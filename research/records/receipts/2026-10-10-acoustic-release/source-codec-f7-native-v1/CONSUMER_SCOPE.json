@@ -1,0 +1,42 @@
+{
+ "source_identity": {
+  "sha256": "c665a93cc5fb9c0f3dd0cb60cd81960764618ab5f0956ead4d8bce03882b445f",
+  "bytes": 68298
+ },
+ "definitions": {
+  "nr_encode": {
+   "first_line": 802,
+   "bytes": 4523,
+   "sha256": "3db4ac6015fef5997997ad785d9c7fbe03401fc8e5bd493932809ce334484cd8"
+  },
+  "nr_decode": {
+   "first_line": 895,
+   "bytes": 3647,
+   "sha256": "10b2b1d798895b61473a91ff7695346d56beb89898eb8215f118510ff223f6ec"
+  },
+  "census_block": {
+   "first_line": 792,
+   "bytes": 119,
+   "sha256": "24155db079c160e52af86c6b90349f9c7404935e49b50e9b1a0779659496543e"
+  },
+  "cell_interval": {
+   "first_line": 463,
+   "bytes": 1975,
+   "sha256": "647d7e1f92d3e823fb7767cfe43ba5a4388a81244b15ecffc8f7bd6a07bb956c"
+  },
+  "actual_encoder_decoder_equality_consumer": {
+   "first_line": 1192,
+   "bytes": 975,
+   "sha256": "8adc46c12111408fdc2a888cae6dda49ec3076077d999cc03c6db687ca8a19a4"
+  }
+ },
+ "owner_identity": {
+  "sha256": "0d454606d0f5735578086ff21ef716256ec58ca4102f90105db4d0acb8134bd3",
+  "bytes": 54537
+ },
+ "affected_fixture_identity": {
+  "sha256": "9cf41dfe354e895f17520f0c7f0124cc8dc22ca80fde6dbd5cc4d2ee2c0f06aa",
+  "bytes": 61791
+ },
+ "header_bits": 70
+}

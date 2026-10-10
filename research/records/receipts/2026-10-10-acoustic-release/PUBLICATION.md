@@ -100,3 +100,51 @@ afterwards, and so carried one private mailbox identifier. The developer binary 
 not retained (it was overwritten in the shared build target). It is bound by its source,
 `ec1b950ad056082a252e750d01775a6b81cb81c7`, and by its build log, SHA-256
 `34534b7cb9b7816b0e997c49e6c13c637c30a95293794179b405a67a0ac361b6`.
+
+## The section word through the field, and the codec whose cells it supplies (`9a5fbaf5`, `f7dd904d`)
+
+**Published source.** The replays of the acoustic branch from `246b8d23` to the section 29 record
+`b0fe5852` ([replay map](REPLAY_SECTION_WORD.md)), merged onto main. The two queue-validated pins are
+`9a5fbaf55629f137d789f33e31ff35699b51f1ce` (tree `cc5ed5b01e51a7a575122bb3e7b5f115cd74b88f`) and
+`f7dd904dc352457678c35775fddc22cd72e0c875` (tree `2957bbcc13b7b22b0ce8da5baee29d0319a998fb`).
+Their replays are `0769f4c9` and `d20f9c3c`. `b0fe5852` adds records and receipts only. The merged
+acoustic sources equal the validated tree.
+
+**The queue's receipts.**
+- **`9a5fbaf5`, the section word's consumer.** Gate (63 doctests) and the nine `acoustic_encoding`
+  fixtures pass. On all 18 carrying frames the ring's section word is founded, admitted and
+  ingested whole, with every carry-out closed and the same moment continued. Four intact runs read
+  their pair relation. Two independent decoders return the whole `SectionWord` with its header. The
+  six departures off the cycle's chart are the residual. `VALIDATION.json` SHA-256 `cb47140420e2ea2fbe2d29300ea00ddae87c00978f0b799938bf0af288a6864f`
+  ([projection](section-word-9a5-native-v1/)).
+- **`f7dd904d`, the source codec at both grains.** Gate (63), the two affected near-return fixtures,
+  a fresh build, and both full grains, run concurrently. The encoder-produced byte vectors decode
+  every sample and the rate exactly from rest, with the inverse tick checked at every tick. Fully
+  charged, with the flags, the 70-bit header and the padding:
+  - quarter grain: 1461704 bits against the cell codec's 1481048 on the same ticks, 19344 fewer;
+  - octant grain: 1344944 bits against 1364296, 19352 fewer.
+
+  `VALIDATION.json` SHA-256 `345e8fb932e2a6f47d48b578dfe6a7e24d03767b095ff56f83f0cd983c7112b8` ([projection](source-codec-f7-native-v1/)).
+
+**Scope.**
+- The section word is ingested on a synthetic declared tone; its amplitude and phase are unbound
+  there.
+- The codec's gain is the ring's own cycles under a fixed 20-tick partition and the near-return's
+  least description. The index of every sample is unchanged, and the gain is not learned content.
+- No retained Field release, learned material, compression of unseen data, or durable format is
+  claimed.
+
+**Failures and custody limits, kept as they happened.**
+- W3's full read reached its deadline: INCOMPLETE, with the projection error recorded.
+- §28's first adapters failed twice: a relation declared over the dictionary, and a carry-out stop
+  taken for entry. §28's F1 was corrected to whole ingestion.
+- The E0599 compile failure's raw log was overwritten when its name was reused, so it survives as a
+  summary only.
+- The f7 queue's first preflight was refused before launch on a unit-name pattern, and its outer
+  launcher failed before preparation. Both are kept in the receipt.
+- The developer projection error of §29's octant run is preserved.
+- Strict all-target clippy remains FAILED (exit 101), without a waiver.
+
+**Projection.** Allowlisted, as before. `HANDOFF.md` is verbatim. The f7 receipt's free `scope`
+text is withheld by the filter; its verbatim handoff states the scope. `ORIGINALS.json` binds every
+private original by size and SHA-256.

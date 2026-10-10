@@ -1,0 +1,716 @@
+{
+ "quarter": {
+  "readings": {
+   "raw_line_number": {
+    "integer": 2,
+    "prime_factorization": [
+     [
+      2,
+      1
+     ]
+    ]
+   },
+   "ring": {
+    "integer": 20,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      5,
+      1
+     ]
+    ]
+   },
+   "source_samples": {
+    "integer": 93680,
+    "prime_factorization": [
+     [
+      2,
+      4
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      1171,
+      1
+     ]
+    ]
+   },
+   "header_bits": {
+    "integer": 70,
+    "prime_factorization": [
+     [
+      2,
+      1
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      7,
+      1
+     ]
+    ]
+   },
+   "fixed_block_ticks": {
+    "integer": 20,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      5,
+      1
+     ]
+    ]
+   },
+   "blocks_read": {
+    "integer": 4684,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      1171,
+      1
+     ]
+    ]
+   },
+   "admitted_blocks": {
+    "integer": 1899,
+    "prime_factorization": [
+     [
+      3,
+      2
+     ],
+     [
+      211,
+      1
+     ]
+    ]
+   },
+   "word_bits_series_sum": {
+    "integer": 89906,
+    "prime_factorization": [
+     [
+      2,
+      1
+     ],
+     [
+      44953,
+      1
+     ]
+    ]
+   },
+   "replaced_cell_bits_series_sum": {
+    "integer": 113940,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      3,
+      3
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      211,
+      1
+     ]
+    ]
+   },
+   "block_flag_bits": {
+    "integer": 4684,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      1171,
+      1
+     ]
+    ]
+   },
+   "emitted_bits_before_padding": {
+    "integer": 1461697,
+    "prime_factorization": [
+     [
+      1461697,
+      1
+     ]
+    ]
+   },
+   "emitted_bytes": {
+    "integer": 182713,
+    "prime_factorization": [
+     [
+      182713,
+      1
+     ]
+    ]
+   },
+   "fully_charged_bits": {
+    "integer": 1461704,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      182713,
+      1
+     ]
+    ]
+   },
+   "padding_bits": {
+    "integer": 7,
+    "prime_factorization": [
+     [
+      7,
+      1
+     ]
+    ]
+   },
+   "cell_codec_bits_on_actual_same_tick_widths": {
+    "integer": 1481047,
+    "prime_factorization": [
+     [
+      1481047,
+      1
+     ]
+    ]
+   },
+   "cell_codec_padding_bits": {
+    "integer": 1
+   },
+   "cell_codec_full_charge_from_width_sum": {
+    "integer": 1481048,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      185131,
+      1
+     ]
+    ]
+   },
+   "fully_charged_source_vs_cell_difference": {
+    "integer": 19344,
+    "prime_factorization": [
+     [
+      2,
+      4
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      13,
+      1
+     ],
+     [
+      31,
+      1
+     ]
+    ]
+   },
+   "raw_uniform_PCM_bits": {
+    "integer": 1498880,
+    "prime_factorization": [
+     [
+      2,
+      8
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      1171,
+      1
+     ]
+    ]
+   },
+   "raw_minus_full_charge_bits": {
+    "integer": 37176,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      1549,
+      1
+     ]
+    ]
+   },
+   "encoded_ms": {
+    "integer": 235452,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      7,
+      1
+     ],
+     [
+      2803,
+      1
+     ]
+    ]
+   },
+   "encode_plus_decode_ms": {
+    "integer": 478183,
+    "prime_factorization": [
+     [
+      41,
+      1
+     ],
+     [
+      107,
+      1
+     ],
+     [
+      109,
+      1
+     ]
+    ]
+   }
+  },
+  "native_actual_readout": {
+   "actual_consumer_conformance": true,
+   "raw_line_number": 2,
+   "octant_grain": false,
+   "ring": 20,
+   "source_samples": 93680,
+   "header_bits": 70,
+   "fixed_block_ticks": 20,
+   "blocks_read": 4684,
+   "admitted_blocks": 1899,
+   "word_bits_series_sum": 89906,
+   "replaced_cell_bits_series_sum": 113940,
+   "block_flag_bits": 4684,
+   "emitted_bits_before_padding": 1461697,
+   "emitted_bytes": 182713,
+   "fully_charged_bits": 1461704,
+   "padding_bits": 7,
+   "cell_codec_bits_on_actual_same_tick_widths": 1481047,
+   "cell_codec_padding_bits": 1,
+   "cell_codec_full_charge_from_width_sum": 1481048,
+   "fully_charged_source_vs_cell_difference": 19344,
+   "raw_uniform_PCM_bits": 1498880,
+   "raw_minus_full_charge_bits": 37176,
+   "source_and_rate_equal_from_actual_byte_vector": true,
+   "encoded_ms": 235452,
+   "encode_plus_decode_ms": 478183,
+   "baseline_is_native_actual_width_sum_not_a_second_emitted_vector": true,
+   "same_invocation_no_persisted_packet_claim": true,
+   "continuing_state_clock_carry_claim_requires_source_binding": true
+  },
+  "charge_composition": {
+   "header": 70,
+   "all_flags": 4684,
+   "near_return_words": 89906,
+   "replaced_tick_classes": 113940,
+   "same_grain_baseline_actual_width_sum": 1481047,
+   "byte_padding": 7,
+   "before_padding_equation": 1461697,
+   "whole_bytes_times8": 1461704,
+   "word_replacement_saving": 24034,
+   "saving_after_every_block_flag": 19350,
+   "padding_difference_baseline_minus_new": -6,
+   "fully_charged_saving_series": {
+    "replacement": 24034,
+    "flags": -4684,
+    "padding": -6,
+    "sum": 19344
+   }
+  },
+  "equality_bound_to_actual_bytevector_and_source_comparison": true,
+  "continuing_decoder_state_and_clock_bound_to_definition_and_per_tick_inverse_checks": true,
+  "fixed_block_partition_not_learned": true,
+  "baseline_is_same_stream_widthsum_not_second_emitted_packet": true
+ },
+ "octant": {
+  "readings": {
+   "raw_line_number": {
+    "integer": 2,
+    "prime_factorization": [
+     [
+      2,
+      1
+     ]
+    ]
+   },
+   "ring": {
+    "integer": 20,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      5,
+      1
+     ]
+    ]
+   },
+   "source_samples": {
+    "integer": 93680,
+    "prime_factorization": [
+     [
+      2,
+      4
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      1171,
+      1
+     ]
+    ]
+   },
+   "header_bits": {
+    "integer": 70,
+    "prime_factorization": [
+     [
+      2,
+      1
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      7,
+      1
+     ]
+    ]
+   },
+   "fixed_block_ticks": {
+    "integer": 20,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      5,
+      1
+     ]
+    ]
+   },
+   "blocks_read": {
+    "integer": 4684,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      1171,
+      1
+     ]
+    ]
+   },
+   "admitted_blocks": {
+    "integer": 1899,
+    "prime_factorization": [
+     [
+      3,
+      2
+     ],
+     [
+      211,
+      1
+     ]
+    ]
+   },
+   "word_bits_series_sum": {
+    "integer": 89906,
+    "prime_factorization": [
+     [
+      2,
+      1
+     ],
+     [
+      44953,
+      1
+     ]
+    ]
+   },
+   "replaced_cell_bits_series_sum": {
+    "integer": 113940,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      3,
+      3
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      211,
+      1
+     ]
+    ]
+   },
+   "block_flag_bits": {
+    "integer": 4684,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      1171,
+      1
+     ]
+    ]
+   },
+   "emitted_bits_before_padding": {
+    "integer": 1344943,
+    "prime_factorization": [
+     [
+      1344943,
+      1
+     ]
+    ]
+   },
+   "emitted_bytes": {
+    "integer": 168118,
+    "prime_factorization": [
+     [
+      2,
+      1
+     ],
+     [
+      84059,
+      1
+     ]
+    ]
+   },
+   "fully_charged_bits": {
+    "integer": 1344944,
+    "prime_factorization": [
+     [
+      2,
+      4
+     ],
+     [
+      84059,
+      1
+     ]
+    ]
+   },
+   "padding_bits": {
+    "integer": 1
+   },
+   "cell_codec_bits_on_actual_same_tick_widths": {
+    "integer": 1364293,
+    "prime_factorization": [
+     [
+      7,
+      1
+     ],
+     [
+      194899,
+      1
+     ]
+    ]
+   },
+   "cell_codec_padding_bits": {
+    "integer": 3,
+    "prime_factorization": [
+     [
+      3,
+      1
+     ]
+    ]
+   },
+   "cell_codec_full_charge_from_width_sum": {
+    "integer": 1364296,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      170537,
+      1
+     ]
+    ]
+   },
+   "fully_charged_source_vs_cell_difference": {
+    "integer": 19352,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      41,
+      1
+     ],
+     [
+      59,
+      1
+     ]
+    ]
+   },
+   "raw_uniform_PCM_bits": {
+    "integer": 1498880,
+    "prime_factorization": [
+     [
+      2,
+      8
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      1171,
+      1
+     ]
+    ]
+   },
+   "raw_minus_full_charge_bits": {
+    "integer": 153936,
+    "prime_factorization": [
+     [
+      2,
+      4
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      1069,
+      1
+     ]
+    ]
+   },
+   "encoded_ms": {
+    "integer": 243912,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      10163,
+      1
+     ]
+    ]
+   },
+   "encode_plus_decode_ms": {
+    "integer": 494763,
+    "prime_factorization": [
+     [
+      3,
+      1
+     ],
+     [
+      83,
+      1
+     ],
+     [
+      1987,
+      1
+     ]
+    ]
+   }
+  },
+  "native_actual_readout": {
+   "actual_consumer_conformance": true,
+   "raw_line_number": 2,
+   "octant_grain": true,
+   "ring": 20,
+   "source_samples": 93680,
+   "header_bits": 70,
+   "fixed_block_ticks": 20,
+   "blocks_read": 4684,
+   "admitted_blocks": 1899,
+   "word_bits_series_sum": 89906,
+   "replaced_cell_bits_series_sum": 113940,
+   "block_flag_bits": 4684,
+   "emitted_bits_before_padding": 1344943,
+   "emitted_bytes": 168118,
+   "fully_charged_bits": 1344944,
+   "padding_bits": 1,
+   "cell_codec_bits_on_actual_same_tick_widths": 1364293,
+   "cell_codec_padding_bits": 3,
+   "cell_codec_full_charge_from_width_sum": 1364296,
+   "fully_charged_source_vs_cell_difference": 19352,
+   "raw_uniform_PCM_bits": 1498880,
+   "raw_minus_full_charge_bits": 153936,
+   "source_and_rate_equal_from_actual_byte_vector": true,
+   "encoded_ms": 243912,
+   "encode_plus_decode_ms": 494763,
+   "baseline_is_native_actual_width_sum_not_a_second_emitted_vector": true,
+   "same_invocation_no_persisted_packet_claim": true,
+   "continuing_state_clock_carry_claim_requires_source_binding": true
+  },
+  "charge_composition": {
+   "header": 70,
+   "all_flags": 4684,
+   "near_return_words": 89906,
+   "replaced_tick_classes": 113940,
+   "same_grain_baseline_actual_width_sum": 1364293,
+   "byte_padding": 1,
+   "before_padding_equation": 1344943,
+   "whole_bytes_times8": 1344944,
+   "word_replacement_saving": 24034,
+   "saving_after_every_block_flag": 19350,
+   "padding_difference_baseline_minus_new": 2,
+   "fully_charged_saving_series": {
+    "replacement": 24034,
+    "flags": -4684,
+    "padding": 2,
+    "sum": 19352
+   }
+  },
+  "equality_bound_to_actual_bytevector_and_source_comparison": true,
+  "continuing_decoder_state_and_clock_bound_to_definition_and_per_tick_inverse_checks": true,
+  "fixed_block_partition_not_learned": true,
+  "baseline_is_same_stream_widthsum_not_second_emitted_packet": true
+ }
+}

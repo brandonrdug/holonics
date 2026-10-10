@@ -1,0 +1,38 @@
+{
+ "test_source_identity": {
+  "sha256": "48055b14bb4f5f50dec89102b3c815e3e279a3256a7922b576039d5b5e16bda0",
+  "bytes": 51014
+ },
+ "definitions": {
+  "ingest_whole": {
+   "first_line": 578,
+   "bytes": 1167,
+   "sha256": "5659044ef0c57abc56adf499d58a5ccf090bf3b72bb3f90c4449d25daa33f467"
+  },
+  "decode_section": {
+   "first_line": 653,
+   "bytes": 1382,
+   "sha256": "260deca7553f6e1d3a609ee11b3ffce1086fd53299b20c4626353d467bdd8c0b"
+  },
+  "decode_runs": {
+   "first_line": 919,
+   "bytes": 2098,
+   "sha256": "0df03b9226473452cfdb8e73f9ae0f777a5ecacaabfdad3c2c81ecdb85a8b545"
+  },
+  "a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole": {
+   "first_line": 709,
+   "bytes": 10301,
+   "sha256": "bdaaf4d9e45c8551c5b185d1d18dee98ada4aa15b69117da28a4518847fb5de1"
+  },
+  "a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_departures_the_residual": {
+   "first_line": 984,
+   "bytes": 7871,
+   "sha256": "e039d4b14f71ec20fc31bfa6319960140c8eb2019e8181f233862cf01949ed0b"
+  }
+ },
+ "source_emission_not_released_retained_SourceMoment": true,
+ "R2_intact_run_relation_not_excluded_substitution_erasure_recovery": true,
+ "developer_binary_tree_fingerprint_and_projection_not_supplied": true,
+ "E0599_raw_overwritten_summary_only": true,
+ "next_f7dd904_source_codec_not_folded_into_this_pin": true
+}

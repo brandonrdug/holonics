@@ -1,0 +1,1003 @@
+{
+ "native_actual_readout": {
+  "actual_consumer_conformance": true,
+  "declared_ring": 1,
+  "settle_ticks": 120,
+  "window_ticks": 120,
+  "hop": 1,
+  "cycle_period": 7,
+  "cycle_support": [
+   1,
+   -2
+  ],
+  "departures": [
+   60,
+   61,
+   62,
+   63,
+   68,
+   75
+  ],
+  "run_ranges": [
+   [
+    0,
+    60
+   ],
+   [
+    64,
+    68
+   ],
+   [
+    69,
+    75
+   ],
+   [
+    76,
+    120
+   ]
+  ],
+  "run_cell_count": 114,
+  "departures_do_not_enter_field": true,
+  "field_admission_and_whole_ingestion_on_all_actual_carrying_frames": 18,
+  "same_moment_continues_across_runs": true,
+  "carry_out_aeon_closes": [
+   14,
+   14,
+   15,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14,
+   14
+  ],
+  "corrected_clean_whole_ingestion_aeon_closes": [
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17,
+   17
+  ],
+  "intact_run_relations": [
+   {
+    "frame": [
+     7,
+     8
+    ],
+    "frame_index": 27,
+    "distance": 7,
+    "map": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ]
+    ],
+    "surviving_distances": [
+     7
+    ]
+   },
+   {
+    "frame": [
+     7,
+     9
+    ],
+    "frame_index": 28,
+    "distance": 7,
+    "map": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ]
+    ],
+    "surviving_distances": [
+     7
+    ]
+   },
+   {
+    "frame": [
+     8,
+     9
+    ],
+    "frame_index": 32,
+    "distance": 7,
+    "map": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ]
+    ],
+    "surviving_distances": [
+     7
+    ]
+   },
+   {
+    "frame": [
+     9,
+     8
+    ],
+    "frame_index": 37,
+    "distance": 7,
+    "map": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      1
+     ]
+    ],
+    "surviving_distances": [
+     7
+    ]
+   }
+  ],
+  "intact_run_pair_relation_is_not_excluded_substitution_or_erasure_recovery": true,
+  "independent_full_SectionWord_header_Eq_assertions_passed_in_source_bound_R3_branches": 2,
+  "departed_emission_cost_series": [
+   {
+    "frame": [
+     7,
+     2
+    ],
+    "frame_index": 22,
+    "header_bits": 28,
+    "after_header_bits": 96,
+    "start_frame_dictionary_departures_bits": 64,
+    "runs_located_code_bits": 32,
+    "full_emission_bits": 124,
+    "near_return_with_start_bits": 75,
+    "spelled_word_with_start_bits": 362,
+    "after_header_minus_near_bits": 21
+   },
+   {
+    "frame": [
+     9,
+     2
+    ],
+    "frame_index": 33,
+    "header_bits": 28,
+    "after_header_bits": 102,
+    "start_frame_dictionary_departures_bits": 64,
+    "runs_located_code_bits": 38,
+    "full_emission_bits": 130,
+    "near_return_with_start_bits": 75,
+    "spelled_word_with_start_bits": 362,
+    "after_header_minus_near_bits": 27
+   }
+  ],
+  "clean_after_header_costs": [
+   {
+    "frame": [
+     7,
+     2
+    ],
+    "values": [
+     22,
+     37,
+     28,
+     20,
+     29,
+     362
+    ]
+   },
+   {
+    "frame": [
+     9,
+     2
+    ],
+    "values": [
+     33,
+     40,
+     28,
+     23,
+     29,
+     362
+    ]
+   }
+  ],
+  "whole_departed_passage_chart_refusal_preserved": true,
+  "source_emission_is_not_released_retained_SourceMoment": true,
+  "no_source_audio_amplitude_phase_learned_deposition_or_compression_claim": true,
+  "same_invocation_no_persisted_emitted_file_claim": true
+ },
+ "cost_series_exact": [
+  {
+   "frame": [
+    7,
+    2
+   ],
+   "exact_readings": {
+    "frame_index": {
+     "integer": 22,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       11,
+       1
+      ]
+     ]
+    },
+    "header_bits": {
+     "integer": 28,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       7,
+       1
+      ]
+     ]
+    },
+    "after_header_bits": {
+     "integer": 96,
+     "prime_factorization": [
+      [
+       2,
+       5
+      ],
+      [
+       3,
+       1
+      ]
+     ]
+    },
+    "start_frame_dictionary_departures_bits": {
+     "integer": 64,
+     "prime_factorization": [
+      [
+       2,
+       6
+      ]
+     ]
+    },
+    "runs_located_code_bits": {
+     "integer": 32,
+     "prime_factorization": [
+      [
+       2,
+       5
+      ]
+     ]
+    },
+    "full_emission_bits": {
+     "integer": 124,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       31,
+       1
+      ]
+     ]
+    },
+    "near_return_with_start_bits": {
+     "integer": 75,
+     "prime_factorization": [
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       2
+      ]
+     ]
+    },
+    "spelled_word_with_start_bits": {
+     "integer": 362,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       181,
+       1
+      ]
+     ]
+    },
+    "after_header_minus_near_bits": {
+     "integer": 21,
+     "prime_factorization": [
+      [
+       3,
+       1
+      ],
+      [
+       7,
+       1
+      ]
+     ]
+    }
+   },
+   "composition": {
+    "header_plus_payload": 124,
+    "payload_residual_plus_runs": 96
+   },
+   "after_header_longer_than_near": true
+  },
+  {
+   "frame": [
+    9,
+    2
+   ],
+   "exact_readings": {
+    "frame_index": {
+     "integer": 33,
+     "prime_factorization": [
+      [
+       3,
+       1
+      ],
+      [
+       11,
+       1
+      ]
+     ]
+    },
+    "header_bits": {
+     "integer": 28,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       7,
+       1
+      ]
+     ]
+    },
+    "after_header_bits": {
+     "integer": 102,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       17,
+       1
+      ]
+     ]
+    },
+    "start_frame_dictionary_departures_bits": {
+     "integer": 64,
+     "prime_factorization": [
+      [
+       2,
+       6
+      ]
+     ]
+    },
+    "runs_located_code_bits": {
+     "integer": 38,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       19,
+       1
+      ]
+     ]
+    },
+    "full_emission_bits": {
+     "integer": 130,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       13,
+       1
+      ]
+     ]
+    },
+    "near_return_with_start_bits": {
+     "integer": 75,
+     "prime_factorization": [
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       2
+      ]
+     ]
+    },
+    "spelled_word_with_start_bits": {
+     "integer": 362,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       181,
+       1
+      ]
+     ]
+    },
+    "after_header_minus_near_bits": {
+     "integer": 27,
+     "prime_factorization": [
+      [
+       3,
+       3
+      ]
+     ]
+    }
+   },
+   "composition": {
+    "header_plus_payload": 130,
+    "payload_residual_plus_runs": 102
+   },
+   "after_header_longer_than_near": true
+  }
+ ],
+ "ingested_run_lengths_exact": [
+  {
+   "integer": 60,
+   "prime_factorization": [
+    [
+     2,
+     2
+    ],
+    [
+     3,
+     1
+    ],
+    [
+     5,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 4,
+   "prime_factorization": [
+    [
+     2,
+     2
+    ]
+   ]
+  },
+  {
+   "integer": 6,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     3,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 44,
+   "prime_factorization": [
+    [
+     2,
+     2
+    ],
+    [
+     11,
+     1
+    ]
+   ]
+  }
+ ],
+ "run_cell_count_exact": {
+  "integer": 114,
+  "prime_factorization": [
+   [
+    2,
+    1
+   ],
+   [
+    3,
+    1
+   ],
+   [
+    19,
+    1
+   ]
+  ]
+ },
+ "departures_count_exact": {
+  "integer": 6,
+  "prime_factorization": [
+   [
+    2,
+    1
+   ],
+   [
+    3,
+    1
+   ]
+  ]
+ },
+ "aeon_close_series_exact": [
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 15,
+   "prime_factorization": [
+    [
+     3,
+     1
+    ],
+    [
+     5,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 14,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  }
+ ],
+ "clean_aeon_close_series_exact": [
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  },
+  {
+   "integer": 17,
+   "prime_factorization": [
+    [
+     17,
+     1
+    ]
+   ]
+  }
+ ],
+ "decoder_Eq_claim_binding": {
+  "ingest_whole": {
+   "first_line": 578,
+   "bytes": 1167,
+   "sha256": "5659044ef0c57abc56adf499d58a5ccf090bf3b72bb3f90c4449d25daa33f467"
+  },
+  "decode_section": {
+   "first_line": 653,
+   "bytes": 1382,
+   "sha256": "260deca7553f6e1d3a609ee11b3ffce1086fd53299b20c4626353d467bdd8c0b"
+  },
+  "decode_runs": {
+   "first_line": 919,
+   "bytes": 2098,
+   "sha256": "0df03b9226473452cfdb8e73f9ae0f777a5ecacaabfdad3c2c81ecdb85a8b545"
+  },
+  "a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole": {
+   "first_line": 709,
+   "bytes": 10301,
+   "sha256": "bdaaf4d9e45c8551c5b185d1d18dee98ada4aa15b69117da28a4518847fb5de1"
+  },
+  "a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_departures_the_residual": {
+   "first_line": 984,
+   "bytes": 7871,
+   "sha256": "e039d4b14f71ec20fc31bfa6319960140c8eb2019e8181f233862cf01949ed0b"
+  }
+ }
+}

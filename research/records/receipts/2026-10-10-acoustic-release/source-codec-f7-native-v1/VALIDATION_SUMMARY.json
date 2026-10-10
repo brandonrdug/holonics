@@ -1,0 +1,2753 @@
+{
+ "source_pin": {
+  "source_commit": "f7dd904dc352457678c35775fddc22cd72e0c875",
+  "source_tree": "2957bbcc13b7b22b0ce8da5baee29d0319a998fb",
+  "source_inputs": {
+   "AGENTS.md": {
+    "sha256": "51e6dc370622fe201fda750773ee0270c2218a17eb508d7add8467492248a2ed",
+    "bytes": 37069
+   },
+   "Cargo.lock": {
+    "sha256": "4380186a0b5ed33a0c6ef3b15822c215072016af539446727800dcd501bde00a",
+    "bytes": 4292
+   },
+   "Cargo.toml": {
+    "sha256": "a9ff455bcb89885c74f5758dd782ec4d3c89bbd31018e89333c4d476ea2dc40f",
+    "bytes": 1160
+   },
+   "crates/README.md": {
+    "sha256": "71bb810675f5a7cca8f1b27bf12f8b4664b10c0f7e7ab9a9c827fc1893e53858",
+    "bytes": 1662
+   },
+   "crates/holonics-cuda/Cargo.toml": {
+    "sha256": "18b25e1b99b09033da5950c3bb6b722085ab60c39adb322dd01dc0b8aec12f33",
+    "bytes": 649
+   },
+   "crates/holonics-cuda/build.rs": {
+    "sha256": "15cf455bd04009bcf138b687df512e7952f147302c29b3f6af3c27b4ffd59194",
+    "bytes": 11927
+   },
+   "crates/holonics-cuda/kernels/exact_integer.cuh": {
+    "sha256": "debeaa8b1fea4d99a979ecc412f3b109d39c2fc63170bffc9269aead56ee9bf4",
+    "bytes": 8317
+   },
+   "crates/holonics-cuda/kernels/hnn.cu": {
+    "sha256": "af7dade8dae88f4b925d8b9770bda1db4700cfd3df5f26d1bd7fded211861870",
+    "bytes": 25210
+   },
+   "crates/holonics-cuda/kernels/hnn_word.cuh": {
+    "sha256": "9fd654bff83267b28efde51d38524303371488ef5d0a8a366289a0800bbd716e",
+    "bytes": 80078
+   },
+   "crates/holonics-cuda/kernels/tree.cu": {
+    "sha256": "78b292ce81aec3855e4cee7f40d764c8e3a8a0ccc7fcbb4a41e381e96ca7e17b",
+    "bytes": 46251
+   },
+   "crates/holonics-cuda/src/bin/mount-smoke.rs": {
+    "sha256": "dcae1004d9697edffb8ae1261f36a9b6c9403d61c7941be74d778c9d3c8be644",
+    "bytes": 6400
+   },
+   "crates/holonics-cuda/src/cuda.rs": {
+    "sha256": "a5ad8f2db28a7e65489d6fd040bd511c4ef897f0623b64b61eab1f9ebd42011c",
+    "bytes": 75709
+   },
+   "crates/holonics-cuda/src/ffi.rs": {
+    "sha256": "f90304f263b2c8d3e261e32973e7c21e3ed1f8eda57246d35a48b6f07e534615",
+    "bytes": 8156
+   },
+   "crates/holonics-cuda/src/hnn/card.rs": {
+    "sha256": "637ae88ad06811a3c6260de8caa28f0479950ab3a2cfdf4b69288e2b1ab00f58",
+    "bytes": 30425
+   },
+   "crates/holonics-cuda/src/hnn/carry.rs": {
+    "sha256": "cb799a71544a9c987ac23c7a53584fa68539540cda8dffe536797c711d4b300f",
+    "bytes": 16404
+   },
+   "crates/holonics-cuda/src/hnn/dyadic.rs": {
+    "sha256": "24d0c05989d2bdae5a76ec264e6aa823bdf033066db0ae4a61e15aae313d7ae1",
+    "bytes": 7971
+   },
+   "crates/holonics-cuda/src/hnn/execute.rs": {
+    "sha256": "97eca583cc8f505b9d4fe603ff0ec6127001834737100e78364f7700c7cc2b7c",
+    "bytes": 67898
+   },
+   "crates/holonics-cuda/src/hnn/lattice.rs": {
+    "sha256": "01d5755a6bafd93f439927fe2ef971c7fd8c8f055dfb3e5dc690cc30ad200d6a",
+    "bytes": 37290
+   },
+   "crates/holonics-cuda/src/hnn/mod.rs": {
+    "sha256": "bbbecfb7dbcd2854ec4bf5e5b4a59d3d55d4bd48c584f391f78d6c51da5dc43c",
+    "bytes": 21064
+   },
+   "crates/holonics-cuda/src/hnn/moment.rs": {
+    "sha256": "8ccc9389f54ea33705db2d182991de746e319b866194772f2d7d74a14e413422",
+    "bytes": 23045
+   },
+   "crates/holonics-cuda/src/hnn/physics_tests.rs": {
+    "sha256": "32df11a9a78c2b04d89a5643b5e3f4a7ab6ac9864bc3a41331d0658306f3f589",
+    "bytes": 11090
+   },
+   "crates/holonics-cuda/src/hnn/port.rs": {
+    "sha256": "9f9cfa4305b99d361f8903f5fb2f3833512cd3c921a8ccb9dc7b84fdb8851cad",
+    "bytes": 89741
+   },
+   "crates/holonics-cuda/src/hnn/port_tests.rs": {
+    "sha256": "f341db9b3fb0d8094b70d7f4ebd8db0f8ebb41e7c6b41122d6da5bedec8a233c",
+    "bytes": 92815
+   },
+   "crates/holonics-cuda/src/hnn/publication.rs": {
+    "sha256": "a3a85008c06e61a8d6ea611f1848600ee367ccc359c8ece710605138dabf0215",
+    "bytes": 20763
+   },
+   "crates/holonics-cuda/src/hnn/readout.rs": {
+    "sha256": "e99fd3db290eff3bf5632ed9a109772e222262cabdce52b16cd5c467459ec72b",
+    "bytes": 55524
+   },
+   "crates/holonics-cuda/src/hnn/store.rs": {
+    "sha256": "bfc2523616104723332095dfd94fc7514bf0ab10be501c8aa7324f4aebde67d3",
+    "bytes": 32537
+   },
+   "crates/holonics-cuda/src/hnn/tests.rs": {
+    "sha256": "77a82888499b6e33c0b11c0ad0ff916031c62b653f7321771d05793c77230946",
+    "bytes": 57001
+   },
+   "crates/holonics-cuda/src/hnn/tree.rs": {
+    "sha256": "c9c50d9005ccf3b0aa07b72adb595adde7fe47c3473c957c904a75ae72f1971f",
+    "bytes": 47146
+   },
+   "crates/holonics-cuda/src/hnn/word.rs": {
+    "sha256": "92a737acd4ea99d44fda14c25da49e5b3a01aea290dae1e23874e12b589cc22b",
+    "bytes": 13728
+   },
+   "crates/holonics-cuda/src/hnn/word_tests.rs": {
+    "sha256": "1b26f752ecb87c8bff089f03202902b5bfc0cd66450acfdbf517d3bc9aec34f8",
+    "bytes": 2651
+   },
+   "crates/holonics-cuda/src/lib.rs": {
+    "sha256": "2c21bb7b3c9bd5512e20f3a59f4f4e7207ddef24b114c2040edb7dca04b4468a",
+    "bytes": 1250
+   },
+   "crates/holonics-cuda/tests/located_ingest.rs": {
+    "sha256": "86db238adba454ebe96dc80f85ee21b129810ccb9dd9dc943deef702bcd67a8a",
+    "bytes": 7123
+   },
+   "crates/holonics/Cargo.toml": {
+    "sha256": "64170e4fac0e1f1b08bfd076b39289dae249ec50e115c720ac252c2cae09c916",
+    "bytes": 1544
+   },
+   "crates/holonics/clippy.toml": {
+    "sha256": "9e24d4bbefb44e67cf54a27844a4136ab421ef21a7abfae475f76acf2a07adc7",
+    "bytes": 1957
+   },
+   "crates/holonics/examples/acoustic_release.rs": {
+    "sha256": "c665a93cc5fb9c0f3dd0cb60cd81960764618ab5f0956ead4d8bce03882b445f",
+    "bytes": 68298
+   },
+   "crates/holonics/examples/helical_duplex.rs": {
+    "sha256": "4ba2841311e5d2d86a6343af85593d2366aec36ca09abc89cbc7decdba33862a",
+    "bytes": 7422
+   },
+   "crates/holonics/src/aeon/epoch.rs": {
+    "sha256": "19e68ecc1c8fabc5203f4007f0e7f43335f045f5203b95199442ba28482e98e3",
+    "bytes": 22842
+   },
+   "crates/holonics/src/aeon/first_law.rs": {
+    "sha256": "02e05fd816f29ba72976da44b74df34a9dc023d7ddcacce4c9cae3b73fca1fb2",
+    "bytes": 26370
+   },
+   "crates/holonics/src/aeon/groupoid.rs": {
+    "sha256": "a2e48359a9a0ea7019c2a2435b053cca10b14830ff0c615094ac6a8223d73181",
+    "bytes": 26932
+   },
+   "crates/holonics/src/aeon/hodge.rs": {
+    "sha256": "bdd8475b2a8dbad2523d0520afa1892fed8ea092c20fe5c8fc8e1de258ae8efb",
+    "bytes": 12999
+   },
+   "crates/holonics/src/aeon/join.rs": {
+    "sha256": "891e9fa752cf1224bdd6cecf7491dffaa92caccf171fb82312026744ae994863",
+    "bytes": 17693
+   },
+   "crates/holonics/src/aeon/lock.rs": {
+    "sha256": "ec5905e52e3fcb215841db21dfdbb399bbf7dab8843f9f3ba5f1d7de283497bd",
+    "bytes": 10949
+   },
+   "crates/holonics/src/aeon/mod.rs": {
+    "sha256": "e2ac911afee55ba27759fe52c144af9381fad5825f938bc5407cb9751d8c1def",
+    "bytes": 10607
+   },
+   "crates/holonics/src/aeon/production.rs": {
+    "sha256": "72ccdb2373e93a3c9cc1d2c686a9f54d535f77a07da23ff0585afd5a89c69d93",
+    "bytes": 34497
+   },
+   "crates/holonics/src/aeon/reading.rs": {
+    "sha256": "0761e5d5d3247d41847859459b5b7ac481d4a3abac47cdb57d9e30edd262d7cd",
+    "bytes": 28656
+   },
+   "crates/holonics/src/compression/cost.rs": {
+    "sha256": "47c71bae4dee52f1dd8ded129afff6d9ec7efb87c1ffedcf4fb7abb38848a1b2",
+    "bytes": 19593
+   },
+   "crates/holonics/src/compression/cost/tests.rs": {
+    "sha256": "00873dd825b70353e8d281b648dbe6266259c5f8f1b0d6cc33ed97b3266168a1",
+    "bytes": 12697
+   },
+   "crates/holonics/src/compression/keys.rs": {
+    "sha256": "67335cc5fe62a10aaa250197270b6473cfcda432a2387e81219e97c831c86da7",
+    "bytes": 21966
+   },
+   "crates/holonics/src/compression/keys/duplex.rs": {
+    "sha256": "48f7f660e3a35896176a8b723fae44a043cd0920ed0935ed451642498f75615d",
+    "bytes": 60827
+   },
+   "crates/holonics/src/compression/keys/duplex/tests.rs": {
+    "sha256": "1f3a651be1952fb7f24a4d79c446ff14ff2aa201609d0e5eaa2897bc5ab9875a",
+    "bytes": 88098
+   },
+   "crates/holonics/src/compression/keys/edges.rs": {
+    "sha256": "031c6b3ba5bee51091b0067d47db8177202adb7e05ebc297258332859c6a3fcd",
+    "bytes": 18132
+   },
+   "crates/holonics/src/compression/keys/frames.rs": {
+    "sha256": "3ed5ca4b72c1b659d6d2ac62697dd89119411fb75f5fd47c7396fd170cfe6698",
+    "bytes": 14056
+   },
+   "crates/holonics/src/compression/keys/local.rs": {
+    "sha256": "143d411df79d321648b5f00d74d185aa5622cd52385d8ed1ebfb2b16ecd16279",
+    "bytes": 20107
+   },
+   "crates/holonics/src/compression/keys/local/tests.rs": {
+    "sha256": "6542837c44d16bbfaf383fd6838aebcb0a870772ec8b133ff756202b52d88698",
+    "bytes": 8031
+   },
+   "crates/holonics/src/compression/keys/repair.rs": {
+    "sha256": "be69d14b09c7ec6578e46f83d5f6802321f99ddbca5c708ca224276da0f74156",
+    "bytes": 24181
+   },
+   "crates/holonics/src/compression/keys/repair/tests.rs": {
+    "sha256": "02490fffb036d03dd407fb171c1fd4cd4f1890533543eb46fa652f898d148895",
+    "bytes": 10632
+   },
+   "crates/holonics/src/compression/keys/tests.rs": {
+    "sha256": "98e119b40d456017941f586726561cd969ffd168986e8ae85635354db9303d3f",
+    "bytes": 12675
+   },
+   "crates/holonics/src/compression/keys/transport.rs": {
+    "sha256": "57f4d4b8f6c4a3ca01ef53788ae66ba57d443bd0b5edbdca1695962f29ecd809",
+    "bytes": 61674
+   },
+   "crates/holonics/src/compression/keys/transport/tests.rs": {
+    "sha256": "d276e5fea67d2701496343700c4b41a15527d22ee94c197e5cb73d5b3eecf362",
+    "bytes": 25500
+   },
+   "crates/holonics/src/compression/keys/turns.rs": {
+    "sha256": "7dfcc2a199da6b3ac30fc32d18d82cb7541c1a0a671763e7f91df7df0b1fdd18",
+    "bytes": 17206
+   },
+   "crates/holonics/src/compression/landmark.rs": {
+    "sha256": "b2020bb401cf404e3fdbdd4aaf8eb4e806d2556f7e2750e2ff54fde4ee05a573",
+    "bytes": 4925
+   },
+   "crates/holonics/src/compression/landmark/context.rs": {
+    "sha256": "5f5e718eee55408f0b6827210acbd99fb7b9414c76af090cbd4cb9c7de8f0efc",
+    "bytes": 263781
+   },
+   "crates/holonics/src/compression/landmark/context/baseline.rs": {
+    "sha256": "413f6c3f0d94127b94aec763bca73fde869d8d64aaa883550e20ef2cdb53cf51",
+    "bytes": 10550
+   },
+   "crates/holonics/src/compression/landmark/context/sections.rs": {
+    "sha256": "f0843ade9a2a7340b268edd80c8b430f395fb3b3afaa68ba1c7e541dda24deed",
+    "bytes": 5059
+   },
+   "crates/holonics/src/compression/landmark/context/tests.rs": {
+    "sha256": "bab40109ec3c9375094725afef6522b929791b3f731e5c2dd5de5a2787d708df",
+    "bytes": 111230
+   },
+   "crates/holonics/src/compression/landmark/context/tests/full.rs": {
+    "sha256": "a26897aa77ff642f55e185564efaedb77b94a1e5d4bd5a0da0aadf1c2cd685f5",
+    "bytes": 9232
+   },
+   "crates/holonics/src/compression/landmark/mobius.rs": {
+    "sha256": "385b851ddc4462c8cdd118bde46697caf731d338b764a0f4a05b250386a4092b",
+    "bytes": 27570
+   },
+   "crates/holonics/src/compression/landmark/quadratic.rs": {
+    "sha256": "b75c5fdfd2db5d747123ba5540a25c36e2a7d74dc7530bc4c4e28f76ecf5ffaf",
+    "bytes": 10655
+   },
+   "crates/holonics/src/compression/landmark/site.rs": {
+    "sha256": "da336b8bbb3a7ddac4751da10f9e41d8cb52094f746c24e3a517cddc9129c621",
+    "bytes": 27824
+   },
+   "crates/holonics/src/compression/mod.rs": {
+    "sha256": "2870e07f0d35dcd9c8c21bff8d480bb362a164402fa87cc8fdb1a4cd1202f2ea",
+    "bytes": 9169
+   },
+   "crates/holonics/src/compression/resonance.rs": {
+    "sha256": "faabd9076873c12ad297b71ca25b7afd6ce7e035ce4cf20d89635f6683914011",
+    "bytes": 18058
+   },
+   "crates/holonics/src/exterior_guards.rs": {
+    "sha256": "ac1a5008df895cd34bb05570bdf630d67fe7edc4bf8de261b46b1ff11bbace3d",
+    "bytes": 11595
+   },
+   "crates/holonics/src/geometry/complex.rs": {
+    "sha256": "6f13385b17eb5a0bc9f3609539fe7f92b4c1915a3394107f32b7b3f8a76b9396",
+    "bytes": 36085
+   },
+   "crates/holonics/src/geometry/exact.rs": {
+    "sha256": "8ff996a5878c7f97d6debb3d7a7f4f11733644cbc4c917b7154c9545ea6d68fe",
+    "bytes": 9605
+   },
+   "crates/holonics/src/geometry/mod.rs": {
+    "sha256": "e9686f8ed6626939a09c16e08dbf1afa6a8995d2929e8ccebed8cd00e8dcda35",
+    "bytes": 1292
+   },
+   "crates/holonics/src/geometry/motion.rs": {
+    "sha256": "1ce22c85fc4c230f5dc642d393d77c0111779d890f56e171ba597ece7980e345",
+    "bytes": 20023
+   },
+   "crates/holonics/src/geometry/screw.rs": {
+    "sha256": "0f5ac4bfb3c651f6e1bff125d8c78fae87e7b08fd67ca13f92cf478b66deceeb",
+    "bytes": 21308
+   },
+   "crates/holonics/src/geometry/swing.rs": {
+    "sha256": "a98e3cbb084058fd8a3b552b501fbff273ed21c4f34387f65b959209d51e369b",
+    "bytes": 11216
+   },
+   "crates/holonics/src/geometry/winding.rs": {
+    "sha256": "ca5a8f4417b638edc922cd6ef12d1b8e6ac0ad04b4e446d4ab2cd271a8fb72c0",
+    "bytes": 10566
+   },
+   "crates/holonics/src/geometry/winding/tests.rs": {
+    "sha256": "11d3b79af579138cf28de806e4d33fc96fc6955ca1c860226e1f07d0368034fa",
+    "bytes": 9386
+   },
+   "crates/holonics/src/hnn/chart.rs": {
+    "sha256": "c2619c3fa102bc5e1349779687d0c197e69251414536ca403da3b4e424446bdf",
+    "bytes": 41658
+   },
+   "crates/holonics/src/hnn/constitution.rs": {
+    "sha256": "81a38c59cab7aeb2e5647fd195d674d36f6a7edd5b2edc21c145dbca6c8e567b",
+    "bytes": 508074
+   },
+   "crates/holonics/src/hnn/contact.rs": {
+    "sha256": "6e07667b40c038eb1884ed192501bc6042ea20a49aa9d932ed9cfa251827f5d5",
+    "bytes": 37045
+   },
+   "crates/holonics/src/hnn/dynamic_section.rs": {
+    "sha256": "089529a2a8aafb0cf0f737dd225f2468839c103a1fffe5ea02870fc3c52595d1",
+    "bytes": 23017
+   },
+   "crates/holonics/src/hnn/encoding.rs": {
+    "sha256": "50152ce0f52a501ec08e9cd0b7981950f8173ec4dcfe5a66286ad48d94bf9739",
+    "bytes": 59224
+   },
+   "crates/holonics/src/hnn/executed.rs": {
+    "sha256": "515c04b41f8bce389a367c19527721647d6faf4087411b77c92a55b003a0f91e",
+    "bytes": 17070
+   },
+   "crates/holonics/src/hnn/field.rs": {
+    "sha256": "7a77cc8452b7b40d9001bc1ab8d784d4e138293dc2f4bdefb20eb683616daee4",
+    "bytes": 119036
+   },
+   "crates/holonics/src/hnn/keys.rs": {
+    "sha256": "6b3d12bc909fe7c4e0e24f443a0313df16cee0460bef0b7db14da76652a44d8f",
+    "bytes": 30498
+   },
+   "crates/holonics/src/hnn/mod.rs": {
+    "sha256": "33b9ce71a972f26d499e8fd0d8dab6f9689b55d7b3e567781a53d006b9c4ef21",
+    "bytes": 36509
+   },
+   "crates/holonics/src/hnn/moment.rs": {
+    "sha256": "7326eddd18b35745c19525e24c4421f64ede9970921f88340882fb11d25d0383",
+    "bytes": 125489
+   },
+   "crates/holonics/src/hnn/paired.rs": {
+    "sha256": "06d3073e0babe29d16af79e4baa5726299c041aeb9f006192ec770a2ea53b350",
+    "bytes": 60947
+   },
+   "crates/holonics/src/hnn/paired/tests.rs": {
+    "sha256": "8efde82f403326ad185278d81863bde1cff83d67b7c6c48d2e0d8470b727bf24",
+    "bytes": 87447
+   },
+   "crates/holonics/src/hnn/pending.rs": {
+    "sha256": "092d05ce266079a07bec53f067adc586eb83b94926530149c93ad44ad6f20332",
+    "bytes": 13935
+   },
+   "crates/holonics/src/hnn/phase_family.rs": {
+    "sha256": "f3065ab9379a30125d4f8bbf0544a3393507453a722432407f18c89e622275ea",
+    "bytes": 81647
+   },
+   "crates/holonics/src/hnn/physical.rs": {
+    "sha256": "6276a5d93a27bc00553912c98bbd0ed1898b27b0511b0861255f6d1a3f814cc1",
+    "bytes": 13037
+   },
+   "crates/holonics/src/hnn/physical/action.rs": {
+    "sha256": "c680a9af3944c45246fad459016e9fba7809cf6689311200156fa9ff0dadc4f2",
+    "bytes": 100876
+   },
+   "crates/holonics/src/hnn/physical/action/model.rs": {
+    "sha256": "dc048bc9f77c29744d9be5e21387297946d46d8308444c6fad5cedb2173c4414",
+    "bytes": 51750
+   },
+   "crates/holonics/src/hnn/physical/action/world.rs": {
+    "sha256": "1866cefaf011dbdaae34ddfbdf5f2cd226bd5ad2acd00d33badc1bca581a27da",
+    "bytes": 17956
+   },
+   "crates/holonics/src/hnn/physical/communication.rs": {
+    "sha256": "148aa1283b5b37cbae457af109deb0fced0d3d700805c6162f624b800069c348",
+    "bytes": 17142
+   },
+   "crates/holonics/src/hnn/physical/contact.rs": {
+    "sha256": "f566bdb53532eebee2ae19deafc4ec1387672d20fdc13329092ee7ef529e723f",
+    "bytes": 19196
+   },
+   "crates/holonics/src/hnn/port.rs": {
+    "sha256": "6220efd8592b0bdaec7e5315b26eed07a92b7a635523d04a40e74d730595b274",
+    "bytes": 71910
+   },
+   "crates/holonics/src/hnn/prediction.rs": {
+    "sha256": "d861d6e6380c8be2175933cb829f7b384009292362667ce5760da66440607faa",
+    "bytes": 198403
+   },
+   "crates/holonics/src/hnn/prediction/charted.rs": {
+    "sha256": "3ab52894893cc886733687e466053edf856ac78706982bc68cb5e32d55a07f8d",
+    "bytes": 50604
+   },
+   "crates/holonics/src/hnn/prediction/charted/linear_radius.rs": {
+    "sha256": "aa54bb088760db2bc3dccac49fa9eab9aa40005496fac725e9804083d4d91337",
+    "bytes": 6296
+   },
+   "crates/holonics/src/hnn/propagation.rs": {
+    "sha256": "383d9d5ac00d5a860e13d9b206751ac8c5df47a4abf38cf5ca2fd88cee896848",
+    "bytes": 67467
+   },
+   "crates/holonics/src/hnn/ratio.rs": {
+    "sha256": "228329e2435b46c36ce05f3d82d54cef4021b51ff986f9e0ba7ffa7e7e6a0b8c",
+    "bytes": 28647
+   },
+   "crates/holonics/src/hnn/realization.rs": {
+    "sha256": "d6daddbf8cc69ee9d546862a1bfc22e05cc27a70ee835455c9016d1062400c5a",
+    "bytes": 6393
+   },
+   "crates/holonics/src/hnn/receiving.rs": {
+    "sha256": "6b61b28f08e2b56c51b8a3e72c554ef9aadd109f6d1b32e5d58cff1ad11c4b85",
+    "bytes": 99700
+   },
+   "crates/holonics/src/hnn/receiving/declaration.rs": {
+    "sha256": "9be4102908e728c7566428ade4881de65c4b41b244008ac2b82c0bdb4de127ab",
+    "bytes": 13691
+   },
+   "crates/holonics/src/hnn/reference.rs": {
+    "sha256": "4f4b604b7e0125a81b7d9bf7a5cd8c87e012b2d7dd2619d7c09a37be3ea5ce1a",
+    "bytes": 223146
+   },
+   "crates/holonics/src/hnn/reference/continuation.rs": {
+    "sha256": "cc8f40d28b4267f2354ddef171094ea2cbb3d6bafee6f43d1dd5abf9fafd7afa",
+    "bytes": 31299
+   },
+   "crates/holonics/src/hnn/reference/interaction.rs": {
+    "sha256": "e459e80b95a8b694fa9fd134a05b40c45f0fab1c6020d986b3762c521282a849",
+    "bytes": 19385
+   },
+   "crates/holonics/src/hnn/reference/passage.rs": {
+    "sha256": "ceea35f639d22f1b05587a1b38ff08c3193f209782e22363e1a886a2ec5000d7",
+    "bytes": 13029
+   },
+   "crates/holonics/src/hnn/retention.rs": {
+    "sha256": "287e881f98cf9d05969b2f0f3969bb7084320b873761c9d790dd04855b69a118",
+    "bytes": 30391
+   },
+   "crates/holonics/src/hnn/ring.rs": {
+    "sha256": "b30bdc76f6e8cbfcc41cfae426803691ff67444039377185837a05ff7765c7cb",
+    "bytes": 181691
+   },
+   "crates/holonics/src/hnn/section_lock.rs": {
+    "sha256": "0d454606d0f5735578086ff21ef716256ec58ca4102f90105db4d0acb8134bd3",
+    "bytes": 54537
+   },
+   "crates/holonics/src/hnn/state_text.rs": {
+    "sha256": "2bb767b8dabc3eaf564873d0ab843f35d154a8551542a409045e821b0155997d",
+    "bytes": 1964
+   },
+   "crates/holonics/src/hnn/tests/chart.rs": {
+    "sha256": "8e68c257478b70719a5f6e3519db66fd92ff514513b393e5b0adee7516e05c05",
+    "bytes": 16139
+   },
+   "crates/holonics/src/hnn/tests/constitution.rs": {
+    "sha256": "12786ecf1aa38c77fef3f33a0ee88276e2e6db8776b253d4c521073b2402df74",
+    "bytes": 131506
+   },
+   "crates/holonics/src/hnn/tests/contact_residual.rs": {
+    "sha256": "c2e6bf8644804f9bbca1022776b01523dee0e89ea391643f67cebbf1ddece490",
+    "bytes": 28458
+   },
+   "crates/holonics/src/hnn/tests/encoding.rs": {
+    "sha256": "f8cd5512219a3f4dba60aa202b9f649af3d7df2b5dc3f6e91df10b77d3344fd0",
+    "bytes": 21151
+   },
+   "crates/holonics/src/hnn/tests/executed.rs": {
+    "sha256": "2743e09de9071e89e230d61560a8291c53f89be308c4b351f31f370b27325e34",
+    "bytes": 29817
+   },
+   "crates/holonics/src/hnn/tests/field.rs": {
+    "sha256": "89424a0a8997e800ce5ec0e189902301581aee2fd2ecf848aae86ed580f02f47",
+    "bytes": 25126
+   },
+   "crates/holonics/src/hnn/tests/finite_decrease.rs": {
+    "sha256": "d3e06b9a78af07e57c264ed4e978d5dc8b6dbe5c4556850eb50bc718cbe02e08",
+    "bytes": 44652
+   },
+   "crates/holonics/src/hnn/tests/floquet.rs": {
+    "sha256": "17732721e670ab57d45431328f7862203d8404cf68e4cb2ce15be75c80c26f8b",
+    "bytes": 49983
+   },
+   "crates/holonics/src/hnn/tests/guards.rs": {
+    "sha256": "6f256581402acfe0fae873a411a62ca2adf2181b2bd93a79bd0163f5aadc9c85",
+    "bytes": 13897
+   },
+   "crates/holonics/src/hnn/tests/keys.rs": {
+    "sha256": "c03889988225553330e737e26d0e1108fb51fc9628644c7ea5c934eeeb10da11",
+    "bytes": 26822
+   },
+   "crates/holonics/src/hnn/tests/learning.rs": {
+    "sha256": "7f29eba2b75e772aeaadd6cae2b5f223338daf69c144706e877e9085638aaac1",
+    "bytes": 11418
+   },
+   "crates/holonics/src/hnn/tests/loaded_scalar.rs": {
+    "sha256": "a53e89e341c0e5b0f09fdca82cd6937a896ce3ffa4b1f833f4ff743563899df5",
+    "bytes": 3962
+   },
+   "crates/holonics/src/hnn/tests/material_tangent.rs": {
+    "sha256": "c9aa1e58be1cd04217a2ac7d298274b06c8235ab553f7bbfd6bbb2a9a8164c7e",
+    "bytes": 13065
+   },
+   "crates/holonics/src/hnn/tests/mod.rs": {
+    "sha256": "47bd3ddc23711f8d0176d124a899131a5d9260f85a6b0e9b854044089538c639",
+    "bytes": 689
+   },
+   "crates/holonics/src/hnn/tests/moment.rs": {
+    "sha256": "a002bc2a07194a74b3eb201edc89166f13b3577ec6aeba0e5a5e88219090643b",
+    "bytes": 37039
+   },
+   "crates/holonics/src/hnn/tests/pending.rs": {
+    "sha256": "eef9d986b1e328ebaaae5a8776d4a31493a3e43bd47fda3af4e3d7c042ba0274",
+    "bytes": 7479
+   },
+   "crates/holonics/src/hnn/tests/physical.rs": {
+    "sha256": "895df8ea4ec14d0a665e0b3b42bc7a4dcaa005b2f9b032a6767305297d2e8128",
+    "bytes": 48917
+   },
+   "crates/holonics/src/hnn/tests/physical_charted.rs": {
+    "sha256": "c5eb98795e16a1fe15e73e4cedd71f678bbde2c197856c770d6d082bf1a81f8d",
+    "bytes": 21568
+   },
+   "crates/holonics/src/hnn/tests/physical_communication.rs": {
+    "sha256": "9fbcf6bbaca7e4f83a4845740830d726f35dd53c2bdedb50246143249a76d530",
+    "bytes": 169366
+   },
+   "crates/holonics/src/hnn/tests/physics.rs": {
+    "sha256": "7d58e4fe8cc16ab179750bd97330f2a60cce3f479d234c827b272c3f6f8447ed",
+    "bytes": 64392
+   },
+   "crates/holonics/src/hnn/tests/port.rs": {
+    "sha256": "ec912210cf852fa4886c20e3216d46927930b3bb7434b42dbcb00216df9692c5",
+    "bytes": 65278
+   },
+   "crates/holonics/src/hnn/tests/prediction.rs": {
+    "sha256": "ac96444434e0dea56efd67f9e9eb0abca684a3452621a88c3cc4bfefb968326a",
+    "bytes": 175394
+   },
+   "crates/holonics/src/hnn/tests/prior_carry.rs": {
+    "sha256": "de3787f153e7c6fc50d7392745b57b80c35b826f2afd176055c5695c1f7a0865",
+    "bytes": 25213
+   },
+   "crates/holonics/src/hnn/tests/propagation.rs": {
+    "sha256": "6c21e6729e2b1d44d1fbc319000e96130d85741ab9a5936c3395dd8d3744fdb1",
+    "bytes": 49477
+   },
+   "crates/holonics/src/hnn/tests/ratio.rs": {
+    "sha256": "c5e4018f9848ffc1ec32f50357e57608a15b429fab9cd8610045742abffa74f5",
+    "bytes": 16437
+   },
+   "crates/holonics/src/hnn/tests/rebase_boundary.rs": {
+    "sha256": "757a189a6920cca8ff9ca89644b2300ccde60113d037ba7897a36d83e3fd1d5e",
+    "bytes": 15572
+   },
+   "crates/holonics/src/hnn/tests/receiving.rs": {
+    "sha256": "6efac0e41141252cc9e42ca72da902019cb950f0e3b917d4f9665ad91fb8d0d0",
+    "bytes": 70737
+   },
+   "crates/holonics/src/hnn/tests/reference.rs": {
+    "sha256": "5fa535641b08a9cd59debc02c9fa6127540715c257c87278f54de90c99a36efe",
+    "bytes": 62158
+   },
+   "crates/holonics/src/hnn/tests/resonator_deposit.rs": {
+    "sha256": "18fe10dc13a0598b5c68d7e275c7c4e2be39c896979a4ecbe6cc9bce5994726f",
+    "bytes": 21882
+   },
+   "crates/holonics/src/hnn/tests/retention.rs": {
+    "sha256": "7266187657e877f40481466730831522074466668a81443e149e5b212960a5ce",
+    "bytes": 55080
+   },
+   "crates/holonics/src/hnn/tests/support.rs": {
+    "sha256": "7d4bfa4a66210a0b4482dc777a2af12c9a322e5195d5d44a03a7c5233e8ea929",
+    "bytes": 19532
+   },
+   "crates/holonics/src/hnn/tests/word.rs": {
+    "sha256": "f32470c088dee3f6fa01907891a2238d14a783faa811f8d3ff72db681c432edd",
+    "bytes": 12411
+   },
+   "crates/holonics/src/hnn/wave.rs": {
+    "sha256": "f32dbb21cb08dc771a2fce332ac36178583af6f79274288807c304d5432bda17",
+    "bytes": 24191
+   },
+   "crates/holonics/src/hnn/word.rs": {
+    "sha256": "ba2b3ab0e62f98596f3f3c0b05f44badb6f8e2bf82a53d18aa9ff24f8cfb3985",
+    "bytes": 148289
+   },
+   "crates/holonics/src/hnn/word/action.rs": {
+    "sha256": "c07e1373836650d36b44a2e54640522298570f435402297896e7ae8749bd795f",
+    "bytes": 46189
+   },
+   "crates/holonics/src/hnn/word/action_return.rs": {
+    "sha256": "8ffd61392acb974ed537e35b4ad99713cb4fcc2ac2f5b1835589614a74685833",
+    "bytes": 7080
+   },
+   "crates/holonics/src/hnn/word/continuation.rs": {
+    "sha256": "0d5be1d7703c772baa8afea4b642ba6cacce2f493520cff2a80d449ad7dc20f7",
+    "bytes": 105436
+   },
+   "crates/holonics/src/hnn/word/finite_gain.rs": {
+    "sha256": "0085927e3358f18262db3c02c868f5a2b6f8095cc54bf28481d165e618009020",
+    "bytes": 17295
+   },
+   "crates/holonics/src/hnn/word/variation.rs": {
+    "sha256": "3cff6d989573b7f108e4da664c99f48e81f6a301a7898eb8d6d22c523ef4b24d",
+    "bytes": 33133
+   },
+   "crates/holonics/src/hnn/word/variation/gain.rs": {
+    "sha256": "0bfffe2f788b2b002b1ee5d2d28245f90c70b55f99d19f6d27df9b83e41e9ec2",
+    "bytes": 24844
+   },
+   "crates/holonics/src/hnn/word/variation/rebase.rs": {
+    "sha256": "757ea2c483f8ebd8027111a22c958fa8076173c5d6dab97184ce4051576f767f",
+    "bytes": 32547
+   },
+   "crates/holonics/src/hnn/word/work.rs": {
+    "sha256": "1710ab55822f882c3d0d21fcaa42565c62221632b0061840da3724495f75b459",
+    "bytes": 5515
+   },
+   "crates/holonics/src/hnn/word/world_boundary.rs": {
+    "sha256": "4ab114da64f3e914d2309e1cebbf419abbe29f1fff50b14d27c8d22ba0e8bef8",
+    "bytes": 4006
+   },
+   "crates/holonics/src/holarchy/gluing.rs": {
+    "sha256": "7076f731eb028c169ffae7ffd307103e886a04063300ae21e03d1cc34a73d8b0",
+    "bytes": 38035
+   },
+   "crates/holonics/src/holarchy/mod.rs": {
+    "sha256": "4c3c3e786eaa085fbe482e7dfcbda4366d3846bb5f8c99e63627ab3c5c1ffc8b",
+    "bytes": 27077
+   },
+   "crates/holonics/src/holarchy/terrain/chase.rs": {
+    "sha256": "6c3894adc1e792f29d1f76b9520814c4b72e739bb403aedb8fc2f3f0c1fc001a",
+    "bytes": 56847
+   },
+   "crates/holonics/src/holarchy/terrain/chase_tests.rs": {
+    "sha256": "d149a0fe0a01cd57dab3682d8c7d7748f88101e68885f1743bbb7854df564572",
+    "bytes": 46303
+   },
+   "crates/holonics/src/holarchy/terrain/crib.rs": {
+    "sha256": "45d8c5b7f68d4cfd38900bb1808169c2801faa23a2ca6bd0ed4d88b78153c5d6",
+    "bytes": 4271
+   },
+   "crates/holonics/src/holarchy/terrain/known.rs": {
+    "sha256": "2252ebc84dde432b7027d71996506ac471d2feace40f4fbdd2b7a777cbe17106",
+    "bytes": 12890
+   },
+   "crates/holonics/src/holarchy/terrain/mod.rs": {
+    "sha256": "bcd7f37f7bcef44fc2e926a1472cbf9fde4a62f9826fd1225caaaf38de59621e",
+    "bytes": 12526
+   },
+   "crates/holonics/src/holarchy/terrain/moire.rs": {
+    "sha256": "bcf9a1499a3ad561d766dc598ed596b7c31461dda545392d19285024ef7649bc",
+    "bytes": 17282
+   },
+   "crates/holonics/src/holarchy/terrain/pursuit.rs": {
+    "sha256": "af43f56795774266758b0ca0fc74e72e1d48f345d6c41085ba44619cfad8d3d8",
+    "bytes": 62351
+   },
+   "crates/holonics/src/holarchy/terrain/sensing.rs": {
+    "sha256": "f4bfb5bb32402039d7fdba193e84e3baf22667559d9db2648d8c81b1ca3445fc",
+    "bytes": 21820
+   },
+   "crates/holonics/src/holarchy/terrain/sensing_tests.rs": {
+    "sha256": "9a9db8e6ac026539a7e1e102008536448afeec90b20b5ca0eb2e6c4adb4e1933",
+    "bytes": 16730
+   },
+   "crates/holonics/src/holarchy/terrain/source.rs": {
+    "sha256": "59a1c7362e9ca7690d06cafede0725517526cd883067002a72f3bd50b7c471ce",
+    "bytes": 31318
+   },
+   "crates/holonics/src/holarchy/terrain/switching.rs": {
+    "sha256": "51590fd7ff814dbdd4a91350d3b9acf7816d129a0c0db048585536c50c81474b",
+    "bytes": 7650
+   },
+   "crates/holonics/src/holarchy/terrain/tests.rs": {
+    "sha256": "6607b889e222bf0e546d5ff3bdf77bfee782cef5cc8844e741b4c7dfc5c01e06",
+    "bytes": 16800
+   },
+   "crates/holonics/src/holarchy/tests.rs": {
+    "sha256": "78f915d2489e1e826e9cc1cb1e355b0ddaf5dfb811367208f5ccb9def1dbac42",
+    "bytes": 35541
+   },
+   "crates/holonics/src/holarchy/view.rs": {
+    "sha256": "394e31eb24dee652c690d738fcf96b18f59f9b795adb0e5eb4ab7cb6c1a526a7",
+    "bytes": 15932
+   },
+   "crates/holonics/src/holon/conformance.rs": {
+    "sha256": "b84e602a91a9bf24f773ba1a45227acbabf9d3ef276eda7e168c00d5cf3e39da",
+    "bytes": 35585
+   },
+   "crates/holonics/src/holon/contact.rs": {
+    "sha256": "20d0316d1424c0f1930921d53a9051706044b7aad980c25a07481454d5a39479",
+    "bytes": 52333
+   },
+   "crates/holonics/src/holon/contact/menu.rs": {
+    "sha256": "c455941738139e4d08a7bdf0aaa45f5aab79747956e874e6dfbf13114025e160",
+    "bytes": 12179
+   },
+   "crates/holonics/src/holon/deposition.rs": {
+    "sha256": "164ee9a8371e1d89d842c6cff4ac0dd3f9f1a9a017e57f05d1ffc9eda844b6b3",
+    "bytes": 49598
+   },
+   "crates/holonics/src/holon/dirac.rs": {
+    "sha256": "738810b57ae629e9354c354678aee4ea140f0d215b8cb870ead6660e07bf6940",
+    "bytes": 33263
+   },
+   "crates/holonics/src/holon/element.rs": {
+    "sha256": "3ec07b3d2fb78aaf1b0ef17460e79e611195e1433445a969f40cac797c4526ae",
+    "bytes": 9990
+   },
+   "crates/holonics/src/holon/element/contact.rs": {
+    "sha256": "41a947bbe3ca180a809d37ef4c8d5d4a1ef93bd897d5c1f8ba8e68bf5439eb40",
+    "bytes": 4832
+   },
+   "crates/holonics/src/holon/law.rs": {
+    "sha256": "80366830ad5f9bc949b093f5a574273a99c0bb53ccb67d86f9d7ad795f5779ef",
+    "bytes": 24095
+   },
+   "crates/holonics/src/holon/mod.rs": {
+    "sha256": "cae7f90c30da6ce2cb42b9ba916a3db7012e8efab2629daa58e6d524d3f3de26",
+    "bytes": 34249
+   },
+   "crates/holonics/src/holon/parametron.rs": {
+    "sha256": "25b6df1023761fbbb0442c314d97c65a9a2473e067f9359e96db847205aafd31",
+    "bytes": 29429
+   },
+   "crates/holonics/src/holon/parametron/loaded.rs": {
+    "sha256": "e54a1126bb99761af613c6d6272343aadab69cadcb3817cfca769a7e89a422b8",
+    "bytes": 22304
+   },
+   "crates/holonics/src/holon/parametron/mounted.rs": {
+    "sha256": "3009606b8f21dcf98b99df3fdf66b6b3651c91a710af20798b4c5706cbb0b965",
+    "bytes": 6423
+   },
+   "crates/holonics/src/holon/port.rs": {
+    "sha256": "080016ede397f88f32a9277245b10563048c4189e1bc2b3e25d14e20c9d3e7d1",
+    "bytes": 10322
+   },
+   "crates/holonics/src/holon/restriction.rs": {
+    "sha256": "e4793320d666786e4ea0f3eb75f80d33767d25d034fb3f3f70c8d6273805bd2e",
+    "bytes": 22136
+   },
+   "crates/holonics/src/holon/restriction/descent.rs": {
+    "sha256": "8043e19886bc5efd55bb68e76d30efab3c7db777b22ba6ecd49ff949497d5a9e",
+    "bytes": 15455
+   },
+   "crates/holonics/src/holon/restriction/fibre.rs": {
+    "sha256": "6657ca1aaeae87bf6f2e86fa1d4c7c560b5d7f7bef0e22d84fa0af337970b89e",
+    "bytes": 14091
+   },
+   "crates/holonics/src/holon/restriction/linear.rs": {
+    "sha256": "26cae1e60ca8fe9dcf8ebfb8353b5f4591a88f9590c6f6c9d18134a4afc78b09",
+    "bytes": 11182
+   },
+   "crates/holonics/src/holon/restriction/tower.rs": {
+    "sha256": "1995980fcd8e61d8c92fb71fdf1ffd1951924092fec5563c1d92ba72c7755c90",
+    "bytes": 107102
+   },
+   "crates/holonics/src/holon/restriction/tower/tests.rs": {
+    "sha256": "35cac77cf4a24dce92ccdb556d808f9c63c8e70153bf341b99698f46fe6a08f6",
+    "bytes": 41983
+   },
+   "crates/holonics/src/holon/restriction/tube.rs": {
+    "sha256": "48a989a80585f28c8964148fa9c9d486037990aecf2b1bf428733988c8162c42",
+    "bytes": 42581
+   },
+   "crates/holonics/src/lib.rs": {
+    "sha256": "61f950806d8151d92301d56330927b86dcac3ac54c6f9a7db838086ce0fd938f",
+    "bytes": 3161
+   },
+   "crates/holonics/src/navigator/address.rs": {
+    "sha256": "fe2de33951e99bcd8f03231ab54d730d55ad7543c4830de88b71848b753cb2da",
+    "bytes": 20610
+   },
+   "crates/holonics/src/navigator/mod.rs": {
+    "sha256": "97b2a701c10dc66730008718fb824077df845449ff8b1597fa7d41918af1281b",
+    "bytes": 29138
+   },
+   "crates/holonics/src/navigator/trace.rs": {
+    "sha256": "807642025dc9fa87a41cfb8b8067820ac559ee8acb44dae98bc8afc6ca872e6d",
+    "bytes": 14606
+   },
+   "crates/holonics/src/physics/fluid.rs": {
+    "sha256": "527849ab40cc00051713213c8efa24f6acafa8797d56bcea4ecc236d608f2baa",
+    "bytes": 4965
+   },
+   "crates/holonics/src/physics/fluid/body.rs": {
+    "sha256": "74f13f642abb1a5c44ed3bcb3c7682ed31f452424bfa7f7bd51be2499b6dbd3d",
+    "bytes": 22085
+   },
+   "crates/holonics/src/physics/fluid/cells.rs": {
+    "sha256": "b4a011146d7d1b0ccbfca20e92df085312d2215fc1bcddce666c096662b65f3a",
+    "bytes": 23191
+   },
+   "crates/holonics/src/physics/fluid/complex.rs": {
+    "sha256": "e744d4f344efafbb6e98c251dc4c55bf93f47d8dabf3378756a69b8c5846183c",
+    "bytes": 15382
+   },
+   "crates/holonics/src/physics/fluid/control_volume.rs": {
+    "sha256": "210711e88c19b94311d50240c334750d6c216211327babe65597a7bf3ff9c59b",
+    "bytes": 30395
+   },
+   "crates/holonics/src/physics/fluid/singularity.rs": {
+    "sha256": "942ae7098ab29b0fce79e061034444dcc10429b2abfbe4b78d0ed0053b00d0d8",
+    "bytes": 20201
+   },
+   "crates/holonics/src/physics/information.rs": {
+    "sha256": "c50285be4d0891d9063e2b7eed07f8f80481c2c0b81cea75a8d771ca4b12197c",
+    "bytes": 7170
+   },
+   "crates/holonics/src/physics/information/apply.rs": {
+    "sha256": "2983abbdc8d9059c4e0a3c2529957cce3cf011ade0c9d0576f76bad4ee654792",
+    "bytes": 16364
+   },
+   "crates/holonics/src/physics/information/rate.rs": {
+    "sha256": "4922b5c427e276986e7310e4908793dd13d2f2f037fb572cb75e6ce7eabb5dc3",
+    "bytes": 9691
+   },
+   "crates/holonics/src/physics/information/tests.rs": {
+    "sha256": "c809005516720ce75ddb47f3fc33401684adde0dcc475f4cffcf36a160e8e9aa",
+    "bytes": 18987
+   },
+   "crates/holonics/src/physics/mod.rs": {
+    "sha256": "dce482909e8c86254b21739dd8762c5d74bca7136b5884c7257aa2400e560147",
+    "bytes": 490
+   },
+   "crates/holonics/src/physics/spacetime.rs": {
+    "sha256": "dc06b19dcb428091a858c136b0dbb2ffb3d780d50810554669e595f10eb33a77",
+    "bytes": 9282
+   },
+   "crates/holonics/src/physics/spacetime/clocks.rs": {
+    "sha256": "676e05f56bb49ea93b203ba610a7b494d4757f310d2692bebfced2596d0b1ccc",
+    "bytes": 5670
+   },
+   "crates/holonics/src/physics/spacetime/einstein.rs": {
+    "sha256": "21c95c284cd847e14720cc59210894b72c0ecbd7340472c491c9c028b4d25bf6",
+    "bytes": 4716
+   },
+   "crates/holonics/src/physics/spacetime/lorentz.rs": {
+    "sha256": "a3a2ba6380c5edbbc69b7e5fafa1feaaa5dd06d592b12721aa28a84977a51283",
+    "bytes": 16360
+   },
+   "crates/holonics/src/physics/spacetime/source.rs": {
+    "sha256": "30166438e3fa8e4817a2476fb36d9499cfd95bb66ab6de7e90e4eefc1f7247d4",
+    "bytes": 14166
+   },
+   "crates/holonics/src/physics/spacetime/tests.rs": {
+    "sha256": "46def048d2076fc3c3ba2a5a8c37d652de8ed8823718307fa755f71df2733416",
+    "bytes": 28398
+   },
+   "crates/holonics/src/physics/thermal.rs": {
+    "sha256": "8b7d1502fb6295db8d5748716e3a3c434cca5bba23d1209686864f76b7fb8a00",
+    "bytes": 11192
+   },
+   "crates/holonics/src/physics/thermal/axes.rs": {
+    "sha256": "d0e1b594f729039b25384e6d43dfd3e6a3a07ad0ea75fbd086be7516255e7e87",
+    "bytes": 11494
+   },
+   "crates/holonics/src/physics/thermal/exchange.rs": {
+    "sha256": "caa0936f50629ca9da048a73aa780c9e4ae7bea6b4375636208cd4f33d9251ec",
+    "bytes": 8560
+   },
+   "crates/holonics/src/physics/thermal/neck.rs": {
+    "sha256": "59bdc3038d59cf02a3ce8d560b0c74bb7c73a1c958ac93e6f1d9f68f325df6b0",
+    "bytes": 5512
+   },
+   "crates/holonics/src/physics/thermal/port.rs": {
+    "sha256": "0caf15ea9905e54f556e6b211c8f89e832137ee4a12f3af019299a4ecae4d85c",
+    "bytes": 3655
+   },
+   "crates/holonics/src/physics/thermal/tests.rs": {
+    "sha256": "bc37321efefbc7eae0849f3a04eaece7145d3a5623d83187447d8d2ac6ceacd9",
+    "bytes": 25333
+   },
+   "crates/holonics/src/physics/wave.rs": {
+    "sha256": "9255780b05fb94ce29a0f1f4c4d8c6ece752250947cff62315c70eab41cc668f",
+    "bytes": 6790
+   },
+   "crates/holonics/src/physics/wave/chain.rs": {
+    "sha256": "3130272d662e592f72601253ad7aac21a2ebd1a2670fb6bd7f9d70f17532265a",
+    "bytes": 28939
+   },
+   "crates/holonics/src/physics/wave/continuation.rs": {
+    "sha256": "fef87716fa785bb372693885adacb91b4cf07164b0d5c421f1a45b0dc0e18674",
+    "bytes": 14963
+   },
+   "crates/holonics/src/physics/wave/interference.rs": {
+    "sha256": "58dc30d9a92bb783c3ebe78420eafb288d3b6c0babcaefb57798392eba4e19d3",
+    "bytes": 1942
+   },
+   "crates/holonics/src/physics/wave/tests.rs": {
+    "sha256": "58350fe1a6a52472e80cac2312bf7f75e85a63f32eb59442718517219a3d3c06",
+    "bytes": 18594
+   },
+   "crates/holonics/src/ratio/algebraic.rs": {
+    "sha256": "aff50b8ff77ffd718784440ce067433e2594c41924fada44c2003d352aa0c5d0",
+    "bytes": 58349
+   },
+   "crates/holonics/src/ratio/disk.rs": {
+    "sha256": "2d696d43b641b4e0cfc55a90179aae1aeeae3e3277e082a7c1fd5d1780a082d7",
+    "bytes": 31062
+   },
+   "crates/holonics/src/ratio/exponentiated.rs": {
+    "sha256": "a22226720ae5f423b0f39975caff0f3f28e1fcb11aa95da1eff4e3f973e4a9d5",
+    "bytes": 25253
+   },
+   "crates/holonics/src/ratio/exponentiated/carried.rs": {
+    "sha256": "3e5d49524168c8360078477e38d93f97ebb93a1cca8ba65a387f7db30ef43332",
+    "bytes": 13651
+   },
+   "crates/holonics/src/ratio/gaussian.rs": {
+    "sha256": "66899eac32c9cb6a8af20ae7fc941a83b268db9f602aa2317ae29cb80a217ed4",
+    "bytes": 5107
+   },
+   "crates/holonics/src/ratio/linear.rs": {
+    "sha256": "a1bb3e17c9e7d0c0fd0da9369700970b9a7a3895a922780c04e6242b1379d5f9",
+    "bytes": 60326
+   },
+   "crates/holonics/src/ratio/linear/inertia.rs": {
+    "sha256": "5e97d0b7677929816bb9795c56191f9aa4ff828ce18256e17be57e6c8d92daeb",
+    "bytes": 29196
+   },
+   "crates/holonics/src/ratio/linear/prime_image.rs": {
+    "sha256": "bc8f9eb928d357eca67af08c7457fa8d7e00206ed1c59a03d190afe3ec2e447e",
+    "bytes": 63195
+   },
+   "crates/holonics/src/ratio/linear/prime_image/tests.rs": {
+    "sha256": "5a05657b15f92c8ce2a3e00e1570bc2fd959766e9d199b17b31b2ab3b844f434",
+    "bytes": 14857
+   },
+   "crates/holonics/src/ratio/linear/vector.rs": {
+    "sha256": "a111e2aaa22ce6f781dec37ebf17cbcc18f46a5f4a93be82f49761a5b6027128",
+    "bytes": 18930
+   },
+   "crates/holonics/src/ratio/log_ratio.rs": {
+    "sha256": "7e561a27844629c0106c95ae2dc2415dabfa38060208551672a12364305caace",
+    "bytes": 9297
+   },
+   "crates/holonics/src/ratio/mod.rs": {
+    "sha256": "9944f3167bf7006904a30cacb471e4ad42b4c30ca23b726ad8e9f4e538f8d682",
+    "bytes": 7370
+   },
+   "crates/holonics/src/ratio/polynomial.rs": {
+    "sha256": "f9ca719594bf5e0e09e5e766ddb0ff78d0e77a2244ffdb8659f8e9ee19855f1e",
+    "bytes": 96688
+   },
+   "crates/holonics/src/ratio/polynomial/root_separation.rs": {
+    "sha256": "7d7eb6cf83a121f20a57fd5260addf2e2a7ba827d489159cf71f469a8eaeacf9",
+    "bytes": 3117
+   },
+   "crates/holonics/src/ratio/polynomial/tests.rs": {
+    "sha256": "3e08cbec3c91a9ce37762c087d9fab25cbabff1a7e1a3cf27d502150e15fd58e",
+    "bytes": 19925
+   },
+   "crates/holonics/src/ratio/presentation.rs": {
+    "sha256": "d32df704d1bbdf400750c324c28d10d8d491869ae11d64d49a09964932183d3d",
+    "bytes": 4788
+   },
+   "crates/holonics/src/ratio/primality.rs": {
+    "sha256": "bd21e383e842a6bdd5b5a4a839b999d629f9e124f8b8117b9ff0e828c5a03cc8",
+    "bytes": 3481
+   },
+   "crates/holonics/src/ratio/ring.rs": {
+    "sha256": "63b10a3686ecc8e71945be3b933ed5a9d6a5cfff67ef2f3878d9189776cba9a1",
+    "bytes": 7878
+   },
+   "crates/holonics/src/ratio/ring/section.rs": {
+    "sha256": "104e07b80568558a634ff6ebfc00fdb869ef0edfbf45dc1966ff54b06f62ec57",
+    "bytes": 3429
+   },
+   "crates/holonics/src/ratio/ring/section/tests.rs": {
+    "sha256": "0479ff0dba89f210441d9cdd71213d745bc52c439796aec42a070b1dd199e7c0",
+    "bytes": 4930
+   },
+   "crates/holonics/src/ratio/surprisal.rs": {
+    "sha256": "e40c543235a531c80ed868c1449361888499c7b8abb63deb69970d21d03b8fb8",
+    "bytes": 45369
+   },
+   "crates/holonics/src/ratio/work.rs": {
+    "sha256": "fe8a71d64d7b2723c15ce1060fe73b6b3cd4286c6ca53a294be32b5f3e461fbd",
+    "bytes": 11411
+   },
+   "crates/holonics/src/receiver/face.rs": {
+    "sha256": "bbdd91b20705207df8feac7eec4b179cd6d98f0e88c2f3d2c052d5c8dc18b89f",
+    "bytes": 57757
+   },
+   "crates/holonics/src/receiver/mod.rs": {
+    "sha256": "da2741278f0e6f913fbe0cb03fb26c09b3551fa31eba9477b12f2dc8e21f3b51",
+    "bytes": 2000
+   },
+   "crates/holonics/src/receiver/population.rs": {
+    "sha256": "cfd9aded5802bd82fbf9956c2c9392a3b067cae405594cdef02ee548a4a0ec35",
+    "bytes": 105215
+   },
+   "crates/holonics/src/receiver/population/birth.rs": {
+    "sha256": "5f22d8caf0689cf1bce5b83c8926413fef1ca5acd6bb2a3fd0ba8d51aef4c185",
+    "bytes": 49128
+   },
+   "crates/holonics/src/receiver/population/birth_tests.rs": {
+    "sha256": "347c7e7fc68e5952d5b6c05fbb44ea6d5e2739784e5efb8034fb4179e79f1428",
+    "bytes": 11291
+   },
+   "crates/holonics/src/receiver/population/chase.rs": {
+    "sha256": "e7d36c043e55b0ce63069a29086865ae049aa14f3417dfdc3f320e96e24465eb",
+    "bytes": 11627
+   },
+   "crates/holonics/src/receiver/population/chaser.rs": {
+    "sha256": "191d4d81cf2cc4a75c159d1c195904b590ea3a5d7df19d73739b92f5de129049",
+    "bytes": 48073
+   },
+   "crates/holonics/src/receiver/population/chaser_tests.rs": {
+    "sha256": "bd85d4036212beb7e7f8ca6157aad943a9d4a8ca27d2f329aee7a11d54af0613",
+    "bytes": 10700
+   },
+   "crates/holonics/src/receiver/population/composition.rs": {
+    "sha256": "cb052720c0ee191918de873ed352f7f766de503fa0218a9eb98e432bc784b471",
+    "bytes": 35014
+   },
+   "crates/holonics/src/receiver/population/composition_tests.rs": {
+    "sha256": "17e669f052f96e882516c76dbb756ef9b812f49ce1455f435ec66864004fee57",
+    "bytes": 28417
+   },
+   "crates/holonics/src/receiver/population/dormancy.rs": {
+    "sha256": "010e4ae88bcbd28d4e050baf3078301e0c38a54a6d0be077028a1cf4fb1d5115",
+    "bytes": 30830
+   },
+   "crates/holonics/src/receiver/population/dormancy_tests.rs": {
+    "sha256": "a48f30d0c267d1f37b89ac235fd92207e6e7b961637732fce9bcd5810026acff",
+    "bytes": 7965
+   },
+   "crates/holonics/src/receiver/population/evolution.rs": {
+    "sha256": "d659c6aae69615ab7ce6326716584d893475a13eb6decfbbbe1cccb6b013cab5",
+    "bytes": 12935
+   },
+   "crates/holonics/src/receiver/population/evolution_tests.rs": {
+    "sha256": "6ef1ec61168dd3212078bb51dfaad754ab7256e654b7f6516733c0a54e54c437",
+    "bytes": 30044
+   },
+   "crates/holonics/src/receiver/population/families.rs": {
+    "sha256": "a2eef57533998b8463d74a849f4b64589f38bf851f076f1cfab0fd6df8225f65",
+    "bytes": 25284
+   },
+   "crates/holonics/src/receiver/population/merge.rs": {
+    "sha256": "666de82c1e357dda1e881ce2426f1492e6f7942ea4068866ddd401d4d5ca4fbe",
+    "bytes": 21448
+   },
+   "crates/holonics/src/receiver/population/merge_tests.rs": {
+    "sha256": "acc4ab73ea75e2905d497afa0b8a886afd37ec0628f5cfa72d122fcd9f237340",
+    "bytes": 7344
+   },
+   "crates/holonics/src/receiver/population/port.rs": {
+    "sha256": "2b2c8cbb72ab72938210d6f8dbd5635f78392b8d5186337149893045db9ef2cf",
+    "bytes": 22579
+   },
+   "crates/holonics/src/receiver/population/port_tests.rs": {
+    "sha256": "9344b8739fc62d304a29b6ce07e8f37aa400a436b9027625aad0ff9e940267e3",
+    "bytes": 8803
+   },
+   "crates/holonics/src/receiver/population/species.rs": {
+    "sha256": "99a9e59c3508e5d58a4b019f330ae28ad542f7d493c62c287f4aa891e076d390",
+    "bytes": 14349
+   },
+   "crates/holonics/src/receiver/population/tests.rs": {
+    "sha256": "6d8897b0092e70b364c8bdc2985b951f0627f130ecc9ea26e0f657e77bb4d888",
+    "bytes": 45993
+   },
+   "crates/holonics/src/receiver/receipt.rs": {
+    "sha256": "d4391ea8f8c7fb6d9a5bc53b081107095b00ac52f1eb30055ae79f05d9397ab4",
+    "bytes": 18545
+   },
+   "crates/holonics/src/receiver/reception.rs": {
+    "sha256": "e1545a458c8fb9d19b3995c7732ee95fcb61cf745c2a6be8b14ed93e2820a5da",
+    "bytes": 36996
+   },
+   "crates/holonics/src/receiver/reception/continuation.rs": {
+    "sha256": "0805e35e5b8c19763b50472835545588dd4ab0918ee72a0e9361a1847bbfc8e1",
+    "bytes": 10991
+   },
+   "crates/holonics/src/receiver/reception/continuation/tests.rs": {
+    "sha256": "9527ef643ac8f48406e2fe7c60367041fd3a5d7c8925860eaec97e1bcbaca3dd",
+    "bytes": 14261
+   },
+   "crates/holonics/src/receiver/release.rs": {
+    "sha256": "b42c84a57d783ab38a5e5bc8a787776de640e30441bb38b3fb93491208b340a0",
+    "bytes": 38235
+   },
+   "crates/holonics/src/receiver/release/tests.rs": {
+    "sha256": "039ddc52a8c5705672904d7338b5eb0ca57c567460098eef6036f251d7ed55c6",
+    "bytes": 36850
+   },
+   "crates/holonics/tests/acoustic_encoding.rs": {
+    "sha256": "48055b14bb4f5f50dec89102b3c815e3e279a3256a7922b576039d5b5e16bda0",
+    "bytes": 51014
+   },
+   "crates/holonics/tests/acoustic_wave_port.rs": {
+    "sha256": "9cf41dfe354e895f17520f0c7f0124cc8dc22ca80fde6dbd5cc4d2ee2c0f06aa",
+    "bytes": 61791
+   },
+   "crates/holonics/tests/material_tangent_world.rs": {
+    "sha256": "ef8e4a723ca4175860b83c9eff529c749f21d9c582333d3ef596f12053babaa0",
+    "bytes": 80887
+   },
+   "crates/holonics/tests/native_action_return.rs": {
+    "sha256": "ed1ed59fef84573e3e0cfc3c041ca11ce0dcc204458b102e80f4948855850cf6",
+    "bytes": 18274
+   },
+   "crates/holonics/tests/physical_action.rs": {
+    "sha256": "f59982b3e7c92db9e22855a948342df033207a035ced8cccf1b8e0a668acf019",
+    "bytes": 12703
+   },
+   "crates/holonics/tests/physical_ask.rs": {
+    "sha256": "459508d425675c73f9c34bf804ec7be632538a72dff5e9f5de6d76eddddfa141",
+    "bytes": 48243
+   },
+   "crates/holonics/tests/ranged_capacity.rs": {
+    "sha256": "86ae43a11634abbe645bf2bbab25e7a62e5e3fad302e31e105b62afb1abebb38",
+    "bytes": 24618
+   },
+   "crates/holonics/tests/resident_cold_restore.rs": {
+    "sha256": "c883536ad0672f210d013ef9bc3adc5b1735b62f3dc88498565d2cbce9e5c2ea",
+    "bytes": 8133
+   },
+   "crates/holonics/tests/source_entrance.rs": {
+    "sha256": "5308ebf2d6cba10019952e1e9023d3b085349d12b3c6df61833cba8b863d9baf",
+    "bytes": 19074
+   },
+   "crates/holonics/tests/world_model.rs": {
+    "sha256": "2946fb61e3004e85e23eefbb1fba88dac82f34d09144651501e0d87a3de3645b",
+    "bytes": 65970
+   },
+   "tools/gate.sh": {
+    "sha256": "5f631203f35bdb6525fd4b87ec0555af2ea2ba08f45e6a7962bb77acf84bdd5e",
+    "bytes": 1339
+   }
+  },
+  "source_edits_by_validator": false,
+  "clean_at_preparation": true
+ },
+ "all_five_stages_passed": true,
+ "gate_reused_same_exact_source": true,
+ "prior_preflight_refusal_preserved": {
+  "gate_PASS_reused": {
+   "sha256": "0434ac6a1d247c73032b6006f31045b9db66cd681931a079cff04be037f7fb25",
+   "bytes": 8498
+  },
+  "failed_command_never_started": true,
+  "refusal": {
+   "sha256": "e083c3f9e65f834c754bee1a192a3ea95f5123da8608dfc0eb3ff4a007e2dc7a",
+   "bytes": 356
+  },
+  "prior_controller_release": {
+   "sha256": "ab6d0a4ca3953f94a8aa0e407252adfdcf4b207169beeaa2b9194e1ba2cbc756",
+   "bytes": 844
+  },
+  "manifest": {
+   "CACHE_COPY.json": {
+    "sha256": "e46b618167ecc7d329b9a974664327395d5fab9de27e3e594393b1de1cdec0aa",
+    "bytes": 434
+   },
+   "CONSUMER_SCOPE.json": {
+    "sha256": "020f76a6408d902cb17b9536a34a397cf4dc8ede721344b42944b40af669d777",
+    "bytes": 3463
+   },
+   "CONTROLLER_RELEASE.json": {
+    "sha256": "ab6d0a4ca3953f94a8aa0e407252adfdcf4b207169beeaa2b9194e1ba2cbc756",
+    "bytes": 844
+   },
+   "CPU_SELECTION.json": {
+    "sha256": "b7c812d191e86973c6f5b8460e2e107077ec9adb80b2394e3d93811221f690f4",
+    "bytes": 3331
+   },
+   "HEADROOM_A.json": {
+    "sha256": "378be8718aaca4f125941b26812ccf65891908fcb45a0d250ec735fa3ea8a024",
+    "bytes": 3784
+   },
+   "HEADROOM_B.json": {
+    "sha256": "11985f62af384fdda68b19c27255174160c7dd7fd18b29be34bd389f2b30b9ab",
+    "bytes": 154852
+   },
+   "OTHER_OWNER_RELEASE.json": {
+    "sha256": "d6f6c6e3856a8d5b7dec2257673824d36ab0781ea0d7d9915666ad0b81e4c827",
+    "bytes": 1049
+   },
+   "PARSER_DEVELOPER_CHECK.json": {
+    "sha256": "80959e472b2515eeb1eb5bc78ba6f895dcafec8a55073ffe3c50020d0eddacb1",
+    "bytes": 3856
+   },
+   "PREPARATION.json": {
+    "sha256": "d7690de88fb3f3283a520404ad62fd79de7218c8c009ebb3d8e804bda826e24a",
+    "bytes": 441
+   },
+   "PREPARATION_SOURCE.py": {
+    "sha256": "ecfff391b9556a410f409178a75f8d23c66944de0c2dfdd63ff19c4c8dee7681",
+    "bytes": 16062
+   },
+   "PRIVATE_INPUT.json": {
+    "sha256": "2c456d5184fe9174b703a72051cf1c317254531a681162b55a278efc5e8c00ad",
+    "bytes": 419
+   },
+   "RECEIPT_SUCCESSOR.json": {
+    "sha256": "c0182606b627f250b0b99c563aeeb94f2196a38f3cb8aa52dd19701adf44d121",
+    "bytes": 492
+   },
+   "REVIEW_ADMISSION.json": {
+    "sha256": "b22049afbfbbdd32ce05f9bebe18e6421ee90a72b16a8022033e62e4a00f5d39",
+    "bytes": 571
+   },
+   "S29_FULL.v1.json": {
+    "sha256": "01daeece1c05f1a1c483a20135aade7651b3cd6b8bb6dd848fadf8c0c9d866d2",
+    "bytes": 1938
+   },
+   "SOURCE_PIN.json": {
+    "sha256": "0aa7a33452cd5cf2c457e155445abcf6929158f13ce9f4ea41f4a3a8f0dd0a1a",
+    "bytes": 47353
+   },
+   "build/native/COMPILE_REQUEST.json": {
+    "sha256": "aa28294c8255a3b486a07250eb4f971295f739521b989fe7863704885bc95014",
+    "bytes": 1070
+   },
+   "build/native/bounded_stage_memory_v186.py": {
+    "sha256": "d28c2663e01f3ce072459adc4eafeeb8e41a0a746b2f6f6507f4dc0f5b89d6d5",
+    "bytes": 17107
+   },
+   "build/native/compile_job.py": {
+    "sha256": "a46d48cfa3f63d84ab933032a80476028537657fa519feb99714f024d201ec07",
+    "bytes": 1697
+   },
+   "build/native/final_stage_memory_v186.py": {
+    "sha256": "835398b19d7f821ffda808c6e881bf33304fe70e8530f348da6c308779838a02",
+    "bytes": 11017
+   },
+   "build/native/leased_stage_memory_v186.py": {
+    "sha256": "5d0d26b70855bcf31f818874f144c392da7f4c559c66052f6d388ef52dbf8a9f",
+    "bytes": 5607
+   },
+   "build/native/sourcecodec-build-f7-20261010-v1.config.json": {
+    "sha256": "2ccc577bd4dfa898ebbb89c2650e0df6d64606aada2eefbac1b058719e137fa6",
+    "bytes": 110282
+   },
+   "gate/native/COMMAND_START.json": {
+    "sha256": "120d5684af7420cceaa3492230d9f657478fc5119b477f4afdd0917abcb8e2cd",
+    "bytes": 720
+   },
+   "gate/native/COMPILE_REQUEST.json": {
+    "sha256": "f8e608caeb34b3dfeac9b989c2ba9e1373f484afcb4a06615f7055c02f44681f",
+    "bytes": 907
+   },
+   "gate/native/RESULT.json": {
+    "sha256": "1fc5ea9bfd4f282cdd7eea38d103f098d317a33b243ab31b5ef6afaf929a6370",
+    "bytes": 1046
+   },
+   "gate/native/STAGE_SUMMARY.json": {
+    "sha256": "0434ac6a1d247c73032b6006f31045b9db66cd681931a079cff04be037f7fb25",
+    "bytes": 8498
+   },
+   "gate/native/bounded_stage_memory_v186.py": {
+    "sha256": "d28c2663e01f3ce072459adc4eafeeb8e41a0a746b2f6f6507f4dc0f5b89d6d5",
+    "bytes": 17107
+   },
+   "gate/native/compile_job.py": {
+    "sha256": "a46d48cfa3f63d84ab933032a80476028537657fa519feb99714f024d201ec07",
+    "bytes": 1697
+   },
+   "gate/native/compiler.stderr": {
+    "sha256": "226fc128ee0529de0b0e7189304c05815028891d366b888627256b7ee986ba61",
+    "bytes": 376242
+   },
+   "gate/native/compiler.stdout": {
+    "sha256": "921a73dce64ee2134d8cd6ec8507869c757f7af5d1c7906b0df0143fe4408d00",
+    "bytes": 6463
+   },
+   "gate/native/final_stage_memory_v186.py": {
+    "sha256": "835398b19d7f821ffda808c6e881bf33304fe70e8530f348da6c308779838a02",
+    "bytes": 11017
+   },
+   "gate/native/joint-launcher.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "gate/native/joint-launcher.stdout": {
+    "sha256": "2cccadfb56b1dbe189c92f4e2962b5606d7c310bbc42ded6cd5f6c8a02e75fac",
+    "bytes": 184
+   },
+   "gate/native/leased_stage_memory_v186.py": {
+    "sha256": "5d0d26b70855bcf31f818874f144c392da7f4c559c66052f6d388ef52dbf8a9f",
+    "bytes": 5607
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.acceptance.json": {
+    "sha256": "38ef65fe68399f55cfa6d14bf9ddcb2395467fcb118f73eb1d3a9a6853a6dcc1",
+    "bytes": 378
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.child-identity.json": {
+    "sha256": "4ba5b321f4fdadb30c2edee4bac0455a3d28173d57e7769673f965f690a60226",
+    "bytes": 78
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.config.json": {
+    "sha256": "ccd2202ddfcccc4ea76ff66f5f730214ef916c9dd5b98e21e1680f3cdc928241",
+    "bytes": 111755
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.external-lease.json": {
+    "sha256": "44d31d42df6f3838460b0a35e4acd2a5aeb7eb45b2cf1e8bd43310e0b2fcae28",
+    "bytes": 277
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.final.json": {
+    "sha256": "3ab867b788643c32284b34ff188145a58c48e436a2fc78cac1f849bc7677ad95",
+    "bytes": 5391
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.input_seal.json": {
+    "sha256": "ba006b1db9b155c6fd368b4c3e82221e588e8be8077a56fb2ce196a04e41fc24",
+    "bytes": 73971
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.lease-identity.json": {
+    "sha256": "79fe67f66ea124d001da53d529e0564710499078fd3d1ff3c87dabd4128c49d9",
+    "bytes": 355
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.memory-gate.json": {
+    "sha256": "ea43d3e86329599ad2329132cb30a554280ac06bee16bcfc30218dd94372f36e",
+    "bytes": 120
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.memory-growth.ndjson": {
+    "sha256": "da76bafe03eec46a829234a9aff7fc396ecf941eb983c64576a15e0a056d925c",
+    "bytes": 80330
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.output_seal.json": {
+    "sha256": "525e6ab3bd61b4d6fbb39d68a7d625b036ecfc3e23d295ae6fa1f13f0b3b3d57",
+    "bytes": 259673
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.publication.json": {
+    "sha256": "3770eddc745c5fbf12f98d01476d7e63bced897410470c4e0418d183fc04c7f6",
+    "bytes": 2924
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.quiescence.json": {
+    "sha256": "8fcfe602b21321eaad28eb511d067082ef12dedad6dd40a2f8bb107e8e5b44d2",
+    "bytes": 130
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.release.json": {
+    "sha256": "ad585568f28d04186281d553dd9979a9e1b4f3e2d510a464c8dc88e45292f2e7",
+    "bytes": 227
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.stage-quiescence.json": {
+    "sha256": "6682f37fbc44e667d414644bde3a755c37bc52eae67294e4c9f1c15306fc5336",
+    "bytes": 136
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.stdout": {
+    "sha256": "75a83b2adf7a09cb74cd037ee099d94cd40c8d52e6f8747d2a2dbbd5b7e4345c",
+    "bytes": 950
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.system-floor.json": {
+    "sha256": "693fef73fbcbeedf7ee9eb3f7a5592c388bb7537b61d07f236c102525c131556",
+    "bytes": 275655
+   },
+   "gate/native/sourcecodec-gate-f7-20261010-v1.unit-cleanup.json": {
+    "sha256": "5d598bef4106a983dac690f9731dece8c09c49b1d53b8a268abeb6272c3792a3",
+    "bytes": 689
+   },
+   "joint/ADMISSION.json": {
+    "sha256": "48907a8e6be40d7b9c7dd7c2d07da2c3193d33a587cd428aa4bb43d93cfacdba",
+    "bytes": 3888
+   },
+   "joint/JOBS.json": {
+    "sha256": "417db288415ca1a29f58bcc36f03525a9396544929c19c04e2aed9ebe39e8016",
+    "bytes": 261966
+   },
+   "joint/LEASE_OWNER.json": {
+    "sha256": "cbab5b7f9a0363ada9d2c5e3e9ca16e51a6c882035e52c6998fd4e6d6d4fc67d",
+    "bytes": 219
+   },
+   "joint/PLAN.json": {
+    "sha256": "9dd646cbe3c955d65997e6a88ee9be6f21c6a8c8016bd57eda2b23134b26e025",
+    "bytes": 3222
+   },
+   "joint/RELEASE.json": {
+    "sha256": "aa4c12a0fac79694cb086b78a4d52db05dca9d4cade877003d98a31402c27726",
+    "bytes": 234
+   },
+   "joint/outer_entry.py": {
+    "sha256": "0610b2ea410a7b8badeda71fc8074d66383eceffe25530eb16c1c4df2d6b68cf",
+    "bytes": 339
+   },
+   "joint/run_joint.py": {
+    "sha256": "370feecfce99d947b2799e9071557f393e59010d152a232167c93cb4518d123e",
+    "bytes": 11373
+   },
+   "joint-controller.stderr": {
+    "sha256": "51ae8eb62aebf07eff7c93fa6067b6522f13befb684419ea58711c0601f52a80",
+    "bytes": 1308
+   },
+   "joint-controller.stdout": {
+    "sha256": "d8374ccfa70e8386e5b00a28a004f2404f0b71e6f5d364ee42a2f73f1450d1b0",
+    "bytes": 1382
+   },
+   "monitor_batch.py": {
+    "sha256": "5a3da4db41a4bd77158b8fc82250858e83c54e46bca3e6b2fe0f19aa9e251124",
+    "bytes": 1383
+   },
+   "near_return/native/COMPILE_REQUEST.json": {
+    "sha256": "9ac25a73bb2f3a838bd21abd99b9390da0576168b9f346c55ecfcc77f86bd3e7",
+    "bytes": 1140
+   },
+   "near_return/native/bounded_stage_memory_v186.py": {
+    "sha256": "d28c2663e01f3ce072459adc4eafeeb8e41a0a746b2f6f6507f4dc0f5b89d6d5",
+    "bytes": 17107
+   },
+   "near_return/native/compile_job.py": {
+    "sha256": "a46d48cfa3f63d84ab933032a80476028537657fa519feb99714f024d201ec07",
+    "bytes": 1697
+   },
+   "near_return/native/final_stage_memory_v186.py": {
+    "sha256": "835398b19d7f821ffda808c6e881bf33304fe70e8530f348da6c308779838a02",
+    "bytes": 11017
+   },
+   "near_return/native/joint-launcher.stderr": {
+    "sha256": "e083c3f9e65f834c754bee1a192a3ea95f5123da8608dfc0eb3ff4a007e2dc7a",
+    "bytes": 356
+   },
+   "near_return/native/joint-launcher.stdout": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "near_return/native/leased_stage_memory_v186.py": {
+    "sha256": "5d0d26b70855bcf31f818874f144c392da7f4c559c66052f6d388ef52dbf8a9f",
+    "bytes": 5607
+   },
+   "near_return/native/sourcecodec-near_return-f7-20261010-v1.config.json": {
+    "sha256": "c04b77aac823fa174eb34f8df6c8a78361998b9e6d788f8e5f6fb9619de3f373",
+    "bytes": 111862
+   },
+   "octant/native/COMPILE_REQUEST.json": {
+    "sha256": "f7be36f4167c109e4a42cfcba90dd7c007d53c7d31a5db41a76e0c59f08be220",
+    "bytes": 1253
+   },
+   "octant/native/bounded_stage_memory_v186.py": {
+    "sha256": "d28c2663e01f3ce072459adc4eafeeb8e41a0a746b2f6f6507f4dc0f5b89d6d5",
+    "bytes": 17107
+   },
+   "octant/native/compile_job.py": {
+    "sha256": "a46d48cfa3f63d84ab933032a80476028537657fa519feb99714f024d201ec07",
+    "bytes": 1697
+   },
+   "octant/native/final_stage_memory_v186.py": {
+    "sha256": "835398b19d7f821ffda808c6e881bf33304fe70e8530f348da6c308779838a02",
+    "bytes": 11017
+   },
+   "octant/native/leased_stage_memory_v186.py": {
+    "sha256": "5d0d26b70855bcf31f818874f144c392da7f4c559c66052f6d388ef52dbf8a9f",
+    "bytes": 5607
+   },
+   "octant/native/sourcecodec-octant-f7-20261010-v1.config.json": {
+    "sha256": "b956343f433b05b7c8f181af45eb226e74b77d0fb63763c40162622bc51353ab",
+    "bytes": 110935
+   },
+   "quarter/native/COMPILE_REQUEST.json": {
+    "sha256": "e183d20094ac0a75444790ec0693e49e8542dfec98ce1b2e7fdbf4f03db2b05f",
+    "bytes": 1250
+   },
+   "quarter/native/bounded_stage_memory_v186.py": {
+    "sha256": "d28c2663e01f3ce072459adc4eafeeb8e41a0a746b2f6f6507f4dc0f5b89d6d5",
+    "bytes": 17107
+   },
+   "quarter/native/compile_job.py": {
+    "sha256": "a46d48cfa3f63d84ab933032a80476028537657fa519feb99714f024d201ec07",
+    "bytes": 1697
+   },
+   "quarter/native/final_stage_memory_v186.py": {
+    "sha256": "835398b19d7f821ffda808c6e881bf33304fe70e8530f348da6c308779838a02",
+    "bytes": 11017
+   },
+   "quarter/native/leased_stage_memory_v186.py": {
+    "sha256": "5d0d26b70855bcf31f818874f144c392da7f4c559c66052f6d388ef52dbf8a9f",
+    "bytes": 5607
+   },
+   "quarter/native/sourcecodec-quarter-f7-20261010-v1.config.json": {
+    "sha256": "f34251d53f04c885deb8aa6bd8a616c1f9cf44d90a30469df315268db7767557",
+    "bytes": 110949
+   },
+   "sourcecodec_conformance.py": {
+    "sha256": "e12e09b2a0f5814801b199b491e7c398c6429cde636d18537b163e08a7662791",
+    "bytes": 2758
+   },
+   "worker_evidence/RAW_INPUT_CUSTODY.json": {
+    "sha256": "b93f9953d0bb93e1f2db209ed580764731abd863ac5d7dcaf03f7b2dd3cfb391",
+    "bytes": 2367
+   },
+   "worker_evidence/gate_s29.log": {
+    "sha256": "66954fb8c072581b084c2a77c9b9a48ab27a38f4b4f3ea43c58969a4ff2716bb",
+    "bytes": 382755
+   },
+   "worker_evidence/s29_build.log": {
+    "sha256": "845472446e01be31bbbeccedb3308b549c606e5d32cdf4c8b772ee63354e1c16",
+    "bytes": 1301
+   },
+   "worker_evidence/s29_o_0.log": {
+    "sha256": "06a64e3befe0916d10516314713c9490fd28231e7a082a73c00aae95d725bfae",
+    "bytes": 587
+   },
+   "worker_evidence/s29_o_2000.log": {
+    "sha256": "6c8740936c4f8c1255c5e44a2dee79c79e64f7a97aab419fbfad68c452d23ce5",
+    "bytes": 560
+   },
+   "worker_evidence/s29_q_0.log": {
+    "sha256": "cffd5602a149bc976d2fc7935fb30b82967d649f17259efdd788dfec6afc1208",
+    "bytes": 588
+   },
+   "worker_evidence/s29_q_2000.log": {
+    "sha256": "1eb30798435fc18a62372c20ebff6fecd3ecd42219774ff201e7901c9624eb43",
+    "bytes": 559
+   },
+   "worker_evidence/s29_tests.log": {
+    "sha256": "ea4be4bbed6ea75aa5702c7aa48e037e882223cf834e4c5379cb8be29e266e33",
+    "bytes": 1889
+   }
+  },
+  "only_local_scopeunit_name_corrected": true,
+  "source_workload_projection_and_resource_bounds_unchanged": true,
+  "no_source_or_old_receipt_edited": true
+ },
+ "outer_not_prepared_failure_preserved": {
+  "properties": {
+   "ExecMainStatus": "2"
+  },
+  "native_never_started": true,
+  "lease_never_acquired": true,
+  "no_source_edits_or_budgetchange": true
+ },
+ "stages": {
+  "gate": {
+   "source_commit": "f7dd904dc352457678c35775fddc22cd72e0c875",
+   "source_tree": "2957bbcc13b7b22b0ce8da5baee29d0319a998fb",
+   "source_clean_unchanged_after": true,
+   "command_result": {
+    "exit": 0,
+    "command_wall_ns": 98548057662,
+    "kernel_command_passed": true,
+    "expected_command_exit": true,
+    "whole_stdout_SHA256": "921a73dce64ee2134d8cd6ec8507869c757f7af5d1c7906b0df0143fe4408d00",
+    "whole_stderr_SHA256": "226fc128ee0529de0b0e7189304c05815028891d366b888627256b7ee986ba61",
+    "source_not_edited": true
+   },
+   "controller_exit": 0,
+   "acceptance": {
+    "passed": true,
+    "final_CPU_receipt": {
+     "sha256": "3ab867b788643c32284b34ff188145a58c48e436a2fc78cac1f849bc7677ad95",
+     "bytes": 5391
+    },
+    "cleanup_receipt": {
+     "sha256": "5d598bef4106a983dac690f9731dece8c09c49b1d53b8a268abeb6272c3792a3",
+     "bytes": 689
+    },
+    "lease_still_held": true,
+    "scientific_job": false,
+    "requires_matching_release_receipt": true
+   },
+   "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "joint_global_lease_remains_held_by_batch": true,
+    "quiescence_confirmed": true,
+    "monotonic_ns": 292959772887040
+   },
+   "resource_integrity": true,
+   "conformance": true,
+   "passed": true,
+   "whole_group_CPU_ns": 191338196000,
+   "peak_child_RSS_KiB": 1731352,
+   "charged_group_peak_bytes": "2100445184",
+   "window_ns": 152151901055,
+   "time_window_is_observation_only": true,
+   "stdout": {
+    "sha256": "921a73dce64ee2134d8cd6ec8507869c757f7af5d1c7906b0df0143fe4408d00",
+    "bytes": 6463
+   },
+   "stderr": {
+    "sha256": "226fc128ee0529de0b0e7189304c05815028891d366b888627256b7ee986ba61",
+    "bytes": 376242
+   },
+   "test_counts": [
+    [
+     "63",
+     "0"
+    ]
+   ],
+   "actual_passed_tests": 63,
+   "projection_comparison": {
+    "exact_measured_over_projection_ratio": {
+     "numerator": 98548057662,
+     "denominator": 152151901055
+    },
+    "projection_error": false,
+    "excess_ns": {
+     "integer": 0
+    },
+    "no_limit_raised": true,
+    "time_windows_observational": true
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 98548057662,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       31,
+       1
+      ],
+      [
+       739,
+       1
+      ],
+      [
+       716953,
+       1
+      ]
+     ]
+    },
+    "whole_scope_CPU_ns": {
+     "integer": 191338196000,
+     "prime_factorization": [
+      [
+       2,
+       5
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       17,
+       1
+      ],
+      [
+       23,
+       1
+      ],
+      [
+       17477,
+       1
+      ]
+     ]
+    },
+    "child_RSS_KiB": {
+     "integer": 1731352,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       43,
+       1
+      ],
+      [
+       719,
+       1
+      ]
+     ]
+    },
+    "charged_peak_bytes": {
+     "integer": 2100445184,
+     "prime_factorization": [
+      [
+       2,
+       14
+      ],
+      [
+       128201,
+       1
+      ]
+     ]
+    },
+    "fixed_observation_ns": {
+     "integer": 152151901055,
+     "prime_factorization": [
+      [
+       5,
+       1
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       11,
+       1
+      ],
+      [
+       127,
+       1
+      ],
+      [
+       3111809,
+       1
+      ]
+     ]
+    }
+   },
+   "wait4_reaped_child_CPU_exact": {
+    "CPU_system_us": {
+     "integer": 8641409,
+     "prime_factorization": [
+      [
+       7,
+       1
+      ],
+      [
+       19,
+       1
+      ],
+      [
+       43,
+       1
+      ],
+      [
+       1511,
+       1
+      ]
+     ]
+    }
+   },
+   "actual_scheduler_realization": {
+    "native_affinity": [
+     21
+    ],
+    "own_guard_affinity": [
+     23
+    ],
+    "actual_concurrent_physical_CPU_budget": 2,
+    "guard_separated_before_first_monitor_loop": true,
+    "guard_CPU_still_in_whole_scope_measurement": true
+   }
+  },
+  "near_return": {
+   "source_commit": "f7dd904dc352457678c35775fddc22cd72e0c875",
+   "source_tree": "2957bbcc13b7b22b0ce8da5baee29d0319a998fb",
+   "source_clean_unchanged_after": true,
+   "command_result": {
+    "exit": 0,
+    "command_wall_ns": 52316041259,
+    "kernel_command_passed": true,
+    "expected_command_exit": true,
+    "whole_stdout_SHA256": "193635548d0db79166a830d8574b24334f63ac91cfea6a74dbdac151224e5b09",
+    "whole_stderr_SHA256": "50759affb4f39703e6303a1c78689c604f63d716716e22e4529b7002b3bdd25d",
+    "source_not_edited": true
+   },
+   "controller_exit": 0,
+   "acceptance": {
+    "passed": true,
+    "final_CPU_receipt": {
+     "sha256": "294154ec4a769e8ed169d7af5de35b85d43b0580da87e3485a8d1c80b59e4e12",
+     "bytes": 5661
+    },
+    "cleanup_receipt": {
+     "sha256": "3724625bc884f7eb01b59d4b7908c026ceaacf0667611e9aff3e9a7de6f82b98",
+     "bytes": 703
+    },
+    "lease_still_held": true,
+    "scientific_job": false,
+    "requires_matching_release_receipt": true
+   },
+   "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "joint_global_lease_remains_held_by_batch": true,
+    "quiescence_confirmed": true,
+    "monotonic_ns": 293185233552934
+   },
+   "resource_integrity": true,
+   "conformance": true,
+   "passed": true,
+   "whole_group_CPU_ns": 105894217000,
+   "peak_child_RSS_KiB": 1820760,
+   "charged_group_peak_bytes": "2060718080",
+   "window_ns": 154869696580,
+   "time_window_is_observation_only": true,
+   "stdout": {
+    "sha256": "193635548d0db79166a830d8574b24334f63ac91cfea6a74dbdac151224e5b09",
+    "bytes": 341
+   },
+   "stderr": {
+    "sha256": "50759affb4f39703e6303a1c78689c604f63d716716e22e4529b7002b3bdd25d",
+    "bytes": 1488
+   },
+   "test_counts": [
+    [
+     "2",
+     "0"
+    ]
+   ],
+   "actual_passed_tests": 2,
+   "projection_comparison": {
+    "exact_measured_over_projection_ratio": {
+     "numerator": 52316041259,
+     "denominator": 154869696580
+    },
+    "projection_error": false,
+    "excess_ns": {
+     "integer": 0
+    },
+    "no_limit_raised": true,
+    "time_windows_observational": true
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 52316041259,
+     "prime_factorization": [
+      [
+       107843,
+       1
+      ],
+      [
+       485113,
+       1
+      ]
+     ]
+    },
+    "whole_scope_CPU_ns": {
+     "integer": 105894217000,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       11,
+       1
+      ],
+      [
+       13,
+       2
+      ],
+      [
+       56963,
+       1
+      ]
+     ]
+    },
+    "child_RSS_KiB": {
+     "integer": 1820760,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       15173,
+       1
+      ]
+     ]
+    },
+    "charged_peak_bytes": {
+     "integer": 2060718080,
+     "prime_factorization": [
+      [
+       2,
+       12
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       100621,
+       1
+      ]
+     ]
+    },
+    "fixed_observation_ns": {
+     "integer": 154869696580,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       29761,
+       1
+      ],
+      [
+       260189,
+       1
+      ]
+     ]
+    }
+   },
+   "wait4_reaped_child_CPU_exact": {
+    "CPU_system_us": {
+     "integer": 4197467,
+     "prime_factorization": [
+      [
+       4197467,
+       1
+      ]
+     ]
+    }
+   },
+   "actual_scheduler_realization": {
+    "native_affinity": [
+     20,
+     21
+    ],
+    "own_guard_affinity": [
+     23
+    ],
+    "actual_concurrent_physical_CPU_budget": 3,
+    "guard_separated_before_first_monitor_loop": true,
+    "guard_CPU_still_in_whole_scope_measurement": true
+   }
+  },
+  "build": {
+   "source_commit": "f7dd904dc352457678c35775fddc22cd72e0c875",
+   "source_tree": "2957bbcc13b7b22b0ce8da5baee29d0319a998fb",
+   "source_clean_unchanged_after": true,
+   "command_result": {
+    "exit": 0,
+    "command_wall_ns": 1537520880,
+    "kernel_command_passed": true,
+    "expected_command_exit": true,
+    "whole_stdout_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "whole_stderr_SHA256": "e2ee3a96c790cf09d294c381ff532313e579c20b95be7ad166066ea523e85499",
+    "source_not_edited": true
+   },
+   "controller_exit": 0,
+   "acceptance": {
+    "passed": true,
+    "final_CPU_receipt": {
+     "sha256": "5e8c1d8940e4f91a0631223030b085bbaf5e948cb87fe7f0a12f6cde769668ce",
+     "bytes": 5456
+    },
+    "cleanup_receipt": {
+     "sha256": "156a68191d622324502c2007f0c3f5a290dc6a108aeaabb81c5084ec9c7db900",
+     "bytes": 691
+    },
+    "lease_still_held": true,
+    "scientific_job": false,
+    "requires_matching_release_receipt": true
+   },
+   "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "joint_global_lease_remains_held_by_batch": true,
+    "quiescence_confirmed": true,
+    "monotonic_ns": 293187397926557
+   },
+   "resource_integrity": true,
+   "conformance": true,
+   "passed": true,
+   "whole_group_CPU_ns": 3180000000,
+   "peak_child_RSS_KiB": 713088,
+   "charged_group_peak_bytes": "640495616",
+   "window_ns": 116022238203,
+   "time_window_is_observation_only": true,
+   "stdout": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "stderr": {
+    "sha256": "e2ee3a96c790cf09d294c381ff532313e579c20b95be7ad166066ea523e85499",
+    "bytes": 1223
+   },
+   "actual_passed_tests": 0,
+   "projection_comparison": {
+    "exact_measured_over_projection_ratio": {
+     "numerator": 512506960,
+     "denominator": 38674079401
+    },
+    "projection_error": false,
+    "excess_ns": {
+     "integer": 0
+    },
+    "no_limit_raised": true,
+    "time_windows_observational": true
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 1537520880,
+     "prime_factorization": [
+      [
+       2,
+       4
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       915191,
+       1
+      ]
+     ]
+    },
+    "whole_scope_CPU_ns": {
+     "integer": 3180000000,
+     "prime_factorization": [
+      [
+       2,
+       8
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       7
+      ],
+      [
+       53,
+       1
+      ]
+     ]
+    },
+    "child_RSS_KiB": {
+     "integer": 713088,
+     "prime_factorization": [
+      [
+       2,
+       7
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       619,
+       1
+      ]
+     ]
+    },
+    "charged_peak_bytes": {
+     "integer": 640495616,
+     "prime_factorization": [
+      [
+       2,
+       12
+      ],
+      [
+       156371,
+       1
+      ]
+     ]
+    },
+    "fixed_observation_ns": {
+     "integer": 116022238203,
+     "prime_factorization": [
+      [
+       3,
+       1
+      ],
+      [
+       38674079401,
+       1
+      ]
+     ]
+    }
+   },
+   "wait4_reaped_child_CPU_exact": {
+    "CPU_system_us": {
+     "integer": 355382,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       177691,
+       1
+      ]
+     ]
+    }
+   },
+   "actual_scheduler_realization": {
+    "native_affinity": [
+     21
+    ],
+    "own_guard_affinity": [
+     23
+    ],
+    "actual_concurrent_physical_CPU_budget": 2,
+    "guard_separated_before_first_monitor_loop": true,
+    "guard_CPU_still_in_whole_scope_measurement": true
+   }
+  },
+  "quarter": {
+   "source_commit": "f7dd904dc352457678c35775fddc22cd72e0c875",
+   "source_tree": "2957bbcc13b7b22b0ce8da5baee29d0319a998fb",
+   "source_clean_unchanged_after": true,
+   "command_result": {
+    "exit": 0,
+    "command_wall_ns": 478187428709,
+    "kernel_command_passed": true,
+    "expected_command_exit": true,
+    "whole_stdout_SHA256": "467ca96d47f3fa3243eadc5512fb99b3ec1d28e219927c967b1962af68e43ff5",
+    "whole_stderr_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_not_edited": true
+   },
+   "controller_exit": 0,
+   "acceptance": {
+    "passed": true,
+    "final_CPU_receipt": {
+     "sha256": "7d61e5289e3a15e059f8fe1efa47284d4f39d68a868ed6a5bb41b281dd73cb82",
+     "bytes": 5538
+    },
+    "cleanup_receipt": {
+     "sha256": "8fa834e8d2b06db2228d084ca0b95c6dd72a7b351b408f8e3f53038c8301dcf5",
+     "bytes": 695
+    },
+    "lease_still_held": true,
+    "scientific_job": false,
+    "requires_matching_release_receipt": true
+   },
+   "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "joint_global_lease_remains_held_by_batch": true,
+    "quiescence_confirmed": true,
+    "monotonic_ns": 293666604485326
+   },
+   "resource_integrity": true,
+   "conformance": true,
+   "passed": true,
+   "whole_group_CPU_ns": 915518093000,
+   "peak_child_RSS_KiB": 20412,
+   "charged_group_peak_bytes": "258691072",
+   "window_ns": 964794929867,
+   "time_window_is_observation_only": true,
+   "stdout": {
+    "sha256": "467ca96d47f3fa3243eadc5512fb99b3ec1d28e219927c967b1962af68e43ff5",
+    "bytes": 499
+   },
+   "stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "actual_passed_tests": 0,
+   "projection_comparison": {
+    "exact_measured_over_projection_ratio": {
+     "numerator": 478187428709,
+     "denominator": 964794929867
+    },
+    "projection_error": false,
+    "excess_ns": {
+     "integer": 0
+    },
+    "no_limit_raised": true,
+    "time_windows_observational": true
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 478187428709,
+     "prime_factorization": [
+      [
+       17,
+       2
+      ],
+      [
+       1654627781,
+       1
+      ]
+     ]
+    },
+    "whole_scope_CPU_ns": {
+     "integer": 915518093000,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       4549,
+       1
+      ],
+      [
+       28751,
+       1
+      ]
+     ]
+    },
+    "child_RSS_KiB": {
+     "integer": 20412,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       3,
+       6
+      ],
+      [
+       7,
+       1
+      ]
+     ]
+    },
+    "charged_peak_bytes": {
+     "integer": 258691072,
+     "prime_factorization": [
+      [
+       2,
+       12
+      ],
+      [
+       137,
+       1
+      ],
+      [
+       461,
+       1
+      ]
+     ]
+    },
+    "fixed_observation_ns": {
+     "integer": 964794929867,
+     "prime_factorization": [
+      [
+       964794929867,
+       1
+      ]
+     ]
+    }
+   },
+   "wait4_reaped_child_CPU_exact": {
+    "CPU_system_us": {
+     "integer": 1635170,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       163517,
+       1
+      ]
+     ]
+    }
+   },
+   "actual_scheduler_realization": {
+    "native_affinity": [
+     20
+    ],
+    "own_guard_affinity": [
+     22
+    ],
+    "actual_concurrent_physical_CPU_budget": 2,
+    "guard_separated_before_first_monitor_loop": true,
+    "guard_CPU_still_in_whole_scope_measurement": true
+   }
+  },
+  "octant": {
+   "source_commit": "f7dd904dc352457678c35775fddc22cd72e0c875",
+   "source_tree": "2957bbcc13b7b22b0ce8da5baee29d0319a998fb",
+   "source_clean_unchanged_after": true,
+   "command_result": {
+    "exit": 0,
+    "command_wall_ns": 494768160928,
+    "kernel_command_passed": true,
+    "expected_command_exit": true,
+    "whole_stdout_SHA256": "2088c0ef5d76630caab2a2f76d9eace1ee9c2f4d8a1866cffb731c1bac61a858",
+    "whole_stderr_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_not_edited": true
+   },
+   "controller_exit": 0,
+   "acceptance": {
+    "passed": true,
+    "final_CPU_receipt": {
+     "sha256": "06e95823ede63817976aba9b1182b8c78344b38ab4abf23404c146010de5628f",
+     "bytes": 5505
+    },
+    "cleanup_receipt": {
+     "sha256": "258d6f8ff0cb9aaab2c9d0ad01f4a60ad237af16eccc0bdf190e2789eaa6eb92",
+     "bytes": 693
+    },
+    "lease_still_held": true,
+    "scientific_job": false,
+    "requires_matching_release_receipt": true
+   },
+   "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "joint_global_lease_remains_held_by_batch": true,
+    "quiescence_confirmed": true,
+    "monotonic_ns": 293683100528663
+   },
+   "resource_integrity": true,
+   "conformance": true,
+   "passed": true,
+   "whole_group_CPU_ns": 969225798000,
+   "peak_child_RSS_KiB": 20272,
+   "charged_group_peak_bytes": "92729344",
+   "window_ns": 964794929867,
+   "time_window_is_observation_only": true,
+   "stdout": {
+    "sha256": "2088c0ef5d76630caab2a2f76d9eace1ee9c2f4d8a1866cffb731c1bac61a858",
+    "bytes": 498
+   },
+   "stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "actual_passed_tests": 0,
+   "projection_comparison": {
+    "exact_measured_over_projection_ratio": {
+     "numerator": 494768160928,
+     "denominator": 964794929867
+    },
+    "projection_error": false,
+    "excess_ns": {
+     "integer": 0
+    },
+    "no_limit_raised": true,
+    "time_windows_observational": true
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 494768160928,
+     "prime_factorization": [
+      [
+       2,
+       5
+      ],
+      [
+       107,
+       1
+      ],
+      [
+       8123,
+       1
+      ],
+      [
+       17789,
+       1
+      ]
+     ]
+    },
+    "whole_scope_CPU_ns": {
+     "integer": 969225798000,
+     "prime_factorization": [
+      [
+       2,
+       4
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       3019,
+       1
+      ],
+      [
+       53507,
+       1
+      ]
+     ]
+    },
+    "child_RSS_KiB": {
+     "integer": 20272,
+     "prime_factorization": [
+      [
+       2,
+       4
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       181,
+       1
+      ]
+     ]
+    },
+    "charged_peak_bytes": {
+     "integer": 92729344,
+     "prime_factorization": [
+      [
+       2,
+       12
+      ],
+      [
+       22639,
+       1
+      ]
+     ]
+    },
+    "fixed_observation_ns": {
+     "integer": 964794929867,
+     "prime_factorization": [
+      [
+       964794929867,
+       1
+      ]
+     ]
+    }
+   },
+   "wait4_reaped_child_CPU_exact": {
+    "CPU_system_us": {
+     "integer": 2861636,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       41,
+       1
+      ],
+      [
+       17449,
+       1
+      ]
+     ]
+    }
+   },
+   "actual_scheduler_realization": {
+    "native_affinity": [
+     21
+    ],
+    "own_guard_affinity": [
+     23
+    ],
+    "actual_concurrent_physical_CPU_budget": 2,
+    "guard_separated_before_first_monitor_loop": true,
+    "guard_CPU_still_in_whole_scope_measurement": true
+   }
+  }
+ },
+ "actual_consumer_readouts": {
+  "quarter": {
+   "actual_consumer_conformance": true,
+   "raw_line_number": 2,
+   "octant_grain": false,
+   "ring": 20,
+   "source_samples": 93680,
+   "header_bits": 70,
+   "fixed_block_ticks": 20,
+   "blocks_read": 4684,
+   "admitted_blocks": 1899,
+   "word_bits_series_sum": 89906,
+   "replaced_cell_bits_series_sum": 113940,
+   "block_flag_bits": 4684,
+   "emitted_bits_before_padding": 1461697,
+   "emitted_bytes": 182713,
+   "fully_charged_bits": 1461704,
+   "padding_bits": 7,
+   "cell_codec_bits_on_actual_same_tick_widths": 1481047,
+   "cell_codec_padding_bits": 1,
+   "cell_codec_full_charge_from_width_sum": 1481048,
+   "fully_charged_source_vs_cell_difference": 19344,
+   "raw_uniform_PCM_bits": 1498880,
+   "raw_minus_full_charge_bits": 37176,
+   "source_and_rate_equal_from_actual_byte_vector": true,
+   "encoded_ms": 235452,
+   "encode_plus_decode_ms": 478183,
+   "baseline_is_native_actual_width_sum_not_a_second_emitted_vector": true,
+   "same_invocation_no_persisted_packet_claim": true,
+   "continuing_state_clock_carry_claim_requires_source_binding": true
+  },
+  "octant": {
+   "actual_consumer_conformance": true,
+   "raw_line_number": 2,
+   "octant_grain": true,
+   "ring": 20,
+   "source_samples": 93680,
+   "header_bits": 70,
+   "fixed_block_ticks": 20,
+   "blocks_read": 4684,
+   "admitted_blocks": 1899,
+   "word_bits_series_sum": 89906,
+   "replaced_cell_bits_series_sum": 113940,
+   "block_flag_bits": 4684,
+   "emitted_bits_before_padding": 1344943,
+   "emitted_bytes": 168118,
+   "fully_charged_bits": 1344944,
+   "padding_bits": 1,
+   "cell_codec_bits_on_actual_same_tick_widths": 1364293,
+   "cell_codec_padding_bits": 3,
+   "cell_codec_full_charge_from_width_sum": 1364296,
+   "fully_charged_source_vs_cell_difference": 19352,
+   "raw_uniform_PCM_bits": 1498880,
+   "raw_minus_full_charge_bits": 153936,
+   "source_and_rate_equal_from_actual_byte_vector": true,
+   "encoded_ms": 243912,
+   "encode_plus_decode_ms": 494763,
+   "baseline_is_native_actual_width_sum_not_a_second_emitted_vector": true,
+   "same_invocation_no_persisted_packet_claim": true,
+   "continuing_state_clock_carry_claim_requires_source_binding": true
+  }
+ },
+ "exact_series_readout": {
+  "sha256": "ea7953a860ed3a2a93bf15810b3a5dfa7ca11bd58cca58fc7e952feb27e28180",
+  "bytes": 15715
+ },
+ "consumer_scope": {
+  "source_identity": {
+   "sha256": "c665a93cc5fb9c0f3dd0cb60cd81960764618ab5f0956ead4d8bce03882b445f",
+   "bytes": 68298
+  },
+  "definitions": {
+   "nr_encode": {
+    "first_line": 802,
+    "bytes": 4523,
+    "sha256": "3db4ac6015fef5997997ad785d9c7fbe03401fc8e5bd493932809ce334484cd8"
+   },
+   "nr_decode": {
+    "first_line": 895,
+    "bytes": 3647,
+    "sha256": "10b2b1d798895b61473a91ff7695346d56beb89898eb8215f118510ff223f6ec"
+   },
+   "census_block": {
+    "first_line": 792,
+    "bytes": 119,
+    "sha256": "24155db079c160e52af86c6b90349f9c7404935e49b50e9b1a0779659496543e"
+   },
+   "cell_interval": {
+    "first_line": 463,
+    "bytes": 1975,
+    "sha256": "647d7e1f92d3e823fb7767cfe43ba5a4388a81244b15ecffc8f7bd6a07bb956c"
+   },
+   "actual_encoder_decoder_equality_consumer": {
+    "first_line": 1192,
+    "bytes": 975,
+    "sha256": "8adc46c12111408fdc2a888cae6dda49ec3076077d999cc03c6db687ca8a19a4"
+   }
+  },
+  "owner_identity": {
+   "sha256": "0d454606d0f5735578086ff21ef716256ec58ca4102f90105db4d0acb8134bd3",
+   "bytes": 54537
+  },
+  "affected_fixture_identity": {
+   "sha256": "9cf41dfe354e895f17520f0c7f0124cc8dc22ca80fde6dbd5cc4d2ee2c0f06aa",
+   "bytes": 61791
+  },
+  "header_bits": 70
+ },
+ "continuation_dataflow_binding": {
+  "source_sha256": "c665a93cc5fb9c0f3dd0cb60cd81960764618ab5f0956ead4d8bce03882b445f",
+  "checks": {
+   "encoder_port_precedes_fixed_block_loop": true,
+   "decoder_port_precedes_fixed_block_loop": true,
+   "decoder_remainder_precedes_fixed_block_loop": true,
+   "encoder_uses_global_enumeration": true,
+   "decoder_uses_global_tick": true,
+   "decoder_advances_remainder_after_each_inverse": true,
+   "actual_cell_landing_checked": true,
+   "actual_octant_landing_checked": true,
+   "every_tick_inverse_bound_to_own_state_clock_and_remainders": true,
+   "fixed_codeword_supplies_exact_landed_cells": true,
+   "decoder_interface_has_bytes_and_ladder_only": true
+  },
+  "binding_is_source_dataflow_not_new_runtime_instrumentation": true,
+  "actual_full_run_still_pending": true
+ },
+ "atlas_owner_consumer_binding": {
+  "rows": [
+   {
+    "line": 870,
+    "sha256": "ba3bae6732bfe32975dd90025e19f17453ef69b533adc056797caabb302cd48f"
+   }
+  ],
+  "read_not_edited": true,
+  "owner_and_consumer_exactsource": true
+ },
+ "affected_fixture_emission_reader_binding": {
+  "the_near_return_decodes_its_window_and_the_exact_lock_is_its_zero_defect_case": {
+   "first_line": 1205,
+   "source_checks": {
+    "emitted_length_matches_price": true,
+    "independent_code_reader_wholeword_Eq": true,
+    "not_only_the_old_decode_relation": true
+   },
+   "includes_truncated_word_refusal": false
+  },
+  "a_near_periodic_window_keeps_its_departure_as_defects": {
+   "first_line": 1242,
+   "source_checks": {
+    "emitted_length_matches_price": true,
+    "independent_code_reader_wholeword_Eq": true,
+    "not_only_the_old_decode_relation": true
+   },
+   "includes_truncated_word_refusal": false
+  }
+ },
+ "source_clean_unchanged": true,
+ "native_binary": {
+  "identity": {
+   "sha256": "623d900f90a826f280fece628e0a8f8d452df4f4b00dace0fbf43ed28aa4b0c3",
+   "bytes": 169664448
+  },
+  "source_commit": "f7dd904dc352457678c35775fddc22cd72e0c875",
+  "source_tree": "2957bbcc13b7b22b0ce8da5baee29d0319a998fb",
+  "fresh_affected_source_build": true,
+  "build_stderr": {
+   "sha256": "e2ee3a96c790cf09d294c381ff532313e579c20b95be7ad166066ea523e85499",
+   "bytes": 1223
+  },
+  "both_runtime_sealed_inputs_equal_binary": true,
+  "cache_is_prior_quiescent_dependencies_not_developer_binary_substitution": true
+ },
+ "private_input_binding": {
+  "input_identity": {
+   "sha256": "e846f8c9b1db13c8fa159b146cb6d797ee1861996d10b1dd3c387289ef5efd46",
+   "bytes": 187438
+  },
+  "input_metadata": {
+   "channels": 1,
+   "sample_width_bytes": 2,
+   "rate_Hz": 16000,
+   "sample_count": 93680
+  },
+  "input_not_copied": true,
+  "no_audio_output_or_packet_persisted": true,
+  "private_expected_artifact_absent": true
+ },
+ "concurrent_grains": {
+  "two_processes": true,
+  "start_gap_exact_microseconds": {
+   "integer": 870,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     3,
+     1
+    ],
+    [
+     5,
+     1
+    ],
+    [
+     29,
+     1
+    ]
+   ]
+  },
+  "shared_input_binary_immutable": true,
+  "private_staged_outputs": true,
+  "native_affinities": [
+   20,
+   21
+  ],
+  "guard_affinities": [
+   22,
+   23
+  ],
+  "physicalcore_budget": 4
+ },
+ "historical_developer_projection_error": {
+  "developer_projection_error_preserved": true,
+  "octant_excess_ns": {
+   "integer": 2847567971,
+   "prime_factorization": [
+    [
+     29,
+     2
+    ],
+    [
+     3385931,
+     1
+    ]
+   ]
+  },
+  "receipt_is_developer_not_native_acceptance": true,
+  "native_observation_was_fixed_before_launch_from_largest_measured_costs": true,
+  "older_native_guard_contention_costs_retained_conservatively_in_projection": true
+ },
+ "S29_FULL_receipt_identity": {
+  "sha256": "01daeece1c05f1a1c483a20135aade7651b3cd6b8bb6dd848fadf8c0c9d866d2",
+  "bytes": 1938
+ },
+ "all_validator_leases_released": true,
+ "strict_D_warnings_not_asserted": true,
+ "schema": "scoped-f7-encoder-produced-sourcecodec-quarter-octant-native-v1",
+ "UTC": "2026-10-10T08:38:11.923079+00:00"
+}
