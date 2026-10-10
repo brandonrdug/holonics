@@ -367,6 +367,39 @@ impl WavePort {
         &self.remainders
     }
 
+    /// [definition; agent-inferred, October 10; the bank record §7] **A key seated at the port**:
+    /// the carried state replaced by `state`, as one action at the port that sets the ring's initial
+    /// configuration for the epoch it opens, returning the work it books, `E(state) − E(before)`.
+    /// On a lattice the key must lie on it, and the carried remainders are cleared: they were the
+    /// rounding of the trajectory the key replaces. Refused for a state of another width.
+    pub fn seat(&mut self, state: [Vec<Rat>; 2]) -> Result<Rat, HnnError> {
+        let width = self.operands.width();
+        if state[0].len() != width || state[1].len() != width {
+            return Err(HnnError::Shape {
+                what: "a seated key has the ring's realified width",
+                expected: width,
+                found: state[0].len().min(state[1].len()),
+            });
+        }
+        if let Some(lattice) = self.lattice
+            && !state.iter().flatten().all(|x| lattice.contains(x))
+        {
+            return Err(HnnError::Wave {
+                what: "a key seated at a port on a lattice lies on that lattice",
+            });
+        }
+        let before = self.stored_energy()?;
+        self.state = state;
+        if self.lattice.is_some() {
+            let rest = vec![Rat::zero(); width];
+            self.remainders = ResonatorRemainders {
+                rate: rest.clone(),
+                state: [rest.clone(), rest],
+            };
+        }
+        Ok(self.stored_energy()? - before)
+    }
+
     /// The ring's operands.
     pub fn operands(&self) -> &ResonatorOperands {
         &self.operands

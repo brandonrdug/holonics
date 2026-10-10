@@ -1,0 +1,17 @@
+{
+ "scope": "Local developer reads by opus under the common lease, not claim-bearing, at the second rung's source (WavePort::seat, the moment-key decoder in examples/acoustic_release, the seat test).",
+ "wave_tests": [
+  "test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.04s",
+  "BOUNDED start 04:55:06 end 04:55:18 exit 0 wall_ns 11140420788 child_peak_rss_kib 37516"
+ ],
+ "gate": [
+  "gate check: ok (3183 ms)",
+  "gate guard-lints: ok (9061 ms)",
+  "gate guard-doctests: ok (23146 ms)",
+  "BOUNDED start 04:55:18 end 04:55:53 exit 0 wall_ns 35397610920 child_peak_rss_kib 2298852"
+ ],
+ "deadlines_s": [
+  420,
+  300
+ ]
+}

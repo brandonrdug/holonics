@@ -1056,3 +1056,27 @@ fn the_lattice_port_carries_its_remainders_across_chunks() {
     assert_eq!(port.state(), whole.state());
     assert_eq!(port.remainders(), whole.remainders());
 }
+
+/// **A key seated at the port** (bank record §7): the state is replaced, the work booked is the
+/// stored energy's change, the remainders are cleared, and a key off the lattice or of another width
+/// is refused with the port unchanged.
+#[test]
+fn a_key_seated_at_a_lattice_port_books_its_work() {
+    use holonics::hnn::constitution::Lattice;
+    let lattice = Lattice::new(32);
+    let operands = declared_ring(&integer(1));
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    for received in port.receive(&matched(&operands, &stream(1, 20))).unwrap() {
+        received.unwrap();
+    }
+    let before = port.stored_energy().unwrap();
+    let key = [vec![rat(1, 4), Rat::zero()], vec![rat(-3, 8), rat(1, 2)]];
+    let work = port.seat(key.clone()).unwrap();
+    assert_eq!(port.state(), [&key[0][..], &key[1][..]]);
+    assert_eq!(work, port.stored_energy().unwrap() - before);
+    assert!(port.remainders().all().all(Zero::is_zero));
+    let off = [vec![Rat::new(1.into(), BigInt::from(3)), Rat::zero()], vec![Rat::zero(), Rat::zero()]];
+    assert!(matches!(port.seat(off), Err(HnnError::Wave { .. })));
+    assert!(matches!(port.seat([vec![Rat::zero()], vec![Rat::zero()]]), Err(HnnError::Shape { .. })));
+    assert_eq!(port.state(), [&key[0][..], &key[1][..]]);
+}

@@ -136,3 +136,90 @@ The next rung's joins, at their actual consumers:
 - **A refusal answered with a larger limit:** the projection and deadline were fixed from the
   development read, and the run finished within them.
 - **Bits read as progress:** no code length is claimed.
+
+## 7. The second rung: each ring decodes its own moment keys (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] **The keys are the rings' moments at their own epochs.** A
+linear ring driven by `x` carries `s_n = T^(n−m) s_m + Σ_(m≤j<n) T^(n−1−j) B x_j`. This is the chunking
+law of `hnn::wave`'s header, and it is the helical code's strand face with the ring as the navigator:
+the state is the phase-carried moment of everything that drove it. The ring's **epochs** are
+intervals between its own section arrivals (`hnn::dynamic_section`: the whole winding `⌊ℓ/4⌋` of its
+actual driven state). A **key** is the ring's state at the arrival that opens an epoch, at the key
+grain `2^(−16)`, together with that arrival's tick (its placement). Nothing in a key is authored:
+the arrivals are crossings of the ring's own state, and the state is its own moment.
+
+- **The epoch's length is the ring's own half-memory.** `W_b` is the least number of whole turns
+  after which the free ring (`a = 0` incident) holds at most half the energy it started with, read
+  from the ring's own free run from a unit state on its lattice. A key opens at the first arrival,
+  and then at each arrival whose whole winding is at least `W_b` past the last key's.
+- **The decoder is the same ring, free between keys.** A second lattice port of the same operands
+  receives incident `0` throughout. At each key's tick its state is seated to the key
+  (`WavePort::seat`: the key as the action that sets the navigator's initial configuration, its work
+  `E(key) − E(before)` booked). The decoded emission is that port's `ê_b = −(2/Y_b) ω̂_b`.
+- **The residual is exact.** `R_n = Σ_b e_b(n) − Σ_b ê_b(n)` per tick, an exact rational. By the
+  moment law it is the drive each epoch received after its key (and the key grain's remainder).
+
+**Acceptance (fixed before code):**
+- **B1.** The decoder's every tick closes, and its whole-stream balance closes exactly with the seat
+  work booked: `E_end = ΣW − ΣhωDω + Σ(chart + split) + Σ seat`.
+- **B2.** `Σ_b e_b = Σ_b ê_b + R` holds exactly at every tick.
+- **B3.** Each ring's `W_b`, the key count, the arrivals the reader refused (a chord through the
+  origin restarts the reader and is counted), and the keys' lengths are reported. The lengths are
+  each key's two integers at `2^(−16)` and its tick gap under the Elias gamma code (`2⌊log₂ n⌋ + 1`
+  bits for `n ≥ 1`, sign one bit), named as such and never read as progress.
+- **B4.** The decode, rendered by the same render law, goes to Brandon whole. (Amended before the
+  first run: each stream is rendered with its own boundary gain, which is reported. A seated key can
+  raise the decoded peak above the emission's, and one shared gain could then overflow 16 bits.) The residual's per-second sums of squares at the PCM grain are reported beside the
+  decode's, as exact integers.
+
+**Not claimed:** compression, intelligibility or any quality reading, which are Brandon's perception
+to judge; that the bank is located (it is still declared, §2); a generation. The decode is what the
+rings' own moment keys carry of the recording, nothing more.
+
+## 8. Measured: the moment keys carry part of the recording, at more than twice its cost
+
+[measured] A development read (2500 ticks, 9704554536 ns) and one full run
+([receipt](receipts/2026-10-10-acoustic-release/DECODE_RUN.v1.json)): 405567075951 ns against a
+projection of 425 s (deadline 480 s), with a peak resident set of 406952 KiB.
+
+- **The encoder is unchanged.** The emission's render is byte-identical to §4's.
+- **B1 holds.** Every decoder tick of every ring closed, and every decoder's whole-stream balance
+  closed exactly with its seat work booked.
+- **B2** holds by construction: `R` is defined as `Σe − Σê` in exact arithmetic. It adds no evidence
+  beyond B1.
+- **B3.**
+  - The half-memory is 1 turn for rings 0–15, 2 turns for rings 16–21 and 3 turns for rings 22–23. At
+    `a = t/32`, the free ring gives up about half its energy through its port in one turn.
+  - There are 86446 keys in all, from 711 (ring 0) to 6841 (ring 21).
+  - The reader restarted once on each of rings 0–5 and 9: their state passed through the origin in
+    silence.
+  - The keys' length under the Elias gamma code is 3872041 bits. The recording's own 16-bit samples
+    are `93680 · 16 = 1498880` bits, and `2 · 1498880 < 3872041 < 3 · 1498880`.
+- **B4.** The decode's peak is in `[2⁻², 2⁻¹)` (gain `2¹`), and the residual's in `[2⁻¹, 2⁰)` (gain
+  `2⁰`). Per second, at those gains, the sums of squares are:
+
+| second | emission (gain 2⁰) | decode (gain 2¹) | residual (gain 2⁰) |
+|---|---|---|---|
+| 0 | 84300621938 | 116590945411 | 61504029725 |
+| 1 | 192651157656 | 324018482445 | 133939683102 |
+| 2 | 121257520412 | 182533990404 | 72837255666 |
+| 3 | 142463995040 | 201902092508 | 82487184684 |
+| 4 | 95539722630 | 143235553289 | 57958910921 |
+| 5 | 49067397092 | 76886180977 | 23992535841 |
+| 6 | 130 | 265 | 14 |
+
+  The decode's gain `2¹` multiplies its sums of squares by 4. At the emission's gain the decode would
+  read about a quarter of each entry in its column, below the residual's entry in every second
+  with recording in it. The decode went to Brandon whole.
+
+**What the reading says.** On this declared bank, a ring forgets half of what it holds within one
+turn. A key therefore carries little beyond its own epoch, and most of each epoch's emission is that
+epoch's own drive: the residual, the news the key does not hold. The keys cost more than the samples
+they replace. This is the measurement, and it names the blocker: **the declared bank's memory is
+about one turn, so its moments are not a code of the recording**, whatever the recording sounds like
+through them. Brandon's perception of the decode is the reading this record cannot make.
+
+The next rung changes what is measured to have failed, not the limit. The rings must be located
+from the recording, and their memory must be that of rings whose port coupling matches what they
+hold (`hnn::section_lock`'s settled locks are the existing owner of a ring that has locked). Then a
+key holds a lock across many turns, and only the lock's departures enter the residual.
