@@ -649,6 +649,24 @@ impl<'f> PhysicalReceiver<'f> {
             }
             ratios.push(&comparison.returned.ratio);
         }
+        let credited: Vec<(&[MaterialTangent], &ReceivingFaceRatio)> = observations
+            .iter()
+            .zip(ratios)
+            .map(|(&(tangents, _), ratio)| (tangents, ratio))
+            .collect();
+        self.bound_proposal(coordinates, &credited, received)
+    }
+
+    /// The descent of `credited` staged where `received`, this receiver's latest encounter, left it:
+    /// the material at its own receiving publication (or its producing commit), the World model at
+    /// its World tick, the carried current it published; its reach, opening clock and normalizing
+    /// contact steps.
+    fn bound_proposal(
+        &self,
+        coordinates: &[ContactCoordinate],
+        credited: &[(&[MaterialTangent], &ReceivingFaceRatio)],
+        received: &ActionReception,
+    ) -> Result<WorldProposal, HnnError> {
         let comparison = received
             .comparison
             .as_ref()
@@ -657,8 +675,6 @@ impl<'f> PhysicalReceiver<'f> {
             })?;
         let returned = &comparison.returned;
         let producing_commit = received.applied.producing_commit();
-        // The present material is the last encounter's own: its receiving publication's commit, or
-        // the producing commit when the comparison published nothing.
         let published = comparison
             .publication
             .as_ref()
@@ -686,16 +702,11 @@ impl<'f> PhysicalReceiver<'f> {
             .ok_or(HnnError::Unadmitted {
                 reason: "a World proposal reads its encounter's own reach",
             })?;
-        let credited: Vec<(&[MaterialTangent], &ReceivingFaceRatio)> = observations
-            .iter()
-            .zip(ratios)
-            .map(|(&(tangents, _), ratio)| (tangents, ratio))
-            .collect();
         let steps = world_descent(
             self.field,
             self.constitution(),
             coordinates,
-            &credited,
+            credited,
             &returned.contacts,
         )?;
         Ok(WorldProposal {
@@ -707,6 +718,56 @@ impl<'f> PhysicalReceiver<'f> {
             world_tick: model.tick(),
             carry: received.carry.clone(),
         })
+    }
+
+    /// [definition; agent-inferred, October 10; the held-carry record §7b] **A proposal that
+    /// descends the admitted future**: at each admitted wave in `controls`, the located key's
+    /// prospect of the next encounter from the present opening, taught along every declared
+    /// coordinate's direction on the present material ([`Self::world_prospect_taught`]); the
+    /// prospects' credits summed per coordinate and law (6) applied ([`world_descent`]). It is
+    /// staged where `received`, this receiver's latest encounter, left it, with that encounter's
+    /// reach, opening clock and normalizing contact steps. The experienced encounters located the
+    /// key; the step descends the comparisons the landing admits by.
+    #[allow(clippy::too_many_arguments)]
+    pub fn world_prospect_proposal(
+        &self,
+        coordinates: &[ContactCoordinate],
+        source: &Encoded,
+        receiver: &ReceiverDeclaration,
+        preparation: &PortPreparation,
+        compared: &[bool],
+        controls: &[&[Rat]],
+        received: &ActionReception,
+    ) -> Result<WorldProposal, HnnError> {
+        if controls.is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason: "a prospect proposal reads the next encounter at one admitted wave at least",
+            });
+        }
+        let theta = self.constitution().clone();
+        let directions = coordinates
+            .iter()
+            .map(|c| MaterialDirection::of_coordinate(self.field, &theta, c))
+            .collect::<Result<Vec<_>, _>>()?;
+        let taught = controls
+            .iter()
+            .map(|control| {
+                self.world_prospect_taught(
+                    &theta,
+                    source,
+                    receiver,
+                    preparation,
+                    compared,
+                    control,
+                    &directions,
+                )
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let credited: Vec<(&[MaterialTangent], &ReceivingFaceRatio)> = taught
+            .iter()
+            .map(|(ratio, tangents)| (tangents.as_slice(), ratio))
+            .collect();
+        self.bound_proposal(coordinates, &credited, received)
     }
 
     /// [definition; agent-inferred, October 9; the held-carry record §5] **The located key's prospect
@@ -725,6 +786,22 @@ impl<'f> PhysicalReceiver<'f> {
         compared: &[bool],
         control: &[Rat],
     ) -> Result<ReceivingFaceRatio, HnnError> {
+        let (prospect, phases) =
+            self.located_prospect(material, source, receiver, preparation, compared, control)?;
+        self.prospect_ratio(&prospect, &phases)
+    }
+
+    /// The located key's coupled prospect behind [`Self::world_prospect_ratio`], with the receiving
+    /// phases it is read in: the raw native logits and the key's raw face at each compared station.
+    pub fn located_prospect(
+        &self,
+        material: &Constitution,
+        source: &Encoded,
+        receiver: &ReceiverDeclaration,
+        preparation: &PortPreparation,
+        compared: &[bool],
+        control: &[Rat],
+    ) -> Result<(CoupledProspect, ReceivingPhases), HnnError> {
         let (_, phases, word, _) =
             self.action_opening(source, receiver, preparation, compared, material)?;
         let feature = word.prospective_feature(&phases, preparation, compared)?;
@@ -757,6 +834,16 @@ impl<'f> PhysicalReceiver<'f> {
                 reason: "a landing's prospect reads a located World state: the key's fibre is a point",
             });
         }
+        Ok((prospect, phases))
+    }
+
+    /// The receiving comparison a located prospect reads: its produced native logits against the
+    /// key's declared raw face, both at the receiver's grain, over the compared stations alone.
+    fn prospect_ratio(
+        &self,
+        prospect: &CoupledProspect,
+        phases: &ReceivingPhases,
+    ) -> Result<ReceivingFaceRatio, HnnError> {
         if prospect.faces.len() != prospect.point.features.len() {
             return Err(HnnError::Unadmitted {
                 reason: "a landing's key declares the face it predicts at every compared station",
@@ -788,6 +875,80 @@ impl<'f> PhysicalReceiver<'f> {
                 .clone(),
         );
         ReceivingFaceRatio::compare_partition(Faces::of_reads(&reads, grain)?, observed, branch)
+    }
+
+    /// [definition; agent-inferred, October 10; the held-carry record §7b] **The located prospect
+    /// taught along material directions**: the prospect of [`Self::world_prospect_ratio`] at
+    /// `control` on `material`, with one material tangent per direction riding the prospective Word
+    /// from the present opening, where the actual carry crosses into the material at held momentum
+    /// ([`MaterialTangent::crossed_at_held_momentum`]), through the located key's charts
+    /// ([`WorldModel::located_prospect_with_tangents`]), and read at the compared stations through
+    /// the same receiving read. Returns the prospect's comparison and its tangents, whose
+    /// `comparison_credit` against it is the derivative of the comparison the landing admits by.
+    /// Nothing actual is read or written.
+    #[allow(clippy::too_many_arguments)]
+    pub fn world_prospect_taught(
+        &self,
+        material: &Constitution,
+        source: &Encoded,
+        receiver: &ReceiverDeclaration,
+        preparation: &PortPreparation,
+        compared: &[bool],
+        control: &[Rat],
+        directions: &[MaterialDirection],
+    ) -> Result<(ReceivingFaceRatio, Vec<MaterialTangent>), HnnError> {
+        let (_, phases, word, _) =
+            self.action_opening(source, receiver, preparation, compared, material)?;
+        let feature = word.prospective_feature(&phases, preparation, compared)?;
+        if control.len() != feature.preparation().controls() {
+            return Err(HnnError::Shape {
+                what: "the prospect's source wave control",
+                expected: feature.preparation().controls(),
+                found: control.len(),
+            });
+        }
+        let (word, _, applied) = feature.prepare_control(word, control)?;
+        let model = self.world_model().ok_or(HnnError::Unadmitted {
+            reason: "a taught prospect reads the bound World model",
+        })?;
+        let live: Vec<usize> = model
+            .states()
+            .iter()
+            .enumerate()
+            .filter(|(_, state)| matches!(state, KeyState::Live(_)))
+            .map(|(key, _)| key)
+            .collect();
+        let [key] = live[..] else {
+            return Err(HnnError::Unadmitted {
+                reason: "a taught prospect reads exactly one live World key",
+            });
+        };
+        let extent = model.keys()[key].extent();
+        let mut tangents = directions
+            .iter()
+            .map(|direction| {
+                MaterialTangent::held_opening(&word, material.commit(), direction.clone())?
+                    .crossed_at_held_momentum(&word)
+                    .map(|tangent| tangent.with_port(applied.ring(), extent))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let prospect = model.located_prospect_with_tangents(
+            key,
+            &word,
+            applied.ring(),
+            &phases,
+            compared,
+            &mut tangents,
+        )?;
+        for tangent in &mut tangents {
+            tangent.read_stations(|anchor| {
+                Ok(phases
+                    .read(self.field, material, self.current(), anchor)?
+                    .logits)
+            })?;
+        }
+        let ratio = self.prospect_ratio(&prospect, &phases)?;
+        Ok((ratio, tangents))
     }
 
     /// [definition; agent-inferred, October 9 and 10; the held-carry record §5, §7] **The World

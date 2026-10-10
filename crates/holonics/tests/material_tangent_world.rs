@@ -1800,3 +1800,226 @@ fn the_two_observation_landing_reads_both_waves() {
     }
 }
 
+// ---- The admitted future descended: the prospect's own credit (the held-carry record §7b) ----
+
+impl Declared {
+    /// The contact material of `at(ε)` on another constitution (its receiving relation kept).
+    fn on(&self, material: &Constitution, epsilon: &Rat) -> Constitution {
+        material
+            .clone()
+            .with_channel(
+                0,
+                plus(&self.storage, &self.direction, epsilon),
+                self.stiffness.clone(),
+                self.dissipation.clone(),
+            )
+            .unwrap()
+    }
+}
+
+/// The two chain encounters, plain, the second kept as the receiver's latest reception.
+fn experience(receiver: &mut PhysicalReceiver<'_>, field: &Field, source: &Encoded) -> ActionReception {
+    let [first, second] = chain_controls();
+    plain(receiver, field, source, &first);
+    let preparation = actuator(field);
+    let probe = receiver
+        .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let reception = probe.encounter(&waves, &second).unwrap();
+    let ActionCommunication::Received(last) = reception.reception else {
+        panic!("the second encounter completes");
+    };
+    last
+}
+
+/// **The prospect's credit at its consumer** (§7b): after two encounters, the located key's
+/// prospect of the next encounter at each wave, taught along one storage direction from the present
+/// opening. On `θ ± εH` (the present receiving relation kept), the prospects' parts at the frozen
+/// covector confirm the credit to second order on `ε = 2⁻⁴ … 2⁻⁸`.
+#[test]
+fn the_prospect_is_credited_at_its_consumer() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let direction = declared.storage_direction(&field);
+    let mut receiver = bound(
+        &field,
+        declared.at(&Rat::zero()),
+        &source,
+        vec![faced_key(&field)],
+    );
+    experience(&mut receiver, &field, &source);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    for control in chain_controls() {
+        let (ratio, tangents) = receiver
+            .world_prospect_taught(
+                &present,
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                &control,
+                &[direction.clone()],
+            )
+            .unwrap();
+        let credit = tangents[0].comparison_credit(&ratio).unwrap();
+        println!(
+            "prospect credit: wave {}: magnitude {}, produced phase {}, observed phase {}",
+            control[0], credit.magnitude, credit.produced_phase, credit.observed_phase
+        );
+        let g = ratio.covector().unwrap().logits().to_vec();
+        let tangent = [credit.magnitude, credit.produced_phase, credit.observed_phase];
+        let logits_at = |epsilon: &Rat| -> Vec<StationLogits> {
+            let (prospect, _) = receiver
+                .located_prospect(
+                    &declared.on(&present, epsilon),
+                    &source,
+                    &field.receivers()[0],
+                    &preparation,
+                    &[false, true],
+                    &control,
+                )
+                .unwrap();
+            prospect
+                .point
+                .features
+                .iter()
+                .zip(&prospect.faces)
+                .enumerate()
+                // numbered as the prospect's comparison numbers its stations
+                .map(|(rank, ((_, _, logits), (_, face)))| StationLogits {
+                    station: rank,
+                    produced: logits.clone(),
+                    observed: face.clone(),
+                })
+                .collect()
+        };
+        let mut residuals: Vec<(Rat, [Rat; 3])> = Vec::new();
+        for j in 4..9 {
+            let epsilon = rat(1, 1i64 << j);
+            let up = parts(&g, &logits_at(&epsilon));
+            let down = parts(&g, &logits_at(&-epsilon.clone()));
+            let two = integer(2) * &epsilon;
+            let r: [Rat; 3] =
+                std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &tangent[k]).abs());
+            println!(
+                "prospect credit: wave {}: ε = 2^-{j}: central residuals {} {} {}",
+                control[0], r[0], r[1], r[2]
+            );
+            residuals.push((epsilon, r));
+        }
+        for k in 0..3 {
+            let (first_epsilon, first) = &residuals[0];
+            let scaled_first = &first[k] / (first_epsilon * first_epsilon);
+            for pair in residuals.windows(2) {
+                assert!(
+                    pair[1].1[k].clone() * integer(2) <= pair[0].1[k],
+                    "part {k}: the residual halves at least"
+                );
+            }
+            for (epsilon, residual) in &residuals {
+                assert!(
+                    &residual[k] / (epsilon * epsilon) <= &scaled_first * integer(2),
+                    "part {k}: the residual stays O(ε²)"
+                );
+            }
+        }
+    }
+}
+
+/// Two encounters on a fresh learner at `theta`, then the proposal descending both waves'
+/// prospects and its landing over both waves.
+fn land_prospect<'f>(
+    field: &'f Field,
+    theta: &Constitution,
+    source: &Encoded,
+) -> (PhysicalReceiver<'f>, WorldLanding) {
+    let [first, second] = chain_controls();
+    let mut receiver = bound(field, theta.clone(), source, vec![faced_key(field)]);
+    let last = experience(&mut receiver, field, source);
+    let present = receiver.constitution().clone();
+    let coordinates = all_coordinates(&present);
+    let preparation = actuator(field);
+    let proposal = receiver
+        .world_prospect_proposal(
+            &coordinates,
+            source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &[&first, &second],
+            &last,
+        )
+        .unwrap();
+    let landing = receiver
+        .land_world_descent(
+            proposal,
+            source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &[&first, &second],
+        )
+        .unwrap();
+    (receiver, landing)
+}
+
+/// **The admitted future, descended** (§7b): after the same two encounters, the step descends the
+/// located key's prospects at both waves and lands through the same admission. The decision is
+/// reported as measured; when admitted, the actual next encounter at each wave (on identical
+/// replays) equals its prospect exactly and is read against the no-deposit twin at that wave.
+#[test]
+fn the_prospect_landing_reads_both_waves() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let controls = chain_controls();
+    let (_, landing) = land_prospect(&field, &theta, &source);
+    let reading = match landing {
+        WorldLanding::Unreached(refusal) => {
+            println!("prospect landing: unreached {refusal:?}");
+            return;
+        }
+        WorldLanding::Read(reading) => reading,
+    };
+    println!(
+        "prospect landing: grain raise {:?}; decision {:?}; deposition work {:?}",
+        reading.grain_raise,
+        reading.decision,
+        reading.deposition_work.as_ref().map(|w| w.to_string())
+    );
+    for wave in &reading.waves {
+        println!(
+            "prospect landing: wave {:?}: producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}",
+            wave.control.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+            wave.producing.code_length().unwrap(),
+            wave.producing.excess().unwrap(),
+            wave.proposed.code_length().unwrap(),
+            wave.proposed.excess().unwrap(),
+            wave.decision
+        );
+    }
+    if reading.decision.is_err() {
+        return;
+    }
+    for (index, control) in controls.iter().enumerate() {
+        let (mut replay, _) = land_prospect(&field, &theta, &source);
+        let landed = second_comparison(&mut replay, &field, &source, control);
+        let wave = &reading.waves[index];
+        assert_eq!(
+            landed.0,
+            wave.proposed.code_length().unwrap(),
+            "the located key's prospect is the actual next comparison"
+        );
+        assert_eq!(landed.1, wave.proposed.excess().unwrap());
+        let mut twin = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+        experience(&mut twin, &field, &source);
+        let unlanded = second_comparison(&mut twin, &field, &source, control);
+        println!(
+            "prospect production: wave {index}: landed code {:?} excess {}; twin code {:?} excess {}",
+            landed.0, landed.1, unlanded.0, unlanded.1
+        );
+    }
+}
+
