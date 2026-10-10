@@ -777,3 +777,60 @@ The quadrant's two sign tests often leave the interval open on one side. The oct
 `s_w w′ − s_u u′` closes it, which is why one bit buys more than one bit's narrowing. The margin is
 still the section chart's grain against the uniform samples, not learned content. §21 takes the
 grain's limit as the principle: refine the cell by mediants until the sample is determined.
+
+## 21. The sample as the ring's phase address (acceptance fixed before code is run)
+
+[definition; agent-inferred, October 10] §20's octant is one step of a refinement whose limit is the
+principle. Every exact sign test that refines a cell is a line through the origin of the phase plane,
+and the lines through the origin are ordered by slope. Refining by mediants walks the Stern–Brocot
+tree: the Farey address that the elementary objects give the pair contact's lock. For the next state:
+
+- Its exact image `(w′, u′) = (w₀ + w_m x, u₀ + u_m x)` is read by two exact-law steps of the ring
+  owner. Testing the image, not the rounded carry, makes every bound exact: no widening, so the
+  descent can end at one value.
+- Its class is its quadrant (3 bits). Within the class, its slope `σ = (s_u u′)/(s_w w′)` descends the
+  Stern–Brocot tree. At node `p/q` the bit is `σ ≥ p/q`, the exact half-line `q s_u u′ − p s_w w′ ≥ 0`
+  on the sample.
+- The descent stops when one PCM value remains, and both sides stop at the same node. The bits are
+  the ring's phase address to the grain the sample needs.
+- A **still line**, `u₀ w_m = w₀ u_m`, is the ring at rest among others. There the slope does not move
+  with the sample, so no descent is read and the remaining index is coded. Coding the remaining index
+  also covers a descent that reaches its cap of 256 nodes.
+
+**Acceptance.**
+- **F1.** `phase_decode(phase_encode(x)) = x` on every sample, with the ring's inverse tick checked at
+  every tick.
+- **F2.** The emitted bits are reported in their three parts (class, Farey path, index) against
+  `1498880` and against §20's 1364296 on the same ring and ticks.
+- **F3.** The path's length per tick, as a distribution read in the receipt.
+- **Reading rule.** As in §16, §19 and §20, a margin against the uniform samples is the section's
+  grain, not learned content. What §21 adds is that the code is made of nothing but the ring's own
+  dynamic symbols (its class and its Farey phase address) wherever the line moves.
+
+## 22. The order of the next loops (decided from the mathematics, October 10)
+
+[definition; agent-inferred] The codec's emitted symbols (the ring's class and its Farey phase
+address) are codes produced by the field's own dynamics. By guard 9 they are the lawful way into the
+field: a sample never becomes `Encoded`, but a section word may be located. The order follows.
+
+1. **The section word through the located route, into the repair owners.** The route is
+   `FrameFamily::locate → PassageChart::located → Encoding::found → Encoded::through`, then
+   `hnn::keys::PairLocation` and `repair::{key_code, residual_code, reopen}`. The squares
+   `DE = ρ, ET = UE, EB = J` hold on the located chart, where the injection is empty. The consumer is
+   the codec, with the class bits replaced by the word's key and residual. Acceptance:
+   - `reopen = word`;
+   - `through` admits the chart, with `check_step` on every stepped lift;
+   - exact decode;
+   - the charged length reported against the fixed-grain codec.
+2. **The ring's material learns from the code length.** The comparison is the next epoch's length.
+   Its smooth face is the log of each interval width, whose endpoints are roots of half-lines affine
+   in the image. The step is a certified deposition on the ring's own material, made epoch by epoch
+   from decoded data only, so the decoder replays it and the decode stays exact. Acceptance: on
+   unseen later epochs, the depositing ring's emitted bits are strictly below a never-depositing
+   twin's, with the decode exact.
+3. **The joint credit of those deposits.** It is `[f_s f_r; g_s g_r]` over the prospective epochs,
+   through the material branch's prospect, schedule and cycle owners. Acceptance: agreement with the
+   actual depositing run's forward perturbation to second order.
+
+§21's finer grain does not by itself establish the learning join; it supplies the word that loop 1
+locates. Loop 2 needs loop 1's length as its comparison, and loop 3 needs loop 2's `g`.
