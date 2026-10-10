@@ -12,8 +12,9 @@ row `rh.modular-scattering-paired-tail` (Refs #62 #63). The published source is 
 - **The first validation attempt failed before elaboration**
   ([its raw compiler diagnostic, projected](composed-tail-0f6a-native-v1/PREDECESSOR_COMPILER.stdout);
   [the failure's receipt](composed-tail-0f6a-native-v1/PREDECESSOR_ENVIRONMENT_FAILURE.json)).
-  The run's object directory had no `HolonicsResearch/Zeta/ModularScatteringResidual.olean`,
-  because that module is newer than the shared Lean build. The queue corrected the environment;
+  The compiler reported that `HolonicsResearch/Zeta/ModularScatteringResidual.olean` did not exist.
+  The cause was the validation environment's search path: an incomplete leading namespace root
+  shadowed the complete dependency root. Removing that leading root corrected the environment, and
   the source did not change.
 - **A review objection at line 205 was resolved against the pinned Mathlib.** In this pin,
   `add_le_add_right` is the additive form of `mul_le_mul_right : b ≤ c → a * b ≤ a * c`, so it gives

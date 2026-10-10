@@ -48,12 +48,14 @@ hold its law and measurements. The developer reads `TWO_OBSERVATION_DEV_TESTS.v1
 
 **Scope and limits kept with it.**
 - The claim is one next comparison per wave against the same-history no-landing twin.
-- It claims no improvement of a whole trajectory, and no necessity of the history. Later developer
-  reads (record §7c–§7e, published separately) find:
+- It claims no improvement of a whole trajectory, and no necessity of the history.
+- Later developer observations are unvalidated and outside this packet. They report:
   - one observation suffices;
   - the fresh no-history comparison is worse at `u = 1`;
   - the trajectory against the never-landing twin is mixed;
-  - the repeated passage closes to an orbit worse than its opening.
+  - after the receiving relation stops moving, finite recurrence of the readings at the receiver's
+    grain, which is neither an exact state periodicity, an indefinite settlement, nor a convergence
+    certificate.
 - The two-observation experience-credit landings were refused (§7a). Those refusals stay.
 - The queue explicitly skipped the old eleven World runtime tests. Strict `-D warnings` was not
   rerun, and its earlier FAILED (exit 101) stays separate, without waiver.
