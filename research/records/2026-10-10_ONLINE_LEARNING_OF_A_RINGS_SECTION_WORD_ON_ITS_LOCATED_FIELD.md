@@ -684,3 +684,46 @@ at commit 18.
   Whether the prior should move a map it cannot read below its lattice, or move only the scale it
   certifies, is the law's question for its owner. It is not answered here by any change, and O3's
   route (§7, §10) does not depend on it.
+
+## 12. The decoder's source review: hygiene repairs and its side information
+
+[definition] Codex's source review of `83f14e23` (cumulative `1a7af330`) gives **SOURCE GO for the
+conditional tone reconstruction consumer**, not yet a completely charged standalone codec.
+- The continuation takes `p_n` from the release's `odometer_masses`, interval-decodes a class, and
+  compares, deposits and ingests that decoded class.
+- The sample decoder uses only the decoded advances, the landing cells and the transmitted indices.
+- D1 replays online learning from a freshly mounted field. It does not load a saved learned
+  constitution, nor release a waveform without residual bits.
+
+It asked for repairs before a decoder can be called independent of its producing fixture. Each is
+now made:
+1. **The dictionary is read from the 28-cell prefix alone.** A later advance outside it is refused,
+   not added.
+2. **The class-to-ordinal map is derived from the prefix alone,** through the chart's classes of the
+   prefix passage.
+3. **The decoder has an enforced interface.** `decode_tone` is given a `ToneContext` and one stream.
+   The context holds the declared field (frame, letters, receiver), the located chart and encoding
+   founded from the prefix, the prefix's ordinals and dictionary, the ring and the window's opening
+   state, the window's clocks and the sample grid. It holds nothing of the word after the prefix.
+4. **The stream is self-delimiting:** the class code's length in Elias gamma, the class code, then
+   each tick's index, whose width the decoder derives from its own landing cell. It must end exactly
+   with the window.
+
+[measured] ([receipt](receipts/2026-10-10-online-learning/D2_DECODER_INTERFACE.v1.json); developer
+read, `acoustic_encoding` 11 of 11, 78939416050 ns.)
+- **D1 holds behind the interface:** every sample of the 120-tick window, exactly.
+- **The stream is 703 bits:** framing 9, class code 25 for the 92 continuation cells, indices 669 for
+  120 ticks.
+- **No hold.**
+- **The side information, listed as the review lists it**, beyond the stream:
+  - the prefix's 28 cells (one bit each if sent);
+  - the frame and the field's declaration with its letters (17 bits for the letters, §10);
+  - the located chart (18 bits on `[7, 2]`, §10);
+  - the dictionary;
+  - the reference, release and grain policy;
+  - the window's opening state after 120 ticks;
+  - the ring;
+  - the clocks;
+  - the grain and the range.
+
+  A standalone codec charges each of them. This one is the conditional consumer the review scoped.

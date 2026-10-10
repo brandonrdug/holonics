@@ -1,0 +1,14 @@
+{
+  "scope": "Local developer read by opus under the common lease, not claim-bearing: the online-learning record section 12, the tone decoder behind an enforced context and a self-delimiting stream.",
+  "runs": [
+    {
+      "log_sha256": "85da38cf03f61097381301dfa2e1f93a4533f906a7e30c56562571d7c9be6b9a",
+      "deadline_s": 300,
+      "lines": [
+        "§9 frame [7, 2]: D2 stream 703 bits = framing 9 + class code 25 (cells 28..120) + indices 669 (120 ticks); the prefix's 28 cells are context (one bit each if sent); holds 0; the near-return codes the word in (27, 360)",
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 53.95s",
+        "BOUNDED start 14:55:29 end 14:56:48 exit 0 wall_ns 78939416050 child_peak_rss_kib 2404144"
+      ]
+    }
+  ]
+}
