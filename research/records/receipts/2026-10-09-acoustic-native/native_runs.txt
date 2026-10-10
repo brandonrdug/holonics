@@ -59,3 +59,15 @@ Task 3 (the lock reader and the joint period):
 Python (not the lane): lock_predictions.py, timeout 300 s, exit 0, written to lock_predictions_output.txt before runs 10 and 11.
 Both runs read the committed source of the lock reader; no assertion was edited after a run. clippy, tools/gate.sh,
 the whole suite and lake were not run.
+
+Codex's review repairs (passive admission, the full reflected vector):
+12. cargo test --test acoustic_wave_port -- --test-threads=1
+    BOUNDED start 00:59:18 end 01:00:11 exit 0 wall_ns 52741765872 child_peak_rss_kib 1493916     15 passed (the 13 and the two witnesses)
+    (a malformed loop invocation of the two lib commands exited 1 in about 0.05 s with no cargo work:
+     BOUNDED start 01:00:17 end 01:00:17 exit 1 wall_ns 52414725 and 33006356; they are not test runs)
+13. cargo test --lib hnn::section_lock -- --test-threads=1
+    BOUNDED start 01:00:24 end 01:00:30 exit 0 wall_ns 6286146867 child_peak_rss_kib 1599108      8 passed
+14. cargo test --lib hnn::dynamic_section -- --test-threads=1
+    BOUNDED start 01:00:30 end 01:00:31 exit 0 wall_ns 80730643 child_peak_rss_kib 28280          6 passed (test binary already built)
+15. RUSTC_BOOTSTRAP=1 cargo test --doc hnn::wave
+    BOUNDED start 01:00:31 end 01:00:57 exit 0 wall_ns 26383352501 child_peak_rss_kib 2180600      6 passed

@@ -165,7 +165,10 @@ fn the_native_ring_steps_the_replicas_exact_states_and_every_tick_closes() {
             parse("12893354225423276842184025503232/1816151322484127584722900390625")
         )
     );
-    let reflected: Vec<Rat> = run.ticks[..4].iter().map(|t| t.reflected.clone()).collect();
+    let reflected: Vec<Rat> = run.ticks[..4]
+        .iter()
+        .map(|t| t.driven_reflected().clone())
+        .collect();
     assert_eq!(
         reflected,
         vec![
@@ -184,7 +187,9 @@ fn the_native_ring_steps_the_replicas_exact_states_and_every_tick_closes() {
         assert!(tick.step.closes(), "the owner's step closes at tick {n}");
         assert_eq!(tick.tick, n);
         assert_eq!(tick.incident, integer(F1[n % 7]));
-        let (a, b) = (&tick.incident, &tick.reflected);
+        let (a, b) = (&tick.incident, tick.driven_reflected());
+        // the isotropic node's quadrature coordinate reflects nothing either
+        assert!(tick.reflected[1].is_zero());
         let work = &h * &y / integer(4) * (a * a - b * b);
         assert_eq!(tick.boundary_work, work, "the wave's work at tick {n}");
         assert_eq!(
@@ -282,6 +287,112 @@ fn a_wave_must_be_matched_and_the_ring_must_be_the_unpumped_exact_one() {
         WavePort::at_rest(pumped, 0),
         Err(HnnError::Resonator { .. })
     ));
+}
+
+/// [Codex's review, witness 1] The loaded-solve certificate `2C + hD + (h²/2)K ⪰ 0` does not make the
+/// storage positive: `C = I`, `K = −I`, `D = 0`, `h = Y = 1` is certified, both balances close, and the
+/// ring is repaid more than it was given. The passive port refuses it; `K = 0` and a coupled positive
+/// `K` are admitted.
+#[test]
+fn a_signed_stiffness_is_not_a_passive_port() {
+    let identity = ExactRatMatrix::identity(2).unwrap();
+    let zero = ExactRatMatrix::zero(2, 2).unwrap();
+    let ring = |stiffness: ExactRatMatrix| {
+        let material =
+            ResonatorMaterial::new(identity.clone(), stiffness, zero.clone(), None).unwrap();
+        ResonatorOperands::at_cut(0, &material, &integer(1), &integer(1), None).unwrap()
+    };
+    let witness = ring(identity.scaled(&integer(-1)));
+
+    // the witness through the owner's own steps: incident 1 then 0 on one coordinate
+    let quiet = vec![Rat::zero(); 2];
+    let remainders = holonics::hnn::ring::ResonatorRemainders::default();
+    let first = witness
+        .step(
+            0,
+            &[integer(1), Rat::zero()],
+            [&quiet, &quiet],
+            &remainders,
+            None,
+        )
+        .unwrap();
+    assert_eq!(first.state[0], [rat(2, 5), Rat::zero()]);
+    assert_eq!(first.state[1], [rat(4, 5), Rat::zero()]);
+    assert_eq!(first.output, [rat(1, 5), Rat::zero()]);
+    assert_eq!(first.after, rat(6, 25));
+    let second = witness
+        .step(
+            1,
+            &[Rat::zero(), Rat::zero()],
+            [&first.state[0], &first.state[1]],
+            &remainders,
+            None,
+        )
+        .unwrap();
+    assert_eq!(second.state[0], [rat(6, 5), Rat::zero()]);
+    assert_eq!(second.state[1], [rat(4, 5), Rat::zero()]);
+    assert_eq!(second.output, [rat(-8, 5), Rat::zero()]);
+    assert_eq!(second.after, rat(-2, 5), "the stored energy is negative");
+    assert!(first.closes() && second.closes(), "both balances close");
+    // incident (hY/4) a² = 1/4 in all; reflected (hY/4) b² = 1/100 + 64/100 = 13/20
+    let (incident, reflected) = (rat(1, 4), rat(1, 100) + rat(64, 100));
+    assert_eq!(reflected, rat(13, 20));
+    assert!(reflected > incident, "repaid more than it brought");
+
+    assert!(matches!(
+        WavePort::at_rest(witness, 0),
+        Err(HnnError::Resonator { .. })
+    ));
+    // a free mass (K = 0, positive semidefinite) and a coupled positive K are passive
+    assert!(WavePort::at_rest(ring(zero.clone()), 0).is_ok());
+    let coupled = ExactRatMatrix::new(vec![
+        vec![integer(2), integer(1)],
+        vec![integer(1), integer(2)],
+    ])
+    .unwrap();
+    assert!(WavePort::at_rest(ring(coupled), 0).is_ok());
+}
+
+/// [Codex's review, witness 2] The reflected wave is a vector: with a coupled `K` every coordinate of
+/// the port reflects. `C = I`, `K = [[2, 1], [1, 2]]`, `h = Y = 1`, input `(1, 0)` reflects
+/// `b = (31/63, 4/63)`, and the work booked over the full port vector is `748/3969`, where the driven
+/// coordinate alone would give `752/3969`.
+#[test]
+fn every_coordinate_of_the_port_reflects() {
+    let identity = ExactRatMatrix::identity(2).unwrap();
+    let coupled = ExactRatMatrix::new(vec![
+        vec![integer(2), integer(1)],
+        vec![integer(1), integer(2)],
+    ])
+    .unwrap();
+    let material = ResonatorMaterial::new(
+        identity.clone(),
+        coupled,
+        ExactRatMatrix::zero(2, 2).unwrap(),
+        None,
+    )
+    .unwrap();
+    let operands = ResonatorOperands::at_cut(0, &material, &integer(1), &integer(1), None).unwrap();
+    let wave = matched(&operands, &[1]);
+    let mut port = WavePort::at_rest(operands, 0).unwrap();
+    let tick = port.receive(&wave).unwrap().next().unwrap().unwrap();
+
+    assert_eq!(tick.reflected, [rat(31, 63), rat(4, 63)]);
+    assert_eq!(*tick.driven_reflected(), rat(31, 63));
+    assert_eq!(tick.step.drive, [integer(1), Rat::zero()]);
+    // the full-vector work, and what the driven coordinate alone would have booked
+    assert_eq!(tick.boundary_work, rat(748, 3969));
+    let scalar = rat(1, 4) * (integer(1) - tick.driven_reflected() * tick.driven_reflected());
+    assert_eq!(scalar, rat(752, 3969));
+    assert_ne!(tick.boundary_work, scalar);
+    assert_eq!(tick.incident_energy, rat(1, 4));
+    assert_eq!(
+        tick.reflected_energy,
+        rat(1, 4) * (rat(31, 63) * rat(31, 63) + rat(4, 63) * rat(4, 63))
+    );
+    // from rest D = 0: the stored energy is exactly the work booked over the whole vector
+    assert!(tick.closes());
+    assert_eq!(port.stored_energy().unwrap(), rat(748, 3969));
 }
 
 // -------------------------------------------------------------------------------------------

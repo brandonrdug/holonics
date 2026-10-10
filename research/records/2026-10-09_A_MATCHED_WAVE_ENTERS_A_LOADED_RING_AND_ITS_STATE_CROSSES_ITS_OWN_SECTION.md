@@ -63,7 +63,7 @@ marked: the opposite-ray form of the polarity item (§4.5) and a probe of the st
   unless its admittance and step are the operands' (matched). Each tick's balance
   (`ReceivedTick::closes`) is checked before the state is committed; a refused tick leaves the port as it
   was. The port holds nothing that grows with the stream but the state's own bits (§8).
-- Reason for the narrow admission: the consumer equation is the unpumped exact one. A pumped, scheduled,
+- Reason for the narrow admission (corrected in §13): the consumer equation is the unpumped exact one, and the port is the passive one (`K ⪰ 0`). A pumped, scheduled,
   nonlinear or lattice ring is refused with a typed reason; the pumped port (subharmonic locks, the sheet
   symbol) is the second rung's item 9, owed.
 - Reason for width 2: a ring lives on a realified width (two coordinates per node). A mono pressure drives
@@ -416,3 +416,59 @@ queue's; clippy and the guard lints were not run.
 7. The joint period: for words with periods `τ_b` on a window of length at least `2 lcm`, the tuple's least
    period is the lcm (Fine–Wilf), and it divides the wave's period when the wave's steady state has that period
    (the second rung's L7, L8).
+
+## 13. Codex's source review: two defects repaired, and stated limits
+
+[source-inspected; Codex, review of §§1–11] Two concrete defects in `hnn::wave`, both exact witnesses. Both
+are repaired and pinned by tests (`a_signed_stiffness_is_not_a_passive_port`,
+`every_coordinate_of_the_port_reflects`; 15 passed in `tests/acoustic_wave_port.rs`).
+
+**1. Passive admission.** `ResonatorMaterial::new` enforces `C ⪰ 0` and `D ⪰ 0` and only the symmetry of `K`; the
+loaded-solve certificate `2C + hD + (h²/2)K ⪰ 0` makes the operator solvable but does not make the storage
+positive. `WavePort::at_rest` therefore admitted a non-passive ring. The witness is `C = I`, `K = −I`,
+`D = 0`, `h = Y = 1`, incident amplitudes `1` then `0` on one coordinate (the test runs the owner's own steps):
+
+| tick | `u` | `w` | `b` | `E = ½(w C w + u K u)` | balance |
+|---|---|---|---|---|---|
+| 1 | `2/5` | `4/5` | `1/5` | `6/25` | closes |
+| 2 | `6/5` | `4/5` | `−8/5` | `−2/5` | closes |
+
+The incident energy totals `1/4` and the reflected `1/100 + 64/100 = 13/20`: the ring was repaid more than it was
+given, with both balances closed and a negative stored energy. The repair: `WavePort::at_rest` requires
+`K ⪰ 0`, decided exactly by the inertia owner (`ratio::linear::inertia`, no negative direction), and refuses a
+signed `K` with `HnnError::Resonator`. `C ⪰ 0` and `D ⪰ 0` are already the owner's, and positive definiteness of
+`C` is not needed: `E ≥ 0` needs only semidefiniteness, and the port's own `(h/Y) I` keeps the solve definite.
+With `E ≥ 0`, the balance gives `Σ boundary_work ≥ E ≥ 0` from rest, so the port cannot be repaid more than it
+brought. A free mass (`K = 0`) and a coupled positive `K` are admitted (asserted). A signed stiffness is a boost
+and keeps its own owner (the signature path); this port is the passive one.
+
+**2. The return contract.** `reflected_energy` summed every output, but `ReceivedTick.reflected` carried only the
+driven coordinate, so a consumer recomputing the work from the incident amplitude and that one entry booked the
+wrong quantity when `K` couples the coordinates. The witness is `C = I`, `K = [[2, 1], [1, 2]]` (positive
+definite), `h = Y = 1`, input `(1, 0)`: `ω = (16/63, −2/63)`, reflected `b = (31/63, 4/63)`, and the work booked
+over the full port vector is `(hY/4)(|a|² − |b|²) = 748/3969`, where the driven coordinate alone gives
+`752/3969`. The repair: `ReceivedTick.reflected` is now the whole reflected vector (with `coordinate` and the
+accessor `driven_reflected()`), `closes()` also requires it to be the owner's output, and the module header
+states that the boundary work is over the full port vector. The test asserts the vector, `748/3969`, that it
+differs from `752/3969`, the incident and reflected energies, and that the stored energy from rest is `748/3969`.
+
+[computational-witness; worker's run] The first run after the repair passed all 15 tests; `native_runs.txt`
+(runs 12 to 15) has the commands. The existing first test now also asserts the isotropic node's quadrature
+coordinate reflects nothing.
+
+**Stated limits** (Codex's other boundaries; everything built here is narrower than they say):
+- The quarter-turn grain is not continuous phase. A class is a quadrant at a declared grain; the lift keeps the
+  class and the whole winding, and the phase inside a quadrant (the exact angle of the state) is neither carried
+  nor read. Two states of one class differ in phase unresolved.
+- `SectionSymbol` carries no receiver, no clock and no subtick placement. It is `(class, advance, crossing)` of
+  one declared section; whose section it is (a receiver's frame), the clock it is read on (the port's `h`, the
+  tick index belongs to the caller) and where inside the tick a crossing falls (the unresolved fibre below the
+  tick) are not in it.
+- Chunk invariance does not certify gaps. §4.2 shows that receiving a stream in chunks with the state carried
+  equals receiving it whole; a stream with a stretch missing (dropped samples, a gap in the clock) is a different
+  wave, and the port has no notion of one: nothing checks the continuity of the clock between chunks beyond its
+  own tick count.
+- A declared quadrant grain is not a founded symbol identity. The symbols are labels of a declared partition of
+  the plane; they are not classes of a founded encoding, not located, and not shown invariant under relabelling,
+  so two rings reading equal labels have not thereby read the same symbol. (§6: the first rung's frames hold the
+  word.)

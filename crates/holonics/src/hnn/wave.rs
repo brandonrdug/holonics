@@ -43,9 +43,23 @@
 //! at the word's end; this owner is a continuing port outside any word and is not joined to a
 //! resident (owed). The chunking of a stream changes nothing: `s_((j+1)g) = Tᵍ s_(jg) + Σ_a T^(g−1−a) B x_(jg+a)`.
 //!
-//! [definition; hypotheses] The ring is unpumped, linear and on the exact law (no lattice): the
-//! consumer equation above is the unpumped one, and the pump's subharmonic locks and the sheet
-//! symbol are the owed pumped port. The wave drives one real coordinate (a mono pressure drives the
+//! [definition; hypotheses] The ring is **passive**, unpumped, linear and on the exact law (no
+//! lattice). Passive: `C ⪰ 0` and `D ⪰ 0` are the owner's (`ResonatorMaterial::new`), and
+//! [`WavePort::at_rest`] requires `K ⪰ 0`, decided exactly by the inertia owner, so that the stored
+//! energy `E = ½ (w C w + u K u)` is nonnegative and the net work the source gives from rest is
+//! nonnegative (`Σ boundary_work ≥ E ≥ 0`). The loaded-solve certificate `2C + hD + (h²/2)K ⪰ 0`
+//! alone does not give that: `C = I`, `K = −I`, `D = 0`, `h = Y = 1` is certified, its balances close,
+//! and a wave of amplitudes `1, 0` is repaid with more than it brought (incident `1/4`, reflected
+//! `13/20`, `E = −2/5`). A signed stiffness (a boost) has its own owner, the signature path; this port
+//! is the passive one. The consumer equation above is the unpumped one, and the pump's subharmonic
+//! locks and the sheet symbol are the owed pumped port.
+//!
+//! [definition] **The boundary work is over the whole port vector.** The ring's coordinates are coupled
+//! by `K` (and `C`, `D`), so a wave on one coordinate is reflected on all of them:
+//! `b = a − (2/Y) ω` is a vector, and the work booked is `(hY/4)(|a|² − |b|²)` with both norms over the
+//! full vector ([`ReceivedTick::reflected`]), not over the driven coordinate. (`C = I`,
+//! `K = [[2, 1], [1, 2]]`, `h = Y = 1`, input `(1, 0)` reflects `b = (31/63, 4/63)`: the work is
+//! `748/3969`, where the driven coordinate alone would give `752/3969`.) The wave drives one real coordinate (a mono pressure drives the
 //! real force of a node; the quadrature stays at rest for an isotropic node). Each tick's balance is
 //! checked before the state is committed, and a refused tick leaves the port as it was.
 //!
@@ -139,7 +153,9 @@
 use num_traits::{Signed, Zero};
 
 use crate::hnn::HnnError;
+use crate::hnn::contact::symmetric;
 use crate::hnn::ring::{ResonatorOperands, ResonatorRemainders, ResonatorStep};
+use crate::ratio::linear::inertia::inertia;
 use crate::ratio::linear::vector::dot;
 use crate::ratio::{Rat, integer};
 
@@ -192,17 +208,21 @@ impl MatchedWave {
     }
 }
 
-/// [definition] **One received tick**: the incident amplitude `a`, the reflected amplitude `b`, the
-/// energy the incident and the reflected waves carry through the port, the net work booked at the
-/// boundary, and the owner's executed step.
+/// [definition] **One received tick**: the incident amplitude `a` on the driven coordinate, the
+/// reflected wave `b` on **every** coordinate of the port, the energy the incident and the reflected
+/// waves carry through the port (both over the full vector), the net work booked at the boundary, and
+/// the owner's executed step.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ReceivedTick {
     /// The port's clock before the tick: the index of the amplitude consumed.
     pub tick: usize,
     /// `a`, the incident amplitude on the driven coordinate.
     pub incident: Rat,
-    /// `b = a − (2/Y) ω` on the driven coordinate.
-    pub reflected: Rat,
+    /// The coordinate the wave drives.
+    pub coordinate: usize,
+    /// `b = a − (2/Y) ω`, the whole reflected wave: every coordinate of the port reflects, not only
+    /// the driven one.
+    pub reflected: Vec<Rat>,
     /// `(hY/4) Σ a²` over the ring's coordinates.
     pub incident_energy: Rat,
     /// `(hY/4) Σ b²` over the ring's coordinates.
@@ -214,6 +234,11 @@ pub struct ReceivedTick {
 }
 
 impl ReceivedTick {
+    /// The reflected amplitude on the driven coordinate: one entry of [`ReceivedTick::reflected`].
+    pub fn driven_reflected(&self) -> &Rat {
+        &self.reflected[self.coordinate]
+    }
+
     /// **The consumer equation, every tick**: the owner's step closes
     /// ([`ResonatorStep::closes`]) with no pump, integration, chart or split term (the unpumped
     /// exact law), the booked work is the incident less the reflected energy, and the stored
@@ -222,6 +247,7 @@ impl ReceivedTick {
     pub fn closes(&self) -> bool {
         let step = &self.step;
         step.closes()
+            && self.reflected == step.output
             && step.pump.is_zero()
             && step.integration.is_zero()
             && step.chart.is_zero()
@@ -244,8 +270,9 @@ pub struct WavePort {
 
 impl WavePort {
     /// **A port at rest**: the ring's operands and the real coordinate the wave drives. Refused
-    /// when the coordinate is outside the ring's width, or the ring is pumped, scheduled,
-    /// nonlinear or on a lattice (the consumer equation is the unpumped exact one).
+    /// when the coordinate is outside the ring's width, the ring is pumped, scheduled, nonlinear
+    /// or on a lattice (the consumer equation is the unpumped exact one), or its stiffness `K` is
+    /// not positive semidefinite (the port is the passive one; module header).
     pub fn at_rest(operands: ResonatorOperands, coordinate: usize) -> Result<Self, HnnError> {
         let width = operands.width();
         if coordinate >= width {
@@ -266,6 +293,15 @@ impl WavePort {
             return Err(HnnError::Resonator {
                 ring: operands.ring(),
                 what: "a matched wave drives a linear ring on the exact law",
+            });
+        }
+        // Passive: C and D are positive semidefinite by the owner; K must be too, or the stored
+        // energy is not nonnegative and the port can be repaid more than it brought (module header).
+        let (_, stiffness, _) = material.forms();
+        if inertia(&symmetric(stiffness)?).negative != 0 {
+            return Err(HnnError::Resonator {
+                ring: operands.ring(),
+                what: "a matched wave drives a passive ring: its stiffness K must be positive semidefinite (a signed stiffness has its own owner)",
             });
         }
         let rest = vec![Rat::zero(); width];
@@ -348,7 +384,8 @@ impl WavePort {
         let received = ReceivedTick {
             tick: self.tick,
             incident: incident.clone(),
-            reflected: step.output[self.coordinate].clone(),
+            coordinate: self.coordinate,
+            reflected: step.output.clone(),
             boundary_work: &incident_energy - &reflected_energy,
             incident_energy,
             reflected_energy,
