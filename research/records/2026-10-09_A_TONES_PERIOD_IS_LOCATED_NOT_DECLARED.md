@@ -1,9 +1,11 @@
 # A tone's period is located, not declared
 
 **Date.** October 9. **Issues.** #148, #73, #386, #62. **Grade.** Definition record, with a
-source-inspected account of the owners and a fixed acceptance. Nothing here was compiled or run:
-the Rust is written against the read signatures and awaits the validation queue; the predictions
-in §6 come from an independent exact replica (receipts below), which is not a repository owner.
+source-inspected account of the owners and a fixed acceptance. The Rust was written against the
+read signatures; a delegated worker later compiled and ran `tests/acoustic_encoding.rs` once under
+the common compiler lease (§6.1: 7 of 7 passed, no source change). That is a worker's reading, not a
+validation-queue receipt. The predictions in §6 come from an independent exact replica (receipts
+below), which is not a repository owner.
 
 ## 1. The acceptance
 
@@ -137,6 +139,32 @@ re-implements the loop closure, the key fibre and the cycle, and predicts, on ri
 | sawtooth step 3, period 9 | 2 narrow, 10 empty | none: held |
 | quantized triangle, period 12 | 5 narrow, 7 empty | none: held |
 
+### 6.1 Measured (October 9, one run under the common lease)
+
+[computational-witness; worker's run, not a queue receipt] `cargo test -p holonics --offline -j 2
+--test acoustic_encoding -- --test-threads=1 --nocapture`, exit 0, wall 29,086,782,095 ns including a
+cold build of the crate and its dependencies, child peak resident 1,879,148 KiB, deadline 300 s. 7 passed, 0 failed, 0 ignored. The readings equal the replica's prediction table
+above on every row, tally by tally:
+
+| source | measured tally (narrow, empty, plural, open, one) | cycle read |
+|---|---|---|
+| sawtooth, period 7, rings to 6 | 5, 0, 6, 0, 1 | rings `(2, 5)`: 7, winding 1 |
+| sawtooth, period 12, rings to 6 | 5, 6, 0, 0, 1 | rings `(3, 4)`: 12, winding 1 |
+| sawtooth, period 7, rings to 9 | 9, 0, 26, 0, 3 | rings `(2, 5)`, `(2, 7)`, `(2, 9)`: 7 each, winding 1 each |
+| triangle, period 7 | 5, 0, 6, 0, 1 | rings `(2, 5)`: 7, winding 3 |
+| square, period 7 | 0, 11, 0, 0, 1 | rings `(5, 2)`: 7, winding 1 |
+| sawtooth step 2, period 8 | 5, 5, 2, 0, 0 | held (`Unlocated`) |
+| sawtooth step 3, period 9 | 2, 10, 0, 0, 0 | held (`Unlocated`) |
+| quantized triangle, period 12 | 5, 7, 0, 0, 0 | held (`Unlocated`) |
+| Thue–Morse, 128 | 0, 12, 0, 0, 0 | refused (`Unlocated`) |
+
+The reversed alphabet read the same tally and cycle as the original (the relabelling test). The
+field declared on the carrying rings admitted the located passage: rings `(2, 5)` read chart
+dimension 10, reached 10, founded dimension 9, squares 10 states and 4 transports, 21 cells; rings
+`(2, 7)` and `(2, 9)` the same fibre and cells at dimensions 14 and 18; rings `(3, 4)` on period 12
+read dimension 12, reached 12, founded 10, a fibre of 2 directions, 36 cells. No prediction failed and
+no assertion was edited.
+
 [agent-inferred] **The fixtures were chosen after this measurement, and say so.** The sawtooth is
 the waveform that is an odometer's own receiving digit, which is what a helix of coprime rings
 generates; tones the family does not carry are held, not tuned until they pass (lesson 12). The
@@ -201,7 +229,8 @@ and refuses the rest with their typed readings.
   constant-rate reading is not this state-dependent advance.
 - The pair-law cross-check at `δ = P` on the admitted passage, and a field derived from the located
   frame (the tests declare it by hand).
-- Anything run: the predictions come from a replica. Lean for the cycle and the period (#62).
+- Anything beyond the 7 tests of §6.1, which one worker ran once; they are not a validation-queue
+  receipt. Lean for the cycle and the period (#62).
 
 ## 10. Owners
 
