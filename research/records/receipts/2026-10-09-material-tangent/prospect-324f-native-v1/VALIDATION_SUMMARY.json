@@ -1,0 +1,722 @@
+{
+ "projection_note": "actual_readout omitted here: it is PROSPECT_READOUT.json beside this file (projected).",
+ "schema": "material_prospect_two_encounter_native_validation_v1",
+ "UTC": "2026-10-10T02:32:43.273447+00:00",
+ "source_pin": {
+  "source_commit": "324f6138efbff0f2645f60fa5f5f8bfefe21d555",
+  "source_tree": "6f300a859f1cd285d0a49dc8ef72069729c4a2de",
+  "source_edits_by_validator": false,
+  "clean_at_admission": true
+ },
+ "review_admission": {
+  "native_GO": true,
+  "source_commit": "324f6138efbff0f2645f60fa5f5f8bfefe21d555",
+  "source_tree": "6f300a859f1cd285d0a49dc8ef72069729c4a2de",
+  "status": "Direct accepted parent source GO; prospect readings and twin comparisons are product acceptance, separate from native PASS.",
+  "compiler_started": false
+ },
+ "scoped_native_commands_passed": true,
+ "per_command_passed": {
+  "gate": true,
+  "world": true
+ },
+ "product_reading_acceptance_passed": true,
+ "stages": [
+  {
+   "kind": "gate",
+   "summary": {
+    "kind": "gate",
+    "source_commit": "324f6138efbff0f2645f60fa5f5f8bfefe21d555",
+    "source_tree": "6f300a859f1cd285d0a49dc8ef72069729c4a2de",
+    "source_clean_unchanged_after": true,
+    "command_result": {
+     "target": "material prospect324f gate",
+     "exit": 0,
+     "command_wall_ns": 166590962221,
+     "kernel_command_passed": true,
+     "expected_command_exit": true,
+     "diagnostic_lines": [],
+     "whole_stdout_SHA256": "a99d4383e0615e0bb7fcd7351f213e04d3a5594bb4a0d09c771cc9cececd6d3f",
+     "whole_stderr_SHA256": "902694c9bf45d1c1870a63f1b2106c8c57992f27dcd7bebca20644b33f9adc98",
+     "source_not_edited": true
+    },
+    "controller_exit": 0,
+    "acceptance": {
+     "passed": true,
+     "final_CPU_receipt": {
+      "sha256": "819d38897c0cde3620b59642651016992c89f9d9fe4d6dc05e90b3e4b65ba4b6",
+      "bytes": 5649
+     },
+     "cleanup_receipt": {
+      "sha256": "81dba5d1a5c53c8a51e47bb5cfa8a8eaa271da1555ddec77a31e48b82bbef2da",
+      "bytes": 705
+     },
+     "lease_still_held": true,
+     "scientific_job": false,
+     "requires_matching_release_receipt": true
+    },
+    "release": {
+     "released_after_final_publication_and_owned_unit_cleanup": true,
+     "joint_global_lease_remains_held_by_batch": true,
+     "quiescence_confirmed": true,
+     "external_controller_PID": 1232528,
+     "monotonic_ns": 271464118440910
+    },
+    "resource_integrity": true,
+    "conformance": true,
+    "passed": true,
+    "whole_group_CPU_ns": 157944354000,
+    "peak_child_RSS_KiB": 1684972,
+    "charged_group_peak_bytes": "2086440960",
+    "window_ns": 180000000000,
+    "time_window_is_observation_only": true,
+    "stdout": {
+     "sha256": "a99d4383e0615e0bb7fcd7351f213e04d3a5594bb4a0d09c771cc9cececd6d3f",
+     "bytes": 5987
+    },
+    "stderr": {
+     "sha256": "902694c9bf45d1c1870a63f1b2106c8c57992f27dcd7bebca20644b33f9adc98",
+     "bytes": 367655
+    },
+    "test_counts": [
+     [
+      "57",
+      "0"
+     ]
+    ],
+    "passed_test_names": [
+     "crates/holonics/src/compression/keys/repair.rs - compression::keys::repair::DamagedPassage (line 135) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 101) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 112)",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 123)",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 15) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 181)",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 250)",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 28) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 40) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 51) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 65) - compile",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 85) - compile fail",
+     "crates/holonics/src/hnn/constitution.rs - hnn::constitution (line 13) - compile fail",
+     "crates/holonics/src/hnn/constitution.rs - hnn::constitution::Constitution::with_element (line 4558) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1042) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1049) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1057) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1066) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1073) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1080) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1088) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1099)",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 970) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 977) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 985) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2512) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2519) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2528) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::Field::selective_step (line 1524) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::Field::selective_step (line 1532) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 222) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 230) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 240)",
+     "crates/holonics/src/hnn/field.rs - hnn::field::RingDeclaration (line 344) - compile fail",
+     "crates/holonics/src/hnn/keys.rs - hnn::keys::locate_keys (line 376) - compile fail",
+     "crates/holonics/src/hnn/keys.rs - hnn::keys::station_pairs (line 459) - compile fail",
+     "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment (line 1301) - compile fail",
+     "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment::ingest (line 1401) - compile fail",
+     "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment::ingest (line 1408) - compile fail",
+     "crates/holonics/src/hnn/pending.rs - hnn::pending (line 29) - compile fail",
+     "crates/holonics/src/hnn/pending.rs - hnn::pending (line 45) - compile fail",
+     "crates/holonics/src/hnn/port.rs - hnn::port (line 52) - compile fail",
+     "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 595) - compile fail",
+     "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 602) - compile fail",
+     "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 609) - compile fail",
+     "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 617) - compile fail",
+     "crates/holonics/src/hnn/prediction.rs - hnn::prediction::CurrentSourceReceivingReturn (line 3227) - compile fail",
+     "crates/holonics/src/hnn/ratio.rs - hnn::ratio::RatioCovector (line 621) - compile fail",
+     "crates/holonics/src/hnn/word.rs - hnn::word (line 89) - compile fail",
+     "crates/holonics/src/hnn/word.rs - hnn::word (line 98) - compile fail",
+     "crates/holonics/src/physics/wave/chain.rs - physics::wave::chain::WaveChain::return_material (line 633) - compile fail",
+     "crates/holonics/src/receiver/population.rs - receiver::population::Emitters (line 629) - compile fail",
+     "crates/holonics/src/receiver/population.rs - receiver::population::Family (line 496) - compile fail",
+     "crates/holonics/src/receiver/population.rs - receiver::population::Family (line 516) - compile fail",
+     "crates/holonics/src/receiver/population/composition.rs - receiver::population::composition::Keystone (line 107) - compile fail",
+     "crates/holonics/src/receiver/population/composition.rs - receiver::population::composition::PortReader (line 197) - compile fail",
+     "crates/holonics/src/receiver/population/dormancy.rs - receiver::population::dormancy::Layered (line 86) - compile fail"
+    ],
+    "actual_passed_tests": 57
+   },
+   "actual_start": {
+    "UTC": "2026-10-10T02:24:41.248789+00:00",
+    "PID": 1232533
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 166590962221,
+     "prime_factorization": [
+      [
+       601,
+       1
+      ],
+      [
+       277189621,
+       1
+      ]
+     ]
+    },
+    "whole_group_CPU_ns": {
+     "integer": 157944354000,
+     "prime_factorization": [
+      [
+       2,
+       4
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       613,
+       1
+      ],
+      [
+       42943,
+       1
+      ]
+     ]
+    },
+    "peak_child_RSS_KiB": {
+     "integer": 1684972,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       17,
+       1
+      ],
+      [
+       71,
+       1
+      ],
+      [
+       349,
+       1
+      ]
+     ]
+    },
+    "charged_group_peak_bytes": {
+     "integer": 2086440960,
+     "prime_factorization": [
+      [
+       2,
+       12
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       29,
+       1
+      ],
+      [
+       1171,
+       1
+      ]
+     ]
+    },
+    "wall_over_observation_window": {
+     "numerator": 166590962221,
+     "denominator": 180000000000
+    },
+    "prior_basis_wall_ns": {
+     "integer": 150471752557,
+     "prime_factorization": [
+      [
+       7,
+       2
+      ],
+      [
+       97,
+       1
+      ],
+      [
+       4723,
+       1
+      ],
+      [
+       6703,
+       1
+      ]
+     ]
+    },
+    "wall_over_prior_basis": {
+     "numerator": 166590962221,
+     "denominator": 150471752557
+    },
+    "prior_basis_exceeded": true,
+    "fixed_observation_exceeded": false,
+    "limits_unchanged": true,
+    "basis_limitation": "Different source and target cache; no measured upper bound at the current partition."
+   }
+  },
+  {
+   "kind": "world",
+   "summary": {
+    "kind": "world",
+    "source_commit": "324f6138efbff0f2645f60fa5f5f8bfefe21d555",
+    "source_tree": "6f300a859f1cd285d0a49dc8ef72069729c4a2de",
+    "source_clean_unchanged_after": true,
+    "command_result": {
+     "target": "material prospect324f world",
+     "exit": 0,
+     "command_wall_ns": 256311358722,
+     "kernel_command_passed": true,
+     "expected_command_exit": true,
+     "diagnostic_lines": [],
+     "whole_stdout_SHA256": "b173026acbe232a7c8606c6559b8cfabc46914ab9cff49caed28709c8d6106c9",
+     "whole_stderr_SHA256": "be91cffa0457f9588e23404161415c544a4e4919e658e7ae729f6fc166ffb743",
+     "source_not_edited": true
+    },
+    "controller_exit": 0,
+    "acceptance": {
+     "passed": true,
+     "final_CPU_receipt": {
+      "sha256": "374c85e78274ca79868afe4de6a2f5fd608c188bd7fac39eda965a1f1b2fa7f9",
+      "bytes": 5685
+     },
+     "cleanup_receipt": {
+      "sha256": "eec1071b760eeaad94f63c8d51c1c4a6ff79ad02a4a07d98904528be4201477c",
+      "bytes": 707
+     },
+     "lease_still_held": true,
+     "scientific_job": false,
+     "requires_matching_release_receipt": true
+    },
+    "release": {
+     "released_after_final_publication_and_owned_unit_cleanup": true,
+     "joint_global_lease_remains_held_by_batch": true,
+     "quiescence_confirmed": true,
+     "external_controller_PID": 1235497,
+     "monotonic_ns": 271721267511627
+    },
+    "resource_integrity": true,
+    "conformance": true,
+    "passed": true,
+    "whole_group_CPU_ns": 219434533000,
+    "peak_child_RSS_KiB": 1661624,
+    "charged_group_peak_bytes": "2107318272",
+    "window_ns": 180000000000,
+    "time_window_is_observation_only": true,
+    "stdout": {
+     "sha256": "b173026acbe232a7c8606c6559b8cfabc46914ab9cff49caed28709c8d6106c9",
+     "bytes": 51801
+    },
+    "stderr": {
+     "sha256": "be91cffa0457f9588e23404161415c544a4e4919e658e7ae729f6fc166ffb743",
+     "bytes": 1504
+    },
+    "test_counts": [
+     [
+      "5",
+      "0"
+     ]
+    ],
+    "passed_test_names": [
+     "a_two_observation_proposal_binds_a_chain",
+     "the_prospect_is_credited_at_its_consumer",
+     "the_prospect_landing_reads_both_waves",
+     "the_two_observation_credit_is_read_at_its_consumer",
+     "the_two_observation_landing_reads_both_waves"
+    ],
+    "actual_passed_tests": 5
+   },
+   "actual_start": {
+    "UTC": "2026-10-10T02:27:28.667536+00:00",
+    "PID": 1235502
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 256311358722,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       3,
+       5
+      ],
+      [
+       527389627,
+       1
+      ]
+     ]
+    },
+    "whole_group_CPU_ns": {
+     "integer": 219434533000,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       219434533,
+       1
+      ]
+     ]
+    },
+    "peak_child_RSS_KiB": {
+     "integer": 1661624,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       229,
+       1
+      ],
+      [
+       907,
+       1
+      ]
+     ]
+    },
+    "charged_group_peak_bytes": {
+     "integer": 2107318272,
+     "prime_factorization": [
+      [
+       2,
+       13
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       19,
+       1
+      ],
+      [
+       4513,
+       1
+      ]
+     ]
+    },
+    "wall_over_observation_window": {
+     "numerator": 14239519929,
+     "denominator": 10000000000
+    },
+    "prior_basis_wall_ns": {
+     "integer": 171186004044,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       3,
+       3
+      ],
+      [
+       11,
+       2
+      ],
+      [
+       149,
+       1
+      ],
+      [
+       87917,
+       1
+      ]
+     ]
+    },
+    "wall_over_prior_basis": {
+     "numerator": 4746506643,
+     "denominator": 3170111186
+    },
+    "prior_basis_exceeded": true,
+    "fixed_observation_exceeded": true,
+    "limits_unchanged": true,
+    "basis_limitation": "Different source and target cache; no measured upper bound at the current partition."
+   }
+  }
+ ],
+ "coverage_scope": {
+  "agent_inferred": true,
+  "reason": "Two new prospect consumers plus their three two-encounter binding/credit/refusal controls. Required full source gate. No unrelated old single-encounter loop/cold-restore runtime replay.",
+  "selected": [
+   "a_two_observation_proposal_binds_a_chain",
+   "the_two_observation_credit_is_read_at_its_consumer",
+   "the_two_observation_landing_reads_both_waves",
+   "the_prospect_is_credited_at_its_consumer",
+   "the_prospect_landing_reads_both_waves"
+  ],
+  "skipped": [
+   "the_world_sensitive_tangent_is_the_actual_worlds_derivative",
+   "a_teaching_encounter_is_refused_until_the_world_is_located",
+   "the_encounters_comparison_is_credited_through_the_world",
+   "the_world_landing_reads_the_next_encounter",
+   "the_world_loop_is_read_against_its_twin_over_encounters",
+   "the_landed_material_is_read_without_its_history",
+   "a_world_proposal_refuses_another_encounters_tangents",
+   "the_tangent_continues_into_the_next_encounter",
+   "co_clock_twins_cannot_swap_tangents",
+   "the_world_loop_is_read_on_a_second_fixture",
+   "the_landed_material_survives_a_cold_restore"
+  ],
+  "all_current_World_test_count": 16,
+  "no_runtime_claim_for_skipped_at_this_pin": true,
+  "no_fresh_no_history_control": true,
+  "no_necessity_of_history_claim": true,
+  "product_acceptance": {
+   "u=1": "Phase; equal code; twin-minus-landed excess in [2^-20,2^-19)",
+   "u=-1": "Classical; twin-minus-landed code in [2^-8,2^-7)",
+   "actual_next_equals_prospect": "code enclosure and signed excess exact equality",
+   "twin": "same two encounters and located key, no contact landing",
+   "older_continued_credit_refusals": "preserve as measured negatives"
+  }
+ },
+ "gate": {
+  "components": [
+   {
+    "name": "check",
+    "outcome": "ok",
+    "elapsed_ms": {
+     "integer": 53194,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       26597,
+       1
+      ]
+     ]
+    }
+   },
+   {
+    "name": "guard-lints",
+    "outcome": "ok",
+    "elapsed_ms": {
+     "integer": 47123,
+     "prime_factorization": [
+      [
+       47123,
+       1
+      ]
+     ]
+    }
+   },
+   {
+    "name": "guard-doctests",
+    "outcome": "ok",
+    "elapsed_ms": {
+     "integer": 66257,
+     "prime_factorization": [
+      [
+       59,
+       1
+      ],
+      [
+       1123,
+       1
+      ]
+     ]
+    }
+   }
+  ],
+  "guard_lints": [
+   "clippy::disallowed_types",
+   "clippy::disallowed_methods",
+   "clippy::float_arithmetic"
+  ],
+  "doctests_expected": 57,
+  "strict_D_warnings_not_run_at_this_pin": true,
+  "historical_strict_D_warnings_acoustic_failure_not_waived": true
+ },
+ "plan": {
+  "reservation_bytes": 5368709120,
+  "combined_cap_bytes": 8589934592,
+  "metadata_ceiling_bytes": 1073741824,
+  "largest_measured_Rust_charged_bytes": 3008802816,
+  "largest_measured_Rust_RSS_KiB": 3133624,
+  "CPU_budgets": {
+   "rust": 1
+  },
+  "partition": "One Cargo job and one test thread, CPU affinity0; two sequential commands sharing own target. Common lease released at command boundary.",
+  "projection_basis": {
+   "gate_upper_prior_wall_ns": 150471752557,
+   "World_prior_five_test_changed_partition_wall_ns": 171186004044,
+   "current_developer_all_sixteen_test_wall_ns": 65783518355,
+   "current_developer_build_RSS_KiB": 2131528,
+   "same_partition_upper_not_measured": true,
+   "total_prior_upper_ns": 321657756601
+  },
+  "per_command_observation_ns": 180000000000,
+  "time_windows_observation_only": true,
+  "source_review_required_before_compiler": true,
+  "native_command_count": 2,
+  "no_full_learning_claim": true,
+  "no_process_killing": true,
+  "no_limit_raise": true
+ },
+ "joint_admission": {
+  "UTC": "2026-10-10T02:24:40.833704+00:00",
+  "MemAvailable_bytes": 11804008448,
+  "PSI": "some avg10=0.00 avg60=0.00 avg300=0.09 total=1041671851\nfull avg10=0.00 avg60=0.00 avg300=0.06 total=908541212\n",
+  "plan": {
+   "reservation_bytes": 5368709120,
+   "combined_cap_bytes": 8589934592,
+   "metadata_ceiling_bytes": 1073741824,
+   "largest_measured_Rust_charged_bytes": 3008802816,
+   "largest_measured_Rust_RSS_KiB": 3133624,
+   "CPU_budgets": {
+    "rust": 1
+   },
+   "partition": "One Cargo job and one test thread, CPU affinity0; two sequential commands sharing own target. Common lease released at command boundary.",
+   "projection_basis": {
+    "gate_upper_prior_wall_ns": 150471752557,
+    "World_prior_five_test_changed_partition_wall_ns": 171186004044,
+    "current_developer_all_sixteen_test_wall_ns": 65783518355,
+    "current_developer_build_RSS_KiB": 2131528,
+    "same_partition_upper_not_measured": true,
+    "total_prior_upper_ns": 321657756601
+   },
+   "per_command_observation_ns": 180000000000,
+   "time_windows_observation_only": true,
+   "source_review_required_before_compiler": true,
+   "native_command_count": 2,
+   "no_full_learning_claim": true,
+   "no_process_killing": true,
+   "no_limit_raise": true
+  },
+  "lease": {
+   "device": 55,
+   "inode": 55954599,
+   "controller_PID": 1232059,
+   "fd": 3,
+   "start_ticks": "27121481",
+   "requested_absolute_path": "<repository>/.local/codex-lean-run.lock",
+   "joint_batch": true
+  }
+ },
+ "joint_release": {
+  "released": true,
+  "quiescence_confirmed": true,
+  "device": 55,
+  "inode": 55954599,
+  "UTC": "2026-10-10T02:31:45.462341+00:00"
+ },
+ "metadata_measurements_exact": {
+  "charged_peak_bytes": {
+   "integer": 144572416,
+   "prime_factorization": [
+    [
+     2,
+     17
+    ],
+    [
+     1103,
+     1
+    ]
+   ]
+  },
+  "CPU_ns": {
+   "integer": 1704043000,
+   "prime_factorization": [
+    [
+     2,
+     3
+    ],
+    [
+     5,
+     3
+    ],
+    [
+     11,
+     2
+    ],
+    [
+     14083,
+     1
+    ]
+   ]
+  },
+  "cap_limited_peak": false
+ },
+ "metadata_controller_release": {
+  "UTC": "2026-10-10T02:32:42.933355+00:00",
+  "unit": "holonics-material-prospect-324f-controller-20261010-v1.service",
+  "stop_exit": 0,
+  "before": {
+   "LoadState": "loaded",
+   "ActiveState": "active",
+   "SubState": "exited",
+   "MainPID": "0",
+   "Result": "success",
+   "ExecMainStatus": "0",
+   "ControlGroup": "",
+   "MemoryCurrent": "[not set]",
+   "MemoryPeak": "144572416",
+   "CPUUsageNSec": "1704043000",
+   "TasksCurrent": "[not set]"
+  },
+  "after": {
+   "LoadState": "not-found",
+   "ActiveState": "inactive",
+   "SubState": "dead",
+   "MainPID": "0",
+   "Result": "success",
+   "ExecMainStatus": "0",
+   "ControlGroup": "",
+   "MemoryCurrent": "[not set]",
+   "MemoryPeak": "[not set]",
+   "CPUUsageNSec": "[not set]",
+   "TasksCurrent": "[not set]"
+  },
+  "no_active_process_stopped": true,
+  "no_unrelated_unit_touched": true,
+  "all_validator_leases_released": true
+ },
+ "all_validator_leases_released": true,
+ "source_unchanged": true,
+ "no_source_edits": true,
+ "no_publication": true,
+ "no_unrelated_runtime_reruns": true,
+ "worker_evidence": {
+  "developer_receipt": {
+   "sha256": "3c0bd17be8ec5b37494b3ca48dbffcaa92f11b79a5923c977048b923be5ffa42",
+   "bytes": 31360
+  },
+  "not_queue_acceptance": true,
+  "full_developer_raw_output_not_supplied": true,
+  "later_report": {
+   "sha256": "e7c17c44b48c27c617d0f97df4bfeb438a0e29991bfff68dc13c4e17a2f0d1cf",
+   "bytes": 2791
+  },
+  "later_report_scope": "Separate subsequent worker observations: one encounter also sufficient, fresh-World effect mixed, multi-round trajectory mixed, deadline projection error retained. Not revalidated in this exact324f queue scope.",
+  "trajectory_gain_not_claimed": true,
+  "later_forty_encounter_report": {
+   "sha256": "4fa2a626797bf2e409844a505552d4587cabfcb057c209b433cbf5aafd9c24a2",
+   "bytes": 1641
+  },
+  "later_forty_encounter_report_scope": "Separate worker developer passage: exited0 after reported136.75 seconds; period2 orbit after settlement worse than opening at u=1, excess from [2^-9,2^-8) to [2^-7,2^-6). No queue revalidation, no trajectory improvement claim."
+ }
+}

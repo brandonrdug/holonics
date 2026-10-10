@@ -35,3 +35,33 @@ Together they place selection as reserved on this field (record §3c).
 declares the placeholders `<repository>`, `<lean-toolchain>/`, `<rustup>`, `<cargo-home>` and `<home>`,
 replaced longer prefixes first. Every projected file inverts byte-exactly to its original, whose size
 and SHA-256 are pinned there. The originals stay in local custody.
+
+## The material that descends the admitted future (`324f6138`)
+
+The published source is exactly `324f6138` (tree `6f300a85`), merged onto main. The record's §7–§7b
+hold its law and measurements. The developer reads `TWO_OBSERVATION_DEV_TESTS.v1.json` and
+`PROSPECT_DEV_TESTS.v1.json` are not claim-bearing.
+
+| Packet | Pin | Result and scope |
+|---|---|---|
+| [prospect-324f](prospect-324f-native-v1/HANDOFF.md) | `324f6138` | The source gate (57 doctests) and five scoped World tests PASS. Actual product reading PASS ([readout, projected](prospect-324f-native-v1/PROSPECT_READOUT.json)): the landing over both waves is `Classical` at grain raise 2. At `u = 1` it is `Phase`, with equal code and an excess gain in `[2⁻²⁰, 2⁻¹⁹)`. At `u = −1` it is `Classical`, with a code gain in `[2⁻⁸, 2⁻⁷)`. The actual next reading equals the prospect on separate identical replays, against the same-history twin with no contact landing. |
+
+**Scope and limits kept with it.**
+- The claim is one next comparison per wave against the same-history no-landing twin.
+- It claims no improvement of a whole trajectory, and no necessity of the history. Later developer
+  reads (record §7c–§7e, published separately) find:
+  - one observation suffices;
+  - the fresh no-history comparison is worse at `u = 1`;
+  - the trajectory against the never-landing twin is mixed;
+  - the repeated passage closes to an orbit worse than its opening.
+- The two-observation experience-credit landings were refused (§7a). Those refusals stay.
+- The queue explicitly skipped the old eleven World runtime tests. Strict `-D warnings` was not
+  rerun, and its earlier FAILED (exit 101) stays separate, without waiver.
+- The World command's wall, 256,311,358,722 ns, exceeded its unchanged 180 s observation window by
+  76,311,358,722 ns. That is a recorded projection error.
+
+**Projection.** `HANDOFF.md` is verbatim. `PROSPECT_READOUT.json` and `COVERAGE_SCOPE.json` replace
+host prefixes by placeholders. `VALIDATION_SUMMARY.json` drops argv, environment, paths and
+identifiers, and omits the readout it duplicates. Originals are pinned in
+[`ORIGINALS.json`](prospect-324f-native-v1/ORIGINALS.json).
+

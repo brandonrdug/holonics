@@ -1,0 +1,35 @@
+{
+  "agent_inferred": true,
+  "reason": "Two new prospect consumers plus their three two-encounter binding/credit/refusal controls. Required full source gate. No unrelated old single-encounter loop/cold-restore runtime replay.",
+  "selected": [
+    "a_two_observation_proposal_binds_a_chain",
+    "the_two_observation_credit_is_read_at_its_consumer",
+    "the_two_observation_landing_reads_both_waves",
+    "the_prospect_is_credited_at_its_consumer",
+    "the_prospect_landing_reads_both_waves"
+  ],
+  "skipped": [
+    "the_world_sensitive_tangent_is_the_actual_worlds_derivative",
+    "a_teaching_encounter_is_refused_until_the_world_is_located",
+    "the_encounters_comparison_is_credited_through_the_world",
+    "the_world_landing_reads_the_next_encounter",
+    "the_world_loop_is_read_against_its_twin_over_encounters",
+    "the_landed_material_is_read_without_its_history",
+    "a_world_proposal_refuses_another_encounters_tangents",
+    "the_tangent_continues_into_the_next_encounter",
+    "co_clock_twins_cannot_swap_tangents",
+    "the_world_loop_is_read_on_a_second_fixture",
+    "the_landed_material_survives_a_cold_restore"
+  ],
+  "all_current_World_test_count": 16,
+  "no_runtime_claim_for_skipped_at_this_pin": true,
+  "no_fresh_no_history_control": true,
+  "no_necessity_of_history_claim": true,
+  "product_acceptance": {
+    "u=1": "Phase; equal code; twin-minus-landed excess in [2^-20,2^-19)",
+    "u=-1": "Classical; twin-minus-landed code in [2^-8,2^-7)",
+    "actual_next_equals_prospect": "code enclosure and signed excess exact equality",
+    "twin": "same two encounters and located key, no contact landing",
+    "older_continued_credit_refusals": "preserve as measured negatives"
+  }
+}

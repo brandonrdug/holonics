@@ -1,0 +1,60 @@
+{
+ "note": "Private originals stay in local custody. Verbatim files equal their originals byte for byte; projected files replace host prefixes by the placeholders named, longer prefixes first, and invert byte-exactly; summaries drop argv, environment, paths and mail/thread/reviewer identifiers and copy every other value. VALIDATION_SUMMARY.json also omits actual_readout, which is PROSPECT_READOUT.json.",
+ "placeholders": [
+  "<repository>",
+  "<lean-toolchain>",
+  "<rustup>",
+  "<cargo-home>",
+  "<home>"
+ ],
+ "originals": {
+  "HANDOFF.md": {
+   "sha256": "d3f4d0ccb932d71e7b041f823ed482bd50101fc54ee92f45b13d489165cbd90d",
+   "bytes": 1346
+  },
+  "PROSPECT_READOUT.json": {
+   "sha256": "e01413a7a44288f100ba49cf13c686ef4468669668f7930f54480f502e38159c",
+   "bytes": 88564
+  },
+  "COVERAGE_SCOPE.json": {
+   "sha256": "35757ffce5ed270ebd015d97b34911ed0347c19bff52903d70bd717fd24c14f2",
+   "bytes": 1710
+  },
+  "VALIDATION.json": {
+   "sha256": "a35b7793e2bf1681b05b8b63c176c62069e309af39769510db26900c7c567b4d",
+   "bytes": 169059
+  },
+  "FILE_HASHES.json": {
+   "sha256": "322ab2fd5bbd31478b9dbecad8e9dbd47dc64ca16e7e13307b50a1fad79f08fb",
+   "bytes": 15413
+  }
+ },
+ "projections": {
+  "PROSPECT_READOUT.json": {
+   "projected": {
+    "sha256": "7308c20a2294fa6e99a12dcb4ecab4fa4b95337332766fe6ca0ebc0a769e3142",
+    "bytes": 88517
+   },
+   "replaced": {
+    "<repository>": 2,
+    "<lean-toolchain>": 0,
+    "<rustup>": 2,
+    "<cargo-home>": 1,
+    "<home>": 1
+   }
+  },
+  "COVERAGE_SCOPE.json": {
+   "projected": {
+    "sha256": "35757ffce5ed270ebd015d97b34911ed0347c19bff52903d70bd717fd24c14f2",
+    "bytes": 1710
+   },
+   "replaced": {
+    "<repository>": 0,
+    "<lean-toolchain>": 0,
+    "<rustup>": 0,
+    "<cargo-home>": 0,
+    "<home>": 0
+   }
+  }
+ }
+}
