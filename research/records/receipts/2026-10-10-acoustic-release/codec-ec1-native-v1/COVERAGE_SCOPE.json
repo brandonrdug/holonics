@@ -1,0 +1,11 @@
+{
+ "developer_read_not_acceptance": {
+  "emitted_bits": 1481048,
+  "raw_bits": 1498880,
+  "ring": 20,
+  "sample_count": 93680
+ },
+ "general_inverse_API_blocked_despite_scoped_consumer_GO": true,
+ "test_success_does_not_certify_unrestricted_inverse": true,
+ "future_4776faec_source_and_test_successor_not_in_queue": true
+}

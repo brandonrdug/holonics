@@ -1,0 +1,219 @@
+{
+ "source_commit": "4776faecb2d667dee4c645d8a5628ad3b5a499ba",
+ "source_tree": "1f6a10b3e93ce7deac3fbdcd5410a0e85eaa6401",
+ "whole_stdout": {
+  "sha256": "bd4fcad7d027b55cef058b927972c5e25b31f7c42a4fbd2dd49e2893aa6fac08",
+  "bytes": 321
+ },
+ "whole_stderr": {
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "bytes": 0
+ },
+ "raw_reading": {
+  "line_number": 2,
+  "line_sha256": "8933348bacccacbf589fe9bb25808b90fd2d999cdb527a83a207b71945b82a7f"
+ },
+ "actual_readings_exact": {
+  "ring_index": {
+   "integer": 20,
+   "prime_factorization": [
+    [
+     2,
+     2
+    ],
+    [
+     5,
+     1
+    ]
+   ]
+  },
+  "source_samples": {
+   "integer": 93680,
+   "prime_factorization": [
+    [
+     2,
+     4
+    ],
+    [
+     5,
+     1
+    ],
+    [
+     1171,
+     1
+    ]
+   ]
+  },
+  "emitted_bytes": {
+   "integer": 170537,
+   "prime_factorization": [
+    [
+     170537,
+     1
+    ]
+   ]
+  },
+  "full_charged_bits": {
+   "integer": 1364296,
+   "prime_factorization": [
+    [
+     2,
+     3
+    ],
+    [
+     170537,
+     1
+    ]
+   ]
+  },
+  "raw_uniform_PCM_bits": {
+   "integer": 1498880,
+   "prime_factorization": [
+    [
+     2,
+     8
+    ],
+    [
+     5,
+     1
+    ],
+    [
+     1171,
+     1
+    ]
+   ]
+  },
+  "raw_minus_full_charge_bits": {
+   "integer": 134584,
+   "prime_factorization": [
+    [
+     2,
+     3
+    ],
+    [
+     16823,
+     1
+    ]
+   ]
+  },
+  "header_bits": {
+   "integer": 70,
+   "prime_factorization": [
+    [
+     2,
+     1
+    ],
+    [
+     5,
+     1
+    ],
+    [
+     7,
+     1
+    ]
+   ]
+  },
+  "encoding_elapsed_ms": {
+   "integer": 309927,
+   "prime_factorization": [
+    [
+     3,
+     1
+    ],
+    [
+     17,
+     1
+    ],
+    [
+     59,
+     1
+    ],
+    [
+     103,
+     1
+    ]
+   ]
+  },
+  "encode_and_decode_elapsed_ms": {
+   "integer": 557315,
+   "prime_factorization": [
+    [
+     5,
+     1
+    ],
+    [
+     11,
+     1
+    ],
+    [
+     10133,
+     1
+    ]
+   ]
+  }
+ },
+ "octant_grain": true,
+ "source_and_rate_equal": true,
+ "emitted_vector_persisted_to_file": false,
+ "fresh_native_binary": {
+  "sha256": "a27f5591fa600e7f991891a2c7d914dfda035a8497b2060239887e57b075937d",
+  "bytes": 168401672
+ },
+ "consumer_source_binding": {
+  "source_file_sha256": "fef57705a8ef0704242a20605c73a11e7e17a734998e9b4f9bf75306c5abcf2b",
+  "definitions": {
+   "cell_interval": {
+    "first_line": 463,
+    "bytes": 1975,
+    "sha256": "647d7e1f92d3e823fb7767cfe43ba5a4388a81244b15ecffc8f7bd6a07bb956c"
+   },
+   "codec_encode": {
+    "first_line": 540,
+    "bytes": 1720,
+    "sha256": "ae06fcfa8538de5c1f5511b56111d2e566e124060bda21a48d3a76e3f0891470"
+   },
+   "codec_decode": {
+    "first_line": 577,
+    "bytes": 2432,
+    "sha256": "e1f784b7b1e926eb78faebcb5495d5109ad3e47e207bf9650610b8e979723193"
+   },
+   "same_vector_consumer": {
+    "first_line": 722,
+    "bytes": 995,
+    "sha256": "fefec5f940a2ab6c2a33d3c4c6c1624333484c8663b189cab01ec16f23c53cdb"
+   }
+  },
+  "same_actual_bytes_operand_to_decoder_and_length_charge": true,
+  "source_not_a_decoder_operand": true,
+  "codec_returns_before_bank_or_continuation": true,
+  "exact_source_sample_count_and_rate_comparison": true,
+  "format_has_explicit_octant_flag": true,
+  "header_bits": 70,
+  "same_process_only_no_persisted_packet_claim": true
+ },
+ "inverse_canonical_lower_endpoint_not_asserted_to_always_read": true,
+ "uniform_PCM_slack_only": true,
+ "no_learned_content_generation_Encoding_join_hearing_or_malformed_packet_claim": true,
+ "developer_octant_full_read": {
+  "wall_ns": 464561780139,
+  "deadline_s": 480,
+  "child_peak_rss_kib": 13816,
+  "exit": 0,
+  "stdout_sha256": "640b10ef1783ccfd04a9814ad6247bcbae44a3163a4bef8f82c00879247c162c"
+ },
+ "developer_cost_equal_to_current_native": true,
+ "actual_native_CPU_affinity_all_run": [
+  23
+ ],
+ "guard_affinity_initial": [
+  23
+ ],
+ "guard_affinity_after_authorized_correction": [
+  21
+ ],
+ "actual_CPU_budget_after_correction": 2,
+ "affinity_adjustment_receipt": {
+  "sha256": "e3dfb181fbf29cfd5a678ad79e5975dcee211e1a27e69fad9642ff89873cec53",
+  "bytes": 3352
+ }
+}

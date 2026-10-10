@@ -1,0 +1,9 @@
+{
+ "header_bits": 70,
+ "prior_24_fixture_receipt": {
+  "sha256": "232b054889df4b78ba81e76abc97e2ebe6d03a6f6a61a94387db5787ca214fba",
+  "bytes": 92795
+ },
+ "unaffected_22_not_rerun": true,
+ "general_inverse_all_inputs_proof_not_asserted": true
+}

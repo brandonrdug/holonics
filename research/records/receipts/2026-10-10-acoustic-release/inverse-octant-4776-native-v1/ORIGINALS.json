@@ -1,0 +1,45 @@
+{
+ "note": "Allowlisted projection: only declared evidence, reading and custody fields are kept; nested values only as booleans, integers, exact rationals, commit/tree ids and SHA-256 bindings; keys naming argv, environment, paths, mail, threads, messages, reviewers or process ids are dropped; any other hex identifier is refused. Private originals stay in local custody, bound here by size and SHA-256.",
+ "originals": {
+  "HANDOFF.md": {
+   "sha256": "0b7f78e17839853a93a7a0c5cb21a1279a7df3aa0d9e5d2852a38f8428b19fe3",
+   "bytes": 851
+  },
+  "VALIDATION.json": {
+   "sha256": "45af774ba651ed2ddf3ebf9b25c1574bd87d817ac9179c05cd20617dad20a511",
+   "bytes": 99969
+  },
+  "CODEC_READOUT.json": {
+   "sha256": "99f24501bd5e1ddf4bcd01e79521514a3ca88d5a255d0f66527fcd039c133367",
+   "bytes": 7778
+  },
+  "COVERAGE_SCOPE.json": {
+   "sha256": "dd61159e038eca55ddb524bc5d299518a87fefd27c06dfc98a92119c3ddbf177",
+   "bytes": 1969
+  },
+  "SOURCE_PIN.json": {
+   "sha256": "279311f83b976b5ff567b5a3a4e36fbc66baed084a7f9dd7bb3651599b5bd3c7",
+   "bytes": 47357
+  },
+  "FILE_HASHES.json": {
+   "sha256": "489087100f5e5403654fdb7c29b34702d7905f47e8dfa0388e45c454fee3b51f",
+   "bytes": 33990
+  },
+  "joint-controller.stdout": {
+   "sha256": "aad6b5626707f9ded9c10b4985578f4572db7055175ac19434450b364fc0635a",
+   "bytes": 4229
+  },
+  "PRIVATE_INPUT.json": {
+   "sha256": "2c456d5184fe9174b703a72051cf1c317254531a681162b55a278efc5e8c00ad",
+   "bytes": 419
+  },
+  "OCTANT_CODEC.v1.json": {
+   "sha256": "016791fe570fae6fc07ecb39d193d0884b32b99aa2706bc158b5e8aad31381bc",
+   "bytes": 1074
+  },
+  "RESOURCE_CAUSE.json": {
+   "sha256": "b8c4f91b6ea60fd49ce0e608248c4762b1e98062106c2ce861f834499479553d",
+   "bytes": 6301
+  }
+ }
+}
