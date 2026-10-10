@@ -513,7 +513,7 @@ The first fixture's `2/3` is off every dyadic lattice, and its cold mount refuse
 "the state's material off its loci's lattices", a property of that declaration, not of the landing.
 On the dyadic fixture:
 1. The first teaching round's landing was admitted (phase).
-2. The receiver's constitution and carry were saved as exact text (20807 bytes, `20807`) and mounted
+2. The receiver's constitution and carry were saved as exact text (20807 bytes, a prime) and mounted
    on the declared founding, the material before any learning.
 3. The restored material and carry equal the live ones exactly.
 4. The World, exterior to the machine, was rebound by its owner at its live state; the World model
