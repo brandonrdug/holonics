@@ -904,3 +904,24 @@ and its decoder replays every deposit.
 - **A3.** Every refused step is typed and reported, never answered by a larger step.
 - **A4.** The joint credit of the deposits is loop 3's. Here the deposit admits on the next epoch's
   measured length only. No `g_s` or `f_r` beyond one epoch is claimed.
+
+## 25. Measured: loop 1's W1 and §21's phase address
+
+[measured] ([receipt](receipts/2026-10-10-acoustic-release/LOOP1_AND_PHASE_DEV.v1.json); developer
+reads.)
+
+- **W1 is not met.** The ring `t = 1` under the replica's F1, in its settled window, near-returns at
+  `τ = 7` with no defect (27 bits against 360). Its cycle of advances, as 5 classes repeated over the
+  window, is carried by none of `FrameFamily::pairs(9)`'s 38 declared two-ring frames: 13 are
+  narrow, 13 empty, 12 plural, and none carries it. This is the tone record's §2 finding: a generic
+  word is located on no single declared helix. W2 is vacuous. The first test asserted a carrying
+  frame and failed. It now pins the typed reading. The declared family's bound is **not** widened
+  after the failure: the next subject is why a 5-class period-7 cycle is plural or empty on every
+  pair frame, read from the typed fibres.
+- **The phase address is exact, and a worse code than the octant.** Over 2000 ticks of ring 20 it
+  emits 26560 bits: 6000 class, 20458 Farey path, 30 index for the still lines, plus header and
+  padding. On the same ticks the octant emits 24440 and the quarter turn 28032. A mediant descent
+  splits the slope space, not the sample's interval, so each Farey bit narrows less than an index
+  bit: about 10.2 path bits per tick against the octant's about 8.2 index bits. No full run is made,
+  because the comparison is settled. What §21 shows is narrower: the sample can be coded by nothing
+  but the ring's own dynamic symbols wherever its line moves, at a cost this measurement reads.

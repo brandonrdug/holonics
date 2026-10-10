@@ -548,3 +548,105 @@ fn the_located_tone_enters_a_field_declared_on_its_rings() {
     }
     assert!(entered >= 1);
 }
+
+// -------------------------------------------------------------------------------------------
+// the located section word (the bank record §23, loop 1)
+
+/// The replica's declared ring `t` (`tests/acoustic_wave_port.rs`'s `declared_ring`): `C = I`,
+/// `D = 0`, `K = 4(a² + t²)`, `Y = 1/(4a)`, `a = t/8`, `h = 1`.
+fn section_ring(t: i64) -> holonics::hnn::ring::ResonatorOperands {
+    use holonics::hnn::ring::{ResonatorMaterial, ResonatorOperands};
+    use holonics::ratio::linear::ExactRatMatrix;
+    let t = integer(t);
+    let a = &t / integer(8);
+    let stiffness = integer(4) * (&a * &a + &t * &t);
+    let identity = ExactRatMatrix::identity(2).unwrap();
+    let material = ResonatorMaterial::new(
+        identity.clone(),
+        identity.scaled(&stiffness),
+        ExactRatMatrix::zero(2, 2).unwrap(),
+        None,
+    )
+    .unwrap();
+    ResonatorOperands::at_cut(0, &material, &(integer(1) / (integer(4) * &a)), &integer(1), None).unwrap()
+}
+
+/// **A ring's section word through its located cycle** (bank record §23, W1 and W2; measured: W1 is
+/// not met). The ring `t = 1` is driven by the replica's F1 tone; its settled window's near-return
+/// cycle, its advances as classes `Δℓ + 2` repeated over the window, is read on the declared two-ring
+/// frames (`FrameFamily::pairs(9)`). On a carrying frame the located chart would be founded and
+/// admitted (`Encoded::through`), its squares and every stepped lift checked, and the regenerated
+/// cycle with the near-return's defects substituted compared with the word (W2). Measured: no
+/// declared pair frame carries the cycle; every reading is typed (narrow, empty or plural). The test
+/// pins that reading; the carrying branch stays the consumer W1 needs.
+#[test]
+fn a_rings_section_word_is_located_on_no_declared_pair_frame() {
+    use holonics::hnn::section_lock::{LockReader, LockWindow, Settled};
+    use holonics::hnn::wave::{MatchedWave, WavePort};
+    let f1 = [-9i64, -9, -2, -2, 5, 5, 12];
+    let window = LockWindow::new(120, 120).unwrap();
+    for (name, departure) in [("clean", None::<(usize, i64)>)] {
+        let mut tone: Vec<i64> = (0..240).map(|k| f1[k % 7]).collect();
+        if let Some((k, d)) = departure {
+            tone[k] += d;
+        }
+        let operands = section_ring(1);
+        let wave = MatchedWave::new(
+            operands.admittance().clone(),
+            operands.hop().clone(),
+            tone.iter().map(|&x| integer(x)).collect(),
+        )
+        .unwrap();
+        let mut port = WavePort::at_rest(operands, 0).unwrap();
+        let mut reader = LockReader::new(window);
+        reader.observe(port.phase_point()).unwrap();
+        let ticks: Vec<_> = port.receive(&wave).unwrap().map(Result::unwrap).collect();
+        for tick in &ticks {
+            reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).unwrap();
+        }
+        let settled = reader.finish().unwrap();
+        let near = settled.near_return(&window).unwrap();
+        let Settled::Word(word) = &settled else {
+            panic!("the ring left rest")
+        };
+        let class = |advance: i8| usize::try_from(advance + 2).unwrap();
+        let actual: Vec<usize> = word.symbols().iter().map(|s| class(s.advance)).collect();
+        let tau = near.period();
+        let passage: Vec<usize> = (0..window.length()).map(|k| actual[k % tau]).collect();
+        let family = FrameFamily::pairs(9).unwrap();
+        let location = family.locate(5, &[passage.clone()]).unwrap();
+        let field = wide_field();
+        let mut carried = 0;
+        for (helix, carrying) in location.carrying() {
+            let located = PassageChart::located(carrying.location(), &[passage.clone()]).unwrap();
+            let encoding = Encoding::found(&located).unwrap();
+            encoding.squares(&located).unwrap();
+            let encoded = Encoded::through(&encoding, &located, &field, &[passage.clone()]).unwrap();
+            let transport = carrying.transport();
+            let lifts = transport.lifts(carrying.key(), &passage).unwrap();
+            for k in 0..passage.len() {
+                encoded[0]
+                    .check_step(k, lifts[k] % helix.period(), lifts[k + 1] % helix.period())
+                    .unwrap();
+            }
+            let mut regenerated = transport.regenerate(carrying.key(), passage.len()).unwrap();
+            for &(k, advance) in near.defects() {
+                regenerated[k] = class(advance);
+            }
+            assert_eq!(regenerated, actual, "W2 on frame {:?} ({name})", helix.periods());
+            carried += 1;
+        }
+        println!(
+            "located section word ({name}): τ {tau}, defects {}, near-return bits {:?}, frames carrying {carried} of {}; tally {:?}",
+            near.defects().len(),
+            near.bits(),
+            family.frames().len(),
+            location.tally()
+        );
+        // Measured (bank record §23): W1 is not met; no declared pair frame carries the cycle.
+        let tally = location.tally();
+        assert_eq!(carried, 0);
+        assert_eq!(tally.one, 0);
+        assert_eq!(tally.narrow + tally.empty + tally.plural + tally.open, family.frames().len());
+    }
+}
