@@ -223,3 +223,31 @@ The next rung changes what is measured to have failed, not the limit. The rings 
 from the recording, and their memory must be that of rings whose port coupling matches what they
 hold (`hnn::section_lock`'s settled locks are the existing owner of a ring that has locked). Then a
 key holds a lock across many turns, and only the lock's departures enter the residual.
+
+## 9. The next rung: decode the source, not the emission (design; acceptance to be fixed before code)
+
+[definition; agent-inferred, October 10, on Codex's join
+`source[n] = decode(located_keys, constitution, frame, clock)[n] + residual[n]`] §7 decodes each ring's
+*emission*. The release must decode the *source*. The moment law fixes how.
+
+- **A key is a linear reading of the source.** `key_(b,k) = s_b(n_k) = Σ_(j<n_k) T_b^(n_k−1−j) B_b x_j`.
+  Every key of every ring is one exact linear functional of the one recording `x`: the receivers'
+  readings of the same source through their own navigators.
+- **The decode is a point of the preimage fibre.** The sources consistent with all keys form an
+  affine fibre `x̂ + ker K`, where `K` is the key map. The decode is the fibre's least-power point
+  under the port's pairing (`(hY/4)|x|²`). It is the minimum-energy source that every ring would read
+  as its keys. The residual `x − x̂` lies exactly in `ker K`: the differences no key distinguishes.
+  That is the kernel the elementary objects name for compression, read here, not declared.
+- **Locality.** A ring forgets (§8: half its energy per turn), so each key reads only the source
+  within a few of its memories. `K` is banded in time, and the fibre's least point is solved epoch by
+  epoch over overlapping windows. Exact rational elimination over the full recording is not
+  admitted, because its numbers grow; the window and its carried boundary are the design's remaining
+  decision, to be derived from the rings' memories before code.
+- **Located rings.** §8's blocker stands: with a memory of one turn, the keys cost more than the
+  samples. The bank's rings must hold what they read. Their turns and couplings are located from the
+  recording by the existing lock owners (`hnn::section_lock`: a settled ring's lock `W/τ`), not
+  declared, so that one key spans many turns of a locked ring.
+
+The section words' omissions (amplitude, within-quadrant phase, placement detail) are the fibre's
+directions. They stay in the decoder's retained constraints or in the residual, with their costs
+accounted (Codex's review of the first rung).
