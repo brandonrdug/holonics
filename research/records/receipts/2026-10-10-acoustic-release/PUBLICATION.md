@@ -20,7 +20,8 @@ balance closed.
   ([receipt](TESTS_AND_GATE_FAILED.v1.json)).
 - The developer render ran on a binary built before the two allow attributes. The queue's fresh
   build closes that difference.
-- Strict all-target clippy remains FAILED (exit 101) on pre-existing warnings, without a waiver.
+- Strict all-target clippy remains FAILED (exit 101), without a waiver. No equivalent failure set on
+  the parent has been proved, and none is claimed.
 - Developer reads stay developer reads.
 
 **Scope.**

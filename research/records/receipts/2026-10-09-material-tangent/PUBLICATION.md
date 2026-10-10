@@ -85,12 +85,12 @@ blocker). Queue receipt `VALIDATION.json`, SHA-256 `3229c68de2b3042cd0216044e7fa
 - The four actual schedule-equals-prospect readings.
 
 **Failures and corrections kept as they happened.**
-- The queue's first World launch failed before Cargo started, on its helper's private eight-thread
-  cap. The helper's capacity was then corrected against the actual host, and the gate receipt was
-  reused.
+- **The gate** passed on its launch, and its evidence was reused for the joint batch.
+- **The World tests** did not run on their first launch. That launch failed before Cargo started, on
+  the helper's private eight-thread cap. The helper's capacity was then corrected against the actual
+  host before the World launch that passed. The original failure trace and receipts are retained.
 - The World observation field was first declared in error and was lowered to its derived bound before
   any World start. The raw plan is retained.
-- Neither command succeeded on its first launch as declared.
 - Developer side:
   - The original 30-of-31 regression and its diagnostic are kept.
   - The PhaseWorse, CovectorScale and NoReach refusals are kept.
