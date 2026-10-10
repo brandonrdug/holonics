@@ -518,6 +518,60 @@ impl HeldContactVariation {
     }
 }
 
+/// [definition; agent-inferred, October 9; the held-carry record §4] **A raw Gram-factor
+/// coordinate's form derivative**, in its family and zero in the others: `E fᵀ + f Eᵀ` for the
+/// storage and dissipation factors, and `E Σ bᵀ + b Σ Eᵀ` for the stiffness factor with the
+/// contact's declared signature `Σ = diag(σ)` (`K = b Σ bᵀ`; `Σ = 1` without a boost). `E` is the
+/// coordinate's unit matrix.
+pub(crate) fn coordinate_forms(
+    field: &Field,
+    theta: &Constitution,
+    coordinate: &ContactCoordinate,
+) -> Result<[ExactRatMatrix; 3], HnnError> {
+    if coordinate.contact >= field.contacts().len() || coordinate.family > 2 {
+        return refuse("a contact coordinate names a contact of the field and one of its three factor families");
+    }
+    let a = coordinate.contact;
+    let factor = factors(theta, a)[coordinate.family];
+    let width = factor.rows();
+    if coordinate.row >= width || coordinate.column >= factor.columns() {
+        return refuse("a contact coordinate names an entry of its factor");
+    }
+    let mut direction = vec![vec![Rat::zero(); factor.columns()]; width];
+    direction[coordinate.row][coordinate.column] = integer(1);
+    let direction = ExactRatMatrix::shaped(width, factor.columns(), direction)?;
+    let signature = match coordinate.family {
+        1 => theta.contact_stiffness_signature(a),
+        _ => None,
+    };
+    // `M Σ`: each column of `M` signed by its factor column's sign.
+    let signed = |m: &ExactRatMatrix| -> Result<ExactRatMatrix, HnnError> {
+        let Some(signature) = signature else {
+            return Ok(m.clone());
+        };
+        let rows = (0..m.rows())
+            .map(|i| {
+                (0..m.columns())
+                    .map(|j| {
+                        let entry = m.get(i, j)?.clone();
+                        Ok(if signature[j] { entry } else { -entry })
+                    })
+                    .collect::<Result<Vec<_>, HnnError>>()
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        Ok(ExactRatMatrix::shaped(m.rows(), m.columns(), rows)?)
+    };
+    let mut forms = [
+        ExactRatMatrix::zero(width, width)?,
+        ExactRatMatrix::zero(width, width)?,
+        ExactRatMatrix::zero(width, width)?,
+    ];
+    forms[coordinate.family] = direction
+        .multiply(&signed(factor)?.transpose()?)?
+        .add(&factor.multiply(&signed(&direction)?.transpose()?)?)?;
+    Ok(forms)
+}
+
 impl Word<'_> {
     fn contact_first_variation(
         &self,
@@ -526,28 +580,28 @@ impl Word<'_> {
         coordinate: &ContactCoordinate,
         theta: &Constitution,
     ) -> Result<EndChange, HnnError> {
+        self.contact_forms_variation(t, chi, coordinate.contact, &coordinate_forms(self.field, theta, coordinate)?)
+    }
+
+    /// [definition] **One tick of a contact material's first variation** at the form derivatives
+    /// `forms = [δC, δK, δD]` of contact `a`: the existing full signed tick used by physical
+    /// completion (no second homogeneous state engine), then the contact's transit variation at the
+    /// tick's own primal state and midpoint with zero state variation, its forcing added at this
+    /// contact's u/w and arrival slots; later signed ticks carry it to every ring. The one law of
+    /// the held contact variation's columns and of `MaterialTangent`.
+    pub(crate) fn contact_forms_variation(
+        &self,
+        t: usize,
+        chi: &EndChange,
+        a: usize,
+        forms: &[ExactRatMatrix; 3],
+    ) -> Result<EndChange, HnnError> {
         let ops = &self.operands;
         let record = &self.passage[t];
-        // Reuse the existing full signed tick used by physical completion; no second
-        // homogeneous state engine. The reached material forcing has only this contact's
-        // u/w and arrival slots at this tick; later signed ticks carry it to every ring.
         let mut next = crate::hnn::prediction::physical_signed_tick(ops, chi, self.opened_at + t)?;
-        let a = coordinate.contact;
         let contact = &ops.contacts()[a];
         let (from, to) = contact.ends();
         let width = contact.width();
-        let factor = factors(theta, a)[coordinate.family];
-        let mut direction = vec![vec![Rat::zero(); factor.columns()]; factor.rows()];
-        direction[coordinate.row][coordinate.column] = integer(1);
-        let direction = ExactRatMatrix::shaped(factor.rows(), factor.columns(), direction)?;
-        let mut forms = [
-            ExactRatMatrix::zero(width, width)?,
-            ExactRatMatrix::zero(width, width)?,
-            ExactRatMatrix::zero(width, width)?,
-        ];
-        forms[coordinate.family] = direction
-            .multiply(&factor.transpose()?)?
-            .add(&factor.multiply(&direction.transpose()?)?)?;
         let zero_from = vec![Rat::zero(); ops.rings()[from].width()];
         let zero_to = vec![Rat::zero(); ops.rings()[to].width()];
         let zero_state = vec![Rat::zero(); width];
@@ -561,7 +615,7 @@ impl Word<'_> {
             &record.states[a][0],
             &record.states[a][1],
             &record.rates[a],
-            &forms,
+            forms,
         )?;
         next.arrivals[a] = [
             add(&next.arrivals[a][0], &forced.arrive_from),

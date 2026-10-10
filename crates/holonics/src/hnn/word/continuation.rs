@@ -59,7 +59,7 @@ use crate::hnn::constitution::{
     CommittedReach, Constitution, DeclaredExponents, DeclaredStepRefusal, DepositReading,
     FactorGradient, Family, Locus, Reach,
 };
-use crate::hnn::port::{Deposit, WordReturn};
+use crate::hnn::port::{ChangeCovector, Deposit, WordReturn};
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::ReceiverDeclaration;
 use crate::hnn::ratio::{Face, Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
@@ -1297,6 +1297,39 @@ pub(crate) fn reading_identity(producing: &HolonRatio, candidate: &HolonRatio) -
         })
 }
 
+/// [definition; agent-inferred, October 9; the held-carry record §5b] **The reading-identity
+/// witness of a receiving face ratio**: the same compared stations, and at every compared station
+/// the same grain and gauge-normalized cells `(n_c − n_max, k_c)` on both the produced and the
+/// observed face. `ReceivingFaceRatio::code_length` reads exactly these inputs: the produced class
+/// codes `log₂ Z − (n_c − n_max) − k_c/L`, weighted by the observed odometer masses
+/// `2^(n_c)(L + k_c)/Σ_d 2^(n_d)(L + k_d)`, which a common carry shift leaves unchanged. Equal inputs
+/// therefore give equal exact code expressions. The phases are not code inputs; the excess reads them,
+/// and the admission compares the excesses. Identical enclosure endpoints alone never count, and the
+/// fibre is never read as a value.
+pub(crate) fn receiving_reading_identity(
+    producing: &crate::hnn::ratio::ReceivingFaceRatio,
+    candidate: &crate::hnn::ratio::ReceivingFaceRatio,
+) -> bool {
+    if producing.stations() != candidate.stations() {
+        return false;
+    }
+    let same = |face: Option<&Face>, other: Option<&Face>| match (face, other) {
+        (Some(face), Some(other)) => {
+            face.grain() == other.grain() && gauge(face).is_some() && gauge(face) == gauge(other)
+        }
+        _ => false,
+    };
+    producing.stations().iter().all(|&station| {
+        same(
+            producing.faces().faces.get(station),
+            candidate.faces().faces.get(station),
+        ) && same(
+            producing.observed().get(station).and_then(Option::as_ref),
+            candidate.observed().get(station).and_then(Option::as_ref),
+        )
+    })
+}
+
 /// [definition; agent-inferred, October 9; Lean `HNN/FiniteDecrease.admission_sound`] **The
 /// admission**: with `L`, `L′` the producing and candidate code enclosures and `X`, `X′` their exact
 /// phase excesses, admit iff `upper(L′) < lower(L)` and `X′ ≤ X`
@@ -1524,4 +1557,650 @@ impl ContactCut {
         }
         Ok(())
     }
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §3] **One contact-material
+/// direction**: the derivatives `δC`, `δK`, `δD` of one contact's forms along a declared parameter
+/// direction, in the contact's own coordinates. A factor direction `H` of `C = c cᵀ` reads
+/// `δC = H cᵀ + c Hᵀ`; `D` is analogous, and `K = b Σ bᵀ` reads `δK = H Σ bᵀ + b Σ Hᵀ` at the
+/// declared signature. The finite factor move's `H Σ Hᵀ` is not a tangent term. `None` is a form the
+/// direction leaves fixed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MaterialDirection {
+    pub contact: usize,
+    pub storage: Option<ExactRatMatrix>,
+    pub stiffness: Option<ExactRatMatrix>,
+    pub dissipation: Option<ExactRatMatrix>,
+}
+
+impl MaterialDirection {
+    /// **The direction of one raw Gram-factor coordinate** (`word::variation::coordinate_forms`):
+    /// its family's form derivative, the other two forms fixed.
+    pub fn of_coordinate(
+        field: &Field,
+        theta: &Constitution,
+        coordinate: &super::variation::ContactCoordinate,
+    ) -> Result<Self, HnnError> {
+        let [storage, stiffness, dissipation] =
+            super::variation::coordinate_forms(field, theta, coordinate)?;
+        Ok(Self {
+            contact: coordinate.contact,
+            storage: (coordinate.family == 0).then_some(storage),
+            stiffness: (coordinate.family == 1).then_some(stiffness),
+            dissipation: (coordinate.family == 2).then_some(dissipation),
+        })
+    }
+
+    /// The three form derivatives `[δC, δK, δD]` at the contact's width, a fixed form zero.
+    fn forms(&self, width: usize) -> Result<[ExactRatMatrix; 3], HnnError> {
+        let form = |f: &Option<ExactRatMatrix>| match f {
+            Some(f) => Ok(f.clone()),
+            None => ExactRatMatrix::zero(width, width),
+        };
+        Ok([
+            form(&self.storage)?,
+            form(&self.stiffness)?,
+            form(&self.dissipation)?,
+        ])
+    }
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §3, eqs. (1)–(3)] **A contact
+/// material's forward tangent, carried beside a Word**: `χ = ∂x/∂θ · H`, the change of the Word's
+/// whole state along one material direction, of the change's own shape.
+///
+/// - **Within the Word** (eq. 2): `χ_(k+1) = T_k χ_k + b_(a,k)`, where `T_k` is the tick's full
+///   fixed-operand state map ([`crate::hnn::prediction::physical_signed_tick`]) and `b_(a,k)` the
+///   transit's variation at the direction's forms with zero state variation
+///   (`propagation::transit_variation`). Both are [`Word::contact_forms_variation`], the one tick
+///   law it shares with the held contact variation's columns. The start state `(u_k, w_k)` and
+///   midpoint `ω_k` are the Word's own passage record.
+/// - **At the opening:** `χ_0 = 0`, the held, parameter-independent opening.
+/// - **Across the passage boundary** (eq. 3, [`Self::opened`]): the linear part of
+///   [`ReceptionCarry::crossed`] (the arriving waves transmitted at `2G_old/(G_old + G_new)`; the
+///   contact and resonator states as carried, because for the same material on both sides the two
+///   `δC w` terms cancel, singular `C` included) and every source ring's storage replaced (`Π_int`).
+///   No contact factor enters the source opening.
+///
+/// - **At the encounter's own compared stations** (the held-carry record §3d): the participation
+///   anchor is linear in the change at the junction's fixed weights, so the receiving ring's anchor
+///   tangent is `δv = ŵ_s δs + Σ_a ŵ_a δa`, and the read `R P^τ v` (`τ` the receiving ring's integer
+///   lift, which no first variation moves) has tangent `R P^τ δv`. Where the World is located with a
+///   declared face, the World's observed face, affine in its state, has tangent
+///   `C_S δψ_S + C_R δψ_R`. [`Self::comparison_credit`] pairs both with the encounter's own covector.
+///
+/// It retains no Word, event or trajectory: `χ` is overwritten at each tick. The scope is an exact,
+/// unsplit Word on fixed operands with nothing deposited or released between the two Words; a
+/// lattice Word, a deposited parameter or a nonlinear passage owes its own differential and is
+/// refused or out of scope.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MaterialTangent {
+    direction: MaterialDirection,
+    /// The producing material commit the direction is based at.
+    commit: u64,
+    /// The Word's opening tick and the full ticks the tangent has followed.
+    opened_at: usize,
+    ticks: usize,
+    tangent: EndChange,
+    /// The World port, where the Word meets a participating World: the source ring and the World's
+    /// own state tangent `ψ` (its extent's coordinates). `None` for a Word with no World.
+    port: Option<(usize, Vec<Rat>)>,
+    /// The tangent's reading at each compared station of its own encounter, bounded by the
+    /// receiver's aperture and consumed by that encounter's comparison.
+    stations: Vec<StationTangent>,
+    /// The direction's contact's executed forms `(C, K, D)` at the opening it was based on: a
+    /// continuation crosses only into a Word whose contact material is the same.
+    forms: [ExactRatMatrix; 3],
+    /// The applied source wave of the encounter the tangent rides (its control's identity), bound at
+    /// that encounter's execution; empty before.
+    source: Vec<Rat>,
+}
+
+/// [definition; agent-inferred, October 9] **The tangent at one compared station** of the encounter
+/// that carried it: the receiving anchor's tangent `δv`, the produced logits' tangent `R P^τ δv` once
+/// read, and the observed face's tangent through the located key's declared face (`None` when the
+/// key declares no face: the World's face is then not located).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct StationTangent {
+    pub station: usize,
+    pub anchor: Vec<Rat>,
+    pub produced: Option<Vec<Rat>>,
+    pub observed: Option<Vec<Rat>>,
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §3d] **The first variation of the
+/// encounter's own comparison** along one material direction, as its series. With `g_j` the
+/// comparison's covector at station `j` (`ReceivingFaceRatio::covector`: real entries `p̃ − q̃`,
+/// imaginary entries `−q̃ (φ_q − φ_p)/2`):
+/// - `magnitude = Σ_j ⟨Re g_j, δℓ_p,j⟩`, the produced real logits against the smooth score at the
+///   grain representative;
+/// - `produced_phase = Σ_j ⟨Im g_j, δℓ_p,j⟩`, the produced phases;
+/// - `observed_phase = −Σ_j ⟨Im g_j, δℓ_q,j⟩`, the observed phases: the phase term reads only the
+///   gap `φ_q − φ_p`, so the target's covector is the produced one's negative.
+///
+/// The observed masses `q̃` are the World face's reading at its grain, constant inside its cell, so
+/// they contribute no first variation; a finite step that moves the target across a cell boundary is
+/// a jump the landing must re-read, not a tangent.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ComparisonCredit {
+    pub magnitude: Rat,
+    pub produced_phase: Rat,
+    pub observed_phase: Rat,
+}
+
+impl ComparisonCredit {
+    /// The series' sum: the directional derivative of the comparison's smooth score.
+    pub fn total(&self) -> Rat {
+        &(&self.magnitude + &self.produced_phase) + &self.observed_phase
+    }
+}
+
+impl MaterialTangent {
+    /// **The tangent at a held opening** (`χ_0 = 0`) of an exact, unrun Word, along `direction`,
+    /// based at the producing material `commit`.
+    pub fn held_opening(
+        word: &Word<'_>,
+        commit: u64,
+        direction: MaterialDirection,
+    ) -> Result<Self, HnnError> {
+        if word.operands().lattice().is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "a material tangent follows an exact, unsplit Word",
+            });
+        }
+        if !word.recorded().is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason: "a material tangent opens with its Word, before any junction step",
+            });
+        }
+        let contacts = word.operands().contacts();
+        let contact = contacts
+            .get(direction.contact)
+            .ok_or(HnnError::Unadmitted {
+                reason: "a material direction names a contact of the Word",
+            })?;
+        let width = contact.width();
+        for form in [
+            &direction.storage,
+            &direction.stiffness,
+            &direction.dissipation,
+        ]
+        .into_iter()
+        .flatten()
+        {
+            if form.rows() != width || form.columns() != width {
+                return Err(HnnError::Shape {
+                    what: "a material direction's form derivative (the contact's width)",
+                    expected: width,
+                    found: form.rows(),
+                });
+            }
+        }
+        let (c, k, d) = contact.forms();
+        let forms = [c.clone(), k.clone(), d.clone()];
+        let opening = word.change()?;
+        let zero = |v: &Vec<Rat>| vec![Rat::zero(); v.len()];
+        let tangent = EndChange {
+            storage: opening.storage.iter().map(zero).collect(),
+            arrivals: opening
+                .arrivals
+                .iter()
+                .map(|[g, h]| [zero(g), zero(h)])
+                .collect(),
+            states: opening
+                .states
+                .iter()
+                .map(|[u, w]| [zero(u), zero(w)])
+                .collect(),
+            resonators: opening
+                .resonators
+                .iter()
+                .map(|state| state.as_ref().map(|[u, w]| [zero(u), zero(w)]))
+                .collect(),
+            resonator_phases: opening.resonator_phases.clone(),
+        };
+        Ok(Self {
+            direction,
+            commit,
+            opened_at: word.opened_at(),
+            ticks: 0,
+            tangent,
+            port: None,
+            stations: Vec::new(),
+            forms,
+            source: Vec::new(),
+        })
+    }
+
+    /// [definition; agent-inferred, October 9; the held-carry record §6] **The tangent continued
+    /// into the next encounter**: eq. (3)'s crossing `χ_open = Π_int B_ref χ_carry` of this tangent's
+    /// carry into the next opening, with the World's state tangent `ψ` carried as it is (the World's
+    /// state persists between encounters), and the station readings cleared. The continued tangent is
+    /// rebound to the next Word at its opening ([`Self::rebind`]); until then it carries the commit it
+    /// was based at.
+    pub fn continued(
+        &self,
+        carry: &ReceptionCarry,
+        conductances: &[Rat],
+        field: &Field,
+    ) -> Result<Self, HnnError> {
+        Ok(Self {
+            direction: self.direction.clone(),
+            commit: self.commit,
+            opened_at: carry.ticks,
+            ticks: 0,
+            tangent: self.opened(carry, conductances, field)?,
+            port: self.port.clone(),
+            stations: Vec::new(),
+            forms: self.forms.clone(),
+            source: Vec::new(),
+        })
+    }
+
+    /// **Rebind a continued tangent to the Word it now rides**, before any junction step: the same
+    /// opening tick, the same contact material (the executed contact forms unchanged), the change's
+    /// own shape, and the Word's producing commit. A receiving publication between the encounters
+    /// changes the commit, never the contact; the receiving map stays an exterior control the tangent
+    /// does not differentiate.
+    pub(crate) fn rebind(&mut self, word: &Word<'_>, commit: u64) -> Result<(), HnnError> {
+        let contact = word
+            .operands()
+            .contacts()
+            .get(self.direction.contact)
+            .ok_or(HnnError::Unadmitted {
+                reason: "a continued tangent names a contact of its next Word",
+            })?;
+        let (c, k, d) = contact.forms();
+        let opening = word.change()?;
+        let shaped = opening.storage.len() == self.tangent.storage.len()
+            && opening
+                .storage
+                .iter()
+                .zip(&self.tangent.storage)
+                .all(|(a, b)| a.len() == b.len())
+            && opening.arrivals.len() == self.tangent.arrivals.len()
+            && opening.states.len() == self.tangent.states.len();
+        if word.opened_at() != self.opened_at
+            || !word.recorded().is_empty()
+            || word.operands().lattice().is_some()
+            || [c, k, d] != [&self.forms[0], &self.forms[1], &self.forms[2]]
+            || !shaped
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a continued tangent rides the next exact Word from its own opening, on the same contact material",
+            });
+        }
+        self.commit = commit;
+        Ok(())
+    }
+
+    /// Bind the applied source wave of the encounter this tangent rides, at that encounter's
+    /// execution.
+    pub(crate) fn bind_source(&mut self, wave: &[Rat]) {
+        self.source = wave.to_vec();
+    }
+
+    /// The applied source wave of the encounter the tangent rode (empty before it rode one).
+    pub fn source(&self) -> &[Rat] {
+        &self.source
+    }
+
+    /// The tangent's World port: its ring and the World state tangent's extent.
+    pub fn port(&self) -> Option<(usize, usize)> {
+        self.port.as_ref().map(|(ring, world)| (*ring, world.len()))
+    }
+
+    /// The same tangent at a World port on `ring`: the World's state tangent starts at `ψ = 0` of
+    /// `extent` coordinates, a World state no earlier material moved (a held opening of both).
+    pub fn with_port(mut self, ring: usize, extent: usize) -> Self {
+        self.port = Some((ring, vec![Rat::zero(); extent]));
+        self
+    }
+
+    /// **Follow one tick through the World port** (the held-carry record §3, the World-sensitive
+    /// tangent): the native tick ([`Self::step`]), then the World's tangent exchange at the port
+    /// with the World's charts `ξ⁺ = F ξ + G a`, `b = P ξ + Q a` at that tick's commit,
+    /// `δb = P ψ + Q δa`, `ψ ← F ψ + G δa`, where `δa` is the tangent's emitted source storage; the
+    /// returned `δb` replaces it, as `Word::return_source_wave` replaces the storage with the actual
+    /// reflected wave. Call after the Word's actual return of that tick.
+    pub fn step_through_port(
+        &mut self,
+        word: &Word<'_>,
+        f: &ExactRatMatrix,
+        g: &ExactRatMatrix,
+        p: &ExactRatMatrix,
+        q: &ExactRatMatrix,
+    ) -> Result<(), HnnError> {
+        self.step(word)?;
+        let (ring, world) = self.port.as_mut().ok_or(HnnError::Unadmitted {
+            reason: "a World-port tangent declares its port",
+        })?;
+        let incident = self.tangent.storage[*ring].clone();
+        let reflected = add(&p.apply(world)?, &q.apply(&incident)?);
+        *world = add(&f.apply(world)?, &g.apply(&incident)?);
+        self.tangent.storage[*ring] = reflected;
+        Ok(())
+    }
+
+    /// The World's state tangent `ψ`, where the tangent crosses a World port.
+    pub fn world(&self) -> Option<&[Rat]> {
+        self.port.as_ref().map(|(_, world)| world.as_slice())
+    }
+
+    /// **The anchor tangent** `δv = ŵ_s δs + Σ_a ŵ_a δa` that ring `ring`'s next junction reads: the
+    /// participation at the junction's own weights, which a contact-material direction does not move.
+    pub fn anchor(&self, word: &Word<'_>, ring: usize) -> Result<Vec<Rat>, HnnError> {
+        let operands = word.operands();
+        let storage = self.tangent.storage.get(ring).ok_or(HnnError::RingOutside {
+            ring,
+            rings: self.tangent.storage.len(),
+        })?;
+        let incoming: Vec<&[Rat]> = operands
+            .incident(ring)
+            .iter()
+            .map(|&a| self.tangent.arrivals[a][operands.end_slot(a, ring)].as_slice())
+            .collect();
+        crate::hnn::propagation::participation(operands.weights(ring), storage, &incoming)
+    }
+
+    /// **Hold the tangent at a compared station** of its own encounter, at the tick the World's
+    /// target face is received: the receiving ring's anchor tangent, and `observed`, the World face's
+    /// tangent through the located key (`None` when not located).
+    pub fn observe_station(
+        &mut self,
+        word: &Word<'_>,
+        ring: usize,
+        station: usize,
+        observed: Option<Vec<Rat>>,
+    ) -> Result<(), HnnError> {
+        if self.stations.iter().any(|held| held.station == station) {
+            return Err(HnnError::Unadmitted {
+                reason: "a compared station is held once per encounter",
+            });
+        }
+        let anchor = self.anchor(word, ring)?;
+        self.stations.push(StationTangent {
+            station,
+            anchor,
+            produced: None,
+            observed,
+        });
+        Ok(())
+    }
+
+    /// **Read the held anchor tangents** through the actual read's own linear part `read` (the
+    /// receiving map at the read's lift, `δv ↦ R P^τ δv`), after the encounter's reads.
+    pub fn read_stations(
+        &mut self,
+        mut read: impl FnMut(&[Rat]) -> Result<Vec<Rat>, HnnError>,
+    ) -> Result<(), HnnError> {
+        for held in &mut self.stations {
+            held.produced = Some(read(&held.anchor)?);
+        }
+        Ok(())
+    }
+
+    /// The tangent's held stations, in the order they were compared.
+    pub fn stations(&self) -> &[StationTangent] {
+        &self.stations
+    }
+
+    /// **The first variation of the encounter's own comparison** ([`ComparisonCredit`]): every
+    /// compared station of `ratio` must be held, read, and located on the World's side.
+    pub fn comparison_credit(
+        &self,
+        ratio: &crate::hnn::ratio::ReceivingFaceRatio,
+    ) -> Result<ComparisonCredit, HnnError> {
+        let covector = ratio.covector()?;
+        let mut credit = ComparisonCredit {
+            magnitude: Rat::zero(),
+            produced_phase: Rat::zero(),
+            observed_phase: Rat::zero(),
+        };
+        for &station in ratio.stations() {
+            let held = self
+                .stations
+                .iter()
+                .find(|held| held.station == station)
+                .ok_or(HnnError::Unadmitted {
+                    reason: "the comparison credit holds the tangent at every compared station",
+                })?;
+            let (Some(produced), Some(observed)) = (&held.produced, &held.observed) else {
+                return Err(HnnError::Unadmitted {
+                    reason: "the comparison credit reads the produced tangent and the located World face's tangent",
+                });
+            };
+            let g = &covector.logits()[station];
+            if produced.len() != g.len() || observed.len() != g.len() {
+                return Err(HnnError::Shape {
+                    what: "a station's logit tangents against its covector",
+                    expected: g.len(),
+                    found: produced.len().min(observed.len()),
+                });
+            }
+            for class in 0..g.len() / 2 {
+                credit.magnitude += &g[2 * class] * &produced[2 * class];
+                credit.produced_phase += &g[2 * class + 1] * &produced[2 * class + 1];
+                credit.observed_phase -= &g[2 * class + 1] * &observed[2 * class + 1];
+            }
+        }
+        Ok(credit)
+    }
+
+    /// **Follow the Word's next full tick** (eq. 2): call after the Word has executed it.
+    pub fn step(&mut self, word: &Word<'_>) -> Result<(), HnnError> {
+        if word.opened_at() != self.opened_at {
+            return Err(HnnError::Unadmitted {
+                reason: "a material tangent follows the Word it opened with",
+            });
+        }
+        let k = self.ticks;
+        let record = word.recorded().get(k).ok_or(HnnError::Unadmitted {
+            reason: "a material tangent follows a full tick the Word has executed",
+        })?;
+        if record.rates.is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason: "a material tangent follows a full tick, not a last junction",
+            });
+        }
+        let a = self.direction.contact;
+        let width = word.operands().contacts()[a].width();
+        self.tangent =
+            word.contact_forms_variation(k, &self.tangent, a, &self.direction.forms(width)?)?;
+        self.ticks += 1;
+        Ok(())
+    }
+
+    /// The tangent `χ` after the full ticks it has followed: at a Word that ended at a last
+    /// junction, the tangent of its reception carry ([`Word::reception_end`]).
+    pub fn tangent(&self) -> &EndChange {
+        &self.tangent
+    }
+
+    pub fn direction(&self) -> &MaterialDirection {
+        &self.direction
+    }
+
+    pub fn commit(&self) -> u64 {
+        self.commit
+    }
+
+    /// The opening tick of the Word this tangent rides.
+    pub fn opened_at(&self) -> usize {
+        self.opened_at
+    }
+
+    /// The full ticks the tangent has followed.
+    pub fn ticks(&self) -> usize {
+        self.ticks
+    }
+
+    /// **The tangent at the next opening** (eq. 3): `χ_open = Π_int B_ref χ_carry`, for a Word
+    /// opened on `carry` with the same material, whose contacts take `conductances`. The carry must
+    /// be the one this tangent followed (its tick).
+    pub fn opened(
+        &self,
+        carry: &ReceptionCarry,
+        conductances: &[Rat],
+        field: &Field,
+    ) -> Result<EndChange, HnnError> {
+        if carry.ticks != self.opened_at + self.ticks {
+            return Err(HnnError::Unadmitted {
+                reason: "a material tangent crosses with the carry of the ticks it followed",
+            });
+        }
+        if conductances.len() != carry.conductances.len()
+            || self.tangent.arrivals.len() != conductances.len()
+        {
+            return Err(HnnError::Shape {
+                what: "the next opening's contacts against the carry's",
+                expected: carry.conductances.len(),
+                found: conductances.len(),
+            });
+        }
+        let mut crossed = self.tangent.clone();
+        for (pair, (from, to)) in crossed
+            .arrivals
+            .iter_mut()
+            .zip(carry.conductances.iter().zip(conductances))
+        {
+            for wave in pair.iter_mut() {
+                *wave = transmitted(wave, from, to);
+            }
+        }
+        Ok(interior_of(field, crossed))
+    }
+
+    /// **The delayed material credit** `⟨μ_open, χ_open⟩` (eq. 3): the next Word's full returned
+    /// opening covector paired with this tangent crossed into its opening.
+    pub fn credit(
+        &self,
+        carry: &ReceptionCarry,
+        conductances: &[Rat],
+        field: &Field,
+        opening: &ChangeCovector,
+    ) -> Result<Rat, HnnError> {
+        Ok(opening.pairing(&self.opened(carry, conductances, field)?))
+    }
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §5a] **The World-sensitive contact
+/// descent of one encounter's own comparison**, one factor step per (contact, family), in the
+/// admission's own order. The admission is lexicographic: a strict classical improvement with no
+/// worse phase excess, or, at an exactly equal code, a smaller excess. For each declared raw
+/// Gram-factor coordinate the tangent's comparison credit (5) gives the classical gradient `g_L` (its
+/// magnitude part) and the phase gradient `g_X` (its two phase parts). Per family the step is the
+/// steepest classical descent that does not raise the phase at first order: `d = −g_L` when
+/// `⟨g_L, g_X⟩ ≥ 0`, and otherwise its projection off `g_X`,
+/// `d = −g_L + (⟨g_L, g_X⟩ / |g_X|²) g_X` (exact and rational), so `⟨g_X, d⟩ = 0` and
+/// `⟨g_L, d⟩ = −|g_L|² + ⟨g_L, g_X⟩²/|g_X|² ≤ 0`. Both bounds hold per family, so they hold for any
+/// positive per-family step. A family with `d = 0` contributes no step. Each step keeps the
+/// normalization the held contact comparison gives its reached covector: the family's within-Word
+/// feature energy and covector scale, read from the encounter's own composed return (`held`). The
+/// tangents open at a held opening (`χ_0 = 0`). It is a proposal: only the landing's admission moves
+/// the material. Refused for a coordinate declared twice, a tangent that does not carry its
+/// coordinate's direction, or a family the composed return did not reach.
+pub fn world_descent(
+    field: &Field,
+    theta: &Constitution,
+    coordinates: &[super::variation::ContactCoordinate],
+    tangents: &[MaterialTangent],
+    ratio: &crate::hnn::ratio::ReceivingFaceRatio,
+    held: &[crate::hnn::constitution::FactorStep],
+) -> Result<Vec<crate::hnn::constitution::FactorStep>, HnnError> {
+    if coordinates.len() != tangents.len() {
+        return Err(HnnError::Shape {
+            what: "one material tangent per declared contact coordinate",
+            expected: coordinates.len(),
+            found: tangents.len(),
+        });
+    }
+    // Per family, each entry's classical and phase gradients.
+    type Entries = Vec<Vec<Option<(Rat, Rat)>>>;
+    let mut families: std::collections::BTreeMap<(usize, usize), Entries> =
+        std::collections::BTreeMap::new();
+    for (coordinate, tangent) in coordinates.iter().zip(tangents) {
+        if tangent.direction() != &MaterialDirection::of_coordinate(field, theta, coordinate)? {
+            return Err(HnnError::Unadmitted {
+                reason: "each material tangent carries its declared coordinate's direction",
+            });
+        }
+        let a = coordinate.contact;
+        let factor = [
+            theta.contact_storage(a),
+            theta.contact_stiffness(a),
+            theta.contact_dissipation(a),
+        ][coordinate.family];
+        let entries = families
+            .entry((a, coordinate.family))
+            .or_insert_with(|| vec![vec![None; factor.columns()]; factor.rows()]);
+        let slot = &mut entries[coordinate.row][coordinate.column];
+        if slot.is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "a contact coordinate is declared once",
+            });
+        }
+        let credit = tangent.comparison_credit(ratio)?;
+        *slot = Some((
+            credit.magnitude.clone(),
+            &credit.produced_phase + &credit.observed_phase,
+        ));
+    }
+    let mut steps = Vec::new();
+    for ((a, family), entries) in families {
+        let rows = entries.len();
+        let columns = entries.first().map_or(0, Vec::len);
+        let pairs: Vec<(Rat, Rat)> = entries
+            .into_iter()
+            .flatten()
+            .map(|x| x.unwrap_or_else(|| (Rat::zero(), Rat::zero())))
+            .collect();
+        let dot = |f: &dyn Fn(&(Rat, Rat)) -> Rat| pairs.iter().map(f).sum::<Rat>();
+        // ⟨g_L, g_X⟩ and |g_X|², exact; the projection's coefficient when they conflict.
+        let conflict = dot(&|(l, x)| l * x);
+        let phase = dot(&|(_, x)| x * x);
+        let lift = if conflict < Rat::zero() && !phase.is_zero() {
+            conflict / phase
+        } else {
+            Rat::zero()
+        };
+        let descent: Vec<Rat> = pairs.iter().map(|(l, x)| &lift * x - l).collect();
+        if descent.iter().all(Zero::is_zero) {
+            continue;
+        }
+        let descent = descent.chunks(columns.max(1)).map(<[Rat]>::to_vec).collect();
+        steps.push(((a, family), rows, columns, descent));
+    }
+    steps
+        .into_iter()
+        .map(|((a, family), rows, columns, descent)| {
+            let tag = Family::Factor(family);
+            let reached = held
+                .iter()
+                .find(|s| s.gradient.locus() == Locus::Channel(a) && s.gradient.family() == tag)
+                .ok_or(HnnError::Unadmitted {
+                    reason: "a World-sensitive descent is normalized by its family's reached within-Word metric",
+                })?;
+            let gradient = ExactRatMatrix::shaped(rows, columns, descent)?;
+            let gradient = match family {
+                0 => FactorGradient::Storage {
+                    contact: a,
+                    gradient,
+                },
+                1 => FactorGradient::Stiffness {
+                    contact: a,
+                    gradient,
+                },
+                _ => FactorGradient::Dissipation {
+                    contact: a,
+                    gradient,
+                },
+            };
+            Ok(crate::hnn::constitution::FactorStep {
+                gradient,
+                energy: reached.energy.clone(),
+                covector: reached.covector.clone(),
+            })
+        })
+        .collect()
 }

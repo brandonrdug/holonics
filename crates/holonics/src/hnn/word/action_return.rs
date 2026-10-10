@@ -21,6 +21,11 @@ pub struct NativeReceivingReturn {
     pub opening: ChangeCovector,
     /// A zero/absent actual comparison changes no normal statistic, remainder or commit.
     pub deposit: Option<Deposit>,
+    /// [agent-inferred, October 9; the held-carry record §5] The contact families' factor steps of
+    /// the same composed return, the World's returns held: their gradients are that conditional
+    /// reading, and their within-Word feature energy and covector scale normalize a World-sensitive
+    /// descent of the same comparison. Not deposited here.
+    pub contacts: Vec<crate::hnn::constitution::FactorStep>,
 }
 
 impl Word<'_> {
@@ -80,6 +85,12 @@ impl Word<'_> {
             &source,
             &pullback,
         )?;
+        let contacts: Vec<_> = composed
+            .factors
+            .iter()
+            .filter(|step| matches!(step.gradient.locus(), Locus::Channel(_)))
+            .cloned()
+            .collect();
         let mut linear: Vec<_> = composed
             .linear
             .into_iter()
@@ -143,6 +154,7 @@ impl Word<'_> {
             pullback,
             opening,
             deposit,
+            contacts,
         })
     }
 }

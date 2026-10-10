@@ -618,6 +618,149 @@ impl WorldModel {
         Ok(Self { keys, states, tick })
     }
 
+    /// [definition; agent-inferred, October 9; the held-carry record §5e] **The memory's learned part
+    /// as exact text**: the tick, and each key's state. A Live state writes its fibre's point and
+    /// directions; a Held state its fibre, certified tick and reason; an Incompatible state its
+    /// elimination tick and annihilator. Rationals are written `p/q`. The keys are declarations, not
+    /// learned, so they are not written: [`Self::restored`] re-declares them.
+    pub fn to_text(&self) -> String {
+        let row = |values: &[Rat]| {
+            values
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join(" ")
+        };
+        let fibre = |out: &mut String, fibre: &StateFibre| {
+            *out += &format!("point {}\n", row(&fibre.point));
+            for direction in &fibre.directions {
+                *out += &format!("direction {}\n", row(direction));
+            }
+        };
+        let mut out = format!("world-model v1\ntick {}\nkeys {}\n", self.tick, self.states.len());
+        for state in &self.states {
+            match state {
+                KeyState::Live(f) => {
+                    out += "live\n";
+                    fibre(&mut out, f);
+                }
+                KeyState::Held {
+                    fibre: f,
+                    certified_tick,
+                    reason,
+                } => {
+                    out += &format!(
+                        "held {certified_tick} {}\n",
+                        match reason {
+                            HeldReason::Charts => "charts",
+                            HeldReason::Arithmetic => "arithmetic",
+                        }
+                    );
+                    fibre(&mut out, f);
+                }
+                KeyState::Incompatible { tick, annihilator } => {
+                    out += &format!("incompatible {tick}\nannihilator {}\n", row(annihilator));
+                }
+            }
+            out += "end\n";
+        }
+        out
+    }
+
+    /// **Restore the memory from its text** ([`Self::to_text`]) on its declared `keys`. It is refused
+    /// for another version, another key count, a malformed value, or a fibre whose extents are not
+    /// its key's.
+    pub fn restored(keys: Vec<ModelKey>, text: &str) -> Result<Self, HnnError> {
+        let refuse = || HnnError::Unadmitted {
+            reason: "a World model's text restores on its own declared keys",
+        };
+        let values = |rest: &str| -> Result<Vec<Rat>, HnnError> {
+            rest.split_whitespace()
+                .map(|v| v.parse::<Rat>().map_err(|_| refuse()))
+                .collect()
+        };
+        let mut lines = text.lines();
+        if lines.next() != Some("world-model v1") {
+            return Err(refuse());
+        }
+        let tick: u64 = lines
+            .next()
+            .and_then(|l| l.strip_prefix("tick "))
+            .and_then(|t| t.parse().ok())
+            .ok_or_else(refuse)?;
+        let count: usize = lines
+            .next()
+            .and_then(|l| l.strip_prefix("keys "))
+            .and_then(|t| t.parse().ok())
+            .ok_or_else(refuse)?;
+        if count != keys.len() {
+            return Err(refuse());
+        }
+        let mut states = Vec::with_capacity(count);
+        for key in &keys {
+            let head = lines.next().ok_or_else(refuse)?;
+            let read_fibre = |lines: &mut std::str::Lines<'_>| -> Result<StateFibre, HnnError> {
+                let point = values(
+                    lines
+                        .next()
+                        .and_then(|l| l.strip_prefix("point"))
+                        .ok_or_else(refuse)?,
+                )?;
+                let mut directions = Vec::new();
+                loop {
+                    let line = lines.next().ok_or_else(refuse)?;
+                    if line == "end" {
+                        break;
+                    }
+                    directions.push(values(line.strip_prefix("direction").ok_or_else(refuse)?)?);
+                }
+                if point.len() != key.extent() || directions.iter().any(|d| d.len() != key.extent()) {
+                    return Err(refuse());
+                }
+                Ok(StateFibre { point, directions })
+            };
+            let state = if head == "live" {
+                KeyState::Live(read_fibre(&mut lines)?)
+            } else if let Some(rest) = head.strip_prefix("held ") {
+                let mut parts = rest.split_whitespace();
+                let certified_tick: u64 =
+                    parts.next().and_then(|t| t.parse().ok()).ok_or_else(refuse)?;
+                let reason = match parts.next() {
+                    Some("charts") => HeldReason::Charts,
+                    Some("arithmetic") => HeldReason::Arithmetic,
+                    _ => return Err(refuse()),
+                };
+                KeyState::Held {
+                    fibre: read_fibre(&mut lines)?,
+                    certified_tick,
+                    reason,
+                }
+            } else if let Some(rest) = head.strip_prefix("incompatible ") {
+                let eliminated: u64 = rest.trim().parse().map_err(|_| refuse())?;
+                let annihilator = values(
+                    lines
+                        .next()
+                        .and_then(|l| l.strip_prefix("annihilator"))
+                        .ok_or_else(refuse)?,
+                )?;
+                if lines.next() != Some("end") {
+                    return Err(refuse());
+                }
+                KeyState::Incompatible {
+                    tick: eliminated,
+                    annihilator,
+                }
+            } else {
+                return Err(refuse());
+            };
+            states.push(state);
+        }
+        if lines.next().is_some() {
+            return Err(refuse());
+        }
+        Ok(Self { keys, states, tick })
+    }
+
     /// The declared keys.
     pub fn keys(&self) -> &[ModelKey] {
         &self.keys

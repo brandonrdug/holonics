@@ -13,6 +13,7 @@ mod guards;
 mod keys;
 pub(crate) mod learning;
 mod loaded_scalar;
+mod material_tangent;
 mod moment;
 mod pending;
 mod prior_carry;
