@@ -1003,6 +1003,8 @@ pub struct CoupledPassage {
     pub features: Vec<(usize, Vec<Rat>, Vec<Rat>)>,
     /// The passage's released work, closed.
     pub word: WordBalance,
+    /// The native carry at the passage's end, which the next encounter of a schedule opens on.
+    pub end: crate::hnn::word::ReceptionCarry,
 }
 
 /// The declared return law of a coupled passage ([`Word::prospective_coupled_passage`]): the returned
@@ -1095,10 +1097,12 @@ impl Word<'_> {
             let logits = map.apply(&feature)?;
             features.push((station, feature, logits));
         }
+        let end = word.reception_end()?;
         Ok(CoupledPassage {
             waves,
             features,
             word: prediction,
+            end,
         })
     }
 }

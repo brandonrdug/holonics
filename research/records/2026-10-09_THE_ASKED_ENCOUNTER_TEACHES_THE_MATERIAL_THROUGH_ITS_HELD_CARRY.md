@@ -852,7 +852,7 @@ rounds").
 - Refused when `1` is an eigenvalue of `M` (no unique closed orbit). Convergence to the orbit is a
   property of the dissipation, to be read from `M`'s spectrum, not assumed.
 
-### 7e. The passage reaches its cycle once the receiving relation settles
+### 7e. The readings recur once the receiving relation stops moving
 
 [measured; developer reads, not claim-bearing;
 [receipt](receipts/2026-10-09-material-tangent/PASSAGE_DEV_TESTS.v1.json)] The cycle law of §7d
@@ -864,23 +864,69 @@ assumes an orbit exists, so two reads were made before it was built.
   is therefore not a still learner: its readout learns as the learner's does. The comparisons of
   §7c and §7d are small material effects (`[2⁻²⁰, 2⁻¹¹)`) on a common drift that is larger: the
   excess rose by up to `[2⁻⁶, 2⁻⁵)` between repeats of a wave, for learner and twin alike.
-- **Then it settles, and the passage closes** (`the_passage_over_forty_encounters`, fixture 1).
+- **Then it stops moving, and the readings recur** (`the_passage_over_forty_encounters`, fixture 1).
+  This is finite measured recurrence at the receiver's grain, not an exact state periodicity, an
+  indefinite settlement of `R` or a certificate of convergence (Epime's precision).
   - `R` moves at encounters 0 to 9 and at none of encounters 10 to 39.
   - From about encounter 23 on, every reading recurs with period 2 at the receiver's grain: at
     `u = 1` code in `[2⁰, 2¹)` and excess in `[2⁻⁷, 2⁻⁶)`; at `u = −1` code in `[2⁰, 2¹)` and excess
     in `[2⁻⁶, 2⁻⁵)`.
-  - The closed orbit is **worse** than the opening: the excess began at `[2⁻⁹, 2⁻⁸)` and
-    `[2⁻⁷, 2⁻⁶)`. The readout's learning and the transient leave the receiver on an orbit whose
-    phase excess is higher.
+  - The recurring readings are **worse** than the opening: the excess began at `[2⁻⁹, 2⁻⁸)` and
+    `[2⁻⁷, 2⁻⁶)`.
 
 **What it means for the law.**
-- Once `R` has settled, the joint native and World passage under the repeated schedule is the affine
-  round map of §7d, and it converges to its closed orbit on this fixture. So the cycle's prospect is
-  well posed after settlement, and it is what the material should improve.
+- While `R` does not move, the joint native and World passage under the repeated schedule is the
+  affine round map of §7d. The readings recur at the grain on this fixture. An exact closed orbit
+  still needs its own owner: `I − M` invertible on its stated domain, the admitted future including
+  any receiving deposits, and no convergence claimed beyond what is measured.
 - Before settlement, `R`'s deposits are lattice steps driven by each comparison. They are part of
   the admitted future, and a prospect that holds `R` fixed is exact only once `R` no longer moves.
-- The orbit being worse than the opening is the plainest target the loop has had. The material is
-  to be admitted on the orbit's comparison, against the orbit the never-landing twin settles on.
+- The recurring readings being worse than the opening is the plainest target the loop has had.
 - The forty-encounter read held the common lease for 136.75 s while the queue waited to launch.
   Developer reads that long are scheduled between the queue's runs, not across them.
+
+### 7f. The schedule's chained prospect: exact after the receiving relation stops moving
+
+[definition; agent-inferred, October 10] The admitted future of a schedule is its encounters in
+order. `PhysicalReceiver::world_prospect_schedule` builds it:
+- Each prospective encounter opens on the previous one's prospective end carry. `CoupledPassage::end`
+  is the Word's `reception_end`; `action_opening_on` opens on a declared carry.
+- The key continues from its prospective end state at the clock its passage reached
+  (`WorldModel::located_passage_with_tangents`, `coupled_at`).
+- The tangents open at the present opening and are continued across every later opening (eq. 3,
+  `MaterialTangent::continued`, `rebind`). The material is the same on both sides of those
+  crossings.
+- Each encounter returns its comparison, its tangents and its raw prospect (`ScheduledProspect`).
+  `world_prospect_taught` is the schedule of one encounter.
+- `world_schedule_proposal` descends every encounter's credit with the common descent.
+- `land_world_descent_on` admits on a declared `AdmittedFuture`: independent waves from the present
+  opening (§7b), or the schedule. `land_world_descent` is its waves case.
+
+The receiving relation is the material's own throughout. That is exact while `R` does not move, and
+it is not a prediction of `R`'s deposits.
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/SCHEDULE_DEV_TESTS.v1.json)]
+- **The chained prospect is the actual schedule once `R` stops moving**
+  (`the_schedule_prospect_is_the_actual_schedule`). After twelve encounters, both encounters of the
+  next round (`u = 1`, then `u = −1`) equal their prospects exactly, in code enclosure and excess.
+  After two encounters, while `R` still moves, the first equals its prospect and the second does not.
+- **The schedule's credit is exact at its consumer** (`the_schedule_is_credited_at_its_consumer`). The
+  two encounters' credits along one storage direction, summed, are confirmed to second order on
+  `θ ± εH` (the present `R` kept), `ε = 2⁻⁴ … 2⁻⁸`.
+- **The one-round schedule loop** (`the_schedule_loop_is_read_against_its_twin`, `…_on_a_second_fixture`;
+  learner and twin each start after twelve encounters):
+  - On fixture 1, every landing is unreached (`NoReach`: no family reaches its lattice), so learner
+    and twin read identically.
+  - On fixture 2, round 0's landing is admitted (`Phase` at both encounters) and improves both of
+    them against the twin: excess lower by `[2⁻¹⁵, 2⁻¹⁴)` and `[2⁻¹², 2⁻¹¹)`. In every later round,
+    `u = 1` is worse than the twin (excess higher by `[2⁻¹⁵, 2⁻¹²)`), and `u = −1` is better or has a
+    higher code with a lower excess. The landings of rounds 1 to 3 are refused (`PhaseWorse`).
+
+**What it shows.** A one-round horizon fixes the schedule mismatch and keeps the horizon effect: a
+step admitted on its own round costs the rounds after it. The cycle owner of §7d stays the next law,
+with Epime's conditions:
+- `I − M` invertible on a stated domain;
+- the admitted future including any receiving deposits, or restricted to where `R` does not move;
+- no convergence claimed beyond what is measured.
 

@@ -15,8 +15,8 @@ use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::physical::PhysicalReceiver;
 use holonics::hnn::physical::action::{
-    ActionCommunication, ActionReception, AdmittedWaves, BoundJointWorld, ModelKey,
-    PreparedPhysicalProbe, WorldLanding, WorldModel,
+    ActionCommunication, ActionReception, AdmittedFuture, AdmittedWaves, BoundJointWorld,
+    ModelKey, PreparedPhysicalProbe, WorldLanding, WorldModel,
 };
 use holonics::hnn::propagation::Operands;
 use holonics::hnn::ring::ResonatorMaterial;
@@ -2401,5 +2401,266 @@ fn the_passage_over_forty_encounters() {
             comparison.receiving_before != comparison.receiving_after
         );
     }
+}
+
+// ---- The schedule's chained prospect (the held-carry record §7f) ----
+
+/// `count` plain encounters alternating `u = 1, −1`, the last kept as the latest reception.
+fn plain_passage(
+    receiver: &mut PhysicalReceiver<'_>,
+    field: &Field,
+    source: &Encoded,
+    count: usize,
+) -> ActionReception {
+    let preparation = actuator(field);
+    let mut last = None;
+    for k in 0..count {
+        let control = &chain_controls()[k % 2];
+        let probe = receiver
+            .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        last = Some(received);
+    }
+    last.unwrap()
+}
+
+/// **The schedule's chained prospect is the actual schedule** (§7f): after `count` encounters, the
+/// located key's prospect of the next two encounters (`u = 1`, then `u = −1`) is read, then the two
+/// encounters actually run. After the receiving relation has settled (twelve encounters) both are
+/// asserted equal to their prospects; after two encounters, while it still moves, the agreement is
+/// reported as measured.
+#[test]
+fn the_schedule_prospect_is_the_actual_schedule() {
+    let (field, base, source) = fixture();
+    let theta = Declared::new(&field, base).at(&Rat::zero());
+    let preparation = actuator(&field);
+    let [first, second] = chain_controls();
+    for count in [2, 12] {
+        let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+        plain_passage(&mut receiver, &field, &source, count);
+        let present = receiver.constitution().clone();
+        let prospects = receiver
+            .world_prospect_schedule(
+                &present,
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                &[&first, &second],
+                &[],
+            )
+            .unwrap();
+        for (k, control) in [&first, &second].iter().enumerate() {
+            let actual = second_comparison(&mut receiver, &field, &source, control);
+            let prospect = &prospects[k].ratio;
+            let equal = actual.0 == prospect.code_length().unwrap()
+                && actual.1 == prospect.excess().unwrap();
+            println!(
+                "schedule prospect: after {count} encounters: encounter {k}: actual equals prospect {equal}"
+            );
+            if count == 12 {
+                assert!(equal, "after settlement the chained prospect is the actual encounter {k}");
+            }
+        }
+    }
+}
+
+/// **The schedule's credit at its consumer** (§7f): after twelve encounters, the chained prospect of
+/// `u = 1` then `u = −1` taught along one storage direction; the two encounters' credits summed. On
+/// `θ ± εH` (the present receiving relation kept) the two prospects' parts at their frozen covectors
+/// confirm it to second order on `ε = 2⁻⁴ … 2⁻⁸`.
+#[test]
+fn the_schedule_is_credited_at_its_consumer() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let direction = declared.storage_direction(&field);
+    let mut receiver = bound(
+        &field,
+        declared.at(&Rat::zero()),
+        &source,
+        vec![faced_key(&field)],
+    );
+    plain_passage(&mut receiver, &field, &source, 12);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    let [first, second] = chain_controls();
+    let taught = receiver
+        .world_prospect_schedule(
+            &present,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &[&first, &second],
+            &[direction],
+        )
+        .unwrap();
+    let mut credit = [Rat::zero(), Rat::zero(), Rat::zero()];
+    let mut covectors = Vec::new();
+    for scheduled in &taught {
+        let c = scheduled.tangents[0].comparison_credit(&scheduled.ratio).unwrap();
+        credit[0] += &c.magnitude;
+        credit[1] += &c.produced_phase;
+        credit[2] += &c.observed_phase;
+        covectors.push(scheduled.ratio.covector().unwrap().logits().to_vec());
+    }
+    println!(
+        "schedule credit: magnitude {}, produced phase {}, observed phase {}",
+        credit[0], credit[1], credit[2]
+    );
+    let parts_at = |epsilon: &Rat| -> [Rat; 3] {
+        let scheduled = receiver
+            .world_prospect_schedule(
+                &declared.on(&present, epsilon),
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                &[&first, &second],
+                &[],
+            )
+            .unwrap();
+        let mut total = [Rat::zero(), Rat::zero(), Rat::zero()];
+        for (k, scheduled) in scheduled.iter().enumerate() {
+            let logits: Vec<StationLogits> = scheduled
+                .prospect
+                .point
+                .features
+                .iter()
+                .zip(&scheduled.prospect.faces)
+                .enumerate()
+                .map(|(rank, ((_, _, logits), (_, face)))| StationLogits {
+                    station: rank,
+                    produced: logits.clone(),
+                    observed: face.clone(),
+                })
+                .collect();
+            let p = parts(&covectors[k], &logits);
+            for i in 0..3 {
+                total[i] += &p[i];
+            }
+        }
+        total
+    };
+    let mut residuals: Vec<(Rat, [Rat; 3])> = Vec::new();
+    for j in 4..9 {
+        let epsilon = rat(1, 1i64 << j);
+        let up = parts_at(&epsilon);
+        let down = parts_at(&-epsilon.clone());
+        let two = integer(2) * &epsilon;
+        let r: [Rat; 3] = std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &credit[k]).abs());
+        println!("schedule credit: ε = 2^-{j}: central residuals {} {} {}", r[0], r[1], r[2]);
+        residuals.push((epsilon, r));
+    }
+    for k in 0..3 {
+        let (first_epsilon, first) = &residuals[0];
+        let scaled_first = &first[k] / (first_epsilon * first_epsilon);
+        for pair in residuals.windows(2) {
+            assert!(
+                pair[1].1[k].clone() * integer(2) <= pair[0].1[k],
+                "part {k}: the residual halves at least"
+            );
+        }
+        for (epsilon, residual) in &residuals {
+            assert!(
+                &residual[k] / (epsilon * epsilon) <= &scaled_first * integer(2),
+                "part {k}: the residual stays O(ε²)"
+            );
+        }
+    }
+}
+
+/// One fixture's schedule loop (§7f): learner and twin each run twelve plain encounters (the
+/// receiving relation settles); then each round the learner lands on the chained prospect of the
+/// round's two encounters (`u = 1`, then `u = −1`) and runs them; the twin runs them with no landing.
+fn schedule_loop(name: &str, second: bool) {
+    let (field, base, source) = fixture();
+    let theta = if second {
+        second_material(&field, base)
+    } else {
+        Declared::new(&field, base).at(&Rat::zero())
+    };
+    let make = |theta: &Constitution| {
+        if second {
+            bound_second(&field, theta.clone(), &source)
+        } else {
+            bound(&field, theta.clone(), &source, vec![faced_key(&field)])
+        }
+    };
+    let mut learner = make(&theta);
+    let mut twin = make(&theta);
+    let mut last = plain_passage(&mut learner, &field, &source, 12);
+    plain_passage(&mut twin, &field, &source, 12);
+    let preparation = actuator(&field);
+    let [first, second_wave] = chain_controls();
+    let schedule: [&[Rat]; 2] = [&first, &second_wave];
+    for round in 0..4 {
+        let coordinates = all_coordinates(learner.constitution());
+        let decision = match learner.world_schedule_proposal(
+            &coordinates,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &schedule,
+            &last,
+        ) {
+            Err(refusal) => format!("proposal refused {refusal:?}"),
+            Ok(proposal) => match learner
+                .land_world_descent_on(
+                    proposal,
+                    &source,
+                    &field.receivers()[0],
+                    &preparation,
+                    &[false, true],
+                    AdmittedFuture::Schedule(&schedule),
+                )
+                .unwrap()
+            {
+                WorldLanding::Unreached(refusal) => format!("unreached {refusal:?}"),
+                WorldLanding::Read(reading) => format!(
+                    "{:?} at grain raise {:?} (encounters {:?})",
+                    reading.decision,
+                    reading.grain_raise,
+                    reading.waves.iter().map(|w| w.decision).collect::<Vec<_>>()
+                ),
+            },
+        };
+        println!("schedule loop ({name}): round {round}: landing {decision}");
+        for (k, control) in schedule.iter().enumerate() {
+            let probe = learner
+                .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+                .unwrap();
+            let waves = admitted(&probe, 0);
+            let reception = probe.encounter(&waves, control).unwrap();
+            let ActionCommunication::Received(received) = reception.reception else {
+                panic!("the encounter completes");
+            };
+            let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+            let (code, excess) = (ratio.code_length().unwrap(), ratio.excess().unwrap());
+            last = received;
+            let (t_code, t_excess, _, _) = second_comparison(&mut twin, &field, &source, control);
+            println!(
+                "schedule loop ({name}): round {round}: encounter {k}: learner code {code:?} excess {excess}; twin code {t_code:?} excess {t_excess}"
+            );
+        }
+    }
+}
+
+/// **The schedule loop against its twin** (§7f), first fixture.
+#[test]
+fn the_schedule_loop_is_read_against_its_twin() {
+    schedule_loop("first", false);
+}
+
+/// The same on the second fixture (§7f).
+#[test]
+fn the_schedule_loop_is_read_on_a_second_fixture() {
+    schedule_loop("second", true);
 }
 
