@@ -1244,3 +1244,126 @@ fn the_world_loop_is_read_on_a_second_fixture() {
         );
     }
 }
+
+/// The fixture's actual World on a declared law, at a given state and native origin (the World's
+/// owner rebinding it after a cold restore of the native side).
+fn world_at(field: &Field, chart: Encoded, holon: Holon, state: HolonState, origin: usize) -> BoundJointWorld {
+    let law = JointLaw::new(
+        ReferenceHolon::new(holon, field.step().clone(), Scheme::Midpoint).unwrap(),
+        N,
+    )
+    .unwrap();
+    let readers = (0..2 * N)
+        .map(|i| {
+            (0..2 * N)
+                .map(|j| if i == j { integer(1) } else { Rat::zero() })
+                .collect()
+        })
+        .collect();
+    let receipt = ReceiptLaw::new(
+        2 * N,
+        readers,
+        vec![RegionChart::new(integer(1), field.step().clone(), 0).unwrap(); 2 * N],
+    )
+    .unwrap();
+    BoundJointWorld::new(
+        law,
+        state,
+        ReceiverFace::receiver_state(N, N).unwrap(),
+        receipt,
+        admittance(),
+        chart,
+        origin,
+    )
+    .unwrap()
+}
+
+/// **The landed material survives a cold restore** (acceptance (c)): after a teaching encounter and
+/// its admitted landing, the receiver's constitution and carry are saved as exact text and mounted
+/// on the declared founding (the material before any learning). The restored material and carry
+/// equal the live ones. The World, exterior to the machine, is rebound at its live state; the World
+/// model is carried by value (its own save is owed). The next encounter then reads the same
+/// comparison on the restored receiver as on the live one.
+#[test]
+fn the_landed_material_survives_a_cold_restore() {
+    use holonics::hnn::Reference;
+    use holonics::hnn::constitution::ContinuingState;
+    let (field, base, source) = fixture();
+    // A continued state mounts only material on its loci's lattices, so this fixture declares
+    // dyadic contact factors (the first fixture's `2/3` is off every dyadic lattice).
+    let width = Operands::exact_at_cut(&field, &base, &Current::at_rest(&field))
+        .unwrap()
+        .contacts()[0]
+        .width();
+    let theta = base
+        .with_channel(
+            0,
+            factor(width, |i| rat(3 + i as i64, 4), rat(1, 8)),
+            factor(width, |i| rat(1, 1i64 << (i + 1)), rat(1, 16)),
+            factor(width, |_| rat(1, 4), Rat::zero()),
+        )
+        .unwrap();
+    let control = vec![integer(1)];
+    let mut live = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    let mut admitted_round = None;
+    for round in 0..6 {
+        let (_, _, decision) = loop_round(&mut live, &field, &source, &control);
+        println!("cold restore fixture: round {round}: landing {decision}");
+        if decision.starts_with("Ok(") {
+            admitted_round = Some(round);
+            break;
+        }
+    }
+    assert!(admitted_round.is_some(), "a landing is admitted within six rounds");
+    assert_ne!(live.constitution(), &theta);
+
+    let resident = live.resident();
+    let text = resident
+        .constitution()
+        .continuing_state(field.sources()[0])
+        .unwrap()
+        .with_carry(resident.carried().cloned())
+        .to_text();
+    let state = ContinuingState::from_text(&text).unwrap();
+    let restored = Reference::campaign_one()
+        .mount_continued(&field, &Current::at_rest(&field), theta.clone(), &state)
+        .unwrap();
+    assert_eq!(restored.constitution(), resident.constitution(), "the material returns");
+    assert_eq!(restored.carried(), resident.carried(), "the carry returns");
+    let mut cold = PhysicalReceiver::from_resident(&field, restored).unwrap();
+    let world_state = live.participating_world().unwrap().state().clone();
+    let origin = live.resident().carried().unwrap().ticks;
+    cold.bind_world(world_at(
+        &field,
+        source.part(0..0).unwrap(),
+        medium(&unit_storage(), source_input(true)),
+        world_state,
+        origin,
+    ))
+    .unwrap();
+    cold.bind_world_model(live.world_model().unwrap().clone())
+        .unwrap();
+
+    let read = |receiver: &mut PhysicalReceiver<'_>| {
+        let preparation = actuator(&field);
+        let probe = receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, &control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+        (ratio.code_length().unwrap(), ratio.excess().unwrap())
+    };
+    let cold_next = read(&mut cold);
+    let live_next = read(&mut live);
+    println!(
+        "cold restore: {} text bytes; next comparison code {:?} excess {}",
+        text.len(),
+        live_next.0,
+        live_next.1
+    );
+    assert_eq!(cold_next, live_next, "the restored receiver reads the live comparison");
+}

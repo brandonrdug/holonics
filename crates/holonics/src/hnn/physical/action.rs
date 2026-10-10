@@ -279,6 +279,8 @@ pub enum WorldLanding {
 /// candidate, the stored energy's exact change at the held-momentum crossing (`None` when refused).
 #[derive(Debug)]
 pub struct WorldLandingReading {
+    /// The BASE declaration: each family's exponent at the material's first reach. The declared
+    /// candidate is this raised by `grain_raise` (`DeclaredExponents::raised`), or this itself.
     pub declared: DeclaredExponents,
     /// The dyadic raise above the material's first reach at which the prospect's reading at the
     /// receiver's grain first moved (`Some(0)` when it moved at the first reach); `None` when it never

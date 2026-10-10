@@ -472,9 +472,10 @@ against its twin, with (6), the witness and the grain reach
 | 4 | **strictly below, gap in `[2⁻⁹, 2⁻⁸)`** | below, in `[2⁻¹⁴, 2⁻¹³)` | phase (never moved) |
 | 5 | overlapping enclosures | below, in `[2⁻¹⁰, 2⁻⁹)` | refused, phase worse |
 
-**On this fixture the loop learns from the World over six encounters and is never worse than its
-twin in the admission's order.** Four of six landings were admitted, three for the phase and one
-classical. The classical one produced a strict code gain at the next encounter. Every refusal is
+**On this fixture the loop learns from the World over six encounters, and wherever the comparison is
+resolved it is never worse than its twin in the admission's order.** In round 5 the two code
+enclosures overlap without being equal, so the classical comparison there is unresolved; only its
+phase excess is lower. Four of six landings were admitted, three for the phase and one classical. The classical one produced a strict code gain at the next encounter. Every refusal is
 typed, and no uncertified step entered. This is one fixture, one declared bank of contact factors and
 one World. The queue's claim-bearing run, the cold restore, the two-observation delayed credit and any
 second fixture remain.
@@ -498,9 +499,30 @@ before any reading; the laws and the reading are the same as the first fixture's
 | 5 | **strictly below, gap in `[2⁻¹⁰, 2⁻⁹)`** | below, in `[2⁻¹¹, 2⁻¹⁰)` | refused: equal endpoints (moved at raise 4) |
 
 The grain reach declared a worse move in round 0 and the admission refused it, so the scan does not
-select improvements. As on the first fixture, the learner is never worse than its twin in the
-admission's order, and its one classical landing gives a strict code gain at the next encounter. Two
+select improvements. Here every round is resolved: the learner's code equals the twin's or lies strictly below it, and
+it is never worse in the admission's order. As on the first fixture, its one classical landing gives
+a strict code gain at the next encounter. Two
 fixtures with one World law and one contact each remain a small sample.
+
+## 5e. The landed material survives a cold restore
+
+[measured; developer read under the common lease, not claim-bearing]
+`the_landed_material_survives_a_cold_restore` covers acceptance (c)'s cold restore. A continued
+state mounts only material on its loci's lattices, so this fixture declares dyadic contact factors.
+The first fixture's `2/3` is off every dyadic lattice, and its cold mount refused with
+"the state's material off its loci's lattices", a property of that declaration, not of the landing.
+On the dyadic fixture:
+1. The first teaching round's landing was admitted (phase).
+2. The receiver's constitution and carry were saved as exact text (20807 bytes, `20807`) and mounted
+   on the declared founding, the material before any learning.
+3. The restored material and carry equal the live ones exactly.
+4. The World, exterior to the machine, was rebound by its owner at its live state; the World model
+   was carried by value (its own save is owed).
+5. The restored receiver's next encounter read the live one's comparison exactly: equal code
+   enclosure and excess.
+
+Run 00:26:53–00:26:57, exit 0
+([receipt](receipts/2026-10-09-material-tangent/COLD_RESTORE_DEV_TESTS.v1.json)).
 
 ## 6. The tangent continues into the next encounter
 
