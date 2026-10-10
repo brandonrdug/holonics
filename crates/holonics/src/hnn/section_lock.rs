@@ -58,6 +58,34 @@
 //! the lcm is at most half the window (Fine–Wilf: a window of length `τ_b + p` with periods `τ_b`
 //! and `p` has period `gcd`); the joint reading checks it ([`JointRefusal::Disagrees`]).
 //!
+//! [definition] **The winding is read by the owners, at the consumer.** The cycle's `W` is
+//! `geometry::winding::closed_loop_winding(4, (Δℓ_k)_(k<τ))` (Lean
+//! `Geometry/PhaseCarry.closed_loop_has_integer_winding`: increments closing mod `n` sum to `n·w`): the
+//! owner refuses a cycle whose lifted sum does not close, carrying the exact remainder
+//! ([`LockRefusal::Winding`]), where the old reading divided and asserted. For an admitted word the
+//! refusal is unreachable (the class recursion closes the cycle), and the owner's integer `W` is the
+//! `i64` of [`Lock::winding`] without loss: `|Σ Δℓ| ≤ 2τ` and `τ ≤ L/2`, so `|W| ≤ L/4`, below
+//! `i64::MAX` on any platform whose `usize` is at most 64 bits ([`LockRefusal::WindingBeyondCarrier`]
+//! returns the exact winding rather than narrow it, were that ever false). The tick's own carry
+//! (`crossing`, the landing class of the recursion) is `dynamic_section::land`'s, the owner's signed
+//! carry law, called once at admission and once by the reader.
+//!
+//! [proved-derived] **Section words concatenate with the carry cocycle** ([`SectionWord::concat`]). The
+//! winding of an open word `u` from class `c_u` with net lift `N_u` is the whole turns its lift gains,
+//! `W(u) = windings(c_u/4 + N_u/4) = ⌊(c_u + N_u)/4⌋` ([`SectionWord::winding`], the signed carry law
+//! applied once to the word's start class and its net lift), and the word lands on the class
+//! `e(u) = (c_u + N_u) mod 4`. For words with `e(u) = c_v`,
+//!
+//! ```text
+//! W(uv) = ⌊(c_u + N_u + N_v)/4⌋ = ⌊(c_u + N_u)/4⌋ + ⌊(e(u) + N_v)/4⌋ = W(u) + W(v)
+//! ```
+//!
+//! (Lean `Aeon/Clock/Winding.windings_add`, `carry_cocycle`; along aeons `aeon_windings_concat`): the
+//! carry at the junction vanishes because the junction phase is the class both words agree on. With
+//! `e(u) ≠ c_v` the join is not a section word: it breaks the class recursion at `u`'s last tick and
+//! is refused `NotASectionWord { relation: Recursion }`, not given a winding. The Lean statement of
+//! this instance (the junction carry of two section words) is owed (#62).
+//!
 //! [definition] **What it is not.** It enumerates candidate periods `τ ≤ L/2` against the settled
 //! symbol word: a least-period test on an exact word, the first-return test the record names, not a
 //! period finder on samples and not learning (guard 17, failure 1): the symbols are the ring's own
@@ -74,15 +102,21 @@
 //!
 //! | Law | Lean | Rust |
 //! |---|---|---|
-//! | a closed class cycle has a whole winding, the signed count of its arrivals; the carry is kept | `Geometry/PhaseCarry.closed_loop_has_integer_winding` | [`SectionWord::new`], [`Lock::winding`] |
+//! | a closed class cycle has a whole winding, the signed count of its arrivals; the carry is kept | `Geometry/PhaseCarry.closed_loop_has_integer_winding` | owner `geometry::winding::closed_loop_winding`, called at [`Settled::lock`] (read by [`Lock::winding`]); the chart relations at [`SectionWord::new`] |
+//! | the tick's crossing and landing class are the signed carry law of the lift | `Aeon/Clock/Winding.windings_add`, `carry_le_one`; `Geometry/PhaseCarry.winding_add` | owner `aeon::Reading::add` (over `geometry::winding::carry`) through [`crate::hnn::dynamic_section::land`], called at [`SectionWord::new`] and by the reader |
+//! | words concatenate with the carry cocycle: `W(uv) = W(u) + W(v)` exactly when `u`'s landing class is `v`'s start class | `Aeon/Clock/Winding.windings_add`, `carry_cocycle`, `aeon_windings_concat`; the section-word instance owed (#62) | [`SectionWord::concat`], [`SectionWord::winding`] |
 //! | the mean rate is a face, not the section word; a constant-rate word is balanced | `Aeon/Clock/CarryWord.carry_balanced`; `Aeon/Clock/Lock.lock_at_address` | [`Lock::mean_rate_face`], [`Lock::arrival_word`] |
 //! | the joint period is the lcm of the rings' | owed (#62) | [`JointLock`] |
 
 use num_bigint::BigInt;
+use num_traits::Zero;
 use thiserror::Error;
 
-use crate::aeon::TwoClocks;
-use crate::hnn::dynamic_section::{RAYS, SectionReader, SectionRefusal, SectionSymbol, quadrant};
+use crate::aeon::{Reading, TwoClocks};
+use crate::geometry::winding::{WindingError, closed_loop_winding};
+use crate::hnn::dynamic_section::{
+    RAYS, SectionReader, SectionRefusal, SectionSymbol, land, quadrant,
+};
 use crate::ratio::Rat;
 
 /// [definition] **Why a window has no lock.** Typed; a period is never invented.
@@ -105,6 +139,15 @@ pub enum LockRefusal {
     /// The dynamic section refused a tick of the window (the origin, a chord through it).
     #[error(transparent)]
     Section(#[from] SectionRefusal),
+    /// The winding owner refused the cycle: its lifted advances do not close on the circle of four
+    /// rays, and the exact remainder is kept. Unreachable for an admitted word of period at most
+    /// half the window (the class recursion closes the cycle); returned rather than assumed.
+    #[error(transparent)]
+    Winding(#[from] WindingError),
+    /// Unreachable: the owner's integer winding does not fit the lock's `i64` (module header bound
+    /// `|W| ≤ L/4`). Returned with the exact winding rather than narrowed.
+    #[error("the cycle's winding {winding} does not fit the lock's carrier")]
+    WindingBeyondCarrier { winding: BigInt },
     /// The ring was at rest at the settle tick and left rest inside the window.
     #[error(
         "the ring was at rest at tick {settle} and left rest inside the window: it had not settled"
@@ -133,7 +176,8 @@ pub enum SectionRelation {
 
 /// [definition] **A section word**: one ring's symbols, one per tick, admitted only when every chart
 /// relation holds (module header). Its symbols are private: a word is built by
-/// [`SectionWord::new`] or by the [`LockReader`] from the ring's own states.
+/// [`SectionWord::new`], by [`SectionWord::concat`] of two words whose classes meet, or by the
+/// [`LockReader`] from the ring's own states (admitted by [`SectionWord::new`] as well).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SectionWord {
     symbols: Vec<SectionSymbol>,
@@ -141,8 +185,10 @@ pub struct SectionWord {
 
 impl SectionWord {
     /// **Admit a word** of symbols, refused at the first tick that breaks a chart relation.
+    ///
+    /// The crossing and the landing class a tick owes are `dynamic_section::land`'s, the owner's signed
+    /// carry law (module header); the class recursion compares the next tick's class with the landing.
     pub fn new(symbols: Vec<SectionSymbol>) -> Result<Self, LockRefusal> {
-        let rays = i8::try_from(RAYS).unwrap_or(i8::MAX);
         for (tick, symbol) in symbols.iter().enumerate() {
             let broken = |relation| LockRefusal::NotASectionWord { tick, relation };
             if symbol.class >= RAYS {
@@ -151,12 +197,12 @@ impl SectionWord {
             if !(-2..=2).contains(&symbol.advance) {
                 return Err(broken(SectionRelation::Advance));
             }
-            let landed = i8::try_from(symbol.class).unwrap_or(i8::MAX) + symbol.advance;
-            if symbol.crossing != landed.div_euclid(rays) {
+            let (crossing, landed) = land(symbol.class, symbol.advance)?;
+            if symbol.crossing != crossing {
                 return Err(broken(SectionRelation::Crossing));
             }
             if let Some(next) = symbols.get(tick + 1)
-                && i8::try_from(next.class).unwrap_or(i8::MAX) != landed.rem_euclid(rays)
+                && next.class != landed
             {
                 return Err(broken(SectionRelation::Recursion));
             }
@@ -167,6 +213,51 @@ impl SectionWord {
     /// The symbols, one per tick.
     pub fn symbols(&self) -> &[SectionSymbol] {
         &self.symbols
+    }
+
+    /// The class the word starts from: its first symbol's class (`None` for the empty word).
+    pub fn start_class(&self) -> Option<u8> {
+        self.symbols.first().map(|symbol| symbol.class)
+    }
+
+    /// **The word's winding** `W(u)`: the whole turns its lift gains, `⌊(c + N)/4⌋` for the start class
+    /// `c` and the net lift `N = Σ Δℓ_k` (module header). It is the owner's signed carry law applied once
+    /// to the word as a whole: the aeon's reading of `c/4`, carried by `Reading::add` with the reading of
+    /// `N/4`, less the reading of `c/4` (whose winding is zero). It does not sum the symbols'
+    /// `crossing` fields; that the two agree is the telescoped per-tick law, asserted at the consumers.
+    /// The empty word has winding `0`.
+    pub fn winding(&self) -> BigInt {
+        let Some(start) = self.start_class() else {
+            return BigInt::zero();
+        };
+        let net: BigInt = self
+            .symbols
+            .iter()
+            .map(|symbol| BigInt::from(symbol.advance))
+            .sum();
+        let turns = |rays: BigInt| Reading::of_turns(&Rat::new(rays, BigInt::from(RAYS)));
+        let behind = turns(BigInt::from(start));
+        behind.add(&turns(net)).windings() - behind.windings()
+    }
+
+    /// **Concatenation** `uv`, the carry cocycle at its consumer (module header): the word of `self`'s
+    /// symbols followed by `other`'s, with `W(uv) = W(u) + W(v)`. It is admitted exactly when `self`'s
+    /// last tick lands on the class `other` starts from; otherwise it is refused
+    /// `NotASectionWord { tick, relation: Recursion }` at `self`'s last tick, the tick whose landing the
+    /// next does not start from. An empty word is the identity.
+    pub fn concat(&self, other: &Self) -> Result<Self, LockRefusal> {
+        if let (Some(last), Some(first)) = (self.symbols.last(), other.symbols.first()) {
+            let (_, landed) = land(last.class, last.advance)?;
+            if first.class != landed {
+                return Err(LockRefusal::NotASectionWord {
+                    tick: self.symbols.len() - 1,
+                    relation: SectionRelation::Recursion,
+                });
+            }
+        }
+        let mut symbols = self.symbols.clone();
+        symbols.extend_from_slice(&other.symbols);
+        Ok(Self { symbols })
     }
 }
 
@@ -246,7 +337,8 @@ impl Lock {
         &self.cycle
     }
 
-    /// `W`, the whole signed turns of the lift over one cycle.
+    /// `W`, the whole signed turns of the lift over one cycle: `geometry::winding::closed_loop_winding`
+    /// of the cycle's advances on the circle of four rays (module header).
     pub fn winding(&self) -> i64 {
         self.winding
     }
@@ -285,7 +377,8 @@ impl Lock {
 impl Settled {
     /// **Read the lock** of a window (module header). Silent when nothing crossed a ray, Unlocked
     /// when no period of at most half the window repeats the word. The word was admitted with its
-    /// chart relations, so the cycle's net lift is whole turns.
+    /// chart relations, so the cycle's net lift is whole turns, and the owner of closed loops reads
+    /// them (`cycle_winding`).
     pub fn lock(&self, window: &LockWindow) -> Result<Lock, LockRefusal> {
         let symbols = match self {
             Self::Rest => return Err(LockRefusal::Silent),
@@ -305,22 +398,7 @@ impl Settled {
             length: window.length,
         })?;
         let cycle = symbols[..period].to_vec();
-        let net: i64 = cycle.iter().map(|symbol| i64::from(symbol.advance)).sum();
-        // whole by the admitted class recursion, and the signed count of the arrivals (module header)
-        let winding = net / i64::from(RAYS);
-        debug_assert_eq!(
-            winding * i64::from(RAYS),
-            net,
-            "an admitted cycle turns whole"
-        );
-        debug_assert_eq!(
-            winding,
-            cycle
-                .iter()
-                .map(|symbol| i64::from(symbol.crossing))
-                .sum::<i64>(),
-            "the winding is the signed count of the arrivals"
-        );
+        let winding = cycle_winding(&cycle)?;
         let address = Rat::new(
             BigInt::from(winding),
             BigInt::from(u64::try_from(period).unwrap_or(u64::MAX)),
@@ -337,6 +415,23 @@ impl Settled {
             address,
             rate_face,
         })
+    }
+}
+
+/// **The cycle's winding, by the owner of closed loops** (module header): the lifted advances of one
+/// cycle are the increments of a loop on the circle of four rays, and
+/// `geometry::winding::closed_loop_winding` returns their integer winding or refuses the loop with the
+/// exact remainder (`LockRefusal::Winding`). The `i64` is the owner's integer, not narrowed past its
+/// carrier (`LockRefusal::WindingBeyondCarrier`).
+fn cycle_winding(cycle: &[SectionSymbol]) -> Result<i64, LockRefusal> {
+    let increments: Vec<BigInt> = cycle
+        .iter()
+        .map(|symbol| BigInt::from(symbol.advance))
+        .collect();
+    let winding = closed_loop_winding(&BigInt::from(RAYS), &increments)?;
+    match i64::try_from(&winding) {
+        Ok(whole) => Ok(whole),
+        Err(_) => Err(LockRefusal::WindingBeyondCarrier { winding }),
     }
 }
 
@@ -424,10 +519,9 @@ impl LockReader {
             });
         }
         Ok(match self.stage {
-            // the reader's own symbols keep every chart relation (`SectionReader::advance`)
-            Stage::Reading(_) => Settled::Word(SectionWord {
-                symbols: self.symbols,
-            }),
+            // the reader's own symbols keep every chart relation (`SectionReader::advance`, both
+            // through `land`); the word is admitted rather than trusted
+            Stage::Reading(_) => Settled::Word(SectionWord::new(self.symbols)?),
             Stage::Rest | Stage::Waiting => Settled::Rest,
         })
     }
@@ -746,6 +840,83 @@ mod tests {
             .map(|point| reader.advance(point.clone()).unwrap())
             .collect();
         assert!(SectionWord::new(stream).is_ok());
+    }
+
+    /// A section word of `(class, advance)` symbols, the crossings the owner's carry gives.
+    fn admitted(cycle: &[(u8, i8)]) -> SectionWord {
+        SectionWord::new(
+            cycle
+                .iter()
+                .map(|&(class, advance)| symbol(class, advance))
+                .collect(),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn a_cycles_winding_is_the_owners_and_an_open_cycle_is_refused_with_its_remainder() {
+        let cycle = |advances: &[i8]| -> Vec<SectionSymbol> {
+            consistent(advances)
+                .iter()
+                .map(|&(class, advance)| symbol(class, advance))
+                .collect()
+        };
+        let open = |remainder: i64| {
+            Err(LockRefusal::Winding(WindingError::LoopDoesNotClose {
+                modulus: BigInt::from(4),
+                remainder: BigInt::from(remainder),
+            }))
+        };
+        // one turn forward, one back, two, and the arrive-and-depart cycle of winding zero
+        assert_eq!(cycle_winding(&cycle(&[1, 1, 1, 1])), Ok(1));
+        assert_eq!(cycle_winding(&cycle(&[-1, -1, -1, -1])), Ok(-1));
+        assert_eq!(cycle_winding(&cycle(&[2, 2, 2, 2])), Ok(2));
+        assert_eq!(cycle_winding(&cycle(&[1, -1])), Ok(0));
+        // an advance sum that does not close on four rays is the owner's refusal, with the exact
+        // remainder (truncated, the sign of the sum), never rounded to a turn
+        assert_eq!(cycle_winding(&cycle(&[1])), open(1));
+        assert_eq!(cycle_winding(&cycle(&[2, 1])), open(3));
+        assert_eq!(cycle_winding(&cycle(&[-1])), open(-1));
+    }
+
+    #[test]
+    fn words_concatenate_with_the_carry_cocycle_when_their_classes_meet() {
+        // u lands on class 3 with winding 0; v starts at 3 and arrives at the section once
+        let u = admitted(&[(1, 1), (2, 1)]);
+        let v = admitted(&[(3, 1), (0, 1)]);
+        assert_eq!(
+            (u.winding(), v.winding()),
+            (BigInt::from(0), BigInt::from(1))
+        );
+        let uv = u.concat(&v).unwrap();
+        assert_eq!(uv, admitted(&[(1, 1), (2, 1), (3, 1), (0, 1)]));
+        assert_eq!(uv.winding(), BigInt::from(1));
+        assert_eq!(uv.winding(), u.winding() + v.winding());
+        // a departure back across the section is a winding of -1, and meeting its return gives 0
+        let back = admitted(&[(0, -1)]);
+        let there = admitted(&[(3, 1)]);
+        assert_eq!(back.winding(), BigInt::from(-1));
+        assert_eq!(there.winding(), BigInt::from(1));
+        assert_eq!(back.concat(&there).unwrap().winding(), BigInt::from(0));
+        // a word starting on another class does not meet: refused at u's last tick, with no winding
+        assert_eq!(
+            u.concat(&admitted(&[(0, 1)])),
+            Err(LockRefusal::NotASectionWord {
+                tick: 1,
+                relation: SectionRelation::Recursion
+            })
+        );
+        // the empty word is the identity, with winding zero
+        let empty = SectionWord::new(Vec::new()).unwrap();
+        assert_eq!(empty.start_class(), None);
+        assert_eq!(empty.winding(), BigInt::from(0));
+        assert_eq!(u.concat(&empty).unwrap(), u);
+        assert_eq!(empty.concat(&u).unwrap(), u);
+        // the word's winding is the signed count of its arrivals
+        for word in [&u, &v, &uv, &back, &there] {
+            let count: i64 = word.symbols().iter().map(|s| i64::from(s.crossing)).sum();
+            assert_eq!(word.winding(), BigInt::from(count));
+        }
     }
 
     #[test]
