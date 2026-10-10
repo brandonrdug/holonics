@@ -113,7 +113,17 @@ developer reads, the first rung at the queue).
   below about 400 Hz, and nearly all at the rings' own free turns. The near-return grain (a
   description-length law, with the defects kept) is the located rung's prerequisite. The section
   owners now call the winding owners (`land`, `closed_loop_winding`, `SectionWord::concat`).
-- **Still owed:** the source decoder as the keys' least-power fibre point (§9), on located rings.
+- **Located rates locate the bank, not the recording (§13):** in the voice's rings the near-returns
+  have period 1 (advance 0, with the crossings as defects), and the other rings turn at their own
+  resonance. §11's low-ring bits only measured sparse crossings.
+- **The architecture (§15, §17): the source through one ring's inverse tick.** `ResonatorOperands::
+  inverse_step` reads the ring's tick backwards exactly (a charted solve and an unlawful carry are
+  refused). The emitted cell codec and its independent decoder (§19) decode the recording exactly
+  from ring 20's cells and in-cell indices: 1481048 bits against 1498880, the margin being the
+  uniform samples' slack, not learned content.
+- **Still owed:** narrowing the in-cell index from the ring's own dynamics (a finer section grain, or
+  two rings read jointly), and the join to `Encoding::found`'s squares through the recovered
+  `ExactPhaseCurrentSection` placement carry and the exact PCM butterfly.
 
 **October 10: learning across two observations lands at both waves** (#73; the
 [held-carry record](research/records/2026-10-09_THE_ASKED_ENCOUNTER_TEACHES_THE_MATERIAL_THROUGH_ITS_HELD_CARRY.md)
