@@ -456,6 +456,148 @@ fn gain_exponent(peak: &Rat) -> i64 {
     k
 }
 
+/// The interval of PCM integers a sample may take so that ring `operands`, at tick `n` from state
+/// `[u, w]`, lands in `class` (`None`: the origin), widened by one value at each end for the
+/// lattice's rounding (record §16, §18). Shared by the encoder and the independent decoder: it reads
+/// only the declared ring, the clock and the decoder's own state.
+fn cell_interval(
+    operands: &ResonatorOperands,
+    n: usize,
+    u: &[Rat],
+    w: &[Rat],
+    class: Option<u8>,
+) -> (BigInt, BigInt) {
+    use holonics::hnn::ring::ResonatorRemainders;
+    let zero = ResonatorRemainders::default();
+    let rate = |a: Rat| operands.step(n, &[a, Rat::zero()], [u, w], &zero, None).unwrap().rate;
+    let (r0, r1) = (rate(Rat::zero()), rate(Rat::one()));
+    let m0 = &r1[0] - &r0[0];
+    let hop = operands.hop();
+    let (w0, wm) = (integer(2) * &r0[0] - &w[0], integer(2) * &m0);
+    let (u0, um) = (&u[0] + hop * &r0[0], hop * &m0);
+    let pcm = Rat::from_integer(BigInt::one() << PCM as usize);
+    let (mut lo, mut hi) = (BigInt::from(-32768), BigInt::from(32767));
+    let mut bound = |a: &Rat, b: &Rat, side: i8| {
+        // side 1: a + b x ≥ 0; −1: ≤ 0; 0: = 0 (both).
+        if b.is_zero() {
+            return;
+        }
+        let root = -(a / b) * &pcm;
+        let (floor, ceil) = (root.floor().to_integer() - 1, root.ceil().to_integer() + 1);
+        if side == 0 {
+            lo = lo.clone().max(floor);
+            hi = hi.clone().min(ceil);
+        } else if b.is_positive() == (side > 0) {
+            lo = lo.clone().max(floor);
+        } else {
+            hi = hi.clone().min(ceil);
+        }
+    };
+    let (sw, su) = match class {
+        Some(0) => (1, 1),
+        Some(1) => (-1, 1),
+        Some(2) => (-1, -1),
+        Some(3) => (1, -1),
+        _ => (0, 0),
+    };
+    bound(&w0, &wm, sw);
+    bound(&u0, &um, su);
+    (lo, hi)
+}
+
+/// Bits needed for an index into `count` values (`0` when one value).
+fn index_width(count: &BigInt) -> u64 {
+    if *count <= BigInt::one() { 0 } else { (count - 1u32).bits() }
+}
+
+fn push_bits(out: &mut Vec<bool>, value: u64, width: u64) {
+    for k in (0..width).rev() {
+        out.push((value >> k) & 1 == 1);
+    }
+}
+
+fn read_bits(bits: &[bool], at: &mut usize, width: u64) -> u64 {
+    let mut value = 0u64;
+    for _ in 0..width {
+        value = (value << 1) | u64::from(bits[*at]);
+        *at += 1;
+    }
+    value
+}
+
+/// **The encoder** (record §18's consumer): a header (ring 5 bits, sample rate 32 bits, ticks 32
+/// bits) and per tick the next cell (3 bits: class 0–3, or 4 for the origin) and the sample's index
+/// in that cell's interval, packed into bytes with the last byte zero-padded.
+fn codec_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32) -> Vec<u8> {
+    use holonics::hnn::dynamic_section::quadrant;
+    let operands = declared_ring(t);
+    let lattice = Lattice::new(STATE_LATTICE);
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let pcm = Rat::from_integer(BigInt::one() << PCM as usize);
+    let mut bits = Vec::new();
+    push_bits(&mut bits, b as u64, 5);
+    push_bits(&mut bits, u64::from(rate), 32);
+    push_bits(&mut bits, stream.len() as u64, 32);
+    for (n, sample) in stream.iter().enumerate() {
+        let [u, w] = port.state().map(<[Rat]>::to_vec);
+        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![sample.clone()]).unwrap();
+        let tick = port.receive(&wave).unwrap().next().unwrap().unwrap();
+        let class = quadrant(&[tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]);
+        let (lo, hi) = cell_interval(&operands, n, &u, &w, class);
+        let v = (sample * &pcm).to_integer();
+        assert!(lo <= v && v <= hi, "ring {b}: the sample lies in its cell's interval at tick {n}");
+        push_bits(&mut bits, u64::from(class.unwrap_or(4)), 3);
+        push_bits(&mut bits, (&v - &lo).to_u64().unwrap(), index_width(&(&hi - &lo + 1)));
+    }
+    bits.chunks(8)
+        .map(|byte| byte.iter().enumerate().fold(0u8, |acc, (k, bit)| acc | (u8::from(*bit) << (7 - k))))
+        .collect()
+}
+
+/// **The independent decoder**: from the bytes alone and the declared ring of the header, starting at
+/// the declared rest state, it reads each tick's cell and index, recovers the sample from the
+/// interval its own state gives, forward-ticks to regenerate the state and carry, checks that the
+/// state lands in the cell it read, and checks the ring's inverse tick against the sample. Returns
+/// the rate and the samples as PCM integers.
+fn codec_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String> {
+    use holonics::hnn::dynamic_section::quadrant;
+    use holonics::hnn::ring::ResonatorRemainders;
+    let bits: Vec<bool> = bytes.iter().flat_map(|byte| (0..8).map(move |k| (byte >> (7 - k)) & 1 == 1)).collect();
+    let mut at = 0usize;
+    let b = read_bits(&bits, &mut at, 5) as usize;
+    let rate = read_bits(&bits, &mut at, 32) as u32;
+    let ticks = read_bits(&bits, &mut at, 32) as usize;
+    let operands = declared_ring(ladder.get(b).ok_or("a ring of the declared ladder")?);
+    let lattice = Lattice::new(STATE_LATTICE);
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let scale = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
+    let mut out = Vec::with_capacity(ticks);
+    let mut before = ResonatorRemainders::default();
+    for n in 0..ticks {
+        let [u, w] = port.state().map(<[Rat]>::to_vec);
+        let code = read_bits(&bits, &mut at, 3) as u8;
+        let class = (code < 4).then_some(code);
+        let (lo, hi) = cell_interval(&operands, n, &u, &w, class);
+        let index = read_bits(&bits, &mut at, index_width(&(&hi - &lo + 1)));
+        let v = &lo + BigInt::from(index);
+        let x = Rat::from_integer(v.clone()) * &scale;
+        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![x.clone()]).unwrap();
+        let tick = port.receive(&wave).unwrap().next().unwrap().map_err(|e| e.to_string())?;
+        if quadrant(&[tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]) != class {
+            return Err(format!("tick {n}: the regenerated state leaves the cell read"));
+        }
+        let drive = operands
+            .inverse_step(n, [&u, &w], [&tick.step.state[0], &tick.step.state[1]], &before, tick.step.remainders(), Some(&lattice))
+            .map_err(|e| e.to_string())?;
+        if drive != vec![x.clone(), Rat::zero()] {
+            return Err(format!("tick {n}: the inverse tick does not return the sample"));
+        }
+        before = tick.step.remainders().clone();
+        out.push(v.to_i16().ok_or("a 16-bit sample")?);
+    }
+    Ok((rate, out))
+}
+
 /// [definition; agent-inferred, October 10; the bank record §16] **The source coded through one
 /// ring's cells**: per recorded tick, given the ring's exact carried state, the drive's image is
 /// affine in the sample (`ω = ω₀ + x m`, read by two exact-law steps), so the next state's cell (its
@@ -538,6 +680,7 @@ fn main() {
     let threads: usize = args.get(4).map_or(12, |x| x.parse().unwrap());
     let census_only = args.get(5).is_some_and(|x| x == "census");
     let interval_only = args.get(5).is_some_and(|x| x == "interval");
+    let codec_ring: Option<usize> = args.get(5).and_then(|x| x.strip_prefix("codec=")).map(|x| x.parse().unwrap());
     let started = Instant::now();
     let (rate, pcm) = read_wav(input);
     let scale = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
@@ -554,6 +697,24 @@ fn main() {
     let ladder: Vec<Rat> = (0..RINGS)
         .map(|b| rat(1, 50) * (0..b).fold(Rat::one(), |x, _| x * rat(6, 5)))
         .collect();
+    if let Some(b) = codec_ring {
+        // Record §18's consumer: emit the bytes, decode them independently, compare exactly.
+        let bytes = codec_encode(b, &ladder[b], &stream, rate);
+        let encoded = started.elapsed().as_millis();
+        let (decoded_rate, samples) = codec_decode(&bytes, &ladder).expect("the bytes decode");
+        let exact = decoded_rate == rate && samples.len() == pcm.len().min(stream.len())
+            && samples.iter().zip(&pcm).all(|(a, b)| a == b);
+        println!(
+            "codec ring {b}: {} ticks; emitted {} bytes = {} bits (header, cells, indices, padding); raw {} bits; decode equals the source exactly: {exact}; encoded at {encoded} ms, decoded at {} ms",
+            stream.len(),
+            bytes.len(),
+            8 * bytes.len(),
+            16 * stream.len(),
+            started.elapsed().as_millis()
+        );
+        assert!(exact, "the independent decode equals the source");
+        return;
+    }
     if interval_only {
         // Record §16: rings 0, 4, …, 20, the recorded ticks only, one thread each.
         let chosen: Vec<usize> = (0..RINGS).step_by(4).collect();
