@@ -834,3 +834,38 @@ field: a sample never becomes `Encoded`, but a section word may be located. The 
 
 §21's finer grain does not by itself establish the learning join; it supplies the word that loop 1
 locates. Loop 2 needs loop 1's length as its comparison, and loop 3 needs loop 2's `g`.
+
+## 23. Loop 1's design, from the owners' actual interfaces (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] **The route.**
+1. A near-return window's cycle, its advances as classes `Δℓ + 2 ∈ {0, …, 4}`, repeated over the
+   window, is a periodic passage.
+2. `FrameFamily::pairs(bound).locate(5, [passage])` reads it on every declared two-ring frame, and
+   `FrameLocation::period` returns the located period.
+3. A carrying frame's location gives `PassageChart::located`, then `Encoding::found`, then
+   `Encoded::through`. The squares `DE = ρ, ET = UE` hold by construction, and `EB = J` holds with an
+   empty injection.
+
+**The defects are substitutions, not erasures.** `compression::keys::repair` repairs *erasures*
+consistent with the located relation (`DamagedPassage::encoded`; `residual_code` refuses a truth that
+leaves its family). A near-return's defect *breaks* the relation: the cycle predicts one advance, and
+the word holds another. So the defects do not enter the repair owner as erasures. They are the helical
+code's substitutions, "absorbed iff the reached difference lies in the kernel" (elementary objects,
+the helical code). The residual is the defect list itself, its positions and advances, and the decoder
+reopens by `transport.regenerate(key, L)` followed by the substitutions.
+
+**The cost, stated before measuring.** A located transport is described by its frame (an index in the
+family), its key (a lift on `ℤ/D`) and its per-class digits. That is at least `5 ⌈log₂ D⌉` bits, more
+than the cycle spelled out at `3τ` bits whenever `τ` is short. §13 measured that most of this speech's
+cycles have period 1. The located route will therefore **not** shorten the code on this recording, and
+that will be measured, not assumed. What it buys is the join: the word enters the field as `Encoded`
+through the located chart, which loop 2's deposition needs. A sample never enters the field, and a
+located section word may.
+
+**Acceptance.**
+- **W1.** For every admitted near-return window whose cycle a frame carries, `Encoded::through`
+  admits the located chart, with the squares checked by the owner and `check_step` on every stepped
+  lift.
+- **W2.** `regenerate(key, L)` with the defects substituted equals the window's word exactly.
+- **W3.** Per ring: the windows located, the windows no frame carries (each typed: narrow, empty,
+  plural, open), and the located description's bits against the spelled cycle's, as exact integers.
