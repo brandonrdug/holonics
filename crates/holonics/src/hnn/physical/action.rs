@@ -556,9 +556,11 @@ impl<'f> PhysicalReceiver<'f> {
     /// [definition; agent-inferred, October 9; the held-carry record §5] **Bind a World-sensitive
     /// proposal to the encounter that located it.** `received` is this receiver's latest teaching
     /// encounter, and `tangents` are the tangents it carried, one per raw coordinate. Every tangent
-    /// must be based at one producing commit. The receiver must still stand where that encounter left
-    /// it: the World model at the encounter's World tick and the carried current the encounter
-    /// published, so the only change since production is the encounter's own receiving publication.
+    /// must have ridden that encounter: based at its producing commit, opened at its Word's opening
+    /// tick and followed to its last tick. The receiver must still stand where that encounter left it:
+    /// the material at the encounter's own receiving publication (or the producing commit when it
+    /// published nothing), the World model at the encounter's World tick, and the carried current the
+    /// encounter published.
     /// The descent is assembled on the present material ([`world_descent`]); a coordinate whose
     /// contact factor has changed no longer matches its tangent's direction and refuses. The ratio,
     /// the normalizing contact steps, the reach and the opening clock are all read from `received`
@@ -578,9 +580,27 @@ impl<'f> PhysicalReceiver<'f> {
                 reason: "a World proposal carries at least one tangent",
             },
         )?;
-        if tangents.iter().any(|t| t.commit() != producing_commit) {
+        // The tangents rode this very encounter: its producing material and its Word's clock.
+        if producing_commit != received.applied.producing_commit()
+            || tangents.iter().any(|t| {
+                t.commit() != producing_commit
+                    || t.opened_at() != received.encounter.before_native_tick
+                    || t.opened_at() + t.ticks() != received.encounter.after_native_tick
+            })
+        {
             return Err(HnnError::Unadmitted {
-                reason: "a World proposal's tangents share one producing commit",
+                reason: "a World proposal's tangents rode its encounter: its producing commit and Word clock",
+            });
+        }
+        // The present material is the encounter's own: its receiving publication's commit, or the
+        // producing commit when the comparison published nothing.
+        let published = comparison
+            .publication
+            .as_ref()
+            .map_or(producing_commit, |reading| reading.commit);
+        if self.constitution().commit() != published {
+            return Err(HnnError::Unadmitted {
+                reason: "a World proposal stages on its encounter's own receiving publication and nothing later",
             });
         }
         let model = self.world_model().ok_or(HnnError::Unadmitted {

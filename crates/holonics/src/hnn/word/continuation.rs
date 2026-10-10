@@ -1937,6 +1937,16 @@ impl MaterialTangent {
         self.commit
     }
 
+    /// The opening tick of the Word this tangent rides.
+    pub fn opened_at(&self) -> usize {
+        self.opened_at
+    }
+
+    /// The full ticks the tangent has followed.
+    pub fn ticks(&self) -> usize {
+        self.ticks
+    }
+
     /// **The tangent at the next opening** (eq. 3): `χ_open = Π_int B_ref χ_carry`, for a Word
     /// opened on `carry` with the same material, whose contacts take `conductances`. The carry must
     /// be the one this tangent followed (its tick).

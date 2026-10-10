@@ -780,8 +780,7 @@ fn the_world_landing_reads_the_next_encounter() {
         .unwrap();
     let reading = match landing {
         WorldLanding::Unreached(refusal) => {
-            println!("world landing: no family reached its lattice: {refusal:?}");
-            return;
+            panic!("the measured landing reaches its lattice; it read: {refusal:?}")
         }
         WorldLanding::Read(reading) => reading,
     };
@@ -957,4 +956,46 @@ fn the_landed_material_is_read_without_its_history() {
             ratio.excess().unwrap()
         );
     }
+}
+
+/// **A proposal binds its tangents to its own encounter.** The tangents of a first teaching encounter
+/// with the reception of a second one are refused, before any step is staged.
+#[test]
+fn a_world_proposal_refuses_another_encounters_tangents() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let control = vec![integer(1)];
+    let coordinates = all_coordinates(&theta);
+    let directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(&field, &theta, c).unwrap())
+        .collect();
+    let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    let preparation = actuator(&field);
+    let teach = |receiver: &mut PhysicalReceiver<'_>, directions: &[MaterialDirection]| {
+        let probe = receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        probe
+            .encounter_teaching(&waves, &control, directions)
+            .unwrap()
+    };
+    let (_, first_tangents) = teach(&mut receiver, &directions);
+    let present = receiver.constitution().clone();
+    let second_directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(&field, &present, c).unwrap())
+        .collect();
+    let (reception, _) = teach(&mut receiver, &second_directions);
+    let ActionCommunication::Received(received) = reception.reception else {
+        panic!("the second teaching encounter completes");
+    };
+    let refused = receiver.world_proposal(&coordinates, &first_tangents, &received);
+    assert!(
+        matches!(refused, Err(HnnError::Unadmitted { .. })),
+        "refused: {:?}",
+        refused.as_ref().err()
+    );
 }
