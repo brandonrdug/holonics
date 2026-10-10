@@ -1,0 +1,48 @@
+{
+ "scope": "Local developer read by opus under the common lease (announced in the mailbox), not claim-bearing: the near-return census (record section 11, N3) at 68aece1a7's source, encoders only; N1 asserted on every window read.",
+ "projection": "about 210 s; deadline 300 s",
+ "wall_ns": 196162216019,
+ "deadline_s": 300,
+ "child_peak_rss_kib": 207700,
+ "exit": 0,
+ "stdout_sha256": "54477507de0900993088110f039c72314a9ec0b4767467818ae4c8f7d631269f",
+ "totals": {
+  "near_admitted": 33395,
+  "near_not": 18733,
+  "bits": 2762870,
+  "raw": 6309636,
+  "defects": 260254
+ },
+ "rings": [
+  "ring 0: lock census over windows of 632 ticks (4 turns of 158): locked 5, unlocked 167, silent or at rest 0, refused 1; near-returns admitted 172, not admitted 0, bits 43991 of 326112 raw over the admitted, defects 3284; addresses (winding over period: windows) {\"1 over 157\": 5}",
+  "ring 2: lock census over windows of 440 ticks (4 turns of 110): locked 4, unlocked 230, silent or at rest 13, refused 1; near-returns admitted 233, not admitted 1, bits 54972 of 307560 raw over the admitted, defects 4453; addresses (winding over period: windows) {\"1 over 109\": 3, \"2 over 218\": 1}",
+  "ring 1: lock census over windows of 524 ticks (4 turns of 131): locked 6, unlocked 197, silent or at rest 5, refused 1; near-returns admitted 203, not admitted 0, bits 50053 of 319116 raw over the admitted, defects 3548; addresses (winding over period: windows) {\"1 over 131\": 6}",
+  "ring 3: lock census over windows of 364 ticks (4 turns of 91): locked 5, unlocked 274, silent or at rest 21, refused 1; near-returns admitted 279, not admitted 0, bits 61765 of 304668 raw over the admitted, defects 5198; addresses (winding over period: windows) {\"1 over 91\": 5}",
+  "ring 4: lock census over windows of 304 ticks (4 turns of 76): locked 1, unlocked 328, silent or at rest 30, refused 1; near-returns admitted 328, not admitted 1, bits 71569 of 299136 raw over the admitted, defects 6380; addresses (winding over period: windows) {\"2 over 150\": 1}",
+  "ring 5: lock census over windows of 256 ticks (4 turns of 64): locked 1, unlocked 386, silent or at rest 39, refused 1; near-returns admitted 384, not admitted 3, bits 84064 of 294912 raw over the admitted, defects 8213; addresses (winding over period: windows) {\"2 over 124\": 1}",
+  "ring 6: lock census over windows of 212 ticks (4 turns of 53): locked 1, unlocked 513, silent or at rest 0, refused 0; near-returns admitted 503, not admitted 11, bits 95877 of 319908 raw over the admitted, defects 9218; addresses (winding over period: windows) {\"2 over 106\": 1}",
+  "ring 7: lock census over windows of 176 ticks (4 turns of 44): locked 77, unlocked 542, silent or at rest 0, refused 0; near-returns admitted 610, not admitted 9, bits 111679 of 322080 raw over the admitted, defects 10197; addresses (winding over period: windows) {\"1 over 40\": 70, \"1 over 44\": 7}",
+  "ring 8: lock census over windows of 148 ticks (4 turns of 37): locked 88, unlocked 648, silent or at rest 0, refused 0; near-returns admitted 714, not admitted 22, bits 122366 of 317016 raw over the admitted, defects 11211; addresses (winding over period: windows) {\"1 over 34\": 86, \"2 over 73\": 2}",
+  "ring 9: lock census over windows of 124 ticks (4 turns of 31): locked 7, unlocked 764, silent or at rest 106, refused 1; near-returns admitted 741, not admitted 30, bits 121765 of 275652 raw over the admitted, defects 12370; addresses (winding over period: windows) {\"2 over 61\": 7}",
+  "ring 10: lock census over windows of 104 ticks (4 turns of 26): locked 147, unlocked 897, silent or at rest 0, refused 0; near-returns admitted 994, not admitted 50, bits 139166 of 310128 raw over the admitted, defects 13541; addresses (winding over period: windows) {\"1 over 22\": 130, \"2 over 51\": 17}",
+  "ring 11: lock census over windows of 88 ticks (4 turns of 22): locked 160, unlocked 1072, silent or at rest 0, refused 0; near-returns admitted 1166, not admitted 66, bits 148885 of 307824 raw over the admitted, defects 14868; addresses (winding over period: windows) {\"1 over 20\": 160}",
+  "ring 12: lock census over windows of 72 ticks (4 turns of 18): locked 199, unlocked 1303, silent or at rest 0, refused 0; near-returns admitted 1404, not admitted 98, bits 164856 of 303264 raw over the admitted, defects 16512; addresses (winding over period: windows) {\"1 over 18\": 1, \"1 over 20\": 198}",
+  "ring 14: lock census over windows of 52 ticks (4 turns of 13): locked 301, unlocked 1768, silent or at rest 0, refused 0; near-returns admitted 1867, not admitted 202, bits 176694 of 291252 raw over the admitted, defects 18573; addresses (winding over period: windows) {\"0 over 13\": 1, \"0 over 25\": 1, \"1 over 12\": 280, \"2 over 25\": 19}",
+  "ring 13: lock census over windows of 60 ticks (4 turns of 15): locked 252, unlocked 1546, silent or at rest 0, refused 0; near-returns admitted 1673, not admitted 125, bits 174967 of 301140 raw over the admitted, defects 17826; addresses (winding over period: windows) {\"0 over 29\": 1, \"1 over 15\": 247, \"2 over 29\": 3, \"2 over 30\": 1}",
+  "ring 15: lock census over windows of 44 ticks (4 turns of 11): locked 352, unlocked 2085, silent or at rest 0, refused 0; near-returns admitted 2132, not admitted 305, bits 178746 of 281424 raw over the admitted, defects 18637; addresses (winding over period: windows) {\"1 over 10\": 336, \"1 over 11\": 1, \"2 over 21\": 14, \"2 over 22\": 1}",
+  "ring 16: lock census over windows of 36 ticks (4 turns of 9): locked 415, unlocked 2549, silent or at rest 0, refused 0; near-returns admitted 2364, not admitted 600, bits 165816 of 255312 raw over the admitted, defects 17275; addresses (winding over period: windows) {\"0 over 17\": 1, \"0 over 9\": 1, \"1 over 10\": 1, \"1 over 9\": 411, \"2 over 18\": 1}",
+  "ring 17: lock census over windows of 32 ticks (4 turns of 8): locked 486, unlocked 2836, silent or at rest 1, refused 0; near-returns admitted 2430, not admitted 893, bits 156983 of 233280 raw over the admitted, defects 15602; addresses (winding over period: windows) {\"0 over 15\": 4, \"0 over 16\": 2, \"0 over 8\": 1, \"1 over 8\": 465, \"2 over 14\": 1, \"2 over 15\": 13}",
+  "ring 18: lock census over windows of 28 ticks (4 turns of 7): locked 561, unlocked 3218, silent or at rest 3, refused 0; near-returns admitted 2518, not admitted 1264, bits 145067 of 211512 raw over the admitted, defects 14082; addresses (winding over period: windows) {\"0 over 13\": 12, \"0 over 6\": 3, \"1 over 6\": 1, \"1 over 7\": 532, \"2 over 13\": 13}",
+  "ring 19: lock census over windows of 24 ticks (4 turns of 6): locked 655, unlocked 3729, silent or at rest 3, refused 0; near-returns admitted 2455, not admitted 1932, bits 119608 of 176760 raw over the admitted, defects 11082; addresses (winding over period: windows) {\"0 over 11\": 13, \"0 over 6\": 5, \"1 over 6\": 623, \"2 over 11\": 13, \"2 over 12\": 1}",
+  "ring 20: lock census over windows of 20 ticks (4 turns of 5): locked 48, unlocked 5163, silent or at rest 11, refused 0; near-returns admitted 2550, not admitted 2672, bits 127525 of 153000 raw over the admitted, defects 12054; addresses (winding over period: windows) {\"0 over 10\": 4, \"0 over 5\": 15, \"0 over 6\": 1, \"0 over 7\": 1, \"0 over 9\": 6, \"1 over 10\": 2, \"1 over 4\": 10, \"1 over 5\": 2, \"1 over 6\": 1, \"2 over 10\": 2, \"2 over 9\": 4}",
+  "ring 22: lock census over windows of 16 ticks (4 turns of 4): locked 1087, unlocked 5347, silent or at rest 17, refused 0; near-returns admitted 2727, not admitted 3724, bits 82173 of 130896 raw over the admitted, defects 4607; addresses (winding over period: windows) {\"0 over 4\": 53, \"0 over 7\": 17, \"0 over 8\": 4, \"1 over 3\": 1, \"1 over 4\": 999, \"1 over 8\": 2, \"2 over 7\": 7, \"2 over 8\": 4}",
+  "ring 21: lock census over windows of 20 ticks (4 turns of 5): locked 862, unlocked 4351, silent or at rest 9, refused 0; near-returns admitted 2515, not admitted 2707, bits 92027 of 150900 raw over the admitted, defects 7021; addresses (winding over period: windows) {\"0 over 10\": 1, \"0 over 4\": 41, \"0 over 9\": 4, \"1 over 4\": 813, \"2 over 8\": 1, \"2 over 9\": 2}",
+  "ring 23: lock census over windows of 16 ticks (4 turns of 4): locked 1010, unlocked 5429, silent or at rest 12, refused 0; near-returns admitted 2433, not admitted 4018, bits 72256 of 116784 raw over the admitted, defects 4502; addresses (winding over period: windows) {\"0 over 3\": 3, \"0 over 4\": 1, \"0 over 6\": 1, \"0 over 7\": 44, \"0 over 8\": 1, \"1 over 3\": 915, \"1 over 7\": 1, \"2 over 7\": 44}"
+ ],
+ "gate_at_68aece1a7": [
+  "gate check: ok (11092 ms)",
+  "gate guard-lints: ok (17143 ms)",
+  "gate guard-doctests: ok (24100 ms)",
+  "BOUNDED start 05:16:00 end 05:16:52 exit 0 wall_ns 52348508097 child_peak_rss_kib 2150436"
+ ]
+}

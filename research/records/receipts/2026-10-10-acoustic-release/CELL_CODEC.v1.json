@@ -1,0 +1,22 @@
+{
+ "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: the emitted cell codec and its independent decoder (record section 19) on ring 20 over the recording's 93680 ticks, at ec1b950ad; gate 1 at the same source.",
+ "development_read": [
+  "codec ring 20: 2000 ticks; emitted 3504 bytes = 28032 bits (header, cells, indices, padding); raw 32000 bits; decode equals the source exactly: true; encoded at 4690 ms, decoded at 9433 ms",
+  "BOUNDED start 06:03:12 end 06:03:21 exit 0 wall_ns 9436104373 child_peak_rss_kib 13116"
+ ],
+ "projection": "93680 / 2000 x 9436104373 ns = 442 s; deadline 480 s",
+ "wall_ns": 441252911580,
+ "deadline_s": 480,
+ "child_peak_rss_kib": 13672,
+ "exit": 0,
+ "stdout_sha256": "0ba937131d1a8000520d9fb8abd08c56297d5b6a4d37a7ba6c51510f38fe5d4a",
+ "run": [
+  "codec ring 20: 93680 ticks; emitted 185131 bytes = 1481048 bits (header, cells, indices, padding); raw 1498880 bits; decode equals the source exactly: true; encoded at 216086 ms, decoded at 441250 ms"
+ ],
+ "gate": [
+  "gate check: ok (2814 ms)",
+  "gate guard-lints: ok (8726 ms)",
+  "gate guard-doctests: ok (22835 ms)",
+  "BOUNDED start 06:10:57 end 06:11:31 exit 0 wall_ns 34400019230 child_peak_rss_kib 2441496"
+ ]
+}

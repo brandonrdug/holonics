@@ -1680,6 +1680,138 @@ impl ResonatorOperands {
     }
 }
 
+impl ResonatorOperands {
+    /// [definition; agent-inferred, October 10; the
+    /// [bank record](../../../../research/records/2026-10-10_A_BANK_OF_RINGS_SOUNDS_ITS_EMISSION_ON_A_BOUNDED_LATTICE.md)
+    /// §15] **The tick read backwards**: the drive `β` the tick at `tick` received, from the state
+    /// `[u, w]` before and `[u′, w′]` after it and the remainders before and after it. Each carried
+    /// value plus its new remainder is its image plus its old remainder (`hnn::chart::carry`,
+    /// `x + r′ = y + r`), so
+    ///
+    /// ```text
+    /// ω  = (w′ + r′_w − r_w + w) / 2             the carried rate (w′'s image is 2ω − w)
+    /// ω̂  = ω + r′_ω − r_ω                        the solve's image
+    /// β  = (M ω̂ − 2C w + h K u) / h               the drive, M the phase's operator
+    /// ```
+    ///
+    /// exactly on the exact solve; under the exact law every remainder is zero. The displacement is
+    /// checked against the same rate, `u′ + r′_u = u + hω + r_u`, and a pair of states that is not
+    /// one tick is refused.
+    ///
+    /// The carry contract is checked before anything is read (Codex's source review): each
+    /// remainder set is either empty (all zero) or has the ring's width in all three parts. Under the
+    /// exact law (`None`) every remainder is zero. On `lattice` every remainder lies in the half-open
+    /// `[−δ/2, δ/2)` of ties-upward rounding, every state entry lies on the lattice, and the recovered
+    /// rate lies on it as the forward's carried rate does. Refused, typed, for a nonlinear ring and for a
+    /// **charted** solve: with a charted forward `z = X q` the drive error would be `(M X − I) q / h`,
+    /// so the exact inverse does not apply to it.
+    pub fn inverse_step(
+        &self,
+        tick: usize,
+        before: [&[Rat]; 2],
+        after: [&[Rat]; 2],
+        remainders_before: &ResonatorRemainders,
+        remainders_after: &ResonatorRemainders,
+        lattice: Option<&Lattice>,
+    ) -> Result<Vec<Rat>, HnnError> {
+        let n = self.width();
+        if [before[0], before[1], after[0], after[1]].iter().any(|v| v.len() != n) {
+            return Err(HnnError::Shape {
+                what: "a resonator's states read backwards (the ring's realified width)",
+                expected: n,
+                found: before[0].len(),
+            });
+        }
+        if self.material.saturation.is_some() || self.phases[self.phase_at(tick)].loaded_law.is_some() {
+            return Err(HnnError::Resonator {
+                ring: self.ring,
+                what: "the tick is read backwards only on the linear law",
+            });
+        }
+        if !self.charts().is_empty() {
+            return Err(HnnError::Resonator {
+                ring: self.ring,
+                what: "the tick is read backwards only on the exact solve: a charted solve is not inverted by its operator",
+            });
+        }
+        let admitted = |r: &ResonatorRemainders| -> Result<ResonatorRemainders, HnnError> {
+            let empty = r.rate.is_empty() && r.state.iter().all(Vec::is_empty);
+            if empty {
+                return Ok(ResonatorRemainders::zero(n));
+            }
+            if r.rate.len() != n || r.state.iter().any(|part| part.len() != n) {
+                return Err(HnnError::Shape {
+                    what: "a remainder set read backwards: empty, or the ring's width in rate and both state parts",
+                    expected: n,
+                    found: r.rate.len(),
+                });
+            }
+            // The error feedback rounds to the nearest lattice point with ties upward, so its remainder
+            // lies in the half-open `[−δ/2, δ/2)` (Codex's review: `+δ/2` is never left by the forward).
+            let lawful = match lattice {
+                None => r.all().all(Zero::is_zero),
+                Some(lattice) => {
+                    let half = lattice.unit() / integer(2);
+                    r.all().all(|x| -&half <= *x && *x < half)
+                }
+            };
+            if !lawful {
+                return Err(HnnError::Resonator {
+                    ring: self.ring,
+                    what: "a remainder read backwards breaks the carry contract (zero under the exact law, in [−δ/2, δ/2) on a lattice)",
+                });
+            }
+            Ok(r.clone())
+        };
+        let (old, new) = (admitted(remainders_before)?, admitted(remainders_after)?);
+        if let Some(lattice) = lattice
+            && ![before[0], before[1], after[0], after[1]]
+                .iter()
+                .all(|v| v.iter().all(|x| lattice.contains(x)))
+        {
+            return Err(HnnError::Resonator {
+                ring: self.ring,
+                what: "a state read backwards on a lattice lies on it",
+            });
+        }
+        let (u, w) = (before[0], before[1]);
+        let h = &self.step;
+        let half = Rat::new(BigInt::from(1), BigInt::from(2));
+        let rate: Vec<Rat> = (0..n)
+            .map(|i| (&after[1][i] + &new.state[1][i] - &old.state[1][i] + &w[i]) * &half)
+            .collect();
+        // The forward carried rate is a lattice point; a recovered rate off the lattice is no tick's
+        // (Codex's review: carries δ/8 and δ/4 recover ω = δ/8 and pass the displacement identity).
+        if let Some(lattice) = lattice
+            && !rate.iter().all(|x| lattice.contains(x))
+        {
+            return Err(HnnError::Resonator {
+                ring: self.ring,
+                what: "the rate recovered backwards lies on the lattice, as every carried rate does",
+            });
+        }
+        for i in 0..n {
+            if &after[0][i] + &new.state[0][i] != &u[i] + h * &rate[i] + &old.state[0][i] {
+                return Err(HnnError::Resonator {
+                    ring: self.ring,
+                    what: "the two states are not one tick of this ring",
+                });
+            }
+        }
+        let image: Vec<Rat> = (0..n)
+            .map(|i| &rate[i] + &new.rate[i] - &old.rate[i])
+            .collect();
+        let phase = self.phase_at(tick);
+        let (capacity, _, _) = self.material.forms();
+        let right = self.phases[phase].operator.apply(&image)?;
+        let held = sub(
+            &scale(&integer(2), &capacity.apply(w)?),
+            &scale(h, &self.phases[phase].stiffness.apply(u)?),
+        );
+        Ok(sub(&right, &held).iter().map(|x| x / h).collect())
+    }
+}
+
 /// `‖x‖₁`.
 fn l1(vector: &[Rat]) -> Rat {
     vector.iter().map(|x| x.abs()).sum()

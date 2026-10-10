@@ -1,0 +1,22 @@
+{
+ "scope": "Local developer read by opus under the common lease (announced), not claim-bearing: the cell codec at the octant grain (record section 20) on ring 20 over the recording's 93680 ticks, at 39304646; gate 1 at the same source.",
+ "development_reads": [
+  "quarter turn, 2000 ticks: 28032 bits, 9552546554 ns",
+  "octant, 2000 ticks: 24440 bits, 9924042211 ns"
+ ],
+ "projection": "93680 / 2000 x 9924042211 ns = 465 s; deadline 480 s",
+ "wall_ns": 464561780139,
+ "deadline_s": 480,
+ "child_peak_rss_kib": 13816,
+ "exit": 0,
+ "stdout_sha256": "640b10ef1783ccfd04a9814ad6247bcbae44a3163a4bef8f82c00879247c162c",
+ "run": [
+  "codec ring 20 (octant grain: true): 93680 ticks; emitted 170537 bytes = 1364296 bits (header, cells, indices, padding); raw 1498880 bits; decode equals the source exactly: true; encoded at 227698 ms, decoded at 464558 ms"
+ ],
+ "gate": [
+  "gate check: ok (2833 ms)",
+  "gate guard-lints: ok (8584 ms)",
+  "gate guard-doctests: ok (22484 ms)",
+  "BOUNDED start 06:21:46 end 06:22:20 exit 0 wall_ns 33930825621 child_peak_rss_kib 2537864"
+ ]
+}

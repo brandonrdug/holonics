@@ -1,0 +1,24 @@
+{
+ "scope": "Local developer read by opus under the common lease (announced), not claim-bearing: the cell-interval source code (record section 16) on rings 0, 4, 8, 12, 16, 20 over the recording's 93680 ticks; every sample asserted inside its cell's interval.",
+ "projection": "110 to 190 s (three steps per tick at 0.4 ms); deadline 300 s",
+ "wall_ns": 228710618817,
+ "deadline_s": 300,
+ "child_peak_rss_kib": 12840,
+ "exit": 0,
+ "projection_error": "measured 228710618817 ns exceeded the projection's upper end of 190 s; within the deadline",
+ "stdout_sha256": "1e5f38c6b1695739f4b3d7bb9f929222274011215e6a79fbebc775881331c26c",
+ "rings": [
+  "interval ring 0: ticks 93680; word bits 281040; index bits 1489416; total 1770456; raw 1498880; ticks with one admissible value 0",
+  "interval ring 4: ticks 93680; word bits 281040; index bits 1464248; total 1745288; raw 1498880; ticks with one admissible value 0",
+  "interval ring 8: ticks 93680; word bits 281040; index bits 1422112; total 1703152; raw 1498880; ticks with one admissible value 0",
+  "interval ring 12: ticks 93680; word bits 281040; index bits 1360269; total 1641309; raw 1498880; ticks with one admissible value 0",
+  "interval ring 16: ticks 93680; word bits 281040; index bits 1267860; total 1548900; raw 1498880; ticks with one admissible value 0",
+  "interval ring 20: ticks 93680; word bits 281040; index bits 1199937; total 1480977; raw 1498880; ticks with one admissible value 0"
+ ],
+ "gate": [
+  "gate check: ok (2907 ms)",
+  "gate guard-lints: ok (8924 ms)",
+  "gate guard-doctests: ok (24069 ms)",
+  "BOUNDED start 05:50:16 end 05:50:52 exit 0 wall_ns 35924857170 child_peak_rss_kib 2240708"
+ ]
+}

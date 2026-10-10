@@ -31,7 +31,8 @@ use holonics::hnn::HnnError;
 use holonics::hnn::dynamic_section::{RAYS, SectionReader, SectionRefusal, SectionSymbol, chord};
 use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands};
 use holonics::hnn::section_lock::{
-    Arrival, JointLock, JointRefusal, Lock, LockReader, LockRefusal, LockWindow, Settled,
+    Arrival, JointLock, JointRefusal, Lock, LockReader, LockRefusal, LockWindow, SectionRelation,
+    SectionWord, Settled,
 };
 use holonics::hnn::wave::{MatchedWave, ReceivedTick, WavePort};
 use holonics::holon::parametron::Carrier;
@@ -911,6 +912,113 @@ fn f4_has_a_joint_period_of_twelve() {
     assert_ne!(locks[1].period(), 4);
 }
 
+/// The concatenation law of section words, at its consumer, on the declared bank (F1, rings
+/// `t = 2/3, 1, 2`): for words `u`, `v` whose classes meet (`u` lands on the class `v` starts from),
+/// `W(uv) = W(u) + W(v)`, with `W` the owner's signed carry law applied once to the word (start class,
+/// net lift) and checked against the signed count of its arrivals; when the classes do not meet the
+/// join is refused at `u`'s last tick and has no winding. The ring words are cut at declared ticks and
+/// every cut of every ring is joined to every cut of every ring, so both outcomes occur.
+#[test]
+fn section_words_concatenate_with_the_carry_cocycle_on_the_declared_bank() {
+    let words: Vec<SectionWord> = bank_settled(&stream(1, SAMPLES))
+        .into_iter()
+        .map(|ring| match ring {
+            Settled::Word(word) => word,
+            Settled::Rest => panic!("the bank rings are not at rest on F1"),
+        })
+        .collect();
+    let length = SAMPLES - SETTLE;
+    let part = |word: &SectionWord, cut: std::ops::Range<usize>| {
+        SectionWord::new(word.symbols()[cut].to_vec()).unwrap()
+    };
+    let arrivals = |word: &SectionWord| {
+        BigInt::from(
+            word.symbols()
+                .iter()
+                .map(|symbol| i32::from(symbol.crossing))
+                .sum::<i32>(),
+        )
+    };
+    let cuts = [1usize, 2, 3, 5, 7, 8, 13, 60, 118, 119];
+
+    // a ring's whole word is the join of its parts at every cut, and the cocycle holds at each
+    for word in &words {
+        assert_eq!(word.symbols().len(), length);
+        assert_eq!(word.winding(), arrivals(word));
+        for &cut in &cuts {
+            let (u, v) = (part(word, 0..cut), part(word, cut..length));
+            assert_eq!(u.concat(&v).as_ref(), Ok(word));
+            assert_eq!(word.winding(), u.winding() + v.winding(), "cut {cut}");
+        }
+        // associativity: the junction carries vanish in either bracketing
+        let (u, v, w) = (part(word, 0..7), part(word, 7..60), part(word, 60..length));
+        let left = u.concat(&v).unwrap().concat(&w).unwrap();
+        let right = u.concat(&v.concat(&w).unwrap()).unwrap();
+        assert_eq!((&left, &right), (word, word));
+        assert_eq!(
+            word.winding(),
+            u.winding() + v.winding() + w.winding(),
+            "three parts"
+        );
+    }
+
+    // across rings: the words meet where u's landing class is v's start class, and only there
+    let (mut met, mut refused) = (0, 0);
+    for a in &words {
+        for b in &words {
+            for &cut_u in &cuts {
+                for &cut_v in &cuts {
+                    let (u, v) = (part(a, 0..cut_u), part(b, cut_v..length));
+                    let last = u.symbols().last().unwrap();
+                    let lands = (i16::from(last.class) + i16::from(last.advance)).rem_euclid(4);
+                    if i16::from(v.start_class().unwrap()) == lands {
+                        met += 1;
+                        let uv = u.concat(&v).unwrap();
+                        assert_eq!(uv.symbols().len(), cut_u + length - cut_v);
+                        assert_eq!(uv.winding(), u.winding() + v.winding());
+                        assert_eq!(uv.winding(), arrivals(&uv));
+                    } else {
+                        refused += 1;
+                        assert_eq!(
+                            u.concat(&v),
+                            Err(LockRefusal::NotASectionWord {
+                                tick: cut_u - 1,
+                                relation: SectionRelation::Recursion
+                            })
+                        );
+                    }
+                }
+            }
+        }
+    }
+    assert!(met > 0 && refused > 0, "met {met}, refused {refused}");
+}
+
+/// The three readings of one winding agree on every lock of the declared bank, on F1, F3 and F4: the
+/// lock's `W` (the closed-loop owner over the cycle's advances), the word's `W` (the signed carry law
+/// over its start class and net lift, on the cycle admitted as a section word) and the signed count of
+/// the observed arrivals. The cycle is closed: it lands on the class it starts from.
+#[test]
+fn a_locks_winding_is_the_closed_loop_owners_the_words_and_the_arrivals() {
+    for tone in [
+        stream(1, SAMPLES),
+        cycle_of(&F3, SAMPLES),
+        cycle_of(&F4, SAMPLES),
+    ] {
+        for ring in bank_settled(&tone) {
+            let lock = ring.lock(&lock_window()).unwrap();
+            let word = SectionWord::new(lock.cycle().to_vec()).unwrap();
+            assert_eq!(word.winding(), BigInt::from(lock.winding()));
+            let count: i32 = lock.arrival_word().iter().map(|&c| i32::from(c)).sum();
+            assert_eq!(i64::from(count), lock.winding());
+            let symbols = lock.cycle();
+            let last = symbols.last().unwrap();
+            let lands = (i16::from(last.class) + i16::from(last.advance)).rem_euclid(4);
+            assert_eq!(Some(u8::try_from(lands).unwrap()), word.start_class());
+        }
+    }
+}
+
 /// Thue–Morse is Unlocked on every ring (no period at most 60 repeats the settled word) and refuses
 /// the joint, naming the first ring; the period 61 control, one over half the window, is Unlocked too.
 #[test]
@@ -1055,4 +1163,253 @@ fn the_lattice_port_carries_its_remainders_across_chunks() {
     assert_eq!(ticks, whole_ticks);
     assert_eq!(port.state(), whole.state());
     assert_eq!(port.remainders(), whole.remainders());
+}
+
+/// **A key seated at the port** (bank record §7): the state is replaced, the work booked is the
+/// stored energy's change, the remainders are cleared, and a key off the lattice or of another width
+/// is refused with the port unchanged.
+#[test]
+fn a_key_seated_at_a_lattice_port_books_its_work() {
+    use holonics::hnn::constitution::Lattice;
+    let lattice = Lattice::new(32);
+    let operands = declared_ring(&integer(1));
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    for received in port.receive(&matched(&operands, &stream(1, 20))).unwrap() {
+        received.unwrap();
+    }
+    let before = port.stored_energy().unwrap();
+    let key = [vec![rat(1, 4), Rat::zero()], vec![rat(-3, 8), rat(1, 2)]];
+    let work = port.seat(key.clone()).unwrap();
+    assert_eq!(port.state(), [&key[0][..], &key[1][..]]);
+    assert_eq!(work, port.stored_energy().unwrap() - before);
+    assert!(port.remainders().all().all(Zero::is_zero));
+    let off = [vec![Rat::new(1.into(), BigInt::from(3)), Rat::zero()], vec![Rat::zero(), Rat::zero()]];
+    assert!(matches!(port.seat(off), Err(HnnError::Wave { .. })));
+    assert!(matches!(port.seat([vec![Rat::zero()], vec![Rat::zero()]]), Err(HnnError::Shape { .. })));
+    assert_eq!(port.state(), [&key[0][..], &key[1][..]]);
+}
+
+// -------------------------------------------------------------------------------------------
+// the near-return grain (bank record §11)
+
+/// The Elias gamma length, as the near-return counts it.
+fn gamma_length(n: usize) -> u64 {
+    2 * u64::from(usize::BITS - 1 - n.leading_zeros()) + 1
+}
+
+/// **N1 and N2 on the declared bank** (bank record §11): on every ring of the bank under F1, F3 and F4,
+/// the near-return decodes the window's word exactly; wherever the exact lock reads `τ₀`, the
+/// near-return is admitted at a description no longer than the exact lock's zero-defect one,
+/// `γ(τ₀) + 3τ₀ + 1`, and when it keeps `τ₀` it has no defect and the same winding and address.
+#[test]
+fn the_near_return_decodes_its_window_and_the_exact_lock_is_its_zero_defect_case() {
+    for tone in [cycle_of(&F1, SAMPLES), cycle_of(&F3, SAMPLES), cycle_of(&F4, SAMPLES)] {
+        let rings = bank_settled(&tone);
+        for (ring, exact) in rings.iter().zip(locks(&rings)) {
+            let near = ring.near_return(&lock_window());
+            if let Ok(near) = &near {
+                let Settled::Word(word) = ring else {
+                    panic!("a near-return reads a word")
+                };
+                assert_eq!(&near.decode().unwrap(), word, "N1: the decode is the window's word");
+                let (bits, raw) = near.bits();
+                assert!(bits < raw);
+            }
+            if let Ok(lock) = exact {
+                let near = near.expect("N2: an exact lock is admitted as a near-return");
+                let tau = lock.period();
+                assert!(near.bits().0 <= gamma_length(tau) + 3 * tau as u64 + 1);
+                if near.period() == tau {
+                    assert!(near.defects().is_empty());
+                    assert_eq!(near.winding(), lock.winding());
+                    assert_eq!(near.address(), lock.address());
+                }
+            }
+        }
+    }
+}
+
+/// **A near-periodic word keeps its defects** (bank record §11): the F1 wave with one sample changed
+/// after the settle allowance no longer locks exactly on the ring `t = 1`, and the near-return reads
+/// the F1 cycle with the departure kept, decoding the window exactly; its defects' lift is read apart
+/// from the cycle's winding.
+#[test]
+fn a_near_periodic_window_keeps_its_departure_as_defects() {
+    let mut tone = cycle_of(&F1, SAMPLES);
+    tone[SETTLE + 60] += 7;
+    let ring = settled(&run(&integer(1), &tone)).unwrap();
+    assert!(matches!(ring.lock(&lock_window()), Err(LockRefusal::Unlocked { .. })));
+    let near = ring.near_return(&lock_window()).unwrap();
+    let Settled::Word(word) = &ring else {
+        panic!("the ring reads a word")
+    };
+    assert_eq!(&near.decode().unwrap(), word);
+    assert!(!near.defects().is_empty());
+    let exact = settled(&run(&integer(1), &cycle_of(&F1, SAMPLES))).unwrap();
+    let clean = exact.lock(&lock_window()).unwrap();
+    let (bits, raw) = near.bits();
+    println!(
+        "near-return: τ {} (clean {}), defects {}, defect lift {}, bits {bits} of {raw}",
+        near.period(),
+        clean.period(),
+        near.defects().len(),
+        near.defect_lift()
+    );
+}
+
+// -------------------------------------------------------------------------------------------
+// the inverse tick (bank record §15)
+
+/// **The source is the ring's inverse tick** (bank record §15): on the exact law and on the lattice
+/// `2^(−32)`, every tick of the declared ring `t = 1` under F1, read backwards from its states and
+/// remainders before and after, returns exactly the drive it received, the incident amplitude on the
+/// driven coordinate and zero on the quadrature; a pair of states that is not one tick is refused.
+#[test]
+fn the_tick_read_backwards_returns_its_drive_exactly() {
+    use holonics::hnn::constitution::Lattice;
+    use holonics::hnn::ring::ResonatorRemainders;
+    let operands = declared_ring(&integer(1));
+    let samples = stream(1, 60);
+    for lattice in [None, Some(Lattice::new(32))] {
+        let mut port = match lattice {
+            None => WavePort::at_rest(operands.clone(), 0).unwrap(),
+            Some(lattice) => WavePort::on_lattice(operands.clone(), 0, lattice).unwrap(),
+        };
+        let ticks: Vec<ReceivedTick> = port
+            .receive(&matched(&operands, &samples))
+            .unwrap()
+            .map(Result::unwrap)
+            .collect();
+        let mut before = ResonatorRemainders::default();
+        for tick in &ticks {
+            let drive = operands
+                .inverse_step(
+                    tick.tick,
+                    [&tick.step.input[0], &tick.step.input[1]],
+                    [&tick.step.state[0], &tick.step.state[1]],
+                    &before,
+                    tick.step.remainders(),
+                    lattice.as_ref(),
+                )
+                .unwrap();
+            assert_eq!(drive, vec![tick.incident.clone(), Rat::zero()], "tick {}", tick.tick);
+            before = tick.step.remainders().clone();
+        }
+        // Two states that are not one tick are refused.
+        let (first, third) = (&ticks[0], &ticks[2]);
+        assert!(operands
+            .inverse_step(
+                0,
+                [&first.step.input[0], &first.step.input[1]],
+                [&third.step.state[0], &third.step.state[1]],
+                &ResonatorRemainders::default(),
+                third.step.remainders(),
+                lattice.as_ref(),
+            )
+            .is_err());
+    }
+}
+
+/// **The inverse's admission** (Codex's source review of `11142433`): a charted solve is refused, since
+/// its forward `z = X q` is not inverted by its operator (the witness `M = (145/32) I` on the word
+/// lattice `(0, 0, 32)`: the zero chart is admitted, a unit drive from rest leaves the state at zero,
+/// and an inverse by `M` would return zero); a remainder set with the rate's width but empty state
+/// parts, or the wrong width, is refused before any index is read; a nonzero remainder under the exact
+/// law, or one beyond half a unit on the lattice, breaks the carry contract and is refused.
+#[test]
+fn the_inverse_refuses_a_charted_solve_and_an_unlawful_carry() {
+    use holonics::hnn::chart::WordLattice;
+    use holonics::hnn::constitution::Lattice;
+    use holonics::hnn::ring::ResonatorRemainders;
+    let t = integer(1);
+    let a = &t / integer(8);
+    let stiffness = integer(4) * (&a * &a + &t * &t);
+    let identity = ExactRatMatrix::identity(2).unwrap();
+    let material = ResonatorMaterial::new(
+        identity.clone(),
+        identity.scaled(&stiffness),
+        ExactRatMatrix::zero(2, 2).unwrap(),
+        None,
+    )
+    .unwrap();
+    let admittance = integer(1) / (integer(4) * &a);
+    let charted = ResonatorOperands::at_cut(
+        0,
+        &material,
+        &admittance,
+        &integer(1),
+        Some(&WordLattice::new(0, 0, 32)),
+    )
+    .unwrap();
+    assert!(!charted.charts().is_empty(), "the word lattice charts the solve");
+    let rest = [vec![Rat::zero(); 2], vec![Rat::zero(); 2]];
+    let none = ResonatorRemainders::default();
+    assert!(matches!(
+        charted.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &none, None),
+        Err(HnnError::Resonator { .. })
+    ));
+
+    let operands = declared_ring(&t);
+    let lattice = Lattice::new(32);
+    let shaped = |rate: Vec<Rat>, state: [Vec<Rat>; 2]| ResonatorRemainders { rate, state };
+    let width = vec![Rat::zero(); 2];
+    for unlawful in [
+        shaped(width.clone(), [Vec::new(), Vec::new()]),
+        shaped(vec![Rat::zero(); 3], [width.clone(), width.clone()]),
+    ] {
+        assert!(matches!(
+            operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &unlawful, &none, Some(&lattice)),
+            Err(HnnError::Shape { .. })
+        ));
+    }
+    let nonzero = shaped(vec![rat(1, 1 << 40), Rat::zero()], [width.clone(), width.clone()]);
+    assert!(matches!(
+        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &nonzero, &none, None),
+        Err(HnnError::Resonator { .. })
+    ));
+    let beyond = shaped(vec![rat(1, 1 << 31), Rat::zero()], [width.clone(), width]);
+    assert!(matches!(
+        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &beyond, &none, Some(&lattice)),
+        Err(HnnError::Resonator { .. })
+    ));
+}
+
+/// **The canonical carry and the lattice rate** (Codex's source review of `4439785b`): ties-upward
+/// rounding leaves remainders in the half-open `[−δ/2, δ/2)`, so a new rate carry of `+δ/2` is
+/// refused; and the reviewer's witness, zero states and old carries with new displacement carry
+/// `δ/8`, velocity carry `δ/4` and rate carry `0`, recovers `ω = δ/8`, which passes the displacement
+/// identity but lies off the lattice, so it is refused.
+#[test]
+fn the_inverse_admits_only_the_canonical_carry_and_a_lattice_rate() {
+    use holonics::hnn::constitution::Lattice;
+    use holonics::hnn::ring::ResonatorRemainders;
+    let lattice = Lattice::new(32);
+    let delta = lattice.unit();
+    let operands = declared_ring(&integer(1));
+    let rest = [vec![Rat::zero(); 2], vec![Rat::zero(); 2]];
+    let zero = || vec![Rat::zero(); 2];
+    let none = ResonatorRemainders::default();
+    let half_up = ResonatorRemainders {
+        rate: vec![&delta / integer(2), Rat::zero()],
+        state: [zero(), zero()],
+    };
+    assert!(matches!(
+        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &half_up, Some(&lattice)),
+        Err(HnnError::Resonator { .. })
+    ));
+    let half_down = ResonatorRemainders {
+        rate: vec![-(&delta / integer(2)), Rat::zero()],
+        state: [zero(), zero()],
+    };
+    // −δ/2 is canonical; this pair is then read (or refused on another ground, never on the carry).
+    let read = operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &half_down, Some(&lattice));
+    assert!(!matches!(&read, Err(HnnError::Resonator { what, .. }) if what.contains("carry contract")));
+    let witness = ResonatorRemainders {
+        rate: zero(),
+        state: [vec![&delta / integer(8), Rat::zero()], vec![&delta / integer(4), Rat::zero()]],
+    };
+    assert!(matches!(
+        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &witness, Some(&lattice)),
+        Err(HnnError::Resonator { what, .. }) if what.contains("recovered backwards lies on the lattice")
+    ));
 }

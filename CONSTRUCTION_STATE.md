@@ -98,6 +98,33 @@ The helical code, the encoding every Holon carries, is defined in
   two-encounter credit's landing, provenance carrying the located key's identity, more fixtures,
   and the World-sensitive Ask on a field where selection is informative.
 
+**October 10: the acoustic release's first rungs** (#386, #148; the
+[bank record](research/records/2026-10-10_A_BANK_OF_RINGS_SOUNDS_ITS_EMISSION_ON_A_BOUNDED_LATTICE.md);
+developer reads, the first rung at the queue).
+- **A bounded port and a render:** `WavePort::on_lattice` carries a ring's state on `2^(−32)` by the
+  ring owner's own error-feedback step. Every tick and every whole-stream balance closes exactly. A
+  declared 24-ring bank's emission, driven by a 93680-tick recording, is rendered by one feedback tick
+  at the PCM lattice, and Brandon has the render.
+- **Each ring decodes its own moment keys:** a key is the ring's state at its own section arrival,
+  once per half-memory, and the decoder is the same ring seated at each key (`WavePort::seat`). The
+  measured blocker: the declared bank forgets half its energy in one turn, so its 86446 keys cost
+  3872041 bits against the recording's 1498880 and carry only part of it.
+- **Exact locks do not carry this speech:** the lock census locks 6730 of 52349 windows, almost none
+  below about 400 Hz, and nearly all at the rings' own free turns. The near-return grain (a
+  description-length law, with the defects kept) is the located rung's prerequisite. The section
+  owners now call the winding owners (`land`, `closed_loop_winding`, `SectionWord::concat`).
+- **Located rates locate the bank, not the recording (§13):** in the voice's rings the near-returns
+  have period 1 (advance 0, with the crossings as defects), and the other rings turn at their own
+  resonance. §11's low-ring bits only measured sparse crossings.
+- **The architecture (§15, §17): the source through one ring's inverse tick.** `ResonatorOperands::
+  inverse_step` reads the ring's tick backwards exactly (a charted solve and an unlawful carry are
+  refused). The emitted cell codec and its independent decoder (§19) decode the recording exactly
+  from ring 20's cells and in-cell indices: 1481048 bits against 1498880, the margin being the
+  uniform samples' slack, not learned content.
+- **Still owed:** narrowing the in-cell index from the ring's own dynamics (a finer section grain, or
+  two rings read jointly), and the join to `Encoding::found`'s squares through the recovered
+  `ExactPhaseCurrentSection` placement carry and the exact PCM butterfly.
+
 **October 10: learning across two observations lands at both waves** (#73; the
 [held-carry record](research/records/2026-10-09_THE_ASKED_ENCOUNTER_TEACHES_THE_MATERIAL_THROUGH_ITS_HELD_CARRY.md)
 §7–§7l; developer reads, not yet the queue's).

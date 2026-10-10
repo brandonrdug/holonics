@@ -1,0 +1,21 @@
+{
+ "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: acoustic_wave_port with the inverse-tick test, and gate 1, at the source with ResonatorOperands::inverse_step.",
+ "build": [
+  "BOUNDED start 05:42:44 end 05:43:01 exit 0 wall_ns 16293734979 child_peak_rss_kib 2480400"
+ ],
+ "tests": [
+  "test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.68s",
+  "BOUNDED start 05:43:01 end 05:43:19 exit 0 wall_ns 18772195107 child_peak_rss_kib 38944"
+ ],
+ "gate": [
+  "gate check: ok (11500 ms)",
+  "gate guard-lints: ok (18898 ms)",
+  "gate guard-doctests: ok (24855 ms)",
+  "BOUNDED start 05:43:19 end 05:44:15 exit 0 wall_ns 55266985837 child_peak_rss_kib 2422944"
+ ],
+ "deadlines_s": [
+  420,
+  120,
+  300
+ ]
+}
