@@ -2972,3 +2972,36 @@ fn the_world_return_is_the_tangents_credit() {
     }
 }
 
+
+/// **When does the second fixture's readout stop moving?** (§7k): forty plain encounters on the
+/// second fixture, whether each receiving publication moved `R`, reported as measured.
+#[test]
+fn the_second_passage_over_forty_encounters() {
+    let (field, base, source) = fixture();
+    let theta = second_material(&field, base);
+    let mut receiver = bound_second(&field, theta, &source);
+    let preparation = actuator(&field);
+    let mut moved = Vec::new();
+    for k in 0..40 {
+        let control = &chain_controls()[k % 2];
+        let probe = receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let comparison = received.comparison.as_ref().unwrap();
+        moved.push(comparison.receiving_before != comparison.receiving_after);
+    }
+    println!(
+        "second passage: R moved at {:?}",
+        moved
+            .iter()
+            .enumerate()
+            .filter(|(_, m)| **m)
+            .map(|(k, _)| k)
+            .collect::<Vec<_>>()
+    );
+}

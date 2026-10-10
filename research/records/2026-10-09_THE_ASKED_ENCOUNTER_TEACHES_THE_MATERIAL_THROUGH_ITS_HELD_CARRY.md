@@ -1154,3 +1154,10 @@ against each other. At the material's lattice, no admitted step lowers both. The
 not the descent, now bounds the cycle on this fixture. Not yet read: the second fixture's cycle,
 which needs more encounters before its readout stops moving, and the storage identity.
 
+**The second fixture's readout does not stop** ([receipt](receipts/2026-10-09-material-tangent/SECOND_PASSAGE_DEV_TESTS.v1.json),
+`the_second_passage_over_forty_encounters`). Over forty plain encounters alternating `u = 1, −1`,
+`R` moved at encounters 0–8, 11, 13, 17–19, 23, 26, 27, 29, 31, 33, 35, 37 and 39: from encounter 29
+on, at every `u = −1` encounter. No fixed-readout cycle exists on this fixture in this window, and the
+cycle owner's refusal there is the law working. A cycle on it would have to be the joint cycle, with
+`R`'s deposits part of the orbit, and only if `R` itself recurs, which forty encounters do not show.
+
