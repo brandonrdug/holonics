@@ -1,0 +1,8 @@
+{
+ "original_helper_E0425_full_raw_output_lost": true,
+ "reason": "Worker reused gate5.log and classify.log names; reruns overwrote originals.",
+ "surviving_original_failure_record": "<local custody>",
+ "worker_confirmation_sha256": "93a4039ecb9fb00a038e2610d8af6d6036a098c2f36afaa60e2317a7fafa1f05",
+ "no_protected_session_recovery_attempted": true,
+ "current_queue_full_raw_output_captured_separately": true
+}

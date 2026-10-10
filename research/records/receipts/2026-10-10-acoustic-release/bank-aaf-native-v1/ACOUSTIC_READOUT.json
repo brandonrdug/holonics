@@ -1,0 +1,482 @@
+{
+ "source_commit": "aaf174102341214d5cdb1cdee5ea84a862cac870",
+ "source_tree": "dd644a63c29f124705e8f2d29520516ea547ebe4",
+ "actual_start": {
+  "UTC": "2026-10-10T05:08:47.881743+00:00",
+  "PID": 1425019
+ },
+ "whole_stdout": {
+  "sha256": "b1540737d2ab107e901e2f4d15db56ca1bfd178a24042192eaed79916fea7fc7",
+  "bytes": 22568
+ },
+ "whole_stderr": {
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "bytes": 0
+ },
+ "all_24_distinct_rings_complete": true,
+ "per_ring_tick_count": 109680,
+ "whole_bank_tick_count": 2632320,
+ "completed_chunks_per_ring": 14,
+ "every_tick_closes_and_state_on_lattice_checked_by_exact_source": true,
+ "ring_rows": [
+  {
+   "ring": 0,
+   "declared_turn": "1/50",
+   "energy_end_enclosure": "0",
+   "port_work_enclosure": "\u2212[2^-26, 2^-25)",
+   "dissipation": "0",
+   "chart_split_enclosure": "[2^-26, 2^-25)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 75,
+   "widest_remainder_bits": 65,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 0: t = 1/50; E_end 0; \u03a3W \u2212[2^-26, 2^-25); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) [2^-26, 2^-25); whole-stream balance closes: true; widest state entry bits 75; widest remainder bits 65; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 338,
+    "raw_line_sha256": "76195f827e08a5d518bcc898f49b1f5d15b514c0047984de92d54f8da0c36f6f"
+   }
+  },
+  {
+   "ring": 1,
+   "declared_turn": "3/125",
+   "energy_end_enclosure": "0",
+   "port_work_enclosure": "[2^-28, 2^-27)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-28, 2^-27)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 75,
+   "widest_remainder_bits": 71,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 1: t = 3/125; E_end 0; \u03a3W [2^-28, 2^-27); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-28, 2^-27); whole-stream balance closes: true; widest state entry bits 75; widest remainder bits 71; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 339,
+    "raw_line_sha256": "c95733d1c0757fd6ad144ab7e0300da1a88164949007fc59ef491760a7f1295c"
+   }
+  },
+  {
+   "ring": 2,
+   "declared_turn": "18/625",
+   "energy_end_enclosure": "0",
+   "port_work_enclosure": "[2^-27, 2^-26)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-27, 2^-26)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 74,
+   "widest_remainder_bits": 75,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 2: t = 18/625; E_end 0; \u03a3W [2^-27, 2^-26); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-27, 2^-26); whole-stream balance closes: true; widest state entry bits 74; widest remainder bits 75; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 340,
+    "raw_line_sha256": "8a9d895b6c3ac4eeaceb3bb000179c1f94244c5bade989bcd4b44a0dccfd01d0"
+   }
+  },
+  {
+   "ring": 3,
+   "declared_turn": "108/3125",
+   "energy_end_enclosure": "0",
+   "port_work_enclosure": "[2^-30, 2^-29)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-30, 2^-29)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 73,
+   "widest_remainder_bits": 81,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 3: t = 108/3125; E_end 0; \u03a3W [2^-30, 2^-29); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-30, 2^-29); whole-stream balance closes: true; widest state entry bits 73; widest remainder bits 81; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 341,
+    "raw_line_sha256": "d02bb75709554a3c5b28b6bcff960efdd14d5fcab6d367f6cf246a1d4bf39111"
+   }
+  },
+  {
+   "ring": 4,
+   "declared_turn": "648/15625",
+   "energy_end_enclosure": "0",
+   "port_work_enclosure": "[2^-28, 2^-27)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-28, 2^-27)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 73,
+   "widest_remainder_bits": 87,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 4: t = 648/15625; E_end 0; \u03a3W [2^-28, 2^-27); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-28, 2^-27); whole-stream balance closes: true; widest state entry bits 73; widest remainder bits 87; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 342,
+    "raw_line_sha256": "3409b2d139c775b2589d7e82781a0af0dc3d39ab0fa09bcb6458d1bbe3266937"
+   }
+  },
+  {
+   "ring": 5,
+   "declared_turn": "3888/78125",
+   "energy_end_enclosure": "0",
+   "port_work_enclosure": "[2^-29, 2^-28)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-29, 2^-28)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 72,
+   "widest_remainder_bits": 91,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 5: t = 3888/78125; E_end 0; \u03a3W [2^-29, 2^-28); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 72; widest remainder bits 91; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 343,
+    "raw_line_sha256": "9b037f1c7e3e9e958d4fe9616278cf8820bbbc1713e7013c6ac21a6f83eb42c4"
+   }
+  },
+  {
+   "ring": 6,
+   "declared_turn": "23328/390625",
+   "energy_end_enclosure": "[2^-70, 2^-69)",
+   "port_work_enclosure": "\u2212[2^-27, 2^-26)",
+   "dissipation": "0",
+   "chart_split_enclosure": "[2^-27, 2^-26)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 72,
+   "widest_remainder_bits": 93,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 6: t = 23328/390625; E_end [2^-70, 2^-69); \u03a3W \u2212[2^-27, 2^-26); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) [2^-27, 2^-26); whole-stream balance closes: true; widest state entry bits 72; widest remainder bits 93; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 344,
+    "raw_line_sha256": "c6feb23135b9b92b486e86a1e9e155f0a427daff89f0fcae6281ed597d5bdd8d"
+   }
+  },
+  {
+   "ring": 7,
+   "declared_turn": "139968/1953125",
+   "energy_end_enclosure": "[2^-63, 2^-62)",
+   "port_work_enclosure": "\u2212[2^-27, 2^-26)",
+   "dissipation": "0",
+   "chart_split_enclosure": "[2^-27, 2^-26)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 72,
+   "widest_remainder_bits": 107,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 7: t = 139968/1953125; E_end [2^-63, 2^-62); \u03a3W \u2212[2^-27, 2^-26); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) [2^-27, 2^-26); whole-stream balance closes: true; widest state entry bits 72; widest remainder bits 107; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 345,
+    "raw_line_sha256": "427cb63347e76c93a3d22420fab598ad42bd46a7489d8cc74912023a23a660c6"
+   }
+  },
+  {
+   "ring": 8,
+   "declared_turn": "839808/9765625",
+   "energy_end_enclosure": "[2^-63, 2^-62)",
+   "port_work_enclosure": "[2^-27, 2^-26)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-27, 2^-26)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 72,
+   "widest_remainder_bits": 115,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 8: t = 839808/9765625; E_end [2^-63, 2^-62); \u03a3W [2^-27, 2^-26); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-27, 2^-26); whole-stream balance closes: true; widest state entry bits 72; widest remainder bits 115; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 346,
+    "raw_line_sha256": "6872ae580744d8f3a4a774c5d198ea0a08c049a2f7e22b8387b58c34d0b30211"
+   }
+  },
+  {
+   "ring": 9,
+   "declared_turn": "5038848/48828125",
+   "energy_end_enclosure": "0",
+   "port_work_enclosure": "\u2212[2^-28, 2^-27)",
+   "dissipation": "0",
+   "chart_split_enclosure": "[2^-28, 2^-27)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 71,
+   "widest_remainder_bits": 125,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 9: t = 5038848/48828125; E_end 0; \u03a3W \u2212[2^-28, 2^-27); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) [2^-28, 2^-27); whole-stream balance closes: true; widest state entry bits 71; widest remainder bits 125; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 347,
+    "raw_line_sha256": "eb1ef176fe4c26a5d978aba80ea5f41a8bf83e1a50821801245865776a5018da"
+   }
+  },
+  {
+   "ring": 10,
+   "declared_turn": "30233088/244140625",
+   "energy_end_enclosure": "[2^-63, 2^-62)",
+   "port_work_enclosure": "[2^-30, 2^-29)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-30, 2^-29)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 70,
+   "widest_remainder_bits": 135,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 10: t = 30233088/244140625; E_end [2^-63, 2^-62); \u03a3W [2^-30, 2^-29); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-30, 2^-29); whole-stream balance closes: true; widest state entry bits 70; widest remainder bits 135; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 348,
+    "raw_line_sha256": "4766538e0af658a1fbc6a7caee6c90091c0ae37d43cb3e4e4920845b1734d76a"
+   }
+  },
+  {
+   "ring": 11,
+   "declared_turn": "181398528/1220703125",
+   "energy_end_enclosure": "[2^-65, 2^-64)",
+   "port_work_enclosure": "[2^-29, 2^-28)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-29, 2^-28)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 70,
+   "widest_remainder_bits": 143,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 11: t = 181398528/1220703125; E_end [2^-65, 2^-64); \u03a3W [2^-29, 2^-28); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 70; widest remainder bits 143; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 349,
+    "raw_line_sha256": "c19b7cdf62d52c040407d1e8f334856d438bca3c2f649609e4b4e11b001983a7"
+   }
+  },
+  {
+   "ring": 12,
+   "declared_turn": "1088391168/6103515625",
+   "energy_end_enclosure": "[2^-66, 2^-65)",
+   "port_work_enclosure": "\u2212[2^-29, 2^-28)",
+   "dissipation": "0",
+   "chart_split_enclosure": "[2^-29, 2^-28)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 69,
+   "widest_remainder_bits": 153,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 12: t = 1088391168/6103515625; E_end [2^-66, 2^-65); \u03a3W \u2212[2^-29, 2^-28); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) [2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 69; widest remainder bits 153; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 350,
+    "raw_line_sha256": "7056d51761863482c27ac01bf0417c3f3c50b171367f13d25e3d1a748112ee4f"
+   }
+  },
+  {
+   "ring": 13,
+   "declared_turn": "6530347008/30517578125",
+   "energy_end_enclosure": "[2^-61, 2^-60)",
+   "port_work_enclosure": "[2^-30, 2^-29)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-30, 2^-29)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 68,
+   "widest_remainder_bits": 163,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 13: t = 6530347008/30517578125; E_end [2^-61, 2^-60); \u03a3W [2^-30, 2^-29); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-30, 2^-29); whole-stream balance closes: true; widest state entry bits 68; widest remainder bits 163; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 351,
+    "raw_line_sha256": "e98eecf5c764af88c9444d0c7bbaf07efdbce2b76f8993e9d3efadf4e0318392"
+   }
+  },
+  {
+   "ring": 14,
+   "declared_turn": "39182082048/152587890625",
+   "energy_end_enclosure": "[2^-63, 2^-62)",
+   "port_work_enclosure": "[2^-29, 2^-28)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-29, 2^-28)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 68,
+   "widest_remainder_bits": 171,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 14: t = 39182082048/152587890625; E_end [2^-63, 2^-62); \u03a3W [2^-29, 2^-28); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 68; widest remainder bits 171; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 352,
+    "raw_line_sha256": "192412eb3fdf09bbba43e9730f3948b006ed4ac4c7861dcc19ecf553ebac1da9"
+   }
+  },
+  {
+   "ring": 15,
+   "declared_turn": "235092492288/762939453125",
+   "energy_end_enclosure": "[2^-60, 2^-59)",
+   "port_work_enclosure": "\u2212[2^-29, 2^-28)",
+   "dissipation": "0",
+   "chart_split_enclosure": "[2^-29, 2^-28)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 67,
+   "widest_remainder_bits": 181,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 15: t = 235092492288/762939453125; E_end [2^-60, 2^-59); \u03a3W \u2212[2^-29, 2^-28); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) [2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 67; widest remainder bits 181; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 353,
+    "raw_line_sha256": "ea10e650a7c4ce9da357496afaf5620b224a0d09e093504f2a376b5be3e69482"
+   }
+  },
+  {
+   "ring": 16,
+   "declared_turn": "1410554953728/3814697265625",
+   "energy_end_enclosure": "[2^-62, 2^-61)",
+   "port_work_enclosure": "[2^-32, 2^-31)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-32, 2^-31)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 66,
+   "widest_remainder_bits": 191,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 16: t = 1410554953728/3814697265625; E_end [2^-62, 2^-61); \u03a3W [2^-32, 2^-31); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-32, 2^-31); whole-stream balance closes: true; widest state entry bits 66; widest remainder bits 191; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 354,
+    "raw_line_sha256": "fd848c8c6e39166c21437ab0dee3f11c382e0ab8a61b759aa8bde4b0a2c928c6"
+   }
+  },
+  {
+   "ring": 17,
+   "declared_turn": "8463329722368/19073486328125",
+   "energy_end_enclosure": "[2^-61, 2^-60)",
+   "port_work_enclosure": "[2^-29, 2^-28)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-29, 2^-28)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 65,
+   "widest_remainder_bits": 199,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 17: t = 8463329722368/19073486328125; E_end [2^-61, 2^-60); \u03a3W [2^-29, 2^-28); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 65; widest remainder bits 199; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 355,
+    "raw_line_sha256": "1613a97ec591efe4280ea0900b46f040e7264989b03ee89be8df1916c4c0f7e5"
+   }
+  },
+  {
+   "ring": 18,
+   "declared_turn": "50779978334208/95367431640625",
+   "energy_end_enclosure": "[2^-61, 2^-60)",
+   "port_work_enclosure": "\u2212[2^-29, 2^-28)",
+   "dissipation": "0",
+   "chart_split_enclosure": "[2^-29, 2^-28)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 65,
+   "widest_remainder_bits": 209,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 18: t = 50779978334208/95367431640625; E_end [2^-61, 2^-60); \u03a3W \u2212[2^-29, 2^-28); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) [2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 65; widest remainder bits 209; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 356,
+    "raw_line_sha256": "e9ad6b714b4da9724a514aec7db90d69e8bcf82e3eee6b2d80d6b6e67a788155"
+   }
+  },
+  {
+   "ring": 19,
+   "declared_turn": "304679870005248/476837158203125",
+   "energy_end_enclosure": "[2^-60, 2^-59)",
+   "port_work_enclosure": "[2^-30, 2^-29)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-30, 2^-29)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 64,
+   "widest_remainder_bits": 219,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 19: t = 304679870005248/476837158203125; E_end [2^-60, 2^-59); \u03a3W [2^-30, 2^-29); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-30, 2^-29); whole-stream balance closes: true; widest state entry bits 64; widest remainder bits 219; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 357,
+    "raw_line_sha256": "bd76f1c9029bbd7e72f278b2eb04ef3b3968a6ca732607eaba6884e22a12cc03"
+   }
+  },
+  {
+   "ring": 20,
+   "declared_turn": "1828079220031488/2384185791015625",
+   "energy_end_enclosure": "[2^-60, 2^-59)",
+   "port_work_enclosure": "\u2212[2^-32, 2^-31)",
+   "dissipation": "0",
+   "chart_split_enclosure": "[2^-32, 2^-31)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 64,
+   "widest_remainder_bits": 229,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 20: t = 1828079220031488/2384185791015625; E_end [2^-60, 2^-59); \u03a3W \u2212[2^-32, 2^-31); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) [2^-32, 2^-31); whole-stream balance closes: true; widest state entry bits 64; widest remainder bits 229; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 358,
+    "raw_line_sha256": "d7499564a8b3c2153cb14f6f954e3ec70979ddad99a5e1cceb892391b32ea668"
+   }
+  },
+  {
+   "ring": 21,
+   "declared_turn": "10968475320188928/11920928955078125",
+   "energy_end_enclosure": "[2^-59, 2^-58)",
+   "port_work_enclosure": "[2^-28, 2^-27)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-28, 2^-27)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 65,
+   "widest_remainder_bits": 239,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 21: t = 10968475320188928/11920928955078125; E_end [2^-59, 2^-58); \u03a3W [2^-28, 2^-27); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-28, 2^-27); whole-stream balance closes: true; widest state entry bits 65; widest remainder bits 239; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 359,
+    "raw_line_sha256": "7b0d697fd2ba8580012c9243211caa1024d9f0f487ea04a45aa7997e94f1357f"
+   }
+  },
+  {
+   "ring": 22,
+   "declared_turn": "65810851921133568/59604644775390625",
+   "energy_end_enclosure": "[2^-59, 2^-58)",
+   "port_work_enclosure": "[2^-33, 2^-32)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-33, 2^-32)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 64,
+   "widest_remainder_bits": 249,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 22: t = 65810851921133568/59604644775390625; E_end [2^-59, 2^-58); \u03a3W [2^-33, 2^-32); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-33, 2^-32); whole-stream balance closes: true; widest state entry bits 64; widest remainder bits 249; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 360,
+    "raw_line_sha256": "728c42fe3fb10046e24827f76e39371d5f6ac8ac4dec6594b2c635cb6725983e"
+   }
+  },
+  {
+   "ring": 23,
+   "declared_turn": "394865111526801408/298023223876953125",
+   "energy_end_enclosure": "[2^-60, 2^-59)",
+   "port_work_enclosure": "[2^-27, 2^-26)",
+   "dissipation": "0",
+   "chart_split_enclosure": "\u2212[2^-27, 2^-26)",
+   "whole_stream_balance_exact": true,
+   "widest_state_entry_bits": 64,
+   "widest_remainder_bits": 257,
+   "widest_remainder_enclosure": "[2^-34, 2^-33)",
+   "binding": {
+    "raw": "ring 23: t = 394865111526801408/298023223876953125; E_end [2^-60, 2^-59); \u03a3W [2^-27, 2^-26); \u03a3h\u03c9D\u03c9 0; \u03a3(chart + split) \u2212[2^-27, 2^-26); whole-stream balance closes: true; widest state entry bits 64; widest remainder bits 257; widest |remainder| [2^-34, 2^-33)",
+    "raw_line_number": 361,
+    "raw_line_sha256": "21a1d3da5098bf71cbd4c391e5e117b8835762ce435d22143605abce90375e0e"
+   }
+  }
+ ],
+ "render_raw": {
+  "raw": "render: emission peak [2^-1, 2^0); gain 2^0; final remainder [2^-35, 2^-34); 109680 samples written; elapsed 216219 ms",
+  "raw_line_number": 362,
+  "raw_line_sha256": "7112cbd12bfdf29d28cece2ae39c5f6933d48294ecac54746e3ef4cb8a08817f"
+ },
+ "emission_peak_enclosure": "[2^-1, 2^0)",
+ "gain_power_of_two_exponent": 0,
+ "final_PCM_remainder_enclosure": "[2^-35, 2^-34)",
+ "private_output_identity": {
+  "sha256": "c22da3b11bce1cbbe8924abbc5f465a464271b2899106fe2efb77c4fe09aa9cf",
+  "bytes": 219404
+ },
+ "matches_worker_first_rung_render_hash": true,
+ "private_output_metadata": {
+  "channels": 1,
+  "sample_width_bytes": 2,
+  "rate_Hz": 16000,
+  "sample_count": 109680,
+  "compression": "NONE"
+ },
+ "private_output_peak_sample_integer": 19242,
+ "private_output_per_second_sum_squares": [
+  84300621938,
+  192651157656,
+  121257520412,
+  142463995040,
+  95539722630,
+  49067397092,
+  130
+ ],
+ "last_second_peak": 42,
+ "fresh_binary_identity": {
+  "sha256": "a251bd2231b99962cb9cde0eedcbd85889af4b8c1756f9b105bc62129d6a64ff",
+  "bytes": 165733936
+ },
+ "chunk_fixture_tests_passed": [
+  "the_port_on_a_lattice_carries_a_bounded_state_and_every_tick_closes",
+  "the_lattice_port_carries_its_remainders_across_chunks"
+ ],
+ "render_derived_acceptance": {
+  "sha256": "2d5296f630f973ea74e3557b0f600579ef4bf65bdf39c69aa29d06aa180c16b8",
+  "bytes": 1480
+ },
+ "source_join": {
+  "receiving_chunk_state_and_remainders": "Exact current wave-port chunk test; declared full bank run carries each port across 8000-tick chunks.",
+  "render_chunk_condition": "One shared gain and one continuing PCM remainder; grouping preserves the same carry recurrence. No independently normalized or reset chunk claim.",
+  "gain_scope": "Largest dyadic gain under g*peak <= 1-2^-14, not every sample-fitting gain.",
+  "residual_scope": "Final PCM remainder is summed quantization error, not a source reconstruction residual.",
+  "boundedness_scope": "Fixed declared rational bank and fixed PCM grain."
+ },
+ "no_learned_decoder_generation_or_hearing_claim": true
+}

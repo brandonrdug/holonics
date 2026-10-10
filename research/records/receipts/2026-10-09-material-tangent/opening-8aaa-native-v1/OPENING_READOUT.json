@@ -1,0 +1,2635 @@
+{
+ "identity_acceptance_passed": true,
+ "forward_join_acceptance_passed": true,
+ "distinct_coordinate_count": 48,
+ "rows_per_family": {
+  "0": 16,
+  "1": 16,
+  "2": 16
+ },
+ "all_gradient_equals_negative_whole_credit": true,
+ "all_reported_ratios_exactly_minus_one": true,
+ "fixture_native_parts_all_exact_zero": true,
+ "coordinate_rows": [
+  {
+   "family": 0,
+   "row": 0,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "a7dc5a975b5c39326adf11001aa92b02d97a92c5a15be218150bb772b2605459",
+     "canonical_bytes": 2003
+    },
+    "numerator_bits": 3266,
+    "denominator_bits": 3275,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "35a9b7dc996ff63bf85c632349ce7b52118370f2bad76bdd522a580892691f45",
+     "canonical_bytes": 2004
+    },
+    "numerator_bits": 3266,
+    "denominator_bits": 3275,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "35a9b7dc996ff63bf85c632349ce7b52118370f2bad76bdd522a580892691f45",
+     "canonical_bytes": 2004
+    },
+    "numerator_bits": 3266,
+    "denominator_bits": 3275,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 259,
+    "raw_line_sha256": "7273390e8c6c03c9923e56bbe1084c45ac8e67d9f0ba4fcbc49f189ab0ccb5c1"
+   }
+  },
+  {
+   "family": 0,
+   "row": 0,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "cf208725b6768eb6e506435a014e8b97b1055df912f602cbfa0bb715a3cd45f2",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3274,
+    "denominator_bits": 3283,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "61f16b2dcac4cb60a96d15b2a14220e2e54138f925be35d9dd06c3ec63ba85b6",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3274,
+    "denominator_bits": 3283,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "61f16b2dcac4cb60a96d15b2a14220e2e54138f925be35d9dd06c3ec63ba85b6",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3274,
+    "denominator_bits": 3283,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 260,
+    "raw_line_sha256": "241558e454daafdff7108f5d57038fa15a45116db29e75beb179f2662a6171b2"
+   }
+  },
+  {
+   "family": 0,
+   "row": 0,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "f8b1fad0ec0234c9d04562b3f7fdf5d24ff66dfaadc6003bbeabc479deceb156",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3274,
+    "denominator_bits": 3286,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "6301f99a3c06342d7655272b12802d41b3011a553a27297a3769d3c2ca6cd03c",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3274,
+    "denominator_bits": 3286,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "6301f99a3c06342d7655272b12802d41b3011a553a27297a3769d3c2ca6cd03c",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3274,
+    "denominator_bits": 3286,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 261,
+    "raw_line_sha256": "5c93820c0a7d7e64084387d4cd3786d04bb68fd1833c0d8e37593023c3733217"
+   }
+  },
+  {
+   "family": 0,
+   "row": 0,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "b9f8675ee4b5760750387e2f18ee0177605a8987ad713b7f2039c1df5bd0f16a",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3279,
+    "denominator_bits": 3288,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "edba0ed2ad361f80b7e5a74a707247cddf8dd0a307658d52c494fc8cfdacdbf3",
+     "canonical_bytes": 2011
+    },
+    "numerator_bits": 3279,
+    "denominator_bits": 3288,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "edba0ed2ad361f80b7e5a74a707247cddf8dd0a307658d52c494fc8cfdacdbf3",
+     "canonical_bytes": 2011
+    },
+    "numerator_bits": 3279,
+    "denominator_bits": 3288,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 262,
+    "raw_line_sha256": "7ef539b9662bcfcde314889699c1f8e3fb2de533eb29ea8a1ac3c542755fdbbb"
+   }
+  },
+  {
+   "family": 0,
+   "row": 1,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "8395996455fe138e8004e1c99526702bdd13dfe24f99d6349ccce5ef6dc3b6b3",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3282,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "71739744d78386f1827d536210ef31d8c1de0e86877008a9ff8b0fea03bc881a",
+     "canonical_bytes": 2007
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3282,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "71739744d78386f1827d536210ef31d8c1de0e86877008a9ff8b0fea03bc881a",
+     "canonical_bytes": 2007
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3282,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 263,
+    "raw_line_sha256": "6d89751d360efbee06d2ea6d94516235e7df305359d929946849acf2dfa1e591"
+   }
+  },
+  {
+   "family": 0,
+   "row": 1,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "83a9ab5495452dfc7ee68292f26cbd5c8d54f97b68d919e37b246da0b5ebb815",
+     "canonical_bytes": 2011
+    },
+    "numerator_bits": 3279,
+    "denominator_bits": 3289,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "9eb151f32b5cf3b1585f42b3dd94f4bebdcda1460692ab8665357e58ed35358a",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3279,
+    "denominator_bits": 3289,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "9eb151f32b5cf3b1585f42b3dd94f4bebdcda1460692ab8665357e58ed35358a",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3279,
+    "denominator_bits": 3289,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 264,
+    "raw_line_sha256": "7705e5b4e1ae06590bcd5f886fce5fa406281076ea2f976e9c73014d3240595b"
+   }
+  },
+  {
+   "family": 0,
+   "row": 1,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "d01d156a52869bda965d53386341df8cc0df472e6e0469b2a80440db71b90b0b",
+     "canonical_bytes": 2015
+    },
+    "numerator_bits": 3283,
+    "denominator_bits": 3293,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "1694893febc4b7bfdb160cdeb0ceece4fccf11f8817b1495148e02c229333192",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3283,
+    "denominator_bits": 3293,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "1694893febc4b7bfdb160cdeb0ceece4fccf11f8817b1495148e02c229333192",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3283,
+    "denominator_bits": 3293,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 265,
+    "raw_line_sha256": "46130b277fab3bee9478bd83c2e2333e518549479f66b963c88067beeb7c5f49"
+   }
+  },
+  {
+   "family": 0,
+   "row": 1,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "f271c92c344bf1409649c4cb79f5e94008e42b9bacbd343a13f93dbd29114e4c",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3279,
+    "denominator_bits": 3295,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "2ba69c746ab6628bf5c7720782434e5220ed9c4eba70e42888fb6f10f6803c34",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3279,
+    "denominator_bits": 3295,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "2ba69c746ab6628bf5c7720782434e5220ed9c4eba70e42888fb6f10f6803c34",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3279,
+    "denominator_bits": 3295,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 266,
+    "raw_line_sha256": "a024fa1f6b554d835ac63bfdb12578692c2fb763a4fd5946fa6e3773ea04f64f"
+   }
+  },
+  {
+   "family": 0,
+   "row": 2,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "8069d01b6bbb92c2ce7309316416b08ef008ab647aa355034751f50ec65ec3c2",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3284,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "79cda15f4cdf507953469d0884dc8fec2b998d581a4a77399017f601c9d5bae2",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3284,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "79cda15f4cdf507953469d0884dc8fec2b998d581a4a77399017f601c9d5bae2",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3284,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 267,
+    "raw_line_sha256": "0ddf9097a3b32791e01c15bddd9aa7bd254491abb3357e13bb46c22be357ae00"
+   }
+  },
+  {
+   "family": 0,
+   "row": 2,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "a1e11020ef4bd06e0668b4588d11866587fb85eb200b7a06b566a9b0f3be99ba",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3292,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "f4973dae6a5fd5628492fb977f1b9872439dadd9b238cc753ac6d26a47308282",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3292,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "f4973dae6a5fd5628492fb977f1b9872439dadd9b238cc753ac6d26a47308282",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3292,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 268,
+    "raw_line_sha256": "5b74362611e5bebc9f3fe141ba10621e6a2971ca0deb991c45f495987c7c5551"
+   }
+  },
+  {
+   "family": 0,
+   "row": 2,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "0d44a4b05433b029ba0b03f872122754cfa2d52f1249ce059ea81989aa41fca6",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3295,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "115ef929218bb6cae34799b6aebb0c8513a40c4851bfe99277403e442cccdb54",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3295,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "115ef929218bb6cae34799b6aebb0c8513a40c4851bfe99277403e442cccdb54",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3295,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 269,
+    "raw_line_sha256": "8a576164289489239563f017fb1b13e890bce86ace10afcf0a1566b83bf34088"
+   }
+  },
+  {
+   "family": 0,
+   "row": 2,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "c7831e18292991feb2b357a5a2ef1e49bac7395eb23da3d89ab2d465d9e010de",
+     "canonical_bytes": 2017
+    },
+    "numerator_bits": 3287,
+    "denominator_bits": 3297,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "b20c1ed04ec8be1b447569c0ff46cc411689fdd11074aed5949aa6f74a545929",
+     "canonical_bytes": 2016
+    },
+    "numerator_bits": 3287,
+    "denominator_bits": 3297,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "b20c1ed04ec8be1b447569c0ff46cc411689fdd11074aed5949aa6f74a545929",
+     "canonical_bytes": 2016
+    },
+    "numerator_bits": 3287,
+    "denominator_bits": 3297,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 270,
+    "raw_line_sha256": "7655e825b0a7621e3983818c60763fa32ff09ee54138450976bda86b5389aa2c"
+   }
+  },
+  {
+   "family": 0,
+   "row": 3,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "2d4dbdfb1a7c69dfde3bbbf6839d0b2d120084f59ced10d5f91feeb8ccd0d1f8",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3285,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "353615448dd9fd820db22b43dd3e4fa7eb53113ab85a0cf12d3292c7383b06f5",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3285,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "353615448dd9fd820db22b43dd3e4fa7eb53113ab85a0cf12d3292c7383b06f5",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3285,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 271,
+    "raw_line_sha256": "535b47809824c9fe51aaa72fb02e5f61c565cdce34f3388e9df615c02485f4bf"
+   }
+  },
+  {
+   "family": 0,
+   "row": 3,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "ff03639e356548e325e22f1de1459b1cc1e0886c07e4a1149fa8f0e7f57de0b4",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3293,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "c4b23cb3bf47bc3f1a16c54b03eef35663ef1918c94c39e2a28fc909da9006d9",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3293,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "c4b23cb3bf47bc3f1a16c54b03eef35663ef1918c94c39e2a28fc909da9006d9",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3293,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 272,
+    "raw_line_sha256": "99faeda85993bb20df5317cb8f5e41f271cabea55c73fc9eb73f2f9f9de19436"
+   }
+  },
+  {
+   "family": 0,
+   "row": 3,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "7c38d099ad65633e5616fb5e8fa75010704106c9dcb8d4f008e15572cde43871",
+     "canonical_bytes": 2016
+    },
+    "numerator_bits": 3285,
+    "denominator_bits": 3296,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "4e9a0b725ee09a2cac9dfd6f5b0eb1e94d549295f7ff0b77a0eb788c87880c86",
+     "canonical_bytes": 2015
+    },
+    "numerator_bits": 3285,
+    "denominator_bits": 3296,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "4e9a0b725ee09a2cac9dfd6f5b0eb1e94d549295f7ff0b77a0eb788c87880c86",
+     "canonical_bytes": 2015
+    },
+    "numerator_bits": 3285,
+    "denominator_bits": 3296,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 273,
+    "raw_line_sha256": "8fe20c3b202bfeafb750e924639a00192598b53b22990539e564864287efea0b"
+   }
+  },
+  {
+   "family": 0,
+   "row": 3,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "6d4b65190554b4915b4ac8f2739a17c5baf66f08be153015cf648728f3f12c42",
+     "canonical_bytes": 2017
+    },
+    "numerator_bits": 3287,
+    "denominator_bits": 3298,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "7a34f0ae02df94900133df145dcfae1a8ca345b54a9213300f75ca46fdf388aa",
+     "canonical_bytes": 2016
+    },
+    "numerator_bits": 3287,
+    "denominator_bits": 3298,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "7a34f0ae02df94900133df145dcfae1a8ca345b54a9213300f75ca46fdf388aa",
+     "canonical_bytes": 2016
+    },
+    "numerator_bits": 3287,
+    "denominator_bits": 3298,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 274,
+    "raw_line_sha256": "d2444d6db43b2ee62f27c55900bf6eadd5ede64f0f614e67941524c8400cbfd2"
+   }
+  },
+  {
+   "family": 1,
+   "row": 0,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "ba56fe8ed70403f2d2ab6b54c42c376a1940bd2dc2f8a5e936bb08d8fee2f577",
+     "canonical_bytes": 2006
+    },
+    "numerator_bits": 3269,
+    "denominator_bits": 3278,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "1ad4f270b21c27bf4a2f506723bee6c9e746b3e78d1815cca7ede4488cc35075",
+     "canonical_bytes": 2005
+    },
+    "numerator_bits": 3269,
+    "denominator_bits": 3278,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "1ad4f270b21c27bf4a2f506723bee6c9e746b3e78d1815cca7ede4488cc35075",
+     "canonical_bytes": 2005
+    },
+    "numerator_bits": 3269,
+    "denominator_bits": 3278,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 275,
+    "raw_line_sha256": "77c8b31fd8d62f7441ded8580435501a6131420a19033e32cf168d37db8f9523"
+   }
+  },
+  {
+   "family": 1,
+   "row": 0,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "8b92e0ef0a51ef96ede48a5bf040651863f3871f2002cdb91be206c9c204092e",
+     "canonical_bytes": 2004
+    },
+    "numerator_bits": 3268,
+    "denominator_bits": 3277,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "4f8c5217dd54532e4ac0ed94ee36dc2398286343968f66c5b7163cf797f2564c",
+     "canonical_bytes": 2005
+    },
+    "numerator_bits": 3268,
+    "denominator_bits": 3277,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "4f8c5217dd54532e4ac0ed94ee36dc2398286343968f66c5b7163cf797f2564c",
+     "canonical_bytes": 2005
+    },
+    "numerator_bits": 3268,
+    "denominator_bits": 3277,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 276,
+    "raw_line_sha256": "1577849d634de16d0c6135e7d04359dfba60df50c0b79e6336f8dff3463e652e"
+   }
+  },
+  {
+   "family": 1,
+   "row": 0,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "6806eed2ed6f401e7e854bce6b304cfa2cd417b46344baddd93d632945d96dc6",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3284,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "2e85bf1e9df3b353b1fc1af4f540441091b1c09fdc97243fe1433b122884dd23",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3284,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "2e85bf1e9df3b353b1fc1af4f540441091b1c09fdc97243fe1433b122884dd23",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3284,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 277,
+    "raw_line_sha256": "c30560aa25b442141eba258260612f4c4e8a9bbd2393971c7f58a01cabd26bb3"
+   }
+  },
+  {
+   "family": 1,
+   "row": 0,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "b3d37c7d77a4c955455999f4c71e8c2d60cdc256ae90bec519aee383560c12cc",
+     "canonical_bytes": 2006
+    },
+    "numerator_bits": 3271,
+    "denominator_bits": 3281,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "6a4194fa5bf5dd49bbec38b072c627bff59a7b8aeda7ea9a8d5676bc548de5d5",
+     "canonical_bytes": 2007
+    },
+    "numerator_bits": 3271,
+    "denominator_bits": 3281,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "6a4194fa5bf5dd49bbec38b072c627bff59a7b8aeda7ea9a8d5676bc548de5d5",
+     "canonical_bytes": 2007
+    },
+    "numerator_bits": 3271,
+    "denominator_bits": 3281,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 278,
+    "raw_line_sha256": "b4738321f160c538bd48f746277078b1c33b7369e3f5b2193baa743c609c4062"
+   }
+  },
+  {
+   "family": 1,
+   "row": 1,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "a6ca0c6bfc93667655f89c2c12a4d37efdda29935174759489ca7a0f104c045e",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3276,
+    "denominator_bits": 3284,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "ba3eb1cb335ba112be9e1514516cd5cfa45962af0c0402cc9f6822f03af689e6",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3276,
+    "denominator_bits": 3284,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "ba3eb1cb335ba112be9e1514516cd5cfa45962af0c0402cc9f6822f03af689e6",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3276,
+    "denominator_bits": 3284,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 279,
+    "raw_line_sha256": "e93e379618159bbc51dc4fcc9d5f65cfab86d11a44c9ab63884c4f0574b47e8c"
+   }
+  },
+  {
+   "family": 1,
+   "row": 1,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "a73d865f50f8f3689ed30391b67e617b71a6f58c22658593df2285dc9b6cd40e",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3285,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "0dac981422d942ea4677eac0dd78df7b0beac204238d89b8f5f65e181a75e501",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3285,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "0dac981422d942ea4677eac0dd78df7b0beac204238d89b8f5f65e181a75e501",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3285,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 280,
+    "raw_line_sha256": "b068be7946682f6517837672483aa63310d38a10ed123b507ecf1475954ee9dc"
+   }
+  },
+  {
+   "family": 1,
+   "row": 1,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "c296c48a87a764c96b1b2f87224d4f8358fc7827bf24bd0e06c3286650a9b912",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3290,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "8cd80ef46de4501531057e4fef815ff004120fa60514d2110596011b89a99393",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3290,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "8cd80ef46de4501531057e4fef815ff004120fa60514d2110596011b89a99393",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3290,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 281,
+    "raw_line_sha256": "76eefc6222dcfff76e5fb437e5ca3accdef0ac70f1447ad49f78520aba269f30"
+   }
+  },
+  {
+   "family": 1,
+   "row": 1,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "86761b7cfcf92067d929bfd465a472e7e207d9ac8bb6d60ba8517ebe3417297f",
+     "canonical_bytes": 2011
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3288,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "be9f5fa7f50220ae71182bdd69e857405fc252f6261d63162b0299d7fb20dc00",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3288,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "be9f5fa7f50220ae71182bdd69e857405fc252f6261d63162b0299d7fb20dc00",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3288,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 282,
+    "raw_line_sha256": "c72ed3524934153b05633cafbdaf0fd3e0b26c74a07f9b60729da35eb1bfe716"
+   }
+  },
+  {
+   "family": 1,
+   "row": 2,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "1c8d4021a4d0817b408cc2a29e26b9fecb4f5f2beaa0739fddb0d5b4553774d5",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3287,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "77ccfdbfc72c030cd1e06d34892501b8ee11e384eb3ee5ccd27f13aca31d1e8c",
+     "canonical_bytes": 2011
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3287,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "77ccfdbfc72c030cd1e06d34892501b8ee11e384eb3ee5ccd27f13aca31d1e8c",
+     "canonical_bytes": 2011
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3287,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 283,
+    "raw_line_sha256": "edf119dc36ac989ee8999604a6bdfe0b12e1fbb252097b0a2172328b48768a06"
+   }
+  },
+  {
+   "family": 1,
+   "row": 2,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "63a8ede03c8e9b94e1da7e6d9ad3cc32a10a3200c00a83447c3e911d522bf106",
+     "canonical_bytes": 2011
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3286,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "798fe15bed169bcb3f75a4b684532c13915825a9eb7d9901e867a0c48c07fba9",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3286,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "798fe15bed169bcb3f75a4b684532c13915825a9eb7d9901e867a0c48c07fba9",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3286,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 284,
+    "raw_line_sha256": "963850d084461c50f879ad25fb50ee66ab7b01cc3d934e45d070134cb8ec7311"
+   }
+  },
+  {
+   "family": 1,
+   "row": 2,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "aa61bfe987d6afefc5e1296b5c3ce78a5221200c15c3ae8c8a0fe3552effd9c5",
+     "canonical_bytes": 2015
+    },
+    "numerator_bits": 3283,
+    "denominator_bits": 3293,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "fd2a868b0ee06c257ba66d8e5156b137fc97ddf745959d44424bd6da4044eb80",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3283,
+    "denominator_bits": 3293,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "fd2a868b0ee06c257ba66d8e5156b137fc97ddf745959d44424bd6da4044eb80",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3283,
+    "denominator_bits": 3293,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 285,
+    "raw_line_sha256": "c7696c4d0ad9a78e316b874f421994f7c03c3fd104ac3172f719043c6ab45fa1"
+   }
+  },
+  {
+   "family": 1,
+   "row": 2,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "afa1bbd150173002aa951f50566416bcf367f33c1a48c41b16ebeb882b98cd36",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3290,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "ffdc4adce406d2af245c602e625fb5c146cae574223d4c36b75c77b2687f1b0c",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3290,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "ffdc4adce406d2af245c602e625fb5c146cae574223d4c36b75c77b2687f1b0c",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3290,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 286,
+    "raw_line_sha256": "a8bf83192251a7dc0918a0e597699d086c49b47eb91cdc91b28833be8c51f9ca"
+   }
+  },
+  {
+   "family": 1,
+   "row": 3,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "e6060a0ca2b55f59e54c035d284a288d7db47da10e92cf27d2b83af750fd4243",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3287,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "c761c22a2f34459d39a33bcb1401a45299786ce90ffe4bda72654500ae9926f9",
+     "canonical_bytes": 2011
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3287,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "c761c22a2f34459d39a33bcb1401a45299786ce90ffe4bda72654500ae9926f9",
+     "canonical_bytes": 2011
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3287,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 287,
+    "raw_line_sha256": "3a0fe2980449e8d39e3804fe960c017f5789c597ed5d37bb10bd9f15b1902261"
+   }
+  },
+  {
+   "family": 1,
+   "row": 3,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "c08a2a466f78f22180a88f89e74bbfafbf83cd20bba178f6d90bbd3351260b9e",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3274,
+    "denominator_bits": 3284,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "e5f8f96832e87b6eadac38e44dd0e9b2975a536b7e2fb43e43af53b36272db84",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3274,
+    "denominator_bits": 3284,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "e5f8f96832e87b6eadac38e44dd0e9b2975a536b7e2fb43e43af53b36272db84",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3274,
+    "denominator_bits": 3284,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 288,
+    "raw_line_sha256": "a4e0b474e0c005e57cf65fdb10ec4c7a1cce9641bde497c0bb9417256922284d"
+   }
+  },
+  {
+   "family": 1,
+   "row": 3,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "c5b9472fb921e01c61bd73ade204dfff06bc3871ad0ae21783c7932d88ebf657",
+     "canonical_bytes": 2015
+    },
+    "numerator_bits": 3284,
+    "denominator_bits": 3294,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "be94771a6974301fa5e04804426d1ea796b53f73c81fa5d45ef723721bebc36e",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3284,
+    "denominator_bits": 3294,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "be94771a6974301fa5e04804426d1ea796b53f73c81fa5d45ef723721bebc36e",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3284,
+    "denominator_bits": 3294,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 289,
+    "raw_line_sha256": "b65d88a99b05653689e77ce132d76b06c3ce2b9064ae7f7929c87c7efc4b2425"
+   }
+  },
+  {
+   "family": 1,
+   "row": 3,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "300fc339abc246a9f0fb85d6d6287a46b543210be96e145cf80cff16b2643949",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3291,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "609c14b1e89ebe8f08b53f02d573bddcfb5cd424cf45bdc202e74357ce0c83bd",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3291,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "609c14b1e89ebe8f08b53f02d573bddcfb5cd424cf45bdc202e74357ce0c83bd",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3291,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 290,
+    "raw_line_sha256": "e39d610df1da080672c09da33da5e00262463880042289ac5d2d8d98ce8329a7"
+   }
+  },
+  {
+   "family": 2,
+   "row": 0,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "ac9f00b69081f61a91f375a7f77aa559e69967476910a5b1ad21da73dd32379a",
+     "canonical_bytes": 2004
+    },
+    "numerator_bits": 3266,
+    "denominator_bits": 3277,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "481714913e120f45be73347182f01a06fc6f7f2ccd31fef15a86ed9629889e27",
+     "canonical_bytes": 2005
+    },
+    "numerator_bits": 3266,
+    "denominator_bits": 3277,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "481714913e120f45be73347182f01a06fc6f7f2ccd31fef15a86ed9629889e27",
+     "canonical_bytes": 2005
+    },
+    "numerator_bits": 3266,
+    "denominator_bits": 3277,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 291,
+    "raw_line_sha256": "469e5f38a94a3821997c4e9e6f97eeaed39e65ff4585642040f65ff4e02e62ea"
+   }
+  },
+  {
+   "family": 2,
+   "row": 0,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "535278e4f6349ce7b133107330ccac2ba4692a146f69958a97b0936996aefc0f",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3284,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "155c507619dc4aae34426b1d16a37f71cca2cf83d44e4b31679076c7dbde7443",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3284,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "155c507619dc4aae34426b1d16a37f71cca2cf83d44e4b31679076c7dbde7443",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3284,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 292,
+    "raw_line_sha256": "c69d3665f20ceface692374a97c56745ae779ab4ab63b2160d2806a5b4445678"
+   }
+  },
+  {
+   "family": 2,
+   "row": 0,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "f85ef835fd7d189a52b3c63433732e5080100e0bd53501d43c6526270cc253fb",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3286,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "d57ad5964a453843b990bdd73580d8dc018422b669e9da8ed780945d6811320d",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3286,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "d57ad5964a453843b990bdd73580d8dc018422b669e9da8ed780945d6811320d",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3286,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 293,
+    "raw_line_sha256": "fd3dbfed941bc0210d6a7ab525d945b886cbd5cd7cbadc1c22f650e5bef71ce4"
+   }
+  },
+  {
+   "family": 2,
+   "row": 0,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "6c2a6dd0605f2a40cb4a23c4f8de4208787c936c1e68292947deca9303b21535",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3287,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "4fdb545fd78d40d5b204b2ff1d367e708e99455d9bb25792e11f1d393fa089bd",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3287,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "4fdb545fd78d40d5b204b2ff1d367e708e99455d9bb25792e11f1d393fa089bd",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3287,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 294,
+    "raw_line_sha256": "43cd3628901bbc8d43da554b356a856360ffc82c47a046b99985ab463dd43515"
+   }
+  },
+  {
+   "family": 2,
+   "row": 1,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "535278e4f6349ce7b133107330ccac2ba4692a146f69958a97b0936996aefc0f",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3284,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "155c507619dc4aae34426b1d16a37f71cca2cf83d44e4b31679076c7dbde7443",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3284,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "155c507619dc4aae34426b1d16a37f71cca2cf83d44e4b31679076c7dbde7443",
+     "canonical_bytes": 2008
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3284,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 295,
+    "raw_line_sha256": "5b61019bb7f6aeae074b7d21968690d1e39cc6bf519e77e0e11c484fb30ce86d"
+   }
+  },
+  {
+   "family": 2,
+   "row": 1,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "1995ee5d7e12341d7a55ec58b1fad12adb880c3519207f9e746c3193bd96a822",
+     "canonical_bytes": 2011
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3290,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "aabad6280725ba2984e5ce1dd4d13a0b6eb4a020e0f60c4f39c215ac589a31f2",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3290,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "aabad6280725ba2984e5ce1dd4d13a0b6eb4a020e0f60c4f39c215ac589a31f2",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3290,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 296,
+    "raw_line_sha256": "eb67acfa49edfa5d208d9804a51e0a27403a77ea63eecdbb540bcfd970aa5965"
+   }
+  },
+  {
+   "family": 2,
+   "row": 1,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "68c2825783d770c929cdfabe7678815ff1c6e3410ba7cf34a0226a2f3d17fd6c",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3293,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "f3298814a5ba30ebaeeb046ff6a86d994d1baa0d7a9fd26e63696ac8a5928c1e",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3293,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "f3298814a5ba30ebaeeb046ff6a86d994d1baa0d7a9fd26e63696ac8a5928c1e",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3293,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 297,
+    "raw_line_sha256": "4d6a016637a7e1ea92808d1ee1cb4cc96c73b4df3c4adc5775dac50bb997d2a9"
+   }
+  },
+  {
+   "family": 2,
+   "row": 1,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "b3fffd3d02889475439521ab0553b715d1461796d6d0f15c0763f06bf638a279",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3294,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "45edb65178e70d49a49808cfb3e134981823781802fd01b0e30c7bc401c0e5fd",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3294,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "45edb65178e70d49a49808cfb3e134981823781802fd01b0e30c7bc401c0e5fd",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3294,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 298,
+    "raw_line_sha256": "77db17a5134accd7c1db9be1aad753d5724b23d665f676a6db68b038f0eba47a"
+   }
+  },
+  {
+   "family": 2,
+   "row": 2,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "f85ef835fd7d189a52b3c63433732e5080100e0bd53501d43c6526270cc253fb",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3286,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "d57ad5964a453843b990bdd73580d8dc018422b669e9da8ed780945d6811320d",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3286,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "d57ad5964a453843b990bdd73580d8dc018422b669e9da8ed780945d6811320d",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3273,
+    "denominator_bits": 3286,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 299,
+    "raw_line_sha256": "e21e880d2a83f4644e7de4ffc7763f224468167ce8b089df068bb0ebed0cf508"
+   }
+  },
+  {
+   "family": 2,
+   "row": 2,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "68c2825783d770c929cdfabe7678815ff1c6e3410ba7cf34a0226a2f3d17fd6c",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3293,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "f3298814a5ba30ebaeeb046ff6a86d994d1baa0d7a9fd26e63696ac8a5928c1e",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3293,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "f3298814a5ba30ebaeeb046ff6a86d994d1baa0d7a9fd26e63696ac8a5928c1e",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3293,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 300,
+    "raw_line_sha256": "e1211b21c9a8345ce1be0bdd3e03ebf4f9f68e2768478a539464886fa45fc547"
+   }
+  },
+  {
+   "family": 2,
+   "row": 2,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "36bc11c943e9d565af012f67c02b11e93979ec2cf6d7caecc9b899d9fdfc5d9a",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3295,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "ee6536e8aafdbab0c9322185c5f72dd2338296d71f5a53b8686c3b32be884c07",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3295,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "ee6536e8aafdbab0c9322185c5f72dd2338296d71f5a53b8686c3b32be884c07",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3280,
+    "denominator_bits": 3295,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 301,
+    "raw_line_sha256": "eb1445423e0f9f11594513b5dd64b676a45643d1ea16e3401e4f17b0f14358e3"
+   }
+  },
+  {
+   "family": 2,
+   "row": 2,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "4c93f7321a62515b7b72808fab469ba858d17d1419fce46f9f86befa94478f15",
+     "canonical_bytes": 2015
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3296,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "c76ef2c27ca8d2b7a86a5699e0d09d675cda467ece1c2e12cf61445fe68499ff",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3296,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "c76ef2c27ca8d2b7a86a5699e0d09d675cda467ece1c2e12cf61445fe68499ff",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3296,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 302,
+    "raw_line_sha256": "f02714adfa72ca742f9a41dc9b5e7e9ceaf9d82ad70fc4caff5dcbdd99432fa2"
+   }
+  },
+  {
+   "family": 2,
+   "row": 3,
+   "column": 0,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "6c2a6dd0605f2a40cb4a23c4f8de4208787c936c1e68292947deca9303b21535",
+     "canonical_bytes": 2010
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3287,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "4fdb545fd78d40d5b204b2ff1d367e708e99455d9bb25792e11f1d393fa089bd",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3287,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "4fdb545fd78d40d5b204b2ff1d367e708e99455d9bb25792e11f1d393fa089bd",
+     "canonical_bytes": 2009
+    },
+    "numerator_bits": 3275,
+    "denominator_bits": 3287,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 303,
+    "raw_line_sha256": "8cead99aed810cee3e30a128601b83538c9bd6beceec27e720b78a4d983ff2c0"
+   }
+  },
+  {
+   "family": 2,
+   "row": 3,
+   "column": 1,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "b3fffd3d02889475439521ab0553b715d1461796d6d0f15c0763f06bf638a279",
+     "canonical_bytes": 2012
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3294,
+    "negative": false
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "45edb65178e70d49a49808cfb3e134981823781802fd01b0e30c7bc401c0e5fd",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3294,
+    "negative": true
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "45edb65178e70d49a49808cfb3e134981823781802fd01b0e30c7bc401c0e5fd",
+     "canonical_bytes": 2013
+    },
+    "numerator_bits": 3278,
+    "denominator_bits": 3294,
+    "negative": true
+   },
+   "binding": {
+    "raw_line_number": 304,
+    "raw_line_sha256": "b4a13ca52b3c518100fa8f0176bb59ffd02736f00457244360533b12241fba5a"
+   }
+  },
+  {
+   "family": 2,
+   "row": 3,
+   "column": 2,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "4c93f7321a62515b7b72808fab469ba858d17d1419fce46f9f86befa94478f15",
+     "canonical_bytes": 2015
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3296,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "c76ef2c27ca8d2b7a86a5699e0d09d675cda467ece1c2e12cf61445fe68499ff",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3296,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "c76ef2c27ca8d2b7a86a5699e0d09d675cda467ece1c2e12cf61445fe68499ff",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3296,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 305,
+    "raw_line_sha256": "ae08d01ffd9351fb2fe18a1593bc167b4adfca755f5ba4fd3c356489cbd1013c"
+   }
+  },
+  {
+   "family": 2,
+   "row": 3,
+   "column": 3,
+   "native_part": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "reported_ratio": {
+    "numerator": "-1",
+    "denominator": "1"
+   },
+   "exact_gradient_plus_whole_credit": {
+    "numerator": "0",
+    "denominator": "1"
+   },
+   "gradient": {
+    "bound": {
+     "sha256": "d61b794b93ef30e1e90d4cac33617cbf14e93c83f00522b31668633a51ef7d7f",
+     "canonical_bytes": 2015
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3297,
+    "negative": true
+   },
+   "whole_credit": {
+    "bound": {
+     "sha256": "a6d9369cb19fdeefe3f6d988e3b9f78900ee6d29ad77d0286f4bcb7b72a0564a",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3297,
+    "negative": false
+   },
+   "observed_part_difference": {
+    "bound": {
+     "sha256": "a6d9369cb19fdeefe3f6d988e3b9f78900ee6d29ad77d0286f4bcb7b72a0564a",
+     "canonical_bytes": 2014
+    },
+    "numerator_bits": 3282,
+    "denominator_bits": 3297,
+    "negative": false
+   },
+   "binding": {
+    "raw_line_number": 306,
+    "raw_line_sha256": "5931f05b0c7524bbfa00fa10025e4aadc864833f937035a4d851d8cb3864c0a6"
+   }
+  }
+ ],
+ "four_actual_schedule_prospect_identities": [
+  {
+   "prior_encounters": 2,
+   "schedule_encounter": 0,
+   "actual_code_and_excess_equal_prospect": true,
+   "binding": {
+    "raw_line_number": 137,
+    "raw": "schedule prospect: after 2 encounters: encounter 0: actual equals prospect true",
+    "raw_line_sha256": "09892071a47c83f63f9caf6b000ff39510d5d0110a54477f102aaf2cd175354d"
+   }
+  },
+  {
+   "prior_encounters": 2,
+   "schedule_encounter": 1,
+   "actual_code_and_excess_equal_prospect": true,
+   "binding": {
+    "raw_line_number": 138,
+    "raw": "schedule prospect: after 2 encounters: encounter 1: actual equals prospect true",
+    "raw_line_sha256": "f7b8284ad1fbf57d231bb8911cef617a309bf3b637fcb383e8f274db067afa4c"
+   }
+  },
+  {
+   "prior_encounters": 12,
+   "schedule_encounter": 0,
+   "actual_code_and_excess_equal_prospect": true,
+   "binding": {
+    "raw_line_number": 158,
+    "raw": "schedule prospect: after 12 encounters: encounter 0: actual equals prospect true",
+    "raw_line_sha256": "f7c394240490570a5900a7f041634cd4d09cd63ae8754f48777a001a8887ac7d"
+   }
+  },
+  {
+   "prior_encounters": 12,
+   "schedule_encounter": 1,
+   "actual_code_and_excess_equal_prospect": true,
+   "binding": {
+    "raw_line_number": 160,
+    "raw": "schedule prospect: after 12 encounters: encounter 1: actual equals prospect true",
+    "raw_line_sha256": "feb4c5744532a243b40cd7b5d967add7516a34ed481ccd7b3290150ec18534ef"
+   }
+  }
+ ],
+ "actual_receiving_publications": [
+  {
+   "fixture": "first",
+   "publication_moved": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "binding": {
+    "raw_line_number": 80,
+    "raw": "receiving relation (first): moved at encounters [true, true, true, true, true, true, true, true, true, true]",
+    "raw_line_sha256": "47c19e2caadcbc235cdbab0987869cd513aac0c944f3864e808600f737a215f6"
+   }
+  },
+  {
+   "fixture": "second",
+   "publication_moved": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "binding": {
+    "raw_line_number": 100,
+    "raw": "receiving relation (second): moved at encounters [true, true, true, true, true, true, true, true, true, false]",
+    "raw_line_sha256": "28031ef9f41dfceda2cad3597e0f5adc3b6f6a8c68ed79d3a1ebd2e4289ee6fb"
+   }
+  }
+ ],
+ "classification_rows": [
+  {
+   "family": 0,
+   "classical_norms": [
+    "0",
+    "0"
+   ],
+   "phase_a_norm": "[2^-10, 2^-9)",
+   "phase_b_norm": "[2^-9, 2^-8)",
+   "inner_product": "[2^-10, 2^-9)",
+   "parallel_defect": "[2^-20, 2^-19)",
+   "exactly_parallel": false,
+   "lambda": "1",
+   "minimum_norm_point_norm": "[2^-10, 2^-9)",
+   "minimum_norm_ratio_enclosure": "[2^0, 2^1)",
+   "widest_descent_entry": "[2^-6, 2^-5)",
+   "covector_scale": "[2^-4, 2^-3)",
+   "largest_certified_exponent": 3,
+   "binding": {
+    "raw_line_number": 94,
+    "raw": "blocker: family 0: classical |L0|\u00b2 0 |L1|\u00b2 0; phase |a|\u00b2 [2^-10, 2^-9) |b|\u00b2 [2^-9, 2^-8) \u27e8a,b\u27e9 [2^-10, 2^-9); parallel defect [2^-20, 2^-19) (exactly parallel: false); \u03bb = 1; |m|\u00b2 [2^-10, 2^-9); |m|\u00b2\u00b7min(|a|\u00b2,|b|\u00b2)\u207b\u00b9 [2^0, 2^1); widest |m_i| [2^-6, 2^-5); covector scale c [2^-4, 2^-3); k_c 3",
+    "raw_line_sha256": "948d329bad96cd425d2206d35386b3cc88b5b035ea0d4dcab4a029212f5d68ad"
+   }
+  },
+  {
+   "family": 1,
+   "classical_norms": [
+    "0",
+    "0"
+   ],
+   "phase_a_norm": "[2^-14, 2^-13)",
+   "phase_b_norm": "[2^-13, 2^-12)",
+   "inner_product": "[2^-14, 2^-13)",
+   "parallel_defect": "[2^-29, 2^-28)",
+   "exactly_parallel": false,
+   "lambda": "1",
+   "minimum_norm_point_norm": "[2^-14, 2^-13)",
+   "minimum_norm_ratio_enclosure": "[2^0, 2^1)",
+   "widest_descent_entry": "[2^-8, 2^-7)",
+   "covector_scale": "[2^-8, 2^-7)",
+   "largest_certified_exponent": 7,
+   "binding": {
+    "raw_line_number": 95,
+    "raw": "blocker: family 1: classical |L0|\u00b2 0 |L1|\u00b2 0; phase |a|\u00b2 [2^-14, 2^-13) |b|\u00b2 [2^-13, 2^-12) \u27e8a,b\u27e9 [2^-14, 2^-13); parallel defect [2^-29, 2^-28) (exactly parallel: false); \u03bb = 1; |m|\u00b2 [2^-14, 2^-13); |m|\u00b2\u00b7min(|a|\u00b2,|b|\u00b2)\u207b\u00b9 [2^0, 2^1); widest |m_i| [2^-8, 2^-7); covector scale c [2^-8, 2^-7); k_c 7",
+    "raw_line_sha256": "e559fb04b567dcc74f5e94f0127cd09276d257ca65d42c47b1930ccd1764c6b8"
+   }
+  },
+  {
+   "family": 2,
+   "classical_norms": [
+    "0",
+    "0"
+   ],
+   "phase_a_norm": "[2^-13, 2^-12)",
+   "phase_b_norm": "[2^-12, 2^-11)",
+   "inner_product": "[2^-13, 2^-12)",
+   "parallel_defect": "[2^-27, 2^-26)",
+   "exactly_parallel": false,
+   "lambda": "1",
+   "minimum_norm_point_norm": "[2^-13, 2^-12)",
+   "minimum_norm_ratio_enclosure": "[2^0, 2^1)",
+   "widest_descent_entry": "[2^-8, 2^-7)",
+   "covector_scale": "[2^-8, 2^-7)",
+   "largest_certified_exponent": 7,
+   "binding": {
+    "raw_line_number": 96,
+    "raw": "blocker: family 2: classical |L0|\u00b2 0 |L1|\u00b2 0; phase |a|\u00b2 [2^-13, 2^-12) |b|\u00b2 [2^-12, 2^-11) \u27e8a,b\u27e9 [2^-13, 2^-12); parallel defect [2^-27, 2^-26) (exactly parallel: false); \u03bb = 1; |m|\u00b2 [2^-13, 2^-12); |m|\u00b2\u00b7min(|a|\u00b2,|b|\u00b2)\u207b\u00b9 [2^0, 2^1); widest |m_i| [2^-8, 2^-7); covector scale c [2^-8, 2^-7); k_c 7",
+    "raw_line_sha256": "ac3a5fbcc40e0ad55fdbca3cf41295ad970e2965fdb392502fb068a405bdd226"
+   }
+  }
+ ],
+ "retained_current_runtime_refusals": [
+  {
+   "raw_line_number": 40,
+   "raw": "per-encounter loop (second): encounter 1 (u = -1): landing before it unreached CovectorScale { locus: Channel(0), family: Factor(0), exponent: 8 }; learner code ExactInterval { lower: Ratio { numer: 79214387052379266293105054875, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79214387052379266294687686211, denom: 79228162514264337593543950336 } } excess 17269110499812639848212470704070007167538829311575388138617911215441409939002812536011976251971075974836463136352701055830962298013598429/1285254152642231847903997950534069492284659167997197566166530655905568861082635575770023637068741284098273561737453696451917185880000000000; twin code ExactInterval { lower: Ratio { numer: 79214387052379266293105054875, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79214387052379266294687686211, denom: 79228162514264337593543950336 } } excess 17269110499812639848212470704070007167538829311575388138617911215441409939002812536011976251971075974836463136352701055830962298013598429/1285254152642231847903997950534069492284659167997197566166530655905568861082635575770023637068741284098273561737453696451917185880000000000",
+   "raw_line_sha256": "0f23d93be93821e89c283c8630af6d743b351f2f37e48aad9314e665406c1e91"
+  },
+  {
+   "raw_line_number": 120,
+   "raw": "prospect loop (second): round 1: landing Err(PhaseWorse) at grain raise None (waves [Err(PhaseWorse), Err(PhaseWorse)])",
+   "raw_line_sha256": "e9d862e95b4dfc252199838e217f31331fc95fdd73521df8f8efae2287dba264"
+  },
+  {
+   "raw_line_number": 122,
+   "raw": "per-encounter loop (first): encounter 5 (u = -1): landing before it unreached CovectorScale { locus: Channel(0), family: Factor(1), exponent: 7 }; learner code ExactInterval { lower: Ratio { numer: 19807040628566084397604873189, denom: 19807040628566084398385987584 }, upper: Ratio { numer: 79228162514264337593654824495, denom: 79228162514264337593543950336 } } excess 224100909435177919127162100915555562520936989791757608233870339938270862423917446430776855065310378364870445957966849674329100147175885508758619935905910256995824824787999848425795788612270438259731567273081776259635226150747207238423924573130985839940790951065446611118254124449659501912774821694752457546430778142414217320324356509125614714446643024492582674717649970994718961647256913481225445242000792770288165538321202353839759384788600405617643147312628193936411726730122392939307249420332812592076750876114036173134675424707499245299378737198552359131665204299750315136240136004586183305058305647668820017675220195135546964510200612337426726417289225183998126594691947516183059836778322880441741137938053/7404550583810264621213671980054466714447430619453987067164672964622796269979859845426650592233714770692057433644564279151016891673738261651109698644161875998964478324868863743417973851914386639600997098070610850108477951275560369306863304656232250948323295706188424626309973266247745190539177368883328498711758694944779379773927543068499322511662617344619989829771902645066350814548193570097452667997735289120813124592396475568267187973731833060864497792253284250339047744224696319144778196759483107932723440990744482508314499187042550019079695642628847382982724730107467426177496495711544773111519455233563081535859732477867702707214863968422616785407696553503591692905224110856456403000000000000000000000000000; twin code ExactInterval { lower: Ratio { numer: 19807040628566084397604873189, denom: 19807040628566084398385987584 }, upper: Ratio { numer: 39614081257132168796827412247, denom: 39614081257132168796771975168 } } excess 4231952960131268964936794977733637132136536820736579151883259669053214899655158705442753485558766262328862085751595785725630219221951626405353695258304582574458513198952617832715059919697915752487247457803338094873996813880535474905951495633065576694460994896464465419139860543875905672452419424522047565061434900870283776359798683271506445640248478596187226824277302760802930581657592366695390421340867839418160575304874155394265801834424834738321/137028372884461995669248443255407899326468889255710359163611147122907658883459119031393551830229250253742062051616900649416232832378813215433363069717170971785590399895465917273233986981282516258098212986610263641270074934045413370532549108171795238324045396447754729552320581256505964969264512231766120953803121080915428854780551880978296036091923954958357521851268377331773575307469719897988563797192626119540080640000000000000000000000000000000000",
+   "raw_line_sha256": "ed1fe3f4c9d8950cf53348c1abe06abfdc3402af7323d1e8f915576795fd8df6"
+  },
+  {
+   "raw_line_number": 135,
+   "raw": "cycle trajectory (first): landing unreached CovectorScale { locus: Channel(0), family: Factor(1), exponent: 8 }",
+   "raw_line_sha256": "368f48fb9ce572539a59ec6f786c4fc418d21d9f32cc6885f94e71cc8671f644"
+  },
+  {
+   "raw_line_number": 159,
+   "raw": "per-encounter loop (first): encounter 7 (u = -1): landing before it unreached CovectorScale { locus: Channel(0), family: Factor(1), exponent: 11 }; learner code ExactInterval { lower: Ratio { numer: 19807040628566084397604873189, denom: 19807040628566084398385987584 }, upper: Ratio { numer: 79228162514264337593654824495, denom: 79228162514264337593543950336 } } excess 19156671509356920224860157486009320904704307420976884848447344416419144322219087144559529587307483677328661881279730467043059219108465856729217218732909089104422678710740774072691445491753509374572852131271459996455724356741224407665546730727337535149452294247716854353307451493587026487632571423440820323381961046240898591333910057505658104425184310876237420940288849364908245280136488448796096776235446241182336923500271859629169205318124036006573414474405844204294565437386574201360905545964724077849184823404958195852051036072938341887617448478991818998992433663983775037486302639901601492280971292097296610269112525295088896770223159294638410111637784530393453395983509081147797247678469759422704635692063931837328291157425935066703960533950070200375086085907075490014028170773764622385733494106753923650630002903920557044968360371645437610945832389156731277591041047613171261124884839986895104386340398198377046219221223807026903586333837948082964361831618410007663576447305721896639335568408837791/491224961569055979160675077910334855770760752424226814478929548989787925304814640552379778023004934373854753886945072381339165345780764651758505198225535701508520734898893777037286438809240433438620680315813758687974034310173865327015901013018227699612351244383875397542418182030853646061761610300938975789405299868956401693504260187184266918900786235689767248787659915356069648688147370681114269246087353665998461408782781845927204920446060159262820034257000491542873976370043750874441072156081721521973356578187794449601930461711279781626306336597898267729211762325521973463064207433443773926363764968213744818974491110281578344004479105798067832237150973478141405011223739751092374022791422796215416952023568244814307685702643407589784346464951115224613660215751686438316263518504688646829088338411769454500337823426966808790880113101470474717172642616613590714501510696970830037334274546867863505338343154799162389575279173038860527306020280977437241945409512304651891554931640625000000000000000000000; twin code ExactInterval { lower: Ratio { numer: 19807040628566084397604873189, denom: 19807040628566084398385987584 }, upper: Ratio { numer: 79228162514264337593654824495, denom: 79228162514264337593543950336 } } excess 609038081863695732601907213908502071526204035510364785894594191651199452881245615917005650564363947721002126475143237483429909571033203374692787417309812463290083681324954743453660988575156913161834672987616586354974302252351442049147538659699048542247268954739904919310609595041683369691053188792709690555607576036684419863413482708363265453475806974548698317735420161957373273804969177986617027322366615610890228393396408639913909631162972386537478840316172089838848230184377682672569063449951278930322962244892385640768701975958311981270473869947314397667612556645870272768606436544829304283073699509064537/17744636287031933952166261693798719542121501581295828835660889959723785906010067542038543785458179585136083814995713828741311763618627373552894638794401605690369158693559635692028384510055365248458231524912393344392831399008725022966389412143649233150764315879435191670877393993767220402912511860058992697262762794764924719283173191823245409929093081058400044583354932535005554390073318210128314315008954617315680795980249786044122456641462021925083163192417256201296546537653241047958598898061639019461946027101179131943213659972522712399859249581256073795267461120000000000000000000000000000000000000000000000",
+   "raw_line_sha256": "922f5f67722e825dde5093efb5901188e378e6536ca1e2537c5aeed732be1b2e"
+  },
+  {
+   "raw_line_number": 206,
+   "raw": "per-encounter loop (second): encounter 8 (u = 1): landing before it unreached CovectorScale { locus: Channel(0), family: Factor(2), exponent: 9 }; learner code ExactInterval { lower: Ratio { numer: 79228162514264337593543950335, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79228162514264337593543950337, denom: 79228162514264337593543950336 } } excess 20401944571123388487961871521885670109906958385979057060638646648368112910520220536928450445411472059566328688827818353988142102841695283901906669534987779008607735566595628601221542532694576328763933438342015200037669578322350581958404884223962897894652661427150573953589600044715501730180106758902929267898316651084259510829532467261816653539282035623644287942229081970684403973663827500423885267594383623369298558982167906578885129752598414984857814159603193639329097991469242435133607132026222938371768060596961981400940965401990496475509653062247030462202943134283746246069787856535647787561290881370677264697686674350190090815428261940705077349329692200326618690071543373428321444724486158590637498989472252216906822535591232807565944978387193565758467755872936205962976568939386768308542576806721085875345739614092121841256792612258602959360450687391402148788242828431368759488451016918439727855239078632026745155877249121517032259721541785638727593669880337657366710283587835195132552921367259105136339957356016557004899185540122473571107107/16735850455456050257565721787304614520207875229814999411113859521476283024475195472378270560245740706246988056113121714579032388461689210079725815132159374584018434220819310833978398377655043738446580023370389715195942298806205673332619566008926362821937548515516691139787219863565403596030538833543943147095757544151285827993237280307226582936853159705958225053388571107337837413555528415276213885019672746343098196117137517696814907507405095142653347441694354303220690145387392738987632621595183456910767364063402297064318499480051994266502196840098422448313207900765799886416568906123323580298648011493395147937885441922204010765299995917107187060149945341551872864742239192115857847946022465893012919053803551889848358292549992410890340568758538313652368813727740471011521294538915194282520412204099876603248674548538373876874525364715297062802529584230020742705780052074922282361993173116116361806886673547387043211506906717992719398233218400397200475714511896022654592677052699628108868746257367040000000000000000000000000000000000000000000000000; twin code ExactInterval { lower: Ratio { numer: 79228162514264337593543950335, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79228162514264337593543950337, denom: 79228162514264337593543950336 } } excess 17418159813976023256330785217115483327102054669443764880348598221283145302910787002042254315412830410442777231424484510666976009473009758946380804602639390485514620422960359462880556141306217766218796814820183608176228497708270778365885629063084423936472343394823578585348930548127398255759518179583031374772454248159424634704393677337377662719002202167649305014495710688374550278583980249519115953041676827289816295496740864349118188858247742721194071549016214644907018252440131252699558418091786982471499510955586462529114375482323760316531309026064238714209154277376158785535536211521930866891032563836486008883699427156050399130194746170651623990970700064168363625122271330565245145408153916560264399113194327153927751394133998067/17798274880216753625432509631752311553691228028698099839021906705042439339830095973203298427028103086498819686102818830459478509487513361755815130314712751546616754520026269679046005229444431902375610912082159324565718528437637379129353983795277737710146604219860779244084681653730263977020629682547437719670374285289337542237216013273573347653433892459300538266933984695915116256417059694448206213068718693562479102108872774680358163342116758742016124416162874305393587418863387085502652024373752960788647129541304379292637167060878993183285304712913950282000448517056281876467215344549030178328651441472534702646701765144058506848555222062212991452856322030532459024022373514929504256000000000000000000000000000000000000000000000000000",
+   "raw_line_sha256": "d8a0d2b220f5550acccca0bd09930bde3d48b209a4daca44ca80d5e48187470b"
+  },
+  {
+   "raw_line_number": 208,
+   "raw": "two-observation landing (both observations): grain raise None; decision Err(PhaseWorse); deposition work None",
+   "raw_line_sha256": "86088005521a0701ce9802f3bc201068372c2625f47eb7a6fbd9a29b78fe06f8"
+  },
+  {
+   "raw_line_number": 209,
+   "raw": "two-observation landing (both observations): wave [\"1\"]: producing code ExactInterval { lower: Ratio { numer: 79228162514264337593543950335, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79228162514264337593543950337, denom: 79228162514264337593543950336 } } excess 542681210296088545429928580811091936249228256741030446030217463450690978790169631005015950530533759803836127644519642355423180629960513483299653030385704486922039081931734415151361946535885572553323877328173/2399032856728337943525540686275675190352394991183984705661720086129112414493412993393211565634817736627000309039672110635674161276456760017476817799208034018098863560024165617187339606037246371840000000000000000; proposed code ExactInterval { lower: Ratio { numer: 79228162514264337593543950335, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79228162514264337593543950337, denom: 79228162514264337593543950336 } } excess 24092487068846739496113367528422104131928489589149389554839285789004561652894231194101744734118663902580626228239018731931580059615103556940645499420226483404012767313256007533782458599299419456817562253073226506036683392784649/103707788490286372761242910219195190030329143307150406845539716738728783219734463553215884827843438887427387806614818537961421361502725884684133599855403891498371547331826056256519164006378299767520995981467812724536320000000000000; decision Err(PhaseWorse)",
+   "raw_line_sha256": "6bddb5c0298f846a0597c3ffb94ce9f0f7aad6decd331cee55dbed6f72005376"
+  },
+  {
+   "raw_line_number": 210,
+   "raw": "two-observation landing (both observations): wave [\"-1\"]: producing code ExactInterval { lower: Ratio { numer: 40067029652474812510103926031, denom: 39614081257132168796771975168 }, upper: Ratio { numer: 80134059304949625021824001127, denom: 79228162514264337593543950336 } } excess 142072257463719047453003574946690259805946734721945206081829611335134865410112119859320708281701831552212039072201808299923098071966495173274712058907190771580882886286128416050155056994357186126195541257042669/148740037117156952498583522549091861801848489453407051751026645340004969698591605590379117069358699670874019160459670859411797999140319121083562703550898109122129540721498268265615055574309275054080000000000000000; proposed code ExactInterval { lower: Ratio { numer: 40067029652474812510103926031, denom: 39614081257132168796771975168 }, upper: Ratio { numer: 80134059304949625021824001127, denom: 79228162514264337593543950336 } } excess 455109398056890377316140976707594284780325466430018292528475354346696121403207397420494885189664069321171346427140139823456804084992237654831563857423261531721379049525309694171451433716119243644947756695995840667628040601660756989021/470699576698747662915180809040963400942555186019596623053919567759235715687241007073616468626981294512755559311760743046430882747666037000074724010999720196382573925590432239792026094867389252937845219671047776290980240947200000000000000; decision Err(PhaseWorse)",
+   "raw_line_sha256": "eff91091e166999e40dfa70175b5fb3eb8f6f878ca010c6e9b77e568035462a7"
+  },
+  {
+   "raw_line_number": 223,
+   "raw": "second loop: round 0: learner code ExactInterval { lower: Ratio { numer: 39930127392853577035998628493, denom: 39614081257132168796771975168 }, upper: Ratio { numer: 39930127392853577038267668703, denom: 39614081257132168796771975168 } } excess 2805538400390647317027002859644151020054599533128483807/1687441415021578397838226960516467232788052529921882040000; twin code ExactInterval { lower: Ratio { numer: 39930127392853577035998628493, denom: 39614081257132168796771975168 }, upper: Ratio { numer: 39930127392853577038267668703, denom: 39614081257132168796771975168 } } excess 2805538400390647317027002859644151020054599533128483807/1687441415021578397838226960516467232788052529921882040000; landing Err(CodeWorse) at grain raise Some(3)",
+   "raw_line_sha256": "fb3cdfd6d8f9c1f0b669d0c755d108a8bf6d5c623799b740b2ebf9298107cbf0"
+  },
+  {
+   "raw_line_number": 224,
+   "raw": "per-encounter loop (first): encounter 9 (u = -1): landing before it Err(PhaseWorse) at grain raise None; learner code ExactInterval { lower: Ratio { numer: 19807040628566084397604873189, denom: 19807040628566084398385987584 }, upper: Ratio { numer: 79228162514264337593654824495, denom: 79228162514264337593543950336 } } excess 301761145520245426700433840671865628454315622086982314341492418480029295722347108687967110792511462148526169431075458794498857758857625754304850726895778870707070041777002059584433226567342061862278297059188824783563230191507999046265811236334173515604751458107966366508113228303636963786437521319474735017817290986065922753187816639343018142339035243551335302156758381297235339740836477684551020089314741236169754380141873177186135506258080179152651710993598981842222467589689042601732965336870736423754679831580562524322181313527974692213728794084236229908509480847732301863435689260087767809594772085515809141914727929233390804664966372448829045364686947695907067210202702055085552167633341098648083545274346423647030189642766320221742655675655969001076866428756870515722287684750629453051946426974502818074635178811402432200600892306946400881006385866044451560634773281147106658045772862224647238577669100571625323897084218041269241665072173509067568424470132115494497410658436856236592310102700133692990436321965047607160739633158929337176780446469060001559046700434996788173758482021647715791504357256659127090855669985819795571170356058632961394979261330210646408125909829719021136837030718813857954485185273191503843851551656882352864323513471984659942478773789695970092502761327934440568440847/7254730380798893665965209993631086595950549372904643968262275890944322579499917644908360742716620454630145021144741601732407154063513587378166890900739959313689679624296153895783727836987455514853205088674201280348093526798387751669441518851326418124184162788887539666668545066075762085691212822322517655284344246800600155925794124111739644970000103338785707360569173914970154046484820087504970895969702499539305174394088776865132283083233148404835920722562119936934010901899041475518690228361591120408724696848887115936232155040593362943304157008953932298298557255301075730645078834716800211455954911942560720324164931348020096641310211934947444666151660449410407134168484674044256659433168033167185131770844928085403217826600382919808163661587500611667654590439388141629043278810351150957550806199080107590958180005047645145196213587141411645067246466520604103088558369411636335355254888307360306078260368900487424040352980580949500743236709877455012233694840018458984697042801424139406789067261536598455230447294623771765384250507456941842618076099213927189609331266437607048199841348672533555495836534044028778519491730132257951866749156297925537267343216369091112316900269884178394241036036288602838642364903055130110075053074810680891331802448957918530090635471923828125000000000000000000000000000; twin code ExactInterval { lower: Ratio { numer: 79325714681204930467709566281, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79325714681204930469292197617, denom: 79228162514264337593543950336 } } excess 2346913466613571963830725901949078278663603977673379099232970027742702278697179781732127418796351398410035082532006188976714868504419757090580291584670909939349285797584951975115390214471654871122967292495862294119336480975133550650849026194656489700039340991508638261187765348861550578918628389358328708100928438468210992986338410439498022912855318313410729086030097234062708216685788552091273978920805042675305880790447530189620059497731458876107236925256218629579386462249176932891305075441985226510294306733034927119236952689261423968310789495622504078230180135757640563600340346991520855596349825533967553969117274614642391591692300215124706796332136178891982831512885803499344546773417654847903556451872298334166204053874640889288773445843698644100793939361025871/67139831412357236056004684783916078844004656034062464520236981821168255539580244331774128004628170966794461758174965307290215312338125177663257807094760931328055375252540131013767145365110749268365380009135556025195134251327459629282704262152866567684606302872886076745820920866383310319031071117432134437658700317449645748214239607854092068825939421452901241661131616902734662547975310785578828296949272868240516973997580562867590727952622133081281188509679856244739520458052071279877889318172614567314468013783281245547795654786653778130700897934573979328843309457034247358811484691554484827676017260738410486131513877373027051869204369544146927670766241089843676595535729988605365931546483359698457076537753600000000000000000000000000000000000000000000000000000000000",
+   "raw_line_sha256": "12e95610039a2d2c8a84c7de35720aa68d16a5a892c344b955f7c03e587017fb"
+  },
+  {
+   "raw_line_number": 230,
+   "raw": "prospect loop (second): round 3: landing Err(PhaseWorse) at grain raise None (waves [Ok(Phase), Err(PhaseWorse)])",
+   "raw_line_sha256": "371c07c497a21c5f7d2c2d261c5a7e20a5f29bcd12cf6e8f1d5cbd4ec88778f9"
+  },
+  {
+   "raw_line_number": 231,
+   "raw": "per-encounter loop (second): encounter 9 (u = -1): landing before it Err(PhaseWorse) at grain raise Some(2); learner code ExactInterval { lower: Ratio { numer: 79334842349697357234713430791, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79334842349697357236296062127, denom: 79228162514264337593543950336 } } excess 23099485711602257229030766125974302200191966095142978803574857529559387196821768860931206981911191225399659438766933781577071804279789920939057198809379864824382953881793060739055995908921417652604420089581152028538976194522825870116803637993930139502557295580569070033391597236382407019588535070867795995993645069244557879362630356257354889287709654354444274152085817789122354706537061974441352627754487230351559316690211618785698362004405500016903797648589309405021068675346673869897422125386322666710301809888610536683505732394663106761518840427823980324500102070679518478558653194428394980280781878342666500906903501739915339540606611069659239805481277399817595380436884497776983787361733977501139651321034052567757183926847395478460961873997081796404963698383666094710563372806696845888770455869659874833684425049704278865225074754377716109405123148879016384507781112872133522276047998090403369154303553209585512259539594130827699817728127419754827530492337310887227345225784126980474367175068547548841206290094557521969600550038504128922006673696342277509138431483159562557518293203058175895322590001999910437445774469142595689135769760191217579655359771652678418318410950622227822431991/695051498652624536067172087335800093649648723217506924236875161402262854062631474077715350019116041734025931731017806716576980113810896612908851972050130828066586694736718390970972317197894475055217277650080817420500925465225314889502243843727775573826544332545677882270738721701175947557861329269771358361811113645827975642908718076065574266356922295493694177494460534593532295089245917128847515765599270182588653924417186281245217604006329382253241422513688542065733064238580565690425306666589254679109030646517456754754235437423073953677110291456795147531909541107815378263358635623753566483931604882090667838993482060144213170961614654682519252000207031645180305848057811011484343567099723739046029736086192318037649462971954220770175461206185689326244021722935452385093930854234306388505148929686654250209169627665198444434135462914877743902400768090977534942669231377090219608700870825022206287962502003901057778864219632023857337803413793552977661194863908429912572928719102201916122510826966493625880882827178321398526568940839675630450583162722667513697853728635604276660213952778621316413704637580313870488404575468283514532659200000000000000000000000000000000000000000000000000000000; twin code ExactInterval { lower: Ratio { numer: 79334842349697357234713430791, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79334842349697357236296062127, denom: 79228162514264337593543950336 } } excess 6889106358136449747421620175190840041751195884782253080612307836290357377432474396125772009956415253620798832731161038680362131717548529056437839422804955995753663970516546719361604062463327875410089361126914250975543095690885233671351992505533455730806556294832111459245463423981353658968446189816033463883706819651617085797191428908091088303516507316325409364863802079298445296643358111563807516397866449484731256555312419020061879818881953056835478320433665349911380756031160591787028890350099738927713181112906174325354436972636588538267448853811778848321656522978851732410895073812410657192452600677019501679692257967604100410806393953751782898076492384160531689206548857604479355866741282118924614503626027206586901908110966676704875336563560709859246539601608514746148780955326161476102755401192427145295441590071/198622891864304098207360884641770761143589722915238123527934629330632010240730248004068203310709146069680985638679062656155472358791774155600327922934179815353293308166252248834222972567933815859531240120727777430054220798912438748918598127378478693010172392996968621948156286993335042648985547933442127928417640082947867117778375205539584237570020234374865960014185624698908137996363186967165538684776357728020085318977159131233153169151447863198924606079005235653014426292597428948374900602339987558152995383845242571968730343834881737801221692789499194853459723408759265685394835385390209122980129475255072384476146364157890103287387203464142026725760104526976168508750078225991523846640133694018774413736581336657677952739498126776286211938901727886787603333120000000000000000000000000000000000000000000000000000000000",
+   "raw_line_sha256": "a67a0d1f990d54c6c9aac95ca0e2f6c9d51b41c05420737ea9fd318ca32dc5c5"
+  },
+  {
+   "raw_line_number": 241,
+   "raw": "second loop: round 1: learner code ExactInterval { lower: Ratio { numer: 2475880078570760549697152945, denom: 2475880078570760549798248448 }, upper: Ratio { numer: 9903520314283042199530314813, denom: 9903520314283042199192993792 } } excess 132542422493721346060642434236457793330774688039170613527179598662000690736416109587209072513191733856756660569245551897907669112713729/252836882486996429095868449285390719793703442884694603180301112637161087426092244413775141718440908347201356407367940285623052960000000000; twin code ExactInterval { lower: Ratio { numer: 2475880078570760549697152945, denom: 2475880078570760549798248448 }, upper: Ratio { numer: 9903520314283042199530314813, denom: 9903520314283042199192993792 } } excess 132542422493721346060642434236457793330774688039170613527179598662000690736416109587209072513191733856756660569245551897907669112713729/252836882486996429095868449285390719793703442884694603180301112637161087426092244413775141718440908347201356407367940285623052960000000000; landing Err(PhaseWorse) at grain raise Some(5)",
+   "raw_line_sha256": "0bea0f029e8bcb9ee1afc5dda34bd09a2f8b89c85ad1874e8f370053171c2297"
+  },
+  {
+   "raw_line_number": 242,
+   "raw": "two-observation landing (continued credit alone): grain raise Some(5); decision Err(PhaseWorse); deposition work None",
+   "raw_line_sha256": "139bb33cbae7b43ccd7c1e89ae5a763a5eb8cffb3511f6920d18c1c8dc4da486"
+  },
+  {
+   "raw_line_number": 243,
+   "raw": "two-observation landing (continued credit alone): wave [\"1\"]: producing code ExactInterval { lower: Ratio { numer: 79228162514264337593543950335, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79228162514264337593543950337, denom: 79228162514264337593543950336 } } excess 542681210296088545429928580811091936249228256741030446030217463450690978790169631005015950530533759803836127644519642355423180629960513483299653030385704486922039081931734415151361946535885572553323877328173/2399032856728337943525540686275675190352394991183984705661720086129112414493412993393211565634817736627000309039672110635674161276456760017476817799208034018098863560024165617187339606037246371840000000000000000; proposed code ExactInterval { lower: Ratio { numer: 79228162514264337593543950335, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79228162514264337593543950337, denom: 79228162514264337593543950336 } } excess 482262685463992062743825001887113542364325295181014264898014910799720589169528410994656489743354649630018270725830762227861421516829217037751426347716983636387146129775182866441393396139355733031936761556388015480789679985416601806074385988902053913773/814682237774863245673989017937082516742981398749961344898761824627903939058051775561444173604950173114339771681522651914882097011798107627497367681044011623534805559084270479298026667332531169387034042944196368803041726859497424331851904640000000000000000; decision Err(PhaseWorse)",
+   "raw_line_sha256": "fa42481d70a0a09c5d50e7de75a49f052b1c2c43cf5c116f2c3c6fc19c600c46"
+  },
+  {
+   "raw_line_number": 244,
+   "raw": "two-observation landing (continued credit alone): wave [\"-1\"]: producing code ExactInterval { lower: Ratio { numer: 40067029652474812510103926031, denom: 39614081257132168796771975168 }, upper: Ratio { numer: 80134059304949625021824001127, denom: 79228162514264337593543950336 } } excess 142072257463719047453003574946690259805946734721945206081829611335134865410112119859320708281701831552212039072201808299923098071966495173274712058907190771580882886286128416050155056994357186126195541257042669/148740037117156952498583522549091861801848489453407051751026645340004969698591605590379117069358699670874019160459670859411797999140319121083562703550898109122129540721498268265615055574309275054080000000000000000; proposed code ExactInterval { lower: Ratio { numer: 20057082167017032743627514825, denom: 19807040628566084398385987584 }, upper: Ratio { numer: 80228328668068130976126208365, denom: 79228162514264337593543950336 } } excess 82464996694780017677570333420280711694473719603385191281581218625616861115202432012286132014772447307920593958346161339254940542628291589212415621577004662288464179640314464493921394906920126303156254625184798192213633480987670373830410436932250942492409/99391233008533315972226660188324067042643730647495284077648942604604280565082316618496189179803921119949452145145763533615615835439369130554678857087369418071246278208280998474359253414568802665218153239191956993971090676858685768485932366080000000000000000; decision Err(CodeWorse)",
+   "raw_line_sha256": "16022ac60f196c5f54ba07e324fd926212dbf7ac3cf6b983556fbc0efd91ab43"
+  },
+  {
+   "raw_line_number": 254,
+   "raw": "world loop: round 2: learner code ExactInterval { lower: Ratio { numer: 4961580295513008546036055785, denom: 4951760157141521099596496896 }, upper: Ratio { numer: 79385284728208136738159523895, denom: 79228162514264337593543950336 } } excess 285048785080536383070475702353088182026816943661067283958393862818561963399890035724978554926905183799387263483160586791092816429754449203372996650641992428483124451621358604773266741761139120507177234794555850029582280278240809229854718107214813541550790541402930481/496352029358986823293147555048383906957397715478200470599302681698224745122603707423109203305059141971079669383150783608675258139999233432836332769293001797076352981399933514129817952354433838454046297020517576510450560469863525494909413657976270630903719377920000000000; twin code ExactInterval { lower: Ratio { numer: 4961580295513008546036055785, denom: 4951760157141521099596496896 }, upper: Ratio { numer: 79385284728208136738159523895, denom: 79228162514264337593543950336 } } excess 6611601557025558744107109842255504748394197923698312759022516125084448809468592067671131173041263117431725907587528322026895831267446502023594462214315369781444083894591145958816637828271622731833651254206049/10129249839519649094885616230941739692599001073887935423905040363656252416749965972104671054902563776869556860389726689350624236500595208962679897374433921409750757253435365939235433892157262458880000000000000000; landing Err(PhaseWorse) at grain raise Some(6)",
+   "raw_line_sha256": "b39ca6ccbc1ce4944f6e35717693e4bf0cf05aa99f3a88482920f62200dc56e9"
+  },
+  {
+   "raw_line_number": 255,
+   "raw": "second loop: round 2: learner code ExactInterval { lower: Ratio { numer: 79228162514264337593543950335, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79228162514264337593543950337, denom: 79228162514264337593543950336 } } excess 3387028180215087017655006339965402984338487021100402375684865571160852541144616043299117779511279067163139245712459135532008780824132570576826381919438809317366551370749321051110473563718431745512253216795898701158907729/3766969851255736500439618106472248164205378337995654117913942507920410825533316278194562542846610437492267553835916889782748619216900873872916955298868539936805725533867872844686288671430007021762892021858555000000000000000; twin code ExactInterval { lower: Ratio { numer: 79228162514264337593543950335, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79228162514264337593543950337, denom: 79228162514264337593543950336 } } excess 3387028180215087017655006339965402984338487021100402375684865571160852541144616043299117779511279067163139245712459135532008780824132570576826381919438809317366551370749321051110473563718431745512253216795898701158907729/3766969851255736500439618106472248164205378337995654117913942507920410825533316278194562542846610437492267553835916889782748619216900873872916955298868539936805725533867872844686288671430007021762892021858555000000000000000; landing Err(PhaseWorse) at grain raise None",
+   "raw_line_sha256": "bec94f37278614976cf57369ecae1b3f119cd77356693319abcd1f38b360bd46"
+  },
+  {
+   "raw_line_number": 308,
+   "raw": "schedule loop (second): round 1: landing Err(PhaseWorse) at grain raise None (encounters [Err(PhaseWorse), Err(PhaseWorse)])",
+   "raw_line_sha256": "59ccdd7738039bac7179f79ad7bb1d40fed3dbaf0d0268e31f0af20b6d10a5b2"
+  },
+  {
+   "raw_line_number": 310,
+   "raw": "second loop: round 3: learner code ExactInterval { lower: Ratio { numer: 19848131035910638541271268643, denom: 19807040628566084398385987584 }, upper: Ratio { numer: 19848131035910638541666926477, denom: 19807040628566084398385987584 } } excess 236684425621085085192751910698516852309499060741364678794844311233000263036960682021921257769092301910576422203006140274757198139837069997547015988790747676583289611622446465263889388999434190537493025814630506065884985266309977263633518104388870505377264463572765159011755872152654044595195593364219427937/204041362310134695021286215509979832732594076925317750304987266854615235503303186227215263809133577322630788860418716416180209548192421259160677174030676788451708916225575006842585028135430564524725680787853599149853612239526416820748464374835604082967716221284555085768075477317164728320000000000000000000000; twin code ExactInterval { lower: Ratio { numer: 19848131035910638541271268643, denom: 19807040628566084398385987584 }, upper: Ratio { numer: 19848131035910638541666926477, denom: 19807040628566084398385987584 } } excess 236684425621085085192751910698516852309499060741364678794844311233000263036960682021921257769092301910576422203006140274757198139837069997547015988790747676583289611622446465263889388999434190537493025814630506065884985266309977263633518104388870505377264463572765159011755872152654044595195593364219427937/204041362310134695021286215509979832732594076925317750304987266854615235503303186227215263809133577322630788860418716416180209548192421259160677174030676788451708916225575006842585028135430564524725680787853599149853612239526416820748464374835604082967716221284555085768075477317164728320000000000000000000000; landing Err(PhaseWorse) at grain raise None",
+   "raw_line_sha256": "1a26e8b8c415fdfb6a70feb2ee6a99f39ec1d734d62189ea74c7c67a24a97442"
+  },
+  {
+   "raw_line_number": 319,
+   "raw": "prospect loop (second): round 4: landing Err(PhaseWorse) at grain raise None (waves [Ok(Phase), Err(PhaseWorse)])",
+   "raw_line_sha256": "c83056207d16ff6dc43ce8b5e3981a3521a7f8fb4b91b9b380e9b47dcbb4967d"
+  },
+  {
+   "raw_line_number": 323,
+   "raw": "world loop: round 5: learner code ExactInterval { lower: Ratio { numer: 79228162514264337593543950335, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79228162514264337593543950337, denom: 79228162514264337593543950336 } } excess 56372539869145820660189940340251559672753210172087245266343081390314684295472278939516707284263578276939174070457530626369509699707559642682134428156036154024395822983062193639167613529942780386049149557380168995722289045897788044926700286695311877165020988272774372428743053284172704427687482000334741026887326037791670050590987889374417558095896717260407580606635350269106924331917482930990145588305616534888775865003279588860010494524658646420696642474648422673558296875564486937396653283615122665582221576897606268138874464503943528035846997781300277284074914191342501542252938326981639902114520973030250790917607536524073738861387493776075003451929563194689305876589/123677975139705268638064688197634706018317848864202983193934566510002342578580568957300480834930236108053834845846765179981787149928140156090698426478196902341259302843295204859346352504331327091850564879582734742494730683907888208744387969095021700890384772933314861606901303786837549723695323524018468472595777873319949183642122985142209219915311306438512011632139941967907215877093029929659756691538050734666829966128612200377565160531920793090735192675891488256210577190245062674960111716527658817957633010479577800785920191617350523605358202813071034433839622744352130622170542269960619109377527902139483074387509093870117072226211379853607243977991200000000000000000000; twin code ExactInterval { lower: Ratio { numer: 1, denom: 1 }, upper: Ratio { numer: 1, denom: 1 } } excess 4412991987753436885564998193679509356432025012623895280354182533693882369427264314663065832080518363588448541072736462966691690706030616655689537931707832688392928060287068055851612103242577900750618280851232080012701945814877141610537307408626023519771923389758536808871108305570794770022051131768111415251672962640874600480067093618873522607487161384283523846772603231082942212349839977351363464006828489813698854782441686384586461451877113238161/2192453966151391930707975092086526389223502228091365746617778353966522542135345904502296829283668004059872992825870410390659725318061011446933809115474735548569446398327454676371743791700520260129571407785764218260321198944726613928520785730748723813184726343164075672837129300104095439508232195708257935260849937294646861676488830095652736577470783279333720349620294037308377204919515518367817020755082017912641290240000000000000000000000000000000000; landing Err(PhaseWorse) at grain raise None",
+   "raw_line_sha256": "7bcfdb51858f4e01a41cc9d7eb4200ecc46fa9cb269a22b872e10a281e0c9310"
+  },
+  {
+   "raw_line_number": 327,
+   "raw": "prospect loop (first): round 4: landing Err(PhaseWorse) at grain raise None (waves [Err(PhaseWorse), Ok(Phase)])",
+   "raw_line_sha256": "c5828455cac89c90a374d0048fcb9439ff7e4720efd65fe59cf0d50fb55c340f"
+  },
+  {
+   "raw_line_number": 337,
+   "raw": "schedule loop (second): round 2: landing Err(PhaseWorse) at grain raise None (encounters [Err(PhaseWorse), Err(PhaseWorse)])",
+   "raw_line_sha256": "e6d30e8113f3e9266e7f51878b31a954aa2002bfc7cbd36de6c62cf05fd7a519"
+  },
+  {
+   "raw_line_number": 340,
+   "raw": "schedule loop (second): round 3: landing Err(PhaseWorse) at grain raise Some(0) (encounters [Ok(Phase), Err(PhaseWorse)])",
+   "raw_line_sha256": "b368117e5dfa4ff1f92777d2233d25bd517b06d3d496c8046b14a2772f004708"
+  }
+ ],
+ "scope": "Present-opening return after twelve encounters on fixture1, contact0, fixed declared key/face; forward schedule equality reads each actual receiving publication. Singular storage unexercised; full receiving differential/update credit, Lean opening pairing and cycle orbit-shift adjoint owed. No full trajectory success.",
+ "test_body_hashes": {
+  "the_world_return_is_the_tangents_credit": "3920ab1c27edfa43e3fea611005253cfae5bab5682f1ba226380be752fc4942c",
+  "the_schedule_prospect_is_the_actual_schedule": "5b87cddd1085b3fb55fbaf877bc05858c027e8b31cceddf4ac070d1b82eb5ce4",
+  "the_cycle_blocker_is_classified": "197a42e1814d3a7bd3511ec585e9c073dd0ad61c83238129a9c6c800f8743384"
+ },
+ "source_commit": "8aaa0eb38ff12513c6430546cb5755a82e4207fa",
+ "source_tree": "d3dc18814ced7ce4f7fae034f8819347422c44e8",
+ "test_source": {
+  "sha256": "0e5d87ec01ae7443cdc6cde54f94e255c8d20816a1186b746919c9f16723bf43",
+  "bytes": 126849
+ },
+ "whole_stdout": {
+  "sha256": "1e86da8acaa5ade3f79c1d16d615aa5ca10f319ef3f52b5fd680e1fc2fde9fc9",
+  "bytes": 777888
+ },
+ "whole_stderr": {
+  "sha256": "407232d575ff0430ac036bf2deac23f8a1676fc46e45bc716cd5a75fba88ba9c",
+  "bytes": 1506
+ },
+ "actual_start": {
+  "UTC": "2026-10-10T04:43:20.242881+00:00",
+  "PID": 1388457
+ },
+ "runtime_summary": {
+  "sha256": "efecbd17fcb082637071f3de3398405b7b4ed2b7dfe2e94dd49d83e735d7100f",
+  "bytes": 4750
+ },
+ "compaction": "Each row's three exact rationals are bound by the SHA-256 of their canonical JSON with their bit lengths; the raw stdout line by its number and SHA-256. The full rows are in the local original (ORIGINALS.json)."
+}

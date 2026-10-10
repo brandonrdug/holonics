@@ -1,0 +1,45 @@
+{
+ "note": "Private originals stay in local custody. Verbatim files equal their originals byte for byte; projected files replace host prefixes by the placeholders named, longer prefixes first, and invert byte-exactly; summaries drop argv, environment, paths and mail/thread/reviewer identifiers and copy every other value.",
+ "placeholders": [
+  "<repository>",
+  "<lean-toolchain>",
+  "<rustup>",
+  "<cargo-home>",
+  "<home>"
+ ],
+ "originals": {
+  "HANDOFF.md": {
+   "sha256": "37eaba61c26c11245ad3c676569fbd03158af13e0a0081c190f91a1a83d55fc9",
+   "bytes": 1431
+  },
+  "COVERAGE_SCOPE.json": {
+   "sha256": "3c5ea95afeb5b97135cf9e91c8e7cf89eb86eaa87ea56f80381a71da18a9bd7a",
+   "bytes": 3139
+  },
+  "FAILED_HELPER_CUSTODY_LIMITATION.json": {
+   "sha256": "d915d3a22cb737aab5aea737a307b833f208ad21acaf1e1ddc73c988f3a4cde2",
+   "bytes": 490
+  },
+  "VALIDATION.json": {
+   "sha256": "3229c68de2b3042cd0216044e7fad60ffe5df60ff410feed2c38fe5fe7db5364",
+   "bytes": 667192
+  },
+  "OPENING_READOUT.json": {
+   "sha256": "40d995a35d704c894b4deda48d9a39d318ea9458939a8bc18b906424d4b1a4d4",
+   "bytes": 565688
+  },
+  "SOURCE_PIN.json": {
+   "sha256": "55fa72ccda8e8aa0e271c1efff461efa37cf080e799d43a36a39ad4dab8a0dd8",
+   "bytes": 46391
+  },
+  "FILE_HASHES.json": {
+   "sha256": "d4eb0614500f68f34d45f0bcc49650eb08bdadd50b89d5b8e8b7287a0c443004",
+   "bytes": 30881
+  },
+  "joint-controller.stdout": {
+   "sha256": "f92a8de5916c891676baad4aec3346720c568f3fcd53cfe9566fd32d19e8cdbf",
+   "bytes": 970
+  }
+ },
+ "projections": {}
+}

@@ -1,0 +1,49 @@
+{
+ "note": "Private originals stay in local custody. Verbatim files equal their originals byte for byte; projected files replace host prefixes by the placeholders named, longer prefixes first, and invert byte-exactly; summaries drop argv, environment, paths and mail/thread/reviewer identifiers and copy every other value.",
+ "placeholders": [
+  "<repository>",
+  "<lean-toolchain>",
+  "<rustup>",
+  "<cargo-home>",
+  "<home>"
+ ],
+ "originals": {
+  "HANDOFF.md": {
+   "sha256": "6b2769e635e36a6c5727c1af66551832df74c07fa3996172d7b8f344a0099636",
+   "bytes": 566
+  },
+  "EXACT_READINGS.json": {
+   "sha256": "bbc3a498d4f7ef355170fd17d67ef11945b630cf1263f74cf9b46518098fa660",
+   "bytes": 3162
+  },
+  "RENDER_DERIVED_ACCEPTANCE.json": {
+   "sha256": "2d5296f630f973ea74e3557b0f600579ef4bf65bdf39c69aa29d06aa180c16b8",
+   "bytes": 1480
+  },
+  "VALIDATION.json": {
+   "sha256": "d3d2962516d0df398be88e137270d6355d8f063b8a21915dea1e9d39b18c3388",
+   "bytes": 88753
+  },
+  "ACOUSTIC_READOUT.json": {
+   "sha256": "f6cffa74e4284892e3101e0ffc61eea36f30ce1b7767698e954d5dd8f099fa44",
+   "bytes": 24571
+  },
+  "SOURCE_PIN.json": {
+   "sha256": "19630bb93477e9ac0c52d5e7828a123ac5eab7a083e5337bc08331e44fba97af",
+   "bytes": 47354
+  },
+  "FILE_HASHES.json": {
+   "sha256": "d5c2f3e8713cd9371df9a3fa5e3f53a49a6a64bb63e434b2f41e5ac47f08161e",
+   "bytes": 28036
+  },
+  "joint-controller.stdout": {
+   "sha256": "e3cb0314beebcebedda6fef573eb36d7fc5ae4665ed17c8087a5796b91382f7b",
+   "bytes": 3410
+  },
+  "private-bank-response.wav": {
+   "sha256": "c22da3b11bce1cbbe8924abbc5f465a464271b2899106fe2efb77c4fe09aa9cf",
+   "bytes": 219404
+  }
+ },
+ "projections": {}
+}

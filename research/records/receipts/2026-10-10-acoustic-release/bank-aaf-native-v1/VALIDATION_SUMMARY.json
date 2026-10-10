@@ -1,0 +1,1091 @@
+{
+ "schema": "exact-native-acoustic-bank-v1",
+ "UTC": "2026-10-10T05:13:35.244360+00:00",
+ "source_pin": {
+  "source_commit": "aaf174102341214d5cdb1cdee5ea84a862cac870",
+  "source_tree": "dd644a63c29f124705e8f2d29520516ea547ebe4",
+  "source_edits_by_validator": false,
+  "clean_at_admission": true
+ },
+ "source_GO": {
+  "native_GO": true,
+  "source_commit": "aaf174102341214d5cdb1cdee5ea84a862cac870",
+  "source_tree": "dd644a63c29f124705e8f2d29520516ea547ebe4",
+  "evidence": "Parent directly relayed independent source GO before preparation; declared bank response only.",
+  "no_second_rung_decoder_admission": true
+ },
+ "docs_only_successor": {
+  "commit": "04ac5e43c68b9ef6a842d7695dbc251f999209d3",
+  "tree": "b2817e695d7eff127192722cbd382608cef9bb4e",
+  "parent": "aaf174102341214d5cdb1cdee5ea84a862cac870",
+  "changed_files": [
+   "research/records/2026-10-10_A_BANK_OF_RINGS_SOUNDS_ITS_EMISSION_ON_A_BOUNDED_LATTICE.md"
+  ],
+  "all_code_identical": true,
+  "no_rebuild_required_for_docs": true,
+  "source_review_scope": "Gain maximal under declared headroom, fixed rational bank and PCM grain, chunk invariance requires shared gain and continued state; PCM remainder is summed quantization error, not source reconstruction residual."
+ },
+ "stages": {
+  "gate": {
+   "kind": "gate",
+   "source_commit": "aaf174102341214d5cdb1cdee5ea84a862cac870",
+   "source_tree": "dd644a63c29f124705e8f2d29520516ea547ebe4",
+   "source_clean_unchanged_after": true,
+   "command_result": {
+    "target": "acoustic-bank-aaf gate",
+    "exit": 0,
+    "command_wall_ns": 146897500667,
+    "kernel_command_passed": true,
+    "expected_command_exit": true,
+    "diagnostic_lines": [],
+    "whole_stdout_SHA256": "93a93026f0b29bf8e481bbcb7bc3e726aea6283f7d53b3284b99b48863821c38",
+    "whole_stderr_SHA256": "6562f97737405c342a64d7ab041cb29b0a4d1a9bb99e05cf54176b16a2e57315",
+    "source_not_edited": true
+   },
+   "controller_exit": 0,
+   "acceptance": {
+    "passed": true,
+    "final_CPU_receipt": {
+     "sha256": "029875dc790abc24fa0983c24a0f576824ca804349a6896937e7e6610bb2afc7",
+     "bytes": 5489
+    },
+    "cleanup_receipt": {
+     "sha256": "8cfd203aac1381a8862a687c0a3ea6a7c65c3bc7e83b0b71dac0b5b3841c3909",
+     "bytes": 695
+    },
+    "lease_still_held": true,
+    "scientific_job": false,
+    "requires_matching_release_receipt": true
+   },
+   "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "joint_global_lease_remains_held_by_batch": true,
+    "quiescence_confirmed": true,
+    "external_controller_PID": 1403645,
+    "monotonic_ns": 280938315435380
+   },
+   "resource_integrity": true,
+   "conformance": true,
+   "passed": true,
+   "whole_group_CPU_ns": 146284617000,
+   "peak_child_RSS_KiB": 1688436,
+   "charged_group_peak_bytes": "2148413440",
+   "window_ns": 180000000000,
+   "time_window_is_observation_only": true,
+   "stdout": {
+    "sha256": "93a93026f0b29bf8e481bbcb7bc3e726aea6283f7d53b3284b99b48863821c38",
+    "bytes": 6463
+   },
+   "stderr": {
+    "sha256": "6562f97737405c342a64d7ab041cb29b0a4d1a9bb99e05cf54176b16a2e57315",
+    "bytes": 371150
+   },
+   "test_counts": [
+    [
+     "63",
+     "0"
+    ]
+   ],
+   "passed_test_names": [
+    "crates/holonics/src/compression/keys/repair.rs - compression::keys::repair::DamagedPassage (line 135) - compile fail",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 101) - compile fail",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 112)",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 123)",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 15) - compile fail",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 181)",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 250)",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 28) - compile fail",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 40) - compile fail",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 51) - compile fail",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 65) - compile",
+    "crates/holonics/src/exterior_guards.rs - exterior_guards (line 85) - compile fail",
+    "crates/holonics/src/hnn/constitution.rs - hnn::constitution (line 13) - compile fail",
+    "crates/holonics/src/hnn/constitution.rs - hnn::constitution::Constitution::with_element (line 4558) - compile fail",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1042) - compile fail",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1049) - compile fail",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1057) - compile fail",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1066) - compile fail",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1073) - compile fail",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1080) - compile fail",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1088) - compile fail",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1099)",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 970) - compile fail",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 977) - compile fail",
+    "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 985) - compile fail",
+    "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2512) - compile fail",
+    "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2519) - compile fail",
+    "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2528) - compile fail",
+    "crates/holonics/src/hnn/field.rs - hnn::field::Field::selective_step (line 1524) - compile fail",
+    "crates/holonics/src/hnn/field.rs - hnn::field::Field::selective_step (line 1532) - compile fail",
+    "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 222) - compile fail",
+    "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 230) - compile fail",
+    "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 240)",
+    "crates/holonics/src/hnn/field.rs - hnn::field::RingDeclaration (line 344) - compile fail",
+    "crates/holonics/src/hnn/keys.rs - hnn::keys::locate_keys (line 376) - compile fail",
+    "crates/holonics/src/hnn/keys.rs - hnn::keys::station_pairs (line 459) - compile fail",
+    "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment (line 1301) - compile fail",
+    "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment::ingest (line 1401) - compile fail",
+    "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment::ingest (line 1408) - compile fail",
+    "crates/holonics/src/hnn/pending.rs - hnn::pending (line 29) - compile fail",
+    "crates/holonics/src/hnn/pending.rs - hnn::pending (line 45) - compile fail",
+    "crates/holonics/src/hnn/port.rs - hnn::port (line 52) - compile fail",
+    "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 595) - compile fail",
+    "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 602) - compile fail",
+    "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 609) - compile fail",
+    "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 617) - compile fail",
+    "crates/holonics/src/hnn/prediction.rs - hnn::prediction::CurrentSourceReceivingReturn (line 3227) - compile fail",
+    "crates/holonics/src/hnn/ratio.rs - hnn::ratio::RatioCovector (line 621) - compile fail",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 106) - compile fail",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 114) - compile fail",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 122) - compile fail",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 131) - compile fail",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 142)",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 98) - compile fail",
+    "crates/holonics/src/hnn/word.rs - hnn::word (line 89) - compile fail",
+    "crates/holonics/src/hnn/word.rs - hnn::word (line 98) - compile fail",
+    "crates/holonics/src/physics/wave/chain.rs - physics::wave::chain::WaveChain::return_material (line 633) - compile fail",
+    "crates/holonics/src/receiver/population.rs - receiver::population::Emitters (line 629) - compile fail",
+    "crates/holonics/src/receiver/population.rs - receiver::population::Family (line 496) - compile fail",
+    "crates/holonics/src/receiver/population.rs - receiver::population::Family (line 516) - compile fail",
+    "crates/holonics/src/receiver/population/composition.rs - receiver::population::composition::Keystone (line 107) - compile fail",
+    "crates/holonics/src/receiver/population/composition.rs - receiver::population::composition::PortReader (line 197) - compile fail",
+    "crates/holonics/src/receiver/population/dormancy.rs - receiver::population::dormancy::Layered (line 86) - compile fail"
+   ],
+   "actual_passed_tests": 63,
+   "projection_comparison": {
+    "measured_over_projection_exact_ratio": {
+     "numerator": 146897500667,
+     "denominator": 180000000000
+    },
+    "projection_error": false,
+    "excess_ns": {
+     "integer": 0,
+     "prime_factorization": null
+    },
+    "no_limit_raised": true,
+    "no_process_stopped_for_time": true
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 146897500667,
+     "prime_factorization": [
+      [
+       17,
+       1
+      ],
+      [
+       1223,
+       1
+      ],
+      [
+       7065437,
+       1
+      ]
+     ]
+    },
+    "CPU_ns": {
+     "integer": 146284617000,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       103,
+       1
+      ],
+      [
+       389,
+       1
+      ],
+      [
+       1217,
+       1
+      ]
+     ]
+    },
+    "RSS_KiB": {
+     "integer": 1688436,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       46901,
+       1
+      ]
+     ]
+    },
+    "charged_peak_bytes": {
+     "integer": 2148413440,
+     "prime_factorization": [
+      [
+       2,
+       12
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       23,
+       1
+      ],
+      [
+       4561,
+       1
+      ]
+     ]
+    },
+    "observation_ns": {
+     "integer": 180000000000,
+     "prime_factorization": [
+      [
+       2,
+       11
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       5,
+       10
+      ]
+     ]
+    }
+   }
+  },
+  "wave_port": {
+   "kind": "wave_port",
+   "source_commit": "aaf174102341214d5cdb1cdee5ea84a862cac870",
+   "source_tree": "dd644a63c29f124705e8f2d29520516ea547ebe4",
+   "source_clean_unchanged_after": true,
+   "command_result": {
+    "target": "acoustic-bank-aaf wave_port",
+    "exit": 0,
+    "command_wall_ns": 166833479796,
+    "kernel_command_passed": true,
+    "expected_command_exit": true,
+    "diagnostic_lines": [],
+    "whole_stdout_SHA256": "ed11e157a57527f030cbfe634917edbc0aeffd2771afa8600e563976be13e4fd",
+    "whole_stderr_SHA256": "114581d34a3398da79342f3dea5e02da3846316e24d16315b0d6c03a93fd91ae",
+    "source_not_edited": true
+   },
+   "controller_exit": 0,
+   "acceptance": {
+    "passed": true,
+    "final_CPU_receipt": {
+     "sha256": "bb33826f8fd1f5524cbac920c62a75853247c77fbec5c877fc9f00d41282e4da",
+     "bytes": 5650
+    },
+    "cleanup_receipt": {
+     "sha256": "a5e39e29815caef4f0f3bda96e73139ff0e1c6f2467ebc584f1828da09707ac8",
+     "bytes": 705
+    },
+    "lease_still_held": true,
+    "scientific_job": false,
+    "requires_matching_release_receipt": true
+   },
+   "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "joint_global_lease_remains_held_by_batch": true,
+    "quiescence_confirmed": true,
+    "external_controller_PID": 1422952,
+    "monotonic_ns": 281105827624316
+   },
+   "resource_integrity": true,
+   "conformance": true,
+   "passed": true,
+   "whole_group_CPU_ns": 166211827000,
+   "peak_child_RSS_KiB": 1676220,
+   "charged_group_peak_bytes": "2134810624",
+   "window_ns": 180000000000,
+   "time_window_is_observation_only": true,
+   "stdout": {
+    "sha256": "ed11e157a57527f030cbfe634917edbc0aeffd2771afa8600e563976be13e4fd",
+    "bytes": 1543
+   },
+   "stderr": {
+    "sha256": "114581d34a3398da79342f3dea5e02da3846316e24d16315b0d6c03a93fd91ae",
+    "bytes": 1491
+   },
+   "test_counts": [
+    [
+     "17",
+     "0"
+    ]
+   ],
+   "passed_test_names": [
+    "a_rings_symbol_word_is_read_by_the_first_rungs_frames",
+    "a_signed_stiffness_is_not_a_passive_port",
+    "a_wave_must_be_matched_and_the_ring_must_be_the_unpumped_exact_one",
+    "an_aperiodic_wave_and_a_period_over_half_the_window_are_unlocked",
+    "every_coordinate_of_the_port_reflects",
+    "f1_locks_at_seven_on_the_declared_bank",
+    "f3_has_a_lock_without_rotation",
+    "f4_has_a_joint_period_of_twelve",
+    "rest_is_silent_and_a_ring_that_has_not_settled_is_refused",
+    "the_arrival_word_is_the_observed_placement_not_the_mean_rate",
+    "the_dynamic_section_reads_the_replicas_symbol_word_and_arrival_ticks",
+    "the_lattice_port_carries_its_remainders_across_chunks",
+    "the_native_ring_steps_the_replicas_exact_states_and_every_tick_closes",
+    "the_polarity_of_the_wave_is_the_half_turn_of_the_lift",
+    "the_port_on_a_lattice_carries_a_bounded_state_and_every_tick_closes",
+    "the_reader_starts_after_the_ring_has_left_rest",
+    "the_state_carried_across_chunks_is_the_state_of_the_whole_stream"
+   ],
+   "actual_passed_tests": 17,
+   "projection_comparison": {
+    "measured_over_projection_exact_ratio": {
+     "numerator": 13902789983,
+     "denominator": 15000000000
+    },
+    "projection_error": false,
+    "excess_ns": {
+     "integer": 0,
+     "prime_factorization": null
+    },
+    "no_limit_raised": true,
+    "no_process_stopped_for_time": true
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 166833479796,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       26003,
+       1
+      ],
+      [
+       534661,
+       1
+      ]
+     ]
+    },
+    "CPU_ns": {
+     "integer": 166211827000,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       41,
+       1
+      ],
+      [
+       4053947,
+       1
+      ]
+     ]
+    },
+    "RSS_KiB": {
+     "integer": 1676220,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       13,
+       1
+      ],
+      [
+       307,
+       1
+      ]
+     ]
+    },
+    "charged_peak_bytes": {
+     "integer": 2134810624,
+     "prime_factorization": [
+      [
+       2,
+       13
+      ],
+      [
+       347,
+       1
+      ],
+      [
+       751,
+       1
+      ]
+     ]
+    },
+    "observation_ns": {
+     "integer": 180000000000,
+     "prime_factorization": [
+      [
+       2,
+       11
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       5,
+       10
+      ]
+     ]
+    }
+   }
+  },
+  "build_render": {
+   "kind": "build_render",
+   "source_commit": "aaf174102341214d5cdb1cdee5ea84a862cac870",
+   "source_tree": "dd644a63c29f124705e8f2d29520516ea547ebe4",
+   "source_clean_unchanged_after": true,
+   "command_result": {
+    "target": "acoustic-bank-aaf build_render",
+    "exit": 0,
+    "command_wall_ns": 1740307456,
+    "kernel_command_passed": true,
+    "expected_command_exit": true,
+    "diagnostic_lines": [],
+    "whole_stdout_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "whole_stderr_SHA256": "3ee47c507fe77ef69edf6079d7ad48fa7ab7128b3dffb5a4732955e13add0f58",
+    "source_not_edited": true
+   },
+   "controller_exit": 0,
+   "acceptance": {
+    "passed": true,
+    "final_CPU_receipt": {
+     "sha256": "cda5ce85ad9ce90eaa0bbec7917cadbd992543a34b1ee197de35c0b81ac1e669",
+     "bytes": 5731
+    },
+    "cleanup_receipt": {
+     "sha256": "6727ccb67598481cebf64f5c268a2584f7f8ead68147178a09f0fba90eec3baa",
+     "bytes": 711
+    },
+    "lease_still_held": true,
+    "scientific_job": false,
+    "requires_matching_release_receipt": true
+   },
+   "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "joint_global_lease_remains_held_by_batch": true,
+    "quiescence_confirmed": true,
+    "external_controller_PID": 1424683,
+    "monotonic_ns": 281123810496356
+   },
+   "resource_integrity": true,
+   "conformance": true,
+   "passed": true,
+   "whole_group_CPU_ns": 1974284000,
+   "peak_child_RSS_KiB": 696448,
+   "charged_group_peak_bytes": "824754176",
+   "window_ns": 180000000000,
+   "time_window_is_observation_only": true,
+   "stdout": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "stderr": {
+    "sha256": "3ee47c507fe77ef69edf6079d7ad48fa7ab7128b3dffb5a4732955e13add0f58",
+    "bytes": 1226
+   },
+   "test_counts": [],
+   "passed_test_names": [],
+   "actual_passed_tests": 0,
+   "projection_comparison": {
+    "measured_over_projection_exact_ratio": {
+     "numerator": 1699519,
+     "denominator": 175781250
+    },
+    "projection_error": false,
+    "excess_ns": {
+     "integer": 0,
+     "prime_factorization": null
+    },
+    "no_limit_raised": true,
+    "no_process_stopped_for_time": true
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 1740307456,
+     "prime_factorization": [
+      [
+       2,
+       10
+      ],
+      [
+       197,
+       1
+      ],
+      [
+       8627,
+       1
+      ]
+     ]
+    },
+    "CPU_ns": {
+     "integer": 1974284000,
+     "prime_factorization": [
+      [
+       2,
+       5
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       13,
+       1
+      ],
+      [
+       37967,
+       1
+      ]
+     ]
+    },
+    "RSS_KiB": {
+     "integer": 696448,
+     "prime_factorization": [
+      [
+       2,
+       7
+      ],
+      [
+       5441,
+       1
+      ]
+     ]
+    },
+    "charged_peak_bytes": {
+     "integer": 824754176,
+     "prime_factorization": [
+      [
+       2,
+       14
+      ],
+      [
+       71,
+       1
+      ],
+      [
+       709,
+       1
+      ]
+     ]
+    },
+    "observation_ns": {
+     "integer": 180000000000,
+     "prime_factorization": [
+      [
+       2,
+       11
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       5,
+       10
+      ]
+     ]
+    }
+   }
+  },
+  "render": {
+   "kind": "render",
+   "source_commit": "aaf174102341214d5cdb1cdee5ea84a862cac870",
+   "source_tree": "dd644a63c29f124705e8f2d29520516ea547ebe4",
+   "source_clean_unchanged_after": true,
+   "command_result": {
+    "target": "acoustic-bank-aaf render",
+    "exit": 0,
+    "command_wall_ns": 216261174537,
+    "kernel_command_passed": true,
+    "expected_command_exit": true,
+    "diagnostic_lines": [],
+    "whole_stdout_SHA256": "b1540737d2ab107e901e2f4d15db56ca1bfd178a24042192eaed79916fea7fc7",
+    "whole_stderr_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_not_edited": true
+   },
+   "controller_exit": 0,
+   "acceptance": {
+    "passed": true,
+    "final_CPU_receipt": {
+     "sha256": "888aa38c8a4bfdbfe1345c675aac43e142d5e642830fb3d5c0882098f1102c50",
+     "bytes": 5557
+    },
+    "cleanup_receipt": {
+     "sha256": "df2e57e37a599cae51d1f3da829c185517e9ab2584dba99d74e5e46f395df7bf",
+     "bytes": 699
+    },
+    "lease_still_held": true,
+    "scientific_job": false,
+    "requires_matching_release_receipt": true
+   },
+   "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "joint_global_lease_remains_held_by_batch": true,
+    "quiescence_confirmed": true,
+    "external_controller_PID": 1425014,
+    "monotonic_ns": 281360433893852
+   },
+   "resource_integrity": true,
+   "conformance": true,
+   "passed": true,
+   "whole_group_CPU_ns": 2149958316000,
+   "peak_child_RSS_KiB": 210220,
+   "charged_group_peak_bytes": "241410048",
+   "window_ns": 210000000000,
+   "time_window_is_observation_only": true,
+   "stdout": {
+    "sha256": "b1540737d2ab107e901e2f4d15db56ca1bfd178a24042192eaed79916fea7fc7",
+    "bytes": 22568
+   },
+   "stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+   },
+   "test_counts": [],
+   "passed_test_names": [],
+   "actual_passed_tests": 0,
+   "projection_comparison": {
+    "measured_over_projection_exact_ratio": {
+     "numerator": 72087058179,
+     "denominator": 70000000000
+    },
+    "projection_error": true,
+    "excess_ns": {
+     "integer": 6261174537,
+     "prime_factorization": [
+      [
+       3,
+       1
+      ],
+      [
+       239,
+       1
+      ],
+      [
+       8732461,
+       1
+      ]
+     ]
+    },
+    "no_limit_raised": true,
+    "no_process_stopped_for_time": true
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 216261174537,
+     "prime_factorization": [
+      [
+       3,
+       3
+      ],
+      [
+       17,
+       1
+      ],
+      [
+       471157243,
+       1
+      ]
+     ]
+    },
+    "CPU_ns": {
+     "integer": 2149958316000,
+     "prime_factorization": [
+      [
+       2,
+       5
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       11,
+       1
+      ],
+      [
+       101,
+       1
+      ],
+      [
+       161263,
+       1
+      ]
+     ]
+    },
+    "RSS_KiB": {
+     "integer": 210220,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       23,
+       1
+      ],
+      [
+       457,
+       1
+      ]
+     ]
+    },
+    "charged_peak_bytes": {
+     "integer": 241410048,
+     "prime_factorization": [
+      [
+       2,
+       13
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       11,
+       1
+      ],
+      [
+       19,
+       1
+      ],
+      [
+       47,
+       1
+      ]
+     ]
+    },
+    "observation_ns": {
+     "integer": 210000000000,
+     "prime_factorization": [
+      [
+       2,
+       10
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       5,
+       10
+      ],
+      [
+       7,
+       1
+      ]
+     ]
+    }
+   }
+  }
+ },
+ "all_four_native_commands_passed": true,
+ "actual_readout": {
+  "sha256": "f6cffa74e4284892e3101e0ffc61eea36f30ce1b7767698e954d5dd8f099fa44",
+  "bytes": 24571
+ },
+ "scope": "A1-A4 first-rung declared bank response only. No fe4 seated decoder, learned association, generation, fidelity, source reconstruction or hearing claim.",
+ "private_input_hash_only_no_input_copy": {
+  "identity": {
+   "sha256": "e846f8c9b1db13c8fa159b146cb6d797ee1861996d10b1dd3c387289ef5efd46",
+   "bytes": 187438
+  },
+  "retained_input_copy": false,
+  "private_render_not_for_publication": true,
+  "no_hearing_request": true
+ },
+ "private_render_local_only_not_to_publish": true,
+ "worker_evidence_custody": {
+  "release.log": {
+   "sha256": "7e90d7501b8dbff2d645f5e4d153b99af52edbd6b2ec079df5dbfff8494ad6c0",
+   "bytes": 22646,
+   "combined_stdout_stderr_not_separate": true,
+   "bounded_rows": [
+    "BOUNDED start 04:24:35 end 04:28:02 exit 0 wall_ns 207570405132 child_peak_rss_kib 209036"
+   ],
+   "gate_rows": [],
+   "error_rows": [],
+   "release_header": [
+    "release: 93680 recorded ticks + 16000 continuation ticks at 16000 per second, 24 rings on 12 threads",
+    "render: emission peak [2^-1, 2^0); gain 2^0; final remainder [2^-35, 2^-34); 109680 samples written; elapsed 207528 ms"
+   ]
+  },
+  "gate.log": {
+   "sha256": "ec31c71d17537003cb1cba28507ea3e4b808d8ba676d5f050fd331a1a7da2e92",
+   "bytes": 378604,
+   "combined_stdout_stderr_not_separate": true,
+   "bounded_rows": [
+    "BOUNDED start 04:28:34 end 04:29:33 exit 1 wall_ns 59734552042 child_peak_rss_kib 2361192"
+   ],
+   "gate_rows": [
+    "gate check: ok (13940 ms)",
+    "gate guard-lints: FAILED (20682 ms)",
+    "gate guard-doctests: ok (25096 ms)"
+   ],
+   "error_rows": [
+    "error: use of a disallowed method `std::fs::read`",
+    "error: use of a disallowed method `std::fs::write`",
+    "error: could not compile `holonics` (example \"acoustic_release\") due to 2 previous errors"
+   ],
+   "release_header": []
+  },
+  "gate2.log": {
+   "sha256": "af9680d4b4e71ab248734cbabe817c241dda603209543dfbb9e780e2fda9cdd3",
+   "bytes": 377769,
+   "combined_stdout_stderr_not_separate": true
+  },
+  "wave_tests.log": {
+   "sha256": "7e71978d3ce3b2858d4500b960a67a9d6124ed7f7edab7d36f7582688af72493",
+   "bytes": 1987,
+   "combined_stdout_stderr_not_separate": true
+  },
+  "dev_read.log": {
+   "sha256": "c3598ad1dc5f6a44aed27024fc8a53732afebc27d58ac0bee48d68a892a52dbe",
+   "bytes": 7345,
+   "combined_stdout_stderr_not_separate": true
+  }
+ },
+ "joint_admission": {
+  "UTC": "2026-10-10T05:02:54.769828+00:00",
+  "MemAvailable_bytes": 13674647552,
+  "PSI": "some avg10=0.77 avg60=1.48 avg300=1.59 total=1113815334\nfull avg10=0.77 avg60=1.48 avg300=1.59 total=980317613\n",
+  "plan": {
+   "reservation_bytes": 5368709120,
+   "combined_cap_bytes": 8589934592,
+   "metadata_ceiling_bytes": 1073741824,
+   "largest_measured_Rust_charged_bytes": 3008802816,
+   "largest_measured_Rust_RSS_KiB": 3133624,
+   "CPU_budgets": {
+    "rust_compile_test": 1,
+    "render": 12
+   },
+   "render_CPU_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "physical_cores_distinct": true,
+   "projection_basis": {
+    "gate_prior_max_ns": 151877639324,
+    "wave15_prior_ns": 159703421530,
+    "compile_prior_max_ns": 116022238203,
+    "render_developer_ns": 207570405132,
+    "render_derived_bank_ns": 194000000000,
+    "render_derived_pcm_ns": 16000000000
+   },
+   "observation_windows_ns": {
+    "gate": 180000000000,
+    "wave_port": 180000000000,
+    "build_render": 180000000000,
+    "render": 210000000000
+   },
+   "time_windows_observation_only": true,
+   "no_limit_raise": true,
+   "native_command_count": 4,
+   "partition": "One Cargo job, serial compile/test/build against one private target; render uses twelve distinct physical cores. Commands share mutable target and render depends on fresh build, so commands execute serially; common lease released at command boundaries.",
+   "declared_scope": "A1-A4 fixed rational bank response, no learned decoder, generation, fidelity or source reconstruction claim."
+  },
+  "lease": {
+   "device": 55,
+   "inode": 55954599,
+   "controller_PID": 1402470,
+   "fd": 3,
+   "start_ticks": "28071617",
+   "joint_batch": true
+  }
+ },
+ "joint_release": {
+  "released": true,
+  "quiescence_confirmed": true,
+  "device": 55,
+  "inode": 55954599,
+  "UTC": "2026-10-10T05:12:24.589872+00:00"
+ },
+ "metadata_controller_release": {
+  "UTC": "2026-10-10T05:12:50.494671+00:00",
+  "unit": "holonics-acoustic-bank-aaf-controller-20261010-v1.service",
+  "before": {
+   "LoadState": "loaded",
+   "ActiveState": "active",
+   "SubState": "exited",
+   "MainPID": "0",
+   "Result": "success",
+   "ExecMainStatus": "0",
+   "ControlGroup": "",
+   "MemoryCurrent": "[not set]",
+   "MemoryPeak": "394371072",
+   "CPUUsageNSec": "2481555000",
+   "TasksCurrent": "[not set]"
+  },
+  "after": {
+   "LoadState": "not-found",
+   "ActiveState": "inactive",
+   "SubState": "dead",
+   "MainPID": "0",
+   "Result": "success",
+   "ExecMainStatus": "0",
+   "ControlGroup": "",
+   "MemoryCurrent": "[not set]",
+   "MemoryPeak": "[not set]",
+   "CPUUsageNSec": "[not set]",
+   "TasksCurrent": "[not set]"
+  },
+  "stop_exit": 0,
+  "no_active_process_stopped": true,
+  "no_unrelated_unit_touched": true,
+  "all_validator_leases_released": true
+ },
+ "all_validator_leases_released": true,
+ "source_clean_unchanged": true,
+ "no_source_edits_or_publication": true,
+ "no_related_or_unrelated_prior_jobs_repeated": true,
+ "command_boundary_custody": {
+  "common_lease_excludes_native_overlap": true,
+  "boundaries": [
+   {
+    "release": {
+     "event": "command_boundary_lease_release",
+     "UTC": "2026-10-10T05:05:22.486632+00:00",
+     "completed": "gate",
+     "native_command_active": false
+    },
+    "reacquired": {
+     "event": "common_lease_reacquired",
+     "UTC": "2026-10-10T05:05:22.486684+00:00",
+     "native_command_active": false
+    }
+   },
+   {
+    "release": {
+     "event": "command_boundary_lease_release",
+     "UTC": "2026-10-10T05:08:09.973861+00:00",
+     "completed": "wave_port",
+     "native_command_active": false
+    },
+    "reacquired": {
+     "event": "common_lease_reacquired",
+     "UTC": "2026-10-10T05:08:25.467893+00:00",
+     "native_command_active": false
+    }
+   },
+   {
+    "release": {
+     "event": "command_boundary_lease_release",
+     "UTC": "2026-10-10T05:08:27.929952+00:00",
+     "completed": "build_render",
+     "native_command_active": false
+    },
+    "reacquired": {
+     "event": "common_lease_reacquired",
+     "UTC": "2026-10-10T05:08:47.387932+00:00",
+     "native_command_active": false
+    }
+   }
+  ],
+  "developer_interleave_observed_from_actual_host_process_read": true,
+  "developer_flock_PID": 1424991,
+  "developer_queued_command": "cargo build -p holonics --example acoustic_release",
+  "ordinary_coordination_message": "1291dd1790d64f21b0e9d08f02dfb681",
+  "no_active_process_stopped": true,
+  "scope_unchanged": "Exact aaf only; fe4 and near-return not incorporated"
+ },
+ "metadata_measurements_exact": {
+  "charged_peak_bytes": {
+   "integer": 394371072,
+   "prime_factorization": [
+    [
+     2,
+     13
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     1783,
+     1
+    ]
+   ]
+  },
+  "CPU_ns": {
+   "integer": 2481555000,
+   "prime_factorization": [
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     1
+    ],
+    [
+     5,
+     4
+    ],
+    [
+     165437,
+     1
+    ]
+   ]
+  }
+ },
+ "three_declared_guard_lints_passed_strict_D_warnings_not_asserted": true
+}

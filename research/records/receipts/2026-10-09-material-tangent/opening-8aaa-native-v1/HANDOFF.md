@@ -1,0 +1,7 @@
+Exact8aaa0eb38ff12513c6430546cb5755a82e4207fa, treed3dc18814ced7ce4f7fae034f8819347422c44e8. Required source gate57 and current34 World runtime tests (second-fixture cycle trajectory excluded): {'gate': True, 'world': True}. Actual48-coordinate and forward identity acceptance: True.
+
+OPENING_READOUT.json binds all48 distinct rows, gradient=-whole credit and reported ratio=-1, plus the four actual schedule=prospect code/excess readings, to the complete raw stdout and exact source/effective command hashes. Conditional present-opening return only. Full receiving differential/update credit, cycle orbit-shift adjoint and Lean pairing owed; singular storage not exercised. No full trajectory success claim.
+
+Original developer failures, refusals and incomplete runs preserved. The original helper-E0425 failure record is retained; full raw output availability is stated in VALIDATION.json. The original queue World launcher failed before Cargo on its private eight-thread cap. Its trace and gate receipt are preserved; the gate was reused and the future helper capacity bound repaired against the host. The erroneous initial World observation field was lowered before any World start to the derived bound; raw PLAN retained.
+
+All own leases and exited accounting units released. Full stdout/stderr, source/tool/argv hashes, exact wall/CPU/RSS/charged readings and projection comparisons retained. No source edits or publication.

@@ -67,3 +67,52 @@ host prefixes by placeholders. `VALIDATION_SUMMARY.json` drops argv, environment
 identifiers, and omits the readout it duplicates. Originals are pinned in
 [`ORIGINALS.json`](prospect-324f-native-v1/ORIGINALS.json).
 
+
+## The opening's crossing, at `8aaa0eb3` (October 10)
+
+**Accepted pin.** `8aaa0eb38ff12513c6430546cb5755a82e4207fa`, tree
+`d3dc18814ced7ce4f7fae034f8819347422c44e8`: the material branch's follow-up since `324f6138` (the
+schedule prospect, the cycle, the World-port adjoint, the opening crossing and the classified
+blocker). Queue receipt `VALIDATION.json`, SHA-256 `3229c68de2b3042cd0216044e7fad60ffe5df60ff410feed2c38fe5fe7db5364`
+([projection](opening-8aaa-native-v1/)).
+
+**Passed at the queue.**
+- Gate 1, with 57 doctests.
+- The 34 scoped World tests. The second fixture's cycle trajectory is excluded; its developer read
+  reached its deadline, incomplete.
+- All 48 coordinate identities: gradient equals minus the whole credit, the reported ratio is exactly
+  `−1`, and every native part is exactly `0`.
+- The four actual schedule-equals-prospect readings.
+
+**Failures and corrections kept as they happened.**
+- The queue's first World launch failed before Cargo started, on its helper's private eight-thread
+  cap. The helper's capacity was then corrected against the actual host, and the gate receipt was
+  reused.
+- The World observation field was first declared in error and was lowered to its derived bound before
+  any World start. The raw plan is retained.
+- Neither command succeeded on its first launch as declared.
+- Developer side:
+  - The original 30-of-31 regression and its diagnostic are kept.
+  - The PhaseWorse, CovectorScale and NoReach refusals are kept.
+  - The deadline runs (t3, the first loop) are reported incomplete.
+  - The helper E0425 gate failure is kept as a summary only. Its raw output was overwritten when the
+    log name was reused, and no raw diagnostic is claimed
+    ([summary](GATE_FAILED_HELPER.v1.json),
+    [custody statement](opening-8aaa-native-v1/FAILED_HELPER_CUSTODY_LIMITATION.json)).
+- Developer reads stay developer reads.
+
+**Scope.**
+- The conditional present-opening return only, at a locally fixed receiving publication.
+- Owed: the full joint receiving-update credit (`g_s`, `f_r`), the cycle's orbit-shift adjoint and
+  the Lean pairing.
+- Singular storage is not exercised.
+- No full trajectory success and no certified cycle step.
+
+**Projection.** `HANDOFF.md` and `COVERAGE_SCOPE.json` are verbatim.
+`FAILED_HELPER_CUSTODY_LIMITATION.json` replaces its local custody path by `<local custody>`.
+- `VALIDATION_SUMMARY.json` drops argv, environment, paths (every private `.local` path, input or
+  stage) and identifiers, and binds the readout it duplicates and the source pin's file hashes by
+  SHA-256.
+- `OPENING_READOUT.json` keeps every coordinate row's family, entry, native part, ratio and exact
+  identity, and binds the three exact rationals of each row by SHA-256 and bit lengths.
+- The originals are pinned in [`ORIGINALS.json`](opening-8aaa-native-v1/ORIGINALS.json).

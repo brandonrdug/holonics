@@ -1,0 +1,1130 @@
+{
+ "schema": "material_receiving_forward_storage_opening_native_validation_v1",
+ "UTC": "2026-10-10T04:58:51.462103+00:00",
+ "source_pin": {
+  "bound": {
+   "sha256": "4771d48f90136f0c5dfb455635e178863c818d6e89c57c10e4a47c1421698b54",
+   "canonical_bytes": 177
+  },
+  "note": "bound by hash; the readout is OPENING_READOUT.json here, the source pin's file hashes are in the local SOURCE_PIN.json (ORIGINALS.json)"
+ },
+ "source_GO": {
+  "native_GO": true,
+  "source_commit": "8aaa0eb38ff12513c6430546cb5755a82e4207fa",
+  "source_tree": "d3dc18814ced7ce4f7fae034f8819347422c44e8",
+  "status": "Independent source GO from reviewer01a11c9d relayed directly by parent01a11863. Storage opening term, factor pullback/sign, range refusals, enlarged normalization and every intermediate receiving publication checked. Scope present-opening return only.",
+  "compiler_started": false
+ },
+ "per_command_passed": {
+  "gate": true,
+  "world": true
+ },
+ "scoped_native_commands_passed": true,
+ "actual48_identity_and_forward_reading_acceptance": true,
+ "actual_readout": {
+  "bound": {
+   "sha256": "5644b9789cf70f2fa2a2e9c8e05553fd243dfca85006bd9cad310a945352e8b8",
+   "canonical_bytes": 548387
+  },
+  "note": "bound by hash; the readout is OPENING_READOUT.json here, the source pin's file hashes are in the local SOURCE_PIN.json (ORIGINALS.json)"
+ },
+ "stages": [
+  {
+   "kind": "gate",
+   "summary": {
+    "kind": "gate",
+    "source_commit": "8aaa0eb38ff12513c6430546cb5755a82e4207fa",
+    "source_tree": "d3dc18814ced7ce4f7fae034f8819347422c44e8",
+    "source_clean_unchanged_after": true,
+    "command_result": {
+     "target": "material prospect8aaa gate",
+     "exit": 0,
+     "command_wall_ns": 151877639324,
+     "kernel_command_passed": true,
+     "expected_command_exit": true,
+     "diagnostic_lines": [],
+     "whole_stdout_SHA256": "7a6a511be78e9f4d0d9842bea5900b6a913abae4930ac9965882cde6f1b5f775",
+     "whole_stderr_SHA256": "f740aa3370fc671492a3aec1928ca31a2fc49687ef9495e1dc0175cbe2850651",
+     "source_not_edited": true
+    },
+    "controller_exit": 0,
+    "acceptance": {
+     "passed": true,
+     "final_CPU_receipt": {
+      "sha256": "f016bb6a55d639d305712e066a0b5cb1e989254e174b3580c9828606add3dbc3",
+      "bytes": 5617
+     },
+     "cleanup_receipt": {
+      "sha256": "cade371af8d826cc519fc52295ca9f6e7a98abda773fc3d6d4e20f43458bcfdb",
+      "bytes": 703
+     },
+     "lease_still_held": true,
+     "scientific_job": false,
+     "requires_matching_release_receipt": true
+    },
+    "release": {
+     "released_after_final_publication_and_owned_unit_cleanup": true,
+     "joint_global_lease_remains_held_by_batch": true,
+     "quiescence_confirmed": true,
+     "external_controller_PID": 1363380,
+     "monotonic_ns": 279124514764087
+    },
+    "resource_integrity": true,
+    "conformance": true,
+    "passed": true,
+    "whole_group_CPU_ns": 151171461000,
+    "peak_child_RSS_KiB": 1719624,
+    "charged_group_peak_bytes": "2124255232",
+    "window_ns": 180000000000,
+    "time_window_is_observation_only": true,
+    "stdout": {
+     "sha256": "7a6a511be78e9f4d0d9842bea5900b6a913abae4930ac9965882cde6f1b5f775",
+     "bytes": 5987
+    },
+    "stderr": {
+     "sha256": "f740aa3370fc671492a3aec1928ca31a2fc49687ef9495e1dc0175cbe2850651",
+     "bytes": 368148
+    },
+    "test_counts": [
+     [
+      "57",
+      "0"
+     ]
+    ],
+    "passed_test_names": [
+     "crates/holonics/src/compression/keys/repair.rs - compression::keys::repair::DamagedPassage (line 135) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 101) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 112)",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 123)",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 15) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 181)",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 250)",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 28) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 40) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 51) - compile fail",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 65) - compile",
+     "crates/holonics/src/exterior_guards.rs - exterior_guards (line 85) - compile fail",
+     "crates/holonics/src/hnn/constitution.rs - hnn::constitution (line 13) - compile fail",
+     "crates/holonics/src/hnn/constitution.rs - hnn::constitution::Constitution::with_element (line 4558) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1042) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1049) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1057) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1066) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1073) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1080) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1088) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1099)",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 970) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 977) - compile fail",
+     "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 985) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2512) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2519) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2528) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::Field::selective_step (line 1524) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::Field::selective_step (line 1532) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 222) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 230) - compile fail",
+     "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 240)",
+     "crates/holonics/src/hnn/field.rs - hnn::field::RingDeclaration (line 344) - compile fail",
+     "crates/holonics/src/hnn/keys.rs - hnn::keys::locate_keys (line 376) - compile fail",
+     "crates/holonics/src/hnn/keys.rs - hnn::keys::station_pairs (line 459) - compile fail",
+     "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment (line 1301) - compile fail",
+     "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment::ingest (line 1401) - compile fail",
+     "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment::ingest (line 1408) - compile fail",
+     "crates/holonics/src/hnn/pending.rs - hnn::pending (line 29) - compile fail",
+     "crates/holonics/src/hnn/pending.rs - hnn::pending (line 45) - compile fail",
+     "crates/holonics/src/hnn/port.rs - hnn::port (line 52) - compile fail",
+     "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 595) - compile fail",
+     "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 602) - compile fail",
+     "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 609) - compile fail",
+     "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 617) - compile fail",
+     "crates/holonics/src/hnn/prediction.rs - hnn::prediction::CurrentSourceReceivingReturn (line 3227) - compile fail",
+     "crates/holonics/src/hnn/ratio.rs - hnn::ratio::RatioCovector (line 621) - compile fail",
+     "crates/holonics/src/hnn/word.rs - hnn::word (line 89) - compile fail",
+     "crates/holonics/src/hnn/word.rs - hnn::word (line 98) - compile fail",
+     "crates/holonics/src/physics/wave/chain.rs - physics::wave::chain::WaveChain::return_material (line 633) - compile fail",
+     "crates/holonics/src/receiver/population.rs - receiver::population::Emitters (line 629) - compile fail",
+     "crates/holonics/src/receiver/population.rs - receiver::population::Family (line 496) - compile fail",
+     "crates/holonics/src/receiver/population.rs - receiver::population::Family (line 516) - compile fail",
+     "crates/holonics/src/receiver/population/composition.rs - receiver::population::composition::Keystone (line 107) - compile fail",
+     "crates/holonics/src/receiver/population/composition.rs - receiver::population::composition::PortReader (line 197) - compile fail",
+     "crates/holonics/src/receiver/population/dormancy.rs - receiver::population::dormancy::Layered (line 86) - compile fail"
+    ],
+    "actual_passed_tests": 57
+   },
+   "actual_start": {
+    "UTC": "2026-10-10T04:32:36.433690+00:00",
+    "PID": 1363385
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 151877639324,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       773,
+       1
+      ],
+      [
+       49119547,
+       1
+      ]
+     ]
+    },
+    "whole_group_CPU_ns": {
+     "integer": 151171461000,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       3,
+       3
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       29,
+       1
+      ],
+      [
+       27581,
+       1
+      ]
+     ]
+    },
+    "peak_child_RSS_KiB": {
+     "integer": 1719624,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       137,
+       1
+      ],
+      [
+       523,
+       1
+      ]
+     ]
+    },
+    "charged_group_peak_bytes": {
+     "integer": 2124255232,
+     "prime_factorization": [
+      [
+       2,
+       12
+      ],
+      [
+       11,
+       1
+      ],
+      [
+       47147,
+       1
+      ]
+     ]
+    },
+    "wall_over_observation_window": {
+     "numerator": 37969409831,
+     "denominator": 45000000000
+    },
+    "wall_over_projection_basis": {
+     "numerator": 151877639324,
+     "denominator": 166590962221
+    },
+    "projection_basis_ns": {
+     "integer": 166590962221,
+     "prime_factorization": [
+      [
+       601,
+       1
+      ],
+      [
+       277189621,
+       1
+      ]
+     ]
+    },
+    "observation_exceeded": false,
+    "limits_unchanged_during_actual_run": true
+   },
+   "required_gate_reused_after_validation_launcher_failure": true
+  },
+  {
+   "kind": "world",
+   "summary": {
+    "kind": "world",
+    "source_commit": "8aaa0eb38ff12513c6430546cb5755a82e4207fa",
+    "source_tree": "d3dc18814ced7ce4f7fae034f8819347422c44e8",
+    "source_clean_unchanged_after": true,
+    "command_result": {
+     "target": "material prospect8aaa world",
+     "exit": 0,
+     "command_wall_ns": 666043801666,
+     "kernel_command_passed": true,
+     "expected_command_exit": true,
+     "diagnostic_lines": [],
+     "whole_stdout_SHA256": "1e86da8acaa5ade3f79c1d16d615aa5ca10f319ef3f52b5fd680e1fc2fde9fc9",
+     "whole_stderr_SHA256": "407232d575ff0430ac036bf2deac23f8a1676fc46e45bc716cd5a75fba88ba9c",
+     "source_not_edited": true
+    },
+    "controller_exit": 0,
+    "acceptance": {
+     "passed": true,
+     "final_CPU_receipt": {
+      "sha256": "9ba3939c1dd66f405392b00d30ee45257dcab453874a048b44e6d7267e26d458",
+      "bytes": 5702
+     },
+     "cleanup_receipt": {
+      "sha256": "d962a0a41c9aa71aa798f82e4ba3a7c089c7b3940a89efa4547baecd7b650936",
+      "bytes": 705
+     },
+     "lease_still_held": true,
+     "scientific_job": false,
+     "requires_matching_release_receipt": true
+    },
+    "release": {
+     "released_after_final_publication_and_owned_unit_cleanup": true,
+     "joint_global_lease_remains_held_by_batch": true,
+     "quiescence_confirmed": true,
+     "external_controller_PID": 1388452,
+     "monotonic_ns": 280282582733865
+    },
+    "resource_integrity": true,
+    "conformance": true,
+    "passed": true,
+    "whole_group_CPU_ns": 2992889417000,
+    "peak_child_RSS_KiB": 1749636,
+    "charged_group_peak_bytes": "2111897600",
+    "window_ns": 550621667792,
+    "time_window_is_observation_only": true,
+    "stdout": {
+     "sha256": "1e86da8acaa5ade3f79c1d16d615aa5ca10f319ef3f52b5fd680e1fc2fde9fc9",
+     "bytes": 777888
+    },
+    "stderr": {
+     "sha256": "407232d575ff0430ac036bf2deac23f8a1676fc46e45bc716cd5a75fba88ba9c",
+     "bytes": 1506
+    },
+    "test_counts": [
+     [
+      "34",
+      "0"
+     ]
+    ],
+    "passed_test_names": [
+     "a_teaching_encounter_is_refused_until_the_world_is_located",
+     "co_clock_twins_cannot_swap_tangents",
+     "a_world_proposal_refuses_another_encounters_tangents",
+     "the_landed_material_survives_a_cold_restore",
+     "the_landed_material_is_read_without_its_history",
+     "the_encounters_comparison_is_credited_through_the_world",
+     "a_two_observation_proposal_binds_a_chain",
+     "the_prospect_landing_after_one_observation",
+     "the_prospect_is_credited_at_its_consumer",
+     "the_prospect_landed_material_is_read_without_its_history",
+     "the_cycle_blocker_is_classified",
+     "the_receiving_relation_between_encounters",
+     "the_prospect_landing_reads_both_waves",
+     "the_schedule_is_credited_at_its_consumer",
+     "the_passage_over_forty_encounters",
+     "the_schedule_prospect_is_the_actual_schedule",
+     "the_cycle_is_where_the_passage_goes",
+     "the_tangent_continues_into_the_next_encounter",
+     "the_two_observation_credit_is_read_at_its_consumer",
+     "the_world_landing_reads_the_next_encounter",
+     "the_per_encounter_loop_is_read_against_its_twin",
+     "the_per_encounter_loop_is_read_on_a_second_fixture",
+     "the_cycle_landing_is_read_over_the_trajectory",
+     "the_two_observation_landing_reads_both_waves",
+     "the_world_sensitive_tangent_is_the_actual_worlds_derivative",
+     "the_world_return_is_the_tangents_credit",
+     "the_prospect_loop_is_read_on_a_second_fixture",
+     "the_world_loop_is_read_on_a_second_fixture",
+     "the_world_loop_is_read_against_its_twin_over_encounters",
+     "the_prospect_loop_is_read_against_its_twin",
+     "the_cycle_closes_and_is_credited_at_its_consumer",
+     "the_schedule_loop_is_read_against_its_twin",
+     "the_second_passage_over_forty_encounters",
+     "the_schedule_loop_is_read_on_a_second_fixture"
+    ],
+    "actual_passed_tests": 34
+   },
+   "actual_start": {
+    "UTC": "2026-10-10T04:43:20.242881+00:00",
+    "PID": 1388457
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 666043801666,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       333021900833,
+       1
+      ]
+     ]
+    },
+    "whole_group_CPU_ns": {
+     "integer": 2992889417000,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       1279,
+       1
+      ],
+      [
+       334289,
+       1
+      ]
+     ]
+    },
+    "peak_child_RSS_KiB": {
+     "integer": 1749636,
+     "prime_factorization": [
+      [
+       2,
+       2
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       53,
+       1
+      ],
+      [
+       131,
+       1
+      ]
+     ]
+    },
+    "charged_group_peak_bytes": {
+     "integer": 2111897600,
+     "prime_factorization": [
+      [
+       2,
+       16
+      ],
+      [
+       5,
+       2
+      ],
+      [
+       1289,
+       1
+      ]
+     ]
+    },
+    "wall_over_observation_window": {
+     "numerator": 333021900833,
+     "denominator": 275310833896
+    },
+    "wall_over_projection_basis": {
+     "numerator": 333021900833,
+     "denominator": 275310833896
+    },
+    "projection_basis_ns": {
+     "integer": 550621667792,
+     "prime_factorization": [
+      [
+       2,
+       4
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       571,
+       1
+      ],
+      [
+       2437,
+       1
+      ],
+      [
+       3533,
+       1
+      ]
+     ]
+    },
+    "observation_exceeded": true,
+    "limits_unchanged_during_actual_run": true
+   },
+   "required_gate_reused_after_validation_launcher_failure": false
+  }
+ ],
+ "coverage_scope": {
+  "agent_inferred": true,
+  "reason": "The receiving forward join and storage opening adjoint affect the current World closure; run its affected runtime consumers, including the unique identity and classification tests. Developer incomplete second-fixture cycle trajectory remains excluded, not rerun with a larger limit.",
+  "selected": [
+   "the_world_sensitive_tangent_is_the_actual_worlds_derivative",
+   "a_teaching_encounter_is_refused_until_the_world_is_located",
+   "the_encounters_comparison_is_credited_through_the_world",
+   "the_world_landing_reads_the_next_encounter",
+   "the_world_loop_is_read_against_its_twin_over_encounters",
+   "the_landed_material_is_read_without_its_history",
+   "a_world_proposal_refuses_another_encounters_tangents",
+   "the_tangent_continues_into_the_next_encounter",
+   "co_clock_twins_cannot_swap_tangents",
+   "the_world_loop_is_read_on_a_second_fixture",
+   "the_landed_material_survives_a_cold_restore",
+   "a_two_observation_proposal_binds_a_chain",
+   "the_two_observation_credit_is_read_at_its_consumer",
+   "the_two_observation_landing_reads_both_waves",
+   "the_prospect_is_credited_at_its_consumer",
+   "the_prospect_landing_reads_both_waves",
+   "the_prospect_landed_material_is_read_without_its_history",
+   "the_prospect_landing_after_one_observation",
+   "the_prospect_loop_is_read_against_its_twin",
+   "the_prospect_loop_is_read_on_a_second_fixture",
+   "the_per_encounter_loop_is_read_against_its_twin",
+   "the_per_encounter_loop_is_read_on_a_second_fixture",
+   "the_receiving_relation_between_encounters",
+   "the_passage_over_forty_encounters",
+   "the_schedule_prospect_is_the_actual_schedule",
+   "the_schedule_is_credited_at_its_consumer",
+   "the_schedule_loop_is_read_against_its_twin",
+   "the_schedule_loop_is_read_on_a_second_fixture",
+   "the_cycle_closes_and_is_credited_at_its_consumer",
+   "the_cycle_is_where_the_passage_goes",
+   "the_cycle_landing_is_read_over_the_trajectory",
+   "the_world_return_is_the_tangents_credit",
+   "the_second_passage_over_forty_encounters",
+   "the_cycle_blocker_is_classified"
+  ],
+  "skipped": [
+   "the_cycle_landing_is_read_over_a_second_trajectory"
+  ],
+  "current_test_count": 35,
+  "runtime_count": 34,
+  "independence": "Each Rust test owns its fixture/receivers/material, sharing immutable source only; stdout lines interleave, so claim-bearing rows carry unique labels and coordinates.",
+  "identity_acceptance": "Exactly 48 distinct family/row/column rows, gradient = -whole credit and ratio=-1; retain exact credit/native-part rows and bind raw stdout/source/effective argv.",
+  "forward_acceptance": "Four actual=prospect readings over the actual receiving publications: both schedule encounters after two and twelve prior encounters.",
+  "scope": "Present opening return/receiving forward join/storage opening adjoint only.",
+  "full_receiving_differential_owed": true,
+  "receiving_update_credit_owed": true,
+  "cycle_orbit_shift_owed": true,
+  "singular_storage_unexercised": true,
+  "Lean_pairing_owed": true,
+  "no_full_trajectory_success_claim": true
+ },
+ "gate": {
+  "components": [
+   {
+    "name": "check",
+    "result": "ok",
+    "elapsed_ms": {
+     "integer": 51685,
+     "prime_factorization": [
+      [
+       5,
+       1
+      ],
+      [
+       10337,
+       1
+      ]
+     ]
+    }
+   },
+   {
+    "name": "guard-lints",
+    "result": "ok",
+    "elapsed_ms": {
+     "integer": 46130,
+     "prime_factorization": [
+      [
+       2,
+       1
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       7,
+       1
+      ],
+      [
+       659,
+       1
+      ]
+     ]
+    }
+   },
+   {
+    "name": "guard-doctests",
+    "result": "ok",
+    "elapsed_ms": {
+     "integer": 54053,
+     "prime_factorization": [
+      [
+       191,
+       1
+      ],
+      [
+       283,
+       1
+      ]
+     ]
+    }
+   }
+  ],
+  "doctest_count": {
+   "integer": 57,
+   "prime_factorization": [
+    [
+     3,
+     1
+    ],
+    [
+     19,
+     1
+    ]
+   ]
+  },
+  "guard_lints": [
+   "clippy::disallowed_types",
+   "clippy::disallowed_methods",
+   "clippy::float_arithmetic"
+  ],
+  "strict_D_warnings_not_run_and_prior_failure_not_waived": true
+ },
+ "actual_runtime_plan": {
+  "reservation_bytes": 5368709120,
+  "combined_cap_bytes": 8589934592,
+  "metadata_ceiling_bytes": 1073741824,
+  "largest_measured_Rust_charged_bytes": 3008802816,
+  "largest_measured_Rust_RSS_KiB": 3133624,
+  "CPU_budgets": {
+   "gate": 1,
+   "world": 12
+  },
+  "partition": "One Cargo job. Gate CPU0; World test threads12 on CPU0..11, disjoint owned fixtures/receivers/material. Two commands share only this isolated target; common lease released at boundary.",
+  "projection_basis": {
+   "gate_upper_prior_wall_ns": 166590962221,
+   "full33_developer_upper_wall_ns": 408234717935,
+   "classification_developer_wall_ns": 26364711654,
+   "compiler_upper_prior_wall_ns": 116022238203,
+   "current_World_count": 34,
+   "developer_CPU_affinity_not_recorded": true,
+   "World_upper_ns": 550621667792,
+   "total_declared_upper_ns": 730621667792
+  },
+  "per_command_observation_ns": {
+   "gate": 180000000000,
+   "world": 550621667792
+  },
+  "time_windows_observation_only": true,
+  "source_review_required_before_compiler": true,
+  "native_command_count": 1,
+  "no_process_killing": true,
+  "no_limit_raise_on_same_workload": true,
+  "recorded_failure_guards": [
+   "Missing return term: inspect all48 coordinates rather than old32 nonstorage rows.",
+   "Uncertified deposition: no cycle/orbit-shift or full receiving differential certification.",
+   "A refusal answered by a larger limit: excluded second-fixture trajectory is not rerun.",
+   "Passing measurements counted as a product: verify actual identities and retain refusals."
+  ],
+  "required_gate_reused": {
+   "identity": {
+    "sha256": "d2c89e6c11a6065c197c544b721388f0219ea6cef58fe744130a4aa5beee1268",
+    "bytes": 8080
+   },
+   "same_exact_source": true,
+   "passed": true
+  },
+  "helper_capacity_repair": "The prior helper hardcoded maximum8. Future helper bounds thread count by actual OS affinity capacity; declared12 preserved, actual CPUs0..11. Native/memory/time policies unchanged."
+ },
+ "original_preparation_PLAN": {
+  "reservation_bytes": 5368709120,
+  "combined_cap_bytes": 8589934592,
+  "metadata_ceiling_bytes": 1073741824,
+  "largest_measured_Rust_charged_bytes": 3008802816,
+  "largest_measured_Rust_RSS_KiB": 3133624,
+  "CPU_budgets": {
+   "gate": 1,
+   "world": 12
+  },
+  "partition": "One Cargo job. Gate CPU0; World test threads12 on CPU0..11, disjoint owned fixtures/receivers/material. Two commands share only this isolated target; common lease released at boundary.",
+  "projection_basis": {
+   "gate_upper_prior_wall_ns": 166590962221,
+   "full33_developer_upper_wall_ns": 408234717935,
+   "classification_developer_wall_ns": 26364711654,
+   "compiler_upper_prior_wall_ns": 116022238203,
+   "current_World_count": 34,
+   "developer_CPU_affinity_not_recorded": true,
+   "World_upper_ns": 550621667792,
+   "total_declared_upper_ns": 730621667792
+  },
+  "per_command_observation_ns": {
+   "gate": 180000000000,
+   "world": 3450621667792
+  },
+  "time_windows_observation_only": true,
+  "source_review_required_before_compiler": true,
+  "native_command_count": 2,
+  "no_process_killing": true,
+  "no_limit_raise_on_same_workload": true,
+  "recorded_failure_guards": [
+   "Missing return term: inspect all48 coordinates rather than old32 nonstorage rows.",
+   "Uncertified deposition: no cycle/orbit-shift or full receiving differential certification.",
+   "A refusal answered by a larger limit: excluded second-fixture trajectory is not rerun.",
+   "Passing measurements counted as a product: verify actual identities and retain refusals."
+  ]
+ },
+ "prelaunch_clock_field_correction": {
+  "UTC": "2026-10-10T04:33:26.799450+00:00",
+  "reason": "Preparation generator replaced the numeric prefix world:5 while replacing a test count; it changed the World observation field to 3450621667792. Detected in prelaunch config read. Root was already launched; only the future unstarted/unsealed World config corrected, before launcher/Popen. In-flight gate and sealed PLAN/JOBS/helpers untouched.",
+  "future_World_not_launched": true,
+  "World_config_before_sha256": "49a36a67c40bdbb3af7e1f012f797b2a9ab6c7b36cda4fa0d55c52ea7fa4158c",
+  "World_config_after_sha256": "45f4f07cab9d1cbe4317ae2e6eb1e7a8866477bdd701e34309b982ff1588b5aa",
+  "before_observation_ns": 3450621667792,
+  "actual_corrected_observation_ns": 550621667792,
+  "authorized_derivation_ns": [
+   408234717935,
+   26364711654,
+   116022238203
+  ],
+  "lowered_before_first_World_launch": true,
+  "raw_preparation_PLAN_preserved": true,
+  "no_limit_raise": true,
+  "no_source_edits": true,
+  "no_process_stopped": true
+ },
+ "original_preparation_not_silently_rewritten": true,
+ "helper_capacity_repair": {
+  "patches": [
+   {
+    "file": "final_stage_memory_v186.py",
+    "before": {
+     "sha256": "cab1553d06b141ae625da2bf498a415541755b8e7cec7a3b1bd3d48e5426c5dc",
+     "bytes": 10990
+    },
+    "after": {
+     "sha256": "835398b19d7f821ffda808c6e881bf33304fe70e8530f348da6c308779838a02",
+     "bytes": 11017
+    },
+    "change": "Fixed hardcoded8 thread maximum replaced with actual OS affinity capacity; declared CPU/thread/memory/time values unchanged."
+   },
+   {
+    "file": "leased_stage_memory_v186.py",
+    "before": {
+     "sha256": "eb411818011964c4a96d6c9618604e9c55829eb054bf1a409ffc5d4587ca16c0",
+     "bytes": 5580
+    },
+    "after": {
+     "sha256": "5d0d26b70855bcf31f818874f144c392da7f4c559c66052f6d388ef52dbf8a9f",
+     "bytes": 5607
+    },
+    "change": "Fixed hardcoded8 thread maximum replaced with actual OS affinity capacity; declared CPU/thread/memory/time values unchanged."
+   },
+   {
+    "file": "bounded_stage_memory_v186.py",
+    "before": {
+     "sha256": "8f84d21d43bdbd83e4c86c1132cfad2142f4f0209a95015caf94e7fb40e06a34",
+     "bytes": 16827
+    },
+    "after": {
+     "sha256": "92b49bc027855369ea2e08c165111a51819d30e4d555076cdfa1088b6e2540ec",
+     "bytes": 16854
+    },
+    "change": "Fixed hardcoded8 thread maximum replaced with actual OS affinity capacity; declared CPU/thread/memory/time values unchanged."
+   }
+  ],
+  "actual_host_CPU_capacity_checked_at_lease_admission": true,
+  "declared_CPU_budget": 12,
+  "declared_affinity": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11
+  ],
+  "no_HNN_source_edits": true,
+  "no_limit_raise": true,
+  "World_was_not_started_on_predecessor": true
+ },
+ "predecessor_launcher_failure": {
+  "before_Cargo": true,
+  "World_never_started": true,
+  "original_full_trace": {
+   "sha256": "4905f80cb206aead0e071d4eb19f069fcf797ea40fbf1e956779f57009e47d1f",
+   "bytes": 420
+  },
+  "passed_gate_not_rerun": true,
+  "predecessor_controller_release": {
+   "UTC": "2026-10-10T04:37:39.985037+00:00",
+   "unit": "holonics-material-opening-8aaa-controller-20261010-v1.service",
+   "before": {
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "MainPID": "0",
+    "Result": "exit-code",
+    "ExecMainStatus": "1",
+    "MemoryPeak": "48791552",
+    "CPUUsageNSec": "1552448000"
+   },
+   "native_units": "",
+   "native_World_never_started": true,
+   "controller_exited_and_kernel_closed_its_lease_fd": true,
+   "all_validator_leases_released": true,
+   "no_active_process_stopped": true,
+   "failure": "Legacy helper rejects12 declared threads before Cargo.",
+   "after_stop_mainPID": "0"
+  }
+ },
+ "developer_original_evidence": {
+  "full5_complete_raw_hash_matches_report": true,
+  "full5": {
+   "sha256": "c6c64865a7834c698989d37cd63730ab121969e141fe0c97956355b9237a6c6e",
+   "bytes": 777772
+  },
+  "historical_raw_logs": {
+   "full1.log": {
+    "identity": {
+     "sha256": "e58cb0f431902167906cdf56f4d53e3bf4401b899919a9799d174b3668353f51",
+     "bytes": 675076
+    },
+    "stream_scope": "Original combined worker log, including any compiler/bounded-helper messages; not separate queue stdout/stderr.",
+    "terminal_lines": [
+     "thread 'the_schedule_loop_is_read_against_its_twin' (1288316) panicked at crates/holonics/tests/material_tangent_world.rs:2621:18:",
+     "test result: FAILED. 30 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 377.90s",
+     "BOUNDED start 03:09:34 end 03:15:52 exit 101 wall_ns 377987199462 child_peak_rss_kib 114136"
+    ],
+    "historical_only": true
+   },
+   "full2.log": {
+    "identity": {
+     "sha256": "0571de988c3f20795f451bf7d9ec70e6bf8fe275bd6bd1c7b60ef8f70c5bcb08",
+     "bytes": 47505
+    },
+    "stream_scope": "Original combined worker log, including any compiler/bounded-helper messages; not separate queue stdout/stderr.",
+    "terminal_lines": [
+     "BOUNDED start 03:16:21 end 03:16:21 exit 0 wall_ns 896766278 child_peak_rss_kib 770536",
+     "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 31 filtered out; finished in 158.96s",
+     "BOUNDED start 03:16:21 end 03:19:00 exit 0 wall_ns 159004463265 child_peak_rss_kib 31456"
+    ],
+    "historical_only": true
+   },
+   "full3.log": {
+    "identity": {
+     "sha256": "2ea555638a1020c4ff5a2e35f4193d6588263cb9ea491b20fe1eaccd1609412d",
+     "bytes": 809642
+    },
+    "stream_scope": "Original combined worker log, including any compiler/bounded-helper messages; not separate queue stdout/stderr.",
+    "terminal_lines": [
+     "BOUNDED start 03:50:00 end 03:50:00 exit 0 wall_ns 100690674 child_peak_rss_kib 28456",
+     "test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 402.31s",
+     "BOUNDED start 03:50:00 end 03:56:42 exit 0 wall_ns 402376783586 child_peak_rss_kib 123688"
+    ],
+    "historical_only": true
+   },
+   "full4.log": {
+    "identity": {
+     "sha256": "bda6c20914c783ab482de08ff4ae300ee8f16f5765d9efb1efdbd1967048c87c",
+     "bytes": 748397
+    },
+    "stream_scope": "Original combined worker log, including any compiler/bounded-helper messages; not separate queue stdout/stderr.",
+    "terminal_lines": [],
+    "historical_only": true
+   },
+   "full5.log": {
+    "identity": {
+     "sha256": "c6c64865a7834c698989d37cd63730ab121969e141fe0c97956355b9237a6c6e",
+     "bytes": 777772
+    },
+    "stream_scope": "Original combined worker log, including any compiler/bounded-helper messages; not separate queue stdout/stderr.",
+    "terminal_lines": [
+     "BOUNDED start 04:06:53 end 04:07:03 exit 0 wall_ns 9759484455 child_peak_rss_kib 2096168",
+     "test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 408.13s",
+     "BOUNDED start 04:07:03 end 04:13:51 exit 0 wall_ns 408234717935 child_peak_rss_kib 126020"
+    ],
+    "historical_only": true
+   },
+   "t3.log": {
+    "identity": {
+     "sha256": "6274bdb2e2a03301e33b5150b5a3307b8ce663c523b23dce50151921df537a4f",
+     "bytes": 237298
+    },
+    "stream_scope": "Original combined worker log, including any compiler/bounded-helper messages; not separate queue stdout/stderr.",
+    "terminal_lines": [
+     "BOUNDED start 03:27:00 end 03:27:01 exit 0 wall_ns 906169537 child_peak_rss_kib 774756",
+     "BOUNDED start 03:27:01 end 03:32:01 exit 124 wall_ns 300018545444 child_peak_rss_kib 28628"
+    ],
+    "historical_only": true
+   },
+   "t4.log": {
+    "identity": {
+     "sha256": "7646eeb233ead7debbbe1144a8a5d43ce50717d6855ae2352660723f077212f7",
+     "bytes": 111359
+    },
+    "stream_scope": "Original combined worker log, including any compiler/bounded-helper messages; not separate queue stdout/stderr.",
+    "terminal_lines": [
+     "BOUNDED start 03:33:10 end 03:33:17 exit 0 wall_ns 7688215197 child_peak_rss_kib 2050848",
+     "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 32 filtered out; finished in 142.66s",
+     "BOUNDED start 03:33:17 end 03:35:40 exit 0 wall_ns 142751998446 child_peak_rss_kib 32272"
+    ],
+    "historical_only": true
+   },
+   "storage_identity.log": {
+    "identity": {
+     "sha256": "3e72c70935274e720cae3bf3f6c4c5f7d5faac2136a0fd78a5b385879c0fff4d",
+     "bytes": 195045
+    },
+    "stream_scope": "Original combined worker log, including any compiler/bounded-helper messages; not separate queue stdout/stderr.",
+    "terminal_lines": [
+     "BOUNDED start 03:57:06 end 03:57:14 exit 0 wall_ns 8612109900 child_peak_rss_kib 1814996",
+     "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 33 filtered out; finished in 19.48s",
+     "BOUNDED start 03:57:14 end 03:57:34 exit 0 wall_ns 19560646399 child_peak_rss_kib 28412"
+    ],
+    "historical_only": true
+   },
+   "classify.log": {
+    "identity": {
+     "sha256": "8e9a5e93c81e9b1de1ca4bc238a365050262d9024338351b00dc74758c0f4185",
+     "bytes": 1214
+    },
+    "stream_scope": "Original combined worker log, including any compiler/bounded-helper messages; not separate queue stdout/stderr.",
+    "terminal_lines": [
+     "BOUNDED start 04:15:17 end 04:15:39 exit 0 wall_ns 22243149628 child_peak_rss_kib 2214036",
+     "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 34 filtered out; finished in 26.28s",
+     "BOUNDED start 04:15:39 end 04:16:05 exit 0 wall_ns 26364711654 child_peak_rss_kib 28744"
+    ],
+    "historical_only": true
+   },
+   "gate5.log": {
+    "identity": {
+     "sha256": "ef73612cf8be9e7caf79ce710808ccdd1cd213e13f718ba507de1e2b8bb5ebe1",
+     "bytes": 373780
+    },
+    "stream_scope": "Original combined worker log, including any compiler/bounded-helper messages; not separate queue stdout/stderr.",
+    "terminal_lines": [
+     "test result: ok. 57 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s",
+     "BOUNDED start 04:16:05 end 04:16:41 exit 0 wall_ns 36201602251 child_peak_rss_kib 1898928"
+    ],
+    "historical_only": true
+   }
+  },
+  "helper_compilation_failure": {
+   "scope": "Local developer gate 1 by opus under the common lease, not claim-bearing, on the worktree with the_cycle_blocker_is_classified first written. FAILED, retained as measured: the test helper `enclosure` used a named format argument inside a positional expression (error E0425 `k` not in scope), so the workspace check and the guard lints could not compile the test target; the guard doctests passed.",
+   "stages": [
+    "gate check: FAILED (4441 ms)",
+    "gate guard-lints: FAILED (20058 ms)",
+    "gate guard-doctests: ok (23289 ms)"
+   ],
+   "wall_ns": 47801576222,
+   "deadline_s": 300,
+   "child_peak_rss_kib": 2355172,
+   "exit": 1,
+   "repair": "the helper binds k before formatting; cargo check -p holonics --tests then exit 0 (wall_ns 4105177429)"
+  },
+  "helper_compilation_failure_not_erased": true,
+  "helper_full_raw_logs_found": [],
+  "helper_full_raw_output_unavailable_here": true,
+  "helper_raw_loss_worker_confirmation": {
+   "original_helper_E0425_full_raw_output_lost": true,
+   "reason": "Worker reused gate5.log and classify.log names; reruns overwrote originals.",
+   "surviving_original_failure_record": "<local custody>",
+   "worker_confirmation_sha256": "93a4039ecb9fb00a038e2610d8af6d6036a098c2f36afaa60e2317a7fafa1f05",
+   "no_protected_session_recovery_attempted": true,
+   "current_queue_full_raw_output_captured_separately": true
+  },
+  "helper_raw_loss_message": {
+   "sha256": "93a4039ecb9fb00a038e2610d8af6d6036a098c2f36afaa60e2317a7fafa1f05",
+   "bytes": 1133
+  },
+  "contemporaneous_historical_source_trees_not_independently_pinned": true,
+  "full4_hand_stopped_before_completion_not_a_pass": true,
+  "t3_deadline_incomplete_not_a_pass": true,
+  "t4_actual_success_preserved": true,
+  "historical_failures_do_not_become_current_source_results": true
+ },
+ "joint_admission": {
+  "UTC": "2026-10-10T04:43:19.802114+00:00",
+  "MemAvailable_bytes": 13866074112,
+  "PSI": "some avg10=0.73 avg60=1.29 avg300=0.89 total=1097604954\nfull avg10=0.73 avg60=1.29 avg300=0.89 total=964139683\n",
+  "plan": {
+   "reservation_bytes": 5368709120,
+   "combined_cap_bytes": 8589934592,
+   "metadata_ceiling_bytes": 1073741824,
+   "largest_measured_Rust_charged_bytes": 3008802816,
+   "largest_measured_Rust_RSS_KiB": 3133624,
+   "CPU_budgets": {
+    "gate": 1,
+    "world": 12
+   },
+   "partition": "One Cargo job. Gate CPU0; World test threads12 on CPU0..11, disjoint owned fixtures/receivers/material. Two commands share only this isolated target; common lease released at boundary.",
+   "projection_basis": {
+    "gate_upper_prior_wall_ns": 166590962221,
+    "full33_developer_upper_wall_ns": 408234717935,
+    "classification_developer_wall_ns": 26364711654,
+    "compiler_upper_prior_wall_ns": 116022238203,
+    "current_World_count": 34,
+    "developer_CPU_affinity_not_recorded": true,
+    "World_upper_ns": 550621667792,
+    "total_declared_upper_ns": 730621667792
+   },
+   "per_command_observation_ns": {
+    "gate": 180000000000,
+    "world": 550621667792
+   },
+   "time_windows_observation_only": true,
+   "source_review_required_before_compiler": true,
+   "native_command_count": 1,
+   "no_process_killing": true,
+   "no_limit_raise_on_same_workload": true,
+   "recorded_failure_guards": [
+    "Missing return term: inspect all48 coordinates rather than old32 nonstorage rows.",
+    "Uncertified deposition: no cycle/orbit-shift or full receiving differential certification.",
+    "A refusal answered by a larger limit: excluded second-fixture trajectory is not rerun.",
+    "Passing measurements counted as a product: verify actual identities and retain refusals."
+   ],
+   "required_gate_reused": {
+    "identity": {
+     "sha256": "d2c89e6c11a6065c197c544b721388f0219ea6cef58fe744130a4aa5beee1268",
+     "bytes": 8080
+    },
+    "same_exact_source": true,
+    "passed": true
+   },
+   "helper_capacity_repair": "The prior helper hardcoded maximum8. Future helper bounds thread count by actual OS affinity capacity; declared12 preserved, actual CPUs0..11. Native/memory/time policies unchanged."
+  },
+  "lease": {
+   "device": 55,
+   "inode": 55954599,
+   "controller_PID": 1386069,
+   "fd": 3,
+   "start_ticks": "27932607",
+   "joint_batch": true
+  }
+ },
+ "joint_release": {
+  "released": true,
+  "quiescence_confirmed": true,
+  "device": 55,
+  "inode": 55954599,
+  "UTC": "2026-10-10T04:54:26.732981+00:00"
+ },
+ "metadata_measurements_exact": {
+  "charged_peak_bytes": {
+   "integer": 108118016,
+   "prime_factorization": [
+    [
+     2,
+     14
+    ],
+    [
+     6599,
+     1
+    ]
+   ]
+  },
+  "CPU_ns": {
+   "integer": 653759000,
+   "prime_factorization": [
+    [
+     2,
+     3
+    ],
+    [
+     5,
+     3
+    ],
+    [
+     31,
+     1
+    ],
+    [
+     21089,
+     1
+    ]
+   ]
+  },
+  "cap_limited_peak": false
+ },
+ "metadata_controller_release": {
+  "UTC": "2026-10-10T04:58:51.100273+00:00",
+  "unit": "holonics-material-opening-8aaa-controller-20261010-v2.service",
+  "stop_exit": 0,
+  "before": {
+   "LoadState": "loaded",
+   "ActiveState": "active",
+   "SubState": "exited",
+   "MainPID": "0",
+   "Result": "success",
+   "ExecMainStatus": "0",
+   "ControlGroup": "",
+   "MemoryCurrent": "[not set]",
+   "MemoryPeak": "108118016",
+   "CPUUsageNSec": "653759000",
+   "TasksCurrent": "[not set]"
+  },
+  "after": {
+   "LoadState": "not-found",
+   "ActiveState": "inactive",
+   "SubState": "dead",
+   "MainPID": "0",
+   "Result": "success",
+   "ExecMainStatus": "0",
+   "ControlGroup": "",
+   "MemoryCurrent": "[not set]",
+   "MemoryPeak": "[not set]",
+   "CPUUsageNSec": "[not set]",
+   "TasksCurrent": "[not set]"
+  },
+  "no_active_process_stopped": true,
+  "no_unrelated_unit_touched": true,
+  "all_validator_leases_released": true
+ },
+ "all_validator_leases_released": true,
+ "source_unchanged": true,
+ "no_source_edits": true,
+ "no_publication": true,
+ "scope": "Receiving forward join and present-opening storage adjoint. 48 coordinates at contact0 after12 encounters on fixture1 and four actual schedule code/excess identities. Full receiving differential/update credit, cycle orbit-shift adjoint and Lean opening pairing owed; singular storage unexercised. Second-fixture cycle trajectory excluded; no full trajectory success claim."
+}

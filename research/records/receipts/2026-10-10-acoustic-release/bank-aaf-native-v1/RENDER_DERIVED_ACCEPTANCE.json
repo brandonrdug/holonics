@@ -1,0 +1,29 @@
+{
+  "epistemic_grade": "derived from independently reviewed exact source; dynamic fixtures and actual render separately bound in ACOUSTIC_READOUT",
+  "gain_ceiling_exact": "1 - 2^-14",
+  "PCM_unit_exact": "2^-15",
+  "PCM_remainder_bound_exact": "2^-16",
+  "render_equation": "q_n*2^-15 + r_n = g*sum_b(e_b,n) + r_(n-1)",
+  "sample_fit_derivation": "|q_n*2^-15| <= g*peak + |r_(n-1)| + |r_n| <= 1 - 2^-14 + 2^-15 = 1 - 2^-15, hence |q_n| <= 32767",
+  "chunk_equation": "For one shared g and continued ring/PCM state, consecutive applications of the same deterministic tick are unchanged by grouping; different gains or cleared state are outside this claim.",
+  "source_reconstruction_claim": false,
+  "whole_window_equation": "sum_n(q_n*2^-15) + r_T = g*sum_n,b(e_b,n) + r_0; this accounts for render quantization only.",
+  "bindings": {
+    "crates/holonics/examples/acoustic_release.rs": {
+      "sha256": "6fe022bb206c245e62eb01b4d60c609945cf6573971fbd92b4e9f565bdeddc95",
+      "bytes": 12064
+    },
+    "crates/holonics/src/hnn/chart.rs": {
+      "sha256": "c2619c3fa102bc5e1349779687d0c197e69251414536ca403da3b4e424446bdf",
+      "bytes": 41658
+    },
+    "crates/holonics/src/hnn/wave.rs": {
+      "sha256": "0e26488dbc212a44eb60487f1c41a2b474479de5fcabee705cde7e813b138efc",
+      "bytes": 22652
+    },
+    "crates/holonics/tests/acoustic_wave_port.rs": {
+      "sha256": "5399faa7334e2a2d30b177dc39c24eb1d3c6120e3078dcfe8104f251af5b0743",
+      "bytes": 44066
+    }
+  }
+}
