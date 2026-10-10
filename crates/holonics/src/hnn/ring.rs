@@ -1699,9 +1699,10 @@ impl ResonatorOperands {
     /// one tick is refused.
     ///
     /// The carry contract is checked before anything is read (Codex's source review): each
-    /// remainder set is either empty (all zero) or has the ring's width in all three parts, and on
-    /// `lattice` every remainder is at most half its unit and every state entry lies on it; under the
-    /// exact law (`None`) every remainder is zero. Refused, typed, for a nonlinear ring and for a
+    /// remainder set is either empty (all zero) or has the ring's width in all three parts. Under the
+    /// exact law (`None`) every remainder is zero. On `lattice` every remainder lies in the half-open
+    /// `[−δ/2, δ/2)` of ties-upward rounding, every state entry lies on the lattice, and the recovered
+    /// rate lies on it as the forward's carried rate does. Refused, typed, for a nonlinear ring and for a
     /// **charted** solve: with a charted forward `z = X q` the drive error would be `(M X − I) q / h`,
     /// so the exact inverse does not apply to it.
     pub fn inverse_step(
@@ -1745,17 +1746,19 @@ impl ResonatorOperands {
                     found: r.rate.len(),
                 });
             }
+            // The error feedback rounds to the nearest lattice point with ties upward, so its remainder
+            // lies in the half-open `[−δ/2, δ/2)` (Codex's review: `+δ/2` is never left by the forward).
             let lawful = match lattice {
                 None => r.all().all(Zero::is_zero),
                 Some(lattice) => {
                     let half = lattice.unit() / integer(2);
-                    r.all().all(|x| x.abs() <= half)
+                    r.all().all(|x| -&half <= *x && *x < half)
                 }
             };
             if !lawful {
                 return Err(HnnError::Resonator {
                     ring: self.ring,
-                    what: "a remainder read backwards breaks the carry contract (zero under the exact law, at most half a unit on a lattice)",
+                    what: "a remainder read backwards breaks the carry contract (zero under the exact law, in [−δ/2, δ/2) on a lattice)",
                 });
             }
             Ok(r.clone())
@@ -1777,6 +1780,16 @@ impl ResonatorOperands {
         let rate: Vec<Rat> = (0..n)
             .map(|i| (&after[1][i] + &new.state[1][i] - &old.state[1][i] + &w[i]) * &half)
             .collect();
+        // The forward carried rate is a lattice point; a recovered rate off the lattice is no tick's
+        // (Codex's review: carries δ/8 and δ/4 recover ω = δ/8 and pass the displacement identity).
+        if let Some(lattice) = lattice
+            && !rate.iter().all(|x| lattice.contains(x))
+        {
+            return Err(HnnError::Resonator {
+                ring: self.ring,
+                what: "the rate recovered backwards lies on the lattice, as every carried rate does",
+            });
+        }
         for i in 0..n {
             if &after[0][i] + &new.state[0][i] != &u[i] + h * &rate[i] + &old.state[0][i] {
                 return Err(HnnError::Resonator {

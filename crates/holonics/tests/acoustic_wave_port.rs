@@ -1373,3 +1373,43 @@ fn the_inverse_refuses_a_charted_solve_and_an_unlawful_carry() {
         Err(HnnError::Resonator { .. })
     ));
 }
+
+/// **The canonical carry and the lattice rate** (Codex's source review of `4439785b`): ties-upward
+/// rounding leaves remainders in the half-open `[−δ/2, δ/2)`, so a new rate carry of `+δ/2` is
+/// refused; and the reviewer's witness, zero states and old carries with new displacement carry
+/// `δ/8`, velocity carry `δ/4` and rate carry `0`, recovers `ω = δ/8`, which passes the displacement
+/// identity but lies off the lattice, so it is refused.
+#[test]
+fn the_inverse_admits_only_the_canonical_carry_and_a_lattice_rate() {
+    use holonics::hnn::constitution::Lattice;
+    use holonics::hnn::ring::ResonatorRemainders;
+    let lattice = Lattice::new(32);
+    let delta = lattice.unit();
+    let operands = declared_ring(&integer(1));
+    let rest = [vec![Rat::zero(); 2], vec![Rat::zero(); 2]];
+    let zero = || vec![Rat::zero(); 2];
+    let none = ResonatorRemainders::default();
+    let half_up = ResonatorRemainders {
+        rate: vec![&delta / integer(2), Rat::zero()],
+        state: [zero(), zero()],
+    };
+    assert!(matches!(
+        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &half_up, Some(&lattice)),
+        Err(HnnError::Resonator { .. })
+    ));
+    let half_down = ResonatorRemainders {
+        rate: vec![-(&delta / integer(2)), Rat::zero()],
+        state: [zero(), zero()],
+    };
+    // −δ/2 is canonical; this pair is then read (or refused on another ground, never on the carry).
+    let read = operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &half_down, Some(&lattice));
+    assert!(!matches!(&read, Err(HnnError::Resonator { what, .. }) if what.contains("carry contract")));
+    let witness = ResonatorRemainders {
+        rate: zero(),
+        state: [vec![&delta / integer(8), Rat::zero()], vec![&delta / integer(4), Rat::zero()]],
+    };
+    assert!(matches!(
+        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &witness, Some(&lattice)),
+        Err(HnnError::Resonator { what, .. }) if what.contains("recovered backwards lies on the lattice")
+    ));
+}
