@@ -1,0 +1,49 @@
+{
+  "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: bank record section 28a, and section 28 F1 corrected to whole ingestion.",
+  "runs": [
+    {
+      "scope": "first run: FAILED, my R1 adapter took a carry-out stop for entry; the port then refused the next run, the aeon awaiting close_aeon",
+      "log_sha256": "91a2eeec370f5bf5934af87fda3473b0d8ea26d75f2abfade6b082a977c17a6f",
+      "deadline_s": 240,
+      "lines": [
+        "test a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_departures_the_residual ... §28a: τ 7, support [1, -2], departures [60, 61, 62, 63, 68, 75], runs [0..60, 64..68, 69..75, 76..120]; tally FrameTally { narrow: 0, empty: 20, plural: 0, open: 0, one: 18 }",
+        "thread 'a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_departures_the_residual' (1606403) panicked at crates/holonics/tests/acoustic_encoding.rs:1033:37:",
+        "R1 frame [6, 5]: the run 64..68 is refused: the joint clock carried out; the aeon awaits close_aeon before any further cell",
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 1.83s",
+        "BOUNDED start 07:41:35 end 07:41:59 exit 101 wall_ns 24709532933 child_peak_rss_kib 2153284"
+      ]
+    },
+    {
+      "scope": "second run (after an E0599 compile failure from my import edit, not run): every passage ingested whole across aeon closes; acoustic_encoding 9 of 9",
+      "log_sha256": "cfd6f0f01e791ad9a2ad457e60b30538e36c3887037936cb55a2cf4322d6ab76",
+      "deadline_s": 240,
+      "lines": [
+        "test a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_departures_the_residual ... §28a: τ 7, support [1, -2], departures [60, 61, 62, 63, 68, 75], runs [0..60, 64..68, 69..75, 76..120]; tally FrameTally { narrow: 0, empty: 20, plural: 0, open: 0, one: 18 }",
+        "  R3 frame [7, 2] (index 22): emission 96 bits after a 28-bit header (start, frame, dictionary and departures 64; the runs' located code 32), against near-return 75 and spelled 362",
+        "  R2 frame [7, 8] (index 27): pair (δ 7, map [(0, 0), (1, 1)]), surviving [7]",
+        "  R2 frame [7, 9] (index 28): pair (δ 7, map [(0, 0), (1, 1)]), surviving [7]",
+        "  R2 frame [8, 9] (index 32): pair (δ 7, map [(0, 0), (1, 1)]), surviving [7]",
+        "  R3 frame [9, 2] (index 33): emission 102 bits after a 28-bit header (start, frame, dictionary and departures 64; the runs' located code 38), against near-return 75 and spelled 362",
+        "  R2 frame [9, 8] (index 37): pair (δ 7, map [(0, 0), (1, 1)]), surviving [7]",
+        "  §28a: frames entered 18 (aeons closed per frame [14, 14, 15, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14]), paired 4, emitted 2",
+        "  refused: no frame of the family carries the passage as one closed gauge class (FrameTally { narrow: 5, empty: 5, plural: 2, open: 0, one: 0 })",
+        "  refused: no frame of the family carries the passage as one closed gauge class (FrameTally { narrow: 2, empty: 10, plural: 0, open: 0, one: 0 })",
+        "  refused: no frame of the family carries the passage as one closed gauge class (FrameTally { narrow: 5, empty: 7, plural: 0, open: 0, one: 0 })",
+        "test a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole ... §28 (clean): τ 7, departures [], dictionary [1, -2] (2 classes), near-return bits (27, 360); tally FrameTally { narrow: 0, empty: 20, plural: 0, open: 0, one: 18 }",
+        "  F3 frame [7, 2] (index 22): emission 37 bits after a 28-bit header (located code 20), against near-return 29 and spelled 362",
+        "  F2 frame [7, 8] (index 27, 8 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 35 bits, surviving distances [7]",
+        "  F2 frame [7, 9] (index 28, 9 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 39 bits, surviving distances [7]",
+        "  F2 frame [8, 9] (index 32, 9 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 39 bits, surviving distances [7]",
+        "  F3 frame [9, 2] (index 33): emission 40 bits after a 28-bit header (located code 23), against near-return 29 and spelled 362",
+        "  F2 frame [9, 8] (index 37, 8 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 35 bits, surviving distances [7]",
+        "  (clean) frames entered 18 (aeons closed per frame [17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17]), paired 4, emitted 2",
+        "§28 (departed): τ 7, departures [(60, -1), (61, 0), (62, 2), (63, 0), (68, 2), (75, 2)], dictionary [1, -2, -1, 0, 2] (5 classes), near-return bits (73, 360); tally FrameTally { narrow: 13, empty: 13, plural: 12, open: 0, one: 0 }",
+        "  (departed) no frame carries: the dictionary's 5 classes include 3 the cycle never reads",
+        "test an_aperiodic_source_is_refused_not_given_a_period ... Thue-Morse, 128 samples: 2 classes read, readings FrameTally { narrow: 0, empty: 12, plural: 0, open: 0, one: 0 }",
+        "  refused: no frame of the family carries the passage as one closed gauge class (FrameTally { narrow: 0, empty: 12, plural: 0, open: 0, one: 0 })",
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.06s",
+        "BOUNDED start 07:42:51 end 07:43:13 exit 0 wall_ns 21819774020 child_peak_rss_kib 741652"
+      ]
+    }
+  ]
+}

@@ -1151,3 +1151,91 @@ adapter**:
   on no frame. F2 and F3 are not read on the departed tone.
 
 The failure is §28a's subject.
+
+## 28a. The departed word enters as its runs in the cycle's chart, its departures the residual (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] §28 measured that a departure outside the cycle's support has
+no class in the cycle's located chart. The encoding law then fixes how the departed window enters:
+- **What enters.** Only the cells the chart has: the window's maximal runs of cells inside the
+  support `S`, the cycle's own classes. Each run is a passage opened at its own located key.
+- **What does not.** The departures are the chart's cokernel. They do not enter the field; they are
+  the residual, each named by its position and its advance in the five advances.
+- Nothing is fabricated: every actual chart cell is ingested, and no departure is replaced by a
+  chart class.
+
+This differs from §28's F1 in one respect, which the measurement forced: the passage that enters is
+the window's runs, not the whole window. The tone, ring and window are §28's, departed.
+
+**Acceptance.**
+- **R1, the runs enter.** The dictionary is `S`, the cycle's advances in order of first occurrence.
+  The cycle located in `S` must carry on the same 18 frames as the clean tone. On every carrying
+  frame:
+  - the runs are founded together by `PassageChart::located`, each at its own least key with the
+    fewest patches;
+  - they are encoded on `field_on(helix.periods())` and each is admitted;
+  - the reference port ingests them in clock order, the first opening a moment and each later run
+    continuing it.
+
+  A refusal of the continuation is reported typed, and R1 is then not met. The field's clock does
+  not advance across a departure: no transport for it is known.
+- **R2, the pair.** On carrying frames with `d > τ`, the pair is located from the stations of all
+  the admitted runs. Each run's repair residual must be empty, since a run holds no departure.
+- **R3, the whole word.** On carrying frames with `d = |S|`, the emission is:
+  1. the header, the start class, the frame index and the dictionary;
+  2. the departures: `γ(|D| + 1)`, then for each departure `γ(gap)` and its advance in 3 bits;
+  3. `located_code(transport, runs)`.
+
+  The independent decoder derives the run lengths from the departures and the window length, reads
+  the runs by `read_located`, interleaves the departures, and must return the whole `SectionWord`
+  with its placement and clock.
+- **R4, charged.** The emission's bits after the header are reported beside the near-return's
+  `L_τ + 2 = 75` and the spelled `3L + 2 = 362`.
+
+### 28a, measured: the departed word enters as its runs and decodes whole; §28's F1 corrected
+
+[measured] ([receipt](receipts/2026-10-10-acoustic-release/S28A_RUNS_IN_THE_CHART.v1.json); developer
+reads.) `acoustic_encoding` passes 9 of 9.
+
+**A correction to §28's F1, found by this loop.** The reference port's ingest stops after the
+occurrence whose step carries the joint clock out, and then refuses any further cell until
+`close_aeon`. §28's check accepted that stop as entry, so its "ingested" covered only the cells up to
+the first carry-out. This loop's first run showed it: on frame `[6, 5]`, after the first run's stop,
+the port refused the next run, "the aeon awaits close_aeon".
+- Both tests now ingest **whole**: at each carry-out the aeon is closed over the admitted receiving
+  phases, and the rest of the passage (`Encoded::part`) continues the same moment.
+- The clean tone's 120 cells close **17 aeons** on every one of its 18 frames: the joint clock
+  carries out about once per cycle of the located helix.
+- §28's F1 is met on that reading, and its other readings are unchanged.
+
+**R1 met.**
+- The support is `S = {+1, −2}`. The departures `60, 61, 62, 63, 68, 75` are exactly the cells
+  outside it.
+- The runs are `[0, 60)`, `[64, 68)`, `[69, 75)` and `[76, 120)`.
+- The cycle in `S` carries on the same 18 frames.
+- On every one of them, the four runs are founded together, each at its own key, admitted and
+  ingested whole into one moment. That closes 14 aeons on 17 frames and 15 on one.
+- No departure enters the field.
+
+**R2 met.** On the 4 frames with `d > 7`, the pair located from all the runs' stations is `δ = 7`
+with the identity map, the only survivor. Every run's repair residual is empty.
+
+**R3 met.** On `[7, 2]` and `[9, 2]`, the independent decoder returns the whole departed
+`SectionWord` with its placement and clock.
+
+**R4.**
+
+| Frame | Emission after header | Start, frame, dictionary, departures | Runs' located code |
+|---|---|---|---|
+| `[7, 2]` | 96 bits | 64 | 32 |
+| `[9, 2]` | 102 bits | 64 | 38 |
+
+The near-return's `L_τ + 2` is 75 bits and the spelled `3L + 2` is 362. The emission is longer than
+the near-return by 21 and 27 bits. The departures cost the same in both (position and advance); the
+excess is the runs' four keys, the frame index and the dictionary.
+
+**What §28–§28a establish.** A ring's section word, clean or departed, enters the field declared on
+its located helix through the actual admission and ingestion owners, across its aeons. Its pair is
+read at the ring's own distance cap, and its emission decodes the whole word.
+- On this short cycle the located description costs more than the near-return. No compression is
+  claimed.
+- The amplitude and phase fibre, and through it the samples, stays unbound. That is §29's subject.
