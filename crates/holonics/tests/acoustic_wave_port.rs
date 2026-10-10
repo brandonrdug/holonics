@@ -30,6 +30,9 @@ use holonics::compression::keys::frames::{FrameFamily, FrameRefusal};
 use holonics::hnn::HnnError;
 use holonics::hnn::dynamic_section::{RAYS, SectionReader, SectionRefusal, SectionSymbol, chord};
 use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands};
+use holonics::hnn::section_lock::{
+    Arrival, JointLock, JointRefusal, Lock, LockReader, LockRefusal, LockWindow, Settled,
+};
 use holonics::hnn::wave::{MatchedWave, ReceivedTick, WavePort};
 use holonics::holon::parametron::Carrier;
 use holonics::ratio::linear::ExactRatMatrix;
@@ -604,4 +607,260 @@ fn a_rings_symbol_word_is_read_by_the_first_rungs_frames() {
         }
         Err(other) => println!("  refused: {other}"),
     }
+}
+
+// -------------------------------------------------------------------------------------------
+// the lock and the joint period (third task): a consumer of the dynamic section's stream
+
+/// The replica's other tones, as integers (zero mean, its fixtures).
+const F3: [i64; 12] = [-15, -15, -3, -3, 9, 9, 21, 9, 9, -3, -3, -15];
+const F4: [i64; 12] = [-4, -1, 2, 2, -3, 0, 0, 3, -2, -2, 1, 4];
+
+fn cycle_of(tone: &[i64], n: usize) -> Vec<i64> {
+    (0..n).map(|k| tone[k % tone.len()]).collect()
+}
+
+/// The declared bank: three rings of the replica's Farey bank, `t = 2/3, 1, 2`. Never searched.
+fn bank() -> [Rat; 3] {
+    [rat(2, 3), integer(1), integer(2)]
+}
+
+/// The declared window: the replica's settle allowance and its settled stretch.
+fn lock_window() -> LockWindow {
+    LockWindow::new(SETTLE, SAMPLES - SETTLE).unwrap()
+}
+
+/// One ring's states fed to the lock reader, tick 0 (rest) to tick 240.
+fn settled(run: &Run) -> Result<Settled, LockRefusal> {
+    let mut reader = LockReader::new(lock_window());
+    for point in &run.points {
+        reader.observe(point.clone())?;
+    }
+    reader.finish()
+}
+
+fn bank_settled(stream: &[i64]) -> Vec<Settled> {
+    bank()
+        .iter()
+        .map(|t| settled(&run(t, stream)).unwrap())
+        .collect()
+}
+
+fn locks(rings: &[Settled]) -> Vec<Result<Lock, LockRefusal>> {
+    rings.iter().map(|ring| ring.lock(&lock_window())).collect()
+}
+
+/// `(τ, W, address, arrival word, arrival ticks)` of a lock.
+type Reading = (usize, i64, Rat, Vec<i8>, Vec<usize>);
+
+fn reading(lock: &Lock) -> Reading {
+    (
+        lock.period(),
+        lock.winding(),
+        lock.address().clone(),
+        lock.arrival_word(),
+        lock.arrivals().iter().map(|a| a.tick).collect(),
+    )
+}
+
+/// F1 locks at τ = 7 on each ring of the bank with the replica's windings (1, 1, 2), the addresses
+/// 1/7, 1/7, 2/7 and its own observed arrival words; the joint period is 7. The mean-rate face is
+/// beside the word, and the word of ring `t = 2` (arrivals `0101000`) is not a balanced word.
+#[test]
+fn f1_locks_at_seven_on_the_declared_bank() {
+    let rings = bank_settled(&stream(1, SAMPLES));
+    let locks: Vec<Lock> = locks(&rings).into_iter().map(Result::unwrap).collect();
+    let readings: Vec<Reading> = locks.iter().map(reading).collect();
+    assert_eq!(
+        readings,
+        [
+            (7, 1, rat(1, 7), vec![0, 0, 1, 0, 0, 0, 0], vec![122]),
+            (7, 1, rat(1, 7), vec![0, 0, 1, 0, 0, 0, 0], vec![122]),
+            (7, 2, rat(2, 7), vec![0, 1, 0, 1, 0, 0, 0], vec![121, 123]),
+        ]
+    );
+    // the observed symbols of ring t = 1: the record's 7-cycle, from tick 120
+    let symbols: Vec<(u8, i8)> = locks[1]
+        .cycle()
+        .iter()
+        .map(|s| (s.class, s.advance))
+        .collect();
+    assert_eq!(
+        symbols,
+        [(1, 1), (2, 1), (3, 1), (0, 1), (1, 1), (2, -2), (0, 1)]
+    );
+    assert_eq!(locks[1].start(), SETTLE);
+    assert_eq!(
+        locks[2].arrivals(),
+        [
+            Arrival { tick: 121, sign: 1 },
+            Arrival { tick: 123, sign: 1 }
+        ]
+    );
+    // the face is beside the word: TwoClocks(W/τ), whose lock address has period 7 on each ring
+    for lock in &locks {
+        let face = lock.mean_rate_face().unwrap();
+        assert_eq!(face.ratio(), lock.address());
+        assert_eq!(
+            face.lock_address().unwrap().period().unwrap(),
+            BigInt::from(7)
+        );
+        assert_eq!(
+            face.convergents().unwrap().last().unwrap().ratio(),
+            *lock.address()
+        );
+    }
+    assert!(is_balanced(&locks[0].arrival_word()) && is_balanced(&locks[1].arrival_word()));
+    assert!(!is_balanced(&locks[2].arrival_word()));
+    // the joint: the lcm of the cycles, dividing the wave's period 7 and every ring's τ dividing it
+    let joint = JointLock::read(&lock_window(), &rings).unwrap();
+    assert_eq!(joint.period(), 7);
+    assert_eq!(7 % joint.period(), 0);
+    assert!(
+        joint
+            .rings()
+            .iter()
+            .flatten()
+            .all(|lock| joint.period() % lock.period() == 0)
+    );
+}
+
+/// F3 (period 12): rings `t = 2/3` and `t = 1` lock at 12 with one winding; ring `t = 2` rocks without
+/// turning, a lock of `W = 0` with an empty arrival word (it is not Silent, and has no mean-rate face).
+#[test]
+fn f3_has_a_lock_without_rotation() {
+    let rings = bank_settled(&cycle_of(&F3, SAMPLES));
+    let locks: Vec<Lock> = locks(&rings).into_iter().map(Result::unwrap).collect();
+    let readings: Vec<Reading> = locks.iter().map(reading).collect();
+    let mut at_three = vec![0i8; 12];
+    at_three[3] = 1;
+    let mut at_two = vec![0i8; 12];
+    at_two[2] = 1;
+    assert_eq!(
+        readings,
+        [
+            (12, 1, rat(1, 12), at_three, vec![123]),
+            (12, 1, rat(1, 12), at_two, vec![122]),
+            (12, 0, integer(0), vec![0i8; 12], vec![]),
+        ]
+    );
+    assert!(locks[2].mean_rate_face().is_none());
+    assert!(locks[2].cycle().iter().any(|symbol| symbol.advance != 0));
+    assert_eq!(
+        JointLock::read(&lock_window(), &rings).unwrap().period(),
+        12
+    );
+}
+
+/// F4 (the 3 + 4 sum, period 12): the rings lock at 4, 12 and 12 with windings 1, 3, 3 and the same
+/// address 1/4; the joint period is 12, the lcm. Ring `t = 2/3` reads only the period-4 component, the
+/// others read the sum; each ring's τ divides the joint 12, and 12 divides the wave's period. The face
+/// of a 12-cycle at address 1/4 has the lock period 4, not 12: the face is not the cycle.
+#[test]
+fn f4_has_a_joint_period_of_twelve() {
+    let rings = bank_settled(&cycle_of(&F4, SAMPLES));
+    let locks: Vec<Lock> = locks(&rings).into_iter().map(Result::unwrap).collect();
+    let readings: Vec<Reading> = locks.iter().map(reading).collect();
+    assert_eq!(
+        readings,
+        [
+            (4, 1, rat(1, 4), vec![0, 0, 0, 1], vec![123]),
+            (
+                12,
+                3,
+                rat(1, 4),
+                vec![0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+                vec![122, 126, 131]
+            ),
+            (
+                12,
+                3,
+                rat(1, 4),
+                vec![0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+                vec![121, 125, 130]
+            ),
+        ]
+    );
+    let joint = JointLock::read(&lock_window(), &rings).unwrap();
+    assert_eq!(joint.period(), 12);
+    assert_eq!(12 % joint.period(), 0);
+    for lock in joint.rings().iter().flatten() {
+        assert_eq!(
+            joint.period() % lock.period(),
+            0,
+            "each ring's τ divides the joint"
+        );
+    }
+    // the rate face of ring t = 1 is 1/4: its lock period is 4, on a cycle of 12
+    let face = locks[1].mean_rate_face().unwrap();
+    assert_eq!(
+        face.lock_address().unwrap().period().unwrap(),
+        BigInt::from(4)
+    );
+    assert_ne!(locks[1].period(), 4);
+}
+
+/// Thue–Morse is Unlocked on every ring (no period at most 60 repeats the settled word) and refuses
+/// the joint, naming the first ring; the period 61 control, one over half the window, is Unlocked too.
+#[test]
+fn an_aperiodic_wave_and_a_period_over_half_the_window_are_unlocked() {
+    let thue_morse: Vec<i64> = (0..SAMPLES as u32)
+        .map(|k| 1 - 2 * i64::from(k.count_ones() % 2))
+        .collect();
+    let sawtooth_61: Vec<i64> = (0..SAMPLES as i64).map(|k| k % 61 - 30).collect();
+    for wave in [thue_morse, sawtooth_61] {
+        let rings = bank_settled(&wave);
+        for reading in locks(&rings) {
+            assert_eq!(
+                reading,
+                Err(LockRefusal::Unlocked {
+                    max_period: 60,
+                    length: 120
+                })
+            );
+        }
+        assert!(matches!(
+            JointLock::read(&lock_window(), &rings),
+            Err(JointRefusal::Ring {
+                ring: 0,
+                refusal: LockRefusal::Unlocked { .. }
+            })
+        ));
+    }
+}
+
+/// A ring at rest has no class and is never started: zero input is Silent on every ring and for the
+/// joint. A ring at rest at the settle tick that leaves rest inside the window has not settled.
+#[test]
+fn rest_is_silent_and_a_ring_that_has_not_settled_is_refused() {
+    let rings = bank_settled(&vec![0; SAMPLES]);
+    assert!(rings.iter().all(|ring| *ring == Settled::Rest));
+    for reading in locks(&rings) {
+        assert_eq!(reading, Err(LockRefusal::Silent));
+    }
+    assert_eq!(
+        JointLock::read(&lock_window(), &rings),
+        Err(JointRefusal::Silent)
+    );
+
+    // the wave starts at tick 130: the ring is at rest at tick 120 and moves at 131
+    let mut late = vec![0i64; 130];
+    late.extend(stream(1, SAMPLES - 130));
+    assert_eq!(
+        settled(&run(&integer(1), &late)),
+        Err(LockRefusal::NotSettled { settle: SETTLE })
+    );
+
+    // a reader offered too few states is refused, not guessed
+    let mut reader = LockReader::new(lock_window());
+    for point in &run(&integer(1), &stream(1, 200)).points {
+        reader.observe(point.clone()).unwrap();
+    }
+    assert!(matches!(
+        reader.finish(),
+        Err(LockRefusal::Incomplete {
+            have: 201,
+            need: 241
+        })
+    ));
 }

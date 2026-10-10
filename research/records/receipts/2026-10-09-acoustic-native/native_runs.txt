@@ -50,3 +50,12 @@ brief): tools/gate.sh, clippy (the guard lints), the whole suite, lake. The new 
 disallowed type, but the lint is unrun.
 
 Also: cargo check (after the word change), BOUNDED start 00:37:35 end 00:37:39 exit 0 wall_ns 3375129044 child_peak_rss_kib 614832.
+
+Task 3 (the lock reader and the joint period):
+10. cargo test --lib hnn::section_lock -- --test-threads=1
+    BOUNDED start 00:48:27 end 00:49:00 exit 0 wall_ns 32787183357 child_peak_rss_kib 2451528     8 passed
+11. cargo test --test acoustic_wave_port -- --test-threads=1
+    BOUNDED start 00:51:52 end 00:53:01 exit 0 wall_ns 69207995081 child_peak_rss_kib 2070748     13 passed (8 earlier, 5 new)
+Python (not the lane): lock_predictions.py, timeout 300 s, exit 0, written to lock_predictions_output.txt before runs 10 and 11.
+Both runs read the committed source of the lock reader; no assertion was edited after a run. clippy, tools/gate.sh,
+the whole suite and lake were not run.

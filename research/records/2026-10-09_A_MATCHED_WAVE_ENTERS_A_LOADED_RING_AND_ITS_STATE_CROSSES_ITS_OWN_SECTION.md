@@ -1,7 +1,8 @@
 # A matched wave enters a loaded ring, and its state crosses its own section
 
 **Date.** October 9. **Issues.** #148, #73, #386, #62. **Grade.** Native build of items 1–3 of the
-second rung's native list, against numbers read from an independent exact replica. Each claim carries
+second rung's native list (§§1–11) and of its items 4 and 5, the lock reader and the joint period (§12),
+against numbers read from an independent exact replica. Each claim carries
 its grade. The Rust was compiled and run once by a delegated worker under the common compiler lease
 (commands and times in [`native_runs.txt`](receipts/2026-10-09-acoustic-native/native_runs.txt)); that
 is a worker's reading, not a validation-queue receipt.
@@ -231,8 +232,9 @@ orbit of a first-rung navigator, so the owed join of the second rung's §6 (a lo
 - That the bank, the quarter-turn grain or the ring is learned or located; that any real recording, noise,
   polyphony or drifting pitch reads; that anything decodes to sound or anything generative or perceptual is
   measured.
-- That a lock is read: no least period of the settled word, no `W` from the net lift, no `aeon::TwoClocks`
-  face, no near-return grain was built. The words above are read by eye and by the test's explicit cycles.
+- That a lock was read in §§1–11: the words there are read by eye and by the tests' explicit cycles. The lock
+  reader and the joint period are §12's; the near-return grain (`TwoClocks::near_return`, for a stretch that
+  is only near-periodic) is not built.
 - **That the state is bounded.** The exact state's denominators grow by the factor `145` per tick at `t = 1`
   (the printed states: `145, 145², 145³, …, 145¹⁴`), so the carried state's bits grow linearly with the
   ticks. It is the exact law without a lattice; the lattice carry with remainders (`hnn::chart`) is the owed
@@ -247,20 +249,16 @@ orbit of a first-rung navigator, so the owed join of the second rung's §6 (a lo
 
 ## 9. What remains
 
-**The lock reader (item 4).** The reader that turns a settled word into a lock: the least `τ` for which the
-`(class, advance)` word is exactly `τ`-periodic (the first-return test, on the exact word), `W = (Σ_(k<τ) Δℓ_k)/4`
-(a closed class cycle has a whole winding; the net lift is `4W`), the address `W/τ` in lowest terms, and
-`aeon::TwoClocks::new(W/τ)` with `lock_address`, `convergents` and `near_return` as a **mean-rate face
-beside the observed arrival word** (§4.4), the near-return grain where no exact lock exists. What this build
-gives it: the symbol stream with the lift and the signed crossings, exact, per tick. What it lacks: the
-periodicity test, `W`, the `TwoClocks` construction and the refusals (`Unlocked`, `Silent`).
+**The lock reader (item 4)** and **the joint period (item 5)** are built, as consumers of the dynamic
+section's stream (§12). What remains of them: the near-return grain for a stretch that is only
+near-periodic (no exact lock), and the amplitude and placement ports of the contact that would read two
+rings' addresses against each other.
 
 **The strand.** A located transport per ring over `(class, advance)` with the hidden state the ring carries
 (§6: the first rung's frames hold it), a letter chart, and a contact whose rate port reads the ring's `W/τ`
 or its convergent and whose placement port reads the arrival word.
 
-**Also owed from the second rung:** the joint period (the lcm of the rings' least periods), the amplitude
-receipt `Ē_b(x) = xᵀQ_bx`, the gauge `decode(σ(encode x)) = x` into the wave port, the render
+**Also owed from the second rung:** the amplitude receipt `Ē_b(x) = xᵀQ_bx`, the gauge `decode(σ(encode x)) = x` into the wave port, the render
 `g·Σ_b b_out = q + r`, the pumped port, and the bounded (lattice) realization of the carried state.
 
 ## 10. Obligations owed to #62
@@ -282,8 +280,139 @@ Lean statements not yet stated (the hand derivations are `proved-derived`):
 
 New: `hnn::wave::{MatchedWave, WavePort, Receiving, ReceivedTick}`;
 `hnn::dynamic_section::{SectionReader, SectionSymbol, SectionRefusal, quadrant, chord}`; `HnnError::Wave`;
+`hnn::section_lock::{LockWindow, LockReader, Settled, Lock, Arrival, LockRefusal, JointLock, JointRefusal}`;
 `tests/acoustic_wave_port.rs`; atlas rows `hnn.matched-wave-port`, `hnn.dynamic-section-lift`,
-`wave.arrival-word-is-not-the-mean-rate`. Consumed unchanged: `hnn::ring::{ResonatorMaterial,
+`hnn.section-lock`, `hnn.joint-period`, `wave.arrival-word-is-not-the-mean-rate`. Consumed unchanged: `hnn::ring::{ResonatorMaterial,
 ResonatorOperands::step, ResonatorStep::closes}`, `aeon::{Reading, ClockLift, epochs}`,
-`compression::keys::frames::FrameFamily` (the probe). Changed: THE_MACHINE guard 9 gains the bullet "a wave
+`compression::keys::frames::FrameFamily` (the probe), `aeon::TwoClocks` and `navigator::address::LockAddress`
+(the mean-rate face). Changed: THE_MACHINE guard 9 gains the bullet "a wave
 is not a code". Receipts: [`receipts/2026-10-09-acoustic-native/`](receipts/2026-10-09-acoustic-native/).
+
+## 12. The lock reader and the joint period
+
+[project-postulate] The coordinator's third task: the second rung's items 4 and 5, as a **consumer** of
+`SectionReader`'s stream, in [`section_lock.rs`](../../crates/holonics/src/hnn/section_lock.rs). No render, no
+strand contact and no learning.
+
+### 12.1 The acceptance, fixed before the Rust ran
+
+The reading was specified and predicted in
+[`lock_predictions.py`](receipts/2026-10-09-acoustic-native/lock_predictions.py), which loads the
+acoustic-locks replica `6d96dfcc…` and applies the reading to its settled symbols; its output
+([`lock_predictions_output.txt`](receipts/2026-10-09-acoustic-native/lock_predictions_output.txt)) was written
+before the lock tests were run. The window is the replica's: settle tick 120, 120 ticks read. The declared
+bank is three rings of the replica's Farey bank, `t = 2/3, 1, 2` (`κ = 1/8`, so `a = t/8`), never searched or
+tuned. The reading, exact equality of symbols, no tolerance:
+
+```text
+τ        the least τ ≤ 60 (half the window) with s_k = s_(k+τ) for every k < 120 − τ      else Unlocked
+W        (Σ_(k<τ) Δℓ_k)/4, whole turns                                                       else Fractional
+address  W/τ in lowest terms;  arrival word = the signed crossings of one cycle, as observed
+Silent   no symbol of the window advances the lift
+joint    the lcm of the locked rings' τ, silent rings skipped, any other refusal refuses it;
+         it equals the least period of the tuple word and divides the wave's period
+```
+
+### 12.2 Owners and the missing term
+
+| Step | Existing owner | Missing term | Built |
+|---|---|---|---|
+| The ring's symbols | `hnn::dynamic_section::SectionReader` (this record, §3) | Nothing reads a word across ticks | consumed |
+| The cycle and its winding | `aeon::Reading` (windings plus phase), `Geometry/PhaseCarry.closed_loop_has_integer_winding` | The least period of the settled word, `W` from the net lift, the typed refusals | `Settled::lock`, `Lock`, `LockRefusal` |
+| The address as a face | `aeon::TwoClocks::{new, lock_address, convergents}`, `navigator::address::LockAddress` | Constructed from a given ratio; never from an observed cycle | `Lock::mean_rate_face`, beside the word |
+| The ring at rest | `SectionReader::at` refuses the origin | A ring that never leaves rest has no stream | `LockReader` reads it as `Settled::Rest` |
+| The joint period | none | The lcm of the rings' cycles and its identity with the tuple word's period | `JointLock` |
+
+### 12.3 Choices and their reasons
+
+[definition; agent-inferred]
+- **The Unlocked bound is half the window** (the brief): a period of at most 60 ticks is a period the 120-tick
+  window shows at least twice. The replica reads at most a third (40, three repetitions); the rings' cycles
+  here are 4, 7 and 12, so the readings coincide, and the prediction was run at 60.
+- **Silent is "no symbol advances the lift"**, not "no section arrival". The replica's own F3 reading is the
+  reason: ring `t = 2` on F3 rocks across the ray 2 without ever arriving at the section and locks at `τ = 12`
+  with `W = 0` (the replica's "lock without rotation"). Read literally, "no section arrival" would call it
+  Silent and lose its cycle. It is a lock with an empty arrival word and no mean-rate face. A ring at rest
+  (the origin has no class) is never started: it is Silent by being at rest (zero input).
+- **Fractional is typed and unreachable from a reader's stream.** The reader's symbols satisfy
+  `class_(k+1) = class_k + Δℓ_k (mod 4)`, so a word that repeats in the class has a net lift `≡ 0 (mod 4)`.
+  The refusal is the typed form of the replica's assertion L9 for symbols that break the recursion (hand-fed,
+  or the half-turn-blind reading of X3 that closes on half a turn); the unit test feeds such symbols.
+- **The read window is the declared finite read set**, held at most 120 symbols and dropped with the reading;
+  it is not retention of the stream. `LockReader::observe` is atomic, ignores ticks before the settle tick and
+  after the window, refuses a ring that was at rest at the settle tick and leaves rest inside the window
+  (`NotSettled`), and refuses an unfilled window (`Incomplete`).
+- **The face exists only for `W > 0`** (`TwoClocks` needs a positive rate) and sits beside the word.
+- **The joint period is the lcm, each ring's `τ` divides it, and it divides the wave's period.** The brief
+  says the joint "must divide every ring's own observed period"; that cannot hold, and the replica's F4 shows
+  it: rings read `τ = 4` and `τ = 12`, the joint is 12, and 12 does not divide 4. The law that holds, and
+  that is asserted, is the converse: every ring's cycle divides the joint, and the joint divides the wave's
+  period (7 for F1, 12 for F3 and F4). The joint reading also checks that the least period of the tuple of the
+  rings' symbols is the lcm (`JointRefusal::Disagrees`): by Fine–Wilf, a window of length `τ_b + p` carrying
+  periods `τ_b` and `p` carries their gcd, so with the lcm at most half the window the tuple's least period
+  `p ≤ lcm` is divisible by every `τ_b`, hence is the lcm. An lcm over half the window is refused
+  (`Beyond`): the window would not show it twice.
+
+### 12.4 Measured
+
+[computational-witness; worker's run] `tests/acoustic_wave_port.rs`, 13 passed (the 8 of §4 and 5 new), plus 8
+unit tests of `hnn::section_lock`; every value equals `lock_predictions_output.txt`, and the cycles, windings
+and addresses equal the replica's own `run_output.txt` at `35d59516` (F1 `W = 1, 1, 2`; F3 `τ = 12`, `W = 1,
+1, 0`; F4 `τ = 4, 12, 12`, `W = 1, 3, 3`, address `1/4`). Arrivals as (tick : sign), series per ring:
+
+| wave (period) | ring | `τ` | `W` | address | arrival word over a cycle from tick 120 | arrivals |
+|---|---|---|---|---|---|---|
+| F1 sawtooth (7) | `2/3` | 7 | 1 | `1/7` | `0 0 1 0 0 0 0` | 122 |
+| | `1` | 7 | 1 | `1/7` | `0 0 1 0 0 0 0` | 122 |
+| | `2` | 7 | 2 | `2/7` | `0 1 0 1 0 0 0` | 121, 123 |
+| F3 quantized triangle (12) | `2/3` | 12 | 1 | `1/12` | arrival at offset 3 | 123 |
+| | `1` | 12 | 1 | `1/12` | arrival at offset 2 | 122 |
+| | `2` | 12 | 0 | `0` | `0` × 12 | none |
+| F4 two-tone 3 + 4 (12) | `2/3` | 4 | 1 | `1/4` | `0 0 0 1` | 123 |
+| | `1` | 12 | 3 | `1/4` | `0 0 1 0 0 0 1 0 0 0 0 1` | 122, 126, 131 |
+| | `2` | 12 | 3 | `1/4` | `0 1 0 0 0 1 0 0 0 0 1 0` | 121, 125, 130 |
+
+- **Joint periods:** F1 7 (divides 7), F3 12 (divides 12), F4 12 (lcm of 4, 12, 12; divides 12; every ring's `τ`
+  divides it), each equal to the least period of the tuple word (checked by the joint reading).
+- **The face is beside the word, and is not it.** On F1 each ring's `TwoClocks(W/τ)` has lock address of
+  period 7 and its last convergent is the address; the word of ring `t = 2` is not balanced (§4.4) while the
+  two others' are. On F4 ring `t = 1` has the face `1/4` with lock period 4 on a cycle of 12: the face
+  does not read the cycle.
+- **Refusals, as measured:** Thue–Morse (replica fixture F5) is `Unlocked { max_period: 60, length: 120 }` on
+  all three rings and refuses the joint at ring 0; the sawtooth of period 61 (one over half the window) is
+  Unlocked on all three; zero input is `Silent` on all three and for the joint; a wave that starts at tick 130
+  leaves a ring at rest at the settle tick and is refused `NotSettled`; a reader offered 201 of the 241 states
+  is refused `Incomplete`. Unit tests (explicit symbol words): `Silent` for no ray crossed, the 13-cycle
+  `Unlocked` and the 12-cycle locked at exactly half the window, `Fractional { period: 1, net: 2 }`, the
+  rocking lock with `W = 0`, the departure `−1` in an arrival word, and the joint (4 and 6 give 12; a silent
+  ring skipped; all silent `Silent`; an unlocked ring refuses it; 4, 6 and 5 give 60 `Beyond`).
+
+### 12.5 Recorded failures checked
+
+- **An authored routine standing in for learning** (failure 1, lesson 5; guard 17). This is a least-period
+  test on an exact word against candidate periods `τ ≤ 60`: it enumerates candidates, so the risk is real. What
+  it reads are the ring's own section symbols, not samples; the bank is declared and not searched; and the
+  claim is the reader, not learning.
+- **A mean rate read as the actual arrival word** (Codex's boundary). The lock's content is the cycle and the
+  observed arrival word; `TwoClocks(W/τ)` is `mean_rate_face()`, beside it, only for `W > 0`.
+- **A sum replaced its series** (lesson 19). Per ring `(τ, W, address)` and the signed arrival word, never a
+  joint score; the joint period is stated with its rings' periods.
+- **A fixture as the goal** (lesson 12). The tones are the replica's F1, F3, F4 and its controls; the three
+  rings were fixed before the run; ring `t = 2` was chosen because the replica shows it unbalanced on F1 and
+  rocking on F3 (disclosed), and the other readings were predicted, not tuned.
+
+### 12.6 Not claimed
+
+That a lock is learned or located; that a near-periodic stretch locks (no `near_return` grain); that the joint
+over many rings stays within a window (the lcm over half the window is refused); that any real recording
+locks; that the address pairs two rings (no contact is built). The runs are a worker's, not the validation
+queue's; clippy and the guard lints were not run.
+
+### 12.7 Obligations owed to #62
+
+6. The least period of a settled symbol word and its winding: a closed class cycle has a whole winding
+   (`closed_loop_has_integer_winding` for the reader's class recursion), and the face `TwoClocks(W/τ)` has the
+   lock period of `W/τ` in lowest terms, which divides the cycle's `τ`.
+7. The joint period: for words with periods `τ_b` on a window of length at least `2 lcm`, the tuple's least
+   period is the lcm (Fine–Wilf), and it divides the wave's period when the wave's steady state has that period
+   (the second rung's L7, L8).

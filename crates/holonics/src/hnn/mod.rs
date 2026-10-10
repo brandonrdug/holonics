@@ -85,6 +85,10 @@
 //! - [`dynamic_section`] (the acoustic line, second rung): the signed crossing of a ring's own
 //!   `(w, u)` state through its four quarter-turn rays, with the lift carried
 //!   ([`dynamic_section::SectionReader`]), read as the aeon's reading and its section's ticks;
+//! - [`section_lock`] (the acoustic line, second rung, items 4 and 5): the lock reader, a consumer of
+//!   the dynamic section's stream (the least period of the settled symbol word, the winding and the
+//!   address, the observed arrival word kept with the mean-rate face beside it) and the joint period
+//!   of several rings;
 //! - [`contact`] (campaign 2): the contact's transfer and site kind, its certified boost, its lock
 //!   address and its break receipt, with [`contact_readings`], the lock and site readings the
 //!   receiving join consumes;
@@ -139,6 +143,7 @@
 //! | the loaded tick's field/resonator balance, separate element and returned-wave splits, the word's balance across the gain commit (the loaded resonator) | `HNN/Ring.{loaded_word_stage_balance, loaded_tick_executed_interconnection_balance}`, `HNN/Word.{field_commit_deposition}` | [`word::FieldBalance`], [`word::WordBalance`], [`word::PowerForm`] |
 //! | a matched wave at a loaded ring's port: the executed tick's balance with the wave's `(hY/4)(a² − b²)` booked as boundary work, the ring continuing across the stream (a wave is not an `Encoded`) | `HNN/Ring.ring_tick_executed_energy_balance`; the matched port and the continuing state owed (#62) | [`wave::MatchedWave`], [`wave::WavePort`], [`wave::ReceivedTick::closes`] |
 //! | the dynamic section: a ring's state point crossing its quarter-turn rays, the lift `ℓ` (class plus carry) with its advance, the signed crossing of the ring section, the polarity `ℓ(−z) = ℓ(z) + 2` | `Geometry/PhaseCarry.winding_add`, `Aeon/Clock/Epoch.signed_count_is_flux`; the chord's advance and the polarity owed (#62) | [`dynamic_section::SectionReader`], [`dynamic_section::chord`] |
+//! | the lock: the least period of a ring's settled symbol word, the winding of its cycle (whole turns), the address `W/τ`, the observed arrival word, `TwoClocks(W/τ)` only as the mean-rate face beside it; the joint period (the lcm) | `Geometry/PhaseCarry.closed_loop_has_integer_winding`, `Aeon/Clock/CarryWord.carry_balanced`, `Aeon/Clock/Lock.lock_at_address`; the joint period owed (#62) | [`section_lock::Settled::lock`], [`section_lock::Lock`], [`section_lock::JointLock`], [`section_lock::LockReader`] |
 //! | the ring's navigator | `Holon/Navigator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
 //! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holarchy`] |
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |
@@ -181,6 +186,7 @@ pub mod reference;
 pub mod retention;
 pub(crate) mod state_text;
 pub mod ring;
+pub mod section_lock;
 pub mod wave;
 pub mod word;
 
