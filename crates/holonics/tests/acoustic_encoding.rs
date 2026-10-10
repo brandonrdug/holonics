@@ -1140,3 +1140,151 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
     println!("  §28a: frames entered 18 (aeons closed per frame {aeons:?}), paired {paired}, emitted {emitted}");
     assert!(emitted > 0, "R3: some carrying frame's code ranks the support");
 }
+
+// -------------------------------------------------------------------------------------------
+// the field continues the section word (the retained-release record §1)
+
+/// The clean F1 section word of the ring `t = 1` over the window `(120, 120)`: its advances, its
+/// own ordinals (the dictionary in order of first occurrence) and the near-return's period.
+fn clean_section_word() -> (Vec<usize>, Vec<i8>, usize) {
+    use holonics::hnn::section_lock::{LockReader, LockWindow, Settled};
+    use holonics::hnn::wave::{MatchedWave, WavePort};
+    let f1 = [-9i64, -9, -2, -2, 5, 5, 12];
+    let window = LockWindow::new(120, 120).unwrap();
+    let tone: Vec<i64> = (0..240).map(|k| f1[k % 7]).collect();
+    let operands = section_ring(1);
+    let wave = MatchedWave::new(
+        operands.admittance().clone(),
+        operands.hop().clone(),
+        tone.iter().map(|&x| integer(x)).collect(),
+    )
+    .unwrap();
+    let mut port = WavePort::at_rest(operands, 0).unwrap();
+    let mut reader = LockReader::new(window);
+    reader.observe(port.phase_point()).unwrap();
+    for tick in port.receive(&wave).unwrap() {
+        let tick = tick.unwrap();
+        reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).unwrap();
+    }
+    let settled = reader.finish().unwrap();
+    let tau = settled.near_return(&window).unwrap().period();
+    let Settled::Word(word) = &settled else {
+        panic!("the ring left rest")
+    };
+    let mut dictionary: Vec<i8> = Vec::new();
+    for symbol in word.symbols() {
+        if !dictionary.contains(&symbol.advance) {
+            dictionary.push(symbol.advance);
+        }
+    }
+    let ordinals = word
+        .symbols()
+        .iter()
+        .map(|symbol| dictionary.iter().position(|&a| a == symbol.advance).unwrap())
+        .collect();
+    (ordinals, dictionary, tau)
+}
+
+/// **The field continues a ring's section word from what it retains** (the retained-release record
+/// §1). On each carrying frame whose receiving cells equal the cycle's support, the word enters the
+/// field declared on the frame's rings; after its first cycle, each later cell is coded at the
+/// receiver's refined face before it is read (prequential): the learner then compares and
+/// deposits, the twin discards its staged deposit; both read the receiver's code of the cell at
+/// the compare (its population over the tree's and the combined face; §2). Reports, per cell, the
+/// actual cell's code-length enclosure for both; C1 asserts the learner's summed enclosure on cells
+/// `60 … 119` strictly below the twin's. C2 (the learner's code below 1 bit, on two classes the
+/// actual class's mass above ½, on cells `106 … 119`) is measured not met (§3) and asserted as
+/// measured: the learner continues the cycle's composition, not its position.
+#[test]
+fn the_field_continues_a_rings_section_word_from_what_it_retains() {
+    use holonics::hnn::field::ConstitutionRead;
+    use holonics::hnn::{Current, ExecutionPort, Handle, Reference};
+    use num_traits::Zero;
+    use std::time::Instant;
+    let (actual, dictionary, tau) = clean_section_word();
+    let length = actual.len();
+    let periodic: Vec<usize> = (0..length).map(|k| actual[k % tau]).collect();
+    let family = FrameFamily::pairs(9).unwrap();
+    let location = family.locate(dictionary.len(), &[periodic]).unwrap();
+    let started = Instant::now();
+    let mut frames = 0;
+    for (helix, carrying) in location.carrying() {
+        if helix.cells() as usize != dictionary.len() {
+            continue;
+        }
+        frames += 1;
+        let located = PassageChart::located(carrying.location(), &[actual.clone()]).unwrap();
+        let encoding = Encoding::found(&located).unwrap();
+        let field = field_on(helix.periods());
+        let encoded = Encoded::through(&encoding, &located, &field, &[actual.clone()]).unwrap().remove(0);
+        let chart: Vec<usize> = encoded.classes_read().collect();
+        let mut denotes = vec![None; encoded.classes()];
+        for (n, &class) in chart.iter().enumerate() {
+            denotes[class] = Some(dictionary[actual[n]]);
+        }
+        let mut sums = Vec::new();
+        let mut continued = 0;
+        for learner in [true, false] {
+            let reference = Reference::new(64, u64::MAX);
+            let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+            let (moment, _) = ingest_whole(&reference, &mut resident, None, &encoded.part(0..tau).unwrap());
+            let phases = resident.admitted()[0].clone();
+            let (mut lower, mut upper) = (rat(0, 1), rat(0, 1));
+            for n in tau..length {
+                let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+                let (staged, compared) = reference
+                    .compare(&mut resident, pending, &encoded.part(n..n + 1).unwrap())
+                    .unwrap();
+                // The receiver's code of cell n: its population over the tree's and the combined
+                // face, scored at the compare, before this cell's deposit.
+                let code = compared.forward.present().unwrap().code_length().unwrap();
+                if n >= length / 2 {
+                    lower = lower + &code.lower;
+                    upper = upper + &code.upper;
+                }
+                if learner {
+                    reference.deposit(&mut resident, staged).unwrap();
+                    if n >= length - 2 * tau && code.upper < rat(1, 1) {
+                        continued += 1;
+                    }
+                } else {
+                    reference.discard(&mut resident, Handle::Staged(staged)).unwrap();
+                }
+                let (_, closed) = ingest_whole(&reference, &mut resident, Some(moment), &encoded.part(n..n + 1).unwrap());
+                let receiving = field.rings().len() - 1;
+                let r_moved = resident
+                    .constitution()
+                    .receiving_map(receiving)
+                    .map(|map| map.entries().iter().any(|entry| !entry.is_zero()));
+                println!(
+                    "§1 frame {:?} {} cell {n}: actual {:?}, code [{}, {}]; aeons closed {closed}, commit {}, R moved {:?} ({} ms)",
+                    helix.periods(),
+                    if learner { "learner" } else { "twin" },
+                    denotes[chart[n]],
+                    code.lower,
+                    code.upper,
+                    resident.constitution().commit(),
+                    r_moved,
+                    started.elapsed().as_millis()
+                );
+            }
+            sums.push((lower, upper));
+        }
+        println!(
+            "§1 frame {:?}: cells {}..{} summed code, learner [{}, {}] against twin [{}, {}]; continued {continued} of {}",
+            helix.periods(),
+            length / 2,
+            length,
+            sums[0].0,
+            sums[0].1,
+            sums[1].0,
+            sums[1].1,
+            2 * tau
+        );
+        assert!(sums[0].1 < sums[1].0, "C1: the learner codes the second half below the twin");
+        // C2 is measured, not met (record §3): the learner codes the cycle's +1 cells below one bit
+        // and its −2 cell above, so it carries the cycle's composition, not its position.
+        assert!(continued < 2 * tau);
+    }
+    assert!(frames > 0);
+}
