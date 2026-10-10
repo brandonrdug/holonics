@@ -472,3 +472,125 @@ Answering it needs a read-only diagnostic that exposes, in the deposit, the post
 pre-prior `W` and carry, the raw descent and applied `q`, and the prior's located pair
 `(A₀, A₁, S)`. None exists in my code yet. O3 (§7) does not depend on it, since the clock letter
 carries the position through the tree, but the question stands for the map.
+
+## 9. The retained-field decoder: from the field's face to the tone's samples (design; acceptance fixed before code)
+
+[definition] **What the release offers** (`ExecutionPort::release`, `hnn::reference`).
+- From a pending ratio, `release` reads the receiver's face at its receiving phase and decides by
+  the declared rule whether the face's width (its fibres) lies within its grain's tolerance.
+- When it does, it publishes the face: the combined face, whose odometer masses `Face::odometer_masses`
+  are exact rationals. Otherwise it holds.
+- It **never chooses a class**. "Released classes" do not exist in the owner; a released face does.
+- The population face, the mixture the compare scores, is not published before its target.
+
+[definition; agent-inferred, 14:35 UTC] **The decoding route, in the owners' own terms.** Both the
+encoder and the decoder run the clocked learner of §7 online. Per cell `n`:
+1. **Field.** `refine`, then `release` with the releasing rule. A released face's exact masses
+   `p_n(c)` are the decoder's distribution for the cell's class. A held face is typed, and its cell's
+   class is then sent at the uniform charge `⌈log₂ |A|⌉`.
+2. **Class.** The actual class is coded under `p_n` by an exact rational interval code: the interval
+   narrows by `p_n(class)`, and the codeword is the shortest dyadic inside the final interval. Its
+   length is at most `Σ −log₂ p_n + 2` bits, with no float and no rounding.
+   - This interval code is the exterior boundary codec that realizes the field's own code length.
+     It learns nothing: the field's face is the model.
+3. **Continuation.** The decoder, having decoded cell `n`, does what the learner does: `compare` it
+   and `deposit`, then `ingest` it. Each step reads only cells already decoded, so the decoder
+   replays every deposit causally.
+4. **Sample.** The decoded class is the section symbol's landing class, the next state's quadrant.
+   - The sample lies in that cell's interval `[lo, hi]`: the ring's next image is affine in the
+     drive, and the cell is a quadrant of half-planes. This is §29's law, moved from the example into
+     the ring owner as one owner of the interval.
+   - The **within-cell fibre**, the sample's index in `[lo, hi]`, is the decoder's residual operand.
+     It is charged at `⌈log₂ (hi − lo + 1)⌉` bits, never chosen.
+   - The decoder forward-ticks the ring with the decoded sample and checks the landing, as §29's
+     decoder does.
+
+**Acceptance (on the clean F1 tone, ring `t = 1`, window `(120, 120)`, frame `[7, 2]` then `[9, 2]`):**
+- **D1, exact.** The independent decoder returns every sample of the window exactly. It is given
+  only the emitted bits and the declared field, ring, frame, letters and window opening.
+- **D2, charged.** The emitted bits split as class bits and index bits, with the window's opening
+  state (its placement) charged in a declared header. The class bits are compared with the
+  near-return's code of the same word (§28) and with the uniform `113 ⌈log₂ 2⌉`. The index bits are
+  identical across the comparison, being the same fibre.
+- **D3, holds.** Every held face is reported by cell, with its typed charge.
+
+**Dependencies, made concrete.**
+- **The permit.** O3's C2″ (14 of 14 on both frames) is the phase-position evidence that permits the
+  build.
+- **Missing owners, built in this order:**
+  1. The cell interval as a ring owner (from the example; the example then calls it).
+  2. The exact interval code over a released face, at the boundary codec.
+  3. The decoder's online field, which is the learner's loop.
+- **If releases hold where the population code is below one bit** (the combined face's width over
+  tolerance), D3 records it. The alternative charge is then the compare-scored population code,
+  which the decoder can read only per candidate class: each candidate is compared, its staged
+  deposit discarded. That route is named and not built unless D3 forces it.
+
+## 10. The O3 review's adjustments: a pinned prefix, the charges, the retained advance law
+
+[definition] Codex's read-only review of `5fbdc9c5` and `b8aa38b7` asks for adjustments:
+- **Lawful:** the phase letter reads an existing ring clock after a received cell, before the target
+  it predicts; the located digits are the chart's fixed per-class `a_g(c)`; the depth stays 2; no
+  authored period-7 routine was found.
+- **Blocked:** §7's claim that `[9, 2]` proves no target fit. The chart was founded from the whole
+  120-cell word, so its advances may encode the period-7 relation even on a modulus-9 ring. That
+  frame rejects a literal ring-period shortcut, not whole-word side information. **Withdrawn.**
+- **Blocked:** §7's claim that C3 includes the letters' description charge. `Field::describe` did not
+  read the letters, and the tree's bundle mixture does not code the declaration or the located chart.
+  **Withdrawn.**
+- **A defect, found from source:** the register's located mode, a flag, was neither written nor
+  restored with the address, nor charged. A cold restoration would then step by the identity route.
+- **A precision for §8:** the exact `(a, −a, b, −b)` form fails even for twin cell 113,
+  `(1/4, −1/4, 23/128, −183/1024)`. The neighbour calculation at cells 116–117 needs a **paired**
+  coefficient `R_i2 − R_i3 = 64`, not a single entry of 64.
+- **Expressive scope:** 14 of 14 is the tree conditioning on a supplied causal clock. It is neither
+  a repaired `R` nor a retained-field release.
+
+[definition; agent-inferred] **The repairs.**
+1. **The located route's advance law is retained state.** The register holds, per class, the digits
+   it has received (a chart's digits are fixed per class), replacing the flag.
+   - It is written and restored with the address (the state text's `advances` line) and charged in
+     the register's bits: one route bit, and per class one presence bit plus its digits on the kept
+     rings.
+   - Known targets step by it at every aperture. "Apertures above one are owed" is withdrawn.
+   - Digits from another chart, an identity step after a located one, or a known target of a class
+     never received are each refused, typed.
+   - A register that keeps no ring, the cell-only family, holds no law, so every existing field and
+     its bits are unchanged.
+   - Test: `a_located_register_retains_its_advance_law_warm_and_cold`. The cold restoration reads
+     every phase as the warm register does.
+2. **The letters are charged in the field's code.** A declared family takes the next receiving-law
+   code (`RECEIVING_LAW_LETTERED = 4`, the doc's own rule, "a feature-law change takes the next
+   code"), followed by its slots. A cell-only field keeps code 3 unchanged.
+3. **The causal experiment.**
+   - The cycle's period and the located chart are read from the word's **first 28 cells only**
+     and frozen. The field ingests that prefix, and every later cell is coded before it is read.
+   - The test runs **two openings**, settle 120 and 123, a shifted phase of the same cycle.
+   - It asserts C1, C2″ and C3″, and reports the letters' charge and the frozen chart's code.
+
+[measured] ([receipt](receipts/2026-10-10-online-learning/O3B_PINNED_PREFIX.v1.json); developer read, 46043566872 ns, taken after the letters' charge and before the advance
+law's retention. After the retention, `acoustic_encoding` passes 10 of 10 with the same C1, C2″ and
+C3″ assertions; the receiving tests 37 of 37; the cold-restore tests 4 of 4.) Population codes on cells `60 … 119`, bracketed exactly in quarter bits
+(the enclosures are in the log); the twin codes 60 bits throughout.
+
+| Opening | Frame | Clocked | Cell-only | C2″ | Letters' charge | Frozen chart |
+|---|---|---|---|---|---|---|
+| 120 | `[7, 2]` | `[21/4, 11/2]` | `[36, 145/4]` | 14 of 14 | 17 bits | 18 bits |
+| 120 | `[9, 2]` | `[21/4, 11/2]` | `[36, 145/4]` | 14 of 14 | 17 bits | 21 bits |
+| 123 | `[7, 2]` | `[5, 21/4]` | `[67/2, 135/4]` | 14 of 14 | 17 bits | 18 bits |
+| 123 | `[9, 2]` | `[19/4, 5]` | `[135/4, 34]` | 14 of 14 | 17 bits | 21 bits |
+
+**Reading, within its scope.**
+- With the chart pinned from a 28-cell prefix, and on a shifted opening, the clocked learner codes
+  the continuation's second half in at most `11/2` bits.
+- Adding the letters' 17-bit declaration still leaves it far below the cell-only learner (at least
+  `67/2` bits). The frozen chart is common to both arms.
+- The `−2` cells of the last two cycles code below one bit on every run.
+
+**What stays open.**
+- The chart is still located from the same word's development prefix, conditional on its cycle
+  being present there. An alternate word of the same composition but a different order is not yet
+  read.
+- The end-to-end code against the near-return or the cell codec, charging the prefix, the chart and
+  the letters together, is the decoder's (§9), not this table's.
+- The map and carry attribution of §8 remains an owner question for the 16:30 checkpoint.

@@ -1645,3 +1645,41 @@ fn the_field_declares_its_receivers_letter_family() {
     };
     assert!(field.with_letter_family(missing).is_err());
 }
+
+/// **A located register retains its advance law, and its cold restoration reads as the warm one**
+/// (`LetterReader`'s advance law; the online-learning record §10): on a field whose receivers read
+/// ring 0's phase class, a register receiving located occurrences (each class's digits on the kept
+/// ring) writes its law with its clocks; the register continued from that text reads every later
+/// phase, known targets included, exactly as the warm register does; its bits charge the law; and
+/// digits for a class that disagree with the retained ones, or an identity step after a located
+/// one, are refused.
+#[test]
+fn a_located_register_retains_its_advance_law_warm_and_cold() {
+    use crate::hnn::receiving::{ActiveAddress, Feature, FeatureFamily, LetterReader};
+    let field = campaign_field();
+    let period = field.ring(0).period();
+    let family = FeatureFamily::new(vec![Feature::Phase { ring: 0, grain: period }]).unwrap();
+    let current = Current::at_rest(&field);
+    let mut warm = ActiveAddress::of_reader(2, LetterReader::of(&field, family.clone(), &current).unwrap());
+    let digits = |class: usize| vec![(class as u64 + 1) % period, 0, 0, 0];
+    let plain_bits = warm.reader().bits();
+    for &class in &[0usize, 1, 0, 2, 1] {
+        warm.receive_at(class, Some(&digits(class))).unwrap();
+    }
+    assert!(warm.reader().bits() > plain_bits, "the retained law is charged");
+    let mut text = String::new();
+    warm.write(&mut text);
+    let mut lines = text.lines();
+    let head = lines.next().unwrap();
+    let mut next = |_: &str| lines.next().ok_or(HnnError::ContinuingState { what: "a line" });
+    let cold = ActiveAddress::of_reader(2, LetterReader::of(&field, family, &current).unwrap())
+        .continued(head, &mut next)
+        .unwrap();
+    for j in 0..3 {
+        assert_eq!(cold.phase(&[1, 0], j).unwrap(), warm.phase(&[1, 0], j).unwrap(), "phase {j}");
+    }
+    assert!(warm.phase(&[3], 1).is_err(), "a known target's class never received has no digits");
+    let mut disagreeing = warm.clone();
+    assert!(disagreeing.receive_at(0, Some(&digits(1))).is_err(), "one chart's digits per class");
+    assert!(warm.receive(0).is_err(), "no identity step after a located one");
+}

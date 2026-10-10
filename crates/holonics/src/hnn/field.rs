@@ -2280,7 +2280,31 @@ impl Field {
         // (0, ℓ, i, j)" (`constitution::declared_sign`), `E_0`'s initial value on every field.
         natural(&mut code, 0);
         // The receiving law (the landmark tree) and the tree's Krichevsky–Trofimov prior `α = 1/2`.
-        natural(&mut code, RECEIVING_LAW);
+        // A declared letter family is a feature-law change, so it takes the next code
+        // (`RECEIVING_LAW_LETTERED`) followed by its slots: kind (0 a ring's phase class, 1 a
+        // contact's reading), the ring or contact, and the grain or the lock bound `(P, Q)`. The
+        // cell-only family keeps `RECEIVING_LAW` and its code is unchanged (the online-learning
+        // record §10).
+        if self.letters.is_empty() {
+            natural(&mut code, RECEIVING_LAW);
+        } else {
+            natural(&mut code, RECEIVING_LAW_LETTERED);
+            natural(&mut code, self.letters.slots() as u64);
+            for feature in self.letters.features() {
+                match feature {
+                    crate::hnn::receiving::Feature::Phase { ring, grain } => {
+                        naturals(&mut code, &[0, *ring as u64, *grain]);
+                    }
+                    crate::hnn::receiving::Feature::Contact { contact, bound } => {
+                        naturals(&mut code, &[1, *contact as u64]);
+                        rational(
+                            &mut code,
+                            &Rat::new(BigInt::from(bound.numerator.clone()), BigInt::from(bound.denominator.clone())),
+                        );
+                    }
+                }
+            }
+        }
         rational(&mut code, &rat(1, 2));
         // The step rule: 2 names "the certified step of every locus" (`hnn::constitution`, "The
         // certified step" and "The factor families' certified step": the largest dyadic step its
@@ -2310,6 +2334,12 @@ impl Field {
 /// the next code and starts a fresh constitution: an old statistic cannot be re-read through new
 /// features without the samples retention forbids.
 pub const RECEIVING_LAW: u64 = 3;
+
+/// [definition; agent-inferred, October 10; the online-learning record §10] **The receiving law with
+/// declared letters**: code [`RECEIVING_LAW`]'s law, its tree addressed by the field's declared
+/// letter family (`Field::with_letter_family`) beside each cell, the family coded after this code in
+/// [`Field::describe`].
+pub const RECEIVING_LAW_LETTERED: u64 = 4;
 
 /// **The word's precisions by rule** ([`WordLattice::by_rule`]): the finest receiver grain
 /// `L_R = ⌈1/ε_bits⌉`, the widest receiving fan-in `X_w = 2d_R`, the widest local solve (a ring's
