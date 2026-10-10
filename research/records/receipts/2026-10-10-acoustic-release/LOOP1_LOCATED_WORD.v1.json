@@ -1,0 +1,13 @@
+{
+ "scope": "Local developer read by opus under the common lease (announced), not claim-bearing: acoustic_encoding with loop 1's located-section-word test after the relabelling correction (bank record section 26).",
+ "log_sha256": "d29c49c5cdd670275e3931490e3f62bb3e014d93d93236921c49dacc1323c9b7",
+ "deadline_s": 300,
+ "lines": [
+  "located section word (clean): τ 7, defects 0, near-return bits (27, 360), frames carrying 18 of 38; tally FrameTally { narrow: 0, empty: 20, plural: 0, open: 0, one: 18 }",
+  "  the cycle's own classes: 2 ([3, 0])",
+  "located section word (departed): τ 7, defects 6, near-return bits (73, 360), frames carrying 18 of 38; tally FrameTally { narrow: 0, empty: 20, plural: 0, open: 0, one: 18 }",
+  "  the cycle's own classes: 2 ([3, 0])",
+  "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.96s",
+  "BOUNDED start 07:11:30 end 07:11:52 exit 0 wall_ns 21478576534 child_peak_rss_kib 715592"
+ ]
+}

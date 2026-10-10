@@ -571,21 +571,21 @@ fn section_ring(t: i64) -> holonics::hnn::ring::ResonatorOperands {
     ResonatorOperands::at_cut(0, &material, &(integer(1) / (integer(4) * &a)), &integer(1), None).unwrap()
 }
 
-/// **A ring's section word through its located cycle** (bank record §23, W1 and W2; measured: W1 is
-/// not met). The ring `t = 1` is driven by the replica's F1 tone; its settled window's near-return
-/// cycle, its advances as classes `Δℓ + 2` repeated over the window, is read on the declared two-ring
-/// frames (`FrameFamily::pairs(9)`). On a carrying frame the located chart would be founded and
-/// admitted (`Encoded::through`), its squares and every stepped lift checked, and the regenerated
-/// cycle with the near-return's defects substituted compared with the word (W2). Measured: no
-/// declared pair frame carries the cycle; every reading is typed (narrow, empty or plural). The test
-/// pins that reading; the carrying branch stays the consumer W1 needs.
+/// **A ring's section word enters the field through its located cycle** (bank record §23, §26; W1 and
+/// W2). The ring `t = 1` is driven by the replica's F1 tone, clean and with one departure after the
+/// settle allowance; its settled window's near-return cycle, read by equality as its own advances'
+/// ordinals in order of first occurrence (the relabelling law; the tone's chart reads its samples so),
+/// is located on the declared two-ring frames (`FrameFamily::pairs(9)`). On every carrying frame the
+/// located chart is founded and admitted (`Encoded::through`), the squares hold, every stepped lift
+/// passes `check_step`, and the located navigator regenerates the cycle, which with the near-return's
+/// defects substituted is the window's word exactly. The defects are substitutions, not erasures.
 #[test]
-fn a_rings_section_word_is_located_on_no_declared_pair_frame() {
+fn a_rings_section_word_enters_the_field_through_its_located_cycle() {
     use holonics::hnn::section_lock::{LockReader, LockWindow, Settled};
     use holonics::hnn::wave::{MatchedWave, WavePort};
     let f1 = [-9i64, -9, -2, -2, 5, 5, 12];
     let window = LockWindow::new(120, 120).unwrap();
-    for (name, departure) in [("clean", None::<(usize, i64)>)] {
+    for (name, departure) in [("clean", None), ("departed", Some((180usize, 7i64)))] {
         let mut tone: Vec<i64> = (0..240).map(|k| f1[k % 7]).collect();
         if let Some((k, d)) = departure {
             tone[k] += d;
@@ -612,9 +612,19 @@ fn a_rings_section_word_is_located_on_no_declared_pair_frame() {
         let class = |advance: i8| usize::try_from(advance + 2).unwrap();
         let actual: Vec<usize> = word.symbols().iter().map(|s| class(s.advance)).collect();
         let tau = near.period();
-        let passage: Vec<usize> = (0..window.length()).map(|k| actual[k % tau]).collect();
+        let periodic: Vec<usize> = (0..window.length()).map(|k| actual[k % tau]).collect();
+        // Location reads only equality (the relabelling law): the passage's classes are its own
+        // advances' ordinals in order of first occurrence, as the tone's chart reads its samples.
+        let mut seen: Vec<usize> = Vec::new();
+        for &c in &periodic {
+            if !seen.contains(&c) {
+                seen.push(c);
+            }
+        }
+        let ordinal = |c: usize| seen.iter().position(|&s| s == c).unwrap();
+        let passage: Vec<usize> = periodic.iter().map(|&c| ordinal(c)).collect();
         let family = FrameFamily::pairs(9).unwrap();
-        let location = family.locate(5, &[passage.clone()]).unwrap();
+        let location = family.locate(seen.len(), &[passage.clone()]).unwrap();
         let field = wide_field();
         let mut carried = 0;
         for (helix, carrying) in location.carrying() {
@@ -629,7 +639,12 @@ fn a_rings_section_word_is_located_on_no_declared_pair_frame() {
                     .check_step(k, lifts[k] % helix.period(), lifts[k + 1] % helix.period())
                     .unwrap();
             }
-            let mut regenerated = transport.regenerate(carrying.key(), passage.len()).unwrap();
+            let mut regenerated: Vec<usize> = transport
+                .regenerate(carrying.key(), passage.len())
+                .unwrap()
+                .into_iter()
+                .map(|o| seen[o])
+                .collect();
             for &(k, advance) in near.defects() {
                 regenerated[k] = class(advance);
             }
@@ -643,10 +658,7 @@ fn a_rings_section_word_is_located_on_no_declared_pair_frame() {
             family.frames().len(),
             location.tally()
         );
-        // Measured (bank record §23): W1 is not met; no declared pair frame carries the cycle.
-        let tally = location.tally();
-        assert_eq!(carried, 0);
-        assert_eq!(tally.one, 0);
-        assert_eq!(tally.narrow + tally.empty + tally.plural + tally.open, family.frames().len());
+        println!("  the cycle's own classes: {} ({:?})", seen.len(), seen);
+        assert!(carried > 0, "W1: some declared frame carries the cycle ({name})");
     }
 }

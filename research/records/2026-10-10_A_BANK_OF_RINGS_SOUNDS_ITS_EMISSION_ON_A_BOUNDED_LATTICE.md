@@ -925,3 +925,28 @@ reads.)
   bit: about 10.2 path bits per tick against the octant's about 8.2 index bits. No full run is made,
   because the comparison is settled. What §21 shows is narrower: the sample can be coded by nothing
   but the ring's own dynamic symbols wherever its line moves, at a cost this measurement reads.
+
+## 26. Loop 1's W1 and W2 met, after correcting my adapter
+
+[measured] ([receipt](receipts/2026-10-10-acoustic-release/LOOP1_LOCATED_WORD.v1.json).) §25's
+failure was in **my adapter**, not in the route. I declared all five advance classes as the alphabet,
+but location reads only equality: its relabelling law (`compression::keys::transport`) says each
+frame's reading on `π ∘ x` is its reading on `x`. The tone route accordingly reads its samples as
+ordinals in order of first occurrence. The ring `t = 1` under F1 turns so that its cycle shows only
+**two** advances (`Δℓ = +1` and `−2`), so 13 frames were narrow only because of my declaration.
+
+With the cycle read as its own ordinals, the frame family and its bound unchanged (`pairs(9)`, 38
+frames):
+
+- **Clean tone.** `τ = 7`, 0 defects. **18 of 38** frames carry the cycle, and the other 20 are empty.
+  On every carrying frame the located chart is founded and admitted (`Encoded::through`), the
+  squares hold, every stepped lift passes `check_step`, and `regenerate(key, L)` equals the window's
+  word exactly. W1 and W2 are met.
+- **Departed tone** (one sample raised by 7 after the settle allowance). `τ = 7`, 6 defects. The same
+  18 frames carry the cycle, and `regenerate(key, L)` with the 6 defects substituted equals the
+  window's word exactly.
+
+`acoustic_encoding` passes 8 of 8. The ring's own section word now enters the field through the
+existing located route, with its departures as substitutions. That is the join loop 2's deposition
+consumes. W3, the census of located windows on the recording with the located description's bits
+against the spelled cycle's, is the next reading.
