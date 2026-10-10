@@ -441,3 +441,42 @@ whole-stream balance with seats closed. The emission's render is unchanged.
 the samples, and they carry less of each epoch's emission than its own drive does. §9's located rings
 and §11's near-returns, which describe the rings' section words in under half their length, remain
 the way forward. The residual named here is the bank's, `R_bank`, not the source's.
+
+## 13. The located rung (design; acceptance fixed before code)
+
+[definition; agent-inferred, October 10] §8 and §12 measure why the declared bank's moments are not a
+code: each ring forgets about half its energy per turn, so each key carries little beyond its own
+epoch. §11 shows the rings' own clocks near-return through most of the speech. The located rung
+therefore takes its rings from those returns, not from a declaration.
+
+- **Locate.** In each near-return window of the declared bank, the cycle's address `W/τ` is a turn
+  rate the speech held for at least two cycles. These readings are the located rates. Nothing names
+  a pitch or a harmonic: the address is the ring's own reading of what drove it.
+- **Located ring.** For a located rate `W/τ`, the ring is the declared ring's form
+  (`C = I, D = 0, K = 4(a² + t²), Y = 1/(4a)`). Its `t` is the simplest rational in the Farey order
+  whose free ring's own section word near-returns at exactly `W/τ`, read by running it. The coupling
+  `a` is the largest dyadic whose free ring holds at least half its energy across the window's span,
+  which is the memory the located return requires. Both are located by the ring's own dynamics; no
+  table maps a rate to a frequency.
+- **Keys and decoder.** As in §7, with §12's clock: keys at the located ring's own complete returns,
+  one per half-memory, and the decoder seated at each key. The decoded source is §9's least-power
+  fibre point of the keys of all located rings, solved per window, and `R_source = x − x̂` is exact.
+- **Both lengths paid.** `L_keys` covers the located rates (each `W/τ` and its window's placement), the
+  located rings' `t` and `a`, and the keys. `L_residual` covers `R_source` at the PCM grain. Both are
+  under the stated integer codes. The raw length is `16` bits per sample.
+
+**Acceptance (fixed before code).**
+- **L1.** Every located ring's free section word near-returns at its located `W/τ`, read by
+  `Settled::near_return`.
+- **L2.** Every decoder balance closes with its seats (as B1).
+- **L3.** `source = x̂ + R_source` exactly at every tick.
+- **L4.** `L_keys`, `L_residual` and `16 · 93680` are reported. A code is claimed only if
+  `L_keys + L_residual < 16 · 93680`. Otherwise the measurement names which term exceeds it.
+- **L5.** The decode `x̂` goes to Brandon whole, rendered by the render law.
+
+**Recorded failures checked.**
+- **An authored routine standing in for learning:** the rates and rings are located by the machine's
+  own returns and runs, and nothing is tuned to speech.
+- **Bits read as progress:** L4 reports both lengths and claims only a strict inequality, with the
+  decoder paid.
+- **Echo counted as generation:** the decode is called a decode of keys, never a generation.
