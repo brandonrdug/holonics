@@ -609,6 +609,14 @@ tests can comb through anything valuable").
      `E0624` on `DamagedPassage::new`, and `E0451` on a forged `Encoded`. No `From<Faces>`,
      `From<Released>` or `From<Vec<_>>` exists, so a release cannot be fed back as the next source
      cell.
+   - **A wave is not a code** (October 9). A sample read as a *symbol* has no path into the field,
+     as above. A sample read as a *pressure* is a different quantity, an exact amplitude with a power
+     pairing: `hnn::wave::MatchedWave` carries the incident-wave amplitudes of a source matched
+     to a loaded ring's port, with the port's admittance and step, and a ring's port receives it
+     (`WavePort::receive`; the executed tick's balance closes with the wave booked as boundary
+     work), never a field entry. The ring's own dynamics make its symbols
+     (`hnn::dynamic_section`). The two types do not convert either way (`compile_fail` doctests,
+     `E0277` and `E0308`): an `Encoded` is never a wave and a wave is never an `Encoded`.
    - **The located step.** An occurrence of the located route steps ring `g` by its class's located
      digit plus the carry, `a_g(c) + carry_g ≤ d_g`, its ticks held at `u64` (`SelectiveStep.ticks`),
      and the squares `D E = ρ` and `E T_a = U_a E` are checked on the lift the step reads and the

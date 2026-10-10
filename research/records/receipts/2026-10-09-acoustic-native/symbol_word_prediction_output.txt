@@ -1,0 +1,7 @@
+ring t=1 symbol word (rings <= 6, 5 classes, 21 samples): {'narrow': 7, 'empty': 0, 'plural': 5, 'open': 0, 'one': 0}; cycles read []
+  frame (2, 5) plural (12 gauge classes)
+  frame (3, 5) plural (108 gauge classes)
+  frame (4, 5) plural (462 gauge classes)
+  frame (5, 6) plural (5424 gauge classes)
+  frame (6, 5) plural (3228 gauge classes)
+exit 124
