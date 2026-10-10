@@ -751,3 +751,17 @@ Gate 1 passed at `ec1b950a`.
   not compression of the speech's content. It is §15's architecture working end to end, at its
   consumer, on the recording: source, cells and index, exact decode, nothing authored. The decode is
   the recording itself, so there is nothing new to hear.
+
+## 20. A finer section grain: the octant (reading fixed before the run)
+
+[definition; agent-inferred, October 10] The quarter-turn cell leaves the in-cell index dominant
+(§19). The cell gains one exact sign test, whether `|w′| ≥ |u′|`. With the class's signs `(s_w, s_u)`
+this is `s_w w′ − s_u u′ ≥ 0`, one more half-line on the sample, read by the same affine image. It
+costs one more bit per turning tick in the word (the origin carries none). The header carries a
+one-bit flag, and the decoder checks the octant it read as it checks the class. This is a finer
+section chart, still exact by signs, and declared like `RAYS`; it is not learned.
+
+**Reading rule.** The octant pays when its narrowing exceeds its bit. That is read as the emitted
+length at the octant grain against the quarter-turn grain on the same ring and ticks, with the
+decode exact in both. Neither length is read as learned content. Both are the section chart's
+grain against the uniform samples.
