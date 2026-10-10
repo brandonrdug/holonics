@@ -852,3 +852,35 @@ rounds").
 - Refused when `1` is an eigenvalue of `M` (no unique closed orbit). Convergence to the orbit is a
   property of the dissipation, to be read from `M`'s spectrum, not assumed.
 
+### 7e. The passage reaches its cycle once the receiving relation settles
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/PASSAGE_DEV_TESTS.v1.json)] The cycle law of §7d
+assumes an orbit exists, so two reads were made before it was built.
+
+- **The receiving relation learns at nearly every encounter at first** (`the_receiving_relation_between_encounters`).
+  Over ten plain encounters alternating `u = 1, −1`, the receiving publication moved `R` at every
+  encounter on fixture 1, and at nine of ten on fixture 2 (all but the last). The never-landing twin
+  is therefore not a still learner: its readout learns as the learner's does. The comparisons of
+  §7c and §7d are small material effects (`[2⁻²⁰, 2⁻¹¹)`) on a common drift that is larger: the
+  excess rose by up to `[2⁻⁶, 2⁻⁵)` between repeats of a wave, for learner and twin alike.
+- **Then it settles, and the passage closes** (`the_passage_over_forty_encounters`, fixture 1).
+  - `R` moves at encounters 0 to 9 and at none of encounters 10 to 39.
+  - From about encounter 23 on, every reading recurs with period 2 at the receiver's grain: at
+    `u = 1` code in `[2⁰, 2¹)` and excess in `[2⁻⁷, 2⁻⁶)`; at `u = −1` code in `[2⁰, 2¹)` and excess
+    in `[2⁻⁶, 2⁻⁵)`.
+  - The closed orbit is **worse** than the opening: the excess began at `[2⁻⁹, 2⁻⁸)` and
+    `[2⁻⁷, 2⁻⁶)`. The readout's learning and the transient leave the receiver on an orbit whose
+    phase excess is higher.
+
+**What it means for the law.**
+- Once `R` has settled, the joint native and World passage under the repeated schedule is the affine
+  round map of §7d, and it converges to its closed orbit on this fixture. So the cycle's prospect is
+  well posed after settlement, and it is what the material should improve.
+- Before settlement, `R`'s deposits are lattice steps driven by each comparison. They are part of
+  the admitted future, and a prospect that holds `R` fixed is exact only once `R` no longer moves.
+- The orbit being worse than the opening is the plainest target the loop has had. The material is
+  to be admitted on the orbit's comparison, against the orbit the never-landing twin settles on.
+- The forty-encounter read held the common lease for 136.75 s while the queue waited to launch.
+  Developer reads that long are scheduled between the queue's runs, not across them.
+

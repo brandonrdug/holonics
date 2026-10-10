@@ -2336,3 +2336,70 @@ fn the_per_encounter_loop_is_read_on_a_second_fixture() {
     per_encounter_loop("second", true);
 }
 
+/// **Does the receiving relation move between encounters?** (§7d, a design read for the cycle):
+/// over ten plain encounters alternating `u = 1, −1` on both fixtures, whether each encounter's
+/// receiving publication changed `R`, reported as measured.
+#[test]
+fn the_receiving_relation_between_encounters() {
+    let (field, base, source) = fixture();
+    for (name, second) in [("first", false), ("second", true)] {
+        let theta = if second {
+            second_material(&field, base.clone())
+        } else {
+            Declared::new(&field, base.clone()).at(&Rat::zero())
+        };
+        let mut receiver = if second {
+            bound_second(&field, theta, &source)
+        } else {
+            bound(&field, theta, &source, vec![faced_key(&field)])
+        };
+        let preparation = actuator(&field);
+        let mut moved = Vec::new();
+        for k in 0..10 {
+            let control = &chain_controls()[k % 2];
+            let probe = receiver
+                .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+                .unwrap();
+            let waves = admitted(&probe, 0);
+            let reception = probe.encounter(&waves, control).unwrap();
+            let ActionCommunication::Received(received) = reception.reception else {
+                panic!("the encounter completes");
+            };
+            let comparison = received.comparison.as_ref().unwrap();
+            moved.push(comparison.receiving_before != comparison.receiving_after);
+        }
+        println!("receiving relation ({name}): moved at encounters {moved:?}");
+    }
+}
+
+/// **Does the passage settle?** (§7e, a design read for the cycle): forty plain encounters
+/// alternating `u = 1, −1` on the first fixture, each encounter's comparison and whether its
+/// receiving publication moved `R`, reported as measured.
+#[test]
+fn the_passage_over_forty_encounters() {
+    let (field, base, source) = fixture();
+    let theta = Declared::new(&field, base).at(&Rat::zero());
+    let mut receiver = bound(&field, theta, &source, vec![faced_key(&field)]);
+    let preparation = actuator(&field);
+    for k in 0..40 {
+        let control = &chain_controls()[k % 2];
+        let probe = receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let comparison = received.comparison.as_ref().unwrap();
+        let ratio = &comparison.returned.ratio;
+        println!(
+            "passage: encounter {k} (u = {}): code {:?} excess {}; R moved {}",
+            control[0],
+            ratio.code_length().unwrap(),
+            ratio.excess().unwrap(),
+            comparison.receiving_before != comparison.receiving_after
+        );
+    }
+}
+
