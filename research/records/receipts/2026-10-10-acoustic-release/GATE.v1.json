@@ -1,0 +1,12 @@
+{
+ "scope": "Local developer gate 1 by opus under the common lease, not claim-bearing, at the committed source of the first release rung (the release run's binary differs only by the two exterior allow attributes).",
+ "stages": [
+  "gate check: ok (4276 ms)",
+  "gate guard-lints: ok (8772 ms)",
+  "gate guard-doctests: ok (6504 ms)"
+ ],
+ "bounded": [
+  "BOUNDED start 04:30:06 end 04:30:25 exit 0 wall_ns 19557969322 child_peak_rss_kib 998384"
+ ],
+ "deadline_s": 300
+}

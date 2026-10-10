@@ -43,8 +43,8 @@
 //! at the word's end; this owner is a continuing port outside any word and is not joined to a
 //! resident (owed). The chunking of a stream changes nothing: `s_((j+1)g) = Tᵍ s_(jg) + Σ_a T^(g−1−a) B x_(jg+a)`.
 //!
-//! [definition; hypotheses] The ring is **passive**, unpumped, linear and on the exact law (no
-//! lattice). Passive: `C ⪰ 0` and `D ⪰ 0` are the owner's (`ResonatorMaterial::new`), and
+//! [definition; hypotheses] The ring is **passive**, unpumped and linear, on the exact law
+//! ([`WavePort::at_rest`]) or with its state carried on a declared lattice ([`WavePort::on_lattice`]). Passive: `C ⪰ 0` and `D ⪰ 0` are the owner's (`ResonatorMaterial::new`), and
 //! [`WavePort::at_rest`] requires `K ⪰ 0`, decided exactly by the inertia owner, so that the stored
 //! energy `E = ½ (w C w + u K u)` is nonnegative and the net work the source gives from rest is
 //! nonnegative (`Σ boundary_work ≥ E ≥ 0`). The loaded-solve certificate `2C + hD + (h²/2)K ⪰ 0`
@@ -76,6 +76,19 @@
 //! | the executed tick closes with every term, the port term the wave's `(hY/4)(a² − b²)` | `HNN/Ring.ring_tick_executed_energy_balance` | [`ReceivedTick::closes`], `ResonatorStep::closes` |
 //! | the matched port, the wave booked as boundary work, the continuing state | owed (#62) | [`MatchedWave`], [`WavePort`] |
 //! | a wave is not a code | structural (`compile_fail`) | [`MatchedWave`] |
+//! | the port on a lattice: the state split by error feedback, its remainders carried, every tick closing with its chart and split terms within their bounds | `HNN/Ring.ring_tick_executed_energy_balance`, `feedback_tick`; the port's own statement owed (#62) | [`WavePort::on_lattice`] |
+//!
+//! [definition; agent-inferred, October 10; the
+//! [bank record](../../../../research/records/2026-10-10_A_BANK_OF_RINGS_SOUNDS_ITS_EMISSION_ON_A_BOUNDED_LATTICE.md)]
+//! **The port on a lattice** ([`WavePort::on_lattice`]). On the exact law the carried state's
+//! denominators grow with every tick (the factor `145` per tick on the replica's bank), so its bits
+//! grow linearly with the stream. The bounded realization is the ring owner's own lattice step:
+//! the solve stays exact, and the rate, displacement and velocity images are each split at the
+//! declared lattice `2^(−L)` by error feedback (`hnn::chart::carry`, `x + r′ = y + r`), with the
+//! remainders carried by the port from tick to tick, never released mid-stream. Every carried state
+//! entry then lies on the lattice. Each tick's balance gains the chart and split terms, each within
+//! its certified bound (`ResonatorStep::closes`), and the port books them:
+//! `E′ − E = W_port − hωDω + chart + split`.
 //!
 //! # Guard 9, the second half: a wave is not an `Encoded`
 //!
@@ -153,6 +166,7 @@
 use num_traits::{Signed, Zero};
 
 use crate::hnn::HnnError;
+use crate::hnn::constitution::Lattice;
 use crate::hnn::contact::symmetric;
 use crate::hnn::ring::{ResonatorOperands, ResonatorRemainders, ResonatorStep};
 use crate::ratio::linear::inertia::inertia;
@@ -231,6 +245,8 @@ pub struct ReceivedTick {
     pub boundary_work: Rat,
     /// The owner's executed tick (its state, rate, remainders and balance terms).
     pub step: ResonatorStep,
+    /// The lattice exponent `L` the state was carried on, or `None` under the exact law.
+    pub lattice: Option<u32>,
 }
 
 impl ReceivedTick {
@@ -240,20 +256,28 @@ impl ReceivedTick {
     }
 
     /// **The consumer equation, every tick**: the owner's step closes
-    /// ([`ResonatorStep::closes`]) with no pump, integration, chart or split term (the unpumped
-    /// exact law), the booked work is the incident less the reflected energy, and the stored
-    /// energy changes by that work less the ring's dissipation,
-    /// `E′ − E = (hY/4)(a² − b²) − h ω D ω`.
+    /// ([`ResonatorStep::closes`]) with no pump or integration term (the unpumped law), the booked
+    /// work is the incident less the reflected energy, and the stored energy changes by that work
+    /// less the ring's dissipation, `E′ − E = (hY/4)(a² − b²) − h ω D ω`, plus, on a lattice, the
+    /// chart and split terms within their certified bounds; under the exact law both are zero.
     pub fn closes(&self) -> bool {
         let step = &self.step;
         step.closes()
             && self.reflected == step.output
             && step.pump.is_zero()
             && step.integration.is_zero()
-            && step.chart.is_zero()
-            && step.split.is_zero()
+            && (self.lattice.is_some() || (step.chart.is_zero() && step.split.is_zero()))
             && self.boundary_work == &self.incident_energy - &self.reflected_energy
-            && &step.after - &step.before == &self.boundary_work - &step.dissipation
+            && &step.after - &step.before
+                == &self.boundary_work - &step.dissipation + &step.chart + &step.split
+    }
+
+    /// The ring's emission `e = b − a`: the reflected wave less the direct reflection of the
+    /// incident amplitude on the driven coordinate, `−(2/Y) ω`, what the ring itself sends back.
+    pub fn emission(&self) -> Vec<Rat> {
+        let mut out = self.reflected.clone();
+        out[self.coordinate] = &out[self.coordinate] - &self.incident;
+        out
     }
 }
 
@@ -266,6 +290,8 @@ pub struct WavePort {
     coordinate: usize,
     state: [Vec<Rat>; 2],
     tick: usize,
+    lattice: Option<Lattice>,
+    remainders: ResonatorRemainders,
 }
 
 impl WavePort {
@@ -308,9 +334,37 @@ impl WavePort {
         Ok(Self {
             operands,
             coordinate,
-            state: [rest.clone(), rest],
+            state: [rest.clone(), rest.clone()],
             tick: 0,
+            lattice: None,
+            remainders: ResonatorRemainders {
+                rate: rest.clone(),
+                state: [rest.clone(), rest],
+            },
         })
+    }
+
+    /// **A port at rest whose state is carried on `lattice`** (module header): the same admission
+    /// as [`Self::at_rest`] (an exact solve, no chart), with every tick's rate and state split at
+    /// `2^(−L)` by error feedback and the remainders carried by the port.
+    pub fn on_lattice(
+        operands: ResonatorOperands,
+        coordinate: usize,
+        lattice: Lattice,
+    ) -> Result<Self, HnnError> {
+        let mut port = Self::at_rest(operands, coordinate)?;
+        port.lattice = Some(lattice);
+        Ok(port)
+    }
+
+    /// The lattice the state is carried on, `None` under the exact law.
+    pub fn lattice(&self) -> Option<Lattice> {
+        self.lattice
+    }
+
+    /// The remainders the next tick meets (all zero under the exact law).
+    pub fn remainders(&self) -> &ResonatorRemainders {
+        &self.remainders
     }
 
     /// The ring's operands.
@@ -375,8 +429,8 @@ impl WavePort {
             self.tick,
             &drive,
             [&self.state[0], &self.state[1]],
-            &ResonatorRemainders::default(),
-            None,
+            &self.remainders,
+            self.lattice.as_ref(),
         )?;
         let quarter = self.operands.hop() * self.operands.admittance() / integer(4);
         let incident_energy = &quarter * dot(&drive, &drive);
@@ -390,6 +444,7 @@ impl WavePort {
             incident_energy,
             reflected_energy,
             step,
+            lattice: self.lattice.map(|lattice| lattice.exponent()),
         };
         if !received.closes() {
             return Err(HnnError::Wave {
@@ -397,6 +452,9 @@ impl WavePort {
             });
         }
         self.state = received.step.state.clone();
+        if self.lattice.is_some() {
+            self.remainders = received.step.remainders().clone();
+        }
         self.tick += 1;
         Ok(received)
     }
