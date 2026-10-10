@@ -292,3 +292,56 @@ near-return grain is §9's prerequisite, and its acceptance comes first.
 near-return grain (matched-wave record §9: a lock for a stretch that is only near-periodic, its
 departure kept in the fibre) is the prerequisite of §9's located rings. Its acceptance is the next
 rung's first item.
+
+## 11. The near-return grain (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] The exact lock (§10) admits a period only when the window's
+symbols repeat with no exception. A near-periodic stretch repeats with exceptions. The grain must
+not be a tolerance, which would be a declared literal. It is read as compression, with both lengths
+paid:
+
+```text
+word      s_0 … s_(L−1)                                   the window's section symbols (hnn::dynamic_section)
+cycle_τ   s_0 … s_(τ−1)                                   the first τ symbols
+defects_τ {(k, Δℓ_k) : Δℓ_k ≠ Δℓ_(k mod τ)}              every tick whose advance the cycle does not predict, kept with it
+L_raw     = L · ℓ_s                                       the word spelled symbol by symbol
+L_τ       = γ(τ) + τ · ℓ_s + γ(|defects_τ| + 1) + Σ_defects (γ(gap) + ℓ_s)
+near-return:  the least τ ≤ L/2 minimizing L_τ, admitted iff L_τ < L_raw;  else Unlocked
+```
+
+Here `ℓ_s` is the bits of one symbol under the section word's own law. The class follows from the
+class recursion `class_(k+1) = class_k + Δℓ_k (mod 4)` and the crossing from `(class, Δℓ)`, so a
+symbol carries only its advance `Δℓ ∈ {−2, …, 2}`: `ℓ_s = ⌈log₂ 5⌉ = 3`. The opening class costs
+`2` bits in both `L_raw` and `L_τ`, so it cancels. A defect substitutes an advance. `γ` is the Elias
+gamma length.
+
+- **Nothing is lost.** The word is exactly the cycle repeated with the defects substituted, and
+  `decode(cycle_τ, defects_τ) = word` is asserted. The defects are the lock's fibre (the section
+  words' omitted detail, Codex's review), carried with their cost, not discarded.
+- **The exact lock is the case with no defects.** A window that locks exactly at `τ₀` has a
+  zero-defect description at `τ₀`, so it is admitted, at a length no greater than that.
+- **The winding is the cycle's.** `W = Σ_(k<τ) Δℓ_k / 4` is admitted only when it is whole. The
+  defects' own lift is read separately, `Σ_defects (Δℓ_k − Δℓ_(k mod τ))`, and is never folded into
+  `W`.
+
+**Acceptance.**
+- **N1.** `decode = word` on every window read.
+- **N2.** Every window the census locked is admitted, and its `L_τ` is at most the exact lock's
+  zero-defect length `γ(τ₀) + 3τ₀ + 1`. A window whose minimizing `τ` differs from `τ₀` (a shorter
+  cycle with a few defects that costs less) is counted and reported. (Amended before any code: under a
+  description-length law the minimizing period need not be the least exact period.)
+- **N3.** The census is repeated with the near-return grain, reporting per ring the windows admitted
+  and the sum of `L_τ` against the sum of `L_raw`, as exact integers.
+- **N4.** The owner is `hnn::section_lock`, beside the exact lock, after the winding join (in flight
+  separately) lands, so that the two changes do not collide.
+
+[measured] **N1 and N2 on the declared bank** ([receipt](receipts/2026-10-10-acoustic-release/NEAR_RETURN_TESTS.v1.json);
+`acoustic_wave_port` 22 of 22 at the merged worktree).
+- Under F1, F3 and F4, on every ring of the replica's bank, the near-return decodes its window's word
+  exactly.
+- Every exact lock is admitted, at a description no longer than its zero-defect one. Where it keeps
+  `τ₀`, it has no defect and the same winding and address.
+- The F1 wave with one sample raised by 7 after the settle allowance no longer locks exactly on the
+  ring `t = 1`. Its near-return keeps the clean cycle, `τ = 7`, with 6 defects whose own lift is 8,
+  read apart from the cycle's winding, and it describes the 120-tick window in 73 bits against 360.
+- The census on the recording (N3) and the gate are pending.

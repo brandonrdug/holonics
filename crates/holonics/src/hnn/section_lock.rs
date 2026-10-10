@@ -418,6 +418,162 @@ impl Settled {
     }
 }
 
+/// [definition; agent-inferred, October 10; the
+/// [bank record](../../../../research/records/2026-10-10_A_BANK_OF_RINGS_SOUNDS_ITS_EMISSION_ON_A_BOUNDED_LATTICE.md)
+/// §11] **A near-return**: the cycle of a window that is only near-periodic, with every tick whose
+/// advance the cycle does not predict kept as a defect. The grain is not a tolerance: it is the least
+/// period minimizing the description `L_τ = γ(τ) + 3τ + γ(|D| + 1) + Σ_D (γ(gap) + 3)` of the
+/// window's advances (a symbol carries only its advance `Δℓ ∈ {−2, …, 2}`, `⌈log₂ 5⌉ = 3` bits; the
+/// class follows by the recursion; `γ` the Elias gamma length), admitted only when it is shorter than
+/// the word spelled out, `3L`. Nothing is lost: [`NearReturn::decode`] returns the window's word.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct NearReturn {
+    start_class: u8,
+    cycle: Vec<i8>,
+    length: usize,
+    winding: i64,
+    address: Rat,
+    defects: Vec<(usize, i8)>,
+    bits: u64,
+    raw_bits: u64,
+}
+
+impl NearReturn {
+    /// The cycle's period `τ`.
+    pub fn period(&self) -> usize {
+        self.cycle.len()
+    }
+
+    /// The cycle's whole winding `W = Σ_(k<τ) Δℓ_k / 4` (the closed-loop owner's).
+    pub fn winding(&self) -> i64 {
+        self.winding
+    }
+
+    /// `W/τ` in lowest terms.
+    pub fn address(&self) -> &Rat {
+        &self.address
+    }
+
+    /// The defects `(k, Δℓ_k)`: every tick whose advance the cycle does not predict.
+    pub fn defects(&self) -> &[(usize, i8)] {
+        &self.defects
+    }
+
+    /// `L_τ` and `L_raw = 3L`, in bits.
+    pub fn bits(&self) -> (u64, u64) {
+        (self.bits, self.raw_bits)
+    }
+
+    /// The defects' own lift, `Σ_D (Δℓ_k − Δℓ_(k mod τ))`, read apart from the cycle's winding.
+    pub fn defect_lift(&self) -> i64 {
+        self.defects
+            .iter()
+            .map(|&(k, advance)| i64::from(advance) - i64::from(self.cycle[k % self.cycle.len()]))
+            .sum()
+    }
+
+    /// **The word, decoded**: the cycle repeated over the window with the defects substituted, the
+    /// classes and crossings by the recursion from the opening class ([`land`]).
+    pub fn decode(&self) -> Result<SectionWord, LockRefusal> {
+        let mut advances: Vec<i8> = (0..self.length)
+            .map(|k| self.cycle[k % self.cycle.len()])
+            .collect();
+        for &(k, advance) in &self.defects {
+            advances[k] = advance;
+        }
+        let mut class = self.start_class;
+        let mut symbols = Vec::with_capacity(self.length);
+        for advance in advances {
+            let (crossing, landed) = land(class, advance)?;
+            symbols.push(SectionSymbol {
+                class,
+                advance,
+                crossing,
+            });
+            class = landed;
+        }
+        SectionWord::new(symbols)
+    }
+}
+
+/// The Elias gamma length of `n ≥ 1`, `2⌊log₂ n⌋ + 1`.
+fn gamma(n: usize) -> u64 {
+    2 * u64::from(usize::BITS - 1 - n.max(1).leading_zeros()) + 1
+}
+
+/// The bits of one advance: `⌈log₂ 5⌉`.
+const ADVANCE_BITS: u64 = 3;
+
+impl Settled {
+    /// **Read the near-return** of a window (§11 of the bank record; module header of
+    /// [`NearReturn`]). Silent when nothing crossed a ray; Unlocked when no period of at most half
+    /// the window, with a whole winding, describes the word in fewer bits than the word itself.
+    pub fn near_return(&self, window: &LockWindow) -> Result<NearReturn, LockRefusal> {
+        let symbols = match self {
+            Self::Rest => return Err(LockRefusal::Silent),
+            Self::Word(word) => word.symbols(),
+        };
+        if symbols.len() != window.length {
+            return Err(LockRefusal::Incomplete {
+                have: symbols.len(),
+                need: window.length,
+            });
+        }
+        if symbols.iter().all(|symbol| symbol.advance == 0) {
+            return Err(LockRefusal::Silent);
+        }
+        let advances: Vec<i8> = symbols.iter().map(|symbol| symbol.advance).collect();
+        let raw_bits = ADVANCE_BITS * u64::try_from(window.length).unwrap_or(u64::MAX);
+        let mut best: Option<(u64, usize, Vec<(usize, i8)>)> = None;
+        let mut net: i64 = 0;
+        for tau in 1..=window.max_period() {
+            // A cycle closes only when its advances sum to whole turns: the closed-loop owner's
+            // admissibility, screened here; the owner reads the chosen cycle's winding below.
+            net += i64::from(advances[tau - 1]);
+            if net.rem_euclid(i64::from(RAYS)) != 0 {
+                continue;
+            }
+            let mut bits = gamma(tau) + ADVANCE_BITS * u64::try_from(tau).unwrap_or(u64::MAX);
+            let mut defects = Vec::new();
+            let mut last = None;
+            for k in tau..advances.len() {
+                if advances[k] != advances[k % tau] {
+                    let gap = last.map_or(k + 1, |previous| k - previous);
+                    bits += gamma(gap) + ADVANCE_BITS;
+                    defects.push((k, advances[k]));
+                    last = Some(k);
+                }
+            }
+            bits += gamma(defects.len() + 1);
+            if best.as_ref().is_none_or(|(kept, ..)| bits < *kept) {
+                best = Some((bits, tau, defects));
+            }
+        }
+        let refused = LockRefusal::Unlocked {
+            max_period: window.max_period(),
+            length: window.length,
+        };
+        let (bits, tau, defects) = best.ok_or(refused.clone())?;
+        if bits >= raw_bits {
+            return Err(refused);
+        }
+        let winding = cycle_winding(&symbols[..tau])?;
+        Ok(NearReturn {
+            start_class: symbols[0].class,
+            cycle: advances[..tau].to_vec(),
+            length: window.length,
+            winding,
+            address: Rat::new(
+                BigInt::from(winding),
+                BigInt::from(u64::try_from(tau).unwrap_or(u64::MAX)),
+            ),
+            defects,
+            bits,
+            raw_bits,
+        })
+    }
+}
+
 /// **The cycle's winding, by the owner of closed loops** (module header): the lifted advances of one
 /// cycle are the increments of a loop on the circle of four rays, and
 /// `geometry::winding::closed_loop_winding` returns their integer winding or refuses the loop with the

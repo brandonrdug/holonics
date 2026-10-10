@@ -1188,3 +1188,71 @@ fn a_key_seated_at_a_lattice_port_books_its_work() {
     assert!(matches!(port.seat([vec![Rat::zero()], vec![Rat::zero()]]), Err(HnnError::Shape { .. })));
     assert_eq!(port.state(), [&key[0][..], &key[1][..]]);
 }
+
+// -------------------------------------------------------------------------------------------
+// the near-return grain (bank record §11)
+
+/// The Elias gamma length, as the near-return counts it.
+fn gamma_length(n: usize) -> u64 {
+    2 * u64::from(usize::BITS - 1 - n.leading_zeros()) + 1
+}
+
+/// **N1 and N2 on the declared bank** (bank record §11): on every ring of the bank under F1, F3 and F4,
+/// the near-return decodes the window's word exactly; wherever the exact lock reads `τ₀`, the
+/// near-return is admitted at a description no longer than the exact lock's zero-defect one,
+/// `γ(τ₀) + 3τ₀ + 1`, and when it keeps `τ₀` it has no defect and the same winding and address.
+#[test]
+fn the_near_return_decodes_its_window_and_the_exact_lock_is_its_zero_defect_case() {
+    for tone in [cycle_of(&F1, SAMPLES), cycle_of(&F3, SAMPLES), cycle_of(&F4, SAMPLES)] {
+        let rings = bank_settled(&tone);
+        for (ring, exact) in rings.iter().zip(locks(&rings)) {
+            let near = ring.near_return(&lock_window());
+            if let Ok(near) = &near {
+                let Settled::Word(word) = ring else {
+                    panic!("a near-return reads a word")
+                };
+                assert_eq!(&near.decode().unwrap(), word, "N1: the decode is the window's word");
+                let (bits, raw) = near.bits();
+                assert!(bits < raw);
+            }
+            if let Ok(lock) = exact {
+                let near = near.expect("N2: an exact lock is admitted as a near-return");
+                let tau = lock.period();
+                assert!(near.bits().0 <= gamma_length(tau) + 3 * tau as u64 + 1);
+                if near.period() == tau {
+                    assert!(near.defects().is_empty());
+                    assert_eq!(near.winding(), lock.winding());
+                    assert_eq!(near.address(), lock.address());
+                }
+            }
+        }
+    }
+}
+
+/// **A near-periodic word keeps its defects** (bank record §11): the F1 wave with one sample changed
+/// after the settle allowance no longer locks exactly on the ring `t = 1`, and the near-return reads
+/// the F1 cycle with the departure kept, decoding the window exactly; its defects' lift is read apart
+/// from the cycle's winding.
+#[test]
+fn a_near_periodic_window_keeps_its_departure_as_defects() {
+    let mut tone = cycle_of(&F1, SAMPLES);
+    tone[SETTLE + 60] += 7;
+    let ring = settled(&run(&integer(1), &tone)).unwrap();
+    assert!(matches!(ring.lock(&lock_window()), Err(LockRefusal::Unlocked { .. })));
+    let near = ring.near_return(&lock_window()).unwrap();
+    let Settled::Word(word) = &ring else {
+        panic!("the ring reads a word")
+    };
+    assert_eq!(&near.decode().unwrap(), word);
+    assert!(!near.defects().is_empty());
+    let exact = settled(&run(&integer(1), &cycle_of(&F1, SAMPLES))).unwrap();
+    let clean = exact.lock(&lock_window()).unwrap();
+    let (bits, raw) = near.bits();
+    println!(
+        "near-return: τ {} (clean {}), defects {}, defect lift {}, bits {bits} of {raw}",
+        near.period(),
+        clean.period(),
+        near.defects().len(),
+        near.defect_lift()
+    );
+}

@@ -98,6 +98,23 @@ The helical code, the encoding every Holon carries, is defined in
   two-encounter credit's landing, provenance carrying the located key's identity, more fixtures,
   and the World-sensitive Ask on a field where selection is informative.
 
+**October 10: the acoustic release's first rungs** (#386, #148; the
+[bank record](research/records/2026-10-10_A_BANK_OF_RINGS_SOUNDS_ITS_EMISSION_ON_A_BOUNDED_LATTICE.md);
+developer reads, the first rung at the queue).
+- **A bounded port and a render:** `WavePort::on_lattice` carries a ring's state on `2^(−32)` by the
+  ring owner's own error-feedback step. Every tick and every whole-stream balance closes exactly. A
+  declared 24-ring bank's emission, driven by a 93680-tick recording, is rendered by one feedback tick
+  at the PCM lattice, and Brandon has the render.
+- **Each ring decodes its own moment keys:** a key is the ring's state at its own section arrival,
+  once per half-memory, and the decoder is the same ring seated at each key (`WavePort::seat`). The
+  measured blocker: the declared bank forgets half its energy in one turn, so its 86446 keys cost
+  3872041 bits against the recording's 1498880 and carry only part of it.
+- **Exact locks do not carry this speech:** the lock census locks 6730 of 52349 windows, almost none
+  below about 400 Hz, and nearly all at the rings' own free turns. The near-return grain (a
+  description-length law, with the defects kept) is the located rung's prerequisite. The section
+  owners now call the winding owners (`land`, `closed_loop_winding`, `SectionWord::concat`).
+- **Still owed:** the source decoder as the keys' least-power fibre point (§9), on located rings.
+
 **October 10: learning across two observations lands at both waves** (#73; the
 [held-carry record](research/records/2026-10-09_THE_ASKED_ENCOUNTER_TEACHES_THE_MATERIAL_THROUGH_ITS_HELD_CARRY.md)
 §7–§7b; developer reads, not yet the queue's).

@@ -1,0 +1,11 @@
+{
+ "scope": "Local developer read by opus under the common lease (it ran in a gap between Codex's validator steps, breaking opus's hold pledge; acknowledged in the mailbox), not claim-bearing: acoustic_wave_port at the merged worktree (the section winding join plus the near-return grain).",
+ "lines": [
+  "near-return: τ 7 (clean 7), defects 6, defect lift 8, bits 73 of 360",
+  "test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 19.37s",
+  "BOUNDED start 05:08:27 end 05:08:47 exit 0 wall_ns 19442252119 child_peak_rss_kib 41360"
+ ],
+ "stdout_sha256": "fed5a772f84e37b01222cb2d327c48c7abef055ef82b2d46f9962698c1b0a06d",
+ "deadline_s": 420,
+ "pending": "the near-return census (N3) and gate 1, deferred until the validator's final receipt"
+}

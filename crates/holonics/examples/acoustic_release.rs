@@ -208,6 +208,8 @@ fn ring_pass(
     let mut lock_reader = LockReader::new(window);
     let (mut locked, mut unlocked, mut rest, mut refused) = (0u64, 0u64, 0u64, 0u64);
     let mut addresses: std::collections::BTreeMap<String, u64> = std::collections::BTreeMap::new();
+    let (mut near_admitted, mut near_refused, mut near_bits, mut near_raw, mut near_defects) =
+        (0u64, 0u64, 0u64, 0u64, 0u64);
     let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
     let (mut work, mut dissipation, mut defect) = (Rat::zero(), Rat::zero(), Rat::zero());
     let (mut state_bits, mut remainder_bits) = (0u64, 0u64);
@@ -252,7 +254,21 @@ fn ring_pass(
                 let full = std::mem::replace(&mut lock_reader, LockReader::new(window));
                 match full.finish() {
                     Ok(Settled::Rest) => rest += 1,
-                    Ok(word @ Settled::Word(_)) => match word.lock(&window) {
+                    Ok(word @ Settled::Word(_)) => {
+                        // N3: the near-return of the same window, with its bits against the raw word.
+                        match word.near_return(&window) {
+                            Ok(near) => {
+                                let (bits, raw) = near.bits();
+                                near_admitted += 1;
+                                near_bits += bits;
+                                near_raw += raw;
+                                near_defects += near.defects().len() as u64;
+                                let Settled::Word(read) = &word else { unreachable!() };
+                                assert_eq!(&near.decode().unwrap(), read, "N1 on the recording");
+                            }
+                            Err(_) => near_refused += 1,
+                        }
+                        match word.lock(&window) {
                         Ok(lock) => {
                             locked += 1;
                             *addresses
@@ -262,7 +278,8 @@ fn ring_pass(
                         Err(LockRefusal::Silent) => rest += 1,
                         Err(LockRefusal::Unlocked { .. }) => unlocked += 1,
                         Err(_) => refused += 1,
-                    },
+                        }
+                    }
                     Err(_) => refused += 1,
                 }
             }
@@ -309,7 +326,7 @@ fn ring_pass(
     let balanced = energy == &work - &dissipation + &defect;
     assert!(balanced, "ring {b}: the whole stream's balance closes");
     let census = format!(
-        "ring {b}: lock census over windows of {} ticks (4 turns of {turn_ticks}): locked {locked}, unlocked {unlocked}, silent or at rest {rest}, refused {refused}; addresses (winding over period: windows) {:?}",
+        "ring {b}: lock census over windows of {} ticks (4 turns of {turn_ticks}): locked {locked}, unlocked {unlocked}, silent or at rest {rest}, refused {refused}; near-returns admitted {near_admitted}, not admitted {near_refused}, bits {near_bits} of {near_raw} raw over the admitted, defects {near_defects}; addresses (winding over period: windows) {:?}",
         window.length(),
         addresses
     );
