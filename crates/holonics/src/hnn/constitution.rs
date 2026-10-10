@@ -8050,6 +8050,27 @@ impl DeclaredExponents {
         self.steps.iter()
     }
 
+    /// [definition; agent-inferred, October 9; the held-carry record §5c] **Every declared exponent
+    /// raised by `by` dyadic steps**, each family's first-reach read kept: the raised exponent lies at
+    /// or above that family's first reach, so its applied factor still moves, which the declared-step
+    /// producer re-checks. `None` on overflow.
+    pub(crate) fn raised(&self, by: i64) -> Option<Self> {
+        let steps = self
+            .steps
+            .iter()
+            .map(|(key, step)| {
+                Some((
+                    *key,
+                    DeclaredExponent {
+                        exponent: step.exponent.checked_add(by)?,
+                        reach: step.reach.clone(),
+                    },
+                ))
+            })
+            .collect::<Option<_>>()?;
+        Some(Self { steps })
+    }
+
     /// The certified exponents a native publication took, declared as they are with no reach
     /// claimed: the anchor at which only the exponent source differs.
     #[cfg(test)]

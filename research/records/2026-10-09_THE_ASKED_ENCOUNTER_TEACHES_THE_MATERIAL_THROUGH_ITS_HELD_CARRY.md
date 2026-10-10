@@ -439,3 +439,43 @@ the excess. Identical enclosure endpoints alone never count. With this witness, 
 strictly smaller excess at an exactly equal code (`Admitted::Phase`), as it already did for the
 contact route's ratios (Lean `HNN/FiniteDecrease.witness_code_eq` covers the class-target form; the
 soft-target form is owed to #62).
+
+## 5c. The first reach at the receiver's grain
+
+[definition; agent-inferred, October 9] The material's first reach is the least exponent at which a
+factor's lattice cell moves. A classical improvement, though, needs the *receiver's* reading at its
+grain to move. The landing therefore scans, and declares exactly one candidate:
+1. From the material's first reach, every declared exponent is raised one dyadic step at a time
+   (`DeclaredExponents::raised`).
+2. Each raise is produced by the native declared-step law and read through the located key's
+   prospect of the next encounter.
+3. The scan stops at the first raise whose code inputs at the grain differ from the contemporary
+   prospect's (`receiving_reading_identity` fails).
+4. The scan ends when the producer refuses. Every stepping family must carry a positive covector
+   scale, and `2^k c ≤ 1` bounds each family's exponent, so the scan is finite.
+5. When the reading never moves first, the material first reach's candidate is declared.
+
+`decide` reads only the declared candidate, so nothing is searched for an improvement: the first
+movement is declared whether it is better or worse. `WorldLandingReading::grain_raise` reports the
+raise.
+
+[measured; developer reads under the common lease, not claim-bearing] The loop over six encounters
+against its twin, with (6), the witness and the grain reach
+([receipt](receipts/2026-10-09-material-tangent/GRAIN_REACH_DEV_TESTS.v1.json)):
+
+| round | learner's code against the twin's | learner's excess − twin's | landing read after the round |
+|---|---|---|---|
+| 0 | equal | 0 | phase (the reading never moved) |
+| 1 | equal | below, in `[2⁻¹⁵, 2⁻¹⁴)` | phase (never moved) |
+| 2 | equal | below, in `[2⁻¹⁴, 2⁻¹³)` | refused, phase worse (moved at raise 6) |
+| 3 | equal | below, in `[2⁻¹⁵, 2⁻¹⁴)` | **classical** (moved at raise 4) |
+| 4 | **strictly below, gap in `[2⁻⁹, 2⁻⁸)`** | below, in `[2⁻¹⁴, 2⁻¹³)` | phase (never moved) |
+| 5 | overlapping enclosures | below, in `[2⁻¹⁰, 2⁻⁹)` | refused, phase worse |
+
+**On this fixture the loop learns from the World over six encounters and is never worse than its
+twin in the admission's order.** Four of six landings were admitted, three for the phase and one
+classical. The classical one produced a strict code gain at the next encounter. Every refusal is
+typed, and no uncertified step entered. This is one fixture, one declared bank of contact factors and
+one World. The queue's claim-bearing run, the cold restore, the two-observation delayed credit and any
+second fixture remain.
+

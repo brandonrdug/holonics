@@ -280,6 +280,10 @@ pub enum WorldLanding {
 #[derive(Debug)]
 pub struct WorldLandingReading {
     pub declared: DeclaredExponents,
+    /// The dyadic raise above the material's first reach at which the prospect's reading at the
+    /// receiver's grain first moved (`Some(0)` when it moved at the first reach); `None` when it never
+    /// moved before the producer refused, and the first reach's candidate was declared.
+    pub grain_raise: Option<i64>,
     pub committed: CommittedReach,
     pub reading: DepositReading,
     pub producing: ReceivingFaceRatio,
@@ -765,6 +769,13 @@ impl<'f> PhysicalReceiver<'f> {
                 reason: "a World landing stages its proposal where the proposal was bound",
             });
         }
+        // [agent-inferred; the record §5c] Every stepping family carries a positive covector scale,
+        // so its declared exponent is bounded by `2^k c ≤ 1` and the grain scan below ends.
+        if steps.iter().any(|step| step.covector.is_zero()) {
+            return Err(HnnError::Unadmitted {
+                reason: "a World landing's families carry a positive covector scale, which bounds their step",
+            });
+        }
         let theta = self.constitution().clone();
         let mut loci: Vec<Locus> = steps.iter().map(|s| s.gradient.locus()).collect();
         loci.sort();
@@ -776,15 +787,49 @@ impl<'f> PhysicalReceiver<'f> {
             Ok(declared) => declared,
             Err(refusal) => return Ok(WorldLanding::Unreached(refusal)),
         };
-        let (candidate, reading, committed) =
+        let producing =
+            self.world_prospect_ratio(&theta, source, receiver, preparation, compared, control)?;
+        // [definition; agent-inferred, October 9; the record §5c] **The first reach at the receiver's
+        // grain.** From the material's first reach, every declared exponent is raised one dyadic step
+        // at a time until the located key's prospect of the next encounter reads a different code
+        // input at the grain (`receiving_reading_identity` fails). The scan ends when the native
+        // producer refuses (`2^k c ≤ 1` bounds every family). That one candidate is declared. When
+        // the reading never moves first, the candidate at the material's first reach is declared.
+        // Nothing is admitted here: `decide` reads only the declared candidate.
+        let (mut candidate, mut reading, mut committed) =
             match theta.deposited_with_contact_spans_at(&deposit, &spans, &declared)? {
                 Ok(produced) => produced,
                 Err(refusal) => return Ok(WorldLanding::Unreached(refusal)),
             };
-        let producing =
-            self.world_prospect_ratio(&theta, source, receiver, preparation, compared, control)?;
-        let proposed =
+        let mut proposed =
             self.world_prospect_ratio(&candidate, source, receiver, preparation, compared, control)?;
+        let mut grain_raise = None;
+        if receiving_reading_identity(&producing, &proposed) {
+            let mut by = 1i64;
+            while let Some(raised) = declared.raised(by) {
+                let Ok(produced) = theta.deposited_with_contact_spans_at(&deposit, &spans, &raised)?
+                else {
+                    break;
+                };
+                let read = self.world_prospect_ratio(
+                    &produced.0,
+                    source,
+                    receiver,
+                    preparation,
+                    compared,
+                    control,
+                )?;
+                if !receiving_reading_identity(&producing, &read) {
+                    (candidate, reading, committed) = produced;
+                    proposed = read;
+                    grain_raise = Some(by);
+                    break;
+                }
+                by += 1;
+            }
+        } else {
+            grain_raise = Some(0);
+        }
         let decision = decide(
             &producing.code_length()?,
             &producing.excess()?,
@@ -798,6 +843,7 @@ impl<'f> PhysicalReceiver<'f> {
         };
         Ok(WorldLanding::Read(Box::new(WorldLandingReading {
             declared,
+            grain_raise,
             committed,
             reading,
             producing,

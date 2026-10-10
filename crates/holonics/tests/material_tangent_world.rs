@@ -785,7 +785,8 @@ fn the_world_landing_reads_the_next_encounter() {
         WorldLanding::Read(reading) => reading,
     };
     println!(
-        "world landing: producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}; deposition work {:?}",
+        "world landing: grain raise {:?}; producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}; deposition work {:?}",
+        reading.grain_raise,
         reading.producing.code_length().unwrap(),
         reading.producing.excess().unwrap(),
         reading.proposed.code_length().unwrap(),
@@ -876,12 +877,14 @@ fn loop_round(
         .unwrap();
     let decision = match landing {
         WorldLanding::Unreached(refusal) => format!("unreached {refusal:?}"),
-        WorldLanding::Read(reading) => format!("{:?}", reading.decision),
+        WorldLanding::Read(reading) => {
+            format!("{:?} at grain raise {:?}", reading.decision, reading.grain_raise)
+        }
     };
     (code, excess, decision)
 }
 
-/// **The loop over several encounters, against its twin without landings.** Each round on the
+/// **The loop over six encounters, against its twin without landings.** Each round on the
 /// learner is a teaching encounter, its World-sensitive descent and the landing read on the next
 /// encounter; the twin runs the same encounters at the same control with no landing. Every round's
 /// actual comparison is reported for both, as measured: the learner's material changes only where a
@@ -894,7 +897,7 @@ fn the_world_loop_is_read_against_its_twin_over_encounters() {
     let control = vec![integer(1)];
     let mut learner = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
     let mut twin = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
-    for round in 0..4 {
+    for round in 0..6 {
         let (code, excess, decision) = loop_round(&mut learner, &field, &source, &control);
         let preparation = actuator(&field);
         let probe = twin
