@@ -496,3 +496,23 @@ therefore takes its rings from those returns, not from a declaration.
    defects' lift is `Σ_D (Δℓ_k − Δℓ_(k mod τ))`.
 4. **The lattice moment law** (§12): `s_n = T^(n−m) s_m + Σ_(m≤j<n) T^(n−1−j) (B x_j + ρ_j)` for the
    port on a lattice, with `ρ_j` the tick's split.
+
+[measured] **The locate step, read** ([receipt](receipts/2026-10-10-acoustic-release/LOCATED_RATES.v1.json)):
+210204364415 ns against a projection of about 200 s (deadline 300 s). Gate 1 passed. Per ring, the
+windows whose near-return turns (`W ≠ 0`) and their most read rates:
+
+- **The voice's rings (0–5) almost never turn.** Ring 0 admitted 172 near-returns (§11), and only 2
+  of them turn (`1/105`, `1/118`). Rings 1–5 turn in 10, 12, 9, 15 and 20 windows, each at a
+  different rate. Their near-returns are non-turning cycles (`W = 0`): the state rocks across rays
+  and returns without completing a turn.
+- **The other rings turn at their own free rate.** Ring 7 turns in 117 windows, 70 of them at `1/40`
+  (free turn 44 ticks). Ring 11 turns in 305, 171 at `1/20` (free turn 22). Ring 21 turns in 1581,
+  1376 at `1/4` (free turn 5). The most read rate is the ring's resonance or its neighbour.
+
+**The blocker, by its measurement.** §13's locate step, which takes rates from the turning
+near-returns, would locate the declared bank's own resonances, not a structure of the recording.
+Where the voice's fundamental lives, there are almost no turning returns to locate. The measured
+object there is the non-turning near-return, whose cycle carries no winding, and the next design
+reads it: what it holds (its cycle's advances and defects) and whether its period, not a winding,
+is the located clock. L1 to L5 are not attempted on a located bank built from resonances. Building
+it would repeat the recorded failure of an authored stand-in: a bank chosen to look located.

@@ -71,6 +71,15 @@ fn read_wav(path: &str) -> (u32, Vec<i16>) {
     (rate.expect("a fmt chunk"), samples.expect("a data chunk"))
 }
 
+/// The located rates' per-window track, private, beside the render.
+#[allow(
+    clippy::disallowed_methods,
+    reason = "the exterior boundary writes the private located track here (crates/holonics/clippy.toml, guard 7)"
+)]
+fn write_track(path: &str, track: &str) {
+    std::fs::write(path, track).expect("the located track writes");
+}
+
 /// The exterior codec's other side: the render as a RIFF/WAVE file of 16-bit mono PCM.
 #[allow(
     clippy::disallowed_methods,
@@ -143,6 +152,9 @@ struct Pass {
     emission: Vec<Rat>,
     decoded: Vec<Rat>,
     line: String,
+    /// The located rates (record §13): each admitted near-return window's start tick, winding,
+    /// period and defect count.
+    located: Vec<(usize, i64, usize, usize)>,
 }
 
 /// The whole winding `⌊ℓ/4⌋` of a lift.
@@ -215,6 +227,7 @@ fn ring_pass(
     let mut addresses: std::collections::BTreeMap<String, u64> = std::collections::BTreeMap::new();
     let (mut near_admitted, mut near_refused, mut near_bits, mut near_raw, mut near_defects) =
         (0u64, 0u64, 0u64, 0u64, 0u64);
+    let mut located: Vec<(usize, i64, usize, usize)> = Vec::new();
     let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
     let (mut work, mut dissipation, mut defect) = (Rat::zero(), Rat::zero(), Rat::zero());
     let (mut state_bits, mut remainder_bits) = (0u64, 0u64);
@@ -268,6 +281,14 @@ fn ring_pass(
                                 near_bits += bits;
                                 near_raw += raw;
                                 near_defects += near.defects().len() as u64;
+                                if near.winding() != 0 {
+                                    located.push((
+                                        tick.tick + 1 - window.length(),
+                                        near.winding(),
+                                        near.period(),
+                                        near.defects().len(),
+                                    ));
+                                }
                                 let Settled::Word(read) = &word else { unreachable!() };
                                 assert_eq!(&near.decode().unwrap(), read, "N1 on the recording");
                             }
@@ -345,6 +366,7 @@ fn ring_pass(
             emission,
             decoded: Vec::new(),
             line: census,
+            located,
         };
     }
     // The decoder: the same ring, incident 0, its state seated to each key at the key's tick.
@@ -407,6 +429,7 @@ fn ring_pass(
         emission,
         decoded,
         line,
+        located,
     }
 }
 
@@ -480,6 +503,37 @@ fn main() {
         println!("{}", pass.line);
     }
     if census_only {
+        // The located rates (record §13): per ring, the distinct addresses `W/τ` in lowest terms with
+        // the windows that read them; the per-window track goes to a private local file beside the
+        // render, never to the repository.
+        let mut track = String::new();
+        for (b, pass) in passes.iter().enumerate() {
+            let mut rates: std::collections::BTreeMap<(i64, usize), u64> =
+                std::collections::BTreeMap::new();
+            for &(start, winding, period, defects) in &pass.located {
+                let address = Rat::new(BigInt::from(winding), BigInt::from(period as u64));
+                let key = (
+                    address.numer().to_i64().unwrap(),
+                    address.denom().to_usize().unwrap(),
+                );
+                *rates.entry(key).or_insert(0) += 1;
+                track.push_str(&format!("{b} {start} {winding} {period} {defects}\n"));
+            }
+            let mut ranked: Vec<_> = rates.into_iter().collect();
+            ranked.sort_by(|x, y| y.1.cmp(&x.1));
+            let top: Vec<String> = ranked
+                .iter()
+                .take(6)
+                .map(|((w, t), n)| format!("{w}/{t}: {n}"))
+                .collect();
+            println!(
+                "located ring {b}: {} windows with a turning near-return, {} distinct rates; most read: {}",
+                pass.located.len(),
+                ranked.len(),
+                top.join(", ")
+            );
+        }
+        write_track(&format!("{output}.located.txt"), &track);
         println!("census: elapsed {} ms", started.elapsed().as_millis());
         return;
     }

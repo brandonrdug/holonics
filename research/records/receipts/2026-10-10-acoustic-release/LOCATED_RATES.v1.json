@@ -1,0 +1,45 @@
+{
+ "scope": "Local developer read by opus under the common lease (announced), not claim-bearing: the located-rate census (record section 13, first stage) at the source above 2aee611a8 (census mode with the located-rate track); encoders only. The per-window track is derived from the private recording and stays local; only its hash and size are bound here.",
+ "projection": "about 200 s from the last census (196162216019 ns); deadline 300 s",
+ "wall_ns": 210204364415,
+ "deadline_s": 300,
+ "child_peak_rss_kib": 208616,
+ "exit": 0,
+ "stdout_sha256": "f8441e414e3943ac361552f1eb6b3b4e2090df694998c7875acd18ac398bd9d0",
+ "private_track": {
+  "sha256": "0f29cdb35d736a3ac07bdebc80df59a1134bb0e470ef90ad64494bc2d5e69067",
+  "bytes": 214143
+ },
+ "located": [
+  "located ring 0: 2 windows with a turning near-return, 2 distinct rates; most read: 1/105: 1, 1/118: 1",
+  "located ring 1: 10 windows with a turning near-return, 8 distinct rates; most read: 1/100: 2, 1/118: 2, 1/97: 1, 1/101: 1, 1/102: 1, 1/107: 1",
+  "located ring 2: 12 windows with a turning near-return, 10 distinct rates; most read: 1/69: 2, 1/106: 2, 1/75: 1, 1/79: 1, 1/86: 1, 1/93: 1",
+  "located ring 3: 9 windows with a turning near-return, 9 distinct rates; most read: 1/65: 1, 1/68: 1, 1/80: 1, 1/89: 1, 1/90: 1, 1/91: 1",
+  "located ring 4: 15 windows with a turning near-return, 11 distinct rates; most read: 1/63: 3, 1/76: 3, 1/46: 1, 1/53: 1, 1/57: 1, 1/58: 1",
+  "located ring 5: 20 windows with a turning near-return, 18 distinct rates; most read: 1/60: 2, 1/61: 2, 1/27: 1, 1/32: 1, 1/33: 1, 1/37: 1",
+  "located ring 6: 40 windows with a turning near-return, 21 distinct rates; most read: 1/39: 5, 1/41: 5, 1/37: 3, 1/40: 3, 1/34: 2, 1/43: 2",
+  "located ring 7: 117 windows with a turning near-return, 23 distinct rates; most read: 1/40: 70, 1/44: 14, 1/33: 4, 1/36: 3, 1/43: 3, 1/27: 2",
+  "located ring 8: 145 windows with a turning near-return, 25 distinct rates; most read: 1/34: 90, 1/28: 8, 1/33: 6, 1/36: 6, 1/31: 5, 1/37: 5",
+  "located ring 9: 87 windows with a turning near-return, 23 distinct rates; most read: 1/31: 22, 1/30: 10, 1/23: 8, 1/24: 8, 1/27: 7, 1/26: 4",
+  "located ring 10: 250 windows with a turning near-return, 29 distinct rates; most read: 1/22: 137, 1/26: 24, 1/25: 10, 1/21: 9, 1/28: 9, 1/27: 8",
+  "located ring 11: 305 windows with a turning near-return, 35 distinct rates; most read: 1/20: 171, 1/21: 29, 1/22: 20, 1/25: 9, 1/16: 8, 1/19: 8",
+  "located ring 12: 409 windows with a turning near-return, 32 distinct rates; most read: 1/20: 204, 1/18: 53, 1/17: 30, 1/15: 18, 1/14: 13, 1/19: 13",
+  "located ring 13: 552 windows with a turning near-return, 28 distinct rates; most read: 1/15: 355, 1/14: 37, 1/13: 29, 1/16: 22, 1/11: 19, 1/12: 16",
+  "located ring 14: 598 windows with a turning near-return, 26 distinct rates; most read: 1/12: 352, 1/11: 43, 1/13: 39, 2/25: 39, 1/10: 21, 1/14: 21",
+  "located ring 15: 775 windows with a turning near-return, 21 distinct rates; most read: 1/10: 478, 1/11: 100, 2/21: 73, 1/9: 26, 1/12: 19, 1/8: 10",
+  "located ring 16: 773 windows with a turning near-return, 22 distinct rates; most read: 1/9: 553, 1/10: 49, 1/8: 36, 1/7: 26, 2/17: 23, 1/11: 19",
+  "located ring 17: 949 windows with a turning near-return, 20 distinct rates; most read: 1/8: 560, 2/15: 108, 1/7: 107, 1/9: 40, 1/6: 31, 1/4: 24",
+  "located ring 18: 1077 windows with a turning near-return, 18 distinct rates; most read: 1/7: 647, 2/13: 173, 1/6: 128, 1/5: 38, 1/4: 30, 1/13: 16",
+  "located ring 19: 1069 windows with a turning near-return, 13 distinct rates; most read: 1/6: 728, 1/5: 132, 2/11: 77, 1/4: 61, 1/7: 25, 1/3: 13",
+  "located ring 20: 1262 windows with a turning near-return, 9 distinct rates; most read: 1/5: 951, 1/4: 225, 2/9: 28, 1/6: 23, 1/3: 10, 1/7: 9",
+  "located ring 21: 1581 windows with a turning near-return, 10 distinct rates; most read: 1/4: 1376, 1/5: 108, 2/9: 40, 1/3: 32, 2/7: 9, 1/8: 6",
+  "located ring 22: 1928 windows with a turning near-return, 7 distinct rates; most read: 1/4: 1641, 1/3: 139, 2/7: 134, 1/5: 5, 1/8: 4, 1/7: 3",
+  "located ring 23: 1734 windows with a turning near-return, 8 distinct rates; most read: 1/3: 1216, 1/4: 289, 2/7: 211, 1/7: 13, 1/5: 2, 1/6: 1"
+ ],
+ "gate": [
+  "gate check: ok (3007 ms)",
+  "gate guard-lints: ok (8904 ms)",
+  "gate guard-doctests: ok (25133 ms)",
+  "BOUNDED start 05:35:13 end 05:35:50 exit 0 wall_ns 37060294815 child_peak_rss_kib 1979264"
+ ]
+}
