@@ -1,0 +1,45 @@
+{
+ "note": "Private originals stay in local custody; the three verbatim files here equal their originals byte for byte.",
+ "originals": {
+  "VALIDATION.json": {
+   "sha256": "118b844d3e52afd94a23aad0f22dc2b9ea44be9d096d22193b32cc511da12981",
+   "bytes": 314826
+  },
+  "FILE_HASHES.json": {
+   "sha256": "2f5e038f49938ff312c6e435eb2d90f579bc1ed1fc3217c77e90c7b49eb7e63e",
+   "bytes": 24819
+  },
+  "SOURCE_EVIDENCE_REUSE.json": {
+   "sha256": "c627a7e1f53ebeb756ffd43ca104379ebbf0038c8318b885a6fff9b1f8dc8491",
+   "bytes": 1331
+  },
+  "developer_strict_clippy/STRICT_CLIPPY_RECEIPT.json": {
+   "sha256": "726b320b6ae9216d0f26eb552d58d180c9557dce4ac319110a91fa9c5895603a",
+   "bytes": 196198
+  },
+  "developer_strict_clippy/r6.combined.log": {
+   "sha256": "e3554400478e51eb8784f9b9307f8a973398fd5e617dcac559b64aee24a26c5f",
+   "bytes": 357677
+  },
+  "aeeb/SOURCE_REVIEW_BLOCK.json": {
+   "sha256": "46e9de8199b47f6a99f93681186963fed49c8a121e9a043dc19d907f485fd93c",
+   "bytes": 2164
+  },
+  "aeeb/REVIEW_HOLD_RECEIPT.json": {
+   "sha256": "57420b18f77cd2112d365d7f5c6e2ff440a97283c3ee8dca6eb68eecbf150814",
+   "bytes": 700
+  },
+  "HANDOFF.md": {
+   "sha256": "0d7963b621dcb554ab24fd42c5d7593d9a423f26d30bcb1694e810a45d63224e",
+   "bytes": 1263
+  },
+  "ACOUSTIC_READOUT.json": {
+   "sha256": "a40c40eed05bf9df59c553ced20fc29cd17a85b86b0d9a9854bdd5f702844bd4",
+   "bytes": 7219
+  },
+  "WAVE_GUARD_COVERAGE.json": {
+   "sha256": "90aee938afc03953536f3addfb2c09e0f5b4bee1994f74ee286c7258f269e33a",
+   "bytes": 610
+  }
+ }
+}

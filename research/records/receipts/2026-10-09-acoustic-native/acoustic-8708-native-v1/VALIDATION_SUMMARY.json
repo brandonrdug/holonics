@@ -1,0 +1,435 @@
+{
+ "schema": "acoustic_scoped_native_validation_public_summary_v1",
+ "projection": "Compact public summary of the sole queue's validation of the acoustic successor, written by the integrating agent from the private VALIDATION.json (hash below). Host paths, argv, environment, mailbox and harness identifiers are omitted; every value below is copied from the original.",
+ "source_commit": "87082a1e12db51d1e1353e3a05b3e2386479611d",
+ "source_tree": "8c51459044b2dcb3570a5f932fd0dd2a8a59e2e4",
+ "public_replay": "The published history replays this commit's 8 commits with one receipt line's host path replaced by <repository>; the replayed tree differs from source_tree only there.",
+ "all_four_scoped_commands_passed": true,
+ "per_command_passed": {
+  "gate": true,
+  "wave_port": true,
+  "dynamic_section": true,
+  "section_lock": true
+ },
+ "stages": [
+  {
+   "kind": "gate",
+   "exit": 0,
+   "passed": true,
+   "kernel_command_passed": true,
+   "source_clean_unchanged_after": true,
+   "wall_ns": {
+    "integer": 150471752557,
+    "prime_factorization": [
+     [
+      7,
+      2
+     ],
+     [
+      97,
+      1
+     ],
+     [
+      4723,
+      1
+     ],
+     [
+      6703,
+      1
+     ]
+    ]
+   },
+   "whole_group_CPU_ns": {
+    "integer": 149448610000,
+    "prime_factorization": [
+     [
+      2,
+      4
+     ],
+     [
+      5,
+      4
+     ],
+     [
+      71,
+      1
+     ],
+     [
+      210491,
+      1
+     ]
+    ]
+   },
+   "peak_child_RSS_KiB": {
+    "integer": 1647848,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      205981,
+      1
+     ]
+    ]
+   },
+   "charged_group_peak_bytes": {
+    "integer": 2076123136,
+    "prime_factorization": [
+     [
+      2,
+      13
+     ],
+     [
+      253433,
+      1
+     ]
+    ]
+   },
+   "wall_over_observation_window": {
+    "numerator": 150471752557,
+    "denominator": 180000000000
+   },
+   "whole_stdout_sha256": "f82ca7eb280e23aa81f4fa0cf811dcc35337e24812459d5d9345d4ad9935154d",
+   "whole_stderr_sha256": "c9fb6cd8f88c027bebc84c1cfed7ab629e4f727e1a25190d029f3427c1638516"
+  },
+  {
+   "kind": "wave_port",
+   "exit": 0,
+   "passed": true,
+   "kernel_command_passed": true,
+   "source_clean_unchanged_after": true,
+   "wall_ns": {
+    "integer": 159703421530,
+    "prime_factorization": [
+     [
+      2,
+      1
+     ],
+     [
+      5,
+      1
+     ],
+     [
+      37,
+      1
+     ],
+     [
+      233,
+      1
+     ],
+     [
+      1852493,
+      1
+     ]
+    ]
+   },
+   "whole_group_CPU_ns": {
+    "integer": 158971647000,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      5,
+      3
+     ],
+     [
+      37,
+      1
+     ],
+     [
+      1432177,
+      1
+     ]
+    ]
+   },
+   "peak_child_RSS_KiB": {
+    "integer": 1698068,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      19,
+      1
+     ],
+     [
+      22343,
+      1
+     ]
+    ]
+   },
+   "charged_group_peak_bytes": {
+    "integer": 2011070464,
+    "prime_factorization": [
+     [
+      2,
+      15
+     ],
+     [
+      13,
+      1
+     ],
+     [
+      4721,
+      1
+     ]
+    ]
+   },
+   "wall_over_observation_window": {
+    "numerator": 15970342153,
+    "denominator": 18000000000
+   },
+   "whole_stdout_sha256": "8b5a163d4a16166072b8e6eb506e5f8036037292f10f91d7ecc5e25230643245",
+   "whole_stderr_sha256": "076f83de2532c3d7245268ce934a8b44cbe488b854c4d94cfc3ca7c923cc2213"
+  },
+  {
+   "kind": "dynamic_section",
+   "exit": 0,
+   "passed": true,
+   "kernel_command_passed": true,
+   "source_clean_unchanged_after": true,
+   "wall_ns": {
+    "integer": 104874345426,
+    "prime_factorization": [
+     [
+      2,
+      1
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      1973,
+      1
+     ],
+     [
+      8859127,
+      1
+     ]
+    ]
+   },
+   "whole_group_CPU_ns": {
+    "integer": 104322645000,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      5,
+      4
+     ],
+     [
+      7,
+      1
+     ],
+     [
+      331183,
+      1
+     ]
+    ]
+   },
+   "peak_child_RSS_KiB": {
+    "integer": 2631532,
+    "prime_factorization": [
+     [
+      2,
+      2
+     ],
+     [
+      17,
+      1
+     ],
+     [
+      38699,
+      1
+     ]
+    ]
+   },
+   "charged_group_peak_bytes": {
+    "integer": 2845503488,
+    "prime_factorization": [
+     [
+      2,
+      12
+     ],
+     [
+      293,
+      1
+     ],
+     [
+      2371,
+      1
+     ]
+    ]
+   },
+   "wall_over_observation_window": {
+    "numerator": 17479057571,
+    "denominator": 30000000000
+   },
+   "whole_stdout_sha256": "eb22eab035dfdcd9796ed56e0aa5fe50429935b6756ec6bdc5343d3f9ef060d6",
+   "whole_stderr_sha256": "240782a9c16241dc78449547aa46148041534483821bc19b0f0bf56ed4360ba3"
+  },
+  {
+   "kind": "section_lock",
+   "exit": 0,
+   "passed": true,
+   "kernel_command_passed": true,
+   "source_clean_unchanged_after": true,
+   "wall_ns": {
+    "integer": 218859946,
+    "prime_factorization": [
+     [
+      2,
+      1
+     ],
+     [
+      109429973,
+      1
+     ]
+    ]
+   },
+   "whole_group_CPU_ns": {
+    "integer": 467133000,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      5,
+      3
+     ],
+     [
+      47,
+      1
+     ],
+     [
+      3313,
+      1
+     ]
+    ]
+   },
+   "peak_child_RSS_KiB": {
+    "integer": 28616,
+    "prime_factorization": [
+     [
+      2,
+      3
+     ],
+     [
+      7,
+      2
+     ],
+     [
+      73,
+      1
+     ]
+    ]
+   },
+   "charged_group_peak_bytes": {
+    "integer": 92778496,
+    "prime_factorization": [
+     [
+      2,
+      12
+     ],
+     [
+      22651,
+      1
+     ]
+    ]
+   },
+   "wall_over_observation_window": {
+    "numerator": 109429973,
+    "denominator": 90000000000
+   },
+   "whole_stdout_sha256": "5f5483f812187b3dd081283e9116a28d4ef2a77461fe5395e636225caa8bee3b",
+   "whole_stderr_sha256": "576addd758396598fa5de48ddc9a5910c7749ca1d05d12abe754c27458309193"
+  }
+ ],
+ "projection_errors": [],
+ "total_native_command_wall_ns": {
+  "integer": 415268379459,
+  "prime_factorization": [
+   [
+    3,
+    2
+   ],
+   [
+    23,
+    1
+   ],
+   [
+    181,
+    1
+   ],
+   [
+    233,
+    1
+   ],
+   [
+    47569,
+    1
+   ]
+  ]
+ },
+ "declared_total_prior_basis_ns": {
+  "integer": 448717914937,
+  "prime_factorization": [
+   [
+    83,
+    1
+   ],
+   [
+    5406239939,
+    1
+   ]
+  ]
+ },
+ "total_native_wall_over_prior_basis": {
+  "numerator": 415268379459,
+  "denominator": 448717914937
+ },
+ "common_lease_waits_excluded_from_native_command_wall": true,
+ "strict_clippy": {
+  "command": "cargo clippy -p holonics --all-targets -- -D warnings (a developer run under the common lease, stricter than the gate's guard lints)",
+  "passed": false,
+  "exit": 101,
+  "wall_ns": 21547812286,
+  "child_peak_rss_KiB": 1331172,
+  "start_UTC": "2026-10-10T01:20:22Z",
+  "end_UTC": "2026-10-10T01:20:43Z",
+  "raw_full_log_sha256": "e3554400478e51eb8784f9b9307f8a973398fd5e617dcac559b64aee24a26c5f",
+  "raw_full_log_lines": 6949,
+  "strict_segment_sha256": "1fa92029d2bda85ff4944867f65b51b4713600ef37f643b5f58e3ee23ce2390b",
+  "contemporaneous_complete_tree_pin_available": false,
+  "repair_changed_Rust_files": [
+   "crates/holonics/src/hnn/mod.rs",
+   "crates/holonics/src/hnn/section_lock.rs"
+  ],
+  "failure_not_waived": true,
+  "gate_pass_separate_from_strict_D_warnings": true,
+  "scope": "Primary diagnostic locations lie in 91 files the repair did not touch; an identical failure set on the parent is not proved, and untouched-file locations are not a waiver."
+ },
+ "no_source_edits": true,
+ "no_publication_by_validator": true,
+ "all_validator_leases_released": true
+}

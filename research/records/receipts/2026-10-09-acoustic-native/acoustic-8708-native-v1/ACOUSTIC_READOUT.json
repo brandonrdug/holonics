@@ -1,0 +1,224 @@
+{
+  "gate": {
+    "passed": true,
+    "components": [
+      {
+        "name": "check",
+        "result": "ok",
+        "elapsed_ms": {
+          "integer": 50674,
+          "prime_factorization": [
+            [
+              2,
+              1
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              1949,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "guard-lints",
+        "result": "ok",
+        "elapsed_ms": {
+          "integer": 45361,
+          "prime_factorization": [
+            [
+              45361,
+              1
+            ]
+          ]
+        }
+      },
+      {
+        "name": "guard-doctests",
+        "result": "ok",
+        "elapsed_ms": {
+          "integer": 54412,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              61,
+              1
+            ],
+            [
+              223,
+              1
+            ]
+          ]
+        }
+      }
+    ],
+    "guard_lints": [
+      "clippy::disallowed_types",
+      "clippy::disallowed_methods",
+      "clippy::float_arithmetic"
+    ],
+    "all_doctests_expected": 63,
+    "strict_D_warnings_is_separate_failure": true
+  },
+  "native_assertion_joins": [
+    {
+      "kind": "wave_port",
+      "test": "a_signed_stiffness_is_not_a_passive_port",
+      "assertion": "Negative stiffness witness produces reflected 13/20 above incident 1/4; WavePort refuses it, and accepts zero and coupled positive stiffness.",
+      "native_test_passed": true,
+      "evidence_kind": "Assertion at the exact source pin joined to the executed named test; no fabricated runtime reading."
+    },
+    {
+      "kind": "wave_port",
+      "test": "every_coordinate_of_the_port_reflects",
+      "assertion": "Coupled port reflects [31/63,4/63]; whole-vector work and stored energy 748/3969, distinct from driven-coordinate-only work 752/3969.",
+      "native_test_passed": true,
+      "evidence_kind": "Assertion at the exact source pin joined to the executed named test; no fabricated runtime reading."
+    },
+    {
+      "kind": "wave_port",
+      "test": "the_state_carried_across_chunks_is_the_state_of_the_whole_stream",
+      "assertion": "Port state continues identically across source chunks.",
+      "native_test_passed": true,
+      "evidence_kind": "Assertion at the exact source pin joined to the executed named test; no fabricated runtime reading."
+    },
+    {
+      "kind": "wave_port",
+      "test": "f1_locks_at_seven_on_the_declared_bank",
+      "assertion": "Declared bank finite-window periods [7,7,7], windings [1,1,2]; third arrival word 0101000 remains beside its 2/7 mean-rate face.",
+      "native_test_passed": true,
+      "evidence_kind": "Assertion at the exact source pin joined to the executed named test; no fabricated runtime reading."
+    },
+    {
+      "kind": "wave_port",
+      "test": "f3_has_a_lock_without_rotation",
+      "assertion": "This F3 ring rocks at zero winding and never reaches its section; its arrival word is empty.",
+      "native_test_passed": true,
+      "evidence_kind": "Assertion at the exact source pin joined to the executed named test; no fabricated runtime reading."
+    },
+    {
+      "kind": "wave_port",
+      "test": "f4_has_a_joint_period_of_twelve",
+      "assertion": "Declared-bank periods [4,12,12], windings [1,3,3], joint period 12; common rate 1/4 does not collapse the observed 12-tick cycles.",
+      "native_test_passed": true,
+      "evidence_kind": "Assertion at the exact source pin joined to the executed named test; no fabricated runtime reading."
+    },
+    {
+      "kind": "wave_port",
+      "test": "an_aperiodic_wave_and_a_period_over_half_the_window_are_unlocked",
+      "assertion": "Declared nonrepeating controls and a 61-tick period exceed the 60-tick maximum in the 120-tick window; typed Unlocked.",
+      "native_test_passed": true,
+      "evidence_kind": "Assertion at the exact source pin joined to the executed named test; no fabricated runtime reading."
+    },
+    {
+      "kind": "section_lock",
+      "test": "hnn::section_lock::tests::a_word_that_breaks_a_chart_relation_is_not_admitted",
+      "assertion": "Forged (0,2,0),(2,2,0) is refused at tick 1 for Crossing; corrected second crossing +1 gives period 2, winding 1, arrivals [0,1]. Class, advance and recursion refusals also execute.",
+      "native_test_passed": true,
+      "evidence_kind": "Assertion at the exact source pin joined to the executed named test; no fabricated runtime reading."
+    },
+    {
+      "kind": "section_lock",
+      "test": "hnn::section_lock::tests::a_lock_without_rotation_can_arrive_and_depart",
+      "assertion": "Zero winding retains signed arrivals [+1,-1]; arrivals cancel rather than disappearing.",
+      "native_test_passed": true,
+      "evidence_kind": "Assertion at the exact source pin joined to the executed named test; no fabricated runtime reading."
+    },
+    {
+      "kind": "section_lock",
+      "test": "hnn::section_lock::tests::the_signed_arrivals_of_a_cycle_sum_to_its_winding",
+      "assertion": "Signed arrival sum equals whole winding on four admitted cycles.",
+      "native_test_passed": true,
+      "evidence_kind": "Assertion at the exact source pin joined to the executed named test; no fabricated runtime reading."
+    }
+  ],
+  "raw_first_rung_frame_probe": [
+    {
+      "stream": "compiler.stdout",
+      "line": "test a_rings_symbol_word_is_read_by_the_first_rungs_frames ... ring t = 1 symbol word, 5 classes [(1, 1), (2, 1), (3, 1), (0, 1), (2, -2)], 21 symbols [0, 1, 2, 3, 0, 4, 3, 0, 1, 2, 3, 0, 4, 3, 0, 1, 2, 3, 0, 4, 3]: FrameTally { narrow: 7, empty: 0, plural: 5, open: 0, one: 0 }"
+    },
+    {
+      "stream": "compiler.stdout",
+      "line": "  held: no frame carries it (FrameTally { narrow: 7, empty: 0, plural: 5, open: 0, one: 0 })"
+    }
+  ],
+  "declared_receiving_read": {
+    "source_samples": {
+      "integer": 240,
+      "prime_factorization": [
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          5,
+          1
+        ]
+      ]
+    },
+    "settle_tick": {
+      "integer": 120,
+      "prime_factorization": [
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          5,
+          1
+        ]
+      ]
+    },
+    "section_word_window_ticks": {
+      "integer": 120,
+      "prime_factorization": [
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          5,
+          1
+        ]
+      ]
+    },
+    "max_observed_period_ticks": {
+      "integer": 60,
+      "prime_factorization": [
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          5,
+          1
+        ]
+      ]
+    }
+  },
+  "scope": "Receiving, dynamic section, admitted SectionWord and finite-window locks of a declared bank. No located cycle family or learned transcript association is established.",
+  "half_turn_chord_hypothesis": "Per-tick turn less than a half-turn; unresolved motion within a tick is not recovered.",
+  "no_general_full_learned_product_claim": true
+}

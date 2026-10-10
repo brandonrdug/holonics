@@ -1,0 +1,14 @@
+{
+  "whole_gate_passed": true,
+  "wave_doctests_passed": 6,
+  "compile_fail_wave_doctests": 5,
+  "exact_passed_names": [
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 101) - compile fail",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 109) - compile fail",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 118) - compile fail",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 129)",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 85) - compile fail",
+    "crates/holonics/src/hnn/wave.rs - hnn::wave (line 93) - compile fail"
+  ],
+  "runtime_filter_not_repeated": true
+}

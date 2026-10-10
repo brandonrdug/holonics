@@ -1,0 +1,49 @@
+{
+ "schema": "acoustic_aeeb_review_hold_public_v1",
+ "projection": "The independent review's hold of the predecessor aeeb0ee8, from the private SOURCE_REVIEW_BLOCK.json and REVIEW_HOLD_RECEIPT.json (hashes in ORIGINALS.json); reviewer and thread identifiers omitted.",
+ "source_commit": "aeeb0ee8f5776a125d0d4809d9d61797bb0bdc20",
+ "source_tree": "1012ed64fef340227b0a07ab41eb221032ed2b0f",
+ "native_GO": false,
+ "compiler_started": false,
+ "status": "BLOCKED pending independently reviewed immutable successor",
+ "partial_source_GO": {
+  "owner": "crates/holonics/src/hnn/wave.rs",
+  "sha256": "cb6403fd1f9dc0bb8a7a59b21335546be678901806d29af1a7c0686017e8dd98",
+  "claims": [
+   "WavePort passive admission requires positive-semidefinite stiffness",
+   "ReceivedTick returns and accounts for the complete reflected vector"
+  ],
+  "native_validation_pass_claim": false
+ },
+ "candidate_blocker": {
+  "owner": "crates/holonics/src/hnn/section_lock.rs",
+  "sha256": "30ffc9c68f8c90a96d2e5392ffdd91c9ed9e87eeb43cbbc2c1b7d1ae67859d4f",
+  "public_admission": "Settled::Word(Vec<SectionSymbol>)",
+  "witness": {
+   "symbols_repeated": [
+    [
+     0,
+     2,
+     0
+    ],
+    [
+     2,
+     2,
+     0
+    ]
+   ],
+   "class_advance_crossing_order": true,
+   "second_symbol_expected_crossing": 1,
+   "second_symbol_supplied_crossing": 0,
+   "class_recursion_closes": true,
+   "period": 2,
+   "net_advance": 4,
+   "whole_winding": 1,
+   "sum_supplied_crossings": 0,
+   "review_says_lock_is_admitted": true,
+   "validator_execution_performed": false
+  },
+  "missing_law": "Public word admission must certify section-symbol construction; a repeated class and whole net winding alone do not certify its declared crossings"
+ },
+ "repair": "Successor 87082a1e: a private-construction SectionWord admitted only with its four chart relations; record section 14."
+}
