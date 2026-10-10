@@ -1047,3 +1047,15 @@ went from `unreached NoReach` to `PhaseWorse` at grain raise 5. A step now exist
 landing is admitted either way. Every other loop decision is identical.
 
 Receipt for §7h and §7i: [CYCLE_TRAJECTORY_DEV_TESTS](receipts/2026-10-09-material-tangent/CYCLE_TRAJECTORY_DEV_TESTS.v1.json) (developer reads, not claim-bearing).
+
+**Where the zero scale comes from** (source-inspected, `word/action_return.rs`,
+`return_observed_receiving`). The held contact steps that normalize a World-sensitive descent are
+the composed return of the comparison's covector, pulled back through the native readout
+(`pull_back_full` through `R`, then `reference::compose_return`). The World-sensitive credit reaches the
+material by two paths: the produced read through `R`, and the observed face through the World's
+state (§3d). The held return sees only the first. On fixture 1's orbit that native pullback vanishes,
+so `c = max_t |g_t|_∞` is zero, while the face path still carries the gradient. The normalization the
+step needs is the scale of the covector arriving at the family through **both** paths. With forward
+tangents only, that covector is not formed. Deriving it, by an adjoint through the World port or by
+a bound read from the tangents, is the next source issue. The step size is never chosen in its place.
+
