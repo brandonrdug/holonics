@@ -330,6 +330,8 @@ pub(crate) struct ScheduleRound {
     pub(crate) end_state: Vec<Rat>,
     pub(crate) end_tick: u64,
     pub(crate) tangents: Vec<MaterialTangent>,
+    /// The material after the run's receiving publications.
+    pub(crate) material: Constitution,
 }
 
 /// [definition; agent-inferred, October 10; the held-carry record §7f] **The admitted future a
@@ -1140,6 +1142,8 @@ impl<'f> PhysicalReceiver<'f> {
             reason: "a taught prospect reads the bound World model",
         })?;
         let extent = model.keys()[key].extent();
+        let receiver_index = self.action_receiver_index(receiver)?;
+        let mut material = material.clone();
         let mut opening = opening;
         let mut state = start;
         let mut tick = tick;
@@ -1148,7 +1152,7 @@ impl<'f> PhysicalReceiver<'f> {
         let mut last_end = None;
         for control in schedule {
             let (_, phases, word, _) = self.action_opening_on(
-                source, receiver, preparation, compared, material, &opening,
+                source, receiver, preparation, compared, &material, &opening,
             )?;
             let feature = word.prospective_feature(&phases, preparation, compared)?;
             if control.len() != feature.preparation().controls() {
@@ -1171,7 +1175,7 @@ impl<'f> PhysicalReceiver<'f> {
                     })
                     .collect::<Result<Vec<_>, HnnError>>()?,
             };
-            let (prospect, end_state) = model.located_passage_with_tangents(
+            let (prospect, end_state, executed) = model.located_passage_with_tangents(
                 key,
                 &state,
                 tick,
@@ -1184,11 +1188,28 @@ impl<'f> PhysicalReceiver<'f> {
             for tangent in &mut tangents {
                 tangent.read_stations(|anchor| {
                     Ok(phases
-                        .read(self.field, material, self.current(), anchor)?
+                        .read(self.field, &material, self.current(), anchor)?
                         .logits)
                 })?;
             }
             let ratio = self.prospect_ratio(&prospect, &phases)?;
+            // [agent-inferred, October 10; the record §7h] The receiving publication between
+            // encounters, as the actual execution makes it: the observed receiving return of this
+            // passage's Word against the key's predicted faces, deposited on the material the next
+            // encounter opens and reads on. It is an observer translation: no producing propagation
+            // or power form changes, so the carry and the tangents cross as they are.
+            let grain = phases.grain();
+            let mut observed = vec![None; compared.len()];
+            for (station, face) in &prospect.faces {
+                observed[*station] = Some(Face::of_read(
+                    &ReceivingRead::of_logits(face.clone(), grain),
+                    grain,
+                )?);
+            }
+            let returned = executed.return_observed_receiving(receiver_index, &applied, observed)?;
+            if let Some(deposit) = returned.deposit.as_ref() {
+                material = material.deposited(deposit)?.0;
+            }
             let end = prospect.point.end.clone();
             tick = tick
                 .checked_add(
@@ -1218,6 +1239,7 @@ impl<'f> PhysicalReceiver<'f> {
             end_state: state,
             end_tick: tick,
             tangents,
+            material,
         })
     }
 

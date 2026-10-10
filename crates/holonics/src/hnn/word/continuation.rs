@@ -2206,13 +2206,29 @@ impl MaterialTangent {
 /// The result `d` has `⟨L_o, d⟩ ≤ 0` and `⟨X_o, d⟩ ≤ 0` for every observation, with equality on
 /// the projected ones; it is zero when the violated gradients span the start. With one observation
 /// it is law (6) exactly: `⟨L, −L⟩ ≤ 0` never violates, and `X` is projected off iff
-/// `⟨L, X⟩ < 0`, giving `−L + (⟨L, X⟩/|X|²) X`.
+/// `⟨L, X⟩ < 0`, giving `−L + (⟨L, X⟩/|X|²) X`. When no classical descent is left (the start
+/// projects to zero), the descent takes the admission's next term: `−Σ_o X_o` projected the same
+/// way, every classical and phase gradient still a constraint (record §7i).
 fn common_descent(classical: &[Vec<Rat>], phase: &[Vec<Rat>]) -> Vec<Rat> {
-    let width = classical.first().map_or(0, Vec::len);
+    let constraints: Vec<&Vec<Rat>> = classical.iter().chain(phase).collect();
+    let descent = projected_descent(classical, &constraints);
+    if !descent.iter().all(Zero::is_zero) {
+        return descent;
+    }
+    // [agent-inferred, October 10; the held-carry record §7i] The admission is lexicographic: with
+    // no classical descent left, the next term is the phase. Start at `−Σ_o X_o`, every classical and
+    // phase gradient still a constraint.
+    projected_descent(phase, &constraints)
+}
+
+/// `−Σ start` projected, exactly, off the span of every constraint it would raise at first order,
+/// one violated constraint at a time in their order, re-projecting until none is raised.
+fn projected_descent(start: &[Vec<Rat>], constraints: &[&Vec<Rat>]) -> Vec<Rat> {
+    let width = start.first().map_or(0, Vec::len);
     let dot = |a: &[Rat], b: &[Rat]| a.iter().zip(b).map(|(x, y)| x * y).sum::<Rat>();
-    let mut start = vec![Rat::zero(); width];
-    for gradient in classical {
-        for (s, g) in start.iter_mut().zip(gradient) {
+    let mut origin = vec![Rat::zero(); width];
+    for gradient in start {
+        for (s, g) in origin.iter_mut().zip(gradient) {
             *s -= g;
         }
     }
@@ -2228,10 +2244,9 @@ fn common_descent(classical: &[Vec<Rat>], phase: &[Vec<Rat>]) -> Vec<Rat> {
         }
         out
     };
-    let constraints: Vec<&Vec<Rat>> = classical.iter().chain(phase).collect();
     let mut used = vec![false; constraints.len()];
     loop {
-        let descent = project(&basis, &start);
+        let descent = project(&basis, &origin);
         let violated = constraints
             .iter()
             .enumerate()

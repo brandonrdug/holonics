@@ -1016,13 +1016,15 @@ pub type WaveReturns<'a> = dyn FnMut(usize, &[Rat]) -> Result<Vec<Rat>, HnnError
 /// consumer beside an actual encounter sees it, and cannot change the Word.
 pub type PassageObserver<'a> = dyn FnMut(&Word<'_>, usize) -> Result<(), HnnError> + 'a;
 
-impl Word<'_> {
+impl<'f> Word<'f> {
     /// **Run the coupled prospective passage** ([`CoupledPassage`]): a fresh Word on this unrun
     /// Word's actual source opening, opened exactly as [`Word::prospective_feature`] opens its
     /// baseline, ticked through the receiving phases' junction steps. After each tick the source
     /// ring's emitted wave `a_t` is answered by `returns(t, a_t)` through the existing
     /// `Word::return_source_wave`, with the exterior work `−h Y_s (|b|² − |a|²)/4` that closes
     /// native power. This Word stays unrun and unchanged, and no actual World is read or written.
+    /// The passage's own Word is returned beside it, keeping this Word's source binding, so the
+    /// observed receiving return can consume it (the held-carry record §7h).
     pub fn prospective_coupled_passage(
         &self,
         source_ring: usize,
@@ -1030,7 +1032,7 @@ impl Word<'_> {
         compared: &[bool],
         returns: &mut WaveReturns<'_>,
         observer: &mut PassageObserver<'_>,
-    ) -> Result<CoupledPassage, HnnError> {
+    ) -> Result<(CoupledPassage, Word<'f>), HnnError> {
         let producer = ActionProducer::of(self)?;
         if compared.len() != phases.aperture() {
             return Err(HnnError::Shape {
@@ -1045,6 +1047,10 @@ impl Word<'_> {
             producer.opening.clone(),
             self.opened_at,
         )?;
+        // The passage is this Word's own, re-run: it keeps this Word's source binding, so the observed
+        // receiving return can consume it as it consumes an executed Word.
+        word.native_source = self.native_source.clone();
+        word.opened_on = self.opened_on.clone();
         word.admit_source_boundary(source_ring)?;
         let admittance = self.field.ring(source_ring).admittance().clone();
         let squares = |wave: &[Rat]| wave.iter().map(|x| x * x).sum::<Rat>();
@@ -1098,11 +1104,14 @@ impl Word<'_> {
             features.push((station, feature, logits));
         }
         let end = word.reception_end()?;
-        Ok(CoupledPassage {
-            waves,
-            features,
-            word: prediction,
-            end,
-        })
+        Ok((
+            CoupledPassage {
+                waves,
+                features,
+                word: prediction,
+                end,
+            },
+            word,
+        ))
     }
 }

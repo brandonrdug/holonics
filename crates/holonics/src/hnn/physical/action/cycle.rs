@@ -27,8 +27,11 @@
 //! - `I − M` is invertible (the closed orbit is unique). Otherwise refused.
 //! - The orbit closes exactly: the run from `x*` returns to `x*`, and its state tangents give the same
 //!   `M`. Otherwise refused.
-//! - The receiving relation is the material's own throughout: the cycle is the one the passage follows
-//!   while `R` does not move (record §7e). It is not a prediction of `R`'s deposits.
+//! - The run's receiving publications are joined (record §7h). On the run from `x_p` and on the orbit's
+//!   run they must not move the readout `R` (nor its carrier, nor any contact): the cycle is the
+//!   **fixed-readout** cycle, exact only while `R` does not move. Otherwise refused. The receiving
+//!   relation's retained statistics (its Gram and chart) keep accumulating at every encounter; the
+//!   cycle does not claim them still, and a later deposit that moves `R` ends it.
 //!
 //! **What it is not.** It claims no convergence of the actual passage to the orbit (that is the
 //! spectrum of `M`, not certified here), and no settlement of `R` beyond what is measured.
@@ -43,6 +46,7 @@ use crate::hnn::word::action::PortPreparation;
 use crate::hnn::word::continuation::{MaterialDirection, MaterialTangent};
 use crate::hnn::word::{Absorption, EndChange, ReceptionCarry, Word, WordOpening};
 use crate::hnn::Encoded;
+use crate::hnn::field::FieldMaterial;
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, sub};
@@ -212,6 +216,13 @@ impl PhysicalReceiver<'_> {
             tick,
             &mut state_seeds,
         )?;
+        // The run's receiving publications (record §7h) must leave the readout as it is: the cycle is
+        // the fixed-readout one, the same map at every repetition only while `R` does not move.
+        if !self.same_readout(&first.material, material) {
+            return Err(HnnError::Unadmitted {
+                reason: "a cycle's run leaves its readout as it is: its receiving publications do not move R",
+            });
+        }
         let next = self.next_opening(
             source,
             receiver,
@@ -313,6 +324,11 @@ impl PhysicalReceiver<'_> {
             &second.end,
             second.end_state.clone(),
         )?;
+        if !self.same_readout(&second.material, material) {
+            return Err(HnnError::Unadmitted {
+                reason: "a cycle's orbit leaves its readout as it is: its receiving publications do not move R",
+            });
+        }
         if closed.coordinates() != orbit {
             return Err(HnnError::Unadmitted {
                 reason: "a cycle's orbit closes exactly: the run from x* returns to x*",
@@ -368,6 +384,19 @@ impl PhysicalReceiver<'_> {
             credits,
             orbit,
             dimension,
+        })
+    }
+
+    /// The same readout on both materials: every receiving ring's receiving map and carrier equal,
+    /// and the contact material untouched (a receiving publication is an observer translation).
+    fn same_readout(&self, after: &Constitution, before: &Constitution) -> bool {
+        self.field.receivers().iter().all(|r| {
+            after.receiving_map(r.ring) == before.receiving_map(r.ring)
+                && after.receiving_carrier(r.ring) == before.receiving_carrier(r.ring)
+        }) && (0..self.field.contacts().len()).all(|a| {
+            after.contact_storage(a) == before.contact_storage(a)
+                && after.contact_stiffness(a) == before.contact_stiffness(a)
+                && after.contact_dissipation(a) == before.contact_dissipation(a)
         })
     }
 

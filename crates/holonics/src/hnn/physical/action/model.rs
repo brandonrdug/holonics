@@ -526,17 +526,18 @@ impl CoupledChange {
 }
 
 /// One key's passage: the native coupled passage and the key's declared raw faces at the compared
-/// stations (empty without a face).
-#[derive(Clone, Debug, PartialEq, Eq)]
-struct KeyPassage {
+/// stations (empty without a face), and the passage's Word.
+struct KeyPassage<'w> {
     passage: CoupledPassage,
     faces: Vec<(usize, Vec<Rat>)>,
     /// The model state after the passage's last step.
     end: Vec<Rat>,
+    /// The passage's Word, as it stands after its last step.
+    word: Word<'w>,
 }
 
 /// The exact change from one key passage to another of the same shape.
-fn change(moved: &KeyPassage, point: &KeyPassage) -> Result<CoupledChange, HnnError> {
+fn change(moved: &KeyPassage<'_>, point: &KeyPassage<'_>) -> Result<CoupledChange, HnnError> {
     let (m, p) = (&moved.passage, &point.passage);
     if m.waves.len() != p.waves.len()
         || m.features.len() != p.features.len()
@@ -945,17 +946,17 @@ impl WorldModel {
     /// the prospect and the key state at the passage's end, which the next encounter of a schedule
     /// starts from (at `tick` plus the passage's junction steps).
     #[allow(clippy::too_many_arguments)]
-    pub fn located_passage_with_tangents(
+    pub fn located_passage_with_tangents<'w>(
         &self,
         key: usize,
         start: &[Rat],
         tick: u64,
-        word: &Word<'_>,
+        word: &Word<'w>,
         source_ring: usize,
         phases: &ReceivingPhases,
         compared: &[bool],
         tangents: &mut [crate::hnn::word::continuation::MaterialTangent],
-    ) -> Result<(CoupledProspect, Vec<Rat>), HnnError> {
+    ) -> Result<(CoupledProspect, Vec<Rat>, Word<'w>), HnnError> {
         let (model, fibre) = self.live(key)?;
         if !fibre.directions.is_empty() {
             return Err(HnnError::Unadmitted {
@@ -1011,6 +1012,7 @@ impl WorldModel {
                 directions: Vec::new(),
             },
             point.end,
+            point.word,
         ))
     }
 
@@ -1018,33 +1020,33 @@ impl WorldModel {
     /// with the key's declared raw face read on the state after the step at every compared epoch,
     /// and `observer` beside the Word after each step's return.
     #[allow(clippy::too_many_arguments)]
-    fn coupled_from(
+    fn coupled_from<'w>(
         &self,
         model: &ModelKey,
         start: &[Rat],
-        word: &Word<'_>,
+        word: &Word<'w>,
         source_ring: usize,
         phases: &ReceivingPhases,
         compared: &[bool],
         observer: &mut crate::hnn::word::action::PassageObserver<'_>,
-    ) -> Result<KeyPassage, HnnError> {
+    ) -> Result<KeyPassage<'w>, HnnError> {
         self.coupled_at(model, start, self.tick, word, source_ring, phases, compared, observer)
     }
 
     /// The coupled passage from model state `start` at model clock `tick` (as
     /// [`Self::coupled_from`], whose clock is the memory's own).
     #[allow(clippy::too_many_arguments)]
-    fn coupled_at(
+    fn coupled_at<'w>(
         &self,
         model: &ModelKey,
         start: &[Rat],
         tick: u64,
-        word: &Word<'_>,
+        word: &Word<'w>,
         source_ring: usize,
         phases: &ReceivingPhases,
         compared: &[bool],
         observer: &mut crate::hnn::word::action::PassageObserver<'_>,
-    ) -> Result<KeyPassage, HnnError> {
+    ) -> Result<KeyPassage<'w>, HnnError> {
         let mut state = start.to_vec();
         let mut states = vec![start.to_vec()];
         let mut returns = |t: usize, incident: &[Rat]| -> Result<Vec<Rat>, HnnError> {
@@ -1059,7 +1061,7 @@ impl WorldModel {
             states.push(state.clone());
             Ok(reflected)
         };
-        let passage = word.prospective_coupled_passage(
+        let (passage, executed) = word.prospective_coupled_passage(
             source_ring,
             phases,
             compared,
@@ -1083,6 +1085,7 @@ impl WorldModel {
             passage,
             faces,
             end,
+            word: executed,
         })
     }
 

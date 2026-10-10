@@ -2429,11 +2429,11 @@ fn plain_passage(
     last.unwrap()
 }
 
-/// **The schedule's chained prospect is the actual schedule** (§7f): after `count` encounters, the
-/// located key's prospect of the next two encounters (`u = 1`, then `u = −1`) is read, then the two
-/// encounters actually run. After the receiving relation has settled (twelve encounters) both are
-/// asserted equal to their prospects; after two encounters, while it still moves, the agreement is
-/// reported as measured.
+/// **The schedule's chained prospect is the actual schedule** (§7f, §7h): after `count` encounters,
+/// the located key's prospect of the next two encounters (`u = 1`, then `u = −1`) is read, with the
+/// receiving publication between them joined, then the two encounters actually run. Both are asserted
+/// equal to their prospects, after two encounters (while the receiving relation still moves) and after
+/// twelve.
 #[test]
 fn the_schedule_prospect_is_the_actual_schedule() {
     let (field, base, source) = fixture();
@@ -2463,9 +2463,7 @@ fn the_schedule_prospect_is_the_actual_schedule() {
             println!(
                 "schedule prospect: after {count} encounters: encounter {k}: actual equals prospect {equal}"
             );
-            if count == 12 {
-                assert!(equal, "after settlement the chained prospect is the actual encounter {k}");
-            }
+            assert!(equal, "the chained prospect is the actual encounter {k} after {count}");
         }
     }
 }
@@ -2611,19 +2609,17 @@ fn schedule_loop(name: &str, second: bool) {
             &last,
         ) {
             Err(refusal) => format!("proposal refused {refusal:?}"),
-            Ok(proposal) => match learner
-                .land_world_descent_on(
-                    proposal,
-                    &source,
-                    &field.receivers()[0],
-                    &preparation,
-                    &[false, true],
-                    AdmittedFuture::Schedule(&schedule),
-                )
-                .unwrap()
-            {
-                WorldLanding::Unreached(refusal) => format!("unreached {refusal:?}"),
-                WorldLanding::Read(reading) => format!(
+            Ok(proposal) => match learner.land_world_descent_on(
+                proposal,
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                AdmittedFuture::Schedule(&schedule),
+            ) {
+                Err(refusal) => format!("landing refused {refusal:?}"),
+                Ok(WorldLanding::Unreached(refusal)) => format!("unreached {refusal:?}"),
+                Ok(WorldLanding::Read(reading)) => format!(
                     "{:?} at grain raise {:?} (encounters {:?})",
                     reading.decision,
                     reading.grain_raise,
@@ -2812,3 +2808,97 @@ fn the_cycle_is_where_the_passage_goes() {
     }
 }
 
+/// One fixture's cycle landing over the trajectory (§7g, §7h): learner and twin each run twelve
+/// plain encounters; the learner lands once on the fixed-readout cycle of the schedule
+/// (`AdmittedFuture::Cycle`); then both run fourteen rounds of the schedule with no further landing.
+/// Every round is reported learner against twin, and the last round against the orbits the landing
+/// read (the candidate's and the contemporary's).
+fn cycle_trajectory(name: &str, second: bool) {
+    let (field, base, source) = fixture();
+    let theta = if second {
+        second_material(&field, base)
+    } else {
+        Declared::new(&field, base).at(&Rat::zero())
+    };
+    let make = |theta: &Constitution| {
+        if second {
+            bound_second(&field, theta.clone(), &source)
+        } else {
+            bound(&field, theta.clone(), &source, vec![faced_key(&field)])
+        }
+    };
+    let mut learner = make(&theta);
+    let mut twin = make(&theta);
+    let last = plain_passage(&mut learner, &field, &source, 12);
+    plain_passage(&mut twin, &field, &source, 12);
+    let preparation = actuator(&field);
+    let [first, second_wave] = chain_controls();
+    let schedule: [&[Rat]; 2] = [&first, &second_wave];
+    let coordinates = all_coordinates(learner.constitution());
+    let landing = learner
+        .world_cycle_proposal(
+            &coordinates,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &schedule,
+            &last,
+        )
+        .and_then(|proposal| {
+            learner.land_world_descent_on(
+                proposal,
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                AdmittedFuture::Cycle(&schedule),
+            )
+        });
+    match &landing {
+        Err(refusal) => {
+            println!("cycle trajectory ({name}): landing refused {refusal:?}");
+        }
+        Ok(WorldLanding::Unreached(refusal)) => {
+            println!("cycle trajectory ({name}): landing unreached {refusal:?}");
+        }
+        Ok(WorldLanding::Read(reading)) => {
+            println!(
+                "cycle trajectory ({name}): landing {:?} at grain raise {:?} (orbit encounters {:?})",
+                reading.decision,
+                reading.grain_raise,
+                reading.waves.iter().map(|w| w.decision).collect::<Vec<_>>()
+            );
+            for (k, wave) in reading.waves.iter().enumerate() {
+                println!(
+                    "cycle trajectory ({name}): orbit encounter {k}: contemporary code {:?} excess {}; candidate code {:?} excess {}",
+                    wave.producing.code_length().unwrap(),
+                    wave.producing.excess().unwrap(),
+                    wave.proposed.code_length().unwrap(),
+                    wave.proposed.excess().unwrap()
+                );
+            }
+        }
+    }
+    for round in 0..14 {
+        for (k, control) in schedule.iter().enumerate() {
+            let (code, excess, _, _) = second_comparison(&mut learner, &field, &source, control);
+            let (t_code, t_excess, _, _) = second_comparison(&mut twin, &field, &source, control);
+            println!(
+                "cycle trajectory ({name}): round {round}: encounter {k}: learner code {code:?} excess {excess}; twin code {t_code:?} excess {t_excess}"
+            );
+        }
+    }
+}
+
+/// **One cycle landing, then the trajectory** (§7g, §7h), first fixture.
+#[test]
+fn the_cycle_landing_is_read_over_the_trajectory() {
+    cycle_trajectory("first", false);
+}
+
+/// The same on the second fixture.
+#[test]
+fn the_cycle_landing_is_read_over_a_second_trajectory() {
+    cycle_trajectory("second", true);
+}

@@ -983,3 +983,67 @@ exactly that omission. The prospective run must join the existing receiving publ
 retained update state. Alternatively, a fixed-receiving admitted future must be made enforceable. A
 longer horizon does not repair it.
 
+### 7h. The receiving publication joined, and the fixed-readout cycle
+
+[definition; agent-inferred, October 10; Epime's review d79924aa] The schedule run now makes the
+receiving publication between its encounters the way the actual execution makes it:
+- `Word::prospective_coupled_passage` returns its own Word, keeping the source binding;
+- the observed receiving return is formed from that Word against the key's predicted faces
+  (`return_observed_receiving`);
+- the deposit is published on the material the next encounter opens and reads on.
+
+It is an observer translation: no producing propagation or power form changes.
+
+[measured; developer reads, not claim-bearing]
+- **The mismatch closes.** After two encounters, while `R` still moves, the chained prospect now
+  equals both actual encounters exactly. Before the join, the second differed (§7f).
+- **The retained state never stands still.** One actual encounter's publication was diffed after 12
+  and after 30 encounters. The receiving relation's Gram statistics grow at every encounter, and its
+  solved chart's exponent rises by one at each (28 to 29 at encounter 12; 46 to 47 at 30), while the
+  readout `R` stays fixed at the grain. A cycle that required the whole material unchanged refused, as
+  it should. The exact cycle is therefore the **fixed-readout** cycle:
+  - the run from `x_p` and the orbit's run must leave `R`, its carrier and every contact factor
+    unchanged;
+  - the accumulating statistics are not claimed still;
+  - a deposit that moves `R` ends the cycle.
+  With that check, the cycle closes on fixture 1 after 12 encounters, and its credit is still second
+  order.
+
+### 7i. One cycle landing, then the trajectory: the descent's next term, and the normalization it lacks
+
+[measured; developer reads, not claim-bearing] `cycle_trajectory`: learner and twin each run twelve
+encounters; the learner lands once on `AdmittedFuture::Cycle`; then both run fourteen rounds with no
+further landing.
+- **Fixture 2:** refused. `R` still moves during the round after twelve encounters (its readout
+  check). This test reached its 300 s deadline after 12 of 14 rounds and is reported incomplete.
+- **Fixture 1, under law (6) as it stood:** unreached (`NoReach`). On the orbit the classical credit
+  is exactly zero. Law (6) only descends the classical part, holding phase as a constraint, so the
+  step is zero. Learner and twin read identically for all fourteen rounds.
+
+[definition; agent-inferred] **The descent is lexicographic, like the admission.** When the classical
+start projects to zero, `common_descent` takes the next term, `−Σ_o X_o`, projected the same way, with
+every classical and phase gradient still a constraint. With a classical gradient present, nothing
+changes.
+
+[measured] Under the lexicographic descent, fixture 1's cycle step exists. The landing then refuses
+it: *a World landing's families carry a positive covector scale, which bounds their step*. Each
+step's normalization (its `FactorStep` energy and covector scale) is read from the encounter's own
+classical contact return, and on the orbit that covector scale is zero. Learner and twin again read
+identically.
+
+**The blocker, by its measurement.** On fixture 1's orbit the code is flat at the grain, and the phase
+excess is the objective left: it is worse on the orbit than at the opening (§7e). The step that would
+descend it has no declared normalization, because the normalization is classical. The next source
+issue is a phase step's normalization: the bound `2^k c ≤ 1` read on the phase part of the reached
+covector. It must be derived from the declared normalization's own law (`FactorStep`, record §5c),
+not chosen.
+
+**The regression under the lexicographic descent** (all World tests but the fixture-2 trajectory run
+in parallel, 03:09:34–03:15:52, measured 377,987,199,462 ns against a 450 s deadline projected from the
+measured per-test maxima). Thirty tests passed and one failed: the fixture-1 schedule loop, whose
+landing now returns the same covector-scale refusal as an error where the test unwrapped it. The test
+now reports it. Exactly one earlier reading changed: the fixture-2 single-observation loop at round 1
+went from `unreached NoReach` to `PhaseWorse` at grain raise 5. A step now exists and is refused, so no
+landing is admitted either way. Every other loop decision is identical.
+
+Receipt for §7h and §7i: [CYCLE_TRAJECTORY_DEV_TESTS](receipts/2026-10-09-material-tangent/CYCLE_TRAJECTORY_DEV_TESTS.v1.json) (developer reads, not claim-bearing).
