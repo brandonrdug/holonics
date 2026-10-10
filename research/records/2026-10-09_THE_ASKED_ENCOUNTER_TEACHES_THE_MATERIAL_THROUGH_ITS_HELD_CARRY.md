@@ -387,3 +387,55 @@ What this measures:
 `HNN/FiniteDecrease.admission_sound` holds for the exact enclosures; that the key's prospect equals
 the actual encounter is the C1b prospect law under its located point.
 
+## 5a. The descent serves the admission's order
+
+[definition; agent-inferred, October 9; the loop's measured refusals above] The admission is
+lexicographic: a strict classical improvement with no worse phase excess, or (§5b) an exactly equal
+code with a smaller excess. Per coordinate, the series (5) gives the classical gradient `g_L` (its
+magnitude part) and the phase gradient `g_X` (its two phase parts). The descent in the admission's
+order is the steepest classical descent that does not raise the phase at first order:
+
+```text
+d = −g_L                                    if ⟨g_L, g_X⟩ ≥ 0
+d = −g_L + (⟨g_L, g_X⟩ / |g_X|²) g_X          otherwise                                       (6)
+```
+
+taken per family, exact and rational. Then `⟨g_X, d⟩ = 0` or `< 0`, and
+`⟨g_L, d⟩ = −|g_L|² + ⟨g_L, g_X⟩²/|g_X|² ≤ 0`. Both hold per family, so they hold for any positive
+per-family step, and the native law's exponents need not be known when the direction is chosen. A
+family with `d = 0` contributes no step, and the admission, not the descent, decides
+(`continuation::world_descent`). Owed (#62): (6) and its two inequalities.
+
+[measured; the third admitted developer slot, local, not claim-bearing] Three descent laws were
+measured on the fixture's loop of four encounters against the twin, all with the same admission
+([receipt](receipts/2026-10-09-material-tangent/DESCENT_LAWS_DEV_TESTS.v1.json)):
+
+| descent | landings admitted (rounds 0–3) | learner's code against the twin's | learner's excess − twin's |
+|---|---|---|---|
+| summed series (§5's first law), no witness | classical, then refused (phase worse twice, then equal endpoints) | strictly below in round 1, gap in `[2⁻⁸, 2⁻⁷)`; then equal | rounds 1 and 2 below, round 3 above |
+| minimum-norm hull point of `{g_L, g_X}`, with the witness | phase, phase, refused (phase worse), phase | equal throughout | rounds 1 and 2 below; round 3 above, in `[2⁻¹⁹, 2⁻¹⁸)` |
+| **(6), with the witness** | **phase in all four** | equal throughout | **below in rounds 1–3**, by amounts in `[2⁻¹⁵, 2⁻¹³)` |
+
+The hull point is pulled toward the smaller gradient (here the phase gradient, at least 34 times
+smaller than the magnitude part), which breaks the admission's order, so it is retired. Law (6)
+admits every landing and never leaves the learner worse than its twin in the admission's order.
+The summed law's single code gain came from a step whose phase trade carried the produced logits
+across a code cell at the grain. Law (6), at the first reach of the *material* lattice, never
+crossed one. **The next subject is the first reach at the receiver's grain:** the least step along
+`d` at which a compared class's code cell changes, declared as the native first reach is declared
+and admitted by the same law. With (6), the landing test's measured decision is `Phase`. The actual
+next encounter reproduced the prospect exactly and was better than the matched control in the
+admission's order (an equal code and a smaller excess). On a fresh World without the history, the
+landed excess is lower by an amount in `[2⁻¹⁸, 2⁻¹⁷)` at an equal code.
+
+## 5b. The witness of a receiving face ratio
+
+[definition; agent-inferred, October 9] `ReceivingFaceRatio::code_length` reads only the produced
+faces' grain and gauge-normalized cells `(n_c − n_max, k_c)` and the observed faces' odometer masses,
+which a common carry shift leaves unchanged. So equal produced and observed grains and gauge cells at
+every compared station give equal exact code expressions (`continuation::receiving_reading_identity`).
+The observed phases are not code inputs; they move with the material (§3d) and are compared through
+the excess. Identical enclosure endpoints alone never count. With this witness, `decide` admits a
+strictly smaller excess at an exactly equal code (`Admitted::Phase`), as it already did for the
+contact route's ratios (Lean `HNN/FiniteDecrease.witness_code_eq` covers the class-target form; the
+soft-target form is owed to #62).

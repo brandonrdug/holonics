@@ -110,7 +110,8 @@ use crate::hnn::word::action::{
     ProspectiveFeature,
 };
 use crate::hnn::word::continuation::{
-    AdmissionRefusal, Admitted, MaterialDirection, MaterialTangent, decide, world_descent,
+    AdmissionRefusal, Admitted, MaterialDirection, MaterialTangent, decide, receiving_reading_identity,
+    world_descent,
 };
 use crate::hnn::word::finite_gain::FiniteContactSpans;
 use crate::hnn::word::variation::{ContactCoordinate, VariationReading};
@@ -712,8 +713,9 @@ impl<'f> PhysicalReceiver<'f> {
     /// - The candidate `θ′` and the contemporary `θ` each read the next encounter (`source`,
     ///   `receiver`, `preparation`, `compared`, `control`) through [`Self::world_prospect_ratio`],
     ///   and [`crate::hnn::word::continuation::decide`] admits `θ′` only on an exact strict
-    ///   classical improvement with no worse phase excess. The reading-identity witness is not read
-    ///   for receiving face ratios, so a phase-only improvement refuses.
+    ///   classical improvement with no worse phase excess, or, with the receiving reading-identity
+    ///   witness (`receiving_reading_identity`), on a strictly smaller phase excess at an exactly
+    ///   equal code.
     /// - An admitted `θ′` is published with the carried current crossed at held momentum
     ///   (`C′ w′ = π`, [`ReceptionCarry::crossed`]), and the stored energy's exact change at the
     ///   crossing is returned as the deposition work. A refusal changes nothing.
@@ -768,7 +770,7 @@ impl<'f> PhysicalReceiver<'f> {
             &producing.excess()?,
             &proposed.code_length()?,
             &proposed.excess()?,
-            false,
+            receiving_reading_identity(&producing, &proposed),
         );
         let deposition_work = match decision {
             Err(_) => None,

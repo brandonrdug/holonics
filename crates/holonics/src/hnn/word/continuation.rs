@@ -1297,6 +1297,39 @@ pub(crate) fn reading_identity(producing: &HolonRatio, candidate: &HolonRatio) -
         })
 }
 
+/// [definition; agent-inferred, October 9; the held-carry record §5b] **The reading-identity
+/// witness of a receiving face ratio**: the same compared stations, and at every compared station
+/// the same grain and gauge-normalized cells `(n_c − n_max, k_c)` on both the produced and the
+/// observed face. `ReceivingFaceRatio::code_length` reads exactly these inputs: the produced class
+/// codes `log₂ Z − (n_c − n_max) − k_c/L`, weighted by the observed odometer masses
+/// `2^(n_c)(L + k_c)/Σ_d 2^(n_d)(L + k_d)`, which a common carry shift leaves unchanged. Equal inputs
+/// therefore give equal exact code expressions. The phases are not code inputs; the excess reads them,
+/// and the admission compares the excesses. Identical enclosure endpoints alone never count, and the
+/// fibre is never read as a value.
+pub(crate) fn receiving_reading_identity(
+    producing: &crate::hnn::ratio::ReceivingFaceRatio,
+    candidate: &crate::hnn::ratio::ReceivingFaceRatio,
+) -> bool {
+    if producing.stations() != candidate.stations() {
+        return false;
+    }
+    let same = |face: Option<&Face>, other: Option<&Face>| match (face, other) {
+        (Some(face), Some(other)) => {
+            face.grain() == other.grain() && gauge(face).is_some() && gauge(face) == gauge(other)
+        }
+        _ => false,
+    };
+    producing.stations().iter().all(|&station| {
+        same(
+            producing.faces().faces.get(station),
+            candidate.faces().faces.get(station),
+        ) && same(
+            producing.observed().get(station).and_then(Option::as_ref),
+            candidate.observed().get(station).and_then(Option::as_ref),
+        )
+    })
+}
+
 /// [definition; agent-inferred, October 9; Lean `HNN/FiniteDecrease.admission_sound`] **The
 /// admission**: with `L`, `L′` the producing and candidate code enclosures and `X`, `X′` their exact
 /// phase excesses, admit iff `upper(L′) < lower(L)` and `X′ ≤ X`
@@ -1953,16 +1986,22 @@ impl MaterialTangent {
     }
 }
 
-/// [definition; agent-inferred, October 9; the held-carry record §5] **The World-sensitive contact
-/// descent of one encounter's own comparison**: for each declared raw Gram-factor coordinate the
-/// negative total of its tangent's comparison credit (5), assembled into one factor step per
-/// (contact, family). Each step keeps the normalization the held contact comparison gives its
-/// reached covector: the family's within-Word feature energy and covector scale, here read from the
-/// encounter's own composed return (`held`, [`crate::hnn::word::NativeReceivingReturn::contacts`]).
-/// The tangents open at a held opening (`χ_0 = 0`), so no opening column adds power or a dual bound.
-/// It is a proposal: only the landing's admission moves the material. Refused for a coordinate
-/// declared twice, a tangent that does not carry its coordinate's direction, or a family the
-/// composed return did not reach.
+/// [definition; agent-inferred, October 9; the held-carry record §5a] **The World-sensitive contact
+/// descent of one encounter's own comparison**, one factor step per (contact, family), in the
+/// admission's own order. The admission is lexicographic: a strict classical improvement with no
+/// worse phase excess, or, at an exactly equal code, a smaller excess. For each declared raw
+/// Gram-factor coordinate the tangent's comparison credit (5) gives the classical gradient `g_L` (its
+/// magnitude part) and the phase gradient `g_X` (its two phase parts). Per family the step is the
+/// steepest classical descent that does not raise the phase at first order: `d = −g_L` when
+/// `⟨g_L, g_X⟩ ≥ 0`, and otherwise its projection off `g_X`,
+/// `d = −g_L + (⟨g_L, g_X⟩ / |g_X|²) g_X` (exact and rational), so `⟨g_X, d⟩ = 0` and
+/// `⟨g_L, d⟩ = −|g_L|² + ⟨g_L, g_X⟩²/|g_X|² ≤ 0`. Both bounds hold per family, so they hold for any
+/// positive per-family step. A family with `d = 0` contributes no step. Each step keeps the
+/// normalization the held contact comparison gives its reached covector: the family's within-Word
+/// feature energy and covector scale, read from the encounter's own composed return (`held`). The
+/// tangents open at a held opening (`χ_0 = 0`). It is a proposal: only the landing's admission moves
+/// the material. Refused for a coordinate declared twice, a tangent that does not carry its
+/// coordinate's direction, or a family the composed return did not reach.
 pub fn world_descent(
     field: &Field,
     theta: &Constitution,
@@ -1978,7 +2017,9 @@ pub fn world_descent(
             found: tangents.len(),
         });
     }
-    let mut families: std::collections::BTreeMap<(usize, usize), Vec<Vec<Option<Rat>>>> =
+    // Per family, each entry's classical and phase gradients.
+    type Entries = Vec<Vec<Option<(Rat, Rat)>>>;
+    let mut families: std::collections::BTreeMap<(usize, usize), Entries> =
         std::collections::BTreeMap::new();
     for (coordinate, tangent) in coordinates.iter().zip(tangents) {
         if tangent.direction() != &MaterialDirection::of_coordinate(field, theta, coordinate)? {
@@ -2001,11 +2042,40 @@ pub fn world_descent(
                 reason: "a contact coordinate is declared once",
             });
         }
-        *slot = Some(-tangent.comparison_credit(ratio)?.total());
+        let credit = tangent.comparison_credit(ratio)?;
+        *slot = Some((
+            credit.magnitude.clone(),
+            &credit.produced_phase + &credit.observed_phase,
+        ));
     }
-    families
+    let mut steps = Vec::new();
+    for ((a, family), entries) in families {
+        let rows = entries.len();
+        let columns = entries.first().map_or(0, Vec::len);
+        let pairs: Vec<(Rat, Rat)> = entries
+            .into_iter()
+            .flatten()
+            .map(|x| x.unwrap_or_else(|| (Rat::zero(), Rat::zero())))
+            .collect();
+        let dot = |f: &dyn Fn(&(Rat, Rat)) -> Rat| pairs.iter().map(f).sum::<Rat>();
+        // ⟨g_L, g_X⟩ and |g_X|², exact; the projection's coefficient when they conflict.
+        let conflict = dot(&|(l, x)| l * x);
+        let phase = dot(&|(_, x)| x * x);
+        let lift = if conflict < Rat::zero() && !phase.is_zero() {
+            conflict / phase
+        } else {
+            Rat::zero()
+        };
+        let descent: Vec<Rat> = pairs.iter().map(|(l, x)| &lift * x - l).collect();
+        if descent.iter().all(Zero::is_zero) {
+            continue;
+        }
+        let descent = descent.chunks(columns.max(1)).map(<[Rat]>::to_vec).collect();
+        steps.push(((a, family), rows, columns, descent));
+    }
+    steps
         .into_iter()
-        .map(|((a, family), entries)| {
+        .map(|((a, family), rows, columns, descent)| {
             let tag = Family::Factor(family);
             let reached = held
                 .iter()
@@ -2013,12 +2083,6 @@ pub fn world_descent(
                 .ok_or(HnnError::Unadmitted {
                     reason: "a World-sensitive descent is normalized by its family's reached within-Word metric",
                 })?;
-            let rows = entries.len();
-            let columns = entries.first().map_or(0, Vec::len);
-            let descent = entries
-                .into_iter()
-                .map(|row| row.into_iter().map(|x| x.unwrap_or_else(Rat::zero)).collect())
-                .collect();
             let gradient = ExactRatMatrix::shaped(rows, columns, descent)?;
             let gradient = match family {
                 0 => FactorGradient::Storage {

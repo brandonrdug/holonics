@@ -794,12 +794,9 @@ fn the_world_landing_reads_the_next_encounter() {
         reading.decision,
         reading.deposition_work.as_ref().map(|w| w.to_string()),
     );
-    // [measured, October 9; LANDING_DEV_TESTS.v1] The landing on this fixture is admitted
-    // classically; kept as this fixture's regression of the measured outcome.
-    assert!(
-        matches!(reading.decision, Ok(Admitted::Classical)),
-        "the measured landing: admitted classically"
-    );
+    // [measured, October 9; the record §5a] Under the lexicographic descent this fixture's landing is
+    // admitted; kept as the fixture's regression of the measured outcome.
+    assert!(reading.decision.is_ok(), "the measured landing is admitted");
     // The actual next encounter on θ′, against the key's prospect and the matched control.
     let landed = second_comparison(&mut receiver, &field, &source, &control);
     assert_eq!(
@@ -822,9 +819,13 @@ fn the_world_landing_reads_the_next_encounter() {
         landed.0, landed.1, unlanded.0, unlanded.1
     );
     assert_eq!(unlanded.0, reading.producing.code_length().unwrap());
+    assert_eq!(unlanded.1, reading.producing.excess().unwrap());
+    // Production in the admission's own order: strictly below in code, or an exactly equal code
+    // (the prospects' witness) with a strictly smaller phase excess.
     assert!(
-        landed.0.upper < unlanded.0.lower,
-        "the measured production: the landed next comparison lies strictly below the control's"
+        landed.0.upper < unlanded.0.lower
+            || (matches!(reading.decision, Ok(Admitted::Phase)) && landed.1 < unlanded.1),
+        "the landed next comparison is better than the matched control's in the admission's order"
     );
 }
 
