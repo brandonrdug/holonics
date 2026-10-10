@@ -869,3 +869,38 @@ located section word may.
 - **W2.** `regenerate(key, L)` with the defects substituted equals the window's word exactly.
 - **W3.** Per ring: the windows located, the windows no frame carries (each typed: narrow, empty,
   plural, open), and the located description's bits against the spelled cycle's, as exact integers.
+
+## 24. Loop 2's acceptance: the ring's material learns from its own code length (fixed before code)
+
+[definition; agent-inferred, October 10, with the reviewer's two design checks] The codec of §19 and
+§20 is fixed-material: the ring's `K` (its turn) and its port coupling `a` (its memory) are declared.
+Loop 2 lets the ring's own material move by deposition, epoch by epoch, so that the cells narrow the
+samples more. Its comparison is the codec's own length, its law is the existing certified deposition,
+and its decoder replays every deposit.
+
+- **The comparison.** Over an epoch, the emitted bits are `Σ_n (cell bits + ⌈log₂ count_n⌉)`. The
+  smooth face is `Σ_n log₂ (hi_n − lo_n + 1)`, whose endpoints are the roots `−a/b` of half-lines
+  affine in the image `(w₀, w_m, u₀, u_m)`. Those depend on the material through the ring's step.
+  The learning covector is `d(face)/d(material)` through the step's tangent in the material (the
+  `f_r` block), read along the epoch.
+- **The law.** The certified step on the ring's own material (`K`, and the port coupling through
+  `Y`), committing at least one lattice unit or refusing (`DeclaredStepRefusal`).
+- **Causality (the reviewer's check 1).** The deposit at the end of epoch `k` reads only samples the
+  decoder has already decoded in epochs `≤ k`. The shared initial material, the epoch length and
+  every choice the step makes (its exponent, its family) are either declared context or charged in
+  the bits. Nothing is chosen from future data and then left out of the code. The decoder replays
+  each deposit from its own decoded samples, and the decode stays exact.
+- **The twin (the reviewer's check 2).** The same codec with the material held fixed. The comparison
+  is the total emitted bits, with the charged side information included, and the exact
+  reconstruction of both. The receivers' local criteria (each epoch's length, each ring's) are
+  reported apart, never collapsed into one reward.
+
+**Acceptance.**
+- **A1.** `decode(encode(x)) = x` for the depositing codec, with every deposit replayed.
+- **A2.** On the recording's later epochs, which no deposit has read before it is coded, the
+  depositing ring's emitted bits against the twin's, epoch by epoch, as exact integers. Learning is
+  claimed only where the depositing ring is strictly below the twin, net of its charged side
+  information.
+- **A3.** Every refused step is typed and reported, never answered by a larger step.
+- **A4.** The joint credit of the deposits is loop 3's. Here the deposit admits on the next epoch's
+  measured length only. No `g_s` or `f_r` beyond one epoch is claimed.
