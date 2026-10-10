@@ -2248,3 +2248,91 @@ fn the_prospect_loop_is_read_on_a_second_fixture() {
     prospect_loop("second", true);
 }
 
+/// One fixture's schedule-consistent loop (§7d): before every encounter after the first, a landing
+/// on that very encounter's prospect (one wave, the one that comes next), then the encounter. The
+/// twin runs the same encounters with no landing. Each encounter is reported against the twin.
+fn per_encounter_loop(name: &str, second: bool) {
+    let (field, base, source) = fixture();
+    let theta = if second {
+        second_material(&field, base)
+    } else {
+        Declared::new(&field, base).at(&Rat::zero())
+    };
+    let make = |theta: &Constitution| {
+        if second {
+            bound_second(&field, theta.clone(), &source)
+        } else {
+            bound(&field, theta.clone(), &source, vec![faced_key(&field)])
+        }
+    };
+    let mut learner = make(&theta);
+    let mut twin = make(&theta);
+    let preparation = actuator(&field);
+    let schedule: Vec<Vec<Rat>> = (0..5).flat_map(|_| chain_controls()).collect();
+    let mut last: Option<ActionReception> = None;
+    for (k, control) in schedule.iter().enumerate() {
+        let decision = match &last {
+            None => "none (first encounter)".to_string(),
+            Some(last) => {
+                let coordinates = all_coordinates(learner.constitution());
+                match learner.world_prospect_proposal(
+                    &coordinates,
+                    &source,
+                    &field.receivers()[0],
+                    &preparation,
+                    &[false, true],
+                    &[control],
+                    last,
+                ) {
+                    Err(refusal) => format!("proposal refused {refusal:?}"),
+                    Ok(proposal) => match learner
+                        .land_world_descent(
+                            proposal,
+                            &source,
+                            &field.receivers()[0],
+                            &preparation,
+                            &[false, true],
+                            &[control],
+                        )
+                        .unwrap()
+                    {
+                        WorldLanding::Unreached(refusal) => format!("unreached {refusal:?}"),
+                        WorldLanding::Read(reading) => {
+                            format!("{:?} at grain raise {:?}", reading.decision, reading.grain_raise)
+                        }
+                    },
+                }
+            }
+        };
+        let probe = learner
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+        let (code, excess) = (ratio.code_length().unwrap(), ratio.excess().unwrap());
+        last = Some(received);
+        let (t_code, t_excess, _, _) = second_comparison(&mut twin, &field, &source, control);
+        println!(
+            "per-encounter loop ({name}): encounter {k} (u = {}): landing before it {decision}; learner code {code:?} excess {excess}; twin code {t_code:?} excess {t_excess}",
+            control[0]
+        );
+    }
+}
+
+/// **The schedule-consistent loop** (§7d), first fixture: a landing on each next encounter's own
+/// prospect before it, over ten encounters alternating `u = 1, −1`, against the twin.
+#[test]
+fn the_per_encounter_loop_is_read_against_its_twin() {
+    per_encounter_loop("first", false);
+}
+
+/// The same on the second fixture (§7d).
+#[test]
+fn the_per_encounter_loop_is_read_on_a_second_fixture() {
+    per_encounter_loop("second", true);
+}
+

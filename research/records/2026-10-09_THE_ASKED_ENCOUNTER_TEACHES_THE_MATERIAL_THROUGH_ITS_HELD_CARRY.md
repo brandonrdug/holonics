@@ -812,3 +812,43 @@ measure.
 a projected 5 s. It is reported incomplete. The deadline was not raised; the loop was split per
 fixture, and the two halves ran in parallel within it.
 
+### 7d. The horizon, not the schedule: the material is admitted on its cycle
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/PER_ENCOUNTER_LOOP_DEV_TESTS.v1.json)]
+`per_encounter_loop` removes the schedule mismatch of §7c. Before every encounter after the first, it
+lands on the prospect of that very encounter, the one that comes next. Over ten encounters
+alternating `u = 1, −1` on both fixtures, against the twin:
+- Fixture 1: the learner is better at encounters 1 and 4. It is **worse** (equal code, higher excess)
+  at encounters 2, 3, 6, 7 and 8, most of them right after an admitted `Phase` landing. Encounter 5 is
+  unresolved, and encounter 9 has a lower code with a higher excess.
+- Fixture 2: better at encounters 2, 3, 5, 7 and 9, worse at 4 and 8, a lower code with a higher
+  excess at 6, and equal at 1.
+
+Some landings are refused or unreached: `EqualEndpoints`, `PhaseWorse`, and an unreached
+`CovectorScale`.
+
+Each admitted landing improves the next encounter against the learner's own no-landing
+counterfactual, and the actual next comparison is that prospect. With the schedule matched, the
+trajectory against the never-landing twin is still mixed, so the cause is the **horizon**. The
+material persists into every later encounter. A step judged on the next encounter alone reshapes the
+transient it leaves behind, and later encounters pay for it.
+
+**The next law** (agent-inferred, recorded before it is built; it replaces §7c's "declared number of
+rounds").
+- The schedule repeated is a **cycle**: a closed loop whose reading is completeness, not duration
+  (the [aeon, epoch and cycle record](2026-09-24_THE_AEON_EPOCH_AND_CYCLE_STANDARDIZE_THE_PASSAGE_OF_TIME.md)).
+- With the key located, one round of the schedule is an affine map of the joint state (the native
+  carry and the World key's state), `x ↦ M x + c`. Each prospective passage is exactly linear in its
+  opening and its returns, and the key's charts are affine.
+- Its closed orbit is the exact fixed point `x* = (I − M)⁻¹ c` wherever `1` is not an eigenvalue of
+  `M`. It depends on the material alone, not on the transient state the receiver stands in.
+- The material is admitted on the comparisons read on that orbit, and the step descends them. The
+  orbit's tangent is `(I − M) δx* = δM x* + δc` (the implicit function law). It reuses the prospect's
+  tangent law (§7b) with the opening at `x*`.
+- An admitted step then never worsens the cycle's own reading. Successive admissions are monotone on
+  it, and a trajectory that converges to the orbit inherits the gain. The twin's orbit is the first
+  material's.
+- Refused when `1` is an eigenvalue of `M` (no unique closed orbit). Convergence to the orbit is a
+  property of the dissipation, to be read from `M`'s spectrum, not assumed.
+
