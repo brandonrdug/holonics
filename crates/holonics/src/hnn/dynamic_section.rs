@@ -63,9 +63,25 @@
 //! of a ring against another is the pair contact's, read from this owner's arrival word by the
 //! owed lock reader, and the port the state lives at is the tube's boundary (`hnn::wave`).
 //!
+//! [proved-derived] **The tick's carry is the owner's, stated once** ([`land`]). The crossing of a tick
+//! is the difference of whole windings of the lift, and the signed carry law gives it from the phases
+//! alone: with `ℓ/4` and `Δℓ/4` as aeon readings, `windings(ℓ/4 + Δℓ/4) = windings(ℓ/4) +
+//! windings(Δℓ/4) + carry(ℓ/4, Δℓ/4)` (Lean `Aeon/Clock/Winding.windings_add`), so
+//!
+//! ```text
+//! crossing_k = ⌊(ℓ_k + Δℓ_k)/4⌋ − ⌊ℓ_k/4⌋ = windings(Δℓ_k/4) + carry(cls_k/4, Δℓ_k/4)    ∈ {−1, 0, 1}
+//! cls_(k+1)  = 4 · openPhase(ℓ_k/4 + Δℓ_k/4)
+//! ```
+//!
+//! A departure back across the section is the negative `windings(Δℓ/4)` less the carry; the carry
+//! depends on the class `ℓ mod 4` and not on the winding. [`land`] calls [`Reading::add`] (which calls
+//! `geometry::winding::carry`) and is the only statement of this law: [`SectionReader::advance`]
+//! emits its symbol from it and `section_lock::SectionWord::new` admits a word against it. The chord
+//! `Δℓ` itself is [`chord`]'s, and the lift's own step `ℓ + Δℓ` is the integer addition of a lift.
+//!
 //! | Law | Lean | Rust |
 //! |---|---|---|
-//! | the lift is class plus carry, `winding(x + y) = winding x + winding y + carry` | `Geometry/PhaseCarry.winding_add`; `Aeon/Clock/Winding.windings_add` | [`SectionReader`], [`SectionReader::reading`] |
+//! | the lift is class plus carry, `winding(x + y) = winding x + winding y + carry`: the tick's crossing and landing class from the signed carry law | `Geometry/PhaseCarry.winding_add`; `Aeon/Clock/Winding.windings_add`, `carry_le_one` | [`land`] calls [`Reading::add`] (owner `aeon::reading`, over `geometry::winding::carry`); consumed by [`SectionReader::advance`], read by [`SectionReader::reading`] |
 //! | the signed crossing of the aeon's ring section is the difference of whole windings | `Aeon/Clock/Epoch.signed_count_is_flux` | [`SectionSymbol::crossing`] read by `aeon::epochs` |
 //! | the chord's advance, the polarity `ℓ(−z) = ℓ(z) + 2` | owed (#62) | [`chord`], [`SectionReader::half_turn`] |
 
@@ -92,6 +108,12 @@ pub enum SectionRefusal {
     /// Unreachable for a straight chord between two classed points; returned rather than assumed.
     #[error("the chord from class {from} to class {to} turns the class by more than a half turn")]
     Inconsistent { from: u8, to: u8 },
+    /// Unreachable: the crossing or the landing class of the owner's carry leaves the symbol's carrier
+    /// (`i8`, `u8`). The carry is one turn or none (`carry_le_one`) and `Δℓ` is a quarter-turn count,
+    /// so the crossing is at most one more than the quarter turns of `Δℓ` and the landing class is
+    /// below four; returned rather than assumed.
+    #[error("the tick from class {class} by {advance} rays leaves the carrier of a section symbol")]
+    Carrier { class: u8, advance: i8 },
 }
 
 /// [definition] **The quadrant class of a point** `(w, u)`: each ray belongs to the class it starts
@@ -135,6 +157,29 @@ pub fn chord(p: &[Rat; 2], q: &[Rat; 2]) -> Result<i8, SectionRefusal> {
             }
         }
     }
+}
+
+/// [proved-derived] **The landing of one tick, by the owner's signed carry law** (module header): the
+/// tick leaves `class` and advances the lift by `advance` rays. It returns the signed crossing
+/// `⌊(class + advance)/4⌋ − ⌊class/4⌋` (`+1` an arrival at the section, `−1` a departure back across
+/// it) and the class it lands on, `(class + advance) mod 4`.
+///
+/// Both are read from the aeon's reading of the lift, `Reading::of_turns(class/4)` carried by
+/// `Reading::add` with `Reading::of_turns(advance/4)`: the crossing is the added whole windings
+/// (`windings(advance/4)`, negative for a backward tick, plus the carry of the open phases) and the
+/// landing class is four times the sum's open phase. No hand comparison of `class + advance` with
+/// `0` and `4` stands beside the owner (Lean `Aeon/Clock/Winding.windings_add`, `openPhase_add`).
+///
+/// Cost: three exact rational readings and one carry, independent of the lift's winding.
+pub fn land(class: u8, advance: i8) -> Result<(i8, u8), SectionRefusal> {
+    let turns = |rays: i64| Reading::of_turns(&Rat::new(BigInt::from(rays), BigInt::from(RAYS)));
+    let behind = turns(i64::from(class));
+    let ahead = behind.add(&turns(i64::from(advance)));
+    let carrier = || SectionRefusal::Carrier { class, advance };
+    let crossing = i8::try_from(ahead.windings() - behind.windings()).map_err(|_| carrier())?;
+    let landed = u8::try_from((ahead.phase() * Rat::from_integer(BigInt::from(RAYS))).to_integer())
+        .map_err(|_| carrier())?;
+    Ok((crossing, landed))
 }
 
 /// [definition] **One tick's symbol**: the class the tick leaves, the signed advance of the lift,
@@ -191,21 +236,18 @@ impl SectionReader {
         Reading::of_turns(&Rat::new(self.lift.clone(), BigInt::from(RAYS)))
     }
 
-    /// **Advance to the next state**: the symbol of the tick `point → next`, the lift carried.
+    /// **Advance to the next state**: the symbol of the tick `point → next`, the lift carried. The
+    /// crossing and the landing class are [`land`]'s, the owner's signed carry law; the lift itself
+    /// adds the chord's advance.
     pub fn advance(&mut self, next: [Rat; 2]) -> Result<SectionSymbol, SectionRefusal> {
         let advance = chord(&self.point, &next)?;
-        let landed = self.class as i8 + advance;
-        let crossing = match landed {
-            landed if landed >= RAYS as i8 => 1,
-            landed if landed < 0 => -1,
-            _ => 0,
-        };
+        let (crossing, landed) = land(self.class, advance)?;
         let symbol = SectionSymbol {
             class: self.class,
             advance,
             crossing,
         };
-        self.class = landed.rem_euclid(RAYS as i8) as u8;
+        self.class = landed;
         self.lift += BigInt::from(advance);
         self.point = next;
         Ok(symbol)
@@ -304,6 +346,107 @@ mod tests {
         assert_eq!(*reader.lift(), BigInt::from(0));
         assert_eq!(crossings, 0);
         assert_eq!(reader.reading().turns(), rat(0, 1));
+    }
+
+    /// The hand law, kept here only as an independent oracle for the owner's landing:
+    /// `⌊(class + advance)/4⌋ − ⌊class/4⌋` and `(class + advance) mod 4`.
+    fn by_hand(class: u8, advance: i8) -> (i8, u8) {
+        let (class, advance, rays) = (i32::from(class), i32::from(advance), i32::from(RAYS));
+        let crossing = (class + advance).div_euclid(rays) - class.div_euclid(rays);
+        (
+            i8::try_from(crossing).unwrap(),
+            u8::try_from((class + advance).rem_euclid(rays)).unwrap(),
+        )
+    }
+
+    #[test]
+    fn the_landing_is_the_owners_signed_carry_law() {
+        // the arrivals and the departures across the section, and the landings that cross nothing
+        assert_eq!(land(3, 1), Ok((1, 0)));
+        assert_eq!(land(2, 2), Ok((1, 0)));
+        assert_eq!(land(0, -1), Ok((-1, 3)));
+        assert_eq!(land(1, -2), Ok((-1, 3)));
+        assert_eq!(land(3, -1), Ok((0, 2)));
+        assert_eq!(land(0, 2), Ok((0, 2)));
+        assert_eq!(land(1, 0), Ok((0, 1)));
+        // the corners of the whole carrier: every advance an `i8` holds, from the classes a section
+        // word may carry and from classes it may not (the crossing is then relative to the class's
+        // own winding), never a refusal and never a difference from the hand law
+        for class in [0u8, 1, 2, 3, 4, 7, 255] {
+            for advance in i8::MIN..=i8::MAX {
+                assert_eq!(
+                    land(class, advance),
+                    Ok(by_hand(class, advance)),
+                    "class {class}, advance {advance}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn the_crossing_is_the_difference_of_the_lifts_whole_windings_at_every_winding() {
+        // the carry depends on the phase `ℓ mod 4` and not on the winding: the same crossing and
+        // landing at ℓ and at ℓ + 4n, read as the difference of the aeon's readings of ℓ/4
+        for lift in -9i64..=9 {
+            let class = u8::try_from(lift.rem_euclid(4)).unwrap();
+            for advance in -2i8..=2 {
+                let before = Reading::of_turns(&rat(lift, 4));
+                let after = Reading::of_turns(&rat(lift + i64::from(advance), 4));
+                let (crossing, landed) = land(class, advance).unwrap();
+                assert_eq!(
+                    BigInt::from(crossing),
+                    after.windings() - before.windings(),
+                    "lift {lift}, advance {advance}"
+                );
+                assert_eq!(rat(i64::from(landed), 4), *after.phase());
+            }
+        }
+    }
+
+    #[test]
+    fn the_reader_emits_the_landing_at_every_tick_and_its_reading_keeps_the_windings() {
+        // a walk with arrivals, a departure back across the section and quiet ticks
+        let walk = [
+            z(1, 1),
+            z(-1, 1),
+            z(-1, -1),
+            z(1, -1),
+            z(1, 1),
+            z(1, -1),
+            z(-1, -1),
+            z(-1, 1),
+            z(-2, 1),
+            z(1, 1),
+            z(-1, 1),
+            z(-1, -1),
+            z(1, -1),
+            z(1, 1),
+        ];
+        let mut reader = SectionReader::at(walk[0].clone()).unwrap();
+        let (mut arrivals, mut departures) = (0i64, 0i64);
+        for point in &walk[1..] {
+            let before = reader.reading();
+            let class = reader.class();
+            let symbol = reader.advance(point.clone()).unwrap();
+            let (crossing, landed) = land(class, symbol.advance).unwrap();
+            assert_eq!((symbol.class, symbol.crossing), (class, crossing));
+            assert_eq!(reader.class(), landed);
+            let after = reader.reading();
+            assert_eq!(
+                after.windings() - before.windings(),
+                BigInt::from(symbol.crossing)
+            );
+            assert_eq!(*after.phase(), rat(i64::from(landed), 4));
+            arrivals += i64::from(symbol.crossing > 0);
+            departures += i64::from(symbol.crossing < 0);
+        }
+        // two arrivals and one departure back across the section: the lift ends at 4, one winding
+        assert_eq!((arrivals, departures), (2, 1));
+        assert_eq!(*reader.lift(), BigInt::from(4));
+        assert_eq!(
+            *reader.reading().windings(),
+            BigInt::from(arrivals - departures)
+        );
     }
 
     #[test]

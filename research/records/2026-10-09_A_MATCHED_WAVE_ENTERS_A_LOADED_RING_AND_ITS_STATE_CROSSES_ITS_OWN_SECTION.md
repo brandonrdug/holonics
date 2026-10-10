@@ -525,3 +525,115 @@ unit tests and the integration tests are unchanged, and they build words through
 reader. The finite window stays a hypothesis: a lock is a repetition inside the declared window, not a proof that
 the steady state is periodic beyond it.
 
+## 15. The section owners call the winding owners at their consumers
+
+[project-postulate] #386, #148. The coordinator's brief called this subsection §14; §14 is the second review above, so
+the join is §15. The survey that opened it found the section owners restating a law their neighbours already own:
+`section_lock::Settled::lock` divided the cycle's net lift by four and asserted the result, `SectionWord::new` compared
+`class + Δℓ` with four by hand, and `SectionReader::advance` compared it with `0` and `4`, while
+`geometry::winding::closed_loop_winding` had no consumer outside its tests and `aeon::Reading::add` (the signed carry
+law, over `geometry::winding::carry`) none outside its own. This section replaces each hand computation by the call to
+the owner at the consumer and proves equality with the old reading on the declared bank. The recorded failure it could
+repeat is "a search hit is not a join" (lessons, September 29 and October 9): a docstring naming an owner joined
+nothing, so each row below is a call and a test.
+
+### 15.1 The equations now stated at each consumer
+
+| Consumer | Equation | Owner called |
+|---|---|---|
+| `dynamic_section::land`, called by `SectionReader::advance` and `SectionWord::new` | `crossing = windings(Δℓ/4) + carry(cls/4, Δℓ/4) = ⌊(ℓ + Δℓ)/4⌋ − ⌊ℓ/4⌋ ∈ {−1, 0, 1}`; `cls′ = 4·openPhase(ℓ/4 + Δℓ/4)`; the carry depends on `ℓ mod 4`, not the winding | `aeon::Reading::{of_turns, add}`, which calls `geometry::winding::carry` (Lean `Aeon/Clock/Winding.windings_add`, `carry_le_one`) |
+| `section_lock::cycle_winding`, called by `Settled::lock` | `W = closed_loop_winding(4, (Δℓ_k)_(k<τ))`: the advances close on four rays, else refused with the exact remainder | `geometry::winding::closed_loop_winding` (Lean `Geometry/PhaseCarry.closed_loop_has_integer_winding`) |
+| `SectionWord::winding` | `W(u) = windings(c_u/4 + N_u/4) = ⌊(c_u + N_u)/4⌋`, `N_u = Σ Δℓ_k`, the carry law applied once to the start class and net lift | `aeon::Reading::add` |
+| `SectionWord::concat` | `e(u) = c_v ⇒ W(uv) = W(u) + W(v)`; `e(u) ≠ c_v ⇒ NotASectionWord { tick: |u| − 1, Recursion }`, no winding | the cocycle `windings_add`, `carry_cocycle`, `aeon_windings_concat` |
+
+The concatenation derivation: with `e(u) = (c_u + N_u) mod 4`, `⌊(e(u) + N_v)/4⌋ = ⌊(c_u + N_u + N_v)/4⌋ −
+⌊(c_u + N_u)/4⌋`, so the junction carry is zero exactly when the junction phase is the class both words agree on.
+
+### 15.2 Choices and their reasons
+
+[definition; agent-inferred]
+- **One statement of the tick's law.** `land(class, advance) -> (crossing, landed class)` is the only place that
+  carries a quarter-turn tick. The reader emits its symbol from it and `SectionWord::new` admits a symbol against it,
+  so the chart relation `crossing = ⌊(class + Δℓ)/4⌋` and the class recursion cannot drift from the reader. The lift
+  itself still adds `Δℓ` as an integer, which is no carry. `LockReader::finish` now admits the reader's symbols through
+  `SectionWord::new` instead of trusting the comment that they satisfy the relations.
+- **The lock's winding is the closed-loop owner's.** Its refusal (`LockRefusal::Winding`) replaces the two
+  `debug_assert`s: a loop that does not close is a typed return carrying `LoopDoesNotClose { modulus, remainder }`, in
+  release builds too. For an admitted word it is unreachable (the least period `τ ≤ L/2` makes the class repeat, and the
+  recursion then closes the lifted sum), and it is tested directly on non-closing cycles (`cycle_winding`).
+- **The conversion is lossless, and refused if not.** The owner returns a `BigInt`; the lock keeps `i64`. `|Σ Δℓ| ≤ 2τ`
+  and `τ ≤ L/2` give `|W| ≤ L/4`, below `i64::MAX` on any platform whose `usize` is at most 64 bits.
+  `LockRefusal::WindingBeyondCarrier { winding }` returns the exact integer rather than narrow it, and
+  `SectionRefusal::Carrier` does the same for `land`'s `i8` and `u8` (the crossing is at most one more than the quarter
+  turns of `Δℓ`, `carry_le_one`). Both are unreachable and typed. `SectionWord::winding` returns a `BigInt` and needs no
+  narrowing.
+- **`SectionWord::winding` does not sum the `crossing` fields.** It is the carry law applied once to the word, so that
+  `W(uv) = W(u) + W(v)` is a statement about the owner's cocycle and not a tautology of a sum. That `W` equals the signed
+  count of the arrivals (the telescoped per-tick law the old `debug_assert` stated) is asserted instead, on every
+  declared lock and on every cut of every bank ring.
+- **The `i8` chord and the half-turn partner stay as they were.** `chord` (the advance) and `SectionReader::half_turn`
+  (`ℓ + 2`, the class `+ 2`) are the chart's own definitions with the Lean owed in §10 item 2; they are not a
+  carry and were not joined.
+
+### 15.3 Measured
+
+[computational-witness; worker's run] Every existing test passes with its asserted values unchanged (no assertion was
+edited): `tests/acoustic_wave_port.rs`, 17 passed (the 15 of §13 and two new), and the unit tests of the four modules,
+39 passed (`hnn::section_lock` 12, `hnn::dynamic_section` 9, `geometry::winding` 10, `aeon::reading` 8). The new tests:
+- `dynamic_section::tests::the_landing_is_the_owners_signed_carry_law`: `land` equals the hand law, kept in the test only
+  as an independent oracle, on every `i8` advance from the classes `0, 1, 2, 3, 4, 7, 255`, and the six boundary
+  landings (`land(3, +1) = (+1, 0)`, `land(0, −1) = (−1, 3)`, …).
+- `…the_crossing_is_the_difference_of_the_lifts_whole_windings_at_every_winding`: for lifts `ℓ = −9 … 9` and `Δℓ ∈
+  {−2, …, 2}` the crossing is the difference of the windings of `Reading::of_turns(ℓ/4)` and of `(ℓ + Δℓ)/4`, and the
+  landing class is the open phase times four: the carry is a function of the phase alone.
+- `…the_reader_emits_the_landing_at_every_tick_and_its_reading_keeps_the_windings`: along a walk with two arrivals and
+  a departure, each tick's symbol is `land`'s, `reading().windings()` moves by the crossing, and the lift ends at `4`.
+- `section_lock::tests::a_cycles_winding_is_the_owners_and_an_open_cycle_is_refused_with_its_remainder`: windings `1,
+  −1, 2, 0` for closed advance cycles; the sums `1, 3, −1` are refused `LoopDoesNotClose` with remainders `1, 3, −1`.
+- `section_lock::tests::words_concatenate_with_the_carry_cocycle_when_their_classes_meet`: `W = 0, 1` for two words
+  joining to `1`; a departure `−1` meets its return `+1` at `0`; a word on another class is refused `Recursion` at
+  tick `1`; the empty word is the identity.
+- `tests/acoustic_wave_port.rs::section_words_concatenate_with_the_carry_cocycle_on_the_declared_bank`: the three ring
+  words of the declared bank on F1 (`t = 2/3, 1, 2`, 120 symbols each), cut at ten declared ticks. A word equals the join
+  of its parts at every cut with `W` additive, and is associative over three parts. Every cut of every ring joined to
+  every cut of every ring: where the landing class of `u` is the start class of `v` the join exists, `W(uv) = W(u) +
+  W(v)` and equals the signed arrival count; everywhere else it is refused `Recursion` at `u`'s last tick; both outcomes
+  occur.
+- `…::a_locks_winding_is_the_closed_loop_owners_the_words_and_the_arrivals`: on all nine locks of the bank (F1, F3, F4)
+  the lock's `W` (closed-loop owner) equals the winding of its cycle as a section word (carry law) and the signed sum
+  of its arrival word, and the cycle lands on the class it starts from.
+
+Runs, under the common lease, `CARGO_BUILD_JOBS=4`, test threads 4, scratch in the worktree's `.local/`:
+
+| Run | Projection and deadline | Result |
+|---|---|---|
+| `cargo test -p holonics --test acoustic_wave_port` | at most 420 s (the largest earlier unit was 70 s) | exit 0, 17 passed; the build took 21 s and the tests 19 s; the 717 s of wall time in its BOUNDED line include about 670 s waiting for the lease |
+| `cargo test -p holonics --lib -- hnn::section_lock hnn::dynamic_section geometry::winding aeon::reading` | 420 s | exit 0, 39 passed, 36 s wall (build included) |
+| `bash tools/gate.sh`, first run | 420 s | exit 1 in 50 s: `check` ok, `guard-doctests` ok (63 passed), `guard-lints` FAILED: `clippy::infinite_iter` (deny by default) on my new test's `lock.cycle().last()`, which reads the accessor name `cycle` as the iterator adapter; a false positive, repaired by binding the slice first |
+| `bash tools/gate.sh`, after the repair | 420 s | exit 0 in 19 s: `check`, `guard-lints`, `guard-doctests` all ok |
+| `cargo test -p holonics --test acoustic_wave_port`, after the repair | 420 s | exit 0, 17 passed, 19 s of tests, 42 s wall with the build; the unit run above predates only a comment edit in `hnn/mod.rs` |
+
+The gate's remaining clippy warnings (`manual_is_multiple_of` and others in `tests/acoustic_wave_port.rs` and the notebook files) are
+the ones `origin/main` already carries; this change adds none.
+
+### 15.4 Recorded failures checked
+
+- **A search hit is not a join** (lessons): the owners are called at their consumers and equal the old readings on the
+  bank; the hand comparisons that stood beside them (`landed >= 4`, `div_euclid`, `net / RAYS`, two `debug_assert`s) are
+  deleted. The only hand law left is the test oracle in `dynamic_section::tests::by_hand` and the fixture helper
+  `section_lock::tests::symbol`, which agree with the owner's reading and cross-check it.
+- **A located cause carried unrepaired into a new consumer**: the cause (the carry law restated beside its owner) is
+  repaired in its three consumers, not carried into `concat` or `winding`, which are built on `land` and `Reading::add`.
+- **A design thought in arrays and offsets**: the word is stated by its start class, net lift and landing class (a
+  residue and its carry), and the cuts of the bank words are a declared grid, not a search.
+- **A refusal answered with a larger limit**: none occurred; no deadline was raised.
+
+### 15.5 Not claimed, and owed to #62
+
+That the section is a helical code: no strand face, pairing involution or decoder was built, and `SectionWord::concat`
+joins symbol words only. That the junction law holds beyond the quarter-turn grain.
+
+8. The Lean statement of the section-word instance of the carry cocycle: for section words `u`, `v` with `e(u) = c_v`,
+   `⌊(c_u + N_u + N_v)/4⌋ = ⌊(c_u + N_u)/4⌋ + ⌊(c_v + N_v)/4⌋` (an instance of `Aeon/Clock/Winding.windings_add` at the
+   junction phase `c_v/4`), the refusal at a class mismatch, and `Σ crossing = W` over an admitted word (the telescoped
+   recursion).

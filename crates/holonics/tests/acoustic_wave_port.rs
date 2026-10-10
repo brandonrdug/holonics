@@ -31,7 +31,8 @@ use holonics::hnn::HnnError;
 use holonics::hnn::dynamic_section::{RAYS, SectionReader, SectionRefusal, SectionSymbol, chord};
 use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands};
 use holonics::hnn::section_lock::{
-    Arrival, JointLock, JointRefusal, Lock, LockReader, LockRefusal, LockWindow, Settled,
+    Arrival, JointLock, JointRefusal, Lock, LockReader, LockRefusal, LockWindow, SectionRelation,
+    SectionWord, Settled,
 };
 use holonics::hnn::wave::{MatchedWave, ReceivedTick, WavePort};
 use holonics::holon::parametron::Carrier;
@@ -909,6 +910,113 @@ fn f4_has_a_joint_period_of_twelve() {
         BigInt::from(4)
     );
     assert_ne!(locks[1].period(), 4);
+}
+
+/// The concatenation law of section words, at its consumer, on the declared bank (F1, rings
+/// `t = 2/3, 1, 2`): for words `u`, `v` whose classes meet (`u` lands on the class `v` starts from),
+/// `W(uv) = W(u) + W(v)`, with `W` the owner's signed carry law applied once to the word (start class,
+/// net lift) and checked against the signed count of its arrivals; when the classes do not meet the
+/// join is refused at `u`'s last tick and has no winding. The ring words are cut at declared ticks and
+/// every cut of every ring is joined to every cut of every ring, so both outcomes occur.
+#[test]
+fn section_words_concatenate_with_the_carry_cocycle_on_the_declared_bank() {
+    let words: Vec<SectionWord> = bank_settled(&stream(1, SAMPLES))
+        .into_iter()
+        .map(|ring| match ring {
+            Settled::Word(word) => word,
+            Settled::Rest => panic!("the bank rings are not at rest on F1"),
+        })
+        .collect();
+    let length = SAMPLES - SETTLE;
+    let part = |word: &SectionWord, cut: std::ops::Range<usize>| {
+        SectionWord::new(word.symbols()[cut].to_vec()).unwrap()
+    };
+    let arrivals = |word: &SectionWord| {
+        BigInt::from(
+            word.symbols()
+                .iter()
+                .map(|symbol| i32::from(symbol.crossing))
+                .sum::<i32>(),
+        )
+    };
+    let cuts = [1usize, 2, 3, 5, 7, 8, 13, 60, 118, 119];
+
+    // a ring's whole word is the join of its parts at every cut, and the cocycle holds at each
+    for word in &words {
+        assert_eq!(word.symbols().len(), length);
+        assert_eq!(word.winding(), arrivals(word));
+        for &cut in &cuts {
+            let (u, v) = (part(word, 0..cut), part(word, cut..length));
+            assert_eq!(u.concat(&v).as_ref(), Ok(word));
+            assert_eq!(word.winding(), u.winding() + v.winding(), "cut {cut}");
+        }
+        // associativity: the junction carries vanish in either bracketing
+        let (u, v, w) = (part(word, 0..7), part(word, 7..60), part(word, 60..length));
+        let left = u.concat(&v).unwrap().concat(&w).unwrap();
+        let right = u.concat(&v.concat(&w).unwrap()).unwrap();
+        assert_eq!((&left, &right), (word, word));
+        assert_eq!(
+            word.winding(),
+            u.winding() + v.winding() + w.winding(),
+            "three parts"
+        );
+    }
+
+    // across rings: the words meet where u's landing class is v's start class, and only there
+    let (mut met, mut refused) = (0, 0);
+    for a in &words {
+        for b in &words {
+            for &cut_u in &cuts {
+                for &cut_v in &cuts {
+                    let (u, v) = (part(a, 0..cut_u), part(b, cut_v..length));
+                    let last = u.symbols().last().unwrap();
+                    let lands = (i16::from(last.class) + i16::from(last.advance)).rem_euclid(4);
+                    if i16::from(v.start_class().unwrap()) == lands {
+                        met += 1;
+                        let uv = u.concat(&v).unwrap();
+                        assert_eq!(uv.symbols().len(), cut_u + length - cut_v);
+                        assert_eq!(uv.winding(), u.winding() + v.winding());
+                        assert_eq!(uv.winding(), arrivals(&uv));
+                    } else {
+                        refused += 1;
+                        assert_eq!(
+                            u.concat(&v),
+                            Err(LockRefusal::NotASectionWord {
+                                tick: cut_u - 1,
+                                relation: SectionRelation::Recursion
+                            })
+                        );
+                    }
+                }
+            }
+        }
+    }
+    assert!(met > 0 && refused > 0, "met {met}, refused {refused}");
+}
+
+/// The three readings of one winding agree on every lock of the declared bank, on F1, F3 and F4: the
+/// lock's `W` (the closed-loop owner over the cycle's advances), the word's `W` (the signed carry law
+/// over its start class and net lift, on the cycle admitted as a section word) and the signed count of
+/// the observed arrivals. The cycle is closed: it lands on the class it starts from.
+#[test]
+fn a_locks_winding_is_the_closed_loop_owners_the_words_and_the_arrivals() {
+    for tone in [
+        stream(1, SAMPLES),
+        cycle_of(&F3, SAMPLES),
+        cycle_of(&F4, SAMPLES),
+    ] {
+        for ring in bank_settled(&tone) {
+            let lock = ring.lock(&lock_window()).unwrap();
+            let word = SectionWord::new(lock.cycle().to_vec()).unwrap();
+            assert_eq!(word.winding(), BigInt::from(lock.winding()));
+            let count: i32 = lock.arrival_word().iter().map(|&c| i32::from(c)).sum();
+            assert_eq!(i64::from(count), lock.winding());
+            let symbols = lock.cycle();
+            let last = symbols.last().unwrap();
+            let lands = (i16::from(last.class) + i16::from(last.advance)).rem_euclid(4);
+            assert_eq!(Some(u8::try_from(lands).unwrap()), word.start_class());
+        }
+    }
 }
 
 /// Thue–Morse is Unlocked on every ring (no period at most 60 repeats the settled word) and refuses
