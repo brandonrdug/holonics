@@ -281,14 +281,12 @@ fn ring_pass(
                                 near_bits += bits;
                                 near_raw += raw;
                                 near_defects += near.defects().len() as u64;
-                                if near.winding() != 0 {
-                                    located.push((
-                                        tick.tick + 1 - window.length(),
-                                        near.winding(),
-                                        near.period(),
-                                        near.defects().len(),
-                                    ));
-                                }
+                                located.push((
+                                    tick.tick + 1 - window.length(),
+                                    near.winding(),
+                                    near.period(),
+                                    near.defects().len(),
+                                ));
                                 let Settled::Word(read) = &word else { unreachable!() };
                                 assert_eq!(&near.decode().unwrap(), read, "N1 on the recording");
                             }
@@ -510,14 +508,20 @@ fn main() {
         for (b, pass) in passes.iter().enumerate() {
             let mut rates: std::collections::BTreeMap<(i64, usize), u64> =
                 std::collections::BTreeMap::new();
+            let mut still: std::collections::BTreeMap<usize, u64> = std::collections::BTreeMap::new();
             for &(start, winding, period, defects) in &pass.located {
+                track.push_str(&format!("{b} {start} {winding} {period} {defects}\n"));
+                if winding == 0 {
+                    // A non-turning near-return: its period is the clock it holds (record §13).
+                    *still.entry(period).or_insert(0) += 1;
+                    continue;
+                }
                 let address = Rat::new(BigInt::from(winding), BigInt::from(period as u64));
                 let key = (
                     address.numer().to_i64().unwrap(),
                     address.denom().to_usize().unwrap(),
                 );
                 *rates.entry(key).or_insert(0) += 1;
-                track.push_str(&format!("{b} {start} {winding} {period} {defects}\n"));
             }
             let mut ranked: Vec<_> = rates.into_iter().collect();
             ranked.sort_by(|x, y| y.1.cmp(&x.1));
@@ -526,11 +530,20 @@ fn main() {
                 .take(6)
                 .map(|((w, t), n)| format!("{w}/{t}: {n}"))
                 .collect();
+            let turning: u64 = ranked.iter().map(|(_, n)| n).sum();
+            let mut held: Vec<_> = still.into_iter().collect();
+            held.sort_by(|x, y| y.1.cmp(&x.1));
+            let periods: Vec<String> = held
+                .iter()
+                .take(8)
+                .map(|(period, n)| format!("{period}: {n}"))
+                .collect();
             println!(
-                "located ring {b}: {} windows with a turning near-return, {} distinct rates; most read: {}",
-                pass.located.len(),
+                "located ring {b}: {turning} windows turning ({} distinct rates; most read: {}); {} windows not turning, periods most read (ticks: windows): {}",
                 ranked.len(),
-                top.join(", ")
+                top.join(", "),
+                pass.located.len() as u64 - turning,
+                periods.join(", ")
             );
         }
         write_track(&format!("{output}.located.txt"), &track);

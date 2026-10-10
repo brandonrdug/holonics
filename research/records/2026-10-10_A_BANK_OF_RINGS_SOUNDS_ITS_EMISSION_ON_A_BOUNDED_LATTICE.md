@@ -358,8 +358,11 @@ read and held. Gate 1 passed at `68aece1a`.
 | bits of the same windows spelled out | 6309636 |
 | defects kept | 260254 |
 
-- **The voice's rings now return.** Ring 0 admits 172 of its 173 windows (exact locks: 5), described
-  in 43991 bits against 326112, with 3284 defects kept. Rings 1–5 admit 203, 233, 279, 328 and 384
+- **The voice's rings are admitted, trivially** (corrected below, §13's period reading). Ring 0 admits
+  172 of its 173 windows (exact locks: 5), described in 43991 bits against 326112, with 3284 defects
+  kept. Every one of ring 0's non-turning admissions has period 1: the cycle is "advance 0", and the
+  defects are the ray crossings. The bits measure that a slowly turning ring's word is mostly zeros,
+  not a structure of the speech. Rings 1–5 admit 203, 233, 279, 328 and 384
   windows, each at between `1/7` and `3/10` of its raw length (the exact bits are in the receipt).
 - **The upper rings admit fewer.** Ring 23 admits 2433 of 6451 windows. Its windows of 16 ticks
   leave little room for a cycle to pay for itself.
@@ -569,3 +572,20 @@ samples' own length, or a measurement that it does not, and where.
 - `hnn::keys` and `hnn::moment` (`68fb967d`; `SourceMoment`, the field's own phase-carried moment,
   whose bridge to the strand face is owed in #62).
 - `hnn::dynamic_section` (`b043cb8e`) and `hnn::section_lock` (`c55faacf`, the near-return above).
+
+[measured] **The non-turning near-returns' periods** ([receipt](receipts/2026-10-10-acoustic-release/NEAR_RETURN_PERIODS.v1.json)):
+203487886494 ns against a projection of about 210 s (deadline 300 s).
+
+- **The voice's rings.** In rings 0–5 nearly every non-turning near-return has **period 1**: ring 0
+  170 of 170, ring 1 192 of 193, ring 4 313 of 313. The "cycle" is the advance `0` repeated, and
+  every ray crossing is a defect. A ring turning a quarter in tens of ticks reads mostly `0`, and its
+  near-return says only that.
+- **The upper rings.** Period 1 still leads, and the short periods near each ring's own turn follow
+  (ring 19: 6, 11 and 5 ticks; ring 23: 7 and 3 ticks).
+- **What it settles.** The hypothesis that the non-turning cycles hold the recording's clock is
+  refuted on this bank. Their periods are trivial in the voice's rings and resonant above.
+  - §11's N3 bits for the low rings are corrected accordingly: they measure sparse crossings, not a
+    located return.
+  - The information of a slow ring's word is in **where its crossings fall** (the defects'
+    placement) and in the fibre. That is where §15's architecture puts it, through the repair
+    owners' residual code and the fibre's code, read against the source by the inverse tick.
