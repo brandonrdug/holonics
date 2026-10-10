@@ -1,8 +1,13 @@
 {
- "scope": "Local developer read by opus under the common lease, not claim-bearing: material_tangent_world cold_restore, 00:26:53-00:26:57, exit 0, wall 4,301,401,800 ns, child peak 746,724 KiB. The earlier attempt on the first fixture (00:23:43-00:23:51, exit 101) refused at mount_continued: ContinuingState \"the state's material off its loci's lattices\".",
+ "scope": "Local developer read by opus under the common lease, not claim-bearing: material_tangent_world cold_restore, 00:26:53-00:26:57, exit 0, wall 4,301,401,800 ns, child peak 746,724 KiB. The earlier attempt on the first fixture (00:23:43-00:23:51, exit 101) refused at mount_continued: ContinuingState \"the state's material off its loci's lattices\". With the World model text restore: 00:33:56-00:34:09, exit 0, wall 13,098,305,271 ns, child peak 1,604,060 KiB.",
  "stdout_sha256": "491f28f17f3ca388207c4459cef735e69612a64d5a87a6491f9b8f904d166064",
  "lines": [
   "test the_landed_material_survives_a_cold_restore ... cold restore fixture: round 0: landing Ok(Phase) at grain raise None",
   "cold restore: 20807 text bytes; next comparison code ExactInterval { lower: Ratio { numer: 79539092636454120132838037485, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79539092636454120138643154515, denom: 79228162514264337593543950336 } } excess 50430886807952251374925832746184567964003615589297927605331355434004916959339232213855175636241412886123689426217641347399726040470890511545594135451149621/19213874109780528139233501874655262209704002632233650651737787611731990234188136463889456357983905258854066601769677879595012880079288590254595068748509220000"
+ ],
+ "stdout_sha256_with_model": "66ad1d5cf9a9c3fecf37440a39374e6673528999f605c3ad2765a01eb638755d",
+ "lines_with_model": [
+  "test the_landed_material_survives_a_cold_restore ... cold restore fixture: round 0: landing Ok(Phase) at grain raise None",
+  "cold restore: 20807 text bytes, World model 491 text bytes; next comparison code ExactInterval { lower: Ratio { numer: 79539092636454120132838037485, denom: 79228162514264337593543950336 }, upper: Ratio { numer: 79539092636454120138643154515, denom: 79228162514264337593543950336 } } excess 50430886807952251374925832746184567964003615589297927605331355434004916959339232213855175636241412886123689426217641347399726040470890511545594135451149621/19213874109780528139233501874655262209704002632233650651737787611731990234188136463889456357983905258854066601769677879595012880079288590254595068748509220000"
  ]
 }

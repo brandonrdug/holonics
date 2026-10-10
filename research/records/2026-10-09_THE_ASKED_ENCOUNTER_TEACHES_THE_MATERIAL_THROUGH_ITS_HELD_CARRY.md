@@ -516,12 +516,14 @@ On the dyadic fixture:
 2. The receiver's constitution and carry were saved as exact text (20807 bytes, a prime) and mounted
    on the declared founding, the material before any learning.
 3. The restored material and carry equal the live ones exactly.
-4. The World, exterior to the machine, was rebound by its owner at its live state; the World model
-   was carried by value (its own save is owed).
+4. The World model's learned part, its tick and each key's state, was saved as its own exact text
+   (491 bytes, a prime; `WorldModel::{to_text, restored}`) and restored on its declared keys, which
+   are declarations and are not written. It equals the live memory. The World, exterior to the
+   machine, was rebound by its owner at its live state.
 5. The restored receiver's next encounter read the live one's comparison exactly: equal code
    enclosure and excess.
 
-Run 00:26:53–00:26:57, exit 0
+Runs 00:26:53–00:26:57 and, with the World model's text, 00:33:56–00:34:09, both exit 0
 ([receipt](receipts/2026-10-09-material-tangent/COLD_RESTORE_DEV_TESTS.v1.json)).
 
 ## 6. The tangent continues into the next encounter

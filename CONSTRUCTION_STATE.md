@@ -90,9 +90,9 @@ The helical code, the encoding every Holon carries, is defined in
   learner was never worse in the admission's order (one round on the first fixture has overlapping,
   unresolved code enclosures). After each classical landing its code was strictly below the twin's.
   Without its history the first fixture's classical gain vanished.
-- **Cold restore:** on a dyadic-factor fixture the landed material and carry return exactly from text and
-  the restored receiver reads the live next comparison.
-- **Still owed:** the queue's claim-bearing runs of the latest pins, the World model's own save, the
+- **Cold restore:** on a dyadic-factor fixture the landed material, the carry and the World model's
+  learned part return exactly from text, and the restored receiver reads the live next comparison.
+- **Still owed:** the queue's claim-bearing runs of the latest pins, the
   two-encounter credit's landing, provenance carrying the located key's identity, more fixtures,
   and the World-sensitive Ask on a field where selection is informative.
 

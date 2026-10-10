@@ -1281,9 +1281,10 @@ fn world_at(field: &Field, chart: Encoded, holon: Holon, state: HolonState, orig
 /// **The landed material survives a cold restore** (acceptance (c)): after a teaching encounter and
 /// its admitted landing, the receiver's constitution and carry are saved as exact text and mounted
 /// on the declared founding (the material before any learning). The restored material and carry
-/// equal the live ones. The World, exterior to the machine, is rebound at its live state; the World
-/// model is carried by value (its own save is owed). The next encounter then reads the same
-/// comparison on the restored receiver as on the live one.
+/// equal the live ones. The World model's learned part is saved as its own exact text and restored
+/// on its declared keys. The World, exterior to the machine, is rebound by its owner at its live
+/// state. The next encounter then reads the same comparison on the restored receiver as on the live
+/// one.
 #[test]
 fn the_landed_material_survives_a_cold_restore() {
     use holonics::hnn::Reference;
@@ -1341,8 +1342,10 @@ fn the_landed_material_survives_a_cold_restore() {
         origin,
     ))
     .unwrap();
-    cold.bind_world_model(live.world_model().unwrap().clone())
-        .unwrap();
+    let model_text = live.world_model().unwrap().to_text();
+    let model = WorldModel::restored(vec![faced_key(&field)], &model_text).unwrap();
+    assert_eq!(&model, live.world_model().unwrap(), "the World model returns");
+    cold.bind_world_model(model).unwrap();
 
     let read = |receiver: &mut PhysicalReceiver<'_>| {
         let preparation = actuator(&field);
@@ -1360,8 +1363,9 @@ fn the_landed_material_survives_a_cold_restore() {
     let cold_next = read(&mut cold);
     let live_next = read(&mut live);
     println!(
-        "cold restore: {} text bytes; next comparison code {:?} excess {}",
+        "cold restore: {} text bytes, World model {} text bytes; next comparison code {:?} excess {}",
         text.len(),
+        model_text.len(),
         live_next.0,
         live_next.1
     );
