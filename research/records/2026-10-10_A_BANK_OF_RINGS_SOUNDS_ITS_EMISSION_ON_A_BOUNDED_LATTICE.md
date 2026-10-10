@@ -649,3 +649,32 @@ its cell's interval, so the code is lossless and `R_source = 0`.
   quarter turn (more rays) or a pair of rings read jointly (the helical duplex, where one ring's cell
   constrains the other's), each paid in the word. The finer grain is the cheaper join, because
   `dynamic_section`'s `RAYS` is already the declared grain of the section chart.
+
+## 17. Refinements to §15 (the source reviewer, via Codex)
+
+The source reviewer found §15's one-ring, source-inverse and repair direction aligned with the
+recovered history, and refined it.
+
+1. **The inverse from the emission.** The full emission determines the rate, `ω = −Y e / 2`, so
+   `a = [M (ω + r′_ω − r_ω) − 2C w + h K u] / h` with `M = 2C + (h/Y) I + hD + (h²/2) K`. This is the
+   same tick as `inverse_step`, read from the emission instead of the velocity. The declared
+   operands, the initial state and the carry constraints stay at the consumer. Unknown operands,
+   state or carries need an explicit preimage fibre. That one retained state suffices for the ring's
+   future is not a reconstruction of past forcing: the inverse uses the before-and-after relation and
+   its reached carry.
+2. **A candidate certificate (the reviewer's, untested here).** With `h = 1`, `C = I`, state and rate
+   on `2^(−32)`, the displacement and velocity splits' remainders zero, and a declared `M = m I` with
+   `m < 7`: `|a − a₀| < 7 · 2^(−32) < 2^(−16)`. At the PCM grain `2^(−15)` the nearest incident
+   amplitude is then unique. It is neither an implemented inverse nor a validation of
+   `inverse_step`, and it says nothing of the summed and rendered file.
+3. **A coarse state's residual.** When the decoder knows the state only coarsely, `R_source` includes
+   the feedback carry's difference, not only `Δ_T(s − ŝ)`. The initial section class, lift, clock and
+   placement are decoder operands or unresolved fibre in the bridge to the repair owners, not
+   bookkeeping to drop. `R_source` stays distinct from `R_bank`.
+4. **Where the source interface joins the recovered encoder.** `Encoding::found`'s squares,
+   `D E = ρ`, `E T = U E` and `E B = J`, must hold with the actual source-reading forms. The
+   historical `ExactPhaseCurrentSection` (its phase polynomials and placement carry) and the exact
+   PCM butterfly are the reusable laws (recovery in progress).
+5. **The cost correction stands.** 2455192 bits include the quadrature's 112076; without them,
+   2343116, which is still more than 1498880. The repaired clock keeps its source GO, and its codec
+   failure stands. §16's margin is the scoped slack measurement, not learned source content.
