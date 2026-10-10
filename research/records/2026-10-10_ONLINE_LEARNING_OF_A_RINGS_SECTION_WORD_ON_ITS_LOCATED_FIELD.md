@@ -632,3 +632,55 @@ the same 28072 bits, decode exact.
 opening state given. It is not the recording, not the departed word, and not generation. A comparison
 of the whole charge (prefix, chart, letters, opening, classes and indices) against §29's codec on the
 same ticks is the next measurement.
+
+## 11. The receiving map's descent and its prior's move, read apart (the checkpoint's owner question)
+
+[measured] ([receipt](receipts/2026-10-10-online-learning/M1_MAP_STAGES.v1.json); in-crate test
+`the_receiving_maps_descent_and_its_priors_move_are_read_apart`, 19054732809 ns.)
+
+**The owners' order**, from a read-only trace of `Constitution::deposited`. Within one deposit:
+1. The certified step `η` is fixed.
+2. The raw descent `ηD` goes into the map through its carry, giving the stepped value `W_s + r_s`
+   and a staged tail `e_s`.
+3. Only then does `NormalLaw::moved_prior` move the prior and multiply the map's value by
+   `x = 2^(k − k′)` through the same carry.
+
+The test separates the stages without any owner change. The same deposit, applied to the predecessor
+without its prior pairs (`Constitution::without_prior_pairs`), gives the stepped map before the move.
+It runs on the online consumer's field (frame `[7, 2]`, cell-only receiver) and word.
+
+**Readings at every deposit whose prior moved** (101 of them). The sequence is the acoustic run's
+exactly: moves from commit 6, the jump `6 → 3` at commit 12, then `7 → 8` at commit 17 and `8 → 9`
+at commit 18.
+
+| Commit | Prior | Nonzero `W` before | After the descent, `W_s` | After the move, `W_f` |
+|---|---|---|---|---|
+| 17 | `7 → 8` | 8 | 8 | 4 |
+| 18 | `8 → 9` | 4 | 8 (entries `±1/128`) | **0** |
+| 19 | `9 → 10` | 0 | 4 | 0 |
+| 20 … 106 | one per commit, to `96 → 97` | 0 | 0 | 0 |
+
+- **The move's ledger holds exactly at every move:** `W_f + r_f + e_f = x (W_s + r_s) + e_s`.
+- **The attribution, now separated.**
+  - At commits 18 and 19, the certified descent **raised** `R`'s entries back to one lattice unit.
+  - The prior's move, `x = 1/2`, then halved `W + r` below the `2^(−7)` lattice. The forward read
+    takes `W` alone, so the readout became exactly zero while the remainders kept the value below the
+    read.
+  - From commit 20 on, the descent's step, which also shrinks as each move lifts the Gram by `2^k`,
+    no longer reaches one unit of the map.
+  - The prior's exponent then climbs by one per commit without end. This is the Lean module's own
+    item 3, "the code falls toward the zero map without end".
+
+[definition] **The owner question, answered from the owners.**
+- **The prior's move is an actual amplitude change of the map, not a read-preserving
+  re-representation.** The doc of `moved_prior` (the map's value `x (W + r)`, "the map the law
+  located"), the prior carry's record (§3: "the map the law located"; §7: "the prior rises one member
+  per read") and `HNN/PriorMove.lean` (items 3 and 5) all say so. No frame or decoder compensates, and
+  `R` is the receiver's decoder.
+- **It is not certified against the receiving comparison.** `certify_steps` runs before it, and only
+  the moved chart's bound `‖1 − X̂′H′‖∞` is certified.
+- **This is the measured cause of `R`'s loss of readout on this field.** The deposit's two operations
+  disagree: the descent raises the map, and the prior's code verdict halves it below the read.
+  Whether the prior should move a map it cannot read below its lattice, or move only the scale it
+  certifies, is the law's question for its owner. It is not answered here by any change, and O3's
+  route (§7, §10) does not depend on it.

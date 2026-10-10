@@ -1683,3 +1683,155 @@ fn a_located_register_retains_its_advance_law_warm_and_cold() {
     assert!(disagreeing.receive_at(0, Some(&digits(1))).is_err(), "one chart's digits per class");
     assert!(warm.receive(0).is_err(), "no identity step after a located one");
 }
+
+/// **The receiving map's stages separated at a prior's move** (the online-learning record §11;
+/// Codex's review of `25eeac97`): on the field of the acoustic online consumer (frame `[7, 2]`, the
+/// cell-only receiver on the last ring) and the clean section word's ordinals (its `−2` at
+/// `n ≡ 5 (mod 7)`), the loop of §1 deposits each compared cell; at every deposit whose receiving
+/// prior moved, the same deposit on the predecessor without its prior pairs
+/// (`Constitution::without_prior_pairs`) gives the stepped map before the move. Reports, per map
+/// entry, `W_0` (before), `W_s + r_s` with the stepped tail `e_s` (after the certified descent and
+/// its carry), and `W_f + r_f` with the tail `e_f` (after the move by `x = 2^(from − to)`), and checks
+/// the move's ledger exactly: `W_f + r_f + e_f = x (W_s + r_s) + e_s`.
+#[test]
+fn the_receiving_maps_descent_and_its_priors_move_are_read_apart() {
+    use crate::compression::keys::frames::FrameFamily;
+    use crate::geometry::RatVec3;
+    use crate::geometry::screw::ScrewGenerator;
+    use crate::hnn::constitution::Carrier;
+    use crate::hnn::field::{ContactDeclaration, CribDeclaration, RingDeclaration};
+    use crate::hnn::reference::Reference;
+    use crate::hnn::{Encoded, Encoding, PassageChart};
+    use crate::compression::landmark::context::{BaseMeasure, StopPrior};
+    let ring = |period: u64, lock: Vec<u64>| RingDeclaration {
+        period,
+        screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
+        placements: (0..period).map(|node| FieldDeclaration::quarter_turn(node, period)).collect(),
+        lock,
+        reflector: (0..period).map(|p| ((period - p) % period) as usize).collect(),
+        admittance: Rat::from_integer(BigInt::from(2)),
+        initial: 0,
+    };
+    let field = Field::declare(
+        FieldDeclaration {
+            rings: vec![ring(7, vec![0]), ring(2, vec![0, 1])],
+            contacts: vec![ContactDeclaration {
+                from: 0,
+                to: 1,
+                channel: vec![(0, 0), (1, 1)],
+                admittance: Rat::from_integer(BigInt::from(2)),
+                exponent: Rat::from_integer(BigInt::from(2)),
+            }],
+            loops: Vec::new(),
+            sources: vec![1],
+            offsets: Vec::new(),
+            alphabet: 2,
+            step: Rat::one(),
+            exponent_grain: 1,
+            receivers: vec![ReceiverDeclaration {
+                ring: 1,
+                aperture: 1,
+                tolerance: rat(1, 16),
+                depth: 2,
+                prior: StopPrior::half(),
+                mass: 1,
+                base: BaseMeasure::Even,
+                receiving_prior: 0,
+            }],
+            crib: CribDeclaration { window: 16, offset: 1 },
+            population: 1 << 24,
+            lattice: Default::default(),
+        }
+        .by_lattice_rule(),
+    )
+    .unwrap();
+    let (tau, length) = (7usize, 120usize);
+    let word: Vec<usize> = (0..length).map(|n| usize::from(n % tau == 5)).collect();
+    let location = FrameFamily::pairs(9).unwrap().locate(2, &[word.clone()]).unwrap();
+    let (_, carrying) = location.carrying().find(|(helix, _)| helix.periods() == [7, 2]).unwrap();
+    let located = PassageChart::located(carrying.location(), &[word.clone()]).unwrap();
+    let encoding = Encoding::found(&located).unwrap();
+    let encoded = Encoded::through(&encoding, &located, &field, &[word]).unwrap().remove(0);
+    let reference = Reference::new(64, u64::MAX);
+    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let feed = |resident: &mut crate::hnn::Resident, moment: Option<crate::hnn::MomentId>, part: &Encoded| {
+        let mut moment = moment;
+        let mut rest = part.part(0..part.len()).unwrap();
+        loop {
+            let (id, ingest) = reference.ingest(resident, moment.as_ref(), &rest).unwrap();
+            moment = Some(id);
+            let ingested = ingest.forward.into_present().unwrap();
+            if ingested.carry_out {
+                let admitted = resident.admitted().to_vec();
+                reference.close_aeon(resident, &admitted).unwrap();
+            }
+            if ingested.cells == rest.len() {
+                return moment.unwrap();
+            }
+            rest = rest.part(ingested.cells..rest.len()).unwrap();
+        }
+    };
+    let moment = feed(&mut resident, None, &encoded.part(0..tau).unwrap());
+    let phases = resident.admitted()[0].clone();
+    let map_of = |theta: &Constitution| theta.receiving_map(1).unwrap().entries().to_vec();
+    let carry_of = |theta: &Constitution| -> Vec<Rat> {
+        let carried = theta.carried_remainders();
+        (0..map_of(theta).len())
+            .map(|i| {
+                carried
+                    .iter()
+                    .find(|(locus, carrier, entry, _)| *locus == Locus::ReceivingMap(1) && *carrier == Carrier::Map && *entry == i)
+                    .map(|(.., r)| r.clone())
+                    .unwrap_or_else(Rat::zero)
+            })
+            .collect()
+    };
+    let tail_of = |released: &[(Locus, Carrier, usize, Rat)], i: usize| -> Rat {
+        released
+            .iter()
+            .find(|(locus, carrier, entry, _)| *locus == Locus::ReceivingMap(1) && *carrier == Carrier::Map && *entry == i)
+            .map(|(.., e)| e.clone())
+            .unwrap_or_else(Rat::zero)
+    };
+    let mut moves = 0;
+    for n in tau..length {
+        let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+        let (staged, compared) = reference.compare(&mut resident, pending, &encoded.part(n..n + 1).unwrap()).unwrap();
+        let deposit = compared.deposit.into_present().unwrap();
+        let before = resident.constitution().clone();
+        let reading = reference.deposit(&mut resident, staged).unwrap().deposit.into_present().unwrap();
+        let moved = reading.charts.iter().find_map(|(locus, chart)| match (locus, &chart.prior) {
+            (Locus::ReceivingMap(1), Some(prior)) if prior.to != prior.from => Some(prior.clone()),
+            _ => None,
+        });
+        if let Some(prior) = moved {
+            moves += 1;
+            let (stepped, stepped_reading) = before.without_prior_pairs().deposited(&deposit).unwrap();
+            let after = resident.constitution();
+            let power = |e: u32| Rat::from_integer(BigInt::one() << e as usize);
+            let x = power(prior.from) / power(prior.to);
+            let (w0, ws, rs, wf, rf) = (map_of(&before), map_of(&stepped), carry_of(&stepped), map_of(after), carry_of(after));
+            let mut ledger = true;
+            for i in 0..wf.len() {
+                let (es, ef) = (tail_of(&stepped_reading.released, i), tail_of(&reading.released, i));
+                ledger &= &wf[i] + &rf[i] + &ef == &x * (&ws[i] + &rs[i]) + &es;
+            }
+            let nonzero = |v: &[Rat]| v.iter().filter(|e| !e.is_zero()).count();
+            println!(
+                "§11 cell {n} commit {}: prior {} -> {} (x = {x}); W_0 nonzero {}, W_s nonzero {}, W_f nonzero {}; the move's ledger holds: {ledger}; W_0 {:?}; W_s {:?}; W_f {:?}",
+                after.commit(),
+                prior.from,
+                prior.to,
+                nonzero(&w0),
+                nonzero(&ws),
+                nonzero(&wf),
+                w0.iter().map(ToString::to_string).collect::<Vec<_>>(),
+                ws.iter().map(ToString::to_string).collect::<Vec<_>>(),
+                wf.iter().map(ToString::to_string).collect::<Vec<_>>()
+            );
+            assert!(ledger, "the move's ledger at commit {}", after.commit());
+        }
+        feed(&mut resident, Some(moment), &encoded.part(n..n + 1).unwrap());
+    }
+    assert!(moves > 0);
+}
