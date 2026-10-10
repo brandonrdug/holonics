@@ -678,3 +678,30 @@ recovered history, and refined it.
 5. **The cost correction stands.** 2455192 bits include the quadrature's 112076; without them,
    2343116, which is still more than 1498880. The repaired clock keeps its source GO, and its codec
    failure stands. §16's margin is the scoped slack measurement, not learned source content.
+
+## 18. Corrections on the source review of `11142433` and `3e1c051d`
+
+1. **A charted solve has no inverse here.** `inverse_step` admitted a charted solve and returned
+   `M z`. With a charted forward `z = X q` the drive error is `(M X − I) q / h`. The reviewer's witness:
+   `M = (145/32) I` on the word lattice `(0, 0, 32)`, where the zero chart is admitted, a unit drive
+   from rest leaves the state at zero, and the inverse returns zero. **Closed:** a charted solve is
+   refused, typed, as `WavePort` already refuses it, and the exact inverse is claimed for the exact
+   solve only. Test: `the_inverse_refuses_a_charted_solve_and_an_unlawful_carry`.
+2. **The carry contract was not checked.** A rate remainder of the right width with empty state
+   parts panicked, and a wrong width silently became zero. **Closed:** each remainder set is either
+   empty (all zero) or has the ring's width in all three parts, refused otherwise before any index is
+   read. Under the exact law every remainder must be zero. On a lattice, which `inverse_step` now
+   takes, every remainder is at most half a unit and every state entry lies on the lattice. The
+   displacement identity alone did not validate an arbitrary carry.
+3. **§16 overstated what was built.** `interval_pass` computes each sample's interval containment and
+   an estimated length. It emits no index code, runs no independent decoder, and does not call
+   `inverse_step`. The words "decodes losslessly" and "`R_source = 0`" in §16 claim a consumer that
+   does not exist. **Corrected:** §16's valid result is the containment, every sample inside its
+   cell's widened interval, and the **estimated** lengths in its table. The consumer is the next
+   join: the encoder emits the class and index code as bytes; an independent decoder starts from the
+   declared rest state, reads them, recovers each sample, and forward-ticks to regenerate the state
+   and carry; and exact equality with the source and the charged length of the emitted bytes,
+   including termination and metadata, are checked on the same bytes. The one-value widening is
+   coherent for this family (`m < 7`, `δ = 2^(−32)`, `h = 1`: a boundary error under `7/2^17 < 1`
+   PCM integer), a certificate still unimplemented. Ring 20's estimated `1480977` against `1498880`
+   remains uniform PCM slack.

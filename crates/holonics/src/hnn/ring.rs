@@ -1694,9 +1694,16 @@ impl ResonatorOperands {
     /// β  = (M ω̂ − 2C w + h K u) / h               the drive, M the phase's operator
     /// ```
     ///
-    /// exactly; under the exact law every remainder is zero. The displacement is checked against
-    /// the same rate, `u′ + r′_u = u + hω + r_u`, and a pair of states that is not one tick is refused.
-    /// Refused for a nonlinear ring, whose element relation is not this linear solve.
+    /// exactly on the exact solve; under the exact law every remainder is zero. The displacement is
+    /// checked against the same rate, `u′ + r′_u = u + hω + r_u`, and a pair of states that is not
+    /// one tick is refused.
+    ///
+    /// The carry contract is checked before anything is read (Codex's source review): each
+    /// remainder set is either empty (all zero) or has the ring's width in all three parts, and on
+    /// `lattice` every remainder is at most half its unit and every state entry lies on it; under the
+    /// exact law (`None`) every remainder is zero. Refused, typed, for a nonlinear ring and for a
+    /// **charted** solve: with a charted forward `z = X q` the drive error would be `(M X − I) q / h`,
+    /// so the exact inverse does not apply to it.
     pub fn inverse_step(
         &self,
         tick: usize,
@@ -1704,11 +1711,9 @@ impl ResonatorOperands {
         after: [&[Rat]; 2],
         remainders_before: &ResonatorRemainders,
         remainders_after: &ResonatorRemainders,
+        lattice: Option<&Lattice>,
     ) -> Result<Vec<Rat>, HnnError> {
         let n = self.width();
-        let zero = ResonatorRemainders::zero(n);
-        let pick = |r: &ResonatorRemainders| if r.rate.len() == n { r.clone() } else { zero.clone() };
-        let (old, new) = (pick(remainders_before), pick(remainders_after));
         if [before[0], before[1], after[0], after[1]].iter().any(|v| v.len() != n) {
             return Err(HnnError::Shape {
                 what: "a resonator's states read backwards (the ring's realified width)",
@@ -1720,6 +1725,50 @@ impl ResonatorOperands {
             return Err(HnnError::Resonator {
                 ring: self.ring,
                 what: "the tick is read backwards only on the linear law",
+            });
+        }
+        if !self.charts().is_empty() {
+            return Err(HnnError::Resonator {
+                ring: self.ring,
+                what: "the tick is read backwards only on the exact solve: a charted solve is not inverted by its operator",
+            });
+        }
+        let admitted = |r: &ResonatorRemainders| -> Result<ResonatorRemainders, HnnError> {
+            let empty = r.rate.is_empty() && r.state.iter().all(Vec::is_empty);
+            if empty {
+                return Ok(ResonatorRemainders::zero(n));
+            }
+            if r.rate.len() != n || r.state.iter().any(|part| part.len() != n) {
+                return Err(HnnError::Shape {
+                    what: "a remainder set read backwards: empty, or the ring's width in rate and both state parts",
+                    expected: n,
+                    found: r.rate.len(),
+                });
+            }
+            let lawful = match lattice {
+                None => r.all().all(Zero::is_zero),
+                Some(lattice) => {
+                    let half = lattice.unit() / integer(2);
+                    r.all().all(|x| x.abs() <= half)
+                }
+            };
+            if !lawful {
+                return Err(HnnError::Resonator {
+                    ring: self.ring,
+                    what: "a remainder read backwards breaks the carry contract (zero under the exact law, at most half a unit on a lattice)",
+                });
+            }
+            Ok(r.clone())
+        };
+        let (old, new) = (admitted(remainders_before)?, admitted(remainders_after)?);
+        if let Some(lattice) = lattice
+            && ![before[0], before[1], after[0], after[1]]
+                .iter()
+                .all(|v| v.iter().all(|x| lattice.contains(x)))
+        {
+            return Err(HnnError::Resonator {
+                ring: self.ring,
+                what: "a state read backwards on a lattice lies on it",
             });
         }
         let (u, w) = (before[0], before[1]);

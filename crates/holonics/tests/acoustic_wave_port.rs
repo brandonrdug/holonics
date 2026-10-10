@@ -1289,6 +1289,7 @@ fn the_tick_read_backwards_returns_its_drive_exactly() {
                     [&tick.step.state[0], &tick.step.state[1]],
                     &before,
                     tick.step.remainders(),
+                    lattice.as_ref(),
                 )
                 .unwrap();
             assert_eq!(drive, vec![tick.incident.clone(), Rat::zero()], "tick {}", tick.tick);
@@ -1303,7 +1304,72 @@ fn the_tick_read_backwards_returns_its_drive_exactly() {
                 [&third.step.state[0], &third.step.state[1]],
                 &ResonatorRemainders::default(),
                 third.step.remainders(),
+                lattice.as_ref(),
             )
             .is_err());
     }
+}
+
+/// **The inverse's admission** (Codex's source review of `11142433`): a charted solve is refused, since
+/// its forward `z = X q` is not inverted by its operator (the witness `M = (145/32) I` on the word
+/// lattice `(0, 0, 32)`: the zero chart is admitted, a unit drive from rest leaves the state at zero,
+/// and an inverse by `M` would return zero); a remainder set with the rate's width but empty state
+/// parts, or the wrong width, is refused before any index is read; a nonzero remainder under the exact
+/// law, or one beyond half a unit on the lattice, breaks the carry contract and is refused.
+#[test]
+fn the_inverse_refuses_a_charted_solve_and_an_unlawful_carry() {
+    use holonics::hnn::chart::WordLattice;
+    use holonics::hnn::constitution::Lattice;
+    use holonics::hnn::ring::ResonatorRemainders;
+    let t = integer(1);
+    let a = &t / integer(8);
+    let stiffness = integer(4) * (&a * &a + &t * &t);
+    let identity = ExactRatMatrix::identity(2).unwrap();
+    let material = ResonatorMaterial::new(
+        identity.clone(),
+        identity.scaled(&stiffness),
+        ExactRatMatrix::zero(2, 2).unwrap(),
+        None,
+    )
+    .unwrap();
+    let admittance = integer(1) / (integer(4) * &a);
+    let charted = ResonatorOperands::at_cut(
+        0,
+        &material,
+        &admittance,
+        &integer(1),
+        Some(&WordLattice::new(0, 0, 32)),
+    )
+    .unwrap();
+    assert!(!charted.charts().is_empty(), "the word lattice charts the solve");
+    let rest = [vec![Rat::zero(); 2], vec![Rat::zero(); 2]];
+    let none = ResonatorRemainders::default();
+    assert!(matches!(
+        charted.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &none, None),
+        Err(HnnError::Resonator { .. })
+    ));
+
+    let operands = declared_ring(&t);
+    let lattice = Lattice::new(32);
+    let shaped = |rate: Vec<Rat>, state: [Vec<Rat>; 2]| ResonatorRemainders { rate, state };
+    let width = vec![Rat::zero(); 2];
+    for unlawful in [
+        shaped(width.clone(), [Vec::new(), Vec::new()]),
+        shaped(vec![Rat::zero(); 3], [width.clone(), width.clone()]),
+    ] {
+        assert!(matches!(
+            operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &unlawful, &none, Some(&lattice)),
+            Err(HnnError::Shape { .. })
+        ));
+    }
+    let nonzero = shaped(vec![rat(1, 1 << 40), Rat::zero()], [width.clone(), width.clone()]);
+    assert!(matches!(
+        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &nonzero, &none, None),
+        Err(HnnError::Resonator { .. })
+    ));
+    let beyond = shaped(vec![rat(1, 1 << 31), Rat::zero()], [width.clone(), width]);
+    assert!(matches!(
+        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &beyond, &none, Some(&lattice)),
+        Err(HnnError::Resonator { .. })
+    ));
 }
