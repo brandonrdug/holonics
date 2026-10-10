@@ -1,0 +1,51 @@
+{
+ "scope": "Local developer run by opus under the common lease (announced), not claim-bearing: the repaired decoder (record section 12) at 293b19c4, same recording and bank; the original defective-clock run is DECODE_RUN.v1.json, kept.",
+ "projection": "about 425 s from DECODE_RUN; deadline 480 s",
+ "wall_ns": 400859590067,
+ "deadline_s": 480,
+ "child_peak_rss_kib": 421544,
+ "exit": 0,
+ "stdout_sha256": "72ba076279c88e802bc939038b8e1a1f51da62f1bef35f3b2b2ef281e81c8496",
+ "keys_total": 56039,
+ "key_bits_gamma_four_integers": 2455192,
+ "quadrature_bits": 112076,
+ "key_bits_without_quadrature": 2343116,
+ "recording_pcm_bits": 1498880,
+ "rings": [
+  "ring 0: t = 1/50; half-memory 2 turns; keys 356; reader restarts 1; key bits (gamma, four integers per key) 27658, of which the quadrature's 712; E_end 0; ΣW −[2^-26, 2^-25); Σ(chart + split) [2^-26, 2^-25); balance closes: true; decoder balance with seats closes: true, Σ seat [2^11, 2^12)",
+  "ring 1: t = 3/125; half-memory 2 turns; keys 395; reader restarts 1; key bits (gamma, four integers per key) 30101, of which the quadrature's 790; E_end 0; ΣW [2^-28, 2^-27); Σ(chart + split) −[2^-28, 2^-27); balance closes: true; decoder balance with seats closes: true, Σ seat [2^12, 2^13)",
+  "ring 2: t = 18/625; half-memory 2 turns; keys 428; reader restarts 1; key bits (gamma, four integers per key) 30953, of which the quadrature's 856; E_end 0; ΣW [2^-27, 2^-26); Σ(chart + split) −[2^-27, 2^-26); balance closes: true; decoder balance with seats closes: true, Σ seat [2^11, 2^12)",
+  "ring 3: t = 108/3125; half-memory 2 turns; keys 498; reader restarts 1; key bits (gamma, four integers per key) 35505, of which the quadrature's 996; E_end 0; ΣW [2^-30, 2^-29); Σ(chart + split) −[2^-30, 2^-29); balance closes: true; decoder balance with seats closes: true, Σ seat [2^9, 2^10)",
+  "ring 4: t = 648/15625; half-memory 2 turns; keys 606; reader restarts 1; key bits (gamma, four integers per key) 43681, of which the quadrature's 1212; E_end 0; ΣW [2^-28, 2^-27); Σ(chart + split) −[2^-28, 2^-27); balance closes: true; decoder balance with seats closes: true, Σ seat [2^10, 2^11)",
+  "ring 5: t = 3888/78125; half-memory 2 turns; keys 722; reader restarts 1; key bits (gamma, four integers per key) 49509, of which the quadrature's 1444; E_end 0; ΣW [2^-29, 2^-28); Σ(chart + split) −[2^-29, 2^-28); balance closes: true; decoder balance with seats closes: true, Σ seat [2^9, 2^10)",
+  "ring 6: t = 23328/390625; half-memory 2 turns; keys 893; reader restarts 0; key bits (gamma, four integers per key) 59233, of which the quadrature's 1786; E_end [2^-70, 2^-69); ΣW −[2^-27, 2^-26); Σ(chart + split) [2^-27, 2^-26); balance closes: true; decoder balance with seats closes: true, Σ seat [2^9, 2^10)",
+  "ring 7: t = 139968/1953125; half-memory 2 turns; keys 1138; reader restarts 0; key bits (gamma, four integers per key) 69845, of which the quadrature's 2276; E_end [2^-63, 2^-62); ΣW −[2^-27, 2^-26); Σ(chart + split) [2^-27, 2^-26); balance closes: true; decoder balance with seats closes: true, Σ seat [2^10, 2^11)",
+  "ring 8: t = 839808/9765625; half-memory 2 turns; keys 1384; reader restarts 0; key bits (gamma, four integers per key) 83576, of which the quadrature's 2768; E_end [2^-63, 2^-62); ΣW [2^-27, 2^-26); Σ(chart + split) −[2^-27, 2^-26); balance closes: true; decoder balance with seats closes: true, Σ seat [2^10, 2^11)",
+  "ring 9: t = 5038848/48828125; half-memory 2 turns; keys 1371; reader restarts 1; key bits (gamma, four integers per key) 89773, of which the quadrature's 2742; E_end 0; ΣW −[2^-28, 2^-27); Σ(chart + split) [2^-28, 2^-27); balance closes: true; decoder balance with seats closes: true, Σ seat [2^10, 2^11)",
+  "ring 10: t = 30233088/244140625; half-memory 2 turns; keys 1832; reader restarts 0; key bits (gamma, four integers per key) 99557, of which the quadrature's 3664; E_end [2^-63, 2^-62); ΣW [2^-30, 2^-29); Σ(chart + split) −[2^-30, 2^-29); balance closes: true; decoder balance with seats closes: true, Σ seat [2^9, 2^10)",
+  "ring 11: t = 181398528/1220703125; half-memory 2 turns; keys 1990; reader restarts 0; key bits (gamma, four integers per key) 103079, of which the quadrature's 3980; E_end [2^-65, 2^-64); ΣW [2^-29, 2^-28); Σ(chart + split) −[2^-29, 2^-28); balance closes: true; decoder balance with seats closes: true, Σ seat [2^7, 2^8)",
+  "ring 12: t = 1088391168/6103515625; half-memory 2 turns; keys 2196; reader restarts 0; key bits (gamma, four integers per key) 112326, of which the quadrature's 4392; E_end [2^-66, 2^-65); ΣW −[2^-29, 2^-28); Σ(chart + split) [2^-29, 2^-28); balance closes: true; decoder balance with seats closes: true, Σ seat [2^6, 2^7)",
+  "ring 13: t = 6530347008/30517578125; half-memory 2 turns; keys 2605; reader restarts 0; key bits (gamma, four integers per key) 125971, of which the quadrature's 5210; E_end [2^-61, 2^-60); ΣW [2^-30, 2^-29); Σ(chart + split) −[2^-30, 2^-29); balance closes: true; decoder balance with seats closes: true, Σ seat [2^6, 2^7)",
+  "ring 14: t = 39182082048/152587890625; half-memory 2 turns; keys 2839; reader restarts 0; key bits (gamma, four integers per key) 127947, of which the quadrature's 5678; E_end [2^-63, 2^-62); ΣW [2^-29, 2^-28); Σ(chart + split) −[2^-29, 2^-28); balance closes: true; decoder balance with seats closes: true, Σ seat [2^5, 2^6)",
+  "ring 15: t = 235092492288/762939453125; half-memory 2 turns; keys 3331; reader restarts 0; key bits (gamma, four integers per key) 147123, of which the quadrature's 6662; E_end [2^-60, 2^-59); ΣW −[2^-29, 2^-28); Σ(chart + split) [2^-29, 2^-28); balance closes: true; decoder balance with seats closes: true, Σ seat [2^4, 2^5)",
+  "ring 16: t = 1410554953728/3814697265625; half-memory 2 turns; keys 3582; reader restarts 0; key bits (gamma, four integers per key) 147592, of which the quadrature's 7164; E_end [2^-62, 2^-61); ΣW [2^-32, 2^-31); Σ(chart + split) −[2^-32, 2^-31); balance closes: true; decoder balance with seats closes: true, Σ seat [2^3, 2^4)",
+  "ring 17: t = 8463329722368/19073486328125; half-memory 2 turns; keys 4145; reader restarts 0; key bits (gamma, four integers per key) 166255, of which the quadrature's 8290; E_end [2^-61, 2^-60); ΣW [2^-29, 2^-28); Σ(chart + split) −[2^-29, 2^-28); balance closes: true; decoder balance with seats closes: true, Σ seat [2^2, 2^3)",
+  "ring 18: t = 50779978334208/95367431640625; half-memory 3 turns; keys 3203; reader restarts 0; key bits (gamma, four integers per key) 129910, of which the quadrature's 6404; E_end [2^-61, 2^-60); ΣW −[2^-29, 2^-28); Σ(chart + split) [2^-29, 2^-28); balance closes: true; decoder balance with seats closes: true, Σ seat [2^1, 2^2)",
+  "ring 19: t = 304679870005248/476837158203125; half-memory 2 turns; keys 5154; reader restarts 0; key bits (gamma, four integers per key) 184521, of which the quadrature's 10308; E_end [2^-60, 2^-59); ΣW [2^-30, 2^-29); Σ(chart + split) −[2^-30, 2^-29); balance closes: true; decoder balance with seats closes: true, Σ seat [2^1, 2^2)",
+  "ring 20: t = 1828079220031488/2384185791015625; half-memory 3 turns; keys 3781; reader restarts 0; key bits (gamma, four integers per key) 130466, of which the quadrature's 7562; E_end [2^-60, 2^-59); ΣW −[2^-32, 2^-31); Σ(chart + split) [2^-32, 2^-31); balance closes: true; decoder balance with seats closes: true, Σ seat [2^1, 2^2)",
+  "ring 21: t = 10968475320188928/11920928955078125; half-memory 3 turns; keys 4560; reader restarts 0; key bits (gamma, four integers per key) 157789, of which the quadrature's 9120; E_end [2^-59, 2^-58); ΣW [2^-28, 2^-27); Σ(chart + split) −[2^-28, 2^-27); balance closes: true; decoder balance with seats closes: true, Σ seat [2^4, 2^5)",
+  "ring 22: t = 65810851921133568/59604644775390625; half-memory 3 turns; keys 4858; reader restarts 0; key bits (gamma, four integers per key) 165719, of which the quadrature's 9716; E_end [2^-59, 2^-58); ΣW [2^-33, 2^-32); Σ(chart + split) −[2^-33, 2^-32); balance closes: true; decoder balance with seats closes: true, Σ seat [2^3, 2^4)",
+  "ring 23: t = 394865111526801408/298023223876953125; half-memory 4 turns; keys 4172; reader restarts 0; key bits (gamma, four integers per key) 137103, of which the quadrature's 8344; E_end [2^-60, 2^-59); ΣW [2^-27, 2^-26); Σ(chart + split) −[2^-27, 2^-26); balance closes: true; decoder balance with seats closes: true, Σ seat [2^3, 2^4)"
+ ],
+ "renders": [
+  "render emission: peak [2^-1, 2^0); gain 2^0; final remainder [2^-35, 2^-34); 109680 samples; per second (sum of squares, peak) (84300621938, 19242) (192651157656, 16358) (121257520412, 15025) (142463995040, 16000) (95539722630, 14125) (49067397092, 16490) (130, 1)",
+  "render decode: peak [2^-1, 2^0); gain 2^0; final remainder [2^-17, 2^-16); 109680 samples; per second (sum of squares, peak) (29858688978, 13347) (94190053906, 17609) (50072620369, 10076) (54767801302, 9988) (38789479270, 8266) (19420221985, 9252) (128, 1)",
+  "render residual: peak [2^-1, 2^0); gain 2^0; final remainder −[2^-17, 2^-16); 109680 samples; per second (sum of squares, peak) (63138906044, 18025) (144603167496, 15466) (82477282185, 12414) (93445197990, 13507) (71565583994, 11914) (27306618823, 14192) (0, 0)"
+ ],
+ "gate_at_293b19c4": [
+  "gate check: ok (3021 ms)",
+  "gate guard-lints: ok (8929 ms)",
+  "gate guard-doctests: ok (24130 ms)",
+  "BOUNDED start 05:28:07 end 05:28:43 exit 0 wall_ns 36091826185 child_peak_rss_kib 2305468"
+ ]
+}

@@ -407,3 +407,37 @@ defective clock.
 
 The repaired decoder is to be rerun under the announced lane, and its measurement goes beside §8,
 never over it.
+
+[measured] **The repaired decoder** ([receipt](receipts/2026-10-10-acoustic-release/DECODE_REPAIRED_RUN.v1.json);
+§8's run is kept beside it): 400859590067 ns against a projection of about 425 s (deadline 480 s), with
+a peak resident set of 421544 KiB. Gate 1 passed at `293b19c4`. B1 held: every decoder tick and every
+whole-stream balance with seats closed. The emission's render is unchanged.
+
+- **The half-memory, read at complete returns:** 2 turns for rings 0–17 and 19, 3 for rings 18 and
+  20–22, 4 for ring 23. §8's defective clock read 1 turn for rings 0–15.
+- **The keys:** 56039 in all, against §8's 86446. Ring 0 has 356 keys (§8: 711).
+- **The keys' length under the gamma code, four integers per key:** 2455192 bits. The quadrature's
+  zeros are 112076 of those bits, which leaves 2343116. One key per ring can fall on the stream's
+  last tick, where it opens no epoch and is not seated; the quadrature's count shows one such key in
+  all. Against the recording's 1498880 bits: `1498880 < 2343116 < 2455192 < 2 · 1498880`. The keys
+  still cost more than the samples they stand for, now by less than twice.
+- **The renders, all at gain `2⁰`** (per second, sums of squares):
+
+| second | emission | decode | residual `R_bank` |
+|---|---|---|---|
+| 0 | 84300621938 | 29858688978 | 63138906044 |
+| 1 | 192651157656 | 94190053906 | 144603167496 |
+| 2 | 121257520412 | 50072620369 | 82477282185 |
+| 3 | 142463995040 | 54767801302 | 93445197990 |
+| 4 | 95539722630 | 38789479270 | 71565583994 |
+| 5 | 49067397092 | 19420221985 | 27306618823 |
+| 6 | 130 | 128 | 0 |
+
+  In every second that holds the recording, the residual exceeds the decode. In the continuation
+  (second 6) the residual renders to exactly 0: with no drive, the decoder seated at its last key and
+  the encoder ring evolve identically, to within the key grain, below the PCM grain.
+
+**The blocker, restated with the repaired clock.** The declared bank's moments still cost more than
+the samples, and they carry less of each epoch's emission than its own drive does. §9's located rings
+and §11's near-returns, which describe the rings' section words in under half their length, remain
+the way forward. The residual named here is the bank's, `R_bank`, not the source's.
