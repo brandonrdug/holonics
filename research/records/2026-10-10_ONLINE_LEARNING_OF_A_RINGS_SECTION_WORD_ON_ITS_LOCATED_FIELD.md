@@ -431,3 +431,44 @@ not `τ`) checks that the result is not authored to `τ = 7`.
 **Scope.** The online code of one clean periodic word, with its chart founded from the whole word
 before the loop (§4). It is not the departed word, not the recording, not generation, and not a
 release. The cell-only default and every other field are unchanged.
+
+## 8. Corrections from the review of `365984a7` and `25eeac97`
+
+[definition] Codex's independent read-only review confirms:
+- §4's corrected C1 consumes `ReceiptDetail::Compare::code_length` and passes on both frames;
+- C2's 12 of 14 is the majority read;
+- the O1 log's SHA-256 matches its receipt.
+
+It corrects three of my statements, all of which stand corrected here:
+1. **The feature's form.** §5 said `f` "has the form `(a, −a, b, −b)`". That holds for the **twin's**
+   last-cycle features on the last-ring receiver, as printed. The learner's features do not all have
+   it. Separately, non-collision does not certify a linear separating map, and drift alone does not
+   refute continuation.
+2. **The prior moves' attribution.** §5 said `R` "is zeroed by its prior's moves, not by the
+   descent". The whole deposit's before and after cannot establish that.
+   - The moves `7 → 8` and `8 → 9` mean `x = 1/2` in the exact operation, applied through the map's
+     carry **after** the certified descent.
+   - `StepReading::moves` is a sum of squared output moves, not a largest entry displacement, and
+     `vanished = []` is aggregate evidence.
+   - The ReceivingMap's residuals are nonzero at both moves.
+
+   What stands: `R`'s readout entries reached zero at the deposits where its prior moved by
+   `x = 1/2`. The descent's applied coordinates and the prior's rescale are not separated by this
+   reading, and §4–§5's single attributions are withdrawn.
+3. **What `W = 0` means.** The owner's invariant is `W′ + r′ + e′ = x (W + r)`, with
+   `W′ + r′ = x (W + r)` only when the released residual is zero. The map's carry and its phase
+   statistics are retained, while the forward read uses only the coarse `W`. So `W = 0` is a loss
+   of **current readout**, not a deletion of what the field retains. No claim about preserved or
+   lost information is made without auditing the full carrier and residual.
+
+**The owner question this leaves**, for the shared checkpoint: is the receiving prior's move meant
+as an actual amplitude change of the map, or as a read-preserving re-representation?
+- If an amplitude change, its effect on the receiving comparison needs its own certificate, separate
+  from the quadratic prior's.
+- If a re-representation, the decoder's compensation (the frame transport that keeps the read) is
+  owed.
+
+Answering it needs a read-only diagnostic that exposes, in the deposit, the post-descent and
+pre-prior `W` and carry, the raw descent and applied `q`, and the prior's located pair
+`(A₀, A₁, S)`. None exists in my code yet. O3 (§7) does not depend on it, since the clock letter
+carries the position through the tree, but the question stands for the map.
