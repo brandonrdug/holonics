@@ -1,0 +1,60 @@
+{
+ "note": "Private originals stay in local custody. Verbatim files equal their originals byte for byte; projected files replace host prefixes by the placeholders named, longer prefixes first, and invert byte-exactly; summaries drop argv, environment, paths and mail/thread/reviewer identifiers and copy every other value.",
+ "placeholders": [
+  "<repository>",
+  "<lean-toolchain>",
+  "<rustup>",
+  "<cargo-home>",
+  "<home>"
+ ],
+ "originals": {
+  "HANDOFF.md": {
+   "sha256": "f79f13d39e8fcb0d4ee0432f08bf755be2a2748e9664c821e363c0ef788ab909",
+   "bytes": 938
+  },
+  "PREDECESSOR_ENVIRONMENT_FAILURE.json": {
+   "sha256": "9947d984443654d5ae0eba1148db717f1de1f841243ded18d8de67b6d1eaae0b",
+   "bytes": 616
+  },
+  "VALIDATION.json": {
+   "sha256": "d657cabe099a17d0746095aba49818cd847583fcb029f996a4c9476566bd8111",
+   "bytes": 351026
+  },
+  "FILE_HASHES.json": {
+   "sha256": "79cea311ecc605fedcde6238796314e66f6b63496830c077ec689306e0439575",
+   "bytes": 26618
+  },
+  "predecessor:owner/native/compiler.stdout": {
+   "sha256": "9a93c8c3b7f66d9f75c07d8fffff82de7cf0e86b6af882576cd081b00613debb",
+   "bytes": 1959
+  }
+ },
+ "projections": {
+  "PREDECESSOR_ENVIRONMENT_FAILURE.json": {
+   "projected": {
+    "sha256": "7c009802051d8fec777d9b21f113531eeefcca739641cddb6237b721cf27df01",
+    "bytes": 601
+   },
+   "replaced": {
+    "<repository>": 1,
+    "<lean-toolchain>": 0,
+    "<rustup>": 0,
+    "<cargo-home>": 0,
+    "<home>": 0
+   }
+  },
+  "predecessor:owner/native/compiler.stdout": {
+   "projected": {
+    "sha256": "88a0a01fe7aeca42db83835fd1db85c9d793cc83bb4598f72fc1cdcb680d1782",
+    "bytes": 1676
+   },
+   "replaced": {
+    "<repository>": 17,
+    "<lean-toolchain>": 2,
+    "<rustup>": 0,
+    "<cargo-home>": 0,
+    "<home>": 0
+   }
+  }
+ }
+}

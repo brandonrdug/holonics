@@ -1,0 +1,10 @@
+{
+  "reason": "Incomplete namespace search root caused missing provider before elaboration; validation environment corrected, source and limits unchanged.",
+  "original_results": "<repository>/.local/composed-tail-native-0f6a-20261010/joint/RESULTS.json",
+  "source_failure_proved": false,
+  "actual_failed_exit": 1,
+  "original_stdout_SHA256": "9a93c8c3b7f66d9f75c07d8fffff82de7cf0e86b6af882576cd081b00613debb",
+  "original_stderr_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "original_own_leases_released": true,
+  "new_owner_object_not_present_before_run": true
+}

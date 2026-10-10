@@ -1,0 +1,931 @@
+{
+ "schema": "composed_tail_fresh_owner_importer_validation_v2",
+ "UTC": "2026-10-10T02:21:31.516720+00:00",
+ "source_pin": {
+  "source_commit": "0f6a8e47755044c5b579a7d240e778d0281deb5f",
+  "source_tree": "a012d8ac0ebf4f0f897cd5a063d5314a57cfcf3b",
+  "source_edits_by_validator": false,
+  "clean_at_admission": true
+ },
+ "source_review_correction": {
+  "supersedes_hold": {
+   "sha256": "35cb833a678e25ae05ba80ac7847df3bcc3161d0d80bccf3b5d3cf5694a60714",
+   "bytes": 1896
+  },
+  "hold_was_source_review_inference_not_compiler_failure": true,
+  "source_unchanged": true,
+  "pinned_mathlib_commit": "db584cd6d46c92f209a44c0f1c829460d327499d",
+  "source_definition": "to_additive of mul_le_mul_right: a*b <= a*c. add_le_add_right h c therefore gives c+p <= c+q, exactly the required calc operand order.",
+  "mathlib_source_file": "<repository>/lean/.lake/packages/mathlib/Mathlib/Algebra/Order/Monoid/Unbundled/Basic.lean",
+  "mathlib_source_identity": {
+   "sha256": "d1487f01ffdc094065987d7e21bcd60023585ba9e7ec2f1e03866224eb888194",
+   "bytes": 52360
+  },
+  "incorrect_proposed_repair_applied": false,
+  "developer_source_sha256": "f63692e4e0433cff45b7d495c4a65b7f7d08d0067cea28fd6f80083007cdc90c"
+ },
+ "review_admission": {
+  "native_GO": true,
+  "source_commit": "0f6a8e47755044c5b579a7d240e778d0281deb5f",
+  "source_tree": "a012d8ac0ebf4f0f897cd5a063d5314a57cfcf3b",
+  "source_review_GO": true,
+  "corrected_source_review_hold": true,
+  "owner_source_unchanged": true,
+  "scope": "Fresh exact owner module and fresh importer;34 selected axiom queries on each. Aggregate libraries are outside this focused acceptance."
+ },
+ "fresh_owner_and_importer_passed": true,
+ "query_count_per_command": 34,
+ "all_queries_only_standard_axioms": true,
+ "fresh_owner_object": {
+  "sha256": "1e653edcab6c967212f8641614edcde743e85cd25830d3c28609f00be950ac0d",
+  "bytes": 2075784
+ },
+ "owner_source": {
+  "sha256": "f63692e4e0433cff45b7d495c4a65b7f7d08d0067cea28fd6f80083007cdc90c",
+  "bytes": 54585
+ },
+ "stages": [
+  {
+   "kind": "owner",
+   "summary": {
+    "kind": "owner",
+    "source_commit": "0f6a8e47755044c5b579a7d240e778d0281deb5f",
+    "source_tree": "a012d8ac0ebf4f0f897cd5a063d5314a57cfcf3b",
+    "source_clean_unchanged_after": true,
+    "command_result": {
+     "target": "composed-tail owner",
+     "exit": 0,
+     "command_wall_ns": 35257203537,
+     "kernel_command_passed": true,
+     "expected_command_exit": true,
+     "diagnostic_lines": [],
+     "whole_stdout_SHA256": "17231309e8db161be5b4aebfae4de9f49a803fad1d52cf2a343daa7780366f50",
+     "whole_stderr_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "source_not_edited": true
+    },
+    "controller_exit": 0,
+    "acceptance": {
+     "passed": true,
+     "final_CPU_receipt": {
+      "sha256": "20e611a2c61029749b64718c1ccbf3a73099eeb60fbbf35c480a1d3415e1f49d",
+      "bytes": 5595
+     },
+     "cleanup_receipt": {
+      "sha256": "bc98e317346cd9b26b990c310b3be30dfcb473435af836ad1d09c060d92e5e07",
+      "bytes": 699
+     },
+     "lease_still_held": true,
+     "scientific_job": false,
+     "requires_matching_release_receipt": true
+    },
+    "release": {
+     "released_after_final_publication_and_owned_unit_cleanup": true,
+     "joint_global_lease_remains_held_by_batch": true,
+     "quiescence_confirmed": true,
+     "external_controller_PID": 1229278,
+     "monotonic_ns": 270861148479001
+    },
+    "resource_integrity": true,
+    "conformance": true,
+    "passed": true,
+    "whole_group_CPU_ns": 42152548000,
+    "peak_child_RSS_KiB": 6736792,
+    "charged_group_peak_bytes": "8363806720",
+    "window_ns": 180000000000,
+    "time_window_is_observation_only": true,
+    "stdout": {
+     "sha256": "17231309e8db161be5b4aebfae4de9f49a803fad1d52cf2a343daa7780366f50",
+     "bytes": 6038
+    },
+    "stderr": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    },
+    "axiom_queries": {
+     "Holonics.Zeta.ModularScatteringPairedTail.tankC_sub_tankC": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.pair_identity": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tankC_sub_eq_pair": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tankC_sub_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tankC_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_pairKernel_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.pairedCoeff_le_of_quarter": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.separateCoeff_le_of_quarter": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.four_le_of_charts": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.four_lt_of_charts": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_reflect_tail": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_tsum": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tank_sub_eq_pair": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_two_mul_tsum": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_idx_eq_tsum_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_tail_idx_eq_tsum_tail_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.summable_tail_zero_kernel": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_two_mul_tsum_zeros": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_paired": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_separate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_min": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_paired_of_sub_eq_one": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_eighth": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_eighth_separate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_xiRemainderPair_le_paired": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_xiRemainderPair_le_separate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_paired": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_separate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_min": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_published": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_paired": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_separate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_min": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.eighth_paired_le_published": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ]
+    },
+    "selected_declarations": [
+     "Holonics.Zeta.ModularScatteringPairedTail.tankC_sub_tankC",
+     "Holonics.Zeta.ModularScatteringPairedTail.pair_identity",
+     "Holonics.Zeta.ModularScatteringPairedTail.tankC_sub_eq_pair",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tankC_sub_le",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tankC_le",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_pairKernel_le",
+     "Holonics.Zeta.ModularScatteringPairedTail.pairedCoeff_le_of_quarter",
+     "Holonics.Zeta.ModularScatteringPairedTail.separateCoeff_le_of_quarter",
+     "Holonics.Zeta.ModularScatteringPairedTail.four_le_of_charts",
+     "Holonics.Zeta.ModularScatteringPairedTail.four_lt_of_charts",
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_reflect_tail",
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_tsum",
+     "Holonics.Zeta.ModularScatteringPairedTail.tank_sub_eq_pair",
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_two_mul_tsum",
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_idx_eq_tsum_zero",
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_tail_idx_eq_tsum_tail_zero",
+     "Holonics.Zeta.ModularScatteringPairedTail.summable_tail_zero_kernel",
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_two_mul_tsum_zeros",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_paired",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_separate",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_min",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_paired_of_sub_eq_one",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_eighth",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_eighth_separate",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_xiRemainderPair_le_paired",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_xiRemainderPair_le_separate",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_paired",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_separate",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_min",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_published",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_paired",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_separate",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_min",
+     "Holonics.Zeta.ModularScatteringPairedTail.eighth_paired_le_published"
+    ],
+    "unexpected_axioms": {}
+   },
+   "actual_start": {
+    "UTC": "2026-10-10T02:16:45.571782+00:00",
+    "PID": 1229323
+   },
+   "effective_command_binding": {
+    "whole_owner_source": "<repository>/.local/wt/composed-tail-validation-0f6a-20261010/lean/HolonicsResearch/Zeta/ModularScatteringPairedTail.lean"
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 35257203537,
+     "prime_factorization": [
+      [
+       3,
+       1
+      ],
+      [
+       2333,
+       1
+      ],
+      [
+       5037463,
+       1
+      ]
+     ]
+    },
+    "whole_group_CPU_ns": {
+     "integer": 42152548000,
+     "prime_factorization": [
+      [
+       2,
+       5
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       2971,
+       1
+      ],
+      [
+       3547,
+       1
+      ]
+     ]
+    },
+    "peak_child_RSS_KiB": {
+     "integer": 6736792,
+     "prime_factorization": [
+      [
+       2,
+       3
+      ],
+      [
+       19,
+       1
+      ],
+      [
+       23,
+       1
+      ],
+      [
+       41,
+       1
+      ],
+      [
+       47,
+       1
+      ]
+     ]
+    },
+    "charged_group_peak_bytes": {
+     "integer": 8363806720,
+     "prime_factorization": [
+      [
+       2,
+       12
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       408389,
+       1
+      ]
+     ]
+    },
+    "wall_over_observation_window": {
+     "numerator": 11752401179,
+     "denominator": 60000000000
+    },
+    "native_reservation_exceeded": true,
+    "native_ceiling_exceeded": false
+   }
+  },
+  {
+   "kind": "importer",
+   "summary": {
+    "kind": "importer",
+    "source_commit": "0f6a8e47755044c5b579a7d240e778d0281deb5f",
+    "source_tree": "a012d8ac0ebf4f0f897cd5a063d5314a57cfcf3b",
+    "source_clean_unchanged_after": true,
+    "command_result": {
+     "target": "composed-tail importer",
+     "exit": 0,
+     "command_wall_ns": 16884992087,
+     "kernel_command_passed": true,
+     "expected_command_exit": true,
+     "diagnostic_lines": [],
+     "whole_stdout_SHA256": "8ce4c52a1428d901c77b911085358b181ecb457d3d004d1c62775d9c72f882e9",
+     "whole_stderr_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "source_not_edited": true
+    },
+    "controller_exit": 0,
+    "acceptance": {
+     "passed": true,
+     "final_CPU_receipt": {
+      "sha256": "78ffc248d07489cc0606c372dc60942f03f7b938f58cb7d054d30d1ba0f1ea41",
+      "bytes": 5691
+     },
+     "cleanup_receipt": {
+      "sha256": "7fa586766504cd339b55f2d625d1504927e12979b03a6b870ea1d18aa61ad8bb",
+      "bytes": 705
+     },
+     "lease_still_held": true,
+     "scientific_job": false,
+     "requires_matching_release_receipt": true
+    },
+    "release": {
+     "released_after_final_publication_and_owned_unit_cleanup": true,
+     "joint_global_lease_remains_held_by_batch": true,
+     "quiescence_confirmed": true,
+     "external_controller_PID": 1229587,
+     "monotonic_ns": 270894376728230
+    },
+    "resource_integrity": true,
+    "conformance": true,
+    "passed": true,
+    "whole_group_CPU_ns": 24907804000,
+    "peak_child_RSS_KiB": 6709312,
+    "charged_group_peak_bytes": "8274903040",
+    "window_ns": 180000000000,
+    "time_window_is_observation_only": true,
+    "stdout": {
+     "sha256": "8ce4c52a1428d901c77b911085358b181ecb457d3d004d1c62775d9c72f882e9",
+     "bytes": 5820
+    },
+    "stderr": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    },
+    "axiom_queries": {
+     "Holonics.Zeta.ModularScatteringPairedTail.tankC_sub_tankC": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.pair_identity": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tankC_sub_eq_pair": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tankC_sub_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tankC_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_pairKernel_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.pairedCoeff_le_of_quarter": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.separateCoeff_le_of_quarter": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.four_le_of_charts": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.four_lt_of_charts": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_reflect_tail": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_tsum": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tank_sub_eq_pair": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_two_mul_tsum": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_idx_eq_tsum_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_tail_idx_eq_tsum_tail_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.summable_tail_zero_kernel": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_two_mul_tsum_zeros": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_paired": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_separate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_min": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_paired_of_sub_eq_one": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_eighth": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_eighth_separate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_xiRemainderPair_le_paired": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_xiRemainderPair_le_separate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_paired": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_separate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_min": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_published": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_paired": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_separate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_min": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ],
+     "Holonics.Zeta.ModularScatteringPairedTail.eighth_paired_le_published": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+     ]
+    },
+    "selected_declarations": [
+     "Holonics.Zeta.ModularScatteringPairedTail.tankC_sub_tankC",
+     "Holonics.Zeta.ModularScatteringPairedTail.pair_identity",
+     "Holonics.Zeta.ModularScatteringPairedTail.tankC_sub_eq_pair",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tankC_sub_le",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tankC_le",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_pairKernel_le",
+     "Holonics.Zeta.ModularScatteringPairedTail.pairedCoeff_le_of_quarter",
+     "Holonics.Zeta.ModularScatteringPairedTail.separateCoeff_le_of_quarter",
+     "Holonics.Zeta.ModularScatteringPairedTail.four_le_of_charts",
+     "Holonics.Zeta.ModularScatteringPairedTail.four_lt_of_charts",
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_reflect_tail",
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_tsum",
+     "Holonics.Zeta.ModularScatteringPairedTail.tank_sub_eq_pair",
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_two_mul_tsum",
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_idx_eq_tsum_zero",
+     "Holonics.Zeta.ModularScatteringPairedTail.tsum_tail_idx_eq_tsum_tail_zero",
+     "Holonics.Zeta.ModularScatteringPairedTail.summable_tail_zero_kernel",
+     "Holonics.Zeta.ModularScatteringPairedTail.tailPair_eq_two_mul_tsum_zeros",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_paired",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_separate",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_min",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_paired_of_sub_eq_one",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_eighth",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_tailPair_le_eighth_separate",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_xiRemainderPair_le_paired",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_xiRemainderPair_le_separate",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_paired",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_separate",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_min",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_published",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_paired",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_separate",
+     "Holonics.Zeta.ModularScatteringPairedTail.norm_modularScattering_residual_le_eighth_min",
+     "Holonics.Zeta.ModularScatteringPairedTail.eighth_paired_le_published"
+    ],
+    "unexpected_axioms": {}
+   },
+   "actual_start": {
+    "UTC": "2026-10-10T02:17:37.086720+00:00",
+    "PID": 1229662
+   },
+   "effective_command_binding": {
+    "whole_owner_source": "<repository>/.local/wt/composed-tail-validation-0f6a-20261010/lean/HolonicsResearch/Zeta/ModularScatteringPairedTail.lean"
+   },
+   "measurements_exact": {
+    "wall_ns": {
+     "integer": 16884992087,
+     "prime_factorization": [
+      [
+       16884992087,
+       1
+      ]
+     ]
+    },
+    "whole_group_CPU_ns": {
+     "integer": 24907804000,
+     "prime_factorization": [
+      [
+       2,
+       5
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       23,
+       1
+      ],
+      [
+       270737,
+       1
+      ]
+     ]
+    },
+    "peak_child_RSS_KiB": {
+     "integer": 6709312,
+     "prime_factorization": [
+      [
+       2,
+       6
+      ],
+      [
+       79,
+       1
+      ],
+      [
+       1327,
+       1
+      ]
+     ]
+    },
+    "charged_group_peak_bytes": {
+     "integer": 8274903040,
+     "prime_factorization": [
+      [
+       2,
+       16
+      ],
+      [
+       5,
+       1
+      ],
+      [
+       25253,
+       1
+      ]
+     ]
+    },
+    "wall_over_observation_window": {
+     "numerator": 16884992087,
+     "denominator": 180000000000
+    },
+    "native_reservation_exceeded": true,
+    "native_ceiling_exceeded": false
+   }
+  }
+ ],
+ "plan": {
+  "reservation_bytes": 8397570048,
+  "combined_cap_bytes": 8589934592,
+  "native_reservation_bytes": 8129134592,
+  "native_ceiling_bytes": 8589934592,
+  "metadata_reservation_bytes": 268435456,
+  "metadata_ceiling_bytes": 268435456,
+  "largest_measured_prior_Lean_charged_bytes": 8129134592,
+  "largest_developer_owner_RSS_KiB": 6870108,
+  "largest_measured_metadata_charged_bytes": 230137856,
+  "CPU_budgets": {
+   "lean": 1
+  },
+  "partition": "One Lean compiler at a time; source-owner output precedes importer, with common kernel lease released at the command boundary. No acoustic or material command overlaps or reruns.",
+  "projection_basis": {
+   "largest_developer_owner_wall_rounded_ms": 28915,
+   "largest_developer_owner_total_CPU_ns": 25672257000,
+   "same_partition_not_measured": true
+  },
+  "per_command_observation_ns": 180000000000,
+  "native_command_count": 2,
+  "time_windows_observation_only": true,
+  "no_limit_raise": true,
+  "source_review_correction_preserved": true
+ },
+ "joint_admission": {
+  "UTC": "2026-10-10T02:16:30.605943+00:00",
+  "MemAvailable_bytes": 11342888960,
+  "PSI": "some avg10=0.00 avg60=0.00 avg300=0.03 total=1039433315\nfull avg10=0.00 avg60=0.00 avg300=0.03 total=906755726\n",
+  "plan": {
+   "reservation_bytes": 8397570048,
+   "combined_cap_bytes": 8589934592,
+   "native_reservation_bytes": 8129134592,
+   "native_ceiling_bytes": 8589934592,
+   "metadata_reservation_bytes": 268435456,
+   "metadata_ceiling_bytes": 268435456,
+   "largest_measured_prior_Lean_charged_bytes": 8129134592,
+   "largest_developer_owner_RSS_KiB": 6870108,
+   "largest_measured_metadata_charged_bytes": 230137856,
+   "CPU_budgets": {
+    "lean": 1
+   },
+   "partition": "One Lean compiler at a time; source-owner output precedes importer, with common kernel lease released at the command boundary. No acoustic or material command overlaps or reruns.",
+   "projection_basis": {
+    "largest_developer_owner_wall_rounded_ms": 28915,
+    "largest_developer_owner_total_CPU_ns": 25672257000,
+    "same_partition_not_measured": true
+   },
+   "per_command_observation_ns": 180000000000,
+   "native_command_count": 2,
+   "time_windows_observation_only": true,
+   "no_limit_raise": true,
+   "source_review_correction_preserved": true
+  },
+  "lease": {
+   "device": 55,
+   "inode": 55954599,
+   "controller_PID": 1229039,
+   "fd": 3,
+   "start_ticks": "27077981",
+   "requested_absolute_path": "<repository>/.local/codex-lean-run.lock",
+   "joint_batch": true
+  }
+ },
+ "joint_release": {
+  "released": true,
+  "quiescence_confirmed": true,
+  "device": 55,
+  "inode": 55954599,
+  "UTC": "2026-10-10T02:17:58.539785+00:00"
+ },
+ "metadata_measurements_exact": {
+  "charged_peak_bytes": {
+   "integer": 268435456,
+   "prime_factorization": [
+    [
+     2,
+     28
+    ]
+   ]
+  },
+  "CPU_ns": {
+   "integer": 8145389000,
+   "prime_factorization": [
+    [
+     2,
+     3
+    ],
+    [
+     5,
+     3
+    ],
+    [
+     7,
+     1
+    ],
+    [
+     1163627,
+     1
+    ]
+   ]
+  },
+  "cap_limited_peak": true,
+  "not_an_unconstrained_metadata_workload_peak": true
+ },
+ "metadata_controller_release": {
+  "UTC": "2026-10-10T02:20:36.178001+00:00",
+  "unit": "holonics-composed-tail-0f6a-controller-20261010-v2.service",
+  "stop_exit": 0,
+  "before": {
+   "LoadState": "loaded",
+   "ActiveState": "active",
+   "SubState": "exited",
+   "MainPID": "0",
+   "Result": "success",
+   "ExecMainStatus": "0",
+   "ControlGroup": "",
+   "MemoryCurrent": "[not set]",
+   "MemoryPeak": "268435456",
+   "CPUUsageNSec": "8145389000",
+   "TasksCurrent": "[not set]"
+  },
+  "after": {
+   "LoadState": "not-found",
+   "ActiveState": "inactive",
+   "SubState": "dead",
+   "MainPID": "0",
+   "Result": "success",
+   "ExecMainStatus": "0",
+   "ControlGroup": "",
+   "MemoryCurrent": "[not set]",
+   "MemoryPeak": "[not set]",
+   "CPUUsageNSec": "[not set]",
+   "TasksCurrent": "[not set]"
+  },
+  "no_active_process_stopped": true,
+  "no_unrelated_unit_touched": true,
+  "all_validator_leases_released": true
+ },
+ "all_validator_leases_released": true,
+ "source_unchanged": true,
+ "scope": "Fresh ModularScatteringPairedTail source owner and fresh importer of its object; same 34 axiom queries on each. Full HolonicsResearch aggregate not rebuilt. Cached dependency objects are individually pinned; copied from quiescent worker cache, no new owner fallback.",
+ "projection_comparison": {
+  "owner_wall_exceeded_prior_largest_developer_wall": true,
+  "prior_developer_wall_ns": {
+   "integer": 28915000000,
+   "prime_factorization": [
+    [
+     2,
+     6
+    ],
+    [
+     5,
+     7
+    ],
+    [
+     5783,
+     1
+    ]
+   ]
+  },
+  "same_partition_upper_not_measured": true,
+  "neither_command_exceeded_fixed_observation_window": true,
+  "limits_unchanged": true
+ },
+ "predecessor_failure": {
+  "directory": "<repository>/.local/composed-tail-native-0f6a-20261010-v2/predecessor_environment_failure",
+  "exit": 1,
+  "cause": "Incomplete leading LEAN_PATH namespace root shadowed complete dependency root; missing ModularScatteringResidual.olean before elaboration. Source unchanged.",
+  "not_a_proof_failure": true
+ },
+ "no_source_edits": true,
+ "no_publication": true,
+ "no_unrelated_reruns": true
+}
