@@ -345,3 +345,65 @@ gamma length.
   ring `t = 1`. Its near-return keeps the clean cycle, `τ = 7`, with 6 defects whose own lift is 8,
   read apart from the cycle's winding, and it describes the 120-tick window in 73 bits against 360.
 - The census on the recording (N3) and the gate are pending.
+
+[measured] **N3, the near-return census** ([receipt](receipts/2026-10-10-acoustic-release/NEAR_RETURN_CENSUS.v1.json)):
+196162216019 ns against a projection of about 210 s (deadline 300 s). N1 was asserted on every window
+read and held. Gate 1 passed at `68aece1a`.
+
+| reading over all 24 rings | value |
+|---|---|
+| windows admitted as near-returns | 33395 (exact locks: 6730) |
+| windows not admitted | 18733 |
+| bits of the admitted descriptions | 2762870 |
+| bits of the same windows spelled out | 6309636 |
+| defects kept | 260254 |
+
+- **The voice's rings now return.** Ring 0 admits 172 of its 173 windows (exact locks: 5), described
+  in 43991 bits against 326112, with 3284 defects kept. Rings 1–5 admit 203, 233, 279, 328 and 384
+  windows, each at between `1/7` and `3/10` of its raw length (the exact bits are in the receipt).
+- **The upper rings admit fewer.** Ring 23 admits 2433 of 6451 windows. Its windows of 16 ticks
+  leave little room for a cycle to pay for itself.
+- **What this is.** It describes the section words, the rings' advances, and nothing else. A
+  section word omits amplitude, within-quadrant phase and placement. Those stay in the fibre or the
+  residual with their own costs, and a lossless section-word code does not by itself rebuild the
+  waveform (Codex's review). The census shows that the rings' own clocks near-return through most of
+  this speech, so located near-returns can carry keys across turns. It does not show a decoder.
+
+## 12. The second rung's key clock, repaired (Codex's review of `fe4b6b63`)
+
+The decoder's seating and balance kept source GO. Five defects were found in its key clock and its
+statements. Each is closed below at the source after `68aece1a`. The original run (§8,
+[receipt](receipts/2026-10-10-acoustic-release/DECODE_RUN.v1.json)) is kept as measured with the
+defective clock.
+
+1. **The half-memory was read inside a turn.** `half_memory` tested the energy at every tick once a
+   whole turn had passed, so it returned the floor of the winding at the first halving tick. Exact
+   witness on ring 0: the first whole return is at tick 158 (lift 4) with energy above `1/4`; the first
+   halving tick is 290 (lift 7) with energy below `1/4`. The helper returned `W = 1` and discarded class
+   3. **Closed:** the energy is now read only at the ring's complete section returns (positive
+   arrivals), so `W` is the least whole-return count at which the free ring holds at most half its
+   energy.
+2. **A reader restart kept the last key's lift.** After a restart (the state through the origin, §8)
+   the new reader's lift starts from its class, while `last_key` still named the old passage's whole
+   winding, and the two were subtracted. **Closed:** a restart, and the reader's first start, clear
+   `last_key`, so the next arrival opens a key and a new span. No winding is subtracted across
+   passages.
+3. **The key's dimension was misstated.** B3 said each key is two integers. The key is the ring's
+   state `[u, w]` of one complex node: **four** integers at `2^(−16)`, the driven coordinate's two and
+   the quadrature's two. §8's 3872041 gamma bits priced all four. The quadrature stays at rest for
+   this isotropic node, and Codex computes 3699149 bits without its zeros' cost. **Closed:** the run
+   now reports both, the four integers' cost and the quadrature's share. A packing that drops the
+   zeros is not compression and is not presented as one.
+4. **Two residuals, kept apart.** The decoder of §7 targets the bank's emission,
+   `bank(source)[n] = decoded_keys[n] + R_bank[n]`. That is not the requested source reconstruction,
+   `source[n] = decode(located_keys, constitution, frame, clock)[n] + R_source[n]` (§9). Each residual
+   is read at its own consumer with its own cost. The keys do not carry the forcing that arrives
+   during an epoch's free evolution. On the lattice, the moment law keeps its rounding terms,
+   `s_n = T^(n−m) s_m + Σ_(m≤j<n) T^(n−1−j) (B x_j + ρ_j)`, where `ρ_j` is the error-feedback split of
+   tick `j` (`hnn::chart::carry`); §7's statement omitted `ρ`.
+5. **The residual-over-decode reading holds for the recording only.** §8 compares within the six
+   seconds that hold the recording. In the continuation (second 6) the decode reads 265 at gain `2¹`,
+   about 66 at the emission's gain, above the residual's 14.
+
+The repaired decoder is to be rerun under the announced lane, and its measurement goes beside §8,
+never over it.

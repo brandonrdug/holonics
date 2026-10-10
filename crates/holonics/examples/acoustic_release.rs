@@ -159,8 +159,10 @@ fn gamma(z: &BigInt) -> u64 {
     2 * (n.bits() - 1) + 1 + u64::from(!z.is_zero())
 }
 
-/// The ring's half-memory in whole turns (record §7): the least `W` after which the free ring, from
-/// a unit state on its lattice, holds at most half its starting energy.
+/// The ring's half-memory in whole turns (record §7, repaired on Codex's review): the least `W` such
+/// that the free ring, from a unit state on its lattice, holds at most half its starting energy **at
+/// its `W`-th complete section return** (a positive arrival of its own reader), together with the
+/// tick of its first whole return. The energy is read only at returns, never at a tick inside a turn.
 fn half_memory(operands: &ResonatorOperands, lattice: Lattice) -> (u64, usize) {
     let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
     port.seat([vec![Rat::zero(); 2], vec![Rat::one(), Rat::zero()]]).unwrap();
@@ -178,7 +180,10 @@ fn half_memory(operands: &ResonatorOperands, lattice: Lattice) -> (u64, usize) {
         for received in port.receive(&silence).unwrap() {
             assert!(received.unwrap().closes());
         }
-        reader.advance(port.phase_point()).unwrap();
+        let symbol = reader.advance(port.phase_point()).unwrap();
+        if symbol.crossing <= 0 {
+            continue;
+        }
         let turns = whole(reader.lift()) - &opened;
         if turns.is_positive() && turn_ticks.is_none() {
             turn_ticks = Some(tick);
@@ -289,13 +294,17 @@ fn ring_pass(
             let arrived = match reader.as_mut() {
                 None => {
                     reader = SectionReader::at(point).ok();
+                    last_key = None;
                     false
                 }
                 Some(open) => match open.advance(point.clone()) {
                     Ok(symbol) => symbol.crossing != 0,
                     Err(_) => {
+                        // A restart opens a new span: the next arrival opens a key, and no winding
+                        // is subtracted across the two passages.
                         restarts += 1;
                         reader = SectionReader::at(point).ok();
+                        last_key = None;
                         false
                     }
                 },
@@ -344,6 +353,7 @@ fn ring_pass(
         (Rat::zero(), Rat::zero(), Rat::zero(), Rat::zero());
     let mut decoded = Vec::with_capacity(total);
     let mut key_bits = 0u64;
+    let mut quadrature_bits = 0u64;
     let mut previous = 0usize;
     let mut next = keys.iter().peekable();
     let mut n = 0usize;
@@ -353,8 +363,16 @@ fn ring_pass(
         {
             seated += decoder.seat(key.clone()).unwrap();
             let scale = Rat::from_integer(BigInt::one() << KEY_GRAIN as usize);
-            for x in key.iter().flatten() {
-                key_bits += gamma(&(x * &scale).to_integer());
+            // The key is the ring's state `[u, w]`, one complex node: four integers at the key
+            // grain, the driven coordinate's two and the quadrature's two.
+            for part in key {
+                for (coordinate, x) in part.iter().enumerate() {
+                    let bits = gamma(&(x * &scale).to_integer());
+                    key_bits += bits;
+                    if coordinate != 0 {
+                        quadrature_bits += bits;
+                    }
+                }
             }
             key_bits += gamma(&BigInt::from(n - previous)) - 1;
             previous = n;
@@ -377,7 +395,7 @@ fn ring_pass(
     let d_balanced = d_energy == &d_work - &d_dissipation + &d_defect + &seated;
     assert!(d_balanced, "ring {b}: the decoder's whole stream balance closes");
     let line = format!(
-        "ring {b}: t = {t}; half-memory {memory} turns; keys {}; reader restarts {restarts}; key bits (gamma) {key_bits}; E_end {}; ΣW {}; Σ(chart + split) {}; balance closes: {balanced}; decoder balance with seats closes: {d_balanced}, Σ seat {}; widest state entry bits {state_bits}; widest remainder bits {remainder_bits}; widest |remainder| {}",
+        "ring {b}: t = {t}; half-memory {memory} turns; keys {}; reader restarts {restarts}; key bits (gamma, four integers per key) {key_bits}, of which the quadrature's {quadrature_bits}; E_end {}; ΣW {}; Σ(chart + split) {}; balance closes: {balanced}; decoder balance with seats closes: {d_balanced}, Σ seat {}; widest state entry bits {state_bits}; widest remainder bits {remainder_bits}; widest |remainder| {}",
         keys.len(),
         enclosure(&energy),
         enclosure(&work),
