@@ -18,6 +18,7 @@ use std::time::Instant;
 use holonics::hnn::chart::carry;
 use holonics::hnn::constitution::Lattice;
 use holonics::hnn::dynamic_section::{RAYS, SectionReader};
+use holonics::hnn::section_lock::{LockReader, LockRefusal, LockWindow, Settled};
 use holonics::hnn::ring::{ResonatorMaterial, ResonatorOperands};
 use holonics::hnn::wave::{MatchedWave, WavePort};
 use holonics::ratio::linear::ExactRatMatrix;
@@ -160,7 +161,7 @@ fn gamma(z: &BigInt) -> u64 {
 
 /// The ring's half-memory in whole turns (record §7): the least `W` after which the free ring, from
 /// a unit state on its lattice, holds at most half its starting energy.
-fn half_memory(operands: &ResonatorOperands, lattice: Lattice) -> u64 {
+fn half_memory(operands: &ResonatorOperands, lattice: Lattice) -> (u64, usize) {
     let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
     port.seat([vec![Rat::zero(); 2], vec![Rat::one(), Rat::zero()]]).unwrap();
     let start = port.stored_energy().unwrap();
@@ -172,24 +173,41 @@ fn half_memory(operands: &ResonatorOperands, lattice: Lattice) -> u64 {
         vec![Rat::zero(); 1],
     )
     .unwrap();
-    for _ in 0..1_000_000 {
-        for tick in port.receive(&silence).unwrap() {
-            assert!(tick.unwrap().closes());
+    let mut turn_ticks = None;
+    for tick in 1..1_000_000usize {
+        for received in port.receive(&silence).unwrap() {
+            assert!(received.unwrap().closes());
         }
         reader.advance(port.phase_point()).unwrap();
         let turns = whole(reader.lift()) - &opened;
+        if turns.is_positive() && turn_ticks.is_none() {
+            turn_ticks = Some(tick);
+        }
         if turns.is_positive() && port.stored_energy().unwrap() * integer(2) <= start {
-            return turns.to_u64().unwrap();
+            return (turns.to_u64().unwrap(), turn_ticks.unwrap());
         }
     }
     panic!("the free ring does not halve its energy within the declared ticks");
 }
 
-fn ring_pass(b: usize, t: &Rat, stream: &[Rat], continuation: usize, started: Instant) -> Pass {
+fn ring_pass(
+    b: usize,
+    t: &Rat,
+    stream: &[Rat],
+    continuation: usize,
+    started: Instant,
+    census_only: bool,
+) -> Pass {
     let operands = declared_ring(t);
     let (admittance, hop) = (operands.admittance().clone(), operands.hop().clone());
     let lattice = Lattice::new(STATE_LATTICE);
-    let memory = half_memory(&operands, lattice);
+    let (memory, turn_ticks) = half_memory(&operands, lattice);
+    // The lock census (record §10): consecutive windows of four of the ring's own turns, so that a
+    // period of up to two turns shows twice, each read by the existing lock owner.
+    let window = LockWindow::new(0, 4 * turn_ticks).unwrap();
+    let mut lock_reader = LockReader::new(window);
+    let (mut locked, mut unlocked, mut rest, mut refused) = (0u64, 0u64, 0u64, 0u64);
+    let mut addresses: std::collections::BTreeMap<String, u64> = std::collections::BTreeMap::new();
     let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
     let (mut work, mut dissipation, mut defect) = (Rat::zero(), Rat::zero(), Rat::zero());
     let (mut state_bits, mut remainder_bits) = (0u64, 0u64);
@@ -226,6 +244,28 @@ fn ring_pass(b: usize, t: &Rat, stream: &[Rat], continuation: usize, started: In
             dissipation += &tick.step.dissipation;
             defect += &tick.step.chart + &tick.step.split;
             emission.push(tick.emission()[0].clone());
+            let observed = lock_reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]);
+            if observed.is_err() {
+                refused += 1;
+                lock_reader = LockReader::new(window);
+            } else if lock_reader.seen() == window.length() + 1 {
+                let full = std::mem::replace(&mut lock_reader, LockReader::new(window));
+                match full.finish() {
+                    Ok(Settled::Rest) => rest += 1,
+                    Ok(word @ Settled::Word(_)) => match word.lock(&window) {
+                        Ok(lock) => {
+                            locked += 1;
+                            *addresses
+                                .entry(format!("{} over {}", lock.winding(), lock.period()))
+                                .or_insert(0) += 1;
+                        }
+                        Err(LockRefusal::Silent) => rest += 1,
+                        Err(LockRefusal::Unlocked { .. }) => unlocked += 1,
+                        Err(_) => refused += 1,
+                    },
+                    Err(_) => refused += 1,
+                }
+            }
             // The section reader on the ring's own state; an epoch opens at an arrival `W` whole
             // turns past the last key. A chord through the origin, or the origin itself, restarts it.
             let point = [tick.step.state[1][0].clone(), tick.step.state[0][0].clone()];
@@ -268,6 +308,19 @@ fn ring_pass(b: usize, t: &Rat, stream: &[Rat], continuation: usize, started: In
     let energy = port.stored_energy().unwrap();
     let balanced = energy == &work - &dissipation + &defect;
     assert!(balanced, "ring {b}: the whole stream's balance closes");
+    let census = format!(
+        "ring {b}: lock census over windows of {} ticks (4 turns of {turn_ticks}): locked {locked}, unlocked {unlocked}, silent or at rest {rest}, refused {refused}; addresses (winding over period: windows) {:?}",
+        window.length(),
+        addresses
+    );
+    println!("{census}");
+    if census_only {
+        return Pass {
+            emission,
+            decoded: Vec::new(),
+            line: census,
+        };
+    }
     // The decoder: the same ring, incident 0, its state seated to each key at the key's tick.
     let mut decoder = WavePort::on_lattice(operands, 0, lattice).unwrap();
     let (mut d_work, mut d_dissipation, mut d_defect, mut seated) =
@@ -352,6 +405,7 @@ fn main() {
     let (input, output) = (&args[1], &args[2]);
     let limit: Option<usize> = args.get(3).map(|x| x.parse().unwrap()).filter(|x| *x > 0);
     let threads: usize = args.get(4).map_or(12, |x| x.parse().unwrap());
+    let census_only = args.get(5).is_some_and(|x| x == "census");
     let started = Instant::now();
     let (rate, pcm) = read_wav(input);
     let scale = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
@@ -376,7 +430,7 @@ fn main() {
             handles.push(scope.spawn(move || {
                 (worker..RINGS)
                     .step_by(threads)
-                    .map(|b| (b, ring_pass(b, &ladder[b], stream, continuation, started)))
+                    .map(|b| (b, ring_pass(b, &ladder[b], stream, continuation, started, census_only)))
                     .collect::<Vec<_>>()
             }));
         }
@@ -389,6 +443,10 @@ fn main() {
     let passes: Vec<Pass> = passes.into_iter().map(Option::unwrap).collect();
     for pass in &passes {
         println!("{}", pass.line);
+    }
+    if census_only {
+        println!("census: elapsed {} ms", started.elapsed().as_millis());
+        return;
     }
     // Σ_b e_b per tick, its peak, and the largest gain 2^(−k) with g·peak ≤ 1 − 2^(−14), so that one
     // feedback tick at 2^(−15) stays within 16 bits.

@@ -1,0 +1,42 @@
+{
+ "scope": "Local developer read by opus under the common lease, not claim-bearing: the lock census (examples/acoustic_release census mode, record section 10) on the same recording and declared bank; encoders only.",
+ "projection": "about 210 s from RELEASE_RUN's encoders; deadline 300 s",
+ "wall_ns": 192734411239,
+ "deadline_s": 300,
+ "child_peak_rss_kib": 201684,
+ "exit": 0,
+ "stdout_sha256": "ed5408dfa3b32c6b37431bee6a84b6257c9bdc4c0783fe92e11a0f805710238e",
+ "totals": {
+  "locked": 6730,
+  "unlocked": 45342,
+  "rest": 270,
+  "refused": 7
+ },
+ "rings": [
+  "ring 0: lock census over windows of 632 ticks (4 turns of 158): locked 5, unlocked 167, silent or at rest 0, refused 1; addresses (winding over period: windows) {\"1 over 157\": 5}",
+  "ring 1: lock census over windows of 524 ticks (4 turns of 131): locked 6, unlocked 197, silent or at rest 5, refused 1; addresses (winding over period: windows) {\"1 over 131\": 6}",
+  "ring 2: lock census over windows of 440 ticks (4 turns of 110): locked 4, unlocked 230, silent or at rest 13, refused 1; addresses (winding over period: windows) {\"1 over 109\": 3, \"2 over 218\": 1}",
+  "ring 3: lock census over windows of 364 ticks (4 turns of 91): locked 5, unlocked 274, silent or at rest 21, refused 1; addresses (winding over period: windows) {\"1 over 91\": 5}",
+  "ring 4: lock census over windows of 304 ticks (4 turns of 76): locked 1, unlocked 328, silent or at rest 30, refused 1; addresses (winding over period: windows) {\"2 over 150\": 1}",
+  "ring 5: lock census over windows of 256 ticks (4 turns of 64): locked 1, unlocked 386, silent or at rest 39, refused 1; addresses (winding over period: windows) {\"2 over 124\": 1}",
+  "ring 6: lock census over windows of 212 ticks (4 turns of 53): locked 1, unlocked 513, silent or at rest 0, refused 0; addresses (winding over period: windows) {\"2 over 106\": 1}",
+  "ring 7: lock census over windows of 176 ticks (4 turns of 44): locked 77, unlocked 542, silent or at rest 0, refused 0; addresses (winding over period: windows) {\"1 over 40\": 70, \"1 over 44\": 7}",
+  "ring 8: lock census over windows of 148 ticks (4 turns of 37): locked 88, unlocked 648, silent or at rest 0, refused 0; addresses (winding over period: windows) {\"1 over 34\": 86, \"2 over 73\": 2}",
+  "ring 9: lock census over windows of 124 ticks (4 turns of 31): locked 7, unlocked 764, silent or at rest 106, refused 1; addresses (winding over period: windows) {\"2 over 61\": 7}",
+  "ring 10: lock census over windows of 104 ticks (4 turns of 26): locked 147, unlocked 897, silent or at rest 0, refused 0; addresses (winding over period: windows) {\"1 over 22\": 130, \"2 over 51\": 17}",
+  "ring 11: lock census over windows of 88 ticks (4 turns of 22): locked 160, unlocked 1072, silent or at rest 0, refused 0; addresses (winding over period: windows) {\"1 over 20\": 160}",
+  "ring 12: lock census over windows of 72 ticks (4 turns of 18): locked 199, unlocked 1303, silent or at rest 0, refused 0; addresses (winding over period: windows) {\"1 over 18\": 1, \"1 over 20\": 198}",
+  "ring 13: lock census over windows of 60 ticks (4 turns of 15): locked 252, unlocked 1546, silent or at rest 0, refused 0; addresses (winding over period: windows) {\"0 over 29\": 1, \"1 over 15\": 247, \"2 over 29\": 3, \"2 over 30\": 1}",
+  "ring 14: lock census over windows of 52 ticks (4 turns of 13): locked 301, unlocked 1768, silent or at rest 0, refused 0; addresses (winding over period: windows) {\"0 over 13\": 1, \"0 over 25\": 1, \"1 over 12\": 280, \"2 over 25\": 19}",
+  "ring 15: lock census over windows of 44 ticks (4 turns of 11): locked 352, unlocked 2085, silent or at rest 0, refused 0; addresses (winding over period: windows) {\"1 over 10\": 336, \"1 over 11\": 1, \"2 over 21\": 14, \"2 over 22\": 1}",
+  "ring 16: lock census over windows of 36 ticks (4 turns of 9): locked 415, unlocked 2549, silent or at rest 0, refused 0; addresses (winding over period: windows) {\"0 over 17\": 1, \"0 over 9\": 1, \"1 over 10\": 1, \"1 over 9\": 411, \"2 over 18\": 1}",
+  "ring 17: lock census over windows of 32 ticks (4 turns of 8): locked 486, unlocked 2836, silent or at rest 1, refused 0; addresses (winding over period: windows) {\"0 over 15\": 4, \"0 over 16\": 2, \"0 over 8\": 1, \"1 over 8\": 465, \"2 over 14\": 1, \"2 over 15\": 13}",
+  "ring 18: lock census over windows of 28 ticks (4 turns of 7): locked 561, unlocked 3218, silent or at rest 3, refused 0; addresses (winding over period: windows) {\"0 over 13\": 12, \"0 over 6\": 3, \"1 over 6\": 1, \"1 over 7\": 532, \"2 over 13\": 13}",
+  "ring 19: lock census over windows of 24 ticks (4 turns of 6): locked 655, unlocked 3729, silent or at rest 3, refused 0; addresses (winding over period: windows) {\"0 over 11\": 13, \"0 over 6\": 5, \"1 over 6\": 623, \"2 over 11\": 13, \"2 over 12\": 1}",
+  "ring 20: lock census over windows of 20 ticks (4 turns of 5): locked 48, unlocked 5163, silent or at rest 11, refused 0; addresses (winding over period: windows) {\"0 over 10\": 4, \"0 over 5\": 15, \"0 over 6\": 1, \"0 over 7\": 1, \"0 over 9\": 6, \"1 over 10\": 2, \"1 over 4\": 10, \"1 over 5\": 2, \"1 over 6\": 1, \"2 over 10\": 2, \"2 over 9\": 4}",
+  "ring 21: lock census over windows of 20 ticks (4 turns of 5): locked 862, unlocked 4351, silent or at rest 9, refused 0; addresses (winding over period: windows) {\"0 over 10\": 1, \"0 over 4\": 41, \"0 over 9\": 4, \"1 over 4\": 813, \"2 over 8\": 1, \"2 over 9\": 2}",
+  "ring 22: lock census over windows of 16 ticks (4 turns of 4): locked 1087, unlocked 5347, silent or at rest 17, refused 0; addresses (winding over period: windows) {\"0 over 4\": 53, \"0 over 7\": 17, \"0 over 8\": 4, \"1 over 3\": 1, \"1 over 4\": 999, \"1 over 8\": 2, \"2 over 7\": 7, \"2 over 8\": 4}",
+  "ring 23: lock census over windows of 16 ticks (4 turns of 4): locked 1010, unlocked 5429, silent or at rest 12, refused 0; addresses (winding over period: windows) {\"0 over 3\": 3, \"0 over 4\": 1, \"0 over 6\": 1, \"0 over 7\": 44, \"0 over 8\": 1, \"1 over 3\": 915, \"1 over 7\": 1, \"2 over 7\": 44}"
+ ],
+ "gate": "pending: the census mode's source has not yet passed gate 1 (the common lease is with Codex's acoustic validator)"
+}

@@ -251,3 +251,44 @@ key holds a lock across many turns, and only the lock's departures enter the res
 The section words' omissions (amplitude, within-quadrant phase, placement detail) are the fibre's
 directions. They stay in the decoder's retained constraints or in the residual, with their costs
 accounted (Codex's review of the first rung).
+
+## 10. Do the rings lock on this recording? (the lock census; reading fixed before the run)
+
+[definition; agent-inferred, October 10] §9's located rings need locks that hold across many turns.
+The existing lock owner (`hnn::section_lock::{LockReader, Settled::lock}`) is the reading. Each ring's
+driven state is read in consecutive windows of four of its own turns, so that a period of up to two
+turns shows twice. The ring's turn is the free run's first whole turn, from §7's half-memory read.
+Each window is tallied as locked (with its winding over period), unlocked, silent or at rest, or
+refused. The lock requires the window's symbols to repeat exactly, with no tolerance. The near-return
+grain for a stretch that is only near-periodic is not built (matched-wave record §9).
+
+**What decides the next rung.** If the speech's rings lock in a substantial share of windows, located
+locks can carry keys across turns and §9 proceeds on the exact lock. If they rarely lock, the owed
+near-return grain is §9's prerequisite, and its acceptance comes first.
+
+[measured] **The census** ([receipt](receipts/2026-10-10-acoustic-release/LOCK_CENSUS.v1.json)):
+192734411239 ns against a projection of about 210 s (deadline 300 s), with a peak resident set of
+201684 KiB. Over all 24 rings, there were 52349 windows:
+
+| reading | windows |
+|---|---|
+| locked | 6730 |
+| unlocked | 45342 |
+| silent or at rest | 270 |
+| refused (a chord through the origin) | 7 |
+
+- **The rings below about 400 Hz (0–6) almost never lock.** Rings 0–6 hold the voice's fundamental,
+  read in windows of 212 to 632 ticks. Ring 0 locked in 5 of 173 windows, and rings 4–6 in 1 window
+  each.
+- **The middle and upper rings lock in about one window in nine to one in six** (ring 7: 77 of 619;
+  ring 15: 352 of 2437; ring 22: 1087 of 6451). Ring 20 locked in 48 of 5222.
+- **Nearly every lock is at the ring's own free turn or next to it.** Ring 11 locks at `1/20` against
+  its free turn of 22 ticks, ring 15 at `1/10` against 11, and ring 21 at `1/4` against 5. A ring
+  locks when one sinusoid dominates its band long enough for its symbols to repeat exactly. These are
+  readings of the ring's resonance, not periodicities located in the speech: no lock in the
+  fundamental's region holds across a voiced stretch.
+
+**Decision, by the rule fixed before the run.** Exact locks do not carry this speech. The owed
+near-return grain (matched-wave record §9: a lock for a stretch that is only near-periodic, its
+departure kept in the fibre) is the prerequisite of §9's located rings. Its acceptance is the next
+rung's first item.
