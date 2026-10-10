@@ -1,0 +1,505 @@
+{
+  "title": "World-sensitive contact tangent developer feedback",
+  "source_commit": "23ea9d78179dc564249890395d5d7ad80f3554b5",
+  "source_tree": "a7cdfddb01c7384c4bf29acaa72ea87265f7b51b",
+  "stages": [
+    {
+      "kind": "contact-check",
+      "source_commit": "23ea9d78179dc564249890395d5d7ad80f3554b5",
+      "source_tree": "a7cdfddb01c7384c4bf29acaa72ea87265f7b51b",
+      "passed": true,
+      "exit": 0,
+      "command": [
+        "/usr/bin/env",
+        "-i",
+        "PATH=<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/:/usr/bin:/opt/cuda/bin",
+        "HOME=<home>",
+        "CARGO_HOME=<cargo-home>",
+        "CARGO_TARGET_DIR=<repository>/.local/wt/contact-tangent-20261009/.local/target-dev",
+        "LANG=C",
+        "LC_ALL=C",
+        "RAYON_NUM_THREADS=1",
+        "CARGO_BUILD_JOBS=1",
+        "RUSTFLAGS=",
+        "RUSTDOCFLAGS=",
+        "CARGO_ENCODED_RUSTFLAGS=",
+        "NVCC=/opt/cuda/bin/nvcc",
+        "<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "check",
+        "-p",
+        "holonics",
+        "--tests",
+        "--offline",
+        "--locked",
+        "-j",
+        "1"
+      ],
+      "command_request": {
+        "sha256": "00365f425725f23f060193c545d6e942672c237aac41b5d4b5577a788799f788",
+        "bytes": 954
+      },
+      "source_input_manifest": {
+        "sha256": "8a47448fc998c567a6a47e52182a9252259a8eca04539b4b7a65ae70872b7a72",
+        "bytes": 45933
+      },
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "sha256": "850251dbfb2163e3497911d12dacb1501c58fce86208ea686494fbabd07b4273",
+        "bytes": 1690
+      },
+      "unique_test_names": [],
+      "passed_fixtures": 0,
+      "failed_fixtures": 0,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 13380422249,
+          "prime_factorization": [
+            [
+              13380422249,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 14473040000,
+          "prime_factorization": [
+            [
+              2,
+              7
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              113,
+              1
+            ],
+            [
+              1601,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 939544,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              117443,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 1218879488,
+          "prime_factorization": [
+            [
+              2,
+              13
+            ],
+            [
+              19,
+              1
+            ],
+            [
+              41,
+              1
+            ],
+            [
+              191,
+              1
+            ]
+          ]
+        }
+      },
+      "source_clean_unchanged_after": true,
+      "resource_integrity": true,
+      "native_receipt": ".local/native-feedback-continuation-20261009/contact-check/native",
+      "observation_window_ns": 60167185554,
+      "time_window_is_observation_only": true,
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "joint_global_lease_remains_held_by_batch": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 925439,
+        "monotonic_ns": 258456205298342
+      }
+    },
+    {
+      "kind": "contact-test",
+      "source_commit": "23ea9d78179dc564249890395d5d7ad80f3554b5",
+      "source_tree": "a7cdfddb01c7384c4bf29acaa72ea87265f7b51b",
+      "passed": true,
+      "exit": 0,
+      "command": [
+        "/usr/bin/env",
+        "-i",
+        "PATH=<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/:/usr/bin:/opt/cuda/bin",
+        "HOME=<home>",
+        "CARGO_HOME=<cargo-home>",
+        "CARGO_TARGET_DIR=<repository>/.local/wt/contact-tangent-20261009/.local/target-dev",
+        "LANG=C",
+        "LC_ALL=C",
+        "RAYON_NUM_THREADS=1",
+        "CARGO_BUILD_JOBS=1",
+        "RUSTFLAGS=",
+        "RUSTDOCFLAGS=",
+        "CARGO_ENCODED_RUSTFLAGS=",
+        "NVCC=/opt/cuda/bin/nvcc",
+        "<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--offline",
+        "--locked",
+        "-j",
+        "1",
+        "--test",
+        "material_tangent_world",
+        "--",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "command_request": {
+        "sha256": "b35df0ac1e1f6892019b7660c76c3dead4f490cb6cf746a5b9b702c3a6b36b9e",
+        "bytes": 1034
+      },
+      "source_input_manifest": {
+        "sha256": "8a47448fc998c567a6a47e52182a9252259a8eca04539b4b7a65ae70872b7a72",
+        "bytes": 45933
+      },
+      "stdout": {
+        "sha256": "50dd4068a2ef9d7ed8503ce7762dae4943e8aef35ec4aeaabf6b89dfd816eea5",
+        "bytes": 1558
+      },
+      "stderr": {
+        "sha256": "3ebc6a771d98a80b24716b7d9d3222b3fa42c6399e9e63b67f9d99633c8443df",
+        "bytes": 1331
+      },
+      "unique_test_names": [
+        "a_teaching_encounter_is_refused_until_the_world_is_located",
+        "the_world_sensitive_tangent_is_the_actual_worlds_derivative"
+      ],
+      "passed_fixtures": 2,
+      "failed_fixtures": 0,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 81041698365,
+          "prime_factorization": [
+            [
+              3,
+              1
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              947,
+              1
+            ],
+            [
+              5705153,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 75468227000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              4339,
+              1
+            ],
+            [
+              17393,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 1629408,
+          "prime_factorization": [
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              1543,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 1837572096,
+          "prime_factorization": [
+            [
+              2,
+              13
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              74771,
+              1
+            ]
+          ]
+        }
+      },
+      "source_clean_unchanged_after": true,
+      "resource_integrity": true,
+      "native_receipt": ".local/native-feedback-continuation-20261009/contact-test/native",
+      "observation_window_ns": 256507596038,
+      "time_window_is_observation_only": true,
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "joint_global_lease_remains_held_by_batch": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 926065,
+        "monotonic_ns": 258539356112150
+      }
+    },
+    {
+      "kind": "contact-regressions",
+      "source_commit": "23ea9d78179dc564249890395d5d7ad80f3554b5",
+      "source_tree": "a7cdfddb01c7384c4bf29acaa72ea87265f7b51b",
+      "passed": true,
+      "exit": 0,
+      "command": [
+        "/usr/bin/env",
+        "-i",
+        "PATH=<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/:/usr/bin:/opt/cuda/bin",
+        "HOME=<home>",
+        "CARGO_HOME=<cargo-home>",
+        "CARGO_TARGET_DIR=<repository>/.local/wt/contact-tangent-20261009/.local/target-dev",
+        "LANG=C",
+        "LC_ALL=C",
+        "RAYON_NUM_THREADS=1",
+        "CARGO_BUILD_JOBS=1",
+        "RUSTFLAGS=",
+        "RUSTDOCFLAGS=",
+        "CARGO_ENCODED_RUSTFLAGS=",
+        "NVCC=/opt/cuda/bin/nvcc",
+        "<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--offline",
+        "--locked",
+        "-j",
+        "1",
+        "--test",
+        "world_model",
+        "--test",
+        "physical_ask",
+        "--test",
+        "physical_action",
+        "--test",
+        "native_action_return",
+        "--",
+        "--test-threads=1"
+      ],
+      "command_request": {
+        "sha256": "1b21c67a7aa4692c2fc5ce664f69c1234064113da9a4a42e7e22c17bf08c1f1f",
+        "bytes": 1124
+      },
+      "source_input_manifest": {
+        "sha256": "8a47448fc998c567a6a47e52182a9252259a8eca04539b4b7a65ae70872b7a72",
+        "bytes": 45933
+      },
+      "stdout": {
+        "sha256": "70da04eeb590dfa9e7d454ebbaae377db69f3a5bab84a0455aa6efc2fc8630a8",
+        "bytes": 3091
+      },
+      "stderr": {
+        "sha256": "023faa903517fd1a893dc5296ed20148c5285178bc37e534339daa27cf2f47b2",
+        "bytes": 1618
+      },
+      "unique_test_names": [
+        "a_held_preimage_or_foreign_clock_changes_neither_actual_participant",
+        "actual_prior_world_history_changes_native_carry_and_matched_later_choice",
+        "an_actual_world_face_changes_r_then_the_later_native_prospect",
+        "paired_actual_faces_keep_mass_phase_and_unobserved_regions",
+        "a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obstruction",
+        "a_unique_preparation_uses_the_full_loaded_opening_and_actual_pump_clock",
+        "an_unconstrained_request_retains_the_whole_control_domain",
+        "the_current_receiving_material_changes_the_prospect_and_stale_producing_words_refuse",
+        "a_control_of_the_wrong_shape_is_refused_before_either_participant_moves",
+        "a_control_outside_its_declaration_is_refused_before_either_participant_moves",
+        "a_native_feature_read_compares_exactly_one_declared_station",
+        "a_preparation_without_full_column_rank_or_beyond_its_capacity_is_refused",
+        "absorbing_the_receipt_contracts_the_leverage_at_the_probed_feature_while_the_frozen_twin_is_unchanged",
+        "after_one_deposited_encounter_the_retained_family_separates_waves_and_asks",
+        "before_any_reading_the_family_is_one_member_and_the_probe_holds_with_its_reason",
+        "successive_probes_run_on_one_receiver_and_one_world_and_each_is_actually_received",
+        "the_admitted_waves_are_the_exact_work_sublevel_lattice_in_lexicographic_order",
+        "the_asked_wave_executes_one_actual_encounter_and_the_receipt_is_absorbed",
+        "the_native_feature_is_what_the_receiving_read_multiplies_and_it_matches_the_request_path_and_a_forward_perturbation",
+        "a_disconnected_key_is_eliminated_only_by_its_exact_annihilator",
+        "a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not",
+        "a_non_passive_key_is_held_at_its_certified_cut_while_the_tick_advances",
+        "a_prospect_is_refused_without_a_world_model_and_moves_no_participant",
+        "an_interrupted_encounter_is_absorbed_through_its_executed_steps_without_rollback",
+        "binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame",
+        "retained_world_history_fixes_the_next_reading_that_its_state_only_control_leaves_open",
+        "the_resident_charges_the_models_current_bits_at_every_encounter",
+        "the_return_image_separates_the_free_and_forced_responses_and_holds_the_actual_returns",
+        "the_world_key_reproduces_every_actual_step_and_its_fibre_is_the_batch_preimage",
+        "the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs"
+      ],
+      "passed_fixtures": 30,
+      "failed_fixtures": 0,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 57322452888,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              1039,
+              1
+            ],
+            [
+              766261,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 56580286000,
+          "prime_factorization": [
+            [
+              2,
+              4
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              449,
+              1
+            ],
+            [
+              9001,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 746580,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              23,
+              1
+            ],
+            [
+              541,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 1623638016,
+          "prime_factorization": [
+            [
+              2,
+              14
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              11,
+              2
+            ],
+            [
+              13,
+              1
+            ]
+          ]
+        }
+      },
+      "source_clean_unchanged_after": true,
+      "resource_integrity": true,
+      "native_receipt": ".local/native-feedback-continuation-20261009/contact-regressions/native",
+      "observation_window_ns": 285432856576,
+      "time_window_is_observation_only": true,
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "joint_global_lease_remains_held_by_batch": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 927817,
+        "monotonic_ns": 258598431126160
+      }
+    }
+  ],
+  "source_clean_unchanged_after": true,
+  "source_edits": false,
+  "publication": false,
+  "all_leases_released": true,
+  "full_material_learning_acceptance": false,
+  "original_c65_negatives_preserved": true,
+  "full_receipt": ".local/native-feedback-continuation-20261009/VALIDATION.json",
+  "full_receipt_hash": {
+    "sha256": "3a49abebc02f2edc9863ac2a5eada2a6ccdf6de9f3f5ec85a839315e412a4a7e",
+    "bytes": 27567
+  },
+  "raw_manifest": ".local/native-feedback-continuation-20261009/FILE_HASHES.json",
+  "raw_manifest_hash": {
+    "sha256": "51cbff64ab451055157f3d09090f376553be99573b27059bbe7cf69c88c8e5d9",
+    "bytes": 36063
+  }
+}

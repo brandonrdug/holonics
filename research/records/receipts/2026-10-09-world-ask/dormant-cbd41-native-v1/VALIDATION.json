@@ -1,0 +1,339 @@
+{
+  "title": "Dormant successor scoped native measurement",
+  "source_commit": "cbd41c47dde1a2b44f50912b9e5d7dba5e8a6e60",
+  "source_tree": "31ae29cb3e038fad17ae29a6465ce343ed72d859",
+  "stages": [
+    {
+      "kind": "dormant-check",
+      "source_commit": "cbd41c47dde1a2b44f50912b9e5d7dba5e8a6e60",
+      "source_tree": "31ae29cb3e038fad17ae29a6465ce343ed72d859",
+      "passed": true,
+      "exit": 0,
+      "command": [
+        "/usr/bin/env",
+        "-i",
+        "PATH=<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/:/usr/bin:/opt/cuda/bin",
+        "HOME=<home>",
+        "CARGO_HOME=<cargo-home>",
+        "CARGO_TARGET_DIR=<repository>/.local/wt/world-ask-dormant-20261009/.local/target-dev",
+        "LANG=C",
+        "LC_ALL=C",
+        "RAYON_NUM_THREADS=1",
+        "CARGO_BUILD_JOBS=1",
+        "RUSTFLAGS=",
+        "RUSTDOCFLAGS=",
+        "CARGO_ENCODED_RUSTFLAGS=",
+        "NVCC=/opt/cuda/bin/nvcc",
+        "<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "check",
+        "-p",
+        "holonics",
+        "--tests",
+        "--offline",
+        "--locked",
+        "-j",
+        "1"
+      ],
+      "command_request": {
+        "sha256": "1fcfcd92c7f0c215e460f87c87f792ba90e893862a55bb1545da5a48c1bfa946",
+        "bytes": 958
+      },
+      "source_input_manifest": {
+        "sha256": "3915f0909339e6bb266216a6beeb8409914d5184220aff467d7ac7dc73839041",
+        "bytes": 46080
+      },
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "sha256": "ef11c40d31dbb45bb39ed32a6869083f0ffbd43e5627b982af6cac0daf7ce700",
+        "bytes": 2233
+      },
+      "unique_test_names": [],
+      "passed_fixtures": 0,
+      "failed_fixtures": 0,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 52219612518,
+          "prime_factorization": [
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              223,
+              1
+            ],
+            [
+              1483,
+              1
+            ],
+            [
+              26317,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 53006653000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              1319,
+              1
+            ],
+            [
+              5741,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 1445884,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              17,
+              1
+            ],
+            [
+              1933,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 1679753216,
+          "prime_factorization": [
+            [
+              2,
+              16
+            ],
+            [
+              19,
+              2
+            ],
+            [
+              71,
+              1
+            ]
+          ]
+        }
+      },
+      "source_clean_unchanged_after": true,
+      "resource_integrity": true,
+      "native_receipt": ".local/native-feedback-continuation-20261009/dormant-check/native",
+      "observation_window_ns": 60167185554,
+      "time_window_is_observation_only": true,
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "joint_global_lease_remains_held_by_batch": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 925438,
+        "monotonic_ns": 258495015714567
+      }
+    },
+    {
+      "kind": "dormant-test",
+      "source_commit": "cbd41c47dde1a2b44f50912b9e5d7dba5e8a6e60",
+      "source_tree": "31ae29cb3e038fad17ae29a6465ce343ed72d859",
+      "passed": false,
+      "exit": 101,
+      "command": [
+        "/usr/bin/env",
+        "-i",
+        "PATH=<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/:/usr/bin:/opt/cuda/bin",
+        "HOME=<home>",
+        "CARGO_HOME=<cargo-home>",
+        "CARGO_TARGET_DIR=<repository>/.local/wt/world-ask-dormant-20261009/.local/target-dev",
+        "LANG=C",
+        "LC_ALL=C",
+        "RAYON_NUM_THREADS=1",
+        "CARGO_BUILD_JOBS=1",
+        "RUSTFLAGS=",
+        "RUSTDOCFLAGS=",
+        "CARGO_ENCODED_RUSTFLAGS=",
+        "NVCC=/opt/cuda/bin/nvcc",
+        "<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--offline",
+        "--locked",
+        "-j",
+        "1",
+        "--test",
+        "world_ask_dormant",
+        "--",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "command_request": {
+        "sha256": "a6905541e55da55977d4399d0893a4da9fe150dd0c8eb43e7379b1645249a8b3",
+        "bytes": 1033
+      },
+      "source_input_manifest": {
+        "sha256": "3915f0909339e6bb266216a6beeb8409914d5184220aff467d7ac7dc73839041",
+        "bytes": 46080
+      },
+      "stdout": {
+        "sha256": "be7be42daeed22629c93ef0f3d7d61fda61fa3026a7213ccc524d20daf5b3203",
+        "bytes": 600
+      },
+      "stderr": {
+        "sha256": "1d0a5df1a523424024f7591dec9352a35765d1f018f2f6d91a6798258f06a875",
+        "bytes": 2069
+      },
+      "unique_test_names": [
+        "the_world_family_asks_the_wave_that_wakes_a_dormant_mode"
+      ],
+      "passed_fixtures": 0,
+      "failed_fixtures": 1,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 77110256550,
+          "prime_factorization": [
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              23,
+              1
+            ],
+            [
+              22350799,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 77896414000,
+          "prime_factorization": [
+            [
+              2,
+              4
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              17,
+              1
+            ],
+            [
+              109,
+              1
+            ],
+            [
+              21019,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 1688896,
+          "prime_factorization": [
+            [
+              2,
+              6
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              2399,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 1970282496,
+          "prime_factorization": [
+            [
+              2,
+              13
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              881,
+              1
+            ]
+          ]
+        }
+      },
+      "source_clean_unchanged_after": true,
+      "resource_integrity": true,
+      "native_receipt": ".local/native-feedback-continuation-20261009/dormant-test/native",
+      "observation_window_ns": 169502773270,
+      "time_window_is_observation_only": true,
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "joint_global_lease_remains_held_by_batch": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 926531,
+        "monotonic_ns": 258574129062436
+      }
+    }
+  ],
+  "source_clean_unchanged_after": true,
+  "source_edits": false,
+  "publication": false,
+  "all_leases_released": true,
+  "full_material_learning_acceptance": false,
+  "original_c65_negatives_preserved": true,
+  "full_receipt": ".local/native-feedback-continuation-20261009/VALIDATION.json",
+  "full_receipt_hash": {
+    "sha256": "3a49abebc02f2edc9863ac2a5eada2a6ccdf6de9f3f5ec85a839315e412a4a7e",
+    "bytes": 27567
+  },
+  "raw_manifest": ".local/native-feedback-continuation-20261009/FILE_HASHES.json",
+  "raw_manifest_hash": {
+    "sha256": "51cbff64ab451055157f3d09090f376553be99573b27059bbe7cf69c88c8e5d9",
+    "bytes": 36063
+  }
+}

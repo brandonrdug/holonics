@@ -1,0 +1,182 @@
+{
+  "files": {
+    "landing-74-native-v1/HANDOFF.md": {
+      "original": {
+        "bytes": 1181,
+        "sha256": "fda348c84da5c83f48a23162ef1255b9e85560033e7001203d91fb7c5c8d7ab9"
+      },
+      "projected": {
+        "bytes": 1166,
+        "sha256": "b992477992a010168168551670242fcb4f0ab76a2d500063575bb506c4fc214d"
+      },
+      "replaced": {
+        "<repository>": 1,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 0,
+        "<cargo-home>": 0,
+        "<home>": 0
+      }
+    },
+    "landing-74-native-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 128893,
+        "sha256": "33321f51825f223557f5ccebea0610d0b7929a4757da795b26331b0e380d4d58"
+      },
+      "projected": {
+        "bytes": 128208,
+        "sha256": "6b3d2418b8f68f192aecf2be33696377405344aa29b66d6c0a80ffa056ab0c7f"
+      },
+      "replaced": {
+        "<repository>": 33,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 22,
+        "<cargo-home>": 12,
+        "<home>": 12
+      }
+    },
+    "landing-981-native-v1/HANDOFF.md": {
+      "original": {
+        "bytes": 1651,
+        "sha256": "599512c2d923ce598c0e657963975a9ce6424871067d8250a7721263c41b6f56"
+      },
+      "projected": {
+        "bytes": 1636,
+        "sha256": "3d8a737f6be8f85c463b041a2f5ddd67bc8af2b356c6278920e23e4abdb50d7f"
+      },
+      "replaced": {
+        "<repository>": 1,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 0,
+        "<cargo-home>": 0,
+        "<home>": 0
+      }
+    },
+    "landing-981-native-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 149014,
+        "sha256": "aed89c85a5aba2b2866244d51acf593a594b8d24dd5b42d5fc2ee8de2a40b4d2"
+      },
+      "projected": {
+        "bytes": 148314,
+        "sha256": "60d324248d35c697977b7d26daad0f41e303c19a7776b86f34b9a4642a1190f7"
+      },
+      "replaced": {
+        "<repository>": 34,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 22,
+        "<cargo-home>": 12,
+        "<home>": 12
+      }
+    },
+    "landing-d2-native-v1/COVERAGE_REUSE.json": {
+      "original": {
+        "bytes": 1812,
+        "sha256": "fa06479bf7e61db418c1eb1e3d0a00830d6b3206c8550b6732590bc1c4690772"
+      },
+      "projected": {
+        "bytes": 1797,
+        "sha256": "87236eb37358eed559269d004567a783dfe0626914371dbae0d0a9b64685fb6a"
+      },
+      "replaced": {
+        "<repository>": 1,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 0,
+        "<cargo-home>": 0,
+        "<home>": 0
+      }
+    },
+    "landing-d2-native-v1/HANDOFF.md": {
+      "original": {
+        "bytes": 1438,
+        "sha256": "47c147c3580ab4b79c14ee7c65959fac269876ab4e33ceb25f70e4d3cb4f8123"
+      },
+      "projected": {
+        "bytes": 1423,
+        "sha256": "1afe8a3c4af857e678b08e92bf7c8affbeeeff3d69e88adcbcf6c23db827fecf"
+      },
+      "replaced": {
+        "<repository>": 1,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 0,
+        "<cargo-home>": 0,
+        "<home>": 0
+      }
+    },
+    "landing-d2-native-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 136443,
+        "sha256": "ad6693759bfa5f7bd469e33eee7b7fb4f670c4e8bda92a4cc3c72ab2d55503b1"
+      },
+      "projected": {
+        "bytes": 136194,
+        "sha256": "8c93eae089719c20d2630aaf51b311cd7413a0fa128ea8b6fd440167d5e5610d"
+      },
+      "replaced": {
+        "<repository>": 13,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 6,
+        "<cargo-home>": 4,
+        "<home>": 4
+      }
+    },
+    "station-credit-4f-native-v1/HANDOFF.md": {
+      "original": {
+        "bytes": 959,
+        "sha256": "2283e688ac333b33d6a6ed1973e6d0fe623a930f6f999af72ecd4bd3a5215be6"
+      },
+      "projected": {
+        "bytes": 929,
+        "sha256": "99a689fb64bff5c5aeeb74d0ffa17197e9a41aa5a7eab4ea1f440420633c727e"
+      },
+      "replaced": {
+        "<repository>": 2,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 0,
+        "<cargo-home>": 0,
+        "<home>": 0
+      }
+    },
+    "station-credit-4f-native-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 36277,
+        "sha256": "39771642b3128012caaa8ebf68d3c958b5916e36712c539c5e7c63e251eb3489"
+      },
+      "projected": {
+        "bytes": 35871,
+        "sha256": "404491b54f5029f4bc47ee6c2324db803b166f0b333beffcd90d6bfbaa49e9ca"
+      },
+      "replaced": {
+        "<repository>": 23,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 7,
+        "<cargo-home>": 4,
+        "<home>": 4
+      }
+    },
+    "world-sensitive-23ea-native-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 14857,
+        "sha256": "404ab903fb403ae08b00b717f18e452d38242824fd7193fb0033afb609c7abdd"
+      },
+      "projected": {
+        "bytes": 14761,
+        "sha256": "7aafd4c3519db68c3ca518e798986a23a89bf3d6661ea59de336067c9974473b"
+      },
+      "replaced": {
+        "<repository>": 3,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 6,
+        "<cargo-home>": 3,
+        "<home>": 3
+      }
+    }
+  },
+  "placeholders": {
+    "<cargo-home>": "the host's Cargo home; the path that follows is kept",
+    "<home>": "the host user's home directory",
+    "<lean-toolchain>/": "the absolute host directory of the Lean 4.33.0 toolchain the check invoked; the path that follows is kept",
+    "<repository>": "the absolute host directory of the repository's main checkout; the path that follows (a tracked path, or a worktree or private run directory under .local/) is kept",
+    "<rustup>": "the host's rustup home; the toolchain path that follows is kept"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder, the longer prefixes first; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here; checked locally before commit. The originals stay in local custody."
+}

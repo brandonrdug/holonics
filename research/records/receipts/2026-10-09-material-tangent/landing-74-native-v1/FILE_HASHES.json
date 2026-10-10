@@ -1,0 +1,922 @@
+{
+  "SOURCE_PIN.json": {
+    "sha256": "014c26cd8f117912156f2baceb8def41debd48304b9d4eb71bfbc34a46c3899a",
+    "bytes": 46210
+  },
+  "SOURCE_REVIEW.json": {
+    "sha256": "0371d73d34ef603715422b51adb8c5025bc7ce7b2fa0981d886f8882337636b9",
+    "bytes": 854
+  },
+  "PREPARATION.json": {
+    "sha256": "9c9926154e193836588ec3f9f04f92cbec85eba6864186558f4ebfd0592ef00b",
+    "bytes": 1194
+  },
+  "REVIEW_ADMISSION.json": {
+    "sha256": "0a8ff8195f7e538a5cb6e8e585dcdb14a9ab1748d87b6e67d52e83cf7101da53",
+    "bytes": 777
+  },
+  "watch_events.py": {
+    "sha256": "b1510bad36f3983d8c269161d17253be81b587d1e8112a589f4d1dc29f10288b",
+    "bytes": 1243
+  },
+  "joint-controller.stdout": {
+    "sha256": "5aea2d93c5d1c227634ce5826d7ba8a5a1ad0fc0f6408b4a787f0155a7158b51",
+    "bytes": 2896
+  },
+  "joint-controller.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "WORLD_READOUT.json": {
+    "sha256": "fbc5ca3825b5d1e9693b44302c0c7a069182e6d3ffcc789176e4ab890f1db50e",
+    "bytes": 50312
+  },
+  "VALIDATION.json": {
+    "sha256": "33321f51825f223557f5ccebea0610d0b7929a4757da795b26331b0e380d4d58",
+    "bytes": 128893
+  },
+  "CONTROLLER_QUIESCENCE.json": {
+    "sha256": "ea877230024beeda922e0f622704a8caf611a9afef790176379313546898f69e",
+    "bytes": 363
+  },
+  "CONTROLLER_RELEASE.json": {
+    "sha256": "5e2d1f29f866e93a3bb206bd56629bdbb4b703fe44d02de43d147819ade3de83",
+    "bytes": 138
+  },
+  "joint/JOBS.json": {
+    "sha256": "d954f96c79fd47f268343987c63281b52ff9e4acde504385f053ee8d477c3334",
+    "bytes": 306155
+  },
+  "joint/PLAN.json": {
+    "sha256": "3d4a1c9ba8d426732984d83373b7b0382462d0e66db361b8ae3a7edc2732226d",
+    "bytes": 969
+  },
+  "joint/DRIVER_TEMPLATE.py": {
+    "sha256": "481eff50913daf3414ed785d12c4039fc6f2240d6233972cf3fbd42842012a20",
+    "bytes": 9745
+  },
+  "joint/ALL_PREPARED_JOBS.json": {
+    "sha256": "6ca7e9f63b5bd6d34c31274da917ea49f1f7d1c26c8d1c2a8b3f65e3c9c31af0",
+    "bytes": 408199
+  },
+  "joint/run_joint.py": {
+    "sha256": "89e91695ae1fae45b356925fad0f6986687d1469924b426e6840b2d91fc68535",
+    "bytes": 10161
+  },
+  "joint/outer_entry.py": {
+    "sha256": "0610b2ea410a7b8badeda71fc8074d66383eceffe25530eb16c1c4df2d6b68cf",
+    "bytes": 339
+  },
+  "joint/LEASE_OWNER.json": {
+    "sha256": "1ea2dc1dac9a5e79113558fc58cb51babc235cbd298533bb8f827e6eec22af8d",
+    "bytes": 219
+  },
+  "joint/ADMISSION.json": {
+    "sha256": "d6886e50560b2b0aedaea49ce54019174140c0b600593d824c5807ccd737b127",
+    "bytes": 1479
+  },
+  "joint/RESULTS.json": {
+    "sha256": "9ec5169e3c4086cad692492cddd3e2700b046136c7cb5d59640b842d0826ec49",
+    "bytes": 28974
+  },
+  "joint/QUIESCENCE.json": {
+    "sha256": "a54d50c72956d7d6498ff5b1bf3183519e6686bf427e2f47d6e23d2cccb0a946",
+    "bytes": 93
+  },
+  "joint/SLICE_PROPERTIES.json": {
+    "sha256": "2a0399daed3d165ded3c322dc9a095f179f3d377fe3c184a07de504c91f8aea0",
+    "bytes": 251
+  },
+  "joint/RELEASE.json": {
+    "sha256": "5d2e0dfcdb1149f93d42b9bd9aedfc335bd897698c8bbe8ed68349a52d51aee6",
+    "bytes": 137
+  },
+  "held-4/native/final_stage_memory_v186.py": {
+    "sha256": "3928305f425b9a3291d1ef6e1ce01b3db142d815d84c5aeb1619ac0442add060",
+    "bytes": 11361
+  },
+  "held-4/native/leased_stage_memory_v186.py": {
+    "sha256": "585afff0e5ec7d5d0686c2cb3c13b84217ee815906e8abe2b34f0ac253eaf695",
+    "bytes": 5566
+  },
+  "held-4/native/bounded_stage_memory_v186.py": {
+    "sha256": "835d9594be929585f0221221c66a9d3791c22f73a6607a4fc07845c607275277",
+    "bytes": 17021
+  },
+  "held-4/native/compile_job.py": {
+    "sha256": "a9990c539f5163be0eda84ada65687ac9f35f717e3714a0080bf109540b106f0",
+    "bytes": 1667
+  },
+  "held-4/native/COMPILE_REQUEST.json": {
+    "sha256": "b65501fe9da7c59d9f541a80848883dd31feccfbecc0f175ca59d6923ef6c1de",
+    "bytes": 1248
+  },
+  "held-4/native/SOURCE_NATIVE_INPUTS.json": {
+    "sha256": "014c26cd8f117912156f2baceb8def41debd48304b9d4eb71bfbc34a46c3899a",
+    "bytes": 46210
+  },
+  "held-4/native/world-landing-held-4-74-20261010-v1.config.json": {
+    "sha256": "aaea395eeaf5ba79854d450c028cadfa93c06706802db49f8b8c1f161394c94c",
+    "bytes": 38922
+  },
+  "held-3/native/final_stage_memory_v186.py": {
+    "sha256": "cab1553d06b141ae625da2bf498a415541755b8e7cec7a3b1bd3d48e5426c5dc",
+    "bytes": 10990
+  },
+  "held-3/native/leased_stage_memory_v186.py": {
+    "sha256": "eb411818011964c4a96d6c9618604e9c55829eb054bf1a409ffc5d4587ca16c0",
+    "bytes": 5580
+  },
+  "held-3/native/bounded_stage_memory_v186.py": {
+    "sha256": "8f84d21d43bdbd83e4c86c1132cfad2142f4f0209a95015caf94e7fb40e06a34",
+    "bytes": 16827
+  },
+  "held-3/native/compile_job.py": {
+    "sha256": "ec5cd0c02bbbc71fe86b066b1eb7906648896f6443855c3b56ba03ba3a1b8c2e",
+    "bytes": 1665
+  },
+  "held-3/native/COMPILE_REQUEST.json": {
+    "sha256": "da449edeab53e2ad70545f458322ac3a16edfdf4aa8ed749cd12e2e58d744e17",
+    "bytes": 1242
+  },
+  "held-3/native/SOURCE_NATIVE_INPUTS.json": {
+    "sha256": "014c26cd8f117912156f2baceb8def41debd48304b9d4eb71bfbc34a46c3899a",
+    "bytes": 46210
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.config.json": {
+    "sha256": "58704ca4bd6bf9f21af6661a8c2bfd4ebf06a648572eb9854434e0712f661240",
+    "bytes": 110489
+  },
+  "held-3/native/joint-launcher.stdout": {
+    "sha256": "d18599fd9649fa24b5eb271452ef6c84b78f37b5896150707361c9581151aae5",
+    "bytes": 185
+  },
+  "held-3/native/joint-launcher.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.external-lease.json": {
+    "sha256": "8653ab50e70a1e27feb2637a04b0f7d089727a25940ba5157b1bbc0f6ff1e1aa",
+    "bytes": 277
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.lease-identity.json": {
+    "sha256": "23a236bd1356c80d381096906d123260089a32c1be246fdccaee67d30d39b416",
+    "bytes": 355
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.host-pressure.ndjson": {
+    "sha256": "931c6835997baf249f767bb8a42ec6dfb3de156c0926f88a50c10cdd05bc10f2",
+    "bytes": 27839
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.input_seal.json": {
+    "sha256": "b06aa79001ad91560ac024172623b4b29c0ed423f09a6c68be3dff672cd17f1d",
+    "bytes": 72853
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.memory-growth.ndjson": {
+    "sha256": "701c66fb247ea1d75b9b9ad8570a4d1029e9a7e9f1693f1f361e0da225087c8b",
+    "bytes": 1332
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.stdout": {
+    "sha256": "1ac350fe37d412e36a348fcdc895a3d60edb2696a66164cbce79129cd7119b72",
+    "bytes": 1240
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.memory-gate.json": {
+    "sha256": "7f12f38639a0ca3c02ba41e05f4ae439bfb13d57b9dffcaf3eb505634e97c32e",
+    "bytes": 120
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.child-identity.json": {
+    "sha256": "729533cd9da474f3cf793bd06e0b87f99253426a1009aa8dbaa477dddb0017a8",
+    "bytes": 78
+  },
+  "held-3/native/compiler.stdout": {
+    "sha256": "01c44e29bb223c59ed1de2a12baf82c8b841f1ab9dafc57384f07b7dc66f6a87",
+    "bytes": 313
+  },
+  "held-3/native/compiler.stderr": {
+    "sha256": "90c75fe122d34a7012f777dbbe53bf5b3766dc1fbc8a59eff090dac419100e24",
+    "bytes": 1072
+  },
+  "held-3/native/COMMAND_START.json": {
+    "sha256": "6af03ce176bbbceceb00f60e37db441665ef3fef5b7cbc9c70baf42f0367c4c6",
+    "bytes": 1052
+  },
+  "held-3/native/RESULT.json": {
+    "sha256": "1c9fe31b0e842344e51dbe7696aeaae09851338edf9e3b802a9b5935d8686ffd",
+    "bytes": 1380
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.system-floor.json": {
+    "sha256": "85749b3417c4e4aa8bc3af6eff1cc12c91711b8b95a438acc3c59ef692655382",
+    "bytes": 2777
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.quiescence.json": {
+    "sha256": "e2183854be70da033886af338e41caba0afc7bf62503670fd9dd8c51fbeae875",
+    "bytes": 130
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.output_seal.json": {
+    "sha256": "4c903264d58df56ddbc528bcef34d591dbebad9ec9df39d879e4840eb11b3f87",
+    "bytes": 4650
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.publication.json": {
+    "sha256": "ef0cf7dbd0828c7eabc2cd6caf5742d5c6586878112004285f4a8b71eff8fd10",
+    "bytes": 2994
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.stage-quiescence.json": {
+    "sha256": "4ee81d1e507d7d9b17860684afde99984fb00153127a15de2d5c792924d3cf39",
+    "bytes": 136
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.final.json": {
+    "sha256": "496c1b3fe16eab9edf965c6f597e481ffa4f960be220d139607bc45527a9257a",
+    "bytes": 5506
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.unit-cleanup.json": {
+    "sha256": "73e0ab67c014f28b14770b42bbe38db5151b123f5fa966a6d2590613c4ce72ea",
+    "bytes": 697
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.acceptance.json": {
+    "sha256": "52f41b94e8c4264e0851f95464105a2b912e913f850f5a64a631af4b3a349104",
+    "bytes": 378
+  },
+  "held-3/native/world-landing-held-3-74-20261010-v1.release.json": {
+    "sha256": "1dafb02aaaf87d8d7adb11a122c2afdae0702b2c22ed10fae2936aea49e0ca41",
+    "bytes": 227
+  },
+  "held-3/native/STAGE_SUMMARY.json": {
+    "sha256": "560ab6d4f9ce452d7e7922e2f02839944b53e1d74637a7de75476da360cf5515",
+    "bytes": 3098
+  },
+  "held-2/native/final_stage_memory_v186.py": {
+    "sha256": "3928305f425b9a3291d1ef6e1ce01b3db142d815d84c5aeb1619ac0442add060",
+    "bytes": 11361
+  },
+  "held-2/native/leased_stage_memory_v186.py": {
+    "sha256": "585afff0e5ec7d5d0686c2cb3c13b84217ee815906e8abe2b34f0ac253eaf695",
+    "bytes": 5566
+  },
+  "held-2/native/bounded_stage_memory_v186.py": {
+    "sha256": "835d9594be929585f0221221c66a9d3791c22f73a6607a4fc07845c607275277",
+    "bytes": 17021
+  },
+  "held-2/native/compile_job.py": {
+    "sha256": "a9990c539f5163be0eda84ada65687ac9f35f717e3714a0080bf109540b106f0",
+    "bytes": 1667
+  },
+  "held-2/native/COMPILE_REQUEST.json": {
+    "sha256": "411404f546baf2a7bef639fd78c97703d7cb4f076148003a698711b721ba7aee",
+    "bytes": 1230
+  },
+  "held-2/native/SOURCE_NATIVE_INPUTS.json": {
+    "sha256": "014c26cd8f117912156f2baceb8def41debd48304b9d4eb71bfbc34a46c3899a",
+    "bytes": 46210
+  },
+  "held-2/native/world-landing-held-2-74-20261010-v1.config.json": {
+    "sha256": "71237a2fd7242da776b2fc3cb398fdcb919e2d026116286ef72ada55b49c325a",
+    "bytes": 38922
+  },
+  "held-1/native/final_stage_memory_v186.py": {
+    "sha256": "cab1553d06b141ae625da2bf498a415541755b8e7cec7a3b1bd3d48e5426c5dc",
+    "bytes": 10990
+  },
+  "held-1/native/leased_stage_memory_v186.py": {
+    "sha256": "eb411818011964c4a96d6c9618604e9c55829eb054bf1a409ffc5d4587ca16c0",
+    "bytes": 5580
+  },
+  "held-1/native/bounded_stage_memory_v186.py": {
+    "sha256": "8f84d21d43bdbd83e4c86c1132cfad2142f4f0209a95015caf94e7fb40e06a34",
+    "bytes": 16827
+  },
+  "held-1/native/compile_job.py": {
+    "sha256": "ec5cd0c02bbbc71fe86b066b1eb7906648896f6443855c3b56ba03ba3a1b8c2e",
+    "bytes": 1665
+  },
+  "held-1/native/COMPILE_REQUEST.json": {
+    "sha256": "9c96d99a9e303f75c9f0cb62494a0b0f242daf73d28e2f82ef965df1fcdd4256",
+    "bytes": 1130
+  },
+  "held-1/native/SOURCE_NATIVE_INPUTS.json": {
+    "sha256": "014c26cd8f117912156f2baceb8def41debd48304b9d4eb71bfbc34a46c3899a",
+    "bytes": 46210
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.config.json": {
+    "sha256": "790661cd9597caf9e49d4a6603bf4b34b32e6505739e2972caef4954c2c897d2",
+    "bytes": 110489
+  },
+  "held-1/native/joint-launcher.stdout": {
+    "sha256": "0e3f92b6d36a8c9dc649b519ca1caa6accd510c63e08a8114aadb7bcd2e7b98f",
+    "bytes": 183
+  },
+  "held-1/native/joint-launcher.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.external-lease.json": {
+    "sha256": "8653ab50e70a1e27feb2637a04b0f7d089727a25940ba5157b1bbc0f6ff1e1aa",
+    "bytes": 277
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.lease-identity.json": {
+    "sha256": "f74c82385594fa61824e35e5ac750aac76135d560545fc70a6360e583b906ee9",
+    "bytes": 355
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.host-pressure.ndjson": {
+    "sha256": "fb2d76f1d576ca7652fc1fc6e673b2acb3adec0538e9ee6a9e57475f98284755",
+    "bytes": 10290
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.input_seal.json": {
+    "sha256": "5c77a8bbd26f755ebb2c7a9148d02f1ace76b0c4caae9fd94e0f42973b193c76",
+    "bytes": 72853
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.memory-growth.ndjson": {
+    "sha256": "292c5d59566b74b472e84d775711e0ca7caf008db455b649f3244e825a00957e",
+    "bytes": 582
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.stdout": {
+    "sha256": "eeff7b587eb42176c94f6ce454923256b2fe381d7b33cdfb45ab040cdbaecb6c",
+    "bytes": 1131
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.memory-gate.json": {
+    "sha256": "ea27a25d52b38d9a46f8165ccd7254c459449696544d44311e8d3bbce6d39796",
+    "bytes": 120
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.child-identity.json": {
+    "sha256": "9ad91e8b06ac9a9d4cf9bcc3d12d767bf587038cc6df9153c5f3c47859b8a90e",
+    "bytes": 78
+  },
+  "held-1/native/compiler.stdout": {
+    "sha256": "454f15295e5a59fb3ea75675ae5155282aed31386a0fe4c25973833008414784",
+    "bytes": 525
+  },
+  "held-1/native/compiler.stderr": {
+    "sha256": "307dc0f0924a2345c8d317f48115569f9265120df80a56831b88d8eb11c92ec4",
+    "bytes": 643
+  },
+  "held-1/native/COMMAND_START.json": {
+    "sha256": "8f27ee2a8811ea11f0944cd77b0e744c0ff913b6c98e6ebe12dc3b468b505d5b",
+    "bytes": 940
+  },
+  "held-1/native/RESULT.json": {
+    "sha256": "cf6695d22cab9e8a3b38e68f03975356ea692b9834e00ad698ba0c17f0560b97",
+    "bytes": 1267
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.system-floor.json": {
+    "sha256": "16d1f2628d7428b77de1d276fcb4fe665d60dc1bb7a48c2bed69d3f14c55bd9e",
+    "bytes": 1103
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.quiescence.json": {
+    "sha256": "324db911449ac8168a9d89374ce44c913fc1e931e96de6ae86d6694f59d793bf",
+    "bytes": 130
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.output_seal.json": {
+    "sha256": "a581f78c67fba3c7df7e4143a0ea2123981e029216842f5296a73aae0175c494",
+    "bytes": 3118
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.publication.json": {
+    "sha256": "bce26ab667073acb8980c309d5368177138702e65006172c1e45c7e28863812c",
+    "bytes": 2992
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.stage-quiescence.json": {
+    "sha256": "efaedf00cad367489f853ee1a1bd51e6a2af475838451e86e9ef0049ace7ced3",
+    "bytes": 136
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.final.json": {
+    "sha256": "c70ec8081e9367b0e598bbc7185cdf5524f55d99b7fbb68eed08b72aef71b2ee",
+    "bytes": 5502
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.unit-cleanup.json": {
+    "sha256": "d11312a9da87ec4326c7067a21efa55197fc78176c04b9b89440a9639e4d7bfe",
+    "bytes": 697
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.acceptance.json": {
+    "sha256": "4dc27b78193cec5bc0f21dcd5430de108cd559909f0974a3f253d924eea4ab28",
+    "bytes": 378
+  },
+  "held-1/native/world-landing-held-1-74-20261010-v1.release.json": {
+    "sha256": "f9cc9e3eb9c5c8ffcad39a3809213b6aef4506690594bae3741bbb5c8b887fa2",
+    "bytes": 227
+  },
+  "held-1/native/STAGE_SUMMARY.json": {
+    "sha256": "4425ccbe2c713a62cae59bfb4347d157aefad546177098b2c4e93506eae17863",
+    "bytes": 3073
+  },
+  "material-lib/native/final_stage_memory_v186.py": {
+    "sha256": "cab1553d06b141ae625da2bf498a415541755b8e7cec7a3b1bd3d48e5426c5dc",
+    "bytes": 10990
+  },
+  "material-lib/native/leased_stage_memory_v186.py": {
+    "sha256": "eb411818011964c4a96d6c9618604e9c55829eb054bf1a409ffc5d4587ca16c0",
+    "bytes": 5580
+  },
+  "material-lib/native/bounded_stage_memory_v186.py": {
+    "sha256": "8f84d21d43bdbd83e4c86c1132cfad2142f4f0209a95015caf94e7fb40e06a34",
+    "bytes": 16827
+  },
+  "material-lib/native/compile_job.py": {
+    "sha256": "ec5cd0c02bbbc71fe86b066b1eb7906648896f6443855c3b56ba03ba3a1b8c2e",
+    "bytes": 1665
+  },
+  "material-lib/native/COMPILE_REQUEST.json": {
+    "sha256": "c8f68bd0a5f31fae459748ec7f9f4596d0ff9cdff70da5fc9adaabf2855832f9",
+    "bytes": 1111
+  },
+  "material-lib/native/SOURCE_NATIVE_INPUTS.json": {
+    "sha256": "014c26cd8f117912156f2baceb8def41debd48304b9d4eb71bfbc34a46c3899a",
+    "bytes": 46210
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.config.json": {
+    "sha256": "caeff344516d79a3657f377fee49ced322585cbe480e423667250a6c6c28ea3a",
+    "bytes": 110585
+  },
+  "material-lib/native/joint-launcher.stdout": {
+    "sha256": "f4f4d205b8a90770be52e2ceba58e25d99c8242c167f5762d1401be8033028e2",
+    "bytes": 195
+  },
+  "material-lib/native/joint-launcher.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.external-lease.json": {
+    "sha256": "8653ab50e70a1e27feb2637a04b0f7d089727a25940ba5157b1bbc0f6ff1e1aa",
+    "bytes": 277
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.lease-identity.json": {
+    "sha256": "0d44644dae3070ce4cf85e680a8cb45ce2ea30d4aaab12d5b0c11df5b4776550",
+    "bytes": 355
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.host-pressure.ndjson": {
+    "sha256": "8307c99544f9d16c43604f9c27f1b0d00f31335210812f06ff871d5d915bdcd2",
+    "bytes": 1684985
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.input_seal.json": {
+    "sha256": "579685d60ea61dde5fc3249f487b89385369b3fe3683d028bf31efaf9a0f4ee6",
+    "bytes": 72913
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.memory-growth.ndjson": {
+    "sha256": "450725edb694e712ccfccdd6bdbaf8033d930e822adf395d425a464f412b98c7",
+    "bytes": 93247
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.stdout": {
+    "sha256": "2edaea7294cafbce35795fa28010173d9f05850765e4816da03550f208675ee8",
+    "bytes": 1119
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.memory-gate.json": {
+    "sha256": "2c84653b929c1a398e684133168f8eaa2a12bef537b9ca2591472f09dda3577b",
+    "bytes": 120
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.child-identity.json": {
+    "sha256": "736b11a71cfee124120ec1d61d97d1f3b57483f96ea1f32d10b8af185f579817",
+    "bytes": 78
+  },
+  "material-lib/native/compiler.stdout": {
+    "sha256": "c9583868b153816f1c9a06fa9d1ab7516cf207b6a209f2c344e728b19f2761cc",
+    "bytes": 312
+  },
+  "material-lib/native/compiler.stderr": {
+    "sha256": "b5d4c78d3a534f6b7a9c6fae14fd1f21ba1a686607270e7b48e9e96b90351bb4",
+    "bytes": 766
+  },
+  "material-lib/native/COMMAND_START.json": {
+    "sha256": "27700b17bf6c03d69d8ecebe93f41dcbae950fbce4dafa84a6c7523033194135",
+    "bytes": 915
+  },
+  "material-lib/native/RESULT.json": {
+    "sha256": "1b73830ec009c67e724c25cc0e3011b757ac368db7452991eb2091f9baaffaf4",
+    "bytes": 1251
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.system-floor.json": {
+    "sha256": "3c754ec15a2e8aeb42bfcc5e73d264367cdfafc22a4e9204d25ca2a56781b5b1",
+    "bytes": 161031
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.quiescence.json": {
+    "sha256": "0b7713347008efaac9fff0ea137b34b608b1a00f498ece6272ad929a5a9d7be9",
+    "bytes": 130
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.output_seal.json": {
+    "sha256": "27dbd9dd62207a8822ad2a353b493d8e325a3aad897c7600ad8fa98bb0231641",
+    "bytes": 151896
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.publication.json": {
+    "sha256": "fcf83b9d8f027a0404e40d85c31cb8e8d08db3ea4c537f4bd3783a1873092743",
+    "bytes": 3126
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.stage-quiescence.json": {
+    "sha256": "cea473e2356371e5bf23f01c6af37dbedee85c5d8a727267901fb63b203fa72d",
+    "bytes": 136
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.final.json": {
+    "sha256": "c1b40269f3d3f8515679ba9bd0a9743b582fb0b4dfe3aab5af874094c4f3599b",
+    "bytes": 5713
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.unit-cleanup.json": {
+    "sha256": "91b8a348d075a2e3cc6a5a8070eaf87ff810b821fd9fa878484b30d8673d7790",
+    "bytes": 709
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.acceptance.json": {
+    "sha256": "b13d85684593fa89d47120120f5b20178262cf6d5bbbb779fbc15a3248fa0d95",
+    "bytes": 378
+  },
+  "material-lib/native/world-landing-material-lib-74-20261010-v1.release.json": {
+    "sha256": "ba308c2b0c25af2ed8c17f8c5ff4c4366cdaa75faa54b9c5f6d1d51b169fb8e5",
+    "bytes": 227
+  },
+  "material-lib/native/STAGE_SUMMARY.json": {
+    "sha256": "283eae9b5929f2f955d2b36d62c40fea16e9b8c0126ea8851140437db53c40ca",
+    "bytes": 3034
+  },
+  "consumers/native/final_stage_memory_v186.py": {
+    "sha256": "cab1553d06b141ae625da2bf498a415541755b8e7cec7a3b1bd3d48e5426c5dc",
+    "bytes": 10990
+  },
+  "consumers/native/leased_stage_memory_v186.py": {
+    "sha256": "eb411818011964c4a96d6c9618604e9c55829eb054bf1a409ffc5d4587ca16c0",
+    "bytes": 5580
+  },
+  "consumers/native/bounded_stage_memory_v186.py": {
+    "sha256": "8f84d21d43bdbd83e4c86c1132cfad2142f4f0209a95015caf94e7fb40e06a34",
+    "bytes": 16827
+  },
+  "consumers/native/compile_job.py": {
+    "sha256": "ec5cd0c02bbbc71fe86b066b1eb7906648896f6443855c3b56ba03ba3a1b8c2e",
+    "bytes": 1665
+  },
+  "consumers/native/COMPILE_REQUEST.json": {
+    "sha256": "0b3c5a20494ce5bdf71cb1d1863a14cf3283bd3efb5945a418ef35b021a01191",
+    "bytes": 1217
+  },
+  "consumers/native/SOURCE_NATIVE_INPUTS.json": {
+    "sha256": "014c26cd8f117912156f2baceb8def41debd48304b9d4eb71bfbc34a46c3899a",
+    "bytes": 46210
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.config.json": {
+    "sha256": "6e5db688f97c4d5e43be51bcd39422f47e7ad01610579566a8ce20ba61fad705",
+    "bytes": 110537
+  },
+  "consumers/native/joint-launcher.stdout": {
+    "sha256": "ff60334fc3712fda1f02d98582977af86f950fd2b76f6d103a0afb302121f73f",
+    "bytes": 190
+  },
+  "consumers/native/joint-launcher.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.external-lease.json": {
+    "sha256": "8653ab50e70a1e27feb2637a04b0f7d089727a25940ba5157b1bbc0f6ff1e1aa",
+    "bytes": 277
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.lease-identity.json": {
+    "sha256": "7d051e800730dbf0c016b2e6cdfc6cb739ac588cd4d59c9e6bb6e82767929e24",
+    "bytes": 355
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.host-pressure.ndjson": {
+    "sha256": "e99ad5d42d48a73164122bd5ef4400ff67c3f20a7b99d1e118ebecb6e6a85d6f",
+    "bytes": 854003
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.input_seal.json": {
+    "sha256": "d27bde7015ea409d16259e8a221f60165743a42b58973598c3f0de53f74233bb",
+    "bytes": 72883
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.memory-growth.ndjson": {
+    "sha256": "372ed8a53733f3b1cc221a116240844e4d7eaf8ee355ea4af88218a4578ba702",
+    "bytes": 45705
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.stdout": {
+    "sha256": "d480138e2e41fd60122fe9263c7b3c6eba84754c9615723c377ef54337dad726",
+    "bytes": 1200
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.memory-gate.json": {
+    "sha256": "e1f3fc1eca62056ac5065c1b92d3ebf1b639597bae232a1e359c81e1e345344c",
+    "bytes": 120
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.child-identity.json": {
+    "sha256": "26e1b39d540911e9ad1fa6633b2818675319149155b307b99f9b335fd2aa70e8",
+    "bytes": 78
+  },
+  "consumers/native/compiler.stdout": {
+    "sha256": "090ee60ca2f947e57c2a63de2b1598afc3f61f4b0db44ebfa4ee3dc99746ce7e",
+    "bytes": 3091
+  },
+  "consumers/native/compiler.stderr": {
+    "sha256": "0e1b42431aef52ffba71556f564a56d57e5e3fbd24a776669264313f9efc689a",
+    "bytes": 1642
+  },
+  "consumers/native/COMMAND_START.json": {
+    "sha256": "dc81a45956e699ed5f9b327ec33d2b0302fe96c5e152ed68951d36d739b00fd6",
+    "bytes": 1024
+  },
+  "consumers/native/RESULT.json": {
+    "sha256": "3e0b94e611066eb4f2568385a0eba8544a504de9cbbb5b71f61dcda976e31136",
+    "bytes": 1356
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.system-floor.json": {
+    "sha256": "305a969d8d637b4f313bd36a1fb6d20d879c5fbd7038695a3ff16d9fb9eee4f4",
+    "bytes": 79571
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.quiescence.json": {
+    "sha256": "3ddd4ad97073ec5bbdccf1ceb5dc3cc637040d34cc9f0241ccc5799b91783a3b",
+    "bytes": 130
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.output_seal.json": {
+    "sha256": "3fe24961c977115472688805fbdefc060acde47b4f0d2859adfb7df190751865",
+    "bytes": 75898
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.publication.json": {
+    "sha256": "64fb8baad02549fb10d5c4c92b98a286587d8d5cddf61016c403cc3e39355290",
+    "bytes": 3061
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.stage-quiescence.json": {
+    "sha256": "ac7447c8bc5e328b2bf264936e583f5addfc25168afc33f1b9624ebd920e90fb",
+    "bytes": 136
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.final.json": {
+    "sha256": "e3764a6a527e7b9b4781501462b54da66821226ce869aedbda7544034ff3bf91",
+    "bytes": 5611
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.unit-cleanup.json": {
+    "sha256": "87486ff3b11441191bdd644c89c23315c2530ac25fb1b25a00af822fa3b05ac5",
+    "bytes": 703
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.acceptance.json": {
+    "sha256": "d8d9efbfecc834f3eb14fde356689b0460a9e20498e6542fb6135f87c75110c5",
+    "bytes": 378
+  },
+  "consumers/native/world-landing-consumers-74-20261010-v1.release.json": {
+    "sha256": "c832a9dda5e036eb8a0061d8f4ba08ec607e02140faa57519f25ec6fb9613a4c",
+    "bytes": 227
+  },
+  "consumers/native/STAGE_SUMMARY.json": {
+    "sha256": "57aab0bc8e8fdb007478d34128c5b59d518935086f38243ea514078eb4c5f149",
+    "bytes": 5552
+  },
+  "world/native/final_stage_memory_v186.py": {
+    "sha256": "cab1553d06b141ae625da2bf498a415541755b8e7cec7a3b1bd3d48e5426c5dc",
+    "bytes": 10990
+  },
+  "world/native/leased_stage_memory_v186.py": {
+    "sha256": "eb411818011964c4a96d6c9618604e9c55829eb054bf1a409ffc5d4587ca16c0",
+    "bytes": 5580
+  },
+  "world/native/bounded_stage_memory_v186.py": {
+    "sha256": "8f84d21d43bdbd83e4c86c1132cfad2142f4f0209a95015caf94e7fb40e06a34",
+    "bytes": 16827
+  },
+  "world/native/compile_job.py": {
+    "sha256": "ec5cd0c02bbbc71fe86b066b1eb7906648896f6443855c3b56ba03ba3a1b8c2e",
+    "bytes": 1665
+  },
+  "world/native/COMPILE_REQUEST.json": {
+    "sha256": "4493cc66620d03a751056b91c0a2e2aa71024ca8cae3c2dcd46010c1df8f2ca8",
+    "bytes": 1130
+  },
+  "world/native/SOURCE_NATIVE_INPUTS.json": {
+    "sha256": "014c26cd8f117912156f2baceb8def41debd48304b9d4eb71bfbc34a46c3899a",
+    "bytes": 46210
+  },
+  "world/native/world-landing-world-74-20261010-v1.config.json": {
+    "sha256": "ca6d11b2bc32e9f7fea3e709aa14952849205b00f75f8fa452a7bfb9797afd44",
+    "bytes": 110473
+  },
+  "world/native/joint-launcher.stdout": {
+    "sha256": "c1bf917ee7b6d53ad64b0f761e000a6aaca07e804048322e07b1d89a17897357",
+    "bytes": 188
+  },
+  "world/native/joint-launcher.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "world/native/world-landing-world-74-20261010-v1.external-lease.json": {
+    "sha256": "8653ab50e70a1e27feb2637a04b0f7d089727a25940ba5157b1bbc0f6ff1e1aa",
+    "bytes": 277
+  },
+  "world/native/world-landing-world-74-20261010-v1.lease-identity.json": {
+    "sha256": "9dc88d0f97a85de3fd145d25544c1d67c9b5c07583d9e9ffcf1df4d120e7953f",
+    "bytes": 355
+  },
+  "world/native/world-landing-world-74-20261010-v1.host-pressure.ndjson": {
+    "sha256": "3455d807e1c06a82df41ab7363c94e93fb4e79f67d6e7f04082c6d390287345d",
+    "bytes": 1951268
+  },
+  "world/native/world-landing-world-74-20261010-v1.input_seal.json": {
+    "sha256": "18a169b2aded3a9585a3cf9d6b6379268e1d3358828d6e68102ea764a11eacca",
+    "bytes": 72843
+  },
+  "world/native/world-landing-world-74-20261010-v1.memory-growth.ndjson": {
+    "sha256": "98f630bd3530549abb9d806baebb9332136a1f11996cdaf39007a0b427b4c910",
+    "bytes": 105801
+  },
+  "world/native/world-landing-world-74-20261010-v1.stdout": {
+    "sha256": "39def08aecd60f39fae1fa23d98fdbbcdaeef5eb5d0919343140a2292434fac2",
+    "bytes": 1134
+  },
+  "world/native/world-landing-world-74-20261010-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "world/native/world-landing-world-74-20261010-v1.memory-gate.json": {
+    "sha256": "2f90d9962caad26424080c4ede96931128602f7c7cac733257fc9e2096472e44",
+    "bytes": 120
+  },
+  "world/native/world-landing-world-74-20261010-v1.child-identity.json": {
+    "sha256": "d2062d2ce06d70de44783f840b8c2efad0f79b9256940b7d2003e3e7abb28020",
+    "bytes": 78
+  },
+  "world/native/compiler.stdout": {
+    "sha256": "b56f3b3dc60506097ec963d507aa59b321d277d4edbfceaf50658eea6c62ba0f",
+    "bytes": 20720
+  },
+  "world/native/compiler.stderr": {
+    "sha256": "b737311f007cd209fefbd6e8db8c7529bfbc3b95fa7664eddce79ec7afa866c1",
+    "bytes": 1498
+  },
+  "world/native/COMMAND_START.json": {
+    "sha256": "9bf939ed30c20f03ccb5edd5b5f7400cf6b4b99eaa5f31d33e5ebfe0cb6ae7fd",
+    "bytes": 941
+  },
+  "world/native/RESULT.json": {
+    "sha256": "ca017baf538807cb78e1abcba2d4ff58daf8f11b47572c63cb02b896dc2245b2",
+    "bytes": 1270
+  },
+  "world/native/world-landing-world-74-20261010-v1.system-floor.json": {
+    "sha256": "d43f0dfa1c755f2362b8410afc6a3e656bece495ab55fcf6c9483532f0b3a2ef",
+    "bytes": 188341
+  },
+  "world/native/world-landing-world-74-20261010-v1.quiescence.json": {
+    "sha256": "db29a7ad380c0ae583a5ea5f2984a16c0509f4f7ed6316514f030737e3c42a7f",
+    "bytes": 130
+  },
+  "world/native/world-landing-world-74-20261010-v1.output_seal.json": {
+    "sha256": "270933b08297675d21fc1f3a7c54041df436d9bfdeeff81dcecd4441ae8d0cdd",
+    "bytes": 177492
+  },
+  "world/native/world-landing-world-74-20261010-v1.publication.json": {
+    "sha256": "0056a86b81080cc3440a3f07cff09eca11fc7790eff5265f40d4587c067661b0",
+    "bytes": 2986
+  },
+  "world/native/world-landing-world-74-20261010-v1.stage-quiescence.json": {
+    "sha256": "3341ae6c82388c91641ffb123ec3337428aac55ea62d150f1592696e07b15ca6",
+    "bytes": 136
+  },
+  "world/native/world-landing-world-74-20261010-v1.final.json": {
+    "sha256": "935cb2b9e0d4b47e03f8c753f56d8c0ddf4be14492cfa89c3f66e003de0e1fc1",
+    "bytes": 5490
+  },
+  "world/native/world-landing-world-74-20261010-v1.unit-cleanup.json": {
+    "sha256": "e88004a9142da141a624cd0ae02f520e35a96bff784ee0ea1b16cf731b739128",
+    "bytes": 695
+  },
+  "world/native/world-landing-world-74-20261010-v1.acceptance.json": {
+    "sha256": "7954a35dd2128bc98e4b121479e776d0c0962c6cfe4f0e90838ada5ca64a4be8",
+    "bytes": 378
+  },
+  "world/native/world-landing-world-74-20261010-v1.release.json": {
+    "sha256": "aea5e113ddec6d3240f20a8e95c990b89710fde7a5d92c19e994d0330d632a61",
+    "bytes": 227
+  },
+  "world/native/STAGE_SUMMARY.json": {
+    "sha256": "002f23dc60d5e29ca94ba8e79d7b41ae0051ca0ea2c504253152cb30d4d72a5e",
+    "bytes": 3290
+  },
+  "gate/native/final_stage_memory_v186.py": {
+    "sha256": "cab1553d06b141ae625da2bf498a415541755b8e7cec7a3b1bd3d48e5426c5dc",
+    "bytes": 10990
+  },
+  "gate/native/leased_stage_memory_v186.py": {
+    "sha256": "eb411818011964c4a96d6c9618604e9c55829eb054bf1a409ffc5d4587ca16c0",
+    "bytes": 5580
+  },
+  "gate/native/bounded_stage_memory_v186.py": {
+    "sha256": "8f84d21d43bdbd83e4c86c1132cfad2142f4f0209a95015caf94e7fb40e06a34",
+    "bytes": 16827
+  },
+  "gate/native/compile_job.py": {
+    "sha256": "ec5cd0c02bbbc71fe86b066b1eb7906648896f6443855c3b56ba03ba3a1b8c2e",
+    "bytes": 1665
+  },
+  "gate/native/COMPILE_REQUEST.json": {
+    "sha256": "faed6b1607cb3ec8616e6db944f517bbfb5c9a3e46fb521bdcb6ae2e6f811529",
+    "bytes": 912
+  },
+  "gate/native/SOURCE_NATIVE_INPUTS.json": {
+    "sha256": "014c26cd8f117912156f2baceb8def41debd48304b9d4eb71bfbc34a46c3899a",
+    "bytes": 46210
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.config.json": {
+    "sha256": "d989f2db17368a5b9bebb81adad683b2acd7bab879ef28c803b7f7e86a89bfad",
+    "bytes": 110456
+  },
+  "gate/native/joint-launcher.stdout": {
+    "sha256": "b60e93c49b37730620bff877ded544a72412366e50f8d867573c977ea9912c8c",
+    "bytes": 187
+  },
+  "gate/native/joint-launcher.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.external-lease.json": {
+    "sha256": "8653ab50e70a1e27feb2637a04b0f7d089727a25940ba5157b1bbc0f6ff1e1aa",
+    "bytes": 277
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.lease-identity.json": {
+    "sha256": "2c87c3d5f9e3b44e3399524e19f7e572ac317e8c0ae409e327ca913f74135f1b",
+    "bytes": 355
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.host-pressure.ndjson": {
+    "sha256": "46937d9c0da9185a6e7b83f7200f034abc11d07a58f4d1d976a44b25e3a001fe",
+    "bytes": 1766594
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.input_seal.json": {
+    "sha256": "e83fed62aed65d22c7dea4f0aa6829cde42b707e98d9251b4b10e4e59fe32ed1",
+    "bytes": 72832
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.memory-growth.ndjson": {
+    "sha256": "97d512946a495780e08ce4397e970edbb71f186778428f5eaa35bd17993debe7",
+    "bytes": 119787
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.stdout": {
+    "sha256": "353640c2fc1be75207c5cc0af5ae8822da1bc690d79246ae95756ae1cb587f5d",
+    "bytes": 956
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.memory-gate.json": {
+    "sha256": "bbd7b8980cc6bd3ee9e4a65c9a3d2845413edb7ca77b028cf5d59bbea3e5710d",
+    "bytes": 120
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.child-identity.json": {
+    "sha256": "01d2eec98421a4d5024c38ffcefcaafe15995b60fffb1224b1d6d5753d68dc44",
+    "bytes": 78
+  },
+  "gate/native/compiler.stdout": {
+    "sha256": "1a81b97596ef94f9c2feeeab8c92ffadebcdece2a0d6c951a9f629291f877739",
+    "bytes": 5987
+  },
+  "gate/native/compiler.stderr": {
+    "sha256": "b121264ec49fd8985149019ef7dbf6f40b3568cd1c0ceaf26229901f8b64606f",
+    "bytes": 365650
+  },
+  "gate/native/COMMAND_START.json": {
+    "sha256": "85271f581ed8965742c531840bb757e2f3cfa7acb596edb3c927146ffef38cca",
+    "bytes": 724
+  },
+  "gate/native/RESULT.json": {
+    "sha256": "92b61523c380e6172745376074d889a35bc694c4bc5d5d89d7f0611b8ccab4d1",
+    "bytes": 1052
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.system-floor.json": {
+    "sha256": "51a6ed6a508d60f24aec1c20dd42a3e14df626ded55e6e01c368f5cdc0edd161",
+    "bytes": 144638
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.quiescence.json": {
+    "sha256": "b8a8c97297882334fbd4ab2608ab8b9c550762717f94077b43d458d37a61d182",
+    "bytes": 130
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.output_seal.json": {
+    "sha256": "8510a7ac2d92062cb15476c06ba5751c76961a58b8f7a802355dfa2ed17a76f8",
+    "bytes": 136772
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.publication.json": {
+    "sha256": "59ec1f76c426985c62c77d8fc031b7ada76d4e1aef6876bb5008fb2675ae36d3",
+    "bytes": 2965
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.stage-quiescence.json": {
+    "sha256": "1feb611425db9481acc3b17206b92a495835dcf50a290e3044320019e57b87ea",
+    "bytes": 136
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.final.json": {
+    "sha256": "f11801be24bf6bc4c1d05e3e82c5383f9e26424086f18e07984d0b6191ecf913",
+    "bytes": 5457
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.unit-cleanup.json": {
+    "sha256": "f8b3ab1c2fff8a8f2f302de7b2e7d40ed8f1b11709122f264b02834782f03a4c",
+    "bytes": 693
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.acceptance.json": {
+    "sha256": "8d20245e997f90935b09b5a0e03fb5c4fdea309d087e25663ffe5e2e78c51e29",
+    "bytes": 378
+  },
+  "gate/native/world-landing-gate-74-20261010-v1.release.json": {
+    "sha256": "2acfa3a9b0b52459607e46a8535d0b62da9e8b3dca4a01ccbb9f365d7bf75b28",
+    "bytes": 227
+  },
+  "gate/native/STAGE_SUMMARY.json": {
+    "sha256": "3ff2a42ca41bf1f6f56d39b53cd169bbb51ef2afddec58360f96156433b7380f",
+    "bytes": 8058
+  },
+  "joint/__pycache__/run_joint.cpython-314.pyc": {
+    "sha256": "8e496cdfe93716fdd69e48c662a25597e7633e5f04e4671437117a16ce7b1f0b",
+    "bytes": 26795
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "files": {
+    "dormant-cbd41-native-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 8617,
+        "sha256": "c16f47241dd9e085fc10ce03df959219ace4474029f0d91b223545b9e8da231c"
+      },
+      "projected": {
+        "bytes": 8553,
+        "sha256": "2c26cb132ffee66b8f31e0ac88ee93c4803ca7e8c6c55df920f02dc54dcd576e"
+      },
+      "replaced": {
+        "<repository>": 2,
+        "<lean-toolchain>/": 0,
+        "<rustup>": 4,
+        "<cargo-home>": 2,
+        "<home>": 2
+      }
+    }
+  },
+  "placeholders": {
+    "<cargo-home>": "the host's Cargo home; the path that follows is kept",
+    "<home>": "the host user's home directory",
+    "<lean-toolchain>/": "the absolute host directory of the Lean 4.33.0 toolchain the check invoked; the path that follows is kept",
+    "<repository>": "the absolute host directory of the repository's main checkout; the path that follows (a tracked path, or a worktree or private run directory under .local/) is kept",
+    "<rustup>": "the host's rustup home; the toolchain path that follows is kept"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder, the longer prefixes first; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here; checked locally before commit. The originals stay in local custody."
+}

@@ -1,0 +1,1146 @@
+{
+  "source_commit": "c65cd8b8d94ec345227e1f80f1ae2918bf5bf1cd",
+  "source_tree": "292b5770a38292689d15d666235b5141f535e2e9",
+  "acceptance_passed": false,
+  "unique_fixture_count": 41,
+  "fixture_passes": 38,
+  "fixture_failures": 3,
+  "doc_passes": 57,
+  "checks_passed": [
+    "typecheck",
+    "workspace all-target check",
+    "fresh seven-target build",
+    "affected clippy",
+    "57doc tests"
+  ],
+  "source_edits": false,
+  "publication": false,
+  "leases_released": true,
+  "typecheck_receipt": ".local/ask-typecheck-native-20261009/native/VALIDATION.json",
+  "original_negative": "world_ask.rs:361 retained family asks Some(FewerThanTwoKeys)",
+  "coverage_negatives": "world_ask_coverage.rs:618 a candidate wave; first crossing eliminated[1,2]",
+  "developer_feedback_is_separate": true,
+  "joint_release": {
+    "released": true,
+    "quiescence_confirmed": true,
+    "device": 55,
+    "inode": 55954599,
+    "UTC": "2026-10-09T22:37:25.803739+00:00"
+  },
+  "full_receipt": ".local/ask-successor-native-20261009/VALIDATION.json",
+  "full_receipt_hash": {
+    "SHA256": "f48db118cd2d6058843de3cb39e7790499a19adfa799d77160da776f8415df11",
+    "bytes": 53063
+  },
+  "raw_manifest": ".local/ask-successor-native-20261009/FILE_HASHES.json",
+  "raw_manifest_hash": {
+    "SHA256": "4bcab2f85bf7bb4b53930c8eaf425d3d8c3e1a52a5cd173fbae673370db65351",
+    "bytes": 92423
+  },
+  "stage_results": [
+    {
+      "kind": "build",
+      "command_exit": 0,
+      "passed": true,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 59751701828,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              19,
+              1
+            ],
+            [
+              761,
+              1
+            ],
+            [
+              11353,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 117356254000,
+          "prime_factorization": [
+            [
+              2,
+              4
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              58678127,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 2152540,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              17,
+              1
+            ],
+            [
+              487,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 2404626432,
+          "prime_factorization": [
+            [
+              2,
+              12
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              15053,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/build/native"
+    },
+    {
+      "kind": "check",
+      "command_exit": 0,
+      "passed": true,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 31347313300,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              5,
+              2
+            ],
+            [
+              313473133,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 61717683000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              31,
+              1
+            ],
+            [
+              663631,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 1532232,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              1637,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 1732378624,
+          "prime_factorization": [
+            [
+              2,
+              17
+            ],
+            [
+              13217,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/check/native"
+    },
+    {
+      "kind": "clippy",
+      "command_exit": 0,
+      "passed": true,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 11565846991,
+          "prime_factorization": [
+            [
+              19,
+              1
+            ],
+            [
+              18097,
+              1
+            ],
+            [
+              33637,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 23730630000,
+          "prime_factorization": [
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              5,
+              4
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              10273,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 965768,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              120721,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 1223606272,
+          "prime_factorization": [
+            [
+              2,
+              14
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              47,
+              1
+            ],
+            [
+              227,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/clippy/native"
+    },
+    {
+      "kind": "coverage-moving",
+      "command_exit": 0,
+      "passed": true,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 15463728158,
+          "prime_factorization": [
+            [
+              2,
+              1
+            ],
+            [
+              3209,
+              1
+            ],
+            [
+              2409431,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 15585279000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              1051,
+              1
+            ],
+            [
+              4943,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 20352,
+          "prime_factorization": [
+            [
+              2,
+              7
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              53,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 66240512,
+          "prime_factorization": [
+            [
+              2,
+              14
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              311,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/coverage-moving/native"
+    },
+    {
+      "kind": "coverage-partition",
+      "command_exit": 101,
+      "passed": false,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 2864251501,
+          "prime_factorization": [
+            [
+              19,
+              1
+            ],
+            [
+              103,
+              1
+            ],
+            [
+              241,
+              1
+            ],
+            [
+              6073,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 3048328000,
+          "prime_factorization": [
+            [
+              2,
+              6
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              23,
+              1
+            ],
+            [
+              16567,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 20212,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              31,
+              1
+            ],
+            [
+              163,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 62382080,
+          "prime_factorization": [
+            [
+              2,
+              13
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              1523,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/coverage-partition/native"
+    },
+    {
+      "kind": "coverage-tie",
+      "command_exit": 101,
+      "passed": false,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 4054709530,
+          "prime_factorization": [
+            [
+              2,
+              1
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              29,
+              1
+            ],
+            [
+              109,
+              1
+            ],
+            [
+              128273,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 4222187000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              181,
+              1
+            ],
+            [
+              23327,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 20268,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              563,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 59531264,
+          "prime_factorization": [
+            [
+              2,
+              13
+            ],
+            [
+              13,
+              2
+            ],
+            [
+              43,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/coverage-tie/native"
+    },
+    {
+      "kind": "doc",
+      "command_exit": 0,
+      "passed": true,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 39523330092,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              19,
+              1
+            ],
+            [
+              31,
+              1
+            ],
+            [
+              157,
+              1
+            ],
+            [
+              35617,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 78548924000,
+          "prime_factorization": [
+            [
+              2,
+              5
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              67,
+              1
+            ],
+            [
+              293093,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 1716920,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              42923,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 2033242112,
+          "prime_factorization": [
+            [
+              2,
+              12
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              45127,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/doc/native"
+    },
+    {
+      "kind": "regression-guards",
+      "command_exit": 0,
+      "passed": true,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 678830641,
+          "prime_factorization": [
+            [
+              3623,
+              1
+            ],
+            [
+              187367,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 904646000,
+          "prime_factorization": [
+            [
+              2,
+              4
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              383,
+              1
+            ],
+            [
+              1181,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 31036,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              7759,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 109203456,
+          "prime_factorization": [
+            [
+              2,
+              12
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              8887,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/regression-guards/native"
+    },
+    {
+      "kind": "regression-native-action-return",
+      "command_exit": 0,
+      "passed": true,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 1482307926,
+          "prime_factorization": [
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              727,
+              1
+            ],
+            [
+              30893,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 1657634000,
+          "prime_factorization": [
+            [
+              2,
+              4
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              75347,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 20396,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              5099,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 65777664,
+          "prime_factorization": [
+            [
+              2,
+              12
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              53,
+              1
+            ],
+            [
+              101,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/regression-native-action-return/native"
+    },
+    {
+      "kind": "regression-physical-action",
+      "command_exit": 0,
+      "passed": true,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 536718115,
+          "prime_factorization": [
+            [
+              5,
+              1
+            ],
+            [
+              37,
+              1
+            ],
+            [
+              149,
+              1
+            ],
+            [
+              19471,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 700711000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              11,
+              2
+            ],
+            [
+              5791,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 20380,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              1019,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 53673984,
+          "prime_factorization": [
+            [
+              2,
+              16
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              7,
+              1
+            ],
+            [
+              13,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/regression-physical-action/native"
+    },
+    {
+      "kind": "regression-physical-ask",
+      "command_exit": 0,
+      "passed": true,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 4801416855,
+          "prime_factorization": [
+            [
+              3,
+              1
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              320094457,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 4951729000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              4951729,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 20392,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              2549,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 66387968,
+          "prime_factorization": [
+            [
+              2,
+              16
+            ],
+            [
+              1013,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/regression-physical-ask/native"
+    },
+    {
+      "kind": "regression-world-model",
+      "command_exit": 0,
+      "passed": true,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 37139222961,
+          "prime_factorization": [
+            [
+              3,
+              2
+            ],
+            [
+              1847,
+              1
+            ],
+            [
+              2234207,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 37194097000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              43,
+              1
+            ],
+            [
+              864979,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 20228,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              13,
+              1
+            ],
+            [
+              389,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 69398528,
+          "prime_factorization": [
+            [
+              2,
+              12
+            ],
+            [
+              16943,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/regression-world-model/native"
+    },
+    {
+      "kind": "runtime-original",
+      "command_exit": 101,
+      "passed": false,
+      "exact_readings": {
+        "wall_ns": {
+          "integer": 10875602846,
+          "prime_factorization": [
+            [
+              2,
+              1
+            ],
+            [
+              41,
+              1
+            ],
+            [
+              4703,
+              1
+            ],
+            [
+              28201,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 10986441000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              137,
+              1
+            ],
+            [
+              26731,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 18924,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              19,
+              1
+            ],
+            [
+              83,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 23126016,
+          "prime_factorization": [
+            [
+              2,
+              13
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              941,
+              1
+            ]
+          ]
+        }
+      },
+      "native_receipt": ".local/ask-successor-native-20261009/runtime-original/native"
+    }
+  ]
+}

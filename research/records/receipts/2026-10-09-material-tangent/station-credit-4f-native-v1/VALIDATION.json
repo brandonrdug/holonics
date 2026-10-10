@@ -1,0 +1,1012 @@
+{
+  "schema": "bounded_native_validation_v1",
+  "UTC": "2026-10-09T23:40:29.394146+00:00",
+  "whole_stdout_stderr_preserved": true,
+  "source_edits_by_validator": false,
+  "no_publication": true,
+  "all_leases_released": true,
+  "lease_device": 55,
+  "lease_inode": 55954599,
+  "joint_plan": {
+    "reservation_bytes": 8229851136,
+    "combined_cap_bytes": 8589934592,
+    "largest_measured_affected_Lean_charged_bytes": 4300443648,
+    "largest_measured_Rust_charged_bytes": 2855665664,
+    "largest_measured_metadata_bytes": 1073741824,
+    "sum_estimated_peaks_bytes": 8229851136,
+    "CPU_budgets": {
+      "rust": 1,
+      "lean": 1
+    },
+    "partition": "Two remaining never-executed Rust commands plus six never-executed Lean commands; exact separate pins and disjoint target-dev / fresh objects; prior tangentPASS retained without rerun; previous wrapper refusals preserved.",
+    "time_windows_observation_only": true,
+    "unchanged_gate_command_not_rerun": true
+  },
+  "joint_admission": {
+    "UTC": "2026-10-09T23:36:06.330207+00:00",
+    "MemAvailable_bytes": 12262477824,
+    "PSI": "some avg10=0.00 avg60=0.23 avg300=0.57 total=923670281\nfull avg10=0.00 avg60=0.22 avg300=0.56 total=792697023\n",
+    "plan": {
+      "reservation_bytes": 8229851136,
+      "combined_cap_bytes": 8589934592,
+      "largest_measured_affected_Lean_charged_bytes": 4300443648,
+      "largest_measured_Rust_charged_bytes": 2855665664,
+      "largest_measured_metadata_bytes": 1073741824,
+      "sum_estimated_peaks_bytes": 8229851136,
+      "CPU_budgets": {
+        "rust": 1,
+        "lean": 1
+      },
+      "partition": "Two remaining never-executed Rust commands plus six never-executed Lean commands; exact separate pins and disjoint target-dev / fresh objects; prior tangentPASS retained without rerun; previous wrapper refusals preserved.",
+      "time_windows_observation_only": true,
+      "unchanged_gate_command_not_rerun": true
+    },
+    "lease": {
+      "device": 55,
+      "inode": 55954599,
+      "controller_PID": 1006091,
+      "fd": 3,
+      "start_ticks": "26118166",
+      "requested_absolute_path": "<repository>/.local/codex-lean-run.lock",
+      "joint_batch": true
+    }
+  },
+  "joint_release": {
+    "released": true,
+    "quiescence_confirmed": true,
+    "device": 55,
+    "inode": 55954599,
+    "UTC": "2026-10-09T23:38:59.075486+00:00"
+  },
+  "source_claim_separate_from_admission": true,
+  "source_commit": "4f248fac4d0ecec46161d0395e5d59d5e8a2939f",
+  "source_tree": "89c32babb790bb8111de964a8c4378611a593f75",
+  "clean_validation_worktree": "<repository>/.local/wt/station-credit-validation-4f-20261009",
+  "passed_remaining_three_commands": true,
+  "gate_command_passed": true,
+  "gate_admission_complete": false,
+  "entire_gate_clean_pass_claim": false,
+  "gate_incompleteness": "Unregistered implementer Lean developer reads overlapped gate; useful command completed; compiler concurrency flag remains. Gate not rerun.",
+  "original_gate": {
+    "kind": "gate",
+    "label": "station-credit-gate-4f-20261009-v1",
+    "native": "<repository>/.local/station-credit-native-20261009/gate/native",
+    "expected_tests": null,
+    "passed": false,
+    "command_result": {
+      "target": "station-credit gate",
+      "argv": [
+        "/usr/bin/env",
+        "-i",
+        "PATH=<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/:/usr/bin:/opt/cuda/bin",
+        "HOME=<home>",
+        "CARGO_HOME=<cargo-home>",
+        "CARGO_TARGET_DIR=<repository>/.local/wt/contact-tangent-20261009/.local/target-dev",
+        "LANG=C",
+        "LC_ALL=C",
+        "RAYON_NUM_THREADS=1",
+        "CARGO_BUILD_JOBS=1",
+        "RUSTFLAGS=",
+        "RUSTDOCFLAGS=",
+        "CARGO_ENCODED_RUSTFLAGS=",
+        "NVCC=/opt/cuda/bin/nvcc",
+        "CARGO_NET_OFFLINE=true",
+        "/bin/bash",
+        "tools/gate.sh"
+      ],
+      "cwd": "<repository>/.local/wt/contact-tangent-20261009",
+      "exit": 0,
+      "command_wall_ns": 147465443450,
+      "kernel_command_passed": true,
+      "expected_command_exit": true,
+      "diagnostic_lines": [],
+      "whole_stdout_SHA256": "1b50ba3f29a1f71b757e3dd5a39e7f2dadeda22f16db0df5a6b889d604c531ed",
+      "whole_stderr_SHA256": "c4f7fadd8c0959932c1ccefdbd4a5642c4e72ca6b30e753c99bcadb6be314313",
+      "source_not_edited": true
+    },
+    "test_count": 57,
+    "actual_test_names": [
+      "crates/holonics/src/compression/keys/repair.rs - compression::keys::repair::DamagedPassage (line 135) - compile fail",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 101) - compile fail",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 112)",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 123)",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 15) - compile fail",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 181)",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 250)",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 28) - compile fail",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 40) - compile fail",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 51) - compile fail",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 65) - compile",
+      "crates/holonics/src/exterior_guards.rs - exterior_guards (line 85) - compile fail",
+      "crates/holonics/src/hnn/constitution.rs - hnn::constitution (line 13) - compile fail",
+      "crates/holonics/src/hnn/constitution.rs - hnn::constitution::Constitution::with_element (line 4558) - compile fail",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1042) - compile fail",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1049) - compile fail",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1057) - compile fail",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1066) - compile fail",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1073) - compile fail",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1080) - compile fail",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1088) - compile fail",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1099)",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 970) - compile fail",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 977) - compile fail",
+      "crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 985) - compile fail",
+      "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2512) - compile fail",
+      "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2519) - compile fail",
+      "crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2528) - compile fail",
+      "crates/holonics/src/hnn/field.rs - hnn::field::Field::selective_step (line 1524) - compile fail",
+      "crates/holonics/src/hnn/field.rs - hnn::field::Field::selective_step (line 1532) - compile fail",
+      "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 222) - compile fail",
+      "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 230) - compile fail",
+      "crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 240)",
+      "crates/holonics/src/hnn/field.rs - hnn::field::RingDeclaration (line 344) - compile fail",
+      "crates/holonics/src/hnn/keys.rs - hnn::keys::locate_keys (line 376) - compile fail",
+      "crates/holonics/src/hnn/keys.rs - hnn::keys::station_pairs (line 459) - compile fail",
+      "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment (line 1301) - compile fail",
+      "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment::ingest (line 1401) - compile fail",
+      "crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment::ingest (line 1408) - compile fail",
+      "crates/holonics/src/hnn/pending.rs - hnn::pending (line 29) - compile fail",
+      "crates/holonics/src/hnn/pending.rs - hnn::pending (line 45) - compile fail",
+      "crates/holonics/src/hnn/port.rs - hnn::port (line 52) - compile fail",
+      "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 595) - compile fail",
+      "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 602) - compile fail",
+      "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 609) - compile fail",
+      "crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 617) - compile fail",
+      "crates/holonics/src/hnn/prediction.rs - hnn::prediction::CurrentSourceReceivingReturn (line 3227) - compile fail",
+      "crates/holonics/src/hnn/ratio.rs - hnn::ratio::RatioCovector (line 621) - compile fail",
+      "crates/holonics/src/hnn/word.rs - hnn::word (line 89) - compile fail",
+      "crates/holonics/src/hnn/word.rs - hnn::word (line 98) - compile fail",
+      "crates/holonics/src/physics/wave/chain.rs - physics::wave::chain::WaveChain::return_material (line 633) - compile fail",
+      "crates/holonics/src/receiver/population.rs - receiver::population::Emitters (line 629) - compile fail",
+      "crates/holonics/src/receiver/population.rs - receiver::population::Family (line 496) - compile fail",
+      "crates/holonics/src/receiver/population.rs - receiver::population::Family (line 516) - compile fail",
+      "crates/holonics/src/receiver/population/composition.rs - receiver::population::composition::Keystone (line 107) - compile fail",
+      "crates/holonics/src/receiver/population/composition.rs - receiver::population::composition::PortReader (line 197) - compile fail",
+      "crates/holonics/src/receiver/population/dormancy.rs - receiver::population::dormancy::Layered (line 86) - compile fail"
+    ],
+    "declared_conformance": true,
+    "whole_group_CPU_ns": 146400574000,
+    "child_RSS_KiB": 1691028,
+    "charged_peak_bytes": "2097659904",
+    "resource_integrity": false,
+    "source_clean_unchanged_after": true,
+    "release": {
+      "released_after_final_publication_and_owned_unit_cleanup": true,
+      "quiescence_confirmed": true,
+      "external_controller_PID": 971802,
+      "monotonic_ns": 260190847283913
+    },
+    "executables": {},
+    "stdout": {
+      "sha256": "1b50ba3f29a1f71b757e3dd5a39e7f2dadeda22f16db0df5a6b889d604c531ed",
+      "bytes": 5987
+    },
+    "stderr": {
+      "sha256": "c4f7fadd8c0959932c1ccefdbd4a5642c4e72ca6b30e753c99bcadb6be314313",
+      "bytes": 365005
+    },
+    "peak_child_RSS_KiB": 1691028,
+    "charged_group_peak_bytes": "2097659904",
+    "window_ns": 180000000000,
+    "exact_readings": {
+      "command_wall_ns": {
+        "integer": 147465443450,
+        "prime_factorization": [
+          [
+            2,
+            1
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            17,
+            2
+          ],
+          [
+            785017,
+            1
+          ]
+        ]
+      },
+      "whole_group_CPU_ns": {
+        "integer": 146400574000,
+        "prime_factorization": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            2797,
+            1
+          ],
+          [
+            26171,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 1691028,
+        "prime_factorization": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            107,
+            1
+          ],
+          [
+            439,
+            1
+          ]
+        ]
+      },
+      "charged_group_peak_bytes": {
+        "integer": 2097659904,
+        "prime_factorization": [
+          [
+            2,
+            14
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            42677,
+            1
+          ]
+        ]
+      },
+      "observation_window_ns": {
+        "integer": 180000000000,
+        "prime_factorization": [
+          [
+            2,
+            11
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            5,
+            10
+          ]
+        ]
+      }
+    },
+    "wall_to_observation_window": {
+      "numerator": 147465443450,
+      "denominator": 180000000000
+    }
+  },
+  "stages": [
+    {
+      "kind": "tangent",
+      "source_commit": "4f248fac4d0ecec46161d0395e5d59d5e8a2939f",
+      "source_tree": "89c32babb790bb8111de964a8c4378611a593f75",
+      "source_clean_unchanged_after": true,
+      "command_result": {
+        "target": "station-credit tangent",
+        "argv": [
+          "/usr/bin/env",
+          "-i",
+          "PATH=<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/:/usr/bin:/opt/cuda/bin",
+          "HOME=<home>",
+          "CARGO_HOME=<cargo-home>",
+          "CARGO_TARGET_DIR=<repository>/.local/wt/contact-tangent-20261009/.local/target-dev",
+          "LANG=C",
+          "LC_ALL=C",
+          "RAYON_NUM_THREADS=1",
+          "CARGO_BUILD_JOBS=1",
+          "RUSTFLAGS=",
+          "RUSTDOCFLAGS=",
+          "CARGO_ENCODED_RUSTFLAGS=",
+          "NVCC=/opt/cuda/bin/nvcc",
+          "CARGO_NET_OFFLINE=true",
+          "<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "-p",
+          "holonics",
+          "--offline",
+          "--locked",
+          "-j1",
+          "--test",
+          "material_tangent_world",
+          "--",
+          "--test-threads=1",
+          "--nocapture"
+        ],
+        "cwd": "<repository>/.local/wt/station-credit-validation-4f-20261009",
+        "exit": 0,
+        "command_wall_ns": 83675733502,
+        "kernel_command_passed": true,
+        "expected_command_exit": true,
+        "diagnostic_lines": [],
+        "whole_stdout_SHA256": "7f603cb566b715f084d79d7928f104fe11ec80b81218e4c28d3b43238eed3269",
+        "whole_stderr_SHA256": "a65961f0f5e9a903ae42f35a5d55fd27ec713d477e35013cac17e5a96f011ab2",
+        "source_not_edited": true
+      },
+      "controller_exit": 0,
+      "acceptance": {
+        "passed": true,
+        "final_CPU_receipt": {
+          "sha256": "87be2c98f793261c8682e0c3a649f9deaeb438b6b425a8d37b77d4055f25c8be",
+          "bytes": 5537
+        },
+        "cleanup_receipt": {
+          "sha256": "e186818259bec6652c731a45f502dc95e8ab07da7ee94ef362b6572c2722d06c",
+          "bytes": 701
+        },
+        "lease_still_held": true,
+        "scientific_job": false,
+        "requires_matching_release_receipt": true
+      },
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "joint_global_lease_remains_held_by_batch": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 986432,
+        "monotonic_ns": 261088348176491
+      },
+      "resource_integrity": true,
+      "conformance": true,
+      "passed": true,
+      "whole_group_CPU_ns": 83518599000,
+      "peak_child_RSS_KiB": 1720876,
+      "charged_group_peak_bytes": "2077413376",
+      "window_ns": 180000000000,
+      "time_window_is_observation_only": true,
+      "stdout": {
+        "sha256": "7f603cb566b715f084d79d7928f104fe11ec80b81218e4c28d3b43238eed3269",
+        "bytes": 5433
+      },
+      "stderr": {
+        "sha256": "a65961f0f5e9a903ae42f35a5d55fd27ec713d477e35013cac17e5a96f011ab2",
+        "bytes": 1559
+      },
+      "test_counts": [
+        [
+          "3",
+          "0"
+        ]
+      ],
+      "passed_test_names": [
+        "a_teaching_encounter_is_refused_until_the_world_is_located",
+        "the_encounters_comparison_is_credited_through_the_world",
+        "the_world_sensitive_tangent_is_the_actual_worlds_derivative"
+      ],
+      "actual_passed_tests": 3,
+      "receipt_conformance_reconciliation": {
+        "passed": true,
+        "conformance": true,
+        "passed_test_names": [
+          "a_teaching_encounter_is_refused_until_the_world_is_located",
+          "the_encounters_comparison_is_credited_through_the_world",
+          "the_world_sensitive_tangent_is_the_actual_worlds_derivative"
+        ],
+        "raw_stdout_SHA256": "7f603cb566b715f084d79d7928f104fe11ec80b81218e4c28d3b43238eed3269",
+        "original_summary": "<repository>/.local/station-credit-native-20261009/tangent/native/STAGE_SUMMARY.json",
+        "original_parser_defect": "--nocapture logs separate status ok from two test-name lines; prior parser recognized only inline ok",
+        "no_native_rerun": true,
+        "source_commit": "4f248fac4d0ecec46161d0395e5d59d5e8a2939f",
+        "source_tree": "89c32babb790bb8111de964a8c4378611a593f75",
+        "wall_ns": 83675733502,
+        "whole_group_CPU_ns": 83518599000,
+        "peak_child_RSS_KiB": 1720876,
+        "charged_group_peak_bytes": "2077413376"
+      },
+      "exact_readings": {
+        "command_wall_ns": {
+          "integer": 83675733502,
+          "prime_factorization": [
+            [
+              2,
+              1
+            ],
+            [
+              41837866751,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 83518599000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              41,
+              1
+            ],
+            [
+              43,
+              1
+            ],
+            [
+              15791,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 1720876,
+          "prime_factorization": [
+            [
+              2,
+              2
+            ],
+            [
+              17,
+              1
+            ],
+            [
+              25307,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 2077413376,
+          "prime_factorization": [
+            [
+              2,
+              12
+            ],
+            [
+              29,
+              1
+            ],
+            [
+              17489,
+              1
+            ]
+          ]
+        },
+        "observation_window_ns": {
+          "integer": 180000000000,
+          "prime_factorization": [
+            [
+              2,
+              11
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              5,
+              10
+            ]
+          ]
+        }
+      },
+      "wall_to_observation_window": {
+        "numerator": 83675733502,
+        "denominator": 180000000000
+      }
+    },
+    {
+      "kind": "consumers",
+      "source_commit": "4f248fac4d0ecec46161d0395e5d59d5e8a2939f",
+      "source_tree": "89c32babb790bb8111de964a8c4378611a593f75",
+      "source_clean_unchanged_after": true,
+      "command_result": {
+        "target": "station-credit consumers",
+        "argv": [
+          "/usr/bin/env",
+          "-i",
+          "PATH=<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/:/usr/bin:/opt/cuda/bin",
+          "HOME=<home>",
+          "CARGO_HOME=<cargo-home>",
+          "CARGO_TARGET_DIR=<repository>/.local/wt/contact-tangent-20261009/.local/target-dev",
+          "LANG=C",
+          "LC_ALL=C",
+          "RAYON_NUM_THREADS=1",
+          "CARGO_BUILD_JOBS=1",
+          "RUSTFLAGS=",
+          "RUSTDOCFLAGS=",
+          "CARGO_ENCODED_RUSTFLAGS=",
+          "NVCC=/opt/cuda/bin/nvcc",
+          "CARGO_NET_OFFLINE=true",
+          "<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "-p",
+          "holonics",
+          "--offline",
+          "--locked",
+          "-j1",
+          "--test",
+          "world_model",
+          "--test",
+          "physical_ask",
+          "--test",
+          "physical_action",
+          "--test",
+          "native_action_return",
+          "--",
+          "--test-threads=1"
+        ],
+        "cwd": "<repository>/.local/wt/station-credit-validation-4f-20261009",
+        "exit": 0,
+        "command_wall_ns": 55198571079,
+        "kernel_command_passed": true,
+        "expected_command_exit": true,
+        "diagnostic_lines": [],
+        "whole_stdout_SHA256": "f4b1d47397aeea58f451e253f456a880f522be2a2f9c59a1950ddd864332ba0a",
+        "whole_stderr_SHA256": "7ffc61e0a7af94813bebac56dcebb4f6651ed0fba08e38d17d2ad1aa1a3e00b6",
+        "source_not_edited": true
+      },
+      "controller_exit": 0,
+      "acceptance": {
+        "passed": true,
+        "final_CPU_receipt": {
+          "sha256": "8fbf1e96ff89102316cf704c56803b7f2fc2709704a8fdbd83749758d28c454a",
+          "bytes": 5598
+        },
+        "cleanup_receipt": {
+          "sha256": "91797726dd357e7a826cbda87bcda41e94f930abc20397237f0d8156c9c7780a",
+          "bytes": 705
+        },
+        "lease_still_held": true,
+        "scientific_job": false,
+        "requires_matching_release_receipt": true
+      },
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "joint_global_lease_remains_held_by_batch": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 1006320,
+        "monotonic_ns": 261238175212255
+      },
+      "resource_integrity": true,
+      "conformance": true,
+      "passed": true,
+      "whole_group_CPU_ns": 55213181000,
+      "peak_child_RSS_KiB": 746064,
+      "charged_group_peak_bytes": "1860517888",
+      "window_ns": 180000000000,
+      "time_window_is_observation_only": true,
+      "stdout": {
+        "sha256": "f4b1d47397aeea58f451e253f456a880f522be2a2f9c59a1950ddd864332ba0a",
+        "bytes": 3091
+      },
+      "stderr": {
+        "sha256": "7ffc61e0a7af94813bebac56dcebb4f6651ed0fba08e38d17d2ad1aa1a3e00b6",
+        "bytes": 1883
+      },
+      "test_counts": [
+        [
+          "4",
+          "0"
+        ],
+        [
+          "4",
+          "0"
+        ],
+        [
+          "11",
+          "0"
+        ],
+        [
+          "11",
+          "0"
+        ]
+      ],
+      "passed_test_names": [
+        "a_held_preimage_or_foreign_clock_changes_neither_actual_participant",
+        "actual_prior_world_history_changes_native_carry_and_matched_later_choice",
+        "an_actual_world_face_changes_r_then_the_later_native_prospect",
+        "paired_actual_faces_keep_mass_phase_and_unobserved_regions",
+        "a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obstruction",
+        "a_unique_preparation_uses_the_full_loaded_opening_and_actual_pump_clock",
+        "an_unconstrained_request_retains_the_whole_control_domain",
+        "the_current_receiving_material_changes_the_prospect_and_stale_producing_words_refuse",
+        "a_control_of_the_wrong_shape_is_refused_before_either_participant_moves",
+        "a_control_outside_its_declaration_is_refused_before_either_participant_moves",
+        "a_native_feature_read_compares_exactly_one_declared_station",
+        "a_preparation_without_full_column_rank_or_beyond_its_capacity_is_refused",
+        "absorbing_the_receipt_contracts_the_leverage_at_the_probed_feature_while_the_frozen_twin_is_unchanged",
+        "after_one_deposited_encounter_the_retained_family_separates_waves_and_asks",
+        "before_any_reading_the_family_is_one_member_and_the_probe_holds_with_its_reason",
+        "successive_probes_run_on_one_receiver_and_one_world_and_each_is_actually_received",
+        "the_admitted_waves_are_the_exact_work_sublevel_lattice_in_lexicographic_order",
+        "the_asked_wave_executes_one_actual_encounter_and_the_receipt_is_absorbed",
+        "the_native_feature_is_what_the_receiving_read_multiplies_and_it_matches_the_request_path_and_a_forward_perturbation",
+        "a_disconnected_key_is_eliminated_only_by_its_exact_annihilator",
+        "a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not",
+        "a_non_passive_key_is_held_at_its_certified_cut_while_the_tick_advances",
+        "a_prospect_is_refused_without_a_world_model_and_moves_no_participant",
+        "an_interrupted_encounter_is_absorbed_through_its_executed_steps_without_rollback",
+        "binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame",
+        "retained_world_history_fixes_the_next_reading_that_its_state_only_control_leaves_open",
+        "the_resident_charges_the_models_current_bits_at_every_encounter",
+        "the_return_image_separates_the_free_and_forced_responses_and_holds_the_actual_returns",
+        "the_world_key_reproduces_every_actual_step_and_its_fibre_is_the_batch_preimage",
+        "the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs"
+      ],
+      "actual_passed_tests": 30,
+      "exact_readings": {
+        "command_wall_ns": {
+          "integer": 55198571079,
+          "prime_factorization": [
+            [
+              3,
+              1
+            ],
+            [
+              23,
+              1
+            ],
+            [
+              569,
+              1
+            ],
+            [
+              1405939,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 55213181000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              4217,
+              1
+            ],
+            [
+              13093,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 746064,
+          "prime_factorization": [
+            [
+              2,
+              4
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              157,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 1860517888,
+          "prime_factorization": [
+            [
+              2,
+              14
+            ],
+            [
+              113557,
+              1
+            ]
+          ]
+        },
+        "observation_window_ns": {
+          "integer": 180000000000,
+          "prime_factorization": [
+            [
+              2,
+              11
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              5,
+              10
+            ]
+          ]
+        }
+      },
+      "wall_to_observation_window": {
+        "numerator": 55198571079,
+        "denominator": 180000000000
+      }
+    },
+    {
+      "kind": "material-lib",
+      "source_commit": "4f248fac4d0ecec46161d0395e5d59d5e8a2939f",
+      "source_tree": "89c32babb790bb8111de964a8c4378611a593f75",
+      "source_clean_unchanged_after": true,
+      "command_result": {
+        "target": "station-credit material-lib",
+        "argv": [
+          "/usr/bin/env",
+          "-i",
+          "PATH=<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/:/usr/bin:/opt/cuda/bin",
+          "HOME=<home>",
+          "CARGO_HOME=<cargo-home>",
+          "CARGO_TARGET_DIR=<repository>/.local/wt/contact-tangent-20261009/.local/target-dev",
+          "LANG=C",
+          "LC_ALL=C",
+          "RAYON_NUM_THREADS=1",
+          "CARGO_BUILD_JOBS=1",
+          "RUSTFLAGS=",
+          "RUSTDOCFLAGS=",
+          "CARGO_ENCODED_RUSTFLAGS=",
+          "NVCC=/opt/cuda/bin/nvcc",
+          "CARGO_NET_OFFLINE=true",
+          "<rustup>/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "-p",
+          "holonics",
+          "--lib",
+          "--offline",
+          "--locked",
+          "-j1",
+          "material_tangent",
+          "--",
+          "--test-threads=1"
+        ],
+        "cwd": "<repository>/.local/wt/station-credit-validation-4f-20261009",
+        "exit": 0,
+        "command_wall_ns": 116022238203,
+        "kernel_command_passed": true,
+        "expected_command_exit": true,
+        "diagnostic_lines": [],
+        "whole_stdout_SHA256": "252e582f3e62dbb3fe85e96a312eb45f061e01ee76508a7ccd05a4d1bbaa8561",
+        "whole_stderr_SHA256": "f882455ac96f7838dde1db89b511420db6350028add1c426384bd8525ae0769a",
+        "source_not_edited": true
+      },
+      "controller_exit": 0,
+      "acceptance": {
+        "passed": true,
+        "final_CPU_receipt": {
+          "sha256": "2ea268eb1d2ad1cf89bf7fd8c7257dd81325d670c88e83d716475aeb2d89bc43",
+          "bytes": 5700
+        },
+        "cleanup_receipt": {
+          "sha256": "1c9f14bfc4c993b665477175b4811f9a5f31136427e7e3b60b62b75191a7e5d2",
+          "bytes": 711
+        },
+        "lease_still_held": true,
+        "scientific_job": false,
+        "requires_matching_release_receipt": true
+      },
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "joint_global_lease_remains_held_by_batch": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 1007790,
+        "monotonic_ns": 261354930797647
+      },
+      "resource_integrity": true,
+      "conformance": true,
+      "passed": true,
+      "whole_group_CPU_ns": 115788509000,
+      "peak_child_RSS_KiB": 2651864,
+      "charged_group_peak_bytes": "2814984192",
+      "window_ns": 180000000000,
+      "time_window_is_observation_only": true,
+      "stdout": {
+        "sha256": "252e582f3e62dbb3fe85e96a312eb45f061e01ee76508a7ccd05a4d1bbaa8561",
+        "bytes": 312
+      },
+      "stderr": {
+        "sha256": "f882455ac96f7838dde1db89b511420db6350028add1c426384bd8525ae0769a",
+        "bytes": 827
+      },
+      "test_counts": [
+        [
+          "2",
+          "0"
+        ]
+      ],
+      "passed_test_names": [
+        "hnn::tests::material_tangent::the_material_tangent_crosses_into_the_next_opening",
+        "hnn::tests::material_tangent::the_material_tangent_is_the_exact_derivative_of_its_passage"
+      ],
+      "actual_passed_tests": 2,
+      "exact_readings": {
+        "command_wall_ns": {
+          "integer": 116022238203,
+          "prime_factorization": [
+            [
+              3,
+              1
+            ],
+            [
+              38674079401,
+              1
+            ]
+          ]
+        },
+        "whole_group_CPU_ns": {
+          "integer": 115788509000,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              23,
+              1
+            ],
+            [
+              5034283,
+              1
+            ]
+          ]
+        },
+        "peak_child_RSS_KiB": {
+          "integer": 2651864,
+          "prime_factorization": [
+            [
+              2,
+              3
+            ],
+            [
+              17,
+              2
+            ],
+            [
+              31,
+              1
+            ],
+            [
+              37,
+              1
+            ]
+          ]
+        },
+        "charged_group_peak_bytes": {
+          "integer": 2814984192,
+          "prime_factorization": [
+            [
+              2,
+              14
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              57271,
+              1
+            ]
+          ]
+        },
+        "observation_window_ns": {
+          "integer": 180000000000,
+          "prime_factorization": [
+            [
+              2,
+              11
+            ],
+            [
+              3,
+              2
+            ],
+            [
+              5,
+              10
+            ]
+          ]
+        }
+      },
+      "wall_to_observation_window": {
+        "numerator": 116022238203,
+        "denominator": 180000000000
+      }
+    }
+  ],
+  "comparison_direction_series": {
+    "magnitude": "-64755185281220728356306752118421/1653762184184171186983767755401215",
+    "produced_phase": "-914875189653770898976757728659957880709962755177820785847/1221379757119592388918679424729096485133856354254334120720000",
+    "observed_phase": "-1030311615520370432324823899374293700891018333/918025099461529547617636549641039787731525672000",
+    "sum": "-1119130948239490379565646659706862693118655479091995800090953/27277481242337563352517173818949821501322791911680128696080000",
+    "carry": "Not a margin/class prediction; directional comparison series. Five exact central residual readings for each term are preserved whole in tangent/compiler.stdout."
+  },
+  "scope": "Material/World derivative and station comparison contraction at fixed decoder/frame/clock. Finite ladder epsilon2^-4 through2^-8, exact per-part contraction and scaled residual bounds; observer phase nonzero; World refusal before teaching without located key.",
+  "not_established": [
+    "comparison_credit consumed by contact-factor landing",
+    "World psi retained across later encounter",
+    "post-deposition momentum correction",
+    "next Ask changed by credited constitution",
+    "product/full learning acceptance"
+  ],
+  "original_parser_reconciliation": {
+    "passed": true,
+    "conformance": true,
+    "passed_test_names": [
+      "a_teaching_encounter_is_refused_until_the_world_is_located",
+      "the_encounters_comparison_is_credited_through_the_world",
+      "the_world_sensitive_tangent_is_the_actual_worlds_derivative"
+    ],
+    "raw_stdout_SHA256": "7f603cb566b715f084d79d7928f104fe11ec80b81218e4c28d3b43238eed3269",
+    "original_summary": "<repository>/.local/station-credit-native-20261009/tangent/native/STAGE_SUMMARY.json",
+    "original_parser_defect": "--nocapture logs separate status ok from two test-name lines; prior parser recognized only inline ok",
+    "no_native_rerun": true,
+    "source_commit": "4f248fac4d0ecec46161d0395e5d59d5e8a2939f",
+    "source_tree": "89c32babb790bb8111de964a8c4378611a593f75",
+    "wall_ns": 83675733502,
+    "whole_group_CPU_ns": 83518599000,
+    "peak_child_RSS_KiB": 1720876,
+    "charged_group_peak_bytes": "2077413376"
+  },
+  "executable_pins": {
+    "<repository>/.local/wt/contact-tangent-20261009/.local/target-dev/debug/deps/material_tangent_world-60ee2bfbd92f2caa": {
+      "sha256": "974de1a18ed4da750d3b4f145edb78b18267ca13a95ce0ad6cb222b922b56600",
+      "bytes": 185314528
+    },
+    "<repository>/.local/wt/contact-tangent-20261009/.local/target-dev/debug/deps/native_action_return-f4357b7887b2ce36": {
+      "sha256": "be2a376ed2289473b555d0082c4efc25f5dbd2593a4dc2c4950dda328e1d7dae",
+      "bytes": 187847176
+    },
+    "<repository>/.local/wt/contact-tangent-20261009/.local/target-dev/debug/deps/physical_action-97819edadbfe8a80": {
+      "sha256": "f6651b8eda6a70b446865a6a8a08cc90e7b25a414e1b201f189a460b2c38a689",
+      "bytes": 173387760
+    },
+    "<repository>/.local/wt/contact-tangent-20261009/.local/target-dev/debug/deps/physical_ask-18ba83bbd2d5f278": {
+      "sha256": "4b8bbad601d67ddb0913398496835dfd54a198b4ecf8a21b91cac3a5a5bdda02",
+      "bytes": 187517696
+    },
+    "<repository>/.local/wt/contact-tangent-20261009/.local/target-dev/debug/deps/world_model-92cae80cead061e6": {
+      "sha256": "e63832a85f5d55b097a1e965e3b1f060bda7114e9ea37a8754450d628c0a329a",
+      "bytes": 187248568
+    },
+    "<repository>/.local/wt/contact-tangent-20261009/.local/target-dev/debug/deps/holonics-4ca36bb3d7db439e": {
+      "sha256": "a6f45aab9e5aa3df48850d37af0082340fd8f81e8a214dbd193f10b3de6bb225",
+      "bytes": 298054144
+    }
+  },
+  "original_wrapper_failures": [
+    "<repository>/.local/station-hourglass-joint-20261009/joint/ADMISSION_FAILURE.json",
+    "<repository>/.local/station-hourglass-joint-20261009/lean-owner-1/native",
+    "<repository>/.local/station-hourglass-joint-20261009/lean-owner-2/native"
+  ],
+  "receipt_manifest": "<repository>/.local/hourglass-repaired-native-20261009/FILEHASHES.json"
+}

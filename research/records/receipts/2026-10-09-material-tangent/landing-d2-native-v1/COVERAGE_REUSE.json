@@ -1,0 +1,25 @@
+{
+  "status": "agent-inferred",
+  "reason": "Delta changes teaching tangent metadata, adds continued/rebind and learned-model text restore. Existing no-tangent execution arithmetic, old tangent follow/station/adjoint kernels, model advance/state contraction and held-contact/deposition kernels are unchanged. Full new gate compiles every consumer; five fresh World fixtures consume every new operation and original prospect equation.",
+  "consumer_equation": "execute_prepared_d2(..., directions=[], continued=[]) = execute_prepared_981(..., directions=[]) because both new conditions are false and the new bind-source iteration is empty; other arithmetic in this path is unchanged.",
+  "old_tangent_equation": "The added forms/source fields do not enter unchanged old tangent follow, station credit or coordinate-form arithmetic; new continued/rebind consumption is tested freshly.",
+  "reuse_source_commit": "981e4a78f08aeacd4c5c61a11105b80dd6e72026",
+  "reuse_source_tree": "4cb31daf857a3b62ed2fa37fb157eea286d1edd9",
+  "receipt": "<repository>/research/records/receipts/2026-10-09-material-tangent/landing-981-native-v1/VALIDATION.json",
+  "receipt_sha256": "aed89c85a5aba2b2866244d51acf593a594b8d24dd5b42d5fc2ee8de2a40b4d2",
+  "reused": [
+    "affected consumers30",
+    "material_tangent lib2",
+    "held_contact_variation2",
+    "continuing contact1",
+    "six unchanged older World fixtures"
+  ],
+  "fresh_selected_World_tests": [
+    "co_clock_twins_cannot_swap_tangents",
+    "the_landed_material_survives_a_cold_restore",
+    "the_tangent_continues_into_the_next_encounter",
+    "the_world_landing_reads_the_next_encounter",
+    "the_world_loop_is_read_on_a_second_fixture"
+  ],
+  "fresh_gate_required": "Gate checks/guard-lints/doctests run on changed source; no guard pass reused."
+}

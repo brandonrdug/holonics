@@ -1,0 +1,111 @@
+{
+  "candidate_commit": "deae9b8334c1163855350810a376e5592a3ec518",
+  "candidate_tree": "3b9c00f1f0187674a9bcddb4cf7c2e95fd14c806",
+  "candidate_clean_after": true,
+  "all_stage_local_source_pins_equal_exact_candidate": true,
+  "actual_required_root_passed": true,
+  "root": {
+    "stage": "stage-370",
+    "command": {
+      "target": "HolonicsResearch",
+      "argv": [
+        "/usr/bin/env",
+        "-i",
+        "PATH=<lean-toolchain>/bin:/usr/bin",
+        "HOME=<home>",
+        "LANG=C",
+        "LC_ALL=C",
+        "/bin/bash",
+        "tools/lean_check.sh",
+        "+HolonicsResearch:olean"
+      ],
+      "cwd": "<repository>/.local/wt/lean-integration-20261009",
+      "candidate_commit": "deae9b8334c1163855350810a376e5592a3ec518",
+      "candidate_tree": "3b9c00f1f0187674a9bcddb4cf7c2e95fd14c806"
+    },
+    "result": {
+      "target": "HolonicsResearch",
+      "argv": [
+        "/usr/bin/env",
+        "-i",
+        "PATH=<lean-toolchain>/bin:/usr/bin",
+        "HOME=<home>",
+        "LANG=C",
+        "LC_ALL=C",
+        "/bin/bash",
+        "tools/lean_check.sh",
+        "+HolonicsResearch:olean"
+      ],
+      "cwd": "<repository>/.local/wt/lean-integration-20261009",
+      "exit": 0,
+      "command_wall_ns": 21478673242,
+      "kernel_command_passed": true,
+      "expected_command_exit": true,
+      "diagnostic_lines": [],
+      "whole_stdout_SHA256": "8f3ba40b900ad44f11be6085a305aa5d84553c2fa7da70d98d16e6fe496d425d",
+      "whole_stderr_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_not_edited": true
+    },
+    "cleanup_acceptance": {
+      "passed": true,
+      "final_CPU_receipt": {
+        "sha256": "a624aa937fb252d5fdb6c2d7ac8fbf48abb3e7cd94098e9d9397e9682cdba837",
+        "bytes": 5516
+      },
+      "cleanup_receipt": {
+        "sha256": "cd77331ed8ac2ff127dae7dd741aeda43664ed0faf3539819bf2f3490ea3b44a",
+        "bytes": 681
+      },
+      "lease_still_held": true,
+      "scientific_job": false,
+      "requires_matching_release_receipt": true
+    },
+    "lease_released": true,
+    "guard_wall_ns": 22140113354,
+    "CPU_ns": 21630445000,
+    "child_RSS_KiB": 7508228,
+    "charged_group_peak_bytes": 5595856896,
+    "projection_ns": 600000000000,
+    "measured_wall_to_projection_ratio": {
+      "numerator": 11070056677,
+      "denominator": 300000000000
+    },
+    "reservation_bytes": 7025577984,
+    "enforced_cap_bytes": 8589934592
+  },
+  "native_admission_UTC": "2026-10-09T22:16:40.073091+00:00",
+  "fixed_admission_deadline_UTC": "2026-10-09T22:26:40.073091+00:00",
+  "deadline_scope": "Fixed initial full-import development allocation. Earlier provider-frontier references are measured references, not a certified total-build bound.",
+  "normal_provider_passes": 321,
+  "largest_simultaneous_sum_owned_RSS_KiB": 8580120,
+  "largest_charged_group_peak_bytes": 8129134592,
+  "full_raw_receipt": {
+    "path": "<repository>/.local/lean-serial-native-20261009/receipt/VALIDATION.json",
+    "sha256": "deb2c5588e3406f6be117b21dcd9c910c0168e90f39d8c633f76f5db34cfdf73",
+    "bytes": 1348305
+  },
+  "full_output_manifest": {
+    "path": "<repository>/.local/lean-serial-native-20261009/receipt/FILE_HASHES.json",
+    "sha256": "f363c91d3cb02057ce83bc07d1bf1b0049d515c475653049540944d31703e5ca",
+    "bytes": 5640299
+  },
+  "exact_counter_factorizations": {
+    "path": "<repository>/.local/lean-serial-native-20261009/receipt/EXACT_READINGS.json",
+    "sha256": "e0128d88f5b4f4276f9bf941f46ae822a423a5b97204d6af8976515c185b88f6",
+    "bytes": 775197
+  },
+  "root_full_stdout": {
+    "path": "<repository>/.local/lean-serial-native-20261009/stage-370/native/compiler.stdout",
+    "sha256": "8f3ba40b900ad44f11be6085a305aa5d84553c2fa7da70d98d16e6fe496d425d",
+    "bytes": 3153409
+  },
+  "root_full_stderr": {
+    "path": "<repository>/.local/lean-serial-native-20261009/stage-370/native/compiler.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "all_normal_generated_artifact_hashes_recorded_in_full_receipt": true,
+  "all_leases_released": true,
+  "source_edits": false,
+  "publication": false
+}

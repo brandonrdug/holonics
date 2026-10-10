@@ -1,0 +1,89 @@
+{
+  "old_commit": "981e4a78f08aeacd4c5c61a11105b80dd6e72026",
+  "current_commit": "d2ac96820cd73759599caab251c8e8cee38c5584",
+  "unchanged_test_and_helper_bodies": {
+    "the_world_sensitive_tangent_is_the_actual_worlds_derivative": {
+      "body_sha256": "82dd44b236995520d167ef4936c4b5b13ae4ecb682a7b4d791740d47294456c2",
+      "bytes": 2163,
+      "body_byte_identical": true
+    },
+    "a_teaching_encounter_is_refused_until_the_world_is_located": {
+      "body_sha256": "d4993d44e439ca4c94618446abf58461b45bfc6fd9a3ba6f0a970e7e3e500531",
+      "bytes": 1054,
+      "body_byte_identical": true
+    },
+    "the_encounters_comparison_is_credited_through_the_world": {
+      "body_sha256": "4f01f91042885d8c9fb60e76a8d4a087b129d6192d31f48d15f9217c0ffcf614",
+      "bytes": 3219,
+      "body_byte_identical": true
+    },
+    "the_world_loop_is_read_against_its_twin_over_encounters": {
+      "body_sha256": "1646e95663fceffb34d4e4d7486ccce695d61e84054fbca7e400f942316cb8cc",
+      "bytes": 1306,
+      "body_byte_identical": true
+    },
+    "the_landed_material_is_read_without_its_history": {
+      "body_sha256": "9e40addbf8862d7cc1d7c6a7e4114e25e3db807cd4ebfa66ccd41e160c420f1b",
+      "bytes": 1980,
+      "body_byte_identical": true
+    },
+    "a_world_proposal_refuses_another_encounters_tangents": {
+      "body_sha256": "e035cb10135d952b418e4f47d377cbe8c9456b35c08cb64b6e32cd2cd65a3e01",
+      "bytes": 1683,
+      "body_byte_identical": true
+    },
+    "fixture": {
+      "body_sha256": "f66f489624f0c83a0aa13674fca9061ab9e9d73c6b076eaab5fc940ecd92f204",
+      "bytes": 2365,
+      "body_byte_identical": true
+    },
+    "loop_round": {
+      "body_sha256": "40f086b167856d402c63bd2131904412efd5b4ae4f6b9bbe98bbaa9dcc4dab23",
+      "bytes": 1725,
+      "body_byte_identical": true
+    },
+    "second_comparison": {
+      "body_sha256": "5e696db3fa7c2a0a2a2feef1acd146d57f1ed6bca13650c81ac372d7e8f50f75",
+      "bytes": 1108,
+      "body_byte_identical": true
+    },
+    "compared_logits": {
+      "body_sha256": "b5b0182790db7f29cf886d2d6a8b0e97199b9a274911a052a25977c7eddc3912",
+      "bytes": 1245,
+      "body_byte_identical": true
+    },
+    "parts": {
+      "body_sha256": "0c0759fa8e7770d3eb8bd55b674be5eeb578bb42b513089c56377463647669bc",
+      "bytes": 467,
+      "body_byte_identical": true
+    }
+  },
+  "unchanged_reused_consumer_files": {
+    "crates/holonics/tests/world_model.rs": {
+      "sha256": "2946fb61e3004e85e23eefbb1fba88dac82f34d09144651501e0d87a3de3645b",
+      "bytes": 65970,
+      "file_byte_identical": true
+    },
+    "crates/holonics/tests/physical_ask.rs": {
+      "sha256": "459508d425675c73f9c34bf804ec7be632538a72dff5e9f5de6d76eddddfa141",
+      "bytes": 48243,
+      "file_byte_identical": true
+    },
+    "crates/holonics/tests/physical_action.rs": {
+      "sha256": "f59982b3e7c92db9e22855a948342df033207a035ced8cccf1b8e0a668acf019",
+      "bytes": 12703,
+      "file_byte_identical": true
+    },
+    "crates/holonics/tests/native_action_return.rs": {
+      "sha256": "ed1ed59fef84573e3e0cfc3c041ca11ce0dcc204458b102e80f4948855850cf6",
+      "bytes": 18274,
+      "file_byte_identical": true
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "sha256": "9fbcf6bbaca7e4f83a4845740830d726f35dd53c2bdedb50246143249a76d530",
+      "bytes": 169366,
+      "file_byte_identical": true
+    }
+  },
+  "execution_arithmetic_equivalence_is_agent_inferred_in_COVERAGE_REUSE": true
+}
