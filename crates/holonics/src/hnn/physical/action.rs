@@ -110,8 +110,8 @@ use crate::hnn::word::action::{
     ProspectiveFeature,
 };
 use crate::hnn::word::continuation::{
-    AdmissionRefusal, Admitted, MaterialDirection, MaterialTangent, decide, receiving_reading_identity,
-    world_descent,
+    AdmissionRefusal, Admitted, MaterialDirection, MaterialTangent, decide, decide_over,
+    receiving_reading_identity, world_descent,
 };
 use crate::hnn::word::finite_gain::FiniteContactSpans;
 use crate::hnn::word::variation::{ContactCoordinate, VariationReading};
@@ -275,23 +275,38 @@ pub enum WorldLanding {
     Read(Box<WorldLandingReading>),
 }
 
-/// The landing's declared step, the two prospects it compared and its decision; with an admitted
-/// candidate, the stored energy's exact change at the held-momentum crossing (`None` when refused).
+/// The landing's declared step, the two prospects it compared at each admitted wave, the decision
+/// over the waves; with an admitted candidate, the stored energy's exact change at the held-momentum
+/// crossing (`None` when refused).
 #[derive(Debug)]
 pub struct WorldLandingReading {
     /// The BASE declaration: each family's exponent at the material's first reach. The declared
     /// candidate is this raised by `grain_raise` (`DeclaredExponents::raised`), or this itself.
     pub declared: DeclaredExponents,
-    /// The dyadic raise above the material's first reach at which the prospect's reading at the
-    /// receiver's grain first moved (`Some(0)` when it moved at the first reach); `None` when it never
+    /// The dyadic raise above the material's first reach at which a wave's prospect reading at the
+    /// receiver's grain first moved (`Some(0)` when one moved at the first reach); `None` when none
     /// moved before the producer refused, and the first reach's candidate was declared.
     pub grain_raise: Option<i64>,
     pub committed: CommittedReach,
     pub reading: DepositReading,
+    /// The declared candidate `θ′` the decisions read (published only when admitted).
+    pub candidate: Constitution,
+    /// One per admitted wave, in the order declared.
+    pub waves: Vec<WaveProspect>,
+    /// The admission over the waves ([`crate::hnn::word::continuation::decide_over`]).
+    pub decision: Result<Admitted, AdmissionRefusal>,
+    pub deposition_work: Option<Rat>,
+}
+
+/// [definition; agent-inferred, October 10; the held-carry record §7] **One wave's prospects**: the
+/// located key's prospect of the next encounter at `control`, on the contemporary material and on the
+/// declared candidate, with that wave's own admission ([`crate::hnn::word::continuation::decide`]).
+#[derive(Debug)]
+pub struct WaveProspect {
+    pub control: Vec<Rat>,
     pub producing: ReceivingFaceRatio,
     pub proposed: ReceivingFaceRatio,
     pub decision: Result<Admitted, AdmissionRefusal>,
-    pub deposition_work: Option<Rat>,
 }
 
 /// A bound, unrun preparation. Borrowing the receiver bars interleaved material/current edits.
@@ -560,54 +575,90 @@ impl<'f> PhysicalReceiver<'f> {
         })
     }
 
-    /// [definition; agent-inferred, October 9; the held-carry record §5] **Bind a World-sensitive
-    /// proposal to the encounter that located it.** `received` is this receiver's latest teaching
-    /// encounter, and `tangents` are the tangents it carried, one per raw coordinate. Every tangent
-    /// must have ridden that encounter: based at its producing commit, bound to its applied source
-    /// wave (the control's identity, which co-clock twins at different controls do not share),
-    /// opened at its Word's opening tick and followed to its last tick. The receiver must still stand where that encounter left it:
-    /// the material at the encounter's own receiving publication (or the producing commit when it
-    /// published nothing), the World model at the encounter's World tick, and the carried current the
-    /// encounter published.
-    /// **Provenance limit** (Epime's review): the binding identifies the encounter by its producing
+    /// [definition; agent-inferred, October 9 and 10; the held-carry record §5, §7] **Bind a
+    /// World-sensitive proposal to the chain of encounters that located it.** Each observation is one
+    /// teaching encounter (`received`) with the tangents it carried, one per raw coordinate, in the
+    /// order the encounters ran; the last is this receiver's latest encounter. Every observation's
+    /// tangents must have ridden their own encounter: based at its producing commit, bound to its
+    /// applied source wave (the control's identity, which co-clock twins at different controls do not
+    /// share), opened at its Word's opening tick and followed to its last tick. The first
+    /// observation's tangents share one origin opening at or before its own (a continued tangent alone
+    /// is the delayed credit of its encounter). A chain of several is a chain: each later encounter
+    /// opens on the Word and World clocks where the earlier ended, and its tangents are the earlier
+    /// ones continued (the same directions and the same origin opening). The receiver must still stand where the last encounter left it: the
+    /// material at that encounter's own receiving publication (or its producing commit when it
+    /// published nothing), the World model at its World tick, and the carried current it published.
+    /// **Provenance limit** (Epime's review): the binding identifies an encounter by its producing
     /// commit, applied source wave, Word clock, World tick and carry. It does not carry the located
     /// World key's identity, so two receivers whose different located keys share commit, clock,
     /// control and carry could swap tangents. Arbitrary-encounter provenance is not certified; the
     /// paired single-receiver use is.
-    /// The descent is assembled on the present material ([`world_descent`]); a coordinate whose
-    /// contact factor has changed no longer matches its tangent's direction and refuses. The ratio,
-    /// the normalizing contact steps, the reach and the opening clock are all read from `received`
-    /// itself.
+    /// The descent is assembled on the present material ([`world_descent`]), summing the
+    /// observations' credits; a coordinate whose contact factor has changed no longer matches its
+    /// tangent's direction and refuses. The ratios are read from each observation, and the
+    /// normalizing contact steps, the reach and the opening clock from the last.
     pub fn world_proposal(
         &self,
         coordinates: &[ContactCoordinate],
-        tangents: &[MaterialTangent],
-        received: &ActionReception,
+        observations: &[(&[MaterialTangent], &ActionReception)],
     ) -> Result<WorldProposal, HnnError> {
-        let comparison = received.comparison.as_ref().map_err(|_| HnnError::Unadmitted {
-            reason: "a World proposal reads its encounter's own completed comparison",
+        let &(_, received) = observations.last().ok_or(HnnError::Unadmitted {
+            reason: "a World proposal reads at least one observation",
         })?;
-        let returned = &comparison.returned;
-        let producing_commit = tangents.first().map(MaterialTangent::commit).ok_or(
-            HnnError::Unadmitted {
-                reason: "a World proposal carries at least one tangent",
-            },
-        )?;
-        // The tangents rode this very encounter: its producing material and its Word's clock.
-        if producing_commit != received.applied.producing_commit()
-            || tangents.iter().any(|t| {
-                t.commit() != producing_commit
-                    || t.source() != received.applied.actual_source_wave()
-                    || t.opened_at() != received.encounter.before_native_tick
-                    || t.opened_at() + t.ticks() != received.encounter.after_native_tick
-            })
-        {
-            return Err(HnnError::Unadmitted {
-                reason: "a World proposal's tangents rode its encounter: its producing commit and Word clock",
-            });
+        let mut ratios = Vec::with_capacity(observations.len());
+        for (index, &(tangents, observed)) in observations.iter().enumerate() {
+            let comparison = observed.comparison.as_ref().map_err(|_| HnnError::Unadmitted {
+                reason: "a World proposal reads each encounter's own completed comparison",
+            })?;
+            let commit = observed.applied.producing_commit();
+            if tangents.is_empty()
+                || tangents.iter().any(|t| {
+                    t.commit() != commit
+                        || t.source() != observed.applied.actual_source_wave()
+                        || t.opened_at() != observed.encounter.before_native_tick
+                        || t.opened_at() + t.ticks() != observed.encounter.after_native_tick
+                })
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "a World proposal's tangents rode their encounter: its producing commit and Word clock",
+                });
+            }
+            if let Some(&(before_tangents, before)) = index.checked_sub(1).map(|i| &observations[i]) {
+                let consecutive = observed.encounter.before_native_tick
+                    == before.encounter.after_native_tick
+                    && observed.encounter.before_world_tick == before.encounter.after_world_tick;
+                let continued = tangents.len() == before_tangents.len()
+                    && tangents.iter().zip(before_tangents).all(|(t, b)| {
+                        t.direction() == b.direction() && t.origin() == b.origin()
+                    });
+                if !consecutive || !continued {
+                    return Err(HnnError::Unadmitted {
+                        reason: "a chain of observations is consecutive on both clocks and carries the earlier tangents continued",
+                    });
+                }
+            } else if tangents.iter().any(|t| {
+                t.origin() != tangents[0].origin()
+                    || t.origin().1 > observed.encounter.before_native_tick
+            }) {
+                // The first observation's tangents share one origin at or before its opening: its
+                // own held opening, or an earlier one they were continued from (a delayed credit,
+                // whose crossing each continuation certified when it rode, `MaterialTangent::rebind`).
+                return Err(HnnError::Unadmitted {
+                    reason: "a chain of observations starts from one held opening at or before its first encounter",
+                });
+            }
+            ratios.push(&comparison.returned.ratio);
         }
-        // The present material is the encounter's own: its receiving publication's commit, or the
-        // producing commit when the comparison published nothing.
+        let comparison = received
+            .comparison
+            .as_ref()
+            .map_err(|_| HnnError::Unadmitted {
+                reason: "a World proposal reads its encounter's own completed comparison",
+            })?;
+        let returned = &comparison.returned;
+        let producing_commit = received.applied.producing_commit();
+        // The present material is the last encounter's own: its receiving publication's commit, or
+        // the producing commit when the comparison published nothing.
         let published = comparison
             .publication
             .as_ref()
@@ -635,12 +686,16 @@ impl<'f> PhysicalReceiver<'f> {
             .ok_or(HnnError::Unadmitted {
                 reason: "a World proposal reads its encounter's own reach",
             })?;
+        let credited: Vec<(&[MaterialTangent], &ReceivingFaceRatio)> = observations
+            .iter()
+            .zip(ratios)
+            .map(|(&(tangents, _), ratio)| (tangents, ratio))
+            .collect();
         let steps = world_descent(
             self.field,
             self.constitution(),
             coordinates,
-            tangents,
-            &returned.ratio,
+            &credited,
             &returned.contacts,
         )?;
         Ok(WorldProposal {
@@ -735,9 +790,9 @@ impl<'f> PhysicalReceiver<'f> {
         ReceivingFaceRatio::compare_partition(Faces::of_reads(&reads, grain)?, observed, branch)
     }
 
-    /// [definition; agent-inferred, October 9; the held-carry record §5] **The World landing**: one
-    /// declared contact step along a World-sensitive descent, admitted only by the located key's
-    /// prospect of the next encounter.
+    /// [definition; agent-inferred, October 9 and 10; the held-carry record §5, §7] **The World
+    /// landing**: one declared contact step along a World-sensitive descent, admitted only by the
+    /// located key's prospects of the next encounter at each admitted wave in `controls`.
     /// - The bound proposal ([`Self::world_proposal`]) is staged at the contemporary constitution, the
     ///   one it was bound on, with the reach and opening clock of the encounter that located it,
     ///   through the native declared-step law: the first reach read from the
@@ -745,14 +800,17 @@ impl<'f> PhysicalReceiver<'f> {
     ///   (`Constitution::{first_reach, deposited_with_contact_spans_at}`), which commits at least one
     ///   lattice unit or refuses.
     /// - The candidate `θ′` and the contemporary `θ` each read the next encounter (`source`,
-    ///   `receiver`, `preparation`, `compared`, `control`) through [`Self::world_prospect_ratio`],
-    ///   and [`crate::hnn::word::continuation::decide`] admits `θ′` only on an exact strict
-    ///   classical improvement with no worse phase excess, or, with the receiving reading-identity
-    ///   witness (`receiving_reading_identity`), on a strictly smaller phase excess at an exactly
-    ///   equal code.
+    ///   `receiver`, `preparation`, `compared`, each wave's control) from the present opening through
+    ///   [`Self::world_prospect_ratio`]. At each wave [`crate::hnn::word::continuation::decide`]
+    ///   admits `θ′` only on an exact strict classical improvement with no worse phase excess, or,
+    ///   with the receiving reading-identity witness (`receiving_reading_identity`), on a strictly
+    ///   smaller phase excess at an exactly equal code; over the waves
+    ///   ([`crate::hnn::word::continuation::decide_over`]) every wave must be admitted or exactly
+    ///   unchanged, and at least one admitted.
     /// - An admitted `θ′` is published with the carried current crossed at held momentum
     ///   (`C′ w′ = π`, [`ReceptionCarry::crossed`]), and the stored energy's exact change at the
     ///   crossing is returned as the deposition work. A refusal changes nothing.
+    #[allow(clippy::too_many_arguments)]
     pub fn land_world_descent(
         &mut self,
         proposal: WorldProposal,
@@ -760,7 +818,7 @@ impl<'f> PhysicalReceiver<'f> {
         receiver: &ReceiverDeclaration,
         preparation: &PortPreparation,
         compared: &[bool],
-        control: &[Rat],
+        controls: &[&[Rat]],
     ) -> Result<WorldLanding, HnnError> {
         let WorldProposal {
             steps,
@@ -777,6 +835,11 @@ impl<'f> PhysicalReceiver<'f> {
         {
             return Err(HnnError::Unadmitted {
                 reason: "a World landing stages its proposal where the proposal was bound",
+            });
+        }
+        if controls.is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason: "a World landing reads the next encounter at one admitted wave at least",
             });
         }
         // [agent-inferred; the record §5c] Every stepping family carries a positive covector scale,
@@ -797,39 +860,46 @@ impl<'f> PhysicalReceiver<'f> {
             Ok(declared) => declared,
             Err(refusal) => return Ok(WorldLanding::Unreached(refusal)),
         };
-        let producing =
-            self.world_prospect_ratio(&theta, source, receiver, preparation, compared, control)?;
-        // [definition; agent-inferred, October 9; the record §5c] **The first reach at the receiver's
-        // grain.** From the material's first reach, every declared exponent is raised one dyadic step
-        // at a time until the located key's prospect of the next encounter reads a different code
-        // input at the grain (`receiving_reading_identity` fails). The scan ends when the native
-        // producer refuses (`2^k c ≤ 1` bounds every family). That one candidate is declared. When
-        // the reading never moves first, the candidate at the material's first reach is declared.
-        // Nothing is admitted here: `decide` reads only the declared candidate.
+        let prospects = |material: &Constitution| -> Result<Vec<ReceivingFaceRatio>, HnnError> {
+            controls
+                .iter()
+                .map(|control| {
+                    self.world_prospect_ratio(material, source, receiver, preparation, compared, control)
+                })
+                .collect()
+        };
+        let moved = |producing: &[ReceivingFaceRatio], read: &[ReceivingFaceRatio]| {
+            producing
+                .iter()
+                .zip(read)
+                .any(|(p, r)| !receiving_reading_identity(p, r))
+        };
+        let producing = prospects(&theta)?;
+        // [definition; agent-inferred, October 9; the record §5c, §7] **The first reach at the
+        // receiver's grain.** From the material's first reach, every declared exponent is raised one
+        // dyadic step at a time until the located key's prospect of the next encounter reads a
+        // different code input at the grain at some wave (`receiving_reading_identity` fails). The
+        // scan ends when the native producer refuses (`2^k c ≤ 1` bounds every family). That one
+        // candidate is declared. When no reading moves first, the candidate at the material's first
+        // reach is declared. Nothing is admitted here: the decisions read only the declared candidate.
         let (mut candidate, mut reading, mut committed) =
             match theta.deposited_with_contact_spans_at(&deposit, &spans, &declared)? {
                 Ok(produced) => produced,
                 Err(refusal) => return Ok(WorldLanding::Unreached(refusal)),
             };
-        let mut proposed =
-            self.world_prospect_ratio(&candidate, source, receiver, preparation, compared, control)?;
+        let mut proposed = prospects(&candidate)?;
         let mut grain_raise = None;
-        if receiving_reading_identity(&producing, &proposed) {
+        if moved(&producing, &proposed) {
+            grain_raise = Some(0);
+        } else {
             let mut by = 1i64;
             while let Some(raised) = declared.raised(by) {
                 let Ok(produced) = theta.deposited_with_contact_spans_at(&deposit, &spans, &raised)?
                 else {
                     break;
                 };
-                let read = self.world_prospect_ratio(
-                    &produced.0,
-                    source,
-                    receiver,
-                    preparation,
-                    compared,
-                    control,
-                )?;
-                if !receiving_reading_identity(&producing, &read) {
+                let read = prospects(&produced.0)?;
+                if moved(&producing, &read) {
                     (candidate, reading, committed) = produced;
                     proposed = read;
                     grain_raise = Some(by);
@@ -837,16 +907,25 @@ impl<'f> PhysicalReceiver<'f> {
                 }
                 by += 1;
             }
-        } else {
-            grain_raise = Some(0);
         }
-        let decision = decide(
-            &producing.code_length()?,
-            &producing.excess()?,
-            &proposed.code_length()?,
-            &proposed.excess()?,
-            receiving_reading_identity(&producing, &proposed),
-        );
+        let mut waves = Vec::with_capacity(controls.len());
+        for ((control, producing), proposed) in controls.iter().zip(producing).zip(proposed) {
+            let decision = decide(
+                &producing.code_length()?,
+                &producing.excess()?,
+                &proposed.code_length()?,
+                &proposed.excess()?,
+                receiving_reading_identity(&producing, &proposed),
+            );
+            waves.push(WaveProspect {
+                control: control.to_vec(),
+                producing,
+                proposed,
+                decision,
+            });
+        }
+        let decisions: Vec<_> = waves.iter().map(|wave| wave.decision).collect();
+        let decision = decide_over(&decisions);
         let deposition_work = match decision {
             Err(_) => None,
             Ok(_) => Some(self.publish_landed(&candidate, source, receiver, preparation, compared)?),
@@ -856,8 +935,8 @@ impl<'f> PhysicalReceiver<'f> {
             grain_raise,
             committed,
             reading,
-            producing,
-            proposed,
+            candidate,
+            waves,
             decision,
             deposition_work,
         })))

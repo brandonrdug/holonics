@@ -15,14 +15,14 @@ use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::physical::PhysicalReceiver;
 use holonics::hnn::physical::action::{
-    ActionCommunication, AdmittedWaves, BoundJointWorld, ModelKey, PreparedPhysicalProbe,
-    WorldLanding, WorldModel,
+    ActionCommunication, ActionReception, AdmittedWaves, BoundJointWorld, ModelKey,
+    PreparedPhysicalProbe, WorldLanding, WorldModel,
 };
 use holonics::hnn::propagation::Operands;
 use holonics::hnn::ring::ResonatorMaterial;
 use holonics::hnn::word::action::PortPreparation;
 use holonics::hnn::field::ConstitutionRead;
-use holonics::hnn::word::continuation::{Admitted, MaterialDirection};
+use holonics::hnn::word::continuation::{Admitted, MaterialDirection, MaterialTangent};
 use holonics::hnn::word::variation::ContactCoordinate;
 use holonics::hnn::{
     Constitution, Current, Encoded, Field, FieldDeclaration, RingDeclaration, WordOpening,
@@ -756,7 +756,7 @@ fn the_world_landing_reads_the_next_encounter() {
         panic!("the teaching encounter completes");
     };
     let proposal = receiver
-        .world_proposal(&coordinates, &tangents, &received)
+        .world_proposal(&coordinates, &[(&tangents[..], &received)])
         .unwrap();
     for step in proposal.steps() {
         println!(
@@ -775,7 +775,7 @@ fn the_world_landing_reads_the_next_encounter() {
             &field.receivers()[0],
             &preparation,
             &[false, true],
-            &control,
+            &[&control],
         )
         .unwrap();
     let reading = match landing {
@@ -787,10 +787,10 @@ fn the_world_landing_reads_the_next_encounter() {
     println!(
         "world landing: grain raise {:?}; producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}; deposition work {:?}",
         reading.grain_raise,
-        reading.producing.code_length().unwrap(),
-        reading.producing.excess().unwrap(),
-        reading.proposed.code_length().unwrap(),
-        reading.proposed.excess().unwrap(),
+        reading.waves[0].producing.code_length().unwrap(),
+        reading.waves[0].producing.excess().unwrap(),
+        reading.waves[0].proposed.code_length().unwrap(),
+        reading.waves[0].proposed.excess().unwrap(),
         reading.decision,
         reading.deposition_work.as_ref().map(|w| w.to_string()),
     );
@@ -801,10 +801,10 @@ fn the_world_landing_reads_the_next_encounter() {
     let landed = second_comparison(&mut receiver, &field, &source, &control);
     assert_eq!(
         landed.0,
-        reading.proposed.code_length().unwrap(),
+        reading.waves[0].proposed.code_length().unwrap(),
         "the located key's prospect is the actual next comparison"
     );
-    assert_eq!(landed.1, reading.proposed.excess().unwrap());
+    assert_eq!(landed.1, reading.waves[0].proposed.excess().unwrap());
     let mut matched = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
     {
         let probe = matched
@@ -818,8 +818,8 @@ fn the_world_landing_reads_the_next_encounter() {
         "world production: landed code {:?} excess {}; matched control code {:?} excess {}",
         landed.0, landed.1, unlanded.0, unlanded.1
     );
-    assert_eq!(unlanded.0, reading.producing.code_length().unwrap());
-    assert_eq!(unlanded.1, reading.producing.excess().unwrap());
+    assert_eq!(unlanded.0, reading.waves[0].producing.code_length().unwrap());
+    assert_eq!(unlanded.1, reading.waves[0].producing.excess().unwrap());
     // Production in the admission's own order: strictly below in code, or an exactly equal code
     // (the prospects' witness) with a strictly smaller phase excess.
     assert!(
@@ -863,7 +863,7 @@ fn loop_round(
     let code = returned.ratio.code_length().unwrap();
     let excess = returned.ratio.excess().unwrap();
     let proposal = receiver
-        .world_proposal(&coordinates, &tangents, &received)
+        .world_proposal(&coordinates, &[(&tangents[..], &received)])
         .unwrap();
     let landing = receiver
         .land_world_descent(
@@ -872,7 +872,7 @@ fn loop_round(
             &field.receivers()[0],
             &preparation,
             &[false, true],
-            control,
+            &[control],
         )
         .unwrap();
     let decision = match landing {
@@ -995,7 +995,7 @@ fn a_world_proposal_refuses_another_encounters_tangents() {
     let ActionCommunication::Received(received) = reception.reception else {
         panic!("the second teaching encounter completes");
     };
-    let refused = receiver.world_proposal(&coordinates, &first_tangents, &received);
+    let refused = receiver.world_proposal(&coordinates, &[(&first_tangents[..], &received)]);
     assert!(
         matches!(refused, Err(HnnError::Unadmitted { .. })),
         "refused: {:?}",
@@ -1166,9 +1166,9 @@ fn co_clock_twins_cannot_swap_tangents() {
     let (_, _, first_tangents) = teach(&[integer(1)]);
     let (second, second_received, second_tangents) = teach(&[integer(-1)]);
     assert!(second
-        .world_proposal(&coordinates, &second_tangents, &second_received)
+        .world_proposal(&coordinates, &[(&second_tangents[..], &second_received)])
         .is_ok());
-    let refused = second.world_proposal(&coordinates, &first_tangents, &second_received);
+    let refused = second.world_proposal(&coordinates, &[(&first_tangents[..], &second_received)]);
     assert!(
         matches!(refused, Err(HnnError::Unadmitted { .. })),
         "refused: {:?}",
@@ -1371,3 +1371,432 @@ fn the_landed_material_survives_a_cold_restore() {
     );
     assert_eq!(cold_next, live_next, "the restored receiver reads the live comparison");
 }
+
+// ---- The credit of two observations (the held-carry record §7) ----
+
+/// The two admitted waves of the chain: `u₁ = 1`, then `u₂ = −1`.
+fn chain_controls() -> [Vec<Rat>; 2] {
+    [vec![integer(1)], vec![integer(-1)]]
+}
+
+/// One observation: the tangents an encounter carried and its reception.
+type Observation = (Vec<MaterialTangent>, ActionReception);
+
+/// Two encounters on `receiver`, the first teaching `directions` at `first`, the second carrying the
+/// first's tangents continued at `second`, with nothing landed between them.
+fn teach_chain(
+    receiver: &mut PhysicalReceiver<'_>,
+    field: &Field,
+    source: &Encoded,
+    directions: &[MaterialDirection],
+    first: &[Rat],
+    second: &[Rat],
+) -> [Observation; 2] {
+    let preparation = actuator(field);
+    let probe = receiver
+        .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let (reception, tangents) = probe.encounter_teaching(&waves, first, directions).unwrap();
+    let ActionCommunication::Received(one) = reception.reception else {
+        panic!("the first encounter completes");
+    };
+    let continued: Vec<MaterialTangent> = tangents
+        .iter()
+        .map(|t| t.continued(&one.carry, &one.carry.conductances, field).unwrap())
+        .collect();
+    let probe = receiver
+        .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let (reception, continued) = probe.encounter_continued(&waves, second, continued).unwrap();
+    let ActionCommunication::Received(two) = reception.reception else {
+        panic!("the second encounter completes");
+    };
+    [(tangents, one), (continued, two)]
+}
+
+/// One plain encounter at `control` (no tangents).
+fn plain(receiver: &mut PhysicalReceiver<'_>, field: &Field, source: &Encoded, control: &[Rat]) {
+    let preparation = actuator(field);
+    let probe = receiver
+        .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    probe.encounter(&waves, control).unwrap();
+}
+
+/// **A two-observation proposal binds a chain** (§7 (b)): the chain in its order is admitted; the
+/// swapped order, fresh tangents at the second encounter in place of continued ones, and a
+/// continued tangent offered across a gap are refused.
+#[test]
+fn a_two_observation_proposal_binds_a_chain() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let [first, second] = chain_controls();
+    let coordinates = all_coordinates(&theta);
+    let directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(&field, &theta, c).unwrap())
+        .collect();
+    let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    let [(t1, r1), (t2, r2)] =
+        teach_chain(&mut receiver, &field, &source, &directions, &first, &second);
+    assert!(
+        receiver
+            .world_proposal(&coordinates, &[(&t1[..], &r1), (&t2[..], &r2)])
+            .is_ok(),
+        "the chain in its order binds"
+    );
+    let swapped = receiver.world_proposal(&coordinates, &[(&t2[..], &r2), (&t1[..], &r1)]);
+    assert!(matches!(swapped, Err(HnnError::Unadmitted { .. })), "{swapped:?}");
+
+    // Fresh tangents at the second encounter: the same clocks, another origin.
+    let mut fresh = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    let preparation = actuator(&field);
+    let teach = |receiver: &mut PhysicalReceiver<'_>, control: &[Rat]| {
+        let probe = receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let (reception, tangents) = probe.encounter_teaching(&waves, control, &directions).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        (tangents, received)
+    };
+    let (f1, q1) = teach(&mut fresh, &first);
+    let present = fresh.constitution().clone();
+    let (f2, q2) = {
+        let directions: Vec<MaterialDirection> = coordinates
+            .iter()
+            .map(|c| MaterialDirection::of_coordinate(&field, &present, c).unwrap())
+            .collect();
+        let probe = fresh
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let (reception, tangents) = probe.encounter_teaching(&waves, &second, &directions).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        (tangents, received)
+    };
+    let refused = fresh.world_proposal(&coordinates, &[(&f1[..], &q1), (&f2[..], &q2)]);
+    assert!(matches!(refused, Err(HnnError::Unadmitted { .. })), "{refused:?}");
+
+    // A gap: the first encounter's tangents continued, then a plain encounter, then the continued
+    // tangents offered to the next: the continued tangent rides only the Word that opens on its carry.
+    let mut gapped = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    let (g1, p1) = teach(&mut gapped, &first);
+    let continued: Vec<MaterialTangent> = g1
+        .iter()
+        .map(|t| t.continued(&p1.carry, &p1.carry.conductances, &field).unwrap())
+        .collect();
+    plain(&mut gapped, &field, &source, &first);
+    let probe = gapped
+        .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let refused = probe.encounter_continued(&waves, &second, continued);
+    assert!(matches!(refused, Err(HnnError::Unadmitted { .. })), "{:?}", refused.err());
+}
+
+/// Both encounters' compared logits, the first at `first`, the second at `second`, on `theta`.
+fn chain_logits(
+    field: &Field,
+    theta: Constitution,
+    source: &Encoded,
+    first: &[Rat],
+    second: &[Rat],
+) -> ([Vec<StationLogits>; 2], ExactRatMatrix) {
+    let mut receiver = bound(field, theta, source, vec![faced_key(field)]);
+    let read = |receiver: &mut PhysicalReceiver<'_>, control: &[Rat]| {
+        let preparation = actuator(field);
+        let probe = receiver
+            .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+        ratio
+            .stations()
+            .iter()
+            .map(|&station| {
+                let read = received
+                    .boundary
+                    .readings()
+                    .iter()
+                    .find(|read| read.station == station)
+                    .unwrap();
+                StationLogits {
+                    station,
+                    produced: read.read.logits.clone(),
+                    observed: received.encounter.steps()[read.crossing - 1]
+                        .joint
+                        .face()
+                        .to_vec(),
+                }
+            })
+            .collect::<Vec<_>>()
+    };
+    let one = read(&mut receiver, first);
+    let published = receiver
+        .constitution()
+        .receiving_map(field.receivers()[0].ring)
+        .unwrap()
+        .clone();
+    let two = read(&mut receiver, second);
+    ([one, two], published)
+}
+
+/// **The two-observation credit at its consumer** (§7 (a)): the credit `credit(T₁; r₁) +
+/// credit(T₂; r₂)` on one storage direction. On `θ ± εH`, `ε = 2⁻⁴ … 2⁻⁸`, the two encounters' parts
+/// at the frozen covectors are differenced centrally. The observed-phase part (the World's face, which
+/// does not read the receiving relation) is confirmed to second order. The produced parts' central
+/// residuals, which include the path through the receiving relation the first encounter published
+/// (held exterior by the credit), are reported as measured.
+#[test]
+fn the_two_observation_credit_is_read_at_its_consumer() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let direction = declared.storage_direction(&field);
+    let [first, second] = chain_controls();
+    let mut receiver = bound(
+        &field,
+        declared.at(&Rat::zero()),
+        &source,
+        vec![faced_key(&field)],
+    );
+    let [(t1, r1), (t2, r2)] =
+        teach_chain(&mut receiver, &field, &source, &[direction], &first, &second);
+    let ratio = |r: &ActionReception| r.comparison.as_ref().unwrap().returned.ratio.clone();
+    let (ratio1, ratio2) = (ratio(&r1), ratio(&r2));
+    let c1 = t1[0].comparison_credit(&ratio1).unwrap();
+    let c2 = t2[0].comparison_credit(&ratio2).unwrap();
+    let g1 = ratio1.covector().unwrap().logits().to_vec();
+    let g2 = ratio2.covector().unwrap().logits().to_vec();
+    println!(
+        "two-observation credit: first: magnitude {}, produced phase {}, observed phase {}; second (continued): magnitude {}, produced phase {}, observed phase {}",
+        c1.magnitude, c1.produced_phase, c1.observed_phase, c2.magnitude, c2.produced_phase, c2.observed_phase
+    );
+    let credit = [
+        &c1.magnitude + &c2.magnitude,
+        &c1.produced_phase + &c2.produced_phase,
+        &c1.observed_phase + &c2.observed_phase,
+    ];
+    let second_only = [
+        c2.magnitude.clone(),
+        c2.produced_phase.clone(),
+        c2.observed_phase.clone(),
+    ];
+    let mut residuals: Vec<(Rat, [Rat; 3], [Rat; 3])> = Vec::new();
+    for j in 4..9 {
+        let epsilon = rat(1, 1i64 << j);
+        let ([up1, up2], up_map) =
+            chain_logits(&field, declared.at(&epsilon), &source, &first, &second);
+        let ([down1, down2], down_map) =
+            chain_logits(&field, declared.at(&-epsilon.clone()), &source, &first, &second);
+        // The receiving relation the first encounter published, read on both sides.
+        let moved: Vec<Rat> = (0..up_map.rows())
+            .flat_map(|i| (0..up_map.columns()).map(move |j| (i, j)))
+            .map(|(i, j)| (up_map.get(i, j).unwrap() - down_map.get(i, j).unwrap()).abs())
+            .collect();
+        println!(
+            "two-observation credit: ε = 2^-{j}: the published receiving relation's central change (l1) {}",
+            l1(&moved)
+        );
+        let two = integer(2) * &epsilon;
+        let total = |a: [Rat; 3], b: [Rat; 3]| -> [Rat; 3] { std::array::from_fn(|k| &a[k] + &b[k]) };
+        let up = total(parts(&g1, &up1), parts(&g2, &up2));
+        let down = total(parts(&g1, &down1), parts(&g2, &down2));
+        let r: [Rat; 3] = std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &credit[k]).abs());
+        let up_second = parts(&g2, &up2);
+        let down_second = parts(&g2, &down2);
+        let s: [Rat; 3] = std::array::from_fn(|k| {
+            ((&up_second[k] - &down_second[k]) / &two - &second_only[k]).abs()
+        });
+        println!(
+            "two-observation credit: ε = 2^-{j}: central residuals (both) {} {} {}; (second alone) {} {} {}",
+            r[0], r[1], r[2], s[0], s[1], s[2]
+        );
+        residuals.push((epsilon, r, s));
+    }
+    // [measured, October 10] Every part, both observations and the second alone, to second order: the
+    // acceptance required it of the observed phase and reported the produced parts; they hold too.
+    let picks: [fn(&(Rat, [Rat; 3], [Rat; 3])) -> Rat; 6] = [
+        |r| r.1[0].clone(),
+        |r| r.1[1].clone(),
+        |r| r.1[2].clone(),
+        |r| r.2[0].clone(),
+        |r| r.2[1].clone(),
+        |r| r.2[2].clone(),
+    ];
+    for pick in picks {
+        let first_epsilon = residuals[0].0.clone();
+        let scaled_first = pick(&residuals[0]) / (&first_epsilon * &first_epsilon);
+        for pair in residuals.windows(2) {
+            assert!(
+                pick(&pair[1]) * integer(2) <= pick(&pair[0]),
+                "the residual halves at least"
+            );
+        }
+        for r in &residuals {
+            assert!(
+                pick(r) / (&r.0 * &r.0) <= &scaled_first * integer(2),
+                "the residual stays O(ε²)"
+            );
+        }
+    }
+}
+
+/// The two chain encounters' comparison code enclosures and excesses on `theta`, plain.
+fn chain_readings(
+    field: &Field,
+    theta: Constitution,
+    source: &Encoded,
+) -> Vec<(holonics::ratio::algebraic::ExactInterval, Rat)> {
+    let mut receiver = bound(field, theta, source, vec![faced_key(field)]);
+    chain_controls()
+        .iter()
+        .map(|control| {
+            let preparation = actuator(field);
+            let probe = receiver
+                .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+                .unwrap();
+            let waves = admitted(&probe, 0);
+            let reception = probe.encounter(&waves, control).unwrap();
+            let ActionCommunication::Received(received) = reception.reception else {
+                panic!("the encounter completes");
+            };
+            let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+            (ratio.code_length().unwrap(), ratio.excess().unwrap())
+        })
+        .collect()
+}
+
+/// The second encounter's chain on a fresh learner at `theta`, its proposal over `observations`
+/// (both, or the continued one alone) and its landing over both waves.
+fn land_chain<'f>(
+    field: &'f Field,
+    theta: &Constitution,
+    source: &Encoded,
+    both: bool,
+) -> (PhysicalReceiver<'f>, WorldLanding) {
+    let [first, second] = chain_controls();
+    let coordinates = all_coordinates(theta);
+    let directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(field, theta, c).unwrap())
+        .collect();
+    let mut receiver = bound(field, theta.clone(), source, vec![faced_key(field)]);
+    let [(t1, r1), (t2, r2)] =
+        teach_chain(&mut receiver, field, source, &directions, &first, &second);
+    let observations: Vec<(&[MaterialTangent], &ActionReception)> = if both {
+        vec![(&t1[..], &r1), (&t2[..], &r2)]
+    } else {
+        vec![(&t2[..], &r2)]
+    };
+    let proposal = receiver.world_proposal(&coordinates, &observations).unwrap();
+    let preparation = actuator(field);
+    let landing = receiver
+        .land_world_descent(
+            proposal,
+            source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &[&first, &second],
+        )
+        .unwrap();
+    (receiver, landing)
+}
+
+/// **The landing over both waves** (§7 (c), (d)): the credit of both observations, and the
+/// continued credit alone, each landed as one step and read at both waves' prospects. Each decision
+/// is reported as measured. When admitted, the actual next encounter at each wave (on identical
+/// replays) equals its prospect exactly, and is read against the no-deposit twin at that wave.
+#[test]
+fn the_two_observation_landing_reads_both_waves() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let controls = chain_controls();
+    for (name, both) in [("both observations", true), ("continued credit alone", false)] {
+        let (_, landing) = land_chain(&field, &theta, &source, both);
+        let reading = match landing {
+            WorldLanding::Unreached(refusal) => {
+                println!("two-observation landing ({name}): unreached {refusal:?}");
+                continue;
+            }
+            WorldLanding::Read(reading) => reading,
+        };
+        println!(
+            "two-observation landing ({name}): grain raise {:?}; decision {:?}; deposition work {:?}",
+            reading.grain_raise,
+            reading.decision,
+            reading.deposition_work.as_ref().map(|w| w.to_string())
+        );
+        for wave in &reading.waves {
+            println!(
+                "two-observation landing ({name}): wave {:?}: producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}",
+                wave.control.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+                wave.producing.code_length().unwrap(),
+                wave.producing.excess().unwrap(),
+                wave.proposed.code_length().unwrap(),
+                wave.proposed.excess().unwrap(),
+                wave.decision
+            );
+        }
+        // [measured diagnostic] The credited objective itself at the declared step: the same two
+        // encounters from the initial material, with only the contact factors of the candidate.
+        let stepped = theta
+            .clone()
+            .with_channel(
+                0,
+                reading.candidate.contact_storage(0).clone(),
+                reading.candidate.contact_stiffness(0).clone(),
+                reading.candidate.contact_dissipation(0).clone(),
+            )
+            .unwrap();
+        let base_chain = chain_readings(&field, theta.clone(), &source);
+        let stepped_chain = chain_readings(&field, stepped, &source);
+        for (k, ((code, excess), (s_code, s_excess))) in
+            base_chain.iter().zip(&stepped_chain).enumerate()
+        {
+            println!(
+                "two-observation credited objective ({name}): encounter {k}: code {code:?} -> {s_code:?}; excess change {}",
+                s_excess - excess
+            );
+        }
+        if reading.decision.is_err() {
+            continue;
+        }
+        for (index, control) in controls.iter().enumerate() {
+            // An identical replay, then the actual next encounter at this wave.
+            let (mut replay, _) = land_chain(&field, &theta, &source, both);
+            let landed = second_comparison(&mut replay, &field, &source, control);
+            let wave = &reading.waves[index];
+            assert_eq!(
+                landed.0,
+                wave.proposed.code_length().unwrap(),
+                "the located key's prospect is the actual next comparison"
+            );
+            assert_eq!(landed.1, wave.proposed.excess().unwrap());
+            // The no-deposit twin: the same two encounters, no landing.
+            let mut twin = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+            plain(&mut twin, &field, &source, &controls[0]);
+            plain(&mut twin, &field, &source, &controls[1]);
+            let unlanded = second_comparison(&mut twin, &field, &source, control);
+            println!(
+                "two-observation production ({name}): wave {index}: landed code {:?} excess {}; twin code {:?} excess {}",
+                landed.0, landed.1, unlanded.0, unlanded.1
+            );
+        }
+    }
+}
+
