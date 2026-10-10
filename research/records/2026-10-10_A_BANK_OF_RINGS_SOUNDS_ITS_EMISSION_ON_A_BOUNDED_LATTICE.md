@@ -589,3 +589,11 @@ samples' own length, or a measurement that it does not, and where.
   - The information of a slow ring's word is in **where its crossings fall** (the defects'
     placement) and in the fibre. That is where §15's architecture puts it, through the repair
     owners' residual code and the fibre's code, read against the source by the inverse tick.
+
+[measured] **Interface (b), the inverse tick, is built** (`ResonatorOperands::inverse_step`;
+[receipt](receipts/2026-10-10-acoustic-release/INVERSE_TICK_TESTS.v1.json)). Every tick of the
+declared ring `t = 1` under F1, on the exact law and on the lattice `2^(−32)`, read backwards from its
+states and remainders, returns exactly its incident amplitude on the driven coordinate and zero on
+the quadrature. A pair of states two ticks apart is refused. `acoustic_wave_port` passes 23 of 23,
+and gate 1 is ok. The source is exactly one ring's inverse tick once its state and remainders are
+known. The remaining question is §15's next measurement, at what grain they can be known.

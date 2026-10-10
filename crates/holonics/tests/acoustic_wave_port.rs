@@ -1256,3 +1256,54 @@ fn a_near_periodic_window_keeps_its_departure_as_defects() {
         near.defect_lift()
     );
 }
+
+// -------------------------------------------------------------------------------------------
+// the inverse tick (bank record §15)
+
+/// **The source is the ring's inverse tick** (bank record §15): on the exact law and on the lattice
+/// `2^(−32)`, every tick of the declared ring `t = 1` under F1, read backwards from its states and
+/// remainders before and after, returns exactly the drive it received, the incident amplitude on the
+/// driven coordinate and zero on the quadrature; a pair of states that is not one tick is refused.
+#[test]
+fn the_tick_read_backwards_returns_its_drive_exactly() {
+    use holonics::hnn::constitution::Lattice;
+    use holonics::hnn::ring::ResonatorRemainders;
+    let operands = declared_ring(&integer(1));
+    let samples = stream(1, 60);
+    for lattice in [None, Some(Lattice::new(32))] {
+        let mut port = match lattice {
+            None => WavePort::at_rest(operands.clone(), 0).unwrap(),
+            Some(lattice) => WavePort::on_lattice(operands.clone(), 0, lattice).unwrap(),
+        };
+        let ticks: Vec<ReceivedTick> = port
+            .receive(&matched(&operands, &samples))
+            .unwrap()
+            .map(Result::unwrap)
+            .collect();
+        let mut before = ResonatorRemainders::default();
+        for tick in &ticks {
+            let drive = operands
+                .inverse_step(
+                    tick.tick,
+                    [&tick.step.input[0], &tick.step.input[1]],
+                    [&tick.step.state[0], &tick.step.state[1]],
+                    &before,
+                    tick.step.remainders(),
+                )
+                .unwrap();
+            assert_eq!(drive, vec![tick.incident.clone(), Rat::zero()], "tick {}", tick.tick);
+            before = tick.step.remainders().clone();
+        }
+        // Two states that are not one tick are refused.
+        let (first, third) = (&ticks[0], &ticks[2]);
+        assert!(operands
+            .inverse_step(
+                0,
+                [&first.step.input[0], &first.step.input[1]],
+                [&third.step.state[0], &third.step.state[1]],
+                &ResonatorRemainders::default(),
+                third.step.remainders(),
+            )
+            .is_err());
+    }
+}
