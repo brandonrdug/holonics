@@ -828,7 +828,7 @@ mod tests {
 
     #[test]
     fn waking_epoch_reads_growth_the_game_floor_and_loop_scaling() {
-        let traces = (1..=64)
+        let traces = (1usize..=64)
             .map(|m| {
                 let two = BigInt::one() << m;
                 Rat::from_integer(two.clone()) + Rat::new(BigInt::one(), two)
