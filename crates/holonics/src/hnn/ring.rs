@@ -2894,6 +2894,60 @@ mod founding_tests {
             ));
         }
     }
+    #[test]
+    fn turn_traces_equal_explicit_monodromy_powers_for_both_members() {
+        let identity = ExactRatMatrix::identity(2).unwrap();
+        let material = ResonatorMaterial::new(
+            identity.clone(),
+            identity.clone(),
+            identity.scaled(&rat(1, 2)),
+            None,
+        )
+        .unwrap();
+        let pumps = [PumpStep::Stand, PumpStep::Half]
+            .into_iter()
+            .map(|step| PumpDeclaration::new(rat(1, 4), Carrier::at(&Rat::zero()), step).unwrap())
+            .collect::<Vec<_>>();
+        let bank = ReceivingBank::new(material.clone(), pumps, integer(2), Rat::one(), 4).unwrap();
+        let amplitudes = vec![
+            GaussianRat::new(Rat::one(), Rat::zero()),
+            GaussianRat::new(Rat::zero(), Rat::one()),
+            GaussianRat::new(rat(-1, 2), Rat::zero()),
+            GaussianRat::new(rat(3, 5), rat(4, 5)),
+        ];
+        for member in 0..2 {
+            let schedule = PumpSchedule::placed(&bank.pumps()[member], &amplitudes).unwrap();
+            let operands = ResonatorOperands::scheduled(
+                member,
+                &material,
+                &schedule,
+                &integer(2),
+                &Rat::one(),
+                None,
+            )
+            .unwrap();
+            let monodromy = Floquet::of(&operands).unwrap();
+            let mut power = ExactRatMatrix::identity(4).unwrap();
+            let explicit = (1..=6)
+                .map(|_| {
+                    power = monodromy.monodromy().multiply(&power).unwrap();
+                    (0..4)
+                        .map(|i| power.get(i, i).unwrap().clone())
+                        .sum::<Rat>()
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(bank.turn_traces(member, &amplitudes, 6).unwrap(), explicit);
+            assert!(bank.turn_traces(member, &amplitudes, 0).unwrap().is_empty());
+        }
+        assert!(matches!(
+            bank.turn_traces(2, &amplitudes, 1),
+            Err(HnnError::Shape { .. })
+        ));
+        assert!(matches!(
+            bank.turn_traces(1, &amplitudes[..3], 1),
+            Err(HnnError::Resonator { .. })
+        ));
+    }
 }
 
 impl ReceivingBank {
@@ -2989,6 +3043,39 @@ impl ReceivingBank {
         Ok(TurnReading { members, joint })
     }
 
+    /// `tr(M_T^m)` for `m = 1..=count`, exact, for one member's monodromy over the turn.
+    /// Newton's identities on `det(xI-N) = x^d + c_(d-1)x^(d-1) + ... + c_0`
+    /// give integer power sums `p_m`; the returned trace is `p_m / Delta^m` for `M_T=N/Delta`.
+    /// The same turn admission and executed tick maps as `read_turn` are used.
+    /// [proved-standard; implementation exact; Lean counterpart owed #62.]
+    pub fn turn_traces(
+        &self,
+        member: usize,
+        amplitudes: &[GaussianRat],
+        count: usize,
+    ) -> Result<Vec<Rat>, HnnError> {
+        let (_, product, scale) = self.turn_monodromy(member, amplitudes)?;
+        let coefficients = integer_characteristic(&product);
+        let degree = product.len();
+        let mut powers: Vec<BigInt> = Vec::with_capacity(count);
+        let mut traces = Vec::with_capacity(count);
+        let mut denominator = BigInt::one();
+        for m in 1..=count {
+            let mut sum = BigInt::zero();
+            for i in 1..=degree.min(m - 1) {
+                sum += &coefficients[degree - i] * &powers[m - i - 1];
+            }
+            if m <= degree {
+                sum += BigInt::from(m) * &coefficients[degree - m];
+            }
+            let power = -sum;
+            denominator *= &scale;
+            traces.push(Rat::new(power.clone(), denominator.clone()));
+            powers.push(power);
+        }
+        Ok(traces)
+    }
+
     /// Member `member`'s turn: each crossing's executed tick map, and the monodromy as the integer
     /// matrix `N` over its scale `Δ` (`M_T = N/Δ`; [`ReceivingBank::read_turn`]).
     fn turn_monodromy(
@@ -2996,7 +3083,11 @@ impl ReceivingBank {
         member: usize,
         amplitudes: &[GaussianRat],
     ) -> Result<(Vec<ExactRatMatrix>, Vec<Vec<BigInt>>, BigInt), HnnError> {
-        let pump = &self.pumps[member];
+        let pump = self.pumps.get(member).ok_or(HnnError::Shape {
+            what: "a receiving bank member",
+            expected: self.pumps.len(),
+            found: member,
+        })?;
         if !amplitudes.len().is_multiple_of(pump.phases()) {
             return Err(HnnError::Resonator {
                 ring: member,

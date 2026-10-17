@@ -170,6 +170,7 @@ pub mod dynamic_section;
 pub mod encoding;
 pub mod executed;
 pub mod field;
+pub mod founding;
 pub mod keys;
 pub mod moment;
 pub mod paired;
@@ -264,6 +265,8 @@ pub enum HnnError {
         population: u64,
         source_operand_bound: u128,
     },
+    #[error("founding refused: {what}")]
+    Founding { what: &'static str },
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
     /// A solved receiver-chart carrier refused an exact integer conversion. This is kept
