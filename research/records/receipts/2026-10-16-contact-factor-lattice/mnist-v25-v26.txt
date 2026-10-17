@@ -1,0 +1,23 @@
+# v25: exact coarse split (October 7)
+source base_commit=337f351e9 overlay_files=166 complete_overlay_verified=true binary_sha256=e5bd1b742536e17529beb5d92567ba89c5a102c50c1330fdf0a223807b3b2b9a
+release_build returncode=0 elapsed_ns=154541550366 timeout_s=1800
+cuda_parity test=holonics-cuda::hnn::port_tests::the_card_paired_finite_candidate_replay_matches_reference returncode=0 elapsed_ns=56374498337 timeout_s=1800
+model args=--arrival-context --checkpoint-every 50 --chart placed <mnist> 200 50 returncode=0 timed_out=false deadline_s=1800 projection=none_recorded
+model wall_ns=797210130278 peak_rss_kib=427416 (host process with its monitor) sampled_vram_peak_mib_lower_bound=456
+checkpoint phase=handle_clean_post_training_before_test kind=constitution_only exact_utf8_bytes=4089682 file_bytes=4089682 byte_roundtrip_equal=true state_parse_equal=true restored_constitution_equal=true exact_constitution_bits=12071101 resident_state_bits=12451156 sha256=62f60d62e82a35aa70118fb2494ea507f87b369f28e9224020171f8cf1bf1f85
+complete train_prequential_raw_digit=175/200 raw_digit_correct=39/200 released_faces=200/200 released_digit_coverage=185/200 released_digit_correct=33/200 released_only_accuracy=33/185 released_digit_abstentions=15/200 held_out_learned_raw_digit=49/50 raw_digit_correct=15/50 released_faces=50/50 released_digit_coverage=47/50 released_digit_correct=19/50 released_only_accuracy=19/47 released_digit_abstentions=3/50 commit_digit_coverage=50/50 commit_digit_correct=20/50 drawn_digit_coverage=0/0 drawn_digit_correct=0/0 elapsed_ms=793385
+updates=200 strict=200 attempts={'1': 200} halvings={'0': 200} refinement_rounds={'0': 200}
+carry_rational_payload_bits total=10141673 by_locus=Channel(0):4279220,Channel(1):4308672,Element(2):53400,SourcePort(0):746984,SourcePort(1):750816,Standing(0):850,Standing(1):850,Standing(2):881
+
+# v26: common lattice law
+source base_commit=337f351e9 overlay_files=173 complete_overlay_verified=true binary_sha256=4d4dd5e113c5a385b2b931f1e97e03263b1bf53728a73fe60cacde28f2b469c6
+release_build returncode=0 elapsed_ns=154118372801 timeout_s=1800
+cuda_parity test=holonics-cuda::hnn::port_tests::the_card_paired_finite_candidate_replay_matches_reference returncode=0 elapsed_ns=56955270699 timeout_s=1800
+model args=--arrival-context --checkpoint-every 50 --chart placed <mnist> 200 50 returncode=0 timed_out=false deadline_s=1800 projection=none_recorded
+model wall_ns=820376293829 peak_rss_kib=410780 (host process with its monitor) sampled_vram_peak_mib_lower_bound=456
+checkpoint phase=handle_clean_post_training_before_test kind=constitution_only exact_utf8_bytes=1536990 file_bytes=1536990 byte_roundtrip_equal=true state_parse_equal=true restored_constitution_equal=true exact_constitution_bits=3588354 resident_state_bits=3969891 sha256=ea5970ff63228196621e9109576d07f8583f38750078c5d2ff302299efeff7e0
+complete train_prequential_raw_digit=171/200 raw_digit_correct=38/200 released_faces=200/200 released_digit_coverage=183/200 released_digit_correct=30/200 released_only_accuracy=30/183 released_digit_abstentions=17/200 held_out_learned_raw_digit=41/50 raw_digit_correct=17/50 released_faces=50/50 released_digit_coverage=41/50 released_digit_correct=19/50 released_only_accuracy=19/41 released_digit_abstentions=9/50 commit_digit_coverage=50/50 commit_digit_correct=19/50 drawn_digit_coverage=0/0 drawn_digit_correct=0/0 elapsed_ms=816556
+updates=200 strict=200 attempts={'1': 200} halvings={'0': 200} refinement_rounds={'0': 200}
+carry_rational_payload_bits total=1663623 by_locus=Channel(0):53442,Channel(1):53564,Element(2):53787,SourcePort(0):748521,SourcePort(1):751832,Standing(0):807,Standing(1):807,Standing(2):863
+
+mnist_files_sha256 t10k-images-idx3-ubyte=0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7 t10k-labels-idx1-ubyte=ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2 train-images-idx3-ubyte=ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db train-labels-idx1-ubyte=65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5
