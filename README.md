@@ -93,7 +93,8 @@ unknown stream weighs a population of eggs by their description lengths and upda
 - values are ratios with their remainders, and integers are carried with their factorization;
 - algebraic and transcendental quantities are their constraint identities (π and `e` are
   navigators, and a float is one of their faces);
-- measurements are reported exactly, as `3 + 1/16 + ε` bits and never as a decimal.
+- measurements carry the precision their reading has: exact readings are reported exactly, as
+  `3 + 1/16 + ε` bits, and no precision is invented or picked by hand.
 
 **Mathematics is terrain.** The Riemann hypothesis, the Hodge conjecture, complex Euler and
 Navier–Stokes, and Birch–Swinnerton-Dyer are targets for the same compression and landmark

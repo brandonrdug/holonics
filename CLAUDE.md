@@ -119,12 +119,16 @@ mathematics, not a style.
   navigators; a float is a face of one, and error enters only in how a face is attained.
 - Estimation is replaced by partition.
 - A float appears only at an exterior boundary where foreign data arrives as floats (matching
-  external data). A measurement is never reported as a float or a decimal, not even for a
-  person: a decimal is a collapse (Brandon, September 25). Report readings exactly: integers
-  with their factorization, ratios with their remainder, enclosures with exact endpoints,
-  a reading at a declared grain (carry, phase class and the unresolved fibre, as `GrainCell`),
-  and comparisons as exact orderings or exact differences. Nothing inside a law, an owner or the
-  HNN consumes a float.
+  external data), or in a report at the precision its reading has (the next item). Nothing inside
+  a law, an owner or the HNN consumes a float.
+- A report carries exactly the precision its reading has, never an arbitrary or invented one: the
+  rule is against arbitrary precision, not against valid float reporting (Brandon, October 17).
+  An exact reading is reported exactly: integers with their factorization, ratios with their
+  remainder, enclosures with exact endpoints, a reading at a declared grain (carry, phase class
+  and the unresolved fibre, as `GrainCell`), and comparisons as exact orderings or exact
+  differences. A float or a decimal is a valid report at the precision it truly has, such as a
+  foreign float as it arrived or a clock's reading at its own resolution. A decimal that rounds
+  an exact value, or a precision picked by hand, is a collapse (Brandon, September 25).
 - A percentage is a rate, which is motion; state the motion.
 - A margin, score or reading built from contributions is reported as its series, the winding and
   turning parts with their sum and carry, never collapsed into one number; a predicted or expected
