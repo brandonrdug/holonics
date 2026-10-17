@@ -1401,6 +1401,8 @@ impl<'f> PhysicalReceiver<'f> {
         }
         // [agent-inferred; the record §5c] Every stepping family carries a positive covector scale,
         // so its declared exponent is bounded by `2^k c ≤ 1` and the grain scan below ends.
+        // `descent_from_credits` already refuses a zero scale; this check stays because the scan
+        // does not end without it.
         if steps.iter().any(|step| step.covector.is_zero()) {
             return Err(HnnError::Unadmitted {
                 reason: "a World landing's families carry a positive covector scale, which bounds their step",
