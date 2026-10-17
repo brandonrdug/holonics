@@ -66,13 +66,46 @@ pub fn hodge_split(
             found: form.values().len(),
         });
     }
-    let omega = form.values();
+    cell_split(complex.cell_complex(), metrics, form.values())
+}
+
+/// [definition] **The Hodge split of a 1-cochain on a cell complex** of any dimension ≥ 1, read in
+/// degrees 0, 1 and 2 under one declared metric per degree. Cells of degree 3 and above do not
+/// enter the split of a 1-cochain.
+pub fn cell_split(
+    cells: &CellComplex,
+    metrics: &[SymmetricForm],
+    values: &[Rat],
+) -> Result<TimeSplit, AeonError> {
+    if cells.dimension() == 0 {
+        return Err(AeonError::Shape {
+            what: "complex dimension for a time split",
+            expected: 1,
+            found: 0,
+        });
+    }
+    let metric_count = cells.dimension().min(2) + 1;
+    if metrics.len() != metric_count {
+        return Err(AeonError::Shape {
+            what: "metrics (one per degree 0..=min(dimension, 2))",
+            expected: metric_count,
+            found: metrics.len(),
+        });
+    }
+    if values.len() != cells.cells(1) {
+        return Err(AeonError::Shape {
+            what: "form values (one per passage)",
+            expected: cells.cells(1),
+            found: values.len(),
+        });
+    }
+    let omega = values;
     let d0 = coboundary(cells, 0)?;
     let delta0 = cells.codifferential(0, &metrics[0], &metrics[1])?;
     let potential = solve(&delta0.multiply(&d0)?, &delta0.apply(omega)?)?;
     let state = d0.apply(&potential)?;
-    let (production, curvature_operator) = if complex.two_cells() == 0 {
-        (vec![Rat::zero(); complex.passages()], None)
+    let (production, curvature_operator) = if cells.cells(2) == 0 {
+        (vec![Rat::zero(); cells.cells(1)], None)
     } else {
         let d1 = coboundary(cells, 1)?;
         let delta1 = cells.codifferential(1, &metrics[1], &metrics[2])?;
@@ -151,6 +184,53 @@ mod tests {
 
     fn unit(extent: usize) -> SymmetricForm {
         SymmetricForm::from_diagonal(vec![Rat::one(); extent])
+    }
+
+    #[test]
+    fn the_cell_split_is_the_time_split_on_the_same_complex() {
+        let started = std::time::Instant::now();
+        let complex = filled_and_hollow();
+        let metrics = metrics();
+        let form = Form::new(vec![
+            rat(3, 2),
+            integer(-1),
+            integer(4),
+            rat(2, 3),
+            integer(1),
+        ]);
+        assert_eq!(
+            cell_split(complex.cell_complex(), &metrics, form.values()),
+            hodge_split(&complex, &metrics, &form)
+        );
+        let points = CellComplex::new(vec![3], vec![]).unwrap();
+        assert_eq!(
+            cell_split(&points, &[], &[]),
+            Err(AeonError::Shape {
+                what: "complex dimension for a time split",
+                expected: 1,
+                found: 0,
+            })
+        );
+        assert_eq!(
+            cell_split(complex.cell_complex(), &metrics[..2], form.values()),
+            Err(AeonError::Shape {
+                what: "metrics (one per degree 0..=min(dimension, 2))",
+                expected: 3,
+                found: 2,
+            })
+        );
+        assert_eq!(
+            cell_split(complex.cell_complex(), &metrics, &[]),
+            Err(AeonError::Shape {
+                what: "form values (one per passage)",
+                expected: 5,
+                found: 0,
+            })
+        );
+        eprintln!(
+            "REQ050_TEST name=the_cell_split_is_the_time_split_on_the_same_complex elapsed_ns={}",
+            started.elapsed().as_nanos()
+        );
     }
 
     /// **Every time form splits into state, production and winding time**, orthogonally in the

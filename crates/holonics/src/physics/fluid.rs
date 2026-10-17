@@ -46,6 +46,7 @@ pub mod singularity;
 
 use thiserror::Error;
 
+use crate::aeon::AeonError;
 use crate::compression::landmark::LandmarkError;
 use crate::holon::HolonError;
 use crate::ratio::GaussianError;
@@ -54,6 +55,8 @@ use crate::ratio::linear::ExactLinearError;
 /// Every refusal of the fluid instance. Bad input is a typed return, never a panic.
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum FluidError {
+    #[error(transparent)]
+    Aeon(#[from] AeonError),
     #[error("{what}: expected {expected}, found {found}")]
     Shape {
         what: &'static str,

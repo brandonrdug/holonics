@@ -27,7 +27,7 @@
 //! | `Aeon/Clock/Lock.jointReading`, `IsCycle`, `lock_at_address`, `cycle_iff_period_dvd`, `convergent_near_return` | [`TwoClocks`], [`Convergent`], on the lift |
 //! | `Aeon/Clock/Epoch.epoch_contiguous`, `mem_epoch_digitTicks`, `forwardWord`, `crossingTicks_forwardWord`, `forward_epoch_is_window` (an epoch is an interval; of a digit clock, and so of the forward walk at a section of grain `A`, the window `[A k, A (k + 1))`) | [`Epochs::intervals`], read by `hnn::receiving::receiving_windows` |
 //! | `Aeon/Clock/Epoch.crossingTicks`, `aeonSection`, `epochOf`, `epoch`, `coarsen`, `epochOf_coarse`, `coarsen_tower`, `odometer_tower`, `CutClock`, `reading_eq_crossings`, `crossings_concat`, `sectionForm`, `signed_count_is_flux`, `ring_count_is_flux` | [`Epochs`], [`epochs`], [`EpochTower`], [`ClockLift::ring_section`] |
-//! | `Aeon/Production/HodgeTime.TimeSplit`, `timeSplit_nonempty`, `timeSplit_unique`, `state_reading_of_walk`, `production_is_curvature`, `wordReading_eq_timeReading` | [`TimeSplit`], [`hodge_split`], read on aeons by [`Form::read`] |
+//! | `Aeon/Production/HodgeTime.TimeSplit`, `timeSplit_nonempty`, `timeSplit_unique`, `state_reading_of_walk`, `production_is_curvature`, `wordReading_eq_timeReading` | [`TimeSplit`], [`hodge_split`], [`cell_split`], read on aeons by [`Form::read`] |
 //! | `Aeon/Production/PathReversal.pathLaw`, `production`, `epochProduction`, `pathLogRatio_split`, `detailedBalance_cycle_affinity_zero` | [`MarkovChain`], [`MarkovChain::production`], [`MarkovChain::heat`], [`MarkovChain::reversible_law`] |
 //! | `Aeon/Production/Kac.FirstReturnEquations`, `firstReturn_existsUnique`, `kac_single_state`, `kac_grain_ratio` | [`MarkovChain::mean_return`], [`MarkovChain::grain_ratio`] |
 //! | `Aeon/Production/Kac.epochEntropy`, `wordEntropy_succ`, `wordEntropy_eq_sum`, `abramov_ledger`, `abramov` | [`MarkovChain::epoch_entropy`], [`MarkovChain::word_entropy`], [`MarkovChain::abramov`] |
@@ -61,7 +61,7 @@ pub use first_law::{
 pub use groupoid::{
     Aeon, ClockLift, Cycle, FiniteComplex, LiftPassage, LiftSquare, ParametricComplex, Step,
 };
-pub use hodge::{TimeSplit, hodge_split};
+pub use hodge::{TimeSplit, cell_split, hodge_split};
 pub use join::{AxesJoin, AxisComponent, AxisRate, ClockAxis, join_axes};
 pub use lock::{Convergent, TwoClocks};
 pub use production::{MarkovChain, SectionEntropy, Transition};

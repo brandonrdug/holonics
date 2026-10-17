@@ -24,7 +24,7 @@
 //! | `faceRead`, `outflow_join`, `outflow_join_ignores_sharedFace`, `joined_massOutflow_eq`, `Balances`, `balance_join` | [`outflow`], [`Balance`] |
 //! | `strain`, `viscousStress`, `stress`, `dissipation`, `dissipation_eq`, `stress_power_split`, `stress_power_reversal`, `dissipation_nonneg`, `dissipation_even` | [`NewtonianMaterial`] |
 //! | `viscousHeat`, `cell_heat_port`; `Thermal/ViscousPort.ViscousWork.ofFluid`, `cell_port_join` | [`ViscousHeat`], [`CellReturn::heat`], [`CellReturn::mechanical_deficit`] |
-//! | `vorticity`, `circulation`, `pressurePart`, `pressure_vorticity_zero`, `pressure_circulation_zero`, `dormant_vortex`; `Objects/Pairing.coordinate_stokes`, `classPairing_representatives` | [`vorticity`], [`circulation`], [`pressure_part`] |
+//! | `vorticity`, `circulation`, `pressurePart`, `pressure_vorticity_zero`, `pressure_circulation_zero`, `dormant_vortex`; `Objects/Pairing.coordinate_stokes`, `classPairing_representatives` | [`vorticity`], [`circulation`], [`pressure_part`], [`hodge_parts`] |
 //! | `advection_split`, `lamb_no_work`, `curl`, `lamb_eq_cross`, `kinetic_difference` | [`lamb`], [`bernoulli`], [`curl`] |
 //!
 //! [definition] **The heat port.** [`ViscousHeat`] is the value this instance hands to the thermal
@@ -42,13 +42,15 @@
 //! kinetic-energy change is computed rather than read as the mechanical deficit), the **pressure
 //! solve** (the projection of a provisional face flux onto the divergence-free fluxes, `∂ᵀ∂ p =
 //! ∂ᵀu*/h` on the cells of a joined complex, with its Lean counterpart), and the discretization
-//! defect of a non-affine field.
+//! defect of a non-affine field. The pressure solve owed in #62 is the `state` part of this split.
 
 use num_traits::{One, Signed, Zero};
 
+use crate::aeon::{TimeSplit, cell_split};
 use crate::geometry::complex::CellComplex;
 use crate::geometry::{RatMat3, RatVec3};
 use crate::ratio::linear::ExactRatMatrix;
+use crate::ratio::linear::inertia::SymmetricForm;
 use crate::ratio::{Rat, integer, rat};
 
 use super::FluidError;
@@ -388,6 +390,27 @@ pub fn pressure_part(complex: &CellComplex, pressure: &[Rat]) -> Result<Vec<Rat>
     Ok(complex.incidence()?.apply(pressure)?)
 }
 
+/// [definition] **The one split of a velocity coholon**, the aeon's split on the same complex in
+/// the grid's unit metric (every cell of weight 1, the Euclidean metric of the unit cells this
+/// owner declares): `u = state + production + winding`.
+/// - `state` is the pressure part `∂₁ᵀp`, with `p = potential`.
+/// - `production` is the vortical part. It carries all of `u`'s vorticity.
+/// - `winding` is the circulation around holes, the dormant harmonic class.
+/// It delegates to [`crate::aeon::cell_split`] and adds no solve.
+pub fn hodge_parts(complex: &CellComplex, velocity: &[Rat]) -> Result<TimeSplit, FluidError> {
+    if velocity.len() != complex.cells(1) {
+        return Err(FluidError::Shape {
+            what: "velocity (one value per edge)",
+            expected: complex.cells(1),
+            found: velocity.len(),
+        });
+    }
+    let metrics: Vec<SymmetricForm> = (0..=complex.dimension().min(2))
+        .map(|degree| SymmetricForm::from_diagonal(vec![Rat::one(); complex.cells(degree)]))
+        .collect();
+    Ok(cell_split(complex, &metrics, velocity)?)
+}
+
 /// Whether a velocity coholon is a pressure gradient `∂₁ᵀ p` for some vertex potential.
 pub fn is_pressure_gradient(complex: &CellComplex, velocity: &[Rat]) -> Result<bool, FluidError> {
     let incidence: ExactRatMatrix = complex.incidence()?;
@@ -420,6 +443,226 @@ pub fn bernoulli(gradient: &RatMat3, velocity: &RatVec3) -> RatVec3 {
 mod tests {
     use super::*;
     use crate::physics::fluid::cells::{component, reflect_across_face};
+
+    struct TestTime(&'static str, std::time::Instant);
+
+    impl TestTime {
+        fn start(name: &'static str) -> Self {
+            Self(name, std::time::Instant::now())
+        }
+    }
+
+    impl Drop for TestTime {
+        fn drop(&mut self) {
+            eprintln!(
+                "REQ050_TEST name={} elapsed_ns={}",
+                self.0,
+                self.1.elapsed().as_nanos()
+            );
+        }
+    }
+
+    fn dormant_vortex_complex() -> CellComplex {
+        use crate::ratio::linear::vector::integer_matrix;
+        CellComplex::new(
+            vec![4, 5, 1],
+            vec![
+                integer_matrix(&[
+                    &[-1, 0, 0, 1, -1],
+                    &[1, -1, 0, 0, 0],
+                    &[0, 1, -1, 0, 1],
+                    &[0, 0, 1, -1, 0],
+                ])
+                .unwrap(),
+                integer_matrix(&[&[1], &[1], &[0], &[0], &[-1]]).unwrap(),
+            ],
+        )
+        .unwrap()
+    }
+
+    fn dormant_vortex() -> Vec<Rat> {
+        vec![integer(0), integer(0), integer(0), integer(1), integer(0)]
+    }
+
+    fn joined_velocity(complex: &CellComplex) -> Vec<Rat> {
+        (0..complex.cells(1) as i64)
+            .map(|edge| rat(2 * edge - 3, edge + 2))
+            .collect()
+    }
+
+    /// The exact part is precisely the pressure gradient; production and winding are its two
+    /// obstructions. The converse is checked on both a hole and a filled face.
+    #[test]
+    fn pressure_is_exactly_the_split_without_turn() {
+        let _time = TestTime::start("pressure_is_exactly_the_split_without_turn");
+        let reflection = reflect_across_face(2, 0, true).unwrap();
+        let joined = reflection.glued.complex();
+        let p: Vec<Rat> = (0..joined.cells(0) as i64)
+            .map(|vertex| rat(vertex * vertex, 3))
+            .collect();
+        let pressure = pressure_part(joined, &p).unwrap();
+        let check = |complex: &CellComplex, velocity: &[Rat]| {
+            let split = hodge_parts(complex, velocity).unwrap();
+            assert_eq!(
+                is_pressure_gradient(complex, velocity).unwrap(),
+                split.production.values().iter().all(Rat::is_zero)
+                    && split.winding.values().iter().all(Rat::is_zero)
+            );
+            split
+        };
+        let exact = check(joined, &pressure);
+        assert!(is_pressure_gradient(joined, &pressure).unwrap());
+        assert_eq!(exact.state.values(), pressure);
+        let dormant = dormant_vortex_complex();
+        let hole = check(&dormant, &dormant_vortex());
+        assert!(!hole.winding.values().iter().all(Rat::is_zero));
+        let vortical = check(joined, &joined_velocity(joined));
+        assert!(!vortical.production.values().iter().all(Rat::is_zero));
+    }
+
+    #[test]
+    fn vorticity_lives_in_production() {
+        let _time = TestTime::start("vorticity_lives_in_production");
+        let reflection = reflect_across_face(2, 0, true).unwrap();
+        let complex = reflection.glued.complex();
+        let u = joined_velocity(complex);
+        let split = hodge_parts(complex, &u).unwrap();
+        assert_eq!(
+            vorticity(complex, &u).unwrap(),
+            vorticity(complex, split.production.values()).unwrap()
+        );
+        for part in [&split.state, &split.winding] {
+            assert!(
+                vorticity(complex, part.values())
+                    .unwrap()
+                    .iter()
+                    .all(Rat::is_zero)
+            );
+        }
+    }
+
+    #[test]
+    fn circulation_reads_production_and_winding() {
+        let _time = TestTime::start("circulation_reads_production_and_winding");
+        let check = |complex: &CellComplex, u: &[Rat]| {
+            let split = hodge_parts(complex, u).unwrap();
+            let turn: Vec<Rat> = split
+                .production
+                .values()
+                .iter()
+                .zip(split.winding.values())
+                .map(|(production, winding)| production + winding)
+                .collect();
+            let zeros = vec![Rat::zero(); complex.cells(0)];
+            let (_, cycles) = complex
+                .boundary(1)
+                .unwrap()
+                .preimage_fibre(&zeros)
+                .unwrap()
+                .unwrap();
+            assert!(!cycles.is_empty());
+            for cycle in cycles {
+                assert_eq!(
+                    circulation(u, &cycle).unwrap(),
+                    circulation(&turn, &cycle).unwrap()
+                );
+                assert!(circulation(split.state.values(), &cycle).unwrap().is_zero());
+            }
+        };
+        let reflection = reflect_across_face(2, 0, true).unwrap();
+        let joined = reflection.glued.complex();
+        check(joined, &joined_velocity(joined));
+        let dormant = dormant_vortex_complex();
+        let pressure =
+            pressure_part(&dormant, &[integer(0), integer(1), integer(3), integer(-2)]).unwrap();
+        let u: Vec<Rat> = dormant_vortex()
+            .iter()
+            .zip(pressure)
+            .map(|(vortex, pressure)| vortex + pressure)
+            .collect();
+        check(&dormant, &u);
+    }
+
+    /// The representative e₃ has a boundary, so its harmonic part carries its circulation while
+    /// its exact remainder relaxes. It has no vortical part.
+    #[test]
+    fn a_dormant_vortex_relaxes_to_its_winding_part() {
+        let _time = TestTime::start("a_dormant_vortex_relaxes_to_its_winding_part");
+        let complex = dormant_vortex_complex();
+        let split = hodge_parts(&complex, &dormant_vortex()).unwrap();
+        assert!(split.production.values().iter().all(Rat::is_zero));
+        assert_eq!(
+            split.winding.values(),
+            [rat(1, 8), rat(1, 8), rat(3, 8), rat(3, 8), rat(1, 4)]
+        );
+        let hollow = [integer(0), integer(0), integer(1), integer(1), integer(1)];
+        assert_eq!(
+            circulation(split.winding.values(), &hollow).unwrap(),
+            integer(1)
+        );
+        assert_eq!(
+            split.state.values(),
+            [rat(-1, 8), rat(-1, 8), rat(-3, 8), rat(5, 8), rat(-1, 4)]
+        );
+        assert!(is_pressure_gradient(&complex, split.state.values()).unwrap());
+        assert_eq!(
+            hodge_parts(&complex, split.winding.values())
+                .unwrap()
+                .winding,
+            split.winding
+        );
+    }
+
+    #[test]
+    fn the_split_ignores_the_three_cells() {
+        let _time = TestTime::start("the_split_ignores_the_three_cells");
+        let reflection = reflect_across_face(3, 0, true).unwrap();
+        let complex = reflection.glued.complex();
+        assert_eq!(complex.dimension(), 3);
+        let u = joined_velocity(complex);
+        let split = hodge_parts(complex, &u).unwrap();
+        assert!(split.winding.values().iter().all(Rat::is_zero));
+        let total: Vec<Rat> = (0..complex.cells(1))
+            .map(|edge| {
+                &split.state.values()[edge]
+                    + &split.production.values()[edge]
+                    + &split.winding.values()[edge]
+            })
+            .collect();
+        assert_eq!(total, u);
+        assert_eq!(
+            vorticity(complex, &u).unwrap(),
+            vorticity(complex, split.production.values()).unwrap()
+        );
+        // The same 1-cochain reads only degrees 0, 1 and 2, even when 3-cells are present.
+        let metrics: Vec<SymmetricForm> = (0..=2)
+            .map(|degree| SymmetricForm::from_diagonal(vec![Rat::one(); complex.cells(degree)]))
+            .collect();
+        assert_eq!(cell_split(complex, &metrics, &u).unwrap(), split);
+    }
+
+    #[test]
+    fn the_velocity_split_refuses_the_wrong_shape_and_dimension() {
+        let _time = TestTime::start("the_velocity_split_refuses_the_wrong_shape_and_dimension");
+        let complex = dormant_vortex_complex();
+        assert_eq!(
+            hodge_parts(&complex, &[]),
+            Err(FluidError::Shape {
+                what: "velocity (one value per edge)",
+                expected: 5,
+                found: 0,
+            })
+        );
+        let points = CellComplex::new(vec![3], vec![]).unwrap();
+        assert_eq!(
+            hodge_parts(&points, &[]),
+            Err(FluidError::Aeon(crate::aeon::AeonError::Shape {
+                what: "complex dimension for a time split",
+                expected: 1,
+                found: 0,
+            }))
+        );
+    }
 
     fn coordinate(vector: &RatVec3, i: usize) -> Rat {
         component(vector, i).clone()

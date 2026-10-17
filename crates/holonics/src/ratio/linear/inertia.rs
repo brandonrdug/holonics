@@ -109,7 +109,6 @@ impl SymmetricForm {
         )
     }
 
-    #[cfg(test)]
     pub(crate) fn from_diagonal(diagonal: Vec<Rat>) -> Self {
         let extent = diagonal.len();
         let mut entries = vec![Rat::zero(); extent * extent];
