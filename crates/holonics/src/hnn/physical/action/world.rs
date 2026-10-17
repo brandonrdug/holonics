@@ -168,7 +168,7 @@ impl BoundJointWorld {
             || common_chart.classes() == 0
             || common_chart.has_advances()
             || !common_chart.fibre().is_empty()
-            || *common_chart.decoder() != ExactRatMatrix::identity(common_chart.classes())?
+            || *common_chart.decoder()? != ExactRatMatrix::identity(common_chart.classes())?
         {
             return Err(HnnError::Unadmitted {
                 reason: "a two-participant exact midpoint world, positive wave chart and fixed common identity receiving chart",

@@ -754,6 +754,22 @@ impl ExactRatMatrix {
         Ok(self.reduced_row_echelon()?.1.len())
     }
 
+    /// **Whether this map is injective** (`rank = columns`, `ker = 0`), read exactly.
+    ///
+    /// One prime chart decides it whenever its image keeps full column rank
+    /// (`prime_image::certified_injective`): a maximal minor nonzero modulo a prime is a nonzero
+    /// integer minor. Otherwise the rank decides, as [`Self::rank`] reads it. A chart's refusal or
+    /// lost rank costs the slower reading, never a different answer.
+    pub fn is_injective(&self) -> Result<bool, ExactLinearError> {
+        if matches!(
+            crate::ratio::linear::prime_image::certified_injective(self),
+            Ok(true)
+        ) {
+            return Ok(true);
+        }
+        Ok(self.rank()? == self.columns)
+    }
+
     /// **The certified reading of this map, or `None` where the rational reduction owns it.**
     ///
     /// [definition; agent-inferred] The crossover is on `min(rows, columns)`, which bounds the
@@ -1133,6 +1149,44 @@ mod tests {
         left.iter()
             .zip(right)
             .fold(Rat::zero(), |sum, (a, b)| sum + a * b)
+    }
+
+    /// **Injectivity is read exactly, whichever chart reads it.** A full-rank dyadic map is
+    /// certified in the first prime chart; a map whose every maximal minor is divisible by that
+    /// chart's prime loses rank there, certifies nothing, and is decided by its exact rank; a map
+    /// with a kernel, or with fewer rows than columns, is not injective.
+    #[test]
+    fn injectivity_is_certified_by_one_chart_or_read_from_the_exact_rank() {
+        use crate::ratio::linear::prime_image::certified_injective;
+        let dyadic = ExactRatMatrix::new(vec![
+            vec![rat(1, 2), rat(3, 4), rat(0, 1)],
+            vec![rat(-5, 8), rat(1, 1), rat(1, 16)],
+            vec![rat(0, 1), rat(7, 32), rat(-1, 2)],
+            vec![rat(1, 1), rat(1, 1), rat(1, 1)],
+        ])
+        .expect("well-formed");
+        assert_eq!(certified_injective(&dyadic), Ok(true));
+        assert_eq!(dyadic.is_injective(), Ok(true));
+        let prime: BigInt = (BigInt::from(1u8) << 61u32) - BigInt::from(1u8);
+        // Primitive rows whose every 2×2 minor is ±p: injective over ℚ, rank one in the chart.
+        let one = || Rat::from_integer(BigInt::from(1u8));
+        let bad_prime = ExactRatMatrix::new(vec![
+            vec![one(), Rat::from_integer(BigInt::zero())],
+            vec![one(), Rat::from_integer(prime.clone())],
+            vec![Rat::from_integer(BigInt::from(2u8)), Rat::from_integer(prime)],
+        ])
+        .expect("well-formed");
+        assert_eq!(
+            certified_injective(&bad_prime),
+            Ok(false),
+            "the chart loses the rank of a map whose minors its prime divides"
+        );
+        assert_eq!(bad_prime.is_injective(), Ok(true));
+        let collapsed = matrix(&[&[1, 2], &[2, 4], &[3, 6]]);
+        assert_eq!(certified_injective(&collapsed), Ok(false));
+        assert_eq!(collapsed.is_injective(), Ok(false));
+        assert_eq!(matrix(&[&[1, 0, 0], &[0, 1, 0]]).is_injective(), Ok(false));
+        assert_eq!(ExactRatMatrix::zero(3, 0).unwrap().is_injective(), Ok(true));
     }
 
     /// **Inversion keeps its nonunit fibre.** A singular map returns its four faces, not an

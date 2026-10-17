@@ -4,11 +4,20 @@
 //! are the constitution's ports E, their admitted dyads B, and the exact left decoders D.
 //! DE=I is required: a singular observation port is refused, never silently quotiented.
 //! The rotor's reduced action U=DPE carries its FULL residual R=PE-EU, so PE=EU+R.
-//! U and R are functions of the admitted operands D, P and E, so they are formed exactly on their
-//! first read (`ObservationPort::square`), where the square is checked; admission certifies the
-//! dyad, DE=I and the rotor, and no consumer that never reads U or R pays for them.
+//!
+//! [definition; agent-inferred, October 17] **Admission certifies what DE=I needs, and the decoder
+//! follows its read.** A left decoder of E exists exactly when ker E = 0, and then the Gram
+//! decoder D=(EᵀE)⁻¹Eᵀ satisfies DE=I identically. So admission certifies the dyad, the rotor and
+//! ker E = 0, the last by a maximal minor of E that is nonzero in one prime chart
+//! (`ExactRatMatrix::is_injective`), with the exact rank where that chart loses rank. D is a
+//! function of E alone; it is formed exactly on its first read (`ObservationPort::decoder`), with
+//! the Gram inverted in its paired sectors and DE=I checked there. U and R are functions of D, P
+//! and E, formed on their first read (`ObservationPort::square`). A deposit moves E at every taught
+//! cell, and no per-cell consumer reads D, U or R, so re-admission pays only the certificate.
 //! No zero residual, learned spatial invariance, or inferred latent structure is asserted.
-//! The Lean obligation joining these checked identities to observation admission is open (#62).
+//! The Lean obligation joining these checked identities to observation admission is open (#62): a
+//! nonzero image of a maximal minor under a ring hom to a field proves ker E = 0, and ker E = 0
+//! gives (EᵀE)⁻¹EᵀE = I.
 
 use super::{Encoded, EncodedChart, EncodingError, PortCell, chart_refusal, holding_sources};
 use crate::hnn::field::{ConstitutionRead, Field};
@@ -25,24 +34,24 @@ pub struct RotorSquare {
 }
 
 /// Producing operands for one source ring. Residual is retained, not treated as zero.
-/// The operands are immutable after admission, so the square formed from them on first read is
-/// shared by every clone of the admitted port (every passage the boundary encodes carries one).
+/// The operands are immutable after admission, so the decoder and the square formed from them on
+/// first read are shared by every clone of the admitted port (every passage the boundary encodes
+/// carries one).
 #[derive(Clone, Debug)]
 pub struct ObservationPort {
     carrier: PairedCarrier,
     injection: ExactRatMatrix,
-    decoder: ExactRatMatrix,
+    decoder: Arc<OnceLock<ExactRatMatrix>>,
     rotor: ExactRatMatrix,
     square: Arc<OnceLock<RotorSquare>>,
 }
 
-/// Equality is over the admitted operands: the square is their function, so whether it has been
-/// read yet never separates two ports.
+/// Equality is over the admitted operands: the decoder and the square are their functions, so
+/// whether either has been read yet never separates two ports.
 impl PartialEq for ObservationPort {
     fn eq(&self, other: &Self) -> bool {
         self.carrier == other.carrier
             && self.injection == other.injection
-            && self.decoder == other.decoder
             && self.rotor == other.rotor
     }
 }
@@ -54,8 +63,26 @@ impl ObservationPort {
     pub fn injection(&self) -> &ExactRatMatrix {
         &self.injection
     }
-    pub fn decoder(&self) -> &ExactRatMatrix {
-        &self.decoder
+    /// **`D = (EᵀE)⁻¹Eᵀ`**, the exact left decoder, formed from `E` on its first read and checked
+    /// there: the Gram inverted in its exact paired sectors and certified on both sides, then
+    /// `DE = I` on the complete domain. Admission certified `ker E = 0`, so the Gram is invertible;
+    /// a failed formation is returned and never cached.
+    pub fn decoder(&self) -> Result<&ExactRatMatrix, EncodingError> {
+        if let Some(decoder) = self.decoder.get() {
+            return Ok(decoder);
+        }
+        let transpose = self.injection.transpose()?;
+        let gram = transpose.multiply(&self.injection)?;
+        let decoder =
+            paired_gram_inverse(&gram, self.carrier.sigma().pairs())?.multiply(&transpose)?;
+        if decoder.multiply(&self.injection)? != ExactRatMatrix::identity(self.injection.columns())?
+        {
+            return Err(chart_refusal(
+                "the observation decoder does not recover every class",
+            ));
+        }
+        // A concurrent first read forms the same exact decoder; the one that lands first stands.
+        Ok(self.decoder.get_or_init(|| decoder))
     }
     pub fn rotor(&self) -> &ExactRatMatrix {
         &self.rotor
@@ -67,7 +94,7 @@ impl ObservationPort {
             return Ok(square);
         }
         let advanced = self.rotor.multiply(&self.injection)?;
-        let reduced = self.decoder.multiply(&advanced)?;
+        let reduced = self.decoder()?.multiply(&advanced)?;
         let carried = self.injection.multiply(&reduced)?;
         let residual = advanced.subtract(&carried)?;
         if carried.add(&residual)? != advanced {
@@ -181,14 +208,15 @@ impl PairedObservation {
                     "the observation pairing covers every boundary class",
                 ));
             }
-            let transpose = injection.transpose()?;
-            let gram = transpose.multiply(&injection)?;
-            let decoder =
-                paired_gram_inverse(&gram, carrier.sigma().pairs())?.multiply(&transpose)?;
-            if decoder.multiply(&injection)? != ExactRatMatrix::identity(classes)? {
+            // `ker E = 0` is what `DE = I` needs; `D` itself is formed on its first read. A port
+            // that is not injective has a singular Gram, and is refused as that Gram's inverse is.
+            if injection.columns() != classes {
                 return Err(chart_refusal(
                     "the observation decoder does not recover every class",
                 ));
+            }
+            if !injection.is_injective()? {
+                return Err(crate::ratio::linear::ExactLinearError::SingularMatrix.into());
             }
             let width = carrier.width();
             // Read the actual ring owner's rotor, rather than duplicating its permutation law.
@@ -210,7 +238,7 @@ impl PairedObservation {
             ports.push(ObservationPort {
                 carrier,
                 injection,
-                decoder,
+                decoder: Arc::new(OnceLock::new()),
                 rotor,
                 square: Arc::new(OnceLock::new()),
             });
@@ -286,7 +314,7 @@ impl PairedObservation {
             ports.push(ObservationPort {
                 carrier,
                 injection,
-                decoder,
+                decoder: Arc::new(OnceLock::from(decoder)),
                 rotor,
                 square: Arc::new(OnceLock::from(RotorSquare { reduced, residual })),
             });
@@ -334,9 +362,10 @@ impl PairedObservation {
             chart: Arc::new(EncodedChart {
                 classes: self.classes,
                 sources: self.sources.clone(),
-                // The public scalar boundary decoder reads source 0; all source witnesses
-                // remain attached, and each independently satisfies DE=I.
-                decoder: self.ports[0].decoder.clone(),
+                // The public scalar boundary decoder reads source 0 on its first read
+                // (`Encoded::decoder`); all source witnesses remain attached, and each
+                // independently satisfies DE=I.
+                decoder: None,
                 fibre: Vec::new(),
                 labels: (0..self.classes).map(Some).collect(),
                 advances: None,
@@ -395,7 +424,7 @@ impl PairedObservation {
 
     /// Decode an actual injected amplitude through the first source's exact left decoder.
     pub fn decode(&self, amplitude: &[Rat]) -> Result<Vec<Rat>, EncodingError> {
-        Ok(self.ports[0].decoder.apply(amplitude)?)
+        Ok(self.ports[0].decoder()?.apply(amplitude)?)
     }
 }
 
@@ -453,9 +482,15 @@ mod tests {
         let (field, material, pairing) = fixture();
         let boundary = PairedObservation::admit(&field, &material, &pairing).unwrap();
         let port = &boundary.ports()[0];
+        assert!(port.decoder.get().is_none(), "admission forms no decoder");
+        let charted = boundary.encode(&[1]).unwrap();
         assert_eq!(
-            port.decoder().multiply(port.injection()).unwrap(),
+            port.decoder().unwrap().multiply(port.injection()).unwrap(),
             ExactRatMatrix::identity(4).unwrap()
+        );
+        assert!(
+            std::ptr::eq(charted.decoder().unwrap(), port.decoder().unwrap()),
+            "an encoded passage reads its boundary's one decoder"
         );
         let unread = PairedObservation::admit(&field, &material, &pairing).unwrap();
         let encoded = boundary.encode(&[0]).unwrap();
@@ -717,6 +752,47 @@ mod tests {
     }
 
     #[test]
+    fn lazy_decoder_failure_is_not_cached_and_a_singular_port_is_refused_at_admission() {
+        let (field, material, pairing) = fixture();
+        let boundary = PairedObservation::admit(&field, &material, &pairing).unwrap();
+        let port = &boundary.ports()[0];
+        // Only this owner-module test can forge invalid immutable operands. A failed formation
+        // must neither install a partial decoder nor poison a later read.
+        let mut invalid = port.clone();
+        invalid.decoder = Arc::new(OnceLock::new());
+        invalid.square = Arc::new(OnceLock::new());
+        invalid.injection = ExactRatMatrix::zero(10, 4).unwrap();
+        assert!(invalid.decoder().is_err());
+        assert!(invalid.decoder.get().is_none());
+        assert!(invalid.square().is_err());
+        invalid.injection = port.injection.clone();
+        assert_eq!(invalid.decoder().unwrap(), port.decoder().unwrap());
+        // A port with a kernel is refused before any consumer reads it.
+        let mut collapsed = port.injection().to_rows();
+        for row in &mut collapsed {
+            row[2] = row[0].clone();
+            row[3] = row[1].clone();
+        }
+        let collapsed = ExactRatMatrix::new(collapsed).unwrap();
+        let carrier = PairedCarrier::admit(&field, 0, &pairing, &collapsed).unwrap();
+        let singular = Constitution::initial(&field, 1 << 40)
+            .unwrap()
+            .with_symmetric_source(0, collapsed, carrier.symmetry())
+            .unwrap();
+        assert_eq!(
+            format!(
+                "{:?}",
+                PairedObservation::admit(&field, &singular, &pairing)
+            ),
+            format!(
+                "{:?}",
+                PairedObservation::admit_reference(&field, &singular, &pairing)
+            )
+        );
+        assert!(PairedObservation::admit(&field, &singular, &pairing).is_err());
+    }
+
+    #[test]
     fn paired_observation_matches_independent_original_admission() {
         let (field, material, pairing) = fixture();
         let lazy = PairedObservation::admit(&field, &material, &pairing).unwrap();
@@ -727,8 +803,11 @@ mod tests {
             eager.encode(&[0, 1, 2, 3]).unwrap()
         );
         for (lazy, eager) in lazy.ports().iter().zip(eager.ports()) {
+            assert!(lazy.decoder.get().is_none());
+            assert!(eager.decoder.get().is_some());
             assert!(lazy.square.get().is_none());
             assert!(eager.square.get().is_some());
+            assert_eq!(lazy.decoder().unwrap(), eager.decoder().unwrap());
             assert_eq!(lazy.square().unwrap(), eager.square().unwrap());
         }
         let port = ExactRatMatrix::zero(10, 4).unwrap();

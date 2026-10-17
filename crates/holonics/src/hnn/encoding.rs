@@ -1029,7 +1029,9 @@ impl PortCell {
 struct EncodedChart {
     classes: usize,
     sources: Vec<(usize, u64)>,
-    decoder: ExactRatMatrix,
+    /// `None` exactly on an observed boundary, whose decoder is its source-0 port's, formed on
+    /// that port's first read ([`observed::ObservationPort::decoder`]).
+    decoder: Option<ExactRatMatrix>,
     fibre: Vec<Vec<Rat>>,
     labels: Vec<Option<usize>>,
     advances: Option<LocatedAdvances>,
@@ -1178,7 +1180,7 @@ impl Encoded {
         let chart = Arc::new(EncodedChart {
             classes,
             sources,
-            decoder: ExactRatMatrix::identity(classes)?,
+            decoder: Some(ExactRatMatrix::identity(classes)?),
             fibre: Vec::new(),
             labels: (0..classes).map(Some).collect(),
             advances: None,
@@ -1241,7 +1243,7 @@ impl Encoded {
         let shared = Arc::new(EncodedChart {
             classes,
             sources,
-            decoder: encoding.readout().clone(),
+            decoder: Some(encoding.readout().clone()),
             fibre: encoding.fibre()?,
             labels: located.labels.clone(),
             advances: Some(located.advances.clone()),
@@ -1418,9 +1420,19 @@ impl Encoded {
     }
 
     /// **`D`**, the decoder of the encoding that produced the passage: the identity on `ℚ^|A|` for a
-    /// known truth, the founded readout (`D E = ρ`, one row per class) on the located route.
-    pub fn decoder(&self) -> &ExactRatMatrix {
-        &self.chart.decoder
+    /// known truth, the founded readout (`D E = ρ`, one row per class) on the located route, and on
+    /// an observed boundary the exact left decoder of its first source port, formed on its first
+    /// read (which is why this returns a `Result`: that formation is checked where it happens).
+    pub fn decoder(&self) -> Result<&ExactRatMatrix, EncodingError> {
+        match (&self.chart.decoder, &self.chart.observed) {
+            (Some(decoder), _) => Ok(decoder),
+            (None, Some(observed)) => observed
+                .ports()
+                .first()
+                .ok_or_else(|| chart_refusal("observations require a source ring"))?
+                .decoder(),
+            (None, None) => Err(chart_refusal("the passage chart carries no decoder")),
+        }
     }
 
     /// **The Preimage Fibre**: the reached directions the encoding merges (`ker E ∩ R`, as chart

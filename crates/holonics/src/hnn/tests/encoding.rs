@@ -461,7 +461,10 @@ fn the_identity_refuses_a_terrain_whose_classes_fold_onto_a_source_ring() {
         assert_eq!(&classes, passage);
         assert_eq!(encoded.classes(), 4);
         assert_eq!(encoded.sources(), &[(0, 60)]);
-        assert_eq!(encoded.decoder(), &ExactRatMatrix::identity(4).unwrap());
+        assert_eq!(
+            encoded.decoder().unwrap(),
+            &ExactRatMatrix::identity(4).unwrap()
+        );
         assert!(encoded.fibre().is_empty());
         assert!(encoded.located().is_none());
         for &cell in encoded.cells() {
@@ -471,7 +474,7 @@ fn the_identity_refuses_a_terrain_whose_classes_fold_onto_a_source_ring() {
     // A cut keeps its encoding: the request and its stations.
     let (request, stations) = encoded[0].clone().split_at(40).unwrap();
     assert_eq!((request.len(), stations.len()), (40, 8));
-    assert_eq!(request.decoder(), encoded[0].decoder());
+    assert_eq!(request.decoder().unwrap(), encoded[0].decoder().unwrap());
     assert_eq!(
         [request.cells(), stations.cells()].concat(),
         encoded[0].cells()

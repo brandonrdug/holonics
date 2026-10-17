@@ -1740,7 +1740,7 @@ impl DamagedSection {
         }
         if self.classes() != field.alphabet()
             || !self.chart.fibre().is_empty()
-            || self.chart.decoder()
+            || self.chart.decoder()?
                 != &crate::ratio::linear::ExactRatMatrix::identity(self.classes())?
             || self.runs.iter().any(|(_, run)| {
                 run.cells()

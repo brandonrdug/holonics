@@ -1340,6 +1340,43 @@ pub(crate) fn certified_fibre(
     Ok((Some((particular, kernel)), certificate))
 }
 
+/// **`rank_ℚ A = columns`, read in one prime chart when that chart shows it: an injectivity
+/// certificate that owes no kernel and no inverse.**
+///
+/// [proved-standard] Reduction modulo a prime can only lose rank. When the image of the integral
+/// presentation `B = diag(s) A` in the [`PrimeChart::mersenne61`] chart has full column rank, the
+/// `columns × columns` minor on its pivot rows is nonzero in that chart, hence nonzero over ℤ, and
+/// `A` (with `rank A = rank B`) is injective. That minor is re-read from the presentation by
+/// [`verify_minor`] before the answer is returned, so the sweep alone never decides it.
+///
+/// `Ok(false)` means **not certified in this chart**, never "not injective": a chart whose image
+/// loses rank (a prime dividing every maximal minor) certifies nothing, and the caller owes the
+/// exact reading. The answer does not depend on which prime the chart carries, only its cost does.
+pub(crate) fn certified_injective(matrix: &ExactRatMatrix) -> Result<bool, PrimeImageRefusal> {
+    let columns = matrix.columns();
+    if columns == 0 {
+        return Ok(true);
+    }
+    if matrix.rows() < columns {
+        return Ok(false);
+    }
+    let presentation = IntegralPresentation::of(matrix)?;
+    let chart = PrimeChart::mersenne61()?;
+    let image = PrimeImage::reduce(&presentation, &chart);
+    if image.rank != columns {
+        return Ok(false);
+    }
+    let mut spent = 0u64;
+    verify_minor(
+        &presentation,
+        &chart,
+        &image.pivot_rows,
+        &image.pivot_columns,
+        &mut spent,
+    )?;
+    Ok(true)
+}
+
 /// The one pivot profile a reconstruction lifts against, with the minor that certifies its rank.
 #[derive(Clone, Debug)]
 struct ChosenProfile {
