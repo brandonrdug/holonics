@@ -282,6 +282,28 @@ fn an_empty_fibre_falls_back_to_the_current_configuration() {
     assert_eq!(current, before);
 }
 
+/// An unconstrained gauge orbit locates no key when the menu visits no port.
+/// That ring keeps its nonzero fallback without discarding another ring's location.
+#[test]
+fn an_empty_menu_falls_back_while_the_other_ring_locates() {
+    let field = rotor_field(&[(3, vec![0, 1, 2]), (2, vec![])]);
+    // Both classes lie past ring 1's period, while ring 0 reads a self-edge at port 2.
+    let crib = encoded(&field, &[2, 2]);
+    let current = Current::at(&field, vec![1.into(), 1.into()]).unwrap();
+    let source = locate_ring(&field, 0, &crib, 1, &[1, 1], 1).unwrap();
+    assert!(source.published.is_some());
+    let located = locate_keys(&field, &current, &crib, 1).unwrap();
+    assert_eq!(located.rings[0], source, "the other ring locates as before");
+    let empty = &located.rings[1];
+    assert!(empty.menu_ports.is_empty());
+    assert_eq!(empty.edges, 0);
+    assert_eq!(empty.orbits, 1, "the unconstrained rotor gauge is transitive");
+    assert_eq!(empty.published, None);
+    assert_eq!(empty.carried, None);
+    assert_eq!(empty.configuration, 1, "no evidence moves the ring to key zero");
+    assert!(empty.fell_back);
+}
+
 /// Ring `g` is located under the earlier rings' published or fallen-back configurations: its step
 /// positions come from their carries. A crib a true machine produced on ring 1 with ring 0 at
 /// configuration 1 keeps the truth in ring 1's fibre under that configuration, which ring 0's own

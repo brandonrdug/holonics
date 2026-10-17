@@ -19,6 +19,54 @@ pub struct OccurrencePlacement {
 }
 
 impl OccurrencePlacement {
+    /// Concatenate the actual one-cell placements of an observed crib, inserting
+    /// each unplaced cell's declared selective step at its original opening.
+    /// Each supplied placement must already start at the predecessor's arrival;
+    /// no position or rotor digit is inferred from a later observation.
+    pub fn observed_crib(
+        field: &Field,
+        opening: &Current,
+        cells: &[(usize, Option<OccurrencePlacement>)],
+    ) -> Result<Self, EncodingError> {
+        let periods: Vec<u64> = field.rings().iter().map(|ring| ring.period()).collect();
+        let mut lift = opening.lift().to_vec();
+        let mut advances = Vec::with_capacity(cells.len());
+        let mut arrivals = Vec::with_capacity(cells.len());
+        for (class, placement) in cells {
+            let digits = match placement {
+                Some(placement) => {
+                    if placement.len() != 1
+                        || placement.periods != periods
+                        || placement.opening != lift
+                    {
+                        return Err(chart_refusal(
+                            "the crib placement does not open at its original occurrence",
+                        ));
+                    }
+                    placement.advances[0].clone()
+                }
+                None => (0..periods.len())
+                    .map(|g| field.advance_of(g, *class, None))
+                    .collect(),
+            };
+            field.step_class(&mut lift, *class, Some(&digits))?;
+            if let Some(placement) = placement {
+                if placement.arrivals[0] != lift {
+                    return Err(chart_refusal(
+                        "the crib placement does not arrive at its original occurrence",
+                    ));
+                }
+            }
+            advances.push(digits);
+            arrivals.push(lift.clone());
+        }
+        Ok(Self {
+            periods,
+            opening: opening.lift().to_vec(),
+            advances,
+            arrivals,
+        })
+    }
     /// Place each occurrence at the declared first-k ring residues, retaining all windings.
     /// A repeated identical class can reach a different site: placement belongs to occurrence.
     pub fn at(

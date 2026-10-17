@@ -1108,6 +1108,7 @@ pub struct Field {
     receivers: Vec<ReceiverDeclaration>,
     crib: CribDeclaration,
     population: u64,
+    operand_bounds: BTreeMap<Locus, u128>,
     capacity: Capacity,
     /// The located clock's certificate (`rate_g = d_g`), derived once at the declaration.
     located_capacity: Capacity,
@@ -1247,6 +1248,7 @@ impl Field {
                 });
             }
         }
+        let operand_bounds = learned;
         let lattices: BTreeMap<Locus, Lattice> = declared
             .lattice
             .iter()
@@ -1300,6 +1302,7 @@ impl Field {
             receivers: declared.receivers,
             crib: declared.crib,
             population: declared.population,
+            operand_bounds,
             capacity,
             located_capacity,
             letters: crate::hnn::receiving::FeatureFamily::cells(),
@@ -1492,6 +1495,11 @@ impl Field {
 
     pub fn population(&self) -> u64 {
         self.population
+    }
+
+    /// The declaration's ℓ1 bound on one operand read at a learned locus.
+    pub fn source_operand_bound(&self, locus: Locus) -> Option<u128> {
+        self.operand_bounds.get(&locus).copied()
     }
 
     /// The identity route's capacity crossover `n*` and its certificate; a moment reads it through
