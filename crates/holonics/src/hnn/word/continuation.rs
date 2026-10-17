@@ -2365,6 +2365,11 @@ pub fn world_descent(
 /// observation for each declared coordinate (the cycle's credits are combinations of tangents' credits,
 /// not one tangent's). Refused for a coordinate declared twice, unequal observation counts, or a
 /// family the held return did not reach.
+///
+/// [definition; agent-inferred, October 17] A held step whose covector is zero reaches nothing: a
+/// zero scale bounds no step (the landing needs `2^k c ≤ 1` with `c > 0`). Such a family is
+/// refused here with its own reason, so every step this descent publishes carries the positive
+/// covector scale its landing requires.
 pub fn descent_from_credits(
     theta: &Constitution,
     coordinates: &[super::variation::ContactCoordinate],
@@ -2438,6 +2443,11 @@ pub fn descent_from_credits(
                 .ok_or(HnnError::Unadmitted {
                     reason: "a World-sensitive descent is normalized by its family's reached within-Word metric",
                 })?;
+            if reached.covector.is_zero() {
+                return Err(HnnError::Unadmitted {
+                    reason: "a World-sensitive descent is normalized by a positive covector scale at its family's reached within-Word metric",
+                });
+            }
             let gradient = ExactRatMatrix::shaped(rows, columns, descent)?;
             let gradient = match family {
                 0 => FactorGradient::Storage {
