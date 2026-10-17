@@ -7,6 +7,14 @@ fn fixture(budget: u64) -> (Reference, Resident, MomentId) {
 }
 
 fn fixture_with_family(budget: u64, contact_family: bool) -> (Reference, Resident, MomentId) {
+    fixture_with_material(budget, contact_family, false)
+}
+
+fn fixture_with_material(
+    budget: u64,
+    contact_family: bool,
+    nonzero_operand_control: bool,
+) -> (Reference, Resident, MomentId) {
     let mut declaration = crate::hnn::tests::learning::chain_declaration(4096);
     declaration.founding = true;
     // One class-independent source clock; the later declared rings take carry only.
@@ -28,7 +36,27 @@ fn fixture_with_family(budget: u64, contact_family: bool) -> (Reference, Residen
         budget
     };
     let reference = Reference::new(4, budget);
-    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let mut resident = if nonzero_operand_control {
+        // R2's fixed carried-state construction, not a learning/output-quality control.
+        // Its reach on this chain remains an explicit assertion, never an assumed value.
+        let receiver = field.receivers()[0].ring;
+        let material = crate::hnn::tests::learning::generic_within(&field, 81, budget)
+            .with_ports(
+                receiver,
+                None,
+                None,
+                Some(
+                    ExactRatMatrix::zero(2 * field.alphabet(), field.ring(receiver).width())
+                        .unwrap(),
+                ),
+            )
+            .unwrap();
+        reference
+            .mount_with(&field, &Current::at_rest(&field), material)
+            .unwrap()
+    } else {
+        reference.mount(&field, &Current::at_rest(&field)).unwrap()
+    };
     resident.open_founding().unwrap();
     let prefix = (0..128).map(|k| [0, 0, 1, 0, 2][k % 5]).collect::<Vec<_>>();
     let mut at = 0;
@@ -304,7 +332,7 @@ fn arrived_features(resident: &Resident) -> Vec<Vec<Rat>> {
 
 #[test]
 fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
-    let (reference, mut resident, moment) = fixture(1 << 40);
+    let (reference, mut resident, moment) = fixture_with_material(1 << 40, false, true);
     for _ in 0..2 {
         let phases = resident.admitted[0].clone();
         let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
@@ -319,6 +347,13 @@ fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
         resident.arrived.as_ref().unwrap().opening,
         WordOpening::Received { .. }
     ));
+    assert!(
+        arrived_features(&resident)
+            .iter()
+            .flatten()
+            .any(|x| !x.is_zero()),
+        "the actual pre-founding arrived operand must reach a nonzero feature"
+    );
     let before = resident.ledger.balance().clone();
     resident.publish_founding().unwrap().unwrap();
     let arrived = resident.arrived.as_ref().unwrap();
@@ -355,16 +390,22 @@ fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
     // This witnesses transport/accounting, not production of the remainder by learning.
     let receiver = resident.field.receivers()[0].ring;
     let features = arrived_features(&resident);
-    let column = features[0]
+    let (phase, column) = features
         .iter()
-        .position(|x| !x.is_zero())
+        .enumerate()
+        .find_map(|(phase, feature)| {
+            feature
+                .iter()
+                .position(|x| !x.is_zero())
+                .map(|column| (phase, column))
+        })
         .expect("the receiving word must reach a nonzero feature");
     let unit = resident
         .constitution
         .lattice(Locus::ReceivingMap(receiver))
         .unwrap()
         .unit();
-    let retained = if features[0][column] > Rat::zero() {
+    let retained = if features[phase][column] > Rat::zero() {
         -&unit / crate::ratio::integer(4)
     } else {
         &unit / crate::ratio::integer(4)
@@ -382,7 +423,7 @@ fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
         at..at + "map-carry 0\n".len(),
         &format!("map-carry 1\n{column} {retained}\n"),
     );
-    let opening = Constitution::initial(&resident.field, 1 << 40).unwrap();
+    let opening = resident.constitution.clone();
     let text = ContinuingState::stamped(&text, &opening).unwrap();
     resident.constitution = opening
         .continued(&ContinuingState::from_text(&text).unwrap())

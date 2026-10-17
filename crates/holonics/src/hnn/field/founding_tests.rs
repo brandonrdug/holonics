@@ -216,7 +216,7 @@ fn r4b_declaration_and_located_route_refusals_are_typed() {
     let mut declaration = listener(1, 1 << 16);
     declaration.receivers.clear();
     assert!(matches!(
-        Field::declare(declaration)
+        Field::declare(declaration.by_lattice_rule())
             .unwrap()
             .found(FoundedRing { period: 2, key: 0 }),
         Err(HnnError::Founding { .. })
@@ -224,7 +224,7 @@ fn r4b_declaration_and_located_route_refusals_are_typed() {
     let mut declaration = listener(1, 1 << 16);
     declaration.receivers[0].ring = 0;
     assert!(matches!(
-        Field::declare(declaration)
+        Field::declare(declaration.by_lattice_rule())
             .unwrap()
             .found(FoundedRing { period: 2, key: 0 }),
         Err(HnnError::Founding { .. })
