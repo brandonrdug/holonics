@@ -825,6 +825,13 @@ alternating `u = 1, −1` on both fixtures, against the twin:
 - Fixture 2: better at encounters 2, 3, 5, 7 and 9, worse at 4 and 8, a lower code with a higher
   excess at 6, and equal at 1.
 
+[measured October 17, after #388's common contact lattice;
+[receipt](receipts/2026-10-09-material-tangent/PER_ENCOUNTER_LOOP_COMMON_LATTICE.v1.json)] The readings
+above are the October 10 measurement. On fixture 1 the landing before encounter 9 is now refused at its
+proposal: the family it descends is reached, but its held step carries a zero covector, and a zero scale
+bounds no step (`descent_from_credits` refuses it with its own reason). Before that refusal moved to the
+producer, the landing refused the same step and the loop panicked on it.
+
 Some landings are refused or unreached: `EqualEndpoints`, `PhaseWorse`, and an unreached
 `CovectorScale`.
 
