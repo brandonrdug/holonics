@@ -232,6 +232,8 @@ fn the_reception_carry_continues_from_the_last_crossing() {
 pub(super) fn joint() -> Field {
     Field::declare(
         crate::hnn::field::FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![
                 super::support::ring(6, (0..6).collect()),
                 super::support::ring(6, Vec::new()),
@@ -1365,6 +1367,8 @@ fn sixty_field() -> Field {
     };
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![RingDeclaration {
                 reflector: (0..60).map(|p| ((60 - p) % 60) as usize).collect(),
                 ..ring
@@ -1688,6 +1692,8 @@ mod physical_repair {
     fn field_with_lock_and_offsets(lock: Vec<u64>, offsets: Vec<usize>) -> Field {
         Field::declare(
             FieldDeclaration {
+                founded: Vec::new(),
+                founding: false,
                 rings: vec![ring(8, lock), ring(3, Vec::new())],
                 contacts: vec![contact(0, 1, 3, 0)],
                 loops: Vec::new(),
@@ -1910,6 +1916,8 @@ mod physical_repair {
         receiver.ring = 2;
         let field = Field::declare(
             FieldDeclaration {
+                founded: Vec::new(),
+                founding: false,
                 rings: [2, 3, 5]
                     .into_iter()
                     .map(|period| ring(period, vec![0]))

@@ -35,6 +35,8 @@ fn receiver() -> ReceiverDeclaration {
 fn field() -> Field {
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(4, (0..4).collect()), ring(3, Vec::new())],
             contacts: vec![contact(0, 1, 3, 0)],
             loops: Vec::new(),

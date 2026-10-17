@@ -40,17 +40,19 @@
 //! [definition] **Selective stepping** ([`Field::selective_step`], design (a), "Stepping is
 //! selective"): on each source cell `x`, ring `g` advances `c_g(x) = [port_g(x) ∈ N_g]` ticks, plus
 //! one carry when its predecessor in the carry chain `0 → 1 → … → G−1` wraps. The last ring's
-//! carry is the joint clock's carry-out, the aeon boundary. A ring whose lock no input fits and
+//! carry is the joint clock's carry-out, the aeon boundary. Appended Own rings do not alter it. A ring whose lock no input fits and
 //! that receives no carry keeps its configuration (Lean `HNN/Keys.selective_step_dormant`).
 //!
 //! [definition; agent-inferred, October 5; THE_MACHINE guard 9] **The port chart is the encoding's
 //! classes.** The field reads a source only as `hnn::encoding::Encoded`: each occurrence a class `c`
 //! of the encoding's chart, and `|A|` ([`FieldDeclaration::alphabet`]) is that chart's class count,
 //! never an exterior alphabet: it bounds the classes of the encodings the field admits
-//! ([`Field::admit`]). An encoding's classes inject into every source ring's ports (`Encoded`
+//! ([`Field::admit`]). An encoding's classes inject into every Lock source ring's ports (`Encoded`
 //! refuses a fold, `EncodingError::Fold`), so every class is its own port there,
 //! `port_g(c) = c`; on any other ring a class at or past `d_g` reads the port `d_g`, which no lock
-//! admits ([`Ring::port`]). The codec's
+//! admits ([`Ring::port`]). An Own source ring takes one tick a cell and carries no incoming or
+//! outgoing winding into the declared chain. Its clock reads the cell count, not a class port;
+//! its learned port reads all class counts, with no injectivity premise. The codec's
 //! residue chart `code mod d_g` was deleted with its constructor (October 5); it is at
 //! [`f91666c0`](https://github.com/brandonrdug/holonics/blob/f91666c0/crates/holonics/src/hnn/field.rs).
 //!
@@ -115,6 +117,7 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus};
 use crate::hnn::encoding::Encoded;
+use crate::hnn::founding::Candidate;
 use crate::hnn::moment::{Capacity, PairPort, capacity, capacity_located};
 #[cfg(test)]
 use crate::holarchy::GluingDefect;
@@ -432,6 +435,10 @@ pub struct CribDeclaration {
 /// ring cycles (each consecutive pair, and the last with the first, joined by a contact).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldDeclaration {
+    /// Rings derived from their period and key, in founding order.
+    pub founded: Vec<FoundedRing>,
+    /// Whether a resident may open the founding law.
+    pub founding: bool,
     pub rings: Vec<RingDeclaration>,
     pub contacts: Vec<ContactDeclaration>,
     pub loops: Vec<Vec<usize>>,
@@ -525,6 +532,8 @@ impl FieldDeclaration {
             })
             .collect();
         Self {
+            founded: Vec::new(),
+            founding: false,
             rings,
             contacts,
             loops: vec![vec![0, 1, 2, 3]],
@@ -673,9 +682,26 @@ pub fn lattice_exponent(grain: u128, fan_in: u128) -> u32 {
 // -------------------------------------------------------------------------------------------
 // the ring
 
+/// [definition] A founded ring's complete declaration; the field derives its material chart.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct FoundedRing {
+    pub period: u64,
+    pub key: u64,
+}
+
+/// [definition] A ring's advance at a cell, independently of its spatial placement.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RingAdvance {
+    /// The port's lock fit and the preceding declared ring's carry.
+    Lock,
+    /// One tick per cell, with neither carry in nor carry out.
+    Own,
+}
+
 /// [definition] **A closing rotor ring**, checked. See the module header.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Ring {
+    advance: RingAdvance,
     period: u64,
     navigator: Navigator,
     reflector: PortPermutation,
@@ -689,6 +715,9 @@ pub struct Ring {
 }
 
 impl Ring {
+    pub fn advance(&self) -> RingAdvance {
+        self.advance
+    }
     fn declare(index: usize, declared: &RingDeclaration) -> Result<Self, HnnError> {
         let period = declared.period;
         if period < 2 {
@@ -774,6 +803,7 @@ impl Ring {
         })?;
         let parametron = Parametron::new(incidence, vec![Rat::one(); d], vec![Rat::one(); d])?;
         Ok(Self {
+            advance: RingAdvance::Lock,
             period,
             navigator,
             reflector,
@@ -1098,6 +1128,10 @@ pub struct SelectiveStep {
 /// [definition] **The HNN field**, declared and checked. See the module header.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Field {
+    declaration: FieldDeclaration,
+    /// Unexpanded declaration chart; expansion consequences are derived, never described again.
+    description_base: Option<Box<Field>>,
+    cell_clock: u64,
     rings: Vec<Ring>,
     contacts: Vec<Contact>,
     incident: Vec<Vec<usize>>,
@@ -1141,7 +1175,54 @@ impl Field {
     /// count of the encodings the field reads, and it enters only `n*` and the moment's slots. A
     /// class enters only where it injects into every source ring's ports, which the encoding checks
     /// (`hnn::encoding::Encoded`, `EncodingError::Fold`; guard 9) and [`Field::admit`] reads.
-    pub fn declare(declared: FieldDeclaration) -> Result<Self, HnnError> {
+    pub fn declare(mut declared: FieldDeclaration) -> Result<Self, HnnError> {
+        let declaration = declared.clone();
+        let predecessor = if declared.founded.is_empty() {
+            None
+        } else {
+            let mut base = declared.clone();
+            base.founded.clear();
+            Some(Self::declare(base)?)
+        };
+        if let Some(base) = &predecessor {
+            let (source, receiver, contact) = base.founding_anchor()?;
+            for founded in &declaration.founded {
+                if founded.period < 2 || founded.key >= founded.period {
+                    return Err(HnnError::Founding {
+                        what: "a founded period and key",
+                    });
+                }
+                let period = founded.period;
+                let ring = declared.rings.len();
+                declared.rings.push(RingDeclaration {
+                    period,
+                    screw: base.ring(source).screw().clone(),
+                    placements: (0..period)
+                        .map(|n| FieldDeclaration::quarter_turn(n, period))
+                        .collect(),
+                    lock: Vec::new(),
+                    reflector: (0..period)
+                        .map(|n| ((period - n) % period) as usize)
+                        .collect(),
+                    admittance: base.ring(source).admittance().clone(),
+                    initial: founded.key,
+                });
+                declared.sources.push(ring);
+                declared.contacts.push(ContactDeclaration {
+                    from: ring,
+                    to: receiver,
+                    channel: (0..period.min(base.ring(receiver).period()) as usize)
+                        .map(|n| (n, n))
+                        .collect(),
+                    admittance: base.contact(contact).admittance().clone(),
+                    exponent: base.contact(contact).exponent().clone(),
+                });
+            }
+            // The declaration's loci keep their actual lattice, even when finer than the rule.
+            for (locus, exponent) in declared.lattice_by_rule() {
+                declared.lattice.entry(locus).or_insert(exponent);
+            }
+        }
         if declared.rings.is_empty() {
             return Err(HnnError::Shape {
                 what: "rings",
@@ -1152,12 +1233,15 @@ impl Field {
         if !declared.step.is_positive() || declared.exponent_grain == 0 || declared.alphabet == 0 {
             return Err(HnnError::NonpositiveDeclaration);
         }
-        let rings = declared
+        let mut rings = declared
             .rings
             .iter()
             .enumerate()
             .map(|(index, ring)| Ring::declare(index, ring))
             .collect::<Result<Vec<_>, _>>()?;
+        for ring in &mut rings[declaration.rings.len()..] {
+            ring.advance = RingAdvance::Own;
+        }
         let contacts = declared
             .contacts
             .iter()
@@ -1276,8 +1360,10 @@ impl Field {
         offsets.sort_unstable();
         offsets.dedup();
         let periods: Vec<u64> = rings.iter().map(Ring::period).collect();
-        let capacity = capacity(&periods, &sources, declared.alphabet, &offsets)?;
-        let located_capacity = capacity_located(&periods, &sources, declared.alphabet, &offsets)?;
+        let advances: Vec<_> = rings.iter().map(Ring::advance).collect();
+        let capacity = capacity(&periods, &advances, &sources, declared.alphabet, &offsets)?;
+        let located_capacity =
+            capacity_located(&periods, &advances, &sources, declared.alphabet, &offsets)?;
         let word = Some(word_by_rule(
             &rings,
             &contacts,
@@ -1285,6 +1371,31 @@ impl Field {
             &distances,
             &declared.receivers,
         ));
+        if let (Some(base), Some(next)) = (&predecessor, &word)
+            && base.word.as_ref().is_some_and(|old| {
+                next.chart_exponent() < old.chart_exponent()
+                    || next.target_exponent() < old.target_exponent()
+                    || next.transient_exponent() < old.transient_exponent()
+            })
+        {
+            return Err(HnnError::Founding {
+                what: "a founding would coarsen the word",
+            });
+        }
+        let mut cell_clock = 1u64;
+        for (g, ring) in rings.iter().enumerate() {
+            if ring.advance == RingAdvance::Own
+                || (g == 0 && (0..declared.alphabet).all(|c| ring.fits(ring.port(c))))
+            {
+                let divisor = gcd_u64(cell_clock, ring.period);
+                cell_clock =
+                    (cell_clock / divisor)
+                        .checked_mul(ring.period)
+                        .ok_or(HnnError::Founding {
+                            what: "the cell clock exceeds its exact carrier",
+                        })?;
+            }
+        }
         if declared.population < capacity.n_star() {
             return Err(HnnError::BelowCapacity {
                 population: declared.population,
@@ -1292,6 +1403,9 @@ impl Field {
             });
         }
         Ok(Self {
+            declaration,
+            description_base: predecessor.map(Box::new),
+            cell_clock,
             rings,
             contacts,
             incident,
@@ -1316,6 +1430,127 @@ impl Field {
             lattices,
             word,
         })
+    }
+
+    /// The exact period of the cell-count phase resolved by the field.
+    pub fn cell_clock_period(&self) -> u64 {
+        self.cell_clock
+    }
+
+    pub(crate) fn admit_lock_route(&self) -> Result<(), HnnError> {
+        if self
+            .rings
+            .iter()
+            .any(|ring| ring.advance == RingAdvance::Own)
+        {
+            Err(HnnError::Founding {
+                what: "the founding's located route is owed",
+            })
+        } else {
+            Ok(())
+        }
+    }
+
+    pub fn declaration(&self) -> &FieldDeclaration {
+        &self.declaration
+    }
+
+    fn founding_anchor(&self) -> Result<(usize, usize, usize), HnnError> {
+        let receiver = self
+            .receivers
+            .first()
+            .ok_or(HnnError::Founding {
+                what: "a founding needs a receiver",
+            })?
+            .ring;
+        let (distance, source) = self
+            .sources
+            .iter()
+            .filter_map(|&g| self.distance(g, receiver).map(|e| (e, g)))
+            .min()
+            .ok_or(HnnError::Founding {
+                what: "a founding needs a reached receiver",
+            })?;
+        if distance == 0 {
+            return Err(HnnError::Founding {
+                what: "a source at the receiver cannot anchor a founding",
+            });
+        }
+        let neighbour = self
+            .rings
+            .iter()
+            .enumerate()
+            .filter_map(|(g, _)| {
+                (self.distance(source, g) == Some(1)
+                    && self.distance(g, receiver) == Some(distance - 1))
+                .then_some(g)
+            })
+            .min()
+            .ok_or(HnnError::Founding {
+                what: "a founding needs an inward neighbour",
+            })?;
+        let contact = self
+            .contacts
+            .iter()
+            .position(|a| a.ends() == (source, neighbour))
+            .ok_or(HnnError::Founding {
+                what: "a founding needs its oriented anchor contact",
+            })?;
+        Ok((source, neighbour, contact))
+    }
+
+    /// The exact description increment: gamma(k+2)-gamma(k+1)+gamma(ell+1)+gamma(ell).
+    pub fn founding_cost(&self, period: u64) -> u64 {
+        let length = |n: u64| 2 * (BigUint::from(n) + BigUint::one()).bits() - 1;
+        let k = self.declaration.founded.len() as u64;
+        length(k + 1) - length(k) + length(period) + length(period.saturating_sub(1))
+    }
+
+    /// The capacity fixes the last admitted period; no authored period ceiling enters the law.
+    pub fn founding_candidates(&self) -> Result<Vec<Candidate>, HnnError> {
+        let mut candidates = Vec::new();
+        let mut period = 2u64;
+        loop {
+            match self.found(FoundedRing {
+                period,
+                key: period - 1,
+            }) {
+                Ok(_) => {}
+                Err(HnnError::BelowCapacity { .. }) => break,
+                Err(_) if period == 2 => break,
+                Err(error) => return Err(error),
+            }
+            if !self.cell_clock.is_multiple_of(period) {
+                candidates.push(Candidate {
+                    period,
+                    cost: self.founding_cost(period),
+                });
+            }
+            period = period.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        }
+        Ok(candidates)
+    }
+
+    /// Re-declare the field while retaining attachments which are not part of its declaration.
+    pub fn found(&self, ring: FoundedRing) -> Result<Self, HnnError> {
+        let mut declaration = self.declaration.clone();
+        declaration.founded.push(ring);
+        let mut next = Self::declare(declaration)?;
+        if let (Some(old), Some(word)) = (&self.word, &next.word)
+            && (word.chart_exponent() < old.chart_exponent()
+                || word.target_exponent() < old.target_exponent()
+                || word.transient_exponent() < old.transient_exponent())
+        {
+            return Err(HnnError::Founding {
+                what: "a founding would coarsen the word",
+            });
+        }
+        next.letters = self.letters.clone();
+        next.receiving_contexts = self.receiving_contexts.clone();
+        if self.word.is_none() {
+            next.word = None;
+        }
+        Ok(next)
     }
 
     /// [definition; agent-inferred, October 10; the online-learning record §7] **The receivers'
@@ -1588,6 +1823,11 @@ impl Field {
         }
         if let Some(observation) = encoded.observation() {
             for port in observation.ports() {
+                if self.ring(port.carrier().ring()).advance != RingAdvance::Lock {
+                    return Err(HnnError::Unadmitted {
+                        reason: "an observation port's clock law changed",
+                    });
+                }
                 if self.ring(port.carrier().ring()).reflector().images()
                     != port.carrier().reflector()
                 {
@@ -1595,6 +1835,15 @@ impl Field {
                         reason: "its observed boundary was admitted on another source dyad",
                     });
                 }
+            }
+            if observation
+                .witnesses()
+                .iter()
+                .any(|witness| self.ring(witness.ring).advance != RingAdvance::Own)
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "an observation phase witness's clock law changed",
+                });
             }
         }
         if let Some(periods) = encoded.transport_periods()
@@ -1614,6 +1863,7 @@ impl Field {
     /// **The lift read as the helix's lift** `ℓ = Σ_g τ_g ∏_(h<g) d_h` (`τ_g` ring `g`'s phase
     /// class): the state of the located chart `ℚ^D` the encoding reads.
     fn helix_lift(&self, lift: &[BigInt]) -> Result<u64, HnnError> {
+        self.admit_lock_route()?;
         let mut state = 0u64;
         for (ring, tau) in self.rings.iter().zip(lift).rev() {
             let digit = ring_digit(&ring.clock_at(tau)?);
@@ -1694,6 +1944,7 @@ impl Field {
         let step = match encoded.advance(at) {
             None => self.step_class(&mut staged, cell.class(), None)?,
             Some(digits) => {
+                self.admit_lock_route()?;
                 let before = self.helix_lift(lift)?;
                 let step = self.step_class(&mut staged, cell.class(), Some(digits))?;
                 let after = self.helix_lift(&staged)?;
@@ -1709,6 +1960,9 @@ impl Field {
     /// **Ring `g`'s advance on a class before its carry**: the class's located digit `a_g(c)` on
     /// the located route, else its lock's fit `[c ∈ N_g]`.
     pub(crate) fn advance_of(&self, ring: usize, class: usize, digits: Option<&[u64]>) -> u64 {
+        if self.rings[ring].advance == RingAdvance::Own {
+            return 1;
+        }
         match digits {
             Some(digits) => digits[ring],
             None => {
@@ -1743,6 +1997,12 @@ impl Field {
         let mut ticks = Vec::with_capacity(self.rings.len());
         let mut carry = 0u64;
         for (g, (ring, tau)) in self.rings.iter().zip(lift.iter_mut()).enumerate() {
+            if ring.advance == RingAdvance::Own {
+                ring.clock_at(tau)?;
+                *tau += 1;
+                ticks.push(1);
+                continue;
+            }
             let advance = self.advance_of(g, class, digits) + carry;
             let jumps = ring.clock_at(tau)?.advance(&BigUint::from(advance));
             *tau += advance;
@@ -2231,9 +2491,10 @@ impl Field {
     /// and rationals as (numerator, denominator). It is the one exact code of the declaration
     /// (guard 13), and `Kt` pays for every part of it (design (f), review D3).
     pub fn describe(&self, budget: u64, pending_capacity: usize) -> Vec<bool> {
+        let field = self.description_base.as_deref().unwrap_or(self);
         let mut code = Vec::new();
-        natural(&mut code, self.rings.len() as u64);
-        for ring in &self.rings {
+        natural(&mut code, field.rings.len() as u64);
+        for ring in &field.rings {
             natural(&mut code, ring.period);
             naturals(&mut code, &ring.notches());
             let reflector: Vec<u64> = (0..ring.placements.len())
@@ -2249,8 +2510,13 @@ impl Field {
             rational(&mut code, &ring.admittance);
             natural(&mut code, ring.initial);
         }
-        natural(&mut code, self.contacts.len() as u64);
-        for contact in &self.contacts {
+        natural(&mut code, self.declaration.founded.len() as u64);
+        for ring in &self.declaration.founded {
+            natural(&mut code, ring.period);
+            natural(&mut code, ring.key);
+        }
+        natural(&mut code, field.contacts.len() as u64);
+        for contact in &field.contacts {
             natural(&mut code, contact.from as u64);
             natural(&mut code, contact.to as u64);
             natural(&mut code, contact.channel.len() as u64);
@@ -2261,8 +2527,8 @@ impl Field {
             rational(&mut code, &contact.admittance);
             rational(&mut code, &contact.exponent);
         }
-        natural(&mut code, self.loops.len() as u64);
-        for cycle in &self.loops {
+        natural(&mut code, field.loops.len() as u64);
+        for cycle in &field.loops {
             naturals(
                 &mut code,
                 &cycle.iter().map(|c| *c as u64).collect::<Vec<_>>(),
@@ -2270,17 +2536,17 @@ impl Field {
         }
         naturals(
             &mut code,
-            &self.sources.iter().map(|s| *s as u64).collect::<Vec<_>>(),
+            &field.sources.iter().map(|s| *s as u64).collect::<Vec<_>>(),
         );
         naturals(
             &mut code,
-            &self.offsets.iter().map(|o| *o as u64).collect::<Vec<_>>(),
+            &field.offsets.iter().map(|o| *o as u64).collect::<Vec<_>>(),
         );
-        natural(&mut code, self.alphabet as u64);
-        rational(&mut code, &self.step);
-        natural(&mut code, self.exponent_grain);
-        natural(&mut code, self.receivers.len() as u64);
-        for receiver in &self.receivers {
+        natural(&mut code, field.alphabet as u64);
+        rational(&mut code, &field.step);
+        natural(&mut code, field.exponent_grain);
+        natural(&mut code, field.receivers.len() as u64);
+        for receiver in &field.receivers {
             natural(&mut code, receiver.ring as u64);
             natural(&mut code, receiver.aperture as u64);
             rational(&mut code, &receiver.tolerance);
@@ -2296,11 +2562,11 @@ impl Field {
             natural(&mut code, u64::from(receiver.mass));
             natural(&mut code, u64::from(receiver.base == BaseMeasure::Root));
         }
-        natural(&mut code, self.crib.window as u64);
-        natural(&mut code, self.crib.offset as u64);
-        natural(&mut code, self.population);
-        natural(&mut code, self.lattices.len() as u64);
-        for (locus, lattice) in &self.lattices {
+        natural(&mut code, field.crib.window as u64);
+        natural(&mut code, field.crib.offset as u64);
+        natural(&mut code, field.population);
+        natural(&mut code, field.lattices.len() as u64);
+        for (locus, lattice) in &field.lattices {
             let (kind, index) = match *locus {
                 Locus::Element(g) => (0, g),
                 Locus::Junction(g) => (1, g),
@@ -2316,7 +2582,11 @@ impl Field {
             natural(&mut code, u64::from(lattice.exponent()));
         }
         // The word's precisions (the lattice word): `L_c`, `D_c`, `L_w`; none for the exact law.
-        match &self.word {
+        match if self.word.is_none() {
+            None
+        } else {
+            field.word.as_ref()
+        } {
             Some(word) => naturals(
                 &mut code,
                 &[
@@ -2327,7 +2597,7 @@ impl Field {
             ),
             None => naturals(&mut code, &[]),
         }
-        natural(&mut code, self.capacity.n_star());
+        natural(&mut code, field.capacity.n_star());
         // The source's open: 2 names "the normalized open that reads no held cell" (the marginal
         // over its population and the whole offset moment over its pair population; the encoding
         // pin of September 29), with its population chart's lattice `L_ν`
@@ -2336,7 +2606,7 @@ impl Field {
         natural(&mut code, 2);
         natural(
             &mut code,
-            u64::from(crate::hnn::moment::PopulationChart::of(self).exponent()),
+            u64::from(crate::hnn::moment::PopulationChart::of(field).exponent()),
         );
         // The gauge convention (design R3 K2): 0 names "S_g(p_0) = 0 at the least visited port".
         natural(&mut code, 0);
@@ -2715,6 +2985,11 @@ impl Current {
     }
 
     /// `λ`.
+    /// The new ring's clock starts at the same key as its founding evidence.
+    pub fn found_ring(&mut self, key: u64) {
+        self.lift.push(BigInt::from(key));
+    }
+
     pub fn lift(&self) -> &[BigInt] {
         &self.lift
     }
@@ -2775,3 +3050,13 @@ impl Current {
         Ok(i64::try_from(phase).unwrap_or(i64::MAX) - i64::try_from(old).unwrap_or(i64::MAX))
     }
 }
+
+fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
+    while b != 0 {
+        (a, b) = (b, a % b);
+    }
+    a
+}
+
+#[cfg(test)]
+pub(crate) mod founding_tests;

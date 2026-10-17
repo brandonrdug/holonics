@@ -232,7 +232,7 @@ pub struct EnclosedBalance {
     pub closing: Option<ExactInterval>,
     /// `W = Σ (hi_k − lo_k)` over the aeon's interior occurrences.
     pub widening: Rat,
-    /// The steps taken: exchanges (arrivals after the first reading, and releases), deposits and
+    /// The steps taken: exchanges (arrivals after the first reading, releases and foundings), deposits and
     /// publications. Publication is a deposition-class step at an already arrived source.
     pub exchanges: u64,
     pub depositions: u64,
@@ -413,6 +413,12 @@ impl EnclosedLedger {
     /// targets now reading `reread`: the released part, counted as exchange. Refused before any
     /// reading.
     pub fn release(&mut self, reread: ExactInterval) -> Result<(), AeonError> {
+        self.step(reread, LedgerStep::Exchange)
+    }
+
+    /// The field declaration moved at the fixed arrived targets: one exchange, no arrival/cells.
+    /// The successor remains the closing operand, so subsequent steps still telescope.
+    pub fn found(&mut self, reread: ExactInterval) -> Result<(), AeonError> {
         self.step(reread, LedgerStep::Exchange)
     }
 
@@ -779,5 +785,31 @@ mod tests {
         assert_eq!(read.literal, ExactInterval::point(integer(4)));
         assert_eq!(read.gain.lower, &read.literal.lower - &read.code.upper);
         assert_eq!(read.gain.upper, &read.literal.upper - &read.code.lower);
+    }
+}
+
+#[cfg(test)]
+mod founding_tests {
+    use super::*;
+    use crate::ratio::integer;
+    #[test]
+    fn r4b_founding_is_an_atomic_exchange_without_an_arrival() {
+        let mut ledger = EnclosedLedger::new();
+        let before = ledger.balance().clone();
+        assert_eq!(
+            ledger.found(ExactInterval::point(integer(3))),
+            Err(AeonError::NoOccurrence)
+        );
+        assert_eq!(ledger.balance(), &before);
+        ledger.arrive(ExactInterval::point(integer(7)), 2);
+        let before = ledger.balance().clone();
+        ledger.found(ExactInterval::point(integer(3))).unwrap();
+        assert_eq!(ledger.balance().exchange, ExactInterval::point(integer(-4)));
+        assert_eq!(ledger.balance().exchanges, before.exchanges + 1);
+        assert_eq!(
+            (ledger.balance().arrivals, ledger.balance().cells),
+            (before.arrivals, before.cells)
+        );
+        assert_eq!(ledger.balance().total(), ledger.balance().change());
     }
 }

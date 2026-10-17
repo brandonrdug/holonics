@@ -49,6 +49,8 @@ fn field_at(
         .collect();
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings,
             contacts: [(0usize, 1usize, 2usize), (1, 2, 3)]
                 .into_iter()
@@ -90,8 +92,22 @@ fn field_at(
 
 #[test]
 fn the_located_bound_has_its_own_exact_crossover_and_identity_is_unchanged() {
-    let old = capacity(&[2, 3, 5], &[2], 5, &[1, 3]).unwrap();
-    let full = capacity_located(&[2, 3, 5], &[2], 5, &[1, 3]).unwrap();
+    let old = capacity(
+        &[2, 3, 5],
+        &[holonics::hnn::RingAdvance::Lock; 3],
+        &[2],
+        5,
+        &[1, 3],
+    )
+    .unwrap();
+    let full = capacity_located(
+        &[2, 3, 5],
+        &[holonics::hnn::RingAdvance::Lock; 3],
+        &[2],
+        5,
+        &[1, 3],
+    )
+    .unwrap();
     assert_eq!(old.clock(), CapacityClock::Identity);
     assert_eq!(old.advance_bounds(), &[2, 2, 2]);
     assert_eq!(old.n_star(), 436);
@@ -106,11 +122,27 @@ fn the_located_bound_has_its_own_exact_crossover_and_identity_is_unchanged() {
         }
     }
     assert_eq!(
-        capacity(&[3, 4, 5], &[0, 1, 2], 2, &[]).unwrap().n_star(),
+        capacity(
+            &[3, 4, 5],
+            &[holonics::hnn::RingAdvance::Lock; 3],
+            &[0, 1, 2],
+            2,
+            &[]
+        )
+        .unwrap()
+        .n_star(),
         137
     );
     assert_eq!(
-        capacity(&[5, 7, 11, 13], &[0], 5, &[1]).unwrap().n_star(),
+        capacity(
+            &[5, 7, 11, 13],
+            &[holonics::hnn::RingAdvance::Lock; 4],
+            &[0],
+            5,
+            &[1]
+        )
+        .unwrap()
+        .n_star(),
         190
     );
 }
@@ -118,18 +150,42 @@ fn the_located_bound_has_its_own_exact_crossover_and_identity_is_unchanged() {
 #[test]
 fn the_lift_factor_widens_before_the_word_sized_rate_and_count_are_multiplied() {
     let maximum = u64::MAX;
-    let full = capacity_located(&[maximum], &[], 2, &[]).unwrap();
+    let full = capacity_located(
+        &[maximum],
+        &[holonics::hnn::RingAdvance::Lock; 1],
+        &[],
+        2,
+        &[],
+    )
+    .unwrap();
     assert_eq!(
         full.states(maximum),
         (BigUint::from(1u32) << 128usize) - (BigUint::from(1u32) << 64usize)
     );
-    let old = capacity(&[maximum], &[], 2, &[]).unwrap();
+    let old = capacity(
+        &[maximum],
+        &[holonics::hnn::RingAdvance::Lock; 1],
+        &[],
+        2,
+        &[],
+    )
+    .unwrap();
     assert_eq!(
         old.states(maximum),
         BigUint::from(3u32) * BigUint::from(maximum)
     );
-    assert_eq!(capacity(&[2], &[], 2, &[]).unwrap().state_bits(0), 1);
-    assert_eq!(capacity(&[4], &[], 2, &[]).unwrap().state_bits(0), 2);
+    assert_eq!(
+        capacity(&[2], &[holonics::hnn::RingAdvance::Lock; 1], &[], 2, &[])
+            .unwrap()
+            .state_bits(0),
+        1
+    );
+    assert_eq!(
+        capacity(&[4], &[holonics::hnn::RingAdvance::Lock; 1], &[], 2, &[])
+            .unwrap()
+            .state_bits(0),
+        2
+    );
     assert!(matches!(
         full.certifies(u64::from(u32::MAX) + 1),
         Err(HnnError::CountOverflow)
@@ -139,25 +195,38 @@ fn the_lift_factor_widens_before_the_word_sized_rate_and_count_are_multiplied() 
 #[test]
 fn malformed_capacity_declarations_and_lifts_are_typed_refusals() {
     for bad in [
-        capacity_located(&[1], &[0], 2, &[]),
-        capacity_located(&[2], &[0], 1, &[]),
-        capacity_located(&[2], &[0], 2, &[0]),
+        capacity_located(&[1], &[holonics::hnn::RingAdvance::Lock; 1], &[0], 2, &[]),
+        capacity_located(&[2], &[holonics::hnn::RingAdvance::Lock; 1], &[0], 1, &[]),
+        capacity_located(&[2], &[holonics::hnn::RingAdvance::Lock; 1], &[0], 2, &[0]),
     ] {
         assert!(matches!(bad, Err(HnnError::NonpositiveDeclaration)));
     }
     assert!(matches!(
-        capacity_located(&[2], &[1], 2, &[]),
+        capacity_located(&[2], &[holonics::hnn::RingAdvance::Lock; 1], &[1], 2, &[]),
         Err(HnnError::Shape { .. })
     ));
-    let full = capacity_located(&[2, 3, 5], &[2], 5, &[1, 3]).unwrap();
+    let full = capacity_located(
+        &[2, 3, 5],
+        &[holonics::hnn::RingAdvance::Lock; 3],
+        &[2],
+        5,
+        &[1, 3],
+    )
+    .unwrap();
     let turn = BigInt::from(1u32) << 80usize;
     let opening = vec![&turn * 2 + 1, &turn * 3 + 2, &turn * 5 + 4];
     let reached: Vec<BigInt> = opening.iter().zip([2, 3, 5]).map(|(x, d)| x + d).collect();
     full.check_lift(&opening, &reached, 1).unwrap();
     assert!(matches!(
-        capacity(&[2, 3, 5], &[2], 5, &[1, 3])
-            .unwrap()
-            .check_lift(&opening, &reached, 1),
+        capacity(
+            &[2, 3, 5],
+            &[holonics::hnn::RingAdvance::Lock; 3],
+            &[2],
+            5,
+            &[1, 3]
+        )
+        .unwrap()
+        .check_lift(&opening, &reached, 1),
         Err(HnnError::Unadmitted { .. })
     ));
     let mut beyond = reached.clone();

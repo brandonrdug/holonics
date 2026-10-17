@@ -31,6 +31,8 @@ fn rotor_field(rings: &[(u64, Vec<u64>)]) -> Field {
         .unwrap();
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: rings
                 .iter()
                 .map(|(period, lock)| ring(*period, lock.clone()))

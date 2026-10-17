@@ -32,6 +32,8 @@ fn field() -> Field {
         .collect();
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings,
             // [agent-inferred, adoption, October 5] `Field::declare` reaches every ring from a
             // source ring: the helix's rings joined in a chain on their common nodes. The moment's

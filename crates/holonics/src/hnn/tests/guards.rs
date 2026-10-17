@@ -50,7 +50,14 @@ fn guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity() {
     }
     assert_eq!(sized(&moment), before);
     assert_eq!(before, 2 * (4 + 4 * 4) + 1);
-    let control = capacity(&[3, 4, 5], &[0, 1, 2], 2, &[]).unwrap();
+    let control = capacity(
+        &[3, 4, 5],
+        &[crate::hnn::RingAdvance::Lock; 3],
+        &[0, 1, 2],
+        2,
+        &[],
+    )
+    .unwrap();
     for n in [2u64, 64, 136, 137, 512, 4096] {
         let per_source_bit_below_one = control.state_bits(n) <= n;
         assert_eq!(per_source_bit_below_one, n >= 137, "n = {n}");

@@ -1805,6 +1805,8 @@ fn the_receiving_maps_descent_and_its_priors_move_are_read_apart() {
     };
     let field = Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(7, vec![0]), ring(2, vec![0, 1])],
             contacts: vec![ContactDeclaration {
                 from: 0,

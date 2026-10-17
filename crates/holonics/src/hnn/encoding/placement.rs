@@ -74,6 +74,7 @@ impl OccurrencePlacement {
         current: &Current,
         positions: &[Vec<u64>],
     ) -> Result<Self, EncodingError> {
+        field.admit_lock_route()?;
         let periods: Vec<_> = field.rings().iter().map(|ring| ring.period()).collect();
         let opening = current.lift().to_vec();
         if opening.len() != periods.len() || opening.iter().any(|n| n < &BigInt::zero()) {

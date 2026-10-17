@@ -618,3 +618,355 @@ mod tests {
         );
     }
 }
+
+impl FoundingLaw {
+    pub(crate) fn admit_parameters(
+        &self,
+        alphabet: usize,
+        offset: usize,
+        clock: u64,
+        candidates: &[Candidate],
+    ) -> Result<(), HnnError> {
+        if self.alphabet != alphabet
+            || self.offset != offset
+            || self.cell_clock != clock
+            || self.splits.iter().map(|s| s.candidate).collect::<Vec<_>>() != candidates
+        {
+            return Err(refusal("the saved founding law against its field"));
+        }
+        Ok(())
+    }
+
+    /// Exact retained carriers, kept as a quotient rather than a replay of received cells.
+    pub(crate) fn write_saved(&self, text: &mut String) {
+        use crate::hnn::state_text::line;
+        line(
+            text,
+            "founding-law",
+            [
+                self.alphabet as u64,
+                self.offset as u64,
+                self.cell_clock,
+                self.cells,
+                self.counted,
+                self.splits.len() as u64,
+                self.nodes.len() as u64,
+            ],
+        );
+        line(text, "founding-context", self.context.iter());
+        for split in &self.splits {
+            line(
+                text,
+                "founding-split",
+                [split.candidate.period, split.candidate.cost, split.node],
+            );
+            let (top, bottom, exponent) = split.code.bounds();
+            let mut words = Vec::new();
+            for bound in top.into_iter().chain(bottom) {
+                words.push(bound.mantissa.to_string());
+                words.push(bound.exponent.to_string());
+            }
+            words.push(exponent.to_string());
+            words.push(split.code.factors().to_string());
+            line(text, "founding-code", words);
+            write_counts(text, &split.counts);
+        }
+        for (&node, counts) in &self.nodes {
+            line(text, "founding-node", [node]);
+            write_counts(text, counts);
+        }
+    }
+
+    pub(crate) fn read_saved<'a>(
+        next: crate::hnn::state_text::Next<'_, 'a>,
+    ) -> Result<Self, HnnError> {
+        use crate::compression::landmark::context::ProductBound;
+        use crate::hnn::state_text::{counted, keyed, value};
+        let head: Vec<u64> = counted(
+            next("the founding law")?,
+            "founding-law",
+            7,
+            "the founding law",
+        )?;
+        let alphabet =
+            usize::try_from(head[0]).map_err(|_| refusal("the saved alphabet's carrier"))?;
+        let offset = usize::try_from(head[1]).map_err(|_| refusal("the saved offset's carrier"))?;
+        let words = keyed(
+            next("the founding context")?,
+            "founding-context",
+            "the founding context",
+        )?;
+        let context = words
+            .iter()
+            .map(|word| value(Some(word), "the founding context"))
+            .collect::<Result<VecDeque<usize>, _>>()?;
+        if context.len() > offset
+            || context.iter().any(|&c| c >= alphabet)
+            || head[4] > head[3]
+            || head[3] - head[4] > head[1]
+            || (head[4] != 0 && context.len() != offset)
+            || (context.len() as u64) < head[3].min(head[1])
+        {
+            return Err(refusal("the saved founding context and population"));
+        }
+        let mut splits = Vec::new();
+        for _ in 0..head[5] {
+            let header: Vec<u64> = counted(
+                next("a founding split")?,
+                "founding-split",
+                3,
+                "a founding split",
+            )?;
+            let words = keyed(next("a founding code")?, "founding-code", "a founding code")?;
+            if words.len() != 10 {
+                return Err(refusal("the founding code's ten carriers"));
+            }
+            let mut bounds = [ProductBound::ONE; 4];
+            for (i, bound) in bounds.iter_mut().enumerate() {
+                bound.mantissa = value(words.get(2 * i), "a product mantissa")?;
+                bound.exponent = value(words.get(2 * i + 1), "a product exponent")?;
+            }
+            let factors = value(words.get(9), "the code's factors")?;
+            if factors != head[4] {
+                return Err(refusal("the split code's counted population"));
+            }
+            let code = PassageCode::from_bounds(
+                [bounds[0], bounds[1]],
+                [bounds[2], bounds[3]],
+                value(words.get(8), "the code's twos")?,
+                factors,
+            )?;
+            let counts = read_counts(next, header[0], alphabet, head[4])?;
+            splits.push(Split {
+                candidate: Candidate {
+                    period: header[0],
+                    cost: header[1],
+                },
+                node: header[2],
+                counts,
+                code,
+            });
+        }
+        let mut law = Self::open(
+            alphabet,
+            offset,
+            head[2],
+            splits.iter().map(|s| s.candidate).collect(),
+        )?;
+        if law.nodes.len() as u64 != head[6]
+            || splits
+                .iter()
+                .zip(&law.splits)
+                .any(|(a, b)| a.node != b.node)
+        {
+            return Err(refusal("the saved split's declared node"));
+        }
+        for (&node, counts) in &mut law.nodes {
+            let header: Vec<u64> = counted(
+                next("a founding node")?,
+                "founding-node",
+                1,
+                "a founding node",
+            )?;
+            if header[0] != node {
+                return Err(refusal("the saved founding nodes in order"));
+            }
+            *counts = read_counts(next, node, alphabet, head[4])?;
+        }
+        law.context = context;
+        law.cells = head[3];
+        law.counted = head[4];
+        law.splits = splits;
+        Ok(law)
+    }
+
+    pub(crate) fn retained_bits(&self) -> u64 {
+        let gamma = |n: u64| 2 * (num_bigint::BigUint::from(n) + 1u32).bits() - 1;
+        let count_bits = |counts: &Counts| -> u64 {
+            gamma(counts.len() as u64)
+                + counts
+                    .iter()
+                    .map(|(&(phase, context), row)| {
+                        gamma(phase)
+                            + gamma(context as u64)
+                            + gamma(row.total)
+                            + gamma(row.classes.len() as u64)
+                            + row
+                                .classes
+                                .iter()
+                                .map(|(&class, &n)| gamma(class as u64) + gamma(n))
+                                .sum::<u64>()
+                    })
+                    .sum::<u64>()
+        };
+        gamma(self.alphabet as u64)
+            + gamma(self.offset as u64)
+            + gamma(self.cell_clock)
+            + gamma(self.cells)
+            + gamma(self.counted)
+            + gamma(self.splits.len() as u64)
+            + gamma(self.nodes.len() as u64)
+            + self.context.iter().map(|&c| gamma(c as u64)).sum::<u64>()
+            + self
+                .splits
+                .iter()
+                .map(|split| {
+                    let (top, bottom, twos) = split.code.bounds();
+                    gamma(split.candidate.period)
+                        + gamma(split.candidate.cost)
+                        + gamma(split.node)
+                        + top
+                            .into_iter()
+                            .chain(bottom)
+                            .map(|bound| {
+                                2 * (128 - (bound.mantissa + 1).leading_zeros()) as u64 - 1
+                                    + gamma(bound.exponent)
+                            })
+                            .sum::<u64>()
+                        + gamma(twos)
+                        + gamma(split.code.factors())
+                        + count_bits(&split.counts)
+                })
+                .sum::<u64>()
+            + self
+                .nodes
+                .iter()
+                .map(|(&node, counts)| gamma(node) + count_bits(counts))
+                .sum::<u64>()
+    }
+}
+
+fn write_counts(text: &mut String, counts: &Counts) {
+    use crate::hnn::state_text::line;
+    line(text, "founding-counts", [counts.len()]);
+    for (&(phase, context), row) in counts {
+        let mut words = vec![
+            phase.to_string(),
+            context.to_string(),
+            row.total.to_string(),
+            row.classes.len().to_string(),
+        ];
+        for (&class, &n) in &row.classes {
+            words.push(class.to_string());
+            words.push(n.to_string());
+        }
+        line(text, "founding-row", words);
+    }
+}
+
+fn read_counts<'a>(
+    next: crate::hnn::state_text::Next<'_, 'a>,
+    period: u64,
+    alphabet: usize,
+    population: u64,
+) -> Result<Counts, HnnError> {
+    use crate::hnn::state_text::{counted, keyed, value};
+    let head: Vec<usize> = counted(
+        next("the founding counts")?,
+        "founding-counts",
+        1,
+        "the founding counts",
+    )?;
+    let mut counts = Counts::new();
+    let mut total = 0u64;
+    for _ in 0..head[0] {
+        let words = keyed(next("a founding row")?, "founding-row", "a founding row")?;
+        let phase: u64 = value(words.first(), "a founding phase")?;
+        let context: usize = value(words.get(1), "a founding context")?;
+        let n: u64 = value(words.get(2), "a founding row population")?;
+        let classes: usize = value(words.get(3), "a founding row's class count")?;
+        if phase >= period
+            || context >= alphabet
+            || classes > alphabet
+            || words.len() != 4 + 2 * classes
+            || n == 0
+        {
+            return Err(refusal("a saved founding row's domain"));
+        }
+        let mut row = Row {
+            total: n,
+            classes: BTreeMap::new(),
+        };
+        let mut sum = 0u64;
+        for pair in words[4..].chunks_exact(2) {
+            let class: usize = value(pair.first(), "a founding class")?;
+            let count: u64 = value(pair.get(1), "a founding count")?;
+            if class >= alphabet || count == 0 || row.classes.insert(class, count).is_some() {
+                return Err(refusal("a saved founding class count"));
+            }
+            sum = sum
+                .checked_add(count)
+                .ok_or_else(|| refusal("a saved founding row overflow"))?;
+        }
+        if sum != n || counts.insert((phase, context), row).is_some() {
+            return Err(refusal("a saved founding row's sum or duplicate"));
+        }
+        total = total
+            .checked_add(n)
+            .ok_or_else(|| refusal("saved founding population overflow"))?;
+    }
+    if total != population {
+        return Err(refusal("the saved founding counts' population"));
+    }
+    Ok(counts)
+}
+
+#[cfg(test)]
+mod saving_tests {
+    use super::*;
+    #[test]
+    fn r4b_founding_quotient_roundtrips_without_replaying_the_passage() {
+        let mut law = FoundingLaw::open(
+            4,
+            1,
+            1,
+            vec![
+                Candidate {
+                    period: 5,
+                    cost: 16,
+                },
+                Candidate {
+                    period: 7,
+                    cost: 20,
+                },
+            ],
+        )
+        .unwrap();
+        for k in 0..512 {
+            law.receive([0, 0, 1, 0, 2][k % 5]).unwrap();
+        }
+        let mut text = String::new();
+        law.write_saved(&mut text);
+        let mut lines = text.lines();
+        let mut restored = FoundingLaw::read_saved(&mut |what| {
+            lines.next().ok_or(HnnError::ContinuingState { what })
+        })
+        .unwrap();
+        assert_eq!(restored, law);
+        assert_eq!(restored.read(), law.read());
+        for k in 0..128 {
+            let class = [0, 0, 1, 0, 2][(512 + k) % 5];
+            law.receive(class).unwrap();
+            restored.receive(class).unwrap();
+        }
+        assert_eq!(restored, law);
+        law.reopen(
+            5,
+            vec![Candidate {
+                period: 7,
+                cost: 20,
+            }],
+        )
+        .unwrap();
+        let mut text = String::new();
+        law.write_saved(&mut text);
+        let mut lines = text.lines();
+        assert_eq!(
+            FoundingLaw::read_saved(&mut |what| lines
+                .next()
+                .ok_or(HnnError::ContinuingState { what }))
+            .unwrap(),
+            law
+        );
+    }
+}

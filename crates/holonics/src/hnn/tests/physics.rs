@@ -445,7 +445,7 @@ fn the_ring_ticks_are_its_section_epochs_and_its_carries_their_flux() {
             carried[ring] += BigInt::from(carry);
         }
     }
-    let (_, fluxes, _) = aeon_readings(&lift, start.lift(), end.lift()).unwrap();
+    let (_, fluxes, _) = aeon_readings(&field, &lift, start.lift(), end.lift()).unwrap();
     for ring in 0..rings {
         let micro = (&end.lift()[ring] - &start.lift()[ring])
             .to_biguint()

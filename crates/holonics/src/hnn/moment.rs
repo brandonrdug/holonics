@@ -159,9 +159,14 @@
 //! rings, alphabet and offsets of the field it was opened on, carried from the open and written in
 //! its text, never borrowed from the reader's field) and the reached lift point. The moment must lie
 //! on its ingest-only carrier: no continued station extent, its window and cursor those of `n`
-//! ingested cells, its phase and offset masses `n` and `max(n − δ, 0)`, its opening, end and ticks
+//! ingested cells, its phase and offset masses `n` and `max(n − δ, 0)` on a Lock ring; on an
+//! Own ring opened later, with `t` own ticks, the masses are `t` and `min(t,max(n−δ,0))`. Its opening, end and ticks
 //! those of the reached lift's advance on the plain route; and the full lift's advance must lie
-//! within `b_g n`. A continued section or another partition is refused, typed.
+//! within `b_g n`. For a source founded later, its own population `t≤n` is fixed by the plain
+//! reached lift, or counted by the own-ticks factor after a reframe. Histogram cardinalities
+//! are nondecreasing in population, so `H(n)` is still an upper bound; the later-opening bridge
+//! is an explicit Lean obligation in #62 (REQ-20261017-049).
+//! A continued section or another partition is refused, typed.
 //!
 //! **After reframe** a sibling ingest or a phase rekey separates own source time from the shared
 //! Current. `clock_cells = M` counts all actual ingested occurrences on that Current since the
@@ -243,7 +248,7 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::encoding::Encoded;
-use crate::hnn::field::{Current, Field, FieldMaterial};
+use crate::hnn::field::{Current, Field, FieldMaterial, RingAdvance};
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{Chart, integral, lcm};
@@ -460,29 +465,46 @@ impl Capacity {
     }
 }
 
-/// The established Boolean-fit identity count, `rate_g = 2`.
+/// The Boolean-fit identity count: rate 2 on Lock rings, exactly 1 on Own rings.
 pub fn capacity(
     periods: &[u64],
+    advances: &[RingAdvance],
     sources: &[usize],
     alphabet: usize,
     offsets: &[usize],
 ) -> Result<Capacity, HnnError> {
-    capacity_with_clock(periods, sources, alphabet, offsets, CapacityClock::Identity)
+    capacity_with_clock(
+        periods,
+        advances,
+        sources,
+        alphabet,
+        offsets,
+        CapacityClock::Identity,
+    )
 }
 
-/// The bound for all admitted located digits, `rate_g = d_g`. It also admits identity
+/// The bound for admitted located digits on Lock rings, `rate_g = d_g`; Own rates remain 1. It also admits identity
 /// steps and changing charts, so a later identity/empty passage cannot downgrade the bound.
 pub fn capacity_located(
     periods: &[u64],
+    advances: &[RingAdvance],
     sources: &[usize],
     alphabet: usize,
     offsets: &[usize],
 ) -> Result<Capacity, HnnError> {
-    capacity_with_clock(periods, sources, alphabet, offsets, CapacityClock::Located)
+    capacity_with_clock(
+        periods,
+        advances,
+        sources,
+        alphabet,
+        offsets,
+        CapacityClock::Located,
+    )
 }
 
 fn capacity_with_clock(
     periods: &[u64],
+    advances: &[RingAdvance],
     sources: &[usize],
     alphabet: usize,
     offsets: &[usize],
@@ -501,10 +523,22 @@ fn capacity_with_clock(
             found: source,
         });
     }
-    let rates = match clock {
-        CapacityClock::Identity => vec![2; periods.len()],
-        CapacityClock::Located => periods.to_vec(),
-    };
+    if advances.len() != periods.len() {
+        return Err(HnnError::Shape {
+            what: "capacity clock laws",
+            expected: periods.len(),
+            found: advances.len(),
+        });
+    }
+    let rates = periods
+        .iter()
+        .zip(advances)
+        .map(|(&period, advance)| match (advance, clock) {
+            (RingAdvance::Own, _) => 1,
+            (_, CapacityClock::Identity) => 2,
+            (_, CapacityClock::Located) => period,
+        })
+        .collect::<Vec<_>>();
     let test = |n| lossy(n, periods, &rates, sources, alphabet, offsets);
     let (mut below, mut above) = (0u64, 1u64);
     while !test(above)? {
@@ -590,6 +624,7 @@ fn histogram_count(
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct SourcePartition {
     periods: Vec<u64>,
+    advances: Vec<RingAdvance>,
     sources: Vec<usize>,
     alphabet: usize,
     offsets: Vec<usize>,
@@ -599,6 +634,7 @@ impl SourcePartition {
     fn of(field: &Field) -> Self {
         Self {
             periods: field.rings().iter().map(|ring| ring.period()).collect(),
+            advances: field.rings().iter().map(|ring| ring.advance()).collect(),
             sources: field.sources().to_vec(),
             alphabet: field.alphabet(),
             offsets: field.offsets().to_vec(),
@@ -623,6 +659,13 @@ impl SourcePartition {
             self.offsets.len()
         ));
         row(text, "source-periods", self.periods.iter().copied());
+        row(
+            text,
+            "source-advances",
+            self.advances
+                .iter()
+                .map(|advance| u64::from(*advance == RingAdvance::Own)),
+        );
         row(text, "source-rings", self.sources.iter().map(|&x| x as u64));
         row(
             text,
@@ -651,10 +694,22 @@ impl SourcePartition {
         }
         let periods: Vec<u64> =
             counted(next(what)?, "source-periods", expected.periods.len(), what)?;
+        let advances: Vec<u64> = counted(
+            next(what)?,
+            "source-advances",
+            expected.advances.len(),
+            what,
+        )?;
         let sources: Vec<u64> = counted(next(what)?, "source-rings", expected.sources.len(), what)?;
         let offsets: Vec<u64> =
             counted(next(what)?, "source-offsets", expected.offsets.len(), what)?;
-        if periods != expected.periods
+        if advances
+            != expected
+                .advances
+                .iter()
+                .map(|advance| u64::from(*advance == RingAdvance::Own))
+                .collect::<Vec<_>>()
+            || periods != expected.periods
             || sources
                 != expected
                     .sources
@@ -809,7 +864,6 @@ impl SourceMoment {
                 return Err(refused());
             }
         }
-        let n = BigUint::from(self.cells);
         let sum = |counts: &[u64]| counts.iter().map(|&x| BigUint::from(x)).sum::<BigUint>();
         for counts in &self.rings {
             let width = counts
@@ -819,17 +873,25 @@ impl SourceMoment {
             let pair_width = width
                 .checked_mul(self.alphabet)
                 .ok_or(HnnError::CountOverflow)?;
-            if counts.extent != 0
+            let own = field.ring(counts.ring).advance() == RingAdvance::Own;
+            let population = if own { counts.ticks } else { self.cells };
+            if (own && counts.ticks > self.cells)
+                || counts.extent != 0
                 || counts.first.len() != width
                 || counts.offset.len() != self.offsets.len()
-                || sum(&counts.first) != n
+                || sum(&counts.first) != BigUint::from(population)
                 || counts
                     .offset
                     .iter()
                     .zip(&self.offsets)
                     .any(|(bins, &delta)| {
                         bins.len() != pair_width
-                            || sum(bins) != BigUint::from(self.cells.saturating_sub(delta as u64))
+                            || sum(bins)
+                                != BigUint::from(if own {
+                                    counts.ticks.min(self.cells.saturating_sub(delta as u64))
+                                } else {
+                                    self.cells.saturating_sub(delta as u64)
+                                })
                     })
             {
                 return Err(refused());
@@ -1586,6 +1648,53 @@ impl SourceMoment {
             located: false,
             partition: SourcePartition::of(field),
         }
+    }
+
+    /// Add only the new source's empty slots. Its own ticks count its received population.
+    /// The passage's pair buffer remains available to its first counted cell.
+    pub fn found_ring(&mut self, field: &Field, ring: usize) -> Result<(), HnnError> {
+        if ring != self.opening.len()
+            || field.rings().len() != ring + 1
+            || field.sources().len() != self.rings.len() + 1
+            || field.ring(ring).advance() != RingAdvance::Own
+        {
+            return Err(HnnError::Founding {
+                what: "the moment's next Own source ring",
+            });
+        }
+        let period = field.ring(ring).period() as usize;
+        let key = field.ring(ring).initial();
+        let lattice = field
+            .lattice(crate::hnn::constitution::Locus::SourcePort(ring))
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        let chart = PopulationChart::of(field).exponent();
+        let modulus =
+            crate::hnn::constitution::founding_modulus(lattice.exponent(), period as u64, chart)
+                .ok_or(HnnError::Transport {
+                    ring,
+                    modulus: Rat::zero(),
+                })?;
+        let first = period
+            .checked_mul(self.alphabet)
+            .ok_or(HnnError::CountOverflow)?;
+        let pair = first
+            .checked_mul(self.alphabet)
+            .ok_or(HnnError::CountOverflow)?;
+        let counts = RingCounts {
+            ring,
+            period,
+            first: vec![0; first],
+            offset: vec![vec![0; pair]; self.offsets.len()],
+            start: key,
+            end: key,
+            ticks: 0,
+            extent: 0,
+            leaky: Some(Leaky::open(ring, &modulus, chart, self.offsets.len())?),
+        };
+        self.rings.push(counts);
+        self.opening.push(BigInt::from(key));
+        self.partition = SourcePartition::of(field);
+        Ok(())
     }
 
     /// [definition; agent-inferred, October 2] **Open a moment at the constitution's transports**:
@@ -3048,4 +3157,73 @@ fn earlier(window: &[Option<usize>], cursor: usize, offset: usize) -> Option<usi
         return None;
     }
     window[(cursor + window.len() - offset) % window.len()]
+}
+
+#[cfg(test)]
+mod founding_carrier_tests {
+    use super::*;
+    use crate::hnn::FoundedRing;
+    #[test]
+    fn r4b_founded_population_is_its_own_ticks_and_the_partition_keeps_the_clock() {
+        let field =
+            Field::declare(crate::hnn::field::founding_tests::listener(2, 1 << 16)).unwrap();
+        let mut current = Current::at_rest(&field);
+        let mut moment = SourceMoment::open(&field, &current);
+        let prefix = crate::hnn::tests::support::encoded(&field, &[0; 19]);
+        moment.ingest(&field, &mut current, &prefix).unwrap();
+        let before = moment.window();
+        let cursor = moment.cursor;
+        let expanded = field.found(FoundedRing { period: 2, key: 1 }).unwrap();
+        moment.found_ring(&expanded, 3).unwrap();
+        current.found_ring(1);
+        assert_eq!(moment.window(), before);
+        assert_eq!(moment.cursor, cursor);
+        assert_eq!(moment.rings[1].ticks, 0);
+        assert_eq!(moment.rings[1].first.iter().sum::<u64>(), 0);
+        moment.capacity(&expanded, &current).unwrap();
+        let mut wrong_partition = moment.clone();
+        wrong_partition.partition.advances[3] = RingAdvance::Lock;
+        assert!(wrong_partition.capacity(&expanded, &current).is_err());
+        for k in 0..37 {
+            let cell = crate::hnn::tests::support::encoded(&expanded, &[k % 2]);
+            moment.ingest(&expanded, &mut current, &cell).unwrap();
+            moment.capacity(&expanded, &current).unwrap();
+        }
+        let own = &moment.rings[1];
+        assert_eq!(own.ticks, 37);
+        assert_eq!(own.first.iter().sum::<u64>(), 37);
+        for (bins, &delta) in own.offset.iter().zip(&moment.offsets) {
+            assert_eq!(
+                bins.iter().sum::<u64>(),
+                37.min(moment.cells.saturating_sub(delta as u64))
+            );
+        }
+        let mut tampered = moment.clone();
+        tampered.rings[1].first[0] += 19;
+        assert_eq!(tampered.rings[1].first.iter().sum::<u64>(), moment.cells);
+        assert!(tampered.capacity(&expanded, &current).is_err());
+        let mut text = String::new();
+        moment.write(&mut text);
+        let mut lines = text.lines();
+        let first = lines.next().unwrap();
+        let restored = SourceMoment::read(&expanded, first, &mut |what| {
+            lines.next().ok_or(HnnError::ContinuingState { what })
+        })
+        .unwrap();
+        assert_eq!(restored, moment);
+        restored.capacity(&expanded, &current).unwrap();
+        let old_tag = text
+            .lines()
+            .filter(|line| !line.starts_with("source-advances "))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let mut lines = old_tag.lines();
+        let first = lines.next().unwrap();
+        assert!(
+            SourceMoment::read(&expanded, first, &mut |what| lines
+                .next()
+                .ok_or(HnnError::ContinuingState { what }))
+            .is_err()
+        );
+    }
 }

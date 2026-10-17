@@ -115,13 +115,23 @@ impl ObservationPort {
     }
 }
 
+/// A source ring whose clock does not read its port (an `Own` ring, guard 9): its producing port
+/// `E_f` is kept as a witness only, so a changed founded port refuses a stale observation.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PhaseWitness {
+    pub ring: usize,
+    pub injection: ExactRatMatrix,
+}
+
 /// A checked boundary at a particular material, before any observations enter.
 /// Cloneable immutable operands remain attached to every resulting Encoded passage.
+/// The boundary's complete producing operands, including sources whose clocks do not read ports.
 #[derive(Clone, Debug, PartialEq)]
 pub struct PairedObservation {
     classes: usize,
     sources: Vec<(usize, u64)>,
     ports: Vec<ObservationPort>,
+    witnesses: Vec<PhaseWitness>,
 }
 
 /// Invert the Gram in the exact even/odd sectors of its complete class pairing.
@@ -195,11 +205,16 @@ impl PairedObservation {
             return Err(chart_refusal("observations require a source ring"));
         }
         let mut ports = Vec::new();
+        let mut witnesses = Vec::new();
         for &(ring, _) in &sources {
             let injection = material
                 .source_port(ring)
                 .ok_or_else(|| chart_refusal("the observation has no producing source port"))?
                 .clone();
+            if field.ring(ring).advance() == crate::hnn::RingAdvance::Own {
+                witnesses.push(PhaseWitness { ring, injection });
+                continue;
+            }
             let carrier = PairedCarrier::admit(field, ring, pairing, &injection).map_err(|_| {
                 chart_refusal("the producing observation port does not carry the declared dyad")
             })?;
@@ -243,10 +258,14 @@ impl PairedObservation {
                 square: Arc::new(OnceLock::new()),
             });
         }
+        if ports.is_empty() {
+            return Err(chart_refusal("observations require a Lock source ring"));
+        }
         Ok(Self {
             classes,
             sources,
             ports,
+            witnesses,
         })
     }
 
@@ -262,11 +281,16 @@ impl PairedObservation {
             return Err(chart_refusal("observations require a source ring"));
         }
         let mut ports = Vec::new();
+        let mut witnesses = Vec::new();
         for &(ring, _) in &sources {
             let injection = material
                 .source_port(ring)
                 .ok_or_else(|| chart_refusal("the observation has no producing source port"))?
                 .clone();
+            if field.ring(ring).advance() == crate::hnn::RingAdvance::Own {
+                witnesses.push(PhaseWitness { ring, injection });
+                continue;
+            }
             let carrier = PairedCarrier::admit(field, ring, pairing, &injection).map_err(|_| {
                 chart_refusal("the producing observation port does not carry the declared dyad")
             })?;
@@ -319,15 +343,22 @@ impl PairedObservation {
                 square: Arc::new(OnceLock::from(RotorSquare { reduced, residual })),
             });
         }
+        if ports.is_empty() {
+            return Err(chart_refusal("observations require a Lock source ring"));
+        }
         Ok(Self {
             classes,
             sources,
             ports,
+            witnesses,
         })
     }
 
     pub fn ports(&self) -> &[ObservationPort] {
         &self.ports
+    }
+    pub fn witnesses(&self) -> &[PhaseWitness] {
+        &self.witnesses
     }
     pub fn classes(&self) -> usize {
         self.classes
@@ -340,6 +371,13 @@ impl PairedObservation {
     pub fn check_material(&self, material: &impl ConstitutionRead) -> Result<(), EncodingError> {
         for port in &self.ports {
             if material.source_port(port.carrier.ring()) != Some(&port.injection) {
+                return Err(chart_refusal(
+                    "the observation's producing source port changed; re-admit it",
+                ));
+            }
+        }
+        for witness in &self.witnesses {
+            if material.source_port(witness.ring) != Some(&witness.injection) {
                 return Err(chart_refusal(
                     "the observation's producing source port changed; re-admit it",
                 ));

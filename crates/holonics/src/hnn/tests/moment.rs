@@ -32,7 +32,14 @@ use crate::ratio::{integer, rat};
 /// below 1 past it, at every `n` from 2 to 4,096 (R3 H1).
 #[test]
 fn the_capacity_is_the_least_lossy_population_by_counting() {
-    let control = capacity(&[3, 4, 5], &[0, 1, 2], 2, &[]).unwrap();
+    let control = capacity(
+        &[3, 4, 5],
+        &[crate::hnn::RingAdvance::Lock; 3],
+        &[0, 1, 2],
+        2,
+        &[],
+    )
+    .unwrap();
     assert_eq!(control.n_star(), 137);
     for n in 2..=4096u64 {
         let bound = BigUint::from(2u32).pow(n as u32);
@@ -46,14 +53,27 @@ fn the_capacity_is_the_least_lossy_population_by_counting() {
 /// residue chart, `|A| = 256`, the count was `6,148`; the formula still reads it.
 #[test]
 fn campaign_one_capacity_is_certified_at_its_crossover() {
-    let capacity = capacity(&[5, 7, 11, 13], &[0], 5, &[1]).unwrap();
+    let capacity = capacity(
+        &[5, 7, 11, 13],
+        &[crate::hnn::RingAdvance::Lock; 4],
+        &[0],
+        5,
+        &[1],
+    )
+    .unwrap();
     assert_eq!(capacity.n_star(), 190);
     assert!(!capacity.lossy_at(189));
     assert!(capacity.lossy_at(190));
     assert_eq!(
-        crate::hnn::moment::capacity(&[5, 7, 11, 13], &[0], 256, &[1])
-            .unwrap()
-            .n_star(),
+        crate::hnn::moment::capacity(
+            &[5, 7, 11, 13],
+            &[crate::hnn::RingAdvance::Lock; 4],
+            &[0],
+            256,
+            &[1]
+        )
+        .unwrap()
+        .n_star(),
         6_148
     );
 }
@@ -724,6 +744,8 @@ fn wide_field() -> Field {
     let d = 256u64;
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![RingDeclaration {
                 period: d,
                 screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
@@ -845,6 +867,8 @@ fn helix_field() -> Field {
         .collect();
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings,
             contacts: vec![contact(0, 1, 2, 0), contact(1, 2, 3, 0)],
             loops: Vec::new(),

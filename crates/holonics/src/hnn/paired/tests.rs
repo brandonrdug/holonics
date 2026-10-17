@@ -103,6 +103,8 @@ fn declare(
 ) -> Field {
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings,
             contacts,
             loops: Vec::new(),

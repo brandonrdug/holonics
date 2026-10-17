@@ -301,6 +301,8 @@ pub(super) fn pair_field(alphabet: usize) -> crate::hnn::field::Field {
     use crate::hnn::field::{CribDeclaration, Field, FieldDeclaration, ReceiverDeclaration};
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![super::support::ring(16, (0..16).collect())],
             contacts: Vec::new(),
             loops: Vec::new(),

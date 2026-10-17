@@ -349,6 +349,7 @@ impl Resident {
             .constitution
             .continuing_state(ring)?
             .with_carry(self.carried.clone())
+            .with_founding(self.founding.clone(), self.staged_founding)
             .with_resident_passage(passage))
     }
 

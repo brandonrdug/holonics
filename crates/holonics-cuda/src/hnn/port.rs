@@ -1078,6 +1078,16 @@ impl<'c> Resident<'c> {
         constitution: Constitution,
         family: Option<Vec<ReceivingPhases>>,
     ) -> Result<Mounted<'c>, HnnError> {
+        if field
+            .rings()
+            .iter()
+            .any(|ring| ring.advance() == holonics::hnn::RingAdvance::Own)
+        {
+            return Err(HnnError::Founding {
+                what: "the card's founded ring is owed (#76)",
+            });
+        }
+
         let parametric = field.holarchy(&constitution)?.parametric();
         if parametric != field.parametric() {
             return Err(HnnError::Shape {
@@ -1545,6 +1555,15 @@ impl<'c> ExecutionPort for Resident<'c> {
     }
 
     fn mount(&self, field: &Field, current: &Current) -> Result<Mounted<'c>, HnnError> {
+        if field
+            .rings()
+            .iter()
+            .any(|ring| ring.advance() == holonics::hnn::RingAdvance::Own)
+        {
+            return Err(HnnError::Founding {
+                what: "the card's founded ring is owed (#76)",
+            });
+        }
         let constitution = Constitution::initial(field, self.budget)?;
         self.mount_with(field, current, constitution)
     }
@@ -2850,7 +2869,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         let opening = resident.aeon.opening.clone();
         let carry_out = resident.current.lift().to_vec();
         let (readings, epochs, closing) =
-            aeon_readings(&resident.parametric, &opening, &carry_out)?;
+            aeon_readings(&resident.field, &resident.parametric, &opening, &carry_out)?;
         // Published together.
         resident.constitution = constitution;
         // The collapse keeps the tree whole (`hnn::retention`); the mirror is uploaded again should

@@ -157,6 +157,8 @@ fn contact(from: usize, to: usize, nodes: usize, exponent: i64) -> ContactDeclar
 fn chain() -> Field {
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![
                 ring(2, vec![0], 0),
                 ring(3, vec![0, 2], 0),

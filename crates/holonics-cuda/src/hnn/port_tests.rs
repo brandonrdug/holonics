@@ -85,6 +85,8 @@ fn contact(from: usize, to: usize, nodes: usize, exponent: i64) -> ContactDeclar
 /// two contacts, source ring 0, `|A| = 4`, `Δ = {1}`, receiver ring 2 with aperture 2.
 fn chain_declaration(population: u64) -> FieldDeclaration {
     FieldDeclaration {
+        founded: Vec::new(),
+        founding: false,
         rings: vec![ring(4, vec![0, 2]), ring(3, vec![0]), ring(2, vec![])],
         contacts: vec![contact(0, 1, 2, 2), contact(1, 2, 2, 0)],
         loops: Vec::new(),
@@ -3189,4 +3191,21 @@ fn the_card_class_grain_release_matches_scored_prefix_and_preserves_opening() {
         assert!(code.lower <= -upper.lower);
         assert!(-lower.upper <= code.upper);
     }
+}
+
+#[test]
+#[ignore = "R4b test 18: GPU suite only"]
+fn r4b_18_founded_mount_refuses_before_upload() {
+    let card = card();
+    let base = Field::declare(chain_declaration(1 << 16)).unwrap();
+    let field = base
+        .found(holonics::hnn::FoundedRing { period: 2, key: 1 })
+        .unwrap();
+    let port = Resident::new(&card, 4, 1 << 40);
+    assert!(matches!(
+        port.mount(&field, &Current::at_rest(&field)),
+        Err(HnnError::Founding {
+            what: "the card's founded ring is owed (#76)"
+        })
+    ));
 }

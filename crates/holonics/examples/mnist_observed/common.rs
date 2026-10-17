@@ -1457,9 +1457,14 @@ where
     // Bound the full training horizon, the largest live image moment and the native located
     // capacity derived from this exact field geometry. The pilot subset never changes the machine.
     // Do not multiply by all dataset symbols or hand-tune a capacity threshold.
-    let located_n_star =
-        holonics::hnn::moment::capacity_located(&periods, sources, MNIST_ALPHABET, &offsets)?
-            .n_star();
+    let located_n_star = holonics::hnn::moment::capacity_located(
+        &periods,
+        &vec![holonics::hnn::RingAdvance::Lock; periods.len()],
+        sources,
+        MNIST_ALPHABET,
+        &offsets,
+    )?
+    .n_star();
     let population = 60_000usize.max(chart.digits_per_image()).max(
         usize::try_from(located_n_star).map_err(|_| "located capacity does not fit host usize")?,
     ) as u64;

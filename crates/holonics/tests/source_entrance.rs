@@ -57,6 +57,8 @@ fn chain() -> Field {
     };
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(2, vec![0]), ring(3, vec![0]), ring(2, vec![])],
             contacts: vec![contact(0, 1, 2), contact(1, 2, 0)],
             loops: Vec::new(),
@@ -85,6 +87,8 @@ fn pair_field(alphabet: usize) -> Field {
 fn pair_field_with_offsets(alphabet: usize, offsets: Vec<usize>) -> Field {
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(16, (0..16).collect())],
             contacts: Vec::new(),
             loops: Vec::new(),
@@ -124,6 +128,8 @@ fn material(field: &Field, ring: usize) -> ResonatorMaterial {
 fn source_alias_field() -> Field {
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(8, (0..8).collect()), ring(3, Vec::new())],
             contacts: vec![ContactDeclaration {
                 from: 0,

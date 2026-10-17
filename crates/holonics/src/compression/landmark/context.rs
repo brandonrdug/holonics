@@ -6615,6 +6615,48 @@ impl PassageCode {
         (self.numerator, self.denominator, self.exponent)
     }
 
+    /// Restore the bounded product's actual carriers, without replaying or reordering faces.
+    /// Retention needs all four outward bounds: the counts alone do not recover rounded products.
+    pub(crate) fn from_bounds(
+        numerator: [ProductBound; 2],
+        denominator: [ProductBound; 2],
+        exponent: u64,
+        factors: u64,
+    ) -> Result<Self, ContextError> {
+        fn ordered(bounds: [ProductBound; 2]) -> bool {
+            let [a, b] = bounds;
+            if bounds
+                .iter()
+                .any(|x| x.mantissa == 0 || x.mantissa >= (1u128 << 127))
+            {
+                return false;
+            }
+            let ab = 128 - a.mantissa.leading_zeros();
+            let bb = 128 - b.mantissa.leading_zeros();
+            match (
+                a.exponent.checked_add(u64::from(ab)),
+                b.exponent.checked_add(u64::from(bb)),
+            ) {
+                (Some(x), Some(y)) if x != y => x < y,
+                (Some(_), Some(_)) => (a.mantissa << (127 - ab)) <= (b.mantissa << (127 - bb)),
+                _ => false,
+            }
+        }
+        if !ordered(numerator) || !ordered(denominator) {
+            return Err(shape("ordered positive passage-product carriers", 1, 0));
+        }
+        let restored = Self {
+            numerator,
+            denominator,
+            exponent,
+            factors,
+        };
+        if factors == 0 && restored != Self::new() {
+            return Err(shape("the empty passage's unit product", 1, 0));
+        }
+        Ok(restored)
+    }
+
     /// **The code length** `−log₂ ∏ q`, enclosed and rounded out on `2^(−O)`.
     pub fn bits(&self) -> Result<ExactInterval, ContextError> {
         let octaves = LOG_OCTAVES + 1;
