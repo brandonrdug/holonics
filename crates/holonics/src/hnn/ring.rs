@@ -2816,6 +2816,86 @@ pub struct ReceivingBank {
     grain: u32,
 }
 
+#[cfg(test)]
+mod founding_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    /// REQ-20261017-049 test 7 is a stop gate. Its expected matrix is the design contract's
+    /// hand derivation, independently of the realized tick maps. Never retune either side.
+    #[test]
+    fn half_pump_at_critical_coupling_has_the_stipulated_harmonic_monodromy() {
+        let expected = ExactRatMatrix::new(vec![
+            vec![integer(1), integer(0)],
+            vec![integer(-8), integer(1)],
+        ])
+        .unwrap();
+        for period in [2, 3, 5] {
+            // Exactly Field::declare's cyclic incidence and unit constitutive weights.
+            let incidence = crate::ratio::linear::vector::matrix(period, period, |i, j| {
+                if j == i {
+                    integer(-1)
+                } else if j == (i + 1) % period {
+                    Rat::one()
+                } else {
+                    Rat::zero()
+                }
+            })
+            .unwrap();
+            let ring = Parametron::new(
+                incidence,
+                vec![Rat::one(); period],
+                vec![Rat::one(); period],
+            )
+            .unwrap();
+            let material = |strength| {
+                ResonatorMaterial::of_parametron(
+                    &ring,
+                    &rat(1, 2),
+                    Some(
+                        PumpDeclaration::new(strength, Carrier::at(&Rat::zero()), PumpStep::Half)
+                            .unwrap(),
+                    ),
+                )
+                .unwrap()
+            };
+            let critical = material(rat(1, 2));
+            critical.certify(0, &Rat::one()).unwrap();
+            let operands =
+                ResonatorOperands::at_cut(0, &critical, &integer(2), &Rat::one(), None).unwrap();
+            let floquet = Floquet::of(&operands).unwrap();
+            let width = 2 * period;
+            let mut columns = Vec::new();
+            for coordinate in 0..2 {
+                let mut state = vec![Rat::zero(); 2 * width];
+                for node in 0..period {
+                    state[coordinate * width + 2 * node] = Rat::one();
+                }
+                let image = floquet.monodromy().apply(&state).unwrap();
+                // Invariance of the harmonic in-phase subspace is part of the check.
+                for node in 0..period {
+                    assert_eq!(image[2 * node], image[0]);
+                    assert_eq!(image[width + 2 * node], image[width]);
+                    assert!(image[2 * node + 1].is_zero());
+                    assert!(image[width + 2 * node + 1].is_zero());
+                }
+                columns.push(vec![image[0].clone(), image[width].clone()]);
+            }
+            let realized = ExactRatMatrix::new(vec![
+                vec![columns[0][0].clone(), columns[1][0].clone()],
+                vec![columns[0][1].clone(), columns[1][1].clone()],
+            ])
+            .unwrap();
+            println!("REQ049 test7 period={period} realized={realized:?} expected={expected:?}");
+            assert_eq!(realized, expected, "REQ049 STOP: period {period}");
+            assert!(matches!(
+                material(Rat::one()).certify(0, &Rat::one()),
+                Err(HnnError::UncertifiedResonator { .. })
+            ));
+        }
+    }
+}
+
 impl ReceivingBank {
     /// A linear Floquet bank of at least one member on an unpumped quadratic
     /// material, a positive port and hop. A quartic relation needs its actual
