@@ -22,6 +22,18 @@ fn fixture_with_material(
         ring.lock.clear();
     }
     declaration.rings[0].lock = (0..4).collect();
+    if nonzero_operand_control {
+        // The legacy radius-sqrt(65) placements shield contact 0 at the 128-cell cut:
+        // phases (0,2) give Q=52, beta=2, G=2^-51. The current placement rule gives
+        // Q=4, G=1/8, so the two-hop path's exponent is 4 at receiver grain 16.
+        // This is the fixture's causal construction, not an assumed nonzero read.
+        for ring in &mut declaration.rings {
+            ring.placements = (0..ring.period)
+                .map(|node| crate::hnn::FieldDeclaration::quarter_turn(node, ring.period))
+                .collect();
+        }
+        declaration = declaration.by_lattice_rule();
+    }
     let mut field = Field::declare(declaration).unwrap();
     if contact_family {
         let family = crate::hnn::receiving::FeatureFamily::new(vec![
@@ -333,6 +345,25 @@ fn arrived_features(resident: &Resident) -> Vec<Vec<Rat>> {
 #[test]
 fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
     let (reference, mut resident, moment) = fixture_with_material(1 << 40, false, true);
+    let phases = &resident.admitted[0];
+    let contact =
+        crate::hnn::propagation::contact_exponent(&resident.field, 0, resident.current.lift())
+            .unwrap();
+    assert_eq!(contact.quadrance, crate::ratio::integer(4));
+    assert_eq!(contact.exponent, crate::ratio::integer(-4));
+    let path = path_attenuation(
+        &resident.field,
+        resident.current.lift(),
+        phases.ring(),
+        phases.last_epoch(),
+        phases.grain(),
+    )
+    .unwrap();
+    assert_eq!(path.exponent, crate::ratio::integer(4));
+    assert!(
+        path.open,
+        "the fixture's declared path must be open at its receiver grain"
+    );
     for _ in 0..2 {
         let phases = resident.admitted[0].clone();
         let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
