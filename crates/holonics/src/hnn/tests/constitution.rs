@@ -1246,23 +1246,17 @@ fn flat(entries: &[Rat], n: usize) -> ExactRatMatrix {
 /// Lean `HNN/LatticeDeposit.{remainder_numerator_bounded, remainder_rat_bits_bounded}`: after every
 /// chain deposit each carried remainder at a locus of clock `m` is `ρ·2^(−L−k_m)` with
 /// `|ρ| ≤ 2^(k_m−1)`, and takes at most `L + 2k_m + 1` bits; the remainders' bits therefore stay
-/// bounded by the carried entries, not by the updates' denominators.
+/// bounded by the carried entries, not by the updates' denominators. This holds at the contact
+/// factors and their normalization too, with no exemption (record
+/// `2026-10-16_THE_CONTACT_FACTORS_TAKE_THE_COMMON_LATTICE_LAW_AND_THEIR_RELEASE_STAYS_BELOW_HALF_THE_FOUNDING_UNIT`).
 #[test]
 fn a_carried_remainder_takes_its_lattice_and_clock_bits() {
     for (_, _, theta, _) in chain_run() {
         let mut bound = 0u64;
-        for (locus, carrier, _, r) in theta.carried_remainders() {
-            if matches!(carrier, Carrier::Factor(_) | Carrier::FactorScale(_)) {
-                // These physical coordinates now retain exact unresolved material. Their
-                // rational bits are charged directly, not bounded by the old gamma-grid theorem.
-                bound += r.numer().bits() + r.denom().bits();
-                continue;
-            }
+        for (locus, _, _, r) in theta.carried_remainders() {
             let lattice = theta.lattice(locus).unwrap();
             let k = gamma_length(theta.clock(locus));
-            let scaled = &r * Rat::from_integer(BigInt::one() << (lattice.exponent() + k) as usize);
-            assert!(scaled.is_integer(), "{locus:?}: {r}");
-            assert!(scaled.abs() <= Rat::from_integer(BigInt::one() << (k - 1) as usize));
+            assert!(on_its_clock_grid(&r, lattice.exponent(), k), "{locus:?}: {r}");
             let bits = r.numer().bits() + r.denom().bits();
             assert!(bits <= u64::from(lattice.exponent() + 2 * k + 1));
             bound += u64::from(lattice.exponent() + 2 * k + 1);
@@ -1272,58 +1266,336 @@ fn a_carried_remainder_takes_its_lattice_and_clock_bits() {
     }
 }
 
-/// Actual C/K/D material and normalization share exact coarse accumulation. A later opposite
-/// contribution cancels the same contemporary remainder; no finite future or tolerance kernel
-/// is assumed, and the other carriers retain their separately declared gamma law.
+/// `r = ρ·2^(−L−k)` with `|ρ| ≤ 2^(k−1)` (Lean `HNN/LatticeDeposit.remainder_numerator_bounded`).
+fn on_its_clock_grid(r: &Rat, exponent: u32, k: u32) -> bool {
+    let scaled = r * Rat::from_integer(BigInt::one() << (exponent + k) as usize);
+    scaled.is_integer() && scaled.abs() <= Rat::from_integer(BigInt::one() << (k - 1) as usize)
+}
+
+/// The contact factor carriers (storage, stiffness and dissipation) and their normalizations.
+const CONTACT_CARRIERS: [Carrier; 6] = [
+    Carrier::Factor(0),
+    Carrier::Factor(1),
+    Carrier::Factor(2),
+    Carrier::FactorScale(0),
+    Carrier::FactorScale(1),
+    Carrier::FactorScale(2),
+];
+
+/// [Epime's review, October 16] **The contact factors carry signed, tied, cancelled and staged
+/// steps by the common lattice law** (Lean `HNN/LatticeDeposit.{carry, carry_accounting, release,
+/// rem_bounds}`), at every factor and normalization carrier, on `2^(−15)ℤ` with `δ = 1/(3·2^31)`,
+/// below every fine half cell here:
+///
+/// - clock 1 (`k_1 = 1`) stages two steps at each entry, the ties `±u/2` and then `±δ`: the entry
+///   given `+u/2` moves up one unit and carries `−u/2`, the one given `−u/2` stays and carries
+///   `−u/2` (ties go upward), and each entry releases once, `±δ`;
+/// - clock 2 (`k_2 = 3`) releases `δ/7` and `δ/11` whole, with value and remainder unmoved;
+/// - clock 3 cancels the carried remainders with `∓u/2`: both entries return to zero with no
+///   remainder, and nothing is released;
+/// - clock 4 (`k_4 = 5`) releases `∓δ`, so the releases cancel to the exact accumulation `δ/7`,
+///   `δ/11` while the entries stay at zero.
+///
+/// At every clock the entries, remainders and releases sum to the exact accumulation, each
+/// remainder lies on its clock's fine grid in the half cell, each release is at most half a fine
+/// unit, and the releases since the founding stay below half its unit.
 #[test]
-fn unresolved_contact_direction_and_normalization_accumulate_without_release() {
+fn the_contact_factors_carry_signed_tied_cancelled_and_staged_steps_by_the_lattice_law() {
     use crate::hnn::constitution::Carry;
     let lattice = Lattice::new(15);
+    let (u, half) = (lattice.unit(), lattice.unit() / integer(2));
     let tiny = Rat::new(BigInt::one(), BigInt::from(3) << 31usize);
-    for carrier in [Carrier::Factor(0), Carrier::Factor(1), Carrier::Factor(2),
-        Carrier::FactorScale(0), Carrier::FactorScale(1), Carrier::FactorScale(2)] {
-        let mut carry = Carry::default();
-        let mut value = vec![Rat::zero(); 2];
-        let mut exact = vec![Rat::zero(); 2];
-        for (m,update) in [vec![tiny.clone(), -&tiny],
+    let zero = || vec![Rat::zero(), Rat::zero()];
+    // Per clock: the steps staged in one deposit, then the entries, remainders and releases after it.
+    let clocks = [
+        (
+            vec![vec![half.clone(), -&half], vec![tiny.clone(), -&tiny]],
+            vec![u.clone(), Rat::zero()],
+            vec![-&half, -&half],
+            vec![tiny.clone(), -&tiny],
+        ),
+        (
+            vec![vec![&tiny / integer(7), &tiny / integer(11)]],
+            vec![u.clone(), Rat::zero()],
+            vec![-&half, -&half],
             vec![&tiny / integer(7), &tiny / integer(11)],
-            vec![-&tiny, tiny.clone()]].into_iter().enumerate() {
-            let mut at = BudgetedCarry::new(lattice,m as u64+1);
-            carry.deposit_all(&mut at,carrier,&mut value,&update);
-            assert!(at.released().is_empty());
+        ),
+        (vec![vec![-&half, half.clone()]], zero(), zero(), zero()),
+        (
+            vec![vec![-&tiny, tiny.clone()]],
+            zero(),
+            zero(),
+            vec![-&tiny, tiny.clone()],
+        ),
+    ];
+    for carrier in CONTACT_CARRIERS {
+        let mut carry = Carry::default();
+        let (mut value, mut exact, mut released) = (zero(), zero(), zero());
+        let mut kraft = Rat::zero();
+        for (m, (steps, entries, remainders, releases)) in clocks.iter().enumerate() {
+            let clock = m as u64 + 1;
+            let k = gamma_length(clock);
+            let mut at = BudgetedCarry::new(lattice, clock);
+            for update in steps {
+                carry.deposit_all(&mut at, carrier, &mut value, update);
+                for i in 0..2 {
+                    exact[i] += &update[i];
+                }
+            }
+            kraft += Rat::new(BigInt::one(), BigInt::one() << k as usize);
+            let fine_half = Lattice::new(lattice.exponent() + k).unit() / integer(2);
+            let mut once = zero();
+            for (c, i, e) in at.released() {
+                assert_eq!(c, carrier);
+                assert!(e.abs() <= fine_half, "{carrier:?} clock {clock}: {e}");
+                once[i] = e.clone();
+                released[i] += e;
+            }
+            assert_eq!(&once, releases, "{carrier:?} clock {clock}");
+            assert_eq!(&value, entries, "{carrier:?} clock {clock}");
             for i in 0..2 {
-                exact[i] += &update[i];
-                assert_eq!(&value[i] + carry.at(i),exact[i]);
-                let r=carry.at(i);
-                assert!(-lattice.unit()/integer(2) <= r && r < lattice.unit()/integer(2));
+                let r = carry.at(i);
+                assert_eq!(r, remainders[i], "{carrier:?} clock {clock}");
+                assert!(on_its_clock_grid(&r, lattice.exponent(), k));
+                assert!(-&half <= r && r < half);
+                assert_eq!(&value[i] + &r + &released[i], exact[i]);
+                assert!(released[i].abs() <= &half * &kraft && released[i].abs() < half);
+                assert!((&value[i] - &exact[i]).abs() < u);
             }
         }
-        assert!(value.iter().all(Rat::is_zero));
-        assert_eq!(carry.at(0),&tiny / integer(7));
-        assert_eq!(carry.at(1),&tiny / integer(11));
-        let mut at=BudgetedCarry::new(lattice,4);
-        at.rebase(2,&mut [(&mut carry,&mut value)]).unwrap();
-        for i in 0..2 { assert_eq!(&value[i] + carry.at(i),exact[i]); }
-        assert!(at.released().is_empty());
+        assert_eq!(released, vec![&tiny / integer(7), &tiny / integer(11)]);
+        assert_eq!(released, exact);
     }
 }
 
-/// An exact unresolved contact coordinate cannot evade the existing constitution budget.
-/// This is a synthetic deposition-law control, not an observed physical teaching or a curriculum.
+/// [Epime's review, October 16] **An early tiny factor step is released, then accumulates across a
+/// founding cell** (Lean `HNN/LatticeDeposit/Rebase.{history_accounting, history_release_lt,
+/// history_within_founding_unit}`), at every factor and normalization carrier, over 3,000 deposits
+/// of one step on `2^(−15)ℤ`:
+///
+/// - `δ = 1/(3·2^24)` is released whole while it lies below the fine half cell (`k_m ≤ 9`, clocks 1
+///   to 31), registers at clock 32 (`k_32 = 11`) and moves the entry at deposit 815, where exact
+///   accumulation reaches the cell's tie at 768; the releases total `255635/4194304` of the half
+///   unit;
+/// - with a two-level re-base before deposit 500, the re-base itself moves the entry by the finer
+///   unit, and the releases total `1008531/16777216` of the founding half unit;
+/// - `δ = 1/(3·2^31)` registers at clock 256 (`k_256 = 17`) and does not move the entry within 3,000
+///   deposits; its releases total `1005/4194304` of the half unit.
+///
+/// At every deposit the entry, remainder and releases sum to the exact accumulation, the remainder
+/// lies on its clock's fine grid, the releases stay within `u₀/2·Σ_(m ≤ clock) 2^(−k_m)` and so
+/// below half the founding unit `u₀`, and the entry stays within `u₀/2 + u/2` of the exact
+/// accumulation. These figures agree with an independent exact simulation of the same law. The
+/// bound is the representation of this supplied update history, not of a trajectory whose later
+/// updates depend on the entries (the open `commit_chain_residual`).
 #[test]
-fn unresolved_contact_material_is_refused_atomically_at_the_existing_budget() {
-    let field=chain();
-    let budget=Constitution::initial(&field,OPEN_BUDGET).unwrap().exact_bits()+1;
-    let theta=Constitution::initial(&field,budget).unwrap();
-    let before=theta.clone();
-    let tiny=Rat::new(BigInt::one(),BigInt::from(3)<<31usize);
-    let gradient=theta.contact_storage(0).scaled(&tiny);
-    let deposit=Deposit::new(theta.commit(),vec![],vec![FactorStep {
-        gradient:FactorGradient::Storage { contact:0,gradient },
-        energy:Rat::zero(),covector:Rat::one(),
-    }],vec![]).with_reach(chain_reach());
-    assert!(matches!(theta.deposited(&deposit),Err(HnnError::ConstitutionBudget { .. })));
-    assert_eq!(theta,before);
+fn an_early_tiny_factor_step_is_released_then_accumulates_across_a_founding_cell() {
+    use crate::hnn::constitution::Carry;
+    let founding = Lattice::new(15);
+    let half = founding.unit() / integer(2);
+    let third = |shift: usize| Rat::new(BigInt::one(), BigInt::from(3) << shift);
+    let histories = [
+        (third(24), None, 32u64, Some(815u64), rat(255_635, 4_194_304)),
+        (third(24), Some(500u64), 32, Some(500), rat(1_008_531, 16_777_216)),
+        (third(31), None, 256, None, rat(1_005, 4_194_304)),
+    ];
+    for carrier in CONTACT_CARRIERS {
+        for (step, rebase, registered, moved, released_over_half) in &histories {
+            let (mut lattice, mut carry) = (founding, Carry::default());
+            let mut value = vec![Rat::zero()];
+            let (mut exact, mut released, mut kraft) = (Rat::zero(), Rat::zero(), Rat::zero());
+            let (mut first_registered, mut first_moved) = (None, None);
+            for m in 1u64..=3000 {
+                let mut at = BudgetedCarry::new(lattice, m);
+                if *rebase == Some(m) {
+                    let before = &value[0] + carry.at(0);
+                    at.rebase(2, &mut [(&mut carry, value.as_mut_slice())]).unwrap();
+                    lattice = at.lattice();
+                    assert_eq!(&value[0] + carry.at(0), before);
+                    assert!(at.released().is_empty());
+                }
+                carry.deposit_all(&mut at, carrier, &mut value, std::slice::from_ref(step));
+                exact += step;
+                let k = gamma_length(m);
+                kraft += Rat::new(BigInt::one(), BigInt::one() << k as usize);
+                let e: Rat = at.released().into_iter().map(|(_, _, e)| e).sum();
+                if first_registered.is_none() && e != *step {
+                    first_registered = Some(m);
+                }
+                if first_moved.is_none() && !value[0].is_zero() {
+                    first_moved = Some(m);
+                }
+                released += e;
+                let r = carry.at(0);
+                assert_eq!(&value[0] + &r + &released, exact);
+                assert!(lattice.contains(&value[0]));
+                assert!(on_its_clock_grid(&r, lattice.exponent(), k));
+                assert!(released.abs() <= &half * &kraft && released.abs() < half);
+                assert!((&value[0] - &exact).abs() < &half + lattice.unit() / integer(2));
+            }
+            assert_eq!(first_registered, Some(*registered), "{carrier:?} {step}");
+            assert_eq!(first_moved, *moved, "{carrier:?} {step}");
+            assert_eq!(&released / &half, *released_over_half, "{carrier:?} {step}");
+        }
+    }
+}
+
+/// [the #388 review, October 17] **A restored remainder off its locus's fine lattice, or outside
+/// its half cell, is refused** (`Constitution::continued`, Lean `Carried.{rem_fine, rem_bounded}`);
+/// no earlier save format is read or kept (THE_MACHINE guard 13). One storage deposit with a reached
+/// energy, on the founding constitution, releases every nonzero factor and normalization step whole
+/// at clock 1, so channel 0 carries no contact remainder. Its continuing state restores exactly.
+/// The same text carrying each release as an exact coarse remainder (the October 7 form, its
+/// denominators keeping `δ`'s 3) is refused, and so is the grid point `u/2` just past the half cell;
+/// the grid point `−u/2` at clock 1's fine lattice is a remainder the law carries, and restores.
+#[test]
+fn a_restored_remainder_off_its_fine_lattice_or_half_cell_is_refused() {
+    use crate::hnn::constitution::{ContinuingState, text_residue};
+    let field = chain();
+    let founding = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let tiny = Rat::new(BigInt::one(), BigInt::from(3) << 31usize);
+    let storage = |theta: &Constitution| {
+        Deposit::new(
+            theta.commit(),
+            vec![],
+            vec![FactorStep {
+                gradient: FactorGradient::Storage {
+                    contact: 0,
+                    gradient: theta.contact_storage(0).scaled(&tiny),
+                },
+                energy: tiny.clone(),
+                covector: Rat::one(),
+            }],
+            vec![],
+        )
+        .with_reach(chain_reach())
+    };
+    let locus = Locus::Channel(0);
+    let contact = |c: &Carrier| CONTACT_CARRIERS.contains(c);
+    let (first, reading) = founding.deposited(&storage(&founding)).unwrap();
+    let held: Vec<(Carrier, usize, Rat)> = reading
+        .released
+        .iter()
+        .filter(|(l, c, ..)| *l == locus && contact(c))
+        .map(|(_, c, i, e)| (*c, *i, e.clone()))
+        .collect();
+    assert!(held.iter().any(|(c, ..)| *c == Carrier::Factor(0)));
+    assert!(held.iter().any(|(c, ..)| *c == Carrier::FactorScale(0)));
+    assert!(held.iter().all(|(.., e)| (e.denom() % BigInt::from(3)).is_zero()));
+    assert!(
+        first
+            .carried_remainders()
+            .iter()
+            .all(|(l, c, ..)| !(*l == locus && contact(c)))
+    );
+    assert_eq!(first.clock(locus), 1);
+    let text = first
+        .continuing_state(field.sources()[0])
+        .unwrap()
+        .to_text();
+    let restore = |text: &str| {
+        Constitution::initial(&field, OPEN_BUDGET)
+            .unwrap()
+            .continued(&ContinuingState::from_text(text).unwrap())
+    };
+    assert_eq!(restore(&text).unwrap(), first);
+    // The same text with `rows` added as contact remainders at channel 0, under the writer's check
+    // over the edited lines (`check n r`, then `end`).
+    let with_remainders = |rows: &[(Carrier, usize, Rat)]| {
+        let mut blocks: BTreeMap<Carrier, Vec<(usize, Rat)>> = BTreeMap::new();
+        for (c, i, r) in rows {
+            blocks.entry(*c).or_default().push((*i, r.clone()));
+        }
+        let head = text
+            .lines()
+            .find(|line| line.starts_with("carries "))
+            .unwrap()
+            .to_string();
+        let count: usize = head["carries ".len()..].parse().unwrap();
+        let mut carries = format!("carries {}\n", count + blocks.len());
+        for (c, rows) in &blocks {
+            let carrier = match c {
+                Carrier::Factor(i) => format!("factor {i}"),
+                Carrier::FactorScale(i) => format!("factor-scale {i}"),
+                _ => unreachable!(),
+            };
+            carries += &format!("channel 0 {carrier} {}\n", rows.len());
+            for (i, r) in rows {
+                carries += &format!("{i} {r}\n");
+            }
+        }
+        let edited = text.replacen(&format!("{head}\n"), &carries, 1);
+        let at = edited.rfind("\ncheck ").unwrap() + 1;
+        let (body, rest) = edited.split_at(at);
+        let end = &rest[rest.find('\n').unwrap() + 1..];
+        format!("{body}check {} {}\n{end}", body.len(), text_residue(body))
+    };
+    let refused = |result: Result<Constitution, HnnError>| {
+        matches!(
+            result,
+            Err(HnnError::ContinuingState { what })
+                if what == "a remainder off its locus's fine lattice or outside its half cell"
+        )
+    };
+    assert!(refused(restore(&with_remainders(&held))));
+    let half = first.lattice(locus).unwrap().unit() / integer(2);
+    assert!(refused(restore(&with_remainders(&[(
+        Carrier::Factor(0),
+        0,
+        half.clone()
+    )]))));
+    let carried = restore(&with_remainders(&[(Carrier::Factor(0), 0, -half.clone())])).unwrap();
+    assert!(carried.carried_remainders().into_iter().any(
+        |(l, c, i, r)| l == locus && c == Carrier::Factor(0) && i == 0 && r == -half.clone()
+    ));
+    carried.deposited(&storage(&carried)).unwrap();
+}
+
+/// A contact-factor successor past the constitution budget is refused atomically, the refusal naming
+/// its channel and the predecessor unchanged; at the same budget a step below every fine half cell is
+/// released whole and accepted, with no factor remainder. This is a synthetic deposition-law
+/// control, not an observed physical teaching or a curriculum.
+#[test]
+fn a_contact_factor_successor_past_the_budget_is_refused_atomically() {
+    let field = chain();
+    let budget = Constitution::initial(&field, OPEN_BUDGET)
+        .unwrap()
+        .exact_bits()
+        + 1;
+    let theta = Constitution::initial(&field, budget).unwrap();
+    let before = theta.clone();
+    let storage = |scale: &Rat| {
+        Deposit::new(
+            theta.commit(),
+            vec![],
+            vec![FactorStep {
+                gradient: FactorGradient::Storage {
+                    contact: 0,
+                    gradient: theta.contact_storage(0).scaled(scale),
+                },
+                energy: Rat::zero(),
+                covector: Rat::one(),
+            }],
+            vec![],
+        )
+        .with_reach(chain_reach())
+    };
+    let tiny = Rat::new(BigInt::one(), BigInt::from(3) << 31usize);
+    let (released, reading) = theta.deposited(&storage(&tiny)).unwrap();
+    assert!(
+        reading
+            .released
+            .iter()
+            .any(|(l, c, ..)| *l == Locus::Channel(0) && *c == Carrier::Factor(0))
+    );
+    assert!(reading.unresolved_contact_material.is_empty());
+    assert!(released.carried_remainders().is_empty());
+    assert!(released.exact_bits() <= budget);
+    assert!(matches!(
+        theta.deposited(&storage(&Rat::one())),
+        Err(HnnError::ConstitutionBudget { loci, .. }) if loci.contains(&Locus::Channel(0))
+    ));
+    assert_eq!(theta, before);
     assert!(theta.carried_remainders().is_empty());
 }
 

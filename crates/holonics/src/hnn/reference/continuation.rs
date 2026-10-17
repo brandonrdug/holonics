@@ -458,11 +458,36 @@ fn reached_contact_storage_reacts_together_and_reenters_on_actual_support() {
         &field, &current, &source, &deposit, &mut charts,
     ).unwrap();
     assert_eq!(returned.receipt.material.len(), 6);
-    assert!(returned.deposit.present().unwrap().stepped > 0);
-    assert!(returned.receipt.material.iter().any(|movement| {
-        movement.family == crate::hnn::constitution::Family::Factor(0)
-            && movement.form.entries().iter().any(|x| !x.is_zero())
-    }));
+    let reading = returned.deposit.present().unwrap();
+    assert!(reading.stepped > 0);
+    // [October 16, the common lattice law] A reached C step moves its factor only once its carry
+    // reaches a lattice cell. Here neither contact's step reaches one at clock 1: each C is a named
+    // rounding refusal, unmoved, and every entry its step updated is carried as unresolved contact
+    // material on the fine grid or released below it (the 2026-10-16 record's §the continuation).
+    for contact in 0..2 {
+        let moved = returned.receipt.material.iter().any(|movement| {
+            movement.contact == contact
+                && movement.family == crate::hnn::constitution::Family::Factor(0)
+                && movement.form.entries().iter().any(|x| !x.is_zero())
+        });
+        let refused = reading.vanished.contains(
+            &(Locus::Channel(contact), crate::hnn::constitution::Family::Factor(0)));
+        assert!(!moved && refused, "contact {contact}: C is a rounding refusal, unmoved");
+        let updated: Vec<usize> = deposit.factors().iter().filter_map(|step| match &step.gradient {
+            FactorGradient::Storage { contact: c, gradient } if *c == contact => Some(gradient),
+            _ => None,
+        }).flat_map(|gradient| gradient.entries().iter().enumerate()
+            .filter(|(_, x)| !x.is_zero()).map(|(i, _)| i).collect::<Vec<_>>()).collect();
+        assert!(!updated.is_empty(), "contact {contact}: its C step updates an entry");
+        for i in updated {
+            let at = |rows: &[(Locus, crate::hnn::constitution::Carrier, usize, Rat)]| {
+                rows.iter().any(|(l, c, j, _)| *l == Locus::Channel(contact)
+                    && *c == crate::hnn::constitution::Carrier::Factor(0) && *j == i)
+            };
+            assert!(at(&reading.released) || at(&reading.unresolved_contact_material),
+                "contact {contact} entry {i}: carried or released");
+        }
+    }
     assert_eq!(&returned.receipt.committed - &returned.receipt.before,
         returned.receipt.deposition_work);
     let mut next = returned.forward.into_present().unwrap();

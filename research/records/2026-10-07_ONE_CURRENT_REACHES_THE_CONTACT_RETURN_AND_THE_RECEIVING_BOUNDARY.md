@@ -357,6 +357,10 @@ learning, or useful compression; no reference code was executed.
 
 ## Exact unresolved contact material and its existing physical consumer
 
+[superseded, October 16] The contact factors now take the common lattice law; the exact coarse
+split below is history. See
+[the October 16 record](2026-10-16_THE_CONTACT_FACTORS_TAKE_THE_COMMON_LATTICE_LAW_AND_THEIR_RELEASE_STAYS_BELOW_HALF_THE_FOUNDING_UNIT.md).
+
 [implementation; native law controls accepted at cacb0d037/v82] Preserve the unresolved C/K/D directions and
 their normalization in the same Constitution. The missing all-future sensitivity is a reason
 to retain them, not an assumption permitting their release. At each physical factor or its

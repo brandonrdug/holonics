@@ -417,22 +417,28 @@
 //! coefficient-to-receiver norm, unit and admitted-future join remains owed in #62.
 //! Brandon may override this choice.
 //!
-//! [definition; agent-inferred, October 7] **Unresolved physical material is retained exactly.**
-//! C/K/D factor carriers and their three normalization carriers instead use one coarse split:
-//! `delta + r_old = q u + r_new`, `value_new = value_old + q u`, `r_new in [-u/2,u/2)`.
-//! The same constitution owns value, normalization and unresolved direction; its common Resident
-//! owns the physical current receiving their eventual finite reaction. There is no fine release
-//! at these carriers: the next
-//! admitted deposition and a lossless rebase consume this one contemporary rational aggregate,
-//! never an update list or a retained Word. Its actual numerator/denominator bits enter B_Theta,
-//! and an over-budget successor is refused before publication. No logarithmic gamma bit bound,
-//! all-future extinction, full nonlinear score decrease or immediate storage move is asserted.
-//! The existing contact consumer retains its paired source/clock/chart and finite held-momentum
-//! work account; [`DepositReading::unresolved_contact_material`] names its unresolved successor.
-//! This repairs future contact accumulation, not residuals already released by older commits.
-//! Other carrier families keep the separately declared gamma approximation and its open future
-//! sensitivity obligations. These coarse identities consume `HNN/LatticeDeposit.{div_rem_spec,
-//! rem_bounds}` directly. No step, material unit, observed target or acceptance changes.
+//! [definition; agent-inferred, October 16; record
+//! `2026-10-16_THE_CONTACT_FACTORS_TAKE_THE_COMMON_LATTICE_LAW_AND_THEIR_RELEASE_STAYS_BELOW_HALF_THE_FOUNDING_UNIT`]
+//! **The contact factors take the common lattice law.** The C/K/D factor carriers and their three
+//! normalization carriers carry as every other carrier does: `y = Δ + r_old = y_f + e` at the fine
+//! lattice `2^(−L−k_m)ℤ`, `y_f = q·u + r_new`, the entry moves by `q·u`, `r_new` is carried and `e`
+//! released. October 7 gave them one exact coarse split instead, because no admitted-future
+//! kernel certified a release. That remainder's denominator is the lcm of every step `η·G/h′`
+//! that reached the entry, so its bits grew with every deposit and dominated the constitution. The
+//! history theorems `HNN/LatticeDeposit/Rebase.{history_accounting, history_release_lt,
+//! history_within_founding_unit}` do not depend on the carrier: over any history of deposits and
+//! re-bases at one entry the releases sum to less than half the founding unit `u₀`, and the entry
+//! stays within `u₀/2 + u/2` of the exact accumulation of the same updates. That is a bound on the
+//! representation of the supplied update history. It is not a bound on the trajectory that
+//! never-rounded learning would take, because a moved normalization changes later rates and a moved
+//! C/K/D changes later covectors; that bound is the open `commit_chain_residual` above. Every
+//! carried remainder is on the fine lattice of its locus's clock, in its half cell (Lean
+//! `Carried.{rem_fine, rem_bounded}`), and [`Constitution::continued`] refuses a restored state that
+//! carries any other: no earlier save format is read or kept. An entry whose update is zero is left
+//! as it is, remainder included. [`DepositReading::unresolved_contact_material`] names the factor
+//! remainders the successor carries; what fell below the fine grid is in `released`. The existing
+//! contact consumer keeps its paired source/clock/chart and finite held-momentum work account. No
+//! step, material unit, observed target or acceptance changes.
 //!
 //! A [`NormalLaw`] keeps `W` and its Gram `H` of the locus's own width (no global Gram), each
 //! carried, and the **solved chart** `X̂ ≈ H⁻¹` of the carried Gram (the lattice word, Lean
@@ -482,8 +488,8 @@
 //! [`Constitution::deposited_within`], the lock's half-turn, the re-base and the executed source
 //! move alike). Past `B_Θ` the deposit is refused with [`HnnError::ConstitutionBudget`], naming the loci that grew most; the predecessor
 //! stays published. The lattice bounds the entries' bits (`lattice_bits_bounded`) and the clock the
-//! bounded carriers' remainders (`remainder_rat_bits_bounded`); exact unresolved contact material
-//! instead pays its actual rational bits. [`Constitution::carrier_bits`] reads the three parts
+//! remainders (`remainder_rat_bits_bounded`), the contact factors' included.
+//! [`Constitution::carrier_bits`] reads the three parts
 //! separately, and [`DepositReading`] the released residuals and their bits, with each chart's
 //! certificate and released prox residual ([`ChartReading`]). The deposit clocks,
 //! like the commit counter, are counters of `⌈log₂ m⌉` bits and are not counted against `B_Θ`.
@@ -669,8 +675,8 @@ pub fn gamma_length(clock: u64) -> u32 {
 /// [definition; agent-inferred] **One deposit's budgeted carry at one locus** (Lean
 /// `HNN/LatticeDeposit.{step, carry, release}`; the module header states the law): the locus's
 /// lattice `2^(−L)ℤ`, the clock `m` the deposit advances it to (its precision `k_m` names the fine
-/// lattice `2^(−L−k_m)ℤ` for bounded carriers; physical factor/normalization carriers keep the
-/// whole exact coarse remainder), and what the deposit does there, staged by carrier and entry until it
+/// lattice `2^(−L−k_m)ℤ` at every carrier), and what the deposit does there, staged by carrier and
+/// entry until it
 /// publishes: each entry's released residual `e` (exact) and its applied coordinate `q`, and whether
 /// any update at the locus was nonzero (only then does the clock advance).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -736,8 +742,8 @@ impl BudgetedCarry {
     }
 
     /// **The released residuals** `e ≠ 0`, exact, by carrier and entry (Lean `release`): each at most
-    /// `½·2^(−L−k_m)` (`release_bounded`) at bounded carriers. Physical contact factors and their
-    /// normalization retain the exact coarse remainder and release nothing here.
+    /// `½·2^(−L−k_m)` (`release_bounded`), at every carrier, the contact factors and their
+    /// normalization included.
     pub fn released(&self) -> Vec<(Carrier, usize, Rat)> {
         self.staged
             .iter()
@@ -831,17 +837,15 @@ impl BudgetedCarry {
 
 /// [definition] **The carried remainders of one lattice-valued array** (Lean `Carried.rem`), by
 /// flat entry index; a zero remainder is not stored, so two carriers with one content compare equal.
-/// Physical contact factors/normalization keep an arbitrary exact rational in the coarse cell;
-/// other carriers keep the separately declared gamma-grid remainder.
+/// Every carrier keeps the gamma-grid remainder `ρ·2^(−L−k_m)`, `−2^(k_m−1) ≤ ρ < 2^(k_m−1)`, at
+/// its locus's lattice and clock; [`Constitution::continued`] refuses a state carrying any other.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub(crate) struct Carry(BTreeMap<usize, Rat>);
 
 impl Carry {
     /// **One entry's budgeted deposit** (Lean `carry`, `carry_accounting`): `y = Δ + r_prev` split at
     /// the fine lattice `2^(−L−k_m)ℤ` into `y_f + e` and `y_f` at the lattice into `q·2^(−L) + r`; the
-    /// entry moves by `q·2^(−L)`, `r` is carried and `e` is staged for release. Contact factors and
-    /// normalization instead divide y directly at the coarse unit and retain its exact remainder.
-    /// A zero update moves
+    /// entry moves by `q·2^(−L)`, `r` is carried and `e` is staged for release. A zero update moves
     /// nothing and releases nothing (`carry_entry_zero`). A residual staged by an earlier step of the
     /// same deposit at this entry is taken back into `y`, so the deposit releases once per entry.
     fn deposit(
@@ -858,7 +862,7 @@ impl Carry {
         at.moved = true;
         let staged = at.staged.remove(&(carrier, index));
         let previous = self.0.remove(&index);
-        let carried = carried_entry(&at.lattice, at.precision(), carrier, entry, update, staged, previous);
+        let carried = carried_entry(&at.lattice, at.precision(), entry, update, staged, previous);
         self.adopt(at, carrier, index, entry, carried)
     }
 
@@ -900,7 +904,6 @@ impl Carry {
                     carried_entry(
                         &lattice,
                         precision,
-                        carrier,
                         &current[index],
                         &updates[index],
                         staged,
@@ -958,9 +961,9 @@ struct CarriedEntry {
 /// residual and coordinate an earlier step of the same deposit staged there, and the remainder the
 /// entry carries.
 ///
-/// Contact factors and normalization use one exact coarse division instead, with no fine release.
-/// For other carriers, [proved-derived] the two splits compose into one floor.
-/// With `y = Δ + r_prev` and `k = k_m ≥ 1`,
+/// Every carrier takes this one law, the contact factors and their normalization included (record
+/// `2026-10-16_THE_CONTACT_FACTORS_TAKE_THE_COMMON_LATTICE_LAW_AND_THEIR_RELEASE_STAYS_BELOW_HALF_THE_FOUNDING_UNIT`).
+/// [proved-derived] The two splits compose into one floor. With `y = Δ + r_prev` and `k = k_m ≥ 1`,
 /// the applied coordinate is `q = ⌊y·2^L + 1/2 + 2^(−k−1)⌋` (Lean
 /// `HNN/LatticeDeposit.{quot_fine_eq_floor, step_coordinate_eq_floor}`). So `q` moves only where
 /// `y` crosses `(z − 1/2)·2^(−L) − 2^(−L−k−1)`, half a fine unit below the boundary of one rounding
@@ -968,7 +971,6 @@ struct CarriedEntry {
 fn carried_entry(
     lattice: &Lattice,
     precision: u32,
-    carrier: Carrier,
     entry: &Rat,
     update: &Rat,
     staged: Option<Staged>,
@@ -976,35 +978,17 @@ fn carried_entry(
 ) -> CarriedEntry {
     let (staged, applied) = staged.unwrap_or_else(|| (Rat::zero(), BigInt::zero()));
     let previous = previous.unwrap_or_else(Rat::zero);
-    if matches!(carrier, Carrier::Factor(_) | Carrier::FactorScale(_)) {
-        // [definition; agent-inferred, October 7] No admitted-future kernel certifies dropping
-        // a physical C/K/D direction or its normalization. Keep one exact contemporary
-        // remainder in this same constitution. Its actual bits enter B_Theta before publication.
-        let moving = update + &staged + previous;
-        let (quotient, remainder) = lattice.div_rem(&moving);
-        let entry = entry + Rat::new(quotient.clone(), lattice.scale());
-        let applied = applied + quotient;
-        return CarriedEntry {
-            entry,
-            remainder,
-            staged: (!applied.is_zero()).then_some((Rat::zero(), applied)),
-        };
-    }
     let exponent = lattice.exponent + precision;
     // y = Δ + staged + r_prev. The carried remainder lies on the fine lattice of an earlier
-    // clock, so it moves the fine point by its own coordinate and adds nothing to `e`.
-    let mut moving = if staged.is_zero() {
+    // clock (Lean `Carried.rem_fine`; `Constitution::continued` refuses any other), so it moves
+    // the fine point by its own coordinate and adds nothing to `e`.
+    let moving = if staged.is_zero() {
         update.clone()
     } else {
         update + &staged
     };
-    let carried = match dyadic_coordinate(&previous, exponent) {
-        Some(coordinate) => coordinate,
-        None => {
-            moving += &previous;
-            BigInt::zero()
-        }
-    };
+    let carried = dyadic_coordinate(&previous, exponent)
+        .expect("a carried remainder lies on the fine lattice of its locus's clock");
     let (point, residual) = Lattice::new(exponent).div_rem(&moving);
     let point = point + carried;
     // y_f = P·2^(−L−k): its coordinate at the lattice, nearest, ties upward.
@@ -3766,7 +3750,8 @@ pub struct DepositReading {
     pub loci: Vec<Locus>,
     pub released: Vec<(Locus, Carrier, usize, Rat)>,
     pub released_bits: u64,
-    /// Exact unresolved C/K/D factor and normalization coordinates in the successor constitution.
+    /// The C/K/D factor and normalization remainders the successor constitution carries, each on
+    /// its clock's fine grid within the half cell; what fell below that grid is in `released`.
     /// This is a transient reading of contemporary material, not an update history or a physical
     /// storage/work claim. The next admitted deposition and lossless rebase consume the same carry.
     pub unresolved_contact_material: Vec<(Locus, Carrier, usize, Rat)>,
@@ -3775,8 +3760,7 @@ pub struct DepositReading {
     /// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)]
     /// **The rounding refusals**: every family certified at a step `η > 0` none of whose entries
     /// took a nonzero lattice coordinate, so its constitution did not change at this deposit. Its
-    /// physical factor move is retained as an exact remainder below the coarse lattice; other
-    /// carriers may also release below their separately declared fine lattice
+    /// move is carried as a remainder on its clock's fine grid or released below that grid
     /// ([`Constitution::carried_remainders`] says which); it is not necessarily lost. Only a
     /// positively certified family either moves material coordinates or is named here: a reached
     /// family with no admitted step is outside this list. The aggregate `stepped` count includes
@@ -6602,8 +6586,9 @@ impl Constitution {
     /// before pass 2. For each certified family `f` with unit step `d_f = G_f / h′_f` (the boost's
     /// column signs taken, as pass 2 takes them) it reads, entry by entry, the parts `r_i` pass 2
     /// would meet (the staged residual and the carried remainder, exactly as `carried_entry` reads
-    /// them) and returns `k_f`, the least `k ≥ k_cert(f)` at which the owner's own split of
-    /// `2^k d_{f,i} + r_i` leaves its cell at some entry. The families are declared together, each
+    /// them) and returns `k_f`, the least `k ≥ k_cert(f)` at which the split pass 2 takes of
+    /// `2^k d_{f,i} + r_i` (the fine lattice at the locus's precision, then the lattice) leaves its
+    /// cell at some entry. The families are declared together, each
     /// at its own `k_f`: one joint candidate, no search over candidates. No family with a step
     /// refuses typed ([`DeclaredStepRefusal::NoReach`]).
     pub(crate) fn first_reach(
@@ -6859,8 +6844,13 @@ impl Constitution {
                         })
                         .collect();
                     let lattice = self.lattice(*locus)?;
+                    // The precision pass 2 deposits at: its stroke's, or the one it would open.
+                    let precision = region
+                        .stroke
+                        .as_ref()
+                        .map_or_else(|| gamma_length(self.clock(*locus) + 1), |at| at.precision());
                     if let Some(reach) =
-                        first_reach_scan(&lattice, reading.step.exponent, &entries)?
+                        first_reach_scan(&lattice, precision, reading.step.exponent, &entries)?
                     {
                         reached.insert(
                             key,
@@ -8120,20 +8110,45 @@ pub struct CommittedReach {
     pub families: BTreeMap<(Locus, Family), Vec<(usize, BigInt)>>,
 }
 
-/// [definition; agent-inferred, October 9; Lean `HNN/FiniteDecrease.{split_spec, split_bounds,
-/// quot_ne_zero_of_half_lt, first_reach_endpoint}`] **The first reach of one family, entry by
-/// entry from the owner's own split** ([`Lattice::div_rem`]: nearest, ties upward). Each entry
-/// is its unit step `d_i` and the part `r_i` pass 2 meets there (the staged residual and the
-/// carried remainder, with the invariant `−u/2 ≤ r_i < u/2`, refused where it fails). With
-/// `q_i(k)` the coordinate of `2^k d_i + r_i`, the first reach is
-/// `k_f = min { k ≥ k_cert : some q_i(k) ≠ 0 }`. The scan is finite: at `k_max`, the least `k`
-/// with `2^k max_i |d_i| > u`, the widest entry has `|2^k d_i + r_i| > u − u/2`, so its `q_i ≠ 0`,
-/// and the scan has ended by `max(k_cert, k_max)`. `None` when every `d_i = 0`: such a family is
-/// not in the candidate. The split decides, never `max |η d|`: a remainder of the opposite sign
-/// can hold the widest entry in its cell while a narrower entry, its remainder of the same
-/// sign, leaves its own.
+/// [definition; agent-inferred, October 9 and 16; Lean `HNN/FiniteDecrease.{split_spec,
+/// split_bounds, quot_ne_zero_of_half_lt}`, `HNN/LatticeDeposit.{quot_fine_eq_floor,
+/// step_coordinate_eq_floor}`] **The first reach of one family, entry by entry from the split the
+/// deposit takes** ([`carried_entry`]: the fine lattice `2^(−L−k_m)ℤ` at the deposit's precision
+/// `k_m`, then the lattice, each nearest with ties upward). Each entry is its unit step `d_i` and
+/// the part `r_i` pass 2 meets there (the staged residual and the carried remainder, with the
+/// invariant `−u/2 ≤ r_i < u/2`, refused where it fails). With `q_i(k)` the applied coordinate of
+/// `y = 2^k d_i + r_i`, `q_i(k) = ⌊y/u + 1/2 + 2^(−k_m−1)⌋`, the first reach is
+/// `k_f = min { k ≥ k_cert : some i with d_i ≠ 0 has q_i(k) ≠ 0 }`. `None` when every `d_i = 0`: such a family is not
+/// in the candidate. The split decides, never `max |η d|`: a remainder of the opposite sign can hold
+/// the widest entry in its cell while a narrower entry, its remainder of the same sign, leaves its
+/// own.
+///
+/// `k_m` and `r_i` are the actual deposit's: the precision of the clock the deposit advances the
+/// locus to (its open stroke's, or `k_(m+1)` at clock `m`), and that deposit's staged residual plus
+/// carried remainder at the entry.
+///
+/// [proved-derived; Lean statement owed in #62] The scan is finite. With `δ = 2^(−k_m−1)`, an
+/// entry with `d_i > 0` reaches exactly when `y/u + 1/2 + δ ≥ 1`, which every admitted remainder
+/// meets once `2^k d_i ≥ u(1 − δ)`, the worst case `r_i = −u/2`. An entry with `d_i < 0` reaches
+/// exactly when `y/u + 1/2 + δ < 0`, which every remainder `r_i < u/2` meets once
+/// `2^k |d_i| ≥ u(1 + δ)`, and no smaller bound serves every such remainder. So
+/// `k_max = ⌈log₂(u(1 + δ)/max_i |d_i|)⌉`, the least `k` with `2^k max_i |d_i| ≥ u(1 + δ)`, is the
+/// tight sign-independent worst-case endpoint, not the first reach, which the scan finds; at its
+/// equality a negative entry reaches only because `r_i < u/2` is strict (at `r_i = u/2`,
+/// `y/u + 1/2 + δ = 0`). The scan has ended by `max(k_cert, k_max)`. A remainder in
+/// `[u(1/2 − δ), u/2)` moves its coordinate with every update of its own sign, however small, and
+/// with an opposite-sign update no larger than `r_i − u(1/2 − δ)`; a larger opposite-sign update
+/// can cancel it. No admitted `r_i` lies there: a carried remainder is on the fine lattice of the
+/// locus's clock, at most `u/2 − u·2^(−k_m)`, and a staged residual is below half a fine unit,
+/// `u·2^(−k_m−1)`, so their sum stays below `u(1/2 − δ)`; the scan's tests read its whole domain.
+/// An entry with `d_i = 0` receives no update: the deposit leaves its coordinate, staged residual
+/// and remainder as they are ([`Carry::deposit_all`]), so the scan reads only `d_i ≠ 0`, and a
+/// remainder there claims no reach whatever its value. The ceiling is exact: where
+/// `u(1 + δ)/max_i |d_i|` is a power of two, `k_max` is its logarithm, one below the strict form
+/// `⌊log₂⌋ + 1` the coarse `first_reach_endpoint` (`2^k max_i |d_i| > u`) takes.
 pub(crate) fn first_reach_scan(
     lattice: &Lattice,
+    precision: u32,
     certified: i64,
     entries: &[(Rat, Rat)],
 ) -> Result<Option<FirstReach>, HnnError> {
@@ -8153,16 +8168,27 @@ pub(crate) fn first_reach_scan(
     else {
         return Ok(None);
     };
-    // The least `k` with `2^k · widest > u`: `⌊log₂(u / widest)⌋ + 1`.
-    let reaching = crate::ratio::disk::floor_log2(&(&unit / &widest)) + 1;
+    // The least `k` with `2^k · widest ≥ u(1 + 2^(−k_m−1))`: `⌈log₂(u(1 + 2^(−k_m−1)) / widest)⌉`.
+    let fine = Lattice::new(lattice.exponent + precision);
+    let bound = (&unit + &fine.unit() / rat(2, 1)) / &widest;
+    let floor = crate::ratio::disk::floor_log2(&bound);
+    let reaching = if crate::holon::deposition::dyadic(floor) == bound {
+        floor
+    } else {
+        floor + 1
+    };
     let endpoint = certified.max(reaching);
     for exponent in certified..=endpoint {
         let step = crate::holon::deposition::dyadic(exponent);
         let reached: Vec<(usize, BigInt)> = entries
             .iter()
             .enumerate()
+            // A zero update leaves its coordinate untouched ([`Carry::deposit_all`]), so it reaches
+            // nothing, whatever remainder it carries.
+            .filter(|(_, (d, _))| !d.is_zero())
             .filter_map(|(entry, (d, r))| {
-                let (quotient, _) = lattice.div_rem(&(&step * d + r));
+                let (point, _) = fine.div_rem(&(&step * d + r));
+                let (quotient, _) = lattice.div_rem_coordinate(&point, precision);
                 (!quotient.is_zero()).then_some((entry, quotient))
             })
             .collect();
@@ -9513,6 +9539,27 @@ impl Constitution {
         if !self.on_lattice() {
             return Err(refuse("the state's material off its loci's lattices"));
         }
+        // [definition; agent-inferred, October 17] Every restored remainder is one the lattice law
+        // carries (Lean `HNN/LatticeDeposit.Carried.{rem_bounded, rem_fine}`): `ρ·2^(−L−k_m)` at its
+        // locus's lattice `2^(−L)` and the precision `k_m` of its clock, `−2^(k_m−1) ≤ ρ < 2^(k_m−1)`.
+        // A deposit only advances a clock and a re-base only refines a lattice, so a remainder carried
+        // at an earlier clock or on a coarser lattice lies there too. The text readers take any exact
+        // rational, and this is their one consumer, so the check stands here for every carrier, the
+        // laws' map and Gram carries included. No other remainder is read: an earlier save format
+        // is a superseded prototype (THE_MACHINE guard 13).
+        for (locus, _, _, remainder) in self.carried_remainders() {
+            let precision = gamma_length(self.clock(locus));
+            let half = BigInt::one() << (precision - 1) as usize;
+            let carried = self.lattices.get(&locus).is_some_and(|lattice| {
+                dyadic_coordinate(&remainder, lattice.exponent + precision)
+                    .is_some_and(|rho| -&half <= rho && rho < half)
+            });
+            if !carried {
+                return Err(refuse(
+                    "a remainder off its locus's fine lattice or outside its half cell",
+                ));
+            }
+        }
         Ok(self)
     }
 }
@@ -10811,5 +10858,76 @@ impl ConstitutionRead for Constitution {
     }
     fn population(&self, ring: usize) -> Option<&PortPopulation> {
         self.rings[ring].population.as_ref()
+    }
+}
+
+/// [Epime's review, October 16] **The scan and the deposit agree at a zero update.** At `L = 4` and
+/// clock 1 a remainder near `u/2`, `r = u/2 − u/4096`, inside the scan's domain `[−u/2, u/2)` though
+/// off the fine lattice the law carries, sits at an entry whose update is zero, beside `d = ±1` at `r = 0`. The scan claims no reach at that entry and the nonzero
+/// pair reaches at `2^(−6)`. For each of the six contact carriers, at the certified exponent, at the
+/// first reach and above it, `Carry::deposit_all` leaves the zero-update entry, its remainder and its
+/// staged residual untouched, moves exactly the entries the scan names, and keeps
+/// `value + r + e = Δ` at every nonzero entry.
+#[cfg(test)]
+#[test]
+fn factor_first_reach_skips_zero_updates_with_an_off_grid_carry() {
+    let lattice = Lattice::new(4);
+    let precision = gamma_length(1);
+    let off_grid = lattice.unit() / rat(2, 1) - lattice.unit() / rat(4096, 1);
+    let entries = vec![
+        (Rat::zero(), off_grid.clone()),
+        (rat(1, 1), Rat::zero()),
+        (-rat(1, 1), Rat::zero()),
+    ];
+    let reach = first_reach_scan(&lattice, precision, -10, &entries)
+        .unwrap()
+        .unwrap();
+    assert_eq!(reach.exponent, -6);
+    assert_eq!(reach.reached, vec![(1, BigInt::one())]);
+    for carrier in [
+        Carrier::Factor(0),
+        Carrier::Factor(1),
+        Carrier::Factor(2),
+        Carrier::FactorScale(0),
+        Carrier::FactorScale(1),
+        Carrier::FactorScale(2),
+    ] {
+        for exponent in [-10, reach.exponent, -4] {
+            let mut carry = Carry(BTreeMap::from([(0, off_grid.clone())]));
+            let mut values = vec![Rat::zero(); 3];
+            let mut at = BudgetedCarry::new(lattice, 1);
+            let step = crate::holon::deposition::dyadic(exponent);
+            let updates = vec![Rat::zero(), step.clone(), -step];
+            carry.deposit_all(&mut at, carrier, &mut values, &updates);
+            assert!(values[0].is_zero());
+            assert_eq!(carry.at(0), off_grid);
+            assert!(!at.staged.contains_key(&(carrier, 0)));
+            let actual: Vec<_> = values
+                .iter()
+                .enumerate()
+                .filter(|(_, v)| !v.is_zero())
+                .map(|(i, v)| (i, (v / lattice.unit()).to_integer()))
+                .collect();
+            if exponent == -10 {
+                assert!(actual.is_empty());
+            } else {
+                assert_eq!(
+                    actual,
+                    first_reach_scan(&lattice, precision, exponent, &entries)
+                        .unwrap()
+                        .unwrap()
+                        .reached
+                );
+            }
+            for i in 1..3 {
+                let released = at
+                    .released()
+                    .into_iter()
+                    .filter(|(_, j, _)| *j == i)
+                    .map(|(_, _, e)| e)
+                    .sum::<Rat>();
+                assert_eq!(&values[i] + carry.at(i) + released, updates[i]);
+            }
+        }
     }
 }

@@ -12,8 +12,8 @@ use super::support::{contact, encoded, ring};
 use crate::compression::landmark::context::{BaseMeasure, StopPrior};
 use crate::hnn::chart::Charts;
 use crate::hnn::constitution::{
-    Carrier, Constitution, DeclaredExponents, DeclaredStepRefusal,
-    FactorGradient, Family, FirstReach, Lattice, Locus, first_reach_scan,
+    Carrier, Constitution, DeclaredExponents, DeclaredStepRefusal, DepositReading,
+    FactorGradient, Family, FirstReach, Lattice, Locus, first_reach_scan, gamma_length,
 };
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{
@@ -212,11 +212,14 @@ fn factor(constitution: &Constitution, family: usize) -> &crate::ratio::linear::
 }
 
 /// The carry identity at a declared step, entry by entry for every contact family:
-/// `2^k G_i / h′ + r_prior = ΔF_i + r_next` (factor carriers release nothing), `h′` the
-/// successor's statistic; a family with no declared exponent has no step.
+/// `2^k G_i / h′ + r_prior = ΔF_i + r_next + e_i`, `h′` the successor's statistic and `e_i` the
+/// entry's release in the publication (the common lattice law, record
+/// `2026-10-16_THE_CONTACT_FACTORS_TAKE_THE_COMMON_LATTICE_LAW_AND_THEIR_RELEASE_STAYS_BELOW_HALF_THE_FOUNDING_UNIT`);
+/// a family with no declared exponent has no step.
 fn carry_identity(
     before: &Constitution,
     after: &Constitution,
+    publication: &DepositReading,
     deposit: &Deposit,
     declared: &DeclaredExponents,
 ) {
@@ -233,10 +236,18 @@ fn carry_identity(
             .zip(factor(after, f).entries());
         for (i, ((g, old), new)) in entries.enumerate() {
             let proposed = &step * g / statistic;
+            let released: Rat = publication
+                .released
+                .iter()
+                .filter(|(l, c, j, _)| {
+                    *l == Locus::Channel(0) && *c == Carrier::Factor(f) && *j == i
+                })
+                .map(|(.., e)| e.clone())
+                .sum();
             assert_eq!(
                 proposed + carried(before, Carrier::Factor(f), i),
-                (new - old) + carried(after, Carrier::Factor(f), i),
-                "family {f} entry {i}: proposal + r_prior = applied + r_next"
+                (new - old) + carried(after, Carrier::Factor(f), i) + released,
+                "family {f} entry {i}: proposal + r_prior = applied + r_next + e"
             );
         }
     }
@@ -245,16 +256,25 @@ fn carry_identity(
 // -------------------------------------------------------------------------------------------
 // the first reach
 
-/// The split at a declared lattice, read entry by entry (`first_reach_scan`). At `L = 4` the unit is
-/// `u = 1/16` and the half-unit `1/32`; `q(x) = ⌊16x + ½⌋`.
+/// The applied coordinate the deposit takes of `y` at a lattice and precision `k_m` (`carried_entry`):
+/// the fine lattice `2^(−L−k_m)ℤ`, then the lattice, each nearest with ties upward, so
+/// `q = ⌊y/u + 1/2 + 2^(−k_m−1)⌋` (Lean `HNN/LatticeDeposit.step_coordinate_eq_floor`).
+fn applied(lattice: &Lattice, precision: u32, y: &Rat) -> BigInt {
+    let (point, _) = Lattice::new(lattice.exponent() + precision).div_rem(y);
+    lattice.div_rem_coordinate(&point, precision).0
+}
+
+/// The split the deposit takes, read entry by entry (`first_reach_scan`). At `L = 4` the unit is
+/// `u = 1/16` and the half-unit `1/32`. At clock 2 (`k_2 = 3`) the deposit's coordinate is
+/// `q(x) = ⌊16x + 1/2 + 1/16⌋`; at clock 1 (`k_1 = 1`) it is `⌊16x + 1/2 + 1/4⌋`.
 #[test]
 fn the_first_reach_is_read_from_the_owner_split_entry_by_entry() {
     let lattice = Lattice::new(4);
     let half = rat(1, 32);
-    // The split read: d = 1, r = 0. q(2^k) ≠ 0 exactly from 2^k = 1/32 (the tie goes up), so
-    // k_f = −5; k_max = ⌊log₂(u / 1)⌋ + 1 = −3, the endpoint max(−10, −3).
+    // The split read at k_m = 3: d = 1, r = 0. q(2^k) ≠ 0 exactly from 2^k = 1/32, so k_f = −5;
+    // k_max is the least k with 2^k ≥ u(1 + 1/16) = 17/256, −3, and the endpoint is max(−10, −3).
     assert_eq!(
-        first_reach_scan(&lattice, -10, &[(integer(1), Rat::zero())]).unwrap(),
+        first_reach_scan(&lattice, 3, -10, &[(integer(1), Rat::zero())]).unwrap(),
         Some(FirstReach {
             exponent: -5,
             certified: -10,
@@ -262,13 +282,26 @@ fn the_first_reach_is_read_from_the_owner_split_entry_by_entry() {
             reached: vec![(0, BigInt::from(1))],
         })
     );
-    assert_eq!(lattice.div_rem(&dyadic(-6)).0, BigInt::zero(), "2^-6 stays in its cell");
+    assert_eq!(applied(&lattice, 3, &dyadic(-6)), BigInt::zero(), "2^-6 stays in its cell");
+    // At clock 1 the fine lattice is 2^(−5)ℤ: 2^-6 is its tie and goes up to 1/32, the lattice's
+    // tie, which goes up to 1/16. So the first reach is one dyadic step earlier, k_f = −6, where
+    // the lattice split alone would hold 2^-6 in its cell.
+    assert_eq!(
+        first_reach_scan(&lattice, 1, -10, &[(integer(1), Rat::zero())]).unwrap(),
+        Some(FirstReach {
+            exponent: -6,
+            certified: -10,
+            endpoint: -3,
+            reached: vec![(0, BigInt::from(1))],
+        })
+    );
+    assert_eq!(lattice.div_rem(&dyadic(-6)).0, BigInt::zero());
     // The invariant −u/2 ≤ r < u/2: the lower end is a remainder, the upper end is not.
-    assert!(first_reach_scan(&lattice, -10, &[(integer(1), -half.clone())]).is_ok());
-    assert!(first_reach_scan(&lattice, -10, &[(integer(1), half.clone())]).is_err());
+    assert!(first_reach_scan(&lattice, 3, -10, &[(integer(1), -half.clone())]).is_ok());
+    assert!(first_reach_scan(&lattice, 3, -10, &[(integer(1), half.clone())]).is_err());
     // A certificate above k_max: the scan starts and ends at k_cert, q(1) = 16.
     assert_eq!(
-        first_reach_scan(&lattice, 0, &[(integer(1), Rat::zero())]).unwrap(),
+        first_reach_scan(&lattice, 3, 0, &[(integer(1), Rat::zero())]).unwrap(),
         Some(FirstReach {
             exponent: 0,
             certified: 0,
@@ -278,45 +311,158 @@ fn the_first_reach_is_read_from_the_owner_split_entry_by_entry() {
     );
     // The endpoint with the remainder that delays the most, r = −u/2: 2^-4 − 1/32 = 1/32 reaches
     // (q = 1) while 2^-5 − 1/32 = 0 does not, so k_f = −4 ≤ k_max = −3.
-    let delayed = first_reach_scan(&lattice, -10, &[(integer(1), -half.clone())])
+    let delayed = first_reach_scan(&lattice, 3, -10, &[(integer(1), -half.clone())])
         .unwrap()
         .unwrap();
     assert_eq!((delayed.exponent, delayed.endpoint), (-4, -3));
     assert_eq!(delayed.reached, vec![(0, BigInt::from(1))]);
     // No direction: the family is not in the candidate.
     assert_eq!(
-        first_reach_scan(&lattice, -10, &[(Rat::zero(), Rat::zero()), (Rat::zero(), rat(1, 64))])
-            .unwrap(),
+        first_reach_scan(
+            &lattice,
+            3,
+            -10,
+            &[(Rat::zero(), Rat::zero()), (Rat::zero(), rat(1, 64))]
+        )
+        .unwrap(),
         None
     );
 }
 
 /// Signed remainders decide, not `max |η d|`. Entry 0 is the widest (`d = 2`) with `r = −1/32`;
-/// entry 1 has `d = 1` and `r = 31/1024`. At `k = −10`, entry 1 is `1/1024 + 31/1024 = 1/32`, the
-/// tie, so `q = 1`; entry 0 is `2/1024 − 32/1024`, `q = 0`. At `k = −11` entry 1 is `63/2048` and
-/// entry 0 `−31/1024`: both stay. So `k_f = −10`, reached by the narrower entry, while
+/// entry 1 has `d = 1` and `r = 31/1024`, which lies on the fine lattice `2^(−11)ℤ` of `k_m = 7`
+/// (clocks 8 to 15), the precision read here. At `k = −10`, entry 1 is `1/1024 + 31/1024 = 1/32`,
+/// the tie, so `q = 1`; entry 0 is `2/1024 − 32/1024`, `q = 0`. At `k = −11` entry 1 is `63/2048`
+/// and entry 0 `−31/1024`: both stay. So `k_f = −10`, reached by the narrower entry, while
 /// `max |η d| = 2^-9` lies 4 binary orders below the half-unit and a half-unit rule on `max |η d|`
 /// would name `k = −6`.
 #[test]
 fn a_signed_remainder_moves_the_first_reach_off_the_widest_entry() {
     let lattice = Lattice::new(4);
+    let precision = gamma_length(8);
+    assert_eq!(precision, 7);
     let entries = [(integer(2), -rat(1, 32)), (integer(1), rat(31, 1024))];
-    let reach = first_reach_scan(&lattice, -20, &entries).unwrap().unwrap();
+    let reach = first_reach_scan(&lattice, precision, -20, &entries).unwrap().unwrap();
     assert_eq!(
         reach,
         FirstReach {
             exponent: -10,
             certified: -20,
-            // k_max = ⌊log₂((1/16) / 2)⌋ + 1 = −4.
+            // k_max: the least k with 2^k · 2 ≥ (1/16)(1 + 2^-8), −4.
             endpoint: -4,
             reached: vec![(1, BigInt::from(1))],
         }
     );
     let widest = dyadic(-10) * integer(2);
-    assert_eq!(lattice.div_rem(&(&widest - rat(1, 32))).0, BigInt::zero());
+    assert_eq!(applied(&lattice, precision, &(&widest - rat(1, 32))), BigInt::zero());
     assert!(widest < rat(1, 32), "max |η d| is below the half-unit at the first reach");
     // The half-unit rule on the widest entry alone: the least k with 2^k · 2 ≥ 1/32.
     assert!(dyadic(-6) * integer(2) >= rat(1, 32) && dyadic(-7) * integer(2) < rat(1, 32));
+}
+
+/// The endpoint is the sign-independent worst case, not the first reach, read at its signed
+/// boundaries. At `L = 4` and clock 1 (`k_1 = 1`) the unit is `u = 1/16`, `δ = 2^(−k_m−1) = 1/4`,
+/// and `q(y) = ⌊16y + 3/4⌋`. A positive entry at its worst remainder `r = −u/2` reaches exactly
+/// when `2^k d ≥ u(1 − δ) = 3/64`. A negative entry reaches when `2^k d + r < −u(1/2 + δ)`; as
+/// `r` approaches `u/2` from below this needs `2^k |d| ≥ u(1 + δ) = 5/64`, so `u(1 + δ)` is the
+/// bound no smaller exponent meets for every remainder, and its equality holds only because
+/// `r < u/2` is strict. The endpoint is its exact ceiling: at dyadic equality the floor itself.
+#[test]
+fn the_first_reach_endpoint_is_the_signed_worst_case_at_its_exact_ceiling() {
+    let lattice = Lattice::new(4);
+    let precision = gamma_length(1);
+    assert_eq!(precision, 1);
+    let half = rat(1, 32);
+    // Positive, at r = −u/2: d = 3/64 reaches at k = 0 (3/64 − 1/32 = 1/64, q = ⌊1/4 + 3/4⌋ = 1)
+    // and not at k = −1 (q = ⌊−1/8 + 3/4⌋ = 0), one exponent below the endpoint
+    // ⌈log₂((5/64)/(3/64))⌉ = 1.
+    let positive = first_reach_scan(&lattice, precision, -10, &[(rat(3, 64), -half.clone())])
+        .unwrap()
+        .unwrap();
+    assert_eq!(
+        positive,
+        FirstReach {
+            exponent: 0,
+            certified: -10,
+            endpoint: 1,
+            reached: vec![(0, BigInt::from(1))],
+        }
+    );
+    assert_eq!(applied(&lattice, precision, &(rat(3, 128) - &half)), BigInt::zero());
+    // The positive threshold is exact: d one part in 4096 below 3/64 stays at k = 0
+    // (16·63/4096 + 3/4 = 255/256) and reaches at the endpoint k = 1.
+    let under = rat(3, 64) - rat(1, 4096);
+    assert_eq!(applied(&lattice, precision, &(&under - &half)), BigInt::zero());
+    let delayed = first_reach_scan(&lattice, precision, -10, &[(under, -half.clone())])
+        .unwrap()
+        .unwrap();
+    assert_eq!((delayed.exponent, delayed.endpoint), (1, 1));
+    // Negative, at equality: d = −5/64 = −u(1 + δ) and r = 1/32 − 1/4096, just below u/2. Such a
+    // remainder moves with any small enough update (16r + 3/4 = 319/256), here one of opposite
+    // sign no larger than r − u(1/2 − δ) = 63/4096, so from k_cert = −10 the scan reaches at once
+    // with q = +1. The scan reads its whole domain; no admitted r lies in [u(1/2 − δ), u/2): a
+    // carried remainder is on the fine lattice of the locus's clock, r ≤ u/2 − u·2^(−k_m), here 0,
+    // and a staged residual adds less than half a fine unit.
+    let below = &half - rat(1, 4096);
+    let alone = first_reach_scan(&lattice, precision, -10, &[(-rat(5, 64), below.clone())])
+        .unwrap()
+        .unwrap();
+    assert_eq!((alone.exponent, alone.reached.clone()), (-10, vec![(0, BigInt::from(1))]));
+    // From k_cert = −2 the step has carried y into the zero cell (y = 47/4096, 16y + 3/4 =
+    // 239/256; at k = −1, y = −33/4096 and 159/256). At k = 0, y = −193/4096 and 16y + 3/4 =
+    // −1/256 < 0, so q = −1. The first reach is the endpoint, the exact ceiling of
+    // log₂((5/64)/(5/64)) = 0, where the strict form ⌊log₂⌋ + 1 names 1.
+    let negative = first_reach_scan(&lattice, precision, -2, &[(-rat(5, 64), below)])
+        .unwrap()
+        .unwrap();
+    assert_eq!(
+        negative,
+        FirstReach {
+            exponent: 0,
+            certified: -2,
+            endpoint: 0,
+            reached: vec![(0, BigInt::from(-1))],
+        }
+    );
+    assert_eq!(floor_log2(&(rat(5, 64) / rat(5, 64))) + 1, 1);
+    // The equality needs r < u/2 strictly: at r = u/2 the composed coordinate is ⌊0⌋ = 0 (the fine
+    // tie −3/2 goes up to −1, then the lattice tie −1/2 goes up to 0), and the scan refuses that
+    // remainder.
+    assert_eq!(applied(&lattice, precision, &(-rat(5, 64) + &half)), BigInt::zero());
+    assert!(first_reach_scan(&lattice, precision, -2, &[(-rat(5, 64), half)]).is_err());
+}
+
+/// [Epime's review, October 16] **A zero update reaches nothing, whatever its remainder.** The
+/// deposit skips an entry whose update is zero (`Carry::deposit_all`), so a remainder there, here
+/// `r = 1/32 − 1/4096` near `u/2` (in the scan's domain, though not one the lattice law carries),
+/// stays as it is, though its composed coordinate alone would be `⌊16r + 3/4⌋ = 1`. At `L = 4` and clock 1 the scan reads only the nonzero entry: `d = 1` at
+/// `r = 0` reaches at `2^(−6)`, the fine tie, and the off-grid remainder claims no earlier reach.
+#[test]
+fn a_zero_update_claims_no_reach_from_an_off_grid_remainder() {
+    let lattice = Lattice::new(4);
+    let precision = gamma_length(1);
+    let off_grid = rat(1, 32) - rat(1, 4096);
+    assert_eq!(applied(&lattice, precision, &off_grid), BigInt::from(1));
+    assert_eq!(
+        first_reach_scan(
+            &lattice,
+            precision,
+            -10,
+            &[(Rat::zero(), off_grid.clone()), (integer(1), Rat::zero())]
+        )
+        .unwrap(),
+        Some(FirstReach {
+            exponent: -6,
+            certified: -10,
+            endpoint: -3,
+            reached: vec![(1, BigInt::from(1))],
+        })
+    );
+    // With no nonzero update the family has no direction, so it is not in the candidate.
+    assert_eq!(
+        first_reach_scan(&lattice, precision, -10, &[(Rat::zero(), off_grid)]).unwrap(),
+        None
+    );
 }
 
 // -------------------------------------------------------------------------------------------
@@ -344,7 +490,7 @@ fn the_certified_exponents_declared_reproduce_the_native_deposit() {
     assert_eq!(successor.carried_remainders(), native.carried_remainders());
     assert_eq!(publication, reading, "the same publication");
     assert!(committed.families.is_empty(), "no reach is claimed at the certified exponents");
-    carry_identity(&theta, &successor, &issued.deposit, &declared);
+    carry_identity(&theta, &successor, &publication, &issued.deposit, &declared);
 }
 
 /// The first reach is read from the native pass's own state: the test re-reads it from the
@@ -375,6 +521,8 @@ fn the_first_reach_commits_its_proposed_reach_or_refuses_typed() {
         .expect("0279's reached families have certified steps, so each has a first reach");
     let locus = Locus::Channel(0);
     let lattice = theta.lattice(locus).unwrap();
+    // The precision of the deposit that advances the channel's clock.
+    let precision = gamma_length(theta.clock(locus) + 1);
     for (&(at, family), step) in declared.families_with_steps() {
         let Family::Factor(f) = family else {
             panic!("a contact family")
@@ -400,7 +548,7 @@ fn the_first_reach_commits_its_proposed_reach_or_refuses_typed() {
             .map(|(i, g)| (g / statistic, carried(&theta, Carrier::Factor(f), i)))
             .collect();
         assert_eq!(
-            first_reach_scan(&lattice, k_cert, &entries).unwrap().as_ref(),
+            first_reach_scan(&lattice, precision, k_cert, &entries).unwrap().as_ref(),
             Some(reach),
             "the read used the pass's own h′ and remainders"
         );
@@ -408,7 +556,7 @@ fn the_first_reach_commits_its_proposed_reach_or_refuses_typed() {
             assert!(
                 entries
                     .iter()
-                    .all(|(d, r)| lattice.div_rem(&(dyadic(k) * d + r)).0.is_zero()),
+                    .all(|(d, r)| applied(&lattice, precision, &(dyadic(k) * d + r)).is_zero()),
                 "family {f}: no entry leaves its cell below the first reach (k = {k})"
             );
         }
@@ -423,7 +571,9 @@ fn the_first_reach_commits_its_proposed_reach_or_refuses_typed() {
     {
         Ok((candidate, publication, committed)) => {
             assert_eq!(candidate.commit(), theta.commit() + 1);
-            carry_identity(&theta, &candidate, &issued.deposit, &declared);
+            // The scan read the precision of the clock this deposit advanced the channel to.
+            assert_eq!(candidate.clock(locus), theta.clock(locus) + 1);
+            carry_identity(&theta, &candidate, &publication, &issued.deposit, &declared);
             for (key, step) in declared.families_with_steps() {
                 let reach = step.reach.as_ref().expect("claimed");
                 assert_eq!(
@@ -726,8 +876,9 @@ fn an_admission_binds_its_own_cut_by_equality() {
         refused(&field, &theta, &current, |_, _| {}),
         binding(BindingRefusal::Decision)
     );
-    // A different θ′ with the same commit counter: the certified exponents with one family a step
-    // lower move the same commit to different carries.
+    // A different θ′ with the same commit counter. Under the common lattice law a certified step
+    // this small is released whole, at one exponent lower too, so neither moves an entry; the
+    // first reach moves the same commit to a different θ′.
     assert_eq!(
         refused(&field, &theta, &current, |admission, issued| {
             let spans = spans(&field, &theta, &current, &issued.deposit);
@@ -735,14 +886,12 @@ fn an_admission_binds_its_own_cut_by_equality() {
                 .deposited_with_contact_spans(&issued.deposit, &spans)
                 .unwrap();
             let (first, _) = certified.steps.first().expect("a certified family").clone();
-            let lower = DeclaredExponents::declare(certified.steps.iter().enumerate().map(
-                |(index, (l, r))| {
-                    let k = r.step.exponent - i64::from(index == 0);
-                    ((*l, r.family), k)
-                },
-            ));
+            let reached = theta
+                .first_reach(&issued.deposit, &spans)
+                .unwrap()
+                .expect("0279's reached families have a first reach");
             let (other, _, _) = theta
-                .deposited_with_contact_spans_at(&issued.deposit, &spans, &lower)
+                .deposited_with_contact_spans_at(&issued.deposit, &spans, &reached)
                 .unwrap()
                 .unwrap();
             assert_eq!(first, Locus::Channel(0));

@@ -716,8 +716,26 @@ fn the_fixed_v79_contact_observation_accounts_for_its_actual_material_and_remain
 
 #[test]
 fn the_actual_unresolved_contact_return_survives_a_different_physical_passage() {
-    use crate::hnn::constitution::{Carrier, Family, Locus};
+    use crate::hnn::constitution::{Carrier, Family, Lattice, Locus, gamma_length};
     use crate::hnn::physical::contact::ContactObservation;
+    use num_traits::Signed;
+    // The contact factors take the common lattice law (record
+    // 2026-10-16_THE_CONTACT_FACTORS_TAKE_THE_COMMON_LATTICE_LAW_AND_THEIR_RELEASE_STAYS_BELOW_HALF_THE_FOUNDING_UNIT):
+    // each factor and normalization remainder lies on its clock's fine grid in the half cell, and
+    // each release there is at most half a fine unit.
+    let on_the_lattice_law = |theta: &Constitution,
+                              publication: &crate::hnn::physical::contact::ContactPublication| {
+        let locus = Locus::Channel(0);
+        let exponent = theta.lattice(locus).unwrap().exponent() + gamma_length(theta.clock(locus));
+        let fine = Lattice::new(exponent).unit();
+        let contact = |c: &Carrier| matches!(c, Carrier::Factor(_) | Carrier::FactorScale(_));
+        assert!(publication.publication.released.iter()
+            .filter(|(l,c,_,_)| *l==locus && contact(c))
+            .all(|(..,e)| e.abs() <= &fine / integer(2)));
+        let half = theta.lattice(locus).unwrap().unit() / integer(2);
+        assert!(publication.publication.unresolved_contact_material.iter().all(|(_,_,_,r)|
+            (r / &fine).is_integer() && -&half <= *r && *r < half));
+    };
     let field=field();
     let initial=contact_material(&field);
     let mut actual=PhysicalReceiver::new(&field,initial.clone(),Current::at_rest(&field),WordOpening::Rest).unwrap();
@@ -731,19 +749,22 @@ fn the_actual_unresolved_contact_return_survives_a_different_physical_passage() 
     let pending:Vec<_>=learned.carried_remainders().into_iter().filter(|(l,c,_,_)|
         *l==Locus::Channel(0) && matches!(c,Carrier::Factor(_) | Carrier::FactorScale(_))).collect();
     assert_eq!(pending,publication.publication.unresolved_contact_material);
-    assert!(publication.publication.released.iter().all(|(_,c,_,_)|
-        !matches!(c,Carrier::Factor(_) | Carrier::FactorScale(_))));
+    on_the_lattice_law(&learned,publication);
     // Conditioned on the actual sub-cell displacement (Epime's review, October 8): the storage
     // family's move stays below its cell exactly when the publication reads it as vanished, and
-    // only then is the exact unresolved direction not an immediate physical storage move, with
-    // every storage entry pending. complete_contact_return_publishes_held_point_before_existing_
-    // communication demands that move on these same operands and stays the failed acceptance while
-    // it vanishes; a move that leaves its cell is a physical storage move here too.
+    // only then is the unresolved direction not an immediate physical storage move, with every
+    // storage entry carried on its fine grid or released below it.
+    // complete_contact_return_publishes_held_point_before_existing_communication demands that move
+    // on these same operands and stays the failed acceptance while it vanishes; a move that leaves
+    // its cell is a physical storage move here too.
     if publication.publication.vanished.contains(&(Locus::Channel(0), Family::Factor(0))) {
-        assert_eq!(pending.iter().filter(|(_,c,_,_)| *c==Carrier::Factor(0)).count(),
-            initial.contact_storage(0).entries().len());
+        let storage = |entries: &mut dyn Iterator<Item=usize>| entries.collect::<std::collections::BTreeSet<_>>();
+        let carried = storage(&mut pending.iter().filter(|(_,c,_,_)| *c==Carrier::Factor(0)).map(|(_,_,i,_)| *i));
+        let released = storage(&mut publication.publication.released.iter()
+            .filter(|(l,c,_,_)| *l==Locus::Channel(0) && *c==Carrier::Factor(0)).map(|(_,_,i,_)| *i));
+        assert!((0..initial.contact_storage(0).entries().len()).all(|i| carried.contains(&i) || released.contains(&i)));
         assert_eq!(learned.contact_storage(0),initial.contact_storage(0),
-            "exact unresolved direction is not an immediate physical storage move");
+            "an unresolved direction is not an immediate physical storage move");
     } else {
         assert_ne!(learned.contact_storage(0),initial.contact_storage(0),
             "a storage move that left its cell is an immediate physical storage move");
@@ -759,8 +780,7 @@ fn the_actual_unresolved_contact_return_survives_a_different_physical_passage() 
     assert!(next.closes());
     let publication=next.comparison.as_ref().unwrap().as_ref().unwrap();
     contact_causal_receipt(&prior,actual.constitution(),publication);
-    assert!(publication.publication.released.iter().all(|(_,c,_,_)|
-        !matches!(c,Carrier::Factor(_) | Carrier::FactorScale(_))));
+    on_the_lattice_law(actual.constitution(),publication);
     println!("whole ordinary boundary carrying unresolved contact material: {:?}",ordinary.boundary);
     println!("whole next blind boundary with a different source: {:?}",next.boundary);
     println!("exact successor unresolved contact material: {:?}",publication.publication.unresolved_contact_material);
@@ -797,7 +817,8 @@ fn complete_contact_return_publishes_held_point_before_existing_communication() 
     // the failed receipts of v85, v90 and v116-v118 are kept): a reached, certified form moves its
     // representative only when its move leaves its cell. Here the reached storage move is about
     // 2^-38 against the half-unit 2^-16 (the pin-2 owner diagnostic), so the publication reads
-    // C, K and D as vanished and carries them exactly; the former `C_after != C_before` was a
+    // C, K and D as vanished and carries or releases them on the fine grid; the former
+    // `C_after != C_before` was a
     // false expectation at this grain. The stronger behaviour, material that moved felt by a later
     // output, is asserted below wherever the forms actually moved.
     let vanished = |family| publication.publication.vanished.contains(&(Locus::Channel(0), family));
