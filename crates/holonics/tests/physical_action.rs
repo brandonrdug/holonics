@@ -110,19 +110,13 @@ fn reads(
     word: &Word<'_>,
     field: &Field,
     theta: &Constitution,
-    current: &Current,
     phases: &ReceivingPhases,
 ) -> Vec<Vec<Rat>> {
     phases
         .epochs()
         .map(|k| {
             phases
-                .read(
-                    field,
-                    theta,
-                    current,
-                    word.anchor(k, phases.ring()).unwrap(),
-                )
+                .read(field, theta, word.anchor(k, phases.ring()).unwrap())
                 .unwrap()
                 .logits
         })
@@ -134,7 +128,6 @@ fn reads(
 fn perturbed_target(
     word: &Word<'_>,
     theta: &Constitution,
-    current: &Current,
     phases: &ReceivingPhases,
     added: &[Rat],
 ) -> Vec<Vec<Rat>> {
@@ -155,7 +148,7 @@ fn perturbed_target(
     .unwrap();
     actual.run(phases.junction_steps()).unwrap();
     assert!(actual.field_balances().iter().all(|b| b.closes()));
-    reads(&actual, field, theta, current, phases)
+    reads(&actual, field, theta, phases)
 }
 
 #[test]
@@ -183,7 +176,7 @@ fn a_unique_preparation_uses_the_full_loaded_opening_and_actual_pump_clock() {
     let preparation =
         PortPreparation::new(&field, 0, ExactRatMatrix::identity(4).unwrap()).unwrap();
     let control = vec![rat(1, 4), rat(-1, 8), rat(1, 16), rat(1, 32)];
-    let mut target = perturbed_target(&baseline, &theta, &current, &phases, &control);
+    let mut target = perturbed_target(&baseline, &theta, &phases, &control);
     // The unused station is an unconstrained receiving face, not a zero target.
     target[0] = vec![Rat::zero(); 4];
     let prospect = baseline
@@ -228,7 +221,7 @@ fn a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obs
     let baseline = open(&field, &theta, &current, &WordOpening::Rest);
     let preparation =
         PortPreparation::new(&field, 0, ExactRatMatrix::identity(4).unwrap()).unwrap();
-    let target = perturbed_target(&baseline, &theta, &current, &phases, &vec![rat(1, 4); 4]);
+    let target = perturbed_target(&baseline, &theta, &phases, &vec![rat(1, 4); 4]);
     let prospect = baseline
         .prospective_port_preparation(&phases, &preparation, &target, &[false, true])
         .unwrap();
@@ -257,7 +250,7 @@ fn a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obs
 
     let baseline = open(&field, &theta, &current, &WordOpening::Rest);
     let zero = PortPreparation::new(&field, 0, ExactRatMatrix::zero(4, 1).unwrap()).unwrap();
-    let mut target = perturbed_target(&baseline, &theta, &current, &phases, &vec![Rat::zero(); 4]);
+    let mut target = perturbed_target(&baseline, &theta, &phases, &vec![Rat::zero(); 4]);
     target[1][0] += Rat::one();
     let prospect = baseline
         .prospective_port_preparation(&phases, &zero, &target, &[false, true])
@@ -288,7 +281,7 @@ fn the_current_receiving_material_changes_the_prospect_and_stale_producing_words
     let baseline = open(&field, &theta, &current, &WordOpening::Rest);
     let preparation =
         PortPreparation::new(&field, 0, ExactRatMatrix::identity(4).unwrap()).unwrap();
-    let target = perturbed_target(&baseline, &theta, &current, &phases, &vec![rat(1, 4); 4]);
+    let target = perturbed_target(&baseline, &theta, &phases, &vec![rat(1, 4); 4]);
     assert!(target[1].iter().any(|x| !x.is_zero()));
     let prospect = baseline
         .prospective_port_preparation(&phases, &preparation, &target, &[false, true])

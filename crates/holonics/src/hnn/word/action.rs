@@ -239,8 +239,12 @@ impl ProspectiveControl {
     pub fn baseline(&self) -> &[Vec<Rat>] {
         &self.baseline
     }
-    pub fn prediction_word(&self) -> &WordBalance { &self.prediction_word }
-    pub fn prediction_balances(&self) -> &[FieldBalance] { &self.prediction_balances }
+    pub fn prediction_word(&self) -> &WordBalance {
+        &self.prediction_word
+    }
+    pub fn prediction_balances(&self) -> &[FieldBalance] {
+        &self.prediction_balances
+    }
     /// Rows are selected stations in order, then each realified receiving coordinate.
     pub fn response(&self) -> &ExactRatMatrix {
         &self.response
@@ -509,12 +513,9 @@ impl AppliedPortPreparation {
                 .ok_or(HnnError::WordEnded {
                     ticks: word.ticks(),
                 })?;
-            let read = self.phases.read(
-                word.field,
-                &self.producer.constitution,
-                &self.producer.current,
-                anchor,
-            )?;
+            let read = self
+                .phases
+                .read(word.field, &self.producer.constitution, anchor)?;
             if &read.logits != target {
                 return Err(HnnError::Realization {
                     what: "the actual controlled Word satisfies its inferred receiving relation",
@@ -668,7 +669,8 @@ impl ProspectiveFeature {
             .ok_or(HnnError::MissingReceivingMap {
                 ring: self.phases.ring(),
             })?;
-        let reads = control.baseline().get(self.station) == Some(&map.apply(&self.baseline_feature)?);
+        let reads =
+            control.baseline().get(self.station) == Some(&map.apply(&self.baseline_feature)?);
         let rows = &map.multiply(&self.jacobian)? == control.response();
         Ok(reads && rows)
     }
@@ -755,11 +757,11 @@ impl Word<'_> {
         // Full ticks retain the real end for the later current; anchors are read at their
         // own junctions. Loaded pump phases read opened_at+k exactly as the controlled Word.
         baseline_word.run(phases.junction_steps())?;
-        let prediction_word=WordBalance::of(&baseline_word.released()?);
-        let prediction_balances=baseline_word.field_balances().to_vec();
+        let prediction_word = WordBalance::of(&baseline_word.released()?);
+        let prediction_balances = baseline_word.field_balances().to_vec();
         if !prediction_word.closes() || prediction_balances.iter().any(|b| !b.closes()) {
             return Err(HnnError::Unadmitted {
-                reason:"the native prospective passage exposes its actual closed work receipts",
+                reason: "the native prospective passage exposes its actual closed work receipts",
             });
         }
         let baseline = phases
@@ -772,12 +774,7 @@ impl Word<'_> {
                             ticks: baseline_word.ticks(),
                         })?;
                 Ok(phases
-                    .read(
-                        self.field,
-                        &producer.constitution,
-                        &producer.current,
-                        anchor,
-                    )?
+                    .read(self.field, &producer.constitution, anchor)?
                     .logits)
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
@@ -799,13 +796,9 @@ impl Word<'_> {
                 let receiving_row = (0..map.columns())
                     .map(|j| map.get(coordinate, j).cloned())
                     .collect::<Result<Vec<_>, _>>()?;
-                // P is a declared permutation: its transpose is the inverse rotor.
-                let anchor_row = self
-                    .field
-                    .ring(phases.ring())
-                    .rotate(&receiving_row, &(-&producer.current.lift()[phases.ring()]));
+                // The read is in the passage frame: its transpose is the map's row.
                 let mut anchors = vec![None; baseline_word.ticks()];
-                anchors[epoch] = Some(anchor_row);
+                anchors[epoch] = Some(receiving_row);
                 let opening_dual = baseline_word.anchor_differential(anchors, phases.ring())?;
                 rows.push(preparation_transpose.apply(&opening_dual.storage[preparation.ring])?);
                 residual.push(&target[coordinate] - &base[coordinate]);
@@ -861,8 +854,8 @@ impl Word<'_> {
     /// declared controls. It mirrors [`Word::prospective_port_preparation`] up to the reverse
     /// sweeps: the same producer check, field check, baseline Word run and closed-balance check, and
     /// exactly one compared station. Row `j` of `J` replaces the receiving row `R_i` by the unit
-    /// covector `e_j` in the same loop (rotate by `−lift`, the anchor differential at the
-    /// station's epoch, the opening dual at the preparation's ring, the preparation transpose).
+    /// covector `e_j` in the same loop (the passage frame: the unit is the anchor's own, the
+    /// anchor differential at the station's epoch, the opening dual at the preparation's ring, the preparation transpose).
     /// No request is read, so no target, residual or fibre exists here; the opening and the Word
     /// are left unrun and unchanged.
     pub fn prospective_feature(
@@ -921,12 +914,7 @@ impl Word<'_> {
                             ticks: baseline_word.ticks(),
                         })?;
                 Ok(phases
-                    .read(
-                        self.field,
-                        &producer.constitution,
-                        &producer.current,
-                        anchor,
-                    )?
+                    .read(self.field, &producer.constitution, anchor)?
                     .logits)
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
@@ -945,10 +933,9 @@ impl Word<'_> {
             .ok_or(HnnError::WordEnded {
                 ticks: baseline_word.ticks(),
             })?;
-        let ring = self.field.ring(phases.ring());
-        let lift = &producer.current.lift()[phases.ring()];
-        // x0 is what the receiving read multiplies: `ReceivingPhases::read` forms logits as R x0.
-        let baseline_feature = ring.rotate(anchor, lift);
+        // x0 is what the receiving read multiplies: `ReceivingPhases::read` forms logits as R x0,
+        // the anchor in the passage frame.
+        let baseline_feature = anchor.to_vec();
         if map.apply(&baseline_feature)? != baseline[station] {
             return Err(HnnError::Realization {
                 what: "the native feature reproduces the baseline receiving reading",
@@ -960,10 +947,9 @@ impl Word<'_> {
         for coordinate in 0..width {
             let mut unit = vec![Rat::zero(); width];
             unit[coordinate] = Rat::one();
-            // P is a declared permutation: its transpose is the inverse rotor.
-            let anchor_row = ring.rotate(&unit, &(-lift));
+            // The read is in the passage frame: the feature's unit is the anchor's.
             let mut anchors = vec![None; baseline_word.ticks()];
-            anchors[crossing] = Some(anchor_row);
+            anchors[crossing] = Some(unit);
             let opening_dual = baseline_word.anchor_differential(anchors, phases.ring())?;
             rows.push(preparation_transpose.apply(&opening_dual.storage[preparation.ring])?);
         }
@@ -993,7 +979,7 @@ impl Word<'_> {
 /// when every source wave it emits is answered by a declared return law instead of the actual World.
 /// Per junction step the emitted wave `a_t` and the returned wave `b_t`; at every compared station the
 /// native feature in the receiving frame, formed exactly as [`Word::prospective_feature`] forms it
-/// (`ring.rotate(anchor, lift)`), with its receiving logits. It is the native readout, not the World's
+/// (the anchor in the passage frame), with its receiving logits. It is the native readout, not the World's
 /// observed face. Transient: it keeps no producer and is never resident history.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CoupledPassage {
@@ -1087,8 +1073,6 @@ impl<'f> Word<'f> {
                 ring: phases.ring(),
             },
         )?;
-        let ring = self.field.ring(phases.ring());
-        let lift = &producer.current.lift()[phases.ring()];
         let mut features = Vec::new();
         for (station, crossing) in phases.epochs().enumerate() {
             if !compared[station] {
@@ -1099,7 +1083,8 @@ impl<'f> Word<'f> {
                 .ok_or(HnnError::WordEnded {
                     ticks: word.ticks(),
                 })?;
-            let feature = ring.rotate(anchor, lift);
+            // The passage frame: the feature is the anchor as it stands.
+            let feature = anchor.to_vec();
             let logits = map.apply(&feature)?;
             features.push((station, feature, logits));
         }

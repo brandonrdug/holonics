@@ -5,12 +5,12 @@ use num_bigint::BigInt;
 use num_traits::Zero;
 
 use super::learning::chain;
-use crate::hnn::tests::support::encoded;
 use super::support::Medium;
 use crate::hnn::HnnError;
 use crate::hnn::field::{Current, Field};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, ReceivingRead, grain_logits};
+use crate::hnn::tests::support::encoded;
 use crate::hnn::word::Word;
 use crate::ratio::{Rat, integer};
 
@@ -23,7 +23,9 @@ fn cut(field: &Field) -> (Medium, Current, SourceMoment) {
     let cells = vec![1usize; 40];
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open(field, &current);
-    moment.ingest(field, &mut current, &encoded(field, &cells)).unwrap();
+    moment
+        .ingest(field, &mut current, &encoded(field, &cells))
+        .unwrap();
     (medium, current, moment)
 }
 
@@ -137,7 +139,7 @@ fn the_initial_constitution_opens_an_empty_word() {
     let mut word = Word::open(field, &medium, &current, &moment).unwrap();
     assert_eq!(word.power().unwrap(), Rat::zero());
     for (anchor, tree) in word.forward(&phases).unwrap().into_iter().zip(&tree) {
-        let wave = phases.read(field, &medium, &current, &anchor).unwrap();
+        let wave = phases.read(field, &medium, &anchor).unwrap();
         assert!(wave.logits.iter().all(Zero::is_zero));
         let read = ReceivingRead::combined(wave.logits, tree, phases.grain()).unwrap();
         assert_eq!(read.logits, grain_logits(tree));
@@ -174,7 +176,10 @@ fn a_carried_change_crosses_the_next_openings_references() {
         [vec![r(1, 3), r(-2, 7)], vec![r(5, 6), r(0, 1), r(-1, 9)]],
         [vec![r(-4, 5), r(3, 8)], vec![r(1, 2), r(2, 3), r(-3, 4)]],
     ];
-    let states = vec![[vec![r(1, 7), r(-1, 3)], rate.clone()], [vec![r(2, 5), r(1, 11)], rate.clone()]];
+    let states = vec![
+        [vec![r(1, 7), r(-1, 3)], rate.clone()],
+        [vec![r(2, 5), r(1, 11)], rate.clone()],
+    ];
     let carry = ReceptionCarry {
         change: EndChange {
             storage: vec![vec![r(1, 1), r(2, 1)], vec![r(0, 1); 3]],
@@ -193,7 +198,9 @@ fn a_carried_change_crosses_the_next_openings_references() {
     let grown = storage.add(&accreted).unwrap();
     let after = [r(1, 8), r(1, 4)];
     let step = r(1, 2);
-    let crossed = carry.crossed(&after, &[&storage, &grown], &[Some(&grown), None]).unwrap();
+    let crossed = carry
+        .crossed(&after, &[&storage, &grown], &[Some(&grown), None])
+        .unwrap();
     // Storage and displacements carry unchanged; the resonator's rate is held at its momentum.
     assert_eq!(crossed.storage, carry.change.storage);
     for (a, b) in crossed.states.iter().zip(&carry.change.states) {
@@ -203,7 +210,10 @@ fn a_carried_change_crosses_the_next_openings_references() {
     assert_eq!(u, vec![r(1, 5), r(-1, 4)]);
     assert_eq!(grown.apply(&w).unwrap(), momentum);
     assert_eq!(
-        carry.crossed(&after, &[&storage, &grown], &[Some(&storage), None]).unwrap().resonators,
+        carry
+            .crossed(&after, &[&storage, &grown], &[Some(&storage), None])
+            .unwrap()
+            .resonators,
         carry.change.resonators,
         "an unchanged capacity holds the resonator's rate exactly"
     );
@@ -222,7 +232,10 @@ fn a_carried_change_crosses_the_next_openings_references() {
         let gamma = (from - to) / (from + to);
         for (wave, crossed) in before.iter().zip(now) {
             let power = dot(wave, wave);
-            assert_eq!(to * dot(crossed, crossed) + &gamma * &gamma * from * &power, from * &power);
+            assert_eq!(
+                to * dot(crossed, crossed) + &gamma * &gamma * from * &power,
+                from * &power
+            );
             reflected += &step / integer(4) * &gamma * &gamma * from * power;
         }
         if from == to {
@@ -232,7 +245,10 @@ fn a_carried_change_crosses_the_next_openings_references() {
     assert!(reflected > Rat::zero());
     assert_eq!(carry.reflected(&step, &after), reflected);
     // The rates: held at momentum.
-    assert_eq!(crossed.states[0][1], rate, "an unchanged storage holds the rate exactly");
+    assert_eq!(
+        crossed.states[0][1], rate,
+        "an unchanged storage holds the rate exactly"
+    );
     let held = &crossed.states[1][1];
     assert_eq!(grown.apply(held).unwrap(), momentum);
     let jump = sub(&rate, held);

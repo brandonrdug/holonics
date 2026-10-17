@@ -1034,7 +1034,8 @@ pub(super) fn run_world_history(out: &str, pin: &exterior::Pin) {
 }
 
 fn run_domain(out: &str, pin: &exterior::Pin, world_domain: bool) {
-    #[allow(clippy::disallowed_types, clippy::disallowed_methods)] // exterior output, never the retained machine state
+    #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
+    // exterior output, never the retained machine state
     let mut output = {
         std::fs::create_dir_all(out).expect("the output receipt directory");
         BufWriter::new(
@@ -1074,11 +1075,14 @@ fn exercise(mut output: &mut impl Write, pin: &exterior::Pin, world_domain: bool
             pin.threads()
         ),
     );
-    publish(&mut output, if world_domain {
-        "fixed scoped World-operation acceptance: two existing actual receiving observations precede two acquired-R actual coupled encounters; actual World faces and R movement, later matched R-only preparation change, both participant states and conjugate wave work/clock close. This is not the full prior-World-history choice proof; that bounded mechanical control is separate. The original seven-passage C/K/D movement gate remains failed and recorded; combined World/contact material transport remains unadmitted. No holdout, acquisition, repair or useful-product claim.\n"
-    } else {
-        "unchanged closed-field foundation acceptance: seven native passages, at least two actual C/K/D factor movements, nonzero delayed comparison, full held differential/clock, and all source/work/momentum balances close. No actual World is bound or discarded in this domain. The coupled World/contact foundation gate remains open. No holdout, acquisition, repair or useful-product claim.\n"
-    });
+    publish(
+        &mut output,
+        if world_domain {
+            "fixed scoped World-operation acceptance: two existing actual receiving observations precede two acquired-R actual coupled encounters; actual World faces and R movement, later matched R-only preparation change, both participant states and conjugate wave work/clock close. This is not the full prior-World-history choice proof; that bounded mechanical control is separate. The original seven-passage C/K/D movement gate remains failed and recorded; combined World/contact material transport remains unadmitted. No holdout, acquisition, repair or useful-product claim.\n"
+        } else {
+            "unchanged closed-field foundation acceptance: seven native passages, at least two actual C/K/D factor movements, nonzero delayed comparison, full held differential/clock, and all source/work/momentum balances close. No actual World is bound or discarded in this domain. The coupled World/contact foundation gate remains open. No holdout, acquisition, repair or useful-product claim.\n"
+        },
+    );
     let (field, declared) = match declare() {
         Ok(v) => v,
         Err(error) => {

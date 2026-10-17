@@ -1,7 +1,7 @@
 //! The receiving phases: the grain derived from the receiver, the observability refusal (the exact
 //! grain reading and its integer comparison are `receiver::face`'s, tested there); the receiving parametron's landmark tree declared from
 //! the receiver and coded in the description; the active suffix address and each phase's causal
-//! address; the combined read of the tree's face and the wave through `R P_R^(τ_R)`; the compare's
+//! address; the combined read of the tree's face and the wave through `R` in the passage frame; the compare's
 //! landmark steps and their deposit; and the maps' openings (the landmark tree: `R_0 = 0`, `E_0` the sign
 //! generator times ½), with the deadlock they avoid. Campaign 2: the receiving letters read from the
 //! clock before the cell they predict (through aeon boundaries and re-keying), restricted by whole
@@ -12,8 +12,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
 use super::learning::{OPEN_BUDGET, chain, chain_declaration, moment, phases};
-use crate::hnn::tests::support::encoded;
-use super::support::{Draw, Medium, Parts, lift, small_field};
+use super::support::{Draw, Medium, Parts, small_field};
 use crate::compression::landmark::context::{
     Landmarks, Letter, LetterFamily, Widths, address, letter_address,
 };
@@ -31,6 +30,7 @@ use crate::hnn::receiving::{
 };
 use crate::hnn::reference::{Reference, compose};
 use crate::hnn::ring::ResonatorMaterial;
+use crate::hnn::tests::support::encoded;
 use crate::hnn::word::Word;
 use crate::ratio::algebraic::{ExactInterval, log2_enclosure};
 use crate::ratio::linear::ExactRatMatrix;
@@ -301,15 +301,15 @@ fn the_field_declares_the_tree_and_codes_it() {
     assert!(source.entries().iter().any(|x| *x == rat(-1, 2)));
 }
 
-/// The read is `f_j = k(a_j)/L_R + R · P_R^(τ_R) v_R` (the combined face): the wave rotated to the
-/// receiving ring's phase, plus the tree face's grain logits at phase `j`'s address, read after the
-/// epoch's earlier targets (cell order); each class's
+/// The read is `f_j = k(a_j)/L_R + R · v_R` (the combined face): the wave read in the passage frame
+/// (the anchor as it stands, whatever the receiving ring's lift), plus the tree face's grain logits
+/// at phase `j`'s address, read after the epoch's earlier targets (cell order); each class's
 /// real logit read at the grain, its imaginary logit (the wave's alone) halved into turns. The
 /// tree logits lie on the grain, so each cell is the wave's shifted by `k_c/L_R` exactly and keeps
 /// the wave's fibre; the tree's face sums to one exactly and its grain logits alone code each class
 /// within one grain of `−log₂ q(c)` (`grain_code_residual`).
 #[test]
-fn the_read_adds_the_trees_face_to_the_rotated_wave() {
+fn the_read_adds_the_trees_face_to_the_passage_frame_wave() {
     let field = &chain();
     let mut medium = Medium::encoding(field, 12);
     // A tree that received a short passage, so its face differs from address to address; the
@@ -352,12 +352,10 @@ fn the_read_adds_the_trees_face_to_the_rotated_wave() {
         }
     }
     assert_ne!(faces[0], faces[1], "two phases read two addresses");
-    let current = Current::at(field, lift(&[0, 0, 3])).unwrap();
     let anchor = Draw::new(13).vector(4);
-    let wave_read = phases.read(field, &medium, &current, &anchor).unwrap();
+    let wave_read = phases.read(field, &medium, &anchor).unwrap();
     let map = medium.receiving_map(2).unwrap();
-    let rotated = field.ring(2).rotate(&anchor, &BigInt::from(3));
-    let wave = map.apply(&rotated).unwrap();
+    let wave = map.apply(&anchor).unwrap();
     assert_eq!(wave_read.logits, wave);
     let stored = grain_logits(&faces[0]);
     let read = ReceivingRead::combined(wave.clone(), &faces[0], 16).unwrap();
@@ -377,7 +375,7 @@ fn the_read_adds_the_trees_face_to_the_rotated_wave() {
         );
         assert_eq!(read.phases[class], &wave[2 * class + 1] / integer(2));
     }
-    assert!(phases.read(field, &medium, &current, &anchor[..2]).is_err());
+    assert!(phases.read(field, &medium, &anchor[..2]).is_err());
     // A tree face of another grain, or a register of another depth, is refused.
     let coarse = tree.face(&address(&passage, 9, 2), 8).unwrap();
     assert!(ReceivingRead::combined(wave, &coarse, 16).is_err());
@@ -413,7 +411,6 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
         .pull_back(
             &ratio.covector().unwrap(),
             theta.receiving_map(2).unwrap(),
-            &current.lift()[2],
             &phases,
         )
         .unwrap();
@@ -467,7 +464,7 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
 
 /// **With every map at zero the wave never learns** (the deadlock `R_0 = 0` alone would meet): with
 /// `E = 0`, the pair port's outputs `e_ρ = 0` and `R = 0`, the source moment, the open and every
-/// feature `f = P_R^(τ_R) v_R` are zero, so `R`'s step `G = Σ γ g fᵀ` is zero and the covector
+/// feature `f = v_R` (the passage frame) are zero, so `R`'s step `G = Σ γ g fᵀ` is zero and the covector
 /// `Rᵀ g` reaching every upstream locus is zero: after a compare and its deposit, `R` and `E` are
 /// unchanged, and the model's face is the tree's exactly.
 #[test]
@@ -476,7 +473,12 @@ fn the_wave_is_inert_when_every_map_opens_at_zero() {
     let a = field.alphabet();
     let initial = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let silent = initial
-        .with_ports(0, None, Some(ExactRatMatrix::zero(field.ring(0).width(), a).unwrap()), None)
+        .with_ports(
+            0,
+            None,
+            Some(ExactRatMatrix::zero(field.ring(0).width(), a).unwrap()),
+            None,
+        )
         .unwrap();
     let reference = Reference::campaign_one();
     let mut resident = reference
@@ -534,7 +536,9 @@ fn r_opens_at_zero_and_learns_from_the_first_deposit() {
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let mut draw = Draw::new(92);
     let cells: Vec<usize> = (0..14).map(|_| draw.below(a)).collect();
-    let (moment_id, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
+    let (moment_id, _) = reference
+        .ingest(&mut resident, None, &encoded(&field, &[]))
+        .unwrap();
     let phases = resident.admitted()[0].clone();
     // The cells in order, each aeon closed at the joint clock's carry-out.
     let feed = |resident: &mut crate::hnn::Resident, cells: &[usize]| {
@@ -842,7 +846,9 @@ fn the_receiving_face_codes_within_one_bit_of_the_better_face() {
     // The tree read in cell order is the count-only prequential tree, exactly.
     let receiver = &field.receivers()[0];
     let declared = landmark_declaration(&field, receiver).unwrap();
-    let letters = crate::compression::landmark::context::cell_letters(&cut.cells.classes_read().collect::<Vec<_>>());
+    let letters = crate::compression::landmark::context::cell_letters(
+        &cut.cells.classes_read().collect::<Vec<_>>(),
+    );
     let alone = crate::hnn::reference::prequential(&cut, &letters, &declared).unwrap();
     let narrow = Rat::new(1.into(), num_bigint::BigInt::from(1u8) << 60usize);
     for (exposed, measured) in [
@@ -889,7 +895,9 @@ fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
     let field = campaign_field();
     let family = clock_family();
     let mut draw = Draw::new(29);
-    let cells: Vec<usize> = (0..3_000).map(|_| (draw.next() % super::support::classes(&field) as u64) as usize).collect();
+    let cells: Vec<usize> = (0..3_000)
+        .map(|_| (draw.next() % super::support::classes(&field) as u64) as usize)
+        .collect();
     let letters = clock_letters(&field, &family, &encoded(&field, &cells), &[]).unwrap();
     assert!(matches!(letters[0], Letter::Bundle(_)));
     let depth = 3;
@@ -923,8 +931,13 @@ fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
             if step.carry_out {
                 let end = p + offset + 1;
                 let from = end.saturating_sub(crib.window).max(aeon_start);
-                let location =
-                    keys::locate_closing(&field, &current, &encoded(&field, &cells[from..end]), crib.offset).unwrap();
+                let location = keys::locate_closing(
+                    &field,
+                    &current,
+                    &encoded(&field, &cells[from..end]),
+                    crib.offset,
+                )
+                .unwrap();
                 location.rekey(&field, &mut current).unwrap();
                 register.synchronize(&field, &current).unwrap();
                 aeon_start = end;
@@ -964,7 +977,9 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
     ])
     .unwrap();
     let mut draw = Draw::new(41);
-    let cells: Vec<usize> = (0..1_500).map(|_| (draw.next() % super::support::classes(&field) as u64) as usize).collect();
+    let cells: Vec<usize> = (0..1_500)
+        .map(|_| (draw.next() % super::support::classes(&field) as u64) as usize)
+        .collect();
     let letters = clock_letters(&field, &family, &encoded(&field, &cells), &[]).unwrap();
     let coarse = clock_letters(&field, &sheets, &encoded(&field, &cells), &[]).unwrap();
     let declared =
@@ -1199,7 +1214,9 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
         })
         .collect();
     let mut draw = Draw::new(53);
-    let cells: Vec<usize> = (0..3_000).map(|_| (draw.next() % super::support::classes(&field) as u64) as usize).collect();
+    let cells: Vec<usize> = (0..3_000)
+        .map(|_| (draw.next() % super::support::classes(&field) as u64) as usize)
+        .collect();
     let (depth, aperture) = (3, 2);
     let mut current = Current::at_rest(&field);
     let mut opening = current.clone();
@@ -1258,8 +1275,13 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
             if step.carry_out {
                 let end = received.len();
                 let from = end.saturating_sub(crib.window).max(aeon_start);
-                let location =
-                    keys::locate_closing(&field, &current, &encoded(&field, &cells[from..end]), crib.offset).unwrap();
+                let location = keys::locate_closing(
+                    &field,
+                    &current,
+                    &encoded(&field, &cells[from..end]),
+                    crib.offset,
+                )
+                .unwrap();
                 location.rekey(&field, &mut current).unwrap();
                 register.synchronize(&field, &current).unwrap();
                 opening = current.clone();
@@ -1280,7 +1302,13 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
             "cell {position}"
         );
     }
-    let replayed = clock_letters(&field, &family, &encoded(&field, &cells[..received.len()]), &held).unwrap();
+    let replayed = clock_letters(
+        &field,
+        &family,
+        &encoded(&field, &cells[..received.len()]),
+        &held,
+    )
+    .unwrap();
     assert_eq!(replayed, received);
     for j in [1usize, 17, 400, 1_500, 2_999] {
         let mut changed = cells[..received.len()].to_vec();
@@ -1543,11 +1571,7 @@ fn cold_restore_preserves_empty_window_zero_cursor_and_rejects_nonzero() {
         checked
     );
     let (_, ingested) = reference
-        .ingest(
-            &mut restored,
-            Some(&moment),
-            &encoded(&field, &[0]),
-        )
+        .ingest(&mut restored, Some(&moment), &encoded(&field, &[0]))
         .unwrap();
     assert_eq!(
         ingested.forward.present().unwrap().cells,
@@ -1628,19 +1652,35 @@ fn the_field_declares_its_receivers_letter_family() {
     let field = campaign_field();
     assert_eq!(letter_family(&field), FeatureFamily::cells());
     let period = field.ring(0).period();
-    let phase = FeatureFamily::new(vec![Feature::Phase { ring: 0, grain: period }]).unwrap();
+    let phase = FeatureFamily::new(vec![Feature::Phase {
+        ring: 0,
+        grain: period,
+    }])
+    .unwrap();
     let declared = field.clone().with_letter_family(phase.clone()).unwrap();
     assert_eq!(letter_family(&declared), phase);
     let rings = field.rings().len();
-    let outside = FeatureFamily::new(vec![Feature::Phase { ring: rings, grain: 2 }]).unwrap();
+    let outside = FeatureFamily::new(vec![Feature::Phase {
+        ring: rings,
+        grain: 2,
+    }])
+    .unwrap();
     assert!(field.clone().with_letter_family(outside).is_err());
     let coprime = (2..=period + 1).find(|g| period % g != 0).unwrap();
-    let undivided = FeatureFamily::new(vec![Feature::Phase { ring: 0, grain: coprime }]).unwrap();
+    let undivided = FeatureFamily::new(vec![Feature::Phase {
+        ring: 0,
+        grain: coprime,
+    }])
+    .unwrap();
     assert!(field.clone().with_letter_family(undivided).is_err());
     let contacts = field.contacts().len();
     let beyond = FeatureFamily::new(vec![Feature::contact(&field, 0)]).unwrap();
     let missing = match beyond.features()[0].clone() {
-        Feature::Contact { bound, .. } => FeatureFamily::new(vec![Feature::Contact { contact: contacts, bound }]).unwrap(),
+        Feature::Contact { bound, .. } => FeatureFamily::new(vec![Feature::Contact {
+            contact: contacts,
+            bound,
+        }])
+        .unwrap(),
         Feature::Phase { .. } => unreachable!(),
     };
     assert!(field.with_letter_family(missing).is_err());
@@ -1658,61 +1698,92 @@ fn a_located_register_retains_its_advance_law_warm_and_cold() {
     use crate::hnn::receiving::{ActiveAddress, Feature, FeatureFamily, LetterReader};
     let field = campaign_field();
     let period = field.ring(0).period();
-    let family = FeatureFamily::new(vec![Feature::Phase { ring: 0, grain: period }]).unwrap();
+    let family = FeatureFamily::new(vec![Feature::Phase {
+        ring: 0,
+        grain: period,
+    }])
+    .unwrap();
     let current = Current::at_rest(&field);
-    let mut warm = ActiveAddress::of_reader(2, LetterReader::of(&field, family.clone(), &current).unwrap());
+    let mut warm = ActiveAddress::of_reader(
+        2,
+        LetterReader::of(&field, family.clone(), &current).unwrap(),
+    );
     let digits = |class: usize| vec![(class as u64 + 1) % period, 0, 0, 0];
     let plain_bits = warm.reader().bits();
     for &class in &[0usize, 1, 0, 2, 1] {
         warm.receive_at(class, Some(&digits(class))).unwrap();
     }
-    assert!(warm.reader().bits() > plain_bits, "the retained law is charged");
+    assert!(
+        warm.reader().bits() > plain_bits,
+        "the retained law is charged"
+    );
     let mut text = String::new();
     warm.write(&mut text);
     let mut lines = text.lines();
     let head = lines.next().unwrap();
-    let mut next = |_: &str| lines.next().ok_or(HnnError::ContinuingState { what: "a line" });
+    let mut next = |_: &str| {
+        lines
+            .next()
+            .ok_or(HnnError::ContinuingState { what: "a line" })
+    };
     let cold = ActiveAddress::of_reader(2, LetterReader::of(&field, family, &current).unwrap())
         .continued(head, &mut next)
         .unwrap();
     for j in 0..3 {
-        assert_eq!(cold.phase(&[1, 0], j).unwrap(), warm.phase(&[1, 0], j).unwrap(), "phase {j}");
+        assert_eq!(
+            cold.phase(&[1, 0], j).unwrap(),
+            warm.phase(&[1, 0], j).unwrap(),
+            "phase {j}"
+        );
     }
-    assert!(warm.phase(&[3], 1).is_err(), "a known target's class never received has no digits");
+    assert!(
+        warm.phase(&[3], 1).is_err(),
+        "a known target's class never received has no digits"
+    );
     let mut disagreeing = warm.clone();
-    assert!(disagreeing.receive_at(0, Some(&digits(1))).is_err(), "one chart's digits per class");
-    assert!(warm.receive(0).is_err(), "no identity step after a located one");
+    assert!(
+        disagreeing.receive_at(0, Some(&digits(1))).is_err(),
+        "one chart's digits per class"
+    );
+    assert!(
+        warm.receive(0).is_err(),
+        "no identity step after a located one"
+    );
     let before = warm.reader().clone();
-    assert!(warm.receive_at(4, Some(&[period, 0, 0, 0])).is_err(), "a digit at or past its ring's period");
-    assert!(warm.receive_at(4, Some(&[])).is_err(), "digits short of the kept rings");
+    assert!(
+        warm.receive_at(4, Some(&[period, 0, 0, 0])).is_err(),
+        "a digit at or past its ring's period"
+    );
+    assert!(
+        warm.receive_at(4, Some(&[])).is_err(),
+        "digits short of the kept rings"
+    );
     assert_eq!(warm.reader(), &before, "a refused occurrence moves nothing");
 }
 
-/// **The receiving map's stages separated at a prior's move** (the online-learning record §11;
-/// Codex's review of `25eeac97`): on the field of the acoustic online consumer (frame `[7, 2]`, the
-/// cell-only receiver on the last ring) and the clean section word's ordinals (its `−2` at
-/// `n ≡ 5 (mod 7)`), the loop of §1 deposits each compared cell; at every deposit whose receiving
-/// prior moved, the same deposit on the predecessor without its prior pairs
-/// (`Constitution::without_prior_pairs`) gives the stepped map before the move. Reports, per map
-/// entry, `W_0` (before), `W_s + r_s` with the stepped tail `e_s` (after the certified descent and
-/// its carry), and `W_f + r_f` with the tail `e_f` (after the move by `x = 2^(from − to)`), and checks
-/// the move's ledger exactly: `W_f + r_f + e_f = x (W_s + r_s) + e_s`.
+/// The current-window radial proposal and ordinary force share one certified eta.
+/// Reconstruct the actual metric gradient, chart residual and both carry defects;
+/// check the generalized balance, including W_old DeltaLambda and eta R H'.
 #[test]
 fn the_receiving_maps_descent_and_its_priors_move_are_read_apart() {
     use crate::compression::keys::frames::FrameFamily;
+    use crate::compression::landmark::context::{BaseMeasure, StopPrior};
     use crate::geometry::RatVec3;
     use crate::geometry::screw::ScrewGenerator;
     use crate::hnn::constitution::Carrier;
     use crate::hnn::field::{ContactDeclaration, CribDeclaration, RingDeclaration};
     use crate::hnn::reference::Reference;
     use crate::hnn::{Encoded, Encoding, PassageChart};
-    use crate::compression::landmark::context::{BaseMeasure, StopPrior};
     let ring = |period: u64, lock: Vec<u64>| RingDeclaration {
         period,
         screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
-        placements: (0..period).map(|node| FieldDeclaration::quarter_turn(node, period)).collect(),
+        placements: (0..period)
+            .map(|node| FieldDeclaration::quarter_turn(node, period))
+            .collect(),
         lock,
-        reflector: (0..period).map(|p| ((period - p) % period) as usize).collect(),
+        reflector: (0..period)
+            .map(|p| ((period - p) % period) as usize)
+            .collect(),
         admittance: Rat::from_integer(BigInt::from(2)),
         initial: 0,
     };
@@ -1742,7 +1813,10 @@ fn the_receiving_maps_descent_and_its_priors_move_are_read_apart() {
                 base: BaseMeasure::Even,
                 receiving_prior: 0,
             }],
-            crib: CribDeclaration { window: 16, offset: 1 },
+            crib: CribDeclaration {
+                window: 16,
+                offset: 1,
+            },
             population: 1 << 24,
             lattice: Default::default(),
         }
@@ -1751,14 +1825,24 @@ fn the_receiving_maps_descent_and_its_priors_move_are_read_apart() {
     .unwrap();
     let (tau, length) = (7usize, 120usize);
     let word: Vec<usize> = (0..length).map(|n| usize::from(n % tau == 5)).collect();
-    let location = FrameFamily::pairs(9).unwrap().locate(2, &[word.clone()]).unwrap();
-    let (_, carrying) = location.carrying().find(|(helix, _)| helix.periods() == [7, 2]).unwrap();
+    let location = FrameFamily::pairs(9)
+        .unwrap()
+        .locate(2, &[word.clone()])
+        .unwrap();
+    let (_, carrying) = location
+        .carrying()
+        .find(|(helix, _)| helix.periods() == [7, 2])
+        .unwrap();
     let located = PassageChart::located(carrying.location(), &[word.clone()]).unwrap();
     let encoding = Encoding::found(&located).unwrap();
-    let encoded = Encoded::through(&encoding, &located, &field, &[word]).unwrap().remove(0);
+    let encoded = Encoded::through(&encoding, &located, &field, &[word])
+        .unwrap()
+        .remove(0);
     let reference = Reference::new(64, u64::MAX);
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
-    let feed = |resident: &mut crate::hnn::Resident, moment: Option<crate::hnn::MomentId>, part: &Encoded| {
+    let feed = |resident: &mut crate::hnn::Resident,
+                moment: Option<crate::hnn::MomentId>,
+                part: &Encoded| {
         let mut moment = moment;
         let mut rest = part.part(0..part.len()).unwrap();
         loop {
@@ -1777,75 +1861,244 @@ fn the_receiving_maps_descent_and_its_priors_move_are_read_apart() {
     };
     let moment = feed(&mut resident, None, &encoded.part(0..tau).unwrap());
     let phases = resident.admitted()[0].clone();
-    let map_of = |theta: &Constitution| theta.receiving_map(1).unwrap().entries().to_vec();
-    let carry_of = |theta: &Constitution| -> Vec<Rat> {
-        let carried = theta.carried_remainders();
-        (0..map_of(theta).len())
-            .map(|i| {
-                carried
-                    .iter()
-                    .find(|(locus, carrier, entry, _)| *locus == Locus::ReceivingMap(1) && *carrier == Carrier::Map && *entry == i)
-                    .map(|(.., r)| r.clone())
-                    .unwrap_or_else(Rat::zero)
-            })
-            .collect()
-    };
-    let tail_of = |released: &[(Locus, Carrier, usize, Rat)], i: usize| -> Rat {
-        released
-            .iter()
-            .find(|(locus, carrier, entry, _)| *locus == Locus::ReceivingMap(1) && *carrier == Carrier::Map && *entry == i)
-            .map(|(.., e)| e.clone())
-            .unwrap_or_else(Rat::zero)
-    };
     let mut moves = 0;
     for n in tau..length {
         let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
-        let (staged, compared) = reference.compare(&mut resident, pending, &encoded.part(n..n + 1).unwrap()).unwrap();
+        let (staged, compared) = reference
+            .compare(&mut resident, pending, &encoded.part(n..n + 1).unwrap())
+            .unwrap();
         let deposit = compared.deposit.into_present().unwrap();
         let before = resident.constitution().clone();
-        let reading = reference.deposit(&mut resident, staged).unwrap().deposit.into_present().unwrap();
-        let moved = reading.charts.iter().find_map(|(locus, chart)| match (locus, &chart.prior) {
-            (Locus::ReceivingMap(1), Some(prior)) if prior.to != prior.from => Some(prior.clone()),
-            _ => None,
-        });
+        let reading = reference
+            .deposit(&mut resident, staged)
+            .unwrap()
+            .deposit
+            .into_present()
+            .unwrap();
+        let moved = reading
+            .charts
+            .iter()
+            .find_map(|(locus, chart)| match (locus, &chart.prior) {
+                (Locus::ReceivingMap(1), Some(prior)) if prior.to != prior.from => {
+                    Some(prior.clone())
+                }
+                _ => None,
+            });
         if let Some(prior) = moved {
             moves += 1;
-            let (stepped, stepped_reading) = before.without_prior_pairs().deposited(&deposit).unwrap();
+            use crate::hnn::constitution::{LinearLocus, receiving_metric_samples};
+            use crate::ratio::linear::ExactRatMatrix;
             let after = resident.constitution();
+            let old = before.receiving_law(1).unwrap();
+            let next = after.receiving_law(1).unwrap();
+            let chart = reading
+                .charts
+                .iter()
+                .find(|(locus, _)| *locus == Locus::ReceivingMap(1))
+                .unwrap();
+            let radial = chart
+                .1
+                .radial
+                .as_ref()
+                .expect("a moved prior has an explicit radial receipt");
+            let eta = reading.linear_step(Locus::ReceivingMap(1));
+            assert_eq!(radial.realized_step, eta);
             let power = |e: u32| Rat::from_integer(BigInt::one() << e as usize);
             let x = power(prior.from) / power(prior.to);
-            let (w0, ws, rs, wf, rf) = (map_of(&before), map_of(&stepped), carry_of(&stepped), map_of(after), carry_of(after));
-            let mut ledger = true;
-            for i in 0..wf.len() {
-                let (es, ef) = (tail_of(&stepped_reading.released, i), tail_of(&reading.released, i));
-                ledger &= &wf[i] + &rf[i] + &ef == &x * (&ws[i] + &rs[i]) + &es;
+            assert_eq!(radial.proposed_factor, x);
+            let ridge_delta = power(prior.to) - power(prior.from);
+            let radial_direction = old.map().scaled(&(&x - Rat::one()));
+            assert_eq!(radial.displacement, radial_direction.scaled(&eta));
+            assert_eq!(
+                radial.gram_balance,
+                radial.displacement.multiply(&next.gram()).unwrap()
+            );
+            assert_eq!(radial.ridge_balance, old.map().scaled(&ridge_delta));
+
+            let (rows, columns) = (old.map().rows(), old.map().columns());
+            let raw = &deposit
+                .linear()
+                .iter()
+                .find(|step| step.locus == LinearLocus::Receiving(1))
+                .unwrap()
+                .samples;
+            let metric = receiving_metric_samples(raw);
+            let samples = metric.as_deref().unwrap_or(raw);
+            let mut observed_gram = ExactRatMatrix::zero(columns, columns).unwrap();
+            let mut gradient = ExactRatMatrix::zero(rows, columns).unwrap();
+            for sample in samples {
+                let outer = |left: &[Rat], right: &[Rat]| {
+                    ExactRatMatrix::shaped(
+                        left.len(),
+                        right.len(),
+                        left.iter()
+                            .map(|l| right.iter().map(|r| &sample.weight * l * r).collect())
+                            .collect(),
+                    )
+                    .unwrap()
+                };
+                observed_gram = observed_gram
+                    .add(&outer(&sample.feature, &sample.feature))
+                    .unwrap();
+                gradient = gradient
+                    .add(&outer(&sample.covector, &sample.feature))
+                    .unwrap();
             }
-            let nonzero = |v: &[Rat]| v.iter().filter(|e| !e.is_zero()).count();
-            println!(
-                "§11 cell {n} commit {}: prior {} -> {} (x = {x}); W_0 nonzero {}, W_s nonzero {}, W_f nonzero {}; the move's ledger holds: {ledger}; W_0 {:?}; W_s {:?}; W_f {:?}",
-                after.commit(),
-                prior.from,
-                prior.to,
-                nonzero(&w0),
-                nonzero(&ws),
-                nonzero(&wf),
-                w0.iter().map(ToString::to_string).collect::<Vec<_>>(),
-                ws.iter().map(ToString::to_string).collect::<Vec<_>>(),
-                wf.iter().map(ToString::to_string).collect::<Vec<_>>()
+            let released = |carrier: Carrier, m: usize, n: usize| {
+                let mut dense = vec![vec![Rat::zero(); n]; m];
+                for (locus, c, index, value) in &reading.released {
+                    if *locus == Locus::ReceivingMap(1) && *c == carrier {
+                        dense[index / n][index % n] += value;
+                    }
+                }
+                ExactRatMatrix::shaped(m, n, dense).unwrap()
+            };
+            let gram_carry = old
+                .gram_remainder()
+                .subtract(&next.gram_remainder())
+                .unwrap()
+                .subtract(&released(Carrier::Gram, columns, columns))
+                .unwrap();
+            let map_carry = old
+                .map_remainder()
+                .subtract(&next.map_remainder())
+                .unwrap()
+                .subtract(&released(Carrier::Map, rows, columns))
+                .unwrap();
+            let identity = ExactRatMatrix::identity(columns).unwrap();
+            assert_eq!(
+                next.gram(),
+                old.gram()
+                    .add(&observed_gram)
+                    .unwrap()
+                    .add(&identity.scaled(&ridge_delta))
+                    .unwrap()
+                    .add(&gram_carry)
+                    .unwrap()
             );
-            let stage = |v: &[Rat]| v.iter().map(ToString::to_string).collect::<Vec<_>>();
-            let tails = |released: &[(Locus, Carrier, usize, Rat)]| (0..wf.len()).map(|i| tail_of(released, i).to_string()).collect::<Vec<_>>();
-            println!(
-                "§11 commit {}: retained r_s {:?}; released e_s {:?}; retained r_f {:?}; released e_f {:?}",
-                after.commit(),
-                stage(&rs),
-                tails(&stepped_reading.released),
-                stage(&rf),
-                tails(&reading.released)
+
+            // The ordinary force is reconstructed independently from actual metric
+            // samples and the published chart. The radial proposal acts on W_old,
+            // never on the map after an independently certified ordinary descent.
+            let ordinary_direction = gradient.multiply(&next.solved()).unwrap();
+            assert_eq!(
+                next.map().subtract(old.map()).unwrap(),
+                ordinary_direction
+                    .add(&radial_direction)
+                    .unwrap()
+                    .scaled(&eta)
+                    .add(&map_carry)
+                    .unwrap()
             );
-            assert!(ledger, "the move's ledger at commit {}", after.commit());
+            let residual = identity
+                .subtract(&next.solved().multiply(&next.gram()).unwrap())
+                .unwrap();
+            let rho = gradient.multiply(&residual).unwrap().scaled(&eta);
+            let left = next
+                .map()
+                .multiply(&next.gram())
+                .unwrap()
+                .subtract(
+                    &old.map()
+                        .multiply(&old.gram())
+                        .unwrap()
+                        .add(&old.map().multiply(&observed_gram).unwrap())
+                        .unwrap()
+                        .add(&gradient.scaled(&eta))
+                        .unwrap(),
+                )
+                .unwrap();
+            let right = old
+                .map()
+                .multiply(&gram_carry)
+                .unwrap()
+                .add(&map_carry.multiply(&next.gram()).unwrap())
+                .unwrap()
+                .subtract(&rho)
+                .unwrap()
+                .add(&radial.ridge_balance)
+                .unwrap()
+                .add(&radial.gram_balance)
+                .unwrap();
+            assert_eq!(
+                left,
+                right,
+                "generalized predeposit radial balance at commit {}",
+                after.commit()
+            );
+
+            // This replay has its own eta and old ridge; it is an ordinary-law
+            // control, not an intermediate stage of the actual joint publication.
+            let (_, ordinary_reading) = before.without_prior_pairs().deposited(&deposit).unwrap();
+            assert!(
+                ordinary_reading
+                    .charts
+                    .iter()
+                    .filter(|(locus, _)| *locus == Locus::ReceivingMap(1))
+                    .all(|(_, chart)| chart.radial.is_none() && chart.prior.is_none())
+            );
         }
-        feed(&mut resident, Some(moment), &encoded.part(n..n + 1).unwrap());
+        feed(
+            &mut resident,
+            Some(moment),
+            &encoded.part(n..n + 1).unwrap(),
+        );
     }
     assert!(moves > 0);
+}
+
+/// [L3] **The receiving section's reading** ([`crate::hnn::receiving::section_bits`]) on
+/// the chain's rings (periods 4, 3, 2): its width is `3 σ(n)`, the partition's declared width; an
+/// anchor at rest reads rest at every point; node 0 at `(1, 0)` alone on the receiver (period 2)
+/// reads the mean mode `(½, 0)` and the alternating mode `(½, 0)` then `(−½, 0)`, the far sheets of
+/// both axes; a quarter turn `(w, u) ↦ (−u, w)` of every node keeps each rest letter and flips
+/// exactly one sheet letter of every other point (the quadrant's Gray code); and an anchor off the
+/// ring's width is refused. The section reads the anchor in the passage frame, so it takes no
+/// clock.
+#[test]
+fn receiving_section_reads_each_mode_over_its_cycle() {
+    use crate::hnn::receiving::{ObservationPartition, SECTION_LETTERS, section_bits};
+    let field = chain();
+    let rest = Current::at_rest(&field);
+    assert!(rest.lift().iter().all(Zero::is_zero));
+    let mut draw = Draw::new(41);
+    for ring in 0..field.rings().len() {
+        let receiving = field.ring(ring);
+        let width = receiving.width();
+        let n = receiving.period();
+        let points: u64 = (1..=n).filter(|d| n.is_multiple_of(*d)).sum();
+        let bits = ObservationPartition::ReceivingSection.outcome_bits(&field, ring);
+        assert_eq!(bits, SECTION_LETTERS * points as usize);
+        let at_rest = section_bits(&field, ring, &vec![Rat::zero(); width]).unwrap();
+        assert_eq!(at_rest.len(), bits);
+        for point in at_rest.chunks(SECTION_LETTERS) {
+            assert_eq!(point, [true, false, false]);
+        }
+        let anchor: Vec<Rat> = (0..width)
+            .map(|_| rat(draw.below(9) as i64 - 4, 1 + draw.below(3) as i64))
+            .collect();
+        let read = section_bits(&field, ring, &anchor).unwrap();
+        assert_eq!(read.len(), bits);
+        let turned: Vec<Rat> = anchor
+            .chunks(2)
+            .flat_map(|node| [-node[1].clone(), node[0].clone()])
+            .collect();
+        let quarter = section_bits(&field, ring, &turned).unwrap();
+        for (a, b) in read
+            .chunks(SECTION_LETTERS)
+            .zip(quarter.chunks(SECTION_LETTERS))
+        {
+            assert_eq!(a[0], b[0]);
+            if !a[0] {
+                assert_eq!(usize::from(a[1] != b[1]) + usize::from(a[2] != b[2]), 1);
+            }
+        }
+        assert!(section_bits(&field, ring, &anchor[1..]).is_err());
+    }
+    let receiver = field.receivers()[0].ring;
+    let mut anchor = vec![Rat::zero(); field.ring(receiver).width()];
+    anchor[0] = Rat::one();
+    let read = section_bits(&field, receiver, &anchor).unwrap();
+    let flags = |bits: &[bool]| bits.iter().map(|&b| u8::from(b)).collect::<Vec<_>>();
+    assert_eq!(flags(&read), [0, 0, 0, 0, 0, 0, 0, 1, 1]);
 }

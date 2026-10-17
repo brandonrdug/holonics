@@ -102,7 +102,6 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::geometry::swing::half_turn;
-use crate::holon::element::ContactConstitution;
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, Charts, WordLattice, refine};
 use crate::hnn::constitution::Lattice;
@@ -111,6 +110,7 @@ use crate::hnn::realization::{entries, indexed};
 use crate::hnn::ring::ResonatorOperands;
 #[cfg(test)]
 use crate::hnn::ring::{PortScattering, port_scattering};
+use crate::holon::element::ContactConstitution;
 use crate::ratio::exponentiated::power_of_two;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot, integer_dot, integral, lcm, scale, sub};
@@ -1338,7 +1338,14 @@ pub fn transit_solve(
     displacement: &[Rat],
     rate: &[Rat],
 ) -> Result<(Vec<Rat>, Vec<Rat>), HnnError> {
-    let right = transit_right(contact,step,outgoing_from,outgoing_to,displacement,rate);
+    let right = transit_right(
+        contact,
+        step,
+        outgoing_from,
+        outgoing_to,
+        displacement,
+        rate,
+    );
     let image = contact.solve.apply(&right)?;
     Ok((right, image))
 }
@@ -1425,15 +1432,40 @@ pub(crate) fn transit_variation(
     primal_midpoint: &[Rat],
     forms: &[ExactRatMatrix; 3],
 ) -> Result<Transit, HnnError> {
-    let mut right = transit_right(contact, step, outgoing_from, outgoing_to,
-        displacement, rate);
+    let mut right = transit_right(
+        contact,
+        step,
+        outgoing_from,
+        outgoing_to,
+        displacement,
+        rate,
+    );
     let [dc, dk, dd] = forms;
-    right = add(&right, &scale(&integer(2), &dc.apply(&sub(primal_rate, primal_midpoint))?));
+    right = add(
+        &right,
+        &scale(&integer(2), &dc.apply(&sub(primal_rate, primal_midpoint))?),
+    );
     right = sub(&right, &scale(step, &dd.apply(primal_midpoint)?));
-    right = sub(&right, &scale(step, &dk.apply(&add(primal_displacement,
-        &scale(&(step / integer(2)), primal_midpoint)))?));
+    right = sub(
+        &right,
+        &scale(
+            step,
+            &dk.apply(&add(
+                primal_displacement,
+                &scale(&(step / integer(2)), primal_midpoint),
+            ))?,
+        ),
+    );
     let solved = contact.solve.apply(&right)?;
-    Ok(transit_update(contact, step, &solved, outgoing_from, outgoing_to, displacement, rate))
+    Ok(transit_update(
+        contact,
+        step,
+        &solved,
+        outgoing_from,
+        outgoing_to,
+        displacement,
+        rate,
+    ))
 }
 
 /// **The transit's chart term** `⟨ω, m ζ − right⟩` at the solved `ζ` the word carried (the chart's

@@ -163,9 +163,8 @@ impl MoireFamily {
 
     /// **The key space** `N_Q^k`.
     pub fn key_space(&self) -> BigUint {
-        BigUint::from(self.gratings()).pow(
-            u32::try_from(self.rings).expect("a count of rings within a machine word"),
-        )
+        BigUint::from(self.gratings())
+            .pow(u32::try_from(self.rings).expect("a count of rings within a machine word"))
     }
 
     /// **The key description** `⌈log₂ N_Q^k⌉` bits.

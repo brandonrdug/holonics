@@ -37,12 +37,17 @@
 //! `K` times the weight, which `Σ_k w` already says.
 //!
 //! [definition; agent-inferred, October 8] **The declared family at tolerance `τ`**
-//! ([`PhaseFamily`]). Under the receiving law's prior ridge `2^k I` (the normal law's founding
+//! ([`PhaseFamily`]). Under the receiving law's scalar prior ridge `2^k I` (the normal law's founding
 //! statistic `H₀ = 2^k I`, [`crate::hnn::constitution::NormalLaw::with_scaled_prior`]; here a
 //! declared convention of the family that makes every `A_c` positive definite, not a deposited loss
-//! term) set `A_c = S_c + 2^k I`. The ridged comparison
-//! `G(V) = J(V) + (1/8) 2^k Σ_c |v_c|² = Σ_c (1/8)(v_cᵀ A_c v_c − 2 v_cᵀ m_c + s_c)` has the exact
-//! minimizer `v̂_c = A_c⁻¹ m_c` and the exact minimum `L* = Σ_c (1/8)(s_c − v̂_cᵀ m_c)`, and
+//! term) set `A_c = S_c + 2^k I`. The scalar convention is preserved by [`PhaseStatistics::family`];
+//! [`PhaseStatistics::family_with_diagonal_ridge`] also admits an explicit positive diagonal ridge
+//! `R`, which supports exact coordinate-chart changes without changing the phase family. In the
+//! general diagonal case, set `A_c = S_c + R` and
+//! `G_R(V) = J(V) + (1/8) Σ_c v_cᵀ R v_c`; for the scalar specialization this is
+//! `G(V) = J(V) + (1/8) 2^k Σ_c |v_c|²`. In either case
+//! `G_R(V) = Σ_c (1/8)(v_cᵀ A_c v_c − 2 v_cᵀ m_c + s_c)` has the exact minimizer
+//! `v̂_c = A_c⁻¹ m_c` and the exact minimum `L* = Σ_c (1/8)(s_c − v̂_cᵀ m_c)`, and
 //!
 //! ```text
 //! F_τ = { V : G(V) ≤ L* + τ } = { V : Σ_c (1/8)(v_c − v̂_c)ᵀ A_c (v_c − v̂_c) ≤ τ }.
@@ -164,11 +169,14 @@ pub enum PhaseFamilyError {
     /// The tolerance of the family is nonnegative.
     #[error("the family's tolerance must be nonnegative")]
     NegativeTolerance,
+    /// Every coordinate's ridge is strictly positive, so each class shape is positive definite.
+    #[error("every diagonal ridge entry must be strictly positive")]
+    NonPositiveRidge,
     /// The receiver's grain `L` of an outcome block is a positive integer.
     #[error("the grain of an outcome block must be a positive integer")]
     ZeroGrain,
-    /// A shape matrix had a zero pivot. `A_c = S_c + 2^k I` is positive definite, so this cannot
-    /// arise from the family's own statistics.
+    /// A shape matrix had a zero pivot. `A_c = S_c + R` with positive diagonal `R` is positive
+    /// definite, so this cannot arise from the family's own statistics.
     #[error("the shape matrix is singular")]
     Singular,
     /// Restored parts that no sequence of receipts produces: an asymmetric Gram, a negative
@@ -584,18 +592,36 @@ impl PhaseStatistics {
         Ok(())
     }
 
-    /// **The declared family at tolerance `tolerance = τ ≥ 0`** under the prior ridge
-    /// `2^prior_scale I`: the shapes `A_c = S_c + 2^k I`, the exact minimizer `v̂_c = A_c⁻¹ m_c`
-    /// and the exact minimum `L* = Σ_c (1/8)(s_c − v̂_cᵀ m_c)` (module header).
+    /// **The declared family at tolerance `tolerance = τ ≥ 0`** under the scalar prior ridge
+    /// `2^prior_scale I`. This is the scalar specialization of
+    /// [`PhaseStatistics::family_with_diagonal_ridge`].
     pub fn family(
         &self,
         prior_scale: u32,
         tolerance: &Rat,
     ) -> Result<PhaseFamily, PhaseFamilyError> {
+        let ridge = Rat::from_integer(BigInt::one() << prior_scale as usize);
+        self.family_with_diagonal_ridge(&vec![ridge; self.features], tolerance)
+    }
+
+    /// **The declared family under an explicit positive diagonal ridge**
+    /// `R = diag(r_0, …, r_(n−1))`: the shapes `A_c = S_c + R`, the exact minimizer
+    /// `v̂_c = A_c⁻¹ m_c` and the exact minimum `L* = Σ_c (1/8)(s_c − v̂_cᵀ m_c)` (module header).
+    /// Every `r_i` must be strictly positive. This permits exact coordinate changes with
+    /// blockwise dyadic scales: if `x̂ = S⁻¹x` and `v̂ = Sv`, use
+    /// `R̂ = S⁻¹ R S⁻¹`; then both the phase read `vᵀx` and the ridged comparison are preserved.
+    pub fn family_with_diagonal_ridge(
+        &self,
+        diagonal_ridge: &[Rat],
+        tolerance: &Rat,
+    ) -> Result<PhaseFamily, PhaseFamilyError> {
         if tolerance.is_negative() {
             return Err(PhaseFamilyError::NegativeTolerance);
         }
-        let ridge = Rat::from_integer(BigInt::one() << prior_scale as usize);
+        require_extent(self.features, diagonal_ridge.len())?;
+        if diagonal_ridge.iter().any(|ridge| !ridge.is_positive()) {
+            return Err(PhaseFamilyError::NonPositiveRidge);
+        }
         let mut shapes = Vec::with_capacity(self.classes);
         let mut minimizer = Vec::with_capacity(self.classes);
         let mut minimum = Rat::zero();
@@ -604,7 +630,7 @@ impl PhaseStatistics {
                 Some(sums) => {
                     let mut shape = sums.gram.clone();
                     for (i, row) in shape.iter_mut().enumerate() {
-                        row[i] += &ridge;
+                        row[i] += &diagonal_ridge[i];
                     }
                     let centre = solve(&shape, &sums.moment)?;
                     minimum += (second - dot(&centre, &sums.moment)) * eighth();
@@ -612,10 +638,10 @@ impl PhaseStatistics {
                     minimizer.push(centre);
                 }
                 None => {
-                    // The prior alone, `A_c = 2^k I` with `m_c = 0`: `v̂_c = 0` exactly, no solve.
+                    // The prior alone, `A_c = R` with `m_c = 0`: `v̂_c = 0` exactly, no solve.
                     let mut shape = vec![vec![Rat::zero(); self.features]; self.features];
                     for (i, row) in shape.iter_mut().enumerate() {
-                        row[i] = ridge.clone();
+                        row[i] = diagonal_ridge[i].clone();
                     }
                     minimum += second * eighth();
                     shapes.push(shape);
@@ -1215,6 +1241,160 @@ mod tests {
     }
 
     #[test]
+    fn diagonal_ridge_is_positive_and_covariant_under_blockwise_operand_scaling() {
+        // Two two-coordinate blocks, with dyadic operand scales 2 and 4. Keep nonzero
+        // cross-block covariance so the test checks the full congruence, not only the diagonal.
+        let scales = ints(&[2, 2, 4, 4]);
+        let samples = [
+            (
+                integer(1),
+                ints(&[1, 2, 3, 4]),
+                vec![rat(1, 2), rat(1, 2)],
+                ints(&[2, 4]),
+            ),
+            (
+                integer(2),
+                ints(&[2, 0, -1, 1]),
+                vec![integer(1), Rat::zero()],
+                ints(&[6, 99]),
+            ),
+        ];
+        let (mut physical, mut charted) = (
+            PhaseStatistics::founded(2, 4),
+            PhaseStatistics::founded(2, 4),
+        );
+        for (weight, feature, masses, targets) in &samples {
+            physical.absorb(weight, feature, masses, targets).unwrap();
+            let charted_feature: Vec<Rat> = feature
+                .iter()
+                .zip(&scales)
+                .map(|(x, sigma)| x / sigma)
+                .collect();
+            charted
+                .absorb(weight, &charted_feature, masses, targets)
+                .unwrap();
+        }
+
+        // A physical scalar ridge 2I is represented in the chart by
+        // diag(2/2², 2/2², 2/4², 2/4²).
+        let physical_ridge = vec![integer(2); 4];
+        let charted_ridge = vec![rat(1, 2), rat(1, 2), rat(1, 8), rat(1, 8)];
+        let tolerance = rat(1, 10);
+        let original = physical.family(1, &tolerance).unwrap();
+        let rescaled = charted
+            .family_with_diagonal_ridge(&charted_ridge, &tolerance)
+            .unwrap();
+        assert_eq!(
+            original,
+            physical
+                .family_with_diagonal_ridge(&physical_ridge, &tolerance)
+                .unwrap()
+        );
+
+        // Â = S⁻¹ A S⁻¹, with the off-diagonal covariance scaling preserved.
+        for class in 0..2 {
+            for i in 0..4 {
+                for j in 0..4 {
+                    assert_eq!(
+                        rescaled.shapes[class][i][j],
+                        &original.shapes[class][i][j] / (&scales[i] * &scales[j])
+                    );
+                }
+            }
+            assert_eq!(
+                rescaled.minimizer[class],
+                original.minimizer[class]
+                    .iter()
+                    .zip(&scales)
+                    .map(|(v, sigma)| v * sigma)
+                    .collect::<Vec<_>>()
+            );
+        }
+        assert_eq!(rescaled.minimum(), original.minimum());
+
+        // Both the objective gap and the actual phase-image ellipsoid are unchanged.
+        let candidate = vec![ints(&[1, -2, 3, 4]), ints(&[-1, 0, 2, 5])];
+        let charted_candidate: Vec<Vec<Rat>> = candidate
+            .iter()
+            .map(|row| row.iter().zip(&scales).map(|(v, s)| v * s).collect())
+            .collect();
+        assert_eq!(
+            original.excess(&candidate).unwrap(),
+            rescaled.excess(&charted_candidate).unwrap()
+        );
+        let feature = ints(&[3, -2, 5, 4]);
+        let charted_feature: Vec<Rat> = feature
+            .iter()
+            .zip(&scales)
+            .map(|(x, sigma)| x / sigma)
+            .collect();
+        let original_image = original.image(&feature).unwrap();
+        let rescaled_image = rescaled.image(&charted_feature).unwrap();
+        assert_eq!(rescaled_image.centre(), original_image.centre());
+        assert_eq!(rescaled_image.leverage(), original_image.leverage());
+
+        let prior_only = PhaseStatistics::founded(2, 4)
+            .family_with_diagonal_ridge(&charted_ridge, &tolerance)
+            .unwrap();
+        assert_eq!(
+            prior_only.minimizer(),
+            &[vec![Rat::zero(); 4], vec![Rat::zero(); 4]]
+        );
+        assert_eq!(
+            prior_only.shapes[0],
+            vec![
+                vec![
+                    charted_ridge[0].clone(),
+                    Rat::zero(),
+                    Rat::zero(),
+                    Rat::zero()
+                ],
+                vec![
+                    Rat::zero(),
+                    charted_ridge[1].clone(),
+                    Rat::zero(),
+                    Rat::zero()
+                ],
+                vec![
+                    Rat::zero(),
+                    Rat::zero(),
+                    charted_ridge[2].clone(),
+                    Rat::zero()
+                ],
+                vec![
+                    Rat::zero(),
+                    Rat::zero(),
+                    Rat::zero(),
+                    charted_ridge[3].clone()
+                ],
+            ]
+        );
+        assert_eq!(prior_only.minimum(), &integer(0));
+
+        assert_eq!(
+            physical.family_with_diagonal_ridge(
+                &[integer(2), Rat::zero(), integer(2), integer(2)],
+                &tolerance,
+            ),
+            Err(PhaseFamilyError::NonPositiveRidge)
+        );
+        assert_eq!(
+            physical.family_with_diagonal_ridge(
+                &[integer(2), integer(-1), integer(2), integer(2)],
+                &tolerance,
+            ),
+            Err(PhaseFamilyError::NonPositiveRidge)
+        );
+        assert_eq!(
+            physical.family_with_diagonal_ridge(&vec![integer(2); 3], &tolerance),
+            Err(PhaseFamilyError::Shape {
+                expected: 4,
+                found: 3
+            })
+        );
+    }
+
+    #[test]
     fn a_founded_statistic_gives_the_prior_family_alone() {
         let family = PhaseStatistics::founded(2, 3)
             .family(2, &rat(1, 2))
@@ -1784,16 +1964,32 @@ mod tests {
 
         let mut statistics = PhaseStatistics::founded(3, 2);
         statistics
-            .absorb(&integer(1), &ints(&[1, 2]), &[Rat::zero(), Rat::one(), Rat::zero()], &ints(&[0, 3, 0]))
+            .absorb(
+                &integer(1),
+                &ints(&[1, 2]),
+                &[Rat::zero(), Rat::one(), Rat::zero()],
+                &ints(&[0, 3, 0]),
+            )
             .unwrap();
         assert_eq!(statistics.reached().collect::<Vec<_>>(), vec![1]);
-        assert_eq!(statistics.gram(0).to_vec(), vec![ints(&[0, 0]), ints(&[0, 0])]);
-        assert_eq!(statistics.gram(1).to_vec(), vec![ints(&[1, 2]), ints(&[2, 4])]);
+        assert_eq!(
+            statistics.gram(0).to_vec(),
+            vec![ints(&[0, 0]), ints(&[0, 0])]
+        );
+        assert_eq!(
+            statistics.gram(1).to_vec(),
+            vec![ints(&[1, 2]), ints(&[2, 4])]
+        );
         assert_eq!(statistics.moment(1).to_vec(), ints(&[3, 6]));
         assert_eq!(statistics.second(1), &integer(9));
         // A zero feature compares its class (its second and the count move) and opens no Gram.
         statistics
-            .absorb(&integer(2), &ints(&[0, 0]), &[Rat::zero(), Rat::zero(), Rat::one()], &ints(&[0, 0, 5]))
+            .absorb(
+                &integer(2),
+                &ints(&[0, 0]),
+                &[Rat::zero(), Rat::zero(), Rat::one()],
+                &ints(&[0, 0, 5]),
+            )
             .unwrap();
         assert_eq!(statistics.reached().collect::<Vec<_>>(), vec![1]);
         assert_eq!(statistics.second(2), &integer(50));
@@ -1813,16 +2009,25 @@ mod tests {
             PhaseStatistics::from_reached(3, 2, reached, second, integer(3))
         };
         let class1 = (1, vec![ints(&[1, 2]), ints(&[2, 4])], ints(&[3, 6]));
-        assert_eq!(listed(vec![class1.clone()], ints(&[0, 9, 50])), Ok(statistics.clone()));
+        assert_eq!(
+            listed(vec![class1.clone()], ints(&[0, 9, 50])),
+            Ok(statistics.clone())
+        );
         assert_eq!(
             listed(vec![class1.clone(), class1.clone()], ints(&[0, 9, 50])),
             Err(PhaseFamilyError::Malformed)
         );
         assert_eq!(
-            listed(vec![(3, vec![ints(&[0, 0]), ints(&[0, 0])], ints(&[0, 0]))], ints(&[0, 9, 50])),
+            listed(
+                vec![(3, vec![ints(&[0, 0]), ints(&[0, 0])], ints(&[0, 0]))],
+                ints(&[0, 9, 50])
+            ),
             Err(PhaseFamilyError::Malformed)
         );
-        assert_eq!(listed(vec![class1], ints(&[-1, 9, 50])), Err(PhaseFamilyError::Malformed));
+        assert_eq!(
+            listed(vec![class1], ints(&[-1, 9, 50])),
+            Err(PhaseFamilyError::Malformed)
+        );
     }
 
     /// **A restored statistic must meet a sum of receipts' necessary conditions** (Epime's review,
@@ -1833,7 +2038,14 @@ mod tests {
     #[test]
     fn a_restored_statistic_must_be_a_sum_of_receipts() {
         let one_class = |gram: Vec<Vec<Rat>>, moment: Vec<Rat>, second: Rat| {
-            PhaseStatistics::from_parts(1, gram.len(), vec![gram], vec![moment], vec![second], Rat::one())
+            PhaseStatistics::from_parts(
+                1,
+                gram.len(),
+                vec![gram],
+                vec![moment],
+                vec![second],
+                Rat::one(),
+            )
         };
         assert_eq!(
             one_class(vec![ints(&[-2])], ints(&[0]), Rat::zero()),
@@ -1844,7 +2056,11 @@ mod tests {
             Err(PhaseFamilyError::Malformed)
         );
         assert_eq!(
-            one_class(vec![ints(&[1, 2]), ints(&[3, 4])], ints(&[0, 0]), Rat::zero()),
+            one_class(
+                vec![ints(&[1, 2]), ints(&[3, 4])],
+                ints(&[0, 0]),
+                Rat::zero()
+            ),
             Err(PhaseFamilyError::Malformed)
         );
         assert!(one_class(vec![ints(&[1])], ints(&[1]), integer(1)).is_ok());
@@ -1853,10 +2069,20 @@ mod tests {
 
         let mut absorbed = PhaseStatistics::founded(2, 2);
         absorbed
-            .absorb(&integer(2), &ints(&[1, -1]), &[rat(1, 3), rat(2, 3)], &[rat(1, 2), integer(-3)])
+            .absorb(
+                &integer(2),
+                &ints(&[1, -1]),
+                &[rat(1, 3), rat(2, 3)],
+                &[rat(1, 2), integer(-3)],
+            )
             .unwrap();
         absorbed
-            .absorb(&Rat::one(), &ints(&[2, 5]), &[Rat::one(), Rat::zero()], &[integer(7), Rat::zero()])
+            .absorb(
+                &Rat::one(),
+                &ints(&[2, 5]),
+                &[Rat::one(), Rat::zero()],
+                &[integer(7), Rat::zero()],
+            )
             .unwrap();
         let restored = PhaseStatistics::from_parts(
             2,
@@ -1869,17 +2095,38 @@ mod tests {
         .unwrap();
         assert_eq!(restored, absorbed);
         assert_eq!(
-            PhaseStatistics::from_parts(1, 1, vec![vec![ints(&[1])]], vec![ints(&[0])], vec![Rat::zero()], integer(-1)),
+            PhaseStatistics::from_parts(
+                1,
+                1,
+                vec![vec![ints(&[1])]],
+                vec![ints(&[0])],
+                vec![Rat::zero()],
+                integer(-1)
+            ),
             Err(PhaseFamilyError::Malformed)
         );
         // A zero count carries no receipt: nonzero statistics with N = 0 are unreachable, and the
         // founded (all-zero) statistic restores.
         assert_eq!(
-            PhaseStatistics::from_parts(1, 1, vec![vec![ints(&[1])]], vec![ints(&[1])], vec![Rat::one()], Rat::zero()),
+            PhaseStatistics::from_parts(
+                1,
+                1,
+                vec![vec![ints(&[1])]],
+                vec![ints(&[1])],
+                vec![Rat::one()],
+                Rat::zero()
+            ),
             Err(PhaseFamilyError::Malformed)
         );
         assert_eq!(
-            PhaseStatistics::from_parts(1, 1, vec![vec![ints(&[0])]], vec![ints(&[0])], vec![Rat::zero()], Rat::zero()),
+            PhaseStatistics::from_parts(
+                1,
+                1,
+                vec![vec![ints(&[0])]],
+                vec![ints(&[0])],
+                vec![Rat::zero()],
+                Rat::zero()
+            ),
             Ok(PhaseStatistics::founded(1, 1))
         );
     }

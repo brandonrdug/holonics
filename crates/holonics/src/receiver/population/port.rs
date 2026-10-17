@@ -65,6 +65,32 @@ use super::{
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;
 
+/// One family face in two reads of the same frozen population window.
+/// `Shared` asserts expression identity, not merely equal enclosure endpoints.
+/// The producing comparison owner must establish that identity. This numerical
+/// type alone does not authenticate a read or authorize material publication.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ComparedFace {
+    Shared(ExactInterval),
+    Changed {
+        before: ExactInterval,
+        after: ExactInterval,
+    },
+}
+
+impl ComparedFace {
+    fn before(&self) -> &ExactInterval {
+        match self {
+            Self::Shared(face) | Self::Changed { before: face, .. } => face,
+        }
+    }
+    fn after(&self) -> &ExactInterval {
+        match self {
+            Self::Shared(face) | Self::Changed { after: face, .. } => face,
+        }
+    }
+}
+
 /// One family read at the port: its declared description, its normalized prior, its likelihood's
 /// outward bounds and the cell it died at.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -384,6 +410,223 @@ impl PortPopulation {
         code_between(&lower, &upper)
     }
 
+    /// Living retained likelihoods that are intervals rather than exact points.
+    /// More arithmetic precision cannot recover the evidence discarded into these
+    /// intervals. Correlated comparisons can nevertheless cancel shared uncertainty.
+    pub fn retained_interval_members(&self) -> usize {
+        self.members
+            .iter()
+            .filter(|member| member.died.is_none() && member.likelihood.0 != member.likelihood.1)
+            .count()
+    }
+
+    /// The same retained likelihood bounds, on one common relative scale. This
+    /// avoids materializing an exponentially small history and avoids introducing
+    /// the fixed Bound arithmetic grid into a higher-precision transient read.
+    fn scaled_charged_at(&self, bits: u32) -> Result<Vec<ExactInterval>, PopulationError> {
+        let extent = || {
+            refuse(
+                "population precision",
+                "relative bound exponents fit their exact carrier",
+            )
+        };
+        let common = self
+            .members
+            .iter()
+            .filter(|member| member.died.is_none())
+            .filter(|member| !member.likelihood.1.is_zero())
+            .map(|member| {
+                member
+                    .likelihood
+                    .1
+                    .exponent
+                    .checked_add(
+                        i64::try_from(member.likelihood.1.mantissa.bits()).map_err(|_| extent())?,
+                    )
+                    .ok_or_else(extent)
+            })
+            .collect::<Result<Vec<_>, _>>()?
+            .into_iter()
+            .max()
+            .ok_or(PopulationError::Extinct {
+                cell: self.cells as usize,
+            })?;
+        let read = |bound: &Bound, up: bool| -> Result<Rat, PopulationError> {
+            let shift = bound
+                .exponent
+                .checked_sub(common)
+                .and_then(|shift| shift.checked_add(i64::from(bits)))
+                .ok_or_else(extent)?;
+            let numerator = if shift >= 0 {
+                &bound.mantissa << usize::try_from(shift).map_err(|_| extent())?
+            } else {
+                let right = shift.unsigned_abs();
+                let (mut numerator, discarded) = if right >= bound.mantissa.bits() {
+                    (num_bigint::BigUint::zero(), !bound.is_zero())
+                } else {
+                    let right = usize::try_from(right).map_err(|_| extent())?;
+                    let numerator = &bound.mantissa >> right;
+                    let discarded = (&numerator << right) != bound.mantissa;
+                    (numerator, discarded)
+                };
+                if up && discarded {
+                    numerator += 1u32;
+                }
+                numerator
+            };
+            Ok(Rat::new(
+                BigInt::from(numerator),
+                BigInt::one() << bits as usize,
+            ))
+        };
+        self.members
+            .iter()
+            .map(|member| {
+                if member.died.is_some() {
+                    return Ok(ExactInterval::point(Rat::zero()));
+                }
+                Ok(ExactInterval::new(
+                    read(&member.likelihood.0, false)? * &member.prior,
+                    read(&member.likelihood.1, true)? * &member.prior,
+                )?)
+            })
+            .collect()
+    }
+
+    /// Read the same population mixture at a requested arithmetic precision.
+    /// Retained likelihood intervals remain unchanged; this is not new evidence.
+    pub fn face_of_at(
+        &self,
+        faces: &[ExactInterval],
+        bits: u32,
+    ) -> Result<ExactInterval, PopulationError> {
+        self.admit(faces)?;
+        let charged = self.scaled_charged_at(bits)?;
+        let mut numerator = ExactInterval::point(Rat::zero());
+        let mut denominator = ExactInterval::point(Rat::zero());
+        for (charge, face) in charged.iter().zip(faces) {
+            let product = charge.times(face)?;
+            numerator.lower += product.lower;
+            numerator.upper += product.upper;
+            denominator.lower += &charge.lower;
+            denominator.upper += &charge.upper;
+        }
+        if !denominator.lower.is_positive() {
+            return Err(refuse(
+                "population precision",
+                "a living retained lower likelihood is positive at the requested precision",
+            ));
+        }
+        Ok(ExactInterval::new(
+            &numerator.lower / &denominator.upper,
+            (&numerator.upper / &denominator.lower).min(Rat::one()),
+        )?
+        .round_out(bits)?)
+    }
+
+    /// Code for the same mixture using requested-precision logarithms. This may
+    /// remain an interval even as bits increases because history is interval-valued.
+    pub fn code_of_at(
+        &self,
+        faces: &[ExactInterval],
+        bits: u32,
+    ) -> Result<ExactInterval, PopulationError> {
+        let face = self.face_of_at(faces, bits)?;
+        if !face.lower.is_positive() {
+            return Err(refuse(
+                "the code of a received class",
+                "the population's face of it is positive",
+            ));
+        }
+        let log = crate::ratio::algebraic::log2_of_enclosure_at(&face, bits)?;
+        Ok(ExactInterval::new(-log.upper, -log.lower)?)
+    }
+
+    /// Enclose `code(after) - code(before)` for one frozen population window.
+    /// Rows are successive phases, columns are declared families. The population
+    /// is not advanced. Its common normalization cancels in the likelihood ratio;
+    /// explicitly shared factors cancel in the product difference. Every retained
+    /// likelihood interval remains present, including its correlations with itself.
+    /// This can certify a change hidden by independently enclosed absolute scores.
+    pub fn code_change_at(
+        &self,
+        window: &[Vec<ComparedFace>],
+        bits: u32,
+    ) -> Result<ExactInterval, PopulationError> {
+        for row in window {
+            self.admit(
+                &row.iter()
+                    .map(|face| face.before().clone())
+                    .collect::<Vec<_>>(),
+            )?;
+            self.admit(
+                &row.iter()
+                    .map(|face| face.after().clone())
+                    .collect::<Vec<_>>(),
+            )?;
+        }
+        if window.is_empty() {
+            return Ok(ExactInterval::point(Rat::zero()));
+        }
+        let charges = self.scaled_charged_at(bits)?;
+        let mut before_sum = ExactInterval::point(Rat::zero());
+        let mut after_sum = ExactInterval::point(Rat::zero());
+        let mut difference = ExactInterval::point(Rat::zero());
+        let add = |sum: &mut ExactInterval, value: ExactInterval| {
+            sum.lower += value.lower;
+            sum.upper += value.upper;
+        };
+        for (family, charge) in charges.iter().enumerate() {
+            let mut before = ExactInterval::point(Rat::one());
+            let mut after = ExactInterval::point(Rat::one());
+            let mut delta = ExactInterval::point(Rat::zero());
+            // Inductively A' - B' = (A-B)*b + A*(a-b). A shared
+            // factor has exactly zero difference even if its enclosure is wide.
+            for row in window {
+                let face = &row[family];
+                let mut next_delta = delta.times(face.before())?;
+                if let ComparedFace::Changed {
+                    before,
+                    after: next,
+                } = face
+                {
+                    let change = ExactInterval::new(
+                        &next.lower - &before.upper,
+                        &next.upper - &before.lower,
+                    )?;
+                    add(&mut next_delta, after.times(&change)?);
+                }
+                delta = next_delta;
+                before = before.times(face.before())?;
+                after = after.times(face.after())?;
+            }
+            add(&mut before_sum, charge.times(&before)?);
+            add(&mut after_sum, charge.times(&after)?);
+            add(&mut difference, charge.times(&delta)?);
+        }
+        if !before_sum.lower.is_positive() {
+            return Err(refuse(
+                "a frozen population comparison",
+                "the baseline window likelihood has a positive lower bound",
+            ));
+        }
+        let reciprocal = ExactInterval::new(before_sum.upper.recip(), before_sum.lower.recip())?;
+        let delta_ratio = difference.times(&reciprocal)?;
+        let ordinary_ratio = after_sum.times(&reciprocal)?;
+        let ratio = ExactInterval::new(
+            (Rat::one() + delta_ratio.lower).max(ordinary_ratio.lower),
+            (Rat::one() + delta_ratio.upper).min(ordinary_ratio.upper),
+        )?;
+        if !ratio.lower.is_positive() {
+            return Err(refuse(
+                "a frozen population comparison",
+                "the candidate likelihood ratio has a positive lower bound",
+            ));
+        }
+        let log = crate::ratio::algebraic::log2_of_enclosure_at(&ratio, bits)?;
+        Ok(ExactInterval::new(-log.upper, -log.lower)?)
+    }
+
     /// **Receive one cell** (module header): each living family's face of the received class
     /// multiplies its likelihood's bounds; a family whose face is exactly zero dies there, keeping
     /// its likelihood as it died, and its mass passes to the survivors (the telescope's
@@ -521,5 +764,124 @@ impl PortPopulation {
             })
             .sum::<u64>()
             + BigInt::from(self.cells).bits().max(1)
+    }
+}
+
+#[cfg(test)]
+mod precision_tests {
+    use super::*;
+
+    #[test]
+    fn population_precision_refines_arithmetic_without_refounding_history() {
+        let population = PortPopulation::new(&[1, 1]).unwrap();
+        let half = Rat::new(BigInt::one(), BigInt::from(2));
+        let epsilon = Rat::new(BigInt::one(), BigInt::one() << 160usize);
+        let before = vec![ExactInterval::point(half.clone()); 2];
+        let after = vec![before[0].clone(), ExactInterval::point(&half + epsilon)];
+        let low = population.code_of_at(&after, 96).unwrap();
+        let high = population.code_of_at(&after, 256).unwrap();
+        assert!(low.lower <= Rat::one() && low.upper >= Rat::one());
+        assert!(high.upper < Rat::one());
+        assert!(high.lower >= low.lower && high.upper <= low.upper);
+        assert_eq!(population.retained_interval_members(), 0);
+        assert_eq!(
+            population.code_of_at(&before, 256).unwrap(),
+            ExactInterval::point(Rat::one())
+        );
+    }
+
+    #[test]
+    fn population_precision_correlated_change_preserves_shared_history() {
+        let mut population = PortPopulation::new(&[1, 1]).unwrap();
+        let q = |n: i64, d: i64| Rat::new(BigInt::from(n), BigInt::from(d));
+        population
+            .receive(&[
+                ExactInterval::new(q(1, 4), q(3, 4)).unwrap(),
+                ExactInterval::new(q(1, 3), q(2, 3)).unwrap(),
+            ])
+            .unwrap();
+        let shared = ExactInterval::new(q(1, 4), q(3, 4)).unwrap();
+        let epsilon = Rat::new(BigInt::one(), BigInt::one() << 160usize);
+        let before = ExactInterval::point(q(1, 2));
+        let after = ExactInterval::point(q(1, 2) + epsilon);
+        let original = population.clone();
+        let absolute_before = population
+            .code_of_at(&[shared.clone(), before.clone()], 256)
+            .unwrap();
+        let absolute_after = population
+            .code_of_at(&[shared.clone(), after.clone()], 256)
+            .unwrap();
+        assert!(absolute_after.upper >= absolute_before.lower);
+        let window = vec![vec![
+            ComparedFace::Shared(shared.clone()),
+            ComparedFace::Changed {
+                before: before.clone(),
+                after: after.clone(),
+            },
+        ]];
+        let refined = population.code_change_at(&window, 256).unwrap();
+        assert!(refined.upper < Rat::zero());
+        assert!(population.code_change_at(&window, 96).unwrap().upper >= Rat::zero());
+        let equal = vec![vec![
+            ComparedFace::Shared(shared.clone()),
+            ComparedFace::Shared(before.clone()),
+        ]];
+        assert_eq!(
+            population.code_change_at(&equal, 256).unwrap(),
+            ExactInterval::point(Rat::zero())
+        );
+        // Identical interval endpoints do not assert the same expression.
+        let unshared = vec![vec![
+            ComparedFace::Changed {
+                before: shared.clone(),
+                after: shared,
+            },
+            ComparedFace::Shared(before),
+        ]];
+        let uncertain = population.code_change_at(&unshared, 256).unwrap();
+        assert!(uncertain.lower < Rat::zero() && uncertain.upper > Rat::zero());
+        // A two-phase telescope agrees with an exact endpoint realization.
+        let two = vec![window[0].clone(), window[0].clone()];
+        let change = population.code_change_at(&two, 256).unwrap();
+        assert!(change.upper < Rat::zero());
+        for tree_charge in [q(1, 4), q(3, 4)] {
+            for combined_charge in [q(1, 3), q(2, 3)] {
+                for tree_face in [q(1, 4), q(3, 4)] {
+                    let tree = &tree_charge * &tree_face * &tree_face;
+                    let numerator = &tree + &combined_charge * &after.lower * &after.lower;
+                    let denominator = &tree + &combined_charge * q(1, 2) * q(1, 2);
+                    let exact =
+                        crate::ratio::algebraic::log2_enclosure_at(&(numerator / denominator), 384)
+                            .unwrap();
+                    assert!(change.lower <= -&exact.upper && change.upper >= -&exact.lower);
+                }
+            }
+        }
+        assert_eq!(population, original);
+    }
+
+    #[test]
+    fn population_precision_keeps_retained_interval_uncertainty_visible() {
+        let mut population = PortPopulation::new(&[1, 1]).unwrap();
+        let half = Rat::new(BigInt::one(), BigInt::from(2));
+        population
+            .receive(&[
+                ExactInterval::point(half),
+                ExactInterval::new(
+                    Rat::new(BigInt::one(), BigInt::from(4)),
+                    Rat::new(BigInt::from(3), BigInt::from(4)),
+                )
+                .unwrap(),
+            ])
+            .unwrap();
+        let saved = population.clone();
+        let faces = vec![
+            ExactInterval::point(Rat::new(BigInt::one(), BigInt::from(4))),
+            ExactInterval::point(Rat::new(BigInt::from(3), BigInt::from(4))),
+        ];
+        let reading = population.code_of_at(&faces, 256).unwrap();
+        assert!(!reading.is_point());
+        assert!(population.retained_interval_members() > 0);
+        assert_eq!(population, saved);
     }
 }

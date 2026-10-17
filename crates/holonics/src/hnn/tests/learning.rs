@@ -2,7 +2,6 @@
 //! [`release.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/release.py), a small chain for the return's exactness,
 //! and generic exact constitutions (control charts).
 
-use crate::hnn::tests::support::encoded;
 use super::support::{Draw, contact, ring};
 use crate::hnn::constitution::{Constitution, Reach};
 use crate::hnn::field::{
@@ -10,6 +9,7 @@ use crate::hnn::field::{
 };
 use crate::hnn::moment::{PairPort, SourceMoment};
 use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::tests::support::encoded;
 use crate::ratio::{Rat, integer, rat};
 
 /// A generous budget for the laws' tests: the budget itself is tested on its own.
@@ -238,7 +238,9 @@ pub(crate) fn generic_within(field: &Field, seed: u64, budget: u64) -> Constitut
 /// continues; only the resident waits for the boundary).
 pub(crate) fn moment(field: &Field, seed: u64, cells: usize) -> (Current, SourceMoment) {
     let mut draw = Draw::new(seed);
-    let codes: Vec<usize> = (0..cells).map(|_| draw.below(super::support::classes(&field))).collect();
+    let codes: Vec<usize> = (0..cells)
+        .map(|_| draw.below(super::support::classes(&field)))
+        .collect();
     let mut current = Current::at_rest(field);
     let mut open = SourceMoment::open(field, &current);
     let mut fed = 0;

@@ -1488,7 +1488,7 @@ not:
     population's remainder at each node;
   - *the joint*: a declared constitutive map from bits to the Holon's port variables (no code
     carries joules until one is stated), a Dirac structure between the receiving ring's port (the
-    wave's `R P_R^(τ_R) v_R` in the field's quadratic chart) and the combined family's flow
+    wave's `R v_R`, in the passage frame, in the field's quadratic chart) and the combined family's flow
     `ln q_C(x)`, which the softmax receiver does not give power-neutrally (a power-preserving
     receiver map, or its defect bounded), and a common clock (the receiver's epochs as an
     `aeon::Epochs` reading, built at U5: `hnn::receiving::ReceivingPhases::windows`).

@@ -128,7 +128,9 @@ pub enum CompressionError {
     },
     #[error("a pair relation joins cells at least one tick apart")]
     ZeroOffset,
-    #[error("the pair relation empties cell {cell}'s compatible family: the key does not fit the passage")]
+    #[error(
+        "the pair relation empties cell {cell}'s compatible family: the key does not fit the passage"
+    )]
     Contradicted { cell: usize },
     #[error("the release law refused the repair's width: {0}")]
     ReleaseLaw(String),

@@ -3,7 +3,6 @@
 use num_bigint::{BigInt, BigUint};
 
 use super::learning::{OPEN_BUDGET, chain_declaration, generic};
-use crate::hnn::tests::support::encoded;
 use super::support::{Draw, chorded_field, contact, ring, small_field};
 use crate::geometry::RatVec3;
 use crate::hnn::HnnError;
@@ -11,6 +10,7 @@ use crate::hnn::constitution::{Constitution, Locus};
 use crate::hnn::field::ConstitutionRead;
 use crate::hnn::field::{Current, End, Field, FieldDeclaration};
 use crate::hnn::moment::capacity;
+use crate::hnn::tests::support::encoded;
 use crate::holon::conformance::check_tellegen;
 use crate::ratio::Rat;
 use crate::ratio::linear::vector::{form_matrix, is_zero};
@@ -77,10 +77,7 @@ fn campaign_one_declares_its_values() {
         (declared.sources.clone(), declared.offsets.clone()),
         (vec![0], vec![1])
     );
-    assert_eq!(
-        (declared.alphabet, declared.step.clone()),
-        (5, integer(1))
-    );
+    assert_eq!((declared.alphabet, declared.step.clone()), (5, integer(1)));
     assert_eq!(declared.exponent_grain, 1);
     let receiver = &declared.receivers[..];
     assert_eq!(receiver.len(), 1);
@@ -572,7 +569,10 @@ fn the_field_holon_is_a_read_only_holarchy_of_rings_and_contacts() {
     let unit = crate::ratio::linear::ExactRatMatrix::identity(m).unwrap();
     for i in 0..m {
         for j in 0..m {
-            assert_eq!(storage.get(sigma + k + i, sigma + k + j).unwrap(), unit.get(i, j).unwrap());
+            assert_eq!(
+                storage.get(sigma + k + i, sigma + k + j).unwrap(),
+                unit.get(i, j).unwrap()
+            );
         }
     }
     // Where `C_a ≻ 0` the factor's chart is the momentum chart: `c_aᵀ C_a⁻¹ c_a = 1`.

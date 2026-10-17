@@ -16,6 +16,13 @@ pub struct WorkRead {
     pub full_ticks: u64,
     pub return_attempts: u64,
     pub returns: u64,
+    /// Companion-column crossings and ticks are additional work, never physical Words.
+    pub response_crossings: u64,
+    pub response_ticks: u64,
+    pub response_return_attempts: u64,
+    pub response_returns: u64,
+    /// Unsplit surrogate evaluations used to certify response-column coordinate errors.
+    pub response_certificate_ticks: u64,
     /// A counter overflow makes the exterior reading unusable; it changes no native law.
     pub overflowed: bool,
 }
@@ -50,6 +57,17 @@ impl WorkRead {
             full_ticks: self.full_ticks.checked_sub(before.full_ticks)?,
             return_attempts: self.return_attempts.checked_sub(before.return_attempts)?,
             returns: self.returns.checked_sub(before.returns)?,
+            response_crossings: self
+                .response_crossings
+                .checked_sub(before.response_crossings)?,
+            response_ticks: self.response_ticks.checked_sub(before.response_ticks)?,
+            response_return_attempts: self
+                .response_return_attempts
+                .checked_sub(before.response_return_attempts)?,
+            response_returns: self.response_returns.checked_sub(before.response_returns)?,
+            response_certificate_ticks: self
+                .response_certificate_ticks
+                .checked_sub(before.response_certificate_ticks)?,
             overflowed: false,
         })
     }
@@ -65,6 +83,11 @@ pub(crate) enum Event {
     FullTick,
     ReturnAttempt,
     Return,
+    ResponseCrossing,
+    ResponseTick,
+    ResponseReturnAttempt,
+    ResponseReturn,
+    ResponseCertificateTick,
 }
 
 pub(crate) fn reached(event: Event) {
@@ -80,6 +103,11 @@ pub(crate) fn reached(event: Event) {
             Event::FullTick => &mut reading.full_ticks,
             Event::ReturnAttempt => &mut reading.return_attempts,
             Event::Return => &mut reading.returns,
+            Event::ResponseCrossing => &mut reading.response_crossings,
+            Event::ResponseTick => &mut reading.response_ticks,
+            Event::ResponseReturnAttempt => &mut reading.response_return_attempts,
+            Event::ResponseReturn => &mut reading.response_returns,
+            Event::ResponseCertificateTick => &mut reading.response_certificate_ticks,
         };
         match counter.checked_add(1) {
             Some(next) => *counter = next,

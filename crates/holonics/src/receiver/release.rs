@@ -114,7 +114,7 @@
 //!
 //! [implemented-exact] **No floats.** Every width, tolerance, key, bound and mass is an exact `Rat`.
 
-use num_bigint::BigUint;
+use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 use thiserror::Error;
 
@@ -177,7 +177,9 @@ impl ProbePartition {
             if sizes.is_empty() || sizes.contains(&0) {
                 return None;
             }
-            sizes.iter().try_fold(0usize, |total, &size| total.checked_add(size))
+            sizes
+                .iter()
+                .try_fold(0usize, |total, &size| total.checked_add(size))
         };
         match (members(&classes), members(&against)) {
             (Some(left), Some(right)) if left == right => {}
@@ -351,9 +353,15 @@ pub enum DrawRefusal {
     /// A class whose bounds are reversed: the interval encloses no mass. `ExactInterval`'s fields
     /// are public, so a face can reach the draw without passing [`ExactInterval::new`].
     #[error("class {class} has reversed mass bounds [{lower}, {upper}]")]
-    ReversedMass { class: usize, lower: Rat, upper: Rat },
+    ReversedMass {
+        class: usize,
+        lower: Rat,
+        upper: Rat,
+    },
     /// Interval bounds that enclose no normalized face.
-    #[error("the lower bounds total {lower_total} and the upper bounds {upper_total}; no normalized face lies between")]
+    #[error(
+        "the lower bounds total {lower_total} and the upper bounds {upper_total}; no normalized face lies between"
+    )]
     InvalidNormalization { lower_total: Rat, upper_total: Rat },
     /// An exact face that does not sum to one.
     #[error("the exact face sums to {total}, not exactly one")]
@@ -361,6 +369,9 @@ pub enum DrawRefusal {
     /// A key outside `[0, 1)`.
     #[error("the key {key} lies outside [0, 1)")]
     KeyOutOfRange { key: Rat },
+    /// A key stream declared with keys of no bytes.
+    #[error("a key stream's keys must have at least one byte")]
+    KeyWidth,
     /// The decision law refused the draw's own width (unreachable through [`draw`]'s declarations).
     #[error("the release law refused the draw: {0}")]
     Law(String),
@@ -381,6 +392,16 @@ pub fn draw(face: &[ExactInterval], key: &Rat) -> Result<ReleaseReturn, DrawRefu
     }
     if key < &Rat::zero() || key >= &Rat::one() {
         return Err(DrawRefusal::KeyOutOfRange { key: key.clone() });
+    }
+    admitted(face)?;
+    decide(face.len(), inverse_cdf(face, key))
+}
+
+/// The interval face's admission: nonempty, every class's bounds ordered inside `[0, 1]`, and a
+/// normalized face between the lower and upper totals.
+fn admitted(face: &[ExactInterval]) -> Result<(), DrawRefusal> {
+    if face.is_empty() {
+        return Err(DrawRefusal::EmptyFace);
     }
     let mut lower_total = Rat::zero();
     let mut upper_total = Rat::zero();
@@ -413,7 +434,7 @@ pub fn draw(face: &[ExactInterval], key: &Rat) -> Result<ReleaseReturn, DrawRefu
             upper_total,
         });
     }
-    decide(face.len(), inverse_cdf(face, key))
+    Ok(())
 }
 
 /// **The certified draw from an exact face** (a family's own normalized face): the point enclosure
@@ -508,6 +529,145 @@ fn decide(
         (decided, _) => Err(DrawRefusal::Law(format!(
             "the holding rule at tolerance zero returned {decided:?} against the draw's own width"
         ))),
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the commit at class grain
+// -------------------------------------------------------------------------------------------
+
+/// **A class commit** ([`commit`]): the classes some compatible face may hold maximal, and the
+/// holding rule's decision on them at tolerance zero.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ClassCommit {
+    /// `Released` at width zero (one class), or `Hold` (the plural classes are kept).
+    pub release: ReleaseReturn,
+    /// The classes that may be maximal over the enclosure, in class order: exactly one when the
+    /// commit releases.
+    pub classes: Vec<usize>,
+}
+
+impl ClassCommit {
+    /// The committed class, when the commit releases.
+    pub fn class(&self) -> Option<usize> {
+        match (&self.release, self.classes.as_slice()) {
+            (ReleaseReturn::Released { .. }, [class]) => Some(*class),
+            _ => None,
+        }
+    }
+}
+
+/// The declared name of the rule a class commit is decided by.
+pub const CLASS_COMMIT_RULE: &str =
+    "class commit: one maximal class over the enclosure, at tolerance zero, else hold";
+
+/// [definition; agent-inferred, October 16] **The commit of a unique answer at class grain**
+/// (the threshold commit arm on a class reading). A release that must be unique (an answer, an
+/// action with a consequence) has no key: its reading is the set of maximal classes,
+/// `R(q) = {c : q_c = max_d q_d}`, over the compatible fibre of the interval face. The classes that
+/// may be maximal are `M = {c : upper_c ≥ max_(d≠c) lower_d}`, a superset of every member's maximal
+/// set (normalization is not used, so it may be wider). The commit releases at tolerance zero
+/// exactly when `M` is one class, which happens exactly when that class's lower bound exceeds every
+/// other class's upper bound: the reading is then constant on the fibre (`width_eq_zero_iff`, the
+/// enclosure route `width_le_of_bounds`). Otherwise it holds and returns `M`: a face whose
+/// enclosure leaves two classes maximal is never committed, and a face that covers the simplex
+/// holds. Like the draw it is decided through [`release`] by the holding rule at tolerance zero,
+/// and the certificate is sufficient, not necessary. On a point face `M` is the exact maximal set,
+/// ties kept. The Lean statement of the certificate is owed (#62).
+pub fn commit(face: &[ExactInterval]) -> Result<ClassCommit, DrawRefusal> {
+    admitted(face)?;
+    let classes: Vec<usize> = (0..face.len())
+        .filter(|&c| {
+            face.iter()
+                .enumerate()
+                .filter(|(d, _)| *d != c)
+                .all(|(_, other)| face[c].upper >= other.lower)
+        })
+        .collect();
+    let law = |refusal: WidthRefusal| DrawRefusal::Law(refusal.to_string());
+    let single = classes.len() == 1;
+    let width = ReceiverWidth::declared(
+        "the maximal classes",
+        "the normalized faces inside the interval enclosure",
+        DiameterNorm::Supremum,
+        if single { Rat::zero() } else { Rat::one() },
+        if single {
+            WidthWitness::Point
+        } else {
+            WidthWitness::Coordinate {
+                coordinate: classes.first().copied().unwrap_or(0),
+            }
+        },
+        face.len(),
+    )
+    .map_err(law)?;
+    let options = LawfulOptions::assemble(&width, Rat::zero(), None, false).map_err(law)?;
+    let rule = DecisionRule::new(
+        CLASS_COMMIT_RULE,
+        WithinTolerance::Release,
+        BeyondTolerance::Hold,
+    );
+    let release = release(&rule, &options).map_err(law)?;
+    match (&release, single) {
+        (ReleaseReturn::Released { .. }, true) | (ReleaseReturn::Hold, false) => {
+            Ok(ClassCommit { release, classes })
+        }
+        (decided, _) => Err(DrawRefusal::Law(format!(
+            "the holding rule at tolerance zero returned {decided:?} against the commit's own width"
+        ))),
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the declared key
+// -------------------------------------------------------------------------------------------
+
+/// [definition; agent-inferred, October 16] **A declared exterior key stream** (the release
+/// redesign of October 15, item 3: the key source is declared and recorded; by default an exterior
+/// dyadic stream with recorded provenance). The bytes are read in order, `width` bytes a key, each
+/// key the big-endian integer `k` read as `k / 256^width`, a dyadic in `[0, 1)`. The provenance of
+/// the bytes is the caller's to record (their file and its place in the run's receipt); no key is
+/// formed from anything the release has read, so none is chosen after seeing the output. A stream
+/// that runs out returns no key, and the caller's release then holds by name.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct KeyStream {
+    bytes: Vec<u8>,
+    width: usize,
+    read: usize,
+}
+
+impl KeyStream {
+    /// A stream of `width`-byte keys over `bytes`; refused at a zero width.
+    pub fn new(bytes: Vec<u8>, width: usize) -> Result<Self, DrawRefusal> {
+        if width == 0 {
+            return Err(DrawRefusal::KeyWidth);
+        }
+        Ok(Self {
+            bytes,
+            width,
+            read: 0,
+        })
+    }
+
+    /// The next key, `k / 256^width`, or none when fewer than `width` bytes remain.
+    pub fn next_key(&mut self) -> Option<Rat> {
+        let start = self.read * self.width;
+        let word = self.bytes.get(start..start + self.width)?;
+        self.read += 1;
+        Some(Rat::new(
+            BigInt::from(BigUint::from_bytes_be(word)),
+            BigInt::one() << (8 * self.width),
+        ))
+    }
+
+    /// The keys read so far: the next key is the stream's key of that index.
+    pub fn keys_read(&self) -> usize {
+        self.read
+    }
+
+    /// The bytes a key.
+    pub fn width(&self) -> usize {
+        self.width
     }
 }
 

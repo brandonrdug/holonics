@@ -179,13 +179,25 @@ impl PhaseField {
 
     /// **The real chart** `θ ↦ 2^(1/L)`, enclosed at [`READING_BITS`]: an exterior reading.
     pub fn enclosure(&self) -> Result<ExactInterval, RatioError> {
+        self.enclosure_at(READING_BITS)
+    }
+
+    /// [definition; agent-inferred, October 16] **The real chart read at the bits a decision
+    /// demands**: each `θ^i` enclosed by `⌊2^(i/L + b)⌋/2^b` and one unit above at `b = bits`, so a
+    /// finer reading nests inside a coarser one (the floor at `b + 1` bits lies in the cell at `b`).
+    /// The release's demand refinement reads here (`hnn::receiving::cells`); nothing is rounded and
+    /// the value is the same exact element of `ℚ(θ)` at every depth. Refused at zero bits.
+    pub fn enclosure_at(&self, bits: u32) -> Result<ExactInterval, RatioError> {
+        if bits == 0 {
+            return Err(RatioError::Enclosure);
+        }
         let grain = self.grain();
         let (mut lower, mut upper) = (Rat::zero(), Rat::zero());
         for (place, value) in self.coordinates.iter().enumerate() {
             if value.is_zero() {
                 continue;
             }
-            let (low, high) = theta_power_bounds(place as u64, grain);
+            let (low, high) = theta_power_bounds(place as u64, grain, bits);
             if value.is_negative() {
                 lower += value * &high;
                 upper += value * &low;
@@ -217,16 +229,16 @@ pub fn power_of_two(n: &BigInt) -> Result<Rat, RatioError> {
     })
 }
 
-/// Rational bounds of `θ^i = 2^(i/L)` at [`READING_BITS`]: `⌊2^(i/L + b)⌋ / 2^b` below and one unit
-/// above, exact when the power is.
-fn theta_power_bounds(i: u64, grain: u64) -> (Rat, Rat) {
+/// Rational bounds of `θ^i = 2^(i/L)` at `b = reading` bits: `⌊2^(i/L + b)⌋ / 2^b` below and one
+/// unit above, exact when the power is.
+fn theta_power_bounds(i: u64, grain: u64, reading: u32) -> (Rat, Rat) {
     if i == 0 {
         return (Rat::one(), Rat::one());
     }
-    let bits = u64::from(READING_BITS);
+    let bits = u64::from(reading);
     let target = BigUint::one() << (i + bits * grain) as usize;
     let floor = target.nth_root(u32::try_from(grain).expect("a grain fits u32"));
-    let unit = Rat::new(BigInt::one(), BigInt::one() << READING_BITS as usize);
+    let unit = Rat::new(BigInt::one(), BigInt::one() << reading as usize);
     let lower = Rat::from_integer(BigInt::from(floor.clone())) * &unit;
     let exact = floor.pow(u32::try_from(grain).expect("a grain fits u32")) == target;
     let upper = if exact {

@@ -19,6 +19,7 @@ pub mod complex;
 mod exact;
 pub mod motion;
 pub mod screw;
+pub mod spatial;
 pub mod swing;
 pub mod winding;
 

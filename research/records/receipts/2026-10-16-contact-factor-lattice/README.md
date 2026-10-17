@@ -42,3 +42,5 @@ Each run had a 1,800 s deadline (the wrapper's timeout) and no recorded projecti
 measured-over-projected ratio is not available: v25's wall `797,210,130,278` ns and v26's
 `820,376,293,829` ns are below their deadlines, `398,605,065,139/900,000,000,000` and
 `820,376,293,829/1,800,000,000,000` of them.
+
+The key paths in `p4.txt` and `p5.txt` were replaced by `keys=external`.

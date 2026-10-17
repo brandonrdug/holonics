@@ -31,8 +31,8 @@ use holonics::hnn::HnnError;
 use holonics::hnn::dynamic_section::{RAYS, SectionReader, SectionRefusal, SectionSymbol, chord};
 use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands};
 use holonics::hnn::section_lock::{
-    Arrival, JointLock, JointRefusal, Lock, LockReader, LockRefusal, LockWindow, NearReturn, SectionRelation,
-    SectionWord, Settled,
+    Arrival, JointLock, JointRefusal, Lock, LockReader, LockRefusal, LockWindow, NearReturn,
+    SectionRelation, SectionWord, Settled,
 };
 use holonics::hnn::wave::{MatchedWave, ReceivedTick, WavePort};
 use holonics::holon::parametron::Carrier;
@@ -1111,12 +1111,19 @@ fn the_port_on_a_lattice_carries_a_bounded_state_and_every_tick_closes() {
         assert_eq!(tick.lattice, Some(32));
         let mut bits = 0;
         for x in tick.step.state.iter().flatten() {
-            assert!(lattice.contains(x), "tick {}: the state lies on the lattice", tick.tick);
+            assert!(
+                lattice.contains(x),
+                "tick {}: the state lies on the lattice",
+                tick.tick
+            );
             bits = bits.max(x.denom().bits());
         }
         widest.push(bits);
         for r in tick.step.remainders().all() {
-            assert!(r.abs() * integer(2) <= lattice.unit(), "a carried remainder is at most half a unit");
+            assert!(
+                r.abs() * integer(2) <= lattice.unit(),
+                "a carried remainder is at most half a unit"
+            );
         }
         let emission = tick.emission();
         let expected = -(integer(2) / operands.admittance()) * &tick.step.rate[0];
@@ -1126,14 +1133,20 @@ fn the_port_on_a_lattice_carries_a_bounded_state_and_every_tick_closes() {
         defect += &tick.step.chart + &tick.step.split;
     }
     assert_eq!(port.ticks(), 2 * SAMPLES);
-    assert_eq!(port.stored_energy().unwrap(), &work - &dissipation + &defect);
+    assert_eq!(
+        port.stored_energy().unwrap(),
+        &work - &dissipation + &defect
+    );
     // The state's denominators never exceed the lattice's.
     assert!(widest.iter().all(|bits| *bits <= 33));
     // The exact law's state on the same stream: its denominators grow with the ticks.
     let exact = run(&integer(1), &stream(1, SAMPLES));
     let first = exact.ticks[9].step.state[0][0].denom().bits();
     let last = exact.ticks[SAMPLES - 1].step.state[0][0].denom().bits();
-    assert!(last > first, "the exact law's state grows: {first} then {last} bits");
+    assert!(
+        last > first,
+        "the exact law's state grows: {first} then {last} bits"
+    );
 }
 
 /// **The stream is one on the lattice** (bank record A3): received in chunks, the lattice port
@@ -1154,7 +1167,10 @@ fn the_lattice_port_carries_its_remainders_across_chunks() {
     let mut ticks = Vec::new();
     let mut at = 0;
     for length in [1, 6, 113, 120] {
-        for received in port.receive(&matched(&operands, &all[at..at + length])).unwrap() {
+        for received in port
+            .receive(&matched(&operands, &all[at..at + length]))
+            .unwrap()
+        {
             ticks.push(received.unwrap());
         }
         at += length;
@@ -1183,9 +1199,15 @@ fn a_key_seated_at_a_lattice_port_books_its_work() {
     assert_eq!(port.state(), [&key[0][..], &key[1][..]]);
     assert_eq!(work, port.stored_energy().unwrap() - before);
     assert!(port.remainders().all().all(Zero::is_zero));
-    let off = [vec![Rat::new(1.into(), BigInt::from(3)), Rat::zero()], vec![Rat::zero(), Rat::zero()]];
+    let off = [
+        vec![Rat::new(1.into(), BigInt::from(3)), Rat::zero()],
+        vec![Rat::zero(), Rat::zero()],
+    ];
     assert!(matches!(port.seat(off), Err(HnnError::Wave { .. })));
-    assert!(matches!(port.seat([vec![Rat::zero()], vec![Rat::zero()]]), Err(HnnError::Shape { .. })));
+    assert!(matches!(
+        port.seat([vec![Rat::zero()], vec![Rat::zero()]]),
+        Err(HnnError::Shape { .. })
+    ));
     assert_eq!(port.state(), [&key[0][..], &key[1][..]]);
 }
 
@@ -1203,7 +1225,11 @@ fn gamma_length(n: usize) -> u64 {
 /// `γ(τ₀) + 3τ₀ + 1`, and when it keeps `τ₀` it has no defect and the same winding and address.
 #[test]
 fn the_near_return_decodes_its_window_and_the_exact_lock_is_its_zero_defect_case() {
-    for tone in [cycle_of(&F1, SAMPLES), cycle_of(&F3, SAMPLES), cycle_of(&F4, SAMPLES)] {
+    for tone in [
+        cycle_of(&F1, SAMPLES),
+        cycle_of(&F3, SAMPLES),
+        cycle_of(&F4, SAMPLES),
+    ] {
         let rings = bank_settled(&tone);
         for (ring, exact) in rings.iter().zip(locks(&rings)) {
             let near = ring.near_return(&lock_window());
@@ -1211,14 +1237,26 @@ fn the_near_return_decodes_its_window_and_the_exact_lock_is_its_zero_defect_case
                 let Settled::Word(word) = ring else {
                     panic!("a near-return reads a word")
                 };
-                assert_eq!(&near.decode().unwrap(), word, "N1: the decode is the window's word");
+                assert_eq!(
+                    &near.decode().unwrap(),
+                    word,
+                    "N1: the decode is the window's word"
+                );
                 let (bits, raw) = near.bits();
                 assert!(bits < raw);
                 // §29: the emitted code has the priced length and reads back the word.
                 let code = near.code();
                 assert_eq!(code.len() as u64, bits, "the code is L_τ bits");
-                let read = NearReturn::read(&mut code.iter().copied(), word.start_class().unwrap(), lock_window().length());
-                assert_eq!(&read.unwrap(), word, "the code reads back the window's word");
+                let read = NearReturn::read(
+                    &mut code.iter().copied(),
+                    word.start_class().unwrap(),
+                    lock_window().length(),
+                );
+                assert_eq!(
+                    &read.unwrap(),
+                    word,
+                    "the code reads back the window's word"
+                );
             }
             if let Ok(lock) = exact {
                 let near = near.expect("N2: an exact lock is admitted as a near-return");
@@ -1243,7 +1281,10 @@ fn a_near_periodic_window_keeps_its_departure_as_defects() {
     let mut tone = cycle_of(&F1, SAMPLES);
     tone[SETTLE + 60] += 7;
     let ring = settled(&run(&integer(1), &tone)).unwrap();
-    assert!(matches!(ring.lock(&lock_window()), Err(LockRefusal::Unlocked { .. })));
+    assert!(matches!(
+        ring.lock(&lock_window()),
+        Err(LockRefusal::Unlocked { .. })
+    ));
     let near = ring.near_return(&lock_window()).unwrap();
     let Settled::Word(word) = &ring else {
         panic!("the ring reads a word")
@@ -1255,7 +1296,10 @@ fn a_near_periodic_window_keeps_its_departure_as_defects() {
     assert_eq!(code.len() as u64, near.bits().0);
     let start = word.start_class().unwrap();
     let length = lock_window().length();
-    assert_eq!(&NearReturn::read(&mut code.iter().copied(), start, length).unwrap(), word);
+    assert_eq!(
+        &NearReturn::read(&mut code.iter().copied(), start, length).unwrap(),
+        word
+    );
     assert!(matches!(
         NearReturn::read(&mut code[..code.len() - 1].iter().copied(), start, length),
         Err(LockRefusal::Code { .. })
@@ -1307,21 +1351,28 @@ fn the_tick_read_backwards_returns_its_drive_exactly() {
                     lattice.as_ref(),
                 )
                 .unwrap();
-            assert_eq!(drive, vec![tick.incident.clone(), Rat::zero()], "tick {}", tick.tick);
+            assert_eq!(
+                drive,
+                vec![tick.incident.clone(), Rat::zero()],
+                "tick {}",
+                tick.tick
+            );
             before = tick.step.remainders().clone();
         }
         // Two states that are not one tick are refused.
         let (first, third) = (&ticks[0], &ticks[2]);
-        assert!(operands
-            .inverse_step(
-                0,
-                [&first.step.input[0], &first.step.input[1]],
-                [&third.step.state[0], &third.step.state[1]],
-                &ResonatorRemainders::default(),
-                third.step.remainders(),
-                lattice.as_ref(),
-            )
-            .is_err());
+        assert!(
+            operands
+                .inverse_step(
+                    0,
+                    [&first.step.input[0], &first.step.input[1]],
+                    [&third.step.state[0], &third.step.state[1]],
+                    &ResonatorRemainders::default(),
+                    third.step.remainders(),
+                    lattice.as_ref(),
+                )
+                .is_err()
+        );
     }
 }
 
@@ -1356,11 +1407,21 @@ fn the_inverse_refuses_a_charted_solve_and_an_unlawful_carry() {
         Some(&WordLattice::new(0, 0, 32)),
     )
     .unwrap();
-    assert!(!charted.charts().is_empty(), "the word lattice charts the solve");
+    assert!(
+        !charted.charts().is_empty(),
+        "the word lattice charts the solve"
+    );
     let rest = [vec![Rat::zero(); 2], vec![Rat::zero(); 2]];
     let none = ResonatorRemainders::default();
     assert!(matches!(
-        charted.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &none, None),
+        charted.inverse_step(
+            0,
+            [&rest[0], &rest[1]],
+            [&rest[0], &rest[1]],
+            &none,
+            &none,
+            None
+        ),
         Err(HnnError::Resonator { .. })
     ));
 
@@ -1373,18 +1434,42 @@ fn the_inverse_refuses_a_charted_solve_and_an_unlawful_carry() {
         shaped(vec![Rat::zero(); 3], [width.clone(), width.clone()]),
     ] {
         assert!(matches!(
-            operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &unlawful, &none, Some(&lattice)),
+            operands.inverse_step(
+                0,
+                [&rest[0], &rest[1]],
+                [&rest[0], &rest[1]],
+                &unlawful,
+                &none,
+                Some(&lattice)
+            ),
             Err(HnnError::Shape { .. })
         ));
     }
-    let nonzero = shaped(vec![rat(1, 1 << 40), Rat::zero()], [width.clone(), width.clone()]);
+    let nonzero = shaped(
+        vec![rat(1, 1 << 40), Rat::zero()],
+        [width.clone(), width.clone()],
+    );
     assert!(matches!(
-        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &nonzero, &none, None),
+        operands.inverse_step(
+            0,
+            [&rest[0], &rest[1]],
+            [&rest[0], &rest[1]],
+            &nonzero,
+            &none,
+            None
+        ),
         Err(HnnError::Resonator { .. })
     ));
     let beyond = shaped(vec![rat(1, 1 << 31), Rat::zero()], [width.clone(), width]);
     assert!(matches!(
-        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &beyond, &none, Some(&lattice)),
+        operands.inverse_step(
+            0,
+            [&rest[0], &rest[1]],
+            [&rest[0], &rest[1]],
+            &beyond,
+            &none,
+            Some(&lattice)
+        ),
         Err(HnnError::Resonator { .. })
     ));
 }
@@ -1409,7 +1494,14 @@ fn the_inverse_admits_only_the_canonical_carry_and_a_lattice_rate() {
         state: [zero(), zero()],
     };
     assert!(matches!(
-        operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &half_up, Some(&lattice)),
+        operands.inverse_step(
+            0,
+            [&rest[0], &rest[1]],
+            [&rest[0], &rest[1]],
+            &none,
+            &half_up,
+            Some(&lattice)
+        ),
         Err(HnnError::Resonator { .. })
     ));
     let half_down = ResonatorRemainders {
@@ -1417,11 +1509,23 @@ fn the_inverse_admits_only_the_canonical_carry_and_a_lattice_rate() {
         state: [zero(), zero()],
     };
     // −δ/2 is canonical; this pair is then read (or refused on another ground, never on the carry).
-    let read = operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &half_down, Some(&lattice));
-    assert!(!matches!(&read, Err(HnnError::Resonator { what, .. }) if what.contains("carry contract")));
+    let read = operands.inverse_step(
+        0,
+        [&rest[0], &rest[1]],
+        [&rest[0], &rest[1]],
+        &none,
+        &half_down,
+        Some(&lattice),
+    );
+    assert!(
+        !matches!(&read, Err(HnnError::Resonator { what, .. }) if what.contains("carry contract"))
+    );
     let witness = ResonatorRemainders {
         rate: zero(),
-        state: [vec![&delta / integer(8), Rat::zero()], vec![&delta / integer(4), Rat::zero()]],
+        state: [
+            vec![&delta / integer(8), Rat::zero()],
+            vec![&delta / integer(4), Rat::zero()],
+        ],
     };
     assert!(matches!(
         operands.inverse_step(0, [&rest[0], &rest[1]], [&rest[0], &rest[1]], &none, &witness, Some(&lattice)),

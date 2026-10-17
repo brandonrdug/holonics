@@ -27,6 +27,41 @@ fn row_norm(m: &ExactRatMatrix) -> Rat {
         .unwrap_or_else(Rat::zero)
 }
 
+#[test]
+fn imported_chart_entries_are_exact_and_field_checked() {
+    let field = chorded_field();
+    let exponent = field.word_lattice().unwrap().chart_exponent();
+    let width = field.ring(0).width();
+    let coordinates = vec![BigInt::from(0); width * width];
+    let chart = ChartWords::of_coordinates(width, width, exponent, &coordinates).unwrap();
+    let charts = Charts::from_entries([(ChartKey::Ring(0), chart.clone())]).unwrap();
+    assert_eq!(charts.get(&ChartKey::Ring(0)), Some(&chart));
+    assert!(charts.validate_for(&field).is_ok());
+
+    let wrong_grid = ChartWords::of_coordinates(width, width, exponent + 1, &coordinates).unwrap();
+    let charts = Charts::from_entries([(ChartKey::Ring(0), wrong_grid)]).unwrap();
+    assert!(charts.validate_for(&field).is_err());
+
+    let wrong_shape = ChartWords::of_coordinates(width - 1, width, exponent, &coordinates).unwrap();
+    assert!(Charts::from_entries([(ChartKey::Ring(0), wrong_shape)]).is_err());
+    assert!(
+        Charts::from_entries([
+            (ChartKey::Ring(0), chart.clone()),
+            (ChartKey::Ring(0), chart),
+        ])
+        .is_err()
+    );
+    assert!(
+        Charts::from_entries([(
+            ChartKey::Ring(field.rings().len()),
+            ChartWords::of_coordinates(width, width, exponent, &coordinates).unwrap()
+        )])
+        .unwrap()
+        .validate_for(&field)
+        .is_err()
+    );
+}
+
 /// `I − ½K` for a passive `K = −ffᵀ + Σ (u vᵀ − v uᵀ)` of dyadic factors: the ring's operator.
 fn ring_operator(draw: &mut Draw, n: usize) -> ExactRatMatrix {
     let f = draw.dyadic_matrix(n, n).scaled(&rat(1, 4));

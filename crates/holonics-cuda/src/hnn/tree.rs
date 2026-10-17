@@ -262,6 +262,7 @@ pub struct CardTree<'c> {
     module: Module,
     stream: Stream,
     declaration: LandmarkDeclaration,
+    observation_bits: usize,
     law: TreeLaw,
     splitting: Vec<usize>,
     splitting_buffer: CardBuffer<'c, u32>,
@@ -327,13 +328,14 @@ impl<'c> CardTree<'c> {
         // decides the stop weight before any division, so every width the host's tree admits
         // (`Landmarks::new`, its products within `u128`) runs on the card: the wide cut included.
         let widths: Widths = tree.widths();
-        let depths = declaration.branch_depths();
+        let depths = tree.arena().branch_depths();
         if depths.iter().any(|&depth| depth + 1 > MAX_DEPTH) || depths.len() > 2 {
             return Err(launch_error(
                 "a branch within the kernels' path of 64 nodes",
             ));
         }
-        let sums = declaration.rung_sums();
+        let arena_law = tree.arena();
+        let sums = arena_law.rung_sums();
         let widest = sums
             .iter()
             .map(|branch| branch.last().copied().unwrap_or(0))
@@ -367,8 +369,8 @@ impl<'c> CardTree<'c> {
             branches: depths.len() as u32,
             depth0: depths[0] as u32,
             depth1: depths.get(1).copied().unwrap_or(0) as u32,
-            forced0: declaration.forced as u32,
-            forced1: 0,
+            forced0: tree.arena().forced() as u32,
+            forced1: tree.arena().forced_by_branch().get(1).copied().unwrap_or(0) as u32,
             cells: cells as u32,
             stride: stride as u32,
             log_stride: log_stride as u32,
@@ -463,6 +465,7 @@ impl<'c> CardTree<'c> {
             times: TreeTimes::default(),
             read_threads,
             declaration,
+            observation_bits: tree.observation_width(),
         };
         mirrored.upload(&arena)?;
         Ok(mirrored)
@@ -530,6 +533,29 @@ impl<'c> CardTree<'c> {
             words[branch * stride..branch * stride + letters.len()].copy_from_slice(letters);
         }
         words
+    }
+
+    pub(crate) fn pack_branches(&self, branches: &[Vec<u32>]) -> Result<Vec<u32>, DeviceError> {
+        let stride = self.law.stride as usize;
+        if branches.len() != self.law.branches as usize
+            || branches.iter().enumerate().any(|(i, b)| {
+                b.len()
+                    != if i == 0 {
+                        self.law.depth0 as usize
+                    } else {
+                        self.law.depth1 as usize
+                    }
+            })
+        {
+            return Err(launch_error(
+                "native schema branch extents match the card tree",
+            ));
+        }
+        let mut words = vec![0; branches.len() * stride];
+        for (i, branch) in branches.iter().enumerate() {
+            words[i * stride..i * stride + branch.len()].copy_from_slice(branch);
+        }
+        Ok(words)
     }
 
     /// The digits a class opens, as `(h, b)` words.
@@ -699,6 +725,30 @@ impl<'c> CardTree<'c> {
         addresses: &[Vec<Letter>],
         known: &[usize],
     ) -> Result<Vec<Splits>, DeviceError> {
+        if self.observation_bits != 0 {
+            return Err(launch_error(
+                "an observed tree requires its typed observation prefix",
+            ));
+        }
+        let letters = addresses
+            .iter()
+            .map(|address| self.letter_words(address))
+            .collect::<Vec<_>>();
+        self.window_splits_words(&letters, known)
+    }
+
+    /// Execute shared native tree-schema words, already flattened by its ArenaView.
+    pub(crate) fn window_splits_words(
+        &mut self,
+        addresses: &[Vec<u32>],
+        known: &[usize],
+    ) -> Result<Vec<Splits>, DeviceError> {
+        let width = self.law.branches as usize * self.law.stride as usize;
+        if addresses.iter().any(|address| address.len() != width) {
+            return Err(launch_error(
+                "flattened tree address at the declared branch stride",
+            ));
+        }
         let phases = addresses.len();
         if phases == 0 {
             return Ok(Vec::new());
@@ -711,7 +761,7 @@ impl<'c> CardTree<'c> {
         let start = Instant::now();
         let letters: Vec<u32> = addresses
             .iter()
-            .flat_map(|address| self.letter_words(address))
+            .flat_map(|address| address.iter().copied())
             .collect();
         self.card.write(&self.letters, 0, &letters)?;
         let mut digit_counts = Vec::with_capacity(deposits);
@@ -763,13 +813,32 @@ impl<'c> CardTree<'c> {
     /// **Deposit cells on the mirror** (`Landmarks::deposit`'s opened-path update, in order), as the
     /// host's constitution deposits them. Refused past the mirror's capacity.
     pub fn deposit(&mut self, steps: &[(Vec<Letter>, usize)]) -> Result<(), DeviceError> {
+        if self.observation_bits != 0 {
+            return Err(launch_error(
+                "an observed tree deposit requires its typed observation prefix",
+            ));
+        }
+        let words = steps
+            .iter()
+            .map(|(address, class)| (self.letter_words(address), *class))
+            .collect::<Vec<_>>();
+        self.deposit_words(&words)
+    }
+
+    pub(crate) fn deposit_words(&mut self, steps: &[(Vec<u32>, usize)]) -> Result<(), DeviceError> {
+        let width = self.law.branches as usize * self.law.stride as usize;
+        if steps.iter().any(|(address, _)| address.len() != width) {
+            return Err(launch_error(
+                "flattened tree deposit at the declared branch stride",
+            ));
+        }
         let window = self.logs.len() + 1;
         for chunk in steps.chunks(window) {
             self.room(chunk.len())?;
             let start = Instant::now();
             let letters: Vec<u32> = chunk
                 .iter()
-                .flat_map(|(address, _)| self.letter_words(address))
+                .flat_map(|(address, _)| address.iter().copied())
                 .collect();
             self.card.write(&self.letters, 0, &letters)?;
             let mut words = vec![0u32; chunk.len() * 2 * MAX_DIGITS];

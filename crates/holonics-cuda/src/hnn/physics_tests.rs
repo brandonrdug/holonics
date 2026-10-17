@@ -180,7 +180,11 @@ fn the_prox_deposit_on_the_card_equals_the_host_and_is_measured() {
         let chart = next.solved();
         let off = Rat::new(BigInt::one(), BigInt::one() << scale as usize);
         for i in reached..n {
-            assert_eq!(chart.get(i, i).unwrap(), &off, "the chart off the support at {i}");
+            assert_eq!(
+                chart.get(i, i).unwrap(),
+                &off,
+                "the chart off the support at {i}"
+            );
         }
         let chart_lattice = Lattice::new(next.chart().exponent());
         let feature_lattice = Lattice::new(6);

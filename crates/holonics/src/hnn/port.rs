@@ -38,7 +38,8 @@
 //! declares `C_g`.
 
 //! [definition] **The word's return** ([`Word::pull_back`]): the ratio's covector `R⁻¹dR` on the
-//! logits pulled back through `R` and `P_R^(τ_R)` to the receiving anchors, then through the ticks
+//! logits pulled back through `R` to the receiving anchors (the read is in the passage frame,
+//! `hnn::receiving`), then through the ticks
 //! in reverse over the word's own per-tick waves, to the opening storage. It claims no inverse of a
 //! step (design R2 H2): each reverse step is the transpose of the linear map that tick executed at
 //! its fixed operands (the junctions' executed weights, the lattice charts of `(I − ½K_r)⁻¹` and
@@ -54,10 +55,9 @@
 //! use holonics::hnn::{ReceivingPhases, Word};
 //! use holonics::ratio::Rat;
 //! use holonics::ratio::linear::ExactRatMatrix;
-//! use num_bigint::BigInt;
 //! // A scalar loss or a bare vector is not an operand of the return (guard 10).
 //! fn scalar(word: Word<'_>, loss: Vec<Vec<Rat>>, map: &ExactRatMatrix, phases: &ReceivingPhases) {
-//!     let _ = word.pull_back(&loss, map, &BigInt::from(0), phases);
+//!     let _ = word.pull_back(&loss, map, phases);
 //! }
 //! ```
 //!
@@ -70,11 +70,12 @@ use num_traits::{One, Signed, Zero};
 use crate::aeon::Reading;
 use crate::compression::{CompressionError, ResonanceSplit, resonance_split};
 use crate::hnn::HnnError;
-use crate::hnn::encoding::Encoded;
 use crate::hnn::chart::{ChartReading, Remainders, carry};
 use crate::hnn::constitution::{
-    Constitution, DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
+    Constitution, ContinuingState, DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep,
+    Locus, Reach,
 };
+use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{ConstitutionRead, Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
 use crate::hnn::moment::{Ingested, SourceCapacity};
@@ -178,6 +179,8 @@ pub enum ReceiptDetail {
     /// remainders the word released at its end, the last junction's residual, and each declared
     /// resonator's balance over the word and the word's whole balance (campaign 2).
     Refine {
+        /// The fresh source injection's actual mode-qualified coupling; clocks and carry remain independent.
+        view: crate::hnn::ring::modes::ModeView,
         reached: Vec<Locus>,
         released_power: Rat,
         peak_bits: u64,
@@ -211,6 +214,10 @@ pub enum ReceiptDetail {
         residual: Vec<Vec<Rat>>,
         reached: Vec<Locus>,
         released: Remainders,
+        /// Actual same-return transient chart, independently refined from the fixed forward word.
+        return_precision: crate::hnn::chart::ReturnPrecision,
+        /// Bounds for both executed paired paths, when this read uses arrival/context material.
+        response_defect: Option<PairedReadDefect>,
         tree: Vec<crate::ratio::algebraic::ExactInterval>,
         tree_grain: Vec<crate::ratio::algebraic::ExactInterval>,
         model: Vec<crate::ratio::algebraic::ExactInterval>,
@@ -220,6 +227,7 @@ pub enum ReceiptDetail {
     Deposit {
         reading: DepositReading,
         reread: crate::ratio::algebraic::ExactInterval,
+        finite_comparison: Option<crate::hnn::reference::FiniteComparisonReceipt>,
     },
     /// `release`: the width read from the receiving phases' fibres against the grain, the declared
     /// rule's decision, and the RIDE/FOUND split of the receiving ring's last anchor, its real and
@@ -229,6 +237,12 @@ pub enum ReceiptDetail {
         tolerance: Rat,
         decision: ReleaseReturn,
         split: [Component<ResonanceSplit>; 2],
+    },
+    /// `release_cells`: each decided cell's return and the reading bits that decided it
+    /// (`hnn::receiving::cells`), in phase order.
+    Cells {
+        decisions: Vec<ReleaseReturn>,
+        bits: Vec<u32>,
     },
     /// `close_aeon`: the boundary is the forward component.
     Boundary,
@@ -465,6 +479,8 @@ pub struct Deposit {
     linear: Vec<LinearStep>,
     factors: Vec<FactorStep>,
     landmarks: Vec<LandmarkStep>,
+    landmark_observations: Option<Vec<Vec<bool>>>,
+    landmark_partition: Option<crate::hnn::receiving::ObservationPartition>,
     receiving: Vec<ReceivingStep>,
     reached: Vec<Locus>,
     reach: Option<Reach>,
@@ -482,6 +498,8 @@ impl Deposit {
             linear,
             factors,
             landmarks: Vec::new(),
+            landmark_observations: None,
+            landmark_partition: None,
             receiving: Vec::new(),
             reached,
             reach: None,
@@ -509,6 +527,58 @@ impl Deposit {
     /// The receiving face's steps (`hnn::receiving::ReceivingStep`), in cell order.
     pub fn receiving(&self) -> &[ReceivingStep] {
         &self.receiving
+    }
+
+    /// Frozen phase-specific observation prefixes, parallel to the landmark steps. They are
+    /// produced before targets arrive and stay fixed through the target's material update.
+    pub fn landmark_observations(&self) -> Option<&[Vec<bool>]> {
+        self.landmark_observations.as_deref()
+    }
+
+    /// The deposit with each landmark step's frozen observation, read by its partition.
+    pub(crate) fn with_landmark_observations(
+        mut self,
+        observed: Option<(crate::hnn::receiving::ObservationPartition, Vec<Vec<bool>>)>,
+    ) -> Result<Self, HnnError> {
+        let (partition, paths) = observed.unzip();
+        if let Some(paths) = &paths {
+            if paths.len() != self.landmarks.len() {
+                return Err(HnnError::Unadmitted {
+                    reason: "one observation prefix per landmark deposit",
+                });
+            }
+        }
+        self.landmark_observations = paths;
+        self.landmark_partition = partition;
+        Ok(self)
+    }
+
+    /// The partition the landmark observations were read by.
+    pub fn landmark_partition(&self) -> Option<crate::hnn::receiving::ObservationPartition> {
+        self.landmark_partition
+    }
+
+    /// **Each landmark step's observed address**: its frozen observation typed by its partition,
+    /// beside its unchanged causal address; none when the deposit carries no observation.
+    pub fn observed_landmarks(
+        &self,
+    ) -> Result<Option<Vec<crate::compression::landmark::context::ObservedAddress>>, HnnError> {
+        let (Some(partition), Some(paths)) =
+            (self.landmark_partition, self.landmark_observations.as_ref())
+        else {
+            return Ok(None);
+        };
+        self.landmarks
+            .iter()
+            .zip(paths)
+            .map(|(step, bits)| {
+                Ok(crate::compression::landmark::context::ObservedAddress::new(
+                    partition.path(bits.clone())?,
+                    step.address.clone(),
+                ))
+            })
+            .collect::<Result<Vec<_>, HnnError>>()
+            .map(Some)
     }
 
     /// The deposit with the receiving parametron's landmark steps (the landmark tree).
@@ -581,7 +651,14 @@ impl Deposit {
             .iter()
             .map(|step| bits(&step.tree) + bits(&step.combined.lower) + bits(&step.combined.upper))
             .sum();
-        linear + factors + landmarks + receiving
+        linear
+            + factors
+            + landmarks
+            + receiving
+            + self
+                .landmark_observations
+                .as_ref()
+                .map_or(0, |paths| paths.iter().map(|p| p.len() as u64).sum::<u64>())
     }
 }
 
@@ -630,6 +707,22 @@ pub trait ExecutionPort {
 
     /// Mounts the field at the lift point with the declared initial constitution (a transfer).
     fn mount(&self, field: &Field, current: &Current) -> Result<Self::Resident, HnnError>;
+
+    /// Restore the exact resident passage carried by a native continuing state. Realizations that
+    /// only support a constitution remount refuse this operation rather than silently dropping
+    /// current, address, carry, charts or open operands.
+    fn mount_continued(
+        &self,
+        field: &Field,
+        current: &Current,
+        opening: Constitution,
+        state: &ContinuingState,
+    ) -> Result<Self::Resident, HnnError> {
+        let _ = (field, current, opening, state);
+        Err(HnnError::Unadmitted {
+            reason: "full resident continuation on this realization",
+        })
+    }
 
     /// The field, the lift point, and every open handle with its exact bits (a transfer).
     fn read(
@@ -680,6 +773,28 @@ pub trait ExecutionPort {
         HnnError,
     >;
 
+    /// Execute a qualified fresh source view, retaining the original moment and its complement.
+    fn refine_view(
+        &self,
+        resident: &mut Self::Resident,
+        moment: &MomentId,
+        phases: &ReceivingPhases,
+        view: &crate::hnn::ring::modes::ModeView,
+    ) -> Result<
+        (
+            PendingId,
+            InteractionReturn<Faces, (), (), Vec<ReceivingPhases>, PortReceipt>,
+        ),
+        HnnError,
+    > {
+        if !view.is_whole() {
+            return Err(HnnError::Unadmitted {
+                reason: "this realization does not execute mode-qualified source views",
+            });
+        }
+        self.refine(resident, moment, phases)
+    }
+
     /// Consumes the pending ratio once the compare succeeds; a refusal leaves it open.
     fn compare(
         &self,
@@ -715,6 +830,34 @@ pub trait ExecutionPort {
         pending: &PendingId,
         decision: &DecisionRule,
     ) -> Result<InteractionReturn<Faces, (), (), Vec<ReceivingPhases>, PortReceipt>, HnnError>;
+
+    /// [definition; agent-inferred, October 16] **Release the pending ratio's epoch at class grain**
+    /// (`hnn::receiving::cells`): every phase's scored face, the receiver's population over the
+    /// tree's face and the combined face read as the compare reads them, decided by the declared
+    /// arm (the commit of a unique answer, or the certified draw of the declared key stream) with
+    /// demand refinement, the released classes received in cell order. It borrows the pending ratio
+    /// and changes nothing the resident holds; nothing is learned from it. A realization that has
+    /// not mirrored it refuses by name.
+    fn release_cells(
+        &self,
+        resident: &mut Self::Resident,
+        pending: &PendingId,
+        law: crate::hnn::receiving::cells::CellLaw<'_>,
+    ) -> Result<
+        InteractionReturn<
+            crate::hnn::receiving::cells::CellRelease,
+            (),
+            (),
+            Vec<ReceivingPhases>,
+            PortReceipt,
+        >,
+        HnnError,
+    > {
+        let _ = (resident, pending, law);
+        Err(HnnError::Unadmitted {
+            reason: "a release at class grain on this realization",
+        })
+    }
 
     /// Refused unless the joint clock has carried out since the last boundary, and unless
     /// `admitted` is contained in the previous boundary's family.
@@ -771,7 +914,7 @@ pub struct TransitTick {
 /// ring, the element and transit ticks with their adjoints, the conductance covector `∂ℓ/∂G_a` (at
 /// each junction read at the executed node potential,
 /// [`crate::hnn::propagation::conductance_covector`]), per receiving phase the receiving map's
-/// feature `P_R^(τ_R) v_R(e_j)` with the logit gradient, and the adjoint's carried remainders,
+/// feature `v_R(e_j)` (the passage frame) with the logit gradient, and the adjoint's carried remainders,
 /// released at the open ([`Remainders`]; none under the exact law).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WordReturn {
@@ -783,6 +926,87 @@ pub struct WordReturn {
     pub conductance: Vec<Rat>,
     pub reads: Vec<(Vec<Rat>, Vec<Rat>)>,
     pub released: Remainders,
+    pub precision: crate::hnn::chart::ReturnPrecision,
+    pub response_defect: Option<PairedReadDefect>,
+}
+
+/// Coordinate radii against the unsplit physical paths, one receiving vector per station.
+/// Absence of the actual path's certificate is explicit; it cannot certify pure context.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PairedReadDefect {
+    pub fresh: Vec<Vec<Rat>>,
+    pub actual: Option<Vec<Vec<Rat>>>,
+}
+
+impl PairedReadDefect {
+    pub fn context_bounds(&self) -> Result<Vec<Vec<Rat>>, HnnError> {
+        let actual = self.actual.as_ref().ok_or(HnnError::Unadmitted {
+            reason: "the context defect needs both actual and fresh path certificates",
+        })?;
+        if actual.len() != self.fresh.len()
+            || actual
+                .iter()
+                .zip(&self.fresh)
+                .any(|(a, s)| a.len() != s.len() || a.iter().chain(s).any(|x| x < &Rat::zero()))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "paired path radii share one nonnegative receiving shape",
+            });
+        }
+        Ok(actual
+            .iter()
+            .zip(&self.fresh)
+            .map(|(a, s)| add(a, s))
+            .collect())
+    }
+}
+
+impl WordReturn {
+    /// Join two same-cut executed-surrogate returns before material certification. The fresh
+    /// path contributes to source injection and shared material, never to the actual interior
+    /// carry derivative. `reads` contains the physical paired feature once per comparison.
+    pub fn join_response(
+        field: &Field,
+        mut actual: Self,
+        fresh: Self,
+        reads: Vec<(Vec<Rat>, Vec<Rat>)>,
+    ) -> Result<Self, HnnError> {
+        let shape = |back: &Self| {
+            back.opening.len() == field.rings().len()
+                && back
+                    .opening
+                    .iter()
+                    .zip(field.rings())
+                    .all(|(v, r)| v.len() == r.width())
+                && back.elements.len() == field.rings().len()
+                && back.resonators.len() == field.rings().len()
+                && back.transits.len() == field.contacts().len()
+                && back.conductance.len() == field.contacts().len()
+        };
+        if !shape(&actual) || !shape(&fresh) || actual.precision != fresh.precision {
+            return Err(HnnError::Unadmitted {
+                reason: "paired returns share one producing shape and return precision",
+            });
+        }
+        for &ring in field.sources() {
+            actual.opening[ring] = add(&actual.opening[ring], &fresh.opening[ring]);
+        }
+        for (a, b) in actual.elements.iter_mut().zip(fresh.elements) {
+            a.extend(b);
+        }
+        for (a, b) in actual.transits.iter_mut().zip(fresh.transits) {
+            a.extend(b);
+        }
+        for (a, b) in actual.resonators.iter_mut().zip(fresh.resonators) {
+            a.extend(b);
+        }
+        for (a, b) in actual.conductance.iter_mut().zip(fresh.conductance) {
+            *a += b;
+        }
+        actual.released = actual.released.join(&fresh.released);
+        actual.reads = reads;
+        Ok(actual)
+    }
 }
 
 /// One loaded resonator tick's material-free adjoint operands.
@@ -875,15 +1099,17 @@ impl<'c> Word<'c> {
     }
 
     /// **The word's return over its own per-tick waves** (module header). `map` is the receiving
-    /// map `R` and `lift` the receiving ring's lift `τ_R` the read used.
+    /// map `R`; the read is in the passage frame (`hnn::receiving`), so its transpose is `Rᵀ`.
     pub fn pull_back(
         self,
         covector: &RatioCovector,
         map: &ExactRatMatrix,
-        lift: &BigInt,
         phases: &ReceivingPhases,
     ) -> Result<WordReturn, HnnError> {
-        Ok(reverse(&self, covector, map, lift, phases, None)?.0)
+        if let Some(column) = self.response() {
+            return Ok(reverse_response(&self, column, covector.logits(), map, phases)?.0);
+        }
+        Ok(reverse(&self, covector, map, phases, None)?.0)
     }
 
     /// The same receiving return, retaining its complete opening dual. A held-material
@@ -893,10 +1119,12 @@ impl<'c> Word<'c> {
         self,
         covector: &RatioCovector,
         map: &ExactRatMatrix,
-        lift: &BigInt,
         phases: &ReceivingPhases,
     ) -> Result<(WordReturn, ChangeCovector), HnnError> {
-        reverse(&self, covector, map, lift, phases, None)
+        if let Some(column) = self.response() {
+            return reverse_response(&self, column, covector.logits(), map, phases);
+        }
+        reverse(&self, covector, map, phases, None)
     }
 
     /// [definition; agent-inferred, October 10; the held-carry record §7j] **The return through the
@@ -907,11 +1135,15 @@ impl<'c> Word<'c> {
         &self,
         covector: &RatioCovector,
         map: &ExactRatMatrix,
-        lift: &BigInt,
         phases: &ReceivingPhases,
         world: &WorldAdjoint,
     ) -> Result<(WordReturn, ChangeCovector), HnnError> {
-        reverse(self, covector, map, lift, phases, Some(world))
+        if self.response().is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "a paired response through a responsive World requires its complete declared variation",
+            });
+        }
+        reverse(self, covector, map, phases, Some(world))
     }
 
     /// [definition; agent-inferred] **A continuing word's return** (U6's native generation; its
@@ -997,7 +1229,7 @@ struct Adjoint {
     resonator_state: Vec<Option<[Vec<Rat>; 2]>>,
     zetas: Vec<Vec<Rat>>,
     solved: Vec<Vec<Rat>>,
-    /// The receiving anchor's covector `P^(−τ)Rᵀg_j`, the return's source, carried from epoch to
+    /// The receiving anchor's covector `Rᵀg_j`, the return's source, carried from epoch to
     /// epoch in reverse.
     reads: Vec<Vec<Rat>>,
 }
@@ -1110,7 +1342,9 @@ impl WorldPort {
             let t = epoch.checked_sub(1).ok_or(HnnError::Unadmitted {
                 reason: "a compared station reads after a World step",
             })?;
-            let slot = face.get_mut(t).ok_or(HnnError::WordEnded { ticks: steps })?;
+            let slot = face
+                .get_mut(t)
+                .ok_or(HnnError::WordEnded { ticks: steps })?;
             let pulled = transpose.apply(&phi)?;
             *slot = Some(match slot.take() {
                 Some(held) => add(&held, &pulled),
@@ -1130,7 +1364,6 @@ fn reverse(
     word: &Word<'_>,
     covector: &RatioCovector,
     map: &ExactRatMatrix,
-    lift: &BigInt,
     phases: &ReceivingPhases,
     world: Option<&WorldAdjoint>,
 ) -> Result<(WordReturn, ChangeCovector), HnnError> {
@@ -1151,19 +1384,18 @@ fn reverse(
         });
     }
     let receiving = phases.ring();
-    let receiving_ring = field.ring(receiving);
     let map_t = map.transpose()?;
-    // The anchor covector of each receiving epoch: P^(−τ) Rᵀ g_j.
+    // The anchor covector of each receiving epoch: Rᵀ g_j (the read is in the passage frame).
     let mut reads = Vec::with_capacity(phases.aperture());
     let mut read_covector: Vec<Option<Vec<Rat>>> = vec![None; steps];
     for (j, epoch) in phases.epochs().enumerate() {
         let gradient = covector.logits()[j].clone();
         let pulled = apply_rows(&map_t, &gradient)?;
-        read_covector[epoch] = Some(receiving_ring.rotate(&pulled, &-lift));
+        read_covector[epoch] = Some(pulled);
         let anchor = word
             .anchor(epoch, receiving)
             .ok_or(HnnError::WordEnded { ticks: steps })?;
-        reads.push((receiving_ring.rotate(anchor, lift), gradient));
+        reads.push((anchor.to_vec(), gradient));
     }
     let anchors = read_covector
         .into_iter()
@@ -1176,6 +1408,66 @@ fn reverse(
     let (mut back, opening) = reverse_core_joined(word, anchors, None, world)?;
     back.reads = reads;
     Ok((back, opening))
+}
+
+/// Two same-cut response paths, with one seed precision and one joined material return.
+/// The returned opening dual belongs only to the actual interior, for held-momentum crossing.
+/// Responsive World coupling needs its explicit joined variation; this entry holds exterior
+/// overwrite values exactly as the producing schedule does.
+pub(crate) fn reverse_response(
+    word: &Word<'_>,
+    column: &crate::hnn::word::column::ResponseColumn,
+    gradients: &[Vec<Rat>],
+    map: &ExactRatMatrix,
+    phases: &ReceivingPhases,
+) -> Result<(WordReturn, ChangeCovector), HnnError> {
+    if gradients.len() != phases.aperture() || word.recorded().len() != phases.junction_steps() {
+        return Err(HnnError::Unadmitted {
+            reason: "paired receiving seeds use the executed aperture and crossings",
+        });
+    }
+    let rings = word.field().rings().len();
+    let steps = word.recorded().len();
+    let mut actual_seeds = vec![vec![None; rings]; steps];
+    let mut fresh_seeds = actual_seeds.clone();
+    let mut reads = Vec::with_capacity(gradients.len());
+    let mut seeds = Vec::with_capacity(2 * gradients.len());
+    for (j, crossing) in phases.epochs().enumerate() {
+        let (feature, actual, fresh) =
+            column.receiving_seed(word, crossing, phases.ring(), map, &gradients[j])?;
+        seeds.push(actual.clone());
+        seeds.push(fresh.clone());
+        actual_seeds[crossing][phases.ring()] = Some(actual);
+        fresh_seeds[crossing][phases.ring()] = Some(fresh);
+        reads.push((feature, gradients[j].clone()));
+    }
+    let precision = crate::hnn::chart::ReturnPrecision::for_seeds(
+        word.operands().lattice().map(|l| l.transient()),
+        &seeds,
+    )?;
+    let actual_view = crate::hnn::word::trajectory::TrajectoryView::actual(word);
+    let fresh_view = crate::hnn::word::trajectory::TrajectoryView::column(
+        word,
+        &column.records,
+        &column.resonances,
+    )?;
+    let (actual, opening) =
+        reverse_trajectory_joined_at(&actual_view, actual_seeds, None, None, precision.clone())?;
+    let (fresh, _) = reverse_trajectory_joined_at(&fresh_view, fresh_seeds, None, None, precision)?;
+    let mut joined = WordReturn::join_response(word.field(), actual, fresh, reads)?;
+    joined.response_defect = Some(PairedReadDefect {
+        fresh: phases
+            .epochs()
+            .map(|t| column.anchor_errors[t][phases.ring()].clone())
+            .collect(),
+        actual: word.response_actual_errors()?.map(|errors| {
+            phases
+                .epochs()
+                .map(|t| errors[t][phases.ring()].clone())
+                .collect()
+        }),
+    });
+    Ok((joined, opening))
 }
 
 /// [definition; agent-inferred, October 10; the held-carry record §7l] **The opening's crossing,
@@ -1288,30 +1580,89 @@ fn reverse_core(
             rings,
         });
     }
-    let anchors = read_covector.into_iter().map(|seed| {
-        let mut joined = vec![None; rings];
-        joined[receiving] = seed;
-        joined
-    }).collect();
+    let anchors = read_covector
+        .into_iter()
+        .map(|seed| {
+            let mut joined = vec![None; rings];
+            joined[receiving] = seed;
+            joined
+        })
+        .collect();
     reverse_core_joined(word, anchors, end, None)
 }
 
 fn reverse_core_joined(
     word: &Word<'_>,
-    mut read_covector: Vec<Vec<Option<Vec<Rat>>>>,
+    read_covector: Vec<Vec<Option<Vec<Rat>>>>,
     end: Option<&ChangeCovector>,
     world: Option<&WorldAdjoint>,
 ) -> Result<(WordReturn, ChangeCovector), HnnError> {
-    crate::hnn::word::work::reached(crate::hnn::word::work::Event::ReturnAttempt);
+    let mut seeds: Vec<Vec<Rat>> = read_covector
+        .iter()
+        .flatten()
+        .filter_map(|seed| seed.clone())
+        .collect();
+    if let Some(end) = end {
+        seeds.extend(end.storage.iter().cloned());
+        seeds.extend(end.arrivals.iter().flat_map(|pair| pair.iter().cloned()));
+        seeds.extend(end.states.iter().flat_map(|pair| pair.iter().cloned()));
+        seeds.extend(
+            end.resonators
+                .iter()
+                .flatten()
+                .flat_map(|pair| pair.iter().cloned()),
+        );
+    }
+    if let Some(world) = world {
+        seeds.extend(world.face.iter().flatten().cloned());
+    }
+    let precision = crate::hnn::chart::ReturnPrecision::for_seeds(
+        word.operands().lattice().map(|word| word.transient()),
+        &seeds,
+    )?;
+    reverse_core_joined_at(word, read_covector, end, world, precision)
+}
+
+fn reverse_core_joined_at(
+    word: &Word<'_>,
+    read_covector: Vec<Vec<Option<Vec<Rat>>>>,
+    end: Option<&ChangeCovector>,
+    world: Option<&WorldAdjoint>,
+    precision: crate::hnn::chart::ReturnPrecision,
+) -> Result<(WordReturn, ChangeCovector), HnnError> {
+    reverse_trajectory_joined_at(
+        &crate::hnn::word::trajectory::TrajectoryView::actual(word),
+        read_covector,
+        end,
+        world,
+        precision,
+    )
+}
+
+fn reverse_trajectory_joined_at(
+    word: &crate::hnn::word::trajectory::TrajectoryView<'_, '_>,
+    mut read_covector: Vec<Vec<Option<Vec<Rat>>>>,
+    end: Option<&ChangeCovector>,
+    world: Option<&WorldAdjoint>,
+    precision: crate::hnn::chart::ReturnPrecision,
+) -> Result<(WordReturn, ChangeCovector), HnnError> {
+    crate::hnn::word::work::reached(if word.is_response() {
+        crate::hnn::word::work::Event::ResponseReturnAttempt
+    } else {
+        crate::hnn::word::work::Event::ReturnAttempt
+    });
     let field = word.field();
     let operands = word.operands();
     let records = word.recorded();
     let steps = records.len();
-    if read_covector.len() != steps || read_covector.iter().any(|at| {
-        at.len() != field.rings().len() || at.iter().zip(field.rings()).any(|(seed, ring)| {
-            seed.as_ref().is_some_and(|seed| seed.len() != ring.width())
+    if read_covector.len() != steps
+        || read_covector.iter().any(|at| {
+            at.len() != field.rings().len()
+                || at.iter().zip(field.rings()).any(|(seed, ring)| {
+                    seed.as_ref().is_some_and(|seed| seed.len() != ring.width())
+                })
         })
-    }) {
+    {
         return Err(HnnError::Unadmitted {
             reason: "one matched anchor covector slot per executed crossing and ring",
         });
@@ -1319,7 +1670,7 @@ fn reverse_core_joined(
     if end.is_some() && word.is_ended() {
         return Err(HnnError::WordEnded { ticks: steps });
     }
-    let lattice = operands.lattice().map(|word| word.transient());
+    let lattice = precision.lattice();
     let h = operands.step().clone();
     let rings = operands.rings();
     let contacts = operands.contacts();
@@ -1455,17 +1806,19 @@ fn reverse_core_joined(
             {
                 *mu = add(mu, face);
             }
-            for returned in word.source_returns().iter().filter(|returned| returned.tick == t + 1) {
+            for returned in word
+                .source_returns()
+                .iter()
+                .filter(|returned| returned.tick == t + 1)
+            {
                 match (world, world_bar.as_mut()) {
                     (Some(world), Some(mu)) if world.ring == returned.ring => {
                         // [§7j] Through the World port: the returned wave b = P ξ + Q a overwrote
                         // the emitted wave a, and ξ′ = F ξ + G a.
                         let [f, g, p, q] = &world.charts[t];
                         let lambda = storage_bar[returned.ring].clone();
-                        let emitted = add(
-                            &q.transpose()?.apply(&lambda)?,
-                            &g.transpose()?.apply(mu)?,
-                        );
+                        let emitted =
+                            add(&q.transpose()?.apply(&lambda)?, &g.transpose()?.apply(mu)?);
                         *mu = add(&f.transpose()?.apply(mu)?, &p.transpose()?.apply(&lambda)?);
                         storage_bar[returned.ring] = emitted;
                     }
@@ -1710,13 +2063,17 @@ fn reverse_core_joined(
         // slots, its remainders and its conductance terms: the rings run together, and the
         // conductance terms are added afterwards in ring, then incidence, order.
         // The return's source enters at the receiving anchor on the transients' lattice.
-        let read_carried: Vec<_> = read_covector[t].iter_mut().enumerate().map(|(r, seed)| {
-            seed.take().map(|image| {
-                let (read, remainder) = split(lattice.as_ref(), image, &carried.reads[r]);
-                carried.reads[r] = remainder;
-                read
+        let read_carried: Vec<_> = read_covector[t]
+            .iter_mut()
+            .enumerate()
+            .map(|(r, seed)| {
+                seed.take().map(|image| {
+                    let (read, remainder) = split(lattice.as_ref(), image, &carried.reads[r]);
+                    carried.reads[r] = remainder;
+                    read
+                })
             })
-        }).collect();
+            .collect();
         let (arrival_carried, storage_carried) = (&carried.arrivals, &carried.storage);
         let swung = indexed(rings.len(), |r| {
             let junction = &junctions[r];
@@ -1813,7 +2170,11 @@ fn reverse_core_joined(
             .collect(),
         resonators: resonator_state_bar,
     };
-    crate::hnn::word::work::reached(crate::hnn::word::work::Event::Return);
+    crate::hnn::word::work::reached(if word.is_response() {
+        crate::hnn::word::work::Event::ResponseReturn
+    } else {
+        crate::hnn::word::work::Event::Return
+    });
     Ok((
         WordReturn {
             opening: storage_bar,
@@ -1823,7 +2184,109 @@ fn reverse_core_joined(
             conductance,
             reads: Vec::new(),
             released: carried.released(),
+            precision,
+            response_defect: None,
         },
         opening,
     ))
+}
+
+#[cfg(test)]
+mod adaptive_return_precision_tests {
+    use super::*;
+    use crate::hnn::chart::{ReturnPrecision, carry};
+    use crate::hnn::tests::support;
+    use num_traits::One;
+
+    #[test]
+    fn seed_driven_reverse_precision_reaches_source_without_changing_forward_word() {
+        let field = support::small_field(
+            &[2, 2, 2],
+            vec![support::contact(0, 1, 1, 0), support::contact(1, 2, 1, 0)],
+            2,
+        );
+        let theta = Constitution::initial(&field, 1 << 40).unwrap();
+        let current = Current::at_rest(&field);
+        let storage = field
+            .rings()
+            .iter()
+            .map(|ring| vec![Rat::zero(); ring.width()])
+            .collect();
+        let mut word = Word::open_on(&field, &theta, &current, storage).unwrap();
+        word.run(3).unwrap();
+        let before = word.change().unwrap();
+        let declared = field.word_lattice().unwrap().transient();
+        let tiny = Rat::new(BigInt::one(), BigInt::one() << 40usize);
+        let mut seed = vec![Rat::zero(); field.ring(2).width()];
+        seed[0] = tiny.clone();
+        let mut seeds = vec![vec![None; field.rings().len()]; 3];
+        seeds[2][2] = Some(seed.clone());
+        let baseline_precision = ReturnPrecision::for_seeds(Some(declared), &[]).unwrap();
+        let (coarse, _) =
+            reverse_core_joined_at(&word, seeds.clone(), None, None, baseline_precision.clone())
+                .unwrap();
+        assert!(coarse.opening.iter().flatten().all(Zero::is_zero));
+        assert!(coarse.released.total > Rat::zero());
+        let (fine, _) = reverse_core_joined(&word, seeds, None, None).unwrap();
+        assert_eq!(fine.precision.levels(), 40);
+        assert!(
+            fine.opening[0].iter().any(|x| !x.is_zero()),
+            "a tiny transported receiver seed reaches the actual source"
+        );
+        assert_eq!(
+            word.change().unwrap(),
+            before,
+            "return refinement cannot create a forward signal"
+        );
+        // Same exact rechart as the device realization: normalize the seed, keep the declared
+        // lattice, then decode only cotangents. Primal recorded operands never scale.
+        let mut unit = vec![Rat::zero(); field.ring(2).width()];
+        unit[0] = Rat::one();
+        let mut normalized = vec![vec![None; field.rings().len()]; 3];
+        normalized[2][2] = Some(unit);
+        let (scaled, _) =
+            reverse_core_joined_at(&word, normalized, None, None, baseline_precision).unwrap();
+        for (actual, unit) in fine
+            .opening
+            .iter()
+            .flatten()
+            .zip(scaled.opening.iter().flatten())
+        {
+            assert_eq!(actual, &(unit * &tiny));
+        }
+        assert_eq!(fine.released.total, &scaled.released.total * &tiny);
+        assert_eq!(fine.released.largest, &scaled.released.largest * &tiny);
+    }
+
+    #[test]
+    fn return_precision_preserves_mixed_seed_groups_and_signed_tie_accounting() {
+        let at = Lattice::new(14);
+        let tiny = Rat::new(BigInt::one(), BigInt::one() << 40usize);
+        let reading = ReturnPrecision::for_seeds(
+            Some(at),
+            &[vec![Rat::one()], vec![-tiny.clone()], vec![Rat::zero()]],
+        )
+        .unwrap();
+        assert_eq!(reading.levels(), 40);
+        assert_eq!(reading.seed_groups(), 2);
+        assert_eq!(reading.lattice().unwrap().exponent(), 54);
+        let factor = Rat::from_integer(BigInt::one() << 40usize);
+        for sign in [-1i64, 1] {
+            let value = crate::ratio::integer(sign) * reading.lattice().unwrap().unit()
+                / crate::ratio::integer(2);
+            let mut fine_rem = vec![Rat::zero()];
+            let fine = carry(&reading.lattice().unwrap(), &[value.clone()], &mut fine_rem);
+            let mut scaled_rem = vec![Rat::zero()];
+            let scaled = carry(&at, &[&value * &factor], &mut scaled_rem);
+            assert_eq!(scaled[0], &fine[0] * &factor);
+            assert_eq!(scaled_rem[0], &fine_rem[0] * &factor);
+            assert_eq!(&fine[0] + &fine_rem[0], value);
+        }
+        assert_eq!(
+            ReturnPrecision::for_seeds(None, &[vec![tiny]])
+                .unwrap()
+                .levels(),
+            0
+        );
+    }
 }

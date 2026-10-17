@@ -168,7 +168,13 @@ fn material_work_at_reached_point_and_successor_delegation_agree() {
         direct.step().unwrap()
     );
     assert_eq!(
-        delegated.forward.present().unwrap().reached().state().commit,
+        delegated
+            .forward
+            .present()
+            .unwrap()
+            .reached()
+            .state()
+            .commit,
         2
     );
     assert!(

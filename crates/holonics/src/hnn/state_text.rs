@@ -15,7 +15,11 @@ pub(crate) fn refused<T>(what: &'static str) -> Result<T, HnnError> {
 }
 
 /// A line's words after its key, refused when the key differs.
-pub(crate) fn keyed<'a>(line: &'a str, key: &str, what: &'static str) -> Result<Vec<&'a str>, HnnError> {
+pub(crate) fn keyed<'a>(
+    line: &'a str,
+    key: &str,
+    what: &'static str,
+) -> Result<Vec<&'a str>, HnnError> {
     let mut words = line.split_whitespace();
     if words.next() != Some(key) {
         return refused(what);

@@ -87,7 +87,10 @@ impl ContextTree {
     /// address reaches exactly one of them.
     pub fn new(alphabet: usize, leaves: Vec<Vec<usize>>) -> Result<Self, TerrainError> {
         if alphabet < 2 {
-            return Err(refuse("a context tree", "its alphabet needs at least two letters"));
+            return Err(refuse(
+                "a context tree",
+                "its alphabet needs at least two letters",
+            ));
         }
         let declared: HashSet<Vec<usize>> = leaves.iter().cloned().collect();
         if declared.len() != leaves.len()
@@ -392,9 +395,7 @@ impl TreeSource {
         }
         if numerators.len() != tree.leaves.len()
             || numerators.iter().any(|face| {
-                face.len() != tree.alphabet
-                    || face.contains(&0)
-                    || face.iter().sum::<u64>() != grid
+                face.len() != tree.alphabet || face.contains(&0) || face.iter().sum::<u64>() != grid
             })
         {
             return Err(refuse(
@@ -538,7 +539,9 @@ impl TreeSource {
         let rate_bits = rate.enclosure()?;
         Ok(TreeSourceTruth {
             leaves: self.tree.leaves(),
-            faces: (0..self.tree.leaves.len()).map(|leaf| self.face(leaf)).collect(),
+            faces: (0..self.tree.leaves.len())
+                .map(|leaf| self.face(leaf))
+                .collect(),
             stationary,
             rate,
             rate_bits,
@@ -638,7 +641,10 @@ impl TreeSource {
             if uniform[node].is_some() {
                 break;
             }
-            node = self.tree.nodes[node].children.as_ref().expect("a split node")[letter];
+            node = self.tree.nodes[node]
+                .children
+                .as_ref()
+                .expect("a split node")[letter];
         }
         self.tree.nodes[node].context.len()
     }

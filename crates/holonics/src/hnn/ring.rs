@@ -324,6 +324,8 @@
 //! | `HNN/BankFace.flip_reflection` (the executed turn reads a passage and its conjugate alike) | [`ReceivingBank::read_turn`] (the owner's test); the face's other laws have no Rust consumer since batch H |
 //! | `HNN/ExecutedComparison.{product_deriv, simple_root_deriv, log_modulus_deriv}` (the executed growth's covector) | [`ReceivingBank::read_turn_covector`], [`ReceivingBank::turn_variation`], [`ReceivingBank::directional_routes`], [`dominant_multiplier`] |
 
+pub mod modes;
+
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
@@ -1438,7 +1440,10 @@ impl ResonatorOperands {
         let (r0, r1) = (rate(Rat::zero())?, rate(Rat::one())?);
         let m0 = &r1[coordinate] - &r0[coordinate];
         let hop = &self.step;
-        let (w0, wm) = (integer(2) * &r0[coordinate] - &state[1][coordinate], integer(2) * &m0);
+        let (w0, wm) = (
+            integer(2) * &r0[coordinate] - &state[1][coordinate],
+            integer(2) * &m0,
+        );
         let (u0, um) = (&state[0][coordinate] + hop * &r0[coordinate], hop * &m0);
         let (mut lo, mut hi) = range;
         let mut bound = |a: &Rat, b: &Rat, side: i8| {
@@ -1785,14 +1790,19 @@ impl ResonatorOperands {
         lattice: Option<&Lattice>,
     ) -> Result<Vec<Rat>, HnnError> {
         let n = self.width();
-        if [before[0], before[1], after[0], after[1]].iter().any(|v| v.len() != n) {
+        if [before[0], before[1], after[0], after[1]]
+            .iter()
+            .any(|v| v.len() != n)
+        {
             return Err(HnnError::Shape {
                 what: "a resonator's states read backwards (the ring's realified width)",
                 expected: n,
                 found: before[0].len(),
             });
         }
-        if self.material.saturation.is_some() || self.phases[self.phase_at(tick)].loaded_law.is_some() {
+        if self.material.saturation.is_some()
+            || self.phases[self.phase_at(tick)].loaded_law.is_some()
+        {
             return Err(HnnError::Resonator {
                 ring: self.ring,
                 what: "the tick is read backwards only on the linear law",

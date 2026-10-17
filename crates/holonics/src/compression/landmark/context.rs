@@ -695,6 +695,12 @@ pub enum ContextError {
     },
     #[error("cell code {code} lies outside the exterior chart of {alphabet}")]
     CellOutside { code: usize, alphabet: usize },
+    #[error("a maximum-mass observation must contain at least one class")]
+    EmptyObservation,
+    #[error("maximum-mass set contains class {class} more than once")]
+    DuplicateObservationClass { class: usize },
+    #[error("the observation context's {what} extent overflowed")]
+    ExtentOverflow { what: &'static str },
     #[error("the tree's declared population and grain must be positive")]
     NonpositiveDeclaration,
     #[error(
@@ -742,6 +748,201 @@ impl Letter {
             Letter::Boundary => None,
             Letter::Cell(code) | Letter::Bundle(Bundle { cell: code, .. }) => Some(code),
         }
+    }
+}
+
+/// [definition; agent-inferred] One binary letter of a receiver's observation. This is a
+/// tree-context symbol, not a source tick and never advances an `ActiveAddress`.
+/// - `MaximumMass`: a class's membership in the maximum-mass set of the receiving wave.
+/// - `Section`: one polarized side reading of a plane point at the receiving section, its rest
+///   flag or one of its two half-turn sheets (`hnn::receiving::ObservationPartition`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum ObservationLetter {
+    MaximumMass(bool),
+    Section(bool),
+}
+
+impl ObservationLetter {
+    /// The letter's symbol: `0` when absent (or on the near sheet) and `1` when present.
+    pub fn code(self) -> u32 {
+        match self {
+            Self::MaximumMass(false) | Self::Section(false) => 0,
+            Self::MaximumMass(true) | Self::Section(true) => 1,
+        }
+    }
+}
+
+/// [definition; agent-inferred, L3] **How a tree reads its observation letters.**
+/// - `Route`: the letters lead each address and are forced, so each observed path is its own
+///   region of the tree and the declared stop prior starts after them (the maximum-mass
+///   context's law).
+/// - `Refine`: the letters follow the causal letters and are mixed under the declared stop prior
+///   at their own depths, so the tree may stop before them. The causal tree is then a pruning of
+///   the observed one: a causal leaf at depth `D` becomes a mixing node whose weighted face is at
+///   least `w_D` times its own, so the observed tree's ideal code is at most the causal tree's
+///   plus `−log₂ w_D` for each causal context the passage reached at depth `D` (one bit at the
+///   half law; the statement is owed in #62). A refining observation can therefore carry many
+///   letters without partitioning the arrivals into one region per observed path (the recorded
+///   index-of-contexts failure).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum ObservationRole {
+    Route,
+    Refine,
+}
+
+impl ObservationRole {
+    /// The forced depths of branch `branch` (the declared forced splits apply to the cell
+    /// branch's causal letters): a routing prefix adds its letters to them.
+    fn forced(self, declared: usize, bits: usize, branch: usize) -> Option<usize> {
+        let causal = if branch == 0 { declared } else { 0 };
+        match self {
+            Self::Route => causal.checked_add(bits),
+            Self::Refine => Some(causal),
+        }
+    }
+
+    /// The declared stop prior's depth that tree depth `at` reads: a routing prefix shifts the
+    /// schedule past its letters, a refining suffix reads it at its own depth.
+    fn prior_depth(self, bits: usize, at: usize) -> usize {
+        match self {
+            Self::Route => at.saturating_sub(bits),
+            Self::Refine => at,
+        }
+    }
+
+    /// One branch's letters: the observation before the causal letters, or after them.
+    fn join(self, observation: &[u32], causal: Vec<u32>) -> Vec<u32> {
+        match self {
+            Self::Route => observation.iter().copied().chain(causal).collect(),
+            Self::Refine => causal
+                .into_iter()
+                .chain(observation.iter().copied())
+                .collect(),
+        }
+    }
+}
+
+/// A checked, canonical membership path for one receiver phase's maximum-mass class set. Its bits
+/// are kept distinct from causal [`Letter`]s and are supplied by the HNN receiver from the wave
+/// face. The tree checks the declared width when the path is read or deposited; provenance is
+/// bound by the receiver's pending comparison, not by this value type.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct ObservationPath {
+    letters: Vec<ObservationLetter>,
+}
+
+impl ObservationPath {
+    /// Construct from a dense membership vector. The vector must describe a nonempty subset;
+    /// callers obtain it from the face's exact maximum-mass classes, with ties preserved.
+    pub fn from_membership_bits(bits: Vec<bool>) -> Result<Self, ContextError> {
+        if bits.is_empty() {
+            return Err(ContextError::Extent {
+                what: "a maximum-mass observation's class alphabet",
+                expected: 1,
+                found: 0,
+            });
+        }
+        if !bits.iter().any(|&member| member) {
+            return Err(ContextError::EmptyObservation);
+        }
+        Ok(Self {
+            letters: bits
+                .into_iter()
+                .map(ObservationLetter::MaximumMass)
+                .collect(),
+        })
+    }
+
+    /// Construct from a receiving section's side readings, in their declared order. Every
+    /// binary path of positive width is a reading (all points on their near sheets included).
+    pub fn from_section_bits(bits: Vec<bool>) -> Result<Self, ContextError> {
+        if bits.is_empty() {
+            return Err(ContextError::Extent {
+                what: "a section observation's letters",
+                expected: 1,
+                found: 0,
+            });
+        }
+        Ok(Self {
+            letters: bits.into_iter().map(ObservationLetter::Section).collect(),
+        })
+    }
+
+    /// Construct the canonical membership vector of a finite maximum-mass set.
+    pub fn from_maximum_mass_classes(
+        alphabet: usize,
+        classes: &[usize],
+    ) -> Result<Self, ContextError> {
+        if alphabet == 0 {
+            return Err(ContextError::Extent {
+                what: "a maximum-mass observation's class alphabet",
+                expected: 1,
+                found: 0,
+            });
+        }
+        if classes.is_empty() {
+            return Err(ContextError::EmptyObservation);
+        }
+        let mut bits = vec![false; alphabet];
+        for &class in classes {
+            if class >= alphabet {
+                return Err(ContextError::CellOutside {
+                    code: class,
+                    alphabet,
+                });
+            }
+            if std::mem::replace(&mut bits[class], true) {
+                return Err(ContextError::DuplicateObservationClass { class });
+            }
+        }
+        Self::from_membership_bits(bits)
+    }
+
+    /// The context's fixed class-alphabet width.
+    pub fn len(&self) -> usize {
+        self.letters.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.letters.is_empty()
+    }
+
+    /// The typed binary letters in class order.
+    pub fn letters(&self) -> &[ObservationLetter] {
+        &self.letters
+    }
+
+    /// The dense membership vector in class order.
+    pub fn membership_bits(&self) -> Vec<bool> {
+        self.letters
+            .iter()
+            .map(|letter| letter.code() == 1)
+            .collect()
+    }
+}
+
+/// A tree-only address: the receiver observation followed by the unchanged causal tick
+/// suffix. It is deliberately separate from [`Letter`] and is never installed in a source reader.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct ObservedAddress {
+    observation: ObservationPath,
+    causal: Vec<Letter>,
+}
+
+impl ObservedAddress {
+    pub fn new(observation: ObservationPath, causal: Vec<Letter>) -> Self {
+        Self {
+            observation,
+            causal,
+        }
+    }
+
+    pub fn observation(&self) -> &ObservationPath {
+        &self.observation
+    }
+
+    pub fn causal(&self) -> &[Letter] {
+        &self.causal
     }
 }
 
@@ -1236,6 +1437,62 @@ impl LandmarkDeclaration {
         } else {
             depths.iter().map(|&d| d as u64).sum::<u64>() + 2
         }
+    }
+
+    /// The branch depths when each address is prefixed by `observation_bits` typed binary
+    /// observation letters. Observation letters do not carry feature slots, so the prefix adds
+    /// once to each branch rather than multiplying by the bundle family's slot count.
+    fn branch_depths_with_observation(
+        &self,
+        observation_bits: usize,
+    ) -> Result<Vec<usize>, ContextError> {
+        let cell_depth =
+            self.depth
+                .checked_add(observation_bits)
+                .ok_or(ContextError::ExtentOverflow {
+                    what: "cell-branch depth",
+                })?;
+        if self.family.is_empty() {
+            Ok(vec![cell_depth])
+        } else {
+            let causal_bundle_depth = self
+                .depth
+                .checked_mul(1usize.checked_add(self.family.slots()).ok_or(
+                    ContextError::ExtentOverflow {
+                        what: "bundle slot count",
+                    },
+                )?)
+                .ok_or(ContextError::ExtentOverflow {
+                    what: "causal bundle-branch depth",
+                })?;
+            let bundle_depth = causal_bundle_depth.checked_add(observation_bits).ok_or(
+                ContextError::ExtentOverflow {
+                    what: "observed bundle-branch depth",
+                },
+            )?;
+            Ok(vec![cell_depth, bundle_depth])
+        }
+    }
+
+    /// The widths' path-depth operand with a binary observation prefix in each branch.
+    fn path_depth_with_observation(&self, observation_bits: usize) -> Result<u64, ContextError> {
+        let depths = self.branch_depths_with_observation(observation_bits)?;
+        let mut total = 0u64;
+        for depth in depths.iter().copied() {
+            total = total
+                .checked_add(
+                    u64::try_from(depth).map_err(|_| ContextError::ExtentOverflow {
+                        what: "path-depth conversion",
+                    })?,
+                )
+                .ok_or(ContextError::ExtentOverflow { what: "path depth" })?;
+        }
+        if depths.len() > 1 {
+            total = total.checked_add(2).ok_or(ContextError::ExtentOverflow {
+                what: "joined path depth",
+            })?;
+        }
+        Ok(total)
     }
 
     /// **Each branch's summed rungs from the root** (stored where paths part): `sums[b][d] = Σ_(i<d, i ≥ f_b) j_i`
@@ -1962,7 +2219,13 @@ trait Topology {
     /// The node's face of `b` at the declared base ([`BaseMeasure`]), its digit tree's root the
     /// path's first node `root`: `Even` reads the masses `(m_b, M)`, `Root` reads
     /// `(16 m_b − 16 + 2·16π_b, 16M)`, the masses `2^j n_b + 1` re-split by the base.
-    fn kt_based(&self, node: u32, symbol: usize, root: Option<u32>, base: BaseMeasure) -> (u64, u64) {
+    fn kt_based(
+        &self,
+        node: u32,
+        symbol: usize,
+        root: Option<u32>,
+        base: BaseMeasure,
+    ) -> (u64, u64) {
         match base {
             BaseMeasure::Even => self.kt(node, symbol),
             BaseMeasure::Root => {
@@ -2163,34 +2426,67 @@ impl Nodes {
 /// each join's chart, and the rebases, releases and cells passed. Its law is the declared
 /// opening's, so the standing is placed back on it ([`Landmarks::with_standing`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct TreeStanding(Nodes);
+pub struct TreeStanding {
+    nodes: Nodes,
+    observation_bits: usize,
+    observation_role: ObservationRole,
+}
 
 impl TreeStanding {
-    /// **The standing as text**, every value exact: `tree R N L C J rebases releases passed` (roots,
-    /// nodes, labels, children, joins), the roots on one line (`-` for an empty tree), one line a
-    /// node (its depth word, its two half-unit masses, its label end and its chart), the labels on
-    /// one line, one line a child (its key and node, in key order), and one line a join's chart. A
-    /// chart is `numerator denominator exponent stop rebases drift excess`.
+    /// **The standing as text**, every value exact:
+    /// `tree R N L C J rebases releases passed [obs [forced]]` (roots, nodes, labels, children,
+    /// joins). The optional ninth value is the positive observation width; width zero keeps the
+    /// causal header. A routing prefix forces all its letters and keeps the nine-value head; a
+    /// refining suffix writes a tenth value, its forced letters, zero. The roots are on one line
+    /// (`-` for an empty tree), one line a node (its depth word, its two half-unit masses, its label
+    /// end and its chart), the labels on one line, one line a child (its key and node, in key
+    /// order), and one line a join's chart. A chart is
+    /// `numerator denominator exponent stop rebases drift excess`.
     pub fn write(&self, s: &mut String) {
-        let nodes = &self.0;
+        let nodes = &self.nodes;
         let arena = &nodes.arena;
         let chart = |c: &Chart| {
             format!(
                 "{} {} {} {} {} {} {}",
-                c.beta.numerator, c.beta.denominator, c.beta.exponent, c.stop, c.rebases, c.drift, c.excess
+                c.beta.numerator,
+                c.beta.denominator,
+                c.beta.exponent,
+                c.stop,
+                c.rebases,
+                c.drift,
+                c.excess
             )
         };
-        *s += &format!(
-            "tree {} {} {} {} {} {} {} {}\n",
-            arena.roots.len(),
-            arena.depths.len(),
-            arena.letters.len(),
-            arena.children.len(),
-            nodes.joins.len(),
-            nodes.rebases,
-            nodes.releases,
-            nodes.passed
-        );
+        if self.observation_bits == 0 {
+            *s += &format!(
+                "tree {} {} {} {} {} {} {} {}\n",
+                arena.roots.len(),
+                arena.depths.len(),
+                arena.letters.len(),
+                arena.children.len(),
+                nodes.joins.len(),
+                nodes.rebases,
+                nodes.releases,
+                nodes.passed
+            );
+        } else {
+            *s += &format!(
+                "tree {} {} {} {} {} {} {} {} {}{}\n",
+                arena.roots.len(),
+                arena.depths.len(),
+                arena.letters.len(),
+                arena.children.len(),
+                nodes.joins.len(),
+                nodes.rebases,
+                nodes.releases,
+                nodes.passed,
+                self.observation_bits,
+                match self.observation_role {
+                    ObservationRole::Route => "",
+                    ObservationRole::Refine => " 0",
+                }
+            );
+        }
         let roots: Vec<String> = arena
             .roots
             .iter()
@@ -2255,13 +2551,29 @@ impl TreeStanding {
             lines.next().and_then(|line| line.strip_prefix("tree ")),
             "the tree's head",
         )?;
-        let [roots, n, held, children, joins, rebases, releases, passed] = head[..] else {
-            return Err("the tree's head");
+        let observation_role = match head.len() {
+            8 | 9 => ObservationRole::Route,
+            10 if head[8] > 0 && head[9] == 0 => ObservationRole::Refine,
+            _ => return Err("the tree's head"),
         };
+        let [roots, n, held, children, joins, rebases, releases, passed] = [
+            head[0], head[1], head[2], head[3], head[4], head[5], head[6], head[7],
+        ];
+        let observation_bits = if head.len() >= 9 { head[8] } else { 0 };
         let count = |x: u64| usize::try_from(x).map_err(|_| "the tree's head");
-        let (roots, n, held, children, joins) =
-            (count(roots)?, count(n)?, count(held)?, count(children)?, count(joins)?);
-        let root_words: Vec<&str> = lines.next().ok_or("the tree's roots")?.split_whitespace().collect();
+        let (roots, n, held, children, joins, observation_bits) = (
+            count(roots)?,
+            count(n)?,
+            count(held)?,
+            count(children)?,
+            count(joins)?,
+            count(observation_bits)?,
+        );
+        let root_words: Vec<&str> = lines
+            .next()
+            .ok_or("the tree's roots")?
+            .split_whitespace()
+            .collect();
         if root_words.len() != roots {
             return Err("the tree's roots");
         }
@@ -2276,7 +2588,11 @@ impl TreeStanding {
         arena.roots = roots;
         let mut charts = Vec::with_capacity(n);
         for _ in 0..n {
-            let words: Vec<&str> = lines.next().ok_or("a tree's node")?.split_whitespace().collect();
+            let words: Vec<&str> = lines
+                .next()
+                .ok_or("a tree's node")?
+                .split_whitespace()
+                .collect();
             if words.len() != 11 {
                 return Err("a tree's node");
             }
@@ -2302,18 +2618,36 @@ impl TreeStanding {
         }
         let joins = (0..joins)
             .map(|_| {
-                let words: Vec<&str> = lines.next().ok_or("a tree's join")?.split_whitespace().collect();
+                let words: Vec<&str> = lines
+                    .next()
+                    .ok_or("a tree's join")?
+                    .split_whitespace()
+                    .collect();
                 chart(&words, "a tree's join")
             })
             .collect::<Result<Vec<Chart>, _>>()?;
-        Ok(Self(Nodes {
-            arena,
-            charts,
-            joins,
-            rebases,
-            releases,
-            passed,
-        }))
+        Ok(Self {
+            nodes: Nodes {
+                arena,
+                charts,
+                joins,
+                rebases,
+                releases,
+                passed,
+            },
+            observation_bits,
+            observation_role,
+        })
+    }
+
+    /// The tree law's observation width, `0` for causal-only standings.
+    pub fn observation_width(&self) -> usize {
+        self.observation_bits
+    }
+
+    /// The tree law's observation role (a causal-only standing reads as routing none).
+    pub fn observation_role(&self) -> ObservationRole {
+        self.observation_role
     }
 }
 
@@ -2656,7 +2990,9 @@ fn check_declaration(declaration: &LandmarkDeclaration) -> Result<(), ContextErr
     }
     if declaration.mass == 0
         || declaration.mass >= 32
-        || u64::from(u32::MAX).checked_shr(declaration.mass).is_none_or(|top| declaration.population >= top / 2)
+        || u64::from(u32::MAX)
+            .checked_shr(declaration.mass)
+            .is_none_or(|top| declaration.population >= top / 2)
         || declaration.grain > u64::from(u32::MAX)
     {
         return Err(shape(
@@ -2920,6 +3256,101 @@ struct Branch {
     forced: usize,
 }
 
+/// The branches of a tree whose addresses carry `bits` observation letters in `role`, refused
+/// where a branch's forced depths pass its depth (the executed tree's and the ideal tree's one
+/// law).
+fn observed_branches(
+    declaration: &LandmarkDeclaration,
+    bits: usize,
+    role: ObservationRole,
+) -> Result<Vec<Branch>, ContextError> {
+    declaration
+        .branch_depths_with_observation(bits)?
+        .into_iter()
+        .enumerate()
+        .map(|(branch, depth)| {
+            let forced = role.forced(declaration.forced, bits, branch).ok_or(
+                ContextError::ExtentOverflow {
+                    what: "observed forced depth",
+                },
+            )?;
+            if forced > depth {
+                return Err(shape(
+                    "forced splits within the observed branch depth",
+                    depth,
+                    forced,
+                ));
+            }
+            Ok(Branch { depth, forced })
+        })
+        .collect()
+}
+
+/// Each branch's summed rungs from the root, `Σ_(i<d, i ≥ forced) j_(prior depth of i)`.
+fn observed_sums(
+    declaration: &LandmarkDeclaration,
+    bits: usize,
+    role: ObservationRole,
+    branches: &[Branch],
+) -> Vec<Vec<u64>> {
+    branches
+        .iter()
+        .map(|branch| {
+            let mut sums = vec![0u64; branch.depth + 1];
+            for at in 0..branch.depth {
+                let rung = if at >= branch.forced {
+                    u64::from(declaration.prior.rung(role.prior_depth(bits, at)))
+                } else {
+                    0
+                };
+                sums[at + 1] = sums[at] + rung;
+            }
+            sums
+        })
+        .collect()
+}
+
+/// Each branch's letters of an observed address: the observation's codes joined to the causal
+/// cells (the cell branch) or to the flattened bundles (the bundle branch) by `role`.
+fn observed_letters(
+    declaration: &LandmarkDeclaration,
+    bits: usize,
+    role: ObservationRole,
+    address: &ObservedAddress,
+) -> Result<Vec<Vec<u32>>, ContextError> {
+    if address.observation.len() != bits {
+        return Err(ContextError::Extent {
+            what: "the observed address's observation letters",
+            expected: bits,
+            found: address.observation.len(),
+        });
+    }
+    check(declaration, &address.causal, 0)?;
+    let observation = address
+        .observation
+        .letters()
+        .iter()
+        .copied()
+        .map(ObservationLetter::code)
+        .collect::<Vec<_>>();
+    let cell = address
+        .causal
+        .iter()
+        .map(|letter| letter.code() as u32)
+        .collect();
+    if declaration.family.is_empty() {
+        return Ok(vec![role.join(&observation, cell)]);
+    }
+    let mut bundle = Vec::new();
+    for &letter in &address.causal {
+        declaration.family.flatten_into(letter, &mut bundle);
+    }
+    Ok(vec![
+        role.join(&observation, cell),
+        role.join(&observation, bundle),
+    ])
+}
+
 /// The tree's law, apart from its standing: the declaration, its derived widths, the odometer, the
 /// branches, the founding chart at each depth (the declared stop prior's `β₀ = 2^(j_d) − 1` with
 /// its stop weight `λ̂ = ⟦1 − 2^(−j_d)⟧`), each branch's summed rungs from the root
@@ -2930,6 +3361,11 @@ struct Branch {
 struct Law {
     declaration: LandmarkDeclaration,
     widths: Widths,
+    /// One binary observation path per branch; it is not part of the source tick declaration.
+    observation_bits: usize,
+    /// Where the observation path sits in each branch and whether it is mixed.
+    observation_role: ObservationRole,
+    path_depth: u64,
     odometer: Odometer,
     branches: Vec<Branch>,
     founding: Vec<Chart>,
@@ -2997,21 +3433,19 @@ fn carry_ratio(
 }
 
 impl Law {
-    fn new(declaration: LandmarkDeclaration, widths: Widths) -> Self {
+    fn new(
+        declaration: LandmarkDeclaration,
+        widths: Widths,
+        observation_bits: usize,
+        observation_role: ObservationRole,
+        path_depth: u64,
+    ) -> Self {
         let odometer = Odometer {
             alphabet: declaration.alphabet,
             digits: widths.digits,
         };
-        let branches = declaration
-            .branch_depths()
-            .into_iter()
-            .enumerate()
-            .map(|(branch, depth)| Branch {
-                depth,
-                forced: if branch == 0 { declaration.forced } else { 0 },
-            })
-            .collect::<Vec<Branch>>();
-        let deepest = branches.iter().map(|b| b.depth).max().unwrap_or(0);
+        let branches = observed_branches(&declaration, observation_bits, observation_role)
+            .expect("observed branches were checked by the constructor");
         let chart_of = |ratio: u64| {
             let beta = Beta {
                 numerator: ratio,
@@ -3028,15 +3462,25 @@ impl Law {
         };
         // `β₀ = 2^(j_d) − 1`, odd, carried exactly: within `W` bits at every mixing depth (the
         // declaration is refused otherwise), and never stepped at a leaf.
+        let deepest = branches.iter().map(|b| b.depth).max().unwrap_or(0);
         let founding = (0..=deepest)
-            .map(|depth| chart_of(declaration.prior.founding(depth)))
+            .map(|depth| {
+                chart_of(
+                    declaration
+                        .prior
+                        .founding(observation_role.prior_depth(observation_bits, depth)),
+                )
+            })
             .collect();
-        let sums = declaration.rung_sums();
+        let sums = observed_sums(&declaration, observation_bits, observation_role, &branches);
         let ceiling = declaration.capacity.ceiling_halves();
         let unit = 1u32 << declaration.mass;
         Self {
             declaration,
             widths,
+            observation_bits,
+            observation_role,
+            path_depth,
             odometer,
             branches,
             founding,
@@ -3060,7 +3504,7 @@ impl Law {
 
     /// The path depth the widths' rule reads: the declaration's `P`.
     fn path_depth(&self) -> u64 {
-        self.declaration.path_depth()
+        self.path_depth
     }
 
     /// Tree `t = branch · 2^B + h`.
@@ -3071,6 +3515,24 @@ impl Law {
     /// **Each branch's letters** of an address: the cells, then the flattened bundles.
     fn flatten(&self, address: &[Letter]) -> Vec<Vec<u32>> {
         self.declaration.letters(address)
+    }
+
+    /// Each branch's typed observation letters joined to its unchanged causal letters, before
+    /// them (a routing prefix) or after them (a refining suffix).
+    fn flatten_observed(&self, address: &ObservedAddress) -> Result<Vec<Vec<u32>>, ContextError> {
+        if self.observation_bits == 0 {
+            return Err(ContextError::Extent {
+                what: "an observed address for an observation-free tree",
+                expected: 0,
+                found: address.observation.len(),
+            });
+        }
+        observed_letters(
+            &self.declaration,
+            self.observation_bits,
+            self.observation_role,
+            address,
+        )
     }
 
     /// `⟦2^M u/v⟧`: the lattice numerator nearest `u/v` (ties up), inside `[1, 2^M − 1]`.
@@ -3335,10 +3797,19 @@ impl Law {
     /// Every digit a class opens, read at the standing.
     fn reads(&self, nodes: &impl Standing, address: &[Letter], class: usize) -> Vec<DigitRead> {
         let letters = self.flatten(address);
+        self.reads_flat(nodes, &letters, class)
+    }
+
+    fn reads_flat(
+        &self,
+        nodes: &impl Standing,
+        letters: &[Vec<u32>],
+        class: usize,
+    ) -> Vec<DigitRead> {
         self.odometer
             .emitted(class)
             .into_iter()
-            .map(|(dyadic, symbol)| self.digit(nodes, dyadic, symbol, &letters))
+            .map(|(dyadic, symbol)| self.digit(nodes, dyadic, symbol, letters))
             .collect()
     }
 
@@ -3443,11 +3914,15 @@ impl Law {
     /// face, heap-ordered.
     fn splits(&self, nodes: &impl Standing, address: &[Letter]) -> Splits {
         let letters = self.flatten(address);
+        self.splits_flat(nodes, &letters)
+    }
+
+    fn splits_flat(&self, nodes: &impl Standing, letters: &[Vec<u32>]) -> Splits {
         let numerators = self
             .odometer
             .splitting()
             .into_iter()
-            .map(|dyadic| self.digit(nodes, dyadic, 0, &letters).face)
+            .map(|dyadic| self.digit(nodes, dyadic, 0, letters).face)
             .collect();
         Splits {
             face_bits: self.widths.face,
@@ -3636,12 +4111,22 @@ impl Law {
         digits: Vec<DigitRead>,
         admitted: u64,
     ) -> Result<Vec<u128>, ContextError> {
+        let letters = self.flatten(address);
+        self.apply_flat(nodes, &letters, digits, admitted)
+    }
+
+    fn apply_flat(
+        &self,
+        nodes: &mut impl Standing,
+        letters: &[Vec<u32>],
+        digits: Vec<DigitRead>,
+        admitted: u64,
+    ) -> Result<Vec<u128>, ContextError> {
         if nodes.passed() >= admitted {
             return Err(ContextError::PopulationReached {
                 population: self.declaration.population,
             });
         }
-        let letters = self.flatten(address);
         let founding: usize = letters.iter().map(|l| l.len() + 1).sum();
         let held: usize = letters.iter().map(Vec::len).sum();
         nodes.founded_within(digits.len() * founding, held)?;
@@ -3720,6 +4205,38 @@ impl Landmarks {
         Self::with_widths(declaration, widths)
     }
 
+    /// Declare a tree whose per-phase addresses have a typed binary observation prefix before
+    /// their causal letters, forced ([`ObservationRole::Route`]). The prefix is sparse: only
+    /// submitted paths are materialized, and its width contributes once to every branch's
+    /// path-depth bound.
+    pub fn new_with_observation(
+        declaration: LandmarkDeclaration,
+        observation_bits: usize,
+    ) -> Result<Self, ContextError> {
+        Self::new_observed(declaration, observation_bits, ObservationRole::Route)
+    }
+
+    /// **Declare a tree whose addresses carry `observation_bits` observation letters** in `role`
+    /// ([`ObservationRole`]). The letters add once to every branch's depth and to the path depth
+    /// the widths are derived from; only submitted paths are materialized.
+    pub fn new_observed(
+        declaration: LandmarkDeclaration,
+        observation_bits: usize,
+        role: ObservationRole,
+    ) -> Result<Self, ContextError> {
+        if observation_bits == 0 {
+            return Err(ContextError::Extent {
+                what: "an observed tree's binary letters",
+                expected: 1,
+                found: 0,
+            });
+        }
+        check_declaration(&declaration)?;
+        let path_depth = declaration.path_depth_with_observation(observation_bits)?;
+        let widths = Widths::at_depth(&declaration, path_depth, None);
+        Self::with_widths_and_observation(declaration, widths, observation_bits, role, path_depth)
+    }
+
     /// **Declare a tree at a declared carrier width `W`** in place of the rule's. A width below the
     /// rule's gives up the rule's place below the grain ([`Landmarks::face_rule`] reports it); the
     /// executed face stays exactly normalized and every certificate stays valid.
@@ -3733,6 +4250,23 @@ impl Landmarks {
     }
 
     fn with_widths(declaration: LandmarkDeclaration, widths: Widths) -> Result<Self, ContextError> {
+        let path_depth = declaration.path_depth();
+        Self::with_widths_and_observation(
+            declaration,
+            widths,
+            0,
+            ObservationRole::Route,
+            path_depth,
+        )
+    }
+
+    fn with_widths_and_observation(
+        declaration: LandmarkDeclaration,
+        widths: Widths,
+        observation_bits: usize,
+        observation_role: ObservationRole,
+        path_depth: u64,
+    ) -> Result<Self, ContextError> {
         let operands = widths.operand_bits(declaration.population);
         if !(2..=63).contains(&widths.carrier)
             || widths.face > 62
@@ -3746,9 +4280,25 @@ impl Landmarks {
             ));
         }
         // The mixing depths' founding ratios are stepped on the carrier: each within `W` bits.
-        let deepest = declaration.branch_depths().into_iter().max().unwrap_or(0);
-        let widest = (0..deepest)
-            .map(|depth| declaration.prior.rung(depth))
+        let branches = observed_branches(&declaration, observation_bits, observation_role)?;
+        if let Some(branch) = branches
+            .iter()
+            .find(|branch| branch.depth >= BRANCH_BIT as usize)
+        {
+            return Err(ContextError::Extent {
+                what: "a tree branch's depth word",
+                expected: BRANCH_BIT as usize - 1,
+                found: branch.depth,
+            });
+        }
+        let widest = branches
+            .iter()
+            .flat_map(|branch| 0..branch.depth)
+            .map(|at| {
+                declaration
+                    .prior
+                    .rung(observation_role.prior_depth(observation_bits, at))
+            })
             .max()
             .unwrap_or(0);
         if u64::from(widest) > widths.carrier {
@@ -3758,7 +4308,13 @@ impl Landmarks {
                 widest as usize,
             ));
         }
-        let law = Law::new(declaration, widths);
+        let law = Law::new(
+            declaration,
+            widths,
+            observation_bits,
+            observation_role,
+            path_depth,
+        );
         Ok(Self {
             nodes: Nodes::founding(&law),
             law,
@@ -3778,22 +4334,49 @@ impl Landmarks {
     /// standing**, which a saved state carries whole ([`TreeStanding`]); the law stays with the
     /// declared opening.
     pub fn standing(&self) -> TreeStanding {
-        TreeStanding(self.nodes.clone())
+        TreeStanding {
+            nodes: self.nodes.clone(),
+            observation_bits: self.law.observation_bits,
+            observation_role: self.law.observation_role,
+        }
     }
 
     /// **The tree with a saved standing placed on its law**: refused where the standing is not of
     /// this law's shape (its trees and joins), or a root, a child, a node's chart or a label end
     /// lies outside the arena.
     pub fn with_standing(&self, standing: &TreeStanding) -> Result<Self, ContextError> {
-        let nodes = &standing.0;
+        if standing.observation_bits != self.law.observation_bits {
+            return Err(shape(
+                "a saved tree's observation-prefix width against its law",
+                self.law.observation_bits,
+                standing.observation_bits,
+            ));
+        }
+        if self.law.observation_bits != 0 && standing.observation_role != self.law.observation_role
+        {
+            return Err(shape(
+                "a saved tree's observation role against its law (forced letters)",
+                self.law.observation_bits,
+                0,
+            ));
+        }
+        let nodes = &standing.nodes;
         let founding = Nodes::founding(&self.law);
         let arena = &nodes.arena;
         let n = arena.depths.len();
         if arena.roots.len() != founding.arena.roots.len() {
-            return Err(shape("a saved tree's roots", founding.arena.roots.len(), arena.roots.len()));
+            return Err(shape(
+                "a saved tree's roots",
+                founding.arena.roots.len(),
+                arena.roots.len(),
+            ));
         }
         if nodes.joins.len() != founding.joins.len() {
-            return Err(shape("a saved tree's joins", founding.joins.len(), nodes.joins.len()));
+            return Err(shape(
+                "a saved tree's joins",
+                founding.joins.len(),
+                nodes.joins.len(),
+            ));
         }
         for (what, len) in [
             ("a saved tree's masses", arena.halves.len()),
@@ -3815,7 +4398,11 @@ impl Landmarks {
                 .all(|(&key, &child)| inside((key >> 32) as u32) && inside(child))
             || !arena.ends.iter().all(|&end| end as usize <= held)
         {
-            return Err(shape("a saved tree's arena within its nodes and labels", n, held));
+            return Err(shape(
+                "a saved tree's arena within its nodes and labels",
+                n,
+                held,
+            ));
         }
         Ok(Self {
             nodes: nodes.clone(),
@@ -3856,6 +4443,51 @@ impl Landmarks {
     /// The declaration.
     pub fn declaration(&self) -> &LandmarkDeclaration {
         &self.law.declaration
+    }
+
+    /// The number of phase-specific binary observation letters in each tree path, or zero for a
+    /// causal-only tree.
+    pub fn observation_width(&self) -> usize {
+        self.law.observation_bits
+    }
+
+    /// Where the observation letters sit and whether they are mixed ([`ObservationRole`]).
+    pub fn observation_role(&self) -> ObservationRole {
+        self.law.observation_role
+    }
+
+    /// Flatten one phase's typed observation and unchanged causal suffix into the tree branches.
+    /// Observation symbols stay in this tree-only path and never enter a source address.
+    pub fn letters_observed(
+        &self,
+        address: &ObservedAddress,
+    ) -> Result<Vec<Vec<u32>>, ContextError> {
+        self.law.flatten_observed(address)
+    }
+
+    fn check_causal_address(&self, address: &[Letter], class: usize) -> Result<(), ContextError> {
+        if self.law.observation_bits != 0 {
+            return Err(ContextError::Extent {
+                what: "a causal-only address for an observation-conditioned tree",
+                expected: self.law.observation_bits,
+                found: 0,
+            });
+        }
+        check(&self.law.declaration, address, class)
+    }
+
+    fn checked_observed_letters(
+        &self,
+        address: &ObservedAddress,
+        class: usize,
+    ) -> Result<Vec<Vec<u32>>, ContextError> {
+        if class >= self.law.declaration.alphabet {
+            return Err(ContextError::CellOutside {
+                code: class,
+                alphabet: self.law.declaration.alphabet,
+            });
+        }
+        self.law.flatten_observed(address)
     }
 
     /// The derived widths.
@@ -3918,7 +4550,9 @@ impl Landmarks {
                 let masses: u64 = arena.halves[node]
                     .iter()
                     .map(|&units| {
-                        u64::from(u32::BITS - units.leading_zeros()) + 1 + u64::from(self.law.unit.trailing_zeros())
+                        u64::from(u32::BITS - units.leading_zeros())
+                            + 1
+                            + u64::from(self.law.unit.trailing_zeros())
                     })
                     .sum();
                 let beta = if at < branch.depth {
@@ -3991,9 +4625,16 @@ impl Landmarks {
         );
         let paths = &n * &d * &d;
         let floor = (BigInt::one() << face as usize)
-            / BigInt::from(based_floor(declaration.population, declaration.mass, declaration.base));
+            / BigInt::from(based_floor(
+                declaration.population,
+                declaration.mass,
+                declaration.base,
+            ));
         let rounding = Rat::new(&paths + &d * 2 + 1, floor * 2);
-        let units = BigInt::from(mantissa_units(declaration.population, self.law.path_depth()));
+        let units = BigInt::from(mantissa_units(
+            declaration.population,
+            self.law.path_depth(),
+        ));
         let mut rebases = Rat::from_integer(units) * two_power(1 - carrier as i64);
         if rebase > 0 {
             rebases += Rat::from_integer(paths) * two_power(1 - rebase as i64);
@@ -4010,8 +4651,19 @@ impl Landmarks {
     /// **Score one class** at an address at the current standing: its executed face and its
     /// certified residual, with nothing deposited.
     pub fn score(&self, address: &[Letter], class: usize) -> Result<CellReading, ContextError> {
-        check(&self.law.declaration, address, class)?;
+        self.check_causal_address(address, class)?;
         let reads = self.law.reads(&self.nodes, address, class);
+        Ok(self.law.reading(&self.nodes, &reads))
+    }
+
+    /// Score one class at an observation-conditioned address, without depositing it.
+    pub fn score_observed(
+        &self,
+        address: &ObservedAddress,
+        class: usize,
+    ) -> Result<CellReading, ContextError> {
+        let letters = self.checked_observed_letters(address, class)?;
+        let reads = self.law.reads_flat(&self.nodes, &letters, class);
         Ok(self.law.reading(&self.nodes, &reads))
     }
 
@@ -4022,7 +4674,7 @@ impl Landmarks {
         address: &[Letter],
         class: usize,
     ) -> Result<Vec<OpenedPath>, ContextError> {
-        check(&self.law.declaration, address, class)?;
+        self.check_causal_address(address, class)?;
         let law = &self.law;
         let scale = BigInt::one() << law.widths.face as usize;
         Ok(law
@@ -4066,15 +4718,34 @@ impl Landmarks {
     /// **The splits at an address** (module header, "Faces"): each splitting dyadic cell's
     /// executed digit-0 numerator, heap-ordered.
     pub fn splits(&self, address: &[Letter]) -> Result<Splits, ContextError> {
-        check(&self.law.declaration, address, 0)?;
+        self.check_causal_address(address, 0)?;
         Ok(self.law.splits(&self.nodes, address))
+    }
+
+    /// The splitting dyadic faces at an observation-conditioned address.
+    pub fn splits_observed(&self, address: &ObservedAddress) -> Result<Splits, ContextError> {
+        let letters = self.checked_observed_letters(address, 0)?;
+        Ok(self.law.splits_flat(&self.nodes, &letters))
     }
 
     /// **All classes' executed faces at an address**, with their grain exponents at `grain`
     /// (module header, "Faces").
     pub fn face(&self, address: &[Letter], grain: u64) -> Result<LandmarkFace, ContextError> {
-        check(&self.law.declaration, address, 0)?;
+        self.check_causal_address(address, 0)?;
         self.law.face(&self.nodes, address, grain)
+    }
+
+    /// All class faces at an observation-conditioned address.
+    pub fn face_observed(
+        &self,
+        address: &ObservedAddress,
+        grain: u64,
+    ) -> Result<LandmarkFace, ContextError> {
+        LandmarkFace::of_splits(
+            &self.law.declaration,
+            &self.splits_observed(address)?,
+            grain,
+        )
     }
 
     /// [definition; agent-inferred] **An epoch's standings in cell order** (module header, "An
@@ -4088,27 +4759,59 @@ impl Landmarks {
     /// address or class outside the declaration.
     pub fn window<'a>(
         &'a self,
-        addresses: &'a [Vec<Letter>],
+        addresses: &[Vec<Letter>],
         known: &[usize],
     ) -> Result<Window<'a>, ContextError> {
         let law = &self.law;
-        for address in addresses {
-            check(&law.declaration, address, 0)?;
+        let encoded = addresses
+            .iter()
+            .map(|address| {
+                self.check_causal_address(address, 0)?;
+                Ok(law.flatten(address))
+            })
+            .collect::<Result<Vec<_>, ContextError>>()?;
+        self.window_flat(encoded, known)
+    }
+
+    /// The phase-indexed tree window at an observation prefix followed by each phase's unchanged
+    /// causal address. The prefix width and causal depth are checked before any overlay is built.
+    pub fn window_observed<'a>(
+        &'a self,
+        addresses: &[ObservedAddress],
+        known: &[usize],
+    ) -> Result<Window<'a>, ContextError> {
+        let encoded = addresses
+            .iter()
+            .map(|address| self.law.flatten_observed(address))
+            .collect::<Result<Vec<_>, _>>()?;
+        self.window_flat(encoded, known)
+    }
+
+    fn window_flat<'a>(
+        &'a self,
+        addresses: Vec<Vec<Vec<u32>>>,
+        known: &[usize],
+    ) -> Result<Window<'a>, ContextError> {
+        for &class in known.iter().take(addresses.len().saturating_sub(1)) {
+            if class >= self.law.declaration.alphabet {
+                return Err(ContextError::CellOutside {
+                    code: class,
+                    alphabet: self.law.declaration.alphabet,
+                });
+            }
         }
         let deposits = known.len().min(addresses.len().saturating_sub(1));
-        for (address, &class) in addresses.iter().zip(known).take(deposits) {
-            check(&law.declaration, address, class)?;
-        }
         let admitted = self.working_admission(deposits as u64);
         let mut working = Working::on(&self.nodes);
         let mut standings = Vec::with_capacity(deposits);
         for (address, &class) in addresses.iter().zip(known).take(deposits) {
-            let reads = law.reads(&working, address, class);
-            law.apply(&mut working, address, reads, admitted)?;
+            let reads = self.law.reads_flat(&working, address, class);
+            self.law
+                .apply_flat(&mut working, address, reads, admitted)?;
             standings.push(working.clone());
         }
         Ok(Window {
-            law,
+            law: &self.law,
             nodes: &self.nodes,
             addresses,
             standings,
@@ -4136,11 +4839,25 @@ impl Landmarks {
     /// node's mass of the digit grows, and each join's β steps. Refused before anything moves at a
     /// bad address or class, or past the declared population.
     pub fn deposit(&mut self, address: &[Letter], class: usize) -> Result<(), ContextError> {
-        check(&self.law.declaration, address, class)?;
+        self.check_causal_address(address, class)?;
         let reads = self.law.reads(&self.nodes, address, class);
         let population = self.law.declaration.population;
         self.law
             .apply(&mut self.nodes, address, reads, population)
+            .map(|_| ())
+    }
+
+    /// Deposit one class on the exact observation-prefixed causal paths it opens.
+    pub fn deposit_observed(
+        &mut self,
+        address: &ObservedAddress,
+        class: usize,
+    ) -> Result<(), ContextError> {
+        let letters = self.checked_observed_letters(address, class)?;
+        let reads = self.law.reads_flat(&self.nodes, &letters, class);
+        let population = self.law.declaration.population;
+        self.law
+            .apply_flat(&mut self.nodes, &letters, reads, population)
             .map(|_| ())
     }
 
@@ -4153,6 +4870,17 @@ impl Landmarks {
         Ok(self.receive_digits(address, class)?.reading)
     }
 
+    /// Score and deposit one class at an observation-conditioned address.
+    pub fn receive_observed(
+        &mut self,
+        address: &ObservedAddress,
+        class: usize,
+    ) -> Result<CellReading, ContextError> {
+        let reading = self.score_observed(address, class)?;
+        self.deposit_observed(address, class)?;
+        Ok(reading)
+    }
+
     /// **Receive one cell, digit by digit** (the development harness's and a join's reading): the
     /// cell's reading, and per opened digit its dyadic cell, its digit, its executed digit-0
     /// numerator on `2^(−M_p)`, its certificate and the deposit's top excess increment on `2^(−C)`.
@@ -4161,7 +4889,7 @@ impl Landmarks {
         address: &[Letter],
         class: usize,
     ) -> Result<DigitsReading, ContextError> {
-        check(&self.law.declaration, address, class)?;
+        self.check_causal_address(address, class)?;
         let reads = self.law.reads(&self.nodes, address, class);
         let reading = self.law.reading(&self.nodes, &reads);
         let digits: Vec<DigitReading> = reads
@@ -4188,6 +4916,40 @@ impl Landmarks {
         })
     }
 
+    /// Score and deposit one class at an observation-conditioned address, returning the exact
+    /// per-digit numerator and residual increments as for [`Self::receive_digits`].
+    pub fn receive_observed_digits(
+        &mut self,
+        address: &ObservedAddress,
+        class: usize,
+    ) -> Result<DigitsReading, ContextError> {
+        let letters = self.checked_observed_letters(address, class)?;
+        let reads = self.law.reads_flat(&self.nodes, &letters, class);
+        let reading = self.law.reading(&self.nodes, &reads);
+        let digits: Vec<DigitReading> = reads
+            .iter()
+            .map(|digit| DigitReading {
+                dyadic: digit.dyadic,
+                symbol: digit.symbol,
+                split: digit.face,
+                certificate: self.law.digit_certificate(&self.nodes, digit),
+                increment: 0,
+            })
+            .collect();
+        let population = self.law.declaration.population;
+        let increments = self
+            .law
+            .apply_flat(&mut self.nodes, &letters, reads, population)?;
+        Ok(DigitsReading {
+            reading,
+            digits: digits
+                .into_iter()
+                .zip(increments)
+                .map(|(digit, increment)| DigitReading { increment, ..digit })
+                .collect(),
+        })
+    }
+
     /// **The stored nodes and joins a deposit writes** (the mirror's per-deposit lockstep), read at
     /// the current standing before it: every stored node of every branch's walk of every digit
     /// `class` opens at `address` (their masses and charts step, and a parting chain's lower part
@@ -4199,9 +4961,30 @@ impl Landmarks {
         address: &[Letter],
         class: usize,
     ) -> Result<(Vec<u32>, Vec<usize>), ContextError> {
-        check(&self.law.declaration, address, class)?;
+        self.check_causal_address(address, class)?;
         let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
         for digit in self.law.reads(&self.nodes, address, class) {
+            dyadic.push(digit.dyadic);
+            for read in digit.reads {
+                nodes.extend(read.nodes);
+            }
+        }
+        nodes.sort_unstable();
+        nodes.dedup();
+        dyadic.sort_unstable();
+        dyadic.dedup();
+        Ok((nodes, dyadic))
+    }
+
+    /// The nodes and dyadic cells read by one observation-conditioned deposit.
+    pub fn touched_observed(
+        &self,
+        address: &ObservedAddress,
+        class: usize,
+    ) -> Result<(Vec<u32>, Vec<usize>), ContextError> {
+        let letters = self.checked_observed_letters(address, class)?;
+        let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
+        for digit in self.law.reads_flat(&self.nodes, &letters, class) {
             dyadic.push(digit.dyadic);
             for read in digit.reads {
                 nodes.extend(read.nodes);
@@ -4229,7 +5012,7 @@ impl Landmarks {
 pub struct Window<'a> {
     law: &'a Law,
     nodes: &'a Nodes,
-    addresses: &'a [Vec<Letter>],
+    addresses: Vec<Vec<Vec<u32>>>,
     standings: Vec<Working<'a>>,
 }
 
@@ -4245,8 +5028,8 @@ impl Window<'_> {
         match phase.min(self.standings.len()).checked_sub(1) {
             Some(index) => self
                 .law
-                .splits(&self.standings[index], &self.addresses[phase]),
-            None => self.law.splits(self.nodes, &self.addresses[phase]),
+                .splits_flat(&self.standings[index], &self.addresses[phase]),
+            None => self.law.splits_flat(self.nodes, &self.addresses[phase]),
         }
     }
 
@@ -4287,6 +5070,24 @@ impl ArenaView<'_> {
     /// The cell branch's forced depths.
     pub fn forced(&self) -> usize {
         self.tree.law.branches[0].forced
+    }
+
+    /// The forced depth of each branch: observation symbols route context and are never learned
+    /// as causal outcomes; the declared source forced depth applies after that prefix only on the
+    /// cell branch.
+    pub fn forced_by_branch(&self) -> Vec<usize> {
+        self.tree
+            .law
+            .branches
+            .iter()
+            .map(|branch| branch.forced)
+            .collect()
+    }
+
+    /// Each branch's actual cumulative stop-prior rungs, indexed by bottom depth. This includes
+    /// the observation-prefix forced levels used by the active law.
+    pub fn rung_sums(&self) -> &[Vec<u64>] {
+        &self.tree.law.sums
     }
 
     /// Each tree's root, `u32::MAX` unfounded.
@@ -4361,6 +5162,14 @@ impl ArenaView<'_> {
     /// Each branch's letters of an address (the cells, then the flattened bundles).
     pub fn letters(&self, address: &[Letter]) -> Vec<Vec<u32>> {
         self.tree.law.flatten(address)
+    }
+
+    /// Flatten one phase's typed observation and unchanged causal suffix into each branch.
+    pub fn letters_observed(
+        &self,
+        address: &ObservedAddress,
+    ) -> Result<Vec<Vec<u32>>, ContextError> {
+        self.tree.law.flatten_observed(address)
     }
 }
 
@@ -4543,6 +5352,8 @@ fn dyadic_grain_exponent(
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct IdealLandmarks {
     declaration: LandmarkDeclaration,
+    observation_bits: usize,
+    observation_role: ObservationRole,
     odometer: Odometer,
     branches: Vec<Branch>,
     sums: Vec<Vec<u64>>,
@@ -4581,30 +5392,56 @@ struct IdealDigit {
 impl IdealLandmarks {
     /// **Declare the oracle**, empty, with `β` exact (`width = None`) or carried at a width.
     pub fn new(declaration: LandmarkDeclaration, width: Option<u64>) -> Result<Self, ContextError> {
+        Self::new_with_observation(declaration, width, 0)
+    }
+
+    /// Declare an ideal tree with a typed, forced context prefix before each causal path. The
+    /// declared stop-prior schedule starts after that prefix, at causal depth zero.
+    pub fn new_with_observation(
+        declaration: LandmarkDeclaration,
+        width: Option<u64>,
+        observation_bits: usize,
+    ) -> Result<Self, ContextError> {
+        Self::new_observed(declaration, width, observation_bits, ObservationRole::Route)
+    }
+
+    /// Declare an ideal tree whose addresses carry `observation_bits` observation letters in
+    /// `role` (the executed tree's [`Landmarks::new_observed`]).
+    pub fn new_observed(
+        declaration: LandmarkDeclaration,
+        width: Option<u64>,
+        observation_bits: usize,
+        observation_role: ObservationRole,
+    ) -> Result<Self, ContextError> {
         check_declaration(&declaration)?;
         let digits = odometer_digits(declaration.alphabet);
-        let branches: Vec<Branch> = declaration
-            .branch_depths()
-            .into_iter()
-            .enumerate()
-            .map(|(branch, depth)| Branch {
-                depth,
-                forced: if branch == 0 { declaration.forced } else { 0 },
-            })
-            .collect();
+        let branches = observed_branches(&declaration, observation_bits, observation_role)?;
+        if let Some(branch) = branches
+            .iter()
+            .find(|branch| branch.depth >= BRANCH_BIT as usize)
+        {
+            return Err(ContextError::Extent {
+                what: "an ideal tree branch's depth word",
+                expected: BRANCH_BIT as usize - 1,
+                found: branch.depth,
+            });
+        }
         let cells = 1usize << digits;
         let joins = if branches.len() > 1 {
             vec![Rat::one(); cells]
         } else {
             Vec::new()
         };
+        let sums = observed_sums(&declaration, observation_bits, observation_role, &branches);
         Ok(Self {
+            observation_bits,
+            observation_role,
             odometer: Odometer {
                 alphabet: declaration.alphabet,
                 digits,
             },
             arena: Arena::new(branches.len() * cells),
-            sums: declaration.rung_sums(),
+            sums,
             branches,
             declaration,
             beta: Vec::new(),
@@ -4636,9 +5473,13 @@ impl IdealLandmarks {
         let Some(width) = self.width else {
             return Rat::zero();
         };
+        let path_depth = self
+            .declaration
+            .path_depth_with_observation(self.observation_bits)
+            .expect("ideal observed path depth was checked at construction");
         let (n, d) = (
             BigInt::from(self.declaration.population),
-            BigInt::from(self.declaration.path_depth()),
+            BigInt::from(path_depth),
         );
         log2_e_bound()
             * Rat::from_integer(BigInt::from(self.odometer.digits) * n * &d * &d)
@@ -4651,12 +5492,31 @@ impl IdealLandmarks {
     }
 
     fn kt(&self, node: u32, symbol: usize, root: Option<u32>) -> Rat {
-        let (u, v) = self.arena.kt_based(node, symbol, root, self.declaration.base);
+        let (u, v) = self
+            .arena
+            .kt_based(node, symbol, root, self.declaration.base);
         Rat::new(BigInt::from(u), BigInt::from(v))
     }
 
     fn flatten(&self, address: &[Letter]) -> Vec<Vec<u32>> {
         self.declaration.letters(address)
+    }
+
+    /// Each branch's typed observation letters joined to its causal letters by its role.
+    fn flatten_observed(&self, address: &ObservedAddress) -> Result<Vec<Vec<u32>>, ContextError> {
+        if self.observation_bits == 0 {
+            return Err(ContextError::Extent {
+                what: "an observed address for an observation-free ideal tree",
+                expected: 0,
+                found: address.observation.len(),
+            });
+        }
+        observed_letters(
+            &self.declaration,
+            self.observation_bits,
+            self.observation_role,
+            address,
+        )
     }
 
     /// The ratio `2^k − 1`.
@@ -4672,7 +5532,10 @@ impl IdealLandmarks {
         let bottom = self.arena.bottom(node);
         let upper_rung = self.sums[branch][depth + 1] - self.sums[branch][top];
         if upper_rung == 0 {
-            let founding = self.declaration.prior.founding(depth);
+            let founding = self.declaration.prior.founding(
+                self.observation_role
+                    .prior_depth(self.observation_bits, depth),
+            );
             return (Rat::from_integer(BigInt::from(founding)), None);
         }
         if bottom == self.branches[branch].depth {
@@ -4742,6 +5605,10 @@ impl IdealLandmarks {
 
     fn reads(&self, address: &[Letter], class: usize) -> Vec<IdealDigit> {
         let letters = self.flatten(address);
+        self.reads_flat(&letters, class)
+    }
+
+    fn reads_flat(&self, letters: &[Vec<u32>], class: usize) -> Vec<IdealDigit> {
         self.odometer
             .emitted(class)
             .into_iter()
@@ -4770,6 +5637,21 @@ impl IdealLandmarks {
         check(&self.declaration, address, class)?;
         Ok(self
             .reads(address, class)
+            .iter()
+            .map(|digit| digit.face.clone())
+            .product())
+    }
+
+    /// The ideal face of one class at an observation-conditioned causal address, exact.
+    pub fn probability_observed(
+        &self,
+        address: &ObservedAddress,
+        class: usize,
+    ) -> Result<Rat, ContextError> {
+        check(&self.declaration, &address.causal, class)?;
+        let letters = self.flatten_observed(address)?;
+        Ok(self
+            .reads_flat(&letters, class)
             .iter()
             .map(|digit| digit.face.clone())
             .product())
@@ -4821,8 +5703,24 @@ impl IdealLandmarks {
     /// **Receive one cell**: its ideal face at the current standing, then its deposit.
     pub fn receive(&mut self, address: &[Letter], class: usize) -> Result<Rat, ContextError> {
         check(&self.declaration, address, class)?;
-        let digits = self.reads(address, class);
         let letters = self.flatten(address);
+        self.receive_flat(&letters, class)
+    }
+
+    /// Receive one class in a phase-specific observation context: its ideal face at the current
+    /// standing, then its deposit on the same frozen observed path.
+    pub fn receive_observed(
+        &mut self,
+        address: &ObservedAddress,
+        class: usize,
+    ) -> Result<Rat, ContextError> {
+        check(&self.declaration, &address.causal, class)?;
+        let letters = self.flatten_observed(address)?;
+        self.receive_flat(&letters, class)
+    }
+
+    fn receive_flat(&mut self, letters: &[Vec<u32>], class: usize) -> Result<Rat, ContextError> {
+        let digits = self.reads_flat(letters, class);
         let founding: usize = letters.iter().map(|l| l.len() + 1).sum();
         let held: usize = letters.iter().map(Vec::len).sum();
         self.arena.founded_within(digits.len() * founding, held)?;
@@ -4921,7 +5819,10 @@ impl IdealLandmarks {
             let leaf_top = nodes.last().map_or(0, |&p| self.arena.bottom(p) + 1);
             let run = runs[branch].expect("an arrival's label run");
             let leaf = self.arena.push(branch, depth, [1, 1], run);
-            let founding = self.declaration.prior.founding(depth);
+            let founding = self.declaration.prior.founding(
+                self.observation_role
+                    .prior_depth(self.observation_bits, depth),
+            );
             self.beta.push(Rat::from_integer(BigInt::from(founding)));
             let parent = nodes.last().map(|&p| (p, letters[leaf_top - 1]));
             self.arena.link(tree, parent, leaf);

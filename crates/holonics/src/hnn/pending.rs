@@ -21,7 +21,10 @@
 //!   the abstract block operator; the concrete-tick bridge is owed in #62);
 //! - the producing anchor is a clock reading, not material, and no frozen cut of earlier material.
 //!
-//! No constructor accepts a material, a word or a face. The guarantee is structural: the fields are
+//! The source constructor never accepts a face in place of its moment. An opt-in, trusted
+//! realization handoff separately attaches a finite observation context after the actual read.
+//! It retains only resolved membership bits, never logits/material as a memorization key.
+//! The source-constructor guarantee is structural: the fields are
 //! private and [`PendingRatio::produce`], the only constructor, takes the anchor's lift point, the
 //! moment, the receiving phases and the commit. The doctest shows a face refused where the moment
 //! goes (`E0308`, a type mismatch):
@@ -48,7 +51,7 @@
 
 use num_bigint::BigInt;
 
-use crate::compression::landmark::context::{LandmarkFace, Letter};
+use crate::compression::landmark::context::{LandmarkFace, Letter, ObservedAddress};
 use crate::hnn::HnnError;
 use crate::hnn::chart::Charts;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
@@ -57,6 +60,7 @@ use crate::hnn::ratio::Faces;
 use crate::hnn::realization::indexed;
 use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, Scored};
 use crate::hnn::word::{Word, WordOpening};
+use crate::ratio::Rat;
 
 /// [definition] **A pending ratio**: the producing anchor `λ`, the encoder moment `M`, the active
 /// suffix address, the receiving phases and the producing commit. See the module header.
@@ -67,6 +71,8 @@ pub struct PendingRatio {
     address: ActiveAddress,
     phases: ReceivingPhases,
     commit: u64,
+    view: crate::hnn::ring::modes::ModeView,
+    observation: Option<Vec<Vec<bool>>>,
 }
 
 /// [definition] **An epoch's faces at compare**: the combined faces (the tree's at each phase's
@@ -83,10 +89,34 @@ impl PendingRatio {
     /// There is no saved material, word or face, and no sequence of prior comparisons.
     pub(crate) fn write_saved(&self, s: &mut String) {
         use crate::hnn::state_text::line;
-        line(s, "ratio-commit", [self.commit]);
+        let mut header = vec![self.commit.to_string()];
+        for &(g, _, d) in self.view.selections() {
+            header.push(g.to_string());
+            header.push(d.to_string());
+        }
+        line(s, "ratio-commit", header);
         line(s, "ratio-anchor", &self.anchor);
         self.moment.write(s);
         self.phases.write_saved(s);
+        if self.phases.observation_partition().is_some() {
+            line(
+                s,
+                "ratio-observation",
+                [self.observation.as_ref().map_or(0, Vec::len).to_string()],
+            );
+            if let Some(paths) = &self.observation {
+                for path in paths {
+                    line(
+                        s,
+                        "observation-bits",
+                        [path
+                            .iter()
+                            .map(|b| if *b { '1' } else { '0' })
+                            .collect::<String>()],
+                    );
+                }
+            }
+        }
         self.address.write(s);
     }
 
@@ -95,19 +125,84 @@ impl PendingRatio {
         prototype: &ActiveAddress,
         next: crate::hnn::state_text::Next<'_, 'a>,
     ) -> Result<Self, HnnError> {
-        use crate::hnn::state_text::{counted, keyed, values};
-        let commit: Vec<u64> = counted(next("the producing commit")?,
-            "ratio-commit", 1, "the producing commit")?;
+        use crate::hnn::state_text::{keyed, values};
+        let commit: Vec<u64> = values(
+            &keyed(
+                next("the producing commit")?,
+                "ratio-commit",
+                "the producing commit",
+            )?,
+            "the producing commit",
+        )?;
+        if commit.is_empty() || commit.len() % 2 != 1 {
+            return Err(HnnError::Unadmitted {
+                reason: "a saved ratio's commit and mode selections",
+            });
+        }
+        let mut selections = Vec::new();
+        for pair in commit[1..].chunks_exact(2) {
+            selections.push((
+                usize::try_from(pair[0]).map_err(|_| HnnError::CountOverflow)?,
+                pair[1],
+            ));
+        }
+        let view = crate::hnn::ring::modes::ModeView::from_periods(field, &selections)?;
         let anchor: Vec<BigInt> = values(
-            &keyed(next("the producing anchor")?, "ratio-anchor", "the producing anchor")?,
+            &keyed(
+                next("the producing anchor")?,
+                "ratio-anchor",
+                "the producing anchor",
+            )?,
             "the producing anchor",
         )?;
         let current = Current::at(field, anchor)?;
         let moment = SourceMoment::read(field, next("the producing moment")?, next)?;
         let phases = ReceivingPhases::read_saved(field, next("the producing phases")?)?;
-        let address = prototype.truncated(phases.depth())?
+        let observation = if let Some(partition) = phases.observation_partition() {
+            let n: Vec<usize> = values(
+                &keyed(
+                    next("the producing observation")?,
+                    "ratio-observation",
+                    "the producing observation",
+                )?,
+                "the producing observation",
+            )?;
+            if n.len() != 1 || (n[0] != 0 && n[0] != phases.aperture()) {
+                return Err(HnnError::Unadmitted {
+                    reason: "one saved observation per receiving phase",
+                });
+            }
+            let mut paths = Vec::new();
+            for _ in 0..n[0] {
+                let words = keyed(
+                    next("observation membership bits")?,
+                    "observation-bits",
+                    "observation membership bits",
+                )?;
+                if words.len() != 1
+                    || words[0].len() != partition.outcome_bits(field, phases.ring())
+                    || !words[0].bytes().all(|b| b == b'0' || b == b'1')
+                {
+                    return Err(HnnError::Unadmitted {
+                        reason: "a saved receiver observation of its partition's width",
+                    });
+                }
+                let bits: Vec<bool> = words[0].bytes().map(|b| b == b'1').collect();
+                partition.path(bits.clone())?;
+                paths.push(bits);
+            }
+            if n[0] == 0 { None } else { Some(paths) }
+        } else {
+            None
+        };
+        let address = prototype
+            .truncated(phases.depth())?
             .continued(next("the producing address")?, next)?;
-        Self::produce(&current, &moment, &address, &phases, commit[0])
+        Self::produce(&current, &moment, &address, &phases, commit[0]).map(|mut ratio| {
+            ratio.view = view;
+            ratio.observation = observation;
+            ratio
+        })
     }
 
     /// **Produce a pending ratio at the cut**: the lift point, a copy of the moment's counts, the
@@ -127,7 +222,64 @@ impl PendingRatio {
             address: address.truncated(phases.depth())?,
             phases: phases.clone(),
             commit,
+            view: crate::hnn::ring::modes::ModeView::whole(),
+            observation: None,
         })
+    }
+
+    /// Bind a declared source view to the same producing moment, lift and commit.
+    pub fn with_view(
+        mut self,
+        field: &Field,
+        view: &crate::hnn::ring::modes::ModeView,
+    ) -> Result<Self, HnnError> {
+        if self.observation.is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "a produced observation cannot be rebound to a source view",
+            });
+        }
+        view.check(field)?;
+        self.view = view.clone();
+        Ok(self)
+    }
+    /// Trusted cross-realization handoff, called exactly once after the actual initial raw
+    /// wave read and before any target or tree combination: `anchors` are the receiving phases'
+    /// anchors the read ran through and `wave` its faces ([`ObservationPartition::read`]). This
+    /// derives its own finite paths; callers cannot attach arbitrary paths. As with other backend
+    /// read handoffs, shape admission does not cryptographically prove an arbitrary external Face
+    /// was executed. Native PendingId slots bind the producing resident and immutable WordOpening.
+    pub fn admit_observed_read(
+        &mut self,
+        field: &Field,
+        anchors: &[Vec<Rat>],
+        wave: &Faces,
+    ) -> Result<(), HnnError> {
+        let Some(partition) = self.phases.observation_partition() else {
+            return Ok(());
+        };
+        if self.observation.is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "an observation context is bound only once",
+            });
+        }
+        if field.receiving_context(self.phases.ring()) != Some(partition) {
+            return Err(HnnError::Unadmitted {
+                reason: "an observed read belongs to its declared receiving phases",
+            });
+        }
+        self.observation = Some(partition.read(field, &self.phases, anchors, wave)?);
+        Ok(())
+    }
+
+    /// Frozen cut metadata: each phase's observation letters in the partition's order (a maximum
+    /// set's class-index-ordered membership bits, a section's side readings).
+    /// Successor rereads preserve this conditioning path; they do not claim to observe it anew.
+    pub fn observation_bits(&self) -> Option<&[Vec<bool>]> {
+        self.observation.as_deref()
+    }
+
+    pub fn view(&self) -> &crate::hnn::ring::modes::ModeView {
+        &self.view
     }
 
     /// The producing anchor `λ`.
@@ -195,13 +347,14 @@ impl PendingRatio {
         charts: &mut Charts,
         opening: &WordOpening,
     ) -> Result<Word<'c>, HnnError> {
-        Word::open_received(
+        Word::open_received_view(
             field,
             constitution,
             &self.current(field)?,
             &self.moment,
             charts,
             opening,
+            &self.view,
         )
     }
 
@@ -230,6 +383,8 @@ impl PendingRatio {
         self.read_on(field, constitution, charts, &WordOpening::Rest)
     }
 
+    /// A detached call may intentionally evaluate another material/opening as a counterfactual;
+    /// it does not authenticate resident continuation or rebind a frozen observation prefix.
     /// **The contemporary read on a reception's opening** ([`PendingRatio::open_on`]): what
     /// [`PendingRatio::read_charted`] returns, the word opened on `opening`.
     pub fn read_on<'c>(
@@ -239,13 +394,64 @@ impl PendingRatio {
         charts: &mut Charts,
         opening: &WordOpening,
     ) -> Result<(Word<'c>, Faces), HnnError> {
-        let current = self.current(field)?;
         let mut word = self.open_on(field, constitution, charts, opening)?;
         let anchors = word.forward(&self.phases)?;
-        let reads = indexed(anchors.len(), |j| {
-            self.phases.read(field, constitution, &current, &anchors[j])
-        })?;
+        let reads = if matches!(
+            constitution.receiving_layout(self.phases.ring()),
+            Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { .. })
+        ) {
+            word.prepare_response()?;
+            let column = word.response().expect("prepared response");
+            indexed(anchors.len(), |j| {
+                let crossing = self.phases.first_epoch() + j;
+                self.phases.read_paired(
+                    field,
+                    constitution,
+                    &anchors[j],
+                    &column.records[crossing].anchors[self.phases.ring()],
+                )
+            })?
+        } else {
+            indexed(anchors.len(), |j| {
+                self.phases.read(field, constitution, &anchors[j])
+            })?
+        };
         Ok((word, Faces::of_reads(&reads, self.phases.grain())?))
+    }
+
+    /// The frozen phase-specific observation prefixes paired with the ordinary causal
+    /// addresses. Known targets advance only the latter; they never form an observation.
+    pub fn observed_addresses(
+        &self,
+        known: &[usize],
+    ) -> Result<Option<Vec<ObservedAddress>>, HnnError> {
+        if self.phases.observation_partition().is_none() {
+            return Ok(None);
+        }
+        let paths = self.observation.as_ref().ok_or(HnnError::Unadmitted {
+            reason: "receiving observation context has not been realized",
+        })?;
+        let causal = self.addresses(known)?;
+        if paths.len() != causal.len() {
+            return Err(HnnError::Unadmitted {
+                reason: "observation phase count differs from causal addresses",
+            });
+        }
+        Ok(Some(
+            paths
+                .iter()
+                .zip(causal)
+                .map(|(bits, address)| {
+                    Ok(ObservedAddress::new(
+                        self.phases
+                            .observation_partition()
+                            .expect("checked above")
+                            .path(bits.clone())?,
+                        address,
+                    ))
+                })
+                .collect::<Result<Vec<_>, HnnError>>()?,
+        ))
     }
 
     /// The contemporary tree faces at each phase's causal address given the epoch's known targets:
@@ -255,7 +461,17 @@ impl PendingRatio {
         constitution: &impl ConstitutionRead,
         known: &[usize],
     ) -> Result<Vec<crate::compression::landmark::context::LandmarkFace>, HnnError> {
-        self.phases.tree_faces(constitution, &self.address, known)
+        if let Some(addresses) = self.observed_addresses(known)? {
+            let ring = self.phases.ring();
+            let tree = constitution
+                .landmarks(ring)
+                .ok_or(HnnError::MissingReceivingMap { ring })?;
+            let window = tree.window_observed(&addresses, known)?;
+            let splits = indexed(window.phases(), |j| Ok(window.splits(j)))?;
+            crate::hnn::receiving::faces_of_splits(tree.declaration(), &splits, self.phases.grain())
+        } else {
+            self.phases.tree_faces(constitution, &self.address, known)
+        }
     }
 
     /// **The epoch's faces at compare** (module header; the landmark tree): the contemporary tree
@@ -268,7 +484,7 @@ impl PendingRatio {
         wave: &Faces,
         known: &[usize],
     ) -> Result<Against, HnnError> {
-        let trees = self.phases.tree_faces(constitution, &self.address, known)?;
+        let trees = self.tree_faces(constitution, known)?;
         Ok(Against {
             faces: self.phases.combine(wave, &trees)?,
             trees,
@@ -319,10 +535,35 @@ impl PendingRatio {
         Ok((word, against))
     }
 
+    /// The resident's explicitly provenance-preserving successor reread. The original
+    /// observation prefix is fixed cut metadata, while the successor wave/tree are recomputed.
+    /// The caller retains the native arrived slot's unchanged WordOpening and lineage; a local
+    /// commit comparison alone is not authentication of arbitrary detached constitutions.
+    pub fn read_successor_against_on<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &crate::hnn::constitution::Constitution,
+        charts: &mut Charts,
+        targets: &[usize],
+        opening: &WordOpening,
+    ) -> Result<(Word<'c>, Against), HnnError> {
+        if constitution.commit() < self.commit {
+            return Err(HnnError::Unadmitted {
+                reason: "a successor reread cannot precede its producing commit",
+            });
+        }
+        self.read_against_on(field, constitution, charts, targets, opening)
+    }
+
     /// The pending ratio's exact bits: the anchor's integers, the moment's dense code and the
     /// active suffix address.
     pub fn bits(&self) -> u64 {
         self.anchor.iter().map(|x| x.bits() + 1).sum::<u64>()
+            + self.view.bits()
+            + self
+                .observation
+                .as_ref()
+                .map_or(0, |paths| paths.iter().map(|p| p.len() as u64).sum::<u64>())
             + self.moment.dense_bits()
             + self.address.bits(self.moment.alphabet())
     }

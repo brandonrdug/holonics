@@ -1896,10 +1896,12 @@ fn one_actual_pair_deposit_takes_the_equivariant_port_off_its_subspace() {
     let opening = vec![BigInt::from(5 + 1), BigInt::zero()];
     let u = vec![2, 0, 1, 3, 3, 0, 2, 1, 0];
     let strand = run(&field, 0, &opening, None, &u);
-    assert!(carrier
-        .partner_face(&field, &placed, &strand.current, &strand.moment, 4)
-        .unwrap()
-        .is_exact());
+    assert!(
+        carrier
+            .partner_face(&field, &placed, &strand.current, &strand.moment, 4)
+            .unwrap()
+            .is_exact()
+    );
     let located = LocatedPair {
         offset: 1,
         map: vec![(0, 2)],
@@ -1921,7 +1923,9 @@ fn one_actual_pair_deposit_takes_the_equivariant_port_off_its_subspace() {
             partner,
             ..
         }) => assert_eq!((ring, column, partner), (0, 2, 3)),
-        other => panic!("an equivariant port moved by one located pair is refused at its column: {other:?}"),
+        other => panic!(
+            "an equivariant port moved by one located pair is refused at its column: {other:?}"
+        ),
     }
 }
 
@@ -1955,7 +1959,10 @@ fn located_over(field: &Field, passages: &[Vec<usize>]) -> crate::hnn::keys::Loc
             location.observe(&observation);
         }
     }
-    location.survivors().located().expect("the passages' law is located")
+    location
+        .survivors()
+        .located()
+        .expect("the passages' law is located")
 }
 
 /// [measured, October 9; helical step 3, loop 2; the module header, "The paired deposit"] **The paired
@@ -1997,14 +2004,21 @@ fn the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant() {
     // The duplex on disjoint columns.
     let alternating: Vec<Vec<usize>> = [0usize, 2, 0]
         .iter()
-        .map(|&start| (0..8).map(|k| if k % 2 == 0 { start } else { 2 - start }).collect())
+        .map(|&start| {
+            (0..8)
+                .map(|k| if k % 2 == 0 { start } else { 2 - start })
+                .collect()
+        })
         .collect();
     let located = located_over(&field, &alternating);
     eprintln!(
         "alternating strand: located offset {}, map {:?}, cycle {}, turns {:?}",
         located.offset, located.map, located.cycle, located.turns
     );
-    assert_eq!((located.offset, located.map.clone()), (1, vec![(0, 2), (2, 0)]));
+    assert_eq!(
+        (located.offset, located.map.clone()),
+        (1, vec![(0, 2), (2, 0)])
+    );
     let (forward_only, _) = pair_deposit(&field, &placed, &completed, 0, &located).unwrap();
     let control = carrier.partner_face(&field, &forward_only, &strand.current, &strand.moment, 3);
     eprintln!("control, the forward deposit alone: {control:?}");
@@ -2017,7 +2031,9 @@ fn the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant() {
             ..
         })
     ));
-    let (learned, deposit) = carrier.deposit(&field, &placed, &completed, &located).unwrap();
+    let (learned, deposit) = carrier
+        .deposit(&field, &placed, &completed, &located)
+        .unwrap();
     eprintln!(
         "paired deposit: forward {:?}, reversed {:?}, slip {} -> {}, step {}, consumer {}",
         deposit.classes,
@@ -2029,7 +2045,10 @@ fn the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant() {
     );
     assert_eq!(deposit.reversed, vec![(1, 3), (3, 1)]);
     assert!(deposit.certificate.holds());
-    assert!(deposit.consumer, "both strands' slips close on disjoint columns");
+    assert!(
+        deposit.consumer,
+        "both strands' slips close on disjoint columns"
+    );
     assert_eq!(
         carrier.certify(ConstitutionRead::source_port(&learned, 0).unwrap()),
         Ok(())
@@ -2070,12 +2089,18 @@ fn the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant() {
                 constitution = next;
             }
             Err(refusal) => {
-                eprintln!("stepping strand: paired deposit {} is refused: {refusal}", deposits + 1);
+                eprintln!(
+                    "stepping strand: paired deposit {} is refused: {refusal}",
+                    deposits + 1
+                );
                 break;
             }
         }
     }
-    assert!(deposits >= 1, "the first paired deposit on shared columns certifies");
+    assert!(
+        deposits >= 1,
+        "the first paired deposit on shared columns certifies"
+    );
 }
 
 /// [measured, October 9; helical step 3, loop 3; the module header, "Every route on a paired source
@@ -2100,9 +2125,7 @@ fn the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant() {
 #[test]
 fn a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposits() {
     use crate::hnn::HnnError;
-    use crate::hnn::constitution::{
-        BudgetedCarry, ContinuingState, Locus, Sample, founding_prior,
-    };
+    use crate::hnn::constitution::{BudgetedCarry, ContinuingState, Locus, Sample, founding_prior};
     use crate::hnn::executed::{pair_deposit, pair_slip};
     use crate::hnn::prediction::closed_pairs;
     let field = deposit_field();
@@ -2113,8 +2136,14 @@ fn a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposi
     let (paired, carrier, prior) =
         PairedCarrier::found(&field, initial.clone(), 0, &declared).unwrap();
     let base = declared_source_port(&field, 0).unwrap().unwrap();
-    assert_eq!(founding_prior(&field, &paired, 0).unwrap(), Some(prior.clone()));
-    assert_eq!(founding_prior(&field, &initial, 0).unwrap(), Some(base.clone()));
+    assert_eq!(
+        founding_prior(&field, &paired, 0).unwrap(),
+        Some(prior.clone())
+    );
+    assert_eq!(
+        founding_prior(&field, &initial, 0).unwrap(),
+        Some(base.clone())
+    );
     let opening = vec![BigInt::from(4 + 1), BigInt::zero()];
     let u = vec![2, 0, 1, 3, 3, 0, 2, 1, 0];
     let strand = run(&field, 0, &opening, None, &u);
@@ -2128,7 +2157,11 @@ fn a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposi
     // The pair route.
     let alternating: Vec<Vec<usize>> = [0usize, 2, 0]
         .iter()
-        .map(|&start| (0..8).map(|k| if k % 2 == 0 { start } else { 2 - start }).collect())
+        .map(|&start| {
+            (0..8)
+                .map(|k| if k % 2 == 0 { start } else { 2 - start })
+                .collect()
+        })
         .collect();
     let located = located_over(&field, &alternating);
     let (forward, deposit) = pair_deposit(&field, &paired, &prior, 0, &located).unwrap();
@@ -2149,7 +2182,12 @@ fn a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposi
     eprintln!("closed contacts through the founding prior: {closed:?}");
     assert!(closed.contains(&1) && closed.contains(&3));
     let port = ConstitutionRead::source_port(&learned, 0).unwrap();
-    assert!(pair_slip(&field, 0, port, &prior, 3, (1, 3)).unwrap().iter().all(Rat::is_zero));
+    assert!(
+        pair_slip(&field, 0, port, &prior, 3, (1, 3))
+            .unwrap()
+            .iter()
+            .all(Rat::is_zero)
+    );
     let declared_read = pair_slip(&field, 0, port, &base, 3, (1, 3)).unwrap();
     eprintln!("the image's slip read against the declared port alone: {declared_read:?}");
     assert!(declared_read.iter().any(|x| !x.is_zero()));
@@ -2174,7 +2212,12 @@ fn a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposi
     let lattice = paired.lattice(Locus::SourcePort(0)).unwrap();
     let law = paired.source_law(0).unwrap();
     let (next, reading) = law
-        .deposited(&samples, &Rat::one(), &rule, &mut BudgetedCarry::new(lattice, 1))
+        .deposited(
+            &samples,
+            &Rat::one(),
+            &rule,
+            &mut BudgetedCarry::new(lattice, 1),
+        )
         .unwrap();
     let reading = reading.unwrap();
     eprintln!(
@@ -2194,11 +2237,19 @@ fn a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposi
             );
         }
     }
-    let unpaired = initial.clone().with_ports(0, None, Some(prior.clone()), None).unwrap();
+    let unpaired = initial
+        .clone()
+        .with_ports(0, None, Some(prior.clone()), None)
+        .unwrap();
     let (plain, _) = unpaired
         .source_law(0)
         .unwrap()
-        .deposited(&samples, &Rat::one(), &rule, &mut BudgetedCarry::new(lattice, 1))
+        .deposited(
+            &samples,
+            &Rat::one(),
+            &rule,
+            &mut BudgetedCarry::new(lattice, 1),
+        )
         .unwrap();
     let left = carrier.certify(plain.map());
     eprintln!("the same samples on a plain law: {left:?}");
@@ -2217,10 +2268,12 @@ fn a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposi
         masses: None,
     }];
     assert_eq!(
-        partial
-            .source_law(0)
-            .unwrap()
-            .deposited(&outside, &Rat::one(), &rule, &mut BudgetedCarry::new(lattice, 1)),
+        partial.source_law(0).unwrap().deposited(
+            &outside,
+            &Rat::one(),
+            &rule,
+            &mut BudgetedCarry::new(lattice, 1)
+        ),
         Err(HnnError::PairedOutside { class: 0 })
     );
 

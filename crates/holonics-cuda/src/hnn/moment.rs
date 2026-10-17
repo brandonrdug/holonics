@@ -216,6 +216,119 @@ impl<'c> ResidentMoment<'c> {
         })
     }
 
+    /// Hydrate the exact native moment into fresh device buffers. No ingest is replayed.
+    /// Publication happens only after all counts, window entries and current phases agree.
+    pub(crate) fn restored(
+        card: &'c Card,
+        field: &Field,
+        current: &Current,
+        host: &holonics::hnn::SourceMoment,
+    ) -> Result<Self, DeviceError> {
+        holonics::hnn::moment::SourceCapacity::checked_of(host, field, current)?;
+        for &source in field.sources() {
+            if host.transported_mass(source)?.is_some() {
+                return Err(DeviceError::Hnn(HnnError::ContinuingState {
+                    what: "a leaky source observer has no admitted device continuation carrier",
+                }));
+            }
+        }
+        if host.cells() >= 1u64 << 63 {
+            return Err(DeviceError::Hnn(HnnError::CountOverflow));
+        }
+        let mut out = Self::open(card, field, current)?;
+        out.valid = false;
+        let mut first = Vec::new();
+        let mut paired = Vec::new();
+        for &source in field.sources() {
+            for phase in 0..field.ring(source).period() as usize {
+                first.extend_from_slice(host.phase_counts(source, phase)?);
+            }
+            for &offset in field.offsets() {
+                for phase in 0..field.ring(source).period() as usize {
+                    paired.extend_from_slice(host.offset_counts(source, offset, phase)?);
+                }
+            }
+        }
+        if first.len() != out.first.len()
+            || paired.len() != out.paired.len()
+            || first.iter().chain(&paired).any(|&n| n > host.cells())
+        {
+            return Err(DeviceError::Hnn(HnnError::ContinuingState {
+                what: "native moment counts against the device shape and word bound",
+            }));
+        }
+        let held = host.window();
+        let valid = held.iter().take_while(|x| x.is_some()).count();
+        if held.len() + 1 != out.window.len()
+            || held[valid..].iter().any(Option::is_some)
+            || held.iter().flatten().any(|&x| x >= field.alphabet())
+        {
+            return Err(DeviceError::Hnn(HnnError::ContinuingState {
+                what: "native held window against the device delay line",
+            }));
+        }
+        let mut window = vec![0u32; out.window.len()];
+        window[0] = valid as u32;
+        for (i, value) in held[..valid].iter().rev().enumerate() {
+            window[i + 1] = value.unwrap() as u32;
+        }
+        card.write(&out.first, 0, &first)?;
+        card.write(&out.paired, 0, &paired)?;
+        card.write(&out.window, 0, &window)?;
+        out.opening = host.opening().to_vec();
+        out.cells = host.cells();
+        out.valid = true;
+        out.check_native(field, current, host)?;
+        Ok(out)
+    }
+    /// Read and validate actual device-owned state before a native checkpoint is emitted.
+    pub(crate) fn check_native(
+        &self,
+        field: &Field,
+        current: &Current,
+        host: &holonics::hnn::SourceMoment,
+    ) -> Result<(), DeviceError> {
+        self.ensure_valid()?;
+        if &self.field != field
+            || self.lift != current.lift()
+            || self.opening != host.opening()
+            || self.cells != host.cells()
+            || self.window()? != host.window()
+        {
+            return Err(DeviceError::Hnn(HnnError::ContinuingState {
+                what: "device moment metadata/window against the native passage",
+            }));
+        }
+        let phases = self.phases()?;
+        for (g, &phase) in phases.iter().enumerate() {
+            if u64::from(phase) != current.phase(field, g)? {
+                return Err(DeviceError::Hnn(HnnError::ContinuingState {
+                    what: "device phases against the saved lift",
+                }));
+            }
+        }
+        let counts = self.counts()?;
+        for &source in field.sources() {
+            for phase in 0..field.ring(source).period() as usize {
+                if counts.phase_counts(source, phase)? != host.phase_counts(source, phase)? {
+                    return Err(DeviceError::Hnn(HnnError::ContinuingState {
+                        what: "device phase counts against the native passage",
+                    }));
+                }
+                for &offset in field.offsets() {
+                    if counts.offset_counts(source, offset, phase)?
+                        != host.offset_counts(source, offset, phase)?
+                    {
+                        return Err(DeviceError::Hnn(HnnError::ContinuingState {
+                            what: "device offset counts against the native passage",
+                        }));
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
     /// **Ingest cells in order** at the layout derived from the card's census: the lift point's
     /// selective steps, then the phase-binned and offset counts on every source ring, then the
     /// held cells. Stops after the cell whose step carries the joint clock out, and reports it.
@@ -279,7 +392,18 @@ impl<'c> ResidentMoment<'c> {
         // after the first stopping cell. Only the admitted prefix is counted and committed.
         // A mounted value is an encoding's actual resident transport face, not an inferred or
         // authored table of answers.
-        let located = if encoded.located().is_some() {
+        let occurrence_major = encoded.placement().is_some();
+        let located = if occurrence_major {
+            let mut advances = Vec::with_capacity(rings * encoded.len());
+            for at in 0..encoded.len() {
+                advances.extend_from_slice(encoded.advance(at).ok_or(DeviceError::Hnn(
+                    HnnError::Unadmitted {
+                        reason: "a placed occurrence has no transport digits",
+                    },
+                ))?);
+            }
+            Some(card.upload(&advances)?)
+        } else if encoded.located().is_some() {
             let mut advances = vec![0u64; rings * self.alphabet];
             for at in 0..encoded.len() {
                 let digits = encoded
@@ -308,6 +432,7 @@ impl<'c> ResidentMoment<'c> {
         let mut periods = self.period_words.device_ptr();
         let mut chart = located.as_ref().unwrap_or(&self.chart).device_ptr();
         let mut alphabet = self.alphabet as u32;
+        let mut placement_mode = u32::from(occurrence_major);
         let mut sources_wire = self.sources.len() as u32;
         let mut sources = self.source_words.device_ptr();
         let mut offsets_wire = self.offsets.len() as u32;
@@ -320,13 +445,14 @@ impl<'c> ResidentMoment<'c> {
         let mut paired = self.paired.device_ptr();
         let mut paired_base = self.paired_base_words.device_ptr();
         let mut receipt = self.receipt.device_ptr();
-        let mut params: [*mut c_void; 18] = [
+        let mut params: [*mut c_void; 19] = [
             &mut codes_ptr as *mut _ as *mut c_void,
             &mut cells as *mut _ as *mut c_void,
             &mut rings_wire as *mut _ as *mut c_void,
             &mut periods as *mut _ as *mut c_void,
             &mut chart as *mut _ as *mut c_void,
             &mut alphabet as *mut _ as *mut c_void,
+            &mut placement_mode as *mut _ as *mut c_void,
             &mut sources_wire as *mut _ as *mut c_void,
             &mut sources as *mut _ as *mut c_void,
             &mut offsets_wire as *mut _ as *mut c_void,
@@ -538,5 +664,28 @@ impl MomentSnapshot<'_> {
     pub(crate) fn paired_pointer(&self, source: usize, offset: usize) -> crate::ffi::CUdeviceptr {
         self.paired.device_ptr()
             + self.paired_base(source, offset) * core::mem::size_of::<u64>() as u64
+    }
+}
+
+#[cfg(test)]
+mod continuation_tests {
+    use super::*;
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_card_full_resident_continuation_refuses_invalid_or_mismatched_moment() {
+        let card = crate::hnn::tests::card();
+        let field = Field::declare(
+            holonics::hnn::FieldDeclaration::campaign_one(1 << 20).by_lattice_rule(),
+        )
+        .unwrap();
+        let current = Current::at_rest(&field);
+        let native = holonics::hnn::SourceMoment::open(&field, &current);
+        let mut moment = ResidentMoment::restored(&card, &field, &current, &native).unwrap();
+        moment.check_native(&field, &current, &native).unwrap();
+        card.write(&moment.first, 0, &[1u64]).unwrap();
+        assert!(moment.check_native(&field, &current, &native).is_err());
+        card.write(&moment.first, 0, &[0u64]).unwrap();
+        moment.valid = false;
+        assert!(moment.check_native(&field, &current, &native).is_err());
     }
 }

@@ -71,8 +71,13 @@ fn factored(members: &[Vec<Rat>], g: impl Fn(&Rat) -> Rat) -> ReceiverWidth {
         .iter()
         .map(|member| ExactFace::Vector(vec![g(&member[0])]))
         .collect::<Vec<_>>();
-    width_over_readings("g ∘ x", "the enumerated fibre", &faces, DiameterNorm::Supremum)
-        .expect("a width")
+    width_over_readings(
+        "g ∘ x",
+        "the enumerated fibre",
+        &faces,
+        DiameterNorm::Supremum,
+    )
+    .expect("a width")
 }
 
 /// **The exact system whose event is future-stable while its timing is not**: the doubling
@@ -255,7 +260,10 @@ fn the_coarse_event_reading_does_not_determine_the_timing() {
     let eighth = vec![ratio(1, 8)];
     let quarter = vec![ratio(1, 4)];
     assert_eq!(event.read(&eighth).unwrap(), event.read(&quarter).unwrap());
-    assert_ne!(timing.read(&eighth).unwrap(), timing.read(&quarter).unwrap());
+    assert_ne!(
+        timing.read(&eighth).unwrap(),
+        timing.read(&quarter).unwrap()
+    );
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -711,7 +719,10 @@ fn a_certified_capture_releases_at_zero_and_an_uncertified_one_asks_or_holds() {
             tolerance: Rat::zero()
         }
     );
-    assert_eq!(decide(1, Some(probe())), ReleaseReturn::Ask { probe: probe() });
+    assert_eq!(
+        decide(1, Some(probe())),
+        ReleaseReturn::Ask { probe: probe() }
+    );
     assert_eq!(decide(1, None), ReleaseReturn::Hold);
 }
 
@@ -795,7 +806,10 @@ fn invalid_normalization_is_refused() {
 #[test]
 fn reversed_mass_bounds_are_refused() {
     let face = vec![
-        ExactInterval { lower: ratio(3, 4), upper: ratio(1, 4) },
+        ExactInterval {
+            lower: ratio(3, 4),
+            upper: ratio(1, 4),
+        },
         ExactInterval::new(ratio(0, 1), ratio(3, 4)).unwrap(),
     ];
     assert_eq!(
@@ -925,6 +939,103 @@ fn a_simplex_covering_face_holds_every_key() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// the commit at class grain
+// ---------------------------------------------------------------------------------------------
+
+/// On a point face the commit's classes are the exact maximal set: one class releases at width
+/// zero, and a tie is held with both classes kept.
+#[test]
+fn a_point_face_commits_its_unique_maximum_and_holds_a_tie() {
+    let unique = vec![
+        ExactInterval::point(ratio(1, 4)),
+        ExactInterval::point(ratio(1, 2)),
+        ExactInterval::point(ratio(1, 4)),
+    ];
+    let committed = commit(&unique).unwrap();
+    assert_eq!(committed.classes, vec![1]);
+    assert_eq!(committed.class(), Some(1));
+    assert!(matches!(
+        committed.release,
+        ReleaseReturn::Released { ref width, ref tolerance } if width.is_zero() && tolerance.is_zero()
+    ));
+    let tie = vec![
+        ExactInterval::point(ratio(3, 8)),
+        ExactInterval::point(ratio(1, 4)),
+        ExactInterval::point(ratio(3, 8)),
+    ];
+    let held = commit(&tie).unwrap();
+    assert_eq!(held.release, ReleaseReturn::Hold);
+    assert_eq!(held.classes, vec![0, 2]);
+    assert_eq!(held.class(), None);
+}
+
+/// On an interval face the commit releases exactly when one class's lower bound exceeds every
+/// other upper bound; an overlap holds the classes that may be maximal and drops the rest.
+#[test]
+fn an_interval_face_commits_only_a_separated_maximum() {
+    let separated = vec![
+        ExactInterval::new(ratio(1, 8), ratio(1, 4)).unwrap(),
+        ExactInterval::new(ratio(5, 16), ratio(1, 2)).unwrap(),
+        ExactInterval::new(ratio(1, 4), ratio(5, 16)).unwrap(),
+    ];
+    // Class 1's lower 5/16 meets class 2's upper 5/16: equal bounds do not separate.
+    let touching = commit(&separated).unwrap();
+    assert_eq!(touching.release, ReleaseReturn::Hold);
+    assert_eq!(touching.classes, vec![1, 2]);
+    let apart = vec![
+        separated[0].clone(),
+        ExactInterval::new(ratio(3, 8), ratio(1, 2)).unwrap(),
+        separated[2].clone(),
+    ];
+    assert_eq!(commit(&apart).unwrap().class(), Some(1));
+    // Class 0's upper bound is below class 1's lower bound, so class 0 is never maximal.
+    let overlapping = vec![
+        ExactInterval::new(ratio(1, 16), ratio(1, 8)).unwrap(),
+        ExactInterval::new(ratio(1, 4), ratio(1, 2)).unwrap(),
+        ExactInterval::new(ratio(3, 8), ratio(5, 8)).unwrap(),
+    ];
+    let plural = commit(&overlapping).unwrap();
+    assert_eq!(plural.release, ReleaseReturn::Hold);
+    assert_eq!(plural.classes, vec![1, 2]);
+    // A face covering the simplex holds every class.
+    let covering = vec![ExactInterval::new(Rat::zero(), Rat::one()).unwrap(); 3];
+    assert_eq!(commit(&covering).unwrap().classes, vec![0, 1, 2]);
+}
+
+/// The commit refuses what the draw refuses: a face that cannot be normalized.
+#[test]
+fn the_commit_refuses_an_unadmitted_face() {
+    let short = vec![
+        ExactInterval::point(ratio(1, 4)),
+        ExactInterval::point(ratio(1, 4)),
+    ];
+    assert_eq!(
+        commit(&short).unwrap_err(),
+        draw(&short, &Rat::zero()).unwrap_err()
+    );
+}
+
+// ---------------------------------------------------------------------------------------------
+// the declared key
+// ---------------------------------------------------------------------------------------------
+
+/// A key is its big-endian word over `256^width`; the stream reads its words in order, counts
+/// them, holds at a short tail and refuses a zero width.
+#[test]
+fn the_key_stream_reads_dyadic_words_in_order() {
+    let mut stream = KeyStream::new(vec![0x80, 0x00, 0x00, 0x01, 0xff, 0xff, 0x07], 2).unwrap();
+    assert_eq!(stream.width(), 2);
+    assert_eq!(stream.next_key(), Some(ratio(1, 2)));
+    assert_eq!(stream.next_key(), Some(ratio(1, 65536)));
+    assert_eq!(stream.next_key(), Some(ratio(65535, 65536)));
+    assert_eq!(stream.keys_read(), 3);
+    // One byte remains: no key, and the count stands.
+    assert_eq!(stream.next_key(), None);
+    assert_eq!(stream.keys_read(), 3);
+    assert_eq!(KeyStream::new(vec![1, 2, 3], 0), Err(DrawRefusal::KeyWidth));
+}
+
+// ---------------------------------------------------------------------------------------------
 // the faces the width is taken over
 // ---------------------------------------------------------------------------------------------
 
@@ -979,9 +1090,13 @@ fn the_width_over_readings_refuses_empty_and_oversized_families() {
         ExactFace::Vector(vec![integer(4)]),
         ExactFace::Vector(vec![integer(2)]),
     ];
-    let over_readings =
-        width_over_readings("the first coordinate", "three", &faces, DiameterNorm::Supremum)
-            .expect("an exact width");
+    let over_readings = width_over_readings(
+        "the first coordinate",
+        "three",
+        &faces,
+        DiameterNorm::Supremum,
+    )
+    .expect("an exact width");
     assert_eq!(over_readings.diameter(), &integer(3));
     assert_eq!(
         over_readings.attaining(),

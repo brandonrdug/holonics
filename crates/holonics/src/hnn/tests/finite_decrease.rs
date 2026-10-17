@@ -10,6 +10,7 @@ use num_traits::{One, Signed, Zero};
 
 use super::support::{contact, encoded, ring};
 use crate::compression::landmark::context::{BaseMeasure, StopPrior};
+use crate::hnn::HnnError;
 use crate::hnn::chart::Charts;
 use crate::hnn::constitution::{
     Carrier, Constitution, DeclaredExponents, DeclaredStepRefusal, DepositReading,
@@ -30,12 +31,11 @@ use crate::hnn::word::continuation::{
     LandingCandidate, LandingRefusal, admit, decide, reading_identity,
 };
 use crate::hnn::word::finite_gain::FiniteContactSpans;
-use crate::hnn::HnnError;
 use crate::hnn::word::{Absorption, EndChange, ReceptionCarry, Word, WordOpening};
 use crate::holon::deposition::dyadic;
 use crate::ratio::algebraic::ExactInterval;
-use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::disk::floor_log2;
+use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
 
 // -------------------------------------------------------------------------------------------
@@ -118,14 +118,9 @@ fn opened_on<'f>(
             .unwrap();
     }
     let moment = Arc::new(moment);
-    let (mut word, _) = Word::open_source_exact_received(
-        field,
-        theta,
-        current,
-        Arc::clone(&moment),
-        opening,
-    )
-    .unwrap();
+    let (mut word, _) =
+        Word::open_source_exact_received(field, theta, current, Arc::clone(&moment), opening)
+            .unwrap();
     word.run(phases.junction_steps()).unwrap();
     (moment, word)
 }
@@ -147,7 +142,12 @@ fn issued(field: &Field, theta: &Constitution, current: &Current) -> Issued {
 }
 
 /// The same comparison on a Word opened on `opening`, declared to the landing as that opening.
-fn issued_on(field: &Field, theta: &Constitution, current: &Current, opening: &WordOpening) -> Issued {
+fn issued_on(
+    field: &Field,
+    theta: &Constitution,
+    current: &Current,
+    opening: &WordOpening,
+) -> Issued {
     let (moment, word) = opened_on(field, theta, current, &[0, 1], opening);
     let targets = encoded(field, &[0, 1, 3]);
     let compared = vec![false, false, true];
@@ -486,7 +486,10 @@ fn the_certified_exponents_declared_reproduce_the_native_deposit() {
         .deposited_with_contact_spans_at(&issued.deposit, &spans, &declared)
         .unwrap()
         .unwrap();
-    assert_eq!(successor, native, "the same successor, material and carries");
+    assert_eq!(
+        successor, native,
+        "the same successor, material and carries"
+    );
     assert_eq!(successor.carried_remainders(), native.carried_remainders());
     assert_eq!(publication, reading, "the same publication");
     assert!(committed.families.is_empty(), "no reach is claimed at the certified exponents");
@@ -582,7 +585,10 @@ fn the_first_reach_commits_its_proposed_reach_or_refuses_typed() {
                     "the committed reach is the proposed reach"
                 );
             }
-            assert!(publication.vanished.is_empty(), "every claimed family moved");
+            assert!(
+                publication.vanished.is_empty(),
+                "every claimed family moved"
+            );
             println!("first reach committed: {:?}", committed.families);
         }
         Err(DeclaredStepRefusal::CovectorScale {
@@ -618,7 +624,10 @@ fn a_declared_exponent_past_the_covector_scale_refuses_typed() {
         .unwrap();
     let (locus, reading) = certified.steps.first().expect("a certified family").clone();
     let covector = reading.step.covector.clone();
-    assert!(covector.is_positive(), "a reached nonzero direction has a nonzero covector");
+    assert!(
+        covector.is_positive(),
+        "a reached nonzero direction has a nonzero covector"
+    );
     let exponent = floor_log2(&(Rat::one() / &covector)) + 1;
     assert!(dyadic(exponent) * &covector > Rat::one());
     let declared = DeclaredExponents::declare(certified.steps.iter().map(|(l, r)| {
@@ -679,7 +688,10 @@ fn the_reading_identity_reads_gauge_normalized_cells_never_endpoints() {
     // A common carry shift: cells (5, 4) normalize to the same (0, −1).
     let shifted = station(vec![integer(5), integer(1), integer(4), integer(0)]);
     assert!(reading_identity(&producing, &shifted));
-    assert_eq!(shifted.code_length().unwrap(), producing.code_length().unwrap());
+    assert_eq!(
+        shifted.code_length().unwrap(),
+        producing.code_length().unwrap()
+    );
     // One differing cell: (0, −2).
     let differing = station(vec![integer(0), integer(1), integer(-2), integer(0)]);
     assert!(!reading_identity(&producing, &differing));
@@ -720,25 +732,46 @@ fn the_reading_identity_reads_gauge_normalized_cells_never_endpoints() {
 #[test]
 fn the_admission_is_an_exact_strict_improvement_and_refuses_typed() {
     let interval = |lower: Rat, upper: Rat| ExactInterval::new(lower, upper).unwrap();
-    let (low, high) = (interval(integer(1), integer(2)), interval(integer(3), integer(4)));
+    let (low, high) = (
+        interval(integer(1), integer(2)),
+        interval(integer(3), integer(4)),
+    );
     let one = integer(1);
     // Classical: upper(L′) = 2 < lower(L) = 3 and X′ ≤ X.
-    assert_eq!(decide(&high, &one, &low, &one, false), Ok(Admitted::Classical));
-    assert_eq!(decide(&high, &one, &low, &rat(1, 2), false), Ok(Admitted::Classical));
+    assert_eq!(
+        decide(&high, &one, &low, &one, false),
+        Ok(Admitted::Classical)
+    );
+    assert_eq!(
+        decide(&high, &one, &low, &rat(1, 2), false),
+        Ok(Admitted::Classical)
+    );
     // Phase: the witness and X′ < X.
-    assert_eq!(decide(&low, &one, &low, &rat(1, 2), true), Ok(Admitted::Phase));
+    assert_eq!(
+        decide(&low, &one, &low, &rat(1, 2), true),
+        Ok(Admitted::Phase)
+    );
     // Refusals.
     assert_eq!(
         decide(&high, &one, &low, &integer(2), false),
         Err(AdmissionRefusal::PhaseWorse)
     );
-    assert_eq!(decide(&low, &one, &high, &one, false), Err(AdmissionRefusal::CodeWorse));
+    assert_eq!(
+        decide(&low, &one, &high, &one, false),
+        Err(AdmissionRefusal::CodeWorse)
+    );
     assert_eq!(
         decide(&low, &one, &low, &rat(1, 2), false),
         Err(AdmissionRefusal::EqualEndpoints)
     );
     assert_eq!(
-        decide(&interval(integer(1), integer(3)), &one, &interval(integer(2), integer(4)), &one, false),
+        decide(
+            &interval(integer(1), integer(3)),
+            &one,
+            &interval(integer(2), integer(4)),
+            &one,
+            false
+        ),
         Err(AdmissionRefusal::Overlap)
     );
     // Touching endpoints are not separated.
@@ -746,8 +779,14 @@ fn the_admission_is_an_exact_strict_improvement_and_refuses_typed() {
         decide(&interval(integer(2), integer(3)), &one, &low, &one, false),
         Err(AdmissionRefusal::Overlap)
     );
-    assert_eq!(decide(&low, &one, &low, &one, true), Err(AdmissionRefusal::Unchanged));
-    assert_eq!(decide(&low, &one, &low, &integer(2), true), Err(AdmissionRefusal::PhaseWorse));
+    assert_eq!(
+        decide(&low, &one, &low, &one, true),
+        Err(AdmissionRefusal::Unchanged)
+    );
+    assert_eq!(
+        decide(&low, &one, &low, &integer(2), true),
+        Err(AdmissionRefusal::PhaseWorse)
+    );
     // On faces: (0, −2) has Z = 5/4 against (0, −1)'s 3/2, so log₂(5/4) < log₂(3/2) strictly, with
     // the same phases; and the target's phase 1/4 in place of 1/2 keeps every cell.
     let producing = producing_station();
@@ -807,7 +846,12 @@ fn an_opening_that_is_not_the_words_own_issues_no_candidate() {
 /// declared, the producing ratio as the candidate's, `Phase` claimed). Its decision does not
 /// re-read (the witness holds with `X′ = X`, `Unchanged`), so it is refused at the decision unless a
 /// binding refuses first. It exercises the binding; it is never an admission.
-fn forged(field: &Field, theta: &Constitution, current: &Current, issued: &Issued) -> FiniteDecrease {
+fn forged(
+    field: &Field,
+    theta: &Constitution,
+    current: &Current,
+    issued: &Issued,
+) -> FiniteDecrease {
     let spans = spans(field, theta, current, &issued.deposit);
     let (_, certified) = theta
         .deposited_with_contact_spans(&issued.deposit, &spans)
@@ -861,8 +905,15 @@ fn refused(
         deposit,
         ..
     } = issued;
-    cut.continue_admitted(field, current, &moment, &deposit, &admission, &mut Charts::new())
-        .err()
+    cut.continue_admitted(
+        field,
+        current,
+        &moment,
+        &deposit,
+        &admission,
+        &mut Charts::new(),
+    )
+    .err()
 }
 
 #[test]
@@ -939,7 +990,14 @@ fn an_admission_binds_its_own_cut_by_equality() {
     let deposit = returned.deposit.into_present().unwrap();
     assert_eq!(
         foreign
-            .continue_admitted(&field, &current, &moment, &deposit, &admission, &mut Charts::new())
+            .continue_admitted(
+                &field,
+                &current,
+                &moment,
+                &deposit,
+                &admission,
+                &mut Charts::new()
+            )
             .err(),
         binding(BindingRefusal::ForeignCut)
     );
@@ -974,7 +1032,10 @@ fn a_post_admission_refusal_keeps_the_cut_for_the_certified_continuation() {
         &[false, false, false],
     )
     .unwrap();
-    assert_eq!(none.code_length().unwrap(), ExactInterval::point(Rat::zero()));
+    assert_eq!(
+        none.code_length().unwrap(),
+        ExactInterval::point(Rat::zero())
+    );
     assert_eq!(none.excess(), Rat::zero());
     assert_eq!(admit(&issued.ratio, &none), Ok(Admitted::Classical));
     admission.candidate.ratio = none;
@@ -1008,7 +1069,10 @@ fn a_post_admission_refusal_keeps_the_cut_for_the_certified_continuation() {
     let (successor, returned) = cut
         .continue_deposited(&field, &current, &moment, &deposit, &mut charts)
         .unwrap();
-    assert_eq!(successor, native, "the certified continuation runs on the same cut");
+    assert_eq!(
+        successor, native,
+        "the certified continuation runs on the same cut"
+    );
     assert_eq!(returned.deposit.present(), Some(&reading));
     assert!(returned.receipt.landing.is_none());
 }
@@ -1025,7 +1089,11 @@ fn the_landing_on_0279_is_a_measured_outcome() {
     println!(
         "0279 landing: declared={:?} outcome={:?}",
         issued.landing.declared,
-        issued.landing.outcome.as_ref().map(FiniteDecrease::admitted)
+        issued
+            .landing
+            .outcome
+            .as_ref()
+            .map(FiniteDecrease::admitted)
     );
     let Issued {
         moment,
@@ -1038,14 +1106,23 @@ fn the_landing_on_0279_is_a_measured_outcome() {
     let next_tick = cut.next_tick();
     match &landing.outcome {
         Ok(admission) => {
-            let candidate = landing.candidate.as_ref().expect("an admitted candidate was read");
+            let candidate = landing
+                .candidate
+                .as_ref()
+                .expect("an admitted candidate was read");
             assert_eq!(candidate, admission.candidate());
             assert_eq!(admission.ratio(), &ratio);
             assert_eq!(admit(&ratio, candidate.ratio()), Ok(admission.admitted()));
             assert_eq!(candidate.tick(), next_tick);
             // As the W0 flow does: prepare the admitted continuation without consuming the cut.
-            match cut.prepare_admitted(&field, &current, &moment, &deposit, admission, &Charts::new())
-            {
+            match cut.prepare_admitted(
+                &field,
+                &current,
+                &moment,
+                &deposit,
+                admission,
+                &Charts::new(),
+            ) {
                 Ok(prepared) => {
                     let (successor, returned) = cut.finish(prepared, &mut Charts::new());
                     assert_eq!(&successor, candidate.theta());
@@ -1064,11 +1141,16 @@ fn the_landing_on_0279_is_a_measured_outcome() {
                     );
                     println!("0279 admitted continuation refused after admission: {refusal:?}");
                     let spans = spans(&field, &theta, &current, &deposit);
-                    let (native, _) = theta.deposited_with_contact_spans(&deposit, &spans).unwrap();
+                    let (native, _) = theta
+                        .deposited_with_contact_spans(&deposit, &spans)
+                        .unwrap();
                     let (successor, returned) = cut
                         .continue_deposited(&field, &current, &moment, &deposit, &mut Charts::new())
                         .unwrap();
-                    assert_eq!(successor, native, "the same cut continues on the certified step");
+                    assert_eq!(
+                        successor, native,
+                        "the same cut continues on the certified step"
+                    );
                     assert!(returned.receipt.landing.is_none());
                 }
             }
@@ -1076,11 +1158,16 @@ fn the_landing_on_0279_is_a_measured_outcome() {
         Err(refusal) => {
             println!("0279 landing refused: {refusal:?}");
             let spans = spans(&field, &theta, &current, &deposit);
-            let (native, _) = theta.deposited_with_contact_spans(&deposit, &spans).unwrap();
+            let (native, _) = theta
+                .deposited_with_contact_spans(&deposit, &spans)
+                .unwrap();
             let (successor, returned) = cut
                 .continue_deposited(&field, &current, &moment, &deposit, &mut Charts::new())
                 .unwrap();
-            assert_eq!(successor, native, "a refused landing continues on the certified step");
+            assert_eq!(
+                successor, native,
+                "a refused landing continues on the certified step"
+            );
             assert!(returned.receipt.landing.is_none());
         }
     }
@@ -1125,7 +1212,10 @@ fn a_carry_crosses_into_its_producing_constitution_unchanged() {
         .iter()
         .filter(|state| state[1].iter().any(|w| !w.is_zero()))
         .count();
-    println!("0279 carry: ticks={} contacts with a nonzero rate={moving}", carry.ticks);
+    println!(
+        "0279 carry: ticks={} contacts with a nonzero rate={moving}",
+        carry.ticks
+    );
     let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
     let (conductances, storage, resonators) = crossing(&operands);
     assert_eq!(
@@ -1153,7 +1243,11 @@ fn a_received_opening_reads_its_landing_from_the_crossed_carry() {
     println!(
         "0279 received landing: declared={:?} outcome={:?}",
         issued.landing.declared,
-        issued.landing.outcome.as_ref().map(FiniteDecrease::admitted)
+        issued
+            .landing
+            .outcome
+            .as_ref()
+            .map(FiniteDecrease::admitted)
     );
     if let Err(refusal) = &issued.landing.outcome {
         println!("0279 received landing refused: {refusal:?}");
@@ -1225,8 +1319,15 @@ fn an_admission_binds_its_opening_by_value() {
         ..
     } = issued;
     assert_eq!(
-        cut.continue_admitted(&field, &current, &moment, &deposit, &admission, &mut Charts::new())
-            .err(),
+        cut.continue_admitted(
+            &field,
+            &current,
+            &moment,
+            &deposit,
+            &admission,
+            &mut Charts::new()
+        )
+        .err(),
         Some(LandingRefusal::Binding(BindingRefusal::Opening))
     );
 }

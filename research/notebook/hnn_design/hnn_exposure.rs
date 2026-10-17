@@ -148,13 +148,13 @@ use std::time::Instant;
 
 use holonics::aeon::{EnclosedBalance, LiteralComparison};
 use holonics::compression::cost::ceil_log2;
+use holonics::compression::keys::transport::{CarryHelix, TransportLocation};
 use holonics::compression::landmark::context::baseline::PPM_ORDER;
 use holonics::compression::landmark::context::{Landmarks, cell_letters, letter_address};
-use holonics::compression::keys::transport::{CarryHelix, TransportLocation};
-use holonics::hnn::encoding::{Encoded, Encoding, EncodingError, PassageChart};
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
-use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
+use holonics::hnn::encoding::{Encoded, Encoding, EncodingError, PassageChart};
 use holonics::hnn::moment::SourceCapacity;
+use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
 use holonics::hnn::receiving::landmark_declaration;
 use holonics::hnn::reference::{Bits, KeyReport};
 use holonics::hnn::{
@@ -238,7 +238,12 @@ fn component<T>(value: &Component<T>, present: impl Fn(&T) -> String) -> String 
 fn encoded_text(field: &Field, bytes: &[u8]) -> Result<Encoded, EncodingError> {
     let periods = field.rings().iter().map(|ring| ring.period()).collect();
     let helix = CarryHelix::new(periods)?;
-    let codes = vec![bytes.iter().map(|&byte| usize::from(byte)).collect::<Vec<usize>>()];
+    let codes = vec![
+        bytes
+            .iter()
+            .map(|&byte| usize::from(byte))
+            .collect::<Vec<usize>>(),
+    ];
     let location = TransportLocation::locate(helix, 256, &codes)?;
     let chart = PassageChart::located(&location, &codes)?;
     let encoding = Encoding::found(&chart)?;
@@ -381,7 +386,9 @@ fn main() {
         None => Reference::campaign_one(),
     };
     let reference = if refining {
-        println!("grain: the contacts on the refining grain (re-based by the dyadic exponent of L(N))");
+        println!(
+            "grain: the contacts on the refining grain (re-based by the dyadic exponent of L(N))"
+        );
         reference.with_refining_grain()
     } else {
         reference
@@ -402,16 +409,21 @@ fn main() {
     } else if founded {
         // The source rings' transport founded off the lossless boundary, read by the leaky count
         // (the contact loop record §24).
-        let mut initial = loaded.then(|| loaded_constitution(&field)).unwrap_or_else(|| {
-            Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("the initial constitution")
-        });
+        let mut initial = loaded
+            .then(|| loaded_constitution(&field))
+            .unwrap_or_else(|| {
+                Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
+                    .expect("the initial constitution")
+            });
         for &ring in field.sources() {
             initial = initial
                 .founded_transport(&field, ring)
                 .expect("the founded transport");
             println!(
                 "transport: ring {ring} founded at {} (the leaky count)",
-                initial.founding_transport(&field, ring).expect("the founding")
+                initial
+                    .founding_transport(&field, ring)
+                    .expect("the founding")
             );
         }
         Some(initial)
@@ -468,7 +480,16 @@ fn main() {
         return;
     }
     if let Some(count) = ablation {
-        contact_ablation_run(&field, &cut, count, information, descent, samples_out.as_deref(), founded, memory);
+        contact_ablation_run(
+            &field,
+            &cut,
+            count,
+            information,
+            descent,
+            samples_out.as_deref(),
+            founded,
+            memory,
+        );
         return;
     }
 
@@ -915,11 +936,19 @@ fn report(field: &Field, exposure: &Exposure) {
     let (n_star, counted) = match state.moment_capacity {
         SourceCapacity::Identity { state_bits, n_star } => (
             format!("{n_star} (identity clock)"),
-            format!("{} bits, per source bit {}", state_bits, over_source(state_bits)),
+            format!(
+                "{} bits, per source bit {}",
+                state_bits,
+                over_source(state_bits)
+            ),
         ),
         SourceCapacity::Located { state_bits, n_star } => (
             format!("{n_star} (located clock)"),
-            format!("{} bits, per source bit {}", state_bits, over_source(state_bits)),
+            format!(
+                "{} bits, per source bit {}",
+                state_bits,
+                over_source(state_bits)
+            ),
         ),
         SourceCapacity::Retained {
             clock,
@@ -1103,9 +1132,14 @@ fn rounding(exposure: &Exposure) {
             entry.3 = entry.3.max(*exponent);
         }
     }
-    println!("the rounding census over {} deposits:", exposure.constitution_curve.len() - 1);
+    println!(
+        "the rounding census over {} deposits:",
+        exposure.constitution_curve.len() - 1
+    );
     for (family, (certified, moved, least, largest)) in &families {
-        println!("  {family}: moved at {moved} of {certified} certified deposits; steps 2^{least}..2^{largest}");
+        println!(
+            "  {family}: moved at {moved} of {certified} certified deposits; steps 2^{least}..2^{largest}"
+        );
     }
 }
 
@@ -1142,7 +1176,11 @@ fn write_samples(
     }
     #[allow(clippy::disallowed_methods)]
     std::fs::write(path, text).expect("write the samples");
-    println!("  samples written: {} inputs, {} maps", samples.len(), maps.len());
+    println!(
+        "  samples written: {} inputs, {} maps",
+        samples.len(),
+        maps.len()
+    );
 }
 
 /// [measured-diagnostic; agent-inferred, October 2; the contact loop record §7] **The contact loop
@@ -1169,22 +1207,39 @@ fn contact_ablation_run(
     // contacts-only commits (families certified and vanished, the return's size `a`) and R's steps.
     let aeon_line = |a: usize, readings: &[ContactAblation], receiver: &[ReceiverStep]| {
         let here: Vec<&ContactAblation> = readings.iter().filter(|r| r.aeon == a).collect();
-        let largest = here.iter().map(|r| r.exponent_spread.clone()).max().unwrap_or_else(Rat::zero);
-        let single = here.iter().map(|r| r.exponent_shift.clone()).max().unwrap_or_else(Rat::zero);
+        let largest = here
+            .iter()
+            .map(|r| r.exponent_spread.clone())
+            .max()
+            .unwrap_or_else(Rat::zero);
+        let single = here
+            .iter()
+            .map(|r| r.exponent_shift.clone())
+            .max()
+            .unwrap_or_else(Rat::zero);
         let families: usize = here.iter().map(|r| r.contact_families).sum();
         let vanished: usize = here.iter().map(|r| r.contact_vanished).sum();
         let total: Rat = here.iter().map(|r| r.contact_alignment.clone()).sum();
         let mut aligns: Vec<Rat> = here.iter().map(|r| r.contact_alignment.clone()).collect();
         aligns.sort();
-        let median = aligns.get(aligns.len() / 2).cloned().unwrap_or_else(Rat::zero);
+        let median = aligns
+            .get(aligns.len() / 2)
+            .cloned()
+            .unwrap_or_else(Rat::zero);
         let steps: Vec<&ReceiverStep> = receiver.iter().filter(|s| s.aeon == a).collect();
         let r_moved = steps.iter().filter(|s| s.moved).count();
         let mut r_aligns: Vec<Rat> = steps.iter().map(|s| s.alignment.clone()).collect();
         r_aligns.sort();
-        let r_median = r_aligns.get(r_aligns.len() / 2).cloned().unwrap_or_else(Rat::zero);
+        let r_median = r_aligns
+            .get(r_aligns.len() / 2)
+            .cloned()
+            .unwrap_or_else(Rat::zero);
         let mut r_steps: Vec<Rat> = steps.iter().map(|s| s.step.clone()).collect();
         r_steps.sort();
-        let r_step = r_steps.get(r_steps.len() / 2).cloned().unwrap_or_else(Rat::zero);
+        let r_step = r_steps
+            .get(r_steps.len() / 2)
+            .cloned()
+            .unwrap_or_else(Rat::zero);
         let held = |x: &Rat| holonics::holon::deposition::significant(x, 24, false);
         println!(
             "  aeon {a}: the receiver's exponent span, largest {largest} bits; one deposit's contact change, largest {single} bits; contacts-only commits {}: channel families certified {families}, vanished {vanished}; the contacts' return a, median {}, total {} (24 bits); R's steps {}: moved {r_moved}, its a median {} (24 bits), its step median {r_step}; {} ms",
@@ -1253,13 +1308,19 @@ fn contact_ablation_run(
             .collect();
         ratios.sort();
         let n = ratios.len();
-        let pick = |q: usize| ratios.get(q.min(n.saturating_sub(1))).cloned().unwrap_or_else(Rat::zero);
+        let pick = |q: usize| {
+            ratios
+                .get(q.min(n.saturating_sub(1)))
+                .cloned()
+                .unwrap_or_else(Rat::zero)
+        };
         let bound = Rat::new(5.into(), 9.into());
         let past = ratios.iter().filter(|r| **r > bound).count();
         let (mut fell, mut rose, mut undecided) = (0, 0, 0);
         let (mut fell_past, mut rose_past) = (0, 0);
         for d in &run.descents {
-            let failing = d.a_plus.is_positive() && &d.a_minus / &d.a_plus > bound || !d.a_plus.is_positive();
+            let failing =
+                d.a_plus.is_positive() && &d.a_minus / &d.a_plus > bound || !d.a_plus.is_positive();
             if d.after.upper < d.before.lower {
                 fell += 1;
                 fell_past += usize::from(failing);
@@ -1289,9 +1350,14 @@ fn contact_ablation_run(
         let threshold_high = Rat::new(BigInt::from(2 * 3689), BigInt::from(1000));
         let mut pooled: BTreeMap<String, (Rat, Rat, usize, usize, usize, usize)> = BTreeMap::new();
         for ((locus, _, _), r) in &run.released {
-            let slot = pooled
-                .entry(format!("{locus:?}"))
-                .or_insert((Rat::zero(), Rat::zero(), 0, 0, 0, 0));
+            let slot = pooled.entry(format!("{locus:?}")).or_insert((
+                Rat::zero(),
+                Rat::zero(),
+                0,
+                0,
+                0,
+                0,
+            ));
             slot.0 += r.sum.abs();
             slot.1 += &r.magnitude;
             slot.2 += r.count;
@@ -1306,7 +1372,11 @@ fn contact_ablation_run(
             }
         }
         for (locus, (net, magnitude, count, entries, coherent, not)) in &pooled {
-            let ratio = if magnitude.is_positive() { net / magnitude } else { Rat::zero() };
+            let ratio = if magnitude.is_positive() {
+                net / magnitude
+            } else {
+                Rat::zero()
+            };
             println!(
                 "  released at {locus}: {count} residuals over {entries} entries; |sum| over magnitudes pooled {} (24 bits); entries coherent at alpha 1/20 (Z^2 > 2 ln 40): {coherent}, not: {not}, of {entries}",
                 holonics::holon::deposition::significant(&ratio, 24, false),
@@ -1374,15 +1444,36 @@ fn contact_ablation_run(
         let quarter = spreads.len().div_ceil(4).max(1);
         let by: Vec<String> = spreads
             .chunks(quarter)
-            .map(|chunk| chunk.iter().max().cloned().unwrap_or_else(Rat::zero).to_string())
+            .map(|chunk| {
+                chunk
+                    .iter()
+                    .max()
+                    .cloned()
+                    .unwrap_or_else(Rat::zero)
+                    .to_string()
+            })
             .collect();
-        println!("  exponent spread by quarter of the windows (largest each): {}", by.join(", "));
+        println!(
+            "  exponent spread by quarter of the windows (largest each): {}",
+            by.join(", ")
+        );
     }
     // The exponent shifts against two grains: the declared tolerance 1/16 bit and 1/21 bit (below
     // the derived resolution, the contact loop record §11).
-    for (label, values) in [("fresh", &mut shifts), ("continued", &mut c_shifts), ("relative factor change", &mut changes), ("relative anchor change (continued)", &mut anchors), ("exponent spread (continued, held)", &mut spreads)] {
+    for (label, values) in [
+        ("fresh", &mut shifts),
+        ("continued", &mut c_shifts),
+        ("relative factor change", &mut changes),
+        ("relative anchor change (continued)", &mut anchors),
+        ("exponent spread (continued, held)", &mut spreads),
+    ] {
         values.sort();
-        let at = |q: usize| values.get(values.len().saturating_sub(1).min(q)).cloned().unwrap_or_else(Rat::zero);
+        let at = |q: usize| {
+            values
+                .get(values.len().saturating_sub(1).min(q))
+                .cloned()
+                .unwrap_or_else(Rat::zero)
+        };
         let n = values.len();
         let above = |grain: Rat| values.iter().filter(|v| **v >= grain).count();
         println!(
@@ -1398,7 +1489,10 @@ fn contact_ablation_run(
         "contact ablation: {} windows read; a contact moved at {moved}; the next window's contact states differ at {states}, its logits at {logits}, its grain faces at {faces} (above the fibre at {cells}); continued from the window's own change: anchors at {c_anchors}, logits at {c_logits}, grain faces at {c_faces} (above the fibre at {c_cells}); the next window's code strictly lower {lower}, strictly higher {higher}, equal {equal}, overlapping {overlap}; {} ms; resident {}",
         readings.len(),
         clock.elapsed().as_millis(),
-        exterior::resident_set().map_or_else(|| "unread".to_string(), |(now, peak)| format!("{now} now, {peak} peak"))
+        exterior::resident_set().map_or_else(
+            || "unread".to_string(),
+            |(now, peak)| format!("{now} now, {peak} peak")
+        )
     );
 }
 
@@ -1720,7 +1814,11 @@ fn prior_mass_ladder(
         base.depth = depth;
     }
     if let Some(root) = root {
-        base.base = if root { BaseMeasure::Root } else { BaseMeasure::Even };
+        base.base = if root {
+            BaseMeasure::Root
+        } else {
+            BaseMeasure::Even
+        };
     }
     let grain = base.grain;
     let digits = holonics::compression::landmark::context::odometer_digits(base.alphabet) as u32;
@@ -1747,7 +1845,11 @@ fn prior_mass_ladder(
                 .expect("the tree receives the cell");
             let code = holonics::compression::landmark::context::code_length(&reading.executed)
                 .expect("a positive face has a code");
-            let sum = if cut.held_out(position) { &mut held_out } else { &mut training };
+            let sum = if cut.held_out(position) {
+                &mut held_out
+            } else {
+                &mut training
+            };
             *sum = interval_sum(sum, &code).expect("an ordered sum");
         }
         println!(

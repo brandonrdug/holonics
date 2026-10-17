@@ -6,7 +6,6 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use super::learning::chain;
-use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::field::Current;
 use crate::hnn::moment::SourceMoment;
@@ -15,7 +14,8 @@ use crate::hnn::ratio::{
     Face, Faces, HolonRatio, TargetPhases, power_of_two_enclosure, target_phases,
 };
 use crate::hnn::receiving::ReceivingRead;
-use crate::hnn::reference::{Reference};
+use crate::hnn::reference::Reference;
+use crate::hnn::tests::support::encoded;
 use crate::ratio::algebraic::{ExactInterval, interval_difference, log2_of_enclosure};
 use crate::ratio::exponentiated::{CarriedPower, PhaseField, power_of_two};
 use crate::ratio::{Rat, integer, rat};
@@ -150,7 +150,8 @@ fn the_windowed_gap_stays_bounded_over_a_long_stream() {
     let zeros = read(vec![Rat::zero(); 2 * alphabet], 16);
     for (start, cells) in stream.chunks(aperture).enumerate() {
         if cells.len() == aperture && start % 29 == 0 {
-            let window = target_phases(field, current.lift(), ring, &encoded(field, cells)).unwrap();
+            let window =
+                target_phases(field, current.lift(), ring, &encoded(field, cells)).unwrap();
             assert_eq!(window.branch, current.winding(field, ring).unwrap());
             for phase in &window.phases {
                 assert!(!phase.is_negative() && phase < &bound, "{phase}");

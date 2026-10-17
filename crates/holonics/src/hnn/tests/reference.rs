@@ -20,19 +20,19 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
 use super::learning::{OPEN_BUDGET, chain, chain_of};
-use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::compression::landmark::context::{
-    Capacity, ContextError, LandmarkDeclaration, Landmarks, LetterFamily, StopPrior, address, cell_letters,
-    code_length,
+    Capacity, ContextError, LandmarkDeclaration, Landmarks, LetterFamily, StopPrior, address,
+    cell_letters, code_length,
 };
+use crate::hnn::Absorption;
 use crate::hnn::HnnError;
 use crate::hnn::field::Current;
 use crate::hnn::port::{ExecutionPort, ReceiptDetail};
-use crate::hnn::Absorption;
 use crate::hnn::reference::{
     Cut, Exposure, ReadoutWall, Reception, Reference, WallTimes, prequential,
 };
+use crate::hnn::tests::support::encoded;
 use crate::ratio::Rat;
 use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::reception::Component;
@@ -474,14 +474,26 @@ fn landmark_prequential_partitions_the_cut() {
 fn reached_contacts(
     reference: &Reference,
     field: &crate::hnn::Field,
-) -> (crate::hnn::reference::Resident, crate::hnn::port::Deposit, crate::hnn::port::StagedId) {
+) -> (
+    crate::hnn::reference::Resident,
+    crate::hnn::port::Deposit,
+    crate::hnn::port::StagedId,
+) {
     let mut resident = reference
-        .mount_with(field, &Current::at_rest(field), super::learning::generic(field, 301))
+        .mount_with(
+            field,
+            &Current::at_rest(field),
+            super::learning::generic(field, 301),
+        )
         .unwrap();
-    let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[1, 0, 0, 1, 1])).unwrap();
+    let (moment, _) = reference
+        .ingest(&mut resident, None, &encoded(&field, &[1, 0, 0, 1, 1]))
+        .unwrap();
     let phases = resident.admitted()[0].clone();
     let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
-    let (staged, compared) = reference.compare(&mut resident, pending, &encoded(&field, &[1, 0])).unwrap();
+    let (staged, compared) = reference
+        .compare(&mut resident, pending, &encoded(&field, &[1, 0]))
+        .unwrap();
     match compared.deposit {
         Component::Present(deposit) => (resident, deposit, staged),
         other => panic!("the compare's deposit: {other:?}"),
@@ -518,10 +530,21 @@ fn a_reached_contact_family_moves_or_is_named_a_rounding_refusal() {
     for a in 0..field.contacts().len() {
         for family in 0..3 {
             let key = (Locus::Channel(a), Family::Factor(family));
-            let certified: Vec<_> = whole.steps.iter().filter(|(l, s)| *l == key.0 && s.family == key.1).collect();
-            assert_eq!(certified.len(), 1, "the return reaches contact {a}'s family {family}");
+            let certified: Vec<_> = whole
+                .steps
+                .iter()
+                .filter(|(l, s)| *l == key.0 && s.family == key.1)
+                .collect();
+            assert_eq!(
+                certified.len(),
+                1,
+                "the return reaches contact {a}'s family {family}"
+            );
             assert!(certified[0].1.step.step > Rat::zero());
-            assert_eq!(moved(a, family, post.constitution()), !whole.vanished.contains(&key));
+            assert_eq!(
+                moved(a, family, post.constitution()),
+                !whole.vanished.contains(&key)
+            );
             let step = deposit
                 .factors()
                 .iter()
@@ -535,10 +558,14 @@ fn a_reached_contact_family_moves_or_is_named_a_rounding_refusal() {
         }
     }
     let later = |resident: &mut crate::hnn::reference::Resident| {
-        let (moment, _) = reference.ingest(resident, None, &encoded(&field, &[0, 1, 1, 0, 0])).unwrap();
+        let (moment, _) = reference
+            .ingest(resident, None, &encoded(&field, &[0, 1, 1, 0, 0]))
+            .unwrap();
         let phases = resident.admitted()[0].clone();
         let (pending, _) = reference.refine(resident, &moment, &phases).unwrap();
-        let (_, compared) = reference.compare(resident, pending, &encoded(&field, &[0, 1])).unwrap();
+        let (_, compared) = reference
+            .compare(resident, pending, &encoded(&field, &[0, 1]))
+            .unwrap();
         format!("{:?}", compared.forward)
     };
     assert_ne!(later(&mut pre), later(&mut post));
@@ -634,8 +661,14 @@ fn the_exposure_returns_its_retained_constitution_and_carried_end() {
     assert_eq!(exposure.retained.commit(), last.commit);
     assert_eq!(exposure.retained.carrier_bits(), last.bits);
     let opening = Constitution::initial(&field, OPEN_BUDGET).unwrap();
-    assert_ne!(exposure.retained, opening, "the receiver's chain moved its constitution");
-    assert!(exposure.carried.is_some(), "the default reception carries its end");
+    assert_ne!(
+        exposure.retained, opening,
+        "the receiver's chain moved its constitution"
+    );
+    assert!(
+        exposure.carried.is_some(),
+        "the default reception carries its end"
+    );
     let rest = reference
         .clone()
         .with_reception(Reception::Rest)
@@ -670,9 +703,15 @@ fn the_exposures_retained_state_saves_and_restores_whole() {
     let retained = &exposure.retained;
     let opening = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let rings = 0..field.rings().len();
-    let receiving = rings.clone().find(|&g| opening.landmarks(g).is_some()).unwrap();
+    let receiving = rings
+        .clone()
+        .find(|&g| opening.landmarks(g).is_some())
+        .unwrap();
     assert_ne!(retained.landmarks(receiving), opening.landmarks(receiving));
-    assert_ne!(retained.population(receiving), opening.population(receiving));
+    assert_ne!(
+        retained.population(receiving),
+        opening.population(receiving)
+    );
     let ring = rings.clone().find(|&g| field.is_source(g)).unwrap();
     let state = retained
         .continuing_state(ring)
@@ -729,8 +768,14 @@ fn the_chained_balance_closes_and_the_chain_is_dissipative() {
     assert!(chained.closed);
     assert_eq!(chained.dissipative, chained.read);
     assert_eq!(chained.lift_emits, chained.read);
-    assert!(chained.reflected > Rat::zero(), "the lift moves a carried wave's reference");
-    assert!(!chained.split.is_zero(), "a transmitted wave is split at the word's lattice");
+    assert!(
+        chained.reflected > Rat::zero(),
+        "the lift moves a carried wave's reference"
+    );
+    assert!(
+        !chained.split.is_zero(),
+        "a transmitted wave is split at the word's lattice"
+    );
 }
 
 /// The reception carry §2.4 on a pumped field: with a resonator declared on every ring the carry
@@ -748,10 +793,8 @@ fn the_chained_balance_closes_on_a_pumped_field() {
     let reference = Reference::new(64, OPEN_BUDGET)
         .with_deadline(24)
         .with_reception(Reception::Carry(Absorption::Nothing));
-    let theta = super::prediction::resonant(
-        &field,
-        Constitution::initial(&field, OPEN_BUDGET).unwrap(),
-    );
+    let theta =
+        super::prediction::resonant(&field, Constitution::initial(&field, OPEN_BUDGET).unwrap());
     let exposure = reference.expose_with(&field, &cut, theta).unwrap();
     let chained = &exposure.word.chained;
     assert!(exposure.word.words.closed && exposure.word.closed);
@@ -791,7 +834,9 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let phases = resident.admitted()[0].clone();
     let steps = phases.junction_steps();
-    let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
+    let (moment, _) = reference
+        .ingest(&mut resident, None, &encoded(&field, &[]))
+        .unwrap();
     assert!(resident.carried().is_none());
     let mut position = 0;
     let (mut receptions, mut moved, mut separated) = (0, 0, 0);
@@ -846,16 +891,26 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
             let faces = refined.forward.into_present().unwrap();
             let theta = resident.constitution().clone();
             let mut charts = kept.clone();
-            let (_, on) = ratio.read_on(&field, &theta, &mut charts, &opening).unwrap();
+            let (_, on) = ratio
+                .read_on(&field, &theta, &mut charts, &opening)
+                .unwrap();
             assert_eq!(faces, on);
-            assert_eq!(&charts, resident.charts(), "the read keeps the refine's charts");
+            assert_eq!(
+                &charts,
+                resident.charts(),
+                "the read keeps the refine's charts"
+            );
             let mut fresh_charts = Charts::new();
             let (_, fresh) = ratio
                 .read_on(&field, &theta, &mut fresh_charts, &opening)
                 .unwrap();
             separated += usize::from(fresh != faces);
             // Diagnosis only: whether the kept charts differ from cold ones at all.
-            eprintln!("carry-chain charts window={} kept_equals_fresh={}", receptions + 1, charts == fresh_charts);
+            eprintln!(
+                "carry-chain charts window={} kept_equals_fresh={}",
+                receptions + 1,
+                charts == fresh_charts
+            );
             let moving = |carry: &crate::hnn::ReceptionCarry| {
                 let change = &carry.change;
                 change
@@ -874,7 +929,10 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
                 moved += usize::from(faces != at_rest);
             }
             receptions += 1;
-            let carry = resident.carried().cloned().expect("the refine writes the carry");
+            let carry = resident
+                .carried()
+                .cloned()
+                .expect("the refine writes the carry");
             // Each word's motion stands at its last crossing, whose hop has not run (§2.4).
             assert_eq!(carry.ticks, receptions * (steps - 1));
             // The compare reads the word; the motion already carried at its refine (§8).
@@ -890,13 +948,21 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
                 reading.stepped,
                 reading.vanished,
                 reading.unresolved_contact_material.len(),
-                reading.steps.iter().map(|(locus, _)| *locus).collect::<Vec<_>>()
+                reading
+                    .steps
+                    .iter()
+                    .map(|(locus, _)| *locus)
+                    .collect::<Vec<_>>()
             );
         }
         let mut fed = 0;
         while fed < window.len() {
             let (_, ingested) = reference
-                .ingest(&mut resident, Some(&moment), &encoded(&field, &window[fed..]))
+                .ingest(
+                    &mut resident,
+                    Some(&moment),
+                    &encoded(&field, &window[fed..]),
+                )
                 .unwrap();
             let ingested = ingested.forward.into_present().unwrap();
             fed += ingested.cells;
@@ -923,7 +989,12 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
     // charts; the whole continuation is `mount_continued` on the resident's state (its passage).
     let carry = resident.carried().cloned().expect("the chain carries");
     let mounted = reference
-        .mount_carried(&field, resident.current(), resident.constitution().clone(), carry.clone())
+        .mount_carried(
+            &field,
+            resident.current(),
+            resident.constitution().clone(),
+            carry.clone(),
+        )
         .unwrap();
     assert_eq!(mounted.carried(), Some(&carry));
     assert!(mounted.charts().is_empty() && !resident.charts().is_empty());
@@ -964,7 +1035,9 @@ fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let phases = resident.admitted()[0].clone();
     let ring = field.sources()[0];
-    let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
+    let (moment, _) = reference
+        .ingest(&mut resident, None, &encoded(&field, &[]))
+        .unwrap();
     let (mut receptions, mut separated) = (0, 0);
     for span in phases.windows(cells.len()).unwrap().into_iter().take(24) {
         let window = &cells[span.clone()];
@@ -996,11 +1069,19 @@ fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
             };
             let mut fresh_charts = Charts::new();
             let (_, fresh) = ratio
-                .read_on(&field, resident.constitution(), &mut fresh_charts, &word_opening)
+                .read_on(
+                    &field,
+                    resident.constitution(),
+                    &mut fresh_charts,
+                    &word_opening,
+                )
                 .unwrap();
             let (whole, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
             // Diagnosis only: whether the kept charts differ from cold ones at all.
-            eprintln!("cold-restore charts window={receptions} kept_equals_fresh={}", resident.charts() == &fresh_charts);
+            eprintln!(
+                "cold-restore charts window={receptions} kept_equals_fresh={}",
+                resident.charts() == &fresh_charts
+            );
             let (cold, restored_refined) =
                 reference.refine(&mut restored, &moment, &phases).unwrap();
             assert_eq!(restored_refined.forward, refined.forward);
@@ -1019,7 +1100,11 @@ fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
                 reading.stepped,
                 reading.vanished,
                 reading.unresolved_contact_material.len(),
-                reading.steps.iter().map(|(locus, _)| *locus).collect::<Vec<_>>()
+                reading
+                    .steps
+                    .iter()
+                    .map(|(locus, _)| *locus)
+                    .collect::<Vec<_>>()
             );
             reference.deposit(&mut restored, restored_staged).unwrap();
             assert_eq!(restored.constitution(), resident.constitution());
@@ -1030,7 +1115,11 @@ fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
         let mut fed = 0;
         while fed < window.len() {
             let (_, ingested) = reference
-                .ingest(&mut resident, Some(&moment), &encoded(&field, &window[fed..]))
+                .ingest(
+                    &mut resident,
+                    Some(&moment),
+                    &encoded(&field, &window[fed..]),
+                )
                 .unwrap();
             let ingested = ingested.forward.into_present().unwrap();
             fed += ingested.cells;
@@ -1058,8 +1147,8 @@ fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
 /// published while the third word's end stood, read as one commit at held momentum.
 #[test]
 fn several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_closes() {
-    use crate::hnn::word::{PowerForm, WordBalance};
     use crate::hnn::word::{ChainedBalance, EndChange, ReceptionCarry};
+    use crate::hnn::word::{PowerForm, WordBalance};
     let length = cut_length();
     let field = chain_of(length as u64);
     let cells = source(length, 81);
@@ -1069,15 +1158,18 @@ fn several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_
     let phases = resident.admitted()[0].clone();
     let steps = phases.junction_steps();
     let (moment, _) = reference
-        .ingest(&mut resident, None, &encoded(&field, &cells[..phases.aperture()]))
+        .ingest(
+            &mut resident,
+            None,
+            &encoded(&field, &cells[..phases.aperture()]),
+        )
         .unwrap();
     let serial = resident.clone();
     // The form at a word's cut and the opening change it reads, before its refine.
     let opening = |resident: &crate::hnn::reference::Resident,
                    carry: &ReceptionCarry|
      -> (PowerForm, EndChange) {
-        let form =
-            PowerForm::read(&field, resident.constitution(), resident.current()).unwrap();
+        let form = PowerForm::read(&field, resident.constitution(), resident.current()).unwrap();
         let source = resident
             .moment(&moment)
             .unwrap()
@@ -1100,7 +1192,10 @@ fn several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_
     for j in 0..3 {
         let opened = carries.last().map(|carry| opening(&resident, carry));
         let (id, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
-        let carry = resident.carried().cloned().expect("the refine writes the carry");
+        let carry = resident
+            .carried()
+            .cloned()
+            .expect("the refine writes the carry");
         assert_eq!(carry.ticks, (j + 1) * (steps - 1));
         let word = balance(&refined.receipt);
         assert!(word.closes());
@@ -1115,7 +1210,10 @@ fn several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_
             )
             .unwrap();
             assert!(chained.closes() && chained.dissipative());
-            assert!(chained.deposition.is_zero(), "no commit between the refines");
+            assert!(
+                chained.deposition.is_zero(),
+                "no commit between the refines"
+            );
         }
         forms.push(PowerForm::read(&field, resident.constitution(), resident.current()).unwrap());
         pending.push(id);
@@ -1138,7 +1236,11 @@ fn several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_
     let mut reversed = resident.clone();
     for &id in pending.iter().rev() {
         reference
-            .compare(&mut reversed, id, &encoded(&field, &cells[..phases.aperture()]))
+            .compare(
+                &mut reversed,
+                id,
+                &encoded(&field, &cells[..phases.aperture()]),
+            )
             .unwrap();
         assert_eq!(reversed.carried(), carries.last());
     }
@@ -1148,7 +1250,11 @@ fn several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_
     for &id in &pending {
         let commit = resident.constitution().commit();
         let (staged, _) = reference
-            .compare(&mut resident, id, &encoded(&field, &cells[..phases.aperture()]))
+            .compare(
+                &mut resident,
+                id,
+                &encoded(&field, &cells[..phases.aperture()]),
+            )
             .unwrap();
         reference.deposit(&mut resident, staged).unwrap();
         moved += usize::from(resident.constitution().commit() != commit);
@@ -1172,7 +1278,6 @@ fn several_pending_ratios_are_one_chain_in_refine_order_and_the_chained_balance_
     .unwrap();
     assert!(chained.closes() && chained.dissipative());
 }
-
 
 /// The reception carry §10: a passage stopped at a window's opening is saved with the resident's
 /// passage (its lift point, open moment, aeon in progress, first-law balance, charts, address
@@ -1202,12 +1307,24 @@ fn a_saved_passage_continues_at_its_epoch_as_the_whole_run() {
         .unwrap();
     assert_eq!(prefix.deadline, Some(8));
     assert!(prefix.aeons.is_empty());
-    let ring = (0..field.rings().len()).find(|&g| field.is_source(g)).unwrap();
+    let ring = (0..field.rings().len())
+        .find(|&g| field.is_source(g))
+        .unwrap();
     let state = resident.continuing_state(ring).unwrap();
     assert!(state.passage().is_some());
     let read = ContinuingState::from_text(&state.to_text()).unwrap();
     assert_eq!(read, state);
     let opening = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let passage = read.resident_passage(&field, &opening).unwrap().unwrap();
+    assert_eq!(passage.to_text(), state.passage().unwrap());
+    assert_eq!(passage.parts().current, *resident.current());
+    assert_eq!(passage.parts().admitted, resident.admitted());
+    assert_eq!(passage.parts().charts, *resident.charts());
+    assert_eq!(passage.parts().address, *resident.address());
+    assert!(
+        passage.parts().moment.is_some(),
+        "the checkpoint carries the live partial source moment"
+    );
     let restored = reference
         .mount_continued(&field, &Current::at_rest(&field), opening, &read)
         .unwrap();

@@ -246,7 +246,7 @@ use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{Current, Field, FieldMaterial};
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::vector::integral;
+use crate::ratio::linear::vector::{Chart, integral, lcm};
 
 // -------------------------------------------------------------------------------------------
 // the capacity
@@ -355,13 +355,13 @@ impl Capacity {
                 reason: "the capacity certificate has another source partition or alphabet",
             });
         }
-        if let Some(located) = encoded.located() {
+        if let Some(periods) = encoded.transport_periods() {
             if self.clock == CapacityClock::Identity {
                 return Err(HnnError::Unadmitted {
                     reason: "the identity capacity does not admit a located clock",
                 });
             }
-            if located.periods() != self.periods {
+            if periods != self.periods {
                 return Err(HnnError::Unadmitted {
                     reason: "the capacity certificate has another located helix",
                 });
@@ -440,7 +440,13 @@ impl Capacity {
     /// histogram/held suffix, the whole shared lift, and each source's independent own ticks.
     /// The original no-rekey `n*` does not certify this count.
     fn reframed_state_bits(&self, n: u64, clock_cells: u64) -> u64 {
-        let mut count = histogram_count(n, &self.periods, &self.sources, self.alphabet, &self.offsets);
+        let mut count = histogram_count(
+            n,
+            &self.periods,
+            &self.sources,
+            self.alphabet,
+            &self.offsets,
+        );
         for &period in &self.periods {
             count *= BigUint::from(period) * (BigUint::from(clock_cells) + 1u32);
         }
@@ -1029,6 +1035,18 @@ impl PairPort {
         alphabet: usize,
         width: usize,
     ) -> Vec<Rat> {
+        ExactPairContraction::of(self).apply_table(table, phase, alphabet, width)
+    }
+
+    /// The former termwise rational contraction, retained as a test oracle for the integer chart.
+    #[cfg(test)]
+    pub(crate) fn apply_table_termwise(
+        &self,
+        table: &OffsetTable,
+        phase: usize,
+        alphabet: usize,
+        width: usize,
+    ) -> Vec<Rat> {
         let mut weights = vec![Rat::zero(); self.rank()];
         for (slot, count) in table.normalized(phase, alphabet) {
             let (x, a) = (slot / alphabet, slot % alphabet);
@@ -1047,6 +1065,203 @@ impl PairPort {
         }
         output
     }
+}
+
+/// A pair port's fixed rational factors in one shared-denominator integer chart. The chart is
+/// compiled once per port by `moment_parts`, then applied to every occupied phase of that passage.
+/// Denominator growth is exact and unbounded; no approximation or truncation is introduced.
+#[derive(Clone, Debug)]
+pub(crate) struct ExactPairContraction {
+    current: Vec<Chart>,
+    earlier: Vec<Chart>,
+    outputs: Vec<Chart>,
+    feature_denominator: BigInt,
+    output_denominator: BigInt,
+    rank_scales: Vec<BigInt>,
+    output_scales: Vec<BigInt>,
+}
+
+impl ExactPairContraction {
+    pub(crate) fn of(port: &PairPort) -> Self {
+        let current: Vec<_> = port.current.iter().map(|row| integral(row)).collect();
+        let earlier: Vec<_> = port.earlier.iter().map(|row| integral(row)).collect();
+        let outputs: Vec<_> = port.outputs.iter().map(|row| integral(row)).collect();
+        // Keep the source-read contraction and the final output contraction staged as in the
+        // rational law: the occupied-slot loop is O(slots × rank), not slots × rank × width.
+        let feature_denominators: Vec<_> = (0..port.rank())
+            .map(|rho| &current[rho].1 * &earlier[rho].1)
+            .collect();
+        let feature_denominator = feature_denominators
+            .iter()
+            .fold(BigInt::one(), |denominator, term| lcm(&denominator, term));
+        let output_denominator = outputs
+            .iter()
+            .fold(BigInt::one(), |denominator, (_, term)| {
+                lcm(&denominator, term)
+            });
+        let rank_scales = feature_denominators
+            .iter()
+            .map(|term| &feature_denominator / term)
+            .collect();
+        let output_scales = outputs
+            .iter()
+            .map(|(_, term)| &output_denominator / term)
+            .collect();
+        Self {
+            current,
+            earlier,
+            outputs,
+            feature_denominator,
+            output_denominator,
+            rank_scales,
+            output_scales,
+        }
+    }
+
+    /// Bit-volume counters for focused exact-arithmetic benchmarks. The byte estimate counts
+    /// integer payload bits only; it excludes allocator and container overhead.
+    #[cfg(test)]
+    pub(crate) fn bit_volume(
+        &self,
+        table: &OffsetTable,
+        phase: usize,
+        alphabet: usize,
+    ) -> PairContractionBitVolume {
+        let chart_integer_bits = self
+            .current
+            .iter()
+            .chain(&self.earlier)
+            .chain(&self.outputs)
+            .map(|(numerators, denominator)| {
+                numerators
+                    .iter()
+                    .map(|numerator| numerator.magnitude().bits())
+                    .sum::<u64>()
+                    + denominator.bits()
+            })
+            .sum::<u64>()
+            + self
+                .rank_scales
+                .iter()
+                .chain(&self.output_scales)
+                .map(|scale| scale.magnitude().bits())
+                .sum::<u64>();
+        let phase_weight_denominator_bits = if let Some(transported) = &table.transported {
+            let block = alphabet * alphabet;
+            let start = phase * block;
+            transported
+                .range(start..start + block)
+                .fold(BigInt::one(), |denominator, (_, value)| {
+                    lcm(&denominator, value.denom())
+                })
+                .bits()
+        } else {
+            table.weight.denom().bits()
+        };
+        let final_denominator = &self.feature_denominator
+            * &self.output_denominator
+            * table
+                .transported
+                .as_ref()
+                .map(|transported| {
+                    let block = alphabet * alphabet;
+                    let start = phase * block;
+                    transported
+                        .range(start..start + block)
+                        .fold(BigInt::one(), |denominator, (_, value)| {
+                            lcm(&denominator, value.denom())
+                        })
+                })
+                .unwrap_or_else(|| table.weight.denom().clone());
+        PairContractionBitVolume {
+            chart_integer_bits,
+            phase_weight_denominator_bits,
+            feature_denominator_bits: self.feature_denominator.bits(),
+            output_denominator_bits: self.output_denominator.bits(),
+            final_denominator_bits: final_denominator.bits(),
+        }
+    }
+
+    /// Contract the phase's exact normalized table weights and fixed port factors in integers;
+    /// each output entry is normalized only after all occupied count/rank terms have been summed.
+    pub(crate) fn apply_table(
+        &self,
+        table: &OffsetTable,
+        phase: usize,
+        alphabet: usize,
+        width: usize,
+    ) -> Vec<Rat> {
+        let block = alphabet * alphabet;
+        let start = phase * block;
+        let end = start + block;
+        let (weights, weight_denominator): (Vec<(usize, BigInt)>, BigInt) =
+            if let Some(transported) = &table.transported {
+                let entries: Vec<_> = transported.range(start..end).collect();
+                let denominator = entries
+                    .iter()
+                    .fold(BigInt::one(), |denominator, (_, value)| {
+                        lcm(&denominator, value.denom())
+                    });
+                let weights = entries
+                    .into_iter()
+                    .map(|(&slot, value)| {
+                        (slot - start, value.numer() * (&denominator / value.denom()))
+                    })
+                    .collect();
+                (weights, denominator)
+            } else {
+                let denominator = table.weight.denom().clone();
+                let weights = table
+                    .phase(phase, alphabet)
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, count)| **count != 0)
+                    .map(|(slot, &count)| (slot, BigInt::from(count) * table.weight.numer()))
+                    .collect();
+                (weights, denominator)
+            };
+
+        let mut rank_sums = vec![BigInt::zero(); self.outputs.len()];
+        for (slot, weight) in weights {
+            if weight.is_zero() {
+                continue;
+            }
+            let (x, a) = (slot / alphabet, slot % alphabet);
+            for rho in 0..self.outputs.len() {
+                let current = &self.current[rho].0[x];
+                let earlier = &self.earlier[rho].0[a];
+                if current.is_zero() || earlier.is_zero() {
+                    continue;
+                }
+                rank_sums[rho] += &weight * current * earlier * &self.rank_scales[rho];
+            }
+        }
+        let mut sums = vec![BigInt::zero(); width];
+        for (rho, rank_sum) in rank_sums.iter().enumerate() {
+            if rank_sum.is_zero() {
+                continue;
+            }
+            let output_weight = rank_sum * &self.output_scales[rho];
+            for (sum, entry) in sums.iter_mut().zip(&self.outputs[rho].0) {
+                if !entry.is_zero() {
+                    *sum += &output_weight * entry;
+                }
+            }
+        }
+        let denominator = weight_denominator * &self.feature_denominator * &self.output_denominator;
+        sums.into_iter()
+            .map(|sum| Rat::new(sum, denominator.clone()))
+            .collect()
+    }
+}
+
+#[cfg(test)]
+pub(crate) struct PairContractionBitVolume {
+    pub(crate) chart_integer_bits: u64,
+    pub(crate) phase_weight_denominator_bits: u64,
+    pub(crate) feature_denominator_bits: u64,
+    pub(crate) output_denominator_bits: u64,
+    pub(crate) final_denominator_bits: u64,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1259,7 +1474,9 @@ impl Leaky {
     fn enter(map: &mut BTreeMap<usize, BigInt>, slot: usize, unit: u32, modulus: &Rat, age: u64) {
         let scale = Rat::from_integer(BigInt::one() << unit as usize);
         let half = Rat::new(BigInt::one(), BigInt::from(2));
-        let value = (modulus_power(modulus, age) * scale + half).floor().to_integer();
+        let value = (modulus_power(modulus, age) * scale + half)
+            .floor()
+            .to_integer();
         if value.is_zero() {
             return;
         }
@@ -1421,10 +1638,13 @@ impl SourceMoment {
         let a = self.alphabet;
         field.admit(cells)?;
         for (consumed, code) in cells.classes_read().enumerate() {
-            let clock_cells = self.clock_cells.checked_add(1).ok_or(HnnError::CountOverflow)?;
+            let clock_cells = self
+                .clock_cells
+                .checked_add(1)
+                .ok_or(HnnError::CountOverflow)?;
             let counted = self.cells.checked_add(1).ok_or(HnnError::CountOverflow)?;
             let step = current.step(field, cells, consumed)?;
-            self.located |= cells.located().is_some();
+            self.located |= cells.has_advances();
             for counts in &mut self.rings {
                 let phase = current.phase(field, counts.ring)? as usize;
                 counts.end = phase as u64;
@@ -1433,7 +1653,10 @@ impl SourceMoment {
                 if let Some(leaky) = &mut counts.leaky {
                     leaky.decay(step.ticks[counts.ring]);
                     let one = BigInt::one() << leaky.unit as usize;
-                    *leaky.first.entry(phase * a + code).or_insert_with(BigInt::zero) += &one;
+                    *leaky
+                        .first
+                        .entry(phase * a + code)
+                        .or_insert_with(BigInt::zero) += &one;
                 }
                 for (index, &offset) in self.offsets.iter().enumerate() {
                     if let Some(earlier) = earlier(&self.window, self.cursor, offset) {
@@ -1502,13 +1725,17 @@ impl SourceMoment {
                 reason: "a continued section is not an ingest clock synchronization carrier",
             });
         }
-        let clock_cells = self.clock_cells.checked_add(external_cells).ok_or(HnnError::CountOverflow)?;
+        let clock_cells = self
+            .clock_cells
+            .checked_add(external_cells)
+            .ok_or(HnnError::CountOverflow)?;
         if clock_cells < self.cells {
             return Err(HnnError::Unadmitted {
                 reason: "the shared clock's population is smaller than its source's",
             });
         }
-        self.histogram_capacity(field)?.check_windings(&self.opening, current.lift(), clock_cells)
+        self.histogram_capacity(field)?
+            .check_windings(&self.opening, current.lift(), clock_cells)
     }
 
     pub fn synchronize_clock(
@@ -1588,7 +1815,13 @@ impl SourceMoment {
             for (station, cell) in cells.iter().enumerate() {
                 if let Some(code) = *cell {
                     let slot = ((phase + 1 + station) % period) * a + code;
-                    Leaky::enter(&mut leaky.first, slot, unit, &modulus, counts.extent - 1 - station as u64);
+                    Leaky::enter(
+                        &mut leaky.first,
+                        slot,
+                        unit,
+                        &modulus,
+                        counts.extent - 1 - station as u64,
+                    );
                 }
             }
         }
@@ -1616,16 +1849,27 @@ impl SourceMoment {
         let mut passage = self.continued(field, current, ring, cells)?;
         let phase = current.phase(field, ring)? as usize;
         let a = passage.alphabet;
-        let counts = passage.rings.iter_mut().find(|counts| counts.ring == ring)
+        let counts = passage
+            .rings
+            .iter_mut()
+            .find(|counts| counts.ring == ring)
             .ok_or(HnnError::MissingSourcePort { ring })?;
         for (index, &offset) in passage.offsets.iter().enumerate() {
             for station in offset..cells.len() {
-                let (Some(x), Some(y)) = (cells[station], cells[station-offset]) else { continue };
-                let slot = (((phase + 1) + station % counts.period) % counts.period) * a * a + x * a + y;
+                let (Some(x), Some(y)) = (cells[station], cells[station - offset]) else {
+                    continue;
+                };
+                let slot =
+                    (((phase + 1) + station % counts.period) % counts.period) * a * a + x * a + y;
                 bump(&mut counts.offset[index][slot])?;
                 if let Some(leaky) = &mut counts.leaky {
-                    Leaky::enter(&mut leaky.offset[index], slot, leaky.unit, &leaky.modulus,
-                        counts.extent - 1 - station as u64);
+                    Leaky::enter(
+                        &mut leaky.offset[index],
+                        slot,
+                        leaky.unit,
+                        &leaky.modulus,
+                        counts.extent - 1 - station as u64,
+                    );
                 }
             }
         }
@@ -1633,33 +1877,52 @@ impl SourceMoment {
     }
 
     fn admit_fresh_station_section(
-        &self, field: &Field, current: &Current, ring: usize, cells: &[Option<usize>],
+        &self,
+        field: &Field,
+        current: &Current,
+        ring: usize,
+        cells: &[Option<usize>],
     ) -> Result<(), HnnError> {
         self.admit_partition(field)?;
         let counts = self.counts(ring)?;
         if (0..self.alphabet).any(|class| !field.ring(ring).fits(field.ring(ring).port(class)))
-            || (0..ring).any(|g| (0..self.alphabet)
-                .any(|class| field.ring(g).fits(field.ring(g).port(class))))
+            || (0..ring).any(|g| {
+                (0..self.alphabet).any(|class| field.ring(g).fits(field.ring(g).port(class)))
+            })
         {
             return Err(HnnError::Unadmitted {
                 reason: "the physical station source has no class-independent unit clock",
             });
         }
-        if self.opening.as_slice() != current.lift() || self.clock_cells != 0 || self.reframed || self.located
-            || counts.start != current.phase(field, ring)? || counts.end != counts.start
-            || counts.ticks != 0 || counts.extent != 0
+        if self.opening.as_slice() != current.lift()
+            || self.clock_cells != 0
+            || self.reframed
+            || self.located
+            || counts.start != current.phase(field, ring)?
+            || counts.end != counts.start
+            || counts.ticks != 0
+            || counts.extent != 0
             || counts.first.iter().any(|&n| n != 0)
             || counts.offset.iter().flatten().any(|&n| n != 0)
-            || counts.leaky.as_ref().is_some_and(|leaky|
-                !leaky.first.is_empty() || leaky.offset.iter().any(|map| !map.is_empty()))
+            || counts.leaky.as_ref().is_some_and(|leaky| {
+                !leaky.first.is_empty() || leaky.offset.iter().any(|map| !map.is_empty())
+            })
         {
             return Err(HnnError::Unadmitted {
                 reason: "the physical station source requires its fresh immutable opening",
             });
         }
         u64::try_from(cells.len()).map_err(|_| HnnError::CountOverflow)?;
-        if let Some(code) = cells.iter().flatten().copied().find(|&code| code >= self.alphabet) {
-            return Err(HnnError::CellOutside { code, alphabet: self.alphabet });
+        if let Some(code) = cells
+            .iter()
+            .flatten()
+            .copied()
+            .find(|&code| code >= self.alphabet)
+        {
+            return Err(HnnError::CellOutside {
+                code,
+                alphabet: self.alphabet,
+            });
         }
         Ok(())
     }
@@ -1672,49 +1935,82 @@ impl SourceMoment {
     /// monochrome completion is substituted for mixed pair slots. No candidate Word is run.
     #[allow(clippy::type_complexity)]
     pub(crate) fn station_pair_bounds(
-        &self, field: &Field, current: &Current, ring: usize,
-        cells: &[Option<usize>], offset: usize,
+        &self,
+        field: &Field,
+        current: &Current,
+        ring: usize,
+        cells: &[Option<usize>],
+        offset: usize,
     ) -> Result<Option<(Vec<Vec<Rat>>, Vec<Vec<Rat>>)>, HnnError> {
         self.admit_fresh_station_section(field, current, ring, cells)?;
-        if !self.offsets.contains(&offset) { return Err(HnnError::Offset { offset }) }
+        if !self.offsets.contains(&offset) {
+            return Err(HnnError::Offset { offset });
+        }
         let counts = self.counts(ring)?;
         let a = self.alphabet;
         let phase = current.phase(field, ring)? as usize;
-        let mut lower = vec![vec![BigInt::zero(); a*a]; counts.period];
+        let mut lower = vec![vec![BigInt::zero(); a * a]; counts.period];
         let mut upper = lower.clone();
         if cells.len() <= offset {
-            let zero = vec![vec![Rat::zero(); a*a]; counts.period];
+            let zero = vec![vec![Rat::zero(); a * a]; counts.period];
             return Ok(Some((zero.clone(), zero)));
         }
         let mut mass = BigInt::zero();
         for station in offset..cells.len() {
             let weight = if let Some(leaky) = &counts.leaky {
                 let mut entry = BTreeMap::new();
-                Leaky::enter(&mut entry, 0, leaky.unit, &leaky.modulus,
-                    (cells.len()-1-station) as u64);
+                Leaky::enter(
+                    &mut entry,
+                    0,
+                    leaky.unit,
+                    &leaky.modulus,
+                    (cells.len() - 1 - station) as u64,
+                );
                 entry.remove(&0).unwrap_or_else(BigInt::zero)
-            } else { BigInt::one() };
+            } else {
+                BigInt::one()
+            };
             mass += &weight;
-            let phase = ((phase+1) + station % counts.period) % counts.period;
-            let (x, y) = (cells[station], cells[station-offset]);
+            let phase = ((phase + 1) + station % counts.period) % counts.period;
+            let (x, y) = (cells[station], cells[station - offset]);
             for current_class in 0..a {
-                if x.is_some_and(|x| x != current_class) { continue }
+                if x.is_some_and(|x| x != current_class) {
+                    continue;
+                }
                 for earlier_class in 0..a {
-                    if y.is_some_and(|y| y != earlier_class) { continue }
-                    let slot = current_class*a + earlier_class;
+                    if y.is_some_and(|y| y != earlier_class) {
+                        continue;
+                    }
+                    let slot = current_class * a + earlier_class;
                     upper[phase][slot] += &weight;
-                    if x.is_some() && y.is_some() { lower[phase][slot] += &weight }
+                    if x.is_some() && y.is_some() {
+                        lower[phase][slot] += &weight
+                    }
                 }
             }
         }
-        if cells.len() > offset && mass <= BigInt::zero() { return Ok(None) }
+        if cells.len() > offset && mass <= BigInt::zero() {
+            return Ok(None);
+        }
         let chart = PopulationChart::of(field);
-        let normalize = |rows: Vec<Vec<BigInt>>| -> Vec<Vec<Rat>> { rows.into_iter().map(|row|
-            row.into_iter().map(|count| {
-                if mass.is_zero() { Rat::zero() }
-                else if counts.leaky.is_some() { chart.chart(&Rat::new(count, mass.clone())) }
-                else { Rat::from_integer(count) * chart.value((cells.len()-offset) as u64) }
-            }).collect()).collect() };
+        let normalize = |rows: Vec<Vec<BigInt>>| -> Vec<Vec<Rat>> {
+            rows.into_iter()
+                .map(|row| {
+                    row.into_iter()
+                        .map(|count| {
+                            if mass.is_zero() {
+                                Rat::zero()
+                            } else if counts.leaky.is_some() {
+                                chart.chart(&Rat::new(count, mass.clone()))
+                            } else {
+                                Rat::from_integer(count)
+                                    * chart.value((cells.len() - offset) as u64)
+                            }
+                        })
+                        .collect()
+                })
+                .collect()
+        };
         Ok(Some((normalize(lower), normalize(upper))))
     }
 
@@ -1748,13 +2044,17 @@ impl SourceMoment {
         );
         line(s, "opening", &self.opening);
         self.partition.write(s);
-        *s += &format!("source-clock {} {}\n", self.clock_cells,
-            if self.reframed { "reframed" } else { "plain" });
+        *s += &format!(
+            "source-clock {} {}\n",
+            self.clock_cells,
+            if self.reframed { "reframed" } else { "plain" }
+        );
         let map = |s: &mut String, map: &BTreeMap<usize, BigInt>| {
             line(
                 s,
                 "map",
-                map.iter().flat_map(|(slot, value)| [slot.to_string(), value.to_string()]),
+                map.iter()
+                    .flat_map(|(slot, value)| [slot.to_string(), value.to_string()]),
             );
         };
         for counts in &self.rings {
@@ -1814,16 +2114,29 @@ impl SourceMoment {
         let alphabet = field.alphabet();
         let offsets = field.offsets().to_vec();
         let reach = offsets.iter().copied().max().unwrap_or(0);
-        let window = keyed(next("the moment's window")?, "window", "the moment's window")?
-            .into_iter()
-            .map(|word| match word {
-                "-" => Ok(None),
-                code => value::<usize>(Some(&code), "the moment's window")
-                    .and_then(|code| if code < alphabet { Ok(Some(code)) } else { refused("the moment's window") }),
-            })
-            .collect::<Result<Vec<_>, _>>()?;
+        let window = keyed(
+            next("the moment's window")?,
+            "window",
+            "the moment's window",
+        )?
+        .into_iter()
+        .map(|word| match word {
+            "-" => Ok(None),
+            code => value::<usize>(Some(&code), "the moment's window").and_then(|code| {
+                if code < alphabet {
+                    Ok(Some(code))
+                } else {
+                    refused("the moment's window")
+                }
+            }),
+        })
+        .collect::<Result<Vec<_>, _>>()?;
         let opening: Vec<BigInt> = values(
-            &keyed(next("the moment's opening")?, "opening", "the moment's opening")?,
+            &keyed(
+                next("the moment's opening")?,
+                "opening",
+                "the moment's opening",
+            )?,
             "the moment's opening",
         )?;
         // Ingest writes at the cursor before advancing it modulo a nonempty window.
@@ -1840,10 +2153,20 @@ impl SourceMoment {
         // The producing partition is mandatory and read against the restored field before the
         // ring counts: an absent or different tag is refused, never borrowed from the reader.
         let partition = SourcePartition::read_against(field, next)?;
-        let clock = keyed(next("the moment's shared source clock")?, "source-clock", "the moment's shared source clock")?;
+        let clock = keyed(
+            next("the moment's shared source clock")?,
+            "source-clock",
+            "the moment's shared source clock",
+        )?;
         let (clock_cells, reframed) = match clock.as_slice() {
-            [population, "plain"] => (value(Some(population), "the moment's shared source clock")?, false),
-            [population, "reframed"] => (value(Some(population), "the moment's shared source clock")?, true),
+            [population, "plain"] => (
+                value(Some(population), "the moment's shared source clock")?,
+                false,
+            ),
+            [population, "reframed"] => (
+                value(Some(population), "the moment's shared source clock")?,
+                true,
+            ),
             _ => return refused("the moment's shared source clock"),
         };
         if clock_cells < cells || (!reframed && clock_cells != cells) {
@@ -1866,8 +2189,12 @@ impl SourceMoment {
             if head[0] != ring as u64 || head[1] != period as u64 || head[6] > 1 {
                 return refused("a ring's counts against its declared ring and period");
             }
-            let first: Vec<u64> =
-                counted(next("a ring's phase counts")?, "first", period * alphabet, "a ring's phase counts")?;
+            let first: Vec<u64> = counted(
+                next("a ring's phase counts")?,
+                "first",
+                period * alphabet,
+                "a ring's phase counts",
+            )?;
             let offset = (0..offsets.len())
                 .map(|_| {
                     counted(
@@ -1989,7 +2316,11 @@ impl SourceMoment {
     /// unit-count route. The fresh physical completion consumer normalizes immediately after
     /// its one continued section and compares this denominator before mapping through E.
     pub fn transported_mass(&self, ring: usize) -> Result<Option<BigInt>, HnnError> {
-        Ok(self.counts(ring)?.leaky.as_ref().map(|leaky| leaky.first.values().sum()))
+        Ok(self
+            .counts(ring)?
+            .leaky
+            .as_ref()
+            .map(|leaky| leaky.first.values().sum()))
     }
 
     /// **The pair population `n_(g,δ) = Σ_(c,x,a) C_g(δ)[c, x, a]`** of a source ring's offset
@@ -2017,7 +2348,12 @@ impl SourceMoment {
     /// identify the ticks only within one turn:
     /// a passage over more than `d` ticks, or one re-keyed within its span, is refused at `ρ < 1`
     /// ([`HnnError::AliasedAges`]); zero at an empty phase.
-    pub fn phase_weights(&self, field: &Field, ring: usize, modulus: &Rat) -> Result<Vec<Rat>, HnnError> {
+    pub fn phase_weights(
+        &self,
+        field: &Field,
+        ring: usize,
+        modulus: &Rat,
+    ) -> Result<Vec<Rat>, HnnError> {
         let counts = self.counts(ring)?;
         let a = self.alphabet;
         let d = counts.period;
@@ -2049,7 +2385,10 @@ impl SourceMoment {
                 .into_iter()
                 .map(|h| {
                     if h && !mass.is_zero() {
-                        chart.chart(&Rat::new(BigInt::one() << leaky.unit as usize, mass.clone()))
+                        chart.chart(&Rat::new(
+                            BigInt::one() << leaky.unit as usize,
+                            mass.clone(),
+                        ))
                     } else {
                         Rat::zero()
                     }
@@ -2276,6 +2615,24 @@ impl SourceMoment {
             .iter()
             .map(|&offset| self.offset_table(field, ring, offset))
             .collect::<Result<Vec<_>, _>>()?;
+        // Pair factors are fixed across phases. Chart each declared port once instead of
+        // rebuilding its denominator lattice in every phase's contraction.
+        let pair_contractions = self
+            .offsets
+            .iter()
+            .zip(&tables)
+            .map(|(&offset, table)| {
+                table
+                    .as_ref()
+                    .map(|_| {
+                        constitution
+                            .pair_port(ring, offset)
+                            .ok_or(HnnError::MissingSourcePort { ring })
+                            .map(ExactPairContraction::of)
+                    })
+                    .transpose()
+            })
+            .collect::<Result<Vec<_>, _>>()?;
         let geometry = field.ring(ring);
         let width = geometry.width();
         let port = constitution
@@ -2308,14 +2665,13 @@ impl SourceMoment {
                 reads.push((phase, geometry.rotate(&binned, &-BigInt::from(phase))));
             }
             let mut driven_sum: Option<Vec<Rat>> = None;
-            for (&offset, table) in self.offsets.iter().zip(&tables) {
-                let Some(table) = table else {
+            for ((_, table), contraction) in
+                self.offsets.iter().zip(&tables).zip(&pair_contractions)
+            {
+                let (Some(table), Some(contraction)) = (table, contraction) else {
                     continue;
                 };
-                let pair = constitution
-                    .pair_port(ring, offset)
-                    .ok_or(HnnError::MissingSourcePort { ring })?;
-                let driven = pair.apply_table(table, phase, a, width);
+                let driven = contraction.apply_table(table, phase, a, width);
                 driven_sum = Some(match driven_sum {
                     Some(sum) => sum.iter().zip(driven).map(|(s, d)| s + d).collect(),
                     None => driven,

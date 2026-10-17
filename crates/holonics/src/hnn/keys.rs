@@ -504,7 +504,11 @@ pub fn damaged_station_pairs(
     passage: &DamagedPassage,
 ) -> Result<Vec<(usize, Vec<PairReading>)>, HnnError> {
     let (opening, passage) = (passage.opening(), passage.cells());
-    if let Some(&code) = passage.iter().flatten().find(|&&code| code >= field.alphabet()) {
+    if let Some(&code) = passage
+        .iter()
+        .flatten()
+        .find(|&&code| code >= field.alphabet())
+    {
         return Err(HnnError::CellOutside {
             code,
             alphabet: field.alphabet(),

@@ -12,16 +12,16 @@ use holonics::compression::landmark::context::{BaseMeasure, StopPrior};
 use holonics::geometry::{RatVec3, screw::ScrewGenerator};
 use holonics::hnn::HnnError;
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
+use holonics::hnn::field::ConstitutionRead;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::physical::PhysicalReceiver;
 use holonics::hnn::physical::action::{
-    ActionCommunication, ActionReception, AdmittedFuture, AdmittedWaves, BoundJointWorld,
-    ModelKey, PreparedPhysicalProbe, WorldLanding, WorldModel,
+    ActionCommunication, ActionReception, AdmittedFuture, AdmittedWaves, BoundJointWorld, ModelKey,
+    PreparedPhysicalProbe, WorldLanding, WorldModel,
 };
 use holonics::hnn::propagation::Operands;
 use holonics::hnn::ring::ResonatorMaterial;
 use holonics::hnn::word::action::PortPreparation;
-use holonics::hnn::field::ConstitutionRead;
 use holonics::hnn::word::continuation::{Admitted, MaterialDirection, MaterialTangent};
 use holonics::hnn::word::variation::ContactCoordinate;
 use holonics::hnn::{
@@ -818,7 +818,10 @@ fn the_world_landing_reads_the_next_encounter() {
         "world production: landed code {:?} excess {}; matched control code {:?} excess {}",
         landed.0, landed.1, unlanded.0, unlanded.1
     );
-    assert_eq!(unlanded.0, reading.waves[0].producing.code_length().unwrap());
+    assert_eq!(
+        unlanded.0,
+        reading.waves[0].producing.code_length().unwrap()
+    );
     assert_eq!(unlanded.1, reading.waves[0].producing.excess().unwrap());
     // Production in the admission's own order: strictly below in code, or an exactly equal code
     // (the prospects' witness) with a strictly smaller phase excess.
@@ -837,11 +840,7 @@ fn loop_round(
     field: &Field,
     source: &Encoded,
     control: &[Rat],
-) -> (
-    holonics::ratio::algebraic::ExactInterval,
-    Rat,
-    String,
-) {
+) -> (holonics::ratio::algebraic::ExactInterval, Rat, String) {
     let theta = receiver.constitution().clone();
     let coordinates = all_coordinates(&theta);
     let directions: Vec<MaterialDirection> = coordinates
@@ -878,7 +877,10 @@ fn loop_round(
     let decision = match landing {
         WorldLanding::Unreached(refusal) => format!("unreached {refusal:?}"),
         WorldLanding::Read(reading) => {
-            format!("{:?} at grain raise {:?}", reading.decision, reading.grain_raise)
+            format!(
+                "{:?} at grain raise {:?}",
+                reading.decision, reading.grain_raise
+            )
         }
     };
     (code, excess, decision)
@@ -1088,7 +1090,9 @@ fn the_tangent_continues_into_the_next_encounter() {
         .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
         .unwrap();
     let waves = admitted(&probe, 0);
-    let (reception, tangents) = probe.encounter_continued(&waves, &control, continued).unwrap();
+    let (reception, tangents) = probe
+        .encounter_continued(&waves, &control, continued)
+        .unwrap();
     assert!(matches!(
         reception.reception,
         ActionCommunication::Received(_)
@@ -1165,9 +1169,11 @@ fn co_clock_twins_cannot_swap_tangents() {
     };
     let (_, _, first_tangents) = teach(&[integer(1)]);
     let (second, second_received, second_tangents) = teach(&[integer(-1)]);
-    assert!(second
-        .world_proposal(&coordinates, &[(&second_tangents[..], &second_received)])
-        .is_ok());
+    assert!(
+        second
+            .world_proposal(&coordinates, &[(&second_tangents[..], &second_received)])
+            .is_ok()
+    );
     let refused = second.world_proposal(&coordinates, &[(&first_tangents[..], &second_received)]);
     assert!(
         matches!(refused, Err(HnnError::Unadmitted { .. })),
@@ -1178,11 +1184,18 @@ fn co_clock_twins_cannot_swap_tangents() {
 
 /// A second declared World medium: a non-uniform diagonal storage, declared before any reading.
 fn second_storage() -> Vec<Rat> {
-    [1, 2, 1, 3, 2, 1, 3, 1].iter().map(|&n| integer(n)).collect()
+    [1, 2, 1, 3, 2, 1, 3, 1]
+        .iter()
+        .map(|&n| integer(n))
+        .collect()
 }
 
 /// A receiver on the second World, with its own key (the World's law) declaring the World's face.
-fn bound_second<'f>(field: &'f Field, theta: Constitution, source: &Encoded) -> PhysicalReceiver<'f> {
+fn bound_second<'f>(
+    field: &'f Field,
+    theta: Constitution,
+    source: &Encoded,
+) -> PhysicalReceiver<'f> {
     let mut receiver =
         PhysicalReceiver::new(field, theta, Current::at_rest(field), WordOpening::Rest).unwrap();
     receiver
@@ -1247,7 +1260,13 @@ fn the_world_loop_is_read_on_a_second_fixture() {
 
 /// The fixture's actual World on a declared law, at a given state and native origin (the World's
 /// owner rebinding it after a cold restore of the native side).
-fn world_at(field: &Field, chart: Encoded, holon: Holon, state: HolonState, origin: usize) -> BoundJointWorld {
+fn world_at(
+    field: &Field,
+    chart: Encoded,
+    holon: Holon,
+    state: HolonState,
+    origin: usize,
+) -> BoundJointWorld {
     let law = JointLaw::new(
         ReferenceHolon::new(holon, field.step().clone(), Scheme::Midpoint).unwrap(),
         N,
@@ -1315,7 +1334,10 @@ fn the_landed_material_survives_a_cold_restore() {
             break;
         }
     }
-    assert!(admitted_round.is_some(), "a landing is admitted within six rounds");
+    assert!(
+        admitted_round.is_some(),
+        "a landing is admitted within six rounds"
+    );
     assert_ne!(live.constitution(), &theta);
 
     let resident = live.resident();
@@ -1329,7 +1351,11 @@ fn the_landed_material_survives_a_cold_restore() {
     let restored = Reference::campaign_one()
         .mount_continued(&field, &Current::at_rest(&field), theta.clone(), &state)
         .unwrap();
-    assert_eq!(restored.constitution(), resident.constitution(), "the material returns");
+    assert_eq!(
+        restored.constitution(),
+        resident.constitution(),
+        "the material returns"
+    );
     assert_eq!(restored.carried(), resident.carried(), "the carry returns");
     let mut cold = PhysicalReceiver::from_resident(&field, restored).unwrap();
     let world_state = live.participating_world().unwrap().state().clone();
@@ -1344,7 +1370,11 @@ fn the_landed_material_survives_a_cold_restore() {
     .unwrap();
     let model_text = live.world_model().unwrap().to_text();
     let model = WorldModel::restored(vec![faced_key(&field)], &model_text).unwrap();
-    assert_eq!(&model, live.world_model().unwrap(), "the World model returns");
+    assert_eq!(
+        &model,
+        live.world_model().unwrap(),
+        "the World model returns"
+    );
     cold.bind_world_model(model).unwrap();
 
     let read = |receiver: &mut PhysicalReceiver<'_>| {
@@ -1369,7 +1399,10 @@ fn the_landed_material_survives_a_cold_restore() {
         live_next.0,
         live_next.1
     );
-    assert_eq!(cold_next, live_next, "the restored receiver reads the live comparison");
+    assert_eq!(
+        cold_next, live_next,
+        "the restored receiver reads the live comparison"
+    );
 }
 
 // ---- The credit of two observations (the held-carry record §7) ----
@@ -1403,13 +1436,18 @@ fn teach_chain(
     };
     let continued: Vec<MaterialTangent> = tangents
         .iter()
-        .map(|t| t.continued(&one.carry, &one.carry.conductances, field).unwrap())
+        .map(|t| {
+            t.continued(&one.carry, &one.carry.conductances, field)
+                .unwrap()
+        })
         .collect();
     let probe = receiver
         .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
         .unwrap();
     let waves = admitted(&probe, 0);
-    let (reception, continued) = probe.encounter_continued(&waves, second, continued).unwrap();
+    let (reception, continued) = probe
+        .encounter_continued(&waves, second, continued)
+        .unwrap();
     let ActionCommunication::Received(two) = reception.reception else {
         panic!("the second encounter completes");
     };
@@ -1450,7 +1488,10 @@ fn a_two_observation_proposal_binds_a_chain() {
         "the chain in its order binds"
     );
     let swapped = receiver.world_proposal(&coordinates, &[(&t2[..], &r2), (&t1[..], &r1)]);
-    assert!(matches!(swapped, Err(HnnError::Unadmitted { .. })), "{swapped:?}");
+    assert!(
+        matches!(swapped, Err(HnnError::Unadmitted { .. })),
+        "{swapped:?}"
+    );
 
     // Fresh tangents at the second encounter: the same clocks, another origin.
     let mut fresh = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
@@ -1460,7 +1501,9 @@ fn a_two_observation_proposal_binds_a_chain() {
             .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
             .unwrap();
         let waves = admitted(&probe, 0);
-        let (reception, tangents) = probe.encounter_teaching(&waves, control, &directions).unwrap();
+        let (reception, tangents) = probe
+            .encounter_teaching(&waves, control, &directions)
+            .unwrap();
         let ActionCommunication::Received(received) = reception.reception else {
             panic!("the encounter completes");
         };
@@ -1477,14 +1520,19 @@ fn a_two_observation_proposal_binds_a_chain() {
             .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
             .unwrap();
         let waves = admitted(&probe, 0);
-        let (reception, tangents) = probe.encounter_teaching(&waves, &second, &directions).unwrap();
+        let (reception, tangents) = probe
+            .encounter_teaching(&waves, &second, &directions)
+            .unwrap();
         let ActionCommunication::Received(received) = reception.reception else {
             panic!("the encounter completes");
         };
         (tangents, received)
     };
     let refused = fresh.world_proposal(&coordinates, &[(&f1[..], &q1), (&f2[..], &q2)]);
-    assert!(matches!(refused, Err(HnnError::Unadmitted { .. })), "{refused:?}");
+    assert!(
+        matches!(refused, Err(HnnError::Unadmitted { .. })),
+        "{refused:?}"
+    );
 
     // A gap: the first encounter's tangents continued, then a plain encounter, then the continued
     // tangents offered to the next: the continued tangent rides only the Word that opens on its carry.
@@ -1492,7 +1540,10 @@ fn a_two_observation_proposal_binds_a_chain() {
     let (g1, p1) = teach(&mut gapped, &first);
     let continued: Vec<MaterialTangent> = g1
         .iter()
-        .map(|t| t.continued(&p1.carry, &p1.carry.conductances, &field).unwrap())
+        .map(|t| {
+            t.continued(&p1.carry, &p1.carry.conductances, &field)
+                .unwrap()
+        })
         .collect();
     plain(&mut gapped, &field, &source, &first);
     let probe = gapped
@@ -1500,7 +1551,11 @@ fn a_two_observation_proposal_binds_a_chain() {
         .unwrap();
     let waves = admitted(&probe, 0);
     let refused = probe.encounter_continued(&waves, &second, continued);
-    assert!(matches!(refused, Err(HnnError::Unadmitted { .. })), "{:?}", refused.err());
+    assert!(
+        matches!(refused, Err(HnnError::Unadmitted { .. })),
+        "{:?}",
+        refused.err()
+    );
 }
 
 /// Both encounters' compared logits, the first at `first`, the second at `second`, on `theta`.
@@ -1555,11 +1610,12 @@ fn chain_logits(
 }
 
 /// **The two-observation credit at its consumer** (§7 (a)): the credit `credit(T₁; r₁) +
-/// credit(T₂; r₂)` on one storage direction. On `θ ± εH`, `ε = 2⁻⁴ … 2⁻⁸`, the two encounters' parts
+/// credit(T₂; r₂)` on one storage direction. On `θ ± εH`, `ε = 2⁻⁴ … 2⁻¹⁰`, the two encounters' parts
 /// at the frozen covectors are differenced centrally. The observed-phase part (the World's face, which
-/// does not read the receiving relation) is confirmed to second order. The produced parts' central
-/// residuals, which include the path through the receiving relation the first encounter published
-/// (held exterior by the credit), are reported as measured.
+/// does not read the receiving relation) is confirmed to second order. Under the passage-frame read
+/// the first encounter's receiving publication moves by whole lattice steps at coarse ε (one step at
+/// 2⁻⁵…2⁻⁷ on this fixture) and is held below them; the credit holds it exterior and is the exact
+/// derivative, so the produced parts are asserted where the publication is held.
 #[test]
 fn the_two_observation_credit_is_read_at_its_consumer() {
     let (field, base, source) = fixture();
@@ -1572,8 +1628,14 @@ fn the_two_observation_credit_is_read_at_its_consumer() {
         &source,
         vec![faced_key(&field)],
     );
-    let [(t1, r1), (t2, r2)] =
-        teach_chain(&mut receiver, &field, &source, &[direction], &first, &second);
+    let [(t1, r1), (t2, r2)] = teach_chain(
+        &mut receiver,
+        &field,
+        &source,
+        &[direction],
+        &first,
+        &second,
+    );
     let ratio = |r: &ActionReception| r.comparison.as_ref().unwrap().returned.ratio.clone();
     let (ratio1, ratio2) = (ratio(&r1), ratio(&r2));
     let c1 = t1[0].comparison_credit(&ratio1).unwrap();
@@ -1582,7 +1644,12 @@ fn the_two_observation_credit_is_read_at_its_consumer() {
     let g2 = ratio2.covector().unwrap().logits().to_vec();
     println!(
         "two-observation credit: first: magnitude {}, produced phase {}, observed phase {}; second (continued): magnitude {}, produced phase {}, observed phase {}",
-        c1.magnitude, c1.produced_phase, c1.observed_phase, c2.magnitude, c2.produced_phase, c2.observed_phase
+        c1.magnitude,
+        c1.produced_phase,
+        c1.observed_phase,
+        c2.magnitude,
+        c2.produced_phase,
+        c2.observed_phase
     );
     let credit = [
         &c1.magnitude + &c2.magnitude,
@@ -1595,23 +1662,32 @@ fn the_two_observation_credit_is_read_at_its_consumer() {
         c2.observed_phase.clone(),
     ];
     let mut residuals: Vec<(Rat, [Rat; 3], [Rat; 3])> = Vec::new();
-    for j in 4..9 {
+    let mut publication_changes = Vec::new();
+    for j in 4..11 {
         let epsilon = rat(1, 1i64 << j);
         let ([up1, up2], up_map) =
             chain_logits(&field, declared.at(&epsilon), &source, &first, &second);
-        let ([down1, down2], down_map) =
-            chain_logits(&field, declared.at(&-epsilon.clone()), &source, &first, &second);
+        let ([down1, down2], down_map) = chain_logits(
+            &field,
+            declared.at(&-epsilon.clone()),
+            &source,
+            &first,
+            &second,
+        );
         // The receiving relation the first encounter published, read on both sides.
         let moved: Vec<Rat> = (0..up_map.rows())
             .flat_map(|i| (0..up_map.columns()).map(move |j| (i, j)))
             .map(|(i, j)| (up_map.get(i, j).unwrap() - down_map.get(i, j).unwrap()).abs())
             .collect();
+        let publication_change = l1(&moved);
         println!(
             "two-observation credit: ε = 2^-{j}: the published receiving relation's central change (l1) {}",
-            l1(&moved)
+            publication_change
         );
+        publication_changes.push(publication_change);
         let two = integer(2) * &epsilon;
-        let total = |a: [Rat; 3], b: [Rat; 3]| -> [Rat; 3] { std::array::from_fn(|k| &a[k] + &b[k]) };
+        let total =
+            |a: [Rat; 3], b: [Rat; 3]| -> [Rat; 3] { std::array::from_fn(|k| &a[k] + &b[k]) };
         let up = total(parts(&g1, &up1), parts(&g2, &up2));
         let down = total(parts(&g1, &down1), parts(&g2, &down2));
         let r: [Rat; 3] = std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &credit[k]).abs());
@@ -1626,8 +1702,20 @@ fn the_two_observation_credit_is_read_at_its_consumer() {
         );
         residuals.push((epsilon, r, s));
     }
-    // [measured, October 10] Every part, both observations and the second alone, to second order: the
-    // acceptance required it of the observed phase and reported the produced parts; they hold too.
+    let held_start = publication_changes
+        .iter()
+        .rposition(|change| !change.is_zero())
+        .map_or(0, |last_jump| last_jump + 1);
+    assert!(
+        residuals.len() - held_start >= 3,
+        "the held publication tail must contain at least three ε; l1 changes: {publication_changes:?}"
+    );
+    for (epsilon, both, second) in &residuals[..held_start] {
+        println!(
+            "two-observation credit: ε = {epsilon}: measured produced residuals before the held tail (lattice jump of the publication): both {} {}; second alone {} {}",
+            both[0], both[1], second[0], second[1]
+        );
+    }
     let picks: [fn(&(Rat, [Rat; 3], [Rat; 3])) -> Rat; 6] = [
         |r| r.1[0].clone(),
         |r| r.1[1].clone(),
@@ -1636,16 +1724,21 @@ fn the_two_observation_credit_is_read_at_its_consumer() {
         |r| r.2[1].clone(),
         |r| r.2[2].clone(),
     ];
-    for pick in picks {
-        let first_epsilon = residuals[0].0.clone();
-        let scaled_first = pick(&residuals[0]) / (&first_epsilon * &first_epsilon);
-        for pair in residuals.windows(2) {
+    for (index, pick) in picks.into_iter().enumerate() {
+        let asserted = if matches!(index, 2 | 5) {
+            &residuals[..]
+        } else {
+            &residuals[held_start..]
+        };
+        let first_epsilon = asserted[0].0.clone();
+        let scaled_first = pick(&asserted[0]) / (&first_epsilon * &first_epsilon);
+        for pair in asserted.windows(2) {
             assert!(
                 pick(&pair[1]) * integer(2) <= pick(&pair[0]),
                 "the residual halves at least"
             );
         }
-        for r in &residuals {
+        for r in asserted {
             assert!(
                 pick(r) / (&r.0 * &r.0) <= &scaled_first * integer(2),
                 "the residual stays O(ε²)"
@@ -1701,7 +1794,9 @@ fn land_chain<'f>(
     } else {
         vec![(&t2[..], &r2)]
     };
-    let proposal = receiver.world_proposal(&coordinates, &observations).unwrap();
+    let proposal = receiver
+        .world_proposal(&coordinates, &observations)
+        .unwrap();
     let preparation = actuator(field);
     let landing = receiver
         .land_world_descent(
@@ -1726,7 +1821,10 @@ fn the_two_observation_landing_reads_both_waves() {
     let declared = Declared::new(&field, base);
     let theta = declared.at(&Rat::zero());
     let controls = chain_controls();
-    for (name, both) in [("both observations", true), ("continued credit alone", false)] {
+    for (name, both) in [
+        ("both observations", true),
+        ("continued credit alone", false),
+    ] {
         let (_, landing) = land_chain(&field, &theta, &source, both);
         let reading = match landing {
             WorldLanding::Unreached(refusal) => {
@@ -1744,7 +1842,10 @@ fn the_two_observation_landing_reads_both_waves() {
         for wave in &reading.waves {
             println!(
                 "two-observation landing ({name}): wave {:?}: producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}",
-                wave.control.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+                wave.control
+                    .iter()
+                    .map(|x| x.to_string())
+                    .collect::<Vec<_>>(),
                 wave.producing.code_length().unwrap(),
                 wave.producing.excess().unwrap(),
                 wave.proposed.code_length().unwrap(),
@@ -1818,7 +1919,11 @@ impl Declared {
 }
 
 /// The two chain encounters, plain, the second kept as the receiver's latest reception.
-fn experience(receiver: &mut PhysicalReceiver<'_>, field: &Field, source: &Encoded) -> ActionReception {
+fn experience(
+    receiver: &mut PhysicalReceiver<'_>,
+    field: &Field,
+    source: &Encoded,
+) -> ActionReception {
     let [first, second] = chain_controls();
     plain(receiver, field, source, &first);
     let preparation = actuator(field);
@@ -1869,7 +1974,11 @@ fn the_prospect_is_credited_at_its_consumer() {
             control[0], credit.magnitude, credit.produced_phase, credit.observed_phase
         );
         let g = ratio.covector().unwrap().logits().to_vec();
-        let tangent = [credit.magnitude, credit.produced_phase, credit.observed_phase];
+        let tangent = [
+            credit.magnitude,
+            credit.produced_phase,
+            credit.observed_phase,
+        ];
         let logits_at = |epsilon: &Rat| -> Vec<StationLogits> {
             let (prospect, _) = receiver
                 .located_prospect(
@@ -1992,7 +2101,10 @@ fn the_prospect_landing_reads_both_waves() {
     for wave in &reading.waves {
         println!(
             "prospect landing: wave {:?}: producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}",
-            wave.control.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+            wave.control
+                .iter()
+                .map(|x| x.to_string())
+                .collect::<Vec<_>>(),
             wave.producing.code_length().unwrap(),
             wave.producing.excess().unwrap(),
             wave.proposed.code_length().unwrap(),
@@ -2002,7 +2114,10 @@ fn the_prospect_landing_reads_both_waves() {
     }
     // [measured, October 10; the record §7b] On this fixture the landing over both waves is
     // admitted; kept as the fixture's regression of the measured outcome.
-    assert!(reading.decision.is_ok(), "the measured prospect landing is admitted");
+    assert!(
+        reading.decision.is_ok(),
+        "the measured prospect landing is admitted"
+    );
     for (index, control) in controls.iter().enumerate() {
         let (mut replay, _) = land_prospect(&field, &theta, &source);
         let landed = second_comparison(&mut replay, &field, &source, control);
@@ -2049,7 +2164,10 @@ fn the_prospect_landed_material_is_read_without_its_history() {
     let WorldLanding::Read(reading) = landing else {
         panic!("the measured prospect landing reaches its lattice");
     };
-    assert!(reading.decision.is_ok(), "the measured prospect landing is admitted");
+    assert!(
+        reading.decision.is_ok(),
+        "the measured prospect landing is admitted"
+    );
     let landed = landed_receiver.constitution().clone();
     for (index, control) in chain_controls().iter().enumerate() {
         let read = |material: &Constitution| {
@@ -2126,7 +2244,10 @@ fn the_prospect_landing_after_one_observation() {
             for wave in &reading.waves {
                 println!(
                     "prospect after one observation: wave {:?}: producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}",
-                    wave.control.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+                    wave.control
+                        .iter()
+                        .map(|x| x.to_string())
+                        .collect::<Vec<_>>(),
                     wave.producing.code_length().unwrap(),
                     wave.producing.excess().unwrap(),
                     wave.proposed.code_length().unwrap(),
@@ -2225,7 +2346,8 @@ fn prospect_loop(name: &str, second: bool) {
             let comparison = second_comparison(&mut twin, &field, &source, &control);
             twin_read.push((comparison.0, comparison.1));
         }
-        for (wave, ((code, excess), (t_code, t_excess))) in read.iter().zip(&twin_read).enumerate() {
+        for (wave, ((code, excess), (t_code, t_excess))) in read.iter().zip(&twin_read).enumerate()
+        {
             println!(
                 "prospect loop ({name}): round {round}: wave {wave}: learner code {code:?} excess {excess}; twin code {t_code:?} excess {t_excess}"
             );
@@ -2298,7 +2420,10 @@ fn per_encounter_loop(name: &str, second: bool) {
                     {
                         WorldLanding::Unreached(refusal) => format!("unreached {refusal:?}"),
                         WorldLanding::Read(reading) => {
-                            format!("{:?} at grain raise {:?}", reading.decision, reading.grain_raise)
+                            format!(
+                                "{:?} at grain raise {:?}",
+                                reading.decision, reading.grain_raise
+                            )
                         }
                     },
                 }
@@ -2429,6 +2554,33 @@ fn plain_passage(
     last.unwrap()
 }
 
+/// The same passage with each receipt's exact receiving-readout motion.
+fn plain_passage_with_motion(
+    receiver: &mut PhysicalReceiver<'_>,
+    field: &Field,
+    source: &Encoded,
+    count: usize,
+) -> (ActionReception, Vec<bool>) {
+    let preparation = actuator(field);
+    let mut last = None;
+    let mut moved = Vec::new();
+    for k in 0..count {
+        let control = &chain_controls()[k % 2];
+        let probe = receiver
+            .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let comparison = received.comparison.as_ref().unwrap();
+        moved.push(comparison.receiving_before != comparison.receiving_after);
+        last = Some(received);
+    }
+    (last.unwrap(), moved)
+}
+
 /// **The schedule's chained prospect is the actual schedule** (§7f, §7h): after `count` encounters,
 /// the located key's prospect of the next two encounters (`u = 1`, then `u = −1`) is read, with the
 /// receiving publication between them joined, then the two encounters actually run. Both are asserted
@@ -2463,7 +2615,10 @@ fn the_schedule_prospect_is_the_actual_schedule() {
             println!(
                 "schedule prospect: after {count} encounters: encounter {k}: actual equals prospect {equal}"
             );
-            assert!(equal, "the chained prospect is the actual encounter {k} after {count}");
+            assert!(
+                equal,
+                "the chained prospect is the actual encounter {k} after {count}"
+            );
         }
     }
 }
@@ -2501,7 +2656,9 @@ fn the_schedule_is_credited_at_its_consumer() {
     let mut credit = [Rat::zero(), Rat::zero(), Rat::zero()];
     let mut covectors = Vec::new();
     for scheduled in &taught {
-        let c = scheduled.tangents[0].comparison_credit(&scheduled.ratio).unwrap();
+        let c = scheduled.tangents[0]
+            .comparison_credit(&scheduled.ratio)
+            .unwrap();
         credit[0] += &c.magnitude;
         credit[1] += &c.produced_phase;
         credit[2] += &c.observed_phase;
@@ -2552,7 +2709,10 @@ fn the_schedule_is_credited_at_its_consumer() {
         let down = parts_at(&-epsilon.clone());
         let two = integer(2) * &epsilon;
         let r: [Rat; 3] = std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &credit[k]).abs());
-        println!("schedule credit: ε = 2^-{j}: central residuals {} {} {}", r[0], r[1], r[2]);
+        println!(
+            "schedule credit: ε = 2^-{j}: central residuals {} {} {}",
+            r[0], r[1], r[2]
+        );
         residuals.push((epsilon, r));
     }
     for k in 0..3 {
@@ -2666,6 +2826,8 @@ fn the_schedule_loop_is_read_on_a_second_fixture() {
 /// the repeated schedule (`u = 1`, `u = −1`) on the present material, with the orbit's credit along
 /// one storage direction. On `θ ± εH` (the present receiving relation kept) the two orbit encounters'
 /// parts at their frozen covectors confirm the credit to second order on `ε = 2⁻⁴ … 2⁻⁸`.
+/// Under the passage-frame read, the fixed-readout hypothesis fails on this fixture, so the cycle
+/// is refused by its guard. The claims hold wherever the cycle is admitted.
 #[test]
 fn the_cycle_closes_and_is_credited_at_its_consumer() {
     let (field, base, source) = fixture();
@@ -2677,134 +2839,170 @@ fn the_cycle_closes_and_is_credited_at_its_consumer() {
         &source,
         vec![faced_key(&field)],
     );
-    plain_passage(&mut receiver, &field, &source, 12);
+    let (_, moved) = plain_passage_with_motion(&mut receiver, &field, &source, 12);
     let present = receiver.constitution().clone();
     let preparation = actuator(&field);
     let [first, second] = chain_controls();
     let schedule: [&[Rat]; 2] = [&first, &second];
-    let reading = receiver
-        .world_cycle(
-            &present,
-            &source,
-            &field.receivers()[0],
-            &preparation,
-            &[false, true],
-            &schedule,
-            &[direction],
-        )
-        .unwrap();
-    println!("cycle: dimension {}", reading.dimension);
-    let mut credit = [Rat::zero(), Rat::zero()];
-    let mut covectors = Vec::new();
-    for (k, encounter) in reading.encounters.iter().enumerate() {
-        credit[0] += &reading.credits[k][0].0;
-        credit[1] += &reading.credits[k][0].1;
-        covectors.push(encounter.ratio.covector().unwrap().logits().to_vec());
-        println!(
-            "cycle: orbit encounter {k}: code {:?} excess {}",
-            encounter.ratio.code_length().unwrap(),
-            encounter.ratio.excess().unwrap()
-        );
-    }
-    println!("cycle credit: classical {}, phase {}", credit[0], credit[1]);
-    let parts_at = |epsilon: &Rat| -> [Rat; 2] {
-        let reading = receiver
-            .world_cycle(
-                &declared.on(&present, epsilon),
-                &source,
-                &field.receivers()[0],
-                &preparation,
-                &[false, true],
-                &schedule,
-                &[],
-            )
-            .unwrap();
-        let mut total = [Rat::zero(), Rat::zero()];
-        for (k, encounter) in reading.encounters.iter().enumerate() {
-            let logits: Vec<StationLogits> = encounter
-                .prospect
-                .point
-                .features
+    match receiver.world_cycle(
+        &present,
+        &source,
+        &field.receivers()[0],
+        &preparation,
+        &[false, true],
+        &schedule,
+        &[direction],
+    ) {
+        Ok(reading) => {
+            println!("cycle: dimension {}", reading.dimension);
+            let mut credit = [Rat::zero(), Rat::zero()];
+            let mut covectors = Vec::new();
+            for (k, encounter) in reading.encounters.iter().enumerate() {
+                credit[0] += &reading.credits[k][0].0;
+                credit[1] += &reading.credits[k][0].1;
+                covectors.push(encounter.ratio.covector().unwrap().logits().to_vec());
+                println!(
+                    "cycle: orbit encounter {k}: code {:?} excess {}",
+                    encounter.ratio.code_length().unwrap(),
+                    encounter.ratio.excess().unwrap()
+                );
+            }
+            println!("cycle credit: classical {}, phase {}", credit[0], credit[1]);
+            let parts_at = |epsilon: &Rat| -> [Rat; 2] {
+                let reading = receiver
+                    .world_cycle(
+                        &declared.on(&present, epsilon),
+                        &source,
+                        &field.receivers()[0],
+                        &preparation,
+                        &[false, true],
+                        &schedule,
+                        &[],
+                    )
+                    .unwrap();
+                let mut total = [Rat::zero(), Rat::zero()];
+                for (k, encounter) in reading.encounters.iter().enumerate() {
+                    let logits: Vec<StationLogits> = encounter
+                        .prospect
+                        .point
+                        .features
+                        .iter()
+                        .zip(&encounter.prospect.faces)
+                        .enumerate()
+                        .map(|(rank, ((_, _, logits), (_, face)))| StationLogits {
+                            station: rank,
+                            produced: logits.clone(),
+                            observed: face.clone(),
+                        })
+                        .collect();
+                    let p = parts(&covectors[k], &logits);
+                    total[0] += &p[0];
+                    total[1] += &p[1] + &p[2];
+                }
+                total
+            };
+            let mut residuals: Vec<(Rat, [Rat; 2])> = Vec::new();
+            for j in 4..9 {
+                let epsilon = rat(1, 1i64 << j);
+                let up = parts_at(&epsilon);
+                let down = parts_at(&-epsilon.clone());
+                let two = integer(2) * &epsilon;
+                let r: [Rat; 2] =
+                    std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &credit[k]).abs());
+                println!(
+                    "cycle credit: ε = 2^-{j}: central residuals {} {}",
+                    r[0], r[1]
+                );
+                residuals.push((epsilon, r));
+            }
+            for k in 0..2 {
+                let (first_epsilon, first) = &residuals[0];
+                let scaled_first = &first[k] / (first_epsilon * first_epsilon);
+                for pair in residuals.windows(2) {
+                    assert!(
+                        pair[1].1[k].clone() * integer(2) <= pair[0].1[k],
+                        "part {k}: the residual halves at least"
+                    );
+                }
+                for (epsilon, residual) in &residuals {
+                    assert!(
+                        &residual[k] / (epsilon * epsilon) <= &scaled_first * integer(2),
+                        "part {k}: the residual stays O(ε²)"
+                    );
+                }
+            }
+        }
+        Err(HnnError::Unadmitted { reason })
+            if reason
+                == "a cycle's run leaves its readout as it is: its receiving publications do not move R" =>
+        {
+            let encounters: Vec<usize> = moved
                 .iter()
-                .zip(&encounter.prospect.faces)
                 .enumerate()
-                .map(|(rank, ((_, _, logits), (_, face)))| StationLogits {
-                    station: rank,
-                    produced: logits.clone(),
-                    observed: face.clone(),
-                })
+                .filter(|(_, changed)| **changed)
+                .map(|(encounter, _)| encounter)
                 .collect();
-            let p = parts(&covectors[k], &logits);
-            total[0] += &p[0];
-            total[1] += &p[1] + &p[2];
+            println!("cycle refused: R moved at {encounters:?}");
+            return;
         }
-        total
-    };
-    let mut residuals: Vec<(Rat, [Rat; 2])> = Vec::new();
-    for j in 4..9 {
-        let epsilon = rat(1, 1i64 << j);
-        let up = parts_at(&epsilon);
-        let down = parts_at(&-epsilon.clone());
-        let two = integer(2) * &epsilon;
-        let r: [Rat; 2] = std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &credit[k]).abs());
-        println!("cycle credit: ε = 2^-{j}: central residuals {} {}", r[0], r[1]);
-        residuals.push((epsilon, r));
-    }
-    for k in 0..2 {
-        let (first_epsilon, first) = &residuals[0];
-        let scaled_first = &first[k] / (first_epsilon * first_epsilon);
-        for pair in residuals.windows(2) {
-            assert!(
-                pair[1].1[k].clone() * integer(2) <= pair[0].1[k],
-                "part {k}: the residual halves at least"
-            );
-        }
-        for (epsilon, residual) in &residuals {
-            assert!(
-                &residual[k] / (epsilon * epsilon) <= &scaled_first * integer(2),
-                "part {k}: the residual stays O(ε²)"
-            );
-        }
+        Err(error) => panic!("unexpected cycle refusal: {error:?}"),
     }
 }
 
 /// **Where the passage goes** (§7g): the orbit computed after twelve encounters, against the actual
 /// readings of encounters 38 and 39 of the same passage (no landing). Reported as measured: whether
 /// the actual readings reach the orbit's at the receiver's grain, and their exact differences.
+/// Under the passage-frame read, the fixed-readout hypothesis fails on this fixture, so the cycle
+/// is refused by its guard. The claims hold wherever the cycle is admitted.
 #[test]
 fn the_cycle_is_where_the_passage_goes() {
     let (field, base, source) = fixture();
     let theta = Declared::new(&field, base).at(&Rat::zero());
     let mut receiver = bound(&field, theta, &source, vec![faced_key(&field)]);
-    plain_passage(&mut receiver, &field, &source, 12);
+    let (_, moved) = plain_passage_with_motion(&mut receiver, &field, &source, 12);
     let present = receiver.constitution().clone();
     let preparation = actuator(&field);
     let [first, second] = chain_controls();
     let schedule: [&[Rat]; 2] = [&first, &second];
-    let reading = receiver
-        .world_cycle(
-            &present,
-            &source,
-            &field.receivers()[0],
-            &preparation,
-            &[false, true],
-            &schedule,
-            &[],
-        )
-        .unwrap();
-    plain_passage(&mut receiver, &field, &source, 26);
-    for (k, control) in schedule.iter().enumerate() {
-        let actual = second_comparison(&mut receiver, &field, &source, control);
-        let orbit = &reading.encounters[k].ratio;
-        println!(
-            "cycle limit: encounter {}: actual code {:?} excess {}; orbit code {:?} excess {}; equal code {}",
-            38 + k,
-            actual.0,
-            actual.1,
-            orbit.code_length().unwrap(),
-            orbit.excess().unwrap(),
-            actual.0 == orbit.code_length().unwrap()
-        );
+    match receiver.world_cycle(
+        &present,
+        &source,
+        &field.receivers()[0],
+        &preparation,
+        &[false, true],
+        &schedule,
+        &[],
+    ) {
+        Ok(reading) => {
+            plain_passage(&mut receiver, &field, &source, 26);
+            for (k, control) in schedule.iter().enumerate() {
+                let actual = second_comparison(&mut receiver, &field, &source, control);
+                let orbit = &reading.encounters[k].ratio;
+                println!(
+                    "cycle limit: encounter {}: actual code {:?} excess {}; orbit code {:?} excess {}; equal code {}",
+                    38 + k,
+                    actual.0,
+                    actual.1,
+                    orbit.code_length().unwrap(),
+                    orbit.excess().unwrap(),
+                    actual.0 == orbit.code_length().unwrap()
+                );
+            }
+        }
+        Err(HnnError::Unadmitted { reason })
+            if reason
+                == "a cycle's run leaves its readout as it is: its receiving publications do not move R" =>
+        {
+            let encounters: Vec<usize> = moved
+                .iter()
+                .enumerate()
+                .filter(|(_, changed)| **changed)
+                .map(|(encounter, _)| encounter)
+                .collect();
+            println!("cycle refused: R moved at {encounters:?}");
+            return;
+        }
+        Err(error) => panic!("unexpected cycle refusal: {error:?}"),
     }
 }
 
@@ -2951,7 +3149,10 @@ fn the_world_return_is_the_tangents_credit() {
         let step = encounter
             .world_contacts
             .iter()
-            .find(|s| s.gradient.family() == holonics::hnn::constitution::Family::Factor(coordinate.family))
+            .find(|s| {
+                s.gradient.family()
+                    == holonics::hnn::constitution::Family::Factor(coordinate.family)
+            })
             .unwrap();
         let entries: Vec<Rat> = step.gradient.entries().cloned().collect();
         let columns = match coordinate.family {
@@ -2968,12 +3169,15 @@ fn the_world_return_is_the_tangents_credit() {
             entry,
             total,
             native,
-            if total.is_zero() { "∞".to_string() } else { (entry / &total).to_string() }
+            if total.is_zero() {
+                "∞".to_string()
+            } else {
+                (entry / &total).to_string()
+            }
         );
         assert_eq!(entry, &-total, "coordinate {coordinate:?}");
     }
 }
-
 
 /// **When does the second fixture's readout stop moving?** (§7k): forty plain encounters on the
 /// second fixture, whether each receiving publication moved `R`, reported as measured.
@@ -3039,6 +3243,8 @@ fn floor_log2(x: &Rat) -> i64 {
 /// parallel), the minimum-norm point `m` of `[a, b]` with its `λ`, and the family's covector scale
 /// `c` through the World port with the largest certified exponent `k_c` (`2^(k_c) c ≤ 1`). Nothing is
 /// stepped; the objective and its comparisons are those of §7k.
+/// Under the passage-frame read, the fixed-readout hypothesis fails on this fixture, so the cycle
+/// is refused by its guard. The claims hold wherever the cycle is admitted.
 #[test]
 fn the_cycle_blocker_is_classified() {
     let (field, base, source) = fixture();
@@ -3048,7 +3254,7 @@ fn the_cycle_blocker_is_classified() {
         &source,
         vec![faced_key(&field)],
     );
-    plain_passage(&mut receiver, &field, &source, 12);
+    let (_, moved) = plain_passage_with_motion(&mut receiver, &field, &source, 12);
     let present = receiver.constitution().clone();
     let preparation = actuator(&field);
     let [first, second] = chain_controls();
@@ -3058,89 +3264,108 @@ fn the_cycle_blocker_is_classified() {
         .iter()
         .map(|c| MaterialDirection::of_coordinate(&field, &present, c).unwrap())
         .collect();
-    let reading = receiver
-        .world_cycle(
-            &present,
-            &source,
-            &field.receivers()[0],
-            &preparation,
-            &[false, true],
-            &schedule,
-            &directions,
-        )
-        .unwrap();
-    assert_eq!(reading.encounters.len(), 2);
-    let dot = |x: &[Rat], y: &[Rat]| x.iter().zip(y).map(|(p, q)| p * q).sum::<Rat>();
-    for family in 0..3 {
-        let indices: Vec<usize> = coordinates
-            .iter()
-            .enumerate()
-            .filter(|(_, c)| c.family == family)
-            .map(|(d, _)| d)
-            .collect();
-        let read = |e: usize, part: usize| -> Vec<Rat> {
-            indices
+    match receiver.world_cycle(
+        &present,
+        &source,
+        &field.receivers()[0],
+        &preparation,
+        &[false, true],
+        &schedule,
+        &directions,
+    ) {
+        Ok(reading) => {
+            assert_eq!(reading.encounters.len(), 2);
+            let dot = |x: &[Rat], y: &[Rat]| x.iter().zip(y).map(|(p, q)| p * q).sum::<Rat>();
+            for family in 0..3 {
+                let indices: Vec<usize> = coordinates
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, c)| c.family == family)
+                    .map(|(d, _)| d)
+                    .collect();
+                let read = |e: usize, part: usize| -> Vec<Rat> {
+                    indices
+                        .iter()
+                        .map(|d| {
+                            let (classical, phase) = &reading.credits[e][*d];
+                            if part == 0 {
+                                classical.clone()
+                            } else {
+                                phase.clone()
+                            }
+                        })
+                        .collect()
+                };
+                let (l0, l1, a, b) = (read(0, 0), read(1, 0), read(0, 1), read(1, 1));
+                let (aa, bb, ab) = (dot(&a, &a), dot(&b, &b), dot(&a, &b));
+                let defect = &(&aa * &bb) - &(&ab * &ab);
+                let difference: Vec<Rat> = b.iter().zip(&a).map(|(p, q)| p - q).collect();
+                let length = dot(&difference, &difference);
+                let lambda = if length.is_zero() {
+                    Rat::zero()
+                } else {
+                    let raw = dot(&difference, &b) / &length;
+                    raw.clamp(Rat::zero(), Rat::one())
+                };
+                let m: Vec<Rat> = a
+                    .iter()
+                    .zip(&b)
+                    .map(|(p, q)| &lambda * p + (Rat::one() - &lambda) * q)
+                    .collect();
+                let mm = dot(&m, &m);
+                let widest = m.iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero);
+                let covector = reading
+                    .encounters
+                    .iter()
+                    .flat_map(|e| &e.world_contacts)
+                    .filter(|s| {
+                        s.gradient.family() == holonics::hnn::constitution::Family::Factor(family)
+                    })
+                    .map(|s| s.covector.clone())
+                    .max()
+                    .unwrap_or_else(Rat::zero);
+                // The largest `k` with `2^k c ≤ 1`: `−j` when `c = 2^j` exactly, `−j − 1` otherwise.
+                let certified = if covector.is_zero() {
+                    "unbounded".to_string()
+                } else {
+                    let j = floor_log2(&covector);
+                    let exact = holonics::holon::deposition::dyadic(j) == covector;
+                    (if exact { -j } else { -j - 1 }).to_string()
+                };
+                println!(
+                    "blocker: family {family}: classical |L0|² {} |L1|² {}; phase |a|² {} |b|² {} ⟨a,b⟩ {}; parallel defect {} (exactly parallel: {}); λ = {}; |m|² {}; |m|²·min(|a|²,|b|²)⁻¹ {}; widest |m_i| {}; covector scale c {}; k_c {certified}",
+                    enclosure(&dot(&l0, &l0)),
+                    enclosure(&dot(&l1, &l1)),
+                    enclosure(&aa),
+                    enclosure(&bb),
+                    enclosure(&ab),
+                    enclosure(&defect),
+                    defect.is_zero(),
+                    lambda,
+                    enclosure(&mm),
+                    if aa.is_zero() || bb.is_zero() {
+                        "∞".to_string()
+                    } else {
+                        enclosure(&(&mm / aa.clone().min(bb.clone())))
+                    },
+                    enclosure(&widest),
+                    enclosure(&covector),
+                );
+            }
+        }
+        Err(HnnError::Unadmitted { reason })
+            if reason
+                == "a cycle's run leaves its readout as it is: its receiving publications do not move R" =>
+        {
+            let encounters: Vec<usize> = moved
                 .iter()
-                .map(|d| {
-                    let (classical, phase) = &reading.credits[e][*d];
-                    if part == 0 { classical.clone() } else { phase.clone() }
-                })
-                .collect()
-        };
-        let (l0, l1, a, b) = (read(0, 0), read(1, 0), read(0, 1), read(1, 1));
-        let (aa, bb, ab) = (dot(&a, &a), dot(&b, &b), dot(&a, &b));
-        let defect = &(&aa * &bb) - &(&ab * &ab);
-        let difference: Vec<Rat> = b.iter().zip(&a).map(|(p, q)| p - q).collect();
-        let length = dot(&difference, &difference);
-        let lambda = if length.is_zero() {
-            Rat::zero()
-        } else {
-            let raw = dot(&difference, &b) / &length;
-            raw.clamp(Rat::zero(), Rat::one())
-        };
-        let m: Vec<Rat> = a
-            .iter()
-            .zip(&b)
-            .map(|(p, q)| &lambda * p + (Rat::one() - &lambda) * q)
-            .collect();
-        let mm = dot(&m, &m);
-        let widest = m.iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero);
-        let covector = reading
-            .encounters
-            .iter()
-            .flat_map(|e| &e.world_contacts)
-            .filter(|s| {
-                s.gradient.family() == holonics::hnn::constitution::Family::Factor(family)
-            })
-            .map(|s| s.covector.clone())
-            .max()
-            .unwrap_or_else(Rat::zero);
-        // The largest `k` with `2^k c ≤ 1`: `−j` when `c = 2^j` exactly, `−j − 1` otherwise.
-        let certified = if covector.is_zero() {
-            "unbounded".to_string()
-        } else {
-            let j = floor_log2(&covector);
-            let exact = holonics::holon::deposition::dyadic(j) == covector;
-            (if exact { -j } else { -j - 1 }).to_string()
-        };
-        println!(
-            "blocker: family {family}: classical |L0|² {} |L1|² {}; phase |a|² {} |b|² {} ⟨a,b⟩ {}; parallel defect {} (exactly parallel: {}); λ = {}; |m|² {}; |m|²·min(|a|²,|b|²)⁻¹ {}; widest |m_i| {}; covector scale c {}; k_c {certified}",
-            enclosure(&dot(&l0, &l0)),
-            enclosure(&dot(&l1, &l1)),
-            enclosure(&aa),
-            enclosure(&bb),
-            enclosure(&ab),
-            enclosure(&defect),
-            defect.is_zero(),
-            lambda,
-            enclosure(&mm),
-            if aa.is_zero() || bb.is_zero() {
-                "∞".to_string()
-            } else {
-                enclosure(&(&mm / aa.clone().min(bb.clone())))
-            },
-            enclosure(&widest),
-            enclosure(&covector),
-        );
+                .enumerate()
+                .filter(|(_, changed)| **changed)
+                .map(|(encounter, _)| encounter)
+                .collect();
+            println!("cycle refused: R moved at {encounters:?}");
+            return;
+        }
+        Err(error) => panic!("unexpected cycle refusal: {error:?}"),
     }
 }

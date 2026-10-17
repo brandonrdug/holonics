@@ -123,7 +123,12 @@ impl Cover {
 
 /// **The menus over a span of cells**: one [`TurnMenu`] on `period` ports a distance `δ ∈ [1, r]`,
 /// each reading every pair `(t − δ, t)` inside the span whose two cells are intact, in clock order.
-pub fn menus(cells: &[Option<usize>], span: &Range<usize>, reach: usize, period: usize) -> Vec<TurnMenu> {
+pub fn menus(
+    cells: &[Option<usize>],
+    span: &Range<usize>,
+    reach: usize,
+    period: usize,
+) -> Vec<TurnMenu> {
     (1..=reach)
         .map(|offset| {
             let mut menu = TurnMenu::open(period as u64);
@@ -179,7 +184,6 @@ impl LocalKey {
     pub fn keyed(&self) -> bool {
         matches!(self, Self::One(_) | Self::Plural(_))
     }
-
 }
 
 /// [definition] **A join of two adjacent regions** (module header; Lean
@@ -224,7 +228,11 @@ pub struct Families {
 
 /// **A menu's relation on the classes**: each read port with its consequence, every other class
 /// unread (for a published map, the map).
-pub fn relation(menu: &TurnMenu, offset: usize, classes: usize) -> Result<PairRelation, CompressionError> {
+pub fn relation(
+    menu: &TurnMenu,
+    offset: usize,
+    classes: usize,
+) -> Result<PairRelation, CompressionError> {
     let mut map = vec![None; classes];
     for (from, to) in menu.relation() {
         if from < classes && to < classes {
@@ -273,7 +281,14 @@ pub fn locate(
             if !keys[i].keyed() || !keys[i + 1].keyed() {
                 return Join::Open;
             }
-            match fibre(cells, &(regions[i].start..regions[i + 1].end), cover.reach, period).1 {
+            match fibre(
+                cells,
+                &(regions[i].start..regions[i + 1].end),
+                cover.reach,
+                period,
+            )
+            .1
+            {
                 LocalKey::One(_) => Join::Unique,
                 LocalKey::Plural(_) => Join::Plural,
                 LocalKey::Unread | LocalKey::Empty => Join::Obstructed,
@@ -286,7 +301,13 @@ pub fn locate(
         let mut last = first;
         while last + 1 < regions.len()
             && matches!(
-                fibre(cells, &(regions[first].start..regions[last + 1].end), cover.reach, period).1,
+                fibre(
+                    cells,
+                    &(regions[first].start..regions[last + 1].end),
+                    cover.reach,
+                    period
+                )
+                .1,
                 LocalKey::One(_)
             )
         {
@@ -306,11 +327,7 @@ pub fn locate(
         });
         first = last + 1;
     }
-    Ok(LocalRepair {
-        keys,
-        joins,
-        glued,
-    })
+    Ok(LocalRepair { keys, joins, glued })
 }
 
 impl LocalRepair {
@@ -364,8 +381,11 @@ impl LocalRepair {
                     certified[t] = all_certified[offset];
                 } else {
                     // Two keyed glued regions: the intersection encloses the joint projection.
-                    let meet: Vec<usize> =
-                        families[t].iter().copied().filter(|c| family.contains(c)).collect();
+                    let meet: Vec<usize> = families[t]
+                        .iter()
+                        .copied()
+                        .filter(|c| family.contains(c))
+                        .collect();
                     if !meet.is_empty() {
                         families[t] = meet;
                     } else {
@@ -416,12 +436,19 @@ impl LocalRepair {
         let mut current = passage.clone();
         loop {
             let releases = self.release(&current)?;
-            let held = releases.iter().enumerate().find_map(|(t, release)| match release {
-                CellRelease::Held(family) => Some((t, family.clone())),
-                _ => None,
-            });
+            let held = releases
+                .iter()
+                .enumerate()
+                .find_map(|(t, release)| match release {
+                    CellRelease::Held(family) => Some((t, family.clone())),
+                    _ => None,
+                });
             let Some((t, family)) = held else {
-                if releases.iter().zip(truth).any(|(release, truth)| release.class() != Some(*truth)) {
+                if releases
+                    .iter()
+                    .zip(truth)
+                    .any(|(release, truth)| release.class() != Some(*truth))
+                {
                     return Err(CompressionError::NotRegenerated {
                         length: truth.len(),
                     });
@@ -447,24 +474,35 @@ impl LocalRepair {
         let mut current = passage.clone();
         loop {
             let releases = self.release(&current)?;
-            let held = releases.iter().enumerate().find_map(|(t, release)| match release {
-                CellRelease::Held(family) => Some((t, family.clone())),
-                _ => None,
-            });
+            let held = releases
+                .iter()
+                .enumerate()
+                .find_map(|(t, release)| match release {
+                    CellRelease::Held(family) => Some((t, family.clone())),
+                    _ => None,
+                });
             let Some((t, family)) = held else {
                 return Ok(releases
                     .iter()
                     .map(|release| release.class().expect("no cell is held"))
                     .collect());
             };
-            let index = read_index(residual, ceil_log2(&BigUint::from(family.len())), family.len())?;
+            let index = read_index(
+                residual,
+                ceil_log2(&BigUint::from(family.len())),
+                family.len(),
+            )?;
             current = pinned(&current, t, family[index])?;
         }
     }
 }
 
 /// The passage with cell `t` read as `class` (a residual's patch).
-fn pinned(passage: &DamagedPassage, t: usize, class: usize) -> Result<DamagedPassage, CompressionError> {
+fn pinned(
+    passage: &DamagedPassage,
+    t: usize,
+    class: usize,
+) -> Result<DamagedPassage, CompressionError> {
     let mut cells = passage.cells().to_vec();
     cells[t] = Some(class);
     DamagedPassage::new(cells, passage.classes(), passage.opening())

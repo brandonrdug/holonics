@@ -175,6 +175,71 @@ impl<'c> ChartStore<'c> {
         self.mirror.values().map(ChartWords::bits).sum()
     }
 
+    /// Export actual kept device charts through the shared native owner. A mismatching mirror
+    /// refuses rather than emitting a checkpoint that silently substitutes host cache contents.
+    pub(crate) fn continuing_charts(&self) -> Result<holonics::hnn::Charts, HnnError> {
+        let mut entries = Vec::with_capacity(self.mirror.len());
+        for (key, chart) in &self.mirror {
+            let slot = self
+                .slots
+                .get(key)
+                .ok_or_else(|| refused("a kept chart has its device slot"))?;
+            if !slot.present || slot.width != chart.rows() || chart.columns() != slot.width {
+                return Err(refused("a kept chart has its present square device slot"));
+            }
+            let words = self
+                .card
+                .fetch_range(&self.kept, slot.offset, chart.words().len())
+                .map_err(device)?;
+            if words != chart.words() {
+                return Err(refused(
+                    "device chart words equal their native continuation mirror",
+                ));
+            }
+            entries.push((key.clone(), chart.clone()));
+        }
+        holonics::hnn::Charts::from_entries(entries)
+    }
+    /// Restore warm charts into a fresh store. Operator/workspace caches are rebuilt at the next
+    /// actual read, whose normal certificate decides whether this retained chart is a warm start.
+    pub(crate) fn continued(
+        card: &'c Card,
+        field: &holonics::hnn::Field,
+        charts: &holonics::hnn::Charts,
+    ) -> Result<Self, HnnError> {
+        let lattice = field
+            .word_lattice()
+            .ok_or_else(|| refused("a continued device chart store has a declared word lattice"))?;
+        let mut out = Self::new(card, lattice)?;
+        for key in charts.keys() {
+            let chart = charts.get(key).expect("a native chart key");
+            let width = match key {
+                ChartKey::Ring(g) => field.rings().get(*g).map(|r| r.width()),
+                ChartKey::Contact { contact, .. } => {
+                    field.contacts().get(*contact).map(|c| c.width())
+                }
+            }
+            .ok_or_else(|| refused("a continued chart key belongs to the declared field"))?;
+            if chart.rows() != width
+                || chart.columns() != width
+                || chart.exponent() != out.exponent
+                || chart.words().len() != width.checked_mul(width).ok_or(HnnError::CountOverflow)?
+            {
+                return Err(refused(
+                    "a continued chart has the declared square shape and chart exponent",
+                ));
+            }
+            out.place(key, width)?;
+            let slot = out.slots.get_mut(key).expect("placed chart");
+            card.write(&out.kept, slot.offset, chart.words())
+                .map_err(device)?;
+            out.octets += 8 * chart.words().len();
+            slot.present = true;
+            out.mirror.insert(key.clone(), chart.clone());
+        }
+        Ok(out)
+    }
+
     pub(crate) fn before_trial(&self) -> ChartState {
         ChartState {
             slots: self.slots.clone(),

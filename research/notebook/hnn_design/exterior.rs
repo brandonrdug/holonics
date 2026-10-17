@@ -633,7 +633,12 @@ pub fn show_release(out: &str, name: &str, release: &[u8], admitted: &[&[u8]]) -
         .open(format!("{out}/releases.show"))
         .expect("the private show");
     let whole: String = release.iter().map(|&b| eye(b)).collect();
-    writeln!(show, "{name} ({} bytes): {whole}\n{receipt}\n", release.len()).expect("write the show");
+    writeln!(
+        show,
+        "{name} ({} bytes): {whole}\n{receipt}\n",
+        release.len()
+    )
+    .expect("write the show");
     let at = |value: Option<usize>| value.map_or_else(|| "none".to_string(), |v| v.to_string());
     println!(
         "    shown {name}: {} bytes whole; copy length {} against {} admitted passages (release start {}, passage {}, offset {}); bytes covered by runs of at least {} {}",
@@ -745,12 +750,15 @@ impl Pin {
             if line.is_empty() || line.starts_with('#') {
                 continue;
             }
-            let (key, value) = line
-                .split_once('=')
-                .unwrap_or_else(|| panic!("refused: the pin {path}'s line `{line}` is not `key = value`"));
+            let (key, value) = line.split_once('=').unwrap_or_else(|| {
+                panic!("refused: the pin {path}'s line `{line}` is not `key = value`")
+            });
             let key = key.trim();
             assert!(
-                matches!(key, "command" | "projection" | "deadline_ms" | "unit_bound_ms" | "threads"),
+                matches!(
+                    key,
+                    "command" | "projection" | "deadline_ms" | "unit_bound_ms" | "threads"
+                ),
                 "refused: the pin {path} declares an unknown key `{key}`"
             );
             assert!(
@@ -766,9 +774,9 @@ impl Pin {
                 .unwrap_or_else(|| panic!("refused: the pin {path} declares no `{key}`"))
         };
         let count = |key: &str, value: &str| -> u128 {
-            value
-                .parse()
-                .unwrap_or_else(|_| panic!("refused: the pin {path}'s `{key}` is not a whole count"))
+            value.parse().unwrap_or_else(|_| {
+                panic!("refused: the pin {path}'s `{key}` is not a whole count")
+            })
         };
         assert_eq!(
             field("command"),
@@ -829,7 +837,8 @@ impl Pin {
         std::thread::spawn(move || {
             let whole = Duration::from_millis(u64::try_from(deadline).unwrap_or(u64::MAX));
             std::thread::sleep(whole.saturating_sub(clock.elapsed()));
-            let reason = format!("stopped: past the pinned deadline {deadline} ms ({path}): INCOMPLETE");
+            let reason =
+                format!("stopped: past the pinned deadline {deadline} ms ({path}): INCOMPLETE");
             println!("{reason}");
             eprintln!("{reason}");
             #[allow(clippy::disallowed_methods)] // exterior notebook: an incomplete run exits so

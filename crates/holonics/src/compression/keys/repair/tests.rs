@@ -75,7 +75,10 @@ fn both_sides_plural_hold_the_chain_with_its_joint_fibre() {
     assert_eq!(restriction.joint(), BigUint::from(4u32));
     let residual = residual_code(&truth, &passage, &relation).unwrap();
     assert_eq!(residual.len(), 2);
-    assert_eq!(reopen(&passage, &relation, &mut residual.into_iter()).unwrap(), truth);
+    assert_eq!(
+        reopen(&passage, &relation, &mut residual.into_iter()).unwrap(),
+        truth
+    );
 }
 
 /// [implemented-exact] **A consequence never read restricts nothing from its side.** On `ℤ/3` at
@@ -88,7 +91,10 @@ fn an_unread_consequence_restricts_nothing_from_its_side() {
     let relation = PairRelation::new(1, vec![Some(1), None, Some(0)]).unwrap();
     let passage = DamagedPassage::new(vec![Some(1), None, Some(0)], 3, 1).unwrap();
     let restriction = restrict(&passage, &relation).unwrap();
-    assert_eq!(restriction.release().unwrap()[1], CellRelease::Held(vec![1, 2]));
+    assert_eq!(
+        restriction.release().unwrap()[1],
+        CellRelease::Held(vec![1, 2])
+    );
     assert_eq!(restriction.joint(), BigUint::from(2u32));
 }
 
@@ -150,15 +156,18 @@ fn the_restriction_is_the_joint_fibres_projection_and_the_codec_reopens() {
                 cells[t] = rest % classes;
                 rest /= classes;
             }
-            let admitted = (opening.max(offset)..length)
-                .all(|t| relation.joins(cells[t - offset], cells[t]));
+            let admitted =
+                (opening.max(offset)..length).all(|t| relation.joins(cells[t - offset], cells[t]));
             if admitted {
                 members.push(cells);
             }
         }
         let restriction = restrict(&passage, &relation);
         if members.is_empty() {
-            assert!(matches!(restriction, Err(CompressionError::Contradicted { .. })));
+            assert!(matches!(
+                restriction,
+                Err(CompressionError::Contradicted { .. })
+            ));
             refused += 1;
             continue;
         }
@@ -204,11 +213,21 @@ fn the_restriction_is_the_joint_fibres_projection_and_the_codec_reopens() {
         for (index, word) in words.iter().enumerate() {
             for other in &words[index + 1..] {
                 let shorter = word.len().min(other.len());
-                assert_ne!(word[..shorter], other[..shorter], "a prefix of another word");
+                assert_ne!(
+                    word[..shorter],
+                    other[..shorter],
+                    "a prefix of another word"
+                );
             }
         }
         let key = key_code(&relation, 8).unwrap();
-        assert_eq!(read_key(&mut key.into_iter(), classes, 8).unwrap(), relation);
+        assert_eq!(
+            read_key(&mut key.into_iter(), classes, 8).unwrap(),
+            relation
+        );
     }
-    assert!(fitting > 100 && refused > 0 && held > 0, "{fitting} {refused} {held}");
+    assert!(
+        fitting > 100 && refused > 0 && held > 0,
+        "{fitting} {refused} {held}"
+    );
 }

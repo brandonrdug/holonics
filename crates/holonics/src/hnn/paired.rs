@@ -732,7 +732,11 @@ impl PortSymmetry {
                 .iter()
                 .map(|column| column.map_or(1, length))
                 .sum::<u64>()
-            + self.pairs.iter().map(|&(leader, _)| length(leader)).sum::<u64>()
+            + self
+                .pairs
+                .iter()
+                .map(|&(leader, _)| length(leader))
+                .sum::<u64>()
     }
 
     /// **A port completed on the subspace** ([`PairedCarrier::equivariant_port`]): each leader's

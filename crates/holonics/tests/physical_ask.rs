@@ -143,19 +143,13 @@ fn reads(
     word: &Word<'_>,
     field: &Field,
     theta: &Constitution,
-    current: &Current,
     phases: &ReceivingPhases,
 ) -> Vec<Vec<Rat>> {
     phases
         .epochs()
         .map(|k| {
             phases
-                .read(
-                    field,
-                    theta,
-                    current,
-                    word.anchor(k, phases.ring()).unwrap(),
-                )
+                .read(field, theta, word.anchor(k, phases.ring()).unwrap())
                 .unwrap()
                 .logits
         })
@@ -163,11 +157,7 @@ fn reads(
 }
 
 /// An independent actual forward perturbation of the opening by the source wave `added = B u`.
-fn perturbed_word<'f>(
-    word: &Word<'f>,
-    phases: &ReceivingPhases,
-    added: &[Rat],
-) -> Word<'f> {
+fn perturbed_word<'f>(word: &Word<'f>, phases: &ReceivingPhases, added: &[Rat]) -> Word<'f> {
     let field = word.field();
     let mut injection: Vec<Vec<Rat>> = field
         .rings()
@@ -192,29 +182,24 @@ fn perturbed_word<'f>(
 fn perturbed_target(
     word: &Word<'_>,
     theta: &Constitution,
-    current: &Current,
     phases: &ReceivingPhases,
     added: &[Rat],
 ) -> Vec<Vec<Rat>> {
     let actual = perturbed_word(word, phases, added);
-    reads(&actual, word.field(), theta, current, phases)
+    reads(&actual, word.field(), theta, phases)
 }
 
-/// The feature `P^lift · anchor` an independently executed forward Word presents at `station`:
-/// the vector the receiving read multiplies.
+/// The feature an independently executed forward Word presents at `station`: its anchor in the
+/// passage frame, the vector the receiving read multiplies.
 fn perturbed_feature(
     word: &Word<'_>,
-    current: &Current,
     phases: &ReceivingPhases,
     station: usize,
     added: &[Rat],
 ) -> Vec<Rat> {
     let actual = perturbed_word(word, phases, added);
     let epoch = phases.epochs().nth(station).unwrap();
-    word.field().ring(phases.ring()).rotate(
-        actual.anchor(epoch, phases.ring()).unwrap(),
-        &current.lift()[phases.ring()],
-    )
+    actual.anchor(epoch, phases.ring()).unwrap().to_vec()
 }
 
 /// The selection of source coordinates `columns` as the preparation's actuators (rows are the
@@ -225,7 +210,13 @@ fn selecting(columns: &[usize]) -> ExactRatMatrix {
             .map(|row| {
                 columns
                     .iter()
-                    .map(|&column| if column == row { Rat::one() } else { Rat::zero() })
+                    .map(|&column| {
+                        if column == row {
+                            Rat::one()
+                        } else {
+                            Rat::zero()
+                        }
+                    })
                     .collect()
             })
             .collect(),
@@ -240,18 +231,14 @@ fn selecting(columns: &[usize]) -> ExactRatMatrix {
 fn the_native_feature_is_what_the_receiving_read_multiplies_and_it_matches_the_request_path_and_a_forward_perturbation()
  {
     let (field, theta, current) = open_fixture();
-    let phases =
-        ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
+    let phases = ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
     let preparation =
         PortPreparation::new(&field, 0, ExactRatMatrix::identity(4).unwrap()).unwrap();
     let compared = [false, true];
     let map = theta.receiving_map(1).unwrap().clone();
-    for (index, opening) in [
-        WordOpening::Rest,
-        loaded_opening(&field, &theta, &current),
-    ]
-    .into_iter()
-    .enumerate()
+    for (index, opening) in [WordOpening::Rest, loaded_opening(&field, &theta, &current)]
+        .into_iter()
+        .enumerate()
     {
         let baseline = open(&field, &theta, &current, &opening);
         let before = baseline.change().unwrap();
@@ -286,7 +273,10 @@ fn the_native_feature_is_what_the_receiving_read_multiplies_and_it_matches_the_r
             control.baseline()[1]
         );
         assert_eq!(feature.baseline_logits(), control.baseline()[1].as_slice());
-        assert_eq!(map.multiply(feature.jacobian()).unwrap(), *control.response());
+        assert_eq!(
+            map.multiply(feature.jacobian()).unwrap(),
+            *control.response()
+        );
         assert_eq!(feature.response(), control.response());
         for (station, logits) in feature.baseline().iter().enumerate() {
             assert_eq!(logits, &control.baseline()[station]);
@@ -302,7 +292,7 @@ fn the_native_feature_is_what_the_receiving_read_multiplies_and_it_matches_the_r
             let added = preparation.map().apply(&u).unwrap();
             assert_eq!(
                 feature.feature_at(&u).unwrap(),
-                perturbed_feature(&baseline, &current, &phases, 1, &added)
+                perturbed_feature(&baseline, &phases, 1, &added)
             );
         }
 
@@ -313,7 +303,7 @@ fn the_native_feature_is_what_the_receiving_read_multiplies_and_it_matches_the_r
             continue;
         }
         let u = vec![rat(1, 4), rat(-1, 8), rat(1, 16), rat(1, 32)];
-        let mut target = perturbed_target(&baseline, &theta, &current, &phases, &u);
+        let mut target = perturbed_target(&baseline, &theta, &phases, &u);
         // The unused station is an unconstrained receiving face, not a zero target.
         target[0] = vec![Rat::zero(); 4];
         let prospect = baseline
@@ -333,8 +323,7 @@ fn the_native_feature_is_what_the_receiving_read_multiplies_and_it_matches_the_r
 #[test]
 fn a_native_feature_read_compares_exactly_one_declared_station() {
     let (field, theta, current) = open_fixture();
-    let phases =
-        ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
+    let phases = ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
     let preparation =
         PortPreparation::new(&field, 0, ExactRatMatrix::identity(4).unwrap()).unwrap();
     let baseline = open(&field, &theta, &current, &WordOpening::Rest);
@@ -385,8 +374,7 @@ fn lattice_range(low: &Rat, high: &Rat, j: u32) -> std::ops::RangeInclusive<i64>
 #[test]
 fn the_admitted_waves_are_the_exact_work_sublevel_lattice_in_lexicographic_order() {
     let (field, theta, current) = open_fixture();
-    let phases =
-        ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
+    let phases = ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
     let compared = [false, true];
     let baseline = open(&field, &theta, &current, &WordOpening::Rest);
 
@@ -477,8 +465,7 @@ fn the_admitted_waves_are_the_exact_work_sublevel_lattice_in_lexicographic_order
 #[test]
 fn a_preparation_without_full_column_rank_or_beyond_its_capacity_is_refused() {
     let (field, theta, current) = open_fixture();
-    let phases =
-        ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
+    let phases = ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
     let compared = [false, true];
     let baseline = open(&field, &theta, &current, &WordOpening::Rest);
     // Two equal columns: a one-dimensional kernel, a quotient this declaration does not make.
@@ -798,7 +785,8 @@ fn before_any_reading_the_family_is_one_member_and_the_probe_holds_with_its_reas
         // The empty lattice holds for its own typed reason: a supply below the least work
         // `−c|m|²` (the storage power of the opening's own source wave) admits no wave.
         let least = probe.feature().storage_power(probe.feature().source_wave());
-        let none = AdmittedWaves::declare(probe.feature(), 1, -least - integer(1), 1 << 12).unwrap();
+        let none =
+            AdmittedWaves::declare(probe.feature(), 1, -least - integer(1), 1 << 12).unwrap();
         assert!(none.is_empty());
         let empty = probe.ask(&none).unwrap();
         assert_eq!(empty.release, ReleaseReturn::Hold);
@@ -806,7 +794,10 @@ fn before_any_reading_the_family_is_one_member_and_the_probe_holds_with_its_reas
         // Asking executes nothing: no World step, deposit or carry.
         assert_eq!(probe.opened_at(), 0);
     }
-    assert_eq!(receiver.participating_world().unwrap().state(), &world_before);
+    assert_eq!(
+        receiver.participating_world().unwrap().state(),
+        &world_before
+    );
     assert_eq!(receiver.opening(), opening_before);
     assert_eq!(receiver.constitution().commit(), commit_before);
 }
@@ -861,7 +852,10 @@ fn after_one_deposited_encounter_the_retained_family_separates_waves_and_asks() 
         );
 
         let ReleaseReturn::Ask { probe: offered } = &decision.release else {
-            panic!("the release law asks for the offered probe: {:?}", decision.release);
+            panic!(
+                "the release law asks for the offered probe: {:?}",
+                decision.release
+            );
         };
         let ProbeSeparation::Leverage(separation) = &offered.partition else {
             panic!("a continuum family offers a leverage separation: {offered:?}");
@@ -888,7 +882,10 @@ fn after_one_deposited_encounter_the_retained_family_separates_waves_and_asks() 
         assert_eq!(probe.predict(u).unwrap().as_ref(), Some(prediction));
     }
     // Asking executes nothing.
-    assert_eq!(receiver.participating_world().unwrap().state(), &world_before);
+    assert_eq!(
+        receiver.participating_world().unwrap().state(),
+        &world_before
+    );
     assert_eq!(receiver.opening(), opening_before);
 }
 
@@ -913,7 +910,10 @@ fn the_asked_wave_executes_one_actual_encounter_and_the_receipt_is_absorbed() {
     let grain = probe.receiving_phases().grain();
     let reception = probe.encounter(&waves, &control).unwrap();
     let ActionCommunication::Received(received) = &reception.reception else {
-        panic!("the asked wave is actually received: {:?}", reception.reception);
+        panic!(
+            "the asked wave is actually received: {:?}",
+            reception.reception
+        );
     };
     assert!(received.closes());
     assert!(received.comparison.as_ref().unwrap().publication.is_some());
@@ -951,7 +951,10 @@ fn the_asked_wave_executes_one_actual_encounter_and_the_receipt_is_absorbed() {
         discrepancy.predicted,
         prediction.blocks.contains(&discrepancy.observed_block)
     );
-    assert_eq!(discrepancy.contained, prediction.image.contains(observed.phases()));
+    assert_eq!(
+        discrepancy.contained,
+        prediction.image.contains(observed.phases())
+    );
     assert_eq!(discrepancy.falsified(), !discrepancy.predicted);
     if discrepancy.contained {
         assert!(discrepancy.predicted);
@@ -1055,7 +1058,11 @@ fn successive_probes_run_on_one_receiver_and_one_world_and_each_is_actually_rece
     for round in 0..3 {
         // The opening is the preceding encounter's carry on the World's actual clock.
         let carried = receiver.resident().carried().map(|carry| carry.ticks);
-        let world_tick = receiver.participating_world().unwrap().native_tick().unwrap();
+        let world_tick = receiver
+            .participating_world()
+            .unwrap()
+            .native_tick()
+            .unwrap();
         assert_eq!(carried.unwrap_or(0), world_tick);
         let probe = receiver
             .prepare_probe(&source, declared, &actuators(&field), &COMPARED)
@@ -1081,7 +1088,10 @@ fn successive_probes_run_on_one_receiver_and_one_world_and_each_is_actually_rece
         };
         let reception = probe.encounter(&waves, &control).unwrap();
         let ActionCommunication::Received(received) = &reception.reception else {
-            panic!("round {round}: not actually received: {:?}", reception.reception);
+            panic!(
+                "round {round}: not actually received: {:?}",
+                reception.reception
+            );
         };
         assert!(received.closes(), "round {round}");
         assert!(received.comparison.is_ok(), "round {round}");
@@ -1116,7 +1126,10 @@ fn a_control_of_the_wrong_shape_is_refused_before_either_participant_moves() {
     let waves = AdmittedWaves::declare(probe.feature(), 1, rat(1, 4), 1 << 12).unwrap();
     // Two actuators, one control.
     assert!(probe.encounter(&waves, &[Rat::zero()]).is_err());
-    assert_eq!(receiver.participating_world().unwrap().state(), &world_before);
+    assert_eq!(
+        receiver.participating_world().unwrap().state(),
+        &world_before
+    );
     assert_eq!(receiver.opening(), opening_before);
     assert_eq!(receiver.constitution().commit(), commit_before);
     // A probe on a station set other than exactly one compared future is refused at preparation.
@@ -1125,7 +1138,10 @@ fn a_control_of_the_wrong_shape_is_refused_before_either_participant_moves() {
             .prepare_probe(&source, declared, &actuators(&field), &[false, false])
             .is_err()
     );
-    assert_eq!(receiver.participating_world().unwrap().state(), &world_before);
+    assert_eq!(
+        receiver.participating_world().unwrap().state(),
+        &world_before
+    );
 }
 
 /// **An admitted wave is a checked membership** (Epime's review, October 8): a control outside its
@@ -1146,7 +1162,10 @@ fn a_control_outside_its_declaration_is_refused_before_either_participant_moves(
     let outside = vec![integer(1 << 20), integer(1 << 20)];
     assert!(!waves.contains(&outside));
     assert!(probe.encounter(&waves, &outside).is_err());
-    assert_eq!(receiver.participating_world().unwrap().state(), &world_before);
+    assert_eq!(
+        receiver.participating_world().unwrap().state(),
+        &world_before
+    );
     assert_eq!(receiver.opening(), opening_before);
     assert_eq!(receiver.constitution().commit(), commit_before);
 }

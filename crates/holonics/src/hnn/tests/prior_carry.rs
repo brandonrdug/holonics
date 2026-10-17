@@ -6,17 +6,17 @@
 //! unchanged, and a saved state restoring across a move.
 
 use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 
 use super::learning::{chain_declaration, chain_reach};
-use crate::hnn::tests::support::encoded;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
     BudgetedCarry, ChartRule, Constitution, ContinuingState, Lattice, LinearLocus, LinearStep,
-    LocatedPrior, Locus, NormalLaw, PriorHeld, RESIDUAL_SHIFT, Sample, prequential_terms,
+    LocatedPrior, Locus, NormalLaw, PriorHeld, Sample, prequential_terms,
 };
 use crate::hnn::field::Field;
 use crate::hnn::port::Deposit;
+use crate::hnn::tests::support::encoded;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
 
@@ -56,7 +56,13 @@ fn window(t: usize, n: usize, a: usize) -> Vec<Sample> {
                 .collect();
             let lead = (t + s) % a;
             let masses: Vec<Rat> = (0..a)
-                .map(|c| if c == lead { rat(5, 8) } else { rat(3, 8 * (a as i64 - 1)) })
+                .map(|c| {
+                    if c == lead {
+                        rat(5, 8)
+                    } else {
+                        rat(3, 8 * (a as i64 - 1))
+                    }
+                })
                 .collect();
             reading(&feature, &masses, (lead + 1 + s) % a, &rat(1, 16))
         })
@@ -82,12 +88,24 @@ fn receiving_deposit(theta: &Constitution, g: usize, t: usize) -> Deposit {
 /// `2^e` for a signed `e`.
 fn power(e: i64) -> Rat {
     let p = BigInt::one() << e.unsigned_abs() as usize;
-    if e >= 0 { Rat::from_integer(p) } else { Rat::new(BigInt::one(), p) }
+    if e >= 0 {
+        Rat::from_integer(p)
+    } else {
+        Rat::new(BigInt::one(), p)
+    }
 }
 
 /// A located run of `windows` hand-built receiving deposits on the chain from `2^from I`, with
 /// each window's law before, its terms read independently at that law's map, and its prior read.
-fn located_run(from: u32, windows: usize) -> Vec<(NormalLaw, (Rat, Rat), NormalLaw, crate::hnn::constitution::PriorMove)> {
+fn located_run(
+    from: u32,
+    windows: usize,
+) -> Vec<(
+    NormalLaw,
+    (Rat, Rat),
+    NormalLaw,
+    crate::hnn::constitution::PriorMove,
+)> {
     let field = chain_at(from);
     let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
     (0..windows)
@@ -100,48 +118,43 @@ fn located_run(from: u32, windows: usize) -> Vec<(NormalLaw, (Rat, Rat), NormalL
                 panic!("one chart reading, at the receiving map");
             };
             assert_eq!(*locus, Locus::ReceivingMap(2));
-            let read = chart.prior.clone().expect("a located prior is read at every deposit");
+            let read = chart
+                .prior
+                .clone()
+                .expect("a located prior is read at every deposit");
             theta = next;
             (before, terms, theta.receiving_law(2).unwrap().clone(), read)
         })
         .collect()
 }
 
-/// **The terms are read before the deposit, and the pair keeps no tape** (§6, tests 1 and 2):
-/// the first window reads the founding map `W₀ = 0`, so its terms are `(0, 0)` and nothing locates;
-/// every later window's terms are read at the map before its deposit, computed independently here;
-/// the pair after each window is the pair before it plus that window's terms, rebased by the move's
-/// `x` where the prior moved (Lean `HNN/PriorCarry.{carried_append, carried_eq_sum}`,
-/// `rebaseAt`), and between moves it is the sum of the windows' terms.
+/// Each receiving proposal belongs to its predeposit map. A different ordinary successor
+/// does not inherit that ray's scalar evidence; the current window alone selects the metric.
 #[test]
-fn the_pair_reads_each_window_through_the_map_before_its_deposit_and_keeps_no_tape() {
+fn each_receiving_window_selects_at_its_old_map_without_transporting_scalar_history() {
+    use crate::hnn::constitution::receiving_window::ReceivingWindowRay;
     let run = located_run(6, 8);
     assert_eq!(run[0].1, (Rat::zero(), Rat::zero()));
     assert_eq!(run[0].3.held, Some(PriorHeld::NoCurvature));
-    let mut carried = LocatedPrior::from_parts(6, Rat::zero(), Rat::zero(), Rat::zero());
-    let (mut moves, mut since) = (0, (Rat::zero(), Rat::zero()));
-    for (before, terms, after, read) in &run {
+    let mut moves = 0;
+    for (t, (before, _terms, after, read)) in run.iter().enumerate() {
         assert_eq!(read.from, before.chart().scale());
         assert_eq!(read.to, after.chart().scale());
-        let mut expected = before.located().unwrap().clone();
-        expected.read(terms);
-        carried.read(terms);
-        since = (&since.0 + &terms.0, &since.1 + &terms.1);
-        if read.to != read.from {
-            let x = power(i64::from(read.from) - i64::from(read.to));
-            expected = expected.rebased(&x);
-            carried = carried.rebased(&x);
-            since = (Rat::zero(), Rat::zero());
-            moves += 1;
-        } else if moves == 0 {
-            let (from, a0, a1, s) = after.located().unwrap().parts();
-            assert_eq!((from, a0, a1, s), (6, &since.0, &Rat::zero(), &since.1));
-        }
-        assert_eq!(after.located(), Some(&expected));
-        assert_eq!(after.located(), Some(&carried));
+        let samples = window(t, before.map().columns(), before.map().rows() / 2);
+        let ray = ReceivingWindowRay::read(&samples, before.map()).unwrap();
+        let (j, _) = ray.member().unwrap();
+        let j = j.min(i64::from(read.from));
+        assert_eq!(i64::from(read.to), i64::from(read.from) - j);
+        let (from, a0, a1, s) = after.located().unwrap().parts();
+        assert_eq!(from, 6);
+        assert!(
+            a0.is_zero() && a1.is_zero() && s.is_zero(),
+            "no scalar summary is relabeled as evidence at a changed map"
+        );
+        moves += usize::from(read.to != read.from);
     }
-    assert!(moves >= 1, "the run moves its prior");
-    // Moves compose (Lean `rebaseAt_mul`).
+    assert!(moves >= 1, "current evidence still permits a prior move");
+    // The old scalar rebase algebra remains valid for a genuinely fixed ray.
     let pair = LocatedPrior::from_parts(0, rat(3, 7), rat(-2, 5), rat(9, 4));
     assert_eq!(
         pair.rebased(&rat(1, 2)).rebased(&integer(8)),
@@ -172,7 +185,10 @@ fn the_founding_carries_a_zero_pair_and_the_mount_moves_nothing() {
             panic!("one chart reading, at the receiving map");
         };
         let read = chart.prior.clone().unwrap();
-        assert_eq!((read.from, read.to, read.held), (from, from, Some(PriorHeld::NoCurvature)));
+        assert_eq!(
+            (read.from, read.to, read.held),
+            (from, from, Some(PriorHeld::NoCurvature))
+        );
     }
 }
 
@@ -236,10 +252,7 @@ fn assert_moved(law: &NormalLaw, moved: &NormalLaw, to: u32, rule: &ChartRule) {
     }
     assert_eq!(moved.chart().scale(), to);
     assert!(moved.chart().certificate() <= &rule.target());
-    assert_eq!(
-        moved.located(),
-        Some(&law.located().unwrap().rebased(&x))
-    );
+    assert_eq!(moved.located(), Some(&law.located().unwrap().rebased(&x)));
 }
 
 /// **The move** (§6, test 3): a pair whose Newton point `1 + a/V = 2` lies in the cell of
@@ -266,9 +279,9 @@ fn the_prior_moves_to_the_newton_points_cell_with_its_gram_map_chart_and_pair() 
 /// `HNN/PriorMove.{rebaseAt_add, exit_down_iterate}`, #318): a pair with `V + a ≤ 0` moves one
 /// member up, its rebase by `x = 1/2` keeps `V + a ≤ 0` (`V′ + a′ = x (V + a)`), so the next read
 /// moves again;
-/// at the carrier's residual shift the law holds `k` and the reading says so, with the law unmoved.
+/// the dynamically sized exact chart continues through the former fixed residual shift.
 #[test]
-fn where_no_member_codes_least_the_prior_rises_until_the_carrier_holds_it() {
+fn where_no_member_codes_least_the_prior_crosses_the_old_fixed_carrier() {
     let pair = LocatedPrior::from_parts(5, integer(-10), Rat::zero(), Rat::one());
     assert_eq!(pair.member(5).unwrap(), (-1, None));
     let half = rat(1, 2);
@@ -277,28 +290,27 @@ fn where_no_member_codes_least_the_prior_rises_until_the_carrier_holds_it() {
         assert_eq!(climbed.member(k).unwrap(), (-1, None));
         climbed = climbed.rebased(&half);
     }
-    assert_eq!(pair.member(RESIDUAL_SHIFT - 1).unwrap(), (-1, None));
-    assert_eq!(pair.member(RESIDUAL_SHIFT).unwrap(), (0, Some(PriorHeld::Carrier)));
+    assert_eq!(pair.member(125 - 1).unwrap(), (-1, None));
+    assert_eq!(pair.member(125).unwrap(), (-1, None));
     let lattice = Lattice::new(4);
-    let law = NormalLaw::with_receiving_prior(
-        ExactRatMatrix::zero(4, 2).unwrap(),
-        RESIDUAL_SHIFT,
-    )
-    .with_located(Some(LocatedPrior::from_parts(
-        RESIDUAL_SHIFT,
-        integer(-10),
-        Rat::zero(),
-        Rat::one(),
-    )));
+    let law = NormalLaw::with_receiving_prior(ExactRatMatrix::zero(4, 2).unwrap(), 125)
+        .with_located(Some(LocatedPrior::from_parts(
+            125,
+            integer(-10),
+            Rat::zero(),
+            Rat::one(),
+        )));
     let (held, read) = law
-        .moved_prior(&ChartRule::new(lattice, 16), &mut BudgetedCarry::new(lattice, 1))
+        .moved_prior(
+            &ChartRule::new(lattice, 16),
+            &mut BudgetedCarry::new(lattice, 1),
+        )
         .unwrap()
         .unwrap();
-    assert_eq!(held, law);
-    assert_eq!(
-        (read.from, read.to, read.held, read.certificate),
-        (RESIDUAL_SHIFT, RESIDUAL_SHIFT, Some(PriorHeld::Carrier), None)
-    );
+    assert_ne!(held, law);
+    assert_eq!((read.from, read.to, read.held), (125, 126, None));
+    assert_eq!(held.chart().scale(), 126);
+    assert!(read.certificate.is_some());
 }
 
 /// **A sign inside the enclosure holds `k`; no curvature holds `k`** (§6, test 5): with
@@ -310,7 +322,10 @@ fn a_sign_inside_ln_twos_enclosure_holds_the_prior() {
     let middle = (&ln2.lower + &ln2.upper) / integer(2);
     let (law, rule, mut at) = moving_law(2, (-middle, Rat::zero(), Rat::one()));
     let (moved, read) = law.moved_prior(&rule, &mut at).unwrap().unwrap();
-    assert_eq!((read.from, read.to, read.held), (2, 2, Some(PriorHeld::Undecided)));
+    assert_eq!(
+        (read.from, read.to, read.held),
+        (2, 2, Some(PriorHeld::Undecided))
+    );
     assert_eq!(moved, law);
     let (law, rule, mut at) = moving_law(2, (integer(3), integer(1), Rat::zero()));
     let (moved, read) = law.moved_prior(&rule, &mut at).unwrap().unwrap();
@@ -326,11 +341,17 @@ fn a_cell_below_the_unit_prior_moves_to_it() {
     let s = rat(7, 2);
     let (law, rule, mut at) = moving_law(1, (Rat::zero(), integer(99) * &s, s.clone()));
     let (moved, read) = law.moved_prior(&rule, &mut at).unwrap().unwrap();
-    assert_eq!((read.from, read.to, read.held), (1, 0, Some(PriorHeld::Floor)));
+    assert_eq!(
+        (read.from, read.to, read.held),
+        (1, 0, Some(PriorHeld::Floor))
+    );
     assert_moved(&law, &moved, 0, &rule);
     let (law, rule, mut at) = moving_law(0, (Rat::zero(), integer(99) * &s, s));
     let (moved, read) = law.moved_prior(&rule, &mut at).unwrap().unwrap();
-    assert_eq!((read.from, read.to, read.held), (0, 0, Some(PriorHeld::Floor)));
+    assert_eq!(
+        (read.from, read.to, read.held),
+        (0, 0, Some(PriorHeld::Floor))
+    );
     assert_eq!(moved, law);
 }
 
@@ -347,10 +368,12 @@ fn a_saved_state_restores_across_a_move() {
     let mut moved = false;
     for t in 0..2 {
         let (next, reading) = theta.deposited(&receiving_deposit(&theta, 2, t)).unwrap();
-        moved |= reading
-            .charts
-            .iter()
-            .any(|(_, chart)| chart.prior.as_ref().is_some_and(|read| read.to != read.from));
+        moved |= reading.charts.iter().any(|(_, chart)| {
+            chart
+                .prior
+                .as_ref()
+                .is_some_and(|read| read.to != read.from)
+        });
         theta = next;
     }
     assert!(moved, "the second window moves the prior");
@@ -363,7 +386,9 @@ fn a_saved_state_restores_across_a_move() {
     let restored = opening.clone().continued(&read).unwrap();
     assert_eq!(restored, theta);
     let (a, ra) = theta.deposited(&receiving_deposit(&theta, 2, 2)).unwrap();
-    let (b, rb) = restored.deposited(&receiving_deposit(&restored, 2, 2)).unwrap();
+    let (b, rb) = restored
+        .deposited(&receiving_deposit(&restored, 2, 2))
+        .unwrap();
     assert_eq!((a, ra), (b, rb));
     let other = Constitution::initial(&chain_at(5), 1 << 40).unwrap();
     assert!(matches!(
@@ -395,13 +420,15 @@ fn exposed(
 ) -> (u64, Vec<crate::hnn::constitution::PriorMove>, NormalLaw) {
     use crate::hnn::field::Current;
     use crate::hnn::port::{ExecutionPort, Handle};
-    use crate::hnn::reference::{Reference};
+    use crate::hnn::reference::Reference;
 
     let reference = Reference::campaign_one().with_reception(reception);
     let mut resident = reference.mount(field, &Current::at_rest(field)).unwrap();
     let phases = resident.admitted()[0].clone();
     let family = resident.admitted().to_vec();
-    let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
+    let (moment, _) = reference
+        .ingest(&mut resident, None, &encoded(&field, &[]))
+        .unwrap();
     let (mut deposits, mut reads) = (0u64, Vec::new());
     for span in cells.chunks(phases.aperture()) {
         if span.len() == phases.aperture() {
@@ -415,11 +442,18 @@ fn exposed(
                     .unwrap();
             } else {
                 let returned = reference.deposit(&mut resident, staged).unwrap();
-                let reading = returned.deposit.into_present().expect("a published deposit");
+                let reading = returned
+                    .deposit
+                    .into_present()
+                    .expect("a published deposit");
                 deposits += 1;
                 for (locus, chart) in &reading.charts {
                     let Some(prior) = &chart.prior else {
-                        assert_ne!(*locus, Locus::ReceivingMap(2), "a stepped map reads its pair");
+                        assert_ne!(
+                            *locus,
+                            Locus::ReceivingMap(2),
+                            "a stepped map reads its pair"
+                        );
                         continue;
                     };
                     assert_eq!(*locus, Locus::ReceivingMap(2));
@@ -470,7 +504,10 @@ fn an_exposed_located_chain_reads_its_pair_where_the_map_is_stepped_and_moves_it
     let reception = crate::hnn::reference::Reference::campaign_one().reception();
     let (deposits, reads, last) = exposed(&field, &cells, reception);
     let moves: Vec<_> = reads.iter().filter(|read| read.to != read.from).collect();
-    println!("{deposits} deposits, {} pair reads, moves {moves:?}", reads.len());
+    println!(
+        "{deposits} deposits, {} pair reads, moves {moves:?}",
+        reads.len()
+    );
     assert!(!reads.is_empty() && reads.len() as u64 <= deposits);
     assert!(!moves.is_empty(), "the exposure moves the located prior");
     assert_eq!(last.receiving_prior(), Some(6));
@@ -523,4 +560,322 @@ fn at_rest_a_map_that_never_leaves_zero_holds_its_prior() {
             .all(|read| (read.from, read.to, read.held) == (6, 6, Some(PriorHeld::NoCurvature)))
     );
     assert!(rest_law.map().entries().iter().all(Zero::is_zero));
+}
+
+
+
+#[test]
+fn zero_prequential_window_does_not_suppress_ordinary_receiving_learning() {
+    let run = located_run(1, 1);
+    let (before, terms, after, prior) = &run[0];
+    assert_eq!(terms, &(Rat::zero(), Rat::zero()));
+    assert_eq!(prior.held, Some(PriorHeld::NoCurvature));
+    assert_ne!(before.gram(), after.gram());
+    assert_ne!(before.map(), after.map());
+    assert_ne!(before.phase_statistics(), after.phase_statistics());
+}
+
+
+
+#[test]
+fn receiving_rebase_conserves_map_gram_carries_and_recertifies_without_an_observation() {
+    use std::collections::BTreeSet;
+    let field = chain_at(1);
+    let initial = Constitution::initial(&field, 1 << 40).unwrap();
+    let (theta, _) = initial
+        .deposited(&receiving_deposit(&initial, 2, 0))
+        .unwrap();
+    let locus = Locus::ReceivingMap(2);
+    let retained = BTreeSet::from([locus]);
+    assert_eq!(theta.rebased(locus, 0, &retained).unwrap(), theta);
+    let old = theta.receiving_law(2).unwrap();
+    let exponent = theta.lattice(locus).unwrap().exponent();
+    let remainder = old.map_remainder();
+    assert!(remainder.entries().iter().any(|x| !x.is_zero()));
+    let mut levels = 1;
+    while remainder
+        .entries()
+        .iter()
+        .all(|x| Lattice::new(exponent + levels).div_rem(x).0.is_zero())
+    {
+        levels += 1;
+    }
+    let stale = receiving_deposit(&theta, 2, 1);
+    let next = theta.rebased(locus, levels, &retained).unwrap();
+    let new = next.receiving_law(2).unwrap();
+    assert_eq!(next.clock(locus), theta.clock(locus));
+    assert_eq!(next.commit(), theta.commit() + 1);
+    assert_eq!(
+        next.lattice(locus).unwrap().exponent(),
+        theta.lattice(locus).unwrap().exponent() + levels
+    );
+    assert_eq!(old.prior_scale(), new.prior_scale());
+    assert_eq!(old.located(), new.located());
+    assert_eq!(old.phase_statistics(), new.phase_statistics());
+    for ((a, b), (ar, br)) in old.map().entries().iter().zip(new.map().entries()).zip(
+        old.map_remainder()
+            .entries()
+            .iter()
+            .zip(new.map_remainder().entries()),
+    ) {
+        assert_eq!(a + ar, b + br);
+    }
+    for ((a, b), (ar, br)) in old.gram().entries().iter().zip(new.gram().entries()).zip(
+        old.gram_remainder()
+            .entries()
+            .iter()
+            .zip(new.gram_remainder().entries()),
+    ) {
+        assert_eq!(a + ar, b + br);
+    }
+    assert!(new.chart().certificate() <= &next.chart_rule(locus).unwrap().target());
+    assert!(next.on_lattice());
+    assert_ne!(
+        old.map(),
+        new.map(),
+        "the retained remainder actually becomes executed material"
+    );
+    assert!(matches!(
+        next.deposited(&stale),
+        Err(HnnError::StaleDeposit { .. })
+    ));
+    let (continued, _) = next.deposited(&receiving_deposit(&next, 2, 1)).unwrap();
+    assert_eq!(continued.clock(locus), next.clock(locus) + 1);
+    assert_eq!(
+        continued.lattice(locus).unwrap(),
+        next.lattice(locus).unwrap()
+    );
+    let changed = old
+        .map()
+        .entries()
+        .iter()
+        .zip(new.map().entries())
+        .position(|(a, b)| a != b)
+        .unwrap();
+    let column = changed % old.map().columns();
+    let mut basis = vec![Rat::zero(); old.map().columns()];
+    basis[column] = Rat::one();
+    let feature = field.ring(2).rotate(&basis, &BigInt::from(-3));
+    let rotated = field.ring(2).rotate(&feature, &BigInt::from(3));
+    assert_eq!(rotated, basis);
+    assert_ne!(
+        old.map().apply(&rotated).unwrap(),
+        new.map().apply(&rotated).unwrap()
+    );
+    // Exact output change and its row-sum bound on an actual test feature; not a claim that
+    // publishing the carry leaves the formerly quantized receiver output unchanged.
+    let feature = vec![rat(3, 7); old.map().columns()];
+    for row in 0..old.map().rows() {
+        let delta: Vec<Rat> = old
+            .map()
+            .row(row)
+            .unwrap()
+            .iter()
+            .zip(new.map().row(row).unwrap())
+            .map(|(a, b)| b - a)
+            .collect();
+        let effect: Rat = delta.iter().zip(&feature).map(|(d, z)| d * z).sum();
+        let bound: Rat = delta
+            .iter()
+            .map(|d| if d < &Rat::zero() { -d } else { d.clone() })
+            .sum::<Rat>()
+            * rat(3, 7);
+        assert!(effect >= -&bound && effect <= bound);
+    }
+}
+
+/// Both operand blocks learn through one full comparison and survive a cold save.
+#[test]
+fn arrival_context_receiving_deposit_is_dyadically_covariant_and_restores() {
+    use crate::hnn::constitution::ReceivingLayout;
+    use crate::hnn::field::ConstitutionRead;
+    let field = chain_at(1);
+    let mut opening = Constitution::initial(&field, 1 << 40).unwrap();
+    let width = opening.receiving_map(2).unwrap().columns();
+    opening.bind_arrival_context_receiving(2).unwrap();
+    assert_eq!(
+        opening.receiving_layout(2),
+        Some(ReceivingLayout::ArrivalContext {
+            source_width: width
+        })
+    );
+    assert!(opening.receiving_law(2).is_none());
+    let classes = opening.receiving_map(2).unwrap().rows() / 2;
+    let masses = vec![rat(1, classes as i64); classes];
+    let sample = |source_scale: Rat, context_scale: Rat| {
+        let feature = (0..2 * width)
+            .map(|j| {
+                if j < width {
+                    &source_scale * rat((j % 3 + 1) as i64, 16)
+                } else {
+                    &context_scale * rat((j % 2 + 1) as i64, 64)
+                }
+            })
+            .collect::<Vec<_>>();
+        let mut sample = reading(&feature, &masses, 0, &rat(1, 16));
+        // A categorical target has a phase covector only on its observed class.
+        for class in 1..classes {
+            sample.covector[2 * class + 1] = Rat::zero();
+        }
+        sample.masses = Some(masses.clone());
+        sample
+    };
+    let update = |theta: &Constitution, sample: Sample| {
+        let deposit = Deposit::new(
+            theta.commit(),
+            vec![LinearStep {
+                locus: LinearLocus::Receiving(2),
+                samples: vec![sample],
+            }],
+            Vec::new(),
+            vec![Locus::ReceivingMap(2)],
+        )
+        .with_reach(chain_reach());
+        theta.deposited(&deposit).unwrap()
+    };
+    let a = sample(integer(1), integer(1));
+    let b = sample(integer(8), rat(1, 4));
+    let (next, reading_a) = update(&opening, a.clone());
+    let (scaled, reading_b) = update(&opening, b.clone());
+    assert_eq!(reading_a.charts.len(), 2);
+    assert_eq!(reading_b.charts.len(), 2);
+    assert_eq!(
+        next.receiving_map(2).unwrap().apply(&a.feature).unwrap(),
+        scaled.receiving_map(2).unwrap().apply(&b.feature).unwrap()
+    );
+    for (left, right) in next
+        .receiving_blocks(2)
+        .unwrap()
+        .iter()
+        .zip(scaled.receiving_blocks(2).unwrap())
+    {
+        assert_eq!(left.law(), right.law());
+        assert!(left.law().map().entries().iter().any(|x| !x.is_zero()));
+    }
+    let state = next.continuing_state(0).unwrap();
+    let text = state.to_text();
+    assert!(
+        next.receiving_phase_statistics(2)
+            .unwrap()
+            .cells()
+            .is_positive()
+    );
+    // A known synthetic old-chart fixture has a valid checksum; the semantic
+    // version check must still refuse it. This is not migration of user history.
+    let untagged = text.replace("receiving-chart passage-relative-read-and-target-v1\n", "");
+    let old_chart = ContinuingState::stamped(&untagged, &opening).unwrap();
+    assert!(matches!(
+        ContinuingState::from_text(&old_chart),
+        Err(HnnError::ContinuingState {
+            what: "the receiving read and target phase chart (requires passage-relative-read-and-target-v1)"
+        })
+    ));
+    let saved = ContinuingState::from_text(&text).unwrap();
+    let restored = opening.clone().continued(&saved).unwrap();
+    assert_eq!(restored, next);
+    assert!(
+        Constitution::initial(&field, 1 << 40)
+            .unwrap()
+            .continued(&saved)
+            .is_err()
+    );
+    let (continued, read_a) = update(&next, a.clone());
+    let (cold, read_b) = update(&restored, a);
+    assert_eq!(continued, cold);
+    assert_eq!(read_a, read_b);
+    // The single-anchor medium certificate cannot certify a second response path.
+    // Until the paired gain owner is integrated, refuse shared-material learning explicitly.
+    let source = next.source_law(0).unwrap().map();
+    let mixed = Deposit::new(
+        next.commit(),
+        vec![
+            LinearStep {
+                locus: LinearLocus::Receiving(2),
+                samples: vec![b],
+            },
+            LinearStep {
+                locus: LinearLocus::SourcePort(0),
+                samples: vec![Sample {
+                    weight: integer(1),
+                    feature: vec![integer(1); source.columns()],
+                    covector: vec![integer(1); source.rows()],
+                    masses: None,
+                }],
+            },
+        ],
+        Vec::new(),
+        vec![Locus::ReceivingMap(2), Locus::SourcePort(0)],
+    )
+    .with_reach(chain_reach());
+    let staged = next
+        .staged_comparison_candidate(&mixed, &next.held(), 0)
+        .unwrap();
+    assert_eq!(staged.producing(), &next);
+    assert!(
+        staged
+            .reading()
+            .steps
+            .iter()
+            .any(|(locus, _)| *locus == Locus::SourcePort(0))
+    );
+    assert!(
+        staged
+            .admit(
+                &crate::ratio::algebraic::ExactInterval::point(integer(1)),
+                &crate::ratio::algebraic::ExactInterval::point(integer(1)),
+            )
+            .is_none()
+    );
+    assert!(matches!(
+        next.deposited(&mixed),
+        Err(HnnError::Unadmitted {
+            reason: "paired receiving shared-material steps require the joined source/context propagation gain certificate"
+        })
+    ));
+}
+
+#[test]
+fn staged_comparison_candidate_requires_strict_finite_admission() {
+    use crate::ratio::algebraic::ExactInterval;
+    let field = chain_at(1);
+    let opening = Constitution::initial(&field, 1 << 40).unwrap();
+    let original = opening.clone();
+    let deposit = receiving_deposit(&opening, 2, 0);
+    let held = opening.held();
+    let candidate = opening
+        .staged_comparison_candidate(&deposit, &held, 0)
+        .unwrap();
+    assert_eq!(candidate.producing(), &opening);
+    let changes = candidate.changes();
+    assert!(!changes.full_material_unchanged);
+    assert_eq!(changes.published_operand_loci, vec![Locus::ReceivingMap(2)]);
+    assert!(changes.tree_rings.is_empty());
+    assert!(changes.population_rings.is_empty());
+    assert_eq!(changes.carry_entries_before, opening.carried_remainders().len());
+    assert_eq!(changes.carry_entries_after, candidate.material().carried_remainders().len());
+    assert_eq!(opening, original);
+    assert_ne!(candidate.material(), &opening);
+    let identical = ExactInterval::point(integer(2));
+    assert!(candidate.admit(&identical, &identical).is_none());
+    let candidate = opening
+        .staged_comparison_candidate(&deposit, &held, 0)
+        .unwrap();
+    let expected = candidate.material().clone();
+    let reading = candidate.reading().clone();
+    // This unit test checks only the private numerical admission boundary.
+    // The frozen comparison owner must supply the actual producing scores.
+    let accepted = candidate
+        .admit(&identical, &ExactInterval::point(integer(1)))
+        .unwrap();
+    assert_eq!(accepted, (expected, reading));
+    let coarse = opening
+        .staged_comparison_candidate(&deposit, &held, 0)
+        .unwrap();
+    let finer = opening
+        .staged_comparison_candidate(&deposit, &held, 1)
+        .unwrap();
+    for ((_, a), (_, b)) in coarse.reading().steps.iter().zip(&finer.reading().steps) {
+        assert_eq!(a.step.exponent - 1, b.step.exponent);
+    }
+    assert_eq!(opening, original);
 }

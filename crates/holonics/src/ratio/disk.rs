@@ -189,20 +189,12 @@ impl Disk {
 
     /// `self + other`.
     pub fn add(&self, other: &Self, bits: u32) -> Self {
-        Self::new(
-            self.center.add(&other.center),
-            &self.radius + &other.radius,
-        )
-        .held(bits)
+        Self::new(self.center.add(&other.center), &self.radius + &other.radius).held(bits)
     }
 
     /// `self − other`.
     pub fn sub(&self, other: &Self, bits: u32) -> Self {
-        Self::new(
-            self.center.sub(&other.center),
-            &self.radius + &other.radius,
-        )
-        .held(bits)
+        Self::new(self.center.sub(&other.center), &self.radius + &other.radius).held(bits)
     }
 
     /// `self · other`: `D(ab, |a|s + |b|r + rs)`, each `|a|` at its cheap upper bound
@@ -230,7 +222,13 @@ impl Disk {
             return None;
         }
         let gap = self.center.norm_sq() - &self.radius * &self.radius;
-        Some(Self::new(self.center.conj().scale(&(Rat::one() / &gap)), &self.radius / &gap).held(bits))
+        Some(
+            Self::new(
+                self.center.conj().scale(&(Rat::one() / &gap)),
+                &self.radius / &gap,
+            )
+            .held(bits),
+        )
     }
 
     /// `self / other`; `None` when `other` contains zero.
@@ -497,7 +495,11 @@ pub fn quotient(numerator: &BigInt, denominator: &BigInt, exponent: i64, bits: u
     let shift = s + exponent;
     // Beside the floor, a right shift of the numerator moved it by less than one unit of 2^(−s).
     let unit = dyadic(-shift);
-    let radius = if s >= 0 { unit.clone() } else { &unit * Rat::from_integer(BigInt::from(2)) };
+    let radius = if s >= 0 {
+        unit.clone()
+    } else {
+        &unit * Rat::from_integer(BigInt::from(2))
+    };
     Disk::new(GaussianRat::real(Rat::from_integer(q) * unit), radius)
 }
 
@@ -573,7 +575,11 @@ impl DyadicPoint {
     }
 
     fn sub(&self, other: &Self, bits: u32) -> Self {
-        Self::held(self.re.add(&other.re.neg()), self.im.add(&other.im.neg()), bits)
+        Self::held(
+            self.re.add(&other.re.neg()),
+            self.im.add(&other.im.neg()),
+            bits,
+        )
     }
 
     fn mul(&self, other: &Self, bits: u32) -> Self {
@@ -619,7 +625,11 @@ impl DyadicPoint {
 /// bits after every operation, from the points `(2/5 + 9i/10)^i` scaled by the Cauchy bound,
 /// stopped when no step moves a point by more than `2^(−bits/2)` of the bound or after
 /// `iterations`. Trusted nowhere: its points only seed [`isolate`].
-pub fn attained_roots(coefficients: &[GaussianRat], bits: u32, iterations: usize) -> Vec<GaussianRat> {
+pub fn attained_roots(
+    coefficients: &[GaussianRat],
+    bits: u32,
+    iterations: usize,
+) -> Vec<GaussianRat> {
     let n = coefficients.len().saturating_sub(1);
     if n == 0 {
         return Vec::new();
@@ -755,7 +765,11 @@ mod tests {
         let b = Disk::new(GaussianRat::new(rat(-2, 7), rat(5, 4)), rat(1, 50));
         let product = a.mul(&b, 64);
         // Every corner of the operands' disks lands in the product's disk.
-        for (da, db) in [(rat(1, 100), rat(1, 50)), (rat(-1, 100), rat(1, 50)), (rat(1, 100), rat(-1, 50))] {
+        for (da, db) in [
+            (rat(1, 100), rat(1, 50)),
+            (rat(-1, 100), rat(1, 50)),
+            (rat(1, 100), rat(-1, 50)),
+        ] {
             let x = a.center.add(&GaussianRat::new(da.clone(), Rat::zero()));
             let y = b.center.add(&GaussianRat::new(Rat::zero(), db.clone()));
             assert!(product.holds_inside(&Disk::point(x.mul(&y))) || product.radius > Rat::zero());
@@ -766,7 +780,11 @@ mod tests {
         let back = inverse.mul(&b, 64);
         let distance = back.center.sub(&GaussianRat::one()).norm_sq();
         assert!(distance <= &back.radius * &back.radius);
-        assert!(Disk::new(GaussianRat::one(), integer(2)).inverse(64).is_none());
+        assert!(
+            Disk::new(GaussianRat::one(), integer(2))
+                .inverse(64)
+                .is_none()
+        );
     }
 
     #[test]
@@ -782,12 +800,18 @@ mod tests {
             (da.mul(&db, 64), a.mul(&b)),
             (da.add(&db, 64), a.add(&b)),
             (da.scale(&x, 64), a.scale(&x)),
-            (da.mul(&db, 64).mul(&da, 64).add(&db, 64), a.mul(&b).mul(&a).add(&b)),
+            (
+                da.mul(&db, 64).mul(&da, 64).add(&db, 64),
+                a.mul(&b).mul(&a).add(&b),
+            ),
         ];
         for (disk, exact) in checks {
             let disk = disk.disk();
             let distance = disk.center.sub(&exact).norm_sq();
-            assert!(distance <= &disk.radius * &disk.radius, "{disk:?} {exact:?}");
+            assert!(
+                distance <= &disk.radius * &disk.radius,
+                "{disk:?} {exact:?}"
+            );
             assert!(disk.radius < rat(1, 1 << 50), "{disk:?}");
         }
     }
@@ -824,7 +848,12 @@ mod tests {
             assert!(disk.radius < rat(1, 1 << 20));
         }
         // A disk holding two roots fails the test.
-        assert!(!krawczyk(&exact, &GaussianRat::new(rat(1, 2), Rat::zero()), &integer(1), 128));
+        assert!(!krawczyk(
+            &exact,
+            &GaussianRat::new(rat(1, 2), Rat::zero()),
+            &integer(1),
+            128
+        ));
     }
 
     #[test]
@@ -836,7 +865,12 @@ mod tests {
         ]);
         let exact = disks(&coefficients);
         for k in 1..40 {
-            assert!(!krawczyk(&exact, &GaussianRat::real(rat(1, 2)), &dyadic(-k), 128));
+            assert!(!krawczyk(
+                &exact,
+                &GaussianRat::real(rat(1, 2)),
+                &dyadic(-k),
+                128
+            ));
         }
     }
 }

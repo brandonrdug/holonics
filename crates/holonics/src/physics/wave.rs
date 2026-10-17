@@ -70,7 +70,8 @@ mod interference;
 mod tests;
 
 pub use chain::{
-    Incidence, Junction, Propagation, WaveBalance, WaveChain, WaveMaterial, WaveReceiver, WaveState, damping,
+    Incidence, Junction, Propagation, WaveBalance, WaveChain, WaveMaterial, WaveReceiver,
+    WaveState, damping,
 };
 pub use interference::{Interference, interfere};
 

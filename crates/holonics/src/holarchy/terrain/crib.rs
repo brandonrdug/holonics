@@ -79,8 +79,12 @@ impl RotorCrib {
         draw: &mut Draw,
     ) -> Result<Self, TerrainError> {
         let period = field.ring(ring).period();
-        let ports = usize::try_from(period)
-            .map_err(|_| refuse("a rotor crib", "the ring's period exceeds the address space"))?;
+        let ports = usize::try_from(period).map_err(|_| {
+            refuse(
+                "a rotor crib",
+                "the ring's period exceeds the address space",
+            )
+        })?;
         let key = draw.below(ports) as u64;
         let mut images: Vec<usize> = (0..ports).collect();
         for i in (1..ports).rev() {

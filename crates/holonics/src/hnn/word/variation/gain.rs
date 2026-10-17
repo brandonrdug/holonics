@@ -250,8 +250,8 @@ impl HeldContactVariation {
                         .collect();
                     let anchor =
                         participation(word.operands.weights(ring), &chi.storage[ring], &incoming)?;
-                    let read =
-                        map.apply(&word.field.ring(ring).rotate(&anchor, &current.lift()[ring]))?;
+                    // The receiving read is in the passage frame: `R` reads the anchor as it stands.
+                    let read = map.apply(&anchor)?;
                     for (i, value) in read.into_iter().enumerate() {
                         entries[row_offset + i][j] = value;
                     }
@@ -491,12 +491,7 @@ mod tests {
             .epochs()
             .map(|t| {
                 phases
-                    .read(
-                        &field,
-                        &theta,
-                        &current,
-                        second.anchor(t, phases.ring()).unwrap(),
-                    )
+                    .read(&field, &theta, second.anchor(t, phases.ring()).unwrap())
                     .unwrap()
             })
             .collect::<Vec<_>>();
@@ -524,11 +519,7 @@ mod tests {
                     .map(|j| map.get(component, j).unwrap().clone())
                     .collect::<Vec<_>>();
                 let mut anchors = vec![None; phases.junction_steps()];
-                anchors[epoch] = Some(
-                    field
-                        .ring(phases.ring())
-                        .rotate(&row, &(-current.lift()[phases.ring()].clone())),
-                );
+                anchors[epoch] = Some(row);
                 let mut control = Word::on_change(
                     &field,
                     actual_operands.clone(),
@@ -567,7 +558,6 @@ mod tests {
             .pull_back_full(
                 &covector,
                 FieldMaterial::receiving_map(&theta, phases.ring()).unwrap(),
-                &current.lift()[phases.ring()],
                 &phases,
             )
             .unwrap();

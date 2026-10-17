@@ -24,3 +24,9 @@ path = "src/bin/mount-smoke.rs"
 [[example]]
 name = "hnn_exposure"
 path = "../../research/notebook/hnn_design/hnn_exposure.rs"
+
+# The shared MNIST observed runner defaults to the resident CUDA port; `--backend host` runs the
+# exact reference through the same exterior encoding, decoding and reporting path.
+[[example]]
+name = "mnist_observed"
+path = "examples/mnist_observed.rs"

@@ -47,30 +47,39 @@ use std::time::Instant;
 use holonics::aeon::{ClockLift, EnclosedLedger};
 use holonics::compression::cost::ceil_log2;
 use holonics::compression::landmark::context::{
-    LandmarkDeclaration, Landmarks, Letter, code_length,
+    LandmarkDeclaration, Landmarks, Letter, ObservedAddress, code_length,
 };
 use holonics::hnn::constitution::{
-    CAMPAIGN_ONE_BUDGET, Carrier, DepositReading, LandmarkStep, LinearLocus, gamma_length,
+    CAMPAIGN_ONE_BUDGET, Carrier, ComparisonCandidate, ContinuingState, DepositReading,
+    LinearLocus, ReceivingLayout, ReceivingPrecision, gamma_length,
 };
-use holonics::hnn::keys::{self, KeyLocation};
 use holonics::hnn::encoding::Encoded;
+use holonics::hnn::keys::{self, KeyLocation};
 use holonics::hnn::moment::{Ingested, SourceCapacity};
 use holonics::hnn::pending::Against;
 use holonics::hnn::port::{
-    Census, Deposit, ExecutionPort, Handle, MomentId, PendingId, PortReceipt, Pullback,
-    ReceiptDetail, StagedId, Transpose, port_receipt, release_width, resonance_reading,
-    source_order, stepped, wrote_all,
+    Census, Deposit, ExecutionPort, Handle, MomentId, PairedReadDefect, PendingId, PortReceipt,
+    Pullback, ReceiptDetail, StagedId, Transpose, WordReturn, port_receipt, release_width,
+    resonance_reading, source_order, stepped, wrote_all,
 };
-use holonics::hnn::propagation::path_attenuation;
+use holonics::hnn::propagation::{Operands, path_attenuation};
 use holonics::hnn::ratio::{HolonRatio, PhaseRatio};
+use holonics::hnn::receiving::cells::{CellLaw, CellRelease, release_cells};
 use holonics::hnn::receiving::faces_of_splits;
-use holonics::hnn::reference::{
-    BudgetStop, ChartTally, ComparePhase, Cut, Declared, ExposedResident, Exposure, Reception,
-    WallTimes, carry_bits, compare_phase, compose, expose, expose_from, window_code_length,
+use holonics::hnn::reference::passage::{
+    ResidentAeon, ResidentArrived, ResidentPassage, ResidentPassageParts,
 };
-use holonics::hnn::retention::{Diamond, aeon_readings, collapse, contained, retained, separator};
+use holonics::hnn::reference::{
+    BudgetStop, ChartTally, ComparePhase, ComparisonTrialReading, Cut, Declared, ExposedResident,
+    Exposure, FiniteComparisonReceipt, FrozenComparison, Reception, WallTimes, carry_bits,
+    compare_phase, compose, expose, expose_from, window_code_length,
+};
+use holonics::hnn::retention::{
+    Diamond, Opens, aeon_readings, collapse, contained, retained, separator,
+};
+use holonics::hnn::word::{EndChange, PowerForm, WordOpening};
 use holonics::hnn::{
-    Absorption, ActiveAddress, AeonBoundary, ChartKey, ChartReading, Constitution,
+    Absorption, ActiveAddress, AeonBoundary, ChartKey, ChartReading, Charts, Constitution,
     ConstitutionRead, Current, Faces, Field, HnnError, Locus, PendingRatio, ReceivingPhases,
     ReceptionCarry, SourceMoment,
 };
@@ -142,9 +151,12 @@ fn rekey_moments(
 ) -> Result<(), HnnError> {
     for (id, moment) in moments.iter() {
         if Some(*id) != except {
-            moment
-                .host
-                .check_clock_synchronization(field, current, external_cells, external_ticks)?;
+            moment.host.check_clock_synchronization(
+                field,
+                current,
+                external_cells,
+                external_ticks,
+            )?;
         }
     }
     let mut failed = Vec::new();
@@ -185,6 +197,22 @@ pub struct Traffic {
     /// The words run and the returns run.
     pub word_count: u64,
     pub return_count: u64,
+    /// Exact host-side mode projection and its temporary source-publication upload, broken out
+    /// from ordinary words/publications. These are subcounts of the corresponding bus phases.
+    pub mode_view_projection_ns: u128,
+    pub mode_view_publication_ns: u128,
+    pub mode_view_publication_octets: u64,
+    pub mode_view_max_exponent_extra: u32,
+    /// The paired-response companion's additional forward transfer bytes, included in `words`.
+    pub response_words: u64,
+    /// The paired-response companion's additional reverse transfer bytes, included in `returns`.
+    pub response_returns: u64,
+    /// Cumulative device-buffer bytes allocated for paired companion lanes; this is an allocation
+    /// volume, not a live-memory or peak-memory measurement.
+    pub response_buffer_allocated_octets: u64,
+    /// Companion forward/reverse launch counts, included in `word_count` / `return_count`.
+    pub response_word_count: u64,
+    pub response_return_count: u64,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -255,6 +283,23 @@ impl Arrived<'_> {
     }
 }
 
+/// A staged compare whose ArrivalContext update must be checked against the same frozen window.
+/// Candidate reads use a private copy of the charts captured immediately after the original read.
+#[derive(Clone, Debug)]
+struct StagedSlot {
+    deposit: Deposit,
+    comparison: Option<FrozenComparison>,
+    trial_charts: Option<Charts>,
+}
+
+impl StagedSlot {
+    fn bits(&self) -> u64 {
+        self.deposit.bits()
+            + self.comparison.as_ref().map_or(0, FrozenComparison::bits)
+            + self.trial_charts.as_ref().map_or(0, Charts::bits)
+    }
+}
+
 #[derive(Clone, Debug)]
 struct AeonState {
     awaiting: bool,
@@ -273,9 +318,10 @@ pub struct Mounted<'c> {
     constitution: Constitution,
     moments: BTreeMap<MomentId, MomentSlot<'c>>,
     pending: BTreeMap<PendingId, PendingSlot<'c>>,
-    staged: BTreeMap<StagedId, Deposit>,
+    staged: BTreeMap<StagedId, StagedSlot>,
     next: u64,
     admitted: Vec<ReceivingPhases>,
+    opens: Opens,
     parametric: ClockLift,
     aeon: AeonState,
     ledger: EnclosedLedger,
@@ -309,6 +355,59 @@ impl<'c> Mounted<'c> {
     /// The receiving parametron's active suffix address (the reference's `Resident::address`).
     pub fn address(&self) -> &ActiveAddress {
         &self.address
+    }
+
+    /// Full native continuation, at the same quiescent boundary admitted by the host owner.
+    pub fn continuing_state(&self, ring: usize) -> Result<ContinuingState, HnnError> {
+        if !self.pending.is_empty() || !self.staged.is_empty() {
+            return Err(HnnError::ContinuingState {
+                what: "a device resident with an open pending ratio or staged deposit",
+            });
+        }
+        if self.stop.is_some() || self.moments.len() > 1 || self.next == u64::MAX {
+            return Err(HnnError::ContinuingState {
+                what: "a stopped, multiply-open or exhausted device resident",
+            });
+        }
+        for moment in self.moments.values() {
+            moment
+                .card
+                .check_native(&self.field, &self.current, &moment.host)
+                .map_err(device)?;
+        }
+        let parts = ResidentPassageParts {
+            current: self.current.clone(),
+            admitted: self.admitted.clone(),
+            opens: self.opens,
+            next_handle: self.next,
+            released_bits: self.released_bits,
+            moment: self
+                .moments
+                .iter()
+                .next()
+                .map(|(id, slot)| (*id, slot.host.clone())),
+            aeon: ResidentAeon {
+                awaiting: self.aeon.awaiting,
+                keys_admitted: self.aeon.keys_admitted,
+                opening: self.aeon.opening.clone(),
+                cells: self.aeon.cells,
+                closed: self.aeon.closed,
+            },
+            balance: self.ledger.balance().clone(),
+            charts: self.store.continuing_charts()?,
+            address: self.address.clone(),
+            arrived: self.arrived.as_ref().map(|a| ResidentArrived {
+                ratio: a.ratio.clone(),
+                targets: a.targets.clone(),
+                opening: a.opening.host(),
+            }),
+        };
+        let passage = ResidentPassage::new(&self.field, &self.constitution, parts)?;
+        Ok(self
+            .constitution
+            .continuing_state(ring)?
+            .with_carry(self.carried.as_ref().map(|c| c.host.clone()))
+            .with_resident_passage(passage))
     }
 
     /// What crossed the bus through this resident's port (exterior; [`Traffic`]).
@@ -357,7 +456,7 @@ impl<'c> Mounted<'c> {
             .map(|moment| moment.host.dense_bits())
             .sum();
         let pending: u64 = self.pending.values().map(PendingSlot::bits).sum();
-        let staged: u64 = self.staged.values().map(Deposit::bits).sum();
+        let staged: u64 = self.staged.values().map(StagedSlot::bits).sum();
         let arrived = self.arrived.as_ref().map_or(0, Arrived::bits);
         let carried = self
             .carried
@@ -382,28 +481,48 @@ impl<'c> Mounted<'c> {
         publication: &Rc<Publication<'c>>,
         card: &'c Card,
         opening: &CardOpening<'c>,
-    ) -> Result<(ExecutedWord<'c>, Faces), HnnError> {
+    ) -> Result<(ExecutedWord<'c>, Faces, Rc<Publication<'c>>), HnnError> {
         let field = &self.field;
         let current = ratio.current(field)?;
+        let active_publication = if ratio.view().is_whole() {
+            Rc::clone(publication)
+        } else {
+            let projection_started = Instant::now();
+            let (projected, max_extra_exponent) =
+                publication.loci.with_source_view(field, ratio.view())?;
+            let projection_ns = projection_started.elapsed().as_nanos();
+            let publication_started = Instant::now();
+            let projected = Publication::publish(card, projected, None)?;
+            let publication_ns = publication_started.elapsed().as_nanos();
+            self.count(|traffic| {
+                traffic.mode_view_projection_ns += projection_ns;
+                traffic.mode_view_publication_ns += publication_ns;
+                traffic.mode_view_publication_octets += projected.octets as u64;
+                traffic.mode_view_max_exponent_extra =
+                    traffic.mode_view_max_exponent_extra.max(max_extra_exponent);
+                traffic.publications += projected.octets as u64;
+            });
+            Rc::new(projected)
+        };
         // The normalized open (it reads no held cell), read from the pending ratio's copy of the
         // moment.
         let opens = SourceOpen::of(field, ratio.moment())?;
         // The host's declared resonator operands and charts at this publication, formed once per
         // publication (`Loci::resonator_operands`); ring/contact chart refinement remains resident
         // below.
-        let resonators = publication.loci.resonator_operands(field)?;
+        let resonators = active_publication.loci.resonator_operands(field)?;
         let plan = WordPlan::form(
             field,
             &current,
-            publication,
+            &active_publication,
             ratio.phases(),
             moment,
             &opens,
             &resonators,
         )?;
         // A received opening's carry table and its words on the card (the reception carry).
-        let (plan, carried) = opening.plan(plan, &publication.loci)?;
-        let loci = &publication.loci;
+        let (plan, carried) = opening.plan(plan, &active_publication.loci)?;
+        let loci = &active_publication.loci;
         let mut operators = Vec::with_capacity(plan.contacts.len());
         for (a, contact) in plan.contacts.iter().enumerate() {
             operators.push(loci.contact_operator(
@@ -435,14 +554,60 @@ impl<'c> Mounted<'c> {
         }
         let refined = self.store.refine(&pairs)?;
         drop(pairs);
+        let response_operands = if matches!(
+            plan.receiving_layout,
+            ReceivingLayout::ArrivalContext { .. }
+        ) {
+            // The tube must use the very chart words the producing CUDA read used. Import the
+            // store's checked device charts and refuse if native operand preparation would alter
+            // any of them; never seed this certificate with a cold/fresh chart.
+            let device_charts = self.store.continuing_charts()?;
+            let mut charted = device_charts.clone();
+            let operands =
+                Operands::at_cut_charted(field, &self.constitution, &current, &mut charted)?;
+            if charted != device_charts {
+                return Err(HnnError::Unadmitted {
+                    reason: "CUDA response certification preserves the producing device charts",
+                });
+            }
+            Some(operands)
+        } else {
+            None
+        };
+        let response_opening_base = match (response_operands.as_ref(), opening.host()) {
+            (Some(operands), WordOpening::Rest) => Some(EndChange::rest(field, operands)),
+            (
+                Some(_operands),
+                WordOpening::Received {
+                    carry,
+                    absorption: Absorption::Nothing,
+                },
+            ) => {
+                Some(PowerForm::read(field, &self.constitution, &current)?.opening(field, &carry)?)
+            }
+            (
+                Some(operands),
+                WordOpening::Received {
+                    absorption: Absorption::Complete,
+                    ..
+                },
+            ) => Some(EndChange {
+                resonators: vec![None; field.rings().len()],
+                resonator_phases: vec![None; field.rings().len()],
+                ..EndChange::rest(field, operands)
+            }),
+            (None, _) => None,
+        };
         let (word, launches) = ResidentWord::forward(
             card,
             plan,
-            Rc::clone(publication),
+            Rc::clone(&active_publication),
             moment,
             &self.store,
             &refined,
             carried,
+            response_operands.as_ref(),
+            response_opening_base.as_ref(),
         )?;
         self.layouts.set(Some(launches.layouts()));
         let mut word = word;
@@ -451,6 +616,16 @@ impl<'c> Mounted<'c> {
             traffic.words += octets + store;
             traffic.word_count += 1;
         });
+        if let Some(response_octets) = word.take_response_octets() {
+            let response_storage = word.response_storage_octets().unwrap_or(0) as u64;
+            self.count(|traffic| {
+                traffic.words += response_octets as u64;
+                traffic.word_count += 1;
+                traffic.response_words += response_octets as u64;
+                traffic.response_word_count += 1;
+                traffic.response_buffer_allocated_octets += response_storage;
+            });
+        }
         self.store.octets = 0;
         word.octets = 0;
         let faces = readout::faces(&word.plan, &word.record)?;
@@ -461,6 +636,7 @@ impl<'c> Mounted<'c> {
                 readings: refined.readings,
             },
             faces,
+            active_publication,
         ))
     }
 
@@ -479,6 +655,11 @@ impl<'c> Mounted<'c> {
             expected: 1,
             found: 0,
         })?;
+        // A paired finite candidate's successor is an unpublished material until every later
+        // deposit stage succeeds. The successor re-read must nevertheless bind its response tube
+        // to that candidate material, not the still-live predecessor.
+        let prior_constitution =
+            successor.map(|material| std::mem::replace(&mut self.constitution, material.clone()));
         let read = self.execute(
             &arrived.ratio,
             &arrived.moment,
@@ -486,9 +667,12 @@ impl<'c> Mounted<'c> {
             card,
             &arrived.opening,
         );
+        if let Some(prior) = prior_constitution {
+            self.constitution = prior;
+        }
         let constitution = successor.unwrap_or(&self.constitution);
         let tree = self.tree.as_mut();
-        let result = read.and_then(|(word, wave)| {
+        let result = read.and_then(|(word, wave, _active_publication)| {
             let (against, _, _) =
                 tree_against(tree, constitution, &arrived.ratio, &wave, &arrived.targets)?;
             let scored = arrived
@@ -531,6 +715,39 @@ impl ExposedResident for Mounted<'_> {
     }
     fn carried(&self) -> Option<&ReceptionCarry> {
         self.carried.as_ref().map(|carry| &carry.host)
+    }
+    fn continuing_state(&self, ring: usize) -> Result<ContinuingState, HnnError> {
+        Mounted::continuing_state(self, ring)
+    }
+    fn publish_receiving_precision(&mut self, event: &ReceivingPrecision) -> Result<(), HnnError> {
+        event.check_constitution(&self.constitution)?;
+        if !self.pending.is_empty() || !self.staged.is_empty() || !self.moments.is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason: "receiving precision publication requires consumed sample handles",
+            });
+        }
+        let retention = retained(&self.field, &self.admitted, self.opens);
+        let next = self.constitution.rebased(
+            holonics::hnn::Locus::ReceivingMap(event.ring()),
+            event.levels(),
+            &retention,
+        )?;
+        // Build and publish the successor before mutating host state. The receiving map is packed
+        // at its new constitutional exponent; all other loci, current/address, tree, ledger and
+        // reception carry remain the resident's existing state.
+        let publication = Publication::publish(
+            self.publication.words.card(),
+            Loci::of(&self.field, &next)?,
+            Some(&self.publication),
+        )?;
+        self.count(|traffic| traffic.publications += publication.octets as u64);
+        self.constitution = next;
+        self.publication = Rc::new(publication);
+        // The compare's arrived operand was already deposited and reread. It was formed at the
+        // predecessor commit and must not survive this constitutive publication.
+        self.arrived = None;
+        self.forget_kept_reads();
+        Ok(())
     }
 }
 
@@ -699,6 +916,90 @@ impl<'c> Resident<'c> {
         )
     }
 
+    /// Restore the shared native resident passage before exposing a device resident. Saved
+    /// declaring phases survive material learning; warm charts and source windows are not reset.
+    pub fn mount_continued(
+        &self,
+        field: &Field,
+        current: &Current,
+        opening: Constitution,
+        state: &ContinuingState,
+    ) -> Result<Mounted<'c>, HnnError> {
+        let constitution = opening.continued(state)?;
+        if let Some(carry) = state.carry() {
+            if !matches!(self.reception, Reception::Carry(_)) || !carry.fits(field) {
+                return Err(HnnError::ContinuingState {
+                    what: "a device carry against the declared reception and field",
+                });
+            }
+        }
+        let Some(text) = state.passage() else {
+            let mut resident = self.mount_with(field, current, constitution)?;
+            resident.carried = state
+                .carry()
+                .cloned()
+                .map(|c| CardCarry::restored(self.card, field, c).map(Rc::new))
+                .transpose()?;
+            return Ok(resident);
+        };
+        let passage = ResidentPassage::from_text(field, &constitution, text)?.into_parts();
+        if passage.opens != self.reception.opens() {
+            return Err(HnnError::ContinuingState {
+                what: "a saved device passage against its declared reception",
+            });
+        }
+        let mut resident = self.mount_with_family(
+            field,
+            &passage.current,
+            constitution,
+            Some(passage.admitted),
+        )?;
+        resident.store = ChartStore::continued(self.card, field, &passage.charts)?;
+        if let Some((id, host)) = passage.moment {
+            let card = ResidentMoment::restored(self.card, field, &passage.current, &host)
+                .map_err(device)?;
+            resident.moments.insert(id, MomentSlot { host, card });
+        }
+        resident.carried = state
+            .carry()
+            .cloned()
+            .map(|c| CardCarry::restored(self.card, field, c).map(Rc::new))
+            .transpose()?;
+        if let Some(arrived) = passage.arrived {
+            let current = arrived.ratio.current(field)?;
+            let frozen =
+                ResidentMoment::restored(self.card, field, &current, arrived.ratio.moment())
+                    .map_err(device)?;
+            let moment = frozen.snapshot().map_err(device)?;
+            let opening = match arrived.opening {
+                WordOpening::Rest => CardOpening::Rest,
+                WordOpening::Received { carry, absorption } => CardOpening::Received {
+                    carry: Rc::new(CardCarry::restored(self.card, field, carry)?),
+                    absorption,
+                },
+            };
+            resident.arrived = Some(Arrived {
+                ratio: arrived.ratio,
+                targets: arrived.targets,
+                moment,
+                opening,
+            });
+        }
+        resident.current = passage.current;
+        resident.address = passage.address;
+        resident.next = passage.next_handle;
+        resident.released_bits = passage.released_bits;
+        resident.aeon = AeonState {
+            awaiting: passage.aeon.awaiting,
+            keys_admitted: passage.aeon.keys_admitted,
+            opening: passage.aeon.opening,
+            cells: passage.aeon.cells,
+            closed: passage.aeon.closed,
+        };
+        resident.ledger = EnclosedLedger::resumed(passage.balance);
+        Ok(resident)
+    }
+
     /// **Mount on a declared constitution** (the reference's `mount_with`): the Holarchy's gluing
     /// certified, the admitted family declared, and the constitution's loci published on the card
     /// with an empty chart store.
@@ -707,6 +1008,16 @@ impl<'c> Resident<'c> {
         field: &Field,
         current: &Current,
         constitution: Constitution,
+    ) -> Result<Mounted<'c>, HnnError> {
+        self.mount_with_family(field, current, constitution, None)
+    }
+
+    fn mount_with_family(
+        &self,
+        field: &Field,
+        current: &Current,
+        constitution: Constitution,
+        family: Option<Vec<ReceivingPhases>>,
     ) -> Result<Mounted<'c>, HnnError> {
         let parametric = field.holarchy(&constitution)?.parametric();
         if parametric != field.parametric() {
@@ -719,11 +1030,16 @@ impl<'c> Resident<'c> {
         let lattice = *field.word_lattice().ok_or(HnnError::Realization {
             what: "a field whose word runs on no declared lattice (the card carries lattice words)",
         })?;
-        let admitted = field
-            .receivers()
-            .iter()
-            .map(|receiver| ReceivingPhases::declare(field, &constitution, current, receiver))
-            .collect::<Result<Vec<_>, _>>()?;
+        let admitted = match family {
+            // The sole saved-family caller parsed ResidentPassage through the shared native
+            // owner, which validates every declaring restriction before this device allocation.
+            Some(family) => family,
+            None => field
+                .receivers()
+                .iter()
+                .map(|receiver| ReceivingPhases::declare(field, &constitution, current, receiver))
+                .collect::<Result<Vec<_>, _>>()?,
+        };
         let publication = Publication::publish(self.card, Loci::of(field, &constitution)?, None)?;
         // The receiving parametron's tree mirrored on the card, with room for a window's overlay
         // and a re-read's (`A − 1` deposits past the population).
@@ -754,6 +1070,7 @@ impl<'c> Resident<'c> {
             staged: BTreeMap::new(),
             next: 0,
             admitted,
+            opens: self.reception.opens(),
             parametric,
             aeon: AeonState {
                 awaiting: false,
@@ -802,8 +1119,23 @@ fn tree_against(
         .ok_or(HnnError::MissingReceivingMap { ring: *ring })?
         .declaration();
     let before = tree.times().transfer;
-    let addresses = ratio.addresses(known)?;
-    let splits = tree.window_splits(&addresses, known).map_err(device)?;
+    let splits = if let Some(addresses) = ratio.observed_addresses(known)? {
+        let host = constitution
+            .landmarks(*ring)
+            .ok_or(HnnError::MissingReceivingMap { ring: *ring })?;
+        let words = addresses
+            .iter()
+            .map(|address| {
+                Ok(tree
+                    .pack_branches(&host.arena().letters_observed(address)?)
+                    .map_err(device)?)
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        tree.window_splits_words(&words, known).map_err(device)?
+    } else {
+        tree.window_splits(&ratio.addresses(known)?, known)
+            .map_err(device)?
+    };
     let completing = Instant::now();
     let trees = faces_of_splits(declaration, &splits, phases.grain())?;
     let complete = completing.elapsed();
@@ -824,7 +1156,7 @@ fn zero_ticks(field: &Field) -> Vec<u64> {
 
 /// A compare's readings: the ratio, the pullback, the deposit, the receipt, the source order, the
 /// phases, the wall time and the window's code length.
-type Compared<'c> = (
+type Compared = (
     HolonRatio,
     Pullback,
     Deposit,
@@ -833,9 +1165,55 @@ type Compared<'c> = (
     ReceivingPhases,
     WallTimes,
     ExactInterval,
+    Option<FrozenComparison>,
 );
 
 impl<'c> Resident<'c> {
+    /// Execute one staged finite-comparison candidate on the card with the same moment, opening,
+    /// mode-qualified publication, and post-original-read charts. The live resident is restored
+    /// before returning; only the caller may install the returned charts after admission.
+    fn read_candidate(
+        &self,
+        resident: &mut Mounted<'c>,
+        candidate: &ComparisonCandidate,
+        ratio: &PendingRatio,
+        moment: &MomentSnapshot<'c>,
+        opening: &CardOpening<'c>,
+        trial_charts: &Charts,
+    ) -> Result<(Faces, Charts, Vec<ChartReading>), HnnError> {
+        let field = resident.field.clone();
+        let base_publication = Rc::clone(&resident.publication);
+        let candidate_publication = Rc::new(Publication::publish(
+            self.card,
+            Loci::of(&field, candidate.material())?,
+            Some(&base_publication),
+        )?);
+        let publication_octets = candidate_publication.octets as u64;
+        resident.count(|traffic| traffic.publications += publication_octets);
+        let candidate_store = ChartStore::continued(self.card, &field, trial_charts)?;
+
+        // Swap only the material-facing execution resources. Current, address, moment, carry,
+        // landmark tree, ledger, and handles remain the live predecessor throughout every trial.
+        let prior_constitution =
+            std::mem::replace(&mut resident.constitution, candidate.material().clone());
+        let prior_publication = std::mem::replace(&mut resident.publication, candidate_publication);
+        let prior_store = std::mem::replace(&mut resident.store, candidate_store);
+
+        let candidate_publication = Rc::clone(&resident.publication);
+        let result = resident
+            .execute(ratio, moment, &candidate_publication, self.card, opening)
+            .and_then(|(word, faces, _)| {
+                let charts = resident.store.continuing_charts()?;
+                Ok((faces, charts, word.readings))
+            });
+
+        let candidate_store = std::mem::replace(&mut resident.store, prior_store);
+        resident.publication = prior_publication;
+        resident.constitution = prior_constitution;
+        drop(candidate_store);
+        result
+    }
+
     /// **The compare of a pending ratio taken out of the resident** (the reference's compare, the
     /// word's return on the card): its kept read at the published commit, or a word read again.
     fn compared(
@@ -845,7 +1223,7 @@ impl<'c> Resident<'c> {
         kept: Option<KeptRead<'c>>,
         target: &Encoded,
         field: &Field,
-    ) -> Result<Compared<'c>, HnnError> {
+    ) -> Result<Compared, HnnError> {
         let classes: Vec<usize> = target.classes_read().collect();
         let targets = classes.as_slice();
         let commit = resident.constitution.commit();
@@ -857,7 +1235,7 @@ impl<'c> Resident<'c> {
             None => {
                 let start = Instant::now();
                 let publication = Rc::clone(&resident.publication);
-                let (word, faces) = resident.execute(
+                let (word, faces, _active_publication) = resident.execute(
                     ratio,
                     &slot.moment,
                     &publication,
@@ -868,6 +1246,21 @@ impl<'c> Resident<'c> {
                 wall.compare_read = start.elapsed();
                 (word, faces)
             }
+        };
+        let frozen_comparison = if matches!(
+            resident.constitution.receiving_layout(phases.ring()),
+            Some(ReceivingLayout::ArrivalContext { .. })
+        ) {
+            Some(FrozenComparison::new(
+                field,
+                &resident.constitution,
+                ratio,
+                &slot.opening.host(),
+                target,
+                &faces,
+            )?)
+        } else {
+            None
         };
         // The tree part of the combined face at each phase's causal address (the landmark tree): the
         // splits read on the card's mirror of the published tree, the class faces completed on the
@@ -913,28 +1306,119 @@ impl<'c> Resident<'c> {
                 ring: phases.ring(),
             })?
             .matrix;
-        let source = readout::source(
-            field,
-            &word.word.plan,
-            &word.word.record,
-            &covector,
-            map,
-            &ratio.anchor()[phases.ring()],
-        )?;
-        let reverse = word.word.reverse(&source.carried)?;
+        let back = if matches!(
+            word.word.plan.receiving_layout,
+            ReceivingLayout::ArrivalContext { .. }
+        ) {
+            let response_plan = word
+                .word
+                .response_plan_record()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "an ArrivalContext comparison retains its executed response record",
+                })?
+                .0
+                .clone();
+            let paired = {
+                let response_record = word
+                    .word
+                    .response_plan_record()
+                    .ok_or(HnnError::Unadmitted {
+                        reason: "an ArrivalContext comparison retains its executed response record",
+                    })?
+                    .1;
+                readout::paired_source(
+                    field,
+                    &word.word.plan,
+                    &word.word.record,
+                    response_record,
+                    &covector,
+                    map,
+                )?
+            };
+            let actual_reverse = word.word.reverse(&paired.actual.carried)?;
+            let response_reverse = word.word.reverse_response(&paired.fresh.carried)?;
+            let actual_back = readout::word_return(
+                &word.word.plan,
+                &publication.loci,
+                &word.word.record,
+                &actual_reverse,
+                paired.actual,
+            )?;
+            let response_record = word
+                .word
+                .response_plan_record()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "the response record survives its independent return",
+                })?
+                .1;
+            let response_back = readout::word_return(
+                &response_plan,
+                &publication.loci,
+                response_record,
+                &response_reverse,
+                paired.fresh,
+            )?;
+            let mut joined =
+                WordReturn::join_response(field, actual_back, response_back, paired.reads)?;
+            let (fresh_errors, actual_errors) =
+                word.word
+                    .response_anchor_errors()
+                    .ok_or(HnnError::Unadmitted {
+                        reason: "the response return retains both path defect certificates",
+                    })?;
+            let fresh = phases
+                .epochs()
+                .map(|crossing| {
+                    fresh_errors
+                        .get(crossing)
+                        .and_then(|at| at.get(phases.ring()))
+                        .cloned()
+                        .ok_or(HnnError::WordEnded {
+                            ticks: fresh_errors.len(),
+                        })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            let actual = phases
+                .epochs()
+                .map(|crossing| {
+                    actual_errors
+                        .get(crossing)
+                        .and_then(|at| at.get(phases.ring()))
+                        .cloned()
+                        .ok_or(HnnError::WordEnded {
+                            ticks: actual_errors.len(),
+                        })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            joined.response_defect = Some(PairedReadDefect {
+                fresh,
+                actual: Some(actual),
+            });
+            joined
+        } else {
+            let source =
+                readout::source(field, &word.word.plan, &word.word.record, &covector, map)?;
+            let reverse = word.word.reverse(&source.carried)?;
+            readout::word_return(
+                &word.word.plan,
+                &publication.loci,
+                &word.word.record,
+                &reverse,
+                source,
+            )?
+        };
         let octets = word.word.octets as u64;
+        let response_octets = word.word.take_response_octets().unwrap_or(0) as u64;
         resident.count(|traffic| {
-            traffic.returns += octets;
+            traffic.returns += octets + response_octets;
             traffic.return_count += 1;
+            if response_octets > 0 {
+                traffic.return_count += 1;
+                traffic.response_returns += response_octets;
+                traffic.response_return_count += 1;
+            }
         });
         word.word.octets = 0;
-        let back = readout::word_return(
-            &word.word.plan,
-            &publication.loci,
-            &word.word.record,
-            &reverse,
-            source,
-        );
         wall.pull_back = start.elapsed();
         let start = Instant::now();
         let (pullback, deposit) = compose(
@@ -959,6 +1443,8 @@ impl<'c> Resident<'c> {
             residual,
             reached: deposit.loci(),
             released: back.released.clone(),
+            return_precision: back.precision.clone(),
+            response_defect: back.response_defect.clone(),
             tree: scored.tree,
             tree_grain,
             model: scored.model,
@@ -981,6 +1467,7 @@ impl<'c> Resident<'c> {
             phases,
             wall,
             code_length,
+            frozen_comparison,
         ))
     }
 }
@@ -1003,6 +1490,16 @@ impl<'c> ExecutionPort for Resident<'c> {
         self.mount_with(field, current, constitution)
     }
 
+    fn mount_continued(
+        &self,
+        field: &Field,
+        current: &Current,
+        opening: Constitution,
+        state: &ContinuingState,
+    ) -> Result<Mounted<'c>, HnnError> {
+        Resident::mount_continued(self, field, current, opening, state)
+    }
+
     fn read(
         &self,
         resident: &Mounted<'c>,
@@ -1022,7 +1519,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             resident
                 .staged
                 .iter()
-                .map(|(id, deposit)| (Handle::Staged(*id), deposit.bits())),
+                .map(|(id, staged)| (Handle::Staged(*id), staged.bits())),
         );
         Ok((resident.field.clone(), resident.current.clone(), handles))
     }
@@ -1044,6 +1541,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         }
         let field = resident.field.clone();
         field.admit(cells)?;
+        cells.check_observed_material(&resident.constitution)?;
         // The card steps a ring by the admitted encoding's advance plus the carry: an identity by
         // the lock's fit, a located passage by its classes' digits at their exact width, mounted by
         // the native owner (`ResidentMoment::ingest`; #76).
@@ -1092,7 +1590,9 @@ impl<'c> ExecutionPort for Resident<'c> {
             0
         } else {
             let rings = field.rings().len();
-            let located = if cells.located().is_some() {
+            let located = if cells.placement().is_some() {
+                8 * rings * cells.len()
+            } else if cells.located().is_some() {
                 8 * rings * field.alphabet()
             } else {
                 0
@@ -1216,7 +1716,8 @@ impl<'c> ExecutionPort for Resident<'c> {
             carry_out: ingested.carry_out,
         };
         let mut work = ExactWork::nothing();
-        holonics::hnn::port::resident(&mut work, open.host.dense_bits());
+        // `ExactWork::resident_entries` is an entry count, while `dense_bits()` is a logical
+        // bit-length reading. Do not place one unit in the other coordinate.
         stepped(&mut work, ingested.cells as u64);
         let order = source_order(&field, resident.current.lift(), n);
         Ok((
@@ -1325,6 +1826,27 @@ impl<'c> ExecutionPort for Resident<'c> {
         ),
         HnnError,
     > {
+        self.refine_view(
+            resident,
+            moment,
+            phases,
+            &holonics::hnn::ring::modes::ModeView::whole(),
+        )
+    }
+
+    fn refine_view(
+        &self,
+        resident: &mut Mounted<'c>,
+        moment: &MomentId,
+        phases: &ReceivingPhases,
+        view: &holonics::hnn::ring::modes::ModeView,
+    ) -> Result<
+        (
+            PendingId,
+            InteractionReturn<Faces, (), (), Vec<ReceivingPhases>, PortReceipt>,
+        ),
+        HnnError,
+    > {
         if resident.pending.len() >= self.pending_capacity {
             return Err(HnnError::PendingCapacity {
                 capacity: self.pending_capacity,
@@ -1347,18 +1869,24 @@ impl<'c> ExecutionPort for Resident<'c> {
             .ok_or(HnnError::UnknownHandle {
                 handle: Handle::Moment(*moment),
             })?;
-        let ratio = PendingRatio::produce(
+        let mut ratio = PendingRatio::produce(
             &resident.current,
             &source.host,
             &resident.address,
             phases,
             resident.constitution.commit(),
-        )?;
+        )?
+        .with_view(&resident.field, view)?;
         let snapshot = source.card.snapshot().map_err(device)?;
         let start = Instant::now();
         let publication = Rc::clone(&resident.publication);
-        let (word, faces) =
+        let (word, faces, active_publication) =
             resident.execute(&ratio, &snapshot, &publication, self.card, &opening)?;
+        ratio.admit_observed_read(
+            &resident.field,
+            &readout::anchors(&word.word.plan, &word.word.record),
+            &faces,
+        )?;
         let read = start.elapsed();
         let ended = match self.reception {
             Reception::Rest => None,
@@ -1380,7 +1908,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         };
         let released = readout::released(
             &word.word.plan,
-            &publication.loci,
+            &active_publication.loci,
             &word.word.record,
             &executed,
         )?;
@@ -1408,6 +1936,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             field.step(),
             work,
             ReceiptDetail::Refine {
+                view: ratio.view().clone(),
                 reached,
                 released_power: released.power.clone(),
                 peak_bits: released.peak_bits,
@@ -1489,6 +2018,7 @@ impl<'c> ExecutionPort for Resident<'c> {
                 handle: Handle::Pending(pending),
             })?;
         field.admit(target)?;
+        target.check_observed_material(&resident.constitution)?;
         let targets: Vec<usize> = target.classes_read().collect();
         let aperture = slot.ratio.phases().aperture();
         if targets.len() != aperture {
@@ -1507,7 +2037,21 @@ impl<'c> ExecutionPort for Resident<'c> {
             .expect("the slot was read");
         let kept = slot.kept.take();
         match self.compared(resident, &slot, kept, target, &field) {
-            Ok((holon, pullback, deposit, receipt, order, phases, wall, code_length)) => {
+            Ok((
+                holon,
+                pullback,
+                deposit,
+                receipt,
+                order,
+                phases,
+                wall,
+                code_length,
+                comparison,
+            )) => {
+                let trial_charts = comparison
+                    .as_ref()
+                    .map(|_| resident.store.continuing_charts())
+                    .transpose()?;
                 let PendingSlot {
                     ratio,
                     moment,
@@ -1517,7 +2061,14 @@ impl<'c> ExecutionPort for Resident<'c> {
                 resident.ledger.arrive(code_length, targets.len() as u64);
                 resident.wall = add(resident.wall, wall);
                 let id = StagedId(resident.fresh());
-                resident.staged.insert(id, deposit.clone());
+                resident.staged.insert(
+                    id,
+                    StagedSlot {
+                        deposit: deposit.clone(),
+                        comparison,
+                        trial_charts,
+                    },
+                );
                 resident.arrived = Some(Arrived {
                     ratio,
                     targets,
@@ -1561,7 +2112,8 @@ impl<'c> ExecutionPort for Resident<'c> {
             .get(&staged)
             .ok_or(HnnError::UnknownHandle {
                 handle: Handle::Staged(staged),
-            })?;
+            })?
+            .clone();
         let field = resident.field.clone();
         if resident.arrived.is_none() {
             return Err(HnnError::Shape {
@@ -1573,28 +2125,148 @@ impl<'c> ExecutionPort for Resident<'c> {
         let start = Instant::now();
         // The budget reads the resident's retention, as the host's (record B §8).
         let retention = retained(&field, &resident.admitted, self.reception.opens());
-        let (next, reading) = match resident.constitution.deposited_within(slot, &retention) {
-            Ok(published) => published,
-            Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
-                resident.staged.remove(&staged);
-                if let HnnError::ConstitutionBudget {
-                    bits,
-                    budget,
-                    commit,
-                    loci,
-                } = &refusal
-                {
-                    resident.stop = Some(BudgetStop {
-                        bits: *bits,
-                        budget: *budget,
-                        commit: *commit,
-                        loci: loci.clone(),
-                    });
-                }
-                return Err(refusal);
+        let chart_before = resident.store.before_trial();
+        let mut finite_comparison = None;
+        let mut accepted_charts = None;
+        let publish_result = if let Some(frozen) = slot.comparison.as_ref() {
+            let arrived_ref = resident.arrived.as_ref().ok_or(HnnError::Shape {
+                what: "the arrived targets a staged deposit was compared on",
+                expected: 1,
+                found: 0,
+            })?;
+            if !frozen.matches_arrival(
+                &arrived_ref.ratio,
+                &arrived_ref.opening.host(),
+                &arrived_ref.targets,
+            ) {
+                return Err(HnnError::Unadmitted {
+                    reason: "the staged comparison must match the actual arrived opening and targets",
+                });
             }
+            if frozen.producing() != &resident.constitution {
+                return Err(HnnError::Unadmitted {
+                    reason: "a staged finite comparison still owns the producing material",
+                });
+            }
+            let arrived = resident.arrived.take().ok_or(HnnError::Shape {
+                what: "the paired candidate retains its exact arrived moment and opening",
+                expected: 1,
+                found: 0,
+            })?;
+            let candidates = (|| {
+                let mut starting = Some(frozen.stage(&slot.deposit, &retention, 0)?);
+                let last_halving = holonics::hnn::reference::no_reach_halving(
+                    starting.as_ref().expect("starting candidate"),
+                )?;
+                let mut attempts = 0u32;
+                let mut trials = Vec::new();
+                for next_halving in 0..=last_halving {
+                    let candidate = match starting.take() {
+                        Some(candidate) => candidate,
+                        None => frozen.stage(&slot.deposit, &retention, next_halving)?,
+                    };
+                    let smallest_step = candidate
+                        .reading()
+                        .steps
+                        .iter()
+                        .map(|(_, step)| step.step.step.clone())
+                        .min();
+                    let (wave, charts, readings) = self.read_candidate(
+                        resident,
+                        &candidate,
+                        frozen.ratio(),
+                        &arrived.moment,
+                        &arrived.opening,
+                        slot.trial_charts.as_ref().ok_or(HnnError::Unadmitted {
+                            reason: "a paired staged comparison retains post-read charts",
+                        })?,
+                    )?;
+                    // Preserve exact candidate-material and executed-wave diagnostics for every
+                    // trial, including a terminal plateau/precision refusal. The candidate is
+                    // consumed by judge_candidate below, so capture its read-only material audit
+                    // first; wave changes are measured against the frozen producing wave.
+                    let changes = candidate.changes();
+                    let (comparison, admitted) = frozen.judge_candidate(candidate, &wave)?;
+                    resident.tally.read(&readings);
+                    attempts = attempts.checked_add(1).ok_or(HnnError::CountOverflow)?;
+                    let unchanged = comparison.unchanged;
+                    let reason = comparison.unresolved_reason();
+                    let halvings = next_halving;
+                    let needs_precision = comparison.needs_precision();
+                    trials.push(ComparisonTrialReading {
+                        halvings,
+                        smallest_step: smallest_step.clone(),
+                        changes,
+                        comparison: comparison.clone(),
+                        wave_changes: frozen.wave_changes(&wave),
+                    });
+                    if let Some((next, reading)) = admitted {
+                        finite_comparison = Some(FiniteComparisonReceipt {
+                            comparison,
+                            attempts,
+                            halvings,
+                            frozen_operand_bits: frozen.bits(),
+                            trials: std::mem::take(&mut trials),
+                        });
+                        accepted_charts = Some(charts);
+                        return Ok((next, reading));
+                    }
+                    // The full demand ladder cannot refine this candidate again.
+                    if needs_precision {
+                        resident.staged.remove(&staged);
+                        return Err(HnnError::ComparisonUnresolved {
+                            attempts,
+                            next_halving,
+                            unchanged,
+                            reason,
+                            smallest_step,
+                            trials,
+                        });
+                    }
+                }
+                resident.staged.remove(&staged);
+                Err(HnnError::Unadmitted {
+                    reason: "past the no-reach halving the candidate still changed the wave: a read consumes a carrier the step does not scale",
+                })
+            })();
+            resident.arrived = Some(arrived);
+            candidates
+        } else {
+            match resident
+                .constitution
+                .deposited_within(&slot.deposit, &retention)
+            {
+                Ok(published) => Ok(published),
+                Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
+                    resident.staged.remove(&staged);
+                    if let HnnError::ConstitutionBudget {
+                        bits,
+                        budget,
+                        commit,
+                        loci,
+                    } = &refusal
+                    {
+                        resident.stop = Some(BudgetStop {
+                            bits: *bits,
+                            budget: *budget,
+                            commit: *commit,
+                            loci: loci.clone(),
+                        });
+                    }
+                    Err(refusal)
+                }
+                Err(refusal) => Err(refusal),
+            }
+        };
+        let (next, reading) = match publish_result {
+            Ok(published) => published,
             Err(refusal) => return Err(refusal),
         };
+        if let Some(charts) = accepted_charts.as_ref() {
+            // Preserve the trial's warm chart values for the successor's ordinary re-read, but
+            // retain `chart_before` so any later refusal rolls all the way back to the producer.
+            resident.store = ChartStore::continued(self.card, &field, charts)?;
+        }
         let deposited = start.elapsed();
         // The normal laws' prox steps on the card, read against the host's successor (campaign
         // 2), when the mirror runs (the GPU suite's parity tests; not the exposure's path): each
@@ -1604,10 +2276,10 @@ impl<'c> ExecutionPort for Resident<'c> {
         if let Some(mirror) = &self.normal_mirror {
             let mut tally = mirror.get();
             let mut once: BTreeMap<LinearLocus, usize> = BTreeMap::new();
-            for step in slot.linear() {
+            for step in slot.deposit.linear() {
                 *once.entry(step.locus).or_default() += 1;
             }
-            for step in slot.linear() {
+            for step in slot.deposit.linear() {
                 if once[&step.locus] != 1 {
                     tally.repeated += 1;
                     continue;
@@ -1662,23 +2334,45 @@ impl<'c> ExecutionPort for Resident<'c> {
             mirror.set(tally);
         }
         let normal_deposit = start.elapsed();
-        let tree_steps: Vec<(Vec<Letter>, usize)> =
+        let observed = slot.deposit.observed_landmarks()?;
+        let tree_steps: Vec<(Vec<Letter>, usize, Option<ObservedAddress>)> =
             resident.tree.as_ref().map_or_else(Vec::new, |(ring, _)| {
-                slot.landmarks()
+                slot.deposit
+                    .landmarks()
                     .iter()
-                    .filter(|step: &&LandmarkStep| step.ring == *ring)
-                    .map(|step| (step.address.clone(), step.class))
+                    .enumerate()
+                    .filter(|(_, step)| step.ring == *ring)
+                    .map(|(index, step)| {
+                        (
+                            step.address.clone(),
+                            step.class,
+                            observed.as_ref().map(|addresses| addresses[index].clone()),
+                        )
+                    })
                     .collect()
             });
         // The tree and warm charts are physical mirrors. Keep only this call's predecessor until
         // every successor read succeeds; a late carrier refusal must not advance either mirror.
-        let chart_before = resident.store.before_trial();
         let trial = (|| {
             // The card's mirror of the tree moved by the deposit's steps, as the host's moved.
             let start = Instant::now();
             if let Some((ring, tree)) = resident.tree.as_mut() {
                 let steps = &tree_steps;
-                tree.deposit(steps).map_err(device)?;
+                let predecessor = resident
+                    .constitution
+                    .landmarks(*ring)
+                    .ok_or(HnnError::MissingReceivingMap { ring: *ring })?;
+                let words = steps
+                    .iter()
+                    .map(|(address, class, observation)| {
+                        let branches = match observation {
+                            Some(observed) => predecessor.arena().letters_observed(observed)?,
+                            None => predecessor.arena().letters(address),
+                        };
+                        Ok((tree.pack_branches(&branches).map_err(device)?, *class))
+                    })
+                    .collect::<Result<Vec<_>, HnnError>>()?;
+                tree.deposit_words(&words).map_err(device)?;
                 // The lockstep: the counts, and the masses, β, stop weights, depth words and label
                 // ends of every stored node the deposit's walks opened (read on the predecessor: a
                 // later cell's walk only refines an earlier one's chains) and of every node it founded,
@@ -1694,8 +2388,11 @@ impl<'c> ExecutionPort for Resident<'c> {
                     what: "the host's landmark tree at the successor",
                 })?;
                 let (mut nodes, mut dyadic) = (Vec::new(), Vec::new());
-                for (address, class) in steps {
-                    let (touched, cells) = before.touched(address, *class)?;
+                for (address, class, observation) in steps {
+                    let (touched, cells) = match observation {
+                        Some(observed) => before.touched_observed(observed, *class)?,
+                        None => before.touched(address, *class)?,
+                    };
                     nodes.extend(touched);
                     dyadic.extend(cells);
                 }
@@ -1735,7 +2432,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             // the trial succeeds.
             let mut work = ExactWork::nothing();
             stepped(&mut work, 1);
-            holonics::hnn::port::resident(&mut work, reading.bits);
+            // This is the successor's exact bit length, not a resident rational-entry count.
             let receipt = port_receipt(
                 &zero_ticks(&field),
                 &Rat::one(),
@@ -1743,6 +2440,7 @@ impl<'c> ExecutionPort for Resident<'c> {
                 ReceiptDetail::Deposit {
                     reading: reading.clone(),
                     reread: reread.clone(),
+                    finite_comparison: finite_comparison.clone(),
                 },
             )?;
             let mut ledger = resident.ledger.clone();
@@ -1820,7 +2518,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         );
         let ratio = slot.ratio.clone();
         resident.pending.insert(*pending, slot);
-        let (word, wave) = read?;
+        let (word, wave, _active_publication) = read?;
         resident.tally.read(&word.readings);
         // No cell of the window is released yet: every phase reads the tree at the window's
         // opening address (`ActiveAddress::phase`), as the reference's release does.
@@ -1881,6 +2579,77 @@ impl<'c> ExecutionPort for Resident<'c> {
             },
             pullback: Component::Absent("release is forward only"),
             deposit: Component::Absent("FOUND is campaign 3's; the RIDE/FOUND split is a reading"),
+            order: Component::Present(order),
+            phases: Component::Present(vec![phases]),
+            receipt,
+        })
+    }
+
+    /// The release at class grain (`hnn::receiving::cells`), as the reference's: the card executes
+    /// the window's word once, and the host law decides each phase on the receiver's scored face,
+    /// with the tree's splits read on the card's mirror at the released prefix (`tree_against`, the
+    /// known targets' deposits applied and undone on the card, as `compare` reads them). Nothing
+    /// is deposited and the pending ratio stays.
+    fn release_cells(
+        &self,
+        resident: &mut Mounted<'c>,
+        pending: &PendingId,
+        law: CellLaw<'_>,
+    ) -> Result<InteractionReturn<CellRelease, (), (), Vec<ReceivingPhases>, PortReceipt>, HnnError>
+    {
+        let slot = resident
+            .pending
+            .remove(pending)
+            .ok_or(HnnError::UnknownHandle {
+                handle: Handle::Pending(*pending),
+            })?;
+        let publication = Rc::clone(&resident.publication);
+        let read = resident.execute(
+            &slot.ratio,
+            &slot.moment,
+            &publication,
+            self.card,
+            &slot.opening,
+        );
+        let ratio = slot.ratio.clone();
+        resident.pending.insert(*pending, slot);
+        let (word, wave, _active_publication) = read?;
+        resident.tally.read(&word.readings);
+        let phases = ratio.phases().clone();
+        let population = resident.constitution.population(phases.ring()).ok_or(
+            HnnError::MissingReceivingMap {
+                ring: phases.ring(),
+            },
+        )?;
+        let constitution = &resident.constitution;
+        let tree = &mut resident.tree;
+        let cells = release_cells(
+            population,
+            phases.aperture(),
+            |known| Ok(tree_against(tree.as_mut(), constitution, &ratio, &wave, known)?.0),
+            law,
+        )?;
+        let field = &resident.field;
+        let order = source_order(field, ratio.anchor(), ratio.moment().cells());
+        let ticks = vec![phases.junction_steps() as u64; field.rings().len()];
+        let mut receipt = port_receipt(
+            &ticks,
+            field.step(),
+            ExactWork::nothing(),
+            ReceiptDetail::Cells {
+                decisions: cells
+                    .cells
+                    .iter()
+                    .map(|cell| cell.release.clone())
+                    .collect(),
+                bits: cells.cells.iter().map(|cell| cell.bits).collect(),
+            },
+        )?;
+        receipt.unresolved = wave.faces.iter().map(|face| face.fibres()).collect();
+        Ok(InteractionReturn {
+            forward: Component::Present(cells),
+            pullback: Component::Absent("a release is forward only"),
+            deposit: Component::Absent("a release teaches nothing"),
             order: Component::Present(order),
             phases: Component::Present(vec![phases]),
             receipt,
@@ -1958,8 +2727,9 @@ impl<'c> ExecutionPort for Resident<'c> {
         let refused_staged: Vec<(StagedId, Vec<Locus>)> = resident
             .staged
             .iter()
-            .filter_map(|(id, deposit)| {
-                let separating: Vec<Locus> = deposit
+            .filter_map(|(id, staged)| {
+                let separating: Vec<Locus> = staged
+                    .deposit
                     .loci()
                     .into_iter()
                     .filter(|locus| !collapsed.retained.contains(locus))

@@ -3,16 +3,18 @@
 use num_traits::{One, Signed, Zero};
 use std::sync::Arc;
 
-use crate::holon::{Holon, HolonError, HolonState, PortHolon};
 use crate::holon::law::{ReferenceHolon, Scheme};
+use crate::holon::{Holon, HolonError, HolonState, PortHolon};
 use crate::navigator::Clock;
 use crate::ratio::linear::ExactRatMatrix;
-use crate::receiver::receipt::ReceiptLaw;
-use crate::receiver::reception::{InteractionReturn, JointLaw, ReceiverFace};
-use crate::receiver::reception::continuation::{BoundJointState, BoundJointStep, JointProducer, StorageReturn};
 use crate::ratio::linear::inertia::SymmetricForm;
 use crate::ratio::linear::vector::matrix;
 use crate::ratio::{Rat, integer};
+use crate::receiver::receipt::ReceiptLaw;
+use crate::receiver::reception::continuation::{
+    BoundJointState, BoundJointStep, JointProducer, StorageReturn,
+};
+use crate::receiver::reception::{InteractionReturn, JointLaw, ReceiverFace};
 
 use super::{WaveError, check_coefficients, half, square};
 
@@ -294,17 +296,27 @@ impl WaveReceiver {
 
     /// Open under the bound native law; source and clock identity are checked by its producer.
     pub fn open(
-        &self, state: HolonState, source: &Arc<WaveChain>, clock: &Arc<Clock>,
+        &self,
+        state: HolonState,
+        source: &Arc<WaveChain>,
+        clock: &Arc<Clock>,
     ) -> Result<BoundJointState<WaveChain>, WaveError> {
         Ok(self.producer.open(state, source, clock)?)
     }
 
     /// Continue the existing solved joint law from its actual reached state and clock.
     pub fn interact(
-        &self, reached: &BoundJointState<WaveChain>, source: &Arc<WaveChain>,
-        clock: &Arc<Clock>, input: &[Rat], face: &ReceiverFace, receipt: &ReceiptLaw,
+        &self,
+        reached: &BoundJointState<WaveChain>,
+        source: &Arc<WaveChain>,
+        clock: &Arc<Clock>,
+        input: &[Rat],
+        face: &ReceiverFace,
+        receipt: &ReceiptLaw,
     ) -> Result<InteractionReturn<BoundJointStep<WaveChain>>, WaveError> {
-        Ok(self.producer.interact(reached, source, clock, input, face, receipt)?)
+        Ok(self
+            .producer
+            .interact(reached, source, clock, input, face, receipt)?)
     }
 }
 
@@ -615,12 +627,18 @@ impl WaveChain {
 
     /// Bind a native source and clock to the law derived here, without a caller-supplied law.
     pub fn bind_receiver(
-        source: &Arc<Self>, clock: &Arc<Clock>, reader: &ExactRatMatrix,
+        source: &Arc<Self>,
+        clock: &Arc<Clock>,
+        reader: &ExactRatMatrix,
     ) -> Result<WaveReceiver, WaveError> {
         Ok(WaveReceiver {
             current: source.as_ref().clone(),
             reader: reader.clone(),
-            producer: JointProducer::declared(source.joint_receiver(reader)?, source.clone(), clock.clone())?,
+            producer: JointProducer::declared(
+                source.joint_receiver(reader)?,
+                source.clone(),
+                clock.clone(),
+            )?,
         })
     }
 
@@ -646,39 +664,65 @@ impl WaveChain {
     /// }
     /// ```
     pub fn return_material(
-        &self, source: &Arc<Self>, receiver: &WaveReceiver,
-        reached: &BoundJointState<Self>, clock: &Arc<Clock>, successor: &Self,
-        reader: &ExactRatMatrix, epsilon: Rat, receipt: &ReceiptLaw,
+        &self,
+        source: &Arc<Self>,
+        receiver: &WaveReceiver,
+        reached: &BoundJointState<Self>,
+        clock: &Arc<Clock>,
+        successor: &Self,
+        reader: &ExactRatMatrix,
+        epsilon: Rat,
+        receipt: &ReceiptLaw,
     ) -> Result<
-        (WaveReceiver, InteractionReturn<BoundJointState<Self>, (), StorageReturn>, WaveState),
+        (
+            WaveReceiver,
+            InteractionReturn<BoundJointState<Self>, (), StorageReturn>,
+            WaveState,
+        ),
         WaveError,
     > {
-        let same_ports = |a: &Self, b: &Self| a.incidence == b.incidence
-            && a.material.leakage == b.material.leakage && a.tick == b.tick;
-        if self != receiver.current() || reader != &receiver.reader || !same_ports(self, successor)
-            || receiver.law() != &self.joint_receiver(reader)? {
+        let same_ports = |a: &Self, b: &Self| {
+            a.incidence == b.incidence
+                && a.material.leakage == b.material.leakage
+                && a.tick == b.tick
+        };
+        if self != receiver.current()
+            || reader != &receiver.reader
+            || !same_ports(self, successor)
+            || receiver.law() != &self.joint_receiver(reader)?
+        {
             return Err(HolonError::ConformanceFailed {
                 what: "the wave material return uses its derived producing law, reader, incidence and clock",
             }.into());
         }
         let next_law = successor.joint_receiver(reader)?;
-        let (next_producer, returned) = receiver.producer.return_storage(
-            reached, source, clock, next_law, epsilon, receipt,
-        )?;
-        let point = &returned.forward.present().ok_or(HolonError::ConformanceFailed {
-            what: "the wave material return carries its reached point",
-        })?.state().configuration[..next_producer.law().source_extent()];
+        let (next_producer, returned) = receiver
+            .producer
+            .return_storage(reached, source, clock, next_law, epsilon, receipt)?;
+        let point = &returned
+            .forward
+            .present()
+            .ok_or(HolonError::ConformanceFailed {
+                what: "the wave material return carries its reached point",
+            })?
+            .state()
+            .configuration[..next_producer.law().source_extent()];
         let reading = successor.decode_configuration(point)?;
         if successor.configuration(&reading)? != point {
             return Err(HolonError::ConformanceFailed {
                 what: "the native wave successor decoder re-encodes the returned point",
-            }.into());
+            }
+            .into());
         }
-        Ok((WaveReceiver {
-            current: successor.clone(),
-            reader: receiver.reader.clone(),
-            producer: next_producer,
-        }, returned, reading))
+        Ok((
+            WaveReceiver {
+                current: successor.clone(),
+                reader: receiver.reader.clone(),
+                producer: next_producer,
+            },
+            returned,
+            reading,
+        ))
     }
 
     /// Decode the Holon's storage coordinates `(q, phi) = (C V, L I)` in this material.

@@ -68,9 +68,13 @@ pub(super) fn keys(terrain: &str, seed: u64, count: usize, out: &str) {
                 (None, Some(_)) => stable = None,
                 _ => {}
             }
-            let maps: Vec<_> = survivors.alive.iter().map(|(_, reading)| reading.map.clone()).collect();
-            let agreeing = !maps.is_empty()
-                && maps.iter().all(|map| map.is_some() && *map == maps[0]);
+            let maps: Vec<_> = survivors
+                .alive
+                .iter()
+                .map(|(_, reading)| reading.map.clone())
+                .collect();
+            let agreeing =
+                !maps.is_empty() && maps.iter().all(|map| map.is_some() && *map == maps[0]);
             match (agreeing, &one_map) {
                 (true, None) => one_map = Some((k, survivors.distances())),
                 (true, Some((_, known))) if *known != survivors.distances() => {
@@ -107,7 +111,13 @@ pub(super) fn keys(terrain: &str, seed: u64, count: usize, out: &str) {
     #[allow(clippy::disallowed_methods)]
     std::fs::write(format!("{out}.curve"), &curve).expect("write the curve");
     let stations = declared.stations as u64;
-    let units = |k: u64| format!("{k} observations ({} requests plus {} stations)", k / stations, k % stations);
+    let units = |k: u64| {
+        format!(
+            "{k} observations ({} requests plus {} stations)",
+            k / stations,
+            k % stations
+        )
+    };
     println!(
         "keys on {terrain}, seed {seed}, {count} requests: {} observations read",
         location.survivors().observations
@@ -147,14 +157,25 @@ pub(super) fn keys(terrain: &str, seed: u64, count: usize, out: &str) {
         None => println!("  no single map class at the passage's end"),
     }
     let Some((k, pair)) = stable else {
-        println!("executed keys: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+        println!(
+            "executed keys: {} ms; resident {}",
+            clock.elapsed().as_millis(),
+            resident()
+        );
         return;
     };
     if first_lock.as_ref().is_some_and(|(_, first)| first != &pair) {
         println!("  the first lock's pair is not the pair located at the passage's end");
     }
-    let prior = engine.theta.source_port(ring).expect("the opening's source port").clone();
-    for (label, opening) in [("lossless", engine.theta.clone()), ("founded", founded_opening(&engine))] {
+    let prior = engine
+        .theta
+        .source_port(ring)
+        .expect("the opening's source port")
+        .clone();
+    for (label, opening) in [
+        ("lossless", engine.theta.clone()),
+        ("founded", founded_opening(&engine)),
+    ] {
         let started = Instant::now();
         match pair_deposit(field, &opening, &prior, ring, &pair) {
             Ok((theta, deposit)) => {
@@ -169,7 +190,11 @@ pub(super) fn keys(terrain: &str, seed: u64, count: usize, out: &str) {
                     deposit.certificate.curvature,
                     deposit.certificate.covector,
                     deposit.certificate.decrease(),
-                    if deposit.consumer { "holds" } else { "does not hold" },
+                    if deposit.consumer {
+                        "holds"
+                    } else {
+                        "does not hold"
+                    },
                     deposit.source.storage_growth,
                     deposit.source.largest,
                     deposit.source.bits,
@@ -183,7 +208,11 @@ pub(super) fn keys(terrain: &str, seed: u64, count: usize, out: &str) {
             Err(refusal) => println!("  deposit on the {label} opening refused: {refusal}"),
         }
     }
-    println!("executed keys: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+    println!(
+        "executed keys: {} ms; resident {}",
+        clock.elapsed().as_millis(),
+        resident()
+    );
 }
 
 /// [measured-diagnostic; agent-inferred, October 5; a representation probe, never a learning law]
@@ -205,10 +234,15 @@ pub(super) fn keys_probe(terrain: &str, seed: u64, count: usize, scale: &str, ou
     let mut location = PairLocation::open(field, ring);
     let mut located = None;
     for passage in &passages {
-        for observation in station_pairs(field, ring, passage, declared.request).expect("the pair menu") {
+        for observation in
+            station_pairs(field, ring, passage, declared.request).expect("the pair menu")
+        {
             location.observe(&observation);
             if located.is_none() {
-                located = location.survivors().located().map(|pair| (location.survivors().observations, pair));
+                located = location
+                    .survivors()
+                    .located()
+                    .map(|pair| (location.survivors().observations, pair));
             }
         }
     }
@@ -225,7 +259,12 @@ pub(super) fn keys_probe(terrain: &str, seed: u64, count: usize, scale: &str, ou
     let (mut port, mut at) = (start, 0u64);
     loop {
         images[port] = Some(at);
-        port = pair.map.iter().find(|(y, _)| *y == port).expect("a cycle").1;
+        port = pair
+            .map
+            .iter()
+            .find(|(y, _)| *y == port)
+            .expect("a cycle")
+            .1;
         at = (at + turn) % period;
         if port == start {
             break;
@@ -252,10 +291,16 @@ pub(super) fn keys_probe(terrain: &str, seed: u64, count: usize, scale: &str, ou
         "keys-probe at observation {k}: δ {}, turn {turn}, images {images:?}, wave nodes 0 and {lag}, scale {scale}",
         pair.offset
     );
-    for (label, opening) in [("lossless", engine.theta.clone()), ("founded", founded_opening(&engine))] {
-        let theta = opening.with_ports(ring, None, Some(port.clone()), None).expect("the probe's port");
+    for (label, opening) in [
+        ("lossless", engine.theta.clone()),
+        ("founded", founded_opening(&engine)),
+    ] {
+        let theta = opening
+            .with_ports(ring, None, Some(port.clone()), None)
+            .expect("the probe's port");
         #[allow(clippy::disallowed_methods)]
-        std::fs::write(format!("{out}.{label}"), write_state(&theta, ring)).expect("write the state");
+        std::fs::write(format!("{out}.{label}"), write_state(&theta, ring))
+            .expect("write the state");
     }
 }
 
@@ -279,13 +324,27 @@ pub(super) fn pair_members(terrain: &str, seed: u64, count: usize, state: &str) 
     let engine = Engine::new(declared);
     let bank = bank_of(declared.period, &bank_strength());
     let theta = executed_loop::mount(&engine.theta, state);
-    let at = |x: &Rat| executed_loop::cell(&ExactInterval { lower: x.clone(), upper: x.clone() }, 16);
+    let at = |x: &Rat| {
+        executed_loop::cell(
+            &ExactInterval {
+                lower: x.clone(),
+                upper: x.clone(),
+            },
+            16,
+        )
+    };
     let passages = terrain_encoded(terrain, &declared, &engine.field, seed, count);
-    for ((request, target), passage) in terrain_pairs(terrain, &declared, seed, count).iter().zip(&passages) {
-        let (current, moment) =
-            ingest(&engine.field, &passage.part(0..request.len()).expect("the request"));
+    for ((request, target), passage) in terrain_pairs(terrain, &declared, seed, count)
+        .iter()
+        .zip(&passages)
+    {
+        let (current, moment) = ingest(
+            &engine.field,
+            &passage.part(0..request.len()).expect("the request"),
+        );
         let placement =
-            BankPlacement::of(&engine.field, &theta, &current, &moment, &engine.refinement).expect("the placement");
+            BankPlacement::of(&engine.field, &theta, &current, &moment, &engine.refinement)
+                .expect("the placement");
         println!(
             "request tail {:?} | target {target:?} | closed contacts {:?}",
             &request[request.len() - 2..],
@@ -298,16 +357,27 @@ pub(super) fn pair_members(terrain: &str, seed: u64, count: usize, state: &str) 
                 match placement.pair_storage(station, class, &cells) {
                     Some((pair, alone)) => {
                         let pair = bank.read_turn(&turn(&pair), BANK_GRAIN).expect("a reading");
-                        let alone = bank.read_turn(&turn(&alone), BANK_GRAIN).expect("a reading");
+                        let alone = bank
+                            .read_turn(&turn(&alone), BANK_GRAIN)
+                            .expect("a reading");
                         let joint = holonics::hnn::prediction::gain(&pair, &alone).expect("a gain");
                         println!(
                             "    class {class}: pair {:?} alone {:?} joint gain ≥ {}",
-                            pair.members.iter().map(|m| at(&m.lower)).collect::<Vec<_>>(),
-                            alone.members.iter().map(|m| at(&m.lower)).collect::<Vec<_>>(),
+                            pair.members
+                                .iter()
+                                .map(|m| at(&m.lower))
+                                .collect::<Vec<_>>(),
+                            alone
+                                .members
+                                .iter()
+                                .map(|m| at(&m.lower))
+                                .collect::<Vec<_>>(),
                             at(&joint.lower)
                         );
                     }
-                    None => println!("    class {class}: no closed contact joins a placed crossing"),
+                    None => {
+                        println!("    class {class}: no closed contact joins a placed crossing")
+                    }
                 }
             }
             cells[station] = Some(target[station]);

@@ -574,7 +574,14 @@ fn section_ring(t: i64) -> holonics::hnn::ring::ResonatorOperands {
         None,
     )
     .unwrap();
-    ResonatorOperands::at_cut(0, &material, &(integer(1) / (integer(4) * &a)), &integer(1), None).unwrap()
+    ResonatorOperands::at_cut(
+        0,
+        &material,
+        &(integer(1) / (integer(4) * &a)),
+        &integer(1),
+        None,
+    )
+    .unwrap()
 }
 
 /// **A passage ingested whole by the reference port** (§28 F1, §28a R1): each ingest stops after the
@@ -596,13 +603,20 @@ fn ingest_whole(
             .ingest(resident, moment.as_ref(), &rest)
             .unwrap_or_else(|e| panic!("the port refuses a part of {} cells: {e}", rest.len()));
         moment = Some(id);
-        let ingested = ingest.forward.into_present().expect("the ingest's forward is present");
+        let ingested = ingest
+            .forward
+            .into_present()
+            .expect("the ingest's forward is present");
         if ingested.carry_out {
             let admitted = resident.admitted().to_vec();
             reference.close_aeon(resident, &admitted).unwrap();
             closed += 1;
         } else {
-            assert_eq!(ingested.cells, rest.len(), "without a carry-out the ingest consumes the whole part");
+            assert_eq!(
+                ingested.cells,
+                rest.len(),
+                "without a carry-out the ingest consumes the whole part"
+            );
         }
         if ingested.cells == rest.len() {
             return (moment.unwrap(), closed);
@@ -622,7 +636,9 @@ fn push(bits: &mut Vec<bool>, value: usize, width: usize) {
 }
 
 fn pull(bits: &mut impl Iterator<Item = bool>, width: usize) -> usize {
-    (0..width).fold(0, |value, _| (value << 1) | usize::from(bits.next().expect("the emission holds the field")))
+    (0..width).fold(0, |value, _| {
+        (value << 1) | usize::from(bits.next().expect("the emission holds the field"))
+    })
 }
 
 /// Elias gamma of `n ≥ 1`.
@@ -637,7 +653,9 @@ fn pull_gamma(bits: &mut impl Iterator<Item = bool>) -> usize {
     while !bits.next().expect("the emission holds the gamma code") {
         zeros += 1;
     }
-    (0..zeros).fold(1, |value, _| (value << 1) | usize::from(bits.next().expect("the gamma body")))
+    (0..zeros).fold(1, |value, _| {
+        (value << 1) | usize::from(bits.next().expect("the gamma body"))
+    })
 }
 
 /// What the independent decoder of §28 returns: the placement (settle tick, window length), the clock
@@ -672,14 +690,20 @@ fn decode_section(emission: &[bool], family: &FrameFamily) -> DecodedSection {
         .map(|_| i8::try_from(pull(&mut bits, 3)).unwrap() - 2)
         .collect();
     let rest: Vec<bool> = bits.collect();
-    let ordinals = read_located(helix, classes, &rest, &[length]).unwrap().remove(0);
+    let ordinals = read_located(helix, classes, &rest, &[length])
+        .unwrap()
+        .remove(0);
     let mut class = start;
     let symbols = ordinals
         .iter()
         .map(|&o| {
             let advance = dictionary[o];
             let (crossing, landed) = land(class, advance).unwrap();
-            let symbol = SectionSymbol { class, advance, crossing };
+            let symbol = SectionSymbol {
+                class,
+                advance,
+                crossing,
+            };
             class = landed;
             symbol
         })
@@ -714,7 +738,9 @@ fn decode_section(emission: &[bool], family: &FrameFamily) -> DecodedSection {
 #[test]
 fn a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole() {
     use holonics::compression::CompressionError;
-    use holonics::compression::keys::repair::{CellRelease, DamagedPassage, key_code, residual_code, restrict};
+    use holonics::compression::keys::repair::{
+        CellRelease, DamagedPassage, key_code, residual_code, restrict,
+    };
     use holonics::compression::keys::transport::located_code;
     use holonics::hnn::keys::{PairLocation, damaged_station_pairs};
     use holonics::hnn::section_lock::{LockReader, LockWindow, Settled};
@@ -742,7 +768,9 @@ fn a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decod
         reader.observe(port.phase_point()).unwrap();
         for tick in port.receive(&wave).unwrap() {
             let tick = tick.unwrap();
-            reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).unwrap();
+            reader
+                .observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()])
+                .unwrap();
         }
         let settled = reader.finish().unwrap();
         let near = settled.near_return(&window).unwrap();
@@ -764,7 +792,12 @@ fn a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decod
         let tau = near.period();
         let departures: Vec<usize> = near.defects().iter().map(|&(k, _)| k).collect();
         let cycle: Vec<usize> = (0..tau)
-            .map(|j| actual[(j..length).step_by(tau).find(|k| !departures.contains(k)).unwrap()])
+            .map(|j| {
+                actual[(j..length)
+                    .step_by(tau)
+                    .find(|k| !departures.contains(k))
+                    .unwrap()]
+            })
             .collect();
         let periodic: Vec<usize> = (0..length).map(|k| cycle[k % tau]).collect();
         let location = family.locate(classes, &[periodic.clone()]).unwrap();
@@ -794,10 +827,19 @@ fn a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decod
         let (mut entered, mut paired, mut emitted) = (0, 0, 0);
         let mut aeons = Vec::new();
         for (helix, carrying) in location.carrying() {
-            let frame = family.frames().iter().position(|h| h.periods() == helix.periods()).unwrap();
+            let frame = family
+                .frames()
+                .iter()
+                .position(|h| h.periods() == helix.periods())
+                .unwrap();
             // F1: the actual passage enters the field declared on the frame's own rings.
             let located = PassageChart::located(carrying.location(), &[actual.clone()])
-                .unwrap_or_else(|e| panic!("F1 ({name}) frame {:?}: the located chart refuses the actual passage: {e}", helix.periods()));
+                .unwrap_or_else(|e| {
+                    panic!(
+                        "F1 ({name}) frame {:?}: the located chart refuses the actual passage: {e}",
+                        helix.periods()
+                    )
+                });
             let encoding = Encoding::found(&located).unwrap();
             let field = field_on(helix.periods());
             let encoded = Encoded::through(&encoding, &located, &field, &[actual.clone()]).unwrap();
@@ -816,7 +858,12 @@ fn a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decod
                 let cells: Vec<usize> = encoded[0].classes_read().collect();
                 let chart_classes = encoded[0].classes();
                 let cycle_cells: Vec<usize> = (0..tau)
-                    .map(|j| cells[(j..length).step_by(tau).find(|k| !departures.contains(k)).unwrap()])
+                    .map(|j| {
+                        cells[(j..length)
+                            .step_by(tau)
+                            .find(|k| !departures.contains(k))
+                            .unwrap()]
+                    })
                     .collect();
                 let damaged = DamagedPassage::encoded(&encoded[0], &departures, 1).unwrap();
                 let mut pair = PairLocation::open(&field, receiving);
@@ -826,7 +873,9 @@ fn a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decod
                 let survivors = pair.survivors();
                 match survivors.located() {
                     Some(located_pair) => {
-                        let relation = located_pair.relation(&field, receiving, chart_classes).unwrap();
+                        let relation = located_pair
+                            .relation(&field, receiving, chart_classes)
+                            .unwrap();
                         let key = key_code(&relation, d).unwrap();
                         let releases = restrict(&damaged, &relation).unwrap().release().unwrap();
                         for &k in &departures {
@@ -839,7 +888,11 @@ fn a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decod
                         }
                         let residual = residual_code(&cells, &damaged, &relation);
                         if departures.is_empty() {
-                            assert_eq!(residual.unwrap(), Vec::<bool>::new(), "F2 ({name}): nothing is held");
+                            assert_eq!(
+                                residual.unwrap(),
+                                Vec::<bool>::new(),
+                                "F2 ({name}): nothing is held"
+                            );
                         } else {
                             assert!(
                                 matches!(residual, Err(CompressionError::NotRegenerated { .. })),
@@ -883,7 +936,13 @@ fn a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decod
                 let decoded = decode_section(&emission, &family);
                 assert_eq!(
                     decoded,
-                    DecodedSection { settle, length, ring: ring_t, hop, word: word.clone() },
+                    DecodedSection {
+                        settle,
+                        length,
+                        ring: ring_t,
+                        hop,
+                        word: word.clone()
+                    },
                     "F3 ({name}) frame {:?}: the emission decodes the whole word, its placement and clock",
                     helix.periods()
                 );
@@ -900,8 +959,13 @@ fn a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decod
                 emitted += 1;
             }
         }
-        println!("  ({name}) frames entered {entered} (aeons closed per frame {aeons:?}), paired {paired}, emitted {emitted}");
-        assert!(entered > 0, "F1 ({name}): some declared frame carries the cycle");
+        println!(
+            "  ({name}) frames entered {entered} (aeons closed per frame {aeons:?}), paired {paired}, emitted {emitted}"
+        );
+        assert!(
+            entered > 0,
+            "F1 ({name}): some declared frame carries the cycle"
+        );
     }
 }
 
@@ -964,7 +1028,11 @@ fn decode_runs(emission: &[bool], family: &FrameFamily) -> DecodedSection {
         .iter()
         .map(|&advance| {
             let (crossing, landed) = land(class, advance).unwrap();
-            let symbol = SectionSymbol { class, advance, crossing };
+            let symbol = SectionSymbol {
+                class,
+                advance,
+                crossing,
+            };
             class = landed;
             symbol
         })
@@ -987,7 +1055,8 @@ fn decode_runs(emission: &[bool], family: &FrameFamily) -> DecodedSection {
 /// (header, start class, frame, dictionary `S`, the departures by gap and advance, the runs' located
 /// code) decodes to the whole word (R3), charged beside the near-return and the spelled word (R4).
 #[test]
-fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_departures_the_residual() {
+fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_departures_the_residual()
+{
     use holonics::compression::keys::repair::{DamagedPassage, residual_code};
     use holonics::compression::keys::transport::located_code;
     use holonics::hnn::keys::{PairLocation, damaged_station_pairs};
@@ -1013,7 +1082,9 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
     reader.observe(port.phase_point()).unwrap();
     for tick in port.receive(&wave).unwrap() {
         let tick = tick.unwrap();
-        reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).unwrap();
+        reader
+            .observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()])
+            .unwrap();
     }
     let settled = reader.finish().unwrap();
     let near = settled.near_return(&window).unwrap();
@@ -1025,7 +1096,12 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
     let defects: Vec<usize> = near.defects().iter().map(|&(k, _)| k).collect();
     // The cycle's advances and its support `S`, in order of first occurrence.
     let cycle: Vec<i8> = (0..tau)
-        .map(|j| advances[(j..length).step_by(tau).find(|k| !defects.contains(k)).unwrap()])
+        .map(|j| {
+            advances[(j..length)
+                .step_by(tau)
+                .find(|k| !defects.contains(k))
+                .unwrap()]
+        })
         .collect();
     let mut support: Vec<i8> = Vec::new();
     for &a in &cycle {
@@ -1035,9 +1111,13 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
     }
     let classes = support.len();
     let ordinal = |a: i8| support.iter().position(|&s| s == a);
-    let periodic: Vec<usize> = (0..length).map(|k| ordinal(cycle[k % tau]).unwrap()).collect();
+    let periodic: Vec<usize> = (0..length)
+        .map(|k| ordinal(cycle[k % tau]).unwrap())
+        .collect();
     // The departures: the cells outside the chart's support.
-    let departures: Vec<usize> = (0..length).filter(|&k| ordinal(advances[k]).is_none()).collect();
+    let departures: Vec<usize> = (0..length)
+        .filter(|&k| ordinal(advances[k]).is_none())
+        .collect();
     let runs = runs_between(length, &departures);
     let passages: Vec<Vec<usize>> = runs
         .iter()
@@ -1049,11 +1129,19 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
         runs,
         location.tally()
     );
-    assert_eq!(location.carrying().count(), 18, "R1: the cycle in S carries on the clean tone's 18 frames");
+    assert_eq!(
+        location.carrying().count(),
+        18,
+        "R1: the cycle in S carries on the clean tone's 18 frames"
+    );
     let (mut paired, mut emitted) = (0, 0);
     let mut aeons = Vec::new();
     for (helix, carrying) in location.carrying() {
-        let frame = family.frames().iter().position(|h| h.periods() == helix.periods()).unwrap();
+        let frame = family
+            .frames()
+            .iter()
+            .position(|h| h.periods() == helix.periods())
+            .unwrap();
         // R1: the runs enter, in clock order, into one moment.
         let located = PassageChart::located(carrying.location(), &passages).unwrap();
         let encoding = Encoding::found(&located).unwrap();
@@ -1075,8 +1163,10 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
         let receiving = helix.periods().len() - 1;
         if d > tau {
             let mut pair = PairLocation::open(&field, receiving);
-            let damaged: Vec<DamagedPassage> =
-                encoded.iter().map(|passage| DamagedPassage::encoded(passage, &[], 1).unwrap()).collect();
+            let damaged: Vec<DamagedPassage> = encoded
+                .iter()
+                .map(|passage| DamagedPassage::encoded(passage, &[], 1).unwrap())
+                .collect();
             for passage in &damaged {
                 for (_, readings) in damaged_station_pairs(&field, receiving, passage).unwrap() {
                     pair.observe(&readings);
@@ -1084,12 +1174,22 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
             }
             let survivors = pair.survivors();
             let located_pair = survivors.located().unwrap_or_else(|| {
-                panic!("R2 frame {:?}: no pair located; surviving {:?}", helix.periods(), survivors.distances())
+                panic!(
+                    "R2 frame {:?}: no pair located; surviving {:?}",
+                    helix.periods(),
+                    survivors.distances()
+                )
             });
-            let relation = located_pair.relation(&field, receiving, encoded[0].classes()).unwrap();
+            let relation = located_pair
+                .relation(&field, receiving, encoded[0].classes())
+                .unwrap();
             for (passage, run_cells) in damaged.iter().zip(&encoded) {
                 let cells: Vec<usize> = run_cells.classes_read().collect();
-                assert_eq!(residual_code(&cells, passage, &relation).unwrap(), Vec::<bool>::new(), "R2: a run holds no departure");
+                assert_eq!(
+                    residual_code(&cells, passage, &relation).unwrap(),
+                    Vec::<bool>::new(),
+                    "R2: a run holds no departure"
+                );
             }
             println!(
                 "  R2 frame {:?} (index {frame}): pair (δ {}, map {:?}), surviving {:?}",
@@ -1127,7 +1227,13 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
             let decoded = decode_runs(&emission, &family);
             assert_eq!(
                 decoded,
-                DecodedSection { settle, length, ring: ring_t, hop, word: word.clone() },
+                DecodedSection {
+                    settle,
+                    length,
+                    ring: ring_t,
+                    hop,
+                    word: word.clone()
+                },
                 "R3 frame {:?}: the emission decodes the whole departed word, its placement and clock",
                 helix.periods()
             );
@@ -1143,8 +1249,13 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
             emitted += 1;
         }
     }
-    println!("  §28a: frames entered 18 (aeons closed per frame {aeons:?}), paired {paired}, emitted {emitted}");
-    assert!(emitted > 0, "R3: some carrying frame's code ranks the support");
+    println!(
+        "  §28a: frames entered 18 (aeons closed per frame {aeons:?}), paired {paired}, emitted {emitted}"
+    );
+    assert!(
+        emitted > 0,
+        "R3: some carrying frame's code ranks the support"
+    );
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1172,12 +1283,17 @@ fn clean_section_word(settle: usize, length: usize, prefix: usize) -> (Vec<usize
         reader.observe(port.phase_point()).unwrap();
         for tick in port.receive(&wave).unwrap() {
             let tick = tick.unwrap();
-            reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).unwrap();
+            reader
+                .observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()])
+                .unwrap();
         }
         reader.finish().unwrap()
     };
     let development = LockWindow::new(settle, prefix).unwrap();
-    let tau = read(development).near_return(&development).unwrap().period();
+    let tau = read(development)
+        .near_return(&development)
+        .unwrap()
+        .period();
     let Settled::Word(word) = read(LockWindow::new(settle, length).unwrap()) else {
         panic!("the ring left rest")
     };
@@ -1192,7 +1308,12 @@ fn clean_section_word(settle: usize, length: usize, prefix: usize) -> (Vec<usize
     let ordinals = word
         .symbols()
         .iter()
-        .map(|symbol| dictionary.iter().position(|&a| a == symbol.advance).expect("an advance of the prefix's dictionary"))
+        .map(|symbol| {
+            dictionary
+                .iter()
+                .position(|&a| a == symbol.advance)
+                .expect("an advance of the prefix's dictionary")
+        })
         .collect();
     (ordinals, dictionary, tau)
 }
@@ -1224,38 +1345,58 @@ fn the_field_learns_a_rings_section_word_online() {
         // The development prefix alone founds the chart: its cycle, located and frozen.
         let periodic: Vec<usize> = (0..prefix).map(|k| actual[k % tau]).collect();
         let family = FrameFamily::pairs(9).unwrap();
-        let location = family.locate(dictionary.len(), &[periodic.clone()]).unwrap();
+        let location = family
+            .locate(dictionary.len(), &[periodic.clone()])
+            .unwrap();
         for (helix, carrying) in location.carrying() {
             if helix.cells() as usize != dictionary.len() {
                 continue;
             }
             read += 1;
-            let located = PassageChart::located(carrying.location(), &[actual[..prefix].to_vec()]).unwrap();
+            let located =
+                PassageChart::located(carrying.location(), &[actual[..prefix].to_vec()]).unwrap();
             let encoding = Encoding::found(&located).unwrap();
-            let chart_bits = located_code(carrying.transport(), &[actual[..prefix].to_vec()]).unwrap().len();
+            let chart_bits = located_code(carrying.transport(), &[actual[..prefix].to_vec()])
+                .unwrap()
+                .len();
             let mut learner_sums = Vec::new();
             let mut letters_charge_clocked = 0i64;
             for clocked in [false, true] {
                 let plain = field_on(helix.periods());
                 let field = if clocked {
-                    let letter = Feature::Phase { ring: 0, grain: helix.periods()[0] };
-                    plain.clone().with_letter_family(FeatureFamily::new(vec![letter]).unwrap()).unwrap()
+                    let letter = Feature::Phase {
+                        ring: 0,
+                        grain: helix.periods()[0],
+                    };
+                    plain
+                        .clone()
+                        .with_letter_family(FeatureFamily::new(vec![letter]).unwrap())
+                        .unwrap()
                 } else {
                     plain.clone()
                 };
-                let letters_charge = field.describe(u64::MAX, 64).len() as i64 - plain.describe(u64::MAX, 64).len() as i64;
-                let encoded = Encoded::through(&encoding, &located, &field, &[actual.clone()]).unwrap().remove(0);
+                let letters_charge = field.describe(u64::MAX, 64).len() as i64
+                    - plain.describe(u64::MAX, 64).len() as i64;
+                let encoded = Encoded::through(&encoding, &located, &field, &[actual.clone()])
+                    .unwrap()
+                    .remove(0);
                 let mut sums = Vec::new();
                 let mut continued = 0;
                 let mut minus = Vec::new();
                 for learner in [true, false] {
                     let reference = Reference::new(64, u64::MAX);
                     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
-                    let (moment, _) = ingest_whole(&reference, &mut resident, None, &encoded.part(0..prefix).unwrap());
+                    let (moment, _) = ingest_whole(
+                        &reference,
+                        &mut resident,
+                        None,
+                        &encoded.part(0..prefix).unwrap(),
+                    );
                     let phases = resident.admitted()[0].clone();
                     let (mut lower, mut upper) = (rat(0, 1), rat(0, 1));
                     for n in prefix..length {
-                        let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+                        let (pending, _) =
+                            reference.refine(&mut resident, &moment, &phases).unwrap();
                         let (staged, compared) = reference
                             .compare(&mut resident, pending, &encoded.part(n..n + 1).unwrap())
                             .unwrap();
@@ -1278,9 +1419,16 @@ fn the_field_learns_a_rings_section_word_online() {
                                 }
                             }
                         } else {
-                            reference.discard(&mut resident, Handle::Staged(staged)).unwrap();
+                            reference
+                                .discard(&mut resident, Handle::Staged(staged))
+                                .unwrap();
                         }
-                        ingest_whole(&reference, &mut resident, Some(moment), &encoded.part(n..n + 1).unwrap());
+                        ingest_whole(
+                            &reference,
+                            &mut resident,
+                            Some(moment),
+                            &encoded.part(n..n + 1).unwrap(),
+                        );
                     }
                     sums.push((lower, upper));
                 }
@@ -1294,15 +1442,31 @@ fn the_field_learns_a_rings_section_word_online() {
                     sums[1].0,
                     sums[1].1,
                     2 * tau,
-                    minus.iter().map(|(n, c)| (*n, c.upper.clone())).collect::<Vec<_>>(),
+                    minus
+                        .iter()
+                        .map(|(n, c)| (*n, c.upper.clone()))
+                        .collect::<Vec<_>>(),
                     started.elapsed().as_millis()
                 );
-                assert!(sums[0].1 < sums[1].0, "C1: the learner codes the second half below its twin");
+                assert!(
+                    sums[0].1 < sums[1].0,
+                    "C1: the learner codes the second half below its twin"
+                );
                 if clocked {
-                    assert_eq!(continued, 2 * tau, "C2'': the clocked learner codes the last two cycles below one bit");
-                    assert!(letters_charge > 0, "the declared letters are charged in the field's code");
+                    assert_eq!(
+                        continued,
+                        2 * tau,
+                        "C2'': the clocked learner codes the last two cycles below one bit"
+                    );
+                    assert!(
+                        letters_charge > 0,
+                        "the declared letters are charged in the field's code"
+                    );
                 } else {
-                    assert!(continued < 2 * tau, "cell letters alone: the majority read (§3, §4)");
+                    assert!(
+                        continued < 2 * tau,
+                        "cell letters alone: the majority read (§3, §4)"
+                    );
                 }
                 learner_sums.push(sums[0].clone());
                 if clocked {
@@ -1318,7 +1482,10 @@ fn the_field_learns_a_rings_section_word_online() {
             // C3'' charged: the clocked learner's code plus the letters' declaration in the field's
             // code lies below the cell-only learner's (§10, §13).
             let charged = &learner_sums[1].1 + integer(letters_charge_clocked);
-            assert!(charged < learner_sums[0].0, "C3'': the clock letter lowers the learner's code, its charge included");
+            assert!(
+                charged < learner_sums[0].0,
+                "C3'': the clock letter lowers the learner's code, its charge included"
+            );
         }
     }
     assert!(read > 0);
@@ -1343,7 +1510,10 @@ struct IntervalCode {
 
 impl IntervalCode {
     fn new() -> Self {
-        Self { low: rat(0, 1), width: rat(1, 1) }
+        Self {
+            low: rat(0, 1),
+            width: rat(1, 1),
+        }
     }
 
     /// Narrow by class `class` under the masses `p` (summing to one).
@@ -1363,7 +1533,10 @@ impl IntervalCode {
             let m = (&self.low * &scale).ceil();
             if m < &high * &scale {
                 let m = m.to_integer();
-                return (0..k).rev().map(|bit| (&m >> bit) % 2 == BigInt::from(1)).collect();
+                return (0..k)
+                    .rev()
+                    .map(|bit| (&m >> bit) % 2 == BigInt::from(1))
+                    .collect();
             }
             k += 1;
         }
@@ -1405,14 +1578,21 @@ struct ToneContext {
 impl ToneContext {
     /// One ordinal as a one-cell passage through the chart.
     fn cell(&self, ordinal: usize) -> Encoded {
-        Encoded::through(&self.encoding, &self.located, &self.field, &[vec![ordinal]]).unwrap().remove(0)
+        Encoded::through(&self.encoding, &self.located, &self.field, &[vec![ordinal]])
+            .unwrap()
+            .remove(0)
     }
 
     /// The chart's class of each ordinal and back, read from the prefix alone.
     fn classes(&self) -> Vec<Option<usize>> {
-        let prefix = Encoded::through(&self.encoding, &self.located, &self.field, &[self.prefix_ordinals.clone()])
-            .unwrap()
-            .remove(0);
+        let prefix = Encoded::through(
+            &self.encoding,
+            &self.located,
+            &self.field,
+            &[self.prefix_ordinals.clone()],
+        )
+        .unwrap()
+        .remove(0);
         let mut ordinal_of = vec![None; prefix.classes()];
         for (class, &ordinal) in prefix.classes_read().zip(&self.prefix_ordinals) {
             ordinal_of[class] = Some(ordinal);
@@ -1423,23 +1603,39 @@ impl ToneContext {
     /// **The field's online pass** over the continuation: per cell the released face's exact masses
     /// (or the uniform masses of a typed hold), the class `choose` returns, then compare, deposit and
     /// ingest of that class. Returns the classes and the holds.
-    fn field_pass(&self, choose: &mut dyn FnMut(usize, &[holonics::ratio::Rat]) -> usize) -> (Vec<usize>, usize) {
+    fn field_pass(
+        &self,
+        choose: &mut dyn FnMut(usize, &[holonics::ratio::Rat]) -> usize,
+    ) -> (Vec<usize>, usize) {
         use holonics::hnn::{Current, ExecutionPort, Reference};
         use holonics::receiver::release::{BeyondTolerance, DecisionRule, WithinTolerance};
-        let releasing = DecisionRule::new("release at the grain", WithinTolerance::Release, BeyondTolerance::Hold);
+        let releasing = DecisionRule::new(
+            "release at the grain",
+            WithinTolerance::Release,
+            BeyondTolerance::Hold,
+        );
         let ordinal_of = self.classes();
         let reference = Reference::new(64, u64::MAX);
-        let mut resident = reference.mount(&self.field, &Current::at_rest(&self.field)).unwrap();
-        let prefix = Encoded::through(&self.encoding, &self.located, &self.field, &[self.prefix_ordinals.clone()])
-            .unwrap()
-            .remove(0);
+        let mut resident = reference
+            .mount(&self.field, &Current::at_rest(&self.field))
+            .unwrap();
+        let prefix = Encoded::through(
+            &self.encoding,
+            &self.located,
+            &self.field,
+            &[self.prefix_ordinals.clone()],
+        )
+        .unwrap()
+        .remove(0);
         let (moment, _) = ingest_whole(&reference, &mut resident, None, &prefix);
         let phases = resident.admitted()[0].clone();
         let mut classes = Vec::new();
         let mut held = 0;
         for n in self.prefix_ordinals.len()..self.length {
             let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
-            let released = reference.release(&mut resident, &pending, &releasing).unwrap();
+            let released = reference
+                .release(&mut resident, &pending, &releasing)
+                .unwrap();
             let masses = match released.forward.into_present() {
                 Some(faces) => faces.faces[0].odometer_masses().unwrap(),
                 None => {
@@ -1471,7 +1667,9 @@ fn gamma_pull(bits: &mut impl Iterator<Item = bool>) -> usize {
     while !bits.next().expect("a gamma code") {
         zeros += 1;
     }
-    (0..zeros).fold(1, |value, _| (value << 1) | usize::from(bits.next().expect("a gamma body")))
+    (0..zeros).fold(1, |value, _| {
+        (value << 1) | usize::from(bits.next().expect("a gamma body"))
+    })
 }
 
 /// **The tone's decoder** (§9, §12): from the context and one self-delimiting stream alone (the class
@@ -1485,9 +1683,12 @@ fn decode_tone(context: &ToneContext, stream: &[bool]) -> Vec<num_bigint::BigInt
     let mut bits = stream.iter().copied();
     let length = gamma_pull(&mut bits) - 1;
     let class_bits: Vec<bool> = (0..length).map(|_| bits.next().unwrap()).collect();
-    let point = class_bits.iter().fold((rat(0, 1), rat(1, 2)), |(value, unit), &bit| {
-        (if bit { value + &unit } else { value }, unit / integer(2))
-    }).0;
+    let point = class_bits
+        .iter()
+        .fold((rat(0, 1), rat(1, 2)), |(value, unit), &bit| {
+            (if bit { value + &unit } else { value }, unit / integer(2))
+        })
+        .0;
     let mut decoding = IntervalCode::new();
     let (continuation, _) = context.field_pass(&mut |_, masses| decoding.decode(masses, &point));
     let ordinal_of = context.classes();
@@ -1498,7 +1699,11 @@ fn decode_tone(context: &ToneContext, stream: &[bool]) -> Vec<num_bigint::BigInt
                 of.push((*ordinal, class));
             }
         }
-        context.prefix_ordinals.iter().map(|o| of.iter().find(|(x, _)| x == o).unwrap().1).collect()
+        context
+            .prefix_ordinals
+            .iter()
+            .map(|o| of.iter().find(|(x, _)| x == o).unwrap().1)
+            .collect()
     };
     // Each decoded chart cell denotes an advance (its ordinal's label in the dictionary); the
     // section symbols follow by the carry law from the opening's class, and the word is admitted.
@@ -1508,10 +1713,15 @@ fn decode_tone(context: &ToneContext, stream: &[bool]) -> Vec<num_bigint::BigInt
     for &cell in prefix_classes.iter().chain(&continuation) {
         let advance = context.dictionary[ordinal_of[cell].unwrap()];
         let (crossing, landed) = land(class, advance).unwrap();
-        symbols.push(holonics::hnn::dynamic_section::SectionSymbol { class, advance, crossing });
+        symbols.push(holonics::hnn::dynamic_section::SectionSymbol {
+            class,
+            advance,
+            crossing,
+        });
         class = landed;
     }
-    let word = holonics::hnn::section_lock::SectionWord::new(symbols).expect("the decoded symbols are a section word");
+    let word = holonics::hnn::section_lock::SectionWord::new(symbols)
+        .expect("the decoded symbols are a section word");
     let landings: Vec<u8> = word
         .symbols()
         .iter()
@@ -1524,16 +1734,39 @@ fn decode_tone(context: &ToneContext, stream: &[bool]) -> Vec<num_bigint::BigInt
         let n = context.settle + k;
         let (lo, hi) = context
             .operands
-            .drive_interval(n, 0, [&state[0], &state[1]], Some(landings[k]), None, &context.grain, context.range.clone())
+            .drive_interval(
+                n,
+                0,
+                [&state[0], &state[1]],
+                Some(landings[k]),
+                None,
+                &context.grain,
+                context.range.clone(),
+            )
             .unwrap();
         let width = (&hi - &lo).bits() as usize;
-        let index = (0..width).fold(BigInt::from(0), |value, _| (value << 1) + BigInt::from(u8::from(bits.next().unwrap())));
+        let index = (0..width).fold(BigInt::from(0), |value, _| {
+            (value << 1) + BigInt::from(u8::from(bits.next().unwrap()))
+        });
         let sample = &lo + index;
         let step = context
             .operands
-            .step(n, &[holonics::ratio::Rat::from_integer(sample.clone()), rat(0, 1)], [&state[0], &state[1]], &zero, None)
+            .step(
+                n,
+                &[
+                    holonics::ratio::Rat::from_integer(sample.clone()),
+                    rat(0, 1),
+                ],
+                [&state[0], &state[1]],
+                &zero,
+                None,
+            )
             .unwrap();
-        assert_eq!(quadrant(&[step.state[1][0].clone(), step.state[0][0].clone()]), Some(landings[k]), "the landing at tick {n}");
+        assert_eq!(
+            quadrant(&[step.state[1][0].clone(), step.state[0][0].clone()]),
+            Some(landings[k]),
+            "the landing at tick {n}"
+        );
         samples.push(sample);
         state = [step.state[0].clone(), step.state[1].clone()];
     }
@@ -1566,8 +1799,13 @@ fn the_field_decodes_the_tone_from_its_released_face() {
         .expect("the frame [7, 2] carries the prefix's cycle");
     let located = PassageChart::located(carrying.location(), &[actual[..prefix].to_vec()]).unwrap();
     let encoding = Encoding::found(&located).unwrap();
-    let letter = Feature::Phase { ring: 0, grain: helix.periods()[0] };
-    let field = field_on(helix.periods()).with_letter_family(FeatureFamily::new(vec![letter]).unwrap()).unwrap();
+    let letter = Feature::Phase {
+        ring: 0,
+        grain: helix.periods()[0],
+    };
+    let field = field_on(helix.periods())
+        .with_letter_family(FeatureFamily::new(vec![letter]).unwrap())
+        .unwrap();
     let operands = section_ring(1);
     let opening = {
         let mut port = holonics::hnn::wave::WavePort::at_rest(operands.clone(), 0).unwrap();
@@ -1610,15 +1848,36 @@ fn the_field_decodes_the_tone_from_its_released_face() {
     let zero = ResonatorRemainders::default();
     for k in 0..length {
         let n = settle + k;
-        let step = context.operands.step(n, &[integer(tone[n]), rat(0, 1)], [&state[0], &state[1]], &zero, None).unwrap();
+        let step = context
+            .operands
+            .step(
+                n,
+                &[integer(tone[n]), rat(0, 1)],
+                [&state[0], &state[1]],
+                &zero,
+                None,
+            )
+            .unwrap();
         let landing = quadrant(&[step.state[1][0].clone(), step.state[0][0].clone()]);
         let (lo, hi) = context
             .operands
-            .drive_interval(n, 0, [&state[0], &state[1]], landing, None, &context.grain, context.range.clone())
+            .drive_interval(
+                n,
+                0,
+                [&state[0], &state[1]],
+                landing,
+                None,
+                &context.grain,
+                context.range.clone(),
+            )
             .unwrap();
         let index = BigInt::from(tone[n]) - &lo;
         let width = (&hi - &lo).bits() as usize;
-        index_bits.extend((0..width).rev().map(|bit| (&index >> bit) % 2 == BigInt::from(1)));
+        index_bits.extend(
+            (0..width)
+                .rev()
+                .map(|bit| (&index >> bit) % 2 == BigInt::from(1)),
+        );
         state = [step.state[0].clone(), step.state[1].clone()];
     }
     let mut stream = Vec::new();
@@ -1647,13 +1906,25 @@ fn settled_near_bits(settle: usize, length: usize) -> (u64, u64) {
     let tone = clean_tone(settle, length);
     let window = LockWindow::new(settle, length).unwrap();
     let operands = section_ring(1);
-    let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), tone.iter().map(|&x| integer(x)).collect()).unwrap();
+    let wave = MatchedWave::new(
+        operands.admittance().clone(),
+        operands.hop().clone(),
+        tone.iter().map(|&x| integer(x)).collect(),
+    )
+    .unwrap();
     let mut port = WavePort::at_rest(operands, 0).unwrap();
     let mut reader = LockReader::new(window);
     reader.observe(port.phase_point()).unwrap();
     for tick in port.receive(&wave).unwrap() {
         let tick = tick.unwrap();
-        reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).unwrap();
+        reader
+            .observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()])
+            .unwrap();
     }
-    reader.finish().unwrap().near_return(&window).unwrap().bits()
+    reader
+        .finish()
+        .unwrap()
+        .near_return(&window)
+        .unwrap()
+        .bits()
 }

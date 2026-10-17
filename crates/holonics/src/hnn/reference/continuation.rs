@@ -1,14 +1,14 @@
 //! Focused consumer of the native comparison/contact return, reusing the existing tick field
 //! and an uncoupled direct sum of its Floquet node material. No authored factor covector enters.
-use crate::hnn::tests::support::encoded;
 use super::*;
-use crate::ratio::rat;
 use crate::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
-use crate::hnn::word::continuation::ContactCut;
-use crate::holon::parametron::Carrier as ParametronCarrier;
-use std::sync::Arc;
 use crate::hnn::tests::learning;
 use crate::hnn::tests::support;
+use crate::hnn::tests::support::encoded;
+use crate::hnn::word::continuation::ContactCut;
+use crate::holon::parametron::Carrier as ParametronCarrier;
+use crate::ratio::rat;
+use std::sync::Arc;
 // Existing tick-law field (support::small_field) and the direct sum of Floquet node materials
 // (tests/floquet.rs::node). Period two is the smallest admitted ring. The contact meets one node;
 // the two uncoupled pumped complex modes remove the cycle fixture's internal mixing.
@@ -19,11 +19,24 @@ fn resonant(field: &Field, theta: Constitution) -> Constitution {
     let width = field.ring(0).width();
     let identity = ExactRatMatrix::identity(width).unwrap();
     let pump = PumpDeclaration::new(
-        rat(1, 16), ParametronCarrier::new(Rat::one(), Rat::zero()).unwrap(), PumpStep::Half,
-    ).unwrap();
-    theta.with_ring_resonator(field, 0, ResonatorMaterial::new(
-        identity.clone(), identity, ExactRatMatrix::zero(width, width).unwrap(), Some(pump),
-    ).unwrap()).unwrap()
+        rat(1, 16),
+        ParametronCarrier::new(Rat::one(), Rat::zero()).unwrap(),
+        PumpStep::Half,
+    )
+    .unwrap();
+    theta
+        .with_ring_resonator(
+            field,
+            0,
+            ResonatorMaterial::new(
+                identity.clone(),
+                identity,
+                ExactRatMatrix::zero(width, width).unwrap(),
+                Some(pump),
+            )
+            .unwrap(),
+        )
+        .unwrap()
 }
 
 // This finite control's channel grain is derived from its actual coarse comparison receipt.
@@ -42,31 +55,44 @@ fn resonant(field: &Field, theta: Constitution) -> Constitution {
 fn resolved(field: &Field) -> Constitution {
     let every = crate::hnn::retention::loci(field).into_iter().collect();
     resonant(field, learning::generic(field, 81))
-        .rebased(Locus::Channel(0), 8, &every).unwrap()
+        .rebased(Locus::Channel(0), 8, &every)
+        .unwrap()
 }
 
 fn contact_comparison(
-    field: &Field, theta: &Constitution, current: &Current,
-    source: &Arc<SourceMoment>, charts: &mut Charts,
+    field: &Field,
+    theta: &Constitution,
+    current: &Current,
+    source: &Arc<SourceMoment>,
+    charts: &mut Charts,
 ) -> (ContactCut, Deposit) {
     let started = std::time::Instant::now();
     let phases = learning::phases(field, theta, current);
     let mut word = Word::open_source(field, theta, current, source.clone(), charts).unwrap();
     word.run(phases.last_epoch() + 1).unwrap();
     eprintln!("unit forward elapsed_ms={}", started.elapsed().as_millis());
-    let targets: Vec<_> = (0..phases.aperture()).map(|i| (i+1)%field.alphabet()).collect();
+    let targets: Vec<_> = (0..phases.aperture())
+        .map(|i| (i + 1) % field.alphabet())
+        .collect();
     let blind = word.contact_faces(0).unwrap();
-    let (ratio, returned) = word.compare_contacts(
-        0, &encoded(&field, &targets), &vec![true; targets.len()],
-    ).unwrap();
+    let (ratio, returned) = word
+        .compare_contacts(0, &encoded(&field, &targets), &vec![true; targets.len()])
+        .unwrap();
     assert_eq!(ratio.faces(), &blind);
     assert_eq!(ratio.stations().len(), targets.len());
     let back = returned.pullback.present().unwrap();
-    assert!(back.transits[0].iter().any(|tick| tick.solved.iter().any(|x| !x.is_zero())));
+    assert!(
+        back.transits[0]
+            .iter()
+            .any(|tick| tick.solved.iter().any(|x| !x.is_zero()))
+    );
     let cut = returned.forward.into_present().unwrap();
     let deposit = returned.deposit.into_present().unwrap();
     assert_eq!(deposit.factors().len(), 3);
-    eprintln!("unit comparison-deposit-binding elapsed_ms={}", started.elapsed().as_millis());
+    eprintln!(
+        "unit comparison-deposit-binding elapsed_ms={}",
+        started.elapsed().as_millis()
+    );
     (cut, deposit)
 }
 
@@ -107,26 +133,52 @@ fn native_storage_continuation(exact: bool) {
             .collect();
         let mut predecessor =
             Word::continuing(&field, before_operands, &change, &nothing, next_tick).unwrap();
-        eprintln!("native storage before deposit elapsed_ms={}", started.elapsed().as_millis());
+        eprintln!(
+            "native storage before deposit elapsed_ms={}",
+            started.elapsed().as_millis()
+        );
         let (successor, returned) = cut
             .continue_deposited(&field, &current, &source, &deposit, &mut charts)
             .unwrap();
-        eprintln!("native storage continued-open elapsed_ms={}", started.elapsed().as_millis());
+        eprintln!(
+            "native storage continued-open elapsed_ms={}",
+            started.elapsed().as_millis()
+        );
         assert_eq!(successor.commit(), theta.commit() + 1);
         let material = returned.deposit.present().unwrap();
-        eprintln!("native material step={} stepped={} vanished={:?} unit={} statistic={} released={:?} carried={:?}",
-            material.family_step(Locus::Channel(0), crate::hnn::constitution::Family::Factor(0)),
-            material.stepped, material.vanished, theta.lattice(Locus::Channel(0)).unwrap().unit(),
-            successor.contact_scales(0)[0], material.released, successor.carried_remainders());
+        eprintln!(
+            "native material step={} stepped={} vanished={:?} unit={} statistic={} released={:?} carried={:?}",
+            material.family_step(
+                Locus::Channel(0),
+                crate::hnn::constitution::Family::Factor(0)
+            ),
+            material.stepped,
+            material.vanished,
+            theta.lattice(Locus::Channel(0)).unwrap().unit(),
+            successor.contact_scales(0)[0],
+            material.released,
+            successor.carried_remainders()
+        );
         assert!(material.stepped > 0);
         let receipt = returned.receipt;
         assert_eq!(receipt.material.len(), 3);
-        let movement = receipt.material.iter().find(|m|
-            m.family == crate::hnn::constitution::Family::Factor(0)).unwrap();
+        let movement = receipt
+            .material
+            .iter()
+            .find(|m| m.family == crate::hnn::constitution::Family::Factor(0))
+            .unwrap();
         assert_eq!(movement.contact, 0);
-        assert_eq!(movement.linear.add(&movement.quadratic).unwrap(), movement.form);
-        assert_eq!(movement.factor, successor.contact_storage(0)
-            .subtract(theta.contact_storage(0)).unwrap());
+        assert_eq!(
+            movement.linear.add(&movement.quadratic).unwrap(),
+            movement.form
+        );
+        assert_eq!(
+            movement.factor,
+            successor
+                .contact_storage(0)
+                .subtract(theta.contact_storage(0))
+                .unwrap()
+        );
         assert_eq!(
             &receipt.committed - &receipt.before,
             receipt.deposition_work
@@ -152,7 +204,10 @@ fn native_storage_continuation(exact: bool) {
             assert!(displacement.iter().all(Rat::is_zero));
             assert_eq!(held[0], state[0]);
             let rate = crate::ratio::linear::vector::add(&held[1], rate);
-            assert_eq!(moved.apply(&rate).unwrap(), storage.apply(&state[1]).unwrap());
+            assert_eq!(
+                moved.apply(&rate).unwrap(),
+                storage.apply(&state[1]).unwrap()
+            );
             if exact {
                 assert_ne!(held[1], state[1], "the deposit moved the contact's mass");
             }
@@ -162,7 +217,10 @@ fn native_storage_continuation(exact: bool) {
         for (ring, state) in change.resonators.iter().enumerate() {
             if ring == 0 {
                 assert!(state.is_some());
-                assert_eq!(&next.resonances()[ring].as_ref().unwrap().state, state.as_ref().unwrap());
+                assert_eq!(
+                    &next.resonances()[ring].as_ref().unwrap().state,
+                    state.as_ref().unwrap()
+                );
             } else {
                 assert!(state.is_none());
                 assert!(next.resonances()[ring].is_none());
@@ -170,7 +228,10 @@ fn native_storage_continuation(exact: bool) {
         }
         next.run(1).unwrap();
         predecessor.run(1).unwrap();
-        eprintln!("native storage next tick elapsed_ms={}", started.elapsed().as_millis());
+        eprintln!(
+            "native storage next tick elapsed_ms={}",
+            started.elapsed().as_millis()
+        );
         assert_eq!(next.recorded()[0].states, opened.states);
         assert_eq!(next.recorded()[0].arrivals, change.arrivals);
         assert!(next.field_balances()[0].closes());
@@ -181,22 +242,39 @@ fn native_storage_continuation(exact: bool) {
                 .all(|r| r.steps[0].closes())
         );
         if exact {
-            assert_ne!(next.change().unwrap().states[0], predecessor.change().unwrap().states[0]);
+            assert_ne!(
+                next.change().unwrap().states[0],
+                predecessor.change().unwrap().states[0]
+            );
         } else {
             // The material changes, but its next contact point has the same representative at
             // this declared word/chart grain. Read the chart and split terms and released
             // remainders explicitly; do not assert a resolved coordinate response here.
-            assert_eq!(next.change().unwrap().states[0], predecessor.change().unwrap().states[0]);
-            eprintln!("native unresolved next response transient_unit={} successor_transit_chart={} predecessor_transit_chart={} successor_transit_split={} predecessor_transit_split={} successor_remainders={:?} predecessor_remainders={:?}",
+            assert_eq!(
+                next.change().unwrap().states[0],
+                predecessor.change().unwrap().states[0]
+            );
+            eprintln!(
+                "native unresolved next response transient_unit={} successor_transit_chart={} predecessor_transit_chart={} successor_transit_split={} predecessor_transit_split={} successor_remainders={:?} predecessor_remainders={:?}",
                 field.word_lattice().unwrap().transient().unit(),
-                next.field_balances()[0].transit_chart, predecessor.field_balances()[0].transit_chart,
-                next.field_balances()[0].transit_split, predecessor.field_balances()[0].transit_split,
-                next.released().unwrap().remainders, predecessor.released().unwrap().remainders);
+                next.field_balances()[0].transit_chart,
+                predecessor.field_balances()[0].transit_chart,
+                next.field_balances()[0].transit_split,
+                predecessor.field_balances()[0].transit_split,
+                next.released().unwrap().remainders,
+                predecessor.released().unwrap().remainders
+            );
         }
-        eprintln!("native returned work={} opening_difference={} next_tick={} reached={:?} next={:?} predecessor_next={:?} field_balance_closes={}",
-            receipt.deposition_work, receipt.opening_difference, next_tick,
-            change.states[0], next.change().unwrap().states[0],
-            predecessor.change().unwrap().states[0], next.field_balances()[0].closes());
+        eprintln!(
+            "native returned work={} opening_difference={} next_tick={} reached={:?} next={:?} predecessor_next={:?} field_balance_closes={}",
+            receipt.deposition_work,
+            receipt.opening_difference,
+            next_tick,
+            change.states[0],
+            next.change().unwrap().states[0],
+            predecessor.change().unwrap().states[0],
+            next.field_balances()[0].closes()
+        );
         if !exact {
             assert!(next.operands().contacts()[0].chart().is_some());
         }
@@ -229,7 +307,10 @@ fn native_contact_return_refuses_another_source_and_stale_deposit_without_cache_
     let before = charts.clone();
     assert!(matches!(
         cut.continue_deposited(&field, &current, &source, &stale, &mut charts),
-        Err(HnnError::Shape { what: "the deposited contact covector is this cut's actual comparison return", .. })
+        Err(HnnError::Shape {
+            what: "the deposited contact covector is this cut's actual comparison return",
+            ..
+        })
     ));
     assert_eq!(charts, before);
 }
@@ -260,7 +341,11 @@ fn storage_response(exact: bool, ticks: usize) {
     let started = std::time::Instant::now();
     let two = Rat::from_integer(2.into());
     let scale = |c: &Rat, v: &[Rat]| v.iter().map(|x| c * x).collect::<Vec<_>>();
-    let field = if exact { boundary().with_exact_word() } else { boundary() };
+    let field = if exact {
+        boundary().with_exact_word()
+    } else {
+        boundary()
+    };
     let theta = resolved(&field);
     let (current, source) = learning::moment(&field, 82, 9);
     let source = Arc::new(source);
@@ -273,14 +358,21 @@ fn storage_response(exact: bool, ticks: usize) {
     } else {
         Operands::at_cut_charted(&field, &theta, &current, &mut charts).unwrap()
     };
-    let nothing: Vec<_> = change.storage.iter().map(|s| vec![Rat::zero(); s.len()]).collect();
+    let nothing: Vec<_> = change
+        .storage
+        .iter()
+        .map(|s| vec![Rat::zero(); s.len()])
+        .collect();
     let mut predecessor =
         Word::continuing(&field, before_operands, &change, &nothing, next_tick).unwrap();
     let (_, returned) = cut
         .continue_deposited(&field, &current, &source, &deposit, &mut charts)
         .unwrap();
     let mut successor = returned.forward.into_present().unwrap();
-    let (before, after) = (&predecessor.operands().contacts()[0], &successor.operands().contacts()[0]);
+    let (before, after) = (
+        &predecessor.operands().contacts()[0],
+        &successor.operands().contacts()[0],
+    );
     let h = predecessor.operands().step().clone();
     assert_eq!(&h, successor.operands().step());
     let g = before.conductance().clone();
@@ -291,30 +383,57 @@ fn storage_response(exact: bool, ticks: usize) {
     let delta_d = after.forms().2.subtract(before.forms().2).unwrap();
     let operator = after.operator().clone();
     let inverse = operator.inverse().unwrap();
-    let unit = if exact { Rat::zero() } else { field.word_lattice().unwrap().transient().unit() };
-    eprintln!("storage response exact={exact} h={h} G={g} G/h={} unit={unit} dC={:?} dK={:?} dD={:?} m'={:?}",
-        &g / &h, delta.to_rows(), delta_k.to_rows(), delta_d.to_rows(), operator.to_rows());
+    let unit = if exact {
+        Rat::zero()
+    } else {
+        field.word_lattice().unwrap().transient().unit()
+    };
+    eprintln!(
+        "storage response exact={exact} h={h} G={g} G/h={} unit={unit} dC={:?} dK={:?} dD={:?} m'={:?}",
+        &g / &h,
+        delta.to_rows(),
+        delta_k.to_rows(),
+        delta_d.to_rows(),
+        operator.to_rows()
+    );
     // The stiffness and dissipation terms of one tick's response at its midpoint rate `ω` and
     // midpoint displacement `u + ½hω`: `hΔD ω + hΔK(u + ½hω)`.
     let joined = |omega: &[Rat], displacement: &[Rat]| {
         let midpoint = add(displacement, &scale(&(&h / &two), omega));
-        add(&scale(&h, &delta_d.apply(omega).unwrap()), &scale(&h, &delta_k.apply(&midpoint).unwrap()))
+        add(
+            &scale(&h, &delta_d.apply(omega).unwrap()),
+            &scale(&h, &delta_k.apply(&midpoint).unwrap()),
+        )
     };
     assert_eq!(predecessor.solve_remainders(), successor.solve_remainders());
     // The opening holds the momentum: `C′(ŵ′ + ρ′) = C w`, and the jump `δ = ŵ′ + ρ′ − w`.
     let rate0 = predecessor.change().unwrap().states[0][1].clone();
     let opened = successor.change().unwrap().states[0][1].clone();
     let opening_remainder = successor.state_remainders()[0][1].clone();
-    assert!(predecessor.state_remainders()[0][1].iter().all(Rat::is_zero));
+    assert!(
+        predecessor.state_remainders()[0][1]
+            .iter()
+            .all(Rat::is_zero)
+    );
     let held = add(&opened, &opening_remainder);
-    assert_eq!(after.forms().0.apply(&held).unwrap(), storage.apply(&rate0).unwrap());
+    assert_eq!(
+        after.forms().0.apply(&held).unwrap(),
+        storage.apply(&rate0).unwrap()
+    );
     let jump = sub(&held, &rate0);
-    assert!(jump.iter().any(|x| !x.is_zero()), "the deposit moved the contact's mass");
-    eprintln!("storage opening exact={exact} w={rate0:?} jump={jump:?} representative_moved={} remainder={opening_remainder:?}",
-        opened != rate0);
+    assert!(
+        jump.iter().any(|x| !x.is_zero()),
+        "the deposit moved the contact's mass"
+    );
+    eprintln!(
+        "storage opening exact={exact} w={rate0:?} jump={jump:?} representative_moved={} remainder={opening_remainder:?}",
+        opened != rate0
+    );
     let (mut accumulated, mut material, mut rate_images, mut parted) = (
-        vec![Rat::zero(); rate0.len()], vec![Rat::zero(); rate0.len()],
-        vec![Rat::zero(); rate0.len()], None,
+        vec![Rat::zero(); rate0.len()],
+        vec![Rat::zero(); rate0.len()],
+        vec![Rat::zero(); rate0.len()],
+        None,
     );
     for tick in 0..ticks {
         let (pc, sc) = (predecessor.change().unwrap(), successor.change().unwrap());
@@ -327,7 +446,10 @@ fn storage_response(exact: bool, ticks: usize) {
         let r_after = successor.solve_remainders()[0].clone();
         predecessor.run(1).unwrap();
         successor.run(1).unwrap();
-        let (p, s) = (predecessor.recorded().last().unwrap(), successor.recorded().last().unwrap());
+        let (p, s) = (
+            predecessor.recorded().last().unwrap(),
+            successor.recorded().last().unwrap(),
+        );
         let rate = &p.states[0][1];
         // ζ = ζ̂ + r_(t+1) − r_t, ζ̂ = (2h/G) ω.
         let image = |omega: &[Rat], r0: &[Rat], r1: &[Rat]| {
@@ -348,8 +470,11 @@ fn storage_response(exact: bool, ticks: usize) {
                 scale(&-Rat::one(), &add(&delta.apply(&motion).unwrap(), &terms)),
                 "m'(ζ' − ζ) = −ΔC(w + w⁺) − hΔD ω − hΔK(u + ½hω) under the exact solve at held momentum"
             );
-            eprintln!("storage tick={} w={rate:?} w'={:?} difference={difference:?} motion={motion:?} joined={terms:?}",
-                tick + 1, s.states[0][1]);
+            eprintln!(
+                "storage tick={} w={rate:?} w'={:?} difference={difference:?} motion={motion:?} joined={terms:?}",
+                tick + 1,
+                s.states[0][1]
+            );
             continue;
         }
         // On the lattice the solve reads the representatives alone: the 2026-10-02 response, joined
@@ -361,26 +486,49 @@ fn storage_response(exact: bool, ticks: usize) {
         let (pc, sc) = (predecessor.change().unwrap(), successor.change().unwrap());
         let equal = pc == sc;
         if equal {
-            let remainders =
-                sub(&successor.solve_remainders()[0], &predecessor.solve_remainders()[0]);
-            assert_eq!(remainders, accumulated, "equal representatives carry the image difference");
-            let rates = sub(&successor.state_remainders()[0][1], &predecessor.state_remainders()[0][1]);
-            assert_eq!(rates, add(&opening_remainder, &rate_images),
-                "the rate remainders carry the opening's held momentum and the rate images");
+            let remainders = sub(
+                &successor.solve_remainders()[0],
+                &predecessor.solve_remainders()[0],
+            );
+            assert_eq!(
+                remainders, accumulated,
+                "equal representatives carry the image difference"
+            );
+            let rates = sub(
+                &successor.state_remainders()[0][1],
+                &predecessor.state_remainders()[0][1],
+            );
+            assert_eq!(
+                rates,
+                add(&opening_remainder, &rate_images),
+                "the rate remainders carry the opening's held momentum and the rate images"
+            );
         }
         if tick < 4 || (tick + 1).is_power_of_two() || !equal {
-            eprintln!("storage tick={} w={:?} accumulated={:?} material={:?} chart={:?} equal={} elapsed_ms={}",
-                tick + 1, rate, accumulated, material, sub(&accumulated, &material), equal,
-                started.elapsed().as_millis());
+            eprintln!(
+                "storage tick={} w={:?} accumulated={:?} material={:?} chart={:?} equal={} elapsed_ms={}",
+                tick + 1,
+                rate,
+                accumulated,
+                material,
+                sub(&accumulated, &material),
+                equal,
+                started.elapsed().as_millis()
+            );
         }
         if !equal {
             parted = Some(tick + 1);
             break;
         }
     }
-    eprintln!("storage response exact={exact} parted={parted:?} rate_excursion={:?} travel={:?}",
+    eprintln!(
+        "storage response exact={exact} parted={parted:?} rate_excursion={:?} travel={:?}",
         sub(&rate0, &predecessor.change().unwrap().states[0][1]),
-        sub(&predecessor.change().unwrap().states[0][0], &change.states[0][0]));
+        sub(
+            &predecessor.change().unwrap().states[0][0],
+            &change.states[0][0]
+        )
+    );
 }
 
 // [proved-derived] At an opening receiving map `R = 0` (`Constitution::initial`) the face is the
@@ -403,24 +551,40 @@ fn a_zero_receiving_map_returns_no_covector_to_the_contact() {
     let phases = learning::phases(&field, &theta, &current);
     let mut word = Word::open_source(&field, &theta, &current, source, &mut charts).unwrap();
     word.run(phases.last_epoch() + 1).unwrap();
-    let targets: Vec<_> = (0..phases.aperture()).map(|i| (i + 1) % field.alphabet()).collect();
-    let (_, returned) = word.compare_contacts(
-        0, &encoded(&field, &targets), &vec![true; targets.len()],
-    ).unwrap();
+    let targets: Vec<_> = (0..phases.aperture())
+        .map(|i| (i + 1) % field.alphabet())
+        .collect();
+    let (_, returned) = word
+        .compare_contacts(0, &encoded(&field, &targets), &vec![true; targets.len()])
+        .unwrap();
     let back = returned.pullback.present().unwrap();
     // The face's covector and the feature it pairs with are present: `R`'s step has its samples.
-    assert!(back.reads.iter().any(|(f, _)| f.iter().any(|x| !x.is_zero())));
-    assert!(back.reads.iter().any(|(_, g)| g.iter().any(|x| !x.is_zero())));
+    assert!(
+        back.reads
+            .iter()
+            .any(|(f, _)| f.iter().any(|x| !x.is_zero()))
+    );
+    assert!(
+        back.reads
+            .iter()
+            .any(|(_, g)| g.iter().any(|x| !x.is_zero()))
+    );
     // Nothing enters the passage: every adjoint solve and every opening covector is zero.
-    assert!(back.transits.iter().flatten().all(|tick| tick.solved.iter().all(Rat::is_zero)));
+    assert!(
+        back.transits
+            .iter()
+            .flatten()
+            .all(|tick| tick.solved.iter().all(Rat::is_zero))
+    );
     assert!(back.opening.iter().flatten().all(Rat::is_zero));
     // So the contact storage's pull is zero.
     let deposit = returned.deposit.present().unwrap();
     assert_eq!(deposit.factors().len(), 3);
     for step in deposit.factors() {
         let (FactorGradient::Storage { gradient, .. }
-            | FactorGradient::Stiffness { gradient, .. }
-            | FactorGradient::Dissipation { gradient, .. }) = &step.gradient else {
+        | FactorGradient::Stiffness { gradient, .. }
+        | FactorGradient::Dissipation { gradient, .. }) = &step.gradient
+        else {
             panic!("the contact return composes C/K/D alone");
         };
         assert!(gradient.entries().iter().all(Rat::is_zero));
@@ -432,19 +596,31 @@ fn a_zero_receiving_map_returns_no_covector_to_the_contact() {
 #[test]
 fn reached_contact_storage_reacts_together_and_reenters_on_actual_support() {
     let field = support::small_field(
-        &[2, 2, 2], vec![support::contact(0, 1, 1, 0), support::contact(1, 2, 1, 0)], 2,
-    ).with_exact_word();
+        &[2, 2, 2],
+        vec![support::contact(0, 1, 1, 0), support::contact(1, 2, 1, 0)],
+        2,
+    )
+    .with_exact_word();
     let theta = resolved(&field);
     let (current, source) = learning::moment(&field, 82, 9);
     let source = Arc::new(source);
     let mut charts = Charts::new();
     let phases = learning::phases(&field, &theta, &current);
-    let mut word = Word::open_source(&field, &theta, &current, source.clone(), &mut charts).unwrap();
+    let mut word =
+        Word::open_source(&field, &theta, &current, source.clone(), &mut charts).unwrap();
     word.run(phases.junction_steps()).unwrap();
     let blind = word.contact_faces(0).unwrap();
-    eprintln!("native coupled blind current_lift={:?} periods={:?} hop_clock={:?} change={:?} faces={blind:?}",
-        current.lift(), field.rings().iter().map(|ring| ring.period()).collect::<Vec<_>>(),
-        word.clock(), word.change().unwrap());
+    eprintln!(
+        "native coupled blind current_lift={:?} periods={:?} hop_clock={:?} change={:?} faces={blind:?}",
+        current.lift(),
+        field
+            .rings()
+            .iter()
+            .map(|ring| ring.period())
+            .collect::<Vec<_>>(),
+        word.clock(),
+        word.change().unwrap()
+    );
     let targets = encoded(&field, &[1]);
     let (ratio, returned) = word.compare_contacts(0, &targets, &[true]).unwrap();
     assert_eq!(ratio.faces(), &blind);
@@ -454,9 +630,9 @@ fn reached_contact_storage_reacts_together_and_reenters_on_actual_support() {
     let cut = returned.forward.into_present().unwrap();
     let reached = cut.change().clone();
     let tick = cut.next_tick();
-    let (successor, returned) = cut.continue_deposited(
-        &field, &current, &source, &deposit, &mut charts,
-    ).unwrap();
+    let (successor, returned) = cut
+        .continue_deposited(&field, &current, &source, &deposit, &mut charts)
+        .unwrap();
     assert_eq!(returned.receipt.material.len(), 6);
     let reading = returned.deposit.present().unwrap();
     assert!(reading.stepped > 0);
@@ -497,24 +673,44 @@ fn reached_contact_storage_reacts_together_and_reenters_on_actual_support() {
     assert_eq!(next.opened_at(), tick);
     for contact in 0..2 {
         let before_factor = theta.contact_storage(contact);
-        let before = before_factor.multiply(&before_factor.transpose().unwrap()).unwrap();
+        let before = before_factor
+            .multiply(&before_factor.transpose().unwrap())
+            .unwrap();
         let after = next.operands().contacts()[contact].forms().0;
-        assert_eq!(after.apply(&opened.states[contact][1]).unwrap(),
-            before.apply(&reached.states[contact][1]).unwrap());
+        assert_eq!(
+            after.apply(&opened.states[contact][1]).unwrap(),
+            before.apply(&reached.states[contact][1]).unwrap()
+        );
         assert_eq!(opened.states[contact][0], reached.states[contact][0]);
-        let movement = returned.receipt.material.iter().find(|m|
-            m.contact == contact && m.family == crate::hnn::constitution::Family::Factor(0)).unwrap();
+        let movement = returned
+            .receipt
+            .material
+            .iter()
+            .find(|m| {
+                m.contact == contact && m.family == crate::hnn::constitution::Family::Factor(0)
+            })
+            .unwrap();
         assert_eq!(movement.form, after.subtract(&before).unwrap());
-        assert_eq!(movement.linear.add(&movement.quadratic).unwrap(), movement.form);
+        assert_eq!(
+            movement.linear.add(&movement.quadratic).unwrap(),
+            movement.form
+        );
     }
     let support = opened.support(&field);
-    assert!(support.contains(&2), "actual reached motion opens at the receiving ring");
+    assert!(
+        support.contains(&2),
+        "actual reached motion opens at the receiving ring"
+    );
     let phases = learning::phases(&field, &successor, &current);
     next.run(phases.junction_steps()).unwrap();
     assert!(next.field_balances().iter().all(|balance| balance.closes()));
     let reentry = next.contact_faces(0).unwrap();
-    eprintln!("native coupled blind={blind:?} applied={:?} work={} held_growth={:?} reentry={reentry:?} opened_at={tick}",
-        returned.receipt.material, returned.receipt.deposition_work, returned.receipt.held_momentum_growth);
+    eprintln!(
+        "native coupled blind={blind:?} applied={:?} work={} held_growth={:?} reentry={reentry:?} opened_at={tick}",
+        returned.receipt.material,
+        returned.receipt.deposition_work,
+        returned.receipt.held_momentum_growth
+    );
     let (_, returned) = next.compare_contacts(0, &targets, &[true]).unwrap();
     let back = returned.pullback.present().unwrap();
     let cut = returned.forward.present().unwrap();
@@ -525,15 +721,27 @@ fn reached_contact_storage_reacts_together_and_reenters_on_actual_support() {
     assert_eq!(rest.reach(2), Some(2));
     // The carried early slip contributes to the statistic; a source-only diamond omits it.
     let energy = |diamond: &crate::hnn::retention::Diamond| -> Rat {
-        back.transits[1].iter().filter(|t| diamond.channel_window(&field, 1, t.tick))
-            .map(|t| t.rate.iter().zip(&t.midpoint).map(|(w, omega)| {
-                let slip = w - omega;
-                &slip * &slip
-            }).sum::<Rat>()).sum()
+        back.transits[1]
+            .iter()
+            .filter(|t| diamond.channel_window(&field, 1, t.tick))
+            .map(|t| {
+                t.rate
+                    .iter()
+                    .zip(&t.midpoint)
+                    .map(|(w, omega)| {
+                        let slip = w - omega;
+                        &slip * &slip
+                    })
+                    .sum::<Rat>()
+            })
+            .sum()
     };
     let deposit = returned.deposit.present().unwrap();
-    let storage = deposit.factors().iter().find(|step|
-        matches!(step.gradient, FactorGradient::Storage { contact: 1, .. })).unwrap();
+    let storage = deposit
+        .factors()
+        .iter()
+        .find(|step| matches!(step.gradient, FactorGradient::Storage { contact: 1, .. }))
+        .unwrap();
     assert_eq!(storage.energy, energy(&opened));
     assert!(energy(&opened) > energy(&rest));
 }
@@ -546,21 +754,32 @@ fn an_uncompared_contact_read_changes_no_material_statistic() {
     let source = Arc::new(source);
     let mut charts = Charts::new();
     let phases = learning::phases(&field, &theta, &current);
-    let mut word = Word::open_source(&field, &theta, &current, source.clone(), &mut charts).unwrap();
+    let mut word =
+        Word::open_source(&field, &theta, &current, source.clone(), &mut charts).unwrap();
     word.run(phases.junction_steps()).unwrap();
     let blind = word.contact_faces(0).unwrap();
-    let (ratio, returned) = word.compare_contacts(0, &encoded(&field, &[1]), &[false]).unwrap();
+    let (ratio, returned) = word
+        .compare_contacts(0, &encoded(&field, &[1]), &[false])
+        .unwrap();
     assert_eq!(ratio.faces(), &blind);
     assert!(ratio.stations().is_empty());
-    assert!(returned.pullback.present().unwrap().transits.iter().flatten()
-        .all(|tick| tick.solved.iter().all(Rat::is_zero)));
+    assert!(
+        returned
+            .pullback
+            .present()
+            .unwrap()
+            .transits
+            .iter()
+            .flatten()
+            .all(|tick| tick.solved.iter().all(Rat::is_zero))
+    );
     let deposit = returned.deposit.into_present().unwrap();
     assert!(deposit.factors().is_empty());
     assert!(deposit.reach().unwrap().stations.is_empty());
     let cut = returned.forward.into_present().unwrap();
-    let (successor, returned) = cut.continue_deposited(
-        &field, &current, &source, &deposit, &mut charts,
-    ).unwrap();
+    let (successor, returned) = cut
+        .continue_deposited(&field, &current, &source, &deposit, &mut charts)
+        .unwrap();
     assert_eq!(successor.contact_storage(0), theta.contact_storage(0));
     assert_eq!(successor.contact_scales(0), theta.contact_scales(0));
     assert_eq!(returned.deposit.present().unwrap().stepped, 0);
@@ -580,13 +799,24 @@ fn contact_constraint_partition_keeps_blind_free_faces() {
     let mut word = Word::open_source(&field, &theta, &current, source, &mut charts).unwrap();
     word.run(phases.junction_steps()).unwrap();
     let blind = word.contact_faces(0).unwrap();
-    let (ratio, returned) = word.compare_contacts(
-        0, &encoded(&field, &[1, 2]), &[true, false],
-    ).unwrap();
+    let (ratio, returned) = word
+        .compare_contacts(0, &encoded(&field, &[1, 2]), &[true, false])
+        .unwrap();
     assert_eq!(ratio.faces(), &blind);
     assert_eq!(ratio.stations(), &[0]);
-    assert_eq!(ratio.covector().unwrap().logits()[1], vec![Rat::zero(); 2 * field.alphabet()]);
-    assert_eq!(returned.deposit.present().unwrap().reach().unwrap().stations,
-        vec![phases.first_epoch() as u64]);
+    assert_eq!(
+        ratio.covector().unwrap().logits()[1],
+        vec![Rat::zero(); 2 * field.alphabet()]
+    );
+    assert_eq!(
+        returned
+            .deposit
+            .present()
+            .unwrap()
+            .reach()
+            .unwrap()
+            .stations,
+        vec![phases.first_epoch() as u64]
+    );
     assert_eq!(ratio.faces().faces.len(), 2);
 }

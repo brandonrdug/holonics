@@ -23,18 +23,18 @@
 use std::ops::Range;
 
 use holonics::compression::landmark::context::Letter;
+use holonics::hnn::Encoded;
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
 use holonics::hnn::reference::ExposedResident;
-use holonics::hnn::Encoded;
 use holonics::hnn::reference::{Cut, Reception, Reference};
-use holonics::holarchy::terrain::KnownTruth;
 use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
 use holonics::hnn::{
     Absorption, Constitution, ConstitutionRead, Current, Field, FieldDeclaration, HnnError,
     PairPort, ReceivingPhases, ReceptionCarry, RingDeclaration, SourceMoment, Word,
 };
+use holonics::holarchy::terrain::KnownTruth;
 use holonics::holon::parametron::Carrier;
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
@@ -119,6 +119,47 @@ fn chain() -> Field {
     Field::declare(chain_declaration(probe.capacity().n_star())).unwrap()
 }
 
+/// The tiny native finite-comparison fixture: two source/receiver stations and a one-class
+/// aperture, with no pre-existing receiving material so the paired layout can be bound lawfully.
+fn paired_candidate_field() -> Field {
+    let mut declaration = FieldDeclaration::campaign_one(1024);
+    declaration.rings.truncate(2);
+    for (ring, period) in declaration.rings.iter_mut().zip([2u64, 3]) {
+        ring.period = period;
+        ring.placements = (0..period)
+            .map(|node| FieldDeclaration::quarter_turn(node, period))
+            .collect();
+        ring.reflector = (0..period)
+            .map(|node| ((period - node) % period) as usize)
+            .collect();
+    }
+    declaration.contacts.truncate(1);
+    declaration.contacts[0].channel = vec![(0, 0), (1, 1)];
+    declaration.loops.clear();
+    declaration.alphabet = 2;
+    declaration.receivers[0].ring = 1;
+    declaration.receivers[0].depth = 2;
+    declaration.receivers[0].aperture = 1;
+    declaration.crib.window = 2;
+    declaration.lattice.clear();
+    Field::declare(declaration.by_lattice_rule()).unwrap()
+}
+
+/// Same field law and word precision as `chain`, with an explicitly finer declared receiving
+/// material lattice so test maps containing tiny exact coefficients remain admissible.
+fn return_precision_chain() -> Field {
+    let mut probe_declaration = chain_declaration(1 << 20);
+    probe_declaration
+        .lattice
+        .insert(holonics::hnn::Locus::ReceivingMap(2), 48);
+    let probe = Field::declare(probe_declaration).unwrap();
+    let mut declaration = chain_declaration(probe.capacity().n_star());
+    declaration
+        .lattice
+        .insert(holonics::hnn::Locus::ReceivingMap(2), 48);
+    Field::declare(declaration).unwrap()
+}
+
 /// The small chain control with a loaded source ring whose returned wave has a non-unit dyadic
 /// coefficient, and a non-unit hop. It forces the integrated path to carry both splits.
 fn loaded_y4_h2_field() -> Field {
@@ -184,7 +225,41 @@ fn generic(field: &Field, seed: u64) -> Constitution {
                         cell => Letter::Cell(cell - 1),
                     })
                     .collect();
-                tree.receive(&address, draw.below(a)).unwrap();
+                if let Some(partition) = field.receiving_context(g) {
+                    use holonics::compression::landmark::context::{
+                        ObservationPath, ObservedAddress,
+                    };
+                    use holonics::hnn::receiving::{
+                        ObservationPartition, ReceivingRead, section_bits,
+                    };
+                    // This generic fixture draws a receiving carrier, then reads its declared
+                    // partition before drawing the target. It is a tree preconditioning fixture,
+                    // not a claim that these samples were produced by an executed source word.
+                    let anchor = half_vector(&mut draw, n);
+                    let observation = match partition {
+                        ObservationPartition::ReceivingSection => partition
+                            .path(section_bits(field, g, &anchor).unwrap())
+                            .unwrap(),
+                        ObservationPartition::MaximumRealGrainSet => {
+                            let grain = tree.declaration().grain;
+                            let logits = theta.receiving_map(g).unwrap().apply(&anchor).unwrap();
+                            let read = ReceivingRead::of_logits(logits, grain);
+                            let face = holonics::hnn::ratio::Face::of_read(&read, grain).unwrap();
+                            ObservationPath::from_maximum_mass_classes(
+                                a,
+                                &face.maximal_mass_classes(),
+                            )
+                            .unwrap()
+                        }
+                    };
+                    tree.receive_observed(
+                        &ObservedAddress::new(observation, address),
+                        draw.below(a),
+                    )
+                    .unwrap();
+                } else {
+                    tree.receive(&address, draw.below(a)).unwrap();
+                }
             }
             theta = theta.with_tree(g, tree).unwrap();
         }
@@ -225,6 +300,49 @@ fn source(field: &Field, length: usize, seed: u64) -> Encoded {
 fn word(field: &Field, length: usize, seed: u64) -> Encoded {
     let truth = KnownTruth::uniform(field.alphabet(), seed, 1, length).unwrap();
     Encoded::identity(&truth, field).unwrap().remove(0)
+}
+
+/// Catch observed-fixture admission failures without requiring a CUDA device. The native
+/// refine/compare below must still supply its own executed observation to the staged deposit.
+#[test]
+fn the_generic_fixture_preserves_each_declared_observation_partition() {
+    use holonics::hnn::receiving::ObservationPartition;
+    for partition in [
+        ObservationPartition::MaximumRealGrainSet,
+        ObservationPartition::ReceivingSection,
+    ] {
+        let field = chain().with_receiving_context(2, partition).unwrap();
+        let initial = generic(&field, 0xC017_1);
+        let tree = initial.landmarks(2).unwrap();
+        assert_eq!(tree.observation_role(), partition.role());
+        assert_eq!(tree.observation_width(), partition.outcome_bits(&field, 2));
+        let host = Reference::campaign_one();
+        let mut resident = host
+            .mount_with(&field, &Current::at_rest(&field), initial)
+            .unwrap();
+        let (moment, _) = host
+            .ingest(&mut resident, None, &word(&field, 3, 0xC017_2))
+            .unwrap();
+        let phases = resident.admitted()[0].clone();
+        let (pending, _) = host.refine(&mut resident, &moment, &phases).unwrap();
+        let (_, compared) = host
+            .compare(
+                &mut resident,
+                pending,
+                &word(&field, phases.aperture(), 0xC017_4),
+            )
+            .unwrap();
+        let deposit = compared.deposit.present().unwrap();
+        assert_eq!(deposit.landmark_partition(), Some(partition));
+        assert!(
+            deposit
+                .observed_landmarks()
+                .unwrap()
+                .unwrap()
+                .iter()
+                .all(|address| address.observation().len() == partition.outcome_bits(&field, 2))
+        );
+    }
 }
 
 fn releasing() -> DecisionRule {
@@ -932,10 +1050,8 @@ fn the_card_saturating_ring_matches_the_reference_with_carry() {
         let phases = both.h.admitted()[0].clone();
         same(
             "ingest the source",
-            both.host
-                .ingest(&mut both.h, Some(&both.moment), span),
-            both.device
-                .ingest(&mut both.d, Some(&both.moment), span),
+            both.host.ingest(&mut both.h, Some(&both.moment), span),
+            both.device.ingest(&mut both.d, Some(&both.moment), span),
         )
         .unwrap();
         let (pending, refined) = same(
@@ -994,7 +1110,10 @@ fn the_card_saturating_ring_matches_the_reference_with_carry() {
     }));
     let mut integration_seen = false;
     for window in 0..3 {
-        integration_seen |= reception(&mut both, &cut.cells.part(2 * window..2 * window + 2).unwrap());
+        integration_seen |= reception(
+            &mut both,
+            &cut.cells.part(2 * window..2 * window + 2).unwrap(),
+        );
     }
 
     let saved = carry_text(both.h.carried()).expect("the comparison writes the carry");
@@ -1053,7 +1172,10 @@ fn the_card_saturating_ring_matches_the_reference_with_carry() {
         moment,
     };
     for window in 3..5 {
-        integration_seen |= reception(&mut both, &cut.cells.part(2 * window..2 * window + 2).unwrap());
+        integration_seen |= reception(
+            &mut both,
+            &cut.cells.part(2 * window..2 * window + 2).unwrap(),
+        );
     }
     assert!(
         integration_seen,
@@ -1324,10 +1446,139 @@ fn the_card_port_returns_the_reference_on_campaign_one() {
     let n_star = probe.capacity().n_star() as usize;
     let field = Field::declare(FieldDeclaration::campaign_one(n_star as u64)).unwrap();
     let cells = word(&field, n_star, 7);
-    let compared = lockstep(&field, &cut_of(cells, n_star - n_star / 5..n_star), 8, None, 4);
+    let compared = lockstep(
+        &field,
+        &cut_of(cells, n_star - n_star / 5..n_star),
+        8,
+        None,
+        4,
+    );
     println!("campaign 1, drawn classes: {compared:?}");
     assert_eq!(compared.compares, 8);
     assert_eq!(compared.landmarks, 16);
+}
+
+/// The reverse chart is chosen from the actual `R^T g` seed but does not change the already-run
+/// word. Compare the complete host and card returns on deliberately tiny and mixed row scales;
+/// this exercises the fixed-Lw card kernel with a reverse-only normalized source.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_reverse_seed_rechart_matches_host_for_tiny_and_mixed_scales() {
+    let field = return_precision_chain();
+    let card = card();
+    let original = generic(&field, 0x51a7);
+    let receiving_rows = original.receiving_map(2).unwrap().to_rows();
+    for (scenario, row_exponents) in [
+        ("tiny", vec![42; receiving_rows.len()]),
+        (
+            "mixed",
+            (0..receiving_rows.len())
+                .map(|row| [18, 27, 35, 43][row % 4])
+                .collect(),
+        ),
+    ] {
+        let scaled = receiving_rows
+            .iter()
+            .zip(row_exponents)
+            .map(|(row, exponent)| {
+                let factor = rat(1, 1i64 << exponent);
+                row.iter().map(|value| value * &factor).collect()
+            })
+            .collect();
+        let receiving =
+            ExactRatMatrix::shaped(2 * field.alphabet(), field.ring(2).width(), scaled).unwrap();
+        let theta = original
+            .clone()
+            .with_ports(2, None, None, Some(receiving))
+            .unwrap();
+        let target = word(&field, 2, if scenario == "tiny" { 37 } else { 41 });
+        let mut pair = pair(&card, &field, Some(theta));
+        feed(&mut pair, &target);
+        let phases = pair.h.admitted()[0].clone();
+        let (pending, _) = same(
+            "refine before return rechart",
+            pair.host.refine(&mut pair.h, &pair.moment, &phases),
+            pair.device.refine(&mut pair.d, &pair.moment, &phases),
+        )
+        .unwrap();
+        let (staged, compared) = same(
+            "tiny/mixed reverse return",
+            pair.host.compare(&mut pair.h, pending, &target),
+            pair.device.compare(&mut pair.d, pending, &target),
+        )
+        .unwrap();
+        let ReceiptDetail::Compare {
+            return_precision, ..
+        } = &compared.receipt.detail
+        else {
+            panic!("compare receipt has return precision")
+        };
+        assert!(
+            return_precision.levels() > 0,
+            "{scenario} R^Tg must select a finer reverse chart: {return_precision:?}"
+        );
+        assert!(return_precision.seed_groups() > 0);
+        println!(
+            "reverse parity scenario={scenario} levels={} groups={} smallest_peak={}",
+            return_precision.levels(),
+            return_precision.seed_groups(),
+            return_precision.smallest_nonzero_group_peak()
+        );
+        same(
+            "discard the parity probe's staged deposit",
+            pair.host.discard(&mut pair.h, Handle::Staged(staged)),
+            pair.device.discard(&mut pair.d, Handle::Staged(staged)),
+        );
+    }
+}
+
+/// The actual card path executes the selected source E/pair-output view, while the shared return
+/// applies its exact transpose once. This locks the projected forward publication and back-return
+/// to the same host realization on a nontrivial dyadic primitive component.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_mode_view_forward_and_transpose_match_host() {
+    use holonics::hnn::ring::modes::ModeView;
+    let field = chain();
+    let theta = generic(&field, 0x28_041);
+    let card = card();
+    let mut both = pair(&card, &field, Some(theta));
+    let cells = source(&field, 8, 0x28_042);
+    feed(&mut both, &cells);
+    let phases = both.h.admitted()[0].clone();
+    let view = ModeView::from_periods(&field, &[(0, 2)]).unwrap();
+    assert!(!view.is_whole());
+    let mut impulse = vec![integer(0); field.ring(0).width()];
+    impulse[0] = integer(1);
+    assert_ne!(view.apply_ring(&field, 0, &impulse).unwrap(), impulse);
+    let (pending, refined) = same(
+        "view-qualified source opening",
+        both.host
+            .refine_view(&mut both.h, &both.moment, &phases, &view),
+        both.device
+            .refine_view(&mut both.d, &both.moment, &phases, &view),
+    )
+    .expect("host/card projected face and receipt parity");
+    match refined.receipt.detail {
+        ReceiptDetail::Refine { view: observed, .. } => assert_eq!(observed, view),
+        other => panic!("unexpected view receipt: {other:?}"),
+    }
+    let target = word(&field, 2, 0x28_043);
+    let (staged, returned) = same(
+        "view-qualified transpose return",
+        both.host.compare(&mut both.h, pending, &target),
+        both.device.compare(&mut both.d, pending, &target),
+    )
+    .expect("host/card projected return parity");
+    assert!(matches!(
+        returned.receipt.detail,
+        ReceiptDetail::Compare { .. }
+    ));
+    same(
+        "discard the view probe's staged deposit",
+        both.host.discard(&mut both.h, Handle::Staged(staged)),
+        both.device.discard(&mut both.d, Handle::Staged(staged)),
+    );
 }
 
 /// **Campaign 2's physics through the port** (the hardware-surfaces rule): campaign 1's field with a resonator on
@@ -1426,7 +1677,7 @@ fn the_loaded_source_matches_with_y4_and_hop_two() {
         let anchors = word.forward(&phases).unwrap();
         let faces = anchors
             .iter()
-            .map(|anchor| phases.read(&field, constitution, &current, anchor).unwrap())
+            .map(|anchor| phases.read(&field, constitution, anchor).unwrap())
             .collect::<Vec<_>>();
         (faces, word.release().unwrap())
     };
@@ -1659,10 +1910,16 @@ fn feed(pair: &mut Pair<'_>, cells: &Encoded) {
     while fed < cells.len() {
         let (_, ingested) = same(
             "ingest",
-            pair.host
-                .ingest(&mut pair.h, Some(&pair.moment), &cells.part(fed..cells.len()).unwrap()),
-            pair.device
-                .ingest(&mut pair.d, Some(&pair.moment), &cells.part(fed..cells.len()).unwrap()),
+            pair.host.ingest(
+                &mut pair.h,
+                Some(&pair.moment),
+                &cells.part(fed..cells.len()).unwrap(),
+            ),
+            pair.device.ingest(
+                &mut pair.d,
+                Some(&pair.moment),
+                &cells.part(fed..cells.len()).unwrap(),
+            ),
         )
         .unwrap();
         let ingested = ingested.forward.into_present().unwrap();
@@ -1799,7 +2056,8 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
     same(
         "compare",
         both.host.compare(&mut both.h, other, &word(&field, 2, 113)),
-        both.device.compare(&mut both.d, other, &word(&field, 2, 113)),
+        both.device
+            .compare(&mut both.d, other, &word(&field, 2, 113)),
     );
     let boundary = same(
         "close_aeon onto no receiver",
@@ -1828,7 +2086,8 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
     same(
         "compare on the collapsed medium",
         both.host.compare(&mut both.h, fresh, &word(&field, 2, 117)),
-        both.device.compare(&mut both.d, fresh, &word(&field, 2, 117)),
+        both.device
+            .compare(&mut both.d, fresh, &word(&field, 2, 117)),
     );
     same("read", both.host.read(&both.h), both.device.read(&both.d));
 }
@@ -1905,7 +2164,10 @@ fn a_located_capacity_refusal_leaves_both_ports_unchanged() {
         Some(&below)
     );
     assert_eq!(
-        device.ingest(&mut d, Some(&moment), &located).err().as_ref(),
+        device
+            .ingest(&mut d, Some(&moment), &located)
+            .err()
+            .as_ref(),
         Some(&below)
     );
     assert_eq!(
@@ -2127,13 +2389,21 @@ fn partial_span(field: &Field) -> (Encoded, u64) {
     let mut draw = holonics::holarchy::terrain::Draw::new(2_026_100_995);
     let advances: Vec<u64> = (0..5).map(|_| 5 * (1 + draw.below(5)) as u64).collect();
     let mut left: Vec<usize> = (0..5).collect();
-    let labels: Vec<usize> = (0..5).map(|_| left.remove(draw.below(left.len()))).collect();
+    let labels: Vec<usize> = (0..5)
+        .map(|_| left.remove(draw.below(left.len())))
+        .collect();
     let terrain = SteppedTerrain::new(helix.clone(), advances, labels).unwrap();
-    let passages: Vec<Vec<usize>> = (0..helix.period()).map(|key| terrain.passage(key, 60)).collect();
+    let passages: Vec<Vec<usize>> = (0..helix.period())
+        .map(|key| terrain.passage(key, 60))
+        .collect();
     let location = TransportLocation::locate(helix, 5, &passages).unwrap();
     let chart = PassageChart::located(&location, &passages[..1]).unwrap();
     let encoding = Encoding::found(&chart).unwrap();
-    assert_eq!(encoding.reached(), 6, "the chart reaches one coset of 5ℤ/30");
+    assert_eq!(
+        encoding.reached(),
+        6,
+        "the chart reaches one coset of 5ℤ/30"
+    );
     let key = chart.openings()[0]
         .iter()
         .position(|entry| !entry.is_zero())
@@ -2162,7 +2432,11 @@ fn a_failed_ingest_leaves_no_further_reads() {
         let ell = ell % 30;
         Current::at(
             &field,
-            vec![BigInt::from(ell % 2), BigInt::from(ell / 2 % 3), BigInt::from(ell / 6)],
+            vec![
+                BigInt::from(ell % 2),
+                BigInt::from(ell / 2 % 3),
+                BigInt::from(ell / 6),
+            ],
         )
         .unwrap()
     };
@@ -2189,14 +2463,27 @@ fn a_failed_ingest_leaves_no_further_reads() {
     assert_eq!(ExposedResident::current(&h), &off);
     assert_eq!(ExposedResident::current(&d), &off);
     let (_, _, handles) = same("read", host.read(&h), device.read(&d)).unwrap();
-    assert!(handles.iter().all(|(handle, _)| !matches!(handle, Handle::Moment(_))));
+    assert!(
+        handles
+            .iter()
+            .all(|(handle, _)| !matches!(handle, Handle::Moment(_)))
+    );
     let unknown = || HnnError::UnknownHandle {
         handle: Handle::Moment(moment),
     };
-    assert_eq!(host.ingest(&mut h, Some(&moment), &empty).err(), Some(unknown()));
-    assert_eq!(device.ingest(&mut d, Some(&moment), &empty).err(), Some(unknown()));
+    assert_eq!(
+        host.ingest(&mut h, Some(&moment), &empty).err(),
+        Some(unknown())
+    );
+    assert_eq!(
+        device.ingest(&mut d, Some(&moment), &empty).err(),
+        Some(unknown())
+    );
     assert_eq!(host.refine(&mut h, &moment, &phases).err(), Some(unknown()));
-    assert_eq!(device.refine(&mut d, &moment, &phases).err(), Some(unknown()));
+    assert_eq!(
+        device.refine(&mut d, &moment, &phases).err(),
+        Some(unknown())
+    );
     // On the reached coset a fresh open ingests the passage through the card's located route alike.
     let on = lift(key);
     let mut h = host.mount(&field, &on).unwrap();
@@ -2209,4 +2496,617 @@ fn a_failed_ingest_leaves_no_further_reads() {
     .unwrap();
     assert!(ingested.forward.present().unwrap().cells > 0);
     assert_eq!(ExposedResident::current(&h), ExposedResident::current(&d));
+}
+
+/// Full native passage restoration keeps the actual one-open moment, its window and counts,
+/// saved declaring reader, address, warm charts, carry and arrived selected-view operands.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_full_resident_continuation_preserves_next_native_operations() {
+    full_resident_continuation_case(chain());
+}
+
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_observation_context_preserves_compare_deposit_and_continuation() {
+    use holonics::hnn::receiving::ObservationPartition;
+    full_resident_continuation_case(
+        chain()
+            .with_receiving_context(2, ObservationPartition::MaximumRealGrainSet)
+            .unwrap(),
+    );
+}
+
+/// The refining section uses the executed receiving anchors and typed Section letters all the
+/// way through the card tree's deposit, then keeps that law across cold continuation.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_receiving_section_preserves_compare_deposit_and_continuation() {
+    use holonics::hnn::receiving::ObservationPartition;
+    full_resident_continuation_case(
+        chain()
+            .with_receiving_context(2, ObservationPartition::ReceivingSection)
+            .unwrap(),
+    );
+}
+
+/// The paired receiving operator is physically 2A×2w. Its candidate is replayed on the same
+/// CUDA word and must receive the same strict same-window acceptance decision as the host.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_paired_finite_candidate_replay_matches_reference() {
+    let field = paired_candidate_field();
+    let mut initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    initial
+        .bind_arrival_context_receiving(field.receivers()[0].ring)
+        .unwrap();
+    let current = Current::at_rest(&field);
+    let card = card();
+    let reception = Reception::Carry(Absorption::Nothing);
+    let host = Reference::campaign_one().with_reception(reception);
+    let device = Resident::campaign_one(&card).with_reception(reception);
+    let mut h = host.mount_with(&field, &current, initial.clone()).unwrap();
+    let mut d = device.mount_with(&field, &current, initial).unwrap();
+
+    let source_truth = KnownTruth::uniform(field.alphabet(), 71, 1, 2).unwrap();
+    let source = Encoded::identity(&source_truth, &field).unwrap().remove(0);
+    let (moment, _) = same(
+        "paired comparison source",
+        host.ingest(&mut h, None, &source),
+        device.ingest(&mut d, None, &source),
+    )
+    .unwrap();
+    let phases = h.admitted()[0].clone();
+    let target_truth = (0..128)
+        .find_map(|seed| {
+            let truth = KnownTruth::uniform(field.alphabet(), seed, 1, 1).ok()?;
+            (truth.passages()[0] == [0]).then_some(truth)
+        })
+        .expect("a deterministic one-cell uniform truth with class zero");
+    let target = Encoded::identity(&target_truth, &field).unwrap().remove(0);
+    let (pending, _) = same(
+        "paired finite-candidate refine",
+        host.refine(&mut h, &moment, &phases),
+        device.refine(&mut d, &moment, &phases),
+    )
+    .unwrap();
+    let (staged, compared) = same(
+        "paired finite-candidate compare",
+        host.compare(&mut h, pending, &target),
+        device.compare(&mut d, pending, &target),
+    )
+    .unwrap();
+    let ReceiptDetail::Compare {
+        response_defect: Some(defect),
+        ..
+    } = &compared.receipt.detail
+    else {
+        panic!("paired return reports the executed actual and fresh response defects");
+    };
+    assert_eq!(defect.context_bounds().unwrap().len(), phases.aperture());
+    let predecessor = ExposedResident::constitution(&d).clone();
+    let carry = ExposedResident::carried(&d).cloned();
+    let deposited = same(
+        "paired finite-candidate deposit",
+        host.deposit(&mut h, staged),
+        device.deposit(&mut d, staged),
+    )
+    .unwrap();
+    let ReceiptDetail::Deposit {
+        finite_comparison: Some(finite),
+        ..
+    } = deposited.receipt.detail
+    else {
+        panic!("the accepted paired candidate reports its finite comparison");
+    };
+    assert!(
+        finite.comparison.strictly_improved
+            || finite.comparison.unchanged
+            || finite.comparison.objective_equal()
+    );
+    if finite.comparison.strictly_improved {
+        assert!(finite.comparison.objective_change.upper < integer(0));
+    }
+    if finite.comparison.objective_equal() {
+        assert_eq!(finite.comparison.objective_change.lower, integer(0));
+        assert_eq!(finite.comparison.objective_change.upper, integer(0));
+    }
+    if finite.comparison.unchanged {
+        assert!(finite.comparison.objective_equal());
+    }
+    assert!(finite.attempts > 0);
+    assert_eq!(finite.trials.len(), finite.attempts as usize);
+    assert!(finite.trials.iter().all(|trial| {
+        (trial.comparison.strictly_improved && trial.comparison.objective_change.upper < integer(0))
+            || trial.comparison.unchanged
+            || trial.comparison.objective_equal()
+            || trial.comparison.needs_precision()
+            || trial.comparison.objective_change.lower > integer(0)
+    }));
+    assert!(ExposedResident::constitution(&d).commit() > predecessor.commit());
+    assert_eq!(ExposedResident::carried(&d), carry.as_ref());
+    assert_eq!(
+        h.continuing_state(0).unwrap().to_text(),
+        d.continuing_state(0).unwrap().to_text()
+    );
+}
+
+fn full_resident_continuation_case(field: Field) {
+    use holonics::hnn::constitution::ContinuingState;
+    use holonics::hnn::reference::passage::ResidentPassage;
+    use holonics::hnn::ring::modes::ModeView;
+    let initial = generic(&field, 0xC017_1);
+    let current = Current::at_rest(&field);
+    let card = card();
+    let reception = Reception::Carry(Absorption::Nothing);
+    let host = Reference::campaign_one().with_reception(reception);
+    let device = Resident::campaign_one(&card).with_reception(reception);
+    let mut h = host.mount_with(&field, &current, initial.clone()).unwrap();
+    let mut d = device
+        .mount_with(&field, &current, initial.clone())
+        .unwrap();
+    assert_eq!(
+        h.continuing_state(0).unwrap().to_text(),
+        d.continuing_state(0).unwrap().to_text()
+    );
+    let (moment, _) = same(
+        "full continuation partial source",
+        host.ingest(&mut h, None, &word(&field, 3, 0xC017_2)),
+        device.ingest(&mut d, None, &word(&field, 3, 0xC017_2)),
+    )
+    .unwrap();
+    let (extra, _) = same(
+        "second open before continuation refusal",
+        host.ingest(&mut h, None, &word(&field, 0, 0)),
+        device.ingest(&mut d, None, &word(&field, 0, 0)),
+    )
+    .unwrap();
+    assert!(h.continuing_state(0).is_err());
+    assert!(d.continuing_state(0).is_err());
+    same(
+        "discard second open",
+        host.discard(&mut h, Handle::Moment(extra)),
+        device.discard(&mut d, Handle::Moment(extra)),
+    )
+    .unwrap();
+    let saved = d.continuing_state(0).unwrap();
+    let text = saved.to_text();
+    assert_eq!(text, h.continuing_state(0).unwrap().to_text());
+    let saved = ContinuingState::from_text(&text).unwrap();
+    let mut restored = device
+        .mount_continued(&field, &current, initial.clone(), &saved)
+        .unwrap();
+    assert_eq!(restored.continuing_state(0).unwrap().to_text(), text);
+    let next = word(&field, 2, 0xC017_3);
+    let expected = same(
+        "continued source ingest",
+        host.ingest(&mut h, Some(&moment), &next),
+        device.ingest(&mut d, Some(&moment), &next),
+    )
+    .unwrap();
+    assert_eq!(
+        device.ingest(&mut restored, Some(&moment), &next).unwrap(),
+        expected
+    );
+    assert_eq!(
+        d.continuing_state(0).unwrap().to_text(),
+        restored.continuing_state(0).unwrap().to_text()
+    );
+    let phases = h.admitted()[0].clone();
+    let view = ModeView::primitive(&field, 0, 2).unwrap();
+    let (pending, _) = same(
+        "continued selected view",
+        host.refine_view(&mut h, &moment, &phases, &view),
+        device.refine_view(&mut d, &moment, &phases, &view),
+    )
+    .unwrap();
+    assert!(h.continuing_state(0).is_err());
+    assert!(d.continuing_state(0).is_err());
+    let targets = word(&field, phases.aperture(), 0xC017_4);
+    let (staged, compared) = same(
+        "continued selected return",
+        host.compare(&mut h, pending, &targets),
+        device.compare(&mut d, pending, &targets),
+    )
+    .unwrap();
+    if matches!(
+        ExposedResident::constitution(&d).receiving_layout(phases.ring()),
+        Some(holonics::hnn::constitution::ReceivingLayout::ArrivalContext { .. })
+    ) {
+        let ReceiptDetail::Compare {
+            response_defect: Some(defect),
+            ..
+        } = &compared.receipt.detail
+        else {
+            panic!("paired comparison receipt includes both executed response defects");
+        };
+        assert_eq!(defect.fresh.len(), phases.aperture());
+        assert_eq!(
+            defect.actual.as_ref().map(Vec::len),
+            Some(phases.aperture())
+        );
+        // A paired receipt must expose certified context bounds, never silently omit the
+        // actual lane or treat a missing lane as a zero error.
+        assert_eq!(defect.context_bounds().unwrap().len(), phases.aperture());
+    }
+    assert!(h.continuing_state(0).is_err());
+    assert!(d.continuing_state(0).is_err());
+    let deposited = same(
+        "continued selected deposit",
+        host.deposit(&mut h, staged),
+        device.deposit(&mut d, staged),
+    )
+    .unwrap();
+    if matches!(
+        ExposedResident::constitution(&d).receiving_layout(phases.ring()),
+        Some(holonics::hnn::constitution::ReceivingLayout::ArrivalContext { .. })
+    ) {
+        let ReceiptDetail::Deposit {
+            finite_comparison: Some(finite),
+            ..
+        } = &deposited.receipt.detail
+        else {
+            panic!("an accepted paired update reports its finite same-window comparison");
+        };
+        assert!(finite.comparison.strictly_improved || finite.comparison.objective_equal());
+        if finite.comparison.strictly_improved {
+            assert!(finite.comparison.objective_change.upper < integer(0));
+        } else {
+            assert_eq!(finite.comparison.objective_change.lower, integer(0));
+            assert_eq!(finite.comparison.objective_change.upper, integer(0));
+        }
+        assert!(finite.attempts > 0);
+    }
+    let saved = d.continuing_state(0).unwrap();
+    assert_eq!(saved.to_text(), h.continuing_state(0).unwrap().to_text());
+    let passage =
+        ResidentPassage::from_text(&field, d.constitution(), saved.passage().unwrap()).unwrap();
+    assert!(!passage.parts().charts.is_empty());
+    assert_eq!(
+        passage.parts().arrived.as_ref().unwrap().ratio.view(),
+        &view
+    );
+    assert!(saved.carry().is_some());
+    assert!(
+        Resident::campaign_one(&card)
+            .with_reception(Reception::Rest)
+            .mount_continued(&field, &current, initial.clone(), &saved)
+            .is_err()
+    );
+    let mut restored = device
+        .mount_continued(&field, &current, initial.clone(), &saved)
+        .unwrap();
+    let mut restored_host = host
+        .mount_continued(&field, &current, initial, &saved)
+        .unwrap();
+    assert_eq!(
+        restored.continuing_state(0).unwrap().to_text(),
+        saved.to_text()
+    );
+    assert_eq!(
+        restored_host.continuing_state(0).unwrap().to_text(),
+        saved.to_text()
+    );
+    assert_eq!(restored.address(), d.address());
+    assert_eq!(restored.current(), d.current());
+    let next = word(&field, 2, 0xC017_5);
+    let expected = same(
+        "warm continued ingest",
+        host.ingest(&mut h, Some(&moment), &next),
+        device.ingest(&mut d, Some(&moment), &next),
+    )
+    .unwrap();
+    assert_eq!(
+        device.ingest(&mut restored, Some(&moment), &next).unwrap(),
+        expected
+    );
+    assert_eq!(
+        host.ingest(&mut restored_host, Some(&moment), &next)
+            .unwrap(),
+        expected
+    );
+    let expected = same(
+        "warm continued read",
+        host.refine(&mut h, &moment, &phases),
+        device.refine(&mut d, &moment, &phases),
+    )
+    .unwrap();
+    assert_eq!(
+        device.refine(&mut restored, &moment, &phases).unwrap(),
+        expected
+    );
+    assert_eq!(
+        host.refine(&mut restored_host, &moment, &phases).unwrap(),
+        expected
+    );
+    let pending = expected.0;
+    let expected = same(
+        "warm continued return",
+        host.compare(&mut h, pending, &targets),
+        device.compare(&mut d, pending, &targets),
+    )
+    .unwrap();
+    assert_eq!(
+        device.compare(&mut restored, pending, &targets).unwrap(),
+        expected
+    );
+    assert_eq!(
+        host.compare(&mut restored_host, pending, &targets).unwrap(),
+        expected
+    );
+    let staged = expected.0;
+    let expected = same(
+        "warm continued publication",
+        host.deposit(&mut h, staged),
+        device.deposit(&mut d, staged),
+    )
+    .unwrap();
+    assert_eq!(device.deposit(&mut restored, staged).unwrap(), expected);
+    assert_eq!(host.deposit(&mut restored_host, staged).unwrap(), expected);
+    assert_eq!(
+        d.continuing_state(0).unwrap().to_text(),
+        restored.continuing_state(0).unwrap().to_text()
+    );
+}
+
+/// Every erased receiver component survives the same admitted precision publication, including
+/// turns, while a previously published component cannot discharge another row's demand.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_receiving_component_precision_preserves_outputs_and_cold_continuation() {
+    use holonics::hnn::Locus;
+    use holonics::hnn::constitution::{ContinuingState, Lattice};
+    let field = chain();
+    let ring = field.receivers()[0].ring;
+    let width = field.ring(ring).width();
+    let mut rows = vec![vec![Rat::zero(); width]; 2 * field.alphabet()];
+    rows[0][0] = Rat::one();
+    let opening = generic(&field, 0xC0_18)
+        .with_ports(
+            ring,
+            None,
+            None,
+            Some(ExactRatMatrix::shaped(rows.len(), width, rows).unwrap()),
+        )
+        .unwrap();
+    let exponent = opening
+        .lattice(Locus::ReceivingMap(ring))
+        .unwrap()
+        .exponent();
+    let unit = Lattice::new(exponent).unit();
+    // Exact persisted-state control fixture: valid sub-lattice remainders, no fabricated
+    // target/gradient or direct device-buffer mutation. The native restore validates it.
+    let text = opening
+        .continuing_state(field.sources()[0])
+        .unwrap()
+        .to_text();
+    let header = format!("receiving {} {}\n", 2 * field.alphabet(), width);
+    let start = text.find(&header).unwrap();
+    let carry = start + text[start..].find("map-carry 0\n").unwrap();
+    let mut seeded = text.clone();
+    seeded.replace_range(
+        carry..carry + "map-carry 0\n".len(),
+        &format!(
+            "map-carry 2\n{} {}\n{} {}\n",
+            2 * width,
+            &unit / integer(8),
+            3 * width,
+            -&unit / integer(32)
+        ),
+    );
+    assert!(
+        ContinuingState::from_text(&seeded).is_err(),
+        "editing a checksummed state must be refused"
+    );
+    // These same remainders are refused at clock zero by the native fine-lattice law.
+    let clock_zero = ContinuingState::stamped(&seeded, &opening).unwrap();
+    let clock_zero = ContinuingState::from_text(&clock_zero).unwrap();
+    assert!(matches!(
+        opening.clone().continued(&clock_zero),
+        Err(HnnError::ContinuingState {
+            what: "a remainder off its locus's fine lattice or outside its half cell"
+        })
+    ));
+    // The deeper remainder is unit/32, depth d = 5. Its smallest carrying clock is
+    // 1 << ((d - 1) / 2): gamma_length(4) = 5. Four sub-lattice deposits can advance
+    // that clock while leaving the map equal to the opening's, as asserted below.
+    let deeper_remainder_depth = 5u32;
+    let receiving_clock = 1u64 << ((deeper_remainder_depth - 1) / 2);
+    let clocks_start = seeded.find("\nclocks ").unwrap() + 1;
+    let clocks_head_end = clocks_start + seeded[clocks_start..].find('\n').unwrap();
+    let clock_count: usize = seeded[clocks_start..clocks_head_end]
+        .strip_prefix("clocks ")
+        .unwrap()
+        .parse()
+        .unwrap();
+    let entries_start = clocks_head_end + 1;
+    let mut clocks: Vec<String> = seeded[entries_start..]
+        .lines()
+        .take(clock_count)
+        .map(str::to_owned)
+        .collect();
+    let clocks_end = entries_start + clocks.iter().map(|line| line.len() + 1).sum::<usize>();
+    let receiving_locus = format!("receiving {ring} ");
+    let receiving_entry = format!("{receiving_locus}{receiving_clock}");
+    if let Some(entry) = clocks
+        .iter_mut()
+        .find(|line| line.starts_with(&receiving_locus))
+    {
+        *entry = receiving_entry;
+    } else {
+        clocks.push(receiving_entry);
+    }
+    let clock_block = format!("clocks {}\n{}\n", clocks.len(), clocks.join("\n"));
+    seeded.replace_range(clocks_start..clocks_end, &clock_block);
+    // Recompute the text integrity check after constructing this explicit carried-state fixture.
+    let seeded = ContinuingState::stamped(&seeded, &opening).unwrap();
+    let state = ContinuingState::from_text(&seeded).unwrap();
+    assert_eq!(ContinuingState::from_text(&state.to_text()).unwrap(), state);
+    let theta = opening.clone().continued(&state).unwrap();
+    let restored_carry = theta.receiving_law(ring).unwrap().map_remainder();
+    assert_eq!(restored_carry.get(2, 0).unwrap(), &(&unit / integer(8)));
+    assert_eq!(restored_carry.get(3, 0).unwrap(), &(-&unit / integer(32)));
+    assert_eq!(theta.receiving_map(ring), opening.receiving_map(ring));
+    let mut feature = vec![Rat::zero(); width];
+    feature[0] = Rat::one();
+    let event = theta
+        .receiving_precision_event(ring, &[feature.clone()], &Rat::one())
+        .unwrap()
+        .unwrap();
+    assert_eq!(event.erased_components(), &[(0, 2), (0, 3)]);
+    assert_eq!(event.levels(), 5);
+    let current = Current::at_rest(&field);
+    let card = card();
+    let host = Reference::campaign_one();
+    let device = Resident::campaign_one(&card);
+    let mut h = host.mount_with(&field, &current, theta.clone()).unwrap();
+    let mut d = device.mount_with(&field, &current, theta).unwrap();
+    same(
+        "component precision publication",
+        h.publish_receiving_precision(&event),
+        d.publish_receiving_precision(&event),
+    )
+    .unwrap();
+    assert_eq!(h.constitution(), d.constitution());
+    assert_eq!(h.current(), &current);
+    assert_eq!(d.current(), &current);
+    let actual = d
+        .constitution()
+        .receiving_map(ring)
+        .unwrap()
+        .apply(&feature)
+        .unwrap();
+    assert_eq!(actual[0], Rat::one());
+    assert!(!actual[2].is_zero());
+    assert!(!actual[3].is_zero());
+    assert!(
+        d.publish_receiving_precision(&event).is_err(),
+        "stale event must refuse"
+    );
+    let saved = d.continuing_state(field.sources()[0]).unwrap();
+    assert_eq!(
+        saved.to_text(),
+        h.continuing_state(field.sources()[0]).unwrap().to_text()
+    );
+    let mut cold = device
+        .mount_continued(&field, &current, opening, &saved)
+        .unwrap();
+    assert_eq!(cold.constitution(), d.constitution());
+    let input = word(&field, 8, 0xC0_19);
+    let ingested = same(
+        "component publication input",
+        host.ingest(&mut h, None, &input),
+        device.ingest(&mut d, None, &input),
+    )
+    .unwrap();
+    assert_eq!(device.ingest(&mut cold, None, &input).unwrap(), ingested);
+    let phases = h.admitted()[0].clone();
+    let refined = same(
+        "component publication actual word",
+        host.refine(&mut h, &ingested.0, &phases),
+        device.refine(&mut d, &ingested.0, &phases),
+    )
+    .unwrap();
+    assert_eq!(
+        device.refine(&mut cold, &ingested.0, &phases).unwrap(),
+        refined
+    );
+    let released = same(
+        "component publication actual release",
+        host.release(&mut h, &refined.0, &releasing()),
+        device.release(&mut d, &refined.0, &releasing()),
+    )
+    .unwrap();
+    assert_eq!(
+        device.release(&mut cold, &refined.0, &releasing()).unwrap(),
+        released
+    );
+}
+
+/// The card reads one fixed producing window per call, and receives its own released prefix
+/// through the same tree/population sequence as comparison without changing live carry.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_class_grain_release_matches_scored_prefix_and_preserves_opening() {
+    use holonics::hnn::receiving::cells::CellLaw;
+    use holonics::receiver::release::KeyStream;
+    let field = chain();
+    let card = card();
+    let host = Reference::campaign_one();
+    let device = Resident::campaign_one(&card);
+    let current = Current::at_rest(&field);
+    let mut h = host.mount(&field, &current).unwrap();
+    let mut d = device.mount(&field, &current).unwrap();
+    let input = word(&field, 4, 0x12);
+    let (moment, _) = same(
+        "class release ingest",
+        host.ingest(&mut h, None, &input),
+        device.ingest(&mut d, None, &input),
+    )
+    .unwrap();
+    let phases = h.admitted()[0].clone();
+    let (pending, _) = same(
+        "class release refine",
+        host.refine(&mut h, &moment, &phases),
+        device.refine(&mut d, &moment, &phases),
+    )
+    .unwrap();
+    let saved_current = d.current().clone();
+    let saved_carry = d.carried().cloned();
+    let committed = same(
+        "class commit",
+        host.release_cells(&mut h, &pending, CellLaw::Commit),
+        device.release_cells(&mut d, &pending, CellLaw::Commit),
+    )
+    .unwrap();
+    let bytes = vec![0x5a, 0x01, 0xc3, 0x7e, 0x0f, 0xe0, 0x21, 0x99];
+    let mut hk = KeyStream::new(bytes.clone(), 4).unwrap();
+    let mut dk = hk.clone();
+    let drawn = same(
+        "class draw",
+        host.release_cells(&mut h, &pending, CellLaw::Draw(&mut hk)),
+        device.release_cells(&mut d, &pending, CellLaw::Draw(&mut dk)),
+    )
+    .unwrap();
+    assert_eq!(hk, dk);
+    assert_eq!(d.current(), &saved_current);
+    assert_eq!(d.carried(), saved_carry.as_ref());
+    let release = drawn.forward.present().unwrap();
+    assert_eq!(
+        committed.forward.present().unwrap().cells[0].face,
+        release.cells[0].face
+    );
+    let placement = release.classes().expect("fixture draws every phase");
+    let mut again = KeyStream::new(bytes, 4).unwrap();
+    assert_eq!(
+        device
+            .release_cells(&mut d, &pending, CellLaw::Draw(&mut again))
+            .unwrap()
+            .forward
+            .present(),
+        Some(release)
+    );
+    // Select the drawn target from an already admitted identity passage; no unchecked encoding.
+    let targets = word(&field, 4096, 0x1234);
+    let classes: Vec<_> = targets.classes_read().collect();
+    let start = classes
+        .windows(placement.len())
+        .position(|part| part == placement)
+        .expect("finite fixture contains drawn pair");
+    let input = targets.part(start..start + placement.len()).unwrap();
+    let (_, compared) = same(
+        "class draw compare",
+        host.compare(&mut h, pending, &input),
+        device.compare(&mut d, pending, &input),
+    )
+    .unwrap();
+    let ReceiptDetail::Compare { model, .. } = compared.receipt.detail else {
+        panic!("comparison receipt");
+    };
+    for ((code, cell), class) in model.iter().zip(&release.cells).zip(placement) {
+        let upper = holonics::ratio::algebraic::log2_enclosure(&cell.face[class].upper).unwrap();
+        let lower = holonics::ratio::algebraic::log2_enclosure(&cell.face[class].lower).unwrap();
+        assert!(code.lower <= -upper.lower);
+        assert!(-lower.upper <= code.upper);
+    }
 }
