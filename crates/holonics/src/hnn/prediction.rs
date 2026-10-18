@@ -4070,10 +4070,12 @@ impl PhysicalPrediction<'_, '_> {
             if learning == PhysicalLearning::PairOutputs {
                 for mut step in composed.factors {
                     if let FactorGradient::PairPort {
+                        ring,
+                        offset,
                         outputs,
                         current,
                         earlier,
-                        ..
+                        speed,
                     } = &mut step.gradient
                     {
                         if step.energy.is_zero() || outputs.iter().flatten().all(Zero::is_zero) {
@@ -4084,6 +4086,17 @@ impl PhysicalPrediction<'_, '_> {
                         for value in current.iter_mut().chain(earlier.iter_mut()).flatten() {
                             *value = Rat::zero();
                         }
+                        let pair = material
+                            .pair_port(*ring, *offset)
+                            .ok_or(HnnError::MissingSourcePort { ring: *ring })?;
+                        *speed = crate::hnn::reference::pair_ray_speed(
+                            field,
+                            &source,
+                            *ring,
+                            *offset,
+                            pair,
+                            [outputs, current, earlier],
+                        )?;
                         factors.push(step);
                     }
                 }
