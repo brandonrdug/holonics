@@ -634,3 +634,64 @@ fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
         )
         .unwrap();
 }
+
+/// [the #398 review] **A founded `Own` source builds no resident pair face.** Its counts open
+/// leaky at the founding modulus (`SourceMoment::found_ring`), and REQ-055's face holds only
+/// unit-modulus counts, so the founded ring's pair read stays the transported whole-table read.
+/// The `Lock` sources' faces are read on the retained moment before the pending ratio copies
+/// it, and a second refine at the same reads builds none.
+#[test]
+fn r4b_founded_own_source_keeps_the_transported_pair_read() {
+    let (reference, mut resident, moment) = fixture(1 << 40);
+    resident.publish_founding().unwrap().unwrap();
+    let own = resident.field.rings().len() - 1;
+    assert_eq!(
+        resident.field.ring(own).advance(),
+        crate::hnn::RingAdvance::Own
+    );
+    assert!(resident.field.is_source(own));
+    let phases = resident.admitted[0].clone();
+    let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    reference
+        .discard(&mut resident, Handle::Pending(pending))
+        .unwrap();
+    let source = resident.moments.get(&moment).unwrap();
+    let (mut own_ports, mut lock_faces) = (0, 0);
+    for &ring in resident.field.sources() {
+        for &offset in resident.field.offsets() {
+            let Some(port) = resident.constitution.pair_port(ring, offset) else {
+                continue;
+            };
+            let face = source.resident_pair_face(ring, offset, port).unwrap();
+            if ring == own {
+                assert!(
+                    face.is_none(),
+                    "offset {offset}: a leaky count builds no face"
+                );
+                assert_eq!(source.pair_face_read_matches(ring, offset, port), None);
+                own_ports += 1;
+            } else {
+                assert!(face.is_some(), "ring {ring} offset {offset}: a Lock face");
+                assert_eq!(
+                    source.pair_face_read_matches(ring, offset, port),
+                    Some(true)
+                );
+                lock_faces += 1;
+            }
+        }
+    }
+    assert!(own_ports > 0 && lock_faces > 0);
+    let builds = source.pair_face_total_builds();
+    let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    reference
+        .discard(&mut resident, Handle::Pending(pending))
+        .unwrap();
+    assert_eq!(
+        resident
+            .moments
+            .get(&moment)
+            .unwrap()
+            .pair_face_total_builds(),
+        builds
+    );
+}

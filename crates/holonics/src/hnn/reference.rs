@@ -2927,7 +2927,6 @@ pub fn compose_return_view(
     let source_opening = view.apply(field, &back.opening)?;
     for &g in field.sources() {
         let ring = field.ring(g);
-        let n = ring.width();
         let d = ring.placements().len();
         let opening = &source_opening[g];
         let turned: Vec<Vec<Rat>> = (0..d)

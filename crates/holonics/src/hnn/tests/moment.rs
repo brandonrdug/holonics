@@ -328,7 +328,6 @@ mod resident_pair_face_controls {
 
     #[test]
     fn pair_face_is_not_retained() {
-        use std::{hint::black_box, time::Instant};
         let (field, material) = deposited();
         let (current, moment) = passage(&field);
         let retained = text(&moment);
@@ -341,15 +340,9 @@ mod resident_pair_face_controls {
         assert_eq!(text(&moment), retained);
         assert_eq!(moment.dense_bits(), bits);
         assert_eq!(moment.capacity(&field, &current).unwrap(), capacity);
-        let start = Instant::now();
-        let base_clone = black_box(parsed.clone());
-        let base_clone_ns = start.elapsed().as_nanos();
-        let start = Instant::now();
-        let face_clone = black_box(moment.clone());
-        let face_clone_ns = start.elapsed().as_nanos();
-        eprintln!(
-            "pair-face clone control: cells=400 base_clone_ns={base_clone_ns} face_clone_ns={face_clone_ns}"
-        );
+        // The clone's time is the listener's per-cell receipt (`clone_ns`), not this test's.
+        let base_clone = parsed.clone();
+        let face_clone = moment.clone();
         assert_eq!(face_clone, base_clone);
         assert_reads(&field, &material, &current, &parsed);
         assert_eq!(text(&parsed), retained);

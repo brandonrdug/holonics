@@ -2682,9 +2682,6 @@ fn physical_source_only_change(
     })
 }
 
-/// Read the applied output-row move on the same pair tables that produced the source.
-/// The read factors are fixed by the caller's executable other-relation check, hence this is
-/// the actual affine output difference, including any budgeted output carry/release.
 /// The actual per-phase pair-output difference used by the physical source certificate.
 /// A changed read, or a leaky count, retains the former two-contraction expression.
 pub(crate) fn pair_output_move_series(
@@ -2729,6 +2726,9 @@ pub(crate) fn pair_output_move_series(
     Ok(moved)
 }
 
+/// Read the applied output-row move on the same pair tables that produced the source.
+/// The read factors are fixed by the caller's executable other-relation check, hence this is
+/// the actual affine output difference, including any budgeted output carry/release.
 fn physical_pair_output_certificate(
     field: &Field,
     before: &dyn FieldMaterial,
