@@ -3,8 +3,8 @@
 use crate::hnn::HnnError;
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
+use crate::ratio::linear::vector::lcm;
 use num_bigint::{BigInt, BigUint};
-use num_integer::Integer;
 use num_traits::{One, Zero};
 use std::collections::BTreeMap;
 use std::fmt;
@@ -51,7 +51,7 @@ impl MarginalFace {
         let denominator = port
             .entries()
             .iter()
-            .fold(BigInt::one(), |d, x| d.lcm(x.denom()));
+            .fold(BigInt::one(), |d, x| lcm(&d, x.denom()));
         let integers: Vec<_> = port
             .entries()
             .iter()
@@ -96,7 +96,7 @@ impl MarginalFace {
             .filter_map(|(i, (new, old))| (new != old).then_some(i))
             .collect();
         let denominator = changed.iter().fold(self.denominator.clone(), |d, &i| {
-            d.lcm(port.entries()[i].denom())
+            lcm(&d, port.entries()[i].denom())
         });
         if denominator != self.denominator {
             let scale = &denominator / &self.denominator;
