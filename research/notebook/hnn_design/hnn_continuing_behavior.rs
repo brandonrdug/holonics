@@ -142,6 +142,8 @@ fn declare() -> Result<(Field, ReceiverDeclaration), holonics::hnn::HnnError> {
     // three. The legal period-two interior has width four and keeps the actual Half pump clock.
     let field = Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(4, (0..4).collect()), ring(2, Vec::new())],
             contacts: vec![ContactDeclaration {
                 from: 0,

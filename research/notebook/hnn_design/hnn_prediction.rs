@@ -151,6 +151,8 @@ fn declare_with_offsets(declared: &Declared, offsets: Vec<usize>) -> Field {
     };
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring((0..d).collect()), ring(Vec::new()), ring(Vec::new())],
             contacts: vec![contact(0, 1), contact(1, 2)],
             loops: Vec::new(),
