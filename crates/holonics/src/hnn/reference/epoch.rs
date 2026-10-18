@@ -276,7 +276,7 @@ mod tests {
         // source ring, with classes that still fit that source's port chart.
         wrong_declaration.alphabet = 2;
         wrong_declaration.sources = vec![1];
-        let wrong_field = Field::declare(wrong_declaration).unwrap();
+        let wrong_field = Field::declare(wrong_declaration.by_lattice_rule()).unwrap();
         let wrong_cells = encoded(&wrong_field, &[0, 1]);
         assert!(
             resident_reference
