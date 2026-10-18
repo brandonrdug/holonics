@@ -12296,7 +12296,8 @@ mod receiving_precision_tests {
             Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
         let ring = field.receivers()[0].ring;
         let locus = Locus::ReceivingMap(ring);
-        let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
+        let opening = Constitution::initial(&field, 1 << 40).unwrap();
+        let mut theta = opening.clone();
         let exponent = theta.lattice(locus).unwrap().exponent();
         let unit = Lattice::new(exponent).unit();
         theta.clocks.insert(locus, 1u64 << ((7 - 1) / 2));
@@ -12367,7 +12368,11 @@ mod receiving_precision_tests {
         );
         let state = next.continuing_state(field.sources()[0]).unwrap();
         let state = ContinuingState::from_text(&state.to_text()).unwrap();
-        assert_eq!(theta.clone().continued(&state).unwrap(), next);
+        assert!(
+            theta.clone().continued(&state).is_err(),
+            "a moved clock is not a declared opening"
+        );
+        assert_eq!(opening.continued(&state).unwrap(), next);
     }
 
     #[test]
