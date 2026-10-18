@@ -502,14 +502,36 @@ pub fn capacity_located(
     )
 }
 
-fn capacity_with_clock(
+/// Whether the identity-clock partition is lossy at this population: one exact count,
+/// with the same declaration checks and rates as `capacity`, without searching for n*.
+pub fn capacity_admits(
+    periods: &[u64],
+    advances: &[RingAdvance],
+    sources: &[usize],
+    alphabet: usize,
+    offsets: &[usize],
+    n: u64,
+) -> Result<bool, HnnError> {
+    let rates = capacity_rates(
+        periods,
+        advances,
+        sources,
+        alphabet,
+        offsets,
+        CapacityClock::Identity,
+    )?;
+    lossy(n, periods, &rates, sources, alphabet, offsets)
+}
+
+/// Shared declaration admission and clock rates for the search and one-count consumer.
+fn capacity_rates(
     periods: &[u64],
     advances: &[RingAdvance],
     sources: &[usize],
     alphabet: usize,
     offsets: &[usize],
     clock: CapacityClock,
-) -> Result<Capacity, HnnError> {
+) -> Result<Vec<u64>, HnnError> {
     if alphabet < 2 || periods.iter().any(|&d| d < 2) || offsets.contains(&0) {
         return Err(HnnError::NonpositiveDeclaration);
     }
@@ -539,6 +561,18 @@ fn capacity_with_clock(
             (_, CapacityClock::Located) => period,
         })
         .collect::<Vec<_>>();
+    Ok(rates)
+}
+
+fn capacity_with_clock(
+    periods: &[u64],
+    advances: &[RingAdvance],
+    sources: &[usize],
+    alphabet: usize,
+    offsets: &[usize],
+    clock: CapacityClock,
+) -> Result<Capacity, HnnError> {
+    let rates = capacity_rates(periods, advances, sources, alphabet, offsets, clock)?;
     let test = |n| lossy(n, periods, &rates, sources, alphabet, offsets);
     let (mut below, mut above) = (0u64, 1u64);
     while !test(above)? {
@@ -576,6 +610,40 @@ fn lossy(
     let exponent = u32::try_from(n).map_err(|_| HnnError::CountOverflow)?;
     let bound = BigUint::from(alphabet).pow(exponent);
     Ok(state_count(n, periods, rates, sources, alphabet, offsets) < bound)
+}
+
+#[cfg(test)]
+mod capacity_predicate_tests {
+    use super::*;
+
+    #[test]
+    fn one_count_agrees_at_the_identity_capacity_boundary_and_after_it() {
+        for advances in [vec![RingAdvance::Lock], vec![RingAdvance::Own]] {
+            let threshold = capacity(&[3], &advances, &[0], 2, &[1]).unwrap().n_star();
+            for n in [threshold - 1, threshold, threshold + 1, threshold + 7] {
+                assert_eq!(
+                    capacity_admits(&[3], &advances, &[0], 2, &[1], n).unwrap(),
+                    n >= threshold
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn one_count_and_search_share_all_declaration_refusals() {
+        for (periods, advances, sources, alphabet, offsets) in [
+            (vec![1], vec![RingAdvance::Lock], vec![0], 2, vec![1]),
+            (vec![3], vec![RingAdvance::Lock], vec![0], 1, vec![1]),
+            (vec![3], vec![RingAdvance::Lock], vec![0], 2, vec![0]),
+            (vec![3], vec![], vec![0], 2, vec![1]),
+            (vec![3], vec![RingAdvance::Lock], vec![1], 2, vec![1]),
+        ] {
+            let searched = capacity(&periods, &advances, &sources, alphabet, &offsets).unwrap_err();
+            let counted = capacity_admits(&periods, &advances, &sources, alphabet, &offsets, 100)
+                .unwrap_err();
+            assert_eq!(counted, searched);
+        }
+    }
 }
 
 fn state_count(

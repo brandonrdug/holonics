@@ -118,7 +118,7 @@ use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus};
 use crate::hnn::encoding::Encoded;
 use crate::hnn::founding::Candidate;
-use crate::hnn::moment::{Capacity, PairPort, capacity, capacity_located};
+use crate::hnn::moment::{Capacity, PairPort, capacity, capacity_admits, capacity_located};
 #[cfg(test)]
 use crate::holarchy::GluingDefect;
 use crate::holarchy::{Gluing, Holarchy};
@@ -1510,10 +1510,29 @@ impl Field {
     /// After the whole period-two declaration, exact expanded-partition capacity probes double
     /// and bisect the monotone boundary. One final whole declaration confirms that boundary.
     pub fn founding_candidates(&self) -> Result<Vec<Candidate>, HnnError> {
-        self.founding_candidates_with(|period| self.founding_n_star(period))
+        self.founding_candidates_with(|period| self.founding_admits(period))
+    }
+
+    /// One exact count at the declared population on the expanded identity-clock partition.
+    pub fn founding_admits(&self, period: u64) -> Result<bool, HnnError> {
+        let mut periods: Vec<_> = self.rings.iter().map(Ring::period).collect();
+        let mut advances: Vec<_> = self.rings.iter().map(Ring::advance).collect();
+        let mut sources = self.sources.clone();
+        periods.push(period);
+        advances.push(RingAdvance::Own);
+        sources.push(self.rings.len());
+        capacity_admits(
+            &periods,
+            &advances,
+            &sources,
+            self.alphabet,
+            &self.offsets,
+            self.population,
+        )
     }
 
     /// Capacity of the expanded partition only; the key does not enter this exact count.
+    #[cfg(test)]
     fn founding_n_star(&self, period: u64) -> Result<u64, HnnError> {
         let mut periods: Vec<_> = self.rings.iter().map(Ring::period).collect();
         let mut advances: Vec<_> = self.rings.iter().map(Ring::advance).collect();
@@ -1526,10 +1545,10 @@ impl Field {
         Ok(n_star)
     }
 
-    /// The same consumer search with an observable exact capacity call for its unit receipts.
+    /// The same consumer search with an observable one-count predicate for its unit receipts.
     fn founding_candidates_with(
         &self,
-        mut n_star: impl FnMut(u64) -> Result<u64, HnnError>,
+        mut admits: impl FnMut(u64) -> Result<bool, HnnError>,
     ) -> Result<Vec<Candidate>, HnnError> {
         let first = self.found(FoundedRing { period: 2, key: 1 });
         if first.is_err() {
@@ -1538,13 +1557,13 @@ impl Field {
         drop(first);
         let mut below = 2u64;
         let mut above = below.checked_mul(2).ok_or(HnnError::CountOverflow)?;
-        while n_star(above)? <= self.population {
+        while admits(above)? {
             below = above;
             above = above.checked_mul(2).ok_or(HnnError::CountOverflow)?;
         }
         while above - below > 1 {
             let middle = below + (above - below) / 2;
-            if n_star(middle)? <= self.population {
+            if admits(middle)? {
                 below = middle;
             } else {
                 above = middle;

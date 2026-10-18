@@ -236,13 +236,16 @@ fn capacity_control(places: usize) {
     // Search-only and all are validation partitions; the external receipt wrapper fixes their
     // measured growth projection and stop budget before launch. No test reads its own timings.
     let phase = std::env::var("R4B_CAPACITY_PHASE").unwrap_or_else(|_| "all".into());
-    assert!(matches!(phase.as_str(), "monotone" | "search" | "all"));
+    assert!(matches!(
+        phase.as_str(),
+        "monotone" | "search" | "all" | "count-dev"
+    ));
     let field = Field::declare(listener(places, 1 << 16)).unwrap();
     let probes = CapacityProbeScope::open(places);
     let started = std::time::Instant::now();
     let first_whole = field.found(FoundedRing { period: 2, key: 1 }).unwrap();
     record_capacity_whole(
-        if phase == "monotone" {
+        if phase == "monotone" || phase == "count-dev" {
             "development"
         } else {
             "first"
@@ -258,6 +261,10 @@ fn capacity_control(places: usize) {
     for period in first..=last {
         let started = std::time::Instant::now();
         let n = field.founding_n_star(period).unwrap();
+        assert_eq!(
+            field.founding_admits(period).unwrap(),
+            n <= field.population()
+        );
         record_capacity_probe(period, n, started.elapsed().as_nanos());
         assert!(
             n >= previous,
@@ -270,15 +277,46 @@ fn capacity_control(places: usize) {
         println!("R4B_CAPACITY_READ places={places} units=7 development_only=true");
         return;
     }
-    let before_search = probes.readings().len();
+    if phase == "count-dev" {
+        let largest = if places == 1 { 256 } else { 32 };
+        let predicted_boundary = if places == 1 { 150 } else { 18 };
+        let started = std::time::Instant::now();
+        let admits = field.founding_admits(largest).unwrap();
+        println!(
+            "R4B_ADMITS places={places} l={largest} admits={admits} elapsed_ns={} kind=development",
+            started.elapsed().as_nanos()
+        );
+        for (period, kind) in [
+            (predicted_boundary, "development_confirmed"),
+            (predicted_boundary + 1, "development_refused"),
+        ] {
+            let started = std::time::Instant::now();
+            let n_star = match field.found(FoundedRing {
+                period,
+                key: period - 1,
+            }) {
+                Ok(found) => found.capacity().n_star(),
+                Err(HnnError::BelowCapacity { n_star, .. }) => n_star,
+                other => panic!("development whole declaration: {other:?}"),
+            };
+            record_capacity_whole(kind, period, n_star, started.elapsed().as_nanos());
+        }
+        println!("R4B_CAPACITY_READ places={places} development_only=true count_amendment=true");
+        return;
+    }
+    let mut search = Vec::new();
     let started = std::time::Instant::now();
     // The public consumer's law, observed through its existing capacity-call seam.
     let candidates = field
         .founding_candidates_with(|period| {
             let started = std::time::Instant::now();
-            let n = field.founding_n_star(period)?;
-            record_capacity_probe(period, n, started.elapsed().as_nanos());
-            Ok(n)
+            let admits = field.founding_admits(period)?;
+            println!(
+                "R4B_ADMITS places={places} l={period} admits={admits} elapsed_ns={} kind=search",
+                started.elapsed().as_nanos()
+            );
+            search.push((period, admits));
+            Ok(admits)
         })
         .unwrap();
     println!(
@@ -286,11 +324,10 @@ fn capacity_control(places: usize) {
         started.elapsed().as_nanos()
     );
     let readings = probes.readings();
-    let search = &readings[before_search..];
     let maximum = search
         .iter()
-        .filter(|reading| reading.n_star <= field.population())
-        .map(|reading| reading.period)
+        .filter(|(_, admits)| *admits)
+        .map(|(period, _)| *period)
         .max()
         .unwrap_or(2);
     let log_bound = u64::BITS - maximum.leading_zeros();
@@ -347,7 +384,16 @@ fn capacity_control(places: usize) {
     };
     record_capacity_whole("refused", next, n_star, started.elapsed().as_nanos());
     assert!(n_star > field.population());
-    assert_eq!(ordered.get(&next), Some(&n_star));
+    assert!(search.contains(&(next, false)));
+    let searched: BTreeMap<_, _> = search.iter().copied().collect();
+    let mut refused = false;
+    for (_, admits) in searched {
+        assert!(
+            !refused || !admits,
+            "admitted periods form an initial segment"
+        );
+        refused |= !admits;
+    }
     println!(
         "R4B_CAPACITY_BOUNDARY places={places} l_max={maximum} probes={}",
         search.len()
@@ -381,7 +427,7 @@ fn r4b_capacity_search_propagates_probe_errors_and_checked_overflow() {
         Err(HnnError::CountOverflow)
     ));
     assert!(matches!(
-        field.founding_candidates_with(|_| Ok(0)),
+        field.founding_candidates_with(|_| Ok(true)),
         Err(HnnError::CountOverflow)
     ));
     let mut declaration = field.declaration().clone();
