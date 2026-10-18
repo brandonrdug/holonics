@@ -38,7 +38,10 @@ struct MarginalFace {
 
 impl MarginalFace {
     fn matches(&self, counts: &[u64], port: &ExactRatMatrix) -> bool {
-        self.counts.as_slice() == counts && self.values.as_slice() == port.entries()
+        self.width == port.rows()
+            && self.alphabet == port.columns()
+            && self.counts.as_slice() == counts
+            && self.values.as_slice() == port.entries()
     }
 
     fn build(
