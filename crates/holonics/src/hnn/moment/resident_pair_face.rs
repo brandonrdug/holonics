@@ -1,5 +1,6 @@
 //! The derived pair face at unit modulus. Counts have one writer; readers share exact snapshots.
 use super::*;
+use crate::ratio::linear::vector::combination;
 use rayon::prelude::*;
 use std::fmt;
 use std::sync::atomic::{AtomicU64, Ordering};
