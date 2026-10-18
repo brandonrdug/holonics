@@ -961,9 +961,9 @@ pub(super) fn run(
             .unwrap_or_else(|_| Err("B branch worker panicked".to_owned()));
         (a_result, a0_result, b_result)
     });
-    let (a_views, a_faces, a_lifts, _a_times) = from_worker(a_result)?;
+    let (a_views, a_faces, _a_lifts, _a_times) = from_worker(a_result)?;
     let (_a0_faces, _a0_lifts, _a0_times) = from_worker(a0_result)?;
-    let (b_views, b_faces, b_lifts, _b_times) = from_worker(b_result)?;
+    let (b_views, b_faces, _b_lifts, _b_times) = from_worker(b_result)?;
     let a_end = cut_view(a.constitution(), &[])?;
     let b_end = cut_view(b.constitution(), &[])?;
     println!(

@@ -162,7 +162,7 @@ impl PhaseBudget {
 
     /// Reports a final partial block and returns the exact phase accounting. A partial block is
     /// not inserted into the forecast, so the estimator always uses fixed eight-cell blocks.
-    pub(super) fn finish_phase(mut self) -> PhaseSummary {
+    pub(super) fn finish_phase(self) -> PhaseSummary {
         if self.block_cells > 0 {
             self.report_block(true);
         }
@@ -457,13 +457,13 @@ mod tests {
     #[test]
     fn isolated_spike_is_not_a_single_cell_abort_or_second_block_stop() {
         let mut forecast = ForecastBook::default();
-        // Seven ordinary timings and one spike make a completed block rate of 22.5 ns/cell.
+        // Seven ordinary timings and one spike make a completed block rate of 21.25 ns/cell.
         let block = [10_u128, 10, 10, 10, 10, 10, 10, 100]
             .into_iter()
             .sum::<u128>();
         forecast.push(block);
         assert_eq!(BLOCK_CELLS, 8);
-        assert_eq!(forecast.upper_ns_per_cell(), Some(23)); // ceil(180 / 8)
+        assert_eq!(forecast.upper_ns_per_cell(), Some(22)); // ceil(170 / 8)
         let projected_ns = 1_000 + forecast.upper_ns_per_cell().unwrap() * 10;
         let allowed_ns = 1_200;
         let bad_blocks = usize::from(projected_ns > allowed_ns);
@@ -476,7 +476,8 @@ mod tests {
         cell_times.push(100); // one slow cell contributes to its completed block, not a hard cap
         cell_times.extend([10_u128; 8]);
         cell_times.push(u128::MAX); // incomplete tail is not admitted into the forecast
-        assert_eq!(completed_block_upper_ns_per_cell(&cell_times), Some(29));
+        // M=250/16 and S=90/8, so ceil(M+S)=ceil(26.875)=27.
+        assert_eq!(completed_block_upper_ns_per_cell(&cell_times), Some(27));
         assert_eq!(completed_block_upper_ns_per_cell(&[u128::MAX]), None);
     }
 
