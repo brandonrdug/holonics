@@ -147,6 +147,8 @@ pub use comparison::{
     FrozenComparison, no_reach_halving,
 };
 
+pub mod observed;
+
 use std::collections::{BTreeMap, BTreeSet};
 use std::ops::Range;
 use std::time::{Duration, Instant};
@@ -3349,14 +3351,25 @@ impl Cut {
     /// before the aeon's opening `start`, and none at or before a held-out cell, so the crib holds
     /// only cells already read and never a held-out one (review D1).
     pub fn closing_crib(&self, start: usize, at: usize, window: usize) -> Range<usize> {
-        let mut from = at.saturating_sub(window).max(start);
-        for range in &self.held_out {
-            if range.start < at && range.end > from {
-                from = from.max(range.end.min(at));
-            }
-        }
-        from..at
+        closing_crib(start, at, window, &self.held_out)
     }
+}
+
+/// The sole closing-crib law: only cells of this aeon after the last excluded
+/// position, within the declaration's finite window.
+pub fn closing_crib(
+    start: usize,
+    at: usize,
+    window: usize,
+    held_out: &[Range<usize>],
+) -> Range<usize> {
+    let mut from = at.saturating_sub(window).max(start);
+    for range in held_out {
+        if range.start < at && range.end > from {
+            from = from.max(range.end.min(at));
+        }
+    }
+    from..at
 }
 
 /// [definition] **Bits on a population of targets**: the model's code length on its scored face,
@@ -3415,6 +3428,50 @@ impl Bits {
 pub struct KeyReport {
     pub cell: u64,
     pub detail: ReceiptDetail,
+}
+
+/// One close and optional location, with the published boundary beside the exact
+/// key-location reading. The resident retains neither crib nor report.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ClosedLocated {
+    pub boundary: AeonBoundary,
+    pub receipt: PortReceipt,
+    pub key: Option<PortReceipt>,
+    pub crib_len: usize,
+}
+
+/// One owner of the carry-out close and its key location for every execution
+/// port. The caller provides the already encoded closing crib; the field's
+/// declared offset alone decides whether to locate. Inadmissible input is refused
+/// before closing; a caller needing atomicity against a later location refusal
+/// on admitted input stages the resident.
+pub fn close_and_locate<P: ExecutionPort>(
+    port: &P,
+    resident: &mut P::Resident,
+    admitted: &[ReceivingPhases],
+    crib: &Encoded,
+) -> Result<ClosedLocated, HnnError> {
+    let (field, _, _) = port.read(resident)?;
+    let offset = field.crib().offset;
+    if crib.len() > offset {
+        field.admit(crib)?;
+    }
+    let closed = port.close_aeon(resident, admitted)?;
+    let key = if crib.len() > offset {
+        let located = port.locate_keys(resident, crib, offset)?;
+        Some(located.receipt)
+    } else {
+        None
+    };
+    Ok(ClosedLocated {
+        boundary: closed
+            .forward
+            .into_present()
+            .expect("close returns its boundary"),
+        receipt: closed.receipt,
+        key,
+        crib_len: crib.len(),
+    })
 }
 
 /// [definition] **The state against the source, in bits**: the lift point, the open moment, the
@@ -4829,17 +4886,6 @@ where
     let crib = field.crib();
     let cells = &cut.cells;
     let mut keys = Vec::new();
-    let mut locate = |resident: &mut P::Resident, span: Range<usize>| -> Result<(), HnnError> {
-        if span.len() > crib.offset {
-            let at = span.end as u64;
-            let located = port.locate_keys(resident, &cells.part(span)?, crib.offset)?;
-            keys.push(KeyReport {
-                cell: at,
-                detail: located.receipt.detail,
-            });
-        }
-        Ok(())
-    };
     // The passage continues: the moment the resident holds and the cells it has received, or a
     // moment opened at cell zero.
     let (moment, aeon_cells) = match resident.continuing() {
@@ -5127,9 +5173,20 @@ where
             if ingested.carry_out {
                 let at = position + fed;
                 course.push(leg.close(at as u64, resident.constitution(), phases.ring())?);
-                let closed = port.close_aeon(&mut resident, &family)?;
-                aeons.push(closed.forward.into_present().expect("a boundary"));
-                locate(&mut resident, cut.closing_crib(aeon_start, at, crib.window))?;
+                let span = cut.closing_crib(aeon_start, at, crib.window);
+                let closing = close_and_locate(
+                    port,
+                    &mut resident,
+                    &family,
+                    &cells.part(span)?,
+                )?;
+                aeons.push(closing.boundary);
+                if let Some(key) = closing.key {
+                    keys.push(KeyReport {
+                        cell: at as u64,
+                        detail: key.detail,
+                    });
+                }
                 aeon_start = at;
             }
         }

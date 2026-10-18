@@ -246,6 +246,13 @@ use crate::receiver::face::WidthRefusal;
 /// `?` from its owner's error.
 #[derive(Debug, Error, PartialEq)]
 pub enum HnnError {
+    #[error(
+        "the continuing source reached its declared horizon: population {population}, source operand bound {source_operand_bound}"
+    )]
+    Horizon {
+        population: u64,
+        source_operand_bound: u128,
+    },
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
     /// A solved receiver-chart carrier refused an exact integer conversion. This is kept

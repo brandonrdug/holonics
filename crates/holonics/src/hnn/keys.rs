@@ -27,7 +27,8 @@
 //!   `p_0` the menu visits is published. Exactly one member of each orbit satisfies it (Lean
 //!   `HNN/Keys.gauge_fix_unique`). It is a declared symmetry-breaking convention (R3 K2), recorded in
 //!   [`crate::hnn::Field::describe`], not a finding;
-//! - **fallback**: an empty fibre (reported with its shortest failing loop) or a plural one leaves
+//! - **fallback**: an empty fibre (reported with its shortest failing loop), a plural one,
+//!   or a menu that visits no port, which leaves the gauge nothing to fix at, leaves
 //!   the ring at its current configuration;
 //! - **re-keying** ([`KeyLocation::rekey`]) sets each published ring's phase class in `λ`, keeping
 //!   its winding. It is never applied to a past cell: the open moment is untouched (R3 K1).
@@ -299,7 +300,8 @@ fn class(candidate: &Candidate<Clock>, period: u64) -> (u64, Vec<Option<usize>>)
 }
 
 /// **Locate one ring's key** under the declared configurations of the rings before it, falling back
-/// to `fallback` (its current configuration) unless the fibre is one gauge orbit.
+/// to `fallback` (its current configuration) on an empty or plural fibre, or a menu that visits
+/// no port, which leaves the gauge nothing to fix at. Otherwise one gauge orbit is published.
 pub fn locate_ring(
     field: &Field,
     ring: usize,
@@ -342,15 +344,13 @@ pub fn locate_ring(
         one_orbit &=
             members.len() == classes.len() && classes.iter().all(|known| members.contains(known));
     }
-    let published = if one_orbit && orbits == 1 {
-        let least = menu_ports[0];
-        classes
+    let published = match menu_ports.first() {
+        Some(&least) if one_orbit && orbits == 1 => classes
             .iter()
             .filter(|(_, images)| images[least] == Some(0))
             .map(|(key, _)| *key)
-            .next()
-    } else {
-        None
+            .next(),
+        _ => None,
     };
     Ok(RingKeys {
         ring,
@@ -370,7 +370,8 @@ pub fn locate_ring(
 
 /// **Locate every ring's key** at a crib's opening (the lift `current`), per ring in carry order:
 /// ring `g` is located under the published or fallen-back configurations of rings `0 … g−1`, and a
-/// ring whose fibre is not one orbit keeps the current configuration. The crib is an encoded
+/// ring with an empty or plural fibre, or a menu that visits no port, which leaves the gauge
+/// nothing to fix at, keeps the current configuration. The crib is an encoded
 /// passage (THE_MACHINE guard 9; structural, `E0308` on a code list):
 ///
 /// ```compile_fail,E0308
