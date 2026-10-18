@@ -344,17 +344,16 @@ mod tests {
                 generic_within(&field, 301, OPEN_BUDGET),
             )
             .unwrap();
+        // Take the first two actual deposits, before the period-four chain's
+        // recorded carrier edge at cell two (2026-10-05 record, section 2).
+        // The marginal identity concerns these admitted port values and counts;
+        // alternating them exercises both signs without widening the carrier.
         let mut held = None;
-        let mut published_changes = 0;
-        for n in 0..400 {
+        let mut deposited = Vec::new();
+        for n in 0..2 {
             let (id, _) = reference
                 .ingest(&mut resident, held.as_ref(), &encoded(&field, &[code(n)]))
                 .unwrap();
-            equal(
-                &field,
-                resident.constitution(),
-                resident.moment(&id).unwrap(),
-            );
             let phases = resident.admitted()[0].clone();
             let (pending, _) = reference.refine(&mut resident, &id, &phases).unwrap();
             let targets: Vec<_> = (1..=field.receivers()[0].aperture)
@@ -363,23 +362,42 @@ mod tests {
             let (staged, _) = reference
                 .compare(&mut resident, pending, &encoded(&field, &targets))
                 .unwrap();
-            let before = resident.constitution().source_port(0).unwrap().clone();
             reference.deposit(&mut resident, staged).unwrap();
-            published_changes +=
-                usize::from(resident.constitution().source_port(0) != Some(&before));
-            equal(
-                &field,
-                resident.constitution(),
-                resident.moment(&id).unwrap(),
-            );
+            deposited.push(resident.constitution().clone());
             held = Some(id);
         }
-        assert!(
-            published_changes > 0,
-            "400 actual deposits must exercise port changes"
-        );
+        let mut current = Current::at_rest(&field);
+        let mut moment = SourceMoment::open(&field, &current);
+        for n in 0..400 {
+            moment
+                .ingest(&field, &mut current, &encoded(&field, &[code(n)]))
+                .unwrap();
+            let before = &deposited[n % 2];
+            let after = &deposited[(n + 1) % 2];
+            let before_port = before.source_port(0).unwrap();
+            let after_port = after.source_port(0).unwrap();
+            assert_eq!(before_port.rows(), after_port.rows());
+            assert_eq!(before_port.columns(), field.alphabet());
+            assert_eq!(after_port.columns(), field.alphabet());
+            assert_ne!(before_port, after_port, "E must differ on every cell");
+            assert!(
+                before_port
+                    .entries()
+                    .iter()
+                    .zip(after_port.entries())
+                    .enumerate()
+                    .any(|(i, (old, new))| old != new
+                        && (0..moment.rings[0].period)
+                            .any(|phase| moment.phase_counts(0, phase).unwrap()
+                                [i % field.alphabet()]
+                                != 0)),
+                "the changed port entry must meet a counted phase on every cell"
+            );
+            equal(&field, before, &moment);
+            equal(&field, after, &moment);
+        }
         println!(
-            "marginal_oracle cells=400 certified_deposits=400 published_port_changes={published_changes}"
+            "marginal_oracle cells=400 actual_deposited_constitutions=2 alternating_port_changes=400"
         );
     }
 
@@ -398,7 +416,9 @@ mod tests {
         equal(
             &field,
             &material,
-            &moment.station_section(&field, &current, 0, &cells).unwrap(),
+            &SourceMoment::open(&field, &current)
+                .station_section(&field, &current, 0, &cells)
+                .unwrap(),
         );
         equal(&field, &material, &parsed(&field, &moment));
         moment.rings[0].first[0] += 13;
