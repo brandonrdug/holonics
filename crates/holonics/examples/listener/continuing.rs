@@ -266,6 +266,24 @@ fn packed<T: std::fmt::Display>(values: &[T]) -> String {
     )
 }
 
+/// Exterior receipt, called only after both Native and report clocks have stopped.
+fn pair_face_line(resident: &Resident, section: usize, role: &str, unit: u64) -> Result<String> {
+    let (id, _) = resident
+        .continuing()
+        .ok_or("pair face receipt has no continuing moment")?;
+    let moment = resident
+        .moment(&id)
+        .ok_or("pair face receipt has no moment")?;
+    let started = Instant::now();
+    let clone = std::hint::black_box(moment.clone());
+    let clone_ns = elapsed(started);
+    drop(clone);
+    Ok(format!(
+        "pair_face section={section} role={role} unit={unit} ring_offset_population_occupied_bindings_rebuilds={:?} clone_ns={clone_ns}",
+        moment.pair_face_summary()
+    ))
+}
+
 fn deliver(
     port: &Reference,
     resident: &mut Resident,
@@ -412,6 +430,7 @@ fn deliver(
             resident.state_bits(),
             material.exact_bits()
         ));
+        emit(pair_face_line(resident, section, role, native.cells)?);
     }
     Ok(())
 }
@@ -546,6 +565,7 @@ fn release_fork(
         emit(format!(
             "report section={section} role=drawn index={index} report_ns={report_ns}"
         ));
+        emit(pair_face_line(&fork, section, "drawn", index as u64)?);
         if horizon {
             break;
         }
@@ -1029,6 +1049,14 @@ mod tests {
                     "source_chart_ring_exponent_scale_support_certificate",
                     "source_chart_ring_rule_exponent_target",
                 ]
+            } else if line.starts_with("pair_face ") {
+                &[
+                    "section",
+                    "role",
+                    "unit",
+                    "ring_offset_population_occupied_bindings_rebuilds",
+                    "clone_ns",
+                ]
             } else if line.starts_with("cert ") {
                 &["section", "role", "delivered", "steps"]
             } else if line.starts_with("pairing ") {
@@ -1066,6 +1094,7 @@ mod tests {
             "cell ",
             "precision ",
             "state ",
+            "pair_face ",
             "cert ",
             "pairing ",
             "drawn ",

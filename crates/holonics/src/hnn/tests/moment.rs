@@ -27,6 +27,378 @@ use crate::ratio::Rat;
 use crate::ratio::linear::vector::{add, dot};
 use crate::ratio::{integer, rat};
 
+mod resident_pair_face_controls {
+    use super::*;
+    use crate::hnn::constitution::{FactorGradient, FactorStep};
+    use crate::hnn::port::ExecutionPort;
+    use crate::hnn::reference::{Reference, compose_pair_return, whole_pair_gradient};
+    use crate::hnn::tests::learning::{OPEN_BUDGET, chain_two_declaration, generic_within};
+    use crate::ratio::linear::vector::integral;
+    use num_traits::One;
+
+    /// The smaller two-class, rank-four chain; both offsets are read at the real port of a
+    /// constitution after a certified comparison and deposition, not a fabricated gradient.
+    fn deposited() -> (Field, crate::hnn::Constitution) {
+        let mut declared = chain_two_declaration(1 << 16);
+        declared.offsets = vec![1, 2];
+        // Every class fits the source ring, so its physical sections have one declared tick
+        // per station. This is the source clock required by station_section's admission.
+        declared.rings[0].lock = (0..declared.rings[0].period).collect();
+        let field = Field::declare(declared.by_lattice_rule()).unwrap();
+        let reference = Reference::new(4, OPEN_BUDGET);
+        let before = generic_within(&field, 301, OPEN_BUDGET);
+        let mut resident = reference
+            .mount_with(&field, &Current::at_rest(&field), before.clone())
+            .unwrap();
+        let (moment, _) = reference
+            .ingest(&mut resident, None, &encoded(&field, &[1, 0, 0, 1, 1]))
+            .unwrap();
+        let phases = resident.admitted()[0].clone();
+        let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+        let (staged, _) = reference
+            .compare(&mut resident, pending, &encoded(&field, &[1, 0]))
+            .unwrap();
+        reference.deposit(&mut resident, staged).unwrap();
+        let material = resident.constitution().clone();
+        assert!(material.commit() > before.commit());
+        assert!(
+            field
+                .offsets()
+                .iter()
+                .any(|&offset| { before.pair_port(0, offset) != material.pair_port(0, offset) })
+        );
+        assert_eq!(material.transport(0), Rat::one());
+        (field, material)
+    }
+
+    fn code(index: usize) -> usize {
+        (index * index + 3 * index + index / 7) % 2
+    }
+
+    fn feed(field: &Field, current: &mut Current, moment: &mut SourceMoment, index: usize) {
+        assert_eq!(
+            moment
+                .ingest(field, current, &encoded(field, &[code(index)]))
+                .unwrap()
+                .cells,
+            1
+        );
+    }
+
+    fn passage(field: &Field) -> (Current, SourceMoment) {
+        let mut current = Current::at_rest(field);
+        let mut moment = SourceMoment::open(field, &current);
+        for index in 0..400 {
+            feed(field, &mut current, &mut moment, index);
+        }
+        (current, moment)
+    }
+
+    fn text(moment: &SourceMoment) -> String {
+        let mut text = String::new();
+        moment.write(&mut text);
+        text
+    }
+
+    fn cold(field: &Field, moment: &SourceMoment) -> SourceMoment {
+        let serialized = text(moment);
+        let mut lines = serialized.lines();
+        let head = lines.next().unwrap();
+        SourceMoment::read(field, head, &mut |what| {
+            lines.next().ok_or(HnnError::ContinuingState { what })
+        })
+        .unwrap()
+    }
+
+    fn assert_reads(
+        field: &Field,
+        material: &crate::hnn::Constitution,
+        current: &Current,
+        moment: &SourceMoment,
+    ) {
+        let (ring, width, alphabet) = (0, field.ring(0).width(), field.alphabet());
+        let chart = crate::hnn::moment::PopulationChart::of(field);
+        for &offset in field.offsets() {
+            let pair = material.pair_port(ring, offset).unwrap();
+            let face = moment
+                .resident_pair_face(ring, offset, pair)
+                .unwrap()
+                .unwrap();
+            let series = face
+                .output_series(pair, width, &chart.value(face.population()))
+                .unwrap();
+            let table = moment.offset_table(field, ring, offset).unwrap();
+            for (phase, row) in series.iter().enumerate() {
+                let expected = table.as_ref().map_or_else(
+                    || vec![Rat::zero(); width],
+                    |table| pair.apply_table_termwise(table, phase, alphabet, width),
+                );
+                assert_eq!(
+                    *row,
+                    expected,
+                    "cell{} offset{offset} phase{phase}",
+                    moment.cells()
+                );
+            }
+        }
+        let (reads, pairs) = moment
+            .moment_parts_whole_table_oracle(field, material, ring)
+            .unwrap();
+        let geometry = field.ring(ring);
+        let lifted_reads: Vec<_> = reads
+            .iter()
+            .map(|(phase, read)| (*phase, geometry.rotate(read, &current.lift()[ring])))
+            .collect();
+        assert_eq!(
+            moment.open_parts(field, material, current, ring).unwrap(),
+            (lifted_reads, geometry.rotate(&pairs, &current.lift()[ring]))
+        );
+        let weights = moment
+            .phase_weights(field, ring, &material.transport(ring))
+            .unwrap();
+        let mut encoded = pairs;
+        for (phase, read) in reads {
+            for (sum, entry) in encoded.iter_mut().zip(read) {
+                *sum += entry * &weights[phase];
+            }
+        }
+        assert_eq!(moment.encode(field, material, ring).unwrap(), encoded);
+    }
+
+    #[test]
+    fn pair_face_reads_the_whole_table() {
+        let (field, material) = deposited();
+        let mut current = Current::at_rest(&field);
+        let mut moment = SourceMoment::open(&field, &current);
+        // First read at zero, then every binding must increment the same live face.
+        assert_reads(&field, &material, &current, &moment);
+        for index in 0..400 {
+            feed(&field, &mut current, &mut moment, index);
+            assert_reads(&field, &material, &current, &moment);
+        }
+        assert!(
+            moment
+                .pair_face_summary()
+                .iter()
+                .all(|row| row.4 == BigUint::one())
+        );
+    }
+
+    #[test]
+    fn pair_face_gradient_equals_the_whole_table() {
+        let (field, material) = deposited();
+        let mut current = Current::at_rest(&field);
+        let mut moment = SourceMoment::open(&field, &current);
+        let width = field.ring(0).width();
+        let turned: Vec<Vec<Rat>> = (0..field.ring(0).period() as usize)
+            .map(|c| {
+                (0..width)
+                    .map(|j| rat((3 * c + j) as i64 - 5, (c + j + 1) as i64))
+                    .collect()
+            })
+            .collect();
+        let charts: Vec<_> = turned.iter().map(|r| integral(r)).collect();
+        for index in 0..400 {
+            feed(&field, &mut current, &mut moment, index);
+            for &offset in field.offsets() {
+                let pair = material.pair_port(0, offset).unwrap();
+                let old = whole_pair_gradient(&field, &moment, 0, offset, pair, &turned, &charts)
+                    .unwrap();
+                let expected = FactorStep {
+                    gradient: FactorGradient::PairPort {
+                        ring: 0,
+                        offset,
+                        outputs: old
+                            .outputs
+                            .iter()
+                            .map(|r| r.iter().map(|v| -v).collect())
+                            .collect(),
+                        current: old
+                            .current
+                            .iter()
+                            .map(|r| r.iter().map(|v| -v).collect())
+                            .collect(),
+                        earlier: old
+                            .earlier
+                            .iter()
+                            .map(|r| r.iter().map(|v| -v).collect())
+                            .collect(),
+                    },
+                    energy: old.energy,
+                    covector: old.covector,
+                };
+                let (step, pullback) =
+                    compose_pair_return(&field, &moment, 0, offset, pair, &turned, &charts)
+                        .unwrap();
+                assert_eq!(step, expected, "cell{index} offset{offset}");
+                assert_eq!(pullback, [old.outputs, old.current, old.earlier]);
+            }
+        }
+    }
+
+    #[test]
+    fn pair_face_rebuilds_on_changed_reads() {
+        let (field, material) = deposited();
+        let (current, moment) = passage(&field);
+        assert_reads(&field, &material, &current, &moment);
+        let original = material.pair_port(0, 1).unwrap();
+        let mut reads = original.current_reads().to_vec();
+        reads[0][0] += rat(1, 2);
+        let changed = material
+            .clone()
+            .with_pair(
+                0,
+                1,
+                PairPort::new(
+                    original.outputs().to_vec(),
+                    reads,
+                    original.earlier_reads().to_vec(),
+                )
+                .unwrap(),
+            )
+            .unwrap();
+        assert_reads(&field, &changed, &current, &moment);
+        let counts = moment.pair_face_summary();
+        assert_eq!(
+            counts.iter().find(|r| r.1 == 1).unwrap().4,
+            BigUint::from(2u8)
+        );
+        assert_eq!(counts.iter().find(|r| r.1 == 2).unwrap().4, BigUint::one());
+        let pair = changed.pair_port(0, 1).unwrap();
+        // A finer exact chart has the same values, including a separately allocated port.
+        let recharted = pair
+            .current_reads()
+            .iter()
+            .map(|row| {
+                row.iter()
+                    .map(|v| Rat::new(v.numer() * 2, v.denom() * 2))
+                    .collect()
+            })
+            .collect();
+        let changed = changed
+            .clone()
+            .with_pair(
+                0,
+                1,
+                PairPort::new(
+                    pair.outputs().to_vec(),
+                    recharted,
+                    pair.earlier_reads().to_vec(),
+                )
+                .unwrap(),
+            )
+            .unwrap();
+        assert_reads(&field, &changed, &current, &moment);
+        assert_eq!(moment.pair_face_summary(), counts);
+    }
+
+    #[test]
+    fn pair_face_follows_sections() {
+        let (field, material) = deposited();
+        let (current, moment) = passage(&field);
+        assert_reads(&field, &material, &current, &moment);
+        let retained = text(&moment);
+        let summary = moment.pair_face_summary();
+        let cells: Vec<_> = (0..400).map(|i| (i % 11 != 0).then(|| code(i))).collect();
+        let continued = moment.continued(&field, &current, 0, &cells).unwrap();
+        let opening = SourceMoment::open(&field, &current);
+        assert_reads(&field, &material, &current, &opening);
+        let opening_text = text(&opening);
+        let opening_summary = opening.pair_face_summary();
+        let section = opening
+            .station_section(&field, &current, 0, &cells)
+            .unwrap();
+        assert_reads(&field, &material, &current, &continued);
+        assert_reads(&field, &material, &current, &section);
+        assert_ne!(
+            continued.pair_population(0, 1).unwrap(),
+            section.pair_population(0, 1).unwrap()
+        );
+        assert_eq!(text(&moment), retained);
+        assert_eq!(
+            moment.pair_face_summary(),
+            summary,
+            "a clone's write cannot change its parent face"
+        );
+        assert_eq!(text(&opening), opening_text);
+        assert_eq!(opening.pair_face_summary(), opening_summary);
+    }
+
+    #[test]
+    fn pair_face_is_not_retained() {
+        use std::{hint::black_box, time::Instant};
+        let (field, material) = deposited();
+        let (current, moment) = passage(&field);
+        let retained = text(&moment);
+        let bits = moment.dense_bits();
+        let capacity = moment.capacity(&field, &current).unwrap();
+        let parsed = cold(&field, &moment);
+        assert!(parsed.pair_face_summary().is_empty());
+        assert_reads(&field, &material, &current, &moment);
+        assert_eq!(moment, parsed);
+        assert_eq!(text(&moment), retained);
+        assert_eq!(moment.dense_bits(), bits);
+        assert_eq!(moment.capacity(&field, &current).unwrap(), capacity);
+        let start = Instant::now();
+        let base_clone = black_box(parsed.clone());
+        let base_clone_ns = start.elapsed().as_nanos();
+        let start = Instant::now();
+        let face_clone = black_box(moment.clone());
+        let face_clone_ns = start.elapsed().as_nanos();
+        eprintln!(
+            "pair-face clone control: cells=400 base_clone_ns={base_clone_ns} face_clone_ns={face_clone_ns}"
+        );
+        assert_eq!(face_clone, base_clone);
+        assert_reads(&field, &material, &current, &parsed);
+        assert_eq!(text(&parsed), retained);
+        assert_reads(&field, &material, &current, &face_clone);
+    }
+
+    #[test]
+    fn pair_face_physical_source_move_equals_two_contractions() {
+        let (field, material) = deposited();
+        let (_, moment) = passage(&field);
+        let (width, alphabet) = (field.ring(0).width(), field.alphabet());
+        let mut nonzero = false;
+        for &offset in field.offsets() {
+            let old = material.pair_port(0, offset).unwrap();
+            let outputs = old
+                .outputs()
+                .iter()
+                .enumerate()
+                .map(|(r, row)| {
+                    row.iter()
+                        .enumerate()
+                        .map(|(j, value)| value + rat((r + j + 1) as i64, 2))
+                        .collect()
+                })
+                .collect();
+            let new = PairPort::new(
+                outputs,
+                old.current_reads().to_vec(),
+                old.earlier_reads().to_vec(),
+            )
+            .unwrap();
+            let actual = crate::hnn::prediction::pair_output_move_series(
+                &field, &moment, 0, offset, old, &new,
+            )
+            .unwrap();
+            let table = moment.offset_table(&field, 0, offset).unwrap().unwrap();
+            for (phase, row) in actual.iter().enumerate() {
+                let before = old.apply_table_termwise(&table, phase, alphabet, width);
+                let after = new.apply_table_termwise(&table, phase, alphabet, width);
+                let expected: Vec<_> = after.iter().zip(&before).map(|(a, b)| a - b).collect();
+                nonzero |= row.iter().any(|v| !v.is_zero());
+                assert_eq!(*row, expected);
+            }
+        }
+        assert!(
+            nonzero,
+            "the physical move control cannot be a zero comparison"
+        );
+    }
+}
+
 /// Lean `HNN/Moment.moment_capacity` on the three-ring control (periods 3, 4, 5, `|A| = 2`, every
 /// ring a source, no offsets): `n* = 137`, and `log₂N(n)` per source bit is at least 1 below it and
 /// below 1 past it, at every `n` from 2 to 4,096 (R3 H1).

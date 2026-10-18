@@ -2552,6 +2552,144 @@ pub fn compose_return(
     )
 }
 
+/// The transported-table path and the independent test oracle for the unit-modulus face.
+pub(crate) fn whole_pair_gradient(
+    field: &Field,
+    moment: &SourceMoment,
+    g: usize,
+    offset: usize,
+    pair: &crate::hnn::moment::PairPort,
+    turned: &[Vec<Rat>],
+    turned_charts: &[crate::ratio::linear::vector::Chart],
+) -> Result<crate::hnn::moment::PairFaceGradient, HnnError> {
+    use crate::ratio::linear::vector::{Chart, combination, integral};
+    let d = turned.len();
+    let n = field.ring(g).width();
+    let alphabet = field.alphabet();
+    let rank = pair.rank();
+    // The whole normalized offset moment of each phase `(x, a, C_c[x, a] ν̂)` over its pair
+    // population (`hnn::moment`: the open reads no held cell), read once; none at an empty
+    // population.
+    let tables = [moment.offset_table(field, g, offset)?];
+    let mut nonzero: Vec<Vec<(usize, usize, Rat)>> = Vec::with_capacity(d);
+    let mut energy = Rat::zero();
+    for c in 0..d {
+        let mut slots = Vec::new();
+        for table in tables.iter().flatten() {
+            for (slot, value) in table.normalized(c, alphabet) {
+                energy += &value * &value;
+                slots.push((slot / alphabet, slot % alphabet, value));
+            }
+        }
+        nonzero.push(slots);
+    }
+    // Each rank reads only its own reads `a_ρ`, `b_ρ`, `e_ρ`: the ranks run together.
+    let ranks = indexed(rank, |rho| {
+        let (a_rho, b_rho, e_rho) = (
+            &pair.current_reads()[rho],
+            &pair.earlier_reads()[rho],
+            &pair.outputs()[rho],
+        );
+        // Per phase: w_ρc = a_ρᵀ C_c b_ρ, C_c b_ρ (by the current cell) and C_cᵀ a_ρ (by
+        // the earlier cell), over the small counts.
+        let mut weights = Vec::with_capacity(d);
+        let mut by_current: Vec<(Rat, Chart)> = Vec::with_capacity(d);
+        let mut by_earlier: Vec<(Rat, Chart)> = Vec::with_capacity(d);
+        for (slots, h) in nonzero.iter().zip(turned) {
+            let mut weight = Rat::zero();
+            let e_h = dot(e_rho, h);
+            let mut current_row = vec![Rat::zero(); alphabet];
+            let mut earlier_row = vec![Rat::zero(); alphabet];
+            for (x, y, count) in slots {
+                weight += count * &a_rho[*x] * &b_rho[*y];
+                if !e_h.is_zero() {
+                    current_row[*x] += count * &b_rho[*y];
+                    earlier_row[*y] += count * &a_rho[*x];
+                }
+            }
+            weights.push(weight);
+            if !e_h.is_zero() {
+                by_current.push((e_h.clone(), integral(&current_row)));
+                by_earlier.push((e_h, integral(&earlier_row)));
+            }
+        }
+        Ok((
+            combination(n, weights.iter().zip(turned_charts)),
+            combination(
+                alphabet,
+                by_current.iter().map(|(weight, chart)| (weight, chart)),
+            ),
+            combination(
+                alphabet,
+                by_earlier.iter().map(|(weight, chart)| (weight, chart)),
+            ),
+        ))
+    })?;
+    let mut outputs = Vec::with_capacity(rank);
+    let mut current_reads = Vec::with_capacity(rank);
+    let mut earlier_reads = Vec::with_capacity(rank);
+    for (output, current_read, earlier_read) in ranks {
+        outputs.push(output);
+        current_reads.push(current_read);
+        earlier_reads.push(earlier_read);
+    }
+    // The covector one phase's injection carries: the turned opening at each phase the
+    // offset moment occupies.
+    let covector = nonzero
+        .iter()
+        .zip(turned)
+        .filter(|(slots, _)| !slots.is_empty())
+        .flat_map(|(_, h)| h.iter().map(Signed::abs))
+        .max()
+        .unwrap_or_else(Rat::zero);
+    Ok(crate::hnn::moment::PairFaceGradient {
+        outputs,
+        current: current_reads,
+        earlier: earlier_reads,
+        energy,
+        covector,
+    })
+}
+
+/// The pair part of the actual composed return, with the whole-table route for leaky counts.
+/// Keeping the FactorStep here lets the equality oracle compare every field of the Native step.
+#[allow(clippy::type_complexity)]
+pub(crate) fn compose_pair_return(
+    field: &Field,
+    moment: &SourceMoment,
+    ring: usize,
+    offset: usize,
+    pair: &crate::hnn::moment::PairPort,
+    turned: &[Vec<Rat>],
+    turned_charts: &[crate::ratio::linear::vector::Chart],
+) -> Result<(FactorStep, [Vec<Vec<Rat>>; 3]), HnnError> {
+    let gradient = if let Some(face) = moment.resident_pair_face(ring, offset, pair)? {
+        let weight = PopulationChart::of(field).value(face.population());
+        face.gradient(pair, turned, turned_charts, &weight)?
+    } else {
+        whole_pair_gradient(field, moment, ring, offset, pair, turned, turned_charts)?
+    };
+    let crate::hnn::moment::PairFaceGradient {
+        outputs,
+        current,
+        earlier,
+        energy,
+        covector,
+    } = gradient;
+    let step = FactorStep {
+        gradient: FactorGradient::PairPort {
+            ring,
+            offset,
+            outputs: outputs.iter().map(|x| negated(x)).collect(),
+            current: current.iter().map(|x| negated(x)).collect(),
+            earlier: earlier.iter().map(|x| negated(x)).collect(),
+        },
+        energy,
+        covector,
+    };
+    Ok((step, [outputs, current, earlier]))
+}
+
 /// Compose the exact transpose of the declared source view before E, pair and count returns.
 /// Interior/contact adjoints and the return's carried-state covectors are not reprojected.
 pub fn compose_return_view(
@@ -2564,7 +2702,7 @@ pub fn compose_return_view(
     back: &WordReturn,
     view: &crate::hnn::ring::modes::ModeView,
 ) -> Result<ComposedReturn, HnnError> {
-    use crate::ratio::linear::vector::{Chart, combination, integral};
+    use crate::ratio::linear::vector::{Chart, integral};
     let released = constitution.released();
     let retained = |locus: Locus| diamond.retains(field, locus) && !released.contains(&locus);
     let alphabet = field.alphabet();
@@ -2749,94 +2887,10 @@ pub fn compose_return_view(
             let pair = constitution
                 .pair_port(g, offset)
                 .ok_or(HnnError::MissingSourcePort { ring: g })?;
-            let rank = pair.rank();
-            // The whole normalized offset moment of each phase `(x, a, C_c[x, a] ν̂)` over its pair
-            // population (`hnn::moment`: the open reads no held cell), read once; none at an empty
-            // population.
-            let tables = [moment.offset_table(field, g, offset)?];
-            let mut nonzero: Vec<Vec<(usize, usize, Rat)>> = Vec::with_capacity(d);
-            let mut energy = Rat::zero();
-            for c in 0..d {
-                let mut slots = Vec::new();
-                for table in tables.iter().flatten() {
-                    for (slot, value) in table.normalized(c, alphabet) {
-                        energy += &value * &value;
-                        slots.push((slot / alphabet, slot % alphabet, value));
-                    }
-                }
-                nonzero.push(slots);
-            }
-            // Each rank reads only its own reads `a_ρ`, `b_ρ`, `e_ρ`: the ranks run together.
-            let ranks = indexed(rank, |rho| {
-                let (a_rho, b_rho, e_rho) = (
-                    &pair.current_reads()[rho],
-                    &pair.earlier_reads()[rho],
-                    &pair.outputs()[rho],
-                );
-                // Per phase: w_ρc = a_ρᵀ C_c b_ρ, C_c b_ρ (by the current cell) and C_cᵀ a_ρ (by
-                // the earlier cell), over the small counts.
-                let mut weights = Vec::with_capacity(d);
-                let mut by_current: Vec<(Rat, Chart)> = Vec::with_capacity(d);
-                let mut by_earlier: Vec<(Rat, Chart)> = Vec::with_capacity(d);
-                for (slots, h) in nonzero.iter().zip(&turned) {
-                    let mut weight = Rat::zero();
-                    let e_h = dot(e_rho, h);
-                    let mut current_row = vec![Rat::zero(); alphabet];
-                    let mut earlier_row = vec![Rat::zero(); alphabet];
-                    for (x, y, count) in slots {
-                        weight += count * &a_rho[*x] * &b_rho[*y];
-                        if !e_h.is_zero() {
-                            current_row[*x] += count * &b_rho[*y];
-                            earlier_row[*y] += count * &a_rho[*x];
-                        }
-                    }
-                    weights.push(weight);
-                    if !e_h.is_zero() {
-                        by_current.push((e_h.clone(), integral(&current_row)));
-                        by_earlier.push((e_h, integral(&earlier_row)));
-                    }
-                }
-                Ok((
-                    combination(n, weights.iter().zip(&turned_charts)),
-                    combination(
-                        alphabet,
-                        by_current.iter().map(|(weight, chart)| (weight, chart)),
-                    ),
-                    combination(
-                        alphabet,
-                        by_earlier.iter().map(|(weight, chart)| (weight, chart)),
-                    ),
-                ))
-            })?;
-            let mut outputs = Vec::with_capacity(rank);
-            let mut current_reads = Vec::with_capacity(rank);
-            let mut earlier_reads = Vec::with_capacity(rank);
-            for (output, current_read, earlier_read) in ranks {
-                outputs.push(output);
-                current_reads.push(current_read);
-                earlier_reads.push(earlier_read);
-            }
-            // The covector one phase's injection carries: the turned opening at each phase the
-            // offset moment occupies.
-            let covector = nonzero
-                .iter()
-                .zip(&turned)
-                .filter(|(slots, _)| !slots.is_empty())
-                .flat_map(|(_, h)| h.iter().map(Signed::abs))
-                .max()
-                .unwrap_or_else(Rat::zero);
-            pair_steps.push(FactorStep {
-                gradient: FactorGradient::PairPort {
-                    ring: g,
-                    offset,
-                    outputs: outputs.iter().map(|x| negated(x)).collect(),
-                    current: current_reads.iter().map(|x| negated(x)).collect(),
-                    earlier: earlier_reads.iter().map(|x| negated(x)).collect(),
-                },
-                energy,
-                covector,
-            });
-            pair_pullbacks.push((offset, [outputs, current_reads, earlier_reads]));
+            let (step, pullbacks) =
+                compose_pair_return(field, moment, g, offset, pair, &turned, &turned_charts)?;
+            pair_steps.push(step);
+            pair_pullbacks.push((offset, pullbacks));
         }
         phases = phases.max(source_samples.len() as u64);
         if retained(Locus::SourcePort(g)) {
