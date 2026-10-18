@@ -218,7 +218,7 @@ mod tests {
         );
         assert_eq!(
             flow.covector,
-            EpochArray::new(2, 2, 1, vec![6.into(), -2.into(), -9.into(), 1.into()],).unwrap()
+            EpochArray::new(2, 2, 1, vec![6.into(), (-2).into(), (-9).into(), 1.into()]).unwrap()
         );
         assert_eq!(flow.support, vec![0, 1]);
     }
@@ -269,7 +269,7 @@ mod tests {
     fn unit_check_handles_large_exponents_without_a_fixed_width_face() {
         let tiny = EpochArray::new(1, 1, 1_000_000, vec![BigInt::one()]).unwrap();
         assert!(within_unit(&tiny.values[0], tiny.exponent));
-        assert!(within_unit(&BigInt::one() << 1_000_000usize, 1_000_000));
+        assert!(within_unit(&(BigInt::one() << 1_000_000usize), 1_000_000));
     }
 
     #[test]

@@ -144,6 +144,7 @@
 //! uncounted rather than estimated from shapes.
 
 mod comparison;
+mod epoch;
 pub use comparison::{
     ComparisonReading, ComparisonTrialReading, ComparisonWaveChanges, FiniteComparisonReceipt,
     FrozenComparison, no_reach_halving,
