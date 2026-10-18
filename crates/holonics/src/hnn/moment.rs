@@ -2533,6 +2533,39 @@ impl SourceMoment {
             .map(Some)
     }
 
+    /// The retained moment reads its port's face before the pending ratio copies the moment.
+    /// Each copy owns its slot map and shares only already materialized immutable faces.
+    pub(crate) fn read_retained_pair_faces(
+        &self,
+        field: &Field,
+        material: &dyn FieldMaterial,
+    ) -> Result<(), HnnError> {
+        for &ring in field.sources() {
+            for &offset in &self.offsets {
+                if let Some(port) = material.pair_port(ring, offset) {
+                    self.resident_pair_face(ring, offset, port)?;
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Exterior build counter over this moment and its copies. Only the number is shared;
+    /// derived faces and their maps remain independent when their counts diverge.
+    pub fn pair_face_total_builds(&self) -> BigUint {
+        self.pair_faces.total_builds()
+    }
+
+    /// Whether an existing face reads exactly these actual a/b values; absent before its first read.
+    pub fn pair_face_read_matches(
+        &self,
+        ring: usize,
+        offset: usize,
+        port: &PairPort,
+    ) -> Option<bool> {
+        self.pair_faces.read_matches(ring, offset, port)
+    }
+
     /// Exterior occupancy and rebuild receipts only; these values do not enter retention or
     /// the moment's equality and text. Each row is (ring, offset, population, occupied bindings,
     /// rebuilds). The occupancy rises only when a previously empty count receives a binding.

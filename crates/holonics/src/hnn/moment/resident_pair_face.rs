@@ -2,7 +2,7 @@
 use super::*;
 use rayon::prelude::*;
 use std::fmt;
-use std::sync::{Arc, RwLock};
+use std::sync::{Arc, Mutex, RwLock};
 
 #[derive(Clone)]
 struct Reads {
@@ -293,13 +293,14 @@ struct FaceState {
 
 /// Derived cache only: equality, text and retained bits remain the moment's counts and fields.
 #[derive(Default)]
-pub(crate) struct ResidentPairFaces(RwLock<FaceState>);
+pub(crate) struct ResidentPairFaces(RwLock<FaceState>, Arc<Mutex<BigUint>>);
 
 impl Clone for ResidentPairFaces {
     fn clone(&self) -> Self {
-        Self(RwLock::new(
-            self.0.read().map(|s| s.clone()).unwrap_or_default(),
-        ))
+        Self(
+            RwLock::new(self.0.read().map(|s| s.clone()).unwrap_or_default()),
+            Arc::clone(&self.1),
+        )
     }
 }
 impl fmt::Debug for ResidentPairFaces {
@@ -315,6 +316,20 @@ impl PartialEq for ResidentPairFaces {
 impl Eq for ResidentPairFaces {}
 
 impl ResidentPairFaces {
+    /// Exterior audit only. Clones share this number, never a cache or slot map.
+    pub(crate) fn total_builds(&self) -> BigUint {
+        self.1.lock().unwrap_or_else(|e| e.into_inner()).clone()
+    }
+
+    pub(crate) fn read_matches(&self, ring: usize, offset: usize, port: &PairPort) -> Option<bool> {
+        self.0
+            .read()
+            .ok()?
+            .slots
+            .get(&(ring, offset))
+            .map(|slot| slot.face.reads.matches(port))
+    }
+
     pub(crate) fn read(
         &self,
         ring: usize,
@@ -355,6 +370,7 @@ impl ResidentPairFaces {
                 rebuilds,
             },
         );
+        *self.1.lock().unwrap_or_else(|e| e.into_inner()) += BigUint::one();
         Ok(face)
     }
 
