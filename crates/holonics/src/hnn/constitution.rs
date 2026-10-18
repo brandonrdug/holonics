@@ -2220,6 +2220,11 @@ pub struct NormalLaw {
     symmetry: Option<PortSymmetry>,
 }
 
+struct NormalStatistics<'a> {
+    samples: Vec<(&'a Sample, Chart)>,
+    gram: Vec<Rat>,
+}
+
 impl NormalLaw {
     /// **The unit prior at a map**: `H_0 = I` (so `B_0 = W_0`), no remainder, and the founding chart
     /// `X̂ = I` exact (`δ = 0`). [agent-inferred, October 2; the
@@ -2451,60 +2456,29 @@ impl NormalLaw {
         samples: &[Sample],
     ) -> Result<(ExactRatMatrix, ExactRatMatrix), HnnError> {
         let (m, n) = (self.map.rows(), self.map.columns());
-        for sample in samples {
-            if sample.feature.len() != n || sample.covector.len() != m {
-                return Err(HnnError::Shape {
-                    what: "a normal sample (feature, covector)",
-                    expected: n + m,
-                    found: sample.feature.len() + sample.covector.len(),
-                });
-            }
-        }
-        let active: Vec<(&Sample, Chart, Chart)> = samples
-            .iter()
-            .filter(|sample| !sample.weight.is_zero())
-            .filter(|sample| sample.feature.iter().any(|x| !x.is_zero()))
-            .map(|sample| {
-                (
-                    sample,
-                    integral(&sample.feature),
-                    integral(&sample.covector),
-                )
-            })
-            .collect();
-        if active.is_empty() {
+        let Some(NormalStatistics {
+            samples: active,
+            gram,
+        }) = self.sample_statistics(samples)?
+        else {
             return Ok((ExactRatMatrix::zero(m, n)?, ExactRatMatrix::zero(n, n)?));
-        }
-        if let Some(symmetry) = &self.symmetry {
-            for (sample, _, _) in &active {
-                if let Some(class) = (0..n).find(|&class| {
-                    symmetry.columns()[class].is_none() && !sample.feature[class].is_zero()
-                }) {
-                    return Err(HnnError::PairedOutside { class });
-                }
-            }
-        }
+        };
+        let covectors: Vec<Chart> = active
+            .iter()
+            .map(|(sample, _)| integral(&sample.covector))
+            .collect();
         let cross = outer_integral(
             m,
             n,
             &active
                 .iter()
-                .map(|(sample, feature, covector)| (&sample.weight, covector, feature))
+                .zip(&covectors)
+                .map(|((sample, feature), covector)| (&sample.weight, covector, feature))
                 .collect::<Vec<_>>(),
         );
         let cross = match &self.symmetry {
             Some(symmetry) => cross.projected(symmetry.rows(), symmetry.columns()),
             None => cross,
-        };
-        let gram = gram_sum(
-            n,
-            active
-                .iter()
-                .map(|(sample, feature, _)| (&sample.weight, feature)),
-        );
-        let gram = match &self.symmetry {
-            Some(symmetry) => symmetrized_gram(n, &gram, symmetry),
-            None => gram,
         };
         Ok((
             ExactRatMatrix::shaped(m, n, cross.to_rows())?,
@@ -2512,32 +2486,12 @@ impl NormalLaw {
         ))
     }
 
-    /// **The carried prox step through the solved chart, prepared at its unit step** (Lean
-    /// `HNN/Normal.normal_prox_step`, `HNN/LatticeDeposit.carry`, `HNN/LatticeWord.prox_chart_residual`;
-    /// module header, "The certified step"): `ΔH = Σ w f fᵀ` carried onto `H` gives `H'`; the chart of
-    /// `H'` follows from the previous chart ([`SolvedChart`]: the warm start, its exact certificate
-    /// and the rounded refinements to `δ ≤ δ_ℓ` of the locus's [`ChartRule`]); then the **unit step**
-    /// `D = Σ w g (X̂f)ᵀ` is formed in the integral chart with the readings its certificate needs: the
-    /// alignment `a = Σ_t w ⟨g_t, D f_t⟩` (checked, never assumed), the feature moves
-    /// `b = Σ_t w |D f_t|²`, the lattice's covector scale `c = max_t |w g_t|_∞`, and the Schur norms of
-    /// `W` and `D`. The step `η` is certified by the constitution (it reads every locus's gains) and
-    /// applied by [`PreparedStep::stepped`]: `ΔW = η D`, so `(W + ΔW)H' = WH' + ηG − ηG(1 − X̂H')`
-    /// exactly, with `G = Σ w g fᵀ`. The Gram's carry is at the budgeted carry `at` of the locus's
-    /// deposit (its residuals staged there). `None` when nothing reached the locus (no nonzero
-    /// weighted feature), which moves nothing.
-    ///
-    /// [definition; agent-inferred] **The sums are read in the integral chart**: each sample's
-    /// feature and covector is charted once as integers over its least common denominator
-    /// (`ratio::linear::vector::integral`), each reach `X̂f` is an integer product over the feature's
-    /// denominator times `2^(L_s)`, each sum of rank-one terms is formed over integers and each entry
-    /// normalized once (`D` by row blocks, the symmetric `ΔH` on its upper triangle and mirrored). A
-    /// reduced ratio is canonical, so every value equals the termwise rational sum's.
-    pub(crate) fn prepare(
+    /// Validate and chart the reached samples and form their native Gram update once, for
+    /// both deposition and read-only statistics. Empty input keeps prepare's no-step path.
+    fn sample_statistics<'a>(
         &self,
-        samples: &[Sample],
-        rule: &ChartRule,
-        at: &mut BudgetedCarry,
-    ) -> Result<Option<PreparedStep>, HnnError> {
+        samples: &'a [Sample],
+    ) -> Result<Option<NormalStatistics<'a>>, HnnError> {
         let (m, n) = (self.map.rows(), self.map.columns());
         for sample in samples {
             if sample.feature.len() != n || sample.covector.len() != m {
@@ -2568,7 +2522,6 @@ impl NormalLaw {
                 }
             }
         }
-        let mut law = self.clone();
         // ΔH = Σ w f fᵀ, carried onto H; on a paired port ½(ΔH + Σ ΔH Σ), so H keeps commuting with Σ.
         let gram_update = gram_sum(
             n,
@@ -2580,6 +2533,47 @@ impl NormalLaw {
             Some(symmetry) => symmetrized_gram(n, &gram_update, symmetry),
             None => gram_update,
         };
+        Ok(Some(NormalStatistics {
+            samples: active,
+            gram: gram_update,
+        }))
+    }
+
+    /// **The carried prox step through the solved chart, prepared at its unit step** (Lean
+    /// `HNN/Normal.normal_prox_step`, `HNN/LatticeDeposit.carry`, `HNN/LatticeWord.prox_chart_residual`;
+    /// module header, "The certified step"): `ΔH = Σ w f fᵀ` carried onto `H` gives `H'`; the chart of
+    /// `H'` follows from the previous chart ([`SolvedChart`]: the warm start, its exact certificate
+    /// and the rounded refinements to `δ ≤ δ_ℓ` of the locus's [`ChartRule`]); then the **unit step**
+    /// `D = Σ w g (X̂f)ᵀ` is formed in the integral chart with the readings its certificate needs: the
+    /// alignment `a = Σ_t w ⟨g_t, D f_t⟩` (checked, never assumed), the feature moves
+    /// `b = Σ_t w |D f_t|²`, the lattice's covector scale `c = max_t |w g_t|_∞`, and the Schur norms of
+    /// `W` and `D`. The step `η` is certified by the constitution (it reads every locus's gains) and
+    /// applied by [`PreparedStep::stepped`]: `ΔW = η D`, so `(W + ΔW)H' = WH' + ηG − ηG(1 − X̂H')`
+    /// exactly, with `G = Σ w g fᵀ`. The Gram's carry is at the budgeted carry `at` of the locus's
+    /// deposit (its residuals staged there). `None` when nothing reached the locus (no nonzero
+    /// weighted feature), which moves nothing.
+    ///
+    /// [definition; agent-inferred] **The sums are read in the integral chart**: each sample's
+    /// feature and covector is charted once as integers over its least common denominator
+    /// (`ratio::linear::vector::integral`), each reach `X̂f` is an integer product over the feature's
+    /// denominator times `2^(L_s)`, each sum of rank-one terms is formed over integers and each entry
+    /// normalized once (`D` by row blocks, the symmetric `ΔH` on its upper triangle and mirrored). A
+    /// reduced ratio is canonical, so every value equals the termwise rational sum's.
+    pub(crate) fn prepare(
+        &self,
+        samples: &[Sample],
+        rule: &ChartRule,
+        at: &mut BudgetedCarry,
+    ) -> Result<Option<PreparedStep>, HnnError> {
+        let (m, n) = (self.map.rows(), self.map.columns());
+        let Some(NormalStatistics {
+            samples: active,
+            gram: gram_update,
+        }) = self.sample_statistics(samples)?
+        else {
+            return Ok(None);
+        };
+        let mut law = self.clone();
         let mut gram: Vec<Rat> = self.gram.iter().flatten().cloned().collect();
         law.gram_carry
             .deposit_all(at, Carrier::Gram, &mut gram, &gram_update);
@@ -12939,6 +12933,42 @@ mod projected_statistics_tests {
             &law.gram,
             &vec![vec![rat(1, 1), rat(0, 1)], vec![rat(0, 1), rat(1, 1)]]
         );
+    }
+
+    #[test]
+    fn projected_g_times_chart_transpose_matches_native_reach_sum_and_prepared_unit() {
+        let symmetry = PortSymmetry::from_parts(vec![1, 0], vec![Some(1), Some(0)], &[0]).unwrap();
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(2, 2).unwrap())
+            .with_symmetry(symmetry.clone())
+            .unwrap();
+        let samples = [Sample {
+            weight: rat(2, 1),
+            feature: vec![rat(1, 1), rat(2, 1)],
+            covector: vec![rat(3, 1), rat(-1, 1)],
+            masses: None,
+        }];
+        let (cross, _) = law.projected_statistics(&samples).unwrap();
+        let lattice = Lattice::new(16);
+        let prepared = law
+            .prepare(
+                &samples,
+                &ChartRule::new(lattice, 16),
+                &mut BudgetedCarry::new(lattice, 1),
+            )
+            .unwrap()
+            .unwrap();
+        let covector = integral(&samples[0].covector);
+        let reached = prepared.law.chart.reach(&integral(&samples[0].feature));
+        let from_reach = outer_integral(2, 2, &[(&samples[0].weight, &covector, &reached)])
+            .projected(symmetry.rows(), symmetry.columns());
+        let native_unit = ExactRatMatrix::new(prepared.unit.to_rows()).unwrap();
+        assert_eq!(native_unit.to_rows(), from_reach.to_rows());
+        // The outer product has (Xhat f)^T on its right. Do not assume Xhat is symmetric.
+        let chart_transpose = ExactRatMatrix::new(prepared.law.chart.dense(2))
+            .unwrap()
+            .transpose()
+            .unwrap();
+        assert_eq!(cross.multiply(&chart_transpose).unwrap(), native_unit);
     }
 
     #[test]
