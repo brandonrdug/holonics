@@ -754,7 +754,7 @@ mod precision_tests {
                 &pairing,
                 2,
                 None,
-                |_, _, _, _, reading| reading.commit(),
+                |_, _, _, _, reading| reading.commit,
             )
             .unwrap();
         let diagnostic_receipt = port
@@ -768,7 +768,7 @@ mod precision_tests {
                     let held = frozen
                         .map(|comparison| comparison.recompare_covector(comparison.wave()))
                         .transpose();
-                    (reading.commit(), samples.to_vec(), held)
+                    (reading.commit, samples.to_vec(), held)
                 },
             )
             .unwrap();
@@ -838,7 +838,7 @@ mod precision_tests {
             &pairing,
             2,
             Some(&placement),
-            |_, _, _, _, reading, samples, _| (reading.commit(), samples.to_vec()),
+            |_, _, _, _, reading, samples, _| (reading.commit, samples.to_vec()),
         );
         assert!(
             result.is_err(),

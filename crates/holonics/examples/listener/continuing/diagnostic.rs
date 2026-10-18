@@ -228,7 +228,7 @@ fn observe_branch(
             .vanished
             .iter()
             .any(|(locus, _)| *locus == Locus::ReceivingMap(2));
-        faces.push(native.prediction.faces.clone());
+        faces.push(native.prediction.clone());
         lifts.push(resident.current().lift().to_vec());
         views.push(view);
         let overhead_elapsed = cell_started
@@ -299,7 +299,7 @@ fn observe_plain_branch(
             abort.store(true, Ordering::Release);
             return Err(format!("branch {branch} exceeded cumulative n*u guard after cell {}: {cumulative_native_ns} ns > {allowance} ns", index + 1).into());
         }
-        faces.push(native.prediction.faces.clone());
+        faces.push(native.prediction.clone());
         lifts.push(resident.current().lift().to_vec());
         let exterior = cell_started
             .elapsed()
@@ -559,7 +559,7 @@ pub(super) fn run(
                 .checked_mul((source_count + 1) as u128)
                 .ok_or("trunk n*u allowance overflow")?;
             println!(
-                "step0_cell branch=trunk index={source_count} class={class} cell_ns={cell_ns} native_ns={cell_ns} exterior_ns=0 cumulative_native_ns={trunk_native_ns} n_u_allowance_ns={trunk_allowance}",
+                "step0_cell branch=trunk index={source_count} class={class} delivered={} cell_ns={cell_ns} native_ns={cell_ns} exterior_ns=0 cumulative_native_ns={trunk_native_ns} n_u_allowance_ns={trunk_allowance}",
                 receipt.cells
             );
             if cell_ns > TRUNK_CELL_UPPER_NS
