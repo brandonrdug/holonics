@@ -278,8 +278,14 @@ fn pair_face_line(resident: &Resident, section: usize, role: &str, unit: u64) ->
     let clone = std::hint::black_box(moment.clone());
     let clone_ns = elapsed(started);
     drop(clone);
+    let phase_wall_ns: Vec<_> = resident
+        .wall()
+        .phases()
+        .into_iter()
+        .map(|(name, time)| (name.replace(' ', "_"), time.as_nanos()))
+        .collect();
     Ok(format!(
-        "pair_face section={section} role={role} unit={unit} ring_offset_population_occupied_bindings_rebuilds={:?} clone_ns={clone_ns}",
+        "pair_face section={section} role={role} unit={unit} ring_offset_population_occupied_bindings_rebuilds={:?} clone_ns={clone_ns} phase_wall_ns={phase_wall_ns:?}",
         moment.pair_face_summary()
     ))
 }
@@ -1056,6 +1062,7 @@ mod tests {
                     "unit",
                     "ring_offset_population_occupied_bindings_rebuilds",
                     "clone_ns",
+                    "phase_wall_ns",
                 ]
             } else if line.starts_with("cert ") {
                 &["section", "role", "delivered", "steps"]
