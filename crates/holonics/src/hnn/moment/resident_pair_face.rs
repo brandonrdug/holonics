@@ -279,6 +279,73 @@ impl ResidentPairFace {
             ),
         })
     }
+
+    /// The two exact squared speeds on this comparison's unscaled direction. W, R and L
+    /// already hold the contemporary reads; only the terms moving both reads need a table
+    /// bound. Nothing here is retained or changes the count face.
+    pub(crate) fn ray_speed(
+        &self,
+        port: &PairPort,
+        direction: [&[Vec<Rat>]; 3],
+        weight: &Rat,
+    ) -> Result<[Rat; 2], HnnError> {
+        let [de, da, db] = direction;
+        if !self.reads.matches(port)
+            || [port.outputs(), port.current_reads(), port.earlier_reads()]
+                .into_iter()
+                .zip(direction)
+                .any(|(base, delta)| {
+                    base.len() != delta.len()
+                        || base.iter().zip(delta).any(|(x, dx)| x.len() != dx.len())
+                })
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a pair ray must read its contemporary factors and direction",
+            });
+        }
+        let width = port.outputs().first().map_or(0, Vec::len);
+        let e: Vec<_> = port.outputs().iter().map(|row| integral(row)).collect();
+        let de: Vec<_> = de.iter().map(|row| integral(row)).collect();
+        let da: Vec<_> = da.iter().map(|row| integral(row)).collect();
+        let db: Vec<_> = db.iter().map(|row| integral(row)).collect();
+        let mut speed = [Rat::zero(), Rat::zero()];
+        for phase in &self.phases {
+            if phase.population == 0 {
+                continue;
+            }
+            let mut weights = Vec::with_capacity(port.rank());
+            let mut linear = Vec::with_capacity(port.rank());
+            for rho in 0..port.rank() {
+                let current: BigInt = da[rho]
+                    .0
+                    .iter()
+                    .zip(&phase.current)
+                    .map(|(dx, row)| dx * &row[rho])
+                    .sum();
+                let earlier: BigInt = db[rho]
+                    .0
+                    .iter()
+                    .zip(&phase.earlier)
+                    .map(|(dx, row)| dx * &row[rho])
+                    .sum();
+                weights.push(Rat::new(
+                    &phase.weights[rho] * weight.numer(),
+                    &self.reads.current[rho].1 * &self.reads.earlier[rho].1 * weight.denom(),
+                ));
+                linear.push(
+                    (Rat::new(current, &da[rho].1 * &self.reads.earlier[rho].1)
+                        + Rat::new(earlier, &db[rho].1 * &self.reads.current[rho].1))
+                        * weight,
+                );
+            }
+            // Y1 = Σ (Ge W + e (Ga·R + L·Gb)); Y2' = Σ Ge (Ga·R + L·Gb).
+            let first = combination(width, weights.iter().zip(&de).chain(linear.iter().zip(&e)));
+            let second = combination(width, linear.iter().zip(&de));
+            speed[0] += first.iter().map(|x| x * x).sum::<Rat>();
+            speed[1] += second.iter().map(|x| x * x).sum::<Rat>();
+        }
+        Ok(speed)
+    }
 }
 
 #[derive(Clone)]

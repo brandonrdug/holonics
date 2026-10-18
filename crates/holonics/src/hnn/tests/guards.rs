@@ -185,6 +185,7 @@ fn guard_four_the_constitution_keeps_no_journal() {
                 outputs: zero(pair.rank(), field.ring(0).width()),
                 current: zero(pair.rank(), alphabet),
                 earlier: zero(pair.rank(), alphabet),
+                speed: [Rat::zero(), Rat::zero()],
             },
             energy: Rat::zero(),
             covector: Rat::zero(),

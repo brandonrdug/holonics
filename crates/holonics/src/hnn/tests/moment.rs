@@ -225,6 +225,15 @@ mod resident_pair_face_controls {
                             .iter()
                             .map(|r| r.iter().map(|v| -v).collect())
                             .collect(),
+                        speed: crate::hnn::reference::whole_pair_ray_speed(
+                            &field,
+                            &moment,
+                            0,
+                            offset,
+                            pair,
+                            [&old.outputs, &old.current, &old.earlier],
+                        )
+                        .unwrap(),
                     },
                     energy: old.energy,
                     covector: old.covector,
