@@ -796,15 +796,15 @@ theorem trilinear_ray_deriv_bound {H : Type*}
     ‖Y1 + (2 * t) • Y2 + (3 * t ^ 2) • Y3‖ ≤
         ‖Y1 + (2 * t) • Y2‖ + ‖(3 * t ^ 2) • Y3‖ := norm_add_le _ _
     _ ≤ ‖Y1‖ + ‖(2 * t) • Y2‖ + ‖(3 * t ^ 2) • Y3‖ :=
-      add_le_add_right (norm_add_le _ _) _
+      add_le_add (norm_add_le _ _) le_rfl
     _ = ‖Y1‖ + 2 * t * ‖Y2‖ + 3 * t ^ 2 * ‖Y3‖ := by
       rw [norm_smul, norm_smul, Real.norm_of_nonneg htwo, Real.norm_of_nonneg hthree]
     _ ≤ ‖Y1‖ + 2 * η * ‖Y2‖ + 3 * η ^ 2 * ‖Y3‖ := by
-      exact add_le_add
-        (add_le_add_left (mul_le_mul_of_nonneg_right
-          (mul_le_mul_of_nonneg_left htη (by norm_num)) (norm_nonneg Y2)) _)
-        (mul_le_mul_of_nonneg_right
-          (mul_le_mul_of_nonneg_left hsq (by norm_num)) (norm_nonneg Y3))
+      have h2 : 2 * t * ‖Y2‖ ≤ 2 * η * ‖Y2‖ := by gcongr
+      have h3 : 3 * t ^ 2 * ‖Y3‖ ≤ 3 * η ^ 2 * ‖Y3‖ := by
+        exact mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_left hsq (by norm_num : (0 : ℝ) ≤ 3)) (norm_nonneg Y3)
+      exact add_le_add (add_le_add le_rfl h2) h3
 
 /-- [proved-derived; formal-checked] **The transit's solve is a contraction.** An operator `m ⪰ 1`
 (`‖v‖² ≤ ⟨v, m v⟩`), as the transit's normalized `m_a = 1 + (G/2h)(2C + hD + (h²/2)K)` is for
