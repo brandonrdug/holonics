@@ -106,14 +106,14 @@ def founded : Located L := ⟨0, 0, 0⟩
 /-- The pair's value `(a, V) = (A₀ + A₁ ℓ, S ℓ)`. -/
 def value (ℓ : L) (p : Located L) : L × L := (p.a0 + p.a1 * ℓ, p.s * ℓ)
 
-/-- One reading's terms added ([historical LocatedPrior::read](https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2710)): `A₀ += α`, `S += σ`. -/
+/-- One reading's terms added ([historical LocatedPrior::read](https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2708)): `A₀ += α`, `S += σ`. -/
 def read (p : Located L) (r : AtMapReading ι L) : Located L :=
   ⟨p.a0 + r.alignment, p.a1, p.s + r.curvature⟩
 
 /-- The pair carried from `p` over readings in their order of arrival. -/
 def carried (p : Located L) (rs : List (AtMapReading ι L)) : Located L := rs.foldl read p
 
-/-- The pair rebased to the member `x` ([historical LocatedPrior::rebased](https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2718)). -/
+/-- The pair rebased to the member `x` ([historical LocatedPrior::rebased](https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2716)). -/
 def rebased (x : L) (p : Located L) : Located L :=
   ⟨x * p.a0, x * (p.a1 - (x - 1) * p.s), x ^ 2 * p.s⟩
 

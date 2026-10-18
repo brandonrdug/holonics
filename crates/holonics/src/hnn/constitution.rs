@@ -1189,9 +1189,15 @@ fn chart_extent_overflow(
 /// Every certificate is computed exactly, so a refinement the lattice does not carry restarts cold
 /// and, short of `δ_ℓ` within the rule's count, is refused
 /// ([`ExactLinearError::InverseCertificateFailure`]); no chart above `δ_ℓ` is released. The Gram's
-/// own norm is read at each deposit, as the clock's Elias-gamma length is: the lattice refines as
-/// the Gram grows, and never coarsens (a coarser chart is a finer one's lattice point). Brandon may
-/// override the rule.
+/// own norm is read at each deposit, as the clock's Elias-gamma length is: the lattice follows the
+/// Gram. [agent-inferred, October 18] Every deposit and every prior move founds the chart on this
+/// rule's lattice at the current Gram (and at least `k`), its warm start carried there by nearest
+/// rounding; a chart left finer between deposits (a paired mean, one level) returns to the rule at
+/// the next. A lattice finer than the rule's carries only differences below the receiver's grain,
+/// which no admitted receiver reads, so carrying it forward is not retention. Holding the previous
+/// lattice as a floor made a paired source chart gain one level per deposit (one per cell heard:
+/// `L_s = 46 + cells` on the listener's first 90 cells, about 2,500 levels after 2,474 cells
+/// against a rule near 65). Brandon may override the rule.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ChartRule {
     lattice: Lattice,
@@ -1442,6 +1448,16 @@ fn nearest_shift_wide(x: &BigInt, k: u32) -> BigInt {
         return x.clone();
     }
     (x + (BigInt::one() << (k - 1) as usize)) >> k as usize
+}
+
+/// A coordinate on `2^(−from)ℤ` carried to `2^(−to)ℤ`: exactly where `to ≥ from`, at its nearest
+/// point of the coarser lattice (ties upward) where `to < from`.
+fn relatticed(value: BigInt, from: u32, to: u32) -> BigInt {
+    if to >= from {
+        value << (to - from) as usize
+    } else {
+        nearest_shift_wide(&value, from - to)
+    }
 }
 
 /// `numerator / denominator` at its nearest integer, ties upward (`denominator > 0`).
@@ -1731,9 +1747,11 @@ impl SolvedChart {
         (reach, denominator << shift)
     }
 
-    /// The chart carried onto another support at a lattice at least as fine: an entry both
-    /// supports hold moves by `2^(L − L_s)` exactly, and an index the chart did not hold enters as the
-    /// prior's chart `2^(−k)` on the diagonal.
+    /// The chart carried onto another support at the lattice `L`: an entry both supports hold
+    /// moves by `2^(L − L_s)` exactly where `L ≥ L_s`, and to its nearest point of the coarser lattice
+    /// (ties upward) where `L < L_s`; an index the chart did not hold enters as the prior's chart
+    /// `2^(−k)` on the diagonal. A coarsened carry is a warm start only: the chart that holds it is
+    /// certified exactly against its Gram ([`settled`]).
     fn carried_to(
         &self,
         support: &[usize],
@@ -1742,7 +1760,6 @@ impl SolvedChart {
         _prior_scale: u32,
         _gram_exponent: u32,
     ) -> Result<Vec<BigInt>, HnnError> {
-        let shift = exponent - self.exponent;
         let held: BTreeMap<usize, usize> = self
             .support
             .iter()
@@ -1759,7 +1776,7 @@ impl SolvedChart {
                     _ if a == b => BigInt::one() << (self.exponent - self.scale) as usize,
                     _ => BigInt::zero(),
                 };
-                block[a * s + b] = value << shift as usize;
+                block[a * s + b] = relatticed(value, self.exponent, exponent);
             }
         }
         Ok(block)
@@ -1784,7 +1801,9 @@ impl SolvedChart {
             None,
         )?;
         let s = carried.support.len();
-        let exponent = rule.exponent(n, carried.norm).max(self.exponent);
+        // The rule's lattice at this Gram, never the previous chart's: precision below the rule
+        // separates nothing a receiver reads (the type's header), so it is not carried forward.
+        let exponent = rule.exponent(n, carried.norm).max(self.scale);
 
         if s == 0 {
             let chart = Self {
@@ -1863,12 +1882,9 @@ impl SolvedChart {
             None,
         )?;
         let s = carried.support.len();
-        // x = 2^(k − k′): a halving needs the lattice one level finer per halving.
-        let finer = scale.saturating_sub(self.scale);
-        let exponent = rule
-            .exponent(n, carried.norm)
-            .max(self.exponent + finer)
-            .max(scale);
+        // The rule's lattice at the moved Gram, as at a deposit; the moved prior's own chart
+        // `2^(−k′)` must lie on it.
+        let exponent = rule.exponent(n, carried.norm).max(scale);
 
         if s == 0 {
             let chart = Self { exponent, ..moved };
@@ -1880,19 +1896,23 @@ impl SolvedChart {
             };
             return Ok((chart, refinement));
         }
+        // x = 2^(k − k′): the warm start x X̂ is exact one level finer per halving, then carried to
+        // the rule's lattice.
+        let exact = self.exponent + scale.saturating_sub(self.scale);
         let mut warm = self.carried_to(
             &carried.support,
-            exponent,
+            exact,
             rule.lattice().exponent(),
             scale,
             carried.exponent,
         )?;
         for value in &mut warm {
-            *value = if scale >= self.scale {
+            let scaled = if scale >= self.scale {
                 &*value >> (scale - self.scale) as usize
             } else {
                 &*value << (self.scale - scale) as usize
             };
+            *value = relatticed(scaled, exact, exponent);
         }
         settled(warm, carried, exponent, scale, n, rule)
     }
@@ -2377,6 +2397,15 @@ impl NormalLaw {
     /// The solved chart, with its lattice and certificate.
     pub fn chart(&self) -> &SolvedChart {
         &self.chart
+    }
+
+    /// The chart's rule exponent at this carried Gram and prior, before a paired mean's
+    /// possible extra level. Reads the same Gram norm that deposition and prior motion use.
+    pub fn chart_rule_exponent(&self, rule: &ChartRule) -> Result<u32, HnnError> {
+        let carried = GramBlock::of(&self.gram, &self.chart.prior(), None, None, None, None)?;
+        Ok(rule
+            .exponent(self.gram.len(), carried.norm)
+            .max(self.chart.scale))
     }
 
     /// Raw solved-chart coordinate payload; separate from this law's reduced logical bits.
@@ -12351,6 +12380,149 @@ mod receiving_precision_tests {
             &old.map.entries()[odd] + &old.map_remainder().entries()[odd],
             &new.map.entries()[odd] + &new.map_remainder().entries()[odd]
         );
+    }
+}
+
+#[cfg(test)]
+mod chart_follows_rule_tests {
+    use super::*;
+    use crate::geometry::RatVec3;
+    use crate::geometry::screw::ScrewGenerator;
+    use crate::hnn::field::{CribDeclaration, FieldDeclaration, RingDeclaration};
+    use crate::hnn::paired::{PairedCarrier, PairingDeclaration};
+    use crate::ratio::{integer, rat};
+
+    #[test]
+    fn paired_chart_follows_its_rule() {
+        let field = Field::declare(
+            FieldDeclaration {
+                rings: vec![RingDeclaration {
+                    period: 4,
+                    screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
+                    placements: (0..4)
+                        .map(|node| FieldDeclaration::quarter_turn(node, 4))
+                        .collect(),
+                    lock: vec![0, 1, 2, 3],
+                    reflector: vec![0, 3, 2, 1],
+                    admittance: integer(2),
+                    initial: 0,
+                }],
+                contacts: Vec::new(),
+                loops: Vec::new(),
+                sources: vec![0],
+                offsets: Vec::new(),
+                alphabet: 4,
+                step: Rat::one(),
+                exponent_grain: 1,
+                receivers: Vec::new(),
+                crib: CribDeclaration {
+                    window: 16,
+                    offset: 1,
+                },
+                population: 1 << 16,
+                lattice: Default::default(),
+            }
+            .by_lattice_rule(),
+        )
+        .unwrap();
+        let (paired, carrier, _) = PairedCarrier::found(
+            &field,
+            Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap(),
+            0,
+            &PairingDeclaration::Family {
+                table: vec![(0, 1), (1, 0), (2, 3), (3, 2)],
+            },
+        )
+        .unwrap();
+        let rule = paired.chart_rule(Locus::SourcePort(0)).unwrap();
+        let mut law = paired.source_law(0).unwrap().clone();
+        for clock in 1..=64 {
+            let mut feature = vec![rat(1, 2), rat(1, 4), rat(1, 4), Rat::zero()];
+            feature.rotate_left((clock as usize - 1) % 4);
+            let sample = Sample {
+                weight: Rat::one(),
+                feature,
+                covector: (0..law.map.rows())
+                    .map(|row| rat((row % 5) as i64 - 2, 4))
+                    .collect(),
+                masses: None,
+            };
+            let (next, reading) = law
+                .deposited(
+                    &[sample],
+                    &Rat::one(),
+                    &rule,
+                    &mut BudgetedCarry::new(rule.lattice(), clock),
+                )
+                .unwrap();
+            assert!(reading.is_some());
+            let chart = &next.chart;
+            let carried =
+                GramBlock::of(&next.gram, &chart.prior(), None, None, None, None).unwrap();
+            let upper = rule
+                .exponent(next.gram.len(), carried.norm)
+                .max(chart.scale)
+                + 1;
+            assert!(
+                chart.exponent <= upper,
+                "deposit {clock}: {} > {upper}",
+                chart.exponent
+            );
+            assert!(chart.certificate <= rule.target(), "deposit {clock}");
+            assert_eq!(carrier.certify(next.map()), Ok(()));
+            law = next;
+        }
+    }
+
+    #[test]
+    fn moved_chart_follows_its_rule() {
+        let rule = ChartRule::new(Lattice::new(4), 16);
+        // One receiving statistic, held while only its diagonal prior moves.
+        let gram_at = |scale: u32| {
+            let prior = Rat::from_integer(BigInt::one() << scale as usize);
+            vec![
+                vec![integer(2) + &prior, Rat::one()],
+                vec![Rat::one(), integer(3) + prior],
+            ]
+        };
+        let (mut chart, _) = SolvedChart::founded(0)
+            .deposited(&gram_at(0), &[], &rule)
+            .unwrap();
+        for cycle in 0..8 {
+            for scale in [1, 0] {
+                let gram = gram_at(scale);
+                let (next, _) = chart.moved(&gram, scale, &rule).unwrap();
+                let carried = GramBlock::of(&gram, &next.prior(), None, None, None, None).unwrap();
+                let upper = rule.exponent(gram.len(), carried.norm).max(scale);
+                assert!(next.exponent <= upper, "cycle {cycle}, scale {scale}");
+                assert!(next.certificate <= rule.target());
+                chart = next;
+            }
+        }
+    }
+
+    #[test]
+    fn coarsened_carry_is_nearest() {
+        // A transport operand, not a certified Gram inverse: all signed coordinates,
+        // including exact positive and negative half units of the coarser lattice.
+        for coordinate in -37i32..=37 {
+            let chart = SolvedChart {
+                support: vec![0],
+                block: vec![BigInt::from(coordinate)],
+                exponent: 6,
+                ..SolvedChart::founded(0)
+            };
+            let coarse = chart.carried_to(&[0], 3, 3, 0, 0).unwrap();
+            let exact = Rat::new(BigInt::from(coordinate), BigInt::from(64));
+            let rounded = Rat::new(coarse[0].clone(), BigInt::from(8));
+            let error = &rounded - &exact;
+            assert!(error.abs() <= rat(1, 16));
+            if coordinate.rem_euclid(8) == 4 {
+                assert_eq!(error, rat(1, 16), "ties round upward");
+            }
+            let fine = chart.carried_to(&[0], 9, 3, 0, 0).unwrap();
+            assert_eq!(fine[0], BigInt::from(coordinate) << 3usize);
+        }
     }
 }
 

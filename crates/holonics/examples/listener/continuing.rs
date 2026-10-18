@@ -361,6 +361,57 @@ fn deliver(
             "report section={section} role={role} delivered={} report_ns={report_ns}",
             native.cells
         ));
+        // Outside both timed intervals: where the retained bits sit, by locus (its lattice
+        // exponent, entry, remainder and solved-chart bits), and each source law's solved chart
+        // (its exponent `L_s`, prior scale `k`, support width and certificate `δ`).
+        let material = resident.constitution();
+        let loci: Vec<_> = material
+            .carrier_bits_by_locus()
+            .into_iter()
+            .map(|(locus, bits)| {
+                let exponent = material.lattice(locus).ok().map(|l| l.exponent());
+                (locus, exponent, bits.entries, bits.remainders, bits.solved)
+            })
+            .collect();
+        let charts: Vec<_> = resident
+            .field()
+            .sources()
+            .iter()
+            .filter_map(|&ring| {
+                material.source_law(ring).map(|law| {
+                    let chart = law.chart();
+                    (
+                        ring,
+                        chart.exponent(),
+                        chart.scale(),
+                        chart.support().len(),
+                        chart.certificate().to_string(),
+                    )
+                })
+            })
+            .collect();
+        let chart_rules: Vec<_> = resident
+            .field()
+            .sources()
+            .iter()
+            .map(|&ring| {
+                let rule = material.chart_rule(Locus::SourcePort(ring))?;
+                let law = material
+                    .source_law(ring)
+                    .ok_or(HnnError::MissingSourcePort { ring })?;
+                Ok((
+                    ring,
+                    law.chart_rule_exponent(&rule)?,
+                    rule.target().to_string(),
+                ))
+            })
+            .collect::<std::result::Result<_, HnnError>>()?;
+        emit(format!(
+            "state section={section} role={role} delivered={} state_bits={} constitution_bits={} loci_exponent_entries_remainders_solved={loci:?} source_chart_ring_exponent_scale_support_certificate={charts:?} source_chart_ring_rule_exponent_target={chart_rules:?}",
+            native.cells,
+            resident.state_bits(),
+            material.exact_bits()
+        ));
     }
     Ok(())
 }
@@ -967,6 +1018,17 @@ mod tests {
                     "balance_before",
                     "balance_after",
                 ]
+            } else if line.starts_with("state ") {
+                &[
+                    "section",
+                    "role",
+                    "delivered",
+                    "state_bits",
+                    "constitution_bits",
+                    "loci_exponent_entries_remainders_solved",
+                    "source_chart_ring_exponent_scale_support_certificate",
+                    "source_chart_ring_rule_exponent_target",
+                ]
             } else if line.starts_with("cert ") {
                 &["section", "role", "delivered", "steps"]
             } else if line.starts_with("pairing ") {
@@ -1003,6 +1065,7 @@ mod tests {
         for name in [
             "cell ",
             "precision ",
+            "state ",
             "cert ",
             "pairing ",
             "drawn ",
