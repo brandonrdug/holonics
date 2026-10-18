@@ -168,6 +168,8 @@ fn the_copy_ring_founds_its_hankel_rank_on_the_reached_orbit() {
 fn crib_field() -> Field {
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(5, vec![0, 1, 2]), ring(7, vec![0, 3, 5])],
             contacts: vec![contact(0, 1, 5, 2)],
             loops: Vec::new(),
@@ -398,6 +400,8 @@ fn sixty_field() -> Field {
     };
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![
                 declared((0..d).collect()),
                 declared(Vec::new()),

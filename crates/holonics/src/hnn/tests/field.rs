@@ -97,7 +97,15 @@ fn campaign_one_declares_its_values() {
 /// the capacity itself is admitted (the chain control, `n* = 134 = 2·67`).
 #[test]
 fn a_population_below_capacity_is_refused() {
-    let n_star = capacity(&[4, 3, 2], &[0], 4, &[1]).unwrap().n_star();
+    let n_star = capacity(
+        &[4, 3, 2],
+        &[crate::hnn::RingAdvance::Lock; 3],
+        &[0],
+        4,
+        &[1],
+    )
+    .unwrap()
+    .n_star();
     assert_eq!(n_star, 134);
     assert_eq!(
         Field::declare(chain_declaration(n_star - 1)),

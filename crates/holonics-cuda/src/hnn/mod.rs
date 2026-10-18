@@ -163,7 +163,7 @@ pub use port::{Mounted, Resident, Traffic};
 pub use tree::{CardTree, TreeTimes};
 pub use word::{Refusal, ResonatorPlan};
 
-use holonics::hnn::HnnError;
+use holonics::hnn::{Field, HnnError, RingAdvance};
 use thiserror::Error;
 
 use crate::cuda::CudaError;
@@ -214,4 +214,21 @@ pub enum DeviceError {
     Status { status: u32 },
     #[error(transparent)]
     Hnn(#[from] HnnError),
+}
+
+/// [definition] The card carries `Lock` rings only: a founded `Own` ring's word, phase and moment
+/// on the card are owed (#76). Every entry that uploads a field's material (a mount, a resumed
+/// mount, a resident moment) asks this first, so the refusal precedes any transfer. The host's
+/// reference refuses an `Own` ring's located route the same way (`Field::admit_lock_route`).
+pub(crate) fn admit_card_field(field: &Field) -> Result<(), HnnError> {
+    if field
+        .rings()
+        .iter()
+        .any(|ring| ring.advance() == RingAdvance::Own)
+    {
+        return Err(HnnError::Founding {
+            what: "the card's founded ring is owed (#76)",
+        });
+    }
+    Ok(())
 }

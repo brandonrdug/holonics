@@ -544,7 +544,7 @@ pub use receiving_blocks::ReceivingLayout;
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
-use num_traits::{One, Signed, ToPrimitive, Zero};
+use num_traits::{One, Signed, Zero};
 use rayon::prelude::*;
 
 use crate::compression::landmark::context::{Landmarks, Letter, TreeStanding};
@@ -4071,6 +4071,7 @@ pub struct PumpedReading {
 /// [definition] **The constitution `Θ`**, the one owner. See the module header.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Constitution {
+    founded: Vec<crate::hnn::FoundedRing>,
     rings: Vec<RingMaterial>,
     contacts: Vec<ContactMaterial>,
     budget: u64,
@@ -4496,40 +4497,8 @@ impl Constitution {
     /// locus's step is certified at its deposit (module header).
     pub fn initial(field: &Field, budget: u64) -> Result<Self, HnnError> {
         let lattices = field.lattices().clone();
-        // L_R = ⌈1/ε_bits⌉, the finest admitted receiver's (`FieldDeclaration::lattice_by_rule`).
-        let grain = field
-            .receivers()
-            .iter()
-            .map(|receiver| receiver_grain(&receiver.tolerance))
-            .max()
-            .unwrap_or(1);
-        let a = field.alphabet();
-        // Each receiving ring's prior, from its first declared receiver (as its tree).
-        let receivers: BTreeMap<usize, u32> = field
-            .receivers()
-            .iter()
-            .rev()
-            .map(|r| (r.ring, r.receiving_prior))
-            .collect();
-        // Each receiving ring's tree, declared from its first declared receiver.
-        let tree = |g: usize| -> Result<Option<Landmarks>, HnnError> {
-            field
-                .receivers()
-                .iter()
-                .find(|receiver| receiver.ring == g)
-                .map(|receiver| {
-                    let declaration = landmark_declaration(field, receiver)?;
-                    Ok(match field.receiving_context(g) {
-                        Some(partition) => Landmarks::new_observed(
-                            declaration,
-                            partition.outcome_bits(field, g),
-                            partition.role(),
-                        )?,
-                        None => Landmarks::new(declaration)?,
-                    })
-                })
-                .transpose()
-        };
+        // L_R = ⌈1/ε_bits⌉, the finest admitted receiver's (`Field::finest_grain`).
+        let grain = u128::from(field.finest_grain());
         // The standing founded as a standing wave with declared lobes (module header, "The
         // founding"): every slice at its component's first lattice unit in the `+1` lobe.
         let lock = LockChart::of(field)?;
@@ -4551,91 +4520,11 @@ impl Constitution {
             .rings()
             .iter()
             .enumerate()
-            .map(|(g, ring)| {
-                let n = ring.width();
-                // `E_0`: the declared sign sequence times ½ on every field. [historical] The founded
-                // injection of a passage-founded port chart (each cell's column at one node's real
-                // quadrature) was retired on September 29 with the founded charts: many codes shared
-                // one node, aliasing cells, and on the prediction field it alone made the
-                // refinement's exact cost grow past its bound (the lessons record, §4; `96d8940b`).
-                let source = declared_source_port(field, g)?.map(NormalLaw::with_prior);
-                let pairs = if field.is_source(g) {
-                    field
-                        .offsets()
-                        .iter()
-                        .enumerate()
-                        .map(|(o, &offset)| {
-                            let reads = |kind: u64| -> Vec<Vec<Rat>> {
-                                (0..n)
-                                    .map(|rho| {
-                                        (0..a)
-                                            .map(|x| {
-                                                declared_sign(
-                                                    locus_code(kind, g, o),
-                                                    rho as u64,
-                                                    x as u64,
-                                                )
-                                            })
-                                            .collect()
-                                    })
-                                    .collect()
-                            };
-                            Ok((
-                                offset,
-                                PairPort::new(vec![vec![Rat::zero(); n]; n], reads(2), reads(3))?,
-                            ))
-                        })
-                        .collect::<Result<Vec<_>, HnnError>>()?
-                } else {
-                    Vec::new()
-                };
-                let receiving = receivers
-                    .get(&g)
-                    .map(|&prior| {
-                        ExactRatMatrix::zero(2 * a, n).map(|map| {
-                            ReceivingMaterial::Single(NormalLaw::with_receiving_prior(map, prior))
-                        })
-                    })
-                    .transpose()?;
-                Ok(RingMaterial {
-                    standing: std::mem::take(&mut founded[g]),
-                    standing_scale: Rat::one(),
-                    passive: scaled_identity(n, rat(1, 2)),
-                    passive_scale: Rat::one(),
-                    contrast: NormalLaw::with_prior(ExactRatMatrix::zero(n, n)?),
-                    slices: (0..n)
-                        .map(|rho| (unit(n, rho), unit(n, (rho + 1) % n)))
-                        .collect(),
-                    slice_scale: Rat::one(),
-                    source,
-                    pairs,
-                    pair_scale: Rat::one(),
-                    receiving,
-                    population: receivers.contains_key(&g).then(receiving_population),
-                    tree: tree(g)?,
-                    resonator: None,
-                    resonator_scales: Vec::new(),
-                    resonator_step: None,
-                    transport: Rat::one(),
-                })
-            })
+            .map(|(g, _)| initial_ring(field, g, std::mem::take(&mut founded[g])))
             .collect::<Result<Vec<_>, HnnError>>()?;
-        let contacts = field
-            .contacts()
-            .iter()
-            .map(|contact| {
-                let k = contact.width();
-                ContactMaterial {
-                    storage: scaled_identity(k, Rat::one()),
-                    stiffness: scaled_identity(k, rat(1, 2)),
-                    dissipation: scaled_identity(k, rat(1, 2)),
-                    scales: [Rat::one(), Rat::one(), Rat::one()],
-                    boost: None,
-                    surface: None,
-                }
-            })
-            .collect();
-        Ok(Self {
+        let contacts = field.contacts().iter().map(initial_contact).collect();
+        let mut material = Self {
+            founded: field.declaration().founded.clone(),
             rings,
             contacts,
             budget,
@@ -4661,7 +4550,88 @@ impl Constitution {
             grain,
             lock,
             fixed,
-        })
+        };
+        for (ring, declared) in field.rings().iter().enumerate() {
+            if declared.advance() == crate::hnn::RingAdvance::Own {
+                material = material.with_founded_dynamics(field, ring)?;
+            }
+        }
+        Ok(material)
+    }
+
+    /// Extend only the newly derived ring and its contact; publish on the caller's staged copy.
+    pub fn found_ring(mut self, field: &Field, ring: usize, budget: u64) -> Result<Self, HnnError> {
+        if ring != self.rings.len()
+            || field.rings().len() != ring + 1
+            || field.contacts().len() != self.contacts.len() + 1
+            || field.ring(ring).advance() != crate::hnn::RingAdvance::Own
+        {
+            return Err(HnnError::Founding {
+                what: "the next founded ring and its one contact",
+            });
+        }
+        let contact = self.contacts.len();
+        let lock = LockChart::of(field)?;
+        let units = (0..field.rings().len())
+            .map(|g| {
+                field
+                    .lattice(Locus::Standing(g))
+                    .map(|lattice| lattice.unit())
+                    .ok_or(HnnError::Lattice {
+                        locus: Locus::Standing(g),
+                    })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let mut founding = lock.founding(&units)?;
+        self.rings.push(initial_ring(
+            field,
+            ring,
+            std::mem::take(&mut founding.standings[ring]),
+        )?);
+        self.contacts.push(initial_contact(field.contact(contact)));
+        self.admittances.push(field.ring(ring).admittance().clone());
+        let added = field.contact(contact);
+        self.conductances
+            .push((!added.exponent().is_negative()).then(|| added.admittance().clone()));
+        for (locus, lattice) in field.lattices() {
+            self.lattices.entry(*locus).or_insert(*lattice);
+        }
+        self.lock = lock;
+        self.fixed = founding.fixed;
+        self.budget = budget;
+        self.founded = field.declaration().founded.clone();
+        self = self.with_founded_dynamics(field, ring)?;
+        let bits = self.exact_bits();
+        if bits > budget {
+            return Err(HnnError::ConstitutionBudget {
+                bits,
+                budget,
+                commit: self.commit,
+                loci: vec![
+                    Locus::Element(ring),
+                    Locus::SourcePort(ring),
+                    Locus::Channel(contact),
+                    Locus::Resonator(ring),
+                ],
+            });
+        }
+        self.commit = self.commit.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        Ok(self)
+    }
+
+    /// Derived pump and source transport; a saved declaration mounts the same founding material.
+    fn with_founded_dynamics(mut self, field: &Field, ring: usize) -> Result<Self, HnnError> {
+        self = self.founded_transport(field, ring)?;
+        let d = field.ring(ring).admittance().recip();
+        let pump = crate::hnn::ring::PumpDeclaration::new(
+            &d / field.step(),
+            crate::holon::parametron::Carrier::at(&Rat::zero()),
+            crate::hnn::ring::PumpStep::Half,
+        )?;
+        let material =
+            ResonatorMaterial::of_parametron(field.ring(ring).parametron(), &d, Some(pump))?;
+        self = self.with_ring_resonator(field, ring, material)?;
+        Ok(self)
     }
 
     /// The commit counter.
@@ -6008,11 +5978,10 @@ impl Constitution {
         features: &[Vec<Rat>],
         tolerance: &Rat,
     ) -> Result<Option<ReceivingPrecision>, HnnError> {
-        if !tolerance.is_positive() {
-            return Err(HnnError::Unadmitted {
-                reason: "receiving precision requires a positive declared output tolerance",
-            });
-        }
+        let grain = Rat::new(
+            BigInt::one(),
+            BigInt::from(receiver_grain(tolerance)?) << 1usize,
+        );
         let locus = Locus::ReceivingMap(ring);
         let law = self
             .rings
@@ -6020,10 +5989,6 @@ impl Constitution {
             .and_then(|r| r.receiving.as_ref())
             .ok_or(HnnError::MissingReceivingMap { ring })?;
         let remainder = law.map_remainder()?;
-        let grain = Rat::new(
-            BigInt::one(),
-            BigInt::from(receiver_grain(tolerance)) << 1usize,
-        );
         let mut erased = Vec::new();
         let mut unresolved_reads = Vec::new();
         for (index, feature) in features.iter().enumerate() {
@@ -10352,6 +10317,9 @@ pub(crate) fn certify_storage_growth(
 /// is also a partial remount's input; the rest follows it line by line, every value exact.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContinuingState {
+    founded: Vec<crate::hnn::FoundedRing>,
+    founding: Option<crate::hnn::founding::FoundingLaw>,
+    staged_founding: Option<u64>,
     /// The source ring whose port heads the text.
     ring: usize,
     rings: Vec<LearnedRing>,
@@ -10694,6 +10662,9 @@ impl Constitution {
             return Err(HnnError::MissingSourcePort { ring });
         }
         Ok(ContinuingState {
+            founded: self.founded.clone(),
+            founding: None,
+            staged_founding: None,
             ring,
             rings: self.rings.iter().map(LearnedRing::of).collect(),
             contacts: self.contacts.iter().map(LearnedContact::of).collect(),
@@ -10757,6 +10728,11 @@ impl Constitution {
     /// and storage product placed on it, every part of its declared shape and every entry on its
     /// locus's lattice.
     pub fn continued(mut self, state: &ContinuingState) -> Result<Self, HnnError> {
+        if self.founded != state.founded {
+            return Err(HnnError::ContinuingState {
+                what: "the saved founded list against the opening",
+            });
+        }
         let refuse = |what: &'static str| HnnError::ContinuingState { what };
         if self
             .rings
@@ -11223,6 +11199,30 @@ impl LearnedRing {
 }
 
 impl ContinuingState {
+    pub fn founded(&self) -> &[crate::hnn::FoundedRing] {
+        &self.founded
+    }
+    pub(crate) fn founding(&self) -> Option<&crate::hnn::founding::FoundingLaw> {
+        self.founding.as_ref()
+    }
+    pub(crate) fn staged_founding(&self) -> Option<u64> {
+        self.staged_founding
+    }
+    /// Whether the state carries an open founding law or a staged period, which a realization
+    /// without the founding law must refuse rather than drop.
+    pub fn founding_open(&self) -> bool {
+        self.founding.is_some() || self.staged_founding.is_some()
+    }
+    pub(crate) fn with_founding(
+        mut self,
+        founding: Option<crate::hnn::founding::FoundingLaw>,
+        staged: Option<u64>,
+    ) -> Self {
+        self.founding = founding;
+        self.staged_founding = staged;
+        self
+    }
+
     /// The source ring whose port heads the state.
     pub fn ring(&self) -> usize {
         self.ring
@@ -11277,7 +11277,10 @@ impl ContinuingState {
     }
 
     /// **The state as text**, every value exact (the type's header): `E rows cols`, the rows,
-    /// `rho ρ`, then `state g` and the head's source law's parts ([`write_law`]); `rings n contacts
+    /// `rho ρ`, `state g`, `founded k` with one `founded-ring ℓ key` line per founded ring in
+    /// founding order, `founding o s` (whether the founding law is open, and the staged period or
+    /// `-`) with the open law's quotient ([`crate::hnn::founding::FoundingLaw`]), then the head's
+    /// source law's parts ([`write_law`]); `rings n contacts
     /// k`, each ring as `ring h` with its learned material ([`LearnedRing::write`]), each contact as
     /// `contact a` with its factors and `scales`; `lattices n` with `locus exponent` lines; `carries
     /// n` with `locus carrier count` heads and their `index value` lines; `clocks n` with `locus
@@ -11293,6 +11296,20 @@ impl ContinuingState {
         write_matrix(&mut s, "E", &law.map);
         s += &format!("rho {}\n", self.transport());
         s += &format!("state {}\n", self.ring);
+        s += &format!("founded {}\n", self.founded.len());
+        for ring in &self.founded {
+            s += &format!("founded-ring {} {}\n", ring.period, ring.key);
+        }
+        s += &format!(
+            "founding {} {}\n",
+            u8::from(self.founding.is_some()),
+            self.staged_founding
+                .map_or_else(|| "-".to_string(), |period| period.to_string())
+        );
+        if let Some(law) = &self.founding {
+            law.write_saved(&mut s);
+        }
+
         write_law(&mut s, law);
         s += &format!(
             "rings {} contacts {}\n",
@@ -11429,6 +11446,71 @@ impl ContinuingState {
             .first(),
             "the state's ring",
         )?;
+        let n = number(
+            head(
+                next(&mut lines, "the founded rings")?,
+                "founded",
+                "the founded rings",
+            )?
+            .first(),
+            "the founded count",
+        )?;
+        let mut founded = Vec::new();
+        for _ in 0..n {
+            let row = head(
+                next(&mut lines, "a founded ring")?,
+                "founded-ring",
+                "a founded ring",
+            )?;
+            if row.len() != 2 {
+                return refuse("a founded ring's two coordinates");
+            }
+            let period: u64 = row[0].parse().map_err(|_| HnnError::ContinuingState {
+                what: "a founded period",
+            })?;
+            let key: u64 = row[1].parse().map_err(|_| HnnError::ContinuingState {
+                what: "a founded key",
+            })?;
+            if period < 2 || key >= period {
+                return refuse("a founded period and key");
+            }
+            founded.push(crate::hnn::FoundedRing { period, key });
+        }
+        let row = head(
+            next(&mut lines, "the founding state")?,
+            "founding",
+            "the founding state",
+        )?;
+        if row.len() != 2 {
+            return refuse("the founding state head");
+        }
+        let staged_founding = if row[1] == "-" {
+            None
+        } else {
+            Some(
+                row[1]
+                    .parse::<u64>()
+                    .map_err(|_| HnnError::ContinuingState {
+                        what: "the staged founding",
+                    })?,
+            )
+        };
+        let founding = match row[0].as_str() {
+            "0" if staged_founding.is_none() => None,
+            "1" => Some(crate::hnn::founding::FoundingLaw::read_saved(
+                &mut |what| next(&mut lines, what),
+            )?),
+            _ => return refuse("the founding law's presence"),
+        };
+        if staged_founding.is_some_and(|period| {
+            founding.as_ref().is_none_or(|law| {
+                law.read().map_or(true, |read| {
+                    !read.candidates.iter().any(|c| c.period == period)
+                })
+            })
+        }) {
+            return refuse("the staged period among the founding candidates");
+        }
         let law = read_law(&mut lines, map)?;
         let counts = head(
             next(&mut lines, "the rings' head")?,
@@ -11631,6 +11713,9 @@ impl ContinuingState {
             return refuse("the end");
         }
         Ok(Self {
+            founded,
+            founding,
+            staged_founding,
             ring,
             rings,
             contacts: learned,
@@ -12205,7 +12290,7 @@ mod receiving_precision_tests {
         let tolerance = &field.receivers()[0].tolerance;
         let grain = Rat::new(
             BigInt::one(),
-            BigInt::from(receiver_grain(tolerance)) << 1usize,
+            BigInt::from(receiver_grain(tolerance).unwrap()) << 1usize,
         );
         let locus = Locus::ReceivingMap(ring);
         let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
@@ -12500,6 +12585,8 @@ mod chart_follows_rule_tests {
     fn paired_chart_follows_its_rule() {
         let field = Field::declare(
             FieldDeclaration {
+                founded: Vec::new(),
+                founding: false,
                 rings: vec![RingDeclaration {
                     period: 4,
                     screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
@@ -12999,3 +13086,112 @@ fn factor_first_reach_skips_zero_updates_with_an_off_grid_carry() {
         }
     }
 }
+
+/// The per-ring initial rule, shared by initial declaration and atomic ring founding.
+fn initial_ring(field: &Field, g: usize, standing: Vec<Rat>) -> Result<RingMaterial, HnnError> {
+    let ring = field.ring(g);
+    let a = field.alphabet();
+    // Each receiving ring's prior, from its first declared receiver (as its tree).
+    let receivers: BTreeMap<usize, u32> = field
+        .receivers()
+        .iter()
+        .rev()
+        .map(|r| (r.ring, r.receiving_prior))
+        .collect();
+    // Each receiving ring's tree, declared from its first declared receiver.
+    let tree = |g: usize| -> Result<Option<Landmarks>, HnnError> {
+        field
+            .receivers()
+            .iter()
+            .find(|receiver| receiver.ring == g)
+            .map(|receiver| {
+                let declaration = landmark_declaration(field, receiver)?;
+                Ok(match field.receiving_context(g) {
+                    Some(partition) => Landmarks::new_observed(
+                        declaration,
+                        partition.outcome_bits(field, g),
+                        partition.role(),
+                    )?,
+                    None => Landmarks::new(declaration)?,
+                })
+            })
+            .transpose()
+    };
+
+    let n = ring.width();
+    // `E_0`: the declared sign sequence times ½ on every field. [historical] The founded
+    // injection of a passage-founded port chart (each cell's column at one node's real
+    // quadrature) was retired on September 29 with the founded charts: many codes shared
+    // one node, aliasing cells, and on the prediction field it alone made the
+    // refinement's exact cost grow past its bound (the lessons record, §4; `96d8940b`).
+    let source = declared_source_port(field, g)?.map(NormalLaw::with_prior);
+    let pairs = if field.is_source(g) {
+        field
+            .offsets()
+            .iter()
+            .enumerate()
+            .map(|(o, &offset)| {
+                let reads = |kind: u64| -> Vec<Vec<Rat>> {
+                    (0..n)
+                        .map(|rho| {
+                            (0..a)
+                                .map(|x| {
+                                    declared_sign(locus_code(kind, g, o), rho as u64, x as u64)
+                                })
+                                .collect()
+                        })
+                        .collect()
+                };
+                Ok((
+                    offset,
+                    PairPort::new(vec![vec![Rat::zero(); n]; n], reads(2), reads(3))?,
+                ))
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?
+    } else {
+        Vec::new()
+    };
+    let receiving = receivers
+        .get(&g)
+        .map(|&prior| {
+            ExactRatMatrix::zero(2 * a, n)
+                .map(|map| ReceivingMaterial::Single(NormalLaw::with_receiving_prior(map, prior)))
+        })
+        .transpose()?;
+    Ok(RingMaterial {
+        standing,
+        standing_scale: Rat::one(),
+        passive: scaled_identity(n, rat(1, 2)),
+        passive_scale: Rat::one(),
+        contrast: NormalLaw::with_prior(ExactRatMatrix::zero(n, n)?),
+        slices: (0..n)
+            .map(|rho| (unit(n, rho), unit(n, (rho + 1) % n)))
+            .collect(),
+        slice_scale: Rat::one(),
+        source,
+        pairs,
+        pair_scale: Rat::one(),
+        receiving,
+        population: receivers.contains_key(&g).then(receiving_population),
+        tree: tree(g)?,
+        resonator: None,
+        resonator_scales: Vec::new(),
+        resonator_step: None,
+        transport: Rat::one(),
+    })
+}
+
+fn initial_contact(contact: &crate::hnn::field::Contact) -> ContactMaterial {
+    let k = contact.width();
+    ContactMaterial {
+        storage: scaled_identity(k, Rat::one()),
+        stiffness: scaled_identity(k, rat(1, 2)),
+        dissipation: scaled_identity(k, rat(1, 2)),
+        scales: [Rat::one(), Rat::one(), Rat::one()],
+        boost: None,
+        surface: None,
+    }
+}
+
+#[cfg(test)]
+mod founding_tests;

@@ -36,6 +36,8 @@ pub(super) fn path_with(aperture: usize, junctions: &[Rat], contacts: &[Rat]) ->
         .collect();
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings,
             contacts,
             loops: Vec::new(),
@@ -104,6 +106,8 @@ fn chain_declared(first_admittance: Rat, population: u64, offsets: Vec<usize>) -
 /// (`71` on the folded chain before October 5).
 pub(crate) fn chain_declaration(population: u64) -> FieldDeclaration {
     FieldDeclaration {
+        founded: Vec::new(),
+        founding: false,
         rings: vec![ring(4, vec![0, 2]), ring(3, vec![0]), ring(2, vec![])],
         contacts: vec![contact(0, 1, 2, 2), contact(1, 2, 2, 0)],
         loops: Vec::new(),

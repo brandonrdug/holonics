@@ -577,7 +577,7 @@ tests can comb through anything valuable").
    §1.3, "text run on its codec's grain"; recurred October 5 in the byte-chart key location and
    the 2⁸-port text repair).
    - **One source type.** The field reads only `Encoded` cells (`hnn::encoding::Encoded`, each
-     occurrence a `PortCell`): on each source ring, classes of its own port chart `ℤ/d_g`, carried
+     occurrence a `PortCell`): on each source ring whose clock reads the port, classes of its own port chart `ℤ/d_g`, carried
      with the decoder `D` and the Preimage Fibre of the encoding that produced them, the boundary's
      labels and, on the located route, the located advances as the lift's digits at their periods'
      width (`LocatedAdvances`). Its fields are private, and only `hnn::encoding` constructs one, in
@@ -586,7 +586,7 @@ tests can comb through anything valuable").
        (`holarchy::terrain::KnownTruth`, built only by a terrain's generator, never from a file:
        the cyclic terrains on `ℤ/|A|` and the located transport's stepped terrain,
        `holarchy::terrain::known`). It is refused unless the terrain's classes inject into every
-       source ring's ports (`|A| ≤ d_g`, else `EncodingError::Fold`): no fold, no residue.
+       source ring whose clock reads the port (`|A| ≤ d_g`, else `EncodingError::Fold`): no fold, no residue.
      - `Encoded::through`: the image `E` of a founded `Encoding` (`Encoding::found`), whose squares
        `D E = ρ`, `E T_a = U_a E` and the injection square are checked on every reached state. Its
        chart must be one the field's own key location built: today the located chart
@@ -694,6 +694,9 @@ tests can comb through anything valuable").
      unlocated chart, a plural fibre, an unread code) are runtime laws, each pinned by a test.
      Supersedes the residue chart's "stated exception" and its September 29
      `[open]` (`hnn::field`, "The port chart").
+     A founded ring's clock reads the cell count, not the class; its learned port reads the exact
+     class counts without requiring an injective port chart (#73).
+
 10. **No scalar operand.** `Word::pull_back` accepts only a `RatioCovector`, which only a
     `HolonRatio` constructs (`compile_fail`).
 11. **Learning is locating keys and depositing covectors,** never "a current changes a later

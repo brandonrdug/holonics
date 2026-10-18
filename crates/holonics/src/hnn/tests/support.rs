@@ -148,6 +148,8 @@ pub(crate) fn small_field_of(
 ) -> Field {
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: periods
                 .iter()
                 .map(|period| ring(*period, vec![0]))
@@ -551,11 +553,12 @@ pub(crate) fn encoded_classes(classes: usize, word: &[usize]) -> crate::hnn::enc
 }
 
 /// **The widest class chart the field reads without a fold**: its class count and every source
-/// ring's period at most (THE_MACHINE guard 9). A test draws its words below it.
+/// Lock ring's period at most (THE_MACHINE guard 9). A test draws its words below it.
 pub(crate) fn classes(field: &Field) -> usize {
     field
         .sources()
         .iter()
+        .filter(|&&ring| field.ring(ring).advance() == crate::hnn::RingAdvance::Lock)
         .map(|&ring| field.ring(ring).period() as usize)
         .fold(field.alphabet(), usize::min)
 }

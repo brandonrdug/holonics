@@ -328,7 +328,6 @@ mod resident_pair_face_controls {
 
     #[test]
     fn pair_face_is_not_retained() {
-        use std::{hint::black_box, time::Instant};
         let (field, material) = deposited();
         let (current, moment) = passage(&field);
         let retained = text(&moment);
@@ -341,15 +340,9 @@ mod resident_pair_face_controls {
         assert_eq!(text(&moment), retained);
         assert_eq!(moment.dense_bits(), bits);
         assert_eq!(moment.capacity(&field, &current).unwrap(), capacity);
-        let start = Instant::now();
-        let base_clone = black_box(parsed.clone());
-        let base_clone_ns = start.elapsed().as_nanos();
-        let start = Instant::now();
-        let face_clone = black_box(moment.clone());
-        let face_clone_ns = start.elapsed().as_nanos();
-        eprintln!(
-            "pair-face clone control: cells=400 base_clone_ns={base_clone_ns} face_clone_ns={face_clone_ns}"
-        );
+        // The clone's time is the listener's per-cell receipt (`clone_ns`), not this test's.
+        let base_clone = parsed.clone();
+        let face_clone = moment.clone();
         assert_eq!(face_clone, base_clone);
         assert_reads(&field, &material, &current, &parsed);
         assert_eq!(text(&parsed), retained);
@@ -406,7 +399,14 @@ mod resident_pair_face_controls {
 /// below 1 past it, at every `n` from 2 to 4,096 (R3 H1).
 #[test]
 fn the_capacity_is_the_least_lossy_population_by_counting() {
-    let control = capacity(&[3, 4, 5], &[0, 1, 2], 2, &[]).unwrap();
+    let control = capacity(
+        &[3, 4, 5],
+        &[crate::hnn::RingAdvance::Lock; 3],
+        &[0, 1, 2],
+        2,
+        &[],
+    )
+    .unwrap();
     assert_eq!(control.n_star(), 137);
     for n in 2..=4096u64 {
         let bound = BigUint::from(2u32).pow(n as u32);
@@ -420,14 +420,27 @@ fn the_capacity_is_the_least_lossy_population_by_counting() {
 /// residue chart, `|A| = 256`, the count was `6,148`; the formula still reads it.
 #[test]
 fn campaign_one_capacity_is_certified_at_its_crossover() {
-    let capacity = capacity(&[5, 7, 11, 13], &[0], 5, &[1]).unwrap();
+    let capacity = capacity(
+        &[5, 7, 11, 13],
+        &[crate::hnn::RingAdvance::Lock; 4],
+        &[0],
+        5,
+        &[1],
+    )
+    .unwrap();
     assert_eq!(capacity.n_star(), 190);
     assert!(!capacity.lossy_at(189));
     assert!(capacity.lossy_at(190));
     assert_eq!(
-        crate::hnn::moment::capacity(&[5, 7, 11, 13], &[0], 256, &[1])
-            .unwrap()
-            .n_star(),
+        crate::hnn::moment::capacity(
+            &[5, 7, 11, 13],
+            &[crate::hnn::RingAdvance::Lock; 4],
+            &[0],
+            256,
+            &[1]
+        )
+        .unwrap()
+        .n_star(),
         6_148
     );
 }
@@ -1098,6 +1111,8 @@ fn wide_field() -> Field {
     let d = 256u64;
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![RingDeclaration {
                 period: d,
                 screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
@@ -1219,6 +1234,8 @@ fn helix_field() -> Field {
         .collect();
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings,
             contacts: vec![contact(0, 1, 2, 0), contact(1, 2, 3, 0)],
             loops: Vec::new(),

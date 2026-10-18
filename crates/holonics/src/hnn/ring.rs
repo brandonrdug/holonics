@@ -2816,6 +2816,134 @@ pub struct ReceivingBank {
     grain: u32,
 }
 
+#[cfg(test)]
+mod founding_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    /// The founded ring's declaration (`Constitution::with_founded_dynamics`: `d = 1/Y`, a Half
+    /// pump of strength `p`) on the harmonic in-phase mode. The expected entries are hand
+    /// derivations from `a = h/Y + hd` and `b = h²p`, independent of the realized tick maps: the
+    /// period monodromy is the shear `[[1, 0], [−8hp/(a−b), 1]]` wherever the signed form
+    /// certifies, which is exactly `p ≤ d/h`. Never retune either side.
+    #[test]
+    fn half_pump_at_critical_coupling_has_the_stipulated_harmonic_monodromy() {
+        // (Y, h, p, the hand-derived lower-left entry); p = d/h is the founded ring's own pump.
+        let certified = [
+            (integer(2), Rat::one(), rat(1, 2), integer(-8)),
+            (integer(2), Rat::one(), rat(1, 4), rat(-8, 3)),
+            (integer(3), integer(2), rat(1, 6), integer(-4)),
+            (integer(3), integer(2), rat(1, 12), rat(-4, 3)),
+        ];
+        // Just past the edge d/h, and at the shear's singularity 2d/h.
+        let refused = [
+            (integer(2), Rat::one(), rat(65, 128)),
+            (integer(2), Rat::one(), Rat::one()),
+            (integer(3), integer(2), rat(65, 384)),
+            (integer(3), integer(2), rat(1, 3)),
+        ];
+        for period in [2, 3, 5] {
+            // Exactly Field::declare's cyclic incidence and unit constitutive weights.
+            let incidence = crate::ratio::linear::vector::matrix(period, period, |i, j| {
+                if j == i {
+                    integer(-1)
+                } else if j == (i + 1) % period {
+                    Rat::one()
+                } else {
+                    Rat::zero()
+                }
+            })
+            .unwrap();
+            let ring = Parametron::new(
+                incidence,
+                vec![Rat::one(); period],
+                vec![Rat::one(); period],
+            )
+            .unwrap();
+            let material = |admittance: &Rat, strength: &Rat| {
+                ResonatorMaterial::of_parametron(
+                    &ring,
+                    &admittance.recip(),
+                    Some(
+                        PumpDeclaration::new(
+                            strength.clone(),
+                            Carrier::at(&Rat::zero()),
+                            PumpStep::Half,
+                        )
+                        .unwrap(),
+                    ),
+                )
+                .unwrap()
+            };
+            let width = 2 * period;
+            for (admittance, step, strength, entry) in &certified {
+                let d = admittance.recip();
+                let a = step / admittance + step * &d;
+                let b = step * step * strength;
+                assert!(a > b);
+                assert_eq!(
+                    *entry,
+                    Rat::from_integer(BigInt::from(-8)) * step * strength / (a - b),
+                    "the hand entry is the stated formula"
+                );
+                assert!(strength <= &(&d / step));
+                let pumped = material(admittance, strength);
+                pumped.certify(0, step).unwrap();
+                let operands =
+                    ResonatorOperands::at_cut(0, &pumped, admittance, step, None).unwrap();
+                let floquet = Floquet::of(&operands).unwrap();
+                let mut columns = Vec::new();
+                for coordinate in 0..2 {
+                    let mut state = vec![Rat::zero(); 2 * width];
+                    for node in 0..period {
+                        state[coordinate * width + 2 * node] = Rat::one();
+                    }
+                    let image = floquet.monodromy().apply(&state).unwrap();
+                    // Invariance of the harmonic in-phase subspace is part of the check.
+                    for node in 0..period {
+                        assert_eq!(image[2 * node], image[0]);
+                        assert_eq!(image[width + 2 * node], image[width]);
+                        assert!(image[2 * node + 1].is_zero());
+                        assert!(image[width + 2 * node + 1].is_zero());
+                    }
+                    columns.push(vec![image[0].clone(), image[width].clone()]);
+                }
+                let realized = ExactRatMatrix::new(vec![
+                    vec![columns[0][0].clone(), columns[1][0].clone()],
+                    vec![columns[0][1].clone(), columns[1][1].clone()],
+                ])
+                .unwrap();
+                let expected = ExactRatMatrix::new(vec![
+                    vec![Rat::one(), Rat::zero()],
+                    vec![entry.clone(), Rat::one()],
+                ])
+                .unwrap();
+                assert_eq!(
+                    realized, expected,
+                    "period {period}, Y {admittance}, h {step}, p {strength}"
+                );
+            }
+            for (admittance, step, strength) in &refused {
+                assert!(strength > &(&admittance.recip() / step));
+                assert!(matches!(
+                    material(admittance, strength).certify(0, step),
+                    Err(HnnError::UncertifiedResonator { .. })
+                ));
+                assert!(matches!(
+                    ResonatorOperands::at_cut(
+                        0,
+                        &material(admittance, strength),
+                        admittance,
+                        step,
+                        None
+                    ),
+                    Err(HnnError::UncertifiedResonator { .. })
+                ));
+            }
+        }
+    }
+}
+
 impl ReceivingBank {
     /// A linear Floquet bank of at least one member on an unpumped quadratic
     /// material, a positive port and hop. A quartic relation needs its actual

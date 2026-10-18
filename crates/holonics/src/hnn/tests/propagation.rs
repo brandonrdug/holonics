@@ -746,6 +746,8 @@ fn the_six_cycle_front_matches_the_measured_cone() {
 /// campaign 1's tolerance `1/16`, on the exponent lattice `L`.
 fn quarter_turn_path(periods: &[u64], exponents: &[i64], grain: u64) -> FieldDeclaration {
     FieldDeclaration {
+        founded: Vec::new(),
+        founding: false,
         rings: periods
             .iter()
             .map(|&period| crate::hnn::field::RingDeclaration {

@@ -530,6 +530,8 @@ fn to_the_carry_out(reference: &Reference, resident: &mut crate::hnn::reference:
 fn two_receiver_path() -> Field {
     let base = six_path(2);
     let mut declared = crate::hnn::field::FieldDeclaration {
+        founded: Vec::new(),
+        founding: false,
         rings: (0..6).map(|_| super::support::ring(2, vec![0])).collect(),
         contacts: (0..5)
             .map(|g| super::support::contact(g, g + 1, 1, 0))
@@ -904,6 +906,8 @@ fn a_collapsed_constitution_remounts_and_reads_alike() {
 fn split_path() -> Field {
     let base = six_path(2);
     let declared = crate::hnn::field::FieldDeclaration {
+        founded: Vec::new(),
+        founding: false,
         rings: (0..6).map(|_| super::support::ring(2, vec![0])).collect(),
         contacts: [0, 1, 3, 4]
             .into_iter()

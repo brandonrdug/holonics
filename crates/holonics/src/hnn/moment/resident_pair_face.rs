@@ -364,6 +364,10 @@ impl ResidentPairFaces {
             .get(&key)
             .map(|s| &s.rebuilds + BigUint::one())
             .unwrap_or_else(BigUint::one);
+        // The shared audit count refuses at its carrier's end rather than wrapping.
+        self.1
+            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |n| n.checked_add(1))
+            .map_err(|_| HnnError::CountOverflow)?;
         state.slots.insert(
             key,
             Slot {
@@ -371,7 +375,6 @@ impl ResidentPairFaces {
                 rebuilds,
             },
         );
-        self.1.fetch_add(1, Ordering::Relaxed);
         Ok(face)
     }
 

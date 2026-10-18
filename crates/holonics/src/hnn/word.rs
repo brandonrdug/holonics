@@ -432,6 +432,57 @@ pub struct ReceptionCarry {
     pub resonator_momenta: Vec<Option<Vec<Rat>>>,
 }
 
+impl EndChange {
+    /// The new ring and contact carry no motion; every earlier coordinate keeps its value.
+    pub(crate) fn found_ring(
+        &mut self,
+        field: &Field,
+        constitution: &crate::hnn::constitution::Constitution,
+        ring: usize,
+        contact: usize,
+        current: &Current,
+        ticks: usize,
+    ) -> Result<(), HnnError> {
+        if current.lift().len() != field.rings().len()
+            || self.storage.len() != ring
+            || self.arrivals.len() != contact
+            || self.states.len() != contact
+            || self.resonators.len() != ring
+            || self.resonator_phases.len() != ring
+            || field.rings().len() != ring + 1
+            || field.contacts().len() != contact + 1
+        {
+            return Err(HnnError::Founding {
+                what: "the carried change before the next ring and contact",
+            });
+        }
+        let resonator = constitution
+            .ring_resonator(ring)
+            .ok_or(HnnError::Founding {
+                what: "the founded ring's declared resonator",
+            })?;
+        // The pump shares the word's clock; a founding introduces no per-ring origin.
+        let phase = resonator
+            .pump()
+            .map_or(0, |pump| pump.phase_at(ticks.saturating_sub(1)));
+        // Every refusal precedes the first push, so a refused founding leaves the change whole.
+        let width = field.ring(ring).width();
+        let channel = field.contact(contact).width();
+        self.storage.push(vec![Rat::zero(); width]);
+        let (from, to) = field.contact(contact).ends();
+        self.arrivals.push([
+            vec![Rat::zero(); field.ring(from).width()],
+            vec![Rat::zero(); field.ring(to).width()],
+        ]);
+        self.states
+            .push([vec![Rat::zero(); channel], vec![Rat::zero(); channel]]);
+        self.resonators
+            .push(Some([vec![Rat::zero(); width], vec![Rat::zero(); width]]));
+        self.resonator_phases.push(Some(phase));
+        Ok(())
+    }
+}
+
 /// [definition; the deposit record (October 3) §2–§3, Lean
 /// `HolonicsResearch/HNN/MoveDirection.held_momentum_loss`] **The rate a contact carries across a
 /// change of its storage at held momentum**: `w′ = w + δ` with `C′ δ = π − C′ w`, so `C′ w′ = π`.
@@ -497,6 +548,40 @@ fn reflected_power(step: &Rat, wave: &[Rat], from: &Rat, to: &Rat) -> Rat {
 }
 
 impl ReceptionCarry {
+    /// Extend at the live publication cut, retaining every earlier wave, rate and reference.
+    pub fn found_ring(
+        &self,
+        field: &Field,
+        constitution: &crate::hnn::constitution::Constitution,
+        ring: usize,
+        contact: usize,
+        current: &Current,
+    ) -> Result<Self, HnnError> {
+        if self.conductances.len() != contact
+            || self.momenta.len() != contact
+            || self.resonator_momenta.len() != ring
+        {
+            return Err(HnnError::Founding {
+                what: "the carry before the next ring and contact",
+            });
+        }
+        let form = PowerForm::read(field, constitution, current)?;
+        let mut next = self.clone();
+        next.change
+            .found_ring(field, constitution, ring, contact, current, self.ticks)?;
+        next.conductances.push(form.conductances[contact].clone());
+        next.momenta
+            .push(vec![Rat::zero(); field.contact(contact).width()]);
+        next.resonator_momenta
+            .push(Some(vec![Rat::zero(); field.ring(ring).width()]));
+        if !next.fits(field) {
+            return Err(HnnError::Founding {
+                what: "the extended carry's field frame",
+            });
+        }
+        Ok(next)
+    }
+
     /// [definition; the reception carry §2.1] **The interior change** `Π_int x_k(end)`: the carried
     /// change with every source ring's storage at zero, which the moment's imposed storage then
     /// replaces at the source port. Arrivals, contact states and resonator states are interior.
@@ -3532,5 +3617,104 @@ impl KeptWord {
             source_returns,
             opened_at,
         }
+    }
+}
+
+#[cfg(test)]
+mod founding_carry_tests {
+    use super::*;
+    #[test]
+    fn r4b_new_contact_reference_is_read_at_the_live_cut() {
+        let field =
+            Field::declare(crate::hnn::field::founding_tests::listener(1, 1 << 16)).unwrap();
+        let old = Current::at(
+            &field,
+            vec![
+                integer(0).to_integer(),
+                integer(3).to_integer(),
+                integer(0).to_integer(),
+            ],
+        )
+        .unwrap();
+        let zeros = |width| vec![Rat::zero(); width];
+        let material = crate::hnn::constitution::Constitution::initial(&field, 1 << 40).unwrap();
+        let old_form = PowerForm::read(&field, &material, &old).unwrap();
+        let carry = ReceptionCarry {
+            change: EndChange {
+                storage: field.rings().iter().map(|g| zeros(g.width())).collect(),
+                arrivals: field
+                    .contacts()
+                    .iter()
+                    .map(|a| {
+                        let (from, to) = a.ends();
+                        [
+                            zeros(field.ring(from).width()),
+                            zeros(field.ring(to).width()),
+                        ]
+                    })
+                    .collect(),
+                states: field
+                    .contacts()
+                    .iter()
+                    .map(|a| [zeros(a.width()), zeros(a.width())])
+                    .collect(),
+                resonators: vec![None; 3],
+                resonator_phases: vec![None; 3],
+            },
+            ticks: 2,
+            conductances: old_form.conductances,
+            momenta: field.contacts().iter().map(|a| zeros(a.width())).collect(),
+            resonator_momenta: vec![None; 3],
+        };
+        let expanded = field
+            .found(crate::hnn::FoundedRing { period: 2, key: 1 })
+            .unwrap();
+        let material = material.found_ring(&expanded, 3, 1 << 40).unwrap();
+        let mut current = old;
+        current.found_ring(1);
+        let expected = PowerForm::read(&expanded, &material, &current)
+            .unwrap()
+            .conductances[2]
+            .clone();
+        let rest = PowerForm::read(&expanded, &material, &Current::at_rest(&expanded))
+            .unwrap()
+            .conductances[2]
+            .clone();
+        assert_ne!(
+            expected, rest,
+            "the control must distinguish the live cut from rest"
+        );
+        let next = carry
+            .found_ring(&expanded, &material, 3, 2, &current)
+            .unwrap();
+        assert_eq!(next.conductances[2], expected);
+        assert_eq!(next.ticks, carry.ticks);
+        assert_eq!(&next.change.storage[..3], carry.change.storage);
+        assert_eq!(&next.conductances[..2], carry.conductances);
+        let phase = material
+            .ring_resonator(3)
+            .unwrap()
+            .pump()
+            .unwrap()
+            .phase_at(carry.ticks - 1);
+        assert_eq!(
+            phase, 1,
+            "this control must exercise a nonzero shared word-clock phase"
+        );
+        assert_eq!(next.change.resonator_phases[3], Some(phase));
+        let moment = SourceMoment::open(&expanded, &current);
+        let opening = WordOpening::Received {
+            carry: next,
+            absorption: Absorption::Nothing,
+        };
+        Word::open_received(
+            &expanded,
+            &material,
+            &current,
+            &moment,
+            &mut Charts::new(),
+            &opening,
+        )
+        .unwrap();
     }
 }

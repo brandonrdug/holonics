@@ -441,6 +441,32 @@ struct Arrived {
 }
 
 impl Arrived {
+    fn found_ring(
+        &self,
+        field: &Field,
+        constitution: &Constitution,
+        ring: usize,
+        contact: usize,
+        key: u64,
+    ) -> Result<Self, HnnError> {
+        let ratio = self
+            .ratio
+            .found_ring(field, constitution, ring, contact, key)?;
+        let current = Current::at(field, ratio.anchor().to_vec())?;
+        let opening = match &self.opening {
+            WordOpening::Rest => WordOpening::Rest,
+            WordOpening::Received { carry, absorption } => WordOpening::Received {
+                carry: carry.found_ring(field, constitution, ring, contact, &current)?,
+                absorption: *absorption,
+            },
+        };
+        Ok(Self {
+            ratio,
+            opening,
+            targets: self.targets.clone(),
+        })
+    }
+
     /// The arrived targets' code length at a constitution under its receiver's population (ruling
     /// A), read from the executed faces (the resident's charts warm-started and refined), the
     /// constitution's tree at the targets' addresses and its population's likelihoods, with the
@@ -501,6 +527,8 @@ struct AeonState {
 /// budget stop once it comes.
 #[derive(Clone, Debug)]
 pub struct Resident {
+    founding: Option<crate::hnn::founding::FoundingLaw>,
+    staged_founding: Option<u64>,
     field: Field,
     current: Current,
     address: ActiveAddress,
@@ -893,6 +921,10 @@ impl Resident {
             })
         });
         lift + moments
+            + self.founding.as_ref().map_or(0, |law| law.retained_bits())
+            + self
+                .staged_founding
+                .map_or(0, |p| BigInt::from(p).bits() + 1)
             + carried
             + self.carry_error_bits()
             + self
@@ -1079,6 +1111,8 @@ impl Reference {
                 .collect::<Result<Vec<_>, _>>()?,
         };
         Ok(Resident {
+            founding: None,
+            staged_founding: None,
             field: field.clone(),
             current: current.clone(),
             address: ActiveAddress::of_field(field, current, &constitution)?,
@@ -1160,6 +1194,32 @@ impl Reference {
         opening: Constitution,
         state: &crate::hnn::constitution::ContinuingState,
     ) -> Result<Resident, HnnError> {
+        if state.founded() != field.declaration().founded.as_slice() {
+            return Err(HnnError::ContinuingState {
+                what: "the saved founded list against the field",
+            });
+        }
+        if let Some(law) = state.founding() {
+            if !field.declaration().founding {
+                return Err(HnnError::Founding {
+                    what: "a saved founding law needs its enabled field",
+                });
+            }
+            let offset = field
+                .offsets()
+                .iter()
+                .copied()
+                .min()
+                .ok_or(HnnError::Founding {
+                    what: "a saved founding law needs its pair offset",
+                })?;
+            law.admit_parameters(
+                field.alphabet(),
+                offset,
+                field.cell_clock_period(),
+                &field.founding_candidates()?,
+            )?;
+        }
         let constitution = opening.continued(state)?;
         if let Some(text) = state.passage() {
             let passage = passage::ResidentPassage::from_text(field, &constitution, text)?;
@@ -1183,13 +1243,18 @@ impl Reference {
                 Some(parts.admitted.clone()),
             )?;
             resident.carried = state.carry().cloned();
+            resident.founding = state.founding().cloned();
+            resident.staged_founding = state.staged_founding();
             return resident.with_passage(passage);
         }
         // A constitution-only save remains a declared narrower material/carry remount.
-        match state.carry() {
+        let mut resident = match state.carry() {
             Some(carry) => self.mount_carried(field, current, constitution, carry.clone()),
             None => self.mount_with(field, current, constitution),
-        }
+        }?;
+        resident.founding = state.founding().cloned();
+        resident.staged_founding = state.staged_founding();
+        Ok(resident)
     }
 }
 
@@ -1368,6 +1433,22 @@ impl ExecutionPort for Reference {
             resident.current = found;
             return Err(error);
         }
+        // The open founding law receives the same consumed prefix as the address, on a copy taken
+        // only when cells were consumed; a refusal discards the open like the refusals above.
+        let founding = match &resident.founding {
+            Some(law) if ingested.cells > 0 => {
+                let mut law = law.clone();
+                for class in cells.classes_read().take(ingested.cells) {
+                    if let Err(error) = law.receive(class) {
+                        resident.moments.remove(&id);
+                        resident.current = found;
+                        return Err(error);
+                    }
+                }
+                Some(law)
+            }
+            _ => None,
+        };
         // The receiving parametron's active suffix address receives the cells the moment took, each
         // tick's letter read by its register's clock, which stays the lift point's (its windings
         // since the aeon's opening, which the carry-out moves to its own lift point), and its
@@ -1375,6 +1456,9 @@ impl ExecutionPort for Reference {
         // ingest and never inside it (`hnn::receiving::LetterReader`).
         for (at, code) in cells.classes_read().take(ingested.cells).enumerate() {
             resident.address.receive_at(code, cells.advance(at))?;
+        }
+        if founding.is_some() {
+            resident.founding = founding;
         }
         let opening = if ingested.carry_out {
             resident.current.lift()
@@ -1430,6 +1514,7 @@ impl ExecutionPort for Reference {
                 }
             }
         }
+        let receipt = receipt(&field, &ticks, &Rat::one(), work, detail)?;
         Ok((
             id,
             InteractionReturn {
@@ -1438,7 +1523,7 @@ impl ExecutionPort for Reference {
                 deposit: Component::Absent("ingestion deposits nothing"),
                 order: Component::Present(order),
                 phases: Component::Absent("nothing is read at ingest"),
-                receipt: receipt(&field, &ticks, &Rat::one(), work, detail)?,
+                receipt,
             },
         ))
     }
@@ -2296,7 +2381,7 @@ impl ExecutionPort for Reference {
         let opening = resident.aeon.opening.clone();
         let carry_out = resident.current.lift().to_vec();
         let (readings, epochs, closing) =
-            aeon_readings(&resident.parametric, &opening, &carry_out)?;
+            aeon_readings(&resident.field, &resident.parametric, &opening, &carry_out)?;
         // Published together.
         resident.constitution = constitution;
         resident.carried = carry;
@@ -2842,7 +2927,6 @@ pub fn compose_return_view(
     let source_opening = view.apply(field, &back.opening)?;
     for &g in field.sources() {
         let ring = field.ring(g);
-        let n = ring.width();
         let d = ring.placements().len();
         let opening = &source_opening[g];
         let turned: Vec<Vec<Rat>> = (0..d)
@@ -3607,6 +3691,9 @@ pub struct Exposure {
     /// The cell at which the run stopped at its deadline ([`Reference::with_deadline`]), if it did.
     pub deadline: Option<u64>,
     pub complete: bool,
+    /// The field's code length ([`Field::describe`]) and the declared physics' bits. Since #398 the
+    /// code carries the founded count and the founding flag, two bits more than lengths recorded
+    /// before on a field without a founding law.
     pub description_bits: u64,
     /// Final scalar gains of declared resonators, in ring order (a constitutive reading, not an
     /// event archive).
@@ -4748,6 +4835,22 @@ pub struct PublicationStorageBits {
 /// phase. The host reference's [`Resident`] answers them, and so does a device's resident, so the
 /// exposure protocol is stated once ([`expose`]) for every realization of the port.
 pub trait ExposedResident {
+    fn open_founding(&mut self) -> Result<(), HnnError> {
+        Err(HnnError::Unadmitted {
+            reason: "ring founding on this realization",
+        })
+    }
+    fn read_founding(&mut self) -> Result<crate::hnn::founding::FoundingRead, HnnError> {
+        Err(HnnError::Unadmitted {
+            reason: "ring founding on this realization",
+        })
+    }
+    fn publish_founding(&mut self) -> Result<Option<crate::hnn::FoundedRing>, HnnError> {
+        Err(HnnError::Unadmitted {
+            reason: "ring founding on this realization",
+        })
+    }
+
     fn admitted(&self) -> &[ReceivingPhases];
     fn constitution(&self) -> &Constitution;
     fn stopped(&self) -> Option<&BudgetStop>;
@@ -4800,6 +4903,16 @@ pub trait ExposedResident {
 }
 
 impl ExposedResident for Resident {
+    fn open_founding(&mut self) -> Result<(), HnnError> {
+        Resident::open_founding(self)
+    }
+    fn read_founding(&mut self) -> Result<crate::hnn::founding::FoundingRead, HnnError> {
+        Resident::read_founding(self)
+    }
+    fn publish_founding(&mut self) -> Result<Option<crate::hnn::FoundedRing>, HnnError> {
+        Resident::publish_founding(self)
+    }
+
     fn publication_storage_bits(&self) -> Result<PublicationStorageBits, HnnError> {
         Ok(PublicationStorageBits {
             arrived: self.arrived.as_ref().map_or(0, Arrived::bits),
@@ -5554,3 +5667,163 @@ pub mod passage;
 
 #[cfg(test)]
 mod precision_publication_tests;
+
+impl Resident {
+    /// Open the field's own two-part-code law, once, before receiving its evidence.
+    pub fn open_founding(&mut self) -> Result<(), HnnError> {
+        if !self.field.declaration().founding || self.founding.is_some() {
+            return Err(HnnError::Founding {
+                what: "the field enables one unopened founding law",
+            });
+        }
+        let offset = self
+            .field
+            .offsets()
+            .iter()
+            .copied()
+            .min()
+            .ok_or(HnnError::Founding {
+                what: "a founding law needs a declared pair offset",
+            })?;
+        let law = crate::hnn::founding::FoundingLaw::open(
+            self.field.alphabet(),
+            offset,
+            self.field.cell_clock_period(),
+            self.field.founding_candidates()?,
+        )?;
+        self.founding = Some(law);
+        Ok(())
+    }
+
+    /// A staged founding is a single transaction; subsequent reads do not restage it.
+    pub fn read_founding(&mut self) -> Result<crate::hnn::founding::FoundingRead, HnnError> {
+        let mut read = self
+            .founding
+            .as_ref()
+            .ok_or(HnnError::Founding {
+                what: "the founding law is not open",
+            })?
+            .read()?;
+        if self.staged_founding.is_some() {
+            read.founded = None;
+        } else {
+            self.staged_founding = read.founded;
+        }
+        Ok(read)
+    }
+}
+
+#[cfg(test)]
+mod founding_tests;
+
+impl Resident {
+    /// Publish the complete derived object at one boundary; every refusal keeps its staging.
+    pub fn publish_founding(&mut self) -> Result<Option<crate::hnn::FoundedRing>, HnnError> {
+        let Some(period) = self.staged_founding else {
+            return Ok(None);
+        };
+        if !self.pending.is_empty()
+            || !self.staged.is_empty()
+            || self.held_contact_variation.is_some()
+            || self.receiving_chart.is_some()
+            || self.participating_world.is_some()
+            || self.world_model.is_some()
+        {
+            // A receiving chart is encoded over the old rings; no consumer transports it to the
+            // founded field yet, so it refuses rather than goes stale.
+            return Err(HnnError::Unadmitted {
+                reason: "founding requires no pending ratio, staged deposit, held variation, \
+                         receiving chart or World",
+            });
+        }
+        let mut law = self.founding.clone().ok_or(HnnError::Founding {
+            what: "a staged founding needs its open law",
+        })?;
+        let key = law.key(period);
+        let founded = crate::hnn::FoundedRing { period, key };
+        let mut next = self.clone();
+        let ring = self.field.rings().len();
+        let contact = self.field.contacts().len();
+        next.field = self.field.found(founded)?;
+        next.constitution =
+            self.constitution
+                .clone()
+                .found_ring(&next.field, ring, self.constitution.budget())?;
+        for moment in next.moments.values_mut() {
+            moment.found_ring(&next.field, ring)?;
+        }
+        next.current.found_ring(key);
+        next.carried = self
+            .carried
+            .as_ref()
+            .map(|carry| {
+                carry.found_ring(
+                    &next.field,
+                    &next.constitution,
+                    ring,
+                    contact,
+                    &next.current,
+                )
+            })
+            .transpose()?;
+        if let Some(error) = &mut next.carried_error {
+            error.found_ring(
+                &next.field,
+                &next.constitution,
+                ring,
+                contact,
+                &next.current,
+                self.carried.as_ref().map_or(0, |carry| carry.ticks),
+            )?;
+        }
+        next.aeon.opening.push(BigInt::from(key));
+        next.parametric = next.field.parametric();
+        next.address = self.address.found_ring(
+            &next.field,
+            &next.constitution,
+            ring,
+            contact,
+            &next.current,
+        )?;
+        next.charts = Charts::new();
+        let occurrence = next.ledger.balance().closing.is_some();
+        if occurrence != next.arrived.is_some() {
+            return Err(HnnError::PrecisionOccurrence {
+                occurrence,
+                arrived: next.arrived.is_some(),
+            });
+        }
+        next.arrived = self
+            .arrived
+            .as_ref()
+            .map(|arrived| arrived.found_ring(&next.field, &next.constitution, ring, contact, key))
+            .transpose()?;
+        if let Some(arrived) = &next.arrived {
+            let (reread, readings) =
+                arrived.code_length(&next.field, &next.constitution, &mut next.charts)?;
+            next.tally.read(&readings);
+            next.ledger.found(reread)?;
+        }
+        law.reopen(
+            next.field.cell_clock_period(),
+            next.field.founding_candidates()?,
+        )?;
+        next.founding = Some(law);
+        next.staged_founding = None;
+        next.admit_exact_current()?;
+        for moment in next.moments.values() {
+            SourceCapacity::checked_of(moment, &next.field, &next.current)?;
+        }
+        if !next
+            .address
+            .reader()
+            .agrees(&next.field, &next.current, &next.aeon.opening)
+        {
+            return Err(HnnError::Founding {
+                what: "the extended address and current disagree",
+            });
+        }
+        *self = next;
+        Ok(Some(founded))
+    }
+}

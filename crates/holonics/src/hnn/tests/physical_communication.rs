@@ -29,6 +29,8 @@ fn receiver() -> ReceiverDeclaration {
 fn field() -> Field {
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(4, (0..4).collect()), ring(3, Vec::new())],
             contacts: vec![contact(0, 1, 3, 0)],
             loops: Vec::new(),
@@ -84,6 +86,8 @@ fn held_variation_fixture() -> (Field, Constitution, WordOpening, ReceiverDeclar
     let declared = receiver();
     let field = Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(2, vec![0, 1]), ring(2, vec![])],
             contacts: vec![contact(0, 1, 1, 0)],
             loops: vec![],

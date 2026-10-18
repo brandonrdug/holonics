@@ -1344,6 +1344,8 @@ mod tests {
         };
         Field::declare(
             FieldDeclaration {
+                founded: Vec::new(),
+                founding: false,
                 rings: vec![ring((0..4).collect()), ring(Vec::new()), ring(Vec::new())],
                 contacts: vec![contact(0, 1), contact(1, 2)],
                 loops: Vec::new(),

@@ -85,6 +85,8 @@ fn contact(from: usize, to: usize, nodes: usize, exponent: i64) -> ContactDeclar
 /// two contacts, source ring 0, `|A| = 4`, `Δ = {1}`, receiver ring 2 with aperture 2.
 fn chain_declaration(population: u64) -> FieldDeclaration {
     FieldDeclaration {
+        founded: Vec::new(),
+        founding: false,
         rings: vec![ring(4, vec![0, 2]), ring(3, vec![0]), ring(2, vec![])],
         contacts: vec![contact(0, 1, 2, 2), contact(1, 2, 2, 0)],
         loops: Vec::new(),
@@ -2953,7 +2955,7 @@ fn the_card_receiving_component_precision_preserves_outputs_and_cold_continuatio
     let tolerance = &field.receivers()[0].tolerance;
     let grain = Rat::new(
         BigInt::one(),
-        BigInt::from(holonics::hnn::field::receiver_grain(tolerance)) << 1usize,
+        BigInt::from(holonics::hnn::field::receiver_grain(tolerance).unwrap()) << 1usize,
     );
     assert!(feature_scale > Rat::one() / &unit);
     let retained_reads = restored_carry.apply(&feature).unwrap();
@@ -3189,4 +3191,48 @@ fn the_card_class_grain_release_matches_scored_prefix_and_preserves_opening() {
         assert!(code.lower <= -upper.lower);
         assert!(-lower.upper <= code.upper);
     }
+}
+
+#[test]
+#[ignore = "R4b test 18: GPU suite only"]
+fn r4b_18_founded_mount_refuses_before_upload() {
+    let card = card();
+    let base = Field::declare(chain_declaration(1 << 16)).unwrap();
+    let field = base
+        .found(holonics::hnn::FoundedRing { period: 2, key: 1 })
+        .unwrap();
+    let port = Resident::new(&card, 4, 1 << 40);
+    let before = port.traffic();
+    assert!(matches!(
+        port.mount(&field, &Current::at_rest(&field)),
+        Err(HnnError::Founding {
+            what: "the card's founded ring is owed (#76)"
+        })
+    ));
+    assert_eq!(port.traffic(), before);
+    assert!(matches!(
+        super::ResidentMoment::open(&card, &field, &Current::at_rest(&field)),
+        Err(super::DeviceError::Hnn(HnnError::Founding {
+            what: "the card's founded ring is owed (#76)"
+        }))
+    ));
+
+    // A host state saved with its founding law open: the card carries no founding law, so the
+    // resume refuses before anything crosses the bus rather than dropping the law.
+    let mut declaration = chain_declaration(1 << 16);
+    declaration.founding = true;
+    let field = Field::declare(declaration).unwrap();
+    let host = Reference::new(4, 1 << 40);
+    let mut saved = host.mount(&field, &Current::at_rest(&field)).unwrap();
+    saved.open_founding().unwrap();
+    let state = saved.continuing_state(0).unwrap();
+    assert!(state.founding_open());
+    let opening = Constitution::initial(&field, 1 << 40).unwrap();
+    assert!(matches!(
+        port.mount_continued(&field, &Current::at_rest(&field), opening, &state),
+        Err(HnnError::Founding {
+            what: "the card's founding law is owed (#76)"
+        })
+    ));
+    assert_eq!(port.traffic(), before);
 }

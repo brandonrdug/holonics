@@ -166,7 +166,8 @@ use crate::hnn::HnnError;
 use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{
-    ConstitutionRead, Current, Field, FieldMaterial, ReceiverDeclaration, ring_digit,
+    ConstitutionRead, Current, Field, FieldMaterial, ReceiverDeclaration, receiver_grain,
+    ring_digit,
 };
 use crate::hnn::keys;
 use crate::hnn::propagation::Operands;
@@ -431,6 +432,7 @@ impl FeatureFamily {
 /// register's clock restarts at an aeon's opening.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct ClockRing {
+    advance: crate::hnn::RingAdvance,
     period: u64,
     ports: Vec<usize>,
     lock: Vec<bool>,
@@ -530,6 +532,7 @@ impl LetterReader {
         let rings: Vec<ClockRing> = field.rings()[..reach]
             .iter()
             .map(|ring| ClockRing {
+                advance: ring.advance(),
                 period: ring.period(),
                 ports: (0..field.alphabet()).map(|code| ring.port(code)).collect(),
                 lock: (0..ring.period() as usize)
@@ -678,6 +681,10 @@ impl LetterReader {
         }
         let mut carry = 0u64;
         for (g, (ring, clock)) in self.rings.iter().zip(self.clocks.iter_mut()).enumerate() {
+            if ring.advance == crate::hnn::RingAdvance::Own {
+                clock.advance(&BigUint::one());
+                continue;
+            }
             let advance = match digits {
                 Some(digits) => digits[g],
                 None => u64::from(
@@ -845,6 +852,64 @@ impl ActiveAddress {
         reader.refresh(field, constitution)?;
         Ok(Self {
             letters: vec![Letter::Boundary; depth],
+            reader,
+        })
+    }
+
+    /// Extend a contact reader to the founded field, keeping every letter and old clock.
+    /// A phase-only reader names no founded locus and remains unchanged.
+    pub fn found_ring(
+        &self,
+        field: &Field,
+        constitution: &crate::hnn::constitution::Constitution,
+        ring: usize,
+        contact: usize,
+        current: &Current,
+    ) -> Result<Self, HnnError> {
+        if field.rings().len() != ring + 1
+            || field.contacts().len() != contact + 1
+            || field.ring(ring).advance() != crate::hnn::RingAdvance::Own
+            || current.lift().len() != field.rings().len()
+        {
+            return Err(HnnError::Founding {
+                what: "the address at the next founded ring and contact",
+            });
+        }
+        if self.reader.advances.is_some() {
+            return Err(HnnError::Founding {
+                what: "the founding's located route is owed",
+            });
+        }
+        if !self.reader.family.reads_contacts() {
+            return Ok(self.clone());
+        }
+        let mut reader = LetterReader::of(field, self.reader.family.clone(), current)?;
+        if self.reader.rings.len() != ring
+            || self.reader.clocks.len() != ring
+            || self.reader.ends.len() != contact
+            || reader.rings[..ring] != self.reader.rings
+            || reader.ends[..contact] != self.reader.ends
+        {
+            return Err(HnnError::Founding {
+                what: "a founding must retain the contact address's previous frame",
+            });
+        }
+        reader.clocks[..ring].clone_from_slice(&self.reader.clocks);
+        reader.kinds = match &self.reader.kinds {
+            None => None,
+            Some(old) => {
+                if old.len() != contact {
+                    return Err(HnnError::Founding {
+                        what: "the held kinds before the founded contact",
+                    });
+                }
+                let mut kinds = old.clone();
+                kinds.push(site_kinds(field, constitution)?[contact]);
+                Some(kinds)
+            }
+        };
+        Ok(Self {
+            letters: self.letters.clone(),
             reader,
         })
     }
@@ -1235,30 +1300,13 @@ pub fn landmark_declaration_with(
         depth: receiver.depth,
         forced: 0,
         population: field.population(),
-        grain: grain_of(&receiver.tolerance)?,
+        grain: receiver_grain(&receiver.tolerance)?,
         family,
         prior: receiver.prior.clone(),
         capacity: crate::compression::landmark::context::Capacity::Unbounded,
         mass: receiver.mass,
         base: receiver.base,
     })
-}
-
-/// `L_R = ⌈1/ε_bits⌉`, refused at a tolerance that is not positive or whose grain passes the word.
-fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
-    if *tolerance <= Rat::zero() {
-        return Err(HnnError::Tolerance {
-            tolerance: tolerance.clone(),
-        });
-    }
-    tolerance
-        .recip()
-        .ceil()
-        .to_integer()
-        .to_u64()
-        .ok_or(HnnError::Tolerance {
-            tolerance: tolerance.clone(),
-        })
 }
 
 // -------------------------------------------------------------------------------------------
@@ -2230,7 +2278,7 @@ impl ReceivingPhases {
             || field.first_epoch(ring) != Some(first_epoch)
             || aperture == 0
             || first_epoch.checked_add(aperture).is_none()
-            || grain != grain_of(&tolerance)?
+            || grain != receiver_grain(&tolerance)?
         {
             return refused(what);
         }
@@ -2267,7 +2315,7 @@ impl ReceivingPhases {
     pub(crate) fn is_declared_restriction(&self, field: &Field) -> Result<bool, HnnError> {
         for receiver in field.receivers() {
             if self.ring == receiver.ring
-                && self.grain == grain_of(&receiver.tolerance)?
+                && self.grain == receiver_grain(&receiver.tolerance)?
                 && self.aperture <= receiver.aperture
                 && self.observation_partition == field.receiving_context(self.ring)
             {
@@ -2293,7 +2341,7 @@ impl ReceivingPhases {
                 rings: field.rings().len(),
             });
         }
-        let grain = grain_of(&receiver.tolerance)?;
+        let grain = receiver_grain(&receiver.tolerance)?;
         if receiver.aperture == 0 {
             return Err(HnnError::Observability {
                 aperture: 0,
@@ -2663,5 +2711,180 @@ impl ReceivingPhases {
             ReceivingRead::combined(waves.logits[j].clone(), &trees[j], self.grain)
         })?;
         Faces::of_reads(&reads, self.grain)
+    }
+}
+
+#[cfg(test)]
+mod founded_address_frame_tests {
+    use super::*;
+    use crate::hnn::HnnError;
+    use crate::hnn::constitution::Constitution;
+    use crate::hnn::field::{Current, Field, FoundedRing, ring_digit};
+    use crate::hnn::receiving::{Feature, FeatureFamily};
+    use num_traits::Zero;
+
+    const BUDGET: u64 = 1 << 40;
+
+    fn founded_pair() -> (Field, Current, Constitution, Field, Current, Constitution) {
+        let field =
+            Field::declare(crate::hnn::field::founding_tests::listener(1, 1 << 16)).unwrap();
+        let family = FeatureFamily::new(vec![Feature::contact(&field, 0)]).unwrap();
+        let field = field.with_letter_family(family).unwrap();
+        let current = Current::at_rest(&field);
+        let material = Constitution::initial(&field, BUDGET).unwrap();
+        let founded = field.found(FoundedRing { period: 2, key: 1 }).unwrap();
+        let mut founded_current = current.clone();
+        founded_current.found_ring(1);
+        let founded_material = material
+            .clone()
+            .found_ring(&founded, field.rings().len(), BUDGET)
+            .unwrap();
+        (
+            field,
+            current,
+            material,
+            founded,
+            founded_current,
+            founded_material,
+        )
+    }
+
+    #[test]
+    fn r4b_contact_reader_founding_preserves_the_old_address_and_extends_its_frame() {
+        let (field, current, material, founded, _, founded_material) = founded_pair();
+        let family = field.letter_family().clone();
+        let mut current = current;
+        let mut address = ActiveAddress::of_field(&field, &current, &material).unwrap();
+        for cell in [0, 1] {
+            current
+                .step(
+                    &field,
+                    &crate::hnn::tests::support::encoded(&field, &[cell]),
+                    0,
+                )
+                .unwrap();
+            address.receive(cell).unwrap();
+        }
+        let mut founded_current = current.clone();
+        founded_current.found_ring(1);
+
+        let old_letters = address.letters.clone();
+        let old_reader = address.reader.clone();
+        let founded_address = address
+            .found_ring(
+                &founded,
+                &founded_material,
+                field.rings().len(),
+                field.contacts().len(),
+                &founded_current,
+            )
+            .unwrap();
+
+        let expected = LetterReader::of(&founded, family.clone(), &founded_current).unwrap();
+        let actual_kinds = site_kinds(&founded, &founded_material).unwrap();
+        assert_eq!(founded_address.reader.family, family);
+        assert_eq!(founded_address.reader.rings, expected.rings);
+        assert_eq!(founded_address.reader.ends, expected.ends);
+        assert_eq!(founded_address.reader.kinds.as_ref(), Some(&actual_kinds));
+        assert_eq!(
+            &founded_address.reader.rings[..old_reader.rings.len()],
+            old_reader.rings.as_slice()
+        );
+        assert_eq!(
+            &founded_address.reader.ends[..old_reader.ends.len()],
+            old_reader.ends.as_slice()
+        );
+        assert_eq!(
+            &founded_address.reader.clocks[..old_reader.clocks.len()],
+            old_reader.clocks.as_slice()
+        );
+        assert_eq!(founded_address.reader.advances, old_reader.advances);
+        assert_eq!(
+            &founded_address.reader.kinds.as_ref().unwrap()
+                [..old_reader.kinds.as_ref().unwrap().len()],
+            old_reader.kinds.as_ref().unwrap().as_slice()
+        );
+        assert_eq!(founded_address.letters, old_letters);
+        assert_eq!(address.letters, old_letters);
+        assert_eq!(address.reader, old_reader);
+        assert_eq!(
+            founded_address.reader.clocks.len(),
+            old_reader.clocks.len() + 1
+        );
+        let new_clock = founded_address.reader.clocks.last().unwrap();
+        assert_eq!(
+            ring_digit(new_clock),
+            1,
+            "the appended clock starts at its key"
+        );
+        assert!(
+            new_clock.winding().is_zero(),
+            "the appended clock starts with zero winding"
+        );
+        assert_eq!(founded_address.reader.clocks.last(), expected.clocks.last());
+
+        let mut text = String::new();
+        founded_address.write(&mut text);
+        let mut lines = text.lines();
+        let head = lines.next().unwrap();
+        let mut next = |_: &str| {
+            lines
+                .next()
+                .ok_or(HnnError::ContinuingState { what: "a line" })
+        };
+        let restored = ActiveAddress::of_field(&founded, &founded_current, &founded_material)
+            .unwrap()
+            .continued(head, &mut next)
+            .unwrap();
+        assert_eq!(
+            restored, founded_address,
+            "the founded frame roundtrips exactly"
+        );
+
+        let mut lines = text.lines();
+        let head = lines.next().unwrap();
+        let mut next = |_: &str| {
+            lines
+                .next()
+                .ok_or(HnnError::ContinuingState { what: "a line" })
+        };
+        let refused = ActiveAddress::of_field(&field, &current, &material)
+            .unwrap()
+            .continued(head, &mut next);
+        assert!(matches!(
+            refused,
+            Err(HnnError::ContinuingState {
+                what: "the address register against the field's declaration"
+            })
+        ));
+    }
+
+    #[test]
+    fn r4b_phase_only_reader_does_not_acquire_the_founded_ring_clock() {
+        let (field, current, _material, founded, founded_current, founded_material) =
+            founded_pair();
+        let family = FeatureFamily::new(vec![Feature::Phase { ring: 1, grain: 7 }]).unwrap();
+        let reader = LetterReader::of(&field, family.clone(), &current).unwrap();
+        let address = ActiveAddress::of_reader(field.receivers()[0].depth, reader);
+        let old_letters = address.letters.clone();
+        let old_reader = address.reader.clone();
+
+        let founded_address = address
+            .found_ring(
+                &founded,
+                &founded_material,
+                field.rings().len(),
+                field.contacts().len(),
+                &founded_current,
+            )
+            .unwrap();
+
+        assert_eq!(founded_address.reader.family, family);
+        assert_eq!(founded_address.reader.rings, old_reader.rings);
+        assert_eq!(founded_address.reader.clocks, old_reader.clocks);
+        assert_eq!(founded_address.reader.clocks.len(), 2);
+        assert_eq!(founded_address.reader.kinds, old_reader.kinds);
+        assert_eq!(founded_address.letters, old_letters);
+        assert_eq!(founded_address, address);
     }
 }

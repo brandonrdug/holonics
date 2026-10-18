@@ -180,6 +180,8 @@ fn receiver(ring: usize, aperture: usize) -> ReceiverDeclaration {
 fn wide_field() -> Field {
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(16, (0..16).collect())],
             contacts: Vec::new(),
             loops: Vec::new(),
@@ -233,6 +235,8 @@ fn field_on_receiving(periods: &[u64], receiving: usize) -> Field {
         .collect();
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings,
             contacts,
             loops: Vec::new(),

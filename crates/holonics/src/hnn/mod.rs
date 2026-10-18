@@ -170,6 +170,7 @@ pub mod dynamic_section;
 pub mod encoding;
 pub mod executed;
 pub mod field;
+pub mod founding;
 pub mod keys;
 pub mod moment;
 pub mod paired;
@@ -202,7 +203,7 @@ pub use contact::{
 pub use encoding::{Encoded, Encoding, EncodingError, PassageChart, PortCell};
 pub use field::{
     ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration, FieldMaterial,
-    Ring, RingDeclaration,
+    FoundedRing, Ring, RingAdvance, RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
 pub use moment::{Capacity, PairPort, SourceMoment};
@@ -264,6 +265,8 @@ pub enum HnnError {
         population: u64,
         source_operand_bound: u128,
     },
+    #[error("founding refused: {what}")]
+    Founding { what: &'static str },
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
     /// A solved receiver-chart carrier refused an exact integer conversion. This is kept

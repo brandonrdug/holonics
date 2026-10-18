@@ -84,6 +84,25 @@ pub struct Against {
 }
 
 impl PendingRatio {
+    /// Transport the retained producing cut into a derived field, without inventing past ticks.
+    pub(crate) fn found_ring(
+        &self,
+        field: &Field,
+        constitution: &crate::hnn::constitution::Constitution,
+        ring: usize,
+        contact: usize,
+        key: u64,
+    ) -> Result<Self, HnnError> {
+        let mut next = self.clone();
+        next.moment.found_ring(field, ring)?;
+        next.anchor.push(BigInt::from(key));
+        let current = Current::at(field, next.anchor.clone())?;
+        next.address = self
+            .address
+            .found_ring(field, constitution, ring, contact, &current)?;
+        Ok(next)
+    }
+
     /// [definition; agent-inferred, October 4] The one arrived ratio's producing operands:
     /// commit, anchor, SourceMoment copy, declaring phases and producing address/reader.
     /// There is no saved material, word or face, and no sequence of prior comparisons.

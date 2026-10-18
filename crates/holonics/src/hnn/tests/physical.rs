@@ -29,6 +29,8 @@ fn receiver(aperture: usize) -> ReceiverDeclaration {
 fn field() -> Field {
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(8, (0..8).collect()), ring(3, Vec::new())],
             contacts: vec![contact(0, 1, 3, 0)],
             loops: Vec::new(),
@@ -61,6 +63,8 @@ fn four_station_field() -> Field {
     };
     Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![
                 quarter_ring((0..4).collect()),
                 quarter_ring(Vec::new()),

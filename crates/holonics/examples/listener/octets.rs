@@ -1075,9 +1075,15 @@ mod boundary_tests {
                 .unwrap()
                 .arrival_context
         );
-        let population = holonics::hnn::moment::capacity_located(&PERIODS, &[0], CLASSES, &OFFSETS)
-            .unwrap()
-            .n_star();
+        let population = holonics::hnn::moment::capacity_located(
+            &PERIODS,
+            &vec![holonics::hnn::RingAdvance::Lock; PERIODS.len()],
+            &[0],
+            CLASSES,
+            &OFFSETS,
+        )
+        .unwrap()
+        .n_star();
         let field = field(u64::try_from(population).unwrap()).unwrap();
         let pairing = PairingDeclaration::Family {
             table: (0..CLASSES).map(|c| (c, c ^ 1)).collect(),
@@ -1247,8 +1253,14 @@ where
         let cells = section.source_cells(index)?.len() + section.target_cells(index)?.len();
         longest = longest.max(cells);
     }
-    let located =
-        holonics::hnn::moment::capacity_located(&PERIODS, &[0], CLASSES, &OFFSETS)?.n_star();
+    let located = holonics::hnn::moment::capacity_located(
+        &PERIODS,
+        &vec![holonics::hnn::RingAdvance::Lock; PERIODS.len()],
+        &[0],
+        CLASSES,
+        &OFFSETS,
+    )?
+    .n_star();
     if learn_end > learn.len() {
         return Err(format!(
             "--learn-count {learn_end} exceeds the available {} learning sections",

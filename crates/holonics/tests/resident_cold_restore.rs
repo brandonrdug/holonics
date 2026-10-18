@@ -35,6 +35,8 @@ fn chain() -> Field {
         exponent: integer(exponent),
     };
     let mut declaration = FieldDeclaration {
+        founded: Vec::new(),
+        founding: false,
         rings: vec![ring(2, vec![0]), ring(3, vec![0]), ring(2, vec![])],
         contacts: vec![contact(0, 1, 2), contact(1, 2, 0)],
         loops: Vec::new(),

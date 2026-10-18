@@ -91,9 +91,9 @@ fn fixture_with_budget(budget: u64) -> (Reference, Resident, MomentId, Receiving
     let unit = Lattice::new(unscaled.lattice(Locus::ReceivingMap(0)).unwrap().exponent()).unit();
     let grain = Rat::new(
         num_bigint::BigInt::from(1),
-        num_bigint::BigInt::from(crate::hnn::field::receiver_grain(
-            &field.receivers()[0].tolerance,
-        )) << 1usize,
+        num_bigint::BigInt::from(
+            crate::hnn::field::receiver_grain(&field.receivers()[0].tolerance).unwrap(),
+        ) << 1usize,
     );
     let source = unscaled.source_port(0).unwrap().clone();
     let mut source_scale = Rat::one();
@@ -114,7 +114,6 @@ fn fixture_with_budget(budget: u64) -> (Reference, Resident, MomentId, Receiving
                 None,
             )
             .unwrap();
-        eprintln!("publication fixture: actual-word pilot at source scale {source_scale}");
         let mut pilot = reference
             .mount_with(&field, &Current::at_rest(&field), founding.clone())
             .unwrap();
@@ -133,12 +132,16 @@ fn fixture_with_budget(budget: u64) -> (Reference, Resident, MomentId, Receiving
         let retained_read = &unit / integer(4) * reached[0][column].abs();
         let norm: Rat = reached[0].iter().map(|x| x.abs()).sum();
         let declared_bound = Rat::from_integer(num_bigint::BigInt::from(width));
-        eprintln!(
-            "publication fixture: scale={source_scale} feature_l1={norm} X={declared_bound} retained_read={retained_read} grain={grain}"
-        );
         if retained_read > grain && norm > declared_bound {
             break (founding, reached, column);
         }
+        // The scale stops at the lattice's own reach `2^L = 1/unit` (the observed fixture's
+        // bound).
+        assert!(
+            &source_scale * &unit < Rat::one(),
+            "publication fixture: no read above the grain by source scale {source_scale} \
+             (feature l1 {norm}, X {declared_bound}, retained read {retained_read}, grain {grain})"
+        );
         source_scale *= integer(2);
     };
     let retained = if reached[0][column] > Rat::zero() {

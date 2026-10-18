@@ -628,6 +628,8 @@ mod tests {
         };
         let field = Field::declare(
             FieldDeclaration {
+                founded: Vec::new(),
+                founding: false,
                 rings: vec![ring(), ring()],
                 contacts: vec![ContactDeclaration {
                     from: 0,

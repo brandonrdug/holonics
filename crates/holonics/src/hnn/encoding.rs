@@ -1148,13 +1148,18 @@ pub struct Encoded {
 }
 
 /// The source rings of a field with their periods; refused unless `classes ≤ d_g` on each (no fold).
-fn holding_sources(field: &Field, classes: usize) -> Result<Vec<(usize, u64)>, EncodingError> {
+pub(crate) fn holding_sources(
+    field: &Field,
+    classes: usize,
+) -> Result<Vec<(usize, u64)>, EncodingError> {
     field
         .sources()
         .iter()
         .map(|&ring| {
             let period = field.ring(ring).period();
-            if u64::try_from(classes).is_ok_and(|classes| classes <= period) {
+            if field.ring(ring).advance() == crate::hnn::RingAdvance::Own
+                || u64::try_from(classes).is_ok_and(|classes| classes <= period)
+            {
                 Ok((ring, period))
             } else {
                 Err(EncodingError::Fold {

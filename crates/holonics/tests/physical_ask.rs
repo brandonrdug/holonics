@@ -56,6 +56,8 @@ fn open_fixture() -> (Field, Constitution, Current) {
     };
     let field = Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(true), ring(false)],
             contacts: vec![ContactDeclaration {
                 from: 0,
@@ -517,6 +519,8 @@ fn world_fixture() -> (Field, Constitution, Encoded) {
     };
     let field = Field::declare(
         FieldDeclaration {
+            founded: Vec::new(),
+            founding: false,
             rings: vec![ring(true), ring(false)],
             contacts: vec![ContactDeclaration {
                 from: 0,

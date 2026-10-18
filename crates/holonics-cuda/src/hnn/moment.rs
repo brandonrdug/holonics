@@ -147,6 +147,7 @@ impl<'c> ResidentMoment<'c> {
     /// **Open a moment on the card** at a lift point: every count zero, no cell held, the
     /// field's lock chart and the rings' phase classes mounted (transfers).
     pub fn open(card: &'c Card, field: &Field, current: &Current) -> Result<Self, DeviceError> {
+        super::admit_card_field(field)?;
         let alphabet = field.alphabet();
         let rings = field.rings().len();
         let periods: Vec<u64> = field.rings().iter().map(|ring| ring.period()).collect();
