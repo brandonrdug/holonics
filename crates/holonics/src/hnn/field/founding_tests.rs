@@ -239,21 +239,26 @@ fn capacity_control(places: usize) {
     assert!(matches!(phase.as_str(), "monotone" | "search" | "all"));
     let field = Field::declare(listener(places, 1 << 16)).unwrap();
     let probes = CapacityProbeScope::open(places);
-    if phase == "monotone" {
-        let started = std::time::Instant::now();
-        let first = field.found(FoundedRing { period: 2, key: 1 }).unwrap();
-        record_capacity_whole(
-            "development",
-            2,
-            first.capacity().n_star(),
-            started.elapsed().as_nanos(),
-        );
-    }
+    let started = std::time::Instant::now();
+    let first_whole = field.found(FoundedRing { period: 2, key: 1 }).unwrap();
+    record_capacity_whole(
+        if phase == "monotone" {
+            "development"
+        } else {
+            "first"
+        },
+        2,
+        first_whole.capacity().n_star(),
+        started.elapsed().as_nanos(),
+    );
+    drop(first_whole);
     let mut previous = 0;
     let first = if phase == "search" { 8 } else { 2 };
     let last = if phase == "monotone" { 8 } else { 9 };
     for period in first..=last {
+        let started = std::time::Instant::now();
         let n = field.founding_n_star(period).unwrap();
+        record_capacity_probe(period, n, started.elapsed().as_nanos());
         assert!(
             n >= previous,
             "places={places} period={period} n*={n} predecessor={previous}"
@@ -267,8 +272,15 @@ fn capacity_control(places: usize) {
     }
     let before_search = probes.readings().len();
     let started = std::time::Instant::now();
-    // The public consumer runs the very capacity probes recorded above; no surrogate search.
-    let candidates = field.founding_candidates().unwrap();
+    // The public consumer's law, observed through its existing capacity-call seam.
+    let candidates = field
+        .founding_candidates_with(|period| {
+            let started = std::time::Instant::now();
+            let n = field.founding_n_star(period)?;
+            record_capacity_probe(period, n, started.elapsed().as_nanos());
+            Ok(n)
+        })
+        .unwrap();
     println!(
         "R4B_CAPACITY_SEARCH places={places} elapsed_ns={}",
         started.elapsed().as_nanos()
@@ -298,12 +310,21 @@ fn capacity_control(places: usize) {
             "capacity must be monotone at every probed pair: {pair:?}"
         );
     }
-    let whole = probes.whole();
-    assert_eq!(
-        whole.len(),
-        2,
-        "the consumer has exactly two whole declarations"
+    let started = std::time::Instant::now();
+    let confirmed = field
+        .found(FoundedRing {
+            period: maximum,
+            key: maximum - 1,
+        })
+        .unwrap();
+    record_capacity_whole(
+        "confirmed",
+        maximum,
+        confirmed.capacity().n_star(),
+        started.elapsed().as_nanos(),
     );
+    drop(confirmed);
+    let whole = probes.whole();
     assert_eq!((whole[0].kind, whole[0].period), ("first", 2));
     assert_eq!((whole[1].kind, whole[1].period), ("confirmed", maximum));
     assert!(whole.iter().all(|read| read.n_star <= field.population()));

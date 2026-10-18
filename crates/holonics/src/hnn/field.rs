@@ -1521,12 +1521,8 @@ impl Field {
         periods.push(period);
         advances.push(RingAdvance::Own);
         sources.push(self.rings.len());
-        #[cfg(test)]
-        let started = std::time::Instant::now();
         let n_star =
             capacity(&periods, &advances, &sources, self.alphabet, &self.offsets)?.n_star();
-        #[cfg(test)]
-        founding_tests::record_capacity_probe(period, n_star, started.elapsed().as_nanos());
         Ok(n_star)
     }
 
@@ -1535,19 +1531,10 @@ impl Field {
         &self,
         mut n_star: impl FnMut(u64) -> Result<u64, HnnError>,
     ) -> Result<Vec<Candidate>, HnnError> {
-        #[cfg(test)]
-        let started = std::time::Instant::now();
         let first = self.found(FoundedRing { period: 2, key: 1 });
         if first.is_err() {
             return Ok(Vec::new());
         }
-        #[cfg(test)]
-        founding_tests::record_capacity_whole(
-            "first",
-            2,
-            first.as_ref().unwrap().capacity().n_star(),
-            started.elapsed().as_nanos(),
-        );
         drop(first);
         let mut below = 2u64;
         let mut above = below.checked_mul(2).ok_or(HnnError::CountOverflow)?;
@@ -1563,19 +1550,10 @@ impl Field {
                 above = middle;
             }
         }
-        #[cfg(test)]
-        let started = std::time::Instant::now();
         let confirmed = self.found(FoundedRing {
             period: below,
             key: below - 1,
         })?;
-        #[cfg(test)]
-        founding_tests::record_capacity_whole(
-            "confirmed",
-            below,
-            confirmed.capacity().n_star(),
-            started.elapsed().as_nanos(),
-        );
         drop(confirmed);
         Ok((2..=below)
             .filter(|period| !self.cell_clock.is_multiple_of(*period))
