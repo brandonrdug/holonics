@@ -1189,9 +1189,15 @@ fn chart_extent_overflow(
 /// Every certificate is computed exactly, so a refinement the lattice does not carry restarts cold
 /// and, short of `δ_ℓ` within the rule's count, is refused
 /// ([`ExactLinearError::InverseCertificateFailure`]); no chart above `δ_ℓ` is released. The Gram's
-/// own norm is read at each deposit, as the clock's Elias-gamma length is: the lattice refines as
-/// the Gram grows, and never coarsens (a coarser chart is a finer one's lattice point). Brandon may
-/// override the rule.
+/// own norm is read at each deposit, as the clock's Elias-gamma length is: the lattice follows the
+/// Gram. [agent-inferred, October 18] Every deposit and every prior move founds the chart on this
+/// rule's lattice at the current Gram (and at least `k`), its warm start carried there by nearest
+/// rounding; a chart left finer between deposits (a paired mean, one level) returns to the rule at
+/// the next. A lattice finer than the rule's carries only differences below the receiver's grain,
+/// which no admitted receiver reads, so carrying it forward is not retention. Holding the previous
+/// lattice as a floor made a paired source chart gain one level per deposit (one per cell heard:
+/// `L_s = 46 + cells` on the listener's first 90 cells, about 2,500 levels after 2,474 cells
+/// against a rule near 65). Brandon may override the rule.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ChartRule {
     lattice: Lattice,
@@ -1442,6 +1448,16 @@ fn nearest_shift_wide(x: &BigInt, k: u32) -> BigInt {
         return x.clone();
     }
     (x + (BigInt::one() << (k - 1) as usize)) >> k as usize
+}
+
+/// A coordinate on `2^(−from)ℤ` carried to `2^(−to)ℤ`: exactly where `to ≥ from`, at its nearest
+/// point of the coarser lattice (ties upward) where `to < from`.
+fn relatticed(value: BigInt, from: u32, to: u32) -> BigInt {
+    if to >= from {
+        value << (to - from) as usize
+    } else {
+        nearest_shift_wide(&value, from - to)
+    }
 }
 
 /// `numerator / denominator` at its nearest integer, ties upward (`denominator > 0`).
@@ -1731,9 +1747,11 @@ impl SolvedChart {
         (reach, denominator << shift)
     }
 
-    /// The chart carried onto another support at a lattice at least as fine: an entry both
-    /// supports hold moves by `2^(L − L_s)` exactly, and an index the chart did not hold enters as the
-    /// prior's chart `2^(−k)` on the diagonal.
+    /// The chart carried onto another support at the lattice `L`: an entry both supports hold
+    /// moves by `2^(L − L_s)` exactly where `L ≥ L_s`, and to its nearest point of the coarser lattice
+    /// (ties upward) where `L < L_s`; an index the chart did not hold enters as the prior's chart
+    /// `2^(−k)` on the diagonal. A coarsened carry is a warm start only: the chart that holds it is
+    /// certified exactly against its Gram ([`settled`]).
     fn carried_to(
         &self,
         support: &[usize],
@@ -1742,7 +1760,6 @@ impl SolvedChart {
         _prior_scale: u32,
         _gram_exponent: u32,
     ) -> Result<Vec<BigInt>, HnnError> {
-        let shift = exponent - self.exponent;
         let held: BTreeMap<usize, usize> = self
             .support
             .iter()
@@ -1759,7 +1776,7 @@ impl SolvedChart {
                     _ if a == b => BigInt::one() << (self.exponent - self.scale) as usize,
                     _ => BigInt::zero(),
                 };
-                block[a * s + b] = value << shift as usize;
+                block[a * s + b] = relatticed(value, self.exponent, exponent);
             }
         }
         Ok(block)
@@ -1784,7 +1801,9 @@ impl SolvedChart {
             None,
         )?;
         let s = carried.support.len();
-        let exponent = rule.exponent(n, carried.norm).max(self.exponent);
+        // The rule's lattice at this Gram, never the previous chart's: precision below the rule
+        // separates nothing a receiver reads (the type's header), so it is not carried forward.
+        let exponent = rule.exponent(n, carried.norm).max(self.scale);
 
         if s == 0 {
             let chart = Self {
@@ -1863,12 +1882,9 @@ impl SolvedChart {
             None,
         )?;
         let s = carried.support.len();
-        // x = 2^(k − k′): a halving needs the lattice one level finer per halving.
-        let finer = scale.saturating_sub(self.scale);
-        let exponent = rule
-            .exponent(n, carried.norm)
-            .max(self.exponent + finer)
-            .max(scale);
+        // The rule's lattice at the moved Gram, as at a deposit; the moved prior's own chart
+        // `2^(−k′)` must lie on it.
+        let exponent = rule.exponent(n, carried.norm).max(scale);
 
         if s == 0 {
             let chart = Self { exponent, ..moved };
@@ -1880,19 +1896,23 @@ impl SolvedChart {
             };
             return Ok((chart, refinement));
         }
+        // x = 2^(k − k′): the warm start x X̂ is exact one level finer per halving, then carried to
+        // the rule's lattice.
+        let exact = self.exponent + scale.saturating_sub(self.scale);
         let mut warm = self.carried_to(
             &carried.support,
-            exponent,
+            exact,
             rule.lattice().exponent(),
             scale,
             carried.exponent,
         )?;
         for value in &mut warm {
-            *value = if scale >= self.scale {
+            let scaled = if scale >= self.scale {
                 &*value >> (scale - self.scale) as usize
             } else {
                 &*value << (self.scale - scale) as usize
             };
+            *value = relatticed(scaled, exact, exponent);
         }
         settled(warm, carried, exponent, scale, n, rule)
     }
