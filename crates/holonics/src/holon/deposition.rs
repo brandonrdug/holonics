@@ -126,25 +126,6 @@ use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::{SymmetricForm, inertia};
 use crate::ratio::linear::vector::{dot, form_matrix, matrix, matrix_form, symmetric_part};
 
-/// The least `m >= 1` with `traces[m-1]^2 > frame^2 * norm^m`, or `None` within `traces`.
-///
-/// `traces` are the residual closed counts of any game cochain (the PLAY record section 4):
-/// a ring's turn traces, with `frame` its transport's dimension and `norm` one, or a graph's
-/// twisted non-backtracking residual `E_n`, with `frame = 2|V|` and `norm = d - 1`.
-/// The inequality is strict: equality with the spectral floor never wakes.
-/// [proved-derived; formal counterpart owed #62.]
-pub fn waking_epoch(traces: &[Rat], frame: u64, norm: &Rat) -> Option<usize> {
-    let frame = Rat::from_integer(BigInt::from(frame));
-    let mut floor = &frame * &frame;
-    for (index, trace) in traces.iter().enumerate() {
-        floor *= norm;
-        if trace * trace > floor {
-            return Some(index + 1);
-        }
-    }
-    None
-}
-
 /// Both sides of `Holon/Deposition.learned_rate_form`: `⟨x, ((LQ)ᵀQ + Q(LQ)) x⟩` and
 /// `2⟨Qx, L Qx⟩`.
 pub fn learned_rate_form(
@@ -825,46 +806,6 @@ mod tests {
     use crate::ratio::integer;
     use crate::ratio::linear::vector::{integer_matrix, ints};
     use crate::ratio::rat;
-
-    #[test]
-    fn waking_epoch_reads_growth_the_game_floor_and_loop_scaling() {
-        let traces = (1usize..=64)
-            .map(|m| {
-                let two = BigInt::one() << m;
-                Rat::from_integer(two.clone()) + Rat::new(BigInt::one(), two)
-            })
-            .collect::<Vec<_>>();
-        assert_eq!(waking_epoch(&traces, 4, &Rat::one()), Some(2));
-        assert_eq!(waking_epoch(&traces, 4, &integer(4)), None);
-        // A Z_2 game on a five-cycle with holonomy -1. There are two directions;
-        // the trivial part vanishes because |E|=|V|. Equality is not a wake.
-        let game = (1..=60)
-            .map(|n| {
-                if n % 5 != 0 {
-                    Rat::zero()
-                } else if (n / 5) % 2 == 0 {
-                    integer(10)
-                } else {
-                    integer(-10)
-                }
-            })
-            .collect::<Vec<_>>();
-        assert_eq!(waking_epoch(&game, 10, &Rat::one()), None);
-        for c in [2, 3, 7] {
-            let scaled = traces
-                .iter()
-                .map(|trace| trace * integer(c))
-                .collect::<Vec<_>>();
-            for norm in [Rat::one(), integer(4)] {
-                assert_eq!(
-                    waking_epoch(&scaled, 4 * c as u64, &norm),
-                    waking_epoch(&traces, 4, &norm),
-                );
-            }
-        }
-        assert_eq!(waking_epoch(&[], 4, &Rat::one()), None);
-        assert_eq!(waking_epoch(&[integer(-5)], 4, &Rat::one()), Some(1));
-    }
 
     #[test]
     fn the_congruence_handles_the_zero_diagonal_branch() {

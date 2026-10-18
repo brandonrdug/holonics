@@ -165,7 +165,7 @@
 //! within `b_g n`. For a source founded later, its own population `t≤n` is fixed by the plain
 //! reached lift, or counted by the own-ticks factor after a reframe. Histogram cardinalities
 //! are nondecreasing in population, so `H(n)` is still an upper bound; the later-opening bridge
-//! is an explicit Lean obligation in #62 (REQ-20261017-049).
+//! is an explicit Lean obligation in #62.
 //! A continued section or another partition is refused, typed.
 //!
 //! **After reframe** a sibling ingest or a phase rekey separates own source time from the shared

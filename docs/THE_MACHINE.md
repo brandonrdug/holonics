@@ -695,7 +695,7 @@ tests can comb through anything valuable").
      Supersedes the residue chart's "stated exception" and its September 29
      `[open]` (`hnn::field`, "The port chart").
      A founded ring’s clock reads the cell count, not the class; its learned port reads the exact
-     class counts without requiring an injective port chart (REQ-20261017-049 R4b).
+     class counts without requiring an injective port chart (#73).
 
 10. **No scalar operand.** `Word::pull_back` accepts only a `RatioCovector`, which only a
     `HolonRatio` constructs (`compile_fail`).

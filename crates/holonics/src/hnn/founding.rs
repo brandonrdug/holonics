@@ -3,8 +3,18 @@
 //! [proved-derived; formalization owed #62] For `g = gcd(period, cell_clock)`, the node's
 //! maximum-likelihood code is `ML_g = sum(n log2 n - sum_y N_y log2 N_y)`. The candidate's KT
 //! sequential law is `Q`; the surplus is `ML_g - bits(Q)`. Its conservative lower endpoint must
-//! strictly exceed the description cost. Under any fixed node law `P`, `Q / P_ML <= Q / P`;
-//! Ville's inequality and the family union bound give `sum 2^(-cost)` at arbitrary read times.
+//! strictly exceed the description cost.
+//!
+//! **The guarantee and its hypotheses** (universal inference with Ville's inequality):
+//! - The null is any law `P` under which the class `y_k` depends on the past only through
+//!   `(k mod g, y_(k-offset))`. `ML_g` is the shortest code among them, so `Q / P_ML <= Q / P`,
+//!   and `Q / P` is a nonnegative `P`-martingale of mean one.
+//! - The family and its costs are fixed at `open`, before the stream. Ville's inequality and the
+//!   union over the family bound the probability that any node law explains a founding by
+//!   `family_bound = sum 2^(-cost)`, at every read time however often the law is read.
+//! - `open` refuses a family whose bound is not below one (a cost of zero among them), so the
+//!   guarantee is never vacuous.
+//! - Each `reopen` is a fresh e-process: its guarantee runs from its own first counted cell.
 //! This reads the helical pair interaction at the declared offset, on classes of any modality.
 //! It retains pair counts, their bounded product code and the last offset classes, never a tape.
 //!
@@ -20,7 +30,14 @@ use num_traits::{One, Zero};
 use crate::compression::landmark::context::PassageCode;
 use crate::hnn::HnnError;
 use crate::ratio::Rat;
-use crate::ratio::algebraic::{ExactInterval, log2_enclosure_at};
+use crate::ratio::algebraic::{ExactInterval, LOG_OCTAVES, log2_enclosure_at};
+
+/// [definition] **The description ceiling.** A cost is the field's description increment of one
+/// founded ring (`Field::founding_cost`): two Elias-gamma lengths `2 bits(n+1) - 1` of `u64`
+/// values plus the founded count's increment (zero or two). On `u64` each length is at most
+/// `2 * 65 - 1`, so no field description exceeds this, and `open` refuses a larger cost before the
+/// exact family bound's denominator `2^cost` is formed.
+pub const DESCRIPTION_CEILING: u64 = 2 + 2 * (2 * (u64::BITS as u64 + 1) - 1);
 
 /// One candidate period with its description cost, in bits.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -58,6 +75,8 @@ pub struct FoundingLaw {
     counted: u64,
     splits: Vec<Split>,
     nodes: BTreeMap<u64, Counts>,
+    /// `sum 2^(-cost)` over the family fixed at `open`, below one.
+    family_bound: Rat,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -139,7 +158,8 @@ fn appended(mut code: PassageCode, face: &Rat) -> Result<PassageCode, HnnError> 
 
 impl FoundingLaw {
     /// Refused for a missing alphabet, offset or cell clock, a period below two or dividing the
-    /// cell clock, or duplicate periods. Nothing is allocated in proportion to a period.
+    /// cell clock, duplicate periods, a cost above [`DESCRIPTION_CEILING`], or a family whose
+    /// bound `sum 2^(-cost)` is not below one. Nothing is allocated in proportion to a period.
     pub fn open(
         alphabet: usize,
         offset: usize,
@@ -154,6 +174,7 @@ impl FoundingLaw {
         let mut periods = BTreeSet::new();
         let mut nodes = BTreeMap::new();
         let mut splits = Vec::with_capacity(candidates.len());
+        let mut family_bound = Rat::zero();
         for candidate in candidates {
             if candidate.period < 2 || cell_clock.is_multiple_of(candidate.period) {
                 return Err(refusal(
@@ -163,6 +184,12 @@ impl FoundingLaw {
             if !periods.insert(candidate.period) {
                 return Err(refusal("candidate periods are distinct"));
             }
+            if candidate.cost > DESCRIPTION_CEILING {
+                return Err(refusal(
+                    "a candidate's cost is a field description, within the description ceiling",
+                ));
+            }
+            family_bound += Rat::new(BigInt::one(), BigInt::one() << candidate.cost as usize);
             let node = gcd(candidate.period, cell_clock);
             nodes.entry(node).or_insert_with(BTreeMap::new);
             splits.push(Split {
@@ -171,6 +198,11 @@ impl FoundingLaw {
                 counts: BTreeMap::new(),
                 code: PassageCode::new(),
             });
+        }
+        if family_bound >= Rat::one() {
+            return Err(refusal(
+                "a founding family's bound sum 2^(-cost) is below one",
+            ));
         }
         Ok(Self {
             alphabet,
@@ -181,6 +213,7 @@ impl FoundingLaw {
             counted: 0,
             splits,
             nodes,
+            family_bound,
         })
     }
 
@@ -245,9 +278,17 @@ impl FoundingLaw {
 
     /// Read every candidate without changing the law. Greatest certified excess wins; ties use
     /// the least period. Empty counts have exactly zero maximum-likelihood code.
+    ///
+    /// [proved-derived] **The read's precision.** Each `m log2 m` is `m` times an enclosure of
+    /// `log2 m` narrower than `3 * 2^(-p)` (`log2_enclosure_at`). A node's terms carry weights
+    /// `m` that sum to `2n` (the rows' totals and their class counts, `n` counted cells each), so
+    /// `ML_g`'s enclosure is narrower than `6n * 2^(-p)`. With `p = ceil(log2(6n)) + O` it is
+    /// narrower than `2^(-O)`, the declared grid on which every code length is held
+    /// ([`LOG_OCTAVES`]), the grid `bits(Q)` is read on.
     pub fn read(&self) -> Result<FoundingRead, HnnError> {
-        let six_n = 6 * u128::from(self.counted.max(1));
-        let precision = u128::BITS - (six_n - 1).leading_zeros() + 8;
+        // The weights' sum 2n times the enclosure's width factor 3.
+        let width_factor = 6 * u128::from(self.counted.max(1));
+        let precision = u128::BITS - (width_factor - 1).leading_zeros() + LOG_OCTAVES;
         let mut logs = BTreeMap::new();
         let mut ml = BTreeMap::new();
         for (&node, counts) in &self.nodes {
@@ -264,7 +305,6 @@ impl FoundingLaw {
             }
             ml.insert(node, code);
         }
-        let mut family_bound = Rat::zero();
         let mut best: Option<(Rat, u64)> = None;
         let mut candidates = Vec::with_capacity(self.splits.len());
         for split in &self.splits {
@@ -272,9 +312,6 @@ impl FoundingLaw {
             let bits = split.code.bits()?;
             let surplus = ExactInterval::new(&node.lower - bits.upper, &node.upper - bits.lower)?;
             let cost = split.candidate.cost;
-            let shift = usize::try_from(cost)
-                .map_err(|_| refusal("the description cost exceeds the exact carrier's extent"))?;
-            family_bound += Rat::new(BigInt::one(), BigInt::one() << shift);
             let excess = &surplus.lower - Rat::from_integer(BigInt::from(cost));
             let period = split.candidate.period;
             if excess > Rat::zero()
@@ -295,7 +332,7 @@ impl FoundingLaw {
             cells: self.cells,
             cell_clock: self.cell_clock,
             candidates,
-            family_bound,
+            family_bound: self.family_bound.clone(),
             founded: best.map(|(_, period)| period),
         })
     }
@@ -360,20 +397,31 @@ mod tests {
 
     // An independent, exact-rational oracle. It keeps its own dense test counts, multiplies
     // the KT probabilities exactly, and exponentiates integer counts to form the node MLE.
-    // Thus log2(Q/P_ML)>cost is checked as Q/P_ML>2^cost, without logarithm enclosures.
-    fn oracle(stream: &[usize], candidates: &[Candidate], clock: u64) -> Option<u64> {
+    // Thus log2(Q/P_ML)>cost is checked as Q/P_ML>2^cost, without logarithm enclosures. Cell
+    // `k` (counted from the opening context) sits at phase `k mod period` with context
+    // `stream[k - offset]`; its node is `gcd(period, clock)`.
+    fn oracle(
+        stream: &[usize],
+        candidates: &[Candidate],
+        alphabet: usize,
+        offset: usize,
+        clock: u64,
+    ) -> Option<u64> {
         let mut best: Option<(Rat, u64)> = None;
         for candidate in candidates {
             let period = candidate.period as usize;
             let node = gcd(candidate.period, clock) as usize;
-            let mut split = vec![vec![vec![0u64; 4]; 4]; period];
-            let mut counts = vec![vec![vec![0u64; 4]; 4]; node];
+            let mut split = vec![vec![vec![0u64; alphabet]; alphabet]; period];
+            let mut counts = vec![vec![vec![0u64; alphabet]; alphabet]; node];
             let mut probability = Rat::one();
-            for k in 1..stream.len() {
-                let (a, y) = (stream[k - 1], stream[k]);
+            for k in offset..stream.len() {
+                let (a, y) = (stream[k - offset], stream[k]);
                 let row = &mut split[k % period][a];
                 let total = row.iter().sum::<u64>();
-                probability *= Rat::new(BigInt::from(2 * row[y] + 1), BigInt::from(2 * total + 4));
+                probability *= Rat::new(
+                    BigInt::from(2 * row[y] + 1),
+                    BigInt::from(2 * total + alphabet as u64),
+                );
                 row[y] += 1;
                 counts[k % node][a][y] += 1;
             }
@@ -415,7 +463,7 @@ mod tests {
                 let before = law.clone();
                 let read = law.read().unwrap();
                 assert_eq!(law, before, "read is immutable");
-                let exact = oracle(&stream[..=k], &candidates, 1);
+                let exact = oracle(&stream[..=k], &candidates, 4, 1, 1);
                 assert_eq!(read.founded, exact, "read at {} cells", k + 1);
                 if let Some(period) = read.founded {
                     assert_eq!(period, 5);
@@ -431,10 +479,62 @@ mod tests {
                 assert_eq!(read.family_bound, family);
             }
         }
-        println!(
-            "REQ049 test1 first_founding_cells={} period=5",
-            first.unwrap()
+        assert!(
+            first.is_some(),
+            "the planted period founds within the stream"
         );
+    }
+
+    /// The oracle's decisions where the node splits (`g = gcd(period, clock) > 1`) and the
+    /// context reaches past the previous cell (`offset > 1`), founding and not.
+    #[test]
+    fn nodes_above_one_and_longer_offsets_agree_with_the_integer_power_oracle() {
+        let costed = |periods: &[u64]| -> Vec<Candidate> {
+            periods
+                .iter()
+                .map(|&period| Candidate {
+                    period,
+                    cost: COSTS[period as usize - 2],
+                })
+                .collect()
+        };
+        const SIX: [usize; 6] = [0, 1, 2, 0, 3, 1];
+        const QUIET: [usize; 6] = [0, 0, 1, 2, 3, 3];
+        for (pattern, clock, offset, periods, founds) in [
+            (SIX, 2, 3, vec![4, 6, 8, 10, 12], true),
+            (SIX, 3, 2, vec![6, 9, 12], true),
+            (SIX, 4, 3, vec![6, 10, 12], true),
+            (QUIET, 3, 2, vec![6, 9, 12], false),
+        ] {
+            let candidates = costed(&periods);
+            let mut law = FoundingLaw::open(4, offset, clock, candidates.clone()).unwrap();
+            let stream = (0..512).map(|k| pattern[k % 6]).collect::<Vec<_>>();
+            let mut founded = None;
+            for (k, &class) in stream.iter().enumerate() {
+                law.receive(class).unwrap();
+                if (k + 1) % 64 == 0 {
+                    let read = law.read().unwrap();
+                    for candidate in &read.candidates {
+                        assert_eq!(candidate.node, gcd(candidate.period, clock));
+                    }
+                    let exact = oracle(&stream[..=k], &candidates, 4, offset, clock);
+                    assert_eq!(
+                        read.founded,
+                        exact,
+                        "clock {clock} offset {offset} at {}",
+                        k + 1
+                    );
+                    founded = founded.or(read.founded);
+                }
+            }
+            assert_eq!(founded.is_some(), founds, "clock {clock} offset {offset}");
+            if let Some(period) = founded {
+                assert!(
+                    gcd(period, clock) > 1,
+                    "the founding reads a node above one"
+                );
+            }
+        }
     }
 
     #[test]
@@ -456,7 +556,7 @@ mod tests {
 
     #[test]
     fn a_class_carried_phase_leaves_the_split_and_node_kt_codes_identical() {
-        let mut law = FoundingLaw::open(4, 1, 1, vec![Candidate { period: 2, cost: 0 }]).unwrap();
+        let mut law = FoundingLaw::open(4, 1, 1, vec![Candidate { period: 2, cost: 1 }]).unwrap();
         let mut counts = vec![vec![0u64; 4]; 4];
         let mut node_code = PassageCode::new();
         let stream = (0..512)
@@ -542,6 +642,41 @@ mod tests {
                 Err(HnnError::Founding { .. })
             ));
         }
+        // A vacuous family (a bound of one or more) and a cost no field describes are refused.
+        for costs in [
+            vec![0],
+            vec![1, 1],
+            vec![1, 2, 2],
+            vec![DESCRIPTION_CEILING + 1],
+        ] {
+            let candidates = costs
+                .into_iter()
+                .zip(2..)
+                .map(|(cost, period)| Candidate { period, cost })
+                .collect();
+            assert!(matches!(
+                FoundingLaw::open(4, 1, 1, candidates),
+                Err(HnnError::Founding { .. })
+            ));
+        }
+        let ceiling = FoundingLaw::open(
+            4,
+            1,
+            1,
+            vec![
+                Candidate { period: 2, cost: 1 },
+                Candidate {
+                    period: 3,
+                    cost: DESCRIPTION_CEILING,
+                },
+            ],
+        )
+        .unwrap();
+        assert_eq!(
+            ceiling.read().unwrap().family_bound,
+            Rat::new(BigInt::one(), BigInt::from(2))
+                + Rat::new(BigInt::one(), BigInt::one() << DESCRIPTION_CEILING as usize)
+        );
         let mut law = FoundingLaw::open(4, 1, 1, vec![Candidate { period: 2, cost: 1 }]).unwrap();
         assert_eq!(law.read().unwrap().cells, 0);
         assert_eq!(law.key(2), 1);
@@ -773,6 +908,32 @@ impl FoundingLaw {
             }
             *counts = read_counts(next, node, alphabet, head[4])?;
         }
+        // The node counts are the splits' marginals, and each split's bounded code encloses the
+        // KT product its counts fix. The product is exact in any order; only the carriers'
+        // rounding depends on it, so a genuine code meets the canonical one. A saved code that
+        // does not is refused, and none can move a founding past the enclosures' own width.
+        for split in &splits {
+            let mut marginal = Counts::new();
+            for (&(phase, context), row) in &split.counts {
+                let folded = marginal.entry((phase % split.node, context)).or_default();
+                folded.total += row.total;
+                for (&class, &n) in &row.classes {
+                    *folded.classes.entry(class).or_default() += n;
+                }
+            }
+            if law.nodes.get(&split.node) != Some(&marginal) {
+                return Err(refusal("the saved node counts are their splits' marginals"));
+            }
+            let (saved, canonical) = (
+                split.code.bits()?,
+                kt_code(&split.counts, alphabet)?.bits()?,
+            );
+            if saved.lower > canonical.upper || canonical.lower > saved.upper {
+                return Err(refusal(
+                    "a saved split code encloses the KT product of its counts",
+                ));
+            }
+        }
         law.context = context;
         law.cells = head[3];
         law.counted = head[4];
@@ -836,6 +997,27 @@ impl FoundingLaw {
     }
 }
 
+/// The KT code its counts fix, faced row by row and class by class. Within a row the faces'
+/// numerators are `2j + 1` for each class's `j`-th arrival and the denominators `2i + |A|` for the
+/// row's `i`-th, whatever the arrival order, so the exact product is the counts'.
+fn kt_code(counts: &Counts, alphabet: usize) -> Result<PassageCode, HnnError> {
+    let mut code = PassageCode::new();
+    for row in counts.values() {
+        let mut seen = 0u64;
+        for &n in row.classes.values() {
+            for j in 0..n {
+                let face = Rat::new(
+                    BigInt::from(j) * 2 + 1,
+                    BigInt::from(seen) * 2 + BigInt::from(alphabet),
+                );
+                code = appended(code, &face)?;
+                seen += 1;
+            }
+        }
+    }
+    Ok(code)
+}
+
 fn write_counts(text: &mut String, counts: &Counts) {
     use crate::hnn::state_text::line;
     line(text, "founding-counts", [counts.len()]);
@@ -875,10 +1057,13 @@ fn read_counts<'a>(
         let context: usize = value(words.get(1), "a founding context")?;
         let n: u64 = value(words.get(2), "a founding row population")?;
         let classes: usize = value(words.get(3), "a founding row's class count")?;
+        let extent = classes
+            .checked_mul(2)
+            .and_then(|pairs| pairs.checked_add(4));
         if phase >= period
             || context >= alphabet
             || classes > alphabet
-            || words.len() != 4 + 2 * classes
+            || extent != Some(words.len())
             || n == 0
         {
             return Err(refusal("a saved founding row's domain"));
@@ -968,5 +1153,82 @@ mod saving_tests {
             .unwrap(),
             law
         );
+    }
+
+    /// A saved state whose node counts are not its splits' marginals, or whose split code does
+    /// not enclose its counts' KT product, is refused, typed.
+    #[test]
+    fn a_forged_founding_quotient_is_refused() {
+        let mut law = FoundingLaw::open(
+            4,
+            1,
+            1,
+            vec![
+                Candidate {
+                    period: 5,
+                    cost: 16,
+                },
+                Candidate {
+                    period: 7,
+                    cost: 20,
+                },
+            ],
+        )
+        .unwrap();
+        for k in 0..512 {
+            law.receive([0, 0, 1, 0, 2][k % 5]).unwrap();
+        }
+        let mut text = String::new();
+        law.write_saved(&mut text);
+        let read = |text: &str| {
+            let mut lines = text.lines();
+            FoundingLaw::read_saved(&mut |what| {
+                lines.next().ok_or(HnnError::ContinuingState { what })
+            })
+        };
+        assert_eq!(read(&text).unwrap(), law);
+        let lines: Vec<&str> = text.lines().collect();
+        // The two splits' genuine codes exchanged: each is well formed, neither is its own.
+        let codes: Vec<usize> = (0..lines.len())
+            .filter(|&i| lines[i].starts_with("founding-code "))
+            .collect();
+        assert_eq!(codes.len(), 2);
+        let mut swapped = lines.clone();
+        swapped.swap(codes[0], codes[1]);
+        assert!(matches!(
+            read(&swapped.join("\n")),
+            Err(HnnError::Founding { .. })
+        ));
+        // One node count moved between two classes of a row: every sum still holds.
+        let node = lines
+            .iter()
+            .position(|line| line.starts_with("founding-node "))
+            .unwrap();
+        let (row, mut words) = (node + 1..lines.len())
+            .find_map(|i| {
+                let words: Vec<u64> = lines[i]
+                    .strip_prefix("founding-row ")?
+                    .split(' ')
+                    .map(|word| word.parse().unwrap())
+                    .collect();
+                (words[3] >= 2 && words[5] >= 2).then_some((i, words))
+            })
+            .unwrap();
+        words[5] -= 1;
+        words[7] += 1;
+        let moved = format!(
+            "founding-row {}",
+            words
+                .iter()
+                .map(u64::to_string)
+                .collect::<Vec<_>>()
+                .join(" ")
+        );
+        let mut forged = lines.clone();
+        forged[row] = &moved;
+        assert!(matches!(
+            read(&forged.join("\n")),
+            Err(HnnError::Founding { .. })
+        ));
     }
 }

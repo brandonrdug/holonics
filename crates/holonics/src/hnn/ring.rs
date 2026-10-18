@@ -2821,15 +2821,27 @@ mod founding_tests {
     use super::*;
     use crate::ratio::rat;
 
-    /// REQ-20261017-049 test 7 is a stop gate. Its expected matrix is the design contract's
-    /// hand derivation, independently of the realized tick maps. Never retune either side.
+    /// The founded ring's declaration (`Constitution::with_founded_dynamics`: `d = 1/Y`, a Half
+    /// pump of strength `p`) on the harmonic in-phase mode. The expected entries are hand
+    /// derivations from `a = h/Y + hd` and `b = h²p`, independent of the realized tick maps: the
+    /// period monodromy is the shear `[[1, 0], [−8hp/(a−b), 1]]` wherever the signed form
+    /// certifies, which is exactly `p ≤ d/h`. Never retune either side.
     #[test]
     fn half_pump_at_critical_coupling_has_the_stipulated_harmonic_monodromy() {
-        let expected = ExactRatMatrix::new(vec![
-            vec![integer(1), integer(0)],
-            vec![integer(-8), integer(1)],
-        ])
-        .unwrap();
+        // (Y, h, p, the hand-derived lower-left entry); p = d/h is the founded ring's own pump.
+        let certified = [
+            (integer(2), Rat::one(), rat(1, 2), integer(-8)),
+            (integer(2), Rat::one(), rat(1, 4), rat(-8, 3)),
+            (integer(3), integer(2), rat(1, 6), integer(-4)),
+            (integer(3), integer(2), rat(1, 12), rat(-4, 3)),
+        ];
+        // Just past the edge d/h, and at the shear's singularity 2d/h.
+        let refused = [
+            (integer(2), Rat::one(), rat(65, 128)),
+            (integer(2), Rat::one(), Rat::one()),
+            (integer(3), integer(2), rat(65, 384)),
+            (integer(3), integer(2), rat(1, 3)),
+        ];
         for period in [2, 3, 5] {
             // Exactly Field::declare's cyclic incidence and unit constitutive weights.
             let incidence = crate::ratio::linear::vector::matrix(period, period, |i, j| {
@@ -2848,105 +2860,87 @@ mod founding_tests {
                 vec![Rat::one(); period],
             )
             .unwrap();
-            let material = |strength| {
+            let material = |admittance: &Rat, strength: &Rat| {
                 ResonatorMaterial::of_parametron(
                     &ring,
-                    &rat(1, 2),
+                    &admittance.recip(),
                     Some(
-                        PumpDeclaration::new(strength, Carrier::at(&Rat::zero()), PumpStep::Half)
-                            .unwrap(),
+                        PumpDeclaration::new(
+                            strength.clone(),
+                            Carrier::at(&Rat::zero()),
+                            PumpStep::Half,
+                        )
+                        .unwrap(),
                     ),
                 )
                 .unwrap()
             };
-            let critical = material(rat(1, 2));
-            critical.certify(0, &Rat::one()).unwrap();
-            let operands =
-                ResonatorOperands::at_cut(0, &critical, &integer(2), &Rat::one(), None).unwrap();
-            let floquet = Floquet::of(&operands).unwrap();
             let width = 2 * period;
-            let mut columns = Vec::new();
-            for coordinate in 0..2 {
-                let mut state = vec![Rat::zero(); 2 * width];
-                for node in 0..period {
-                    state[coordinate * width + 2 * node] = Rat::one();
+            for (admittance, step, strength, entry) in &certified {
+                let d = admittance.recip();
+                let a = step / admittance + step * &d;
+                let b = step * step * strength;
+                assert!(a > b);
+                assert_eq!(
+                    *entry,
+                    Rat::from_integer(BigInt::from(-8)) * step * strength / (a - b),
+                    "the hand entry is the stated formula"
+                );
+                assert!(strength <= &(&d / step));
+                let pumped = material(admittance, strength);
+                pumped.certify(0, step).unwrap();
+                let operands =
+                    ResonatorOperands::at_cut(0, &pumped, admittance, step, None).unwrap();
+                let floquet = Floquet::of(&operands).unwrap();
+                let mut columns = Vec::new();
+                for coordinate in 0..2 {
+                    let mut state = vec![Rat::zero(); 2 * width];
+                    for node in 0..period {
+                        state[coordinate * width + 2 * node] = Rat::one();
+                    }
+                    let image = floquet.monodromy().apply(&state).unwrap();
+                    // Invariance of the harmonic in-phase subspace is part of the check.
+                    for node in 0..period {
+                        assert_eq!(image[2 * node], image[0]);
+                        assert_eq!(image[width + 2 * node], image[width]);
+                        assert!(image[2 * node + 1].is_zero());
+                        assert!(image[width + 2 * node + 1].is_zero());
+                    }
+                    columns.push(vec![image[0].clone(), image[width].clone()]);
                 }
-                let image = floquet.monodromy().apply(&state).unwrap();
-                // Invariance of the harmonic in-phase subspace is part of the check.
-                for node in 0..period {
-                    assert_eq!(image[2 * node], image[0]);
-                    assert_eq!(image[width + 2 * node], image[width]);
-                    assert!(image[2 * node + 1].is_zero());
-                    assert!(image[width + 2 * node + 1].is_zero());
-                }
-                columns.push(vec![image[0].clone(), image[width].clone()]);
+                let realized = ExactRatMatrix::new(vec![
+                    vec![columns[0][0].clone(), columns[1][0].clone()],
+                    vec![columns[0][1].clone(), columns[1][1].clone()],
+                ])
+                .unwrap();
+                let expected = ExactRatMatrix::new(vec![
+                    vec![Rat::one(), Rat::zero()],
+                    vec![entry.clone(), Rat::one()],
+                ])
+                .unwrap();
+                assert_eq!(
+                    realized, expected,
+                    "period {period}, Y {admittance}, h {step}, p {strength}"
+                );
             }
-            let realized = ExactRatMatrix::new(vec![
-                vec![columns[0][0].clone(), columns[1][0].clone()],
-                vec![columns[0][1].clone(), columns[1][1].clone()],
-            ])
-            .unwrap();
-            println!("REQ049 test7 period={period} realized={realized:?} expected={expected:?}");
-            assert_eq!(realized, expected, "REQ049 STOP: period {period}");
-            assert!(matches!(
-                material(Rat::one()).certify(0, &Rat::one()),
-                Err(HnnError::UncertifiedResonator { .. })
-            ));
+            for (admittance, step, strength) in &refused {
+                assert!(strength > &(&admittance.recip() / step));
+                assert!(matches!(
+                    material(admittance, strength).certify(0, step),
+                    Err(HnnError::UncertifiedResonator { .. })
+                ));
+                assert!(matches!(
+                    ResonatorOperands::at_cut(
+                        0,
+                        &material(admittance, strength),
+                        admittance,
+                        step,
+                        None
+                    ),
+                    Err(HnnError::UncertifiedResonator { .. })
+                ));
+            }
         }
-    }
-    #[test]
-    fn turn_traces_equal_explicit_monodromy_powers_for_both_members() {
-        let identity = ExactRatMatrix::identity(2).unwrap();
-        let material = ResonatorMaterial::new(
-            identity.clone(),
-            identity.clone(),
-            identity.scaled(&rat(1, 2)),
-            None,
-        )
-        .unwrap();
-        let pumps = [PumpStep::Stand, PumpStep::Half]
-            .into_iter()
-            .map(|step| PumpDeclaration::new(rat(1, 4), Carrier::at(&Rat::zero()), step).unwrap())
-            .collect::<Vec<_>>();
-        let bank = ReceivingBank::new(material.clone(), pumps, integer(2), Rat::one(), 4).unwrap();
-        let amplitudes = vec![
-            GaussianRat::new(Rat::one(), Rat::zero()),
-            GaussianRat::new(Rat::zero(), Rat::one()),
-            GaussianRat::new(rat(-1, 2), Rat::zero()),
-            GaussianRat::new(rat(3, 5), rat(4, 5)),
-        ];
-        for member in 0..2 {
-            let schedule = PumpSchedule::placed(&bank.pumps()[member], &amplitudes).unwrap();
-            let operands = ResonatorOperands::scheduled(
-                member,
-                &material,
-                &schedule,
-                &integer(2),
-                &Rat::one(),
-                None,
-            )
-            .unwrap();
-            let monodromy = Floquet::of(&operands).unwrap();
-            let mut power = ExactRatMatrix::identity(4).unwrap();
-            let explicit = (1..=6)
-                .map(|_| {
-                    power = monodromy.monodromy().multiply(&power).unwrap();
-                    (0..4)
-                        .map(|i| power.get(i, i).unwrap().clone())
-                        .sum::<Rat>()
-                })
-                .collect::<Vec<_>>();
-            assert_eq!(bank.turn_traces(member, &amplitudes, 6).unwrap(), explicit);
-            assert!(bank.turn_traces(member, &amplitudes, 0).unwrap().is_empty());
-        }
-        assert!(matches!(
-            bank.turn_traces(2, &amplitudes, 1),
-            Err(HnnError::Shape { .. })
-        ));
-        assert!(matches!(
-            bank.turn_traces(1, &amplitudes[..3], 1),
-            Err(HnnError::Resonator { .. })
-        ));
     }
 }
 
@@ -3043,39 +3037,6 @@ impl ReceivingBank {
         Ok(TurnReading { members, joint })
     }
 
-    /// `tr(M_T^m)` for `m = 1..=count`, exact, for one member's monodromy over the turn.
-    /// Newton's identities on `det(xI-N) = x^d + c_(d-1)x^(d-1) + ... + c_0`
-    /// give integer power sums `p_m`; the returned trace is `p_m / Delta^m` for `M_T=N/Delta`.
-    /// The same turn admission and executed tick maps as `read_turn` are used.
-    /// [proved-standard; implementation exact; Lean counterpart owed #62.]
-    pub fn turn_traces(
-        &self,
-        member: usize,
-        amplitudes: &[GaussianRat],
-        count: usize,
-    ) -> Result<Vec<Rat>, HnnError> {
-        let (_, product, scale) = self.turn_monodromy(member, amplitudes)?;
-        let coefficients = integer_characteristic(&product);
-        let degree = product.len();
-        let mut powers: Vec<BigInt> = Vec::with_capacity(count);
-        let mut traces = Vec::with_capacity(count);
-        let mut denominator = BigInt::one();
-        for m in 1..=count {
-            let mut sum = BigInt::zero();
-            for i in 1..=degree.min(m - 1) {
-                sum += &coefficients[degree - i] * &powers[m - i - 1];
-            }
-            if m <= degree {
-                sum += BigInt::from(m) * &coefficients[degree - m];
-            }
-            let power = -sum;
-            denominator *= &scale;
-            traces.push(Rat::new(power.clone(), denominator.clone()));
-            powers.push(power);
-        }
-        Ok(traces)
-    }
-
     /// Member `member`'s turn: each crossing's executed tick map, and the monodromy as the integer
     /// matrix `N` over its scale `Δ` (`M_T = N/Δ`; [`ReceivingBank::read_turn`]).
     fn turn_monodromy(
@@ -3083,11 +3044,7 @@ impl ReceivingBank {
         member: usize,
         amplitudes: &[GaussianRat],
     ) -> Result<(Vec<ExactRatMatrix>, Vec<Vec<BigInt>>, BigInt), HnnError> {
-        let pump = self.pumps.get(member).ok_or(HnnError::Shape {
-            what: "a receiving bank member",
-            expected: self.pumps.len(),
-            found: member,
-        })?;
+        let pump = &self.pumps[member];
         if !amplitudes.len().is_multiple_of(pump.phases()) {
             return Err(HnnError::Resonator {
                 ring: member,
