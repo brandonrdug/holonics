@@ -552,7 +552,7 @@ use crate::hnn::HnnError;
 use crate::hnn::contact::{
     certify_boost, contact_conductances, signed_form_certifies, signed_stiffness,
 };
-use crate::hnn::field::{ConstitutionRead, Field, lattice_exponent};
+use crate::hnn::field::{ConstitutionRead, Field, lattice_exponent, receiver_grain};
 use crate::hnn::moment::PairPort;
 use crate::hnn::paired::PortSymmetry;
 use crate::hnn::phase_family::PhaseStatistics;
@@ -4500,13 +4500,7 @@ impl Constitution {
         let grain = field
             .receivers()
             .iter()
-            .filter(|receiver| receiver.tolerance.is_positive())
-            .filter_map(|receiver| {
-                (Rat::one() / &receiver.tolerance)
-                    .ceil()
-                    .to_integer()
-                    .to_u128()
-            })
+            .map(|receiver| receiver_grain(&receiver.tolerance))
             .max()
             .unwrap_or(1);
         let a = field.alphabet();
@@ -6001,12 +5995,13 @@ impl Constitution {
         Ok(next)
     }
 
-    /// Find the least refinement restoring every erased output component of the supplied
-    /// features: published contraction zero, retained exact contraction nonzero. Real and
-    /// imaginary rows are independent demands, even when another row already survives. Features are
-    /// actual rotated receiver operands (or declared differences thereof), never target labels.
-    /// This detects lost observability, rather than comparing a latent effect to a fixed absolute
-    /// classification tolerance. A nonzero existing map may still erase one of these modes.
+    /// Find the least refinement restoring each erased output component its receiver resolves:
+    /// published contraction zero and retained read strictly above `1/(2 L_R)` in magnitude,
+    /// `L_R = receiver_grain(tolerance)`. At or below that grain the difference stays in the carry.
+    /// Lean `HNN/LatticeDeposit.remainder_below_grain` bounds every unpublished read within the
+    /// lattice rule's operand scale, so an event is demanded only beyond that scale. Real and
+    /// imaginary rows are independent demands, even when another row already survives. Features
+    /// are actual rotated receiver operands (or declared differences thereof), never target labels.
     pub fn receiving_precision_event(
         &self,
         ring: usize,
@@ -6025,13 +6020,17 @@ impl Constitution {
             .and_then(|r| r.receiving.as_ref())
             .ok_or(HnnError::MissingReceivingMap { ring })?;
         let remainder = law.map_remainder()?;
+        let grain = Rat::new(
+            BigInt::one(),
+            BigInt::from(receiver_grain(tolerance)) << 1usize,
+        );
         let mut erased = Vec::new();
         let mut unresolved_reads = Vec::new();
         for (index, feature) in features.iter().enumerate() {
             let published = law.map().apply(feature)?;
             let unresolved = remainder.apply(feature)?;
             for (row, (visible, retained)) in published.iter().zip(&unresolved).enumerate() {
-                if visible.is_zero() && !retained.is_zero() {
+                if visible.is_zero() && retained.abs() > grain {
                     erased.push((index, row));
                 }
             }
@@ -12199,6 +12198,99 @@ mod receiving_precision_tests {
     use crate::hnn::field::FieldDeclaration;
 
     #[test]
+    fn receiving_precision_ignores_an_erasure_at_or_below_the_grain() {
+        let field =
+            Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
+        let ring = field.receivers()[0].ring;
+        let tolerance = &field.receivers()[0].tolerance;
+        let grain = Rat::new(
+            BigInt::one(),
+            BigInt::from(receiver_grain(tolerance)) << 1usize,
+        );
+        let locus = Locus::ReceivingMap(ring);
+        let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
+        let lattice = theta.lattice(locus).unwrap();
+        let unit = lattice.unit();
+        theta.clocks.insert(locus, 2);
+        let law = theta.rings[ring]
+            .receiving
+            .as_mut()
+            .unwrap()
+            .single_mut()
+            .unwrap();
+        let width = law.map.columns();
+        let remainder = &unit / crate::ratio::integer(4);
+        assert!(Lattice::new(lattice.exponent() + gamma_length(2)).contains(&remainder));
+        assert!(remainder.abs() <= &unit / crate::ratio::integer(2));
+        law.map_carry.0.insert(0, remainder.clone());
+        let at_grain = &grain / &remainder;
+        for read in [&grain - &unit / crate::ratio::integer(2), grain.clone()] {
+            let mut feature = vec![Rat::zero(); width];
+            feature[0] = &read / &remainder;
+            assert!(
+                theta
+                    .receiving_precision_event(ring, &[feature], tolerance)
+                    .unwrap()
+                    .is_none()
+            );
+        }
+        let mut feature = vec![Rat::zero(); width];
+        feature[0] = at_grain + crate::ratio::integer(2);
+        let event = theta
+            .receiving_precision_event(ring, &[feature], tolerance)
+            .unwrap()
+            .expect("strictly above the receiver's grain");
+        assert_eq!(event.erased_components(), &[(0, 0)]);
+        assert_eq!(
+            event.unresolved_reads()[0][0],
+            grain + &unit / crate::ratio::integer(2)
+        );
+    }
+
+    #[test]
+    fn no_receiving_event_within_the_rule() {
+        let field =
+            Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
+        let ring = field.receivers()[0].ring;
+        let tolerance = &field.receivers()[0].tolerance;
+        let locus = Locus::ReceivingMap(ring);
+        let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
+        let unit = theta.lattice(locus).unwrap().unit();
+        let law = theta.rings[ring]
+            .receiving
+            .as_mut()
+            .unwrap()
+            .single_mut()
+            .unwrap();
+        let width = law.map.columns();
+        assert!(law.map.entries().iter().all(Zero::is_zero));
+        // A full unit is the theorem's conservative bound, larger than a legal half-cell
+        // remainder. This exercises the bound, not a persisted carried-state construction.
+        for entry in 0..law.map.rows() * width {
+            law.map_carry.0.insert(entry, unit.clone());
+        }
+        let mut concentrated = vec![Rat::zero(); width];
+        concentrated[0] = Rat::from_integer(BigInt::from(width));
+        let features = vec![
+            vec![Rat::one(); width],
+            vec![-Rat::one(); width],
+            concentrated,
+        ];
+        assert!(
+            features
+                .iter()
+                .all(|v| v.iter().map(|x| x.abs()).sum::<Rat>()
+                    <= Rat::from_integer(BigInt::from(width)))
+        );
+        assert!(
+            theta
+                .receiving_precision_event(ring, &features, tolerance)
+                .unwrap()
+                .is_none()
+        );
+    }
+
+    #[test]
     fn receiving_precision_restores_every_real_and_turn_component_despite_a_survivor() {
         let field =
             Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
@@ -12207,6 +12299,7 @@ mod receiving_precision_tests {
         let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
         let exponent = theta.lattice(locus).unwrap().exponent();
         let unit = Lattice::new(exponent).unit();
+        theta.clocks.insert(locus, 1u64 << ((7 - 1) / 2));
         let law = theta.rings[ring]
             .receiving
             .as_mut()
@@ -12228,11 +12321,12 @@ mod receiving_precision_tests {
             .0
             .insert(width + 1, &unit / crate::ratio::integer(128));
         let mut feature = vec![Rat::zero(); width];
-        feature[0] = Rat::one();
+        let feature_scale = Rat::from_integer(BigInt::one() << (exponent + 3) as usize);
+        feature[0] = feature_scale.clone();
         let mut second = vec![Rat::zero(); width];
-        second[1] = Rat::one();
+        second[1] = feature_scale;
         let features = vec![feature, second];
-        let tolerance = Rat::one();
+        let tolerance = field.receivers()[0].tolerance.clone();
         let event = theta
             .receiving_precision_event(ring, &features, &tolerance)
             .unwrap()
@@ -12285,6 +12379,7 @@ mod receiving_precision_tests {
         let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
         let exponent = theta.lattice(locus).unwrap().exponent();
         let held = Lattice::new(exponent + 3).unit();
+        theta.clocks.insert(locus, 2);
         let law = theta.rings[ring]
             .receiving
             .as_mut()
@@ -12299,9 +12394,10 @@ mod receiving_precision_tests {
             .0
             .insert(law.map.columns(), crate::ratio::integer(2) * &held);
         let mut feature = vec![Rat::zero(); law.map.columns()];
-        feature[0] = Rat::one();
+        let feature_scale = Rat::from_integer(BigInt::one() << exponent as usize);
+        feature[0] = feature_scale.clone();
         let features = vec![feature];
-        let tolerance = &held / crate::ratio::integer(16);
+        let tolerance = field.receivers()[0].tolerance.clone();
         let event = theta
             .receiving_precision_event(ring, &features, &tolerance)
             .unwrap()
@@ -12320,10 +12416,13 @@ mod receiving_precision_tests {
             "the explicit changed perception is allowed"
         );
         assert!(event.residual_bounds[0] <= tolerance);
-        assert_eq!(event.unresolved_reads[0][0], held);
-        assert_eq!(event.real_logit_output_bounds[0], held);
-        assert_eq!(event.phase_output_bounds[0], held);
-        assert_eq!(event.output_bounds[0], crate::ratio::integer(2) * &held);
+        assert_eq!(event.unresolved_reads[0][0], &held * &feature_scale);
+        assert_eq!(event.real_logit_output_bounds[0], &held * &feature_scale);
+        assert_eq!(event.phase_output_bounds[0], &held * &feature_scale);
+        assert_eq!(
+            event.output_bounds[0],
+            crate::ratio::integer(2) * &held * &feature_scale
+        );
         assert!(event.phase_residual_bounds[0].is_zero());
         let next = theta
             .rebased(locus, event.levels, &BTreeSet::from([locus]))

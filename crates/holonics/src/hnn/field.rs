@@ -626,13 +626,7 @@ impl FieldDeclaration {
         let grain: u128 = self
             .receivers
             .iter()
-            .filter(|receiver| receiver.tolerance.is_positive())
-            .filter_map(|receiver| {
-                (Rat::one() / &receiver.tolerance)
-                    .ceil()
-                    .to_integer()
-                    .to_u128()
-            })
+            .map(|receiver| receiver_grain(&receiver.tolerance))
             .max()
             .unwrap_or(1);
         self.learned_loci()
@@ -645,6 +639,21 @@ impl FieldDeclaration {
     pub fn by_lattice_rule(mut self) -> Self {
         self.lattice = self.lattice_by_rule();
         self
+    }
+}
+
+/// **The receiver's grain denominator** `L_R = ⌈1/ε⌉`, read by both the lattice rule and
+/// receiving precision. The field's existing fallback is one when the tolerance is not positive
+/// or its reciprocal ceiling has no `u128` representation; declarations validate their tolerance.
+pub fn receiver_grain(tolerance: &Rat) -> u128 {
+    if tolerance.is_positive() {
+        (Rat::one() / tolerance)
+            .ceil()
+            .to_integer()
+            .to_u128()
+            .unwrap_or(1)
+    } else {
+        1
     }
 }
 
