@@ -632,10 +632,13 @@ impl FieldDeclaration {
     /// scale of the waves is an assumption the notebook measures at each boundary. Brandon may
     /// override the rule.
     pub fn lattice_by_rule(&self) -> BTreeMap<Locus, u32> {
+        // A receiver without a grain is refused at `Field::declare`, before any declared lattice
+        // is read; read on a declaration not yet declared, the rule takes the grains that exist.
         let grain: u128 = self
             .receivers
             .iter()
-            .map(|receiver| receiver_grain(&receiver.tolerance))
+            .filter_map(|receiver| receiver_grain(&receiver.tolerance).ok())
+            .map(u128::from)
             .max()
             .unwrap_or(1);
         self.learned_loci()
@@ -651,19 +654,25 @@ impl FieldDeclaration {
     }
 }
 
-/// **The receiver's grain denominator** `L_R = ⌈1/ε⌉`, read by both the lattice rule and
-/// receiving precision. The field's existing fallback is one when the tolerance is not positive
-/// or its reciprocal ceiling has no `u128` representation; declarations validate their tolerance.
-pub fn receiver_grain(tolerance: &Rat) -> u128 {
-    if tolerance.is_positive() {
-        (Rat::one() / tolerance)
-            .ceil()
-            .to_integer()
-            .to_u128()
-            .unwrap_or(1)
-    } else {
-        1
+/// **The receiver's grain denominator** `L_R = ⌈1/ε⌉`, the one owner read by the lattice rule,
+/// the word's precisions, the receiving face, the section reader and receiving precision. A
+/// tolerance that is not positive, or whose grain has no `u64` representation (the word's and the
+/// receiving face's carrier), has no grain and is refused, typed; [`Field::declare`] refuses such a
+/// receiver before any lattice reads it, so no consumer substitutes a coarser grain.
+pub fn receiver_grain(tolerance: &Rat) -> Result<u64, HnnError> {
+    if !tolerance.is_positive() {
+        return Err(HnnError::Tolerance {
+            tolerance: tolerance.clone(),
+        });
     }
+    tolerance
+        .recip()
+        .ceil()
+        .to_integer()
+        .to_u64()
+        .ok_or(HnnError::Tolerance {
+            tolerance: tolerance.clone(),
+        })
 }
 
 /// **The lattice rule's exponent** ([`FieldDeclaration::lattice_by_rule`]): `L = ⌈log₂(2 L_R X)⌉`
@@ -1176,6 +1185,10 @@ impl Field {
     /// class enters only where it injects into every source ring's ports, which the encoding checks
     /// (`hnn::encoding::Encoded`, `EncodingError::Fold`; guard 9) and [`Field::admit`] reads.
     pub fn declare(mut declared: FieldDeclaration) -> Result<Self, HnnError> {
+        // Every receiver's grain exists before a lattice reads it ([`receiver_grain`]).
+        for receiver in &declared.receivers {
+            receiver_grain(&receiver.tolerance)?;
+        }
         let declaration = declared.clone();
         let predecessor = if declared.founded.is_empty() {
             None
@@ -1370,7 +1383,7 @@ impl Field {
             &sources,
             &distances,
             &declared.receivers,
-        ));
+        )?);
         if let (Some(base), Some(next)) = (&predecessor, &word)
             && base.word.as_ref().is_some_and(|old| {
                 next.chart_exponent() < old.chart_exponent()
@@ -2743,11 +2756,12 @@ fn word_by_rule(
     sources: &[usize],
     distances: &[Vec<Option<usize>>],
     receivers: &[ReceiverDeclaration],
-) -> WordLattice {
+) -> Result<WordLattice, HnnError> {
     let grain = receivers
         .iter()
-        .filter(|receiver| receiver.tolerance.is_positive())
-        .filter_map(|receiver| receiver.tolerance.recip().ceil().to_integer().to_u64())
+        .map(|receiver| receiver_grain(&receiver.tolerance))
+        .collect::<Result<Vec<_>, _>>()?
+        .into_iter()
         .max()
         .unwrap_or(1);
     let fan_in = receivers
@@ -2773,7 +2787,7 @@ fn word_by_rule(
         })
         .max()
         .unwrap_or(1);
-    WordLattice::by_rule(grain, fan_in, width, steps)
+    Ok(WordLattice::by_rule(grain, fan_in, width, steps))
 }
 
 /// Holons joined side by side, the first leftmost, sharing no port: each join's whole again a

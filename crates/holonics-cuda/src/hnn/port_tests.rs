@@ -2955,7 +2955,7 @@ fn the_card_receiving_component_precision_preserves_outputs_and_cold_continuatio
     let tolerance = &field.receivers()[0].tolerance;
     let grain = Rat::new(
         BigInt::one(),
-        BigInt::from(holonics::hnn::field::receiver_grain(tolerance)) << 1usize,
+        BigInt::from(holonics::hnn::field::receiver_grain(tolerance).unwrap()) << 1usize,
     );
     assert!(feature_scale > Rat::one() / &unit);
     let retained_reads = restored_carry.apply(&feature).unwrap();

@@ -77,6 +77,21 @@ fn the_grain_is_derived_from_the_receivers_code_tolerance() {
     ));
 }
 
+/// A receiver without a grain, whose tolerance is not positive or whose `L_R = ⌈1/ε⌉` has no `u64`
+/// carrier, is refused at declaration, before any lattice reads it: no consumer substitutes a
+/// coarser grain for it (`field::receiver_grain`).
+#[test]
+fn a_receiver_without_a_grain_is_refused_at_declaration() {
+    for tolerance in [Rat::zero(), Rat::new(BigInt::one(), BigInt::one() << 64usize)] {
+        let mut declared = FieldDeclaration::campaign_one(1 << 17);
+        declared.receivers[0].tolerance = tolerance.clone();
+        assert!(matches!(
+            Field::declare(declared),
+            Err(HnnError::Tolerance { tolerance: refused }) if refused == tolerance
+        ));
+    }
+}
+
 /// Review C7: an aperture beyond the receiving ring's observability rank over the word is refused,
 /// and the rank is reported. A period-2 source ring injects at most 4 directions.
 #[test]

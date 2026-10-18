@@ -258,7 +258,7 @@
 pub mod charted;
 
 use num_bigint::BigInt;
-use num_traits::{One, Signed, ToPrimitive, Zero};
+use num_traits::{One, Signed, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::encoding::Encoded;
@@ -327,20 +327,7 @@ impl Refinement {
                 alphabet: field.alphabet(),
             });
         }
-        if !receiver.tolerance.is_positive() {
-            return Err(HnnError::Tolerance {
-                tolerance: receiver.tolerance.clone(),
-            });
-        }
-        let grain = receiver
-            .tolerance
-            .recip()
-            .ceil()
-            .to_integer()
-            .to_u64()
-            .ok_or(HnnError::Tolerance {
-                tolerance: receiver.tolerance.clone(),
-            })?;
+        let grain = crate::hnn::field::receiver_grain(&receiver.tolerance)?;
         Ok(Self {
             ring,
             words,

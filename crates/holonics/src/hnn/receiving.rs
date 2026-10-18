@@ -166,7 +166,8 @@ use crate::hnn::HnnError;
 use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{
-    ConstitutionRead, Current, Field, FieldMaterial, ReceiverDeclaration, ring_digit,
+    ConstitutionRead, Current, Field, FieldMaterial, ReceiverDeclaration, receiver_grain,
+    ring_digit,
 };
 use crate::hnn::keys;
 use crate::hnn::propagation::Operands;
@@ -1299,30 +1300,13 @@ pub fn landmark_declaration_with(
         depth: receiver.depth,
         forced: 0,
         population: field.population(),
-        grain: grain_of(&receiver.tolerance)?,
+        grain: receiver_grain(&receiver.tolerance)?,
         family,
         prior: receiver.prior.clone(),
         capacity: crate::compression::landmark::context::Capacity::Unbounded,
         mass: receiver.mass,
         base: receiver.base,
     })
-}
-
-/// `L_R = ⌈1/ε_bits⌉`, refused at a tolerance that is not positive or whose grain passes the word.
-fn grain_of(tolerance: &Rat) -> Result<u64, HnnError> {
-    if *tolerance <= Rat::zero() {
-        return Err(HnnError::Tolerance {
-            tolerance: tolerance.clone(),
-        });
-    }
-    tolerance
-        .recip()
-        .ceil()
-        .to_integer()
-        .to_u64()
-        .ok_or(HnnError::Tolerance {
-            tolerance: tolerance.clone(),
-        })
 }
 
 // -------------------------------------------------------------------------------------------
@@ -2294,7 +2278,7 @@ impl ReceivingPhases {
             || field.first_epoch(ring) != Some(first_epoch)
             || aperture == 0
             || first_epoch.checked_add(aperture).is_none()
-            || grain != grain_of(&tolerance)?
+            || grain != receiver_grain(&tolerance)?
         {
             return refused(what);
         }
@@ -2331,7 +2315,7 @@ impl ReceivingPhases {
     pub(crate) fn is_declared_restriction(&self, field: &Field) -> Result<bool, HnnError> {
         for receiver in field.receivers() {
             if self.ring == receiver.ring
-                && self.grain == grain_of(&receiver.tolerance)?
+                && self.grain == receiver_grain(&receiver.tolerance)?
                 && self.aperture <= receiver.aperture
                 && self.observation_partition == field.receiving_context(self.ring)
             {
@@ -2357,7 +2341,7 @@ impl ReceivingPhases {
                 rings: field.rings().len(),
             });
         }
-        let grain = grain_of(&receiver.tolerance)?;
+        let grain = receiver_grain(&receiver.tolerance)?;
         if receiver.aperture == 0 {
             return Err(HnnError::Observability {
                 aperture: 0,

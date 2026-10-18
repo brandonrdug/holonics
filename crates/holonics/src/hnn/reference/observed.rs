@@ -490,9 +490,8 @@ mod precision_tests {
         let width = field.ring(0).width();
         let grain = Rat::new(
             BigInt::from(1),
-            BigInt::from(crate::hnn::field::receiver_grain(
-                &field.receivers()[0].tolerance,
-            )) << 1usize,
+            BigInt::from(crate::hnn::field::receiver_grain(&field.receivers()[0].tolerance).unwrap())
+                << 1usize,
         );
         let mut source_scale = Rat::one();
         // The same real word is re-read at each power of two. Neither the target nor a
@@ -511,9 +510,6 @@ mod precision_tests {
                 .clone()
                 .with_symmetric_source(0, scaled, carrier.symmetry())
                 .unwrap();
-            eprintln!(
-                "observed precision fixture: boundary={steps_to_boundary:?} source_scale={source_scale}"
-            );
             let mut resident = port.mount_with(&field, &current, material).unwrap();
             let cell = PairedObservation::admit(&field, resident.constitution(), &pairing)
                 .unwrap()
@@ -538,12 +534,18 @@ mod precision_tests {
                 .unit();
             let read = &unit / integer(4) * features[0][column].abs();
             let norm: Rat = features[0].iter().map(|x| x.abs()).sum();
-            eprintln!(
-                "observed precision fixture: source_scale={source_scale} feature_l1={norm} X={width} retained_read={read} grain={grain}"
-            );
             if read > grain && norm > integer(width as i64) {
                 break (resident, moment, column, unit);
             }
+            // The scale stops at the lattice's own reach `2^L = 1/unit`: past it a unit cell of
+            // the map would hold the whole feature, so a failure there is the fixture's, not a
+            // larger search's.
+            assert!(
+                &source_scale * &unit < Rat::one(),
+                "observed precision fixture: no read above the grain by source scale \
+                 {source_scale} (boundary {steps_to_boundary:?}, feature l1 {norm}, X {width}, \
+                 retained read {read}, grain {grain})"
+            );
             source_scale *= integer(2);
         };
         let mut text = resident.constitution.continuing_state(0).unwrap().to_text();

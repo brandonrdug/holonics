@@ -544,7 +544,7 @@ pub use receiving_blocks::ReceivingLayout;
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
-use num_traits::{One, Signed, ToPrimitive, Zero};
+use num_traits::{One, Signed, Zero};
 use rayon::prelude::*;
 
 use crate::compression::landmark::context::{Landmarks, Letter, TreeStanding};
@@ -4501,7 +4501,9 @@ impl Constitution {
         let grain = field
             .receivers()
             .iter()
-            .map(|receiver| receiver_grain(&receiver.tolerance))
+            .map(|receiver| receiver_grain(&receiver.tolerance).map(u128::from))
+            .collect::<Result<Vec<_>, _>>()?
+            .into_iter()
             .max()
             .unwrap_or(1);
         // The standing founded as a standing wave with declared lobes (module header, "The
@@ -5997,7 +5999,7 @@ impl Constitution {
         let remainder = law.map_remainder()?;
         let grain = Rat::new(
             BigInt::one(),
-            BigInt::from(receiver_grain(tolerance)) << 1usize,
+            BigInt::from(receiver_grain(tolerance)?) << 1usize,
         );
         let mut erased = Vec::new();
         let mut unresolved_reads = Vec::new();
@@ -12295,7 +12297,7 @@ mod receiving_precision_tests {
         let tolerance = &field.receivers()[0].tolerance;
         let grain = Rat::new(
             BigInt::one(),
-            BigInt::from(receiver_grain(tolerance)) << 1usize,
+            BigInt::from(receiver_grain(tolerance).unwrap()) << 1usize,
         );
         let locus = Locus::ReceivingMap(ring);
         let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
