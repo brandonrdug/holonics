@@ -381,6 +381,22 @@ fn pair_face_line(
         .map(PairReadSnapshot::exact_values)
         .collect();
     let summary = moment.pair_face_summary();
+    // Read the published port, excluding its separate carried remainders. This exterior
+    // count identifies the first nonzero output without entering either measured clock.
+    let output_nonzero_ring_offset_entries: Vec<_> = summary
+        .iter()
+        .filter_map(|&(ring, offset, _, _, _)| {
+            resident.constitution().pair_port(ring, offset).map(|port| {
+                let entries = port.outputs().iter().flatten();
+                (
+                    ring,
+                    offset,
+                    entries.clone().count(),
+                    entries.filter(|entry| !entry.is_zero()).count(),
+                )
+            })
+        })
+        .collect();
     let mut count_checks = Vec::new();
     if unit == 1 || unit % 100 == 0 {
         for &(ring, offset, _, _, _) in &summary {
@@ -405,7 +421,7 @@ fn pair_face_line(
         .map(|(name, time)| (name.replace(' ', "_"), time.as_nanos()))
         .collect();
     Ok(format!(
-        "pair_face section={section} role={role} unit={unit} ring_offset_population_occupied_bindings_rebuilds={summary:?} clone_ns={clone_ns} phase_wall_ns={phase_wall_ns:?} retained_builds={retained_builds} other_copy_builds={other_copy_builds} prior_read_match={prior_read_mismatch:?} deposit_reads_changed={deposit_reads_changed:?} count_checks={count_checks:?} read_values_before={read_values_before:?} read_values_after={read_values_after:?}"
+        "pair_face section={section} role={role} unit={unit} ring_offset_population_occupied_bindings_rebuilds={summary:?} clone_ns={clone_ns} phase_wall_ns={phase_wall_ns:?} retained_builds={retained_builds} other_copy_builds={other_copy_builds} prior_read_match={prior_read_mismatch:?} deposit_reads_changed={deposit_reads_changed:?} count_checks={count_checks:?} read_values_before={read_values_before:?} read_values_after={read_values_after:?} output_nonzero_ring_offset_entries={output_nonzero_ring_offset_entries:?}"
     ))
 }
 
