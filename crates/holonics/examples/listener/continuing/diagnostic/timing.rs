@@ -215,7 +215,7 @@ impl PhaseBudget {
                 )
             });
         eprintln!(
-            "timing phase={} block={} cells={} wall_ns={} partial={} completed={} elapsed_wall_ns={} phase_allowance_ns={} M={:?}/{:?}ns_per_cell S={:?}/{:?}ns_per_cell ceil(M+S)={:?}ns_per_cell remaining_cells={} projected_ns={} bad_block_streak={}",
+            "timing phase={} block={} cells={} wall_ns={} partial={} completed={} elapsed_wall_ns={} phase_allowance_ns={} M={:?}/{:?}ns_per_cell S={:?}/{:?}ns_per_cell ceil(M+S)={:?}ns_per_cell remaining_cells={} projected_ns={:?} bad_block_streak={}",
             self.label,
             self.block_index + usize::from(partial),
             self.block_cells.max(if partial { 0 } else { BLOCK_CELLS }),

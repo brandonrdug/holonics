@@ -460,7 +460,7 @@ pub(super) fn report_epoch(
     };
     let actual_end_gap = matrix_subtract(&end.map, &optimum)?;
     println!(
-        "step0_epoch_majorizer branch={branch} column_exponents={majorizer_exponents:?} M_diagonal={majorizer_diagonal:?} D_hyp={d_hyp:?} max_abs_D_hyp={} max_abs_D_in_W_units={} lattice_unit={lattice_unit} step_toward_zero={step:?} residual_R_double_prime={residual_after:?} exact_fall={fall} nonzero_step={nonzero_step} positive_fall_check={fall_check} actual_W_end_minus_W_star_unconstrained={actual_end_gap}",
+        "step0_epoch_majorizer branch={branch} column_exponents={majorizer_exponents:?} M_diagonal={majorizer_diagonal:?} D_hyp={d_hyp:?} max_abs_D_hyp={} max_abs_D_in_W_units={} lattice_unit={lattice_unit} step_toward_zero={step:?} residual_R_double_prime={residual_after:?} exact_fall={fall} nonzero_step={nonzero_step} positive_fall_check={fall_check} actual_W_end_minus_W_star_unconstrained={actual_end_gap:?}",
         matrix_max_abs(&d_hyp),
         matrix_max_abs(&d_hyp) / &lattice_unit,
     );
