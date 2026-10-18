@@ -7,14 +7,17 @@ fn fixture(budget: u64) -> (Reference, Resident, MomentId) {
 }
 
 fn fixture_with_family(budget: u64, contact_family: bool) -> (Reference, Resident, MomentId) {
-    fixture_with_material(budget, contact_family, false)
+    fixture_with_material(budget, contact_family, None)
 }
 
+/// `source_scale` mounts R2's fixed carried-state construction (a zero receiving map) with ring
+/// 0's source map scaled by it; `None` mounts the field's opening constitution.
 fn fixture_with_material(
     budget: u64,
     contact_family: bool,
-    nonzero_operand_control: bool,
+    source_scale: Option<&Rat>,
 ) -> (Reference, Resident, MomentId) {
+    let nonzero_operand_control = source_scale.is_some();
     let mut declaration = crate::hnn::tests::learning::chain_declaration(4096);
     declaration.founding = true;
     // One class-independent source clock; the later declared rings take carry only.
@@ -63,6 +66,26 @@ fn fixture_with_material(
                 ),
             )
             .unwrap();
+        let scale = source_scale.unwrap();
+        let source = material
+            .source_port(0)
+            .expect("ring 0 carries the class source")
+            .clone();
+        let rows = (0..source.rows())
+            .map(|i| {
+                (0..source.columns())
+                    .map(|j| source.get(i, j).unwrap() * scale)
+                    .collect()
+            })
+            .collect();
+        let material = material
+            .with_ports(
+                0,
+                None,
+                Some(ExactRatMatrix::shaped(source.rows(), source.columns(), rows).unwrap()),
+                None,
+            )
+            .unwrap();
         reference
             .mount_with(&field, &Current::at_rest(&field), material)
             .unwrap()
@@ -94,13 +117,41 @@ fn fixture_with_material(
 }
 
 #[test]
+fn r4b_saved_state_names_its_open_founding_law() {
+    // The predicate a realization without the founding law reads before it resumes a state.
+    let mut declaration = crate::hnn::tests::learning::chain_declaration(1 << 16);
+    declaration.founding = true;
+    let field = Field::declare(declaration).unwrap();
+    let reference = Reference::new(4, 1 << 40);
+    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    assert!(!resident.continuing_state(0).unwrap().founding_open());
+    resident.open_founding().unwrap();
+    assert!(resident.continuing_state(0).unwrap().founding_open());
+    let (_, mut staged, _) = fixture(1 << 40);
+    assert!(staged.continuing_state(0).unwrap().founding_open());
+    staged.publish_founding().unwrap().unwrap();
+    // The published field's law reopens empty for the next founding, and is still carried.
+    assert!(staged.continuing_state(0).unwrap().founding_open());
+}
+
+#[test]
 fn r4b_14_publication_refusals_keep_the_complete_resident_and_staging() {
     let (reference, mut pending, moment) = fixture(1 << 40);
     let phases = pending.admitted[0].clone();
     let (id, _) = reference.refine(&mut pending, &moment, &phases).unwrap();
+    // The Debug face omits a mode view's rotor bindings; the ratios' own equality reads them.
+    let ratios = |resident: &Resident| {
+        resident
+            .pending
+            .values()
+            .map(|slot| slot.ratio.clone())
+            .collect::<Vec<_>>()
+    };
+    let held = ratios(&pending);
     let before = format!("{pending:?}");
     assert!(pending.publish_founding().is_err());
     assert_eq!(format!("{pending:?}"), before);
+    assert_eq!(ratios(&pending), held);
     assert_eq!(pending.staged_founding, Some(5));
     let targets = crate::hnn::tests::support::encoded(&pending.field, &vec![0; phases.aperture()]);
     reference.compare(&mut pending, id, &targets).unwrap();
@@ -116,6 +167,29 @@ fn r4b_14_publication_refusals_keep_the_complete_resident_and_staging() {
     ));
     assert_eq!(format!("{small:?}"), before);
     assert_eq!(small.staged_founding, Some(5));
+    // A refusal at the last check, after the field, constitution, moments, address and arrived
+    // read were all extended on the staged copy, keeps the resident whole too. The contact family
+    // makes the address read the aeon's opening winding; one whole turn of ring 0 moved into the
+    // opening is the disagreement.
+    let (_, mut late, _) = fixture_with_family(1 << 40, true);
+    let turn = BigInt::from(late.field.ring(0).period());
+    late.aeon.opening[0] += turn;
+    let (field, constitution) = (late.field.clone(), late.constitution.clone());
+    let before = format!("{late:?}");
+    let refused = late.publish_founding();
+    assert!(
+        matches!(
+            refused,
+            Err(HnnError::Founding {
+                what: "the extended address and current disagree"
+            })
+        ),
+        "{refused:?}"
+    );
+    assert_eq!(format!("{late:?}"), before);
+    assert_eq!(late.field, field);
+    assert_eq!(late.constitution, constitution);
+    assert_eq!(late.staged_founding, Some(5));
 }
 
 #[test]
@@ -342,9 +416,14 @@ fn arrived_features(resident: &Resident) -> Vec<Vec<Rat>> {
     word.receiving_anchors(arrived.ratio.phases()).unwrap()
 }
 
-#[test]
-fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
-    let (reference, mut resident, moment) = fixture_with_material(1 << 40, false, true);
+/// The carried-state fixture at `source_scale`, its arrived operand read twice and then carried
+/// across one founding publication, with the publication's ledger exchange checked; returns the
+/// ledger balance before the founding.
+fn arrived_across_founding(
+    source_scale: &Rat,
+) -> (Reference, Resident, MomentId, crate::aeon::EnclosedBalance) {
+    let (reference, mut resident, moment) =
+        fixture_with_material(1 << 40, false, Some(source_scale));
     let phases = &resident.admitted[0];
     let contact =
         crate::hnn::propagation::contact_exponent(&resident.field, 0, resident.current.lift())
@@ -417,20 +496,63 @@ fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
     assert_eq!(after.total().lower, after.change().lower - &after.widening);
     assert_eq!(after.total().upper, after.change().upper + &after.widening);
 
+    (reference, resident, moment, before)
+}
+
+#[test]
+fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
+    // A receiving precision event refines only a read strictly above the receiver's grain
+    // `1/(2 L_R)`, and within the lattice rule none is (REQ-056). As 056's publication fixture
+    // does, the source map's scale is found by doubling from one and re-reading the real word
+    // after the founding, until the seeded quarter-unit remainder's read lies above the grain.
+    // Each doubling must widen the reach; the declared budget bounds the scaled material (the
+    // mount refuses past it), so the search ends at a read or at that refusal.
+    let mut source_scale = Rat::one();
+    let mut previous = Rat::zero();
+    let (reference, mut resident, moment, before) = loop {
+        let (reference, resident, moment, before) = arrived_across_founding(&source_scale);
+        let receiver = resident.field.receivers()[0].ring;
+        let unit = resident
+            .constitution
+            .lattice(Locus::ReceivingMap(receiver))
+            .unwrap()
+            .unit();
+        let grain = Rat::new(
+            BigInt::one(),
+            BigInt::from(
+                crate::hnn::field::receiver_grain(&resident.field.receivers()[0].tolerance)
+                    .unwrap(),
+            ) << 1usize,
+        );
+        let reached = arrived_features(&resident)
+            .iter()
+            .flatten()
+            .map(|x| x.abs())
+            .max()
+            .unwrap();
+        if &unit / crate::ratio::integer(4) * &reached > grain {
+            break (reference, resident, moment, before);
+        }
+        assert!(
+            reached > previous,
+            "source scale {source_scale} widens no reach ({reached}, grain {grain})"
+        );
+        previous = reached;
+        source_scale *= crate::ratio::integer(2);
+    };
+    println!("r4b_founding_source_scale {source_scale}");
+
     // As in R2's fixed carried-state control, seed a legal retained remainder in a zero map.
     // This witnesses transport/accounting, not production of the remainder by learning.
     let receiver = resident.field.receivers()[0].ring;
     let features = arrived_features(&resident);
+    // The largest reached feature, the one the scale above was found for.
     let (phase, column) = features
         .iter()
         .enumerate()
-        .find_map(|(phase, feature)| {
-            feature
-                .iter()
-                .position(|x| !x.is_zero())
-                .map(|column| (phase, column))
-        })
-        .expect("the receiving word must reach a nonzero feature");
+        .flat_map(|(phase, feature)| (0..feature.len()).map(move |column| (phase, column)))
+        .max_by(|&(p, c), &(q, d)| features[p][c].abs().cmp(&features[q][d].abs()))
+        .expect("the receiving word must reach a feature");
     let unit = resident
         .constitution
         .lattice(Locus::ReceivingMap(receiver))
@@ -454,6 +576,9 @@ fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
         at..at + "map-carry 0\n".len(),
         &format!("map-carry 1\n{column} {retained}\n"),
     );
+    // A quarter unit needs precision 2 on the receiving clock; gamma_length(2) = 3, and
+    // gamma_length(1) = 1 carries only the half cell.
+    super::precision_publication_tests::receiving_carry_clock(&mut text, receiver, 2);
     let opening = resident.constitution.clone();
     let text = ContinuingState::stamped(&text, &opening).unwrap();
     resident.constitution = opening

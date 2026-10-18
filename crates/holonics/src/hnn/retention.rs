@@ -526,13 +526,14 @@ pub fn separator(field: &Field, diamond: &Diamond, kept: &BTreeSet<Locus>) -> Ve
 /// - each ring's epochs are the flux through its ring section ([`aeon::epochs`] at
 ///   [`ClockLift::ring_section`], [`crate::aeon::Epochs::flux`]; Lean
 ///   `Aeon/Clock/Epoch.signed_count_is_flux`);
-/// - the carry-out is the aeon closing on the last ring's clock: read on that ring's own circle
-///   the aeon is an [`aeon::Cycle`] exactly when the ring opened on its section, and the cycle then
-///   reads one whole winding (Lean `Winding.torus_cycle_reads_whole_windings`). Campaign 1's last
-///   ring steps only by carry, so from its section it returns to it exactly at the carry-out. A
-///   published key that opened it off its section, or a lock of its own that steps it past the
-///   section, leaves the carry-out one crossing of the section (flux 1) that is not a cycle: a
-///   declared absence.
+/// - the carry-out is the aeon closing on the last `Lock` ring's clock (the carry chain's end; a
+///   founded `Own` ring after it stays outside the chain and closes nothing): read on that ring's
+///   own circle the aeon is an [`aeon::Cycle`] exactly when the ring opened on its section, and the
+///   cycle then reads one whole winding (Lean `Winding.torus_cycle_reads_whole_windings`). Campaign
+///   1's last ring steps only by carry, so from its section it returns to it exactly at the
+///   carry-out. A published key that opened it off its section, or a lock of its own that steps it
+///   past the section, leaves the carry-out one crossing of the section (flux 1) that is not a
+///   cycle: a declared absence.
 ///
 /// [`aeon::epochs`]: crate::aeon::epochs
 /// [`aeon::Cycle`]: crate::aeon::Cycle

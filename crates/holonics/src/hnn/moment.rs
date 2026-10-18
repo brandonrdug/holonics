@@ -502,8 +502,10 @@ pub fn capacity_located(
     )
 }
 
-/// Whether the identity-clock partition is lossy at this population: one exact count,
-/// with the same declaration checks and rates as `capacity`, without searching for n*.
+/// Whether the identity-clock partition is lossy at this population, `n* ≤ n`: one exact count,
+/// with the same declaration checks and rates as `capacity`, without searching for n*. The count
+/// compares against `|A|^n`, whose exponent its carrier holds to 32 bits; above that the same
+/// predicate is read as `n* ≤ n` from the search (lossiness is monotone in `n`).
 pub fn capacity_admits(
     periods: &[u64],
     advances: &[RingAdvance],
@@ -520,6 +522,9 @@ pub fn capacity_admits(
         offsets,
         CapacityClock::Identity,
     )?;
+    if u32::try_from(n).is_err() {
+        return Ok(capacity(periods, advances, sources, alphabet, offsets)?.n_star() <= n);
+    }
     lossy(n, periods, &rates, sources, alphabet, offsets)
 }
 
@@ -1414,13 +1419,9 @@ pub struct PopulationChart {
 impl PopulationChart {
     /// The chart a field declares by rule.
     pub fn of(field: &Field) -> Self {
-        let grain = field
-            .receivers()
-            .iter()
-            .filter_map(|receiver| receiver.tolerance.recip().ceil().to_integer().to_u64())
-            .max()
-            .unwrap_or(1);
-        let reach = BigUint::from(2u32) * BigUint::from(grain) * BigUint::from(field.population());
+        let reach = BigUint::from(2u32)
+            * BigUint::from(field.finest_grain())
+            * BigUint::from(field.population());
         Self {
             exponent: u32::try_from(crate::compression::cost::ceil_log2(&reach))
                 .expect("a population chart within 32 bits"),

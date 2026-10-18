@@ -977,6 +977,9 @@ impl<'c> Resident<'c> {
 
     /// Restore the shared native resident passage before exposing a device resident. Saved
     /// declaring phases survive material learning; warm charts and source windows are not reset.
+    ///
+    /// The card carries no founding law: a state with an open law or a staged period is refused
+    /// before anything crosses the bus, so a resume never drops the law it was saved with (#76).
     pub fn mount_continued(
         &self,
         field: &Field,
@@ -984,6 +987,12 @@ impl<'c> Resident<'c> {
         opening: Constitution,
         state: &ContinuingState,
     ) -> Result<Mounted<'c>, HnnError> {
+        super::admit_card_field(field)?;
+        if state.founding_open() {
+            return Err(HnnError::Founding {
+                what: "the card's founding law is owed (#76)",
+            });
+        }
         let constitution = opening.continued(state)?;
         if let Some(carry) = state.carry() {
             if !matches!(self.reception, Reception::Carry(_)) || !carry.fits(field) {
@@ -1078,16 +1087,7 @@ impl<'c> Resident<'c> {
         constitution: Constitution,
         family: Option<Vec<ReceivingPhases>>,
     ) -> Result<Mounted<'c>, HnnError> {
-        if field
-            .rings()
-            .iter()
-            .any(|ring| ring.advance() == holonics::hnn::RingAdvance::Own)
-        {
-            return Err(HnnError::Founding {
-                what: "the card's founded ring is owed (#76)",
-            });
-        }
-
+        super::admit_card_field(field)?;
         let parametric = field.holarchy(&constitution)?.parametric();
         if parametric != field.parametric() {
             return Err(HnnError::Shape {
@@ -1555,15 +1555,7 @@ impl<'c> ExecutionPort for Resident<'c> {
     }
 
     fn mount(&self, field: &Field, current: &Current) -> Result<Mounted<'c>, HnnError> {
-        if field
-            .rings()
-            .iter()
-            .any(|ring| ring.advance() == holonics::hnn::RingAdvance::Own)
-        {
-            return Err(HnnError::Founding {
-                what: "the card's founded ring is owed (#76)",
-            });
-        }
+        super::admit_card_field(field)?;
         let constitution = Constitution::initial(field, self.budget)?;
         self.mount_with(field, current, constitution)
     }

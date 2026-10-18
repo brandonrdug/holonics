@@ -4497,15 +4497,8 @@ impl Constitution {
     /// locus's step is certified at its deposit (module header).
     pub fn initial(field: &Field, budget: u64) -> Result<Self, HnnError> {
         let lattices = field.lattices().clone();
-        // L_R = ⌈1/ε_bits⌉, the finest admitted receiver's (`FieldDeclaration::lattice_by_rule`).
-        let grain = field
-            .receivers()
-            .iter()
-            .map(|receiver| receiver_grain(&receiver.tolerance).map(u128::from))
-            .collect::<Result<Vec<_>, _>>()?
-            .into_iter()
-            .max()
-            .unwrap_or(1);
+        // L_R = ⌈1/ε_bits⌉, the finest admitted receiver's (`Field::finest_grain`).
+        let grain = u128::from(field.finest_grain());
         // The standing founded as a standing wave with declared lobes (module header, "The
         // founding"): every slice at its component's first lattice unit in the `+1` lobe.
         let lock = LockChart::of(field)?;
@@ -5985,11 +5978,10 @@ impl Constitution {
         features: &[Vec<Rat>],
         tolerance: &Rat,
     ) -> Result<Option<ReceivingPrecision>, HnnError> {
-        if !tolerance.is_positive() {
-            return Err(HnnError::Unadmitted {
-                reason: "receiving precision requires a positive declared output tolerance",
-            });
-        }
+        let grain = Rat::new(
+            BigInt::one(),
+            BigInt::from(receiver_grain(tolerance)?) << 1usize,
+        );
         let locus = Locus::ReceivingMap(ring);
         let law = self
             .rings
@@ -5997,10 +5989,6 @@ impl Constitution {
             .and_then(|r| r.receiving.as_ref())
             .ok_or(HnnError::MissingReceivingMap { ring })?;
         let remainder = law.map_remainder()?;
-        let grain = Rat::new(
-            BigInt::one(),
-            BigInt::from(receiver_grain(tolerance)?) << 1usize,
-        );
         let mut erased = Vec::new();
         let mut unresolved_reads = Vec::new();
         for (index, feature) in features.iter().enumerate() {
@@ -11219,6 +11207,11 @@ impl ContinuingState {
     }
     pub(crate) fn staged_founding(&self) -> Option<u64> {
         self.staged_founding
+    }
+    /// Whether the state carries an open founding law or a staged period, which a realization
+    /// without the founding law must refuse rather than drop.
+    pub fn founding_open(&self) -> bool {
+        self.founding.is_some() || self.staged_founding.is_some()
     }
     pub(crate) fn with_founding(
         mut self,

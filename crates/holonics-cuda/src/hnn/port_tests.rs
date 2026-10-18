@@ -3202,10 +3202,37 @@ fn r4b_18_founded_mount_refuses_before_upload() {
         .found(holonics::hnn::FoundedRing { period: 2, key: 1 })
         .unwrap();
     let port = Resident::new(&card, 4, 1 << 40);
+    let before = port.traffic();
     assert!(matches!(
         port.mount(&field, &Current::at_rest(&field)),
         Err(HnnError::Founding {
             what: "the card's founded ring is owed (#76)"
         })
     ));
+    assert_eq!(port.traffic(), before);
+    assert!(matches!(
+        super::ResidentMoment::open(&card, &field, &Current::at_rest(&field)),
+        Err(super::DeviceError::Hnn(HnnError::Founding {
+            what: "the card's founded ring is owed (#76)"
+        }))
+    ));
+
+    // A host state saved with its founding law open: the card carries no founding law, so the
+    // resume refuses before anything crosses the bus rather than dropping the law.
+    let mut declaration = chain_declaration(1 << 16);
+    declaration.founding = true;
+    let field = Field::declare(declaration).unwrap();
+    let host = Reference::new(4, 1 << 40);
+    let mut saved = host.mount(&field, &Current::at_rest(&field)).unwrap();
+    saved.open_founding().unwrap();
+    let state = saved.continuing_state(0).unwrap();
+    assert!(state.founding_open());
+    let opening = Constitution::initial(&field, 1 << 40).unwrap();
+    assert!(matches!(
+        port.mount_continued(&field, &Current::at_rest(&field), opening, &state),
+        Err(HnnError::Founding {
+            what: "the card's founding law is owed (#76)"
+        })
+    ));
+    assert_eq!(port.traffic(), before);
 }

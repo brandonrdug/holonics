@@ -28,6 +28,18 @@ fn r4b_13_new_loci_follow_the_initial_rules_and_old_loci_are_unchanged() {
     assert_eq!(found.clocks, previous.clocks);
     assert_eq!(found.released, previous.released);
     assert_eq!(found.storage_product, previous.storage_product);
+    // The field-derived parts are the expanded field's own, exactly as its initial constitution
+    // derives them.
+    assert_eq!(found.lock, declared.lock);
+    assert_eq!(found.fixed, declared.fixed);
+    assert_eq!(found.admittances, declared.admittances);
+    assert_eq!(found.conductances, declared.conductances);
+    assert_eq!(found.founded, declared.founded);
+    assert_eq!(found.hop, declared.hop);
+    assert_eq!(found.grain, declared.grain);
+    for (locus, lattice) in &declared.lattices {
+        assert_eq!(found.lattices.get(locus), Some(lattice));
+    }
     assert!(matches!(
         previous.found_ring(&expanded, 3, 1),
         Err(HnnError::ConstitutionBudget { .. })

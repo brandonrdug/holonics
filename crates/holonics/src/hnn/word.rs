@@ -456,6 +456,16 @@ impl EndChange {
                 what: "the carried change before the next ring and contact",
             });
         }
+        let resonator = constitution
+            .ring_resonator(ring)
+            .ok_or(HnnError::Founding {
+                what: "the founded ring's declared resonator",
+            })?;
+        // The pump shares the word's clock; a founding introduces no per-ring origin.
+        let phase = resonator
+            .pump()
+            .map_or(0, |pump| pump.phase_at(ticks.saturating_sub(1)));
+        // Every refusal precedes the first push, so a refused founding leaves the change whole.
         let width = field.ring(ring).width();
         let channel = field.contact(contact).width();
         self.storage.push(vec![Rat::zero(); width]);
@@ -468,15 +478,6 @@ impl EndChange {
             .push([vec![Rat::zero(); channel], vec![Rat::zero(); channel]]);
         self.resonators
             .push(Some([vec![Rat::zero(); width], vec![Rat::zero(); width]]));
-        let resonator = constitution
-            .ring_resonator(ring)
-            .ok_or(HnnError::Founding {
-                what: "the founded ring's declared resonator",
-            })?;
-        // The pump shares the word's clock; a founding introduces no per-ring origin.
-        let phase = resonator
-            .pump()
-            .map_or(0, |pump| pump.phase_at(ticks.saturating_sub(1)));
         self.resonator_phases.push(Some(phase));
         Ok(())
     }

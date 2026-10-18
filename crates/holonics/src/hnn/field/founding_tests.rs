@@ -1,6 +1,14 @@
 //! R4b's field expansion and clock/capacity controls (Refs #73 #62).
 use super::*;
 
+/// The external receipt wrapper names the capacity phase it runs; a plain test run names none and
+/// prints no timing line. No test reads its own timings.
+fn receipt(line: std::fmt::Arguments) {
+    if std::env::var_os("R4B_CAPACITY_PHASE").is_some() {
+        println!("{line}");
+    }
+}
+
 pub(crate) fn listener(places: usize, population: u64) -> FieldDeclaration {
     let classes = 16 * places;
     let periods = [classes as u64 + 1, 7, 11];
@@ -178,9 +186,9 @@ pub(super) fn record_capacity_probe(period: u64, n_star: u64, elapsed_ns: u128) 
     CAPACITY_PROBES.with(|record| {
         if let Some(reading) = record.borrow_mut().as_mut() {
             let places = reading.places;
-            println!(
+            receipt(format_args!(
                 "R4B_CAPACITY places={places} l={period} n_star={n_star} elapsed_ns={elapsed_ns}"
-            );
+            ));
             reading.probes.push(CapacityProbe { period, n_star });
         }
     });
@@ -195,8 +203,16 @@ pub(super) fn record_capacity_whole(
     CAPACITY_PROBES.with(|record| {
         if let Some(reading) = record.borrow_mut().as_mut() {
             let places = reading.places;
-            println!("R4B_CAPACITY_WHOLE places={places} l={period} key={} n_star={n_star} elapsed_ns={elapsed_ns} kind={kind}", period - 1);
-            reading.whole.push(WholeCapacity { kind, period, n_star });
+            receipt(format_args!(
+                "R4B_CAPACITY_WHOLE places={places} l={period} key={} n_star={n_star} \
+                 elapsed_ns={elapsed_ns} kind={kind}",
+                period - 1
+            ));
+            reading.whole.push(WholeCapacity {
+                kind,
+                period,
+                n_star,
+            });
         }
     });
 }
@@ -232,24 +248,16 @@ impl Drop for CapacityProbeScope {
 }
 
 fn capacity_control(places: usize) {
-    // A monotone-only invocation is the seven-unit development read, not the full control.
     // Search-only and all are validation partitions; the external receipt wrapper fixes their
     // measured growth projection and stop budget before launch. No test reads its own timings.
     let phase = std::env::var("R4B_CAPACITY_PHASE").unwrap_or_else(|_| "all".into());
-    assert!(matches!(
-        phase.as_str(),
-        "monotone" | "search" | "all" | "count-dev"
-    ));
+    assert!(matches!(phase.as_str(), "search" | "all"));
     let field = Field::declare(listener(places, 1 << 16)).unwrap();
     let probes = CapacityProbeScope::open(places);
     let started = std::time::Instant::now();
     let first_whole = field.found(FoundedRing { period: 2, key: 1 }).unwrap();
     record_capacity_whole(
-        if phase == "monotone" || phase == "count-dev" {
-            "development"
-        } else {
-            "first"
-        },
+        "first",
         2,
         first_whole.capacity().n_star(),
         started.elapsed().as_nanos(),
@@ -257,8 +265,7 @@ fn capacity_control(places: usize) {
     drop(first_whole);
     let mut previous = 0;
     let first = if phase == "search" { 8 } else { 2 };
-    let last = if phase == "monotone" { 8 } else { 9 };
-    for period in first..=last {
+    for period in first..=9 {
         let started = std::time::Instant::now();
         let n = field.founding_n_star(period).unwrap();
         assert_eq!(
@@ -272,38 +279,6 @@ fn capacity_control(places: usize) {
         );
         previous = n;
     }
-    if phase == "monotone" {
-        assert_eq!(probes.whole()[0].n_star, probes.readings()[0].n_star);
-        println!("R4B_CAPACITY_READ places={places} units=7 development_only=true");
-        return;
-    }
-    if phase == "count-dev" {
-        let largest = if places == 1 { 256 } else { 32 };
-        let predicted_boundary = if places == 1 { 150 } else { 18 };
-        let started = std::time::Instant::now();
-        let admits = field.founding_admits(largest).unwrap();
-        println!(
-            "R4B_ADMITS places={places} l={largest} admits={admits} elapsed_ns={} kind=development",
-            started.elapsed().as_nanos()
-        );
-        for (period, kind) in [
-            (predicted_boundary, "development_confirmed"),
-            (predicted_boundary + 1, "development_refused"),
-        ] {
-            let started = std::time::Instant::now();
-            let n_star = match field.found(FoundedRing {
-                period,
-                key: period - 1,
-            }) {
-                Ok(found) => found.capacity().n_star(),
-                Err(HnnError::BelowCapacity { n_star, .. }) => n_star,
-                other => panic!("development whole declaration: {other:?}"),
-            };
-            record_capacity_whole(kind, period, n_star, started.elapsed().as_nanos());
-        }
-        println!("R4B_CAPACITY_READ places={places} development_only=true count_amendment=true");
-        return;
-    }
     let mut search = Vec::new();
     let started = std::time::Instant::now();
     // The public consumer's law, observed through its existing capacity-call seam.
@@ -311,18 +286,18 @@ fn capacity_control(places: usize) {
         .founding_candidates_with(|period| {
             let started = std::time::Instant::now();
             let admits = field.founding_admits(period)?;
-            println!(
+            receipt(format_args!(
                 "R4B_ADMITS places={places} l={period} admits={admits} elapsed_ns={} kind=search",
                 started.elapsed().as_nanos()
-            );
+            ));
             search.push((period, admits));
             Ok(admits)
         })
         .unwrap();
-    println!(
+    receipt(format_args!(
         "R4B_CAPACITY_SEARCH places={places} elapsed_ns={}",
         started.elapsed().as_nanos()
-    );
+    ));
     let readings = probes.readings();
     let maximum = search
         .iter()
@@ -394,10 +369,10 @@ fn capacity_control(places: usize) {
         );
         refused |= !admits;
     }
-    println!(
+    receipt(format_args!(
         "R4B_CAPACITY_BOUNDARY places={places} l_max={maximum} probes={}",
         search.len()
-    );
+    ));
     assert_eq!(
         candidates.iter().map(|c| c.period).collect::<Vec<_>>(),
         (2..=maximum)
@@ -479,10 +454,10 @@ fn r4b_declaration_and_located_route_refusals_are_typed() {
 fn r4b_12_cost_is_the_closed_form_declaration_difference() {
     let started = std::time::Instant::now();
     let base = Field::declare(listener(1, u64::MAX)).unwrap();
-    println!(
+    receipt(format_args!(
         "R4B_COST l=0 key=0 elapsed_ns={} base=true",
         started.elapsed().as_nanos()
-    );
+    ));
     assert_eq!(base.founding_cost(2), 8);
     let base_code = base.describe(12345, 7);
     let mut first = None;
@@ -491,10 +466,10 @@ fn r4b_12_cost_is_the_closed_form_declaration_difference() {
         for key in 0..period {
             let started = std::time::Instant::now();
             let field = base.found(FoundedRing { period, key }).unwrap();
-            println!(
+            receipt(format_args!(
                 "R4B_COST l={period} key={key} elapsed_ns={}",
                 started.elapsed().as_nanos()
-            );
+            ));
             let difference = field.describe(12345, 7).len() - base_code.len();
             assert!(difference <= cost as usize);
             if key == period - 1 {
@@ -508,10 +483,10 @@ fn r4b_12_cost_is_the_closed_form_declaration_difference() {
     let one = first.unwrap();
     let started = std::time::Instant::now();
     let two = one.found(FoundedRing { period: 3, key: 1 }).unwrap();
-    println!(
+    receipt(format_args!(
         "R4B_COST l=3 key=1 elapsed_ns={} founded_count=2",
         started.elapsed().as_nanos()
-    );
+    ));
     let started = std::time::Instant::now();
     for n in 0..=(1u64 << 16) {
         let mut code = Vec::new();
@@ -519,10 +494,10 @@ fn r4b_12_cost_is_the_closed_form_declaration_difference() {
         let bitlen = u64::BITS - (n + 1).leading_zeros();
         assert_eq!(code.len(), (2 * bitlen - 1) as usize, "natural({n})");
     }
-    println!(
+    receipt(format_args!(
         "R4B_COST_LENGTH maximum=65536 count=65537 elapsed_ns={}",
         started.elapsed().as_nanos()
-    );
+    ));
     let mut rings = Vec::new();
     natural(&mut rings, base.rings().len() as u64);
     // The insertion point is the complete original ring block: find it by describing the
@@ -621,9 +596,15 @@ fn r4b_11_guard_nine_reads_only_lock_ports_and_keeps_phase_witnesses() {
     none.sources = vec![3];
     assert!(PairedObservation::admit(&none, &material, &pairing).is_err());
     let current = Current::at_rest(&field);
-    assert!(
-        matches!(crate::hnn::encoding::placement::OccurrencePlacement::at(&field,&current,&[vec![0]]),Err(EncodingError::Hnn(error)) if matches!(*error,HnnError::Founding {what:"the founding's located route is owed"}))
-    );
+    let placed =
+        crate::hnn::encoding::placement::OccurrencePlacement::at(&field, &current, &[vec![0]]);
+    assert!(matches!(
+        placed,
+        Err(EncodingError::Hnn(error)) if matches!(
+            *error,
+            HnnError::Founding { what: "the founding's located route is owed" }
+        )
+    ));
 }
 
 #[test]

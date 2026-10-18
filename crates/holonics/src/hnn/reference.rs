@@ -1331,7 +1331,6 @@ impl ExecutionPort for Reference {
         HnnError,
     > {
         resident.admit_exact_current()?;
-        let mut founding = resident.founding.clone();
         if resident.aeon.awaiting {
             return Err(HnnError::AeonAwaitingClose);
         }
@@ -1402,15 +1401,6 @@ impl ExecutionPort for Reference {
                 return Err(error);
             }
         };
-        if let Some(law) = &mut founding {
-            for class in cells.classes_read().take(ingested.cells) {
-                if let Err(error) = law.receive(class) {
-                    resident.moments.remove(&id);
-                    resident.current = found;
-                    return Err(error);
-                }
-            }
-        }
         let n = open.cells();
         let moment_bits = open.dense_bits();
         // The physical aging operand is each ring's actual elapsed ticks, not the number of
@@ -1443,6 +1433,22 @@ impl ExecutionPort for Reference {
             resident.current = found;
             return Err(error);
         }
+        // The open founding law receives the same consumed prefix as the address, on a copy taken
+        // only when cells were consumed; a refusal discards the open like the refusals above.
+        let founding = match &resident.founding {
+            Some(law) if ingested.cells > 0 => {
+                let mut law = law.clone();
+                for class in cells.classes_read().take(ingested.cells) {
+                    if let Err(error) = law.receive(class) {
+                        resident.moments.remove(&id);
+                        resident.current = found;
+                        return Err(error);
+                    }
+                }
+                Some(law)
+            }
+            _ => None,
+        };
         // The receiving parametron's active suffix address receives the cells the moment took, each
         // tick's letter read by its register's clock, which stays the lift point's (its windings
         // since the aeon's opening, which the carry-out moves to its own lift point), and its
@@ -1450,6 +1456,9 @@ impl ExecutionPort for Reference {
         // ingest and never inside it (`hnn::receiving::LetterReader`).
         for (at, code) in cells.classes_read().take(ingested.cells).enumerate() {
             resident.address.receive_at(code, cells.advance(at))?;
+        }
+        if founding.is_some() {
+            resident.founding = founding;
         }
         let opening = if ingested.carry_out {
             resident.current.lift()
@@ -1506,7 +1515,6 @@ impl ExecutionPort for Reference {
             }
         }
         let receipt = receipt(&field, &ticks, &Rat::one(), work, detail)?;
-        resident.founding = founding;
         Ok((
             id,
             InteractionReturn {
@@ -3629,6 +3637,9 @@ pub struct Exposure {
     /// The cell at which the run stopped at its deadline ([`Reference::with_deadline`]), if it did.
     pub deadline: Option<u64>,
     pub complete: bool,
+    /// The field's code length ([`Field::describe`]) and the declared physics' bits. Since #398 the
+    /// code carries the founded count and the founding flag, two bits more than lengths recorded
+    /// before on a field without a founding law.
     pub description_bits: u64,
     /// Final scalar gains of declared resonators, in ring order (a constitutive reading, not an
     /// event archive).
@@ -5660,14 +5671,18 @@ impl Resident {
         if !self.pending.is_empty()
             || !self.staged.is_empty()
             || self.held_contact_variation.is_some()
+            || self.receiving_chart.is_some()
             || self.participating_world.is_some()
             || self.world_model.is_some()
         {
+            // A receiving chart is encoded over the old rings; no consumer transports it to the
+            // founded field yet, so it refuses rather than goes stale.
             return Err(HnnError::Unadmitted {
-                reason: "founding requires no pending ratio, staged deposit, held variation or World",
+                reason: "founding requires no pending ratio, staged deposit, held variation, \
+                         receiving chart or World",
             });
         }
-        let law = self.founding.as_ref().ok_or(HnnError::Founding {
+        let mut law = self.founding.clone().ok_or(HnnError::Founding {
             what: "a staged founding needs its open law",
         })?;
         let key = law.key(period);
@@ -5735,13 +5750,11 @@ impl Resident {
             next.tally.read(&readings);
             next.ledger.found(reread)?;
         }
-        next.founding
-            .as_mut()
-            .expect("the staged law was checked")
-            .reopen(
-                next.field.cell_clock_period(),
-                next.field.founding_candidates()?,
-            )?;
+        law.reopen(
+            next.field.cell_clock_period(),
+            next.field.founding_candidates()?,
+        )?;
+        next.founding = Some(law);
         next.staged_founding = None;
         next.admit_exact_current()?;
         for moment in next.moments.values() {

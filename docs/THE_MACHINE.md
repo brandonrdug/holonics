@@ -694,7 +694,7 @@ tests can comb through anything valuable").
      unlocated chart, a plural fibre, an unread code) are runtime laws, each pinned by a test.
      Supersedes the residue chart's "stated exception" and its September 29
      `[open]` (`hnn::field`, "The port chart").
-     A founded ring’s clock reads the cell count, not the class; its learned port reads the exact
+     A founded ring's clock reads the cell count, not the class; its learned port reads the exact
      class counts without requiring an injective port chart (#73).
 
 10. **No scalar operand.** `Word::pull_back` accepts only a `RatioCovector`, which only a

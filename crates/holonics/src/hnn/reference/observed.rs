@@ -490,8 +490,7 @@ mod precision_tests {
         let width = field.ring(0).width();
         let grain = Rat::new(
             BigInt::from(1),
-            BigInt::from(crate::hnn::field::receiver_grain(&field.receivers()[0].tolerance).unwrap())
-                << 1usize,
+            BigInt::from(field.finest_grain()) << 1usize,
         );
         let mut source_scale = Rat::one();
         // The same real word is re-read at each power of two. Neither the target nor a

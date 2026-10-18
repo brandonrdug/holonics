@@ -2,7 +2,9 @@
 //!
 //! This is not key location and not a claim that an observation is true. The producing operands
 //! are the constitution's ports E, their admitted dyads B, and the exact left decoders D.
-//! DE=I is required: a singular observation port is refused, never silently quotiented.
+//! DE=I is required on every `Lock` source port: a singular observation port is refused, never
+//! silently quotiented. A founded `Own` ring's port is attached as a phase witness only: it reads
+//! the ring's phase, decodes nothing, and is not certified (the decoder reads a `Lock` port).
 //! The rotor's reduced action U=DPE carries its FULL residual R=PE-EU, so PE=EU+R.
 //!
 //! [definition; agent-inferred, October 17] **Admission certifies what DE=I needs, and the decoder
@@ -401,8 +403,8 @@ impl PairedObservation {
                 classes: self.classes,
                 sources: self.sources.clone(),
                 // The public scalar boundary decoder reads source 0 on its first read
-                // (`Encoded::decoder`); all source witnesses remain attached, and each
-                // independently satisfies DE=I.
+                // (`Encoded::decoder`); all source witnesses remain attached, and each `Lock`
+                // witness independently satisfies DE=I (an `Own` phase witness decodes nothing).
                 decoder: None,
                 fibre: Vec::new(),
                 labels: (0..self.classes).map(Some).collect(),

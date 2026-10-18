@@ -632,18 +632,14 @@ impl FieldDeclaration {
     /// scale of the waves is an assumption the notebook measures at each boundary. Brandon may
     /// override the rule.
     pub fn lattice_by_rule(&self) -> BTreeMap<Locus, u32> {
-        // A receiver without a grain is refused at `Field::declare`, before any declared lattice
-        // is read; read on a declaration not yet declared, the rule takes the grains that exist.
-        let grain: u128 = self
-            .receivers
-            .iter()
-            .filter_map(|receiver| receiver_grain(&receiver.tolerance).ok())
-            .map(u128::from)
-            .max()
-            .unwrap_or(1);
+        // A declaration with a receiver that has no grain has no rule: it declares no lattice, and
+        // `Field::declare` refuses it before any lattice is read, so no grain is substituted.
+        let Ok(grain) = finest_grain(&self.receivers) else {
+            return BTreeMap::new();
+        };
         self.learned_loci()
             .into_iter()
-            .map(|(locus, fan_in)| (locus, lattice_exponent(grain, fan_in)))
+            .map(|(locus, fan_in)| (locus, lattice_exponent(u128::from(grain), fan_in)))
             .collect()
     }
 
@@ -675,6 +671,16 @@ pub fn receiver_grain(tolerance: &Rat) -> Result<u64, HnnError> {
         })
 }
 
+/// **The finest receiver grain** `max_R L_R` over declared receivers, `1` where none is declared:
+/// the one reading of [`receiver_grain`] taken by every consumer of the finest grain (the lattice
+/// rule, the word's lattice, the initial constitution and the population chart). A receiver without
+/// a grain refuses it, typed.
+pub fn finest_grain(receivers: &[ReceiverDeclaration]) -> Result<u64, HnnError> {
+    receivers.iter().try_fold(1, |finest, receiver| {
+        Ok(finest.max(receiver_grain(&receiver.tolerance)?))
+    })
+}
+
 /// **The lattice rule's exponent** ([`FieldDeclaration::lattice_by_rule`]): `L = ⌈log₂(2 L_R X)⌉`
 /// for the finest receiver grain `L_R` and a locus's fan-in `X` (at least one). It is the one owner
 /// of the rule, read by the field's declared loci and by a constitution's declared resonator
@@ -696,6 +702,18 @@ pub fn lattice_exponent(grain: u128, fan_in: u128) -> u32 {
 pub struct FoundedRing {
     pub period: u64,
     pub key: u64,
+}
+
+impl FoundedRing {
+    /// A founded ring is a clock: a period of at least 2 and a key among its phases.
+    fn admit(&self) -> Result<(), HnnError> {
+        if self.period < 2 || self.key >= self.period {
+            return Err(HnnError::Founding {
+                what: "a founded period and key",
+            });
+        }
+        Ok(())
+    }
 }
 
 /// [definition] A ring's advance at a cell, independently of its spatial placement.
@@ -1154,6 +1172,8 @@ pub struct Field {
     exponent_grain: u64,
     quadrance_denominator: BigInt,
     receivers: Vec<ReceiverDeclaration>,
+    /// The receivers' finest grain `max_R L_R` ([`finest_grain`]), read once at the declaration.
+    finest_grain: u64,
     crib: CribDeclaration,
     population: u64,
     operand_bounds: BTreeMap<Locus, u128>,
@@ -1185,10 +1205,8 @@ impl Field {
     /// class enters only where it injects into every source ring's ports, which the encoding checks
     /// (`hnn::encoding::Encoded`, `EncodingError::Fold`; guard 9) and [`Field::admit`] reads.
     pub fn declare(mut declared: FieldDeclaration) -> Result<Self, HnnError> {
-        // Every receiver's grain exists before a lattice reads it ([`receiver_grain`]).
-        for receiver in &declared.receivers {
-            receiver_grain(&receiver.tolerance)?;
-        }
+        // Every receiver's grain exists before a lattice reads it ([`finest_grain`]).
+        let finest_grain = finest_grain(&declared.receivers)?;
         let declaration = declared.clone();
         let predecessor = if declared.founded.is_empty() {
             None
@@ -1200,11 +1218,7 @@ impl Field {
         if let Some(base) = &predecessor {
             let (source, receiver, contact) = base.founding_anchor()?;
             for founded in &declaration.founded {
-                if founded.period < 2 || founded.key >= founded.period {
-                    return Err(HnnError::Founding {
-                        what: "a founded period and key",
-                    });
-                }
+                founded.admit()?;
                 let period = founded.period;
                 let ring = declared.rings.len();
                 declared.rings.push(RingDeclaration {
@@ -1432,6 +1446,7 @@ impl Field {
             exponent_grain: declared.exponent_grain,
             quadrance_denominator,
             receivers: declared.receivers,
+            finest_grain,
             crib: declared.crib,
             population: declared.population,
             operand_bounds,
@@ -1512,7 +1527,11 @@ impl Field {
         Ok((source, neighbour, contact))
     }
 
-    /// The exact description increment: gamma(k+2)-gamma(k+1)+gamma(ell+1)+gamma(ell).
+    /// **The founding's description increment, bounded in its key**:
+    /// `γ(k+2) − γ(k+1) + γ(ℓ+1) + γ(ℓ)` for the `k`-th founding of period `ℓ`, where [`Field::describe`]
+    /// codes `(ℓ, key)` as `γ(ℓ+1)` and `γ(key+1)`. The key is read only after the founding, so the
+    /// cost takes its largest value, `key = ℓ − 1`: it is exact there and an upper bound at every
+    /// other key (the founding law then pays at least the description it adds).
     pub fn founding_cost(&self, period: u64) -> u64 {
         let length = |n: u64| 2 * (BigUint::from(n) + BigUint::one()).bits() - 1;
         let k = self.declaration.founded.len() as u64;
@@ -1528,12 +1547,7 @@ impl Field {
 
     /// One exact count at the declared population on the expanded identity-clock partition.
     pub fn founding_admits(&self, period: u64) -> Result<bool, HnnError> {
-        let mut periods: Vec<_> = self.rings.iter().map(Ring::period).collect();
-        let mut advances: Vec<_> = self.rings.iter().map(Ring::advance).collect();
-        let mut sources = self.sources.clone();
-        periods.push(period);
-        advances.push(RingAdvance::Own);
-        sources.push(self.rings.len());
+        let (periods, advances, sources) = self.founding_partition(period);
         capacity_admits(
             &periods,
             &advances,
@@ -1544,18 +1558,22 @@ impl Field {
         )
     }
 
-    /// Capacity of the expanded partition only; the key does not enter this exact count.
-    #[cfg(test)]
-    fn founding_n_star(&self, period: u64) -> Result<u64, HnnError> {
+    /// The expanded partition a founding of `period` declares: the field's rings and sources with
+    /// one `Own` source ring appended. The key does not enter it.
+    fn founding_partition(&self, period: u64) -> (Vec<u64>, Vec<RingAdvance>, Vec<usize>) {
         let mut periods: Vec<_> = self.rings.iter().map(Ring::period).collect();
         let mut advances: Vec<_> = self.rings.iter().map(Ring::advance).collect();
         let mut sources = self.sources.clone();
         periods.push(period);
         advances.push(RingAdvance::Own);
         sources.push(self.rings.len());
-        let n_star =
-            capacity(&periods, &advances, &sources, self.alphabet, &self.offsets)?.n_star();
-        Ok(n_star)
+        (periods, advances, sources)
+    }
+
+    /// The capacity `n*` of the expanded partition.
+    fn founding_n_star(&self, period: u64) -> Result<u64, HnnError> {
+        let (periods, advances, sources) = self.founding_partition(period);
+        Ok(capacity(&periods, &advances, &sources, self.alphabet, &self.offsets)?.n_star())
     }
 
     /// The same consumer search with an observable one-count predicate for its unit receipts.
@@ -1563,11 +1581,15 @@ impl Field {
         &self,
         mut admits: impl FnMut(u64) -> Result<bool, HnnError>,
     ) -> Result<Vec<Candidate>, HnnError> {
-        let first = self.found(FoundedRing { period: 2, key: 1 });
-        if first.is_err() {
-            return Ok(Vec::new());
+        // A field that cannot found the least period founds nothing; any other refusal is the
+        // search's own and is returned.
+        match self.found(FoundedRing { period: 2, key: 1 }) {
+            Ok(_) => {}
+            Err(HnnError::BelowCapacity { .. } | HnnError::Founding { .. }) => {
+                return Ok(Vec::new());
+            }
+            Err(error) => return Err(error),
         }
-        drop(first);
         let mut below = 2u64;
         let mut above = below.checked_mul(2).ok_or(HnnError::CountOverflow)?;
         while admits(above)? {
@@ -1598,6 +1620,16 @@ impl Field {
 
     /// Re-declare the field while retaining attachments which are not part of its declaration.
     pub fn found(&self, ring: FoundedRing) -> Result<Self, HnnError> {
+        // The ring's own declaration, then the one count at the population, which refuses a
+        // period the population cannot carry before the declaration lays out its rings (whose
+        // extent grows with the period).
+        ring.admit()?;
+        if !self.founding_admits(ring.period)? {
+            return Err(HnnError::BelowCapacity {
+                population: self.population,
+                n_star: self.founding_n_star(ring.period)?,
+            });
+        }
         let mut declaration = self.declaration.clone();
         declaration.founded.push(ring);
         let mut next = Self::declare(declaration)?;
@@ -1792,6 +1824,12 @@ impl Field {
 
     pub fn receivers(&self) -> &[ReceiverDeclaration] {
         &self.receivers
+    }
+
+    /// The receivers' finest grain `max_R L_R` ([`finest_grain`]); a declared field's receivers all
+    /// have a grain.
+    pub fn finest_grain(&self) -> u64 {
+        self.finest_grain
     }
 
     pub fn crib(&self) -> CribDeclaration {
@@ -2554,7 +2592,11 @@ impl Field {
     /// and the constitution's declared values (the step rule, which certifies every locus's step,
     /// and the budget `B_Θ`) with the pending capacity, as Elias-gamma naturals, zig-zag integers
     /// and rationals as (numerator, denominator). It is the one exact code of the declaration
-    /// (guard 13), and `Kt` pays for every part of it (design (f), review D3).
+    /// (guard 13), and `Kt` pays for every part of it (design (f), review D3). The founded rings
+    /// `(ℓ, key)` follow the declared rings from the unfounded base, with the count first and the
+    /// founding flag after them; since #398 every code carries both, so a field without a founding
+    /// law codes two bits more than a description length recorded before (`natural(0)` and the
+    /// flag `natural(0)`), and one with it four.
     pub fn describe(&self, budget: u64, pending_capacity: usize) -> Vec<bool> {
         let field = self.description_base.as_deref().unwrap_or(self);
         let mut code = Vec::new();
@@ -2580,6 +2622,7 @@ impl Field {
             natural(&mut code, ring.period);
             natural(&mut code, ring.key);
         }
+        natural(&mut code, u64::from(self.declaration.founding));
         natural(&mut code, field.contacts.len() as u64);
         for contact in &field.contacts {
             natural(&mut code, contact.from as u64);
@@ -2757,13 +2800,7 @@ fn word_by_rule(
     distances: &[Vec<Option<usize>>],
     receivers: &[ReceiverDeclaration],
 ) -> Result<WordLattice, HnnError> {
-    let grain = receivers
-        .iter()
-        .map(|receiver| receiver_grain(&receiver.tolerance))
-        .collect::<Result<Vec<_>, _>>()?
-        .into_iter()
-        .max()
-        .unwrap_or(1);
+    let grain = finest_grain(receivers)?;
     let fan_in = receivers
         .iter()
         .filter_map(|receiver| rings.get(receiver.ring))
@@ -3050,12 +3087,12 @@ impl Current {
         Ok(Self { lift })
     }
 
-    /// `λ`.
     /// The new ring's clock starts at the same key as its founding evidence.
     pub fn found_ring(&mut self, key: u64) {
         self.lift.push(BigInt::from(key));
     }
 
+    /// `λ`.
     pub fn lift(&self) -> &[BigInt] {
         &self.lift
     }

@@ -82,14 +82,37 @@ fn the_grain_is_derived_from_the_receivers_code_tolerance() {
 /// coarser grain for it (`field::receiver_grain`).
 #[test]
 fn a_receiver_without_a_grain_is_refused_at_declaration() {
-    for tolerance in [Rat::zero(), Rat::new(BigInt::one(), BigInt::one() << 64usize)] {
+    use crate::hnn::field::receiver_grain;
+    // `u64::MAX` is the finest grain the carrier holds; the next tolerance down has none.
+    let finest = BigInt::from(u64::MAX);
+    assert_eq!(
+        receiver_grain(&Rat::new(BigInt::one(), finest.clone())).unwrap(),
+        u64::MAX
+    );
+    let past = Rat::new(BigInt::one(), finest + BigInt::one());
+    for tolerance in [Rat::zero(), rat(-1, 16), past] {
+        assert!(matches!(
+            receiver_grain(&tolerance),
+            Err(HnnError::Tolerance { tolerance: refused }) if refused == tolerance
+        ));
         let mut declared = FieldDeclaration::campaign_one(1 << 17);
         declared.receivers[0].tolerance = tolerance.clone();
+        // The rule declares no lattice without a grain, and the declaration's lattice is that
+        // empty map: a lattice read would refuse it as `Lattice`, so the `Tolerance` refusal shows
+        // the grain is read first.
+        declared.lattice = declared.lattice_by_rule();
+        assert!(declared.lattice.is_empty());
         assert!(matches!(
             Field::declare(declared),
             Err(HnnError::Tolerance { tolerance: refused }) if refused == tolerance
         ));
     }
+    let mut control = FieldDeclaration::campaign_one(1 << 17);
+    control.lattice.clear();
+    assert!(matches!(
+        Field::declare(control),
+        Err(HnnError::Lattice { .. })
+    ));
 }
 
 /// Review C7: an aperture beyond the receiving ring's observability rank over the word is refused,
