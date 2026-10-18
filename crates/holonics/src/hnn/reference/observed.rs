@@ -465,16 +465,13 @@ mod precision_tests {
         )
         .unwrap();
         let source = PairedCarrier::complete_port(&field, 0, &pairing, &free).unwrap();
-        let carrier = PairedCarrier::admit(&field, 0, &pairing, &source).unwrap();
-        let material = crate::hnn::tests::learning::generic_within(&field, 81, OPEN_BUDGET)
+        let base = crate::hnn::tests::learning::generic_within(&field, 81, OPEN_BUDGET)
             .with_ports(
                 0,
                 None,
                 None,
                 Some(ExactRatMatrix::zero(8, field.ring(0).width()).unwrap()),
             )
-            .unwrap()
-            .with_symmetric_source(0, source, carrier.symmetry())
             .unwrap();
         let current = if let Some(steps) = steps_to_boundary {
             Current::at(
@@ -490,29 +487,65 @@ mod precision_tests {
             Current::at_rest(&field)
         };
         let port = Reference::new(4, OPEN_BUDGET);
-        let mut resident = port.mount_with(&field, &current, material).unwrap();
-        let cell = PairedObservation::admit(&field, resident.constitution(), &pairing)
-            .unwrap()
-            .encode(&[0])
-            .unwrap();
-        let (moment, _) = port.ingest(&mut resident, None, &cell).unwrap();
-        assert_eq!(resident.awaiting_boundary(), steps_to_boundary == Some(1));
-        // Unit fixture only: retain a legal sub-lattice imaginary component along an actual
-        // blind receiving operand. No target or diagnostic output chooses its direction.
-        let mut pilot = resident.clone();
-        let phases = pilot.admitted[0].clone();
-        let (pending, _) = port.refine(&mut pilot, &moment, &phases).unwrap();
-        let features = pilot.receiving_inputs(&pending, &phases).unwrap().unwrap();
-        let column = features[0]
-            .iter()
-            .position(|x| !x.is_zero())
-            .expect("a reached receiving coordinate");
         let width = field.ring(0).width();
-        let unit = resident
-            .constitution
-            .lattice(Locus::ReceivingMap(0))
-            .unwrap()
-            .unit();
+        let grain = Rat::new(
+            BigInt::from(1),
+            BigInt::from(crate::hnn::field::receiver_grain(
+                &field.receivers()[0].tolerance,
+            )) << 1usize,
+        );
+        let mut source_scale = Rat::one();
+        // The same real word is re-read at each power of two. Neither the target nor a
+        // fabricated receiver tolerance chooses the seed or its scale.
+        let (mut resident, moment, column, unit) = loop {
+            let rows = (0..source.rows())
+                .map(|r| {
+                    (0..source.columns())
+                        .map(|c| source.get(r, c).unwrap() * &source_scale)
+                        .collect()
+                })
+                .collect();
+            let scaled = ExactRatMatrix::shaped(source.rows(), source.columns(), rows).unwrap();
+            let carrier = PairedCarrier::admit(&field, 0, &pairing, &scaled).unwrap();
+            let material = base
+                .clone()
+                .with_symmetric_source(0, scaled, carrier.symmetry())
+                .unwrap();
+            eprintln!(
+                "observed precision fixture: boundary={steps_to_boundary:?} source_scale={source_scale}"
+            );
+            let mut resident = port.mount_with(&field, &current, material).unwrap();
+            let cell = PairedObservation::admit(&field, resident.constitution(), &pairing)
+                .unwrap()
+                .encode(&[0])
+                .unwrap();
+            let (moment, _) = port.ingest(&mut resident, None, &cell).unwrap();
+            assert_eq!(resident.awaiting_boundary(), steps_to_boundary == Some(1));
+            let mut pilot = resident.clone();
+            let phases = pilot.admitted[0].clone();
+            let (pending, _) = port.refine(&mut pilot, &moment, &phases).unwrap();
+            let features = pilot.receiving_inputs(&pending, &phases).unwrap().unwrap();
+            let column = features[0]
+                .iter()
+                .enumerate()
+                .max_by(|(_, a), (_, b)| a.abs().cmp(&b.abs()))
+                .map(|(column, _)| column)
+                .expect("a reached receiving coordinate");
+            let unit = resident
+                .constitution
+                .lattice(Locus::ReceivingMap(0))
+                .unwrap()
+                .unit();
+            let read = &unit / integer(4) * features[0][column].abs();
+            let norm: Rat = features[0].iter().map(|x| x.abs()).sum();
+            eprintln!(
+                "observed precision fixture: source_scale={source_scale} feature_l1={norm} X={width} retained_read={read} grain={grain}"
+            );
+            if read > grain && norm > integer(width as i64) {
+                break (resident, moment, column, unit);
+            }
+            source_scale *= integer(2);
+        };
         let mut text = resident.constitution.continuing_state(0).unwrap().to_text();
         let start = text.find(&format!("receiving 8 {width}\n")).unwrap();
         let at = start + text[start..].find("map-carry 0\n").unwrap();
@@ -555,8 +588,10 @@ mod precision_tests {
         port.deposit(next, staged).unwrap();
         let before = next.constitution.clone();
         let ledger = next.ledger.balance().clone();
-        let event = before.receiving_precision_event(phases.ring(), &features, phases.tolerance()).unwrap()
-            .expect("the fixed unit fixture must actually publish a previously erased carried component");
+        let event = before
+            .receiving_precision_event(phases.ring(), &features, phases.tolerance())
+            .unwrap()
+            .expect("the above-grain real-word fixture must publish its erased carried component");
         next.publish_receiving_precision(&event).unwrap();
         (features, event, before, ledger)
     }
