@@ -274,7 +274,7 @@ mod tests {
         let mut wrong_declaration = field.declaration().clone();
         // An identity frame over a smaller alphabet may be valid on this field. Use an
         // actually out-of-alphabet cell, rather than treating its declared origin as a defect.
-        wrong_declaration.alphabet = field.alphabet() + 1;
+        wrong_declaration.alphabet = field.alphabet() * 2;
         let wrong_field = Field::declare(wrong_declaration).unwrap();
         let wrong_cells = encoded(&wrong_field, &[field.alphabet()]);
         assert!(
