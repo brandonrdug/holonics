@@ -2535,7 +2535,8 @@ impl SourceMoment {
 
     /// The retained moment reads its port's face before the pending ratio copies the moment.
     /// Each copy owns its slot map and shares only already materialized immutable faces.
-    pub(crate) fn read_retained_pair_faces(
+    /// Derived cache only; no law reads this preparation's audit bookkeeping.
+    pub fn read_retained_pair_faces(
         &self,
         field: &Field,
         material: &dyn FieldMaterial,

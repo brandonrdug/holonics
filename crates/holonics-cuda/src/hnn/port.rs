@@ -1928,6 +1928,9 @@ impl<'c> ExecutionPort for Resident<'c> {
             .ok_or(HnnError::UnknownHandle {
                 handle: Handle::Moment(*moment),
             })?;
+        source
+            .host
+            .read_retained_pair_faces(&resident.field, &resident.constitution)?;
         let mut ratio = PendingRatio::produce(
             &resident.current,
             &source.host,
