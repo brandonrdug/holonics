@@ -563,6 +563,16 @@ fn deliver(
             native.cells,
             &boundary_before,
         )?);
+        emit(format!(
+            "marginal_face section={section} role={role} delivered={} held_matches={:?} totals={:?}",
+            native.cells,
+            resident
+                .constitution()
+                .source_port(0)
+                .map(|_| moment.marginal_face_matches(resident.field(), material))
+                .transpose()?,
+            moment.marginal_face_audit(),
+        ));
     }
     Ok(())
 }
@@ -1248,6 +1258,8 @@ mod tests {
                     "clone_ns",
                     "phase_wall_ns",
                 ]
+            } else if line.starts_with("marginal_face ") {
+                &["section", "role", "delivered", "held_matches", "totals"]
             } else if line.starts_with("cert ") {
                 &["section", "role", "delivered", "steps"]
             } else if line.starts_with("pairing ") {
@@ -1286,6 +1298,7 @@ mod tests {
             "precision ",
             "state ",
             "pair_face ",
+            "marginal_face ",
             "cert ",
             "pairing ",
             "drawn ",

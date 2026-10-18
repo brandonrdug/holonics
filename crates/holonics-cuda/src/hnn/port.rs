@@ -1941,7 +1941,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             })?;
         source
             .host
-            .read_retained_pair_faces(&resident.field, &resident.constitution)?;
+            .read_retained_faces(&resident.field, &resident.constitution)?;
         let mut ratio = PendingRatio::produce(
             &resident.current,
             &source.host,
