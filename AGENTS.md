@@ -111,28 +111,37 @@ general; no cryptanalytic application is pursued.
 
 ## The object's governing laws
 
-[definition] **Exact arithmetic; no floats inside the machinery.** This is a law of the
-mathematics, not a style.
+[definition] **Exact arithmetic; no floats as storage.** This is a precision law about bit purity
+and computational efficiency: it is for dynamic precision and against arbitrary precision. It
+governs what the machinery stores and computes, not how a reading is written in a report or a chat
+(Brandon, October 18: "It is for dynamic precision, it is against arbitrary precision, it is a
+computational efficiency rule, not a rule about the aesthetics of what you can write in chats. Get
+rid of the rule if it pertains to chats, it's a precision law about bit purity.").
 - Values are exact: ratios with their remainder, and integers carried with their factorization
   (`13122 = 2·3⁸`, `729 = 3⁶`), never as bare magnitudes.
 - Algebraic and transcendental quantities are their constraint identities. π and `e` are
   navigators; a float is a face of one, and error enters only in how a face is attained.
 - Estimation is replaced by partition.
-- A float appears only at an exterior boundary where foreign data arrives as floats (matching
-  external data), or in a report at the precision its reading has (the next item). Nothing inside
-  a law, an owner or the HNN consumes a float.
-- A report carries exactly the precision its reading has, never an arbitrary or invented one: the
-  rule is against arbitrary precision, not against valid float reporting (Brandon, October 17).
-  An exact reading is reported exactly: integers with their factorization, ratios with their
-  remainder, enclosures with exact endpoints, a reading at a declared grain (carry, phase class
-  and the unresolved fibre, as `GrainCell`), and comparisons as exact orderings or exact
-  differences. A float or a decimal is a valid report at the precision it truly has, such as a
-  foreign float as it arrived or a clock's reading at its own resolution. A decimal that rounds
-  an exact value, or a precision picked by hand, is a collapse (Brandon, September 25).
-- A percentage is a rate, which is motion; state the motion.
-- A margin, score or reading built from contributions is reported as its series, the winding and
-  turning parts with their sum and carry, never collapsed into one number; a predicted or expected
-  class is reported with what it denotes at its receiver (Brandon, October 7).
+- Storage is a series. A value is kept as the terms of its expansion, numerators grouped over the
+  denominators they share (inversion, charts, basis, gcd, softmax and sigmoid), so terms cancel
+  where the mathematics cancels them and a carrier is as wide as its surviving terms need. A float
+  stored in its place rounds every term to one fixed width and kills the expansion (Brandon,
+  October 18: "they're series expansions of ratios in calculus … you store it as a float and you
+  kill the series expansion that otherwise had terms that could easily be grouped by denominators
+  (inversion, charts, basis, gcd and softmax/sigmoid) and numerators").
+- Width is dynamic, never arbitrary. A carrier widens at a declared crossing when a term outgrows
+  it, and a term is released only by partition at a declared tolerance, with its remainder
+  accounted. A width picked by hand, or a fixed float width standing in for the series, is
+  arbitrary precision.
+- Exact series are the condition for parallel determinism. Integer and rational addition is
+  associative, so co-present terms summed in any order, on any partition of the card, give the same
+  bits; float addition is not associative, so a parallel float sum depends on its schedule. This is
+  what lets many cells deposit as one flow.
+- Foreign data that arrives as floats is converted at the exterior boundary where it arrives.
+  Nothing inside a law, an owner or the HNN stores or consumes a float.
+- A margin, score or reading the machine builds from contributions keeps its series, the winding
+  and turning parts with their sum and carry, never collapsed into one number; a predicted or
+  expected class carries what it denotes at its receiver (Brandon, October 7).
 - No unjustified literal or magic number enters a law.
 
 [definition] **Retention is a quotient sufficient for the admitted future**
