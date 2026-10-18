@@ -1186,6 +1186,7 @@ impl<'c> Word<'c> {
     }
 
     /// Declaration/control differential of the same joined anchors, with no retained Word.
+    #[cfg(test)]
     pub(crate) fn anchor_differential_joined(
         &self,
         anchors: Vec<Vec<Option<Vec<Rat>>>>,

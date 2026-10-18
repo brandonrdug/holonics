@@ -1,15 +1,5 @@
-//! [definition; agent-inferred, October 4] The whole resident passage, format version 3.
-//!
-//! Retain exactly the operands admitted future actions may read: the lift, optional one open
-//! moment, aeon, first-law balance, charts, address including held contact-site kinds,
-//! admitted declaring phases, handle counter and the one arrived comparison/opening.
-//! Arrived is a bounded contemporary operand, not a history or a frozen material cut.
-//! Immediate close, or ingest then close without another compare, may read it.
-//!
-//! Version 3 marks F1: material learned under the old absolute-lift read is not continued
-//! under the passage-frame read. Version 2 and unversioned passages are refused at mount.
-//! Constitution-only states remain a narrower remount. No legacy passage decoder, inferred
-//! empty Arrived or borrowed live predecessor is admitted.
+//! Version 4 retains the resident passage and publication subtotals; the ratio owns its receiver.
+//! Version 2, version 3 and unversioned passages are refused without migration.
 
 use super::*;
 use crate::aeon::EnclosedBalance;
@@ -36,7 +26,7 @@ pub struct ResidentArrived {
 
 /// Validated resident passage fields shared by host and device realizations.
 ///
-/// Construct with [`ResidentPassage::new`] or read the version-3 text with
+/// Construct with [`ResidentPassage::new`] or read the version-4 text with
 /// [`ResidentPassage::from_text`]. Both routes validate by the same parser; `to_text` is the sole
 /// passage serializer used by host and CUDA.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -54,7 +44,7 @@ pub struct ResidentPassageParts {
     pub arrived: Option<ResidentArrived>,
 }
 
-/// The complete, validated resident continuation carried inside `ContinuingState` v2.
+/// The complete, validated resident continuation carried inside `ContinuingState`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResidentPassage {
     parts: ResidentPassageParts,
@@ -71,7 +61,7 @@ impl ResidentPassage {
         Self::from_text(field, constitution, &text)
     }
 
-    /// Read the one native version-3 passage format against its field and contemporary material.
+    /// Read the one native version-4 passage format against its field and contemporary material.
     pub fn from_text(
         field: &Field,
         constitution: &Constitution,
@@ -221,7 +211,7 @@ impl ResidentPassage {
         })
     }
 
-    /// The exact native v3 passage text, including all arrived and mode-view operands.
+    /// The exact native v4 passage text, including all arrived and mode-view operands.
     pub fn to_text(&self) -> String {
         write_passage(&self.parts)
     }
@@ -261,7 +251,7 @@ impl ContinuingState {
 
 fn write_passage(parts: &ResidentPassageParts) -> String {
     let mut s = String::new();
-    line(&mut s, "resident-passage", [3]);
+    line(&mut s, "resident-passage", [4]);
     line(
         &mut s,
         "opens",
@@ -396,19 +386,28 @@ impl Resident {
     }
 }
 
+/// Refuse superseded formats before reading operands whose representation changed.
+pub(crate) fn check_version(line: &str) -> Result<(), HnnError> {
+    let words: Vec<_> = line.split_whitespace().collect();
+    if words == ["resident-passage", "4"] {
+        return Ok(());
+    }
+    let version = match words.as_slice() {
+        ["resident-passage", number] => number
+            .parse()
+            .map(crate::hnn::SavedPassageVersion::Number)
+            .unwrap_or(crate::hnn::SavedPassageVersion::Malformed),
+        ["resident-passage", ..] => crate::hnn::SavedPassageVersion::Malformed,
+        _ => crate::hnn::SavedPassageVersion::Unversioned,
+    };
+    Err(HnnError::PassageVersion { version })
+}
+
 fn read_opening<'a>(
     field: &Field,
     next: Next<'_, 'a>,
 ) -> Result<(Current, Vec<ReceivingPhases>, Opens), HnnError> {
-    let version: Vec<u64> = counted(
-        next("the resident passage version")?,
-        "resident-passage",
-        1,
-        "the resident passage version",
-    )?;
-    if version[0] != 3 {
-        return refused("the resident passage version (expected 3)");
-    }
+    check_version(next("the resident passage version")?)?;
     let opens = match keyed(
         next("the declared opening")?,
         "opens",
@@ -509,11 +508,18 @@ fn write_interval(s: &mut String, key: &str, interval: Option<&ExactInterval>) {
 /// `lower upper` (or `-` before any reading).
 fn write_balance(s: &mut String, balance: &EnclosedBalance) {
     *s += &format!(
-        "ledger {} {} {} {} {}\n",
-        balance.exchanges, balance.depositions, balance.arrivals, balance.cells, balance.widening
+        "ledger {} {} {} {} {} {}\n",
+        balance.exchanges,
+        balance.depositions,
+        balance.publications,
+        balance.arrivals,
+        balance.cells,
+        balance.widening
     );
     write_interval(s, "exchange", Some(&balance.exchange));
     write_interval(s, "deposition", Some(&balance.deposition));
+    write_interval(s, "deposited", Some(&balance.deposited));
+    write_interval(s, "published", Some(&balance.published));
     write_interval(s, "opening", balance.opening.as_ref());
     write_interval(s, "closing", balance.closing.as_ref());
     write_interval(s, "arrived", Some(&balance.arrived));
@@ -534,32 +540,96 @@ fn read_interval(
         _ => refused(what),
     }
 }
-
 fn read_balance<'a>(next: Next<'_, 'a>) -> Result<EnclosedBalance, HnnError> {
     let what = "the first law's balance";
     let words = keyed(next(what)?, "ledger", what)?;
-    let [exchanges, depositions, arrivals, cells, widening] = words[..] else {
-        return refused(what);
-    };
     let whole =
         |interval: Option<ExactInterval>| interval.ok_or(HnnError::ContinuingState { what });
+    let [
+        exchanges,
+        depositions,
+        publications,
+        arrivals,
+        cells,
+        widening,
+    ] = words[..]
+    else {
+        return refused(what);
+    };
+    let exchange = whole(read_interval(next(what)?, "exchange", what)?)?;
+    let deposition = whole(read_interval(next(what)?, "deposition", what)?)?;
+    let deposited = whole(read_interval(next(what)?, "deposited", what)?)?;
+    let published = whole(read_interval(next(what)?, "published", what)?)?;
+    if exact_plus(&deposited, &published) != deposition {
+        return refused("the v4 deposition subtotals against their inclusive total");
+    }
+    let opening = read_interval(next(what)?, "opening", what)?;
+    let closing = read_interval(next(what)?, "closing", what)?;
+    let arrived = whole(read_interval(next(what)?, "arrived", what)?)?;
     Ok(EnclosedBalance {
         exchanges: value(Some(&exchanges), what)?,
         depositions: value(Some(&depositions), what)?,
+        publications: value(Some(&publications), what)?,
         arrivals: value(Some(&arrivals), what)?,
         cells: value(Some(&cells), what)?,
         widening: value(Some(&widening), what)?,
-        exchange: whole(read_interval(next(what)?, "exchange", what)?)?,
-        deposition: whole(read_interval(next(what)?, "deposition", what)?)?,
-        opening: read_interval(next(what)?, "opening", what)?,
-        closing: read_interval(next(what)?, "closing", what)?,
-        arrived: whole(read_interval(next(what)?, "arrived", what)?)?,
+        exchange,
+        deposition,
+        deposited,
+        published,
+        opening,
+        closing,
+        arrived,
     })
+}
+
+fn exact_plus(a: &ExactInterval, b: &ExactInterval) -> ExactInterval {
+    ExactInterval {
+        lower: &a.lower + &b.lower,
+        upper: &a.upper + &b.upper,
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn main_version_three_save_is_refused_before_changed_law_operands() {
+        // Written at 03b949b83006236044e7e15abb2142d00918474d by Resident::continuing_state().to_text().
+        let text = include_str!("fixtures/main-v3.state");
+        assert!(matches!(ContinuingState::from_text(text),
+            Err(HnnError::PassageVersion { version }) if version == crate::hnn::SavedPassageVersion::Number(3)));
+    }
+    #[test]
+    fn version_four_never_decodes_located_prior_text() {
+        let (_, resident) = arrived_resident(false);
+        let state = resident
+            .continuing_state(resident.field.sources()[0])
+            .unwrap();
+        let text = state.to_text();
+        assert!(text.contains("receiving_prior none"));
+        let changed = text.replacen("receiving_prior none", "located none", 1);
+        let stamped = ContinuingState::stamped(&changed, resident.constitution()).unwrap();
+        assert!(ContinuingState::from_text(&stamped).is_err());
+    }
+    #[test]
+    fn superseded_and_unversioned_passages_are_typed_refusals() {
+        for (text, expected) in [
+            (
+                "resident-passage 2",
+                crate::hnn::SavedPassageVersion::Number(2),
+            ),
+            (
+                "resident-passage 3",
+                crate::hnn::SavedPassageVersion::Number(3),
+            ),
+            ("opens rest", crate::hnn::SavedPassageVersion::Unversioned),
+        ] {
+            assert!(
+                matches!(check_version(text), Err(HnnError::PassageVersion { version }) if version == expected)
+            );
+        }
+    }
     fn arrived_resident(outside_future: bool) -> (Reference, Resident) {
         use crate::hnn::tests::{learning, support};
         let field = learning::chain();

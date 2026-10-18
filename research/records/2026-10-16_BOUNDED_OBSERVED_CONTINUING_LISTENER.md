@@ -23,6 +23,11 @@ are admitted before refinement; a later refusal discards the returned view. Both
 paths refuse a second open moment. The close owner reads its offset from the field itself. Stable cell, cert, pairing, keys and drawn lines replace whole native
 Debug receipts. Codes remain enclosures and role-labelled series; they assert no task success.
 
+Receiving precision is derived from the delivered comparison's staged features at the deposited
+successor, with its admitted tolerance. Publication and the same-cell ingest share the resident
+and crib transaction, so a later refusal releases neither state nor exterior view. A checked
+absent event is complete. There is no separate fixed-precision arm or user precision control.
+
 ## Declared routes and causal order
 
 The host requires --route sections or --route observed. The CUDA example accepts sections only
@@ -72,7 +77,7 @@ these host readings consumed zero accelerator compute units.
 
 ## Remaining scope
 
-Precision publication and continuing resume; the device fork (#76); a horizon founded from the
+Continuing resume; the device fork (#76); a horizon founded from the
 moment's own count; the receiver's scale-square tower, recurring-residual capacity founding and
 subsequent design repairs. Separate-process releases on material no run has read depend on resume.
 No useful generation, broad task accuracy or accelerated throughput is claimed here.

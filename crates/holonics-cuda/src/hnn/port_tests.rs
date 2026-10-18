@@ -2959,6 +2959,77 @@ fn the_card_receiving_component_precision_preserves_outputs_and_cold_continuatio
     let card = card();
     let host = Reference::campaign_one();
     let device = Resident::campaign_one(&card);
+    {
+        let mut h = host.mount_with(&field, &current, theta.clone()).unwrap();
+        let mut d = device.mount_with(&field, &current, theta.clone()).unwrap();
+        let input = word(&field, 8, 0xC0_21);
+        let (moment, _) = same(
+            "publication open moment",
+            host.ingest(&mut h, None, &input),
+            device.ingest(&mut d, None, &input),
+        )
+        .unwrap();
+        let phases = h.admitted()[0].clone();
+        let (pending, _) = same(
+            "publication producing receiver",
+            host.refine(&mut h, &moment, &phases),
+            device.refine(&mut d, &moment, &phases),
+        )
+        .unwrap();
+        let targets = word(&field, phases.aperture(), 0xC0_22);
+        let (staged, _) = same(
+            "publication arrived operand",
+            host.compare(&mut h, pending, &targets),
+            device.compare(&mut d, pending, &targets),
+        )
+        .unwrap();
+        same(
+            "publication consumes staged",
+            host.discard(&mut h, Handle::Staged(staged)),
+            device.discard(&mut d, Handle::Staged(staged)),
+        )
+        .unwrap();
+        let before = h.ledger().balance().clone();
+        same(
+            "open-moment precision publication",
+            h.publish_receiving_precision(&event),
+            d.publish_receiving_precision(&event),
+        )
+        .unwrap();
+        let saved = d.continuing_state(field.sources()[0]).unwrap();
+        assert_eq!(saved, h.continuing_state(field.sources()[0]).unwrap());
+        assert_eq!(h.ledger().balance().publications, before.publications + 1);
+        assert_eq!(h.ledger().balance().arrived, before.arrived);
+        assert_eq!(h.ledger().balance().cells, before.cells);
+        assert_eq!(
+            h.ledger().balance(),
+            d.ledger().balance(),
+            "publication keeps the whole enclosed balance, including the published subtotal"
+        );
+        let mut cold = device
+            .mount_continued(&field, &current, opening.clone(), &saved)
+            .unwrap();
+        let input = word(&field, 1, 0xC0_23);
+        let read = same(
+            "publication warm continuation",
+            host.ingest(&mut h, Some(&moment), &input),
+            device.ingest(&mut d, Some(&moment), &input),
+        )
+        .unwrap();
+        assert_eq!(
+            device.ingest(&mut cold, Some(&moment), &input).unwrap(),
+            read
+        );
+        assert_eq!(
+            cold.continuing_state(field.sources()[0]).unwrap(),
+            d.continuing_state(field.sources()[0]).unwrap()
+        );
+        assert_eq!(
+            h.ledger().balance(),
+            d.ledger().balance(),
+            "warm continuation preserves publication balance parity"
+        );
+    }
     let mut h = host.mount_with(&field, &current, theta.clone()).unwrap();
     let mut d = device.mount_with(&field, &current, theta).unwrap();
     same(

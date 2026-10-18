@@ -222,7 +222,7 @@ impl NormalLaw {
         rule: &ChartRule,
         at: &mut BudgetedCarry,
     ) -> Result<Option<PreparedStep>, HnnError> {
-        let Some(origin) = self.located.as_ref() else {
+        let Some(_) = self.receiving_prior else {
             return self.prepare(metric_samples, rule, at);
         };
         let ray = ReceivingWindowRay::read(samples, self.map());
@@ -246,7 +246,6 @@ impl NormalLaw {
             Rat::new(BigInt::one(), BigInt::one() << j.unsigned_abs() as usize)
         };
         let mut candidate = self.clone();
-        candidate.located = Some(LocatedPrior::founded(origin.from));
         let mut movement = PriorMove {
             from: k,
             to: k,
@@ -268,7 +267,6 @@ impl NormalLaw {
                 }
                 Err(_) => {
                     candidate = self.clone();
-                    candidate.located = Some(LocatedPrior::founded(origin.from));
                     factor = Rat::one();
                     movement.held = Some(PriorHeld::Chart);
                 }
@@ -327,13 +325,6 @@ mod joint_tests {
             vec![integer(0)],
         ]);
         let law = NormalLaw::with_receiving_prior(map.clone(), 2);
-        let mut history = law.clone();
-        history.located = Some(LocatedPrior::from_parts(
-            2,
-            integer(1000),
-            integer(-7),
-            integer(900),
-        ));
         let sample = Sample {
             weight: Rat::one(),
             feature: vec![Rat::one()],
@@ -348,17 +339,10 @@ mod joint_tests {
         let samples = vec![sample];
         let rule = ChartRule::new(Lattice::new(20), 16);
         let mut carry = BudgetedCarry::new(Lattice::new(20), 1);
-        let mut other_carry = carry.clone();
         let prepared = law
             .prepare_receiving_window(&samples, &samples, &rule, &mut carry)
             .unwrap()
             .unwrap();
-        let other = history
-            .prepare_receiving_window(&samples, &samples, &rule, &mut other_carry)
-            .unwrap()
-            .unwrap();
-        assert_eq!(prepared.unit.to_rows(), other.unit.to_rows());
-        assert_eq!(prepared.law.gram, other.law.gram);
         assert_eq!(
             prepared.radial.as_ref().unwrap().factor,
             Rat::new(1.into(), 2.into())
@@ -383,7 +367,7 @@ mod joint_tests {
             rate_matrix(&integer(4), &map).unwrap()
         );
         assert_eq!(reading.prior.unwrap().to, 3);
-        assert_eq!(after.located.as_ref().unwrap().a0, Rat::zero());
+        assert_eq!(after.receiving_prior(), Some(2));
         // The actual map plus its carry equals old map + eta times the full direction
         // up to the separately released carry, whose exact accounting is owned by BudgetedCarry.
         for row in 0..map.rows() {

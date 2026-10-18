@@ -61,15 +61,10 @@ dyadic      q(x) ≤ q(2x)  ⇔  2 (V + a) ≤ 3 x V ;  x best on the grid  ⇐ 
    and the opening's located priors lie in `[8/3, 16/3]`, the cell of `2² I`
    (`campaign_one_open_cell`), which the at-map read refines (record §5).
 
-What the Rust carries, read against these statements (#317; #62 holds the rest):
-`receiving_fisher_face` computes item 1's terms on the window's own deposit for the window's
-certified step. A receiver declared `ReceivingPrior::Located { from: k }`
-(`ReceiverDeclaration::receiving_prior`) carries the at-map pair exactly, `a = A₀ + A₁ ln 2` and
-`V = S ln 2` (`LocatedPrior`), its terms read through the map before the window's deposit
-(`prequential_terms`), and moves `k` to the member item 4 locates (`LocatedPrior::member`,
-`NormalLaw::moved_prior`). That representation's carry and rebase, and the move's two exits, are
-`HNN/PriorMove`. A receiver declared `ReceivingPrior::Held(k)` founds `k` once
-(`NormalLaw::with_scaled_prior`, `SolvedChart::founded`) and nothing moves it.
+The historical Rust names `LocatedPrior` and `NormalLaw::moved_prior` are pinned to
+https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2679 (retired historical-pair owner).
+The statements below remain reference mathematics; the current-window receiving owner does
+not consume this carried scalar pair. `prequential_terms` still reads contemporary windows.
 -/
 
 namespace Holonics.HNN.PriorCarry

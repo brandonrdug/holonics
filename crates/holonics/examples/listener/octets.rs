@@ -1461,6 +1461,7 @@ where
             &features,
             phases.tolerance(),
         )?;
+        let storage_before_publication = resident.publication_storage_bits()?;
         let precision_applied = match precision {
             Some(event) => match resident.publish_receiving_precision(&event) {
                 Ok(()) => "applied".to_string(),
@@ -1472,6 +1473,20 @@ where
             None => "none".to_string(),
         };
         cost.precision += elapsed(precision_started);
+        let storage_after_publication = resident.publication_storage_bits()?;
+        // The arrived operand remains resident after publication; no duplicate receiver is held.
+        let retained_arrived = if precision_applied == "applied" {
+            storage_after_publication.arrived
+        } else {
+            0
+        };
+        println!(
+            "publication_storage section={index} retained_arrived_bits={} arrived_bits={} executed_chart_bits_before={} executed_chart_bits_after={}",
+            retained_arrived,
+            storage_after_publication.arrived,
+            storage_before_publication.charts,
+            storage_after_publication.charts,
+        );
         let section_baselines = stream
             .baselines
             .iter()

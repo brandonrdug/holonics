@@ -2178,9 +2178,8 @@ pub struct NormalLaw {
     chart: SolvedChart,
     map_carry: Carry,
     gram_carry: Carry,
-    /// The receiving prior's carried pair on a receiving law ([`LocatedPrior`]); `None` on a source
-    /// or contrast law.
-    located: Option<LocatedPrior>,
+    /// Immutable founding declaration; absent on source and contrast laws.
+    receiving_prior: Option<u32>,
     /// [definition; agent-inferred, October 8] The receiving law's exact phase-comparison statistics
     /// ([`PhaseStatistics`]): per class one fixed-size sum of the readings that reached the map, in
     /// the doubled lifted phase targets the map's imaginary rows are regressed on, absorbed in the
@@ -2212,7 +2211,7 @@ impl NormalLaw {
             carrier: crate::hnn::receiving::ReceivingCarrier::Anchor,
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
-            located: None,
+            receiving_prior: None,
             phase: None,
             symmetry: None,
         }
@@ -2247,22 +2246,20 @@ impl NormalLaw {
             carrier: crate::hnn::receiving::ReceivingCarrier::Anchor,
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
-            located: None,
+            receiving_prior: None,
             phase: None,
             symmetry: None,
         }
     }
 
-    /// **The receiving map's law as its field declares its prior**: founded at `2^k I`
-    /// ([`NormalLaw::with_scaled_prior`]) with the prequential pair carried from zero
-    /// ([`LocatedPrior`]), so the readings move `k` (`ReceiverDeclaration::receiving_prior`), and
-    /// with the phase statistics founded empty ([`PhaseStatistics::founded`]): the receiving map's
-    /// rows are realified `[Re, Im]` per class, so its `m` rows are `m/2` classes, each regressed
-    /// on the map's `n` features.
+    /// Founded at the field's immutable declared prior with empty phase statistics.
+    /// Current-window proposals may move the ridge, but never this founding declaration.
+    /// The receiving map's rows are realified `[Re, Im]` per class, so its `m` rows
+    /// are `m/2` classes, each regressed on the map's `n` features.
     pub fn with_receiving_prior(map: ExactRatMatrix, from: u32) -> Self {
         let phase = PhaseStatistics::founded(map.rows() / 2, map.columns());
         Self {
-            located: Some(LocatedPrior::founded(from)),
+            receiving_prior: Some(from),
             phase: Some(phase),
             ..Self::with_scaled_prior(map, from)
         }
@@ -2271,7 +2268,7 @@ impl NormalLaw {
     /// The member a receiving law's prior was founded at, `None` on a source or contrast law, which
     /// keeps the unit prior and carries no pair.
     pub fn receiving_prior(&self) -> Option<u32> {
-        self.located.as_ref().map(|pair| pair.from)
+        self.receiving_prior
     }
 
     /// The carrier on which this law's map, Gram, solved chart and prior were founded.
@@ -2279,15 +2276,7 @@ impl NormalLaw {
         self.carrier
     }
 
-    /// The receiving prior's carried pair, `None` on a source or contrast law.
-    pub fn located(&self) -> Option<&LocatedPrior> {
-        self.located.as_ref()
-    }
-
-    /// The exponent `k` of the prior ridge `2^k I` in force (moved by the located prior): the
-    /// solved chart's scale ([`SolvedChart::scale`]), which the Gram's diagonal off the chart's
-    /// support holds at `2^k` and [`NormalLaw::moved_prior`] moves together with the Gram, the map
-    /// and the chart.
+    /// The current ridge exponent, distinct from the immutable founding declaration.
     pub fn prior_scale(&self) -> u32 {
         self.chart.scale
     }
@@ -2302,7 +2291,7 @@ impl NormalLaw {
     }
 
     /// Whether the law is at its founding: the unit prior, no remainder, the identity chart, no
-    /// located pair, statistics or symmetry; only its map is declared.
+    /// founding declaration, statistics or symmetry; only its map is declared.
     fn is_founding(&self) -> bool {
         *self == Self::with_prior(self.map.clone())
     }
@@ -2367,18 +2356,6 @@ impl NormalLaw {
             });
         }
         Ok(())
-    }
-
-    /// The law with its carried pair replaced (a test's pair at a chosen Newton point).
-    #[cfg(test)]
-    pub(crate) fn with_located(self, located: Option<LocatedPrior>) -> Self {
-        Self { located, ..self }
-    }
-
-    /// The law with its phase statistics replaced (a test's statistics at a chosen point).
-    #[cfg(test)]
-    pub(crate) fn with_phase(self, phase: Option<PhaseStatistics>) -> Self {
-        Self { phase, ..self }
     }
 
     /// `W`.
@@ -2666,161 +2643,6 @@ impl NormalLaw {
     }
 }
 
-/// [definition; agent-inferred, October 4; the
-/// [prior carry's design](../../../../research/records/2026-10-04_THE_RECEIVING_PRIOR_IS_CARRIED_BESIDE_ITS_GRAM_AND_MOVES_TO_THE_CODES_CELL.md)
-/// §2] **The receiving prior's carried pair**: the prequential code's alignment `a = A₀ + A₁ ln 2`
-/// and curvature `V = S ln 2` at the map in force, with `A₀`, `A₁` and `S` exact (`ln 2` is
-/// irrational, so the representation is unique and nothing is rounded), and the `k` the
-/// declaration founded the prior at. A window's readings add their terms
-/// ([`prequential_terms`]) to `A₀` and `S`; only a move of the prior changes `A₁`
-/// ([`LocatedPrior::rebased`]). The pair after two windows is read from the pair after the first,
-/// so no reading is kept (Lean `HNN/PriorCarry.{carried_append, carried_eq_sum}`).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct LocatedPrior {
-    from: u32,
-    a0: Rat,
-    a1: Rat,
-    s: Rat,
-}
-
-impl LocatedPrior {
-    /// The pair at its founding: no reading yet, at the declared `2^from I`.
-    fn founded(from: u32) -> Self {
-        Self {
-            from,
-            a0: Rat::zero(),
-            a1: Rat::zero(),
-            s: Rat::zero(),
-        }
-    }
-
-    /// The pair as text's parts and back: `(from, A₀, A₁, S)`.
-    pub fn parts(&self) -> (u32, &Rat, &Rat, &Rat) {
-        (self.from, &self.a0, &self.a1, &self.s)
-    }
-
-    /// The pair from its parts (a continuing state's reading).
-    pub fn from_parts(from: u32, a0: Rat, a1: Rat, s: Rat) -> Self {
-        Self { from, a0, a1, s }
-    }
-
-    /// A window's terms `(Σα_t, Σσ_t)` read at the map in force, added.
-    pub(crate) fn read(&mut self, (alignment, curvature): &(Rat, Rat)) {
-        self.a0 += alignment;
-        self.s += curvature;
-    }
-
-    /// **The pair rebased to the member `x`** (Lean `HNN/PriorCarry.rebaseAt`, `model_rebase`):
-    /// `(a, V) ↦ (x (a − (x − 1) V), x² V)`, which in the exact representation is
-    /// `(A₀, A₁, S) ↦ (x A₀, x (A₁ − (x − 1) S), x² S)`.
-    pub(crate) fn rebased(&self, x: &Rat) -> Self {
-        let one = Rat::one();
-        Self {
-            from: self.from,
-            a0: x * &self.a0,
-            a1: x * (&self.a1 - (x - &one) * &self.s),
-            s: x * x * &self.s,
-        }
-    }
-
-    /// **The member the pair locates** (the design §3), as the exponent `j` of `x = 2^j` with the
-    /// prior at `k` (member `x` is the prior `2^(k − j)`), or the reason it holds. Every comparison
-    /// is the sign of an `r + t ln 2`, read through `ln 2`'s enclosure: a sign inside it holds `k`.
-    /// - `S = 0`: no curvature locates nothing.
-    /// - `V + a ≤ 0`: the code falls toward the zero map at every member, so no member codes least;
-    ///   one member, `j = −1`, the least move the evidence asks, held at the carrier's residual
-    ///   shift (`PriorHeld::Carrier`).
-    /// - Otherwise the `j` whose cell `3x/4 ≤ 1 + a/V ≤ 3x/2` holds the Newton point, the code-least
-    ///   member (Lean `HNN/PriorCarry.grid_member_best_zpow`), with `k − j` floored at `0`: on the
-    ///   members the code descends up to the cell, so `2^0` codes least among the admitted ones.
-    pub(crate) fn member(&self, k: u32) -> Result<(i64, Option<PriorHeld>), HnnError> {
-        if self.s.is_zero() {
-            return Ok((0, Some(PriorHeld::NoCurvature)));
-        }
-        let ln2 = crate::hnn::executed::ln_two()?;
-        // Whether `r + t ln 2 ≤ 0`, `None` inside the enclosure.
-        let at_most_zero = |r: Rat, t: Rat| -> Option<bool> {
-            let low = &r + &t * &ln2.lower;
-            let high = &r + &t * &ln2.upper;
-            match (low.is_positive(), high.is_positive()) {
-                (false, false) => Some(true),
-                (true, true) => Some(false),
-                _ => None,
-            }
-        };
-        let (a0, a1, s) = (&self.a0, &self.a1, &self.s);
-        let two = Rat::from_integer(BigInt::from(2));
-        let (three, four) = (
-            Rat::from_integer(BigInt::from(3)),
-            Rat::from_integer(BigInt::from(4)),
-        );
-        // V + a ≤ 0 is A₀ + (S + A₁) ln 2 ≤ 0.
-        match at_most_zero(a0.clone(), s + a1) {
-            None => return Ok((0, Some(PriorHeld::Undecided))),
-            Some(true) => {
-                // No member codes least here (Lean `HNN/PriorMove.exit_down_iterate`: half the map
-                // still codes strictly less, and `rebaseAt_add` keeps `V + a ≤ 0` through every
-                // halving), so the prior rises one member per deposit while its exponent is representable.
-                if k == u32::MAX {
-                    return Ok((0, Some(PriorHeld::Carrier)));
-                }
-                return Ok((-1, None));
-            }
-            Some(false) => {}
-        }
-        // 2(V + a) ≤ 3xV: the Newton point is at most 3x/2.
-        let below_high = |x: &Rat| at_most_zero(&two * a0, &two * s + &two * a1 - &three * x * s);
-        // 3xV ≤ 4(V + a): the Newton point is at least 3x/4.
-        let above_low =
-            |x: &Rat| at_most_zero(-(&four * a0), &three * x * s - &four * s - &four * a1);
-        let power = |j: i64| -> Rat {
-            let p = BigInt::one() << j.unsigned_abs() as usize;
-            if j >= 0 {
-                Rat::from_integer(p)
-            } else {
-                Rat::new(BigInt::one(), p)
-            }
-        };
-        match below_high(&Rat::one()) {
-            None => return Ok((0, Some(PriorHeld::Undecided))),
-            Some(false) => {
-                // The Newton point lies above the unit's cell: the prior falls, at most to 2^0.
-                let mut j = 1i64;
-                loop {
-                    if j > i64::from(k) {
-                        return Ok((i64::from(k), Some(PriorHeld::Floor)));
-                    }
-                    match below_high(&power(j)) {
-                        None => return Ok((0, Some(PriorHeld::Undecided))),
-                        Some(true) => return Ok((j, None)),
-                        Some(false) => j += 1,
-                    }
-                }
-            }
-            Some(true) => {}
-        }
-        match above_low(&Rat::one()) {
-            None => Ok((0, Some(PriorHeld::Undecided))),
-            Some(true) => Ok((0, None)),
-            Some(false) => {
-                // The Newton point lies below the unit's cell: the prior rises, as far as the chart's
-                // lattice can carry its scale.
-                let mut j = -1i64;
-                loop {
-                    if i64::from(k) - j > i64::from(u32::MAX) {
-                        return Ok((0, Some(PriorHeld::Carrier)));
-                    }
-                    match above_low(&power(j)) {
-                        None => return Ok((0, Some(PriorHeld::Undecided))),
-                        Some(true) => return Ok((j, None)),
-                        Some(false) => j -= 1,
-                    }
-                }
-            }
-        }
-    }
-}
-
 /// [definition; agent-inferred, October 4; the prior carry's design §3] **Why a located prior's
 /// `k` did not move to its member**: a sign inside `ln 2`'s enclosure, a member below `2^0`
 /// (moved to `0`), a moved chart that did not certify, a scale the chart's lattice cannot carry,
@@ -2967,103 +2789,6 @@ pub struct PriorMove {
     pub to: u32,
     pub held: Option<PriorHeld>,
     pub certificate: Option<Rat>,
-}
-
-impl NormalLaw {
-    /// **The located prior read and moved** (the prior carry's design §3), after a deposit added its
-    /// window's terms: the member the pair locates ([`LocatedPrior::member`]) and, when it differs
-    /// from the prior in force, one atomic successor. With `x = 2^(k − k′)`:
-    /// - the map's value `W′ + r′ = x (W + r)`, the map the law located (`L(φ)` is the code along
-    ///   `φ W`), moved through the map's carry by its budgeted deposit `(x − 1)(W + r)` so a
-    ///   remainder is carried, not dropped;
-    /// - the Gram `H′ = H + (2^(k′) − 2^k) I`, the readings' statistic unchanged;
-    /// - the chart at scale `k′` ([`SolvedChart::moved`]);
-    /// - the pair rebased by `x` ([`LocatedPrior::rebased`]), so its Newton point lands in the unit's
-    ///   cell and the law does not move again until new readings move it (Lean
-    ///   `HNN/PriorCarry.{newton_rebaseAt, rebase_into_cell}`).
-    ///
-    /// When the chart does not certify, the unmoved law stands and the read says so. `None` on a
-    /// source or contrast law, which carries no pair.
-    pub(crate) fn moved_prior(
-        &self,
-        rule: &ChartRule,
-        at: &mut BudgetedCarry,
-    ) -> Result<Option<(Self, PriorMove)>, HnnError> {
-        let Some(pair) = &self.located else {
-            return Ok(None);
-        };
-        let k = self.chart.scale;
-        let (j, held) = pair.member(k)?;
-        let unmoved = |held| PriorMove {
-            from: k,
-            to: k,
-            held,
-            certificate: None,
-        };
-        if j == 0 {
-            return Ok(Some((self.clone(), unmoved(held))));
-        }
-        let to = u32::try_from(i64::from(k) - j).map_err(|_| {
-            chart_extent_overflow(
-                "LocatedPrior::moved_prior.scale_to_u32",
-                Some(rule.lattice().exponent()),
-                Some(k),
-                Some(self.chart.exponent),
-                None,
-                None,
-                Some(self.chart.support.len()),
-            )
-        })?;
-        let power = |e: u32| Rat::from_integer(BigInt::one() << e as usize);
-        let mut gram = self.gram.clone();
-        let shift = power(to) - power(k);
-        for (i, row) in gram.iter_mut().enumerate() {
-            row[i] += &shift;
-        }
-        let Ok((chart, _)) = self.chart.moved(&gram, to, rule) else {
-            return Ok(Some((self.clone(), unmoved(Some(PriorHeld::Chart)))));
-        };
-        let x = if j > 0 {
-            power(j as u32)
-        } else {
-            Rat::new(BigInt::one(), BigInt::one() << j.unsigned_abs() as usize)
-        };
-        let (m, n) = (self.map.rows(), self.map.columns());
-        let mut map_carry = self.map_carry.clone();
-        let mut map = self.map.entries().to_vec();
-        // The map's value is its lattice entry with its carried remainder, so the move deposits
-        // `(x − 1)(W + r)` and `W′ + r′ = x (W + r)` (the deposit's staged release is emitted, not
-        // retained, and is not scaled).
-        let update: Vec<Rat> = map
-            .iter()
-            .enumerate()
-            .map(|(i, w)| (&x - Rat::one()) * (w + map_carry.at(i)))
-            .collect();
-        map_carry.deposit_all(at, Carrier::Map, &mut map, &update);
-        let certificate = chart.certificate().clone();
-        // The phase statistics are the readings' own sums: a move of the prior (the ridge, the map's
-        // value, the chart and the pair) changes none of them.
-        let moved = Self {
-            map: flat_matrix(m, n, map)?,
-            carrier: self.carrier,
-            gram,
-            chart,
-            map_carry,
-            gram_carry: self.gram_carry.clone(),
-            located: Some(pair.rebased(&x)),
-            phase: self.phase.clone(),
-            symmetry: self.symmetry.clone(),
-        };
-        Ok(Some((
-            moved,
-            PriorMove {
-                from: k,
-                to,
-                held,
-                certificate: Some(certificate),
-            },
-        )))
-    }
 }
 
 /// [definition; agent-inferred, October 4; the prior carry's design §2] **A window's prequential
@@ -5118,9 +4843,10 @@ impl Constitution {
         for material in &mut theta.rings {
             if let Some(law) = material.receiving.take() {
                 material.receiving = Some(match law {
-                    ReceivingMaterial::Single(law) => {
-                        ReceivingMaterial::Single(law.with_located(None))
-                    }
+                    ReceivingMaterial::Single(law) => ReceivingMaterial::Single(NormalLaw {
+                        receiving_prior: None,
+                        ..law
+                    }),
                     other => other,
                 });
             }
@@ -9430,6 +9156,7 @@ impl ComparisonCandidate {
     /// The trusted producing-comparison owner supplies joint class-plus-phase
     /// enclosures from identical frozen context. No public caller-provided score
     /// can authorize publication through this boundary.
+    #[cfg(test)]
     pub(crate) fn admit(
         self,
         before: &crate::ratio::algebraic::ExactInterval,
@@ -10569,7 +10296,7 @@ pub(crate) fn certify_storage_growth(
 ///   the contrast's normal law, the slices) with their statistics, its source port's normal law
 ///   whole (the map `E`, the carried Gram `H`, the solved chart `X̂` with its lattice, support and
 ///   certificate, and the carried remainders) with its pair ports and the navigator's transport
-///   modulus `ρ`, its receiving map's normal law whole with its located prior's pair and its phase
+///   modulus `ρ`, its receiving map's normal law whole with its immutable founding declaration and its phase
 ///   statistics, its landmark
 ///   tree's executed standing, its population's reading, and its resonator's declared gains with their
 ///   statistics;
@@ -11376,9 +11103,9 @@ impl LearnedRing {
             read_optional_law(lines, "source", "a ring's source law")?
         };
         if let Some(law) = &source {
-            if law.located.is_some() || law.phase.is_some() || law.chart.scale != 0 {
+            if law.receiving_prior.is_some() || law.phase.is_some() || law.chart.scale != 0 {
                 return refuse(
-                    "a source law (founded at the unit prior, with no located pair or phase statistics)",
+                    "a source law (founded at the unit prior, with no receiving declaration or phase statistics)",
                 );
             }
         }
@@ -11649,6 +11376,12 @@ impl ContinuingState {
             || check[1].parse::<u128>().ok() != Some(text_residue(body))
         {
             return refuse("the check (the state is damaged)");
+        }
+        // A superseded passage is rejected before interpreting changed normal-law text.
+        if let Some(at) = body.lines().position(|line| line.starts_with("passage ")) {
+            if let Some(line) = body.lines().nth(at + 1) {
+                crate::hnn::reference::passage::check_version(line)?;
+            }
         }
         let mut lines = text.lines();
         let map = read_matrix(&mut lines, "E", "the port's head")?;
@@ -11953,7 +11686,7 @@ fn read_rows(
 /// **A normal law's parts as text** ([`ContinuingState::to_text`]), its map written by its caller:
 /// `gram n` with its rows, `chart L_s δ k`, `support s` with the support, `block` with the chart's
 /// integer coordinates, `map-carry c` and `gram-carry c` each with `index value` lines,
-/// `located from A₀ A₁ S` or `located none`, and `phase none` or the phase statistics
+/// `receiving_prior k` or `receiving_prior none`, and `phase none` or the phase statistics
 /// ([`write_phase`]).
 fn write_law(s: &mut String, law: &NormalLaw) {
     let join = |values: &mut dyn Iterator<Item = String>| values.collect::<Vec<_>>().join(" ");
@@ -11982,9 +11715,9 @@ fn write_law(s: &mut String, law: &NormalLaw) {
             *s += &format!("{index} {value}\n");
         }
     }
-    match &law.located {
-        Some(pair) => *s += &format!("located {} {} {} {}\n", pair.from, pair.a0, pair.a1, pair.s),
-        None => *s += "located none\n",
+    match law.receiving_prior {
+        Some(k) => *s += &format!("receiving_prior {k}\n"),
+        None => *s += "receiving_prior none\n",
     }
     match &law.phase {
         Some(phase) => write_phase(s, phase),
@@ -12211,30 +11944,18 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
         }
         carries.push(Carry(carry));
     }
-    let located = match head(
-        next(lines, "the located pair")?,
-        "located",
-        "the located pair",
+    let receiving_prior = match head(
+        next(lines, "the receiving prior declaration")?,
+        "receiving_prior",
+        "the receiving prior declaration",
     )?
     .as_slice()
     {
         [none] if none == "none" => None,
-        [from, a0, a1, s] => {
-            let exact = |x: &String| {
-                x.parse::<Rat>().map_err(|_| HnnError::ContinuingState {
-                    what: "the located pair",
-                })
-            };
-            Some(LocatedPrior {
-                from: from.parse().map_err(|_| HnnError::ContinuingState {
-                    what: "the located pair's founding",
-                })?,
-                a0: exact(a0)?,
-                a1: exact(a1)?,
-                s: exact(s)?,
-            })
-        }
-        _ => return refuse("the located pair"),
+        [k] => Some(k.parse().map_err(|_| HnnError::ContinuingState {
+            what: "the receiving prior declaration",
+        })?),
+        _ => return refuse("the receiving prior declaration"),
     };
     let phase = read_phase(lines, &map)?;
     let symmetry = read_symmetry(lines, &map)?;
@@ -12289,7 +12010,7 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
         },
         map_carry,
         gram_carry,
-        located,
+        receiving_prior,
         phase,
         symmetry,
     };

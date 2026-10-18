@@ -1260,7 +1260,10 @@ fn a_carried_remainder_takes_its_lattice_and_clock_bits() {
         for (locus, _, _, r) in theta.carried_remainders() {
             let lattice = theta.lattice(locus).unwrap();
             let k = gamma_length(theta.clock(locus));
-            assert!(on_its_clock_grid(&r, lattice.exponent(), k), "{locus:?}: {r}");
+            assert!(
+                on_its_clock_grid(&r, lattice.exponent(), k),
+                "{locus:?}: {r}"
+            );
             let bits = r.numer().bits() + r.denom().bits();
             assert!(bits <= u64::from(lattice.exponent() + 2 * k + 1));
             bound += u64::from(lattice.exponent() + 2 * k + 1);
@@ -1399,8 +1402,20 @@ fn an_early_tiny_factor_step_is_released_then_accumulates_across_a_founding_cell
     let half = founding.unit() / integer(2);
     let third = |shift: usize| Rat::new(BigInt::one(), BigInt::from(3) << shift);
     let histories = [
-        (third(24), None, 32u64, Some(815u64), rat(255_635, 4_194_304)),
-        (third(24), Some(500u64), 32, Some(500), rat(1_008_531, 16_777_216)),
+        (
+            third(24),
+            None,
+            32u64,
+            Some(815u64),
+            rat(255_635, 4_194_304),
+        ),
+        (
+            third(24),
+            Some(500u64),
+            32,
+            Some(500),
+            rat(1_008_531, 16_777_216),
+        ),
         (third(31), None, 256, None, rat(1_005, 4_194_304)),
     ];
     for carrier in CONTACT_CARRIERS {
@@ -1413,7 +1428,8 @@ fn an_early_tiny_factor_step_is_released_then_accumulates_across_a_founding_cell
                 let mut at = BudgetedCarry::new(lattice, m);
                 if *rebase == Some(m) {
                     let before = &value[0] + carry.at(0);
-                    at.rebase(2, &mut [(&mut carry, value.as_mut_slice())]).unwrap();
+                    at.rebase(2, &mut [(&mut carry, value.as_mut_slice())])
+                        .unwrap();
                     lattice = at.lattice();
                     assert_eq!(&value[0] + carry.at(0), before);
                     assert!(at.released().is_empty());
@@ -1485,7 +1501,10 @@ fn a_restored_remainder_off_its_fine_lattice_or_half_cell_is_refused() {
         .collect();
     assert!(held.iter().any(|(c, ..)| *c == Carrier::Factor(0)));
     assert!(held.iter().any(|(c, ..)| *c == Carrier::FactorScale(0)));
-    assert!(held.iter().all(|(.., e)| (e.denom() % BigInt::from(3)).is_zero()));
+    assert!(
+        held.iter()
+            .all(|(.., e)| (e.denom() % BigInt::from(3)).is_zero())
+    );
     assert!(
         first
             .carried_remainders()
@@ -1549,9 +1568,15 @@ fn a_restored_remainder_off_its_fine_lattice_or_half_cell_is_refused() {
         half.clone()
     )]))));
     let carried = restore(&with_remainders(&[(Carrier::Factor(0), 0, -half.clone())])).unwrap();
-    assert!(carried.carried_remainders().into_iter().any(
-        |(l, c, i, r)| l == locus && c == Carrier::Factor(0) && i == 0 && r == -half.clone()
-    ));
+    assert!(
+        carried
+            .carried_remainders()
+            .into_iter()
+            .any(|(l, c, i, r)| l == locus
+                && c == Carrier::Factor(0)
+                && i == 0
+                && r == -half.clone())
+    );
     carried.deposited(&storage(&carried)).unwrap();
 }
 
@@ -3380,67 +3405,8 @@ fn only_a_reached_face_of_nonnegative_weight_is_absorbed_and_the_rest_is_skipped
 /// and moves `k = 2` to `k′ = 1` by its pair's Newton point; the moved law holds the same
 /// statistics, and the sources and contrasts of a constitution hold none.
 #[test]
-fn a_moved_prior_keeps_the_phase_statistics_and_the_ridge_is_read_at_its_scale() {
-    use crate::hnn::constitution::LocatedPrior;
+fn the_founding_declaration_keeps_its_empty_phase_statistics() {
     use crate::hnn::phase_family::PhaseStatistics;
-    let lattice = Lattice::new(4);
-    let rule = ChartRule::new(lattice, 16);
-    let map = ExactRatMatrix::shaped(
-        4,
-        2,
-        vec![
-            vec![rat(1, 2), rat(-1, 4)],
-            vec![rat(1, 8), Rat::zero()],
-            vec![rat(-3, 4), rat(1, 2)],
-            vec![Rat::zero(), rat(1, 16)],
-        ],
-    )
-    .unwrap();
-    let law = NormalLaw::with_receiving_prior(map, 2);
-    assert_eq!(law.prior_scale(), 2);
-    assert_eq!(
-        law.phase_statistics(),
-        Some(&PhaseStatistics::founded(2, 2))
-    );
-    // One deposit so the Gram has a support (the prior carry's window at t = 1).
-    let reading = |feature: [Rat; 2], masses: [Rat; 2], target: usize| {
-        let covector: Vec<Rat> = (0..2)
-            .flat_map(|c| {
-                let q = if c == target { Rat::one() } else { Rat::zero() };
-                [q - &masses[c], rat(1, 16)]
-            })
-            .collect();
-        face_sample(feature.to_vec(), covector, None)
-    };
-    let samples = vec![
-        reading([rat(-1, 4), rat(1, 2)], [rat(3, 8), rat(5, 8)], 0),
-        reading([rat(1, 4), rat(-1, 4)], [rat(5, 8), rat(3, 8)], 0),
-        reading([rat(-1, 2), rat(1, 4)], [rat(3, 8), rat(5, 8)], 0),
-    ];
-    let mut at = BudgetedCarry::new(lattice, 1);
-    let (law, _) = law.deposited(&samples, &rat(1, 4), &rule, &mut at).unwrap();
-    // The statistics a window left, and a pair whose Newton point asks for k′ = 1.
-    let mut statistics = PhaseStatistics::founded(2, 2);
-    statistics
-        .absorb(
-            &Rat::one(),
-            &[rat(1, 2), rat(-1, 4)],
-            &[rat(1, 2), rat(1, 2)],
-            &[rat(1, 3), rat(-2, 3)],
-        )
-        .unwrap();
-    let s = rat(5, 3);
-    let law = law
-        .with_phase(Some(statistics.clone()))
-        .with_located(Some(LocatedPrior::from_parts(2, Rat::zero(), s.clone(), s)));
-    let (moved, read) = law
-        .moved_prior(&rule, &mut BudgetedCarry::new(lattice, 2))
-        .unwrap()
-        .unwrap();
-    assert_eq!((read.from, read.to, read.held), (2, 1, None));
-    assert_eq!(moved.prior_scale(), 1);
-    assert_eq!(moved.phase_statistics(), Some(&statistics));
-
     // Sources and contrasts hold none; the receiving law is founded empty at its declared ridge.
     let mut declared = super::learning::chain_declaration(1 << 16);
     declared.receivers[0].receiving_prior = 3;

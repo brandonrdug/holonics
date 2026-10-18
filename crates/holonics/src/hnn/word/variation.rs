@@ -468,12 +468,6 @@ impl HeldContactVariation {
         Ok(columns)
     }
 
-    /// Advance columns through this Word's recorded producing ticks. All primal states and
-    /// midpoints come from this Word; this is no second simulation of the physical passage.
-    pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {
-        self.advance_contact_columns(word, opened, |_, _| Ok(()))
-    }
-
     /// The one column transport, optionally observed BEFORE its producing junction.
     /// The observer writes only its own transient reading; it changes no current column.
     fn advance_contact_columns(

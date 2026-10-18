@@ -234,7 +234,10 @@ fn source_observer_same_carrier_normal_comparison_preserves_carry_and_withholds_
     assert_eq!(old_law.carrier(), ReceivingCarrier::Anchor);
     assert_eq!(material.receiving_law().map(), old_law.map());
     assert_eq!(material.receiving_law().gram(), old_law.gram());
-    assert_eq!(material.receiving_law().located(), old_law.located());
+    assert_eq!(
+        material.receiving_law().receiving_prior(),
+        old_law.receiving_prior()
+    );
     assert!(
         material.constitution().continuing_state(0).is_err(),
         "an unjoined save cannot discard the view binding"

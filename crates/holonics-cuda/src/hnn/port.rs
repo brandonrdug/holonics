@@ -348,6 +348,12 @@ pub struct Mounted<'c> {
 }
 
 impl<'c> Mounted<'c> {
+    /// The complete ledger read by host/card parity controls, without a second serializer.
+    #[cfg(test)]
+    pub(super) fn ledger(&self) -> &EnclosedLedger {
+        &self.ledger
+    }
+
     pub fn field(&self) -> &Field {
         &self.field
     }
@@ -686,6 +692,14 @@ impl<'c> Mounted<'c> {
 }
 
 impl ExposedResident for Mounted<'_> {
+    fn publication_storage_bits(
+        &self,
+    ) -> Result<holonics::hnn::reference::PublicationStorageBits, HnnError> {
+        Ok(holonics::hnn::reference::PublicationStorageBits {
+            arrived: self.arrived.as_ref().map_or(0, Arrived::bits),
+            charts: self.store.continuing_charts()?.bits(),
+        })
+    }
     fn admitted(&self) -> &[ReceivingPhases] {
         &self.admitted
     }
@@ -721,9 +735,16 @@ impl ExposedResident for Mounted<'_> {
     }
     fn publish_receiving_precision(&mut self, event: &ReceivingPrecision) -> Result<(), HnnError> {
         event.check_constitution(&self.constitution)?;
-        if !self.pending.is_empty() || !self.staged.is_empty() || !self.moments.is_empty() {
+        if !self.pending.is_empty() || !self.staged.is_empty() {
             return Err(HnnError::Unadmitted {
-                reason: "receiving precision publication requires consumed sample handles",
+                reason: "receiving precision publication requires consumed pending and staged handles",
+            });
+        }
+        let occurrence = self.ledger.balance().closing.is_some();
+        if occurrence != self.arrived.is_some() {
+            return Err(HnnError::PrecisionOccurrence {
+                occurrence,
+                arrived: self.arrived.is_some(),
             });
         }
         let retention = retained(&self.field, &self.admitted, self.opens);
@@ -732,21 +753,59 @@ impl ExposedResident for Mounted<'_> {
             event.levels(),
             &retention,
         )?;
-        // Build and publish the successor before mutating host state. The receiving map is packed
-        // at its new constitutional exponent; all other loci, current/address, tree, ledger and
-        // reception carry remain the resident's existing state.
-        let publication = Publication::publish(
-            self.publication.words.card(),
-            Loci::of(&self.field, &next)?,
-            Some(&self.publication),
-        )?;
+        let card = self.publication.words.card();
+        let charts_before = self.store.before_trial();
+        let store_octets_before = self.store.octets;
+        let traffic_before = self.traffic.get();
+        let layouts_before = self.layouts.get();
+        let tree_times_before = self.tree_times.get();
+        // The deposit owner's chart checkpoint and tree upload restore unpublished writes.
+        // The arrived device moment/opening stays bounded and is restored by its reread owner.
+        let trial = (|| {
+            let publication = Rc::new(Publication::publish(
+                card,
+                Loci::of(&self.field, &next)?,
+                Some(&self.publication),
+            )?);
+            let mut ledger = self.ledger.clone();
+            let mut tally = self.tally.clone();
+            if self.arrived.is_some() {
+                let (reread, readings) =
+                    self.arrived_code_length(&publication, Some(&next), card)?;
+                ledger.publish(reread)?;
+                tally.read(&readings);
+            }
+            Ok::<_, HnnError>((publication, ledger, tally))
+        })();
+        let (publication, ledger, tally) = match trial {
+            Ok(success) => success,
+            Err(refusal) => {
+                let tree_restore = if let Some((ring, tree)) = self.tree.as_mut() {
+                    match self.constitution.landmarks(*ring) {
+                        Some(before) => tree.upload(&before.arena()).map_err(device),
+                        None => Err(HnnError::MissingReceivingMap { ring: *ring }),
+                    }
+                } else {
+                    Ok(())
+                };
+                let charts_restore = self.store.restore(charts_before);
+                self.store.octets = store_octets_before;
+                self.publish_tree_times();
+                self.traffic.set(traffic_before);
+                self.layouts.set(layouts_before);
+                self.tree_times.set(tree_times_before);
+                charts_restore?;
+                tree_restore?;
+                return Err(refusal);
+            }
+        };
         self.count(|traffic| traffic.publications += publication.octets as u64);
         self.constitution = next;
-        self.publication = Rc::new(publication);
-        // The compare's arrived operand was already deposited and reread. It was formed at the
-        // predecessor commit and must not survive this constitutive publication.
-        self.arrived = None;
+        self.publication = publication;
+        self.ledger = ledger;
+        self.tally = tally;
         self.forget_kept_reads();
+        self.publish_tree_times();
         Ok(())
     }
 }

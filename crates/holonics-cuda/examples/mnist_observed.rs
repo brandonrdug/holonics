@@ -4,7 +4,7 @@
 #[path = "../../holonics/examples/mnist_observed/common.rs"]
 mod shared;
 
-use holonics::hnn::{Current, Reference};
+use holonics::hnn::Reference;
 use holonics_cuda::hnn::{Card, Resident as CudaResident};
 use std::error::Error;
 

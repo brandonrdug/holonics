@@ -7,9 +7,9 @@ restricting aeon close. The admitted future family is a separate operand: it may
 become empty without invalidating this already produced accounting operand. No duplicate
 receiver, second saved-bit charge or archive of former families is retained.
 
-Passage version 3 marks F1: material learned under the absolute-lift phase read is not continued
-under the passage-frame read. Version 2 and unversioned passage text remain refused with
-ContinuingState; there is no inferred migration. The reader checks the arrived ratio's saved
+Passage version 4 carries the immutable `receiving_prior` declaration and separate deposited
+and published ledger subtotals. Version 2, version 3 and unversioned passage text are refused
+with typed PassageVersion; there is no inferred migration. The reader checks the arrived ratio's saved
 phases against the field's observation partition, not against the later future family. Saved
 phase structural checks still validate ring, field first epoch, nonzero aperture, overflow,
 grain/tolerance consistency, finite rank bounds and rank scope. Existing address, source
@@ -33,7 +33,7 @@ The resident_cold_restore integration target checks the post-close save with an 
 family; pending across close before compare; staged survivor deposit; a narrower future family;
 and repeated cold mounts preserving material, carry, current, address, family, handles and the
 ledger balance. The staged control keeps sealed arrival counters and the continuous opening
-while adding exactly one deposition. Version-2 and unversioned passage text remain refused.
+while adding exactly one deposition. Version-2, version-3 and unversioned passage text remain refused.
 The passage unit controls retain a native producer outside the future family, a wrong field
 observation partition, an invalid ring and an invalid field epoch. There is no one-sided witness
 control because there is no second copy. These controls run with the whole library and

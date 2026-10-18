@@ -13,7 +13,7 @@ use crate::hnn::tests::support::encoded;
 use crate::ratio::{Rat, integer, rat};
 
 /// A generous budget for the laws' tests: the budget itself is tested on its own.
-pub(super) const OPEN_BUDGET: u64 = 1 << 40;
+pub(crate) const OPEN_BUDGET: u64 = 1 << 40;
 
 /// The test fields declare `2^16` cells, well within the receiving tree's declaration: at `|A| = 4`,
 /// `D = 2` it is refused only from 1,712,317 = 233·7349 cells, where a lattice product itself passes 128 bits
@@ -102,7 +102,7 @@ fn chain_declared(first_admittance: Rat, population: u64, offsets: Vec<usize>) -
 /// **The chain control's declaration** over a population of `population` cells (`Δ = {1}`, carrier
 /// lattices by rule): the fixture of the declaration's own laws. Its capacity is `n* = 134 = 2·67`
 /// (`71` on the folded chain before October 5).
-pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
+pub(crate) fn chain_declaration(population: u64) -> FieldDeclaration {
     FieldDeclaration {
         rings: vec![ring(4, vec![0, 2]), ring(3, vec![0]), ring(2, vec![])],
         contacts: vec![contact(0, 1, 2, 2), contact(1, 2, 2, 0)],

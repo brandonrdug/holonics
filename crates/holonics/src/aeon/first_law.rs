@@ -33,7 +33,10 @@
 //!
 //! The exact values telescope to `C(closing) − C(opening)` over any walk of such steps
 //! (`ledger_telescopes`); where `C` is a cross-entropy of positive laws the two sums are
-//! `first_law_aeon`'s (`ledger_is_first_law`). Read on enclosures `[lo_k, hi_k] ∋ C_k`, each step is
+//! `first_law_aeon`'s (`ledger_is_first_law`). A publication rereads the same arrived source
+//! through the published receiver: it is a separately counted deposition-class step, contributes
+//! once to the inclusive deposition total and once to the published subseries, and adds no arrival.
+//! Read on enclosures `[lo_k, hi_k] ∋ C_k`, each step is
 //! the exact Minkowski difference `[lo_(k+1) − hi_k, hi_(k+1) − lo_k]`, each sum contains its exact
 //! value (`enclosed_contains`), and the two sums together are the enclosed change widened by the
 //! widths of the interior occurrences, exactly (`enclosed_telescopes`):
@@ -210,23 +213,30 @@ fn zero() -> ExactInterval {
 }
 
 /// [definition] **One aeon's first law read on enclosed code lengths** (module header): the
-/// summed exchange and deposition steps, the code lengths at the aeon's opening and closing
-/// occurrences, the widening `W` (the widths of its interior occurrences), and the arrivals: the
-/// summed code length `Σ ℓ_k(Θ_k)` of every arrival read at the constitution it arrived through,
-/// with their cells.
+/// summed exchange and deposition-class steps, their independent deposited and published
+/// subseries, the code lengths at the aeon's opening and closing occurrences, the widening `W`
+/// (the widths of its interior occurrences), and the arrivals: the summed code length
+/// `Σ ℓ_k(Θ_k)` of every arrival read at the constitution it arrived through, with their cells.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EnclosedBalance {
     pub exchange: ExactInterval,
+    /// The inclusive deposition-class total: `deposited + published`, counted once in `total`.
     pub deposition: ExactInterval,
+    /// Receiver movement caused by a deposit.
+    pub deposited: ExactInterval,
+    /// Receiver movement published at the fixed arrived source, independent of new arrivals.
+    pub published: ExactInterval,
     /// The code length at the occurrence the aeon opened at; `None` before any reading.
     pub opening: Option<ExactInterval>,
     /// The code length at the occurrence the aeon has reached; `None` before any reading.
     pub closing: Option<ExactInterval>,
     /// `W = Σ (hi_k − lo_k)` over the aeon's interior occurrences.
     pub widening: Rat,
-    /// The steps taken: exchanges (arrivals after the first reading, and releases) and depositions.
+    /// The steps taken: exchanges (arrivals after the first reading, and releases), deposits and
+    /// publications. Publication is a deposition-class step at an already arrived source.
     pub exchanges: u64,
     pub depositions: u64,
+    pub publications: u64,
     /// The arrivals read in the aeon (the first reading of all included), their cells and summed
     /// code length.
     pub arrivals: u64,
@@ -239,11 +249,14 @@ impl EnclosedBalance {
         Self {
             exchange: zero(),
             deposition: zero(),
+            deposited: zero(),
+            published: zero(),
             opening: at.clone(),
             closing: at,
             widening: Rat::zero(),
             exchanges: 0,
             depositions: 0,
+            publications: 0,
             arrivals: 0,
             cells: 0,
             arrived: zero(),
@@ -260,7 +273,9 @@ impl EnclosedBalance {
     /// exactly (Lean `enclosed_telescopes`).
     pub fn change(&self) -> ExactInterval {
         match (&self.opening, &self.closing) {
-            (Some(opening), Some(closing)) if self.exchanges + self.depositions > 0 => {
+            (Some(opening), Some(closing))
+                if self.exchanges > 0 || self.depositions > 0 || self.publications > 0 =>
+            {
                 minus(closing, opening)
             }
             _ => zero(),
@@ -331,19 +346,35 @@ impl EnclosedLedger {
         Self { aeon }
     }
 
-    /// One step from the occurrence reached to `next`, into exchange or deposition.
-    fn step(&mut self, next: ExactInterval, deposition: bool) -> Result<(), AeonError> {
-        let at = self.aeon.closing.take().ok_or(AeonError::NoOccurrence)?;
+    /// One step from the occurrence reached to `next`, classified by its receiving face.
+    fn step(&mut self, next: ExactInterval, kind: LedgerStep) -> Result<(), AeonError> {
+        // Read first, then publish all of the new balance together. A refused step leaves the
+        // occurrence and every accumulated subtotal untouched.
+        let at = self
+            .aeon
+            .closing
+            .as_ref()
+            .cloned()
+            .ok_or(AeonError::NoOccurrence)?;
         let moved = minus(&next, &at);
-        if self.aeon.exchanges + self.aeon.depositions > 0 {
+        if self.aeon.exchanges > 0 || self.aeon.depositions > 0 || self.aeon.publications > 0 {
             self.aeon.widening += width(&at);
         }
-        if deposition {
-            self.aeon.deposition = plus(&self.aeon.deposition, &moved);
-            self.aeon.depositions += 1;
-        } else {
-            self.aeon.exchange = plus(&self.aeon.exchange, &moved);
-            self.aeon.exchanges += 1;
+        match kind {
+            LedgerStep::Exchange => {
+                self.aeon.exchange = plus(&self.aeon.exchange, &moved);
+                self.aeon.exchanges += 1;
+            }
+            LedgerStep::Deposit => {
+                self.aeon.deposition = plus(&self.aeon.deposition, &moved);
+                self.aeon.deposited = plus(&self.aeon.deposited, &moved);
+                self.aeon.depositions += 1;
+            }
+            LedgerStep::Publication => {
+                self.aeon.deposition = plus(&self.aeon.deposition, &moved);
+                self.aeon.published = plus(&self.aeon.published, &moved);
+                self.aeon.publications += 1;
+            }
         }
         self.aeon.closing = Some(next);
         Ok(())
@@ -357,7 +388,8 @@ impl EnclosedLedger {
         self.aeon.arrivals += 1;
         self.aeon.cells += cells;
         if self.aeon.closing.is_some() {
-            self.step(code, false).expect("an occurrence has been read");
+            self.step(code, LedgerStep::Exchange)
+                .expect("an occurrence has been read");
         } else {
             self.aeon.opening = Some(code.clone());
             self.aeon.closing = Some(code);
@@ -367,14 +399,21 @@ impl EnclosedLedger {
     /// **The constitution moved at the arrived targets**, which now read `reread`: a deposition
     /// step. Refused before any reading.
     pub fn deposit(&mut self, reread: ExactInterval) -> Result<(), AeonError> {
-        self.step(reread, true)
+        self.step(reread, LedgerStep::Deposit)
+    }
+
+    /// **The receiver published its moved reading at the fixed arrived source**: a
+    /// deposition-class step, kept in its own subtotal and count as well as in the inclusive
+    /// deposition total. It creates neither another arrival nor additional cells.
+    pub fn publish(&mut self, reread: ExactInterval) -> Result<(), AeonError> {
+        self.step(reread, LedgerStep::Publication)
     }
 
     /// **The constitution moved by a release** (the collapse at an aeon boundary), the arrived
     /// targets now reading `reread`: the released part, counted as exchange. Refused before any
     /// reading.
     pub fn release(&mut self, reread: ExactInterval) -> Result<(), AeonError> {
-        self.step(reread, false)
+        self.step(reread, LedgerStep::Exchange)
     }
 
     /// **Close the aeon**: its balance, and the next aeon opened at the occurrence reached.
@@ -382,6 +421,13 @@ impl EnclosedLedger {
         let reached = self.aeon.closing.clone();
         std::mem::replace(&mut self.aeon, EnclosedBalance::opened(reached))
     }
+}
+
+#[derive(Clone, Copy)]
+enum LedgerStep {
+    Exchange,
+    Deposit,
+    Publication,
 }
 
 #[cfg(test)]
@@ -597,6 +643,121 @@ mod tests {
             &exact.deposition.enclosure().unwrap()
         ));
         assert!(meets(&read.change(), &exact.total().enclosure().unwrap()));
+    }
+
+    #[test]
+    fn publication_is_a_deposition_class_step_without_a_new_arrival() {
+        let source = enclosed(rat(7, 3), rat(1, 8), rat(1, 16));
+        let reread = enclosed(rat(11, 4), rat(1, 16), rat(1, 32));
+        let mut ledger = EnclosedLedger::new();
+        ledger.arrive(source.clone(), 5);
+        ledger.publish(reread.clone()).unwrap();
+
+        let balance = ledger.balance();
+        let movement = minus(&reread, &source);
+        assert_eq!((balance.arrivals, balance.cells), (1, 5));
+        assert_eq!(balance.arrived, source);
+        assert_eq!(balance.exchange, zero());
+        assert_eq!(balance.depositions, 0);
+        assert_eq!(balance.publications, 1);
+        assert_eq!(balance.deposited, zero());
+        assert_eq!(balance.published, movement);
+        assert_eq!(balance.deposition, balance.published);
+        assert_eq!(balance.total(), balance.deposition);
+        assert_eq!(
+            balance.change(),
+            minus(&reread, &balance.opening.clone().unwrap())
+        );
+        assert_eq!(balance.widening, Rat::zero());
+
+        let closed = ledger.close();
+        assert_eq!(closed.published, closed.deposition);
+        assert_eq!(ledger.balance().opening, Some(reread.clone()));
+        assert_eq!(ledger.balance().closing, Some(reread));
+        assert_eq!(ledger.balance().publications, 0);
+        assert_eq!(ledger.balance().published, zero());
+        assert_eq!(ledger.balance().change(), zero());
+    }
+
+    #[test]
+    fn repeated_publications_keep_their_own_interval_series_and_leave_arrivals_sealed() {
+        let first = ExactInterval::point(rat(2, 1));
+        let second = ExactInterval::point(rat(5, 2));
+        let third = ExactInterval::point(rat(1, 1));
+        let mut ledger = EnclosedLedger::new();
+        ledger.arrive(first.clone(), 3);
+        ledger.publish(second.clone()).unwrap();
+        ledger.publish(third.clone()).unwrap();
+
+        let balance = ledger.balance();
+        let first_read = minus(&second, &first);
+        let second_read = minus(&third, &second);
+        assert_eq!(balance.arrivals, 1);
+        assert_eq!(balance.cells, 3);
+        assert_eq!(balance.arrived, first);
+        assert_eq!(balance.depositions, 0);
+        assert_eq!(balance.publications, 2);
+        assert_eq!(balance.published, plus(&first_read, &second_read));
+        assert_eq!(balance.deposition, balance.published);
+        assert_eq!(balance.total(), balance.published);
+        assert_eq!(balance.change(), minus(&third, &first));
+        assert_eq!(balance.widening, Rat::zero());
+    }
+
+    #[test]
+    fn depositions_and_publications_partition_the_inclusive_total_and_telescope() {
+        let reads = [
+            ExactInterval::point(rat(1, 1)),
+            enclosed(rat(3, 2), rat(1, 8), rat(1, 16)),
+            enclosed(rat(2, 1), rat(1, 16), rat(1, 8)),
+            enclosed(rat(9, 4), rat(1, 32), rat(1, 16)),
+            ExactInterval::point(rat(3, 1)),
+        ];
+        let mut ledger = EnclosedLedger::new();
+        ledger.arrive(reads[0].clone(), 2);
+        ledger.arrive(reads[1].clone(), 4);
+        ledger.deposit(reads[2].clone()).unwrap();
+        ledger.publish(reads[3].clone()).unwrap();
+        ledger.deposit(reads[4].clone()).unwrap();
+
+        let balance = ledger.balance();
+        let deposited = plus(&minus(&reads[2], &reads[1]), &minus(&reads[4], &reads[3]));
+        let published = minus(&reads[3], &reads[2]);
+        assert_eq!(
+            (balance.exchanges, balance.depositions, balance.publications),
+            (1, 2, 1)
+        );
+        assert_eq!(balance.deposited, deposited);
+        assert_eq!(balance.published, published);
+        assert_eq!(balance.deposition, plus(&deposited, &published));
+        assert_eq!(balance.exchange, minus(&reads[1], &reads[0]));
+        assert_eq!(
+            balance.total(),
+            plus(&balance.exchange, &balance.deposition)
+        );
+        assert_eq!(balance.change(), minus(&reads[4], &reads[0]));
+        assert_eq!(
+            balance.widening,
+            width(&reads[1]) + width(&reads[2]) + width(&reads[3])
+        );
+        assert_eq!(
+            balance.total(),
+            ExactInterval {
+                lower: &balance.change().lower - &balance.widening,
+                upper: &balance.change().upper + &balance.widening,
+            }
+        );
+    }
+
+    #[test]
+    fn refusing_a_publication_without_an_occurrence_is_atomic() {
+        let mut ledger = EnclosedLedger::new();
+        let before = ledger.balance().clone();
+        assert_eq!(
+            ledger.publish(ExactInterval::point(rat(9, 1))),
+            Err(AeonError::NoOccurrence)
+        );
+        assert_eq!(ledger.balance(), &before);
     }
 
     /// **The face against the literal.** `Σ ℓ + Σ g = n·log₂|A|`: with `|A| = 4` (two bits a cell)

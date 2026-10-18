@@ -71,7 +71,7 @@ impl ReceivingBlock {
             || self.law.map.rows() % 2 != 0
             || self.law.phase.is_some()
             || self.law.symmetry.is_some()
-            || self.law.located.is_none()
+            || self.law.receiving_prior.is_none()
             || self.law.gram.len() != self.width()
             || self.law.gram.iter().any(|row| row.len() != self.width())
             || self
@@ -289,6 +289,7 @@ impl ReceivingMaterial {
     /// Add one indexed internal receipt to its map/Gram entry, for the exact
     /// carried trajectory. Does not add to the carry a second time. This reading
     /// operation is not an admitted learning step or a solved-chart recertification.
+    #[cfg(test)]
     pub(super) fn add_remainder(
         &mut self,
         array: Carrier,
@@ -364,6 +365,7 @@ impl ReceivingMaterial {
         self.rebuild_published()
     }
 
+    #[cfg(test)]
     pub(super) fn clear_carries(&mut self) -> Result<(), HnnError> {
         for law in self.laws_mut() {
             law.map_carry = Carry::default();
@@ -642,9 +644,7 @@ impl ReceivingMaterial {
             }
         }
     }
-    pub(super) fn bits(&self) -> u64 {
-        self.carrier_bits().total()
-    }
+
     pub(super) fn blocks(&self) -> Option<&[ReceivingBlock; 2]> {
         match self {
             Self::ArrivalContext { blocks, .. } => Some(blocks),
