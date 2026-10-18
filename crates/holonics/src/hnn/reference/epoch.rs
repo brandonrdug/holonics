@@ -272,11 +272,12 @@ mod tests {
         assert_eq!(resident.carried, before_carried);
 
         let mut wrong_declaration = field.declaration().clone();
-        // An identity frame over a smaller alphabet may be valid on this field. Use an
-        // actually out-of-alphabet cell, rather than treating its declared origin as a defect.
-        wrong_declaration.alphabet = field.alphabet() * 2;
+        // A smaller alphabet alone remains admissible. Encode against a genuinely different
+        // source ring, with classes that still fit that source's port chart.
+        wrong_declaration.alphabet = 2;
+        wrong_declaration.sources = vec![1];
         let wrong_field = Field::declare(wrong_declaration).unwrap();
-        let wrong_cells = encoded(&wrong_field, &[field.alphabet()]);
+        let wrong_cells = encoded(&wrong_field, &[0, 1]);
         assert!(
             resident_reference
                 .read_epoch(&resident, &moment, &phases, &wrong_cells)
