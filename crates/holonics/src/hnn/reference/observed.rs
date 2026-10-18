@@ -4,7 +4,9 @@
 //! cell holonomy, tube and tower laws are unchanged. Comparison reads E_Θ(u,x), then
 //! ingestion reads E_Θ′(u,x). The caller, never the resident, holds the finite crib.
 
+use super::comparison::FrozenComparison;
 use super::*;
+use crate::hnn::constitution::Sample;
 use crate::hnn::encoding::observed::PairedObservation;
 use crate::hnn::encoding::placement::OccurrencePlacement;
 use crate::hnn::paired::PairingDeclaration;
@@ -320,6 +322,64 @@ impl Reference {
             &DepositReading,
         ) -> T,
     ) -> Result<ObservedCellReceipt<T>, HnnError> {
+        self.observe_cell_continuing_inner(
+            resident,
+            crib,
+            pairing,
+            class,
+            placement,
+            false,
+            |field, material, moment, address, reading, _, _| {
+                observer(field, material, moment, address, reading)
+            },
+        )
+    }
+
+    /// Diagnostic-only variant that exposes the exact staged receiving samples used by this
+    /// comparison. Samples are copied before deposit consumes the staged value and are returned
+    /// only inside the ordinary successful receipt. The callback runs at the same post-deposit,
+    /// pre-ingest point as `observe_cell_continuing`; callers should keep it read-only because
+    /// external callback side effects cannot be rolled back if the later ingest refuses.
+    pub fn observe_cell_continuing_with_samples<T>(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        class: usize,
+        placement: Option<&OccurrencePlacement>,
+        observer: impl FnOnce(
+            &Field,
+            &Constitution,
+            &SourceMoment,
+            &ActiveAddress,
+            &DepositReading,
+            &[Sample],
+            Option<&FrozenComparison>,
+        ) -> T,
+    ) -> Result<ObservedCellReceipt<T>, HnnError> {
+        self.observe_cell_continuing_inner(
+            resident, crib, pairing, class, placement, true, observer,
+        )
+    }
+
+    fn observe_cell_continuing_inner<T>(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        class: usize,
+        placement: Option<&OccurrencePlacement>,
+        capture_samples: bool,
+        observer: impl FnOnce(
+            &Field,
+            &Constitution,
+            &SourceMoment,
+            &ActiveAddress,
+            &DepositReading,
+            &[Sample],
+            Option<&FrozenComparison>,
+        ) -> T,
+    ) -> Result<ObservedCellReceipt<T>, HnnError> {
         let (boundary, target) = admit_observed_cell(resident, crib, pairing, class, placement)?;
         if self.refining {
             return Err(HnnError::Unadmitted {
@@ -354,7 +414,40 @@ impl Reference {
         let comparison_commit = next.constitution.commit();
         // Admission has checked the target, but the blind read cannot consult it.
         let (pending, refined) = self.refine(&mut next, &moment, &phases)?;
+        let frozen_comparison = if capture_samples {
+            let slot = next.pending.get(&pending).ok_or(HnnError::UnknownHandle {
+                handle: Handle::Pending(pending),
+            })?;
+            let wave = refined.forward.present().ok_or(HnnError::Unadmitted {
+                reason: "diagnostic sample view requires the actual refined wave",
+            })?;
+            Some(FrozenComparison::new(
+                &field,
+                &next.constitution,
+                &slot.ratio,
+                &slot.opening,
+                &target,
+                wave,
+            )?)
+        } else {
+            None
+        };
         let (staged, compared) = self.compare(&mut next, pending, &target)?;
+        let captured_samples = if capture_samples {
+            compared
+                .deposit
+                .present()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "observed sample view requires the actual comparison's staged return",
+                })?
+                .linear()
+                .iter()
+                .filter(|step| step.locus == LinearLocus::Receiving(phases.ring()))
+                .flat_map(|step| step.samples.iter().cloned())
+                .collect::<Vec<Sample>>()
+        } else {
+            Vec::new()
+        };
         let features = compared
             .deposit
             .present()
@@ -405,6 +498,8 @@ impl Reference {
             next.moment(&moment).expect("open moment"),
             &next.address,
             &post_deposit,
+            &captured_samples,
+            frozen_comparison.as_ref(),
         );
         let ingestion_commit = next.constitution.commit();
         let fed = self.ingest_class_step(&mut next, &mut next_crib, pairing, class, placement)?;
@@ -644,6 +739,113 @@ mod precision_tests {
         assert_eq!(after.arrived, ledger.arrived);
         assert_eq!(after.publications, ledger.publications + 1);
         assert_eq!(entry.continuing().unwrap().0, moment);
+    }
+
+    #[test]
+    fn diagnostic_sample_hook_matches_ordinary_execution_and_exposes_actual_samples() {
+        let (port, mut ordinary, pairing, _) = prepared(false);
+        let mut diagnostic = ordinary.clone();
+        let mut ordinary_crib = crib(&ordinary);
+        let mut diagnostic_crib = ordinary_crib.clone();
+        let ordinary_receipt = port
+            .observe_cell_continuing(
+                &mut ordinary,
+                &mut ordinary_crib,
+                &pairing,
+                2,
+                None,
+                |_, _, _, _, reading| reading.commit,
+            )
+            .unwrap();
+        let diagnostic_receipt = port
+            .observe_cell_continuing_with_samples(
+                &mut diagnostic,
+                &mut diagnostic_crib,
+                &pairing,
+                2,
+                None,
+                |_, _, _, _, reading, samples, frozen| {
+                    let held = frozen
+                        .map(|comparison| comparison.recompare_covector(comparison.wave()))
+                        .transpose();
+                    (reading.commit, samples.to_vec(), held)
+                },
+            )
+            .unwrap();
+        assert_eq!(ordinary_receipt.view, diagnostic_receipt.view.0);
+        assert!(!diagnostic_receipt.view.1.is_empty());
+        assert_eq!(
+            ordinary
+                .continuing_state(ordinary.field.sources()[0])
+                .unwrap(),
+            diagnostic
+                .continuing_state(diagnostic.field.sources()[0])
+                .unwrap()
+        );
+        assert_eq!(ordinary_crib, diagnostic_crib);
+        assert_eq!(ordinary_receipt.prediction, diagnostic_receipt.prediction);
+        assert_eq!(ordinary_receipt.precision, diagnostic_receipt.precision);
+        assert_eq!(ordinary_receipt.ingest, diagnostic_receipt.ingest);
+        assert_eq!(
+            diagnostic_receipt
+                .view
+                .1
+                .iter()
+                .map(|sample| sample.feature.clone())
+                .collect::<Vec<_>>(),
+            diagnostic_receipt.precision.features
+        );
+        let held = diagnostic_receipt
+            .view
+            .2
+            .as_ref()
+            .unwrap()
+            .as_ref()
+            .unwrap();
+        assert_eq!(
+            held,
+            &diagnostic_receipt
+                .view
+                .1
+                .iter()
+                .map(|sample| sample.covector.clone())
+                .collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn diagnostic_sample_hook_refusal_returns_no_view_and_rolls_back() {
+        let (port, mut entry, pairing, _) = prepared_at(Some(2));
+        let placement = OccurrencePlacement::at(
+            &entry.field,
+            &entry.current,
+            &[vec![0; entry.field.rings().len()]],
+        )
+        .unwrap();
+        let next = entry.moments.values().next().unwrap().cells() as usize;
+        let mut crib = ObservedCrib::new(next.saturating_sub(1));
+        crib.next = next;
+        crib.entries.push(ObservedCribCell {
+            position: next.saturating_sub(1),
+            class: entry.field.alphabet(),
+            placement: None,
+        });
+        let before = format!("{entry:?}");
+        let crib_before = crib.clone();
+        let result = port.observe_cell_continuing_with_samples(
+            &mut entry,
+            &mut crib,
+            &pairing,
+            2,
+            Some(&placement),
+            |_, _, _, _, reading, samples, _| (reading.commit, samples.to_vec()),
+        );
+        assert!(
+            result.is_err(),
+            "a refused close returns no diagnostic receipt/view"
+        );
+        assert_eq!(format!("{entry:?}"), before);
+        assert_eq!(crib, crib_before);
     }
     #[test]
     fn observed_precision_late_ingest_refusal_rolls_back_publication_when_its_close_rejects_the_crib()

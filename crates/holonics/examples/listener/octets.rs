@@ -132,7 +132,7 @@ fn checkpoint_counts(value: &str) -> Result<Vec<usize>> {
     Ok(counts)
 }
 
-fn save_checkpoint<R: ExposedResident>(
+pub(crate) fn save_checkpoint<R: ExposedResident>(
     resident: &R,
     opening: &Constitution,
     source: usize,
