@@ -73,6 +73,68 @@ mod resident_pair_face_controls {
         (field, material)
     }
 
+    /// Y1 and Y2' of a pair ray, interpolated from four exact table contractions:
+    /// `y(t) = y₀ + t Y1 + t² Y2 + t³ Y3` read at `t = 0, 1, 2, 3`. Y2' is the quadratic
+    /// coefficient with the base output set to zero, where the `e Q` term vanishes. No resident
+    /// face or ray-speed reader supplies these values.
+    fn interpolated_ray_speed(
+        field: &Field,
+        moment: &SourceMoment,
+        offset: usize,
+        pair: &PairPort,
+        direction: [&[Vec<Rat>]; 3],
+    ) -> [Rat; 2] {
+        let Some(table) = moment.offset_table(field, 0, offset).unwrap() else {
+            return [Rat::zero(), Rat::zero()];
+        };
+        let (alphabet, width) = (field.alphabet(), field.ring(0).width());
+        let phases = field.ring(0).placements().len();
+        let coefficients = |outputs: &[Vec<Rat>]| -> [Vec<Rat>; 2] {
+            let base = [outputs, pair.current_reads(), pair.earlier_reads()];
+            let values: Vec<Vec<Rat>> = (0..4i64)
+                .map(|at| {
+                    let t = integer(at);
+                    let [e, a, b]: [Vec<Vec<Rat>>; 3] = std::array::from_fn(|k| {
+                        base[k]
+                            .iter()
+                            .zip(direction[k])
+                            .map(|(row, d)| row.iter().zip(d).map(|(x, dx)| x + &t * dx).collect())
+                            .collect()
+                    });
+                    let port = PairPort::new(e, a, b).unwrap();
+                    (0..phases)
+                        .flat_map(|c| port.apply_table(&table, c, alphabet, width))
+                        .collect()
+                })
+                .collect();
+            let n = values[0].len();
+            let third: Vec<Rat> = (0..n)
+                .map(|i| {
+                    (&values[3][i] - integer(3) * &values[2][i] + integer(3) * &values[1][i]
+                        - &values[0][i])
+                        / integer(6)
+                })
+                .collect();
+            let second: Vec<Rat> = (0..n)
+                .map(|i| {
+                    (&values[2][i] - integer(2) * &values[1][i] + &values[0][i]) / integer(2)
+                        - integer(3) * &third[i]
+                })
+                .collect();
+            let first = (0..n)
+                .map(|i| &values[1][i] - &values[0][i] - &second[i] - &third[i])
+                .collect();
+            [first, second]
+        };
+        let zero = vec![vec![Rat::zero(); width]; pair.rank()];
+        let [first, _] = coefficients(pair.outputs());
+        let [_, second] = coefficients(zero.as_slice());
+        [
+            first.iter().map(|x| x * x).sum(),
+            second.iter().map(|x| x * x).sum(),
+        ]
+    }
+
     fn code(index: usize) -> usize {
         (index * index + 3 * index + index / 7) % 2
     }
@@ -242,6 +304,20 @@ mod resident_pair_face_controls {
                     compose_pair_return(&field, &moment, 0, offset, pair, &turned, &charts)
                         .unwrap();
                 assert_eq!(step, expected, "cell{index} offset{offset}");
+                // The step's speed is the ray's exact derivative, read by an independent route.
+                if index % 100 == 99 {
+                    let FactorGradient::PairPort { speed, .. } = &step.gradient else {
+                        unreachable!("a pair return composes a pair step")
+                    };
+                    let direction = [&old.outputs[..], &old.current[..], &old.earlier[..]];
+                    let exact = interpolated_ray_speed(&field, &moment, offset, pair, direction);
+                    // Both readings are live: the base output and both read directions move.
+                    assert!(
+                        exact.iter().all(|v| !v.is_zero()),
+                        "cell{index} offset{offset}"
+                    );
+                    assert_eq!(*speed, exact, "cell{index} offset{offset}");
+                }
                 assert_eq!(pullback, [old.outputs, old.current, old.earlier]);
             }
         }
