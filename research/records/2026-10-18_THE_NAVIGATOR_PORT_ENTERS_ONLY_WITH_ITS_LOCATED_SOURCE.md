@@ -12,9 +12,9 @@ read at the opening's phase beside the count port `E_g`:
 
 `s_g(0) = P_g^(τ_g) (m̃_g + N_g x̃)`
 
-The phase-binned and offset counts hold order only up to the moment's capacity
-(`hnn.moment-capacity`). Past it, the field's odometer steps every class abelianly
-(`Field::step_class`). The navigator carries order as a state. On a closing ring `P_g` permutes
+The field's odometer steps every class abelianly (`Field::step_class`), so order lives only in
+the phase-binned and offset counts, up to the moment's capacity (`hnn.moment-capacity`). The
+navigator carries order as a state. On a closing ring `P_g` permutes
 the realified coordinates (`Ring::rotate`), so `(P_g^τ)ᵀ = P_g^(−τ)`. The identities:
 
 1. **Admission.** A row `D` with `D N_g = c` exists iff `c` lies in the row space of `N_g`, iff
@@ -63,6 +63,9 @@ the realified coordinates (`Ring::rotate`), so `(P_g^τ)ᵀ = P_g^(−τ)`. The 
      identity 3 and the encoder contract (`hnn.encoder-moment-contract`). So one step of the joint
      map is exactly the joint deposit.
    - The reads stay two blocks. With `r = 0` the joint map is `E_g` alone.
+   - The founding prior is `[E_0 | N_0]`. A paired source port's symmetry (`hnn::paired::PortSymmetry`,
+     `W e_(σa) = B W e_a`) acts on the `E_g` block only: the navigator's columns lie outside the
+     paired family (`σ` is `None` there), so the projected deposit leaves them free.
 
 ## Its dimension is located
 
