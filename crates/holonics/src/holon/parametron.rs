@@ -39,7 +39,7 @@
 //! | `Physics/CoupledIncidence.diagonalStorage`, `diagonalResponse`, `IsGeneralizedMode` | [`Parametron::storage`], [`Parametron::is_mode`] |
 //! | `Objects/Parametron.modeWitness` | tests |
 //! | `Physics/PhaseCarrier.pumpStorage`, `pumpStorage_halfTurnSheet`, `phaseCarrier_halfTurnSheet` | [`pump_storage`], [`Carrier::half_turn`] |
-//! | `Physics/PhaseCarrier.phaseCoupling`, `isingCoupling`, `phaseNetworkEnergy_binaryPhase` | [`Population::phase_energy`], [`Population::ising_energy`] |
+//! | `Physics/PhaseCarrier.phaseCoupling`, `isingCoupling`, `phaseNetworkEnergy_binaryPhase` | [`Population::phase_energy`], [`Population::ising_energy`], tests |
 //! | `Objects/Parametron.drivenIsing_update`, `thresholdSheet_minimizes`, `perceptron_is_a_face` | [`Population::local_field`], [`threshold_sheet`] |
 //! | `Objects/Parametron.globalHalfTurn_composite`, `drive_breaks_halfTurn` | tests |
 //! | `Objects/Parametron.ringCrossings_eq`, `no_crossing_of_denominator_one` | [`ring_crossings`] |
@@ -563,6 +563,236 @@ mod tests {
     use super::*;
     use crate::geometry::winding::Odometer;
     use crate::ratio::rat;
+
+    // [proved-derived; computational witness] On the half-turn sheets the pair reads
+    // -w σ_i σ_j. For w=(-1)^c and zero drive its least energy is 2f-|E|.
+    // The frustrations below are declared from loop parity, never found by a gauge search:
+    // every twisted row/column requires one violation; their edge sets are disjoint. A single
+    // curled edge has odd plaquette parity. The zero sheet attains each bound.
+    #[derive(Clone, Copy, Debug)]
+    enum Sector {
+        Untwisted,
+        TwistedX,
+        TwistedY,
+        TwistedXy,
+        Curled,
+    }
+
+    const SECTORS: [Sector; 5] = [
+        Sector::Untwisted,
+        Sector::TwistedX,
+        Sector::TwistedY,
+        Sector::TwistedXy,
+        Sector::Curled,
+    ];
+
+    impl Sector {
+        fn cochain(self, l: usize, x: usize, y: usize, horizontal: bool) -> bool {
+            match self {
+                Self::Untwisted => false,
+                Self::TwistedX => horizontal && x == l - 1,
+                Self::TwistedY => !horizontal && y == l - 1,
+                Self::TwistedXy => (horizontal && x == l - 1) || (!horizontal && y == l - 1),
+                Self::Curled => horizontal && x == 0 && y == 0,
+            }
+        }
+
+        fn frustration(self, l: usize) -> usize {
+            match self {
+                Self::Untwisted => 0,
+                Self::TwistedX | Self::TwistedY => l,
+                Self::TwistedXy => 2 * l,
+                Self::Curled => 1,
+            }
+        }
+    }
+
+    struct GameTestTime(&'static str, usize, std::time::Instant);
+
+    impl GameTestTime {
+        fn start(name: &'static str, l: usize) -> Self {
+            Self(name, l, std::time::Instant::now())
+        }
+    }
+
+    impl Drop for GameTestTime {
+        fn drop(&mut self) {
+            eprintln!(
+                "REQ050_TEST name={} l={} elapsed_ns={}",
+                self.0,
+                self.1,
+                self.2.elapsed().as_nanos()
+            );
+        }
+    }
+
+    /// The L×L torus's declared cochain, optionally changed by δg. Each pair appears once for
+    /// L≥3, in y/x order with the horizontal edge followed by the vertical edge.
+    fn torus_population(
+        l: usize,
+        cochain: impl Fn(usize, usize, bool) -> bool,
+        gauge: &[bool],
+    ) -> Population {
+        assert!(l >= 3);
+        assert_eq!(gauge.len(), l * l);
+        let mut edges = Vec::with_capacity(2 * l * l);
+        for y in 0..l {
+            for x in 0..l {
+                let site = x + l * y;
+                for (other, horizontal) in
+                    [((x + 1) % l + l * y, true), (x + l * ((y + 1) % l), false)]
+                {
+                    let curled = cochain(x, y, horizontal) ^ gauge[site] ^ gauge[other];
+                    edges.push((site, other, integer(if curled { -1 } else { 1 })));
+                }
+            }
+        }
+        Population::new(edges, vec![Rat::zero(); l * l]).unwrap()
+    }
+
+    fn sector_population(l: usize, sector: Sector, gauge: &[bool]) -> Population {
+        torus_population(
+            l,
+            |x, y, horizontal| sector.cochain(l, x, y, horizontal),
+            gauge,
+        )
+    }
+
+    fn sheet_state(sites: usize, word: usize) -> Vec<bool> {
+        (0..sites).map(|site| word >> site & 1 == 1).collect()
+    }
+
+    /// Global half-turn invariance with zero drive fixes site 0 on its zero sheet. Every energy
+    /// is read by the population's existing owner, without an integer energy substitute.
+    fn least_locked_energy(l: usize, population: &Population, label: &str) -> Rat {
+        let states = 1usize << (l * l - 1);
+        assert_eq!(states, if l == 3 { 256 } else { 32_768 });
+        let started = std::time::Instant::now();
+        let least = (0..states)
+            .map(|word| {
+                let state = sheet_state(l * l, word << 1);
+                assert!(!state[0]);
+                population.ising_energy(&state).unwrap()
+            })
+            .min()
+            .unwrap();
+        eprintln!(
+            "REQ050_SECTOR l={} label={} states={} edges={} elapsed_ns={}",
+            l,
+            label,
+            states,
+            2 * l * l,
+            started.elapsed().as_nanos()
+        );
+        least
+    }
+
+    fn sector_minima(l: usize) {
+        let _time = GameTestTime::start(
+            "the_least_locked_sheet_energy_is_twice_the_frustration_less_the_edges",
+            l,
+        );
+        let zero = vec![false; l * l];
+        for sector in SECTORS {
+            let population = sector_population(l, sector, &zero);
+            let least = least_locked_energy(l, &population, &format!("{sector:?}"));
+            let expected = integer(2 * sector.frustration(l) as i64 - (2 * l * l) as i64);
+            assert_eq!(least, expected, "L={l}, sector={sector:?}");
+        }
+    }
+
+    fn gauge_copies(l: usize) {
+        let _time = GameTestTime::start("a_gauge_copy_relabels_the_sheets", l);
+        let zero = vec![false; l * l];
+        let checkerboard: Vec<bool> = (0..l * l)
+            .map(|site| (site % l + site / l) % 2 == 1)
+            .collect();
+        if l == 3 {
+            let mut site_zero = zero.clone();
+            site_zero[0] = true;
+            let row: Vec<bool> = (0..l * l).map(|site| site / l == 0).collect();
+            for sector in SECTORS {
+                let population = sector_population(l, sector, &zero);
+                for gauge in [&site_zero, &checkerboard, &row] {
+                    let copy = sector_population(l, sector, gauge);
+                    // All 2^9=512 states, including both global-half-turn partners, as required
+                    // for this pointwise relabelling rather than just a minimum.
+                    for word in 0..1usize << (l * l) {
+                        let state = sheet_state(l * l, word);
+                        let relabelled: Vec<bool> = state
+                            .iter()
+                            .zip(gauge)
+                            .map(|(sheet, gauge)| sheet ^ gauge)
+                            .collect();
+                        assert_eq!(
+                            copy.ising_energy(&state).unwrap(),
+                            population.ising_energy(&relabelled).unwrap(),
+                            "L={l}, sector={sector:?}, state={word}"
+                        );
+                    }
+                }
+            }
+        } else {
+            assert_eq!(l, 4);
+            for sector in SECTORS {
+                let population = sector_population(l, sector, &zero);
+                let copy = sector_population(l, sector, &checkerboard);
+                assert_eq!(
+                    least_locked_energy(l, &population, &format!("{sector:?}-gauge-original")),
+                    least_locked_energy(l, &copy, &format!("{sector:?}-checkerboard-copy")),
+                    "L={l}, sector={sector:?}"
+                );
+            }
+        }
+    }
+
+    fn antiferromagnet(l: usize) {
+        let _time = GameTestTime::start("the_antiferromagnet_carries_the_odd_winding", l);
+        let population = torus_population(l, |_, _, _| true, &vec![false; l * l]);
+        // Odd L: every row and column has odd parity, the twisted-xy class (f=2L).
+        // Even L: the cochain is δ(checkerboard), so f=0.
+        let declared_frustration = if l % 2 == 1 { 2 * l } else { 0 };
+        assert_eq!(
+            least_locked_energy(l, &population, "antiferromagnet"),
+            integer(2 * declared_frustration as i64 - (2 * l * l) as i64)
+        );
+    }
+
+    // These modules partition the development read from its measured projection. All six tests
+    // remain ordinary owner tests; the l3 filter runs first, then l4 under its fixed deadline.
+    mod l3 {
+        #[test]
+        fn the_least_locked_sheet_energy_is_twice_the_frustration_less_the_edges() {
+            super::sector_minima(3);
+        }
+
+        #[test]
+        fn a_gauge_copy_relabels_the_sheets() {
+            super::gauge_copies(3);
+        }
+
+        #[test]
+        fn the_antiferromagnet_carries_the_odd_winding() {
+            super::antiferromagnet(3);
+        }
+    }
+
+    mod l4 {
+        #[test]
+        fn the_least_locked_sheet_energy_is_twice_the_frustration_less_the_edges() {
+            super::sector_minima(4);
+        }
+
+        #[test]
+        fn a_gauge_copy_relabels_the_sheets() {
+            super::gauge_copies(4);
+        }
+
+        #[test]
+        fn the_antiferromagnet_carries_the_odd_winding() {
+            super::antiferromagnet(4);
+        }
+    }
 
     fn phases() -> Vec<RationalPhase> {
         [integer(0), rat(1, 2), integer(1), integer(3), rat(-2, 7)]
