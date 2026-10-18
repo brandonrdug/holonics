@@ -1018,6 +1018,17 @@ mod tests {
                     "balance_before",
                     "balance_after",
                 ]
+            } else if line.starts_with("state ") {
+                &[
+                    "section",
+                    "role",
+                    "delivered",
+                    "state_bits",
+                    "constitution_bits",
+                    "loci_exponent_entries_remainders_solved",
+                    "source_chart_ring_exponent_scale_support_certificate",
+                    "source_chart_ring_rule_exponent_target",
+                ]
             } else if line.starts_with("cert ") {
                 &["section", "role", "delivered", "steps"]
             } else if line.starts_with("pairing ") {
@@ -1054,6 +1065,7 @@ mod tests {
         for name in [
             "cell ",
             "precision ",
+            "state ",
             "cert ",
             "pairing ",
             "drawn ",
