@@ -1,7 +1,9 @@
 //! One-fork, one-epoch read-only diagnostic. It uses the same observed-cell transaction as the
 //! ordinary listener; the hook only returns the exact receiving samples already staged there.
 
+#[path = "diagnostic/epoch.rs"]
 mod epoch;
+#[path = "diagnostic/timing.rs"]
 mod timing;
 
 use super::*;
@@ -595,7 +597,7 @@ pub(super) fn run(
             .source_cells(0)
             .map(|cells| cells.len())
         })
-        .collect::<Result<Vec<_>>>()?
+        .collect::<std::result::Result<Vec<_>, _>>()?
         .into_iter()
         .sum::<usize>();
     let trunk_units = profile_cells.unwrap_or(declared_source_count);
