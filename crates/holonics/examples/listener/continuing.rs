@@ -275,6 +275,22 @@ struct PairReadSnapshot {
     matches_retained_face: Option<bool>,
 }
 
+impl PairReadSnapshot {
+    fn exact_values(&self) -> (usize, usize, Vec<Vec<String>>, Vec<Vec<String>>) {
+        let shown = |rows: &[Vec<Rat>]| {
+            rows.iter()
+                .map(|row| row.iter().map(ToString::to_string).collect())
+                .collect()
+        };
+        (
+            self.ring,
+            self.offset,
+            shown(&self.current),
+            shown(&self.earlier),
+        )
+    }
+}
+
 struct PairFaceBoundary {
     rebuilds: BigUint,
     total_builds: BigUint,
@@ -354,6 +370,16 @@ fn pair_face_line(
             )
         })
         .collect();
+    let read_values_before: Vec<_> = before
+        .reads
+        .iter()
+        .map(PairReadSnapshot::exact_values)
+        .collect();
+    let read_values_after: Vec<_> = after
+        .reads
+        .iter()
+        .map(PairReadSnapshot::exact_values)
+        .collect();
     let summary = moment.pair_face_summary();
     let mut count_checks = Vec::new();
     if unit == 1 || unit % 100 == 0 {
@@ -379,7 +405,7 @@ fn pair_face_line(
         .map(|(name, time)| (name.replace(' ', "_"), time.as_nanos()))
         .collect();
     Ok(format!(
-        "pair_face section={section} role={role} unit={unit} ring_offset_population_occupied_bindings_rebuilds={summary:?} clone_ns={clone_ns} phase_wall_ns={phase_wall_ns:?} retained_builds={retained_builds} other_copy_builds={other_copy_builds} prior_read_match={prior_read_mismatch:?} deposit_reads_changed={deposit_reads_changed:?} count_checks={count_checks:?}"
+        "pair_face section={section} role={role} unit={unit} ring_offset_population_occupied_bindings_rebuilds={summary:?} clone_ns={clone_ns} phase_wall_ns={phase_wall_ns:?} retained_builds={retained_builds} other_copy_builds={other_copy_builds} prior_read_match={prior_read_mismatch:?} deposit_reads_changed={deposit_reads_changed:?} count_checks={count_checks:?} read_values_before={read_values_before:?} read_values_after={read_values_after:?}"
     ))
 }
 

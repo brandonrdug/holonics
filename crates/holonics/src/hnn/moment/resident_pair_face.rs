@@ -2,7 +2,8 @@
 use super::*;
 use rayon::prelude::*;
 use std::fmt;
-use std::sync::{Arc, Mutex, RwLock};
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::{Arc, RwLock};
 
 #[derive(Clone)]
 struct Reads {
@@ -293,7 +294,7 @@ struct FaceState {
 
 /// Derived cache only: equality, text and retained bits remain the moment's counts and fields.
 #[derive(Default)]
-pub(crate) struct ResidentPairFaces(RwLock<FaceState>, Arc<Mutex<BigUint>>);
+pub(crate) struct ResidentPairFaces(RwLock<FaceState>, Arc<AtomicU64>);
 
 impl Clone for ResidentPairFaces {
     fn clone(&self) -> Self {
@@ -318,7 +319,7 @@ impl Eq for ResidentPairFaces {}
 impl ResidentPairFaces {
     /// Exterior audit only. Clones share this number, never a cache or slot map.
     pub(crate) fn total_builds(&self) -> BigUint {
-        self.1.lock().unwrap_or_else(|e| e.into_inner()).clone()
+        BigUint::from(self.1.load(Ordering::Relaxed))
     }
 
     pub(crate) fn read_matches(&self, ring: usize, offset: usize, port: &PairPort) -> Option<bool> {
@@ -370,7 +371,7 @@ impl ResidentPairFaces {
                 rebuilds,
             },
         );
-        *self.1.lock().unwrap_or_else(|e| e.into_inner()) += BigUint::one();
+        self.1.fetch_add(1, Ordering::Relaxed);
         Ok(face)
     }
 
