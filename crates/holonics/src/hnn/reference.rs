@@ -2740,6 +2740,73 @@ pub(crate) fn whole_pair_gradient(
     })
 }
 
+/// The independent whole-table reading of Y1 and Y2' on a pair ray, including leaky counts.
+pub(crate) fn whole_pair_ray_speed(
+    field: &Field,
+    moment: &SourceMoment,
+    ring: usize,
+    offset: usize,
+    pair: &crate::hnn::moment::PairPort,
+    direction: [&[Vec<Rat>]; 3],
+) -> Result<[Rat; 2], HnnError> {
+    let [de, da, db] = direction;
+    if [pair.outputs(), pair.current_reads(), pair.earlier_reads()]
+        .into_iter()
+        .zip(direction)
+        .any(|(base, delta)| {
+            base.len() != delta.len() || base.iter().zip(delta).any(|(x, dx)| x.len() != dx.len())
+        })
+    {
+        return Err(HnnError::Unadmitted {
+            reason: "a pair speed must read its own factor direction",
+        });
+    }
+    let width = field.ring(ring).width();
+    let alphabet = field.alphabet();
+    let table = moment.offset_table(field, ring, offset)?;
+    let mut speed = [Rat::zero(), Rat::zero()];
+    for phase in 0..field.ring(ring).placements().len() {
+        let mut first = vec![Rat::zero(); width];
+        let mut second = vec![Rat::zero(); width];
+        for rho in 0..pair.rank() {
+            let (mut weight, mut linear) = (Rat::zero(), Rat::zero());
+            if let Some(table) = &table {
+                for (slot, count) in table.normalized(phase, alphabet) {
+                    let (x, y) = (slot / alphabet, slot % alphabet);
+                    let (a, b) = (&pair.current_reads()[rho][x], &pair.earlier_reads()[rho][y]);
+                    weight += &count * a * b;
+                    linear += count * (&da[rho][x] * b + a * &db[rho][y]);
+                }
+            }
+            for j in 0..width {
+                first[j] += &de[rho][j] * &weight + &pair.outputs()[rho][j] * &linear;
+                second[j] += &de[rho][j] * &linear;
+            }
+        }
+        speed[0] += first.iter().map(|x| x * x).sum::<Rat>();
+        speed[1] += second.iter().map(|x| x * x).sum::<Rat>();
+    }
+    Ok(speed)
+}
+
+/// Read the actual direction on the same normalized face as its comparison. The returned
+/// squared norms belong only to this direction; a projected consumer must read them again.
+pub(crate) fn pair_ray_speed(
+    field: &Field,
+    moment: &SourceMoment,
+    ring: usize,
+    offset: usize,
+    pair: &crate::hnn::moment::PairPort,
+    direction: [&[Vec<Rat>]; 3],
+) -> Result<[Rat; 2], HnnError> {
+    if let Some(face) = moment.resident_pair_face(ring, offset, pair)? {
+        let weight = PopulationChart::of(field).value(face.population());
+        face.ray_speed(pair, direction, &weight)
+    } else {
+        whole_pair_ray_speed(field, moment, ring, offset, pair, direction)
+    }
+}
+
 /// The pair part of the actual composed return, with the whole-table route for leaky counts.
 /// Keeping the FactorStep here lets the equality oracle compare every field of the Native step.
 #[allow(clippy::type_complexity)]
@@ -2765,13 +2832,26 @@ pub(crate) fn compose_pair_return(
         energy,
         covector,
     } = gradient;
+    let step_outputs: Vec<_> = outputs.iter().map(|x| negated(x)).collect();
+    let step_current: Vec<_> = current.iter().map(|x| negated(x)).collect();
+    let step_earlier: Vec<_> = earlier.iter().map(|x| negated(x)).collect();
+    let speed = pair_ray_speed(
+        field,
+        moment,
+        ring,
+        offset,
+        pair,
+        [&step_outputs, &step_current, &step_earlier],
+    )?;
     let step = FactorStep {
         gradient: FactorGradient::PairPort {
             ring,
             offset,
-            outputs: outputs.iter().map(|x| negated(x)).collect(),
-            current: current.iter().map(|x| negated(x)).collect(),
-            earlier: earlier.iter().map(|x| negated(x)).collect(),
+            // The pullback below is the positive transpose; the step's direction is its negative.
+            outputs: step_outputs,
+            current: step_current,
+            earlier: step_earlier,
+            speed,
         },
         energy,
         covector,

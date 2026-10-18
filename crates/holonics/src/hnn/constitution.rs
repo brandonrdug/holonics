@@ -176,8 +176,16 @@
 //! q_g             Σ_ρ (M D)_ρ A_ρ,r x̄_t,r (lock chart)  4 |D|²_∞ Σ_r S(U_r) S(V_r) e_r over its chart's rings r        N_g · max_r the element's at r
 //! c_a, b_a, F_a   2 c cᵀ(w − ω), h b bᵀ(u + ½hω), h F Fᵀ ω   (16, 4h², 4h²) · S(D) S(x + ηD) e                     the channel's at a
 //! g_(r,i)         g_i² × base_i                         |D|² e ((|g_i| + η|D|) / |g_i|)²,  e from ∂(output)/∂g_i        the resonator's at r
-//! (e, a, b)_(g,o) Σ_ρ e_ρ a_ρᵀ M_c b_ρ                   3 k e Σ_ρ (|De_ρ|² A_ρ B_ρ + E_ρ |Da_ρ|² B_ρ + E_ρ A_ρ |Db_ρ|²)   the source's at g
+//! (e, a, b)_(g,o) Σ_ρ e_ρ a_ρᵀ M_c b_ρ                   min(old, (r(v1) + 2η(r(v2) + r(e)Q2) + 3η²r(e)Q3)²)             the source's at g
 //! ```
+//!
+//! The pair's `v1 = Σ_c ‖Y1_c‖²` and `v2 = Σ_c ‖Y2'_c‖²` read its actual direction on the
+//! contemporary `W, R, L` face: `Y1 = Σ (De W + e (Da·R + L·Db))`,
+//! `Y2' = Σ De (Da·R + L·Db)`. With `Q2 = Σ_ρ r(|e_ρ|²|Da_ρ|²|Db_ρ|²)` and
+//! `Q3 = Σ_ρ r(|De_ρ|²|Da_ρ|²|Db_ρ|²)`, only the terms moving both reads use Hölder.
+//! Here `r` is [`root_ceiling`]; the trilinear derivative and its triangle bound are
+//! Lean `Holon/Deposition.{trilinear_ray_deriv,trilinear_ray_deriv_bound}`. A consumer that
+//! projects the direction reads these two speeds again before deposition.
 //!
 //! with `X_ρ = 2|x_ρ|² + 2η²|Dx_ρ|²` for `x ∈ {e, a, b}` (`|x + tDx|² ≤ X_ρ` on the ray), `k` the pair
 //! port's rank, `N_g` the rings of the standing's lock chart whose term is nonzero (their moves add by
@@ -3682,6 +3690,9 @@ pub enum FactorGradient {
         outputs: Vec<Vec<Rat>>,
         current: Vec<Vec<Rat>>,
         earlier: Vec<Vec<Rat>>,
+        /// Exact squared Y1 and Y2' on this comparison's unscaled direction. Re-read after
+        /// any projection of that direction; these readings are never retained.
+        speed: [Rat; 2],
     },
     /// `c_a` (`C_a = c cᵀ`).
     Storage {
@@ -9505,10 +9516,16 @@ enum Moves {
     Standing { unit: Rat, reach: Vec<(usize, Rat)> },
     /// A resonator gain: `|D|` and `|g_i| > 0`; `b(η) = |D|² e ((|g_i| + η|D|) / |g_i|)²`.
     Resonator { unit: Rat, gain: Rat },
-    /// A pair port, per rank `(|De_ρ|², |Da_ρ|², |Db_ρ|², |e_ρ|², |a_ρ|², |b_ρ|²)`;
-    /// `b(η) = 3 k e Σ_ρ (|De_ρ|² A_ρ B_ρ + E_ρ |Da_ρ|² B_ρ + E_ρ A_ρ |Db_ρ|²)`,
-    /// `X_ρ = 2|x_ρ|² + 2η²|Dx_ρ|²`.
-    Pair { ranks: Vec<[Rat; 6]> },
+    /// A pair's exact ray readings and its six squared rank norms. With `r` the upper root,
+    /// `Q2 = Σ r(|e|²|Da|²|Db|²)`, `Q3 = Σ r(|De|²|Da|²|Db|²)`, the new bound is
+    /// `(r(v1) + 2η(r(v2) + r(energy)Q2) + 3η²r(energy)Q3)²`. Its minimum with the old
+    /// `3 k energy Σ (|De|² A B + E |Da|² B + E A |Db|²)` remains a bound; only the two
+    /// terms moving both reads keep Hölder. Here `X = 2|x|² + 2η²|Dx|²`.
+    Pair {
+        ranks: Vec<[Rat; 6]>,
+        /// Exact squared Y1/h' and Y2'/h'^2, before their upper-root faces.
+        speed: [Rat; 2],
+    },
 }
 
 impl Moves {
@@ -9536,7 +9553,7 @@ impl Moves {
                 let reached = (gain + step * unit) / gain;
                 unit * unit * energy * &reached * &reached
             }
-            Moves::Pair { ranks } => {
+            Moves::Pair { ranks, speed } => {
                 let square = step * step;
                 let bound = |x: &Rat, dx: &Rat| integer(2) * x + integer(2) * &square * dx;
                 let sum: Rat = ranks
@@ -9546,7 +9563,20 @@ impl Moves {
                         de * &big_a * &big_b + &big_e * da * &big_b + &big_e * &big_a * db
                     })
                     .sum();
-                integer(3) * integer(ranks.len() as i64) * energy * sum
+                let old = integer(3) * integer(ranks.len() as i64) * energy * sum;
+                let root_energy = root_ceiling(energy);
+                let second: Rat = ranks
+                    .iter()
+                    .map(|[_, da, db, e, _, _]| root_ceiling(&(e * da * db)))
+                    .sum();
+                let third: Rat = ranks
+                    .iter()
+                    .map(|[de, da, db, _, _, _]| root_ceiling(&(de * da * db)))
+                    .sum();
+                let amplitude = root_ceiling(&speed[0])
+                    + integer(2) * step * (root_ceiling(&speed[1]) + &root_energy * second)
+                    + integer(3) * square * root_energy * third;
+                old.min(&amplitude * &amplitude)
             }
             Moves::Standing { .. } => {
                 return Err(HnnError::Carrier {
@@ -9770,6 +9800,7 @@ fn factor_prepared(
                 outputs,
                 current,
                 earlier,
+                speed,
                 ..
             },
             LocusMaterial::SourcePort { pairs, scale, .. },
@@ -9798,7 +9829,18 @@ fn factor_prepared(
                 .flatten()
                 .map(|row| squared(row))
                 .sum();
-            (scale.clone(), total / &scale, Moves::Pair { ranks })
+            let ray_speed = [
+                &speed[0] / &square_scale,
+                &speed[1] / (&square_scale * &square_scale),
+            ];
+            (
+                scale.clone(),
+                total / &scale,
+                Moves::Pair {
+                    ranks,
+                    speed: ray_speed,
+                },
+            )
         }
         (
             FactorGradient::Storage { gradient, .. }
@@ -13195,3 +13237,204 @@ fn initial_contact(contact: &crate::hnn::field::Contact) -> ContactMaterial {
 
 #[cfg(test)]
 mod founding_tests;
+
+#[cfg(test)]
+mod pair_ray_speed_tests {
+    use super::*;
+    use crate::hnn::moment::{ExactPairContraction, OffsetTable};
+    use crate::ratio::{integer, rat};
+
+    type Direction = [Vec<Vec<Rat>>; 3];
+
+    fn fixture(still: bool) -> (PairPort, Direction, OffsetTable) {
+        let port = PairPort::new(
+            vec![
+                vec![rat(1, 2), rat(-1, 3), rat(2, 5)],
+                vec![rat(-2, 7), rat(1, 5), rat(3, 4)],
+            ],
+            vec![vec![rat(1, 2), rat(-1, 4)], vec![rat(1, 3), rat(2, 5)]],
+            vec![vec![rat(-1, 5), rat(2, 3)], vec![rat(3, 7), rat(-1, 2)]],
+        )
+        .unwrap();
+        let mut direction = [
+            vec![
+                vec![rat(1, 5), rat(1, 6), rat(-1, 3)],
+                vec![rat(-1, 4), rat(2, 7), rat(1, 8)],
+            ],
+            vec![vec![rat(1, 7), rat(-1, 3)], vec![rat(1, 5), rat(1, 9)]],
+            vec![vec![rat(2, 5), rat(1, 8)], vec![rat(-1, 6), rat(2, 9)]],
+        ];
+        if still {
+            for rows in &mut direction[1..] {
+                for x in rows.iter_mut().flatten() {
+                    *x = Rat::zero();
+                }
+            }
+        }
+        let table = OffsetTable {
+            counts: vec![3, 1, 0, 2, 1, 4, 2, 0, 0, 2, 5, 1],
+            population: 21,
+            weight: rat(1, 8),
+            transported: None,
+        };
+        (port, direction, table)
+    }
+
+    // Four independent exact contractions interpolate the cubic; no resident face or ray-speed
+    // implementation supplies these coefficients.
+    fn cubic(port: &PairPort, delta: &Direction, table: &OffsetTable) -> Direction {
+        let values: Vec<Vec<Vec<Rat>>> = (0..4)
+            .map(|at| {
+                let t = integer(at);
+                let moved: Vec<Vec<Vec<Rat>>> =
+                    [port.outputs(), port.current_reads(), port.earlier_reads()]
+                        .into_iter()
+                        .zip(delta)
+                        .map(|(rows, changes)| {
+                            rows.iter()
+                                .zip(changes)
+                                .map(|(row, change)| {
+                                    row.iter().zip(change).map(|(x, dx)| x + &t * dx).collect()
+                                })
+                                .collect()
+                        })
+                        .collect();
+                let p =
+                    PairPort::new(moved[0].clone(), moved[1].clone(), moved[2].clone()).unwrap();
+                let contraction = ExactPairContraction::of(&p);
+                (0..3)
+                    .map(|phase| contraction.apply_table(table, phase, 2, 3))
+                    .collect()
+            })
+            .collect();
+        let mut coefficients: Direction = std::array::from_fn(|_| vec![vec![Rat::zero(); 3]; 3]);
+        for phase in 0..3 {
+            for j in 0..3 {
+                let third = (&values[3][phase][j] - integer(3) * &values[2][phase][j]
+                    + integer(3) * &values[1][phase][j]
+                    - &values[0][phase][j])
+                    / integer(6);
+                let second = (&values[2][phase][j] - integer(2) * &values[1][phase][j]
+                    + &values[0][phase][j])
+                    / integer(2)
+                    - integer(3) * &third;
+                let first = &values[1][phase][j] - &values[0][phase][j] - &second - &third;
+                coefficients[0][phase][j] = first;
+                coefficients[1][phase][j] = second;
+                coefficients[2][phase][j] = third;
+            }
+        }
+        coefficients
+    }
+
+    fn readings(
+        port: &PairPort,
+        delta: &Direction,
+        table: &OffsetTable,
+    ) -> (Moves, Rat, Direction) {
+        let coefficients = cubic(port, delta, table);
+        // With the base e zero, the quadratic coefficient is precisely Y2' (no e Q term).
+        let zero = PairPort::new(
+            vec![vec![Rat::zero(); 3]; port.rank()],
+            port.current_reads().to_vec(),
+            port.earlier_reads().to_vec(),
+        )
+        .unwrap();
+        let prime = cubic(&zero, delta, table);
+        let speed = [
+            coefficients[0].iter().map(|v| squared(v)).sum(),
+            prime[1].iter().map(|v| squared(v)).sum(),
+        ];
+        let ranks = (0..port.rank())
+            .map(|rho| {
+                [
+                    squared(&delta[0][rho]),
+                    squared(&delta[1][rho]),
+                    squared(&delta[2][rho]),
+                    squared(&port.outputs()[rho]),
+                    squared(&port.current_reads()[rho]),
+                    squared(&port.earlier_reads()[rho]),
+                ]
+            })
+            .collect();
+        let energy = (0..3)
+            .flat_map(|phase| table.normalized(phase, 2))
+            .map(|(_, count)| &count * &count)
+            .sum();
+        (Moves::Pair { ranks, speed }, energy, coefficients)
+    }
+
+    fn exact_speed(coefficients: &Direction, t: &Rat) -> Rat {
+        (0..3)
+            .flat_map(|phase| (0..3).map(move |j| (phase, j)))
+            .map(|(phase, j)| {
+                let d = &coefficients[0][phase][j]
+                    + integer(2) * t * &coefficients[1][phase][j]
+                    + integer(3) * t * t * &coefficients[2][phase][j];
+                &d * &d
+            })
+            .sum()
+    }
+
+    fn old_bound(port: &PairPort, delta: &Direction, energy: &Rat, eta: &Rat) -> Rat {
+        let ray =
+            |x: &[Rat], dx: &[Rat]| integer(2) * squared(x) + integer(2) * eta * eta * squared(dx);
+        integer(3)
+            * integer(port.rank() as i64)
+            * energy
+            * (0..port.rank())
+                .map(|rho| {
+                    squared(&delta[0][rho])
+                        * ray(&port.current_reads()[rho], &delta[1][rho])
+                        * ray(&port.earlier_reads()[rho], &delta[2][rho])
+                        + ray(&port.outputs()[rho], &delta[0][rho])
+                            * squared(&delta[1][rho])
+                            * ray(&port.earlier_reads()[rho], &delta[2][rho])
+                        + ray(&port.outputs()[rho], &delta[0][rho])
+                            * ray(&port.current_reads()[rho], &delta[1][rho])
+                            * squared(&delta[2][rho])
+                })
+                .sum::<Rat>()
+    }
+
+    #[test]
+    fn pair_moves_bound_the_exact_speed() {
+        let (port, delta, table) = fixture(false);
+        assert_eq!(table.counts.len() / 4, 3);
+        assert!(port.outputs().iter().flatten().all(|x| !x.is_zero()));
+        assert!(delta[1..].iter().flatten().flatten().all(|x| !x.is_zero()));
+        let (moves, energy, coefficients) = readings(&port, &delta, &table);
+        for eta in [rat(1, 8), rat(1, 2), integer(1)] {
+            let bound = moves.own(&energy, &eta).unwrap();
+            for t in [Rat::zero(), &eta / integer(2), eta.clone()] {
+                assert!(exact_speed(&coefficients, &t) <= bound);
+            }
+        }
+    }
+
+    #[test]
+    fn pair_moves_equal_the_speed_at_still_reads() {
+        let (port, delta, table) = fixture(true);
+        let (moves, energy, coefficients) = readings(&port, &delta, &table);
+        let exact = exact_speed(&coefficients, &Rat::zero());
+        let root = root_ceiling(&exact);
+        for eta in [rat(1, 8), rat(1, 2), integer(1)] {
+            let bound = moves.own(&energy, &eta).unwrap();
+            assert!(exact <= bound && bound <= &root * &root);
+            assert!(bound < old_bound(&port, &delta, &energy, &eta));
+        }
+    }
+
+    #[test]
+    fn pair_moves_never_exceed_the_old_bound() {
+        for still in [false, true] {
+            let (port, delta, table) = fixture(still);
+            let (moves, energy, _) = readings(&port, &delta, &table);
+            for eta in [rat(1, 8), rat(1, 2), integer(1)] {
+                assert!(
+                    moves.own(&energy, &eta).unwrap() <= old_bound(&port, &delta, &energy, &eta)
+                );
+            }
+        }
+    }
+}

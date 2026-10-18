@@ -752,6 +752,60 @@ theorem square_ray_deriv_bound {E F : Type*} [NormedAddCommGroup E] [NormedSpace
     _ ≤ 2 * (‖B‖ * ‖D‖) * (‖x‖ + η * ‖D‖) := by gcongr
     _ = _ := by ring
 
+/-- [proved-derived] **The trilinear output's derivative along its ray.** The three
+coefficients are the evaluations containing respectively one, two and three directions. -/
+theorem trilinear_ray_deriv {E F G H : Type*}
+    [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [NormedAddCommGroup F] [NormedSpace ℝ F]
+    [NormedAddCommGroup G] [NormedSpace ℝ G]
+    [NormedAddCommGroup H] [NormedSpace ℝ H]
+    (T : E →L[ℝ] F →L[ℝ] G →L[ℝ] H)
+    (x Dx : E) (y Dy : F) (z Dz : G) (t : ℝ) :
+    HasDerivAt (fun s : ℝ => T (x + s • Dx) (y + s • Dy) (z + s • Dz))
+      ((T Dx y z + T x Dy z + T x y Dz)
+        + (2 * t) • (T Dx Dy z + T Dx y Dz + T x Dy Dz)
+        + (3 * t ^ 2) • T Dx Dy Dz) t := by
+  let Y1 := T Dx y z + T x Dy z + T x y Dz
+  let Y2 := T Dx Dy z + T Dx y Dz + T x Dy Dz
+  let Y3 := T Dx Dy Dz
+  have ray : (fun s : ℝ => T (x + s • Dx) (y + s • Dy) (z + s • Dz)) =
+      (fun s : ℝ => T x y z + (s • Y1 + s ^ 2 • Y2 + s ^ 3 • Y3)) := by
+    funext s
+    dsimp [Y1, Y2, Y3]
+    simp only [map_add, map_smul, _root_.add_apply, _root_.smul_apply]
+    module
+  rw [ray]
+  have h1 := (hasDerivAt_id t).smul_const Y1
+  have h2 := ((hasDerivAt_id t).pow 2).smul_const Y2
+  have h3 := ((hasDerivAt_id t).pow 3).smul_const Y3
+  simpa [Y1, Y2, Y3] using ((h1.add h2).add h3).const_add (T x y z)
+
+/-- [proved-derived] **The trilinear ray's speed is bounded at its end.** This is the
+triangle bound used by the pair's certified move, before squaring and upper-root faces. -/
+theorem trilinear_ray_deriv_bound {H : Type*}
+    [NormedAddCommGroup H] [NormedSpace ℝ H] (Y1 Y2 Y3 : H) {t η : ℝ}
+    (ht : 0 ≤ t) (htη : t ≤ η) :
+    ‖Y1 + (2 * t) • Y2 + (3 * t ^ 2) • Y3‖ ≤
+      ‖Y1‖ + 2 * η * ‖Y2‖ + 3 * η ^ 2 * ‖Y3‖ := by
+  have hη : 0 ≤ η := ht.trans htη
+  have hsq : t ^ 2 ≤ η ^ 2 := by
+    nlinarith [mul_nonneg (sub_nonneg.mpr htη) (add_nonneg hη ht)]
+  have htwo : 0 ≤ 2 * t := mul_nonneg (by norm_num) ht
+  have hthree : 0 ≤ 3 * t ^ 2 := mul_nonneg (by norm_num) (sq_nonneg t)
+  calc
+    ‖Y1 + (2 * t) • Y2 + (3 * t ^ 2) • Y3‖ ≤
+        ‖Y1 + (2 * t) • Y2‖ + ‖(3 * t ^ 2) • Y3‖ := norm_add_le _ _
+    _ ≤ ‖Y1‖ + ‖(2 * t) • Y2‖ + ‖(3 * t ^ 2) • Y3‖ :=
+      add_le_add (norm_add_le _ _) le_rfl
+    _ = ‖Y1‖ + 2 * t * ‖Y2‖ + 3 * t ^ 2 * ‖Y3‖ := by
+      rw [norm_smul, norm_smul, Real.norm_of_nonneg htwo, Real.norm_of_nonneg hthree]
+    _ ≤ ‖Y1‖ + 2 * η * ‖Y2‖ + 3 * η ^ 2 * ‖Y3‖ := by
+      have h2 : 2 * t * ‖Y2‖ ≤ 2 * η * ‖Y2‖ := by gcongr
+      have h3 : 3 * t ^ 2 * ‖Y3‖ ≤ 3 * η ^ 2 * ‖Y3‖ := by
+        exact mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_left hsq (by norm_num : (0 : ℝ) ≤ 3)) (norm_nonneg Y3)
+      exact add_le_add (add_le_add le_rfl h2) h3
+
 /-- [proved-derived; formal-checked] **The transit's solve is a contraction.** An operator `m ⪰ 1`
 (`‖v‖² ≤ ⟨v, m v⟩`), as the transit's normalized `m_a = 1 + (G/2h)(2C + hD + (h²/2)K)` is for
 positive semidefinite carriers, has `‖v‖ ≤ ‖m v‖`: the solve `m ζ = r` has `|ζ| ≤ |r|`. -/

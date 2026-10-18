@@ -979,6 +979,7 @@ fn updates_at(
                 outputs,
                 current,
                 earlier,
+                ..
             } => (
                 Carrier::PairScale,
                 next.ring_scales(*ring)[3].clone(),
