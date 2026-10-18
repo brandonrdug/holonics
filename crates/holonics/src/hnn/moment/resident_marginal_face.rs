@@ -357,8 +357,11 @@ mod tests {
             );
             let phases = resident.admitted()[0].clone();
             let (pending, _) = reference.refine(&mut resident, &id, &phases).unwrap();
+            let targets: Vec<_> = (1..=field.receivers()[0].aperture)
+                .map(|offset| code(n + offset))
+                .collect();
             let (staged, _) = reference
-                .compare(&mut resident, pending, &encoded(&field, &[code(n + 1)]))
+                .compare(&mut resident, pending, &encoded(&field, &targets))
                 .unwrap();
             let before = resident.constitution().source_port(0).unwrap().clone();
             reference.deposit(&mut resident, staged).unwrap();
