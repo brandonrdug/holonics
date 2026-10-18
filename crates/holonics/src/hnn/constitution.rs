@@ -540,6 +540,7 @@
 //! | `HNN/LatticeDeposit.lattice_deposit_descends` | [`Constitution::deposited`] with `hnn::retention::collapse` |
 //! | `HNN/Ring.gain_backtrack_midpoint` | [`GainBacktrack`], [`DepositReading::backtracks`] |
 
+pub(crate) mod epoch;
 pub mod receiving_blocks;
 mod receiving_material;
 mod receiving_prepared;
@@ -6588,6 +6589,7 @@ impl Constitution {
         factors: &[(Locus, &FactorPrepared)],
         loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
         source: StepSource<'_>,
+        epoch_readout_upper: Option<&Rat>,
     ) -> Result<Result<CertifiedSteps, DeclaredStepRefusal>, HnnError> {
         /// A normal law's readings at the certificate's faces: its alignment at its floor, its
         /// covector scale, feature moves and unit step's Schur norms at their ceilings, and (the
@@ -6627,14 +6629,18 @@ impl Constitution {
             // certified spectral norm (the other maps' rays read their Schur norms).
             let norm = match kind {
                 LinearLocus::Receiving(_) => {
-                    let rows = prepared.unit.to_rows();
-                    let columns = rows.first().map_or(0, Vec::len);
-                    let entries: Vec<Rat> = rows.into_iter().flatten().collect();
-                    ceiling(&spectral_norm(
-                        entries.len() / columns.max(1),
-                        columns,
-                        &entries,
-                    ))
+                    if let Some(norm) = prepared.epoch_norm {
+                        ceiling(norm)
+                    } else {
+                        let rows = prepared.unit.to_rows();
+                        let columns = rows.first().map_or(0, Vec::len);
+                        let entries: Vec<Rat> = rows.into_iter().flatten().collect();
+                        ceiling(&spectral_norm(
+                            entries.len() / columns.max(1),
+                            columns,
+                            &entries,
+                        ))
+                    }
                 }
                 _ => Rat::zero(),
             };
@@ -6703,7 +6709,10 @@ impl Constitution {
             })?;
         // The readout's certified spectral norm `‖R‖₂` (module header, "The tightened certificate").
         let map = receiving.map();
-        let readout_base = ceiling(&spectral_norm(map.rows(), map.columns(), map.entries()));
+        let readout_base = match epoch_readout_upper {
+            Some(bound) => ceiling(bound),
+            None => ceiling(&spectral_norm(map.rows(), map.columns(), map.entries())),
+        };
         // The pumped medium's reach (module header, "The pumped medium's reach"): each ring not
         // certified passive read by its Floquet bound (refused where its certificate is), the span
         // factors over the stations' spans, and the ring's own gain families held where their rays
@@ -7519,7 +7528,7 @@ impl Constitution {
                 DepositMode::Candidate { halvings } => StepSource::Candidate { halvings },
                 DepositMode::Certified | DepositMode::FirstReach => StepSource::Certified,
             };
-            match self.certify_steps(deposit.reach(), &linear, &factors, loaded, source)? {
+            match self.certify_steps(deposit.reach(), &linear, &factors, loaded, source, None)? {
                 Ok(steps) => steps,
                 Err(refusal) => return Ok(DepositOutcome::Refused(refusal)),
             }
@@ -9444,6 +9453,9 @@ struct PreparedDirectionRef<'a> {
     moves: &'a Rat,
     covector: &'a Rat,
     unit_norms: &'a (Rat, Rat),
+    /// A grouped epoch direction's already certified bound. The ordinary
+    /// per-cell consumer keeps its current exact spectral reading.
+    epoch_norm: Option<&'a Rat>,
 }
 enum PreparedLinear {
     Single(PreparedStep),
@@ -9458,6 +9470,7 @@ impl PreparedLinear {
                 moves: &p.moves,
                 covector: &p.covector,
                 unit_norms: &p.unit_norms,
+                epoch_norm: None,
             },
             Self::Blocks(p) => {
                 let d = p.direction();
@@ -9467,6 +9480,7 @@ impl PreparedLinear {
                     moves: &d.moves,
                     covector: &d.covector,
                     unit_norms: &d.unit_norms,
+                    epoch_norm: None,
                 }
             }
         }

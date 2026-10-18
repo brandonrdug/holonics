@@ -32,6 +32,25 @@ pub(crate) struct IntegralMatrix {
 }
 
 impl IntegralMatrix {
+    /// Admit an already grouped integer chart without reducing its entries to
+    /// separate fractions. The denominator belongs to the whole array.
+    pub(crate) fn from_grouped(
+        rows: usize,
+        columns: usize,
+        numerators: Vec<BigInt>,
+        denominator: BigInt,
+    ) -> Result<Self, ExactLinearError> {
+        if rows.checked_mul(columns) != Some(numerators.len()) || denominator <= BigInt::zero() {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        Ok(Self {
+            rows,
+            columns,
+            numerators,
+            denominator,
+        })
+    }
+
     /// **`Σ_t w_t l_t r_tᵀ`** over terms whose vectors are already in the integral chart
     /// ([`integral`]), with rational weights.
     pub(crate) fn outer_sum<'a>(

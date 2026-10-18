@@ -508,6 +508,8 @@ pub enum HnnError {
         "the deposit's storage growth is not certified: no dyadic ε in the declared search makes Q_(k+1) ⪯ (1 + ε) Q_k on the contacts' and resonators' storage forms"
     )]
     UncertifiedStorage,
+    #[error("epoch {crossing}'s nonzero represented step has no strictly positive exact fall")]
+    EpochStepNonDescending { crossing: u64 },
     #[error("deposits stopped at commit {commit}, when the constitution reached its budget")]
     DepositsStopped { commit: u64 },
     #[error(

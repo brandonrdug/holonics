@@ -3193,6 +3193,16 @@ struct Chart {
     excess: u128,
 }
 
+/// The pure result of one stored chart level's arrival. Counter effects are reported separately
+/// so the sequential caller can record them on its standing in the original order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct ChartStepResult {
+    chart: Chart,
+    increment: u128,
+    rebases: u32,
+    released: bool,
+}
+
 /// [definition; agent-inferred] **A parting chain's two parts** (stored where paths part; Lean `Compression/Landmark/Context/Compaction.chain_split`): the read's last stored chain parts from the address at
 /// `depth`; its upper part, down to `depth`, is read (and founded at the deposit) with `upper`, and
 /// its lower part keeps its counts with `lower` (none when it keeps its chart: a leaf, or an upper
@@ -3214,7 +3224,7 @@ struct Parting {
 /// depth where it parts), the parting chain's parts, and the lattice faces of the digit `0`,
 /// `q̂_ℓ(0)` as numerators of `2^(−M_p)`, at the levels `ℓ = 0, …, top` (`top` the last node at a
 /// leaf, or one past it where the prior `2^(M_p − 1)` is read). A level is a stored chain.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 struct LatticeRead {
     tree: usize,
     branch: usize,
@@ -3623,13 +3633,25 @@ impl Law {
         node: u32,
         depth: usize,
     ) -> Parting {
+        self.part_chart(*nodes.chart(node), nodes.bottom(node), branch, top, depth)
+    }
+
+    /// The exact split law on a carried chart and explicit chain geometry. The segment DAG uses
+    /// this when the source chart is an immutable opening snapshot rather than a mutable standing.
+    fn part_chart(
+        &self,
+        chart: Chart,
+        bottom: usize,
+        branch: usize,
+        top: usize,
+        depth: usize,
+    ) -> Parting {
         let Widths {
             face,
             carrier,
             certificate,
             ..
         } = self.widths;
-        let bottom = nodes.bottom(node);
         let upper_rung = self.rung_sum(branch, top, depth);
         if upper_rung == 0 {
             return Parting {
@@ -3651,7 +3673,6 @@ impl Law {
             };
         }
         let lower_rung = self.rung_sum(branch, depth + 1, bottom);
-        let chart = *nodes.chart(node);
         let [upper, lower] = chart.beta.split(upper_rung, lower_rung, carrier);
         let unit = |kept: Option<u128>| kept.map_or(0, |m| ceil_div(1u128 << certificate, m));
         let (lower_units, upper_units) = (unit(lower.1), unit(upper.1));
@@ -3693,6 +3714,34 @@ impl Law {
         self.round(u128::from(u) << self.widths.face, u128::from(v))
     }
 
+    /// The same KT/base operands from an opening mass snapshot, used by the segment chart DAG.
+    fn kt_based_halves(
+        &self,
+        halves: [u32; 2],
+        root: Option<[u32; 2]>,
+        symbol: usize,
+    ) -> (u64, u64) {
+        match self.declaration.base {
+            BaseMeasure::Even => (
+                u64::from(halves[symbol]),
+                u64::from(halves[0]) + u64::from(halves[1]),
+            ),
+            BaseMeasure::Root => {
+                let split = base_sixteenths(BaseMeasure::Root, root);
+                let mass = u64::from(halves[symbol]);
+                (
+                    16 * mass - 16 + 2 * split[symbol],
+                    16 * (u64::from(halves[0]) + u64::from(halves[1])),
+                )
+            }
+        }
+    }
+
+    fn leaf_halves(&self, halves: [u32; 2], root: Option<[u32; 2]>) -> u64 {
+        let (u, v) = self.kt_based_halves(halves, root, 0);
+        self.round(u128::from(u) << self.widths.face, u128::from(v))
+    }
+
     /// `⟦λ̂ u/v + (1 − λ̂) x⟧` with the stop weight `λ̂` and a lattice face `x` ([`lattice_mix`]).
     fn mix_stop(&self, stop: u64, u: u64, v: u64, below: u64) -> u64 {
         lattice_mix(&self.widths, stop, u, v, below)
@@ -3700,7 +3749,11 @@ impl Law {
 
     /// The join's lattice face `⟦λ̂_h q̂_cells + (1 − λ̂_h) q̂_bundles⟧`.
     fn join_face(&self, nodes: &impl Standing, dyadic: usize, cells: u64, bundles: u64) -> u64 {
-        lattice_blend(&self.widths, nodes.join(dyadic).stop, cells, bundles)
+        self.join_face_stop(nodes.join(dyadic).stop, cells, bundles)
+    }
+
+    fn join_face_stop(&self, stop: u64, cells: u64, bundles: u64) -> u64 {
+        lattice_blend(&self.widths, stop, cells, bundles)
     }
 
     /// **One branch's executed read** at its letters in tree `t`: its walk, and a parting chain's
@@ -3715,13 +3768,28 @@ impl Law {
         symbol: usize,
         letters: &[u32],
     ) -> LatticeRead {
+        let tree = self.tree(branch, dyadic);
+        let walk = nodes.walk(tree, letters);
+        self.read_walk(nodes, branch, dyadic, symbol, walk)
+    }
+
+    /// The same read law on an opening path already captured by the topology scheduler. Keeping
+    /// `read` as the walker preserves the sequential oracle; all face arithmetic remains here.
+    fn read_walk(
+        &self,
+        nodes: &impl Standing,
+        branch: usize,
+        dyadic: usize,
+        symbol: usize,
+        walk: Walk,
+    ) -> LatticeRead {
         let forced = self.branches[branch].forced;
         let tree = self.tree(branch, dyadic);
         let Walk {
             nodes: path,
             parting,
             stop,
-        } = nodes.walk(tree, letters);
+        } = walk;
         let mut bottoms: Vec<usize> = path.iter().map(|&node| nodes.bottom(node)).collect();
         let parting = parting.map(|depth| {
             let last = path.len() - 1;
@@ -3826,15 +3894,11 @@ impl Law {
     /// at a mixing level, `2^(−M−1)/min(q̂_D, k_D)` at a stored leaf, zero at a forced or unfounded
     /// level (their faces pass exactly).
     fn rounding(&self, nodes: &impl Standing, read: &LatticeRead, level: usize) -> u128 {
-        let Widths {
-            face, certificate, ..
-        } = self.widths;
-        let forced = self.branches[read.branch].forced;
         let top = read.faces.len() - 1;
         if level > top || (level == top && read.stop == Stop::Prior) {
             return 0;
         }
-        if read.bottoms[level] < forced {
+        if read.bottoms[level] < self.branches[read.branch].forced {
             return 0;
         }
         let (u, v) = nodes.kt_based(
@@ -3843,14 +3907,48 @@ impl Law {
             read.nodes.first().copied(),
             self.declaration.base,
         );
-        let here = u128::from(self.side(read.faces[level], read.symbol));
+        let below = (level + 1 < read.faces.len()).then(|| read.faces[level + 1]);
+        self.rounding_operands(
+            read.branch,
+            read.symbol,
+            read.bottoms[level],
+            read.faces[level],
+            below,
+            level == top && read.stop == Stop::Node,
+            u,
+            v,
+        )
+    }
+
+    /// Exact level rounding with the KT operands and opening faces supplied by a segment stream.
+    fn rounding_operands(
+        &self,
+        branch: usize,
+        symbol: usize,
+        bottom: usize,
+        here_face: u64,
+        below_face: Option<u64>,
+        top: bool,
+        u: u64,
+        v: u64,
+    ) -> u128 {
+        let Widths {
+            face, certificate, ..
+        } = self.widths;
+        if bottom < self.branches[branch].forced {
+            return 0;
+        }
+        let here = u128::from(self.side(here_face, symbol));
         let kt =
             |shift: u64| ceil_div(u128::from(v) << (certificate - face - shift), u128::from(u));
-        if level == top {
+        if top {
             let lattice = ceil_div(1u128 << (certificate - 1), here);
             lattice.max(kt(1))
         } else {
-            let below = u128::from(self.side(read.faces[level + 1], read.symbol));
+            let below = u128::from(self.side(
+                below_face.expect("a non-top level has a below face"),
+                symbol,
+            ));
             let lattice = ceil_div(1u128 << certificate, here.min(below));
             lattice.max(kt(0))
         }
@@ -3957,6 +4055,56 @@ impl Law {
         u32::from(carried.mantissa.is_some())
     }
 
+    /// Advance one chart at one arrival from exact scalars captured by its read. A top level has
+    /// no β step; the unused KT operands are zero there. Standing counters are returned as
+    /// bookkeeping so callers can apply them without borrowing the whole standing during a level
+    /// transition.
+    fn chart_step(
+        &self,
+        mut chart: Chart,
+        theta: u128,
+        top: bool,
+        u: u64,
+        v: u64,
+        below: u64,
+        child_increment: u128,
+        split_units: u128,
+    ) -> ChartStepResult {
+        let mut rebase = 0u128;
+        let mut rebases = 0u32;
+        let mut released = false;
+        if !top {
+            let (step, units) = self.beta_step(
+                chart.beta,
+                u128::from(u),
+                u128::from(v),
+                u128::from(below),
+                self.widths.face as i64,
+            );
+            rebase = units;
+            rebases = u32::from(step.mantissa.is_some());
+            released = step.released.is_some();
+            chart.beta = step.beta;
+            chart.stop = step.beta.stop_weight(self.widths.face, self.widths.carrier);
+            chart.rebases += rebases;
+            chart.drift = chart
+                .drift
+                .saturating_add(child_increment)
+                .saturating_add(rebase);
+        }
+        let increment = theta
+            .saturating_add(rebase.saturating_mul(2))
+            .saturating_add(child_increment)
+            .saturating_add(split_units.saturating_mul(2));
+        chart.excess = chart.excess.saturating_add(increment);
+        ChartStepResult {
+            chart,
+            increment,
+            rebases,
+            released,
+        }
+    }
+
     /// **Deposit one branch's read** on a standing: each mixing level's β steps by
     /// `k(b)/q̂_(ℓ+1)(b)` bottom-up and its certificates grow (a parting chain's upper part is
     /// stepped on its split's chart, and its split's rounding added twice to the increment). Then
@@ -3974,7 +4122,6 @@ impl Law {
         read: LatticeRead,
         run: Option<u32>,
     ) -> u128 {
-        let face = self.widths.face;
         let forced = self.branches[read.branch].forced;
         let top = read.faces.len() - 1;
         let levels = read.nodes.len();
@@ -3996,42 +4143,44 @@ impl Law {
                 Some(parting) if parts => parting.units,
                 _ => 0,
             };
-            let mut rebase = 0u128;
-            if level < top {
-                let below = self.side(read.faces[level + 1], read.symbol);
-                let beta = match &upper {
-                    Some(chart) if parts => chart.beta,
-                    _ => nodes.chart(node).beta,
-                };
-                let (u, v) = nodes.kt_based(node, read.symbol, root, self.declaration.base);
-                let (step, units) = self.beta_step(
-                    beta,
-                    u128::from(u),
-                    u128::from(v),
-                    u128::from(below),
-                    face as i64,
-                );
-                rebase = units;
-                let rebased = Self::record(nodes, &step);
+            let is_top = level == top;
+            let below = if is_top {
+                0
+            } else {
+                self.side(read.faces[level + 1], read.symbol)
+            };
+            let current = match &upper {
+                Some(chart) if parts => *chart,
+                _ => *nodes.chart(node),
+            };
+            let (u, v) = if is_top {
+                (0, 0)
+            } else {
+                nodes.kt_based(node, read.symbol, root, self.declaration.base)
+            };
+            let step = self.chart_step(current, theta, is_top, u, v, below, carried, split);
+            if step.rebases > 0 {
+                nodes.rebased();
+            }
+            if step.released {
+                nodes.released();
+            }
+            if !is_top {
                 let chart = match upper.as_mut() {
                     Some(chart) if parts => chart,
                     _ => nodes.chart_mut(node),
                 };
-                chart.beta = step.beta;
-                chart.stop = step.beta.stop_weight(face, self.widths.carrier);
-                chart.rebases += rebased;
-                chart.drift = chart.drift.saturating_add(carried).saturating_add(rebase);
+                chart.beta = step.chart.beta;
+                chart.stop = step.chart.stop;
+                chart.rebases = step.chart.rebases;
+                chart.drift = step.chart.drift;
             }
-            let increment = theta
-                .saturating_add(rebase.saturating_mul(2))
-                .saturating_add(carried)
-                .saturating_add(split.saturating_mul(2));
             let chart = match upper.as_mut() {
                 Some(chart) if parts => chart,
                 _ => nodes.chart_mut(node),
             };
-            chart.excess = chart.excess.saturating_add(increment);
-            carried = increment;
+            chart.excess = step.chart.excess;
+            carried = step.increment;
         }
         let LatticeRead {
             tree,
@@ -4746,6 +4895,64 @@ impl Landmarks {
             &self.splits_observed(address)?,
             grain,
         )
+    }
+
+    /// Read and deposit a bounded batch of causal arrivals through the compressed-segment chart
+    /// executor. The result contains each cell's opening face in input order. The tree publishes
+    /// the final nodes only after address validation, topology scheduling, and chart execution all
+    /// succeed; refusals leave its standing unchanged.
+    pub(crate) fn receive_arrivals(
+        &mut self,
+        addresses: &[Vec<Letter>],
+        classes: &[usize],
+        grain: u64,
+    ) -> Result<Vec<LandmarkFace>, ContextError> {
+        if addresses.len() != classes.len() {
+            return Err(shape(
+                "one class for each landmark arrival address",
+                addresses.len(),
+                classes.len(),
+            ));
+        }
+        let encoded = addresses
+            .iter()
+            .zip(classes)
+            .map(|(address, &class)| {
+                self.check_causal_address(address, class)?;
+                Ok(self.law.flatten(address))
+            })
+            .collect::<Result<Vec<_>, ContextError>>()?;
+        let schedule = arrivals::build_encoded(self, &encoded, classes)?;
+        let execution = arrivals::execute(self, &schedule, grain)?;
+        self.nodes = execution.nodes;
+        Ok(execution.faces)
+    }
+
+    /// Observation-prefixed counterpart of [`Landmarks::receive_arrivals`]. Prefixes are
+    /// checked and flattened as their submitted observation paths, then scheduled exactly as
+    /// those paths; they are never inferred from or truncated to the causal suffix.
+    pub(crate) fn receive_observed_arrivals(
+        &mut self,
+        addresses: &[ObservedAddress],
+        classes: &[usize],
+        grain: u64,
+    ) -> Result<Vec<LandmarkFace>, ContextError> {
+        if addresses.len() != classes.len() {
+            return Err(shape(
+                "one class for each landmark arrival address",
+                addresses.len(),
+                classes.len(),
+            ));
+        }
+        let encoded = addresses
+            .iter()
+            .zip(classes)
+            .map(|(address, &class)| self.checked_observed_letters(address, class))
+            .collect::<Result<Vec<_>, ContextError>>()?;
+        let schedule = arrivals::build_encoded(self, &encoded, classes)?;
+        let execution = arrivals::execute(self, &schedule, grain)?;
+        self.nodes = execution.nodes;
+        Ok(execution.faces)
     }
 
     /// [definition; agent-inferred] **An epoch's standings in cell order** (module header, "An
@@ -6673,6 +6880,8 @@ impl PassageCode {
         Ok(interval_sum(&zero(), &enclosure)?)
     }
 }
+
+mod arrivals;
 
 #[cfg(test)]
 mod tests;

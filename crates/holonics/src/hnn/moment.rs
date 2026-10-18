@@ -253,6 +253,7 @@ use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{Chart, integral, lcm};
 
+mod epoch;
 mod resident_marginal_face;
 mod resident_pair_face;
 pub use resident_marginal_face::MarginalFaceAudit;
