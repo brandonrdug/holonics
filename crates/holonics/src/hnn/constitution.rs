@@ -12375,6 +12375,149 @@ mod receiving_precision_tests {
 }
 
 #[cfg(test)]
+mod chart_follows_rule_tests {
+    use super::*;
+    use crate::geometry::RatVec3;
+    use crate::geometry::screw::ScrewGenerator;
+    use crate::hnn::field::{CribDeclaration, FieldDeclaration, RingDeclaration};
+    use crate::hnn::paired::{PairedCarrier, PairingDeclaration};
+    use crate::ratio::{integer, rat};
+
+    #[test]
+    fn paired_chart_follows_its_rule() {
+        let field = Field::declare(
+            FieldDeclaration {
+                rings: vec![RingDeclaration {
+                    period: 4,
+                    screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
+                    placements: (0..4)
+                        .map(|node| FieldDeclaration::quarter_turn(node, 4))
+                        .collect(),
+                    lock: vec![0, 1, 2, 3],
+                    reflector: vec![0, 3, 2, 1],
+                    admittance: integer(2),
+                    initial: 0,
+                }],
+                contacts: Vec::new(),
+                loops: Vec::new(),
+                sources: vec![0],
+                offsets: Vec::new(),
+                alphabet: 4,
+                step: Rat::one(),
+                exponent_grain: 1,
+                receivers: Vec::new(),
+                crib: CribDeclaration {
+                    window: 16,
+                    offset: 1,
+                },
+                population: 1 << 16,
+                lattice: Default::default(),
+            }
+            .by_lattice_rule(),
+        )
+        .unwrap();
+        let (paired, carrier, _) = PairedCarrier::found(
+            &field,
+            Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap(),
+            0,
+            &PairingDeclaration::Family {
+                table: vec![(0, 1), (1, 0), (2, 3), (3, 2)],
+            },
+        )
+        .unwrap();
+        let rule = paired.chart_rule(Locus::SourcePort(0)).unwrap();
+        let mut law = paired.source_law(0).unwrap().clone();
+        for clock in 1..=64 {
+            let mut feature = vec![rat(1, 2), rat(1, 4), rat(1, 4), Rat::zero()];
+            feature.rotate_left((clock as usize - 1) % 4);
+            let sample = Sample {
+                weight: Rat::one(),
+                feature,
+                covector: (0..law.map.rows())
+                    .map(|row| rat((row % 5) as i64 - 2, 4))
+                    .collect(),
+                masses: None,
+            };
+            let (next, reading) = law
+                .deposited(
+                    &[sample],
+                    &Rat::one(),
+                    &rule,
+                    &mut BudgetedCarry::new(rule.lattice(), clock),
+                )
+                .unwrap();
+            assert!(reading.is_some());
+            let chart = &next.chart;
+            let carried =
+                GramBlock::of(&next.gram, &chart.prior(), None, None, None, None).unwrap();
+            let upper = rule
+                .exponent(next.gram.len(), carried.norm)
+                .max(chart.scale)
+                + 1;
+            assert!(
+                chart.exponent <= upper,
+                "deposit {clock}: {} > {upper}",
+                chart.exponent
+            );
+            assert!(chart.certificate <= rule.target(), "deposit {clock}");
+            assert_eq!(carrier.certify(next.map()), Ok(()));
+            law = next;
+        }
+    }
+
+    #[test]
+    fn moved_chart_follows_its_rule() {
+        let rule = ChartRule::new(Lattice::new(4), 16);
+        // One receiving statistic, held while only its diagonal prior moves.
+        let gram_at = |scale: u32| {
+            let prior = Rat::from_integer(BigInt::one() << scale as usize);
+            vec![
+                vec![integer(2) + &prior, Rat::one()],
+                vec![Rat::one(), integer(3) + prior],
+            ]
+        };
+        let (mut chart, _) = SolvedChart::founded(0)
+            .deposited(&gram_at(0), &[], &rule)
+            .unwrap();
+        for cycle in 0..8 {
+            for scale in [1, 0] {
+                let gram = gram_at(scale);
+                let (next, _) = chart.moved(&gram, scale, &rule).unwrap();
+                let carried = GramBlock::of(&gram, &next.prior(), None, None, None, None).unwrap();
+                let upper = rule.exponent(gram.len(), carried.norm).max(scale);
+                assert!(next.exponent <= upper, "cycle {cycle}, scale {scale}");
+                assert!(next.certificate <= rule.target());
+                chart = next;
+            }
+        }
+    }
+
+    #[test]
+    fn coarsened_carry_is_nearest() {
+        // A transport operand, not a certified Gram inverse: all signed coordinates,
+        // including exact positive and negative half units of the coarser lattice.
+        for coordinate in -37i32..=37 {
+            let chart = SolvedChart {
+                support: vec![0],
+                block: vec![BigInt::from(coordinate)],
+                exponent: 6,
+                ..SolvedChart::founded(0)
+            };
+            let coarse = chart.carried_to(&[0], 3, 3, 0, 0).unwrap();
+            let exact = Rat::new(BigInt::from(coordinate), BigInt::from(64));
+            let rounded = Rat::new(coarse[0].clone(), BigInt::from(8));
+            let error = &rounded - &exact;
+            assert!(error.abs() <= rat(1, 16));
+            if coordinate.rem_euclid(8) == 4 {
+                assert_eq!(error, rat(1, 16), "ties round upward");
+            }
+            let fine = chart.carried_to(&[0], 9, 3, 0, 0).unwrap();
+            assert_eq!(fine[0], BigInt::from(coordinate) << 3usize);
+        }
+    }
+}
+
+#[cfg(test)]
 mod solved_chart_wide_tests {
     use super::*;
     #[test]
