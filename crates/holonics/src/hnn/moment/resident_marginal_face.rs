@@ -337,34 +337,29 @@ mod tests {
     fn marginal_face_reads_the_whole_table() {
         let field = field();
         let reference = Reference::new(4, OPEN_BUDGET);
-        let mut resident = reference
-            .mount_with(
-                &field,
-                &Current::at_rest(&field),
-                generic_within(&field, 301, OPEN_BUDGET),
-            )
-            .unwrap();
-        // Take the first two actual deposits, before the period-four chain's
+        // Independently deposit two constitutions before the period-four chain's
         // recorded carrier edge at cell two (2026-10-05 record, section 2).
         // The marginal identity concerns these admitted port values and counts;
         // alternating them exercises both signs without widening the carrier.
-        let mut held = None;
         let mut deposited = Vec::new();
-        for n in 0..2 {
+        for seed in [301, 302] {
+            let initial = generic_within(&field, seed, OPEN_BUDGET);
+            let before_commit = initial.commit();
+            let mut resident = reference
+                .mount_with(&field, &Current::at_rest(&field), initial)
+                .unwrap();
             let (id, _) = reference
-                .ingest(&mut resident, held.as_ref(), &encoded(&field, &[code(n)]))
+                .ingest(&mut resident, None, &encoded(&field, &[code(0)]))
                 .unwrap();
             let phases = resident.admitted()[0].clone();
             let (pending, _) = reference.refine(&mut resident, &id, &phases).unwrap();
-            let targets: Vec<_> = (1..=field.receivers()[0].aperture)
-                .map(|offset| code(n + offset))
-                .collect();
+            let targets: Vec<_> = (1..=field.receivers()[0].aperture).map(code).collect();
             let (staged, _) = reference
                 .compare(&mut resident, pending, &encoded(&field, &targets))
                 .unwrap();
             reference.deposit(&mut resident, staged).unwrap();
+            assert!(resident.constitution().commit() > before_commit);
             deposited.push(resident.constitution().clone());
-            held = Some(id);
         }
         let mut current = Current::at_rest(&field);
         let mut moment = SourceMoment::open(&field, &current);
