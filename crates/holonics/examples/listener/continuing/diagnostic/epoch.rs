@@ -1,0 +1,630 @@
+//! Exact, explicitly hypothetical one-epoch normal-law readout.
+//!
+//! This module does not claim access to the listener's private `PreparedStep.unit`, persistent
+//! carry, or a device-certified gain. It forms `G_cross` from the retained frozen comparison
+//! covectors and staged samples, then reports the unit-gain (`gamma = 1`) hypothetical law with
+//! zero incoming residual. The native material Gram is the metric; the separately retained Gram
+//! remainder is shown as carry and is never silently added to that metric.
+
+use super::*;
+use holonics::hnn::reference::FrozenComparison;
+use holonics::ratio::algebraic::ExactInterval;
+use holonics::ratio::linear::ExactRatMatrix;
+use num_bigint::BigInt;
+use num_traits::{One, Signed, Zero};
+use std::fmt;
+
+type Matrix = ExactRatMatrix;
+
+fn rat_pow2(exponent: i64) -> Rat {
+    if exponent >= 0 {
+        Rat::from_integer(BigInt::one() << exponent as usize)
+    } else {
+        Rat::new(BigInt::one(), BigInt::one() << (-exponent) as usize)
+    }
+}
+
+fn ceil_log2_positive(value: &Rat) -> Option<i64> {
+    if value <= &Rat::zero() {
+        return None;
+    }
+    let numerator = value.numer().bits() as i64;
+    let denominator = value.denom().bits() as i64;
+    let candidate = numerator - denominator;
+    Some(if value <= &rat_pow2(candidate) {
+        candidate
+    } else {
+        candidate + 1
+    })
+}
+
+fn matrix_is_symmetric(matrix: &Matrix) -> bool {
+    matrix.is_square()
+        && (0..matrix.rows())
+            .all(|i| (0..matrix.columns()).all(|j| matrix.get(i, j).ok() == matrix.get(j, i).ok()))
+}
+
+fn matrix_max_abs(matrix: &Matrix) -> Rat {
+    matrix
+        .entries()
+        .iter()
+        .map(|entry| entry.abs())
+        .max()
+        .unwrap_or_else(Rat::zero)
+}
+
+fn leading_determinant(matrix: &Matrix, extent: usize) -> Option<Rat> {
+    if extent == 0 || extent > matrix.rows() || !matrix.is_square() {
+        return (extent == 0).then(|| Rat::one());
+    }
+    let mut values = (0..extent)
+        .map(|i| {
+            (0..extent)
+                .map(|j| matrix.get(i, j).ok().cloned())
+                .collect::<Option<Vec<_>>>()
+        })
+        .collect::<Option<Vec<_>>>()?;
+    let mut determinant = Rat::one();
+    for pivot in 0..extent {
+        let selected = (pivot..extent).find(|&row| !values[row][pivot].is_zero())?;
+        if selected != pivot {
+            values.swap(selected, pivot);
+            determinant = -determinant;
+        }
+        let diagonal = values[pivot][pivot].clone();
+        determinant *= &diagonal;
+        for row in (pivot + 1)..extent {
+            let factor = &values[row][pivot] / &diagonal;
+            for column in (pivot + 1)..extent {
+                let correction = &factor * &values[pivot][column];
+                values[row][column] -= correction;
+            }
+        }
+    }
+    Some(determinant)
+}
+
+fn is_positive_definite(matrix: &Matrix) -> bool {
+    matrix.is_square()
+        && matrix_is_symmetric(matrix)
+        && (1..=matrix.rows()).all(|extent| {
+            leading_determinant(matrix, extent).is_some_and(|determinant| determinant > Rat::zero())
+        })
+}
+
+fn unconstrained_reasons(
+    crossing_symmetry: &str,
+    end_symmetry: &str,
+    crossing_support: &[usize],
+    crossing_width: usize,
+    end_support: &[usize],
+    end_width: usize,
+    gram: &Matrix,
+) -> Vec<&'static str> {
+    let full_support = |support: &[usize], width: usize| {
+        support.len() == width && support.iter().copied().eq(0..width)
+    };
+    let mut reasons = Vec::new();
+    if !matrix_is_symmetric(gram) {
+        reasons.push("H_end is not exactly symmetric");
+    }
+    if !is_positive_definite(gram) {
+        reasons.push("H_end positive-definiteness is not established");
+    }
+    if !full_support(crossing_support, crossing_width)
+        || !full_support(end_support, end_width)
+        || crossing_support != end_support
+    {
+        reasons.push("receiver chart support is not the same full declared coordinate set");
+    }
+    if crossing_symmetry != "None" || end_symmetry != "None" {
+        reasons.push("receiver symmetry constraint is not None at both cuts");
+    }
+    reasons
+}
+
+#[derive(Debug)]
+struct NonpositiveHypotheticalFall {
+    fall: Rat,
+}
+
+impl fmt::Display for NonpositiveHypotheticalFall {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            formatter,
+            "nonzero hypothetical step has nonpositive exact fall {} under the admitted unconstrained metric",
+            self.fall
+        )
+    }
+}
+
+impl std::error::Error for NonpositiveHypotheticalFall {}
+
+fn check_hypothetical_fall(
+    nonzero_step: bool,
+    unconstrained_metric_admitted: bool,
+    fall: &Rat,
+) -> std::result::Result<(), NonpositiveHypotheticalFall> {
+    if nonzero_step && unconstrained_metric_admitted && fall <= &Rat::zero() {
+        Err(NonpositiveHypotheticalFall { fall: fall.clone() })
+    } else {
+        Ok(())
+    }
+}
+
+fn matrix_product(left: &Matrix, right: &Matrix) -> Result<Matrix> {
+    if left.columns() != right.rows() {
+        return Err("epoch matrix product dimensions disagree".into());
+    }
+    let mut rows = vec![vec![Rat::zero(); right.columns()]; left.rows()];
+    for (i, row) in rows.iter_mut().enumerate() {
+        for (j, value) in row.iter_mut().enumerate() {
+            for k in 0..left.columns() {
+                *value += left.get(i, k)? * right.get(k, j)?;
+            }
+        }
+    }
+    Ok(Matrix::new(rows)?)
+}
+
+fn matrix_add(left: &Matrix, right: &Matrix) -> Result<Matrix> {
+    if left.rows() != right.rows() || left.columns() != right.columns() {
+        return Err("epoch matrix sum dimensions disagree".into());
+    }
+    let mut rows = left.to_rows();
+    for i in 0..left.rows() {
+        for j in 0..left.columns() {
+            rows[i][j] += right.get(i, j)?;
+        }
+    }
+    Ok(Matrix::new(rows)?)
+}
+
+fn matrix_subtract(left: &Matrix, right: &Matrix) -> Result<Matrix> {
+    if left.rows() != right.rows() || left.columns() != right.columns() {
+        return Err("epoch matrix difference dimensions disagree".into());
+    }
+    let mut rows = left.to_rows();
+    for i in 0..left.rows() {
+        for j in 0..left.columns() {
+            rows[i][j] -= right.get(i, j)?;
+        }
+    }
+    Ok(Matrix::new(rows)?)
+}
+
+fn column_majorizer(gram: &Matrix) -> Result<(Vec<i64>, Vec<Rat>)> {
+    if !gram.is_square() {
+        return Err("epoch metric is not square".into());
+    }
+    let mut exponents = Vec::with_capacity(gram.columns());
+    let mut diagonal = Vec::with_capacity(gram.columns());
+    for column in 0..gram.columns() {
+        let mut norm = Rat::zero();
+        for row in 0..gram.rows() {
+            norm += gram.get(row, column)?.abs();
+        }
+        let exponent = ceil_log2_positive(&norm)
+            .ok_or("column majorizer is undefined for a zero metric column")?;
+        exponents.push(exponent);
+        diagonal.push(rat_pow2(exponent));
+    }
+    Ok((exponents, diagonal))
+}
+
+fn right_column_scale(matrix: &Matrix, diagonal: &[Rat]) -> Result<Matrix> {
+    if matrix.columns() != diagonal.len() {
+        return Err("epoch diagonal scale width disagrees with matrix".into());
+    }
+    let mut rows = matrix.to_rows();
+    for row in &mut rows {
+        for (value, scale) in row.iter_mut().zip(diagonal) {
+            *value /= scale;
+        }
+    }
+    Ok(Matrix::new(rows)?)
+}
+
+fn project_toward_zero(matrix: &Matrix, lattice_exponent: u32) -> Result<Matrix> {
+    let scale = rat_pow2(i64::from(lattice_exponent));
+    let mut rows = matrix.to_rows();
+    for row in &mut rows {
+        for value in row {
+            *value = Rat::from_integer((&*value * &scale).to_integer()) / &scale;
+        }
+    }
+    Ok(Matrix::new(rows)?)
+}
+
+fn max_row_sum(matrix: &Matrix) -> Rat {
+    (0..matrix.rows())
+        .map(|row| {
+            (0..matrix.columns()).fold(Rat::zero(), |sum, column| {
+                sum + matrix
+                    .get(row, column)
+                    .map(Rat::abs)
+                    .unwrap_or_else(|_| Rat::zero())
+            })
+        })
+        .max()
+        .unwrap_or_else(Rat::zero)
+}
+
+fn exact_fall(step: &Matrix, gradient: &Matrix, gram: &Matrix) -> Result<Rat> {
+    let linear = step
+        .entries()
+        .iter()
+        .zip(gradient.entries())
+        .fold(Rat::zero(), |sum, (a, b)| sum + a * b);
+    let quadratic = matrix_product(&matrix_product(step, gram)?, &step.transpose()?)?;
+    let trace = (0..quadratic.rows()).fold(Rat::zero(), |sum, i| {
+        sum + quadratic.get(i, i).cloned().unwrap_or_else(|_| Rat::zero())
+    });
+    Ok(linear - trace / Rat::from_integer(BigInt::from(2)))
+}
+
+fn held_candidate_wave(
+    frozen: &FrozenComparison,
+    producing_map: &Matrix,
+    candidate_map: &Matrix,
+    samples: &[Sample],
+) -> Result<Faces> {
+    let wave = super::held_wave(candidate_map, producing_map, frozen.wave(), samples)?;
+    // Exercise the same retained tree/phase combine path as recompare_covector/evaluate. The
+    // combined value is not used to invent a parallel score; evaluate owns the exact objective.
+    frozen.combined_faces(&wave)?;
+    Ok(wave)
+}
+
+fn add_intervals(left: &mut Option<ExactInterval>, right: &ExactInterval) -> Result<()> {
+    *left = Some(match left.take() {
+        Some(total) => ExactInterval::new(total.lower + &right.lower, total.upper + &right.upper)?,
+        None => right.clone(),
+    });
+    Ok(())
+}
+
+fn held_readings_for_map(
+    views: &[CutView],
+    candidate_map: &Matrix,
+    label: &str,
+    branch: &str,
+    total_samples: usize,
+) -> Result<()> {
+    let mut before_total = None;
+    let mut after_total = None;
+    let mut change_total = None;
+    let mut evaluated = 0usize;
+    for (cell, view) in views.iter().enumerate() {
+        let Some(frozen) = view.frozen.as_ref() else {
+            println!(
+                "step0_epoch_held_reading branch={branch} cell={cell} candidate={label} status=unavailable reason=no-retained-frozen-comparison"
+            );
+            continue;
+        };
+        let wave = held_candidate_wave(frozen, &view.producing_map, candidate_map, &view.samples)?;
+        let reading = frozen.evaluate(&wave)?;
+        add_intervals(&mut before_total, &reading.before)?;
+        add_intervals(&mut after_total, &reading.after)?;
+        add_intervals(&mut change_total, &reading.objective_change)?;
+        evaluated += 1;
+        println!(
+            "step0_epoch_held_reading branch={branch} cell={cell} candidate={label} before={:?} after={:?} objective_change={:?} unchanged={} strict_improvement={} needs_precision={} reason={}",
+            reading.before,
+            reading.after,
+            reading.objective_change,
+            reading.unchanged,
+            reading.strictly_improved,
+            reading.needs_precision(),
+            reading.unresolved_reason()
+        );
+    }
+    println!(
+        "step0_epoch_held_objective_total branch={branch} candidate={label} evaluated_cells={evaluated} epoch_samples={total_samples} before={before_total:?} after={after_total:?} objective_change={change_total:?} metric=exact-sum-of-per-cell-frozen-comparison-intervals"
+    );
+    Ok(())
+}
+
+/// Report exact sample statistics and the explicitly hypothetical unit-gain normal-law step.
+/// No data is deposited, no comparison is re-heard, and no result here substitutes for the
+/// native per-step `PreparedStep.unit` or for a certified persistent residual.
+pub(super) fn report_epoch(
+    branch: &str,
+    crossing: &CutView,
+    end: &CutView,
+    views: &[CutView],
+    receiver_grain: u64,
+    lattice_exponent: u32,
+) -> Result<()> {
+    if receiver_grain == 0 {
+        return Err("receiver grain denominator must be positive".into());
+    }
+    let (gradient, sample_gram_delta) = super::epoch_statistics(crossing, views)?;
+    let actual_map_delta = matrix_subtract(&end.map, &crossing.map)?;
+    let actual_stored_gram_delta = matrix_subtract(&end.gram, &crossing.gram)?;
+    let actual_carry_delta = matrix_subtract(&end.gram_remainder, &crossing.gram_remainder)?;
+    let max_feature = views
+        .iter()
+        .flat_map(|view| &view.samples)
+        .flat_map(|sample| &sample.feature)
+        .map(Rat::abs)
+        .max()
+        .unwrap_or_else(Rat::zero);
+    let max_live_g = views
+        .iter()
+        .flat_map(|view| &view.samples)
+        .flat_map(|sample| &sample.covector)
+        .map(Rat::abs)
+        .max()
+        .unwrap_or_else(Rat::zero);
+    let max_sample_crossing_g = views
+        .iter()
+        .flat_map(|view| &view.crossing_covectors)
+        .flatten()
+        .map(Rat::abs)
+        .max()
+        .unwrap_or_else(Rat::zero);
+    let newest_sample_weight = views
+        .iter()
+        .rev()
+        .find_map(|view| view.samples.last())
+        .map(|sample| &sample.weight);
+    let zero_step_cells = views
+        .iter()
+        .filter(|view| view.receiving_step.is_zero())
+        .count();
+    let vanished_cells = views.iter().filter(|view| view.receiving_vanished).count();
+    let grain_unit = Rat::new(BigInt::one(), BigInt::from(receiver_grain));
+    let native_half_quantum = &grain_unit / Rat::from_integer(BigInt::from(2));
+
+    println!(
+        "step0_epoch branch={branch} samples={} W_cross={:?} H_cross_stored={:?} G_cross={:?} sample_H_delta={:?} H_end_stored={:?} H_stored_delta={:?} carry_cross={:?} carry_end={:?} carry_delta={:?} W_end={:?} W_actual_delta={:?}",
+        views.iter().map(|view| view.samples.len()).sum::<usize>(),
+        crossing.map,
+        crossing.gram,
+        gradient,
+        sample_gram_delta,
+        end.gram,
+        actual_stored_gram_delta,
+        crossing.gram_remainder,
+        end.gram_remainder,
+        actual_carry_delta,
+        end.map,
+        actual_map_delta,
+    );
+    println!(
+        "step0_epoch_contract branch={branch} metric=native-stored-H; ridge_is_already_in_stored-H; gram_carry_reported_separately_not_added; gamma=1_hypothetical; incoming_R=0_hypothetical; this_G_is_frozen_crossing_covector_sum_not_live_PreparedStep.unit; radial_mode=not_exposed; receiving_prior={:?} prior_scale={} support={:?} symmetry={} receiver_grain_unit=1/{receiver_grain}={grain_unit} native_precision_half_quantum={native_half_quantum}",
+        crossing.receiving_prior, crossing.prior_scale, crossing.support, crossing.symmetry,
+    );
+    println!(
+        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_one_crossing_g={max_sample_crossing_g} max_abs_G_cross={} last_staged_sample_weight_as_newest_datum_weight={newest_sample_weight:?} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} L_W={lattice_exponent} grain_denominator={receiver_grain}; no_clock_feature_split_claimed",
+        matrix_max_abs(&gradient)
+    );
+
+    // This is the stated step-0 hypothetical law: no persistent native carry is present in the
+    // captured API, so R' is exactly the unit-gain crossing gradient for this readout only.
+    let residual_prime = gradient.clone();
+    let majorizer_result = column_majorizer(&end.gram);
+    let (majorizer_exponents, majorizer_diagonal) = match majorizer_result {
+        Ok(value) => value,
+        Err(error) => {
+            println!(
+                "step0_epoch_candidate branch={branch} status=unavailable reason={error}; zero-or-invalid-column-majorizer"
+            );
+            let sample_count = views.iter().map(|view| view.samples.len()).sum();
+            held_readings_for_map(views, &crossing.map, "W_cross", branch, sample_count)?;
+            held_readings_for_map(views, &end.map, "W_end", branch, sample_count)?;
+            return Ok(());
+        }
+    };
+    let d_hyp = right_column_scale(&residual_prime, &majorizer_diagonal)?;
+    let lattice_unit = rat_pow2(-i64::from(lattice_exponent));
+    let step = project_toward_zero(&d_hyp, lattice_exponent)?;
+    let residual_after = matrix_subtract(&residual_prime, &matrix_product(&step, &end.gram)?)?;
+    let fall = exact_fall(&step, &residual_prime, &end.gram)?;
+    let inverse = match end.gram.inverse() {
+        Ok(inverse) => inverse,
+        Err(error) => {
+            println!(
+                "step0_epoch_stalls branch={branch} status=unavailable reason=singular-H_end error={error}"
+            );
+            let sample_count = views.iter().map(|view| view.samples.len()).sum();
+            held_readings_for_map(views, &crossing.map, "W_cross", branch, sample_count)?;
+            held_readings_for_map(views, &end.map, "W_end", branch, sample_count)?;
+            return Ok(());
+        }
+    };
+    let unconstrained_update = matrix_product(&residual_prime, &inverse)?;
+    let optimum = matrix_add(&crossing.map, &unconstrained_update)?;
+    let unconstrained_reasons = unconstrained_reasons(
+        &crossing.symmetry,
+        &end.symmetry,
+        &crossing.support,
+        crossing.map.columns(),
+        &end.support,
+        end.map.columns(),
+        &end.gram,
+    );
+    let nonzero_step = !step.entries().iter().all(Rat::is_zero);
+    let fall_error =
+        check_hypothetical_fall(nonzero_step, unconstrained_reasons.is_empty(), &fall).err();
+    let fall_defect = fall_error.is_some();
+    let fall_check = if !nonzero_step {
+        "zero-step"
+    } else if unconstrained_reasons.is_empty() && !fall_defect {
+        "PASS"
+    } else if fall_defect {
+        "FAIL"
+    } else {
+        "unconstrained-only"
+    };
+    let actual_end_gap = matrix_subtract(&end.map, &optimum)?;
+    println!(
+        "step0_epoch_majorizer branch={branch} column_exponents={majorizer_exponents:?} M_diagonal={majorizer_diagonal:?} D_hyp={d_hyp:?} max_abs_D_hyp={} max_abs_D_in_W_units={} lattice_unit={lattice_unit} step_toward_zero={step:?} residual_R_double_prime={residual_after:?} exact_fall={fall} nonzero_step={nonzero_step} positive_fall_check={fall_check} actual_W_end_minus_W_star_unconstrained={actual_end_gap:?}",
+        matrix_max_abs(&d_hyp),
+        matrix_max_abs(&d_hyp) / &lattice_unit,
+    );
+    println!(
+        "step0_epoch_quadratic_candidate branch={branch} status={} W_star_unconstrained={optimum:?} exact_normal_residual=0 objective=unconstrained_exact_prox_quadratic_only; radial_constraint_certificate=not_exposed; frozen-comparison-readings-are-reported-separately; not_a_certified_native_update; W_end_gap_is_not_a_deposit_law_defect constraints={unconstrained_reasons:?}",
+        if unconstrained_reasons.is_empty() && (fall_check == "PASS" || fall_check == "zero-step") {
+            "exact-unconstrained-diagnostic"
+        } else {
+            "not-admitted-as-lawful-candidate"
+        }
+    );
+    let residual_dual = matrix_product(&residual_after, &inverse)?;
+    let mut stalls = Vec::new();
+    for i in 0..unconstrained_update.rows() {
+        for j in 0..unconstrained_update.columns() {
+            let full = unconstrained_update.get(i, j)?.abs();
+            let emitted = d_hyp.get(i, j)?.abs();
+            if full >= lattice_unit && emitted < lattice_unit {
+                stalls.push((i, j));
+            }
+        }
+    }
+    let witness_bound = max_row_sum(&residual_dual) * &max_feature;
+    let width_times_entry_bound = Rat::from_integer(BigInt::from(residual_dual.columns()))
+        * matrix_max_abs(&residual_dual)
+        * &max_feature;
+    let mut witnesses_over_grain = Vec::new();
+    let mut max_witness = Rat::zero();
+    for &(row, column) in &stalls {
+        for (cell, view) in views.iter().enumerate() {
+            for (sample_index, sample) in view.samples.iter().enumerate() {
+                if sample.feature.len() != residual_dual.columns() {
+                    return Err("stall witness feature width disagrees with residual dual".into());
+                }
+                let value = (0..sample.feature.len()).fold(Rat::zero(), |sum, j| {
+                    sum + residual_dual
+                        .get(row, j)
+                        .cloned()
+                        .unwrap_or_else(|_| Rat::zero())
+                        * &sample.feature[j]
+                });
+                let magnitude = value.abs();
+                if magnitude >= grain_unit {
+                    witnesses_over_grain.push((row, column, cell, sample_index, value));
+                }
+                max_witness = max_witness.max(magnitude);
+            }
+        }
+    }
+    println!(
+        "step0_epoch_stalls branch={branch} status={} stalled_entries={stalls:?} count={} norm_inf_Rdual_times_maxf_bound={witness_bound} width_times_max_entry_times_maxf_bound={width_times_entry_bound} per_feature_witnesses_at_or_above_grain={witnesses_over_grain:?} max_per_feature_logit_witness={} receiver_grain_unit={grain_unit} native_half_quantum={native_half_quantum}; hypothetical_R_double_prime_only; no_live_deposit_refusal_claim",
+        if unconstrained_reasons.is_empty() {
+            "unconstrained-hypothetical"
+        } else {
+            "unconstrained-only-not-R12"
+        },
+        stalls.len(),
+        max_witness,
+    );
+
+    let sample_count = views.iter().map(|view| view.samples.len()).sum();
+    held_readings_for_map(views, &crossing.map, "W_cross", branch, sample_count)?;
+    held_readings_for_map(views, &end.map, "W_end", branch, sample_count)?;
+    held_readings_for_map(
+        views,
+        &optimum,
+        "W_star_unconstrained",
+        branch,
+        sample_count,
+    )?;
+    if fall_defect {
+        return Err(Box::new(
+            fall_error.expect("fall defect carries its typed error"),
+        ));
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn matrix(rows: &[&[i64]]) -> Matrix {
+        Matrix::new(
+            rows.iter()
+                .map(|row| row.iter().map(|x| Rat::from_integer((*x).into())).collect())
+                .collect(),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn hypothetical_majorizer_projection_and_fall_are_exact() {
+        let h = matrix(&[&[2, 0], &[0, 4]]);
+        let g = matrix(&[&[3, -1], &[1, 2]]);
+        let (exponents, m) = column_majorizer(&h).unwrap();
+        assert_eq!(exponents, vec![1, 2]);
+        assert_eq!(
+            m,
+            vec![Rat::from_integer(2.into()), Rat::from_integer(4.into())]
+        );
+        let d = right_column_scale(&g, &m).unwrap();
+        assert_eq!(
+            d,
+            Matrix::new(vec![
+                vec![
+                    Rat::new(3.into(), 2.into()),
+                    Rat::new((-1).into(), 4.into())
+                ],
+                vec![Rat::new(1.into(), 2.into()), Rat::new(1.into(), 2.into())],
+            ])
+            .unwrap()
+        );
+        let step = project_toward_zero(&d, 0).unwrap();
+        assert_eq!(step, matrix(&[&[1, 0], &[0, 0]]));
+        let residual = matrix_subtract(&g, &matrix_product(&step, &h).unwrap()).unwrap();
+        assert_eq!(residual, matrix(&[&[1, -1], &[1, 2]]));
+        assert_eq!(
+            exact_fall(&step, &g, &h).unwrap(),
+            Rat::from_integer(2.into())
+        );
+    }
+
+    #[test]
+    fn grain_denominator_and_native_half_quantum_are_distinct() {
+        let grain = Rat::new(BigInt::one(), BigInt::from(32));
+        let half = &grain / Rat::from_integer(BigInt::from(2));
+        assert_eq!(grain, Rat::new(1.into(), 32.into()));
+        assert_eq!(half, Rat::new(1.into(), 64.into()));
+        assert_ne!(grain, rat_pow2(-32));
+    }
+
+    #[test]
+    fn metric_uses_stored_gram_without_adding_carry() {
+        let h = matrix(&[&[5, 0], &[0, 3]]);
+        let reasons = unconstrained_reasons("None", "None", &[0, 1], 2, &[0, 1], 2, &h);
+        assert!(reasons.is_empty());
+        let constrained = unconstrained_reasons("Paired", "Paired", &[0], 2, &[0], 2, &h);
+        assert!(constrained.iter().any(|reason| reason.contains("symmetry")));
+        assert!(constrained.iter().any(|reason| reason.contains("support")));
+        assert!(is_positive_definite(&h));
+        assert!(!is_positive_definite(&matrix(&[&[1, 2], &[2, 1]])));
+    }
+
+    #[test]
+    fn exact_column_bound_rounds_up_not_under() {
+        let subunit = Matrix::new(vec![vec![Rat::new(3.into(), 4.into())]]).unwrap();
+        assert_eq!(
+            column_majorizer(&subunit).unwrap(),
+            (vec![0], vec![Rat::one()])
+        );
+        let h = Matrix::new(vec![vec![Rat::new(3.into(), 2.into())]]).unwrap();
+        assert_eq!(
+            column_majorizer(&h).unwrap(),
+            (vec![1], vec![Rat::from_integer(2.into())])
+        );
+    }
+
+    #[test]
+    fn nonpositive_fall_is_typed_only_for_nonzero_admitted_unconstrained_steps() {
+        assert!(check_hypothetical_fall(true, true, &Rat::zero()).is_err());
+        assert!(check_hypothetical_fall(true, true, &Rat::from_integer((-1).into())).is_err());
+        assert!(check_hypothetical_fall(true, true, &Rat::one()).is_ok());
+        assert!(check_hypothetical_fall(false, true, &Rat::zero()).is_ok());
+        assert!(check_hypothetical_fall(true, false, &Rat::zero()).is_ok());
+    }
+}
