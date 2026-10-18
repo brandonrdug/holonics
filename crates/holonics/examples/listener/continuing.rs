@@ -14,7 +14,7 @@ use holonics::hnn::receiving::ActiveAddress;
 use holonics::hnn::receiving::cells::CellLaw;
 use holonics::hnn::reference::observed::ObservedCrib;
 use holonics::hnn::reference::{ClosedLocated, ExposedResident, Reference, Resident};
-use holonics::hnn::{ExecutionPort, HnnError, SourceMoment};
+use holonics::hnn::{ExecutionPort, Faces, HnnError, SourceMoment};
 use holonics::ratio::Rat;
 use holonics::receiver::release::KeyStream;
 use num_bigint::BigUint;
@@ -25,17 +25,40 @@ struct ContinuingOptions {
     learn: String,
     count: Option<usize>,
     population: u64,
-    keys: String,
+    keys: Option<String>,
+    diagnostic_step0: bool,
+    diagnostic_calibration_only: bool,
+    diagnostic_checkpoint: Option<String>,
+    diagnostic_unit_upper_ns: Option<u128>,
 }
 
 fn parse(args: &[String]) -> Result<ContinuingOptions> {
-    let (mut learn, mut count, mut population, mut keys) = (None, None, None, None);
+    let (mut learn, mut count, mut population, mut keys, mut diagnostic_checkpoint) =
+        (None, None, None, None, None);
+    let mut diagnostic_unit_upper_ns = None;
+    let mut diagnostic_step0 = false;
+    let mut diagnostic_calibration_only = false;
     let mut at = 0;
     while at < args.len() {
         let option = args[at].as_str();
+        if option == "--diagnostic-step0" {
+            diagnostic_step0 = true;
+            at += 1;
+            continue;
+        }
+        if option == "--diagnostic-calibration-only" {
+            diagnostic_calibration_only = true;
+            at += 1;
+            continue;
+        }
         if !matches!(
             option,
-            "--learn" | "--learn-count" | "--population" | "--keys"
+            "--learn"
+                | "--learn-count"
+                | "--population"
+                | "--keys"
+                | "--diagnostic-checkpoint"
+                | "--diagnostic-unit-upper-ns"
         ) {
             return Err(format!("{option} is unsupported in --route observed: one open moment; section options, cap flags and resume are unavailable").into());
         }
@@ -47,6 +70,8 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
             "--learn-count" => count = Some(value.parse()?),
             "--population" => population = Some(value.parse()?),
             "--keys" => keys = Some(value.clone()),
+            "--diagnostic-checkpoint" => diagnostic_checkpoint = Some(value.clone()),
+            "--diagnostic-unit-upper-ns" => diagnostic_unit_upper_ns = Some(value.parse()?),
             _ => unreachable!(),
         }
         at += 2;
@@ -56,11 +81,24 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     if population == 0 {
         return Err("--population must be positive".into());
     }
+    if diagnostic_calibration_only && !diagnostic_step0 {
+        return Err("--diagnostic-calibration-only requires --diagnostic-step0".into());
+    }
+    if !diagnostic_step0 && (diagnostic_checkpoint.is_some() || diagnostic_unit_upper_ns.is_some())
+    {
+        return Err(
+            "diagnostic checkpoint and unit-bound options require --diagnostic-step0".into(),
+        );
+    }
     Ok(ContinuingOptions {
         learn: learn.ok_or("--route observed requires --learn HLSN1")?,
         count,
         population,
-        keys: keys.ok_or("--route observed requires --keys for exterior native draws")?,
+        keys,
+        diagnostic_step0,
+        diagnostic_calibration_only,
+        diagnostic_checkpoint,
+        diagnostic_unit_upper_ns,
     })
 }
 
@@ -820,9 +858,23 @@ fn header_line(resident: &Resident) -> Result<String> {
 
 pub fn run(port: &Reference, args: &[String]) -> Result<()> {
     let options = parse(args)?;
+    if options.diagnostic_step0 {
+        if options.diagnostic_calibration_only {
+            return diagnostic::run(port, options, None);
+        }
+        let checkpoint = options
+            .diagnostic_checkpoint
+            .clone()
+            .ok_or("full --diagnostic-step0 requires --diagnostic-checkpoint DIR")?;
+        return diagnostic::run(port, options, Some(&checkpoint));
+    }
+    let keys = options
+        .keys
+        .as_deref()
+        .ok_or("--route observed requires --keys for exterior native draws")?;
     let (mut resident, pairing) = mounted(port, options.population)?;
     let mut crib = ObservedCrib::new(0);
-    let mut keys = KeyStream::new(read(&options.keys)?, RELEASE_KEY_BYTES)?;
+    let mut keys = KeyStream::new(read(keys)?, RELEASE_KEY_BYTES)?;
     let frames = sections_of(Some(&options.learn), options.count)?;
     println!("{}", header_line(&resident)?);
     let mut longest = 0;
@@ -873,6 +925,9 @@ pub fn run(port: &Reference, args: &[String]) -> Result<()> {
     Ok(())
 }
 
+#[path = "continuing/diagnostic.rs"]
+mod diagnostic;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -885,6 +940,34 @@ mod tests {
             .chain(extra.iter().copied())
             .map(str::to_owned)
             .collect()
+    }
+
+    #[test]
+    fn diagnostic_only_cli_options_require_explicit_diagnostic_mode() {
+        let upper = [
+            "--learn",
+            "unread.hlsn",
+            "--population",
+            "1",
+            "--diagnostic-unit-upper-ns",
+            "10",
+        ]
+        .into_iter()
+        .map(str::to_owned)
+        .collect::<Vec<_>>();
+        assert!(parse(&upper).is_err());
+        let checkpoint = [
+            "--learn",
+            "unread.hlsn",
+            "--population",
+            "1",
+            "--diagnostic-checkpoint",
+            "unused",
+        ]
+        .into_iter()
+        .map(str::to_owned)
+        .collect::<Vec<_>>();
+        assert!(parse(&checkpoint).is_err());
     }
     fn keys() -> KeyStream {
         KeyStream::new(vec![0; 1 << 16], RELEASE_KEY_BYTES).unwrap()
