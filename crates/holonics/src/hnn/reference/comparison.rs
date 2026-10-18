@@ -18,7 +18,7 @@
 use super::*;
 use crate::compression::landmark::context::LandmarkFace;
 use crate::hnn::constitution::ComparisonCandidate;
-use crate::hnn::ratio::TargetPhases;
+use crate::hnn::ratio::{HolonRatio, TargetPhases};
 
 /// The least h with 2^(-h)|d_i| < u_i 2^(-k_m-1) at every stepped entry.
 /// The h=0 candidate supplies pass 1's lattice/clock and pass 2's exact update coordinates.
@@ -201,6 +201,32 @@ impl FrozenComparison {
     }
     pub fn before(&self) -> &ExactInterval {
         &self.before
+    }
+
+    /// The exact wave already used by this live comparison. A diagnostic may adjust these
+    /// logits under a fixed map while retaining this comparison's saved target phases and tree
+    /// faces; it does not refine, ingest, or manufacture a second target.
+    pub fn wave(&self) -> &Faces {
+        &self.wave
+    }
+
+    /// Rebuild the combined ratio faces using this comparison's retained tree faces and target
+    /// phase context. Read-only callers can compare a held wave without re-hearing or rebuilding
+    /// the frozen opening.
+    pub fn combined_faces(&self, wave: &Faces) -> Result<Faces, HnnError> {
+        self.ratio.phases().combine(wave, &self.trees)
+    }
+
+    /// Re-evaluate the descent covector against the frozen target, phase and tree context for a
+    /// supplied wave. The return uses the normal law's descent convention (`q - p̃`, including
+    /// the phase part), the negation of `HolonRatio::covector()`'s objective gradient.
+    pub fn recompare_covector(&self, wave: &Faces) -> Result<Vec<Vec<Rat>>, HnnError> {
+        let faces = self.combined_faces(wave)?;
+        let comparison = HolonRatio::compare(faces, &self.targets, &self.target_phases)?;
+        let covector = comparison.covector()?;
+        Ok((0..wave.faces.len())
+            .map(|phase| covector.descent(phase))
+            .collect())
     }
 
     /// Exact executed-logit diagnostics, independent of objective enclosure precision.
