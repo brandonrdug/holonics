@@ -518,7 +518,7 @@ fn the_located_route_encodes_the_read_set_without_its_labels() {
         assert_eq!(moved_length, length);
         for (moved, encoded) in moved.iter().zip(&encoded) {
             assert_eq!(moved.cells(), encoded.cells());
-            assert_eq!(moved.decoder(), encoded.decoder());
+            assert_eq!(moved.decoder().unwrap(), encoded.decoder().unwrap());
             assert_eq!(moved.fibre(), encoded.fibre());
             assert_eq!(moved.located(), encoded.located());
             for &cell in encoded.cells() {

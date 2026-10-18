@@ -880,14 +880,17 @@ impl Resident {
         let staged: u64 = self.staged.values().map(|slot| slot.bits()).sum();
         let arrived = self.arrived.as_ref().map_or(0, Arrived::bits);
         let carried = self.carried.as_ref().map_or(0, carry_bits);
+        // An observed chart's decoder forms here on its first read; its port's admission certified
+        // `ker E = 0`, so it forms, and a chart that carries no decoder retains none.
         let receiving_chart = self.receiving_chart.as_ref().map_or(0, |chart| {
-            chart
-                .decoder()
-                .entries()
-                .iter()
-                .filter(|x| !x.is_zero())
-                .map(|x| x.numer().bits() + x.denom().bits())
-                .sum::<u64>()
+            chart.decoder().map_or(0, |decoder| {
+                decoder
+                    .entries()
+                    .iter()
+                    .filter(|x| !x.is_zero())
+                    .map(|x| x.numer().bits() + x.denom().bits())
+                    .sum::<u64>()
+            })
         });
         lift + moments
             + carried
