@@ -187,6 +187,17 @@ theorem whole_pair_read_counts (P : (Module.End ℚ S)ˣ) (I : X →ₗ[ℚ] S)
       (pairPopulation d C : ℚ)⁻¹ • pairRead P I F d (fun c x b => (C c x b : ℚ)) := by
   simp only [pairRead, pairNormalized, if_neg h.ne', Finset.smul_sum, smul_smul, div_eq_inv_mul]
 
+/-- [proved-derived] **One binding moves the count read by its own term**: adding one count at
+`(c₀, x₀, b₀)`, `c₀ < d`, adds exactly `P^(−c₀) I F(e_(x₀) ⊗ e_(b₀))` to the count read. -/
+theorem pair_read_counts_bind (P : (Module.End ℚ S)ˣ) (I : X →ₗ[ℚ] S)
+    (F : (A × A → ℚ) →ₗ[ℚ] X) {d : ℕ} (C : ℕ → A → A → ℕ) {c₀ : ℕ} (hc : c₀ < d) (x₀ b₀ : A) :
+    pairRead P I F d (fun c x b =>
+        ((C c x b + if c = c₀ ∧ x = x₀ ∧ b = b₀ then 1 else 0 : ℕ) : ℚ)) =
+      pairRead P I F d (fun c x b => (C c x b : ℚ)) + back P c₀ (I (F (Pi.single (x₀, b₀) 1))) := by
+  simp only [pairRead, Nat.cast_add, add_smul, Finset.sum_add_distrib]
+  congr 1
+  simp [ite_and, hc]
+
 /-- [proved-derived; formal-checked] **The whole read is the passage's offset moment over its pair
 population**: on a closing ring, reading the offset counts of the passage whole gives
 `HNN/Moment.offsetContribution`, every pair of the passage at the offset, over `n_δ`. -/
@@ -327,6 +338,7 @@ section Audit
 #print axioms encoding_reduced_recurrence
 #print axioms moment_reduced_recurrence
 #print axioms whole_pair_read_counts
+#print axioms pair_read_counts_bind
 #print axioms whole_pair_read_offset_moment
 #print axioms whole_pair_read_population_invariant
 #print axioms whole_pair_read_tape_free

@@ -646,26 +646,56 @@ fn reached_contact_storage_reacts_together_and_reenters_on_actual_support() {
                 && movement.family == crate::hnn::constitution::Family::Factor(0)
                 && movement.form.entries().iter().any(|x| !x.is_zero())
         });
-        let refused = reading.vanished.contains(
-            &(Locus::Channel(contact), crate::hnn::constitution::Family::Factor(0)));
-        assert!(!moved && refused, "contact {contact}: C is a rounding refusal, unmoved");
-        let updated: Vec<usize> = deposit.factors().iter().filter_map(|step| match &step.gradient {
-            FactorGradient::Storage { contact: c, gradient } if *c == contact => Some(gradient),
-            _ => None,
-        }).flat_map(|gradient| gradient.entries().iter().enumerate()
-            .filter(|(_, x)| !x.is_zero()).map(|(i, _)| i).collect::<Vec<_>>()).collect();
-        assert!(!updated.is_empty(), "contact {contact}: its C step updates an entry");
+        let refused = reading.vanished.contains(&(
+            Locus::Channel(contact),
+            crate::hnn::constitution::Family::Factor(0),
+        ));
+        assert!(
+            !moved && refused,
+            "contact {contact}: C is a rounding refusal, unmoved"
+        );
+        let updated: Vec<usize> = deposit
+            .factors()
+            .iter()
+            .filter_map(|step| match &step.gradient {
+                FactorGradient::Storage {
+                    contact: c,
+                    gradient,
+                } if *c == contact => Some(gradient),
+                _ => None,
+            })
+            .flat_map(|gradient| {
+                gradient
+                    .entries()
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, x)| !x.is_zero())
+                    .map(|(i, _)| i)
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+        assert!(
+            !updated.is_empty(),
+            "contact {contact}: its C step updates an entry"
+        );
         for i in updated {
             let at = |rows: &[(Locus, crate::hnn::constitution::Carrier, usize, Rat)]| {
-                rows.iter().any(|(l, c, j, _)| *l == Locus::Channel(contact)
-                    && *c == crate::hnn::constitution::Carrier::Factor(0) && *j == i)
+                rows.iter().any(|(l, c, j, _)| {
+                    *l == Locus::Channel(contact)
+                        && *c == crate::hnn::constitution::Carrier::Factor(0)
+                        && *j == i
+                })
             };
-            assert!(at(&reading.released) || at(&reading.unresolved_contact_material),
-                "contact {contact} entry {i}: carried or released");
+            assert!(
+                at(&reading.released) || at(&reading.unresolved_contact_material),
+                "contact {contact} entry {i}: carried or released"
+            );
         }
     }
-    assert_eq!(&returned.receipt.committed - &returned.receipt.before,
-        returned.receipt.deposition_work);
+    assert_eq!(
+        &returned.receipt.committed - &returned.receipt.before,
+        returned.receipt.deposition_work
+    );
     let mut next = returned.forward.into_present().unwrap();
     let opened = next.change().unwrap();
     assert_eq!(opened.storage, reached.storage);

@@ -17,6 +17,7 @@ use holonics::hnn::reference::{ClosedLocated, ExposedResident, Reference, Reside
 use holonics::hnn::{ExecutionPort, HnnError, SourceMoment};
 use holonics::ratio::Rat;
 use holonics::receiver::release::KeyStream;
+use num_bigint::BigUint;
 use num_traits::{One, Signed, Zero};
 use std::time::Instant;
 
@@ -266,6 +267,148 @@ fn packed<T: std::fmt::Display>(values: &[T]) -> String {
     )
 }
 
+struct PairReadSnapshot {
+    ring: usize,
+    offset: usize,
+    current: Vec<Vec<Rat>>,
+    earlier: Vec<Vec<Rat>>,
+    matches_retained_face: Option<bool>,
+}
+
+impl PairReadSnapshot {
+    fn exact_values(&self) -> (usize, usize, Vec<Vec<String>>, Vec<Vec<String>>) {
+        let shown = |rows: &[Vec<Rat>]| {
+            rows.iter()
+                .map(|row| row.iter().map(ToString::to_string).collect())
+                .collect()
+        };
+        (
+            self.ring,
+            self.offset,
+            shown(&self.current),
+            shown(&self.earlier),
+        )
+    }
+}
+
+struct PairFaceBoundary {
+    rebuilds: BigUint,
+    total_builds: BigUint,
+    reads: Vec<PairReadSnapshot>,
+}
+
+/// An exterior boundary observation; it does not materialize a face or enter either clock.
+fn pair_face_boundary(resident: &Resident) -> Result<PairFaceBoundary> {
+    let moment = resident
+        .continuing()
+        .and_then(|(id, _)| resident.moment(&id));
+    let mut reads = Vec::new();
+    for &ring in resident.field().sources() {
+        for &offset in resident.field().offsets() {
+            if let Some(port) = resident.constitution().pair_port(ring, offset) {
+                reads.push(PairReadSnapshot {
+                    ring,
+                    offset,
+                    current: port.current_reads().to_vec(),
+                    earlier: port.earlier_reads().to_vec(),
+                    matches_retained_face: moment
+                        .and_then(|m| m.pair_face_read_matches(ring, offset, port)),
+                });
+            }
+        }
+    }
+    Ok(PairFaceBoundary {
+        rebuilds: moment
+            .map(|m| m.pair_face_summary().into_iter().map(|r| r.4).sum())
+            .unwrap_or_default(),
+        total_builds: moment
+            .map(SourceMoment::pair_face_total_builds)
+            .unwrap_or_default(),
+        reads,
+    })
+}
+
+/// Exterior receipt, called only after both Native and report clocks have stopped.
+fn pair_face_line(
+    resident: &Resident,
+    section: usize,
+    role: &str,
+    unit: u64,
+    before: &PairFaceBoundary,
+) -> Result<String> {
+    let (id, _) = resident
+        .continuing()
+        .ok_or("pair face receipt has no continuing moment")?;
+    let moment = resident
+        .moment(&id)
+        .ok_or("pair face receipt has no moment")?;
+    let after = pair_face_boundary(resident)?;
+    if after.rebuilds < before.rebuilds || after.total_builds < before.total_builds {
+        return Err("pair face exterior build counter regressed".into());
+    }
+    let retained_builds = &after.rebuilds - &before.rebuilds;
+    let total_builds = &after.total_builds - &before.total_builds;
+    if total_builds < retained_builds {
+        return Err("pair face exterior owner counts disagree".into());
+    }
+    let other_copy_builds = total_builds - &retained_builds;
+    let prior_read_mismatch: Vec<_> = before
+        .reads
+        .iter()
+        .map(|r| (r.ring, r.offset, r.matches_retained_face))
+        .collect();
+    let deposit_reads_changed: Vec<_> = before
+        .reads
+        .iter()
+        .zip(&after.reads)
+        .map(|(a, b)| {
+            (
+                a.ring,
+                a.offset,
+                a.current != b.current,
+                a.earlier != b.earlier,
+            )
+        })
+        .collect();
+    let read_values_before: Vec<_> = before
+        .reads
+        .iter()
+        .map(PairReadSnapshot::exact_values)
+        .collect();
+    let read_values_after: Vec<_> = after
+        .reads
+        .iter()
+        .map(PairReadSnapshot::exact_values)
+        .collect();
+    let summary = moment.pair_face_summary();
+    let mut count_checks = Vec::new();
+    if unit == 1 || unit % 100 == 0 {
+        for &(ring, offset, _, _, _) in &summary {
+            let mut population = 0u64;
+            let mut occupied = 0usize;
+            for phase in 0..resident.field().ring(ring).placements().len() {
+                let counts = moment.offset_counts(ring, offset, phase)?;
+                population += counts.iter().sum::<u64>();
+                occupied += counts.iter().filter(|&&count| count != 0).count();
+            }
+            count_checks.push((ring, offset, population, occupied));
+        }
+    }
+    let started = Instant::now();
+    let clone = std::hint::black_box(moment.clone());
+    let clone_ns = elapsed(started);
+    drop(clone);
+    let phase_wall_ns: Vec<_> = resident
+        .wall()
+        .phases()
+        .into_iter()
+        .map(|(name, time)| (name.replace(' ', "_"), time.as_nanos()))
+        .collect();
+    Ok(format!(
+        "pair_face section={section} role={role} unit={unit} ring_offset_population_occupied_bindings_rebuilds={summary:?} clone_ns={clone_ns} phase_wall_ns={phase_wall_ns:?} retained_builds={retained_builds} other_copy_builds={other_copy_builds} prior_read_match={prior_read_mismatch:?} deposit_reads_changed={deposit_reads_changed:?} count_checks={count_checks:?} read_values_before={read_values_before:?} read_values_after={read_values_after:?}"
+    ))
+}
+
 fn deliver(
     port: &Reference,
     resident: &mut Resident,
@@ -278,6 +421,7 @@ fn deliver(
     emit: &mut dyn FnMut(String),
 ) -> Result<()> {
     for &class in cells {
+        let boundary_before = pair_face_boundary(resident)?;
         let started = Instant::now();
         let native = port.observe_cell_continuing(
             resident,
@@ -412,6 +556,13 @@ fn deliver(
             resident.state_bits(),
             material.exact_bits()
         ));
+        emit(pair_face_line(
+            resident,
+            section,
+            role,
+            native.cells,
+            &boundary_before,
+        )?);
     }
     Ok(())
 }
@@ -476,6 +627,7 @@ fn release_fork(
     let mut classes = Vec::new();
     let mut stop = Stop::Maximum;
     for index in 0..maximum {
+        let boundary_before = pair_face_boundary(&fork)?;
         let started = Instant::now();
         let (moment, _) = fork
             .continuing()
@@ -546,6 +698,13 @@ fn release_fork(
         emit(format!(
             "report section={section} role=drawn index={index} report_ns={report_ns}"
         ));
+        emit(pair_face_line(
+            &fork,
+            section,
+            "drawn",
+            index as u64,
+            &boundary_before,
+        )?);
         if horizon {
             break;
         }
@@ -716,6 +875,57 @@ mod tests {
             .encode(&vec![0; count])
             .unwrap();
         ingest(port, trunk, None, &encoded, &mut Cost::default()).unwrap();
+    }
+
+    #[test]
+    fn observed_cells_keep_the_retained_pair_faces_before_pending_copies_read() {
+        let port = Reference::new(4, BUDGET);
+        let (mut resident, pairing) = mounted(&port, 65536).unwrap();
+        let mut crib = ObservedCrib::new(0);
+        let mut published = 0;
+        for class in (0..20).map(|i| i % 4) {
+            let mut exterior = Vec::new();
+            deliver(
+                &port,
+                &mut resident,
+                &mut crib,
+                &pairing,
+                &[class],
+                0,
+                "source",
+                &mut published,
+                &mut |line| {
+                    if line.starts_with("pair_face ") {
+                        exterior.push(line);
+                    }
+                },
+            )
+            .unwrap();
+            assert_eq!(exterior.len(), 1);
+            assert!(
+                exterior[0].contains("other_copy_builds=0 "),
+                "{}",
+                exterior[0]
+            );
+            let (id, _) = resident.continuing().unwrap();
+            let moment = resident.moment(&id).unwrap();
+            let rows = moment.pair_face_summary();
+            assert_eq!(rows.len(), resident.field().offsets().len());
+            for (ring, offset, population, occupied, _) in rows {
+                assert_eq!(population, moment.pair_population(ring, offset).unwrap());
+                let expected: usize = (0..resident.field().ring(ring).placements().len())
+                    .map(|phase| {
+                        moment
+                            .offset_counts(ring, offset, phase)
+                            .unwrap()
+                            .iter()
+                            .filter(|&&c| c != 0)
+                            .count()
+                    })
+                    .sum();
+                assert_eq!(occupied, expected);
+            }
+        }
     }
     #[test]
     fn explicit_population_and_routes_refuse_before_io() {
@@ -1029,6 +1239,15 @@ mod tests {
                     "source_chart_ring_exponent_scale_support_certificate",
                     "source_chart_ring_rule_exponent_target",
                 ]
+            } else if line.starts_with("pair_face ") {
+                &[
+                    "section",
+                    "role",
+                    "unit",
+                    "ring_offset_population_occupied_bindings_rebuilds",
+                    "clone_ns",
+                    "phase_wall_ns",
+                ]
             } else if line.starts_with("cert ") {
                 &["section", "role", "delivered", "steps"]
             } else if line.starts_with("pairing ") {
@@ -1066,6 +1285,7 @@ mod tests {
             "cell ",
             "precision ",
             "state ",
+            "pair_face ",
             "cert ",
             "pairing ",
             "drawn ",
