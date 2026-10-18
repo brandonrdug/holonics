@@ -390,8 +390,24 @@ fn deliver(
                 })
             })
             .collect();
+        let chart_rules: Vec<_> = resident
+            .field()
+            .sources()
+            .iter()
+            .map(|&ring| {
+                let rule = material.chart_rule(Locus::SourcePort(ring))?;
+                let law = material
+                    .source_law(ring)
+                    .ok_or(HnnError::MissingSourcePort { ring })?;
+                Ok((
+                    ring,
+                    law.chart_rule_exponent(&rule)?,
+                    rule.target().to_string(),
+                ))
+            })
+            .collect::<std::result::Result<_, HnnError>>()?;
         emit(format!(
-            "state section={section} role={role} delivered={} state_bits={} constitution_bits={} loci_exponent_entries_remainders_solved={loci:?} source_chart_ring_exponent_scale_support_certificate={charts:?}",
+            "state section={section} role={role} delivered={} state_bits={} constitution_bits={} loci_exponent_entries_remainders_solved={loci:?} source_chart_ring_exponent_scale_support_certificate={charts:?} source_chart_ring_rule_exponent_target={chart_rules:?}",
             native.cells,
             resident.state_bits(),
             material.exact_bits()

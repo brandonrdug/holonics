@@ -2399,6 +2399,15 @@ impl NormalLaw {
         &self.chart
     }
 
+    /// The chart's rule exponent at this carried Gram and prior, before a paired mean's
+    /// possible extra level. Reads the same Gram norm that deposition and prior motion use.
+    pub fn chart_rule_exponent(&self, rule: &ChartRule) -> Result<u32, HnnError> {
+        let carried = GramBlock::of(&self.gram, &self.chart.prior(), None, None, None, None)?;
+        Ok(rule
+            .exponent(self.gram.len(), carried.norm)
+            .max(self.chart.scale))
+    }
+
     /// Raw solved-chart coordinate payload; separate from this law's reduced logical bits.
     pub fn chart_coordinate_storage(&self) -> ChartCoordinateStorage {
         self.chart.coordinate_storage()
