@@ -354,14 +354,15 @@ impl ThreadCpu {
     pub(super) fn read() -> Option<Self> {
         #[cfg(target_os = "linux")]
         {
-            let stat = std::fs::read_to_string("/proc/thread-self/stat").ok()?;
-            let (user_ticks, system_ticks) = parse_thread_stat(&stat)?;
+            // Procfs is exterior telemetry, read through the example's explicit I/O boundary.
+            let stat = crate::octets::read("/proc/thread-self/stat").ok()?;
+            let (user_ticks, system_ticks) = parse_thread_stat(std::str::from_utf8(&stat).ok()?)?;
             let ticks_per_second = std::env::var("REQ063_CLK_TCK")
                 .ok()
                 .and_then(|value| parse_ticks_per_second(&value));
-            let scheduler = std::fs::read_to_string("/proc/thread-self/schedstat")
+            let scheduler = crate::octets::read("/proc/thread-self/schedstat")
                 .ok()
-                .and_then(|value| parse_schedstat(&value));
+                .and_then(|value| std::str::from_utf8(&value).ok().and_then(parse_schedstat));
             Some(Self {
                 user_ticks,
                 system_ticks,
