@@ -248,6 +248,10 @@ use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{Chart, integral, lcm};
 
+mod resident_pair_face;
+use resident_pair_face::ResidentPairFaces;
+pub(crate) use resident_pair_face::{PairFaceGradient, ResidentPairFace};
+
 // -------------------------------------------------------------------------------------------
 // the capacity
 
@@ -1541,6 +1545,8 @@ pub struct SourceMoment {
     located: bool,
     /// The producing source partition of the field the moment was opened on ([`SourcePartition`]).
     partition: SourcePartition,
+    /// The counts' derived pair face, shared by read-only clones; not retained or serialized.
+    pair_faces: ResidentPairFaces,
 }
 
 impl SourceMoment {
@@ -1585,6 +1591,7 @@ impl SourceMoment {
             reframed: false,
             located: false,
             partition: SourcePartition::of(field),
+            pair_faces: ResidentPairFaces::default(),
         }
     }
 
@@ -1661,7 +1668,7 @@ impl SourceMoment {
                 for (index, &offset) in self.offsets.iter().enumerate() {
                     if let Some(earlier) = earlier(&self.window, self.cursor, offset) {
                         let slot = phase * a * a + code * a + earlier;
-                        bump(&mut counts.offset[index][slot])?;
+                        bind_pair_count(&mut self.pair_faces, counts, index, offset, slot, a)?;
                         if let Some(leaky) = &mut counts.leaky {
                             let one = BigInt::one() << leaky.unit as usize;
                             *leaky.offset[index].entry(slot).or_insert_with(BigInt::zero) += one;
@@ -1861,7 +1868,7 @@ impl SourceMoment {
                 };
                 let slot =
                     (((phase + 1) + station % counts.period) % counts.period) * a * a + x * a + y;
-                bump(&mut counts.offset[index][slot])?;
+                bind_pair_count(&mut passage.pair_faces, counts, index, offset, slot, a)?;
                 if let Some(leaky) = &mut counts.leaky {
                     Leaky::enter(
                         &mut leaky.offset[index],
@@ -2249,6 +2256,7 @@ impl SourceMoment {
             reframed,
             located,
             partition,
+            pair_faces: ResidentPairFaces::default(),
         })
     }
 
@@ -2499,6 +2507,73 @@ impl SourceMoment {
         }))
     }
 
+    /// The unit-modulus pair's resident count face. Leaky counts retain their transported
+    /// whole-table route. The face is keyed by the port's actual read values, never its outputs.
+    pub(crate) fn resident_pair_face(
+        &self,
+        ring: usize,
+        offset: usize,
+        port: &PairPort,
+    ) -> Result<Option<std::sync::Arc<ResidentPairFace>>, HnnError> {
+        let counts = self.counts(ring)?;
+        if counts.leaky.is_some() {
+            return Ok(None);
+        }
+        let index = self
+            .offsets
+            .iter()
+            .position(|&o| o == offset)
+            .ok_or(HnnError::Offset { offset })?;
+        let table = counts
+            .offset
+            .get(index)
+            .ok_or(HnnError::Offset { offset })?;
+        self.pair_faces
+            .read(ring, offset, table, counts.period, self.alphabet, port)
+            .map(Some)
+    }
+
+    /// The retained moment reads its port's face before the pending ratio copies the moment.
+    /// Each copy owns its slot map and shares only already materialized immutable faces.
+    /// Derived cache only; no law reads this preparation's audit bookkeeping.
+    pub fn read_retained_pair_faces(
+        &self,
+        field: &Field,
+        material: &dyn FieldMaterial,
+    ) -> Result<(), HnnError> {
+        for &ring in field.sources() {
+            for &offset in &self.offsets {
+                if let Some(port) = material.pair_port(ring, offset) {
+                    self.resident_pair_face(ring, offset, port)?;
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Exterior build counter over this moment and its copies. Only the number is shared;
+    /// derived faces and their maps remain independent when their counts diverge.
+    pub fn pair_face_total_builds(&self) -> BigUint {
+        self.pair_faces.total_builds()
+    }
+
+    /// Whether an existing face reads exactly these actual a/b values; absent before its first read.
+    pub fn pair_face_read_matches(
+        &self,
+        ring: usize,
+        offset: usize,
+        port: &PairPort,
+    ) -> Option<bool> {
+        self.pair_faces.read_matches(ring, offset, port)
+    }
+
+    /// Exterior occupancy and rebuild receipts only; these values do not enter retention or
+    /// the moment's equality and text. Each row is (ring, offset, population, occupied bindings,
+    /// rebuilds). The occupancy rises only when a previously empty count receives a binding.
+    pub fn pair_face_summary(&self) -> Vec<(usize, usize, u64, usize, BigUint)> {
+        self.pair_faces.summary()
+    }
+
     /// **The source moment `m̃_g`** of one source ring at the constitution's ports, computed from
     /// the counts and never stored, on the normalized open that reads no held cell (module header):
     /// `Σ_c P_g^(−c)(E_g M_g[c] w(c) + Σ_δ Σ_(x,a) C_g(δ)[c, x, a] ν̂(n_(g,δ)) E_g^(δ)(e_x ⊗ e_a))`,
@@ -2604,6 +2679,88 @@ impl SourceMoment {
     /// normalized offset moments.
     #[allow(clippy::type_complexity)]
     fn moment_parts(
+        &self,
+        field: &Field,
+        constitution: &dyn FieldMaterial,
+        ring: usize,
+    ) -> Result<(Vec<(usize, Vec<Rat>)>, Vec<Rat>), HnnError> {
+        let counts = self.counts(ring)?;
+        let geometry = field.ring(ring);
+        let width = geometry.width();
+        let port = constitution
+            .source_port(ring)
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        if port.rows() != width || port.columns() != self.alphabet {
+            return Err(HnnError::Shape {
+                what: "source port E_g",
+                expected: width * self.alphabet,
+                found: port.rows() * port.columns(),
+            });
+        }
+        let pair_series = self
+            .offsets
+            .iter()
+            .map(|&offset| {
+                let Some(pair) = constitution.pair_port(ring, offset) else {
+                    return if self.offset_table(field, ring, offset)?.is_some() {
+                        Err(HnnError::MissingSourcePort { ring })
+                    } else {
+                        Ok(None)
+                    };
+                };
+                if let Some(face) = self.resident_pair_face(ring, offset, pair)? {
+                    let weight = PopulationChart::of(field).value(face.population());
+                    return face.output_series(pair, width, &weight).map(Some);
+                }
+                // Transported slot weights do not share the unit-modulus face.
+                self.offset_table(field, ring, offset)?
+                    .map(|table| {
+                        let contraction = ExactPairContraction::of(pair);
+                        (0..counts.period)
+                            .map(|phase| {
+                                contraction.apply_table(&table, phase, self.alphabet, width)
+                            })
+                            .collect()
+                    })
+                    .map_or(Ok(None), |series| Ok(Some(series)))
+            })
+            .collect::<Result<Vec<Option<Vec<Vec<Rat>>>>, HnnError>>()?;
+        let mut reads = Vec::new();
+        let mut pairs = vec![Rat::zero(); width];
+        let a = self.alphabet;
+        for phase in 0..counts.period {
+            let mut binned = vec![Rat::zero(); width];
+            let mut occupied = false;
+            for (code, &count) in counts.first[phase * a..(phase + 1) * a].iter().enumerate() {
+                if count == 0 {
+                    continue;
+                }
+                occupied = true;
+                let count = Rat::from_integer(BigInt::from(count));
+                for (row, value) in binned.iter_mut().enumerate() {
+                    *value += &count * port.get(row, code)?;
+                }
+            }
+            if occupied {
+                reads.push((phase, geometry.rotate(&binned, &-BigInt::from(phase))));
+            }
+            let mut driven = vec![Rat::zero(); width];
+            for series in pair_series.iter().flatten() {
+                for (sum, value) in driven.iter_mut().zip(&series[phase]) {
+                    *sum += value;
+                }
+            }
+            let carried = geometry.rotate(&driven, &-BigInt::from(phase));
+            for (value, add) in pairs.iter_mut().zip(carried) {
+                *value += add;
+            }
+        }
+        Ok((reads, pairs))
+    }
+
+    /// The former whole-table read, retained only as an independent equality oracle.
+    #[cfg(test)]
+    pub(crate) fn moment_parts_whole_table_oracle(
         &self,
         field: &Field,
         constitution: &dyn FieldMaterial,
@@ -3024,6 +3181,7 @@ impl SourceMoment {
             reframed: false,
             located: false,
             partition: self.partition.clone(),
+            pair_faces: ResidentPairFaces::default(),
         })
     }
 }
@@ -3035,6 +3193,30 @@ pub(crate) fn modulus_power(modulus: &Rat, age: u64) -> Rat {
         power *= modulus;
     }
     power
+}
+
+/// The sole count writer for both native ingest and a fresh physical station section.
+fn bind_pair_count(
+    faces: &mut ResidentPairFaces,
+    counts: &mut RingCounts,
+    index: usize,
+    offset: usize,
+    slot: usize,
+    alphabet: usize,
+) -> Result<(), HnnError> {
+    let old = counts.offset[index][slot];
+    bump(&mut counts.offset[index][slot])?;
+    if counts.leaky.is_none() {
+        faces.bind(
+            counts.ring,
+            offset,
+            slot / (alphabet * alphabet),
+            (slot / alphabet) % alphabet,
+            slot % alphabet,
+            old,
+        )?;
+    }
+    Ok(())
 }
 
 fn bump(count: &mut u64) -> Result<(), HnnError> {

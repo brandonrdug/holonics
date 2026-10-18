@@ -2698,6 +2698,50 @@ fn physical_source_only_change(
 /// Read the applied output-row move on the same pair tables that produced the source.
 /// The read factors are fixed by the caller's executable other-relation check, hence this is
 /// the actual affine output difference, including any budgeted output carry/release.
+/// The actual per-phase pair-output difference used by the physical source certificate.
+/// A changed read, or a leaky count, retains the former two-contraction expression.
+pub(crate) fn pair_output_move_series(
+    field: &Field,
+    source: &SourceMoment,
+    ring: usize,
+    offset: usize,
+    old: &crate::hnn::moment::PairPort,
+    new: &crate::hnn::moment::PairPort,
+) -> Result<Vec<Vec<Rat>>, HnnError> {
+    let geometry = field.ring(ring);
+    let mut moved = vec![vec![Rat::zero(); geometry.width()]; geometry.placements().len()];
+    let same_reads =
+        old.current_reads() == new.current_reads() && old.earlier_reads() == new.earlier_reads();
+    let face = if same_reads {
+        source.resident_pair_face(ring, offset, old)?
+    } else {
+        None
+    };
+    if let Some(face) = face {
+        let weight = PopulationChart::of(field).value(face.population());
+        let old_series = face.output_series(old, geometry.width(), &weight)?;
+        let new_series = face.output_series(new, geometry.width(), &weight)?;
+        for (row, (old, new)) in moved.iter_mut().zip(old_series.iter().zip(&new_series)) {
+            for (value, (old, new)) in row.iter_mut().zip(old.iter().zip(new)) {
+                *value += new - old;
+            }
+        }
+    } else if let Some(table) = source.offset_table(field, ring, offset)? {
+        let old_contraction = ExactPairContraction::of(old);
+        let new_contraction = ExactPairContraction::of(new);
+        for (phase, row) in moved.iter_mut().enumerate() {
+            let old =
+                old_contraction.apply_table(&table, phase, field.alphabet(), geometry.width());
+            let new =
+                new_contraction.apply_table(&table, phase, field.alphabet(), geometry.width());
+            for (value, (old, new)) in row.iter_mut().zip(old.iter().zip(new)) {
+                *value += new - old;
+            }
+        }
+    }
+    Ok(moved)
+}
+
 fn physical_pair_output_certificate(
     field: &Field,
     before: &dyn FieldMaterial,
@@ -2755,28 +2799,11 @@ fn physical_pair_output_certificate(
                     reason: "the pair-output successor has no physical source gain reading",
                 })?;
             gain = gain.max(reading.1.gain.clone());
-            if let Some(table) = source.offset_table(field, ring, offset)? {
-                // The old and new port factors are fixed across phases. Compile their exact
-                // integer charts once for this material comparison, then reuse them for each
-                // phase instead of rebuilding denominator lattices inside the loop.
-                let old_contraction = ExactPairContraction::of(old);
-                let new_contraction = ExactPairContraction::of(new);
-                for (phase, moved) in by_phase.iter_mut().enumerate() {
-                    let old = old_contraction.apply_table(
-                        &table,
-                        phase,
-                        field.alphabet(),
-                        geometry.width(),
-                    );
-                    let new = new_contraction.apply_table(
-                        &table,
-                        phase,
-                        field.alphabet(),
-                        geometry.width(),
-                    );
-                    for (value, (old, new)) in moved.iter_mut().zip(old.iter().zip(new)) {
-                        *value += new - old;
-                    }
+            for (row, change) in by_phase.iter_mut().zip(pair_output_move_series(
+                field, source, ring, offset, old, new,
+            )?) {
+                for (value, add) in row.iter_mut().zip(change) {
+                    *value += add;
                 }
             }
         }
