@@ -1,28 +1,19 @@
 //! One-fork, one-epoch read-only diagnostic. It uses the same observed-cell transaction as the
 //! ordinary listener; the hook only returns the exact receiving samples already staged there.
 
+mod epoch;
+mod timing;
+
 use super::*;
 use holonics::hnn::constitution::Sample;
 use holonics::hnn::moment::PopulationChart;
 use holonics::hnn::receiving::ReceivingRead;
+use holonics::hnn::reference::FrozenComparison;
+use holonics::hnn::word::{EndChange, ReceptionCarry};
+use holonics::ratio::integer;
 use holonics::ratio::linear::ExactRatMatrix;
 use num_bigint::BigInt;
 use std::sync::atomic::{AtomicBool, Ordering};
-
-const TRUNK_CELL_UPPER_NS: u128 = 186_000_000;
-const CALIBRATION_CELL_UPPER_NS: u128 = 186_000_000;
-const BRANCH_WALL_CAP_NS: u128 = 180_000_000_000;
-const FIXED_RUN_WALL_CAP_NS: u128 = 300_000_000_000;
-
-fn within_n_u(cumulative_ns: u128, completed: usize, unit_upper_ns: u128) -> bool {
-    unit_upper_ns
-        .checked_mul(completed as u128)
-        .is_some_and(|allowance| cumulative_ns <= allowance)
-}
-
-fn projection_fits(projection_ns: u128, remaining_ns: u128) -> bool {
-    projection_ns <= BRANCH_WALL_CAP_NS && projection_ns <= remaining_ns
-}
 
 fn guarded_worker<T>(
     abort: &AtomicBool,
@@ -43,8 +34,23 @@ fn guarded_worker<T>(
 
 #[derive(Clone)]
 struct CutView {
+    /// Post-deposit W and H shown by the listener's ordinary post-commit callback.
     map: ExactRatMatrix,
     gram: ExactRatMatrix,
+    gram_remainder: ExactRatMatrix,
+    /// Exact map and comparison context at the producing, pre-deposit cut.
+    producing_map: ExactRatMatrix,
+    frozen: Option<FrozenComparison>,
+    producing: Option<Constitution>,
+    moment_text: String,
+    address_text: String,
+    pre_lift: Vec<BigInt>,
+    pre_clocks: Vec<(u64, u64, BigInt)>,
+    /// The preceding reception's carry at the pre-call cut, distinct from this word's end.
+    pre_carried: Option<ReceptionCarry>,
+    /// The exact word end change aligned with the sealed prediction for this read.
+    physical: Option<EndChange>,
+    contact_j: Vec<ExactRatMatrix>,
     samples: Vec<Sample>,
     receiving_prior: Option<u32>,
     prior_scale: u32,
@@ -62,6 +68,17 @@ fn cut_view(material: &Constitution, samples: &[Sample]) -> Result<CutView> {
     Ok(CutView {
         map: law.map().clone(),
         gram: law.gram(),
+        gram_remainder: law.gram_remainder(),
+        producing_map: law.map().clone(),
+        frozen: None,
+        producing: None,
+        moment_text: String::new(),
+        address_text: String::new(),
+        pre_lift: Vec::new(),
+        pre_clocks: Vec::new(),
+        pre_carried: None,
+        physical: None,
+        contact_j: Vec::new(),
         samples: samples.to_vec(),
         receiving_prior: law.receiving_prior(),
         prior_scale: law.prior_scale(),
@@ -151,23 +168,30 @@ fn observe_branch(
     classes: &[usize],
     branch: &str,
     crossing_map: &ExactRatMatrix,
-    unit_upper_ns: u128,
+    budget: &timing::RunBudget,
     abort: &AtomicBool,
 ) -> Result<(Vec<CutView>, Vec<Faces>, Vec<Vec<BigInt>>, Vec<u128>)> {
+    let mut phase = budget.phase(branch, classes.len(), Some(180_000_000_000))?;
     let mut views = Vec::with_capacity(classes.len());
     let mut faces = Vec::with_capacity(classes.len());
     let mut lifts = Vec::with_capacity(classes.len());
     let mut native_ns = 0u128;
     let mut report_ns = 0u128;
-    let mut cumulative_native_ns = 0u128;
     let mut cell_times = Vec::with_capacity(classes.len());
     for (index, &class) in classes.iter().enumerate() {
+        phase.before_cell()?;
         if abort.load(Ordering::Acquire) {
             return Err(
                 format!("branch {branch} stopped after a shared diagnostic guard failure").into(),
             );
         }
         let cell_started = Instant::now();
+        let cpu_started = timing::ThreadCpu::read();
+        let wall_before = resident.wall().phases();
+        let pre_lift = resident.current().lift().to_vec();
+        let pre_clocks = clock_snapshot_at(resident.field(), resident.current())?;
+        let pre_carried = resident.carried().cloned();
+        let pre_contact_j = contact_j_signature(resident.field(), &pre_lift)?;
         let map_at_compare = cut_view(resident.constitution(), &[])?.map;
         let native_started = Instant::now();
         let native_result = port.observe_cell_continuing_with_samples(
@@ -176,8 +200,29 @@ fn observe_branch(
             pairing,
             class,
             None,
-            |_, material, _, _, reading, samples, frozen| {
-                let view = cut_view(material, samples);
+            |_, material, moment, address, reading, samples, frozen| {
+                let view = cut_view(material, samples).and_then(|mut view| {
+                    let mut source_moment = String::new();
+                    moment.write(&mut source_moment);
+                    view.producing_map = frozen
+                        .and_then(|frozen| frozen.producing().receiving_law(2))
+                        .map(|law| law.map().clone())
+                        .unwrap_or_else(|| map_at_compare.clone());
+                    view.frozen = frozen.cloned();
+                    view.producing = frozen.map(|frozen| frozen.producing().clone());
+                    view.moment_text = source_moment;
+                    view.address_text = format!("{address:?}");
+                    view.pre_lift = pre_lift.clone();
+                    view.pre_clocks = pre_clocks.clone();
+                    view.pre_carried = pre_carried.clone();
+                    view.contact_j = pre_contact_j.clone();
+                    if view.producing_map != map_at_compare {
+                        return Err(
+                            "frozen producing map differs from the observer's pre-call map".into(),
+                        );
+                    }
+                    Ok(view)
+                });
                 let crossing_covectors = if samples.is_empty() {
                     Ok(Vec::new())
                 } else {
@@ -206,23 +251,13 @@ fn observe_branch(
         };
         let native_elapsed = native_started.elapsed().as_nanos();
         native_ns += native_elapsed;
-        cumulative_native_ns = cumulative_native_ns
-            .checked_add(native_elapsed)
-            .ok_or("branch native elapsed counter overflow")?;
-        let allowance = unit_upper_ns
-            .checked_mul((index + 1) as u128)
-            .ok_or("branch n*u allowance overflow")?;
-        if !within_n_u(cumulative_native_ns, index + 1, unit_upper_ns) {
-            abort.store(true, Ordering::Release);
-            return Err(format!(
-                "branch {branch} exceeded cumulative n*u guard after cell {}: {cumulative_native_ns} ns > {allowance} ns",
-                index + 1
-            )
-            .into());
-        }
         let (view_result, reading) = native.view;
         let (mut view, crossing_covectors) = view_result?;
         view.crossing_covectors = crossing_covectors;
+        view.physical = match &native.refine.detail {
+            ReceiptDetail::Refine { word, .. } => Some(word.change.clone()),
+            _ => return Err("observed cell did not return its actual refine word balance".into()),
+        };
         view.receiving_step = reading.linear_step(Locus::ReceivingMap(2));
         view.receiving_vanished = reading
             .vanished
@@ -230,6 +265,30 @@ fn observe_branch(
             .any(|(locus, _)| *locus == Locus::ReceivingMap(2));
         faces.push(native.prediction.clone());
         lifts.push(resident.current().lift().to_vec());
+        let serialization_started = Instant::now();
+        let captured = format!(
+            "moment_pre_ingest={} address_pre_ingest={} pre_clocks={:?} pre_lift={:?} pre_call_reception_carry={:?} producing_identity={:?} producing_map={:?} frozen_comparison={:?} samples_f_g_w_masses={:?} crossing_covectors={:?} refine_word_end_change={:?} contact_J={:?} postdeposit_map={:?} H_stored={:?} H_remainder={:?}",
+            view.moment_text,
+            view.address_text,
+            view.pre_clocks,
+            view.pre_lift,
+            view.pre_carried,
+            view.producing,
+            view.producing_map,
+            view.frozen,
+            view.samples,
+            view.crossing_covectors,
+            view.physical,
+            view.contact_j,
+            view.map,
+            view.gram,
+            view.gram_remainder,
+        );
+        let serialization_ns = serialization_started.elapsed().as_nanos();
+        println!("step0_capture_data branch={branch} index={index} class={class} {captured}");
+        println!(
+            "step0_capture_serialization branch={branch} index={index} serialization_ns={serialization_ns} (formatting only; stdout I/O excluded)"
+        );
         views.push(view);
         let overhead_elapsed = cell_started
             .elapsed()
@@ -238,13 +297,26 @@ fn observe_branch(
         report_ns += overhead_elapsed;
         let cell_ns = native_elapsed + overhead_elapsed;
         cell_times.push(cell_ns);
+        phase.finish_cell(cell_ns)?;
+        let cpu_delta = cpu_started
+            .zip(timing::ThreadCpu::read())
+            .and_then(|(start, end)| end.delta_since(start));
+        let wall_after = resident.wall().phases();
+        let native_wall_phases: Vec<_> = wall_after
+            .iter()
+            .zip(wall_before)
+            .map(|((name, after), (_, before))| (*name, after.saturating_sub(before).as_nanos()))
+            .collect();
         println!(
-            "step0_cell branch={branch} index={index} class={class} cell_ns={cell_ns} native_ns={native_elapsed} exterior_ns={overhead_elapsed} cumulative_native_ns={cumulative_native_ns} n_u_allowance_ns={allowance}"
+            "step0_cell branch={branch} index={index} class={class} cell_ns={cell_ns} transaction_including_hook_ns={native_elapsed} exterior_ns={overhead_elapsed} native_wall_phases={native_wall_phases:?} thread_cpu={cpu_delta:?}"
         );
     }
+    let summary = phase.finish_phase();
     println!(
-        "step0_branch_timing branch={branch} cells={} native_elapsed_ns={native_ns} exterior_overhead_ns={report_ns}",
+        "step0_branch_timing branch={branch} cells={} transaction_including_hook_elapsed_ns={native_ns} exterior_overhead_ns={report_ns} phase_elapsed_wall_ns={} forecast_upper_ns_per_cell={:?}",
         classes.len(),
+        summary.elapsed_wall_ns,
+        summary.forecast_upper_ns_per_cell,
     );
     Ok((views, faces, lifts, cell_times))
 }
@@ -256,22 +328,25 @@ fn observe_plain_branch(
     pairing: &PairingDeclaration,
     classes: &[usize],
     branch: &str,
-    unit_upper_ns: u128,
+    budget: &timing::RunBudget,
     abort: &AtomicBool,
 ) -> Result<(Vec<Faces>, Vec<Vec<BigInt>>, Vec<u128>)> {
+    let mut phase = budget.phase(branch, classes.len(), Some(180_000_000_000))?;
     let mut faces = Vec::with_capacity(classes.len());
     let mut lifts = Vec::with_capacity(classes.len());
     let mut native_ns = 0u128;
     let mut exterior_ns = 0u128;
-    let mut cumulative_native_ns = 0u128;
     let mut cell_times = Vec::with_capacity(classes.len());
     for (index, &class) in classes.iter().enumerate() {
+        phase.before_cell()?;
         if abort.load(Ordering::Acquire) {
             return Err(
                 format!("branch {branch} stopped after a shared diagnostic guard failure").into(),
             );
         }
         let cell_started = Instant::now();
+        let cpu_started = timing::ThreadCpu::read();
+        let wall_before = resident.wall().phases();
         let native_started = Instant::now();
         let native = match port.observe_cell_continuing(
             resident,
@@ -289,16 +364,6 @@ fn observe_plain_branch(
         };
         let native_elapsed = native_started.elapsed().as_nanos();
         native_ns += native_elapsed;
-        cumulative_native_ns = cumulative_native_ns
-            .checked_add(native_elapsed)
-            .ok_or("branch native elapsed counter overflow")?;
-        let allowance = unit_upper_ns
-            .checked_mul((index + 1) as u128)
-            .ok_or("branch n*u allowance overflow")?;
-        if !within_n_u(cumulative_native_ns, index + 1, unit_upper_ns) {
-            abort.store(true, Ordering::Release);
-            return Err(format!("branch {branch} exceeded cumulative n*u guard after cell {}: {cumulative_native_ns} ns > {allowance} ns", index + 1).into());
-        }
         faces.push(native.prediction.clone());
         lifts.push(resident.current().lift().to_vec());
         let exterior = cell_started
@@ -308,13 +373,26 @@ fn observe_plain_branch(
         exterior_ns += exterior;
         let cell_ns = native_elapsed + exterior;
         cell_times.push(cell_ns);
+        phase.finish_cell(cell_ns)?;
+        let cpu_delta = cpu_started
+            .zip(timing::ThreadCpu::read())
+            .and_then(|(start, end)| end.delta_since(start));
+        let wall_after = resident.wall().phases();
+        let native_wall_phases: Vec<_> = wall_after
+            .iter()
+            .zip(wall_before)
+            .map(|((name, after), (_, before))| (*name, after.saturating_sub(before).as_nanos()))
+            .collect();
         println!(
-            "step0_cell branch={branch} index={index} class={class} cell_ns={cell_ns} native_ns={native_elapsed} exterior_ns={exterior} cumulative_native_ns={cumulative_native_ns} n_u_allowance_ns={allowance}"
+            "step0_cell branch={branch} index={index} class={class} cell_ns={cell_ns} transaction_including_hook_ns={native_elapsed} exterior_ns={exterior} native_wall_phases={native_wall_phases:?} thread_cpu={cpu_delta:?}"
         );
     }
+    let summary = phase.finish_phase();
     println!(
-        "step0_branch_timing branch={branch} cells={} native_elapsed_ns={native_ns} exterior_overhead_ns={exterior_ns}",
-        classes.len()
+        "step0_branch_timing branch={branch} cells={} transaction_elapsed_ns={native_ns} exterior_overhead_ns={exterior_ns} phase_elapsed_wall_ns={} forecast_upper_ns_per_cell={:?}",
+        classes.len(),
+        summary.elapsed_wall_ns,
+        summary.forecast_upper_ns_per_cell
     );
     Ok((faces, lifts, cell_times))
 }
@@ -328,14 +406,29 @@ fn from_worker<T>(result: std::result::Result<T, String>) -> Result<T> {
 }
 
 fn clock_snapshot(resident: &Resident) -> std::result::Result<Vec<(u64, u64, BigInt)>, HnnError> {
-    (0..resident.field().rings().len())
+    clock_snapshot_at(resident.field(), resident.current())
+}
+
+fn clock_snapshot_at(
+    field: &Field,
+    current: &Current,
+) -> std::result::Result<Vec<(u64, u64, BigInt)>, HnnError> {
+    (0..field.rings().len())
         .map(|ring| {
             Ok((
-                resident.field().rings()[ring].period(),
-                resident.current().phase(resident.field(), ring)?,
-                resident.current().winding(resident.field(), ring)?,
+                field.rings()[ring].period(),
+                current.phase(field, ring)?,
+                current.winding(field, ring)?,
             ))
         })
+        .collect()
+}
+
+fn contact_j_signature(field: &Field, lift: &[BigInt]) -> Result<Vec<ExactRatMatrix>> {
+    field
+        .contacts()
+        .iter()
+        .map(|contact| contact.pair(field, lift).slip().map_err(Into::into))
         .collect()
 }
 
@@ -426,86 +519,34 @@ fn causal_differences(
     ))
 }
 
-fn report_epoch(crossing: &CutView, end: &CutView, views: &[CutView]) -> Result<()> {
-    let (gradient, dh) = epoch_statistics(crossing, views)?;
-    let actual_delta = matrix_delta(&end.map, &crossing.map)?;
-    let actual_gram_delta = matrix_delta(&end.gram, &crossing.gram)?;
-    let candidate = if crossing.symmetry == "None" {
-        end.gram
-            .inverse()
-            .ok()
-            .map(|inverse| crossing.map.add(&gradient.multiply(&inverse).ok()?).ok())
-            .flatten()
-    } else {
-        None
-    };
-    let residual = candidate
-        .as_ref()
-        .map(|candidate| {
-            gradient.subtract(&candidate.subtract(&crossing.map)?.multiply(&end.gram)?)
+#[derive(Debug, PartialEq, Eq)]
+struct CoarseFace {
+    grain: u64,
+    cells: Vec<(BigInt, u64)>,
+    phases: Vec<Rat>,
+}
+
+fn coarse_face_key(wave: &Faces) -> Vec<CoarseFace> {
+    wave.faces
+        .iter()
+        .map(|face| {
+            let top = face
+                .cells()
+                .iter()
+                .map(|cell| cell.carry.clone())
+                .max()
+                .unwrap_or_default();
+            CoarseFace {
+                grain: face.grain(),
+                cells: face
+                    .cells()
+                    .iter()
+                    .map(|cell| (&cell.carry - &top, cell.phase))
+                    .collect(),
+                phases: face.phases().to_vec(),
+            }
         })
-        .transpose()?;
-    println!(
-        "step0_epoch samples={} W_cross={:?} H_cross={:?} G_cross={:?} sample_H_delta={:?} H_end={:?} H_table_delta={:?} W_end={:?} W_table_delta={:?}",
-        views.iter().map(|view| view.samples.len()).sum::<usize>(),
-        crossing.map,
-        crossing.gram,
-        gradient,
-        dh,
-        end.gram,
-        actual_gram_delta,
-        end.map,
-        actual_delta
-    );
-    println!(
-        "step0_receiver_law receiving_prior={:?} current_prior_scale={} support={:?} symmetry={} radial_mode=not_exposed; actual_prior_and_support_are_retained_in_H_end",
-        crossing.receiving_prior, crossing.prior_scale, crossing.support, crossing.symmetry
-    );
-    if let (Some(candidate), Some(residual)) = (candidate, residual) {
-        println!(
-            "step0_prox_quadratic_candidate W_star={candidate:?} exact_normal_residual={residual:?} objective=unconstrained_full_coordinate_local_exact_prox_quadratic_only; support={:?} symmetry={} radial_mode=not_exposed; not_cross_entropy_optimum; W_end_gap_is_not_a_deposit_law_defect_and_sets_no_order",
-            crossing.support, crossing.symmetry
-        );
-    } else {
-        println!(
-            "step0_prox_quadratic_candidate status=unavailable reason=symmetry_constraint_or_singular_H_end; no projected solve was fabricated"
-        );
-    }
-    let max_feature = views
-        .iter()
-        .flat_map(|view| &view.samples)
-        .flat_map(|sample| &sample.feature)
-        .map(|value| value.abs())
-        .max()
-        .unwrap_or_else(Rat::zero);
-    let max_covector = views
-        .iter()
-        .flat_map(|view| &view.samples)
-        .flat_map(|sample| &sample.covector)
-        .map(|value| value.abs())
-        .max()
-        .unwrap_or_else(Rat::zero);
-    let newest_sample_weight = views
-        .iter()
-        .rev()
-        .find_map(|view| view.samples.last())
-        .map(|sample| &sample.weight);
-    let max_cross_covector = views
-        .iter()
-        .flat_map(|view| &view.crossing_covectors)
-        .flatten()
-        .map(|value| value.abs())
-        .max()
-        .unwrap_or_else(Rat::zero);
-    let zero_step_cells = views
-        .iter()
-        .filter(|view| view.receiving_step.is_zero())
-        .count();
-    let vanished_map_cells = views.iter().filter(|view| view.receiving_vanished).count();
-    println!(
-        "step0_exact_observables max_abs_f={max_feature} max_abs_live_sample_g={max_covector} max_abs_G_cross={max_cross_covector} last_staged_sample_weight={newest_sample_weight:?} newest_datum_weight=unavailable_from_actual_nu_based_age_weight zero_step_cells={zero_step_cells} vanished_map_cells={vanished_map_cells} max_abs_D=unavailable_from_receipt; prepared unit D is not exposed; stalls=unavailable_without_per-step-certified-family-read"
-    );
-    Ok(())
+        .collect()
 }
 
 pub(super) fn run(
@@ -514,6 +555,16 @@ pub(super) fn run(
     checkpoint_path: Option<&str>,
 ) -> Result<()> {
     let run_started = Instant::now();
+    let profile_cells = options.diagnostic_profile_trunk_cells;
+    let full_run = profile_cells.is_none() && !options.diagnostic_calibration_only;
+    let reserve_ns = if full_run {
+        options
+            .diagnostic_report_reserve_ns
+            .ok_or("full diagnostic requires an explicit --diagnostic-report-reserve-ns")?
+    } else {
+        options.diagnostic_report_reserve_ns.unwrap_or(0)
+    };
+    let budget = timing::RunBudget::new(reserve_ns)?;
     let checkpoint_target =
         checkpoint_path.map(|path| format!("{}/step-000312.state", path.trim_end_matches('/')));
     if let Some(checkpoint) = &checkpoint_target {
@@ -533,6 +584,22 @@ pub(super) fn run(
     let input = frames
         .first()
         .ok_or("step0 diagnostic requires section 0")?;
+    let declared_source_count = input
+        .passages
+        .iter()
+        .map(|passage| {
+            Section {
+                passages: vec![passage.clone()],
+                target: Vec::new(),
+            }
+            .source_cells(0)
+            .map(|cells| cells.len())
+        })
+        .collect::<Result<Vec<_>>>()?
+        .into_iter()
+        .sum::<usize>();
+    let trunk_units = profile_cells.unwrap_or(declared_source_count);
+    let mut trunk_phase = budget.phase("trunk", trunk_units, None)?;
     let mut source_count = 0usize;
     let mut trunk_native_ns = 0u128;
     for passage in &input.passages {
@@ -542,7 +609,13 @@ pub(super) fn run(
         }
         .source_cells(0)?;
         for class in source {
+            if source_count >= trunk_units {
+                break;
+            }
+            trunk_phase.before_cell()?;
             let started = Instant::now();
+            let cpu_started = timing::ThreadCpu::read();
+            let wall_before = resident.wall().phases();
             let receipt = port.observe_cell_continuing(
                 &mut resident,
                 &mut crib,
@@ -552,23 +625,46 @@ pub(super) fn run(
                 |_, _, _, _, _| (),
             )?;
             let cell_ns = started.elapsed().as_nanos();
+            trunk_phase.finish_cell(cell_ns)?;
+            let cpu_delta = cpu_started
+                .zip(timing::ThreadCpu::read())
+                .and_then(|(a, b)| b.delta_since(a));
+            let wall_after = resident.wall().phases();
+            let wall_delta: Vec<_> = wall_after
+                .iter()
+                .zip(wall_before)
+                .map(|((name, after), (_, before))| {
+                    (*name, after.saturating_sub(before).as_nanos())
+                })
+                .collect();
             trunk_native_ns = trunk_native_ns
                 .checked_add(cell_ns)
                 .ok_or("trunk elapsed counter overflow")?;
-            let trunk_allowance = TRUNK_CELL_UPPER_NS
-                .checked_mul((source_count + 1) as u128)
-                .ok_or("trunk n*u allowance overflow")?;
             println!(
-                "step0_cell branch=trunk index={source_count} class={class} delivered={} cell_ns={cell_ns} native_ns={cell_ns} exterior_ns=0 cumulative_native_ns={trunk_native_ns} n_u_allowance_ns={trunk_allowance}",
+                "step0_cell branch=trunk index={source_count} class={class} delivered={} cell_ns={cell_ns} transaction_elapsed_ns={cell_ns} exterior_ns=0 cumulative_transaction_ns={trunk_native_ns} wall_delta={wall_delta:?} thread_cpu={cpu_delta:?}",
                 receipt.cells
             );
-            if cell_ns > TRUNK_CELL_UPPER_NS
-                || !within_n_u(trunk_native_ns, source_count + 1, TRUNK_CELL_UPPER_NS)
-            {
-                return Err(format!("trunk cell {source_count} exceeded declared per-cell or cumulative n*u upper {TRUNK_CELL_UPPER_NS} ns").into());
-            }
             source_count += 1;
         }
+        if source_count >= trunk_units {
+            break;
+        }
+    }
+    let trunk_summary = trunk_phase.finish_phase();
+    println!(
+        "step0_trunk_timing completed={} declared={} elapsed_wall_ns={} reserve_ns={reserve_ns}",
+        trunk_summary.completed_cells, trunk_summary.declared_cells, trunk_summary.elapsed_wall_ns
+    );
+    if profile_cells.is_some() {
+        if source_count != trunk_units {
+            return Err(format!(
+                "profile requested exactly {trunk_units} trunk cells but source contained only {source_count}"
+            ).into());
+        }
+        println!(
+            "step0_profile_only source_cells={source_count}; returned before target fork, calibration, checkpoint, and epoch readouts"
+        );
+        return Ok(());
     }
     if source_count != 312 {
         return Err(
@@ -603,7 +699,7 @@ pub(super) fn run(
         &pairing,
         calibration_classes,
         "calibration_plain",
-        CALIBRATION_CELL_UPPER_NS,
+        &budget,
         &calibration_abort,
     )?;
     let plain_elapsed = plain_started.elapsed();
@@ -618,7 +714,7 @@ pub(super) fn run(
         calibration_classes,
         "calibration_capture",
         &crossing.map,
-        CALIBRATION_CELL_UPPER_NS,
+        &budget,
         &calibration_abort,
     )?;
     let capture_elapsed = capture_started.elapsed();
@@ -633,17 +729,21 @@ pub(super) fn run(
         .iter()
         .map(|view| view.samples.len())
         .sum::<usize>();
-    let max_calibration_cell_ns = plain_cell_ns
+    let max_observed_calibration_cell_ns = plain_cell_ns
         .iter()
         .chain(&capture_cell_ns)
         .copied()
         .max()
         .unwrap_or(0);
+    let completed_block_upper = timing::completed_block_upper_ns_per_cell(&plain_cell_ns)
+        .into_iter()
+        .chain(timing::completed_block_upper_ns_per_cell(&capture_cell_ns))
+        .max();
     let postwork_started = Instant::now();
     let _ = epoch_statistics(&crossing, &capture_views)?;
     let exact_statistics_postwork = postwork_started.elapsed();
     println!(
-        "step0_calibration cells_per_control=64 no_capture_elapsed_ms={} with_actual_capture_elapsed_ms={} captured_samples={captured_samples} plain_samples=0 max_measured_cell_ns={max_calibration_cell_ns} exact_statistics_computed=true physical_state_equal=true crib_equal=true exact_statistics_postwork_ms={}",
+        "step0_calibration cells_per_control=64 no_capture_elapsed_ms={} with_actual_capture_elapsed_ms={} captured_samples={captured_samples} plain_samples=0 max_observed_cell_ns={max_observed_calibration_cell_ns} completed_block_upper_ns_per_cell={completed_block_upper:?} exact_statistics_computed=true physical_state_equal=true crib_equal=true exact_statistics_postwork_ms={}",
         plain_elapsed.as_millis(),
         capture_elapsed.as_millis(),
         exact_statistics_postwork.as_millis()
@@ -654,22 +754,18 @@ pub(super) fn run(
         );
         return Ok(());
     }
-    let branch_unit_ns = options
-        .diagnostic_unit_upper_ns
-        .unwrap_or(CALIBRATION_CELL_UPPER_NS)
-        .max(CALIBRATION_CELL_UPPER_NS)
-        .max(max_calibration_cell_ns);
-    let branch_projection_ns = branch_unit_ns
-        .checked_mul(231)
-        .ok_or("branch wall projection overflow")?;
-    let elapsed_ns = run_started.elapsed().as_nanos();
-    let remaining_ns = FIXED_RUN_WALL_CAP_NS.saturating_sub(elapsed_ns);
+    let Some(block_upper_ns_per_cell) = completed_block_upper else {
+        return Err("calibration produced no completed eight-cell timing block; refusing a branch projection".into());
+    };
+    let projection = block_upper_ns_per_cell.saturating_mul(231);
+    let remaining_ns = 300_000_000_000u128
+        .saturating_sub(run_started.elapsed().as_nanos())
+        .saturating_sub(reserve_ns);
     println!(
-        "step0_projection branch_unit_upper_ns={branch_unit_ns} parallel_wall_projection_ns={branch_projection_ns} projected_three_branch_cpu_ns={} remaining_fixed_300s_ns={remaining_ns}",
-        branch_unit_ns.saturating_mul(693)
+        "step0_projection completed_block_upper_ns_per_cell={block_upper_ns_per_cell} three_branch_wall_projection_ns={projection} branch_cap_ns=180000000000 remaining_global_ns={remaining_ns} forecast_only=true"
     );
-    if !projection_fits(branch_projection_ns, remaining_ns) {
-        return Err("calibrated three-branch projection exceeds the 180-second branch cap or remaining fixed 300-second run budget; aborting before fork".into());
+    if projection > 180_000_000_000 || projection > remaining_ns {
+        return Err("measured branch projection exceeds the 180-second branch cap or remaining fixed run budget; aborting before fork".into());
     }
     let checkpoint_path =
         checkpoint_path.ok_or("full diagnostic requires checkpoint destination")?;
@@ -740,20 +836,54 @@ pub(super) fn run(
             ))
         })
         .collect::<std::result::Result<Vec<_>, HnnError>>()?;
+    let receiving_law = resident
+        .constitution()
+        .receiving_law(2)
+        .ok_or("receiver law unavailable")?;
+    let receiver_grain = resident
+        .admitted()
+        .first()
+        .ok_or("no admitted receiving source")?
+        .grain();
+    let lr_inverse = Rat::new(BigInt::from(1), BigInt::from(receiver_grain));
+    let half_quantum = &lr_inverse / integer(2);
+    let source_rings = resident.field().sources();
+    let ring_metadata: Vec<_> = (0..resident.field().rings().len())
+        .map(|ring| {
+            let rho = resident.constitution().transport(ring);
+            let resonator = resident
+                .constitution()
+                .resonator(ring)
+                .map(|r| format!("pump={:?}", r.pump()));
+            let rho0 = source_rings.contains(&ring).then(|| {
+                match resident
+                    .constitution()
+                    .founding_transport(resident.field(), ring)
+                {
+                    Ok(candidate) => format!("candidate={candidate}"),
+                    Err(error) => format!("refusal={error}"),
+                }
+            });
+            (ring, rho, rho0, resonator)
+        })
+        .collect();
     println!(
-        "step0_crossing source_cells={source_count} next_epoch_cells=231 target_cells={} checkpoint={checkpoint_path:?} crossing_W={:?} crossing_H={:?} L_R={} L_W={} L_nu={} clock_phases={clock_phases:?} pump_present={} rho=1",
+        "step0_crossing source_cells={source_count} next_epoch_cells=231 target_cells={} checkpoint={checkpoint_path:?} crossing_W={:?} crossing_H_stored={:?} crossing_H_remainder={:?} L_R={} inverse_L_R={} native_half_quantum={} L_W={} L_nu={} clock_phases={clock_phases:?} ring_transport_resonators={ring_metadata:?}",
         target.len(),
         crossing.map,
         crossing.gram,
-        resident.constitution().grain(),
+        crossing.gram_remainder,
+        receiver_grain,
+        lr_inverse,
+        half_quantum,
         resident
             .field()
             .lattice(Locus::ReceivingMap(2))
             .ok_or("receiver map lattice missing")?
             .exponent(),
         PopulationChart::of(resident.field()).exponent(),
-        resident.constitution().resonator(2).is_some()
     );
+    let _ = receiving_law;
     let path_contacts: Vec<_> = contacts
         .iter()
         .filter(|(_, ends, _, _)| *ends == (0, 1) || *ends == (1, 2))
@@ -784,7 +914,7 @@ pub(super) fn run(
                     &base_classes,
                     "A",
                     &crossing.map,
-                    branch_unit_ns,
+                    &budget,
                     &branch_abort,
                 )
             })
@@ -798,7 +928,7 @@ pub(super) fn run(
                     &pairing,
                     &base_classes,
                     "A0",
-                    branch_unit_ns,
+                    &budget,
                     &branch_abort,
                 )
             })
@@ -813,7 +943,7 @@ pub(super) fn run(
                     &changed_classes,
                     "B",
                     &crossing.map,
-                    branch_unit_ns,
+                    &budget,
                     &branch_abort,
                 )
             })
@@ -840,7 +970,23 @@ pub(super) fn run(
         clock_snapshot(&a0)?,
         clock_snapshot(&b)?
     );
-    report_epoch(&crossing, &a_end, &a_views)?;
+    let lw = resident
+        .field()
+        .lattice(Locus::ReceivingMap(2))
+        .ok_or("receiver lattice missing")?
+        .exponent();
+    let epoch_report_started = Instant::now();
+    epoch::report_epoch("A", &crossing, &a_end, &a_views, receiver_grain, lw)?;
+    println!(
+        "step0_epoch_report_timing branch=A wall_ns={}",
+        epoch_report_started.elapsed().as_nanos()
+    );
+    let epoch_report_started = Instant::now();
+    epoch::report_epoch("B", &crossing, &b_end, &b_views, receiver_grain, lw)?;
+    println!(
+        "step0_epoch_report_timing branch=B wall_ns={}",
+        epoch_report_started.elapsed().as_nanos()
+    );
     let a_state = a.continuing_state(resident.field().sources()[0])?;
     let a0_state = a0.continuing_state(resident.field().sources()[0])?;
     let aa_equal = a_state == a0_state && a_crib == a0_crib;
@@ -862,10 +1008,66 @@ pub(super) fn run(
     println!(
         "step0_causal_AB max_abs_delta_f={max_f_delta} first_differing_feature_index={first_f_delta:?} max_abs_delta_logits={max_logit_delta} first_differing_logit_index={first_logit_delta:?} coordinates=(cell,sample_or_station,feature_or_class); clock_content_split=not_inferred"
     );
-    let later_same_face_different_lift =
-        (1..231).find(|&i| a_faces[i] == b_faces[i] && a_lifts[i] != b_lifts[i]);
+    fn different_indices<T: PartialEq>(left: &[T], right: &[T]) -> Vec<usize> {
+        (0..left.len().max(right.len()))
+            .filter(|&index| left.get(index) != right.get(index))
+            .collect()
+    }
+    for (index, (left, right)) in a_views.iter().zip(&b_views).enumerate() {
+        let a_change = left.physical.as_ref().ok_or("A refine word end missing")?;
+        let b_change = right.physical.as_ref().ok_or("B refine word end missing")?;
+        println!(
+            "step0_carried_AB index={index} preclock_equal={} pre_call_reception_carry_equal={} source_moment_counts_and_clock_equal={} producing_constitution_equal={} refine_end_storage_different_rings={:?} refine_end_arrivals_different_contacts={:?} refine_end_states_different_contacts={:?} refine_end_resonators_different_rings={:?} refine_end_resonator_phases_different_rings={:?}; comparisons_keep_pre_call_and_refine_end_cuts_separate",
+            left.pre_clocks == right.pre_clocks,
+            left.pre_carried == right.pre_carried,
+            left.moment_text == right.moment_text,
+            left.producing == right.producing,
+            different_indices(&a_change.storage, &b_change.storage),
+            different_indices(&a_change.arrivals, &b_change.arrivals),
+            different_indices(&a_change.states, &b_change.states),
+            different_indices(&a_change.resonators, &b_change.resonators),
+            different_indices(&a_change.resonator_phases, &b_change.resonator_phases),
+        );
+    }
+    let distinct_carried = (1..231).find(|&i| {
+        coarse_face_key(&a_faces[i]) == coarse_face_key(&b_faces[i])
+            && a_views[i].pre_clocks == b_views[i].pre_clocks
+            && a_views[i].pre_carried == b_views[i].pre_carried
+            && a_views[i].address_text == b_views[i].address_text
+            && a_views[i].contact_j == b_views[i].contact_j
+            && a_views[i]
+                .physical
+                .as_ref()
+                .zip(b_views[i].physical.as_ref())
+                .is_some_and(|(left, right)| {
+                    left.states == right.states
+                        && left.arrivals == right.arrivals
+                        && (a_views[i].moment_text != b_views[i].moment_text
+                            || a_views[i].producing != b_views[i].producing
+                            || left != right)
+                })
+    });
+    let suffix_readout = distinct_carried.map(|pair_index| {
+        let start = pair_index + 1;
+        let agrees = (start..231).all(|i| a_faces[i] == b_faces[i]);
+        let first_divergence = (start..231).find(|&i| a_faces[i] != b_faces[i]);
+        let max_logit_delta = a_faces[start..231]
+            .iter()
+            .zip(&b_faces[start..231])
+            .flat_map(|(a, b)| a.logits.iter().zip(&b.logits))
+            .flat_map(|(a, b)| a.iter().zip(b))
+            .map(|(a, b)| (a - b).abs())
+            .max()
+            .unwrap_or_else(Rat::zero);
+        (pair_index, agrees, first_divergence, max_logit_delta)
+    });
     println!(
-        "step0_reachable_pair index={later_same_face_different_lift:?} criterion=equal_present_faces_and_different_current_lift; this is not a slip-equivalence claim"
+        "step0_finite_future after_candidate_pair={suffix_readout:?} divergence_indices_are_strictly_after_candidate; agreement is finite-horizon evidence only"
+    );
+    println!(
+        "step0_reachable_pair_candidate index={distinct_carried:?} criterion=equal_coarse_grain_face_phase_key_preclock_address_contact_J_states_arrivals_and_distinct_full_carried_state pre_lifts_A={:?} pre_lifts_B={:?}; J_is_geometry_signature_only; realized_Ju_equality_and_unread_predicate_are_unavailable_and_not_established; no pair if absent",
+        distinct_carried.map(|i| a_views[i].pre_lift.clone()),
+        distinct_carried.map(|i| b_views[i].pre_lift.clone())
     );
     Ok(())
 }
@@ -927,15 +1129,25 @@ mod tests {
     }
 
     #[test]
-    fn n_u_and_projection_guards_are_exact_and_bounded() {
-        assert!(within_n_u(7, 2, 4));
-        assert!(!within_n_u(9, 2, 4));
-        assert!(!within_n_u(u128::MAX, 2, u128::MAX));
-        assert!(projection_fits(BRANCH_WALL_CAP_NS, FIXED_RUN_WALL_CAP_NS));
-        assert!(!projection_fits(
-            BRANCH_WALL_CAP_NS + 1,
-            FIXED_RUN_WALL_CAP_NS
-        ));
-        assert!(!projection_fits(1, 0));
+    fn coarse_face_projection_keeps_grain_phase_but_drops_fibre_and_logits() {
+        let left = Faces::of_reads(
+            &[ReceivingRead::of_logits(vec![rat(1, 7), integer(0)], 3)],
+            3,
+        )
+        .unwrap();
+        let right = Faces::of_reads(
+            &[ReceivingRead::of_logits(vec![rat(1, 5), integer(0)], 3)],
+            3,
+        )
+        .unwrap();
+        let left_key = coarse_face_key(&left);
+        let right_key = coarse_face_key(&right);
+        // The projection intentionally discards exact logits and fibre coordinates. It keeps
+        // only the declared grain and phase/carry chart used for this comparison.
+        assert_eq!(left_key[0].grain, 3);
+        assert_eq!(right_key[0].grain, 3);
+        assert_eq!(left_key.len(), right_key.len());
+        assert_eq!(left_key, right_key);
+        assert_ne!(left.logits, right.logits);
     }
 }

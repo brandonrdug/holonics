@@ -29,13 +29,15 @@ struct ContinuingOptions {
     diagnostic_step0: bool,
     diagnostic_calibration_only: bool,
     diagnostic_checkpoint: Option<String>,
-    diagnostic_unit_upper_ns: Option<u128>,
+    diagnostic_profile_trunk_cells: Option<usize>,
+    diagnostic_report_reserve_ns: Option<u128>,
 }
 
 fn parse(args: &[String]) -> Result<ContinuingOptions> {
     let (mut learn, mut count, mut population, mut keys, mut diagnostic_checkpoint) =
         (None, None, None, None, None);
-    let mut diagnostic_unit_upper_ns = None;
+    let mut diagnostic_profile_trunk_cells = None;
+    let mut diagnostic_report_reserve_ns = None;
     let mut diagnostic_step0 = false;
     let mut diagnostic_calibration_only = false;
     let mut at = 0;
@@ -58,7 +60,8 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
                 | "--population"
                 | "--keys"
                 | "--diagnostic-checkpoint"
-                | "--diagnostic-unit-upper-ns"
+                | "--diagnostic-profile-trunk-cells"
+                | "--diagnostic-report-reserve-ns"
         ) {
             return Err(format!("{option} is unsupported in --route observed: one open moment; section options, cap flags and resume are unavailable").into());
         }
@@ -71,7 +74,10 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
             "--population" => population = Some(value.parse()?),
             "--keys" => keys = Some(value.clone()),
             "--diagnostic-checkpoint" => diagnostic_checkpoint = Some(value.clone()),
-            "--diagnostic-unit-upper-ns" => diagnostic_unit_upper_ns = Some(value.parse()?),
+            "--diagnostic-profile-trunk-cells" => {
+                diagnostic_profile_trunk_cells = Some(value.parse()?)
+            }
+            "--diagnostic-report-reserve-ns" => diagnostic_report_reserve_ns = Some(value.parse()?),
             _ => unreachable!(),
         }
         at += 2;
@@ -84,11 +90,23 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     if diagnostic_calibration_only && !diagnostic_step0 {
         return Err("--diagnostic-calibration-only requires --diagnostic-step0".into());
     }
-    if !diagnostic_step0 && (diagnostic_checkpoint.is_some() || diagnostic_unit_upper_ns.is_some())
+    if !diagnostic_step0
+        && (diagnostic_checkpoint.is_some()
+            || diagnostic_profile_trunk_cells.is_some()
+            || diagnostic_report_reserve_ns.is_some())
     {
-        return Err(
-            "diagnostic checkpoint and unit-bound options require --diagnostic-step0".into(),
-        );
+        return Err("diagnostic options require --diagnostic-step0".into());
+    }
+    if diagnostic_profile_trunk_cells.is_some_and(|cells| cells == 0 || cells > 312) {
+        return Err("--diagnostic-profile-trunk-cells must be between 1 and 312".into());
+    }
+    if diagnostic_profile_trunk_cells.is_some()
+        && (diagnostic_calibration_only || diagnostic_checkpoint.is_some())
+    {
+        return Err("trunk profiling cannot include calibration or checkpoint/fork options".into());
+    }
+    if diagnostic_report_reserve_ns.is_some_and(|reserve| reserve >= 300_000_000_000) {
+        return Err("diagnostic report reserve must fit inside the fixed 300-second budget".into());
     }
     Ok(ContinuingOptions {
         learn: learn.ok_or("--route observed requires --learn HLSN1")?,
@@ -98,7 +116,8 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         diagnostic_step0,
         diagnostic_calibration_only,
         diagnostic_checkpoint,
-        diagnostic_unit_upper_ns,
+        diagnostic_profile_trunk_cells,
+        diagnostic_report_reserve_ns,
     })
 }
 
@@ -859,8 +878,11 @@ fn header_line(resident: &Resident) -> Result<String> {
 pub fn run(port: &Reference, args: &[String]) -> Result<()> {
     let options = parse(args)?;
     if options.diagnostic_step0 {
-        if options.diagnostic_calibration_only {
+        if options.diagnostic_calibration_only || options.diagnostic_profile_trunk_cells.is_some() {
             return diagnostic::run(port, options, None);
+        }
+        if options.diagnostic_report_reserve_ns.is_none() {
+            return Err("full diagnostic requires an explicit --diagnostic-report-reserve-ns within the fixed total budget".into());
         }
         let checkpoint = options
             .diagnostic_checkpoint
@@ -968,6 +990,45 @@ mod tests {
         .map(str::to_owned)
         .collect::<Vec<_>>();
         assert!(parse(&checkpoint).is_err());
+    }
+
+    #[test]
+    fn diagnostic_profile_is_a_bounded_separate_work_partition() {
+        let declared = |extra: &[&str]| {
+            [
+                "--learn",
+                "unread.hlsn",
+                "--population",
+                "65536",
+                "--diagnostic-step0",
+            ]
+            .into_iter()
+            .chain(extra.iter().copied())
+            .map(str::to_owned)
+            .collect::<Vec<_>>()
+        };
+        let profile = parse(&declared(&["--diagnostic-profile-trunk-cells", "64"])).unwrap();
+        assert_eq!(profile.diagnostic_profile_trunk_cells, Some(64));
+        assert!(profile.diagnostic_checkpoint.is_none());
+        for extra in [
+            vec!["--diagnostic-profile-trunk-cells", "0"],
+            vec!["--diagnostic-profile-trunk-cells", "313"],
+            vec![
+                "--diagnostic-profile-trunk-cells",
+                "64",
+                "--diagnostic-checkpoint",
+                "unused",
+            ],
+            vec![
+                "--diagnostic-profile-trunk-cells",
+                "64",
+                "--diagnostic-calibration-only",
+            ],
+            vec!["--diagnostic-unit-upper-ns", "195882064"],
+            vec!["--diagnostic-report-reserve-ns", "300000000000"],
+        ] {
+            assert!(parse(&declared(&extra)).is_err(), "{extra:?}");
+        }
     }
     fn keys() -> KeyStream {
         KeyStream::new(vec![0; 1 << 16], RELEASE_KEY_BYTES).unwrap()
