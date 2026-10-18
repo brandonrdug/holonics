@@ -42,7 +42,10 @@
 //! kinetic-energy change is computed rather than read as the mechanical deficit), the **pressure
 //! solve** (the projection of a provisional face flux onto the divergence-free fluxes, `∂ᵀ∂ p =
 //! ∂ᵀu*/h` on the cells of a joined complex, with its Lean counterpart), and the discretization
-//! defect of a non-affine field. The pressure solve owed in #62 is the `state` part of this split.
+//! defect of a non-affine field. The vertex-potential reading of pressure ([`pressure_part`], Lean
+//! `pressurePart`) is the `state` part of [`hodge_parts`]. The face-flux solve above is the same
+//! split one degree up, where pressure lives on the cells: the exact part of a face flux on the
+//! dual complex, which [`hodge_parts`] does not compute and #62 still owes.
 
 use num_traits::{One, Signed, Zero};
 
@@ -396,6 +399,7 @@ pub fn pressure_part(complex: &CellComplex, pressure: &[Rat]) -> Result<Vec<Rat>
 /// - `state` is the pressure part `∂₁ᵀp`, with `p = potential`.
 /// - `production` is the vortical part. It carries all of `u`'s vorticity.
 /// - `winding` is the circulation around holes, the dormant harmonic class.
+///
 /// It delegates to [`crate::aeon::cell_split`] and adds no solve.
 pub fn hodge_parts(complex: &CellComplex, velocity: &[Rat]) -> Result<TimeSplit, FluidError> {
     if velocity.len() != complex.cells(1) {
@@ -634,11 +638,16 @@ mod tests {
             vorticity(complex, &u).unwrap(),
             vorticity(complex, split.production.values()).unwrap()
         );
-        // The same 1-cochain reads only degrees 0, 1 and 2, even when 3-cells are present.
-        let metrics: Vec<SymmetricForm> = (0..=2)
-            .map(|degree| SymmetricForm::from_diagonal(vec![Rat::one(); complex.cells(degree)]))
-            .collect();
-        assert_eq!(cell_split(complex, &metrics, &u).unwrap(), split);
+        // The 2-skeleton, without the 3-cells, gives the same split.
+        let skeleton = CellComplex::new(
+            (0..=2).map(|degree| complex.cells(degree)).collect(),
+            (1..=2)
+                .map(|degree| complex.boundary(degree).unwrap().clone())
+                .collect(),
+        )
+        .unwrap();
+        assert_eq!(skeleton.dimension(), 2);
+        assert_eq!(hodge_parts(&skeleton, &u).unwrap(), split);
     }
 
     #[test]

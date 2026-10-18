@@ -749,9 +749,9 @@ mod tests {
     fn antiferromagnet(l: usize) {
         let _time = GameTestTime::start("the_antiferromagnet_carries_the_odd_winding", l);
         let population = torus_population(l, |_, _, _| true, &vec![false; l * l]);
-        // L=3: every row and column has odd parity, the twisted-xy class (f=6).
-        // L=4: the cochain is δ(checkerboard), so f=0.
-        let declared_frustration = if l == 3 { 2 * l } else { 0 };
+        // Odd L: every row and column has odd parity, the twisted-xy class (f=2L).
+        // Even L: the cochain is δ(checkerboard), so f=0.
+        let declared_frustration = if l % 2 == 1 { 2 * l } else { 0 };
         assert_eq!(
             least_locked_energy(l, &population, "antiferromagnet"),
             integer(2 * declared_frustration as i64 - (2 * l * l) as i64)
