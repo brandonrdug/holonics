@@ -343,7 +343,7 @@ use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::{Inertia, inertia};
 use crate::ratio::linear::vector::{add, common_denominator, dot, scale, sub};
 use crate::ratio::polynomial::{RationalPolynomial, half_plane_count};
-use crate::ratio::{Rat, integer};
+use crate::ratio::{Rat, integer, rat};
 
 // -------------------------------------------------------------------------------------------
 // the pump
@@ -1564,6 +1564,192 @@ impl ResonatorOperands {
         )?)
     }
 
+    /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The standing sheet's
+    /// amplitude**: under a standing pump of strength `p` at axis `e^(iφ)` and the saturation `β`,
+    /// the uniform displacement `a e^(iφ)` on every node with `w = 0` has force
+    /// `K_b c − 2p c + β a² c`, zero when the base stiffness annihilates the uniform configuration
+    /// and `a² = 2p/β`. Refused off a standing pump, without saturation, or where `2p/β` is not the
+    /// square of a rational (the certificate is exact; a deposit that moves `p` or `β` off a
+    /// rational square leaves no exact sheet to certify).
+    pub fn sheet_amplitude(&self) -> Result<Rat, HnnError> {
+        let refused = |what| HnnError::Resonator {
+            ring: self.ring,
+            what,
+        };
+        let pump = self
+            .material
+            .pump()
+            .filter(|pump| pump.step() == PumpStep::Stand && self.schedule.is_none())
+            .ok_or(refused("a standing sheet needs a declared standing pump"))?;
+        let beta = self
+            .material
+            .saturation()
+            .ok_or(refused("a standing sheet needs the saturated storage"))?
+            .coefficient();
+        let square = integer(2) * pump.strength() / beta;
+        let root = |x: &BigInt| -> Option<BigInt> {
+            let r = x.sqrt();
+            (&r * &r == *x).then_some(r)
+        };
+        match (root(square.numer()), root(square.denom())) {
+            (Some(numerator), Some(denominator)) if square.is_positive() => {
+                Ok(Rat::new(numerator, denominator))
+            }
+            _ => Err(refused(
+                "the standing sheet's amplitude is not a rational point",
+            )),
+        }
+    }
+
+    /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The standing sheet's
+    /// period proposal** on sheet `sign = ±1`, for the executed solve `solve` (`None`: the exact
+    /// law). Its centre is `±a e^(iφ)` on every node at rest, an exact fixed point checked by the
+    /// certificate (`η = 0`). Its metric is the one derived for the deadbeat sheet, where
+    /// `h²X(K + H(c)) = I` and the Jacobian is `[[0, hQ], [−I/h, Q]]` with `Q = XC`:
+    /// `G = [[I/h², −Q/(2h)], [−Q/(2h), Q + (I − Q)/4]] ⪰ min(1, 1/h²)/4 · I`. The listener's
+    /// founding (`h = 1`, `C = K_b`, `p = r/(4h²)`) is deadbeat; elsewhere the certificate refuses.
+    /// The shape is chosen against the Young test (`ε = a/200`, `r² = gε²`, `λ = 24/25`,
+    /// `s = 1/25`: the Hessian variation `3β(2aε+ε²)` then fits under `λ²` beside the quadrature's
+    /// `ρ(JᵀGJ)`), and the envelope radius is stated in whole units of the split it bounds.
+    pub fn standing_sheet(
+        &self,
+        sign: i8,
+        solve: Option<&crate::holon::parametron::ExecutedSolve>,
+    ) -> Result<Vec<crate::holon::parametron::DomainProposal>, HnnError> {
+        let amplitude = self.sheet_amplitude()? * integer(i64::from(sign.signum()));
+        let pump = self
+            .material
+            .pump()
+            .expect("the amplitude read the standing pump");
+        let n = self.width();
+        let h = &self.step;
+        let x = self.phases[0].operator.inverse()?;
+        let (capacity, _, _) = self.material.forms();
+        let q = x.multiply(capacity)?;
+        let id = ExactRatMatrix::identity(n)?;
+        let quarter = rat(1, 4);
+        let quadrature = q.add(&id.subtract(&q)?.scaled(&quarter))?;
+        let metric = ExactRatMatrix::shaped(
+            2 * n,
+            2 * n,
+            (0..2 * n)
+                .map(|i| {
+                    (0..2 * n)
+                        .map(|j| match (i < n, j < n) {
+                            (true, true) => {
+                                if i == j {
+                                    Rat::one() / (h * h)
+                                } else {
+                                    Rat::zero()
+                                }
+                            }
+                            (true, false) => -q.get(i, j - n).expect("in range") / (integer(2) * h),
+                            (false, true) => -q.get(i - n, j).expect("in range") / (integer(2) * h),
+                            (false, false) => {
+                                quadrature.get(i - n, j - n).expect("in range").clone()
+                            }
+                        })
+                        .collect()
+                })
+                .collect(),
+        )?;
+        let lower = quarter * (Rat::one() / (h * h)).min(Rat::one());
+        let euclidean = amplitude.abs() / integer(200);
+        let mut centre = vec![Rat::zero(); 2 * n];
+        for node in 0..n / 2 {
+            centre[2 * node] = &amplitude * pump.axis().cos();
+            centre[2 * node + 1] = &amplitude * pump.axis().sin();
+        }
+        // `√g = min(1, 1/h)/2` is rational, so `r = √g ε` meets `r² ≤ gε²` with equality.
+        let radius = &euclidean * (Rat::one() / h).min(Rat::one()) / integer(2);
+        let mut proposal = crate::holon::parametron::DomainProposal {
+            centre,
+            drive: vec![Rat::zero(); n],
+            metric: metric.clone(),
+            radius,
+            metric_lower: lower,
+            euclidean_radius: euclidean,
+            lipschitz: rat(24, 25),
+            centre_residual: Rat::zero(),
+            young: rat(1, 25),
+            rounding: Rat::zero(),
+        };
+        if let Some(solve) = solve {
+            let law = self.phases[0]
+                .loaded_law
+                .as_ref()
+                .ok_or(HnnError::Resonator {
+                    ring: self.ring,
+                    what: "a nonlinear period needs the explicit quartic element relation",
+                })?;
+            let floor =
+                crate::holon::parametron::rounding_floor(law, &proposal, &metric, Some(solve))?;
+            let units = (floor / (&solve.unit * &solve.unit)).ceil().to_integer();
+            let mut k = units.sqrt();
+            if &k * &k < units {
+                k += 1;
+            }
+            proposal.rounding = Rat::from_integer(k) * &solve.unit;
+        }
+        Ok(vec![proposal; self.phases.len()])
+    }
+
+    /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The executed lock**:
+    /// both standing sheets certified on the period this word executes, each phase's solve the
+    /// chart it applies and its splits at `transient`'s unit (`None`: the exact law, whose solve
+    /// must be the exact inverse), read at the closing boundary on the axis's leading
+    /// displacement coordinate, and joined as a [`crate::holon::parametron::LockedPair`].
+    pub fn executed_lock(
+        &self,
+        transient: Option<&Lattice>,
+    ) -> Result<crate::holon::parametron::LockedPair, HnnError> {
+        let solves = transient
+            .map(|lattice| {
+                (0..self.phases.len())
+                    .map(|tick| {
+                        Ok(crate::holon::parametron::ExecutedSolve {
+                            chart: self.phases[self.phase_at(tick)].solve.matrix()?,
+                            unit: lattice.unit(),
+                        })
+                    })
+                    .collect::<Result<Vec<_>, HnnError>>()
+            })
+            .transpose()?;
+        let pump = self.material.pump().ok_or(HnnError::Resonator {
+            ring: self.ring,
+            what: "a standing sheet needs a declared standing pump",
+        })?;
+        let axis = usize::from(pump.axis().sin().abs() > pump.axis().cos().abs());
+        let sheet = |sign: i8| -> Result<crate::holon::parametron::PeriodicLock, HnnError> {
+            let proposals = self.standing_sheet(sign, solves.as_ref().map(|solves| &solves[0]))?;
+            let domain = match &solves {
+                Some(solves) => {
+                    let laws = (0..self.phases.len())
+                        .map(|tick| {
+                            self.phases[self.phase_at(tick)].loaded_law.clone().ok_or(
+                                HnnError::Resonator {
+                                    ring: self.ring,
+                                    what: "a nonlinear period needs the explicit quartic element relation",
+                                },
+                            )
+                        })
+                        .collect::<Result<Vec<_>, HnnError>>()?;
+                    crate::holon::parametron::PeriodicDomain::certify_executed(
+                        &laws, solves, &proposals,
+                    )?
+                }
+                None => self.exact_period_domain(&proposals)?,
+            };
+            Ok(crate::holon::parametron::PeriodicLock::read(
+                domain, 0, axis,
+            )?)
+        };
+        Ok(crate::holon::parametron::LockedPair::new(
+            sheet(1)?,
+            sheet(-1)?,
+        )?)
+    }
+
     fn exact_period_domain(
         &self,
         proposals: &[crate::holon::parametron::DomainProposal],
@@ -1751,6 +1937,88 @@ impl ResonatorOperands {
                 rate: rate_remainder,
                 state: [displacement_remainder, velocity_remainder],
             },
+        })
+    }
+}
+
+/// [definition; agent-inferred, October 18] **The splits a loaded tick's reverse crosses**, in the
+/// order it crosses them: the rate covector `z̄`, its transpose solve `X̂ᵀz̄`, and the drive,
+/// displacement and velocity covectors it returns.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReverseSplit {
+    Rate,
+    Solve,
+    Drive,
+    Displacement,
+    Velocity,
+}
+
+/// [definition] **One loaded tick's return**: the covector on its drive, on its producing state
+/// `(u, w)`, and the transpose solve `X̂ᵀz̄` it carried, each as split.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResonatorReturn {
+    pub drive: Vec<Rat>,
+    pub state: [Vec<Rat>; 2],
+    pub solved: Vec<Rat>,
+}
+
+impl ResonatorOperands {
+    /// [definition; agent-inferred, October 18] **One loaded tick's reverse**: the transpose of the
+    /// executed tick `(u, w, e) ↦ (u′, w′, s′)` read at its own producing state. With covectors
+    /// `(ū′, w̄′)` on the next state and `s̄` on the returned wave `s′ = e − (2/Y)ω`,
+    /// `z̄ = hū′ + c w̄′ − (2/Y)s̄` (`c = 1` saturated, `w′ = ω`; `c = 2` quadratic, `w′ = 2ω − w`),
+    /// `r̄ = X̂ᵀz̄`, `ē = s̄ + h r̄`, `ū = ū′ − hH(u)r̄` with the force Hessian `H(u) = K_j + ∇²Q(u)`
+    /// at this tick's displacement (versioned per tick, never a frozen `K`), and `w̄ = C r̄`
+    /// (saturated) or `−w̄′ + 2C r̄` (quadratic). Each covector crosses `split` where the word
+    /// splits it; the identity split is the unsplit executed transpose.
+    pub fn reverse(
+        &self,
+        step: &ResonatorStep,
+        state_bar: [&[Rat]; 2],
+        storage_bar: &[Rat],
+        split: &mut dyn FnMut(ReverseSplit, Vec<Rat>) -> Vec<Rat>,
+    ) -> Result<ResonatorReturn, HnnError> {
+        let n = self.width();
+        if state_bar[0].len() != n || state_bar[1].len() != n || storage_bar.len() != n {
+            return Err(HnnError::Shape {
+                what: "a loaded tick's covectors (the ring's realified width)",
+                expected: n,
+                found: storage_bar.len(),
+            });
+        }
+        let h = &self.step;
+        let nonlinear = self.material.saturation().is_some();
+        let velocity_factor = if nonlinear { integer(1) } else { integer(2) };
+        let port = integer(2) / &self.admittance;
+        let z_image: Vec<Rat> = (0..n)
+            .map(|i| {
+                h * &state_bar[0][i] + &velocity_factor * &state_bar[1][i] - &port * &storage_bar[i]
+            })
+            .collect();
+        let zbar = split(ReverseSplit::Rate, z_image);
+        let image = self.solve_transpose(step.phase, &zbar)?;
+        let solved = split(ReverseSplit::Solve, image);
+        let drive_image = add(storage_bar, &scale(h, &solved));
+        let drive = split(ReverseSplit::Drive, drive_image);
+        let (capacity, _, _) = self.material.forms();
+        let hessian = self.force_hessian(step.phase, &step.input[0])?;
+        // `H(u)` and `C` are symmetric, so their transposes apply as they stand.
+        let u_image = sub(state_bar[0], &scale(h, &hessian.apply(&solved)?));
+        let capacity_return = capacity.apply(&solved)?;
+        let w_image = if nonlinear {
+            capacity_return
+        } else {
+            add(
+                &scale(&integer(-1), state_bar[1]),
+                &scale(&integer(2), &capacity_return),
+            )
+        };
+        let u_bar = split(ReverseSplit::Displacement, u_image);
+        let w_bar = split(ReverseSplit::Velocity, w_image);
+        Ok(ResonatorReturn {
+            drive,
+            state: [u_bar, w_bar],
+            solved,
         })
     }
 }

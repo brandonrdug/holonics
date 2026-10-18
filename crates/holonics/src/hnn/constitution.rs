@@ -4645,6 +4645,59 @@ impl Constitution {
         Ok(self)
     }
 
+    /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The locking pump**:
+    /// ring `g`'s resonator founded saturated, with no linear stage. Its dissipation is the
+    /// founding's `d = 1/Y`. Its pump stands (`PumpStep::Stand`) at axis `1` with strength
+    /// `p = r/(4h²)`, `r = h(d + 1/Y)`, so at `h = 1` the uniform in-phase mode is deadbeat at the
+    /// sheet (`h²X(K + H(c)) = I`, `ring::ResonatorOperands::standing_sheet`). Its saturation
+    /// `β = 2p/a²` stands the sheet at amplitude `a`. The amplitude is the least power of two whose
+    /// two opposite sheets certify on the period the live word executes: the field's word lattice,
+    /// the resonator's charts cold-started as every cut starts them, and the transients' unit
+    /// (`ring::ResonatorOperands::executed_lock`). The search ends at `a = 1/δ`, past which the
+    /// sheet's relative grain `δ/a` passes `δ²` and a refusal is structural, not rounding; under the
+    /// exact law the envelope vanishes and `a = 1` certifies or nothing does. Refused with the last
+    /// attempt's refusal.
+    ///
+    /// It replaces the founding's half-turn pump at `d/h` on this ring: that pump leaves the
+    /// uniform mode deadbeat to the origin (`(1 + 2ph²/r)(1 − 2ph²/r) = 0`), so no sheet stands
+    /// there; a standing pump's lock event is read at every tick, its period's closing boundary.
+    pub fn with_locking_pump(self, field: &Field, ring: usize) -> Result<Self, HnnError> {
+        use crate::hnn::ring::{PumpDeclaration, PumpStep};
+        let declared = field.ring(ring);
+        let d = declared.admittance().recip();
+        let h = field.step();
+        let loss = h * (&d + declared.admittance().recip());
+        let strength = &loss / (Rat::from_integer(BigInt::from(4)) * h * h);
+        let pump = PumpDeclaration::new(
+            strength.clone(),
+            crate::holon::parametron::Carrier::at(&Rat::zero()),
+            PumpStep::Stand,
+        )?;
+        let base = ResonatorMaterial::of_parametron(declared.parametron(), &d, Some(pump))?;
+        let lattice = field.word_lattice().copied();
+        let transient = lattice.map(|lattice| lattice.transient());
+        let limit = transient.as_ref().map_or(0, Lattice::exponent);
+        let mut refusal = None;
+        for k in 0..=limit {
+            let amplitude = Rat::from_integer(BigInt::one() << k as usize);
+            let material = base.clone().with_symmetric_saturation(
+                Rat::from_integer(BigInt::from(2)) * &strength / (&amplitude * &amplitude),
+            )?;
+            let operands = ResonatorOperands::at_cut(
+                ring,
+                &material,
+                declared.admittance(),
+                h,
+                lattice.as_ref(),
+            )?;
+            match operands.executed_lock(transient.as_ref()) {
+                Ok(_) => return self.with_ring_resonator(field, ring, material),
+                Err(error) => refusal = Some(error),
+            }
+        }
+        Err(refusal.expect("the search tries at least one amplitude"))
+    }
+
     /// The commit counter.
     pub fn commit(&self) -> u64 {
         self.commit

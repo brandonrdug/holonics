@@ -17,6 +17,26 @@
 //! period map. The certificates store material and domain geometry, not an event tape.
 //! Charted solves, lattice splitting and their retained fibres need an additional
 //! envelope; these smooth certificates never certify them implicitly.
+//!
+//! [definition; agent-inferred, October 18; the revised plan, step 1a] **The executed envelope.**
+//! The rounded Word applies a chart `X̂` and splits with error feedback at unit `δ`: its rate is
+//! `ω̂ = X̂r + ν`, `|ν|∞ < δ` (two remainders in `[−δ/2, δ/2)`), its velocity `w′ = ω̂` is
+//! already on the lattice, and its displacement split adds `ν_u`, `|ν_u|∞ < δ`. With
+//! `Δ = X̂ − N⁻¹`, `B = [hI; I]`, `bI ⪰ BᵀG_next B` and `γI ⪰ (G_next)_uu`,
+//!
+//! `F̂(x,e₀) − F(x,e₀) = B(Δr(x,e₀) + ν) + (ν_u, 0)`, so
+//! `|F̂ − F|²_G_next ≤ 2bn(‖Δ‖∞ ρ + δ)² + 2γnδ² ≤ ε_t²`,
+//!
+//! where `ρ ≥ sup_ball ‖r(x,e₀)‖∞ = ‖r(c,e₀)‖∞ + (‖C‖∞ + h‖K‖∞ + 3hβ(U+2ε)²)ε` and `U` is the
+//! largest node `ℓ¹` norm of `c_u` (the quartic is node-diagonal, so its Hessian variation and its
+//! effort's `∞`-Lipschitz bound are read per node). The inclusion becomes
+//! `η + ε_t + λr ≤ r_next`; it holds on every state the Word carries, on the lattice or not. A
+//! drive `e` enters the rate through the executed chart, `r(x,e) = r(x,e₀) + h(e−e₀)`, so
+//! `F̂(x,e) = F(x,e₀) + D̂(e−e₀) + B(Δr(x,e₀) + ν(x,e)) + (ν_u, 0)` with `D̂ = BhX̂`; the last two
+//! terms keep the same envelope whatever `e` is (`|ν|∞ < δ` for every rate), so the drive margin
+//! `m_t = r_next − (η + ε_t + λr)` holds the sheet for every `|D̂(e−e₀)|_G_next ≤ m_t`. The error
+//! feedback is not odd (ties go upward), so the opposite sheet is certified separately, never
+//! read from this one by symmetry.
 
 use num_traits::{One, Signed, Zero};
 
@@ -323,6 +343,122 @@ pub struct DomainProposal {
     pub lipschitz: Rat,
     pub centre_residual: Rat,
     pub young: Rat,
+    /// The declared envelope radius `ε_t ≥ |F̂ − F|_G_next` over the ball; zero under the exact law.
+    pub rounding: Rat,
+}
+
+/// [definition; agent-inferred, October 18] **An executed phase solve**: the chart `X̂` the rounded
+/// Word applies at this phase and the unit `δ` of its error-feedback splits.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExecutedSolve {
+    pub chart: ExactRatMatrix,
+    pub unit: Rat,
+}
+
+/// The largest absolute row sum.
+fn row_norm(m: &ExactRatMatrix) -> Rat {
+    m.to_rows()
+        .iter()
+        .map(|row| row.iter().map(|v| v.abs()).sum::<Rat>())
+        .max()
+        .unwrap_or_else(Rat::zero)
+}
+
+/// `cI ⪰ M` for a symmetric PSD form, `c` its absolute row norm, which bounds its spectral norm.
+fn dominated(m: &ExactRatMatrix) -> Result<Rat, HolonError> {
+    let c = row_norm(m);
+    nonnegative_form(&ExactRatMatrix::identity(m.rows())?.scaled(&c).subtract(m)?)?;
+    Ok(c)
+}
+
+/// The largest node `ℓ¹` norm of a realified displacement.
+fn node_reach(displacement: &[Rat]) -> Rat {
+    displacement
+        .chunks(2)
+        .map(|node| node.iter().map(|v| v.abs()).sum::<Rat>())
+        .max()
+        .unwrap_or_else(Rat::zero)
+}
+
+/// `B = [hI; I]`, the rate's reach into `(u′, w′)`.
+fn rate_map(h: &Rat, n: usize) -> Result<ExactRatMatrix, HolonError> {
+    Ok(matrix(2 * n, n, |i, k| {
+        if i % n != k {
+            Rat::zero()
+        } else if i < n {
+            h.clone()
+        } else {
+            Rat::one()
+        }
+    })?)
+}
+
+/// [definition; agent-inferred, October 18] **The squared floor of the executed envelope** (module
+/// header): `2bn(‖Δ‖∞ρ + δ)² + 2γnδ²` for the step from `p` into the next metric, zero under the
+/// exact law. A proposal's `rounding` must reach its square root.
+pub fn rounding_floor(
+    law: &ReferenceHolon,
+    p: &DomainProposal,
+    next_metric: &ExactRatMatrix,
+    solve: Option<&ExecutedSolve>,
+) -> Result<Rat, HolonError> {
+    let Some(solve) = solve else {
+        return Ok(Rat::zero());
+    };
+    let element = law
+        .holon()
+        .loaded_parametron()
+        .ok_or(failed("an executed envelope needs the actual quartic law"))?;
+    let n = element.width();
+    let h = law.step();
+    if solve.chart.rows() != n || solve.chart.columns() != n || !solve.unit.is_positive() {
+        return Err(failed(
+            "the executed solve has the declared extent and a positive unit",
+        ));
+    }
+    if next_metric.rows() != 2 * n || next_metric.columns() != 2 * n || p.centre.len() != 2 * n {
+        return Err(failed("period domain extent"));
+    }
+    floor_with(
+        element,
+        h,
+        &element.operator(h)?.inverse()?,
+        p,
+        next_metric,
+        solve,
+    )
+}
+
+fn floor_with(
+    element: &LoadedParametron,
+    h: &Rat,
+    inverse: &ExactRatMatrix,
+    p: &DomainProposal,
+    next_metric: &ExactRatMatrix,
+    solve: &ExecutedSolve,
+) -> Result<Rat, HolonError> {
+    let n = element.width();
+    let deviation = row_norm(&solve.chart.subtract(inverse)?);
+    let eps = &p.euclidean_radius;
+    let reach = node_reach(&p.centre[..n]) + integer(2) * eps;
+    let right = element.right(h, &p.centre, &p.drive)?;
+    let sup = right
+        .iter()
+        .map(|v| v.abs())
+        .max()
+        .unwrap_or_else(Rat::zero);
+    let operand = sup
+        + (row_norm(&element.capacity)
+            + h * row_norm(&element.stiffness)
+            + integer(3) * h * element.saturation.coefficient() * &reach * &reach)
+            * eps;
+    let b_map = rate_map(h, n)?;
+    let b = dominated(&b_map.transpose()?.multiply(next_metric)?.multiply(&b_map)?)?;
+    let gamma = dominated(&matrix(n, n, |i, j| at(next_metric, i, j))?)?;
+    let width = integer(n as i64);
+    let rate = deviation * operand + &solve.unit;
+    Ok(integer(2) * b * &width * &rate * &rate
+        + integer(2) * gamma * width * &solve.unit * &solve.unit)
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -332,6 +468,11 @@ pub struct DomainStep {
     hessian_variation: Rat,
     jacobian: ExactRatMatrix,
     centre_residual_squared: Rat,
+    /// `D̂ = BhX̂` (or `BhN⁻¹` under the exact law): the executed drive's reach into `(u′, w′)`.
+    response: ExactRatMatrix,
+    next_metric: ExactRatMatrix,
+    rounding_floor: Rat,
+    margin: Rat,
 }
 
 impl DomainStep {
@@ -339,6 +480,7 @@ impl DomainStep {
         law: &ReferenceHolon,
         p: &DomainProposal,
         next: &DomainProposal,
+        solve: Option<&ExecutedSolve>,
     ) -> Result<Self, HolonError> {
         let element = law
             .holon()
@@ -360,6 +502,7 @@ impl DomainStep {
             || !p.young.is_positive()
             || !p.lipschitz.is_positive()
             || p.centre_residual.is_negative()
+            || p.rounding.is_negative()
         {
             return Err(failed("positive domain bounds"));
         }
@@ -392,7 +535,8 @@ impl DomainStep {
             .max()
             .unwrap_or_else(Rat::zero);
         nonnegative_form(&ExactRatMatrix::identity(n)?.scaled(&a).subtract(&a_gram)?)?;
-        let u: Rat = p.centre[..n].iter().map(|v| v.abs()).sum();
+        // The quartic is node-diagonal: its Hessian varies by `3β(2|c|ε + ε²)` on each node.
+        let u = node_reach(&p.centre[..n]);
         let eps = &p.euclidean_radius;
         let delta =
             integer(3) * element.saturation.coefficient() * (integer(2) * u * eps + eps * eps);
@@ -407,18 +551,67 @@ impl DomainStep {
         let advanced = law.advance(&HolonState::new(p.centre.clone()), &p.drive)?;
         let residual = sub(&advanced.state.configuration, &next.centre);
         let residual_squared = dot(&residual, &next.metric.apply(&residual)?);
-        if residual_squared > &p.centre_residual * &p.centre_residual
-            || &p.centre_residual + &p.lipschitz * &p.radius > next.radius
-        {
+        let floor = match solve {
+            Some(solve) => {
+                if solve.chart.rows() != n
+                    || solve.chart.columns() != n
+                    || !solve.unit.is_positive()
+                {
+                    return Err(failed(
+                        "the executed solve has the declared extent and a positive unit",
+                    ));
+                }
+                floor_with(element, h, &x, p, &next.metric, solve)?
+            }
+            None => Rat::zero(),
+        };
+        if &p.rounding * &p.rounding < floor {
+            return Err(failed("the executed envelope reaches its rounding floor"));
+        }
+        let margin = &next.radius - (&p.centre_residual + &p.rounding + &p.lipschitz * &p.radius);
+        if residual_squared > &p.centre_residual * &p.centre_residual || margin.is_negative() {
             return Err(failed("the actual centre residual and domain inclusion"));
         }
+        let executed = solve.map_or(&x, |solve| &solve.chart);
+        let response = rate_map(h, n)?.multiply(&executed.scaled(h))?;
         Ok(Self {
             law: law.clone(),
             proposal: p.clone(),
             hessian_variation: delta,
             jacobian: j,
             centre_residual_squared: residual_squared,
+            response,
+            next_metric: next.metric.clone(),
+            rounding_floor: floor,
+            margin,
         })
+    }
+
+    /// [definition; agent-inferred, October 18] **A drive this step holds**:
+    /// `|D̂(e − e₀)|_G_next ≤ m_t`, so the executed successor of every input in this ball lies in
+    /// the next ball (module header).
+    pub fn holds(&self, drive: &[Rat]) -> Result<bool, HolonError> {
+        if drive.len() != self.response.columns() {
+            return Err(failed("a drive of the loaded port's extent"));
+        }
+        let reach = self.response.apply(&sub(drive, &self.proposal.drive))?;
+        Ok(dot(&reach, &self.next_metric.apply(&reach)?) <= &self.margin * &self.margin)
+    }
+
+    /// `m_t = r_next − (η + ε_t + λr)`.
+    pub fn margin(&self) -> &Rat {
+        &self.margin
+    }
+    /// The squared envelope floor the proposal's rounding reaches.
+    pub fn rounding_floor(&self) -> &Rat {
+        &self.rounding_floor
+    }
+    /// `D̂`, the executed drive response.
+    pub fn response(&self) -> &ExactRatMatrix {
+        &self.response
+    }
+    pub fn proposal(&self) -> &DomainProposal {
+        &self.proposal
     }
 
     pub fn contains(&self, state: &[Rat]) -> Result<bool, HolonError> {
@@ -456,6 +649,27 @@ impl PeriodicDomain {
         laws: &[ReferenceHolon],
         proposals: &[DomainProposal],
     ) -> Result<Self, HolonError> {
+        Self::certify_on(laws, None, proposals)
+    }
+
+    /// [definition; agent-inferred, October 18] **The executed period**: each phase's domain step
+    /// certified for the rounded map its Word applies (module header), one solve per phase.
+    pub fn certify_executed(
+        laws: &[ReferenceHolon],
+        solves: &[ExecutedSolve],
+        proposals: &[DomainProposal],
+    ) -> Result<Self, HolonError> {
+        if solves.len() != laws.len() {
+            return Err(failed("one executed solve per declared phase"));
+        }
+        Self::certify_on(laws, Some(solves), proposals)
+    }
+
+    fn certify_on(
+        laws: &[ReferenceHolon],
+        solves: Option<&[ExecutedSolve]>,
+        proposals: &[DomainProposal],
+    ) -> Result<Self, HolonError> {
         if laws.is_empty() || laws.len() != proposals.len() {
             return Err(failed("a nonempty declared period"));
         }
@@ -484,6 +698,7 @@ impl PeriodicDomain {
                 &laws[i],
                 &proposals[i],
                 &proposals[(i + 1) % laws.len()],
+                solves.map(|solves| &solves[i]),
             )?);
             contraction *= &proposals[i].lipschitz;
         }
@@ -559,6 +774,7 @@ impl PeriodicDomain {
 pub struct PeriodicLock {
     domain: PeriodicDomain,
     phase: usize,
+    axis: usize,
     sheet: i8,
     amplitude_squared: [Rat; 2],
 }
@@ -585,9 +801,18 @@ impl PeriodicLock {
         Ok(Self {
             domain,
             phase,
+            axis,
             sheet,
             amplitude_squared: [lower, upper],
         })
+    }
+    /// The displacement coordinate the sheet is read on.
+    pub fn axis(&self) -> usize {
+        self.axis
+    }
+    /// Closed-ball membership in this sheet's domain at its phase.
+    pub fn contains(&self, state: &[Rat]) -> Result<bool, HolonError> {
+        self.domain.step(self.phase)?.contains(state)
     }
     pub fn sheet(&self) -> i8 {
         self.sheet
@@ -603,5 +828,89 @@ impl PeriodicLock {
     }
     pub fn advance(&self, state: &HolonState) -> Result<HolonState, HolonError> {
         self.domain.period_map(self.phase, state)
+    }
+}
+
+/// [definition; agent-inferred, October 18; the revised plan, step 1a] **The locked pair**: two
+/// certified opposite sheets of one executed period, read at its closing boundary (the period's
+/// phase `0`) on one displacement axis, their domains disjoint (`|c⁺ − c⁻| > ε⁺ + ε⁻`, each ball
+/// inside its Euclidean ε-ball). A sample is closed-ball membership: in one ball it is that sheet,
+/// in neither it is unlocked. Sheets are read, never thresholded.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LockedPair {
+    positive: PeriodicLock,
+    negative: PeriodicLock,
+}
+
+/// One sample at the period's closing boundary.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LockSample {
+    Sheet(i8),
+    Unlocked,
+}
+
+/// [definition; agent-inferred, October 18] **A lock event**: the state entered a ball other than
+/// the one it last lay in (`from`, `None` before any ball), at closing boundary `at`. One event
+/// per change of ball; an unlocked sample is reported and makes none.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct LockEvent {
+    pub from: Option<i8>,
+    pub to: i8,
+    pub at: u64,
+}
+
+impl LockedPair {
+    pub fn new(positive: PeriodicLock, negative: PeriodicLock) -> Result<Self, HolonError> {
+        if positive.sheet() != 1
+            || negative.sheet() != -1
+            || positive.phase_class() != 0
+            || negative.phase_class() != 0
+            || positive.axis() != negative.axis()
+            || positive.domain().period() != negative.domain().period()
+        {
+            return Err(failed(
+                "a locked pair reads two opposite sheets on one axis at the closing boundary",
+            ));
+        }
+        let (p, q) = (
+            positive.domain().step(0)?.proposal(),
+            negative.domain().step(0)?.proposal(),
+        );
+        let gap = sub(&p.centre, &q.centre);
+        let reach = &p.euclidean_radius + &q.euclidean_radius;
+        if dot(&gap, &gap) <= &reach * &reach {
+            return Err(failed("the two sheets' domains are disjoint"));
+        }
+        Ok(Self { positive, negative })
+    }
+    pub fn positive(&self) -> &PeriodicLock {
+        &self.positive
+    }
+    pub fn negative(&self) -> &PeriodicLock {
+        &self.negative
+    }
+    /// Closed-ball membership at the closing boundary.
+    pub fn sample(&self, state: &[Rat]) -> Result<LockSample, HolonError> {
+        Ok(if self.positive.contains(state)? {
+            LockSample::Sheet(1)
+        } else if self.negative.contains(state)? {
+            LockSample::Sheet(-1)
+        } else {
+            LockSample::Unlocked
+        })
+    }
+    /// The sample at boundary `at` and its event against the ball last lain in.
+    pub fn observe(
+        &self,
+        last: Option<i8>,
+        state: &[Rat],
+        at: u64,
+    ) -> Result<(LockSample, Option<LockEvent>), HolonError> {
+        let sample = self.sample(state)?;
+        let event = match sample {
+            LockSample::Sheet(to) if last != Some(to) => Some(LockEvent { from: last, to, at }),
+            _ => None,
+        };
+        Ok((sample, event))
     }
 }

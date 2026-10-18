@@ -86,6 +86,7 @@ use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector};
 use crate::hnn::realization::{apply_rows, entries, indexed};
 use crate::hnn::receiving::{ReceivingPhases, ReceivingStep};
 use crate::hnn::retention::AeonBoundary;
+use crate::hnn::ring::{ResonatorReturn, ReverseSplit};
 use crate::hnn::word::Word;
 use crate::holon::HolonError;
 use crate::holon::contact::FeatureCovector;
@@ -1844,44 +1845,37 @@ fn reverse_trajectory_joined_at(
                     expected: 1,
                     found: 0,
                 })?;
-                let nonlinear = resonator.material().saturation().is_some();
-                let velocity_factor = if nonlinear { integer(1) } else { integer(2) };
-                let z_image = entries(widths[r], |i| {
-                    &h * &state_bar[0][i] + &velocity_factor * &state_bar[1][i]
-                        - integer(2) / resonator.admittance() * &storage_bar[r][i]
-                });
-                let (zbar, zbar_remainder) =
-                    split(lattice.as_ref(), z_image, &carried.resonator_rate[r]);
-                let image = resonator.solve_transpose(step.phase, &zbar)?;
-                let (solved, solved_remainder) =
-                    split(lattice.as_ref(), image, &carried.resonator_solve[r]);
-                let drive_image = entries(widths[r], |i| &storage_bar[r][i] + &h * &solved[i]);
-                let (drive, drive_remainder) =
-                    split(lattice.as_ref(), drive_image, &carried.resonator_drive[r]);
-                let capacity = resonator.material().forms().0;
-                // The Hessian is read at the displacement that produced this tick, with its
-                // own executed transpose solve. The nonlinear kick has w'=omega, not 2omega-w.
-                let hessian = resonator.force_hessian(step.phase, &step.input[0])?;
-                let u_image = sub(&state_bar[0], &scale(&h, &apply_rows(&hessian, &solved)?));
-                let capacity_return = apply_rows(capacity, &solved)?;
-                let w_image = if nonlinear {
-                    capacity_return
-                } else {
-                    add(
-                        &scale(&integer(-1), &state_bar[1]),
-                        &scale(&integer(2), &capacity_return),
-                    )
-                };
-                let (u_bar, u_remainder) = split(
-                    lattice.as_ref(),
-                    u_image,
-                    &carried.resonator_state[r].as_ref().expect("declared state")[0],
-                );
-                let (w_bar, w_remainder) = split(
-                    lattice.as_ref(),
-                    w_image,
-                    &carried.resonator_state[r].as_ref().expect("declared state")[1],
-                );
+                let mut remainders: [Vec<Rat>; 5] = Default::default();
+                let state_carried = carried.resonator_state[r].as_ref().expect("declared state");
+                let returned = resonator.reverse(
+                    step,
+                    [&state_bar[0], &state_bar[1]],
+                    &storage_bar[r],
+                    &mut |at, image| {
+                        let (slot, remainder) = match at {
+                            ReverseSplit::Rate => (0, &carried.resonator_rate[r]),
+                            ReverseSplit::Solve => (1, &carried.resonator_solve[r]),
+                            ReverseSplit::Drive => (2, &carried.resonator_drive[r]),
+                            ReverseSplit::Displacement => (3, &state_carried[0]),
+                            ReverseSplit::Velocity => (4, &state_carried[1]),
+                        };
+                        let (carried, next) = split(lattice.as_ref(), image, remainder);
+                        remainders[slot] = next;
+                        carried
+                    },
+                )?;
+                let [
+                    zbar_remainder,
+                    solved_remainder,
+                    drive_remainder,
+                    u_remainder,
+                    w_remainder,
+                ] = remainders;
+                let ResonatorReturn {
+                    drive,
+                    state: [u_bar, w_bar],
+                    solved,
+                } = returned;
                 Ok(Some((
                     drive,
                     [u_bar, w_bar],

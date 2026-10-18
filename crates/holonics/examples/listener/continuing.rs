@@ -210,13 +210,20 @@ fn mounted(port: &Reference, population: u64) -> Result<(Resident, PairingDeclar
     let pairing = PairingDeclaration::Family {
         table: (0..CLASSES).map(|c| (c, c ^ 1)).collect(),
     };
-    let material =
-        PairedCarrier::found(&field, Constitution::initial(&field, BUDGET)?, 0, &pairing)?.0;
+    // The receiving ring's resonator is founded saturated on its standing pump, its two sheets
+    // certified on the period the live word executes (`Constitution::with_locking_pump`).
+    let receiving = field.receivers()[0].ring;
+    let founded = Constitution::initial(&field, BUDGET)?.with_locking_pump(&field, receiving)?;
+    let material = PairedCarrier::found(&field, founded, 0, &pairing)?.0;
     Ok((
         port.mount_with(&field, &Current::at_rest(&field), material)?,
         pairing,
     ))
 }
+
+#[cfg(test)]
+#[path = "continuing/lock.rs"]
+mod lock;
 
 /// The protocol register's own serialized address, with whitespace-free field framing.
 fn address_text(address: &ActiveAddress) -> String {
