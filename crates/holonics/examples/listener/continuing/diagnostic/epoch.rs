@@ -7,6 +7,8 @@
 //! remainder is shown as carry and is never silently added to that metric.
 
 use super::*;
+use holonics::hnn::constitution::NormalLaw;
+use holonics::hnn::paired::PortSymmetry;
 use holonics::hnn::reference::FrozenComparison;
 use holonics::ratio::algebraic::ExactInterval;
 use holonics::ratio::linear::ExactRatMatrix;
@@ -93,8 +95,6 @@ fn is_positive_definite(matrix: &Matrix) -> bool {
 }
 
 fn unconstrained_reasons(
-    crossing_symmetry: &str,
-    end_symmetry: &str,
     crossing_support: &[usize],
     crossing_width: usize,
     end_support: &[usize],
@@ -117,10 +117,68 @@ fn unconstrained_reasons(
     {
         reasons.push("receiver chart support is not the same full declared coordinate set");
     }
-    if crossing_symmetry != "None" || end_symmetry != "None" {
-        reasons.push("receiver symmetry constraint is not None at both cuts");
-    }
     reasons
+}
+
+fn map_respects_native_subspace(law: &NormalLaw, map: &Matrix) -> Result<bool> {
+    match law.symmetry() {
+        Some(symmetry) => Ok(symmetry.first_failure(map)?.is_none()),
+        None => Ok(true),
+    }
+}
+
+fn gram_commutes_with_native_symmetry(law: &NormalLaw, gram: &Matrix) -> bool {
+    law.symmetry()
+        .is_none_or(|symmetry| gram_commutes_with_symmetry(symmetry, gram))
+}
+
+fn gram_commutes_with_symmetry(symmetry: &PortSymmetry, gram: &Matrix) -> bool {
+    gram.is_square()
+        && symmetry.columns().len() == gram.rows()
+        && (0..gram.rows()).all(|row| {
+            (0..gram.columns()).all(|column| {
+                gram.get(row, column).ok()
+                    == gram.get(symmetry.column(row), symmetry.column(column)).ok()
+            })
+        })
+}
+
+fn exact_log2_power_of_two(value: &BigInt) -> Option<u32> {
+    if value <= &BigInt::zero() {
+        return None;
+    }
+    let bits = value.bits();
+    let exponent = u32::try_from(bits.checked_sub(1)?).ok()?;
+    (value == &(BigInt::one() << exponent as usize)).then_some(exponent)
+}
+
+fn spec_lattice_exponent(receiver_grain: u64, support_width: usize) -> Option<u32> {
+    let doubled_grain = BigInt::from(receiver_grain) << 1usize;
+    let b_r = exact_log2_power_of_two(&doubled_grain)?;
+    let width = u64::try_from(support_width).ok()?;
+    if width == 0 {
+        return None;
+    }
+    let ceil_width = if width.is_power_of_two() {
+        width.trailing_zeros()
+    } else {
+        u64::BITS - width.leading_zeros()
+    };
+    b_r.checked_add(ceil_width)
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum SilenceVerdict {
+    BelowGrain,
+    AtOrAboveWholeGrain,
+}
+
+fn silence_verdict(bound: &Rat, grain: &Rat) -> SilenceVerdict {
+    if bound < grain {
+        SilenceVerdict::BelowGrain
+    } else {
+        SilenceVerdict::AtOrAboveWholeGrain
+    }
 }
 
 #[derive(Debug)]
@@ -334,15 +392,27 @@ pub(super) fn report_epoch(
     end: &CutView,
     views: &[CutView],
     receiver_grain: u64,
-    lattice_exponent: u32,
+    spec_lattice_exponent_argument: u32,
 ) -> Result<()> {
     if receiver_grain == 0 {
         return Err("receiver grain denominator must be positive".into());
     }
     let (gradient, sample_gram_delta) = super::epoch_statistics(crossing, views)?;
+    let native_lw_cross = crossing.native_lattice_exponent;
+    let native_lw_end = end.native_lattice_exponent;
+    let width = crossing.support.len();
+    let spec_lw = spec_lattice_exponent(receiver_grain, width);
+    let spec_b_r = exact_log2_power_of_two(&(BigInt::from(receiver_grain) << 1usize));
+    let spec_unit = spec_lw.map(|exponent| rat_pow2(-i64::from(exponent)));
+    let native_unit_cross = rat_pow2(-i64::from(native_lw_cross));
+    let native_unit_end = rat_pow2(-i64::from(native_lw_end));
     let actual_map_delta = matrix_subtract(&end.map, &crossing.map)?;
     let actual_stored_gram_delta = matrix_subtract(&end.gram, &crossing.gram)?;
     let actual_carry_delta = matrix_subtract(&end.gram_remainder, &crossing.gram_remainder)?;
+    let exact_gram_residual = matrix_subtract(
+        &matrix_subtract(&actual_stored_gram_delta, &actual_carry_delta)?,
+        &sample_gram_delta,
+    )?;
     let max_feature = views
         .iter()
         .flat_map(|view| &view.samples)
@@ -378,7 +448,7 @@ pub(super) fn report_epoch(
     let native_half_quantum = &grain_unit / Rat::from_integer(BigInt::from(2));
 
     println!(
-        "step0_epoch branch={branch} samples={} W_cross={:?} H_cross_stored={:?} G_cross={:?} sample_H_delta={:?} H_end_stored={:?} H_stored_delta={:?} carry_cross={:?} carry_end={:?} carry_delta={:?} W_end={:?} W_actual_delta={:?}",
+        "step0_epoch branch={branch} samples={} W_cross={:?} H_cross_stored={:?} G_cross_projected={:?} sample_H_delta_projected={:?} H_end_stored={:?} H_stored_delta={:?} carry_cross={:?} carry_end={:?} carry_delta={:?} exact_Hstored_delta_minus_carry_delta_minus_sample_H_delta={:?} W_end={:?} W_actual_delta={:?}",
         views.iter().map(|view| view.samples.len()).sum::<usize>(),
         crossing.map,
         crossing.gram,
@@ -389,16 +459,17 @@ pub(super) fn report_epoch(
         crossing.gram_remainder,
         end.gram_remainder,
         actual_carry_delta,
+        exact_gram_residual,
         end.map,
         actual_map_delta,
     );
     println!(
-        "step0_epoch_contract branch={branch} metric=native-stored-H; ridge_is_already_in_stored-H; gram_carry_reported_separately_not_added; gamma=1_hypothetical; incoming_R=0_hypothetical; this_G_is_frozen_crossing_covector_sum_not_live_PreparedStep.unit; radial_mode=not_exposed; receiving_prior={:?} prior_scale={} support={:?} symmetry={} receiver_grain_unit=1/{receiver_grain}={grain_unit} native_precision_half_quantum={native_half_quantum}",
+        "step0_epoch_contract branch={branch} metric=native-stored-H; ridge_is_already_in_stored-H; gram_carry_reported_separately_not_added; G_cross_and_sample_deltaH_are_projected_by_crossing_NormalLaw; gamma=1_hypothetical; incoming_R=0_hypothetical; this_G_is_not_live_PreparedStep.unit; radial_mode=not_exposed; receiving_prior={:?} prior_scale={} support={:?} symmetry={} receiver_grain_unit=1/{receiver_grain}={grain_unit} native_precision_half_quantum={native_half_quantum}",
         crossing.receiving_prior, crossing.prior_scale, crossing.support, crossing.symmetry,
     );
     println!(
-        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_one_crossing_g={max_sample_crossing_g} max_abs_G_cross={} last_staged_sample_weight_as_newest_datum_weight={newest_sample_weight:?} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} L_W={lattice_exponent} grain_denominator={receiver_grain}; no_clock_feature_split_claimed",
-        matrix_max_abs(&gradient)
+        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_sample_weight:?} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} spec_b_R=log2(2*L_R)={spec_b_r:?} spec_LW=b_R+ceil(log2(support_width={width}))={spec_lw:?} spec_W_unit={spec_unit:?} passed_spec_LW={spec_lattice_exponent_argument} no_clock_feature_split_claimed",
+        matrix_max_abs(&gradient),
     );
 
     // This is the stated step-0 hypothetical law: no persistent native carry is present in the
@@ -418,10 +489,17 @@ pub(super) fn report_epoch(
         }
     };
     let d_hyp = right_column_scale(&residual_prime, &majorizer_diagonal)?;
-    let lattice_unit = rat_pow2(-i64::from(lattice_exponent));
-    let step = project_toward_zero(&d_hyp, lattice_exponent)?;
+    let lattice_unit = native_unit_cross.clone();
+    let step = project_toward_zero(&d_hyp, native_lw_cross)?;
+    let end_lattice_step = project_toward_zero(&d_hyp, native_lw_end)?;
+    let candidate_map = matrix_add(&crossing.map, &step)?;
     let residual_after = matrix_subtract(&residual_prime, &matrix_product(&step, &end.gram)?)?;
+    let end_lattice_residual = matrix_subtract(
+        &residual_prime,
+        &matrix_product(&end_lattice_step, &end.gram)?,
+    )?;
     let fall = exact_fall(&step, &residual_prime, &end.gram)?;
+    let end_lattice_fall = exact_fall(&end_lattice_step, &residual_prime, &end.gram)?;
     let inverse = match end.gram.inverse() {
         Ok(inverse) => inverse,
         Err(error) => {
@@ -436,15 +514,35 @@ pub(super) fn report_epoch(
     };
     let unconstrained_update = matrix_product(&residual_prime, &inverse)?;
     let optimum = matrix_add(&crossing.map, &unconstrained_update)?;
-    let unconstrained_reasons = unconstrained_reasons(
-        &crossing.symmetry,
-        &end.symmetry,
+    let mut unconstrained_reasons = unconstrained_reasons(
         &crossing.support,
         crossing.map.columns(),
         &end.support,
         end.map.columns(),
         &end.gram,
     );
+    if !gram_commutes_with_native_symmetry(&crossing.law, &crossing.gram)
+        || !gram_commutes_with_native_symmetry(&crossing.law, &crossing.gram_remainder)
+        || !gram_commutes_with_native_symmetry(&end.law, &end.gram)
+        || !gram_commutes_with_native_symmetry(&end.law, &end.gram_remainder)
+        || !gram_commutes_with_native_symmetry(&crossing.law, &sample_gram_delta)
+        || !gram_commutes_with_native_symmetry(&end.law, &sample_gram_delta)
+    {
+        unconstrained_reasons.push("stored Gram/carry/projected sample DeltaH does not commute with native paired symmetry");
+    }
+    let cross_step_compatible = map_respects_native_subspace(&crossing.law, &step)?
+        && map_respects_native_subspace(&end.law, &step)?
+        && map_respects_native_subspace(&crossing.law, &end_lattice_step)?
+        && map_respects_native_subspace(&end.law, &end_lattice_step)?
+        && map_respects_native_subspace(&crossing.law, &residual_after)?
+        && map_respects_native_subspace(&end.law, &residual_after)?;
+    let cross_candidate_compatible = map_respects_native_subspace(&crossing.law, &candidate_map)?
+        && map_respects_native_subspace(&end.law, &candidate_map)?;
+    let end_candidate_compatible = map_respects_native_subspace(&crossing.law, &optimum)?
+        && map_respects_native_subspace(&end.law, &optimum)?;
+    if !cross_step_compatible || !cross_candidate_compatible || !end_candidate_compatible {
+        unconstrained_reasons.push("projected step or candidate map leaves native paired subspace");
+    }
     let nonzero_step = !step.entries().iter().all(Rat::is_zero);
     let fall_error =
         check_hypothetical_fall(nonzero_step, unconstrained_reasons.is_empty(), &fall).err();
@@ -460,7 +558,7 @@ pub(super) fn report_epoch(
     };
     let actual_end_gap = matrix_subtract(&end.map, &optimum)?;
     println!(
-        "step0_epoch_majorizer branch={branch} column_exponents={majorizer_exponents:?} M_diagonal={majorizer_diagonal:?} D_hyp={d_hyp:?} max_abs_D_hyp={} max_abs_D_in_W_units={} lattice_unit={lattice_unit} step_toward_zero={step:?} residual_R_double_prime={residual_after:?} exact_fall={fall} nonzero_step={nonzero_step} positive_fall_check={fall_check} actual_W_end_minus_W_star_unconstrained={actual_end_gap:?}",
+        "step0_epoch_majorizer branch={branch} column_exponents={majorizer_exponents:?} M_diagonal={majorizer_diagonal:?} D_hyp={d_hyp:?} max_abs_D_hyp={} max_abs_D_in_crossing_W_units={} native_LW_cross={native_lw_cross} native_LW_end={native_lw_end} native_cross_step={step:?} native_cross_R_double_prime={residual_after:?} native_cross_fall={fall} native_end_step_diagnostic={end_lattice_step:?} native_end_R_double_prime_diagnostic={end_lattice_residual:?} native_end_fall_diagnostic={end_lattice_fall} positive_fall_check={fall_check} step_pair_subspace_ok={cross_step_compatible} native_cross_candidate_pair_subspace_ok={cross_candidate_compatible} W_star_pair_subspace_ok={end_candidate_compatible} actual_W_end_minus_W_star_unconstrained={actual_end_gap:?}",
         matrix_max_abs(&d_hyp),
         matrix_max_abs(&d_hyp) / &lattice_unit,
     );
@@ -510,15 +608,17 @@ pub(super) fn report_epoch(
             }
         }
     }
+    let exact_witness_verdict = silence_verdict(&max_witness, &grain_unit);
+    let norm_inf_bound_verdict = silence_verdict(&witness_bound, &grain_unit);
+    let width_entry_bound_verdict = silence_verdict(&width_times_entry_bound, &grain_unit);
     println!(
-        "step0_epoch_stalls branch={branch} status={} stalled_entries={stalls:?} count={} norm_inf_Rdual_times_maxf_bound={witness_bound} width_times_max_entry_times_maxf_bound={width_times_entry_bound} per_feature_witnesses_at_or_above_grain={witnesses_over_grain:?} max_per_feature_logit_witness={} receiver_grain_unit={grain_unit} native_half_quantum={native_half_quantum}; hypothetical_R_double_prime_only; no_live_deposit_refusal_claim",
+        "step0_epoch_stalls branch={branch} status={} stalled_entries={stalls:?} count={} exact_max_feature_witness={max_witness} exact_witness_verdict={exact_witness_verdict:?} norm_inf_Rdual_times_maxf_bound={witness_bound} norm_inf_silence_verdict={norm_inf_bound_verdict:?} width_times_max_entry_times_maxf_bound={width_times_entry_bound} width_entry_silence_verdict={width_entry_bound_verdict:?} per_feature_witnesses_at_or_above_whole_grain={witnesses_over_grain:?} receiver_grain_q_R={grain_unit} native_half_quantum={native_half_quantum}; hypothetical_R_double_prime_only; no_live_deposit_refusal_claim",
         if unconstrained_reasons.is_empty() {
             "unconstrained-hypothetical"
         } else {
             "unconstrained-only-not-R12"
         },
         stalls.len(),
-        max_witness,
     );
 
     let sample_count = views.iter().map(|view| view.samples.len()).sum();
@@ -596,10 +696,9 @@ mod tests {
     #[test]
     fn metric_uses_stored_gram_without_adding_carry() {
         let h = matrix(&[&[5, 0], &[0, 3]]);
-        let reasons = unconstrained_reasons("None", "None", &[0, 1], 2, &[0, 1], 2, &h);
+        let reasons = unconstrained_reasons(&[0, 1], 2, &[0, 1], 2, &h);
         assert!(reasons.is_empty());
-        let constrained = unconstrained_reasons("Paired", "Paired", &[0], 2, &[0], 2, &h);
-        assert!(constrained.iter().any(|reason| reason.contains("symmetry")));
+        let constrained = unconstrained_reasons(&[0], 2, &[0], 2, &h);
         assert!(constrained.iter().any(|reason| reason.contains("support")));
         assert!(is_positive_definite(&h));
         assert!(!is_positive_definite(&matrix(&[&[1, 2], &[2, 1]])));
@@ -617,6 +716,72 @@ mod tests {
             column_majorizer(&h).unwrap(),
             (vec![1], vec![Rat::from_integer(2.into())])
         );
+    }
+
+    #[test]
+    fn native_and_spec_lattice_units_are_reported_independently() {
+        let grain = 32;
+        let spec = spec_lattice_exponent(grain, 32).unwrap();
+        assert_eq!(exact_log2_power_of_two(&(BigInt::from(2 * grain))), Some(6));
+        assert_eq!(spec, 11);
+        let native_cross = 37;
+        let native_end = 39;
+        assert_ne!(native_cross, spec);
+        assert_ne!(native_end, spec);
+        assert_eq!(
+            rat_pow2(-i64::from(native_cross)),
+            Rat::new(1.into(), BigInt::one() << 37usize)
+        );
+        assert_eq!(
+            rat_pow2(-i64::from(native_end)),
+            Rat::new(1.into(), BigInt::one() << 39usize)
+        );
+        assert_eq!(
+            rat_pow2(-i64::from(spec)),
+            Rat::new(1.into(), BigInt::one() << 11usize)
+        );
+    }
+
+    #[test]
+    fn both_silence_bounds_use_whole_grain_boundary_inclusively() {
+        let grain = Rat::new(1.into(), 32.into());
+        let below = Rat::new(31.into(), 1024.into());
+        let exact = grain.clone();
+        let above = Rat::new(33.into(), 1024.into());
+        assert_eq!(silence_verdict(&below, &grain), SilenceVerdict::BelowGrain);
+        assert_eq!(
+            silence_verdict(&exact, &grain),
+            SilenceVerdict::AtOrAboveWholeGrain
+        );
+        assert_eq!(
+            silence_verdict(&above, &grain),
+            SilenceVerdict::AtOrAboveWholeGrain
+        );
+        // The two reportable enclosures each get their own verdict at the same grain q_R.
+        let norm_bound = Rat::new(30.into(), 1024.into());
+        let width_bound = Rat::new(32.into(), 1024.into());
+        assert_eq!(
+            silence_verdict(&norm_bound, &grain),
+            SilenceVerdict::BelowGrain
+        );
+        assert_eq!(
+            silence_verdict(&width_bound, &grain),
+            SilenceVerdict::AtOrAboveWholeGrain
+        );
+    }
+
+    #[test]
+    fn paired_projected_gram_and_candidate_must_preserve_native_subspace() {
+        let symmetry = PortSymmetry::from_parts(vec![1, 0], vec![Some(1), Some(0)], &[0]).unwrap();
+        let h_projected = matrix(&[&[4, 1], &[1, 4]]);
+        let delta_h_projected = matrix(&[&[2, -1], &[-1, 2]]);
+        let candidate = matrix(&[&[3, 5], &[5, 3]]);
+        assert!(gram_commutes_with_symmetry(&symmetry, &h_projected));
+        assert!(gram_commutes_with_symmetry(&symmetry, &delta_h_projected));
+        assert_eq!(symmetry.first_failure(&candidate).unwrap(), None);
+        let unprojected = matrix(&[&[2, 0], &[0, 1]]);
+        assert!(!gram_commutes_with_symmetry(&symmetry, &unprojected));
+        assert!(symmetry.first_failure(&unprojected).unwrap().is_some());
     }
 
     #[test]

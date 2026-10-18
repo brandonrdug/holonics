@@ -2441,6 +2441,77 @@ impl NormalLaw {
         )
     }
 
+    /// The exact statistics of readings at this law: `(G, ΔH)`, before lattice carry or a solved
+    /// chart is applied. A paired port uses the same projection of `G` and symmetrization of `ΔH`
+    /// as [`NormalLaw::prepare`] (Lean `HNN/PairedDeposit.mul_commuting_stays`). This read does not
+    /// prepare or deposit a step and does not change the law. In particular, `G` is not the native
+    /// prepared unit step, which also depends on the successor's solved chart.
+    pub fn projected_statistics(
+        &self,
+        samples: &[Sample],
+    ) -> Result<(ExactRatMatrix, ExactRatMatrix), HnnError> {
+        let (m, n) = (self.map.rows(), self.map.columns());
+        for sample in samples {
+            if sample.feature.len() != n || sample.covector.len() != m {
+                return Err(HnnError::Shape {
+                    what: "a normal sample (feature, covector)",
+                    expected: n + m,
+                    found: sample.feature.len() + sample.covector.len(),
+                });
+            }
+        }
+        let active: Vec<(&Sample, Chart, Chart)> = samples
+            .iter()
+            .filter(|sample| !sample.weight.is_zero())
+            .filter(|sample| sample.feature.iter().any(|x| !x.is_zero()))
+            .map(|sample| {
+                (
+                    sample,
+                    integral(&sample.feature),
+                    integral(&sample.covector),
+                )
+            })
+            .collect();
+        if active.is_empty() {
+            return Ok((ExactRatMatrix::zero(m, n)?, ExactRatMatrix::zero(n, n)?));
+        }
+        if let Some(symmetry) = &self.symmetry {
+            for (sample, _, _) in &active {
+                if let Some(class) = (0..n).find(|&class| {
+                    symmetry.columns()[class].is_none() && !sample.feature[class].is_zero()
+                }) {
+                    return Err(HnnError::PairedOutside { class });
+                }
+            }
+        }
+        let cross = outer_integral(
+            m,
+            n,
+            &active
+                .iter()
+                .map(|(sample, feature, covector)| (&sample.weight, covector, feature))
+                .collect::<Vec<_>>(),
+        );
+        let cross = match &self.symmetry {
+            Some(symmetry) => cross.projected(symmetry.rows(), symmetry.columns()),
+            None => cross,
+        };
+        let gram = gram_sum(
+            n,
+            active
+                .iter()
+                .map(|(sample, feature, _)| (&sample.weight, feature)),
+        );
+        let gram = match &self.symmetry {
+            Some(symmetry) => symmetrized_gram(n, &gram, symmetry),
+            None => gram,
+        };
+        Ok((
+            ExactRatMatrix::shaped(m, n, cross.to_rows())?,
+            ExactRatMatrix::shaped(n, n, gram.chunks(n).map(<[Rat]>::to_vec).collect())?,
+        ))
+    }
+
     /// **The carried prox step through the solved chart, prepared at its unit step** (Lean
     /// `HNN/Normal.normal_prox_step`, `HNN/LatticeDeposit.carry`, `HNN/LatticeWord.prox_chart_residual`;
     /// module header, "The certified step"): `ΔH = Σ w f fᵀ` carried onto `H` gives `H'`; the chart of
@@ -12797,6 +12868,105 @@ mod solved_chart_wide_tests {
                 bits(&chart.dense(1)[0][0]) + bits(chart.certificate())
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod projected_statistics_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    #[test]
+    fn signed_statistics_are_exact_and_leave_the_law_unchanged() {
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(2, 2).unwrap());
+        let before = law.clone();
+        let samples = [
+            Sample {
+                weight: rat(1, 2),
+                feature: vec![rat(1, 1), rat(2, 1)],
+                covector: vec![rat(3, 1), rat(-1, 1)],
+                masses: None,
+            },
+            Sample {
+                weight: rat(-1, 3),
+                feature: vec![rat(2, 1), rat(-1, 1)],
+                covector: vec![rat(1, 1), rat(4, 1)],
+                masses: None,
+            },
+        ];
+        let (cross, gram) = law.projected_statistics(&samples).unwrap();
+        assert_eq!(
+            cross.to_rows(),
+            vec![vec![rat(5, 6), rat(10, 3)], vec![rat(-19, 6), rat(1, 3)]]
+        );
+        assert_eq!(
+            gram.to_rows(),
+            vec![vec![rat(-5, 6), rat(5, 3)], vec![rat(5, 3), rat(5, 3)]]
+        );
+        assert_eq!(law, before);
+    }
+
+    #[test]
+    fn paired_statistics_share_the_native_projection_and_gram_deposit() {
+        let symmetry = PortSymmetry::from_parts(vec![1, 0], vec![Some(1), Some(0)], &[0]).unwrap();
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(2, 2).unwrap())
+            .with_symmetry(symmetry.clone())
+            .unwrap();
+        let samples = [Sample {
+            weight: rat(2, 1),
+            feature: vec![rat(1, 1), rat(0, 1)],
+            covector: vec![rat(3, 1), rat(-1, 1)],
+            masses: None,
+        }];
+        let (cross, gram) = law.projected_statistics(&samples).unwrap();
+        assert_eq!(
+            cross.to_rows(),
+            vec![vec![rat(3, 1), rat(-1, 1)], vec![rat(-1, 1), rat(3, 1)]]
+        );
+        assert_eq!(symmetry.first_failure(&cross).unwrap(), None);
+        assert_eq!(gram, ExactRatMatrix::identity(2).unwrap());
+        let lattice = Lattice::new(16);
+        let rule = ChartRule::new(lattice, 16);
+        let prepared = law
+            .prepare(&samples, &rule, &mut BudgetedCarry::new(lattice, 1))
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            &prepared.law.gram,
+            &vec![vec![rat(2, 1), rat(0, 1)], vec![rat(0, 1), rat(2, 1)]]
+        );
+        assert_eq!(
+            &law.gram,
+            &vec![vec![rat(1, 1), rat(0, 1)], vec![rat(0, 1), rat(1, 1)]]
+        );
+    }
+
+    #[test]
+    fn statistics_preserve_empty_shapes_and_refuse_bad_samples_or_outside_pairs() {
+        let empty = NormalLaw::with_prior(ExactRatMatrix::zero(0, 3).unwrap());
+        let (cross, gram) = empty.projected_statistics(&[]).unwrap();
+        assert_eq!((cross.rows(), cross.columns()), (0, 3));
+        assert_eq!((gram.rows(), gram.columns()), (3, 3));
+        let symmetry =
+            PortSymmetry::from_parts(vec![0], vec![Some(1), Some(0), None], &[0]).unwrap();
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(1, 3).unwrap())
+            .with_symmetry(symmetry)
+            .unwrap();
+        let mut sample = Sample {
+            weight: Rat::one(),
+            feature: vec![Rat::zero(), Rat::zero(), Rat::one()],
+            covector: vec![Rat::one()],
+            masses: None,
+        };
+        assert!(matches!(
+            law.projected_statistics(&[sample.clone()]),
+            Err(HnnError::PairedOutside { class: 2 })
+        ));
+        sample.feature.pop();
+        assert!(matches!(
+            law.projected_statistics(&[sample]),
+            Err(HnnError::Shape { .. })
+        ));
     }
 }
 

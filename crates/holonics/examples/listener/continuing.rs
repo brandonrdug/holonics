@@ -30,6 +30,7 @@ struct ContinuingOptions {
     diagnostic_calibration_only: bool,
     diagnostic_checkpoint: Option<String>,
     diagnostic_profile_trunk_cells: Option<usize>,
+    diagnostic_profile_paired_cells64: bool,
     diagnostic_report_reserve_ns: Option<u128>,
 }
 
@@ -37,6 +38,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     let (mut learn, mut count, mut population, mut keys, mut diagnostic_checkpoint) =
         (None, None, None, None, None);
     let mut diagnostic_profile_trunk_cells = None;
+    let mut diagnostic_profile_paired_cells64 = false;
     let mut diagnostic_report_reserve_ns = None;
     let mut diagnostic_step0 = false;
     let mut diagnostic_calibration_only = false;
@@ -50,6 +52,11 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         }
         if option == "--diagnostic-calibration-only" {
             diagnostic_calibration_only = true;
+            at += 1;
+            continue;
+        }
+        if option == "--diagnostic-profile-paired-cells64" {
+            diagnostic_profile_paired_cells64 = true;
             at += 1;
             continue;
         }
@@ -93,6 +100,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     if !diagnostic_step0
         && (diagnostic_checkpoint.is_some()
             || diagnostic_profile_trunk_cells.is_some()
+            || diagnostic_profile_paired_cells64
             || diagnostic_report_reserve_ns.is_some())
     {
         return Err("diagnostic options require --diagnostic-step0".into());
@@ -104,6 +112,13 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         && (diagnostic_calibration_only || diagnostic_checkpoint.is_some())
     {
         return Err("trunk profiling cannot include calibration or checkpoint/fork options".into());
+    }
+    if diagnostic_profile_paired_cells64
+        && (diagnostic_profile_trunk_cells.is_some()
+            || diagnostic_calibration_only
+            || diagnostic_checkpoint.is_some())
+    {
+        return Err("paired 64+64 profiling is a separate calibration mode and cannot include trunk-only profiling, calibration-only, or checkpoint options".into());
     }
     if diagnostic_report_reserve_ns.is_some_and(|reserve| reserve >= 300_000_000_000) {
         return Err("diagnostic report reserve must fit inside the fixed 300-second budget".into());
@@ -117,6 +132,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         diagnostic_calibration_only,
         diagnostic_checkpoint,
         diagnostic_profile_trunk_cells,
+        diagnostic_profile_paired_cells64,
         diagnostic_report_reserve_ns,
     })
 }
@@ -878,7 +894,10 @@ fn header_line(resident: &Resident) -> Result<String> {
 pub fn run(port: &Reference, args: &[String]) -> Result<()> {
     let options = parse(args)?;
     if options.diagnostic_step0 {
-        if options.diagnostic_calibration_only || options.diagnostic_profile_trunk_cells.is_some() {
+        if options.diagnostic_calibration_only
+            || options.diagnostic_profile_trunk_cells.is_some()
+            || options.diagnostic_profile_paired_cells64
+        {
             return diagnostic::run(port, options, None);
         }
         if options.diagnostic_report_reserve_ns.is_none() {
@@ -978,6 +997,17 @@ mod tests {
         .map(str::to_owned)
         .collect::<Vec<_>>();
         assert!(parse(&upper).is_err());
+        let paired = [
+            "--learn",
+            "unread.hlsn",
+            "--population",
+            "1",
+            "--diagnostic-profile-paired-cells64",
+        ]
+        .into_iter()
+        .map(str::to_owned)
+        .collect::<Vec<_>>();
+        assert!(parse(&paired).is_err());
         let checkpoint = [
             "--learn",
             "unread.hlsn",
@@ -1009,7 +1039,12 @@ mod tests {
         };
         let profile = parse(&declared(&["--diagnostic-profile-trunk-cells", "64"])).unwrap();
         assert_eq!(profile.diagnostic_profile_trunk_cells, Some(64));
+        assert!(!profile.diagnostic_profile_paired_cells64);
         assert!(profile.diagnostic_checkpoint.is_none());
+        let paired = parse(&declared(&["--diagnostic-profile-paired-cells64"])).unwrap();
+        assert!(paired.diagnostic_profile_paired_cells64);
+        assert_eq!(paired.diagnostic_profile_trunk_cells, None);
+        assert!(paired.diagnostic_checkpoint.is_none());
         for extra in [
             vec!["--diagnostic-profile-trunk-cells", "0"],
             vec!["--diagnostic-profile-trunk-cells", "313"],
@@ -1026,6 +1061,16 @@ mod tests {
             ],
             vec!["--diagnostic-unit-upper-ns", "195882064"],
             vec!["--diagnostic-report-reserve-ns", "300000000000"],
+            vec![
+                "--diagnostic-profile-paired-cells64",
+                "--diagnostic-profile-trunk-cells",
+                "64",
+            ],
+            vec![
+                "--diagnostic-profile-paired-cells64",
+                "--diagnostic-checkpoint",
+                "unused",
+            ],
         ] {
             assert!(parse(&declared(&extra)).is_err(), "{extra:?}");
         }

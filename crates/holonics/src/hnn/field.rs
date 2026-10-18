@@ -2060,6 +2060,25 @@ impl Field {
         Ok(step)
     }
 
+    /// A ring's native class advance before carry, on the ordinary lock route. An `Own` ring
+    /// advances once for every admitted class, including classes outside its lock. Located route
+    /// digits belong to an encoded occurrence and are read by [`Field::selective_step`] instead.
+    pub fn class_advance(&self, ring: usize, class: usize) -> Result<u64, HnnError> {
+        if ring >= self.rings.len() {
+            return Err(HnnError::RingOutside {
+                ring,
+                rings: self.rings.len(),
+            });
+        }
+        if class >= self.alphabet {
+            return Err(HnnError::CellOutside {
+                code: class,
+                alphabet: self.alphabet,
+            });
+        }
+        Ok(self.advance_of(ring, class, None))
+    }
+
     /// **Ring `g`'s advance on a class before its carry**: the class's located digit `a_g(c)` on
     /// the located route, else its lock's fit `[c ∈ N_g]`.
     pub(crate) fn advance_of(&self, ring: usize, class: usize, digits: Option<&[u64]>) -> u64 {
@@ -3163,3 +3182,36 @@ fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
 
 #[cfg(test)]
 pub(crate) mod founding_tests;
+
+#[cfg(test)]
+mod class_advance_tests {
+    use super::*;
+
+    #[test]
+    fn native_class_read_distinguishes_lock_fit_and_own_advance() {
+        let mut field =
+            Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
+        assert_eq!(field.class_advance(0, 0).unwrap(), 1);
+        assert_eq!(field.class_advance(0, 1).unwrap(), 0);
+        for class in 0..field.alphabet {
+            assert_eq!(
+                field.class_advance(0, class).unwrap(),
+                field.advance_of(0, class, None)
+            );
+        }
+        // An Own ring's step is independent of its lock. Exercise a zero-fit fixture explicitly.
+        field.rings[0].advance = RingAdvance::Own;
+        field.rings[0].lock.fill(false);
+        for class in 0..field.alphabet {
+            assert_eq!(field.class_advance(0, class).unwrap(), 1);
+        }
+        assert!(matches!(
+            field.class_advance(field.rings.len(), 0),
+            Err(HnnError::RingOutside { .. })
+        ));
+        assert!(matches!(
+            field.class_advance(0, field.alphabet),
+            Err(HnnError::CellOutside { .. })
+        ));
+    }
+}

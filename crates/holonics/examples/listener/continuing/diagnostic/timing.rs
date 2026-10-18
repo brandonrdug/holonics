@@ -1,40 +1,71 @@
 //! Fixed-deadline timing and process-local observability for the step-0 diagnostic.
 //!
-//! The caller owns the native transaction. A `PhaseBudget` checks whether that next declared
-//! unit can still fit, records its elapsed time, and reports fixed eight-cell blocks. It never
-//! imposes a per-cell latency ceiling. Forecasts are feasibility warnings from completed blocks,
-//! not guarantees of constant cost.
+//! The native phase uses the supervisor's Linux `CLOCK_MONOTONIC` deadlines. It reserves the
+//! declared postwork interval inside the native cutoff; it cannot create or extend a deadline.
+
+#[path = "exterior_clock.rs"]
+mod exterior_clock;
 
 use std::io;
-use std::time::{Duration, Instant};
 
 const RUN_WALL_CAP_NS: u128 = 300_000_000_000;
+const TERM_OFFSET_NS: u128 = 295_000_000_000;
+const NATIVE_TERM_GRACE_NS: u128 = 5_000_000_000;
 const BLOCK_CELLS: usize = 8;
 
-/// A shared immutable start/deadline. `Instant` and the scalar reserve make this safe to borrow
-/// from independent branch workers; each worker creates its own `PhaseBudget`.
+#[derive(Clone, Copy, Debug)]
+struct DeadlineContract {
+    started_ns: u128,
+    term_ns: u128,
+    total_ns: u128,
+    native_ns: u128,
+}
+
+/// A shared immutable external deadline. Independent branch workers borrow this safely and
+/// create separate mutable phase trackers; no timing mutex serializes their work.
 #[derive(Clone, Debug)]
 pub(super) struct RunBudget {
-    started: Instant,
+    deadline: DeadlineContract,
     reserve_ns: u128,
 }
 
 impl RunBudget {
-    /// Starts the absolute 300-second wall deadline and reserves time for declared postwork.
+    /// Loads the supervisor's absolute monotonic deadlines and reserves time for declared
+    /// postwork. Missing/malformed environment values and non-Linux monotonic clocks fail closed.
     pub(super) fn new(reserve_ns: u128) -> io::Result<Self> {
-        if reserve_ns >= RUN_WALL_CAP_NS {
+        let deadline = DeadlineContract {
+            started_ns: deadline_env("REQ063_SUPERVISOR_START_MONOTONIC_NS")?,
+            term_ns: deadline_env("REQ063_TERM_DEADLINE_MONOTONIC_NS")?,
+            total_ns: deadline_env("REQ063_TOTAL_DEADLINE_MONOTONIC_NS")?,
+            native_ns: deadline_env("REQ063_NATIVE_DEADLINE_MONOTONIC_NS")?,
+        };
+        if deadline.term_ns.checked_sub(deadline.started_ns) != Some(TERM_OFFSET_NS)
+            || deadline.total_ns.checked_sub(deadline.started_ns) != Some(RUN_WALL_CAP_NS)
+            || deadline.term_ns.checked_sub(deadline.native_ns) != Some(NATIVE_TERM_GRACE_NS)
+        {
             return Err(invalid(
-                "the explicit reserve must be less than the 300-second run cap",
+                "supervisor deadlines do not match the fixed 295s TERM / 300s total / 5s native grace contract",
+            ));
+        }
+        let now = exterior_clock::monotonic_ns()?;
+        if now < deadline.started_ns || now >= deadline.native_ns {
+            return Err(timed_out(
+                "native process started outside its supervisor-provided execution window",
+            ));
+        }
+        if reserve_ns >= deadline.native_ns - now {
+            return Err(timed_out(
+                "the explicit phase reserve does not fit before the native cutoff",
             ));
         }
         Ok(Self {
-            started: Instant::now(),
+            deadline,
             reserve_ns,
         })
     }
 
-    /// Opens a phase against the remaining global budget. Its allowance is fixed at entry and
-    /// cannot be increased by later forecasts. `cap_ns` is an optional narrower phase cap.
+    /// Opens a phase against the remaining native cutoff. Its allowance is fixed at entry and
+    /// cannot be raised by later forecasts. The explicit phase cap can only narrow it.
     pub(super) fn phase(
         &self,
         label: &str,
@@ -46,82 +77,102 @@ impl RunBudget {
                 "a timing phase must declare at least one work unit",
             ));
         }
-        let now = Instant::now();
-        let global_left = self.global_remaining_ns_at(now);
-        let phase_allowance_ns = cap_ns.map_or(global_left, |cap| cap.min(global_left));
+        let now = exterior_clock::monotonic_ns()?;
+        let available = self.global_remaining_ns_at(now);
+        let phase_allowance_ns = cap_ns.map_or(available, |cap| cap.min(available));
         if phase_allowance_ns == 0 {
-            return Err(timed_out("no global wall budget remains for this phase"));
+            return Err(timed_out(
+                "no reserved native wall budget remains for this phase",
+            ));
         }
-        let end = now
-            .checked_add(duration_from_ns(phase_allowance_ns))
-            .ok_or_else(|| invalid("phase deadline is outside the representable clock range"))?;
+        let phase_deadline_ns = now
+            .checked_add(phase_allowance_ns)
+            .ok_or_else(|| invalid("phase cutoff overflows monotonic nanoseconds"))?;
         Ok(PhaseBudget {
             label: label.to_owned(),
-            started: now,
-            end,
-            global_deadline: self.global_deadline(),
+            started_ns: now,
+            last_clock_ns: now,
+            phase_deadline_ns,
+            deadline: self.deadline,
             reserve_ns: self.reserve_ns,
             total_cells,
             completed_cells: 0,
+            measured_cell_wall_ns: 0,
             block_cells: 0,
             block_wall_ns: 0,
             block_index: 0,
             forecast: ForecastBook::default(),
             consecutive_bad_blocks: 0,
             phase_allowance_ns,
+            stop_reason: None,
+            summary_written: false,
         })
     }
 
-    fn global_deadline(&self) -> Instant {
-        self.started + duration_from_ns(RUN_WALL_CAP_NS)
+    /// Remaining absolute native wall budget after the explicit postwork reserve. This uses the
+    /// same supervisor-origin `CLOCK_MONOTONIC` cutoff as per-phase admission.
+    pub(super) fn remaining_ns(&self) -> io::Result<u128> {
+        let now = exterior_clock::monotonic_ns()?;
+        Ok(self.global_remaining_ns_at(now))
     }
 
-    fn global_remaining_ns_at(&self, now: Instant) -> u128 {
-        let deadline = self.global_deadline();
-        let hard_left = deadline.saturating_duration_since(now).as_nanos();
-        hard_left.saturating_sub(self.reserve_ns)
+    fn global_remaining_ns_at(&self, now_ns: u128) -> u128 {
+        self.deadline
+            .native_ns
+            .saturating_sub(now_ns)
+            .saturating_sub(self.reserve_ns)
     }
 }
 
-/// Per-phase mutable accounting. One instance belongs to one worker; independent workers share
-/// only their `&RunBudget` and therefore do not serialize native work through a timing mutex.
+/// Per-phase mutable accounting. One instance belongs to one worker. Dropping it before explicit
+/// completion writes an incomplete summary, including a partial block and a reason.
 #[derive(Debug)]
 pub(super) struct PhaseBudget {
     label: String,
-    started: Instant,
-    end: Instant,
-    global_deadline: Instant,
+    started_ns: u128,
+    last_clock_ns: u128,
+    phase_deadline_ns: u128,
+    deadline: DeadlineContract,
     reserve_ns: u128,
     total_cells: usize,
     completed_cells: usize,
+    measured_cell_wall_ns: u128,
     block_cells: usize,
     block_wall_ns: u128,
     block_index: usize,
     forecast: ForecastBook,
     consecutive_bad_blocks: usize,
     phase_allowance_ns: u128,
+    stop_reason: Option<String>,
+    summary_written: bool,
 }
 
 impl PhaseBudget {
-    /// Check actual phase/global time and whether the latest completed-block upper estimate can
-    /// fit the next declared unit. This check occurs before the caller starts that unit.
-    pub(super) fn before_cell(&self) -> io::Result<()> {
+    /// Check actual native/phase time and whether the latest completed-block upper estimate can
+    /// fit the next declared unit. Call before starting that unit.
+    pub(super) fn before_cell(&mut self) -> io::Result<()> {
         if self.completed_cells >= self.total_cells {
-            return Err(invalid("phase has no declared work units remaining"));
+            return Err(self.stop_error("phase has no declared work units remaining"));
         }
-        let now = Instant::now();
-        let phase_left = self.end.saturating_duration_since(now).as_nanos();
-        let global_left = self.global_remaining_ns_at(now);
-        if phase_left == 0 || global_left == 0 || now >= self.global_deadline {
-            return Err(timed_out(format!(
-                "{} stopped before cell {}: fixed phase/global deadline reached",
+        let now = match exterior_clock::monotonic_ns() {
+            Ok(now) => now,
+            Err(error) => {
+                return Err(self.stop_error(format!("monotonic clock unavailable: {error}")));
+            }
+        };
+        self.last_clock_ns = now;
+        let phase_left = self.phase_deadline_ns.saturating_sub(now);
+        let native_left = self.native_remaining_ns_at(now);
+        if phase_left == 0 || native_left == 0 || now >= self.deadline.native_ns {
+            return Err(self.stop_error(format!(
+                "{} stopped before cell {}: fixed native/phase cutoff reached",
                 self.label,
                 self.completed_cells + 1
             )));
         }
         if let Some(upper_ns_per_cell) = self.forecast.upper_ns_per_cell() {
-            if phase_left <= upper_ns_per_cell || global_left <= upper_ns_per_cell {
-                return Err(timed_out(format!(
+            if phase_left <= upper_ns_per_cell || native_left <= upper_ns_per_cell {
+                return Err(self.stop_error(format!(
                     "{} stopped before cell {}: remaining hard budget cannot fit the next declared unit (forecast upper {} ns)",
                     self.label,
                     self.completed_cells + 1,
@@ -130,7 +181,7 @@ impl PhaseBudget {
             }
         }
         if self.consecutive_bad_blocks >= 2 {
-            return Err(timed_out(format!(
+            return Err(self.stop_error(format!(
                 "{} stopped before cell {}: projected exhaustion persisted for two completed blocks",
                 self.label,
                 self.completed_cells + 1
@@ -139,67 +190,118 @@ impl PhaseBudget {
         Ok(())
     }
 
-    /// Records one completed native unit. The observed duration is never an individual-cell
-    /// abort condition. Complete blocks update forecasts; an unfinished tail is reported only by
-    /// `finish_phase` and is excluded from the fixed-block estimate.
+    /// Records a completed native unit. An individual cell's duration never triggers an abort.
+    /// Complete eight-cell blocks update forecasts; the final partial block is reported separately.
     pub(super) fn finish_cell(&mut self, cell_ns: u128) -> io::Result<()> {
         if self.completed_cells >= self.total_cells {
-            return Err(invalid("more completed cells than the phase declared"));
+            return Err(self.stop_error("more completed cells than the phase declared"));
         }
         self.completed_cells += 1;
+        self.measured_cell_wall_ns = self.measured_cell_wall_ns.saturating_add(cell_ns);
         self.block_cells += 1;
         self.block_wall_ns = self.block_wall_ns.saturating_add(cell_ns);
         if self.block_cells == BLOCK_CELLS {
             self.block_index += 1;
             self.forecast.push(self.block_wall_ns);
-            self.update_projection_streak();
+            if let Err(error) = self.update_projection_streak() {
+                return Err(
+                    self.stop_error(format!("monotonic clock unavailable after cell: {error}"))
+                );
+            }
             self.report_block(false);
             self.block_cells = 0;
             self.block_wall_ns = 0;
         }
+        let now = match exterior_clock::monotonic_ns() {
+            Ok(now) => now,
+            Err(error) => {
+                return Err(
+                    self.stop_error(format!("monotonic clock unavailable after cell: {error}"))
+                );
+            }
+        };
+        self.last_clock_ns = now;
+        if now >= self.phase_deadline_ns || now >= self.deadline.native_ns {
+            return Err(self.stop_error(format!(
+                "{} crossed its fixed native cutoff while completing cell {}",
+                self.label, self.completed_cells
+            )));
+        }
         Ok(())
     }
 
-    /// Reports a final partial block and returns the exact phase accounting. A partial block is
-    /// not inserted into the forecast, so the estimator always uses fixed eight-cell blocks.
-    pub(super) fn finish_phase(self) -> PhaseSummary {
-        if self.block_cells > 0 {
-            self.report_block(true);
-        }
-        PhaseSummary {
-            label: self.label,
-            completed_cells: self.completed_cells,
-            declared_cells: self.total_cells,
-            elapsed_wall_ns: self.started.elapsed().as_nanos(),
-            phase_allowance_ns: self.phase_allowance_ns,
-            forecast_upper_ns_per_cell: self.forecast.upper_ns_per_cell(),
-            consecutive_bad_blocks: self.consecutive_bad_blocks,
-        }
+    /// Mark a caller-detected failure or early stop so Drop can emit a truthful incomplete receipt.
+    pub(super) fn mark_stop(&mut self, reason: impl Into<String>) {
+        self.stop_reason = Some(reason.into());
     }
 
-    fn global_remaining_ns_at(&self, now: Instant) -> u128 {
-        let hard_left = self
-            .global_deadline
-            .saturating_duration_since(now)
-            .as_nanos();
-        hard_left.saturating_sub(self.reserve_ns)
+    /// Emits final partial-block and phase summary and returns the summary to the parent.
+    pub(super) fn finish_phase(mut self) -> PhaseSummary {
+        if self.completed_cells < self.total_cells && self.stop_reason.is_none() {
+            self.stop_reason = Some("phase ended before its declared work count".to_owned());
+        }
+        let summary = self.summary();
+        self.write_summary();
+        self.summary_written = true;
+        summary
     }
 
-    fn update_projection_streak(&mut self) {
+    fn stop_error(&mut self, reason: impl Into<String>) -> io::Error {
+        let reason = reason.into();
+        self.stop_reason = Some(reason.clone());
+        timed_out(reason)
+    }
+
+    fn native_remaining_ns_at(&self, now_ns: u128) -> u128 {
+        self.deadline
+            .native_ns
+            .saturating_sub(now_ns)
+            .saturating_sub(self.reserve_ns)
+    }
+
+    fn update_projection_streak(&mut self) -> io::Result<()> {
         let Some(upper_ns_per_cell) = self.forecast.upper_ns_per_cell() else {
-            return;
+            return Ok(());
         };
+        let now = exterior_clock::monotonic_ns()?;
+        self.last_clock_ns = now;
         let remaining_cells = self.total_cells.saturating_sub(self.completed_cells) as u128;
-        let projected = self
-            .started
-            .elapsed()
-            .as_nanos()
+        let projected = now
+            .saturating_sub(self.started_ns)
             .saturating_add(upper_ns_per_cell.saturating_mul(remaining_cells));
         if projected > self.phase_allowance_ns {
             self.consecutive_bad_blocks = self.consecutive_bad_blocks.saturating_add(1);
         } else {
             self.consecutive_bad_blocks = 0;
         }
+        Ok(())
+    }
+
+    fn elapsed_ns(&self) -> u128 {
+        exterior_clock::monotonic_ns()
+            .map(|now| now.saturating_sub(self.started_ns))
+            .unwrap_or_else(|_| self.last_clock_ns.saturating_sub(self.started_ns))
+    }
+
+    fn projected_ns(&self) -> Option<u128> {
+        let rate = self.forecast.upper_ns_per_cell()?;
+        Some(self.elapsed_ns().saturating_add(
+            rate.saturating_mul(self.total_cells.saturating_sub(self.completed_cells) as u128),
+        ))
+    }
+
+    fn summary(&self) -> PhaseSummary {
+        phase_summary_from_measurements(
+            self.label.clone(),
+            self.completed_cells,
+            self.total_cells,
+            self.elapsed_ns(),
+            self.measured_cell_wall_ns,
+            self.phase_allowance_ns,
+            self.forecast.upper_ns_per_cell(),
+            self.consecutive_bad_blocks,
+            self.stop_reason.clone(),
+        )
     }
 
     fn report_block(&self, partial: bool) {
@@ -222,7 +324,7 @@ impl PhaseBudget {
             self.block_wall_ns,
             partial,
             self.completed_cells,
-            self.started.elapsed().as_nanos(),
+            self.elapsed_ns(),
             self.phase_allowance_ns,
             mean_num,
             mean_den,
@@ -230,26 +332,119 @@ impl PhaseBudget {
             spread_den,
             upper,
             self.total_cells.saturating_sub(self.completed_cells),
-            upper.map(|rate| self.started.elapsed().as_nanos().saturating_add(
-                rate.saturating_mul(
-                    (self.total_cells.saturating_sub(self.completed_cells)) as u128
-                )
-            )),
+            self.projected_ns(),
             self.consecutive_bad_blocks,
+        );
+    }
+
+    fn write_summary(&self) {
+        if self.block_cells > 0 {
+            self.report_block(true);
+        }
+        let summary = self.summary();
+        eprintln!(
+            "timing phase_summary phase={} status={} reason={:?} completed={} declared={} elapsed_wall_ns={} measured_cell_wall_ns={} mean_cell_wall_ns={:?}/{:?} forecast_upper_ns_per_cell={:?} projected_ns={:?} fixed_phase_allowance_ns={} bad_block_streak={}",
+            summary.label,
+            if summary.incomplete {
+                "incomplete"
+            } else {
+                "complete"
+            },
+            summary.stop_reason,
+            summary.completed_cells,
+            summary.declared_cells,
+            summary.elapsed_wall_ns,
+            summary.measured_cell_wall_ns,
+            (summary.completed_cells > 0).then_some(summary.measured_cell_wall_ns),
+            (summary.completed_cells > 0).then_some(summary.completed_cells),
+            summary.forecast_upper_ns_per_cell,
+            summary.projected_ns,
+            summary.phase_allowance_ns,
+            summary.consecutive_bad_blocks,
         );
     }
 }
 
-/// Small immutable end-of-phase receipt for the parent diagnostic to log or serialize.
+impl Drop for PhaseBudget {
+    fn drop(&mut self) {
+        if self.summary_written {
+            return;
+        }
+        if self.stop_reason.is_none() {
+            self.stop_reason = Some("phase dropped before explicit finish".to_owned());
+        }
+        self.write_summary();
+        self.summary_written = true;
+    }
+}
+
+/// End-of-phase accounting, including an explicit incomplete reason and measured rate operands.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(super) struct PhaseSummary {
     pub(super) label: String,
     pub(super) completed_cells: usize,
     pub(super) declared_cells: usize,
     pub(super) elapsed_wall_ns: u128,
+    pub(super) measured_cell_wall_ns: u128,
     pub(super) phase_allowance_ns: u128,
     pub(super) forecast_upper_ns_per_cell: Option<u128>,
+    pub(super) projected_ns: Option<u128>,
     pub(super) consecutive_bad_blocks: usize,
+    pub(super) incomplete: bool,
+    pub(super) stop_reason: Option<String>,
+}
+
+fn phase_summary_from_measurements(
+    label: String,
+    completed_cells: usize,
+    declared_cells: usize,
+    elapsed_wall_ns: u128,
+    measured_cell_wall_ns: u128,
+    phase_allowance_ns: u128,
+    forecast_upper_ns_per_cell: Option<u128>,
+    consecutive_bad_blocks: usize,
+    stop_reason: Option<String>,
+) -> PhaseSummary {
+    let incomplete = completed_cells != declared_cells || stop_reason.is_some();
+    let projected_ns = forecast_upper_ns_per_cell.map(|rate| {
+        elapsed_wall_ns.saturating_add(
+            rate.saturating_mul(declared_cells.saturating_sub(completed_cells) as u128),
+        )
+    });
+    PhaseSummary {
+        label,
+        completed_cells,
+        declared_cells,
+        elapsed_wall_ns,
+        measured_cell_wall_ns,
+        phase_allowance_ns,
+        forecast_upper_ns_per_cell,
+        projected_ns,
+        consecutive_bad_blocks,
+        incomplete,
+        stop_reason: stop_reason.or_else(|| {
+            incomplete.then(|| "phase ended before its declared work count".to_owned())
+        }),
+    }
+}
+
+fn deadline_env(name: &str) -> io::Result<u128> {
+    std::env::var(name)
+        .map_err(|_| invalid(format!("required supervisor deadline {name} is missing")))?
+        .parse::<u128>()
+        .map_err(|_| {
+            invalid(format!(
+                "required supervisor deadline {name} is not unsigned nanoseconds"
+            ))
+        })
+}
+
+fn invalid(message: impl Into<String>) -> io::Error {
+    io::Error::new(io::ErrorKind::InvalidInput, message.into())
+}
+
+fn timed_out(message: impl Into<String>) -> io::Error {
+    io::Error::new(io::ErrorKind::TimedOut, message.into())
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -424,24 +619,14 @@ fn div_ceil(numerator: u128, denominator: u128) -> Option<u128> {
     Some(numerator / denominator + u128::from(numerator % denominator != 0))
 }
 
-fn duration_from_ns(nanos: u128) -> Duration {
-    Duration::from_nanos(nanos.min(u64::MAX as u128) as u64)
-}
-
-fn invalid(message: impl Into<String>) -> io::Error {
-    io::Error::new(io::ErrorKind::InvalidInput, message.into())
-}
-
-fn timed_out(message: impl Into<String>) -> io::Error {
-    io::Error::new(io::ErrorKind::TimedOut, message.into())
-}
-
 #[cfg(test)]
 mod tests {
+    use std::io;
+
     use super::{
-        BLOCK_CELLS, ForecastBook, ThreadCpu, ThreadSchedulerTime,
-        completed_block_upper_ns_per_cell, div_ceil, parse_schedstat, parse_thread_stat,
-        parse_ticks_per_second,
+        BLOCK_CELLS, DeadlineContract, ForecastBook, PhaseBudget, RunBudget, ThreadCpu,
+        ThreadSchedulerTime, completed_block_upper_ns_per_cell, div_ceil, parse_schedstat,
+        parse_thread_stat, parse_ticks_per_second, phase_summary_from_measurements,
     };
 
     #[test]
@@ -594,6 +779,106 @@ mod tests {
                 .ticks_per_second,
             None
         );
+    }
+
+    #[test]
+    fn partial_stop_summary_keeps_reason_count_measured_rate_and_projection() {
+        let summary = phase_summary_from_measurements(
+            "synthetic".to_owned(),
+            5,
+            9,
+            100,
+            250,
+            1_000,
+            Some(75),
+            1,
+            Some("next unit cannot fit".to_owned()),
+        );
+        assert!(summary.incomplete);
+        assert_eq!(summary.stop_reason.as_deref(), Some("next unit cannot fit"));
+        assert_eq!((summary.completed_cells, summary.declared_cells), (5, 9));
+        assert_eq!(summary.measured_cell_wall_ns, 250);
+        assert_eq!(summary.forecast_upper_ns_per_cell, Some(75));
+        assert_eq!(summary.projected_ns, Some(400));
+    }
+
+    #[test]
+    fn expired_before_cell_error_drops_incomplete_partial_block_summary() {
+        let now = super::exterior_clock::monotonic_ns().expect("Linux monotonic clock");
+        let mut forecast = ForecastBook::default();
+        forecast.push(80);
+        forecast.push(160);
+        let mut phase = PhaseBudget {
+            label: "expired synthetic phase".to_owned(),
+            started_ns: now,
+            last_clock_ns: now,
+            phase_deadline_ns: 0,
+            deadline: DeadlineContract {
+                started_ns: 0,
+                term_ns: 0,
+                total_ns: 0,
+                native_ns: 0,
+            },
+            reserve_ns: 0,
+            total_cells: 9,
+            completed_cells: 5,
+            measured_cell_wall_ns: 250,
+            block_cells: 5,
+            block_wall_ns: 250,
+            block_index: 0,
+            forecast,
+            consecutive_bad_blocks: 0,
+            phase_allowance_ns: 1_000,
+            stop_reason: None,
+            summary_written: false,
+        };
+
+        let error = phase.before_cell().expect_err("expired absolute cutoff");
+        assert_eq!(error.kind(), io::ErrorKind::TimedOut);
+        let summary = phase.summary();
+        assert!(summary.incomplete);
+        assert!(
+            summary
+                .stop_reason
+                .as_deref()
+                .expect("before_cell records its stop")
+                .contains("fixed native/phase cutoff reached")
+        );
+        assert_eq!((summary.completed_cells, summary.declared_cells), (5, 9));
+        assert_eq!(summary.measured_cell_wall_ns, 250);
+        assert_eq!(summary.forecast_upper_ns_per_cell, Some(25));
+        assert_eq!(summary.projected_ns, Some(summary.elapsed_wall_ns + 25 * 4));
+        assert_eq!((phase.block_cells, phase.block_wall_ns), (5, 250));
+
+        // Dropping the real tracker exercises the fallback writer for the partial block and
+        // incomplete phase receipt, rather than only testing the summary value constructor.
+        drop(phase);
+    }
+
+    #[test]
+    fn later_phase_start_stays_bounded_by_shared_absolute_cutoff() {
+        let now = super::exterior_clock::monotonic_ns().expect("Linux monotonic clock");
+        let native_cutoff = now + 290_000_000_000;
+        let reserve_ns = 100;
+        let budget = RunBudget {
+            deadline: DeadlineContract {
+                started_ns: now,
+                term_ns: now + 295_000_000_000,
+                total_ns: now + 300_000_000_000,
+                native_ns: native_cutoff,
+            },
+            reserve_ns,
+        };
+        let before_phase = budget.remaining_ns().expect("shared cutoff budget");
+        let phase = budget
+            .phase("later local phase", 1, None)
+            .expect("cutoff remains available");
+        let after_phase_start = budget.remaining_ns().expect("same shared cutoff");
+
+        assert!(after_phase_start <= before_phase);
+        assert_eq!(phase.phase_deadline_ns, native_cutoff - reserve_ns);
+        assert!(phase.phase_deadline_ns <= native_cutoff - reserve_ns);
+        drop(phase);
     }
 
     #[test]

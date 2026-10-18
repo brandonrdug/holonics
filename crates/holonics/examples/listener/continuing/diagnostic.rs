@@ -1,5 +1,5 @@
-//! One-fork, one-epoch read-only diagnostic. It uses the same observed-cell transaction as the
-//! ordinary listener; the hook only returns the exact receiving samples already staged there.
+//! Read-only listener diagnostic with a target fork and dynamically selected lock-advance cases.
+//! The optional hook returns exact receiving samples already staged in the ordinary transaction.
 
 #[path = "diagnostic/epoch.rs"]
 mod epoch;
@@ -7,7 +7,9 @@ mod epoch;
 mod timing;
 
 use super::*;
+use holonics::hnn::constitution::NormalLaw;
 use holonics::hnn::constitution::Sample;
+use holonics::hnn::contact::{LockDeclaration, lock_address};
 use holonics::hnn::moment::PopulationChart;
 use holonics::hnn::receiving::ReceivingRead;
 use holonics::hnn::reference::FrozenComparison;
@@ -61,12 +63,15 @@ struct CutView {
     crossing_covectors: Vec<Vec<Rat>>,
     receiving_step: Rat,
     receiving_vanished: bool,
+    law: NormalLaw,
+    native_lattice_exponent: u32,
 }
 
 fn cut_view(material: &Constitution, samples: &[Sample]) -> Result<CutView> {
     let law = material
         .receiving_law(2)
         .ok_or("receiver ring 2 has no single-map normal law")?;
+    let native_lattice_exponent = material.lattice(Locus::ReceivingMap(2))?.exponent();
     Ok(CutView {
         map: law.map().clone(),
         gram: law.gram(),
@@ -89,6 +94,8 @@ fn cut_view(material: &Constitution, samples: &[Sample]) -> Result<CutView> {
         crossing_covectors: Vec::new(),
         receiving_step: Rat::zero(),
         receiving_vanished: false,
+        law: law.clone(),
+        native_lattice_exponent,
     })
 }
 
@@ -130,6 +137,7 @@ fn held_wave(
     Ok(Faces::of_reads(&reads, wave.faces[0].grain())?)
 }
 
+#[cfg(test)]
 fn add_sample_statistics(
     gradient: &mut [Vec<Rat>],
     gram_delta: &mut [Vec<Rat>],
@@ -183,6 +191,7 @@ fn observe_branch(
     for (index, &class) in classes.iter().enumerate() {
         phase.before_cell()?;
         if abort.load(Ordering::Acquire) {
+            phase.mark_stop("shared diagnostic guard failure");
             return Err(
                 format!("branch {branch} stopped after a shared diagnostic guard failure").into(),
             );
@@ -193,6 +202,7 @@ fn observe_branch(
         let pre_lift = resident.current().lift().to_vec();
         let pre_clocks = clock_snapshot_at(resident.field(), resident.current())?;
         let pre_carried = resident.carried().cloned();
+        let pre_moment = pre_call_moment_text(resident)?;
         let pre_contact_j = contact_j_signature(resident.field(), &pre_lift)?;
         let map_at_compare = cut_view(resident.constitution(), &[])?.map;
         let native_started = Instant::now();
@@ -206,13 +216,19 @@ fn observe_branch(
                 let view = cut_view(material, samples).and_then(|mut view| {
                     let mut source_moment = String::new();
                     moment.write(&mut source_moment);
+                    if source_moment != pre_moment {
+                        return Err(
+                            "callback SourceMoment differs from exact pre-call resident moment"
+                                .into(),
+                        );
+                    }
                     view.producing_map = frozen
                         .and_then(|frozen| frozen.producing().receiving_law(2))
                         .map(|law| law.map().clone())
                         .unwrap_or_else(|| map_at_compare.clone());
                     view.frozen = frozen.cloned();
                     view.producing = frozen.map(|frozen| frozen.producing().clone());
-                    view.moment_text = source_moment;
+                    view.moment_text = pre_moment.clone();
                     view.address_text = format!("{address:?}");
                     view.pre_lift = pre_lift.clone();
                     view.pre_clocks = pre_clocks.clone();
@@ -342,6 +358,7 @@ fn observe_plain_branch(
     for (index, &class) in classes.iter().enumerate() {
         phase.before_cell()?;
         if abort.load(Ordering::Acquire) {
+            phase.mark_stop("shared diagnostic guard failure");
             return Err(
                 format!("branch {branch} stopped after a shared diagnostic guard failure").into(),
             );
@@ -407,6 +424,63 @@ fn from_worker<T>(result: std::result::Result<T, String>) -> Result<T> {
     result.map_err(|message| std::io::Error::other(message).into())
 }
 
+fn source_interventions(field: &Field, classes: &[usize]) -> Result<Vec<(String, usize, u64)>> {
+    let first = *classes
+        .first()
+        .ok_or("no first source class for intervention")?;
+    let source_ring = *field.sources().first().ok_or("source ring missing")?;
+    let base_advance = field.class_advance(source_ring, first)?;
+    let xor8 = first ^ 8;
+    if xor8 >= field.alphabet() {
+        return Err("the fixed XOR-8 alternate is outside the declared source alphabet".into());
+    }
+    let xor_advance = field.class_advance(source_ring, xor8)?;
+    let mut alternatives = vec![if xor_advance == base_advance {
+        ("B_same_advance_xor8".to_owned(), xor8, xor_advance)
+    } else {
+        ("B_advance_separating_xor8".to_owned(), xor8, xor_advance)
+    }];
+    let mut separating = None;
+    for class in 0..field.alphabet() {
+        if class == first {
+            continue;
+        }
+        let advance = field.class_advance(source_ring, class)?;
+        if advance != base_advance {
+            separating = Some((class, advance));
+            break;
+        }
+    }
+    if let Some((class, advance)) = separating {
+        if !alternatives
+            .iter()
+            .any(|(_, _, existing_advance)| *existing_advance != base_advance)
+        {
+            alternatives.push(("B_advance_separating".to_owned(), class, advance));
+        }
+    }
+    let mut same = None;
+    for class in 0..field.alphabet() {
+        if class == first {
+            continue;
+        }
+        let advance = field.class_advance(source_ring, class)?;
+        if advance == base_advance {
+            same = Some((class, advance));
+            break;
+        }
+    }
+    if let Some((class, advance)) = same {
+        if !alternatives
+            .iter()
+            .any(|(_, _, existing_advance)| *existing_advance == base_advance)
+        {
+            alternatives.push(("B_same_advance".to_owned(), class, advance));
+        }
+    }
+    Ok(alternatives)
+}
+
 fn clock_snapshot(resident: &Resident) -> std::result::Result<Vec<(u64, u64, BigInt)>, HnnError> {
     clock_snapshot_at(resident.field(), resident.current())
 }
@@ -434,20 +508,59 @@ fn contact_j_signature(field: &Field, lift: &[BigInt]) -> Result<Vec<ExactRatMat
         .collect()
 }
 
+fn pre_call_moment_text(resident: &Resident) -> Result<String> {
+    let (id, _) = resident
+        .continuing()
+        .ok_or("diagnostic cut has no continuing source moment")?;
+    let moment = resident
+        .moment(&id)
+        .ok_or("continuing source moment id has no resident value")?;
+    let mut text = String::new();
+    moment.write(&mut text);
+    Ok(text)
+}
+
+fn diagnostic_spec_lattice_exponent(receiver_grain: u64, support_width: usize) -> Result<u32> {
+    let twice_grain = receiver_grain
+        .checked_mul(2)
+        .ok_or("twice the receiver grain overflows u64")?;
+    if !twice_grain.is_power_of_two() || support_width == 0 {
+        return Err(
+            "specification LW requires power-of-two 2*receiver grain and nonzero support width"
+                .into(),
+        );
+    }
+    let width = u64::try_from(support_width).map_err(|_| "support width exceeds u64")?;
+    let ceil_log2_width = if width.is_power_of_two() {
+        width.trailing_zeros()
+    } else {
+        u64::BITS - width.leading_zeros()
+    };
+    twice_grain
+        .trailing_zeros()
+        .checked_add(ceil_log2_width)
+        .ok_or_else(|| "specification LW overflows u32".into())
+}
+
 fn epoch_statistics(
     crossing: &CutView,
     views: &[CutView],
 ) -> Result<(ExactRatMatrix, ExactRatMatrix)> {
-    let rows = crossing.map.rows();
-    let columns = crossing.map.columns();
-    let mut g = vec![vec![Rat::zero(); columns]; rows];
-    let mut dh = vec![vec![Rat::zero(); columns]; columns];
+    let mut reached = Vec::new();
     for view in views {
-        add_sample_statistics(&mut g, &mut dh, &view.samples, &view.crossing_covectors)?;
+        if view.samples.len() != view.crossing_covectors.len() {
+            return Err("crossing covector count differs from staged sample count".into());
+        }
+        for (sample, covector) in view.samples.iter().zip(&view.crossing_covectors) {
+            let mut sample = sample.clone();
+            sample.covector = covector.clone();
+            reached.push(sample);
+        }
     }
-    let gradient = ExactRatMatrix::new(g)?;
-    let dh = ExactRatMatrix::new(dh)?;
-    Ok((gradient, dh))
+    crossing
+        .law
+        .projected_statistics(&reached)
+        .map_err(Into::into)
 }
 
 fn causal_differences(
@@ -556,9 +669,10 @@ pub(super) fn run(
     options: ContinuingOptions,
     checkpoint_path: Option<&str>,
 ) -> Result<()> {
-    let run_started = Instant::now();
     let profile_cells = options.diagnostic_profile_trunk_cells;
-    let full_run = profile_cells.is_none() && !options.diagnostic_calibration_only;
+    let full_run = profile_cells.is_none()
+        && !options.diagnostic_calibration_only
+        && !options.diagnostic_profile_paired_cells64;
     let reserve_ns = if full_run {
         options
             .diagnostic_report_reserve_ns
@@ -604,6 +718,7 @@ pub(super) fn run(
     let mut trunk_phase = budget.phase("trunk", trunk_units, None)?;
     let mut source_count = 0usize;
     let mut trunk_native_ns = 0u128;
+    let mut trunk_source_classes = Vec::with_capacity(trunk_units.min(312));
     for passage in &input.passages {
         let source = Section {
             passages: vec![passage.clone()],
@@ -626,6 +741,7 @@ pub(super) fn run(
                 None,
                 |_, _, _, _, _| (),
             )?;
+            trunk_source_classes.push(class);
             let cell_ns = started.elapsed().as_nanos();
             trunk_phase.finish_cell(cell_ns)?;
             let cpu_delta = cpu_started
@@ -673,6 +789,71 @@ pub(super) fn run(
             format!("step0 section-0 source cut has {source_count} cells, expected 312").into(),
         );
     }
+    if options.diagnostic_profile_paired_cells64 {
+        let classes = trunk_source_classes
+            .get(..64)
+            .ok_or("paired profile requires at least 64 captured source classes")?;
+        let crossing = cut_view(resident.constitution(), &[])?;
+        let mut plain = resident.clone();
+        let mut plain_crib = crib.clone();
+        let mut capture = resident.clone();
+        let mut capture_crib = crib.clone();
+        let abort = AtomicBool::new(false);
+        let plain_started = Instant::now();
+        let (_, _, plain_times) = observe_plain_branch(
+            port,
+            &mut plain,
+            &mut plain_crib,
+            &pairing,
+            classes,
+            "profile_plain",
+            &budget,
+            &abort,
+        )?;
+        let plain_elapsed = plain_started.elapsed();
+        let capture_started = Instant::now();
+        let (views, _, _, capture_times) = observe_branch(
+            port,
+            &mut capture,
+            &mut capture_crib,
+            &pairing,
+            classes,
+            "profile_capture",
+            &crossing.map,
+            &budget,
+            &abort,
+        )?;
+        let capture_elapsed = capture_started.elapsed();
+        if plain.continuing_state(resident.field().sources()[0])?
+            != capture.continuing_state(resident.field().sources()[0])?
+            || plain_crib != capture_crib
+        {
+            return Err(
+                "paired profile changed native continuation or caller-owned crib between controls"
+                    .into(),
+            );
+        }
+        let block_upper = timing::completed_block_upper_ns_per_cell(&plain_times)
+            .into_iter()
+            .chain(timing::completed_block_upper_ns_per_cell(&capture_times))
+            .max();
+        let max_observed = plain_times
+            .iter()
+            .chain(&capture_times)
+            .copied()
+            .max()
+            .unwrap_or(0);
+        println!(
+            "step0_paired_profile transactions=440 prefix_source_cells=312 ordinary=64 sample_view_hook=64 compared_prefix=the_same_312_source_cut physical_state_equal=true caller_owned_crib_equal=true plain_elapsed_ns={} capture_elapsed_ns={} largest_observed_transaction_ns={max_observed} completed_block_upper_ns_per_cell={block_upper:?} per_cell_exact_cuts={:?}; includes the 312-cell native prefix; no target stream read, forks, checkpoint, or epoch report",
+            plain_elapsed.as_nanos(),
+            capture_elapsed.as_nanos(),
+            views
+                .iter()
+                .map(|v| (&v.map, &v.gram, &v.gram_remainder))
+                .collect::<Vec<_>>()
+        );
+        return Ok(());
+    }
     let target = input.target_cells(0)?;
     if target.len() < 231 {
         return Err(format!(
@@ -686,8 +867,6 @@ pub(super) fn run(
     let mut a_crib = crib.clone();
     let mut a0 = resident.clone();
     let mut a0_crib = crib.clone();
-    let mut b = resident.clone();
-    let mut b_crib = crib.clone();
     let base_classes = target[..231].to_vec();
     let calibration_classes = &base_classes[..64];
     let mut calibration_plain = resident.clone();
@@ -756,24 +935,31 @@ pub(super) fn run(
         );
         return Ok(());
     }
+    let first = base_classes[0];
+    let source_ring = *resident
+        .field()
+        .sources()
+        .first()
+        .ok_or("source ring missing")?;
+    let fit_ring = resident.field().ring(source_ring);
+    let fit_all = (0..resident.field().alphabet()).all(|class| fit_ring.fits(fit_ring.port(class)));
+    let intervention_specs = source_interventions(resident.field(), &base_classes)?;
+    let branch_workers = 2usize + intervention_specs.len();
+    let branch_waves = branch_workers.div_ceil(3);
     let Some(block_upper_ns_per_cell) = completed_block_upper else {
         return Err("calibration produced no completed eight-cell timing block; refusing a branch projection".into());
     };
-    let projection = block_upper_ns_per_cell.saturating_mul(231);
-    let remaining_ns = 300_000_000_000u128
-        .saturating_sub(run_started.elapsed().as_nanos())
-        .saturating_sub(reserve_ns);
+    let branch_projection = block_upper_ns_per_cell.saturating_mul(231);
+    let projection = branch_projection.saturating_mul(branch_waves as u128);
+    let remaining_ns = budget.remaining_ns()?;
     println!(
-        "step0_projection completed_block_upper_ns_per_cell={block_upper_ns_per_cell} three_branch_wall_projection_ns={projection} branch_cap_ns=180000000000 remaining_global_ns={remaining_ns} forecast_only=true"
+        "step0_projection completed_block_upper_ns_per_cell={block_upper_ns_per_cell} branch_workers={branch_workers} declared_cpu_workers=3 conservative_waves={branch_waves} one_branch_projection_ns={branch_projection} parallel_branch_horizon_projection_ns={projection} branch_cap_ns=180000000000 remaining_global_ns={remaining_ns} forecast_only=true"
     );
-    if projection > 180_000_000_000 || projection > remaining_ns {
+    if branch_projection > 180_000_000_000 || projection > remaining_ns {
         return Err("measured branch projection exceeds the 180-second branch cap or remaining fixed run budget; aborting before fork".into());
     }
     let checkpoint_path =
         checkpoint_path.ok_or("full diagnostic requires checkpoint destination")?;
-    println!(
-        "step0_protocol_exact_cells=1133 (312 trunk + 64 plain calibration + 64 actual-capture calibration + 3*231 fork cells); workers=3"
-    );
     crate::octets::save_checkpoint(
         &resident,
         &opening,
@@ -784,23 +970,32 @@ pub(super) fn run(
     println!(
         "step0_checkpoint scope=resident_only crib_sidecar=false; ObservedCrib is caller-owned and no validated roundtrip codec exists, so later observed resume is not claimed"
     );
-    let first = base_classes[0];
-    let alternative = first ^ 8;
-    let source_ring = *b.field().sources().first().ok_or("source ring missing")?;
-    let fit_ring = b
-        .field()
-        .rings()
-        .get(source_ring)
-        .ok_or("declared source ring missing")?;
-    let fit_all = (0..b.field().alphabet()).all(|class| fit_ring.fits(fit_ring.port(class)));
-    if !fit_all
-        || !fit_ring.fits(fit_ring.port(alternative))
-        || !fit_ring.fits(fit_ring.port(first))
-    {
-        return Err("step0 A/B source classes require the declared XOR-8 intervention and every class fitting the source ring".into());
-    }
-    let mut changed_classes = base_classes.clone();
-    changed_classes[0] = alternative;
+    let mut b_branches: Vec<(String, usize, u64, Vec<usize>, Resident, ObservedCrib)> =
+        intervention_specs
+            .iter()
+            .map(|(name, class, advance)| {
+                let mut classes = base_classes.clone();
+                classes[0] = *class;
+                (
+                    name.clone(),
+                    *class,
+                    *advance,
+                    classes,
+                    resident.clone(),
+                    crib.clone(),
+                )
+            })
+            .collect();
+    let declared_transactions = 312usize + 64 + 64 + 231 * (2 + b_branches.len());
+    println!(
+        "step0_protocol transactions={declared_transactions} components=312_trunk+64_plain+64_capture+231*(A+A0+{}_B_variants) branch_workers={} variants={:?}",
+        b_branches.len(),
+        2 + b_branches.len(),
+        b_branches
+            .iter()
+            .map(|(name, class, advance, _, _, _)| (name, class, advance))
+            .collect::<Vec<_>>()
+    );
     let source_fit_pattern = |classes: &[usize]| {
         classes
             .iter()
@@ -814,10 +1009,10 @@ pub(super) fn run(
             .collect::<String>()
     };
     println!(
-        "step0_source_advance source_ring={source_ring} ring_advance={:?} A_fit_pattern={} B_fit_pattern={} source_clock_is_distinct_from_receiver_clock=true",
-        fit_ring.advance(),
+        "step0_source_advance source_ring={source_ring} A_class={first} A_advance={} A_fit_pattern={} intervention_count={} interventions={intervention_specs:?}; source clock is distinct from receiver clock",
+        resident.field().class_advance(source_ring, first)?,
         source_fit_pattern(&base_classes),
-        source_fit_pattern(&changed_classes)
+        b_branches.len()
     );
     let clock_phases = clock_snapshot(&resident)?;
     let contacts = resident
@@ -826,10 +1021,24 @@ pub(super) fn run(
         .iter()
         .enumerate()
         .map(|(index, contact)| {
+            let (from, to) = contact.ends();
+            let from_winding = resident.current().winding(resident.field(), from)?;
+            let to_winding = resident.current().winding(resident.field(), to)?;
+            let bound = LockDeclaration::derived(resident.field(), index);
+            let address = lock_address(&from_winding, &to_winding, &bound);
+            let geometric_lock = contact
+                .pair(resident.field(), resident.current().lift())
+                .lock(&from_winding, &to_winding)
+                .map(|reading| format!("reading={reading:?}"))
+                .unwrap_or_else(|error| format!("typed_refusal={error}"));
+            let lock_metadata = format!(
+                "pre_from_winding={from_winding} pre_to_winding={to_winding} hnn_bound={bound:?} hnn_lock_address={address:?} geometric_pair_lock={geometric_lock}"
+            );
             Ok((
                 index,
                 contact.ends(),
                 contact.admittance().clone(),
+                lock_metadata,
                 holonics::hnn::propagation::contact_exponent(
                     resident.field(),
                     index,
@@ -838,10 +1047,6 @@ pub(super) fn run(
             ))
         })
         .collect::<std::result::Result<Vec<_>, HnnError>>()?;
-    let receiving_law = resident
-        .constitution()
-        .receiving_law(2)
-        .ok_or("receiver law unavailable")?;
     let receiver_grain = resident
         .admitted()
         .first()
@@ -870,7 +1075,7 @@ pub(super) fn run(
         })
         .collect();
     println!(
-        "step0_crossing source_cells={source_count} next_epoch_cells=231 target_cells={} checkpoint={checkpoint_path:?} crossing_W={:?} crossing_H_stored={:?} crossing_H_remainder={:?} L_R={} inverse_L_R={} native_half_quantum={} L_W={} L_nu={} clock_phases={clock_phases:?} ring_transport_resonators={ring_metadata:?}",
+        "step0_crossing source_cells={source_count} next_epoch_cells=231 target_cells={} checkpoint={checkpoint_path:?} crossing_W={:?} crossing_H_stored={:?} crossing_H_remainder={:?} L_R={} inverse_L_R={} native_half_quantum={} native_L_W={} declared_field_L_W={} L_nu={} clock_phases={clock_phases:?} ring_transport_resonators={ring_metadata:?}",
         target.len(),
         crossing.map,
         crossing.gram,
@@ -878,6 +1083,7 @@ pub(super) fn run(
         receiver_grain,
         lr_inverse,
         half_quantum,
+        crossing.native_lattice_exponent,
         resident
             .field()
             .lattice(Locus::ReceivingMap(2))
@@ -885,15 +1091,14 @@ pub(super) fn run(
             .exponent(),
         PopulationChart::of(resident.field()).exponent(),
     );
-    let _ = receiving_law;
     let path_contacts: Vec<_> = contacts
         .iter()
-        .filter(|(_, ends, _, _)| *ends == (0, 1) || *ends == (1, 2))
+        .filter(|(_, ends, _, _, _)| *ends == (0, 1) || *ends == (1, 2))
         .collect();
     let path_product = if path_contacts.len() == 2 {
         let conductances = path_contacts
             .iter()
-            .map(|(_, _, admittance, reading)| {
+            .map(|(_, _, admittance, _, reading)| {
                 Ok(holonics::ratio::exponentiated::power_of_two(&reading.carry)? * admittance)
             })
             .collect::<std::result::Result<Vec<Rat>, HnnError>>()?;
@@ -902,10 +1107,10 @@ pub(super) fn run(
         None
     };
     println!(
-        "step0_contact_metadata contacts={contacts:?} effective_0_1_1_2_product={path_product:?} causal_receiver_gain_claim=none; path product alone is not an end-to-end input-to-face bound"
+        "step0_contact_metadata pre_call_whole_windings_bounds_hnn_lock_address_and_geometry_J contacts={contacts:?} contact_carry_only_0_1_1_2_product={path_product:?} phase_class_factor=omitted causal_receiver_gain_claim=none; carry-only product is not an end-to-end input-to-face bound"
     );
     let branch_abort = AtomicBool::new(false);
-    let (a_result, a0_result, b_result) = std::thread::scope(|scope| {
+    let (a_result, a0_result, b_results) = std::thread::scope(|scope| {
         let a_worker = scope.spawn(|| {
             guarded_worker(&branch_abort, || {
                 observe_branch(
@@ -935,60 +1140,110 @@ pub(super) fn run(
                 )
             })
         });
-        let b_worker = scope.spawn(|| {
-            guarded_worker(&branch_abort, || {
-                observe_branch(
-                    port,
-                    &mut b,
-                    &mut b_crib,
-                    &pairing,
-                    &changed_classes,
-                    "B",
-                    &crossing.map,
-                    &budget,
-                    &branch_abort,
-                )
+        let branch_abort_ref = &branch_abort;
+        let pairing_ref = &pairing;
+        let crossing_map_ref = &crossing.map;
+        let budget_ref = &budget;
+        let port_ref = port;
+        let b_workers: Vec<_> = b_branches
+            .iter_mut()
+            .map(|(name, _, _, classes, branch_resident, branch_crib)| {
+                let name = name.clone();
+                let worker_name = name.clone();
+                let branch_abort = branch_abort_ref;
+                let pairing = pairing_ref;
+                let crossing_map = crossing_map_ref;
+                let budget = budget_ref;
+                let port = port_ref;
+                let handle = scope.spawn(move || {
+                    guarded_worker(branch_abort, || {
+                        observe_branch(
+                            port,
+                            branch_resident,
+                            branch_crib,
+                            pairing,
+                            classes,
+                            &worker_name,
+                            crossing_map,
+                            budget,
+                            branch_abort,
+                        )
+                    })
+                });
+                (name, handle)
             })
-        });
+            .collect();
         let a_result = a_worker
             .join()
             .unwrap_or_else(|_| Err("A branch worker panicked".to_owned()));
         let a0_result = a0_worker
             .join()
             .unwrap_or_else(|_| Err("A0 branch worker panicked".to_owned()));
-        let b_result = b_worker
-            .join()
-            .unwrap_or_else(|_| Err("B branch worker panicked".to_owned()));
-        (a_result, a0_result, b_result)
+        let b_results = b_workers
+            .into_iter()
+            .map(|(name, worker)| {
+                let result = worker
+                    .join()
+                    .unwrap_or_else(|_| Err(format!("{name} branch worker panicked")));
+                (name, result)
+            })
+            .collect::<Vec<_>>();
+        (a_result, a0_result, b_results)
     });
     let (a_views, a_faces, _a_lifts, _a_times) = from_worker(a_result)?;
     let (_a0_faces, _a0_lifts, _a0_times) = from_worker(a0_result)?;
-    let (b_views, b_faces, _b_lifts, _b_times) = from_worker(b_result)?;
     let a_end = cut_view(a.constitution(), &[])?;
-    let b_end = cut_view(b.constitution(), &[])?;
+    let spec_lw = diagnostic_spec_lattice_exponent(receiver_grain, crossing.support.len())?;
+    let mut b_outputs = Vec::with_capacity(b_branches.len());
+    for ((name, class, advance, _, branch_resident, _), (result_name, result)) in
+        b_branches.iter().zip(b_results)
+    {
+        if name != &result_name {
+            return Err("dynamic branch result ordering changed".into());
+        }
+        let (views, faces, _lifts, _times) = from_worker(result)?;
+        let end = cut_view(branch_resident.constitution(), &[])?;
+        let clocks = clock_snapshot(branch_resident)?;
+        b_outputs.push((name.clone(), *class, *advance, views, faces, end, clocks));
+    }
+    let base_advance = resident.field().class_advance(source_ring, first)?;
+    let primary_b = b_outputs
+        .iter()
+        .position(|(_, _, advance, _, _, _, _)| *advance == base_advance)
+        .unwrap_or(0);
+    let (b_name, alternative, b_advance, b_views, b_faces, b_end, _) = &b_outputs[primary_b];
     println!(
         "step0_clock_registers crossing={clock_phases:?} A_end={:?} A0_end={:?} B_end={:?} feature_content_clock_split=not_declared_in_actual_feature_basis",
         clock_snapshot(&a)?,
         clock_snapshot(&a0)?,
-        clock_snapshot(&b)?
+        b_outputs
+            .iter()
+            .map(|(name, class, advance, _, _, _, clocks)| (name, class, advance, clocks))
+            .collect::<Vec<_>>()
     );
-    let lw = resident
-        .field()
-        .lattice(Locus::ReceivingMap(2))
-        .ok_or("receiver lattice missing")?
-        .exponent();
+    println!(
+        "step0_lattice_exponents crossing={} A_end={} B_end={:?}",
+        crossing.native_lattice_exponent,
+        a_end.native_lattice_exponent,
+        b_outputs
+            .iter()
+            .map(|(name, _, _, _, _, end, _)| (name, end.native_lattice_exponent))
+            .collect::<Vec<_>>()
+    );
     let epoch_report_started = Instant::now();
-    epoch::report_epoch("A", &crossing, &a_end, &a_views, receiver_grain, lw)?;
+    epoch::report_epoch("A", &crossing, &a_end, &a_views, receiver_grain, spec_lw)?;
     println!(
         "step0_epoch_report_timing branch=A wall_ns={}",
         epoch_report_started.elapsed().as_nanos()
     );
-    let epoch_report_started = Instant::now();
-    epoch::report_epoch("B", &crossing, &b_end, &b_views, receiver_grain, lw)?;
-    println!(
-        "step0_epoch_report_timing branch=B wall_ns={}",
-        epoch_report_started.elapsed().as_nanos()
-    );
+    for (name, _, _, views, _, end, _) in &b_outputs {
+        let epoch_report_started = Instant::now();
+        epoch::report_epoch(name, &crossing, end, views, receiver_grain, spec_lw)?;
+        println!(
+            "step0_epoch_report_timing branch={name} wall_ns={}",
+            epoch_report_started.elapsed().as_nanos()
+        );
+    }
     let a_state = a.continuing_state(resident.field().sources()[0])?;
     let a0_state = a0.continuing_state(resident.field().sources()[0])?;
     let aa_equal = a_state == a0_state && a_crib == a0_crib;
@@ -999,14 +1254,29 @@ pub(super) fn run(
     }
     println!("step0_AA0 exact_resident_state_equal=true caller_owned_crib_equal=true");
     let (g_a, _) = epoch_statistics(&crossing, &a_views)?;
-    let (g_b, _) = epoch_statistics(&crossing, &b_views)?;
+    let (g_b, _) = epoch_statistics(&crossing, b_views)?;
     let (max_f_delta, first_f_delta, max_logit_delta, first_logit_delta) =
-        causal_differences(&a_views, &a_faces, &b_views, &b_faces)?;
+        causal_differences(&a_views, &a_faces, b_views, b_faces)?;
     println!(
-        "step0_intervention fit_all={fit_all} first_class={first} changed_class={alternative} G_A={g_a:?} G_B={g_b:?} W_table_delta_A={:?} W_table_delta_B={:?}",
+        "step0_intervention all_alphabet_classes_fit_source_lock={fit_all} first_class={first} changed_class={alternative} primary_branch={b_name} changed_advance={b_advance} alternatives={intervention_specs:?} G_A={g_a:?} G_B={g_b:?} W_table_delta_A={:?} W_table_delta_B={:?}",
         matrix_delta(&a_end.map, &crossing.map)?,
         matrix_delta(&b_end.map, &crossing.map)?
     );
+    let source_base_advance = resident.field().class_advance(source_ring, first)?;
+    for (name, class, advance, views, faces, end, _) in &b_outputs {
+        if name == b_name {
+            continue;
+        }
+        let (max_f, first_f, max_logit, first_logit) =
+            causal_differences(&a_views, &a_faces, views, faces)?;
+        let (gradient, _) = epoch_statistics(&crossing, views)?;
+        println!(
+            "step0_intervention_variant_vs_A branch={name} changed_class={class} source_advance={advance} baseline_advance={source_base_advance} same_advance_category={} max_abs_delta_f={max_f} first_differing_feature_index={first_f:?} max_abs_delta_logits={max_logit} first_differing_logit_index={first_logit:?} G={gradient:?} W_table_delta={:?} native_LW_end={}",
+            *advance == source_base_advance,
+            matrix_delta(&end.map, &crossing.map)?,
+            end.native_lattice_exponent
+        );
+    }
     println!(
         "step0_causal_AB max_abs_delta_f={max_f_delta} first_differing_feature_index={first_f_delta:?} max_abs_delta_logits={max_logit_delta} first_differing_logit_index={first_logit_delta:?} coordinates=(cell,sample_or_station,feature_or_class); clock_content_split=not_inferred"
     );
@@ -1015,7 +1285,7 @@ pub(super) fn run(
             .filter(|&index| left.get(index) != right.get(index))
             .collect()
     }
-    for (index, (left, right)) in a_views.iter().zip(&b_views).enumerate() {
+    for (index, (left, right)) in a_views.iter().zip(b_views).enumerate() {
         let a_change = left.physical.as_ref().ok_or("A refine word end missing")?;
         let b_change = right.physical.as_ref().ok_or("B refine word end missing")?;
         println!(
@@ -1128,6 +1398,41 @@ mod tests {
             gram,
             vec![vec![rat(3, 4), rat(-3, 2)], vec![rat(-3, 2), integer(3)]]
         );
+    }
+
+    #[test]
+    fn specification_lattice_argument_is_derived_from_grain_and_support_width() {
+        assert_eq!(diagnostic_spec_lattice_exponent(32, 32).unwrap(), 11);
+        assert!(diagnostic_spec_lattice_exponent(3, 32).is_err());
+        assert!(diagnostic_spec_lattice_exponent(32, 0).is_err());
+    }
+
+    #[test]
+    fn source_interventions_keep_one_branch_per_lock_advance_category() {
+        fn source_field(lock: Vec<u64>) -> Field {
+            let mut declaration = holonics::hnn::field::FieldDeclaration::campaign_one(1 << 17);
+            let source = &mut declaration.rings[0];
+            source.period = 16;
+            source.placements = (0..16)
+                .map(|node| holonics::hnn::field::FieldDeclaration::quarter_turn(node, 16))
+                .collect();
+            source.reflector = (0..16).map(|port| ((16 - port) % 16) as usize).collect();
+            source.lock = lock;
+            declaration.alphabet = 16;
+            Field::declare(declaration.by_lattice_rule()).unwrap()
+        }
+
+        let partial = source_field(vec![0]);
+        let partial_cases = source_interventions(&partial, &[1]).unwrap();
+        let base = partial.class_advance(0, 1).unwrap();
+        assert_eq!(partial_cases.len(), 2);
+        assert!(partial_cases.iter().any(|(_, _, advance)| *advance == base));
+        assert!(partial_cases.iter().any(|(_, _, advance)| *advance != base));
+
+        let all_fit = source_field((0..16).collect());
+        let all_fit_cases = source_interventions(&all_fit, &[1]).unwrap();
+        assert_eq!(all_fit_cases.len(), 1);
+        assert_eq!(all_fit_cases[0].1, 1 ^ 8);
     }
 
     #[test]
