@@ -1507,28 +1507,83 @@ impl Field {
     }
 
     /// The capacity fixes the last admitted period; no authored period ceiling enters the law.
+    /// After the whole period-two declaration, exact expanded-partition capacity probes double
+    /// and bisect the monotone boundary. One final whole declaration confirms that boundary.
     pub fn founding_candidates(&self) -> Result<Vec<Candidate>, HnnError> {
-        let mut candidates = Vec::new();
-        let mut period = 2u64;
-        loop {
-            match self.found(FoundedRing {
-                period,
-                key: period - 1,
-            }) {
-                Ok(_) => {}
-                Err(HnnError::BelowCapacity { .. }) => break,
-                Err(_) if period == 2 => break,
-                Err(error) => return Err(error),
-            }
-            if !self.cell_clock.is_multiple_of(period) {
-                candidates.push(Candidate {
-                    period,
-                    cost: self.founding_cost(period),
-                });
-            }
-            period = period.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        self.founding_candidates_with(|period| self.founding_n_star(period))
+    }
+
+    /// Capacity of the expanded partition only; the key does not enter this exact count.
+    fn founding_n_star(&self, period: u64) -> Result<u64, HnnError> {
+        let mut periods: Vec<_> = self.rings.iter().map(Ring::period).collect();
+        let mut advances: Vec<_> = self.rings.iter().map(Ring::advance).collect();
+        let mut sources = self.sources.clone();
+        periods.push(period);
+        advances.push(RingAdvance::Own);
+        sources.push(self.rings.len());
+        #[cfg(test)]
+        let started = std::time::Instant::now();
+        let n_star =
+            capacity(&periods, &advances, &sources, self.alphabet, &self.offsets)?.n_star();
+        #[cfg(test)]
+        founding_tests::record_capacity_probe(period, n_star, started.elapsed().as_nanos());
+        Ok(n_star)
+    }
+
+    /// The same consumer search with an observable exact capacity call for its unit receipts.
+    fn founding_candidates_with(
+        &self,
+        mut n_star: impl FnMut(u64) -> Result<u64, HnnError>,
+    ) -> Result<Vec<Candidate>, HnnError> {
+        #[cfg(test)]
+        let started = std::time::Instant::now();
+        let first = self.found(FoundedRing { period: 2, key: 1 });
+        if first.is_err() {
+            return Ok(Vec::new());
         }
-        Ok(candidates)
+        #[cfg(test)]
+        founding_tests::record_capacity_whole(
+            "first",
+            2,
+            first.as_ref().unwrap().capacity().n_star(),
+            started.elapsed().as_nanos(),
+        );
+        drop(first);
+        let mut below = 2u64;
+        let mut above = below.checked_mul(2).ok_or(HnnError::CountOverflow)?;
+        while n_star(above)? <= self.population {
+            below = above;
+            above = above.checked_mul(2).ok_or(HnnError::CountOverflow)?;
+        }
+        while above - below > 1 {
+            let middle = below + (above - below) / 2;
+            if n_star(middle)? <= self.population {
+                below = middle;
+            } else {
+                above = middle;
+            }
+        }
+        #[cfg(test)]
+        let started = std::time::Instant::now();
+        let confirmed = self.found(FoundedRing {
+            period: below,
+            key: below - 1,
+        })?;
+        #[cfg(test)]
+        founding_tests::record_capacity_whole(
+            "confirmed",
+            below,
+            confirmed.capacity().n_star(),
+            started.elapsed().as_nanos(),
+        );
+        drop(confirmed);
+        Ok((2..=below)
+            .filter(|period| !self.cell_clock.is_multiple_of(*period))
+            .map(|period| Candidate {
+                period,
+                cost: self.founding_cost(period),
+            })
+            .collect())
     }
 
     /// Re-declare the field while retaining attachments which are not part of its declaration.

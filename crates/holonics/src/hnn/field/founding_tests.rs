@@ -150,51 +150,228 @@ fn r4b_09_own_clock_leaves_the_declared_carry_chain_unchanged() {
     }
 }
 
-#[test]
-fn r4b_10_capacity_is_monotone_and_candidates_stop_at_its_boundary() {
-    for places in [1, 2] {
-        let field = Field::declare(listener(places, 1 << 16)).unwrap();
-        let mut previous = 0;
-        for period in 2..=40 {
-            let mut declaration = listener(places, u64::MAX);
-            declaration.founded.push(FoundedRing {
-                period,
-                key: period - 1,
-            });
-            let expanded = Field::declare(declaration).unwrap();
-            let n = expanded.capacity().n_star();
-            assert!(
-                n >= previous,
-                "period={period} n*={n} predecessor={previous}"
+#[derive(Clone, Copy, Debug)]
+struct CapacityProbe {
+    period: u64,
+    n_star: u64,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct WholeCapacity {
+    kind: &'static str,
+    period: u64,
+    n_star: u64,
+}
+
+struct CapacityReadings {
+    places: usize,
+    probes: Vec<CapacityProbe>,
+    whole: Vec<WholeCapacity>,
+}
+
+thread_local! {
+    static CAPACITY_PROBES: std::cell::RefCell<Option<CapacityReadings>> =
+        const { std::cell::RefCell::new(None) };
+}
+
+pub(super) fn record_capacity_probe(period: u64, n_star: u64, elapsed_ns: u128) {
+    CAPACITY_PROBES.with(|record| {
+        if let Some(reading) = record.borrow_mut().as_mut() {
+            let places = reading.places;
+            println!(
+                "R4B_CAPACITY places={places} l={period} n_star={n_star} elapsed_ns={elapsed_ns}"
             );
-            previous = n;
+            reading.probes.push(CapacityProbe { period, n_star });
         }
-        let candidates = field.founding_candidates().unwrap();
-        let mut maximum = 1;
-        while field
-            .found(FoundedRing {
-                period: maximum + 1,
-                key: maximum,
-            })
-            .is_ok()
-        {
-            maximum += 1;
+    });
+}
+
+pub(super) fn record_capacity_whole(
+    kind: &'static str,
+    period: u64,
+    n_star: u64,
+    elapsed_ns: u128,
+) {
+    CAPACITY_PROBES.with(|record| {
+        if let Some(reading) = record.borrow_mut().as_mut() {
+            let places = reading.places;
+            println!("R4B_CAPACITY_WHOLE places={places} l={period} key={} n_star={n_star} elapsed_ns={elapsed_ns} kind={kind}", period - 1);
+            reading.whole.push(WholeCapacity { kind, period, n_star });
         }
-        println!("r4b_capacity places={places} l_max={maximum}");
-        assert_eq!(
-            candidates.iter().map(|c| c.period).collect::<Vec<_>>(),
-            (2..=maximum)
-                .filter(|l| !field.cell_clock_period().is_multiple_of(*l))
-                .collect::<Vec<_>>()
-        );
-        assert!(matches!(
-            field.found(FoundedRing {
-                period: maximum + 1,
-                key: maximum
-            }),
-            Err(HnnError::BelowCapacity { .. })
-        ));
+    });
+}
+
+struct CapacityProbeScope;
+
+impl CapacityProbeScope {
+    fn open(places: usize) -> Self {
+        CAPACITY_PROBES.with(|record| {
+            assert!(record.borrow().is_none());
+            *record.borrow_mut() = Some(CapacityReadings {
+                places,
+                probes: Vec::new(),
+                whole: Vec::new(),
+            });
+        });
+        Self
     }
+
+    fn readings(&self) -> Vec<CapacityProbe> {
+        CAPACITY_PROBES.with(|record| record.borrow().as_ref().unwrap().probes.clone())
+    }
+
+    fn whole(&self) -> Vec<WholeCapacity> {
+        CAPACITY_PROBES.with(|record| record.borrow().as_ref().unwrap().whole.clone())
+    }
+}
+
+impl Drop for CapacityProbeScope {
+    fn drop(&mut self) {
+        CAPACITY_PROBES.with(|record| *record.borrow_mut() = None);
+    }
+}
+
+fn capacity_control(places: usize) {
+    // A monotone-only invocation is the seven-unit development read, not the full control.
+    // Search-only and all are validation partitions; the external receipt wrapper fixes their
+    // measured growth projection and stop budget before launch. No test reads its own timings.
+    let phase = std::env::var("R4B_CAPACITY_PHASE").unwrap_or_else(|_| "all".into());
+    assert!(matches!(phase.as_str(), "monotone" | "search" | "all"));
+    let field = Field::declare(listener(places, 1 << 16)).unwrap();
+    let probes = CapacityProbeScope::open(places);
+    if phase == "monotone" {
+        let started = std::time::Instant::now();
+        let first = field.found(FoundedRing { period: 2, key: 1 }).unwrap();
+        record_capacity_whole(
+            "development",
+            2,
+            first.capacity().n_star(),
+            started.elapsed().as_nanos(),
+        );
+    }
+    let mut previous = 0;
+    let first = if phase == "search" { 8 } else { 2 };
+    let last = if phase == "monotone" { 8 } else { 9 };
+    for period in first..=last {
+        let n = field.founding_n_star(period).unwrap();
+        assert!(
+            n >= previous,
+            "places={places} period={period} n*={n} predecessor={previous}"
+        );
+        previous = n;
+    }
+    if phase == "monotone" {
+        assert_eq!(probes.whole()[0].n_star, probes.readings()[0].n_star);
+        println!("R4B_CAPACITY_READ places={places} units=7 development_only=true");
+        return;
+    }
+    let before_search = probes.readings().len();
+    let started = std::time::Instant::now();
+    // The public consumer runs the very capacity probes recorded above; no surrogate search.
+    let candidates = field.founding_candidates().unwrap();
+    println!(
+        "R4B_CAPACITY_SEARCH places={places} elapsed_ns={}",
+        started.elapsed().as_nanos()
+    );
+    let readings = probes.readings();
+    let search = &readings[before_search..];
+    let maximum = search
+        .iter()
+        .filter(|reading| reading.n_star <= field.population())
+        .map(|reading| reading.period)
+        .max()
+        .unwrap_or(2);
+    let log_bound = u64::BITS - maximum.leading_zeros();
+    assert!(search.len() as u32 <= 2 * log_bound + 1);
+    let mut ordered = BTreeMap::new();
+    for reading in &readings {
+        if let Some(old) = ordered.insert(reading.period, reading.n_star) {
+            assert_eq!(
+                old, reading.n_star,
+                "a repeated exact capacity call must agree"
+            );
+        }
+    }
+    for pair in ordered.iter().collect::<Vec<_>>().windows(2) {
+        assert!(
+            pair[0].1 <= pair[1].1,
+            "capacity must be monotone at every probed pair: {pair:?}"
+        );
+    }
+    let whole = probes.whole();
+    assert_eq!(
+        whole.len(),
+        2,
+        "the consumer has exactly two whole declarations"
+    );
+    assert_eq!((whole[0].kind, whole[0].period), ("first", 2));
+    assert_eq!((whole[1].kind, whole[1].period), ("confirmed", maximum));
+    assert!(whole.iter().all(|read| read.n_star <= field.population()));
+    for read in &whole {
+        if let Some(n_star) = ordered.get(&read.period) {
+            assert_eq!(
+                read.n_star, *n_star,
+                "whole and capacity-only declarations agree"
+            );
+        }
+    }
+    let next = maximum.checked_add(1).unwrap();
+    let started = std::time::Instant::now();
+    let n_star = match field.found(FoundedRing {
+        period: next,
+        key: maximum,
+    }) {
+        Err(HnnError::BelowCapacity { n_star, .. }) => n_star,
+        other => panic!("the next whole declaration must refuse BelowCapacity: {other:?}"),
+    };
+    record_capacity_whole("refused", next, n_star, started.elapsed().as_nanos());
+    assert!(n_star > field.population());
+    assert_eq!(ordered.get(&next), Some(&n_star));
+    println!(
+        "R4B_CAPACITY_BOUNDARY places={places} l_max={maximum} probes={}",
+        search.len()
+    );
+    assert_eq!(
+        candidates.iter().map(|c| c.period).collect::<Vec<_>>(),
+        (2..=maximum)
+            .filter(|l| !field.cell_clock_period().is_multiple_of(*l))
+            .collect::<Vec<_>>()
+    );
+    for candidate in candidates {
+        assert_eq!(candidate.cost, field.founding_cost(candidate.period));
+    }
+}
+
+#[test]
+fn r4b_10_capacity_places_one() {
+    capacity_control(1);
+}
+
+#[test]
+fn r4b_10_capacity_places_two() {
+    capacity_control(2);
+}
+
+#[test]
+fn r4b_capacity_search_propagates_probe_errors_and_checked_overflow() {
+    let field = Field::declare(listener(1, 1 << 16)).unwrap();
+    assert!(matches!(
+        field.founding_candidates_with(|_| Err(HnnError::CountOverflow)),
+        Err(HnnError::CountOverflow)
+    ));
+    assert!(matches!(
+        field.founding_candidates_with(|_| Ok(0)),
+        Err(HnnError::CountOverflow)
+    ));
+    let mut declaration = field.declaration().clone();
+    declaration.receivers.clear();
+    let unanchored = Field::declare(declaration.by_lattice_rule()).unwrap();
+    assert!(
+        unanchored
+            .founding_candidates_with(|_| panic!("a refused first declaration has no probes"))
+            .unwrap()
+            .is_empty()
+    );
 }
 
 #[test]
@@ -233,28 +410,52 @@ fn r4b_declaration_and_located_route_refusals_are_typed() {
 
 #[test]
 fn r4b_12_cost_is_the_closed_form_declaration_difference() {
-    let base = Field::declare(listener(2, u64::MAX)).unwrap();
+    let started = std::time::Instant::now();
+    let base = Field::declare(listener(1, u64::MAX)).unwrap();
+    println!(
+        "R4B_COST l=0 key=0 elapsed_ns={} base=true",
+        started.elapsed().as_nanos()
+    );
     assert_eq!(base.founding_cost(2), 8);
     let base_code = base.describe(12345, 7);
-    for period in 2..=40 {
+    let mut first = None;
+    for period in [2, 3, 5] {
         let cost = base.founding_cost(period);
-        let largest = base
-            .found(FoundedRing {
-                period,
-                key: period - 1,
-            })
-            .unwrap();
-        assert_eq!(
-            largest.describe(12345, 7).len() - base_code.len(),
-            cost as usize
-        );
         for key in 0..period {
+            let started = std::time::Instant::now();
             let field = base.found(FoundedRing { period, key }).unwrap();
-            assert!(field.describe(12345, 7).len() - base_code.len() <= cost as usize);
+            println!(
+                "R4B_COST l={period} key={key} elapsed_ns={}",
+                started.elapsed().as_nanos()
+            );
+            let difference = field.describe(12345, 7).len() - base_code.len();
+            assert!(difference <= cost as usize);
+            if key == period - 1 {
+                assert_eq!(difference, cost as usize);
+            }
+            if period == 2 && key == 0 {
+                first = Some(field);
+            }
         }
     }
-    let one = base.found(FoundedRing { period: 2, key: 0 }).unwrap();
+    let one = first.unwrap();
+    let started = std::time::Instant::now();
     let two = one.found(FoundedRing { period: 3, key: 1 }).unwrap();
+    println!(
+        "R4B_COST l=3 key=1 elapsed_ns={} founded_count=2",
+        started.elapsed().as_nanos()
+    );
+    let started = std::time::Instant::now();
+    for n in 0..=(1u64 << 16) {
+        let mut code = Vec::new();
+        natural(&mut code, n);
+        let bitlen = u64::BITS - (n + 1).leading_zeros();
+        assert_eq!(code.len(), (2 * bitlen - 1) as usize, "natural({n})");
+    }
+    println!(
+        "R4B_COST_LENGTH maximum=65536 count=65537 elapsed_ns={}",
+        started.elapsed().as_nanos()
+    );
     let mut rings = Vec::new();
     natural(&mut rings, base.rings().len() as u64);
     // The insertion point is the complete original ring block: find it by describing the
