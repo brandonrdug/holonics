@@ -27,6 +27,8 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
+- [The navigator port enters only with its located source](2026-10-18_THE_NAVIGATOR_PORT_ENTERS_ONLY_WITH_ITS_LOCATED_SOURCE.md) (#73, #76, #62): a located linear navigator's state enters its source ring through a second material port at the opening's phase; admission is `ker N ⊆ ker c`, the decoder is a fibre, the covector is tape-free and the dimension is located; the port waits for its consumer (a located linear source, whose single-trajectory identification is not derived).
+
 - [The continuing listener locates keys at its close and writes its release before the answer](2026-10-16_BOUNDED_OBSERVED_CONTINUING_LISTENER.md) (#73, #148, #62): one finite continuing host moment, shared close and native key location, read-only comparison receipts and workload-derived release maximum; fixed precision, device fork and resume scope remain explicit.
 
 - [The contact factors take the common lattice law, and their release stays below half the founding unit](2026-10-16_THE_CONTACT_FACTORS_TAKE_THE_COMMON_LATTICE_LAW_AND_THEIR_RELEASE_STAYS_BELOW_HALF_THE_FOUNDING_UNIT.md) (#73, #62; reviewed by Epime and in #388): the C/K/D factors and their normalizations leave the October 7 exact coarse split for the one budgeted law of every carrier (`carried_entry`), with the formal-checked history bounds (`HNN/LatticeDeposit/Rebase`) covering the release over any history of deposits and re-bases; the counterfactual bound stays owed in #62 (`commit_chain_residual`'s `K`); a restored remainder off its locus's fine lattice is refused, and no earlier save format is kept; the remainder bits that were most of the constitution, measured on the GSM8K octet listener

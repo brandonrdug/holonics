@@ -361,6 +361,11 @@ separately tagged phase binding. The adjoint of the moment needs no tape: the po
 `g∘U^(n−1−k)∘I` (`Transport/SourceMoment`). Navigator count is independent of source length;
 ingestion, exact bit growth and retained source defects keep their own costs.
 
+[definition; not built] A located linear navigator's state enters as a second port block read at
+the opening's phase, `s_g(0)=P_g^(τ_g)(m̃_g+N_g x̃)`, admitted iff `ker N_g ⊆ ker c` and deposited in
+its locus's one step. The port waits for its located source
+([record](../research/records/2026-10-18_THE_NAVIGATOR_PORT_ENTERS_ONLY_WITH_ITS_LOCATED_SOURCE.md)).
+
 [definition] The [helical elementary realization](HELICAL_GEOMETRY.md) makes one geometric
 instance explicit: Lie generators and initial points, frame transport, the pair contact
 differential, its geometric second variation, and a quadratic receiver that factors through the
