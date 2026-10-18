@@ -5,7 +5,6 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 
 use super::learning::{OPEN_BUDGET, chain};
-use crate::hnn::tests::support::encoded;
 use super::support::{Draw, Medium};
 use crate::aeon::{Cycle, Reading, TorusClock, TwoClocks, epochs, reading};
 use crate::compression::landmark::context::Landmarks;
@@ -26,6 +25,7 @@ use crate::hnn::ring::{
     PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands, ResonatorRemainders,
     port_scattering, sheets,
 };
+use crate::hnn::tests::support::encoded;
 use crate::hnn::word::{PowerForm, Word, WordBalance};
 use crate::holarchy::GluingDefect;
 use crate::holon::parametron::{Carrier, Parametron, Population, pump_storage, ring_crossings};
@@ -112,7 +112,9 @@ fn cut(field: &Field) -> (Current, SourceMoment) {
     let cells = vec![1usize; 40];
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open(field, &current);
-    moment.ingest(field, &mut current, &encoded(field, &cells)).unwrap();
+    moment
+        .ingest(field, &mut current, &encoded(field, &cells))
+        .unwrap();
     (current, moment)
 }
 
@@ -424,7 +426,9 @@ fn the_ring_ticks_are_its_section_epochs_and_its_carries_their_flux() {
             .unwrap()
     };
     let mut draw = Draw::new(29);
-    let cells: Vec<usize> = (0..3000).map(|_| draw.below(super::support::classes(&field))).collect();
+    let cells: Vec<usize> = (0..3000)
+        .map(|_| draw.below(super::support::classes(&field)))
+        .collect();
     let start = Current::at_rest(&field);
     let mut end = start.clone();
     let mut carried = vec![BigInt::zero(); rings];
@@ -677,9 +681,15 @@ fn a_perturbed_resonator_solve_fails_the_word_balance() {
         perturbed.resonators_mut()[0] = Some(resonator.with_executed_solve(0, wrong));
         match run(perturbed) {
             Err(HnnError::Resonator { ring: 0, what }) => {
-                assert_eq!(what, "an executed tick exceeds its chart or split certificate")
+                assert_eq!(
+                    what,
+                    "an executed tick exceeds its chart or split certificate"
+                )
             }
-            other => panic!("the perturbed solve must be refused at its tick, got {:?}", other.map(|_| ())),
+            other => panic!(
+                "the perturbed solve must be refused at its tick, got {:?}",
+                other.map(|_| ())
+            ),
         }
     }
 }
@@ -690,7 +700,7 @@ fn a_perturbed_resonator_solve_fails_the_word_balance() {
 #[test]
 fn the_refine_receipt_carries_each_resonators_balance() {
     use crate::hnn::port::{ExecutionPort, ReceiptDetail};
-    use crate::hnn::reference::{Reference};
+    use crate::hnn::reference::Reference;
     let field = chain();
     let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let mut resonant = theta.clone();
@@ -1021,9 +1031,18 @@ fn the_word_balance_closes_across_its_commit_at_held_momentum() {
             same.commit.unwrap().deposition,
             held.commit.clone().unwrap(),
         );
-        assert!(same_work > Rat::zero(), "holding the rate injects ½⟨w, ΔC w⟩");
-        assert!(commit.deposition < Rat::zero(), "holding the momentum loses");
-        assert_eq!(integer(9) * &commit.deposition + integer(4) * &same_work, Rat::zero());
+        assert!(
+            same_work > Rat::zero(),
+            "holding the rate injects ½⟨w, ΔC w⟩"
+        );
+        assert!(
+            commit.deposition < Rat::zero(),
+            "holding the momentum loses"
+        );
+        assert_eq!(
+            integer(9) * &commit.deposition + integer(4) * &same_work,
+            Rat::zero()
+        );
         assert_eq!(commit.committed, &held.end + &commit.deposition);
         assert!(held.closes(), "{held:?}");
         let mut unmoved = WordBalance::of(&released);
@@ -1299,7 +1318,13 @@ fn the_contact_readings_are_read_from_retained_state() {
     let mut draw = Draw::new(31);
     let mut current = rest.clone();
     for _ in 0..5000 {
-        current.step(&field, &encoded(&field, &[draw.below(super::support::classes(&field))]), 0).unwrap();
+        current
+            .step(
+                &field,
+                &encoded(&field, &[draw.below(super::support::classes(&field))]),
+                0,
+            )
+            .unwrap();
     }
     let later = contact_readings(&field, &theta, &current, Some(&rest)).unwrap();
     let again = contact_readings(&field, &theta, &current, Some(&rest)).unwrap();

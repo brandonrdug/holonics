@@ -83,13 +83,8 @@ impl Word<'_> {
             None => None,
             Some(port) => {
                 let adjoint = port.adjoint(&covector, &phases, applied.compared())?;
-                let (through, opening) = self.pull_back_world(
-                    &covector,
-                    &map,
-                    &current.lift()[phases.ring()],
-                    &phases,
-                    &adjoint,
-                )?;
+                let (through, opening) =
+                    self.pull_back_world(&covector, &map, &phases, &adjoint)?;
                 // [§7l] The opening's held-momentum crossing, the storage solve the opening is.
                 let crossings =
                     crate::hnn::port::opening_crossings(&self, &theta, &opening, &through)?;
@@ -113,12 +108,7 @@ impl Word<'_> {
                 Some(steps)
             }
         };
-        let (pullback, opening) = self.pull_back_full(
-            &covector,
-            &map,
-            &current.lift()[phases.ring()],
-            &phases,
-        )?;
+        let (pullback, opening) = self.pull_back_full(&covector, &map, &phases)?;
         let composed = crate::hnn::reference::compose_return(
             field,
             &theta,

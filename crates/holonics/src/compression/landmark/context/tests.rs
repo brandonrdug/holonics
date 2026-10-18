@@ -36,9 +36,10 @@ use num_traits::{One, Zero};
 use crate::compression::landmark::context::baseline::{Baselines, Ppm, kt_probability};
 use crate::compression::landmark::context::{
     Beta, Bundle, Capacity, ContextError, DigitsReading, FaceJoins, IdealLandmarks, JoinTree,
-    LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, PassageCode, StopMixture,
-    StopPrior, Widths, address, binary_log, carrier_width, cell_letters, code_length, face_bits,
-    ladder_top, lattice_mix, letter_address, odometer_digits, prior_family, ratio_code_length,
+    LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, ObservationPath,
+    ObservedAddress, PassageCode, StopMixture, StopPrior, TreeStanding, Widths, address,
+    binary_log, carrier_width, cell_letters, code_length, face_bits, ladder_top, lattice_mix,
+    letter_address, odometer_digits, prior_family, ratio_code_length,
 };
 use crate::ratio::algebraic::{ExactInterval, interval_sum, log2_enclosure};
 use crate::ratio::{Rat, rat};
@@ -562,7 +563,8 @@ fn landmark_rule_lies_below_half_a_grain() {
             let rounding = Rat::new(&n * &p * &p + &p * 2 + 1, floor * 2);
             let paths = &n * &p * &p;
             let splits = (&paths + &p * &p).max(&n * &p * 4);
-            let mantissa = Rat::from_integer(&paths + splits) * rat_power(1 - widths.carrier as i64);
+            let mantissa =
+                Rat::from_integer(&paths + splits) * rat_power(1 - widths.carrier as i64);
             let quarter = rat(1, 4 * grain);
             let bits = |term: Rat| term * rat(3, 2) * Rat::from_integer(BigInt::from(digits));
             assert!(bits(rounding) <= quarter, "n* = {population}, D = {depth}");
@@ -2244,7 +2246,10 @@ fn the_prior_mass_reads_its_masses_and_keeps_the_rule() {
     let stream: Vec<usize> = (0..40u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
     let mut previous: Option<Rat> = None;
     for mass in [1u32, 2, 3, 8] {
-        let declared = LandmarkDeclaration { mass, ..declaration(alphabet, 2) };
+        let declared = LandmarkDeclaration {
+            mass,
+            ..declaration(alphabet, 2)
+        };
         let mut tree = Landmarks::new(declared.clone()).unwrap();
         let mut oracle = IdealLandmarks::new(declared.clone(), None).unwrap();
         assert!(tree.face_rule() < rat(1, 32), "j = {mass}");
@@ -2262,7 +2267,10 @@ fn the_prior_mass_reads_its_masses_and_keeps_the_rule() {
             assert!(within(&reading.executed, &face, &reading.residual));
         }
         // A binary depth-0 tree after a run of three zeros reads (3·2^j + 1)/(3·2^j + 2).
-        let binary = LandmarkDeclaration { mass, ..declaration(2, 0) };
+        let binary = LandmarkDeclaration {
+            mass,
+            ..declaration(2, 0)
+        };
         let mut run = IdealLandmarks::new(binary, None).unwrap();
         let mut weight = Rat::one();
         for _ in 0..3 {
@@ -2294,12 +2302,22 @@ fn the_roots_base_keeps_the_rule_and_leans_on_the_unconditional_split() {
     use crate::compression::landmark::context::BaseMeasure;
     let alphabet = 5;
     let stream: Vec<usize> = (0..60u64)
-        .map(|t| if t % 4 == 3 { ((t * 7 + t / 3) % 5) as usize } else { 1 })
+        .map(|t| {
+            if t % 4 == 3 {
+                ((t * 7 + t / 3) % 5) as usize
+            } else {
+                1
+            }
+        })
         .collect();
     for mass in [1u32, 3] {
         let mut codes = Vec::new();
         for base in [BaseMeasure::Even, BaseMeasure::Root] {
-            let declared = LandmarkDeclaration { mass, base, ..declaration(alphabet, 3) };
+            let declared = LandmarkDeclaration {
+                mass,
+                base,
+                ..declaration(alphabet, 3)
+            };
             let mut tree = Landmarks::new(declared.clone()).unwrap();
             let mut oracle = IdealLandmarks::new(declared, None).unwrap();
             assert!(tree.face_rule() < rat(1, 32), "j = {mass}, {base:?}");
@@ -2325,19 +2343,29 @@ fn the_roots_base_keeps_the_rule_and_leans_on_the_unconditional_split() {
     // After its root has seen class 1 ten times in one context, a context never seen leans on the
     // root's split at the root's base and on the even split at the even base.
     let leaning = |base| {
-        let mut tree =
-            Landmarks::new(LandmarkDeclaration { mass: 3, base, ..declaration(alphabet, 3) }).unwrap();
+        let mut tree = Landmarks::new(LandmarkDeclaration {
+            mass: 3,
+            base,
+            ..declaration(alphabet, 3)
+        })
+        .unwrap();
         let seen = [Letter::Cell(0), Letter::Cell(0), Letter::Cell(0)];
         for _ in 0..10 {
             tree.receive(&seen, 1).unwrap();
         }
-        tree.probability(&[Letter::Cell(3), Letter::Cell(3), Letter::Cell(3)], 1).unwrap()
+        tree.probability(&[Letter::Cell(3), Letter::Cell(3), Letter::Cell(3)], 1)
+            .unwrap()
     };
     assert!(leaning(BaseMeasure::Root) > leaning(BaseMeasure::Even));
     // A fresh digit tree reads the even split at either base.
     let fresh = |base| {
-        let tree = Landmarks::new(LandmarkDeclaration { base, ..declaration(2, 2) }).unwrap();
-        tree.probability(&[Letter::Boundary, Letter::Boundary], 0).unwrap()
+        let tree = Landmarks::new(LandmarkDeclaration {
+            base,
+            ..declaration(2, 2)
+        })
+        .unwrap();
+        tree.probability(&[Letter::Boundary, Letter::Boundary], 0)
+            .unwrap()
     };
     assert_eq!(fresh(BaseMeasure::Root), fresh(BaseMeasure::Even));
 }
@@ -2353,7 +2381,13 @@ fn the_roots_base_is_read_before_the_arrivals_deposit() {
     use crate::compression::landmark::context::BaseMeasure;
     let alphabet = 5;
     let stream: Vec<usize> = (0..60u64)
-        .map(|t| if t % 4 == 3 { ((t * 7 + t / 3) % 5) as usize } else { 1 })
+        .map(|t| {
+            if t % 4 == 3 {
+                ((t * 7 + t / 3) % 5) as usize
+            } else {
+                1
+            }
+        })
         .collect();
     let declared = LandmarkDeclaration {
         mass: 3,
@@ -2366,7 +2400,11 @@ fn the_roots_base_is_read_before_the_arrivals_deposit() {
         let before: Vec<Rat> = (0..alphabet)
             .map(|class| tree.probability(&here, class).unwrap())
             .collect();
-        assert_eq!(before.iter().cloned().sum::<Rat>(), Rat::one(), "position {position}");
+        assert_eq!(
+            before.iter().cloned().sum::<Rat>(),
+            Rat::one(),
+            "position {position}"
+        );
         let reading = tree.receive(&here, cell).unwrap();
         assert_eq!(reading.executed, before[cell], "position {position}");
     }
@@ -2380,5 +2418,433 @@ fn the_roots_base_is_read_before_the_arrivals_deposit() {
         let here = [Letter::Boundary, Letter::Boundary];
         assert_eq!(fresh.receive(&here, digit).unwrap().executed, rat(1, 2));
         assert!(fresh.probability(&here, digit).unwrap() > rat(1, 2));
+    }
+}
+
+/// Observation bits are a sparse, typed tree prefix: each branch gets the receiver alphabet's
+/// width once, while source addresses and their causal depth remain unchanged. A saved standing
+/// carries that width without changing the legacy causal-only format.
+#[test]
+fn observed_tree_paths_are_phase_specific_and_roundtrip_their_law_width() {
+    let declared = bundle_declaration(4, 2);
+    let tree = Landmarks::new_with_observation(declared.clone(), declared.alphabet).unwrap();
+    assert_eq!(declared.branch_depths(), vec![2, 6]);
+    assert_eq!(tree.arena().branch_depths(), vec![6, 10]);
+    assert_eq!(tree.arena().forced_by_branch(), vec![4, 4]);
+    assert_eq!(tree.arena().rung_sums()[0], vec![0, 0, 0, 0, 0, 1, 2]);
+    assert_eq!(
+        tree.arena().rung_sums()[1],
+        vec![0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6]
+    );
+    assert_eq!(tree.observation_width(), 4);
+
+    let observed = ObservedAddress::new(
+        ObservationPath::from_maximum_mass_classes(4, &[0, 2]).unwrap(),
+        vec![
+            Letter::Bundle(Bundle {
+                cell: 2,
+                features: declared.family.encode(&[1, 1]).unwrap(),
+            }),
+            Letter::Bundle(Bundle {
+                cell: 1,
+                features: declared.family.encode(&[0, 0]).unwrap(),
+            }),
+        ],
+    );
+    let flattened = tree.letters_observed(&observed).unwrap();
+    assert_eq!(flattened.len(), 2);
+    assert_eq!(flattened[0].len(), 6);
+    assert_eq!(flattened[1].len(), 10);
+    assert_eq!(&flattened[0][..4], &[1, 0, 1, 0]);
+    assert_eq!(&flattened[0][4..], &[3, 2]);
+    assert_eq!(&flattened[1][..4], &[1, 0, 1, 0]);
+
+    let mut trained = Landmarks::new_with_observation(declaration(2, 0), 2).unwrap();
+    let first_context = ObservedAddress::new(
+        ObservationPath::from_maximum_mass_classes(2, &[0]).unwrap(),
+        Vec::new(),
+    );
+    let other_context = ObservedAddress::new(
+        ObservationPath::from_maximum_mass_classes(2, &[1]).unwrap(),
+        Vec::new(),
+    );
+    for _ in 0..8 {
+        trained.deposit_observed(&first_context, 0).unwrap();
+    }
+    assert!(trained.probability(&[], 1).is_err());
+    assert!(trained.score_observed(&first_context, 1).unwrap().executed < rat(1, 2));
+    assert_eq!(
+        trained.score_observed(&other_context, 1).unwrap().executed,
+        rat(1, 2)
+    );
+    let before_window = trained.standing();
+    let window = trained
+        .window_observed(&[first_context.clone(), other_context.clone()], &[0])
+        .unwrap();
+    assert_eq!(window.face(1, 16).unwrap().probabilities[1], rat(1, 2));
+    assert_eq!(trained.standing(), before_window);
+
+    let mut text = String::new();
+    trained.standing().write(&mut text);
+    assert_eq!(text.lines().next().unwrap().split_whitespace().count(), 10);
+    let restored = TreeStanding::read(&mut text.lines()).unwrap();
+    assert_eq!(restored.observation_width(), 2);
+    assert_eq!(trained.with_standing(&restored).unwrap(), trained);
+
+    let legacy = Landmarks::new(declaration(2, 0)).unwrap();
+    let mut legacy_text = String::new();
+    legacy.standing().write(&mut legacy_text);
+    assert_eq!(
+        legacy_text
+            .lines()
+            .next()
+            .unwrap()
+            .split_whitespace()
+            .count(),
+        9
+    );
+    let legacy_standing = TreeStanding::read(&mut legacy_text.lines()).unwrap();
+    assert_eq!(legacy_standing.observation_width(), 0);
+    assert_eq!(legacy.with_standing(&legacy_standing).unwrap(), legacy);
+}
+
+#[test]
+fn observed_paths_refuse_empty_duplicate_and_wrong_width_membership() {
+    use crate::compression::landmark::context::ContextError;
+
+    assert_eq!(
+        ObservationPath::from_maximum_mass_classes(4, &[]).unwrap_err(),
+        ContextError::EmptyObservation
+    );
+    assert_eq!(
+        ObservationPath::from_maximum_mass_classes(4, &[1, 1]).unwrap_err(),
+        ContextError::DuplicateObservationClass { class: 1 }
+    );
+    assert!(ObservationPath::from_maximum_mass_classes(4, &[4]).is_err());
+    assert_eq!(
+        ObservationPath::from_membership_bits(vec![false, false]).unwrap_err(),
+        ContextError::EmptyObservation
+    );
+
+    let tree = Landmarks::new_with_observation(declaration(3, 0), 3).unwrap();
+    let before = tree.standing();
+    let wrong_width = ObservedAddress::new(
+        ObservationPath::from_maximum_mass_classes(2, &[0]).unwrap(),
+        Vec::new(),
+    );
+    assert!(tree.score_observed(&wrong_width, 0).is_err());
+    assert_eq!(tree.standing(), before);
+    assert!(Landmarks::new_with_observation(declaration(3, 2), usize::MAX).is_err());
+}
+
+/// A forced observation prefix routes into a causal subtree; it must not advance a
+/// depth-dependent StopPrior. The exact oracle and the executed rung schedule therefore match
+/// the causal-only tree after removing the prefix, even after deposits.
+#[test]
+fn observed_prefix_preserves_nonconstant_causal_prior_schedule() {
+    let declared = LandmarkDeclaration {
+        prior: StopPrior::per_depth(vec![1, 3, 2]).unwrap(),
+        ..declaration(3, 3)
+    };
+    let observation = ObservationPath::from_maximum_mass_classes(3, &[0, 2]).unwrap();
+    let mut causal = Landmarks::new(declared.clone()).unwrap();
+    // Hold numeric precision fixed so this compares the causal law itself, not the larger
+    // whole-passage precision bound used by the public observed constructor.
+    let observed_path_depth = declared.path_depth_with_observation(3).unwrap();
+    let mut observed = Landmarks::with_widths_and_observation(
+        declared.clone(),
+        Widths::derived(&declared),
+        3,
+        crate::compression::landmark::context::ObservationRole::Route,
+        observed_path_depth,
+    )
+    .unwrap();
+    let mut causal_ideal = IdealLandmarks::new(declared.clone(), None).unwrap();
+    let mut observed_ideal =
+        IdealLandmarks::new_with_observation(declared.clone(), None, 3).unwrap();
+
+    let causal_rungs = causal.arena().rung_sums().to_vec();
+    let observed_rungs = observed.arena().rung_sums().to_vec();
+    assert_eq!(causal.arena().forced_by_branch(), vec![0]);
+    assert_eq!(observed.arena().forced_by_branch(), vec![3]);
+    assert_eq!(&observed_rungs[0][..=3], &[0, 0, 0, 0]);
+    for (branch, causal_branch) in causal_rungs.iter().enumerate() {
+        assert_eq!(
+            &observed_rungs[branch][3..],
+            causal_branch.as_slice(),
+            "branch {branch} must restart the prior schedule after observation routing"
+        );
+    }
+
+    let stream = [0, 2, 1, 0, 1, 2, 2, 0, 1, 1, 0];
+    for position in declared.depth..stream.len() {
+        let suffix = address(&stream, position, declared.depth);
+        let conditioned = ObservedAddress::new(observation.clone(), suffix.clone());
+        for class in 0..declared.alphabet {
+            let causal_score = causal.score(&suffix, class).unwrap().executed;
+            let observed_score = observed
+                .score_observed(&conditioned, class)
+                .unwrap()
+                .executed;
+            assert_eq!(
+                observed_score, causal_score,
+                "executed prediction at position {position}, class {class}"
+            );
+            assert_eq!(
+                observed_ideal
+                    .probability_observed(&conditioned, class)
+                    .unwrap(),
+                causal_ideal.probability(&suffix, class).unwrap(),
+                "ideal prediction at position {position}, class {class}"
+            );
+        }
+
+        let target = stream[position];
+        assert_eq!(
+            observed
+                .receive_observed(&conditioned, target)
+                .unwrap()
+                .executed,
+            causal.receive(&suffix, target).unwrap().executed,
+            "executed receive at position {position}"
+        );
+        assert_eq!(
+            observed_ideal
+                .receive_observed(&conditioned, target)
+                .unwrap(),
+            causal_ideal.receive(&suffix, target).unwrap(),
+            "ideal receive at position {position}"
+        );
+    }
+}
+
+// L3: a receiver's observation letters, routed before the causal letters or refining
+// after them
+
+/// Three section letters a phase, the low bits of `(5t + ⌊t/4⌋) mod 8` (a fixture's reading).
+fn section_path(t: usize) -> crate::compression::landmark::context::ObservationPath {
+    let word = 5 * t + t / 4;
+    crate::compression::landmark::context::ObservationPath::from_section_bits(
+        (0..3).map(|bit| (word >> bit) & 1 == 1).collect(),
+    )
+    .unwrap()
+}
+
+/// [L3] **An observed tree's faces are normalized and certified in both roles** (Lean
+/// owed in #62 with the refining law): with three observation letters a phase, routed before the
+/// causal letters or refining after them, on the cell tree and the enlarged tree, under forced
+/// depths and two stop priors, at every step the all-class face sums to 1 exactly, each class's
+/// face is its one-class score, the ideal oracle of the same role sums to 1, each cell's
+/// certificate lies within the rule and holds against the oracle, and each branch's letters are
+/// the observation's codes before the causal letters (routing) or after them (refining).
+#[test]
+fn landmark_observed_faces_are_normalized_and_certified() {
+    use crate::compression::landmark::context::{ObservationRole, ObservedAddress};
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..48u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
+    let laws = [StopPrior::half(), StopPrior::per_depth(vec![1, 3]).unwrap()];
+    for role in [ObservationRole::Route, ObservationRole::Refine] {
+        for enlarged in [false, true] {
+            for (forced, prior) in [0, 1]
+                .into_iter()
+                .flat_map(|f| laws.clone().map(|p| (f, p)))
+            {
+                let base = if enlarged {
+                    bundle_declaration(alphabet, 2)
+                } else {
+                    declaration(alphabet, 2)
+                };
+                let declared = LandmarkDeclaration {
+                    forced,
+                    prior,
+                    ..base
+                };
+                let letters = if enlarged {
+                    bundles(&stream, &declared.family)
+                } else {
+                    Vec::new()
+                };
+                let mut tree = Landmarks::new_observed(declared.clone(), 3, role).unwrap();
+                let mut oracle =
+                    IdealLandmarks::new_observed(declared.clone(), None, 3, role).unwrap();
+                assert_eq!(tree.observation_width(), 3);
+                assert_eq!(tree.observation_role(), role);
+                for (position, &cell) in stream.iter().enumerate() {
+                    let causal = if enlarged {
+                        letter_address(&letters, position, 2)
+                    } else {
+                        address(&stream, position, 2)
+                    };
+                    let here = ObservedAddress::new(section_path(position), causal.clone());
+                    let codes: Vec<u32> = here
+                        .observation()
+                        .letters()
+                        .iter()
+                        .map(|letter| letter.code())
+                        .collect();
+                    for (flat, causal) in tree
+                        .letters_observed(&here)
+                        .unwrap()
+                        .into_iter()
+                        .zip(declared.letters(&causal))
+                    {
+                        let joined: Vec<u32> = match role {
+                            ObservationRole::Route => codes.iter().copied().chain(causal).collect(),
+                            ObservationRole::Refine => {
+                                causal.into_iter().chain(codes.clone()).collect()
+                            }
+                        };
+                        assert_eq!(flat, joined);
+                    }
+                    let face = tree.face_observed(&here, 16).unwrap();
+                    let sum: Rat = face.probabilities.iter().cloned().sum();
+                    assert_eq!(sum, Rat::one());
+                    let ideal: Rat = (0..alphabet)
+                        .map(|class| oracle.probability_observed(&here, class).unwrap())
+                        .sum();
+                    assert_eq!(ideal, Rat::one());
+                    for class in 0..alphabet {
+                        let p = &face.probabilities[class];
+                        assert!(p > &Rat::zero());
+                        assert_eq!(p, &tree.score_observed(&here, class).unwrap().executed);
+                    }
+                    let reading = tree.receive_observed(&here, cell).unwrap();
+                    let ideal = oracle.receive_observed(&here, cell).unwrap();
+                    assert!(reading.residual <= tree.face_rule());
+                    assert!(within(&reading.executed, &ideal, &reading.residual));
+                }
+            }
+        }
+    }
+}
+
+/// [L3] **A refining observation keeps the causal tree** (the refining law's bound,
+/// owed in #62; on the ideal oracles with `β` exact): the causal tree is a pruning of the refined
+/// one, each causal leaf at depth `D` a refined mixing node whose weighted face is at least `w_D`
+/// times its estimate, so over any stream and any observation
+/// `∏ q_refined · ∏_(reached) w_D⁻¹ ≥ ∏ q_causal`, one factor for each dyadic cell's causal
+/// context the passage reached. And where the observation carries what the causal letters leave
+/// plural (here the cell's own odometer bits, a fixture's leak), the refined code is strictly
+/// shorter.
+#[test]
+fn landmark_refining_observation_keeps_the_causal_tree() {
+    use crate::compression::landmark::context::{
+        ObservationPath, ObservationRole, ObservedAddress,
+    };
+    use std::collections::BTreeSet;
+    let alphabet = 5;
+    let mut draw = Draw::new(29);
+    let stream: Vec<usize> = (0..60).map(|_| draw.below(alphabet)).collect();
+    let observed: Vec<ObservationPath> = (0..60)
+        .map(|_| {
+            ObservationPath::from_section_bits((0..3).map(|_| draw.below(2) == 1).collect())
+                .unwrap()
+        })
+        .collect();
+    for (forced, prior) in [0, 1]
+        .into_iter()
+        .flat_map(|f| priors().into_iter().map(move |p| (f, p)))
+    {
+        let declared = LandmarkDeclaration {
+            forced,
+            prior: prior.clone(),
+            ..declaration(alphabet, 2)
+        };
+        let mut causal = IdealLandmarks::new(declared.clone(), None).unwrap();
+        let mut refined =
+            IdealLandmarks::new_observed(declared.clone(), None, 3, ObservationRole::Refine)
+                .unwrap();
+        let mut reached = BTreeSet::new();
+        let (mut q_causal, mut q_refined) = (Rat::one(), Rat::one());
+        for (position, &cell) in stream.iter().enumerate() {
+            let here = address(&stream, position, 2);
+            for path in causal.opened(&here, cell).unwrap() {
+                reached.insert((path.dyadic, declared.letters(&here)[path.branch].clone()));
+            }
+            q_causal *= causal.receive(&here, cell).unwrap();
+            let observed = ObservedAddress::new(observed[position].clone(), here);
+            q_refined *= refined.receive_observed(&observed, cell).unwrap();
+        }
+        let charge = (0..reached.len()).fold(Rat::one(), |q, _| q / prior.weight(2));
+        assert!(q_refined.clone() * charge >= q_causal);
+        assert!(q_refined != q_causal);
+    }
+    let declared = declaration(alphabet, 1);
+    let stream: Vec<usize> = (0..160).map(|_| draw.below(alphabet)).collect();
+    let mut causal = IdealLandmarks::new(declared.clone(), None).unwrap();
+    let mut refined =
+        IdealLandmarks::new_observed(declared, None, 3, ObservationRole::Refine).unwrap();
+    let (mut q_causal, mut q_refined) = (Rat::one(), Rat::one());
+    for (position, &cell) in stream.iter().enumerate() {
+        let here = address(&stream, position, 1);
+        q_causal *= causal.receive(&here, cell).unwrap();
+        let leak =
+            ObservationPath::from_section_bits((0..3).map(|b| (cell >> b) & 1 == 1).collect())
+                .unwrap();
+        q_refined *= refined
+            .receive_observed(&ObservedAddress::new(leak, here), cell)
+            .unwrap();
+    }
+    assert!(q_refined > q_causal);
+}
+
+/// [L3] **An observed tree's standing keeps its role**: a routing standing writes the
+/// nine-value head and a refining one a tenth value, its forced letters, zero; each reads back to
+/// the same standing, is placed on its own law with the same faces, and is refused on the other
+/// role's law; a refining head with forced letters, or with a tenth value at width zero, is
+/// refused.
+#[test]
+fn landmark_observed_standing_keeps_its_role() {
+    use crate::compression::landmark::context::{ObservationRole, ObservedAddress, TreeStanding};
+    let alphabet = 5;
+    let stream: Vec<usize> = (0..24u64).map(|t| ((t * 7 + t / 3) % 5) as usize).collect();
+    let declared = declaration(alphabet, 2);
+    for (role, other, values) in [
+        (ObservationRole::Route, ObservationRole::Refine, 9),
+        (ObservationRole::Refine, ObservationRole::Route, 10),
+    ] {
+        let mut tree = Landmarks::new_observed(declared.clone(), 3, role).unwrap();
+        for (position, &cell) in stream.iter().enumerate() {
+            let here = ObservedAddress::new(section_path(position), address(&stream, position, 2));
+            tree.receive_observed(&here, cell).unwrap();
+        }
+        let mut text = String::new();
+        tree.standing().write(&mut text);
+        let head = text.lines().next().unwrap();
+        assert_eq!(head.split_whitespace().count(), 1 + values);
+        let read = TreeStanding::read(&mut text.lines()).unwrap();
+        assert_eq!(read, tree.standing());
+        assert_eq!(read.observation_role(), role);
+        assert_eq!(read.observation_width(), 3);
+        let placed = Landmarks::new_observed(declared.clone(), 3, role)
+            .unwrap()
+            .with_standing(&read)
+            .unwrap();
+        let next = ObservedAddress::new(
+            section_path(stream.len()),
+            address(&stream, stream.len(), 2),
+        );
+        assert_eq!(
+            placed.face_observed(&next, 16).unwrap(),
+            tree.face_observed(&next, 16).unwrap()
+        );
+        assert!(
+            Landmarks::new_observed(declared.clone(), 3, other)
+                .unwrap()
+                .with_standing(&read)
+                .is_err()
+        );
+        if role == ObservationRole::Refine {
+            let rest: Vec<&str> = text.lines().skip(1).collect();
+            for bad in [
+                head.strip_suffix(" 0").unwrap().to_string() + " 1",
+                head.strip_suffix(" 3 0").unwrap().to_string() + " 0 0",
+            ] {
+                let lines: Vec<&str> = std::iter::once(bad.as_str())
+                    .chain(rest.iter().copied())
+                    .collect();
+                assert!(TreeStanding::read(&mut lines.into_iter()).is_err());
+            }
+        }
     }
 }

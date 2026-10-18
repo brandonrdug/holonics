@@ -12,17 +12,17 @@ use std::time::Instant;
 use holonics::geometry::RatVec3;
 use holonics::geometry::screw::ScrewGenerator;
 use holonics::hnn::Encoded;
-use holonics::holarchy::terrain::KnownTruth;
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::{
     Constitution, ConstitutionRead, ContactDeclaration, Current, Field, FieldDeclaration, Lattice,
     Locus, ReceivingPhases, RingDeclaration, SourceMoment,
 };
+use holonics::holarchy::terrain::KnownTruth;
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::{Rat, integer, rat};
 use num_bigint::BigInt;
-use num_traits::{Signed, ToPrimitive, Zero};
+use num_traits::{Signed, Zero};
 
 use super::card::{READ_SHARED_PER_THREAD, ingest_shared};
 use super::*;
@@ -201,21 +201,6 @@ fn as_rats(counts: &[u64]) -> Vec<Rat> {
     counts
         .iter()
         .map(|count| Rat::from_integer(BigInt::from(*count)))
-        .collect()
-}
-
-/// The gather realizing `P^k` on a ring's realified coordinates, read off the host's own rotation
-/// (`Ring::rotate` of the index vector): coordinate `j` of `P^k v` is `v[gather[j]]`.
-fn rotation_gather(field: &Field, ring: usize, k: &BigInt) -> Vec<usize> {
-    let width = field.ring(ring).width();
-    let indices: Vec<Rat> = (0..width)
-        .map(|index| Rat::from_integer(BigInt::from(index)))
-        .collect();
-    field
-        .ring(ring)
-        .rotate(&indices, k)
-        .iter()
-        .map(|index| index.to_integer().to_usize().unwrap())
         .collect()
 }
 
@@ -657,8 +642,8 @@ fn moment_ingest_matches_the_host_moment() {
 /// equals the host moment's; `E_0 M_0[c]` (`10 × 5` on its lattice, against the
 /// resident counts) equals the host's product per phase and, over the population chart (ruling B),
 /// folds to `SourceMoment::encode`; and
-/// `R P_R^(τ_R) v` (`2|A| × 22 = 10 × 22` on `2^(−10)ℤ`, the initial and a drawn map, against lattice anchors
-/// with the rotation as a gather) equals `ReceivingPhases::read`'s logits.
+/// `R v` in the passage frame (`2|A| × 22 = 10 × 22` on `2^(−10)ℤ`, the initial and a drawn map, against
+/// lattice anchors, no gather) equals `ReceivingPhases::read`'s logits.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn campaign_one_reads_and_ingest_match_the_host() {
@@ -685,7 +670,11 @@ fn campaign_one_reads_and_ingest_match_the_host() {
     let (mut fed, mut aeons, mut device_us) = (0usize, 0usize, 0u128);
     while fed < cells.len() {
         let expected = host
-            .ingest(&field, &mut current, &encoded.part(fed..cells.len()).unwrap())
+            .ingest(
+                &field,
+                &mut current,
+                &encoded.part(fed..cells.len()).unwrap(),
+            )
             .unwrap();
         let clock = Instant::now();
         let (found, layout) = device
@@ -760,15 +749,12 @@ fn campaign_one_reads_and_ingest_match_the_host() {
     assert_eq!(folded, host.encode(&field, &theta, 0).unwrap());
 
     // R on 2^(−10)ℤ: the initial map and a drawn one, against two lattice anchors on 2^(−20)ℤ,
-    // rotated by the receiving ring's lift.
+    // read as they stand (the passage frame: no gather).
     let r_lattice = initial.lattice(Locus::ReceivingMap(2)).unwrap();
     assert_eq!(r_lattice.exponent(), 10);
     let anchors: Vec<Vec<Rat>> = (0..2)
         .map(|_| (0..22).map(|_| draw.lattice_value(20, 40)).collect())
         .collect();
-    let lift = current.lift()[2].clone();
-    let gather = rotation_gather(&field, 2, &lift);
-    let gathers = Gather::mount(&card, &[gather.clone(), gather]).unwrap();
     let x = ResidentLattice::mount(
         &card,
         &LatticeCoordinates::of_vectors(&anchors, Lattice::new(20)).unwrap(),
@@ -792,15 +778,15 @@ fn campaign_one_reads_and_ingest_match_the_host() {
         )
         .unwrap();
         let clock = Instant::now();
-        let read = card.read(&locus, x.operand(), Some(&gathers)).unwrap();
+        let read = card.read(&locus, x.operand(), None).unwrap();
         let layout = *read.layout();
         let read = read.fetch().unwrap();
         eprintln!(
-            "R P v ({name}): {layout:?}, {} us with the transfer",
+            "R v ({name}): {layout:?}, {} us with the transfer",
             clock.elapsed().as_micros()
         );
         // Declared at the mount's lift point, as the reference declares its admitted family; the
-        // read rotates by the lift the ingest reached.
+        // read is in the passage frame, whatever lift the ingest reached.
         let clock = Instant::now();
         let phases =
             ReceivingPhases::declare(&field, &theta, &opening, &field.receivers()[0]).unwrap();
@@ -811,10 +797,7 @@ fn campaign_one_reads_and_ingest_match_the_host() {
         // The card reads the wave; the host adds the tree's grain logits at compare
         // (the landmark tree), so the wave's read is the host's `ReceivingPhases::read`.
         for (b, anchor) in anchors.iter().enumerate() {
-            let logits = phases
-                .read(&field, &theta, &current, anchor)
-                .unwrap()
-                .logits;
+            let logits = phases.read(&field, &theta, anchor).unwrap().logits;
             assert_eq!(read.vector(b), logits, "{name}, anchor {b}");
         }
     }

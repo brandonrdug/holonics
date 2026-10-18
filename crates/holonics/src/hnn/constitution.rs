@@ -532,6 +532,15 @@
 //! | `HNN/LatticeDeposit.lattice_deposit_descends` | [`Constitution::deposited`] with `hnn::retention::collapse` |
 //! | `HNN/Ring.gain_backtrack_midpoint` | [`GainBacktrack`], [`DepositReading::backtracks`] |
 
+pub mod receiving_blocks;
+mod receiving_material;
+mod receiving_prepared;
+pub use receiving_material::ReceivingBlock;
+use receiving_material::ReceivingMaterial;
+use receiving_prepared::PreparedReceivingBlocks;
+pub mod receiving_window;
+pub use receiving_blocks::ReceivingLayout;
+
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
@@ -1119,9 +1128,25 @@ fn ceil_log2(x: u128) -> u32 {
     }
 }
 
-/// The widest shift a residual's coordinates take: `2^(L_s + e_H)` with its sign and one more bit
-/// of headroom stays inside the `i128` carrier.
-pub(crate) const RESIDUAL_SHIFT: u32 = 125;
+fn chart_extent_overflow(
+    site: &'static str,
+    rule_lattice_exponent: Option<u32>,
+    prior_scale: Option<u32>,
+    old_chart_exponent: Option<u32>,
+    requested_chart_exponent: Option<u32>,
+    gram_exponent: Option<u32>,
+    support_width: Option<usize>,
+) -> HnnError {
+    HnnError::ChartExtentOverflow {
+        site,
+        rule_lattice_exponent,
+        prior_scale,
+        old_chart_exponent,
+        requested_chart_exponent,
+        gram_exponent,
+        support_width,
+    }
+}
 
 /// [definition; agent-inferred] **The chart rule of a normal law's locus** (the lattice word; Lean
 /// `HNN/LatticeWord.{prox_chart_certificate, rounded_refinement_certificate_left,
@@ -1232,7 +1257,7 @@ impl ChartRule {
 /// left residual `δ = ‖1 − X̂H‖∞`, computed exactly. The Gram is its prior `2^k I` off its
 /// **support** (the rows where a deposit moved it: `H = 2^k I + Σ w f fᵀ` moves only rows some
 /// feature reached), and the chart is `2^(−k) I` there, exact on its lattice (`L_s ≥ k`); the chart
-/// is carried on the support as integer coordinates (`i128`, with the carrier refused past it), and
+/// is carried on the support as integer coordinates (`BigInt`, dynamically sized and charged by reduced bit length), and
 /// every product it takes is an integer product. The founding chart is exact: `H_0 = 2^k I`,
 /// `X̂ = 2^(−k) I`, `δ = 0` ([`SolvedChart::founded`]; `k = 0` is [`SolvedChart::identity`], every
 /// law's but a receiving map's declared otherwise, `ReceiverDeclaration::receiving_prior`, and a
@@ -1272,13 +1297,45 @@ pub struct SolvedChart {
     /// The Gram's support `S`, ascending; off it the chart is `2^(−k) I`.
     support: Vec<usize>,
     /// The chart on `S × S` as integer coordinates at `2^(−L_s)`, row-major and symmetric.
-    block: Vec<i128>,
+    block: Vec<BigInt>,
     /// `δ = ‖1 − X̂H‖∞`, exact.
     certificate: Rat,
 }
 
+/// Physical-coordinate payload census for a stored solved-chart block. These readings are
+/// distinct from reduced rational logical bits. Digit payloads round each magnitude to a
+/// hypothetical 32/64-bit digit representation; they are not allocator capacity, heap usage,
+/// RSS, device allocation, or serialized bytes. Vec byte counts cover BigInt descriptors only.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ChartCoordinateStorage {
+    pub coordinate_count: u128,
+    pub magnitude_bits: u128,
+    pub max_magnitude_bits: u64,
+    pub positive_coordinates: u128,
+    pub negative_coordinates: u128,
+    pub zero_coordinates: u128,
+    pub vec_length_descriptor_bytes: u128,
+    pub vec_capacity_descriptor_bytes: u128,
+    pub u32_digit_payload_bytes_estimate: u128,
+    pub u64_digit_payload_bytes_estimate: u128,
+}
+impl ChartCoordinateStorage {
+    fn add(&mut self, other: &Self) {
+        self.coordinate_count += other.coordinate_count;
+        self.magnitude_bits += other.magnitude_bits;
+        self.max_magnitude_bits = self.max_magnitude_bits.max(other.max_magnitude_bits);
+        self.positive_coordinates += other.positive_coordinates;
+        self.negative_coordinates += other.negative_coordinates;
+        self.zero_coordinates += other.zero_coordinates;
+        self.vec_length_descriptor_bytes += other.vec_length_descriptor_bytes;
+        self.vec_capacity_descriptor_bytes += other.vec_capacity_descriptor_bytes;
+        self.u32_digit_payload_bytes_estimate += other.u32_digit_payload_bytes_estimate;
+        self.u64_digit_payload_bytes_estimate += other.u64_digit_payload_bytes_estimate;
+    }
+}
+
 /// What one deposit's refinement of a chart read: the warm start's certificate (`None` when it left
-/// the `i128` carrier), the refinements taken, whether it restarted from the scaled identity, and the
+/// the exact carrier), the refinements taken, whether it restarted from the scaled identity, and the
 /// bits of the certified residual `1 − X̂H'` (its nonzero entries, reduced).
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Refinement {
@@ -1294,25 +1351,26 @@ struct Refinement {
 struct GramBlock {
     support: Vec<usize>,
     exponent: u32,
-    coordinates: Vec<i128>,
+    coordinates: Vec<BigInt>,
     norm: u32,
 }
-
 impl GramBlock {
-    /// Read a carried Gram (every entry on a dyadic lattice) against its prior's diagonal `prior`,
-    /// refusing a coordinate past `i128` and an entry off every dyadic lattice (a Gram that is not
-    /// carried has no chart).
-    fn of(gram: &[Vec<Rat>], prior: &Rat) -> Result<Self, HnnError> {
+    fn of(
+        gram: &[Vec<Rat>],
+        prior: &Rat,
+        _rule_lattice_exponent: Option<u32>,
+        _prior_scale: Option<u32>,
+        _old_chart_exponent: Option<u32>,
+        _requested_chart_exponent: Option<u32>,
+    ) -> Result<Self, HnnError> {
         let support: Vec<usize> = (0..gram.len())
             .filter(|&i| {
-                gram[i].iter().enumerate().any(
-                    |(j, x)| {
-                        if i == j { x != prior } else { !x.is_zero() }
-                    },
-                )
+                gram[i]
+                    .iter()
+                    .enumerate()
+                    .any(|(j, x)| if i == j { x != prior } else { !x.is_zero() })
             })
             .collect();
-        let s = support.len();
         let mut exponent = 0u32;
         for &i in &support {
             for &j in &support {
@@ -1321,28 +1379,29 @@ impl GramBlock {
                 if denominator.bits() != twos + 1 {
                     return Err(ExactLinearError::InverseCertificateFailure.into());
                 }
-                exponent = exponent.max(twos as u32);
+                exponent = exponent.max(
+                    u32::try_from(twos)
+                        .map_err(|_| HnnError::from(ExactLinearError::ExtentOverflow))?,
+                );
             }
         }
-        let overflow = || HnnError::from(ExactLinearError::ExtentOverflow);
-        let mut coordinates = Vec::with_capacity(s * s);
-        let mut widest = 1u128 << exponent;
+        let mut coordinates = Vec::with_capacity(support.len() * support.len());
+        let mut widest = BigInt::one() << exponent as usize;
         for &i in &support {
-            let mut row = 0u128;
+            let mut row = BigInt::zero();
             for &j in &support {
                 let value = &gram[i][j];
                 let twos = value.denom().trailing_zeros().unwrap_or(0) as u32;
-                let coordinate = (value.numer() << (exponent - twos) as usize)
-                    .to_i128()
-                    .ok_or_else(overflow)?;
-                row = row
-                    .checked_add(coordinate.unsigned_abs())
-                    .ok_or_else(overflow)?;
+                let coordinate = value.numer() << (exponent - twos) as usize;
+                row += coordinate.abs();
                 coordinates.push(coordinate);
             }
             widest = widest.max(row);
         }
-        let norm = ceil_log2(widest).saturating_sub(exponent);
+        let ceiling = (&widest - BigInt::one()).bits();
+        let norm = u32::try_from(ceiling)
+            .map_err(|_| HnnError::from(ExactLinearError::ExtentOverflow))?
+            .saturating_sub(exponent);
         Ok(Self {
             support,
             exponent,
@@ -1352,76 +1411,29 @@ impl GramBlock {
     }
 }
 
-/// One row of an integer product, exact: in the `i128` carrier while every partial sum fits it,
-/// otherwise in bounded-bit integers (the row's bits are at most the operands' plus `⌈log₂ s⌉`).
-enum ProductRow {
-    Narrow(Vec<i128>),
-    Wide(Vec<BigInt>),
-}
-
+/// Exact row product in dynamically sized integer coordinates.
+struct ProductRow(Vec<BigInt>);
 impl ProductRow {
-    /// Row `row · B` of an `s × s` row-major `B`.
-    fn of(row: &[i128], matrix: &[i128], s: usize) -> Self {
-        let mut sums = vec![0i128; s];
-        let narrow = 'narrow: {
-            for (k, &left) in row.iter().enumerate() {
-                if left == 0 {
-                    continue;
-                }
-                for (sum, &right) in sums.iter_mut().zip(&matrix[k * s..(k + 1) * s]) {
-                    match left
-                        .checked_mul(right)
-                        .and_then(|term| sum.checked_add(term))
-                    {
-                        Some(value) => *sum = value,
-                        None => break 'narrow false,
-                    }
-                }
-            }
-            true
-        };
-        if narrow {
-            return ProductRow::Narrow(sums);
-        }
+    fn of(row: &[BigInt], matrix: &[BigInt], s: usize) -> Self {
         let mut sums = vec![BigInt::zero(); s];
-        for (k, &left) in row.iter().enumerate() {
-            if left == 0 {
+        for (k, left) in row.iter().enumerate() {
+            if left.is_zero() {
                 continue;
             }
-            let left = BigInt::from(left);
-            for (sum, &right) in sums.iter_mut().zip(&matrix[k * s..(k + 1) * s]) {
-                if right != 0 {
-                    *sum += &left * right;
+            for (sum, right) in sums.iter_mut().zip(&matrix[k * s..(k + 1) * s]) {
+                if !right.is_zero() {
+                    *sum += left * right;
                 }
             }
         }
-        ProductRow::Wide(sums)
+        Self(sums)
     }
-
-    /// Entry `j` with `offset − entry` taken, in the `i128` carrier or `None`.
-    fn subtracted_from(&self, j: usize, offset: i128) -> Option<i128> {
-        match self {
-            ProductRow::Narrow(sums) => offset.checked_sub(sums[j]),
-            ProductRow::Wide(sums) => (BigInt::from(offset) - &sums[j]).to_i128(),
-        }
+    fn subtracted_from(&self, j: usize, offset: BigInt) -> BigInt {
+        offset - &self.0[j]
     }
-
-    /// Entry `j` at the nearest point of `2^(−k)` coarser, ties upward, in the `i128` carrier or
-    /// `None`.
-    fn nearest(&self, j: usize, k: u32) -> Option<i128> {
-        match self {
-            ProductRow::Narrow(sums) => nearest_shift(sums[j], k),
-            ProductRow::Wide(sums) => nearest_shift_wide(&sums[j], k).to_i128(),
-        }
+    fn nearest(&self, j: usize, k: u32) -> BigInt {
+        nearest_shift_wide(&self.0[j], k)
     }
-}
-
-/// `x·2^(−k)` at its nearest integer, ties upward (Lean `quot` at a coordinate).
-fn nearest_shift(x: i128, k: u32) -> Option<i128> {
-    if k == 0 {
-        return Some(x);
-    }
-    x.checked_add(1i128 << (k - 1)).map(|y| y >> k)
 }
 
 /// `x·2^(−k)` at its nearest integer, ties upward, in bounded-bit integers.
@@ -1444,12 +1456,12 @@ fn nearest_quotient(numerator: &BigInt, denominator: &BigInt) -> BigInt {
 }
 
 /// A symmetric `s × s` block from its upper-triangle rows (row `i` holds columns `i..s`).
-fn mirrored(s: usize, upper: Vec<Vec<i128>>) -> Vec<i128> {
-    let mut block = vec![0i128; s * s];
+fn mirrored(s: usize, upper: Vec<Vec<BigInt>>) -> Vec<BigInt> {
+    let mut block = vec![BigInt::zero(); s * s];
     for (i, row) in upper.into_iter().enumerate() {
         for (offset, value) in row.into_iter().enumerate() {
             let j = i + offset;
-            block[i * s + j] = value;
+            block[i * s + j] = value.clone();
             block[j * s + i] = value;
         }
     }
@@ -1459,63 +1471,58 @@ fn mirrored(s: usize, upper: Vec<Vec<i128>>) -> Vec<i128> {
 /// **The certified residual** of a chart block `X` (at `2^(−L_s)`) against a Gram block `H` (at
 /// `2^(−e_H)`): `P = 2^(L_s + e_H)(1 − XH)` exactly, with `δ = max_i Σ_j |P_ij| · 2^(−L_s − e_H)`
 /// (Lean `rowNorm`). Each row reads only the shared blocks and writes only its own: the rows run
-/// together. `None` when an entry leaves the `i128` carrier.
-fn certified(block: &[i128], gram: &[i128], s: usize, shift: u32) -> Option<(Vec<i128>, Rat)> {
-    let one = 1i128 << shift;
-    let rows: Vec<Option<(Vec<i128>, u128)>> = (0..s)
+/// together. Integer widths grow with exact operand demand.
+fn certified(
+    block: &[BigInt],
+    gram: &[BigInt],
+    s: usize,
+    shift: u32,
+) -> Option<(Vec<BigInt>, Rat)> {
+    let one = BigInt::one() << shift as usize;
+    let rows: Vec<(Vec<BigInt>, BigInt)> = (0..s)
         .into_par_iter()
         .map(|i| {
             let product = ProductRow::of(&block[i * s..(i + 1) * s], gram, s);
-            let mut row = Vec::with_capacity(s);
-            let mut sum = 0u128;
-            for j in 0..s {
-                let value = product.subtracted_from(j, if i == j { one } else { 0 })?;
-                sum = sum.checked_add(value.unsigned_abs())?;
-                row.push(value);
-            }
-            Some((row, sum))
+            let row: Vec<BigInt> = (0..s)
+                .map(|j| {
+                    product.subtracted_from(j, if i == j { one.clone() } else { BigInt::zero() })
+                })
+                .collect();
+            let sum = row.iter().map(Signed::abs).sum();
+            (row, sum)
         })
         .collect();
     let mut residual = Vec::with_capacity(s * s);
-    let mut widest = 0u128;
-    for row in rows {
-        let (row, sum) = row?;
+    let mut widest = BigInt::zero();
+    for (row, sum) in rows {
         widest = widest.max(sum);
         residual.extend(row);
     }
-    Some((
-        residual,
-        Rat::new(BigInt::from(widest), BigInt::one() << shift as usize),
-    ))
+    Some((residual, Rat::new(widest, one)))
 }
 
-/// **One rounded Newton–Schulz refinement, left form** (Lean `nsStep`, `newton_schulz_left`,
-/// `solvedRefine`, `solved_refinement_certificate`): `X' = round(X + R̃X)` on `2^(−L_s)ℤ`, with `R̃`
-/// the certified residual `P·2^(−L_s−e_H)` read at the chart's lattice. `X + RX = (2 − XH)X` is
-/// symmetric for a symmetric `X` and `H`, so the upper triangle is formed and mirrored; `R̃X` is not,
-/// and the mirror carries the residual's rounding transposed (`ChartRule`, "Why the lattice"). The
-/// rows run together. `None` when an entry leaves the `i128` carrier.
+/// Rounded Newton–Schulz step, with the same nearest/ties-up law in unbounded coordinates.
 fn refined(
-    block: &[i128],
-    residual: &[i128],
+    block: &[BigInt],
+    residual: &[BigInt],
     s: usize,
     gram_exponent: u32,
     exponent: u32,
-) -> Option<Vec<i128>> {
-    let rounded: Vec<i128> = residual
+) -> Option<Vec<BigInt>> {
+    let rounded: Vec<BigInt> = residual
         .iter()
-        .map(|&p| nearest_shift(p, gram_exponent))
-        .collect::<Option<_>>()?;
-    let upper: Vec<Option<Vec<i128>>> = (0..s)
+        .map(|p| nearest_shift_wide(p, gram_exponent))
+        .collect();
+    let upper: Vec<Vec<BigInt>> = (0..s)
         .into_par_iter()
         .map(|i| {
             let product = ProductRow::of(&rounded[i * s..(i + 1) * s], block, s);
             (i..s)
-                .map(|j| block[i * s + j].checked_add(product.nearest(j, exponent)?))
+                .map(|j| &block[i * s + j] + product.nearest(j, exponent))
                 .collect()
         })
         .collect();
-    Some(mirrored(s, upper.into_iter().collect::<Option<_>>()?))
+    Some(mirrored(s, upper))
 }
 
 /// **The warm start's rank-one steps** at the chart's lattice (Sherman–Morrison): for each return
@@ -1524,12 +1531,15 @@ fn refined(
 /// A step whose denominator is not positive is skipped (the certificate then decides). The rows of
 /// each step run together.
 fn corrected(
-    mut block: Vec<i128>,
+    mut block: Vec<BigInt>,
     s: usize,
     exponent: u32,
+    _rule_lattice_exponent: u32,
+    _prior_scale: u32,
+    _old_chart_exponent: u32,
+    _gram_exponent: u32,
     features: &[(&Rat, Vec<BigInt>)],
-) -> Result<Vec<i128>, HnnError> {
-    let overflow = || HnnError::from(ExactLinearError::ExtentOverflow);
+) -> Result<Vec<BigInt>, HnnError> {
     let shift = exponent as usize;
     for (weight, feature) in features {
         let reach: Vec<BigInt> = (0..s)
@@ -1537,8 +1547,8 @@ fn corrected(
             .map(|i| {
                 let mut sum = BigInt::zero();
                 for (k, value) in feature.iter().enumerate() {
-                    let c = block[i * s + k];
-                    if c != 0 && !value.is_zero() {
+                    let c = &block[i * s + k];
+                    if !c.is_zero() && !value.is_zero() {
                         sum += value * c;
                     }
                 }
@@ -1555,15 +1565,13 @@ fn corrected(
             .map(|v| (weight.numer() * v) << shift)
             .collect();
         let current = &block;
-        let upper: Vec<Result<Vec<i128>, HnnError>> = (0..s)
+        let upper: Vec<Result<Vec<BigInt>, HnnError>> = (0..s)
             .into_par_iter()
             .map(|i| {
                 (i..s)
                     .map(|j| {
-                        let step = nearest_quotient(&(&scaled[i] * &reach[j]), &denominator)
-                            .to_i128()
-                            .ok_or_else(overflow)?;
-                        current[i * s + j].checked_sub(step).ok_or_else(overflow)
+                        let step = nearest_quotient(&(&scaled[i] * &reach[j]), &denominator);
+                        Ok(&current[i * s + j] - step)
                     })
                     .collect()
             })
@@ -1574,26 +1582,51 @@ fn corrected(
 }
 
 /// The bits of a residual's nonzero entries `P·2^(−shift)`, each as a reduced ratio.
-fn residual_bits(residual: &[i128], shift: u32) -> u64 {
+fn residual_bits(residual: &[BigInt], shift: u32) -> u64 {
     residual
         .iter()
-        .filter(|p| **p != 0)
-        .map(|&p| lattice_bits(p, shift))
+        .filter(|p| !p.is_zero())
+        .map(|p| lattice_bits(p, shift))
         .sum()
 }
-
-/// The bits of the lattice value `c·2^(−L)` as a reduced ratio (numerator and denominator), as
-/// [`bits`] counts it.
-fn lattice_bits(c: i128, exponent: u32) -> u64 {
-    if c == 0 {
+/// Reduced logical bit length, including arbitrarily wide coordinate numerators.
+fn lattice_bits(c: &BigInt, exponent: u32) -> u64 {
+    if c.is_zero() {
         return 1;
     }
-    let twos = c.trailing_zeros().min(exponent);
-    let magnitude = c.unsigned_abs() >> twos;
-    u64::from(128 - magnitude.leading_zeros()) + u64::from(exponent - twos + 1)
+    let twos = c.trailing_zeros().unwrap_or(0).min(u64::from(exponent));
+    c.bits() - twos + u64::from(exponent) - twos + 1
 }
 
 impl SolvedChart {
+    /// Read the stored integer coordinates without materializing dense rational rows or
+    /// cloning digit arrays. The exponent/support/certificate and allocator overhead are excluded.
+    pub fn coordinate_storage(&self) -> ChartCoordinateStorage {
+        let mut reading = ChartCoordinateStorage {
+            coordinate_count: self.block.len() as u128,
+            vec_length_descriptor_bytes: self.block.len() as u128
+                * std::mem::size_of::<BigInt>() as u128,
+            vec_capacity_descriptor_bytes: self.block.capacity() as u128
+                * std::mem::size_of::<BigInt>() as u128,
+            ..ChartCoordinateStorage::default()
+        };
+        for coordinate in &self.block {
+            let bits = coordinate.bits();
+            reading.magnitude_bits += u128::from(bits);
+            reading.max_magnitude_bits = reading.max_magnitude_bits.max(bits);
+            if coordinate.is_zero() {
+                reading.zero_coordinates += 1;
+            } else if coordinate.is_negative() {
+                reading.negative_coordinates += 1;
+            } else {
+                reading.positive_coordinates += 1;
+            }
+            reading.u32_digit_payload_bytes_estimate += u128::from(bits).div_ceil(32) * 4;
+            reading.u64_digit_payload_bytes_estimate += u128::from(bits).div_ceil(64) * 8;
+        }
+        reading
+    }
+
     /// **The founding chart**: `H_0 = I`, so `X̂ = I` exactly, `δ = 0`.
     pub fn identity() -> Self {
         Self {
@@ -1658,7 +1691,7 @@ impl SolvedChart {
         let (s, scale) = (self.support.len(), BigInt::one() << self.exponent as usize);
         for (a, &i) in self.support.iter().enumerate() {
             for (b, &j) in self.support.iter().enumerate() {
-                rows[i][j] = Rat::new(BigInt::from(self.block[a * s + b]), scale.clone());
+                rows[i][j] = Rat::new(self.block[a * s + b].clone(), scale.clone());
             }
         }
         rows
@@ -1673,7 +1706,7 @@ impl SolvedChart {
         let block: u64 = self
             .block
             .iter()
-            .map(|&c| lattice_bits(c, self.exponent))
+            .map(|c| lattice_bits(c, self.exponent))
             .sum();
         outside + block + bits(&self.certificate)
     }
@@ -1688,8 +1721,8 @@ impl SolvedChart {
         for (a, &i) in self.support.iter().enumerate() {
             let mut sum = BigInt::zero();
             for (b, &k) in self.support.iter().enumerate() {
-                let c = self.block[a * s + b];
-                if c != 0 && !values[k].is_zero() {
+                let c = &self.block[a * s + b];
+                if !c.is_zero() && !values[k].is_zero() {
                     sum += &values[k] * c;
                 }
             }
@@ -1701,14 +1734,15 @@ impl SolvedChart {
     /// The chart carried onto another support at a lattice at least as fine: an entry both
     /// supports hold moves by `2^(L − L_s)` exactly, and an index the chart did not hold enters as the
     /// prior's chart `2^(−k)` on the diagonal.
-    fn carried_to(&self, support: &[usize], exponent: u32) -> Result<Vec<i128>, HnnError> {
-        let s = support.len();
-        // Every chart and the rule's lattice lie within the residual's shift, so the move fits.
+    fn carried_to(
+        &self,
+        support: &[usize],
+        exponent: u32,
+        _rule_lattice_exponent: u32,
+        _prior_scale: u32,
+        _gram_exponent: u32,
+    ) -> Result<Vec<BigInt>, HnnError> {
         let shift = exponent - self.exponent;
-        if exponent > RESIDUAL_SHIFT {
-            return Err(ExactLinearError::ExtentOverflow.into());
-        }
-        let scale = 1i128 << shift;
         let held: BTreeMap<usize, usize> = self
             .support
             .iter()
@@ -1716,17 +1750,16 @@ impl SolvedChart {
             .map(|(a, &i)| (i, a))
             .collect();
         let width = self.support.len();
-        let mut block = vec![0i128; s * s];
+        let s = support.len();
+        let mut block = vec![BigInt::zero(); s * s];
         for (a, i) in support.iter().enumerate() {
             for (b, j) in support.iter().enumerate() {
                 let value = match (held.get(i), held.get(j)) {
-                    (Some(&p), Some(&q)) => self.block[p * width + q],
-                    _ if a == b => 1i128 << (self.exponent - self.scale),
-                    _ => 0,
+                    (Some(&p), Some(&q)) => self.block[p * width + q].clone(),
+                    _ if a == b => BigInt::one() << (self.exponent - self.scale) as usize,
+                    _ => BigInt::zero(),
                 };
-                block[a * s + b] = value
-                    .checked_mul(scale)
-                    .ok_or(ExactLinearError::ExtentOverflow)?;
+                block[a * s + b] = value << shift as usize;
             }
         }
         Ok(block)
@@ -1734,7 +1767,7 @@ impl SolvedChart {
 
     /// **The successor's chart** (the type's header): the Gram `gram` is the carried successor, and
     /// `features` the returns `(w, f)` that reached the locus, in the integral chart. Refused past
-    /// the `i128` carrier or when the refinement does not reach `δ_ℓ` within the rule's count.
+    /// the refinement does not reach `δ_ℓ` within the rule's count.
     fn deposited(
         &self,
         gram: &[Vec<Rat>],
@@ -1742,13 +1775,17 @@ impl SolvedChart {
         rule: &ChartRule,
     ) -> Result<(Self, Refinement), HnnError> {
         let n = gram.len();
-        let carried = GramBlock::of(gram, &self.prior())?;
+        let carried = GramBlock::of(
+            gram,
+            &self.prior(),
+            Some(rule.lattice().exponent()),
+            Some(self.scale),
+            Some(self.exponent),
+            None,
+        )?;
         let s = carried.support.len();
         let exponent = rule.exponent(n, carried.norm).max(self.exponent);
-        let shift = exponent + carried.exponent;
-        if shift > RESIDUAL_SHIFT {
-            return Err(ExactLinearError::ExtentOverflow.into());
-        }
+
         if s == 0 {
             let chart = Self {
                 exponent,
@@ -1782,9 +1819,19 @@ impl SolvedChart {
             })
             .collect();
         let warm = corrected(
-            self.carried_to(&carried.support, exponent)?,
+            self.carried_to(
+                &carried.support,
+                exponent,
+                rule.lattice().exponent(),
+                self.scale,
+                carried.exponent,
+            )?,
             s,
             exponent,
+            rule.lattice().exponent(),
+            self.scale,
+            self.exponent,
+            carried.exponent,
             &features,
         )?;
         settled(warm, carried, exponent, self.scale, n, rule)
@@ -1807,7 +1854,14 @@ impl SolvedChart {
     ) -> Result<(Self, Refinement), HnnError> {
         let n = gram.len();
         let moved = Self::founded(scale);
-        let carried = GramBlock::of(gram, &moved.prior())?;
+        let carried = GramBlock::of(
+            gram,
+            &moved.prior(),
+            Some(rule.lattice().exponent()),
+            Some(scale),
+            Some(self.exponent),
+            None,
+        )?;
         let s = carried.support.len();
         // x = 2^(k − k′): a halving needs the lattice one level finer per halving.
         let finer = scale.saturating_sub(self.scale);
@@ -1815,9 +1869,7 @@ impl SolvedChart {
             .exponent(n, carried.norm)
             .max(self.exponent + finer)
             .max(scale);
-        if exponent + carried.exponent > RESIDUAL_SHIFT {
-            return Err(ExactLinearError::ExtentOverflow.into());
-        }
+
         if s == 0 {
             let chart = Self { exponent, ..moved };
             let refinement = Refinement {
@@ -1828,15 +1880,18 @@ impl SolvedChart {
             };
             return Ok((chart, refinement));
         }
-        let mut warm = self.carried_to(&carried.support, exponent)?;
-        let overflow = || HnnError::from(ExactLinearError::ExtentOverflow);
+        let mut warm = self.carried_to(
+            &carried.support,
+            exponent,
+            rule.lattice().exponent(),
+            scale,
+            carried.exponent,
+        )?;
         for value in &mut warm {
             *value = if scale >= self.scale {
-                *value >> (scale - self.scale)
+                &*value >> (scale - self.scale) as usize
             } else {
-                value
-                    .checked_mul(1i128 << (self.scale - scale))
-                    .ok_or_else(overflow)?
+                &*value << (self.scale - scale) as usize
             };
         }
         settled(warm, carried, exponent, scale, n, rule)
@@ -1848,7 +1903,7 @@ impl SolvedChart {
     /// lattice that holds the mean (the chart's own, or one level finer), so `X̂_s` commutes with `Σ`
     /// and stays symmetric. The Lean bound gives `‖1 − X̂_s H′‖∞ ≤ ‖1 − X̂H′‖∞` on the actual carried
     /// Gram; the certificate is still computed exactly here, never assumed, and refused above the
-    /// rule's target, as is a lattice past the residual's shift. The Gram commutes with `Σ`, so its
+    /// rule's target. Integer coordinates grow to represent the exact mean. The Gram commutes with `Σ`, so its
     /// support is closed under it; a support that is not is refused. Returns the chart and the bits of
     /// its certified residual.
     fn symmetrized(
@@ -1861,7 +1916,6 @@ impl SolvedChart {
         if s == 0 {
             return Ok((self.clone(), 0));
         }
-        let overflow = || HnnError::from(ExactLinearError::ExtentOverflow);
         let failure = || HnnError::from(ExactLinearError::InverseCertificateFailure);
         let position: BTreeMap<usize, usize> = self
             .support
@@ -1872,34 +1926,52 @@ impl SolvedChart {
         let images: Vec<usize> = self
             .support
             .iter()
-            .map(|&i| position.get(&symmetry.column(i)).copied().ok_or_else(failure))
+            .map(|&i| {
+                position
+                    .get(&symmetry.column(i))
+                    .copied()
+                    .ok_or_else(failure)
+            })
             .collect::<Result<_, HnnError>>()?;
-        let mut sums = vec![0i128; s * s];
+        let mut sums = vec![BigInt::zero(); s * s];
         for a in 0..s {
             for b in 0..s {
-                sums[a * s + b] = self.block[a * s + b]
-                    .checked_add(self.block[images[a] * s + images[b]])
-                    .ok_or_else(overflow)?;
+                sums[a * s + b] = &self.block[a * s + b] + &self.block[images[a] * s + images[b]];
             }
         }
         // The mean exactly, on the coarsest lattice that holds it: the chart's own when every sum is
         // even, otherwise one level finer (Epime's review, October 9: a rounded mean adds a residual
         // the averaging theorem does not cover).
-        let (block, exponent) = if sums.iter().all(|sum| sum % 2 == 0) {
+        let (block, exponent) = if sums.iter().all(|sum| (sum % 2u32).is_zero()) {
             (sums.iter().map(|sum| sum / 2).collect(), self.exponent)
         } else {
             (sums, self.exponent + 1)
         };
-        let carried = GramBlock::of(gram, &self.prior())?;
+        let carried = GramBlock::of(
+            gram,
+            &self.prior(),
+            Some(rule.lattice().exponent()),
+            Some(self.scale),
+            Some(self.exponent),
+            Some(exponent),
+        )?;
         if carried.support != self.support {
             return Err(failure());
         }
         let shift = exponent + carried.exponent;
-        if shift > RESIDUAL_SHIFT {
-            return Err(overflow());
-        }
-        let (residual, certificate) =
-            certified(&block, &carried.coordinates, s, shift).ok_or_else(overflow)?;
+
+        let (residual, certificate) = certified(&block, &carried.coordinates, s, shift)
+            .ok_or_else(|| {
+                chart_extent_overflow(
+                    "SolvedChart::symmetrized.certified_residual",
+                    Some(rule.lattice().exponent()),
+                    Some(self.scale),
+                    Some(self.exponent),
+                    Some(exponent),
+                    Some(carried.exponent),
+                    Some(s),
+                )
+            })?;
         if certificate > rule.target() {
             return Err(failure());
         }
@@ -1921,7 +1993,7 @@ impl SolvedChart {
 /// contract or a refinement does not lower its certificate; refused when the refinement does not
 /// reach `δ_ℓ` within the rule's count. The chart is at lattice `exponent` and prior scale `scale`.
 fn settled(
-    warm: Vec<i128>,
+    warm: Vec<BigInt>,
     carried: GramBlock,
     exponent: u32,
     scale: u32,
@@ -1949,9 +2021,9 @@ fn settled(
             // The scaled identity 2^(−a)I: its residual 1 − 2^(−a)H' is contracting.
             cold = true;
             phase = 0;
-            block = vec![0i128; s * s];
+            block = vec![BigInt::zero(); s * s];
             for a in 0..s {
-                block[a * s + a] = 1i128 << (exponent - carried.norm);
+                block[a * s + a] = BigInt::one() << (exponent - carried.norm) as usize;
             }
             residual = certified(&block, &carried.coordinates, s, shift);
             continue;
@@ -1998,14 +2070,14 @@ fn settled(
 /// **One rounded refinement of a dense chart** (a test fixture's reading of the certified residual
 /// and the refinement): a symmetric chart on `2^(−exponent)ℤ` against a carried Gram, returning the
 /// refined chart with the certificates before and after. `None` when the chart is off its lattice or
-/// an entry leaves the `i128` carrier.
+/// the chart is off its declared lattice.
 #[cfg(test)]
 pub(crate) fn refined_once(
     chart: &[Vec<Rat>],
     exponent: u32,
     gram: &[Vec<Rat>],
 ) -> Option<(Vec<Vec<Rat>>, Rat, Rat)> {
-    let carried = GramBlock::of(gram, &Rat::one()).ok()?;
+    let carried = GramBlock::of(gram, &Rat::one(), None, None, None, None).ok()?;
     let s = carried.support.len();
     let scale = Rat::from_integer(BigInt::one() << exponent as usize);
     let mut block = Vec::with_capacity(s * s);
@@ -2015,7 +2087,7 @@ pub(crate) fn refined_once(
             if !coordinate.is_integer() {
                 return None;
             }
-            block.push(coordinate.to_integer().to_i128()?);
+            block.push(coordinate.to_integer());
         }
     }
     let shift = exponent + carried.exponent;
@@ -2034,7 +2106,7 @@ pub(crate) fn refined_once(
 
 /// [definition] **One normal law's solved chart at a deposit** (the lattice word; Lean
 /// `HNN/LatticeWord.prox_chart_certificate`): the chart's lattice `L_s`, the declared target `δ_ℓ`,
-/// the warm start's certificate (`None` when it left the `i128` carrier), the executed chart's
+/// the warm start's certificate, the executed chart's
 /// certificate `δ = ‖1 − X̂H'‖∞` (exact), the refinements taken and whether the chart restarted from
 /// the scaled identity; the **released prox residual** `ρ = γ G (1 − X̂H')` by its certificate
 /// `‖ρ‖∞ ≤ Σ_t |wγ| ‖g_t‖∞ ‖f_t‖₁ · δ` (exact; `prox_chart_certificate` per return, summed) and the most
@@ -2054,6 +2126,10 @@ pub struct ChartReading {
     pub residual_bits: u64,
     /// A located receiving prior's read at this deposit ([`PriorMove`]); `None` on every other law.
     pub prior: Option<PriorMove>,
+    /// Explicit additional radial force; ordinary prox residual excludes this exact term.
+    pub radial: Option<RadialPriorReading>,
+    /// Block identity and frozen operand units; None for a single normal law.
+    pub receiving_block: Option<ReceivingBlockReading>,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -2326,6 +2402,11 @@ impl NormalLaw {
         &self.chart
     }
 
+    /// Raw solved-chart coordinate payload; separate from this law's reduced logical bits.
+    pub fn chart_coordinate_storage(&self) -> ChartCoordinateStorage {
+        self.chart.coordinate_storage()
+    }
+
     /// `W`'s carried remainders, dense.
     pub fn map_remainder(&self) -> ExactRatMatrix {
         let (m, n) = (self.map.rows(), self.map.columns());
@@ -2394,8 +2475,9 @@ impl NormalLaw {
         // A paired port's deposit stays on its family (`hnn::paired`, "The paired deposit").
         if let Some(symmetry) = &self.symmetry {
             for (sample, _) in &active {
-                let outside = (0..n)
-                    .find(|&class| symmetry.columns()[class].is_none() && !sample.feature[class].is_zero());
+                let outside = (0..n).find(|&class| {
+                    symmetry.columns()[class].is_none() && !sample.feature[class].is_zero()
+                });
                 if let Some(class) = outside {
                     return Err(HnnError::PairedOutside { class });
                 }
@@ -2511,6 +2593,7 @@ impl NormalLaw {
             refinement,
             target: rule.target(),
             rule: *rule,
+            radial: None,
         }))
     }
 
@@ -2677,8 +2760,8 @@ impl LocatedPrior {
             Some(true) => {
                 // No member codes least here (Lean `HNN/PriorMove.exit_down_iterate`: half the map
                 // still codes strictly less, and `rebaseAt_add` keeps `V + a ≤ 0` through every
-                // halving), so the prior rises one member per deposit until the carrier holds it.
-                if k >= RESIDUAL_SHIFT {
+                // halving), so the prior rises one member per deposit while its exponent is representable.
+                if k == u32::MAX {
                     return Ok((0, Some(PriorHeld::Carrier)));
                 }
                 return Ok((-1, None));
@@ -2724,7 +2807,7 @@ impl LocatedPrior {
                 // lattice can carry its scale.
                 let mut j = -1i64;
                 loop {
-                    if i64::from(k) - j > i64::from(RESIDUAL_SHIFT) {
+                    if i64::from(k) - j > i64::from(u32::MAX) {
                         return Ok((0, Some(PriorHeld::Carrier)));
                     }
                     match above_low(&power(j)) {
@@ -2750,6 +2833,129 @@ pub enum PriorHeld {
     Carrier,
     NoCurvature,
     Unread,
+}
+
+/// A label-free precision event witnessing an observable carried receiving mode erased by
+/// the current publication. The exact delta reads and norm bounds describe the intended change
+/// in executed output; latent map-plus-remainder is conserved by `Constitution::rebased`.
+/// Construction and mutation are sealed; only the producer computes the event.
+/// ```compile_fail,E0616
+/// use holonics::hnn::constitution::ReceivingPrecision;
+/// fn forge_level(event: &mut ReceivingPrecision) { event.levels = 100; }
+/// ```
+#[derive(Clone, PartialEq, Eq)]
+pub struct ReceivingPrecision {
+    producer: Box<Constitution>,
+    ring: usize,
+    commit: u64,
+    levels: u32,
+    from_exponent: u32,
+    to_exponent: u32,
+    unresolved_reads: Vec<Vec<Rat>>,
+    erased_components: Vec<(usize, usize)>,
+    promoted_reads: Vec<Vec<Rat>>,
+    /// Continuous real-logit code-length change bound, in bits (twice the real-logit bound).
+    output_bounds: Vec<Rat>,
+    /// Remaining continuous code-length error bound in bits; this is compared to tolerance.
+    residual_bounds: Vec<Rat>,
+    real_logit_output_bounds: Vec<Rat>,
+    phase_output_bounds: Vec<Rat>,
+    real_logit_residual_bounds: Vec<Rat>,
+    phase_residual_bounds: Vec<Rat>,
+    tolerance: Rat,
+}
+
+impl ReceivingPrecision {
+    pub fn ring(&self) -> usize {
+        self.ring
+    }
+    pub fn commit(&self) -> u64 {
+        self.commit
+    }
+    pub fn levels(&self) -> u32 {
+        self.levels
+    }
+    pub fn from_exponent(&self) -> u32 {
+        self.from_exponent
+    }
+    pub fn to_exponent(&self) -> u32 {
+        self.to_exponent
+    }
+    pub fn unresolved_reads(&self) -> &[Vec<Rat>] {
+        &self.unresolved_reads
+    }
+    /// Exact demanded (feature index, output row) pairs. Even rows are real logits in bits;
+    /// odd rows are imaginary logits, whose receiving phase is half the value in turns.
+    /// Every listed contraction is restored; another surviving row cannot discharge it.
+    pub fn erased_components(&self) -> &[(usize, usize)] {
+        &self.erased_components
+    }
+    pub fn promoted_reads(&self) -> &[Vec<Rat>] {
+        &self.promoted_reads
+    }
+    pub fn output_bounds(&self) -> &[Rat] {
+        &self.output_bounds
+    }
+    pub fn residual_bounds(&self) -> &[Rat] {
+        &self.residual_bounds
+    }
+    pub fn real_logit_output_bounds(&self) -> &[Rat] {
+        &self.real_logit_output_bounds
+    }
+    pub fn phase_output_bounds(&self) -> &[Rat] {
+        &self.phase_output_bounds
+    }
+    pub fn real_logit_residual_bounds(&self) -> &[Rat] {
+        &self.real_logit_residual_bounds
+    }
+    pub fn phase_residual_bounds(&self) -> &[Rat] {
+        &self.phase_residual_bounds
+    }
+    pub fn tolerance(&self) -> &Rat {
+        &self.tolerance
+    }
+
+    /// A commit is a local clock, not a global material identity. Publication must match the
+    /// complete exact producer, including another constitution with the same commit number.
+    pub fn check_constitution(&self, constitution: &Constitution) -> Result<(), HnnError> {
+        if constitution.commit() != self.commit {
+            return Err(HnnError::StaleDeposit {
+                staged: self.commit,
+                published: constitution.commit(),
+            });
+        }
+        if constitution != self.producer.as_ref() {
+            return Err(HnnError::Unadmitted {
+                reason: "receiving precision belongs to a different exact producer material",
+            });
+        }
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for ReceivingPrecision {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ReceivingPrecision")
+            .field("ring", &self.ring)
+            .field("commit", &self.commit)
+            .field("levels", &self.levels)
+            .field("from_exponent", &self.from_exponent)
+            .field("to_exponent", &self.to_exponent)
+            .field("unresolved_reads", &self.unresolved_reads)
+            .field("erased_components", &self.erased_components)
+            .field("promoted_reads", &self.promoted_reads)
+            .field("output_bounds", &self.output_bounds)
+            .field("residual_bounds", &self.residual_bounds)
+            .field("real_logit_output_bounds", &self.real_logit_output_bounds)
+            .field("phase_output_bounds", &self.phase_output_bounds)
+            .field(
+                "real_logit_residual_bounds",
+                &self.real_logit_residual_bounds,
+            )
+            .field("phase_residual_bounds", &self.phase_residual_bounds)
+            .field("tolerance", &self.tolerance)
+            .finish_non_exhaustive()
+    }
 }
 
 /// [definition; agent-inferred, October 4; the prior carry's design §3] **One deposit's read of a
@@ -2797,7 +3003,17 @@ impl NormalLaw {
         if j == 0 {
             return Ok(Some((self.clone(), unmoved(held))));
         }
-        let to = u32::try_from(i64::from(k) - j).map_err(|_| ExactLinearError::ExtentOverflow)?;
+        let to = u32::try_from(i64::from(k) - j).map_err(|_| {
+            chart_extent_overflow(
+                "LocatedPrior::moved_prior.scale_to_u32",
+                Some(rule.lattice().exponent()),
+                Some(k),
+                Some(self.chart.exponent),
+                None,
+                None,
+                Some(self.chart.support.len()),
+            )
+        })?;
         let power = |e: u32| Rat::from_integer(BigInt::one() << e as usize);
         let mut gram = self.gram.clone();
         let shift = power(to) - power(k);
@@ -2885,6 +3101,208 @@ pub fn prequential_terms(samples: &[Sample], map: &ExactRatMatrix) -> Option<(Ra
         curvature += sample.weight.abs() * (second - &mean * &mean);
     }
     Some((alignment, curvature))
+}
+
+/// Read-only diagnostics for the exact prior window at its predeposit map. The producer comparison
+/// is supplied so the samples are checked against the actual combined faces and covectors rather
+/// than accepted by extent alone. `alpha_odometer` and `curvature_odometer` are the exact rational
+/// pair accumulated by the prior; `alpha_face` and `curvature_face` enclose the corresponding
+/// class-magnitude readings using the true face masses. Both curvature values are the variance
+/// coefficient `Σ |w| Var_p(δ)`; the bit-code Hessian is `ln(2)` times this coefficient. `correction_bound` is the proved
+/// `1/16 · Σ |w| min_s Σ_c p̃_c |δ_c − δ_s|` bound on the odometer/face alignment difference for
+/// `δ = Wf` in this exact predeposit map. The existing `ChartReading::prior` remains the authority
+/// for whether the later, post-prepare move was actually selected and applied.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PriorWindowDiagnostic {
+    /// Exact predeposit alignment `Σ w ⟨q − p̃, Wf⟩`, in the prior's `A₀` units.
+    pub alpha_odometer: Rat,
+    /// A nonnegative, exact rational certificate for `|alpha_face − alpha_odometer|`.
+    pub correction_bound: Rat,
+    /// Exact-face magnitude alignment enclosure, with `p̂` read from each combined `Face`.
+    pub alpha_face: crate::ratio::algebraic::ExactInterval,
+    /// Exact prior variance coefficient `Σ |w| Var_p̃(Wf)` (the bit-code Hessian adds `ln(2)`).
+    pub curvature_odometer: Rat,
+    /// True-face variance coefficient `Σ |w| Var_p̂(Wf)`, enclosed using exact face-mass arithmetic;
+    /// the bit-code Hessian is `ln(2)` times this value.
+    pub curvature_face: crate::ratio::algebraic::ExactInterval,
+}
+
+/// Diagnose one receiving prior window without changing the material, samples or comparison.
+///
+/// `samples[j]` must be the receiving linear sample produced by `comparison`, and `comparison`
+/// must be that same predeposit `HolonRatio` whose combined faces generated the deposit. This is
+/// checked by the complete covector equality, by equality of the sample's odometer masses with
+/// the corresponding `Face::odometer_masses`, and by checking the reconstructed observed masses
+/// `q = p̃ + g` are a distribution. `map` must be the receiving map in force when that comparison
+/// was produced. No prior selection is recomputed here; the applied/held movement is already read
+/// by `ChartReading::prior` after the deposit.
+pub fn prior_window_diagnostic(
+    samples: &[Sample],
+    map: &ExactRatMatrix,
+    comparison: &crate::hnn::ratio::HolonRatio,
+) -> Result<PriorWindowDiagnostic, HnnError> {
+    use crate::ratio::algebraic::{ExactInterval, interval_difference, interval_sum};
+
+    let faces = &comparison.faces().faces;
+    if faces.len() != samples.len() {
+        return Err(HnnError::Shape {
+            what: "one exact combined producing face per prior-window sample",
+            expected: faces.len(),
+            found: samples.len(),
+        });
+    }
+    let comparison_covector = comparison.covector()?;
+    let (rows, columns) = (map.rows(), map.columns());
+    let sixteen = Rat::from_integer(BigInt::from(16));
+    let mut correction_bound = Rat::zero();
+    let (mut alpha_face, mut curvature_face) = (
+        ExactInterval::point(Rat::zero()),
+        ExactInterval::point(Rat::zero()),
+    );
+
+    let scale_interval =
+        |interval: &ExactInterval, scale: &Rat| -> Result<ExactInterval, HnnError> {
+            let low = &interval.lower * scale;
+            let high = &interval.upper * scale;
+            if scale.is_negative() {
+                Ok(ExactInterval::new(high, low)?)
+            } else {
+                Ok(ExactInterval::new(low, high)?)
+            }
+        };
+    let square_interval = |interval: &ExactInterval| -> Result<ExactInterval, HnnError> {
+        let low_square = &interval.lower * &interval.lower;
+        let high_square = &interval.upper * &interval.upper;
+        let lower = if !interval.lower.is_positive() && !interval.upper.is_negative() {
+            Rat::zero()
+        } else {
+            low_square.clone().min(high_square.clone())
+        };
+        Ok(ExactInterval::new(lower, low_square.max(high_square))?)
+    };
+
+    for (index, (sample, face)) in samples.iter().zip(faces).enumerate() {
+        if sample.feature.len() != columns
+            || sample.covector.len() != rows
+            || rows != 2 * face.cells().len()
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a prior-window sample, map and combined face have the same class and feature extent",
+            });
+        }
+        let actual_gradient = comparison_covector
+            .logits()
+            .get(index)
+            .ok_or(HnnError::Shape {
+                what: "one comparison covector per receiving sample",
+                expected: samples.len(),
+                found: comparison_covector.logits().len(),
+            })?;
+        if actual_gradient.len() != rows
+            || sample
+                .covector
+                .iter()
+                .zip(actual_gradient)
+                .any(|(sampled, compared)| sampled != &(-compared))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a prior-window covector is the negated covector of its supplied HolonRatio",
+            });
+        }
+
+        let Some(masses) = face_masses(sample) else {
+            return Err(HnnError::Unadmitted {
+                reason: "a prior-window sample carries or identifies its producing odometer masses",
+            });
+        };
+        let face_masses = face.odometer_masses()?;
+        if masses != face_masses {
+            return Err(HnnError::Unadmitted {
+                reason: "a prior-window sample's odometer masses match its actual combined producing face",
+            });
+        }
+        let observed: Vec<Rat> = masses
+            .iter()
+            .enumerate()
+            .map(|(class, mass)| mass + &sample.covector[2 * class])
+            .collect();
+        if observed.iter().any(Signed::is_negative) || observed.iter().sum::<Rat>() != Rat::one() {
+            return Err(HnnError::Unadmitted {
+                reason: "the prior-window covector reconstructs a nonnegative observed mass distribution",
+            });
+        }
+
+        let delta: Vec<Rat> = (0..face.cells().len())
+            .map(|class| {
+                (0..columns)
+                    .map(|column| {
+                        map.get(2 * class, column).expect("map extent checked")
+                            * &sample.feature[column]
+                    })
+                    .sum()
+            })
+            .collect();
+        // The same cell-spread certificate used by the executed smooth-face correction, now at
+        // the actual predeposit read `Wf` accumulated into the prior rather than at a proposed
+        // SGD unit direction.
+        let spread = (0..masses.len())
+            .map(|reference| {
+                masses
+                    .iter()
+                    .zip(&delta)
+                    .map(|(mass, value)| mass * (value - &delta[reference]).abs())
+                    .sum::<Rat>()
+            })
+            .min()
+            .ok_or(HnnError::Unadmitted {
+                reason: "a prior-window face has at least one class",
+            })?;
+        correction_bound += sample.weight.abs() * spread / &sixteen;
+
+        if sample.weight.is_zero() {
+            continue;
+        }
+        let mut mean = ExactInterval::point(Rat::zero());
+        let mut second = ExactInterval::point(Rat::zero());
+        for class in 0..face.cells().len() {
+            let exact_mass = face.mass(class)?.enclosure()?;
+            let q_minus_face =
+                interval_difference(&ExactInterval::point(observed[class].clone()), &exact_mass)?;
+            alpha_face = interval_sum(
+                &alpha_face,
+                &scale_interval(&q_minus_face, &(&sample.weight * &delta[class]))?,
+            )?;
+            mean = interval_sum(&mean, &scale_interval(&exact_mass, &delta[class])?)?;
+            second = interval_sum(
+                &second,
+                &scale_interval(&exact_mass, &(&delta[class] * &delta[class]))?,
+            )?;
+        }
+        let raw_variance = interval_difference(&second, &square_interval(&mean)?)?;
+        if raw_variance.upper.is_negative() {
+            return Err(HnnError::Unadmitted {
+                reason: "the exact true-face variance enclosure is nonnegative",
+            });
+        }
+        let variance = ExactInterval::new(raw_variance.lower.max(Rat::zero()), raw_variance.upper)?;
+        curvature_face = interval_sum(
+            &curvature_face,
+            &scale_interval(&variance, &sample.weight.abs())?,
+        )?;
+    }
+
+    let Some((alpha_odometer, curvature_odometer)) = prequential_terms(samples, map) else {
+        return Err(HnnError::Unadmitted {
+            reason: "the prior-window samples are not exact receiving face covectors",
+        });
+    };
+    Ok(PriorWindowDiagnostic {
+        alpha_odometer,
+        correction_bound,
+        alpha_face,
+        curvature_odometer,
+        curvature_face,
+    })
 }
 
 /// [definition; agent-inferred, October 8] **A receiving sample's face masses `p̃`**: the descent
@@ -3028,6 +3446,33 @@ pub(crate) fn absorb_phase(
     Ok(())
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReceivingBlockReading {
+    pub index: usize,
+    pub operand_scale: Rat,
+}
+
+/// The additional exact terms of a current-window radial receiving update.
+/// These are forces in the generalized balance, not inverse-chart residuals.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RadialPriorReading {
+    pub proposed_factor: Rat,
+    pub realized_step: Rat,
+    /// The explicitly realized eta*(x-1)*W_t, before lattice carry effects.
+    pub displacement: ExactRatMatrix,
+    /// Extra exact term eta*(x-1)*W_t*H' in the generalized normal-law balance.
+    pub gram_balance: ExactRatMatrix,
+    /// W_t times the explicitly changed ridge, separate from the observed Gram update.
+    pub ridge_balance: ExactRatMatrix,
+}
+
+struct RadialPriorProposal {
+    factor: Rat,
+    direction: ExactRatMatrix,
+    movement: PriorMove,
+    ridge_balance: ExactRatMatrix,
+}
+
 /// [definition; agent-inferred] **A normal law's step prepared at its unit step**
 /// ([`NormalLaw::prepare`]): the law with its Gram and chart carried (its map not yet moved), the
 /// unit step `D` in the integral chart, its alignment `a`, its feature moves `b`, the lattice's
@@ -3044,6 +3489,7 @@ pub(crate) struct PreparedStep {
     refinement: Refinement,
     target: Rat,
     rule: ChartRule,
+    radial: Option<RadialPriorProposal>,
 }
 
 impl PreparedStep {
@@ -3074,6 +3520,7 @@ impl PreparedStep {
         }
         let released = next.chart.certificate() * step * &self.shares;
         let reading = ChartReading {
+            receiving_block: None,
             exponent: next.chart.exponent(),
             target: self.target,
             warm: self.refinement.warm,
@@ -3083,7 +3530,21 @@ impl PreparedStep {
             read: self.rule.read(&released),
             released,
             residual_bits: self.refinement.residual_bits,
-            prior: None,
+            prior: self.radial.as_ref().map(|p| p.movement.clone()),
+            radial: self
+                .radial
+                .map(|p| {
+                    let displacement = rate_matrix(step, &p.direction)?;
+                    let gram_balance = displacement.multiply(&rows_matrix(&next.gram))?;
+                    Ok::<_, HnnError>(RadialPriorReading {
+                        proposed_factor: p.factor,
+                        realized_step: step.clone(),
+                        displacement,
+                        gram_balance,
+                        ridge_balance: p.ridge_balance,
+                    })
+                })
+                .transpose()?,
         };
         Ok((next, reading))
     }
@@ -3218,7 +3679,7 @@ struct RingMaterial {
     source: Option<NormalLaw>,
     pairs: Vec<(usize, PairPort)>,
     pair_scale: Rat,
-    receiving: Option<NormalLaw>,
+    receiving: Option<ReceivingMaterial>,
     /// The receiving parametron's landmark tree (`compression::landmark::context`), on a receiving ring.
     tree: Option<Landmarks>,
     /// The receiver's population over the tree's face and the combined face (ruling A; THE_REBUILD
@@ -3920,7 +4381,10 @@ fn locus_code(kind: u64, index: usize, part: usize) -> u64 {
 /// prior `B_0 = E_0` its normal law keeps ([`Constitution::initial`]), declared by the field alone:
 /// every opening of one field holds it, so a learned part `E − E_0` is read against it
 /// (`hnn::executed::pair_deposit`; the release's pair contacts, `hnn::prediction`).
-pub fn declared_source_port(field: &Field, ring: usize) -> Result<Option<ExactRatMatrix>, HnnError> {
+pub fn declared_source_port(
+    field: &Field,
+    ring: usize,
+) -> Result<Option<ExactRatMatrix>, HnnError> {
     if !field.is_source(ring) {
         return Ok(None);
     }
@@ -4264,7 +4728,7 @@ impl Constitution {
     /// bit it moves: the located failure read the old prior's reading `R_0 z` alone at `10 + 9/16 +
     /// ε` bits a cell, a share in `[51/56, 3713/4077]` of the held-out logits' energy. With `E_0 = 0`
     /// and `e_ρ = 0` as well, the source moment `m̃`, the open, every wave and every feature
-    /// `f = P_R^(τ_R) v_R` would be zero, so `R`'s step `G = Σ γ g fᵀ` and every upstream covector
+    /// `f = v_R` (the passage frame) would be zero, so `R`'s step `G = Σ γ g fᵀ` and every upstream covector
     /// `Rᵀ g` would vanish at every commit: the chain of maps needs one nonzero member to carry a
     /// covector. `E_0` takes the sign sequence's pattern at the value `R_0` had. Its normal law keeps
     /// the prior's reading (`B_0 = E_0`), a fixed feature map that `R` reads, not a term of the
@@ -4305,7 +4769,17 @@ impl Constitution {
                 .receivers()
                 .iter()
                 .find(|receiver| receiver.ring == g)
-                .map(|receiver| Ok(Landmarks::new(landmark_declaration(field, receiver)?)?))
+                .map(|receiver| {
+                    let declaration = landmark_declaration(field, receiver)?;
+                    Ok(match field.receiving_context(g) {
+                        Some(partition) => Landmarks::new_observed(
+                            declaration,
+                            partition.outcome_bits(field, g),
+                            partition.role(),
+                        )?,
+                        None => Landmarks::new(declaration)?,
+                    })
+                })
                 .transpose()
         };
         // The standing founded as a standing wave with declared lobes (module header, "The
@@ -4370,8 +4844,9 @@ impl Constitution {
                 let receiving = receivers
                     .get(&g)
                     .map(|&prior| {
-                        ExactRatMatrix::zero(2 * a, n)
-                            .map(|map| NormalLaw::with_receiving_prior(map, prior))
+                        ExactRatMatrix::zero(2 * a, n).map(|map| {
+                            ReceivingMaterial::Single(NormalLaw::with_receiving_prior(map, prior))
+                        })
                     })
                     .transpose()?;
                 Ok(RingMaterial {
@@ -4478,17 +4953,156 @@ impl Constitution {
 
     /// Ring `g`'s receiving-map normal law `R`.
     pub fn receiving_law(&self, ring: usize) -> Option<&NormalLaw> {
-        self.rings[ring].receiving.as_ref()
+        self.rings[ring]
+            .receiving
+            .as_ref()
+            .and_then(ReceivingMaterial::single)
+    }
+
+    /// Explicit receiving operand layout; a paired map is never inferred from its width.
+    pub fn receiving_layout(&self, ring: usize) -> Option<ReceivingLayout> {
+        self.rings
+            .get(ring)?
+            .receiving
+            .as_ref()
+            .map(ReceivingMaterial::layout)
+    }
+    pub fn receiving_blocks(&self, ring: usize) -> Option<&[ReceivingBlock; 2]> {
+        self.rings.get(ring)?.receiving.as_ref()?.blocks()
+    }
+    /// Full phase statistics. Paired statistics use the frozen normalized operand chart.
+    pub fn receiving_phase_statistics(&self, ring: usize) -> Option<&PhaseStatistics> {
+        self.rings.get(ring)?.receiving.as_ref()?.phase_statistics()
+    }
+    /// Normalize an actual full physical operand for the phase-family consumer.
+    /// A zero unfounded block remains zero; no missing context is synthesized.
+    pub fn receiving_phase_feature(
+        &self,
+        ring: usize,
+        physical: &[Rat],
+    ) -> Result<Vec<Rat>, HnnError> {
+        let owner = self
+            .rings
+            .get(ring)
+            .and_then(|r| r.receiving.as_ref())
+            .ok_or(HnnError::MissingReceivingMap { ring })?;
+        if physical.len() != owner.map().columns() {
+            return Err(HnnError::Shape {
+                what: "the complete receiving phase operand",
+                expected: owner.map().columns(),
+                found: physical.len(),
+            });
+        }
+        let Some(blocks) = owner.blocks() else {
+            return Ok(physical.to_vec());
+        };
+        let mut normalized = Vec::with_capacity(physical.len());
+        let mut offset = 0;
+        for block in blocks {
+            let feature = &physical[offset..offset + block.width()];
+            match block.chart() {
+                Some(chart) => normalized.extend(chart.feature(feature)?),
+                None if feature.iter().all(Zero::is_zero) => normalized.extend_from_slice(feature),
+                None => {
+                    return Err(HnnError::Unadmitted {
+                        reason: "an unfounded receiving block has no nonzero phase operand chart",
+                    });
+                }
+            }
+            offset += block.width();
+        }
+        Ok(normalized)
+    }
+    /// A phase family in the normalized coordinates returned by receiving_phase_feature.
+    /// The tolerance is the caller's total phase-family tolerance, not silently per-cell.
+    pub fn receiving_phase_family(
+        &self,
+        ring: usize,
+        tolerance: &Rat,
+    ) -> Result<Option<crate::hnn::phase_family::PhaseFamily>, HnnError> {
+        let owner = self
+            .rings
+            .get(ring)
+            .and_then(|r| r.receiving.as_ref())
+            .ok_or(HnnError::MissingReceivingMap { ring })?;
+        let Some(statistics) = owner.phase_statistics() else {
+            return Ok(None);
+        };
+        let ridge = owner
+            .laws()
+            .iter()
+            .flat_map(|law| {
+                std::iter::repeat_n(
+                    Rat::from_integer(BigInt::one() << law.prior_scale() as usize),
+                    law.map.columns(),
+                )
+            })
+            .collect::<Vec<_>>();
+        statistics.family_with_diagonal_ridge(&ridge,tolerance).map(Some).map_err(|_|HnnError::Unadmitted {reason:"the receiving phase family refuses its declared diagonal ridge or tolerance"})
+    }
+
+    /// Declare separate arrival/context preconditioners on a pristine receiving map.
+    /// The zero physical publication is widened, while no learned material is migrated.
+    pub fn bind_arrival_context_receiving(&mut self, ring: usize) -> Result<(), HnnError> {
+        let old = self
+            .rings
+            .get(ring)
+            .and_then(|r| r.receiving.as_ref())
+            .and_then(ReceivingMaterial::single)
+            .ok_or(HnnError::MissingReceivingMap { ring })?;
+        let prior = old.receiving_prior().ok_or(HnnError::Unadmitted {
+            reason: "paired receiving requires a founding receiving prior",
+        })?;
+        let mut pristine = NormalLaw::with_receiving_prior(
+            ExactRatMatrix::zero(old.map.rows(), old.map.columns())?,
+            prior,
+        );
+        pristine.carrier = old.carrier;
+        if old != &pristine {
+            return Err(HnnError::Unadmitted {
+                reason: "arrival/context layout can only bind a pristine receiving law",
+            });
+        }
+        let width = old.map.columns();
+        let mut full = NormalLaw::with_receiving_prior(
+            ExactRatMatrix::zero(
+                old.map.rows(),
+                width.checked_mul(2).ok_or(HnnError::CountOverflow)?,
+            )?,
+            prior,
+        );
+        full.carrier = old.carrier;
+        let owner = ReceivingMaterial::arrival_context(full, width, width)?;
+        let mut next = self.clone();
+        next.rings[ring].receiving = Some(owner);
+        let bits = next.exact_bits();
+        if bits > self.budget {
+            return Err(HnnError::ConstitutionBudget {
+                bits,
+                budget: self.budget,
+                commit: self.commit,
+                loci: vec![Locus::ReceivingMap(ring)],
+            });
+        }
+        next.commit = next.commit.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        *self = next;
+        Ok(())
     }
 
     /// Bind the observer's own pristine law. The caller verifies freshness and the complete
     /// observation identity first; no existing statistics are migrated or reset here.
     pub(crate) fn bind_source_observer_receiving(&mut self, ring: usize) -> Result<(), HnnError> {
         let commit = self.commit.checked_add(1).ok_or(HnnError::CountOverflow)?;
-        let law = self.rings.get_mut(ring).and_then(|r| r.receiving.as_mut())
+        let law = self
+            .rings
+            .get_mut(ring)
+            .and_then(|r| r.receiving.as_mut())
+            .and_then(ReceivingMaterial::single_mut)
             .ok_or(HnnError::MissingReceivingMap { ring })?;
         if law.carrier != crate::hnn::receiving::ReceivingCarrier::Anchor {
-            return Err(HnnError::Unadmitted { reason: "a receiving law already bound to another carrier" });
+            return Err(HnnError::Unadmitted {
+                reason: "a receiving law already bound to another carrier",
+            });
         }
         law.carrier = crate::hnn::receiving::ReceivingCarrier::SourceObserver;
         self.commit = commit;
@@ -4503,7 +5117,12 @@ impl Constitution {
         let mut theta = self.clone();
         for material in &mut theta.rings {
             if let Some(law) = material.receiving.take() {
-                material.receiving = Some(law.with_located(None));
+                material.receiving = Some(match law {
+                    ReceivingMaterial::Single(law) => {
+                        ReceivingMaterial::Single(law.with_located(None))
+                    }
+                    other => other,
+                });
             }
         }
         theta
@@ -4965,9 +5584,21 @@ impl Constitution {
             let prior = material
                 .receiving
                 .as_ref()
+                .and_then(ReceivingMaterial::single)
                 .and_then(NormalLaw::receiving_prior)
                 .unwrap_or(0);
-            material.receiving = Some(NormalLaw::with_receiving_prior(receiving, prior));
+            if material
+                .receiving
+                .as_ref()
+                .is_some_and(|m| m.blocks().is_some())
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "a paired receiving material cannot be replaced by an unqualified single map",
+                });
+            }
+            material.receiving = Some(ReceivingMaterial::Single(NormalLaw::with_receiving_prior(
+                receiving, prior,
+            )));
         }
         Ok(self)
     }
@@ -5210,6 +5841,38 @@ impl Constitution {
         loci
     }
 
+    /// Stored solved-chart blocks by normal-law locus, including any released locus whose
+    /// material remains stored. This is a payload census, unlike the retained logical bit budget.
+    pub fn chart_coordinate_storage_by_locus(&self) -> Vec<(LinearLocus, ChartCoordinateStorage)> {
+        let mut readings = Vec::new();
+        for (ring, material) in self.rings.iter().enumerate() {
+            readings.push((
+                LinearLocus::Contrast(ring),
+                material.contrast.chart_coordinate_storage(),
+            ));
+            if let Some(law) = &material.source {
+                readings.push((
+                    LinearLocus::SourcePort(ring),
+                    law.chart_coordinate_storage(),
+                ));
+            }
+            if let Some(law) = &material.receiving {
+                readings.push((LinearLocus::Receiving(ring), law.chart_coordinate_storage()));
+            }
+        }
+        readings
+    }
+
+    /// Sum all stored normal-law chart-coordinate payload readings. Does not claim total model
+    /// allocation: maps, Grams, carries, trees, support, certificates and allocator overhead differ.
+    pub fn chart_coordinate_storage(&self) -> ChartCoordinateStorage {
+        let mut total = ChartCoordinateStorage::default();
+        for (_, reading) in self.chart_coordinate_storage_by_locus() {
+            total.add(&reading);
+        }
+        total
+    }
+
     /// **The constitution's exact bits** per retained locus: the sum of its carriers.
     pub fn bits_by_locus(&self) -> Vec<(Locus, u64)> {
         self.carrier_bits_by_locus()
@@ -5260,7 +5923,6 @@ impl Constitution {
             for (locus, law) in [
                 (Locus::Element(g), Some(&material.contrast)),
                 (Locus::SourcePort(g), material.source.as_ref()),
-                (Locus::ReceivingMap(g), material.receiving.as_ref()),
             ] {
                 if let Some(law) = law {
                     for (array, carry) in [
@@ -5275,6 +5937,16 @@ impl Constitution {
                         );
                     }
                 }
+            }
+        }
+        for (g, material) in self.rings.iter().enumerate() {
+            if let Some(receiving) = &material.receiving {
+                carried.extend(
+                    receiving
+                        .carried_remainders()
+                        .into_iter()
+                        .map(|(array, entry, value)| (Locus::ReceivingMap(g), array, entry, value)),
+                );
             }
         }
         carried
@@ -5368,9 +6040,16 @@ impl Constitution {
                 }
                 (_, Carrier::Map | Carrier::Gram) => {
                     let material = &mut exact.rings[ring];
+                    if matches!(locus, Locus::ReceivingMap(_)) {
+                        material
+                            .receiving
+                            .as_mut()
+                            .ok_or(HnnError::MissingReceivingMap { ring })?
+                            .add_remainder(array, entry, &r)?;
+                        continue;
+                    }
                     let law = match locus {
                         Locus::SourcePort(_) => material.source.as_mut(),
-                        Locus::ReceivingMap(_) => material.receiving.as_mut(),
                         _ => Some(&mut material.contrast),
                     }
                     .ok_or(HnnError::MissingSourcePort { ring })?;
@@ -5412,16 +6091,15 @@ impl Constitution {
         }
         exact.carries.clear();
         for material in &mut exact.rings {
-            for law in [
-                Some(&mut material.contrast),
-                material.source.as_mut(),
-                material.receiving.as_mut(),
-            ]
-            .into_iter()
-            .flatten()
+            for law in [Some(&mut material.contrast), material.source.as_mut()]
+                .into_iter()
+                .flatten()
             {
                 law.map_carry = Carry::default();
                 law.gram_carry = Carry::default();
+            }
+            if let Some(receiving) = &mut material.receiving {
+                receiving.clear_carries()?;
             }
         }
         Ok(exact)
@@ -5456,7 +6134,8 @@ impl Constitution {
     /// A channel's lattice is read only by its deposits, so its re-base is this move alone. The ring
     /// loci also read their lattice outside the deposit (the solved charts' rule, the founding
     /// modulus, the standing's fine half unit, the resonator's Floquet grain), and their re-base is
-    /// refused ([`HnnError::RebaseLocus`]); a released channel is refused
+    /// refused except the receiving map, whose Gram chart is re-certified while its prior and
+    /// phase statistics remain unchanged. Other ring loci return [`HnnError::RebaseLocus`]; a released locus is refused
     /// ([`HnnError::ReleasedLocus`]).
     ///
     /// [definition; agent-inferred] A re-base by `j > 0` levels is published as a commit, since an
@@ -5478,6 +6157,9 @@ impl Constitution {
         levels: u32,
         retained: &BTreeSet<Locus>,
     ) -> Result<Self, HnnError> {
+        if let Locus::ReceivingMap(ring) = locus {
+            return self.rebased_receiving(ring, levels, retained);
+        }
         let Locus::Channel(contact) = locus else {
             return Err(HnnError::RebaseLocus { locus });
         };
@@ -5549,6 +6231,242 @@ impl Constitution {
             certify_storage_growth(&self.storage_forms()?, &next.storage_forms()?)?
                 .ok_or(HnnError::UncertifiedStorage)?;
         next.storage_product = &self.storage_product * (Rat::one() + &storage_growth);
+        let mut counted = retained.clone();
+        counted.insert(locus);
+        let bits = next.bits_within(&counted);
+        if bits > self.budget {
+            return Err(HnnError::ConstitutionBudget {
+                bits,
+                budget: self.budget,
+                commit: self.commit,
+                loci: vec![locus],
+            });
+        }
+        next.commit += 1;
+        Ok(next)
+    }
+
+    /// Find the least refinement restoring every erased output component of the supplied
+    /// features: published contraction zero, retained exact contraction nonzero. Real and
+    /// imaginary rows are independent demands, even when another row already survives. Features are
+    /// actual rotated receiver operands (or declared differences thereof), never target labels.
+    /// This detects lost observability, rather than comparing a latent effect to a fixed absolute
+    /// classification tolerance. A nonzero existing map may still erase one of these modes.
+    pub fn receiving_precision_event(
+        &self,
+        ring: usize,
+        features: &[Vec<Rat>],
+        tolerance: &Rat,
+    ) -> Result<Option<ReceivingPrecision>, HnnError> {
+        if !tolerance.is_positive() {
+            return Err(HnnError::Unadmitted {
+                reason: "receiving precision requires a positive declared output tolerance",
+            });
+        }
+        let locus = Locus::ReceivingMap(ring);
+        let law = self
+            .rings
+            .get(ring)
+            .and_then(|r| r.receiving.as_ref())
+            .ok_or(HnnError::MissingReceivingMap { ring })?;
+        let remainder = law.map_remainder()?;
+        let mut erased = Vec::new();
+        let mut unresolved_reads = Vec::new();
+        for (index, feature) in features.iter().enumerate() {
+            let published = law.map().apply(feature)?;
+            let unresolved = remainder.apply(feature)?;
+            for (row, (visible, retained)) in published.iter().zip(&unresolved).enumerate() {
+                if visible.is_zero() && !retained.is_zero() {
+                    erased.push((index, row));
+                }
+            }
+            unresolved_reads.push(unresolved);
+        }
+        if erased.is_empty() {
+            return Ok(None);
+        }
+        let from_exponent = self.lattice(locus)?.exponent();
+        let mut levels = 0u32;
+        loop {
+            levels = levels.checked_add(1).ok_or(HnnError::Rebase {
+                exponent: from_exponent,
+                levels,
+                staged: 0,
+            })?;
+            let to_exponent = from_exponent.checked_add(levels).ok_or(HnnError::Rebase {
+                exponent: from_exponent,
+                levels,
+                staged: 0,
+            })?;
+            let finer = Lattice::new(to_exponent);
+            let delta = law.promoted_remainder(&finer)?;
+            let promoted_reads = features
+                .iter()
+                .map(|feature| delta.apply(feature))
+                .collect::<Result<Vec<_>, _>>()?;
+            // Each demanded component must separate its actual retained value from zero.
+            // The strict residual bound is in that component's own units; dividing odd rows
+            // by two gives exactly the same inequality in turns. This does not invent a turn
+            // tolerance from the real-code tolerance and does not demand exact dyadic phases.
+            if erased.iter().any(|&(index, row)| {
+                let retained = &unresolved_reads[index][row];
+                let promoted = &promoted_reads[index][row];
+                promoted.is_zero() || (retained - promoted).abs() >= retained.abs()
+            }) {
+                continue;
+            }
+            let row_bounds = |difference: bool, parity: usize| -> Rat {
+                (parity..delta.rows())
+                    .step_by(2)
+                    .map(|row| {
+                        if difference {
+                            remainder
+                                .row(row)
+                                .expect("matrix row")
+                                .iter()
+                                .zip(delta.row(row).expect("matrix row"))
+                                .map(|(held, published)| (held - published).abs())
+                                .sum::<Rat>()
+                        } else {
+                            delta
+                                .row(row)
+                                .expect("matrix row")
+                                .iter()
+                                .map(Signed::abs)
+                                .sum::<Rat>()
+                        }
+                    })
+                    .max()
+                    .unwrap_or_else(Rat::zero)
+            };
+            let feature_bounds: Vec<Rat> = features
+                .iter()
+                .map(|feature| {
+                    feature
+                        .iter()
+                        .map(Signed::abs)
+                        .max()
+                        .unwrap_or_else(Rat::zero)
+                })
+                .collect();
+            let bound = |operator: Rat| -> Vec<Rat> {
+                feature_bounds
+                    .iter()
+                    .map(|feature| &operator * feature)
+                    .collect()
+            };
+            let real_logit_output_bounds = bound(row_bounds(false, 0));
+            let phase_output_bounds = bound(row_bounds(false, 1) / crate::ratio::integer(2));
+            let real_logit_residual_bounds = bound(row_bounds(true, 0));
+            let phase_residual_bounds = bound(row_bounds(true, 1) / crate::ratio::integer(2));
+            // Real exponents have units bits; imaginary logits/2 have units turns. For the
+            // continuous softmax code, shared log-normalizer variation contributes another delta,
+            // so a uniform real-logit error delta bounds code-length error by 2*delta.
+            // These are not claims about the discontinuous grain-cell decision; exact delta
+            // vectors and the published Face remain available to that consumer. No phase tolerance
+            // is inferred from a code-length tolerance; phase errors are reported in turns only.
+            let output_bounds: Vec<Rat> = real_logit_output_bounds
+                .iter()
+                .map(|x| crate::ratio::integer(2) * x)
+                .collect();
+            let residual_bounds: Vec<Rat> = real_logit_residual_bounds
+                .iter()
+                .map(|x| crate::ratio::integer(2) * x)
+                .collect();
+            if residual_bounds.iter().any(|bound| bound > tolerance) {
+                continue;
+            }
+            return Ok(Some(ReceivingPrecision {
+                producer: Box::new(self.clone()),
+                ring,
+                commit: self.commit,
+                levels,
+                from_exponent,
+                to_exponent,
+                unresolved_reads,
+                erased_components: erased,
+                promoted_reads,
+                output_bounds,
+                residual_bounds,
+                real_logit_output_bounds,
+                phase_output_bounds,
+                real_logit_residual_bounds,
+                phase_residual_bounds,
+                tolerance: tolerance.clone(),
+            }));
+        }
+    }
+
+    /// Refine a receiving law's representation without adding a sample or rescaling its prior.
+    /// Both W+r_W and H+r_H are conserved exactly. Published W can change; callers must account
+    /// for that output change. For any feature z, its exact delta is (W'-W)z and is bounded by
+    /// max_i sum_j |W'ij-Wij| times max_j |z_j|. Ring rotations preserve this bound because they
+    /// permute realified coordinates. No arbitrary feature-rechart invariance is asserted.
+    fn rebased_receiving(
+        &self,
+        ring: usize,
+        levels: u32,
+        retained: &BTreeSet<Locus>,
+    ) -> Result<Self, HnnError> {
+        let locus = Locus::ReceivingMap(ring);
+        if self.released.contains(&locus) {
+            return Err(HnnError::ReleasedLocus { locus });
+        }
+        if levels == 0 {
+            return Ok(self.clone());
+        }
+        let mut next = self.clone();
+        let old_lattice = self.lattice(locus)?;
+        let mut finer = Lattice::new(old_lattice.exponent().checked_add(levels).ok_or(
+            HnnError::Rebase {
+                exponent: old_lattice.exponent(),
+                levels,
+                staged: 0,
+            },
+        )?);
+        let material = next
+            .rings
+            .get_mut(ring)
+            .ok_or(HnnError::Lattice { locus })?;
+        let receiving = material
+            .receiving
+            .as_mut()
+            .ok_or(HnnError::MissingReceivingMap { ring })?;
+        let active = receiving.blocks().map(|blocks| {
+            blocks
+                .iter()
+                .map(|b| b.chart().is_some())
+                .collect::<Vec<_>>()
+        });
+        for (index, law) in receiving.laws_mut().into_iter().enumerate() {
+            if active.as_ref().is_some_and(|active| !active[index]) {
+                continue;
+            }
+            let mut at = BudgetedCarry::new(old_lattice, self.clock(locus));
+            let (rows, columns) = (law.map.rows(), law.map.columns());
+            let mut map = law.map.entries().to_vec();
+            let mut gram: Vec<Rat> = law.gram.iter().flatten().cloned().collect();
+            at.rebase(
+                levels,
+                &mut [
+                    (&mut law.map_carry, map.as_mut_slice()),
+                    (&mut law.gram_carry, gram.as_mut_slice()),
+                ],
+            )?;
+            law.map = flat_matrix(rows, columns, map)?;
+            law.gram = gram.chunks(columns).map(<[Rat]>::to_vec).collect();
+            let signature = inertia(&crate::hnn::contact::symmetric(&rows_matrix(&law.gram))?);
+            if signature.positive != columns {
+                return Err(HnnError::Unadmitted {
+                    reason: "a refined receiving Gram must remain positive definite",
+                });
+            }
+            let rule = ChartRule::new(at.lattice(), self.grain);
+            law.chart = law.chart.moved(&law.gram, law.chart.scale, &rule)?.0;
+            finer = at.lattice();
+        }
+        receiving.rebuild_published()?;
+        next.lattices.insert(locus, finer);
         let mut counted = retained.clone();
         counted.insert(locus);
         let bits = next.bits_within(&counted);
@@ -5936,7 +6854,7 @@ impl Constitution {
     fn certify_steps(
         &self,
         reach: Option<&Reach>,
-        linear: &[(Locus, LinearLocus, &PreparedStep)],
+        linear: &[(Locus, LinearLocus, PreparedDirectionRef<'_>)],
         factors: &[(Locus, &FactorPrepared)],
         loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
         source: StepSource<'_>,
@@ -6016,6 +6934,19 @@ impl Constitution {
                 .map(|()| (BTreeMap::new(), None, None, None)));
         }
         let reach = reach.ok_or(HnnError::MissingReach)?;
+        if !matches!(source, StepSource::Candidate { .. })
+            && matches!(
+                self.receiving_layout(reach.receiver),
+                Some(ReceivingLayout::ArrivalContext { .. })
+            )
+            && parts
+                .iter()
+                .any(|(locus, ..)| *locus != Locus::ReceivingMap(reach.receiver))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "paired receiving shared-material steps require the joined source/context propagation gain certificate",
+            });
+        }
         // A declared boost is refused where the word reads its channel's transit (`Reach::loci`,
         // record B §8): a released channel's stiffness is zero, so its signature signs nothing.
         if let Some(contact) = (0..self.contacts.len()).find(|&contact| {
@@ -6057,14 +6988,18 @@ impl Constitution {
             && !parts.iter().any(|(locus, family, _)| {
                 *locus == Locus::ReceivingMap(reach.receiver) && *family == Family::Map
             });
-        let rings = if loaded.is_some() { Vec::new() } else { self.ring_reaches(span, |ring| {
-            reach.reads_ring(ring)
-                && !(silent
-                    && self.rings[ring]
-                        .resonator
-                        .as_ref()
-                        .is_some_and(|law| law.saturation().is_some() && !pumped(law)))
-        })? };
+        let rings = if loaded.is_some() {
+            Vec::new()
+        } else {
+            self.ring_reaches(span, |ring| {
+                reach.reads_ring(ring)
+                    && !(silent
+                        && self.rings[ring]
+                            .resonator
+                            .as_ref()
+                            .is_some_and(|law| law.saturation().is_some() && !pumped(law)))
+            })?
+        };
         let factors = (!rings.is_empty()).then(|| Self::factors_of(&rings, span));
         let mut held = Vec::new();
         if !rings.is_empty() {
@@ -6208,13 +7143,21 @@ impl Constitution {
                 }
             };
         let loaded_read = |steps: &[Option<CertifiedStep>]| {
-            loaded.map(|spans| {
-                let forms = channel_base.iter().enumerate().map(|(a,(c,k))| (
-                    square_ray(steps,(Locus::Channel(a),Family::Factor(0)),c),
-                    square_ray(steps,(Locus::Channel(a),Family::Factor(1)),k),
-                )).collect::<Vec<_>>();
-                spans.read(&forms)
-            }).transpose()
+            loaded
+                .map(|spans| {
+                    let forms = channel_base
+                        .iter()
+                        .enumerate()
+                        .map(|(a, (c, k))| {
+                            (
+                                square_ray(steps, (Locus::Channel(a), Family::Factor(0)), c),
+                                square_ray(steps, (Locus::Channel(a), Family::Factor(1)), k),
+                            )
+                        })
+                        .collect::<Vec<_>>();
+                    spans.read(&forms)
+                })
+                .transpose()
         };
         // Each family's gain `κ²` and moves `b` at the end of every ray.
         let curvature = |index: usize,
@@ -6278,7 +7221,7 @@ impl Constitution {
                 )),
                 (Locus::Channel(a), moves) => {
                     if let Some(loaded) = loaded {
-                        return Ok((loaded.gain(a,readout),moves.own(&prepared.energy,own)?));
+                        return Ok((loaded.gain(a, readout), moves.own(&prepared.energy, own)?));
                     }
                     let conductance = self.conductances[a]
                         .as_ref()
@@ -6368,8 +7311,8 @@ impl Constitution {
             )
         };
         // The exponent source, the only part of the certificate the two sources do not share.
-        let (steps, read, bounds, joint) = match source {
-            StepSource::Certified => {
+        let (mut steps, mut read, mut bounds, mut joint) = match source {
+            StepSource::Certified | StepSource::Candidate { .. } => {
                 // The first steps: each family's own certificate at the current constitution (its
                 // curvature `C = s κ² b`, the largest dyadic with `ηC ≤ a` and `ηc ≤ 1`).
                 let none = vec![None; parts.len()];
@@ -6491,6 +7434,25 @@ impl Constitution {
                 (steps, read, bounds, joint)
             }
         };
+        // These bounds only propose a candidate. A finite reread owns its admission;
+        // in particular this is not a nonlinear score-descent certificate.
+        if let StepSource::Candidate { halvings } = source {
+            if steps.iter().any(Option::is_some) {
+                // Preserve the native relative locus rates. One common halving
+                // scales this fixed joint direction; it does not replace every
+                // family's step with the smallest family step. The two receiving
+                // blocks remain one ReceivingMap family with one shared rate.
+                refine_candidate_steps(&mut steps, halvings)?;
+                read = reading(&steps)?;
+                for (step, (gain, moves)) in steps.iter_mut().zip(&read) {
+                    if let Some(step) = step {
+                        step.curvature = &score * gain * moves;
+                    }
+                }
+                bounds = bounds_of(&read);
+                joint = joint_of(&steps.iter().flatten().collect::<Vec<_>>(), &bounds);
+            }
+        }
         let (readout, amplitude) = gains(&steps);
         let readings: BTreeMap<(Locus, Family), StepReading> = parts
             .iter()
@@ -6512,7 +7474,12 @@ impl Constitution {
                 )
             })
             .collect();
-        Ok(Ok((readings, Some(joint), pumped_reading, loaded_read(&steps)?)))
+        Ok(Ok((
+            readings,
+            Some(joint),
+            pumped_reading,
+            loaded_read(&steps)?,
+        )))
     }
 
     /// **The successor of a staged deposit** (design (c), `deposit`): each linear locus's step
@@ -6557,13 +7524,40 @@ impl Constitution {
             .published()
     }
 
+    /// Stage an unpublished finite-comparison candidate. Heuristic curvature selects
+    /// only the starting relative family steps; `halvings` scales their whole
+    /// fixed direction by one common dyadic factor until a candidate is admitted.
+    /// All material, chart, carry, retention and budget checks still apply. The exact
+    /// resulting material must be reread at the producing cut before admission.
+    pub fn staged_comparison_candidate(
+        &self,
+        deposit: &Deposit,
+        retained: &BTreeSet<Locus>,
+        halvings: u32,
+    ) -> Result<ComparisonCandidate, HnnError> {
+        match self.deposited_in(deposit, retained, None, DepositMode::Candidate { halvings })? {
+            DepositOutcome::Published(material, reading, _, starting_updates) => {
+                Ok(ComparisonCandidate {
+                    producing: self.clone(),
+                    material,
+                    reading,
+                    starting_updates,
+                })
+            }
+            DepositOutcome::Reached(_) | DepositOutcome::Refused(_) => Err(HnnError::Realization {
+                what: "a finite-comparison candidate publishes its trial successor",
+            }),
+        }
+    }
+
     /// Source-private native contact consumer. ContactCut constructs the witness
     /// from its own producing operands; ring/source/receiving families cannot change
     /// under its ray. The complete current constitution remains resident (held()).
-    pub(crate) fn deposited_with_contact_spans(&self, deposit:&Deposit,
-        loaded:&crate::hnn::word::finite_gain::FiniteContactSpans)
-        -> Result<(Self,DepositReading),HnnError>
-    {
+    pub(crate) fn deposited_with_contact_spans(
+        &self,
+        deposit: &Deposit,
+        loaded: &crate::hnn::word::finite_gain::FiniteContactSpans,
+    ) -> Result<(Self, DepositReading), HnnError> {
         Self::contact_only(deposit)?;
         self.deposited_in(deposit, &self.held(), Some(loaded), DepositMode::Certified)?
             .published()
@@ -6571,9 +7565,15 @@ impl Constitution {
 
     /// The finite contact span's scope: no linear step, and every factor step at a channel.
     fn contact_only(deposit: &Deposit) -> Result<(), HnnError> {
-        if !deposit.linear().is_empty() || deposit.factors().iter().any(|s|
-            !matches!(s.gradient.locus(),Locus::Channel(_))) {
-            return Err(HnnError::Realization { what: "the finite contact span keeps ring and receiving material fixed" });
+        if !deposit.linear().is_empty()
+            || deposit
+                .factors()
+                .iter()
+                .any(|s| !matches!(s.gradient.locus(), Locus::Channel(_)))
+        {
+            return Err(HnnError::Realization {
+                what: "the finite contact span keeps ring and receiving material fixed",
+            });
         }
         Ok(())
     }
@@ -6629,11 +7629,11 @@ impl Constitution {
             Some(loaded),
             DepositMode::Declared(declared),
         )? {
-            DepositOutcome::Published(next, reading, Some(committed)) => {
+            DepositOutcome::Published(next, reading, Some(committed), _) => {
                 Ok(Ok((next, reading, committed)))
             }
             DepositOutcome::Refused(refusal) => Ok(Err(refusal)),
-            DepositOutcome::Published(_, _, None) | DepositOutcome::Reached(_) => {
+            DepositOutcome::Published(_, _, None, _) | DepositOutcome::Reached(_) => {
                 Err(HnnError::Realization {
                     what: "a declared deposit publishes its successor with its committed reach",
                 })
@@ -6641,11 +7641,13 @@ impl Constitution {
         }
     }
 
-    fn deposited_in(&self, deposit:&Deposit, retained:&BTreeSet<Locus>,
-        loaded:Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
-        mode: DepositMode<'_>)
-        -> Result<DepositOutcome,HnnError>
-    {
+    fn deposited_in(
+        &self,
+        deposit: &Deposit,
+        retained: &BTreeSet<Locus>,
+        loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
+        mode: DepositMode<'_>,
+    ) -> Result<DepositOutcome, HnnError> {
         if deposit.commit() != self.commit {
             return Err(HnnError::StaleDeposit {
                 staged: deposit.commit(),
@@ -6653,6 +7655,8 @@ impl Constitution {
             });
         }
         let mut next = self.clone();
+        // The landmark steps' observed addresses, typed by their partition once.
+        let observed = deposit.observed_landmarks()?;
         // The deposit's steps by locus, each with its place in the deposit's order (its linear
         // steps, then its factor steps, then its class-mass steps).
         let mut groups: BTreeMap<Locus, Vec<(usize, LocusStep<'_>)>> = BTreeMap::new();
@@ -6687,7 +7691,10 @@ impl Constitution {
             groups
                 .entry(Locus::ReceivingMap(step.ring))
                 .or_default()
-                .push((factors + index, LocusStep::Landmark(step)));
+                .push((
+                    factors + index,
+                    LocusStep::Landmark(step, observed.as_ref().map(|addresses| &addresses[index])),
+                ));
         }
         let landmarks = factors + deposit.landmarks().len();
         for (index, step) in deposit.receiving().iter().enumerate() {
@@ -6753,7 +7760,7 @@ impl Constitution {
         }
         // The certificate reads every prepared step at once.
         let (certified, joint, pumped, loaded) = {
-            let linear: Vec<(Locus, LinearLocus, &PreparedStep)> = regions
+            let linear: Vec<(Locus, LinearLocus, PreparedDirectionRef<'_>)> = regions
                 .iter()
                 .zip(&ready)
                 .filter_map(|((locus, ..), region)| {
@@ -6763,7 +7770,7 @@ impl Constitution {
                         .and_then(|(_, locus_kind, prepared)| {
                             prepared
                                 .as_ref()
-                                .map(|prepared| (*locus, *locus_kind, prepared))
+                                .map(|prepared| (*locus, *locus_kind, prepared.direction()))
                         })
                 })
                 .collect();
@@ -6779,6 +7786,7 @@ impl Constitution {
                 .collect();
             let source = match mode {
                 DepositMode::Declared(declared) => StepSource::Declared(declared),
+                DepositMode::Candidate { halvings } => StepSource::Candidate { halvings },
                 DepositMode::Certified | DepositMode::FirstReach => StepSource::Certified,
             };
             match self.certify_steps(deposit.reach(), &linear, &factors, loaded, source)? {
@@ -6865,7 +7873,9 @@ impl Constitution {
             if reached.is_empty() {
                 return Ok(DepositOutcome::Refused(DeclaredStepRefusal::NoReach));
             }
-            return Ok(DepositOutcome::Reached(DeclaredExponents { steps: reached }));
+            return Ok(DepositOutcome::Reached(DeclaredExponents {
+                steps: reached,
+            }));
         }
         let mut certified = certified;
         // The standing's fold (module header, "Within a lobe", "At a node"): each standing
@@ -6896,6 +7906,56 @@ impl Constitution {
                 })
                 .collect();
             self.lobe(deposit.reach(), retained, &stepping, &mut certified)?
+        };
+        // The h=0 candidate retains only computational no-reach inputs, read from the same
+        // pass-1 owners as first_reach_scan and the exact directions pass 2 actually deposits.
+        // Paired receiving blocks round in their normalized internal coordinates, not the
+        // joined direction's physical operand coordinates. No statistic or carry is published here.
+        let starting_updates = if matches!(mode, DepositMode::Candidate { halvings: 0 }) {
+            let mut parts = Vec::new();
+            for ((locus, steps, _, _), region) in regions.iter().zip(&ready) {
+                let step_of = |family| {
+                    certified
+                        .get(&(*locus, family))
+                        .map_or_else(Rat::zero, |reading| reading.step.step.clone())
+                };
+                let mut updates = Vec::new();
+                if let Some((_, _, Some(linear))) = &region.linear {
+                    let step = step_of(Family::Map);
+                    match linear {
+                        PreparedLinear::Single(prepared) => {
+                            updates.extend(prepared.unit.scaled_rows(&step).into_iter().flatten());
+                        }
+                        PreparedLinear::Blocks(prepared) => {
+                            updates.extend(prepared.step_entries(&step));
+                        }
+                    }
+                }
+                for prepared in &region.factors {
+                    let step = steps
+                        .iter()
+                        .find_map(|(index, step)| match step {
+                            LocusStep::Factor(step) if *index == prepared.index => Some(*step),
+                            _ => None,
+                        })
+                        .ok_or(HnnError::Lattice { locus: *locus })?;
+                    let rate = step_of(prepared.family) / &prepared.scale;
+                    // A boost signs columns, preserving every absolute entry used by the bound.
+                    updates.extend(step.gradient.entries().map(|entry| entry * &rate));
+                }
+                let precision = region
+                    .stroke
+                    .as_ref()
+                    .map_or_else(|| gamma_length(self.clock(*locus) + 1), |at| at.precision());
+                parts.push(ComparisonStepEntries {
+                    unit: self.lattice(*locus)?.unit(),
+                    precision,
+                    updates,
+                });
+            }
+            Some(parts)
+        } else {
+            None
         };
         // Pass 2: every locus's steps in the deposit's order, each family at its certified step,
         // the loci together.
@@ -7032,7 +8092,10 @@ impl Constitution {
                         });
                     };
                     let (before, after) = match index {
-                        0 => (&self.contacts[contact].storage, &next.contacts[contact].storage),
+                        0 => (
+                            &self.contacts[contact].storage,
+                            &next.contacts[contact].storage,
+                        ),
                         1 => (
                             &self.contacts[contact].stiffness,
                             &next.contacts[contact].stiffness,
@@ -7069,15 +8132,23 @@ impl Constitution {
                 }
                 Some(CommittedReach { families })
             }
-            DepositMode::Certified | DepositMode::FirstReach => None,
+            DepositMode::Certified | DepositMode::FirstReach | DepositMode::Candidate { .. } => {
+                None
+            }
         };
         let reading = DepositReading {
             storage_growth,
             storage_product: next.storage_product.clone(),
-            unresolved_contact_material: next.carries.iter().filter(|((l,c),_)|
-                retained.contains(l) && matches!(l, Locus::Channel(_))
-                    && matches!(c, Carrier::Factor(_) | Carrier::FactorScale(_)))
-                .flat_map(|((l,c),carry)| carry.0.iter().map(|(i,r)| (*l,*c,*i,r.clone()))).collect(),
+            unresolved_contact_material: next
+                .carries
+                .iter()
+                .filter(|((l, c), _)| {
+                    retained.contains(l)
+                        && matches!(l, Locus::Channel(_))
+                        && matches!(c, Carrier::Factor(_) | Carrier::FactorScale(_))
+                })
+                .flat_map(|((l, c), carry)| carry.0.iter().map(|(i, r)| (*l, *c, *i, r.clone())))
+                .collect(),
             steps: certified
                 .into_iter()
                 .map(|((locus, _), reading)| (locus, reading))
@@ -7100,7 +8171,12 @@ impl Constitution {
             pumped,
             loaded,
         };
-        Ok(DepositOutcome::Published(next, reading, committed))
+        Ok(DepositOutcome::Published(
+            next,
+            reading,
+            committed,
+            starting_updates,
+        ))
     }
 
     /// [definition; agent-inferred, September 29] **The lobe law at a deposit** (module header,
@@ -7408,7 +8484,6 @@ impl Constitution {
             stroke: None,
             linear: None,
             factors: Vec::new(),
-            terms: None,
         };
         for (index, step) in steps {
             let refused = |refusal: HnnError| (*index, refusal);
@@ -7416,6 +8491,24 @@ impl Constitution {
                 LocusStep::Linear(step) => {
                     if self.released.contains(&locus) {
                         return Err(refused(HnnError::ReleasedLocus { locus }));
+                    }
+                    if let (
+                        LinearLocus::Receiving(_),
+                        Some(LocusMaterial::ReceivingMap { receiving, .. }),
+                    ) = (step.locus, material.as_deref_mut())
+                    {
+                        if let Some(owner) =
+                            receiving.as_ref().filter(|owner| owner.blocks().is_some())
+                        {
+                            let at = self.stroke(locus, &mut prepared.stroke).map_err(refused)?;
+                            let rule = self.chart_rule(locus).map_err(refused)?;
+                            let joined =
+                                PreparedReceivingBlocks::prepare(owner, &step.samples, &rule, at)
+                                    .map_err(refused)?;
+                            prepared.linear =
+                                Some((*index, step.locus, joined.map(PreparedLinear::Blocks)));
+                            continue;
+                        }
                     }
                     let law = material
                         .as_deref_mut()
@@ -7438,13 +8531,14 @@ impl Constitution {
                         LinearLocus::Receiving(_) => receiving_metric_samples(&step.samples),
                         _ => None,
                     };
-                    // A located prior's terms read through the map before this window's deposit
-                    // (the prior carry's design §2): no reading meets its own window's deposit.
-                    if law.located.is_some() {
-                        prepared.terms = Some(prequential_terms(&step.samples, law.map()));
-                    }
                     let samples = metric.as_deref().unwrap_or(&step.samples[..]);
-                    let mut step_prepared = law.prepare(samples, &rule, at).map_err(refused)?;
+                    let mut step_prepared = match step.locus {
+                        LinearLocus::Receiving(_) => {
+                            law.prepare_receiving_window(&step.samples, samples, &rule, at)
+                        }
+                        _ => law.prepare(samples, &rule, at),
+                    }
+                    .map_err(refused)?;
                     if let (Some(_), Some(prepared_step)) = (&metric, step_prepared.as_mut()) {
                         if let Some((moves, oscillation, alignment)) =
                             receiving_fisher_face(&step.samples, &prepared_step.unit.to_rows())
@@ -7479,7 +8573,11 @@ impl Constitution {
                             };
                         }
                     }
-                    prepared.linear = Some((*index, step.locus, step_prepared));
+                    prepared.linear = Some((
+                        *index,
+                        step.locus,
+                        step_prepared.map(PreparedLinear::Single),
+                    ));
                 }
                 LocusStep::Factor(step) => {
                     if self.released.contains(&locus) {
@@ -7497,7 +8595,7 @@ impl Constitution {
                         ..factor
                     });
                 }
-                LocusStep::Landmark(_) | LocusStep::Receiving(_) => {}
+                LocusStep::Landmark(_, _) | LocusStep::Receiving(_) => {}
             }
         }
         Ok(prepared)
@@ -7539,7 +8637,6 @@ impl Constitution {
             mut stroke,
             mut linear,
             factors,
-            terms,
         } = prepared;
         let mut charts = Vec::new();
         let step_of = |family: Family| {
@@ -7554,6 +8651,38 @@ impl Constitution {
             }
             match step {
                 LocusStep::Linear(step) => {
+                    if matches!(
+                        linear.as_ref(),
+                        Some((_, _, Some(PreparedLinear::Blocks(_))))
+                    ) {
+                        let Some((_, _, Some(PreparedLinear::Blocks(joined)))) = linear.take()
+                        else {
+                            unreachable!("checked joined step")
+                        };
+                        let at = self.stroke(locus, &mut stroke).map_err(refused)?;
+                        let (next, readings) =
+                            joined.stepped(&step_of(Family::Map), at).map_err(refused)?;
+                        let Some(LocusMaterial::ReceivingMap { receiving, .. }) =
+                            material.as_deref_mut()
+                        else {
+                            return Err(refused(HnnError::Lattice { locus }));
+                        };
+                        **receiving = Some(next);
+                        charts.extend(readings);
+                        continue;
+                    }
+                    // A zero paired window may have no prepared step, but remains a valid
+                    // clocked locus without inventing a single-law fallback.
+                    if let Some(LocusMaterial::ReceivingMap { receiving, .. }) =
+                        material.as_deref_mut()
+                    {
+                        if receiving
+                            .as_ref()
+                            .is_some_and(|owner| owner.blocks().is_some())
+                        {
+                            continue;
+                        }
+                    }
                     let law = material
                         .as_deref_mut()
                         .and_then(|material| material.law(step.locus))
@@ -7569,8 +8698,8 @@ impl Constitution {
                     // The step prepared in pass 1 (none when nothing reached the locus), at its
                     // certified step (zero when its alignment was zero: the Gram and chart move,
                     // the map does not).
-                    if let Some((_, _, Some(prepared))) = linear.take() {
-                        let (mut next, mut reading) = prepared
+                    if let Some((_, _, Some(PreparedLinear::Single(prepared)))) = linear.take() {
+                        let (mut next, reading) = prepared
                             .stepped(&step_of(Family::Map), at)
                             .map_err(refused)?;
                         // The receiving map's window of phase comparisons is absorbed into the same
@@ -7583,30 +8712,9 @@ impl Constitution {
                         {
                             absorb_phase(phase, law.map(), &step.samples).map_err(refused)?;
                         }
-                        // A located prior reads its window's terms and moves (the prior carry's
-                        // design §3), one atomic successor of the stepped law.
-                        match (&mut next.located, &terms) {
-                            (Some(pair), Some(Some(window))) => {
-                                pair.read(window);
-                                let rule = self.chart_rule(locus).map_err(refused)?;
-                                if let Some((moved, read)) =
-                                    next.moved_prior(&rule, at).map_err(refused)?
-                                {
-                                    next = moved;
-                                    reading.prior = Some(read);
-                                }
-                            }
-                            (Some(_), _) => {
-                                let k = next.chart.scale;
-                                reading.prior = Some(PriorMove {
-                                    from: k,
-                                    to: k,
-                                    held: Some(PriorHeld::Unread),
-                                    certificate: None,
-                                });
-                            }
-                            (None, _) => {}
-                        }
+                        // The receiving prior proposal was formed on the predeposit map and
+                        // included in the one certified direction. Never rescale this already
+                        // stepped map using a scalar pair from an earlier ray.
                         *law = next;
                         charts.push(reading);
                     }
@@ -7625,7 +8733,7 @@ impl Constitution {
                     let rate = step_of(prepared.family) / &prepared.scale;
                     factor_step(material, carries, step, &rate, at).map_err(refused)?;
                 }
-                LocusStep::Landmark(step) => {
+                LocusStep::Landmark(step, observation) => {
                     // The tree carries no lattice remainder, so the stroke is opened for the locus's
                     // reading and nothing moves its clock.
                     self.stroke(locus, &mut stroke).map_err(refused)?;
@@ -7634,8 +8742,13 @@ impl Constitution {
                         .and_then(LocusMaterial::tree)
                         .ok_or(HnnError::MissingReceivingMap { ring: step.ring })
                         .map_err(refused)?;
-                    tree.deposit(&step.address, step.class)
-                        .map_err(|refusal| refused(refusal.into()))?;
+                    if let Some(address) = observation {
+                        tree.deposit_observed(address, step.class)
+                            .map_err(|error| refused(error.into()))?;
+                    } else {
+                        tree.deposit(&step.address, step.class)
+                            .map_err(|refusal| refused(refusal.into()))?;
+                    }
                 }
                 LocusStep::Receiving(step) => {
                     // The population carries its likelihoods' bounds, so it moves no lattice clock.
@@ -7894,7 +9007,10 @@ fn odometer_alignment_defect(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<Ra
 
 /// The receiving step's odometer defect for a test ([`odometer_alignment_defect`]).
 #[cfg(test)]
-pub(crate) fn odometer_alignment_defect_probe(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<Rat> {
+pub(crate) fn odometer_alignment_defect_probe(
+    samples: &[Sample],
+    unit: &[Vec<Rat>],
+) -> Option<Rat> {
     odometer_alignment_defect(samples, unit)
 }
 
@@ -7915,12 +9031,78 @@ type CertifiedSteps = (
 // -------------------------------------------------------------------------------------------
 // the declared first-reach step
 
+/// Keep relative family exponents fixed while backtracking the entire proposal.
+/// This selects a candidate only; the frozen executed comparison owns admission.
+fn refine_candidate_steps(
+    steps: &mut [Option<CertifiedStep>],
+    halvings: u32,
+) -> Result<(), HnnError> {
+    let exponents = steps
+        .iter()
+        .flatten()
+        .map(|step| {
+            step.exponent
+                .checked_sub(i64::from(halvings))
+                .ok_or(HnnError::CountOverflow)
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    for (step, exponent) in steps.iter_mut().flatten().zip(exponents) {
+        step.exponent = exponent;
+        step.step = crate::holon::deposition::dyadic(exponent);
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod candidate_relative_step_tests {
+    use super::*;
+
+    #[test]
+    fn candidate_halving_preserves_relative_family_exponents() {
+        let make = |exponent| {
+            Some(CertifiedStep {
+                exponent,
+                step: crate::holon::deposition::dyadic(exponent),
+                alignment: Rat::one(),
+                curvature: Rat::one(),
+                covector: Rat::one(),
+            })
+        };
+        let mut steps = vec![make(-3), None, make(-7), make(-21)];
+        refine_candidate_steps(&mut steps, 0).unwrap();
+        assert_eq!(
+            steps
+                .iter()
+                .flatten()
+                .map(|s| s.exponent)
+                .collect::<Vec<_>>(),
+            vec![-3, -7, -21]
+        );
+        let before = steps.clone();
+        refine_candidate_steps(&mut steps, 4).unwrap();
+        assert!(steps[1].is_none());
+        for (before, after) in before.iter().flatten().zip(steps.iter().flatten()) {
+            assert_eq!(before.exponent - 4, after.exponent);
+            assert_eq!(&before.step / rat(16, 1), after.step);
+        }
+        assert_eq!(
+            steps[0].as_ref().unwrap().exponent - steps[2].as_ref().unwrap().exponent,
+            4
+        );
+        assert_eq!(
+            steps[2].as_ref().unwrap().exponent - steps[3].as_ref().unwrap().exponent,
+            14
+        );
+    }
+}
+
 /// [definition; agent-inferred, October 9] **Where a deposit's step exponents come from**
 /// ([`Constitution::certify_steps`]): the native certificate (the own-curvature fixed point and
 /// the joint halving), or one declared candidate's exponents. Nothing else differs.
 #[derive(Clone, Copy)]
 enum StepSource<'d> {
     Certified,
+    Candidate { halvings: u32 },
     Declared(&'d DeclaredExponents),
 }
 
@@ -7928,7 +9110,7 @@ impl StepSource<'_> {
     /// A deposit in which no family steps: a declaration then names none.
     fn unstepped(&self) -> Result<(), DeclaredStepRefusal> {
         match self {
-            StepSource::Certified => Ok(()),
+            StepSource::Certified | StepSource::Candidate { .. } => Ok(()),
             StepSource::Declared(declared) => match declared.families().next() {
                 Some(&(locus, family)) => Err(DeclaredStepRefusal::Undeclared { locus, family }),
                 None => Ok(()),
@@ -7942,14 +9124,330 @@ impl StepSource<'_> {
 #[derive(Clone, Copy)]
 enum DepositMode<'d> {
     Certified,
+    Candidate { halvings: u32 },
     FirstReach,
     Declared(&'d DeclaredExponents),
+}
+
+/// An unpublished rounded material candidate. The port deposition path consumes
+/// it through the producing comparison owner after strict improvement or exact
+/// executed-wave neutrality. Its step readings are proposal diagnostics, not a
+/// certificate of nonlinear score decrease. Read-only material is cloneable for
+/// backend execution; this type is not a global unforgeable publication capability.
+#[derive(Debug)]
+pub struct ComparisonCandidate {
+    producing: Constitution,
+    material: Constitution,
+    reading: DepositReading,
+    starting_updates: Option<Vec<ComparisonStepEntries>>,
+}
+
+/// The h=0 pass's exact updates before its carry rounding. Transient comparison inputs only.
+#[derive(Debug)]
+pub(crate) struct ComparisonStepEntries {
+    pub(crate) unit: Rat,
+    pub(crate) precision: u32,
+    pub(crate) updates: Vec<Rat>,
+}
+
+/// Exact candidate differences for diagnostics. Published operands exclude
+/// statistics, numerical carries, landmark counts and population. Their equality
+/// alone does not certify identical executed output with different warm charts.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ComparisonMatrixDelta {
+    pub locus: Locus,
+    pub operand: &'static str,
+    pub changed_entries: usize,
+    pub largest_absolute_delta: Rat,
+}
+
+/// Deltas in the named carrier's retained coordinates; do not sum unlike
+/// map/Gram/factor coordinates as a physical error norm.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ComparisonCarryDelta {
+    pub locus: Locus,
+    pub carrier: Carrier,
+    pub changed_entries: usize,
+    pub largest_absolute_delta: Rat,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ComparisonReceivingBlockChange {
+    pub ring: usize,
+    pub block: usize,
+    pub prior_before: u32,
+    pub prior_after: u32,
+    pub operand_scale_before: Option<Rat>,
+    pub operand_scale_after: Option<Rat>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ComparisonCandidateChanges {
+    pub full_material_unchanged: bool,
+    pub published_operand_loci: Vec<Locus>,
+    /// Exact coefficient summaries, not step proposals or norm estimates.
+    pub matrix_deltas: Vec<ComparisonMatrixDelta>,
+    pub tree_rings: Vec<usize>,
+    pub population_rings: Vec<usize>,
+    pub carry_entries_before: usize,
+    pub carry_entries_after: usize,
+    pub changed_carry_entries: usize,
+    pub carry_deltas: Vec<ComparisonCarryDelta>,
+    pub receiving_blocks: Vec<ComparisonReceivingBlockChange>,
+}
+
+impl ComparisonCandidate {
+    pub(crate) fn starting_updates(&self) -> Result<&[ComparisonStepEntries], HnnError> {
+        self.starting_updates
+            .as_deref()
+            .ok_or(HnnError::Unadmitted {
+                reason: "the no-reach halving is read from the starting candidate",
+            })
+    }
+    pub(crate) fn producing(&self) -> &Constitution {
+        &self.producing
+    }
+    pub fn material(&self) -> &Constitution {
+        &self.material
+    }
+    pub fn reading(&self) -> &DepositReading {
+        &self.reading
+    }
+
+    /// Compare actual published coefficients, separately from latent carry and
+    /// statistical changes. This is an audit, not a replacement for candidate replay.
+    pub fn changes(&self) -> ComparisonCandidateChanges {
+        let mut loci = BTreeSet::new();
+        let mut matrix_deltas = Vec::new();
+        let mut matrix_delta = |locus, operand, before: &ExactRatMatrix, after: &ExactRatMatrix| {
+            let deltas = before
+                .entries()
+                .iter()
+                .zip(after.entries())
+                .map(|(a, b)| (b - a).abs())
+                .filter(|delta| !delta.is_zero())
+                .collect::<Vec<_>>();
+            if !deltas.is_empty() {
+                matrix_deltas.push(ComparisonMatrixDelta {
+                    locus,
+                    operand,
+                    changed_entries: deltas.len(),
+                    largest_absolute_delta: deltas.into_iter().max().unwrap_or_else(Rat::zero),
+                });
+            }
+        };
+        let mut receiving_blocks = Vec::new();
+        let mut tree_rings = Vec::new();
+        let mut population_rings = Vec::new();
+        for (ring, (before, after)) in self
+            .producing
+            .rings
+            .iter()
+            .zip(&self.material.rings)
+            .enumerate()
+        {
+            matrix_delta(
+                Locus::Element(ring),
+                "passive",
+                &before.passive,
+                &after.passive,
+            );
+            matrix_delta(
+                Locus::Element(ring),
+                "contrast",
+                before.contrast.map(),
+                after.contrast.map(),
+            );
+            if let (Some(a), Some(b)) = (&before.source, &after.source) {
+                matrix_delta(Locus::SourcePort(ring), "source", a.map(), b.map());
+            }
+            if let (Some(a), Some(b)) = (&before.receiving, &after.receiving) {
+                matrix_delta(
+                    Locus::ReceivingMap(ring),
+                    "physical_receiving",
+                    a.map(),
+                    b.map(),
+                );
+            }
+            if let (Some(a), Some(b)) = (&before.receiving, &after.receiving) {
+                if let (Some(a), Some(b)) = (a.blocks(), b.blocks()) {
+                    for (block, (a, b)) in a.iter().zip(b).enumerate() {
+                        receiving_blocks.push(ComparisonReceivingBlockChange {
+                            ring,
+                            block,
+                            prior_before: a.law().prior_scale(),
+                            prior_after: b.law().prior_scale(),
+                            operand_scale_before: a.chart().map(|chart| chart.scale().clone()),
+                            operand_scale_after: b.chart().map(|chart| chart.scale().clone()),
+                        });
+                    }
+                }
+            }
+            if before.standing != after.standing {
+                loci.insert(Locus::Standing(ring));
+            }
+            if before.passive != after.passive
+                || before.contrast.map() != after.contrast.map()
+                || before.slices != after.slices
+            {
+                loci.insert(Locus::Element(ring));
+            }
+            if before.source.as_ref().map(NormalLaw::map)
+                != after.source.as_ref().map(NormalLaw::map)
+                || before.source.as_ref().and_then(NormalLaw::symmetry)
+                    != after.source.as_ref().and_then(NormalLaw::symmetry)
+                || before.pairs != after.pairs
+                || before.transport != after.transport
+            {
+                loci.insert(Locus::SourcePort(ring));
+            }
+            if before.receiving.as_ref().map(ReceivingMaterial::map)
+                != after.receiving.as_ref().map(ReceivingMaterial::map)
+                || before.receiving.as_ref().map(ReceivingMaterial::layout)
+                    != after.receiving.as_ref().map(ReceivingMaterial::layout)
+                || before.receiving.as_ref().map(ReceivingMaterial::carrier)
+                    != after.receiving.as_ref().map(ReceivingMaterial::carrier)
+            {
+                loci.insert(Locus::ReceivingMap(ring));
+            }
+            if before.resonator != after.resonator || before.resonator_step != after.resonator_step
+            {
+                loci.insert(Locus::Resonator(ring));
+            }
+            if before.tree != after.tree {
+                tree_rings.push(ring);
+            }
+            if before.population != after.population {
+                population_rings.push(ring);
+            }
+        }
+        for (contact, (before, after)) in self
+            .producing
+            .contacts
+            .iter()
+            .zip(&self.material.contacts)
+            .enumerate()
+        {
+            matrix_delta(
+                Locus::Channel(contact),
+                "storage_factor",
+                &before.storage,
+                &after.storage,
+            );
+            matrix_delta(
+                Locus::Channel(contact),
+                "stiffness_factor",
+                &before.stiffness,
+                &after.stiffness,
+            );
+            matrix_delta(
+                Locus::Channel(contact),
+                "dissipation_factor",
+                &before.dissipation,
+                &after.dissipation,
+            );
+            if before.storage != after.storage
+                || before.stiffness != after.stiffness
+                || before.dissipation != after.dissipation
+                || before.boost != after.boost
+                || before.surface != after.surface
+            {
+                loci.insert(Locus::Channel(contact));
+            }
+        }
+        let carries = |theta: &Constitution| {
+            theta
+                .carried_remainders()
+                .into_iter()
+                .map(|(locus, carrier, index, value)| ((locus, carrier, index), value))
+                .collect::<BTreeMap<_, _>>()
+        };
+        let before = carries(&self.producing);
+        let after = carries(&self.material);
+        let keys = before.keys().chain(after.keys()).collect::<BTreeSet<_>>();
+        let mut carry_deltas: BTreeMap<(Locus, Carrier), (usize, Rat)> = BTreeMap::new();
+        for key in keys {
+            let delta = (after.get(key).cloned().unwrap_or_else(Rat::zero)
+                - before.get(key).cloned().unwrap_or_else(Rat::zero))
+            .abs();
+            if !delta.is_zero() {
+                let entry = carry_deltas
+                    .entry((key.0, key.1))
+                    .or_insert((0, Rat::zero()));
+                entry.0 += 1;
+                if delta > entry.1 {
+                    entry.1 = delta;
+                }
+            }
+        }
+        let changed_carry_entries = carry_deltas.values().map(|(count, _)| *count).sum();
+        let carry_deltas = carry_deltas
+            .into_iter()
+            .map(
+                |((locus, carrier), (changed_entries, largest_absolute_delta))| {
+                    ComparisonCarryDelta {
+                        locus,
+                        carrier,
+                        changed_entries,
+                        largest_absolute_delta,
+                    }
+                },
+            )
+            .collect();
+        ComparisonCandidateChanges {
+            full_material_unchanged: self.producing == self.material,
+            published_operand_loci: loci.into_iter().collect(),
+            matrix_deltas,
+            tree_rings,
+            population_rings,
+            carry_entries_before: before.len(),
+            carry_entries_after: after.len(),
+            changed_carry_entries,
+            carry_deltas,
+            receiving_blocks,
+        }
+    }
+
+    /// The frozen comparison owner calls this only after exact executed-wave
+    /// equality or a proved joint objective-change enclosure [0, 0] at the same
+    /// frozen context. Overlapping or equal absolute score intervals do not suffice.
+    /// This is neutral admission, not strict improvement. Ordinary statistics,
+    /// retained numerical carry and the separate tree update law are preserved.
+    pub(crate) fn admit_neutral(self) -> (Constitution, DepositReading) {
+        (self.material, self.reading)
+    }
+
+    /// A correlated joint objective-change enclosure supplied by the frozen
+    /// comparison owner. Shared population/tree expressions may cancel, but
+    /// retained uncertainty is never removed without that expression identity.
+    pub(crate) fn admit_change(
+        self,
+        change: &crate::ratio::algebraic::ExactInterval,
+    ) -> Option<(Constitution, DepositReading)> {
+        (change.upper < Rat::zero()).then_some((self.material, self.reading))
+    }
+
+    /// The trusted producing-comparison owner supplies joint class-plus-phase
+    /// enclosures from identical frozen context. No public caller-provided score
+    /// can authorize publication through this boundary.
+    pub(crate) fn admit(
+        self,
+        before: &crate::ratio::algebraic::ExactInterval,
+        after: &crate::ratio::algebraic::ExactInterval,
+    ) -> Option<(Constitution, DepositReading)> {
+        (after.upper < before.lower).then_some((self.material, self.reading))
+    }
 }
 
 /// What one pass of the deposit law returns: a successor with its reading (and, for a declared
 /// pass, its committed reach), the first reach, or a declared step's typed refusal.
 enum DepositOutcome {
-    Published(Constitution, DepositReading, Option<CommittedReach>),
+    Published(
+        Constitution,
+        DepositReading,
+        Option<CommittedReach>,
+        Option<Vec<ComparisonStepEntries>>,
+    ),
     Reached(DeclaredExponents),
     Refused(DeclaredStepRefusal),
 }
@@ -7958,7 +9456,7 @@ impl DepositOutcome {
     /// The native successor; the native pass returns nothing else.
     fn published(self) -> Result<(Constitution, DepositReading), HnnError> {
         match self {
-            DepositOutcome::Published(next, reading, _) => Ok((next, reading)),
+            DepositOutcome::Published(next, reading, _, _) => Ok((next, reading)),
             DepositOutcome::Reached(_) | DepositOutcome::Refused(_) => Err(HnnError::Realization {
                 what: "the certified deposit publishes its successor",
             }),
@@ -8209,13 +9707,44 @@ pub(crate) fn first_reach_scan(
 /// One locus's pass-1 preparation: its budgeted carry (opened by its first step), its linear step's
 /// place, kind and prepared unit step (none when nothing reached the locus), and its factor
 /// families' prepared unit steps.
+struct PreparedDirectionRef<'a> {
+    unit: &'a IntegralMatrix,
+    alignment: &'a Rat,
+    moves: &'a Rat,
+    covector: &'a Rat,
+    unit_norms: &'a (Rat, Rat),
+}
+enum PreparedLinear {
+    Single(PreparedStep),
+    Blocks(PreparedReceivingBlocks),
+}
+impl PreparedLinear {
+    fn direction(&self) -> PreparedDirectionRef<'_> {
+        match self {
+            Self::Single(p) => PreparedDirectionRef {
+                unit: &p.unit,
+                alignment: &p.alignment,
+                moves: &p.moves,
+                covector: &p.covector,
+                unit_norms: &p.unit_norms,
+            },
+            Self::Blocks(p) => {
+                let d = p.direction();
+                PreparedDirectionRef {
+                    unit: &d.unit,
+                    alignment: &d.alignment,
+                    moves: &d.moves,
+                    covector: &d.covector,
+                    unit_norms: &d.unit_norms,
+                }
+            }
+        }
+    }
+}
 struct Prepared {
     stroke: Option<BudgetedCarry>,
-    linear: Option<(usize, LinearLocus, Option<PreparedStep>)>,
+    linear: Option<(usize, LinearLocus, Option<PreparedLinear>)>,
     factors: Vec<FactorPrepared>,
-    /// A located receiving prior's window terms at the map in force ([`prequential_terms`]):
-    /// `None` on a law with no pair, `Some(None)` where the readings are not a face's.
-    terms: Option<Option<(Rat, Rat)>>,
 }
 
 /// [definition; agent-inferred] **A factor family's step prepared at its unit step** (module
@@ -8630,7 +10159,10 @@ fn certified_passive(resonator: &ResonatorMaterial) -> Result<bool, HnnError> {
 enum LocusStep<'d> {
     Linear(&'d LinearStep),
     Factor(&'d FactorStep),
-    Landmark(&'d LandmarkStep),
+    Landmark(
+        &'d LandmarkStep,
+        Option<&'d crate::compression::landmark::context::ObservedAddress>,
+    ),
     Receiving(&'d ReceivingStep),
 }
 
@@ -8659,7 +10191,7 @@ enum LocusMaterial<'a> {
         scale: &'a mut Rat,
     },
     ReceivingMap {
-        receiving: &'a mut Option<NormalLaw>,
+        receiving: &'a mut Option<ReceivingMaterial>,
         tree: &'a mut Option<Landmarks>,
         population: &'a mut Option<PortPopulation>,
     },
@@ -8773,7 +10305,7 @@ impl<'a> LocusMaterial<'a> {
             }
             (LinearLocus::Contrast(_), LocusMaterial::Element { contrast, .. }) => Some(contrast),
             (LinearLocus::Receiving(_), LocusMaterial::ReceivingMap { receiving, .. }) => {
-                receiving.as_mut()
+                receiving.as_mut().and_then(ReceivingMaterial::single_mut)
             }
             _ => None,
         }
@@ -9111,7 +10643,7 @@ struct LearnedRing {
     transport: Rat,
     pairs: Vec<PairPort>,
     pair_scale: Rat,
-    receiving: Option<NormalLaw>,
+    receiving: Option<ReceivingMaterial>,
     tree: Option<TreeStanding>,
     population: Option<PortReading>,
     /// The resonator's declared gains (`None` once released).
@@ -9209,10 +10741,14 @@ impl LearnedRing {
             || match (&self.receiving, &material.receiving) {
                 (None, None) => false,
                 (Some(saved), Some(declared)) => {
-                    !same_law_shape(saved, declared)
-                        || saved.receiving_prior() != declared.receiving_prior()
-                        || saved.phase.is_some() != declared.phase.is_some()
+                    saved.layout() != declared.layout()
+                        || !same_shape(saved.map(), declared.map())
                         || saved.carrier() != declared.carrier()
+                        || saved.laws().iter().zip(declared.laws()).any(|(a, b)| {
+                            !same_law_shape(a, b)
+                                || a.receiving_prior() != b.receiving_prior()
+                                || a.phase.is_some() != b.phase.is_some()
+                        })
                 }
                 _ => true,
             }
@@ -9332,11 +10868,7 @@ impl RingMaterial {
         self.pair_scale = zero.clone();
         // A moved prior or a grown pair leaves the identity, the founding member stays in it.
         if let Some(law) = &self.receiving {
-            let prior = law.receiving_prior().unwrap_or(0);
-            self.receiving = Some(NormalLaw::with_receiving_prior(
-                law.map.scaled(&zero),
-                prior,
-            ));
+            self.receiving = Some(law.founding());
         }
         self.tree = self.tree.as_ref().map(Landmarks::founding);
         self.population = self.population.as_ref().map(PortPopulation::founding);
@@ -9388,8 +10920,11 @@ impl Constitution {
     /// **The complete continuing state** ([`ContinuingState`]) headed by ring `g`'s source port:
     /// refused off a source ring, and complete wherever the constitution has moved.
     pub fn continuing_state(&self, ring: usize) -> Result<ContinuingState, HnnError> {
-        if self.rings.iter().filter_map(|r| r.receiving.as_ref()).any(|law|
-            law.carrier() == crate::hnn::receiving::ReceivingCarrier::SourceObserver)
+        if self
+            .rings
+            .iter()
+            .filter_map(|r| r.receiving.as_ref())
+            .any(|law| law.carrier() == crate::hnn::receiving::ReceivingCarrier::SourceObserver)
         {
             return Err(HnnError::Unadmitted {
                 reason: "the source observer's producing view and save/restore square are not admitted",
@@ -9559,6 +11094,21 @@ impl Constitution {
                     "a remainder off its locus's fine lattice or outside its half cell",
                 ));
             }
+        }
+        // Restoration is publication too: the opening's declared retained-material budget
+        // governs the saved material, including dynamically sized exact chart coordinates.
+        let bits = self.exact_bits();
+        if bits > self.budget {
+            return Err(HnnError::ConstitutionBudget {
+                bits,
+                budget: self.budget,
+                commit: self.commit,
+                loci: self
+                    .bits_by_locus()
+                    .into_iter()
+                    .map(|(locus, _)| locus)
+                    .collect(),
+            });
         }
         Ok(self)
     }
@@ -9756,7 +11306,7 @@ impl LearnedRing {
             }
         }
         write_keyed(s, "pair-scale", [&self.pair_scale].into_iter());
-        write_optional_law(s, "receiving", self.receiving.as_ref());
+        ReceivingMaterial::write_optional(s, "receiving", self.receiving.as_ref());
         match &self.tree {
             Some(tree) => tree.write(s),
             None => *s += "tree none\n",
@@ -9857,7 +11407,8 @@ impl LearnedRing {
             pairs.push(PairPort::new(outputs, current, earlier)?);
         }
         let pair_scale = scalar(lines, "pair-scale", "a ring's pair scale")?;
-        let receiving = read_optional_law(lines, "receiving", "a ring's receiving law")?;
+        let receiving =
+            ReceivingMaterial::read_optional(lines, "receiving", "a ring's receiving law")?;
         let tree = if lines.clone().next() == Some("tree none") {
             lines.next();
             None
@@ -10453,7 +12004,12 @@ fn write_law(s: &mut String, law: &NormalLaw) {
                 column.map_or_else(|| "-".to_owned(), |partner| partner.to_string())
             }));
             s.push('\n');
-            *s += &join(&mut symmetry.pairs().iter().map(|(leader, _)| leader.to_string()));
+            *s += &join(
+                &mut symmetry
+                    .pairs()
+                    .iter()
+                    .map(|(leader, _)| leader.to_string()),
+            );
             s.push('\n');
         }
         None => *s += "symmetry none\n",
@@ -10614,7 +12170,7 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
         "block",
         "the block's head",
     )?;
-    let block: Vec<i128> = next(lines, "the block")?
+    let block: Vec<BigInt> = next(lines, "the block")?
         .split_whitespace()
         .map(|x| {
             x.parse()
@@ -10684,9 +12240,8 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
     let symmetry = read_symmetry(lines, &map)?;
     // The scale founds the Gram off its support, the support is exactly the rows that leave
     // `2^k I` (as `GramBlock::of` reads it), and the scale bounds the chart's lattice from below.
-    // A lawful prior never passes the carrier's residual shift (a move there holds), so no larger
-    // `2^k` is formed.
-    if scale > RESIDUAL_SHIFT || exponent < scale {
+    // Integer coordinates may exceed machine words; the exact stored values remain budgeted.
+    if exponent < scale {
         return refuse("the chart's scale against its Gram and lattice");
     }
     let prior = Rat::from_integer(BigInt::one() << scale as usize);
@@ -10700,6 +12255,24 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
         .collect();
     if left != support {
         return refuse("the chart's scale against its Gram and lattice");
+    }
+    // A checkpoint carries an exact certificate, not authority to invent one. Re-read the
+    // dynamically sized block against its actual Gram before admitting it.
+    if (0..k).any(|i| (0..k).any(|j| block[i * k + j] != block[j * k + i])) {
+        return refuse("the saved chart's symmetry");
+    }
+    let carried = GramBlock::of(&gram, &prior, None, Some(scale), None, Some(exponent))?;
+    let shift = exponent
+        .checked_add(carried.exponent)
+        .ok_or(HnnError::ContinuingState {
+            what: "the saved chart's exponent sum",
+        })?;
+    let (_, actual_certificate) =
+        certified(&block, &carried.coordinates, k, shift).ok_or(HnnError::ContinuingState {
+            what: "the saved chart's certificate",
+        })?;
+    if actual_certificate != certificate {
+        return refuse("the saved chart's certificate against its Gram");
     }
     let gram_carry = carries.pop().expect("two carries");
     let map_carry = carries.pop().expect("two carries");
@@ -10796,7 +12369,10 @@ fn read_symmetry(
 
 impl ConstitutionRead for Constitution {
     fn receiving_carrier(&self, ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
-        self.receiving_law(ring).map_or(crate::hnn::receiving::ReceivingCarrier::Anchor, NormalLaw::carrier)
+        self.rings[ring].receiving.as_ref().map_or(
+            crate::hnn::receiving::ReceivingCarrier::Anchor,
+            ReceivingMaterial::carrier,
+        )
     }
     fn standing(&self, ring: usize) -> &[Rat] {
         &self.rings[ring].standing
@@ -10850,14 +12426,509 @@ impl ConstitutionRead for Constitution {
     fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix {
         &self.contacts[contact].dissipation
     }
+    fn receiving_layout(&self, ring: usize) -> Option<ReceivingLayout> {
+        Constitution::receiving_layout(self, ring)
+    }
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
-        self.rings[ring].receiving.as_ref().map(NormalLaw::map)
+        self.rings[ring]
+            .receiving
+            .as_ref()
+            .map(ReceivingMaterial::map)
     }
     fn landmarks(&self, ring: usize) -> Option<&Landmarks> {
         self.rings[ring].tree.as_ref()
     }
     fn population(&self, ring: usize) -> Option<&PortPopulation> {
         self.rings[ring].population.as_ref()
+    }
+}
+
+#[cfg(test)]
+mod receiving_precision_tests {
+    use super::*;
+    use crate::hnn::field::FieldDeclaration;
+
+    #[test]
+    fn receiving_precision_restores_every_real_and_turn_component_despite_a_survivor() {
+        let field =
+            Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
+        let ring = field.receivers()[0].ring;
+        let locus = Locus::ReceivingMap(ring);
+        let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
+        let exponent = theta.lattice(locus).unwrap().exponent();
+        let unit = Lattice::new(exponent).unit();
+        let law = theta.rings[ring]
+            .receiving
+            .as_mut()
+            .unwrap()
+            .single_mut()
+            .unwrap();
+        let width = law.map.columns();
+        let mut entries = law.map.entries().to_vec();
+        entries[0] = Rat::one(); // This actually reached row previously suppressed all refinement.
+        law.map = flat_matrix(law.map.rows(), width, entries).unwrap();
+        law.map_carry
+            .0
+            .insert(2 * width, &unit / crate::ratio::integer(8));
+        law.map_carry
+            .0
+            .insert(3 * width, -&unit / crate::ratio::integer(32));
+        // A second feature has a smaller independent turn demand and cannot be skipped.
+        law.map_carry
+            .0
+            .insert(width + 1, &unit / crate::ratio::integer(128));
+        let mut feature = vec![Rat::zero(); width];
+        feature[0] = Rat::one();
+        let mut second = vec![Rat::zero(); width];
+        second[1] = Rat::one();
+        let features = vec![feature, second];
+        let tolerance = Rat::one();
+        let event = theta
+            .receiving_precision_event(ring, &features, &tolerance)
+            .unwrap()
+            .unwrap();
+        assert_eq!(event.erased_components(), &[(0, 2), (0, 3), (1, 1)]);
+        assert_eq!(event.levels(), 7);
+        for &(i, row) in event.erased_components() {
+            let exact = &event.unresolved_reads()[i][row];
+            let published = &event.promoted_reads()[i][row];
+            assert!(!published.is_zero());
+            assert!((exact - published).abs() < exact.abs());
+        }
+        let next = theta
+            .rebased(locus, event.levels(), &BTreeSet::from([locus]))
+            .unwrap();
+        let before = theta.receiving_law(ring).unwrap();
+        let after = next.receiving_law(ring).unwrap();
+        for (a, b) in before
+            .map()
+            .entries()
+            .iter()
+            .zip(before.map_remainder().entries())
+            .zip(
+                after
+                    .map()
+                    .entries()
+                    .iter()
+                    .zip(after.map_remainder().entries()),
+            )
+        {
+            assert_eq!(a.0 + a.1, b.0 + b.1);
+        }
+        assert_eq!(after.map().get(0, 0).unwrap(), &Rat::one());
+        assert!(
+            next.receiving_precision_event(ring, &features, &tolerance)
+                .unwrap()
+                .is_none()
+        );
+        let state = next.continuing_state(field.sources()[0]).unwrap();
+        let state = ContinuingState::from_text(&state.to_text()).unwrap();
+        assert_eq!(theta.clone().continued(&state).unwrap(), next);
+    }
+
+    #[test]
+    fn receiving_precision_restores_erased_mode_and_bounds_remaining_error_not_output_change() {
+        let field =
+            Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
+        let ring = field.receivers()[0].ring;
+        let locus = Locus::ReceivingMap(ring);
+        let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
+        let exponent = theta.lattice(locus).unwrap().exponent();
+        let held = Lattice::new(exponent + 3).unit();
+        let law = theta.rings[ring]
+            .receiving
+            .as_mut()
+            .unwrap()
+            .single_mut()
+            .unwrap();
+        let mut entries = law.map.entries().to_vec();
+        entries[1] = Rat::one(); // A different mode is already published: no global zero-map hack.
+        law.map = flat_matrix(law.map.rows(), law.map.columns(), entries).unwrap();
+        law.map_carry.0.insert(0, held.clone());
+        law.map_carry
+            .0
+            .insert(law.map.columns(), crate::ratio::integer(2) * &held);
+        let mut feature = vec![Rat::zero(); law.map.columns()];
+        feature[0] = Rat::one();
+        let features = vec![feature];
+        let tolerance = &held / crate::ratio::integer(16);
+        let event = theta
+            .receiving_precision_event(ring, &features, &tolerance)
+            .unwrap()
+            .unwrap();
+        event.check_constitution(&theta).unwrap();
+        let mut different = theta.clone();
+        different.rings[0].standing[0] += Rat::one();
+        assert_eq!(different.commit(), theta.commit());
+        assert!(
+            event.check_constitution(&different).is_err(),
+            "same commit is not material identity"
+        );
+        assert_eq!(event.levels, 3);
+        assert!(
+            event.output_bounds[0] > tolerance,
+            "the explicit changed perception is allowed"
+        );
+        assert!(event.residual_bounds[0] <= tolerance);
+        assert_eq!(event.unresolved_reads[0][0], held);
+        assert_eq!(event.real_logit_output_bounds[0], held);
+        assert_eq!(event.phase_output_bounds[0], held);
+        assert_eq!(event.output_bounds[0], crate::ratio::integer(2) * &held);
+        assert!(event.phase_residual_bounds[0].is_zero());
+        let next = theta
+            .rebased(locus, event.levels, &BTreeSet::from([locus]))
+            .unwrap();
+        assert!(event.check_constitution(&next).is_err());
+        let before = theta.receiving_law(ring).unwrap();
+        let after = next.receiving_law(ring).unwrap();
+        assert_eq!(
+            before.map().apply(&features[0]).unwrap(),
+            vec![Rat::zero(); before.map.rows()]
+        );
+        assert_eq!(
+            after.map().apply(&features[0]).unwrap(),
+            event.promoted_reads[0]
+        );
+        assert!(
+            next.receiving_precision_event(ring, &features, &tolerance)
+                .unwrap()
+                .is_none()
+        );
+        let zero = vec![vec![Rat::zero(); before.map.columns()]];
+        assert!(
+            theta
+                .receiving_precision_event(ring, &zero, &tolerance)
+                .unwrap()
+                .is_none()
+        );
+        // A non-dyadic phase carry never becomes exactly representable at finite dyadic grain.
+        // It must remain reported, not turn the real-code precision event into an endless loop.
+        let mut nondyadic = theta.clone();
+        let law = nondyadic.rings[ring]
+            .receiving
+            .as_mut()
+            .unwrap()
+            .single_mut()
+            .unwrap();
+        let odd = law.map.columns();
+        law.map_carry.0.insert(
+            odd,
+            Lattice::new(exponent).unit() / crate::ratio::integer(3),
+        );
+        let phase_event = nondyadic
+            .receiving_precision_event(ring, &features, &tolerance)
+            .unwrap()
+            .unwrap();
+        assert_eq!(phase_event.levels, 3);
+        assert!(!phase_event.phase_residual_bounds[0].is_zero());
+        let promoted = nondyadic
+            .rebased(locus, phase_event.levels, &BTreeSet::from([locus]))
+            .unwrap();
+        let old = nondyadic.receiving_law(ring).unwrap();
+        let new = promoted.receiving_law(ring).unwrap();
+        assert_eq!(
+            &old.map.entries()[odd] + &old.map_remainder().entries()[odd],
+            &new.map.entries()[odd] + &new.map_remainder().entries()[odd]
+        );
+    }
+}
+
+#[cfg(test)]
+mod solved_chart_wide_tests {
+    use super::*;
+    #[test]
+    fn exact_chart_certificates_cross_fixed_width_boundaries() {
+        let rule = ChartRule::new(Lattice::new(31), 16);
+        for norm in [36u32, 38, 40, 100] {
+            let gram = vec![vec![Rat::new(
+                (BigInt::one() << (norm + 28) as usize) - BigInt::one(),
+                BigInt::one() << 28usize,
+            )]];
+            let (chart, _) = SolvedChart::founded(32)
+                .deposited(&gram, &[], &rule)
+                .unwrap();
+            assert_eq!(chart.exponent(), norm + 61);
+            assert_eq!(
+                chart.dense(1)[0][0],
+                Rat::new(BigInt::one(), BigInt::one() << norm as usize)
+            );
+            assert_eq!(
+                *chart.certificate(),
+                Rat::new(BigInt::one(), BigInt::one() << (norm + 28) as usize)
+            );
+            assert!(chart.certificate() <= &rule.target());
+            let carried = GramBlock::of(&gram, &chart.prior(), None, None, None, None).unwrap();
+            let (_, certificate) = certified(
+                &chart.block,
+                &carried.coordinates,
+                1,
+                chart.exponent + carried.exponent,
+            )
+            .unwrap();
+            assert_eq!(certificate, *chart.certificate());
+            assert_eq!(
+                chart.bits(1),
+                bits(&chart.dense(1)[0][0]) + bits(chart.certificate())
+            );
+        }
+    }
+}
+
+#[cfg(test)]
+mod solved_chart_wide_persistence_tests {
+    use super::*;
+    #[test]
+    fn wide_normal_deposit_and_saved_chart_preserve_exact_material() {
+        let lattice = Lattice::new(31);
+        let rule = ChartRule::new(lattice, 16);
+        let prior = BigInt::one() << 32usize;
+        let h = Rat::new(
+            (BigInt::one() << 128usize) - BigInt::one(),
+            BigInt::one() << 28usize,
+        );
+        let law = NormalLaw::with_scaled_prior(ExactRatMatrix::zero(1, 1).unwrap(), 32);
+        let sample = Sample {
+            weight: &h - Rat::from_integer(prior),
+            feature: vec![Rat::one()],
+            covector: vec![Rat::zero()],
+            masses: None,
+        };
+        let (mut next, reading) = law
+            .deposited(
+                &[sample],
+                &Rat::one(),
+                &rule,
+                &mut BudgetedCarry::new(lattice, 1),
+            )
+            .unwrap();
+        assert!(reading.is_some());
+        assert_eq!(next.gram[0][0], h);
+        assert!(next.gram_remainder().entries().iter().all(Zero::is_zero));
+        assert_eq!(next.map, law.map);
+        assert!(next.chart.certificate <= rule.target());
+        let exact = next.chart.dense(1);
+        let original_bits = next.chart.bits(1);
+        next.chart.block = next
+            .chart
+            .carried_to(&next.chart.support, next.chart.exponent + 200, 31, 32, 28)
+            .unwrap();
+        next.chart.exponent += 200;
+        assert!(next.chart.block.iter().any(|x| x.bits() > 128));
+        assert_eq!(next.chart.dense(1), exact);
+        assert_eq!(next.chart.bits(1), original_bits);
+        let mut saved = String::new();
+        write_law(&mut saved, &next);
+        let restored = read_law(&mut saved.lines(), next.map.clone()).unwrap();
+        assert_eq!(restored, next);
+        let carried = GramBlock::of(
+            &restored.gram,
+            &restored.chart.prior(),
+            None,
+            None,
+            None,
+            None,
+        )
+        .unwrap();
+        let (_, certificate) = certified(
+            &restored.chart.block,
+            &carried.coordinates,
+            1,
+            restored.chart.exponent + carried.exponent,
+        )
+        .unwrap();
+        assert_eq!(certificate, restored.chart.certificate);
+        // The stored coordinate width is not silently truncated by the next actual deposit.
+        let (continued, _) = restored
+            .deposited(
+                &[Sample {
+                    weight: Rat::one(),
+                    feature: vec![Rat::one()],
+                    covector: vec![Rat::zero()],
+                    masses: None,
+                }],
+                &Rat::one(),
+                &rule,
+                &mut BudgetedCarry::new(lattice, 2),
+            )
+            .unwrap();
+        assert_eq!(continued.gram[0][0], h + Rat::one());
+        assert!(continued.chart.certificate <= rule.target());
+    }
+}
+
+#[cfg(test)]
+mod wide_restore_budget_tests {
+    use super::*;
+    use crate::hnn::field::FieldDeclaration;
+    #[test]
+    fn restored_wide_chart_is_charged_to_the_openings_budget() {
+        let field =
+            Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
+        let opening = Constitution::initial(&field, 1 << 40).unwrap();
+        let ring = field.receivers()[0].ring;
+        let mut theta = opening.clone();
+        let law = theta.rings[ring]
+            .receiving
+            .as_mut()
+            .unwrap()
+            .single_mut()
+            .unwrap();
+        // A reachable normal-law chart, deliberately retained at a much finer exact chart
+        // lattice; its physical values and certificate are unchanged by coordinate transport.
+        let width = law.map.columns();
+        let mut feature = vec![Rat::zero(); width];
+        feature[0] = Rat::one();
+        let rule = ChartRule::new(theta.lattices[&Locus::ReceivingMap(ring)], theta.grain);
+        let (next, _) = law
+            .deposited(
+                &[Sample {
+                    weight: Rat::one(),
+                    feature,
+                    covector: vec![Rat::zero(); law.map.rows()],
+                    masses: None,
+                }],
+                &Rat::one(),
+                &rule,
+                &mut BudgetedCarry::new(rule.lattice(), 1),
+            )
+            .unwrap();
+        *law = next;
+        law.chart.block = law
+            .chart
+            .carried_to(
+                &law.chart.support,
+                law.chart.exponent + 200,
+                rule.lattice().exponent(),
+                law.chart.scale,
+                0,
+            )
+            .unwrap();
+        law.chart.exponent += 200;
+        assert!(law.chart.block.iter().any(|x| x.bits() > 128));
+        let state = theta.continuing_state(field.sources()[0]).unwrap();
+        let parsed = ContinuingState::from_text(&state.to_text()).unwrap();
+        assert_eq!(opening.clone().continued(&parsed).unwrap(), theta);
+        let bits = theta.exact_bits();
+        let mut limited = opening;
+        limited.budget = bits - 1;
+        // Budget participates in opening identity, so a different-budget opening already
+        // refuses the high-budget save. Exercise the new guard on a valid same-opening
+        // identity whose supplied learned material exceeds that opening's declared budget.
+        assert!(limited.clone().continued(&parsed).is_err());
+        theta.budget = bits - 1;
+        let over_budget = ContinuingState::from_text(
+            &theta
+                .continuing_state(field.sources()[0])
+                .unwrap()
+                .to_text(),
+        )
+        .unwrap();
+        let result = limited.continued(&over_budget);
+        assert!(
+            matches!(&result,Err(HnnError::ConstitutionBudget{bits:b,budget,..}) if *b==bits && *budget==bits-1),
+            "{result:?}"
+        );
+    }
+}
+
+#[cfg(test)]
+mod chart_coordinate_storage_tests {
+    use super::*;
+    use crate::hnn::field::FieldDeclaration;
+    #[test]
+    fn raw_coordinate_payload_is_separate_from_reduced_logical_bits() {
+        let mut block = Vec::with_capacity(12);
+        block.extend([
+            BigInt::zero(),
+            -(BigInt::one() << 130usize),
+            BigInt::one(),
+            BigInt::from(3),
+        ]);
+        let chart = SolvedChart {
+            exponent: 130,
+            scale: 0,
+            support: vec![0, 1],
+            block,
+            certificate: Rat::zero(),
+        };
+        let reading = chart.coordinate_storage();
+        assert_eq!(
+            (
+                reading.coordinate_count,
+                reading.magnitude_bits,
+                reading.max_magnitude_bits
+            ),
+            (4, 134, 131)
+        );
+        assert_eq!(
+            (
+                reading.negative_coordinates,
+                reading.positive_coordinates,
+                reading.zero_coordinates
+            ),
+            (1, 2, 1)
+        );
+        assert_eq!(
+            reading.vec_length_descriptor_bytes,
+            4 * std::mem::size_of::<BigInt>() as u128
+        );
+        assert_eq!(
+            reading.vec_capacity_descriptor_bytes,
+            12 * std::mem::size_of::<BigInt>() as u128
+        );
+        assert_eq!(reading.u32_digit_payload_bytes_estimate, 28);
+        assert_eq!(reading.u64_digit_payload_bytes_estimate, 40);
+        let mut finer = chart.clone();
+        finer.block = finer.block.iter().map(|x| x << 200usize).collect();
+        finer.exponent += 200;
+        assert_eq!(finer.dense(2), chart.dense(2));
+        assert_eq!(finer.bits(2), chart.bits(2));
+        assert_eq!(
+            finer.coordinate_storage().magnitude_bits,
+            reading.magnitude_bits + 600
+        );
+        assert_eq!(
+            SolvedChart::identity().coordinate_storage(),
+            ChartCoordinateStorage::default()
+        );
+    }
+    #[test]
+    fn constitution_aggregates_all_normal_law_chart_payloads() {
+        let field =
+            Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
+        let mut theta = Constitution::initial(&field, 1 << 40).unwrap();
+        let ring = field.receivers()[0].ring;
+        theta.rings[ring]
+            .receiving
+            .as_mut()
+            .unwrap()
+            .single_mut()
+            .unwrap()
+            .chart
+            .block = vec![BigInt::one() << 200usize];
+        let readings = theta.chart_coordinate_storage_by_locus();
+        assert_eq!(
+            readings.len(),
+            field.rings().len() + field.sources().len() + field.receivers().len()
+        );
+        let mut sum = ChartCoordinateStorage::default();
+        for (_, reading) in &readings {
+            sum.add(reading);
+        }
+        assert_eq!(theta.chart_coordinate_storage(), sum);
+        assert_eq!(sum.coordinate_count, 1);
+        assert_eq!(sum.magnitude_bits, 201);
+        assert_eq!(
+            readings
+                .iter()
+                .find(|(locus, _)| *locus == LinearLocus::Receiving(ring))
+                .unwrap()
+                .1,
+            theta
+                .receiving_law(ring)
+                .unwrap()
+                .chart_coordinate_storage()
+        );
     }
 }
 

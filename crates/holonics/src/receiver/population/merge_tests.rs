@@ -57,7 +57,11 @@ fn the_kt_mass_is_the_exchangeable_product_of_its_faces() {
     let order = [true, false, false, true, false];
     let (mut ones, mut zeros, mut product) = (0u64, 0u64, Rat::one());
     for letter in order {
-        let (count, total) = if letter { (ones, ones + zeros) } else { (zeros, ones + zeros) };
+        let (count, total) = if letter {
+            (ones, ones + zeros)
+        } else {
+            (zeros, ones + zeros)
+        };
         product *= Rat::new(BigInt::from(2 * count + 1), BigInt::from(2 * total + 2));
         if letter {
             ones += 1;
@@ -70,7 +74,11 @@ fn the_kt_mass_is_the_exchangeable_product_of_its_faces() {
 
 #[test]
 fn the_restaurant_ratio_is_the_masses_ratio_and_never_below_two() {
-    for (a, b, rest) in [(1usize, 1usize, vec![]), (3, 2, vec![1, 4]), (5, 1, vec![2])] {
+    for (a, b, rest) in [
+        (1usize, 1usize, vec![]),
+        (3, 2, vec![1, 4]),
+        (5, 1, vec![2]),
+    ] {
         let mut before = vec![a, b];
         before.extend(&rest);
         let mut after = vec![a + b];
@@ -127,11 +135,7 @@ fn the_price_is_the_code_length_pair_decided_exactly() {
 
 #[test]
 fn a_merge_keeps_every_seed_and_splits_back_exactly() {
-    let items = vec![
-        item(0, &[[20, 2]]),
-        item(0, &[[19, 2]]),
-        item(1, &[[4, 0]]),
-    ];
+    let items = vec![item(0, &[[20, 2]]), item(0, &[[19, 2]]), item(1, &[[4, 0]])];
     let mut blocks = Blocks::new(2, 1, items.clone()).expect("blocks");
     let before = blocks.likelihood_bits().expect("bits");
     assert!(blocks.price(0, 2).is_err(), "merges stay within one group");

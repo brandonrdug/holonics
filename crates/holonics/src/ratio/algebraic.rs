@@ -231,6 +231,69 @@ pub fn log2_enclosure(value: &Rat) -> Result<ExactInterval, ExactValueError> {
     ExactInterval::new(lower, upper)?.round_out(LOG_OCTAVES)
 }
 
+/// **`log₂` at the receiver's declared dyadic precision**, enclosed on `2^(−bits)`.
+///
+/// [proved-standard; sizing agent-inferred] Write `value = 2^e r`, `1 ≤ r < 2`, and keep
+/// `e` exact: `log₂ value = e + ln r / ln 2`. For both logarithm series, `z ≤ 1/3`, so the
+/// tail after `n` terms is at most `2^(−3n)`. We take `n = ceil((bits + 6)/3)` and work at
+/// `bits + ceil(log₂(n + 1)) + 8` octaves. With working-grid unit `δ`, each power endpoint
+/// errs by at most `9δ/8`; sum and tail rounding give a width at most
+/// `8(n + 1)δ + 2^(−3n) ≤ 3·2^(−bits)/64` for either logarithm. Their quotient has width
+/// at most six times that (`ln 2`'s lower bound is at least `1/2`, both numerators are at
+/// most one). Final outward rounding therefore leaves width less than `3·2^(−bits)`.
+/// Increasing precision refines the series itself, not just the grid holding a fixed series.
+///
+/// Powers of two remain exact at every precision, including zero bits. Nonpositive values
+/// and precision arithmetic that cannot be represented are refused. The fixed-grid
+/// [`log2_enclosure`] is unchanged.
+pub fn log2_enclosure_at(value: &Rat, bits: u32) -> Result<ExactInterval, ExactValueError> {
+    if !value.is_positive() {
+        return Err(ExactValueError::NonPositiveLogarithm);
+    }
+    if let (Some(n), Some(d)) = (
+        value.numer().to_biguint().filter(|n| n.count_ones() == 1),
+        value.denom().to_biguint().filter(|d| d.count_ones() == 1),
+    ) {
+        let exponent = BigInt::from(n.bits()) - BigInt::from(d.bits());
+        return Ok(ExactInterval::point(Rat::from_integer(exponent)));
+    }
+
+    let overflow = || ExactValueError::LogarithmPrecisionOverflow { bits };
+    let terms = bits.checked_add(8).ok_or_else(overflow)? / 3;
+    // ceil(log₂(n + 1)) is the bit length of the positive integer n.
+    let guard = u32::BITS - terms.leading_zeros();
+    let octaves = bits
+        .checked_add(guard)
+        .and_then(|value| value.checked_add(8))
+        .ok_or_else(overflow)?;
+    // natural_log_enclosure forms each odd coefficient and the tail's 2n + 1 in u32.
+    terms
+        .checked_mul(2)
+        .and_then(|value| value.checked_add(1))
+        .ok_or_else(overflow)?;
+
+    let two = Rat::from_integer(BigInt::from(2));
+    let mut reduced = value.clone();
+    let mut exponent = BigInt::zero();
+    while reduced >= two {
+        reduced /= &two;
+        exponent += BigInt::one();
+    }
+    while reduced < Rat::one() {
+        reduced *= &two;
+        exponent -= BigInt::one();
+    }
+    let natural = natural_log_enclosure(&reduced, terms, octaves)?;
+    let log_two = natural_log_enclosure(&two, terms, octaves)?;
+    let exponent = Rat::from_integer(exponent);
+    // The reduced logarithm is nonnegative, and log_two.lower is positive at this sizing.
+    ExactInterval::new(
+        &exponent + natural.lower / log_two.upper,
+        exponent + natural.upper / log_two.lower,
+    )?
+    .round_out(bits)
+}
+
 /// **`ln` of a positive rational, enclosed** at the declared series terms, held on the declared
 /// grid; a point at one. Refused at a value that is not positive.
 pub fn ln_enclosure(value: &Rat) -> Result<ExactInterval, ExactValueError> {
@@ -253,6 +316,17 @@ fn ln_two() -> Result<&'static ExactInterval, ExactValueError> {
 pub fn log2_of_enclosure(value: &ExactInterval) -> Result<ExactInterval, ExactValueError> {
     let lower = log2_enclosure(&value.lower)?;
     let upper = log2_enclosure(&value.upper)?;
+    ExactInterval::new(lower.lower, upper.upper)
+}
+
+/// `log₂` of an enclosed positive value on `2^(−bits)`, using monotonicity at its endpoints.
+/// The input interval's width is retained; only the endpoint logarithms are refined.
+pub fn log2_of_enclosure_at(
+    value: &ExactInterval,
+    bits: u32,
+) -> Result<ExactInterval, ExactValueError> {
+    let lower = log2_enclosure_at(&value.lower, bits)?;
+    let upper = log2_enclosure_at(&value.upper, bits)?;
     ExactInterval::new(lower.lower, upper.upper)
 }
 
@@ -847,6 +921,8 @@ impl AlgebraicRoot {
 pub enum ExactValueError {
     #[error("a logarithm was asked of a non-positive value")]
     NonPositiveLogarithm,
+    #[error("logarithm precision {bits} overflows its series or working-grid arithmetic")]
+    LogarithmPrecisionOverflow { bits: u32 },
     #[error("an exact interval cannot have its lower endpoint above its upper endpoint")]
     ReversedInterval,
     #[error("the zero polynomial does not identify an algebraic species")]
@@ -1167,6 +1243,113 @@ mod tests {
             natural_log_enclosure(&Rat::zero(), 40, 128),
             Err(ExactValueError::NonPositiveLogarithm)
         );
+    }
+
+    #[test]
+    fn variable_precision_logarithms_keep_binary_powers_exact() {
+        for exponent in [-257_i32, -1, 0, 1, 257] {
+            let power = BigInt::one() << exponent.unsigned_abs() as usize;
+            let value = if exponent < 0 {
+                Rat::new(BigInt::one(), power)
+            } else {
+                Rat::from_integer(power)
+            };
+            for bits in [0, 1, 32, 96, 192, u32::MAX] {
+                assert_eq!(
+                    log2_enclosure_at(&value, bits).unwrap(),
+                    ExactInterval::point(Rat::from_integer(BigInt::from(exponent)))
+                );
+            }
+        }
+    }
+
+    /// The 384-bit width would fail with a finer grid around the old 48-term series.
+    #[test]
+    fn variable_precision_logarithms_refine_the_series_and_the_grid() {
+        for value in [rat(3, 2), rat(1, 3), integer(3), rat(10, 7), rat(257, 256)] {
+            let mut previous: Option<ExactInterval> = None;
+            for bits in [0, 16, 32, 96, 192, 384] {
+                let enclosure = log2_enclosure_at(&value, bits).unwrap();
+                let unit = Rat::new(BigInt::one(), BigInt::one() << bits as usize);
+                assert!(!enclosure.is_point());
+                assert!(&enclosure.upper - &enclosure.lower < integer(3) * &unit);
+                assert!((&enclosure.lower / &unit).is_integer());
+                assert!((&enclosure.upper / &unit).is_integer());
+                if let Some(coarser) = previous {
+                    assert!(coarser.lower <= enclosure.lower);
+                    assert!(enclosure.upper <= coarser.upper);
+                }
+                previous = Some(enclosure);
+            }
+        }
+        // (3/2)^2 > 2 and (3/2)^3 < 4 locate its logarithm without a float.
+        let enclosure = log2_enclosure_at(&rat(3, 2), 192).unwrap();
+        assert!(enclosure.lower > rat(1, 2));
+        assert!(enclosure.upper < rat(2, 3));
+    }
+
+    #[test]
+    fn variable_precision_logarithms_keep_the_binary_exponent_exact() {
+        let base = rat(3, 2);
+        let reference = log2_enclosure_at(&base, 192).unwrap();
+        let power = Rat::from_integer(BigInt::one() << 257_usize);
+        for (value, exponent) in [
+            (&base * &power, integer(257)),
+            (base / power, integer(-257)),
+        ] {
+            assert_eq!(
+                log2_enclosure_at(&value, 192).unwrap(),
+                ExactInterval::new(&reference.lower + &exponent, &reference.upper + exponent)
+                    .unwrap()
+            );
+        }
+    }
+
+    #[test]
+    fn variable_precision_interval_logarithms_keep_monotone_endpoints() {
+        let value = ExactInterval::new(rat(1, 3), rat(3, 2)).unwrap();
+        for bits in [0, 32, 192] {
+            let enclosed = log2_of_enclosure_at(&value, bits).unwrap();
+            assert_eq!(
+                enclosed.lower,
+                log2_enclosure_at(&value.lower, bits).unwrap().lower
+            );
+            assert_eq!(
+                enclosed.upper,
+                log2_enclosure_at(&value.upper, bits).unwrap().upper
+            );
+            assert_eq!(
+                log2_of_enclosure_at(&ExactInterval::new(rat(1, 8), integer(8)).unwrap(), bits)
+                    .unwrap(),
+                ExactInterval::new(integer(-3), integer(3)).unwrap()
+            );
+        }
+    }
+
+    #[test]
+    fn variable_precision_logarithms_refuse_nonpositive_values_and_overflow() {
+        for value in [integer(0), integer(-1)] {
+            for bits in [0, 192, u32::MAX] {
+                assert_eq!(
+                    log2_enclosure_at(&value, bits),
+                    Err(ExactValueError::NonPositiveLogarithm)
+                );
+                assert_eq!(
+                    log2_of_enclosure_at(
+                        &ExactInterval::new(value.clone(), integer(1)).unwrap(),
+                        bits
+                    ),
+                    Err(ExactValueError::NonPositiveLogarithm)
+                );
+            }
+        }
+        // The first request overflows the series sizing, the second the guarded grid.
+        for bits in [u32::MAX, u32::MAX - 8] {
+            assert_eq!(
+                log2_enclosure_at(&rat(3, 2), bits),
+                Err(ExactValueError::LogarithmPrecisionOverflow { bits })
+            );
+        }
     }
 }
 

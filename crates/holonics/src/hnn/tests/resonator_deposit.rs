@@ -5,18 +5,18 @@ use super::learning::{chain, chain_declaration, chain_reach, generic, phases};
 
 use num_traits::{One, Zero};
 
-use crate::hnn::tests::support::encoded;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
     Carrier, Constitution, FactorGradient, FactorStep, GainBacktrack, Locus,
 };
 use crate::hnn::field::{Current, Field};
 use crate::hnn::port::{Deposit, ExecutionPort, Handle};
-use crate::hnn::reference::{Reference};
+use crate::hnn::reference::Reference;
 use crate::hnn::retention::{Opens, collapse, loci, retained};
 use crate::hnn::ring::{
     PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands, ResonatorRemainders,
 };
+use crate::hnn::tests::support::encoded;
 use crate::hnn::word::{EndChange, PowerForm};
 use crate::holon::parametron::Carrier as PumpAxis;
 use crate::ratio::linear::ExactRatMatrix;

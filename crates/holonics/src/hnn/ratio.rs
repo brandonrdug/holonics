@@ -2,14 +2,14 @@
 //!
 //! [definition] The loss is the logarithm of a ratio of Holons (design (a), `compare`; "Exact
 //! charts"). At receiving phase `j` the produced Holon `|H⟩` is the logit vector
-//! `f_j = k(a_j)/L_R + R P_R^(τ_R) v_R(e_j)`, the landmark tree's grain logits at phase `j`'s causal
+//! `f_j = k(a_j)/L_R + R v_R(e_j)` (`v_R` in the passage frame), the landmark tree's grain logits at phase `j`'s causal
 //! address plus the wave (the landmark tree, `hnn::receiving::ReceivingRead::combined`; the covector below
 //! is read on this combined face and flows back through `R` alone), and the target `|T⟩` is the byte
 //! `t_j` read in the same exterior chart that `E` reads: the one-hot `q_j`, with the receiving
 //! ring's clock `τ_R(j)` advanced by selective stepping over the targets. Both phases are read in
-//! the cut's frame: the target's is
-//! `φ^T_j = (τ_R(j) − d_R w)/d_R` turns with `w = ⌊λ_R/d_R⌋` the cut's winding, which is the log's
-//! branch ([`TargetPhases`]). The produced side reads only a phase class through `P_R^(τ_R)` and
+//! the passage frame, from the anchor's own lift `λ_R`: the target's is
+//! `φ^T_j = (τ_R(j) − λ_R)/d_R` turns, with `w = ⌊λ_R/d_R⌋` the cut's winding, which is the log's
+//! branch ([`TargetPhases`]). The produced side reads the anchor as it stands and
 //! represents no stream winding, so the winding is carried as the branch and never descended on,
 //! and the gap stays at the scale of the magnitude part (review C1: the absolute `τ_R/d_R` reached
 //! 521 turns over 40,000 cells). Their ratio at the target class is
@@ -200,6 +200,13 @@ impl Face {
         )?)
     }
 
+    fn log_normalizer(&self) -> Result<ExactInterval, HnnError> {
+        Ok(match self.normalizer.as_rational() {
+            Some(value) => log2_enclosure(value)?,
+            None => log2_of_enclosure(&self.normalizer.enclosure()?)?,
+        })
+    }
+
     /// **The exact mass `p̂_c`** in `ℚ(θ)`.
     pub fn mass(&self, class: usize) -> Result<PhaseField, HnnError> {
         Ok(self
@@ -208,19 +215,57 @@ impl Face {
             .times(&self.normalizer.inverse()?)?)
     }
 
+    /// All classes attaining the largest exact face mass, preserving ties.
+    ///
+    /// Every mass has the same positive normalizer. Its numerator is
+    /// `2^(carry - top + phase / grain)`; normalized phases are in `0..grain`.
+    /// Thus lexicographic `(carry, phase)` ordering is exact, without separately
+    /// enclosing a shared logarithmic normalizer. Fibres and imaginary phases
+    /// remain separate readings, as in [`Self::mass`].
+    pub fn maximal_mass_classes(&self) -> Vec<usize> {
+        let maximum = self
+            .cells
+            .iter()
+            .map(|cell| (&cell.carry, cell.phase))
+            .max();
+        self.cells
+            .iter()
+            .enumerate()
+            .filter(|(_, cell)| Some((&cell.carry, cell.phase)) == maximum)
+            .map(|(class, _)| class)
+            .collect()
+    }
+
     /// **The code length `−log₂ p̂_c`**, enclosed: `log₂ Z − (n_c − n_top) − k_c/L`.
     pub fn code_length(&self, class: usize) -> Result<ExactInterval, HnnError> {
         let carried = self.carried(class)?;
         let offset = Rat::from_integer(carried.carry().clone())
             + Rat::new(BigInt::from(carried.phase()), BigInt::from(self.grain));
-        let log_normalizer = match self.normalizer.as_rational() {
-            Some(value) => log2_enclosure(value)?,
-            None => log2_of_enclosure(&self.normalizer.enclosure()?)?,
-        };
+        let log_normalizer = self.log_normalizer()?;
         Ok(interval_difference(
             &log_normalizer,
             &ExactInterval::point(offset),
         )?)
+    }
+
+    /// **Every class's code length `−log₂ p̂_c`**, enclosed in class order.
+    ///
+    /// The normalizer is shared by all class masses, so its logarithm is enclosed once and the
+    /// exact carried-power offsets are subtracted individually. This is equivalent to calling
+    /// [`Self::code_length`] for every class, while avoiding repeated logarithm enclosures.
+    pub fn code_lengths(&self) -> Result<Vec<ExactInterval>, HnnError> {
+        let log_normalizer = self.log_normalizer()?;
+        (0..self.cells.len())
+            .map(|class| {
+                let carried = self.carried(class)?;
+                let offset = Rat::from_integer(carried.carry().clone())
+                    + Rat::new(BigInt::from(carried.phase()), BigInt::from(self.grain));
+                Ok(interval_difference(
+                    &log_normalizer,
+                    &ExactInterval::point(offset),
+                )?)
+            })
+            .collect()
     }
 
     /// **The odometer masses** `p̃_c = 2^(n_c)(L + k_c) / Σ_d 2^(n_d)(L + k_d)`: the covector's
@@ -256,9 +301,11 @@ impl Faces {
 // -------------------------------------------------------------------------------------------
 // the target's phase
 
-/// [definition] **The target phases of one epoch, read in the cut's frame** (Lean
-/// `HNN/Ratio.alignCost_turns`): the receiving ring's winding at the anchor, `w = ⌊λ_R/d_R⌋`, which
-/// is the log's branch, and `φ^T_j = (τ_R(j) − d_R w)/d_R` turns per receiving phase.
+/// [definition] **The target phases of one epoch, read in the passage frame** (Lean
+/// `HNN/Ratio.alignCost_turns`, recharted by `receivingPhase_ratio`): the receiving ring's winding
+/// at the anchor, `w = ⌊λ_R/d_R⌋`, which is the log's branch, and `φ^T_j = (τ_R(j) − λ_R)/d_R`
+/// turns per receiving phase, measured from the anchor's own lift, where the receiver reads
+/// (`hnn::receiving`, the passage frame).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TargetPhases {
     pub branch: BigInt,
@@ -267,11 +314,14 @@ pub struct TargetPhases {
 
 /// **The target phases** of an epoch: the receiving ring's lift from the anchor `λ`, advanced by
 /// selective stepping over the encoded targets `t_0 … t_j` (with carries, as ingest would, without
-/// ingesting; a located route's digits and its squares at the consumer), read relative to the cut's
-/// winding `w = ⌊λ_R/d_R⌋`, which is returned as the branch. On an identity each phase lies in
-/// `[0, 1 + 2(j+1)/d_R)`, the anchor's open phase plus at most two ticks a cell (a step and a
-/// carry), however long the stream before the cut; a located step advances a ring by at most its
-/// period. Refused unless the field admits the targets (`Field::admit`).
+/// ingesting; a located route's digits and its squares at the consumer), read from the anchor's
+/// own lift `λ_R`, the passage frame the receiving read is in. The cut's winding `w = ⌊λ_R/d_R⌋`
+/// is returned as the branch. [agent-inferred, F1, October 16] The anchor's open phase
+/// `(λ_R − d_R w)/d_R` is the common rechart of target and produced phases (Lean
+/// `HNN/Ratio.receivingPhase_ratio`): the read no longer turns with the clock, so neither does the
+/// target. On an identity each phase lies in `[0, 2(j+1)/d_R]`, at most two ticks a cell (a step
+/// and a carry), however long the stream before the cut; a located step advances a ring by at most
+/// its period. Refused unless the field admits the targets (`Field::admit`).
 pub fn target_phases(
     field: &Field,
     anchor: &[BigInt],
@@ -289,14 +339,14 @@ pub fn target_phases(
         expected: field.rings().len(),
         found: anchor.len(),
     })?;
-    // The cut's winding is the receiving ring's clock's (`Ring::clock_at`).
+    // The cut's winding is the receiving ring's clock's (`Ring::clock_at`); the phases are
+    // measured from the anchor's own lift.
     let branch = BigInt::from(declared.clock_at(at)?.winding().clone());
-    let floor = &branch * BigInt::from(period);
     let mut lift = anchor.to_vec();
     let phases = (0..targets.len())
-        .map(|at| {
-            field.step_occurrence(&mut lift, targets, at)?;
-            Ok(Rat::new(&lift[ring] - &floor, BigInt::from(period)))
+        .map(|step| {
+            field.step_occurrence(&mut lift, targets, step)?;
+            Ok(Rat::new(&lift[ring] - at, BigInt::from(period)))
         })
         .collect::<Result<_, HnnError>>()?;
     Ok(TargetPhases { branch, phases })
@@ -306,7 +356,7 @@ pub fn target_phases(
 // the Holon ratio
 
 /// [definition] **The ratio at one receiving phase** at its target class `t`: the target's phase
-/// `φ^T` in the cut's frame, the produced phase `φ^H_t`, the gap past the cut's winding
+/// `φ^T` in the passage frame, the produced phase `φ^H_t`, the gap past the cut's winding
 /// `Δ = φ^T − φ^H_t` read as its windings and open phase ([`Reading`]), the cut's winding `w` as
 /// the branch, never descended on (Lean `HNN/Ratio.alignCost_turns`), the code length `−log₂ p̂(t)`
 /// (the KL part against the one-hot target, enclosed), and the phase excess `½ Δ²` exactly.
@@ -347,7 +397,7 @@ pub struct HolonRatio {
 
 impl HolonRatio {
     /// **Compare the produced faces with the targets** `(t_j, φ^T_j)`, one per receiving phase,
-    /// the target phases read in the cut's frame with its winding the branch.
+    /// the target phases read in the passage frame with the cut's winding the branch.
     pub fn compare(
         faces: Faces,
         targets: &[usize],
@@ -520,12 +570,16 @@ impl ReceivingFaceRatio {
                 found: observed.len(),
             });
         }
-        let stations: Vec<_> = observed.iter().enumerate()
-            .filter_map(|(j, q)| q.as_ref().map(|_| j)).collect();
+        let stations: Vec<_> = observed
+            .iter()
+            .enumerate()
+            .filter_map(|(j, q)| q.as_ref().map(|_| j))
+            .collect();
         for &j in &stations {
             let p = &produced.faces[j];
             let q = observed[j].as_ref().expect("an observed receiving region");
-            if p.cells().is_empty() || p.grain() != q.grain()
+            if p.cells().is_empty()
+                || p.grain() != q.grain()
                 || p.cells().len() != q.cells().len()
                 || p.phases().len() != p.cells().len()
                 || q.phases().len() != q.cells().len()
@@ -535,20 +589,39 @@ impl ReceivingFaceRatio {
                 });
             }
         }
-        Ok(Self { produced, observed, stations, branch })
+        Ok(Self {
+            produced,
+            observed,
+            stations,
+            branch,
+        })
     }
 
-    pub fn faces(&self) -> &Faces { &self.produced }
-    pub fn observed(&self) -> &[Option<Face>] { &self.observed }
-    pub fn stations(&self) -> &[usize] { &self.stations }
+    pub fn faces(&self) -> &Faces {
+        &self.produced
+    }
+    pub fn observed(&self) -> &[Option<Face>] {
+        &self.observed
+    }
+    pub fn stations(&self) -> &[usize] {
+        &self.stations
+    }
 
     /// The actual target-to-produced phase gap, including its winding and unresolved phase.
     pub fn phase_gap(&self, station: usize, class: usize) -> Result<Reading, HnnError> {
-        let q = self.observed.get(station).and_then(Option::as_ref)
-            .ok_or(HnnError::Unadmitted { reason: "an actual compared receiving region" })?;
+        let q =
+            self.observed
+                .get(station)
+                .and_then(Option::as_ref)
+                .ok_or(HnnError::Unadmitted {
+                    reason: "an actual compared receiving region",
+                })?;
         let p = &self.produced.faces[station];
         let (Some(p), Some(q)) = (p.phases().get(class), q.phases().get(class)) else {
-            return Err(HnnError::CellOutside { code: class, alphabet: p.cells().len() });
+            return Err(HnnError::CellOutside {
+                code: class,
+                alphabet: p.cells().len(),
+            });
         };
         Ok(Reading::of_turns(&(q - p)))
     }
@@ -557,12 +630,22 @@ impl ReceivingFaceRatio {
     /// The open phase remains in `phase_gap`; neither the pair nor its branch is collapsed.
     pub fn log_ratio(&self, station: usize, class: usize) -> Result<LogRatio, HnnError> {
         let gap = self.phase_gap(station, class)?;
-        let q = self.observed[station].as_ref().expect("a compared receiving region");
+        let q = self.observed[station]
+            .as_ref()
+            .expect("a compared receiving region");
         let p_mass = self.produced.faces[station].odometer_masses()?[class].clone();
         let q_mass = q.odometer_masses()?[class].clone();
-        let winding = (&self.branch + gap.windings()).to_i64().ok_or(HnnError::CountOverflow)?;
-        LogRatio::new(GaussianRat::real(q_mass), GaussianRat::real(p_mass), winding)
-            .map_err(|_| HnnError::Unadmitted { reason: "a nonzero paired receiving mass" })
+        let winding = (&self.branch + gap.windings())
+            .to_i64()
+            .ok_or(HnnError::CountOverflow)?;
+        LogRatio::new(
+            GaussianRat::real(q_mass),
+            GaussianRat::real(p_mass),
+            winding,
+        )
+        .map_err(|_| HnnError::Unadmitted {
+            reason: "a nonzero paired receiving mass",
+        })
     }
 
     /// Cross-entropy at the observed grain representative, region by region.
@@ -570,7 +653,9 @@ impl ReceivingFaceRatio {
     pub fn code_length(&self) -> Result<ExactInterval, HnnError> {
         let mut total = ExactInterval::point(Rat::zero());
         for &j in &self.stations {
-            let q = self.observed[j].as_ref().expect("a compared receiving region");
+            let q = self.observed[j]
+                .as_ref()
+                .expect("a compared receiving region");
             for (class, mass) in q.odometer_masses()?.iter().enumerate() {
                 let length = self.produced.faces[j].code_length(class)?;
                 let weighted = ExactInterval::new(&length.lower * mass, &length.upper * mass)?;
@@ -584,7 +669,9 @@ impl ReceivingFaceRatio {
     pub fn excess(&self) -> Result<Rat, HnnError> {
         let mut total = Rat::zero();
         for &j in &self.stations {
-            let q = self.observed[j].as_ref().expect("a compared receiving region");
+            let q = self.observed[j]
+                .as_ref()
+                .expect("a compared receiving region");
             for (class, mass) in q.odometer_masses()?.iter().enumerate() {
                 let gap = self.phase_gap(j, class)?.turns();
                 total += mass * &gap * &gap / integer(2);
@@ -596,11 +683,17 @@ impl ReceivingFaceRatio {
     /// The reached covector uses both producing operands and the observed target face.
     /// Unobserved regions have exactly zero covectors; no class leader is substituted for q.
     pub fn covector(&self) -> Result<RatioCovector, HnnError> {
-        let mut logits: Vec<_> = self.produced.faces.iter()
-            .map(|p| vec![Rat::zero(); 2 * p.cells().len()]).collect();
+        let mut logits: Vec<_> = self
+            .produced
+            .faces
+            .iter()
+            .map(|p| vec![Rat::zero(); 2 * p.cells().len()])
+            .collect();
         for &j in &self.stations {
             let p = &self.produced.faces[j];
-            let q = self.observed[j].as_ref().expect("a compared receiving region");
+            let q = self.observed[j]
+                .as_ref()
+                .expect("a compared receiving region");
             let p_mass = p.odometer_masses()?;
             let q_mass = q.odometer_masses()?;
             for class in 0..p.cells().len() {
@@ -639,5 +732,91 @@ impl RatioCovector {
     /// The descent direction `−R⁻¹dR` at receiving phase `j`: the normal law's covector `g`.
     pub fn descent(&self, phase: usize) -> Vec<Rat> {
         self.logits[phase].iter().map(|x| -x).collect()
+    }
+}
+
+#[cfg(test)]
+mod exact_mass_order_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    #[test]
+    fn shared_normalizer_mass_order_keeps_grain_ties_and_signed_carries() {
+        let face = Face::of_read(
+            &ReceivingRead::of_logits(
+                vec![
+                    rat(-1, 16),
+                    integer(0),
+                    integer(0),
+                    integer(0),
+                    rat(1, 16),
+                    integer(7),
+                    rat(3, 32),
+                    integer(-9),
+                ],
+                16,
+            ),
+            16,
+        )
+        .unwrap();
+        // Last two real logits occupy the same grain cell despite distinct fibres and phases.
+        assert_eq!(face.maximal_mass_classes(), vec![2, 3]);
+        assert_eq!(face.mass(2).unwrap(), face.mass(3).unwrap());
+        let shifted = Face::of_read(
+            &ReceivingRead::of_logits(vec![rat(1, 16), integer(0), rat(2, 16), integer(0)], 16),
+            16,
+        )
+        .unwrap();
+        assert_eq!(shifted.maximal_mass_classes(), vec![1]);
+    }
+}
+
+#[cfg(test)]
+mod bulk_code_length_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    #[test]
+    fn bulk_code_lengths_match_individual_rational_and_algebraic_enclosures() {
+        let cases = [
+            (
+                vec![
+                    integer(-2),
+                    integer(0),
+                    integer(0),
+                    integer(0),
+                    integer(3),
+                    integer(0),
+                ],
+                true,
+            ),
+            (
+                vec![
+                    rat(-1, 16),
+                    integer(0),
+                    integer(0),
+                    integer(0),
+                    rat(1, 16),
+                    integer(0),
+                    rat(3, 32),
+                    integer(0),
+                ],
+                false,
+            ),
+        ];
+
+        for (logits, rational_normalizer) in cases {
+            let face = Face::of_read(&ReceivingRead::of_logits(logits, 16), 16).unwrap();
+            assert_eq!(
+                face.normalizer().as_rational().is_some(),
+                rational_normalizer
+            );
+
+            let bulk = face.code_lengths().unwrap();
+            let individual = (0..face.cells().len())
+                .map(|class| face.code_length(class).unwrap())
+                .collect::<Vec<_>>();
+            assert_eq!(bulk, individual);
+        }
     }
 }

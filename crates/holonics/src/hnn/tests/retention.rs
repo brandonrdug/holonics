@@ -10,7 +10,6 @@ use std::collections::BTreeSet;
 use num_traits::{Signed, Zero};
 
 use super::learning::{generic, moment, path_with, phases, six_path};
-use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
@@ -24,6 +23,7 @@ use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::receiving::{ActiveAddress, ReceivingPhases};
 use crate::hnn::reference::{Reception, Reference, compose};
 use crate::hnn::retention::{Diamond, Opens, collapse, loci, retained, retained_on_motion};
+use crate::hnn::tests::support::encoded;
 use crate::hnn::word::Word;
 use crate::ratio::{Rat, integer, rat};
 
@@ -299,7 +299,6 @@ fn compose_deposit(field: &Field, theta: &Constitution, pending: &PendingRatio) 
         .pull_back(
             &ratio.covector().unwrap(),
             theta.receiving_map(2).unwrap(),
-            &pending.anchor()[2],
             pending.phases(),
         )
         .unwrap();
@@ -513,7 +512,9 @@ fn the_collapse_deletes_whole_loci() {
 /// Ingest zeros until the joint clock carries out.
 fn to_the_carry_out(reference: &Reference, resident: &mut crate::hnn::reference::Resident) {
     let field = resident.field().clone();
-    let (moment, _) = reference.ingest(resident, None, &encoded(&field, &[])).unwrap();
+    let (moment, _) = reference
+        .ingest(resident, None, &encoded(&field, &[]))
+        .unwrap();
     for _ in 0..4096 {
         let (_, ingested) = reference
             .ingest(resident, Some(&moment), &encoded(&field, &[0]))
@@ -742,11 +743,19 @@ fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
     let mut resident = reference
         .mount_with(&field, &Current::at_rest(&field), generic(&field, 23))
         .unwrap();
-    let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
+    let (moment, _) = reference
+        .ingest(&mut resident, None, &encoded(&field, &[]))
+        .unwrap();
     let phases = resident.admitted()[0].clone();
     let mut draw = Draw::new(23);
     let cells: Vec<usize> = (0..64)
-        .map(|k| if draw.below(8) == 0 { draw.below(4) } else { [0, 1, 2, 1][k % 4] })
+        .map(|k| {
+            if draw.below(8) == 0 {
+                draw.below(4)
+            } else {
+                [0, 1, 2, 1][k % 4]
+            }
+        })
         .collect();
     let mut position = 0;
     loop {
@@ -762,30 +771,47 @@ fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
         if ingested.carry_out {
             break;
         }
-        assert!(position + 2 <= cells.len(), "the joint clock carries out within the cut");
+        assert!(
+            position + 2 <= cells.len(),
+            "the joint clock carries out within the cut"
+        );
     }
     let (id, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let (other, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     reference
         .compare(&mut resident, other, &encoded(&field, &[1, 2]))
         .unwrap();
-    let held = resident.carried().cloned().expect("the refine writes the carry");
+    let held = resident
+        .carried()
+        .cloned()
+        .expect("the refine writes the carry");
     assert!(
         held.momenta.iter().flatten().any(|x| !x.is_zero()),
         "the carried end holds momentum at a contact"
     );
     let boundary = reference.close_aeon(&mut resident, &[]).unwrap();
     let collapse = &boundary.forward.present().unwrap().collapse;
-    assert!(collapse.released.contains(&Locus::Channel(0)), "the collapse releases the contacts");
+    assert!(
+        collapse.released.contains(&Locus::Channel(0)),
+        "the collapse releases the contacts"
+    );
     let (expected, moved) = held.released(&collapse.released);
-    assert!(!moved.is_empty(), "the released material held carried motion");
-    let carry = resident.carried().expect("the carry stays, released where its material was");
+    assert!(
+        !moved.is_empty(),
+        "the released material held carried motion"
+    );
+    let carry = resident
+        .carried()
+        .expect("the carry stays, released where its material was");
     assert_eq!(carry, &expected);
     for locus in &collapse.released {
         if let Locus::Channel(a) = *locus {
             assert!(carry.change.states[a].iter().flatten().all(|x| x.is_zero()));
             assert!(carry.momenta[a].iter().all(|x| x.is_zero()));
-            assert_eq!(carry.change.arrivals[a], held.change.arrivals[a], "the waves stay");
+            assert_eq!(
+                carry.change.arrivals[a], held.change.arrivals[a],
+                "the waves stay"
+            );
         }
     }
     // The collapsed medium reads on: a word opens on the released carry, and is compared.
@@ -818,12 +844,16 @@ fn a_collapsed_constitution_remounts_and_reads_alike() {
         .mount_with(&field, &Current::at_rest(&field), generic(&field, 23))
         .unwrap();
     let phases = resident.admitted()[0].clone();
-    let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
+    let (moment, _) = reference
+        .ingest(&mut resident, None, &encoded(&field, &[]))
+        .unwrap();
     let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let (staged, _) = reference
         .compare(&mut resident, pending, &encoded(&field, &[1, 0]))
         .unwrap();
-    reference.discard(&mut resident, Handle::Staged(staged)).unwrap();
+    reference
+        .discard(&mut resident, Handle::Staged(staged))
+        .unwrap();
     to_the_carry_out(&reference, &mut resident);
     let boundary = reference.close_aeon(&mut resident, &[]).unwrap();
     let released = &boundary.forward.present().unwrap().collapse.released;
@@ -832,7 +862,10 @@ fn a_collapsed_constitution_remounts_and_reads_alike() {
         let factor = resident.constitution().contact_storage(a);
         assert!(factor.entries().iter().all(Zero::is_zero));
     }
-    let carry = resident.carried().cloned().expect("the refine wrote the carry");
+    let carry = resident
+        .carried()
+        .cloned()
+        .expect("the refine wrote the carry");
     let mut remounted = reference
         .mount_carried(
             &field,
@@ -857,10 +890,12 @@ fn a_collapsed_constitution_remounts_and_reads_alike() {
     // Every chart the remount's word read is the resident's kept chart at that key (the resident
     // also keeps a contact's chart at a conductance carry this word does not read).
     assert!(!remounted.charts().is_empty());
-    assert!(remounted
-        .charts()
-        .keys()
-        .all(|key| remounted.charts().get(key) == resident.charts().get(key)));
+    assert!(
+        remounted
+            .charts()
+            .keys()
+            .all(|key| remounted.charts().get(key) == resident.charts().get(key))
+    );
 }
 
 /// The six rings of the six-ring path split in two: `0–1–2` (source ring 0, receiver ring 2) and
@@ -912,7 +947,10 @@ fn collapse_changes_no_step(
     let mut collapsed = theta.clone();
     let reading = collapse(field, &mut collapsed, &admitted, opens).unwrap();
     for locus in released {
-        assert!(reading.released.contains(locus), "{opens:?}: {locus:?} is released");
+        assert!(
+            reading.released.contains(locus),
+            "{opens:?}: {locus:?} is released"
+        );
     }
     let (mut first, whole) = deposit_read(field, theta, &pending);
     let (second, kept) = deposit_read(field, &collapsed, &pending);
@@ -938,11 +976,17 @@ fn collapse_changes_no_step(
 /// on the uncollapsed and the collapsed constitution.
 #[test]
 fn a_collapse_releasing_a_pumped_ring_changes_no_step() {
-    for (field, opens) in [(split_path(), Opens::OnMotion), (six_path(2), Opens::AtRest)] {
+    for (field, opens) in [
+        (split_path(), Opens::OnMotion),
+        (six_path(2), Opens::AtRest),
+    ] {
         let theta = super::prediction::pumped_at(&field, generic(&field, 51), 4);
         let released = [Locus::Resonator(4), Locus::Element(4)];
         let whole = collapse_changes_no_step(&field, &theta, opens, &released);
-        assert!(whole.pumped.is_none(), "{opens:?}: ring 4 is outside the word's diamond");
+        assert!(
+            whole.pumped.is_none(),
+            "{opens:?}: ring 4 is outside the word's diamond"
+        );
     }
 }
 
@@ -972,15 +1016,27 @@ fn a_collapse_releasing_a_standings_neighbours_changes_no_lobe_hold() {
     let theta = standings
         .into_iter()
         .fold(generic(&field, 51), |theta, (ring, standing)| {
-            theta.with_ports(ring, Some(standing.to_vec()), None, None).unwrap()
+            theta
+                .with_ports(ring, Some(standing.to_vec()), None, None)
+                .unwrap()
         });
     let contrasts = theta.standing_contrasts();
-    assert!(contrasts[3][..2].iter().chain(&contrasts[4][..2]).all(Zero::is_zero));
+    assert!(
+        contrasts[3][..2]
+            .iter()
+            .chain(&contrasts[4][..2])
+            .all(Zero::is_zero)
+    );
     let (current, _) = moment(&field, 52, 11);
     let admitted = [phases(&field, &theta, &current)];
     let mut collapsed = theta.clone();
     let reading = collapse(&field, &mut collapsed, &admitted, Opens::AtRest).unwrap();
-    for locus in [Locus::Element(3), Locus::Element(4), Locus::Standing(4), Locus::Standing(5)] {
+    for locus in [
+        Locus::Element(3),
+        Locus::Element(4),
+        Locus::Standing(4),
+        Locus::Standing(5),
+    ] {
         assert!(reading.released.contains(&locus), "{locus:?} is released");
     }
     assert!(reading.retained.contains(&Locus::Standing(3)));
@@ -991,7 +1047,12 @@ fn a_collapse_releasing_a_standings_neighbours_changes_no_lobe_hold() {
             vec![FactorStep {
                 gradient: FactorGradient::Standing {
                     ring: 3,
-                    gradient: vec![integer(1 << 12), integer(-(1 << 12)), Rat::zero(), Rat::zero()],
+                    gradient: vec![
+                        integer(1 << 12),
+                        integer(-(1 << 12)),
+                        Rat::zero(),
+                        Rat::zero(),
+                    ],
                     reach: vec![(3, Rat::zero()), (2, integer(1)), (4, Rat::zero())],
                 },
                 energy: Rat::zero(),
@@ -1111,7 +1172,10 @@ fn the_budget_reads_the_residents_retention() {
         .unwrap();
     collapse(&field, &mut first, &admitted, Opens::AtRest).unwrap();
     assert_eq!(first, second);
-    for refused in [theta.deposited_within(&deposit, &carry), theta.deposited(&deposit)] {
+    for refused in [
+        theta.deposited_within(&deposit, &carry),
+        theta.deposited(&deposit),
+    ] {
         assert!(matches!(refused, Err(HnnError::ConstitutionBudget { .. })));
     }
 }
@@ -1134,7 +1198,10 @@ fn a_rebase_reads_the_residents_retention() {
     let every: BTreeSet<Locus> = loci(&field).into_iter().collect();
     let measured = generic(&field, 51).rebased(locus, 3, &every).unwrap();
     let (read, whole) = (measured.bits_within(&reads), measured.exact_bits());
-    assert!(read < whole, "the released rings hold bits: {read} against {whole}");
+    assert!(
+        read < whole,
+        "the released rings hold bits: {read} against {whole}"
+    );
     let theta = super::learning::generic_within(&field, 51, read);
     let mut collapsed = theta.clone();
     let reading = collapse(&field, &mut collapsed, &admitted, Opens::AtRest).unwrap();
@@ -1175,7 +1242,11 @@ fn the_source_step_reads_the_retention_under_the_carry() {
     assert_eq!(reads, retained(&field, &admitted, Opens::OnMotion));
     let ring = field.sources()[0];
     let port = open.source_port(ring).unwrap().clone();
-    let unit = |n: usize| (0..n).map(|j| integer(i64::from(j == 0))).collect::<Vec<_>>();
+    let unit = |n: usize| {
+        (0..n)
+            .map(|j| integer(i64::from(j == 0)))
+            .collect::<Vec<_>>()
+    };
     let samples = [crate::hnn::constitution::Sample {
         weight: integer(1),
         feature: unit(port.columns()),
@@ -1184,9 +1255,15 @@ fn the_source_step_reads_the_retention_under_the_carry() {
     }];
     let step = integer(1);
     let every: BTreeSet<Locus> = loci(&field).into_iter().collect();
-    let (measured, _) = open.stepped_source(ring, &samples, &step, &every).unwrap().unwrap();
+    let (measured, _) = open
+        .stepped_source(ring, &samples, &step, &every)
+        .unwrap()
+        .unwrap();
     let (read, whole) = (measured.bits_within(&reads), measured.exact_bits());
-    assert!(read < whole, "the released rings hold bits: {read} against {whole}");
+    assert!(
+        read < whole,
+        "the released rings hold bits: {read} against {whole}"
+    );
     let collapsed_at = |theta: &Constitution| {
         let mut collapsed = theta.clone();
         let reading = collapse(&field, &mut collapsed, &admitted, Opens::OnMotion).unwrap();
@@ -1196,14 +1273,23 @@ fn the_source_step_reads_the_retention_under_the_carry() {
     };
     let theta = super::learning::generic_within(&field, 51, read);
     let collapsed = collapsed_at(&theta);
-    let (mut first, before) = theta.stepped_source(ring, &samples, &step, &reads).unwrap().unwrap();
-    let (second, after) =
-        collapsed.stepped_source(ring, &samples, &step, &reads).unwrap().unwrap();
+    let (mut first, before) = theta
+        .stepped_source(ring, &samples, &step, &reads)
+        .unwrap()
+        .unwrap();
+    let (second, after) = collapsed
+        .stepped_source(ring, &samples, &step, &reads)
+        .unwrap()
+        .unwrap();
     let unbilled = |step: crate::hnn::constitution::SourceStep| {
         crate::hnn::constitution::SourceStep { bits: 0, ..step }
     };
     assert_eq!(unbilled(before), unbilled(after));
-    assert_ne!(first.source_port(ring), theta.source_port(ring), "the step moves the port");
+    assert_ne!(
+        first.source_port(ring),
+        theta.source_port(ring),
+        "the step moves the port"
+    );
     collapse(&field, &mut first, &admitted, Opens::OnMotion).unwrap();
     assert_eq!(first, second);
     let tight = super::learning::generic_within(&field, 51, read - 1);

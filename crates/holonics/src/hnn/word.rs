@@ -99,15 +99,17 @@
 //! fn borrowed(field: holonics::hnn::Field<'static>) {}
 //! ```
 
-pub mod continuation;
-pub mod finite_gain;
-pub mod work;
-pub mod variation;
 pub mod action;
 mod action_return;
+pub(crate) mod column;
+pub mod continuation;
+pub mod finite_gain;
+pub(crate) mod trajectory;
+pub mod variation;
+pub mod work;
 mod world_boundary;
-pub use world_boundary::SourceWaveReturn;
 pub use action_return::NativeReceivingReturn;
+pub use world_boundary::SourceWaveReturn;
 
 use std::collections::BTreeSet;
 
@@ -194,6 +196,10 @@ pub struct Word<'c> {
     /// comparison from it and refuses any other. `None` for every other opener. It is the Word's
     /// own present input, released with the Word, never a retained record.
     opened_on: Option<WordOpening>,
+    /// Transient actual source operand and same-cut response; never retained in reception carry.
+    response_source: Option<Vec<Vec<Rat>>>,
+    response_opening_exact: Option<EndChange>,
+    response: Option<Box<column::ResponseColumn>>,
     field: &'c Field,
     operands: Operands,
     clock: Clock,
@@ -1782,11 +1788,46 @@ impl<'c> Word<'c> {
         charts: &mut Charts,
         opening: &WordOpening,
     ) -> Result<Self, HnnError> {
-        let WordOpening::Received { carry, absorption } = opening else {
-            return Self::open_charted(field, constitution, current, moment, charts);
-        };
-        let storage = moment.open_storage(field, constitution, current)?;
+        Self::open_received_view(
+            field,
+            constitution,
+            current,
+            moment,
+            charts,
+            opening,
+            &crate::hnn::ring::modes::ModeView::whole(),
+        )
+    }
+
+    /// Execute a declared mode-qualified fresh injection; carried interior is untouched.
+    pub fn open_received_view(
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        current: &Current,
+        moment: &SourceMoment,
+        charts: &mut Charts,
+        opening: &WordOpening,
+        view: &crate::hnn::ring::modes::ModeView,
+    ) -> Result<Self, HnnError> {
+        let storage = view.apply(field, &moment.open_storage(field, constitution, current)?)?;
+        let paired = field.receivers().iter().any(|r| {
+            matches!(
+                constitution.receiving_layout(r.ring),
+                Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { .. })
+            )
+        });
+        let response_source = paired.then(|| storage.clone());
         let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
+        let WordOpening::Received { carry, absorption } = opening else {
+            let exact = paired.then(|| EndChange {
+                storage: storage.clone(),
+                ..EndChange::rest(field, &operands)
+            });
+            let mut word = Self::on_operands(field, operands, storage)?;
+            word.response_source = response_source;
+            word.response_opening_exact = exact;
+            return Ok(word);
+        };
         let change = match absorption {
             Absorption::Complete => {
                 let rings = field.rings().len();
@@ -1809,7 +1850,17 @@ impl<'c> Word<'c> {
                 carry.opening(field, &conductances, &storage, &resonators)?
             }
         };
-        Self::continuing(field, operands, &change, &storage, carry.ticks)
+        let exact = paired.then(|| {
+            let mut exact = change.clone();
+            for (wave, injection) in exact.storage.iter_mut().zip(&storage) {
+                *wave = add(wave, injection);
+            }
+            exact
+        });
+        let mut word = Self::continuing(field, operands, &change, &storage, carry.ticks)?;
+        word.response_source = response_source;
+        word.response_opening_exact = exact;
+        Ok(word)
     }
 
     /// [definition; agent-inferred, October 5] Enter the exact physical field on its
@@ -1920,41 +1971,80 @@ impl<'c> Word<'c> {
         let operands = Operands::at_cut_charted(field, material, current, charts)?;
         let (mut entered, opened_at) = match opening {
             WordOpening::Rest => (EndChange::rest(field, &operands), 0),
-            WordOpening::Received { carry, absorption: Absorption::Complete } =>
-                (EndChange::rest(field, &operands), carry.ticks),
-            WordOpening::Received { carry, absorption: Absorption::Nothing } => {
-                let conductances: Vec<_> = operands.contacts().iter()
-                    .map(|c| c.conductance().clone()).collect();
+            WordOpening::Received {
+                carry,
+                absorption: Absorption::Complete,
+            } => (EndChange::rest(field, &operands), carry.ticks),
+            WordOpening::Received {
+                carry,
+                absorption: Absorption::Nothing,
+            } => {
+                let conductances: Vec<_> = operands
+                    .contacts()
+                    .iter()
+                    .map(|c| c.conductance().clone())
+                    .collect();
                 let storage: Vec<_> = operands.contacts().iter().map(|c| c.forms().0).collect();
-                let resonators: Vec<_> = operands.resonators().iter()
-                    .map(|r| r.as_ref().map(|r| r.material().forms().0)).collect();
-                (carry.crossed(&conductances, &storage, &resonators)?, carry.ticks)
+                let resonators: Vec<_> = operands
+                    .resonators()
+                    .iter()
+                    .map(|r| r.as_ref().map(|r| r.material().forms().0))
+                    .collect();
+                (
+                    carry.crossed(&conductances, &storage, &resonators)?,
+                    carry.ticks,
+                )
             }
         };
         let shaped = entered.storage.len() == field.rings().len()
-            && entered.storage.iter().zip(field.rings()).all(|(s,r)|s.len()==r.width())
-            && entered.arrivals.len()==field.contacts().len()
-            && entered.states.len()==field.contacts().len()
-            && entered.resonators.len()==field.rings().len()
-            && entered.resonator_phases.len()==field.rings().len()
-            && entered.arrivals.iter().zip(&entered.states).zip(operands.contacts()).all(|((a,s),c)| {
-                let (g,h)=c.ends(); a[0].len()==field.ring(g).width() && a[1].len()==field.ring(h).width()
-                    && s.iter().all(|s|s.len()==c.width())
-            })
-            && entered.resonators.iter().zip(operands.resonators()).all(|(s,r)|match(s,r) {
-                (Some(s),Some(r))=>s.iter().all(|s|s.len()==r.width()), (None,_)=>true, _=>false,
-            });
+            && entered
+                .storage
+                .iter()
+                .zip(field.rings())
+                .all(|(s, r)| s.len() == r.width())
+            && entered.arrivals.len() == field.contacts().len()
+            && entered.states.len() == field.contacts().len()
+            && entered.resonators.len() == field.rings().len()
+            && entered.resonator_phases.len() == field.rings().len()
+            && entered
+                .arrivals
+                .iter()
+                .zip(&entered.states)
+                .zip(operands.contacts())
+                .all(|((a, s), c)| {
+                    let (g, h) = c.ends();
+                    a[0].len() == field.ring(g).width()
+                        && a[1].len() == field.ring(h).width()
+                        && s.iter().all(|s| s.len() == c.width())
+                })
+            && entered
+                .resonators
+                .iter()
+                .zip(operands.resonators())
+                .all(|(s, r)| match (s, r) {
+                    (Some(s), Some(r)) => s.iter().all(|s| s.len() == r.width()),
+                    (None, _) => true,
+                    _ => false,
+                });
         if !shaped {
-            return Err(HnnError::ContinuingState { what: "the charted source opening has a foreign carried field shape" });
+            return Err(HnnError::ContinuingState {
+                what: "the charted source opening has a foreign carried field shape",
+            });
         }
         for (ring, resonator) in operands.resonators().iter().enumerate() {
             if let Some(resonator) = resonator {
                 let phase = resonator.phase_at(opened_at.saturating_sub(1));
-                if matches!(opening, WordOpening::Received { absorption: Absorption::Nothing, .. })
-                    && entered.resonator_phases[ring].is_some_and(|p| p != phase)
+                if matches!(
+                    opening,
+                    WordOpening::Received {
+                        absorption: Absorption::Nothing,
+                        ..
+                    }
+                ) && entered.resonator_phases[ring].is_some_and(|p| p != phase)
                 {
                     return Err(HnnError::Resonator {
-                        ring, what: "the charted opening keeps the carry's actual pump clock",
+                        ring,
+                        what: "the charted opening keeps the carry's actual pump clock",
                     });
                 }
                 entered.resonator_phases[ring] = Some(phase);
@@ -1962,8 +2052,11 @@ impl<'c> Word<'c> {
         }
         let form = PowerForm::read(field, material, current)?;
         let before = form.power(&entered)? + form.resonator_power(&entered)?;
-        let absorbed = field.sources().iter()
-            .map(|&g| form.ring_power(g, &entered.storage[g])).sum();
+        let absorbed = field
+            .sources()
+            .iter()
+            .map(|&g| form.ring_power(g, &entered.storage[g]))
+            .sum();
         let interior = interior_of(field, entered);
         let mut raw = interior.clone();
         for (storage, injection) in raw.storage.iter_mut().zip(&injection) {
@@ -1973,30 +2066,65 @@ impl<'c> Word<'c> {
         let actual = word.change()?;
         let after = form.power(&actual)? + form.resonator_power(&actual)?;
         let raw_power = form.power(&raw)? + form.resonator_power(&raw)?;
-        let imposed = field.sources().iter()
-            .map(|&g| form.ring_power(g, &injection[g])).sum();
-        let difference = |a: &[Rat], b: &[Rat]| a.iter().zip(b)
-            .map(|(a, b)| (a-b).abs()).collect::<Vec<_>>();
+        let imposed = field
+            .sources()
+            .iter()
+            .map(|&g| form.ring_power(g, &injection[g]))
+            .sum();
+        let difference = |a: &[Rat], b: &[Rat]| {
+            a.iter()
+                .zip(b)
+                .map(|(a, b)| (a - b).abs())
+                .collect::<Vec<_>>()
+        };
         let mut error = actual.clone();
-        for ((e, a), b) in error.storage.iter_mut().zip(&actual.storage).zip(&raw.storage) {
+        for ((e, a), b) in error
+            .storage
+            .iter_mut()
+            .zip(&actual.storage)
+            .zip(&raw.storage)
+        {
             *e = difference(a, b);
         }
-        for (errors, (actual, raw)) in error.arrivals.iter_mut().zip(actual.arrivals.iter().zip(&raw.arrivals)) {
-            for k in 0..2 { errors[k] = difference(&actual[k], &raw[k]); }
+        for (errors, (actual, raw)) in error
+            .arrivals
+            .iter_mut()
+            .zip(actual.arrivals.iter().zip(&raw.arrivals))
+        {
+            for k in 0..2 {
+                errors[k] = difference(&actual[k], &raw[k]);
+            }
         }
-        for (errors, (actual, raw)) in error.states.iter_mut().zip(actual.states.iter().zip(&raw.states)) {
-            for k in 0..2 { errors[k] = difference(&actual[k], &raw[k]); }
+        for (errors, (actual, raw)) in error
+            .states
+            .iter_mut()
+            .zip(actual.states.iter().zip(&raw.states))
+        {
+            for k in 0..2 {
+                errors[k] = difference(&actual[k], &raw[k]);
+            }
         }
-        for (errors, (actual, raw)) in error.resonators.iter_mut().zip(actual.resonators.iter().zip(&raw.resonators)) {
+        for (errors, (actual, raw)) in error
+            .resonators
+            .iter_mut()
+            .zip(actual.resonators.iter().zip(&raw.resonators))
+        {
             if let (Some(errors), Some(actual)) = (errors, actual) {
                 for k in 0..2 {
-                    errors[k] = match raw { Some(raw) => difference(&actual[k], &raw[k]),
-                        None => actual[k].iter().map(|a| a.abs()).collect() };
+                    errors[k] = match raw {
+                        Some(raw) => difference(&actual[k], &raw[k]),
+                        None => actual[k].iter().map(|a| a.abs()).collect(),
+                    };
                 }
             }
         }
         let receipt = ChartedSourceOpeningReceipt {
-            source: SourceOpeningReceipt { before, after: after.clone(), absorbed, imposed },
+            source: SourceOpeningReceipt {
+                before,
+                after: after.clone(),
+                absorbed,
+                imposed,
+            },
             split: raw_power - after,
             error,
         };
@@ -2275,6 +2403,9 @@ impl<'c> Word<'c> {
         let mut word = Self {
             native_source: None,
             opened_on: None,
+            response_source: None,
+            response_opening_exact: None,
+            response: None,
             field,
             operands,
             clock,
@@ -2303,6 +2434,78 @@ impl<'c> Word<'c> {
     /// The field the word borrows.
     pub fn field(&self) -> &'c Field {
         self.field
+    }
+
+    pub(crate) fn prepare_response(&mut self) -> Result<(), HnnError> {
+        if self.response.is_some() {
+            return Ok(());
+        }
+        let source = self.response_source.take().ok_or(HnnError::Unadmitted {
+            reason: "a paired read requires its producing mode-qualified source operand",
+        })?;
+        self.response = Some(Box::new(column::ResponseColumn::execute(self, source)?));
+        Ok(())
+    }
+
+    pub(crate) fn response(&self) -> Option<&column::ResponseColumn> {
+        self.response.as_deref()
+    }
+
+    pub(crate) fn response_actual_errors(&self) -> Result<Option<Vec<Vec<Vec<Rat>>>>, HnnError> {
+        let Some(exact) = self.response_opening_exact.as_ref() else {
+            return Ok(None);
+        };
+        if self.passage.is_empty() {
+            return Ok(Some(Vec::new()));
+        }
+        let point = |t: usize| -> EndChange {
+            let record = &self.passage[t];
+            EndChange {
+                storage: record.storage.clone(),
+                arrivals: record.arrivals.clone(),
+                states: record.states.clone(),
+                resonators: self
+                    .resonators
+                    .iter()
+                    .map(|r| {
+                        r.as_ref().map(|r| {
+                            r.steps
+                                .get(t)
+                                .map_or_else(|| r.state.clone(), |s| s.input.clone())
+                        })
+                    })
+                    .collect(),
+                resonator_phases: self
+                    .operands
+                    .resonators()
+                    .iter()
+                    .map(|r| {
+                        r.as_ref()
+                            .map(|r| r.phase_at((self.opened_at + t).saturating_sub(1)))
+                    })
+                    .collect(),
+            }
+        };
+        let mut tube =
+            crate::hnn::prediction::charted::ResponseTube::open(&self.operands, exact, &point(0))?;
+        let mut errors = Vec::with_capacity(self.passage.len());
+        for t in 0..self.passage.len() {
+            for overwrite in self.source_returns.iter().filter(|r| r.tick == t) {
+                tube.held_overwrite(overwrite.ring)?;
+            }
+            let before = point(t);
+            errors.push(tube.anchors(&before, &self.passage[t].anchors)?);
+            if t + 1 < self.passage.len() || !self.ended {
+                let after = if t + 1 < self.passage.len() {
+                    point(t + 1)
+                } else {
+                    self.end_change()
+                };
+                tube.advance(&before, &after, self.opened_at + t)?;
+                work::reached(work::Event::ResponseCertificateTick);
+            }
+        }
+        Ok(Some(errors))
     }
 
     /// The operands fixed at the cut.
@@ -3033,6 +3236,12 @@ impl<'c> Word<'c> {
             self.tick()?;
         }
         self.last_junction()?;
+        self.receiving_anchors(phases)
+    }
+
+    /// **The anchors the receiving phases read** `v_R(e_j)`, once the word has run through its
+    /// receiving epochs ([`Word::forward`]); refused before.
+    pub fn receiving_anchors(&self, phases: &ReceivingPhases) -> Result<Vec<Vec<Rat>>, HnnError> {
         phases
             .epochs()
             .map(|epoch| {
@@ -3086,6 +3295,9 @@ impl<'c> Word<'c> {
             native_source: _,
             opened_on: _,
             field: _,
+            response_source,
+            response_opening_exact,
+            response,
             operands,
             clock,
             storage,
@@ -3106,6 +3318,9 @@ impl<'c> Word<'c> {
             opened_at,
         } = self;
         KeptWord {
+            response_source,
+            response_opening_exact,
+            response,
             operands,
             clock,
             storage,
@@ -3221,6 +3436,9 @@ fn admittance_total(operands: &Operands, ring: usize) -> Rat {
 /// outlives its return). It is not `Clone`: a clone of the slot drops it and reads again.
 #[derive(Debug)]
 pub(crate) struct KeptWord {
+    response_source: Option<Vec<Vec<Rat>>>,
+    response_opening_exact: Option<EndChange>,
+    response: Option<Box<column::ResponseColumn>>,
     operands: Operands,
     clock: Clock,
     storage: Vec<Vec<Rat>>,
@@ -3250,9 +3468,25 @@ impl KeptWord {
             .map(Vec::as_slice)
     }
 
+    pub(crate) fn receiving_feature(&self, step: usize, ring: usize) -> Option<Vec<Rat>> {
+        let actual = self.anchor(step, ring)?;
+        match &self.response {
+            None => Some(actual.to_vec()),
+            Some(response) => {
+                let fresh = response.records.get(step)?.anchors.get(ring)?;
+                let mut feature = fresh.clone();
+                feature.extend(sub(actual, fresh));
+                Some(feature)
+            }
+        }
+    }
+
     /// **Resume the word on its field**: the field it was read on, which the resident owns.
     pub(crate) fn resume(self, field: &Field) -> Word<'_> {
         let KeptWord {
+            response_source,
+            response_opening_exact,
+            response,
             operands,
             clock,
             storage,
@@ -3276,6 +3510,9 @@ impl KeptWord {
             native_source: None,
             opened_on: None,
             field,
+            response_source,
+            response_opening_exact,
+            response,
             operands,
             clock,
             storage,

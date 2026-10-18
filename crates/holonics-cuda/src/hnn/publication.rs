@@ -1,10 +1,13 @@
-//! **The published constitution on the card**: every locus a word reads, at its declared lattice.
+//! **The published constitution on the card**: every locus a word reads, at its active lattice.
 //!
 //! [definition] A word reads the constitution `Θ` only through `holonics::hnn::ConstitutionRead`
 //! (the forward face). The device port forms, once per publication (a deposit's successor, a
 //! collapse's descent), the dyadic words of every locus the word's kernels read
-//! ([`Loci::of`]), each at its locus's **declared lattice** (the lattice deposit; `Field::lattice`), so the
-//! words' scales stay fixed across publications:
+//! ([`Loci::of`]), each at its locus's **active lattice**: ordinarily the field's declared
+//! deposit lattice, and the contemporary constitution lattice for a receiving map whose precision
+//! was explicitly re-based. This keeps the device word aligned with the material it publishes.
+//! Locus scales normally stay fixed across deposits; an explicit receiving-map precision event
+//! changes that map's scale and publication layout:
 //!
 //! | Locus | Words | Scale |
 //! |---|---|---|
@@ -31,14 +34,16 @@ use std::rc::Rc;
 
 use core::ffi::c_void;
 
+use holonics::hnn::constitution::ReceivingLayout;
 use holonics::hnn::contact::signed_stiffness;
 use holonics::hnn::propagation::{element_material, gram, ring_operator};
-use holonics::holon::element::contact_operator;
 use holonics::hnn::ring::{ResonatorMaterial, ResonatorOperands};
-use holonics::hnn::{ConstitutionRead, Field, HnnError, Locus};
+use holonics::hnn::{Constitution, ConstitutionRead, Field, HnnError, Locus};
+use holonics::holon::element::contact_operator;
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
 use num_bigint::BigInt;
+use num_traits::Zero;
 
 use crate::hnn::DeviceError;
 use crate::hnn::card::{Card, CardBuffer, copy_layout};
@@ -106,7 +111,7 @@ pub(crate) struct ContactOperator {
 }
 
 /// [definition] **The loci of one publication**, formed on the host, with the published words.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct Loci {
     pub(crate) rings: Vec<RingLoci>,
     pub(crate) contacts: Vec<ContactLoci>,
@@ -116,6 +121,10 @@ pub(crate) struct Loci {
     pub(crate) resonators: Vec<Option<ResonatorMaterial>>,
     /// The receiving map per ring (`None` off the receiving rings).
     pub(crate) maps: Vec<Option<Placed>>,
+    /// The constitutional receiving interpretation per ring. In particular, a physical
+    /// `2A × 2w` map is paired only when the material explicitly declares ArrivalContext; its
+    /// shape alone never selects the response-column path.
+    pub(crate) receiving_layouts: Vec<Option<ReceivingLayout>>,
     pub(crate) words: Vec<i64>,
     /// Each placed array's `(offset, length, exponent)`, in order: two publications with equal
     /// layouts differ only in their words.
@@ -123,6 +132,101 @@ pub(crate) struct Loci {
     operators: RefCell<BTreeMap<(usize, BigInt), Rc<ContactOperator>>>,
     /// The loaded rings' operands at this publication, formed once ([`Loci::resonator_operands`]).
     resonator_operands: OnceCell<Rc<Vec<Option<ResonatorOperands>>>>,
+}
+
+impl Loci {
+    /// Copy a publication with source-generating E and pair-output columns projected exactly for
+    /// one read. Non-dyadic or out-of-word projections are refused by the existing exact card
+    /// carrier; no coefficient is rounded and no persistent constitution is changed.
+    pub(crate) fn with_source_view(
+        &self,
+        field: &Field,
+        view: &holonics::hnn::ring::modes::ModeView,
+    ) -> Result<(Self, u32), HnnError> {
+        use crate::hnn::dyadic::{DyadicMatrix, value};
+        let mut loci = self.clone();
+        let mut max_extra_exponent = 0u32;
+        for source in &mut loci.sources {
+            let ring = source.ring;
+            let project_columns = |matrix: &DyadicMatrix| -> Result<(DyadicMatrix, u32), HnnError> {
+                let mut entries = vec![Rat::zero(); matrix.rows * matrix.columns];
+                for column in 0..matrix.columns {
+                    let carrier = (0..matrix.rows)
+                        .map(|row| {
+                            value(matrix.words[row * matrix.columns + column], matrix.exponent)
+                        })
+                        .collect::<Vec<_>>();
+                    let projected = view.apply_ring(field, ring, &carrier)?;
+                    for (row, entry) in projected.into_iter().enumerate() {
+                        entries[row * matrix.columns + column] = entry;
+                    }
+                }
+                let rows = entries
+                    .chunks(matrix.columns)
+                    .map(<[Rat]>::to_vec)
+                    .collect();
+                let exact = ExactRatMatrix::shaped(matrix.rows, matrix.columns, rows)?;
+                let projected = DyadicMatrix::of(
+                    &exact,
+                    "a mode-projected source column off the exact CUDA dyadics or past its signed word",
+                )?;
+                let extra = projected.exponent.checked_sub(matrix.exponent).unwrap_or(0);
+                Ok((projected, extra))
+            };
+            let project_rows = |matrix: &DyadicMatrix| -> Result<(DyadicMatrix, u32), HnnError> {
+                let mut entries = vec![Rat::zero(); matrix.rows * matrix.columns];
+                for row in 0..matrix.rows {
+                    let carrier = (0..matrix.columns)
+                        .map(|column| {
+                            value(matrix.words[row * matrix.columns + column], matrix.exponent)
+                        })
+                        .collect::<Vec<_>>();
+                    let projected = view.apply_ring(field, ring, &carrier)?;
+                    entries[row * matrix.columns..(row + 1) * matrix.columns]
+                        .clone_from_slice(&projected);
+                }
+                let rows = entries
+                    .chunks(matrix.columns)
+                    .map(<[Rat]>::to_vec)
+                    .collect();
+                let exact = ExactRatMatrix::shaped(matrix.rows, matrix.columns, rows)?;
+                let projected = DyadicMatrix::of(
+                    &exact,
+                    "a mode-projected pair output off the exact CUDA dyadics or past its signed word",
+                )?;
+                let extra = projected.exponent.checked_sub(matrix.exponent).unwrap_or(0);
+                Ok((projected, extra))
+            };
+            let (port, port_extra) = project_columns(&source.port.matrix)?;
+            max_extra_exponent = max_extra_exponent.max(port_extra);
+            let mut updates = vec![(source.port.offset, port.clone())];
+            source.port.matrix = port;
+            for pair in &mut source.pairs {
+                let (outputs, output_extra) = project_rows(&pair.outputs.matrix)?;
+                max_extra_exponent = max_extra_exponent.max(output_extra);
+                updates.push((pair.outputs.offset, outputs.clone()));
+                pair.outputs.matrix = outputs;
+            }
+            for (offset, matrix) in updates {
+                let end = offset
+                    .checked_add(matrix.words.len())
+                    .ok_or_else(|| refused("the mode-projected publication extent fits usize"))?;
+                let destination = loci.words.get_mut(offset..end).ok_or_else(|| {
+                    refused("the mode-projected source matrix lies within its publication")
+                })?;
+                destination.copy_from_slice(&matrix.words);
+                let entry = loci
+                    .layout
+                    .iter_mut()
+                    .find(|(at, _, _)| *at == offset)
+                    .ok_or_else(|| {
+                        refused("the mode-projected source matrix has a publication layout entry")
+                    })?;
+                *entry = (offset, matrix.words.len(), matrix.exponent);
+            }
+        }
+        Ok((loci, max_extra_exponent))
+    }
 }
 
 fn lattice(field: &Field, locus: Locus) -> Result<u32, HnnError> {
@@ -158,11 +262,8 @@ fn vectors(vectors: &[Vec<Rat>], columns: usize) -> Result<ExactRatMatrix, HnnEr
 
 impl Loci {
     /// **Form the loci of a constitution** (see the module header): every array at its locus's
-    /// declared lattice, refused when an entry lies off it or passes the word.
-    pub(crate) fn of(
-        field: &Field,
-        constitution: &impl ConstitutionRead,
-    ) -> Result<Self, HnnError> {
+    /// active lattice, refused when an entry lies off it or passes the word.
+    pub(crate) fn of(field: &Field, constitution: &Constitution) -> Result<Self, HnnError> {
         let mut words = Words {
             words: Vec::new(),
             layout: Vec::new(),
@@ -292,17 +393,20 @@ impl Loci {
             });
         }
         let mut maps = vec![None; field.rings().len()];
+        let mut receiving_layouts = vec![None; field.rings().len()];
         for receiver in field.receivers() {
             let ring = receiver.ring;
             if maps[ring].is_some() {
                 continue;
             }
+            receiving_layouts[ring] = constitution.receiving_layout(ring);
             let map = constitution
                 .receiving_map(ring)
                 .ok_or(HnnError::MissingReceivingMap { ring })?;
+            let map_lattice = constitution.lattice(Locus::ReceivingMap(ring))?.exponent();
             maps[ring] = Some(words.place(DyadicMatrix::at(
                 map,
-                lattice(field, Locus::ReceivingMap(ring))?,
+                map_lattice,
                 "a receiving map entry off its lattice or past the word",
             )?));
         }
@@ -314,6 +418,7 @@ impl Loci {
                 .map(|ring| constitution.ring_resonator(ring).cloned())
                 .collect(),
             maps,
+            receiving_layouts,
             words: words.words,
             layout: words.layout,
             operators: RefCell::new(BTreeMap::new()),

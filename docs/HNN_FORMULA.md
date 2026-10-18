@@ -807,8 +807,18 @@ junction  v_r = (Y_r s_r + Σ_a G_a a_(r←a)) / (Y_r + Σ_a G_a),   G_a = κ_a 
 element   (I − ½K_r) s_r′ = (I + ½K_r) b_r + W_c,r c_r,   b_r = 2 v_r − s_r,   c_r = v_r − s_r,   K_r = W_s,r + Σ_ρ σ_ρ,r A_ρ,r
           (the contrast port drives inside the midpoint: Holon/Cayley.drive_balance; THE_REBUILD step 4 design)
 transit   the contact's midpoint two-port (C_a, K_a, D_a) on its channel, U_a = ι_(a,h) ι_(a,g)ᵀ
-receive   f_j = R[P_R^(τ_R) v_R(e_j)] at the receiving epochs, read at the receiver's grain
+receive   f_j = R v_R(e_j) at the receiving epochs, in the passage frame, read at the receiver's grain
 ```
+
+- **The read is in the passage frame** (F1, October 16,
+  [record](../research/records/2026-10-16_THE_RECEIVER_READS_IN_THE_PASSAGE_FRAME_AN_ABSOLUTE_LIFT_RELEASED_ONE_CLASS.md)).
+  The frame transport between the reception's opening and its read is
+  `P_R^(τ_R − τ_R^open)`, the identity, because the current does not advance inside a reception;
+  U6's `P_R^(1+j)` (below) counts the same way, from the request's last tick. The former
+  `R P_R^(τ_R) v_R` turned each feature by the absolute lift, one node per arrival, so a fixed
+  `R` saw only the period's cyclic average of every feature. The target phase is measured from the
+  anchor's own lift, `φ^T_j = (τ_R(j) − λ_R)/d_R`, and the branch keeps the winding
+  `⌊λ_R/d_R⌋`; the return is `Rᵀ g_j` with no rotor.
 
 - **Participation is the scattering's anchor.** The weights `G_a / (Y_r + Σ_a G_a)` are ring `r`'s
   normalized participation. With one exponent `β_a` per contact, the tick conserves the global

@@ -18,8 +18,8 @@ use std::time::Instant;
 use holonics::hnn::chart::carry;
 use holonics::hnn::constitution::Lattice;
 use holonics::hnn::dynamic_section::{RAYS, SectionReader};
-use holonics::hnn::section_lock::{LockReader, LockRefusal, LockWindow, Settled};
 use holonics::hnn::ring::{ResonatorMaterial, ResonatorOperands};
+use holonics::hnn::section_lock::{LockReader, LockRefusal, LockWindow, Settled};
 use holonics::hnn::wave::{MatchedWave, WavePort};
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::{Rat, integer, rat};
@@ -46,7 +46,10 @@ const CHUNK: usize = 8000;
 )]
 fn read_wav(path: &str) -> (u32, Vec<i16>) {
     let bytes = std::fs::read(path).expect("the recording reads");
-    assert!(&bytes[0..4] == b"RIFF" && &bytes[8..12] == b"WAVE", "a RIFF/WAVE file");
+    assert!(
+        &bytes[0..4] == b"RIFF" && &bytes[8..12] == b"WAVE",
+        "a RIFF/WAVE file"
+    );
     let mut at = 12;
     let (mut rate, mut samples) = (None, None);
     while at + 8 <= bytes.len() {
@@ -57,7 +60,10 @@ fn read_wav(path: &str) -> (u32, Vec<i16>) {
             let format = u16::from_le_bytes(body[0..2].try_into().unwrap());
             let channels = u16::from_le_bytes(body[2..4].try_into().unwrap());
             let bits = u16::from_le_bytes(body[14..16].try_into().unwrap());
-            assert!(format == 1 && channels == 1 && bits == 16, "16-bit mono PCM");
+            assert!(
+                format == 1 && channels == 1 && bits == 16,
+                "16-bit mono PCM"
+            );
             rate = Some(u32::from_le_bytes(body[4..8].try_into().unwrap()));
         } else if id == b"data" {
             samples = Some(
@@ -143,7 +149,11 @@ fn enclosure(x: &Rat) -> String {
     while at(k + 1) <= y {
         k += 1;
     }
-    format!("{}[2^{k}, 2^{})", if x.is_negative() { "−" } else { "" }, k + 1)
+    format!(
+        "{}[2^{k}, 2^{})",
+        if x.is_negative() { "−" } else { "" },
+        k + 1
+    )
 }
 
 /// One ring's pass over the stream: its emission on the driven coordinate per tick, its decode from
@@ -161,7 +171,11 @@ struct Pass {
 fn whole(lift: &BigInt) -> BigInt {
     let rays = BigInt::from(RAYS);
     let (quotient, rest) = (lift / &rays, lift % &rays);
-    if rest.is_negative() { quotient - 1 } else { quotient }
+    if rest.is_negative() {
+        quotient - 1
+    } else {
+        quotient
+    }
 }
 
 /// The Elias gamma length of `n ≥ 1`, `2⌊log₂ n⌋ + 1`; of a signed integer `z`, that of `|z| + 1`
@@ -177,7 +191,8 @@ fn gamma(z: &BigInt) -> u64 {
 /// tick of its first whole return. The energy is read only at returns, never at a tick inside a turn.
 fn half_memory(operands: &ResonatorOperands, lattice: Lattice) -> (u64, usize) {
     let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
-    port.seat([vec![Rat::zero(); 2], vec![Rat::one(), Rat::zero()]]).unwrap();
+    port.seat([vec![Rat::zero(); 2], vec![Rat::one(), Rat::zero()]])
+        .unwrap();
     let start = port.stored_energy().unwrap();
     let mut reader = SectionReader::at(port.phase_point()).unwrap();
     let opened = whole(reader.lift());
@@ -249,9 +264,16 @@ fn ring_pass(
         let wave = MatchedWave::new(admittance.clone(), hop.clone(), samples).unwrap();
         for received in port.receive(&wave).unwrap() {
             let tick = received.expect("every tick admitted");
-            assert!(tick.closes(), "ring {b}: the balance closes at tick {}", tick.tick);
+            assert!(
+                tick.closes(),
+                "ring {b}: the balance closes at tick {}",
+                tick.tick
+            );
             for x in tick.step.state.iter().flatten() {
-                assert!(lattice.contains(x), "ring {b}: the state lies on the lattice");
+                assert!(
+                    lattice.contains(x),
+                    "ring {b}: the state lies on the lattice"
+                );
                 state_bits = state_bits.max(x.numer().bits() + x.denom().bits());
             }
             for r in tick.step.remainders().all() {
@@ -264,7 +286,8 @@ fn ring_pass(
             dissipation += &tick.step.dissipation;
             defect += &tick.step.chart + &tick.step.split;
             emission.push(tick.emission()[0].clone());
-            let observed = lock_reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]);
+            let observed =
+                lock_reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]);
             if observed.is_err() {
                 refused += 1;
                 lock_reader = LockReader::new(window);
@@ -287,21 +310,23 @@ fn ring_pass(
                                     near.period(),
                                     near.defects().len(),
                                 ));
-                                let Settled::Word(read) = &word else { unreachable!() };
+                                let Settled::Word(read) = &word else {
+                                    unreachable!()
+                                };
                                 assert_eq!(&near.decode().unwrap(), read, "N1 on the recording");
                             }
                             Err(_) => near_refused += 1,
                         }
                         match word.lock(&window) {
-                        Ok(lock) => {
-                            locked += 1;
-                            *addresses
-                                .entry(format!("{} over {}", lock.winding(), lock.period()))
-                                .or_insert(0) += 1;
-                        }
-                        Err(LockRefusal::Silent) => rest += 1,
-                        Err(LockRefusal::Unlocked { .. }) => unlocked += 1,
-                        Err(_) => refused += 1,
+                            Ok(lock) => {
+                                locked += 1;
+                                *addresses
+                                    .entry(format!("{} over {}", lock.winding(), lock.period()))
+                                    .or_insert(0) += 1;
+                            }
+                            Err(LockRefusal::Silent) => rest += 1,
+                            Err(LockRefusal::Unlocked { .. }) => unlocked += 1,
+                            Err(_) => refused += 1,
                         }
                     }
                     Err(_) => refused += 1,
@@ -399,8 +424,8 @@ fn ring_pass(
             next.next();
         }
         let stop = next.peek().map_or(total, |(tick, _)| (*tick).min(total));
-        let silence = MatchedWave::new(admittance.clone(), hop.clone(), vec![Rat::zero(); stop - n])
-            .unwrap();
+        let silence =
+            MatchedWave::new(admittance.clone(), hop.clone(), vec![Rat::zero(); stop - n]).unwrap();
         for received in decoder.receive(&silence).unwrap() {
             let tick = received.expect("every decoder tick admitted");
             assert!(tick.closes(), "ring {b}: the decoder's balance closes");
@@ -413,7 +438,10 @@ fn ring_pass(
     }
     let d_energy = decoder.stored_energy().unwrap();
     let d_balanced = d_energy == &d_work - &d_dissipation + &d_defect + &seated;
-    assert!(d_balanced, "ring {b}: the decoder's whole stream balance closes");
+    assert!(
+        d_balanced,
+        "ring {b}: the decoder's whole stream balance closes"
+    );
     let line = format!(
         "ring {b}: t = {t}; half-memory {memory} turns; keys {}; reader restarts {restarts}; key bits (gamma, four integers per key) {key_bits}, of which the quadrature's {quadrature_bits}; E_end {}; ΣW {}; Σ(chart + split) {}; balance closes: {balanced}; decoder balance with seats closes: {d_balanced}, Σ seat {}; widest state entry bits {state_bits}; widest remainder bits {remainder_bits}; widest |remainder| {}",
         keys.len(),
@@ -470,7 +498,15 @@ fn cell_interval(
 ) -> (BigInt, BigInt) {
     let grain = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
     operands
-        .drive_interval(n, 0, [u, w], class, octant, &grain, (BigInt::from(-32768), BigInt::from(32767)))
+        .drive_interval(
+            n,
+            0,
+            [u, w],
+            class,
+            octant,
+            &grain,
+            (BigInt::from(-32768), BigInt::from(32767)),
+        )
         .unwrap()
 }
 
@@ -479,7 +515,12 @@ fn cell_interval(
 fn next_image(operands: &ResonatorOperands, n: usize, u: &[Rat], w: &[Rat]) -> [Rat; 4] {
     use holonics::hnn::ring::ResonatorRemainders;
     let zero = ResonatorRemainders::default();
-    let rate = |a: Rat| operands.step(n, &[a, Rat::zero()], [u, w], &zero, None).unwrap().rate;
+    let rate = |a: Rat| {
+        operands
+            .step(n, &[a, Rat::zero()], [u, w], &zero, None)
+            .unwrap()
+            .rate
+    };
     let (r0, r1) = (rate(Rat::zero()), rate(Rat::one()));
     let m0 = &r1[0] - &r0[0];
     let hop = operands.hop();
@@ -498,13 +539,25 @@ fn half_line(a: &Rat, b: &Rat, holds: bool, strict: bool, lo: &mut BigInt, hi: &
         return;
     }
     // a + b x ≥ 0 (or > 0); its negation is a + b x < 0 (or ≤ 0): flip the sign and the strictness.
-    let (a, b, strict) = if holds { (a.clone(), b.clone(), strict) } else { (-a, -b, !strict) };
+    let (a, b, strict) = if holds {
+        (a.clone(), b.clone(), strict)
+    } else {
+        (-a, -b, !strict)
+    };
     let root = -(&a / &b) * Rat::from_integer(BigInt::one() << PCM as usize);
     if b.is_positive() {
-        let bound = if strict { root.floor().to_integer() + 1 } else { root.ceil().to_integer() };
+        let bound = if strict {
+            root.floor().to_integer() + 1
+        } else {
+            root.ceil().to_integer()
+        };
         *lo = lo.clone().max(bound);
     } else {
-        let bound = if strict { root.ceil().to_integer() - 1 } else { root.floor().to_integer() };
+        let bound = if strict {
+            root.ceil().to_integer() - 1
+        } else {
+            root.floor().to_integer()
+        };
         *hi = hi.clone().min(bound);
     }
 }
@@ -527,14 +580,28 @@ fn phase_address(
     let class = class_of();
     // class: (w sign holds, w strict), (u sign holds, u strict) per quadrant, as `quadrant` reads.
     match class {
-        0 => { half_line(w0, wm, true, true, &mut lo, &mut hi); half_line(u0, um, true, false, &mut lo, &mut hi); }
-        1 => { half_line(w0, wm, false, true, &mut lo, &mut hi); half_line(u0, um, true, true, &mut lo, &mut hi); }
-        2 => { half_line(w0, wm, false, false, &mut lo, &mut hi); half_line(u0, um, false, true, &mut lo, &mut hi); }
-        3 => { half_line(w0, wm, true, false, &mut lo, &mut hi); half_line(u0, um, false, false, &mut lo, &mut hi); }
+        0 => {
+            half_line(w0, wm, true, true, &mut lo, &mut hi);
+            half_line(u0, um, true, false, &mut lo, &mut hi);
+        }
+        1 => {
+            half_line(w0, wm, false, true, &mut lo, &mut hi);
+            half_line(u0, um, true, true, &mut lo, &mut hi);
+        }
+        2 => {
+            half_line(w0, wm, false, false, &mut lo, &mut hi);
+            half_line(u0, um, false, true, &mut lo, &mut hi);
+        }
+        3 => {
+            half_line(w0, wm, true, false, &mut lo, &mut hi);
+            half_line(u0, um, false, false, &mut lo, &mut hi);
+        }
         _ => {
             // the origin: both coordinates zero.
-            half_line(w0, wm, true, false, &mut lo, &mut hi); half_line(w0, wm, false, true, &mut lo, &mut hi);
-            half_line(u0, um, true, false, &mut lo, &mut hi); half_line(u0, um, false, true, &mut lo, &mut hi);
+            half_line(w0, wm, true, false, &mut lo, &mut hi);
+            half_line(w0, wm, false, true, &mut lo, &mut hi);
+            half_line(u0, um, true, false, &mut lo, &mut hi);
+            half_line(u0, um, false, true, &mut lo, &mut hi);
         }
     }
     let mut path = Vec::new();
@@ -542,9 +609,19 @@ fn phase_address(
     // moves no slope: the descent reads nothing there, and the index codes what remains.
     let moves = u0 * wm != w0 * um;
     if class < 4 && moves {
-        let (sw, su) = match class { 0 => (1i64, 1i64), 1 => (-1, 1), 2 => (-1, -1), _ => (1, -1) };
+        let (sw, su) = match class {
+            0 => (1i64, 1i64),
+            1 => (-1, 1),
+            2 => (-1, -1),
+            _ => (1, -1),
+        };
         let (sw, su) = (integer(sw), integer(su));
-        let (mut a, mut b, mut c, mut d) = (BigInt::from(0), BigInt::one(), BigInt::one(), BigInt::from(0));
+        let (mut a, mut b, mut c, mut d) = (
+            BigInt::from(0),
+            BigInt::one(),
+            BigInt::one(),
+            BigInt::from(0),
+        );
         while lo < hi && path.len() < 256 {
             let (p, q) = (&a + &c, &b + &d);
             let (pr, qr) = (Rat::from_integer(p.clone()), Rat::from_integer(q.clone()));
@@ -553,7 +630,13 @@ fn phase_address(
             let up = decide(&big_a, &big_b);
             path.push(up);
             half_line(&big_a, &big_b, up, false, &mut lo, &mut hi);
-            if up { a = p; b = q; } else { c = p; d = q; }
+            if up {
+                a = p;
+                b = q;
+            } else {
+                c = p;
+                d = q;
+            }
         }
     }
     (class, path, lo, hi)
@@ -583,9 +666,17 @@ fn w3_pass(b: usize, t: &Rat, stream: &[Rat], started: Instant) -> String {
     let (mut read, mut located, mut unlocated, mut shape) = (0u64, 0u64, 0u64, 0u64);
     let (mut located_bits, mut spelled_bits) = (0u64, 0u64);
     for (n, sample) in stream.iter().enumerate() {
-        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![sample.clone()]).unwrap();
+        let wave = MatchedWave::new(
+            operands.admittance().clone(),
+            operands.hop().clone(),
+            vec![sample.clone()],
+        )
+        .unwrap();
         let tick = port.receive(&wave).unwrap().next().unwrap().unwrap();
-        if reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).is_err() {
+        if reader
+            .observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()])
+            .is_err()
+        {
             reader = LockReader::new(window);
             continue;
         }
@@ -593,9 +684,15 @@ fn w3_pass(b: usize, t: &Rat, stream: &[Rat], started: Instant) -> String {
             continue;
         }
         let full = std::mem::replace(&mut reader, LockReader::new(window));
-        let Ok(settled @ Settled::Word(_)) = full.finish() else { continue };
-        let Ok(near) = settled.near_return(&window) else { continue };
-        let Settled::Word(word) = &settled else { unreachable!() };
+        let Ok(settled @ Settled::Word(_)) = full.finish() else {
+            continue;
+        };
+        let Ok(near) = settled.near_return(&window) else {
+            continue;
+        };
+        let Settled::Word(word) = &settled else {
+            unreachable!()
+        };
         read += 1;
         let advances: Vec<i8> = word.symbols().iter().map(|s| s.advance).collect();
         let mut seen: Vec<i8> = Vec::new();
@@ -620,9 +717,16 @@ fn w3_pass(b: usize, t: &Rat, stream: &[Rat], started: Instant) -> String {
                     if transport.classes() as u64 != helix.cells() {
                         continue;
                     }
-                    let Ok(code) = located_code(transport, &[actual.clone()]) else { continue };
-                    let back = read_located(helix, classes, &code, &[actual.len()]).expect("the located code reads back");
-                    assert_eq!(back, vec![actual.clone()], "ring {b}: read_located returns the window's word at tick {n}");
+                    let Ok(code) = located_code(transport, &[actual.clone()]) else {
+                        continue;
+                    };
+                    let back = read_located(helix, classes, &code, &[actual.len()])
+                        .expect("the located code reads back");
+                    assert_eq!(
+                        back,
+                        vec![actual.clone()],
+                        "ring {b}: read_located returns the window's word at tick {n}"
+                    );
                     let bits = code.len() as u64 + frame_bits + 3 * classes as u64;
                     best = Some(best.map_or(bits, |kept: u64| kept.min(bits)));
                 }
@@ -638,7 +742,11 @@ fn w3_pass(b: usize, t: &Rat, stream: &[Rat], started: Instant) -> String {
             None => unlocated += 1,
         }
         if n % CHUNK < window.length() + 1 {
-            println!("w3 ring {b}: ticks {} elapsed {} ms", n + 1, started.elapsed().as_millis());
+            println!(
+                "w3 ring {b}: ticks {} elapsed {} ms",
+                n + 1,
+                started.elapsed().as_millis()
+            );
         }
     }
     format!(
@@ -648,7 +756,11 @@ fn w3_pass(b: usize, t: &Rat, stream: &[Rat], started: Instant) -> String {
 
 /// Bits needed for an index into `count` values (`0` when one value).
 fn index_width(count: &BigInt) -> u64 {
-    if *count <= BigInt::one() { 0 } else { (count - 1u32).bits() }
+    if *count <= BigInt::one() {
+        0
+    } else {
+        (count - 1u32).bits()
+    }
 }
 
 fn push_bits(out: &mut Vec<bool>, value: u64, width: u64) {
@@ -682,22 +794,38 @@ fn codec_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32, fine: bool) -> Vec
     push_bits(&mut bits, u64::from(fine), 1);
     for (n, sample) in stream.iter().enumerate() {
         let [u, w] = port.state().map(<[Rat]>::to_vec);
-        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![sample.clone()]).unwrap();
+        let wave = MatchedWave::new(
+            operands.admittance().clone(),
+            operands.hop().clone(),
+            vec![sample.clone()],
+        )
+        .unwrap();
         let tick = port.receive(&wave).unwrap().next().unwrap().unwrap();
         let next = [tick.step.state[1][0].clone(), tick.step.state[0][0].clone()];
         let class = quadrant(&next);
         let octant = (fine && class.is_some()).then(|| next[0].abs() >= next[1].abs());
         let (lo, hi) = cell_interval(&operands, n, &u, &w, class, octant);
         let v = (sample * &pcm).to_integer();
-        assert!(lo <= v && v <= hi, "ring {b}: the sample lies in its cell's interval at tick {n}");
+        assert!(
+            lo <= v && v <= hi,
+            "ring {b}: the sample lies in its cell's interval at tick {n}"
+        );
         push_bits(&mut bits, u64::from(class.unwrap_or(4)), 3);
         if let Some(wide) = octant {
             push_bits(&mut bits, u64::from(wide), 1);
         }
-        push_bits(&mut bits, (&v - &lo).to_u64().unwrap(), index_width(&(&hi - &lo + 1)));
+        push_bits(
+            &mut bits,
+            (&v - &lo).to_u64().unwrap(),
+            index_width(&(&hi - &lo + 1)),
+        );
     }
     bits.chunks(8)
-        .map(|byte| byte.iter().enumerate().fold(0u8, |acc, (k, bit)| acc | (u8::from(*bit) << (7 - k))))
+        .map(|byte| {
+            byte.iter()
+                .enumerate()
+                .fold(0u8, |acc, (k, bit)| acc | (u8::from(*bit) << (7 - k)))
+        })
         .collect()
 }
 
@@ -709,7 +837,10 @@ fn codec_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32, fine: bool) -> Vec
 fn codec_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String> {
     use holonics::hnn::dynamic_section::quadrant;
     use holonics::hnn::ring::ResonatorRemainders;
-    let bits: Vec<bool> = bytes.iter().flat_map(|byte| (0..8).map(move |k| (byte >> (7 - k)) & 1 == 1)).collect();
+    let bits: Vec<bool> = bytes
+        .iter()
+        .flat_map(|byte| (0..8).map(move |k| (byte >> (7 - k)) & 1 == 1))
+        .collect();
     let mut at = 0usize;
     let b = read_bits(&bits, &mut at, 5) as usize;
     let rate = read_bits(&bits, &mut at, 32) as u32;
@@ -730,17 +861,40 @@ fn codec_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String>
         let index = read_bits(&bits, &mut at, index_width(&(&hi - &lo + 1)));
         let v = &lo + BigInt::from(index);
         let x = Rat::from_integer(v.clone()) * &scale;
-        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![x.clone()]).unwrap();
-        let tick = port.receive(&wave).unwrap().next().unwrap().map_err(|e| e.to_string())?;
+        let wave = MatchedWave::new(
+            operands.admittance().clone(),
+            operands.hop().clone(),
+            vec![x.clone()],
+        )
+        .unwrap();
+        let tick = port
+            .receive(&wave)
+            .unwrap()
+            .next()
+            .unwrap()
+            .map_err(|e| e.to_string())?;
         let next = [tick.step.state[1][0].clone(), tick.step.state[0][0].clone()];
-        if quadrant(&next) != class || octant.is_some_and(|wide| (next[0].abs() >= next[1].abs()) != wide) {
-            return Err(format!("tick {n}: the regenerated state leaves the cell read"));
+        if quadrant(&next) != class
+            || octant.is_some_and(|wide| (next[0].abs() >= next[1].abs()) != wide)
+        {
+            return Err(format!(
+                "tick {n}: the regenerated state leaves the cell read"
+            ));
         }
         let drive = operands
-            .inverse_step(n, [&u, &w], [&tick.step.state[0], &tick.step.state[1]], &before, tick.step.remainders(), Some(&lattice))
+            .inverse_step(
+                n,
+                [&u, &w],
+                [&tick.step.state[0], &tick.step.state[1]],
+                &before,
+                tick.step.remainders(),
+                Some(&lattice),
+            )
             .map_err(|e| e.to_string())?;
         if drive != vec![x.clone(), Rat::zero()] {
-            return Err(format!("tick {n}: the inverse tick does not return the sample"));
+            return Err(format!(
+                "tick {n}: the inverse tick does not return the sample"
+            ));
         }
         before = tick.step.remainders().clone();
         out.push(v.to_i16().ok_or("a 16-bit sample")?);
@@ -784,7 +938,12 @@ fn nr_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32, fine: bool) -> (Vec<u
         let mut ticks: Vec<(Option<u8>, Option<bool>, u64, u64)> = Vec::with_capacity(end - start);
         for (n, sample) in stream.iter().enumerate().take(end).skip(start) {
             let [u, w] = port.state().map(<[Rat]>::to_vec);
-            let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![sample.clone()]).unwrap();
+            let wave = MatchedWave::new(
+                operands.admittance().clone(),
+                operands.hop().clone(),
+                vec![sample.clone()],
+            )
+            .unwrap();
             let tick = port.receive(&wave).unwrap().next().unwrap().unwrap();
             let next = [tick.step.state[1][0].clone(), tick.step.state[0][0].clone()];
             reading = reading && reader.observe(next.clone()).is_ok();
@@ -792,14 +951,25 @@ fn nr_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32, fine: bool) -> (Vec<u
             let octant = (fine && class.is_some()).then(|| next[0].abs() >= next[1].abs());
             let (lo, hi) = cell_interval(&operands, n, &u, &w, class, octant);
             let v = (sample * &pcm).to_integer();
-            assert!(lo <= v && v <= hi, "ring {b}: the sample lies in its cell's interval at tick {n}");
-            ticks.push((class, octant, (&v - &lo).to_u64().unwrap(), index_width(&(&hi - &lo + 1))));
+            assert!(
+                lo <= v && v <= hi,
+                "ring {b}: the sample lies in its cell's interval at tick {n}"
+            );
+            ticks.push((
+                class,
+                octant,
+                (&v - &lo).to_u64().unwrap(),
+                index_width(&(&hi - &lo + 1)),
+            ));
         }
         let near = (reading && end - start == block)
             .then(|| reader.finish().ok())
             .flatten()
             .and_then(|settled| match &settled {
-                Settled::Word(word) => settled.near_return(&window).ok().map(|near| (near, word.clone())),
+                Settled::Word(word) => settled
+                    .near_return(&window)
+                    .ok()
+                    .map(|near| (near, word.clone())),
                 Settled::Rest => None,
             });
         for &(_, octant, _, width) in &ticks {
@@ -809,7 +979,11 @@ fn nr_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32, fine: bool) -> (Vec<u
             Some((near, word)) => {
                 // The word's landings are the ticks' cells: the code supplies them.
                 for (symbol, &(class, ..)) in word.symbols().iter().zip(&ticks) {
-                    assert_eq!(Some(land(symbol.class, symbol.advance).unwrap().1), class, "ring {b}: a landing is its tick's cell");
+                    assert_eq!(
+                        Some(land(symbol.class, symbol.advance).unwrap().1),
+                        class,
+                        "ring {b}: a landing is its tick's cell"
+                    );
                 }
                 admitted += 1;
                 bits.push(true);
@@ -842,7 +1016,11 @@ fn nr_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32, fine: bool) -> (Vec<u
     );
     let bytes = bits
         .chunks(8)
-        .map(|byte| byte.iter().enumerate().fold(0u8, |acc, (k, bit)| acc | (u8::from(*bit) << (7 - k))))
+        .map(|byte| {
+            byte.iter()
+                .enumerate()
+                .fold(0u8, |acc, (k, bit)| acc | (u8::from(*bit) << (7 - k)))
+        })
         .collect();
     (bytes, reading)
 }
@@ -856,7 +1034,10 @@ fn nr_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String> {
     use holonics::hnn::dynamic_section::{land, quadrant};
     use holonics::hnn::ring::ResonatorRemainders;
     use holonics::hnn::section_lock::NearReturn;
-    let bits: Vec<bool> = bytes.iter().flat_map(|byte| (0..8).map(move |k| (byte >> (7 - k)) & 1 == 1)).collect();
+    let bits: Vec<bool> = bytes
+        .iter()
+        .flat_map(|byte| (0..8).map(move |k| (byte >> (7 - k)) & 1 == 1))
+        .collect();
     let mut at = 0usize;
     let b = read_bits(&bits, &mut at, 5) as usize;
     let rate = read_bits(&bits, &mut at, 32) as u32;
@@ -873,10 +1054,12 @@ fn nr_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String> {
         let end = (start + block).min(ticks);
         let flagged = read_bits(&bits, &mut at, 1) == 1;
         let cells: Option<Vec<u8>> = if flagged {
-            let opening = quadrant(&port.phase_point()).ok_or("a flagged block opens off the origin")?;
+            let opening =
+                quadrant(&port.phase_point()).ok_or("a flagged block opens off the origin")?;
             let mut rest = bits[at..].iter().copied();
             let left = rest.len();
-            let word = NearReturn::read(&mut rest, opening, end - start).map_err(|e| e.to_string())?;
+            let word =
+                NearReturn::read(&mut rest, opening, end - start).map_err(|e| e.to_string())?;
             at += left - rest.len();
             Some(
                 word.symbols()
@@ -902,17 +1085,40 @@ fn nr_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String> {
             let index = read_bits(&bits, &mut at, index_width(&(&hi - &lo + 1)));
             let v = &lo + BigInt::from(index);
             let x = Rat::from_integer(v.clone()) * &scale;
-            let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![x.clone()]).unwrap();
-            let tick = port.receive(&wave).unwrap().next().unwrap().map_err(|e| e.to_string())?;
+            let wave = MatchedWave::new(
+                operands.admittance().clone(),
+                operands.hop().clone(),
+                vec![x.clone()],
+            )
+            .unwrap();
+            let tick = port
+                .receive(&wave)
+                .unwrap()
+                .next()
+                .unwrap()
+                .map_err(|e| e.to_string())?;
             let next = [tick.step.state[1][0].clone(), tick.step.state[0][0].clone()];
-            if quadrant(&next) != class || octant.is_some_and(|wide| (next[0].abs() >= next[1].abs()) != wide) {
-                return Err(format!("tick {n}: the regenerated state leaves the cell read"));
+            if quadrant(&next) != class
+                || octant.is_some_and(|wide| (next[0].abs() >= next[1].abs()) != wide)
+            {
+                return Err(format!(
+                    "tick {n}: the regenerated state leaves the cell read"
+                ));
             }
             let drive = operands
-                .inverse_step(n, [&u, &w], [&tick.step.state[0], &tick.step.state[1]], &before, tick.step.remainders(), Some(&lattice))
+                .inverse_step(
+                    n,
+                    [&u, &w],
+                    [&tick.step.state[0], &tick.step.state[1]],
+                    &before,
+                    tick.step.remainders(),
+                    Some(&lattice),
+                )
                 .map_err(|e| e.to_string())?;
             if drive != vec![x.clone(), Rat::zero()] {
-                return Err(format!("tick {n}: the inverse tick does not return the sample"));
+                return Err(format!(
+                    "tick {n}: the inverse tick does not return the sample"
+                ));
             }
             before = tick.step.remainders().clone();
             out.push(v.to_i16().ok_or("a 16-bit sample")?);
@@ -946,7 +1152,10 @@ fn phase_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32) -> (Vec<u8>, u64, 
             |a, b| a + b * &x >= Rat::zero(),
         );
         let v = (&x * &pcm).to_integer();
-        assert!(lo <= v && v <= hi, "ring {b}: the phase address holds the sample at tick {n}");
+        assert!(
+            lo <= v && v <= hi,
+            "ring {b}: the phase address holds the sample at tick {n}"
+        );
         push_bits(&mut bits, u64::from(class), 3);
         for bit in &path {
             bits.push(*bit);
@@ -956,11 +1165,21 @@ fn phase_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32) -> (Vec<u8>, u64, 
         class_bits += 3;
         path_bits += path.len() as u64;
         index_bits += width;
-        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![x]).unwrap();
+        let wave = MatchedWave::new(
+            operands.admittance().clone(),
+            operands.hop().clone(),
+            vec![x],
+        )
+        .unwrap();
         port.receive(&wave).unwrap().next().unwrap().unwrap();
     }
-    let bytes = bits.chunks(8)
-        .map(|byte| byte.iter().enumerate().fold(0u8, |acc, (k, bit)| acc | (u8::from(*bit) << (7 - k))))
+    let bytes = bits
+        .chunks(8)
+        .map(|byte| {
+            byte.iter()
+                .enumerate()
+                .fold(0u8, |acc, (k, bit)| acc | (u8::from(*bit) << (7 - k)))
+        })
         .collect();
     (bytes, class_bits, path_bits, index_bits)
 }
@@ -971,7 +1190,10 @@ fn phase_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32) -> (Vec<u8>, u64, 
 /// ring's inverse tick against it.
 fn phase_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String> {
     use holonics::hnn::ring::ResonatorRemainders;
-    let bits: Vec<bool> = bytes.iter().flat_map(|byte| (0..8).map(move |k| (byte >> (7 - k)) & 1 == 1)).collect();
+    let bits: Vec<bool> = bytes
+        .iter()
+        .flat_map(|byte| (0..8).map(move |k| (byte >> (7 - k)) & 1 == 1))
+        .collect();
     let mut at = 0usize;
     let b = read_bits(&bits, &mut at, 5) as usize;
     let rate = read_bits(&bits, &mut at, 32) as u32;
@@ -986,20 +1208,43 @@ fn phase_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String>
         let [u, w] = port.state().map(<[Rat]>::to_vec);
         let image = next_image(&operands, n, &u, &w);
         let class = read_bits(&bits, &mut at, 3) as u8;
-        let (_, _, lo, hi) = phase_address(&image, || class, |_, _| {
-            let bit = bits[at];
-            at += 1;
-            bit
-        });
+        let (_, _, lo, hi) = phase_address(
+            &image,
+            || class,
+            |_, _| {
+                let bit = bits[at];
+                at += 1;
+                bit
+            },
+        );
         let v = &lo + BigInt::from(read_bits(&bits, &mut at, index_width(&(&hi - &lo + 1))));
         let x = Rat::from_integer(v.clone()) * &scale;
-        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![x.clone()]).unwrap();
-        let tick = port.receive(&wave).unwrap().next().unwrap().map_err(|e| e.to_string())?;
+        let wave = MatchedWave::new(
+            operands.admittance().clone(),
+            operands.hop().clone(),
+            vec![x.clone()],
+        )
+        .unwrap();
+        let tick = port
+            .receive(&wave)
+            .unwrap()
+            .next()
+            .unwrap()
+            .map_err(|e| e.to_string())?;
         let drive = operands
-            .inverse_step(n, [&u, &w], [&tick.step.state[0], &tick.step.state[1]], &before, tick.step.remainders(), Some(&lattice))
+            .inverse_step(
+                n,
+                [&u, &w],
+                [&tick.step.state[0], &tick.step.state[1]],
+                &before,
+                tick.step.remainders(),
+                Some(&lattice),
+            )
             .map_err(|e| e.to_string())?;
         if drive != vec![x, Rat::zero()] {
-            return Err(format!("tick {n}: the inverse tick does not return the sample"));
+            return Err(format!(
+                "tick {n}: the inverse tick does not return the sample"
+            ));
         }
         before = tick.step.remainders().clone();
         out.push(v.to_i16().ok_or("a 16-bit sample")?);
@@ -1060,23 +1305,46 @@ fn interval_pass(b: usize, t: &Rat, stream: &[Rat], started: Instant) -> (u64, u
             }
         };
         match class {
-            Some(0) => { bound(&w0, &wm, Some(true)); bound(&u0, &um, Some(true)); }
-            Some(1) => { bound(&w0, &wm, Some(false)); bound(&u0, &um, Some(true)); }
-            Some(2) => { bound(&w0, &wm, Some(false)); bound(&u0, &um, Some(false)); }
-            Some(3) => { bound(&w0, &wm, Some(true)); bound(&u0, &um, Some(false)); }
+            Some(0) => {
+                bound(&w0, &wm, Some(true));
+                bound(&u0, &um, Some(true));
+            }
+            Some(1) => {
+                bound(&w0, &wm, Some(false));
+                bound(&u0, &um, Some(true));
+            }
+            Some(2) => {
+                bound(&w0, &wm, Some(false));
+                bound(&u0, &um, Some(false));
+            }
+            Some(3) => {
+                bound(&w0, &wm, Some(true));
+                bound(&u0, &um, Some(false));
+            }
             _ => {}
         }
         let v = (sample * &pcm).to_integer();
-        assert!(lo <= v && v <= hi, "ring {b}: the sample lies in its cell's interval at tick {n}");
+        assert!(
+            lo <= v && v <= hi,
+            "ring {b}: the sample lies in its cell's interval at tick {n}"
+        );
         let count: BigInt = &hi - &lo + 1;
-        let bits = if count <= BigInt::one() { 0 } else { (count - 1u32).bits() };
+        let bits = if count <= BigInt::one() {
+            0
+        } else {
+            (count - 1u32).bits()
+        };
         if bits == 0 {
             single += 1;
         }
         index_bits += bits;
         word_bits += 3;
         if n % CHUNK == CHUNK - 1 {
-            println!("interval ring {b}: ticks {} elapsed {} ms", n + 1, started.elapsed().as_millis());
+            println!(
+                "interval ring {b}: ticks {} elapsed {} ms",
+                n + 1,
+                started.elapsed().as_millis()
+            );
         }
     }
     (stream.len() as u64, word_bits, index_bits, single)
@@ -1094,7 +1362,10 @@ fn main() {
         .and_then(|x| x.strip_prefix("codec="))
         .map(|x| x.trim_end_matches(",fine").parse().unwrap());
     let fine = args.get(5).is_some_and(|x| x.ends_with(",fine"));
-    let phase_ring: Option<usize> = args.get(5).and_then(|x| x.strip_prefix("phase=")).map(|x| x.parse().unwrap());
+    let phase_ring: Option<usize> = args
+        .get(5)
+        .and_then(|x| x.strip_prefix("phase="))
+        .map(|x| x.parse().unwrap());
     let nr_ring: Option<usize> = args
         .get(5)
         .and_then(|x| x.strip_prefix("nrcodec="))
@@ -1106,7 +1377,10 @@ fn main() {
     let started = Instant::now();
     let (rate, pcm) = read_wav(input);
     let scale = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
-    let mut stream: Vec<Rat> = pcm.iter().map(|&s| Rat::from_integer(s.into()) * &scale).collect();
+    let mut stream: Vec<Rat> = pcm
+        .iter()
+        .map(|&s| Rat::from_integer(s.into()) * &scale)
+        .collect();
     let mut continuation = rate as usize;
     if let Some(limit) = limit {
         stream.truncate(limit);
@@ -1125,7 +1399,13 @@ fn main() {
         std::thread::scope(|scope| {
             for &b in &rings {
                 let (ladder, stream) = (&ladder, &stream);
-                scope.spawn(move || println!("{} (elapsed {} ms)", w3_pass(b, &ladder[b], stream, started), started.elapsed().as_millis()));
+                scope.spawn(move || {
+                    println!(
+                        "{} (elapsed {} ms)",
+                        w3_pass(b, &ladder[b], stream, started),
+                        started.elapsed().as_millis()
+                    )
+                });
             }
         });
         println!("w3: elapsed {} ms", started.elapsed().as_millis());
@@ -1136,7 +1416,8 @@ fn main() {
         let (bytes, class_bits, path_bits, index_bits) = phase_encode(b, &ladder[b], &stream, rate);
         let encoded = started.elapsed().as_millis();
         let (decoded_rate, samples) = phase_decode(&bytes, &ladder).expect("the bytes decode");
-        let exact = decoded_rate == rate && samples.len() == stream.len()
+        let exact = decoded_rate == rate
+            && samples.len() == stream.len()
             && samples.iter().zip(&pcm).all(|(a, b)| a == b);
         println!(
             "phase ring {b}: {} ticks; class bits {class_bits}; Farey path bits {path_bits}; index bits (still lines and capped descents) {index_bits}; emitted {} bytes = {} bits; raw {} bits; decode equals the source exactly: {exact}; encoded at {encoded} ms, decoded at {} ms",
@@ -1154,7 +1435,8 @@ fn main() {
         let (bytes, reading) = nr_encode(b, &ladder[b], &stream, rate, fine);
         let encoded = started.elapsed().as_millis();
         let (decoded_rate, samples) = nr_decode(&bytes, &ladder).expect("the bytes decode");
-        let exact = decoded_rate == rate && samples.len() == pcm.len().min(stream.len())
+        let exact = decoded_rate == rate
+            && samples.len() == pcm.len().min(stream.len())
             && samples.iter().zip(&pcm).all(|(a, b)| a == b);
         println!(
             "nrcodec ring {b} (octant grain: {fine}): {} ticks; {reading}; emitted {} bytes = {} bits; raw {} bits; decode equals the source exactly: {exact}; encoded at {encoded} ms, decoded at {} ms",
@@ -1172,7 +1454,8 @@ fn main() {
         let bytes = codec_encode(b, &ladder[b], &stream, rate, fine);
         let encoded = started.elapsed().as_millis();
         let (decoded_rate, samples) = codec_decode(&bytes, &ladder).expect("the bytes decode");
-        let exact = decoded_rate == rate && samples.len() == pcm.len().min(stream.len())
+        let exact = decoded_rate == rate
+            && samples.len() == pcm.len().min(stream.len())
             && samples.iter().zip(&pcm).all(|(a, b)| a == b);
         println!(
             "codec ring {b} (octant grain: {fine}): {} ticks; emitted {} bytes = {} bits (header, cells, indices, padding); raw {} bits; decode equals the source exactly: {exact}; encoded at {encoded} ms, decoded at {} ms",
@@ -1196,7 +1479,10 @@ fn main() {
                     scope.spawn(move || (b, interval_pass(b, &ladder[b], stream, started)))
                 })
                 .collect();
-            handles.into_iter().map(|h| h.join().expect("a ring's interval pass")).collect()
+            handles
+                .into_iter()
+                .map(|h| h.join().expect("a ring's interval pass"))
+                .collect()
         });
         for (b, (ticks, word, index, single)) in readings {
             println!(
@@ -1216,7 +1502,12 @@ fn main() {
             handles.push(scope.spawn(move || {
                 (worker..RINGS)
                     .step_by(threads)
-                    .map(|b| (b, ring_pass(b, &ladder[b], stream, continuation, started, census_only)))
+                    .map(|b| {
+                        (
+                            b,
+                            ring_pass(b, &ladder[b], stream, continuation, started, census_only),
+                        )
+                    })
                     .collect::<Vec<_>>()
             }));
         }
@@ -1238,7 +1529,8 @@ fn main() {
         for (b, pass) in passes.iter().enumerate() {
             let mut rates: std::collections::BTreeMap<(i64, usize), u64> =
                 std::collections::BTreeMap::new();
-            let mut still: std::collections::BTreeMap<usize, u64> = std::collections::BTreeMap::new();
+            let mut still: std::collections::BTreeMap<usize, u64> =
+                std::collections::BTreeMap::new();
             for &(start, winding, period, defects) in &pass.located {
                 track.push_str(&format!("{b} {start} {winding} {period} {defects}\n"));
                 if winding == 0 {
@@ -1293,7 +1585,11 @@ fn main() {
     let residual: Vec<Rat> = sums.iter().zip(&decoded).map(|(e, d)| e - d).collect();
     let rate_ticks = rate as usize;
     let render = |name: &str, values: &[Rat], path: &str| {
-        let peak = values.iter().map(Signed::abs).max().unwrap_or_else(Rat::zero);
+        let peak = values
+            .iter()
+            .map(Signed::abs)
+            .max()
+            .unwrap_or_else(Rat::zero);
         let k = gain_exponent(&peak);
         let g = gain(k);
         let pcm_lattice = Lattice::new(PCM);
@@ -1309,7 +1605,11 @@ fn main() {
             .chunks(rate_ticks)
             .map(|second| {
                 let sum: i64 = second.iter().map(|&q| i64::from(q) * i64::from(q)).sum();
-                let peak = second.iter().map(|&q| i64::from(q).abs()).max().unwrap_or(0);
+                let peak = second
+                    .iter()
+                    .map(|&q| i64::from(q).abs())
+                    .max()
+                    .unwrap_or(0);
                 format!("({sum}, {peak})")
             })
             .collect();

@@ -136,7 +136,10 @@ impl KtTables {
     /// The tables over an alphabet of at least two classes.
     pub fn new(alphabet: usize) -> Result<Self, PopulationError> {
         if alphabet < 2 {
-            return Err(refuse("KT tables", "the alphabet holds at least two classes"));
+            return Err(refuse(
+                "KT tables",
+                "the alphabet holds at least two classes",
+            ));
         }
         Ok(Self {
             alphabet: alphabet as u64,
@@ -164,9 +167,9 @@ impl KtTables {
     pub fn mass(&mut self, counts: &[u64]) -> (Bounds, Bounds) {
         let total: u64 = counts.iter().sum();
         self.grow(total);
-        let numerator = counts
-            .iter()
-            .fold(ONE, |product, &count| times(product, self.odd[count as usize]));
+        let numerator = counts.iter().fold(ONE, |product, &count| {
+            times(product, self.odd[count as usize])
+        });
         (numerator, self.pooled[total as usize])
     }
 }
@@ -467,7 +470,8 @@ impl Blocks {
         loop {
             let mut best: Option<&Price> = None;
             for price in prices.values() {
-                if price.accepted == Some(true) && best.is_none_or(|best| Self::above(price, best)) {
+                if price.accepted == Some(true) && best.is_none_or(|best| Self::above(price, best))
+                {
                     best = Some(price);
                 }
             }

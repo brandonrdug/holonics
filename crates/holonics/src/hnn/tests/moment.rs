@@ -8,7 +8,6 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{Signed, Zero};
 
 use super::learning::chain;
-use crate::hnn::tests::support::encoded;
 use super::support::{Draw, Medium, Parts, contact, small_field};
 use crate::compression::keys::transport::{CarryHelix, SteppedTerrain, TransportLocation};
 use crate::geometry::RatVec3;
@@ -19,10 +18,14 @@ use crate::hnn::field::{
     ConstitutionRead, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
     RingDeclaration,
 };
-use crate::hnn::moment::{CapacityClock, SourceCapacity, SourceMoment, capacity};
-use crate::ratio::{integer, rat};
+use crate::hnn::moment::{
+    CapacityClock, ExactPairContraction, OffsetTable, PairPort, SourceCapacity, SourceMoment,
+    capacity,
+};
+use crate::hnn::tests::support::encoded;
 use crate::ratio::Rat;
 use crate::ratio::linear::vector::{add, dot};
+use crate::ratio::{integer, rat};
 
 /// Lean `HNN/Moment.moment_capacity` on the three-ring control (periods 3, 4, 5, `|A| = 2`, every
 /// ring a source, no offsets): `n* = 137`, and `log₂N(n)` per source bit is at least 1 below it and
@@ -194,6 +197,142 @@ fn the_moment_contracts_to_the_streamed_encoder_sum() {
     assert!(open[1].iter().all(Zero::is_zero));
 }
 
+fn exact_pair_port_fixture(alphabet: usize, rank: usize, width: usize) -> PairPort {
+    let denominator = [3, 5, 7, 11, 13, 17, 19];
+    let factor = |row: usize, column: usize| {
+        let numerator = ((row * 13 + column * 7 + 3) % 17) as i64 - 8;
+        rat(
+            numerator,
+            denominator[(row * 5 + column * 3) % denominator.len()],
+        )
+    };
+    PairPort::new(
+        (0..rank)
+            .map(|rho| (0..width).map(|j| factor(rho + 2, j + 5)).collect())
+            .collect(),
+        (0..rank)
+            .map(|rho| (0..alphabet).map(|x| factor(rho + 1, x + 1)).collect())
+            .collect(),
+        (0..rank)
+            .map(|rho| (0..alphabet).map(|a| factor(rho + 4, a + 2)).collect())
+            .collect(),
+    )
+    .unwrap()
+}
+
+/// The integer contraction equals the former termwise rational expression for both the declared
+/// population-chart weight and a leaky table with non-dyadic carried entries. The factors also
+/// have non-dyadic denominators, so this exercises shared-denominator reduction rather than only
+/// parity-valued examples.
+#[test]
+fn pair_port_integer_contraction_matches_termwise_dyadic_and_leaky_tables() {
+    let pair = exact_pair_port_fixture(3, 2, 3);
+    let prepared = ExactPairContraction::of(&pair);
+    let mut counts = vec![0u64; 3 * 3 * 3];
+    counts[9 + 1] = 2;
+    counts[9 + 5] = 3;
+    counts[9 + 8] = 1;
+    let chart = crate::hnn::moment::PopulationChart::of(&chain());
+    let population_table = OffsetTable {
+        counts,
+        population: 6,
+        weight: chart.value(6),
+        transported: None,
+    };
+    for phase in 0..3 {
+        assert_eq!(
+            pair.apply_table(&population_table, phase, 3, 3),
+            pair.apply_table_termwise(&population_table, phase, 3, 3),
+            "population-chart phase {phase}"
+        );
+        assert_eq!(
+            prepared.apply_table(&population_table, phase, 3, 3),
+            pair.apply_table_termwise(&population_table, phase, 3, 3),
+            "prepared population-chart phase {phase}"
+        );
+    }
+
+    let mut transported = std::collections::BTreeMap::new();
+    transported.insert(18 + 1, rat(2, 7));
+    transported.insert(18 + 5, rat(4, 9));
+    transported.insert(18 + 8, rat(5, 13));
+    let leaky_table = OffsetTable {
+        counts: vec![0; 3 * 3 * 3],
+        population: 3,
+        weight: rat(0, 1),
+        transported: Some(transported),
+    };
+    assert_eq!(
+        prepared.apply_table(&leaky_table, 2, 3, 3),
+        pair.apply_table_termwise(&leaky_table, 2, 3, 3)
+    );
+    assert_eq!(
+        prepared.apply_table(&leaky_table, 1, 3, 3),
+        pair.apply_table_termwise(&leaky_table, 1, 3, 3),
+        "an unoccupied leaky phase remains exactly zero"
+    );
+}
+
+/// Synthetic-only microbenchmark for arithmetic equivalence and bit volume. It deliberately does
+/// not stand in for MNIST proposal/open_storage timing; the actual learning path has its own runner
+/// profile. Run explicitly with `cargo test -p holonics benchmark_pair_port_contraction_synthetic
+/// -- --ignored --nocapture`.
+#[test]
+#[ignore = "synthetic pair-contraction microbenchmark; not an MNIST learning measurement"]
+fn benchmark_pair_port_contraction_synthetic() {
+    use std::hint::black_box;
+    use std::time::Instant;
+
+    let pair = exact_pair_port_fixture(16, 4, 8);
+    let prepared = ExactPairContraction::of(&pair);
+    let mut counts = vec![0u64; 2 * 16 * 16];
+    for (slot, count) in counts[..16 * 16].iter_mut().enumerate() {
+        *count = (slot % 7 + 1) as u64;
+    }
+    let table = OffsetTable {
+        counts,
+        population: (16 * 16 * 4) as u64,
+        weight: rat(1, 257),
+        transported: None,
+    };
+    let input_factor_bits: u64 = pair
+        .outputs()
+        .iter()
+        .chain(pair.current_reads())
+        .chain(pair.earlier_reads())
+        .flatten()
+        .map(|value| value.numer().magnitude().bits() + value.denom().bits())
+        .sum();
+    let output = pair.apply_table(&table, 0, 16, 8);
+    assert_eq!(output, pair.apply_table_termwise(&table, 0, 16, 8));
+    let output_bits: u64 = output
+        .iter()
+        .map(|value| value.numer().magnitude().bits() + value.denom().bits())
+        .sum();
+    let bit_volume = prepared.bit_volume(&table, 0, 16);
+
+    let repetitions = 128;
+    let start = Instant::now();
+    for _ in 0..repetitions {
+        black_box(pair.apply_table_termwise(black_box(&table), 0, 16, 8));
+    }
+    let termwise = start.elapsed();
+    let start = Instant::now();
+    for _ in 0..repetitions {
+        black_box(prepared.apply_table(black_box(&table), 0, 16, 8));
+    }
+    let integral = start.elapsed();
+    eprintln!(
+        "synthetic pair contraction: alphabet=16 rank=4 occupied=256 output=8 reps={repetitions}; termwise={termwise:?}; shared-denominator={integral:?}; input_factor_bits={input_factor_bits}; factor_chart_integer_bits={}; factor_chart_payload_bytes_ceiling={}; phase_weight_denominator_bits={}; feature_denominator_bits={}; output_denominator_bits={}; final_denominator_bits={}; exact_output_bits={output_bits}; not MNIST",
+        bit_volume.chart_integer_bits,
+        bit_volume.chart_integer_bits.div_ceil(8),
+        bit_volume.phase_weight_denominator_bits,
+        bit_volume.feature_denominator_bits,
+        bit_volume.output_denominator_bits,
+        bit_volume.final_denominator_bits,
+    );
+}
+
 /// Lean `HNN/Moment.encoder_covector_tape_free`: the encoder covector, read from the counts and the
 /// covector alone, equals the exact directional derivative of `⟨g, s(0)⟩` in `E`.
 #[test]
@@ -204,7 +343,9 @@ fn the_encoder_covector_is_the_exact_directional_derivative() {
     let cells: Vec<usize> = (0..10).map(|_| draw.below(4)).collect();
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open(field, &current);
-    moment.ingest(field, &mut current, &encoded(field, &cells)).unwrap();
+    moment
+        .ingest(field, &mut current, &encoded(field, &cells))
+        .unwrap();
     let covector = draw.vector(field.ring(0).width());
     let base = dot(
         &covector,
@@ -237,7 +378,9 @@ fn the_pair_buffer_overwrites_and_its_bits_are_counted() {
     let mut moment = SourceMoment::open(field, &current);
     assert_eq!(moment.window(), vec![None]);
     let empty = moment.dense_bits();
-    moment.ingest(field, &mut current, &encoded(field, &[3, 1, 2])).unwrap();
+    moment
+        .ingest(field, &mut current, &encoded(field, &[3, 1, 2]))
+        .unwrap();
     assert_eq!(moment.window(), vec![Some(2)]);
     // Slots are fixed: only their widths change. The held cell's 3 bits are in the empty code too
     // (`d = 4`, `|A| = 4`).
@@ -252,11 +395,15 @@ fn ingest_stops_at_the_carry_out() {
     let mut current = Current::at_rest(&field);
     let mut moment = SourceMoment::open(&field, &current);
     // Code 0 steps both rings: ring 1 wraps at the second cell (1 + 1 + carry).
-    let ingested = moment.ingest(&field, &mut current, &encoded(&field, &[0, 0, 0, 0])).unwrap();
+    let ingested = moment
+        .ingest(&field, &mut current, &encoded(&field, &[0, 0, 0, 0]))
+        .unwrap();
     assert!(ingested.carry_out);
     assert_eq!(ingested.cells, 2);
     assert_eq!(moment.cells(), 2);
-    let rest = moment.ingest(&field, &mut current, &encoded(&field, &[1, 1])).unwrap();
+    let rest = moment
+        .ingest(&field, &mut current, &encoded(&field, &[1, 1]))
+        .unwrap();
     assert!(!rest.carry_out);
     assert_eq!(rest.cells, 2);
 }
@@ -302,7 +449,11 @@ fn the_open_reads_the_normalized_counts_and_no_window() {
     let n = cells.len() as u64;
     assert_eq!(moment.population(0).unwrap(), n);
     let mass: Rat = (0..field.ring(0).period() as usize)
-        .flat_map(|phase| moment.normalized_counts(field, 0, phase, &crate::ratio::integer(1)).unwrap())
+        .flat_map(|phase| {
+            moment
+                .normalized_counts(field, 0, phase, &crate::ratio::integer(1))
+                .unwrap()
+        })
         .sum();
     assert_eq!(mass, Rat::from_integer(BigInt::from(n)) * chart.value(n));
     assert!(
@@ -346,7 +497,9 @@ fn the_moment_is_one_across_every_split() {
     let field = &chain();
     let medium = Medium::generic(field, 11, Parts::default());
     let mut draw = Draw::new(29);
-    let cells: Vec<usize> = (0..4096).map(|_| draw.below(super::support::classes(&field))).collect();
+    let cells: Vec<usize> = (0..4096)
+        .map(|_| draw.below(super::support::classes(&field)))
+        .collect();
     let (whole, lift) = ingest_split(field, &cells, &[]);
     let open = whole.open_storage(field, &medium, &lift).unwrap();
     let same = |(moment, current): (SourceMoment, Current)| {
@@ -354,7 +507,11 @@ fn the_moment_is_one_across_every_split() {
         assert_eq!(current.lift(), lift.lift());
         assert_eq!(moment.open_storage(field, &medium, &current).unwrap(), open);
     };
-    same(ingest_split(field, &cells, &(1..cells.len()).collect::<Vec<_>>()));
+    same(ingest_split(
+        field,
+        &cells,
+        &(1..cells.len()).collect::<Vec<_>>(),
+    ));
     for split in 1..128 {
         same(ingest_split(field, &cells, &[split]));
     }
@@ -390,20 +547,32 @@ fn nothing_of_the_source_is_discarded_by_length() {
     let mut counted = vec![0u64; a];
     let mut paired = vec![0u64; a * a];
     for phase in 0..d {
-        for (total, count) in counted.iter_mut().zip(moment.phase_counts(0, phase).unwrap()) {
+        for (total, count) in counted
+            .iter_mut()
+            .zip(moment.phase_counts(0, phase).unwrap())
+        {
             *total += count;
         }
-        for (total, count) in paired.iter_mut().zip(moment.offset_counts(0, 1, phase).unwrap()) {
+        for (total, count) in paired
+            .iter_mut()
+            .zip(moment.offset_counts(0, 1, phase).unwrap())
+        {
             *total += count;
         }
     }
     assert_eq!(counted, histogram);
     assert_eq!(paired, pairs);
-    assert_eq!(moment.pair_population(0, 1).unwrap(), cells.len() as u64 - 1);
+    assert_eq!(
+        moment.pair_population(0, 1).unwrap(),
+        cells.len() as u64 - 1
+    );
     let mut changed = cells.clone();
     changed[0] = (changed[0] + 1) % a;
     let (other, _) = ingest_split(field, &changed, &[]);
-    assert_ne!(other, moment, "the first of 4,096 cells is still in the moment");
+    assert_ne!(
+        other, moment,
+        "the first of 4,096 cells is still in the moment"
+    );
 }
 
 /// The leaky count (`hnn::moment`, "The leaky count"): on campaign 1's field at the founded
@@ -423,7 +592,9 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
     let modulus = founded.transport(0);
     assert!(modulus < Rat::from_integer(1.into()));
     let mut draw = Draw::new(24);
-    let cells: Vec<usize> = (0..400).map(|_| draw.below(super::support::classes(&field))).collect();
+    let cells: Vec<usize> = (0..400)
+        .map(|_| draw.below(super::support::classes(&field)))
+        .collect();
     let chart = PopulationChart::of(field);
     let unit = Rat::new(BigInt::from(1), BigInt::from(1u64 << chart.exponent()));
 
@@ -440,21 +611,38 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
         }
     }
     let fed = entered.len();
-    assert!(ticks > 5 * field.ring(0).period(), "a passage of many turns: {ticks} ticks");
+    assert!(
+        ticks > 5 * field.ring(0).period(),
+        "a passage of many turns: {ticks} ticks"
+    );
     let weight = |age: u64| {
-        if age > 64 { Rat::zero() } else { crate::hnn::moment::modulus_power(&modulus, age) }
+        if age > 64 {
+            Rat::zero()
+        } else {
+            crate::hnn::moment::modulus_power(&modulus, age)
+        }
     };
     let mass: Rat = entered.iter().map(|(_, _, t)| weight(ticks - t)).sum();
 
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open_with(field, &current, &founded).unwrap();
-    moment.ingest(field, &mut current, &encoded(field, &cells[..fed])).unwrap();
+    moment
+        .ingest(field, &mut current, &encoded(field, &cells[..fed]))
+        .unwrap();
     let mut plain_current = Current::at_rest(field);
     let mut plain = SourceMoment::open_with(field, &plain_current, &lossless).unwrap();
-    plain.ingest(field, &mut plain_current, &encoded(field, &cells[..fed])).unwrap();
+    plain
+        .ingest(field, &mut plain_current, &encoded(field, &cells[..fed]))
+        .unwrap();
     let mut reference_current = Current::at_rest(field);
     let mut reference = SourceMoment::open(field, &reference_current);
-    reference.ingest(field, &mut reference_current, &encoded(field, &cells[..fed])).unwrap();
+    reference
+        .ingest(
+            field,
+            &mut reference_current,
+            &encoded(field, &cells[..fed]),
+        )
+        .unwrap();
     let one = Rat::from_integer(1.into());
     for phase in 0..field.ring(0).period() as usize {
         let read = moment.normalized_counts(field, 0, phase, &modulus).unwrap();
@@ -465,7 +653,10 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
                 .map(|(_, _, t)| weight(ticks - t))
                 .sum::<Rat>()
                 / &mass;
-            assert!((value - &exact).abs() <= unit, "phase {phase}, class {code}");
+            assert!(
+                (value - &exact).abs() <= unit,
+                "phase {phase}, class {code}"
+            );
         }
         assert_eq!(
             plain.normalized_counts(field, 0, phase, &one).unwrap(),
@@ -473,12 +664,53 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
         );
     }
     assert_eq!(
-        plain.open_storage(field, &lossless, &plain_current).unwrap(),
-        reference.open_storage(field, &lossless, &reference_current).unwrap()
+        plain
+            .open_storage(field, &lossless, &plain_current)
+            .unwrap(),
+        reference
+            .open_storage(field, &lossless, &reference_current)
+            .unwrap()
     );
     // The phase weights read the leaky count, not the aliased phases; another modulus is refused.
     assert!(moment.phase_weights(field, 0, &modulus).is_ok());
     assert!(moment.normalized_counts(field, 0, 0, &one).is_err());
+
+    // The leaky `open_storage` pair path is still the exact termwise read of its carried table,
+    // returned through each phase rotation and the current lift. This exercises the actual founded
+    // table, rather than only the synthetic rational-table oracle above.
+    let alphabet = field.alphabet();
+    let geometry = field.ring(0);
+    let source = founded.source_port(0).unwrap();
+    let pair = founded.pair_port(0, 1).unwrap();
+    let table = moment.offset_table(field, 0, 1).unwrap().unwrap();
+    let mut unlifted = vec![Rat::zero(); geometry.width()];
+    for phase in 0..geometry.period() as usize {
+        let marginal = moment.normalized_counts(field, 0, phase, &modulus).unwrap();
+        let mut driven = source.apply(&marginal).unwrap();
+        for (slot, count) in table.normalized(phase, alphabet) {
+            let (current, earlier) = (slot / alphabet, slot % alphabet);
+            for rho in 0..pair.rank() {
+                let weight = &count
+                    * &pair.current_reads()[rho][current]
+                    * &pair.earlier_reads()[rho][earlier];
+                for (value, entry) in driven.iter_mut().zip(&pair.outputs()[rho]) {
+                    *value += &weight * entry;
+                }
+            }
+        }
+        let returned = geometry.rotate(&driven, &-BigInt::from(phase));
+        unlifted = add(&unlifted, &returned);
+    }
+    let mut expected: Vec<Vec<Rat>> = field
+        .rings()
+        .iter()
+        .map(|ring| vec![Rat::zero(); ring.width()])
+        .collect();
+    expected[0] = geometry.rotate(&unlifted, &current.lift()[0]);
+    assert_eq!(
+        moment.open_storage(field, &founded, &current).unwrap(),
+        expected
+    );
 }
 
 /// A field of one closing source ring of period 256 at the quarter turns, its lock `{0}`, reading
@@ -486,14 +718,18 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
 fn wide_field() -> Field {
     use crate::geometry::RatVec3;
     use crate::geometry::screw::ScrewGenerator;
-    use crate::hnn::field::{CribDeclaration, FieldDeclaration, ReceiverDeclaration, RingDeclaration};
+    use crate::hnn::field::{
+        CribDeclaration, FieldDeclaration, ReceiverDeclaration, RingDeclaration,
+    };
     let d = 256u64;
     Field::declare(
         FieldDeclaration {
             rings: vec![RingDeclaration {
                 period: d,
                 screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
-                placements: (0..d).map(|node| FieldDeclaration::quarter_turn(node, d)).collect(),
+                placements: (0..d)
+                    .map(|node| FieldDeclaration::quarter_turn(node, d))
+                    .collect(),
                 lock: vec![0],
                 reflector: (0..d).map(|port| ((d - port) % d) as usize).collect(),
                 admittance: crate::ratio::integer(2),
@@ -516,7 +752,10 @@ fn wide_field() -> Field {
                 base: crate::compression::landmark::context::BaseMeasure::Even,
                 receiving_prior: 0,
             }],
-            crib: CribDeclaration { window: 64, offset: 1 },
+            crib: CribDeclaration {
+                window: 64,
+                offset: 1,
+            },
             population: 6_148,
             lattice: Default::default(),
         }
@@ -570,7 +809,9 @@ fn the_leaky_read_is_not_within_one_chart_unit_in_general() {
 
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open_with(field, &current, &founded).unwrap();
-    let ingested = moment.ingest(field, &mut current, &encoded(field, &cells)).unwrap();
+    let ingested = moment
+        .ingest(field, &mut current, &encoded(field, &cells))
+        .unwrap();
     assert_eq!((ingested.cells, ingested.carry_out), (207, false));
     let newest = moment.normalized_counts(field, 0, 3, &modulus).unwrap()[0].clone();
     assert_eq!(newest, dyadic(105_840, 18));
@@ -647,13 +888,21 @@ fn partial_span(field: &Field) -> (Encoded, u64) {
     let mut draw = Draw::new(2_026_100_995);
     let advances: Vec<u64> = (0..5).map(|_| 5 * (1 + draw.below(5)) as u64).collect();
     let mut left: Vec<usize> = (0..5).collect();
-    let labels: Vec<usize> = (0..5).map(|_| left.remove(draw.below(left.len()))).collect();
+    let labels: Vec<usize> = (0..5)
+        .map(|_| left.remove(draw.below(left.len())))
+        .collect();
     let terrain = SteppedTerrain::new(helix.clone(), advances, labels).unwrap();
-    let passages: Vec<Vec<usize>> = (0..helix.period()).map(|key| terrain.passage(key, 60)).collect();
+    let passages: Vec<Vec<usize>> = (0..helix.period())
+        .map(|key| terrain.passage(key, 60))
+        .collect();
     let location = TransportLocation::locate(helix, 5, &passages).unwrap();
     let chart = PassageChart::located(&location, &passages[..1]).unwrap();
     let encoding = Encoding::found(&chart).unwrap();
-    assert_eq!(encoding.reached(), 6, "the chart reaches one coset of 5ℤ/30");
+    assert_eq!(
+        encoding.reached(),
+        6,
+        "the chart reaches one coset of 5ℤ/30"
+    );
     let key = chart.openings()[0]
         .iter()
         .position(|entry| !entry.is_zero())
@@ -669,7 +918,11 @@ fn at_helix(field: &Field, lift: u64) -> Current {
     let lift = lift % 30;
     Current::at(
         field,
-        vec![BigInt::from(lift % 2), BigInt::from(lift / 2 % 3), BigInt::from(lift / 6)],
+        vec![
+            BigInt::from(lift % 2),
+            BigInt::from(lift / 2 % 3),
+            BigInt::from(lift / 6),
+        ],
     )
     .unwrap()
 }
@@ -684,7 +937,10 @@ fn at_helix(field: &Field, lift: u64) -> Current {
 fn a_refused_located_step_leaves_the_current_and_the_moment_unchanged() {
     let field = helix_field();
     let (encoded, key) = partial_span(&field);
-    for part in [encoded.part(0..encoded.len()).unwrap(), encoded.part(7..31).unwrap()] {
+    for part in [
+        encoded.part(0..encoded.len()).unwrap(),
+        encoded.part(7..31).unwrap(),
+    ] {
         // On the reached coset the passage steps.
         let mut current = at_helix(&field, key);
         let mut moment = SourceMoment::open(&field, &current);
@@ -738,14 +994,20 @@ fn a_located_moment_refuses_the_identity_capacity() {
         state_bits: located.state_bits(cells),
         n_star: located.n_star(),
     };
-    assert_eq!(moment.capacity(&field, &current), Ok(located_at(moment.cells())));
+    assert_eq!(
+        moment.capacity(&field, &current),
+        Ok(located_at(moment.cells()))
+    );
     assert!(matches!(
         field.capacity().admit(&passage),
         Err(HnnError::Unadmitted { .. })
     ));
     // A later identity-route or empty ingest does not downgrade the moment.
     moment.ingest(&field, &mut current, &empty).unwrap();
-    assert_eq!(moment.capacity(&field, &current), Ok(located_at(moment.cells())));
+    assert_eq!(
+        moment.capacity(&field, &current),
+        Ok(located_at(moment.cells()))
+    );
     // The identity route reads the certificate at the moment's cells.
     let chain = chain();
     let mut current = Current::at_rest(&chain);
@@ -784,7 +1046,9 @@ fn the_moment_text_carries_its_route_profile() {
     let (passage, key) = partial_span(&located_field);
     let mut current = at_helix(&located_field, key);
     let mut located = SourceMoment::open(&located_field, &current);
-    located.ingest(&located_field, &mut current, &passage).unwrap();
+    located
+        .ingest(&located_field, &mut current, &passage)
+        .unwrap();
     let chain = chain();
     let mut current = Current::at_rest(&chain);
     let mut identity = SourceMoment::open(&chain, &current);
@@ -797,7 +1061,12 @@ fn the_moment_text_carries_its_route_profile() {
     ] {
         let mut text = String::new();
         moment.write(&mut text);
-        assert!(text.lines().next().unwrap().ends_with(&format!(" {profile}")));
+        assert!(
+            text.lines()
+                .next()
+                .unwrap()
+                .ends_with(&format!(" {profile}"))
+        );
         assert_eq!(read(field, &text).as_ref(), Ok(moment));
         assert_eq!(
             read(field, &unmarked(&text)),

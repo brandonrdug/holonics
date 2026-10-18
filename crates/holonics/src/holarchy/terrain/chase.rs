@@ -746,17 +746,19 @@ impl Runner {
         if state.held > 0 {
             return Ok(kept());
         }
-        Ok(match self.demand_at_grain(arena, moves, caps, state, chaser, grain, tick) {
-            None => moves.wall(),
-            Some(change)
-                if Move::by_change(motion.velocity, change).within_cap(caps.classes[class]) =>
-            {
-                moves
-                    .letter(change)
-                    .expect("a demand within the top cap has its letter")
-            }
-            Some(_) => kept(),
-        })
+        Ok(
+            match self.demand_at_grain(arena, moves, caps, state, chaser, grain, tick) {
+                None => moves.wall(),
+                Some(change)
+                    if Move::by_change(motion.velocity, change).within_cap(caps.classes[class]) =>
+                {
+                    moves
+                        .letter(change)
+                        .expect("a demand within the top cap has its letter")
+                }
+                Some(_) => kept(),
+            },
+        )
     }
 
     /// **The runner's state after a cell**: the observed motion ([`Arena::observe`]), the ground it

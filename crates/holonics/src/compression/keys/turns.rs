@@ -179,7 +179,10 @@ impl TurnMenu {
         };
         let mut runs: Vec<u64> = paths.iter().map(|p| p + 1).collect();
         runs.sort_unstable_by(|a, b| b.cmp(a));
-        packs(&runs, &mut vec![order; usize::try_from(free).expect("a coset count fits")])
+        packs(
+            &runs,
+            &mut vec![order; usize::try_from(free).expect("a coset count fits")],
+        )
     }
 
     /// **The menu's reading** (the type's header).
@@ -225,7 +228,11 @@ pub fn generator(alive: &[(usize, TurnReading)]) -> Option<&(usize, TurnReading)
     let ((least, reading), others) = alive.split_first()?;
     let map = reading.map.as_ref()?;
     reading.cycle?;
-    let image = |port: usize| map.iter().find(|(from, _)| *from == port).map(|(_, to)| *to);
+    let image = |port: usize| {
+        map.iter()
+            .find(|(from, _)| *from == port)
+            .map(|(_, to)| *to)
+    };
     let wound = others.iter().all(|(offset, other)| {
         offset % least == 0
             && other.map.as_ref().is_some_and(|pairs| {
@@ -282,7 +289,10 @@ mod tests {
     /// image of the menu's ports, each edge read by [`Edge::holds`]): the surviving turns, and the
     /// gauge-invariant map when every survivor reads the same consequence at every menu port.
     #[allow(clippy::type_complexity)]
-    fn turn_fibre(period: usize, edges: &[(usize, usize)]) -> (Vec<u64>, Option<Vec<(usize, usize)>>) {
+    fn turn_fibre(
+        period: usize,
+        edges: &[(usize, usize)],
+    ) -> (Vec<u64>, Option<Vec<(usize, usize)>>) {
         let menu = Menu::of_edges(
             period,
             edges
@@ -296,7 +306,11 @@ mod tests {
         let mut turns = Vec::new();
         let mut maps = Vec::new();
         for candidate in menu.candidates(&keys).unwrap() {
-            if !menu.edges().iter().all(|edge| edge.holds(&candidate).unwrap()) {
+            if !menu
+                .edges()
+                .iter()
+                .all(|edge| edge.holds(&candidate).unwrap())
+            {
                 continue;
             }
             turns.push(candidate.key as u64);
@@ -337,9 +351,8 @@ mod tests {
         for period in [6usize, 8] {
             for trial in 0..120 {
                 let count = 1 + trial % 4;
-                let edges: Vec<(usize, usize)> = (0..count)
-                    .map(|_| (draw.below(4), draw.below(4)))
-                    .collect();
+                let edges: Vec<(usize, usize)> =
+                    (0..count).map(|_| (draw.below(4), draw.below(4))).collect();
                 let mut menu = TurnMenu::open(period as u64);
                 for &(from, to) in &edges {
                     menu.observe(from, to);
@@ -351,7 +364,11 @@ mod tests {
                 // every survivor reads; a path's end that the surviving turns force closed is left
                 // plural.
                 if let Some(published) = &reading.map {
-                    assert_eq!(Some(published), map.as_ref(), "period {period}, edges {edges:?}");
+                    assert_eq!(
+                        Some(published),
+                        map.as_ref(),
+                        "period {period}, edges {edges:?}"
+                    );
                     published_count += 1;
                 }
             }

@@ -13,11 +13,27 @@
 //!
 //! ```text
 //! a_j = [x_(p+j−1), …, x_p, x_(p−1), …]_D        phase j's address: the epoch's earlier targets, then the active suffix address
-//! f_j = k(a_j)/L_R + R · P_R^(τ_R) v_R(e_j)      complex logits over |A| classes, realified [Re, Im, …]
+//! f_j = k(a_j)/L_R + R · v_R(e_j)                complex logits over |A| classes, realified [Re, Im, …], v_R in the passage frame
 //! 2^(k_c) ≤ q(c | a_j)^(L_R) < 2^(k_c+1)         the tree face's grain exponent (integer comparisons)
 //! Re f_c = n_c + k_c/L_R + ε_c,  ε_c ∈ [0, 1/L_R)   the grain cell (carry, phase class) and the fibre
 //! φ^H_c = Im f_c / 2                             each class's phase, in turns
 //! ```
+//!
+//! [definition; agent-inferred, F1, October 16] **The receiver reads in the passage
+//! frame.** The word adds each injection to the carried storage without rotating it
+//! (`hnn::word::Word::continuing`), so the arrival and the carried context stand in the material
+//! frame, and `R` reads the anchor `v_R` there: the passage-frame rotor `P_R^(τ_R − τ_R^open)` is
+//! the identity, because the current does not advance inside a reception (U6's stations read
+//! `P_R^(1+j)` from the request's last tick in the same sense, `docs/HNN_FORMULA.md`, the smallest
+//! native form). The read it replaces, `R P_R^(τ_R) v_R` with `τ_R` the receiving ring's absolute
+//! lift, turned the feature one node per image on a ring of period `d_R`, so a fixed `R` could read
+//! only the cyclic average of what it was shown (on the period-11 placed chart, 2 of its 22
+//! coordinates); it is one of the four measured causes of the commit that released one class on
+//! every image (the [record](../../../../research/records/2026-10-16_THE_RECEIVER_READS_IN_THE_PASSAGE_FRAME_AN_ABSOLUTE_LIFT_RELEASED_ONE_CLASS.md)). The read's
+//! transpose is `Rᵀ` with no rotor (`hnn::port::Word::pull_back`), and the target phase is measured
+//! from the anchor's own lift ([`crate::hnn::ratio::target_phases`]), a common rechart of target and
+//! produced phases (Lean `HNN/Ratio.receivingPhase_ratio`); the log's branch stays the cut's
+//! winding.
 //!
 //! [definition; agent-inferred, U5] **The receiver reads the passage by epochs.** Two clocks meet
 //! there. Over the passage, the source's cell clock (an unwound `navigator::Clock`, one tick a
@@ -97,7 +113,7 @@
 //! [definition; agent-inferred] **The combined face** (the region table's combined read, with the tree's
 //! face in place of the region table's). The scored logits are the tree face's grain logits
 //! (`k_c/L_R` on the real rows, zero on the imaginary rows: [`grain_logits`]) plus the wave's
-//! `R P_R^(τ_R) v_R` ([`ReceivingRead::combined`]). The wave part is the refine's; the tree part
+//! `R v_R` ([`ReceivingRead::combined`]). The wave part is the refine's; the tree part
 //! needs each phase's address, so it is read at **compare**, per phase
 //! ([`ReceivingPhases::tree_faces`], [`ReceivingPhases::combine`]). The tree logits lie on the
 //! grain, so each class's grain cell is the wave's shifted by `k_c/L_R` and its fibre is the
@@ -125,7 +141,7 @@
 //! | `HNN/Ratio.grain_of_tolerance` (`L_R = ⌈1/ε_bits⌉`) | [`ReceivingPhases::declare`] |
 //! | `Aeon/Clock/Epoch.{forward_epoch_is_window, crossingTicks_forwardWord, mem_epoch_digitTicks, odometer_tower}` (the receiver's spans of cells are the digit clock's epochs) | [`ReceivingPhases::windows`] |
 //! | `HNN/RegionCounts.{grain_face_residual, grain_code_residual}` (the grain exponent is `receiver::face::grain_exponent`'s, `grainExponent_spec`, `grain_log_iff_pow_bounds`) | [`grain_logits`] |
-//! | `receiver::reception::ReceiverFace::read` with `C_S = R P_R^(τ_R) Π_R` | [`ReceivingPhases::read`] |
+//! | `receiver::reception::ReceiverFace::read` with `C_S = R Π_R` in the passage frame | [`ReceivingPhases::read`] |
 //! | `HNN/RegionCounts.{combinedLogits, combined_face_pullback, combined_code_pullback}` | [`ReceivingRead::combined`], [`ReceivingPhases::combine`] |
 //! | `Compression/Landmark/Context/Tree.{unfounded_reads_prior, founded_tree_same_law, release_rule}` (the typed suffix address, kept whole by the collapse) | [`ActiveAddress`], [`ReceivingPhases::tree_faces`] |
 //! | `Compression/Landmark/Context/LocalWeighing.two_face_prior` at `π = ½` and `Tree.{sequential_mixture, sequential_mixture_bounds}` (the two-family population is the two-face mixture stepped cell by cell, within one bit of the better face); `Population.population_mixture_enclosed` (the combined face read through its enclosure) | [`receiving_population`], [`score`] |
@@ -133,6 +149,7 @@
 
 use std::ops::Range;
 
+pub mod cells;
 mod declaration;
 pub(crate) use declaration::DeclaringFace;
 
@@ -142,11 +159,12 @@ use num_traits::{One, ToPrimitive, Zero};
 use crate::aeon::{ClockLift, epochs};
 use crate::compression::cost::ceil_log2;
 use crate::compression::landmark::context::{
-    Bundle, LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, Splits, code_length,
+    Bundle, LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, ObservationPath,
+    ObservationRole, Splits, code_length,
 };
 use crate::hnn::HnnError;
-use crate::hnn::encoding::Encoded;
 use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
+use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{
     ConstitutionRead, Current, Field, FieldMaterial, ReceiverDeclaration, ring_digit,
 };
@@ -215,7 +233,7 @@ impl ReceivingRead {
         }
     }
 
-    /// **The combined read** (module header): the wave's exact logits `R P_R^(τ_R) v_R` plus the
+    /// **The combined read** (module header): the wave's exact logits `R v_R` plus the
     /// tree face's grain logits, read at the grain. Refused when the two disagree in length or
     /// grain. The host reference and every device realization form their faces here.
     pub fn combined(wave: Vec<Rat>, tree: &LandmarkFace, grain: u64) -> Result<Self, HnnError> {
@@ -618,25 +636,38 @@ impl LetterReader {
         if let Some(digits) = digits {
             // Refused before anything moves: the kept rings' digits, each below its ring's period.
             if digits.len() < self.rings.len()
-                || self.rings.iter().zip(digits).any(|(ring, &digit)| digit >= ring.period)
+                || self
+                    .rings
+                    .iter()
+                    .zip(digits)
+                    .any(|(ring, &digit)| digit >= ring.period)
             {
-                return Err(route("a located occurrence's digits on the kept rings, each below its ring's period"));
+                return Err(route(
+                    "a located occurrence's digits on the kept rings, each below its ring's period",
+                ));
             }
             if cell >= self.rings[0].ports.len() {
-                return Err(route("a located occurrence's class within the field's alphabet"));
+                return Err(route(
+                    "a located occurrence's class within the field's alphabet",
+                ));
             }
         }
         match (digits, &mut self.advances) {
             (Some(digits), advances) => {
                 let kept = digits[..self.rings.len()].to_vec();
-                let classes = self.rings.first().map_or(cell + 1, |ring| ring.ports.len().max(cell + 1));
+                let classes = self
+                    .rings
+                    .first()
+                    .map_or(cell + 1, |ring| ring.ports.len().max(cell + 1));
                 let table = advances.get_or_insert_with(|| vec![None; classes]);
                 if table.len() <= cell {
                     table.resize(cell + 1, None);
                 }
                 match &table[cell] {
                     Some(held) if *held != kept => {
-                        return Err(route("a located register's digits for a class from one chart"));
+                        return Err(route(
+                            "a located register's digits for a class from one chart",
+                        ));
                     }
                     Some(_) => {}
                     None => table[cell] = Some(kept),
@@ -892,7 +923,11 @@ impl ActiveAddress {
                 "advances",
                 table.iter().map(|digits| match digits {
                     None => "x".to_string(),
-                    Some(digits) => digits.iter().map(u64::to_string).collect::<Vec<_>>().join("."),
+                    Some(digits) => digits
+                        .iter()
+                        .map(u64::to_string)
+                        .collect::<Vec<_>>()
+                        .join("."),
                 }),
             ),
         }
@@ -1063,11 +1098,13 @@ impl ActiveAddress {
             .map(|&cell| {
                 let digits = match &table {
                     None => None,
-                    Some(table) => Some(table.get(cell).cloned().flatten().ok_or(HnnError::Shape {
-                        what: "a known target's class received on the located route",
-                        expected: 1,
-                        found: 0,
-                    })?),
+                    Some(table) => {
+                        Some(table.get(cell).cloned().flatten().ok_or(HnnError::Shape {
+                            what: "a known target's class received on the located route",
+                            expected: 1,
+                            found: 0,
+                        })?)
+                    }
                 };
                 reader.tick_at(cell, digits.as_deref())
             })
@@ -1357,6 +1394,58 @@ pub fn score(
     Ok(scored)
 }
 
+/// Refine the same face expressions at an explicit reading precision. Retained population
+/// uncertainty is preserved; this is not a receiving-grain or history change.
+pub fn score_at(
+    population: &PortPopulation,
+    ring: usize,
+    combined: &Faces,
+    trees: &[LandmarkFace],
+    targets: &[usize],
+    bits: u32,
+) -> Result<Scored, HnnError> {
+    if combined.faces.len() != trees.len() || trees.len() != targets.len() {
+        return Err(HnnError::Shape {
+            what: "one combined face, one tree face and one target per phase",
+            expected: trees.len(),
+            found: targets.len(),
+        });
+    }
+    let mut local = population.clone();
+    let mut scored = Scored {
+        model: Vec::with_capacity(targets.len()),
+        tree: Vec::with_capacity(targets.len()),
+        steps: Vec::with_capacity(targets.len()),
+    };
+    for ((face, tree), &target) in combined.faces.iter().zip(trees).zip(targets) {
+        let q_tree = tree
+            .probabilities
+            .get(target)
+            .ok_or(HnnError::CellOutside {
+                code: target,
+                alphabet: tree.probabilities.len(),
+            })?
+            .clone();
+        let log = crate::ratio::algebraic::log2_enclosure_at(&q_tree, bits)?;
+        scored
+            .tree
+            .push(ExactInterval::new(-log.upper, -log.lower)?);
+        let step = ReceivingStep {
+            ring,
+            tree: q_tree,
+            combined: face_enclosure_at(face, target, bits)?,
+        };
+        scored.model.push(
+            local
+                .code_of_at(&step.faces(), bits)
+                .map_err(population_refusal)?,
+        );
+        local.receive(&step.faces()).map_err(population_refusal)?;
+        scored.steps.push(step);
+    }
+    Ok(scored)
+}
+
 /// A refusal of the receiver's population, as the HNN's.
 pub(crate) fn population_refusal(refusal: PopulationError) -> HnnError {
     match refusal {
@@ -1373,6 +1462,16 @@ pub(crate) fn population_refusal(refusal: PopulationError) -> HnnError {
 /// `θ ↦ 2^(1/L)` at the carried power's reading bits: the carried power's enclosure over the
 /// normalizer's.
 fn face_enclosure(face: &Face, class: usize) -> Result<ExactInterval, HnnError> {
+    face_enclosure_at(face, class, crate::ratio::exponentiated::READING_BITS)
+}
+
+/// The enclosure of one class's face with the real chart read at `bits` (the release's demand
+/// refinement, [`cells`]); [`face_enclosure`] is its reading at the declared reading bits.
+pub(crate) fn face_enclosure_at(
+    face: &Face,
+    class: usize,
+    bits: u32,
+) -> Result<ExactInterval, HnnError> {
     let cells = face.cells();
     let cell = cells.get(class).ok_or(HnnError::CellOutside {
         code: class,
@@ -1385,8 +1484,8 @@ fn face_enclosure(face: &Face, class: usize) -> Result<ExactInterval, HnnError> 
         .expect("a face over at least one class");
     let power = CarriedPower::new(&cell.carry - &top, cell.phase, face.grain())?
         .value()?
-        .enclosure()?;
-    let normalizer = face.normalizer().enclosure()?;
+        .enclosure_at(bits)?;
+    let normalizer = face.normalizer().enclosure_at(bits)?;
     ExactInterval::new(
         &power.lower / &normalizer.upper,
         &power.upper / &normalizer.lower,
@@ -1427,7 +1526,7 @@ pub struct SourceObserverView {
 }
 
 /// The actual clocks of the six measured anchors, and their common publication time. Features
-/// are unrotated source-response carriers; the receiving lift is applied by the matched read.
+/// are the source-response carriers in the passage frame, which the matched read takes as they are.
 /// This is a transient receipt, never a retained passage or a source/target archive.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SourceObserverReceipt {
@@ -1452,6 +1551,14 @@ impl SourceObserverView {
         current: &Current,
         phases: &ReceivingPhases,
     ) -> Result<Self, HnnError> {
+        if material
+            .receiving_map(phases.ring())
+            .is_some_and(|map| map.columns() != field.ring(phases.ring()).width())
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a source observer requires a single receiving block, not a paired arrival/context map",
+            });
+        }
         let refuse = || HnnError::Unadmitted {
             reason: "the exact stationary three-ring source observer's producing geometry and clocks",
         };
@@ -1736,22 +1843,21 @@ impl SourceObserverView {
         })
     }
 
-    /// Complete anchor transpose: sum_j H_j^T P^-lift R^T grad_j, then chi_i^T at
-    /// each of the six actual clocks. The Word performs ONE joined reverse sweep afterward.
+    /// Complete anchor transpose: sum_j H_j^T R^T grad_j (the read is in the passage frame, so no
+    /// rotor enters), then chi_i^T at each of the six actual clocks. The Word performs ONE joined
+    /// reverse sweep afterward.
     pub(crate) fn seeds(
         &self,
         gradients: &[Vec<Rat>],
         map: &ExactRatMatrix,
-        lift: &BigInt,
     ) -> Result<Vec<Vec<Option<Vec<Rat>>>>, HnnError> {
-        self.source_seeds(&self.source_covector(gradients, map, lift)?)
+        self.source_seeds(&self.source_covector(gradients, map)?)
     }
 
     pub(crate) fn source_covector(
         &self,
         gradients: &[Vec<Rat>],
         map: &ExactRatMatrix,
-        lift: &BigInt,
     ) -> Result<Vec<Rat>, HnnError> {
         if gradients.len() != self.response.len()
             || map.columns() != self.field.ring(0).width()
@@ -1765,7 +1871,7 @@ impl SourceObserverView {
         let mt = map.transpose()?;
         let mut source = vec![Rat::zero(); map.columns()];
         for (gradient, h) in gradients.iter().zip(&self.response) {
-            let anchor = self.field.ring(0).rotate(&mt.apply(gradient)?, &-lift);
+            let anchor = mt.apply(gradient)?;
             source = crate::ratio::linear::vector::add(&source, &h.transpose()?.apply(&anchor)?);
         }
         Ok(source)
@@ -1807,6 +1913,14 @@ impl SourceObserverMaterial {
         current: &Current,
         phases: &ReceivingPhases,
     ) -> Result<Self, HnnError> {
+        if !matches!(
+            constitution.receiving_layout(phases.ring()),
+            Some(crate::hnn::constitution::ReceivingLayout::Single)
+        ) {
+            return Err(HnnError::Unadmitted {
+                reason: "a source observer can only found its own single receiving law",
+            });
+        }
         use crate::hnn::constitution::{Locus, NormalLaw};
         let law =
             constitution
@@ -1879,6 +1993,159 @@ impl SourceObserverMaterial {
     }
 }
 
+/// A declared finite partition of the receiver's attained read, the observation letters its
+/// landmark tree reads beside each phase's causal address (label-free: no target enters it).
+/// - `MaximumRealGrainSet`: the actual pre-tree receiving wave's maximum set. It compares the real
+///   exponent's exact grain carry and phase-bin; imaginary turns and fibres remain in the
+///   receiving read and are deliberately not part of this coarse address. It routes
+///   ([`ObservationRole::Route`]).
+/// - `ReceivingSection` (L3): the receiving section's side readings of the carrier the
+///   receiver reads, its operand before the decoder `R` ([`section_bits`]). It varies with the
+///   source from the founding on, when `R` still moves no logit, and it refines
+///   ([`ObservationRole::Refine`]): its letters follow the causal letters and are mixed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ObservationPartition {
+    MaximumRealGrainSet,
+    ReceivingSection,
+}
+
+/// [definition; agent-inferred, L3] **The letters of one section point**: its rest
+/// flag and its two half-turn sheets.
+pub const SECTION_LETTERS: usize = 3;
+
+impl ObservationPartition {
+    pub fn tag(self) -> &'static str {
+        match self {
+            Self::MaximumRealGrainSet => "maximum-real-grain-set-v1",
+            Self::ReceivingSection => "receiving-section-v1",
+        }
+    }
+
+    /// The partition read from its saved tag.
+    pub fn of_tag(tag: &str) -> Option<Self> {
+        [Self::MaximumRealGrainSet, Self::ReceivingSection]
+            .into_iter()
+            .find(|partition| partition.tag() == tag)
+    }
+
+    /// One phase's observation letters on receiving ring `ring`: the alphabet for the maximum set;
+    /// three letters a point and `σ(n) = Σ_(d | n) d` points for the section of a ring of period
+    /// `n` (one point a mode a tick of its cycle).
+    pub fn outcome_bits(self, field: &Field, ring: usize) -> usize {
+        match self {
+            Self::MaximumRealGrainSet => field.alphabet(),
+            Self::ReceivingSection => {
+                let n = field.ring(ring).period();
+                let points: u64 = (1..=n).filter(|d| n.is_multiple_of(*d)).sum();
+                SECTION_LETTERS * usize::try_from(points).expect("a ring's period fits a word")
+            }
+        }
+    }
+
+    /// How the landmark tree reads the letters ([`ObservationRole`]).
+    pub fn role(self) -> ObservationRole {
+        match self {
+            Self::MaximumRealGrainSet => ObservationRole::Route,
+            Self::ReceivingSection => ObservationRole::Refine,
+        }
+    }
+
+    /// The typed path of one phase's letters, refused where they are not this partition's (a
+    /// maximum set is nonempty).
+    pub fn path(self, bits: Vec<bool>) -> Result<ObservationPath, HnnError> {
+        Ok(match self {
+            Self::MaximumRealGrainSet => ObservationPath::from_membership_bits(bits)?,
+            Self::ReceivingSection => ObservationPath::from_section_bits(bits)?,
+        })
+    }
+
+    /// **Each phase's letters of an actual read**: the receiving wave's faces `wave` at the
+    /// receiver's grain (the maximum set reads them alone), and the anchors `anchors` its phases
+    /// read, one each, on the producing current (the section reads them alone). Refused where the
+    /// read is not of the declared phases' shape.
+    pub fn read(
+        self,
+        field: &Field,
+        phases: &ReceivingPhases,
+        anchors: &[Vec<Rat>],
+        wave: &Faces,
+    ) -> Result<Vec<Vec<bool>>, HnnError> {
+        if wave.faces.len() != phases.aperture()
+            || (self == Self::ReceivingSection && anchors.len() != phases.aperture())
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "an observed read belongs to its declared receiving phases",
+            });
+        }
+        match self {
+            Self::MaximumRealGrainSet => wave
+                .faces
+                .iter()
+                .map(|face| {
+                    if face.grain() != phases.grain() || face.cells().len() != field.alphabet() {
+                        return Err(HnnError::Unadmitted {
+                            reason: "an observed read has its declared grain and alphabet",
+                        });
+                    }
+                    let mut path = vec![false; field.alphabet()];
+                    for class in face.maximal_mass_classes() {
+                        path[class] = true;
+                    }
+                    if !path.iter().any(|bit| *bit) {
+                        return Err(HnnError::Unadmitted {
+                            reason: "an observed maximum set is nonempty",
+                        });
+                    }
+                    Ok(path)
+                })
+                .collect(),
+            Self::ReceivingSection => anchors
+                .iter()
+                .map(|anchor| section_bits(field, phases.ring(), anchor))
+                .collect(),
+        }
+    }
+}
+
+/// [definition; agent-inferred, L3] **The receiving section's reading of one phase.**
+/// The carrier the receiver reads is `c = v_R`, the phase's anchor in the passage frame (the operand
+/// of `R`, [`ReceivingPhases::read`]). It splits exactly into its
+/// cyclic modes `Q_d c` (`hnn::ring::modes`, every divisor `d` of the ring's period `n` in
+/// increasing order), and each mode is read at the receiver's node over its own cycle: the `d`
+/// points `(P^k Q_d c)_0`, `k < d`, which hold the whole mode when the navigator is one `n`-cycle
+/// (the period-`d` mode repeats every `d` nodes along it). Each point `(w, u)` reads
+/// [`SECTION_LETTERS`] polarized side letters in the receiver's frame
+/// (`hnn::dynamic_section::quadrant`):
+/// - its rest, the origin, where no side is defined (both sheets then read near);
+/// - its sheet past the real axis, quadrant class 2 or 3 (the half-turn `e^(iπ)` side);
+/// - its sheet past the imaginary axis, class 1 or 2 (the half-turn side in the frame `i`).
+///
+/// The two sheets are the quadrant's Gray code (classes 0, 1, 2, 3 read 00, 01, 11, 10), so a
+/// quarter turn of a point flips exactly one letter. The reading is label-free and
+/// modality-neutral: it reads the field's own state, whatever chart brought the source in.
+pub fn section_bits(field: &Field, ring: usize, anchor: &[Rat]) -> Result<Vec<bool>, HnnError> {
+    let receiving = field.ring(ring);
+    if anchor.len() != receiving.width() {
+        return Err(HnnError::Shape {
+            what: "receiving section anchor",
+            expected: receiving.width(),
+            found: anchor.len(),
+        });
+    }
+    let mut bits = Vec::new();
+    for mode in crate::hnn::ring::modes::decompose(receiving, anchor)? {
+        for tick in 0..mode.period {
+            let at = receiving.rotate(&mode.coordinates, &BigInt::from(tick));
+            let point = [at[0].clone(), at[1].clone()];
+            match crate::hnn::dynamic_section::quadrant(&point) {
+                None => bits.extend([true, false, false]),
+                Some(class) => bits.extend([false, class >= 2, class == 1 || class == 2]),
+            }
+        }
+    }
+    Ok(bits)
+}
+
 /// [definition] **The receiving phases** of one admitted receiver. See the module header.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceivingPhases {
@@ -1890,29 +2157,30 @@ pub struct ReceivingPhases {
     depth: usize,
     rank: usize,
     rank_scope: RankScope,
+    observation_partition: Option<ObservationPartition>,
 }
 
 impl ReceivingPhases {
     /// [definition; agent-inferred, October 4] The saved declaring phases. The rank belongs
     /// to the declaring medium; restoring it does not execute a new observability experiment.
     pub(crate) fn write_saved(&self, s: &mut String) {
-        crate::hnn::state_text::line(
-            s,
-            "phases",
-            [
-                self.ring.to_string(),
-                self.first_epoch.to_string(),
-                self.aperture.to_string(),
-                self.grain.to_string(),
-                self.tolerance.to_string(),
-                self.depth.to_string(),
-                self.rank.to_string(),
-                match self.rank_scope {
-                    RankScope::Linear => "linear".to_owned(),
-                    RankScope::TangentAtRest => "tangent-at-rest".to_owned(),
-                },
-            ],
-        );
+        let mut words = vec![
+            self.ring.to_string(),
+            self.first_epoch.to_string(),
+            self.aperture.to_string(),
+            self.grain.to_string(),
+            self.tolerance.to_string(),
+            self.depth.to_string(),
+            self.rank.to_string(),
+            match self.rank_scope {
+                RankScope::Linear => "linear".to_owned(),
+                RankScope::TangentAtRest => "tangent-at-rest".to_owned(),
+            },
+        ];
+        if let Some(partition) = self.observation_partition {
+            words.push(partition.tag().to_owned());
+        }
+        crate::hnn::state_text::line(s, "phases", words);
     }
 
     /// Read saved operands, checking their declaration, finite differential shape and rank scope. No
@@ -1921,7 +2189,18 @@ impl ReceivingPhases {
         use crate::hnn::state_text::{keyed, refused, value};
         let what = "the saved declaring phases";
         let words = keyed(head, "phases", what)?;
-        let [ring, first, aperture, grain, tolerance, depth, rank, scope] = words[..] else {
+        let observation_partition = match words.get(8).copied() {
+            None => None,
+            Some(tag) if words.len() == 9 => match ObservationPartition::of_tag(tag) {
+                Some(partition) => Some(partition),
+                None => return refused("the saved receiving observation partition"),
+            },
+            _ => return refused("the saved receiving observation partition"),
+        };
+        if words.len() != 8 && words.len() != 9 {
+            return refused(what);
+        }
+        let [ring, first, aperture, grain, tolerance, depth, rank, scope] = words[..8] else {
             return refused(what);
         };
         let (ring, first_epoch, aperture, grain, tolerance, depth, rank): (
@@ -1978,6 +2257,7 @@ impl ReceivingPhases {
             depth,
             rank,
             rank_scope,
+            observation_partition,
         })
     }
 
@@ -1988,6 +2268,7 @@ impl ReceivingPhases {
             if self.ring == receiver.ring
                 && self.grain == grain_of(&receiver.tolerance)?
                 && self.aperture <= receiver.aperture
+                && self.observation_partition == field.receiving_context(self.ring)
             {
                 return Ok(true);
             }
@@ -2032,6 +2313,7 @@ impl ReceivingPhases {
             depth: receiver.depth,
             rank: 0,
             rank_scope: RankScope::Linear,
+            observation_partition: field.receiving_context(receiver.ring),
         };
         let nonlinear = field.rings().iter().enumerate().any(|(ring, _)| {
             constitution
@@ -2193,6 +2475,10 @@ impl ReceivingPhases {
     }
 
     /// `L_R = ⌈1/ε_bits⌉`.
+    pub fn observation_partition(&self) -> Option<ObservationPartition> {
+        self.observation_partition
+    }
+
     pub fn grain(&self) -> u64 {
         self.grain
     }
@@ -2220,8 +2506,9 @@ impl ReceivingPhases {
         self.rank_scope
     }
 
-    /// **The wave's read at one receiving epoch**: `R · P_R^(τ_R) v_R`, each class's real logit read
-    /// at the grain with its fibre, and its imaginary logit halved into turns. The tree part is
+    /// **The wave's read at one receiving epoch**: `R · v_R` in the passage frame (module header),
+    /// each class's real logit read at the grain with its fibre, and its imaginary logit halved
+    /// into turns. The tree part is
     /// added at compare ([`ReceivingPhases::combine`]). [agent-inferred, October 5] It reads the
     /// field's material alone (`R` is the field's decoder, `hnn::field::FieldMaterial`), so a
     /// release reads it without the tree or the population (guard 18).
@@ -2229,32 +2516,73 @@ impl ReceivingPhases {
         &self,
         field: &Field,
         constitution: &(impl FieldMaterial + ?Sized),
-        current: &Current,
         anchor: &[Rat],
     ) -> Result<ReceivingRead, HnnError> {
-        self.read_carrier(field, constitution, current, anchor, ReceivingCarrier::Anchor)
+        self.read_carrier(field, constitution, anchor, ReceivingCarrier::Anchor)
+    }
+
+    /// Read the two physical blocks from the same actual passage and its fresh response.
+    pub fn read_paired(
+        &self,
+        field: &Field,
+        constitution: &(impl FieldMaterial + ?Sized),
+        actual: &[Rat],
+        fresh: &[Rat],
+    ) -> Result<ReceivingRead, HnnError> {
+        let width = field.ring(self.ring).width();
+        if constitution.receiving_layout(self.ring)
+            != Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext {
+                source_width: width,
+            })
+            || constitution.receiving_carrier(self.ring) != ReceivingCarrier::Anchor
+            || actual.len() != width
+            || fresh.len() != width
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a paired read requires its declared arrival/context layout and both complete anchors",
+            });
+        }
+        let map = constitution
+            .receiving_map(self.ring)
+            .ok_or(HnnError::MissingReceivingMap { ring: self.ring })?;
+        if map.rows() != 2 * field.alphabet() || map.columns() != 2 * width {
+            return Err(HnnError::Unadmitted {
+                reason: "a paired read requires two complete physical receiving blocks",
+            });
+        }
+        let mut feature = fresh.to_vec();
+        feature.extend(actual.iter().zip(fresh).map(|(a, s)| a - s));
+        Ok(ReceivingRead::of_logits(
+            apply_rows(map, &feature)?,
+            self.grain,
+        ))
     }
 
     pub(crate) fn read_observer(
         &self,
         field: &Field,
         constitution: &(impl FieldMaterial + ?Sized),
-        current: &Current,
         feature: &[Rat],
     ) -> Result<ReceivingRead, HnnError> {
-        self.read_carrier(field, constitution, current, feature, ReceivingCarrier::SourceObserver)
+        self.read_carrier(
+            field,
+            constitution,
+            feature,
+            ReceivingCarrier::SourceObserver,
+        )
     }
 
     fn read_carrier(
         &self,
         field: &Field,
         constitution: &(impl FieldMaterial + ?Sized),
-        current: &Current,
         anchor: &[Rat],
         carrier: ReceivingCarrier,
     ) -> Result<ReceivingRead, HnnError> {
         if constitution.receiving_carrier(self.ring) != carrier {
-            return Err(HnnError::Unadmitted { reason: "the receiving law's carrier differs from the executed read" });
+            return Err(HnnError::Unadmitted {
+                reason: "the receiving law's carrier differs from the executed read",
+            });
         }
         let ring = field.ring(self.ring);
         if anchor.len() != ring.width() {
@@ -2276,7 +2604,7 @@ impl ReceivingPhases {
         }
         // The map's rows, then the classes' grain cells, each read alone, run together
         // (`hnn::realization`); the map has `2|A|` rows, so the classes pair them exactly.
-        let wave = apply_rows(map, &ring.rotate(anchor, &current.lift()[self.ring]))?;
+        let wave = apply_rows(map, anchor)?;
         Ok(ReceivingRead::of_logits(wave, self.grain))
     }
 

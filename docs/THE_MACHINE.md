@@ -581,7 +581,7 @@ tests can comb through anything valuable").
      with the decoder `D` and the Preimage Fibre of the encoding that produced them, the boundary's
      labels and, on the located route, the located advances as the lift's digits at their periods'
      width (`LocatedAdvances`). Its fields are private, and only `hnn::encoding` constructs one, in
-     two ways:
+     three ways (the observed route was added October 15):
      - `Encoded::identity`: the declared identity encoding of a known-truth terrain
        (`holarchy::terrain::KnownTruth`, built only by a terrain's generator, never from a file:
        the cyclic terrains on `ℤ/|A|` and the located transport's stepped terrain,
@@ -594,6 +594,24 @@ tests can comb through anything valuable").
        read set when its fibre is one gauge class (`EncodingError::Plural` otherwise), and read in
        the receiving cells, never in the labels; each code enters as the receiving cell its located
        label reads.
+     - `encoding::observed::PairedObservation::encode`: an explicitly declared observation
+       boundary, **not** a located latent structure or a known truth. Admission reads the actual
+       constitution's source ports `E`, certifies their helical dyads `BE=EΣ`, requires full column
+       rank and checks the exact decoder `D=(EᵀE)⁻¹Eᵀ`, `DE=I`. The rotor action retains its full
+       residual `PE=EU+R`, `U=DPE`; it never pretends the source image is rotor-invariant. The
+       immutable producing operands travel with `Encoded`. Host and CUDA ingestion/comparison
+       refuse a stale source-port witness before mutation; after deposition the boundary is
+       re-admitted on the actual successor. The unchanged fold refusal also applies. This is a
+       deliberate authored bootstrap observation chart, not a claim of learned compression,
+       arbitrary-label invariance, or semantic truth. Its checked-law formalization is owed #62.
+       `OccurrencePlacement` adds a separate occurrence-specific transport: desired ring-frame
+       residues produce bounded digits through the existing carry law, while complete exact
+       opening/arrival lifts travel with each slice. The native consumer checks the full frame
+       and both endpoint lifts before mutation. CUDA reads these digits occurrence-major, so two
+       identical intensity classes may occupy different sites without changing the alphabet;
+       the existing class-selected located transport keeps its original path. This places an
+       observation in a declared spatial frame; it does not quotient rotations or prove learned
+       spatial invariance. The host/device large-winding and tile-parity tests are its gate.
    - **The field's entries take it, and nothing else.** `Field::selective_step`, `Current::step`,
      `SourceMoment::ingest`, `ExecutionPort::{ingest, locate_keys, compare}` (the host reference
      and the card), `hnn::keys::{locate_keys, station_pairs, damaged_station_pairs}` and the key
@@ -632,15 +650,16 @@ tests can comb through anything valuable").
      `codes`): a class is its own port on a source ring (the encoding refuses a fold,
      `EncodingError::Fold`), and on any other ring a class at or past `d_g` reads the port `d_g`,
      which no lock admits, and is no edge of that ring's key menu.
-   - **Exterior data waits for its encoding.** Text, image, acoustic and motor passages enter only
-     through `Encoded::through`. Until the field's own keys and deposition found their encoding,
+   - **Exterior data needs its declared or located encoding.** An explicitly authored paired
+     observation boundary can use the checked route above. Inferred latent encodings still enter
+     through `Encoded::through`. Until the field's own keys and deposition found that encoding,
      `Encoded::through` refuses the exterior chart (`EncodingError::Unencoded`), and a run reports
      that refusal as its result. `Encoding::found` founds any declared chart as mathematics (the
      terrains' moiré, copy, crib and moment charts, the byte chart itself); only a located chart
      carries the class map an exterior passage needs, so the byte chart, a chart built from bare
      matrices and the moment chart over exterior codes are refused at `through`, as is a code no
-     located label reads. A declared identity is never the bypass, since a cut file is not a
-     `KnownTruth`.
+     located label reads. A cut file is never `KnownTruth`; the distinct observed route records
+     its authored bootstrap chart and complete producing operands instead.
    - **The alphabet fixes nothing.** `FieldDeclaration` has no exterior alphabet: its `alphabet` is
      the class count of the encodings it reads. `Field::declare` fixes the ring count and widths, the
      contacts and the complex. The moment's slots and the receiving classes are the encoding's
@@ -654,7 +673,7 @@ tests can comb through anything valuable").
        channels, complex, moment slot count and receiving class count must be equal.
      - `Encoded::identity` must refuse a terrain of `257` classes on `d_g = 60`, and
        `Encoded::through` must refuse the byte chart (both built, `hnn::tests::encoding`).
-   - **The code length does not see the labels.** For every permutation `π` of an exterior
+   - **The located code length does not see the labels.** For every permutation `π` of an exterior
      alphabet, `L(field; π∘x) = L(field; x)`: the field's description length of a passage is
      unchanged when its symbols are relabelled (code length is invariant under relabelling; keys are
      not, [the egg's genome](../research/records/2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md) §5).
@@ -735,7 +754,7 @@ tests can comb through anything valuable").
     [contamination history](../research/records/2026-10-05_THE_CONTAMINATION_CYCLES_EVERY_COPY_PIPELINE_FOLLOWED_A_DEMAND_FOR_OUTPUT_BEFORE_THE_FIELD_COULD_RELEASE.md)).
     `FieldMaterial` is the field's own material: rings, contacts, ports, resonators, transport
     and the receiving map `R`, the field's decoder (moved in October 5 for the physical repair,
-    `hnn::prediction::repair_by_field`: `R · P_R^(τ_R) v_R` is a linear face of the ring's own
+    `hnn::prediction::repair_by_field`: `R · v_R`, in the passage frame since October 16, is a linear face of the ring's own
     motion and holds no count, address or seen context). It is `ConstitutionRead` without the
     landmark tree and the receiver's population, which are read at compare, and every
     `ConstitutionRead` is one through a blanket view. `generate_by_bank`, `BankPlacement::of`, the

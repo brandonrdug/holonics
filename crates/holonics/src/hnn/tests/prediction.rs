@@ -6,7 +6,6 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use super::learning::{chain, generic, moment};
-use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::constitution::Constitution;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
@@ -14,11 +13,11 @@ use crate::hnn::moment::SourceMoment;
 use crate::hnn::prediction::{BankPlacement, Refinement, generate_by_bank};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ring::{PumpDeclaration, PumpStep, ReceivingBank, ResonatorMaterial};
+use crate::hnn::tests::support::encoded;
 use crate::hnn::word::{EndChange, Word};
 use crate::holon::parametron::{Carrier, Parametron};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::{Rat, integer, rat};
-
 
 /// A cycle parametron of `d` nodes (unit branches), the ring's resonator base.
 pub(super) fn cycle(d: usize) -> Parametron {
@@ -109,17 +108,30 @@ fn continuing_words_carry_waves_contact_and_resonator_states() {
         .map(|wave| vec![Rat::zero(); wave.len()])
         .collect();
     let cut = ContactCut::read(&first, &theta, &current).unwrap();
-    assert!(matches!(cut.continuing(&field,&theta,&current,&nothing,3),Err(Refusal::Clock)));
+    assert!(matches!(
+        cut.continuing(&field, &theta, &current, &nothing, 3),
+        Err(Refusal::Clock)
+    ));
     let mut wrong_phase = cut.clone();
-    wrong_phase.change.resonator_phases[0] = Some(1-cut.change.resonator_phases[0].unwrap());
-    assert!(matches!(wrong_phase.continuing(&field,&theta,&current,&nothing,2),Err(Refusal::Phase)));
+    wrong_phase.change.resonator_phases[0] = Some(1 - cut.change.resonator_phases[0].unwrap());
+    assert!(matches!(
+        wrong_phase.continuing(&field, &theta, &current, &nothing, 2),
+        Err(Refusal::Phase)
+    ));
     let mut wrong_cut = cut.clone();
     wrong_cut.kind = CutKind::AfterJunction;
-    assert!(matches!(wrong_cut.continuing(&field,&theta,&current,&nothing,2),Err(Refusal::Cut(CutKind::AfterJunction))));
-    let mut second = cut.continuing(&field, &theta, &current, &nothing, 2).unwrap();
-    let second_open = ContactCut::read(&second,&theta,&current).unwrap();
+    assert!(matches!(
+        wrong_cut.continuing(&field, &theta, &current, &nothing, 2),
+        Err(Refusal::Cut(CutKind::AfterJunction))
+    ));
+    let mut second = cut
+        .continuing(&field, &theta, &current, &nothing, 2)
+        .unwrap();
+    let second_open = ContactCut::read(&second, &theta, &current).unwrap();
     second.run(2).unwrap();
-    let receipt = second_open.first_step(&second,&theta,&current,0).unwrap();
+    let receipt = second_open
+        .first_step(&second, &theta, &current, 0)
+        .unwrap();
     assert!(receipt.boundary_advanced);
     if let Some(remainder) = receipt.remainder {
         assert!(remainder.iter().all(Zero::is_zero));
@@ -162,7 +174,11 @@ fn continuing_words_carry_waves_contact_and_resonator_states() {
 fn the_reception_carry_continues_from_the_last_crossing() {
     let field = chain().with_exact_word();
     let nothing = |field: &Field| -> Vec<Vec<Rat>> {
-        field.rings().iter().map(|ring| vec![Rat::zero(); ring.width()]).collect()
+        field
+            .rings()
+            .iter()
+            .map(|ring| vec![Rat::zero(); ring.width()])
+            .collect()
     };
     for (theta, pumped) in [
         (resonant(&field, generic(&field, 75)), true),
@@ -183,9 +199,14 @@ fn the_reception_carry_continues_from_the_last_crossing() {
             assert_eq!(carry.change.resonator_phases[ring], phase);
             assert_eq!(carry.change.resonators[ring].is_some(), pumped);
         }
-        let mut second =
-            Word::continuing(&field, operands.clone(), &carry.change, &nothing(&field), carry.ticks)
-                .unwrap();
+        let mut second = Word::continuing(
+            &field,
+            operands.clone(),
+            &carry.change,
+            &nothing(&field),
+            carry.ticks,
+        )
+        .unwrap();
         second.run(2).unwrap();
         assert_eq!(second.change().unwrap(), whole.change().unwrap());
         assert_eq!(second.field_balances(), &whole.field_balances()[3..]);
@@ -315,13 +336,17 @@ fn one_passage_weighs_every_datum_alike() {
     let (whole_current, whole) = {
         let mut current = Current::at_rest(&field);
         let mut moment = SourceMoment::open(&field, &current);
-        moment.ingest(&field, &mut current, &encoded(&field, &cells)).unwrap();
+        moment
+            .ingest(&field, &mut current, &encoded(&field, &cells))
+            .unwrap();
         (current, moment)
     };
     let (current, request) = {
         let mut current = Current::at_rest(&field);
         let mut moment = SourceMoment::open(&field, &current);
-        moment.ingest(&field, &mut current, &encoded(&field, &cells[..7])).unwrap();
+        moment
+            .ingest(&field, &mut current, &encoded(&field, &cells[..7]))
+            .unwrap();
         (current, moment)
     };
     // The joint field's receiving ring steps every cell, so the continuation's station 0 is the
@@ -331,13 +356,19 @@ fn one_passage_weighs_every_datum_alike() {
         .unwrap();
     assert_eq!(passage.population(0).unwrap(), whole.population(0).unwrap());
     for c in 0..6 {
-        assert_eq!(passage.phase_counts(0, c).unwrap(), whole.phase_counts(0, c).unwrap());
+        assert_eq!(
+            passage.phase_counts(0, c).unwrap(),
+            whole.phase_counts(0, c).unwrap()
+        );
     }
     // The same counts and population: the same open, read at the request's frame (the whole
     // passage's frame is one tick on, the rotation between them).
     let open = passage.open_storage(&field, &theta, &current).unwrap();
     let whole_open = whole.open_storage(&field, &theta, &whole_current).unwrap();
-    assert_eq!(field.ring(0).rotate(&open[0], &BigInt::one()), whole_open[0]);
+    assert_eq!(
+        field.ring(0).rotate(&open[0], &BigInt::one()),
+        whole_open[0]
+    );
 }
 
 /// **The partition law** (`prediction::mask`): at least one station is always compared, and every
@@ -366,8 +397,7 @@ fn the_bank_placement_is_the_sections_injection() {
     let theta = generic(&field, 91);
     let (current, request) = moment(&field, 92, 7);
     let refinement = Refinement::declare(&field, 0, 2, 1, 4, 2).unwrap();
-    let placement =
-        BankPlacement::of(&field, &theta, &current, &request, &refinement).unwrap();
+    let placement = BankPlacement::of(&field, &theta, &current, &request, &refinement).unwrap();
     let patterns: [[Option<usize>; 4]; 5] = [
         [None; 4],
         [Some(1), None, None, None],
@@ -472,7 +502,10 @@ fn the_bank_placement_under_a_dissipative_transport() {
                     let Some(weight) = weight else { continue };
                     let r = placed.abs_diff(station) as u64;
                     let power = modulus_power(&modulus, r);
-                    assert!(near(weight, &(own * &power), &residual), "ρ^{r} of the candidate");
+                    assert!(
+                        near(weight, &(own * &power), &residual),
+                        "ρ^{r} of the candidate"
+                    );
                     if placed > station {
                         assert!(weight < own, "a later lock weighs less than the candidate");
                     }
@@ -491,8 +524,15 @@ fn the_bank_placement_under_a_dissipative_transport() {
                 let derivative = placement.modulus_derivative(station, cells);
                 // Each datum's reach slope rebuilds it, datum by datum, within the held grain.
                 let grain = Rat::new(1.into(), BigInt::from(1) << 160usize);
-                for (rebuilt, d) in placement.reach_derivative(station, cells).iter().zip(&derivative) {
-                    assert!((rebuilt - d).abs() <= grain, "the reach slopes rebuild ∂z/∂ρ");
+                for (rebuilt, d) in placement
+                    .reach_derivative(station, cells)
+                    .iter()
+                    .zip(&derivative)
+                {
+                    assert!(
+                        (rebuilt - d).abs() <= grain,
+                        "the reach slopes rebuild ∂z/∂ρ"
+                    );
                 }
                 let residual = |h: &Rat| -> Rat {
                     let up = placement.exact_storage(station, cells, &(&modulus + h));
@@ -505,7 +545,10 @@ fn the_bank_placement_under_a_dissipative_transport() {
                         .unwrap()
                 };
                 let (wide, narrow) = (residual(&rat(1, 64)), residual(&rat(1, 128)));
-                assert!(narrow * integer(3) <= wide, "the central difference is second order");
+                assert!(
+                    narrow * integer(3) <= wide,
+                    "the central difference is second order"
+                );
             }
         }
     }
@@ -568,7 +611,10 @@ fn the_transport_is_founded_off_the_lossless_boundary() {
         founded.transport(0),
         check(lattice, field.ring(0).period(), chart)
     );
-    assert_eq!(founded.transport(0), theta.founding_transport(&field, 0).unwrap());
+    assert_eq!(
+        founded.transport(0),
+        theta.founding_transport(&field, 0).unwrap()
+    );
     assert!(matches!(
         theta.founding_transport(&field, 1),
         Err(HnnError::MissingSourcePort { ring: 1 })
@@ -644,9 +690,15 @@ fn a_contact_change_has_a_unique_reflected_storage_receipt() {
     let field = chain().with_exact_word();
     // Declare the stationary chart's domain; the singular cases keep their fibres separately.
     let theta = generic(&field, 73);
-    let theta = theta.clone().with_channel(0, theta.contact_storage(0).clone(),
-        ExactRatMatrix::identity(field.contact(0).width()).unwrap(),
-        theta.contact_dissipation(0).clone()).unwrap();
+    let theta = theta
+        .clone()
+        .with_channel(
+            0,
+            theta.contact_storage(0).clone(),
+            ExactRatMatrix::identity(field.contact(0).width()).unwrap(),
+            theta.contact_dissipation(0).clone(),
+        )
+        .unwrap();
     let current = Current::at_rest(&field);
     let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
     let mut first = Word::on_operands(&field, operands, storage(&field, 74)).unwrap();
@@ -664,29 +716,65 @@ fn a_contact_change_has_a_unique_reflected_storage_receipt() {
             theta.contact_dissipation(0).clone(),
         )
         .unwrap();
-    let nothing: Vec<Vec<Rat>> = x.storage.iter().map(|w| vec![Rat::zero(); w.len()]).collect();
-    assert!(matches!(cut.continuing(&field,&theta,&current,&nothing,3),Err(Refusal::Clock)));
-    assert!(matches!(ContactCut::read(&first,&next,&current),Err(Refusal::Producer)));
+    let nothing: Vec<Vec<Rat>> = x
+        .storage
+        .iter()
+        .map(|w| vec![Rat::zero(); w.len()])
+        .collect();
+    assert!(matches!(
+        cut.continuing(&field, &theta, &current, &nothing, 3),
+        Err(Refusal::Clock)
+    ));
+    assert!(matches!(
+        ContactCut::read(&first, &next, &current),
+        Err(Refusal::Producer)
+    ));
     let continued = |constitution: &Constitution| {
-        let mut word = cut.continuing(&field, constitution, &current, &nothing, 2).unwrap();
-        let open = ContactCut::read(&word,constitution,&current).unwrap();
+        let mut word = cut
+            .continuing(&field, constitution, &current, &nothing, 2)
+            .unwrap();
+        let open = ContactCut::read(&word, constitution, &current).unwrap();
         word.run(1).unwrap();
-        let receipt = open.first_step(&word,constitution,&current,0).unwrap();
+        let receipt = open.first_step(&word, constitution, &current, 0).unwrap();
         assert!(!receipt.boundary_advanced);
-        assert!(receipt.remainder.as_ref().unwrap().iter().all(Zero::is_zero));
-        for read in [&receipt.before,&receipt.next] {
-            let Read::Unique(read) = read else { panic!("declared nonsingular stiffness") };
+        assert!(
+            receipt
+                .remainder
+                .as_ref()
+                .unwrap()
+                .iter()
+                .all(Zero::is_zero)
+        );
+        for read in [&receipt.before, &receipt.next] {
+            let Read::Unique(read) = read else {
+                panic!("declared nonsingular stiffness")
+            };
             assert!(read.closes());
         }
         let mut wrong_open = open.clone();
         wrong_open.change.storage[0][0] += Rat::one();
-        assert!(matches!(wrong_open.first_step(&word,constitution,&current,0),Err(Refusal::Step)));
+        assert!(matches!(
+            wrong_open.first_step(&word, constitution, &current, 0),
+            Err(Refusal::Step)
+        ));
         word.run(1).unwrap();
-        let advanced = open.first_step(&word,constitution,&current,0).unwrap();
+        let advanced = open.first_step(&word, constitution, &current, 0).unwrap();
         assert!(advanced.boundary_advanced);
-        assert!(advanced.remainder.as_ref().unwrap().iter().all(Zero::is_zero));
-        let (Read::Unique(a),Read::Unique(b)) = (&advanced.before,&advanced.next) else {panic!("unique chart")};
-        assert_ne!(a.boundary,b.boundary,"the actual next junction moved the boundary");
+        assert!(
+            advanced
+                .remainder
+                .as_ref()
+                .unwrap()
+                .iter()
+                .all(Zero::is_zero)
+        );
+        let (Read::Unique(a), Read::Unique(b)) = (&advanced.before, &advanced.next) else {
+            panic!("unique chart")
+        };
+        assert_ne!(
+            a.boundary, b.boundary,
+            "the actual next junction moved the boundary"
+        );
         assert!(a.closes() && b.closes());
         word.run(2).unwrap();
         word
@@ -698,14 +786,24 @@ fn a_contact_change_has_a_unique_reflected_storage_receipt() {
     );
     let work = old.deposition_work(&new, &x).unwrap();
     let declared = field.contact(0);
-    let (from,to) = declared.ends();
-    let boundary = [(from,crate::hnn::field::End::From),(to,crate::hnn::field::End::To)]
-        .map(|(ring,end)| declared.selection(end).into_iter().map(|i|
-            integer(2)*&before.anchor(0,ring).unwrap()[i]-&x.arrivals[0][usize::from(ring!=from)][i]
-        ).collect());
-    let deposition = cut.control_deposit(&next,0,&boundary).unwrap();
+    let (from, to) = declared.ends();
+    let boundary = [
+        (from, crate::hnn::field::End::From),
+        (to, crate::hnn::field::End::To),
+    ]
+    .map(|(ring, end)| {
+        declared
+            .selection(end)
+            .into_iter()
+            .map(|i| {
+                integer(2) * &before.anchor(0, ring).unwrap()[i]
+                    - &x.arrivals[0][usize::from(ring != from)][i]
+            })
+            .collect()
+    });
+    let deposition = cut.control_deposit(&next, 0, &boundary).unwrap();
     assert!(deposition.closes());
-    assert_eq!(deposition.work,work);
+    assert_eq!(deposition.work, work);
     assert!(!work.is_zero());
     assert_eq!(before.field_balances()[0].before, old.power(&x).unwrap());
     assert_eq!(after.field_balances()[0].before, new.power(&x).unwrap());
@@ -719,7 +817,7 @@ fn a_contact_change_has_a_unique_reflected_storage_receipt() {
     let receiver = field.receivers()[0].ring;
     assert_ne!(a.storage[receiver], b.storage[receiver]);
     // Campaign one's unloaded contact fixture has no inherited resonator storage term.
-    for word in [before,after] {
+    for word in [before, after] {
         let balance = crate::hnn::word::WordBalance::of(&word.release().unwrap());
         assert!(balance.resonator_end.is_zero());
         assert!(balance.closes());
@@ -729,14 +827,22 @@ fn a_contact_change_has_a_unique_reflected_storage_receipt() {
 /// A post-junction release is a different cut, never silently resumed as a full-tick cut.
 #[test]
 fn the_private_contact_cut_refuses_a_terminal_junction() {
-    use super::contact_residual::{ContactCut,CutKind,Refusal};
+    use super::contact_residual::{ContactCut, CutKind, Refusal};
     let field = chain().with_exact_word();
-    let theta = generic(&field,73);
+    let theta = generic(&field, 73);
     let current = Current::at_rest(&field);
-    let mut word = Word::on_operands(&field,Operands::exact_at_cut(&field,&theta,&current).unwrap(),storage(&field,74)).unwrap();
+    let mut word = Word::on_operands(
+        &field,
+        Operands::exact_at_cut(&field, &theta, &current).unwrap(),
+        storage(&field, 74),
+    )
+    .unwrap();
     word.run(1).unwrap();
     word.last_junction().unwrap();
-    assert!(matches!(ContactCut::read(&word,&theta,&current),Err(Refusal::Cut(CutKind::AfterJunction))));
+    assert!(matches!(
+        ContactCut::read(&word, &theta, &current),
+        Err(Refusal::Cut(CutKind::AfterJunction))
+    ));
 }
 
 /// Join the existing native deposited return, including its clocks, statistics and carries, to
@@ -744,46 +850,97 @@ fn the_private_contact_cut_refuses_a_terminal_junction() {
 /// the hand-built factor covector came from an HNN comparison.
 #[test]
 fn a_native_contact_successor_carries_its_publication_and_reflected_work() {
-    use super::contact_residual::{ContactCut,Read,Refusal};
-    use super::learning::{OPEN_BUDGET,chain_reach};
-    use crate::hnn::constitution::{FactorGradient,FactorStep,Locus};
+    use super::contact_residual::{ContactCut, Read, Refusal};
+    use super::learning::{OPEN_BUDGET, chain_reach};
+    use crate::hnn::constitution::{FactorGradient, FactorStep, Locus};
     use crate::hnn::port::Deposit;
     let field = chain().with_exact_word();
-    let theta = Constitution::initial(&field,OPEN_BUDGET).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let current = Current::at_rest(&field);
-    let mut first = Word::on_operands(&field,Operands::exact_at_cut(&field,&theta,&current).unwrap(),storage(&field,74)).unwrap();
+    let mut first = Word::on_operands(
+        &field,
+        Operands::exact_at_cut(&field, &theta, &current).unwrap(),
+        storage(&field, 74),
+    )
+    .unwrap();
     first.run(2).unwrap();
-    let cut = ContactCut::read(&first,&theta,&current).unwrap();
-    let deposit = Deposit::new(theta.commit(),Vec::new(),vec![FactorStep {
-        gradient:FactorGradient::Storage {contact:0,
-            gradient:ExactRatMatrix::identity(field.contact(0).width()).unwrap()},
-        energy:Rat::zero(),covector:Rat::one(),
-    }],vec![Locus::Channel(0)]).with_reach(chain_reach());
-    let (next,publication) = theta.deposited(&deposit).unwrap();
-    assert_eq!(next.commit(),theta.commit()+1);
-    assert_eq!(next.clock(Locus::Channel(0)),theta.clock(Locus::Channel(0))+1);
-    assert!(publication.stepped>0);
-    assert_ne!(next.contact_storage(0),theta.contact_storage(0));
-    let nothing:Vec<_> = cut.change.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
-    let mut continued = cut.continuing(&field,&next,&current,&nothing,2).unwrap();
-    let opening = ContactCut::read(&continued,&next,&current).unwrap();
+    let cut = ContactCut::read(&first, &theta, &current).unwrap();
+    let deposit = Deposit::new(
+        theta.commit(),
+        Vec::new(),
+        vec![FactorStep {
+            gradient: FactorGradient::Storage {
+                contact: 0,
+                gradient: ExactRatMatrix::identity(field.contact(0).width()).unwrap(),
+            },
+            energy: Rat::zero(),
+            covector: Rat::one(),
+        }],
+        vec![Locus::Channel(0)],
+    )
+    .with_reach(chain_reach());
+    let (next, publication) = theta.deposited(&deposit).unwrap();
+    assert_eq!(next.commit(), theta.commit() + 1);
+    assert_eq!(
+        next.clock(Locus::Channel(0)),
+        theta.clock(Locus::Channel(0)) + 1
+    );
+    assert!(publication.stepped > 0);
+    assert_ne!(next.contact_storage(0), theta.contact_storage(0));
+    let nothing: Vec<_> = cut
+        .change
+        .storage
+        .iter()
+        .map(|v| vec![Rat::zero(); v.len()])
+        .collect();
+    let mut continued = cut
+        .continuing(&field, &next, &current, &nothing, 2)
+        .unwrap();
+    let opening = ContactCut::read(&continued, &next, &current).unwrap();
     continued.run(2).unwrap();
-    let movement = opening.first_step(&continued,&next,&current,0).unwrap();
+    let movement = opening.first_step(&continued, &next, &current, 0).unwrap();
     assert!(movement.boundary_advanced);
-    assert!(movement.remainder.as_ref().unwrap().iter().all(Zero::is_zero));
-    let Read::Unique(read) = &movement.before else {panic!("initial stiffness is nonsingular")};
+    assert!(
+        movement
+            .remainder
+            .as_ref()
+            .unwrap()
+            .iter()
+            .all(Zero::is_zero)
+    );
+    let Read::Unique(read) = &movement.before else {
+        panic!("initial stiffness is nonsingular")
+    };
     let width = field.contact(0).width();
-    let x = [read.boundary[..width].to_vec(),read.boundary[width..].to_vec()];
-    let receipt = cut.deposited_return(&deposit,&next,&publication,0,&x).unwrap();
+    let x = [
+        read.boundary[..width].to_vec(),
+        read.boundary[width..].to_vec(),
+    ];
+    let receipt = cut
+        .deposited_return(&deposit, &next, &publication, 0, &x)
+        .unwrap();
     assert!(receipt.closes());
     assert!(!receipt.work.is_zero());
-    assert_eq!(receipt.publication.as_ref(),Some(&publication));
-    let replacement = theta.clone().with_channel(0,next.contact_storage(0).clone(),
-        next.contact_stiffness(0).clone(),next.contact_dissipation(0).clone()).unwrap();
-    assert!(matches!(cut.deposited_return(&deposit,&replacement,&publication,0,&x),Err(Refusal::Producer)));
+    assert_eq!(receipt.publication.as_ref(), Some(&publication));
+    let replacement = theta
+        .clone()
+        .with_channel(
+            0,
+            next.contact_storage(0).clone(),
+            next.contact_stiffness(0).clone(),
+            next.contact_dissipation(0).clone(),
+        )
+        .unwrap();
+    assert!(matches!(
+        cut.deposited_return(&deposit, &replacement, &publication, 0, &x),
+        Err(Refusal::Producer)
+    ));
     let mut wrong_publication = publication.clone();
     wrong_publication.commit += 1;
-    assert!(matches!(cut.deposited_return(&deposit,&next,&wrong_publication,0,&x),Err(Refusal::Producer)));
+    assert!(matches!(
+        cut.deposited_return(&deposit, &next, &wrong_publication, 0, &x),
+        Err(Refusal::Producer)
+    ));
 }
 
 /// Original generic-stiffness continuation control, retained verbatim alongside the unique chart.
@@ -808,7 +965,11 @@ fn a_contact_change_is_read_by_the_continued_word_with_its_work() {
             theta.contact_dissipation(0).clone(),
         )
         .unwrap();
-    let nothing: Vec<Vec<Rat>> = x.storage.iter().map(|w| vec![Rat::zero(); w.len()]).collect();
+    let nothing: Vec<Vec<Rat>> = x
+        .storage
+        .iter()
+        .map(|w| vec![Rat::zero(); w.len()])
+        .collect();
     let continued = |constitution: &Constitution| {
         let operands = Operands::exact_at_cut(&field, constitution, &current).unwrap();
         let mut word = Word::continuing(&field, operands, &x, &nothing, 2).unwrap();
@@ -838,142 +999,199 @@ fn a_contact_change_is_read_by_the_continued_word_with_its_work() {
 /// Native production receipts include the actual inherited storage at both endpoints.
 #[test]
 fn inherited_resonator_opening_closes_native_balances() {
-    use crate::hnn::word::{ResonatorBalance,WordBalance};
-    let field=chain().with_exact_word();
-    let theta=resonant(&field,generic(&field,73));
-    let current=Current::at_rest(&field);
-    let operands=Operands::exact_at_cut(&field,&theta,&current).unwrap();
-    let mut first=Word::on_operands(&field,operands.clone(),storage(&field,74)).unwrap();
+    use crate::hnn::word::{ResonatorBalance, WordBalance};
+    let field = chain().with_exact_word();
+    let theta = resonant(&field, generic(&field, 73));
+    let current = Current::at_rest(&field);
+    let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let mut first = Word::on_operands(&field, operands.clone(), storage(&field, 74)).unwrap();
     first.run(2).unwrap();
-    let carried=first.change().unwrap();
-    let nothing:Vec<_>=carried.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
-    let mut next=Word::continuing(&field,operands,&carried,&nothing,2).unwrap();
+    let carried = first.change().unwrap();
+    let nothing: Vec<_> = carried
+        .storage
+        .iter()
+        .map(|v| vec![Rat::zero(); v.len()])
+        .collect();
+    let mut next = Word::continuing(&field, operands, &carried, &nothing, 2).unwrap();
     next.run(2).unwrap();
-    let mut opening=Rat::zero();
-    for (ring,resonance) in next.resonances().iter().enumerate() {
-        if let Some(resonance)=resonance {
-            let b=ResonatorBalance::of(ring,resonance);
-            assert_eq!(b.open,resonance.steps[0].before);
+    let mut opening = Rat::zero();
+    for (ring, resonance) in next.resonances().iter().enumerate() {
+        if let Some(resonance) = resonance {
+            let b = ResonatorBalance::of(ring, resonance);
+            assert_eq!(b.open, resonance.steps[0].before);
             assert!(!b.open.is_zero());
             assert!(b.closes());
-            opening+=b.open;
+            opening += b.open;
         }
     }
-    let balance=WordBalance::of(&next.release().unwrap());
-    assert_eq!(balance.resonator_open,opening);
+    let balance = WordBalance::of(&next.release().unwrap());
+    assert_eq!(balance.resonator_open, opening);
     assert!(balance.closes());
     assert!(WordBalance::of(&first.release().unwrap()).closes());
 }
 
 #[test]
 fn a_zero_tick_native_word_keeps_inherited_resonator_storage() {
-    use crate::hnn::word::{PowerForm,WordBalance};
-    let field=chain().with_exact_word();
-    let theta=resonant(&field,generic(&field,73));
-    let current=Current::at_rest(&field);
-    let operands=Operands::exact_at_cut(&field,&theta,&current).unwrap();
-    let mut first=Word::on_operands(&field,operands.clone(),storage(&field,74)).unwrap();
+    use crate::hnn::word::{PowerForm, WordBalance};
+    let field = chain().with_exact_word();
+    let theta = resonant(&field, generic(&field, 73));
+    let current = Current::at_rest(&field);
+    let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let mut first = Word::on_operands(&field, operands.clone(), storage(&field, 74)).unwrap();
     first.run(2).unwrap();
-    let carried=first.change().unwrap();
-    let energy=PowerForm::read(&field,&theta,&current).unwrap().resonator_power(&carried).unwrap();
+    let carried = first.change().unwrap();
+    let energy = PowerForm::read(&field, &theta, &current)
+        .unwrap()
+        .resonator_power(&carried)
+        .unwrap();
     assert!(!energy.is_zero());
-    let nothing:Vec<_>=carried.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
-    let next=Word::continuing(&field,operands,&carried,&nothing,2).unwrap();
-    let released=next.release().unwrap();
-    for b in &released.resonators {assert_eq!(b.open,b.end);assert!(b.closes());}
-    let balance=WordBalance::of(&released);
-    assert_eq!(balance.resonator_open,energy);
-    assert_eq!(balance.resonator_end,energy);
+    let nothing: Vec<_> = carried
+        .storage
+        .iter()
+        .map(|v| vec![Rat::zero(); v.len()])
+        .collect();
+    let next = Word::continuing(&field, operands, &carried, &nothing, 2).unwrap();
+    let released = next.release().unwrap();
+    for b in &released.resonators {
+        assert_eq!(b.open, b.end);
+        assert!(b.closes());
+    }
+    let balance = WordBalance::of(&released);
+    assert_eq!(balance.resonator_open, energy);
+    assert_eq!(balance.resonator_end, energy);
     assert!(balance.closes());
 }
 
 /// A native refusal certifies phase compatibility; it does not prove an absolute carried clock.
 #[test]
 fn native_continuing_refuses_an_incompatible_carried_phase() {
-    let field=chain().with_exact_word();
-    let theta=resonant(&field,generic(&field,73));
-    let current=Current::at_rest(&field);
-    let operands=Operands::exact_at_cut(&field,&theta,&current).unwrap();
-    let mut first=Word::on_operands(&field,operands.clone(),storage(&field,74)).unwrap();
+    let field = chain().with_exact_word();
+    let theta = resonant(&field, generic(&field, 73));
+    let current = Current::at_rest(&field);
+    let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let mut first = Word::on_operands(&field, operands.clone(), storage(&field, 74)).unwrap();
     first.run(2).unwrap();
-    let mut carried=first.change().unwrap();
-    let nothing:Vec<_>=carried.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
-    carried.resonator_phases[0]=Some(1-carried.resonator_phases[0].unwrap());
-    assert!(matches!(Word::continuing(&field,operands,&carried,&nothing,2),
-        Err(crate::hnn::HnnError::Resonator{ring:0,..})));
-    let unpumped=Constitution::initial(&field,super::learning::OPEN_BUDGET).unwrap();
-    let bare=Operands::exact_at_cut(&field,&unpumped,&current).unwrap();
-    let mut absent=EndChange::rest(&field,&bare);
-    absent.resonator_phases[0]=Some(0);
-    assert!(matches!(Word::continuing(&field,bare,&absent,&nothing,0),
-        Err(crate::hnn::HnnError::Resonator{ring:0,..})));
+    let mut carried = first.change().unwrap();
+    let nothing: Vec<_> = carried
+        .storage
+        .iter()
+        .map(|v| vec![Rat::zero(); v.len()])
+        .collect();
+    carried.resonator_phases[0] = Some(1 - carried.resonator_phases[0].unwrap());
+    assert!(matches!(
+        Word::continuing(&field, operands, &carried, &nothing, 2),
+        Err(crate::hnn::HnnError::Resonator { ring: 0, .. })
+    ));
+    let unpumped = Constitution::initial(&field, super::learning::OPEN_BUDGET).unwrap();
+    let bare = Operands::exact_at_cut(&field, &unpumped, &current).unwrap();
+    let mut absent = EndChange::rest(&field, &bare);
+    absent.resonator_phases[0] = Some(0);
+    assert!(matches!(
+        Word::continuing(&field, bare, &absent, &nothing, 0),
+        Err(crate::hnn::HnnError::Resonator { ring: 0, .. })
+    ));
 }
 
 #[test]
 fn native_absent_state_and_supplied_phase_follow_the_opening_contract() {
-    let field=chain().with_exact_word();
-    let theta=resonant(&field,generic(&field,73));
-    let current=Current::at_rest(&field);
-    let operands=Operands::exact_at_cut(&field,&theta,&current).unwrap();
-    let mut carried=EndChange::rest(&field,&operands);
-    for (ring,r) in operands.resonators().iter().enumerate() {
-        carried.resonator_phases[ring]=r.as_ref().map(|r|r.phase_at(1));
+    let field = chain().with_exact_word();
+    let theta = resonant(&field, generic(&field, 73));
+    let current = Current::at_rest(&field);
+    let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let mut carried = EndChange::rest(&field, &operands);
+    for (ring, r) in operands.resonators().iter().enumerate() {
+        carried.resonator_phases[ring] = r.as_ref().map(|r| r.phase_at(1));
     }
-    let expected=carried.resonator_phases[0].unwrap();
-    carried.resonators[0]=None;
-    let nothing:Vec<_>=carried.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
-    for phase in [None,Some(expected)] {
-        carried.resonator_phases[0]=phase;
-        let word=Word::continuing(&field,operands.clone(),&carried,&nothing,2).unwrap();
-        let resonator=word.resonances()[0].as_ref().unwrap();
+    let expected = carried.resonator_phases[0].unwrap();
+    carried.resonators[0] = None;
+    let nothing: Vec<_> = carried
+        .storage
+        .iter()
+        .map(|v| vec![Rat::zero(); v.len()])
+        .collect();
+    for phase in [None, Some(expected)] {
+        carried.resonator_phases[0] = phase;
+        let word = Word::continuing(&field, operands.clone(), &carried, &nothing, 2).unwrap();
+        let resonator = word.resonances()[0].as_ref().unwrap();
         assert!(resonator.state.iter().flatten().all(Zero::is_zero));
         assert!(resonator.open.is_zero());
-        assert_eq!(word.change().unwrap().resonator_phases[0],Some(expected));
+        assert_eq!(word.change().unwrap().resonator_phases[0], Some(expected));
     }
-    carried.resonator_phases[0]=Some(1-expected);
-    assert!(matches!(Word::continuing(&field,operands.clone(),&carried,&nothing,2),
-        Err(crate::hnn::HnnError::Resonator{ring:0,..})));
-    carried.resonators[0]=Some([vec![Rat::zero();field.ring(0).width()],vec![Rat::zero();field.ring(0).width()]]);
-    carried.resonator_phases[0]=None;
-    assert!(matches!(Word::continuing(&field,operands,&carried,&nothing,2),
-        Err(crate::hnn::HnnError::Resonator{ring:0,..})));
+    carried.resonator_phases[0] = Some(1 - expected);
+    assert!(matches!(
+        Word::continuing(&field, operands.clone(), &carried, &nothing, 2),
+        Err(crate::hnn::HnnError::Resonator { ring: 0, .. })
+    ));
+    carried.resonators[0] = Some([
+        vec![Rat::zero(); field.ring(0).width()],
+        vec![Rat::zero(); field.ring(0).width()],
+    ]);
+    carried.resonator_phases[0] = None;
+    assert!(matches!(
+        Word::continuing(&field, operands, &carried, &nothing, 2),
+        Err(crate::hnn::HnnError::Resonator { ring: 0, .. })
+    ));
 }
 
 /// The opening energy uses the scheduled previous form, not the material's unpumped form or
 /// the first newly executed phase. The native owner keeps the nonzero pump work of that change.
 #[test]
 fn native_opening_uses_the_scheduled_previous_phase() {
-    use crate::hnn::ring::{PumpSchedule,ResonatorOperands};
-    use crate::hnn::word::{ResonatorBalance,WordBalance};
-    let field=chain().with_exact_word();
-    let material=ResonatorMaterial::of_parametron(&cycle(4),&rat(1,8),None).unwrap();
-    let theta=Constitution::initial(&field,super::learning::OPEN_BUDGET).unwrap()
-        .with_ring_resonator(&field,0,material.clone()).unwrap();
-    let current=Current::at_rest(&field);
-    let mut operands=Operands::exact_at_cut(&field,&theta,&current).unwrap();
-    let carrier=|a,b|Carrier::new(integer(a),integer(b)).unwrap();
-    let schedule=PumpSchedule::modulated(
-        &PumpDeclaration::new(rat(1,16),carrier(1,0),PumpStep::Quarter).unwrap(),
-        &[carrier(0,1),carrier(-1,0),carrier(1,0)]).unwrap();
-    let scheduled=ResonatorOperands::scheduled(0,&material,&schedule,field.ring(0).admittance(),field.step(),None).unwrap();
-    *operands.resonators_mut().get_mut(0).unwrap()=Some(scheduled.clone());
-    let mut carried=EndChange::rest(&field,&operands);
-    let width=field.ring(0).width();
-    let unit=|at:usize,value:Rat|(0..width).map(|j|if j==at{value.clone()}else{Rat::zero()}).collect::<Vec<_>>();
-    let input=[unit(0,rat(1,2)),unit(2,rat(1,4))];
-    carried.resonators[0]=Some(input.clone());
-    carried.resonator_phases[0]=Some(scheduled.phase_at(1));
-    let expected=scheduled.energy_at(scheduled.phase_at(1),&input[0],&input[1]).unwrap();
-    let first_form=scheduled.energy_at(scheduled.phase_at(2),&input[0],&input[1]).unwrap();
-    assert_ne!(expected,first_form);
-    let nothing:Vec<_>=carried.storage.iter().map(|v|vec![Rat::zero();v.len()]).collect();
-    let mut word=Word::continuing(&field,operands,&carried,&nothing,2).unwrap();
-    assert_eq!(word.resonances()[0].as_ref().unwrap().open,expected);
+    use crate::hnn::ring::{PumpSchedule, ResonatorOperands};
+    use crate::hnn::word::{ResonatorBalance, WordBalance};
+    let field = chain().with_exact_word();
+    let material = ResonatorMaterial::of_parametron(&cycle(4), &rat(1, 8), None).unwrap();
+    let theta = Constitution::initial(&field, super::learning::OPEN_BUDGET)
+        .unwrap()
+        .with_ring_resonator(&field, 0, material.clone())
+        .unwrap();
+    let current = Current::at_rest(&field);
+    let mut operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let carrier = |a, b| Carrier::new(integer(a), integer(b)).unwrap();
+    let schedule = PumpSchedule::modulated(
+        &PumpDeclaration::new(rat(1, 16), carrier(1, 0), PumpStep::Quarter).unwrap(),
+        &[carrier(0, 1), carrier(-1, 0), carrier(1, 0)],
+    )
+    .unwrap();
+    let scheduled = ResonatorOperands::scheduled(
+        0,
+        &material,
+        &schedule,
+        field.ring(0).admittance(),
+        field.step(),
+        None,
+    )
+    .unwrap();
+    *operands.resonators_mut().get_mut(0).unwrap() = Some(scheduled.clone());
+    let mut carried = EndChange::rest(&field, &operands);
+    let width = field.ring(0).width();
+    let unit = |at: usize, value: Rat| {
+        (0..width)
+            .map(|j| if j == at { value.clone() } else { Rat::zero() })
+            .collect::<Vec<_>>()
+    };
+    let input = [unit(0, rat(1, 2)), unit(2, rat(1, 4))];
+    carried.resonators[0] = Some(input.clone());
+    carried.resonator_phases[0] = Some(scheduled.phase_at(1));
+    let expected = scheduled
+        .energy_at(scheduled.phase_at(1), &input[0], &input[1])
+        .unwrap();
+    let first_form = scheduled
+        .energy_at(scheduled.phase_at(2), &input[0], &input[1])
+        .unwrap();
+    assert_ne!(expected, first_form);
+    let nothing: Vec<_> = carried
+        .storage
+        .iter()
+        .map(|v| vec![Rat::zero(); v.len()])
+        .collect();
+    let mut word = Word::continuing(&field, operands, &carried, &nothing, 2).unwrap();
+    assert_eq!(word.resonances()[0].as_ref().unwrap().open, expected);
     word.run(1).unwrap();
-    let resonance=word.resonances()[0].as_ref().unwrap();
-    assert_eq!(resonance.steps[0].before,expected);
+    let resonance = word.resonances()[0].as_ref().unwrap();
+    assert_eq!(resonance.steps[0].before, expected);
     assert!(!resonance.steps[0].pump.is_zero());
-    assert!(ResonatorBalance::of(0,resonance).closes());
+    assert!(ResonatorBalance::of(0, resonance).closes());
     assert!(WordBalance::of(&word.release().unwrap()).closes());
 }
 
@@ -1011,7 +1229,10 @@ fn symbols_request(field: &Field, seed: u64, n: usize) -> (Current, SourceMoment
     let mut moment = SourceMoment::open(field, &current);
     let mut fed = 0;
     while fed < cells.len() {
-        fed += moment.ingest(field, &mut current, &encoded(field, &cells[fed..])).unwrap().cells;
+        fed += moment
+            .ingest(field, &mut current, &encoded(field, &cells[fed..]))
+            .unwrap()
+            .cells;
     }
     (current, moment, cells)
 }
@@ -1025,7 +1246,9 @@ fn deposited(field: &Field, offset: usize) -> Constitution {
         offset,
         ..super::executed::order_two_pair()
     };
-    crate::hnn::executed::pair_deposit(field, &opening, &prior, 0, &pair).unwrap().0
+    crate::hnn::executed::pair_deposit(field, &opening, &prior, 0, &pair)
+        .unwrap()
+        .0
 }
 
 /// [implemented-exact] **The closed pair contacts are read from the material**
@@ -1045,7 +1268,10 @@ fn the_closed_pair_contacts_are_the_deposits_distance() {
     );
     assert!(closed_pairs(&field, &opening, 0).unwrap().is_empty());
     for offset in [2usize, 3] {
-        assert_eq!(closed_pairs(&field, &deposited(&field, offset), 0).unwrap(), vec![offset]);
+        assert_eq!(
+            closed_pairs(&field, &deposited(&field, offset), 0).unwrap(),
+            vec![offset]
+        );
     }
 }
 
@@ -1072,7 +1298,9 @@ fn a_candidates_pair_storage_joins_its_antecedent_at_the_contacts_weight() {
     let lift = current.lift()[0].clone();
     let phase = current.phase(&field, 0).unwrap();
     let column = |m: &ExactRatMatrix, c: usize| -> Vec<Rat> {
-        (0..m.rows()).map(|r| m.get(r, c).unwrap().clone()).collect()
+        (0..m.rows())
+            .map(|r| m.get(r, c).unwrap().clone())
+            .collect()
     };
     let port = theta.source_port(0).unwrap();
     let placed_at = |v: &[Rat], residue: u64| ring.rotate(v, &(&lift - BigInt::from(residue)));
@@ -1086,7 +1314,10 @@ fn a_candidates_pair_storage_joins_its_antecedent_at_the_contacts_weight() {
         let (pair, alone) = placement.pair_storage(0, x, &open).unwrap();
         let own = placed_at(&column(port, x), c0);
         assert_eq!(alone, scale(own.clone()));
-        assert_eq!(pair, scale(add(&own, &placed_at(&column(port, antecedent), ca))));
+        assert_eq!(
+            pair,
+            scale(add(&own, &placed_at(&column(port, antecedent), ca)))
+        );
     }
     let fits = (antecedent + 1) % 4;
     let (pair, _) = placement.pair_storage(0, fits, &open).unwrap();
@@ -1095,7 +1326,10 @@ fn a_candidates_pair_storage_joins_its_antecedent_at_the_contacts_weight() {
         .zip(column(&prior, antecedent))
         .map(|(e, b)| e - b)
         .collect();
-    let doubled: Vec<Rat> = placed_at(&column(&prior, antecedent), ca).iter().map(|x| x + x).collect();
+    let doubled: Vec<Rat> = placed_at(&column(&prior, antecedent), ca)
+        .iter()
+        .map(|x| x + x)
+        .collect();
     let expected = add(
         &add(&placed_at(&column(&prior, fits), c0), &doubled),
         &placed_at(&learned, ca),
@@ -1109,17 +1343,24 @@ fn a_candidates_pair_storage_joins_its_antecedent_at_the_contacts_weight() {
     assert!(placement.joins(3, &one));
     let (pair, _) = placement.pair_storage(3, 0, &one).unwrap();
     let own = placed_at(&column(port, 0), (phase + 4) % 16);
-    assert_eq!(pair, scale(add(&own, &placed_at(&column(port, 2), (phase + 2) % 16))));
+    assert_eq!(
+        pair,
+        scale(add(&own, &placed_at(&column(port, 2), (phase + 2) % 16)))
+    );
 }
 
 /// One closing ring of the harness's period `60 = 2²·3·5` (its lock every port, quarter-turn
 /// placements), source and receiving ring, over `|A| = 5` (four symbols and the termination): the
 /// order-2 field's receiving ring without its carry rings, which the release does not read.
 fn sixty_field() -> Field {
-    use crate::hnn::field::{CribDeclaration, FieldDeclaration, ReceiverDeclaration, RingDeclaration};
+    use crate::hnn::field::{
+        CribDeclaration, FieldDeclaration, ReceiverDeclaration, RingDeclaration,
+    };
     let ring = RingDeclaration {
         period: 60,
-        placements: (0..60).map(|node| FieldDeclaration::quarter_turn(node, 60)).collect(),
+        placements: (0..60)
+            .map(|node| FieldDeclaration::quarter_turn(node, 60))
+            .collect(),
         ..super::support::ring(16, (0..60).collect())
     };
     Field::declare(
@@ -1164,26 +1405,46 @@ fn order_two_release(seed: u64) {
     let phase = std::time::Instant::now();
     let field = sixty_field();
     let theta = deposited(&field, 2);
-    eprintln!("order-2 seed {seed}: field and deposit {} ns", phase.elapsed().as_nanos());
+    eprintln!(
+        "order-2 seed {seed}: field and deposit {} ns",
+        phase.elapsed().as_nanos()
+    );
     let phase = std::time::Instant::now();
     let bank = super::executed::declared_bank();
     let refinement = Refinement::declare(&field, 0, 2, 1, 6, 4).unwrap();
-    eprintln!("order-2 seed {seed}: bank and refinement {} ns", phase.elapsed().as_nanos());
+    eprintln!(
+        "order-2 seed {seed}: bank and refinement {} ns",
+        phase.elapsed().as_nanos()
+    );
     let phase = std::time::Instant::now();
     let (current, moment, cells) = symbols_request(&field, seed, 8);
-    eprintln!("order-2 seed {seed}: request {} ns", phase.elapsed().as_nanos());
+    eprintln!(
+        "order-2 seed {seed}: request {} ns",
+        phase.elapsed().as_nanos()
+    );
     let phase = std::time::Instant::now();
     let generated =
         generate_by_bank(&field, &theta, &current, &moment, &refinement, &bank, 12).unwrap();
-    eprintln!("order-2 seed {seed}: generation {} ns", phase.elapsed().as_nanos());
+    eprintln!(
+        "order-2 seed {seed}: generation {} ns",
+        phase.elapsed().as_nanos()
+    );
     assert_eq!(generated.contacts, vec![2]);
-    assert!(generated.release.released(), "seed {seed}: {:?}", generated.release);
+    assert!(
+        generated.release.released(),
+        "seed {seed}: {:?}",
+        generated.release
+    );
     assert!(generated.release.width.is_zero());
     let mut passage = cells.clone();
     passage.extend(&generated.release.classes);
     for t in 0..6 {
         let at = cells.len() + t;
-        assert_eq!(passage[at], (passage[at - 2] + 1) % 4, "seed {seed}, station {t}");
+        assert_eq!(
+            passage[at],
+            (passage[at - 2] + 1) % 4,
+            "seed {seed}, station {t}"
+        );
     }
     assert!(generated.locks[0].iter().all(|&station| station < 2));
     let locked: usize = generated.locks.iter().map(Vec::len).sum();
@@ -1211,7 +1472,11 @@ fn the_release_reads_the_located_pair_and_its_consumer_holds_at_seed_41() {
     order_two_release(41);
     let field = sixty_field();
     let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
-    assert!(crate::hnn::prediction::closed_pairs(&field, &opening, 0).unwrap().is_empty());
+    assert!(
+        crate::hnn::prediction::closed_pairs(&field, &opening, 0)
+            .unwrap()
+            .is_empty()
+    );
 }
 
 /// The order-2 release at seed 42 (the test above).
@@ -1249,7 +1514,10 @@ fn the_pair_gain_is_the_joined_banks_determinant_and_a_neutral_member_does_not_m
     // Enclosures: [1, 2] over [1/2, 1] is [1, 4]; with the exact member, [3, 12].
     let pair_wide = reading(vec![growth(integer(1), integer(2))]);
     let alone_wide = reading(vec![growth(rat(1, 2), integer(1))]);
-    assert_eq!(gain(&pair_wide, &alone_wide).unwrap(), growth(integer(1), integer(4)));
+    assert_eq!(
+        gain(&pair_wide, &alone_wide).unwrap(),
+        growth(integer(1), integer(4))
+    );
     let joined = |a: &TurnReading, b: &TurnReading| {
         reading(a.members.iter().chain(&b.members).cloned().collect())
     };
@@ -1262,15 +1530,25 @@ fn the_pair_gain_is_the_joined_banks_determinant_and_a_neutral_member_does_not_m
     let quiet = reading(vec![growth(rat(5, 16), rat(5, 16))]);
     let exact_neutral = reading(vec![exact(rat(5, 16))]);
     assert_eq!(
-        gain(&joined(&pair, &exact_neutral), &joined(&alone, &exact_neutral)).unwrap(),
+        gain(
+            &joined(&pair, &exact_neutral),
+            &joined(&alone, &exact_neutral)
+        )
+        .unwrap(),
         exact(integer(6))
     );
     let widened = gain(&joined(&pair, &neutral), &joined(&alone, &quiet)).unwrap();
     assert_eq!(widened, growth(integer(6), integer(6) * rat(6, 5)));
     // Refusals: a reading alone at zero, and two banks of different membership.
     let silent = reading(vec![growth(Rat::zero(), rat(1, 16)), exact(integer(5))]);
-    assert!(matches!(gain(&pair, &silent), Err(HnnError::NonpositiveDeclaration)));
-    assert!(matches!(gain(&pair, &alone_wide), Err(HnnError::NonpositiveDeclaration)));
+    assert!(matches!(
+        gain(&pair, &silent),
+        Err(HnnError::NonpositiveDeclaration)
+    ));
+    assert!(matches!(
+        gain(&pair, &alone_wide),
+        Err(HnnError::NonpositiveDeclaration)
+    ));
 }
 
 /// One seed of the fixed-map release (the consumer equation below), each phase's elapsed
@@ -1291,21 +1569,40 @@ fn fixed_map_release(seed: u64) {
     let theta = crate::hnn::executed::pair_deposit(&field, &opening, &prior, 0, &identity)
         .unwrap()
         .0;
-    assert_eq!(crate::hnn::prediction::closed_pairs(&field, &theta, 0).unwrap(), vec![2]);
-    eprintln!("fixed map seed {seed}: field and deposit {} ns", phase.elapsed().as_nanos());
+    assert_eq!(
+        crate::hnn::prediction::closed_pairs(&field, &theta, 0).unwrap(),
+        vec![2]
+    );
+    eprintln!(
+        "fixed map seed {seed}: field and deposit {} ns",
+        phase.elapsed().as_nanos()
+    );
     let phase = std::time::Instant::now();
     let bank = super::executed::declared_bank();
     let refinement = Refinement::declare(&field, 0, 2, 1, 6, 4).unwrap();
-    eprintln!("fixed map seed {seed}: bank and refinement {} ns", phase.elapsed().as_nanos());
+    eprintln!(
+        "fixed map seed {seed}: bank and refinement {} ns",
+        phase.elapsed().as_nanos()
+    );
     let phase = std::time::Instant::now();
     let (current, moment, cells) = symbols_request(&field, seed, 8);
-    eprintln!("fixed map seed {seed}: request {} ns", phase.elapsed().as_nanos());
+    eprintln!(
+        "fixed map seed {seed}: request {} ns",
+        phase.elapsed().as_nanos()
+    );
     let phase = std::time::Instant::now();
     let generated =
         generate_by_bank(&field, &theta, &current, &moment, &refinement, &bank, 12).unwrap();
-    eprintln!("fixed map seed {seed}: generation {} ns", phase.elapsed().as_nanos());
+    eprintln!(
+        "fixed map seed {seed}: generation {} ns",
+        phase.elapsed().as_nanos()
+    );
     assert_eq!(generated.contacts, vec![2]);
-    assert!(generated.release.released(), "seed {seed}: {:?}", generated.release);
+    assert!(
+        generated.release.released(),
+        "seed {seed}: {:?}",
+        generated.release
+    );
     assert!(generated.release.width.is_zero());
     let mut passage = cells.clone();
     passage.extend(&generated.release.classes);
@@ -1428,7 +1725,10 @@ mod physical_repair {
                 location.observe(&observation);
             }
         }
-        let located = location.survivors().located().expect("the seen pair is located");
+        let located = location
+            .survivors()
+            .located()
+            .expect("the seen pair is located");
         assert_eq!(located.offset, 2);
         let prior = opening.source_port(0).unwrap().clone();
         let (learned, deposit) =
@@ -1529,9 +1829,13 @@ mod physical_repair {
         );
         // Runs that overlap or leave the section are refused.
         let run = crate::hnn::tests::support::encoded(&field, &[0, 1]);
-        assert!(DamagedSection::of_runs(8, &run, vec![(0, run.clone()), (1, run.clone())]).is_err());
+        assert!(
+            DamagedSection::of_runs(8, &run, vec![(0, run.clone()), (1, run.clone())]).is_err()
+        );
         assert!(DamagedSection::of_runs(8, &run, vec![(7, run.clone())]).is_err());
-        assert!(DamagedSection::of_runs(usize::MAX, &run, vec![(usize::MAX, run.clone())]).is_err());
+        assert!(
+            DamagedSection::of_runs(usize::MAX, &run, vec![(usize::MAX, run.clone())]).is_err()
+        );
     }
 
     #[test]
@@ -1555,7 +1859,10 @@ mod physical_repair {
             .iter()
             .filter(|read| read.leaders().len() == 1)
             .count();
-        assert!(single > 0, "the declared decoder leads one class at some station");
+        assert!(
+            single > 0,
+            "the declared decoder leads one class at some station"
+        );
         for t in [2, 5, 7] {
             assert!(matches!(
                 repair.cells[t],
@@ -1565,7 +1872,12 @@ mod physical_repair {
                 }
             ));
         }
-        assert!(repair.cells.iter().all(|cell| !matches!(cell, RepairedCell::Released(_))));
+        assert!(
+            repair
+                .cells
+                .iter()
+                .all(|cell| !matches!(cell, RepairedCell::Released(_)))
+        );
     }
 
     #[test]
@@ -1596,31 +1908,47 @@ mod physical_repair {
         use crate::hnn::tests::support::Draw;
         let mut receiver = section(1);
         receiver.ring = 2;
-        let field = Field::declare(FieldDeclaration {
-            rings: [2, 3, 5].into_iter().map(|period| ring(period, vec![0])).collect(),
-            contacts: vec![contact(0, 1, 2, 0), contact(1, 2, 3, 0)],
-            loops: Vec::new(),
-            sources: vec![2],
-            offsets: vec![1, 3],
-            alphabet: 5,
-            step: integer(1),
-            exponent_grain: 1,
-            receivers: vec![receiver],
-            crib: CribDeclaration { window: 16, offset: 1 },
-            population: 1 << 16,
-            lattice: Default::default(),
-        }.by_lattice_rule()).unwrap();
+        let field = Field::declare(
+            FieldDeclaration {
+                rings: [2, 3, 5]
+                    .into_iter()
+                    .map(|period| ring(period, vec![0]))
+                    .collect(),
+                contacts: vec![contact(0, 1, 2, 0), contact(1, 2, 3, 0)],
+                loops: Vec::new(),
+                sources: vec![2],
+                offsets: vec![1, 3],
+                alphabet: 5,
+                step: integer(1),
+                exponent_grain: 1,
+                receivers: vec![receiver],
+                crib: CribDeclaration {
+                    window: 16,
+                    offset: 1,
+                },
+                population: 1 << 16,
+                lattice: Default::default(),
+            }
+            .by_lattice_rule(),
+        )
+        .unwrap();
         let helix = CarryHelix::new(vec![2, 3, 5]).unwrap();
         let mut draw = Draw::new(2_026_100_995);
         let advances = (0..5).map(|_| 5 * (1 + draw.below(5)) as u64).collect();
         let mut left: Vec<usize> = (0..5).collect();
-        let labels = (0..5).map(|_| left.remove(draw.below(left.len()))).collect();
+        let labels = (0..5)
+            .map(|_| left.remove(draw.below(left.len())))
+            .collect();
         let terrain = SteppedTerrain::new(helix.clone(), advances, labels).unwrap();
-        let passages: Vec<_> = (0..helix.period()).map(|key| terrain.passage(key, 60)).collect();
+        let passages: Vec<_> = (0..helix.period())
+            .map(|key| terrain.passage(key, 60))
+            .collect();
         let location = TransportLocation::locate(helix, 5, &passages).unwrap();
         let chart = PassageChart::located(&location, &passages[..1]).unwrap();
         let encoding = Encoding::found(&chart).unwrap();
-        let encoded = Encoded::through(&encoding, &chart, &field, &passages[..1]).unwrap().remove(0);
+        let encoded = Encoded::through(&encoding, &chart, &field, &passages[..1])
+            .unwrap()
+            .remove(0);
         (field, encoded)
     }
 
@@ -1629,10 +1957,17 @@ mod physical_repair {
         let (field, located) = located_passage();
         let identity = crate::hnn::tests::support::encoded(&field, &[0, 1]);
         assert_eq!(identity.classes(), located.classes());
-        let refusal = DamagedSection::of_runs(8, &identity, vec![(0, identity.clone()), (3, located.part(0..2).unwrap())]);
-        assert!(matches!(refusal, Err(crate::hnn::HnnError::Unadmitted {
-            reason: "intact runs do not share the section's complete producing chart",
-        })));
+        let refusal = DamagedSection::of_runs(
+            8,
+            &identity,
+            vec![(0, identity.clone()), (3, located.part(0..2).unwrap())],
+        );
+        assert!(matches!(
+            refusal,
+            Err(crate::hnn::HnnError::Unadmitted {
+                reason: "intact runs do not share the section's complete producing chart",
+            })
+        ));
     }
 
     #[test]
@@ -1640,16 +1975,27 @@ mod physical_repair {
         let (field, located) = located_passage();
         let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
         let current = Current::at_rest(&field);
-        let phases = ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
+        let phases =
+            ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
         for erased in [vec![2, 5], (0..located.len()).collect()] {
             let damaged = DamagedSection::damage(&located, &erased).unwrap();
             assert!(damaged.chart().is_empty());
             assert_eq!(damaged.chart(), &located.part(0..0).unwrap());
             let before = theta.clone();
-            let refusal = repair_by_field(&field, &theta, &current, &damaged, &WordOpening::Rest, &phases);
-            assert!(matches!(refusal, Err(crate::hnn::HnnError::Unadmitted {
-                reason: "the located conduct has no certified sparse station-clock chart",
-            })));
+            let refusal = repair_by_field(
+                &field,
+                &theta,
+                &current,
+                &damaged,
+                &WordOpening::Rest,
+                &phases,
+            );
+            assert!(matches!(
+                refusal,
+                Err(crate::hnn::HnnError::Unadmitted {
+                    reason: "the located conduct has no certified sparse station-clock chart",
+                })
+            ));
             assert_eq!(theta, before);
         }
     }
@@ -1662,10 +2008,19 @@ mod physical_repair {
         let phases = ReceivingPhases::declare(&field, &theta, &current, &section(1)).unwrap();
         let encoded = crate::hnn::tests::support::encoded(&field, &[0, 1]);
         let damaged = DamagedSection::damage(&encoded, &[1]).unwrap();
-        assert!(matches!(repair_by_field(&field, &theta, &current, &damaged, &WordOpening::Rest, &phases),
+        assert!(matches!(
+            repair_by_field(
+                &field,
+                &theta,
+                &current,
+                &damaged,
+                &WordOpening::Rest,
+                &phases
+            ),
             Err(crate::hnn::HnnError::Unadmitted {
                 reason: "the identity conduct does not certify one source tick per declared station",
-            })));
+            })
+        ));
     }
 
     #[test]
@@ -1674,24 +2029,46 @@ mod physical_repair {
         let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
         let current = Current::at_rest(&field);
         let phases = ReceivingPhases::declare(&field, &theta, &current, &section(1)).unwrap();
-        let smaller = Encoded::identity(&KnownTruth::declared(3, vec![vec![0, 1]]), &field).unwrap().remove(0);
+        let smaller = Encoded::identity(&KnownTruth::declared(3, vec![vec![0, 1]]), &field)
+            .unwrap()
+            .remove(0);
         let damaged = DamagedSection::damage(&smaller, &[1]).unwrap();
-        assert!(matches!(repair_by_field(&field, &theta, &current, &damaged, &WordOpening::Rest, &phases),
+        assert!(matches!(
+            repair_by_field(
+                &field,
+                &theta,
+                &current,
+                &damaged,
+                &WordOpening::Rest,
+                &phases
+            ),
             Err(crate::hnn::HnnError::Unadmitted {
                 reason: "the physical source and receiver do not share the producing identity decoder's classes",
-            })));
+            })
+        ));
         let encoded = crate::hnn::tests::support::encoded(&field, &[0, 1]);
         let damaged = DamagedSection::damage(&encoded, &[1]).unwrap();
         let width = field.ring(0).width();
         for (source, receiving, reason) in [
-            (Some(ExactRatMatrix::zero(width, 3).unwrap()), None,
-                "the physical source map does not consume the producing chart's classes"),
-            (None, Some(ExactRatMatrix::zero(6, width).unwrap()),
-                "the physical receiving map does not return the producing chart's complex classes"),
+            (
+                Some(ExactRatMatrix::zero(width, 3).unwrap()),
+                None,
+                "the physical source map does not consume the producing chart's classes",
+            ),
+            (
+                None,
+                Some(ExactRatMatrix::zero(6, width).unwrap()),
+                "the physical receiving map does not return the producing chart's complex classes",
+            ),
         ] {
-            let incompatible = theta.clone().with_ports(0, None, source, receiving).unwrap();
-            assert!(matches!(repair_by_field(&field, &incompatible, &current, &damaged, &WordOpening::Rest, &phases),
-                Err(crate::hnn::HnnError::Unadmitted { reason: found }) if found == reason));
+            let incompatible = theta
+                .clone()
+                .with_ports(0, None, source, receiving)
+                .unwrap();
+            assert!(
+                matches!(repair_by_field(&field, &incompatible, &current, &damaged, &WordOpening::Rest, &phases),
+                Err(crate::hnn::HnnError::Unadmitted { reason: found }) if found == reason)
+            );
         }
     }
 
@@ -1704,9 +2081,22 @@ mod physical_repair {
         let truth = passages(&field, 2_026_100_972, 1).remove(0);
         let damaged = DamagedSection::damage(&truth, &[2, 5, 7]).unwrap();
         let first = repaired(&field, &learned, &damaged, &phases);
-        let continued = repair_by_field(&field, &learned, &current, &damaged,
-            &WordOpening::Received { carry: first.carry.clone(), absorption: Absorption::Nothing }, &phases).unwrap();
-        assert!(continued.opening.before > Rat::zero(), "the carried interior is physical motion");
+        let continued = repair_by_field(
+            &field,
+            &learned,
+            &current,
+            &damaged,
+            &WordOpening::Received {
+                carry: first.carry.clone(),
+                absorption: Absorption::Nothing,
+            },
+            &phases,
+        )
+        .unwrap();
+        assert!(
+            continued.opening.before > Rat::zero(),
+            "the carried interior is physical motion"
+        );
         assert!(continued.opening.closes());
         assert!(continued.balances.iter().all(|balance| balance.closes()));
         assert!(continued.word.closes());
@@ -1762,7 +2152,8 @@ mod physical_repair {
             carry: teaching.prediction.carry.clone(),
             absorption: Absorption::Nothing,
         };
-        let before = repair_by_field(&field, &learned, &current, &later, &opening, &phases).unwrap();
+        let before =
+            repair_by_field(&field, &learned, &current, &later, &opening, &phases).unwrap();
         let after = repair_by_field(
             &field,
             &teaching.constitution,
@@ -1783,8 +2174,14 @@ mod physical_repair {
                 .iter()
                 .any(|station| station.read.logits.iter().any(|x| !x.is_zero()))
         );
-        assert!(after.cells.iter().enumerate().filter(|(j, _)| [2, 5, 7].contains(j))
-            .all(|(_, cell)| matches!(cell, RepairedCell::Held { .. })));
+        assert!(
+            after
+                .cells
+                .iter()
+                .enumerate()
+                .filter(|(j, _)| [2, 5, 7].contains(j))
+                .all(|(_, cell)| matches!(cell, RepairedCell::Held { .. }))
+        );
         assert!(after.opening.closes() && after.word.closes());
         assert!(after.balances.iter().all(|balance| balance.closes()));
         // An exterior test perturbation changes one intact source, under the same learned R,
@@ -2254,15 +2651,26 @@ mod physical_repair {
             assert!(reading.balances.iter().all(|balance| balance.closes()));
             for &station in &erased {
                 let domain = reading.domains[station].as_ref().unwrap();
-                assert!(domain.logits.iter().zip(&reading.reads[station].read.logits)
-                    .all(|(interval, value)| &interval.lower <= value && value <= &interval.upper));
+                assert!(
+                    domain
+                        .logits
+                        .iter()
+                        .zip(&reading.reads[station].read.logits)
+                        .all(|(interval, value)| &interval.lower <= value
+                            && value <= &interval.upper)
+                );
                 match &reading.cells[station] {
-                    RepairedCell::Held { fibre, unresolved: Unresolved::PluralDomain } => {
+                    RepairedCell::Held {
+                        fibre,
+                        unresolved: Unresolved::PluralDomain,
+                    } => {
                         assert!(domain.classes.len() > 1);
                         assert_eq!(*fibre, domain.classes);
                     }
                     RepairedCell::Released(class) => assert_eq!(domain.classes, vec![*class]),
-                    other => panic!("a supported leaky completion family has no domain decision: {other:?}"),
+                    other => panic!(
+                        "a supported leaky completion family has no domain decision: {other:?}"
+                    ),
                 }
             }
         }
@@ -2408,7 +2816,13 @@ mod physical_repair {
         )
         .unwrap();
         assert!(sparse.domains.iter().all(Option::is_some));
-        assert!(sparse.domains.iter().flatten().all(|domain| domain.completion.is_none()));
+        assert!(
+            sparse
+                .domains
+                .iter()
+                .flatten()
+                .all(|domain| domain.completion.is_none())
+        );
         assert!(
             sparse
                 .domains
@@ -2469,32 +2883,60 @@ mod physical_repair {
         // fixed. The envelope must consume actual per-slot chart rounding and normalization.
         let source = crate::hnn::tests::support::encoded(&field, &[1, 0, 3, 2, 1, 3, 0, 2, 2]);
         let damaged = DamagedSection::damage(&source, &[0, 8]).unwrap();
-        let sparse = repair_by_field(&field, &theta, &current, &damaged, &opening, &phases).unwrap();
+        let sparse =
+            repair_by_field(&field, &theta, &current, &damaged, &opening, &phases).unwrap();
         assert!(sparse.domains.iter().all(Option::is_some));
         let empty = DamagedSection::damage(&source, &(0..9).collect::<Vec<_>>()).unwrap();
         let empty = repair_by_field(&field, &theta, &current, &empty, &opening, &phases).unwrap();
         assert!(empty.domains.iter().all(Option::is_some));
         let features = |cells: &[Option<usize>]| {
             let moment = crate::hnn::moment::SourceMoment::open_with(&field, &current, &theta)
-                .unwrap().continued(&field, &current, 0, cells).unwrap();
+                .unwrap()
+                .continued(&field, &current, 0, cells)
+                .unwrap();
             let mass = moment.transported_mass(0).unwrap().unwrap();
             assert!(mass > num_bigint::BigInt::zero());
             let features = (0..field.ring(0).placements().len())
-                .flat_map(|phase| moment.normalized_counts(&field, 0, phase, &theta.transport(0)).unwrap())
+                .flat_map(|phase| {
+                    moment
+                        .normalized_counts(&field, 0, phase, &theta.transport(0))
+                        .unwrap()
+                })
                 .collect::<Vec<_>>();
             (features, mass)
         };
-        let monochrome: Vec<_> = (0..field.alphabet()).map(|class|
-            features(&damaged.placed().iter().map(|cell| Some(cell.unwrap_or(class))).collect::<Vec<_>>())
-        ).collect();
+        let monochrome: Vec<_> = (0..field.alphabet())
+            .map(|class| {
+                features(
+                    &damaged
+                        .placed()
+                        .iter()
+                        .map(|cell| Some(cell.unwrap_or(class)))
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .collect();
         let common_mass = monochrome[0].1.clone();
         assert!(monochrome.iter().all(|(_, mass)| *mass == common_mass));
-        let monochrome: Vec<_> = monochrome.into_iter().map(|(features, _)| features).collect();
+        let monochrome: Vec<_> = monochrome
+            .into_iter()
+            .map(|(features, _)| features)
+            .collect();
         let extrema = |rows: &[Vec<Rat>]| {
-            (0..rows[0].len()).map(|coordinate| (
-                rows.iter().map(|row| row[coordinate].clone()).min().unwrap(),
-                rows.iter().map(|row| row[coordinate].clone()).max().unwrap(),
-            )).collect::<Vec<_>>()
+            (0..rows[0].len())
+                .map(|coordinate| {
+                    (
+                        rows.iter()
+                            .map(|row| row[coordinate].clone())
+                            .min()
+                            .unwrap(),
+                        rows.iter()
+                            .map(|row| row[coordinate].clone())
+                            .max()
+                            .unwrap(),
+                    )
+                })
+                .collect::<Vec<_>>()
         };
         let mut all_features = Vec::new();
         let mut distinct = None;
@@ -2504,22 +2946,36 @@ mod physical_repair {
         for first in 0..field.alphabet() {
             for last in 0..field.alphabet() {
                 let actual = crate::hnn::tests::support::encoded(
-                    &field, &[first, 0, 3, 2, 1, 3, 0, 2, last],
+                    &field,
+                    &[first, 0, 3, 2, 1, 3, 0, 2, last],
                 );
                 let complete = DamagedSection::damage(&actual, &[]).unwrap();
                 let (feature, mass) = features(&complete.placed());
-                assert_eq!(mass, common_mass, "mixed source classes changed their rounded denominator");
+                assert_eq!(
+                    mass, common_mass,
+                    "mixed source classes changed their rounded denominator"
+                );
                 all_features.push(feature);
-                let complete = repair_by_field(
-                    &field, &theta, &current, &complete, &opening, &phases,
-                ).unwrap();
+                let complete =
+                    repair_by_field(&field, &theta, &current, &complete, &opening, &phases)
+                        .unwrap();
                 for envelope in [&sparse, &empty] {
                     for (domain, read) in envelope.domains.iter().zip(&complete.reads) {
                         let domain = domain.as_ref().unwrap();
-                        assert!(domain.logits.iter().zip(&read.read.logits)
-                            .all(|(interval, value)| &interval.lower <= value && value <= &interval.upper),
-                            "native mixed completion ({first},{last}) escaped its actual leaky source tube");
-                        assert!(read.leaders().iter().all(|class| domain.classes.contains(class)));
+                        assert!(
+                            domain
+                                .logits
+                                .iter()
+                                .zip(&read.read.logits)
+                                .all(|(interval, value)| &interval.lower <= value
+                                    && value <= &interval.upper),
+                            "native mixed completion ({first},{last}) escaped its actual leaky source tube"
+                        );
+                        assert!(
+                            read.leaders()
+                                .iter()
+                                .all(|class| domain.classes.contains(class))
+                        );
                     }
                 }
                 if let Some(previous) = &distinct {
@@ -2529,20 +2985,41 @@ mod physical_repair {
                 }
                 assert!(complete.opening.closes() && complete.word.closes());
                 assert!(complete.balances.iter().all(|balance| balance.closes()));
-                println!("actual leaky completion ({first},{last}): leaders {:?}; actual complex logits {:?}",
-                    complete.reads.iter().map(|read| read.leaders()).collect::<Vec<_>>(),
-                    complete.reads.iter().map(|read| &read.read.logits).collect::<Vec<_>>());
+                println!(
+                    "actual leaky completion ({first},{last}): leaders {:?}; actual complex logits {:?}",
+                    complete
+                        .reads
+                        .iter()
+                        .map(|read| read.leaders())
+                        .collect::<Vec<_>>(),
+                    complete
+                        .reads
+                        .iter()
+                        .map(|read| &read.read.logits)
+                        .collect::<Vec<_>>()
+                );
             }
         }
-        assert_eq!(extrema(&monochrome), extrema(&all_features),
-            "the actual rounded normalized coordinate hull must equal the full two-hole hull");
-        assert!(changed, "the actual completion field must be source-sensitive");
+        assert_eq!(
+            extrema(&monochrome),
+            extrema(&all_features),
+            "the actual rounded normalized coordinate hull must equal the full two-hole hull"
+        );
+        assert!(
+            changed,
+            "the actual completion field must be source-sensitive"
+        );
         for receipt in [&sparse, &empty] {
             assert!(receipt.opening.closes() && receipt.word.closes());
             assert!(receipt.balances.iter().all(|balance| balance.closes()));
         }
-        println!("leaky source domain: rho {}; whole blind cells {:?}; actual complex bounds {:?}; total-erasure cells {:?}; no erased truth accuracy asserted",
-            theta.transport(0), sparse.cells, sparse.domains, empty.cells);
+        println!(
+            "leaky source domain: rho {}; whole blind cells {:?}; actual complex bounds {:?}; total-erasure cells {:?}; no erased truth accuracy asserted",
+            theta.transport(0),
+            sparse.cells,
+            sparse.domains,
+            empty.cells
+        );
     }
 
     #[test]
@@ -2688,9 +3165,19 @@ mod physical_repair {
         let supported =
             repair_by_field(&field, &leaky, &current, &later, &opening, &phases).unwrap();
         assert!(supported.domains.iter().all(Option::is_some));
-        assert!(supported.domains.iter().zip(&supported.reads).all(|(domain, read)|
-            domain.as_ref().unwrap().logits.iter().zip(&read.read.logits)
-                .all(|(interval, value)| &interval.lower <= value && value <= &interval.upper)));
+        assert!(
+            supported
+                .domains
+                .iter()
+                .zip(&supported.reads)
+                .all(|(domain, read)| domain
+                    .as_ref()
+                    .unwrap()
+                    .logits
+                    .iter()
+                    .zip(&read.read.logits)
+                    .all(|(interval, value)| &interval.lower <= value && value <= &interval.upper))
+        );
         assert!(supported.opening.closes() && supported.word.closes());
         assert!(supported.balances.iter().all(|balance| balance.closes()));
         assert!(after.opening.closes() && after.word.closes());
@@ -2710,7 +3197,9 @@ mod physical_repair {
         use crate::hnn::constitution::Locus;
         use crate::hnn::prediction::predict_by_field;
         let field = field();
-        let initial = quartic_material(&field).founded_transport(&field, 0).unwrap();
+        let initial = quartic_material(&field)
+            .founded_transport(&field, 0)
+            .unwrap();
         let mut current = Current::at_rest(&field);
         current.rekey(&field, 0, 3).unwrap();
         let mut theta = initial.clone();
@@ -2725,13 +3214,20 @@ mod physical_repair {
             let observed = crate::hnn::tests::support::encoded(&field, cells);
             let damaged = DamagedSection::damage(&observed, &[1]).unwrap();
             let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
-            let pending = predict_by_field(
-                &field, &theta, &current, &damaged, &opening, &phases,
-            ).unwrap();
+            let pending =
+                predict_by_field(&field, &theta, &current, &damaged, &opening, &phases).unwrap();
             let blind = pending.prediction().clone();
             closes(&blind);
-            println!("native comparison {comparison} blind whole cells {:?}; actual logits {:?}; entered word end tick {}",
-                blind.cells, blind.reads.iter().map(|read| &read.read.logits).collect::<Vec<_>>(), blind.carry.ticks);
+            println!(
+                "native comparison {comparison} blind whole cells {:?}; actual logits {:?}; entered word end tick {}",
+                blind.cells,
+                blind
+                    .reads
+                    .iter()
+                    .map(|read| &read.read.logits)
+                    .collect::<Vec<_>>(),
+                blind.carry.ticks
+            );
             // Only here does the teacher cross the declared station-1 comparison section.
             let taught = pending.observe(&theta, &observed, &[false, true]).unwrap();
             assert_eq!(taught.prediction, blind);
@@ -2739,22 +3235,44 @@ mod physical_repair {
             assert_eq!(theta.source_port(0), taught.constitution.source_port(0));
             assert_eq!(theta.transport(0), taught.constitution.transport(0));
             for ring in 0..field.rings().len() {
-                assert_eq!(theta.contrast_law(ring), taught.constitution.contrast_law(ring));
-                assert_eq!(theta.passive_factor(ring), taught.constitution.passive_factor(ring));
-                assert_eq!(theta.ring_resonator(ring), taught.constitution.ring_resonator(ring));
+                assert_eq!(
+                    theta.contrast_law(ring),
+                    taught.constitution.contrast_law(ring)
+                );
+                assert_eq!(
+                    theta.passive_factor(ring),
+                    taught.constitution.passive_factor(ring)
+                );
+                assert_eq!(
+                    theta.ring_resonator(ring),
+                    taught.constitution.ring_resonator(ring)
+                );
             }
-            println!("native comparison {comparison} observed receiving publication: commit {} -> {}; R clock {} -> {}; actual ratio {:?}; actual normal steps {:?}",
-                theta.commit(), taught.constitution.commit(),
-                theta.clock(Locus::ReceivingMap(0)), taught.constitution.clock(Locus::ReceivingMap(0)),
-                taught.ratio, taught.publication.steps);
+            println!(
+                "native comparison {comparison} observed receiving publication: commit {} -> {}; R clock {} -> {}; actual ratio {:?}; actual normal steps {:?}",
+                theta.commit(),
+                taught.constitution.commit(),
+                theta.clock(Locus::ReceivingMap(0)),
+                taught.constitution.clock(Locus::ReceivingMap(0)),
+                taught.ratio,
+                taught.publication.steps
+            );
             theta = taught.constitution;
-            opening = WordOpening::Received { carry: blind.carry, absorption: Absorption::Nothing };
+            opening = WordOpening::Received {
+                carry: blind.carry,
+                absorption: Absorption::Nothing,
+            };
         }
         let map = theta.receiving_map(0).unwrap();
-        println!("retained receiving material: full actual R {:?}; equal real rows 0/1 {}; 0/3 {}; 1/3 {}; full source E unchanged {}; transport {}",
-            map, map.row(0).unwrap() == map.row(2).unwrap(),
-            map.row(0).unwrap() == map.row(6).unwrap(), map.row(2).unwrap() == map.row(6).unwrap(),
-            theta.source_port(0) == initial.source_port(0), theta.transport(0));
+        println!(
+            "retained receiving material: full actual R {:?}; equal real rows 0/1 {}; 0/3 {}; 1/3 {}; full source E unchanged {}; transport {}",
+            map,
+            map.row(0).unwrap() == map.row(2).unwrap(),
+            map.row(0).unwrap() == map.row(6).unwrap(),
+            map.row(2).unwrap() == map.row(6).unwrap(),
+            theta.source_port(0) == initial.source_port(0),
+            theta.transport(0)
+        );
         let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
         for cue in [0, 1, 3] {
             // A different four-station passage. No value for its omitted station is ever made;
@@ -2764,18 +3282,44 @@ mod physical_repair {
             let right = crate::hnn::tests::support::encoded(&field, &[3, 0]);
             let probe = DamagedSection::of_runs(4, &chart, vec![(0, left), (2, right)]).unwrap();
             assert_eq!(probe.placed(), vec![Some(cue), None, Some(3), Some(0)]);
-            let before = repair_by_field(&field, &initial, &current, &probe, &opening, &phases).unwrap();
-            let after = repair_by_field(&field, &theta, &current, &probe, &opening, &phases).unwrap();
+            let before =
+                repair_by_field(&field, &initial, &current, &probe, &opening, &phases).unwrap();
+            let after =
+                repair_by_field(&field, &theta, &current, &probe, &opening, &phases).unwrap();
             closes(&before);
             closes(&after);
-            assert_eq!(before.carry, after.carry, "R-only teaching must leave matched native motion fixed");
-            println!("target-free native probe: actual intact source {:?}; initial-R whole output {:?}; learned-R whole output {:?}; initial-R leaders {:?}; learned-R leaders {:?}; initial-R complex logits {:?}; learned-R complex logits {:?}; learned domain {:?}; returned tick {}",
-                probe.placed(), before.cells, after.cells,
-                before.reads.iter().map(|read| read.leaders()).collect::<Vec<_>>(),
-                after.reads.iter().map(|read| read.leaders()).collect::<Vec<_>>(),
-                before.reads.iter().map(|read| &read.read.logits).collect::<Vec<_>>(),
-                after.reads.iter().map(|read| &read.read.logits).collect::<Vec<_>>(),
-                after.domains, after.carry.ticks);
+            assert_eq!(
+                before.carry, after.carry,
+                "R-only teaching must leave matched native motion fixed"
+            );
+            println!(
+                "target-free native probe: actual intact source {:?}; initial-R whole output {:?}; learned-R whole output {:?}; initial-R leaders {:?}; learned-R leaders {:?}; initial-R complex logits {:?}; learned-R complex logits {:?}; learned domain {:?}; returned tick {}",
+                probe.placed(),
+                before.cells,
+                after.cells,
+                before
+                    .reads
+                    .iter()
+                    .map(|read| read.leaders())
+                    .collect::<Vec<_>>(),
+                after
+                    .reads
+                    .iter()
+                    .map(|read| read.leaders())
+                    .collect::<Vec<_>>(),
+                before
+                    .reads
+                    .iter()
+                    .map(|read| &read.read.logits)
+                    .collect::<Vec<_>>(),
+                after
+                    .reads
+                    .iter()
+                    .map(|read| &read.read.logits)
+                    .collect::<Vec<_>>(),
+                after.domains,
+                after.carry.ticks
+            );
         }
         // No output class, singleton, rank increase, fidelity or description-length decrease
         // is an acceptance requirement. The whole actual behavior is the diagnostic result.
@@ -2791,7 +3335,7 @@ mod physical_repair {
         let a = field.alphabet();
         let n = field.ring(0).width();
         let rank = theta.pair_port(0, 1).unwrap().rank();
-        assert_eq!(rank, a*a);
+        assert_eq!(rank, a * a);
         assert_eq!(n, rank);
         let basis = |length: usize, coordinate: usize| {
             let mut row = vec![Rat::zero(); length];
@@ -2800,13 +3344,21 @@ mod physical_repair {
         };
         let pair = PairPort::new(
             (0..rank).map(|rho| basis(n, rho)).collect(),
-            (0..rank).map(|rho| basis(a, rho/a)).collect(),
-            (0..rank).map(|rho| basis(a, rho%a)).collect(),
-        ).unwrap();
-        let receiving = ExactRatMatrix::shaped(2*a, n,
-            (0..2*a).map(|coordinate| basis(n, coordinate)).collect()).unwrap();
-        theta.with_pair(0, 1, pair).unwrap()
-            .with_ports(0, None, None, Some(receiving)).unwrap()
+            (0..rank).map(|rho| basis(a, rho / a)).collect(),
+            (0..rank).map(|rho| basis(a, rho % a)).collect(),
+        )
+        .unwrap();
+        let receiving = ExactRatMatrix::shaped(
+            2 * a,
+            n,
+            (0..2 * a).map(|coordinate| basis(n, coordinate)).collect(),
+        )
+        .unwrap();
+        theta
+            .with_pair(0, 1, pair)
+            .unwrap()
+            .with_ports(0, None, None, Some(receiving))
+            .unwrap()
     }
 
     /// Two bounded actual receiving comparisons break R's initial zero symmetry. Pair outputs
@@ -2820,15 +3372,38 @@ mod physical_repair {
             let observed = crate::hnn::tests::support::encoded(field, &observed);
             let damaged = DamagedSection::damage(&observed, &[1]).unwrap();
             let phases = ReceivingPhases::declare(field, &material, &current, &section(2)).unwrap();
-            let pending = crate::hnn::prediction::predict_by_field(field, &material, &current,
-                &damaged, &opening, &phases).unwrap();
-            println!("pair consumer R opening: blind whole cells {:?}; actual logits {:?}",
+            let pending = crate::hnn::prediction::predict_by_field(
+                field, &material, &current, &damaged, &opening, &phases,
+            )
+            .unwrap();
+            println!(
+                "pair consumer R opening: blind whole cells {:?}; actual logits {:?}",
                 pending.prediction().cells,
-                pending.prediction().reads.iter().map(|r| &r.read.logits).collect::<Vec<_>>());
-            let taught = pending.observe(&material, &observed, &[false, true]).unwrap();
-            assert!(taught.constitution.pair_port(0, 1).unwrap().outputs().iter().flatten().all(Zero::is_zero));
+                pending
+                    .prediction()
+                    .reads
+                    .iter()
+                    .map(|r| &r.read.logits)
+                    .collect::<Vec<_>>()
+            );
+            let taught = pending
+                .observe(&material, &observed, &[false, true])
+                .unwrap();
+            assert!(
+                taught
+                    .constitution
+                    .pair_port(0, 1)
+                    .unwrap()
+                    .outputs()
+                    .iter()
+                    .flatten()
+                    .all(Zero::is_zero)
+            );
             let reached = taught.prediction.carry;
-            opening = WordOpening::Received { carry: reached.clone(), absorption: Absorption::Nothing };
+            opening = WordOpening::Received {
+                carry: reached.clone(),
+                absorption: Absorption::Nothing,
+            };
             carry = Some(reached);
             material = taught.constitution;
         }
@@ -2848,38 +3423,67 @@ mod physical_repair {
         let observed = crate::hnn::tests::support::encoded(&field, &[0, 1, 2]);
         let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
         let phases = ReceivingPhases::declare(&field, &before, &current, &section(3)).unwrap();
-        let opening = WordOpening::Received { carry: entering, absorption: Absorption::Nothing };
+        let opening = WordOpening::Received {
+            carry: entering,
+            absorption: Absorption::Nothing,
+        };
         let compared = [false, false, true];
         let taught = predict_by_field(&field, &before, &current, &damaged, &opening, &phases)
-            .unwrap().observe_pair_outputs(&before, &observed, &compared).unwrap();
-        let source = SourceMoment::open_with(&field, &current, &before).unwrap()
-            .station_section(&field, &current, 0, &damaged.placed()).unwrap();
+            .unwrap()
+            .observe_pair_outputs(&before, &observed, &compared)
+            .unwrap();
+        let source = SourceMoment::open_with(&field, &current, &before)
+            .unwrap()
+            .station_section(&field, &current, 0, &damaged.placed())
+            .unwrap();
         let (mut word, receipt) = crate::hnn::word::Word::open_exact_received(
             &field, &before, &current, &source, &opening,
-        ).unwrap();
+        )
+        .unwrap();
         assert!(receipt.closes());
         let anchors = word.forward(&phases).unwrap();
         for (anchor, actual) in anchors.iter().zip(&taught.prediction.reads) {
-            assert_eq!(phases.read(&field, &before, &current, anchor).unwrap(), actual.read);
+            assert_eq!(phases.read(&field, &before, anchor).unwrap(), actual.read);
         }
         let operands = word.operands().clone();
         let opened_at = word.opened_at();
         let covector = taught.ratio.covector().unwrap();
-        let back = word.pull_back(&covector, before.receiving_map(0).unwrap(),
-            &current.lift()[0], &phases).unwrap();
+        let back = word
+            .pull_back(&covector, before.receiving_map(0).unwrap(), &phases)
+            .unwrap();
         let applied = taught.source_certificate.as_ref().unwrap();
-        let check = |material: &Constitution, frame: &Current, at: usize,
+        let check = |material: &Constitution,
+                     frame: &Current,
+                     at: usize,
                      returned: &crate::hnn::port::WordReturn| {
-            physical_source_pairing(&field, material, &taught.constitution, frame, &phases,
-                &source, &operands, at, &taught.prediction, &covector, returned, &compared, applied)
+            physical_source_pairing(
+                &field,
+                material,
+                &taught.constitution,
+                frame,
+                &phases,
+                &source,
+                &operands,
+                at,
+                &taught.prediction,
+                &covector,
+                returned,
+                &compared,
+                applied,
+            )
         };
         let certified = check(&before, &current, opened_at, &back).unwrap();
         assert_eq!(&certified, taught.source_pairing.as_ref().unwrap());
         assert!(!certified.receiving.is_zero());
         let old_open = source.open_storage(&field, &before, &current).unwrap();
-        let new_open = source.open_storage(&field, &taught.constitution, &current).unwrap();
-        let coordinate = old_open[0].iter().zip(&new_open[0])
-            .position(|(old, new)| old != new).expect("actual nonzero source perturbation");
+        let new_open = source
+            .open_storage(&field, &taught.constitution, &current)
+            .unwrap();
+        let coordinate = old_open[0]
+            .iter()
+            .zip(&new_open[0])
+            .position(|(old, new)| old != new)
+            .expect("actual nonzero source perturbation");
         let mut corrupt = back.clone();
         corrupt.opening[0][coordinate] += integer(1);
         assert!(matches!(check(&before, &current, opened_at, &corrupt),
@@ -2890,8 +3494,15 @@ mod physical_repair {
         foreign_phase.rekey(&field, 0, 4).unwrap();
         assert!(matches!(check(&before, &foreign_phase, opened_at, &back),
             Err(crate::hnn::HnnError::Unadmitted { reason }) if reason.contains("source opening frame")));
-        let wrong_map = before.clone().with_ports(0, None, None,
-            Some(before.receiving_map(0).unwrap().scaled(&integer(-1)))).unwrap();
+        let wrong_map = before
+            .clone()
+            .with_ports(
+                0,
+                None,
+                None,
+                Some(before.receiving_map(0).unwrap().scaled(&integer(-1))),
+            )
+            .unwrap();
         assert!(matches!(check(&wrong_map, &current, opened_at, &back),
             Err(crate::hnn::HnnError::Unadmitted { reason }) if reason.contains("same-Word")));
         corrupt = back.clone();
@@ -2913,39 +3524,79 @@ mod physical_repair {
         let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
         assert_eq!(damaged, DamagedSection::damage(&opposite, &[2]).unwrap());
         let phases = ReceivingPhases::declare(&field, &before, &current, &section(3)).unwrap();
-        let opening = WordOpening::Received { carry: entering, absorption: Absorption::Nothing };
-        let no_deposit = predict_by_field(&field, &before, &current, &damaged, &opening, &phases).unwrap().finish();
-        let plus = predict_by_field(&field, &before, &current, &damaged, &opening, &phases).unwrap()
-            .observe_pair_outputs(&before, &observed, &[false, false, true]).unwrap();
-        let minus = predict_by_field(&field, &before, &current, &damaged, &opening, &phases).unwrap()
-            .observe_pair_outputs(&before, &opposite, &[false, false, true]).unwrap();
+        let opening = WordOpening::Received {
+            carry: entering,
+            absorption: Absorption::Nothing,
+        };
+        let no_deposit = predict_by_field(&field, &before, &current, &damaged, &opening, &phases)
+            .unwrap()
+            .finish();
+        let plus = predict_by_field(&field, &before, &current, &damaged, &opening, &phases)
+            .unwrap()
+            .observe_pair_outputs(&before, &observed, &[false, false, true])
+            .unwrap();
+        let minus = predict_by_field(&field, &before, &current, &damaged, &opening, &phases)
+            .unwrap()
+            .observe_pair_outputs(&before, &opposite, &[false, false, true])
+            .unwrap();
         let ignored = crate::hnn::tests::support::encoded(&field, &[3, 3, 2]);
-        let equivalent = predict_by_field(&field, &before, &current, &damaged, &opening, &phases).unwrap()
-            .observe_pair_outputs(&before, &ignored, &[false, false, true]).unwrap();
-        assert_eq!(equivalent.constitution, plus.constitution, "uncompared teacher cells supply no pair statistic");
+        let equivalent = predict_by_field(&field, &before, &current, &damaged, &opening, &phases)
+            .unwrap()
+            .observe_pair_outputs(&before, &ignored, &[false, false, true])
+            .unwrap();
+        assert_eq!(
+            equivalent.constitution, plus.constitution,
+            "uncompared teacher cells supply no pair statistic"
+        );
         assert_eq!(plus.prediction, no_deposit);
         assert_eq!(minus.prediction, no_deposit);
         let old = before.pair_port(0, 1).unwrap();
         let learned = plus.constitution.pair_port(0, 1).unwrap();
         assert_ne!(learned.outputs(), old.outputs());
-        assert_ne!(learned.outputs(), minus.constitution.pair_port(0, 1).unwrap().outputs());
+        assert_ne!(
+            learned.outputs(),
+            minus.constitution.pair_port(0, 1).unwrap().outputs()
+        );
         assert_eq!(learned.current_reads(), old.current_reads());
         assert_eq!(learned.earlier_reads(), old.earlier_reads());
         assert_eq!(plus.constitution.source_port(0), before.source_port(0));
         assert_eq!(plus.constitution.receiving_map(0), before.receiving_map(0));
-        assert_eq!(plus.constitution.commit(), before.commit()+1);
+        assert_eq!(plus.constitution.commit(), before.commit() + 1);
         let applied = plus.source_certificate.as_ref().unwrap();
         assert_eq!(applied.sources.len(), 1);
         assert!(applied.sources[0].moves > Rat::zero() && applied.joint.holds());
         // A matched forward checks the applied source gain and adjoint against actual logit moves.
-        let matched = repair_by_field(&field, &plus.constitution, &current, &damaged, &opening, &phases).unwrap();
+        let matched = repair_by_field(
+            &field,
+            &plus.constitution,
+            &current,
+            &damaged,
+            &opening,
+            &phases,
+        )
+        .unwrap();
         let gradient = plus.ratio.covector().unwrap();
-        let deltas: Vec<Vec<Rat>> = matched.reads.iter().zip(&no_deposit.reads)
-            .map(|(new, old)| new.read.logits.iter().zip(&old.read.logits).map(|(n,o)| n-o).collect()).collect();
-        let paired: Rat = gradient.logits().iter().zip(&deltas)
-            .map(|(g,d)| g.iter().zip(d).map(|(g,d)| g*d).sum::<Rat>()).sum();
+        let deltas: Vec<Vec<Rat>> = matched
+            .reads
+            .iter()
+            .zip(&no_deposit.reads)
+            .map(|(new, old)| {
+                new.read
+                    .logits
+                    .iter()
+                    .zip(&old.read.logits)
+                    .map(|(n, o)| n - o)
+                    .collect()
+            })
+            .collect();
+        let paired: Rat = gradient
+            .logits()
+            .iter()
+            .zip(&deltas)
+            .map(|(g, d)| g.iter().zip(d).map(|(g, d)| g * d).sum::<Rat>())
+            .sum();
         assert_eq!(-&paired, applied.sources[0].alignment);
-        let logit_move: Rat = deltas[2].iter().map(|v| v*v).sum();
+        let logit_move: Rat = deltas[2].iter().map(|v| v * v).sum();
         let returned = plus.source_pairing.as_ref().unwrap();
         assert_eq!(returned.receiving, paired);
         assert_eq!(returned.opening, paired);
@@ -2954,37 +3605,85 @@ mod physical_repair {
         assert_eq!(returned.crossings[0].logit_move_squared, logit_move);
         assert!(returned.defect.is_zero() && returned.composition_defect.is_zero());
         assert!(logit_move <= &applied.sources[0].gain * &applied.sources[0].moves);
-        println!("actual learned pair outputs: before {:?}; after {:?}; opposite {:?}; applied joint {:?}; matched logit moves {}",
-            old.outputs(), learned.outputs(), minus.constitution.pair_port(0,1).unwrap().outputs(), applied.joint, logit_move);
+        println!(
+            "actual learned pair outputs: before {:?}; after {:?}; opposite {:?}; applied joint {:?}; matched logit moves {}",
+            old.outputs(),
+            learned.outputs(),
+            minus.constitution.pair_port(0, 1).unwrap().outputs(),
+            applied.joint,
+            logit_move
+        );
         // Independent target-free probes: same-phase intact swaps have equal first-only moments.
         // They ask no expected class. All material stages use the identical reached blind carry.
-        let mut left = vec![2; 9]; left[0]=0; left[8]=1;
-        let mut right=left.clone(); right.swap(0,8);
-        let left = DamagedSection::damage(&crate::hnn::tests::support::encoded(&field,&left), &[1]).unwrap();
-        let right = DamagedSection::damage(&crate::hnn::tests::support::encoded(&field,&right), &[1]).unwrap();
+        let mut left = vec![2; 9];
+        left[0] = 0;
+        left[8] = 1;
+        let mut right = left.clone();
+        right.swap(0, 8);
+        let left =
+            DamagedSection::damage(&crate::hnn::tests::support::encoded(&field, &left), &[1])
+                .unwrap();
+        let right =
+            DamagedSection::damage(&crate::hnn::tests::support::encoded(&field, &right), &[1])
+                .unwrap();
         let source = SourceMoment::open_with(&field, &current, &before).unwrap();
-        assert_eq!(source.continued(&field,&current,0,&left.placed()).unwrap(),
-            source.continued(&field,&current,0,&right.placed()).unwrap());
-        let probe_phases = ReceivingPhases::declare(&field,&before,&current,&section(2)).unwrap();
-        let carried = WordOpening::Received { carry: no_deposit.carry.clone(), absorption: Absorption::Nothing };
-        let mut images=Vec::new();
-        for (label, material) in [("no-deposit",&before),("observed",&plus.constitution),("opposite-observation",&minus.constitution)] {
-            let mut reads=Vec::new();
-            for (source_label, source) in [("left",&left),("right",&right)] {
-                let repair = repair_by_field(&field,material,&current,source,&carried,&probe_phases).unwrap();
+        assert_eq!(
+            source
+                .continued(&field, &current, 0, &left.placed())
+                .unwrap(),
+            source
+                .continued(&field, &current, 0, &right.placed())
+                .unwrap()
+        );
+        let probe_phases =
+            ReceivingPhases::declare(&field, &before, &current, &section(2)).unwrap();
+        let carried = WordOpening::Received {
+            carry: no_deposit.carry.clone(),
+            absorption: Absorption::Nothing,
+        };
+        let mut images = Vec::new();
+        for (label, material) in [
+            ("no-deposit", &before),
+            ("observed", &plus.constitution),
+            ("opposite-observation", &minus.constitution),
+        ] {
+            let mut reads = Vec::new();
+            for (source_label, source) in [("left", &left), ("right", &right)] {
+                let repair =
+                    repair_by_field(&field, material, &current, source, &carried, &probe_phases)
+                        .unwrap();
                 assert!(repair.opening.closes() && repair.word.closes());
                 assert!(repair.balances.iter().all(|b| b.closes()));
-                println!("learned-pair target-free {label}/{source_label}: actual intact source {:?}; whole cells {:?}; leaders {:?}; complex logits {:?}; carry tick {}",
-                    source.placed(), repair.cells, repair.reads.iter().map(|read| read.leaders()).collect::<Vec<_>>(),
-                    repair.reads.iter().map(|r| &r.read.logits).collect::<Vec<_>>(), repair.carry.ticks);
+                println!(
+                    "learned-pair target-free {label}/{source_label}: actual intact source {:?}; whole cells {:?}; leaders {:?}; complex logits {:?}; carry tick {}",
+                    source.placed(),
+                    repair.cells,
+                    repair
+                        .reads
+                        .iter()
+                        .map(|read| read.leaders())
+                        .collect::<Vec<_>>(),
+                    repair
+                        .reads
+                        .iter()
+                        .map(|r| &r.read.logits)
+                        .collect::<Vec<_>>(),
+                    repair.carry.ticks
+                );
                 reads.push(repair.reads);
             }
             images.push(reads);
         }
-        assert_eq!(images[0][0],images[0][1], "default zero pair outputs preserve the first-marginal alias");
-        assert_ne!(images[1][0],images[1][1], "the learned pair outputs distinguish actual source arrangements");
-        assert_ne!(images[1],images[0]);
-        assert_ne!(images[1],images[2]);
+        assert_eq!(
+            images[0][0], images[0][1],
+            "default zero pair outputs preserve the first-marginal alias"
+        );
+        assert_ne!(
+            images[1][0], images[1][1],
+            "the learned pair outputs distinguish actual source arrangements"
+        );
+        assert_ne!(images[1], images[0]);
+        assert_ne!(images[1], images[2]);
     }
 
     /// The four complete sources are exterior witnesses for the already fixed one-hole family.
@@ -2997,75 +3696,137 @@ mod physical_repair {
         let observed = crate::hnn::tests::support::encoded(&field, &[0, 1, 2]);
         let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
         let phases = ReceivingPhases::declare(&field, &before, &current, &section(3)).unwrap();
-        let opening = WordOpening::Received { carry: entering, absorption: Absorption::Nothing };
+        let opening = WordOpening::Received {
+            carry: entering,
+            absorption: Absorption::Nothing,
+        };
         let taught = crate::hnn::prediction::predict_by_field(
             &field, &before, &current, &damaged, &opening, &phases,
-        ).unwrap().observe_pair_outputs(&before, &observed, &[false, false, true]).unwrap();
+        )
+        .unwrap()
+        .observe_pair_outputs(&before, &observed, &[false, false, true])
+        .unwrap();
         let material = taught.constitution;
         let carried = WordOpening::Received {
-            carry: taught.prediction.carry, absorption: Absorption::Nothing,
+            carry: taught.prediction.carry,
+            absorption: Absorption::Nothing,
         };
         let map = material.receiving_map(0).unwrap();
         // Neither receiving comparison targeted 0 or 3. Their equal initial rows received
         // equal covectors and the same normal operator; pair-only deposition leaves R fixed.
         assert_eq!(map.row(0).unwrap(), map.row(6).unwrap());
         assert_eq!(map.row(1).unwrap(), map.row(7).unwrap());
-        println!("pair completion witness actual receiving R {:?}; equal complex class rows 0/3", map);
+        println!(
+            "pair completion witness actual receiving R {:?}; equal complex class rows 0/3",
+            map
+        );
         let phases = ReceivingPhases::declare(&field, &material, &current, &section(2)).unwrap();
-        let mut left = vec![2; 9]; left[0] = 0; left[8] = 1;
-        let mut right = left.clone(); right.swap(0, 8);
+        let mut left = vec![2; 9];
+        left[0] = 0;
+        left[8] = 1;
+        let mut right = left.clone();
+        right.swap(0, 8);
         for (label, cells) in [("left", left), ("right", right)] {
             let chart = crate::hnn::tests::support::encoded(&field, &[]);
             let head = crate::hnn::tests::support::encoded(&field, &cells[..1]);
             let tail = crate::hnn::tests::support::encoded(&field, &cells[2..]);
             let sparse = DamagedSection::of_runs(9, &chart, vec![(0, head), (2, tail)]).unwrap();
-            let blind = repair_by_field(&field, &material, &current, &sparse, &carried, &phases).unwrap();
+            let blind =
+                repair_by_field(&field, &material, &current, &sparse, &carried, &phases).unwrap();
             let domain = blind.domains[1].as_ref().unwrap();
             let response = domain.completion.as_ref().unwrap();
             assert_eq!(response.station, 1);
             assert_eq!(response.label_logits.len(), field.alphabet());
-            println!("pair completion witness {label} blind: actual intact source {:?}; whole cells {:?}; point leaders {:?}; actual gap logits {:?}; enclosing domain {:?}; carry tick {}",
-                sparse.placed(), blind.cells, blind.reads[1].leaders(), blind.reads[1].read.logits,
-                domain, blind.carry.ticks);
+            println!(
+                "pair completion witness {label} blind: actual intact source {:?}; whole cells {:?}; point leaders {:?}; actual gap logits {:?}; enclosing domain {:?}; carry tick {}",
+                sparse.placed(),
+                blind.cells,
+                blind.reads[1].leaders(),
+                blind.reads[1].read.logits,
+                domain,
+                blind.carry.ticks
+            );
             let mut leader_union = std::collections::BTreeSet::new();
             let mut exact_sources = Vec::new();
             let mut exact_reads = Vec::new();
             for missing in 0..field.alphabet() {
-                let mut completed = cells.clone(); completed[1] = missing;
+                let mut completed = cells.clone();
+                completed[1] = missing;
                 let encoded = crate::hnn::tests::support::encoded(&field, &completed);
                 let complete = DamagedSection::damage(&encoded, &[]).unwrap();
-                let source = SourceMoment::open_with(&field, &current, &material).unwrap()
-                    .station_section(&field, &current, 0, &complete.placed()).unwrap();
+                let source = SourceMoment::open_with(&field, &current, &material)
+                    .unwrap()
+                    .station_section(&field, &current, 0, &complete.placed())
+                    .unwrap();
                 let actual_source = source.encode(&field, &material, 0).unwrap();
-                let reached = repair_by_field(&field, &material, &current, &complete, &carried, &phases).unwrap();
+                let reached =
+                    repair_by_field(&field, &material, &current, &complete, &carried, &phases)
+                        .unwrap();
                 assert!(reached.opening.closes() && reached.word.closes());
                 assert!(reached.balances.iter().all(|b| b.closes()));
                 let read = &reached.reads[1];
                 for (crossing, read) in reached.reads.iter().enumerate() {
-                    let response = blind.domains[crossing].as_ref().unwrap().completion.as_ref().unwrap();
-                    assert_eq!(crate::ratio::linear::vector::add(&response.fixed_logits,
-                        &response.label_logits[missing]), read.read.logits,
-                        "the shared-label response must equal the actual completed Word at every crossing");
+                    let response = blind.domains[crossing]
+                        .as_ref()
+                        .unwrap()
+                        .completion
+                        .as_ref()
+                        .unwrap();
+                    assert_eq!(
+                        crate::ratio::linear::vector::add(
+                            &response.fixed_logits,
+                            &response.label_logits[missing]
+                        ),
+                        read.read.logits,
+                        "the shared-label response must equal the actual completed Word at every crossing"
+                    );
                 }
-                assert!(domain.logits.iter().zip(&read.read.logits)
-                    .all(|(interval, value)| &interval.lower <= value && value <= &interval.upper));
+                assert!(
+                    domain
+                        .logits
+                        .iter()
+                        .zip(&read.read.logits)
+                        .all(|(interval, value)| &interval.lower <= value
+                            && value <= &interval.upper)
+                );
                 let leaders = read.leaders();
                 assert!(leaders.iter().all(|class| domain.classes.contains(class)));
                 assert_eq!(read.read.logits[0], read.read.logits[6]);
                 assert_eq!(read.read.logits[1], read.read.logits[7]);
                 leader_union.extend(leaders.iter().copied());
-                println!("pair completion witness {label}/{missing}: actual complete source {:?}; exact source moment {:?}; whole cells {:?}; gap leaders {:?}; actual gap complex logits {:?}; carry tick {}",
-                    completed, actual_source, reached.cells, leaders, read.read.logits, reached.carry.ticks);
+                println!(
+                    "pair completion witness {label}/{missing}: actual complete source {:?}; exact source moment {:?}; whole cells {:?}; gap leaders {:?}; actual gap complex logits {:?}; carry tick {}",
+                    completed,
+                    actual_source,
+                    reached.cells,
+                    leaders,
+                    read.read.logits,
+                    reached.carry.ticks
+                );
                 exact_sources.push(actual_source);
                 exact_reads.push(read.read.logits.clone());
             }
-            let aliases = (0..field.alphabet()).flat_map(|a| ((a+1)..field.alphabet()).map(move |b| (a,b)))
-                .map(|(a,b)| (a,b,exact_sources[a] == exact_sources[b],exact_reads[a] == exact_reads[b]))
+            let aliases = (0..field.alphabet())
+                .flat_map(|a| ((a + 1)..field.alphabet()).map(move |b| (a, b)))
+                .map(|(a, b)| {
+                    (
+                        a,
+                        b,
+                        exact_sources[a] == exact_sources[b],
+                        exact_reads[a] == exact_reads[b],
+                    )
+                })
                 .collect::<Vec<_>>();
-            println!("pair completion witness {label} exact family: actual complete leader union {:?}; enclosing fibre {:?}; source/read equality witnesses {:?}",
-                leader_union, domain.classes, aliases);
+            println!(
+                "pair completion witness {label} exact family: actual complete leader union {:?}; enclosing fibre {:?}; source/read equality witnesses {:?}",
+                leader_union, domain.classes, aliases
+            );
             assert_eq!(domain.classes, leader_union.into_iter().collect::<Vec<_>>());
-            assert_eq!(domain.classes, vec![2], "the fixed accepted model-completion family leads with 2");
+            assert_eq!(
+                domain.classes,
+                vec![2],
+                "the fixed accepted model-completion family leads with 2"
+            );
             assert_eq!(blind.cells[1], RepairedCell::Released(2));
             assert!(blind.opening.closes() && blind.word.closes());
             assert!(blind.balances.iter().all(|b| b.closes()));
@@ -3083,13 +3844,22 @@ mod physical_repair {
         let observed = crate::hnn::tests::support::encoded(&field, &[0, 1, 2]);
         let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
         let phases = ReceivingPhases::declare(&field, &before, &rest, &section(3)).unwrap();
-        let opening = WordOpening::Received { carry: entering, absorption: Absorption::Nothing };
-        let taught = crate::hnn::prediction::predict_by_field(&field, &before, &rest,
-            &damaged, &opening, &phases).unwrap()
-            .observe_pair_outputs(&before, &observed, &[false, false, true]).unwrap();
+        let opening = WordOpening::Received {
+            carry: entering,
+            absorption: Absorption::Nothing,
+        };
+        let taught = crate::hnn::prediction::predict_by_field(
+            &field, &before, &rest, &damaged, &opening, &phases,
+        )
+        .unwrap()
+        .observe_pair_outputs(&before, &observed, &[false, false, true])
+        .unwrap();
         let material = taught.constitution;
         let entering_tick = taught.prediction.carry.ticks;
-        let carried = WordOpening::Received { carry: taught.prediction.carry, absorption: Absorption::Nothing };
+        let carried = WordOpening::Received {
+            carry: taught.prediction.carry,
+            absorption: Absorption::Nothing,
+        };
         let mut current = rest.clone();
         current.rekey(&field, 0, 3).unwrap();
         let phases = ReceivingPhases::declare(&field, &material, &current, &section(3)).unwrap();
@@ -3097,19 +3867,28 @@ mod physical_repair {
         for hole in [0, 2, 4] {
             let source = crate::hnn::tests::support::encoded(&field, &original);
             let damaged = DamagedSection::damage(&source, &[hole]).unwrap();
-            let blind = repair_by_field(&field, &material, &current, &damaged, &carried, &phases).unwrap();
+            let blind =
+                repair_by_field(&field, &material, &current, &damaged, &carried, &phases).unwrap();
             let mut union = vec![std::collections::BTreeSet::new(); phases.aperture()];
             for missing in 0..field.alphabet() {
-                let mut completed = original; completed[hole] = missing;
+                let mut completed = original;
+                completed[hole] = missing;
                 let source = crate::hnn::tests::support::encoded(&field, &completed);
                 let complete = DamagedSection::damage(&source, &[]).unwrap();
-                let actual = repair_by_field(&field, &material, &current, &complete, &carried, &phases).unwrap();
+                let actual =
+                    repair_by_field(&field, &material, &current, &complete, &carried, &phases)
+                        .unwrap();
                 for (crossing, read) in actual.reads.iter().enumerate() {
                     let domain = blind.domains[crossing].as_ref().unwrap();
                     let response = domain.completion.as_ref().unwrap();
                     assert_eq!(response.station, hole);
-                    assert_eq!(crate::ratio::linear::vector::add(&response.fixed_logits,
-                        &response.label_logits[missing]), read.read.logits);
+                    assert_eq!(
+                        crate::ratio::linear::vector::add(
+                            &response.fixed_logits,
+                            &response.label_logits[missing]
+                        ),
+                        read.read.logits
+                    );
                     union[crossing].extend(read.leaders());
                 }
                 assert!(actual.opening.closes() && actual.word.closes());
@@ -3117,52 +3896,95 @@ mod physical_repair {
                 assert_eq!(actual.carry.ticks, entering_tick + phases.last_epoch());
             }
             for (crossing, leaders) in union.into_iter().enumerate() {
-                assert_eq!(blind.domains[crossing].as_ref().unwrap().classes,
-                    leaders.into_iter().collect::<Vec<_>>());
+                assert_eq!(
+                    blind.domains[crossing].as_ref().unwrap().classes,
+                    leaders.into_iter().collect::<Vec<_>>()
+                );
             }
             assert!(blind.opening.closes() && blind.word.closes());
             assert!(blind.balances.iter().all(|balance| balance.closes()));
-            println!("signed completion boundary hole {hole}, actual clock {}: whole cells {:?}; complete response receipts {:?}",
-                blind.carry.ticks, blind.cells, blind.domains);
+            println!(
+                "signed completion boundary hole {hole}, actual clock {}: whole cells {:?}; complete response receipts {:?}",
+                blind.carry.ticks, blind.cells, blind.domains
+            );
         }
         let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
         let phases = ReceivingPhases::declare(&field, &initial, &current, &section(3)).unwrap();
         let source = crate::hnn::tests::support::encoded(&field, &original);
         let damaged = DamagedSection::damage(&source, &[2]).unwrap();
-        let tied = repair_by_field(&field, &initial, &current, &damaged, &carried, &phases).unwrap();
-        assert!(tied.domains.iter().flatten().all(|domain| domain.classes == vec![0, 1, 2, 3]));
+        let tied =
+            repair_by_field(&field, &initial, &current, &damaged, &carried, &phases).unwrap();
+        assert!(
+            tied.domains
+                .iter()
+                .flatten()
+                .all(|domain| domain.classes == vec![0, 1, 2, 3])
+        );
         assert!(matches!(tied.cells[2], RepairedCell::Held { .. }));
     }
 
     #[test]
     fn pair_output_teaching_refuses_absent_comparisons_zero_returns_and_uncertified_quartics() {
         use crate::hnn::prediction::predict_by_field;
-        let field=field_with_lock_and_offsets((0..8).collect(),vec![1]);
-        let current=Current::at_rest(&field);
-        let observed=crate::hnn::tests::support::encoded(&field,&[0,1,2]);
-        let damaged=DamagedSection::damage(&observed,&[2]).unwrap();
+        let field = field_with_lock_and_offsets((0..8).collect(), vec![1]);
+        let current = Current::at_rest(&field);
+        let observed = crate::hnn::tests::support::encoded(&field, &[0, 1, 2]);
+        let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
         for (material, compared, expected) in [
-            (Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).unwrap(), [false,false,false], "no observation crosses"),
-            (Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).unwrap(), [false,false,true], "no nonzero sample"),
-            (quartic_material(&field), [false,false,true], "Word-Hessian certificate"),
+            (
+                Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap(),
+                [false, false, false],
+                "no observation crosses",
+            ),
+            (
+                Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap(),
+                [false, false, true],
+                "no nonzero sample",
+            ),
+            (
+                quartic_material(&field),
+                [false, false, true],
+                "Word-Hessian certificate",
+            ),
         ] {
-            let phases=ReceivingPhases::declare(&field,&material,&current,&section(3)).unwrap();
-            let pending=predict_by_field(&field,&material,&current,&damaged,&WordOpening::Rest,&phases).unwrap();
-            let blind=pending.prediction().clone();
-            let refusal=pending.observe_pair_outputs(&material,&observed,&compared).unwrap_err();
-            assert_eq!(refusal.prediction,blind);
-            assert!(matches!(refusal.error,crate::hnn::HnnError::Unadmitted{reason} if reason.contains(expected)));
-            assert_eq!(material.commit(),0);
+            let phases =
+                ReceivingPhases::declare(&field, &material, &current, &section(3)).unwrap();
+            let pending = predict_by_field(
+                &field,
+                &material,
+                &current,
+                &damaged,
+                &WordOpening::Rest,
+                &phases,
+            )
+            .unwrap();
+            let blind = pending.prediction().clone();
+            let refusal = pending
+                .observe_pair_outputs(&material, &observed, &compared)
+                .unwrap_err();
+            assert_eq!(refusal.prediction, blind);
+            assert!(
+                matches!(refusal.error,crate::hnn::HnnError::Unadmitted{reason} if reason.contains(expected))
+            );
+            assert_eq!(material.commit(), 0);
         }
         let (material, carry) = pair_teaching_opening(&field);
-        let no_edge=DamagedSection::damage(&observed,&[1]).unwrap();
-        let phases=ReceivingPhases::declare(&field,&material,&current,&section(3)).unwrap();
-        let opening=WordOpening::Received{carry,absorption:Absorption::Nothing};
-        let pending=predict_by_field(&field,&material,&current,&no_edge,&opening,&phases).unwrap();
-        let blind=pending.prediction().clone();
-        let refusal=pending.observe_pair_outputs(&material,&observed,&[false,true,false]).unwrap_err();
-        assert_eq!(refusal.prediction,blind);
-        assert!(matches!(refusal.error,crate::hnn::HnnError::Unadmitted{reason} if reason.contains("no nonzero sample")));
+        let no_edge = DamagedSection::damage(&observed, &[1]).unwrap();
+        let phases = ReceivingPhases::declare(&field, &material, &current, &section(3)).unwrap();
+        let opening = WordOpening::Received {
+            carry,
+            absorption: Absorption::Nothing,
+        };
+        let pending =
+            predict_by_field(&field, &material, &current, &no_edge, &opening, &phases).unwrap();
+        let blind = pending.prediction().clone();
+        let refusal = pending
+            .observe_pair_outputs(&material, &observed, &[false, true, false])
+            .unwrap_err();
+        assert_eq!(refusal.prediction, blind);
+        assert!(
+            matches!(refusal.error,crate::hnn::HnnError::Unadmitted{reason} if reason.contains("no nonzero sample"))
+        );
     }
 
     #[test]
@@ -3177,11 +3999,14 @@ mod physical_repair {
         let marginal = open.continued(&field, &current, 0, &cells).unwrap();
         assert_eq!(source.population(0).unwrap(), 3);
         for phase in 0..8 {
-            assert_eq!(source.phase_counts(0, phase).unwrap(), marginal.phase_counts(0, phase).unwrap());
+            assert_eq!(
+                source.phase_counts(0, phase).unwrap(),
+                marginal.phase_counts(0, phase).unwrap()
+            );
         }
         assert_eq!(source.pair_population(0, 1).unwrap(), 1);
         assert_eq!(source.pair_population(0, 2).unwrap(), 1);
-        assert_eq!(source.offset_counts(0, 1, 7).unwrap()[3*4+1], 1);
+        assert_eq!(source.offset_counts(0, 1, 7).unwrap()[3 * 4 + 1], 1);
         assert_eq!(source.offset_counts(0, 2, 6).unwrap()[4], 1);
         assert!(source.station_section(&field, &current, 0, &cells).is_err());
         let mut moved = current.clone();
@@ -3189,20 +4014,45 @@ mod physical_repair {
         assert!(open.station_section(&field, &moved, 0, &cells).is_err());
         // Independently executed unit identity clock: no erasure, no carry-out in these four cells.
         let full = crate::hnn::tests::support::encoded(&field, &[0, 1, 2, 3]);
-        let section = open.station_section(&field, &current, 0,
-            &full.cells().iter().map(|cell| Some(cell.class())).collect::<Vec<_>>()).unwrap();
+        let section = open
+            .station_section(
+                &field,
+                &current,
+                0,
+                &full
+                    .cells()
+                    .iter()
+                    .map(|cell| Some(cell.class()))
+                    .collect::<Vec<_>>(),
+            )
+            .unwrap();
         let mut ingested = open.clone();
         let mut walked = current.clone();
-        assert_eq!(ingested.ingest(&field, &mut walked, &full).unwrap().cells, 4);
+        assert_eq!(
+            ingested.ingest(&field, &mut walked, &full).unwrap().cells,
+            4
+        );
         for phase in 0..8 {
-            assert_eq!(section.phase_counts(0, phase).unwrap(), ingested.phase_counts(0, phase).unwrap());
+            assert_eq!(
+                section.phase_counts(0, phase).unwrap(),
+                ingested.phase_counts(0, phase).unwrap()
+            );
             for offset in [1, 2] {
-                assert_eq!(section.offset_counts(0, offset, phase).unwrap(), ingested.offset_counts(0, offset, phase).unwrap());
+                assert_eq!(
+                    section.offset_counts(0, offset, phase).unwrap(),
+                    ingested.offset_counts(0, offset, phase).unwrap()
+                );
             }
         }
-        assert_eq!(section.encode(&field, &theta, 0).unwrap(), ingested.encode(&field, &theta, 0).unwrap());
+        assert_eq!(
+            section.encode(&field, &theta, 0).unwrap(),
+            ingested.encode(&field, &theta, 0).unwrap()
+        );
         // A declared delta longer than this span has an exact empty pair feature box.
-        let (lower, upper) = open.station_pair_bounds(&field, &current, 0, &[Some(0)], 2).unwrap().unwrap();
+        let (lower, upper) = open
+            .station_pair_bounds(&field, &current, 0, &[Some(0)], 2)
+            .unwrap()
+            .unwrap();
         assert!(lower.iter().chain(&upper).flatten().all(Zero::is_zero));
     }
 
@@ -3213,30 +4063,52 @@ mod physical_repair {
         let mut current = Current::at_rest(&field);
         current.rekey(&field, 0, 3).unwrap();
         let placed = [Some(0), None, None, Some(3)];
-        for theta in [initial.clone(), initial.founded_transport(&field, 0).unwrap()] {
+        for theta in [
+            initial.clone(),
+            initial.founded_transport(&field, 0).unwrap(),
+        ] {
             let open = SourceMoment::open_with(&field, &current, &theta).unwrap();
             for offset in [1, 2] {
-                let (lower, upper) = open.station_pair_bounds(&field, &current, 0, &placed, offset).unwrap().unwrap();
-                for x in 0..4 { for y in 0..4 {
-                    let full = [Some(0), Some(x), Some(y), Some(3)];
-                    let source = open.station_section(&field, &current, 0, &full).unwrap();
-                    let table = source.offset_table(&field, 0, offset).unwrap().unwrap();
-                    assert_eq!(table.population, (4-offset) as u64);
-                    for phase in 0..8 {
-                        let mut row = vec![Rat::zero(); 16];
-                        for (slot, value) in table.normalized(phase, 4) { row[slot] = value }
-                        for slot in 0..16 {
-                            assert!(lower[phase][slot] <= row[slot] && row[slot] <= upper[phase][slot]);
+                let (lower, upper) = open
+                    .station_pair_bounds(&field, &current, 0, &placed, offset)
+                    .unwrap()
+                    .unwrap();
+                for x in 0..4 {
+                    for y in 0..4 {
+                        let full = [Some(0), Some(x), Some(y), Some(3)];
+                        let source = open.station_section(&field, &current, 0, &full).unwrap();
+                        let table = source.offset_table(&field, 0, offset).unwrap().unwrap();
+                        assert_eq!(table.population, (4 - offset) as u64);
+                        for phase in 0..8 {
+                            let mut row = vec![Rat::zero(); 16];
+                            for (slot, value) in table.normalized(phase, 4) {
+                                row[slot] = value
+                            }
+                            for slot in 0..16 {
+                                assert!(
+                                    lower[phase][slot] <= row[slot]
+                                        && row[slot] <= upper[phase][slot]
+                                );
+                            }
                         }
                     }
-                }}
+                }
             }
             // Monochrome hole completions miss this heterotypic edge at station2, phase6.
-            let (_, upper) = open.station_pair_bounds(&field, &current, 0, &placed, 1).unwrap().unwrap();
+            let (_, upper) = open
+                .station_pair_bounds(&field, &current, 0, &placed, 1)
+                .unwrap()
+                .unwrap();
             assert!(upper[6][4] > Rat::zero());
             for class in 0..4 {
-                let mono = open.station_section(&field, &current, 0,
-                    &[Some(0), Some(class), Some(class), Some(3)]).unwrap();
+                let mono = open
+                    .station_section(
+                        &field,
+                        &current,
+                        0,
+                        &[Some(0), Some(class), Some(class), Some(3)],
+                    )
+                    .unwrap();
                 assert_eq!(mono.offset_counts(0, 1, 6).unwrap()[4], 0);
             }
         }
@@ -3249,30 +4121,51 @@ mod physical_repair {
         let mut current = Current::at_rest(&field);
         current.rekey(&field, 0, 3).unwrap();
         let mut left = vec![2; 9];
-        left[0] = 0; left[8] = 1;
-        let mut right = left.clone(); right.swap(0, 8);
+        left[0] = 0;
+        left[8] = 1;
+        let mut right = left.clone();
+        right.swap(0, 8);
         let open = SourceMoment::open_with(&field, &current, &theta).unwrap();
         let left_cells: Vec<_> = left.iter().copied().map(Some).collect();
         let right_cells: Vec<_> = right.iter().copied().map(Some).collect();
-        assert_eq!(open.continued(&field, &current, 0, &left_cells).unwrap(),
-            open.continued(&field, &current, 0, &right_cells).unwrap());
-        let l = open.station_section(&field, &current, 0, &left_cells).unwrap();
-        let r = open.station_section(&field, &current, 0, &right_cells).unwrap();
-        assert_ne!(l.encode(&field, &theta, 0).unwrap(), r.encode(&field, &theta, 0).unwrap());
+        assert_eq!(
+            open.continued(&field, &current, 0, &left_cells).unwrap(),
+            open.continued(&field, &current, 0, &right_cells).unwrap()
+        );
+        let l = open
+            .station_section(&field, &current, 0, &left_cells)
+            .unwrap();
+        let r = open
+            .station_section(&field, &current, 0, &right_cells)
+            .unwrap();
+        assert_ne!(
+            l.encode(&field, &theta, 0).unwrap(),
+            r.encode(&field, &theta, 0).unwrap()
+        );
         let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
         let mut receipts = Vec::new();
         for cells in [left, right] {
             let encoded = crate::hnn::tests::support::encoded(&field, &cells);
             let section = DamagedSection::damage(&encoded, &[]).unwrap();
-            let repair = repair_by_field(&field, &theta, &current, &section, &WordOpening::Rest, &phases).unwrap();
+            let repair = repair_by_field(
+                &field,
+                &theta,
+                &current,
+                &section,
+                &WordOpening::Rest,
+                &phases,
+            )
+            .unwrap();
             assert!(repair.opening.closes() && repair.word.closes());
             assert!(repair.balances.iter().all(|b| b.closes()));
             receipts.push(repair);
         }
         assert_ne!(receipts[0].carry.change, receipts[1].carry.change);
         assert_ne!(receipts[0].reads, receipts[1].reads);
-        println!("declared tensor-pair chart separates the source alias: actual native reads {:?} / {:?}",
-            receipts[0].reads, receipts[1].reads);
+        println!(
+            "declared tensor-pair chart separates the source alias: actual native reads {:?} / {:?}",
+            receipts[0].reads, receipts[1].reads
+        );
     }
 
     #[test]
@@ -3284,27 +4177,64 @@ mod physical_repair {
         let chart = crate::hnn::tests::support::encoded(&field, &[]);
         let left = crate::hnn::tests::support::encoded(&field, &[0]);
         let right = crate::hnn::tests::support::encoded(&field, &[3]);
-        let damaged = DamagedSection::of_runs(4, &chart, vec![(0,left),(3,right)]).unwrap();
-        for theta in [initial.clone(), initial.founded_transport(&field, 0).unwrap()] {
+        let damaged = DamagedSection::of_runs(4, &chart, vec![(0, left), (3, right)]).unwrap();
+        for theta in [
+            initial.clone(),
+            initial.founded_transport(&field, 0).unwrap(),
+        ] {
             let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
-            let blind = repair_by_field(&field, &theta, &current, &damaged, &WordOpening::Rest, &phases).unwrap();
+            let blind = repair_by_field(
+                &field,
+                &theta,
+                &current,
+                &damaged,
+                &WordOpening::Rest,
+                &phases,
+            )
+            .unwrap();
             assert!(blind.domains.iter().all(Option::is_some));
-            assert!(blind.domains.iter().flatten().all(|domain| domain.completion.is_none()));
+            assert!(
+                blind
+                    .domains
+                    .iter()
+                    .flatten()
+                    .all(|domain| domain.completion.is_none())
+            );
             assert!(blind.opening.closes() && blind.word.closes());
-            for x in 0..4 { for y in 0..4 {
-                let full = crate::hnn::tests::support::encoded(&field, &[0,x,y,3]);
-                let full = DamagedSection::damage(&full, &[]).unwrap();
-                let read = repair_by_field(&field, &theta, &current, &full, &WordOpening::Rest, &phases).unwrap();
-                assert!(read.opening.closes() && read.word.closes());
-                assert!(read.balances.iter().all(|b| b.closes()));
-                for (domain, read) in blind.domains.iter().zip(&read.reads) {
-                    for (bound, value) in domain.as_ref().unwrap().logits.iter().zip(&read.read.logits) {
-                        assert!(&bound.lower <= value && value <= &bound.upper);
+            for x in 0..4 {
+                for y in 0..4 {
+                    let full = crate::hnn::tests::support::encoded(&field, &[0, x, y, 3]);
+                    let full = DamagedSection::damage(&full, &[]).unwrap();
+                    let read = repair_by_field(
+                        &field,
+                        &theta,
+                        &current,
+                        &full,
+                        &WordOpening::Rest,
+                        &phases,
+                    )
+                    .unwrap();
+                    assert!(read.opening.closes() && read.word.closes());
+                    assert!(read.balances.iter().all(|b| b.closes()));
+                    for (domain, read) in blind.domains.iter().zip(&read.reads) {
+                        for (bound, value) in domain
+                            .as_ref()
+                            .unwrap()
+                            .logits
+                            .iter()
+                            .zip(&read.read.logits)
+                        {
+                            assert!(&bound.lower <= value && value <= &bound.upper);
+                        }
                     }
                 }
-            }}
-            println!("joint station-pair physical tube: rho {}; blind whole cells {:?}; actual complex bounds {:?}",
-                theta.transport(0), blind.cells, blind.domains);
+            }
+            println!(
+                "joint station-pair physical tube: rho {}; blind whole cells {:?}; actual complex bounds {:?}",
+                theta.transport(0),
+                blind.cells,
+                blind.domains
+            );
         }
     }
 
@@ -3315,56 +4245,93 @@ mod physical_repair {
     fn the_retained_reader_reports_matched_material_carry_and_absent_source_controls() {
         use crate::hnn::prediction::predict_by_field;
         let field = field();
-        let mut theta = quartic_material(&field).founded_transport(&field, 0).unwrap();
+        let mut theta = quartic_material(&field)
+            .founded_transport(&field, 0)
+            .unwrap();
         let mut current = Current::at_rest(&field);
         current.rekey(&field, 0, 3).unwrap();
         let mut opening = WordOpening::Rest;
         let mut materials = vec![theta.clone()];
         let mut carries = Vec::new();
-        for cells in [[0,2], [1,1], [3,3]] {
+        for cells in [[0, 2], [1, 1], [3, 3]] {
             let observed = crate::hnn::tests::support::encoded(&field, &cells);
             let damaged = DamagedSection::damage(&observed, &[1]).unwrap();
             let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
-            let pending = predict_by_field(&field, &theta, &current, &damaged, &opening, &phases).unwrap();
+            let pending =
+                predict_by_field(&field, &theta, &current, &damaged, &opening, &phases).unwrap();
             let blind = pending.prediction().clone();
-            let taught = pending.observe(&theta, &observed, &[false,true]).unwrap();
+            let taught = pending.observe(&theta, &observed, &[false, true]).unwrap();
             assert_eq!(blind, taught.prediction);
             assert!(blind.opening.closes() && blind.word.closes());
             assert!(blind.balances.iter().all(|b| b.closes()));
             theta = taught.constitution;
             materials.push(theta.clone());
             carries.push(blind.carry.clone());
-            opening = WordOpening::Received { carry: blind.carry, absorption: Absorption::Nothing };
+            opening = WordOpening::Received {
+                carry: blind.carry,
+                absorption: Absorption::Nothing,
+            };
         }
         let left = crate::hnn::tests::support::encoded(&field, &[0]);
         let chart = left.part(0..0).unwrap();
-        let right = crate::hnn::tests::support::encoded(&field, &[3,0]);
-        let probe = DamagedSection::of_runs(4, &chart, vec![(0,left),(2,right)]).unwrap();
+        let right = crate::hnn::tests::support::encoded(&field, &[3, 0]);
+        let probe = DamagedSection::of_runs(4, &chart, vec![(0, left), (2, right)]).unwrap();
         let absent = DamagedSection::of_runs(4, &chart, Vec::new()).unwrap();
         let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
-        let read = |label: &str, material: &Constitution, opening: &WordOpening, probe: &DamagedSection| {
-            let receipt = repair_by_field(&field, material, &current, probe, opening, &phases).unwrap();
+        let read = |label: &str,
+                    material: &Constitution,
+                    opening: &WordOpening,
+                    probe: &DamagedSection| {
+            let receipt =
+                repair_by_field(&field, material, &current, probe, opening, &phases).unwrap();
             assert!(receipt.opening.closes() && receipt.word.closes());
             assert!(receipt.balances.iter().all(|b| b.closes()));
-            println!("matched retained-reader control {label}: R commit {}; actual intact source {:?}; whole cells {:?}; leaders {:?}; complex logits {:?}; carry tick {}",
-                material.commit(), probe.placed(), receipt.cells,
-                receipt.reads.iter().map(|r| r.leaders()).collect::<Vec<_>>(),
-                receipt.reads.iter().map(|r| &r.read.logits).collect::<Vec<_>>(), receipt.carry.ticks);
+            println!(
+                "matched retained-reader control {label}: R commit {}; actual intact source {:?}; whole cells {:?}; leaders {:?}; complex logits {:?}; carry tick {}",
+                material.commit(),
+                probe.placed(),
+                receipt.cells,
+                receipt
+                    .reads
+                    .iter()
+                    .map(|r| r.leaders())
+                    .collect::<Vec<_>>(),
+                receipt
+                    .reads
+                    .iter()
+                    .map(|r| &r.read.logits)
+                    .collect::<Vec<_>>(),
+                receipt.carry.ticks
+            );
             receipt
         };
         let mut common_motion = None;
         for (index, material) in materials.iter().enumerate() {
-            let receipt = read(&format!("material{index}/enteredC3"), material, &opening, &probe);
-            if let Some(carry) = &common_motion { assert_eq!(carry, &receipt.carry) }
-            else { common_motion = Some(receipt.carry) }
+            let receipt = read(
+                &format!("material{index}/enteredC3"),
+                material,
+                &opening,
+                &probe,
+            );
+            if let Some(carry) = &common_motion {
+                assert_eq!(carry, &receipt.carry)
+            } else {
+                common_motion = Some(receipt.carry)
+            }
         }
         read("R3/rest", &theta, &WordOpening::Rest, &probe);
         for (index, carry) in carries.iter().take(2).enumerate() {
-            read(&format!("R3/enteredC{}",index+1), &theta,
-                &WordOpening::Received { carry: carry.clone(), absorption: Absorption::Nothing }, &probe);
+            read(
+                &format!("R3/enteredC{}", index + 1),
+                &theta,
+                &WordOpening::Received {
+                    carry: carry.clone(),
+                    absorption: Absorption::Nothing,
+                },
+                &probe,
+            );
         }
         read("R3/absent-source/rest", &theta, &WordOpening::Rest, &absent);
         read("R3/absent-source/enteredC3", &theta, &opening, &absent);
     }
-
 }

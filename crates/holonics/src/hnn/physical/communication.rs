@@ -54,16 +54,39 @@ impl PhysicalBoundary {
         grain: u64,
         unite_point: bool,
     ) -> Self {
-        let readings = prediction.reads.iter().filter(|read| read.station >= first)
-            .cloned().collect::<Vec<_>>();
-        let decisions = readings.iter().map(|point| {
-            let decision = &prediction.cells[point.station];
-            if unite_point {
-                communication_decision(decision, point, prediction.domains[point.station].as_ref())
-            } else { decision.clone() }
-        }).collect();
-        let domains = readings.iter().map(|point| prediction.domains[point.station].clone()).collect();
-        Self { chart, first, grain, readings, decisions, domains }
+        let readings = prediction
+            .reads
+            .iter()
+            .filter(|read| read.station >= first)
+            .cloned()
+            .collect::<Vec<_>>();
+        let decisions = readings
+            .iter()
+            .map(|point| {
+                let decision = &prediction.cells[point.station];
+                if unite_point {
+                    communication_decision(
+                        decision,
+                        point,
+                        prediction.domains[point.station].as_ref(),
+                    )
+                } else {
+                    decision.clone()
+                }
+            })
+            .collect();
+        let domains = readings
+            .iter()
+            .map(|point| prediction.domains[point.station].clone())
+            .collect();
+        Self {
+            chart,
+            first,
+            grain,
+            readings,
+            decisions,
+            domains,
+        }
     }
 
     pub fn chart(&self) -> &Encoded {
@@ -225,7 +248,9 @@ impl PhysicalReceiver<'_> {
         // finite phase-section admission bars that wrap; it is not source-map injectivity.
         let span = u64::try_from(aperture).map_err(|_| HnnError::CountOverflow)?;
         for &ring in self.field.sources() {
-            if self.resident.constitution().transport(ring).is_one() && span > self.field.ring(ring).period() {
+            if self.resident.constitution().transport(ring).is_one()
+                && span > self.field.ring(ring).period()
+            {
                 return Err(HnnError::Unadmitted {
                     reason: "a unit-source communication aperture exceeds its producing phase period",
                 });

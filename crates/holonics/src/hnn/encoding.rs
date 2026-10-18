@@ -65,6 +65,8 @@
 //! ([`LocatedAdvances`], each digit at its period's width). Only this module builds one:
 //!
 //! ```text
+//! PairedObservation::encode(symbols)   explicitly authored paired observation boundary;
+//!                                       actual E, DE=I, BE=EΣ, PE=EU+R, stale-port refusal
 //! Encoded::identity(truth, field)       a known truth's classes as themselves; D = I, fibre ∅
 //! Encoded::through(E, chart, field, x)  chart = PassageChart::located(location, read set):
 //!                                       the field's own key location, one gauge class;
@@ -95,6 +97,11 @@
 //! | `HNN/Encoding.encoding_separator` | [`Encoding::fibre`], [`Encoding::separator`] |
 //! | the relabelling law on the located route (the chart and encoded cells of `π∘x` are those of `x`): owed (#62) | [`PassageChart::located`], [`Encoded::through`] |
 //! | the identity's injection `|A| ≤ d_g` (no fold): a runtime law | [`Encoded::identity`] |
+
+pub mod observed;
+pub mod placement;
+#[cfg(test)]
+mod spatial_tests;
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -202,7 +209,9 @@ fn independent(chart: usize, vectors: &[Vec<Rat>]) -> Result<Vec<Vec<Rat>>, Enco
     if nonzero.is_empty() {
         return Ok(Vec::new());
     }
-    let columns = matrix(chart, nonzero.len(), |row, column| nonzero[column][row].clone())?;
+    let columns = matrix(chart, nonzero.len(), |row, column| {
+        nonzero[column][row].clone()
+    })?;
     Ok(columns.image_basis()?)
 }
 
@@ -273,7 +282,9 @@ impl LocatedAdvances {
 
     /// The digits `a_g(c)` of a class's located advance, ring 0 first; `None` at an unlabelled cell.
     pub fn digits(&self, cell: PortCell) -> Option<&[u64]> {
-        self.digits.get(cell.class).and_then(|digits| digits.as_deref())
+        self.digits
+            .get(cell.class)
+            .and_then(|digits| digits.as_deref())
     }
 }
 
@@ -340,7 +351,11 @@ impl PassageChart {
         if passages.is_empty() {
             return Err(chart_refusal("a located chart opens at its passages' keys"));
         }
-        if passages.iter().flatten().any(|&code| code >= member.classes()) {
+        if passages
+            .iter()
+            .flatten()
+            .any(|&code| code >= member.classes())
+        {
             return Err(EncodingError::Unencoded);
         }
         let helix = member.helix();
@@ -483,12 +498,11 @@ impl PassageChart {
             .collect();
         let states: usize = d * periods.iter().product::<usize>();
         let index = |x: usize, phases: &[usize]| -> usize {
-            x + d
-                * phases
-                    .iter()
-                    .zip(&periods)
-                    .rev()
-                    .fold(0usize, |state, (&phase, &period)| state * period + phase)
+            x + d * phases
+                .iter()
+                .zip(&periods)
+                .rev()
+                .fold(0usize, |state, (&phase, &period)| state * period + phase)
         };
         let decode = |mut state: usize| -> (usize, Vec<usize>) {
             let x = state % d;
@@ -730,7 +744,9 @@ impl Encoding {
     /// **`J e_u = E B e_u`**, the founded injection of exterior cell `u`; `None` where `B e_u` lies
     /// outside the reached span (the cell is unfounded).
     pub fn injection(&self, cell: usize) -> Option<&[Rat]> {
-        self.injection.get(cell).and_then(|column| column.as_deref())
+        self.injection
+            .get(cell)
+            .and_then(|column| column.as_deref())
     }
 
     /// **A chart state's coordinates on `R`**: `c` with `x = Σ_j c_j r_j`, read by the left inverse
@@ -793,7 +809,9 @@ impl Encoding {
                     .flat_map(|(a, transport)| {
                         (0..transport.columns())
                             .filter(move |&j| {
-                                !transport.get(index, j).map_or(true, |value| value.is_zero())
+                                !transport
+                                    .get(index, j)
+                                    .map_or(true, |value| value.is_zero())
                             })
                             .map(move |j| (a, j))
                     })
@@ -881,13 +899,19 @@ impl Encoding {
     /// that leaves `R` is refused rather than read.
     pub fn squares(&self, passage: &PassageChart) -> Result<Squares, EncodingError> {
         if passage.chart != self.chart || passage.transports.len() != self.transports.len() {
-            return Err(chart_refusal("the squares read the passage the encoding was founded on"));
+            return Err(chart_refusal(
+                "the squares read the passage the encoding was founded on",
+            ));
         }
         let mut cells = 0;
         for (j, state) in self.reach.forms().iter().enumerate() {
             let encoded = self.encode(state)?;
             let read = self.readout.apply(&encoded)?;
-            let reading: Vec<Rat> = passage.coupling.iter().map(|form| dot(form, state)).collect();
+            let reading: Vec<Rat> = passage
+                .coupling
+                .iter()
+                .map(|form| dot(form, state))
+                .collect();
             if read != reading {
                 return Err(EncodingError::Square {
                     square: "reading D E = ρ",
@@ -1010,6 +1034,7 @@ struct EncodedChart {
     labels: Vec<Option<usize>>,
     advances: Option<LocatedAdvances>,
     founded: Option<Founded>,
+    observed: Option<Arc<observed::PairedObservation>>,
 }
 
 /// [definition; agent-inferred, October 5] **The located route's founded encoding, read at the
@@ -1029,8 +1054,9 @@ struct Founded {
 /// carried with the chart's class count, the source rings its classes inject into, the decoder `D`
 /// and the Preimage Fibre of the encoding that produced it, the boundary's labels (class to exterior
 /// code) and, on the located route, the located advances as the lift's digits. Its fields are
-/// private, and only `hnn::encoding` constructs one, in two ways: [`Encoded::identity`] (a known
-/// truth's declared identity) and [`Encoded::through`] (a located chart's founded encoding).
+/// private, and only `hnn::encoding` constructs one: [`Encoded::identity`] (a known truth),
+/// [`Encoded::through`] (a located chart), or [`observed::PairedObservation::encode`] (a checked
+/// authored observation boundary, never a known truth or inferred latent structure).
 ///
 /// [definition] **Structural guarantees**, each a `compile_fail` doctest checked with its error code
 /// (gate 1 runs them with `RUSTC_BOOTSTRAP=1`): an `Encoded` is never forged (`E0451`); an exterior
@@ -1116,6 +1142,7 @@ struct Founded {
 pub struct Encoded {
     cells: Vec<PortCell>,
     chart: Arc<EncodedChart>,
+    placement: Option<Arc<placement::OccurrencePlacement>>,
 }
 
 /// The source rings of a field with their periods; refused unless `classes ≤ d_g` on each (no fold).
@@ -1156,6 +1183,7 @@ impl Encoded {
             labels: (0..classes).map(Some).collect(),
             advances: None,
             founded: None,
+            observed: None,
         });
         Ok(truth
             .passages()
@@ -1163,6 +1191,7 @@ impl Encoded {
             .map(|passage| Self {
                 cells: passage.iter().map(|&class| PortCell { class }).collect(),
                 chart: Arc::clone(&chart),
+                placement: None,
             })
             .collect())
     }
@@ -1216,6 +1245,7 @@ impl Encoded {
             fibre: encoding.fibre()?,
             labels: located.labels.clone(),
             advances: Some(located.advances.clone()),
+            observed: None,
             founded: Some(Founded {
                 encoding: encoding.clone(),
                 coupling: chart.coupling.clone(),
@@ -1237,6 +1267,7 @@ impl Encoded {
                 Ok(Self {
                     cells,
                     chart: Arc::clone(&shared),
+                    placement: None,
                 })
             })
             .collect()
@@ -1245,31 +1276,48 @@ impl Encoded {
     /// **The passage cut at an occurrence** (a request and its section): both halves keep the
     /// encoding that produced them; refused past the passage's end.
     pub fn split_at(self, at: usize) -> Result<(Self, Self), EncodingError> {
-        if at > self.cells.len() {
-            return Err(chart_refusal("an encoded passage is cut within it"));
-        }
-        let Self { mut cells, chart } = self;
-        let tail = cells.split_off(at);
-        Ok((
-            Self {
-                cells,
-                chart: Arc::clone(&chart),
-            },
-            Self { cells: tail, chart },
-        ))
+        Ok((self.part(0..at)?, self.part(at..self.len())?))
     }
 
-    /// **A part of the passage** (the cells a moment has not yet taken, a crib, a window): the
-    /// occurrences in `range`, keeping the encoding that produced them; refused past the passage.
+    /// A slice preserves its complete occurrence placement, including absolute opening winding.
     pub fn part(&self, range: std::ops::Range<usize>) -> Result<Self, EncodingError> {
         let cells = self
             .cells
-            .get(range)
+            .get(range.clone())
             .ok_or_else(|| chart_refusal("an encoded passage's part lies within it"))?;
         Ok(Self {
             cells: cells.to_vec(),
             chart: Arc::clone(&self.chart),
+            placement: self
+                .placement
+                .as_ref()
+                .map(|p| p.part(range).map(Arc::new))
+                .transpose()?,
         })
+    }
+
+    /// Occurrence-specific placement, separate from field-located latent transport.
+    pub fn placement(&self) -> Option<&placement::OccurrencePlacement> {
+        self.placement.as_deref()
+    }
+    pub fn has_advances(&self) -> bool {
+        self.chart.advances.is_some() || self.placement.is_some()
+    }
+    pub fn transport_periods(&self) -> Option<&[u64]> {
+        self.placement()
+            .map(|p| p.periods())
+            .or_else(|| self.located().map(|p| p.periods()))
+    }
+    pub(crate) fn check_placement_step(
+        &self,
+        at: usize,
+        before: &[BigInt],
+        after: &[BigInt],
+    ) -> Result<(), EncodingError> {
+        if let Some(placement) = self.placement() {
+            placement.check_step(at, before, after)?;
+        }
+        Ok(())
     }
 
     /// The occurrences' classes, in order.
@@ -1286,6 +1334,9 @@ impl Encoded {
     /// the located route; `None` for an identity (the field's lock fit steps it) or past the
     /// passage.
     pub fn advance(&self, at: usize) -> Option<&[u64]> {
+        if let Some(placement) = self.placement() {
+            return placement.advance(at);
+        }
         let cell = *self.cells.get(at)?;
         self.chart.advances.as_ref()?.digits(cell)
     }

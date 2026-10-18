@@ -83,18 +83,18 @@
 mod cycle;
 mod model;
 mod world;
+pub use cycle::CycleReading;
 pub use model::{
     CoupledChange, CoupledProspect, HeldReason, KeyFace, KeyState, ModelCharts, ModelKey,
     ReturnImage, StateFibre, WorldModel,
 };
-pub use cycle::CycleReading;
 pub use world::{BoundJointWorld, NativeEncounter, NativeEncounterFailure, WaveJointStep};
 
 use super::{PhysicalReceiver, communication::PhysicalBoundary};
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
-    CommittedReach, Constitution, DeclaredExponents, DeclaredStepRefusal, DepositReading, FactorStep,
-    Locus, Reach,
+    CommittedReach, Constitution, DeclaredExponents, DeclaredStepRefusal, DepositReading,
+    FactorStep, Locus, Reach,
 };
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{Current, Field, FieldMaterial, ReceiverDeclaration};
@@ -656,9 +656,12 @@ impl<'f> PhysicalReceiver<'f> {
         })?;
         let mut ratios = Vec::with_capacity(observations.len());
         for (index, &(tangents, observed)) in observations.iter().enumerate() {
-            let comparison = observed.comparison.as_ref().map_err(|_| HnnError::Unadmitted {
-                reason: "a World proposal reads each encounter's own completed comparison",
-            })?;
+            let comparison = observed
+                .comparison
+                .as_ref()
+                .map_err(|_| HnnError::Unadmitted {
+                    reason: "a World proposal reads each encounter's own completed comparison",
+                })?;
             let commit = observed.applied.producing_commit();
             if tangents.is_empty()
                 || tangents.iter().any(|t| {
@@ -672,14 +675,16 @@ impl<'f> PhysicalReceiver<'f> {
                     reason: "a World proposal's tangents rode their encounter: its producing commit and Word clock",
                 });
             }
-            if let Some(&(before_tangents, before)) = index.checked_sub(1).map(|i| &observations[i]) {
+            if let Some(&(before_tangents, before)) = index.checked_sub(1).map(|i| &observations[i])
+            {
                 let consecutive = observed.encounter.before_native_tick
                     == before.encounter.after_native_tick
                     && observed.encounter.before_world_tick == before.encounter.after_world_tick;
                 let continued = tangents.len() == before_tangents.len()
-                    && tangents.iter().zip(before_tangents).all(|(t, b)| {
-                        t.direction() == b.direction() && t.origin() == b.origin()
-                    });
+                    && tangents
+                        .iter()
+                        .zip(before_tangents)
+                        .all(|(t, b)| t.direction() == b.direction() && t.origin() == b.origin());
                 if !consecutive || !continued {
                     return Err(HnnError::Unadmitted {
                         reason: "a chain of observations is consecutive on both clocks and carries the earlier tangents continued",
@@ -1114,8 +1119,17 @@ impl<'f> PhysicalReceiver<'f> {
         };
         Ok(self
             .round_from(
-                material, source, receiver, preparation, compared, schedule, key, opening, start,
-                tick, &mut seed,
+                material,
+                source,
+                receiver,
+                preparation,
+                compared,
+                schedule,
+                key,
+                opening,
+                start,
+                tick,
+                &mut seed,
             )?
             .encounters)
     }
@@ -1189,7 +1203,12 @@ impl<'f> PhysicalReceiver<'f> {
         let mut readout_fixed = true;
         for control in schedule {
             let (_, phases, word, _) = self.action_opening_on(
-                source, receiver, preparation, compared, &material, &opening,
+                source,
+                receiver,
+                preparation,
+                compared,
+                &material,
+                &opening,
             )?;
             let feature = word.prospective_feature(&phases, preparation, compared)?;
             if control.len() != feature.preparation().controls() {
@@ -1224,9 +1243,7 @@ impl<'f> PhysicalReceiver<'f> {
             )?;
             for tangent in &mut tangents {
                 tangent.read_stations(|anchor| {
-                    Ok(phases
-                        .read(self.field, &material, self.current(), anchor)?
-                        .logits)
+                    Ok(phases.read(self.field, &material, anchor)?.logits)
                 })?;
             }
             let ratio = self.prospect_ratio(&prospect, &phases)?;
@@ -1290,7 +1307,8 @@ impl<'f> PhysicalReceiver<'f> {
             let end = prospect.point.end.clone();
             tick = tick
                 .checked_add(
-                    u64::try_from(prospect.point.waves.len()).map_err(|_| HnnError::CountOverflow)?,
+                    u64::try_from(prospect.point.waves.len())
+                        .map_err(|_| HnnError::CountOverflow)?,
                 )
                 .ok_or(HnnError::CountOverflow)?;
             state = end_state;
@@ -1424,7 +1442,14 @@ impl<'f> PhysicalReceiver<'f> {
                 AdmittedFuture::Waves(controls) => controls
                     .iter()
                     .map(|control| {
-                        self.world_prospect_ratio(material, source, receiver, preparation, compared, control)
+                        self.world_prospect_ratio(
+                            material,
+                            source,
+                            receiver,
+                            preparation,
+                            compared,
+                            control,
+                        )
                     })
                     .collect(),
                 AdmittedFuture::Schedule(schedule) => Ok(self
@@ -1441,7 +1466,15 @@ impl<'f> PhysicalReceiver<'f> {
                     .map(|scheduled| scheduled.ratio)
                     .collect()),
                 AdmittedFuture::Cycle(schedule) => Ok(self
-                    .world_cycle(material, source, receiver, preparation, compared, schedule, &[])?
+                    .world_cycle(
+                        material,
+                        source,
+                        receiver,
+                        preparation,
+                        compared,
+                        schedule,
+                        &[],
+                    )?
                     .encounters
                     .into_iter()
                     .map(|encounter| encounter.ratio)
@@ -1474,7 +1507,8 @@ impl<'f> PhysicalReceiver<'f> {
         } else {
             let mut by = 1i64;
             while let Some(raised) = declared.raised(by) {
-                let Ok(produced) = theta.deposited_with_contact_spans_at(&deposit, &spans, &raised)?
+                let Ok(produced) =
+                    theta.deposited_with_contact_spans_at(&deposit, &spans, &raised)?
                 else {
                     break;
                 };
@@ -1508,7 +1542,9 @@ impl<'f> PhysicalReceiver<'f> {
         let decision = decide_over(&decisions);
         let deposition_work = match decision {
             Err(_) => None,
-            Ok(_) => Some(self.publish_landed(&candidate, source, receiver, preparation, compared)?),
+            Ok(_) => {
+                Some(self.publish_landed(&candidate, source, receiver, preparation, compared)?)
+            }
         };
         Ok(WorldLanding::Read(Box::new(WorldLandingReading {
             declared,
@@ -1666,29 +1702,32 @@ impl<'f> PhysicalReceiver<'f> {
         // (affine in the World's state, read after the step as the World reads its face), the
         // observed face's tangent.
         let compared = applied.compared();
-        let mut observe = |word: &Word<'_>, t: usize, _step: &WaveJointStep| -> Result<(), HnnError> {
-            if let Some((key, tick)) = &located {
-                let offset = u64::try_from(t - 1).map_err(|_| HnnError::CountOverflow)?;
-                let charts = key.charts(tick.checked_add(offset).ok_or(HnnError::CountOverflow)?)?;
-                for tangent in tangents.iter_mut() {
-                    tangent.step_through_port(word, &charts.f, &charts.g, &charts.p, &charts.q)?;
-                    for (station, (&epoch, &yes)) in epochs.iter().zip(compared).enumerate() {
-                        if !yes || epoch != t {
-                            continue;
+        let mut observe =
+            |word: &Word<'_>, t: usize, _step: &WaveJointStep| -> Result<(), HnnError> {
+                if let Some((key, tick)) = &located {
+                    let offset = u64::try_from(t - 1).map_err(|_| HnnError::CountOverflow)?;
+                    let charts =
+                        key.charts(tick.checked_add(offset).ok_or(HnnError::CountOverflow)?)?;
+                    for tangent in tangents.iter_mut() {
+                        tangent
+                            .step_through_port(word, &charts.f, &charts.g, &charts.p, &charts.q)?;
+                        for (station, (&epoch, &yes)) in epochs.iter().zip(compared).enumerate() {
+                            if !yes || epoch != t {
+                                continue;
+                            }
+                            let observed = match (key.face(), tangent.world()) {
+                                (Some(face), Some(psi)) => Some(sub(
+                                    &face.read(psi)?,
+                                    &face.read(&vec![Rat::zero(); psi.len()])?,
+                                )),
+                                _ => None,
+                            };
+                            tangent.observe_station(word, phases.ring(), station, observed)?;
                         }
-                        let observed = match (key.face(), tangent.world()) {
-                            (Some(face), Some(psi)) => Some(sub(
-                                &face.read(psi)?,
-                                &face.read(&vec![Rat::zero(); psi.len()])?,
-                            )),
-                            _ => None,
-                        };
-                        tangent.observe_station(word, phases.ring(), station, observed)?;
                     }
                 }
-            }
-            Ok(())
-        };
+                Ok(())
+            };
         let encounter = self.resident.participating_world_mut()?.execute_word(
             &mut word,
             applied.ring(),
@@ -1725,17 +1764,14 @@ impl<'f> PhysicalReceiver<'f> {
                         station,
                         crossing,
                         tick: word.opened_at() + crossing,
-                        read: phases.read(self.field, &producing, self.current(), anchor)?,
+                        read: phases.read(self.field, &producing, anchor)?,
                     })
                 })
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
         for tangent in tangents.iter_mut() {
-            tangent.read_stations(|anchor| {
-                Ok(phases
-                    .read(self.field, &producing, self.current(), anchor)?
-                    .logits)
-            })?;
+            tangent
+                .read_stations(|anchor| Ok(phases.read(self.field, &producing, anchor)?.logits))?;
         }
         let blind = PhysicalRepair {
             cells: section
@@ -1906,6 +1942,14 @@ impl<'f> PhysicalReceiver<'f> {
         ),
         HnnError,
     > {
+        if matches!(
+            material.receiving_layout(receiver.ring),
+            Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { .. })
+        ) {
+            return Err(HnnError::Unadmitted {
+                reason: "the prospective physical control has no matched arrival/context operand",
+            });
+        }
         self.resident.admit_exact_current_point()?;
         if self.resident.held_contact_variation().is_some() {
             return Err(HnnError::Unadmitted {
@@ -2093,7 +2137,11 @@ impl AdmittedWaves {
                 exponent,
                 declared_for: declared_for.clone(),
                 supply,
-                controls: if admitted { vec![Vec::new()] } else { Vec::new() },
+                controls: if admitted {
+                    vec![Vec::new()]
+                } else {
+                    Vec::new()
+                },
                 enumerated: 1,
             });
         }
@@ -2338,6 +2386,14 @@ fn declared_family(
     constitution: &Constitution,
     phases: &ReceivingPhases,
 ) -> Result<Option<PhaseFamily>, HnnError> {
+    if matches!(
+        constitution.receiving_layout(phases.ring()),
+        Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { .. })
+    ) {
+        return Err(HnnError::Unadmitted {
+            reason: "the prospective physical control has no matched arrival/context operand",
+        });
+    }
     let law = constitution
         .receiving_law(phases.ring())
         .ok_or(HnnError::MissingReceivingMap {
@@ -2389,7 +2445,10 @@ fn predict_native(
 /// October 8: two blocks need not be a unit phase apart, and one block can hold a nonzero image).
 /// The existing release law at tolerance zero `Hold`s inside the tolerance and `Ask`s beyond it,
 /// only for the probe offered.
-fn decide_probe(station: usize, offered: Option<ObservationProbe>) -> Result<ReleaseReturn, HnnError> {
+fn decide_probe(
+    station: usize,
+    offered: Option<ObservationProbe>,
+) -> Result<ReleaseReturn, HnnError> {
     let (diameter, attaining, read) = if offered.is_some() {
         (Rat::one(), WidthWitness::Pair { left: 0, right: 1 }, 2)
     } else {

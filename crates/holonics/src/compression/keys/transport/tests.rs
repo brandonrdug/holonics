@@ -11,12 +11,22 @@ fn helix(periods: &[u64]) -> CarryHelix {
 /// Every permutation of `ℤ/m`, in lexicographic order.
 fn permutations(m: usize) -> Vec<Vec<usize>> {
     (0..factorial(m))
-        .map(|rank| label_unrank(rank, m).into_iter().map(Option::unwrap).collect())
+        .map(|rank| {
+            label_unrank(rank, m)
+                .into_iter()
+                .map(Option::unwrap)
+                .collect()
+        })
         .collect()
 }
 
 /// A terrain's read set: `count` passages of `length` cells from drawn keys.
-fn read_set(terrain: &SteppedTerrain, draw: &mut Draw, count: usize, length: usize) -> Vec<Vec<usize>> {
+fn read_set(
+    terrain: &SteppedTerrain,
+    draw: &mut Draw,
+    count: usize,
+    length: usize,
+) -> Vec<Vec<usize>> {
     let period = terrain.helix().period() as usize;
     (0..count)
         .map(|_| terrain.passage(draw.below(period) as u64, length))
@@ -64,11 +74,15 @@ fn residue_code_length(
                 .iter()
                 .map(|passage| {
                     (0..helix.period())
-                        .min_by_key(|&key| driven_patches(helix, &advances, &labels, passage, key).len())
+                        .min_by_key(|&key| {
+                            driven_patches(helix, &advances, &labels, passage, key).len()
+                        })
                         .unwrap()
                 })
                 .collect();
-            residual_code(helix, &advances, &labels, &keys, passages).unwrap().len()
+            residual_code(helix, &advances, &labels, &keys, passages)
+                .unwrap()
+                .len()
         })
         .min()
         .unwrap()
@@ -201,7 +215,9 @@ fn brute_fibre(
             if fits {
                 last.sort_unstable();
                 fibre.push((
-                    (0..classes).map(|u| stepped[u].then_some(advances[u])).collect(),
+                    (0..classes)
+                        .map(|u| stepped[u].then_some(advances[u]))
+                        .collect(),
                     labels.iter().map(|&c| emitted[c].then_some(c)).collect(),
                     last,
                 ));
@@ -233,7 +249,11 @@ fn location_equals_the_brute_force_fibre() {
             .map(|s| (s.advances.clone(), s.labels.clone(), s.lifts.clone()))
             .collect();
         survivors.sort();
-        assert_eq!(survivors, brute_fibre(&helix, 3, &passages), "trial {trial}");
+        assert_eq!(
+            survivors,
+            brute_fibre(&helix, 3, &passages),
+            "trial {trial}"
+        );
         let pairs = location.survivors();
         for (advances, labels) in &pairs {
             let reflected: (Vec<Option<u64>>, Vec<Option<usize>>) = (
@@ -286,9 +306,16 @@ fn the_generator_is_a_member_and_every_member_regenerates_the_read_set() {
         .unwrap();
         assert!(members.contains(&gauge_representative(&location, &gauged)));
         for member in &members {
-            assert!(passages.iter().all(|passage| !member.keys(passage).is_empty()));
+            assert!(
+                passages
+                    .iter()
+                    .all(|passage| !member.keys(passage).is_empty())
+            );
             for class in 0..5 {
-                assert_eq!(helix.of_digits(&member.digits(class)), member.advances()[class]);
+                assert_eq!(
+                    helix.of_digits(&member.digits(class)),
+                    member.advances()[class]
+                );
             }
         }
         let n_star = location.located_from().unwrap();
@@ -343,7 +370,11 @@ fn relabelling_carries_the_located_transport_and_keeps_the_code_length() {
             LocatedTransport::new(
                 helix.clone(),
                 advances,
-                member.labels().iter().map(|label| label.map(|u| pi[u])).collect(),
+                member
+                    .labels()
+                    .iter()
+                    .map(|label| label.map(|u| pi[u]))
+                    .collect(),
             )
             .unwrap()
         };
@@ -464,7 +495,14 @@ fn the_located_route_encodes_the_read_set_without_its_labels() {
         assert_eq!(digits.periods(), helix.periods());
         for (&code, &cell) in passage.iter().zip(encoded.cells()) {
             assert_eq!(encoded.label(cell), Some(code));
-            assert!(digits.digits(cell).unwrap().iter().zip(helix.periods()).all(|(a, d)| a < d));
+            assert!(
+                digits
+                    .digits(cell)
+                    .unwrap()
+                    .iter()
+                    .zip(helix.periods())
+                    .all(|(a, d)| a < d)
+            );
         }
     }
     for pi in permutations(5).into_iter().step_by(10) {
@@ -567,4 +605,3 @@ fn the_repair_restores_through_the_located_navigator() {
         ));
     }
 }
-

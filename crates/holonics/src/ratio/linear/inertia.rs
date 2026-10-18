@@ -174,7 +174,10 @@ impl SymmetricForm {
                 columns: map.columns(),
             });
         }
-        let pulled = map.transpose()?.multiply(&self.as_matrix()?)?.multiply(map)?;
+        let pulled = map
+            .transpose()?
+            .multiply(&self.as_matrix()?)?
+            .multiply(map)?;
         Self::from_rows(pulled.to_rows())
     }
 }

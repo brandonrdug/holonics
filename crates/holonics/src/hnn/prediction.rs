@@ -223,7 +223,7 @@
 //!   station `j` is bound to the receiver's phase `j`, the local crossing `e_0 + j` at the
 //!   refinement's tick `opened_at + e_0 + j`, certified by the carried end's tick
 //!   ([`Word::reception_end`]);
-//! - **the read**: `R · P_R^(τ_R) v_R(e)` at the receiver's grain ([`ReceivingPhases::read`]), the
+//! - **the read**: `R · v_R(e)` in the passage frame at the receiver's grain ([`ReceivingPhases::read`]), the
 //!   decoder `R` being the field's material (guard 18 excludes the tree and the population);
 //! - **the release**: a station is released only where the domain of the word's coupled drive,
 //!   projected through the same executed anchor map and decoder, admits one class; otherwise held
@@ -263,12 +263,12 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 use crate::hnn::HnnError;
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{Current, Field, FieldMaterial};
-use crate::hnn::moment::{PopulationChart, SourceMoment};
+use crate::hnn::moment::{ExactPairContraction, PopulationChart, SourceMoment};
 use crate::hnn::receiving::{ReceivingPhases, ReceivingRead};
+use crate::hnn::ring::{Growth, ReceivingBank, TurnCovector, TurnReading, turn};
 use crate::hnn::word::{
     FieldBalance, ReceptionCarry, SourceOpeningReceipt, Word, WordBalance, WordOpening,
 };
-use crate::hnn::ring::{Growth, ReceivingBank, TurnCovector, TurnReading, turn};
 use crate::holarchy::terrain::Draw;
 use crate::ratio::Rat;
 use crate::ratio::gaussian::GaussianRat;
@@ -656,7 +656,16 @@ pub fn bank_release<R: JointGrowth + Send + Sync>(
     read: impl Fn(&[GaussianRat]) -> Result<R, HnnError> + Sync,
     keep: bool,
 ) -> Result<(BankGeneration, Vec<BankRefinement<R>>), HnnError> {
-    bank_release_ordered(placement, declared, alphabet, bank, grain, read, keep, LockOrder::Gap)
+    bank_release_ordered(
+        placement,
+        declared,
+        alphabet,
+        bank,
+        grain,
+        read,
+        keep,
+        LockOrder::Gap,
+    )
 }
 
 /// [definition; agent-inferred, loop 1c's
@@ -716,7 +725,9 @@ pub fn bank_release_ordered<R: JointGrowth + Send + Sync>(
     keep: bool,
     order: LockOrder,
 ) -> Result<(BankGeneration, Vec<BankRefinement<R>>), HnnError> {
-    release_iteration(placement, declared, alphabet, bank, grain, read, keep, order, None)
+    release_iteration(
+        placement, declared, alphabet, bank, grain, read, keep, order, None,
+    )
 }
 
 /// [measured-diagnostic; agent-inferred, October 1; the
@@ -737,7 +748,17 @@ pub fn bank_release_forced<R: JointGrowth + Send + Sync>(
     read: impl Fn(&[GaussianRat]) -> Result<R, HnnError> + Sync,
     targets: &[usize],
 ) -> Result<(BankGeneration, Vec<BankRefinement<R>>), HnnError> {
-    release_iteration(placement, declared, alphabet, bank, grain, read, true, LockOrder::Gap, Some(targets))
+    release_iteration(
+        placement,
+        declared,
+        alphabet,
+        bank,
+        grain,
+        read,
+        true,
+        LockOrder::Gap,
+        Some(targets),
+    )
 }
 
 /// The lock iteration ([`bank_release_ordered`], [`bank_release_forced`]).
@@ -810,7 +831,10 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
         refinements += 1;
-        readings += both.iter().map(|(_, alone)| 1 + usize::from(alone.is_some())).sum::<usize>();
+        readings += both
+            .iter()
+            .map(|(_, alone)| 1 + usize::from(alone.is_some()))
+            .sum::<usize>();
         let read: Vec<R> = both.into_iter().map(|(reading, _)| reading).collect();
         // Each unlocked station's lock's flip: its top candidate and its gap's enclosure, the
         // certain gap `L_top − max U` (the gap read) and its upper end `U_top − max L`.
@@ -852,8 +876,18 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
         }
         let now: Vec<usize> = match order {
             LockOrder::Gap => uncertified_largest(&gaps, &gap_uppers),
-            LockOrder::Ascending => gaps.iter().map(|&(station, _, _)| station).min().into_iter().collect(),
-            LockOrder::Descending => gaps.iter().map(|&(station, _, _)| station).max().into_iter().collect(),
+            LockOrder::Ascending => gaps
+                .iter()
+                .map(|&(station, _, _)| station)
+                .min()
+                .into_iter()
+                .collect(),
+            LockOrder::Descending => gaps
+                .iter()
+                .map(|&(station, _, _)| station)
+                .max()
+                .into_iter()
+                .collect(),
         };
         let mut taken = Vec::new();
         for &station in &now {
@@ -867,7 +901,8 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
             let certificate = if forced.is_some() {
                 Ok(None)
             } else {
-                bank.certify_turn(&amplitudes, read[index].reading(), grain).map(Some)
+                bank.certify_turn(&amplitudes, read[index].reading(), grain)
+                    .map(Some)
             };
             match certificate {
                 Ok(None) => {}
@@ -1199,7 +1234,10 @@ impl BankPlacement {
         station: usize,
         cells: &[Option<usize>],
     ) -> Vec<(u64, Rat, &'a Vec<Rat>)> {
-        assert!(station < self.stations(), "the station read is a declared station");
+        assert!(
+            station < self.stations(),
+            "the station read is a declared station"
+        );
         let mut data: Vec<(u64, Rat, &Vec<Rat>)> = self
             .reads
             .iter()
@@ -1249,7 +1287,10 @@ impl BankPlacement {
         cells: &[Option<usize>],
         mass: &[Option<usize>],
     ) -> (Vec<Rat>, Vec<Option<Rat>>) {
-        assert!(station < self.stations(), "the station read is a declared station");
+        assert!(
+            station < self.stations(),
+            "the station read is a declared station"
+        );
         if self.modulus.is_one() {
             let placed = mass.iter().filter(|cell| cell.is_some()).count() as u64;
             let nu = self.chart.value(self.population + placed);
@@ -1335,7 +1376,11 @@ impl BankPlacement {
         }
         for (placed, (cell, slope)) in cells.iter().zip(&section).enumerate() {
             if let (Some(class), Some(slope)) = (cell, slope) {
-                add(Self::station_distance(station, placed), slope, &self.images[placed][*class]);
+                add(
+                    Self::station_distance(station, placed),
+                    slope,
+                    &self.images[placed][*class],
+                );
             }
         }
         derivative
@@ -1352,7 +1397,10 @@ impl BankPlacement {
     ) -> Vec<Rat> {
         let power = |distance: u64| crate::hnn::moment::modulus_power(modulus, distance);
         let data = self.data(station, cells);
-        let mass: Rat = data.iter().map(|(distance, count, _)| power(*distance) * count).sum();
+        let mass: Rat = data
+            .iter()
+            .map(|(distance, count, _)| power(*distance) * count)
+            .sum();
         let mut storage = self.pairs.clone();
         for (distance, _, read) in data {
             let weight = power(distance) / &mass;
@@ -1379,7 +1427,9 @@ impl BankPlacement {
         let mean: Rat = data
             .iter()
             .map(|(distance, count, _)| {
-                &self.powers[*distance as usize] * count * Rat::from_integer(BigInt::from(*distance))
+                &self.powers[*distance as usize]
+                    * count
+                    * Rat::from_integer(BigInt::from(*distance))
             })
             .sum::<Rat>()
             / &mass;
@@ -1433,7 +1483,9 @@ impl BankPlacement {
         let mean: Rat = data
             .iter()
             .map(|(distance, count, _)| {
-                &self.powers[*distance as usize] * count * Rat::from_integer(BigInt::from(*distance))
+                &self.powers[*distance as usize]
+                    * count
+                    * Rat::from_integer(BigInt::from(*distance))
             })
             .sum::<Rat>()
             / &mass;
@@ -1497,7 +1549,9 @@ pub fn closed_pairs(
         });
     }
     let alphabet = field.alphabet();
-    let column = |matrix: &crate::ratio::linear::ExactRatMatrix, class: usize| -> Result<Vec<Rat>, HnnError> {
+    let column = |matrix: &crate::ratio::linear::ExactRatMatrix,
+                  class: usize|
+     -> Result<Vec<Rat>, HnnError> {
         (0..matrix.rows())
             .map(|row| Ok(matrix.get(row, class)?.clone()))
             .collect()
@@ -1521,7 +1575,8 @@ pub fn closed_pairs(
         let mut found = false;
         'pairs: for &x in &learned {
             for &y in &antecedents {
-                let slip = crate::hnn::executed::pair_slip(field, ring, port, &prior, offset, (y, x))?;
+                let slip =
+                    crate::hnn::executed::pair_slip(field, ring, port, &prior, offset, (y, x))?;
                 if slip.iter().all(Zero::is_zero) {
                     found = true;
                     break 'pairs;
@@ -1671,25 +1726,39 @@ impl DamagedSection {
     /// nothing. Located advances, even on an intact section, cannot be replaced by this square.
     /// A sparse located-clock fibre and its projection through the producing `D` remain owed.
     /// All admission runs before the fresh source section and the physical word's opening.
-    pub(crate) fn admit(&self, field: &Field, material: &dyn FieldMaterial, phases: &ReceivingPhases) -> Result<(), HnnError> {
+    pub(crate) fn admit(
+        &self,
+        field: &Field,
+        material: &dyn FieldMaterial,
+        phases: &ReceivingPhases,
+    ) -> Result<(), HnnError> {
         field.admit(&self.chart)?;
-        if self.chart.located().is_some() {
+        if self.chart.has_advances() {
             return Err(HnnError::Unadmitted {
                 reason: "the located conduct has no certified sparse station-clock chart",
             });
         }
         if self.classes() != field.alphabet()
             || !self.chart.fibre().is_empty()
-            || self.chart.decoder() != &crate::ratio::linear::ExactRatMatrix::identity(self.classes())?
-            || self.runs.iter().any(|(_, run)| run.cells().iter().any(|&cell| run.label(cell) != Some(cell.class())))
+            || self.chart.decoder()
+                != &crate::ratio::linear::ExactRatMatrix::identity(self.classes())?
+            || self.runs.iter().any(|(_, run)| {
+                run.cells()
+                    .iter()
+                    .any(|&cell| run.label(cell) != Some(cell.class()))
+            })
         {
             return Err(HnnError::Unadmitted {
                 reason: "the physical source and receiver do not share the producing identity decoder's classes",
             });
         }
         for &source in field.sources() {
-            if (0..self.classes()).any(|class| !field.ring(source).fits(field.ring(source).port(class)))
-                || (0..source).any(|ring| (0..self.classes()).any(|class| field.ring(ring).fits(field.ring(ring).port(class))))
+            if (0..self.classes())
+                .any(|class| !field.ring(source).fits(field.ring(source).port(class)))
+                || (0..source).any(|ring| {
+                    (0..self.classes())
+                        .any(|class| field.ring(ring).fits(field.ring(ring).port(class)))
+                })
             {
                 return Err(HnnError::Unadmitted {
                     reason: "the identity conduct does not certify one source tick per declared station",
@@ -1704,11 +1773,19 @@ impl DamagedSection {
                 });
             }
             for &offset in field.offsets() {
-                let pair = material.pair_port(source, offset).ok_or(HnnError::Unadmitted {
-                    reason: "the station chart has no declared physical pair port",
-                })?;
-                if pair.outputs().iter().any(|row| row.len() != field.ring(source).width())
-                    || pair.current_reads().iter().chain(pair.earlier_reads())
+                let pair = material
+                    .pair_port(source, offset)
+                    .ok_or(HnnError::Unadmitted {
+                        reason: "the station chart has no declared physical pair port",
+                    })?;
+                if pair
+                    .outputs()
+                    .iter()
+                    .any(|row| row.len() != field.ring(source).width())
+                    || pair
+                        .current_reads()
+                        .iter()
+                        .chain(pair.earlier_reads())
                         .any(|row| row.len() != self.classes())
                 {
                     return Err(HnnError::Unadmitted {
@@ -1718,7 +1795,9 @@ impl DamagedSection {
             }
         }
         let ring = phases.ring();
-        let map = material.receiving_map(ring).ok_or(HnnError::MissingReceivingMap { ring })?;
+        let map = material
+            .receiving_map(ring)
+            .ok_or(HnnError::MissingReceivingMap { ring })?;
         if map.rows() != 2 * self.classes() || map.columns() != field.ring(ring).width() {
             return Err(HnnError::Unadmitted {
                 reason: "the physical receiving map does not return the producing chart's complex classes",
@@ -1731,7 +1810,7 @@ impl DamagedSection {
 /// [definition; agent-inferred, October 5] **One station's read at its bound crossing**: the
 /// station `j`, the local crossing that reads it (`e = e_0 + j`, the receiver's phase `j`:
 /// `hnn::receiving`, "The receiver reads the passage by epochs"), the refinement clock's tick there
-/// (`opened_at + e`), and the read `R · P_R^(τ_R) v_R(e)` at the receiver's grain
+/// (`opened_at + e`), and the read `R · v_R(e)` in the passage frame at the receiver's grain
 /// ([`ReceivingPhases::read`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StationRead {
@@ -1849,8 +1928,10 @@ pub fn repair_by_field(
     opening: &WordOpening,
     phases: &ReceivingPhases,
 ) -> Result<PhysicalRepair, HnnError> {
-    physical_forward(field, material, current, section, opening, phases, true, None)
-        .map(|(prediction, _word, _source, _observation)| prediction)
+    physical_forward(
+        field, material, current, section, opening, phases, true, None,
+    )
+    .map(|(prediction, _word, _source, _observation)| prediction)
 }
 
 /// The one physical forward law, shared by a blind repair and a blind reception awaiting its
@@ -1934,7 +2015,7 @@ fn physical_forward<'f>(
                     crossing: first + station,
                     // H_j's section is provenance; all six physical anchors exist only here.
                     tick: observation.available_at,
-                    read: phases.read_observer(field, material, current, feature)?,
+                    read: phases.read_observer(field, material, feature)?,
                 })
             })
             .collect::<Result<Vec<_>, HnnError>>()?
@@ -1948,7 +2029,7 @@ fn physical_forward<'f>(
                     station,
                     crossing: first + station,
                     tick: opened_at + first + station,
-                    read: phases.read(field, material, current, anchor)?,
+                    read: phases.read(field, material, anchor)?,
                 })
             })
             .collect::<Result<Vec<_>, HnnError>>()?
@@ -2026,7 +2107,6 @@ fn physical_domain_forward(
                 Some(physical_completion_read(
                     field,
                     material,
-                    current,
                     phases,
                     word.operands(),
                     &point,
@@ -2050,7 +2130,6 @@ fn physical_domain_forward(
                         Some(physical_domain_read(
                             field,
                             material,
-                            current,
                             phases,
                             &anchor,
                             &junctions[ring].anchor,
@@ -2105,11 +2184,13 @@ fn physical_domain_forward(
 fn physical_word_is_exact(operands: &crate::hnn::propagation::Operands) -> bool {
     operands.lattice().is_none()
         && operands.rings().iter().all(|ring| ring.chart().is_none())
-        && operands.contacts().iter().all(|contact| contact.chart().is_none())
+        && operands
+            .contacts()
+            .iter()
+            .all(|contact| contact.chart().is_none())
         && operands.resonators().iter().flatten().all(|ring| {
-            (0..ring.phases()).all(|phase| {
-                ring.chart_words(phase).is_none() && ring.certificate(phase).is_zero()
-            })
+            (0..ring.phases())
+                .all(|phase| ring.chart_words(phase).is_none() && ring.certificate(phase).is_zero())
         })
 }
 
@@ -2349,7 +2430,6 @@ pub(crate) fn physical_signed_tick(
 fn physical_completion_read(
     field: &Field,
     material: &dyn FieldMaterial,
-    current: &Current,
     phases: &ReceivingPhases,
     operands: &crate::hnn::propagation::Operands,
     point: &crate::hnn::word::EndChange,
@@ -2369,20 +2449,14 @@ fn physical_completion_read(
         )
     };
     let fixed_logits = phases
-        .read(field, material, current, &anchor(&completion.fixed)?)?
+        .read(field, material, &anchor(&completion.fixed)?)?
         .logits;
     let label_logits = completion
         .labels
         .iter()
-        .map(|column| {
-            Ok(phases
-                .read(field, material, current, &anchor(column)?)?
-                .logits)
-        })
+        .map(|column| Ok(phases.read(field, material, &anchor(column)?)?.logits))
         .collect::<Result<Vec<_>, HnnError>>()?;
-    let sparse = phases
-        .read(field, material, current, &anchor(point)?)?
-        .logits;
+    let sparse = phases.read(field, material, &anchor(point)?)?.logits;
     let mut logits: Vec<_> = sparse
         .into_iter()
         .map(|value| crate::ratio::algebraic::ExactInterval {
@@ -2460,7 +2534,11 @@ pub(super) fn physical_source_pairing(
         });
     }
     if back.opening.len() != field.rings().len()
-        || back.opening.iter().zip(field.rings()).any(|(row, ring)| row.len() != ring.width())
+        || back
+            .opening
+            .iter()
+            .zip(field.rings())
+            .any(|(row, ring)| row.len() != ring.width())
         || covector.logits().len() != phases.aperture()
         || prediction.reads.len() != phases.aperture()
         || compared.len() != phases.aperture()
@@ -2469,15 +2547,23 @@ pub(super) fn physical_source_pairing(
             reason: "the source-return pairing does not share the producing section's shape",
         });
     }
-    let last_station = compared.iter().rposition(|&crossed| crossed).ok_or(HnnError::Unadmitted {
-        reason: "the source-return pairing has no compared receiving crossing",
-    })?;
+    let last_station =
+        compared
+            .iter()
+            .rposition(|&crossed| crossed)
+            .ok_or(HnnError::Unadmitted {
+                reason: "the source-return pairing has no compared receiving crossing",
+            })?;
     for (station, crossing) in phases.epochs().enumerate() {
         let actual = &prediction.reads[station];
-        let tick = opened_at.checked_add(crossing).ok_or(HnnError::Unadmitted {
-            reason: "the source-return pairing's producing clock exceeds its carrier",
-        })?;
-        if actual.station != station || actual.crossing != crossing || actual.tick != tick
+        let tick = opened_at
+            .checked_add(crossing)
+            .ok_or(HnnError::Unadmitted {
+                reason: "the source-return pairing's producing clock exceeds its carrier",
+            })?;
+        if actual.station != station
+            || actual.crossing != crossing
+            || actual.tick != tick
             || covector.logits()[station].len() != 2 * field.alphabet()
             || (!compared[station] && covector.logits()[station].iter().any(|g| !g.is_zero()))
         {
@@ -2489,9 +2575,17 @@ pub(super) fn physical_source_pairing(
     let last_crossing = phases.first_epoch() + last_station;
     let old_open = source.open_storage(field, before, current)?;
     let new_open = source.open_storage(field, after, current)?;
-    let delta: Vec<Vec<Rat>> = new_open.iter().zip(&old_open)
-        .map(|(new, old)| sub(new, old)).collect();
-    let opening: Rat = back.opening.iter().zip(&delta).map(|(g, d)| dot(g, d)).sum();
+    let delta: Vec<Vec<Rat>> = new_open
+        .iter()
+        .zip(&old_open)
+        .map(|(new, old)| sub(new, old))
+        .collect();
+    let opening: Rat = back
+        .opening
+        .iter()
+        .zip(&delta)
+        .map(|(g, d)| dot(g, d))
+        .sum();
     let source_move_squared: Rat = delta.iter().map(|row| dot(row, row)).sum();
     // This is a perturbation of the source storage only. Its zero interior is the difference of
     // two identical entered physical states, not a reset of the production reception.
@@ -2505,18 +2599,25 @@ pub(super) fn physical_source_pairing(
             let station = crossing - phases.first_epoch();
             if compared[station] {
                 let ring = phases.ring();
-                let incoming: Vec<_> = operands.incident(ring).iter()
+                let incoming: Vec<_> = operands
+                    .incident(ring)
+                    .iter()
                     .map(|&a| response.arrivals[a][operands.end_slot(a, ring)].as_slice())
                     .collect();
                 let anchor = crate::hnn::propagation::participation(
-                    operands.weights(ring), &response.storage[ring], &incoming,
+                    operands.weights(ring),
+                    &response.storage[ring],
+                    &incoming,
                 )?;
-                // Use the actual read owner: its same R, current lift and complex row chart.
-                let logits = phases.read(field, before, current, &anchor)?.logits;
+                // Use the actual read owner: its same R in the passage frame and complex row chart.
+                let logits = phases.read(field, before, &anchor)?.logits;
                 let pairing = dot(&covector.logits()[station], &logits);
                 receiving += &pairing;
                 crossings.push(PhysicalSourceCrossing {
-                    station, crossing, tick: prediction.reads[station].tick, pairing,
+                    station,
+                    crossing,
+                    tick: prediction.reads[station].tick,
+                    pairing,
                     logit_move_squared: dot(&logits, &logits),
                 });
             }
@@ -2534,11 +2635,20 @@ pub(super) fn physical_source_pairing(
         });
     }
     Ok(PhysicalSourcePairing {
-        producing_commit: before.commit(), source_lift: current.lift().to_vec(),
-        receiver: phases.ring(), opened_at, junction_steps: phases.junction_steps(),
+        producing_commit: before.commit(),
+        source_lift: current.lift().to_vec(),
+        receiver: phases.ring(),
+        opened_at,
+        junction_steps: phases.junction_steps(),
         response_ticks: last_crossing,
-        source_move_squared, crossings, receiving, opening, deposition, defect,
-        composition_defect, return_remainders: back.released.clone(),
+        source_move_squared,
+        crossings,
+        receiving,
+        opening,
+        deposition,
+        defect,
+        composition_defect,
+        return_remainders: back.released.clone(),
     })
 }
 
@@ -2599,7 +2709,13 @@ fn physical_pair_output_certificate(
     use crate::hnn::constitution::{FactorGradient, Family, Locus};
     let mut groups = std::collections::BTreeMap::<usize, Vec<_>>::new();
     for step in steps {
-        let FactorGradient::PairPort { ring, offset, outputs, .. } = &step.gradient else {
+        let FactorGradient::PairPort {
+            ring,
+            offset,
+            outputs,
+            ..
+        } = &step.gradient
+        else {
             return Err(HnnError::Unadmitted {
                 reason: "the pair-output certificate contains another factor relation",
             });
@@ -2612,21 +2728,52 @@ fn physical_pair_output_certificate(
         let mut by_phase = vec![vec![Rat::zero(); geometry.width()]; geometry.placements().len()];
         let (mut alignment, mut gain) = (Rat::zero(), Rat::zero());
         for (offset, gradient) in pairs {
-            let old = before.pair_port(ring, offset).ok_or(HnnError::MissingSourcePort { ring })?;
-            let new = after.pair_port(ring, offset).ok_or(HnnError::MissingSourcePort { ring })?;
-            alignment += gradient.iter().flatten()
-                .zip(old.outputs().iter().flatten().zip(new.outputs().iter().flatten()))
-                .map(|(g, (old, new))| g * (new - old)).sum::<Rat>();
-            let reading = publication.steps.iter().find(|(at, read)| {
-                *at == Locus::SourcePort(ring) && read.family == Family::Pair(offset)
-            }).ok_or(HnnError::Unadmitted {
-                reason: "the pair-output successor has no physical source gain reading",
-            })?;
+            let old = before
+                .pair_port(ring, offset)
+                .ok_or(HnnError::MissingSourcePort { ring })?;
+            let new = after
+                .pair_port(ring, offset)
+                .ok_or(HnnError::MissingSourcePort { ring })?;
+            alignment += gradient
+                .iter()
+                .flatten()
+                .zip(
+                    old.outputs()
+                        .iter()
+                        .flatten()
+                        .zip(new.outputs().iter().flatten()),
+                )
+                .map(|(g, (old, new))| g * (new - old))
+                .sum::<Rat>();
+            let reading = publication
+                .steps
+                .iter()
+                .find(|(at, read)| {
+                    *at == Locus::SourcePort(ring) && read.family == Family::Pair(offset)
+                })
+                .ok_or(HnnError::Unadmitted {
+                    reason: "the pair-output successor has no physical source gain reading",
+                })?;
             gain = gain.max(reading.1.gain.clone());
             if let Some(table) = source.offset_table(field, ring, offset)? {
+                // The old and new port factors are fixed across phases. Compile their exact
+                // integer charts once for this material comparison, then reuse them for each
+                // phase instead of rebuilding denominator lattices inside the loop.
+                let old_contraction = ExactPairContraction::of(old);
+                let new_contraction = ExactPairContraction::of(new);
                 for (phase, moved) in by_phase.iter_mut().enumerate() {
-                    let old = old.apply_table(&table, phase, field.alphabet(), geometry.width());
-                    let new = new.apply_table(&table, phase, field.alphabet(), geometry.width());
+                    let old = old_contraction.apply_table(
+                        &table,
+                        phase,
+                        field.alphabet(),
+                        geometry.width(),
+                    );
+                    let new = new_contraction.apply_table(
+                        &table,
+                        phase,
+                        field.alphabet(),
+                        geometry.width(),
+                    );
                     for (value, (old, new)) in moved.iter_mut().zip(old.iter().zip(new)) {
                         *value += new - old;
                     }
@@ -2635,11 +2782,21 @@ fn physical_pair_output_certificate(
         }
         let moves: Rat = by_phase.iter().flatten().map(|value| value * value).sum();
         let bound = crate::holon::deposition::root_ceiling(&(&gain * &moves));
-        sources.push(PhysicalSourceMove { ring, alignment, moves, gain, bound });
+        sources.push(PhysicalSourceMove {
+            ring,
+            alignment,
+            moves,
+            gain,
+            bound,
+        });
     }
     let one = Rat::one();
-    let joint = crate::holon::deposition::JointReading::read(&crate::ratio::rat(1, 2),
-        sources.iter().map(|source| (&one, &source.alignment, &source.bound)));
+    let joint = crate::holon::deposition::JointReading::read(
+        &crate::ratio::rat(1, 2),
+        sources
+            .iter()
+            .map(|source| (&one, &source.alignment, &source.bound)),
+    );
     if !joint.holds() {
         return Err(HnnError::Unadmitted {
             reason: "the actual carried pair-output move fails its physical joint-step certificate",
@@ -2674,7 +2831,9 @@ fn physical_opening_radius(
         if !material.transport(ring).is_one() {
             let Some((lower, upper)) =
                 physical_leaky_source_bounds(field, material, current, section, ring)?
-            else { return Ok(None) };
+            else {
+                return Ok(None);
+            };
             for coordinate in 0..field.ring(ring).width() {
                 radius.storage[ring][coordinate] = (&lower[coordinate]
                     - &point.storage[ring][coordinate])
@@ -2711,13 +2870,19 @@ fn physical_opening_radius(
         }
         let Some((pair_lower, pair_upper)) =
             physical_pair_source_bounds(field, material, current, section, ring)?
-        else { return Ok(None) };
+        else {
+            return Ok(None);
+        };
         for coordinate in 0..geometry.width() {
-            radius.storage[ring][coordinate] = (&weight * &lower[coordinate] + &pair_lower[coordinate]
+            radius.storage[ring][coordinate] = (&weight * &lower[coordinate]
+                + &pair_lower[coordinate]
                 - &point.storage[ring][coordinate])
                 .abs()
-                .max((&weight * &upper[coordinate] + &pair_upper[coordinate]
-                    - &point.storage[ring][coordinate]).abs());
+                .max(
+                    (&weight * &upper[coordinate] + &pair_upper[coordinate]
+                        - &point.storage[ring][coordinate])
+                        .abs(),
+                );
         }
     }
     Ok(Some(radius))
@@ -2751,11 +2916,18 @@ fn physical_leaky_source_bounds(
     let mut phase_population = None;
     let mut transported_mass: Option<BigInt> = None;
     for class in 0..section.classes() {
-        let support: Vec<_> = placed.iter().map(|cell| Some(cell.unwrap_or(class))).collect();
+        let support: Vec<_> = placed
+            .iter()
+            .map(|cell| Some(cell.unwrap_or(class)))
+            .collect();
         let moment = open.continued(field, current, ring, &support)?;
-        let Some(mass) = moment.transported_mass(ring)? else { return Ok(None) };
+        let Some(mass) = moment.transported_mass(ring)? else {
+            return Ok(None);
+        };
         if (section.length != 0 && mass <= BigInt::zero())
-            || transported_mass.as_ref().is_some_and(|before| before != &mass)
+            || transported_mass
+                .as_ref()
+                .is_some_and(|before| before != &mass)
         {
             return Ok(None);
         }
@@ -2770,7 +2942,10 @@ fn physical_leaky_source_bounds(
         let population = (0..geometry.placements().len())
             .map(|phase| Ok(moment.phase_counts(ring, phase)?.iter().sum::<u64>()))
             .collect::<Result<Vec<_>, HnnError>>()?;
-        if phase_population.as_ref().is_some_and(|before| before != &population) {
+        if phase_population
+            .as_ref()
+            .is_some_and(|before| before != &population)
+        {
             return Ok(None);
         }
         phase_population = Some(population);
@@ -2791,7 +2966,9 @@ fn physical_leaky_source_bounds(
     let (features_lower, features_upper) = bounds.ok_or(HnnError::Unadmitted {
         reason: "the physical source completion chart has no class",
     })?;
-    let map = material.source_port(ring).ok_or(HnnError::MissingSourcePort { ring })?;
+    let map = material
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?;
     let mut lower = vec![Rat::zero(); geometry.width()];
     let mut upper = lower.clone();
     for phase in 0..geometry.placements().len() {
@@ -2811,7 +2988,9 @@ fn physical_leaky_source_bounds(
     }
     let Some((pair_lower, pair_upper)) =
         physical_pair_source_bounds(field, material, current, section, ring)?
-    else { return Ok(None) };
+    else {
+        return Ok(None);
+    };
     for coordinate in 0..geometry.width() {
         lower[coordinate] += &pair_lower[coordinate];
         upper[coordinate] += &pair_upper[coordinate];
@@ -2826,8 +3005,11 @@ fn physical_leaky_source_bounds(
 /// widen the box. The opening radius also contains the separate actual sparse source point.
 #[allow(clippy::type_complexity)]
 fn physical_pair_source_bounds(
-    field: &Field, material: &dyn FieldMaterial, current: &Current,
-    section: &DamagedSection, ring: usize,
+    field: &Field,
+    material: &dyn FieldMaterial,
+    current: &Current,
+    section: &DamagedSection,
+    ring: usize,
 ) -> Result<Option<(Vec<Rat>, Vec<Rat>)>, HnnError> {
     let geometry = field.ring(ring);
     let a = section.classes();
@@ -2838,13 +3020,19 @@ fn physical_pair_source_bounds(
     for &offset in field.offsets() {
         let Some((feature_lower, feature_upper)) =
             open.station_pair_bounds(field, current, ring, &placed, offset)?
-        else { return Ok(None) };
-        let pair = material.pair_port(ring, offset).ok_or(HnnError::MissingSourcePort { ring })?;
+        else {
+            return Ok(None);
+        };
+        let pair = material
+            .pair_port(ring, offset)
+            .ok_or(HnnError::MissingSourcePort { ring })?;
         for phase in 0..geometry.placements().len() {
             let lift = &current.lift()[ring] - BigInt::from(phase);
-            for slot in 0..a*a {
-                if feature_upper[phase][slot].is_zero() { continue }
-                let (x, y) = (slot/a, slot%a);
+            for slot in 0..a * a {
+                if feature_upper[phase][slot].is_zero() {
+                    continue;
+                }
+                let (x, y) = (slot / a, slot % a);
                 let mut column = vec![Rat::zero(); geometry.width()];
                 for rho in 0..pair.rank() {
                     let coefficient = &pair.current_reads()[rho][x] * &pair.earlier_reads()[rho][y];
@@ -3092,19 +3280,14 @@ fn physical_tick_radius(
 fn physical_domain_read(
     field: &Field,
     material: &dyn FieldMaterial,
-    current: &Current,
     phases: &ReceivingPhases,
     anchor: &[Rat],
     radius: &[Rat],
 ) -> Result<PhysicalDomainRead, HnnError> {
-    let point = phases.read(field, material, current, anchor)?;
+    let point = phases.read(field, material, anchor)?;
     let ring = phases.ring();
-    let transported: Vec<_> = field
-        .ring(ring)
-        .rotate(radius, &current.lift()[ring])
-        .into_iter()
-        .map(|value| value.abs())
-        .collect();
+    // The read is in the passage frame, so the radius enters `R` as it stands.
+    let transported: Vec<_> = radius.iter().map(|value| value.abs()).collect();
     let radius = physical_matrix_radius(
         material
             .receiving_map(ring)
@@ -3139,7 +3322,11 @@ fn physical_domain_read(
         .filter(|(_, cell)| (&cell.carry, cell.phase) >= greatest_lower)
         .map(|(class, _)| class)
         .collect();
-    Ok(PhysicalDomainRead { logits, classes, completion: None })
+    Ok(PhysicalDomainRead {
+        logits,
+        classes,
+        completion: None,
+    })
 }
 
 /// A blind reception through the declared source-relative observer. The same physical forward
@@ -3329,8 +3516,7 @@ impl SourceObserverPrediction<'_, '_> {
                 .ok_or(HnnError::MissingReceivingMap {
                     ring: phases.ring(),
                 })?;
-            let lift = &current.lift()[phases.ring()];
-            let expected_source = view.source_covector(gradient.logits(), map, lift)?;
+            let expected_source = view.source_covector(gradient.logits(), map)?;
             let seeds = view.source_seeds(&expected_source)?;
             let (back, full) = word.pull_back_joined(seeds)?;
             // Differentiate the entire actual opening, including every arriving wave and
@@ -3361,7 +3547,7 @@ impl SourceObserverPrediction<'_, '_> {
                 .filter_map(|((feature, gradient), &crossed)| {
                     crossed.then(|| Sample {
                         weight: Rat::one(),
-                        feature: field.ring(0).rotate(feature, lift),
+                        feature: feature.clone(),
                         covector: gradient.iter().map(|x| -x).collect(),
                         masses: None,
                     })
@@ -3470,8 +3656,16 @@ fn physical_prediction<'f, 'm>(
     phases: &ReceivingPhases,
     completion_domain: bool,
 ) -> Result<PhysicalPrediction<'f, 'm>, HnnError> {
-    let (prediction, word, source, _observation) =
-        physical_forward(field, material, current, section, opening, phases, completion_domain, None)?;
+    let (prediction, word, source, _observation) = physical_forward(
+        field,
+        material,
+        current,
+        section,
+        opening,
+        phases,
+        completion_domain,
+        None,
+    )?;
     Ok(PhysicalPrediction {
         field,
         material,
@@ -3509,7 +3703,7 @@ pub struct PhysicalTeaching {
 }
 
 /// [definition; agent-inferred] The already reached receiving operands at one publication.
-/// Each sample is `f=P_R^lift v_R`, `g=q-p` from the producing Word; the existing class metric
+/// Each sample is `f=v_R` in the passage frame, `g=q-p` from the producing Word; the existing class metric
 /// scales even covector entries only. `before` and `after` include the actual map, Gram, chart,
 /// remainders and located pair. The publication separately carries eta, residual and PriorMove.
 /// Consume `(R_after-R_before)f` at this SAME feature: it includes the actual prior move.
@@ -3617,8 +3811,8 @@ impl PhysicalPrediction<'_, '_> {
     pub fn receiving_feature(&self, station: usize) -> Option<Vec<Rat>> {
         let read = self.prediction.reads.get(station)?;
         let receiver = self.phases.ring();
-        let anchor = self.word.anchor(read.crossing, receiver)?;
-        Some(self.field.ring(receiver).rotate(anchor, &self.current.lift()[receiver]))
+        // The producing read's chart is the passage frame: the anchor as it stands.
+        Some(self.word.anchor(read.crossing, receiver)?.to_vec())
     }
 
     /// Finish without an observation, dropping the transient paired return.
@@ -3660,7 +3854,13 @@ impl PhysicalPrediction<'_, '_> {
         observed: &Encoded,
         compared: &[bool],
     ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
-        self.observe_at(contemporary, observed, compared, PhysicalLearning::Receiving, true)
+        self.observe_at(
+            contemporary,
+            observed,
+            compared,
+            PhysicalLearning::Receiving,
+            true,
+        )
     }
 
     /// An observed source-port comparison through the same blind Word, with R and every internal
@@ -3673,7 +3873,7 @@ impl PhysicalPrediction<'_, '_> {
     /// laws. Their certificate reads the whole executed source-to-comparison diamond, including
     /// its element/contact growth, rather than just the stepped source locus.
     /// With these fixed exact linear operands, the consuming equation is
-    /// `delta_logits_j = R P_R^tau T_j delta_source_open(E)`. Its adjoint pairs the same difference
+    /// `delta_logits_j = R T_j delta_source_open(E)` (the passage frame). Its adjoint pairs the same difference
     /// with the returned E gradient; the source gain bounds the compared logit moves by the
     /// occupied source features' squared moves. The native fixture checks both on the physical
     /// Word. Map-carry remainders need not vanish: the existing joint-step law is evaluated on the
@@ -3714,7 +3914,13 @@ impl PhysicalPrediction<'_, '_> {
         observed: &Encoded,
         compared: &[bool],
     ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
-        self.observe_at(contemporary, observed, compared, PhysicalLearning::PairOutputs, false)
+        self.observe_at(
+            contemporary,
+            observed,
+            compared,
+            PhysicalLearning::PairOutputs,
+            false,
+        )
     }
 
     fn observe_at(
@@ -3741,6 +3947,17 @@ impl PhysicalPrediction<'_, '_> {
             prediction,
         } = self;
         let joined = (|| -> Result<_, HnnError> {
+            if read_receiving_operands
+                && learning == PhysicalLearning::Receiving
+                && matches!(
+                    material.receiving_layout(phases.ring()),
+                    Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { .. })
+                )
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "the requested physical receiving diagnostic has no joined arrival/context operand record",
+                });
+            }
             if contemporary.commit() != material.commit() {
                 return Err(HnnError::StaleDeposit {
                     staged: material.commit(),
@@ -3825,12 +4042,7 @@ impl PhysicalPrediction<'_, '_> {
             let source_return = (learning != PhysicalLearning::Receiving)
                 .then(|| (word.operands().clone(), word.opened_at()));
             let covector = ratio.covector()?;
-            let back = word.pull_back(
-                &covector,
-                map,
-                &current.lift()[phases.ring()],
-                &phases,
-            )?;
+            let back = word.pull_back(&covector, map, &phases)?;
             let composed = crate::hnn::reference::compose_return(
                 field,
                 material,
@@ -3843,7 +4055,13 @@ impl PhysicalPrediction<'_, '_> {
             let mut factors = Vec::new();
             if learning == PhysicalLearning::PairOutputs {
                 for mut step in composed.factors {
-                    if let FactorGradient::PairPort { outputs, current, earlier, .. } = &mut step.gradient {
+                    if let FactorGradient::PairPort {
+                        outputs,
+                        current,
+                        earlier,
+                        ..
+                    } = &mut step.gradient
+                    {
                         if step.energy.is_zero() || outputs.iter().flatten().all(Zero::is_zero) {
                             continue;
                         }
@@ -3902,9 +4120,13 @@ impl PhysicalPrediction<'_, '_> {
                 }
                 PhysicalLearning::PairOutputs => {}
             }
-            let reached: Vec<_> = linear.iter().map(|step| step.locus.locus())
+            let reached: Vec<_> = linear
+                .iter()
+                .map(|step| step.locus.locus())
                 .chain(factors.iter().map(|step| step.gradient.locus()))
-                .collect::<std::collections::BTreeSet<_>>().into_iter().collect();
+                .collect::<std::collections::BTreeSet<_>>()
+                .into_iter()
+                .collect();
             if reached.is_empty()
                 || reached
                     .iter()
@@ -3930,34 +4152,61 @@ impl PhysicalPrediction<'_, '_> {
             };
             let deposit =
                 Deposit::new(material.commit(), linear, factors, reached).with_reach(reach);
-            let feature_energy = deposit.linear().iter().map(|step| {
-                (step.locus.locus(), step.samples.iter().map(|sample| {
-                    &sample.weight * sample.feature.iter().map(|value| value*value).sum::<Rat>()
-                }).sum::<Rat>())
-            }).chain(deposit.factors().iter().map(|step| {
-                (step.gradient.locus(), step.energy.clone())
-            })).collect();
+            let feature_energy = deposit
+                .linear()
+                .iter()
+                .map(|step| {
+                    (
+                        step.locus.locus(),
+                        step.samples
+                            .iter()
+                            .map(|sample| {
+                                &sample.weight
+                                    * sample
+                                        .feature
+                                        .iter()
+                                        .map(|value| value * value)
+                                        .sum::<Rat>()
+                            })
+                            .sum::<Rat>(),
+                    )
+                })
+                .chain(
+                    deposit
+                        .factors()
+                        .iter()
+                        .map(|step| (step.gradient.locus(), step.energy.clone())),
+                )
+                .collect();
             let (constitution, publication) = contemporary.deposited(&deposit)?;
             // Read only already executed operands. The normal-law snapshots and samples are
             // returned to the exterior caller; none is installed in the contemporary successor.
-            let receiving_diagnostic = (read_receiving_operands && learning == PhysicalLearning::Receiving)
+            let receiving_diagnostic = (read_receiving_operands
+                && learning == PhysicalLearning::Receiving)
                 .then(|| {
-                    material.receiving_law(phases.ring())
+                    material
+                        .receiving_law(phases.ring())
                         .zip(constitution.receiving_law(phases.ring()))
                         .and_then(|(before, after)| {
-                            deposit.linear().iter()
+                            deposit
+                                .linear()
+                                .iter()
                                 .find(|step| step.locus == LinearLocus::Receiving(phases.ring()))
                                 .map(|step| PhysicalReceivingDiagnostic {
                                     producing_commit: material.commit(),
                                     receiver: phases.ring(),
                                     source_lift: current.lift().to_vec(),
-                                    crossings: prediction.reads.iter().zip(compared)
-                                        .filter_map(|(read, &crossed)| crossed.then_some(
-                                            PhysicalReceivingCrossing {
+                                    crossings: prediction
+                                        .reads
+                                        .iter()
+                                        .zip(compared)
+                                        .filter_map(|(read, &crossed)| {
+                                            crossed.then_some(PhysicalReceivingCrossing {
                                                 station: read.station,
                                                 crossing: read.crossing,
                                                 tick: read.tick,
-                                            }))
+                                            })
+                                        })
                                         .collect(),
                                     samples: step.samples.clone(),
                                     before: before.clone(),
@@ -3967,8 +4216,13 @@ impl PhysicalPrediction<'_, '_> {
                 })
                 .flatten();
             let source_certificate = if learning == PhysicalLearning::SourcePorts {
-                if !physical_source_only_change(field, material, &constitution, &publication.loci, &[])
-                    || material.released() != constitution.released()
+                if !physical_source_only_change(
+                    field,
+                    material,
+                    &constitution,
+                    &publication.loci,
+                    &[],
+                ) || material.released() != constitution.released()
                     || material.storage_product() != constitution.storage_product()
                 {
                     return Err(HnnError::Unadmitted {
@@ -4033,12 +4287,14 @@ impl PhysicalPrediction<'_, '_> {
                 }
                 Some(PhysicalSourceCertificate { sources, joint })
             } else if learning == PhysicalLearning::PairOutputs {
-                let selected: Vec<_> = deposit.factors().iter().filter_map(|step| {
-                    match &step.gradient {
+                let selected: Vec<_> = deposit
+                    .factors()
+                    .iter()
+                    .filter_map(|step| match &step.gradient {
                         FactorGradient::PairPort { ring, offset, .. } => Some((*ring, *offset)),
                         _ => None,
-                    }
-                }).collect();
+                    })
+                    .collect();
                 if !physical_source_only_change(field, material, &constitution, &[], &selected)
                     || material.released() != constitution.released()
                     || material.storage_product() != constitution.storage_product()
@@ -4047,20 +4303,39 @@ impl PhysicalPrediction<'_, '_> {
                         reason: "the physical pair-output successor changes another forward relation",
                     });
                 }
-                Some(physical_pair_output_certificate(field, material, &constitution,
-                    &source, deposit.factors(), &publication)?)
+                Some(physical_pair_output_certificate(
+                    field,
+                    material,
+                    &constitution,
+                    &source,
+                    deposit.factors(),
+                    &publication,
+                )?)
             } else {
                 None
             };
             let source_pairing = match (source_return, &source_certificate) {
                 (Some((operands, opened_at)), Some(applied)) => Some(physical_source_pairing(
-                    field, material, &constitution, &current, &phases, &source, &operands,
-                    opened_at, &prediction, &covector, &back, compared, applied,
+                    field,
+                    material,
+                    &constitution,
+                    &current,
+                    &phases,
+                    &source,
+                    &operands,
+                    opened_at,
+                    &prediction,
+                    &covector,
+                    &back,
+                    compared,
+                    applied,
                 )?),
                 (None, None) => None,
-                _ => return Err(HnnError::Unadmitted {
-                    reason: "the source publication has no producing Word for its applied pairing",
-                }),
+                _ => {
+                    return Err(HnnError::Unadmitted {
+                        reason: "the source publication has no producing Word for its applied pairing",
+                    });
+                }
             };
             Ok((
                 ratio,
@@ -4074,19 +4349,26 @@ impl PhysicalPrediction<'_, '_> {
             ))
         })();
         match joined {
-            Ok((ratio, pullback, constitution, publication, source_certificate, source_pairing, feature_energy, receiving_diagnostic)) => {
-                Ok(PhysicalTeaching {
-                    prediction,
-                    ratio,
-                    pullback,
-                    constitution,
-                    publication,
-                    source_certificate,
-                    source_pairing,
-                    feature_energy,
-                    receiving_diagnostic,
-                })
-            }
+            Ok((
+                ratio,
+                pullback,
+                constitution,
+                publication,
+                source_certificate,
+                source_pairing,
+                feature_energy,
+                receiving_diagnostic,
+            )) => Ok(PhysicalTeaching {
+                prediction,
+                ratio,
+                pullback,
+                constitution,
+                publication,
+                source_certificate,
+                source_pairing,
+                feature_energy,
+                receiving_diagnostic,
+            }),
             Err(error) => Err(PhysicalTeachingRefusal { prediction, error }),
         }
     }

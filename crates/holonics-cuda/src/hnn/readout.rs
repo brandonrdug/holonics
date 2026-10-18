@@ -7,7 +7,7 @@
 //! enclosure, the Holon ratio"). Each is the host owner's formula read on the record's coordinates:
 //!
 //! - **the faces** (`holonics::hnn::receiving::ReceivingPhases::read`, `ratio::Faces::of_reads`):
-//!   the wave's logits are the card's (`R · P_R^(τ_R) v_R(e_j)`, exact); their grain cells and
+//!   the wave's logits are the card's (`R · v_R(e_j)` in the passage frame, exact); their grain cells and
 //!   faces in `ℚ(θ)` are the host's. The landmark tree's grain logits at each phase's causal address
 //!   (the landmark tree) are read on the host from its constitution's tree at compare and added there
 //!   (`PendingRatio::against`, the host reference's own formula);
@@ -28,6 +28,7 @@
 //!   record; the host contracts it with the declared material gain family.
 
 use holonics::hnn::chart::carry;
+use holonics::hnn::constitution::ReceivingLayout;
 use holonics::hnn::port::{ElementTick, ResonatorTick, TransitTick, WordReturn};
 use holonics::hnn::propagation::TickBalance;
 use holonics::hnn::ratio::Faces;
@@ -1039,25 +1040,170 @@ pub(crate) fn crossing(plan: &WordPlan, record: &ForwardRecord) -> EndChange {
     Change::at(plan, record, plan.steps - 1).end(plan)
 }
 
+/// The executed response column's change at one recorded crossing (not the post-tick change).
+pub(crate) fn crossing_at(
+    plan: &WordPlan,
+    record: &ForwardRecord,
+    crossing: usize,
+) -> Result<EndChange, HnnError> {
+    if crossing >= plan.steps {
+        return Err(HnnError::WordEnded { ticks: plan.steps });
+    }
+    Ok(Change::at(plan, record, crossing).end(plan))
+}
+
+/// Every ring's executed junction anchor at one recorded crossing.
+pub(crate) fn crossing_anchors(
+    plan: &WordPlan,
+    record: &ForwardRecord,
+    crossing: usize,
+) -> Result<Vec<Vec<Rat>>, HnnError> {
+    if crossing >= plan.steps {
+        return Err(HnnError::WordEnded { ticks: plan.steps });
+    }
+    Ok(plan
+        .rings
+        .iter()
+        .map(|ring| {
+            slice(&record.anchors, crossing * plan.n + ring.rows, ring.width)
+                .iter()
+                .map(|value| rat(BigInt::from(*value), plan.lw))
+                .collect()
+        })
+        .collect())
+}
+
+/// The exact unsplit source opening and the executed first crossing from the response record.
+/// Source injections are the kernel's pre-split numerators at their declared opening scales;
+/// every interior coordinate and every carried state starts at zero.
+pub(crate) fn response_openings(
+    plan: &WordPlan,
+    record: &ForwardRecord,
+) -> Result<(EndChange, EndChange), HnnError> {
+    if record.source_opening.len() != plan.n || plan.steps == 0 {
+        return Err(HnnError::Unadmitted {
+            reason: "the response record contains its certified source opening and a crossing",
+        });
+    }
+    let executed = crossing_at(plan, record, 0)?;
+    let mut exact = executed.clone();
+    for (index, ring) in plan.rings.iter().enumerate() {
+        exact.storage[index] = match ring.source_open_exp {
+            Some(scale) => slice(&record.source_opening, ring.rows, ring.width)
+                .iter()
+                .map(|value| rat(BigInt::from(*value), scale))
+                .collect(),
+            None => vec![Rat::zero(); ring.width],
+        };
+    }
+    Ok((exact, executed))
+}
+
+/// The physical path's exact source injection added to its already-crossed carried interior.
+pub(crate) fn response_openings_from(
+    plan: &WordPlan,
+    record: &ForwardRecord,
+    carried_opening: &EndChange,
+) -> Result<(EndChange, EndChange), HnnError> {
+    if record.source_opening.len() != plan.n || plan.steps == 0 {
+        return Err(HnnError::Unadmitted {
+            reason: "the physical paired path retains its exact source opening and a crossing",
+        });
+    }
+    let executed = crossing_at(plan, record, 0)?;
+    let mut exact = carried_opening.clone();
+    for (index, ring) in plan.rings.iter().enumerate() {
+        let Some(scale) = ring.source_open_exp else {
+            continue;
+        };
+        let start = ring.rows;
+        let finish = start + ring.width;
+        let injection: Vec<Rat> = record.source_opening[start..finish]
+            .iter()
+            .map(|value| rat(BigInt::from(*value), scale))
+            .collect();
+        for (opened, injected) in exact.storage[index].iter_mut().zip(injection) {
+            *opened += injected;
+        }
+    }
+    Ok((exact, executed))
+}
+
 /// [definition] **The return's source on the host** (module header): per receiving epoch the
-/// receiving anchor's covector `P_R^(−τ_R) Rᵀ g_j`, split onto `2^(−L_w)ℤ` in reverse epoch order
-/// with its carried remainder; the carried reads (one row per epoch) for the card, the released
-/// remainder, and the reads the return reports.
+/// receiving anchor's covector `Rᵀ g_j` (the passage frame), normalized by the return-only seed policy and
+/// split onto the unchanged card lattice `2^(−L_w)ℤ` in reverse epoch order with its carried
+/// remainder; the card's reverse plan stays at the forward word's `L_w`.
 pub(crate) struct Source {
     pub(crate) carried: Vec<i64>,
+    /// Remainders and carried reads are in the normalized return chart. They are divided by
+    /// `precision` when read back, while the fixed forward word remains on `plan.lw`.
     pub(crate) remainder: Vec<Rat>,
+    pub(crate) reads: Vec<(Vec<Rat>, Vec<Rat>)>,
+    pub(crate) precision: holonics::hnn::chart::ReturnPrecision,
+}
+
+/// The two reverse source lanes for an explicit ArrivalContext receiving map. Each lane has an
+/// independent signed feedback stream; `reads` carries the one physical feature `[fresh, actual-fresh]`.
+pub(crate) struct PairedSource {
+    pub(crate) actual: Source,
+    pub(crate) fresh: Source,
     pub(crate) reads: Vec<(Vec<Rat>, Vec<Rat>)>,
 }
 
-/// **Form the return's source** from the ratio's covector, the receiving map's words and the
-/// receiving ring's lift at the cut.
+/// Multiply an exact rational by `2^levels`, cancelling denominator powers before allocating a
+/// shifted numerator. This is the reverse-only seed normalization; forward operands stay put.
+fn scale_pow2(value: &Rat, levels: u32) -> Result<Rat, HnnError> {
+    if levels == 0 || value.is_zero() {
+        return Ok(value.clone());
+    }
+    let shift = usize::try_from(levels).map_err(|_| HnnError::CountOverflow)?;
+    let cancel = value
+        .denom()
+        .trailing_zeros()
+        .unwrap_or(0)
+        .min(u64::from(levels));
+    let cancel = usize::try_from(cancel).map_err(|_| HnnError::CountOverflow)?;
+    let remaining = shift.checked_sub(cancel).ok_or(HnnError::CountOverflow)?;
+    let numerator = value.numer() << remaining;
+    let denominator = value.denom() >> cancel;
+    Ok(Rat::new(numerator, denominator))
+}
+
+/// Divide an exact rational by `2^levels`, cancelling numerator powers before allocating a
+/// shifted denominator. This restores the actual (un-normalized) cotangent units on readback.
+fn unscale_pow2(value: &Rat, levels: u32) -> Result<Rat, HnnError> {
+    if levels == 0 || value.is_zero() {
+        return Ok(value.clone());
+    }
+    let shift = usize::try_from(levels).map_err(|_| HnnError::CountOverflow)?;
+    let cancel = value
+        .numer()
+        .trailing_zeros()
+        .unwrap_or(0)
+        .min(u64::from(levels));
+    let cancel = usize::try_from(cancel).map_err(|_| HnnError::CountOverflow)?;
+    let remaining = shift.checked_sub(cancel).ok_or(HnnError::CountOverflow)?;
+    let numerator = value.numer() >> cancel;
+    let denominator = value.denom() << remaining;
+    Ok(Rat::new(numerator, denominator))
+}
+
+fn return_coordinate(value: i64, exponent: u32, levels: u32) -> Result<Rat, HnnError> {
+    unscale_pow2(&rat(BigInt::from(value), exponent), levels)
+}
+
+fn return_wide_coordinate(value: i128, exponent: u32, levels: u32) -> Result<Rat, HnnError> {
+    unscale_pow2(&rat(BigInt::from(value), exponent), levels)
+}
+
+/// **Form the return's source** from the ratio's covector and the receiving map's words; the read
+/// is in the passage frame, so no rotor enters.
 pub(crate) fn source(
     field: &Field,
     plan: &WordPlan,
     record: &ForwardRecord,
     covector: &RatioCovector,
     map: &DyadicMatrix,
-    lift: &BigInt,
 ) -> Result<Source, HnnError> {
     if covector.logits().len() != plan.aperture {
         return Err(HnnError::Shape {
@@ -1075,6 +1221,11 @@ pub(crate) fn source(
             .ok_or(HnnError::Realization {
                 what: "a field whose word runs on no declared lattice",
             })?;
+    if lattice.exponent() != plan.lw {
+        return Err(HnnError::Unadmitted {
+            reason: "the reverse seed and the fixed forward word must share the declared transient lattice",
+        });
+    }
     let anchors = anchors(plan, record);
     let mut images = Vec::with_capacity(plan.aperture);
     let mut reads = Vec::with_capacity(plan.aperture);
@@ -1093,13 +1244,40 @@ pub(crate) fn source(
                 Rat::new(sum, scale.clone())
             })
             .collect();
-        images.push(ring.rotate(&pulled, &-lift));
-        reads.push((ring.rotate(&anchors[j], lift), gradient.clone()));
+        images.push(pulled);
+        reads.push((anchors[j].clone(), gradient.clone()));
     }
+    // The policy is driven by the actual transported, post-map, post-rotation seed in each
+    // receiving epoch. Only this reverse source is normalized; neither WordPlan nor the already
+    // executed forward record is changed.
+    let precision = holonics::hnn::chart::ReturnPrecision::for_seeds(Some(lattice), &images)?;
+    let expected_fine = lattice
+        .exponent()
+        .checked_add(precision.levels())
+        .ok_or(HnnError::CountOverflow)?;
+    if precision.declared_lattice() != Some(lattice)
+        || precision.lattice().map(|fine| fine.exponent()) != Some(expected_fine)
+    {
+        return Err(HnnError::Unadmitted {
+            reason: "the return precision must refine this word's declared transient lattice",
+        });
+    }
+    let normalized = images
+        .iter()
+        .map(|image| {
+            image
+                .iter()
+                .map(|coordinate| scale_pow2(coordinate, precision.levels()))
+                .collect::<Result<Vec<_>, _>>()
+        })
+        .collect::<Result<Vec<_>, _>>()?;
     let mut remainder = vec![Rat::zero(); width];
     let mut carried = vec![0i64; plan.aperture * width];
     for j in (0..plan.aperture).rev() {
-        let split = carry(&lattice, &images[j], &mut remainder);
+        // Scaling the seed and splitting on the original fixed lattice is exactly the same
+        // integer read as splitting the seed on Lw+k, while keeping the reverse kernel's plan at
+        // its original Lw.
+        let split = carry(&lattice, &normalized[j], &mut remainder);
         for (i, value) in split.iter().enumerate() {
             let coordinate = value * Rat::from_integer(BigInt::from(1) << plan.lw as usize);
             carried[j * width + i] = num_traits::ToPrimitive::to_i64(&coordinate.to_integer())
@@ -1112,6 +1290,190 @@ pub(crate) fn source(
         carried,
         remainder,
         reads,
+        precision,
+    })
+}
+
+/// Form the dual seeds of a physically paired receiving map `[B_s B_c]`.
+///
+/// The actual trajectory receives `B_c^T g`; the independent zero-interior source response
+/// receives `(B_s-B_c)^T g`. Both are normalized with one ReturnPrecision selected from the union
+/// of their actual per-phase seeds, then split on their own carried remainder streams.
+pub(crate) fn paired_source(
+    field: &Field,
+    plan: &WordPlan,
+    actual_record: &ForwardRecord,
+    fresh_record: &ForwardRecord,
+    covector: &RatioCovector,
+    map: &DyadicMatrix,
+) -> Result<PairedSource, HnnError> {
+    let ReceivingLayout::ArrivalContext { source_width } = plan.receiving_layout else {
+        return Err(HnnError::Unadmitted {
+            reason: "paired source seeds require an explicitly declared ArrivalContext map",
+        });
+    };
+    let ring = field.ring(plan.receiver);
+    let width = ring.width();
+    if source_width != width || map.columns != 2 * width || covector.logits().len() != plan.aperture
+    {
+        return Err(HnnError::Shape {
+            what: "paired receiving map, source width, and comparison aperture",
+            expected: plan.aperture,
+            found: covector.logits().len(),
+        });
+    }
+    let lattice =
+        field
+            .word_lattice()
+            .map(|word| word.transient())
+            .ok_or(HnnError::Realization {
+                what: "a field whose word runs on no declared lattice",
+            })?;
+    if lattice.exponent() != plan.lw {
+        return Err(HnnError::Unadmitted {
+            reason: "the reverse seed and the fixed forward word must share the declared transient lattice",
+        });
+    }
+
+    let anchors_at = |record: &ForwardRecord, phase: usize| -> Result<Vec<Rat>, HnnError> {
+        let step = plan
+            .first_epoch
+            .checked_add(phase)
+            .ok_or(HnnError::CountOverflow)?;
+        let from = step
+            .checked_mul(plan.n)
+            .and_then(|base| base.checked_add(plan.rings[plan.receiver].rows))
+            .ok_or(HnnError::CountOverflow)?;
+        Ok(slice(&record.anchors, from, width)
+            .iter()
+            .map(|x| rat(BigInt::from(*x), plan.lw))
+            .collect())
+    };
+    let mut actual_images = Vec::with_capacity(plan.aperture);
+    let mut fresh_images = Vec::with_capacity(plan.aperture);
+    let mut actual_reads = Vec::with_capacity(plan.aperture);
+    let mut fresh_reads = Vec::with_capacity(plan.aperture);
+    let mut paired_reads = Vec::with_capacity(plan.aperture);
+    for (phase, gradient) in covector.logits().iter().enumerate() {
+        if gradient.len() != map.rows {
+            return Err(HnnError::Shape {
+                what: "paired receiving logits against the physical map rows",
+                expected: map.rows,
+                found: gradient.len(),
+            });
+        }
+        let (actual_anchor, fresh_anchor) = (
+            anchors_at(actual_record, phase)?,
+            anchors_at(fresh_record, phase)?,
+        );
+        let context: Vec<Rat> = actual_anchor
+            .iter()
+            .zip(&fresh_anchor)
+            .map(|(actual, fresh)| actual - fresh)
+            .collect();
+        let mut physical_feature = fresh_anchor.clone();
+        physical_feature.extend(context);
+
+        let (numerators, denominator) = integral(gradient);
+        let scale: BigInt = &denominator * (BigInt::from(1) << map.exponent as usize);
+        let pulled: Vec<Rat> = (0..map.columns)
+            .map(|column| {
+                let sum: BigInt = (0..map.rows)
+                    .filter(|&row| !numerators[row].is_zero())
+                    .map(|row| {
+                        BigInt::from(map.words[row * map.columns + column]) * &numerators[row]
+                    })
+                    .sum();
+                Rat::new(sum, scale.clone())
+            })
+            .collect();
+        let actual_seed = pulled[width..].to_vec();
+        let fresh_seed: Vec<Rat> = pulled[..width]
+            .iter()
+            .zip(&pulled[width..])
+            .map(|(source, context)| source - context)
+            .collect();
+
+        actual_images.push(actual_seed);
+        fresh_images.push(fresh_seed);
+        actual_reads.push((actual_anchor, gradient.clone()));
+        fresh_reads.push((fresh_anchor, gradient.clone()));
+        paired_reads.push((physical_feature, gradient.clone()));
+    }
+    let mut seed_groups = actual_images.clone();
+    seed_groups.extend(fresh_images.clone());
+    let precision = holonics::hnn::chart::ReturnPrecision::for_seeds(Some(lattice), &seed_groups)?;
+    let expected_fine = lattice
+        .exponent()
+        .checked_add(precision.levels())
+        .ok_or(HnnError::CountOverflow)?;
+    if precision.declared_lattice() != Some(lattice)
+        || precision.lattice().map(|fine| fine.exponent()) != Some(expected_fine)
+    {
+        return Err(HnnError::Unadmitted {
+            reason: "paired reverse lanes share a refinement of the fixed forward transient lattice",
+        });
+    }
+    let actual = source_from_images(field, plan, actual_images, actual_reads, precision.clone())?;
+    let fresh = source_from_images(field, plan, fresh_images, fresh_reads, precision)?;
+    Ok(PairedSource {
+        actual,
+        fresh,
+        reads: paired_reads,
+    })
+}
+
+fn source_from_images(
+    field: &Field,
+    plan: &WordPlan,
+    images: Vec<Vec<Rat>>,
+    reads: Vec<(Vec<Rat>, Vec<Rat>)>,
+    precision: holonics::hnn::chart::ReturnPrecision,
+) -> Result<Source, HnnError> {
+    let width = field.ring(plan.receiver).width();
+    if images.len() != plan.aperture
+        || reads.len() != plan.aperture
+        || images.iter().any(|image| image.len() != width)
+    {
+        return Err(HnnError::Shape {
+            what: "one paired reverse image and read per receiving phase",
+            expected: plan.aperture,
+            found: images.len(),
+        });
+    }
+    let lattice =
+        field
+            .word_lattice()
+            .map(|word| word.transient())
+            .ok_or(HnnError::Realization {
+                what: "a field whose word runs on no declared lattice",
+            })?;
+    let normalized = images
+        .iter()
+        .map(|image| {
+            image
+                .iter()
+                .map(|coordinate| scale_pow2(coordinate, precision.levels()))
+                .collect::<Result<Vec<_>, _>>()
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut remainder = vec![Rat::zero(); width];
+    let mut carried = vec![0i64; plan.aperture * width];
+    for phase in (0..plan.aperture).rev() {
+        let split = carry(&lattice, &normalized[phase], &mut remainder);
+        for (coordinate, value) in split.iter().enumerate() {
+            let value = value * Rat::from_integer(BigInt::from(1) << plan.lw as usize);
+            carried[phase * width + coordinate] =
+                num_traits::ToPrimitive::to_i64(&value.to_integer()).ok_or(HnnError::Carrier {
+                    what: "a paired receiving covector past the signed 64-bit word",
+                })?;
+        }
+    }
+    Ok(Source {
+        carried,
+        remainder,
+        reads,
+        precision,
     })
 }
 
@@ -1123,9 +1485,10 @@ pub(crate) fn word_return(
     record: &ForwardRecord,
     reverse: &ReverseRecord,
     source: Source,
-) -> WordReturn {
+) -> Result<WordReturn, HnnError> {
     let _ = loci;
     let (n, k, lc, lw, steps) = (plan.n, plan.k, plan.lc, plan.lw, plan.steps);
+    let levels = source.precision.levels();
     let full = steps.saturating_sub(1);
     let opening = plan
         .rings
@@ -1133,19 +1496,19 @@ pub(crate) fn word_return(
         .map(|ring| {
             slice(&reverse.opening, ring.rows, ring.width)
                 .iter()
-                .map(|v| rat(BigInt::from(*v), lw))
-                .collect()
+                .map(|v| return_coordinate(*v, lw, levels))
+                .collect::<Result<Vec<_>, _>>()
         })
-        .collect();
+        .collect::<Result<Vec<_>, _>>()?;
     let elements = plan
         .rings
         .iter()
-        .map(|ring| {
+        .map(|ring| -> Result<Vec<ElementTick>, HnnError> {
             let sx = lc + ring.contrast.unwrap_or(0) + lw + 1;
             (0..full)
-                .map(|t| {
+                .map(|t| -> Result<ElementTick, HnnError> {
                     let at = t * n + ring.rows;
-                    ElementTick {
+                    Ok(ElementTick {
                         tick: t,
                         midpoint: slice(&record.mid, at, ring.width)
                             .iter()
@@ -1153,25 +1516,25 @@ pub(crate) fn word_return(
                             .collect(),
                         adjoint: slice(&reverse.adjoint, at, ring.width)
                             .iter()
-                            .map(|u| rat(BigInt::from(*u), lw))
-                            .collect(),
+                            .map(|u| return_coordinate(*u, lw, levels))
+                            .collect::<Result<Vec<_>, _>>()?,
                         contrast: slice(&record.anchors, at, ring.width)
                             .iter()
                             .zip(slice(&record.storage, at, ring.width))
                             .map(|(v, s)| rat(BigInt::from(*v) - BigInt::from(*s), lw))
                             .collect(),
-                    }
+                    })
                 })
-                .collect()
+                .collect::<Result<Vec<_>, _>>()
         })
-        .collect();
+        .collect::<Result<Vec<_>, _>>()?;
     let transits = plan
         .contacts
         .iter()
-        .map(|contact| {
+        .map(|contact| -> Result<Vec<TransitTick>, HnnError> {
             let so = lw + contact.gain_exp;
             (0..full)
-                .map(|t| {
+                .map(|t| -> Result<TransitTick, HnnError> {
                     let at = t * k + contact.rows;
                     let at_lw = |values: &[i64]| -> Vec<Rat> {
                         slice(values, at, contact.width)
@@ -1179,71 +1542,76 @@ pub(crate) fn word_return(
                             .map(|v| rat(BigInt::from(*v), lw))
                             .collect()
                     };
-                    TransitTick {
+                    Ok(TransitTick {
                         tick: t,
-                        solved: at_lw(&reverse.solved),
+                        solved: slice(&reverse.solved, at, contact.width)
+                            .iter()
+                            .map(|v| return_coordinate(*v, lw, levels))
+                            .collect::<Result<Vec<_>, _>>()?,
                         displacement: at_lw(&record.u),
                         rate: at_lw(&record.w),
                         midpoint: slice(&record.omega, at, contact.width)
                             .iter()
                             .map(|o| rat(BigInt::from(*o), so))
                             .collect(),
-                    }
+                    })
                 })
-                .collect()
+                .collect::<Result<Vec<_>, _>>()
         })
-        .collect();
+        .collect::<Result<Vec<_>, _>>()?;
     // The loaded rings' own receiving stage shares the field row layout. Keep the public return
     // chronological even though the kernel computes its adjoint in reverse tick order.
     let resonators = plan
         .rings
         .iter()
         .enumerate()
-        .map(|(ring_index, _ring)| {
-            let Some(resonator) = plan.resonators.iter().find(|r| r.ring == ring_index) else {
-                return Vec::new();
-            };
-            (0..full)
-                .map(|t| {
-                    let at = t * n + resonator.rows;
-                    let values = |words: &[i64]| {
-                        slice(words, at, resonator.width)
+        .map(
+            |(ring_index, _ring)| -> Result<Vec<ResonatorTick>, HnnError> {
+                let Some(resonator) = plan.resonators.iter().find(|r| r.ring == ring_index) else {
+                    return Ok(Vec::new());
+                };
+                (0..full)
+                    .map(|t| -> Result<ResonatorTick, HnnError> {
+                        let at = t * n + resonator.rows;
+                        let values = |words: &[i64]| {
+                            slice(words, at, resonator.width)
+                                .iter()
+                                .map(|v| rat(BigInt::from(*v), lw))
+                                .collect()
+                        };
+                        let drive: Vec<Rat> = values(&record.resonator_drive);
+                        let rate: Vec<Rat> = values(&record.resonator_rate);
+                        let output = drive
                             .iter()
-                            .map(|v| rat(BigInt::from(*v), lw))
-                            .collect()
-                    };
-                    let drive: Vec<Rat> = values(&record.resonator_drive);
-                    let rate: Vec<Rat> = values(&record.resonator_rate);
-                    let output = drive
-                        .iter()
-                        .zip(&rate)
-                        .map(|(drive, rate)| {
-                            drive
-                                - Rat::new(
-                                    BigInt::from(resonator.return_gain) * rate.numer(),
-                                    rate.denom()
-                                        * (BigInt::from(1u8) << resonator.return_exp as usize),
-                                )
+                            .zip(&rate)
+                            .map(|(drive, rate)| {
+                                drive
+                                    - Rat::new(
+                                        BigInt::from(resonator.return_gain) * rate.numer(),
+                                        rate.denom()
+                                            * (BigInt::from(1u8) << resonator.return_exp as usize),
+                                    )
+                            })
+                            .collect();
+                        Ok(ResonatorTick {
+                            ring: ring_index,
+                            tick: t,
+                            phase: phase_at(plan, resonator.phases, t),
+                            drive,
+                            displacement: values(&record.resonator_u),
+                            velocity: values(&record.resonator_w),
+                            rate,
+                            solved: slice(&reverse.resonator_solved, at, resonator.width)
+                                .iter()
+                                .map(|v| return_wide_coordinate(*v, lw, levels))
+                                .collect::<Result<Vec<_>, _>>()?,
+                            output,
                         })
-                        .collect();
-                    ResonatorTick {
-                        ring: ring_index,
-                        tick: t,
-                        phase: phase_at(plan, resonator.phases, t),
-                        drive,
-                        displacement: values(&record.resonator_u),
-                        velocity: values(&record.resonator_w),
-                        rate,
-                        solved: slice(&reverse.resonator_solved, at, resonator.width)
-                            .iter()
-                            .map(|v| rat(BigInt::from(*v), lw))
-                            .collect(),
-                        output,
-                    }
-                })
-                .collect()
-        })
-        .collect();
+                    })
+                    .collect::<Result<Vec<_>, _>>()
+            },
+        )
+        .collect::<Result<Vec<_>, _>>()?;
     // The conductance covector: the transits' parts, then the junctions' (each divided by its
     // ring's admittance sum).
     let contacts = plan.contacts.len();
@@ -1271,16 +1639,24 @@ pub(crate) fn word_return(
             x += 1;
         }
     }
+    for value in &mut conductance {
+        *value = unscale_pow2(value, levels)?;
+    }
     // The return's remainders, released at the open.
-    let mut remainders: Vec<Rat> = source.remainder.clone();
+    let mut remainders: Vec<Rat> = source
+        .remainder
+        .iter()
+        .map(|value| unscale_pow2(value, levels))
+        .collect::<Result<_, _>>()?;
     for ring in &plan.rings {
         for i in 0..ring.width {
             let e = ring.rows + i;
-            remainders.push(rat(BigInt::from(reverse.rem_el[e]), lc + lw));
-            remainders.push(rat(
-                BigInt::from(reverse.rem_storage[e]),
+            remainders.push(return_wide_coordinate(reverse.rem_el[e], lc + lw, levels)?);
+            remainders.push(return_wide_coordinate(
+                reverse.rem_storage[e],
                 lc + ring.anchor_exp,
-            ));
+                levels,
+            )?);
         }
     }
     let (_, h_shift, _, _) = plan.hop();
@@ -1289,18 +1665,35 @@ pub(crate) fn word_return(
         let sk = contact.stiffness_exp.unwrap_or(0);
         for i in 0..contact.width {
             let q = contact.rows + i;
-            remainders.push(rat(BigInt::from(reverse.rem_zeta[q]), contact.zeta_exp));
-            remainders.push(rat(BigInt::from(reverse.rem_solved[q]), lc + lw));
-            remainders.push(rat(BigInt::from(reverse.rem_rate[q]), sc + lw));
-            remainders.push(rat(BigInt::from(reverse.rem_disp[q]), sk + lw + h_shift));
+            remainders.push(return_wide_coordinate(
+                reverse.rem_zeta[q],
+                contact.zeta_exp,
+                levels,
+            )?);
+            remainders.push(return_wide_coordinate(
+                reverse.rem_solved[q],
+                lc + lw,
+                levels,
+            )?);
+            remainders.push(return_wide_coordinate(
+                reverse.rem_rate[q],
+                sc + lw,
+                levels,
+            )?);
+            remainders.push(return_wide_coordinate(
+                reverse.rem_disp[q],
+                sk + lw + h_shift,
+                levels,
+            )?);
         }
         for (end, ring) in [contact.ends.0, contact.ends.1].into_iter().enumerate() {
             let target = &plan.rings[ring];
             for i in 0..target.width {
-                remainders.push(rat(
-                    BigInt::from(reverse.rem_arrival[contact.arrival[end] + i]),
+                remainders.push(return_wide_coordinate(
+                    reverse.rem_arrival[contact.arrival[end] + i],
                     lc + target.anchor_exp,
-                ));
+                    levels,
+                )?);
             }
         }
     }
@@ -1309,27 +1702,31 @@ pub(crate) fn word_return(
     for resonator in &plan.resonators {
         for i in 0..resonator.width {
             let row = resonator.rows + i;
-            remainders.push(rat(
-                BigInt::from(reverse.resonator_remainders[0][row]),
+            remainders.push(return_wide_coordinate(
+                reverse.resonator_remainders[0][row],
                 lw + resonator.return_exp,
-            ));
-            remainders.push(rat(
-                BigInt::from(reverse.resonator_remainders[1][row]),
+                levels,
+            )?);
+            remainders.push(return_wide_coordinate(
+                reverse.resonator_remainders[1][row],
                 lw + resonator.chart_exp,
-            ));
+                levels,
+            )?);
             // ē = s̄ + h r̄ is an exact dyadic sum on Lw.
             remainders.push(Rat::zero());
-            remainders.push(rat(
-                BigInt::from(reverse.resonator_remainders[2][row]),
+            remainders.push(return_wide_coordinate(
+                reverse.resonator_remainders[2][row],
                 lw + resonator.force_exp,
-            ));
-            remainders.push(rat(
-                BigInt::from(reverse.resonator_remainders[3][row]),
+                levels,
+            )?);
+            remainders.push(return_wide_coordinate(
+                reverse.resonator_remainders[3][row],
                 lw + resonator.material_exp,
-            ));
+                levels,
+            )?);
         }
     }
-    WordReturn {
+    Ok(WordReturn {
         opening,
         elements,
         transits,
@@ -1337,5 +1734,70 @@ pub(crate) fn word_return(
         conductance,
         reads: source.reads,
         released: Remainders::of(&remainders),
+        precision: source.precision,
+        response_defect: None,
+    })
+}
+
+#[cfg(test)]
+mod return_precision_tests {
+    use super::{scale_pow2, unscale_pow2};
+    use holonics::hnn::chart::{ReturnPrecision, carry};
+    use holonics::hnn::constitution::Lattice;
+    use holonics::ratio::Rat;
+    use num_bigint::BigInt;
+    use num_traits::{One, Zero};
+
+    fn dyadic(numerator: i64, exponent: u32) -> Rat {
+        Rat::new(BigInt::from(numerator), BigInt::one() << exponent as usize)
+    }
+
+    #[test]
+    fn reverse_normalized_source_split_matches_host_for_tiny_mixed_groups() {
+        let declared = Lattice::new(14);
+        let seeds = vec![
+            vec![dyadic(1, 24), dyadic(-3, 21), dyadic(1, 17)],
+            vec![dyadic(1, 22), dyadic(7, 23), dyadic(-5, 18)],
+            vec![dyadic(3, 23), dyadic(-1, 29), dyadic(1, 28)],
+        ];
+        let precision = ReturnPrecision::for_seeds(Some(declared), &seeds).unwrap();
+        assert_eq!(precision.levels(), 22);
+        let fine = precision.lattice().unwrap();
+        let mut host_remainder = vec![Rat::zero(); 3];
+        let mut cuda_chart_remainder = vec![Rat::zero(); 3];
+        let base_scale = Rat::from_integer(BigInt::one() << declared.exponent() as usize);
+        let fine_scale = Rat::from_integer(BigInt::one() << fine.exponent() as usize);
+
+        // The return consumes receiving epochs in reverse chronological order, carrying the
+        // exact residual between them. Host uses Lw+k; CUDA keeps the fixed Lw kernel and scales
+        // only this R^Tg source by 2^k. The integer words read by the kernel must agree exactly.
+        for seed in seeds.iter().rev() {
+            let host = carry(&fine, seed, &mut host_remainder);
+            let normalized = seed
+                .iter()
+                .map(|value| scale_pow2(value, precision.levels()).unwrap())
+                .collect::<Vec<_>>();
+            let cuda = carry(&declared, &normalized, &mut cuda_chart_remainder);
+            assert_eq!(cuda.len(), host.len());
+            for (cuda_value, host_value) in cuda.iter().zip(&host) {
+                assert_eq!(cuda_value * &base_scale, host_value * &fine_scale);
+            }
+            for (cuda_rem, host_rem) in cuda_chart_remainder.iter().zip(&host_remainder) {
+                assert_eq!(
+                    unscale_pow2(cuda_rem, precision.levels()).unwrap(),
+                    *host_rem
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn reverse_output_units_roundtrip_without_touching_zero_or_forward_values() {
+        let exact = Rat::new(BigInt::from(-21), BigInt::from(40));
+        for levels in [0, 1, 7, 22] {
+            let normalized = scale_pow2(&exact, levels).unwrap();
+            assert_eq!(unscale_pow2(&normalized, levels).unwrap(), exact);
+            assert_eq!(scale_pow2(&Rat::zero(), levels).unwrap(), Rat::zero());
+        }
     }
 }

@@ -403,15 +403,16 @@ impl LocatedTransport {
         labels: Vec<Option<usize>>,
     ) -> Result<Self, CompressionError> {
         let mut seen = vec![false; advances.len()];
-        if labels.len() as u64 != helix.cells() || advances.iter().any(|&a| a >= helix.period())
-        {
+        if labels.len() as u64 != helix.cells() || advances.iter().any(|&a| a >= helix.period()) {
             return Err(helix_refusal(
                 "a located transport reads every receiving cell and steps in ℤ/D",
             ));
         }
         for &class in labels.iter().flatten() {
             if class >= advances.len() || std::mem::replace(&mut seen[class], true) {
-                return Err(helix_refusal("the located labels are injective onto the classes"));
+                return Err(helix_refusal(
+                    "the located labels are injective onto the classes",
+                ));
             }
         }
         Ok(Self {
@@ -467,8 +468,14 @@ impl LocatedTransport {
         let cells = self.labels.len();
         Self {
             helix: self.helix.clone(),
-            advances: self.advances.iter().map(|&a| (period - a) % period).collect(),
-            labels: (0..cells).map(|c| self.labels[(cells - c) % cells]).collect(),
+            advances: self
+                .advances
+                .iter()
+                .map(|&a| (period - a) % period)
+                .collect(),
+            labels: (0..cells)
+                .map(|c| self.labels[(cells - c) % cells])
+                .collect(),
         }
     }
 
@@ -603,11 +610,7 @@ impl LocatedTransport {
             .flatten()
             .map(|&class| {
                 let a = usize::try_from(self.advances[class]).expect("an advance fits");
-                ExactRatMatrix::new(
-                    (0..n)
-                        .map(|row| unit((row + n - a) % n))
-                        .collect(),
-                )
+                ExactRatMatrix::new((0..n).map(|row| unit((row + n - a) % n)).collect())
             })
             .collect::<Result<Vec<_>, _>>()?;
         let coupling = (0..self.helix.cells())
@@ -789,9 +792,13 @@ impl TransportLocation {
             }
             let (class, starts) = emissions[k + 1];
             let previous = (!starts).then_some(emissions[k].0);
-            location.successors(&survivor, previous, class, |child| stack.push((k + 1, child)));
+            location.successors(&survivor, previous, class, |child| {
+                stack.push((k + 1, child))
+            });
         }
-        location.survivors.sort_by(|a, b| (&a.advances, &a.labels).cmp(&(&b.advances, &b.labels)));
+        location
+            .survivors
+            .sort_by(|a, b| (&a.advances, &a.labels).cmp(&(&b.advances, &b.labels)));
         Ok(location)
     }
 
@@ -847,8 +854,11 @@ impl TransportLocation {
                     None => (0..period).collect(),
                 };
                 for a in candidates {
-                    let mut moved: Vec<u64> =
-                        parent.lifts.iter().map(|&lift| (lift + a) % period).collect();
+                    let mut moved: Vec<u64> = parent
+                        .lifts
+                        .iter()
+                        .map(|&lift| (lift + a) % period)
+                        .collect();
                     moved.sort_unstable();
                     let mut advances = parent.advances.clone();
                     advances[previous] = Some(a);
@@ -890,8 +900,17 @@ impl TransportLocation {
 
     /// A survivor's ordering key in the classes' first-occurrence order: each advance (`D` unread),
     /// then each cell's label as its class's first-occurrence rank (`|A|` unread).
-    fn ordering(&self, advances: &[Option<u64>], labels: &[Option<usize>]) -> (Vec<u64>, Vec<usize>) {
-        let rank = |class: usize| self.order.iter().position(|&c| c == class).unwrap_or(self.classes);
+    fn ordering(
+        &self,
+        advances: &[Option<u64>],
+        labels: &[Option<usize>],
+    ) -> (Vec<u64>, Vec<usize>) {
+        let rank = |class: usize| {
+            self.order
+                .iter()
+                .position(|&c| c == class)
+                .unwrap_or(self.classes)
+        };
         (
             self.order
                 .iter()
@@ -918,8 +937,9 @@ impl TransportLocation {
             .iter()
             .map(|a| a.map(|a| (period - a) % period))
             .collect();
-        let reflected_labels: Vec<Option<usize>> =
-            (0..cells).map(|c| survivor.labels[(cells - c) % cells]).collect();
+        let reflected_labels: Vec<Option<usize>> = (0..cells)
+            .map(|c| survivor.labels[(cells - c) % cells])
+            .collect();
         if self.ordering(&reflected_advances, &reflected_labels)
             < self.ordering(&survivor.advances, &survivor.labels)
         {
@@ -953,7 +973,10 @@ impl TransportLocation {
             .filter_map(|(advances, labels)| {
                 LocatedTransport::new(
                     self.helix.clone(),
-                    advances.into_iter().map(|a| a.expect("every advance read")).collect(),
+                    advances
+                        .into_iter()
+                        .map(|a| a.expect("every advance read"))
+                        .collect(),
                     labels,
                 )
                 .ok()
@@ -1001,7 +1024,10 @@ pub fn gauge_representative(
     let (advances, labels) = location.representative(&survivor);
     LocatedTransport {
         helix: transport.helix.clone(),
-        advances: advances.into_iter().map(|a| a.expect("every advance read")).collect(),
+        advances: advances
+            .into_iter()
+            .map(|a| a.expect("every advance read"))
+            .collect(),
         labels,
     }
 }
@@ -1053,7 +1079,10 @@ fn label_unrank(mut rank: usize, m: usize) -> Vec<Option<usize>> {
         rank /= m - c;
     }
     let mut left: Vec<usize> = (0..m).collect();
-    digits.into_iter().map(|digit| Some(left.remove(digit))).collect()
+    digits
+        .into_iter()
+        .map(|digit| Some(left.remove(digit)))
+        .collect()
 }
 
 fn factorial(m: usize) -> usize {
@@ -1085,7 +1114,11 @@ impl CodeWidths {
     }
 }
 
-fn shape_refusal(passages: &[Vec<usize>], classes: usize, cells: u64) -> Result<(), CompressionError> {
+fn shape_refusal(
+    passages: &[Vec<usize>],
+    classes: usize,
+    cells: u64,
+) -> Result<(), CompressionError> {
     if classes as u64 != cells || classes > LABEL_CEILING || classes < 2 {
         return Err(helix_refusal(
             "the navigator's code ranks a bijection of at least two classes within the label ceiling",
@@ -1152,7 +1185,10 @@ pub fn read_residual(
     let classes = advances.len();
     let total: usize = lengths.iter().sum();
     let widths = CodeWidths::of(helix, classes, total);
-    let labels = label_unrank(read_index(code, widths.labels, factorial(classes))?, classes);
+    let labels = label_unrank(
+        read_index(code, widths.labels, factorial(classes))?,
+        classes,
+    );
     let period = usize::try_from(helix.period()).expect("a period fits");
     let keys = lengths
         .iter()
@@ -1219,7 +1255,13 @@ pub fn located_code(
                 .expect("a helix has a lift")
         })
         .collect();
-    code.extend(residual_code(helix, &located.advances, &located.labels, &keys, passages)?);
+    code.extend(residual_code(
+        helix,
+        &located.advances,
+        &located.labels,
+        &keys,
+        passages,
+    )?);
     Ok(code)
 }
 
@@ -1475,10 +1517,13 @@ impl FibreRestriction {
 }
 
 fn first_held(releases: &[CellRelease]) -> Option<(usize, Vec<usize>)> {
-    releases.iter().enumerate().find_map(|(t, release)| match release {
-        CellRelease::Held(family) => Some((t, family.clone())),
-        _ => None,
-    })
+    releases
+        .iter()
+        .enumerate()
+        .find_map(|(t, release)| match release {
+            CellRelease::Held(family) => Some((t, family.clone())),
+            _ => None,
+        })
 }
 
 /// **The repair's residual** (module header): while a cell is held, the truth's index in the first

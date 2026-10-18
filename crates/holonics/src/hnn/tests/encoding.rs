@@ -30,7 +30,10 @@ use crate::receiver::population::Closure;
 /// block Hankel matrix `[y_(i+j)]` over `blocks` block rows and columns, `y_t` the one-hot of cell
 /// `t` over `classes` classes (the cells hold at least `2 blocks − 1` ticks).
 fn hankel_rank(cells: &[usize], classes: usize, blocks: usize) -> usize {
-    assert!(cells.len() + 1 >= 2 * blocks, "the emission fills the Hankel matrix");
+    assert!(
+        cells.len() + 1 >= 2 * blocks,
+        "the emission fills the Hankel matrix"
+    );
     let rows = (0..blocks)
         .flat_map(|i| {
             (0..classes).map(move |class| {
@@ -66,7 +69,11 @@ fn reads_the_emission(chart: &PassageChart, encoding: &Encoding, cells: &[usize]
     let mut founded = encoding.encode(&state).unwrap();
     let u = encoding.transport(0).unwrap();
     for (t, &cell) in cells.iter().enumerate() {
-        assert_eq!(encoding.encode(&state).unwrap(), founded, "E Tᵗ = Uᵗ E at tick {t}");
+        assert_eq!(
+            encoding.encode(&state).unwrap(),
+            founded,
+            "E Tᵗ = Uᵗ E at tick {t}"
+        );
         assert_eq!(
             encoding.readout().apply(&founded).unwrap(),
             one_hot(classes, cell),
@@ -204,8 +211,14 @@ fn the_rotor_crib_founds_its_hankel_rank_on_the_reached_orbit() {
         .flat_map(|draw| std::iter::repeat_n(draw, 4));
     for (ring, configurations) in draws {
         let chart_states = 5 * 7usize.pow(u32::from(ring == 1)) * [5usize, 7][ring];
-        let crib = RotorCrib::draw(&field, ring, &configurations, 2 * chart_states + 2, &mut draw)
-            .unwrap();
+        let crib = RotorCrib::draw(
+            &field,
+            ring,
+            &configurations,
+            2 * chart_states + 2,
+            &mut draw,
+        )
+        .unwrap();
         let chart = PassageChart::crib(
             &field,
             ring,
@@ -245,15 +258,25 @@ fn the_moment_chart_runs_the_reduced_recurrence_of_the_source_moment() {
     assert_eq!(squares.transports, 3);
     assert_eq!(encoding.dimension(), chart.chart());
     let mut draw = Draw::new(5);
-    let cells: Vec<usize> = (0..200).map(|_| draw.below(super::support::classes(&field))).collect();
+    let cells: Vec<usize> = (0..200)
+        .map(|_| draw.below(super::support::classes(&field)))
+        .collect();
     let mut current = Current::at_rest(&field);
     let mut moment = SourceMoment::open(&field, &current);
     let mut state = vec![Rat::zero(); chart.chart()];
     let mut driven = Vec::new();
     for &cell in &cells {
         let mut probe = current.clone();
-        let ticks = usize::try_from(probe.step(&field, &encoded(&field, &[cell]), 0).unwrap().ticks[0]).unwrap();
-        moment.ingest(&field, &mut current, &encoded(&field, &[cell])).unwrap();
+        let ticks = usize::try_from(
+            probe
+                .step(&field, &encoded(&field, &[cell]), 0)
+                .unwrap()
+                .ticks[0],
+        )
+        .unwrap();
+        moment
+            .ingest(&field, &mut current, &encoded(&field, &[cell]))
+            .unwrap();
         assert_eq!(current.lift(), probe.lift());
         state = chart.transports()[ticks].apply(&state).unwrap();
         for (entry, injected) in state.iter_mut().zip(&chart.injection()[cell]) {
@@ -288,7 +311,13 @@ fn a_reading_that_does_not_factor_returns_its_separator() {
     let fibre = encoding.fibre().unwrap();
     assert_eq!(encoding.reached() - encoding.dimension(), fibre.len());
     for direction in &fibre {
-        assert!(encoding.encode(direction).unwrap().iter().all(Zero::is_zero));
+        assert!(
+            encoding
+                .encode(direction)
+                .unwrap()
+                .iter()
+                .all(Zero::is_zero)
+        );
     }
     assert!(encoding.separator(&chart.coupling()[2]).unwrap().is_none());
     // Node 1's cell 2: the reached orbit carries it, and the founded readings may merge it.
@@ -297,7 +326,13 @@ fn a_reading_that_does_not_factor_returns_its_separator() {
     match encoding.separator(&indicator).unwrap() {
         Some(direction) => {
             assert!(!dot(&indicator, &direction).is_zero());
-            assert!(encoding.encode(&direction).unwrap().iter().all(Zero::is_zero));
+            assert!(
+                encoding
+                    .encode(&direction)
+                    .unwrap()
+                    .iter()
+                    .all(Zero::is_zero)
+            );
         }
         None => assert!(fibre.iter().all(|v| dot(&indicator, v).is_zero())),
     }

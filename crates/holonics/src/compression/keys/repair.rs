@@ -157,10 +157,12 @@ impl DamagedPassage {
         let mut cells: Vec<Option<usize>> = encoded.classes_read().map(Some).collect();
         for &position in erased {
             let length = cells.len();
-            *cells.get_mut(position).ok_or(CompressionError::IndexOutside {
-                index: position,
-                population: length,
-            })? = None;
+            *cells
+                .get_mut(position)
+                .ok_or(CompressionError::IndexOutside {
+                    index: position,
+                    population: length,
+                })? = None;
         }
         Self::new(cells, encoded.classes(), opening)
     }
@@ -458,8 +460,9 @@ pub(super) fn decide(
         WithinTolerance::Release,
         BeyondTolerance::Hold,
     );
-    let law =
-        |refusal: crate::receiver::face::WidthRefusal| CompressionError::ReleaseLaw(refusal.to_string());
+    let law = |refusal: crate::receiver::face::WidthRefusal| {
+        CompressionError::ReleaseLaw(refusal.to_string())
+    };
     let (diameter, attaining, read) = if certified && family.len() == 1 {
         (Rat::zero(), WidthWitness::Point, 1)
     } else {
@@ -487,10 +490,13 @@ pub(super) fn decide(
 
 /// The first held cell of a release, with its family.
 fn first_held(releases: &[CellRelease]) -> Option<(usize, &[usize])> {
-    releases.iter().enumerate().find_map(|(t, release)| match release {
-        CellRelease::Held(family) => Some((t, family.as_slice())),
-        _ => None,
-    })
+    releases
+        .iter()
+        .enumerate()
+        .find_map(|(t, release)| match release {
+            CellRelease::Held(family) => Some((t, family.as_slice())),
+            _ => None,
+        })
 }
 
 /// **The key's code** (module header): `δ − 1` in `⌈log₂(d − 1)⌉` bits, then each class's
@@ -504,7 +510,11 @@ pub fn key_code(relation: &PairRelation, period: usize) -> Result<Vec<bool>, Com
     }
     let classes = relation.classes();
     let mut code = Vec::new();
-    write_index(&mut code, relation.offset - 1, ceil_log2(&BigUint::from(period - 1)));
+    write_index(
+        &mut code,
+        relation.offset - 1,
+        ceil_log2(&BigUint::from(period - 1)),
+    );
     let width = ceil_log2(&BigUint::from(classes + 1));
     for image in &relation.map {
         write_index(&mut code, image.unwrap_or(classes), width);
@@ -551,7 +561,11 @@ pub fn residual_code(
         let releases = restrict(&current, relation)?.release()?;
         let Some((t, family)) = first_held(&releases) else {
             let reopened: Vec<Option<usize>> = releases.iter().map(CellRelease::class).collect();
-            if reopened.iter().zip(truth).any(|(class, truth)| *class != Some(*truth)) {
+            if reopened
+                .iter()
+                .zip(truth)
+                .any(|(class, truth)| *class != Some(*truth))
+            {
                 return Err(CompressionError::NotRegenerated {
                     length: truth.len(),
                 });
@@ -584,7 +598,11 @@ pub fn reopen(
                 .map(|release| release.class().expect("no cell is held"))
                 .collect());
         };
-        let index = read_index(residual, ceil_log2(&BigUint::from(family.len())), family.len())?;
+        let index = read_index(
+            residual,
+            ceil_log2(&BigUint::from(family.len())),
+            family.len(),
+        )?;
         current = current.pinned(t, family[index]);
     }
 }

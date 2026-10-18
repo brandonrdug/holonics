@@ -175,18 +175,18 @@ pub mod moment;
 pub mod paired;
 pub mod pending;
 pub mod phase_family;
+pub mod physical;
 pub mod port;
 pub mod prediction;
-pub mod physical;
 pub mod propagation;
 pub mod ratio;
 pub(crate) mod realization;
 pub mod receiving;
 pub mod reference;
 pub mod retention;
-pub(crate) mod state_text;
 pub mod ring;
 pub mod section_lock;
+pub(crate) mod state_text;
 pub mod wave;
 pub mod word;
 
@@ -201,8 +201,8 @@ pub use contact::{
 
 pub use encoding::{Encoded, Encoding, EncodingError, PassageChart, PortCell};
 pub use field::{
-    ConstitutionRead, Contact, FieldMaterial, ContactDeclaration, Current, Field, FieldDeclaration, Ring,
-    RingDeclaration,
+    ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration, FieldMaterial,
+    Ring, RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
 pub use moment::{Capacity, PairPort, SourceMoment};
@@ -248,6 +248,35 @@ use crate::receiver::face::WidthRefusal;
 pub enum HnnError {
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
+    /// A solved receiver-chart carrier refused an exact integer conversion. This is kept
+    /// separate from `Linear(ExtentOverflow)`, whose uses are physical matrix dimensions, so a
+    /// diagnostic run can identify chart solving without changing any arithmetic.
+    #[error(
+        "receiver chart extent overflow at {site} (rule lattice {rule_lattice_exponent:?}, prior scale {prior_scale:?}, old chart exponent {old_chart_exponent:?}, requested chart exponent {requested_chart_exponent:?}, Gram exponent {gram_exponent:?}, support width {support_width:?})"
+    )]
+    ChartExtentOverflow {
+        site: &'static str,
+        rule_lattice_exponent: Option<u32>,
+        prior_scale: Option<u32>,
+        old_chart_exponent: Option<u32>,
+        requested_chart_exponent: Option<u32>,
+        gram_exponent: Option<u32>,
+        support_width: Option<usize>,
+    },
+    /// The residual certificate's common dyadic shift would no longer fit the i128 carrier.
+    #[error(
+        "receiver chart residual shift {chart_exponent} + {gram_exponent} = {required_shift} exceeds i128 limit {limit} (rule lattice {rule_lattice_exponent}, prior scale {prior_scale}, old chart exponent {old_chart_exponent}, support width {support_width})"
+    )]
+    ChartResidualShiftOverflow {
+        rule_lattice_exponent: u32,
+        prior_scale: u32,
+        old_chart_exponent: u32,
+        chart_exponent: u32,
+        gram_exponent: u32,
+        support_width: usize,
+        required_shift: u32,
+        limit: u32,
+    },
     #[error(transparent)]
     Holon(#[from] HolonError),
     #[error(transparent)]
@@ -335,6 +364,19 @@ pub enum HnnError {
     /// THE_MACHINE guard 9: an encoded passage this field does not read.
     #[error("the encoded passage does not enter this field: {reason}")]
     Unadmitted { reason: &'static str },
+    /// The full demand ladder overlaps. The staged handle is discarded: the same candidate
+    /// cannot be resolved again because no precision-refinement owner exists.
+    #[error(
+        "finite comparison unresolved after {attempts} candidate reads; next halving {next_halving}, unchanged={unchanged}, smallest step={smallest_step:?}: {reason}"
+    )]
+    ComparisonUnresolved {
+        attempts: u32,
+        next_halving: u32,
+        unchanged: bool,
+        reason: &'static str,
+        smallest_step: Option<Rat>,
+        trials: Vec<reference::ComparisonTrialReading>,
+    },
     /// The encoding's refusal at a consuming call (its squares on the stepped lift). Boxed: the
     /// encoding's refusals are wide.
     #[error(transparent)]

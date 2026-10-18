@@ -640,7 +640,11 @@ impl WorldModel {
                 *out += &format!("direction {}\n", row(direction));
             }
         };
-        let mut out = format!("world-model v1\ntick {}\nkeys {}\n", self.tick, self.states.len());
+        let mut out = format!(
+            "world-model v1\ntick {}\nkeys {}\n",
+            self.tick,
+            self.states.len()
+        );
         for state in &self.states {
             match state {
                 KeyState::Live(f) => {
@@ -717,7 +721,8 @@ impl WorldModel {
                     }
                     directions.push(values(line.strip_prefix("direction").ok_or_else(refuse)?)?);
                 }
-                if point.len() != key.extent() || directions.iter().any(|d| d.len() != key.extent()) {
+                if point.len() != key.extent() || directions.iter().any(|d| d.len() != key.extent())
+                {
                     return Err(refuse());
                 }
                 Ok(StateFibre { point, directions })
@@ -726,8 +731,10 @@ impl WorldModel {
                 KeyState::Live(read_fibre(&mut lines)?)
             } else if let Some(rest) = head.strip_prefix("held ") {
                 let mut parts = rest.split_whitespace();
-                let certified_tick: u64 =
-                    parts.next().and_then(|t| t.parse().ok()).ok_or_else(refuse)?;
+                let certified_tick: u64 = parts
+                    .next()
+                    .and_then(|t| t.parse().ok())
+                    .ok_or_else(refuse)?;
                 let reason = match parts.next() {
                     Some("charts") => HeldReason::Charts,
                     Some("arithmetic") => HeldReason::Arithmetic,
@@ -1030,7 +1037,16 @@ impl WorldModel {
         compared: &[bool],
         observer: &mut crate::hnn::word::action::PassageObserver<'_>,
     ) -> Result<KeyPassage<'w>, HnnError> {
-        self.coupled_at(model, start, self.tick, word, source_ring, phases, compared, observer)
+        self.coupled_at(
+            model,
+            start,
+            self.tick,
+            word,
+            source_ring,
+            phases,
+            compared,
+            observer,
+        )
     }
 
     /// The coupled passage from model state `start` at model clock `tick` (as

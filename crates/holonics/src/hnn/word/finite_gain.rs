@@ -32,14 +32,20 @@ fn norm_squared(matrix: &ExactRatMatrix) -> Rat {
 /// With q=omega/Y=X(h e/Y-h^2 K U+2C W), its output is
 /// (e-2q,U+q,-W+2q). All three ports/states and phase-dependent K are kept.
 /// This map is fixed over this consumer's contact-only material ray.
-fn loaded_block(inverse: &ExactRatMatrix, capacity: &ExactRatMatrix,
-    stiffness: &ExactRatMatrix, h: &Rat, y: &Rat) -> Result<ExactRatMatrix, HnnError>
-{
+fn loaded_block(
+    inverse: &ExactRatMatrix,
+    capacity: &ExactRatMatrix,
+    stiffness: &ExactRatMatrix,
+    h: &Rat,
+    y: &Rat,
+) -> Result<ExactRatMatrix, HnnError> {
     let n = inverse.rows();
     let extent = n.checked_mul(3).ok_or(HnnError::CountOverflow)?;
-    let right = [inverse.scaled(&(h / y)),
+    let right = [
+        inverse.scaled(&(h / y)),
         inverse.multiply(stiffness)?.scaled(&(-square(h))),
-        inverse.multiply(capacity)?.scaled(&integer(2))];
+        inverse.multiply(capacity)?.scaled(&integer(2)),
+    ];
     let correction = [-integer(2), Rat::one(), integer(2)];
     let diagonal = [Rat::one(), Rat::one(), -Rat::one()];
     let mut rows = vec![vec![Rat::zero(); extent]; extent];
@@ -47,8 +53,10 @@ fn loaded_block(inverse: &ExactRatMatrix, capacity: &ExactRatMatrix,
         for b in 0..3 {
             for i in 0..n {
                 for j in 0..n {
-                    rows[a*n+i][b*n+j] = &correction[a] * right[b].get(i,j)?;
-                    if a == b && i == j { rows[a*n+i][b*n+j] += &diagonal[a]; }
+                    rows[a * n + i][b * n + j] = &correction[a] * right[b].get(i, j)?;
+                    if a == b && i == j {
+                        rows[a * n + i][b * n + j] += &diagonal[a];
+                    }
                 }
             }
         }
@@ -205,13 +213,24 @@ impl FiniteContactSpans {
                     + square(&h2) * square(y) * norm_squared(resonator.stiffness(phase))
                     + integer(4) * square(y) * &capacity;
                 // [e,u/(hY),w/Y] -> [e,u/(hY),-w/Y] + [-2,1,2] omega/Y.
-                let triangle = integer(2) * (Rat::one() + &decoder * norm_squared(&inverse) * right);
-                let schur = norm_squared(&loaded_block(&inverse, resonator.material().forms().0,
-                    resonator.stiffness(phase), operands.step(), y)?);
+                let triangle =
+                    integer(2) * (Rat::one() + &decoder * norm_squared(&inverse) * right);
+                let schur = norm_squared(&loaded_block(
+                    &inverse,
+                    resonator.material().forms().0,
+                    resonator.stiffness(phase),
+                    operands.step(),
+                    y,
+                )?);
                 let selected = triangle.clone().min(schur.clone());
                 phases.push(selected.clone());
-                loaded_phase_bounds.push(LoadedPhaseBound { ring: g, phase,
-                    triangle, schur, selected });
+                loaded_phase_bounds.push(LoadedPhaseBound {
+                    ring: g,
+                    phase,
+                    triangle,
+                    schur,
+                    selected,
+                });
             }
             loaded_by_ring.push(Some(phases));
         }
@@ -325,27 +344,39 @@ impl LoadedSpanReading {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial,
-        ResonatorOperands, ResonatorRemainders};
+    use crate::hnn::ring::{
+        PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands, ResonatorRemainders,
+    };
     use crate::holon::parametron::Carrier;
     use crate::ratio::rat;
 
     #[test]
     fn the_full_loaded_block_matches_actual_ticks_at_nonunit_wave_scales_and_all_phases() {
-        let capacity = ExactRatMatrix::new(vec![vec![integer(2), Rat::one()],
-            vec![Rat::one(), integer(2)]]).unwrap();
-        let stiffness = ExactRatMatrix::new(vec![vec![integer(3), Rat::zero()],
-            vec![Rat::zero(), integer(5)]]).unwrap();
-        let material = ResonatorMaterial::new(capacity.clone(), stiffness,
+        let capacity = ExactRatMatrix::new(vec![
+            vec![integer(2), Rat::one()],
+            vec![Rat::one(), integer(2)],
+        ])
+        .unwrap();
+        let stiffness = ExactRatMatrix::new(vec![
+            vec![integer(3), Rat::zero()],
+            vec![Rat::zero(), integer(5)],
+        ])
+        .unwrap();
+        let material = ResonatorMaterial::new(
+            capacity.clone(),
+            stiffness,
             ExactRatMatrix::identity(2).unwrap().scaled(&rat(1, 8)),
-            Some(PumpDeclaration::new(rat(1, 16), Carrier::at(&rat(1, 2)), PumpStep::Half).unwrap()),
-        ).unwrap();
+            Some(
+                PumpDeclaration::new(rat(1, 16), Carrier::at(&rat(1, 2)), PumpStep::Half).unwrap(),
+            ),
+        )
+        .unwrap();
         let h = rat(1, 2);
         let y = integer(3);
         let law = ResonatorOperands::at_cut(0, &material, &y, &h, None).unwrap();
         let mut strict_improvement = false;
         // Visit the same actual phase at two absolute clocks, not a phase-zero idealization.
-        for tick in 0..2*law.phases() {
+        for tick in 0..2 * law.phases() {
             let phase = law.phase_at(tick);
             let mut inverse = vec![vec![Rat::zero(); 2]; 2];
             for j in 0..2 {
@@ -358,32 +389,63 @@ mod tests {
             let inverse = ExactRatMatrix::shaped(2, 2, inverse).unwrap();
             let block = loaded_block(&inverse, &capacity, law.stiffness(phase), &h, &y).unwrap();
             let schur = norm_squared(&block);
-            let triangle = integer(2) * (Rat::one() + integer(9)/square(&y)
-                * norm_squared(&inverse) * (square(&h) + square(&square(&h))*square(&y)
-                    * norm_squared(law.stiffness(phase)) + integer(4)*square(&y)*norm_squared(&capacity)));
+            let triangle = integer(2)
+                * (Rat::one()
+                    + integer(9) / square(&y)
+                        * norm_squared(&inverse)
+                        * (square(&h)
+                            + square(&square(&h))
+                                * square(&y)
+                                * norm_squared(law.stiffness(phase))
+                            + integer(4) * square(&y) * norm_squared(&capacity)));
             let selected = triangle.clone().min(schur.clone());
             strict_improvement |= selected < triangle;
-            let mut inputs: Vec<Vec<Rat>> = (0..6).map(|j| {
-                let mut v = vec![Rat::zero(); 6]; v[j] = Rat::one(); v
-            }).collect();
-            inputs.push(vec![rat(2, 3), rat(-3, 5), rat(4, 7), rat(5, 11), rat(-6, 13), rat(7, 17)]);
+            let mut inputs: Vec<Vec<Rat>> = (0..6)
+                .map(|j| {
+                    let mut v = vec![Rat::zero(); 6];
+                    v[j] = Rat::one();
+                    v
+                })
+                .collect();
+            inputs.push(vec![
+                rat(2, 3),
+                rat(-3, 5),
+                rat(4, 7),
+                rat(5, 11),
+                rat(-6, 13),
+                rat(7, 17),
+            ]);
             for v in inputs {
-                let u: Vec<_> = v[2..4].iter().map(|x| &h*&y*x).collect();
-                let w: Vec<_> = v[4..6].iter().map(|x| &y*x).collect();
+                let u: Vec<_> = v[2..4].iter().map(|x| &h * &y * x).collect();
+                let w: Vec<_> = v[4..6].iter().map(|x| &y * x).collect();
                 // Independent actual native drive/loaded step, including full returned wave.
-                let actual = law.step(tick, &v[..2], [&u, &w],
-                    &ResonatorRemainders::default(), None).unwrap();
+                let actual = law
+                    .step(
+                        tick,
+                        &v[..2],
+                        [&u, &w],
+                        &ResonatorRemainders::default(),
+                        None,
+                    )
+                    .unwrap();
                 assert!(actual.closes());
-                let normalized: Vec<_> = actual.output.iter().cloned()
-                    .chain(actual.state[0].iter().map(|x| x/(&h*&y)))
-                    .chain(actual.state[1].iter().map(|x| x/&y)).collect();
+                let normalized: Vec<_> = actual
+                    .output
+                    .iter()
+                    .cloned()
+                    .chain(actual.state[0].iter().map(|x| x / (&h * &y)))
+                    .chain(actual.state[1].iter().map(|x| x / &y))
+                    .collect();
                 assert_eq!(block.apply(&v).unwrap(), normalized);
                 let input: Rat = v.iter().map(square).sum();
                 let output: Rat = normalized.iter().map(square).sum();
-                assert!(output <= &selected*&input);
+                assert!(output <= &selected * &input);
                 assert!(selected <= triangle && selected <= schur);
             }
         }
-        assert!(strict_improvement, "preserving actual matrix cancellations can sharpen the valid fallback");
+        assert!(
+            strict_improvement,
+            "preserving actual matrix cancellations can sharpen the valid fallback"
+        );
     }
 }

@@ -11,11 +11,11 @@
 //! [`Current`]: crate::hnn::Current
 //! [`RingDeclaration`]: crate::hnn::RingDeclaration
 
-use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::field::{Current, Field};
 use crate::hnn::moment::{SourceMoment, capacity};
+use crate::hnn::tests::support::encoded;
 use crate::ratio::{Rat, rat};
 use crate::receiver::face::GrainCell;
 
@@ -105,7 +105,7 @@ use crate::hnn::constitution::{
 };
 use crate::hnn::field::ConstitutionRead;
 use crate::hnn::port::{Deposit, ExecutionPort};
-use crate::hnn::reference::{Reference};
+use crate::hnn::reference::Reference;
 use crate::ratio::linear::ExactRatMatrix;
 use num_traits::{One, Zero};
 

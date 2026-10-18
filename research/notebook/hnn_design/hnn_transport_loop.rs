@@ -108,7 +108,10 @@ fn residue_code(helix: &CarryHelix, passages: &[Vec<usize>]) -> usize {
             let lengths: Vec<usize> = passages.iter().map(Vec::len).collect();
             let read = read_residual(helix, &advances, &mut code.iter().copied(), &lengths)
                 .expect("the residue code reads back");
-            assert_eq!(read, passages, "the residue chart's code reopens its passages");
+            assert_eq!(
+                read, passages,
+                "the residue chart's code reopens its passages"
+            );
             code.len()
         })
         .min()
@@ -138,7 +141,9 @@ pub(super) fn transport(seed: u64, read_keys: usize, length: usize, out: &str, l
     let mut draw = Draw::new(seed);
     let terrain = SteppedTerrain::draw(helix.clone(), &mut draw);
     let mut left: Vec<u64> = (0..helix.period()).collect();
-    let order: Vec<u64> = (0..period).map(|_| left.remove(draw.below(left.len()))).collect();
+    let order: Vec<u64> = (0..period)
+        .map(|_| left.remove(draw.below(left.len())))
+        .collect();
     assert!(read_keys <= period, "at most every key is read");
     let (read, held_out) = order.split_at(read_keys);
     let passages: Vec<Vec<usize>> = read.iter().map(|&k| terrain.passage(k, length)).collect();
@@ -156,7 +161,12 @@ pub(super) fn transport(seed: u64, read_keys: usize, length: usize, out: &str, l
     let locate_ms = locate.elapsed().as_millis();
     let fibre = location.fibre();
     let members = location.members();
-    let peak = location.curve().iter().map(|c| c.survivors).max().unwrap_or(0);
+    let peak = location
+        .curve()
+        .iter()
+        .map(|c| c.survivors)
+        .max()
+        .unwrap_or(0);
     let nodes: u64 = location.curve().iter().map(|c| c.survivors).sum();
     let mut curve = String::from("observation\tsurvivors\tlifts\tcomplete\n");
     for (k, count) in location.curve().iter().enumerate() {
@@ -189,7 +199,9 @@ pub(super) fn transport(seed: u64, read_keys: usize, length: usize, out: &str, l
     let gauged = LocatedTransport::new(
         helix.clone(),
         truth.advances().to_vec(),
-        (0..CLASSES).map(|c| truth.labels()[(c + turn) % CLASSES]).collect(),
+        (0..CLASSES)
+            .map(|c| truth.labels()[(c + turn) % CLASSES])
+            .collect(),
     )
     .expect("the gauged truth");
     let representative = gauge_representative(&location, &gauged);
@@ -210,12 +222,18 @@ pub(super) fn transport(seed: u64, read_keys: usize, length: usize, out: &str, l
             member.labels()
         );
     }
-    let regenerates = members
-        .iter()
-        .all(|member| passages.iter().all(|passage| !member.keys(passage).is_empty()));
+    let regenerates = members.iter().all(|member| {
+        passages
+            .iter()
+            .all(|passage| !member.keys(passage).is_empty())
+    });
     println!("  every member regenerates every passage from some key: {regenerates}");
     if locate_only {
-        println!("executed transport (location only): {} ms; resident {}", clock.elapsed().as_millis(), resident());
+        println!(
+            "executed transport (location only): {} ms; resident {}",
+            clock.elapsed().as_millis(),
+            resident()
+        );
         return;
     }
 
@@ -223,7 +241,11 @@ pub(super) fn transport(seed: u64, read_keys: usize, length: usize, out: &str, l
     let relabel = Instant::now();
     let Some(located) = members.first().cloned() else {
         println!("  no member: the relabelling, founding, code and repair are not read");
-        println!("executed transport: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+        println!(
+            "executed transport: {} ms; resident {}",
+            clock.elapsed().as_millis(),
+            resident()
+        );
         return;
     };
     let length_bits = located_code(&located, &passages).expect("the code").len();
@@ -238,7 +260,8 @@ pub(super) fn transport(seed: u64, read_keys: usize, length: usize, out: &str, l
             .iter()
             .map(|p| p.iter().map(|&u| pi[u]).collect())
             .collect();
-        let moved = TransportLocation::locate(helix.clone(), CLASSES, &relabelled).expect("location");
+        let moved =
+            TransportLocation::locate(helix.clone(), CLASSES, &relabelled).expect("location");
         let moved_members = moved.members();
         let carry = |member: &LocatedTransport| {
             let mut advances = vec![0; CLASSES];
@@ -248,7 +271,11 @@ pub(super) fn transport(seed: u64, read_keys: usize, length: usize, out: &str, l
             LocatedTransport::new(
                 helix.clone(),
                 advances,
-                member.labels().iter().map(|label| label.map(|u| pi[u])).collect(),
+                member
+                    .labels()
+                    .iter()
+                    .map(|label| label.map(|u| pi[u]))
+                    .collect(),
             )
             .expect("a carried member")
         };
@@ -260,10 +287,16 @@ pub(super) fn transport(seed: u64, read_keys: usize, length: usize, out: &str, l
         if moved.located_from() == location.located_from() {
             n_star_equal += 1;
         }
-        if located_code(&carry(&located), &relabelled).expect("the code").len() == length_bits {
+        if located_code(&carry(&located), &relabelled)
+            .expect("the code")
+            .len()
+            == length_bits
+        {
             code_equal += 1;
         }
-        *residue_lengths.entry(residue_code(&helix, &relabelled)).or_default() += 1;
+        *residue_lengths
+            .entry(residue_code(&helix, &relabelled))
+            .or_default() += 1;
     }
     println!(
         "  relabel: {} ms; of {} permutations, fibre carried {carried_all}, n* equal {n_star_equal}, located code length equal {code_equal} ({length_bits} bits); the residue chart's code lengths (bits: permutations) {residue_lengths:?}",
@@ -282,16 +315,13 @@ pub(super) fn transport(seed: u64, read_keys: usize, length: usize, out: &str, l
         .expect("the passage chart");
     let encoding = Encoding::found(&chart).expect("the founding");
     let squares = encoding.squares(&chart).expect("the squares");
-    let generated = located
-        .advances()
-        .iter()
-        .fold(helix.period(), |g, &a| {
-            let (mut x, mut y) = (g, a);
-            while y != 0 {
-                (x, y) = (y, x % y);
-            }
-            x
-        });
+    let generated = located.advances().iter().fold(helix.period(), |g, &a| {
+        let (mut x, mut y) = (g, a);
+        while y != 0 {
+            (x, y) = (y, x % y);
+        }
+        x
+    });
     println!(
         "  found: {} ms; chart {chart_n}, reached {}, founded dimension {}; squares held on {} states × {} transports; gcd of the advances with D {generated}",
         found.elapsed().as_millis(),
@@ -374,9 +404,17 @@ pub(super) fn transport(seed: u64, read_keys: usize, length: usize, out: &str, l
         "  repair: {} ms; {} passages from {} keys; erased {erased_total}: released {released} (equal to the truth {correct}), held {held} (families by size {families:?}); members kept {kept_members}, refused {refused_members}; residual {residual_bits} bits against the literal {}; reopened {reopened_all} of {}",
         repair.elapsed().as_millis(),
         repair_keys.len(),
-        if held_out.is_empty() { "the read" } else { "the held-out" },
+        if held_out.is_empty() {
+            "the read"
+        } else {
+            "the held-out"
+        },
         3 * erased_total,
         repair_keys.len()
     );
-    println!("executed transport: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+    println!(
+        "executed transport: {} ms; resident {}",
+        clock.elapsed().as_millis(),
+        resident()
+    );
 }

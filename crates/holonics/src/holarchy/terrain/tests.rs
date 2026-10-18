@@ -24,7 +24,11 @@ use crate::ratio::{Rat, rat};
 fn a_cyclic_source_orbit_covers_each_station_without_changing_its_law() {
     let classes = 4;
     let length = 4;
-    for law in [CyclicLaw::OrderTwo { opening: 2 }, CyclicLaw::Alternation, CyclicLaw::Line] {
+    for law in [
+        CyclicLaw::OrderTwo { opening: 2 },
+        CyclicLaw::Alternation,
+        CyclicLaw::Line,
+    ] {
         let truth = KnownTruth::cyclic_class_orbit(law, classes, 20261006001, length).unwrap();
         assert_eq!(truth.classes(), classes);
         assert_eq!(truth.passages().len(), classes);
@@ -37,7 +41,7 @@ fn a_cyclic_source_orbit_covers_each_station_without_changing_its_law() {
             match law {
                 CyclicLaw::OrderTwo { opening } => {
                     for t in opening..length {
-                        assert_eq!(passage[t], (passage[t-2]+1)%classes);
+                        assert_eq!(passage[t], (passage[t - 2] + 1) % classes);
                     }
                 }
                 CyclicLaw::Alternation => {
@@ -45,16 +49,19 @@ fn a_cyclic_source_orbit_covers_each_station_without_changing_its_law() {
                     assert_eq!(passage[3], passage[1]);
                 }
                 CyclicLaw::Line => {
-                    let step = (passage[1]+classes-passage[0])%classes;
+                    let step = (passage[1] + classes - passage[0]) % classes;
                     for t in 0..length {
-                        assert_eq!(passage[t], (passage[0]+step*t)%classes);
+                        assert_eq!(passage[t], (passage[0] + step * t) % classes);
                     }
                 }
             }
         }
     }
     assert!(KnownTruth::cyclic_class_orbit(CyclicLaw::Alternation, 0, 1, length).is_err());
-    assert!(KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo { opening: 1 }, classes, 1, length).is_err());
+    assert!(
+        KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo { opening: 1 }, classes, 1, length)
+            .is_err()
+    );
 }
 
 /// The step is `⌊2^64/φ⌋`: `γ² + γ·2^64 ≤ 2^128 < (γ + 1)² + (γ + 1)·2^64` (`φ⁻¹` is the root of
@@ -243,7 +250,13 @@ fn the_unclosed_tree_is_refused_and_its_closure_splits_the_short_leaf() {
     assert!(tree.is_shift_closed());
     assert_eq!(
         tree.leaves(),
-        vec![vec![0, 0], vec![0, 1, 0], vec![0, 1, 1], vec![1, 0], vec![1, 1]]
+        vec![
+            vec![0, 0],
+            vec![0, 1, 0],
+            vec![0, 1, 1],
+            vec![1, 0],
+            vec![1, 1]
+        ]
     );
     let source = TreeSource::new(tree, 2, vec![vec![1, 1]; 5], vec![0, 0, 0]).unwrap();
     let stationary = source.truth().unwrap().stationary;

@@ -30,8 +30,8 @@
 //! [`9078f103`](https://github.com/brandonrdug/holonics/blob/9078f103/research/notebook/hnn_design/hnn_executed_loop.rs).
 
 use super::*;
-use holonics::hnn::constitution::ContinuingState;
 use holonics::hnn::Encoded;
+use holonics::hnn::constitution::ContinuingState;
 use holonics::holarchy::terrain::{CyclicLaw, KnownTruth};
 use num_bigint::{BigInt, BigUint};
 use num_traits::One;
@@ -50,7 +50,12 @@ pub(super) fn cell(interval: &ExactInterval, grain: i64) -> String {
 /// draws in the same order): `order2`, `x_t = x_(t−2) + 1 (mod 4)` after the request's drawn cells;
 /// `alternation`, two drawn classes alternating, `x_t = x_(t−2)`; `line`, a drawn start and step,
 /// `x_t = x_0 + s t (mod 4)`; each passage a request and its stations.
-pub(super) fn terrain_truth(terrain: &str, declared: &Declared, seed: u64, count: usize) -> KnownTruth {
+pub(super) fn terrain_truth(
+    terrain: &str,
+    declared: &Declared,
+    seed: u64,
+    count: usize,
+) -> KnownTruth {
     let symbols = declared.alphabet - 1;
     let (n, m) = (declared.request, declared.stations);
     let law = match terrain {
@@ -115,9 +120,11 @@ pub(super) fn mount(opening: &Constitution, path: &str) -> Constitution {
     let text = std::fs::read_to_string(path).expect("read the state");
     let state = ContinuingState::from_text(&text)
         .unwrap_or_else(|error| panic!("{path}: not a complete continuing state ({error})"));
-    opening.clone().continued(&state).expect("the state continues the declared opening")
+    opening
+        .clone()
+        .continued(&state)
+        .expect("the state continues the declared opening")
 }
-
 
 /// **The founded opening**: the declared constitution with the source ring's transport founded off the lossless boundary
 /// (`Constitution::founded_transport`).
@@ -146,7 +153,11 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
     let pairs = terrain_pairs(terrain, &declared, seed, count);
     let requests: Vec<Encoded> = terrain_encoded(terrain, &declared, &engine.field, seed, count)
         .into_iter()
-        .map(|passage| passage.part(0..declared.request).expect("a request within its passage"))
+        .map(|passage| {
+            passage
+                .part(0..declared.request)
+                .expect("a request within its passage")
+        })
         .collect();
     let mut listing = String::new();
     for arm in arms {
@@ -222,10 +233,18 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
                 "{} | target {:?} | {} {:?} | locks {:?}{}",
                 request.iter().map(ToString::to_string).collect::<String>(),
                 target,
-                if generation.release.released() { "released" } else { "held" },
+                if generation.release.released() {
+                    "released"
+                } else {
+                    "held"
+                },
                 classes,
                 generation.locks,
-                if is_constant { " | constant request" } else { "" }
+                if is_constant {
+                    " | constant request"
+                } else {
+                    ""
+                }
             )
             .unwrap();
         }
@@ -238,7 +257,11 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
             "  {label} (transport modulus {}; closed pair contacts at {contacts:?}): released {released}, held {held}, refused {refused}, refused certificates {uncertified}; whole sections {whole} of {count} (nonconstant {whole_nonconstant} of {nonconstant}, constant {whole_constant} of {}); the success rule (every nonconstant section whole): {}; incorrect releases {incorrect}; reaching the termination {terminated}; stations right {} by station {by_station:?}; first lock at a request-reading station (0 or 1) {first_request}, first lock right {first_right}; {} ms",
             theta.transport(ring),
             count - nonconstant,
-            if whole_nonconstant == nonconstant { "holds" } else { "does not hold" },
+            if whole_nonconstant == nonconstant {
+                "holds"
+            } else {
+                "does not hold"
+            },
             by_station.iter().sum::<usize>(),
             started.elapsed().as_millis()
         );
@@ -517,7 +540,15 @@ impl ReferenceFamily {
                     for c in translations {
                         let map: [Option<usize>; RESIDUES] =
                             std::array::from_fn(|a| Some((a + c) % RESIDUES));
-                        emit(request, lag, map, &mut Vec::new(), stations, &mut out, bound);
+                        emit(
+                            request,
+                            lag,
+                            map,
+                            &mut Vec::new(),
+                            stations,
+                            &mut out,
+                            bound,
+                        );
                     }
                 }
             }
@@ -574,8 +605,9 @@ impl ReferenceFamily {
                 .alive()
                 .iter()
                 .filter_map(|&l| {
-                    let free: Vec<usize> =
-                        (0..RESIDUES).filter(|&a| lags[l - 1].map[a].is_none()).collect();
+                    let free: Vec<usize> = (0..RESIDUES)
+                        .filter(|&a| lags[l - 1].map[a].is_none())
+                        .collect();
                     (!free.is_empty()).then(|| format!("ℓ {l}: {free:?}"))
                 })
                 .collect::<Vec<_>>()
@@ -602,7 +634,10 @@ fn bits(ratio: &Rat) -> ExactInterval {
 
 /// A ratio of two counts, exact.
 fn count_ratio(numerator: &BigUint, denominator: &BigUint) -> Rat {
-    Rat::new(BigInt::from(numerator.clone()), BigInt::from(denominator.clone()))
+    Rat::new(
+        BigInt::from(numerator.clone()),
+        BigInt::from(denominator.clone()),
+    )
 }
 
 /// [definition; the pin §1, §4] **A family's reading along a passage**: the survivors' count
@@ -647,7 +682,10 @@ fn batch_information(counts: &[BigUint], per_batch: usize) -> Vec<(Rat, ExactInt
 /// The families the pin reads on a terrain (§1): the global family, and on the line `H` too.
 fn families_of(terrain: &str, requests: usize) -> Vec<ReferenceFamily> {
     if terrain == "line" {
-        vec![ReferenceFamily::global(), ReferenceFamily::hierarchical(requests)]
+        vec![
+            ReferenceFamily::global(),
+            ReferenceFamily::hierarchical(requests),
+        ]
     } else {
         vec![ReferenceFamily::global()]
     }
@@ -675,9 +713,13 @@ pub(super) fn counts(
     let pairs = terrain_pairs(terrain, &declared, seed, count);
     let validation = terrain_pairs(terrain, &declared, validation_seed, validation_count);
     let batch = 8;
-    let constant: Vec<usize> =
-        (0..pairs.len()).filter(|&r| constant_request(&pairs[r].0)).collect();
-    let validation_constant = validation.iter().filter(|(r, _)| constant_request(r)).count();
+    let constant: Vec<usize> = (0..pairs.len())
+        .filter(|&r| constant_request(&pairs[r].0))
+        .collect();
+    let validation_constant = validation
+        .iter()
+        .filter(|(r, _)| constant_request(r))
+        .count();
     let shared = validation
         .iter()
         .filter(|(v, _)| pairs.iter().any(|(t, _)| t == v))
@@ -702,7 +744,9 @@ pub(super) fn counts(
         // The stopping object, read where the survivors change (they only shrink, so the
         // continuations only shrink: the first count at which it holds is n*).
         let unique = |f: &ReferenceFamily, v: &(Vec<usize>, Vec<usize>), given: bool| {
-            f.continuations(&v.0, stations, 2, given.then(|| v.1[0])).len() == 1
+            f.continuations(&v.0, stations, 2, given.then(|| v.1[0]))
+                .len()
+                == 1
         };
         let holds = |f: &ReferenceFamily, all: bool, given: bool| {
             validation
@@ -804,9 +848,9 @@ pub(super) fn counts(
                 "  {name}: with the constant validation requests included, the stopping object at {}",
                 both_units(k, stations)
             ),
-            None => println!(
-                "  {name}: with the constant validation requests included, not reached"
-            ),
+            None => {
+                println!("  {name}: with the constant validation requests included, not reached")
+            }
         }
         if hierarchical {
             match star_given {
@@ -822,14 +866,23 @@ pub(super) fn counts(
         println!(
             "  {name}: the syntactic class: the survivors last changed at {}; {end} survivors at the passage's end ({}); alive lags {:?}; survivors: {}; unobserved arguments: {}",
             both_units(last_change, stations),
-            if *end == BigUint::from(1u32) { "one key" } else { "not one key" },
+            if *end == BigUint::from(1u32) {
+                "one key"
+            } else {
+                "not one key"
+            },
             reading.family.alive(),
             reading.family.certificate(generating_key(terrain)),
             reading.family.unobserved()
         );
         let final_distinct: Vec<usize> = validation
             .iter()
-            .map(|v| reading.family.continuations(&v.0, stations, 1 << 12, None).len())
+            .map(|v| {
+                reading
+                    .family
+                    .continuations(&v.0, stations, 1 << 12, None)
+                    .len()
+            })
             .collect();
         let unique_nonconstant = validation
             .iter()

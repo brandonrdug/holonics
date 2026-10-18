@@ -17,8 +17,8 @@ use crate::hnn::propagation::transit_variation;
 use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::retention::Diamond;
 
-mod rebase;
 pub mod gain;
+mod rebase;
 
 /// The parameter family whose first variation the current carries. A realized translation
 /// holds the actually applied factor increments as exterior controls: P = I. It differentiates
@@ -476,11 +476,16 @@ impl HeldContactVariation {
 
     /// The one column transport, optionally observed BEFORE its producing junction.
     /// The observer writes only its own transient reading; it changes no current column.
-    fn advance_contact_columns(&self, word: &Word<'_>, opened: &[EndChange],
-        mut observe: impl FnMut(usize, &[EndChange]) -> Result<(), HnnError>) -> Result<Self, HnnError>
-    {
+    fn advance_contact_columns(
+        &self,
+        word: &Word<'_>,
+        opened: &[EndChange],
+        mut observe: impl FnMut(usize, &[EndChange]) -> Result<(), HnnError>,
+    ) -> Result<Self, HnnError> {
         if opened.len() != self.coordinates.len() {
-            return refuse("the contact column transport preserves its complete parameter population");
+            return refuse(
+                "the contact column transport preserves its complete parameter population",
+            );
         }
         let count = word
             .ticks()
@@ -529,7 +534,9 @@ pub(crate) fn coordinate_forms(
     coordinate: &ContactCoordinate,
 ) -> Result<[ExactRatMatrix; 3], HnnError> {
     if coordinate.contact >= field.contacts().len() || coordinate.family > 2 {
-        return refuse("a contact coordinate names a contact of the field and one of its three factor families");
+        return refuse(
+            "a contact coordinate names a contact of the field and one of its three factor families",
+        );
     }
     let a = coordinate.contact;
     let factor = factors(theta, a)[coordinate.family];
@@ -580,7 +587,12 @@ impl Word<'_> {
         coordinate: &ContactCoordinate,
         theta: &Constitution,
     ) -> Result<EndChange, HnnError> {
-        self.contact_forms_variation(t, chi, coordinate.contact, &coordinate_forms(self.field, theta, coordinate)?)
+        self.contact_forms_variation(
+            t,
+            chi,
+            coordinate.contact,
+            &coordinate_forms(self.field, theta, coordinate)?,
+        )
     }
 
     /// [definition] **One tick of a contact material's first variation** at the form derivatives
@@ -666,7 +678,6 @@ impl Word<'_> {
                 .ok_or(HnnError::Unadmitted {
                     reason: "the held comparison has its producing receiving map",
                 })?,
-            &current.lift()[phases.ring()],
             &phases,
         )?;
         if opened.iter().any(|chi| !same_shape(&opening, chi)) {

@@ -2031,9 +2031,7 @@ pub(crate) fn real_root_count_with_multiplicity(
 /// `ω₀`, so `(ω−ω₀)^m` divides both `P` and `Q` and at least one of the two order-`m` coefficients
 /// is nonzero — hence **the multiplicity of `iω₀` in `p` is exactly the multiplicity of `ω₀` as a
 /// real root of `gcd(P,Q)`**.
-pub fn axis_root_count(
-    polynomial: &RationalPolynomial,
-) -> Result<usize, ExactPolynomialError> {
+pub fn axis_root_count(polynomial: &RationalPolynomial) -> Result<usize, ExactPolynomialError> {
     if polynomial.is_zero() {
         return Err(ExactPolynomialError::ZeroPolynomial);
     }

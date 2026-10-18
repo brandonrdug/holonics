@@ -169,6 +169,11 @@ pub trait ConstitutionRead: Sync {
     fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix;
     /// The receiving map `R` (`2|A| × 2d_R`) of a receiving ring; `None` elsewhere.
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix>;
+    /// Explicit learned feature-block layout; custom single-map materials keep the default.
+    fn receiving_layout(&self, ring: usize) -> Option<crate::hnn::constitution::ReceivingLayout> {
+        self.receiving_map(ring)
+            .map(|_| crate::hnn::constitution::ReceivingLayout::Single)
+    }
     /// The carrier whose normal statistics and receiving map are paired. Raw declarations
     /// use the executed anchor; a source observer binds its own law before any comparison.
     fn receiving_carrier(&self, _ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
@@ -213,8 +218,8 @@ pub trait ConstitutionRead: Sync {
 /// the release is the field's motion, never a lookup of stored passages.
 ///
 /// [definition; agent-inferred, October 5, lane C's physical repair] **The receiving map `R` is
-/// the field's decoder, not storage**, so it is material: a receiver's read `R · P_R^(τ_R) v_R`
-/// at its grain (`hnn::receiving::ReceivingPhases::read`) is a linear face of the ring's own
+/// the field's decoder, not storage**, so it is material: a receiver's read `R · v_R` in the
+/// passage frame at its grain (`hnn::receiving::ReceivingPhases::read`) is a linear face of the ring's own
 /// motion, read through the same executed anchor map at every crossing, and holds no count, no
 /// address and no seen context. Guard 18 excludes the landmark tree (the receiving storage of
 /// counts) and the receiver's population (the families scored at compare), not the decoder.
@@ -278,6 +283,11 @@ pub trait FieldMaterial: Sync {
     /// The receiving map `R` of a receiving ring, the field's decoder (above).
     /// ([`ConstitutionRead::receiving_map`])
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix>;
+    /// Explicit learned feature-block layout; custom single-map materials keep the default.
+    fn receiving_layout(&self, ring: usize) -> Option<crate::hnn::constitution::ReceivingLayout> {
+        self.receiving_map(ring)
+            .map(|_| crate::hnn::constitution::ReceivingLayout::Single)
+    }
     /// The receiving map's producing carrier. ([`ConstitutionRead::receiving_carrier`])
     fn receiving_carrier(&self, _ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
         crate::hnn::receiving::ReceivingCarrier::Anchor
@@ -329,6 +339,9 @@ impl<T: ConstitutionRead + ?Sized> FieldMaterial for T {
     }
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
         ConstitutionRead::receiving_map(self, ring)
+    }
+    fn receiving_layout(&self, ring: usize) -> Option<crate::hnn::constitution::ReceivingLayout> {
+        ConstitutionRead::receiving_layout(self, ring)
     }
     fn receiving_carrier(&self, ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
         ConstitutionRead::receiving_carrier(self, ring)
@@ -1101,6 +1114,7 @@ pub struct Field {
     /// The receivers' declared letter family ([`Field::with_letter_family`]; the cell-only family
     /// unless declared).
     letters: crate::hnn::receiving::FeatureFamily,
+    receiving_contexts: BTreeMap<usize, crate::hnn::receiving::ObservationPartition>,
     distances: Vec<Vec<Option<usize>>>,
     lattices: BTreeMap<Locus, Lattice>,
     /// The word's declared precisions by rule ([`WordLattice::by_rule`]); `None` only for the
@@ -1289,6 +1303,7 @@ impl Field {
             capacity,
             located_capacity,
             letters: crate::hnn::receiving::FeatureFamily::cells(),
+            receiving_contexts: BTreeMap::new(),
             distances,
             lattices,
             word,
@@ -1310,13 +1325,15 @@ impl Field {
         for feature in family.features() {
             match feature {
                 Feature::Phase { ring, grain } => {
-                    let period = self.rings.get(*ring).map(|declared| declared.period).ok_or(
-                        HnnError::Shape {
+                    let period = self
+                        .rings
+                        .get(*ring)
+                        .map(|declared| declared.period)
+                        .ok_or(HnnError::Shape {
                             what: "a phase letter's ring among the field's rings",
                             expected: self.rings.len(),
                             found: *ring,
-                        },
-                    )?;
+                        })?;
                     if *grain < 2 || period % *grain != 0 {
                         return Err(HnnError::Shape {
                             what: "a phase letter's grain of at least 2 dividing its ring's period",
@@ -1338,6 +1355,29 @@ impl Field {
         }
         self.letters = family;
         Ok(self)
+    }
+
+    /// Admit a label-free partition of an attained receiving wave as a separate landmark
+    /// context prefix. Causal source letters and their clocks are unchanged.
+    pub fn with_receiving_context(
+        mut self,
+        ring: usize,
+        partition: crate::hnn::receiving::ObservationPartition,
+    ) -> Result<Self, HnnError> {
+        if !self.receivers.iter().any(|receiver| receiver.ring == ring) {
+            return Err(HnnError::Unadmitted {
+                reason: "an observation context requires a declared receiver",
+            });
+        }
+        self.receiving_contexts.insert(ring, partition);
+        Ok(self)
+    }
+
+    pub fn receiving_context(
+        &self,
+        ring: usize,
+    ) -> Option<crate::hnn::receiving::ObservationPartition> {
+        self.receiving_contexts.get(&ring).copied()
     }
 
     /// The receivers' declared letter family ([`Field::with_letter_family`]).
@@ -1467,7 +1507,7 @@ impl Field {
     /// latest batch (`SourceMoment::capacity`).
     pub fn capacity_for(&self, encoded: &Encoded) -> Result<&Capacity, HnnError> {
         self.admit(encoded)?;
-        let capacity = if encoded.located().is_some() {
+        let capacity = if encoded.has_advances() {
             self.located_capacity()?
         } else {
             self.capacity()
@@ -1533,10 +1573,20 @@ impl Field {
                 reason: "it was encoded against another field's source rings",
             });
         }
-        if let Some(located) = encoded.located()
-            && (located.periods().len() != self.rings.len()
-                || located
-                    .periods()
+        if let Some(observation) = encoded.observation() {
+            for port in observation.ports() {
+                if self.ring(port.carrier().ring()).reflector().images()
+                    != port.carrier().reflector()
+                {
+                    return Err(HnnError::Unadmitted {
+                        reason: "its observed boundary was admitted on another source dyad",
+                    });
+                }
+            }
+        }
+        if let Some(periods) = encoded.transport_periods()
+            && (periods.len() != self.rings.len()
+                || periods
                     .iter()
                     .zip(&self.rings)
                     .any(|(&period, ring)| period != ring.period))
@@ -1638,6 +1688,7 @@ impl Field {
                 step
             }
         };
+        encoded.check_placement_step(at, lift, &staged)?;
         lift.clone_from_slice(&staged);
         Ok(step)
     }
@@ -2299,8 +2350,14 @@ impl Field {
                         // The bound's `P` and `Q` coded apart, never reduced: `(1, 2)` and `(2, 4)`
                         // are different lock families.
                         naturals(&mut code, &[1, *contact as u64]);
-                        rational(&mut code, &Rat::from_integer(BigInt::from(bound.numerator.clone())));
-                        rational(&mut code, &Rat::from_integer(BigInt::from(bound.denominator.clone())));
+                        rational(
+                            &mut code,
+                            &Rat::from_integer(BigInt::from(bound.numerator.clone())),
+                        );
+                        rational(
+                            &mut code,
+                            &Rat::from_integer(BigInt::from(bound.denominator.clone())),
+                        );
                     }
                 }
             }
@@ -2323,7 +2380,7 @@ impl Field {
 /// "the combined face is the grain of the receiving parametron's landmark tree (the cell as its
 /// odometer digits, Krichevsky–Trofimov masses with `α` coded beside it, context-tree weighting over
 /// the per-cell causal address of depth `D`, coded with each receiver, on the tree's declared
-/// lattice) plus the wave `R P_R^(τ_R) v_R`, `R` opening at zero and moving by the prox step on its
+/// lattice) plus the wave `R v_R` (the passage frame since F1), `R` opening at zero and moving by the prox step on its
 /// reached covectors; the scored face is the mixture of the tree's face and the combined face
 /// weighted by their likelihoods, opening at ½/½ (the primary's ruling A; since THE_REBUILD U1 the
 /// receiver's population, `hnn::receiving::receiving_population`); every comparison

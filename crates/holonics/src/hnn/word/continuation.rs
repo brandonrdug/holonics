@@ -59,9 +59,9 @@ use crate::hnn::constitution::{
     CommittedReach, Constitution, DeclaredExponents, DeclaredStepRefusal, DepositReading,
     FactorGradient, Family, Locus, Reach,
 };
-use crate::hnn::port::{ChangeCovector, Deposit, WordReturn};
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::ReceiverDeclaration;
+use crate::hnn::port::{ChangeCovector, Deposit, WordReturn};
 use crate::hnn::ratio::{Face, Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
 use crate::hnn::retention::Diamond;
 use crate::holon::deposition::strictly_better;
@@ -165,21 +165,40 @@ impl ContactMaterialMove {
         family: Family,
     ) -> Result<Self, HnnError> {
         let (old_factor, new_factor, old_form, new_form, signature) = match family {
-            Family::Factor(0) => (producing.contact_storage(contact),
-                successor.contact_storage(contact), before.contacts()[contact].forms().0,
-                after.contacts()[contact].forms().0, None),
+            Family::Factor(0) => (
+                producing.contact_storage(contact),
+                successor.contact_storage(contact),
+                before.contacts()[contact].forms().0,
+                after.contacts()[contact].forms().0,
+                None,
+            ),
             Family::Factor(1) => {
                 let signature = producing.contact_stiffness_signature(contact);
                 if signature != successor.contact_stiffness_signature(contact) {
-                    return Err(HnnError::Realization { what: "the continuing contact keeps its producing stiffness signature" });
+                    return Err(HnnError::Realization {
+                        what: "the continuing contact keeps its producing stiffness signature",
+                    });
                 }
-                (producing.contact_stiffness(contact), successor.contact_stiffness(contact),
-                    before.contacts()[contact].forms().1, after.contacts()[contact].forms().1, signature)
-            },
-            Family::Factor(2) => (producing.contact_dissipation(contact),
-                successor.contact_dissipation(contact), before.contacts()[contact].forms().2,
-                after.contacts()[contact].forms().2, None),
-            _ => return Err(HnnError::Realization { what: "a finite contact movement is a C/K/D factor family" }),
+                (
+                    producing.contact_stiffness(contact),
+                    successor.contact_stiffness(contact),
+                    before.contacts()[contact].forms().1,
+                    after.contacts()[contact].forms().1,
+                    signature,
+                )
+            }
+            Family::Factor(2) => (
+                producing.contact_dissipation(contact),
+                successor.contact_dissipation(contact),
+                before.contacts()[contact].forms().2,
+                after.contacts()[contact].forms().2,
+                None,
+            ),
+            _ => {
+                return Err(HnnError::Realization {
+                    what: "a finite contact movement is a C/K/D factor family",
+                });
+            }
         };
         let factor = new_factor.subtract(old_factor)?;
         let signed = |factor: &ExactRatMatrix| match signature {
@@ -187,14 +206,24 @@ impl ContactMaterialMove {
             None => Ok(factor.clone()),
         };
         let transpose = factor.transpose()?;
-        let linear = signed(&factor)?.multiply(&old_factor.transpose()?)?
+        let linear = signed(&factor)?
+            .multiply(&old_factor.transpose()?)?
             .add(&signed(old_factor)?.multiply(&transpose)?)?;
         let quadratic = signed(&factor)?.multiply(&transpose)?;
         let form = new_form.subtract(old_form)?;
         if linear.add(&quadratic)? != form {
-            return Err(HnnError::Realization { what: "the full applied C/K/D contact reaction" });
+            return Err(HnnError::Realization {
+                what: "the full applied C/K/D contact reaction",
+            });
         }
-        Ok(Self { contact, family, factor, linear, quadratic, form })
+        Ok(Self {
+            contact,
+            family,
+            factor,
+            linear,
+            quadratic,
+            form,
+        })
     }
 }
 
@@ -245,20 +274,36 @@ impl<'c> Word<'c> {
         Ok((word, receipt))
     }
 
-    pub(super) fn contact_receiving(&self, receiver: usize) -> Result<(ReceivingPhases, Faces), HnnError> {
+    pub(super) fn contact_receiving(
+        &self,
+        receiver: usize,
+    ) -> Result<(ReceivingPhases, Faces), HnnError> {
         let (theta, current, _, _) = self.native_source.as_ref().ok_or(HnnError::Shape {
-            what: "a native reading requires its source producer", expected: 1, found: 0,
+            what: "a native reading requires its source producer",
+            expected: 1,
+            found: 0,
         })?;
-        let declaration = self.field.receivers().get(receiver).ok_or(HnnError::Shape {
-            what: "the native admitted receiver", expected: self.field.receivers().len(), found: receiver,
-        })?;
-        let phases = ReceivingPhases::declare(self.field, theta, current, declaration)?;
-        let reads: Vec<_> = phases.epochs().map(|epoch| {
-            let anchor = self.anchor(epoch, phases.ring()).ok_or(HnnError::WordEnded {
-                ticks: self.ticks(),
+        let declaration = self
+            .field
+            .receivers()
+            .get(receiver)
+            .ok_or(HnnError::Shape {
+                what: "the native admitted receiver",
+                expected: self.field.receivers().len(),
+                found: receiver,
             })?;
-            phases.read(self.field, theta, current, anchor)
-        }).collect::<Result<_, _>>()?;
+        let phases = ReceivingPhases::declare(self.field, theta, current, declaration)?;
+        let reads: Vec<_> = phases
+            .epochs()
+            .map(|epoch| {
+                let anchor = self
+                    .anchor(epoch, phases.ring())
+                    .ok_or(HnnError::WordEnded {
+                        ticks: self.ticks(),
+                    })?;
+                phases.read(self.field, theta, anchor)
+            })
+            .collect::<Result<_, _>>()?;
         let faces = Faces::of_reads(&reads, phases.grain())?;
         Ok((phases, faces))
     }
@@ -281,7 +326,10 @@ impl<'c> Word<'c> {
         targets: &Encoded,
         compared: &[bool],
     ) -> Result<
-        (HolonRatio, InteractionReturn<ContactCut, WordReturn, Deposit, Vec<Option<usize>>, Remainders>),
+        (
+            HolonRatio,
+            InteractionReturn<ContactCut, WordReturn, Deposit, Vec<Option<usize>>, Remainders>,
+        ),
         HnnError,
     > {
         self.compare_contacts_read(receiver, targets, compared)
@@ -304,37 +352,55 @@ impl<'c> Word<'c> {
         ),
         HnnError,
     > {
-        let (theta, current, source, support) = self.native_source.as_ref().ok_or(HnnError::Shape {
-            what: "a native comparison requires its source producer", expected: 1, found: 0,
-        })?.clone();
+        let (theta, current, source, support) = self
+            .native_source
+            .as_ref()
+            .ok_or(HnnError::Shape {
+                what: "a native comparison requires its source producer",
+                expected: 1,
+                found: 0,
+            })?
+            .clone();
         let field = self.field;
         let ticks = self.ticks();
         let (phases, faces) = self.contact_receiving(receiver)?;
         let classes: Vec<usize> = targets.classes_read().collect();
         let target_reading = target_phases(field, current.lift(), phases.ring(), targets)?;
-        let ratio = HolonRatio::compare_partition(
-            faces, &classes,
-            &target_reading,
-            compared,
-        )?;
+        let ratio = HolonRatio::compare_partition(faces, &classes, &target_reading, compared)?;
         let returned = self.return_contact(
-            &ratio.covector()?, theta.receiving_map(phases.ring()).ok_or(HnnError::Shape {
-                what: "the native producing receiving map", expected: 1, found: 0,
+            &ratio.covector()?,
+            theta.receiving_map(phases.ring()).ok_or(HnnError::Shape {
+                what: "the native producing receiving map",
+                expected: 1,
+                found: 0,
             })?,
-            &current.lift()[phases.ring()], &phases,
+            &phases,
         )?;
-        let mut cut = returned.forward.into_present().ok_or(HnnError::Realization {
-            what: "the actual compared contact cut",
-        })?;
-        let back = returned.pullback.into_present().ok_or(HnnError::Realization {
-            what: "the actual compared contact adjoint",
-        })?;
+        let mut cut = returned
+            .forward
+            .into_present()
+            .ok_or(HnnError::Realization {
+                what: "the actual compared contact cut",
+            })?;
+        let back = returned
+            .pullback
+            .into_present()
+            .ok_or(HnnError::Realization {
+                what: "the actual compared contact adjoint",
+            })?;
         let diamond = Diamond::opened(field, &phases, &support);
         let retained = |locus| matches!(locus, Locus::Channel(_)) && diamond.retains(field, locus);
         let mut steps = Vec::new();
         for contact in 0..field.contacts().len() {
             let (contact_steps, _) = crate::hnn::reference::compose_contact(
-                field, &theta, &back, &diamond, &retained, current.lift(), field.step(), contact,
+                field,
+                &theta,
+                &back,
+                &diamond,
+                &retained,
+                current.lift(),
+                field.step(),
+                contact,
             )?;
             steps.extend(contact_steps);
         }
@@ -342,15 +408,22 @@ impl<'c> Word<'c> {
         if ratio.stations().is_empty() {
             steps.clear();
         }
-        let occupied = field.sources().iter().map(|&g| {
-            let mut count = 0u64;
-            for c in 0..field.ring(g).placements().len() {
-                if source.phase_counts(g,c)?.iter().any(|n| *n != 0) {
-                    count = count.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        let occupied = field
+            .sources()
+            .iter()
+            .map(|&g| {
+                let mut count = 0u64;
+                for c in 0..field.ring(g).placements().len() {
+                    if source.phase_counts(g, c)?.iter().any(|n| *n != 0) {
+                        count = count.checked_add(1).ok_or(HnnError::CountOverflow)?;
+                    }
                 }
-            }
-            Ok(count)
-        }).collect::<Result<Vec<_>, HnnError>>()?.into_iter().max().unwrap_or(0);
+                Ok(count)
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?
+            .into_iter()
+            .max()
+            .unwrap_or(0);
         // The deposit's loci are the distinct reached loci in first-reached order, as
         // `compose_return` reads them: a contact returns one step per form (C, K and D).
         let mut reached = Vec::new();
@@ -360,13 +433,17 @@ impl<'c> Word<'c> {
                 reached.push(locus);
             }
         }
-        let deposit = Deposit::new(theta.commit(), vec![], steps, reached)
-            .with_reach(Reach {
-                receiver: phases.ring(), stations: ratio.stations().iter()
-                    .map(|&j| (phases.first_epoch() + j) as u64).collect(),
-                entries: vec![0], phases: occupied,
-                loci: diamond.retained(field),
-            });
+        let deposit = Deposit::new(theta.commit(), vec![], steps, reached).with_reach(Reach {
+            receiver: phases.ring(),
+            stations: ratio
+                .stations()
+                .iter()
+                .map(|&j| (phases.first_epoch() + j) as u64)
+                .collect(),
+            entries: vec![0],
+            phases: occupied,
+            loci: diamond.retained(field),
+        });
         cut.deposit = Some(deposit.clone());
         let read = ComparedRead {
             current,
@@ -376,21 +453,29 @@ impl<'c> Word<'c> {
             target_phases: target_reading,
             ticks,
         };
-        Ok((ratio, InteractionReturn {
-            forward: Component::Present(cut), pullback: Component::Present(back),
-            deposit: Component::Present(deposit), order: returned.order,
-            phases: returned.phases, receipt: returned.receipt,
-        }, read))
+        Ok((
+            ratio,
+            InteractionReturn {
+                forward: Component::Present(cut),
+                pullback: Component::Present(back),
+                deposit: Component::Present(deposit),
+                order: returned.order,
+                phases: returned.phases,
+                receipt: returned.receipt,
+            },
+            read,
+        ))
     }
 
     /// Capture the actual full-tick end before consuming this Word's adjoint. Both ordinary
     /// and continuing-material comparisons use this one producer/clock/phase admission.
-    pub(super) fn contact_cut(&self) -> Result<ContactCut,HnnError> {
-        let (producing, current, source, opening_support) = self.native_source.as_ref().ok_or(HnnError::Shape {
-            what: "a contact return requires its native source producer",
-            expected: 1,
-            found: 0,
-        })?;
+    pub(super) fn contact_cut(&self) -> Result<ContactCut, HnnError> {
+        let (producing, current, source, opening_support) =
+            self.native_source.as_ref().ok_or(HnnError::Shape {
+                what: "a contact return requires its native source producer",
+                expected: 1,
+                found: 0,
+            })?;
         let change = self.change()?;
         if self.fields.len() != self.ticks() || self.balances.len() != self.ticks() {
             return Err(HnnError::Shape {
@@ -445,7 +530,6 @@ impl<'c> Word<'c> {
             opened_at: self.opened_at,
             next_tick,
         })
-
     }
 
     /// Consume the actual comparison return and retain its reached full-tick change. A terminal
@@ -455,7 +539,6 @@ impl<'c> Word<'c> {
         self,
         covector: &RatioCovector,
         map: &ExactRatMatrix,
-        lift: &num_bigint::BigInt,
         phases: &ReceivingPhases,
     ) -> Result<
         InteractionReturn<ContactCut, WordReturn, (), Vec<Option<usize>>, Remainders>,
@@ -463,7 +546,7 @@ impl<'c> Word<'c> {
     > {
         let cut = self.contact_cut()?;
         let phase_carry = cut.change.resonator_phases.clone();
-        let back = self.pull_back(covector, map, lift, phases)?;
+        let back = self.pull_back(covector, map, phases)?;
         let released = back.released.clone();
         Ok(InteractionReturn {
             forward: Component::Present(cut),
@@ -479,7 +562,7 @@ impl<'c> Word<'c> {
 impl ContactCut {
     /// Source-private binding by the actual comparison consumer. A caller cannot replace the
     /// covector once the native cut has been issued.
-    pub(super) fn bind_comparison(mut self, deposit:Deposit) -> Self {
+    pub(super) fn bind_comparison(mut self, deposit: Deposit) -> Self {
         self.deposit = Some(deposit);
         // The held-variation route's combined covector pairs the opening's `J_open`; no landing
         // admits its cut ([`LandingRefusal::HeldVariation`]).
@@ -573,7 +656,8 @@ impl ContactCut {
     ) -> Result<PreparedContinuation<'c>, LandingRefusal> {
         self.binds(admission, source, deposit)?;
         let reach = deposit.reach().ok_or(HnnError::MissingReach)?;
-        let spans = super::finite_gain::FiniteContactSpans::of(&self.operands, self.opened_at, reach)?;
+        let spans =
+            super::finite_gain::FiniteContactSpans::of(&self.operands, self.opened_at, reach)?;
         let (successor, publication, committed) = self
             .producing
             .deposited_with_contact_spans_at(deposit, &spans, &admission.candidate.declared)?
@@ -626,7 +710,8 @@ impl ContactCut {
         if self.deposit.as_ref() != Some(deposit) {
             return Err(HnnError::Shape {
                 what: "the deposited contact covector is this cut's actual comparison return",
-                expected: 1, found: 0,
+                expected: 1,
+                found: 0,
             });
         }
         if !contact_only(deposit) {
@@ -636,20 +721,29 @@ impl ContactCut {
                 found: 0,
             });
         }
-        #[cfg(test)] let started = std::time::Instant::now();
-        #[cfg(test)] eprintln!("unit certificate begin elapsed_ms=0");
+        #[cfg(test)]
+        let started = std::time::Instant::now();
+        #[cfg(test)]
+        eprintln!("unit certificate begin elapsed_ms=0");
         // The exact contact route reads the entire loaded field, at the producing
         // absolute clock, rather than multiplying undriven local ring certificates. An admitted
         // landing supplies its declared successor, recomputed and compared whole by the caller.
         let (successor, publication, landing) = match declared {
-            Some(DeclaredSuccessor { successor, publication, end, tick }) => {
-                (successor, publication, Some((end, tick)))
-            }
+            Some(DeclaredSuccessor {
+                successor,
+                publication,
+                end,
+                tick,
+            }) => (successor, publication, Some((end, tick))),
             None => {
                 let (successor, publication) = if self.operands.lattice().is_none() {
-                    let spans = super::finite_gain::FiniteContactSpans::of(&self.operands, self.opened_at,
-                        deposit.reach().ok_or(HnnError::MissingReach)?)?;
-                    self.producing.deposited_with_contact_spans(deposit, &spans)?
+                    let spans = super::finite_gain::FiniteContactSpans::of(
+                        &self.operands,
+                        self.opened_at,
+                        deposit.reach().ok_or(HnnError::MissingReach)?,
+                    )?;
+                    self.producing
+                        .deposited_with_contact_spans(deposit, &spans)?
                 } else {
                     // Historical charted consumer keeps its conditional certificate. It issues
                     // no loaded witness: rounding/split residual inputs are not covered here.
@@ -658,14 +752,22 @@ impl ContactCut {
                 (successor, publication, None)
             }
         };
-        #[cfg(test)] eprintln!("unit certificate end elapsed_ms={}", started.elapsed().as_millis());
+        #[cfg(test)]
+        eprintln!(
+            "unit certificate end elapsed_ms={}",
+            started.elapsed().as_millis()
+        );
         let mut next_charts = charts.clone();
         let operands = if self.operands.lattice().is_some() {
             Operands::at_cut_charted(field, &successor, current, &mut next_charts)?
         } else {
             Operands::exact_at_cut(field, &successor, current)?
         };
-        #[cfg(test)] eprintln!("unit successor-operands elapsed_ms={}", started.elapsed().as_millis());
+        #[cfg(test)]
+        eprintln!(
+            "unit successor-operands elapsed_ms={}",
+            started.elapsed().as_millis()
+        );
         // The unchanged material families preserve ring storage, coupling ports and every lifted
         // pump. This comparison uses their actual declarations, not inverse-chart seed equality.
         for (old, new) in self.operands.rings().iter().zip(operands.rings()) {
@@ -714,16 +816,27 @@ impl ContactCut {
                 FactorGradient::Dissipation { contact, .. } => (contact, Family::Factor(2)),
                 _ => unreachable!("the bound contact deposit was admitted above"),
             };
-            material.push(ContactMaterialMove::between(&self.producing, &successor,
-                &self.operands, &operands, contact, family)?);
+            material.push(ContactMaterialMove::between(
+                &self.producing,
+                &successor,
+                &self.operands,
+                &operands,
+                contact,
+                family,
+            )?);
         }
-        let before_capacity: Vec<_> = self.operands.contacts().iter()
-            .map(|contact| contact.forms().0.clone()).collect();
-        let after_capacity: Vec<_> = operands.contacts().iter()
-            .map(|contact| contact.forms().0.clone()).collect();
-        let held_momentum_growth = certify_held_momentum_growth(
-            &before_capacity, &after_capacity,
-        )?;
+        let before_capacity: Vec<_> = self
+            .operands
+            .contacts()
+            .iter()
+            .map(|contact| contact.forms().0.clone())
+            .collect();
+        let after_capacity: Vec<_> = operands
+            .contacts()
+            .iter()
+            .map(|contact| contact.forms().0.clone())
+            .collect();
+        let held_momentum_growth = certify_held_momentum_growth(&before_capacity, &after_capacity)?;
         // [definition; the storage-resolution record §9, the deposit record §2–§3] The deposit is
         // a sudden change of the constitution between two ticks of one continuing motion, so the
         // contact's canonical state `(u, π = C w)` holds across it and the rate solves
@@ -770,7 +883,11 @@ impl ContactCut {
         let support = held.change.support(field);
         let mut word = Word::continuing(field, operands, &held.change, &nothing, self.next_tick)?;
         word.native_source = Some((successor.clone(), current.clone(), source.clone(), support));
-        #[cfg(test)] eprintln!("unit next-word-open elapsed_ms={}", started.elapsed().as_millis());
+        #[cfg(test)]
+        eprintln!(
+            "unit next-word-open elapsed_ms={}",
+            started.elapsed().as_millis()
+        );
         let opened = word.change()?;
         let opening = new.power(&opened)? + new.resonator_power(&opened)?;
         let opening_difference = &opening - &committed;
@@ -1001,13 +1118,24 @@ impl<'c> Word<'c> {
         HnnError,
     > {
         let field = self.field;
-        let declaration = field.receivers().get(receiver).cloned().ok_or(HnnError::Shape {
-            what: "the native admitted receiver",
-            expected: field.receivers().len(),
-            found: receiver,
-        })?;
+        let declaration = field
+            .receivers()
+            .get(receiver)
+            .cloned()
+            .ok_or(HnnError::Shape {
+                what: "the native admitted receiver",
+                expected: field.receivers().len(),
+                found: receiver,
+            })?;
         let (ratio, returned, read) = self.compare_contacts_read(receiver, targets, compared)?;
-        let InteractionReturn { forward, pullback, deposit, order, phases, receipt } = returned;
+        let InteractionReturn {
+            forward,
+            pullback,
+            deposit,
+            order,
+            phases,
+            receipt,
+        } = returned;
         let mut cut = forward.into_present().ok_or(HnnError::Realization {
             what: "the actual compared contact cut",
         })?;
@@ -1206,7 +1334,10 @@ pub enum LandingRefusal {
     /// candidate's continuation refused at `θ′` (the held law, a preservation check, the
     /// held-momentum growth, the work closure or the next Word), with its native reason. The cut
     /// was not consumed, and the route that issued the admission continues on the certified step.
-    Continuation { admitted: Admitted, reason: HnnError },
+    Continuation {
+        admitted: Admitted,
+        reason: HnnError,
+    },
 }
 
 impl From<HnnError> for LandingRefusal {
@@ -1389,7 +1520,10 @@ pub(crate) fn decide_over(
 
 /// The admission read from two evaluated ratios: their code enclosures, exact excesses and the
 /// reading-identity witness ([`decide`]).
-pub(crate) fn admit(producing: &HolonRatio, candidate: &HolonRatio) -> Result<Admitted, LandingRefusal> {
+pub(crate) fn admit(
+    producing: &HolonRatio,
+    candidate: &HolonRatio,
+) -> Result<Admitted, LandingRefusal> {
     let witness = reading_identity(producing, candidate);
     decide(
         &producing.code_length()?,
@@ -1413,7 +1547,10 @@ impl ContactCut {
         opening: &WordOpening,
         (receiver, declaration): (usize, &ReceiverDeclaration),
         (targets, compared): (&Encoded, &[bool]),
-        (declared, candidate): (&mut Option<DeclaredExponents>, &mut Option<LandingCandidate>),
+        (declared, candidate): (
+            &mut Option<DeclaredExponents>,
+            &mut Option<LandingCandidate>,
+        ),
     ) -> Result<FiniteDecrease, LandingRefusal> {
         if self.held {
             return Err(LandingRefusal::HeldVariation);
@@ -1425,17 +1562,29 @@ impl ContactCut {
         }
         let own_clock = match opening {
             WordOpening::Rest => self.opened_at == 0,
-            WordOpening::Received { carry, absorption: Absorption::Nothing } => {
-                carry.ticks == self.opened_at
-            }
-            WordOpening::Received { absorption: Absorption::Complete, .. } => false,
+            WordOpening::Received {
+                carry,
+                absorption: Absorption::Nothing,
+            } => carry.ticks == self.opened_at,
+            WordOpening::Received {
+                absorption: Absorption::Complete,
+                ..
+            } => false,
         };
         if !own_clock {
             return Err(LandingRefusal::Opening);
         }
         if self.operands.lattice().is_some()
-            || self.operands.rings().iter().any(|ring| ring.chart().is_some())
-            || self.operands.contacts().iter().any(|contact| contact.chart().is_some())
+            || self
+                .operands
+                .rings()
+                .iter()
+                .any(|ring| ring.chart().is_some())
+            || self
+                .operands
+                .contacts()
+                .iter()
+                .any(|contact| contact.chart().is_some())
         {
             return Err(LandingRefusal::ChartedOperands);
         }
@@ -1447,7 +1596,8 @@ impl ContactCut {
         }
         // The declared step, produced by the native deposit law at its first reach.
         let reach = deposit.reach().ok_or(HnnError::MissingReach)?;
-        let spans = super::finite_gain::FiniteContactSpans::of(&self.operands, self.opened_at, reach)?;
+        let spans =
+            super::finite_gain::FiniteContactSpans::of(&self.operands, self.opened_at, reach)?;
         let exponents = self
             .producing
             .first_reach(deposit, &spans)?
@@ -1646,8 +1796,8 @@ impl MaterialDirection {
 ///
 /// - **At the encounter's own compared stations** (the held-carry record §3d): the participation
 ///   anchor is linear in the change at the junction's fixed weights, so the receiving ring's anchor
-///   tangent is `δv = ŵ_s δs + Σ_a ŵ_a δa`, and the read `R P^τ v` (`τ` the receiving ring's integer
-///   lift, which no first variation moves) has tangent `R P^τ δv`. Where the World is located with a
+///   tangent is `δv = ŵ_s δs + Σ_a ŵ_a δa`, and the read `R v` (the passage frame, `hnn::receiving`)
+///   has tangent `R δv`. Where the World is located with a
 ///   declared face, the World's observed face, affine in its state, has tangent
 ///   `C_S δψ_S + C_R δψ_R`. [`Self::comparison_credit`] pairs both with the encounter's own covector.
 ///
@@ -1682,7 +1832,7 @@ pub struct MaterialTangent {
 }
 
 /// [definition; agent-inferred, October 9] **The tangent at one compared station** of the encounter
-/// that carried it: the receiving anchor's tangent `δv`, the produced logits' tangent `R P^τ δv` once
+/// that carried it: the receiving anchor's tangent `δv`, the produced logits' tangent `R δv` once
 /// read, and the observed face's tangent through the located key's declared face (`None` when the
 /// key declares no face: the World's face is then not located).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1886,12 +2036,9 @@ impl MaterialTangent {
         };
         let a = self.direction.contact;
         let opening = word.change()?;
-        let rate = &opening
-            .states
-            .get(a)
-            .ok_or(HnnError::Unadmitted {
-                reason: "a storage direction names a contact of its Word",
-            })?[1];
+        let rate = &opening.states.get(a).ok_or(HnnError::Unadmitted {
+            reason: "a storage direction names a contact of its Word",
+        })?[1];
         let target: Vec<Rat> = delta.apply(rate)?.into_iter().map(|x| -x).collect();
         if target.iter().all(Zero::is_zero) {
             return Ok(self);
@@ -1998,10 +2145,14 @@ impl MaterialTangent {
     /// participation at the junction's own weights, which a contact-material direction does not move.
     pub fn anchor(&self, word: &Word<'_>, ring: usize) -> Result<Vec<Rat>, HnnError> {
         let operands = word.operands();
-        let storage = self.tangent.storage.get(ring).ok_or(HnnError::RingOutside {
-            ring,
-            rings: self.tangent.storage.len(),
-        })?;
+        let storage = self
+            .tangent
+            .storage
+            .get(ring)
+            .ok_or(HnnError::RingOutside {
+                ring,
+                rings: self.tangent.storage.len(),
+            })?;
         let incoming: Vec<&[Rat]> = operands
             .incident(ring)
             .iter()
@@ -2036,7 +2187,7 @@ impl MaterialTangent {
     }
 
     /// **Read the held anchor tangents** through the actual read's own linear part `read` (the
-    /// receiving map at the read's lift, `δv ↦ R P^τ δv`), after the encounter's reads.
+    /// receiving map in the passage frame, `δv ↦ R δv`), after the encounter's reads.
     pub fn read_stations(
         &mut self,
         mut read: impl FnMut(&[Rat]) -> Result<Vec<Rat>, HnnError>,
@@ -2430,7 +2581,10 @@ pub fn descent_from_credits(
         if descent.iter().all(Zero::is_zero) {
             continue;
         }
-        let descent = descent.chunks(columns.max(1)).map(<[Rat]>::to_vec).collect();
+        let descent = descent
+            .chunks(columns.max(1))
+            .map(<[Rat]>::to_vec)
+            .collect();
         steps.push(((a, family), rows, columns, descent));
     }
     steps

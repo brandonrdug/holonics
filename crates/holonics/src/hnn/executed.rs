@@ -274,7 +274,13 @@ pub(crate) fn deposit_reads(
     let slip_before = squared(&slips);
     let unit_feature = |class: usize| -> Vec<Rat> {
         (0..field.alphabet())
-            .map(|code| if code == class { Rat::one() } else { Rat::zero() })
+            .map(|code| {
+                if code == class {
+                    Rat::one()
+                } else {
+                    Rat::zero()
+                }
+            })
             .collect()
     };
     let samples: Vec<Sample> = reads
@@ -334,13 +340,19 @@ pub(crate) fn deposit_reads(
     let stepped = next
         .source_port(ring)
         .ok_or(HnnError::MissingSourcePort { ring })?;
-    if stepped.entries().iter().any(|entry| entry.abs() > entry_bound()) {
+    if stepped
+        .entries()
+        .iter()
+        .any(|entry| entry.abs() > entry_bound())
+    {
         return Err(refused("a deposit within the entry bound"));
     }
     let after = oriented_slips(field, ring, stepped, prior, reads)?;
     let slip_after = squared(&after);
     if slip_after > &slip_before - certificate.decrease() {
-        return Err(refused("a deposit whose slip falls by its certified decrease"));
+        return Err(refused(
+            "a deposit whose slip falls by its certified decrease",
+        ));
     }
     let consumer = after.iter().flatten().all(Zero::is_zero);
     Ok((
@@ -354,4 +366,3 @@ pub(crate) fn deposit_reads(
         },
     ))
 }
-

@@ -357,7 +357,9 @@ impl ReceiverFace {
 
     /// The declared explicit motion of this chart, for a consumer's clock admission.
     /// Reading this does not advance either participant or choose a receiving face.
-    pub fn chart_rate(&self) -> &[Rat] { &self.chart_rate }
+    pub fn chart_rate(&self) -> &[Rat] {
+        &self.chart_rate
+    }
 }
 
 /// [definition] **The face's motion over the solved step**, split into the three terms of the
@@ -638,7 +640,10 @@ mod tests {
             energy(&state.configuration, 0)
         );
         assert_eq!(after.commit, returned.commit());
-        assert_eq!(returned.stored_after().joint(), energy(&after.configuration, after.commit));
+        assert_eq!(
+            returned.stored_after().joint(),
+            energy(&after.configuration, after.commit)
+        );
         assert_eq!(
             returned.stored_after().joint() - returned.stored_before().joint(),
             returned.balance().stored_change
@@ -804,7 +809,10 @@ mod tests {
         assert_eq!(returned.face(), &[&read[0] + &h * &chart_rate]);
         // The medium's field at the midpoint, `Q = 1`.
         let reached = returned.next_state();
-        let midpoint = scale(&rat(1, 2), &add(&state.configuration, &reached.configuration));
+        let midpoint = scale(
+            &rat(1, 2),
+            &add(&state.configuration, &reached.configuration),
+        );
         let drift = sub(
             &omega.apply(&midpoint).unwrap(),
             &resistance.apply(&midpoint).unwrap(),

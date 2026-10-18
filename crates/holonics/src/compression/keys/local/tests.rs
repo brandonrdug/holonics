@@ -14,10 +14,7 @@ fn damaged(truth: &[usize], erased: &[usize], classes: usize) -> DamagedPassage 
 #[test]
 fn the_cover_certifies_every_read_distance_on_its_overlaps() {
     let cover = Cover::declare(48, 16, 8, 4).unwrap();
-    assert_eq!(
-        cover.regions(),
-        vec![0..16, 8..24, 16..32, 24..40, 32..48]
-    );
+    assert_eq!(cover.regions(), vec![0..16, 8..24, 16..32, 24..40, 32..48]);
     assert!(Cover::declare(48, 16, 8, 5).is_err());
     assert!(Cover::declare(48, 16, 10, 3).is_err());
     assert!(Cover::declare(48, 16, 16, 1).is_err());
@@ -88,7 +85,11 @@ fn the_glued_families_are_the_brute_force_projection() {
             let word: Vec<usize> = (0..period).map(|_| draw.below(4)).collect();
             let run = 4 + draw.below(8);
             for k in 0..run {
-                truth.push(if draw.below(16) == 0 { draw.below(4) } else { word[k % period] });
+                truth.push(if draw.below(16) == 0 {
+                    draw.below(4)
+                } else {
+                    word[k % period]
+                });
             }
         }
         truth.truncate(24);
@@ -113,7 +114,10 @@ fn the_glued_families_are_the_brute_force_projection() {
         }
         let read = local.families(&passage).unwrap();
         for (index, glued) in local.glued.iter().enumerate() {
-            assert_eq!(glued.members.len(), usize::from(matches!(glued.key, LocalKey::One(_))));
+            assert_eq!(
+                glued.members.len(),
+                usize::from(matches!(glued.key, LocalKey::One(_)))
+            );
             if glued.members.is_empty() {
                 continue;
             }
@@ -169,7 +173,10 @@ fn the_glued_families_are_the_brute_force_projection() {
             reopened += 1;
         }
     }
-    assert!(keyed > 0 && plural > 0 && empty > 0, "{keyed} {plural} {empty}");
+    assert!(
+        keyed > 0 && plural > 0 && empty > 0,
+        "{keyed} {plural} {empty}"
+    );
     assert!(joins.iter().all(|&count| count > 0), "{joins:?}");
     assert!(released > 0 && reopened > 0, "{released} {reopened}");
 }

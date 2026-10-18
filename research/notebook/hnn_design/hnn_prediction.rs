@@ -59,18 +59,18 @@
 //! deadline check of their own, stop at the pinned deadline. Counts that declare the read stay its
 //! arguments.
 
-#[path = "exterior.rs"]
-mod exterior;
-#[path = "hnn_executed_loop.rs"]
-mod executed_loop;
-#[path = "hnn_keys_loop.rs"]
-mod keys_loop;
-#[path = "hnn_repair_loop.rs"]
-mod repair_loop;
-#[path = "hnn_physical_receive.rs"]
-mod physical_receive;
 #[path = "hnn_continuing_behavior.rs"]
 mod continuing_behavior;
+#[path = "hnn_executed_loop.rs"]
+mod executed_loop;
+#[path = "exterior.rs"]
+mod exterior;
+#[path = "hnn_keys_loop.rs"]
+mod keys_loop;
+#[path = "hnn_physical_receive.rs"]
+mod physical_receive;
+#[path = "hnn_repair_loop.rs"]
+mod repair_loop;
 #[path = "hnn_text_repair.rs"]
 mod text_repair;
 #[path = "hnn_transport_loop.rs"]
@@ -192,7 +192,9 @@ fn ingest(field: &Field, request: &Encoded) -> (Current, SourceMoment) {
             .ingest(
                 field,
                 &mut current,
-                &request.part(fed..request.len()).expect("a part of the request"),
+                &request
+                    .part(fed..request.len())
+                    .expect("a part of the request"),
             )
             .expect("a request in the chart")
             .cells;
@@ -278,7 +280,10 @@ const BANK_GRAIN: u32 = 16;
 
 /// The process's resident set now and at its peak, in bytes (exterior), or `unread`.
 fn resident() -> String {
-    resident_set().map_or_else(|| "unread".to_string(), |(now, peak)| format!("{now} now, {peak} peak"))
+    resident_set().map_or_else(
+        || "unread".to_string(),
+        |(now, peak)| format!("{now} now, {peak} peak"),
+    )
 }
 
 /// **The declaration** (module header; the order pin): the joint residue ring of period
@@ -310,7 +315,10 @@ fn pinned(path: &str, command: &str, clock: Instant, arm: bool) -> exterior::Pin
 fn main() {
     let clock = Instant::now();
     let arguments: Vec<String> = std::env::args().collect();
-    match (arguments.get(1).map(String::as_str), arguments.get(2).map(String::as_str)) {
+    match (
+        arguments.get(1).map(String::as_str),
+        arguments.get(2).map(String::as_str),
+    ) {
         (Some("executed"), Some("evaluate")) => executed_loop::evaluate(
             &arguments[3],
             arguments[4].parse().expect("a seed"),
@@ -384,12 +392,20 @@ fn main() {
             )
         }
         (Some("executed"), Some("continuing-behavior")) => {
-            assert_eq!(arguments.len(), 5, "continuing-behavior <out> <committed pin>");
+            assert_eq!(
+                arguments.len(),
+                5,
+                "continuing-behavior <out> <committed pin>"
+            );
             let pin = pinned(&arguments[4], "executed continuing-behavior", clock, true);
             continuing_behavior::run(&arguments[3], &pin)
         }
         (Some("executed"), Some("native-world-history")) => {
-            assert_eq!(arguments.len(), 5, "native-world-history <out> <committed pin>");
+            assert_eq!(
+                arguments.len(),
+                5,
+                "native-world-history <out> <committed pin>"
+            );
             let pin = pinned(&arguments[4], "executed native-world-history", clock, true);
             continuing_behavior::run_world_history(&arguments[3], &pin)
         }

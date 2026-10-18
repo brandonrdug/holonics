@@ -14,9 +14,9 @@
 //! that same Resident and consumes it in `communicate_contact`. Other views refuse that future
 //! until their differential transport exists; no old Word or source passage is retained.
 
+pub mod action;
 pub mod communication;
 pub mod contact;
-pub mod action;
 
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, DepositReading};
@@ -29,8 +29,8 @@ use crate::hnn::prediction::{
 };
 use crate::hnn::ratio::HolonRatio;
 use crate::hnn::receiving::{DeclaringFace, ReceivingPhases};
-use crate::hnn::word::WordOpening;
 use crate::hnn::reference::{Reference, Resident};
+use crate::hnn::word::WordOpening;
 use crate::holon::HolonState;
 
 /// One supported affine material relation per declared comparison; no coupled R/E ray.
@@ -84,22 +84,41 @@ pub struct PhysicalReceiver<'f> {
 }
 
 impl<'f> PhysicalReceiver<'f> {
-    pub fn new(field: &'f Field, constitution: Constitution, current: Current,
-        opening: WordOpening) -> Result<Self, HnnError> {
-        Self::from_resident(field, Reference::mount_receiving(field, &current, constitution, opening)?)
+    pub fn new(
+        field: &'f Field,
+        constitution: Constitution,
+        current: Current,
+        opening: WordOpening,
+    ) -> Result<Self, HnnError> {
+        Self::from_resident(
+            field,
+            Reference::mount_receiving(field, &current, constitution, opening)?,
+        )
     }
 
     pub fn from_resident(field: &'f Field, resident: Resident) -> Result<Self, HnnError> {
         resident.admit_receiving_view(field)?;
-        Ok(Self { field, resident, declaring: DeclaringFace::new(field) })
+        Ok(Self {
+            field,
+            resident,
+            declaring: DeclaringFace::new(field),
+        })
     }
 
-    pub fn constitution(&self) -> &Constitution { self.resident.constitution() }
-    pub fn current(&self) -> &Current { self.resident.current() }
+    pub fn constitution(&self) -> &Constitution {
+        self.resident.constitution()
+    }
+    pub fn current(&self) -> &Current {
+        self.resident.current()
+    }
     /// Read the same retained current/material and its exact work/storage readings without
     /// remounting the receiver or dropping its already certified declaring-face cache.
-    pub fn resident(&self) -> &Resident { &self.resident }
-    pub fn opening(&self) -> WordOpening { self.resident.reception_opening() }
+    pub fn resident(&self) -> &Resident {
+        &self.resident
+    }
+    pub fn opening(&self) -> WordOpening {
+        self.resident.reception_opening()
+    }
 
     /// Execute one unobserved query and retain its physical end without a deposition.
     pub fn read(
@@ -172,8 +191,11 @@ impl<'f> PhysicalReceiver<'f> {
         let chart = section.chart();
         self.resident.admit_receiving_chart(chart)?;
         let opening = self.resident.reception_opening();
-        let (phases, declaring_face_reused) =
-            self.declaring.declare(self.resident.constitution(), self.resident.current(), receiver)?;
+        let (phases, declaring_face_reused) = self.declaring.declare(
+            self.resident.constitution(),
+            self.resident.current(),
+            receiver,
+        )?;
         let pending = if sparse {
             predict_sparse_by_field(
                 self.field,
@@ -204,75 +226,93 @@ impl<'f> PhysicalReceiver<'f> {
                 reason: "the exact physical passage does not close its declared work receipts",
             });
         }
-        let receiving_features = read_receiving_operands.then(|| {
-            (0..pending.prediction().reads.len()).map(|station| pending.receiving_feature(station))
-                .collect::<Option<Vec<_>>>()
-        }).flatten();
-        let (prediction, mut comparison, successor) = match observation(pending.prediction(), &phases) {
-            None => (pending.finish(), Ok(None), None),
-            Some(observation) => {
-                let result = match observation.learning {
-                    PhysicalLearning::Receiving if read_receiving_operands => pending.observe_receiving_diagnostic(
-                        self.resident.constitution(),
-                        &observation.observed,
-                        &observation.compared,
-                    ),
-                    PhysicalLearning::Receiving => pending.observe(
-                        self.resident.constitution(),
-                        &observation.observed,
-                        &observation.compared,
-                    ),
-                    PhysicalLearning::SourcePorts => pending.observe_source_ports(
-                        self.resident.constitution(),
-                        &observation.observed,
-                        &observation.compared,
-                    ),
-                    PhysicalLearning::PairOutputs => pending.observe_pair_outputs(
-                        self.resident.constitution(),
-                        &observation.observed,
-                        &observation.compared,
-                    ),
-                };
-                match result {
-                    Ok(PhysicalTeaching {
-                        prediction,
-                        ratio,
-                        pullback,
-                        constitution,
-                        publication,
-                        feature_energy,
-                        receiving_diagnostic,
-                        source_certificate,
-                        source_pairing,
-                    }) => (
-                        prediction,
-                        Ok(Some(PhysicalPublication {
+        let receiving_features = read_receiving_operands
+            .then(|| {
+                (0..pending.prediction().reads.len())
+                    .map(|station| pending.receiving_feature(station))
+                    .collect::<Option<Vec<_>>>()
+            })
+            .flatten();
+        let (prediction, mut comparison, successor) =
+            match observation(pending.prediction(), &phases) {
+                None => (pending.finish(), Ok(None), None),
+                Some(observation) => {
+                    let result = match observation.learning {
+                        PhysicalLearning::Receiving if read_receiving_operands => pending
+                            .observe_receiving_diagnostic(
+                                self.resident.constitution(),
+                                &observation.observed,
+                                &observation.compared,
+                            ),
+                        PhysicalLearning::Receiving => pending.observe(
+                            self.resident.constitution(),
+                            &observation.observed,
+                            &observation.compared,
+                        ),
+                        PhysicalLearning::SourcePorts => pending.observe_source_ports(
+                            self.resident.constitution(),
+                            &observation.observed,
+                            &observation.compared,
+                        ),
+                        PhysicalLearning::PairOutputs => pending.observe_pair_outputs(
+                            self.resident.constitution(),
+                            &observation.observed,
+                            &observation.compared,
+                        ),
+                    };
+                    match result {
+                        Ok(PhysicalTeaching {
+                            prediction,
                             ratio,
                             pullback,
+                            constitution,
                             publication,
                             feature_energy,
                             receiving_diagnostic,
                             source_certificate,
                             source_pairing,
-                        })),
-                        Some(constitution),
-                    ),
-                    Err(PhysicalTeachingRefusal { prediction, error }) => {
-                        (prediction, Err(error), None)
+                        }) => (
+                            prediction,
+                            Ok(Some(PhysicalPublication {
+                                ratio,
+                                pullback,
+                                publication,
+                                feature_energy,
+                                receiving_diagnostic,
+                                source_certificate,
+                                source_pairing,
+                            })),
+                            Some(constitution),
+                        ),
+                        Err(PhysicalTeachingRefusal { prediction, error }) => {
+                            (prediction, Err(error), None)
+                        }
                     }
                 }
-            }
-        };
+            };
         // R/E/pair publication keeps C and the loaded storage fixed. Material-coordinate
         // reactions must use their transported contact return, not this blind end unchanged.
-        let commit = successor.as_ref().unwrap_or_else(|| self.resident.constitution()).commit();
-        if let Err(error) = self.resident.publish_reception(successor,
-            HolonState::at(prediction.carry.clone(), commit), None, None, chart) {
+        let commit = successor
+            .as_ref()
+            .unwrap_or_else(|| self.resident.constitution())
+            .commit();
+        if let Err(error) = self.resident.publish_reception(
+            successor,
+            HolonState::at(prediction.carry.clone(), commit),
+            None,
+            None,
+            chart,
+        ) {
             // A failed publication keeps the old material but retains the accounted blind end.
             comparison = Err(error);
             let commit = self.resident.constitution().commit();
-            self.resident.publish_reception(None,
-                HolonState::at(prediction.carry.clone(), commit), None, None, chart)?;
+            self.resident.publish_reception(
+                None,
+                HolonState::at(prediction.carry.clone(), commit),
+                None,
+                None,
+                chart,
+            )?;
         }
         Ok(PhysicalReception {
             prediction,
@@ -283,5 +323,7 @@ impl<'f> PhysicalReceiver<'f> {
     }
 
     /// Return the same complete resident, without retaining an executed Word or source section.
-    pub fn into_resident(self) -> Resident { self.resident }
+    pub fn into_resident(self) -> Resident {
+        self.resident
+    }
 }

@@ -6,7 +6,7 @@
 // source rings, runs `e_max − 1` full ticks (junction Swing, ring element, contact transit) and a
 // last junction, every transient carried on `2^(−L_w)ℤ` with error feedback (the nearest-point
 // split, ties upward, `hnn_nearest`), every inverse applied as its certified lattice chart, and is
-// read at the receiving epochs as `f_j = R · P_R^(τ_R) v_R(e_j)`. Its return runs the ticks in
+// read at the receiving epochs as `f_j = R · v_R(e_j)` in the passage frame. Its return runs the ticks in
 // reverse through the transposes of the executed maps, its own transients carried the same way.
 // These kernels execute exactly that law in integers: every value `x` is an integer `X` on a
 // declared scale, `x = X · 2^(−σ)`, and every scale is fixed by the host before the launch (the
@@ -254,6 +254,7 @@
 #define WL_REC_RES_SOLVED 65
 #define WL_RES_STATUS 66
 #define WL_RES_OPERAND_STATUS 67
+#define WL_SOURCE_OPENING 68
 
 // The status block: the refusal bits, the first refused stage, and the row it refused.
 #define WSTATUS_BITS 0
@@ -578,7 +579,8 @@ extern "C" __global__ void hnn_pair_weights(
 extern "C" __global__ void hnn_word_forward(
     const long long *plan, const int64_t *operands, const int64_t *published,
     const unsigned long long *moment, const wide *pair_weights,
-    unsigned char *word, const unsigned long long *layout
+    unsigned char *word, const unsigned char *fresh_word, int receiving_mode,
+    const unsigned long long *layout
 ) {
     __shared__ uint32_t bits;
     __shared__ unsigned long long first;
@@ -635,6 +637,7 @@ extern "C" __global__ void hnn_word_forward(
     int64_t *rec_zeta = HNN_AT(int64_t, WL_REC_ZETA);
     wide *rec_omega = HNN_AT(wide, WL_REC_OMEGA);
     wide *logits = HNN_AT(wide, WL_LOGITS);
+    wide *source_opening = HNN_AT(wide, WL_SOURCE_OPENING);
     uint32_t *status_block = HNN_AT(uint32_t, WL_STATUS);
     int64_t *rec_res_drive = HNN_AT(int64_t, WL_REC_RES_DRIVE);
     int64_t *rec_res_output = HNN_AT(int64_t, WL_REC_RES_OUTPUT);
@@ -661,6 +664,7 @@ extern "C" __global__ void hnn_word_forward(
         res_rem_output[e] = 0;
         res_status[e] = HNN_EXACT;
         res_operand_status[e] = HNN_EXACT;
+        source_opening[e] = 0;
         if (!carry) {
             res_u[e] = 0;
             res_w[e] = 0;
@@ -765,6 +769,7 @@ extern "C" __global__ void hnn_word_forward(
                     }
                 }
                 const wide value = hnn_read(image, &st);
+                source_opening[base + i] = value;
                 wide remainder = 0;
                 const int64_t opened = hnn_split(value, src[WS_OPEN_EXP] - Lw, &remainder, &st);
                 storage[base + i] = opened;
@@ -1150,22 +1155,40 @@ extern "C" __global__ void hnn_word_forward(
         }
     }
 
-    // The receiving read f_j = R · P_R^(τ_R) v_R(e_j), each logit a certified sum.
+    // The receiving read f_j = R · v_R(e_j) in the passage frame (the plan's gather is the
+    // identity), each logit a certified sum.
     const long long receiver = plan[WP_RECEIVER];
-    if (receiver >= 0) {
+    if (receiver >= 0 && receiving_mode != 1) {
         const long long *ring = rings + receiver * WR_STRIDE;
         const long long n = ring[WR_WIDTH], base = ring[WR_ROWS];
         const long long rows = plan[WP_MAP_ROWS], aperture = plan[WP_APERTURE];
         const long long epoch = plan[WP_EPOCH];
         const long long *gather = plan + plan[WP_GATHER];
         const int64_t *map = published + plan[WP_MAP];
+        const long long map_columns = receiving_mode == 2 ? 2 * n : n;
+        const int64_t *fresh_anchors = receiving_mode == 2
+            ? (const int64_t *)(fresh_word + layout[WL_REC_ANCHOR])
+            : (const int64_t *)0;
         for (long long entry = t; entry < aperture * rows; entry += T) {
             uint32_t st = 0;
             const long long j = entry / rows, row = entry % rows;
             const int64_t *v = rec_anchor + (epoch + j) * N + base;
             HnnSum logit = hnn_sum();
-            for (long long k = 0; k < n; ++k) {
-                hnn_add_words(logit, map[row * n + k], v[gather[k]]);
+            if (receiving_mode == 2) {
+                const int64_t *fresh = fresh_anchors + (epoch + j) * N + base;
+                for (long long k = 0; k < n; ++k) {
+                    const int64_t s = fresh[gather[k]];
+                    hnn_add_words(logit, map[row * map_columns + k], s);
+                    hnn_add_scaled(
+                        logit,
+                        map[row * map_columns + n + k],
+                        hnn_minus(v[gather[k]], s)
+                    );
+                }
+            } else {
+                for (long long k = 0; k < n; ++k) {
+                    hnn_add_words(logit, map[row * map_columns + k], v[gather[k]]);
+                }
             }
             logits[entry] = hnn_read(logit, &st);
             hnn_note(st, STAGE_READ, (uint32_t)entry, &bits, &first);

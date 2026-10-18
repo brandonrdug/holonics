@@ -66,8 +66,11 @@ fn generating(terrain: &str) -> PairRelation {
         "alternation" => (2, 0),
         _ => panic!("a terrain: order2 | alternation | line"),
     };
-    PairRelation::new(offset, (0..CLASSES).map(|y| Some((y + turn) % CLASSES)).collect())
-        .expect("a generating key")
+    PairRelation::new(
+        offset,
+        (0..CLASSES).map(|y| Some((y + turn) % CLASSES)).collect(),
+    )
+    .expect("a generating key")
 }
 
 fn show(cells: &[Option<usize>]) -> String {
@@ -150,7 +153,11 @@ fn survivors_shown(lags: &[Lag]) -> String {
             format!("ℓ {} [{}]", index + 1, map.join(" "))
         })
         .collect();
-    format!("{} alive: {}", alive.len(), alive.iter().take(8).cloned().collect::<Vec<_>>().join("; "))
+    format!(
+        "{} alive: {}",
+        alive.len(),
+        alive.iter().take(8).cloned().collect::<Vec<_>>().join("; ")
+    )
 }
 
 /// **The stopping object at the repair's grain**: at every erased cell of every passage, the union
@@ -223,8 +230,10 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
         .iter()
         .map(|truth| DamagedPassage::encoded(truth, &erased, OPENING).expect("a passage"))
         .collect();
-    let damaged: Vec<Vec<Option<usize>>> =
-        passages.iter().map(|passage| passage.cells().to_vec()).collect();
+    let damaged: Vec<Vec<Option<usize>>> = passages
+        .iter()
+        .map(|passage| passage.cells().to_vec())
+        .collect();
     let truths = truths; // read again only after every release (below)
     println!(
         "executed repair: {terrain}, damage {damage_name}, seed {seed}, {count} passages of {} cells (opening {OPENING}); erased cells {erased:?} ({} of {})",
@@ -242,8 +251,7 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
     let mut per_passage_located = 0usize;
     let mut per = 0usize;
     for (index, passage) in passages.iter().enumerate() {
-        let observations =
-            damaged_station_pairs(&field, ring, passage).expect("the damaged menu");
+        let observations = damaged_station_pairs(&field, ring, passage).expect("the damaged menu");
         per = observations.len();
         let mut own = PairLocation::open(&field, ring);
         for (t, readings) in &observations {
@@ -299,7 +307,11 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
             "  not located at the read set's end ({total} observations): distances alive {:?}; every erased cell held",
             survivors.distances()
         );
-        println!("executed repair: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+        println!(
+            "executed repair: {} ms; resident {}",
+            clock.elapsed().as_millis(),
+            resident()
+        );
         return;
     };
     println!(
@@ -407,7 +419,8 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
             reopen(passage, &read, &mut bits).expect("the passage reopens") == **truth
         })
         .count();
-    let literal = erased.len() * count * usize::try_from(ceil_log2(&BigUint::from(CLASSES))).unwrap();
+    let literal =
+        erased.len() * count * usize::try_from(ceil_log2(&BigUint::from(CLASSES))).unwrap();
     println!(
         "  the codec: key {} bits + residual {residual_bits} bits (longest a passage {longest}; the Fold's bound Σ⌈log₂ N⌉ = {fold_bound}) = {} bits, against the literal {literal} bits; decoded: {reopened} of {count} passages reopened exactly, trailing bits {}",
         key.len(),
@@ -435,7 +448,13 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
             "is not the located relation"
         }
     );
-    let holds = |k: usize| stopping_holds(&reference_after(&damaged, &observed[..k]), &passages, &generated);
+    let holds = |k: usize| {
+        stopping_holds(
+            &reference_after(&damaged, &observed[..k]),
+            &passages,
+            &generated,
+        )
+    };
     if holds(total) {
         let (mut low, mut high) = (0usize, total);
         while low < high {
@@ -463,7 +482,11 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
     let mut settled = 0usize;
     for k in 1..=total {
         let next = reference_after_one(lags.clone(), &damaged, observed[k - 1]);
-        if next.iter().zip(&lags).any(|(a, b)| a.alive != b.alive || a.map != b.map) {
+        if next
+            .iter()
+            .zip(&lags)
+            .any(|(a, b)| a.alive != b.alive || a.map != b.map)
+        {
             settled = k;
         }
         lags = next;
@@ -473,7 +496,11 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
         units(settled, per),
         survivors_shown(&lags)
     );
-    println!("executed repair: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+    println!(
+        "executed repair: {} ms; resident {}",
+        clock.elapsed().as_millis(),
+        resident()
+    );
 }
 
 /// [definition; agent-inferred, October 5; the
@@ -512,7 +539,10 @@ pub(super) fn physical(
     // [agent-inferred] A damaged section has a declared extent, hence no termination class.
     // Its producing identity D = I_4 and the physical E/R use the same four classes. The old
     // five-class generation declaration carried an unjoined termination row into this read.
-    let declared = Declared { alphabet: CLASSES, ..order_declared() };
+    let declared = Declared {
+        alphabet: CLASSES,
+        ..order_declared()
+    };
     let field = declare(&declared);
     let ring = 0;
     let shape = Declared {
@@ -523,7 +553,10 @@ pub(super) fn physical(
     let length = OPENING + STATIONS;
     let erased = damage(damage_name);
     let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("the declared opening");
-    let prior = opening.source_port(ring).expect("the opening's source port").clone();
+    let prior = opening
+        .source_port(ring)
+        .expect("the opening's source port")
+        .clone();
     let current = Current::at_rest(&field);
     let receiver = ReceiverDeclaration {
         ring,
@@ -554,16 +587,20 @@ pub(super) fn physical(
             .collect();
         let mut location = PairLocation::open(&field, ring);
         for passage in &damaged {
-            for (_, readings) in damaged_station_pairs(&field, ring, passage).expect("the damaged menu") {
+            for (_, readings) in
+                damaged_station_pairs(&field, ring, passage).expect("the damaged menu")
+            {
                 location.observe(&readings);
             }
         }
         let Some(located) = location.survivors().located() else {
-            println!("  {terrain} (seed {seed}): no pair located at the read set's end; nothing deposited, nothing repaired");
+            println!(
+                "  {terrain} (seed {seed}): no pair located at the read set's end; nothing deposited, nothing repaired"
+            );
             continue;
         };
-        let (theta, deposit) =
-            pair_deposit(&field, &opening, &prior, ring, &located).expect("the located pair's deposit");
+        let (theta, deposit) = pair_deposit(&field, &opening, &prior, ring, &located)
+            .expect("the located pair's deposit");
         println!(
             "  {terrain} (seed {seed}): located δ {} map {:?}; deposited, slip {} → {}, certificate {}",
             located.offset,
@@ -602,7 +639,8 @@ pub(super) fn physical(
             (0usize, 0usize, 0usize, 0usize);
         let (mut agree, mut beside_reference, mut wrong, mut contains, mut held_cells) =
             (0usize, 0usize, 0usize, 0usize, 0usize);
-        let (mut opening_closes, mut ticks_closing, mut ticks, mut words_close) = (0usize, 0usize, 0usize, 0usize);
+        let (mut opening_closes, mut ticks_closing, mut ticks, mut words_close) =
+            (0usize, 0usize, 0usize, 0usize);
         let mut zero_faces = 0usize;
         let mut leaders: BTreeMap<usize, usize> = BTreeMap::new();
         let mut carries: BTreeMap<usize, usize> = BTreeMap::new();
@@ -651,7 +689,10 @@ pub(super) fn physical(
             let physical: String = repair
                 .cells
                 .iter()
-                .map(|cell| cell.class().map_or_else(|| "?".to_string(), |c| c.to_string()))
+                .map(|cell| {
+                    cell.class()
+                        .map_or_else(|| "?".to_string(), |c| c.to_string())
+                })
                 .collect();
             sections.push_str(&format!(
                 "{terrain} passage {index}\n  damaged   {}\n  physical  {physical}\n  reference {}\n  truth     {}\n  opening: before {} after {} absorbed {} imposed {}; word: open {} end {} dissipation {} residual {}; carry at {}\n",
@@ -680,5 +721,9 @@ pub(super) fn physical(
     }
     #[allow(clippy::disallowed_methods)]
     std::fs::write(format!("{out}.sections"), &sections).expect("write the sections");
-    println!("executed physical-repair: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+    println!(
+        "executed physical-repair: {} ms; resident {}",
+        clock.elapsed().as_millis(),
+        resident()
+    );
 }

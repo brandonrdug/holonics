@@ -6,7 +6,6 @@
 
 use num_bigint::BigUint;
 
-use crate::hnn::tests::support::encoded;
 use super::support::{Draw, contact, ring};
 use crate::compression::{Candidate, Menu, PortImages};
 use crate::hnn::HnnError;
@@ -16,6 +15,7 @@ use crate::hnn::keys::{
     ring_steps,
 };
 use crate::hnn::moment::SourceMoment;
+use crate::hnn::tests::support::encoded;
 use crate::holarchy::terrain::{RotorCrib, rotor_crib};
 use crate::holon::contact::menu::PortPermutation;
 use crate::navigator::Clock;
@@ -26,7 +26,9 @@ use crate::ratio::{integer, rat};
 /// every ring at least as wide (THE_MACHINE guard 9: no residue; it read 16 classes through
 /// `code mod d_g` before October 5).
 fn rotor_field(rings: &[(u64, Vec<u64>)]) -> Field {
-    let widest = (0..rings.len()).max_by_key(|&g| (rings[g].0, std::cmp::Reverse(g))).unwrap();
+    let widest = (0..rings.len())
+        .max_by_key(|&g| (rings[g].0, std::cmp::Reverse(g)))
+        .unwrap();
     Field::declare(
         FieldDeclaration {
             rings: rings
@@ -366,13 +368,24 @@ fn a_closing_crib_is_stepped_back_and_its_key_carried_to_the_boundary() {
     );
     let location = locate_closing(&field, &current, &encoded(&field, &crib), 1).unwrap();
     assert_eq!(location.rings[0].published, Some(3));
-    let ticks = crib_ticks(&field, 0, &encoded(&field, &crib), &location.configurations()).unwrap();
+    let ticks = crib_ticks(
+        &field,
+        0,
+        &encoded(&field, &crib),
+        &location.configurations(),
+    )
+    .unwrap();
     assert_eq!(ticks, 64);
     assert_eq!(location.rings[0].carried, Some((3 + 64) % 7));
     location.rekey(&field, &mut current).unwrap();
     assert_eq!(current.phase(&field, 0).unwrap(), (3 + 64) % 7);
     assert_eq!(
-        crib_opening(&field, Current::at_rest(&field).lift(), &encoded(&field, &crib)).unwrap_err(),
+        crib_opening(
+            &field,
+            Current::at_rest(&field).lift(),
+            &encoded(&field, &crib)
+        )
+        .unwrap_err(),
         HnnError::NegativeLift { ring: 0 }
     );
 }
@@ -435,10 +448,15 @@ fn the_pair_menu_locates_order_two_and_the_alternation_as_its_least_winding() {
     assert!(distances.contains(&2) && distances.contains(&4));
     assert!(distances.iter().all(|offset| offset % 2 == 0));
     for (_, reading) in &survivors.alive {
-        let map = reading.map.as_ref().expect("every winding publishes its map");
+        let map = reading
+            .map
+            .as_ref()
+            .expect("every winding publishes its map");
         assert!(map.iter().all(|(y, x)| y == x));
     }
-    let located = survivors.located().expect("the windings of distance 2 locate it");
+    let located = survivors
+        .located()
+        .expect("the windings of distance 2 locate it");
     assert_eq!(located.offset, 2);
     assert!(located.map.iter().all(|(y, x)| y == x));
     assert_eq!((located.cycle, located.turns.clone()), (1, vec![0]));
@@ -476,11 +494,20 @@ fn a_class_of_windings_locates_its_least_distance_and_any_other_class_stays_plur
     let located = family.located().expect("the windings of (2, +1)");
     assert_eq!((located.offset, located.map.clone()), (2, plus(1)));
     assert_eq!((located.cycle, located.turns), (4, vec![4, 12]));
-    let wrong_power = survivors(vec![(2, generator.clone()), (4, published(&plus(1), 4, &[4, 12]))]);
+    let wrong_power = survivors(vec![
+        (2, generator.clone()),
+        (4, published(&plus(1), 4, &[4, 12])),
+    ]);
     assert!(wrong_power.located().is_none());
-    let coprime = survivors(vec![(2, generator.clone()), (3, published(&plus(1), 4, &[4, 12]))]);
+    let coprime = survivors(vec![
+        (2, generator.clone()),
+        (3, published(&plus(1), 4, &[4, 12])),
+    ]);
     assert!(coprime.located().is_none());
-    let partial = survivors(vec![(2, generator.clone()), (4, published(&plus(2)[..2], 2, &[8]))]);
+    let partial = survivors(vec![
+        (2, generator.clone()),
+        (4, published(&plus(2)[..2], 2, &[8])),
+    ]);
     assert_eq!(partial.located().map(|pair| pair.offset), Some(2));
     let alone = survivors(vec![(5, generator.clone())]);
     assert_eq!(alone.located().map(|pair| pair.offset), Some(5));
@@ -499,7 +526,14 @@ fn the_pair_menu_reads_each_station_at_every_distance_its_passage_reaches() {
     let readings = station_pairs(&field, 0, &encoded(&field, &passage), 18).unwrap();
     assert_eq!(readings.len(), 2);
     assert_eq!(readings[0].len(), 15);
-    assert_eq!(readings[0][1], PairReading { offset: 2, from: 0, to: 2 });
+    assert_eq!(
+        readings[0][1],
+        PairReading {
+            offset: 2,
+            from: 0,
+            to: 2
+        }
+    );
     assert!(matches!(
         station_pairs(&field, 0, &encoded(&field, &passage), 0),
         Err(HnnError::Crib { .. })
@@ -538,7 +572,12 @@ fn a_damaged_passage_locates_its_pair_from_intact_cells_and_is_repaired_through_
     let mut location = PairLocation::open(&field, 0);
     for passage in &passages {
         let cells = damage(passage);
-        let observations = damaged_station_pairs(&field, 0, &DamagedPassage::new(cells.clone(), field.alphabet(), 4).unwrap()).unwrap();
+        let observations = damaged_station_pairs(
+            &field,
+            0,
+            &DamagedPassage::new(cells.clone(), field.alphabet(), 4).unwrap(),
+        )
+        .unwrap();
         let stations: Vec<usize> = observations.iter().map(|(t, _)| *t).collect();
         assert_eq!(stations, vec![4, 7, 8, 10, 11, 12, 13]);
         let (_, at_seven) = &observations[1];
@@ -548,8 +587,14 @@ fn a_damaged_passage_locates_its_pair_from_intact_cells_and_is_repaired_through_
             location.observe(observation);
         }
     }
-    let located = location.survivors().located().expect("order-2 located from intact cells");
-    assert_eq!((located.offset, located.map.clone()), (2, vec![(0, 1), (1, 2), (2, 3), (3, 0)]));
+    let located = location
+        .survivors()
+        .located()
+        .expect("order-2 located from intact cells");
+    assert_eq!(
+        (located.offset, located.map.clone()),
+        (2, vec![(0, 1), (1, 2), (2, 3), (3, 0)])
+    );
     let relation = located.relation(&field, 0, 4).unwrap();
     assert_eq!(relation.map(), &[Some(1), Some(2), Some(3), Some(0)]);
     for passage in &passages {

@@ -12,11 +12,11 @@
 //! y_b = A x_b = (Σ_j a_ij ξ_b,γ_b(j)) · 2^(−(L_A + L_x))
 //! ```
 //!
-//! with an optional gather `γ_b` of the operand's coordinates ([`Gather`]): the ring rotation
-//! `P_R^(τ_R)` is a permutation of the realified coordinates, so the receiving read
-//! `f = R · P_R^(τ_R) v_R` (`holonics::hnn::ReceivingPhases::read`) is `R` against the gathered
-//! anchor, with no arithmetic in the rotation. The integer sum is taken in the ring `ℤ/2^128` and
-//! read under its l1 certificate (`kernels/exact_integer.cuh`): an entry whose bound
+//! with an optional gather `γ_b` of the operand's coordinates ([`Gather`]): a ring rotation `P^k`
+//! is a permutation of the realified coordinates, so a rotated read `R · P^k v` is `R` against the
+//! gathered anchor, with no arithmetic in the rotation. The receiving read
+//! `f = R · v_R` (`holonics::hnn::ReceivingPhases::read`) is in the passage frame: no gather. The
+//! integer sum is taken in the ring `ℤ/2^128` and read under its l1 certificate (`kernels/exact_integer.cuh`): an entry whose bound
 //! `Σ_j |a_ij ξ_j|` reaches `2^127` is refused ([`DeviceError::Carrier`]), whatever its value, so
 //! the refusal depends on the exact terms alone and never on the realization's order. Below the
 //! bound the ring's signed read of any partial sum, in any order, is the integer sum (Lean

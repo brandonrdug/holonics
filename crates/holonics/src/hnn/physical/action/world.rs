@@ -166,7 +166,7 @@ impl BoundJointWorld {
             || face.chart_rate().iter().any(|x| !x.is_zero())
             || !common_chart.is_empty()
             || common_chart.classes() == 0
-            || common_chart.located().is_some()
+            || common_chart.has_advances()
             || !common_chart.fibre().is_empty()
             || *common_chart.decoder() != ExactRatMatrix::identity(common_chart.classes())?
         {
@@ -366,7 +366,11 @@ impl BoundJointWorld {
         epochs: &[usize],
         compared: &[bool],
         grain: u64,
-        observer: &mut dyn FnMut(&crate::hnn::word::Word<'_>, usize, &WaveJointStep) -> Result<(), HnnError>,
+        observer: &mut dyn FnMut(
+            &crate::hnn::word::Word<'_>,
+            usize,
+            &WaveJointStep,
+        ) -> Result<(), HnnError>,
     ) -> Result<NativeEncounter, NativeEncounterFailure> {
         let before_native_tick = word.opened_at();
         let before_world_tick = self.state.commit;

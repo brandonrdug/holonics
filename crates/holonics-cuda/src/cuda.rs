@@ -92,7 +92,10 @@ unsafe fn copy_h_to_d_sync(
 ) -> Result<()> {
     // SAFETY: the caller guarantees `source` addresses `bytes` readable host bytes and
     // `destination` a device allocation of at least `bytes` in the current context.
-    check(unsafe { ffi::cuMemcpyHtoD_v2(destination, source, bytes) }, context)?;
+    check(
+        unsafe { ffi::cuMemcpyHtoD_v2(destination, source, bytes) },
+        context,
+    )?;
     check(
         unsafe { ffi::cuStreamSynchronize(core::ptr::null_mut()) },
         "cuStreamSynchronize(legacy host-to-device copy)",

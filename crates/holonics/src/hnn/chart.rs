@@ -48,6 +48,16 @@
 //! denominator, `crate::ratio::linear::vector::integral`): a carried transient on `2^(−L_w)ℤ` is
 //! its coordinates over `2^(L_w)`.
 //!
+//! [definition; representation extension] `ChartWords::apply` and its transpose retain that
+//! single-word read and its exact refusal for operands whose integral coordinates all fit i64.
+//! Wider operands are signed radix-2^32 limbs. Each limb separately satisfies the same primitive
+//! certificate; BigInt reconstruction computes `Q n = Σ_k 2^(32k) Q n_k` exactly. The assembled
+//! wide product is NOT asserted to satisfy the original whole-operand bound. No chart coordinate,
+//! refinement, tolerance or rounding law changes. Cost is proportional to the limb count; allocation
+//! extents are checked. The shared host response tube uses this representation on both backends;
+//! direct CUDA lattice mounting remains i64-limited and is not extended here.
+//! [open] The limb reconstruction identity's Lean counterpart remains owed in #62.
+//!
 //! [definition] **Error feedback** ([`carry`], Lean `feedback_tick`): an image `y` plus the carried
 //! remainder `r` splits at the nearest point of `2^(−L_w)ℤ`, ties upward, into the carried value `x`
 //! and the next remainder, `x + r' = y + r` (the Ratio's `div_rem`, `hnn::Lattice::div_rem`). Over
@@ -224,15 +234,84 @@ fn word(value: &BigInt, what: &'static str) -> Result<i64, HnnError> {
     value.to_i64().ok_or_else(|| carrier(what))
 }
 
-/// **An operand's integral chart in the carrier**: its entries as signed 64-bit words over one
-/// positive denominator, or the carrier's refusal.
-fn operand(vector: &[Rat]) -> Result<(Vec<i64>, BigInt), HnnError> {
+/// An exact operand, retaining the existing single-word path whenever every coordinate fits.
+/// [definition; representation extension] Wider coordinates are signed radix-2^32 limbs, each read
+/// under the existing integer-dot certificate. Reconstruction is exact BigInt arithmetic:
+/// `Q n = Σ_k 2^(32k) Q n_k`. This extends operand representation, not chart coordinates,
+/// operator refinement, tolerance, or any individual limb's carrier certificate.
+struct Operand {
+    limbs: Vec<Vec<i64>>,
+    denominator: BigInt,
+}
+
+fn operand(vector: &[Rat]) -> Result<Operand, HnnError> {
     let (numerators, denominator) = integral(vector);
-    let words = numerators
+    if let Some(words) = numerators
         .iter()
-        .map(|n| word(n, "an operand's coordinate beyond the 64-bit word"))
-        .collect::<Result<Vec<i64>, HnnError>>()?;
-    Ok((words, denominator))
+        .map(ToPrimitive::to_i64)
+        .collect::<Option<Vec<_>>>()
+    {
+        return Ok(Operand {
+            limbs: vec![words],
+            denominator,
+        });
+    }
+    let count = numerators
+        .iter()
+        .map(|n| n.bits().div_ceil(32))
+        .max()
+        .unwrap_or(0);
+    let count = usize::try_from(count).map_err(|_| carrier("operand limb count"))?;
+    checked_limb_extent(count, numerators.len())?;
+    // Borrow the existing digits; do not allocate a second copy before validating the extent.
+    let mut digits = Vec::new();
+    digits
+        .try_reserve_exact(numerators.len())
+        .map_err(|_| carrier("operand digit iterators"))?;
+    digits.extend(numerators.iter().map(|n| (n.sign(), n.iter_u32_digits())));
+    let mut limbs = Vec::new();
+    limbs
+        .try_reserve_exact(count)
+        .map_err(|_| carrier("operand limb allocation"))?;
+    for _ in 0..count {
+        let mut limb = Vec::new();
+        limb.try_reserve_exact(numerators.len())
+            .map_err(|_| carrier("operand limb allocation"))?;
+        for (sign, digits) in &mut digits {
+            let digit = i64::from(digits.next().unwrap_or(0));
+            limb.push(if *sign == num_bigint::Sign::Minus {
+                -digit
+            } else {
+                digit
+            });
+        }
+        limbs.push(limb);
+    }
+    Ok(Operand { limbs, denominator })
+}
+
+fn checked_limb_extent(count: usize, width: usize) -> Result<(), HnnError> {
+    count
+        .checked_mul(width)
+        .and_then(|n| n.checked_mul(std::mem::size_of::<i64>()))
+        .filter(|bytes| *bytes <= isize::MAX as usize)
+        .ok_or_else(|| carrier("operand limb allocation extent"))?;
+    Ok(())
+}
+
+impl Operand {
+    fn dot(&self, mut coefficients: impl FnMut(usize) -> i64) -> Result<BigInt, HnnError> {
+        let mut sum = BigInt::zero();
+        for limb in self.limbs.iter().rev() {
+            let partial = certified_dot(
+                limb.iter()
+                    .enumerate()
+                    .map(|(j, x)| (i128::from(coefficients(j)), i128::from(*x))),
+            )?;
+            sum = (sum << 32usize) + BigInt::from(partial);
+        }
+        Ok(sum)
+    }
 }
 
 /// `Σ_j q_j x_j` under the ℓ1 certificate: admitted when `Σ_j |q_j x_j| < 2^127`, so every partial
@@ -352,17 +431,13 @@ impl ChartWords {
                 found: vector.len(),
             });
         }
-        let (x, denominator) = operand(vector)?;
-        let scale = self.scale() * denominator;
+        let operand = operand(vector)?;
+        let scale = self.scale() * &operand.denominator;
         (0..self.rows)
             .map(|i| {
                 let row = &self.words[i * self.columns..(i + 1) * self.columns];
-                let sum = certified_dot(
-                    row.iter()
-                        .zip(&x)
-                        .map(|(q, x)| (i128::from(*q), i128::from(*x))),
-                )?;
-                Ok(Rat::new(BigInt::from(sum), scale.clone()))
+                let sum = operand.dot(|j| row[j])?;
+                Ok(Rat::new(sum, scale.clone()))
             })
             .collect()
     }
@@ -377,17 +452,12 @@ impl ChartWords {
                 found: vector.len(),
             });
         }
-        let (x, denominator) = operand(vector)?;
-        let scale = self.scale() * denominator;
+        let operand = operand(vector)?;
+        let scale = self.scale() * &operand.denominator;
         (0..self.columns)
             .map(|j| {
-                let sum = certified_dot((0..self.rows).map(|i| {
-                    (
-                        i128::from(self.words[i * self.columns + j]),
-                        i128::from(x[i]),
-                    )
-                }))?;
-                Ok(Rat::new(BigInt::from(sum), scale.clone()))
+                let sum = operand.dot(|i| self.words[i * self.columns + j])?;
+                Ok(Rat::new(sum, scale.clone()))
             })
             .collect()
     }
@@ -750,6 +820,76 @@ impl Charts {
         Self::default()
     }
 
+    /// Import kept charts from another realization without translating through text.
+    ///
+    /// This is the checked counterpart to [`Charts::read`]: it preserves each exact key and
+    /// `ChartWords` value and refuses malformed shapes or duplicate keys. A realization should
+    /// still validate that the keys and chart exponents belong to its declared field/material.
+    pub fn from_entries(
+        entries: impl IntoIterator<Item = (ChartKey, ChartWords)>,
+    ) -> Result<Self, HnnError> {
+        let mut charts = BTreeMap::new();
+        for (key, chart) in entries {
+            let Some(expected) = chart.rows.checked_mul(chart.columns) else {
+                return Err(HnnError::Unadmitted {
+                    reason: "a kept chart whose shape overflows its coordinate count",
+                });
+            };
+            if expected != chart.words.len() {
+                return Err(HnnError::Shape {
+                    what: "a kept chart's words against its shape",
+                    expected,
+                    found: chart.words.len(),
+                });
+            }
+            if charts.insert(key, chart).is_some() {
+                return Err(HnnError::Unadmitted {
+                    reason: "duplicate kept chart keys",
+                });
+            }
+        }
+        Ok(Self { charts })
+    }
+
+    /// Check that every persisted chart names a solve of this field and its declared word grid.
+    pub fn validate_for(&self, field: &crate::hnn::field::Field) -> Result<(), HnnError> {
+        if self.is_empty() {
+            return Ok(());
+        }
+        let Some(lattice) = field.word_lattice() else {
+            return Err(HnnError::Unadmitted {
+                reason: "kept charts on a field without a declared word lattice",
+            });
+        };
+        for (key, chart) in &self.charts {
+            let width = match key {
+                ChartKey::Ring(ring) => field.rings().get(*ring).map(|ring| ring.width()),
+                ChartKey::Contact { contact, .. } => field
+                    .contacts()
+                    .get(*contact)
+                    .map(|contact| contact.width()),
+            }
+            .ok_or(HnnError::Unadmitted {
+                reason: "a kept chart key outside its field",
+            })?;
+            if chart.rows != width || chart.columns != width {
+                return Err(HnnError::Shape {
+                    what: "a kept chart's dimensions against its field operator",
+                    expected: width,
+                    found: chart.rows.max(chart.columns),
+                });
+            }
+            if chart.exponent != lattice.chart_exponent() {
+                return Err(HnnError::Shape {
+                    what: "a kept chart's exponent against the field word lattice",
+                    expected: lattice.chart_exponent() as usize,
+                    found: chart.exponent as usize,
+                });
+            }
+        }
+        Ok(())
+    }
+
     pub fn get(&self, key: &ChartKey) -> Option<&ChartWords> {
         self.charts.get(key)
     }
@@ -795,15 +935,20 @@ impl Charts {
 
     /// **The charts read back from their text** ([`Charts::write`]); refused, typed, on any line out
     /// of its form or a chart whose words are not `rows × columns`.
-    pub fn read<'a>(head: &str, next: crate::hnn::state_text::Next<'_, 'a>) -> Result<Self, HnnError> {
+    pub fn read<'a>(
+        head: &str,
+        next: crate::hnn::state_text::Next<'_, 'a>,
+    ) -> Result<Self, HnnError> {
         use crate::hnn::state_text::{keyed, refused, value, values};
         let what = "the charts";
         let count: usize = value(keyed(head, "charts", what)?.first(), what)?;
-        let mut charts = BTreeMap::new();
+        let mut charts = Vec::with_capacity(count);
         for _ in 0..count {
             let words: Vec<&str> = next("a chart's key")?.split_whitespace().collect();
             let (key, shape) = match words.first().copied() {
-                Some("ring") if words.len() == 5 => (ChartKey::Ring(value(words.get(1), what)?), &words[2..]),
+                Some("ring") if words.len() == 5 => {
+                    (ChartKey::Ring(value(words.get(1), what)?), &words[2..])
+                }
                 Some("contact") if words.len() == 6 => (
                     ChartKey::Contact {
                         contact: value(words.get(1), what)?,
@@ -822,9 +967,17 @@ impl Charts {
             if Some(words.len()) != rows.checked_mul(columns) {
                 return refused("a chart's words against its shape");
             }
-            charts.insert(key, ChartWords { rows, columns, exponent, words });
+            charts.push((
+                key,
+                ChartWords {
+                    rows,
+                    columns,
+                    exponent,
+                    words,
+                },
+            ));
         }
-        Ok(Self { charts })
+        Self::from_entries(charts)
     }
 }
 
@@ -922,7 +1075,9 @@ mod witness {
     fn two_certified_charts_of_one_operator_split_one_image_differently() {
         let lattice = WordLattice::new(28, 12, 12);
         let entries = |rows: [[i64; 2]; 2]| -> Vec<Vec<Rat>> {
-            rows.iter().map(|row| row.iter().map(|&x| integer(x)).collect()).collect()
+            rows.iter()
+                .map(|row| row.iter().map(|&x| integer(x)).collect())
+                .collect()
         };
         let operator_matrix = ExactRatMatrix::shaped(2, 2, entries([[3, 1], [1, 2]])).unwrap();
         let operator = Operator::of(&operator_matrix).unwrap();
@@ -935,10 +1090,14 @@ mod witness {
         .unwrap();
         assert!(certificate_of(&operator, &exact).unwrap() <= target);
         // A second certified chart of the same operator: its first coordinate one chart unit lower.
-        let mut coordinates: Vec<BigInt> =
-            exact.words().iter().map(|&word| BigInt::from(word)).collect();
+        let mut coordinates: Vec<BigInt> = exact
+            .words()
+            .iter()
+            .map(|&word| BigInt::from(word))
+            .collect();
         coordinates[0] -= BigInt::one();
-        let other = ChartWords::of_coordinates(2, 2, lattice.chart_exponent(), &coordinates).unwrap();
+        let other =
+            ChartWords::of_coordinates(2, 2, lattice.chart_exponent(), &coordinates).unwrap();
         assert!(certificate_of(&operator, &other).unwrap() <= target);
         assert_ne!(exact, other);
         // A right side whose first image under the first chart lies exactly on a tie of the
@@ -958,10 +1117,195 @@ mod witness {
         assert!(read_cold[0].is_zero());
         assert_ne!(read_kept, read_cold);
         // Each split is exact: representative plus remainder is the chart's image.
-        for (read, (rest, image)) in [(&read_kept, (&kept, &first)), (&read_cold, (&cold, &second))] {
+        for (read, (rest, image)) in [
+            (&read_kept, (&kept, &first)),
+            (&read_cold, (&cold, &second)),
+        ] {
             for i in 0..2 {
                 assert_eq!(&read[i] + &rest[i], image[i].clone());
             }
         }
+    }
+}
+
+/// A same-return cotangent chart refinement, chosen from the actual transported seed groups.
+/// Each nonzero group's largest coordinate is resolved at the declared unit-scale precision.
+/// This changes no forward Word operand, phase, sample, or next-Word carry. It is not an exact
+/// adjoint certificate: the executed return still releases its measured rounding residual.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReturnPrecision {
+    declared: Option<Lattice>,
+    lattice: Option<Lattice>,
+    levels: u32,
+    seed_groups: usize,
+    smallest_nonzero_group_peak: Rat,
+}
+impl ReturnPrecision {
+    pub fn for_seeds(declared: Option<Lattice>, seeds: &[Vec<Rat>]) -> Result<Self, HnnError> {
+        let peaks: Vec<Rat> = seeds
+            .iter()
+            .filter_map(|seed| {
+                seed.iter()
+                    .map(Signed::abs)
+                    .max()
+                    .filter(|peak| !peak.is_zero())
+            })
+            .collect();
+        let smallest = peaks.iter().min().cloned().unwrap_or_else(Rat::zero);
+        let mut levels = 0;
+        if declared.is_some() && !smallest.is_zero() && smallest < Rat::one() {
+            let difference = smallest
+                .denom()
+                .bits()
+                .saturating_sub(smallest.numer().bits());
+            levels = u32::try_from(difference).map_err(|_| HnnError::CountOverflow)?;
+            if (smallest.numer() << levels as usize) < *smallest.denom() {
+                levels = levels.checked_add(1).ok_or(HnnError::CountOverflow)?;
+            }
+        }
+        let lattice = declared
+            .map(|at| {
+                at.exponent()
+                    .checked_add(levels)
+                    .map(Lattice::new)
+                    .ok_or(HnnError::CountOverflow)
+            })
+            .transpose()?;
+        Ok(Self {
+            declared,
+            lattice,
+            levels,
+            seed_groups: peaks.len(),
+            smallest_nonzero_group_peak: smallest,
+        })
+    }
+    pub fn levels(&self) -> u32 {
+        self.levels
+    }
+    pub fn lattice(&self) -> Option<Lattice> {
+        self.lattice
+    }
+    pub fn declared_lattice(&self) -> Option<Lattice> {
+        self.declared
+    }
+    pub fn seed_groups(&self) -> usize {
+        self.seed_groups
+    }
+    pub fn smallest_nonzero_group_peak(&self) -> &Rat {
+        &self.smallest_nonzero_group_peak
+    }
+}
+
+#[cfg(test)]
+mod operand_limb_regression {
+    use super::*;
+    use crate::ratio::linear::vector::dot;
+
+    #[test]
+    fn captured_arrival_operand_is_exact_in_forward_and_adjoint() {
+        let ns: [i128; 22] = [
+            -3152519739158986752,
+            -9295429630893613056,
+            -3851478401327464448,
+            -7867972387360907101,
+            -4424336273928904704,
+            -13521607521218011136,
+            -1268213655067500544,
+            -7842752229447360349,
+            756604737398726656,
+            -13679417346519949149,
+            -1877100324688297984,
+            -8840749906873024349,
+            -8517207615284600832,
+            -5529703460830994269,
+            6243790523386748928,
+            -5786224801245626368,
+            3429941476205330432,
+            -3228180212899053568,
+            -162129586585346048,
+            -3177739897072533504,
+            -3242591731706773504,
+            -4712566650080591872,
+        ];
+        let d = BigInt::one() << 68usize;
+        let v: Vec<_> = ns
+            .into_iter()
+            .map(|n| Rat::new(BigInt::from(n), d.clone()))
+            .collect();
+        let parsed = operand(&v).unwrap();
+        assert_eq!(parsed.limbs.len(), 2);
+        let words: Vec<i64> = (0..22 * 22).map(|i| (i as i64 % 17) - 8).collect();
+        let chart = ChartWords {
+            rows: 22,
+            columns: 22,
+            exponent: 7,
+            words,
+        };
+        let oracle = chart.to_matrix().unwrap();
+        assert_eq!(chart.apply(&v).unwrap(), oracle.apply(&v).unwrap());
+        let transposed = chart.apply_transpose(&v).unwrap();
+        let expected: Vec<_> = (0..22)
+            .map(|j| {
+                (0..22)
+                    .map(|i| Rat::new(BigInt::from(chart.words[i * 22 + j]), chart.scale()) * &v[i])
+                    .sum()
+            })
+            .collect();
+        assert_eq!(transposed, expected);
+        let x: Vec<_> = (0..22)
+            .map(|i| Rat::from_integer(BigInt::from(i)))
+            .collect();
+        assert_eq!(dot(&v, &chart.apply(&x).unwrap()), dot(&transposed, &x));
+    }
+
+    #[test]
+    fn ordinary_operand_and_its_dot_certificate_stay_single_word() {
+        let v = vec![Rat::from_integer(BigInt::from(i64::MAX)); 3];
+        assert_eq!(operand(&v).unwrap().limbs.len(), 1);
+        let chart = ChartWords {
+            rows: 1,
+            columns: 3,
+            exponent: 0,
+            words: vec![i64::MAX; 3],
+        };
+        assert!(matches!(chart.apply(&v), Err(HnnError::Carrier { .. })));
+    }
+    #[test]
+    fn wide_operands_reconstruct_sign_zero_and_beyond_whole_carrier() {
+        assert!(checked_limb_extent(usize::MAX, 2).is_err());
+        assert!(checked_limb_extent(2, usize::MAX).is_err());
+        assert!(checked_limb_extent(6, 3).is_ok());
+        // Intentional extended boundary: -2^63 * 2^64 = -2^127 exceeds the old
+        // strict whole-dot bound, while every primitive limb remains certified.
+        let chart = ChartWords {
+            rows: 1,
+            columns: 1,
+            exponent: 0,
+            words: vec![i64::MIN],
+        };
+        let x = vec![Rat::from_integer(BigInt::one() << 64usize)];
+        assert_eq!(
+            chart.apply(&x).unwrap(),
+            vec![Rat::from_integer(-(BigInt::one() << 127usize))]
+        );
+        let chart = ChartWords {
+            rows: 3,
+            columns: 3,
+            exponent: 7,
+            words: vec![3, -4, 1, -2, 5, 0, 7, 1, -6],
+        };
+        let huge = (BigInt::one() << 161usize) + BigInt::from(19);
+        let x = vec![
+            Rat::new(huge.clone(), BigInt::from(7)),
+            Rat::new(-huge, BigInt::from(11)),
+            Rat::zero(),
+        ];
+        let oracle = chart.to_matrix().unwrap();
+        assert!(operand(&x).unwrap().limbs.len() > 4);
+        assert_eq!(chart.apply(&x).unwrap(), oracle.apply(&x).unwrap());
+        assert_eq!(
+            chart.apply_transpose(&x).unwrap(),
+            oracle.transpose().unwrap().apply(&x).unwrap()
+        );
     }
 }

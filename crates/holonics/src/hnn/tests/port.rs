@@ -9,7 +9,6 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use super::learning::{chain, chain_with, generic, moment, pairing, phases};
-use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Carrier, Constitution, FactorGradient, Family, Locus};
@@ -26,6 +25,7 @@ use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, TargetPhases, target_p
 use crate::hnn::receiving::ActiveAddress;
 use crate::hnn::reference::{Reference, compose};
 use crate::hnn::ring::ResonatorMaterial;
+use crate::hnn::tests::support::encoded;
 use crate::hnn::word::Word;
 use crate::ratio::exponentiated::power_of_two;
 use crate::ratio::linear::ExactRatMatrix;
@@ -59,7 +59,7 @@ fn injected(
     // word's linear map from its opening storage is paired alone.
     let reads: Vec<_> = anchors
         .iter()
-        .map(|anchor| phases.read(field, theta, &current, anchor).unwrap())
+        .map(|anchor| phases.read(field, theta, anchor).unwrap())
         .collect();
     let faces = Faces::of_reads(&reads, phases.grain()).unwrap();
     let logits = faces.logits.clone();
@@ -89,18 +89,91 @@ fn the_word_return_is_the_exact_adjoint_of_its_tangent_map() {
     let mut word = Word::open_on(&field, &theta, &current, storage.clone()).unwrap();
     word.forward(&phases).unwrap();
     let back = word
-        .pull_back(
-            &covector,
-            theta.receiving_map(2).unwrap(),
-            &current.lift()[2],
-            &phases,
-        )
+        .pull_back(&covector, theta.receiving_map(2).unwrap(), &phases)
         .unwrap();
     assert_eq!(
         pairing(covector.logits(), &logits),
         pairing(&back.opening, &storage)
     );
     assert!(!pairing(&back.opening, &storage).is_zero());
+}
+
+/// [F1] **The receiver reads in the passage frame.** One arrival (the same opening
+/// storage on every ring) opened at two clocks that differ only on the receiving ring, by
+/// `3 d_R + 1` ticks (another winding and another residue), runs the same word and reads the same
+/// logits: `R` multiplies the anchor as it stands. The read it replaces, `R P_R^(τ_R) v_R`, parts
+/// these anchors at the two clocks. Over one target stream the target phases, measured from each
+/// anchor's own lift, are equal, and the branch carries each clock's winding `⌊λ_R/d_R⌋`; with
+/// equal faces the two ratios differ by their branch alone (the common rechart, Lean
+/// `HNN/Ratio.receivingPhase_ratio`), so the descent covector is one.
+#[test]
+fn an_identical_arrival_reads_identically_at_two_receiving_clocks() {
+    let field = chain();
+    let theta = generic(&field, 61);
+    let mut draw = Draw::new(63);
+    let storage: Vec<Vec<Rat>> = field
+        .rings()
+        .iter()
+        .map(|ring| draw.vector(ring.width()))
+        .collect();
+    let here = Current::at(
+        &field,
+        vec![BigInt::from(3), BigInt::from(4), BigInt::from(1)],
+    )
+    .unwrap();
+    let receiver = field.receivers()[0].ring;
+    let period = field.ring(receiver).period();
+    let mut lift = here.lift().to_vec();
+    lift[receiver] += BigInt::from(3 * period + 1);
+    let there = Current::at(&field, lift).unwrap();
+    let map = theta.receiving_map(receiver).unwrap();
+    let targets = [1usize, 3];
+    let read = |current: &Current| {
+        let phases = phases(&field, &theta, current);
+        let mut word = Word::open_on(&field, &theta, current, storage.clone()).unwrap();
+        let anchors = word.forward(&phases).unwrap();
+        let reads: Vec<_> = anchors
+            .iter()
+            .map(|anchor| phases.read(&field, &theta, anchor).unwrap())
+            .collect();
+        let turned: Vec<Vec<Rat>> = anchors
+            .iter()
+            .map(|anchor| {
+                map.apply(
+                    &field
+                        .ring(receiver)
+                        .rotate(anchor, &current.lift()[receiver]),
+                )
+                .unwrap()
+            })
+            .collect();
+        let faces = Faces::of_reads(&reads, phases.grain()).unwrap();
+        let target =
+            target_phases(&field, current.lift(), receiver, &encoded(&field, &targets)).unwrap();
+        let covector = HolonRatio::compare(faces.clone(), &targets, &target)
+            .unwrap()
+            .covector()
+            .unwrap();
+        (anchors, faces, turned, target, covector)
+    };
+    let (anchors_here, faces_here, turned_here, target_here, covector_here) = read(&here);
+    let (anchors_there, faces_there, turned_there, target_there, covector_there) = read(&there);
+    assert_eq!(anchors_here, anchors_there, "one arrival");
+    assert_eq!(faces_here, faces_there, "the read is in the passage frame");
+    assert!(faces_here.logits.iter().flatten().any(|x| !x.is_zero()));
+    assert_ne!(
+        turned_here, turned_there,
+        "the clock-turned read parts one arrival"
+    );
+    assert_eq!(target_here.phases, target_there.phases);
+    let winding = |current: &Current| current.lift()[receiver].clone() / BigInt::from(period);
+    assert_eq!(target_here.branch, winding(&here));
+    assert_eq!(target_there.branch, winding(&there));
+    assert_ne!(target_here.branch, target_there.branch);
+    assert_eq!(
+        covector_here, covector_there,
+        "the branch is never descended on"
+    );
 }
 
 /// Lean `HNN/LatticeWord.{executed_adjoint_pairing, executed_adjoint_unique}` on the word: the return
@@ -120,7 +193,7 @@ fn the_word_return_pulls_back_through_the_executed_charts() {
         let anchors = word.forward(&phases).unwrap();
         let reads: Vec<_> = anchors
             .iter()
-            .map(|anchor| phases.read(&field, &theta, &current, anchor).unwrap())
+            .map(|anchor| phases.read(&field, &theta, anchor).unwrap())
             .collect();
         let faces = Faces::of_reads(&reads, phases.grain()).unwrap();
         let logits = faces.logits.clone();
@@ -136,12 +209,7 @@ fn the_word_return_pulls_back_through_the_executed_charts() {
         .covector()
         .unwrap();
         let back = word
-            .pull_back(
-                &covector,
-                theta.receiving_map(2).unwrap(),
-                &current.lift()[2],
-                &phases,
-            )
+            .pull_back(&covector, theta.receiving_map(2).unwrap(), &phases)
             .unwrap();
         (logits, covector, back)
     };
@@ -210,12 +278,7 @@ pub(super) fn cut_at(field: Field, theta: Constitution) -> Cut {
         .covector()
         .unwrap();
     let back = word
-        .pull_back(
-            &covector,
-            theta.receiving_map(2).unwrap(),
-            &pending.anchor()[2],
-            &phases,
-        )
+        .pull_back(&covector, theta.receiving_map(2).unwrap(), &phases)
         .unwrap();
     let (pullback, deposit) = compose(
         &field,
@@ -453,7 +516,7 @@ fn central(p: &ExactRatMatrix, m: &ExactRatMatrix) -> ExactRatMatrix {
 /// transit   M δω = h(δα_g − δα_h) + 2C δw − hK δu + 2δC w − hδK u − δM ω,
 ///           δM = 2δC + hδD + (h²/2)δK − (2h/G²)δG I,  δw′ = 2δω − δw,  δu′ = δu + hδω,
 ///           δout = δα ∓ ((2/G)δω − (2δG/G²)ω)
-/// read      δf_j = δR P^τ v(e_j) + R P^τ δv(e_j)
+/// read      δf_j = δR v(e_j) + R δv(e_j)     (the passage frame)
 /// ```
 ///
 /// The primal it carries is checked against the word's own logits, so the two implementations run
@@ -719,8 +782,21 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
             let omega = &passed.midpoint;
             // Keep the independent equation below; compare the recovered production primitive
             // against it rather than replacing the C/K/D forward oracle by its own code.
-            let produced = dg.is_zero().then(|| crate::hnn::propagation::transit_variation(
-                contact,&h,d_out_from,d_out_to,du,dw,u,w,omega,&d_forms[a]).unwrap());
+            let produced = dg.is_zero().then(|| {
+                crate::hnn::propagation::transit_variation(
+                    contact,
+                    &h,
+                    d_out_from,
+                    d_out_to,
+                    du,
+                    dw,
+                    u,
+                    w,
+                    omega,
+                    &d_forms[a],
+                )
+                .unwrap()
+            });
             let d_m = dc
                 .scaled(&two)
                 .add(&dd.scaled(&h))
@@ -749,11 +825,11 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
                 arrive_to[*coordinate] = &d_alpha_to[index] + &exchange[index];
             }
             if let Some(produced) = produced {
-                assert_eq!(produced.midpoint,d_omega);
-                assert_eq!(produced.displacement,add(du,&scale(&h,&d_omega)));
-                assert_eq!(produced.rate,sub(&scale(&two,&d_omega),dw));
-                assert_eq!(produced.arrive_from,arrive_from);
-                assert_eq!(produced.arrive_to,arrive_to);
+                assert_eq!(produced.midpoint, d_omega);
+                assert_eq!(produced.displacement, add(du, &scale(&h, &d_omega)));
+                assert_eq!(produced.rate, sub(&scale(&two, &d_omega), dw));
+                assert_eq!(produced.arrive_from, arrive_from);
+                assert_eq!(produced.arrive_to, arrive_to);
             }
             d_states[a] = [
                 add(du, &scale(&h, &d_omega)),
@@ -769,22 +845,15 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
         plus.1.receiving_map(receiving).unwrap(),
         minus.1.receiving_map(receiving).unwrap(),
     );
-    let (ring, lift) = (field.ring(receiving), &current.lift()[receiving]);
-    // The pending read is the wave's (the tree part is a stored face, added at compare).
+    // The pending read is the wave's (the tree part is a stored face, added at compare), read in
+    // the passage frame: `R` multiplies the anchor as it stands.
     let (_, faces) = cut.pending.read(field, theta).unwrap();
     let waves = faces.logits;
     let mut derivative = Rat::zero();
     for (j, epoch) in phases.epochs().enumerate() {
-        let (v, dv) = (
-            ring.rotate(&anchors[epoch], lift),
-            ring.rotate(&d_anchors[epoch], lift),
-        );
-        assert_eq!(
-            apply(map, &v),
-            waves[j],
-            "the primal is the word's own read"
-        );
-        let d_logits = add(&apply(&d_map, &v), &apply(map, &dv));
+        let (v, dv) = (&anchors[epoch], &d_anchors[epoch]);
+        assert_eq!(apply(map, v), waves[j], "the primal is the word's own read");
+        let d_logits = add(&apply(&d_map, v), &apply(map, dv));
         derivative += dot(&cut.covector.logits()[j], &d_logits);
     }
     derivative
@@ -1106,6 +1175,18 @@ fn every_port_method_returns_its_six_components() {
         .ingest(&mut resident, None, &encoded(&field, &stream))
         .unwrap();
     assert_eq!(shape(&ingested), [true, false, false, true, false]);
+    let moment_bits = match &ingested.receipt.detail {
+        ReceiptDetail::Ingest { moment_bits, .. } => *moment_bits,
+        other => panic!("ingest receipt has the wrong detail: {other:?}"),
+    };
+    assert!(
+        moment_bits > 0,
+        "the exact moment bit reading remains available"
+    );
+    assert!(
+        ingested.receipt.work.resident_entries.is_zero(),
+        "no resident-entry count is reported from a bit-length reading"
+    );
     let ingested = ingested.forward.into_present().unwrap();
     assert!(ingested.carry_out);
     let admitted = resident.admitted().to_vec();
@@ -1150,6 +1231,18 @@ fn every_port_method_returns_its_six_components() {
     assert_eq!(shape(&compared), [true, true, true, true, true]);
     let deposited = reference.deposit(&mut resident, staged).unwrap();
     assert_eq!(shape(&deposited), [true, false, true, false, false]);
+    let deposit_bits = match &deposited.receipt.detail {
+        ReceiptDetail::Deposit { reading, .. } => reading.bits,
+        other => panic!("deposit receipt has the wrong detail: {other:?}"),
+    };
+    assert!(
+        deposit_bits > 0,
+        "the exact successor bit reading remains available"
+    );
+    assert!(
+        deposited.receipt.work.resident_entries.is_zero(),
+        "no resident-entry count is reported from a bit-length reading"
+    );
     let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let discarded = reference
         .discard(&mut resident, Handle::Pending(pending))
@@ -1234,6 +1327,78 @@ fn the_release_reads_its_width_and_the_boundary_returns_the_transpose() {
     assert_eq!(transposes, &vec![(pending, Transpose::Retained(reads))]);
 }
 
+/// The release at class grain (`hnn::receiving::cells`) on the reference port: the draw reads
+/// the pending ratio's scored face with its released prefix, one declared key a cell, and the
+/// comparison of the drawn classes as targets codes each phase inside the release face's code
+/// (`P_release = P_scored` at the port); the release teaches nothing, so a second release of the
+/// same keys returns the identical cells, and the commit is decided on the same faces.
+#[test]
+fn the_release_at_class_grain_draws_the_scored_face_and_compares_inside_it() {
+    use crate::hnn::receiving::cells::CellLaw;
+    use crate::ratio::algebraic::log2_enclosure;
+    use crate::receiver::release::{KeyStream, ReleaseReturn};
+    let field = chain();
+    let reference = Reference::campaign_one();
+    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let stream = [0, 1, 2, 3, 0, 2, 1, 3].repeat(8);
+    let (moment, _) = reference
+        .ingest(&mut resident, None, &encoded(&field, &stream[..4]))
+        .unwrap();
+    let phases = resident.admitted()[0].clone();
+    let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+    let bytes = vec![0x5a, 0x01, 0xc3, 0x7e, 0x0f, 0xe0, 0x21, 0x99];
+    let mut keys = KeyStream::new(bytes.clone(), 4).unwrap();
+    let drawn = reference
+        .release_cells(&mut resident, &pending, CellLaw::Draw(&mut keys))
+        .unwrap();
+    let ReceiptDetail::Cells { decisions, bits } = &drawn.receipt.detail else {
+        panic!("a release at class grain returns its cells");
+    };
+    assert!(!drawn.pullback.is_present() && !drawn.deposit.is_present());
+    let release = drawn.forward.present().unwrap().clone();
+    assert_eq!(release.aperture, phases.aperture());
+    assert_eq!(decisions.len(), release.cells.len());
+    assert_eq!(bits.len(), release.cells.len());
+    assert!(
+        decisions
+            .iter()
+            .all(|decision| matches!(decision, ReleaseReturn::Drawn(_)))
+    );
+    let placement = release.classes().expect("every phase drawn");
+    assert_eq!(keys.keys_read(), placement.len());
+    let mut again = KeyStream::new(bytes, 4).unwrap();
+    let repeated = reference
+        .release_cells(&mut resident, &pending, CellLaw::Draw(&mut again))
+        .unwrap();
+    assert_eq!(repeated.forward.present().unwrap(), &release);
+    let committed = reference
+        .release_cells(&mut resident, &pending, CellLaw::Commit)
+        .unwrap();
+    let first = &committed.forward.present().unwrap().cells[0];
+    assert_eq!(first.face, release.cells[0].face);
+    let (_, compared) = reference
+        .compare(&mut resident, pending, &encoded(&field, &placement))
+        .unwrap();
+    let ReceiptDetail::Compare { model, .. } = &compared.receipt.detail else {
+        panic!("a comparison returns its codes");
+    };
+    assert_eq!(model.len(), placement.len());
+    for ((code, cell), &class) in model.iter().zip(&release.cells).zip(&placement) {
+        // `−log₂` of the release face's ends bounds the comparison's code from each side.
+        let face = &cell.face[class];
+        let at_upper = log2_enclosure(&face.upper).unwrap();
+        let at_lower = log2_enclosure(&face.lower).unwrap();
+        assert!(
+            code.lower <= -at_upper.lower.clone(),
+            "{code:?} against {face:?}"
+        );
+        assert!(
+            -at_lower.upper.clone() <= code.upper,
+            "{code:?} against {face:?}"
+        );
+    }
+}
+
 /// Design (c), R2 M12, review D1: ingest stops at the joint clock's carry-out and the resident
 /// refuses cells until `close_aeon`; keys are located only between `close_aeon` and the next ingest,
 /// from a crib no longer than the closed aeon (the cells it read), and at no other time.
@@ -1266,7 +1431,11 @@ fn the_clock_law_of_ingest_and_keys() {
     let admitted = resident.admitted().to_vec();
     reference.close_aeon(&mut resident, &admitted).unwrap();
     assert!(matches!(
-        reference.locate_keys(&mut resident, &encoded(&field, &vec![0; ingested.cells + 1]), 1),
+        reference.locate_keys(
+            &mut resident,
+            &encoded(&field, &vec![0; ingested.cells + 1]),
+            1
+        ),
         Err(HnnError::Shape { .. })
     ));
     reference.locate_keys(&mut resident, &crib, 1).unwrap();
@@ -1279,7 +1448,11 @@ fn the_clock_law_of_ingest_and_keys() {
     );
     assert_eq!(
         reference
-            .ingest(&mut resident, None, &super::support::encoded_classes(2, &[0]))
+            .ingest(
+                &mut resident,
+                None,
+                &super::support::encoded_classes(2, &[0])
+            )
             .unwrap_err(),
         HnnError::Unadmitted {
             reason: "it was encoded against another field's source rings"
@@ -1560,12 +1733,7 @@ fn a_quartic_comparison_returns_all_five_reached_gain_features() {
         .covector()
         .unwrap();
     let back = word
-        .pull_back(
-            &covector,
-            theta.receiving_map(2).unwrap(),
-            &pending.anchor()[2],
-            &phases,
-        )
+        .pull_back(&covector, theta.receiving_map(2).unwrap(), &phases)
         .unwrap();
     let (pullback, deposit) = compose(
         &field,
@@ -1614,4 +1782,278 @@ fn a_quartic_comparison_returns_all_five_reached_gain_features() {
         })
         .sum();
     assert_eq!(pull.gains[4], expected);
+}
+
+#[test]
+fn equal_distance_observed_sources_reach_one_label_and_both_return() {
+    use crate::hnn::field::FieldDeclaration;
+    use crate::hnn::retention::Diamond;
+    let mut declaration = FieldDeclaration::campaign_one(1 << 16);
+    declaration.rings = (0..3).map(|_| super::support::ring(2, vec![0])).collect();
+    declaration.contacts = vec![
+        super::support::contact(0, 2, 2, 2),
+        super::support::contact(1, 2, 2, 2),
+    ];
+    declaration.sources = vec![0, 1];
+    declaration.loops.clear();
+    declaration.alphabet = 2;
+    declaration.offsets = vec![1];
+    declaration.receivers[0].ring = 2;
+    declaration.receivers[0].aperture = 1;
+    declaration.lattice.clear();
+    let field = Field::declare(declaration.by_lattice_rule()).unwrap();
+    let map = ExactRatMatrix::identity(4).unwrap();
+    let theta = Constitution::initial(&field, 1 << 40)
+        .unwrap()
+        .with_ports(2, None, None, Some(map.clone()))
+        .unwrap();
+    let current = Current::at_rest(&field);
+    let phases = phases(&field, &theta, &current);
+    assert_eq!(phases.aperture(), 1);
+    assert_eq!(phases.first_epoch(), 1);
+    assert_eq!(phases.junction_steps(), 2);
+    let diamond = Diamond::of(&field, &phases);
+    for source in [0, 1] {
+        assert_eq!(field.distance(source, 2), Some(1));
+        assert!(diamond.retains(&field, Locus::SourcePort(source)));
+        let mut storage = vec![vec![Rat::zero(); 4]; 3];
+        storage[source][0] = Rat::one();
+        let mut word = Word::open_on(&field, &theta, &current, storage).unwrap();
+        let anchors = word.forward(&phases).unwrap();
+        assert_eq!(anchors.len(), 1);
+        assert!(
+            anchors[0].iter().any(|x| !x.is_zero()),
+            "source {source} must reach the same single receiving observation"
+        );
+        let read = phases.read(&field, &theta, &anchors[0]).unwrap();
+        let faces = Faces::of_reads(&[read], phases.grain()).unwrap();
+        let ratio = HolonRatio::compare(
+            faces,
+            &[1],
+            &TargetPhases {
+                branch: BigInt::zero(),
+                phases: vec![Rat::zero()],
+            },
+        )
+        .unwrap();
+        let back = word
+            .pull_back(&ratio.covector().unwrap(), &map, &phases)
+            .unwrap();
+        for returned_source in [0, 1] {
+            assert!(
+                back.opening[returned_source].iter().any(|x| !x.is_zero()),
+                "source {returned_source} must receive the one label's actual return"
+            );
+        }
+    }
+}
+
+#[test]
+fn mode_view_source_and_pair_returns_are_exact_producing_derivatives() {
+    use crate::hnn::ring::modes::ModeView;
+    let field = chain().with_exact_word();
+    let theta = generic(&field, 65);
+    let mut cut = cut_at(field, theta);
+    let view = ModeView::primitive(&cut.field, 0, 4).unwrap();
+    let original = cut.pending.moment().clone();
+    cut.pending = cut.pending.clone().with_view(&cut.field, &view).unwrap();
+    assert_eq!(cut.pending.moment(), &original);
+    let storage = original
+        .open_storage(
+            &cut.field,
+            &cut.theta,
+            &cut.pending.current(&cut.field).unwrap(),
+        )
+        .unwrap();
+    let selected = view.apply(&cut.field, &storage).unwrap();
+    let complement = view.complement(&cut.field, &storage).unwrap();
+    for ((whole, part), rest) in storage.iter().zip(&selected).zip(&complement) {
+        assert_eq!(*whole, add(part, rest));
+    }
+    assert_ne!(selected, storage, "the view must be nonvacuous");
+    let (word, faces) = cut.pending.read(&cut.field, &cut.theta).unwrap();
+    cut.back = word
+        .pull_back(
+            &cut.covector,
+            cut.theta.receiving_map(2).unwrap(),
+            cut.pending.phases(),
+        )
+        .unwrap();
+    (cut.pullback, cut.deposit) = compose(
+        &cut.field,
+        &cut.theta,
+        &cut.pending,
+        &crate::hnn::WordOpening::Rest,
+        &cut.back,
+        &[2, 1],
+        &[],
+    )
+    .unwrap();
+    cut.base = pairing(cut.covector.logits(), &faces.logits);
+    // Independent one-count source direction with the producing population weight held.
+    let weight =
+        crate::hnn::moment::PopulationChart::of(&cut.field).value(original.population(0).unwrap());
+    for phase in 0..cut.field.ring(0).period() as usize {
+        for class in 0..cut.field.alphabet() {
+            let column: Vec<_> = (0..cut.field.ring(0).width())
+                .map(|r| {
+                    cut.theta
+                        .source_port(0)
+                        .unwrap()
+                        .get(r, class)
+                        .unwrap()
+                        .clone()
+                        * &weight
+                })
+                .collect();
+            let direction = cut
+                .field
+                .ring(0)
+                .rotate(&column, &(&cut.pending.anchor()[0] - BigInt::from(phase)));
+            let projected = view.apply_ring(&cut.field, 0, &direction).unwrap();
+            assert_eq!(
+                dot(&cut.back.opening[0], &projected),
+                cut.pullback.rings[0].moment.as_ref().unwrap()[phase][class]
+            );
+        }
+    }
+    let mut draw = Draw::new(902);
+    let direction = draw.matrix(cut.field.ring(0).width(), cut.field.alphabet());
+    let moved = cut
+        .theta
+        .clone()
+        .with_ports(
+            0,
+            None,
+            Some(cut.theta.source_port(0).unwrap().add(&direction).unwrap()),
+            None,
+        )
+        .unwrap();
+    assert_eq!(
+        cut.quotient(&moved, &Rat::one()),
+        frobenius(cut.pullback.rings[0].source.as_ref().unwrap(), &direction)
+    );
+    let pair = cut.theta.pair_port(0, 1).unwrap();
+    for family in 0..3 {
+        let width = if family == 0 {
+            cut.field.ring(0).width()
+        } else {
+            cut.field.alphabet()
+        };
+        let by: Vec<_> = (0..pair.rank()).map(|_| draw.vector(width)).collect();
+        let mut parts = [
+            pair.outputs().to_vec(),
+            pair.current_reads().to_vec(),
+            pair.earlier_reads().to_vec(),
+        ];
+        for (row, delta) in parts[family].iter_mut().zip(&by) {
+            *row = add(row, delta);
+        }
+        let [outputs, current, earlier] = parts;
+        let moved = cut
+            .theta
+            .clone()
+            .with_pair(0, 1, PairPort::new(outputs, current, earlier).unwrap())
+            .unwrap();
+        assert_eq!(
+            cut.quotient(&moved, &Rat::one()),
+            nested(&cut.pullback.rings[0].pair[0].1[family], &by),
+            "selected pair family {family}"
+        );
+    }
+}
+
+#[test]
+fn mode_view_execution_port_runs_one_observation_and_keeps_original_moment() {
+    use crate::hnn::ring::modes::ModeView;
+    let field = chain();
+    let theta = generic(&field, 93);
+    let port = Reference::new(4, 1 << 40);
+    let mut resident = port
+        .mount_with(&field, &Current::at_rest(&field), theta)
+        .unwrap();
+    let (moment, _) = port
+        .ingest(&mut resident, None, &encoded(&field, &[0, 1, 2, 3, 1]))
+        .unwrap();
+    let phases = resident.admitted()[0].clone();
+    let view = ModeView::primitive(&field, 0, 4).unwrap();
+    let (pending, read) = port
+        .refine_view(&mut resident, &moment, &phases, &view)
+        .unwrap();
+    assert!(read.forward.present().is_some());
+    let (staged, compared) = port
+        .compare(&mut resident, pending, &encoded(&field, &[2, 1]))
+        .unwrap();
+    assert!(compared.deposit.present().is_some());
+    port.deposit(&mut resident, staged).unwrap();
+    let (whole, read) = port.refine(&mut resident, &moment, &phases).unwrap();
+    assert!(
+        read.forward.present().is_some(),
+        "the original moment remains available for a later whole view"
+    );
+    port.discard(&mut resident, Handle::Pending(whole)).unwrap();
+}
+
+#[test]
+fn mode_view_pending_checkpoint_preserves_view_and_actual_faces() {
+    use crate::hnn::ring::modes::ModeView;
+    let field = chain();
+    let theta = generic(&field, 65);
+    let (current, moment) = moment(&field, 66, 13);
+    let phases = phases(&field, &theta, &current);
+    let address = ActiveAddress::of_field(&field, &current, &theta).unwrap();
+    for view in [
+        ModeView::whole(),
+        ModeView::primitive(&field, 0, 4).unwrap(),
+        ModeView::from_periods(&field, &[(0, 1), (0, 4)]).unwrap(),
+    ] {
+        let pending = PendingRatio::produce(&current, &moment, &address, &phases, theta.commit())
+            .unwrap()
+            .with_view(&field, &view)
+            .unwrap();
+        let mut saved = String::new();
+        pending.write_saved(&mut saved);
+        if view.is_whole() {
+            assert_eq!(
+                saved.lines().next().unwrap(),
+                format!("ratio-commit {}", theta.commit())
+            );
+        }
+        let mut lines = saved.lines();
+        let mut next = |what| lines.next().ok_or(HnnError::ContinuingState { what });
+        let restored = PendingRatio::read_saved(&field, &address, &mut next).unwrap();
+        assert_eq!(restored, pending);
+        assert_eq!(
+            restored.read(&field, &theta).unwrap().1,
+            pending.read(&field, &theta).unwrap().1
+        );
+        assert!(lines.next().is_none());
+    }
+}
+
+#[test]
+fn mode_view_projector_is_frame_covariant_and_rejects_foreign_source_geometry() {
+    use crate::hnn::ring::modes::ModeView;
+    let field = chain();
+    let view = ModeView::primitive(&field, 0, 4).unwrap();
+    let mut draw = Draw::new(903);
+    let x = draw.vector(field.ring(0).width());
+    let y = draw.vector(x.len());
+    let qx = view.apply_ring(&field, 0, &x).unwrap();
+    let qy = view.apply_ring(&field, 0, &y).unwrap();
+    assert_eq!(dot(&qx, &y), dot(&x, &qy));
+    assert_eq!(view.apply_ring(&field, 0, &qx).unwrap(), qx);
+    let turn = BigInt::from(51);
+    assert_eq!(
+        view.apply_ring(&field, 0, &field.ring(0).rotate(&x, &turn))
+            .unwrap(),
+        field.ring(0).rotate(&qx, &turn)
+    );
+    assert!(ModeView::primitive(&field, 0, 3).is_err());
+    assert!(ModeView::primitive(&field, 2, 2).is_err());
+    let mut other = super::learning::chain_declaration(1 << 20);
+    other.rings[0] = super::support::ring(8, vec![0, 2]);
+    other.lattice.clear();
+    let other = Field::declare(other.by_lattice_rule()).unwrap();
+    assert!(view.check(&other).is_err());
 }

@@ -101,7 +101,11 @@ fn the_monodromys_variation_is_its_derivative_forward_and_in_reverse() {
                     .unwrap()
                     .monodromy;
                 let down = bank
-                    .turn_variation(member, &shifted(&turn, &direction, &-eta.clone()), &direction)
+                    .turn_variation(
+                        member,
+                        &shifted(&turn, &direction, &-eta.clone()),
+                        &direction,
+                    )
                     .unwrap()
                     .monodromy;
                 largest(
@@ -150,15 +154,25 @@ fn the_dominant_multiplier_is_certified_or_refused_by_type() {
     let real = read(&expand(&[5, 2, -1, 3], None)).unwrap();
     assert!(!real.pair);
     assert!(real.disk.center.is_real());
-    let distance = real.disk.center.sub(&GaussianRat::real(integer(5))).norm_sq();
+    let distance = real
+        .disk
+        .center
+        .sub(&GaussianRat::real(integer(5)))
+        .norm_sq();
     assert!(distance <= &real.disk.radius * &real.disk.radius);
     assert!(real.inner > integer(3) && real.inner < integer(5));
     let pair = read(&expand(&[1, -2], Some((-2, 26)))).unwrap();
     assert!(pair.pair);
     let distance = pair.disk.center.sub(&GaussianRat::from_i64(1, 5)).norm_sq();
     assert!(distance <= &pair.disk.radius * &pair.disk.radius);
-    assert_eq!(read(&expand(&[5, -5, 1, 2], None)), Err(CovectorRefusal::Tie));
-    assert_eq!(read(&expand(&[5, 5, 1, -2], None)), Err(CovectorRefusal::Collision));
+    assert_eq!(
+        read(&expand(&[5, -5, 1, 2], None)),
+        Err(CovectorRefusal::Tie)
+    );
+    assert_eq!(
+        read(&expand(&[5, 5, 1, -2], None)),
+        Err(CovectorRefusal::Collision)
+    );
 }
 
 /// **A reading has the lattice's floor** (Lean `HNN/Floquet.integer_monodromy_floor`): on `M = N/Δ`
@@ -187,11 +201,19 @@ fn the_covector_pairs_with_the_exact_variation_three_ways() {
     let bank = declared_bank();
     let tight = rat(1, 1 << 32);
     let mut resolved = 0;
-    for (seed, ticks, bits, scale) in [(5u64, 8, 6, 1i64), (7, 8, 6, 4), (13, 8, 6, 6), (41, 60, 21, 2)] {
+    for (seed, ticks, bits, scale) in [
+        (5u64, 8, 6, 1i64),
+        (7, 8, 6, 4),
+        (13, 8, 6, 6),
+        (41, 60, 21, 2),
+    ] {
         let turn = drawn(seed, ticks, bits, scale);
         let direction = drawn(seed + 1000, ticks, bits, 1);
         for member in 0..4 {
-            if let Some(routes) = bank.directional_routes(member, &turn, &direction, 16).unwrap() {
+            if let Some(routes) = bank
+                .directional_routes(member, &turn, &direction, 16)
+                .unwrap()
+            {
                 assert!(routes.agree(), "{routes:?}");
                 for route in [&routes.covector, &routes.eigen, &routes.trace] {
                     assert!(&route.upper - &route.lower < tight, "{routes:?}");
@@ -240,7 +262,10 @@ fn the_covector_predicts_the_executed_growths_change() {
         (&predicted / &ln2.0, &predicted / &ln2.1)
     };
     let slack = predicted.abs() / integer(8);
-    assert!(upper >= low - &slack && lower <= high + slack, "{lower} {upper} {predicted}");
+    assert!(
+        upper >= low - &slack && lower <= high + slack,
+        "{lower} {upper} {predicted}"
+    );
 }
 
 /// **Two members tied in growth are both active branches** (the max comparison's active set): on the
@@ -249,7 +274,9 @@ fn the_covector_predicts_the_executed_growths_change() {
 #[test]
 fn two_members_tied_in_growth_are_both_active() {
     let bank = declared_bank();
-    let line: Vec<GaussianRat> = (0..8).map(|t| quarter(4 * 8 - t % 4).as_gaussian()).collect();
+    let line: Vec<GaussianRat> = (0..8)
+        .map(|t| quarter(4 * 8 - t % 4).as_gaussian())
+        .collect();
     let covector = bank.read_turn_covector(&line, 10).unwrap();
     let members: Vec<usize> = covector.active.iter().map(MemberCovector::member).collect();
     assert_eq!(members.len(), 2);
@@ -257,10 +284,12 @@ fn two_members_tied_in_growth_are_both_active() {
         covector.reading.members[members[0]],
         covector.reading.members[members[1]]
     );
-    assert!(covector
-        .active
-        .iter()
-        .all(|member| matches!(member, MemberCovector::Resolved { .. })));
+    assert!(
+        covector
+            .active
+            .iter()
+            .all(|member| matches!(member, MemberCovector::Resolved { .. }))
+    );
 }
 
 // -------------------------------------------------------------------------------------------
@@ -341,15 +370,24 @@ fn the_located_pairs_deposit_closes_its_slip_and_its_consumer_holds() {
     let ring = field.ring(0);
     for (y, x) in [(0usize, 1usize), (1, 2), (2, 3), (3, 0)] {
         let column = |m: &ExactRatMatrix, c: usize| -> Vec<Rat> {
-            (0..m.rows()).map(|r| m.get(r, c).unwrap().clone()).collect()
+            (0..m.rows())
+                .map(|r| m.get(r, c).unwrap().clone())
+                .collect()
         };
         let carried = ring.rotate(&column(&prior, y), &BigInt::from(2));
-        let expected: Vec<Rat> = column(&prior, x).iter().zip(&carried).map(|(b, u)| b + u).collect();
+        let expected: Vec<Rat> = column(&prior, x)
+            .iter()
+            .zip(&carried)
+            .map(|(b, u)| b + u)
+            .collect();
         assert_eq!(column(port, x), expected);
     }
     for unreached in [4usize, 5] {
         for row in 0..port.rows() {
-            assert_eq!(port.get(row, unreached).unwrap(), prior.get(row, unreached).unwrap());
+            assert_eq!(
+                port.get(row, unreached).unwrap(),
+                prior.get(row, unreached).unwrap()
+            );
         }
     }
     assert!(matches!(
@@ -373,7 +411,11 @@ fn a_port_holding_no_class_refuses_the_pair_deposit() {
     let prior = opening.source_port(0).unwrap().clone();
     assert!(matches!(
         pair_deposit(&field, &opening, &prior, 0, &order_two_pair()),
-        Err(HnnError::Shape { expected: 1, found: 0, .. })
+        Err(HnnError::Shape {
+            expected: 1,
+            found: 0,
+            ..
+        })
     ));
 }
 
@@ -407,7 +449,9 @@ fn joint_opening(
     seed: u64,
 ) -> (crate::hnn::constitution::Constitution, ExactRatMatrix) {
     use crate::hnn::field::ConstitutionRead;
-    let opening = super::learning::generic(field, seed).with_transport(0, rat(3, 4)).unwrap();
+    let opening = super::learning::generic(field, seed)
+        .with_transport(0, rat(3, 4))
+        .unwrap();
     let prior = opening.source_port(0).unwrap().clone();
     (opening, prior)
 }
@@ -463,7 +507,12 @@ fn a_restored_checkpoint_continues_exactly_over_successive_deposits() {
     ));
     let partial = opening
         .clone()
-        .with_ports(0, None, Some(continued.source_port(0).unwrap().clone()), None)
+        .with_ports(
+            0,
+            None,
+            Some(continued.source_port(0).unwrap().clone()),
+            None,
+        )
         .unwrap()
         .with_transport(0, continued.transport(0))
         .unwrap();
@@ -479,7 +528,9 @@ fn a_restored_checkpoint_continues_exactly_over_successive_deposits() {
     assert_ne!(p, c);
     // A checkpoint is refused onto a constitution that is not the declared opening.
     assert!(matches!(
-        continued.clone().continued(&continued.continuing_state(0).unwrap()),
+        continued
+            .clone()
+            .continued(&continued.continuing_state(0).unwrap()),
         Err(HnnError::ContinuingState { .. })
     ));
 }
@@ -518,7 +569,8 @@ fn a_checkpoint_is_refused_onto_foreign_material_and_when_damaged() {
     ));
     // One byte of the port's first row changed, still a well-formed rational: refused by the check.
     let row = text.lines().nth(1).expect("the port's first row");
-    let at = text.find(row).expect("the row") + row.find(|c: char| c.is_ascii_digit()).expect("a digit");
+    let at =
+        text.find(row).expect("the row") + row.find(|c: char| c.is_ascii_digit()).expect("a digit");
     let mut damaged = text.clone().into_bytes();
     damaged[at] = if damaged[at] == b'7' { b'8' } else { b'7' };
     let damaged = String::from_utf8(damaged).unwrap();
@@ -529,7 +581,10 @@ fn a_checkpoint_is_refused_onto_foreign_material_and_when_damaged() {
     ));
     // A changed material line is caught by the check as well.
     let material = format!("material {}", opening.material_identity());
-    let relabelled = text.replace(&material, &format!("material {}", foreign.material_identity()));
+    let relabelled = text.replace(
+        &material,
+        &format!("material {}", foreign.material_identity()),
+    );
     assert_ne!(relabelled, text);
     assert!(ContinuingState::from_text(&relabelled).is_err());
 }
@@ -581,7 +636,11 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
         .iter()
         .map(|contact| [wave(contact.width()), wave(contact.width())])
         .collect();
-    let momenta = field.contacts().iter().map(|contact| wave(contact.width())).collect();
+    let momenta = field
+        .contacts()
+        .iter()
+        .map(|contact| wave(contact.width()))
+        .collect();
     let conductances = (0..field.contacts().len())
         .map(|a| rat(2 * a as i64 + 3, 4))
         .collect();
@@ -622,7 +681,10 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
     // refused; a carried state is refused by a reference declared at rest.
     let current = Current::at_rest(&field);
     let reference = Reference::campaign_one();
-    assert_eq!(reference.reception(), Reception::Carry(crate::hnn::Absorption::Nothing));
+    assert_eq!(
+        reference.reception(),
+        Reception::Carry(crate::hnn::Absorption::Nothing)
+    );
     let rested = reference
         .mount_continued(&field, &current, opening.clone(), &at_rest)
         .unwrap();
@@ -634,13 +696,21 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
     assert_eq!(resumed.carried(), Some(&carry));
     assert_eq!(resumed.constitution(), &continued);
     assert!(matches!(
-        reference.mount_continued(&field, &current, generic_within(&field, 94, OPEN_BUDGET - 1), &at_rest),
+        reference.mount_continued(
+            &field,
+            &current,
+            generic_within(&field, 94, OPEN_BUDGET - 1),
+            &at_rest
+        ),
         Err(HnnError::ContinuingState { .. })
     ));
     assert!(matches!(
-        reference
-            .with_reception(Reception::Rest)
-            .mount_continued(&field, &current, opening.clone(), &read),
+        reference.with_reception(Reception::Rest).mount_continued(
+            &field,
+            &current,
+            opening.clone(),
+            &read
+        ),
         Err(HnnError::ContinuingState { .. })
     ));
 }

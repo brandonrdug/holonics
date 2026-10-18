@@ -10,7 +10,7 @@
 use std::ffi::c_void;
 use std::time::Instant;
 
-use holonics_cuda::{Context, Device, DeviceBuffer, Dim3, Module, FOLD_CONSTANT};
+use holonics_cuda::{Context, Device, DeviceBuffer, Dim3, FOLD_CONSTANT, Module};
 
 /// The PTX payload, built by mount-smoke-kernel/build-ptx.sh and committed as the boundary
 /// artifact. The workspace compiles without

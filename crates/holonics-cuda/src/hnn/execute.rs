@@ -7,8 +7,9 @@
 //! `WA_*`, `WS_*`, `WQ_*` words), formed from the field, the lift point at the word's cut, the
 //! published loci ([`crate::hnn::publication`]) and the word's declared precisions: the junctions'
 //! executed weights (`holonics::hnn::propagation::junction_weights` on `2^(−L_c)ℤ`), each contact's
-//! conductance from its exponent's carry at the cut, and the rotations of the source and receiving
-//! rings as gathers read off the host's own rotation (`Ring::rotate` of the index vector). It
+//! conductance from its exponent's carry at the cut, and the rotations of the source rings as
+//! gathers read off the host's own rotation (`Ring::rotate` of the index vector), and the receiving
+//! ring's identity gather (its read is in the passage frame, `holonics::hnn::receiving`). It
 //! refuses what the card's dyadic words cannot carry: a hop that is not a power of two (its
 //! `ζ/h` would leave the dyadics), a non-dyadic admittance.
 //!
@@ -25,8 +26,11 @@ use std::rc::Rc;
 
 use core::ffi::c_void;
 
+use holonics::hnn::constitution::ReceivingLayout;
 use holonics::hnn::moment::PopulationChart;
-use holonics::hnn::propagation::{contact_exponent, junction_weights};
+use holonics::hnn::prediction::charted::ResponseTube;
+use holonics::hnn::propagation::{Operands, contact_exponent, junction_weights};
+use holonics::hnn::word::EndChange;
 use holonics::hnn::{Current, Field, HnnError, ReceivingPhases, SourceMoment, WordLattice};
 use holonics::ratio::Rat;
 use holonics::ratio::exponentiated::power_of_two as rat_power_of_two;
@@ -145,7 +149,8 @@ const WS_STRIDE: usize = 10;
 const WQ_STRIDE: usize = 8;
 
 /// The word buffer's arrays, in the kernels' `WL_*` order.
-const WL_ENTRIES: usize = 68;
+const WL_SOURCE_OPENING: usize = 68;
+const WL_ENTRIES: usize = 69;
 
 // -------------------------------------------------------------------------------------------
 // the scales the host decodes with
@@ -165,6 +170,8 @@ pub(crate) struct RingPlan {
     pub(crate) contrast: Option<u32>,
     pub(crate) storage_exp: u32,
     pub(crate) anchor_exp: u32,
+    /// Exponent of the source-open numerator before its first transient split.
+    pub(crate) source_open_exp: Option<u32>,
 }
 
 /// [definition] **One contact's plan, as the host reads its record**: its ends, width, rows,
@@ -216,6 +223,7 @@ pub(crate) struct LoadedResonatorPlan {
 /// [definition] **A word's plan**: the plan's words, the operands' weights (every ring's, first;
 /// only they cross the bus), the charts' offsets after them (gathered in on the card), and what the
 /// host reads the record with.
+#[derive(Clone)]
 pub(crate) struct WordPlan {
     pub(crate) plan: Vec<i64>,
     pub(crate) operands: Vec<i64>,
@@ -237,6 +245,8 @@ pub(crate) struct WordPlan {
     pub(crate) first_epoch: usize,
     pub(crate) aperture: usize,
     pub(crate) map_rows: usize,
+    /// Explicit constitutional read interpretation; paired features are `[fresh, actual-fresh]`.
+    pub(crate) receiving_layout: ReceivingLayout,
     pub(crate) logit_exp: u32,
     pub(crate) grain: u64,
     /// Per pair port entry `(source ring index, offset index, phases, rank, weights offset)` and
@@ -434,7 +444,8 @@ impl WordPlan {
                 .sources
                 .iter()
                 .find(|source| source.ring == g)
-                .map(|source| open_exponent(source, population));
+                .map(|source| open_exponent(source, population))
+                .transpose()?;
             let storage_exp = (lc + swc + lw).max(open_exp.unwrap_or(0));
             let anchor_exp = lw + swc.max(h_shift);
             let incident: Vec<(usize, usize, usize)> = field
@@ -475,6 +486,7 @@ impl WordPlan {
                 contrast,
                 storage_exp,
                 anchor_exp,
+                source_open_exp: open_exp,
             });
         }
         // The contacts' table.
@@ -601,13 +613,33 @@ impl WordPlan {
         for (a, offset) in selection_offsets.iter().enumerate() {
             plan[contact_table + a * WC_STRIDE + WC_SELECTION] = (selections_at + offset) as i64;
         }
-        // The receiving epoch and its gather.
+        // The receiving epoch and its gather: the identity, the read being in the passage frame
+        // (`holonics::hnn::receiving`, F1).
         let receiver = phases.ring();
         let map = loci.maps[receiver]
             .as_ref()
             .ok_or(HnnError::MissingReceivingMap { ring: receiver })?;
+        let receiving_layout = loci.receiving_layouts[receiver]
+            .ok_or(HnnError::MissingReceivingMap { ring: receiver })?;
+        let receiving_width = field.ring(receiver).width();
+        let expected_map_columns = match receiving_layout {
+            ReceivingLayout::Single => receiving_width,
+            ReceivingLayout::ArrivalContext { source_width } => {
+                if source_width != receiving_width {
+                    return Err(refused(
+                        "the receiving context source width equals its ring width",
+                    ));
+                }
+                source_width.checked_mul(2).ok_or(HnnError::CountOverflow)?
+            }
+        };
+        if map.matrix.columns != expected_map_columns {
+            return Err(refused(
+                "the receiving map's physical columns agree with its declared layout",
+            ));
+        }
         let gather_at = plan.len();
-        plan.extend(gather(field, receiver, &lift[receiver]));
+        plan.extend(gather(field, receiver, &BigInt::from(0)));
         // The source rings: their ports, pair ports and phase gathers.
         let source_at = plan.len();
         plan.resize(source_at + WS_STRIDE * loci.sources.len(), 0);
@@ -621,7 +653,7 @@ impl WordPlan {
             for c in 0..phases_g {
                 plan.extend(gather(field, g, &(&lift[g] - BigInt::from(c))));
             }
-            let open_exp = open_exponent(source, population);
+            let open_exp = open_exponent(source, population)?;
             let open = opens
                 .get(s)
                 .filter(|open| open.ring == g && open.pairs.len() == source.pairs.len())
@@ -629,7 +661,7 @@ impl WordPlan {
             let first_pair = pair_entries.len();
             for (o, pair) in source.pairs.iter().enumerate() {
                 let rank = pair.rank;
-                let sigma = pair.outputs.matrix.exponent;
+                let pair_exponent = pair_product_exponent(pair)?;
                 let counts = moment.paired_base(s, o) as i64;
                 pair_entries.push([
                     rank as i64,
@@ -638,7 +670,7 @@ impl WordPlan {
                     pair.earlier.offset as i64,
                     counts,
                     pair_weights as i64,
-                    i64::from(open_exp) - 3 * i64::from(sigma) - i64::from(population),
+                    i64::from(pair_population_shift(open_exp, population, pair_exponent)?),
                     phases_g as i64,
                 ]);
                 pairs.push((s, o, phases_g, rank, pair_weights, open.pairs[o]));
@@ -651,9 +683,11 @@ impl WordPlan {
             record[3] = moment.first_base(s) as i64;
             record[4] = gathers_at as i64;
             record[5] = i64::from(open_exp);
-            record[6] = i64::from(open_exp)
-                - i64::from(source.port.matrix.exponent)
-                - i64::from(population);
+            let marginal_shift = open_exp
+                .checked_sub(source.port.matrix.exponent)
+                .and_then(|shift| shift.checked_sub(population))
+                .ok_or_else(|| refused("the normalized source-port exponent is nonnegative"))?;
+            record[6] = i64::from(marginal_shift);
             record[7] = source.pairs.len() as i64;
             record[8] = first_pair as i64;
             record[9] = i64::try_from(open.marginal)
@@ -841,6 +875,7 @@ impl WordPlan {
             first_epoch: phases.first_epoch(),
             aperture: phases.aperture(),
             map_rows: map.matrix.rows,
+            receiving_layout,
             logit_exp: map.matrix.exponent + lw,
             grain: phases.grain(),
             pairs,
@@ -861,16 +896,105 @@ impl WordPlan {
     }
 }
 
-/// A source ring's opening scale: its port's lattice, or three of it with a pair port (`e (a·x)(b·y)`),
-/// and the population chart's lattice `L_ν` beside either (ruling B: the counts enter times `ν̂`).
-fn open_exponent(source: &crate::hnn::publication::SourceLoci, population: u32) -> u32 {
-    let port = source.port.matrix.exponent;
-    source
-        .pairs
-        .iter()
-        .map(|pair| 3 * pair.outputs.matrix.exponent)
-        .fold(port, u32::max)
-        + population
+#[cfg(test)]
+mod source_scale_tests {
+    use super::{open_exponent, pair_population_shift, pair_product_exponent};
+    use crate::hnn::dyadic::DyadicMatrix;
+    use crate::hnn::publication::{PairLoci, Placed, SourceLoci};
+
+    fn placed(exponent: u32) -> Placed {
+        Placed {
+            offset: 0,
+            matrix: DyadicMatrix {
+                rows: 1,
+                columns: 1,
+                exponent,
+                words: vec![1],
+            },
+        }
+    }
+
+    #[test]
+    fn pair_scale_tracks_projected_output_with_unprojected_read_factors() {
+        let original = PairLoci {
+            rank: 1,
+            outputs: placed(5),
+            current: placed(7),
+            earlier: placed(11),
+        };
+        let original_source = SourceLoci {
+            ring: 0,
+            port: placed(4),
+            pairs: vec![original.clone()],
+        };
+        let population = 3;
+        let original_product = pair_product_exponent(&original).unwrap();
+        let original_open = open_exponent(&original_source, population).unwrap();
+        assert_eq!(original_product, 23);
+        assert_eq!(original_open, 26);
+        assert_eq!(
+            pair_population_shift(original_open, population, original_product).unwrap(),
+            0
+        );
+
+        // A source view changes only the output factor. Current and earlier read-factor scales
+        // remain on their original material lattices.
+        let mut projected = original;
+        projected.outputs.matrix.exponent = 6;
+        assert_eq!(projected.current.matrix.exponent, 7);
+        assert_eq!(projected.earlier.matrix.exponent, 11);
+        let projected_source = SourceLoci {
+            ring: 0,
+            port: placed(4),
+            pairs: vec![projected.clone()],
+        };
+        let projected_product = pair_product_exponent(&projected).unwrap();
+        let projected_open = open_exponent(&projected_source, population).unwrap();
+        assert_eq!(projected_product, 24);
+        assert_eq!(projected_open, 27);
+        assert_eq!(
+            pair_population_shift(projected_open, population, projected_product).unwrap(),
+            0
+        );
+    }
+}
+
+/// The product exponent of one pair contribution `e (a·x)(b·y)`. The three published factors
+/// may have different exponents when a temporary mode view projects only `e`.
+fn pair_product_exponent(pair: &crate::hnn::publication::PairLoci) -> Result<u32, HnnError> {
+    pair.outputs
+        .matrix
+        .exponent
+        .checked_add(pair.current.matrix.exponent)
+        .and_then(|exponent| exponent.checked_add(pair.earlier.matrix.exponent))
+        .ok_or_else(|| refused("a source pair product exponent fits u32"))
+}
+
+/// Normalize a pair product against the source's common open exponent and population chart.
+fn pair_population_shift(
+    open_exponent: u32,
+    population: u32,
+    product_exponent: u32,
+) -> Result<u32, HnnError> {
+    open_exponent
+        .checked_sub(product_exponent)
+        .and_then(|shift| shift.checked_sub(population))
+        .ok_or_else(|| refused("a normalized source pair exponent is nonnegative"))
+}
+
+/// A source ring's opening scale: the marginal port's lattice or the sum of the three actual
+/// pair-factor exponents, plus population chart lattice `L_ν` (the counts enter times `ν̂`).
+fn open_exponent(
+    source: &crate::hnn::publication::SourceLoci,
+    population: u32,
+) -> Result<u32, HnnError> {
+    let mut largest = source.port.matrix.exponent;
+    for pair in &source.pairs {
+        largest = largest.max(pair_product_exponent(pair)?);
+    }
+    largest
+        .checked_add(population)
+        .ok_or_else(|| refused("a source open exponent fits u32"))
 }
 
 /// [definition] **One source ring's normalized open, as the plan reads it**
@@ -1003,6 +1127,8 @@ impl WordLayout {
             // The loaded solve's operand statuses, the first stage's snapshot: the chart stage reads
             // its ring's other rows only there, never the status each row rewrites in that stage.
             4 * n,
+            // The optional response lane's unsplit source opening, on its declared open scale.
+            16 * n,
         ];
         let mut offsets = [0u64; WL_ENTRIES];
         let mut at = 0usize;
@@ -1126,6 +1252,8 @@ pub(crate) struct ForwardRecord {
     pub(crate) rem_disp: Vec<i128>,
     pub(crate) rem_rate: Vec<i128>,
     pub(crate) logits: Vec<i128>,
+    /// Certified unsplit source-open numerator per ring row, populated for the response lane.
+    pub(crate) source_opening: Vec<i128>,
     /// One loaded tick's operands and return, laid out by field ring row at `t * N + row`.
     pub(crate) resonator_drive: Vec<i64>,
     pub(crate) resonator_output: Vec<i64>,
@@ -1201,12 +1329,27 @@ pub(crate) struct ResidentWord<'c> {
     plan_words: CardBuffer<'c, i64>,
     operands: CardBuffer<'c, i64>,
     buffer: CardBuffer<'c, u8>,
+    response: Option<ResponseLane<'c>>,
     offsets: CardBuffer<'c, u64>,
     /// The publication the word read: its return reads the same operators.
     pub(crate) publication: Rc<Publication<'c>>,
     pub(crate) record: ForwardRecord,
     /// The octets the word took across the bus.
     pub(crate) octets: usize,
+}
+
+/// A fresh-source companion trajectory held independently beside the physical word. It shares
+/// the declared operators and pair-weight buffers, but has its own zero-initialized word storage,
+/// forward/reverse feedback, record and plan with the carried opening disabled.
+struct ResponseLane<'c> {
+    plan: WordPlan,
+    plan_words: CardBuffer<'c, i64>,
+    buffer: CardBuffer<'c, u8>,
+    record: ForwardRecord,
+    octets: usize,
+    storage_octets: usize,
+    fresh_anchor_errors: Vec<Vec<Vec<Rat>>>,
+    actual_anchor_errors: Option<Vec<Vec<Vec<Rat>>>>,
 }
 
 /// The launches' layouts, derived once from the census for a word's shape.
@@ -1259,6 +1402,8 @@ impl<'c> ResidentWord<'c> {
         store: &ChartStore<'c>,
         refined: &Refined,
         carried: Option<&CardBuffer<'c, u8>>,
+        response_operands: Option<&Operands>,
+        response_opening_base: Option<&EndChange>,
     ) -> Result<(Self, Launches), HnnError> {
         let launches = Launches::derive(card, &plan)?;
         let layout = WordLayout::new(&plan, plan.contacts.len());
@@ -1328,12 +1473,109 @@ impl<'c> ResidentWord<'c> {
             card.launch(PAIR_ENTRY, &layout, &mut params)
                 .map_err(device)?;
         }
+        let mut response = if matches!(
+            plan.receiving_layout,
+            ReceivingLayout::ArrivalContext { .. }
+        ) {
+            if plan
+                .resonators
+                .iter()
+                .any(|resonator| resonator.saturation.is_some())
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "a CUDA response column requires a linear resonator or a declared nonlinear variation",
+                });
+            }
+            let mut response_plan = plan.clone();
+            response_plan.plan[WP_CARRY] = -1;
+            response_plan.carry = None;
+            let response_plan_words = card.upload(&response_plan.plan).map_err(device)?;
+            let response_storage_octets = layout.total + 8 * response_plan.plan.len();
+            let response_buffer = card.alloc::<u8>(layout.total).map_err(device)?;
+            let zeroes = vec![0u8; layout.total];
+            card.write(&response_buffer, 0, &zeroes).map_err(device)?;
+            let mut response_plan_ptr = response_plan_words.device_ptr();
+            let mut response_operands_ptr = operands.device_ptr();
+            let mut response_published = publication.words.device_ptr();
+            let mut response_moment_ptr = moment.first_pointer();
+            let mut response_weights_ptr = weights.device_ptr();
+            let mut response_word_ptr = response_buffer.device_ptr();
+            let mut no_fresh_word = 0u64;
+            let mut response_read_mode = 1i32;
+            let mut response_offsets_ptr = offsets.device_ptr();
+            let mut response_params = arguments![
+                response_plan_ptr,
+                response_operands_ptr,
+                response_published,
+                response_moment_ptr,
+                response_weights_ptr,
+                response_word_ptr,
+                no_fresh_word,
+                response_read_mode,
+                response_offsets_ptr
+            ];
+            card.launch(FORWARD_ENTRY, &launches.forward, &mut response_params)
+                .map_err(device)?;
+            let response_read = card
+                .fetch_range(&response_buffer, 0, layout.forward)
+                .map_err(device)?;
+            if let Some(refusal) = refusal(&u32s(&response_read, layout.at(WL_STATUS), 3), true) {
+                return Err(refusal);
+            }
+            let response_resonators = if plan.resonators.is_empty() {
+                None
+            } else {
+                Some(
+                    card.fetch_range(
+                        &response_buffer,
+                        layout.resonator_forward,
+                        layout.resonator_forward_bytes,
+                    )
+                    .map_err(device)?,
+                )
+            };
+            let source_opening = card
+                .fetch_range(&response_buffer, layout.at(WL_SOURCE_OPENING), 16 * plan.n)
+                .map_err(device)?;
+            let mut response_octets = 8 * response_plan.plan.len() + zeroes.len();
+            response_octets += response_read.len() + source_opening.len();
+            if let Some(bytes) = &response_resonators {
+                response_octets += bytes.len();
+            }
+            let record = decode_forward(
+                &response_plan,
+                &layout,
+                &response_read,
+                response_resonators.as_deref(),
+                Some(&source_opening),
+            );
+            let operands = response_operands.ok_or(HnnError::Unadmitted {
+                reason: "an ArrivalContext CUDA response has the producing charted operands",
+            })?;
+            let fresh_anchor_errors =
+                response_error_trace(&response_plan, &record, operands, None)?;
+
+            Some(ResponseLane {
+                plan: response_plan,
+                plan_words: response_plan_words,
+                buffer: response_buffer,
+                record,
+                octets: response_octets,
+                storage_octets: response_storage_octets,
+                fresh_anchor_errors,
+                actual_anchor_errors: None,
+            })
+        } else {
+            None
+        };
         let mut plan_ptr = plan_words.device_ptr();
         let mut operands_ptr = operands.device_ptr();
         let mut published = publication.words.device_ptr();
         let mut moment_ptr = moment.first_pointer();
         let mut weights_ptr = weights.device_ptr();
         let mut word_ptr = buffer.device_ptr();
+        let mut fresh_word_ptr = response.as_ref().map_or(0, |lane| lane.buffer.device_ptr());
+        let mut receiving_mode = if response.is_some() { 2i32 } else { 0i32 };
         let mut offsets_ptr = offsets.device_ptr();
         let mut params = arguments![
             plan_ptr,
@@ -1342,6 +1584,8 @@ impl<'c> ResidentWord<'c> {
             moment_ptr,
             weights_ptr,
             word_ptr,
+            fresh_word_ptr,
+            receiving_mode,
             offsets_ptr
         ];
         card.launch(FORWARD_ENTRY, &launches.forward, &mut params)
@@ -1375,7 +1619,35 @@ impl<'c> ResidentWord<'c> {
             octets += read.len();
             Some(read)
         };
-        let record = decode_forward(&plan, &layout, &octets_read, resonator_octets.as_deref());
+        let record = decode_forward(
+            &plan,
+            &layout,
+            &octets_read,
+            resonator_octets.as_deref(),
+            None,
+        );
+        if let Some(lane) = response.as_mut() {
+            // The physical word's source opening is read separately to construct the actual
+            // path's unsplit tube. Its carried interior and the zero-interior companion have
+            // distinct certificates, even though they share the same declared operators.
+            let actual_source_opening = card
+                .fetch_range(&buffer, layout.at(WL_SOURCE_OPENING), 16 * plan.n)
+                .map_err(device)?;
+            octets += actual_source_opening.len();
+            let actual_record = decode_forward(
+                &plan,
+                &layout,
+                &octets_read,
+                resonator_octets.as_deref(),
+                Some(&actual_source_opening),
+            );
+            let operands = response_operands.ok_or(HnnError::Unadmitted {
+                reason: "the paired CUDA response retains its producing charted operands",
+            })?;
+            let errors =
+                response_error_trace(&plan, &actual_record, operands, response_opening_base)?;
+            lane.actual_anchor_errors = Some(errors);
+        }
         Ok((
             Self {
                 card,
@@ -1384,6 +1656,7 @@ impl<'c> ResidentWord<'c> {
                 plan_words,
                 operands,
                 buffer,
+                response,
                 offsets,
                 publication,
                 record,
@@ -1482,6 +1755,126 @@ impl<'c> ResidentWord<'c> {
             ],
         })
     }
+
+    /// The independent zero-interior response return. It uses the same fixed operators and
+    /// reverse kernel but writes and reads only the response lane's own storage and feedback.
+    pub(crate) fn reverse_response(&mut self, reads: &[i64]) -> Result<ReverseRecord, HnnError> {
+        let lane = self.response.as_mut().ok_or(HnnError::Unadmitted {
+            reason: "an ArrivalContext return has its executed response lane",
+        })?;
+        let plan = &lane.plan;
+        let expected = plan.aperture * plan.rings[plan.receiver].width;
+        if reads.len() != expected {
+            return Err(HnnError::Shape {
+                what: "the response lane's carried reads",
+                expected,
+                found: reads.len(),
+            });
+        }
+        let octets: Vec<u8> = reads.iter().flat_map(|read| read.to_ne_bytes()).collect();
+        self.card
+            .write(&lane.buffer, self.layout.at(WL_READS), &octets)
+            .map_err(device)?;
+        let launches = Launches::derive(self.card, plan)?;
+        let mut plan_ptr = lane.plan_words.device_ptr();
+        let mut operands_ptr = self.operands.device_ptr();
+        let mut published = self.publication.words.device_ptr();
+        let mut word_ptr = lane.buffer.device_ptr();
+        let mut offsets_ptr = self.offsets.device_ptr();
+        let mut params = arguments![plan_ptr, operands_ptr, published, word_ptr, offsets_ptr];
+        self.card
+            .launch(REVERSE_ENTRY, &launches.reverse, &mut params)
+            .map_err(device)?;
+        let from = self.layout.at(WL_BAR_STORAGE);
+        let read = self
+            .card
+            .fetch_range(&lane.buffer, from, self.layout.total - from)
+            .map_err(device)?;
+        lane.octets += octets.len() + read.len();
+        let at = |entry: usize| self.layout.at(entry) - from;
+        let status = u32s(&read, at(WL_REV_STATUS), 3);
+        if let Some(refusal) = refusal(&status, false) {
+            return Err(refusal);
+        }
+        let (n, na, k, s) = (plan.n, plan.na, plan.k, plan.steps);
+        let c = plan.contacts.len();
+        Ok(ReverseRecord {
+            opening: i64s(&read, at(WL_BAR_STORAGE), n),
+            adjoint: i64s(&read, at(WL_REC_ADJ_U), s * n),
+            solved: i64s(&read, at(WL_REC_SOLVED), s * k),
+            dots1: i128s(&read, at(WL_DOTS1), s * c),
+            dots2: i128s(&read, at(WL_DOTS2), s * c),
+            dots3: i128s(&read, at(WL_DOTS3), s * plan.incidences),
+            rem_el: i128s(&read, at(WL_REV_EL), n),
+            rem_zeta: i128s(&read, at(WL_REV_ZETA), k),
+            rem_solved: i128s(&read, at(WL_REV_SOLVED), k),
+            rem_rate: i128s(&read, at(WL_REV_RATE), k),
+            rem_disp: i128s(&read, at(WL_REV_DISP), k),
+            rem_storage: i128s(&read, at(WL_REV_STORAGE), n),
+            rem_arrival: i128s(&read, at(WL_REV_ARRIVAL), na),
+            resonator_solved: i128s(&read, at(WL_REC_RES_SOLVED), s * n),
+            resonator_remainders: [
+                i128s(&read, at(WL_RES_REM_RATE), n),
+                i128s(&read, at(WL_RES_REM_OUTPUT), n),
+                i128s(&read, at(WL_RES_REM_U), n),
+                i128s(&read, at(WL_RES_REM_W), n),
+            ],
+        })
+    }
+
+    pub(crate) fn response_plan_record(&self) -> Option<(&WordPlan, &ForwardRecord)> {
+        self.response
+            .as_ref()
+            .map(|lane| (&lane.plan, &lane.record))
+    }
+
+    pub(crate) fn response_anchor_errors(&self) -> Option<(&[Vec<Vec<Rat>>], &[Vec<Vec<Rat>>])> {
+        self.response.as_ref().and_then(|lane| {
+            lane.actual_anchor_errors
+                .as_deref()
+                .map(|actual| (lane.fresh_anchor_errors.as_slice(), actual))
+        })
+    }
+
+    pub(crate) fn response_storage_octets(&self) -> Option<usize> {
+        self.response.as_ref().map(|lane| lane.storage_octets)
+    }
+
+    pub(crate) fn take_response_octets(&mut self) -> Option<usize> {
+        self.response
+            .as_mut()
+            .map(|lane| std::mem::take(&mut lane.octets))
+    }
+}
+
+fn response_error_trace(
+    plan: &WordPlan,
+    record: &ForwardRecord,
+    operands: &Operands,
+    opening_base: Option<&EndChange>,
+) -> Result<Vec<Vec<Vec<Rat>>>, HnnError> {
+    let (exact_opening, executed_opening) = match opening_base {
+        Some(base) => crate::hnn::readout::response_openings_from(plan, record, base)?,
+        None => crate::hnn::readout::response_openings(plan, record)?,
+    };
+    let mut tube = ResponseTube::open(operands, &exact_opening, &executed_opening)?;
+    let mut anchor_errors = Vec::with_capacity(plan.steps);
+    for crossing in 0..plan.steps {
+        let point = crate::hnn::readout::crossing_at(plan, record, crossing)?;
+        let anchors = crate::hnn::readout::crossing_anchors(plan, record, crossing)?;
+        anchor_errors.push(tube.anchors(&point, &anchors)?);
+        if crossing + 1 < plan.steps {
+            let next = crate::hnn::readout::crossing_at(plan, record, crossing + 1)?;
+            tube.advance(
+                &point,
+                &next,
+                plan.opened_at
+                    .checked_add(crossing)
+                    .ok_or(HnnError::CountOverflow)?,
+            )?;
+        }
+    }
+    Ok(anchor_errors)
 }
 
 /// [definition] **A carried change's layout on the card**: its storage, arrivals, displacements,
@@ -1504,6 +1897,7 @@ fn decode_forward(
     layout: &WordLayout,
     octets: &[u8],
     resonator_octets: Option<&[u8]>,
+    source_opening_octets: Option<&[u8]>,
 ) -> ForwardRecord {
     let (n, na, k, s) = (plan.n, plan.na, plan.k, plan.steps);
     let at = |entry: usize| layout.at(entry);
@@ -1544,6 +1938,8 @@ fn decode_forward(
         rem_disp: i128s(octets, at(WL_REM_DISP), k),
         rem_rate: i128s(octets, at(WL_REM_RATE), k),
         logits: i128s(octets, at(WL_LOGITS), plan.aperture * plan.map_rows),
+        source_opening: source_opening_octets
+            .map_or_else(|| vec![0; n], |bytes| i128s(bytes, 0, n)),
         resonator_drive: resonator_octets.map_or_else(
             || vec![0; s * n],
             |bytes| i64s(bytes, at_resonator(WL_REC_RES_DRIVE), s * n),

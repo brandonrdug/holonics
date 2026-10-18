@@ -623,7 +623,10 @@ mod tests {
             .law()
             .advance(&HolonState::new(configuration), &input)
             .unwrap();
-        assert_eq!(step.state.configuration, received.next_state().configuration);
+        assert_eq!(
+            step.state.configuration,
+            received.next_state().configuration
+        );
         let storage = joint.law().kinds(&step).unwrap().storage;
         assert!(is_zero(&storage.effort()[joint.source_extent()..]));
         assert_eq!(
@@ -788,9 +791,14 @@ mod tests {
                 } else {
                     integer_matrix(injection).unwrap()
                 };
-                let port_holon =
-                    PortHolon::medium(&zero(2, 2), &zero(2, 2), diagonal(&[1, 1]), &injection, true)
-                        .unwrap();
+                let port_holon = PortHolon::medium(
+                    &zero(2, 2),
+                    &zero(2, 2),
+                    diagonal(&[1, 1]),
+                    &injection,
+                    true,
+                )
+                .unwrap();
                 let holon = Holon::new(port_holon)
                     .unwrap()
                     .with_active(ActiveRelation::new(learned.clone()).unwrap())
@@ -829,7 +837,9 @@ mod tests {
                     .unwrap()
                     .expect("a consistent step");
                 assert!(kernel.is_empty());
-                let advance = law.commit(&state, &input, &before, &active, &after).unwrap();
+                let advance = law
+                    .commit(&state, &input, &before, &active, &after)
+                    .unwrap();
                 assert_eq!(&z[..2], &advance.state.configuration[..]);
                 assert!(advance.balance.is_exact());
             }

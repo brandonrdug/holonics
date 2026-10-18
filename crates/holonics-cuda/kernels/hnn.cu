@@ -21,7 +21,7 @@ extern __shared__ __align__(16) unsigned char hnn_shared[];
 //
 //   y_b = A x_b = (Σ_j a_ij ξ_b,γ_b(j)) · 2^(−(L_A + L_x))
 //
-// with `γ_b` an optional gather of the vector's coordinates (a ring's rotation `P_R^(τ_R)` is a
+// with `γ_b` an optional gather of the vector's coordinates (a source ring's rotation `P_g^(τ_g)` is a
 // permutation of the realified coordinates, so `R P x` is read as `R` against the gathered `x`).
 // The sum is taken in the ring Z/2^128 and read under its l1 certificate (`exact_integer.cuh`):
 // every entry is exact or refused, never rounded.
@@ -110,6 +110,7 @@ extern "C" __global__ void hnn_lattice_read(
 extern "C" __global__ void hnn_moment_ingest(
     const uint32_t *codes, uint32_t cells,
     uint32_t rings, const uint32_t *periods, const unsigned long long *steps, uint32_t alphabet,
+    uint32_t occurrence_major,
     uint32_t sources, const uint32_t *source_rings,
     uint32_t offsets, const uint32_t *offset_values,
     uint32_t *window, uint32_t window_extent,
@@ -145,7 +146,7 @@ extern "C" __global__ void hnn_moment_ingest(
         for (uint32_t g = 0; g < rings; ++g) {
             const uint32_t period = periods[g];
             const unsigned long long step =
-                active ? steps[(size_t)g * alphabet + code] + carry : 0ull;
+                active ? steps[occurrence_major ? (size_t)k * rings + g : (size_t)g * alphabet + code] + carry : 0ull;
             unsigned long long *scan = inclusive + (size_t)g * lanes;
             scan[t] = step;
             __syncthreads();

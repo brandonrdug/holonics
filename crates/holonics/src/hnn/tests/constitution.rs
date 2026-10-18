@@ -12,7 +12,6 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use super::learning::{OPEN_BUDGET, chain, chain_reach, generic, moment, phases, six_path};
-use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
@@ -27,6 +26,7 @@ use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::receiving::ActiveAddress;
 use crate::hnn::reference::{Reference, compose};
+use crate::hnn::tests::support::encoded;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::inertia;
 use crate::ratio::linear::vector::matrix_form;
@@ -613,10 +613,7 @@ fn a_scaled_prior_carries_its_chart_off_the_support() {
     let mut law = NormalLaw::with_scaled_prior(ExactRatMatrix::zero(2, n).unwrap(), 1);
     assert_eq!(law.gram(), scaled_identity(n, integer(2)));
     assert_eq!(law.solved(), scaled_identity(n, rat(1, 2)));
-    assert_eq!(
-        (law.chart().scale(), law.chart().exponent()),
-        (1, 1)
-    );
+    assert_eq!((law.chart().scale(), law.chart().exponent()), (1, 1));
     assert!(law.chart().certificate().is_zero());
     let ints = |values: [i64; 5]| values.iter().map(|x| integer(*x)).collect::<Vec<Rat>>();
     let covector = || vec![rat(1, 3), rat(-1, 2)];
@@ -639,8 +636,8 @@ fn a_scaled_prior_carries_its_chart_off_the_support() {
             .unwrap();
         let reading = reading.unwrap();
         for f in &features {
-            let f = ExactRatMatrix::shaped(n, 1, f.iter().map(|x| vec![x.clone()]).collect())
-                .unwrap();
+            let f =
+                ExactRatMatrix::shaped(n, 1, f.iter().map(|x| vec![x.clone()]).collect()).unwrap();
             exact = exact
                 .add(&f.multiply(&f.transpose().unwrap()).unwrap())
                 .unwrap();
@@ -659,7 +656,10 @@ fn a_scaled_prior_carries_its_chart_off_the_support() {
         assert!(!reading.cold, "deposit {clock} restarted");
         assert!(reading.warm.as_ref().is_some_and(|warm| *warm < rat(1, 4)));
         assert!(reading.certificate <= rule.target());
-        assert_eq!(row_norm(&left_residual(&chart, &exact)), reading.certificate);
+        assert_eq!(
+            row_norm(&left_residual(&chart, &exact)),
+            reading.certificate
+        );
         law = next;
     }
     assert_eq!(law.chart().support(), &[0, 1, 2, 3]);
@@ -825,12 +825,11 @@ fn entries(theta: &Constitution, locus: Locus, carrier: Carrier) -> Vec<Rat> {
 /// chart `X̂` and the locus's certified step `η` (zero where none was certified), `Δh_x = Σ w|f|²`
 /// and `Δx = (η_x / h_x') G_x` at the successor's statistic and the family's certified step `η_x`.
 ///
-/// Where the deposit moved a receiving prior from `2^k` to `2^(k′)` (`ChartReading::prior`), that
-/// move is one more update of the receiving law, after its step: `(2^(k′) − 2^k) I` on the Gram, and
-/// `(x − 1)(W_s + r_s)` on the map, `x = 2^(k − k′)`, with `W_s + r_s` the stepped map's value
-/// (the prior carry's design §3). The step itself is read at the stepped successor's chart, the
-/// one it was taken at, from the same deposit on the predecessor without its prior pairs
-/// (`Constitution::without_prior_pairs`).
+/// The current-window receiving prior contributes `(2^k′ − 2^k) I` to the
+/// Gram before the ordinary direction is prepared. Its additional map direction
+/// is `(2^(k−k′) − 1) W_before`, realized at the same certified eta as the
+/// ordinary step. Reconstruct both from the predecessor and the final successor
+/// chart; the prior does not rescale the stepped map or its retained remainder.
 fn updates(
     before: &Constitution,
     deposit: &Deposit,
@@ -844,14 +843,6 @@ fn updates(
         .filter(|(_, prior)| prior.to != prior.from)
         .map(|(locus, prior)| (locus, prior.from, prior.to))
         .collect();
-    let stepped = (!moves.is_empty()).then(|| {
-        before
-            .without_prior_pairs()
-            .deposited(deposit)
-            .expect("the step deposits without its prior pairs")
-            .0
-    });
-    let next = stepped.as_ref().unwrap_or(next);
     let mut out = updates_at(deposit, next, reading);
     for (locus, from, to) in moves {
         let Locus::ReceivingMap(g) = locus else {
@@ -862,23 +853,34 @@ fn updates(
         let n = law.gram().rows();
         let shift = power(to) - power(from);
         let gram: Vec<Rat> = (0..n * n)
-            .map(|i| if i % (n + 1) == 0 { shift.clone() } else { Rat::zero() })
+            .map(|i| {
+                if i % (n + 1) == 0 {
+                    shift.clone()
+                } else {
+                    Rat::zero()
+                }
+            })
             .collect();
         let x = power(from) / power(to);
-        let carried = remainders(next);
-        let map: Vec<Rat> = law
+        let eta = reading.linear_step(locus);
+        let map: Vec<Rat> = before
+            .receiving_law(g)
+            .unwrap()
             .map()
             .entries()
             .iter()
-            .enumerate()
-            .map(|(i, w)| {
-                let r = carried
-                    .get(&(locus, Carrier::Map, i))
-                    .cloned()
-                    .unwrap_or_else(Rat::zero);
-                (&x - Rat::one()) * (w + r)
-            })
+            .map(|w| &eta * (&x - Rat::one()) * w)
             .collect();
+        let radial = reading
+            .charts
+            .iter()
+            .find(|(at, _)| *at == locus)
+            .unwrap()
+            .1
+            .radial
+            .as_ref()
+            .expect("a receiving prior move records its current-window radial force");
+        assert_eq!(radial.displacement.entries(), map.as_slice());
         out.push(((locus, Carrier::Gram), gram));
         out.push(((locus, Carrier::Map), map));
     }
@@ -1106,10 +1108,12 @@ fn the_budgeted_carry_accounts_for_every_update() {
     // The chain's receiving prior is located (from `2^0`) and moves on this run, so the ledger
     // reads a move's updates as well as the steps'.
     assert!(run.iter().any(|(.., reading)| {
-        reading
-            .charts
-            .iter()
-            .any(|(_, chart)| chart.prior.as_ref().is_some_and(|prior| prior.to != prior.from))
+        reading.charts.iter().any(|(_, chart)| {
+            chart
+                .prior
+                .as_ref()
+                .is_some_and(|prior| prior.to != prior.from)
+        })
     }));
 }
 
@@ -1982,7 +1986,11 @@ fn the_budget_refuses_the_successor_and_keeps_the_predecessor() {
     let mut resident = reference.mount_with(&field, &current, tight).unwrap();
     let before = resident.constitution().clone();
     let (moment_id, _) = reference
-        .ingest(&mut resident, None, &encoded(&field, &[1, 2, 3, 0, 2, 1, 3]))
+        .ingest(
+            &mut resident,
+            None,
+            &encoded(&field, &[1, 2, 3, 0, 2, 1, 3]),
+        )
         .unwrap();
     let phases = resident.admitted()[0].clone();
     let mut refused = None;
@@ -2141,7 +2149,12 @@ fn the_standing_is_founded_off_its_nodes() {
     }
     let current = Current::at_rest(&field);
     let operands = Operands::at_cut(&field, &theta, &current).unwrap();
-    assert!(operands.rings().iter().all(|ring| ring.sheets().iter().all(|s| *s)));
+    assert!(
+        operands
+            .rings()
+            .iter()
+            .all(|ring| ring.sheets().iter().all(|s| *s))
+    );
     // The chain at one matched coordinate founds at (4, 3, 2) units.
     assert_eq!(theta.standing(0)[0], &coarsest * integer(2));
     assert_eq!(theta.standing(1)[0], &coarsest * integer(3));
@@ -2156,10 +2169,9 @@ fn the_standing_is_founded_off_its_nodes() {
     // Campaign 1's cycle of rings 5, 7, 11, 13: rings 2 and 3 alone share nodes 7..11, a single
     // channel there, so their 16 realified slices are its fixed nodes; every other slice is off its
     // node in the `+1` lobe.
-    let campaign = crate::hnn::field::Field::declare(
-        crate::hnn::field::FieldDeclaration::campaign_one(6148),
-    )
-    .unwrap();
+    let campaign =
+        crate::hnn::field::Field::declare(crate::hnn::field::FieldDeclaration::campaign_one(6148))
+            .unwrap();
     let theta = Constitution::initial(&campaign, OPEN_BUDGET).unwrap();
     // Ring 2's receiving map founds at its declared prior 2I (chart ½I), and a replaced map keeps it.
     let receiving = theta.receiving_law(2).unwrap();
@@ -2173,7 +2185,11 @@ fn the_standing_is_founded_off_its_nodes() {
     assert_eq!(replaced.receiving_law(2), Some(receiving));
     let fixed = theta.fixed_nodes();
     assert_eq!(fixed.len(), 16);
-    assert!(fixed.iter().all(|&(g, rho)| (g == 2 || g == 3) && (14..22).contains(&rho)));
+    assert!(
+        fixed
+            .iter()
+            .all(|&(g, rho)| (g == 2 || g == 3) && (14..22).contains(&rho))
+    );
     for (g, contrast) in theta.standing_contrasts().iter().enumerate() {
         for (rho, x) in contrast.iter().enumerate() {
             assert_eq!(x.is_zero(), fixed.contains(&(g, rho)), "({g}, {rho})");
@@ -2208,7 +2224,6 @@ fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
         .pull_back(
             &ratio.covector().unwrap(),
             theta.receiving_map(2).unwrap(),
-            &current.lift()[2],
             &phases,
         )
         .unwrap();
@@ -2337,7 +2352,11 @@ fn the_initial_constitution_is_the_declared_one() {
         assert!(theta.contrast_port(g).entries().iter().all(Zero::is_zero));
         // The standing is founded off its nodes, every slice in the `+1` lobe
         // (`the_standing_is_founded_off_its_nodes`).
-        assert!(theta.standing_contrasts()[g].iter().all(Signed::is_positive));
+        assert!(
+            theta.standing_contrasts()[g]
+                .iter()
+                .all(Signed::is_positive)
+        );
         for (rho, (u, v)) in theta.slices(g).iter().enumerate() {
             assert!(u[rho].is_one() && v[(rho + 1) % n].is_one());
         }
@@ -2569,13 +2588,13 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
         .unwrap();
         let (word, faces) = pending.read(&field, theta).unwrap();
         let targets = [1usize, 0];
-        let anchors = target_phases(&field, pending.anchor(), 2, &encoded(&field, &targets)).unwrap();
+        let anchors =
+            target_phases(&field, pending.anchor(), 2, &encoded(&field, &targets)).unwrap();
         let ratio = HolonRatio::compare(faces, &targets, &anchors).unwrap();
         let back = word
             .pull_back(
                 &ratio.covector().unwrap(),
                 theta.receiving_map(2).unwrap(),
-                &current.lift()[2],
                 &phases,
             )
             .unwrap();
@@ -2702,7 +2721,12 @@ fn the_receiving_step_pairs_the_original_covector() {
         covector: vec![half.clone(), Rat::zero(), -half.clone(), Rat::zero()],
         masses: None,
     };
-    let unit = vec![vec![half.clone()], vec![Rat::zero()], vec![-half.clone()], vec![Rat::zero()]];
+    let unit = vec![
+        vec![half.clone()],
+        vec![Rat::zero()],
+        vec![-half.clone()],
+        vec![Rat::zero()],
+    ];
     let (_, oscillation, alignment) = receiving_fisher_face_probe(&[sample], &unit).unwrap();
     assert_eq!(alignment, half);
     assert_eq!(oscillation, Rat::from_integer(1.into()));
@@ -2735,10 +2759,17 @@ fn a_soft_observed_face_carries_its_own_masses_and_the_one_hot_reconstruction_is
     };
     let feature = vec![Rat::one(), Rat::zero()];
     let soft = vec![rat(1, 6), Rat::zero(), rat(-1, 6), Rat::zero()];
-    let carried = face_sample(feature.clone(), soft.clone(), Some(vec![rat(1, 2), rat(1, 2)]));
+    let carried = face_sample(
+        feature.clone(),
+        soft.clone(),
+        Some(vec![rat(1, 2), rat(1, 2)]),
+    );
     let reconstructed = face_sample(feature.clone(), soft, None);
     assert_eq!(face_masses(&carried), Some(vec![rat(1, 2), rat(1, 2)]));
-    assert_eq!(face_masses(&reconstructed), Some(vec![rat(5, 6), rat(1, 6)]));
+    assert_eq!(
+        face_masses(&reconstructed),
+        Some(vec![rat(5, 6), rat(1, 6)])
+    );
 
     // The prequential terms read the masses: the read through this map is (1, 0) at the two class
     // rows, so the curvature is Var_p̃ = p̃_0 (1 − p̃_0), ¼ at the face's own masses and 5/36 at the
@@ -2765,7 +2796,12 @@ fn a_soft_observed_face_carries_its_own_masses_and_the_one_hot_reconstruction_is
 
     // The Fisher face reads them: a unit step that moves class 0's magnitude by 1 has the curvature
     // 2 (119/80) Var_p̃ (¼ and 5/36 here), the oscillation 1 and the original covector's alignment ⅙.
-    let unit = vec![vec![Rat::one()], vec![Rat::zero()], vec![Rat::zero()], vec![Rat::zero()]];
+    let unit = vec![
+        vec![Rat::one()],
+        vec![Rat::zero()],
+        vec![Rat::zero()],
+        vec![Rat::zero()],
+    ];
     let soft = vec![rat(1, 6), Rat::zero(), rat(-1, 6), Rat::zero()];
     let fisher = |masses: Option<Vec<Rat>>| {
         let sample = face_sample(vec![Rat::one()], soft.clone(), masses);
@@ -2780,7 +2816,11 @@ fn a_soft_observed_face_carries_its_own_masses_and_the_one_hot_reconstruction_is
     // The class metric reads the masses: p̃ = (⅞, ⅛) against q̃ = (⅛, ⅞) is a trace 7/32 (the
     // power of two at or below 32/7 is 4), the reconstruction's (¾, ¼) a trace 3/8 (8/3: 2).
     let steep = vec![rat(-3, 4), Rat::zero(), rat(3, 4), Rat::zero()];
-    let carried = face_sample(feature.clone(), steep.clone(), Some(vec![rat(7, 8), rat(1, 8)]));
+    let carried = face_sample(
+        feature.clone(),
+        steep.clone(),
+        Some(vec![rat(7, 8), rat(1, 8)]),
+    );
     let reconstructed = face_sample(feature.clone(), steep, None);
     assert_eq!(receiving_class_metric(&[carried]), Some(integer(4)));
     assert_eq!(receiving_class_metric(&[reconstructed]), Some(integer(2)));
@@ -2793,7 +2833,11 @@ fn a_soft_observed_face_carries_its_own_masses_and_the_one_hot_reconstruction_is
         masses
     );
     assert_eq!(
-        face_masses(&face_sample(feature.clone(), one_hot.clone(), masses.clone())),
+        face_masses(&face_sample(
+            feature.clone(),
+            one_hot.clone(),
+            masses.clone()
+        )),
         masses
     );
 
@@ -2811,6 +2855,125 @@ fn a_soft_observed_face_carries_its_own_masses_and_the_one_hot_reconstruction_is
             None
         );
     }
+}
+
+/// **The prior diagnostic uses the exact comparison that produced the samples**: the integer-cell
+/// case has `p̂=p̃` and therefore identical face/odometer alignment; a fractional grain reports the
+/// algebraic true-face slope and curvature as certified intervals, with the proved odometer
+/// correction bound enclosing their alignment difference. All operands are snapshots.
+#[test]
+fn prior_window_diagnostics_authenticate_faces_bound_proxy_error_and_do_not_mutate() {
+    use crate::hnn::constitution::prior_window_diagnostic;
+    use crate::hnn::ratio::{Faces, HolonRatio, TargetPhases};
+    use crate::hnn::receiving::ReceivingRead;
+    use crate::ratio::algebraic::{ExactInterval, interval_difference};
+
+    let comparison = |grain: u64, logits: Vec<Rat>| {
+        let faces = Faces::of_reads(&[ReceivingRead::of_logits(logits, grain)], grain).unwrap();
+        HolonRatio::compare(
+            faces,
+            &[1],
+            &TargetPhases {
+                branch: BigInt::zero(),
+                phases: vec![Rat::zero()],
+            },
+        )
+        .unwrap()
+    };
+    let sample_for = |ratio: &HolonRatio| Sample {
+        weight: Rat::one(),
+        feature: vec![Rat::one()],
+        covector: ratio.covector().unwrap().logits()[0]
+            .iter()
+            .map(|value| -value)
+            .collect(),
+        masses: Some(ratio.faces().faces[0].odometer_masses().unwrap()),
+    };
+    // delta = W f = (1, 3) at the two magnitude rows.
+    let map = ExactRatMatrix::shaped(
+        4,
+        1,
+        vec![
+            vec![Rat::one()],
+            vec![Rat::zero()],
+            vec![integer(3)],
+            vec![Rat::zero()],
+        ],
+    )
+    .unwrap();
+
+    let integer_face = comparison(1, vec![Rat::zero(), Rat::zero(), Rat::one(), Rat::zero()]);
+    let integer_sample = sample_for(&integer_face);
+    let integer_law = NormalLaw::with_receiving_prior(map.clone(), 7);
+    let law_before = integer_law.clone();
+    let map_before = map.clone();
+    let sample_before = integer_sample.clone();
+    let face_before = integer_face.clone();
+    let exact =
+        prior_window_diagnostic(&[integer_sample.clone()], integer_law.map(), &integer_face)
+            .unwrap();
+    assert_eq!(exact.alpha_odometer, rat(2, 3));
+    assert_eq!(exact.curvature_odometer, rat(8, 9));
+    assert!(
+        exact.alpha_face.lower <= exact.alpha_odometer
+            && exact.alpha_odometer <= exact.alpha_face.upper
+    );
+    assert_eq!(integer_law, law_before);
+    assert_eq!(map, map_before);
+    assert_eq!(integer_sample, sample_before);
+    assert_eq!(integer_face, face_before);
+
+    let fractional = comparison(2, vec![Rat::zero(), Rat::zero(), rat(1, 2), Rat::zero()]);
+    let fractional_sample = sample_for(&fractional);
+    let diagnostic =
+        prior_window_diagnostic(&[fractional_sample.clone()], &map, &fractional).unwrap();
+    assert_eq!(diagnostic.alpha_odometer, rat(4, 5));
+    assert_eq!(diagnostic.curvature_odometer, rat(24, 25));
+    assert_eq!(diagnostic.correction_bound, rat(1, 20));
+
+    // The exact true-face slope is `2 p̂₀`; the exact true-face variance for (1,3) is `4 p̂₀p̂₁`.
+    // The implementation's interval arithmetic must contain these independent face enclosures.
+    let mass0 = fractional.faces().faces[0]
+        .mass(0)
+        .unwrap()
+        .enclosure()
+        .unwrap();
+    let mass1 = fractional.faces().faces[0]
+        .mass(1)
+        .unwrap()
+        .enclosure()
+        .unwrap();
+    let expected_alpha =
+        ExactInterval::new(integer(2) * &mass0.lower, integer(2) * &mass0.upper).unwrap();
+    assert!(diagnostic.alpha_face.lower <= expected_alpha.lower);
+    assert!(expected_alpha.upper <= diagnostic.alpha_face.upper);
+    let expected_variance = mass0.times(&mass1).unwrap();
+    let expected_variance = ExactInterval::new(
+        integer(4) * &expected_variance.lower,
+        integer(4) * &expected_variance.upper,
+    )
+    .unwrap();
+    assert!(diagnostic.curvature_face.lower <= expected_variance.lower);
+    assert!(expected_variance.upper <= diagnostic.curvature_face.upper);
+    let discrepancy = interval_difference(
+        &diagnostic.alpha_face,
+        &ExactInterval::point(diagnostic.alpha_odometer.clone()),
+    )
+    .unwrap();
+    assert!(discrepancy.lower >= -diagnostic.correction_bound.clone());
+    assert!(discrepancy.upper <= diagnostic.correction_bound.clone());
+
+    // The exact ratio binding is checked, not merely a matching face count or extent.
+    let wrong_mass = Sample {
+        masses: Some(vec![rat(1, 2), rat(1, 2)]),
+        ..fractional_sample.clone()
+    };
+    assert!(prior_window_diagnostic(&[wrong_mass], &map, &fractional).is_err());
+    let wrong_covector = Sample {
+        covector: vec![Rat::zero(); 4],
+        ..fractional_sample
+    };
+    assert!(prior_window_diagnostic(&[wrong_covector], &map, &fractional).is_err());
 }
 
 /// The chain's constitution with its receiving map `W` of quarters (so the predicted phases
@@ -2834,7 +2997,9 @@ fn receiving_chain() -> (crate::hnn::field::Field, Constitution, ExactRatMatrix)
             .collect(),
     )
     .unwrap();
-    let theta = opening.with_ports(2, None, None, Some(map.clone())).unwrap();
+    let theta = opening
+        .with_ports(2, None, None, Some(map.clone()))
+        .unwrap();
     (field, theta, map)
 }
 
@@ -2871,16 +3036,27 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
     let (a, n) = (field.alphabet(), map.columns());
     assert_eq!((a, map.rows()), (4, 8));
     let at = |r: usize, j: usize| map.get(r, j).unwrap().clone();
-    let unit = |j: usize| -> Vec<Rat> { (0..n).map(|i| if i == j { Rat::one() } else { Rat::zero() }).collect() };
+    let unit = |j: usize| -> Vec<Rat> {
+        (0..n)
+            .map(|i| if i == j { Rat::one() } else { Rat::zero() })
+            .collect()
+    };
     let e0 = unit(0);
-    let e01: Vec<Rat> = (0..n).map(|i| if i < 2 { Rat::one() } else { Rat::zero() }).collect();
+    let e01: Vec<Rat> = (0..n)
+        .map(|i| if i < 2 { Rat::one() } else { Rat::zero() })
+        .collect();
 
     // The soft face.
     let produced = [rat(1, 2), rat(1, 4), rat(1, 8), rat(1, 8)];
     let observed = [rat(1, 4), rat(1, 4), rat(1, 2), Rat::zero()];
     let gaps = [rat(1, 2), rat(-1, 4), rat(1, 4), rat(1, 3)];
     let mut soft_covector: Vec<Rat> = (0..a)
-        .flat_map(|c| [&observed[c] - &produced[c], &observed[c] * &gaps[c] / integer(2)])
+        .flat_map(|c| {
+            [
+                &observed[c] - &produced[c],
+                &observed[c] * &gaps[c] / integer(2),
+            ]
+        })
         .collect();
     soft_covector[7] = rat(1, 3);
     let soft = Sample {
@@ -2895,7 +3071,11 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
     let mut hot_covector: Vec<Rat> = (0..a)
         .flat_map(|c| {
             let q = if c == 3 { Rat::one() } else { Rat::zero() };
-            let phase = if c == 3 { &gap_hot / integer(2) } else { Rat::zero() };
+            let phase = if c == 3 {
+                &gap_hot / integer(2)
+            } else {
+                Rat::zero()
+            };
             [q - &produced_hot[c], phase]
         })
         .collect();
@@ -2918,11 +3098,19 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
     // The hand targets: the prediction at the map before the deposit plus twice the gap.
     let soft_target = |c: usize| {
         let predicted = at(2 * c + 1, 0);
-        if observed[c].is_zero() { predicted } else { predicted + integer(2) * &gaps[c] }
+        if observed[c].is_zero() {
+            predicted
+        } else {
+            predicted + integer(2) * &gaps[c]
+        }
     };
     let hot_target = |c: usize| {
         let predicted = at(2 * c + 1, 0) + at(2 * c + 1, 1);
-        if c == 3 { predicted + integer(2) * &gap_hot } else { predicted }
+        if c == 3 {
+            predicted + integer(2) * &gap_hot
+        } else {
+            predicted
+        }
     };
     let mut expected = PhaseStatistics::founded(a, n);
     let soft_targets: Vec<Rat> = (0..a).map(|c| soft_target(c)).collect();
@@ -2946,17 +3134,29 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
     let mut moment0 = vec![Rat::zero(); n];
     moment0[0] = rat(1, 4) * soft_target(0);
     assert_eq!(phase.moment(0), &moment0[..]);
-    assert_eq!(phase.second(0), &(rat(1, 4) * soft_target(0) * soft_target(0)));
+    assert_eq!(
+        phase.second(0),
+        &(rat(1, 4) * soft_target(0) * soft_target(0))
+    );
     let mut gram3 = zeros;
     for (i, j) in [(0, 0), (0, 1), (1, 0), (1, 1)] {
         gram3[i][j] = integer(2);
     }
     assert_eq!(phase.gram(3), &gram3[..]);
     let moment3: Vec<Rat> = (0..n)
-        .map(|j| if j < 2 { integer(2) * hot_target(3) } else { Rat::zero() })
+        .map(|j| {
+            if j < 2 {
+                integer(2) * hot_target(3)
+            } else {
+                Rat::zero()
+            }
+        })
         .collect();
     assert_eq!(phase.moment(3), &moment3[..]);
-    assert_eq!(phase.second(3), &(integer(2) * hot_target(3) * hot_target(3)));
+    assert_eq!(
+        phase.second(3),
+        &(integer(2) * hot_target(3) * hot_target(3))
+    );
 
     // A checkpoint writes the statistics whole and a restored constitution holds them again.
     let state = next.continuing_state(0).unwrap();
@@ -2967,7 +3167,10 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
         .continued(&read)
         .unwrap();
     assert_eq!(restored, next);
-    assert_eq!(restored.receiving_law(2).unwrap().phase_statistics(), Some(&expected));
+    assert_eq!(
+        restored.receiving_law(2).unwrap().phase_statistics(),
+        Some(&expected)
+    );
 
     // Restore, then update (Epime's review of the sparse checkpoint): the next window deposited on
     // the restored constitution returns the uninterrupted successor, the statistic and every other
@@ -2980,8 +3183,14 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
                 weight: integer(1),
                 feature: e01.clone(),
                 covector: vec![
-                    rat(-1, 4), Rat::zero(), rat(1, 4), rat(1, 32),
-                    rat(1, 4), rat(-1, 32), rat(-1, 4), Rat::zero(),
+                    rat(-1, 4),
+                    Rat::zero(),
+                    rat(1, 4),
+                    rat(1, 32),
+                    rat(1, 4),
+                    rat(-1, 32),
+                    rat(-1, 4),
+                    Rat::zero(),
                 ],
                 masses: Some(vec![rat(1, 4); 4]),
             }],
@@ -3002,7 +3211,9 @@ fn a_sparse_checkpoint_restores_and_continues_exactly() {
     use crate::hnn::constitution::ContinuingState;
     let (field, theta, map) = receiving_chain();
     let n = map.columns();
-    let e01: Vec<Rat> = (0..n).map(|i| if i < 2 { Rat::one() } else { Rat::zero() }).collect();
+    let e01: Vec<Rat> = (0..n)
+        .map(|i| if i < 2 { Rat::one() } else { Rat::zero() })
+        .collect();
     let statistics = |theta: &Constitution| {
         theta
             .receiving_law(2)
@@ -3051,8 +3262,14 @@ fn a_sparse_checkpoint_restores_and_continues_exactly() {
                 weight: integer(1),
                 feature: e01.clone(),
                 covector: vec![
-                    rat(-1, 4), Rat::zero(), rat(1, 4), rat(1, 32),
-                    rat(1, 4), rat(-1, 32), rat(-1, 4), Rat::zero(),
+                    rat(-1, 4),
+                    Rat::zero(),
+                    rat(1, 4),
+                    rat(1, 32),
+                    rat(1, 4),
+                    rat(-1, 32),
+                    rat(-1, 4),
+                    Rat::zero(),
                 ],
                 masses: Some(vec![rat(1, 4); 4]),
             }],
@@ -3061,7 +3278,10 @@ fn a_sparse_checkpoint_restores_and_continues_exactly() {
     };
     let (from_kept, from_restored) = (soft(&kept).unwrap(), soft(&restored).unwrap());
     assert_eq!(from_restored, from_kept);
-    assert_eq!(statistics(&from_kept).reached().collect::<Vec<_>>(), vec![1, 2, 3]);
+    assert_eq!(
+        statistics(&from_kept).reached().collect::<Vec<_>>(),
+        vec![1, 2, 3]
+    );
     assert_eq!(restore(&from_kept), from_kept);
 }
 
@@ -3087,30 +3307,53 @@ fn only_a_reached_face_of_nonnegative_weight_is_absorbed_and_the_rest_is_skipped
 
     let statistics = absorbed(&[reached.clone()]).unwrap();
     assert_eq!(statistics.cells(), &integer(1));
-    assert_eq!(statistics.gram(0), &[vec![Rat::one(), Rat::zero()], vec![Rat::zero(), Rat::zero()]][..]);
+    assert_eq!(
+        statistics.gram(0),
+        &[
+            vec![Rat::one(), Rat::zero()],
+            vec![Rat::zero(), Rat::zero()]
+        ][..]
+    );
     assert_eq!(statistics.moment(0), &[rat(1, 2), Rat::zero()][..]);
     assert_eq!(statistics.second(0), &rat(1, 4));
     assert_eq!(statistics.second(1), &Rat::zero());
 
     // Skipped: nothing reached the locus, or the covector is no face's, or no class has mass.
     let skipped = [
-        Sample { weight: Rat::zero(), ..reached.clone() },
-        Sample { feature: vec![Rat::zero(); 2], ..reached.clone() },
+        Sample {
+            weight: Rat::zero(),
+            ..reached.clone()
+        },
+        Sample {
+            feature: vec![Rat::zero(); 2],
+            ..reached.clone()
+        },
         face_sample(feature.clone(), vec![Rat::one(); 4], None),
-        face_sample(feature.clone(), vec![rat(-1, 2), Rat::zero(), rat(-1, 2), Rat::zero()], None),
+        face_sample(
+            feature.clone(),
+            vec![rat(-1, 2), Rat::zero(), rat(-1, 2), Rat::zero()],
+            None,
+        ),
     ];
     for sample in skipped {
         assert_eq!(absorbed(&[sample]).unwrap(), founded);
     }
     // A covector off the map's rows is a shape refusal, not a skipped face.
     assert!(matches!(
-        absorbed(&[face_sample(feature.clone(), vec![rat(1, 2), rat(1, 8), rat(-1, 2)], None)]),
+        absorbed(&[face_sample(
+            feature.clone(),
+            vec![rat(1, 2), rat(1, 8), rat(-1, 2)],
+            None
+        )]),
         Err(HnnError::Shape { .. })
     ));
 
     // Refused: the sample is a face, but its comparison cannot be a regression's.
     let refused = [
-        Sample { weight: integer(-1), ..reached },
+        Sample {
+            weight: integer(-1),
+            ..reached
+        },
         // carried p̃ = (½, ½) with q̃ = p̃ + g = (−¼, 5/4): a negative observed mass
         face_sample(
             feature.clone(),
@@ -3125,7 +3368,10 @@ fn only_a_reached_face_of_nonnegative_weight_is_absorbed_and_the_rest_is_skipped
         ),
     ];
     for sample in refused {
-        assert!(matches!(absorbed(&[sample]), Err(HnnError::Unadmitted { .. })));
+        assert!(matches!(
+            absorbed(&[sample]),
+            Err(HnnError::Unadmitted { .. })
+        ));
     }
 }
 
@@ -3152,7 +3398,10 @@ fn a_moved_prior_keeps_the_phase_statistics_and_the_ridge_is_read_at_its_scale()
     .unwrap();
     let law = NormalLaw::with_receiving_prior(map, 2);
     assert_eq!(law.prior_scale(), 2);
-    assert_eq!(law.phase_statistics(), Some(&PhaseStatistics::founded(2, 2)));
+    assert_eq!(
+        law.phase_statistics(),
+        Some(&PhaseStatistics::founded(2, 2))
+    );
     // One deposit so the Gram has a support (the prior carry's window at t = 1).
     let reading = |feature: [Rat; 2], masses: [Rat; 2], target: usize| {
         let covector: Vec<Rat> = (0..2)
@@ -3173,7 +3422,12 @@ fn a_moved_prior_keeps_the_phase_statistics_and_the_ridge_is_read_at_its_scale()
     // The statistics a window left, and a pair whose Newton point asks for k′ = 1.
     let mut statistics = PhaseStatistics::founded(2, 2);
     statistics
-        .absorb(&Rat::one(), &[rat(1, 2), rat(-1, 4)], &[rat(1, 2), rat(1, 2)], &[rat(1, 3), rat(-2, 3)])
+        .absorb(
+            &Rat::one(),
+            &[rat(1, 2), rat(-1, 4)],
+            &[rat(1, 2), rat(1, 2)],
+            &[rat(1, 3), rat(-2, 3)],
+        )
         .unwrap();
     let s = rat(5, 3);
     let law = law
@@ -3196,7 +3450,10 @@ fn a_moved_prior_keeps_the_phase_statistics_and_the_ridge_is_read_at_its_scale()
     assert_eq!(receiving.prior_scale(), 3);
     assert_eq!(
         receiving.phase_statistics(),
-        Some(&PhaseStatistics::founded(field.alphabet(), receiving.map().columns()))
+        Some(&PhaseStatistics::founded(
+            field.alphabet(),
+            receiving.map().columns()
+        ))
     );
     assert_eq!(theta.source_law(0).unwrap().phase_statistics(), None);
     for g in 0..field.rings().len() {
@@ -3204,7 +3461,10 @@ fn a_moved_prior_keeps_the_phase_statistics_and_the_ridge_is_read_at_its_scale()
     }
     let zero = ExactRatMatrix::zero(4, 2).unwrap();
     assert_eq!(NormalLaw::with_prior(zero.clone()).phase_statistics(), None);
-    assert_eq!(NormalLaw::with_scaled_prior(zero, 2).phase_statistics(), None);
+    assert_eq!(
+        NormalLaw::with_scaled_prior(zero, 2).phase_statistics(),
+        None
+    );
 }
 
 // -------------------------------------------------------------------------------------------
@@ -3225,8 +3485,16 @@ fn the_odometer_defect_is_read_exactly_at_the_least_class() {
         covector: vec![rat(1, 8), rat(1, 5), rat(-1, 8), rat(1, 7)],
         masses: Some(vec![rat(1, 2), rat(1, 2)]),
     };
-    let unit_two = vec![vec![Rat::one()], vec![integer(9)], vec![-Rat::one()], vec![integer(-9)]];
-    assert_eq!(odometer_alignment_defect_probe(&[two], &unit_two), Some(rat(1, 16)));
+    let unit_two = vec![
+        vec![Rat::one()],
+        vec![integer(9)],
+        vec![-Rat::one()],
+        vec![integer(-9)],
+    ];
+    assert_eq!(
+        odometer_alignment_defect_probe(&[two], &unit_two),
+        Some(rat(1, 16))
+    );
 
     let three = Sample {
         weight: integer(2),
@@ -3249,7 +3517,10 @@ fn the_odometer_defect_is_read_exactly_at_the_least_class() {
         vec![integer(4)],
         vec![integer(-3)],
     ];
-    assert_eq!(odometer_alignment_defect_probe(&[three], &unit_three), Some(rat(3, 16)));
+    assert_eq!(
+        odometer_alignment_defect_probe(&[three], &unit_three),
+        Some(rat(3, 16))
+    );
 
     // No face: the one-hot reconstruction of (½, 0, ½, 0) leaves a negative mass.
     let stray = Sample {
@@ -3273,7 +3544,9 @@ fn a_receiving_step_its_alignment_cannot_certify_is_refused() {
     let (field, theta, map) = receiving_chain();
     let (a, n) = (field.alphabet(), map.columns());
     assert_eq!(a, 4);
-    let e0: Vec<Rat> = (0..n).map(|i| if i == 0 { Rat::one() } else { Rat::zero() }).collect();
+    let e0: Vec<Rat> = (0..n)
+        .map(|i| if i == 0 { Rat::one() } else { Rat::zero() })
+        .collect();
     let quarter = rat(1, 4);
     let face = |epsilon: Rat| Sample {
         weight: Rat::one(),

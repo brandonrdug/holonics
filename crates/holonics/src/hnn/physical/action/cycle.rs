@@ -39,14 +39,14 @@
 use num_traits::{One, Zero};
 
 use super::{PhysicalReceiver, ScheduledProspect};
+use crate::hnn::Encoded;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::Constitution;
+use crate::hnn::field::FieldMaterial;
 use crate::hnn::field::ReceiverDeclaration;
 use crate::hnn::word::action::PortPreparation;
 use crate::hnn::word::continuation::{MaterialDirection, MaterialTangent};
 use crate::hnn::word::{Absorption, EndChange, ReceptionCarry, Word, WordOpening};
-use crate::hnn::Encoded;
-use crate::hnn::field::FieldMaterial;
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, sub};
@@ -176,7 +176,11 @@ impl PhysicalReceiver<'_> {
     ) -> Result<CycleReading, HnnError> {
         let (key, start, tick) = self.located_key()?;
         let present = self.resident.reception_opening();
-        let WordOpening::Received { carry: present_carry, .. } = &present else {
+        let WordOpening::Received {
+            carry: present_carry,
+            ..
+        } = &present
+        else {
             return Err(HnnError::Unadmitted {
                 reason: "a cycle opens on a received carry",
             });
@@ -191,7 +195,10 @@ impl PhysicalReceiver<'_> {
             (0..dimension)
                 .map(|i| {
                     let (chi, psi) = if i < native {
-                        (unflatten(&shape, &unit(native, i))?, vec![Rat::zero(); extent])
+                        (
+                            unflatten(&shape, &unit(native, i))?,
+                            vec![Rat::zero(); extent],
+                        )
                     } else {
                         (
                             unflatten(&shape, &vec![Rat::zero(); native])?,
@@ -284,8 +291,14 @@ impl PhysicalReceiver<'_> {
             carry: orbit_carry,
             absorption: Absorption::Nothing,
         };
-        let (opened, _) =
-            self.opening_change(source, receiver, preparation, compared, material, &orbit_opening)?;
+        let (opened, _) = self.opening_change(
+            source,
+            receiver,
+            preparation,
+            compared,
+            material,
+            &orbit_opening,
+        )?;
         if flatten(&opened) != orbit[..native] {
             return Err(HnnError::Unadmitted {
                 reason: "a cycle opens exactly on its orbit's state",
@@ -354,9 +367,8 @@ impl PhysicalReceiver<'_> {
             let state_credits = encounter.tangents[directions_count..]
                 .iter()
                 .map(|t| {
-                    t.comparison_credit(ratio).map(|c| {
-                        (c.magnitude.clone(), &c.produced_phase + &c.observed_phase)
-                    })
+                    t.comparison_credit(ratio)
+                        .map(|c| (c.magnitude.clone(), &c.produced_phase + &c.observed_phase))
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             let mut per = Vec::with_capacity(directions_count);
@@ -433,9 +445,14 @@ impl PhysicalReceiver<'_> {
             .iter()
             .map(|t| {
                 let mut column = flatten(&t.opened(end, &end.conductances, self.field)?);
-                column.extend(t.world().ok_or(HnnError::Unadmitted {
-                    reason: "a cycle's tangents cross the World port",
-                })?.iter().cloned());
+                column.extend(
+                    t.world()
+                        .ok_or(HnnError::Unadmitted {
+                            reason: "a cycle's tangents cross the World port",
+                        })?
+                        .iter()
+                        .cloned(),
+                );
                 Ok(column)
             })
             .collect()
@@ -502,4 +519,3 @@ fn sub_matrix(a: &ExactRatMatrix, b: &ExactRatMatrix) -> Result<ExactRatMatrix, 
         .collect::<Result<Vec<_>, _>>()?;
     Ok(ExactRatMatrix::new(rows)?)
 }
-

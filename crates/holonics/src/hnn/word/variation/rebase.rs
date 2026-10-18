@@ -138,16 +138,26 @@ impl HeldContactVariation {
     /// checks its actual full canonical carry, references, phase tags and native operators.
     /// No direction quotient, extra jet, elapsed tick or old Word enters the rebind.
     pub(crate) fn rebound_receiving(
-        &self, field: &Field, current: &Current, successor: &Constitution,
+        &self,
+        field: &Field,
+        current: &Current,
+        successor: &Constitution,
         carry: &ReceptionCarry,
     ) -> Result<Self, HnnError> {
-        if !carry.fits(field) || !self.matches(&self.producing, carry)
-            || self.coordinates.is_empty() || self.columns.len() != self.coordinates.len()
+        if !carry.fits(field)
+            || !self.matches(&self.producing, carry)
+            || self.coordinates.is_empty()
+            || self.columns.len() != self.coordinates.len()
             || self.references.len() != field.contacts().len()
-            || self.columns.iter().any(|chi| !same_change_shape(chi, &carry.change))
+            || self
+                .columns
+                .iter()
+                .any(|chi| !same_change_shape(chi, &carry.change))
             || successor.released() != self.producing.released()
         {
-            return refuse("an observer rebind preserves the complete admitted current, clock and contact domain");
+            return refuse(
+                "an observer rebind preserves the complete admitted current, clock and contact domain",
+            );
         }
         let old_ops = Operands::exact_at_cut(field, &self.producing, current)?;
         let new_ops = Operands::exact_at_cut(field, successor, current)?;
@@ -155,16 +165,27 @@ impl HeldContactVariation {
         admit(&new_ops)?;
         let old_form = PowerForm::read(field, &self.producing, current)?;
         let new_form = PowerForm::read(field, successor, current)?;
-        if old_ops != new_ops || old_form != new_form
+        if old_ops != new_ops
+            || old_form != new_form
             || old_form.held(&new_form, &carry.change)?.change != carry.change
         {
-            return refuse("a receiving translation changes no actual native operator or full canonical power form");
+            return refuse(
+                "a receiving translation changes no actual native operator or full canonical power form",
+            );
         }
         for g in 0..field.rings().len() {
-            if [Locus::Standing(g), Locus::Element(g), Locus::SourcePort(g), Locus::Resonator(g)]
-                .iter().any(|&locus| self.producing.clock(locus) != successor.clock(locus))
+            if [
+                Locus::Standing(g),
+                Locus::Element(g),
+                Locus::SourcePort(g),
+                Locus::Resonator(g),
+            ]
+            .iter()
+            .any(|&locus| self.producing.clock(locus) != successor.clock(locus))
             {
-                return refuse("an observer translation advances no source or native material clock");
+                return refuse(
+                    "an observer translation advances no source or native material clock",
+                );
             }
             let old = self.producing.receiving_map(g);
             let new = successor.receiving_map(g);
@@ -182,44 +203,71 @@ impl HeldContactVariation {
                 || self.producing.source_law(g) != successor.source_law(g)
                 || self.producing.transport(g) != successor.transport(g)
             {
-                return refuse("an observer-map translation preserves its source, native material and receiving chart");
+                return refuse(
+                    "an observer-map translation preserves its source, native material and receiving chart",
+                );
             }
             for offset in 0..field.offsets().len() {
                 if self.producing.pair_port(g, offset) != successor.pair_port(g, offset) {
-                    return refuse("an observer translation preserves the producing pair-source relation");
+                    return refuse(
+                        "an observer translation preserves the producing pair-source relation",
+                    );
                 }
             }
-            match (&old_ops.resonators()[g], &carry.change.resonators[g],
-                &carry.resonator_momenta[g]) {
+            match (
+                &old_ops.resonators()[g],
+                &carry.change.resonators[g],
+                &carry.resonator_momenta[g],
+            ) {
                 (Some(law), Some([_, w]), Some(pi))
                     if law.material().forms().0.apply(w)? == *pi
                         && carry.change.resonator_phases[g]
                             == Some(law.phase_at(carry.ticks.saturating_sub(1))) => {}
                 (None, None, None) => {}
-                _ => return refuse("an observer rebind keeps actual loaded momentum and absolute pump phase"),
+                _ => {
+                    return refuse(
+                        "an observer rebind keeps actual loaded momentum and absolute pump phase",
+                    );
+                }
             }
         }
         let mut coordinates = Vec::new();
         for a in 0..field.contacts().len() {
             if self.producing.contact_scales(a) != successor.contact_scales(a)
                 || self.producing.clock(Locus::Channel(a)) != successor.clock(Locus::Channel(a))
-                || self.producing.contact_stiffness_signature(a) != successor.contact_stiffness_signature(a)
+                || self.producing.contact_stiffness_signature(a)
+                    != successor.contact_stiffness_signature(a)
                 || self.producing.contact_surface_storage(a) != successor.contact_surface_storage(a)
                 || old_ops.contacts()[a].conductance() != &self.references[a]
-                || old_ops.contacts()[a].forms().0.apply(&carry.change.states[a][1])? != carry.momenta[a]
+                || old_ops.contacts()[a]
+                    .forms()
+                    .0
+                    .apply(&carry.change.states[a][1])?
+                    != carry.momenta[a]
             {
-                return refuse("an observer translation preserves all contact constitutions, statistics and canonical momenta");
+                return refuse(
+                    "an observer translation preserves all contact constitutions, statistics and canonical momenta",
+                );
             }
-            for (family, (old, new)) in factors(&self.producing, a).into_iter()
-                .zip(factors(successor, a)).enumerate()
+            for (family, (old, new)) in factors(&self.producing, a)
+                .into_iter()
+                .zip(factors(successor, a))
+                .enumerate()
             {
                 if old != new {
-                    return refuse("a simultaneous contact update requires the actual canonical contact rebase");
+                    return refuse(
+                        "a simultaneous contact update requires the actual canonical contact rebase",
+                    );
                 }
                 for row in 0..old.rows() {
                     for column in 0..old.columns() {
                         if !successor.released().contains(&Locus::Channel(a)) {
-                            coordinates.push(ContactCoordinate { contact: a, family, row, column });
+                            coordinates.push(ContactCoordinate {
+                                contact: a,
+                                family,
+                                row,
+                                column,
+                            });
                         }
                     }
                 }
@@ -234,7 +282,9 @@ impl HeldContactVariation {
         // Only the identity operand's contemporary exact bits are newly charged.
         next.read_bits()?;
         if !next.matches(successor, carry) {
-            return refuse("the observer-rebound sensitivity is bound to its actual contemporary material");
+            return refuse(
+                "the observer-rebound sensitivity is bound to its actual contemporary material",
+            );
         }
         Ok(next)
     }
@@ -704,10 +754,23 @@ mod tests {
         assert_eq!(variation.columns(), old_columns);
         // An actual observer translation at fixed native material must keep these nonzero
         // canonical columns, not restart them at zero or keep only their directions.
-        let observer = theta.clone().with_ports(0, None, None,
-            Some(ExactRatMatrix::identity(4).unwrap().scaled(&integer(2)))).unwrap();
-        assert!(variation.rebased(&field, &current, &observer, &carry, &carry, &transport).is_err());
-        let rebound = variation.rebound_receiving(&field, &current, &observer, &carry).unwrap();
+        let observer = theta
+            .clone()
+            .with_ports(
+                0,
+                None,
+                None,
+                Some(ExactRatMatrix::identity(4).unwrap().scaled(&integer(2))),
+            )
+            .unwrap();
+        assert!(
+            variation
+                .rebased(&field, &current, &observer, &carry, &carry, &transport)
+                .is_err()
+        );
+        let rebound = variation
+            .rebound_receiving(&field, &current, &observer, &carry)
+            .unwrap();
         assert_eq!(rebound.columns(), variation.columns());
         assert_eq!(rebound.coordinates(), variation.coordinates());
         assert_eq!(rebound.reading.next_tick, variation.reading.next_tick);
@@ -716,14 +779,28 @@ mod tests {
         assert_eq!(rebound.action, variation.action);
         assert_eq!(rebound.columns()[0].states[0][1][0], rat(1, 12));
         assert!(rebound.matches(&observer, &carry));
-        let changed_source = observer.clone().with_ports(0, None,
-            Some(ExactRatMatrix::zero(4, 2).unwrap()), None).unwrap();
-        assert!(rebound.rebound_receiving(&field, &current, &changed_source, &carry).is_err());
+        let changed_source = observer
+            .clone()
+            .with_ports(0, None, Some(ExactRatMatrix::zero(4, 2).unwrap()), None)
+            .unwrap();
+        assert!(
+            rebound
+                .rebound_receiving(&field, &current, &changed_source, &carry)
+                .is_err()
+        );
         let mut wrong_momentum = carry.clone();
         wrong_momentum.momenta[0][0] += integer(1);
-        assert!(rebound.rebound_receiving(&field, &current, &observer, &wrong_momentum).is_err());
+        assert!(
+            rebound
+                .rebound_receiving(&field, &current, &observer, &wrong_momentum)
+                .is_err()
+        );
         let mut wrong_clock = carry.clone();
         wrong_clock.ticks += 1;
-        assert!(rebound.rebound_receiving(&field, &current, &observer, &wrong_clock).is_err());
+        assert!(
+            rebound
+                .rebound_receiving(&field, &current, &observer, &wrong_clock)
+                .is_err()
+        );
     }
 }
