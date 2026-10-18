@@ -2,16 +2,18 @@ import Holonics.HNN.PriorCarry
 import Holonics.HNN.LatticeDeposit
 
 /-!
-# HNN.PriorMove: the at-map pair as the Rust carries it, and the move's two exits
+# HNN.PriorMove: the at-map pair and the move's two exits
 
 [proved-derived; formal-checked] #62 comment 5975754141, owed by #317 (`hnn::constitution::
 {LocatedPrior, prequential_terms, NormalLaw::moved_prior}`; the record
 `research/records/2026-10-04_THE_RECEIVING_PRIOR_IS_CARRIED_BESIDE_ITS_GRAM_AND_MOVES_TO_THE_CODES_CELL.md`).
 `HNN/PriorCarry` proves the carry on the certificate's pair `(a, C)` and the quadratic
-`q(φ) = −(φ − 1) a + ½ (φ − 1)² V` at the map. The Rust carries the at-map pair instead, exactly,
+`q(φ) = −(φ − 1) a + ½ (φ − 1)² V` at the map. The historical implementation carried the at-map pair exactly,
 as three rationals: `a = A₀ + A₁ ℓ` and `V = S ℓ` with `ℓ = ln 2`. A window's readings add their
 terms to `A₀` and `S`; only a move changes `A₁`. This file proves the laws of that representation
-and the two exits of `LocatedPrior::member` that `HNN/PriorCarry` leaves.
+and the two exits left by `HNN/PriorCarry`. The Rust scalar pair is retired; these statements
+remain reference mathematics with no current Rust consumer. Historical owners `LocatedPrior`,
+`NormalLaw::moved_prior` and their methods are pinned to https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2679.
 
 ```text
 reading     α = w ⟨g_Re, δ_Re⟩ ,  σ = |w| Var_p̃(δ_Re) ,  δ = W z     (the map in force)
@@ -88,7 +90,7 @@ def curvature (r : AtMapReading ι L) : L := |r.weight| * variance r.masses r.re
 
 end AtMapReading
 
-/-- [definition] **The located prior's pair** (`LocatedPrior`): `A₀`, `A₁` and `S`, read as
+/-- [definition] **The located prior's pair** ([historical LocatedPrior](https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2679)): `A₀`, `A₁` and `S`, read as
 `a = A₀ + A₁ ℓ` and `V = S ℓ`. -/
 @[ext]
 structure Located (L : Type*) where
@@ -98,20 +100,20 @@ structure Located (L : Type*) where
 
 namespace Located
 
-/-- The pair founded: no reading yet (`LocatedPrior::founded`). -/
+/-- The pair founded: no reading yet ([historical LocatedPrior::founded](https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2688)). -/
 def founded : Located L := ⟨0, 0, 0⟩
 
 /-- The pair's value `(a, V) = (A₀ + A₁ ℓ, S ℓ)`. -/
 def value (ℓ : L) (p : Located L) : L × L := (p.a0 + p.a1 * ℓ, p.s * ℓ)
 
-/-- One reading's terms added (`LocatedPrior::read`): `A₀ += α`, `S += σ`. -/
+/-- One reading's terms added ([historical LocatedPrior::read](https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2710)): `A₀ += α`, `S += σ`. -/
 def read (p : Located L) (r : AtMapReading ι L) : Located L :=
   ⟨p.a0 + r.alignment, p.a1, p.s + r.curvature⟩
 
 /-- The pair carried from `p` over readings in their order of arrival. -/
 def carried (p : Located L) (rs : List (AtMapReading ι L)) : Located L := rs.foldl read p
 
-/-- The pair rebased to the member `x` (`LocatedPrior::rebased`). -/
+/-- The pair rebased to the member `x` ([historical LocatedPrior::rebased](https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2718)). -/
 def rebased (x : L) (p : Located L) : Located L :=
   ⟨x * p.a0, x * (p.a1 - (x - 1) * p.s), x ^ 2 * p.s⟩
 

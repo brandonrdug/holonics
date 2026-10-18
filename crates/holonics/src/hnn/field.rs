@@ -405,14 +405,10 @@ pub struct ContactDeclaration {
 /// `H_0 = 2^k I` (`hnn::constitution::NormalLaw::with_receiving_prior`; `k = 0` is the unit prior
 /// every other law keeps), and the readings move it from there.
 ///
-/// [definition; agent-inferred, October 4; the
-/// [prior carry's design](../../../../research/records/2026-10-04_THE_RECEIVING_PRIOR_IS_CARRIED_BESIDE_ITS_GRAM_AND_MOVES_TO_THE_CODES_CELL.md)
-/// §8] `k` is the prior's initial configuration, not a held choice: the founding map `W_0 = 0`
-/// reads no terms, so the pair founds at zero and the mount moves nothing, as a rest-saved state
-/// mounts with zero carry; every later deposit that reaches the map reads its terms and moves `k`
-/// to the code's cell (Lean `HNN/PriorCarry`, `hnn::constitution::LocatedPrior`). No receiver
-/// holds its prior by law: where no reading reaches the map, or none reads as the face's
-/// `q − p̃`, or the curvature is zero, the located law itself holds `k` and says why.
+/// The founding exponent `k` is immutable declared identity. A current-window proposal may
+/// move the working ridge without moving that declaration or retaining historical scalars.
+/// The retired historical-pair implementation remains at the
+/// [prior owner](https://github.com/brandonrdug/holonics/blob/03b949b83006236044e7e15abb2142d00918474d/crates/holonics/src/hnn/constitution.rs#L2679); its Lean mathematics remains reference mathematics.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverDeclaration {
     pub ring: usize,

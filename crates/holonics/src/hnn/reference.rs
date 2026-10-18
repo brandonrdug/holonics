@@ -70,7 +70,9 @@
 //! arrived targets' diamond reads re-reads them, the released part counted as exchange (otherwise
 //! the collapse changes no admitted reading, exactly). The steps chain, so they telescope to the
 //! aeon's change of code length, and `close_aeon` returns the aeon's balance with the face against
-//! the literal beside it.
+//! the literal beside it. Receiving-only precision publication rereads the same arrived operand
+//! transactionally and adds its receiver-coordinate motion to deposition, separately counted and
+//! subtotaled as publication. It leaves the sealed arrival score and sample count unchanged.
 //!
 //! [definition] **The exposure** ([`Reference::expose`], design (d), campaign 1's protocol under
 //! prequential scoring): the cut, exactly the field's declared population (so the `n*` guard holds), is
@@ -426,11 +428,12 @@ impl StagedSlot {
 /// next step reads: a deposit re-reads it at the successor (the deposition step), a collapse that
 /// releases a locus its diamond reads re-reads it at the collapsed constitution (the release, an
 /// exchange step), and the next compare replaces it. It is bounded (one), counted in
-/// [`Resident::state_bits`], and no other method reads it. [agent-inferred] It is kept in the
+/// [`Resident::state_bits`]; receiving-only precision publication also rereads it transactionally. [agent-inferred] It is kept in the
 /// resident rather than in a [`StagedSlot`]: the collapse's re-read needs it after the staged deposit
 /// is consumed or discarded.
 #[derive(Clone, Debug)]
 struct Arrived {
+    /// Carries its producing phases, independent of a later admitted future family.
     ratio: PendingRatio,
     targets: Vec<usize>,
     /// The opening the compared word opened on, so the successor's re-read opens on it too.
@@ -4673,6 +4676,14 @@ pub fn contact_ablation(
     })
 }
 
+/// Exterior storage readings for a receiving publication, with overlapping terms named.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PublicationStorageBits {
+    /// The one arrived operand; zero when absent.
+    pub arrived: u64,
+    pub charts: u64,
+}
+
 /// [definition] **What an exposure reads of a port's resident** beside the port's own methods: the
 /// admitted family, the published constitution, the budget stop, an open moment, the lift point,
 /// the state's bits with and without the collapse, the executed charts' tally and the wall time by
@@ -4686,6 +4697,8 @@ pub trait ExposedResident {
     fn current(&self) -> &Current;
     fn state_bits(&self) -> u64;
     fn state_bits_without_collapse(&self) -> u64;
+    /// Read the bounded publication operands for exterior state-accounting comparisons.
+    fn publication_storage_bits(&self) -> Result<PublicationStorageBits, HnnError>;
     fn tally(&self) -> &ChartTally;
     fn wall(&self) -> &WallTimes;
     /// The carried change the next reception opens on (the reception carry); a realization that
@@ -4718,8 +4731,9 @@ pub trait ExposedResident {
             found: 0,
         })
     }
-    /// Publish a label-free receiving-map precision event at its bound commit. This is called
-    /// only after the comparison's deposit and all handles for that sample have been consumed.
+    /// Publish a label-free receiving-map precision event at its bound material/commit. Pending
+    /// ratios and staged deposits must be consumed; open source moments may continue unchanged.
+    /// A held arrived operand is reread and accounted at the successor, without a new arrival.
     fn publish_receiving_precision(&mut self, _event: &ReceivingPrecision) -> Result<(), HnnError> {
         Err(HnnError::Unadmitted {
             reason: "receiving-map precision publication on this realization",
@@ -4728,6 +4742,12 @@ pub trait ExposedResident {
 }
 
 impl ExposedResident for Resident {
+    fn publication_storage_bits(&self) -> Result<PublicationStorageBits, HnnError> {
+        Ok(PublicationStorageBits {
+            arrived: self.arrived.as_ref().map_or(0, Arrived::bits),
+            charts: self.charts.bits(),
+        })
+    }
     fn admitted(&self) -> &[ReceivingPhases] {
         Resident::admitted(self)
     }
@@ -4749,9 +4769,20 @@ impl ExposedResident for Resident {
     }
     fn publish_receiving_precision(&mut self, event: &ReceivingPrecision) -> Result<(), HnnError> {
         event.check_constitution(&self.constitution)?;
-        if !self.pending.is_empty() || !self.staged.is_empty() || !self.moments.is_empty() {
+        if !self.pending.is_empty() || !self.staged.is_empty() {
             return Err(HnnError::Unadmitted {
-                reason: "receiving precision publication requires consumed sample handles",
+                reason: "receiving precision publication requires consumed pending and staged handles",
+            });
+        }
+        // A receiving-only rebase writes W, Gram, their carried remainders/chart, the
+        // receiving lattice and commit. SourceMoment, Current, address, phases and
+        // ReceptionCarry read none of these terms: their transport is the identity.
+        // The arrived face DOES read W. Its occurrence must move with the successor.
+        let occurrence = self.ledger.balance().closing.is_some();
+        if occurrence != self.arrived.is_some() {
+            return Err(HnnError::PrecisionOccurrence {
+                occurrence,
+                arrived: self.arrived.is_some(),
             });
         }
         let retention = self.retention();
@@ -4760,10 +4791,20 @@ impl ExposedResident for Resident {
             event.levels(),
             &retention,
         )?;
+        let mut next_charts = self.charts.clone();
+        let mut next_tally = self.tally.clone();
+        let mut next_ledger = self.ledger.clone();
+        if let Some(arrived) = &self.arrived {
+            let (reread, readings) = arrived.code_length(&self.field, &next, &mut next_charts)?;
+            next_tally.read(&readings);
+            next_ledger.publish(reread)?;
+        }
+        // No fallible operation follows publication. The sealed arrival score/cell counts
+        // stay untouched; retain the contemporary operand for the next compare or close.
         self.constitution = next;
-        // The arrived comparison belongs to the prior publication/commit; all of its effects are
-        // already in the deposited successor and its handles have been consumed.
-        self.arrived = None;
+        self.charts = next_charts;
+        self.tally = next_tally;
+        self.ledger = next_ledger;
         self.forget_kept_reads();
         Ok(())
     }
@@ -5174,12 +5215,7 @@ where
                 let at = position + fed;
                 course.push(leg.close(at as u64, resident.constitution(), phases.ring())?);
                 let span = cut.closing_crib(aeon_start, at, crib.window);
-                let closing = close_and_locate(
-                    port,
-                    &mut resident,
-                    &family,
-                    &cells.part(span)?,
-                )?;
+                let closing = close_and_locate(port, &mut resident, &family, &cells.part(span)?)?;
                 aeons.push(closing.boundary);
                 if let Some(key) = closing.key {
                     keys.push(KeyReport {
@@ -5457,3 +5493,6 @@ pub fn prequential(
 mod continuation;
 mod interaction;
 pub mod passage;
+
+#[cfg(test)]
+mod precision_publication_tests;

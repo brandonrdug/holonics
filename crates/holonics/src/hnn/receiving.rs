@@ -1846,6 +1846,7 @@ impl SourceObserverView {
     /// Complete anchor transpose: sum_j H_j^T R^T grad_j (the read is in the passage frame, so no
     /// rotor enters), then chi_i^T at each of the six actual clocks. The Word performs ONE joined
     /// reverse sweep afterward.
+    #[cfg(test)]
     pub(crate) fn seeds(
         &self,
         gradients: &[Vec<Rat>],

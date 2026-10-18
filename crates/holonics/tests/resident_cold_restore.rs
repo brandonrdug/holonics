@@ -401,20 +401,20 @@ fn version_two_resident_passage_is_refused() {
     let resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let state = resident.continuing_state(field.sources()[0]).unwrap();
     let passage = state.passage().unwrap();
-    assert!(passage.starts_with("resident-passage 3\n"));
-    let old = passage.replacen("resident-passage 3", "resident-passage 2", 1);
+    assert!(passage.starts_with("resident-passage 4\n"));
+    let old = passage.replacen("resident-passage 4", "resident-passage 2", 1);
     assert!(matches!(
         state
             .clone()
             .with_passage(Some(old))
             .resident_passage(&field, resident.constitution()),
-        Err(holonics::hnn::HnnError::ContinuingState { .. })
+        Err(holonics::hnn::HnnError::PassageVersion { .. })
     ));
     let unversioned = passage.lines().skip(1).collect::<Vec<_>>().join("\n");
     assert!(matches!(
         state
             .with_passage(Some(unversioned))
             .resident_passage(&field, resident.constitution()),
-        Err(holonics::hnn::HnnError::ContinuingState { .. })
+        Err(holonics::hnn::HnnError::PassageVersion { .. })
     ));
 }

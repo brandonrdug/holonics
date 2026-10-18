@@ -140,6 +140,7 @@ impl<'a, 'c> TrajectoryView<'a, 'c> {
     pub(crate) fn is_ended(&self) -> bool {
         self.producing.is_ended()
     }
+    #[cfg(test)]
     pub(crate) fn opened_at(&self) -> usize {
         self.producing.opened_at()
     }

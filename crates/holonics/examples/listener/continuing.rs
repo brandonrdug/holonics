@@ -1,4 +1,4 @@
-//! Continuing fixed-precision host consumer. Roles, CLI strings and receipt formats are exterior
+//! Continuing host consumer with comparison-derived receiving precision. Roles, CLI strings and receipt formats are exterior
 //! run declarations. Field declarations live in octets; the octet/framing chart lives in sections.
 //! All authored workload values below occur only in tests. Nothing read by this run is unseen.
 use crate::octets::{
@@ -36,7 +36,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
             option,
             "--learn" | "--learn-count" | "--population" | "--keys"
         ) {
-            return Err(format!("{option} is unsupported in --route observed: fixed precision and one open moment; section options, cap flags and resume are unavailable").into());
+            return Err(format!("{option} is unsupported in --route observed: one open moment; section options, cap flags and resume are unavailable").into());
         }
         let value = args
             .get(at + 1)
@@ -274,6 +274,7 @@ fn deliver(
     cells: &[usize],
     section: usize,
     role: &str,
+    published_total: &mut usize,
     emit: &mut dyn FnMut(String),
 ) -> Result<()> {
     for &class in cells {
@@ -294,6 +295,7 @@ fn deliver(
             },
         )?;
         let native_ns = elapsed(started);
+        *published_total += usize::from(native.precision.event.is_some());
         // Only committed owned operands leave the native call. Formatting, diagnostic
         // pairings and emission below are exterior report work, timed separately.
         let (material, moment, active, reading) = &native.view;
@@ -319,6 +321,23 @@ fn deliver(
             enclosure(&wave),
             stepped_families(reading),
             native_ns
+        ));
+        let precision = &native.precision;
+        emit(format!(
+            "precision section={section} role={role} delivered={} resident_state_bits={} precision_checked={} precision_event={} published={} receiving_exponent={}→{} balance_before={:?} balance_after={:?}",
+            native.cells,
+            resident.state_bits(),
+            precision.checked,
+            if precision.event.is_some() {
+                "applied"
+            } else {
+                "none"
+            },
+            precision.event.is_some(),
+            precision.before_exponent,
+            precision.after_exponent,
+            precision.balance_before,
+            precision.balance_after,
         ));
         emit(format!(
             "cert section={section} role={role} delivered={} steps={certificate}",
@@ -416,6 +435,10 @@ fn release_fork(
             .ok_or("no admitted receiver")?
             .clone();
         let active = fork.address().clone();
+        let before_exponent = fork
+            .constitution()
+            .lattice(Locus::ReceivingMap(phases.ring()))?
+            .exponent();
         let draw_started = Instant::now();
         let (pending, _) = port.refine(&mut fork, &moment, &phases)?;
         let drawn = port
@@ -436,9 +459,14 @@ fn release_fork(
         let address = address_text(&active);
         let code = drawn_code(cell, class)?;
         emit(format!(
-            "drawn section={section} index={index} class={class} address={address} drawn_code={} cell_ns={}",
+            "drawn section={section} index={index} class={class} address={address} drawn_code={} cell_ns={} resident_state_bits={} precision_event=none published=false receiving_exponent={}→{}",
             enclosure(&code),
-            native_ns
+            native_ns,
+            fork.state_bits(),
+            before_exponent,
+            fork.constitution()
+                .lattice(Locus::ReceivingMap(phases.ring()))?
+                .exponent()
         ));
         let mut horizon = false;
         match ingestion {
@@ -492,6 +520,7 @@ fn section(
     index: usize,
     longest: &mut usize,
     keys: &mut KeyStream,
+    published_total: &mut usize,
     emit: &mut dyn FnMut(String),
 ) -> Result<Released> {
     // Each source passage becomes a delivered passage before it can enlarge the release maximum.
@@ -503,7 +532,15 @@ fn section(
         }
         .source_cells(index)?;
         deliver(
-            port, resident, crib, pairing, &source, index, "source", emit,
+            port,
+            resident,
+            crib,
+            pairing,
+            &source,
+            index,
+            "source",
+            published_total,
+            emit,
         )?;
         *longest = (*longest).max(source.len());
     }
@@ -511,7 +548,15 @@ fn section(
     emit(released.line(index));
     let answer = input.target_cells(index)?;
     deliver(
-        port, resident, crib, pairing, &answer, index, "answer", emit,
+        port,
+        resident,
+        crib,
+        pairing,
+        &answer,
+        index,
+        "answer",
+        published_total,
+        emit,
     )?;
     *longest = (*longest).max(answer.len());
     Ok(released)
@@ -530,7 +575,7 @@ fn header_line(resident: &Resident) -> Result<String> {
         .exponent();
     let declaration = resident.field().crib();
     Ok(format!(
-        "observed_continuing route=observed precision=fixed population={} source_operand_bound={bound} source_lattice_exponent={lattice} crib_window={} crib_offset={} provenance=exterior",
+        "observed_continuing route=observed precision=derived population={} source_operand_bound={bound} source_lattice_exponent={lattice} crib_window={} crib_offset={} provenance=exterior",
         resident.field().population(),
         declaration.window,
         declaration.offset
@@ -545,6 +590,7 @@ pub fn run(port: &Reference, args: &[String]) -> Result<()> {
     let frames = sections_of(Some(&options.learn), options.count)?;
     println!("{}", header_line(&resident)?);
     let mut longest = 0;
+    let mut published_total = 0usize;
     for (index, input) in frames.iter().enumerate() {
         let started = Instant::now();
         let result = section(
@@ -556,6 +602,7 @@ pub fn run(port: &Reference, args: &[String]) -> Result<()> {
             index,
             &mut longest,
             &mut keys,
+            &mut published_total,
             &mut |line| println!("{line}"),
         );
         if let Err(error) = result {
@@ -571,6 +618,10 @@ pub fn run(port: &Reference, args: &[String]) -> Result<()> {
             }
             return Err(error);
         }
+        println!(
+            "observed_balance section={index} published_events_total={published_total} balance={:?}",
+            resident.ledger().balance()
+        );
         let (moment, _) = resident
             .continuing()
             .ok_or("continuing moment disappeared")?;
@@ -669,6 +720,7 @@ mod tests {
                 index,
                 &mut longest,
                 &mut keys,
+                &mut 0,
                 &mut |_| {},
             )
             .unwrap();
@@ -770,6 +822,7 @@ mod tests {
             0,
             &mut 0,
             &mut keys(),
+            &mut 0,
             &mut |s| lines.push(s),
         );
         assert!(matches!(
@@ -833,6 +886,7 @@ mod tests {
             &[0, 0],
             0,
             "source",
+            &mut 0,
             &mut |line| lines.push(line),
         )
         .unwrap();
@@ -872,6 +926,7 @@ mod tests {
             0,
             &mut maximum,
             &mut keys(),
+            &mut 0,
             &mut |s| lines.push(s),
         )
         .unwrap();
@@ -899,6 +954,19 @@ mod tests {
                 ]
             } else if line.starts_with("report ") {
                 &["section", "role", "report_ns"]
+            } else if line.starts_with("precision ") {
+                &[
+                    "section",
+                    "role",
+                    "delivered",
+                    "resident_state_bits",
+                    "precision_checked",
+                    "precision_event",
+                    "published",
+                    "receiving_exponent",
+                    "balance_before",
+                    "balance_after",
+                ]
             } else if line.starts_with("cert ") {
                 &["section", "role", "delivered", "steps"]
             } else if line.starts_with("pairing ") {
@@ -911,6 +979,10 @@ mod tests {
                     "address",
                     "drawn_code",
                     "cell_ns",
+                    "resident_state_bits",
+                    "precision_event",
+                    "published",
+                    "receiving_exponent",
                 ]
             } else if line.starts_with("keys ") {
                 &[
@@ -930,6 +1002,7 @@ mod tests {
         }
         for name in [
             "cell ",
+            "precision ",
             "cert ",
             "pairing ",
             "drawn ",

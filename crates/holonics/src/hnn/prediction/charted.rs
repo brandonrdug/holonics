@@ -959,16 +959,6 @@ fn junction_error(
         .collect()
 }
 
-#[cfg(test)]
-fn tick_error(
-    o: &Operands,
-    point: &EndChange,
-    error: &EndChange,
-    tick: usize,
-) -> Result<EndChange, HnnError> {
-    tick_error_cached(&mut ContactRadiusMaps::new(o), point, error, tick)
-}
-
 fn tick_error_cached(
     maps: &mut ContactRadiusMaps<'_>,
     point: &EndChange,

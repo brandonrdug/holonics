@@ -239,6 +239,17 @@ use crate::ratio::linear::ExactLinearError;
 use crate::ratio::polynomial::ExactPolynomialError;
 use crate::receiver::face::WidthRefusal;
 
+/// The superseded passage format named by a mount refusal.
+#[derive(Clone, Copy, Debug, Error, PartialEq, Eq)]
+pub enum SavedPassageVersion {
+    #[error("unversioned")]
+    Unversioned,
+    #[error("{0}")]
+    Number(u64),
+    #[error("malformed")]
+    Malformed,
+}
+
 /// Every refusal of the HNN. Bad input is a typed return, never a panic, and every refusal names its
 /// loci, handles and decisions by their types, never by a string (guard 8). The owners' refusals
 /// whose own largest variant is wide (`ContactError`, `ParametronError`, `CompressionError`,
@@ -371,6 +382,11 @@ pub enum HnnError {
     /// THE_MACHINE guard 9: an encoded passage this field does not read.
     #[error("the encoded passage does not enter this field: {reason}")]
     Unadmitted { reason: &'static str },
+    /// Publication requires one reached occurrence and its bounded contemporary operand.
+    #[error("receiving precision occurrence mismatch: ledger={occurrence}, arrived={arrived}")]
+    PrecisionOccurrence { occurrence: bool, arrived: bool },
+    #[error("resident passage version {version} refused (expected 4)")]
+    PassageVersion { version: SavedPassageVersion },
     /// The full demand ladder overlaps. The staged handle is discarded: the same candidate
     /// cannot be resolved again because no precision-refinement owner exists.
     #[error(

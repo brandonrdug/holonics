@@ -1430,17 +1430,33 @@ fn cold_restore_refuses_unversioned_or_unknown_passages() {
     let reference = Reference::new(64, u64::MAX);
     let current = crate::hnn::Current::at_rest(&field);
     let source = field.sources()[0];
-    for payload in ["lift 0 0 0\n", "resident-passage 3\n"] {
+    for (payload, expected) in [
+        ("lift 0 0 0\n", crate::hnn::SavedPassageVersion::Unversioned),
+        (
+            "resident-passage 2\n",
+            crate::hnn::SavedPassageVersion::Number(2),
+        ),
+        (
+            "resident-passage 3\n",
+            crate::hnn::SavedPassageVersion::Number(3),
+        ),
+        (
+            "resident-passage 5\n",
+            crate::hnn::SavedPassageVersion::Number(5),
+        ),
+    ] {
         let opening = crate::hnn::Constitution::initial(&field, u64::MAX).unwrap();
         let state = opening
             .continuing_state(source)
             .unwrap()
             .with_passage(Some(payload.to_string()));
-        let checked = ContinuingState::from_text(&state.to_text()).unwrap();
-        assert!(matches!(
-            reference.mount_continued(&field, &current, opening, &checked),
-            Err(crate::hnn::HnnError::ContinuingState { .. })
-        ));
+        // The real serializer stamps the checksum; version refusal precedes old law operands.
+        assert!(matches!(ContinuingState::from_text(&state.to_text()),
+            Err(crate::hnn::HnnError::PassageVersion {version}) if version == expected));
+        assert!(
+            matches!(reference.mount_continued(&field, &current, opening, &state),
+            Err(crate::hnn::HnnError::PassageVersion {version}) if version == expected)
+        );
     }
 }
 
