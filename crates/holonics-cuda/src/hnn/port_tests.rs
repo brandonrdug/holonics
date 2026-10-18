@@ -41,7 +41,7 @@ use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::{integer, rat};
 use holonics::receiver::release::{BeyondTolerance, DecisionRule, WithinTolerance};
 use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 
 use super::dyadic::{exponent_of, integral, power_of_two};
 use super::lattice::NormalMirror;
@@ -2948,9 +2948,18 @@ fn the_card_receiving_component_precision_preserves_outputs_and_cold_continuatio
     assert_eq!(restored_carry.get(3, 0).unwrap(), &(-&unit / integer(32)));
     assert_eq!(theta.receiving_map(ring), opening.receiving_map(ring));
     let mut feature = vec![Rat::zero(); width];
-    feature[0] = Rat::one();
+    let feature_scale = Rat::from_integer(BigInt::one() << (exponent + 1) as usize);
+    feature[0] = feature_scale.clone();
+    let tolerance = &field.receivers()[0].tolerance;
+    let grain = Rat::new(
+        BigInt::one(),
+        BigInt::from(holonics::hnn::field::receiver_grain(tolerance)) << 1usize,
+    );
+    assert!(feature_scale > Rat::one() / &unit);
+    let retained_reads = restored_carry.apply(&feature).unwrap();
+    assert!(retained_reads[2].abs() > grain && retained_reads[3].abs() > grain);
     let event = theta
-        .receiving_precision_event(ring, &[feature.clone()], &Rat::one())
+        .receiving_precision_event(ring, &[feature.clone()], tolerance)
         .unwrap()
         .unwrap();
     assert_eq!(event.erased_components(), &[(0, 2), (0, 3)]);
@@ -3047,7 +3056,7 @@ fn the_card_receiving_component_precision_preserves_outputs_and_cold_continuatio
         .unwrap()
         .apply(&feature)
         .unwrap();
-    assert_eq!(actual[0], Rat::one());
+    assert_eq!(actual[0], feature_scale);
     assert!(!actual[2].is_zero());
     assert!(!actual[3].is_zero());
     assert!(

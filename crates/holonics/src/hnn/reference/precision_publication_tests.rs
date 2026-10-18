@@ -80,7 +80,7 @@ fn fixture_with_budget(budget: u64) -> (Reference, Resident, MomentId, Receiving
     let field = support::small_field(&[2], vec![], 0);
     let reference = Reference::new(64, budget);
     let width = field.ring(0).width();
-    let founding = learning::generic_within(&field, 81, budget)
+    let unscaled = learning::generic_within(&field, 81, budget)
         .with_ports(
             0,
             None,
@@ -88,20 +88,59 @@ fn fixture_with_budget(budget: u64) -> (Reference, Resident, MomentId, Receiving
             Some(ExactRatMatrix::zero(2 * field.alphabet(), width).unwrap()),
         )
         .unwrap();
-    let mut pilot = reference
-        .mount_with(&field, &Current::at_rest(&field), founding.clone())
-        .unwrap();
-    let (moment, _) = reference
-        .ingest(&mut pilot, None, &support::encoded(&field, &[0]))
-        .unwrap();
-    compare(&reference, &mut pilot, moment);
-    compare(&reference, &mut pilot, moment);
-    let reached = features(&pilot);
-    let column = reached[0]
-        .iter()
-        .position(|x| !x.is_zero())
-        .expect("nonzero receiving feature");
-    let unit = Lattice::new(founding.lattice(Locus::ReceivingMap(0)).unwrap().exponent()).unit();
+    let unit = Lattice::new(unscaled.lattice(Locus::ReceivingMap(0)).unwrap().exponent()).unit();
+    let grain = Rat::new(
+        num_bigint::BigInt::from(1),
+        num_bigint::BigInt::from(crate::hnn::field::receiver_grain(
+            &field.receivers()[0].tolerance,
+        )) << 1usize,
+    );
+    let source = unscaled.source_port(0).unwrap().clone();
+    let mut source_scale = Rat::one();
+    let (founding, reached, column) = loop {
+        let rows = (0..source.rows())
+            .map(|i| {
+                (0..source.columns())
+                    .map(|j| source.get(i, j).unwrap() * &source_scale)
+                    .collect()
+            })
+            .collect();
+        let founding = unscaled
+            .clone()
+            .with_ports(
+                0,
+                None,
+                Some(ExactRatMatrix::shaped(source.rows(), source.columns(), rows).unwrap()),
+                None,
+            )
+            .unwrap();
+        eprintln!("publication fixture: actual-word pilot at source scale {source_scale}");
+        let mut pilot = reference
+            .mount_with(&field, &Current::at_rest(&field), founding.clone())
+            .unwrap();
+        let (moment, _) = reference
+            .ingest(&mut pilot, None, &support::encoded(&field, &[0]))
+            .unwrap();
+        compare(&reference, &mut pilot, moment);
+        compare(&reference, &mut pilot, moment);
+        let reached = features(&pilot);
+        let column = reached[0]
+            .iter()
+            .enumerate()
+            .max_by(|(_, a), (_, b)| a.abs().cmp(&b.abs()))
+            .map(|(column, _)| column)
+            .expect("a receiving feature");
+        let retained_read = &unit / integer(4) * reached[0][column].abs();
+        let norm: Rat = reached[0].iter().map(|x| x.abs()).sum();
+        let declared_bound = Rat::from_integer(num_bigint::BigInt::from(width));
+        eprintln!(
+            "publication fixture: scale={source_scale} feature_l1={norm} X={declared_bound} retained_read={retained_read} grain={grain}"
+        );
+        if retained_read > grain && norm > declared_bound {
+            break (founding, reached, column);
+        }
+        source_scale *= integer(2);
+    };
     let retained = if reached[0][column] > Rat::zero() {
         -&unit / integer(4)
     } else {
@@ -138,9 +177,20 @@ fn fixture_with_budget(budget: u64) -> (Reference, Resident, MomentId, Receiving
         resident.arrived.as_ref().unwrap().opening,
         WordOpening::Rest
     ));
+    let reached = features(&resident);
+    let feature_l1: Rat = reached[0].iter().map(|x| x.abs()).sum();
+    assert!(feature_l1 > Rat::from_integer(num_bigint::BigInt::from(width)));
+    let retained_reads = resident
+        .constitution
+        .receiving_law(0)
+        .unwrap()
+        .map_remainder()
+        .apply(&reached[0])
+        .unwrap();
+    assert!(retained_reads[0].abs() > grain);
     let event = resident
         .constitution
-        .receiving_precision_event(0, &features(&resident), &field.receivers()[0].tolerance)
+        .receiving_precision_event(0, &reached, &field.receivers()[0].tolerance)
         .unwrap()
         .unwrap();
     assert!(resident.carried.is_some());
