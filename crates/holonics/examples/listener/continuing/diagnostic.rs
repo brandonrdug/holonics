@@ -1,4 +1,5 @@
-//! Read-only listener diagnostic with a target fork and dynamically selected lock-advance cases.
+//! Read-only listener diagnostic: full mode reads one 231-cell A/A0 comparison.
+//! Trunk, paired and calibration profiles remain explicit modes.
 //! The optional hook returns exact receiving samples already staged in the ordinary transaction.
 
 #[path = "diagnostic/epoch.rs"]
@@ -15,12 +16,9 @@ use holonics::hnn::constitution::Sample;
 use holonics::hnn::constitution::{
     Carrier, NormalLaw, receiving_class_metric, receiving_metric_samples,
 };
-use holonics::hnn::contact::{LockDeclaration, lock_address};
-use holonics::hnn::moment::PopulationChart;
 use holonics::hnn::receiving::ReceivingRead;
 use holonics::hnn::reference::FrozenComparison;
 use holonics::hnn::word::{EndChange, ReceptionCarry};
-use holonics::ratio::integer;
 use holonics::ratio::linear::ExactRatMatrix;
 use num_bigint::BigInt;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -107,6 +105,14 @@ struct CutView {
     receiving_vanished: bool,
     law: NormalLaw,
     native_lattice_exponent: u32,
+    /// Amended producer partition exponent, distinct from the receiver grain denominator.
+    receiver_partition_exponent: Option<u32>,
+    /// Actual receiver section crossings counted from successful ingest receipts at the mount.
+    opening_crossings: Option<u64>,
+    /// Amended-source epoch index. The receipt tick count is kept separate until joined.
+    partition_epoch_index: Option<u64>,
+    /// Amended producer's declared face-partition bound, distinct from a sample-record count.
+    partition_cell_bound: Option<u64>,
 }
 
 fn cut_view(material: &Constitution, samples: &[Sample]) -> Result<CutView> {
@@ -140,6 +146,10 @@ fn cut_view(material: &Constitution, samples: &[Sample]) -> Result<CutView> {
         receiving_vanished: false,
         law: law.clone(),
         native_lattice_exponent,
+        receiver_partition_exponent: None,
+        opening_crossings: None,
+        partition_epoch_index: None,
+        partition_cell_bound: None,
     })
 }
 
@@ -224,6 +234,7 @@ fn observe_branch(
     crossing_map: &ExactRatMatrix,
     budget: &timing::RunBudget,
     abort: &AtomicBool,
+    mut crossings: Option<&mut u64>,
 ) -> Result<(Vec<CutView>, Vec<Faces>, Vec<Vec<BigInt>>, Vec<u128>)> {
     let mut phase = budget.phase(branch, classes.len(), Some(180_000_000_000))?;
     let mut views = Vec::with_capacity(classes.len());
@@ -243,6 +254,7 @@ fn observe_branch(
         let cell_started = Instant::now();
         let cpu_started = timing::ThreadCpu::read();
         let wall_before = resident.wall().phases();
+        let opening_crossings = crossings.as_deref().copied();
         let pre_lift = resident.current().lift().to_vec();
         let pre_clocks = clock_snapshot_at(resident.field(), resident.current())?;
         let pre_carried = resident.carried().cloned();
@@ -283,6 +295,7 @@ fn observe_branch(
                     view.moment_text = pre_moment.clone();
                     view.address_text = format!("{address:?}");
                     view.pre_lift = pre_lift.clone();
+                    view.opening_crossings = opening_crossings;
                     view.pre_clocks = pre_clocks.clone();
                     view.pre_carried = pre_carried.clone();
                     view.contact_j = pre_contact_j.clone();
@@ -319,6 +332,9 @@ fn observe_branch(
                 return Err(error.into());
             }
         };
+        if let Some(crossings) = crossings.as_deref_mut() {
+            count_receiver_crossings(crossings, &native.ingest)?;
+        }
         let native_elapsed = native_started.elapsed().as_nanos();
         native_ns += native_elapsed;
         let (view_result, reading) = native.view;
@@ -335,38 +351,10 @@ fn observe_branch(
             .any(|(locus, _)| *locus == Locus::ReceivingMap(2));
         faces.push(native.prediction.clone());
         lifts.push(resident.current().lift().to_vec());
-        let serialization_started = Instant::now();
-        let captured = format!(
-            "moment_pre_ingest={} address_pre_ingest={} pre_clocks={:?} pre_lift={:?} pre_call_reception_carry={:?} producing_identity={:?} producing_map={:?} frozen_comparison={:?} samples_f_g_w_masses={:?} crossing_covectors={:?} refine_word_end_change={:?} contact_J={:?} postdeposit_map={:?} H_stored={:?} H_remainder={:?} actual_native_released_gram_entries={:?} receiving_prior={:?} current_prior_scale={}",
-            view.moment_text,
-            view.address_text,
-            view.pre_clocks,
-            view.pre_lift,
-            view.pre_carried,
-            view.producing,
-            view.producing_map,
-            view.frozen,
-            view.samples,
-            view.crossing_covectors,
-            view.physical,
-            view.contact_j,
-            view.map,
-            view.gram,
-            view.gram_remainder,
-            view.gram_release,
-            view.receiving_prior,
-            view.prior_scale,
-        );
-        let capture_record =
-            format!("step0_capture_data branch={branch} index={index} class={class} {captured}");
-        // Count the exact UTF-8 payload printed below, excluding the line terminator.
-        view.capture_record_bytes = capture_record.len();
-        let capture_record_bytes = view.capture_record_bytes;
-        let serialization_ns = serialization_started.elapsed().as_nanos();
-        println!("{capture_record}");
-        println!(
-            "step0_capture_serialization branch={branch} index={index} record_bytes={capture_record_bytes} serialization_ns={serialization_ns} (UTF-8 payload excludes newline; formatting only; stdout I/O excluded)"
-        );
+        // The report consumes exact structs already in memory. Formatting the complete
+        // producing context created megabytes per cell and is not part of this read.
+        // In particular, do not format Debug text merely to hash it.
+        view.capture_record_bytes = 0;
         views.push(view);
         let overhead_elapsed = cell_started
             .elapsed()
@@ -408,6 +396,7 @@ fn observe_plain_branch(
     branch: &str,
     budget: &timing::RunBudget,
     abort: &AtomicBool,
+    mut crossings: Option<&mut u64>,
 ) -> Result<(Vec<Faces>, Vec<Vec<BigInt>>, Vec<u128>)> {
     let mut phase = budget.phase(branch, classes.len(), Some(180_000_000_000))?;
     let mut faces = Vec::with_capacity(classes.len());
@@ -441,6 +430,9 @@ fn observe_plain_branch(
                 return Err(error.into());
             }
         };
+        if let Some(crossings) = crossings.as_deref_mut() {
+            count_receiver_crossings(crossings, &native.ingest)?;
+        }
         let native_elapsed = native_started.elapsed().as_nanos();
         native_ns += native_elapsed;
         faces.push(native.prediction.clone());
@@ -759,6 +751,216 @@ fn coarse_face_key(wave: &Faces) -> Vec<CoarseFace> {
         .collect()
 }
 
+// Historical conservative input from the earlier paired control. This is neither a new
+// measurement nor a cost with Debug formatting subtracted. No deadline depends on raising it.
+const HISTORICAL_NATIVE_CELL_NS: u128 = 549_667_971;
+
+fn historical_native_projection(cells: usize) -> Result<u128> {
+    HISTORICAL_NATIVE_CELL_NS
+        .checked_mul(cells as u128)
+        .ok_or_else(|| "historical native cost projection overflows nanoseconds".into())
+}
+
+fn admission_remaining(budget: &timing::RunBudget) -> Result<u128> {
+    Ok(budget.remaining_ns()?.min(budget.remaining_report_ns()?))
+}
+
+/// Count only actual ingress ticks. Rekeying a lift and the physical word's ticks are distinct
+/// operations; neither changes this exterior receipt count. It starts at the fresh mount.
+fn count_receiver_crossings(
+    count: &mut u64,
+    ingest: &holonics::hnn::port::PortReceipt,
+) -> Result<()> {
+    let ticks = ingest
+        .rings
+        .readings()
+        .get(2)
+        .ok_or("ingest receipt omitted the receiving ring's tick count")?;
+    if ticks.denom() != &BigInt::from(1) {
+        return Err("ingest receiver tick count is not an exact integer".into());
+    }
+    let ticks = u64::try_from(ticks.numer().clone())
+        .map_err(|_| "ingest receiver tick count is negative or exceeds u64")?;
+    *count = count
+        .checked_add(ticks)
+        .ok_or("actual receiver crossing count overflows u64")?;
+    Ok(())
+}
+
+/// Full mode has one captured A and one ordinary identical-input A0. Its only epoch report is
+/// the compact stall read; the crossing-statistic producer still uses the frozen comparison.
+fn run_full_aa0(
+    port: &Reference,
+    resident: &Resident,
+    opening: &Constitution,
+    crib: &ObservedCrib,
+    pairing: &PairingDeclaration,
+    classes: &[usize],
+    crossing: &CutView,
+    budget: &timing::RunBudget,
+    admission: &timing::ReportAdmission,
+    opening_crossings: u64,
+    checkpoint_path: &str,
+    source_count: usize,
+) -> Result<()> {
+    if classes.len() != 231 || crossing.opening_crossings != Some(opening_crossings) {
+        return Err("full A/A0 requires 231 cells and the actual opening crossing receipt".into());
+    }
+    epoch::require_partition_precision(crossing.receiver_partition_exponent)?;
+    if crossing.partition_epoch_index.is_none() || crossing.partition_cell_bound.is_none() {
+        return Err("amended partition epoch index or declared cell bound is unavailable at the actual opening".into());
+    }
+    let branch_native_ns = historical_native_projection(classes.len())?;
+    let pre_checkpoint = admission.admit(
+        branch_native_ns,
+        1,
+        admission_remaining(budget)?,
+        180_000_000_000,
+    )?;
+    println!(
+        "step0_full_protocol transactions=774 components=312_trunk+231_A+231_A0 branch_workers=2 historical_native_cell_ns={HISTORICAL_NATIVE_CELL_NS} historical_bound_not_new_measurement=true admission={pre_checkpoint:?} empirical_report_input={admission:?} opening_crossings={opening_crossings} partition_epoch_index={:?} no_in_process_calibration=true no_B_interventions=true no_held_map_report_passes=true",
+        crossing.partition_epoch_index
+    );
+    let checkpoint_started = Instant::now();
+    crate::octets::save_checkpoint(
+        resident,
+        opening,
+        resident.field().sources()[0],
+        checkpoint_path,
+        source_count,
+    )?;
+    let post_checkpoint = admission.admit_after_checkpoint(
+        branch_native_ns,
+        1,
+        admission_remaining(budget)?,
+        180_000_000_000,
+    )?;
+    println!(
+        "step0_checkpoint scope=resident_only crib_sidecar=false elapsed_ns={} admission={post_checkpoint:?}; caller_owned_crib_resume_not_claimed=true",
+        checkpoint_started.elapsed().as_nanos()
+    );
+    let mut a = resident.clone();
+    let mut a0 = resident.clone();
+    let mut a_crib = crib.clone();
+    let mut a0_crib = crib.clone();
+    let mut a_crossings = opening_crossings;
+    let mut a0_crossings = opening_crossings;
+    let a_pool = execution::one_thread_pool()?;
+    let a0_pool = execution::one_thread_pool()?;
+    let abort = AtomicBool::new(false);
+    let pre_spawn = admission.admit_after_checkpoint(
+        branch_native_ns,
+        1,
+        admission_remaining(budget)?,
+        180_000_000_000,
+    )?;
+    println!("step0_full_pre_spawn admission={pre_spawn:?} shared_fixed_deadline=true");
+    let (a_result, a0_result) = std::thread::scope(|scope| {
+        let a_worker = scope.spawn(|| {
+            a_pool.install(|| {
+                guarded_worker(&abort, || {
+                    observe_branch(
+                        port,
+                        &mut a,
+                        &mut a_crib,
+                        pairing,
+                        classes,
+                        "A",
+                        &crossing.map,
+                        budget,
+                        &abort,
+                        Some(&mut a_crossings),
+                    )
+                })
+            })
+        });
+        let a0_worker = scope.spawn(|| {
+            a0_pool.install(|| {
+                guarded_worker(&abort, || {
+                    observe_plain_branch(
+                        port,
+                        &mut a0,
+                        &mut a0_crib,
+                        pairing,
+                        classes,
+                        "A0",
+                        budget,
+                        &abort,
+                        Some(&mut a0_crossings),
+                    )
+                })
+            })
+        });
+        (
+            a_worker
+                .join()
+                .unwrap_or_else(|_| Err("A branch worker panicked".to_owned())),
+            a0_worker
+                .join()
+                .unwrap_or_else(|_| Err("A0 branch worker panicked".to_owned())),
+        )
+    });
+    let (a_views, _, _, _) = from_worker(a_result)?;
+    let _ = from_worker(a0_result)?;
+    let mut a_end = cut_view(a.constitution(), &[])?;
+    a_end.opening_crossings = Some(a_crossings);
+    let receiver_grain = resident
+        .admitted()
+        .first()
+        .ok_or("full A/A0 has no admitted receiver")?
+        .grain();
+    let mut report_budget = timing::ReportBudget::new(budget, "A_stall", classes.len());
+    let mut capture = epoch::ReportCapture::default();
+    let report = a_pool.install(|| {
+        epoch::report_stall_epoch(
+            "A",
+            crossing,
+            &a_end,
+            &a_views,
+            receiver_grain,
+            &mut report_budget,
+            &mut capture,
+        )
+        .map_err(|error| error.to_string())
+    });
+    let mut failures = Vec::new();
+    verdict::defer_report_result("A", report, &mut failures);
+    println!(
+        "step0_epoch_report_timing branch=A summary={:?}",
+        report_budget.finish()
+    );
+    let mut postwork = timing::ReportBudget::new(budget, "AA0_postwork", classes.len());
+    let (state_equal, crib_equal, crossing_count_equal) = guarded_report_work(
+        &mut postwork,
+        "A/A0 complete resident and crib equality",
+        || {
+            let source = resident.field().sources()[0];
+            Ok((
+                a.continuing_state(source)? == a0.continuing_state(source)?,
+                a_crib == a0_crib,
+                a_crossings == a0_crossings,
+            ))
+        },
+    )?;
+    println!(
+        "step0_AA0 exact_resident_state_equal={state_equal} caller_owned_crib_equal={crib_equal} actual_crossing_count_equal={crossing_count_equal} A_end_crossings={a_crossings} A0_end_crossings={a0_crossings}"
+    );
+    verdict::defer_report_result(
+        "A/A0",
+        if state_equal && crib_equal && crossing_count_equal {
+            Ok(())
+        } else {
+            Err(
+                "identical-input replicas diverged in exact state, crib or actual crossing count"
+                    .to_owned(),
+            )
+        },
+        &mut failures,
+    );
+    postwork.check_before_work("full A/A0 report completion")?;
+    verdict::finish_deferred_reports(&failures)
+}
+
 pub(super) fn run(
     port: &Reference,
     options: ContinuingOptions,
@@ -781,6 +983,25 @@ pub(super) fn run(
         );
     }
     let budget = timing::RunBudget::new(reserve_ns)?;
+    let admission = if full_run {
+        let pinned = timing::ReportAdmission::from_env()?;
+        println!(
+            "step0_reporting_growth empirical_forecast=true completion_not_certified=true input={pinned:?}"
+        );
+        let initial_native = historical_native_projection(312 + 231)?;
+        pinned.admit(
+            initial_native,
+            1,
+            admission_remaining(&budget)?,
+            300_000_000_000,
+        )?;
+        // The native grain denominator supplies no amended partition exponent. Until the
+        // producing source exposes it, refuse rather than manufacture b from that denominator.
+        epoch::require_partition_precision(None)?;
+        Some(pinned)
+    } else {
+        None
+    };
     let checkpoint_target =
         checkpoint_path.map(|path| format!("{}/step-000312.state", path.trim_end_matches('/')));
     if let Some(checkpoint) = &checkpoint_target {
@@ -817,6 +1038,7 @@ pub(super) fn run(
     let trunk_units = profile_cells.unwrap_or(declared_source_count);
     let mut trunk_phase = budget.phase("trunk", trunk_units, None)?;
     let mut source_count = 0usize;
+    let mut receiver_crossings = 0_u64;
     let mut trunk_native_ns = 0u128;
     let mut trunk_source_classes = Vec::with_capacity(trunk_units.min(312));
     for passage in &input.passages {
@@ -841,6 +1063,7 @@ pub(super) fn run(
                 None,
                 |_, _, _, _, _| (),
             )?;
+            count_receiver_crossings(&mut receiver_crossings, &receipt.ingest)?;
             trunk_source_classes.push(class);
             let cell_ns = started.elapsed().as_nanos();
             trunk_phase.finish_cell(cell_ns)?;
@@ -911,6 +1134,7 @@ pub(super) fn run(
                 "profile_plain",
                 &budget,
                 &abort,
+                None,
             )
             .map_err(|error| error.to_string())
         });
@@ -928,6 +1152,7 @@ pub(super) fn run(
                 &crossing.map,
                 &budget,
                 &abort,
+                None,
             )
             .map_err(|error| error.to_string())
         });
@@ -972,11 +1197,25 @@ pub(super) fn run(
         .into());
     }
     let crossing = cut_view(resident.constitution(), &[])?;
-    let mut a = resident.clone();
-    let mut a_crib = crib.clone();
-    let mut a0 = resident.clone();
-    let mut a0_crib = crib.clone();
     let base_classes = target[..231].to_vec();
+    if full_run {
+        let mut crossing = crossing;
+        crossing.opening_crossings = Some(receiver_crossings);
+        return run_full_aa0(
+            port,
+            &resident,
+            &opening,
+            &crib,
+            &pairing,
+            &base_classes,
+            &crossing,
+            &budget,
+            admission.as_ref().ok_or("full report admission missing")?,
+            receiver_crossings,
+            checkpoint_path.ok_or("full diagnostic requires checkpoint destination")?,
+            source_count,
+        );
+    }
     let calibration_classes = &base_classes[..64];
     let mut calibration_plain = resident.clone();
     let mut calibration_plain_crib = crib.clone();
@@ -993,6 +1232,7 @@ pub(super) fn run(
             "calibration_plain",
             &budget,
             &calibration_abort,
+            None,
         )
         .map_err(|error| error.to_string())
     });
@@ -1012,6 +1252,7 @@ pub(super) fn run(
             &crossing.map,
             &budget,
             &calibration_abort,
+            None,
         )
         .map_err(|error| error.to_string())
     });
@@ -1087,877 +1328,9 @@ pub(super) fn run(
         calibration_report_result,
         &mut epoch_report_failures,
     );
-    if options.diagnostic_calibration_only {
-        println!(
-            "step0_calibration_only exact_cells=440 (312 trunk + 64 plain + 64 actual capture); no checkpoint or fork written"
-        );
-        return verdict::finish_deferred_reports(&epoch_report_failures);
-    }
-    let first = base_classes[0];
-    let source_ring = *resident
-        .field()
-        .sources()
-        .first()
-        .ok_or("source ring missing")?;
-    let fit_ring = resident.field().ring(source_ring);
-    let fit_all = (0..resident.field().alphabet()).all(|class| fit_ring.fits(fit_ring.port(class)));
-    let intervention_specs = source_interventions(resident.field(), &base_classes)?;
-    let branch_workers = 2usize + intervention_specs.len();
-    let branch_waves = branch_workers.div_ceil(3);
-    let Some(block_upper_ns_per_cell) = completed_block_upper else {
-        return Err("calibration produced no completed eight-cell timing block; refusing a branch projection".into());
-    };
-    let branch_projection = block_upper_ns_per_cell.saturating_mul(231);
-    let report_projection = calibration_report.projected_231_ns.ok_or(
-        "calibration report lacks completed held-evaluation, inverse, or other-work timing",
-    )?;
-    let projection =
-        timing::fork_and_report_projection(branch_projection, report_projection, branch_waves);
-    let remaining_native_reserve_ns = budget.remaining_ns()?;
-    let remaining_cutoff_ns = budget.remaining_report_ns()?;
-    let remaining_ns = remaining_native_reserve_ns.min(remaining_cutoff_ns);
     println!(
-        "step0_projection completed_block_upper_ns_per_cell={block_upper_ns_per_cell} branch_workers={branch_workers} declared_cpu_workers=3 conservative_waves={branch_waves} one_branch_native_projection_ns={branch_projection} one_branch_report_projection_ns={report_projection} one_branch_combined_projection_ns={} concurrent_fork_and_report_horizon_ns={projection} branch_cap_ns=180000000000 remaining_after_explicit_reserve_ns={remaining_native_reserve_ns} shared_285s_phase_cutoff_remaining_ns={remaining_cutoff_ns} admission_remaining_ns={remaining_ns} explicit_report_reserve_ns={reserve_ns} report_reserve_floor_ns=5000000000 forecast_only=true",
-        branch_projection.saturating_add(report_projection)
+        "step0_calibration_only exact_cells=440 (312 trunk + 64 plain + 64 actual capture); no checkpoint or fork written"
     );
-    if !timing::projection_fits(
-        branch_projection,
-        report_projection,
-        branch_waves,
-        remaining_ns,
-        180_000_000_000,
-    ) {
-        return Err("measured native-plus-report projection exceeds the 180-second branch cap or remaining shared phase budget; aborting before checkpoint/fork".into());
-    }
-    let checkpoint_path =
-        checkpoint_path.ok_or("full diagnostic requires checkpoint destination")?;
-    let checkpoint_started = Instant::now();
-    let checkpoint_result = crate::octets::save_checkpoint(
-        &resident,
-        &opening,
-        resident.field().sources()[0],
-        checkpoint_path,
-        source_count,
-    );
-    let checkpoint_elapsed_ns = checkpoint_started.elapsed().as_nanos();
-    let checkpoint_remaining_native_ns = budget.remaining_ns()?;
-    let checkpoint_remaining_report_ns = budget.remaining_report_ns()?;
-    let checkpoint_remaining_ns =
-        checkpoint_remaining_native_ns.min(checkpoint_remaining_report_ns);
-    println!(
-        "step0_checkpoint scope=resident_only crib_sidecar=false elapsed_ns={checkpoint_elapsed_ns} remaining_after_explicit_reserve_ns={checkpoint_remaining_native_ns} shared_285s_phase_cutoff_remaining_ns={checkpoint_remaining_report_ns} admission_remaining_ns={checkpoint_remaining_ns}; ObservedCrib is caller-owned and no validated roundtrip codec exists, so later observed resume is not claimed"
-    );
-    checkpoint_result?;
-    if !timing::projection_fits(
-        branch_projection,
-        report_projection,
-        branch_waves,
-        checkpoint_remaining_ns,
-        180_000_000_000,
-    ) {
-        return Err("post-checkpoint native-plus-report projection no longer fits the fixed branch cap or shared deadline; checkpoint receipt is retained and no fork was spawned".into());
-    }
-    let mut b_branches: Vec<(String, usize, u64, Vec<usize>, Resident, ObservedCrib)> =
-        intervention_specs
-            .iter()
-            .map(|(name, class, advance)| {
-                let mut classes = base_classes.clone();
-                classes[0] = *class;
-                (
-                    name.clone(),
-                    *class,
-                    *advance,
-                    classes,
-                    resident.clone(),
-                    crib.clone(),
-                )
-            })
-            .collect();
-    let declared_transactions = 312usize + 64 + 64 + 231 * (2 + b_branches.len());
-    println!(
-        "step0_protocol transactions={declared_transactions} components=312_trunk+64_plain+64_capture+231*(A+A0+{}_B_variants) branch_workers={} variants={:?}",
-        b_branches.len(),
-        2 + b_branches.len(),
-        b_branches
-            .iter()
-            .map(|(name, class, advance, _, _, _)| (name, class, advance))
-            .collect::<Vec<_>>()
-    );
-    let source_fit_pattern = |classes: &[usize]| {
-        classes
-            .iter()
-            .map(|&class| {
-                if fit_ring.fits(fit_ring.port(class)) {
-                    '1'
-                } else {
-                    '0'
-                }
-            })
-            .collect::<String>()
-    };
-    println!(
-        "step0_source_advance source_ring={source_ring} A_class={first} A_advance={} A_fit_pattern={} intervention_count={} interventions={intervention_specs:?}; source clock is distinct from receiver clock",
-        resident.field().class_advance(source_ring, first)?,
-        source_fit_pattern(&base_classes),
-        b_branches.len()
-    );
-    let clock_phases = clock_snapshot(&resident)?;
-    let contacts = resident
-        .field()
-        .contacts()
-        .iter()
-        .enumerate()
-        .map(|(index, contact)| {
-            let (from, to) = contact.ends();
-            let from_winding = resident.current().winding(resident.field(), from)?;
-            let to_winding = resident.current().winding(resident.field(), to)?;
-            let bound = LockDeclaration::derived(resident.field(), index);
-            let address = lock_address(&from_winding, &to_winding, &bound);
-            let geometric_lock = contact
-                .pair(resident.field(), resident.current().lift())
-                .lock(&from_winding, &to_winding)
-                .map(|reading| format!("reading={reading:?}"))
-                .unwrap_or_else(|error| format!("typed_refusal={error}"));
-            let lock_metadata = format!(
-                "pre_from_winding={from_winding} pre_to_winding={to_winding} hnn_bound={bound:?} hnn_lock_address={address:?} geometric_pair_lock={geometric_lock}"
-            );
-            Ok((
-                index,
-                contact.ends(),
-                contact.admittance().clone(),
-                lock_metadata,
-                holonics::hnn::propagation::contact_exponent(
-                    resident.field(),
-                    index,
-                    resident.current().lift(),
-                )?,
-            ))
-        })
-        .collect::<std::result::Result<Vec<_>, HnnError>>()?;
-    let receiver_grain = resident
-        .admitted()
-        .first()
-        .ok_or("no admitted receiving source")?
-        .grain();
-    let lr_inverse = Rat::new(BigInt::from(1), BigInt::from(receiver_grain));
-    let half_quantum = &lr_inverse / integer(2);
-    let source_rings = resident.field().sources();
-    let ring_metadata: Vec<_> = (0..resident.field().rings().len())
-        .map(|ring| {
-            let rho = resident.constitution().transport(ring);
-            let resonator = resident
-                .constitution()
-                .resonator(ring)
-                .map(|r| format!("pump={:?}", r.pump()));
-            let rho0 = source_rings.contains(&ring).then(|| {
-                match resident
-                    .constitution()
-                    .founding_transport(resident.field(), ring)
-                {
-                    Ok(candidate) => format!("candidate={candidate}"),
-                    Err(error) => format!("refusal={error}"),
-                }
-            });
-            (ring, rho, rho0, resonator)
-        })
-        .collect();
-    println!(
-        "step0_crossing source_cells={source_count} next_epoch_cells=231 target_cells={} checkpoint={checkpoint_path:?} crossing_W={:?} crossing_H_stored={:?} crossing_H_remainder={:?} L_R={} inverse_L_R={} native_half_quantum={} native_L_W={} declared_field_L_W={} L_nu={} clock_phases={clock_phases:?} ring_transport_resonators={ring_metadata:?}",
-        target.len(),
-        crossing.map,
-        crossing.gram,
-        crossing.gram_remainder,
-        receiver_grain,
-        lr_inverse,
-        half_quantum,
-        crossing.native_lattice_exponent,
-        resident
-            .field()
-            .lattice(Locus::ReceivingMap(2))
-            .ok_or("receiver map lattice missing")?
-            .exponent(),
-        PopulationChart::of(resident.field()).exponent(),
-    );
-    let path_contacts: Vec<_> = contacts
-        .iter()
-        .filter(|(_, ends, _, _, _)| *ends == (0, 1) || *ends == (1, 2))
-        .collect();
-    let path_product = if path_contacts.len() == 2 {
-        let conductances = path_contacts
-            .iter()
-            .map(|(_, _, admittance, _, reading)| {
-                Ok(holonics::ratio::exponentiated::power_of_two(&reading.carry)? * admittance)
-            })
-            .collect::<std::result::Result<Vec<Rat>, HnnError>>()?;
-        Some(conductances.into_iter().product::<Rat>())
-    } else {
-        None
-    };
-    println!(
-        "step0_contact_metadata pre_call_whole_windings_bounds_hnn_lock_address_and_geometry_J contacts={contacts:?} contact_carry_only_0_1_1_2_product={path_product:?} phase_class_factor=omitted causal_receiver_gain_claim=none; carry-only product is not an end-to-end input-to-face bound"
-    );
-    let branch_abort = AtomicBool::new(false);
-    let a_pool = execution::one_thread_pool()?;
-    let a0_pool = execution::one_thread_pool()?;
-    let b_pools = (0..b_branches.len())
-        .map(|_| execution::one_thread_pool())
-        .collect::<Result<Vec<_>>>()?;
-    println!(
-        "step0_execution_realization branch_count={} branch_pools={} workers_per_pool=1 total_branch_pool_workers={} calibration_pool_workers=1 calling_branch_threads={} max_concurrent_branch_executors=3 declared_cpu_workers=3; pools are distinct and one-thread; OS affinity remains the supervisor's responsibility",
-        2 + b_pools.len(),
-        2 + b_pools.len(),
-        2 + b_pools.len(),
-        2 + b_pools.len()
-    );
-    let first_b_count = b_branches.len().min(1);
-    let (first_b_branches, later_b_branches) = b_branches.split_at_mut(first_b_count);
-    let (first_b_pools, later_b_pools) = b_pools.split_at(first_b_count);
-    let pre_fork_native_remaining_ns = budget.remaining_ns()?;
-    let pre_fork_report_remaining_ns = budget.remaining_report_ns()?;
-    let pre_fork_admission_remaining_ns =
-        pre_fork_native_remaining_ns.min(pre_fork_report_remaining_ns);
-    println!(
-        "step0_pre_fork_admission native_remaining_ns={pre_fork_native_remaining_ns} report_cutoff_remaining_ns={pre_fork_report_remaining_ns} admission_remaining_ns={pre_fork_admission_remaining_ns} required_projection_ns={projection}"
-    );
-    if !timing::projection_fits(
-        branch_projection,
-        report_projection,
-        branch_waves,
-        pre_fork_admission_remaining_ns,
-        180_000_000_000,
-    ) {
-        return Err("immediate pre-fork projection no longer fits the fixed branch cap or shared deadline; checkpoint receipt is retained and no fork was spawned".into());
-    }
-    let (a_result, a0_result, b_results) = std::thread::scope(|scope| {
-        let a_pool = &a_pool;
-        let a_worker = scope.spawn(|| {
-            guarded_worker(&branch_abort, || {
-                let result = a_pool
-                    .install(|| {
-                        observe_branch(
-                            port,
-                            &mut a,
-                            &mut a_crib,
-                            &pairing,
-                            &base_classes,
-                            "A",
-                            &crossing.map,
-                            &budget,
-                            &branch_abort,
-                        )
-                        .map_err(|error| error.to_string())
-                    })
-                    .map_err(std::io::Error::other)?;
-                Ok(result)
-            })
-        });
-        let a0_pool = &a0_pool;
-        let a0_worker = scope.spawn(|| {
-            guarded_worker(&branch_abort, || {
-                let result = a0_pool
-                    .install(|| {
-                        observe_plain_branch(
-                            port,
-                            &mut a0,
-                            &mut a0_crib,
-                            &pairing,
-                            &base_classes,
-                            "A0",
-                            &budget,
-                            &branch_abort,
-                        )
-                        .map_err(|error| error.to_string())
-                    })
-                    .map_err(std::io::Error::other)?;
-                Ok(result)
-            })
-        });
-        let branch_abort_ref = &branch_abort;
-        let pairing_ref = &pairing;
-        let crossing_map_ref = &crossing.map;
-        let budget_ref = &budget;
-        let port_ref = port;
-        let first_b_worker = first_b_branches.first_mut().zip(first_b_pools.first()).map(
-            |((name, _, _, classes, branch_resident, branch_crib), pool)| {
-                let name = name.clone();
-                let worker_name = name.clone();
-                let branch_abort = branch_abort_ref;
-                let pairing = pairing_ref;
-                let crossing_map = crossing_map_ref;
-                let budget = budget_ref;
-                let port = port_ref;
-                let pool = pool;
-                let handle = scope.spawn(move || {
-                    guarded_worker(branch_abort, || {
-                        let result = pool
-                            .install(|| {
-                                observe_branch(
-                                    port,
-                                    branch_resident,
-                                    branch_crib,
-                                    pairing,
-                                    classes,
-                                    &worker_name,
-                                    crossing_map,
-                                    budget,
-                                    branch_abort,
-                                )
-                                .map_err(|error| error.to_string())
-                            })
-                            .map_err(std::io::Error::other)?;
-                        Ok(result)
-                    })
-                });
-                (name, handle)
-            },
-        );
-        let a_result = a_worker
-            .join()
-            .unwrap_or_else(|_| Err("A branch worker panicked".to_owned()));
-        let a0_result = a0_worker
-            .join()
-            .unwrap_or_else(|_| Err("A0 branch worker panicked".to_owned()));
-        let mut b_results = first_b_worker
-            .map(|(name, worker)| {
-                let result = worker
-                    .join()
-                    .unwrap_or_else(|_| Err(format!("{name} branch worker panicked")));
-                (name, result)
-            })
-            .into_iter()
-            .collect::<Vec<_>>();
-        for (branch_wave, pool_wave) in later_b_branches.chunks_mut(3).zip(later_b_pools.chunks(3))
-        {
-            if branch_abort.load(Ordering::Acquire) {
-                b_results.extend(branch_wave.iter().map(|(name, ..)| {
-                    (
-                        name.clone(),
-                        Err("shared branch abort before scheduled wave".to_owned()),
-                    )
-                }));
-                continue;
-            }
-            let wave_results = std::thread::scope(|wave_scope| {
-                let wave_workers = branch_wave
-                    .iter_mut()
-                    .zip(pool_wave)
-                    .map(
-                        |((name, _, _, classes, branch_resident, branch_crib), pool)| {
-                            let name = name.clone();
-                            let worker_name = name.clone();
-                            let branch_abort = branch_abort_ref;
-                            let pairing = pairing_ref;
-                            let crossing_map = crossing_map_ref;
-                            let budget = budget_ref;
-                            let port = port_ref;
-                            let pool = pool;
-                            let worker = wave_scope.spawn(move || {
-                                guarded_worker(branch_abort, || {
-                                    let result = pool
-                                        .install(|| {
-                                            observe_branch(
-                                                port,
-                                                branch_resident,
-                                                branch_crib,
-                                                pairing,
-                                                classes,
-                                                &worker_name,
-                                                crossing_map,
-                                                budget,
-                                                branch_abort,
-                                            )
-                                            .map_err(|error| error.to_string())
-                                        })
-                                        .map_err(std::io::Error::other)?;
-                                    Ok(result)
-                                })
-                            });
-                            (name, worker)
-                        },
-                    )
-                    .collect::<Vec<_>>();
-                wave_workers
-                    .into_iter()
-                    .map(|(name, worker)| {
-                        let result = worker
-                            .join()
-                            .unwrap_or_else(|_| Err(format!("{name} branch worker panicked")));
-                        (name, result)
-                    })
-                    .collect::<Vec<_>>()
-            });
-            b_results.extend(wave_results);
-        }
-        (a_result, a0_result, b_results)
-    });
-    let (a_views, a_faces, _a_lifts, _a_times) = from_worker(a_result)?;
-    let (_a0_faces, _a0_lifts, _a0_times) = from_worker(a0_result)?;
-    let a_end = cut_view(a.constitution(), &[])?;
-    let mut b_outputs = Vec::with_capacity(b_branches.len());
-    for ((name, class, advance, _, branch_resident, _), (result_name, result)) in
-        b_branches.iter().zip(b_results)
-    {
-        if name != &result_name {
-            return Err("dynamic branch result ordering changed".into());
-        }
-        let (views, faces, _lifts, _times) = from_worker(result)?;
-        let end = cut_view(branch_resident.constitution(), &[])?;
-        let clocks = clock_snapshot(branch_resident)?;
-        b_outputs.push((name.clone(), *class, *advance, views, faces, end, clocks));
-    }
-    let base_advance = resident.field().class_advance(source_ring, first)?;
-    let primary_b = b_outputs
-        .iter()
-        .position(|(_, _, advance, _, _, _, _)| *advance == base_advance)
-        .unwrap_or(0);
-    let (b_name, alternative, b_advance, b_views, b_faces, b_end, _) = &b_outputs[primary_b];
-    println!(
-        "step0_clock_registers crossing={clock_phases:?} A_end={:?} A0_end={:?} B_end={:?} feature_content_clock_split=not_declared_in_actual_feature_basis",
-        clock_snapshot(&a)?,
-        clock_snapshot(&a0)?,
-        b_outputs
-            .iter()
-            .map(|(name, class, advance, _, _, _, clocks)| (name, class, advance, clocks))
-            .collect::<Vec<_>>()
-    );
-    let spec_lw = epoch::spec_lattice_exponent(receiver_grain, crossing.support.len())?;
-    println!(
-        "step0_lattice_exponents spec_LW={spec_lw} crossing={} crossing_native_spec_mismatch={} A_end={} A_native_spec_mismatch={} B_end_and_native_spec_mismatch={:?}",
-        crossing.native_lattice_exponent,
-        crossing.native_lattice_exponent != spec_lw,
-        a_end.native_lattice_exponent,
-        a_end.native_lattice_exponent != spec_lw,
-        b_outputs
-            .iter()
-            .map(|(name, _, _, _, _, end, _)| (
-                name,
-                end.native_lattice_exponent,
-                end.native_lattice_exponent != spec_lw
-            ))
-            .collect::<Vec<_>>()
-    );
-    println!(
-        "step0_specification_lattice_exponent b_R=log2(2*L_R) support_width={} spec_LW={spec_lw}",
-        crossing.support.len()
-    );
-    let report_results = std::thread::scope(|scope| {
-        let a_pool = &a_pool;
-        let run_budget = &budget;
-        let crossing_ref = &crossing;
-        let a_end = &a_end;
-        let a_views = &a_views;
-        let a_worker = scope.spawn(move || {
-            let mut report_budget = timing::ReportBudget::new(run_budget, "A", a_views.len());
-            let mut capture = epoch::ReportCapture::default();
-            let started = Instant::now();
-            let report = a_pool.install(|| {
-                epoch::report_epoch(
-                    "A",
-                    crossing_ref,
-                    a_end,
-                    a_views,
-                    receiver_grain,
-                    &mut report_budget,
-                    &mut capture,
-                )
-                .map_err(|error| error.to_string())
-            });
-            let wall_ns = started.elapsed().as_nanos();
-            (report, wall_ns, report_budget.finish(), capture)
-        });
-        let b_workers = b_outputs
-            .iter()
-            .zip(&b_pools)
-            .take(2)
-            .map(|((name, _, _, views, _, end, _), pool)| {
-                let name = name.clone();
-                let branch = name.clone();
-                let pool = pool;
-                let run_budget = &budget;
-                let crossing = crossing_ref;
-                let views = views;
-                let end = end;
-                scope.spawn(move || {
-                    let mut report_budget =
-                        timing::ReportBudget::new(run_budget, &branch, views.len());
-                    let mut capture = epoch::ReportCapture::default();
-                    let started = Instant::now();
-                    let report = pool.install(|| {
-                        epoch::report_epoch(
-                            &branch,
-                            crossing,
-                            end,
-                            views,
-                            receiver_grain,
-                            &mut report_budget,
-                            &mut capture,
-                        )
-                        .map_err(|error| error.to_string())
-                    });
-                    let wall_ns = started.elapsed().as_nanos();
-                    (name, report, wall_ns, report_budget.finish(), capture)
-                })
-            })
-            .collect::<Vec<_>>();
-        let a_result = a_worker.join().unwrap_or_else(|_| {
-            (
-                Err("A report worker panicked".to_owned()),
-                0,
-                timing::ReportBudget::new(&budget, "A", 0).finish(),
-                epoch::ReportCapture::default(),
-            )
-        });
-        let mut b_results = b_workers
-            .into_iter()
-            .map(|worker| {
-                worker.join().unwrap_or_else(|_| {
-                    (
-                        "unknown".to_owned(),
-                        Err("report worker panicked".to_owned()),
-                        0,
-                        timing::ReportBudget::new(&budget, "unknown", 0).finish(),
-                        epoch::ReportCapture::default(),
-                    )
-                })
-            })
-            .collect::<Vec<_>>();
-        let mut next_b = b_results.len();
-        while next_b < b_outputs.len() {
-            let wave_end = (next_b + 3).min(b_outputs.len());
-            let wave_workers = b_outputs[next_b..wave_end]
-                .iter()
-                .zip(&b_pools[next_b..wave_end])
-                .map(|((name, _, _, views, _, end, _), pool)| {
-                    let name = name.clone();
-                    let branch = name.clone();
-                    let pool = pool;
-                    let run_budget = &budget;
-                    let crossing = crossing_ref;
-                    let views = views;
-                    let end = end;
-                    scope.spawn(move || {
-                        let mut report_budget =
-                            timing::ReportBudget::new(run_budget, &branch, views.len());
-                        let mut capture = epoch::ReportCapture::default();
-                        let started = Instant::now();
-                        let report = pool.install(|| {
-                            epoch::report_epoch(
-                                &branch,
-                                crossing,
-                                end,
-                                views,
-                                receiver_grain,
-                                &mut report_budget,
-                                &mut capture,
-                            )
-                            .map_err(|error| error.to_string())
-                        });
-                        let wall_ns = started.elapsed().as_nanos();
-                        (name, report, wall_ns, report_budget.finish(), capture)
-                    })
-                })
-                .collect::<Vec<_>>();
-            b_results.extend(wave_workers.into_iter().map(|worker| {
-                worker.join().unwrap_or_else(|_| {
-                    (
-                        "unknown".to_owned(),
-                        Err("report worker panicked".to_owned()),
-                        0,
-                        timing::ReportBudget::new(&budget, "unknown", 0).finish(),
-                        epoch::ReportCapture::default(),
-                    )
-                })
-            }));
-            next_b = wave_end;
-        }
-        (a_result, b_results)
-    });
-    let mut postwork_budget = timing::ReportBudget::new(&budget, "main_postwork", 231);
-    let postwork_started = Instant::now();
-    macro_rules! guarded_println {
-        ($label:expr, $($arg:tt)*) => {
-            guarded_report_work(&mut postwork_budget, $label, || {
-                println!($($arg)*);
-                Ok(())
-            })?;
-        };
-    }
-    let (a_report, a_report_ns, a_report_summary, a_report_capture) = report_results.0;
-    guarded_report_work(&mut postwork_budget, "defer A report verdict", || {
-        verdict::defer_report_result("A", a_report, &mut epoch_report_failures);
-        Ok(())
-    })?;
-    guarded_println!(
-        "A report timing summary",
-        "step0_epoch_report_timing branch=A wall_ns={a_report_ns} summary={a_report_summary:?}"
-    );
-    let mut b_report_captures = Vec::with_capacity(report_results.1.len());
-    for (name, report, wall_ns, summary, capture) in report_results.1 {
-        guarded_report_work(
-            &mut postwork_budget,
-            &format!("defer {name} report verdict"),
-            || {
-                verdict::defer_report_result(&name, report, &mut epoch_report_failures);
-                Ok(())
-            },
-        )?;
-        guarded_println!(
-            &format!("{name} report timing summary"),
-            "step0_epoch_report_timing branch={name} wall_ns={wall_ns} summary={summary:?}"
-        );
-        b_report_captures.push((name, capture));
-    }
-    let (a_state, a0_state, aa_equal) = guarded_report_work(
-        &mut postwork_budget,
-        "A/A0 resident and crib equality",
-        || {
-            let a_state = a.continuing_state(resident.field().sources()[0])?;
-            let a0_state = a0.continuing_state(resident.field().sources()[0])?;
-            let equal = a_state == a0_state && a_crib == a0_crib;
-            Ok((a_state, a0_state, equal))
-        },
-    )?;
-    guarded_report_work(&mut postwork_budget, "defer A/A0 equality verdict", || {
-        verdict::defer_report_result(
-            "A/A0",
-            if aa_equal {
-                Ok(())
-            } else {
-                Err("identical-input replicas diverged in exact resident state or crib".to_owned())
-            },
-            &mut epoch_report_failures,
-        );
-        Ok(())
-    })?;
-    guarded_println!(
-        "A/A0 equality report",
-        "step0_AA0 exact_resident_state_equal={} caller_owned_crib_equal={}",
-        a_state == a0_state,
-        a_crib == a0_crib
-    );
-    let (g_a, g_scale_a) = guarded_report_work(
-        &mut postwork_budget,
-        "cached A metric report products",
-        || {
-            Ok((
-                a_report_capture.gradient.clone(),
-                a_report_capture.exact_metric_scale.clone(),
-            ))
-        },
-    )?;
-    let (g_b, g_scale_b) = guarded_report_work(
-        &mut postwork_budget,
-        "cached primary B metric report products",
-        || {
-            let capture = b_report_captures
-                .iter()
-                .find(|(name, _)| name == b_name)
-                .map(|(_, capture)| capture);
-            Ok((
-                capture.and_then(|capture| capture.gradient.clone()),
-                capture.and_then(|capture| capture.exact_metric_scale.clone()),
-            ))
-        },
-    )?;
-    let (max_f_delta, first_f_delta, max_logit_delta, first_logit_delta) =
-        timed_causal_differences(
-            &a_views,
-            &a_faces,
-            b_views,
-            b_faces,
-            &mut postwork_budget,
-            "primary A/B causal feature and logit differences",
-        )?;
-    guarded_println!(
-        "primary intervention report",
-        "step0_intervention all_alphabet_classes_fit_source_lock={fit_all} first_class={first} changed_class={alternative} primary_branch={b_name} changed_advance={b_advance} alternatives={intervention_specs:?} G_A={g_a:?} exact_metric_scale_s_A={g_scale_a:?} G_B={g_b:?} exact_metric_scale_s_B={g_scale_b:?} W_table_delta_A={:?} W_table_delta_B={:?}",
-        matrix_delta(&a_end.map, &crossing.map)?,
-        matrix_delta(&b_end.map, &crossing.map)?
-    );
-    let source_base_advance = guarded_report_work(
-        &mut postwork_budget,
-        "baseline source class advance read",
-        || Ok(resident.field().class_advance(source_ring, first)?),
-    )?;
-    for (name, class, advance, views, faces, end, _) in &b_outputs {
-        if name == b_name {
-            continue;
-        }
-        let (max_f, first_f, max_logit, first_logit) = timed_causal_differences(
-            &a_views,
-            &a_faces,
-            views,
-            faces,
-            &mut postwork_budget,
-            &format!("variant {name} causal feature and logit differences"),
-        )?;
-        let (gradient, scale) = guarded_report_work(
-            &mut postwork_budget,
-            &format!("cached {name} metric report products"),
-            || {
-                let capture = b_report_captures
-                    .iter()
-                    .find(|(branch, _)| branch == name)
-                    .map(|(_, capture)| capture);
-                Ok((
-                    capture.and_then(|capture| capture.gradient.clone()),
-                    capture.and_then(|capture| capture.exact_metric_scale.clone()),
-                ))
-            },
-        )?;
-        guarded_println!(
-            &format!("variant {name} intervention report"),
-            "step0_intervention_variant_vs_A branch={name} changed_class={class} source_advance={advance} baseline_advance={source_base_advance} same_advance_category={} max_abs_delta_f={max_f} first_differing_feature_index={first_f:?} max_abs_delta_logits={max_logit} first_differing_logit_index={first_logit:?} G={gradient:?} exact_metric_scale_s={scale:?} W_table_delta={:?} native_LW_end={}",
-            *advance == source_base_advance,
-            matrix_delta(&end.map, &crossing.map)?,
-            end.native_lattice_exponent
-        );
-    }
-    guarded_println!(
-        "primary causal report",
-        "step0_causal_AB max_abs_delta_f={max_f_delta} first_differing_feature_index={first_f_delta:?} max_abs_delta_logits={max_logit_delta} first_differing_logit_index={first_logit_delta:?} coordinates=(cell,sample_or_station,feature_or_class); clock_content_split=not_inferred"
-    );
-    fn different_indices<T: PartialEq>(left: &[T], right: &[T]) -> Vec<usize> {
-        (0..left.len().max(right.len()))
-            .filter(|&index| left.get(index) != right.get(index))
-            .collect()
-    }
-    for (index, (left, right)) in a_views.iter().zip(b_views).enumerate() {
-        check_postwork_cutoff(
-            &mut postwork_budget,
-            &format!("carried-state comparison cell {index}"),
-            postwork_started,
-        )?;
-        let a_change = left.physical.as_ref().ok_or("A refine word end missing")?;
-        let b_change = right.physical.as_ref().ok_or("B refine word end missing")?;
-        guarded_println!(
-            &format!("carried-state comparison cell {index}"),
-            "step0_carried_AB index={index} preclock_equal={} pre_call_reception_carry_equal={} source_moment_counts_and_clock_equal={} producing_constitution_equal={} refine_end_storage_different_rings={:?} refine_end_arrivals_different_contacts={:?} refine_end_states_different_contacts={:?} refine_end_resonators_different_rings={:?} refine_end_resonator_phases_different_rings={:?}; comparisons_keep_pre_call_and_refine_end_cuts_separate",
-            left.pre_clocks == right.pre_clocks,
-            left.pre_carried == right.pre_carried,
-            left.moment_text == right.moment_text,
-            left.producing == right.producing,
-            different_indices(&a_change.storage, &b_change.storage),
-            different_indices(&a_change.arrivals, &b_change.arrivals),
-            different_indices(&a_change.states, &b_change.states),
-            different_indices(&a_change.resonators, &b_change.resonators),
-            different_indices(&a_change.resonator_phases, &b_change.resonator_phases),
-        );
-    }
-    check_postwork_cutoff(
-        &mut postwork_budget,
-        "candidate carried-pair scan",
-        postwork_started,
-    )?;
-    let candidate_started = Instant::now();
-    let mut distinct_carried = None;
-    for i in 1..231 {
-        check_postwork_cutoff(
-            &mut postwork_budget,
-            &format!("candidate carried-pair cell {i}"),
-            postwork_started,
-        )?;
-        let matches = coarse_face_key(&a_faces[i]) == coarse_face_key(&b_faces[i])
-            && a_views[i].pre_clocks == b_views[i].pre_clocks
-            && a_views[i].pre_carried == b_views[i].pre_carried
-            && a_views[i].address_text == b_views[i].address_text
-            && a_views[i].contact_j == b_views[i].contact_j
-            && a_views[i]
-                .physical
-                .as_ref()
-                .zip(b_views[i].physical.as_ref())
-                .is_some_and(|(left, right)| {
-                    left.states == right.states
-                        && left.arrivals == right.arrivals
-                        && (a_views[i].moment_text != b_views[i].moment_text
-                            || a_views[i].producing != b_views[i].producing
-                            || left != right)
-                });
-        if matches {
-            distinct_carried = Some(i);
-            break;
-        }
-    }
-    postwork_budget.record_work(
-        timing::ReportWorkKind::Other,
-        candidate_started.elapsed().as_nanos(),
-    );
-    check_postwork_cutoff(
-        &mut postwork_budget,
-        "candidate carried-pair scan completion",
-        postwork_started,
-    )?;
-
-    check_postwork_cutoff(
-        &mut postwork_budget,
-        "finite-future scan after candidate pair",
-        postwork_started,
-    )?;
-    let future_started = Instant::now();
-    let suffix_readout = if let Some(pair_index) = distinct_carried {
-        let mut agrees = true;
-        let mut first_divergence = None;
-        let mut max_logit_delta = Rat::zero();
-        for i in (pair_index + 1)..231 {
-            check_postwork_cutoff(
-                &mut postwork_budget,
-                &format!("finite-future cell {i}"),
-                postwork_started,
-            )?;
-            if a_faces[i] != b_faces[i] {
-                agrees = false;
-                first_divergence.get_or_insert(i);
-            }
-            for (a_station, b_station) in a_faces[i].logits.iter().zip(&b_faces[i].logits) {
-                for (a, b) in a_station.iter().zip(b_station) {
-                    max_logit_delta = max_logit_delta.max((a - b).abs());
-                }
-            }
-        }
-        Some((pair_index, agrees, first_divergence, max_logit_delta))
-    } else {
-        None
-    };
-    postwork_budget.record_work(
-        timing::ReportWorkKind::Other,
-        future_started.elapsed().as_nanos(),
-    );
-    check_postwork_cutoff(
-        &mut postwork_budget,
-        "finite-future scan completion",
-        postwork_started,
-    )?;
-    guarded_println!(
-        "finite-future readout",
-        "step0_finite_future after_candidate_pair={suffix_readout:?} divergence_indices_are_strictly_after_candidate; agreement is finite-horizon evidence only"
-    );
-    guarded_println!(
-        "reachable-pair candidate report",
-        "step0_reachable_pair_candidate index={distinct_carried:?} criterion=equal_coarse_grain_face_phase_key_preclock_address_contact_J_states_arrivals_and_distinct_full_carried_state pre_lifts_A={:?} pre_lifts_B={:?}; J_is_geometry_signature_only; realized_Ju_equality_and_unread_predicate_are_unavailable_and_not_established; no pair if absent",
-        distinct_carried.map(|i| a_views[i].pre_lift.clone()),
-        distinct_carried.map(|i| b_views[i].pre_lift.clone())
-    );
-    let postwork_elapsed_ns = postwork_started.elapsed().as_nanos();
-    let postwork_summary = postwork_budget.finish();
-    check_postwork_cutoff(
-        &mut postwork_budget,
-        "main postwork timing summary",
-        postwork_started,
-    )?;
-    let summary_print_started = Instant::now();
-    println!(
-        "step0_main_postwork elapsed_ns={postwork_elapsed_ns} checked_work={postwork_summary:?} cutoff_remaining_ns={}",
-        postwork_summary.remaining_report_ns
-    );
-    postwork_budget.record_work(
-        timing::ReportWorkKind::Other,
-        summary_print_started.elapsed().as_nanos(),
-    );
-    check_postwork_cutoff(
-        &mut postwork_budget,
-        "deferred scientific verdict finalization",
-        postwork_started,
-    )?;
     verdict::finish_deferred_reports(&epoch_report_failures)
 }
 
@@ -1965,6 +1338,35 @@ pub(super) fn run(
 mod tests {
     use super::*;
     use holonics::ratio::{integer, rat};
+
+    #[test]
+    fn opening_crossings_count_ingress_receipts_and_refuse_overflow() {
+        let receipt = holonics::hnn::port::port_receipt(
+            &[17, 2, 1],
+            &integer(1),
+            holonics::ratio::work::ExactWork::nothing(),
+            ReceiptDetail::Discard { bits: 0 },
+        )
+        .unwrap();
+        let mut crossings = 7;
+        count_receiver_crossings(&mut crossings, &receipt).unwrap();
+        assert_eq!(crossings, 8);
+        let mut fork_crossings = crossings;
+        count_receiver_crossings(&mut fork_crossings, &receipt).unwrap();
+        assert_eq!((crossings, fork_crossings), (8, 9));
+        let mut overflow = u64::MAX;
+        assert!(count_receiver_crossings(&mut overflow, &receipt).is_err());
+        assert_eq!(overflow, u64::MAX);
+    }
+
+    #[test]
+    fn complete_historical_native_horizon_alone_exceeds_fixed_native_cutoff() {
+        assert_eq!(
+            historical_native_projection(312 + 231).unwrap(),
+            298_469_708_253
+        );
+        assert!(historical_native_projection(312 + 231).unwrap() > 290_000_000_000);
+    }
 
     fn sample(weight: Rat, feature: Vec<Rat>, covector: Vec<Rat>) -> Sample {
         Sample {

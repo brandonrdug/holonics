@@ -167,7 +167,6 @@ pub(super) struct ReportSummary {
 pub(super) struct ReportBudget {
     run: RunBudget,
     branch: String,
-    measured_cells: usize,
     started: Instant,
     held_eval: Vec<u128>,
     gram_inverse: Vec<u128>,
@@ -175,11 +174,10 @@ pub(super) struct ReportBudget {
 }
 
 impl ReportBudget {
-    pub(super) fn new(run: &RunBudget, branch: &str, measured_cells: usize) -> Self {
+    pub(super) fn new(run: &RunBudget, branch: &str, _measured_cells: usize) -> Self {
         Self {
             run: run.clone(),
             branch: branch.to_owned(),
-            measured_cells,
             started: Instant::now(),
             held_eval: Vec::new(),
             gram_inverse: Vec::new(),
@@ -213,15 +211,10 @@ impl ReportBudget {
         let held_eval = work_summary(&self.held_eval);
         let gram_inverse = work_summary(&self.gram_inverse);
         let other = work_summary(&self.other);
-        let held_upper = completed_block_upper_ns_per_cell(&self.held_eval);
-        let projected_held = held_upper.map(|per_eval| per_eval.saturating_mul(3 * 231));
-        let projected_inverse = (gram_inverse.count > 0).then_some(gram_inverse.max_ns);
-        let projected_other =
-            (other.count > 0).then(|| project_other_to_231(other.total_ns, self.measured_cells));
-        let projected_231_ns = projected_held
-            .zip(projected_inverse)
-            .zip(projected_other)
-            .map(|((held, inverse), other)| held.saturating_add(inverse).saturating_add(other));
+        // Report work depends on exact rational bit growth and on the report variant. A
+        // calibration count supplies no model for a different population. Keep the raw
+        // measurements; only the separately pinned empirical admission input may forecast 231.
+        let projected_231_ns = None;
         let remaining_report_ns = self.run.remaining_report_ns().unwrap_or(0);
         ReportSummary {
             branch: self.branch.clone(),
@@ -243,11 +236,256 @@ fn work_summary(values: &[u128]) -> WorkSummary {
     }
 }
 
-fn project_other_to_231(other_ns: u128, measured_cells: usize) -> u128 {
-    if measured_cells == 0 {
-        return u128::MAX;
+/// Externally pinned, empirical report-cost input. This is a feasibility forecast, never a
+/// mathematical upper bound or a completion certificate. In particular, increasing measured
+/// populations do not bound future rational bit growth. The source hash identifies the report
+/// implementation/tree; the input hash identifies the exact captured operands. Measurements
+/// must run that implementation and report variant, including its complete corrected series.
+///
+/// `REQ063_REPORT_GROWTH_INPUT` uses newline-delimited `key=value` fields, exactly once each:
+/// source_sha256, input_sha256, report_variant, measurements (`16:ns,32:ns,64:ns`, for example),
+/// target_cells (`231`), projected_report_ns (the externally computed complete per-branch cost),
+/// forecast_description (formula, inputs and future rational-bit-growth scope), adequacy
+/// (`empirical_forecast` or `uncertain`), checkpoint_reserve_ns, aa0_postwork_reserve_ns.
+/// Missing, duplicate and unknown fields fail closed. No cost is inferred by scaling counts.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(super) struct ReportAdmission {
+    pub(super) source_sha256: String,
+    pub(super) input_sha256: String,
+    pub(super) report_variant: String,
+    pub(super) measurements: Vec<ReportGrowthMeasurement>,
+    pub(super) target_cells: usize,
+    pub(super) projected_report_ns: u128,
+    pub(super) forecast_description: String,
+    pub(super) checkpoint_reserve_ns: u128,
+    pub(super) aa0_postwork_reserve_ns: u128,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(super) struct ReportGrowthMeasurement {
+    pub(super) cells: usize,
+    pub(super) report_ns: u128,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(super) struct ReportAdmissionSummary {
+    pub(super) one_branch_combined_ns: u128,
+    pub(super) fork_horizon_ns: u128,
+    pub(super) checkpoint_reserve_ns: u128,
+    pub(super) aa0_postwork_reserve_ns: u128,
+    pub(super) total_required_ns: u128,
+}
+
+impl ReportAdmission {
+    pub(super) fn from_env() -> io::Result<Self> {
+        let text = std::env::var("REQ063_REPORT_GROWTH_INPUT")
+            .map_err(|_| invalid("required pinned REQ063_REPORT_GROWTH_INPUT is missing"))?;
+        Self::parse(&text)
     }
-    div_ceil(other_ns.saturating_mul(231), measured_cells as u128).unwrap_or(u128::MAX)
+
+    fn parse(text: &str) -> io::Result<Self> {
+        use std::collections::BTreeMap;
+        let names = [
+            "source_sha256",
+            "input_sha256",
+            "report_variant",
+            "measurements",
+            "target_cells",
+            "projected_report_ns",
+            "forecast_description",
+            "adequacy",
+            "checkpoint_reserve_ns",
+            "aa0_postwork_reserve_ns",
+        ];
+        let mut fields = BTreeMap::new();
+        for line in text.lines() {
+            let (key, value) = line
+                .split_once('=')
+                .ok_or_else(|| invalid("report-growth input requires key=value lines"))?;
+            if !names.contains(&key) || value.trim().is_empty() {
+                return Err(invalid(format!(
+                    "unknown or empty report-growth field {key:?}"
+                )));
+            }
+            if fields.insert(key, value).is_some() {
+                return Err(invalid(format!("duplicate report-growth field {key}")));
+            }
+        }
+        let field = |key| {
+            fields
+                .get(key)
+                .copied()
+                .ok_or_else(|| invalid(format!("required report-growth field {key} is missing")))
+        };
+        let positive = |key| -> io::Result<u128> {
+            field(key)?
+                .parse::<u128>()
+                .ok()
+                .filter(|&value| value > 0)
+                .ok_or_else(|| {
+                    invalid(format!(
+                        "report-growth {key} must be positive unsigned nanoseconds"
+                    ))
+                })
+        };
+        for key in ["source_sha256", "input_sha256"] {
+            let hash = field(key)?;
+            if hash.len() != 64 || !hash.bytes().all(|byte| byte.is_ascii_hexdigit()) {
+                return Err(invalid(format!(
+                    "report-growth {key} must be a full SHA-256 digest"
+                )));
+            }
+        }
+        if field("adequacy")? != "empirical_forecast" {
+            return Err(invalid(
+                "report-growth adequacy is uncertain or unsupported; refusing admission",
+            ));
+        }
+        let target_cells = field("target_cells")?
+            .parse::<usize>()
+            .map_err(|_| invalid("report-growth target_cells is not an unsigned count"))?;
+        if target_cells != 231 {
+            return Err(invalid(
+                "report-growth target_cells must match the declared 231-cell branch",
+            ));
+        }
+        let mut measurements = Vec::new();
+        for measurement in field("measurements")?.split(',') {
+            let (count, elapsed) = measurement
+                .split_once(':')
+                .ok_or_else(|| invalid("report-growth measurements require cells:report_ns"))?;
+            let cells = count
+                .parse::<usize>()
+                .map_err(|_| invalid("report-growth measurement count is not unsigned"))?;
+            let report_ns = elapsed.parse::<u128>().map_err(|_| {
+                invalid("report-growth measurement timing is not unsigned nanoseconds")
+            })?;
+            if cells == 0
+                || cells > target_cells
+                || report_ns == 0
+                || measurements
+                    .last()
+                    .is_some_and(|previous: &ReportGrowthMeasurement| previous.cells >= cells)
+            {
+                return Err(invalid(
+                    "report-growth measurements need positive timings and strictly increasing positive counts no larger than the target",
+                ));
+            }
+            measurements.push(ReportGrowthMeasurement { cells, report_ns });
+        }
+        if measurements.len() < 3 {
+            return Err(invalid(
+                "report-growth forecast requires at least three measured populations",
+            ));
+        }
+        let projected_report_ns = positive("projected_report_ns")?;
+        if measurements
+            .iter()
+            .any(|measurement| measurement.report_ns > projected_report_ns)
+        {
+            return Err(invalid(
+                "report-growth proposal is below a measured complete report cost",
+            ));
+        }
+        let model = Self {
+            source_sha256: field("source_sha256")?.to_owned(),
+            input_sha256: field("input_sha256")?.to_owned(),
+            report_variant: field("report_variant")?.to_owned(),
+            measurements,
+            target_cells,
+            projected_report_ns,
+            forecast_description: field("forecast_description")?.to_owned(),
+            checkpoint_reserve_ns: positive("checkpoint_reserve_ns")?,
+            aa0_postwork_reserve_ns: positive("aa0_postwork_reserve_ns")?,
+        };
+        // Validate the reserve series itself before a caller can consume the forecast.
+        model
+            .checkpoint_reserve_ns
+            .checked_add(model.aa0_postwork_reserve_ns)
+            .and_then(|reserves| reserves.checked_add(model.projected_report_ns))
+            .ok_or_else(|| {
+                invalid("report-growth cost and reserve series overflows nanoseconds")
+            })?;
+        Ok(model)
+    }
+
+    pub(super) fn report_projection_ns(&self) -> u128 {
+        self.projected_report_ns
+    }
+
+    pub(super) fn admit(
+        &self,
+        native_per_branch_ns: u128,
+        branch_waves: usize,
+        remaining_phase_ns: u128,
+        branch_cap_ns: u128,
+    ) -> io::Result<ReportAdmissionSummary> {
+        self.admit_with_checkpoint(
+            native_per_branch_ns,
+            branch_waves,
+            remaining_phase_ns,
+            branch_cap_ns,
+            self.checkpoint_reserve_ns,
+        )
+    }
+
+    /// The checkpoint has already completed; its actual elapsed time must already have been
+    /// deducted by reading the same immutable supervisor clock. Only its pending reserve goes.
+    pub(super) fn admit_after_checkpoint(
+        &self,
+        native_per_branch_ns: u128,
+        branch_waves: usize,
+        remaining_phase_ns: u128,
+        branch_cap_ns: u128,
+    ) -> io::Result<ReportAdmissionSummary> {
+        self.admit_with_checkpoint(
+            native_per_branch_ns,
+            branch_waves,
+            remaining_phase_ns,
+            branch_cap_ns,
+            0,
+        )
+    }
+
+    fn admit_with_checkpoint(
+        &self,
+        native_per_branch_ns: u128,
+        branch_waves: usize,
+        remaining_phase_ns: u128,
+        branch_cap_ns: u128,
+        checkpoint_reserve_ns: u128,
+    ) -> io::Result<ReportAdmissionSummary> {
+        if native_per_branch_ns == 0 || branch_waves == 0 || branch_cap_ns == 0 {
+            return Err(invalid(
+                "report admission needs positive native cost, branch waves and cap",
+            ));
+        }
+        let one_branch_combined_ns = native_per_branch_ns
+            .checked_add(self.projected_report_ns)
+            .ok_or_else(|| invalid("native-plus-report branch forecast overflows nanoseconds"))?;
+        let fork_horizon_ns = one_branch_combined_ns
+            .checked_mul(branch_waves as u128)
+            .ok_or_else(|| invalid("native-plus-report fork forecast overflows nanoseconds"))?;
+        let total_required_ns = fork_horizon_ns
+            .checked_add(checkpoint_reserve_ns)
+            .and_then(|horizon| horizon.checked_add(self.aa0_postwork_reserve_ns))
+            .ok_or_else(|| {
+                invalid("fork forecast and explicit postwork reserves overflow nanoseconds")
+            })?;
+        if one_branch_combined_ns > branch_cap_ns || total_required_ns > remaining_phase_ns {
+            return Err(timed_out(format!(
+                "empirical native-plus-report forecast does not fit: branch_ns={one_branch_combined_ns} branch_cap_ns={branch_cap_ns} fork_ns={fork_horizon_ns} checkpoint_reserve_ns={checkpoint_reserve_ns} aa0_postwork_reserve_ns={} total_required_ns={total_required_ns} remaining_phase_ns={remaining_phase_ns}; fixed deadline unchanged",
+                self.aa0_postwork_reserve_ns
+            )));
+        }
+        Ok(ReportAdmissionSummary {
+            one_branch_combined_ns,
+            fork_horizon_ns,
+            checkpoint_reserve_ns,
+            aa0_postwork_reserve_ns: self.aa0_postwork_reserve_ns,
+            total_required_ns,
+        })
+    }
 }
 
 pub(super) fn fork_and_report_projection(
@@ -267,9 +505,14 @@ pub(super) fn projection_fits(
     remaining_phase_ns: u128,
     branch_cap_ns: u128,
 ) -> bool {
-    native_per_branch_ns.saturating_add(report_per_branch_ns) <= branch_cap_ns
-        && fork_and_report_projection(native_per_branch_ns, report_per_branch_ns, branch_waves)
-            <= remaining_phase_ns
+    if branch_waves == 0 {
+        return false;
+    }
+    native_per_branch_ns
+        .checked_add(report_per_branch_ns)
+        .filter(|&branch| branch <= branch_cap_ns)
+        .and_then(|branch| branch.checked_mul(branch_waves as u128))
+        .is_some_and(|horizon| horizon <= remaining_phase_ns)
 }
 
 /// Per-phase mutable accounting. One instance belongs to one worker. Dropping it before explicit
@@ -775,8 +1018,170 @@ mod tests {
         BLOCK_CELLS, DeadlineContract, ForecastBook, PhaseBudget, RunBudget, ThreadCpu,
         ThreadSchedulerTime, completed_block_upper_ns_per_cell, div_ceil,
         fork_and_report_projection, parse_schedstat, parse_thread_stat, parse_ticks_per_second,
-        phase_summary_from_measurements, project_other_to_231, projection_fits,
+        phase_summary_from_measurements, projection_fits,
     };
+
+    fn empirical_report_input() -> String {
+        format!(
+            "source_sha256={}\ninput_sha256={}\nreport_variant=corrected-series-fixture\nmeasurements=16:20,32:50,64:150\ntarget_cells=231\nprojected_report_ns=1000\nforecast_description=external synthetic cost proposal with explicit prospective rational-bit-growth scope; empirical extrapolation only\nadequacy=empirical_forecast\ncheckpoint_reserve_ns=50\naa0_postwork_reserve_ns=100",
+            "a".repeat(64),
+            "b".repeat(64)
+        )
+    }
+
+    #[test]
+    fn raw_report_measurements_supply_no_population_growth_model() {
+        let run = RunBudget {
+            deadline: DeadlineContract {
+                started_ns: 0,
+                term_ns: u128::MAX,
+                total_ns: u128::MAX,
+                native_ns: u128::MAX,
+            },
+            reserve_ns: 0,
+        };
+        let mut report = super::ReportBudget::new(&run, "synthetic", 64);
+        for _ in 0..8 {
+            report.record_work(super::ReportWorkKind::HeldEval, 10);
+        }
+        report.record_work(super::ReportWorkKind::GramInverse, 20);
+        report.record_work(super::ReportWorkKind::Other, 30);
+        let summary = report.finish();
+        assert_eq!(summary.held_eval.count, 8);
+        assert_eq!(summary.held_eval.total_ns, 80);
+        assert_eq!(summary.gram_inverse.total_ns, 20);
+        assert_eq!(summary.other.total_ns, 30);
+        assert_eq!(summary.projected_231_ns, None);
+    }
+
+    #[test]
+    fn report_growth_input_refuses_missing_duplicate_and_uncertain_fields() {
+        let input = empirical_report_input();
+        assert!(super::ReportAdmission::parse("").is_err());
+        assert!(
+            super::ReportAdmission::parse(&input.replace("measurements=16:20,32:50,64:150\n", ""))
+                .is_err()
+        );
+        assert!(
+            super::ReportAdmission::parse(&format!("{input}\nprojected_report_ns=2000")).is_err()
+        );
+        assert!(super::ReportAdmission::parse(&format!("{input}\nunknown=1")).is_err());
+        assert!(
+            super::ReportAdmission::parse(
+                &input.replace("adequacy=empirical_forecast", "adequacy=uncertain")
+            )
+            .is_err()
+        );
+        assert!(
+            super::ReportAdmission::parse(&input.replace("target_cells=231", "target_cells=64"))
+                .is_err()
+        );
+        assert!(
+            super::ReportAdmission::parse(
+                &input.replace("report_variant=corrected-series-fixture", "report_variant=")
+            )
+            .is_err()
+        );
+        assert!(
+            super::ReportAdmission::parse(&input.replace(&"a".repeat(64), "unidentified-source"))
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn report_growth_requires_three_increasing_counts_and_positive_costs() {
+        let input = empirical_report_input();
+        for invalid in [
+            "16:20,64:150",
+            "16:20,16:50,64:150",
+            "32:20,16:50,64:150",
+            "0:20,32:50,64:150",
+            "16:0,32:50,64:150",
+            "16:-1,32:50,64:150",
+            "16:20,32:50,232:150",
+            "16:20,32:50,64:bad",
+        ] {
+            assert!(
+                super::ReportAdmission::parse(&input.replace("16:20,32:50,64:150", invalid))
+                    .is_err(),
+                "{invalid}"
+            );
+        }
+        // Timing monotonicity is neither required nor treated as a proof of future cost.
+        assert!(
+            super::ReportAdmission::parse(
+                &input.replace("16:20,32:50,64:150", "16:50,32:20,64:150")
+            )
+            .is_ok()
+        );
+        for field in [
+            "projected_report_ns",
+            "checkpoint_reserve_ns",
+            "aa0_postwork_reserve_ns",
+        ] {
+            let original = match field {
+                "projected_report_ns" => 1000,
+                "checkpoint_reserve_ns" => 50,
+                _ => 100,
+            };
+            for invalid in ["0", "-1", "not-a-timing"] {
+                assert!(
+                    super::ReportAdmission::parse(&input.replace(
+                        &format!("{field}={original}"),
+                        &format!("{field}={invalid}")
+                    ))
+                    .is_err()
+                );
+            }
+        }
+        assert!(
+            super::ReportAdmission::parse(
+                &input.replace("projected_report_ns=1000", "projected_report_ns=149")
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn report_admission_keeps_checkpoint_and_aa0_reserves_in_fixed_remaining_time() {
+        let model = super::ReportAdmission::parse(&empirical_report_input()).unwrap();
+        let admission = model.admit(200, 2, 2550, 1200).unwrap();
+        assert_eq!(model.report_projection_ns(), 1000);
+        assert_eq!(admission.one_branch_combined_ns, 1200);
+        assert_eq!(admission.fork_horizon_ns, 2400);
+        assert_eq!(admission.total_required_ns, 2550);
+        assert!(model.admit(200, 2, 2549, 1200).is_err());
+        assert!(model.admit(200, 2, 2550, 1199).is_err());
+        assert!(model.admit(200, 0, u128::MAX, u128::MAX).is_err());
+        // After actual checkpoint time is deducted, only the already spent reserve is omitted.
+        assert_eq!(
+            model
+                .admit_after_checkpoint(200, 2, 2500, 1200)
+                .unwrap()
+                .total_required_ns,
+            2500
+        );
+        assert!(model.admit_after_checkpoint(200, 2, 2499, 1200).is_err());
+        assert!(model.admit(200, 2, 100, 1200).is_err());
+    }
+
+    #[test]
+    fn report_admission_refuses_overflow_in_cost_horizon_and_reserve_series() {
+        let input = empirical_report_input();
+        assert!(
+            super::ReportAdmission::parse(&input.replace(
+                "projected_report_ns=1000",
+                &format!("projected_report_ns={}", u128::MAX)
+            ))
+            .is_err()
+        );
+        let model = super::ReportAdmission::parse(&input).unwrap();
+        assert!(model.admit(u128::MAX, 1, u128::MAX, u128::MAX).is_err());
+        assert!(model.admit(u128::MAX / 2, 3, u128::MAX, u128::MAX).is_err());
+        assert!(!projection_fits(u128::MAX, 1, 1, u128::MAX, u128::MAX));
+        assert!(!projection_fits(u128::MAX / 2, 0, 3, u128::MAX, u128::MAX));
+        assert!(!projection_fits(1, 1, 0, u128::MAX, u128::MAX));
+    }
 
     #[test]
     fn exact_mean_plus_spread_uses_rational_fixed_block_rates() {
@@ -888,13 +1293,6 @@ mod tests {
         assert!(!projection_fits(70, 30, 1, 99, 100));
         assert!(projection_fits(30, 10, 2, 80, 40));
         assert!(!projection_fits(30, 10, 2, 79, 40));
-    }
-
-    #[test]
-    fn report_other_projection_uses_actual_calibration_cell_count() {
-        assert_eq!(project_other_to_231(64, 64), 231);
-        assert_eq!(project_other_to_231(231, 231), 231);
-        assert_eq!(project_other_to_231(64, 0), u128::MAX);
     }
 
     #[test]

@@ -6,9 +6,13 @@
 //! zero incoming residual. The native material Gram is the metric; the separately retained Gram
 //! remainder is shown as carry and is never silently added to that metric.
 
+#[path = "exact_digest.rs"]
+mod exact_digest;
+
 use super::*;
 use holonics::hnn::constitution::NormalLaw;
 use holonics::hnn::paired::PortSymmetry;
+use holonics::hnn::ratio::Face;
 use holonics::hnn::reference::FrozenComparison;
 use holonics::ratio::algebraic::ExactInterval;
 use holonics::ratio::linear::ExactRatMatrix;
@@ -24,6 +28,330 @@ type Matrix = ExactRatMatrix;
 pub(super) struct ReportCapture {
     pub(super) gradient: Option<Matrix>,
     pub(super) exact_metric_scale: Option<Rat>,
+}
+
+/// The amended tolerance exponent is not the existing face-grain denominator. An absent binding
+/// refuses before native work; no environment variable or inferred conversion fills this field.
+pub(super) fn require_partition_precision(amended_exponent: Option<u32>) -> Result<u32> {
+    amended_exponent.ok_or_else(|| {
+        "compact stall report unavailable: amended receiver partition exponent is not bound to the actual precision owner; the native face-grain denominator is not an exponent".into()
+    })
+}
+
+#[derive(Clone, Copy)]
+struct PartitionContext {
+    receiver_exponent: u32,
+    cell_bound: u64,
+    /// R12's c, counted from zero; not a cumulative ring-tick count without its source binding.
+    epoch_index: u64,
+    phase_period: u64,
+}
+
+fn partition_exponent_explicit(context: PartitionContext) -> Result<u32> {
+    if context.cell_bound == 0 || context.phase_period == 0 {
+        return Err("a face partition requires its declared positive cell bound".into());
+    }
+    let ceil_log2 = |n: u64| {
+        if n <= 1 {
+            0
+        } else {
+            u64::BITS - (n - 1).leading_zeros()
+        }
+    };
+    let next = context
+        .epoch_index
+        .checked_add(1)
+        .ok_or("partition epoch index overflows its next crossing")?;
+    context
+        .receiver_exponent
+        .checked_add(ceil_log2(context.cell_bound))
+        .and_then(|l| l.checked_add(1))
+        .and_then(|l| l.checked_add(2 * ceil_log2(next)))
+        .ok_or_else(|| "receiver-derived partition exponent overflows u32".into())
+}
+
+/// A receiving sample after its exact frozen one-hot comparison has been checked. Its foil
+/// stays undivided as nonnegative integer weights and their positive common normalizer.
+struct PartitionSample {
+    feature: Vec<Rat>,
+    weights: Vec<BigInt>,
+    normalizer: BigInt,
+    target: usize,
+    /// One exact already-produced phase covector per class. It is never partitioned.
+    phase: Vec<Rat>,
+}
+
+struct FaceRelease {
+    quotient: Vec<BigInt>,
+    remainder: Vec<BigInt>,
+    denominator: BigInt,
+}
+
+struct PartitionedStatistics {
+    positive: Matrix,
+    foil: Matrix,
+    phase: Matrix,
+    gradient: Matrix,
+    gram_delta: Matrix,
+    releases: Vec<FaceRelease>,
+    exponent: u32,
+    /// Strict bound on each magnitude entry's omitted contribution after the class scale.
+    /// Projection is an orthogonal half-sum, so this common absolute bound is preserved.
+    released_entry_bound: Rat,
+}
+
+fn face_integer_weights(face: &Face) -> Result<(Vec<BigInt>, BigInt)> {
+    let bottom = face
+        .cells()
+        .iter()
+        .map(|cell| &cell.carry)
+        .min()
+        .ok_or("a frozen comparison face has no classes")?;
+    let mut weights = Vec::with_capacity(face.cells().len());
+    for cell in face.cells() {
+        if cell.phase >= face.grain() {
+            return Err("a frozen face has a phase outside its declared grain".into());
+        }
+        let exponent = usize::try_from(&cell.carry - bottom)
+            .map_err(|_| "a frozen face's exact carry difference does not fit an address")?;
+        weights.push((BigInt::from(face.grain()) + BigInt::from(cell.phase)) << exponent);
+    }
+    let normalizer: BigInt = weights.iter().sum();
+    if !normalizer.is_positive() {
+        return Err("a frozen face requires a positive integer normalizer".into());
+    }
+    Ok((weights, normalizer))
+}
+
+fn checked_partition_sample(
+    sample: &Sample,
+    covector: &[Rat],
+    face: &Face,
+) -> Result<PartitionSample> {
+    let classes = face.cells().len();
+    if sample.weight != Rat::one() || covector.len() != 2 * classes {
+        return Err(
+            "partitioned receiving statistics require exact unit-weight complex samples".into(),
+        );
+    }
+    let (weights, normalizer) = face_integer_weights(face)?;
+    let mut target = None;
+    for (class, weight) in weights.iter().enumerate() {
+        let q = Rat::new(weight.clone(), normalizer.clone()) + &covector[2 * class];
+        if q == Rat::one() && target.is_none() {
+            target = Some(class);
+        } else if !q.is_zero() {
+            return Err("frozen one-hot target reconstruction failed; a soft or foreign covector cannot set q".into());
+        }
+    }
+    Ok(PartitionSample {
+        feature: sample.feature.clone(),
+        weights,
+        normalizer,
+        target: target.ok_or("the frozen comparison has no one-hot target")?,
+        phase: covector.iter().skip(1).step_by(2).cloned().collect(),
+    })
+}
+
+fn dyadic_feature(value: &Rat) -> bool {
+    value.denom().is_positive()
+        && value
+            .denom()
+            .trailing_zeros()
+            .is_some_and(|zeros| value.denom().bits() == zeros + 1)
+}
+
+/// Read-only use of the existing native integer outer-product owner. Positive, partitioned foil
+/// and phase samples are accumulated independently by NormalLaw::projected_statistics, whose
+/// integral/outer_integral path sums integer coordinates over common denominators. Only these
+/// completed series become rational matrix views; individual unpartitioned p_tilde never sum
+/// into G. This neither publishes phase4's native owner nor changes a deposition law.
+fn partitioned_statistics(
+    law: &NormalLaw,
+    samples: &[PartitionSample],
+    context: PartitionContext,
+    metric_scale: Option<&Rat>,
+    mut checkpoint: impl FnMut() -> Result<()>,
+) -> Result<PartitionedStatistics> {
+    checkpoint()?;
+    let count = u64::try_from(samples.len()).map_err(|_| "partition sample count overflows u64")?;
+    if count > context.cell_bound {
+        return Err("partition heard cells exceed the declared bound".into());
+    }
+    let exponent = partition_exponent_explicit(context)?;
+    let lattice_denominator = BigInt::one() << exponent as usize;
+    let classes = law.map().rows() / 2;
+    if law.map().rows() != 2 * classes || classes == 0 {
+        return Err("receiving partition requires nonempty complex class rows".into());
+    }
+    let scale = metric_scale.cloned().unwrap_or_else(Rat::one);
+    if !scale.is_positive()
+        || !dyadic_feature(&scale)
+        || (!scale.numer().is_one()
+            && scale
+                .numer()
+                .trailing_zeros()
+                .is_none_or(|zeros| scale.numer().bits() != zeros + 1))
+    {
+        return Err("the receiving class metric must be its native positive power of two".into());
+    }
+    let mut positive = Vec::with_capacity(samples.len());
+    let mut foil = Vec::with_capacity(samples.len());
+    let mut phase = Vec::with_capacity(samples.len());
+    let mut releases = Vec::with_capacity(samples.len());
+    let mut max_feature = Rat::zero();
+    for sample in samples {
+        checkpoint()?;
+        if sample.feature.len() != law.map().columns()
+            || sample.weights.len() != classes
+            || sample.phase.len() != classes
+            || sample.target >= classes
+            || !sample.normalizer.is_positive()
+            || sample.weights.iter().any(Signed::is_negative)
+            || sample.weights.iter().sum::<BigInt>() != sample.normalizer
+            || sample
+                .feature
+                .iter()
+                .any(|f| !dyadic_feature(f) || f.abs() > Rat::one())
+        {
+            return Err("partition sample disagrees with its unit-weight, bounded dyadic producer or exact integer face".into());
+        }
+        // The phase series retains only the receiving period's fixed odd factor beside
+        // powers of two. A foreign denominator cannot silently widen this native contract.
+        if sample.phase.iter().any(|value| {
+            let twos = value.denom().trailing_zeros().unwrap_or(0);
+            let odd = value.denom() >> twos as usize;
+            !(BigInt::from(context.phase_period) % odd).is_zero()
+        }) {
+            return Err(
+                "phase covector denominator leaves the receiving period's declared odd factor"
+                    .into(),
+            );
+        }
+        max_feature = max_feature.max(
+            sample
+                .feature
+                .iter()
+                .map(Rat::abs)
+                .max()
+                .unwrap_or_else(Rat::zero),
+        );
+        let mut q = vec![Rat::zero(); 2 * classes];
+        let mut p_hat = q.clone();
+        let mut whole_phase = q.clone();
+        q[2 * sample.target] = Rat::one();
+        let mut quotient = Vec::with_capacity(classes);
+        let mut remainder = Vec::with_capacity(classes);
+        for class in 0..classes {
+            let scaled = &sample.weights[class] << exponent as usize;
+            let retained = &scaled / &sample.normalizer;
+            let released = &scaled - &retained * &sample.normalizer;
+            if released.is_negative() || released >= sample.normalizer {
+                return Err("exact face division did not return its Euclidean remainder".into());
+            }
+            p_hat[2 * class] = Rat::new(retained.clone(), lattice_denominator.clone());
+            whole_phase[2 * class + 1] = sample.phase[class].clone();
+            quotient.push(retained);
+            remainder.push(released);
+        }
+        let make = |covector| Sample {
+            weight: Rat::one(),
+            feature: sample.feature.clone(),
+            covector,
+            masses: None,
+        };
+        positive.push(make(q));
+        foil.push(make(p_hat));
+        phase.push(make(whole_phase));
+        releases.push(FaceRelease {
+            quotient,
+            remainder,
+            denominator: sample.normalizer.clone(),
+        });
+    }
+    checkpoint()?;
+    let (positive, gram_delta) = law.projected_statistics(&positive)?;
+    checkpoint()?;
+    let (foil, _) = law.projected_statistics(&foil)?;
+    checkpoint()?;
+    let (phase, _) = law.projected_statistics(&phase)?;
+    checkpoint()?;
+    let mut gradient = matrix_subtract(&positive, &foil)?.to_rows();
+    for (row_index, row) in gradient.iter_mut().enumerate() {
+        for (column, entry) in row.iter_mut().enumerate() {
+            *entry = &*entry * &scale + phase.get(row_index, column)?;
+        }
+    }
+    let released_entry_bound = &scale * Rat::from_integer(BigInt::from(count)) * max_feature
+        / Rat::from_integer(lattice_denominator);
+    checkpoint()?;
+    Ok(PartitionedStatistics {
+        positive,
+        foil,
+        phase,
+        gradient: Matrix::new(gradient)?,
+        gram_delta,
+        releases,
+        exponent,
+        released_entry_bound,
+    })
+}
+
+fn partitioned_crossing_statistics(
+    crossing: &CutView,
+    views: &[CutView],
+    budget: &timing::ReportBudget,
+) -> Result<(PartitionedStatistics, Option<Rat>)> {
+    let receiver_exponent = require_partition_precision(crossing.receiver_partition_exponent)?;
+    let context = PartitionContext {
+        receiver_exponent,
+        cell_bound: crossing.partition_cell_bound.ok_or("compact stall report unavailable: opening partition cell bound is not source-bound")?,
+        epoch_index: crossing.partition_epoch_index.ok_or("compact stall report unavailable: native receipt crossings are not yet bound to R12's epoch index")?,
+        phase_period: views.first().and_then(|view| {
+            view.frozen.as_ref().and_then(|frozen| view.pre_clocks.get(frozen.ratio().phases().ring()).map(|clock| clock.0))
+        }).ok_or("partitioned phase series requires its actual receiving clock period")?,
+    };
+    let mut records = Vec::new();
+    let mut metric_samples = Vec::new();
+    for view in views {
+        budget.check_before_work("partitioned crossing comparison provenance")?;
+        let frozen = view.frozen.as_ref().ok_or(
+            "partitioned crossing statistics require the actual frozen one-hot comparison",
+        )?;
+        let wave = super::held_wave(
+            &crossing.map,
+            &view.producing_map,
+            frozen.wave(),
+            &view.samples,
+        )?;
+        let covectors = frozen.recompare_covector(&wave)?;
+        if covectors != view.crossing_covectors || covectors.len() != view.samples.len() {
+            return Err(
+                "partitioned crossing covectors do not match their retained producing comparison"
+                    .into(),
+            );
+        }
+        let combined = frozen.combined_faces(&wave)?;
+        if combined.faces.len() != view.samples.len() {
+            return Err("partitioned crossing faces do not align with staged samples".into());
+        }
+        for ((sample, covector), face) in view.samples.iter().zip(&covectors).zip(&combined.faces) {
+            records.push(checked_partition_sample(sample, covector, face)?);
+            let mut metric = sample.clone();
+            metric.covector = covector.clone();
+            // Carry the face's actual masses into the native class-metric owner; reconstructing
+            // them from the newly partitioned q-p_hat would silently change the metric.
+            metric.masses = Some(face.odometer_masses()?);
+            metric_samples.push(metric);
+        }
+    }
+    let scale = receiving_class_metric(&metric_samples);
+    let statistics =
+        partitioned_statistics(&crossing.law, &records, context, scale.as_ref(), || {
+            budget.check_before_work("partitioned native integer series")?;
+            Ok(())
+        })?;
+    Ok((statistics, scale))
 }
 
 fn rat_pow2(exponent: i64) -> Rat {
@@ -334,7 +662,8 @@ fn defer_conservation_verdict(
         );
     } else if !adjusted_balance_zero {
         failures.push(format!(
-            "native Gram conservation failed after exact prior adjustment: ΔHstored + Δcarry - ΔsampleH + released - Δprior = {adjusted_balance:?}"
+            "native Gram conservation failed after exact prior adjustment: ΔHstored + Δcarry - ΔsampleH + released - Δprior = {}",
+            matrix_summary(adjusted_balance)
         ));
     }
 }
@@ -565,6 +894,530 @@ fn finish_report_budget(
     deadline_error.map(|error| {
         format!("branch {branch} completed its report readouts at the shared cutoff: {error}")
     })
+}
+
+/// Canonical exact-value identifier and the widths of the actual rational operands.
+/// Other diagnostic records can use the same format without printing a complete matrix.
+pub(super) fn matrix_summary(matrix: &Matrix) -> impl fmt::Display {
+    exact_digest::matrix_summary(matrix)
+}
+
+fn stall_matrix(
+    branch: &str,
+    label: &str,
+    matrix: &Matrix,
+    budget: &timing::ReportBudget,
+) -> Result<()> {
+    let summary = exact_digest::matrix_summary_checked(matrix, || {
+        budget.check_before_work("canonical exact matrix digest")
+    })?;
+    println!("step0_epoch_matrix branch={branch} operand={label} {summary}");
+    budget.check_before_work("exact matrix digest output completion")?;
+    Ok(())
+}
+
+fn stall_work<T>(
+    budget: &timing::ReportBudget,
+    label: &str,
+    work: impl FnOnce() -> Result<T>,
+) -> Result<T> {
+    budget.check_before_work(label)?;
+    let result = work();
+    // A completed expensive kernel does not authorize the next one after the shared cutoff.
+    budget.check_before_work(&format!("completion of {label}"))?;
+    result
+}
+
+fn stall_product(left: &Matrix, right: &Matrix, budget: &timing::ReportBudget) -> Result<Matrix> {
+    if left.columns() != right.rows() {
+        return Err("stall matrix product dimensions disagree".into());
+    }
+    let mut rows = vec![vec![Rat::zero(); right.columns()]; left.rows()];
+    for (i, row) in rows.iter_mut().enumerate() {
+        for (j, value) in row.iter_mut().enumerate() {
+            budget.check_before_work("exact stall product entry")?;
+            for k in 0..left.columns() {
+                *value += left.get(i, k)? * right.get(k, j)?;
+            }
+        }
+    }
+    budget.check_before_work("exact stall product completion")?;
+    Ok(Matrix::shaped(left.rows(), right.columns(), rows)?)
+}
+
+/// Sylvester's criterion through successive exact Schur complements. The pivots are the ratios
+/// of consecutive leading minors, so this retains the existing positive-definiteness condition
+/// without recomputing every minor independently. This is a read of H', never a new native law.
+fn positive_definite_with_check<E>(
+    matrix: &Matrix,
+    mut checkpoint: impl FnMut() -> std::result::Result<(), E>,
+) -> std::result::Result<bool, E> {
+    checkpoint()?;
+    if !matrix_is_symmetric(matrix) {
+        return Ok(false);
+    }
+    let mut values = matrix.to_rows();
+    for pivot in 0..matrix.rows() {
+        checkpoint()?;
+        let diagonal = values[pivot][pivot].clone();
+        if diagonal <= Rat::zero() {
+            return Ok(false);
+        }
+        for row in pivot + 1..matrix.rows() {
+            checkpoint()?;
+            let factor = &values[row][pivot] / &diagonal;
+            for column in row..matrix.columns() {
+                let next = &values[row][column] - &factor * &values[pivot][column];
+                values[row][column] = next.clone();
+                values[column][row] = next;
+            }
+        }
+    }
+    checkpoint()?;
+    Ok(true)
+}
+
+/// Full declared receiver-epoch stall read. It forms only the normal-law operands needed for
+/// stalls and their witnesses; held-face candidate evaluations belong to the explicit profile.
+/// G uses the native integer-statistics owner with explicit source-bound partition context,
+/// and remains distinct from the inaccessible live PreparedStep.unit. No map from this read is deposited or certified.
+pub(super) fn report_stall_epoch(
+    branch: &str,
+    crossing: &CutView,
+    end: &CutView,
+    views: &[CutView],
+    receiver_grain: u64,
+    budget: &mut timing::ReportBudget,
+    capture: &mut ReportCapture,
+) -> Result<()> {
+    if receiver_grain == 0 {
+        return Err("receiver grain denominator must be positive".into());
+    }
+    budget.check_before_work("stall epoch report")?;
+    let report_started = Instant::now();
+    let mut inverse_ns = 0;
+    let mut deferred_failures = Vec::new();
+    let readout = stall_epoch_readout(
+        branch,
+        crossing,
+        end,
+        views,
+        receiver_grain,
+        budget,
+        capture,
+        &mut inverse_ns,
+        &mut deferred_failures,
+    );
+    if let Err(error) = readout {
+        deferred_failures.push(error.to_string());
+    }
+    if let Some(error) = finish_report_budget(
+        branch,
+        budget,
+        report_started,
+        0,
+        inverse_ns,
+        &HeldOutputStats::default(),
+    ) {
+        deferred_failures.push(error);
+    }
+    finish_deferred_failures(deferred_failures)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn stall_epoch_readout(
+    branch: &str,
+    crossing: &CutView,
+    end: &CutView,
+    views: &[CutView],
+    receiver_grain: u64,
+    budget: &mut timing::ReportBudget,
+    capture: &mut ReportCapture,
+    inverse_ns: &mut u128,
+    deferred_failures: &mut Vec<String>,
+) -> Result<()> {
+    let (partitioned, exact_metric_scale) =
+        stall_work(budget, "partitioned crossing statistics", || {
+            partitioned_crossing_statistics(crossing, views, budget)
+        })?;
+    let gradient = partitioned.gradient.clone();
+    let sample_gram_delta = partitioned.gram_delta.clone();
+    for (label, series) in [
+        ("magnitude_positive_q_series", &partitioned.positive),
+        ("magnitude_partitioned_foil_series", &partitioned.foil),
+        ("whole_phase_series", &partitioned.phase),
+    ] {
+        stall_matrix(branch, label, series, budget)?;
+    }
+    for (sample, release) in partitioned.releases.iter().enumerate() {
+        budget.check_before_work("exact partition release record")?;
+        let integers = release
+            .quotient
+            .iter()
+            .chain(&release.remainder)
+            .chain(std::iter::once(&release.denominator))
+            .cloned()
+            .map(Rat::from_integer)
+            .collect::<Vec<_>>();
+        stall_matrix(
+            branch,
+            &format!("face_partition_integer_record_sample_{sample}"),
+            &Matrix::new(vec![integers])?,
+            budget,
+        )?;
+        println!(
+            "step0_epoch_face_partition branch={branch} sample={sample} partition_exponent={} integer_record_order=quotients,remainder_numerators,normalizer classes={} exact_release_denominator=Z*2^L; retained_plus_release_equals_exact_face; remainder_not_added_to_G=true",
+            partitioned.exponent,
+            release.quotient.len()
+        );
+    }
+    println!(
+        "step0_epoch_partition_bound branch={branch} opening_native_receiver_ticks={:?} source_bound_epoch_index={:?} source_bound_cell_bound={:?} source_bound_receiver_exponent={:?} partition_exponent={} strict_released_magnitude_entry_bound={} phase_partition=none; bound_reported_separately_never_added",
+        crossing.opening_crossings,
+        crossing.partition_epoch_index,
+        crossing.partition_cell_bound,
+        crossing.receiver_partition_exponent,
+        partitioned.exponent,
+        partitioned.released_entry_bound
+    );
+    capture.gradient = Some(gradient.clone());
+    capture.exact_metric_scale = exact_metric_scale.clone();
+    let native_lw_cross = crossing.native_lattice_exponent;
+    let native_lw_end = end.native_lattice_exponent;
+    let width = crossing.support.len();
+    let spec_lw = spec_lattice_exponent(receiver_grain, width)?;
+    let spec_b_r = exact_log2_power_of_two(&(BigInt::from(receiver_grain) << 1usize));
+    let spec_unit = rat_pow2(-i64::from(spec_lw));
+    let native_unit_cross = rat_pow2(-i64::from(native_lw_cross));
+    let native_unit_end = rat_pow2(-i64::from(native_lw_end));
+    let native_spec_mismatch_cross = native_lw_cross != spec_lw;
+    let native_spec_mismatch_end = native_lw_end != spec_lw;
+    let actual_map_delta = matrix_subtract(&end.map, &crossing.map)?;
+    let actual_stored_gram_delta = matrix_subtract(&end.gram, &crossing.gram)?;
+    let actual_carry_delta = matrix_subtract(&end.gram_remainder, &crossing.gram_remainder)?;
+    let released_gram = released_gram_matrix(views, crossing.gram.rows(), crossing.gram.columns())?;
+    let raw_gram_delta = matrix_subtract(
+        &matrix_add(&actual_stored_gram_delta, &actual_carry_delta)?,
+        &sample_gram_delta,
+    )?;
+    let raw_plus_release = matrix_add(&raw_gram_delta, &released_gram)?;
+    let prior_delta = prior_gram_delta(
+        crossing.gram.rows(),
+        crossing.gram.columns(),
+        crossing.receiving_prior,
+        end.receiving_prior,
+        crossing.prior_scale,
+        end.prior_scale,
+    )?;
+    let adjusted_gram_balance = prior_delta
+        .as_ref()
+        .map(|prior| matrix_subtract(&raw_plus_release, prior))
+        .transpose()?
+        .unwrap_or_else(|| raw_plus_release.clone());
+    let exact_gram_balance_zero = adjusted_gram_balance.entries().iter().all(Rat::is_zero);
+    defer_conservation_verdict(
+        deferred_failures,
+        prior_delta.is_some(),
+        exact_gram_balance_zero,
+        &adjusted_gram_balance,
+    );
+    let conservation_status = if prior_delta.is_none() {
+        "UNSUPPORTED-prior-change-or-scale-without-declared-prior"
+    } else if exact_gram_balance_zero {
+        "PASS-exact-zero"
+    } else {
+        "FAIL-nonzero-exact-balance"
+    };
+    let max_feature = views
+        .iter()
+        .flat_map(|view| &view.samples)
+        .flat_map(|sample| &sample.feature)
+        .map(Rat::abs)
+        .max()
+        .unwrap_or_else(Rat::zero);
+    let max_live_g = views
+        .iter()
+        .flat_map(|view| &view.samples)
+        .flat_map(|sample| &sample.covector)
+        .map(Rat::abs)
+        .max()
+        .unwrap_or_else(Rat::zero);
+    let max_sample_crossing_g = views
+        .iter()
+        .flat_map(|view| &view.crossing_covectors)
+        .flatten()
+        .map(Rat::abs)
+        .max()
+        .unwrap_or_else(Rat::zero);
+    let newest_sample_weight = views
+        .iter()
+        .rev()
+        .find_map(|view| view.samples.last())
+        .map(|sample| &sample.weight);
+    let zero_step_cells = views
+        .iter()
+        .filter(|view| view.receiving_step.is_zero())
+        .count();
+    let vanished_cells = views.iter().filter(|view| view.receiving_vanished).count();
+    let grain_unit = Rat::new(BigInt::one(), BigInt::from(receiver_grain));
+    let native_half_quantum = &grain_unit / Rat::from_integer(BigInt::from(2));
+
+    for (label, matrix) in [
+        ("W_cross", &crossing.map),
+        ("H_cross_stored", &crossing.gram),
+        ("G_cross_projected", &gradient),
+        ("sample_H_delta_projected", &sample_gram_delta),
+        ("H_prime_native_stored", &end.gram),
+        ("H_stored_delta", &actual_stored_gram_delta),
+        ("carry_cross", &crossing.gram_remainder),
+        ("carry_end", &end.gram_remainder),
+        ("carry_delta", &actual_carry_delta),
+        ("raw_gram_delta", &raw_gram_delta),
+        ("actual_sparse_released_gram", &released_gram),
+        ("adjusted_conservation", &adjusted_gram_balance),
+        ("W_end", &end.map),
+        ("W_actual_delta", &actual_map_delta),
+    ] {
+        stall_matrix(branch, label, matrix, budget)?;
+    }
+    if let Some(prior) = &prior_delta {
+        stall_matrix(branch, "exact_prior_delta", prior, budget)?;
+    }
+    let metric_scale_text = exact_metric_scale
+        .as_ref()
+        .map(ToString::to_string)
+        .unwrap_or_else(|| "unavailable-native-unscaled-fallback".into());
+    println!(
+        "step0_epoch branch={branch} report=full-epoch-stalls samples={} cells={} exact_metric_scale_s={metric_scale_text} receiving_prior_cross={:?} receiving_prior_end={:?} prior_scale_cross={} prior_scale_end={} adjusted_conservation_exact_zero={exact_gram_balance_zero} conservation_status={conservation_status}",
+        views.iter().map(|view| view.samples.len()).sum::<usize>(),
+        views.len(),
+        crossing.receiving_prior,
+        end.receiving_prior,
+        crossing.prior_scale,
+        end.prior_scale,
+    );
+    println!(
+        "step0_epoch_contract branch={branch} metric=native-stored-H; H_prime=H_end_stored; ridge_is_already_in_stored-H; gram_carry_reported_separately_not_added; G_cross=s*(positive_q_series-partitioned_foil_series)+whole_phase_series; native_class_metric_scale_or_explicit_unscaled_fallback; sample_deltaH_is_paired_projected; gamma=1_hypothetical; incoming_R=0_hypothetical; this_G_is_not_live_PreparedStep.unit; radial_mode=not_exposed; support_cross={:?} support_end={:?} symmetry_cross={} symmetry_end={} receiver_grain_unit=1/{receiver_grain}={grain_unit} native_precision_half_quantum={native_half_quantum}; no_candidate_map_or_held_face_pass",
+        crossing.support, end.support, crossing.symmetry, end.symmetry,
+    );
+    let newest_weight = newest_sample_weight
+        .map(ToString::to_string)
+        .unwrap_or_else(|| "unavailable-no-staged-sample".into());
+    println!(
+        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_weight} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_vs_spec_LW_mismatch_cross={native_spec_mismatch_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} native_vs_spec_LW_mismatch_end={native_spec_mismatch_end} spec_b_R=log2(2*L_R)={spec_b_r:?} spec_LW=b_R+ceil(log2(support_width={width}))={spec_lw} spec_W_unit={spec_unit} no_clock_feature_split_claimed",
+        matrix_max_abs(&gradient),
+    );
+
+    let (majorizer_exponents, majorizer_diagonal) =
+        stall_work(budget, "column majorizer", || column_majorizer(&end.gram))?;
+    let d_hyp = stall_work(budget, "majorized direction D", || {
+        right_column_scale(&gradient, &majorizer_diagonal)
+    })?;
+    let step = stall_work(budget, "crossing lattice projection Q(D)", || {
+        project_toward_zero(&d_hyp, native_lw_cross)
+    })?;
+    let step_h = stall_product(&step, &end.gram, budget)?;
+    let residual_after = stall_work(budget, "hypothetical R double prime", || {
+        matrix_subtract(&gradient, &step_h)
+    })?;
+    // Read the quadratic fall directly as a Frobenius pairing; no rows-by-rows candidate
+    // quadratic matrix is needed to read trace(Q H' Q^T).
+    let linear = step
+        .entries()
+        .iter()
+        .zip(gradient.entries())
+        .fold(Rat::zero(), |sum, (q, g)| sum + q * g);
+    let quadratic = step
+        .entries()
+        .iter()
+        .zip(step_h.entries())
+        .fold(Rat::zero(), |sum, (q, qh)| sum + q * qh);
+    let fall = linear - quadratic / Rat::from_integer(BigInt::from(2));
+    let nonzero_step = step.entries().iter().any(|value| !value.is_zero());
+    let metric_pd = positive_definite_with_check(&end.gram, || {
+        budget.check_before_work("exact positive-definiteness Schur complement")
+    })?;
+    let full_support = |support: &[usize], width: usize| {
+        support.len() == width && support.iter().copied().eq(0..width)
+    };
+    let mut reasons = Vec::new();
+    if !matrix_is_symmetric(&end.gram) {
+        reasons.push("H_prime is not exactly symmetric");
+    }
+    if !metric_pd {
+        reasons.push("H_prime positive-definiteness is not established");
+    }
+    if !full_support(&crossing.support, crossing.map.columns())
+        || !full_support(&end.support, end.map.columns())
+        || crossing.support != end.support
+    {
+        reasons.push("receiver chart support is not the same full declared coordinate set");
+    }
+    let gram_symmetry_ok = stall_work(budget, "native paired metric symmetry", || {
+        Ok(
+            gram_commutes_with_native_symmetry(&crossing.law, &crossing.gram)
+                && gram_commutes_with_native_symmetry(&crossing.law, &crossing.gram_remainder)
+                && gram_commutes_with_native_symmetry(&end.law, &end.gram)
+                && gram_commutes_with_native_symmetry(&end.law, &end.gram_remainder)
+                && gram_commutes_with_native_symmetry(&crossing.law, &sample_gram_delta)
+                && gram_commutes_with_native_symmetry(&end.law, &sample_gram_delta),
+        )
+    })?;
+    if !gram_symmetry_ok {
+        reasons.push("stored Gram/carry/projected sample DeltaH does not commute with native paired symmetry");
+    }
+    let paired_operands_ok = stall_work(budget, "native paired direction and residual", || {
+        let mut compatible = true;
+        for operand in [&crossing.map, &gradient, &d_hyp, &step, &residual_after] {
+            compatible &= map_respects_native_subspace(&crossing.law, operand)?
+                && map_respects_native_subspace(&end.law, operand)?;
+        }
+        Ok(compatible)
+    })?;
+    if !paired_operands_ok {
+        reasons.push("normal direction, step or residual leaves native paired subspace");
+    }
+    let fall_error = check_hypothetical_fall(nonzero_step, reasons.is_empty(), &fall).err();
+    let fall_check = if !nonzero_step {
+        "zero-step"
+    } else if fall_error.is_some() {
+        "FAIL"
+    } else if reasons.is_empty() {
+        "PASS"
+    } else {
+        "unconstrained-only"
+    };
+    if let Some(error) = fall_error {
+        deferred_failures.push(error.to_string());
+    }
+    for (label, matrix) in [
+        ("D_hyp", &d_hyp),
+        ("Q_D_crossing_lattice", &step),
+        ("R_double_prime_hyp", &residual_after),
+    ] {
+        stall_matrix(branch, label, matrix, budget)?;
+    }
+    println!(
+        "step0_epoch_majorizer branch={branch} column_exponents={majorizer_exponents:?} M_diagonal_exact={} max_abs_D_hyp={} max_abs_D_in_crossing_W_units={} Q_D_exact_zero={} native_cross_fall={fall} positive_fall_check={fall_check} H_prime_positive_definite={metric_pd} gram_pair_symmetry_ok={gram_symmetry_ok} direction_step_residual_pair_subspace_ok={paired_operands_ok} constraints={reasons:?}; hypothetical_unconstrained_only; radial_constraint_certificate=not_exposed; no_live_deposit_refusal_claim",
+        majorizer_diagonal
+            .iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+            .join(","),
+        matrix_max_abs(&d_hyp),
+        matrix_max_abs(&d_hyp) / &native_unit_cross,
+        !nonzero_step,
+    );
+
+    budget.check_before_work("H prime exact inverse")?;
+    let inverse_started = Instant::now();
+    let inverse_result = end.gram.inverse();
+    *inverse_ns = inverse_started.elapsed().as_nanos();
+    budget.record_work(timing::ReportWorkKind::GramInverse, *inverse_ns);
+    budget.check_before_work("H prime exact inverse completion")?;
+    let inverse = match inverse_result {
+        Ok(value) => value,
+        Err(error) => {
+            println!(
+                "step0_epoch_stalls branch={branch} status=unavailable reason=singular-H_prime error={error}"
+            );
+            return Err(error.into());
+        }
+    };
+    let unconstrained_update = stall_product(&gradient, &inverse, budget)?;
+    let residual_dual = stall_product(&residual_after, &inverse, budget)?;
+    for (label, matrix) in [
+        ("H_prime_inverse", &inverse),
+        ("R_prime_H_prime_inverse", &unconstrained_update),
+        ("R_double_prime_H_prime_inverse", &residual_dual),
+    ] {
+        stall_matrix(branch, label, matrix, budget)?;
+    }
+    let mut stalled_entries = Vec::new();
+    for row in 0..unconstrained_update.rows() {
+        budget.check_before_work("stalled entries")?;
+        for column in 0..unconstrained_update.columns() {
+            let full = unconstrained_update.get(row, column)?.abs();
+            let emitted = d_hyp.get(row, column)?.abs();
+            if full >= native_unit_cross && emitted < native_unit_cross {
+                stalled_entries.push((row, column));
+                println!(
+                    "step0_epoch_stalled_entry branch={branch} row={row} column={column} exact_abs_Rprime_Hprime_inverse={full} exact_abs_D={emitted} exact_Q_D={} native_W_unit_cross={native_unit_cross}",
+                    step.get(row, column)?
+                );
+            }
+        }
+    }
+    let witness_bound = max_row_sum(&residual_dual) * &max_feature;
+    let width_bound = Rat::from_integer(BigInt::from(residual_dual.columns()))
+        * matrix_max_abs(&residual_dual)
+        * &max_feature;
+    let mut max_witness = Rat::zero();
+    let mut witnessed_rows = Vec::new();
+    let mut witnesses_over_grain = 0usize;
+    // A witness belongs to the residual row and sample, not to a duplicate column label.
+    // Report each row/sample once, and keep every stalled coordinate in its own exact record.
+    for &(row, _) in &stalled_entries {
+        if witnessed_rows.contains(&row) {
+            continue;
+        }
+        witnessed_rows.push(row);
+        let mut row_max = Rat::zero();
+        let mut row_witness = None;
+        for (cell, view) in views.iter().enumerate() {
+            budget.check_before_work("exact feature witnesses")?;
+            for (sample_index, sample) in view.samples.iter().enumerate() {
+                budget.check_before_work("exact feature witness sample")?;
+                if sample.feature.len() != residual_dual.columns() {
+                    return Err("stall witness feature width disagrees with residual dual".into());
+                }
+                let terms = sample
+                    .feature
+                    .iter()
+                    .enumerate()
+                    .map(|(j, f)| residual_dual.get(row, j).map(|dual| dual * f))
+                    .collect::<std::result::Result<Vec<_>, _>>()?;
+                let value: Rat = terms.iter().cloned().sum();
+                let magnitude = value.abs();
+                if magnitude >= grain_unit {
+                    witnesses_over_grain += 1;
+                    println!(
+                        "step0_epoch_grain_witness branch={branch} row={row} cell={cell} sample={sample_index} exact_value={value} receiver_grain_q_R={grain_unit} verdict=AtOrAboveWholeGrain"
+                    );
+                }
+                if row_witness.is_none() || magnitude > row_max {
+                    row_max = magnitude;
+                    row_witness = Some((cell, sample_index, value, terms));
+                }
+            }
+        }
+        if let Some((cell, sample_index, value, terms)) = row_witness {
+            println!(
+                "step0_epoch_max_row_witness branch={branch} row={row} cell={cell} sample={sample_index} exact_terms={} exact_sum={value} exact_abs={row_max} verdict={:?}",
+                terms
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join(","),
+                silence_verdict(&row_max, &grain_unit)
+            );
+        }
+        max_witness = max_witness.max(row_max);
+    }
+    budget.check_before_work("stall witness output completion")?;
+    println!(
+        "step0_epoch_stalls branch={branch} status={} stalled_entries={stalled_entries:?} count={} witnessed_rows={witnessed_rows:?} exact_max_feature_witness={max_witness} exact_witness_verdict={:?} norm_inf_Rdual_times_maxf_bound={witness_bound} norm_inf_silence_verdict={:?} width_times_max_entry_times_maxf_bound={width_bound} width_entry_silence_verdict={:?} unique_row_sample_witnesses_at_or_above_whole_grain={witnesses_over_grain} receiver_grain_q_R={grain_unit} native_half_quantum={native_half_quantum}; hypothetical_R_double_prime_only; no_live_deposit_refusal_claim",
+        if reasons.is_empty() {
+            "unconstrained-hypothetical"
+        } else {
+            "unconstrained-only-not-R12"
+        },
+        stalled_entries.len(),
+        silence_verdict(&max_witness, &grain_unit),
+        silence_verdict(&witness_bound, &grain_unit),
+        silence_verdict(&width_bound, &grain_unit),
+    );
+    Ok(())
 }
 
 /// Report exact sample statistics and the explicitly hypothetical unit-gain normal-law step.
@@ -983,6 +1836,138 @@ mod tests {
     }
 
     #[test]
+    fn partition_precision_and_epoch_clock_are_explicit_operands() {
+        assert!(
+            require_partition_precision(None)
+                .unwrap_err()
+                .to_string()
+                .contains("denominator is not an exponent")
+        );
+        assert_eq!(require_partition_precision(Some(32)).unwrap(), 32);
+        let context = PartitionContext {
+            receiver_exponent: 32,
+            cell_bound: 231,
+            epoch_index: 0,
+            phase_period: 11,
+        };
+        assert_eq!(partition_exponent_explicit(context).unwrap(), 41);
+        assert_eq!(
+            partition_exponent_explicit(PartitionContext {
+                epoch_index: 704_776,
+                ..context
+            })
+            .unwrap(),
+            81
+        );
+        assert!(
+            partition_exponent_explicit(PartitionContext {
+                cell_bound: 0,
+                ..context
+            })
+            .is_err()
+        );
+        assert!(
+            partition_exponent_explicit(PartitionContext {
+                epoch_index: u64::MAX,
+                ..context
+            })
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn partitioned_integer_series_keep_release_and_whole_phase_separate() {
+        let law = NormalLaw::with_prior(Matrix::zero(4, 2).unwrap());
+        let samples = [PartitionSample {
+            feature: vec![Rat::new(1.into(), 2.into()), -Rat::one()],
+            weights: vec![1.into(), 2.into()],
+            normalizer: 3.into(),
+            target: 0,
+            phase: vec![Rat::new(1.into(), 22.into()), Rat::zero()],
+        }];
+        let context = PartitionContext {
+            receiver_exponent: 0,
+            cell_bound: 1,
+            epoch_index: 0,
+            phase_period: 11,
+        };
+        let scale = Rat::from_integer(2.into());
+        let stats =
+            partitioned_statistics(&law, &samples, context, Some(&scale), || Ok(())).unwrap();
+        assert_eq!(stats.exponent, 1);
+        assert_eq!(stats.releases[0].quotient, vec![0.into(), 1.into()]);
+        assert_eq!(stats.releases[0].remainder, vec![2.into(), 1.into()]);
+        for class in 0..2 {
+            assert_eq!(
+                &samples[0].weights[class] << stats.exponent as usize,
+                &stats.releases[0].quotient[class] * &stats.releases[0].denominator
+                    + &stats.releases[0].remainder[class]
+            );
+            assert!(stats.releases[0].remainder[class] >= BigInt::zero());
+            assert!(stats.releases[0].remainder[class] < stats.releases[0].denominator);
+        }
+        assert_eq!(stats.gradient.get(0, 0).unwrap(), &Rat::one());
+        assert_eq!(
+            stats.gradient.get(0, 1).unwrap(),
+            &Rat::from_integer((-2).into())
+        );
+        assert_eq!(
+            stats.gradient.get(2, 0).unwrap(),
+            &Rat::new((-1).into(), 2.into())
+        );
+        assert_eq!(
+            stats.gradient.get(1, 0).unwrap(),
+            &Rat::new(1.into(), 44.into())
+        );
+        assert_eq!(
+            stats.phase.get(1, 0).unwrap(),
+            stats.gradient.get(1, 0).unwrap()
+        );
+        assert_eq!(stats.released_entry_bound, Rat::one());
+        // The release stays separate from the retained gradient.
+        assert_ne!(
+            stats.gradient.get(0, 0).unwrap(),
+            &Rat::new(2.into(), 3.into())
+        );
+        assert_eq!(
+            stats.gram_delta.get(0, 0).unwrap(),
+            &Rat::new(1.into(), 4.into())
+        );
+    }
+
+    #[test]
+    fn partition_rejects_foreign_features_phase_factors_and_expired_work() {
+        let law = NormalLaw::with_prior(Matrix::zero(4, 1).unwrap());
+        let context = PartitionContext {
+            receiver_exponent: 3,
+            cell_bound: 1,
+            epoch_index: 0,
+            phase_period: 11,
+        };
+        let phase_foreign = PartitionSample {
+            feature: vec![Rat::one()],
+            weights: vec![1.into(), 2.into()],
+            normalizer: 3.into(),
+            target: 0,
+            phase: vec![Rat::new(1.into(), 3.into()), Rat::zero()],
+        };
+        assert!(partitioned_statistics(&law, &[phase_foreign], context, None, || Ok(())).is_err());
+        let feature_foreign = PartitionSample {
+            feature: vec![Rat::new(1.into(), 3.into())],
+            weights: vec![1.into(), 2.into()],
+            normalizer: 3.into(),
+            target: 0,
+            phase: vec![Rat::zero(); 2],
+        };
+        assert!(
+            partitioned_statistics(&law, &[feature_foreign], context, None, || Ok(())).is_err()
+        );
+        let result =
+            partitioned_statistics(&law, &[], context, None, || Err("shared-cutoff".into()));
+        assert!(result.err().unwrap().to_string().contains("shared-cutoff"));
+    }
+
+    #[test]
     fn hypothetical_majorizer_projection_and_fall_are_exact() {
         let h = matrix(&[&[2, 0], &[0, 4]]);
         let g = matrix(&[&[3, -1], &[1, 2]]);
@@ -1012,6 +1997,60 @@ mod tests {
             exact_fall(&step, &g, &h).unwrap(),
             Rat::from_integer(2.into())
         );
+    }
+
+    #[test]
+    fn exact_schur_read_preserves_sylvester_condition_and_cutoff() {
+        for h in [
+            matrix(&[&[2, 1], &[1, 2]]),
+            matrix(&[&[1, 2], &[2, 1]]),
+            matrix(&[&[1, 1], &[1, 1]]),
+            matrix(&[&[2, 1], &[0, 2]]),
+            matrix(&[&[4, 1, 1], &[1, 3, 1], &[1, 1, 2]]),
+        ] {
+            assert_eq!(
+                positive_definite_with_check(&h, || Ok::<_, &str>(())).unwrap(),
+                is_positive_definite(&h)
+            );
+        }
+        let mut checks = 0;
+        let result = positive_definite_with_check(&matrix(&[&[2, 1], &[1, 2]]), || {
+            checks += 1;
+            if checks == 3 {
+                Err("shared-cutoff")
+            } else {
+                Ok(())
+            }
+        });
+        assert_eq!(result, Err("shared-cutoff"));
+    }
+
+    #[test]
+    fn zero_majorized_projection_can_stall_with_exact_whole_grain_witness() {
+        // The off-diagonal metric cancels on this row: the full normal direction is (1,-1),
+        // while the absolute-column majorizer returns (1/4,-1/4), below the native unit.
+        let h = matrix(&[&[2, 1], &[1, 2]]);
+        let g = matrix(&[&[1, -1]]);
+        let (_, majorizer) = column_majorizer(&h).unwrap();
+        let d = right_column_scale(&g, &majorizer).unwrap();
+        let q = project_toward_zero(&d, 0).unwrap();
+        assert_eq!(q, Matrix::zero(1, 2).unwrap());
+        let residual = matrix_subtract(&g, &matrix_product(&q, &h).unwrap()).unwrap();
+        let full = matrix_product(&g, &h.inverse().unwrap()).unwrap();
+        let dual = matrix_product(&residual, &h.inverse().unwrap()).unwrap();
+        assert_eq!(full, matrix(&[&[1, -1]]));
+        for j in 0..2 {
+            assert!(full.get(0, j).unwrap().abs() >= Rat::one());
+            assert!(d.get(0, j).unwrap().abs() < Rat::one());
+        }
+        let f = matrix(&[&[1], &[0]]);
+        let witness = matrix_product(&dual, &f).unwrap();
+        assert_eq!(witness, matrix(&[&[1]]));
+        assert_eq!(
+            silence_verdict(witness.get(0, 0).unwrap(), &Rat::one()),
+            SilenceVerdict::AtOrAboveWholeGrain
+        );
+        assert_eq!(max_row_sum(&dual), Rat::from_integer(2.into()));
     }
 
     #[test]
