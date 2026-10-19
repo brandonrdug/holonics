@@ -4,17 +4,17 @@
 //! (the forward face). The device port forms, once per publication (a deposit's successor, a
 //! collapse's descent), the dyadic words of every locus the word's kernels read
 //! ([`Loci::of`]), each at its locus's **active lattice**: ordinarily the field's declared
-//! deposit lattice, and the contemporary constitution lattice for a receiving map whose precision
-//! was explicitly re-based. This keeps the device word aligned with the material it publishes.
-//! Locus scales normally stay fixed across deposits; an explicit receiving-map precision event
-//! changes that map's scale and publication layout:
+//! deposit lattice, and the contemporary constitution lattice for a source or receiving map whose
+//! precision was explicitly re-based. Exact pair factors keep their own canonical dyadic scales;
+//! refining the source map does not inflate unchanged factors. This keeps the device word aligned
+//! with the material it publishes. An explicit map precision event changes its publication layout:
 //!
 //! | Locus | Words | Scale |
 //! |---|---|---|
 //! | ring `g`'s contrast port `W_c,g` | `2d_g × 2d_g` | `L_Element(g)` |
 //! | contact `a`'s storage `C_a = c cᵀ`, stiffness `K_a = b diag(σ) bᵀ` (`σ` its declared signature, all positive without a boost) | `k_a × k_a` each | `2 L_Channel(a)` |
 //! | source ring `g`'s port `E_g` | `2d_g × |A|` | `L_SourcePort(g)` |
-//! | its pair port `(e_ρ, a_ρ, b_ρ)` per offset | `m × 2d_g`, `m × |A|`, `m × |A|` | `L_SourcePort(g)` |
+//! | its pair port `(e_ρ, a_ρ, b_ρ)` per offset | `m × 2d_g`, `m × |A|`, `m × |A|` | each exact canonical exponent, at most `L_SourcePort(g)` |
 //! | receiving ring `R`'s map | `2|A| × 2d_R` | `L_ReceivingMap(R)` |
 //!
 //! The host keeps what only the host reads (the element `K_g`, `W_s,g`, the dissipation `D_a`, the
@@ -85,7 +85,7 @@ pub(crate) struct ContactLoci {
 }
 
 /// A source ring's pair port at one declared offset (in the field's order): its rank and its three
-/// families' placed words, all at the port's lattice.
+/// families' placed words, each at its exact dyadic scale within the port's active lattice.
 #[derive(Clone, Debug)]
 pub(crate) struct PairLoci {
     pub(crate) rank: usize,
@@ -348,7 +348,13 @@ impl Loci {
                     "a source transport below modulus one (the card's open reads one population)",
                 ));
             }
-            let sp = lattice(field, Locus::SourcePort(g))?;
+            let founding = lattice(field, Locus::SourcePort(g))?;
+            let sp = constitution.lattice(Locus::SourcePort(g))?.exponent();
+            if sp < founding {
+                return Err(refused(
+                    "a source publication cannot coarsen its founding lattice",
+                ));
+            }
             let port = constitution
                 .source_port(g)
                 .ok_or(HnnError::MissingSourcePort { ring: g })?;
@@ -365,21 +371,18 @@ impl Loci {
                 let what = "a pair port entry off its lattice or past the word";
                 let width = field.ring(g).width();
                 let alphabet = field.alphabet();
-                let outputs = words.place(DyadicMatrix::at(
-                    &vectors(pair.outputs(), width)?,
-                    sp,
-                    what,
-                )?);
-                let current = words.place(DyadicMatrix::at(
-                    &vectors(pair.current_reads(), alphabet)?,
-                    sp,
-                    what,
-                )?);
-                let earlier = words.place(DyadicMatrix::at(
-                    &vectors(pair.earlier_reads(), alphabet)?,
-                    sp,
-                    what,
-                )?);
+                let exact_factor = |matrix: ExactRatMatrix| -> Result<DyadicMatrix, HnnError> {
+                    let factor = DyadicMatrix::of(&matrix, what)?;
+                    if factor.exponent > sp {
+                        return Err(refused(
+                            "a source pair factor lies outside its active lattice",
+                        ));
+                    }
+                    Ok(factor)
+                };
+                let outputs = words.place(exact_factor(vectors(pair.outputs(), width)?)?);
+                let current = words.place(exact_factor(vectors(pair.current_reads(), alphabet)?)?);
+                let earlier = words.place(exact_factor(vectors(pair.earlier_reads(), alphabet)?)?);
                 pairs.push(PairLoci {
                     rank: pair.rank(),
                     outputs,
