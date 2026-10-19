@@ -4730,9 +4730,9 @@ impl Constitution {
         let lattice = field.word_lattice().copied();
         let transient = lattice.map(|lattice| lattice.transient());
         let limit = transient.as_ref().map_or(0, Lattice::exponent);
-        // The ring's grain: the lattice its resonator locus is founded on
-        // ([`Constitution::with_ring_resonator`]), at which its tube and its balls are read.
-        let grain = lattice_exponent(self.grain, base.width() as u128);
+        // The ring's grain: the lattice its resonator locus is founded on, at which its tube and its
+        // balls are read.
+        let grain = self.resonator_lattice(&base).exponent();
         let mut refusal = None;
         for k in 0..=limit {
             let amplitude = Rat::from_integer(BigInt::one() << k as usize);
@@ -5103,6 +5103,13 @@ impl Constitution {
         Ok(self)
     }
 
+    /// The lattice a resonator of this material is founded on: the lattice rule's at its realified
+    /// width ([`Constitution::with_ring_resonator`]). The locking pump's founding reads its balls at
+    /// this grain, so the founding and the mounted locus read one lattice.
+    fn resonator_lattice(&self, material: &ResonatorMaterial) -> Lattice {
+        Lattice::new(lattice_exponent(self.grain, material.width() as u128))
+    }
+
     /// **Declare a ring's resonator** (campaign 2, `hnn::ring`), certified at every pump phase at the
     /// field's hop on the ring's realified width.
     ///
@@ -5135,7 +5142,7 @@ impl Constitution {
             });
         }
         material.certify(ring, field.step())?;
-        let lattice = Lattice::new(lattice_exponent(self.grain, material.width() as u128));
+        let lattice = self.resonator_lattice(&material);
         self.rings[ring].resonator_scales = vec![Rat::one(); material.gain_count()];
         self.rings[ring].resonator = Some(material);
         self.rings[ring].resonator_step = Some(field.step().clone());

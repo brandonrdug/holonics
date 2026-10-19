@@ -114,8 +114,8 @@ before; its period's tube is owed (#62).
 - **The closure** (`TubeClosure`). The stepped passage must stay in the tube. The drive deviation
   at tick `τ` is bounded by the station gain at `τ + 1`, read with the readout `Y_R/Y_tube`;
   `W_t = σW_(t−1) + Σ_x η_x e_(x,t−1)` and the deviation `2d̂ max_t W_t²/γ_lo` must not exceed the
-  slack `(ρ̄ − ρ_c)²`. The receiving map and the standing are skipped. Where it fails, the largest
-  family share is halved until it holds.
+  slack `(ρ̄ − ρ_c)²`. The receiving map, which reads ring 2 and does not drive it, is skipped.
+  Where it fails, the largest family share is halved until it holds.
 - **The radius** climbs its dyadic ladder `ρ̄ = 2^(k + rung)` (`2^k` the least dyadic above `ρ_c`)
   while the certified decrease grows (`Constitution::certify_steps`). Declared and candidate step
   sources read rung 0 with the closure recorded, not enforced.
@@ -143,17 +143,19 @@ ring 2's displacement at the anchor the receiver reads, and `Z = R v_R`. At the 
 so `Z ≡ 0`; the test therefore first learns four cells through the observed deposit, once pumped
 and once with the pump removed before the pairing places its ports, and checks that the learned
 `R` is nonzero. It then runs four arrivals of `1/8` at the quarter-turn carriers, from rest, for
-192 ticks through the live word on that material.
+384 ticks through the live word on that material.
 
 [agent-inferred] Two faces are aligned where `⟨a, b⟩ > 0` and `2⟨a, b⟩² ≥ |a|²|b|²` (within an
 eighth of a turn), and four faces separate by sheet where faces of one sheet are pairwise aligned
 and faces of opposite sheets pairwise opposed (aligned after a half turn). The face is read at the
 station, the tick after the last lock event of the pumped arrivals. The rate `w` is not read: at a
-sheet it is at the lattice's noise.
+sheet it is at the lattice's noise. The run gives the station room (the design review of step 1a):
+the last lock event falls in the run's first half, and every arrival still lies in its sheet's ball
+at the run's last tick.
 
 Measured. With the pump the arrivals lock `[+1, +1, −1, −1]`, `(±1, 0)` at tick 167 and `(0, ±1)`
-at tick 190, so the station is tick 191, the run's last. The signed `cos²` of arrivals 1, 2 and 3
-against arrival 0 there, each an exact enclosure at `2⁻¹⁵`:
+at tick 190, so the station is tick 191, and no lock event follows in the run. The signed `cos²`
+of arrivals 1, 2 and 3 against arrival 0 there, each an exact enclosure at `2⁻¹⁵`:
 
 | | `v_R` | `Z` |
 |---|---|---|
@@ -162,12 +164,39 @@ against arrival 0 there, each an exact enclosure at `2⁻¹⁵`:
 
 The pumped face separates on both readings; the unpumped one on neither: its `v_R` quarter turns
 stay within `7/32` of orthogonal to arrival 0, and its `Z` half turn is not opposed. Pumped, the
-half turn (arrival 2) is opposed at every tick read. Unpumped it is opposed through tick 96 and not
-at the station (`v_R`: `−[3205/32768, 1603/16384]`); [inferred] the unlocked response has decayed toward the
-lattice's grain, where the ties-upward rounding is not odd. What the pump adds is that the quarter
-turns join a sheet: pumped, arrival 1's `v_R` reads `+[639/16384, 1279/32768]` at tick 12,
-`+[4893/8192, 19573/32768]` at tick 24 and `+[29855/32768, 933/1024]` at tick 48. The test asserts
-both faces, so the acceptance vanishes with the pump.
+half turn (arrival 2) is opposed at every tick read. What the pump adds is that the quarter turns
+join a sheet: pumped, arrival 1's `v_R` reads `+[639/16384, 1279/32768]` at tick 12,
+`+[4893/8192, 19573/32768]` at tick 24 and `+[29855/32768, 933/1024]` at tick 48.
+
+Over the whole run, the ticks at which each face separates:
+
+| | `v_R` | `Z` |
+|---|---|---|
+| pumped | 24–363, then 365, 368, 371, 374 | 3, 8–331, 333–343, 347–363, 367–370, 373–374, 377 |
+| pump removed | none | 11–12, 14, 30–32, 48, 96, 212, 256 |
+
+- Pumped, the face's largest entry (over the four arrivals) is `12585/16384` at tick 14,
+  `51/16384` at the station, `27/32768` at tick 256 and `1/8192` at tick 383, while the resonator
+  stays in its sheet's ball through the last tick. [inferred] The anchor reads the response the lock drives into ring 2's change while the
+  resonator approaches its sheet, and that response decays once the resonator sits there. At tick
+  383 the face is a few units of `2⁻¹⁵` and the verdict is rounding residue, so the design's read of
+  the pumped face at the run's last tick is not asserted.
+- With the pump removed the response is small from the start (largest entry `199/16384` at tick 4)
+  and reaches the grain by tick 96 (`3/32768`, and `1/8192` for arrival 2): the unpumped reads at
+  tick 96 and at the station are residue too. `v_R` separates at no tick of the run, and the test
+  asserts that at every tick. `Z = R v_R` separates at ticks 11–12, 14, 30–32 and 48,
+  where the response is resolved (largest entries from `7/8192` at tick 48 to `267/32768` at
+  tick 11), and at ticks 96, 212 and 256, where it is not. The learned `R` alone thus aligns the
+  unpumped quarter turns at isolated ticks, so the design's `Z` read at tick 96 is not asserted.
+  On `Z` the pump adds a sustained separation, from tick 8 to 331, against isolated ticks.
+
+The test asserts the pumped face at the station, the unpumped one at the station, and the unpumped
+`v_R` at every tick. The unpumped read at the station is residue, as phase 3 left it; the contrast
+that holds without residue is `v_R` at every tick, which vanishes with the pump. On `Z` the test
+asserts the sustained separation with no literal tick: the pumped `Z`'s run of consecutive
+separating ticks through the station is longer than every run over which the unpumped `Z`
+separates. Measured, that run is ticks 8 to 331 (324 ticks), and the unpumped `Z`'s longest run is
+ticks 30 to 32 (3 ticks).
 
 ## Owed to Lean (#62)
 

@@ -715,16 +715,19 @@ fn learned(pump: Pump, cells: usize) -> (Resident, Vec<DepositReading>) {
 
 /// The acceptance at the listener's face (the design review's item (c)). Four arrivals of `1/8` at
 /// the quarter-turn carriers, from rest, through the live word on the material the listener learned
-/// over four cells, its receiving map nonzero. With the pump, every arrival locks and at the station
-/// after the last lock event the receiving face (`v_R` and `Z = R v_R`) separates by sheet: the two
-/// arrivals of one sheet point to one side, a half turn reflects it. With the pump removed (strength
-/// zero, the saturation kept, learned over the same cells) nothing locks and the same station's face
-/// does not separate.
+/// over four cells, its receiving map nonzero, over a run of 384 ticks. With the pump, every arrival
+/// locks, the last lock event falls in the run's first half and every arrival still lies in its
+/// sheet's ball at the run's last tick; at the station after the last lock event the receiving face
+/// (`v_R` and `Z = R v_R`) separates by sheet: the two arrivals of one sheet point to one side, a
+/// half turn reflects it. With the pump removed (strength zero, the saturation kept, learned over
+/// the same cells) nothing locks, the station's face does not separate, and `v_R` separates at no
+/// tick of the run. The pumped `Z` separates over a run of consecutive ticks containing the station
+/// that is longer than every run over which the unpumped `Z` separates.
 #[test]
 fn the_receiving_face_separates_by_sheet_and_not_without_the_pump() {
     let z = rat(1, 8);
     let quarters = [(1, 0), (0, 1), (-1, 0), (0, -1)];
-    let ticks = 192;
+    let ticks = 384;
     let read = |unpumped: bool| -> (Vec<Face>, Option<LockedPair>, u32) {
         let (resident, _) = learned(
             if unpumped {
@@ -790,8 +793,11 @@ fn the_receiving_face_separates_by_sheet_and_not_without_the_pump() {
         sheets.push(sheet);
     }
     assert_eq!(sheets, vec![1, 1, -1, -1]);
+    assert!(
+        last_event < ticks / 2,
+        "the last pumped lock event (tick {last_event}) falls in the run's first half"
+    );
     let station = last_event + 1;
-    assert!(station < ticks, "the station follows the last lock event");
     let (bare, _, _) = read(true);
     for (name, faces) in [("pumped", &pumped), ("unpumped", &bare)] {
         for t in [12, 24, 48, 96, station, ticks - 1] {
@@ -804,28 +810,76 @@ fn the_receiving_face_separates_by_sheet_and_not_without_the_pump() {
             eprintln!("{name} t={t}: signed cos² to arrival 0: v_R={anchors:?} Z={logits:?}");
         }
     }
-    let at = |faces: &[Face], logits: bool| -> Vec<Vec<Rat>> {
+    let at = |faces: &[Face], logits: bool, t: usize| -> Vec<Vec<Rat>> {
         faces
             .iter()
             .map(|face| {
                 if logits {
-                    face.logits[station].clone()
+                    face.logits[t].clone()
                 } else {
-                    face.anchors[station].clone()
+                    face.anchors[t].clone()
                 }
             })
             .collect()
     };
+    // The ticks at which a face separates, as maximal runs of consecutive ticks.
+    let runs = |faces: &[Face], logits: bool| -> Vec<(usize, usize)> {
+        let mut runs: Vec<(usize, usize)> = Vec::new();
+        for t in (0..ticks)
+            .filter(|&t| separates(&at(faces, logits, t).iter().collect::<Vec<_>>(), &sheets))
+        {
+            match runs.last_mut() {
+                Some((_, end)) if *end + 1 == t => *end = t,
+                _ => runs.push((t, t)),
+            }
+        }
+        runs
+    };
+    for (name, faces) in [("pumped", &pumped), ("unpumped", &bare)] {
+        for logits in [false, true] {
+            eprintln!(
+                "{name} (logits: {logits}) separates at ticks {:?}",
+                runs(faces, logits)
+            );
+        }
+    }
+    // The pumped `Z` separates over one run of consecutive ticks containing the station, longer
+    // than any run over which the unpumped `Z` separates.
+    let held = runs(&pumped, true)
+        .into_iter()
+        .find(|&(start, end)| start <= station && station <= end)
+        .expect("the pumped Z separates over a run containing the station");
+    let isolated = runs(&bare, true)
+        .into_iter()
+        .max_by_key(|&(start, end)| end - start)
+        .map_or(0, |(start, end)| end - start + 1);
+    eprintln!(
+        "the pumped Z's run through the station: {held:?}; the unpumped Z's longest run: {isolated} ticks"
+    );
+    assert!(
+        held.1 - held.0 + 1 > isolated,
+        "the pumped Z's run through the station {held:?} is longer than every unpumped run ({isolated} ticks)"
+    );
     for logits in [false, true] {
-        let pumped_face = at(&pumped, logits);
-        let bare_face = at(&bare, logits);
         assert!(
-            separates(&pumped_face.iter().collect::<Vec<_>>(), &sheets),
+            separates(
+                &at(&pumped, logits, station).iter().collect::<Vec<_>>(),
+                &sheets
+            ),
             "with the pump the face (logits: {logits}) separates by sheet at tick {station}"
         );
         assert!(
-            !separates(&bare_face.iter().collect::<Vec<_>>(), &sheets),
+            !separates(
+                &at(&bare, logits, station).iter().collect::<Vec<_>>(),
+                &sheets
+            ),
             "without the pump the face (logits: {logits}) does not separate at tick {station}"
+        );
+    }
+    for t in 0..ticks {
+        assert!(
+            !separates(&at(&bare, false, t).iter().collect::<Vec<_>>(), &sheets),
+            "without the pump v_R does not separate at tick {t}"
         );
     }
 }
