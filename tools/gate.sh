@@ -23,4 +23,6 @@ run listener-continuation-controls cargo test -p holonics --example listener con
 run projected-statistics-controls cargo test -p holonics --lib projected_statistics_tests
 run native-class-advance-controls cargo test -p holonics --lib class_advance_tests
 run native-gram-carry-conservation cargo test -p holonics --lib gram_carry_conservation_tests
+run finite-solenoidal-controls cargo test -p holonics --lib solenoid
+run rational-place-controls cargo test -p holonics --lib ratio::places::tests::
 exit $status

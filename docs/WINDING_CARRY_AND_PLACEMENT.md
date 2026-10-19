@@ -312,3 +312,90 @@ Foster sum `flux_eq_tankSum` as a `contactForm` over a population of pair faces.
 
 Each Rust packet lands with the Lean statement of the law it adds under the matching
 `Framework` entry point, or names the obligation it leaves in #62.
+
+
+## 9. Finite solenoidal charts and their physical consumer
+
+[definition; implemented-exact] `geometry::solenoid::{FiniteSolenoidalTower,SolenoidalChart}`
+joins the existing `Tower`/`CompatibleSection` restriction law to the longitudinal carry.
+The caller declares positive moduli `N_i | N_(i+1)`, a normalized rational phase `s`, signed
+winding `w`, and compatible transverse residues `z_i`. The circle face is
+`theta_i=(s+z_i)/N_i`. Advance by `a` uses `c=floor(s+a)` and publishes
+`(s+a-c, w+c, z_i+c mod N_i)`. Restriction commutes with addition and advance; the current
+also keeps the longitudinal lift `w+s`. Equal finite faces do not erase different windings.
+A supplied finer continuation must restrict to the retained section; it is not guessed.
+Negative motion uses Euclidean floor rather than truncation. The finite chart contains no
+occurrence archive. Its Rust controls check these equations and genuine incompatible inputs;
+a Lean proof of this joined operator remains owed in #62.
+
+[proved-standard] The additive universal solenoid uses all positive moduli indexed by
+**divisibility**: for `m|n`, `[x]_(nZ)` maps to `[x]_(mZ)`. In unit-circle coordinates this is
+the degree-`n/m` covering. Its character group is the discrete additive group `Q`.
+A single prime-power chain instead has character group `Z[1/p]`; arbitrary unbounded moduli
+do not imply divisibility-cofinality. An actual inverse limit needs the unbounded compatible
+family and real-circle completion that this finite rational implementation does not supply
+([Burgos–Verjovsky, §2](https://arxiv.org/html/1603.05676v4)). The finite implementation is a
+chart with a retained longitudinal lift, not an implementation of the completed compact group.
+
+[proved-derived] The natural translation flow on that full additive solenoid has no nonzero
+return period: return at time `t` means `t in nZ` for every positive integer `n`; the level
+`n=1` makes `t` integral, and choosing `n>|t|` forces `t=0`. Thus `log(p)` is not a primitive
+closed-orbit period of this particular flow. Prime-power terms in an explicit formula require
+a different specified carrier/action, archimedean and pole terms, and convergence conditions.
+The noncommutative adele-class trace constructions are substantial existing mathematics;
+they are not supplied by an arbitrary finite rotor ([Connes](https://arxiv.org/abs/math/9811068),
+[Connes–Consani–Marcolli](https://arxiv.org/abs/math/0703392)).
+
+[interpretation] The surface counterpart is a lamination with leafwise Riemann-surface
+structure. For a chosen torsion-free cocompact Fuchsian group `Gamma`, the universal
+hyperbolic solenoid uses `(H x Gamma_hat)/Gamma` with the **full** profinite completion and
+its actual diagonal action. `SL(2,Z_hat)` describes a congruence completion, and the modular
+base has cusps; those are not automatically the closed-surface universal object
+([Šarić, §2](https://msp.org/pjm/2007/233-1/pjm-v233-n1-p09-s.pdf)). Identifying an HNN
+parametron with a branched sheet additionally owes the covering/branch map, holomorphic
+charts and compatible transition maps. LC coefficients alone do not construct them.
+
+[definition; implemented-exact] `physics::solenoidal::flow::SolenoidalWave` is an executing
+consumer. Its retained current is the finite chart plus the existing `WaveChain` state.
+The caller supplies turns per physical time. Each actual wave tick advances the chart by
+`rate*tick`, returns the existing exact energy balance, and publishes both successors only
+when both succeed. A source/chart refusal leaves both unchanged. The constructor checks the
+**strict** condition `tick^2 * courant_bound < 4`, rather than silently using the existing
+non-strict convenience predicate. Transverse restriction preserves the physical state and
+commutes with the actual dissipative wave tick. The wave law, storage, source power and heat
+remain owned by `physics::wave`; no LC mode certificate substitutes for its evolution.
+The exterior `solenoidal_wave` example runs these operators and reports every exact balance.
+
+[definition; implemented-exact] `physics::solenoidal::{ContactReading,LcMode,ReflectedPair}`
+consumes the existing contact, port and parametron owners. A contact return carries slip,
+its actual resistive bond, dissipated power, both kernels and definiteness on attainable
+slips. The bond's power is checked to be the negative dissipated power. Zero power is
+material silence; no-slip is checked separately. A declared rational reflected pair has
+power `(2*sigma-1)^2`; a positive Foster LC certificate requires `sigma=1/2` **and**
+`gamma!=0`, and yields `L=2/gamma^2`, `C=1/2`, `omega_squared=gamma^2`. The constructor
+accepts no assertion that these coordinates are zeros of a function. Existing Lean
+`ZeroPairLock`/`FosterTanks` prove the scoped algebra, not the location of actual zeros.
+The equal-angular reflection and the analytic `rho -> 1-rho` pairing need their conjugation
+symmetry map before they are identified.
+
+[conditional] Simultaneous primitive ring ticks close at their LCM; product is valid under
+pairwise coprimality. For `[7,11,33]` the LCM is `231`, whereas the product is `2541`;
+`11` divides `33`, so these periods are not pairwise coprime. An HNN's carried clock cascade
+must be read through its actual tick/carry law rather than ticking every ring once per cell.
+A mounted pump does not by itself certify attraction, stable lock or invariance across cuts:
+consume its executed monodromy/Floquet bound and nonlinear lock domain. Linear pump
+reflections and affine point half-turns are different representations. Fluid interpretation
+additionally owes its velocity/pressure/divergence, viscous/thermal balance and time advance;
+classical circulation is not universally quantized. The exact local joins above are
+subclaims used to build that bridge, not substitutes for these missing maps.
+
+[definition; implemented-exact] `ratio::places::PlaceReading::of` is the executable arithmetic
+place receiver from §7's `PlaceLedger`. It consumes the existing exact factorizer and returns
+the sign, ascending prime valuation series, exact factors `p^(-v_p(x))`, and `|x|`.
+Its constructor checks both signed reconstruction from the finite factors and the exact
+product-one identity before returning. Zero and raw zero denominators are typed refusals;
+valid raw ratios are normalized. Factoring cost remains operand-dependent trial division
+owned by `ratio::surprisal`, not a new constant-cost or probabilistic owner. The wave example
+reads its actual declared longitudinal step through this receiver; the arithmetic identity
+is reported separately from the wave's own physical energy balance. No physical conservation
+law is inferred from product-one.

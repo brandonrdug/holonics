@@ -17,6 +17,22 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 19: finite solenoidal charts consume the physical operators** (#62, #73–#75).
+`geometry::solenoid` joins the existing compatible tower with signed leaf carry and checked finite
+continuation. `physics::solenoidal` consumes contact power/kernels and the LC/sheet owners; its
+`SolenoidalWave` advances the actual `WaveChain` and declared longitudinal clock atomically, with
+the wave's exact energy balance and strict Courant condition. `ratio::places` consumes the existing
+factorizer for signed rational reconstruction and the product formula. The `solenoidal_wave`
+exterior example is their executing caller; these are mathematical/physical operators, not a
+learned-output demonstration. The first thirteen finite chart/contact/wave controls passed in
+28,498,562,971 ns including cold compilation. The extended place/port join is covered by the host
+gate's new focused controls; its receipt names the exact tested source. Full analytic realization,
+branch/gluing maps, physical fluid time/pressure/continuum joins, and any claimed persistent lock
+remain concrete proof/implementation obligations. The guide's [finite-chart contract](docs/WINDING_CARRY_AND_PLACEMENT.md#9-finite-solenoidal-charts-and-their-physical-consumer)
+keeps them separate from the returned finite operators. No learning or generalization result is
+inferred from these controls.
+
+
 **October 8–9 helical code** ([record](research/records/2026-10-08_THE_HELICAL_CODE_IS_HOW_HOLONS_HOLARCHIES_EPOCHS_AND_AEONS_ENCODE.md); #386).
 The helical code, the encoding every Holon carries, is defined in
 [the guide](docs/ELEMENTARY_OBJECTS.md#the-helical-code-how-holons-encode).
