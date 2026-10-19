@@ -17,7 +17,7 @@ use holonics::hnn::reference::{ClosedLocated, ExposedResident, Reference, Reside
 use holonics::hnn::{ExecutionPort, Faces, HnnError, SourceMoment};
 use holonics::ratio::Rat;
 use holonics::receiver::release::KeyStream;
-use num_bigint::BigUint;
+use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 use std::time::Instant;
 
@@ -675,6 +675,11 @@ enum Stop {
         source_operand_bound: u128,
     },
     Maximum,
+    EntropyRate {
+        drawn_cells: usize,
+        lower: Rat,
+        threshold: Rat,
+    },
 }
 impl Stop {
     fn fields(&self) -> String {
@@ -688,7 +693,48 @@ impl Stop {
                 "stop=horizon value=horizon population={population} source_operand_bound={source_operand_bound}"
             ),
             Self::Maximum => "stop=maximum value=maximum".to_owned(),
+            Self::EntropyRate {
+                drawn_cells,
+                lower,
+                threshold,
+            } => format!(
+                "stop=entropy_rate value=entropy_rate drawn_cells={drawn_cells} lower={lower} threshold={threshold}"
+            ),
         }
+    }
+}
+
+/// Release scale is learned only from targets already delivered on the same chart.
+#[derive(Default)]
+struct ReleaseHistory(std::collections::BTreeMap<sections::ChartKind, usize>);
+impl ReleaseHistory {
+    fn maximum(&self, chart: sections::ChartKind) -> usize {
+        self.0.get(&chart).copied().unwrap_or(0)
+    }
+    fn heard_target(&mut self, chart: sections::ChartKind, target_cells: usize) {
+        let maximum = self.0.entry(chart).or_default();
+        *maximum = (*maximum).max(target_cells);
+    }
+}
+
+fn entropy_rate_stop(lower: &Rat, drawn_cells: usize) -> Option<Stop> {
+    if drawn_cells == 0 {
+        return None;
+    }
+    let threshold = Rat::from_integer(BigInt::from(drawn_cells) * BigInt::from(5));
+    (lower >= &threshold).then(|| Stop::EntropyRate {
+        drawn_cells,
+        lower: lower.clone(),
+        threshold,
+    })
+}
+
+/// The completed drawn prefix: the framing end precedes its code-rate stop.
+fn completed_release_stop(classes: &[usize], lower: &Rat) -> Option<Stop> {
+    if sections::closes(classes) {
+        Some(Stop::EndLetter)
+    } else {
+        entropy_rate_stop(lower, classes.len())
     }
 }
 
@@ -721,10 +767,18 @@ fn release_fork(
     section: usize,
     emit: &mut dyn FnMut(String),
 ) -> Result<Released> {
+    if maximum == 0 {
+        return Ok(Released {
+            classes: Vec::new(),
+            stop: Stop::Maximum,
+            maximum,
+        });
+    }
     let mut fork = trunk.clone();
     let mut crib = trunk_crib.clone();
     let mut classes = Vec::new();
     let mut stop = Stop::Maximum;
+    let mut drawn_lower = Rat::zero();
     for index in 0..maximum {
         let boundary_before = pair_face_boundary(&fork)?;
         let started = Instant::now();
@@ -808,8 +862,9 @@ fn release_fork(
             break;
         }
         classes.push(class);
-        if sections::closes(&classes) {
-            stop = Stop::EndLetter;
+        drawn_lower += &code.lower;
+        if let Some(completed) = completed_release_stop(&classes, &drawn_lower) {
+            stop = completed;
             break;
         }
     }
@@ -827,19 +882,23 @@ fn section(
     pairing: &PairingDeclaration,
     input: &Section,
     index: usize,
-    longest: &mut usize,
+    longest: &mut ReleaseHistory,
     keys: &mut KeyStream,
     published_total: &mut usize,
     emit: &mut dyn FnMut(String),
 ) -> Result<Released> {
-    // Each source passage becomes a delivered passage before it can enlarge the release maximum.
-    // No answer cells or their length are read to choose this question's fork or maximum.
+    // A target belongs to its source chart. Reject ambiguous mixed/empty sources before
+    // delivering anything; no target bytes are used to guess a chart.
+    let chart_kind = input.chart_kind()?;
     for passage in &input.passages {
-        let source = Section {
-            passages: vec![passage.clone()],
-            target: Vec::new(),
-        }
-        .source_cells(index)?;
+        let chart = passage.encode_chart()?;
+        emit(format!(
+            "observed_chart section={index} kind={:?} chart_octets={} fibre={:?}",
+            chart.kind,
+            chart.octets.len(),
+            chart.fibre
+        ));
+        let source = chart.cells();
         deliver(
             port,
             resident,
@@ -851,9 +910,17 @@ fn section(
             published_total,
             emit,
         )?;
-        *longest = (*longest).max(source.len());
     }
-    let released = release_fork(port, resident, crib, pairing, *longest, keys, index, emit)?;
+    let released = release_fork(
+        port,
+        resident,
+        crib,
+        pairing,
+        longest.maximum(chart_kind),
+        keys,
+        index,
+        emit,
+    )?;
     emit(released.line(index));
     let answer = input.target_cells(index)?;
     deliver(
@@ -867,7 +934,7 @@ fn section(
         published_total,
         emit,
     )?;
-    *longest = (*longest).max(answer.len());
+    longest.heard_target(chart_kind, answer.len());
     Ok(released)
 }
 
@@ -918,7 +985,7 @@ pub fn run(port: &Reference, args: &[String]) -> Result<()> {
     let mut keys = KeyStream::new(read(keys)?, RELEASE_KEY_BYTES)?;
     let frames = sections_of(Some(&options.learn), options.count)?;
     println!("{}", header_line(&resident)?);
-    let mut longest = 0;
+    let mut longest = ReleaseHistory::default();
     let mut published_total = 0usize;
     for (index, input) in frames.iter().enumerate() {
         let started = Instant::now();
@@ -974,6 +1041,7 @@ mod tests {
     use super::*;
     use crate::octets::{Cost, ingest, options, take_route};
     use holonics::hnn::encoding::observed::PairedObservation;
+    use holonics::ratio::integer;
     use std::collections::BTreeSet;
     fn args(extra: &[&str]) -> Vec<String> {
         ["--learn", "unread.hlsn", "--keys", "unread.keys"]
@@ -1143,6 +1211,75 @@ mod tests {
         }
     }
     #[test]
+    fn release_history_uses_only_prior_targets_on_its_chart() {
+        let mut history = ReleaseHistory::default();
+        assert_eq!(history.maximum(sections::ChartKind::Octets), 0);
+        history.heard_target(sections::ChartKind::Octets, 6);
+        history.heard_target(sections::ChartKind::Octets, 4);
+        assert_eq!(history.maximum(sections::ChartKind::Octets), 6);
+        assert_eq!(history.maximum(sections::ChartKind::Raster), 0);
+        history.heard_target(sections::ChartKind::Raster, 2);
+        assert_eq!(history.maximum(sections::ChartKind::Raster), 2);
+        assert_eq!(history.maximum(sections::ChartKind::Pcm), 0);
+    }
+
+    #[test]
+    fn entropy_stop_uses_exact_lower_endpoint_at_first_drawn_cell() {
+        use holonics::ratio::rat;
+        assert!(entropy_rate_stop(&integer(100), 0).is_none());
+        assert!(entropy_rate_stop(&rat(49, 10), 1).is_none());
+        assert!(matches!(
+            entropy_rate_stop(&integer(5), 1),
+            Some(Stop::EntropyRate { drawn_cells: 1, .. })
+        ));
+        assert!(entropy_rate_stop(&rat(99, 10), 2).is_none());
+        assert!(entropy_rate_stop(&integer(10), 2).is_some());
+        assert!(entropy_rate_stop(&integer(2), 4).is_none());
+    }
+
+    #[test]
+    fn scored_uniform_face_stops_first_cell_and_confident_face_reaches_end() {
+        use holonics::hnn::receiving::cells::CellDecision;
+        use holonics::ratio::algebraic::ExactInterval;
+        use holonics::ratio::rat;
+        use holonics::receiver::release::ReleaseReturn;
+        // Scored-face fixtures exercise drawn_code and the same completed-prefix decision
+        // used by release_fork. They are not a native generated-release observation.
+        let face = |mass: Rat| CellDecision {
+            phase: 0,
+            release: ReleaseReturn::Hold,
+            classes: Vec::new(),
+            key: None,
+            bits: 0,
+            face: vec![ExactInterval::point(mass); CLASSES],
+        };
+        let uniform = drawn_code(&face(rat(1, 32)), 1).unwrap();
+        assert!(matches!(
+            completed_release_stop(&[1], &uniform.lower),
+            Some(Stop::EntropyRate { drawn_cells: 1, .. })
+        ));
+        let prefix = sections::closed_cells(b"A");
+        let mut lower = Rat::zero();
+        for end in 1..=prefix.len() {
+            let class = prefix[end - 1];
+            let mut confident_face = face(Rat::zero());
+            confident_face.face[class] = ExactInterval::point(Rat::one());
+            let confident = drawn_code(&confident_face, class).unwrap();
+            lower += &confident.lower;
+            let decision = completed_release_stop(&prefix[..end], &lower);
+            if end == prefix.len() {
+                assert!(matches!(decision, Some(Stop::EndLetter)));
+            } else {
+                assert!(decision.is_none());
+            }
+        }
+        assert!(matches!(
+            completed_release_stop(&sections::end_cells(), &integer(10)),
+            Some(Stop::EndLetter)
+        ));
+    }
+
+    #[test]
     fn explicit_population_and_routes_refuse_before_io() {
         assert!(parse(&args(&[])).is_err());
         assert_eq!(
@@ -1177,7 +1314,7 @@ mod tests {
         let (mut split, pairing) = mounted(&port, 65536).unwrap();
         let mut raw = split.clone();
         let (mut split_crib, mut raw_crib) = (ObservedCrib::new(0), ObservedCrib::new(0));
-        let mut longest = 0;
+        let mut longest = ReleaseHistory::default();
         let mut keys = keys();
         let inputs = [
             one(),
@@ -1247,8 +1384,10 @@ mod tests {
         let (opening, _) = mounted(&port, 65536).unwrap();
         let population = opening.field().capacity().n_star();
         let (mut trunk, pairing) = mounted(&port, population).unwrap();
-        fill(&port, &mut trunk, &pairing, population as usize - 1);
-        let crib = ObservedCrib::new(population as usize - 1);
+        // Exhaust the ingress horizon before the first release draw. A uniform first
+        // successful draw would now correctly stop at the entropy rate before a second.
+        fill(&port, &mut trunk, &pairing, population as usize);
+        let crib = ObservedCrib::new(population as usize);
         let before = format!("{trunk:?}");
         let mut lines = Vec::new();
         let released = release_fork(
@@ -1266,7 +1405,7 @@ mod tests {
             .field()
             .source_operand_bound(Locus::SourcePort(0))
             .unwrap();
-        assert_eq!(released.classes.len(), 1);
+        assert_eq!(released.classes.len(), 0);
         assert_eq!(
             released.stop,
             Stop::Horizon {
@@ -1296,7 +1435,7 @@ mod tests {
             &pairing,
             &one(),
             0,
-            &mut 0,
+            &mut ReleaseHistory::default(),
             &mut keys(),
             &mut 0,
             &mut |s| lines.push(s),
@@ -1392,7 +1531,7 @@ mod tests {
         let (mut trunk, pairing) = mounted(&port, 65536).unwrap();
         let mut crib = ObservedCrib::new(0);
         let mut lines = Vec::new();
-        let mut maximum = 0;
+        let mut maximum = ReleaseHistory::default();
         let released = section(
             &port,
             &mut trunk,
@@ -1406,7 +1545,24 @@ mod tests {
             &mut |s| lines.push(s),
         )
         .unwrap();
-        assert_eq!(released.maximum, 4);
+        assert_eq!(released.maximum, 0);
+        assert_eq!(maximum.maximum(sections::ChartKind::Octets), 4);
+        assert!(released.classes.is_empty());
+        assert!(!lines.iter().any(|line| line.starts_with("drawn ")));
+        let repeated = section(
+            &port,
+            &mut trunk,
+            &mut crib,
+            &pairing,
+            &one(),
+            1,
+            &mut maximum,
+            &mut keys(),
+            &mut 0,
+            &mut |s| lines.push(s),
+        )
+        .unwrap();
+        assert_eq!(repeated.maximum, 4);
         let fields = |line: &str| {
             line.split_whitespace()
                 .skip(1)
@@ -1482,6 +1638,8 @@ mod tests {
                     "published",
                     "receiving_exponent",
                 ]
+            } else if line.starts_with("observed_chart ") {
+                &["section", "kind", "chart_octets", "fibre"]
             } else if line.starts_with("keys ") {
                 &[
                     "section",
