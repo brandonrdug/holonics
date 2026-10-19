@@ -430,31 +430,61 @@ fn add_intervals(left: &mut Option<ExactInterval>, right: &ExactInterval) -> Res
     Ok(())
 }
 
+#[derive(Default)]
+struct HeldOutputStats {
+    record_bytes: usize,
+    evaluated_record_bytes: usize,
+    evaluated_records: usize,
+}
+
 fn held_readings_for_map(
     views: &[CutView],
     candidate_map: &Matrix,
     label: &str,
     branch: &str,
     total_samples: usize,
+    budget: &mut timing::ReportBudget,
+    held_eval_ns: &mut u128,
+    output_stats: &mut HeldOutputStats,
 ) -> Result<()> {
     let mut before_total = None;
     let mut after_total = None;
     let mut change_total = None;
     let mut evaluated = 0usize;
+    let mut unavailable = 0usize;
+    let mut processed_cells = 0usize;
+    let mut record_bytes = 0usize;
+    let mut evaluated_record_bytes = 0usize;
+    let mut cutoff_error = None;
     for (cell, view) in views.iter().enumerate() {
         let Some(frozen) = view.frozen.as_ref() else {
-            println!(
+            let record = format!(
                 "step0_epoch_held_reading branch={branch} cell={cell} candidate={label} status=unavailable reason=no-retained-frozen-comparison"
             );
+            record_bytes = record_bytes.saturating_add(record.len());
+            println!("{record}");
+            unavailable += 1;
+            processed_cells += 1;
             continue;
         };
-        let wave = held_candidate_wave(frozen, &view.producing_map, candidate_map, &view.samples)?;
-        let reading = frozen.evaluate(&wave)?;
+        let work_label = format!("held comparison {label} cell {cell}");
+        budget.check_before_work(&work_label)?;
+        let started = Instant::now();
+        let evaluation_result = (|| {
+            let wave =
+                held_candidate_wave(frozen, &view.producing_map, candidate_map, &view.samples)?;
+            frozen.evaluate(&wave).map_err(Into::into)
+        })();
+        let elapsed_ns = started.elapsed().as_nanos();
+        budget.record_work(timing::ReportWorkKind::HeldEval, elapsed_ns);
+        *held_eval_ns = held_eval_ns.saturating_add(elapsed_ns);
+        let reading = evaluation_result?;
         add_intervals(&mut before_total, &reading.before)?;
         add_intervals(&mut after_total, &reading.after)?;
         add_intervals(&mut change_total, &reading.objective_change)?;
         evaluated += 1;
-        println!(
+        processed_cells += 1;
+        let record = format!(
             "step0_epoch_held_reading branch={branch} cell={cell} candidate={label} before={:?} after={:?} objective_change={:?} unchanged={} strict_improvement={} needs_precision={} reason={}",
             reading.before,
             reading.after,
@@ -464,11 +494,69 @@ fn held_readings_for_map(
             reading.needs_precision(),
             reading.unresolved_reason()
         );
+        record_bytes = record_bytes.saturating_add(record.len());
+        evaluated_record_bytes = evaluated_record_bytes.saturating_add(record.len());
+        println!("{record}");
+        if budget.remaining_ns()? == 0 {
+            cutoff_error = Some(format!(
+                "branch {branch} crossed the shared report cutoff after retaining {work_label}"
+            ));
+            break;
+        }
     }
     println!(
         "step0_epoch_held_objective_total branch={branch} candidate={label} evaluated_cells={evaluated} epoch_samples={total_samples} before={before_total:?} after={after_total:?} objective_change={change_total:?} metric=exact-sum-of-per-cell-frozen-comparison-intervals"
     );
+    output_stats.record_bytes = output_stats.record_bytes.saturating_add(record_bytes);
+    output_stats.evaluated_record_bytes = output_stats
+        .evaluated_record_bytes
+        .saturating_add(evaluated_record_bytes);
+    output_stats.evaluated_records = output_stats.evaluated_records.saturating_add(evaluated);
+    println!(
+        "step0_epoch_held_output_bytes branch={branch} candidate={label} held_reading_record_bytes={record_bytes} held_reading_bytes_per_evaluated_cell={evaluated_record_bytes}/{evaluated} unavailable_records={unavailable} unprocessed_cells={} excludes_newlines_and_all_other_report_output=true",
+        views.len().saturating_sub(processed_cells),
+    );
+    if let Some(error) = cutoff_error {
+        return Err(error.into());
+    }
     Ok(())
+}
+
+fn finish_report_budget(
+    branch: &str,
+    budget: &mut timing::ReportBudget,
+    report_started: Instant,
+    held_eval_ns: u128,
+    inverse_ns: u128,
+    output_stats: &HeldOutputStats,
+) -> Option<String> {
+    let total_ns = report_started.elapsed().as_nanos();
+    let other_ns = total_ns.saturating_sub(held_eval_ns.saturating_add(inverse_ns));
+    budget.record_work(timing::ReportWorkKind::Other, other_ns);
+    let deadline_error = budget.check_before_work("epoch report completion").err();
+    let summary = budget.finish();
+    println!(
+        "step0_epoch_report_projection branch={} held_eval_count={} held_eval_total_ns={} held_eval_max_ns={} gram_inverse_count={} gram_inverse_total_ns={} gram_inverse_max_ns={} other_count={} other_total_ns={} other_max_ns={} report_elapsed_ns={} projected_231_ns={:?} remaining_report_ns={} held_reading_record_bytes={} held_reading_bytes_per_evaluated_cell={}/{} excludes_newlines_and_all_other_report_output=true",
+        summary.branch,
+        summary.held_eval.count,
+        summary.held_eval.total_ns,
+        summary.held_eval.max_ns,
+        summary.gram_inverse.count,
+        summary.gram_inverse.total_ns,
+        summary.gram_inverse.max_ns,
+        summary.other.count,
+        summary.other.total_ns,
+        summary.other.max_ns,
+        summary.elapsed_ns,
+        summary.projected_231_ns,
+        summary.remaining_report_ns,
+        output_stats.record_bytes,
+        output_stats.evaluated_record_bytes,
+        output_stats.evaluated_records,
+    );
+    deadline_error.map(|error| {
+        format!("branch {branch} completed its report readouts at the shared cutoff: {error}")
+    })
 }
 
 /// Report exact sample statistics and the explicitly hypothetical unit-gain normal-law step.
@@ -480,10 +568,16 @@ pub(super) fn report_epoch(
     end: &CutView,
     views: &[CutView],
     receiver_grain: u64,
+    budget: &mut timing::ReportBudget,
 ) -> Result<()> {
     if receiver_grain == 0 {
         return Err("receiver grain denominator must be positive".into());
     }
+    budget.check_before_work("epoch report")?;
+    let report_started = Instant::now();
+    let mut held_eval_ns = 0u128;
+    let mut inverse_ns = 0u128;
+    let mut held_output_stats = HeldOutputStats::default();
     let (gradient, sample_gram_delta, exact_metric_scale) =
         super::epoch_statistics_with_scale(crossing, views)?;
     let native_lw_cross = crossing.native_lattice_exponent;
@@ -612,8 +706,36 @@ pub(super) fn report_epoch(
                 "step0_epoch_candidate branch={branch} status=unavailable reason={error}; zero-or-invalid-column-majorizer"
             );
             let sample_count = views.iter().map(|view| view.samples.len()).sum();
-            held_readings_for_map(views, &crossing.map, "W_cross", branch, sample_count)?;
-            held_readings_for_map(views, &end.map, "W_end", branch, sample_count)?;
+            held_readings_for_map(
+                views,
+                &crossing.map,
+                "W_cross",
+                branch,
+                sample_count,
+                budget,
+                &mut held_eval_ns,
+                &mut held_output_stats,
+            )?;
+            held_readings_for_map(
+                views,
+                &end.map,
+                "W_end",
+                branch,
+                sample_count,
+                budget,
+                &mut held_eval_ns,
+                &mut held_output_stats,
+            )?;
+            if let Some(error) = finish_report_budget(
+                branch,
+                budget,
+                report_started,
+                held_eval_ns,
+                inverse_ns,
+                &held_output_stats,
+            ) {
+                deferred_failures.push(error);
+            }
             return finish_deferred_failures(deferred_failures);
         }
     };
@@ -629,15 +751,54 @@ pub(super) fn report_epoch(
     )?;
     let fall = exact_fall(&step, &residual_prime, &end.gram)?;
     let end_lattice_fall = exact_fall(&end_lattice_step, &residual_prime, &end.gram)?;
-    let inverse = match end.gram.inverse() {
+    budget.check_before_work("end Gram inverse")?;
+    let inverse_started = Instant::now();
+    let inverse_result = end.gram.inverse();
+    inverse_ns = inverse_started.elapsed().as_nanos();
+    budget.record_work(timing::ReportWorkKind::GramInverse, inverse_ns);
+    if budget.remaining_ns()? == 0 {
+        return Err(format!(
+            "branch {branch} crossed the shared report cutoff while computing the end Gram inverse"
+        )
+        .into());
+    }
+    let inverse = match inverse_result {
         Ok(inverse) => inverse,
         Err(error) => {
             println!(
                 "step0_epoch_stalls branch={branch} status=unavailable reason=singular-H_end error={error}"
             );
             let sample_count = views.iter().map(|view| view.samples.len()).sum();
-            held_readings_for_map(views, &crossing.map, "W_cross", branch, sample_count)?;
-            held_readings_for_map(views, &end.map, "W_end", branch, sample_count)?;
+            held_readings_for_map(
+                views,
+                &crossing.map,
+                "W_cross",
+                branch,
+                sample_count,
+                budget,
+                &mut held_eval_ns,
+                &mut held_output_stats,
+            )?;
+            held_readings_for_map(
+                views,
+                &end.map,
+                "W_end",
+                branch,
+                sample_count,
+                budget,
+                &mut held_eval_ns,
+                &mut held_output_stats,
+            )?;
+            if let Some(error) = finish_report_budget(
+                branch,
+                budget,
+                report_started,
+                held_eval_ns,
+                inverse_ns,
+                &held_output_stats,
+            ) {
+                deferred_failures.push(error);
+            }
             return finish_deferred_failures(deferred_failures);
         }
     };
@@ -751,17 +912,48 @@ pub(super) fn report_epoch(
     );
 
     let sample_count = views.iter().map(|view| view.samples.len()).sum();
-    held_readings_for_map(views, &crossing.map, "W_cross", branch, sample_count)?;
-    held_readings_for_map(views, &end.map, "W_end", branch, sample_count)?;
+    held_readings_for_map(
+        views,
+        &crossing.map,
+        "W_cross",
+        branch,
+        sample_count,
+        budget,
+        &mut held_eval_ns,
+        &mut held_output_stats,
+    )?;
+    held_readings_for_map(
+        views,
+        &end.map,
+        "W_end",
+        branch,
+        sample_count,
+        budget,
+        &mut held_eval_ns,
+        &mut held_output_stats,
+    )?;
     held_readings_for_map(
         views,
         &optimum,
         "W_star_unconstrained",
         branch,
         sample_count,
+        budget,
+        &mut held_eval_ns,
+        &mut held_output_stats,
     )?;
     if let Some(error) = fall_error {
         deferred_failures.push(error.to_string());
+    }
+    if let Some(error) = finish_report_budget(
+        branch,
+        budget,
+        report_started,
+        held_eval_ns,
+        inverse_ns,
+        &held_output_stats,
+    ) {
+        deferred_failures.push(error);
     }
     finish_deferred_failures(deferred_failures)
 }

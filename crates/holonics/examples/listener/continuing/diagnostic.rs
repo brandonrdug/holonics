@@ -3,6 +3,8 @@
 
 #[path = "diagnostic/epoch.rs"]
 mod epoch;
+#[path = "diagnostic/execution.rs"]
+mod execution;
 #[path = "diagnostic/timing.rs"]
 mod timing;
 
@@ -58,6 +60,7 @@ struct CutView {
     physical: Option<EndChange>,
     contact_j: Vec<ExactRatMatrix>,
     samples: Vec<Sample>,
+    capture_record_bytes: usize,
     /// Actual released entries for this receiving Gram carrier from the native deposit receipt.
     gram_release: Vec<(usize, Rat)>,
     receiving_prior: Option<u32>,
@@ -91,6 +94,7 @@ fn cut_view(material: &Constitution, samples: &[Sample]) -> Result<CutView> {
         physical: None,
         contact_j: Vec::new(),
         samples: samples.to_vec(),
+        capture_record_bytes: 0,
         gram_release: Vec::new(),
         receiving_prior: law.receiving_prior(),
         prior_scale: law.prior_scale(),
@@ -318,10 +322,15 @@ fn observe_branch(
             view.receiving_prior,
             view.prior_scale,
         );
+        let capture_record =
+            format!("step0_capture_data branch={branch} index={index} class={class} {captured}");
+        // Count the exact UTF-8 payload printed below, excluding the line terminator.
+        view.capture_record_bytes = capture_record.len();
+        let capture_record_bytes = view.capture_record_bytes;
         let serialization_ns = serialization_started.elapsed().as_nanos();
-        println!("step0_capture_data branch={branch} index={index} class={class} {captured}");
+        println!("{capture_record}");
         println!(
-            "step0_capture_serialization branch={branch} index={index} serialization_ns={serialization_ns} (formatting only; stdout I/O excluded)"
+            "step0_capture_serialization branch={branch} index={index} record_bytes={capture_record_bytes} serialization_ns={serialization_ns} (UTF-8 payload excludes newline; formatting only; stdout I/O excluded)"
         );
         views.push(view);
         let overhead_elapsed = cell_started
@@ -438,14 +447,6 @@ fn matrix_delta(after: &ExactRatMatrix, before: &ExactRatMatrix) -> Result<Exact
 
 fn from_worker<T>(result: std::result::Result<T, String>) -> Result<T> {
     result.map_err(|message| std::io::Error::other(message).into())
-}
-
-fn record_epoch_report_result(branch: &str, report: Result<()>, failures: &mut Vec<String>) {
-    if let Err(error) = report {
-        let message = format!("branch={branch} {error}");
-        println!("step0_epoch_report_deferred_failure {message}");
-        failures.push(message);
-    }
 }
 
 fn source_interventions(field: &Field, classes: &[usize]) -> Result<Vec<(String, usize, u64)>> {
@@ -716,6 +717,11 @@ pub(super) fn run(
     } else {
         options.diagnostic_report_reserve_ns.unwrap_or(0)
     };
+    if full_run && reserve_ns < 5_000_000_000 {
+        return Err(
+            "full diagnostic report reserve must be at least the fixed five-second floor".into(),
+        );
+    }
     let budget = timing::RunBudget::new(reserve_ns)?;
     let checkpoint_target =
         checkpoint_path.map(|path| format!("{}/step-000312.state", path.trim_end_matches('/')));
@@ -835,30 +841,39 @@ pub(super) fn run(
         let mut capture = resident.clone();
         let mut capture_crib = crib.clone();
         let abort = AtomicBool::new(false);
+        let calibration_pool = execution::one_thread_pool()?;
         let plain_started = Instant::now();
-        let (_, _, plain_times) = observe_plain_branch(
-            port,
-            &mut plain,
-            &mut plain_crib,
-            &pairing,
-            classes,
-            "profile_plain",
-            &budget,
-            &abort,
-        )?;
+        let plain_result = calibration_pool.install(|| {
+            observe_plain_branch(
+                port,
+                &mut plain,
+                &mut plain_crib,
+                &pairing,
+                classes,
+                "profile_plain",
+                &budget,
+                &abort,
+            )
+            .map_err(|error| error.to_string())
+        });
+        let (_, _, plain_times) = from_worker(plain_result)?;
         let plain_elapsed = plain_started.elapsed();
         let capture_started = Instant::now();
-        let (views, _, _, capture_times) = observe_branch(
-            port,
-            &mut capture,
-            &mut capture_crib,
-            &pairing,
-            classes,
-            "profile_capture",
-            &crossing.map,
-            &budget,
-            &abort,
-        )?;
+        let capture_result = calibration_pool.install(|| {
+            observe_branch(
+                port,
+                &mut capture,
+                &mut capture_crib,
+                &pairing,
+                classes,
+                "profile_capture",
+                &crossing.map,
+                &budget,
+                &abort,
+            )
+            .map_err(|error| error.to_string())
+        });
+        let (views, _, _, capture_times) = from_worker(capture_result)?;
         let capture_elapsed = capture_started.elapsed();
         if plain.continuing_state(resident.field().sources()[0])?
             != capture.continuing_state(resident.field().sources()[0])?
@@ -907,33 +922,43 @@ pub(super) fn run(
     let calibration_classes = &base_classes[..64];
     let mut calibration_plain = resident.clone();
     let mut calibration_plain_crib = crib.clone();
+    let calibration_pool = execution::one_thread_pool()?;
     let plain_started = Instant::now();
     let calibration_abort = AtomicBool::new(false);
-    let (_plain_faces, _plain_lifts, plain_cell_ns) = observe_plain_branch(
-        port,
-        &mut calibration_plain,
-        &mut calibration_plain_crib,
-        &pairing,
-        calibration_classes,
-        "calibration_plain",
-        &budget,
-        &calibration_abort,
-    )?;
+    let plain_calibration_result = calibration_pool.install(|| {
+        observe_plain_branch(
+            port,
+            &mut calibration_plain,
+            &mut calibration_plain_crib,
+            &pairing,
+            calibration_classes,
+            "calibration_plain",
+            &budget,
+            &calibration_abort,
+        )
+        .map_err(|error| error.to_string())
+    });
+    let (_plain_faces, _plain_lifts, plain_cell_ns) = from_worker(plain_calibration_result)?;
     let plain_elapsed = plain_started.elapsed();
     let mut calibration_capture = resident.clone();
     let mut calibration_capture_crib = crib.clone();
     let capture_started = Instant::now();
-    let (capture_views, _capture_faces, _capture_lifts, capture_cell_ns) = observe_branch(
-        port,
-        &mut calibration_capture,
-        &mut calibration_capture_crib,
-        &pairing,
-        calibration_classes,
-        "calibration_capture",
-        &crossing.map,
-        &budget,
-        &calibration_abort,
-    )?;
+    let capture_calibration_result = calibration_pool.install(|| {
+        observe_branch(
+            port,
+            &mut calibration_capture,
+            &mut calibration_capture_crib,
+            &pairing,
+            calibration_classes,
+            "calibration_capture",
+            &crossing.map,
+            &budget,
+            &calibration_abort,
+        )
+        .map_err(|error| error.to_string())
+    });
+    let (capture_views, _capture_faces, _capture_lifts, capture_cell_ns) =
+        from_worker(capture_calibration_result)?;
     let capture_elapsed = capture_started.elapsed();
     let plain_state = calibration_plain.continuing_state(resident.field().sources()[0])?;
     let capture_state = calibration_capture.continuing_state(resident.field().sources()[0])?;
@@ -945,6 +970,10 @@ pub(super) fn run(
     let captured_samples = capture_views
         .iter()
         .map(|view| view.samples.len())
+        .sum::<usize>();
+    let capture_record_bytes = capture_views
+        .iter()
+        .map(|view| view.capture_record_bytes)
         .sum::<usize>();
     let max_observed_calibration_cell_ns = plain_cell_ns
         .iter()
@@ -960,11 +989,43 @@ pub(super) fn run(
     let _ = epoch_statistics(&crossing, &capture_views)?;
     let exact_statistics_postwork = postwork_started.elapsed();
     println!(
-        "step0_calibration cells_per_control=64 no_capture_elapsed_ms={} with_actual_capture_elapsed_ms={} captured_samples={captured_samples} plain_samples=0 max_observed_cell_ns={max_observed_calibration_cell_ns} completed_block_upper_ns_per_cell={completed_block_upper:?} exact_statistics_computed=true physical_state_equal=true crib_equal=true exact_statistics_postwork_ms={}",
+        "step0_calibration cells_per_control=64 no_capture_elapsed_ms={} with_actual_capture_elapsed_ms={} captured_samples={captured_samples} plain_samples=0 capture_record_bytes_total={capture_record_bytes} capture_record_bytes_per_cell={}/{} max_observed_cell_ns={max_observed_calibration_cell_ns} completed_block_upper_ns_per_cell={completed_block_upper:?} exact_statistics_computed=true physical_state_equal=true crib_equal=true exact_statistics_postwork_ms={} total_report_output_bytes_per_cell=unavailable; held_reading_record_bytes_per_evaluated_cell=emitted_by_calibration_epoch_report",
         plain_elapsed.as_millis(),
         capture_elapsed.as_millis(),
+        capture_record_bytes,
+        capture_views.len(),
         exact_statistics_postwork.as_millis()
     );
+    let calibration_end = cut_view(calibration_capture.constitution(), &[])?;
+    let mut calibration_report_budget =
+        timing::ReportBudget::new(&budget, "calibration_capture", capture_views.len());
+    let calibration_report_result = calibration_pool.install(|| {
+        epoch::report_epoch(
+            "calibration_capture",
+            &crossing,
+            &calibration_end,
+            &capture_views,
+            resident
+                .admitted()
+                .first()
+                .ok_or("no admitted receiving source")?
+                .grain(),
+            &mut calibration_report_budget,
+        )
+        .map_err(|error| error.to_string())
+    });
+    let calibration_report = calibration_report_budget.finish();
+    println!(
+        "step0_calibration_report branch={} held_eval={:?} gram_inverse={:?} other={:?} elapsed_ns={} projected_231_ns={:?} remaining_report_ns={}",
+        calibration_report.branch,
+        calibration_report.held_eval,
+        calibration_report.gram_inverse,
+        calibration_report.other,
+        calibration_report.elapsed_ns,
+        calibration_report.projected_231_ns,
+        calibration_report.remaining_report_ns
+    );
+    calibration_report_result.map_err(std::io::Error::other)?;
     if options.diagnostic_calibration_only {
         println!(
             "step0_calibration_only exact_cells=440 (312 trunk + 64 plain + 64 actual capture); no checkpoint or fork written"
@@ -986,13 +1047,26 @@ pub(super) fn run(
         return Err("calibration produced no completed eight-cell timing block; refusing a branch projection".into());
     };
     let branch_projection = block_upper_ns_per_cell.saturating_mul(231);
-    let projection = branch_projection.saturating_mul(branch_waves as u128);
-    let remaining_ns = budget.remaining_ns()?;
+    let report_projection = calibration_report.projected_231_ns.ok_or(
+        "calibration report lacks completed held-evaluation, inverse, or other-work timing",
+    )?;
+    let projection =
+        timing::fork_and_report_projection(branch_projection, report_projection, branch_waves);
+    let remaining_native_reserve_ns = budget.remaining_ns()?;
+    let remaining_cutoff_ns = budget.remaining_report_ns()?;
+    let remaining_ns = remaining_native_reserve_ns.min(remaining_cutoff_ns);
     println!(
-        "step0_projection completed_block_upper_ns_per_cell={block_upper_ns_per_cell} branch_workers={branch_workers} declared_cpu_workers=3 conservative_waves={branch_waves} one_branch_projection_ns={branch_projection} parallel_branch_horizon_projection_ns={projection} branch_cap_ns=180000000000 remaining_global_ns={remaining_ns} forecast_only=true"
+        "step0_projection completed_block_upper_ns_per_cell={block_upper_ns_per_cell} branch_workers={branch_workers} declared_cpu_workers=3 conservative_waves={branch_waves} one_branch_native_projection_ns={branch_projection} one_branch_report_projection_ns={report_projection} one_branch_combined_projection_ns={} concurrent_fork_and_report_horizon_ns={projection} branch_cap_ns=180000000000 remaining_after_explicit_reserve_ns={remaining_native_reserve_ns} shared_285s_phase_cutoff_remaining_ns={remaining_cutoff_ns} admission_remaining_ns={remaining_ns} explicit_report_reserve_ns={reserve_ns} report_reserve_floor_ns=5000000000 forecast_only=true",
+        branch_projection.saturating_add(report_projection)
     );
-    if branch_projection > 180_000_000_000 || projection > remaining_ns {
-        return Err("measured branch projection exceeds the 180-second branch cap or remaining fixed run budget; aborting before fork".into());
+    if !timing::projection_fits(
+        branch_projection,
+        report_projection,
+        branch_waves,
+        remaining_ns,
+        180_000_000_000,
+    ) {
+        return Err("measured native-plus-report projection exceeds the 180-second branch cap or remaining shared phase budget; aborting before checkpoint/fork".into());
     }
     let checkpoint_path =
         checkpoint_path.ok_or("full diagnostic requires checkpoint destination")?;
@@ -1146,34 +1220,60 @@ pub(super) fn run(
         "step0_contact_metadata pre_call_whole_windings_bounds_hnn_lock_address_and_geometry_J contacts={contacts:?} contact_carry_only_0_1_1_2_product={path_product:?} phase_class_factor=omitted causal_receiver_gain_claim=none; carry-only product is not an end-to-end input-to-face bound"
     );
     let branch_abort = AtomicBool::new(false);
+    let a_pool = execution::one_thread_pool()?;
+    let a0_pool = execution::one_thread_pool()?;
+    let b_pools = (0..b_branches.len())
+        .map(|_| execution::one_thread_pool())
+        .collect::<Result<Vec<_>>>()?;
+    println!(
+        "step0_execution_realization branch_count={} branch_pools={} workers_per_pool=1 total_branch_pool_workers={} calibration_pool_workers=1 calling_branch_threads={} max_concurrent_branch_executors=3 declared_cpu_workers=3; pools are distinct and one-thread; OS affinity remains the supervisor's responsibility",
+        2 + b_pools.len(),
+        2 + b_pools.len(),
+        2 + b_pools.len(),
+        2 + b_pools.len()
+    );
     let (a_result, a0_result, b_results) = std::thread::scope(|scope| {
+        let a_pool = &a_pool;
         let a_worker = scope.spawn(|| {
             guarded_worker(&branch_abort, || {
-                observe_branch(
-                    port,
-                    &mut a,
-                    &mut a_crib,
-                    &pairing,
-                    &base_classes,
-                    "A",
-                    &crossing.map,
-                    &budget,
-                    &branch_abort,
-                )
+                let result = a_pool
+                    .install(|| {
+                        observe_branch(
+                            port,
+                            &mut a,
+                            &mut a_crib,
+                            &pairing,
+                            &base_classes,
+                            "A",
+                            &crossing.map,
+                            &budget,
+                            &branch_abort,
+                        )
+                        .map_err(|error| error.to_string())
+                    })
+                    .map_err(std::io::Error::other)?;
+                Ok(result)
             })
         });
+        let a0_pool = &a0_pool;
         let a0_worker = scope.spawn(|| {
             guarded_worker(&branch_abort, || {
-                observe_plain_branch(
-                    port,
-                    &mut a0,
-                    &mut a0_crib,
-                    &pairing,
-                    &base_classes,
-                    "A0",
-                    &budget,
-                    &branch_abort,
-                )
+                let result = a0_pool
+                    .install(|| {
+                        observe_plain_branch(
+                            port,
+                            &mut a0,
+                            &mut a0_crib,
+                            &pairing,
+                            &base_classes,
+                            "A0",
+                            &budget,
+                            &branch_abort,
+                        )
+                        .map_err(|error| error.to_string())
+                    })
+                    .map_err(std::io::Error::other)?;
+                Ok(result)
             })
         });
         let branch_abort_ref = &branch_abort;
@@ -1183,31 +1283,42 @@ pub(super) fn run(
         let port_ref = port;
         let b_workers: Vec<_> = b_branches
             .iter_mut()
-            .map(|(name, _, _, classes, branch_resident, branch_crib)| {
-                let name = name.clone();
-                let worker_name = name.clone();
-                let branch_abort = branch_abort_ref;
-                let pairing = pairing_ref;
-                let crossing_map = crossing_map_ref;
-                let budget = budget_ref;
-                let port = port_ref;
-                let handle = scope.spawn(move || {
-                    guarded_worker(branch_abort, || {
-                        observe_branch(
-                            port,
-                            branch_resident,
-                            branch_crib,
-                            pairing,
-                            classes,
-                            &worker_name,
-                            crossing_map,
-                            budget,
-                            branch_abort,
-                        )
-                    })
-                });
-                (name, handle)
-            })
+            .zip(&b_pools)
+            .take(1)
+            .map(
+                |((name, _, _, classes, branch_resident, branch_crib), pool)| {
+                    let name = name.clone();
+                    let worker_name = name.clone();
+                    let branch_abort = branch_abort_ref;
+                    let pairing = pairing_ref;
+                    let crossing_map = crossing_map_ref;
+                    let budget = budget_ref;
+                    let port = port_ref;
+                    let pool = pool;
+                    let handle = scope.spawn(move || {
+                        guarded_worker(branch_abort, || {
+                            let result = pool
+                                .install(|| {
+                                    observe_branch(
+                                        port,
+                                        branch_resident,
+                                        branch_crib,
+                                        pairing,
+                                        classes,
+                                        &worker_name,
+                                        crossing_map,
+                                        budget,
+                                        branch_abort,
+                                    )
+                                    .map_err(|error| error.to_string())
+                                })
+                                .map_err(std::io::Error::other)?;
+                            Ok(result)
+                        })
+                    });
+                    (name, handle)
+                },
+            )
             .collect();
         let a_result = a_worker
             .join()
@@ -1215,7 +1326,7 @@ pub(super) fn run(
         let a0_result = a0_worker
             .join()
             .unwrap_or_else(|_| Err("A0 branch worker panicked".to_owned()));
-        let b_results = b_workers
+        let mut b_results = b_workers
             .into_iter()
             .map(|(name, worker)| {
                 let result = worker
@@ -1224,6 +1335,64 @@ pub(super) fn run(
                 (name, result)
             })
             .collect::<Vec<_>>();
+        let mut next_b = b_results.len();
+        while next_b < b_branches.len() {
+            if branch_abort.load(Ordering::Acquire) {
+                b_results.extend(b_branches[next_b..].iter().map(|(name, ..)| {
+                    (
+                        name.clone(),
+                        Err("shared branch abort before scheduled wave".to_owned()),
+                    )
+                }));
+                break;
+            }
+            let wave_end = (next_b + 3).min(b_branches.len());
+            let wave_workers: Vec<_> = b_branches[next_b..wave_end]
+                .iter_mut()
+                .zip(&b_pools[next_b..wave_end])
+                .map(
+                    |((name, _, _, classes, branch_resident, branch_crib), pool)| {
+                        let name = name.clone();
+                        let worker_name = name.clone();
+                        let branch_abort = branch_abort_ref;
+                        let pairing = pairing_ref;
+                        let crossing_map = crossing_map_ref;
+                        let budget = budget_ref;
+                        let port = port_ref;
+                        let pool = pool;
+                        let handle = scope.spawn(move || {
+                            guarded_worker(branch_abort, || {
+                                let result = pool
+                                    .install(|| {
+                                        observe_branch(
+                                            port,
+                                            branch_resident,
+                                            branch_crib,
+                                            pairing,
+                                            classes,
+                                            &worker_name,
+                                            crossing_map,
+                                            budget,
+                                            branch_abort,
+                                        )
+                                        .map_err(|error| error.to_string())
+                                    })
+                                    .map_err(std::io::Error::other)?;
+                                Ok(result)
+                            })
+                        });
+                        (name, handle)
+                    },
+                )
+                .collect();
+            b_results.extend(wave_workers.into_iter().map(|(name, worker)| {
+                let result = worker
+                    .join()
+                    .unwrap_or_else(|_| Err(format!("{name} branch worker panicked")));
+                (name, result)
+            }));
+            next_b = wave_end;
+        }
         (a_result, a0_result, b_results)
     });
     let (a_views, a_faces, _a_lifts, _a_times) = from_worker(a_result)?;
@@ -1277,27 +1446,145 @@ pub(super) fn run(
         crossing.support.len()
     );
     let mut epoch_report_failures = Vec::new();
-    let epoch_report_started = Instant::now();
-    record_epoch_report_result(
-        "A",
-        epoch::report_epoch("A", &crossing, &a_end, &a_views, receiver_grain),
-        &mut epoch_report_failures,
-    );
+    let report_results = std::thread::scope(|scope| {
+        let a_pool = &a_pool;
+        let run_budget = &budget;
+        let crossing = &crossing;
+        let a_end = &a_end;
+        let a_views = &a_views;
+        let a_worker = scope.spawn(move || {
+            let mut report_budget = timing::ReportBudget::new(run_budget, "A", a_views.len());
+            let started = Instant::now();
+            let report = a_pool.install(|| {
+                epoch::report_epoch(
+                    "A",
+                    crossing,
+                    a_end,
+                    a_views,
+                    receiver_grain,
+                    &mut report_budget,
+                )
+                .map_err(|error| error.to_string())
+            });
+            let wall_ns = started.elapsed().as_nanos();
+            (report, wall_ns, report_budget.finish())
+        });
+        let b_workers = b_outputs
+            .iter()
+            .zip(&b_pools)
+            .take(2)
+            .map(|((name, _, _, views, _, end, _), pool)| {
+                let name = name.clone();
+                let branch = name.clone();
+                let pool = pool;
+                let run_budget = &budget;
+                let crossing = &crossing;
+                let views = views;
+                let end = end;
+                scope.spawn(move || {
+                    let mut report_budget =
+                        timing::ReportBudget::new(run_budget, &branch, views.len());
+                    let started = Instant::now();
+                    let report = pool.install(|| {
+                        epoch::report_epoch(
+                            &branch,
+                            crossing,
+                            end,
+                            views,
+                            receiver_grain,
+                            &mut report_budget,
+                        )
+                        .map_err(|error| error.to_string())
+                    });
+                    let wall_ns = started.elapsed().as_nanos();
+                    (name, report, wall_ns, report_budget.finish())
+                })
+            })
+            .collect::<Vec<_>>();
+        let a_result = a_worker.join().unwrap_or_else(|_| {
+            (
+                Err("A report worker panicked".to_owned()),
+                0,
+                timing::ReportBudget::new(&budget, "A", 0).finish(),
+            )
+        });
+        let mut b_results = b_workers
+            .into_iter()
+            .map(|worker| {
+                worker.join().unwrap_or_else(|_| {
+                    (
+                        "unknown".to_owned(),
+                        Err("report worker panicked".to_owned()),
+                        0,
+                        timing::ReportBudget::new(&budget, "unknown", 0).finish(),
+                    )
+                })
+            })
+            .collect::<Vec<_>>();
+        let mut next_b = b_results.len();
+        while next_b < b_outputs.len() {
+            let wave_end = (next_b + 3).min(b_outputs.len());
+            let wave_workers = b_outputs[next_b..wave_end]
+                .iter()
+                .zip(&b_pools[next_b..wave_end])
+                .map(|((name, _, _, views, _, end, _), pool)| {
+                    let name = name.clone();
+                    let branch = name.clone();
+                    let pool = pool;
+                    let run_budget = &budget;
+                    let crossing = &crossing;
+                    let views = views;
+                    let end = end;
+                    scope.spawn(move || {
+                        let mut report_budget =
+                            timing::ReportBudget::new(run_budget, &branch, views.len());
+                        let started = Instant::now();
+                        let report = pool.install(|| {
+                            epoch::report_epoch(
+                                &branch,
+                                crossing,
+                                end,
+                                views,
+                                receiver_grain,
+                                &mut report_budget,
+                            )
+                            .map_err(|error| error.to_string())
+                        });
+                        let wall_ns = started.elapsed().as_nanos();
+                        (name, report, wall_ns, report_budget.finish())
+                    })
+                })
+                .collect::<Vec<_>>();
+            b_results.extend(wave_workers.into_iter().map(|worker| {
+                worker.join().unwrap_or_else(|_| {
+                    (
+                        "unknown".to_owned(),
+                        Err("report worker panicked".to_owned()),
+                        0,
+                        timing::ReportBudget::new(&budget, "unknown", 0).finish(),
+                    )
+                })
+            }));
+            next_b = wave_end;
+        }
+        (a_result, b_results)
+    });
+    let (a_report, a_report_ns, a_report_summary) = report_results.0;
+    if let Err(error) = a_report {
+        let message = format!("branch=A {error}");
+        println!("step0_epoch_report_deferred_failure {message}");
+        epoch_report_failures.push(message);
+    }
     println!(
-        "step0_epoch_report_timing branch=A wall_ns={}",
-        epoch_report_started.elapsed().as_nanos()
+        "step0_epoch_report_timing branch=A wall_ns={a_report_ns} summary={a_report_summary:?}"
     );
-    for (name, _, _, views, _, end, _) in &b_outputs {
-        let epoch_report_started = Instant::now();
-        record_epoch_report_result(
-            name,
-            epoch::report_epoch(name, &crossing, end, views, receiver_grain),
-            &mut epoch_report_failures,
-        );
-        println!(
-            "step0_epoch_report_timing branch={name} wall_ns={}",
-            epoch_report_started.elapsed().as_nanos()
-        );
+    for (name, report, wall_ns, summary) in report_results.1 {
+        if let Err(error) = report {
+            let message = format!("branch={name} {error}");
+            println!("step0_epoch_report_deferred_failure {message}");
+            epoch_report_failures.push(message);
+        }
+        println!("step0_epoch_report_timing branch={name} wall_ns={wall_ns} summary={summary:?}");
     }
     let a_state = a.continuing_state(resident.field().sources()[0])?;
     let a0_state = a0.continuing_state(resident.field().sources()[0])?;

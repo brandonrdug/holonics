@@ -7,10 +7,12 @@
 mod exterior_clock;
 
 use std::io;
+use std::time::Instant;
 
 const RUN_WALL_CAP_NS: u128 = 300_000_000_000;
 const TERM_OFFSET_NS: u128 = 295_000_000_000;
 const NATIVE_TERM_GRACE_NS: u128 = 5_000_000_000;
+const REPORT_RESERVE_FLOOR_NS: u128 = 5_000_000_000;
 const BLOCK_CELLS: usize = 8;
 
 #[derive(Clone, Copy, Debug)]
@@ -116,12 +118,162 @@ impl RunBudget {
         Ok(self.global_remaining_ns_at(now))
     }
 
+    /// Remaining time before the shared 285-second phase cutoff, retaining the fixed five
+    /// second report floor before the native deadline.
+    pub(super) fn remaining_report_ns(&self) -> io::Result<u128> {
+        let now = exterior_clock::monotonic_ns()?;
+        Ok(self
+            .deadline
+            .native_ns
+            .saturating_sub(now)
+            .saturating_sub(REPORT_RESERVE_FLOOR_NS))
+    }
+
+    pub(super) fn reserve_ns(&self) -> u128 {
+        self.reserve_ns
+    }
+
     fn global_remaining_ns_at(&self, now_ns: u128) -> u128 {
         self.deadline
             .native_ns
             .saturating_sub(now_ns)
             .saturating_sub(self.reserve_ns)
     }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub(super) enum ReportWorkKind {
+    HeldEval,
+    GramInverse,
+    Other,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub(super) struct WorkSummary {
+    pub(super) count: usize,
+    pub(super) total_ns: u128,
+    pub(super) max_ns: u128,
+}
+
+#[derive(Clone, Debug)]
+pub(super) struct ReportSummary {
+    pub(super) branch: String,
+    pub(super) held_eval: WorkSummary,
+    pub(super) gram_inverse: WorkSummary,
+    pub(super) other: WorkSummary,
+    pub(super) elapsed_ns: u128,
+    pub(super) projected_231_ns: Option<u128>,
+    pub(super) remaining_report_ns: u128,
+}
+
+/// Per-branch accounting for read-only report work. Trackers share the immutable supervisor
+/// deadline but never serialize branch work through a shared lock.
+pub(super) struct ReportBudget {
+    run: RunBudget,
+    branch: String,
+    measured_cells: usize,
+    started: Instant,
+    held_eval: Vec<u128>,
+    gram_inverse: Vec<u128>,
+    other: Vec<u128>,
+}
+
+impl ReportBudget {
+    pub(super) fn new(run: &RunBudget, branch: &str, measured_cells: usize) -> Self {
+        Self {
+            run: run.clone(),
+            branch: branch.to_owned(),
+            measured_cells,
+            started: Instant::now(),
+            held_eval: Vec::new(),
+            gram_inverse: Vec::new(),
+            other: Vec::new(),
+        }
+    }
+
+    pub(super) fn check_before_work(&self, label: &str) -> io::Result<()> {
+        if self.run.remaining_report_ns()? == 0 {
+            return Err(timed_out(format!(
+                "branch {} cannot start {label}: the shared 285-second phase cutoff was reached (five-second report floor)",
+                self.branch
+            )));
+        }
+        Ok(())
+    }
+
+    pub(super) fn remaining_ns(&self) -> io::Result<u128> {
+        self.run.remaining_report_ns()
+    }
+
+    pub(super) fn record_work(&mut self, kind: ReportWorkKind, elapsed_ns: u128) {
+        match kind {
+            ReportWorkKind::HeldEval => self.held_eval.push(elapsed_ns),
+            ReportWorkKind::GramInverse => self.gram_inverse.push(elapsed_ns),
+            ReportWorkKind::Other => self.other.push(elapsed_ns),
+        }
+    }
+
+    pub(super) fn finish(&mut self) -> ReportSummary {
+        let held_eval = work_summary(&self.held_eval);
+        let gram_inverse = work_summary(&self.gram_inverse);
+        let other = work_summary(&self.other);
+        let held_upper = completed_block_upper_ns_per_cell(&self.held_eval);
+        let projected_held = held_upper.map(|per_eval| per_eval.saturating_mul(3 * 231));
+        let projected_inverse = (gram_inverse.count > 0).then_some(gram_inverse.max_ns);
+        let projected_other =
+            (other.count > 0).then(|| project_other_to_231(other.total_ns, self.measured_cells));
+        let projected_231_ns = projected_held
+            .zip(projected_inverse)
+            .zip(projected_other)
+            .map(|((held, inverse), other)| held.saturating_add(inverse).saturating_add(other));
+        let remaining_report_ns = self.run.remaining_report_ns().unwrap_or(0);
+        ReportSummary {
+            branch: self.branch.clone(),
+            held_eval,
+            gram_inverse,
+            other,
+            elapsed_ns: self.started.elapsed().as_nanos(),
+            projected_231_ns,
+            remaining_report_ns,
+        }
+    }
+}
+
+fn work_summary(values: &[u128]) -> WorkSummary {
+    WorkSummary {
+        count: values.len(),
+        total_ns: values.iter().copied().fold(0, u128::saturating_add),
+        max_ns: values.iter().copied().max().unwrap_or(0),
+    }
+}
+
+fn project_other_to_231(other_ns: u128, measured_cells: usize) -> u128 {
+    if measured_cells == 0 {
+        return u128::MAX;
+    }
+    div_ceil(other_ns.saturating_mul(231), measured_cells as u128).unwrap_or(u128::MAX)
+}
+
+pub(super) fn fork_and_report_projection(
+    native_per_branch_ns: u128,
+    report_per_branch_ns: u128,
+    branch_waves: usize,
+) -> u128 {
+    native_per_branch_ns
+        .saturating_add(report_per_branch_ns)
+        .saturating_mul(branch_waves as u128)
+}
+
+pub(super) fn projection_fits(
+    native_per_branch_ns: u128,
+    report_per_branch_ns: u128,
+    branch_waves: usize,
+    remaining_phase_ns: u128,
+    branch_cap_ns: u128,
+) -> bool {
+    native_per_branch_ns.saturating_add(report_per_branch_ns) <= branch_cap_ns
+        && fork_and_report_projection(native_per_branch_ns, report_per_branch_ns, branch_waves)
+            <= remaining_phase_ns
 }
 
 /// Per-phase mutable accounting. One instance belongs to one worker. Dropping it before explicit
@@ -625,8 +777,9 @@ mod tests {
 
     use super::{
         BLOCK_CELLS, DeadlineContract, ForecastBook, PhaseBudget, RunBudget, ThreadCpu,
-        ThreadSchedulerTime, completed_block_upper_ns_per_cell, div_ceil, parse_schedstat,
-        parse_thread_stat, parse_ticks_per_second, phase_summary_from_measurements,
+        ThreadSchedulerTime, completed_block_upper_ns_per_cell, div_ceil,
+        fork_and_report_projection, parse_schedstat, parse_thread_stat, parse_ticks_per_second,
+        phase_summary_from_measurements, project_other_to_231, projection_fits,
     };
 
     #[test]
@@ -715,6 +868,37 @@ mod tests {
         assert!(projected <= phase_allowance);
         let externally_enforced_rss_cap_bytes = 8_u128 * 1024 * 1024 * 1024;
         assert_eq!(externally_enforced_rss_cap_bytes, 8_589_934_592);
+    }
+
+    #[test]
+    fn fork_admission_includes_concurrent_report_projection() {
+        let native_per_branch = 80_u128;
+        let report_per_branch = 30_u128;
+        let waves = 1;
+        let remaining = 100_u128;
+        assert!(native_per_branch * waves <= remaining);
+        assert_eq!(
+            fork_and_report_projection(native_per_branch, report_per_branch, waves),
+            110
+        );
+        assert!(!projection_fits(
+            native_per_branch,
+            report_per_branch,
+            waves,
+            remaining,
+            180
+        ));
+        assert!(projection_fits(70, 30, 1, 100, 100));
+        assert!(!projection_fits(70, 30, 1, 99, 100));
+        assert!(projection_fits(30, 10, 2, 80, 40));
+        assert!(!projection_fits(30, 10, 2, 79, 40));
+    }
+
+    #[test]
+    fn report_other_projection_uses_actual_calibration_cell_count() {
+        assert_eq!(project_other_to_231(64, 64), 231);
+        assert_eq!(project_other_to_231(231, 231), 231);
+        assert_eq!(project_other_to_231(64, 0), u128::MAX);
     }
 
     #[test]
