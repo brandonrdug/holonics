@@ -1175,6 +1175,15 @@ fn run_cost_profile_64(
         result.map_err(|error| -> Box<dyn std::error::Error> { error.into() })?;
         cutoff.check()?;
     }
+    if crossing.support.is_empty() {
+        println!(
+            "step0_cost_growth receiver=fresh_micro_prefix status=undefined-empty-opening-support; no_stall_question; no_step0_report_forecast_or_growth_exponent"
+        );
+        println!(
+            "step0_cost_profile_done native_complete=true checkpoint_complete=true reports_complete=true stall_question_defined=false full_step0_admission_supported=false full231_completion_not_certified=true"
+        );
+        return Ok(());
+    }
     let growth = timing::empirical_report_growth_floor(
         measured_reports[0],
         measured_reports[1],

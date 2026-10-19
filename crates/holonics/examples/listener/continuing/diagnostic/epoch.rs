@@ -553,13 +553,51 @@ fn is_positive_definite(matrix: &Matrix) -> bool {
         })
 }
 
+#[derive(Debug, Eq, PartialEq)]
+enum UnconstrainedReadout {
+    UndefinedEmptyOpeningSupport {
+        declared_width: usize,
+        end_support_width: usize,
+    },
+    Defined {
+        reasons: Vec<&'static str>,
+    },
+}
+
+fn validate_report_support(support: &[usize], declared_width: usize) -> Result<()> {
+    if declared_width == 0 {
+        return Err(
+            "specification lattice report requires positive declared receiver width".into(),
+        );
+    }
+    if support
+        .iter()
+        .any(|&coordinate| coordinate >= declared_width)
+        || support.windows(2).any(|pair| pair[0] >= pair[1])
+    {
+        return Err(
+            "specification lattice report requires ordered solved support within receiver width"
+                .into(),
+        );
+    }
+    Ok(())
+}
+
 fn unconstrained_reasons(
     crossing_support: &[usize],
     crossing_width: usize,
     end_support: &[usize],
     end_width: usize,
     gram: &Matrix,
-) -> Vec<&'static str> {
+) -> Result<UnconstrainedReadout> {
+    validate_report_support(crossing_support, crossing_width)?;
+    validate_report_support(end_support, end_width)?;
+    if crossing_support.is_empty() {
+        return Ok(UnconstrainedReadout::UndefinedEmptyOpeningSupport {
+            declared_width: crossing_width,
+            end_support_width: end_support.len(),
+        });
+    }
     let full_support = |support: &[usize], width: usize| {
         support.len() == width && support.iter().copied().eq(0..width)
     };
@@ -576,7 +614,7 @@ fn unconstrained_reasons(
     {
         reasons.push("receiver chart support is not the same full declared coordinate set");
     }
-    reasons
+    Ok(UnconstrainedReadout::Defined { reasons })
 }
 
 fn map_respects_native_subspace(law: &NormalLaw, map: &Matrix) -> Result<bool> {
@@ -642,21 +680,7 @@ fn specification_lattice_readout(
     native_lw_end: u32,
 ) -> Result<SpecificationLatticeReadout> {
     let receiver_exponent = amended_partition_receiver_exponent(receiver_grain)?;
-    if declared_width == 0 {
-        return Err(
-            "specification lattice report requires positive declared receiver width".into(),
-        );
-    }
-    if support
-        .iter()
-        .any(|&coordinate| coordinate >= declared_width)
-        || support.windows(2).any(|pair| pair[0] >= pair[1])
-    {
-        return Err(
-            "specification lattice report requires ordered solved support within receiver width"
-                .into(),
-        );
-    }
+    validate_report_support(support, declared_width)?;
     if support.is_empty() {
         return Ok(SpecificationLatticeReadout::UndefinedEmptySolvedSupport {
             declared_width,
@@ -1379,6 +1403,20 @@ fn stall_epoch_readout(
         matrix_max_abs(&gradient),
     );
 
+    if matches!(
+        spec_lattice,
+        SpecificationLatticeReadout::UndefinedEmptySolvedSupport { .. }
+    ) {
+        println!(
+            "step0_epoch_stalls branch={branch} status=undefined-empty-opening-support unconstrained_reading={:?}; no_stall_question; inverse_candidate_and_witness_work_skipped=true; empty_support_report_does_not_forecast_step0",
+            UnconstrainedReadout::UndefinedEmptyOpeningSupport {
+                declared_width: crossing.map.columns(),
+                end_support_width: end.support.len(),
+            },
+        );
+        return Ok(());
+    }
+
     let (majorizer_exponents, majorizer_diagonal) =
         stall_work(budget, "column majorizer", || column_majorizer(&end.gram))?;
     let d_hyp = stall_work(budget, "majorized direction D", || {
@@ -1732,6 +1770,32 @@ pub(super) fn report_epoch(
         matrix_max_abs(&gradient),
     );
 
+    let mut unconstrained_reasons = match unconstrained_reasons(
+        &crossing.support,
+        crossing.map.columns(),
+        &end.support,
+        end.map.columns(),
+        &end.gram,
+    )? {
+        undefined @ UnconstrainedReadout::UndefinedEmptyOpeningSupport { .. } => {
+            println!(
+                "step0_epoch_stalls branch={branch} status=undefined-empty-opening-support unconstrained_reading={undefined:?}; no_stall_question; inverse_candidate_and_witness_work_skipped=true; empty_support_report_does_not_forecast_step0"
+            );
+            if let Some(error) = finish_report_budget(
+                branch,
+                budget,
+                report_started,
+                held_eval_ns,
+                inverse_ns,
+                &held_output_stats,
+            ) {
+                deferred_failures.push(error);
+            }
+            return finish_deferred_failures(deferred_failures);
+        }
+        UnconstrainedReadout::Defined { reasons } => reasons,
+    };
+
     // This is the stated step-0 hypothetical law: no persistent native carry is present in the
     // captured API, so R' is exactly the unit-gain crossing gradient for this readout only.
     let residual_prime = gradient.clone();
@@ -1841,13 +1905,6 @@ pub(super) fn report_epoch(
     };
     let unconstrained_update = matrix_product(&residual_prime, &inverse)?;
     let optimum = matrix_add(&crossing.map, &unconstrained_update)?;
-    let mut unconstrained_reasons = unconstrained_reasons(
-        &crossing.support,
-        crossing.map.columns(),
-        &end.support,
-        end.map.columns(),
-        &end.gram,
-    );
     if !gram_commutes_with_native_symmetry(&crossing.law, &crossing.gram)
         || !gram_commutes_with_native_symmetry(&crossing.law, &crossing.gram_remainder)
         || !gram_commutes_with_native_symmetry(&end.law, &end.gram)
@@ -2424,12 +2481,28 @@ mod tests {
     }
 
     #[test]
-    fn metric_uses_stored_gram_without_adding_carry() {
+    fn report_lattice_metric_uses_stored_gram_without_adding_carry() {
         let h = matrix(&[&[5, 0], &[0, 3]]);
-        let reasons = unconstrained_reasons(&[0, 1], 2, &[0, 1], 2, &h);
-        assert!(reasons.is_empty());
-        let constrained = unconstrained_reasons(&[0], 2, &[0], 2, &h);
-        assert!(constrained.iter().any(|reason| reason.contains("support")));
+        assert_eq!(
+            unconstrained_reasons(&[0, 1], 2, &[0, 1], 2, &h).unwrap(),
+            UnconstrainedReadout::Defined {
+                reasons: Vec::new()
+            }
+        );
+        let UnconstrainedReadout::Defined { reasons } =
+            unconstrained_reasons(&[0], 2, &[0], 2, &h).unwrap()
+        else {
+            panic!("nonempty support has a defined constraint reading");
+        };
+        assert!(reasons.iter().any(|reason| reason.contains("support")));
+        assert_eq!(
+            unconstrained_reasons(&[], 2, &[0, 1], 2, &h).unwrap(),
+            UnconstrainedReadout::UndefinedEmptyOpeningSupport {
+                declared_width: 2,
+                end_support_width: 2,
+            }
+        );
+        assert!(unconstrained_reasons(&[], 0, &[0, 1], 2, &h).is_err());
         assert!(is_positive_definite(&h));
         assert!(!is_positive_definite(&matrix(&[&[1, 2], &[2, 1]])));
     }
