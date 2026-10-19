@@ -31,6 +31,9 @@
 //! archive. Moduli and levels are the caller's finite aperture; no factorization search or
 //! arbitrary depth limit is introduced.
 
+pub mod field;
+pub mod pump;
+
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 use thiserror::Error;

@@ -54,7 +54,10 @@ use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
 use crate::ratio::{GaussianRat, Rat, integer};
 
 pub mod loaded;
-pub use loaded::{DomainProposal, LoadedParametron, PeriodicDomain, PeriodicLock};
+pub use loaded::{
+    DomainProposal, ExecutedSolve, LoadedParametron, LockedPair, PeriodicDomain, PeriodicLock,
+    drive_reach, hessian_variation_on, node_reach, rounding_floor, variation_reach,
+};
 pub mod mounted;
 pub use mounted::{MountedParametron, PeriodAdvance};
 

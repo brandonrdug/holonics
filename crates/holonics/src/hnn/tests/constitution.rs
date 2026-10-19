@@ -2462,6 +2462,7 @@ fn the_gains_read_the_span_factor_term_by_term() {
         entries: vec![0, 2],
         phases: 1,
         loci: Default::default(),
+        passages: Vec::new(),
     };
     let growth = rat(9, 8);
     let factor: Vec<Rat> = (0..=5)

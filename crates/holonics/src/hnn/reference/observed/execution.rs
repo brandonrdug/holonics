@@ -14,6 +14,7 @@ use crate::hnn::pending::PendingRatio;
 use crate::hnn::port::WordReturn;
 use crate::hnn::ratio::{Faces, RatioCovector};
 use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::ring::TubePassage;
 use crate::hnn::word::{KeptWord, ReceptionCarry, Released, Word, WordOpening};
 use crate::ratio::linear::ExactRatMatrix;
 
@@ -22,6 +23,11 @@ use crate::ratio::linear::ExactRatMatrix;
 /// key here; device buffers and contexts need never cross a thread boundary.
 pub trait ObservedEpochWord: std::fmt::Debug + Send + Sync {
     fn charts(&self) -> Vec<ChartReading>;
+
+    /// The saturated rings' summaries of this actual forward record, before
+    /// its adjoint consumes it. An unsupported realization refuses; an empty
+    /// series witnesses that no actual resonator in this word reads a tube.
+    fn tube_passages(&self) -> Result<Vec<TubePassage>, HnnError>;
 
     fn return_at(
         self: Box<Self>,
@@ -78,11 +84,16 @@ impl<'a, 'field> ObservedEpochForwardContext<'a, 'field> {
 struct NativeEpochWord {
     word: KeptWord,
     charts: Vec<ChartReading>,
+    passages: Vec<TubePassage>,
 }
 
 impl ObservedEpochWord for NativeEpochWord {
     fn charts(&self) -> Vec<ChartReading> {
         self.charts.clone()
+    }
+
+    fn tube_passages(&self) -> Result<Vec<TubePassage>, HnnError> {
+        Ok(self.passages.clone())
     }
 
     fn return_at(
@@ -227,11 +238,13 @@ fn keep_native(
     let reception_end = word.reception_end()?;
     let released = word.released()?;
     let charts = word.operands().charts();
+    let passages = word.tube_passages()?;
     Ok(ObservedEpochForwardWord {
         producing_commit,
         word: Box::new(NativeEpochWord {
             word: word.keep(),
             charts,
+            passages,
         }),
         faces,
         anchors,

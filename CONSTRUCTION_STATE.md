@@ -17,6 +17,20 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 19: the native field, holding contacts and pump sheets join the finite face**
+(#62, #73). `geometry::solenoid::field` consumes the actual Lock/Odometer law;
+`receiver::coupling` retains plural optimal contacts and reads supplied actual phase paths;
+`geometry::solenoid::pump` reads every node sheet without inventing period doubling.
+The listener records actual currents behind `--diagnostic-solenoidal-lock`, off by default.
+The verified four-patch step-1a source is reconciled with grouped per-word epoch bounds;
+observed host and CUDA paths return their actual tube-passage summaries before publication.
+These joined changes are implemented and await combined bounded target validation; prior
+Source88 gate acceptance does not cover them. Source precision refinement must certify the
+actual represented move while reusing exact normal news, rather than adding another carry.
+The [consumer contract](docs/WINDING_CARRY_AND_PLACEMENT.md#10-actual-hnn-clock-faces-and-plural-holding-contacts)
+keeps theorem hypotheses and remaining formal/physical joins explicit.
+
+
 **October 19: finite solenoidal charts consume the physical operators** (#62, #73–#75).
 `geometry::solenoid` joins the existing compatible tower with signed leaf carry and checked finite
 continuation. `physics::solenoidal` consumes contact power/kernels and the LC/sheet owners; its

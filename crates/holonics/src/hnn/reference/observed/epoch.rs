@@ -493,6 +493,7 @@ impl Reference {
                     else { phase[row] = descent[row].clone(); }
                 }
                 let word_charts = read.word.charts();
+                let tube_passages = read.word.tube_passages()?;
                 let face_partition_wall = face_start.elapsed();
                 let pull_back_start = Instant::now();
                 let back = read.word.return_at(&field, execution, &covector, map, &phases)?;
@@ -510,7 +511,10 @@ impl Reference {
                 };
                 let compose_wall = compose_start.elapsed();
                 let records_start = Instant::now();
-                let deposit = with_receiving_masses(deposit, receiver, &masses)?;
+                // The adapter reconstructs the deposit, so attach the actual
+                // producing passage only after its receiving masses are kept.
+                let deposit = with_receiving_masses(deposit, receiver, &masses)?
+                    .with_passages(tube_passages);
                 if deposit.commit() != comparison_commit {
                     return Err(refusal(
                         "every observed epoch return belongs to its one producing material",
@@ -1440,6 +1444,77 @@ mod tests {
         assert_eq!(actual.ledger.balance(), expected.ledger.balance());
     }
 
+    fn standing_tube_opening() -> (Reference, Resident, ObservedCrib, PairingDeclaration) {
+        use crate::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
+        let (reference, opening, crib, pairing) = opening();
+        let field = &opening.field;
+        let width = field.ring(0).width();
+        let material = ResonatorMaterial::new(
+            ExactRatMatrix::identity(width).unwrap().scaled(&rat(16, 1)),
+            ExactRatMatrix::zero(width, width).unwrap(),
+            ExactRatMatrix::zero(width, width).unwrap(),
+            Some(
+                PumpDeclaration::new(
+                    rat(1, 8),
+                    crate::holon::parametron::Carrier::new(Rat::one(), Rat::zero()).unwrap(),
+                    PumpStep::Stand,
+                )
+                .unwrap(),
+            ),
+        )
+        .unwrap()
+        .with_symmetric_saturation(rat(1, 65536))
+        .unwrap();
+        let constitution = opening
+            .constitution
+            .clone()
+            .with_ring_resonator(field, 0, material)
+            .unwrap();
+        // Keep the already declared receiving restriction, just as a restored
+        // observed execution does. This test measures its actual word passage,
+        // not a new nonlinear observability declaration.
+        let resident = reference
+            .mount_with_family(
+                field,
+                &opening.current,
+                constitution,
+                Some(opening.admitted.clone()),
+            )
+            .unwrap();
+        (reference, resident, crib, pairing)
+    }
+
+    #[derive(Debug)]
+    struct RefusedTubeWord {
+        actual: Box<dyn ObservedEpochWord>,
+    }
+
+    impl ObservedEpochWord for RefusedTubeWord {
+        fn charts(&self) -> Vec<crate::hnn::chart::ChartReading> {
+            self.actual.charts()
+        }
+
+        fn tube_passages(&self) -> Result<Vec<crate::hnn::ring::TubePassage>, HnnError> {
+            assert!(!self.actual.tube_passages()?.is_empty());
+            Err(HnnError::Resonator {
+                ring: 0,
+                what: "the selected observed realization cannot read its actual saturated passage",
+            })
+        }
+
+        fn return_at(
+            self: Box<Self>,
+            field: &Field,
+            execution: &dyn ObservedEpochExecution,
+            covector: &crate::hnn::ratio::RatioCovector,
+            map: &ExactRatMatrix,
+            phases: &ReceivingPhases,
+        ) -> Result<crate::hnn::port::WordReturn, HnnError> {
+            self.actual
+                .return_at(field, execution, covector, map, phases)
+        }
+    }
+
     struct CheckedExecution {
         returns: std::sync::atomic::AtomicUsize,
         flows: std::sync::atomic::AtomicUsize,
@@ -1485,6 +1560,11 @@ mod tests {
                 HostObservedEpochExecution.forward_scoped(context, ratio, charts, opening)?;
             if self.refusal == 6 {
                 forward.producing_commit = forward.producing_commit.wrapping_add(1);
+            }
+            if self.refusal == 7 {
+                forward.word = Box::new(RefusedTubeWord {
+                    actual: forward.word,
+                });
             }
             Ok(forward)
         }
@@ -1648,6 +1728,93 @@ mod tests {
                 control.prefixes[0].1.continuing_state(0).unwrap().to_text()
             );
         }
+    }
+
+    #[test]
+    fn observed_tube_passages_are_the_actual_native_and_opaque_forward_readings() {
+        let (reference, mut resident, _, pairing) = standing_tube_opening();
+        let field = resident.field.clone();
+        let boundary = PairedObservation::admit(&field, &resident.constitution, &pairing).unwrap();
+        let (moment, _) = reference
+            .ingest(&mut resident, None, &boundary.encode(&[]).unwrap())
+            .unwrap();
+        let cells = boundary.encode(&[1; 32]).unwrap();
+        let native = reference
+            .read_epoch(&resident, &moment, &resident.admitted[0], &cells)
+            .unwrap();
+        let opaque = reference
+            .read_epoch_at_cuts_with_execution(
+                &resident,
+                &moment,
+                &resident.admitted[0],
+                &cells,
+                &[],
+                &HostObservedEpochExecution,
+            )
+            .unwrap();
+        assert!(native.reads.len() > 1);
+        assert_eq!(native.reads.len(), opaque.reads.len());
+        let mut moved = false;
+        for (native, opaque) in native.reads.into_iter().zip(opaque.reads) {
+            let actual = native.word.tube_passages().unwrap();
+            assert!(!actual.is_empty());
+            assert_eq!(opaque.word.tube_passages().unwrap(), actual);
+            let word = native.word.resume(&field);
+            assert_eq!(word.tube_passages().unwrap(), actual);
+            moved |= actual.iter().any(|passage| {
+                passage
+                    .distance(crate::hnn::ring::TubeCentre::Origin)
+                    .is_some_and(|distance| distance.is_positive())
+            });
+        }
+        assert!(
+            moved,
+            "the received source actually displaces its saturated ring"
+        );
+    }
+
+    #[test]
+    fn observed_tube_passage_refusal_precedes_return_and_preserves_the_opening() {
+        let (reference, opening, opening_crib, pairing) = standing_tube_opening();
+        let mut resident = opening.clone();
+        let mut crib = opening_crib.clone();
+        let execution = CheckedExecution::new(7);
+        let error = reference
+            .observe_epoch_continuing_at_cuts_with_execution(
+                &mut resident,
+                &mut crib,
+                &pairing,
+                &[1],
+                None,
+                &[],
+                true,
+                &execution,
+            )
+            .unwrap_err();
+        assert_eq!(
+            error,
+            HnnError::Resonator {
+                ring: 0,
+                what: "the selected observed realization cannot read its actual saturated passage",
+            }
+        );
+        assert_eq!(resident.constitution, opening.constitution);
+        assert_eq!(resident.current, opening.current);
+        assert_eq!(resident.carried, opening.carried);
+        assert_eq!(resident.address, opening.address);
+        assert_eq!(resident.moments, opening.moments);
+        assert_eq!(resident.charts, opening.charts);
+        assert_eq!(resident.ledger.balance(), opening.ledger.balance());
+        assert_eq!(resident.next, opening.next);
+        assert_eq!(crib, opening_crib);
+        assert_eq!(
+            execution.returns.load(std::sync::atomic::Ordering::Relaxed),
+            0
+        );
+        assert_eq!(
+            execution.flows.load(std::sync::atomic::Ordering::Relaxed),
+            0
+        );
     }
 
     #[test]

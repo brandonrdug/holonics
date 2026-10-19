@@ -506,6 +506,7 @@ impl Constitution {
                 .iter()
                 .flat_map(|r| r.loci.iter().copied())
                 .collect(),
+            passages: Vec::new(),
         };
         let mut next = self.clone();
         let mut factor_steps: Vec<_> = factors.into_values().collect();

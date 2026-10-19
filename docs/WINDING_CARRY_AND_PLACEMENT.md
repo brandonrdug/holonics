@@ -399,3 +399,45 @@ owned by `ratio::surprisal`, not a new constant-cost or probabilistic owner. The
 reads its actual declared longitudinal step through this receiver; the arithmetic identity
 is reported separately from the wave's own physical energy balance. No physical conservation
 law is inferred from product-one.
+
+
+## 10. Actual HNN clock faces and plural holding contacts
+
+[definition; implemented-exact, combined acceptance pending] `geometry::solenoid::field`
+reads the existing `Field`, `Current::step` and `Odometer`. Only the ordered Lock rings enter
+its mixed-radix face; Own rings remain individual leaves. For radices `r_i`, the Lock modulus
+is their product, and class increment is derived from the actual field fits and native carry
+law. It is not an independent simultaneous-tick model and its modulus is not an LCM.
+The retained signed lift distinguishes equal finite faces with different windings.
+Refinement reads a declared finite face restriction; a new fine declaration cannot guess
+missing historical winding. Character phases are exact rational turns on this finite group.
+No infinite solenoid, real-circle completion or general continuation theorem is inferred.
+
+[definition; implemented-exact, combined acceptance pending] `receiver::coupling` reads two
+supplied cell strands: `lambda` is the longest order-consistent equal-cell coupling and
+`F_star=|H|+|T|-2*lambda`. Prefix and suffix recurrences keep every optimal contact and
+maximal contiguous diagonal plateau. Their union can contain crossing alternatives, so it
+is never presented as one selected alignment. Actual supplied `LockPhase` paths annotate
+plateaus with mixed-radix differences, signed lifts, whole windings and both carry series.
+A constant plateau phase follows from matching successive native increments; no content
+identity follows from phase alone. Equal multisets with the same key cancel at the terminal
+group sum, while intermediate plateaus can have nonzero differences. In particular `[a,b]`
+and `[b,a]` have terminal difference zero but their contact on `a` can read `-A(b)`.
+The exact optimal-contact/phase join remains a Lean obligation in #62.
+
+The listener's `--diagnostic-solenoidal-lock` reads actual currents before each emitted class
+and at the accepted terminal section. It is off by default. A change of field declaration
+returns a typed unavailable reading; it never substitutes a guessed key or zero origin.
+Targets enter this acceptance receiver after the release. They do not condition prediction,
+locating keys or deposition. Historical logs lacking actual anchor currents admit class
+coupling reads but do not establish either strand's absolute winding or phase path.
+
+[definition; implemented-exact, combined acceptance pending] `geometry::solenoid::pump`
+reads the actual `ResonatorOperands` and displacement through `ring::sheets`. Each node
+returns its own half-turn bit and projection; zero in-phase projection keeps both fibre
+digits unresolved. A common instantaneous sheet is reported only when all node projections
+are nonzero and agree. Absent or zero-strength pump leaves the base clock alone. The actual
+standing, saturated pump has period-one fixed sheets: a two-element fibre over the clock is
+not evidence of a subharmonic orbit or a new carried cover digit. Scheduled-axis readings
+need an actual schedule witness. Stable locking requires the existing nonlinear ball,
+Floquet and executed tube certificates, rather than a mounted-pump flag.

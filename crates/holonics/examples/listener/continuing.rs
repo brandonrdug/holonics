@@ -35,6 +35,7 @@ struct ContinuingOptions {
     stage1_probe_cells: Option<usize>,
     evaluation_from_section: Option<usize>,
     diagnostic_release_faces: bool,
+    diagnostic_solenoidal_lock: bool,
     diagnostic_step0: bool,
     diagnostic_calibration_only: bool,
     diagnostic_checkpoint: Option<String>,
@@ -56,6 +57,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     let mut stage1_probe_cells = None;
     let mut evaluation_from_section = None;
     let mut diagnostic_release_faces = false;
+    let mut diagnostic_solenoidal_lock = false;
     let mut diagnostic_profile_paired_cells64 = false;
     let mut diagnostic_cost_profile_cells64 = false;
     let mut diagnostic_report_reserve_ns = None;
@@ -64,6 +66,11 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     let mut at = 0;
     while at < args.len() {
         let option = args[at].as_str();
+        if option == "--diagnostic-solenoidal-lock" {
+            diagnostic_solenoidal_lock = true;
+            at += 1;
+            continue;
+        }
         if option == "--diagnostic-release-faces" {
             diagnostic_release_faces = true;
             at += 1;
@@ -219,6 +226,9 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
                 .into(),
         );
     }
+    if diagnostic_solenoidal_lock && diagnostic_step0 {
+        return Err("solenoidal-lock diagnosis requires the ordinary observed life".into());
+    }
     Ok(ContinuingOptions {
         learn: learn.ok_or("--route observed requires --learn HLSN1")?,
         count,
@@ -232,6 +242,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         stage1_probe_cells,
         evaluation_from_section,
         diagnostic_release_faces,
+        diagnostic_solenoidal_lock,
         diagnostic_step0,
         diagnostic_calibration_only,
         diagnostic_checkpoint,
@@ -391,13 +402,18 @@ fn mounted(port: &Reference, population: u64) -> Result<(Resident, PairingDeclar
     let pairing = PairingDeclaration::Family {
         table: (0..CLASSES).map(|c| (c, c ^ 1)).collect(),
     };
-    let material =
-        PairedCarrier::found(&field, Constitution::initial(&field, BUDGET)?, 0, &pairing)?.0;
+    let receiving = field.receivers()[0].ring;
+    let founded = Constitution::initial(&field, BUDGET)?.with_locking_pump(&field, receiving)?;
+    let material = PairedCarrier::found(&field, founded, 0, &pairing)?.0;
     Ok((
         port.mount_with(&field, &Current::at_rest(&field), material)?,
         pairing,
     ))
 }
+
+#[cfg(test)]
+#[path = "continuing/lock.rs"]
+mod lock;
 
 /// The protocol register's own serialized address, with whitespace-free field framing.
 fn address_text(address: &ActiveAddress) -> String {
@@ -891,6 +907,7 @@ fn release_fork(
         None,
         true,
         None,
+        None,
         emit,
     )
 }
@@ -907,6 +924,7 @@ fn release_fork_accounted(
     mut work: Option<&mut work::ObservedWork>,
     detailed: bool,
     mut face_decisions: Option<&mut Vec<holonics::hnn::receiving::cells::CellDecision>>,
+    mut solenoidal: Option<&mut solenoidal::Trace>,
     emit: &mut dyn FnMut(String),
 ) -> Result<Released> {
     if maximum == 0 {
@@ -944,6 +962,9 @@ fn release_fork_accounted(
             .exponent();
         let draw_started = Instant::now();
         let (pending, _) = port.refine(&mut fork, &moment, &phases)?;
+        if let Some(trace) = solenoidal.as_deref_mut() {
+            trace.before(fork.field(), fork.current());
+        }
         let drawn = port
             .release_cells(&mut fork, &pending, CellLaw::Draw(keys))?
             .forward
@@ -986,6 +1007,9 @@ fn release_fork_accounted(
         let mut horizon = false;
         match ingestion {
             Ok(native) => {
+                if let Some(trace) = solenoidal.as_deref_mut() {
+                    trace.accepted(fork.field(), fork.current());
+                }
                 if let Some(line) = native
                     .close
                     .as_ref()
@@ -1334,6 +1358,8 @@ mod diagnostic;
 mod face_readings;
 #[path = "continuing/mutual.rs"]
 mod mutual;
+#[path = "continuing/solenoidal.rs"]
+mod solenoidal;
 #[path = "continuing/stage1.rs"]
 mod stage1;
 #[path = "continuing/work.rs"]
@@ -1586,6 +1612,30 @@ mod tests {
     }
 
     #[test]
+    fn solenoidal_lock_diagnosis_is_opt_in_on_the_ordinary_life() {
+        let plain = parse(&args(&["--population", "65536"])).unwrap();
+        assert!(!plain.diagnostic_solenoidal_lock);
+        let traced = parse(&args(&[
+            "--population",
+            "65536",
+            "--diagnostic-solenoidal-lock",
+        ]))
+        .unwrap();
+        assert!(traced.diagnostic_solenoidal_lock);
+        assert_eq!(traced.population, plain.population);
+        assert_eq!(traced.count, plain.count);
+        assert_eq!(traced.keys, plain.keys);
+        assert_eq!(traced.work_deadline_ns, plain.work_deadline_ns);
+        assert!(parse(&args(&[
+            "--population",
+            "65536",
+            "--diagnostic-step0",
+            "--diagnostic-solenoidal-lock",
+        ]))
+        .is_err());
+    }
+
+    #[test]
     fn face_diagnosis_preserves_native_draw_stop_keys_and_trunk() {
         let port = Reference::new(4, BUDGET);
         let (mut resident, pairing) = mounted(&port, 65536).unwrap();
@@ -1606,6 +1656,7 @@ mod tests {
         let mut plain_keys = keys();
         let mut traced_keys = keys();
         let mut decisions = Vec::new();
+        let mut solenoidal = solenoidal::Trace::new(resident.field(), resident.current());
         let plain = release_fork_accounted(
             &port,
             resident.clone(),
@@ -1616,6 +1667,7 @@ mod tests {
             0,
             None,
             false,
+            None,
             None,
             &mut |_| (),
         )
@@ -1631,6 +1683,7 @@ mod tests {
             None,
             false,
             Some(&mut decisions),
+            Some(&mut solenoidal),
             &mut |_| (),
         )
         .unwrap();
@@ -1673,6 +1726,23 @@ mod tests {
                     .any(|line| line.starts_with("observed_release_face "))
             );
         }
+        let mut solenoidal_lines = Vec::new();
+        solenoidal.report(
+            0,
+            &traced.classes,
+            &sections::closed_cells(b"A"),
+            &mut |line| solenoidal_lines.push(line),
+        );
+        assert!(
+            solenoidal_lines
+                .iter()
+                .any(|line| line.starts_with("observed_solenoidal_coupling "))
+        );
+        assert!(
+            solenoidal_lines
+                .iter()
+                .any(|line| line.contains("status=available"))
+        );
         assert_eq!(traced_keys.keys_read(), key_count);
         assert_eq!(resident.constitution(), &constitution);
         assert_eq!(resident.current(), &current);

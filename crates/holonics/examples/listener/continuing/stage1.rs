@@ -409,6 +409,9 @@ fn run_inner(
                     &boundary,
                 )?)
             };
+            let mut solenoidal = options
+                .diagnostic_solenoidal_lock
+                .then(|| solenoidal::Trace::new(fork.field(), fork.current()));
             work.complete(0, elapsed(anchor_started), emit)?;
             let mut face_decisions = Vec::new();
             let released = release_fork_accounted(
@@ -424,6 +427,7 @@ fn run_inner(
                 options
                     .diagnostic_release_faces
                     .then_some(&mut face_decisions),
+                solenoidal.as_mut(),
                 emit,
             )?;
             let report_started = Instant::now();
@@ -449,6 +453,15 @@ fn run_inner(
                 &frames[cut.section].target_cells(cut.section)?,
             )?;
             emit(reading.line(cut.section));
+            if let Some(trace) = solenoidal {
+                // Exterior acceptance only: target cells become available after all draws.
+                trace.report(
+                    cut.section,
+                    &released.classes,
+                    &frames[cut.section].target_cells(cut.section)?,
+                    emit,
+                );
+            }
             if options
                 .evaluation_from_section
                 .is_none_or(|first| cut.section < first)

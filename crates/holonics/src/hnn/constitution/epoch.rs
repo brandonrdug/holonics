@@ -1752,6 +1752,7 @@ mod tests {
             entries: vec![0],
             phases: 1,
             loci: crate::hnn::retention::loci(&field).into_iter().collect(),
+            passages: Vec::new(),
         };
         let mut laws = Vec::new();
         let mut flows = Vec::new();

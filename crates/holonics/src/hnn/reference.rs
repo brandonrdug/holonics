@@ -1951,6 +1951,7 @@ impl ExecutionPort for Reference {
             .clone();
         wall.holon = start.elapsed();
         let start = Instant::now();
+        let passages = word.tube_passages()?;
         let back = word.pull_back(&covector, &map, &phases)?;
         wall.pull_back = start.elapsed();
         let start = Instant::now();
@@ -1963,6 +1964,7 @@ impl ExecutionPort for Reference {
             &targets,
             &scored.steps,
         )?;
+        let deposit = deposit.with_passages(passages);
         wall.compose = start.elapsed();
         let code_length = window_code_length(&scored.model)?;
         let order = source_order(&field, ratio.anchor(), ratio.moment().cells());
@@ -2705,6 +2707,7 @@ fn compose_for(
         entries: vec![0],
         phases: composed.phases,
         loci: diamond.retained(field),
+        passages: Vec::new(),
     };
     Ok((
         composed.pullback,

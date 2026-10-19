@@ -343,7 +343,7 @@ use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::{Inertia, inertia};
 use crate::ratio::linear::vector::{add, common_denominator, dot, scale, sub};
 use crate::ratio::polynomial::{RationalPolynomial, half_plane_count};
-use crate::ratio::{Rat, integer};
+use crate::ratio::{Rat, integer, rat};
 
 // -------------------------------------------------------------------------------------------
 // the pump
@@ -1564,6 +1564,245 @@ impl ResonatorOperands {
         )?)
     }
 
+    /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The standing sheet's
+    /// amplitude**: under a standing pump of strength `p` at axis `e^(iφ)` and the saturation `β`,
+    /// the uniform displacement `a e^(iφ)` on every node with `w = 0` has force
+    /// `K_b c − 2p c + β a² c`, zero when the base stiffness annihilates the uniform configuration
+    /// and `a² = 2p/β`. Refused off a standing pump, without saturation, or where `2p/β` is not the
+    /// square of a rational (the certificate is exact; a deposit that moves `p` or `β` off a
+    /// rational square leaves no exact sheet to certify).
+    pub fn sheet_amplitude(&self) -> Result<Rat, HnnError> {
+        let refused = |what| HnnError::Resonator {
+            ring: self.ring,
+            what,
+        };
+        let pump = self
+            .material
+            .pump()
+            .filter(|pump| pump.step() == PumpStep::Stand && self.schedule.is_none())
+            .ok_or(refused("a standing sheet needs a declared standing pump"))?;
+        let beta = self
+            .material
+            .saturation()
+            .ok_or(refused("a standing sheet needs the saturated storage"))?
+            .coefficient();
+        let square = integer(2) * pump.strength() / beta;
+        let root = |x: &BigInt| -> Option<BigInt> {
+            let r = x.sqrt();
+            (&r * &r == *x).then_some(r)
+        };
+        match (root(square.numer()), root(square.denom())) {
+            (Some(numerator), Some(denominator)) if square.is_positive() => {
+                Ok(Rat::new(numerator, denominator))
+            }
+            _ => Err(refused(
+                "the standing sheet's amplitude is not a rational point",
+            )),
+        }
+    }
+
+    /// [definition; agent-inferred, October 18; the revised plan, step 1a; the design review's item
+    /// (d)] **The standing sheet's period proposal** on sheet `sign = ±1`, for the executed solve
+    /// `solve` (`None`: the exact law), read at the ring's grain `2^(−L)`, `L = grain` (the
+    /// resonator locus's lattice, the grain its tube is read at). Its centre is `±a e^(iφ)` on every node at rest, an
+    /// exact fixed point checked by the certificate (`η = 0`). Its metric is the one derived for the
+    /// deadbeat sheet, where `h²X(K + H(c)) = I` and the Jacobian is `[[0, hQ], [−I/h, Q]]` with
+    /// `Q = XC`: `G = [[I/h², −Q/(2h)], [−Q/(2h), Q + (I − Q)/4]] ⪰ gI`, `g = min(1, 1/h²)/4`. The
+    /// listener's founding (`h = 1`, `C = K_b`, `p = r/(4h²)`) is deadbeat.
+    ///
+    /// The ball's shape is derived from the domain certificate's own Young test, not chosen. With
+    /// `J_c` the tick's tangent at the centre, `τ` the least dyadic at the grain with
+    /// `τG ⪰ J_cᵀGJ_c` (the tangent reading of the centre's tube, [`TubeMetric`]), `aI ⪰ AᵀGA` and
+    /// `δ(ε) = 3β(2|c|ε + ε²)`, a shape `(ε, s, λ)` passes the test wherever
+    /// `λ² ≥ (1 + s)τ + (1 + 1/s)aδ(ε)²/g`, since then
+    /// `λ²G − (1 + 1/s)aδ²G/g − (1 + s)J_cᵀGJ_c ⪰ (1 + s)(τG − J_cᵀGJ_c) ⪰ 0`. At each dyadic
+    /// `ε = 2^k ≤ a` the split is the dyadic `s = 2^j` that minimizes that bound (convex in `s`,
+    /// least at `s² = aδ²/(gτ)`) and `λ` the least dyadic at the grain whose square reaches it. The
+    /// shape leaves the inclusion margin `(1 − λ)r − ε_t`, with `r = √g ε` (the Euclidean enclosure
+    /// with equality) and `ε_t` the executed envelope's radius at that shape, in whole units of the
+    /// split it bounds. `ε` descends from the largest dyadic at most `a`, every `ε` whose bound
+    /// reaches `1` is passed over, and the descent stops where the margin no longer grows: the
+    /// shape with the largest margin is proposed. Refused where the centre's tangent does not
+    /// contract at the grain (`τ ≥ 1`) or no shape leaves a positive margin.
+    pub fn standing_sheet(
+        &self,
+        sign: i8,
+        solve: Option<&crate::holon::parametron::ExecutedSolve>,
+        grain: u32,
+    ) -> Result<Vec<crate::holon::parametron::DomainProposal>, HnnError> {
+        // `2^k` for `k ∈ ℤ` (this module's own `dyadic` is the grain `2^(−g)`).
+        use crate::holon::deposition::dyadic as two_to;
+        use crate::holon::parametron::{DomainProposal, hessian_variation_on, rounding_floor};
+        use crate::ratio::disk::floor_log2;
+        let refused = |what| HnnError::Resonator {
+            ring: self.ring,
+            what,
+        };
+        let law = self.phases[0].loaded_law.as_ref().ok_or(refused(
+            "a nonlinear period needs the explicit quartic element relation",
+        ))?;
+        let element = law
+            .holon()
+            .loaded_parametron()
+            .ok_or(refused("a standing sheet needs the actual quartic law"))?;
+        let n = self.width();
+        let h = &self.step;
+        let amplitude = self.sheet_amplitude()?;
+        let metric = self.sheet_metric()?;
+        let lower = rat(1, 4) * (Rat::one() / (h * h)).min(Rat::one());
+        // `√g = min(1, 1/h)/2` is rational, so `r = √g ε` meets `r² ≤ gε²` with equality.
+        let root = (Rat::one() / h).min(Rat::one()) / integer(2);
+        let mut centre = self.sheet_displacement(sign)?;
+        centre.resize(2 * n, Rat::zero());
+        // The certificate's own operands: the exact solve, the tangent at the centre, `a`.
+        let inverse = element.operator(h)?.inverse()?;
+        let tangent = element.jacobian(h, &inverse, &centre)?;
+        let image = tangent.transpose()?.multiply(&metric)?.multiply(&tangent)?;
+        let reach = crate::holon::parametron::variation_reach(h, &inverse, &metric)?;
+        let beta = element.saturation().coefficient().clone();
+        let contraction = least_dyadic(grain, |value| {
+            Ok(inertia(&symmetric(&metric.scaled(value).subtract(&image)?)?).negative == 0)
+        })?;
+        if !contraction.is_positive() || contraction >= Rat::one() {
+            return Err(refused(
+                "the standing sheet's tangent contracts at its centre",
+            ));
+        }
+        // The bound `(1 + s)τ + (1 + 1/s)·spread` at the dyadic `s = 2^j` that minimizes it.
+        let bound = |j: i64, spread: &Rat| {
+            let s = two_to(j);
+            (Rat::one() + &s) * &contraction + (Rat::one() + Rat::one() / &s) * spread
+        };
+        let split = |spread: &Rat| -> (i64, Rat) {
+            let mut j = floor_log2(&(spread / &contraction)).div_euclid(2);
+            let mut least = bound(j, spread);
+            for step in [1, -1] {
+                loop {
+                    let next = bound(j + step, spread);
+                    if next >= least {
+                        break;
+                    }
+                    least = next;
+                    j += step;
+                }
+            }
+            (j, least)
+        };
+        // The proposal at one shape, its envelope radius in whole units of the split it bounds.
+        let shaped =
+            |epsilon: &Rat, lambda: &Rat, young: &Rat| -> Result<DomainProposal, HnnError> {
+                let mut proposal = DomainProposal {
+                    centre: centre.clone(),
+                    drive: vec![Rat::zero(); n],
+                    metric: metric.clone(),
+                    radius: epsilon * &root,
+                    metric_lower: lower.clone(),
+                    euclidean_radius: epsilon.clone(),
+                    lipschitz: lambda.clone(),
+                    centre_residual: Rat::zero(),
+                    young: young.clone(),
+                    rounding: Rat::zero(),
+                };
+                if let Some(solve) = solve {
+                    let floor = rounding_floor(law, &proposal, &metric, Some(solve))?;
+                    let units = (floor / (&solve.unit * &solve.unit)).ceil().to_integer();
+                    let mut k = units.sqrt();
+                    if &k * &k < units {
+                        k += 1;
+                    }
+                    proposal.rounding = Rat::from_integer(k) * &solve.unit;
+                }
+                Ok(proposal)
+            };
+        let mut best: Option<(Rat, DomainProposal)> = None;
+        // The descent ends: as `ε` falls the bound falls toward `τ < 1`, and the margin
+        // `(1 − λ)√g ε − ε_t` falls with `ε` toward `−ε_t ≤ 0`.
+        let mut k = floor_log2(&amplitude);
+        loop {
+            let epsilon = two_to(k);
+            let delta = hessian_variation_on(&beta, &centre[..n], &epsilon);
+            let spread = &reach * &delta * &delta / &lower;
+            let (j, square) = split(&spread);
+            if square < Rat::one() {
+                let lambda = least_dyadic(grain, |value| Ok(value * value >= square))?;
+                let proposal = shaped(&epsilon, &lambda, &two_to(j))?;
+                let margin = (Rat::one() - &lambda) * &proposal.radius - &proposal.rounding;
+                match &best {
+                    Some((held, _)) if &margin <= held => break,
+                    _ => best = Some((margin, proposal)),
+                }
+            }
+            k -= 1;
+        }
+        match best {
+            Some((margin, proposal)) if margin.is_positive() => {
+                Ok(vec![proposal; self.phases.len()])
+            }
+            _ => Err(refused(
+                "the standing sheet's ball leaves a positive margin",
+            )),
+        }
+    }
+
+    /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The executed lock**:
+    /// both standing sheets certified on the period this word executes, each phase's solve the
+    /// chart it applies and its splits at `transient`'s unit (`None`: the exact law, whose solve
+    /// must be the exact inverse), each ball's shape derived at the ring's grain `2^(−grain)`
+    /// ([`ResonatorOperands::standing_sheet`]), read at the closing boundary on the axis's leading
+    /// displacement coordinate, and joined as a [`crate::holon::parametron::LockedPair`].
+    pub fn executed_lock(
+        &self,
+        transient: Option<&Lattice>,
+        grain: u32,
+    ) -> Result<crate::holon::parametron::LockedPair, HnnError> {
+        let solves = transient
+            .map(|lattice| {
+                (0..self.phases.len())
+                    .map(|tick| {
+                        Ok(crate::holon::parametron::ExecutedSolve {
+                            chart: self.phases[self.phase_at(tick)].solve.matrix()?,
+                            unit: lattice.unit(),
+                        })
+                    })
+                    .collect::<Result<Vec<_>, HnnError>>()
+            })
+            .transpose()?;
+        let pump = self.material.pump().ok_or(HnnError::Resonator {
+            ring: self.ring,
+            what: "a standing sheet needs a declared standing pump",
+        })?;
+        let axis = usize::from(pump.axis().sin().abs() > pump.axis().cos().abs());
+        let sheet = |sign: i8| -> Result<crate::holon::parametron::PeriodicLock, HnnError> {
+            let proposals =
+                self.standing_sheet(sign, solves.as_ref().map(|solves| &solves[0]), grain)?;
+            let domain = match &solves {
+                Some(solves) => {
+                    let laws = (0..self.phases.len())
+                        .map(|tick| {
+                            self.phases[self.phase_at(tick)].loaded_law.clone().ok_or(
+                                HnnError::Resonator {
+                                    ring: self.ring,
+                                    what: "a nonlinear period needs the explicit quartic element relation",
+                                },
+                            )
+                        })
+                        .collect::<Result<Vec<_>, HnnError>>()?;
+                    crate::holon::parametron::PeriodicDomain::certify_executed(
+                        &laws, solves, &proposals,
+                    )?
+                }
+                None => self.exact_period_domain(&proposals)?,
+            };
+            Ok(crate::holon::parametron::PeriodicLock::read(
+                domain, 0, axis,
+            )?)
+        };
+        Ok(crate::holon::parametron::LockedPair::new(
+            sheet(1)?,
+            sheet(-1)?,
+        )?)
+    }
+
     fn exact_period_domain(
         &self,
         proposals: &[crate::holon::parametron::DomainProposal],
@@ -1752,6 +1991,463 @@ impl ResonatorOperands {
                 state: [displacement_remainder, velocity_remainder],
             },
         })
+    }
+}
+
+/// [definition; agent-inferred, October 18] **The splits a loaded tick's reverse crosses**, in the
+/// order it crosses them: the rate covector `z̄`, its transpose solve `X̂ᵀz̄`, and the drive,
+/// displacement and velocity covectors it returns.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReverseSplit {
+    Rate,
+    Solve,
+    Drive,
+    Displacement,
+    Velocity,
+}
+
+/// [definition] **One loaded tick's return**: the covector on its drive, on its producing state
+/// `(u, w)`, and the transpose solve `X̂ᵀz̄` it carried, each as split.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResonatorReturn {
+    pub drive: Vec<Rat>,
+    pub state: [Vec<Rat>; 2],
+    pub solved: Vec<Rat>,
+}
+
+impl ResonatorOperands {
+    /// [definition; agent-inferred, October 18] **One loaded tick's reverse**: the transpose of the
+    /// executed tick `(u, w, e) ↦ (u′, w′, s′)` read at its own producing state. With covectors
+    /// `(ū′, w̄′)` on the next state and `s̄` on the returned wave `s′ = e − (2/Y)ω`,
+    /// `z̄ = hū′ + c w̄′ − (2/Y)s̄` (`c = 1` saturated, `w′ = ω`; `c = 2` quadratic, `w′ = 2ω − w`),
+    /// `r̄ = X̂ᵀz̄`, `ē = s̄ + h r̄`, `ū = ū′ − hH(u)r̄` with the force Hessian `H(u) = K_j + ∇²Q(u)`
+    /// at this tick's displacement (versioned per tick, never a frozen `K`), and `w̄ = C r̄`
+    /// (saturated) or `−w̄′ + 2C r̄` (quadratic). Each covector crosses `split` where the word
+    /// splits it; the identity split is the unsplit executed transpose.
+    pub fn reverse(
+        &self,
+        step: &ResonatorStep,
+        state_bar: [&[Rat]; 2],
+        storage_bar: &[Rat],
+        split: &mut dyn FnMut(ReverseSplit, Vec<Rat>) -> Vec<Rat>,
+    ) -> Result<ResonatorReturn, HnnError> {
+        let n = self.width();
+        if state_bar[0].len() != n || state_bar[1].len() != n || storage_bar.len() != n {
+            return Err(HnnError::Shape {
+                what: "a loaded tick's covectors (the ring's realified width)",
+                expected: n,
+                found: storage_bar.len(),
+            });
+        }
+        let h = &self.step;
+        let nonlinear = self.material.saturation().is_some();
+        let velocity_factor = if nonlinear { integer(1) } else { integer(2) };
+        let port = integer(2) / &self.admittance;
+        let z_image: Vec<Rat> = (0..n)
+            .map(|i| {
+                h * &state_bar[0][i] + &velocity_factor * &state_bar[1][i] - &port * &storage_bar[i]
+            })
+            .collect();
+        let zbar = split(ReverseSplit::Rate, z_image);
+        let image = self.solve_transpose(step.phase, &zbar)?;
+        let solved = split(ReverseSplit::Solve, image);
+        let drive_image = add(storage_bar, &scale(h, &solved));
+        let drive = split(ReverseSplit::Drive, drive_image);
+        let (capacity, _, _) = self.material.forms();
+        let hessian = self.force_hessian(step.phase, &step.input[0])?;
+        // `H(u)` and `C` are symmetric, so their transposes apply as they stand.
+        let u_image = sub(state_bar[0], &scale(h, &hessian.apply(&solved)?));
+        let capacity_return = capacity.apply(&solved)?;
+        let w_image = if nonlinear {
+            capacity_return
+        } else {
+            add(
+                &scale(&integer(-1), state_bar[1]),
+                &scale(&integer(2), &capacity_return),
+            )
+        };
+        let u_bar = split(ReverseSplit::Displacement, u_image);
+        let w_bar = split(ReverseSplit::Velocity, w_image);
+        Ok(ResonatorReturn {
+            drive,
+            state: [u_bar, w_bar],
+            solved,
+        })
+    }
+}
+
+/// [definition; agent-inferred, October 18; the design review of step 1a] **A rest point of a
+/// saturated ring's one-tick period**, a tube's possible centre: the origin, or a sheet
+/// `±a e^(iφ)` on every node where a standing pump stands one; each at rest (`w = 0`). Under a
+/// standing pump the origin is the saddle between the sheets; with the pump removed it is the
+/// period's only rest point (agent-inferred: the name keeps to what holds in both).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum TubeCentre {
+    Origin,
+    Sheet(i8),
+}
+
+/// [definition; agent-inferred, October 18; the design review of step 1a] **A saturated ring's
+/// passage**: for each rest point of its period ([`ResonatorOperands::tube_centres`], the origin
+/// first), the largest node `ℓ¹` distance of the ring's displacement from it over the ticks
+/// observed. One running maximum per centre, never a record of ticks.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TubePassage {
+    pub ring: usize,
+    pub distances: Vec<(TubeCentre, Rat)>,
+}
+
+impl TubePassage {
+    /// `ρ_c`, the passage's distance to `centre` (`None` where `centre` is not a rest point of the
+    /// ring's period).
+    pub fn distance(&self, centre: TubeCentre) -> Option<&Rat> {
+        self.distances
+            .iter()
+            .find(|(at, _)| *at == centre)
+            .map(|(_, distance)| distance)
+    }
+
+    /// The rest point the passage stayed nearest, and its distance (the first, in the passage's
+    /// order, at a tie).
+    pub fn nearest(&self) -> (TubeCentre, &Rat) {
+        let mut best = (TubeCentre::Origin, &self.distances[0].1);
+        for (centre, distance) in &self.distances[1..] {
+            if distance < best.1 {
+                best = (*centre, distance);
+            }
+        }
+        best
+    }
+}
+
+/// [definition; agent-inferred, October 18; the design review of step 1a] **A saturated ring's
+/// tube metric at a rest point** ([`ResonatorOperands::tube_metric`]): the centre, the metric `G`
+/// and the readings that do not depend on the tube's radius: the tangent `J_c = J(K_φ + H_β(c))`,
+/// its carried form `J_cᵀGJ_c ⪯ ρ_J²G`, `γ_lo I ⪯ G ⪯ γ_hi I`, the Hessian variation's reach
+/// `aI ⪰ AᵀGA` (`A = [−h²X; −hX]`), the drive's response `d̂I ⪰ D̂ᵀGD̂`, and the quartic's
+/// coefficient `β` with the centre's largest node `ℓ¹` norm `U`. The certificate is the
+/// navigator's resident face at that centre: each radius reads it with one inertia decision
+/// ([`TubeMetric::at`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TubeMetric {
+    pub ring: usize,
+    pub centre: TubeCentre,
+    pub metric: ExactRatMatrix,
+    pub image: ExactRatMatrix,
+    pub tangent: Rat,
+    pub low: Rat,
+    pub high: Rat,
+    pub variation_reach: Rat,
+    pub response: Rat,
+    pub coefficient: Rat,
+    pub centre_reach: Rat,
+}
+
+/// [definition; agent-inferred, October 18; the design review of step 1a] **A saturated ring's
+/// reach on its tube** ([`TubeMetric::at`]): the centre the passage stayed nearest and its
+/// distance `ρ_c`, the tube's radius `ρ̄ > ρ_c`, the quartic Hessian's variation on it
+/// `δ = 3β(2Uρ̄ + ρ̄²)`, the metric's readings (`J_cᵀGJ_c ⪯ ρ_J²G`, `aI ⪰ AᵀGA`, the drive's
+/// `d̂I ⪰ D̂ᵀGD̂`), the Young split `s` (`None` where one term vanishes), and the bound the
+/// constitution consumes: `σ` at period one with `σ²G ⪰ (1 + s)J_cᵀGJ_c + (1 + 1/s)aδ²G/γ_lo`,
+/// decided by inertia, and `γ_lo I ⪯ G ⪯ γ_hi I`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TubeReach {
+    pub centre: TubeCentre,
+    pub distance: Rat,
+    pub radius: Rat,
+    pub variation: Rat,
+    pub tangent: Rat,
+    pub variation_reach: Rat,
+    pub response: Rat,
+    pub young: Option<Rat>,
+    pub bound: FloquetBound,
+}
+
+impl TubeMetric {
+    /// [proved-derived; implemented-exact, the scope agent-inferred, October 18; the design review
+    /// of step 1a] **The reach on the tube of radius `radius` about the passage**. Two states whose
+    /// displacements lie in the node `ℓ¹` tube of radius `ρ̄` about the centre `c` differ after the
+    /// tick by `J̄(x − y)`, `J̄` the tangent averaged along their segment, which stays in the convex
+    /// tube: `J̄ = J_c + AΔL`, `ΔL` node-diagonal with each block at most `δ = 3β(2Uρ̄ + ρ̄²)`. By
+    /// Young, `|J̄v|²_G ≤ (1 + s)|J_c v|²_G + (1 + 1/s)aδ²|v|²/γ_lo ≤ σ²|v|²_G`; the split is the
+    /// dyadic `2^k`, `|k| ≤ 64`, that minimizes the bound, `σ` its dyadic square-root ceiling at the
+    /// grain `2^(−g)`, and the inequality is decided by inertia. Inside a lock ball the inequality is
+    /// the domain certificate's own, so `σ ≤ λ < 1`; across the saddle `σ > 1`, the parametron's
+    /// phase-sensitive amplification.
+    ///
+    /// [scope] The reach holds for a difference carried between two passages that both stay in the
+    /// tube; the passage's own distance is `ρ_c < ρ̄`, and the stepped passage's stay is the
+    /// deposit's closure certificate (`hnn::constitution::TubeClosure`). Refused where the radius
+    /// does not exceed the passage's distance.
+    pub fn at(
+        &self,
+        passage: &TubePassage,
+        radius: &Rat,
+        grain: u32,
+    ) -> Result<TubeReach, HnnError> {
+        let refused = |what| HnnError::Resonator {
+            ring: self.ring,
+            what,
+        };
+        let distance = passage.distance(self.centre).ok_or(refused(
+            "a tube's centre is a rest point of its passage's period",
+        ))?;
+        if radius <= distance {
+            return Err(refused("a tube's radius exceeds its passage's distance"));
+        }
+        let variation = integer(3)
+            * &self.coefficient
+            * (integer(2) * &self.centre_reach * radius + radius * radius);
+        let spread = &self.variation_reach * &variation * &variation / &self.low;
+        let tangent = &self.tangent;
+        // The Young split minimizing `(1 + s)ρ_J² + (1 + 1/s)aδ²/γ_lo` over the dyadics.
+        let (young, square) = if tangent.is_zero() || spread.is_zero() {
+            (None, tangent + &spread)
+        } else {
+            let at_split = |k: i64| {
+                let split = crate::holon::deposition::dyadic(k);
+                let value =
+                    (Rat::one() + &split) * tangent + (Rat::one() + Rat::one() / &split) * &spread;
+                (split, value)
+            };
+            let (split, value) = (-64..=64)
+                .map(at_split)
+                .min_by(|a, b| a.1.cmp(&b.1))
+                .expect("a nonempty ladder");
+            (Some(split), value)
+        };
+        let growth = crate::holon::deposition::sqrt_ceiling(&square, grain);
+        let tick = &growth * &growth;
+        let (carried, spread_weight) = match &young {
+            Some(split) => (Rat::one() + split, Rat::one() + Rat::one() / split),
+            None => (Rat::one(), Rat::one()),
+        };
+        let gap = self
+            .metric
+            .scaled(&(&tick - spread_weight * &spread))
+            .subtract(&self.image.scaled(&carried))?;
+        if inertia(&symmetric(&gap)?).negative != 0 {
+            return Err(refused("the tube's tick factor is decided by inertia"));
+        }
+        Ok(TubeReach {
+            centre: self.centre,
+            distance: distance.clone(),
+            radius: radius.clone(),
+            variation,
+            tangent: tangent.clone(),
+            variation_reach: self.variation_reach.clone(),
+            response: self.response.clone(),
+            young,
+            bound: FloquetBound {
+                growth,
+                period: 1,
+                tick,
+                low: self.low.clone(),
+                high: self.high.clone(),
+            },
+        })
+    }
+}
+
+impl ResonatorOperands {
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **Whether the ring is
+    /// read on a tube**: its storage saturated on a one-tick period (no schedule, and no pump or a
+    /// declared standing pump), the ring whose rest points [`ResonatorOperands::tube_centres`]
+    /// names. A saturated ring on a pump of several phases is not: its period's tube is owed (#62),
+    /// and its reach keeps its linear part's monodromy.
+    pub fn reads_tube(&self) -> bool {
+        self.schedule.is_none() && self.material.saturation().is_some() && self.phases.len() == 1
+    }
+
+    /// Whether a standing pump of nonzero strength stands the two sheets.
+    fn stands_sheets(&self) -> bool {
+        self.material
+            .pump()
+            .is_some_and(|pump| pump.step() == PumpStep::Stand && !pump.strength().is_zero())
+    }
+
+    /// The displacement of the standing sheet `sign = ±1`: `±a e^(iφ)` on every node.
+    fn sheet_displacement(&self, sign: i8) -> Result<Vec<Rat>, HnnError> {
+        let amplitude = self.sheet_amplitude()? * integer(i64::from(sign.signum()));
+        let pump = self
+            .material
+            .pump()
+            .expect("the amplitude read the standing pump");
+        let n = self.width();
+        let mut displacement = vec![Rat::zero(); n];
+        for node in 0..n / 2 {
+            displacement[2 * node] = &amplitude * pump.axis().cos();
+            displacement[2 * node + 1] = &amplitude * pump.axis().sin();
+        }
+        Ok(displacement)
+    }
+
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **The period's rest
+    /// points** with their displacements: the origin, then, where a standing pump of nonzero
+    /// strength stands them, the two sheets. Refused where [`ResonatorOperands::sheet_amplitude`]
+    /// is, at a pump that stands sheets.
+    pub fn tube_centres(&self) -> Result<Vec<(TubeCentre, Vec<Rat>)>, HnnError> {
+        let mut centres = vec![(TubeCentre::Origin, vec![Rat::zero(); self.width()])];
+        if self.stands_sheets() {
+            for sign in [1, -1] {
+                centres.push((TubeCentre::Sheet(sign), self.sheet_displacement(sign)?));
+            }
+        }
+        Ok(centres)
+    }
+
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **A passage's
+    /// distances**: the running maximum, per rest point, of the node `ℓ¹` distance of each
+    /// displacement the passage executed (`hnn::word::Word::tube_passages`).
+    pub fn passage<'d>(
+        &self,
+        displacements: impl IntoIterator<Item = &'d [Rat]>,
+    ) -> Result<TubePassage, HnnError> {
+        let centres = self.tube_centres()?;
+        let mut distances: Vec<(TubeCentre, Rat)> = centres
+            .iter()
+            .map(|(centre, _)| (*centre, Rat::zero()))
+            .collect();
+        for displacement in displacements {
+            if displacement.len() != self.width() {
+                return Err(HnnError::Shape {
+                    what: "a passage's displacement (the ring's realified width)",
+                    expected: self.width(),
+                    found: displacement.len(),
+                });
+            }
+            for ((_, distance), (_, centre)) in distances.iter_mut().zip(&centres) {
+                let far = crate::holon::parametron::node_reach(&sub(displacement, centre));
+                if far > *distance {
+                    *distance = far;
+                }
+            }
+        }
+        Ok(TubePassage {
+            ring: self.ring,
+            distances,
+        })
+    }
+
+    /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The standing sheet's
+    /// metric**, derived for the deadbeat sheet, where `h²X(K + H(c)) = I` and the Jacobian is
+    /// `[[0, hQ], [−I/h, Q]]` with `Q = XC`: `G = [[I/h², −Q/(2h)], [−Q/(2h), Q + (I − Q)/4]] ⪰
+    /// min(1, 1/h²)/4 · I`. It reads neither the centre nor the sheet.
+    fn sheet_metric(&self) -> Result<ExactRatMatrix, HnnError> {
+        let n = self.width();
+        let h = &self.step;
+        let x = self.phases[0].operator.inverse()?;
+        let (capacity, _, _) = self.material.forms();
+        let q = x.multiply(capacity)?;
+        let id = ExactRatMatrix::identity(n)?;
+        let quarter = rat(1, 4);
+        let quadrature = q.add(&id.subtract(&q)?.scaled(&quarter))?;
+        Ok(ExactRatMatrix::shaped(
+            2 * n,
+            2 * n,
+            (0..2 * n)
+                .map(|i| {
+                    (0..2 * n)
+                        .map(|j| match (i < n, j < n) {
+                            (true, true) => {
+                                if i == j {
+                                    Rat::one() / (h * h)
+                                } else {
+                                    Rat::zero()
+                                }
+                            }
+                            (true, false) => -q.get(i, j - n).expect("in range") / (integer(2) * h),
+                            (false, true) => -q.get(i - n, j).expect("in range") / (integer(2) * h),
+                            (false, false) => {
+                                quadrature.get(i - n, j - n).expect("in range").clone()
+                            }
+                        })
+                        .collect()
+                })
+                .collect(),
+        )?)
+    }
+
+    /// [proved-derived; implemented-exact, the scope agent-inferred, October 18; the design review
+    /// of step 1a] **The tube metric at a rest point** of the saturated ring's one-tick period (the
+    /// exact law), its tangent `J(L) = [[I − h²XL, hXC], [−hXL, XC]]`, `L(u) = K_φ + ∇²Q(u)`, read
+    /// at the centre. The metric is the standing sheet's ([`ResonatorOperands::standing_sheet`]) at
+    /// every centre, the origin's included: it reads only `Q = XC` and `h`. Each reading is its
+    /// dyadic bound at the grain `2^(−g)`, decided by inertia; [`TubeMetric::at`] reads a radius.
+    ///
+    /// [agent-inferred, October 18] The design asks the saddle's metric of the exact Stein solve on
+    /// the growth ladder above `J_c`'s spectral radius (`attain_metric`). On a ring of `n` complex
+    /// nodes that solve is a dense exact system in `2n(4n + 1)` unknowns (990 on the listener's
+    /// eleven nodes), whose elimination the cost law refuses per deposit; the sheet's metric is
+    /// positive at the saddle as well, and the inertia decision certifies whatever `σ` it gives.
+    /// Refused off a one-tick period.
+    pub fn tube_metric(&self, centre: TubeCentre, grain: u32) -> Result<TubeMetric, HnnError> {
+        let refused = |what| HnnError::Resonator {
+            ring: self.ring,
+            what,
+        };
+        if self.phases.len() != 1 || self.schedule.is_some() {
+            return Err(refused("a tube reach reads a one-tick period"));
+        }
+        let law = self.phases[0].loaded_law.as_ref().ok_or(refused(
+            "a nonlinear period needs the explicit quartic element relation",
+        ))?;
+        let element = law
+            .holon()
+            .loaded_parametron()
+            .ok_or(refused("a tube reach needs the actual quartic law"))?;
+        let h = &self.step;
+        let n = self.width();
+        let x = self.phases[0].operator.inverse()?;
+        let centres = self.tube_centres()?;
+        let (_, at) = centres.iter().find(|(at, _)| *at == centre).ok_or(refused(
+            "a tube's centre is a rest point of the ring's period",
+        ))?;
+        let state = [at.clone(), vec![Rat::zero(); n]].concat();
+        let tangent_map = element.jacobian(h, &x, &state)?;
+        let metric = self.sheet_metric()?;
+        let image = tangent_map
+            .transpose()?
+            .multiply(&metric)?
+            .multiply(&tangent_map)?;
+        let semidefinite = |form: ExactRatMatrix| -> Result<bool, HnnError> {
+            Ok(inertia(&symmetric(&form)?).negative == 0)
+        };
+        let tangent = least_dyadic(grain, |value| {
+            semidefinite(metric.scaled(value).subtract(&image)?)
+        })?;
+        let identity = ExactRatMatrix::identity(2 * n)?;
+        let high = least_dyadic(grain, |value| {
+            semidefinite(identity.scaled(value).subtract(&metric)?)
+        })?;
+        let low = greatest_dyadic(grain, |value| {
+            semidefinite(metric.subtract(&identity.scaled(value))?)
+        })?;
+        Ok(TubeMetric {
+            ring: self.ring,
+            centre,
+            variation_reach: crate::holon::parametron::variation_reach(h, &x, &metric)?,
+            response: crate::holon::parametron::drive_reach(h, &x, &metric)?,
+            coefficient: element.saturation().coefficient().clone(),
+            centre_reach: crate::holon::parametron::node_reach(at),
+            metric,
+            image,
+            tangent,
+            low,
+            high,
+        })
+    }
+
+    /// The reach on the tube of radius `radius` about the passage's nearest rest point
+    /// ([`ResonatorOperands::tube_metric`], [`TubeMetric::at`]).
+    pub fn tube_reach(
+        &self,
+        passage: &TubePassage,
+        radius: &Rat,
+        grain: u32,
+    ) -> Result<TubeReach, HnnError> {
+        let (centre, _) = passage.nearest();
+        self.tube_metric(centre, grain)?.at(passage, radius, grain)
     }
 }
 

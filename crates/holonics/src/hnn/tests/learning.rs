@@ -176,6 +176,7 @@ pub(super) fn chain_reach() -> Reach {
         entries: vec![0],
         phases: 1,
         loci: crate::hnn::retention::loci(&chain()).into_iter().collect(),
+        passages: Vec::new(),
     }
 }
 

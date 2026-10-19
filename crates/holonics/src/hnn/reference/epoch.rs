@@ -28,6 +28,13 @@ pub(crate) enum EpochWord {
 }
 
 impl EpochWord {
+    pub(crate) fn tube_passages(&self) -> Result<Vec<crate::hnn::ring::TubePassage>, HnnError> {
+        match self {
+            Self::Native(word) => word.tube_passages(),
+            Self::Executed(word) => word.tube_passages(),
+        }
+    }
+
     pub(crate) fn charts(&self) -> Vec<ChartReading> {
         match self {
             Self::Native(word) => word.operands().charts(),

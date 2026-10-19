@@ -3574,6 +3574,7 @@ impl SourceObserverPrediction<'_, '_> {
                 entries: vec![observation.anchors[0].2 as u64],
                 phases: samples.len() as u64,
                 loci: [locus].into_iter().collect(),
+                passages: Vec::new(),
             };
             let deposit = Deposit::new(
                 theta.commit(),
@@ -4176,6 +4177,7 @@ impl PhysicalPrediction<'_, '_> {
                     PhysicalLearning::Receiving => reached.iter().copied().collect(),
                     PhysicalLearning::SourcePorts | PhysicalLearning::PairOutputs => full_reach,
                 },
+                passages: Vec::new(),
             };
             let deposit =
                 Deposit::new(material.commit(), linear, factors, reached).with_reach(reach);

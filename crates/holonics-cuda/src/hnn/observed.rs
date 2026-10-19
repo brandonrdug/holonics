@@ -18,6 +18,7 @@ use holonics::hnn::reference::observed::{
     ObservedEpochExecution, ObservedEpochForwardContext, ObservedEpochForwardWord,
     ObservedEpochWord,
 };
+use holonics::hnn::ring::TubePassage;
 use holonics::hnn::{RatioCovector, Released, Word};
 use holonics::ratio::linear::ExactRatMatrix;
 
@@ -70,6 +71,7 @@ struct ForwardReading {
     anchors: Vec<Vec<Rat>>,
     reception_end: ReceptionCarry,
     released: Released,
+    passages: Vec<TubePassage>,
 }
 
 struct Client {
@@ -169,6 +171,7 @@ struct DeviceWord {
     id: Option<u64>,
     client: Arc<Client>,
     readings: Vec<ChartReading>,
+    passages: Vec<TubePassage>,
 }
 
 impl fmt::Debug for DeviceWord {
@@ -192,6 +195,10 @@ impl Drop for DeviceWord {
 impl ObservedEpochWord for DeviceWord {
     fn charts(&self) -> Vec<ChartReading> {
         self.readings.clone()
+    }
+
+    fn tube_passages(&self) -> Result<Vec<TubePassage>, HnnError> {
+        Ok(self.passages.clone())
     }
 
     fn return_at(
@@ -235,6 +242,7 @@ impl ObservedEpochDevice {
                 id: Some(reading.id),
                 client: Arc::clone(&self.client),
                 readings: reading.readings,
+                passages: reading.passages,
             }),
             faces: reading.faces,
             anchors: reading.anchors,
@@ -320,6 +328,75 @@ struct RetainedWord<'c> {
     field: Field,
     phases: ReceivingPhases,
     map: ExactRatMatrix,
+}
+
+/// Read the same displacement series as native `Word::tube_passages`, directly
+/// from this word's verified CUDA forward record. The publication's cached
+/// resonator operands are precisely those consumed when its WordPlan was formed;
+/// this reads no replacement native trajectory and seeds no new solve.
+fn executed_tube_passages(
+    word: &ExecutedWord<'_>,
+    field: &Field,
+) -> Result<Vec<TubePassage>, HnnError> {
+    let plan = &word.word.plan;
+    let record = &word.word.record;
+    let operands = word.word.publication.loci.resonator_operands(field)?;
+    let mut passages = Vec::new();
+    for (ring, operands) in operands.iter().enumerate() {
+        let Some(operands) = operands.as_ref().filter(|operands| operands.reads_tube()) else {
+            continue;
+        };
+        let refuse = || HnnError::Resonator {
+            ring,
+            what: "the CUDA tube passage requires every actual pre-tick and final displacement of its producing word",
+        };
+        let loaded = plan
+            .resonators
+            .iter()
+            .find(|loaded| loaded.ring == ring)
+            .ok_or_else(refuse)?;
+        if loaded.width != operands.width()
+            || loaded.phases != operands.phases()
+            || loaded.saturation.is_none()
+            || loaded
+                .rows
+                .checked_add(loaded.width)
+                .is_none_or(|end| end > plan.n)
+        {
+            return Err(refuse());
+        }
+        let full_ticks = plan.steps.checked_sub(1).ok_or_else(refuse)?;
+        let mut displacements = Vec::with_capacity(full_ticks.saturating_add(1));
+        for tick in 0..full_ticks {
+            let start = tick
+                .checked_mul(plan.n)
+                .and_then(|start| start.checked_add(loaded.rows))
+                .ok_or_else(refuse)?;
+            let end = start.checked_add(loaded.width).ok_or_else(refuse)?;
+            let values = record.resonator_u.get(start..end).ok_or_else(refuse)?;
+            displacements.push(
+                values
+                    .iter()
+                    .map(|&value| crate::hnn::dyadic::value(BigInt::from(value), plan.lw))
+                    .collect::<Vec<_>>(),
+            );
+        }
+        let end = loaded.rows.checked_add(loaded.width).ok_or_else(refuse)?;
+        let values = record
+            .resonator_final_u
+            .get(loaded.rows..end)
+            .ok_or_else(refuse)?;
+        displacements.push(
+            values
+                .iter()
+                .map(|&value| crate::hnn::dyadic::value(BigInt::from(value), plan.lw))
+                .collect::<Vec<_>>(),
+        );
+        passages.push(operands.passage(displacements.iter().map(Vec::as_slice))?);
+    }
+    // Empty is justified only by the actual publication's lack of eligible
+    // resonator operands, never by an absent or malformed device record.
+    Ok(passages)
 }
 
 /// Validate the already admitted phase operand without running a new rank
@@ -508,6 +585,7 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>) {
                         &word.word.record,
                         &executed,
                     )?;
+                    let passages = executed_tube_passages(&word, &field)?;
                     let map = mounted
                         .constitution
                         .receiving_map(ratio.phases().ring())
@@ -525,6 +603,7 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>) {
                         anchors,
                         reception_end,
                         released,
+                        passages,
                     };
                     // Only a successful verified export becomes the next reuse
                     // operand. The scope owns no source, target or word history.
@@ -779,6 +858,12 @@ mod tests {
         .unwrap();
         let publication = Rc::clone(&first.mounted.publication);
         let (first_word, first_faces) = execute_prepared(&mut first, &card, &ratio);
+        assert!(
+            executed_tube_passages(&first_word, field)
+                .unwrap()
+                .is_empty(),
+            "the actual unsaturated publication has no eligible tube passage"
+        );
         let verified = first.charts.clone();
         mounts.push(first);
         let mut reused = prepare_observed_mount(
@@ -902,6 +987,100 @@ mod tests {
             )
             .is_err()
         );
+    }
+
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn actual_observed_pump_tube_passages_read_card_displacements_and_refuse_missing_records() {
+        use holonics::hnn::port::ExecutionPort;
+        use holonics::hnn::reference::observed::HostObservedEpochExecution;
+        use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial, TubeCentre};
+        let card = Card::open(0).unwrap();
+        let (reference, mut resident, _, pairing) = opening();
+        let field = resident.field().clone();
+        let boundary = holonics::hnn::encoding::observed::PairedObservation::admit(
+            &field,
+            resident.constitution(),
+            &pairing,
+        )
+        .unwrap();
+        let (moment, _) = reference
+            .ingest(&mut resident, None, &boundary.encode(&[1]).unwrap())
+            .unwrap();
+        let width = field.ring(0).width();
+        let material = ResonatorMaterial::new(
+            ExactRatMatrix::identity(width)
+                .unwrap()
+                .scaled(&integer(16)),
+            ExactRatMatrix::zero(width, width).unwrap(),
+            ExactRatMatrix::zero(width, width).unwrap(),
+            Some(
+                PumpDeclaration::new(
+                    rat(1, 8),
+                    holonics::holon::parametron::Carrier::new(integer(1), integer(0)).unwrap(),
+                    PumpStep::Stand,
+                )
+                .unwrap(),
+            ),
+        )
+        .unwrap()
+        .with_symmetric_saturation(rat(1, 65536))
+        .unwrap();
+        let constitution = resident
+            .constitution()
+            .clone()
+            .with_ring_resonator(&field, 0, material)
+            .unwrap();
+        let phases = &resident.admitted()[0];
+        let ratio = PendingRatio::produce(
+            resident.current(),
+            resident.moment(&moment).unwrap(),
+            resident.address(),
+            phases,
+            constitution.commit(),
+        )
+        .unwrap();
+        let native = HostObservedEpochExecution
+            .forward(
+                &field,
+                &constitution,
+                &ratio,
+                &mut Charts::new(),
+                &WordOpening::Rest,
+            )
+            .unwrap();
+        let expected = native.word.tube_passages().unwrap();
+        assert!(!expected.is_empty());
+        assert!(expected.iter().any(|passage| {
+            passage
+                .distance(TubeCentre::Origin)
+                .is_some_and(|distance| distance > &integer(0))
+        }));
+        let mut mount = prepare_observed_mount(
+            &card,
+            &mut Vec::new(),
+            None,
+            &field,
+            &constitution,
+            resident.current(),
+            phases,
+            &Charts::new(),
+        )
+        .unwrap();
+        let (mut executed, _) = execute_prepared(&mut mount, &card, &ratio);
+        assert_eq!(executed_tube_passages(&executed, &field).unwrap(), expected);
+        let complete = executed.word.record.clone();
+        executed.word.record.resonator_final_u.clear();
+        assert!(matches!(
+            executed_tube_passages(&executed, &field),
+            Err(HnnError::Resonator { ring: 0, .. })
+        ));
+        executed.word.record = complete;
+        executed.word.record.resonator_u.clear();
+        assert!(matches!(
+            executed_tube_passages(&executed, &field),
+            Err(HnnError::Resonator { ring: 0, .. })
+        ));
     }
 
     #[test]
