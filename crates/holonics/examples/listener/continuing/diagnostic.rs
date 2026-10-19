@@ -985,6 +985,7 @@ fn run_cost_profile_64(
     setup_cutoff.check()?;
     let setup_started = Instant::now();
     let (mut fresh, pairing) = mounted(port, options.population)?;
+    setup_cutoff.check()?;
     let opening = fresh.constitution().clone();
     let boundary = holonics::hnn::encoding::observed::PairedObservation::admit(
         fresh.field(),
@@ -992,6 +993,7 @@ fn run_cost_profile_64(
         &pairing,
     )?;
     let empty = boundary.encode(&[])?;
+    setup_cutoff.check()?;
     let (moment, empty_opening) = port.ingest(&mut fresh, None, &empty)?;
     if fresh
         .moment(&moment)
