@@ -2438,6 +2438,7 @@ impl NormalLaw {
             .count();
         Some(EpochStorageReading {
             map_lattice: law.map_lattice,
+            source_refinement: law.source_refinement,
             crossings: law.crossings,
             gram_departed_prior_rows,
             map: read(&law.map),
@@ -2837,7 +2838,14 @@ impl NormalLaw {
                 })
                 .sum::<u64>()
                 + self.phase.as_ref().map_or(0, |phase| phase.bits())
-                + self.symmetry.as_ref().map_or(0, PortSymmetry::bits);
+                + self.symmetry.as_ref().map_or(0, PortSymmetry::bits)
+                // An adaptive source lattice is future-sufficient material,
+                // even when W cancels to a smaller canonical exponent.
+                + if law.source_refinement {
+                    u64::from(law.map_lattice) + 1
+                } else {
+                    1
+                };
             let (_, _, base, moves) = law.spectral.checkpoint_words();
             return CarrierBits {
                 entries,
@@ -2898,6 +2906,7 @@ pub struct EpochArrayReading {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochStorageReading {
     pub map_lattice: u32,
+    pub source_refinement: bool,
     pub crossings: u64,
     /// Rows of canonical H differing from its declared scaled diagonal prior.
     /// This is an actual statistic support, independent of any retired solve.
@@ -2942,6 +2951,9 @@ pub struct EpochLocusDepositReading {
     pub certificate_moves: Rat,
     pub certificate_covector_scale: Rat,
     pub gamma: Rat,
+    /// Actual represented delta's comparison alignment/moves at step one.
+    pub actual_alignment: Rat,
+    pub actual_moves: Rat,
     pub eta: Rat,
     pub fall: Rat,
     /// The local dyadic junction conductance shares, M_jj=2^shares[j].
@@ -2961,6 +2973,10 @@ pub struct EpochDepositReading {
     pub receiver_partition_bits: u32,
     pub partition_exponent: u32,
     pub loci: Vec<EpochLocusDepositReading>,
+    /// Fresh rays selected gamma; only DepositReading::joint/steps certify
+    /// the actual represented normal deltas after retained R was consumed.
+    pub fresh_joint: Option<JointReading>,
+    pub fresh_steps: Vec<(Locus, StepReading)>,
     pub receiving: EpochReceivingSeries,
 }
 
@@ -7158,6 +7174,8 @@ impl Constitution {
     /// grain, while the certified first-order decrease `Σ η a` grows, and stops where it no longer
     /// grows (the ring reach's ladder idiom); a rung whose tube is refused ends the climb. A declared
     /// or candidate source reads the first rung and records the closure without enforcing it.
+    /// An Actual source reads the first rung and enforces its fixed candidate's
+    /// own curvature, joint triangle and every tube closure without searching.
     fn certify_steps(
         &self,
         reach: Option<&Reach>,
@@ -7917,7 +7935,7 @@ impl Constitution {
                     break (steps, read, bounds, joint);
                 }
             }
-            StepSource::Declared(declared) => {
+            StepSource::Declared(declared) | StepSource::Actual(declared) => {
                 // One declared candidate: each stepping family at its declared exponent, the
                 // covector-scale bound kept, nothing halved and nothing searched.
                 let mut steps: Vec<Option<CertifiedStep>> = Vec::with_capacity(parts.len());
@@ -7960,6 +7978,29 @@ impl Constitution {
                 let bounds = bounds_of(&read);
                 let certified: Vec<&CertifiedStep> = steps.iter().flatten().collect();
                 let joint = joint_of(&certified, &bounds);
+                if matches!(source, StepSource::Actual(_)) {
+                    // A represented epoch move is a fixed candidate. Unlike
+                    // Declared/Candidate, it must satisfy the very same bounds
+                    // used by Certified, including the executed tube closure.
+                    if certified.iter().any(|step| !step.admits(&step.curvature)) {
+                        return Err(HnnError::Unadmitted {
+                            reason: "the actual epoch ray violates its own curvature bound",
+                        });
+                    }
+                    if !joint.holds() {
+                        return Err(HnnError::Unadmitted {
+                            reason: "the actual epoch rays violate the joint triangle bound",
+                        });
+                    }
+                    if closure_of(&steps)?
+                        .iter()
+                        .any(|(closure, _)| !closure.holds())
+                    {
+                        return Err(HnnError::Unadmitted {
+                            reason: "the actual epoch rays leave an executed pump tube",
+                        });
+                    }
+                }
                 (steps, read, bounds, joint)
             }
         };
@@ -9647,8 +9688,12 @@ mod candidate_relative_step_tests {
 #[derive(Clone, Copy)]
 enum StepSource<'d> {
     Certified,
-    Candidate { halvings: u32 },
+    Candidate {
+        halvings: u32,
+    },
     Declared(&'d DeclaredExponents),
+    /// Fixed represented deltas: shared ray reads, enforced bounds, no search.
+    Actual(&'d DeclaredExponents),
 }
 
 impl StepSource<'_> {
@@ -9656,7 +9701,10 @@ impl StepSource<'_> {
     fn unstepped(&self) -> Result<(), DeclaredStepRefusal> {
         match self {
             StepSource::Certified | StepSource::Candidate { .. } => Ok(()),
-            StepSource::Declared(declared) => match declared.families().next() {
+            StepSource::Declared(declared) | StepSource::Actual(declared) => match declared
+                .families()
+                .next()
+            {
                 Some(&(locus, family)) => Err(DeclaredStepRefusal::Undeclared { locus, family }),
                 None => Ok(()),
             },
@@ -11710,15 +11758,49 @@ impl Constitution {
             return Err(refuse("the state continues another opening's material"));
         }
         let receiver_exponent = lattice_exponent(self.grain, 1);
-        for (material, saved) in self.rings.iter_mut().zip(&state.rings) {
-            for (saved, declared) in [
-                (Some(&saved.contrast), Some(&material.contrast)),
-                (saved.source.as_ref(), material.source.as_ref()),
+        for (ring, (material, saved)) in self.rings.iter_mut().zip(&state.rings).enumerate() {
+            for (saved, declared, source) in [
+                (Some(&saved.contrast), Some(&material.contrast), false),
+                (saved.source.as_ref(), material.source.as_ref(), true),
             ] {
                 if let (Some(saved), Some(declared)) = (saved, declared)
                     && let Some(epoch) = saved.epoch_law()
                 {
-                    epoch.validate_against_native(declared, receiver_exponent)?;
+                    epoch.validate_against_native(declared, receiver_exponent, source)?;
+                    if source
+                        && epoch.source_refinement
+                        && state
+                            .lattices
+                            .get(&Locus::SourcePort(ring))
+                            .map(Lattice::exponent)
+                            != Some(epoch.map_lattice)
+                    {
+                        return Err(refuse(
+                            "the source epoch disagrees with its active material lattice",
+                        ));
+                    }
+                    if source && epoch.source_refinement {
+                        let founding = self
+                            .lattices
+                            .get(&Locus::SourcePort(ring))
+                            .map(Lattice::exponent)
+                            .ok_or_else(|| refuse("a source lattice declaration"))?;
+                        if epoch.map_lattice < founding {
+                            return Err(refuse(
+                                "a continued source lattice cannot coarsen its founding declaration",
+                            ));
+                        }
+                        // Check before on_lattice can materialize 2^L from an
+                        // untrusted active-lattice word.
+                        if u64::from(epoch.map_lattice) > self.budget {
+                            return Err(HnnError::ConstitutionBudget {
+                                bits: u64::from(epoch.map_lattice),
+                                budget: self.budget,
+                                commit: state.commit,
+                                loci: vec![Locus::SourcePort(ring)],
+                            });
+                        }
+                    }
                     if epoch.news.row_divisors.iter().any(|&d| d != 1) {
                         return Err(refuse(
                             "odd receiving phase factors outside a receiving normal locus",
@@ -11729,7 +11811,7 @@ impl Constitution {
             if let (Some(saved), Some(declared)) = (&saved.receiving, &material.receiving) {
                 for (saved, declared) in saved.laws().into_iter().zip(declared.laws()) {
                     if let Some(epoch) = saved.epoch_law() {
-                        epoch.validate_against_native(declared, receiver_exponent)?;
+                        epoch.validate_against_native(declared, receiver_exponent, false)?;
                     }
                 }
             }
@@ -14864,6 +14946,151 @@ mod epoch_native_checkpoint_tests {
         }
     }
 
+    /// Projection and real source-consumer control. This supplies a normal
+    /// flow directly; it does not claim a learned native comparison or output.
+    #[test]
+    fn refined_source_map_is_consumed_by_encoded_opening_after_cold_mount() {
+        use crate::hnn::{Current, Encoded, SourceMoment, Word, WordOpening};
+        use crate::holarchy::terrain::{CyclicLaw, KnownTruth};
+        use std::sync::Arc;
+        let field = native_field();
+        let opening = Constitution::initial(&field, 1 << 40).unwrap();
+        let normal = opening.source_law(0).unwrap();
+        let (rows, columns) = (normal.map().rows(), normal.map().columns());
+        let opening = opening
+            .with_ports(
+                0,
+                None,
+                Some(ExactRatMatrix::zero(rows, columns).unwrap()),
+                None,
+            )
+            .unwrap()
+            .with_transport(0, Rat::one())
+            .unwrap();
+        let grain = lattice_exponent(u128::from(field.finest_grain()), 1);
+        let law = EpochLaw::from_normal(opening.source_law(0).unwrap(), grain).unwrap();
+        let mut feature = vec![Rat::zero(); columns];
+        feature[0] = Rat::one();
+        let sample = Sample {
+            weight: Rat::one(),
+            feature,
+            covector: vec![Rat::new(BigInt::one(), BigInt::one() << grain as usize); rows],
+            masses: None,
+        };
+        let record = EpochRecord::from_sample_with_phase_rows(&sample, &[], 1).unwrap();
+        let flow =
+            EpochFlow::from_records(rows, columns, grain, 1, 0, 1, &[record.clone()]).unwrap();
+        let gain =
+            EpochArray::from_dyadic_scalar(&Rat::new(BigInt::one(), BigInt::one() << 24usize))
+                .unwrap();
+        let prepared = law
+            .deposit_source(
+                &flow,
+                &gain,
+                opening.lattice(Locus::SourcePort(0)).unwrap().exponent(),
+                1 << 40,
+                0,
+                0,
+            )
+            .unwrap();
+        assert!(!prepared.step.is_zero());
+        let second_flow =
+            EpochFlow::from_records(rows, columns, grain, 1, 1, 1, &[record]).unwrap();
+        let active = prepared.successor.map_lattice;
+        let prepared = prepared
+            .successor
+            .deposit_source(&second_flow, &gain, active, 1 << 40, 0, 0)
+            .unwrap();
+        assert!(!prepared.step.is_zero());
+        assert!(!prepared.successor.news.is_zero());
+        let active = prepared.successor.map_lattice;
+        let mut learned = opening.clone();
+        learned.rings[0]
+            .source
+            .as_mut()
+            .unwrap()
+            .publish_epoch(prepared.successor)
+            .unwrap();
+        learned
+            .lattices
+            .insert(Locus::SourcePort(0), Lattice::new(active));
+        assert!(learned.on_lattice());
+        let text = learned.continuing_state(0).unwrap().to_text();
+        let parsed = ContinuingState::from_text(&text).unwrap();
+        let current = Current::at_rest(&field);
+        let mounted = crate::hnn::reference::Reference::new(16, 1 << 40)
+            .mount_continued(&field, &current, opening.clone(), &parsed)
+            .unwrap();
+        assert_eq!(mounted.constitution(), &learned);
+        assert_eq!(
+            mounted
+                .constitution()
+                .continuing_state(0)
+                .unwrap()
+                .to_text(),
+            text
+        );
+
+        // The boundary enters through Encoded and its actual source moment;
+        // Wm and the exact Word opening must consume the refined publication.
+        let truth = KnownTruth::cyclic(CyclicLaw::Line, 1, 0, 1, 1).unwrap();
+        let cells = Encoded::identity(&truth, &field).unwrap().remove(0);
+        let mut entered = current.clone();
+        let mut moment = SourceMoment::open(&field, &current);
+        moment.ingest(&field, &mut entered, &cells).unwrap();
+        let before = moment.open_storage(&field, &opening, &entered).unwrap();
+        let after = moment
+            .open_storage(&field, mounted.constitution(), &entered)
+            .unwrap();
+        assert!(before[0].iter().all(Zero::is_zero));
+        assert!(after[0].iter().any(|x| !x.is_zero()));
+        let moment = Arc::new(moment);
+        let (mut word, receipt) = Word::open_source_exact_received(
+            &field,
+            mounted.constitution(),
+            &entered,
+            Arc::clone(&moment),
+            &WordOpening::Rest,
+        )
+        .unwrap();
+        assert!(receipt.closes());
+        assert_eq!(word.change().unwrap().storage, after);
+        let (mut uninterrupted, opening_receipt) = Word::open_source_exact_received(
+            &field,
+            &learned,
+            &entered,
+            moment,
+            &WordOpening::Rest,
+        )
+        .unwrap();
+        assert_eq!(opening_receipt, receipt);
+        for _ in 0..2 {
+            word.tick().unwrap();
+            uninterrupted.tick().unwrap();
+            assert_eq!(word.change().unwrap(), uninterrupted.change().unwrap());
+            assert_eq!(word.field_balances(), uninterrupted.field_balances());
+            assert!(word.field_balances().last().unwrap().closes());
+        }
+
+        let mut mismatched = parsed;
+        mismatched
+            .lattices
+            .insert(Locus::SourcePort(0), Lattice::new(active - 1));
+        assert!(opening.clone().continued(&mismatched).is_err());
+        assert_eq!(
+            opening.rings[0]
+                .source
+                .as_ref()
+                .unwrap()
+                .map()
+                .entries()
+                .iter()
+                .filter(|x| !x.is_zero())
+                .count(),
+            0
+        );
+    }
+
     #[test]
     fn canonical_epoch_checkpoint_keeps_odd_news_and_never_saves_the_read_view() {
         let mut normal = NormalLaw::with_receiving_prior(ExactRatMatrix::zero(4, 2).unwrap(), 0);
@@ -14894,7 +15121,7 @@ mod epoch_native_checkpoint_tests {
         write_normal_map(&mut encoded, "E", &normal);
         write_law(&mut encoded, &normal);
         assert!(encoded.starts_with("E 0 0\nepoch-law "));
-        assert_eq!(encoded.matches("epoch-law-checkpoint-v2").count(), 1);
+        assert_eq!(encoded.matches("epoch-law-checkpoint-v3").count(), 1);
         let mut lines = encoded.lines();
         let envelope = read_matrix(&mut lines, "E", "a synthetic source envelope").unwrap();
         let restored = read_law(&mut lines, envelope).unwrap();

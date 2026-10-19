@@ -649,6 +649,9 @@ pub(crate) struct EpochLaw {
     pub(crate) news: EpochArray,
     pub(crate) receiver_grain: u32,
     pub(crate) map_lattice: u32,
+    /// Source material alone may refine its dyadic representation at a crossing.
+    /// R remains its only unabsorbed normal news; this is not another carry.
+    pub(crate) source_refinement: bool,
     /// Number of absorbed batches, distinct from actual receiving ingress c.
     pub(crate) crossings: u64,
     /// This bound affects future certified gains, so a continuing checkpoint
@@ -785,7 +788,13 @@ impl EpochLaw {
         &self,
         declaration: &NormalLaw,
         receiver_grain: u32,
+        source_refinement: bool,
     ) -> Result<(), HnnError> {
+        if self.source_refinement && !source_refinement {
+            return Err(refused(
+                "an epoch source refinement must match its native locus",
+            ));
+        }
         if (self.map.rows, self.map.columns)
             != (declaration.map().rows(), declaration.map().columns())
             || self.receiver_grain != receiver_grain
@@ -795,7 +804,8 @@ impl EpochLaw {
                 "an epoch checkpoint must match the native port shape, receiver grain, and paired declaration",
             ));
         }
-        let founded = Self::from_normal(declaration, receiver_grain)?;
+        let mut founded = Self::from_normal(declaration, receiver_grain)?;
+        founded.source_refinement = self.source_refinement;
         if declaration.receiving_prior().is_some() {
             // `continued` has the actual native law but not its field period.
             // Only that declared receiving role may defer the row binding;
@@ -829,6 +839,7 @@ impl EpochLaw {
             map_lattice: receiver_grain
                 .checked_add(ceil_log2_count(width))
                 .ok_or_else(extent)?,
+            source_refinement: false,
             crossings: 0,
             spectral: EpochSpectral::founded_zero(rows, columns),
             symmetry: None,
@@ -861,6 +872,7 @@ impl EpochLaw {
             map_lattice: receiver_grain
                 .checked_add(ceil_log2_count(columns))
                 .ok_or_else(extent)?,
+            source_refinement: false,
             crossings,
             spectral,
             symmetry,
@@ -1072,12 +1084,72 @@ impl EpochLaw {
         self.deposited_at(flow, gamma, BigInt::one(), BigInt::one())
     }
 
+    /// Prepare source material at its active lattice. Publication additionally
+    /// requires the actual represented-ray check in the epoch consumer. The
+    /// budget is the whole native budget, an upper bound on this local payload.
+    pub(crate) fn deposit_source(
+        &self,
+        flow: &EpochFlow,
+        gamma: &EpochArray,
+        active_lattice: u32,
+        budget: u64,
+        commit: u64,
+        ring: usize,
+    ) -> Result<EpochDeposit, HnnError> {
+        if !self.news.is_dyadic() || !self.map.is_dyadic() {
+            return Err(refused(
+                "source refinement requires dyadic material and news",
+            ));
+        }
+        if self.source_refinement && self.map_lattice != active_lattice {
+            return Err(refused(
+                "source epoch and active material lattices must agree",
+            ));
+        }
+        if (gamma.rows, gamma.columns) != (1, 1)
+            || !gamma.is_dyadic()
+            || gamma.values.iter().any(Signed::is_negative)
+        {
+            return Err(refused(
+                "the source fresh-news gain is nonnegative and dyadic",
+            ));
+        }
+        let mut source = self.clone();
+        source.source_refinement = true;
+        source.map_lattice = source.map_lattice.max(active_lattice);
+        let mut deposit = source.deposited_with_projection(
+            flow,
+            gamma,
+            BigInt::one(),
+            BigInt::one(),
+            Some((budget, commit, Locus::SourcePort(ring))),
+        )?;
+        if deposit.step.is_zero() {
+            // Representation is refined only with an actual admitted move.
+            // A first zero crossing may still absorb F/G on the founded policy.
+            deposit.successor.source_refinement = self.source_refinement;
+            deposit.successor.map_lattice = self.map_lattice;
+        }
+        Ok(deposit)
+    }
+
     fn deposited_at(
         &self,
         flow: &EpochFlow,
         gamma: &EpochArray,
         eta_numerator: BigInt,
         eta_denominator: BigInt,
+    ) -> Result<EpochDeposit, HnnError> {
+        self.deposited_with_projection(flow, gamma, eta_numerator, eta_denominator, None)
+    }
+
+    fn deposited_with_projection(
+        &self,
+        flow: &EpochFlow,
+        gamma: &EpochArray,
+        eta_numerator: BigInt,
+        eta_denominator: BigInt,
+        source_budget: Option<(u64, u64, Locus)>,
     ) -> Result<EpochDeposit, HnnError> {
         if eta_numerator.is_negative() || !eta_denominator.is_positive() {
             return Err(refused(
@@ -1097,7 +1169,55 @@ impl EpochLaw {
         let gram = self.gram.add(&flow.gram)?;
         let news = self.news.add(&flow.covector.scalar_product(gamma)?)?;
         let (direction, shares) = self.direction(&news, &gram, &flow.support)?;
-        let shift = i64::from(self.map_lattice) - i64::from(direction.exponent);
+        let mut map_lattice = self.map_lattice;
+        // A zero fresh gain certifies no new source motion. Old R is retained,
+        // rather than treated as a freshly certified ray.
+        let source_held = source_budget.is_some() && gamma.is_zero();
+        if source_budget.is_some() && !source_held && !direction.is_zero() {
+            let maximum = direction
+                .values
+                .iter()
+                .map(Signed::abs)
+                .max()
+                .expect("a nonzero source direction has a coordinate");
+            // Source rows are dyadic: D = n / 2^e. The smallest l with
+            // 2^l max|D| >= 1 is max(0, e-floor(log2(max|n|))).
+            let whole = maximum.bits().checked_sub(1).ok_or_else(extent)?;
+            let reach = u64::from(direction.exponent).saturating_sub(whole);
+            map_lattice = map_lattice.max(u32::try_from(reach).map_err(|_| extent())?);
+        }
+        if let Some((budget, commit, locus)) = source_budget {
+            // Admit the allocation's actual upper extent before any shift to a
+            // finer lattice. This is conservative, never an enlarged budget.
+            let entries = u64::try_from(self.map.values.len()).map_err(|_| extent())?;
+            let old_bits = self
+                .map
+                .values
+                .iter()
+                .map(BigInt::bits)
+                .max()
+                .unwrap_or(0)
+                .saturating_add(u64::from(map_lattice.saturating_sub(self.map.exponent)));
+            let move_bits = direction
+                .values
+                .iter()
+                .map(BigInt::bits)
+                .max()
+                .unwrap_or(0)
+                .saturating_add(u64::from(map_lattice.saturating_sub(direction.exponent)));
+            let predicted = entries
+                .saturating_mul(old_bits.max(move_bits).saturating_add(2))
+                .saturating_add(u64::from(map_lattice));
+            if predicted > budget {
+                return Err(HnnError::ConstitutionBudget {
+                    bits: predicted,
+                    budget,
+                    commit,
+                    loci: vec![locus],
+                });
+            }
+        }
+        let shift = i64::from(map_lattice) - i64::from(direction.exponent);
         let denominator = if shift < 0 {
             &eta_denominator << (-shift) as usize
         } else {
@@ -1108,6 +1228,9 @@ impl EpochLaw {
             .iter()
             .enumerate()
             .map(|(index, v)| {
+                if source_held {
+                    return BigInt::zero();
+                }
                 let numerator = v * &eta_numerator;
                 let numerator = if shift > 0 {
                     numerator << shift as usize
@@ -1117,7 +1240,7 @@ impl EpochLaw {
                 numerator / (&denominator * direction.row_divisors[index / direction.columns])
             })
             .collect();
-        let step = EpochArray::new(self.map.rows, self.map.columns, self.map_lattice, values)?;
+        let step = EpochArray::new(self.map.rows, self.map.columns, map_lattice, values)?;
         let linear = step.dot(&news)?;
         let quadratic = step.multiply(&gram)?.dot(&step)?.half()?;
         let fall = linear.subtract(&quadratic)?;
@@ -1193,6 +1316,7 @@ impl EpochLaw {
             gram,
             news,
             spectral,
+            map_lattice,
             crossings: self.crossings.checked_add(1).ok_or_else(extent)?,
             ..self.clone()
         };
@@ -1815,5 +1939,165 @@ mod tests {
             assert!(deposited.fall.values[0] > BigInt::zero());
             assert_eq!(deposited.halvings, 0);
         }
+    }
+}
+
+#[cfg(test)]
+mod source_refinement_tests {
+    use super::*;
+
+    fn scalar(exponent: u32, value: i64) -> EpochArray {
+        EpochArray::new(1, 1, exponent, vec![BigInt::from(value)]).unwrap()
+    }
+
+    fn flow(epoch: u64, orientation: i64) -> EpochFlow {
+        EpochFlow {
+            gram: scalar(0, 1),
+            covector: scalar(2, orientation),
+            support: vec![0],
+            partitions: Vec::new(),
+            cells: 1,
+            partition_cells: 1,
+            records: 1,
+            partition_exponent: partition_exponent(11, 1, epoch).unwrap(),
+            receiver_grain: 11,
+            epoch,
+        }
+    }
+
+    fn source(law: &EpochLaw, flow: &EpochFlow, gain: &EpochArray) -> EpochDeposit {
+        law.deposit_source(flow, gain, law.map_lattice, 1 << 20, law.crossings, 0)
+            .unwrap()
+    }
+
+    // This is a projection/retention control, not a native gain certificate or
+    // learned-output fixture. The actual epoch consumer checks its final ray.
+    #[test]
+    fn recurrent_source_news_reaches_a_finer_material_grain_with_exact_remainder() {
+        let declaration = EpochLaw::founded(1, 1, 11, 0).unwrap();
+        let gain = scalar(13, 1);
+        let mut fixed = declaration.clone();
+        let mut adaptive = declaration;
+        for epoch in 0..12 {
+            let incoming = flow(epoch, 1);
+            let old = fixed.deposit(&incoming, &gain).unwrap();
+            assert!(old.step.is_zero());
+            fixed = old.successor;
+            let prepared = source(&adaptive, &incoming, &gain);
+            assert!(!prepared.step.is_zero());
+            assert!(prepared.fall.scalar_ratio().unwrap().is_positive());
+            assert!(prepared.successor.map_lattice >= adaptive.map_lattice);
+            assert!(prepared.successor.map.is_dyadic());
+            let metric = adaptive.gram.add(&incoming.gram).unwrap();
+            assert_eq!(
+                prepared
+                    .successor
+                    .map
+                    .multiply(&metric)
+                    .unwrap()
+                    .add(&prepared.successor.news)
+                    .unwrap(),
+                adaptive
+                    .map
+                    .multiply(&metric)
+                    .unwrap()
+                    .add(&adaptive.news)
+                    .unwrap()
+                    .add(&incoming.covector.scalar_product(&gain).unwrap())
+                    .unwrap(),
+            );
+            if epoch == 0 {
+                assert_eq!(prepared.successor.map_lattice, 16);
+                assert_eq!(
+                    prepared.step.scalar_ratio().unwrap(),
+                    Rat::new(1.into(), BigInt::one() << 16usize)
+                );
+            }
+            adaptive = prepared.successor;
+        }
+        assert!(!adaptive.news.is_zero());
+        assert!(fixed.map.is_zero());
+        assert!(!adaptive.map.is_zero());
+    }
+
+    #[test]
+    fn signed_source_changes_cancel_and_zero_gain_holds_old_news() {
+        let mut law = EpochLaw::founded(1, 1, 11, 0).unwrap();
+        let gain = scalar(13, 1);
+        for epoch in 0..8 {
+            let orientation = if epoch % 2 == 0 { 1 } else { -1 };
+            let prepared = source(&law, &flow(epoch, orientation), &gain);
+            assert!(!prepared.step.is_zero());
+            assert_eq!(
+                prepared.step.values[0].sign(),
+                BigInt::from(orientation).sign()
+            );
+            law = prepared.successor;
+        }
+        let old_news = law.news.clone();
+        let held = source(&law, &flow(8, 1), &scalar(0, 0));
+        assert!(held.step.is_zero());
+        assert_eq!(held.successor.map, law.map);
+        assert_eq!(held.successor.news, old_news);
+        assert_eq!(held.successor.map_lattice, law.map_lattice);
+
+        let mut cancellation = flow(8, 1);
+        cancellation.covector = EpochArray::zero(1, 1)
+            .unwrap()
+            .subtract(&law.news.scalar_product(&scalar(0, 1 << 13)).unwrap())
+            .unwrap();
+        let cancelled = source(&law, &cancellation, &gain);
+        assert!(cancelled.direction.is_zero());
+        assert!(cancelled.step.is_zero());
+        assert!(cancelled.successor.news.is_zero());
+    }
+
+    #[test]
+    fn source_projection_budget_and_odd_rows_refuse_without_mutating_the_law() {
+        let law = EpochLaw::founded(1, 1, 11, 0).unwrap();
+        let before = law.clone();
+        assert!(matches!(
+            law.deposit_source(&flow(0, 1), &scalar(13, 1), 11, 1, 0, 0),
+            Err(HnnError::ConstitutionBudget { .. }),
+        ));
+        assert_eq!(law, before);
+        let mut odd = law.clone();
+        odd.news = EpochArray::with_row_divisors(1, 1, 0, vec![1.into()], vec![3]).unwrap();
+        assert!(
+            odd.deposit_source(&flow(0, 1), &scalar(13, 1), 11, 1 << 20, 0, 0)
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn source_refinement_checkpoint_keeps_the_next_signed_step() {
+        let gain = scalar(13, 1);
+        let mut law = EpochLaw::founded(1, 1, 11, 0).unwrap();
+        for epoch in 0..3 {
+            law = source(&law, &flow(epoch, 1), &gain).successor;
+        }
+        assert!(!law.news.is_zero());
+        let text = law.encode_checkpoint();
+        let declaration = EpochLaw {
+            source_refinement: true,
+            ..EpochLaw::founded(1, 1, 11, 0).unwrap()
+        };
+        let cold = EpochLaw::decode_checkpoint(&text, &declaration).unwrap();
+        let next_flow = flow(3, -1);
+        let uninterrupted = source(&law, &next_flow, &gain).successor;
+        drop(law);
+        let continued = source(&cold, &next_flow, &gain).successor;
+        assert_eq!(continued, uninterrupted);
+        assert_eq!(
+            continued.encode_checkpoint(),
+            uninterrupted.encode_checkpoint()
+        );
+        assert!(
+            EpochLaw::decode_checkpoint(
+                &text.replace("epoch-law-checkpoint-v3", "epoch-law-checkpoint-v2"),
+                &declaration,
+            )
+            .is_err()
+        );
     }
 }

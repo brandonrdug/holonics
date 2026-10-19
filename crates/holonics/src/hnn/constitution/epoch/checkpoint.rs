@@ -10,7 +10,7 @@ use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
-const HEADER: &str = "epoch-law-checkpoint-v2";
+const HEADER: &str = "epoch-law-checkpoint-v3";
 
 impl EpochLaw {
     /// Write this law's exact, canonical continuation words.
@@ -22,6 +22,10 @@ impl EpochLaw {
         text.push_str(&format!(
             "clock {} {} {}\n",
             self.receiver_grain, self.map_lattice, self.crossings
+        ));
+        text.push_str(&format!(
+            "source-refinement {}\n",
+            u8::from(self.source_refinement)
         ));
         write_array(&mut text, "map", &self.map);
         write_array(&mut text, "gram", &self.gram);
@@ -58,6 +62,12 @@ impl EpochLaw {
         let receiver_grain = parse_u32(&clock[0])?;
         let map_lattice = parse_u32(&clock[1])?;
         let crossings = parse_u64(&clock[2])?;
+        let policy = words(take(&mut lines)?, "source-refinement", 1)?;
+        let source_refinement = match policy[0] {
+            "0" => false,
+            "1" => true,
+            _ => return Err(malformed()),
+        };
         let map = read_array(&mut lines, "map")?;
         let gram = read_array(&mut lines, "gram")?;
         let news = read_array(&mut lines, "news")?;
@@ -89,6 +99,7 @@ impl EpochLaw {
             news,
             receiver_grain,
             map_lattice,
+            source_refinement,
             crossings,
             spectral,
             symmetry,
@@ -126,12 +137,15 @@ fn validate_with_row_binding(
     if rows == 0
         || columns == 0
         || (rows, columns) != (declaration.map.rows, declaration.map.columns)
-        || (law.receiver_grain, law.map_lattice, law.symmetry.as_ref())
-            != (
-                declaration.receiver_grain,
-                declaration.map_lattice,
-                declaration.symmetry.as_ref(),
-            )
+        || (
+            law.receiver_grain,
+            law.source_refinement,
+            law.symmetry.as_ref(),
+        ) != (
+            declaration.receiver_grain,
+            declaration.source_refinement,
+            declaration.symmetry.as_ref(),
+        )
     {
         return Err(refused(
             "an epoch checkpoint must match its declared shape, metric, lattice, and paired family",
@@ -151,8 +165,11 @@ fn validate_with_row_binding(
             "an epoch checkpoint must preserve its declared dyadic map/Gram and receiving phase rows",
         ));
     }
-    if law.map_lattice != expected_lattice
-        || law.map.exponent > law.map_lattice
+    if (if law.source_refinement {
+        law.map_lattice < expected_lattice || !law.news.is_dyadic()
+    } else {
+        law.map_lattice != expected_lattice
+    }) || law.map.exponent > law.map_lattice
         || (law.map.rows, law.map.columns) != (rows, columns)
         || (law.news.rows, law.news.columns) != (rows, columns)
         || (law.gram.rows, law.gram.columns) != (columns, columns)

@@ -119,6 +119,122 @@ fn receiving_epoch_certificate(
     })
 }
 
+fn admit_actual_factor_displacements(
+    strokes: &BTreeMap<Locus, BudgetedCarry>,
+) -> Result<(), HnnError> {
+    if strokes.values().any(|at| {
+        at.staged.iter().any(|((carrier, _), (_, q))| {
+            !q.is_zero()
+                && matches!(
+                    carrier,
+                    Carrier::Passive
+                        | Carrier::Slices
+                        | Carrier::Standing
+                        | Carrier::Resonator(_)
+                        | Carrier::Pair { .. }
+                        | Carrier::Factor(_)
+                )
+        })
+    }) {
+        return Err(refused(
+            "actual epoch certification requires the represented nonlinear factor rays",
+        ));
+    }
+    Ok(())
+}
+
+fn admit_refined_source_carries(
+    locus: Locus,
+    finer: u32,
+    carries: &Carries,
+) -> Result<(), HnnError> {
+    let half_exponent = finer.checked_add(1).ok_or_else(extent)?;
+    let half = Rat::new(BigInt::one(), BigInt::one() << half_exponent as usize);
+    if carries
+        .iter()
+        .any(|((at, _), carry)| *at == locus && carry.0.values().any(|r| *r < -&half || *r >= half))
+    {
+        return Err(refused(
+            "source refinement needs its pair-factor remainders inside the finer half-cell",
+        ));
+    }
+    Ok(())
+}
+
+/// The represented normal delta is its own fixed unit ray. Read its true
+/// producing samples, not the fresh Jacobi direction that selected gamma.
+/// Per-sample scalar enclosures keep one dyadic denominator across the epoch.
+fn actual_epoch_face(
+    kind: LinearLocus,
+    delta: &EpochArray,
+    samples: &[Sample],
+    receiving_parts: &[EpochReceivingRecord],
+    partition_bits: u32,
+    admitted_covector: Rat,
+) -> Result<EpochCertificateFace, HnnError> {
+    let rows = delta.to_rows();
+    let (alignment, moves) = if matches!(kind, LinearLocus::Receiving(_)) {
+        let face = receiving_epoch_certificate(samples, receiving_parts, &rows, partition_bits)?;
+        (
+            face.alignment - face.odometer - face.partition.max(Rat::zero()),
+            face.moves,
+        )
+    } else {
+        // Precision follows both the flow partition and actual material grain.
+        // A tiny positive alignment still unresolved on this declared grid is
+        // refused, never rounded up into a descent certificate.
+        let bits = partition_bits
+            .checked_add(delta.exponent)
+            .and_then(|b| b.checked_mul(2))
+            .ok_or_else(extent)?;
+        let denominator = BigInt::one() << bits as usize;
+        let (mut alignment, mut moves) = (BigInt::zero(), BigInt::zero());
+        for sample in samples {
+            if sample.feature.len() != delta.columns
+                || sample.covector.len() != delta.rows
+                || sample.weight.is_negative()
+            {
+                return Err(refused(
+                    "an actual epoch ray needs its producing sample shapes and metric",
+                ));
+            }
+            let image: Vec<Rat> = rows
+                .iter()
+                .map(|row| row.iter().zip(&sample.feature).map(|(p, f)| p * f).sum())
+                .collect();
+            let a = &sample.weight
+                * image
+                    .iter()
+                    .zip(&sample.covector)
+                    .map(|(p, g)| p * g)
+                    .sum::<Rat>();
+            let m = &sample.weight * image.iter().map(|p| p * p).sum::<Rat>();
+            alignment -= upper_grid_numerator(&(-a), &denominator);
+            moves += upper_grid_numerator(&m, &denominator);
+        }
+        (
+            Rat::new(alignment, denominator.clone()),
+            Rat::new(moves, denominator),
+        )
+    };
+    if !alignment.is_positive() {
+        return Err(refused(
+            "a moving actual epoch ray must descend its contemporary comparison",
+        ));
+    }
+    let (numerators, denominator) = delta.integral_chart()?;
+    let unit = IntegralMatrix::from_grouped(delta.rows, delta.columns, numerators, denominator)?;
+    let unit_norms = unit.schur_norms();
+    Ok(EpochCertificateFace {
+        unit,
+        alignment,
+        moves,
+        covector: admitted_covector,
+        unit_norms,
+        norm: EpochSpectral::grouped_frobenius(delta),
+    })
+}
+
 impl Constitution {
     fn epoch_normal(&self, kind: LinearLocus) -> Result<&NormalLaw, HnnError> {
         match kind {
@@ -585,7 +701,7 @@ impl Constitution {
             .collect();
         let readout = &laws[&LinearLocus::Receiving(receiver)].spectral;
         let bound = readout.upper();
-        let (mut certified, joint, pumped, loaded) = self
+        let (mut certified, fresh_joint, _fresh_pumped, _fresh_loaded) = self
             .certify_steps(
                 Some(&envelope),
                 &linear_faces,
@@ -642,6 +758,78 @@ impl Constitution {
             let _ = locus;
         }
         next.carries = rest;
+        // A budgeted factor's rounded/backtracked displacement is generally
+        // not its prepared ray. Until that exact ray is supplied to the shared
+        // certificate, refuse a mixed physical factor move rather than attach
+        // a fresh-direction certificate to different material. Sufficient
+        // factor statistics/carries may change while their material stays put.
+        admit_actual_factor_displacements(&strokes)?;
+        let mut candidates = BTreeMap::new();
+        let mut actual_faces = Vec::new();
+        let mut actual_exponents = DeclaredExponents {
+            steps: BTreeMap::new(),
+        };
+        for kind in &kinds {
+            let fresh = certified.get(&(kind.locus(), Family::Map));
+            let gamma = fresh.map(|r| r.step.step.clone()).unwrap_or_else(Rat::zero);
+            let gain = EpochArray::from_dyadic_scalar(&gamma)?;
+            let deposit = match *kind {
+                LinearLocus::SourcePort(ring) => laws[kind].deposit_source(
+                    &flows[kind],
+                    &gain,
+                    self.lattice(kind.locus())?.exponent(),
+                    self.budget,
+                    self.commit,
+                    ring,
+                )?,
+                _ => laws[kind].deposit(&flows[kind], &gain)?,
+            };
+            if !deposit.step.is_zero() {
+                let fresh = fresh.ok_or_else(|| {
+                    refused("retained epoch news cannot invent an uncertified fresh family")
+                })?;
+                let face = actual_epoch_face(
+                    *kind,
+                    &deposit.step,
+                    samples.get(kind).map(Vec::as_slice).unwrap_or(&[]),
+                    receiving_parts,
+                    exponent,
+                    &gamma * &fresh.step.covector,
+                )?;
+                actual_faces.push((*kind, face));
+                actual_exponents.steps.insert(
+                    (kind.locus(), Family::Map),
+                    DeclaredExponent {
+                        exponent: 0,
+                        reach: None,
+                    },
+                );
+            }
+            if matches!(kind, LinearLocus::SourcePort(_)) && deposit.successor.source_refinement {
+                let finer = deposit.successor.map_lattice;
+                if finer > self.lattice(kind.locus())?.exponent() {
+                    admit_refined_source_carries(kind.locus(), finer, &next.carries)?;
+                }
+            }
+            candidates.insert(*kind, deposit);
+        }
+        let actual_linear: Vec<_> = actual_faces
+            .iter()
+            .map(|(kind, face)| (kind.locus(), *kind, face.direction()))
+            .collect();
+        let (actual_certified, joint, pumped, loaded) = self
+            .certify_steps(
+                Some(&envelope),
+                &actual_linear,
+                &[],
+                None,
+                StepSource::Actual(&actual_exponents),
+                Some(&bound),
+                Some(&reaches),
+            )?
+            .map_err(|_| refused("the fixed actual epoch rays were not all admitted"))?;
+        // Every candidate remains local to next until ALL exact actual-ray,
+        // tube, storage and budget checks pass. No live resident is mutated.
         let mut normal_moves = 0u64;
         let mut vanished = Vec::new();
         let mut locus_readings = Vec::new();
@@ -650,8 +838,13 @@ impl Constitution {
                 .get(&(kind.locus(), Family::Map))
                 .map(|r| r.step.step.clone())
                 .unwrap_or_else(Rat::zero);
-            let deposit =
-                laws[kind].deposit(&flows[kind], &EpochArray::from_dyadic_scalar(&gamma)?)?;
+            let deposit = candidates
+                .remove(kind)
+                .expect("one staged candidate per normal locus");
+            if matches!(kind, LinearLocus::SourcePort(_)) && deposit.successor.source_refinement {
+                next.lattices
+                    .insert(kind.locus(), Lattice::new(deposit.successor.map_lattice));
+            }
             normal_moves = normal_moves
                 .checked_add(deposit.step.values.iter().filter(|v| !v.is_zero()).count() as u64)
                 .ok_or_else(extent)?;
@@ -695,6 +888,14 @@ impl Constitution {
                 certificate_moves: certificate.moves.clone(),
                 certificate_covector_scale: certificate.covector.clone(),
                 gamma,
+                actual_alignment: actual_certified
+                    .get(&(kind.locus(), Family::Map))
+                    .map(|r| r.step.alignment.clone())
+                    .unwrap_or_else(Rat::zero),
+                actual_moves: actual_certified
+                    .get(&(kind.locus(), Family::Map))
+                    .map(|r| r.moves.clone())
+                    .unwrap_or_else(Rat::zero),
                 eta,
                 fall,
                 shares,
@@ -751,6 +952,8 @@ impl Constitution {
                 receiver_partition_bits: grain,
                 partition_exponent: exponent,
                 loci: locus_readings,
+                fresh_joint,
+                fresh_steps: certified.into_iter().map(|((l, _), r)| (l, r)).collect(),
                 receiving: receiving_series
                     .ok_or_else(|| refused("an epoch close keeps its receiving series"))?,
             }),
@@ -766,7 +969,10 @@ impl Constitution {
                 })
                 .flat_map(|((l, c), carry)| carry.0.iter().map(|(i, r)| (*l, *c, *i, r.clone())))
                 .collect(),
-            steps: certified.into_iter().map(|((l, _), r)| (l, r)).collect(),
+            steps: actual_certified
+                .into_iter()
+                .map(|((l, _), r)| (l, r))
+                .collect(),
             joint,
             amplitude: next.amplitude()?,
             commit: next.commit,
@@ -1033,6 +1239,230 @@ fn add_factor(left: &mut FactorStep, right: &FactorStep) -> Result<(), HnnError>
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn actual_source_face_reads_the_signed_represented_delta_and_refuses_opposition() {
+        let delta = EpochArray::new(1, 1, 24, vec![1.into()]).unwrap();
+        let sample = Sample {
+            weight: Rat::one(),
+            feature: vec![Rat::one()],
+            covector: vec![rat(1, 8)],
+            masses: None,
+        };
+        let face = actual_epoch_face(
+            LinearLocus::SourcePort(0),
+            &delta,
+            std::slice::from_ref(&sample),
+            &[],
+            16,
+            Rat::one(),
+        )
+        .unwrap();
+        assert_eq!(face.alignment, rat(1, 8) * delta.scalar_ratio().unwrap());
+        assert_eq!(
+            face.moves,
+            delta.scalar_ratio().unwrap() * delta.scalar_ratio().unwrap()
+        );
+        let opposite = EpochArray::new(1, 1, 24, vec![(-1).into()]).unwrap();
+        assert!(matches!(
+            actual_epoch_face(
+                LinearLocus::SourcePort(0),
+                &opposite,
+                &[sample],
+                &[],
+                16,
+                Rat::one()
+            ),
+            Err(HnnError::Unadmitted { .. })
+        ));
+    }
+
+    #[test]
+    fn fixed_actual_ray_enforces_curvature_where_declared_only_records_it() {
+        let field = crate::hnn::tests::learning::chain();
+        let theta = Constitution::initial(&field, u64::MAX).unwrap();
+        let receiver = field.receivers()[0].ring;
+        let reach = Reach {
+            receiver,
+            stations: vec![1, 2],
+            entries: vec![0],
+            phases: 1,
+            loci: crate::hnn::retention::loci(&field).into_iter().collect(),
+            passages: Vec::new(),
+        };
+        let map = theta.receiving_law(receiver).unwrap().map();
+        let mut entries = vec![BigInt::zero(); map.rows() * map.columns()];
+        entries[0] = BigInt::one();
+        let face = EpochCertificateFace {
+            unit: IntegralMatrix::from_grouped(map.rows(), map.columns(), entries, 1.into())
+                .unwrap(),
+            alignment: Rat::one(),
+            moves: Rat::from_integer(BigInt::one() << 20usize),
+            covector: Rat::one(),
+            unit_norms: (Rat::one(), Rat::one()),
+            norm: Rat::one(),
+        };
+        let kind = LinearLocus::Receiving(receiver);
+        let linear = [(kind.locus(), kind, face.direction())];
+        let declared = DeclaredExponents {
+            steps: BTreeMap::from([(
+                (kind.locus(), Family::Map),
+                DeclaredExponent {
+                    exponent: 0,
+                    reach: None,
+                },
+            )]),
+        };
+        let provisional = theta
+            .certify_steps(
+                Some(&reach),
+                &linear,
+                &[],
+                None,
+                StepSource::Declared(&declared),
+                None,
+                None,
+            )
+            .unwrap()
+            .unwrap();
+        assert!(!provisional.0[&(kind.locus(), Family::Map)].step.holds());
+        let before = theta.continuing_state(0).unwrap().to_text();
+        assert!(matches!(
+            theta.certify_steps(
+                Some(&reach),
+                &linear,
+                &[],
+                None,
+                StepSource::Actual(&declared),
+                None,
+                None
+            ),
+            Err(HnnError::Unadmitted { .. })
+        ));
+        assert_eq!(theta.continuing_state(0).unwrap().to_text(), before);
+    }
+
+    #[test]
+    fn actual_ray_guard_checks_the_joint_triangle_even_when_each_local_bound_holds() {
+        let field = crate::hnn::tests::learning::chain();
+        let theta = Constitution::initial(&field, u64::MAX).unwrap();
+        let receiver = field.receivers()[0].ring;
+        let reach = Reach {
+            receiver,
+            stations: vec![1, 2],
+            entries: vec![0],
+            phases: 1,
+            loci: crate::hnn::retention::loci(&field).into_iter().collect(),
+            passages: Vec::new(),
+        };
+        let kinds = [LinearLocus::SourcePort(0), LinearLocus::Receiving(receiver)];
+        let mut faces: Vec<_> = kinds
+            .iter()
+            .map(|kind| {
+                let map = theta.epoch_normal(*kind).unwrap().map();
+                let mut values = vec![BigInt::zero(); map.rows() * map.columns()];
+                values[0] = BigInt::one();
+                EpochCertificateFace {
+                    unit: IntegralMatrix::from_grouped(map.rows(), map.columns(), values, 1.into())
+                        .unwrap(),
+                    alignment: rat(3, 4),
+                    moves: Rat::one(),
+                    covector: Rat::one(),
+                    unit_norms: (Rat::one(), Rat::one()),
+                    norm: Rat::one(),
+                }
+            })
+            .collect();
+        let declared = DeclaredExponents {
+            steps: kinds
+                .iter()
+                .map(|kind| {
+                    (
+                        (kind.locus(), Family::Map),
+                        DeclaredExponent {
+                            exponent: 0,
+                            reach: None,
+                        },
+                    )
+                })
+                .collect(),
+        };
+        let read = |faces: &[EpochCertificateFace], source: StepSource<'_>| {
+            let linear: Vec<_> = kinds
+                .iter()
+                .zip(faces)
+                .map(|(kind, face)| (kind.locus(), *kind, face.direction()))
+                .collect();
+            theta.certify_steps(Some(&reach), &linear, &[], None, source, None, None)
+        };
+        let calibration = read(&faces, StepSource::Declared(&declared))
+            .unwrap()
+            .unwrap();
+        for (kind, face) in kinds.iter().zip(&mut faces) {
+            let gain = &calibration.0[&(kind.locus(), Family::Map)].gain;
+            assert!(gain.is_positive());
+            face.moves = Rat::one() / gain;
+        }
+        let proposal = read(&faces, StepSource::Declared(&declared))
+            .unwrap()
+            .unwrap();
+        assert!(proposal.0.values().all(|r| r.step.holds()));
+        assert!(!proposal.1.unwrap().holds());
+        assert!(matches!(
+            read(&faces, StepSource::Actual(&declared)),
+            Err(HnnError::Unadmitted {
+                reason: "the actual epoch rays violate the joint triangle bound",
+            })
+        ));
+    }
+
+    #[test]
+    fn nonlinear_material_and_finer_source_carry_refusals_keep_their_operands() {
+        let locus = Locus::SourcePort(0);
+        let mut at = BudgetedCarry::new(Lattice::new(4), 1);
+        at.staged.insert(
+            (
+                Carrier::Pair {
+                    offset: 1,
+                    family: 0,
+                },
+                0,
+            ),
+            (Rat::zero(), BigInt::one()),
+        );
+        let strokes = BTreeMap::from([(locus, at)]);
+        let before = strokes.clone();
+        assert!(admit_actual_factor_displacements(&strokes).is_err());
+        assert_eq!(strokes, before);
+        let mut statistics = BudgetedCarry::new(Lattice::new(4), 1);
+        statistics
+            .staged
+            .insert((Carrier::PairScale, 0), (Rat::zero(), BigInt::one()));
+        assert!(admit_actual_factor_displacements(&BTreeMap::from([(locus, statistics)])).is_ok());
+        for (remainder, admitted) in [
+            (rat(1, 64), false),
+            (rat(1, 128), false),
+            (rat(-1, 128), true),
+            (rat(1, 512), true),
+        ] {
+            let carries = BTreeMap::from([(
+                (
+                    locus,
+                    Carrier::Pair {
+                        offset: 1,
+                        family: 0,
+                    },
+                ),
+                Carry(BTreeMap::from([(0, remainder)])),
+            )]);
+            let before = carries.clone();
+            assert_eq!(
+                admit_refined_source_carries(locus, 6, &carries).is_ok(),
+                admitted
+            );
+            assert_eq!(carries, before);
+        }
+    }
 
     fn certificate_sample(
         index: usize,

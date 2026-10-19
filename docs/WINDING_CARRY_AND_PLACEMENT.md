@@ -441,3 +441,49 @@ standing, saturated pump has period-one fixed sheets: a two-element fibre over t
 not evidence of a subharmonic orbit or a new carried cover digit. Scheduled-axis readings
 need an actual schedule witness. Stable locking requires the existing nonlinear ball,
 Floquet and executed tube certificates, rather than a mounted-pump flag.
+
+
+## 11. Source precision and the actual represented move
+
+[definition; implementation under target validation] The normal epoch already retains
+`R=B-WH`. With fresh gain `gamma`, the exact recurrence is `H+=H+F`,
+`R*=R+gamma*G`, `D=R* S^-1`, `W+=W+P`, `R+=R*-P H+`. Thus
+`W+ H+ + R+ = W H+ + R + gamma G`. Another displacement accumulator would count
+unapplied news twice. A fixed source lattice can nevertheless erase every material move:
+with scalar `g=2^-15`, `H_n=n+1`, `R_n=n*g`, the Jacobi direction remains below `g`
+while the lattice is `2^-11`. Retaining news alone does not cure that representation.
+
+For a SourcePort with admitted positive fresh gain and nonzero dyadic direction, choose
+`L+ = min { l>=L : 2^l max|D_ij| >= 1 }`, then
+`P_ij=trunc_toward_zero(2^L+ D_ij)*2^-L+`. One bit-length calculation derives the
+refinement. It never coarsens, changes the source clock or releases a residual. Zero fresh
+gain holds source material; cancellation, absent support, budget and admission refusals
+remain possible. Source row factors must be dyadic. Receiving and contrast keep their
+existing projection until their own crossing law is supplied.
+
+[proved-derived, scoped algebra] Componentwise `sign(P)=sign(D)` where nonzero and
+`|P|<=|D|` give `<P,R*> >= sum_j S_j P_ij^2`. The same Jacobi/Gershgorin bound gives
+`tr(P H+ P^T) <= sum_j S_j P_ij^2`, so the normal quadratic fall is at least half
+that positive sum. This statement concerns the normal objective. It does not certify
+current comparison descent when retained `R` differs from the fresh covector.
+
+Every nonzero represented normal move, including receiving and contrast, therefore has a
+second admission using its actual `P` as a unit ray. Producing samples supply its actual
+alignment and feature moves; receiving retains its odometer and partition defects. The
+existing shared tightened reader enforces curvature, joint triangle and executed pump tube
+bounds. Fresh `G S^-1` certification alone cannot authorize a different carried move.
+All candidates stage before publication, and any failure leaves the live resident intact.
+The current bounded implementation refuses physical nonlinear factor moves whose rounded
+or backtracked ray has not been joined to that exact check. Refinement also refuses a
+same-locus pair remainder outside the finer half-cell; silently moving its pair factor
+would need that additional ray certificate. These are explicit remaining consumer joins.
+
+The active SourcePort lattice, its normal map lattice and checkpoint v3 must agree. The
+checkpoint retains the active exponent and exact `W/H/R`, checks the founding lower bound
+and dyadic shape, and accepts no old epoch decoder. Census charges the precision metadata;
+allocation and total state budget are checked before publication. CUDA publishes the map at
+the admitted active exponent while unchanged pair factors keep their own exact exponents.
+Material coordinates still use signed i64: a width refusal happens before a large shift or
+acknowledgement, with no host fallback or rounding back to the old grid. Wider auxiliary
+arithmetic is not a wider material carrier. General formal proof of the refinement, actual
+ray composition, finite-budget limitations and full backend continuation remains in #62.
