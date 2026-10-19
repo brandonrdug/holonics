@@ -17,25 +17,27 @@ use holonics::hnn::reference::{ClosedLocated, ExposedResident, Reference, Reside
 use holonics::hnn::{ExecutionPort, HnnError, SourceMoment};
 use holonics::ratio::Rat;
 use holonics::receiver::release::KeyStream;
-use num_bigint::BigUint;
+use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 use std::time::Instant;
 
 struct ContinuingOptions {
     learn: String,
     count: Option<usize>,
+    chart_manifest: Option<String>,
     population: u64,
     keys: String,
 }
 
 fn parse(args: &[String]) -> Result<ContinuingOptions> {
     let (mut learn, mut count, mut population, mut keys) = (None, None, None, None);
+    let mut chart_manifest = None;
     let mut at = 0;
     while at < args.len() {
         let option = args[at].as_str();
         if !matches!(
             option,
-            "--learn" | "--learn-count" | "--population" | "--keys"
+            "--learn" | "--learn-count" | "--chart-manifest" | "--population" | "--keys"
         ) {
             return Err(format!("{option} is unsupported in --route observed: one open moment; section options, cap flags and resume are unavailable").into());
         }
@@ -45,6 +47,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         match option {
             "--learn" => learn = Some(value.clone()),
             "--learn-count" => count = Some(value.parse()?),
+            "--chart-manifest" => chart_manifest = Some(value.clone()),
             "--population" => population = Some(value.parse()?),
             "--keys" => keys = Some(value.clone()),
             _ => unreachable!(),
@@ -59,6 +62,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     Ok(ContinuingOptions {
         learn: learn.ok_or("--route observed requires --learn HLSN1")?,
         count,
+        chart_manifest,
         population,
         keys: keys.ok_or("--route observed requires --keys for exterior native draws")?,
     })
@@ -602,6 +606,11 @@ enum Stop {
         source_operand_bound: u128,
     },
     Maximum,
+    EntropyRate {
+        drawn_cells: usize,
+        lower: Rat,
+        threshold: Rat,
+    },
 }
 impl Stop {
     fn fields(&self) -> String {
@@ -615,7 +624,51 @@ impl Stop {
                 "stop=horizon value=horizon population={population} source_operand_bound={source_operand_bound}"
             ),
             Self::Maximum => "stop=maximum value=maximum".to_owned(),
+            Self::EntropyRate {
+                drawn_cells,
+                lower,
+                threshold,
+            } => format!(
+                "stop=entropy_rate value=entropy_rate drawn_cells={drawn_cells} lower={lower} threshold={threshold}"
+            ),
         }
+    }
+}
+
+/// Release scale is learned only from targets already delivered on the same chart.
+#[derive(Default)]
+struct ReleaseHistory(std::collections::BTreeMap<sections::ChartKind, usize>);
+impl ReleaseHistory {
+    fn maximum(&self, chart: sections::ChartKind) -> usize {
+        self.0.get(&chart).copied().unwrap_or(0)
+    }
+    fn heard_target(&mut self, chart: sections::ChartKind, target_cells: usize) {
+        let maximum = self.0.entry(chart).or_default();
+        *maximum = (*maximum).max(target_cells);
+    }
+}
+
+const _: () = assert!(CLASSES.is_power_of_two());
+const ENTROPY_RATE_BITS: u32 = CLASSES.trailing_zeros();
+
+fn entropy_rate_stop(lower: &Rat, drawn_cells: usize) -> Option<Stop> {
+    if drawn_cells == 0 {
+        return None;
+    }
+    let threshold = Rat::from_integer(BigInt::from(drawn_cells) * BigInt::from(ENTROPY_RATE_BITS));
+    (lower >= &threshold).then(|| Stop::EntropyRate {
+        drawn_cells,
+        lower: lower.clone(),
+        threshold,
+    })
+}
+
+/// The completed drawn prefix: the framing end precedes its code-rate stop.
+fn completed_release_stop(classes: &[usize], lower: &Rat) -> Option<Stop> {
+    if sections::closes(classes) {
+        Some(Stop::EndLetter)
+    } else {
+        entropy_rate_stop(lower, classes.len())
     }
 }
 
@@ -648,10 +701,18 @@ fn release_fork(
     section: usize,
     emit: &mut dyn FnMut(String),
 ) -> Result<Released> {
+    if maximum == 0 {
+        return Ok(Released {
+            classes: Vec::new(),
+            stop: Stop::Maximum,
+            maximum,
+        });
+    }
     let mut fork = trunk.clone();
     let mut crib = trunk_crib.clone();
     let mut classes = Vec::new();
     let mut stop = Stop::Maximum;
+    let mut drawn_lower = Rat::zero();
     for index in 0..maximum {
         let boundary_before = pair_face_boundary(&fork)?;
         let started = Instant::now();
@@ -735,8 +796,9 @@ fn release_fork(
             break;
         }
         classes.push(class);
-        if sections::closes(&classes) {
-            stop = Stop::EndLetter;
+        drawn_lower += &code.lower;
+        if let Some(completed) = completed_release_stop(&classes, &drawn_lower) {
+            stop = completed;
             break;
         }
     }
@@ -754,19 +816,21 @@ fn section(
     pairing: &PairingDeclaration,
     input: &Section,
     index: usize,
-    longest: &mut usize,
+    longest: &mut ReleaseHistory,
     keys: &mut KeyStream,
     published_total: &mut usize,
     emit: &mut dyn FnMut(String),
 ) -> Result<Released> {
-    // Each source passage becomes a delivered passage before it can enlarge the release maximum.
-    // No answer cells or their length are read to choose this question's fork or maximum.
+    // A target belongs to its source chart. Reject ambiguous mixed/empty sources before
+    // delivering anything; no target bytes are used to guess a chart.
+    let chart_kind = input.chart_kind()?;
     for passage in &input.passages {
-        let source = Section {
-            passages: vec![passage.clone()],
-            target: Vec::new(),
-        }
-        .source_cells(index)?;
+        let chart = passage.encode_chart()?;
+        emit(format!(
+            "observed_chart section={index} {}",
+            chart.summary()
+        ));
+        let source = chart.cells();
         deliver(
             port,
             resident,
@@ -778,9 +842,17 @@ fn section(
             published_total,
             emit,
         )?;
-        *longest = (*longest).max(source.len());
     }
-    let released = release_fork(port, resident, crib, pairing, *longest, keys, index, emit)?;
+    let released = release_fork(
+        port,
+        resident,
+        crib,
+        pairing,
+        longest.maximum(chart_kind),
+        keys,
+        index,
+        emit,
+    )?;
     emit(released.line(index));
     let answer = input.target_cells(index)?;
     deliver(
@@ -794,7 +866,7 @@ fn section(
         published_total,
         emit,
     )?;
-    *longest = (*longest).max(answer.len());
+    longest.heard_target(chart_kind, answer.len());
     Ok(released)
 }
 
@@ -818,14 +890,137 @@ fn header_line(resident: &Resident) -> Result<String> {
     ))
 }
 
+/// The Python framer's HLCM1 boundary manifest, parsed without a JSON dependency.
+/// Domain `HLCM1\n`, u64 BE record count; each record has section index (u64), passage
+/// count (u32), then per passage kind (u8), chart length (u64), SHA256 (32 raw bytes),
+/// canonical fibre length (u64) and SHA256 (32 raw bytes); finally target-octet length
+/// (u64) and raw-octet SHA256 (32 bytes). Counts describe the framed sections, not hearings.
+struct ChartManifestReader<'a> {
+    bytes: &'a [u8],
+    at: usize,
+}
+impl ChartManifestReader<'_> {
+    fn take(&mut self, count: usize) -> Result<&[u8]> {
+        let end = self
+            .at
+            .checked_add(count)
+            .filter(|&end| end <= self.bytes.len())
+            .ok_or("truncated chart manifest")?;
+        let value = &self.bytes[self.at..end];
+        self.at = end;
+        Ok(value)
+    }
+    fn u64(&mut self) -> Result<u64> {
+        Ok(u64::from_be_bytes(self.take(8)?.try_into()?))
+    }
+    fn u32(&mut self) -> Result<u32> {
+        Ok(u32::from_be_bytes(self.take(4)?.try_into()?))
+    }
+    fn digest(&mut self) -> Result<String> {
+        Ok(self
+            .take(32)?
+            .iter()
+            .map(|value| format!("{value:02x}"))
+            .collect())
+    }
+}
+
+/// Native Rust codecs own this parity comparison. A mismatch refuses before any mount,
+/// source delivery or diagnostic setup; an explicit frame limit can select a manifest prefix.
+pub(super) fn validate_chart_manifest(
+    frames: &[Section],
+    bytes: &[u8],
+    allow_prefix: bool,
+) -> Result<()> {
+    let mut reader = ChartManifestReader { bytes, at: 0 };
+    if reader.take(6)? != b"HLCM1\n" {
+        return Err("wrong chart manifest domain".into());
+    }
+    let count = usize::try_from(reader.u64()?)?;
+    if count > bytes.len() / 52 || frames.len() > count || (!allow_prefix && frames.len() != count)
+    {
+        return Err("chart manifest section count differs from the selected frames".into());
+    }
+    for index in 0..count {
+        if reader.u64()? != index as u64 {
+            return Err("chart manifest section order differs".into());
+        }
+        let passages = usize::try_from(reader.u32()?)?;
+        if let Some(frame) = frames.get(index) {
+            frame.chart_kind()?;
+            if frame.passages.len() != passages {
+                return Err(
+                    format!("chart manifest passage count differs at section {index}").into(),
+                );
+            }
+        }
+        if passages > (reader.bytes.len() - reader.at) / 81 {
+            return Err("chart manifest passage count exceeds its extent".into());
+        }
+        for passage_index in 0..passages {
+            let kind = reader.take(1)?[0];
+            let octets = reader.u64()?;
+            let chart_digest = reader.digest()?;
+            let fibre_bytes = reader.u64()?;
+            let fibre_digest = reader.digest()?;
+            if kind > 2 {
+                return Err("unknown chart manifest kind".into());
+            }
+            if let Some(frame) = frames.get(index) {
+                let summary = frame.passages[passage_index].encode_chart()?.summary();
+                if summary.kind.byte() != kind
+                    || summary.chart_octets as u64 != octets
+                    || summary.chart_sha256 != chart_digest
+                    || summary.fibre_bytes != u128::from(fibre_bytes)
+                    || summary.fibre_sha256 != fibre_digest
+                {
+                    return Err(format!("Rust/Python chart or fibre drift at section {index} passage {passage_index}").into());
+                }
+            }
+        }
+        let target_octets = reader.u64()?;
+        let target_digest = reader.digest()?;
+        if let Some(frame) = frames.get(index) {
+            if frame.target.len() as u64 != target_octets
+                || sections::sha256(&frame.target) != target_digest
+            {
+                return Err(format!("chart manifest target differs at section {index}").into());
+            }
+        }
+    }
+    if reader.at != bytes.len() {
+        return Err("excess chart manifest bytes".into());
+    }
+    Ok(())
+}
+
 pub fn run(port: &Reference, args: &[String]) -> Result<()> {
     let options = parse(args)?;
+    // Exterior codec parity is checked before either ordinary mounting or a diagnostic route.
+    // Explicit --learn-count permits only a checked prefix, including the two-frame cost probe.
+    let checked_frames = if let Some(path) = &options.chart_manifest {
+        let frames = sections_of(Some(&options.learn), options.count)?;
+        let manifest = read(path)?;
+        validate_chart_manifest(&frames, &manifest, options.count.is_some())?;
+        println!(
+            "chart_manifest checked_sections={} sha256={} codec_owner=rust",
+            frames.len(),
+            sections::sha256(&manifest)
+        );
+        Some(frames)
+    } else {
+        None
+    };
+
     let (mut resident, pairing) = mounted(port, options.population)?;
     let mut crib = ObservedCrib::new(0);
     let mut keys = KeyStream::new(read(&options.keys)?, RELEASE_KEY_BYTES)?;
-    let frames = sections_of(Some(&options.learn), options.count)?;
+    let frames = match checked_frames {
+        Some(frames) => frames,
+        None => sections_of(Some(&options.learn), options.count)?,
+    };
     println!("{}", header_line(&resident)?);
-    let mut longest = 0;
+    let mut longest = ReleaseHistory::default();
     let mut published_total = 0usize;
     for (index, input) in frames.iter().enumerate() {
         let started = Instant::now();
@@ -878,7 +1073,86 @@ mod tests {
     use super::*;
     use crate::octets::{Cost, ingest, options, take_route};
     use holonics::hnn::encoding::observed::PairedObservation;
+    use holonics::ratio::integer;
     use std::collections::BTreeSet;
+    fn boundary_manifest(frames: &[Section]) -> Vec<u8> {
+        fn digest(bytes: &mut Vec<u8>, text: &str) {
+            for i in (0..text.len()).step_by(2) {
+                bytes.push(u8::from_str_radix(&text[i..i + 2], 16).unwrap());
+            }
+        }
+        let mut bytes = b"HLCM1\n".to_vec();
+        bytes.extend((frames.len() as u64).to_be_bytes());
+        for (index, frame) in frames.iter().enumerate() {
+            bytes.extend((index as u64).to_be_bytes());
+            bytes.extend((frame.passages.len() as u32).to_be_bytes());
+            for passage in &frame.passages {
+                let summary = passage.encode_chart().unwrap().summary();
+                bytes.push(summary.kind.byte());
+                bytes.extend((summary.chart_octets as u64).to_be_bytes());
+                digest(&mut bytes, &summary.chart_sha256);
+                bytes.extend((summary.fibre_bytes as u64).to_be_bytes());
+                digest(&mut bytes, &summary.fibre_sha256);
+            }
+            bytes.extend((frame.target.len() as u64).to_be_bytes());
+            digest(&mut bytes, &sections::sha256(&frame.target));
+        }
+        bytes
+    }
+
+    #[test]
+    fn native_manifest_refuses_chart_fibre_target_and_frame_count_drift() {
+        let frames = vec![
+            Section {
+                passages: vec![sections::Passage::Octets(b"abc".to_vec())],
+                target: b"7".to_vec(),
+            },
+            Section {
+                passages: vec![sections::Passage::Pcm {
+                    rate: 16000,
+                    samples: vec![0, 1, -2],
+                }],
+                target: b"8".to_vec(),
+            },
+        ];
+        let bytes = boundary_manifest(&frames);
+        validate_chart_manifest(&frames, &bytes, false).unwrap();
+        validate_chart_manifest(&frames[..1], &bytes, true).unwrap();
+        assert!(validate_chart_manifest(&frames[..1], &bytes, false).is_err());
+        let mut wrong_source = frames.clone();
+        wrong_source[0].passages = vec![sections::Passage::Octets(b"abd".to_vec())];
+        assert!(validate_chart_manifest(&wrong_source, &bytes, false).is_err());
+        let mut wrong_target = frames.clone();
+        wrong_target[0].target = b"9".to_vec();
+        assert!(validate_chart_manifest(&wrong_target, &bytes, false).is_err());
+        for at in [14 + 12, 14 + 21, 14 + 61] {
+            let mut drift = bytes.clone();
+            drift[at] ^= 1;
+            assert!(validate_chart_manifest(&frames, &drift, false).is_err());
+        }
+        for length in [0, 5, 14, bytes.len() - 1] {
+            assert!(validate_chart_manifest(&frames, &bytes[..length], false).is_err());
+        }
+        let mut excess = bytes;
+        excess.push(0);
+        assert!(validate_chart_manifest(&frames, &excess, false).is_err());
+    }
+
+    #[test]
+    fn manifest_option_is_an_exterior_input_and_entropy_comes_from_the_aperture() {
+        let options = parse(&args(&[
+            "--population",
+            "65536",
+            "--chart-manifest",
+            "micro.charts",
+            "--learn-count",
+            "2",
+        ]))
+        .unwrap();
+        assert_eq!(options.chart_manifest.as_deref(), Some("micro.charts"));
+        assert_eq!(options.count, Some(2));
+        assert_eq!(1usize << ENTROPY_RATE_BITS, CLASSES);
+    }
     fn args(extra: &[&str]) -> Vec<String> {
         ["--learn", "unread.hlsn", "--keys", "unread.keys"]
             .into_iter()
@@ -988,7 +1262,7 @@ mod tests {
         let (mut split, pairing) = mounted(&port, 65536).unwrap();
         let mut raw = split.clone();
         let (mut split_crib, mut raw_crib) = (ObservedCrib::new(0), ObservedCrib::new(0));
-        let mut longest = 0;
+        let mut longest = ReleaseHistory::default();
         let mut keys = keys();
         let inputs = [
             one(),
@@ -1058,8 +1332,10 @@ mod tests {
         let (opening, _) = mounted(&port, 65536).unwrap();
         let population = opening.field().capacity().n_star();
         let (mut trunk, pairing) = mounted(&port, population).unwrap();
-        fill(&port, &mut trunk, &pairing, population as usize - 1);
-        let crib = ObservedCrib::new(population as usize - 1);
+        // Exhaust the ingress horizon before the first release draw. A uniform first
+        // successful draw would now correctly stop at the entropy rate before a second.
+        fill(&port, &mut trunk, &pairing, population as usize);
+        let crib = ObservedCrib::new(population as usize);
         let before = format!("{trunk:?}");
         let mut lines = Vec::new();
         let released = release_fork(
@@ -1077,7 +1353,7 @@ mod tests {
             .field()
             .source_operand_bound(Locus::SourcePort(0))
             .unwrap();
-        assert_eq!(released.classes.len(), 1);
+        assert_eq!(released.classes.len(), 0);
         assert_eq!(
             released.stop,
             Stop::Horizon {
@@ -1107,7 +1383,7 @@ mod tests {
             &pairing,
             &one(),
             0,
-            &mut 0,
+            &mut ReleaseHistory::default(),
             &mut keys(),
             &mut 0,
             &mut |s| lines.push(s),
@@ -1203,7 +1479,7 @@ mod tests {
         let (mut trunk, pairing) = mounted(&port, 65536).unwrap();
         let mut crib = ObservedCrib::new(0);
         let mut lines = Vec::new();
-        let mut maximum = 0;
+        let mut maximum = ReleaseHistory::default();
         let released = section(
             &port,
             &mut trunk,
@@ -1217,7 +1493,24 @@ mod tests {
             &mut |s| lines.push(s),
         )
         .unwrap();
-        assert_eq!(released.maximum, 4);
+        assert_eq!(released.maximum, 0);
+        assert_eq!(maximum.maximum(sections::ChartKind::Octets), 4);
+        assert!(released.classes.is_empty());
+        assert!(!lines.iter().any(|line| line.starts_with("drawn ")));
+        let repeated = section(
+            &port,
+            &mut trunk,
+            &mut crib,
+            &pairing,
+            &one(),
+            1,
+            &mut maximum,
+            &mut keys(),
+            &mut 0,
+            &mut |s| lines.push(s),
+        )
+        .unwrap();
+        assert_eq!(repeated.maximum, 4);
         let fields = |line: &str| {
             line.split_whitespace()
                 .skip(1)
@@ -1293,6 +1586,16 @@ mod tests {
                     "published",
                     "receiving_exponent",
                 ]
+            } else if line.starts_with("observed_chart ") {
+                &[
+                    "section",
+                    "kind",
+                    "chart_octets",
+                    "chart_sha256",
+                    "fibre_bytes",
+                    "fibre_sha256",
+                    "canonical_format",
+                ]
             } else if line.starts_with("keys ") {
                 &[
                     "section",
@@ -1334,5 +1637,73 @@ mod tests {
                 .filter(|(_, s)| s.starts_with("cell ") && s.contains("role=answer"))
                 .all(|(i, _)| release < i)
         );
+    }
+    #[test]
+    fn release_history_uses_only_prior_targets_on_its_chart() {
+        let mut history = ReleaseHistory::default();
+        assert_eq!(history.maximum(sections::ChartKind::Octets), 0);
+        history.heard_target(sections::ChartKind::Octets, 6);
+        history.heard_target(sections::ChartKind::Octets, 4);
+        assert_eq!(history.maximum(sections::ChartKind::Octets), 6);
+        assert_eq!(history.maximum(sections::ChartKind::Raster), 0);
+        history.heard_target(sections::ChartKind::Raster, 2);
+        assert_eq!(history.maximum(sections::ChartKind::Raster), 2);
+        assert_eq!(history.maximum(sections::ChartKind::Pcm), 0);
+    }
+
+    #[test]
+    fn entropy_stop_uses_exact_lower_endpoint_at_first_drawn_cell() {
+        use holonics::ratio::rat;
+        assert!(entropy_rate_stop(&integer(100), 0).is_none());
+        assert!(entropy_rate_stop(&rat(49, 10), 1).is_none());
+        assert!(matches!(
+            entropy_rate_stop(&integer(5), 1),
+            Some(Stop::EntropyRate { drawn_cells: 1, .. })
+        ));
+        assert!(entropy_rate_stop(&rat(99, 10), 2).is_none());
+        assert!(entropy_rate_stop(&integer(10), 2).is_some());
+        assert!(entropy_rate_stop(&integer(2), 4).is_none());
+    }
+
+    #[test]
+    fn scored_uniform_face_stops_first_cell_and_confident_face_reaches_end() {
+        use holonics::hnn::receiving::cells::CellDecision;
+        use holonics::ratio::algebraic::ExactInterval;
+        use holonics::ratio::rat;
+        use holonics::receiver::release::ReleaseReturn;
+        // Scored-face fixtures exercise drawn_code and the same completed-prefix decision
+        // used by release_fork. They are not a native generated-release observation.
+        let face = |mass: Rat| CellDecision {
+            phase: 0,
+            release: ReleaseReturn::Hold,
+            classes: Vec::new(),
+            key: None,
+            bits: 0,
+            face: vec![ExactInterval::point(mass); CLASSES],
+        };
+        let uniform = drawn_code(&face(rat(1, 32)), 1).unwrap();
+        assert!(matches!(
+            completed_release_stop(&[1], &uniform.lower),
+            Some(Stop::EntropyRate { drawn_cells: 1, .. })
+        ));
+        let prefix = sections::closed_cells(b"A");
+        let mut lower = Rat::zero();
+        for end in 1..=prefix.len() {
+            let class = prefix[end - 1];
+            let mut confident_face = face(Rat::zero());
+            confident_face.face[class] = ExactInterval::point(Rat::one());
+            let confident = drawn_code(&confident_face, class).unwrap();
+            lower += &confident.lower;
+            let decision = completed_release_stop(&prefix[..end], &lower);
+            if end == prefix.len() {
+                assert!(matches!(decision, Some(Stop::EndLetter)));
+            } else {
+                assert!(decision.is_none());
+            }
+        }
+        assert!(matches!(
+            completed_release_stop(&sections::end_cells(), &integer(10)),
+            Some(Stop::EndLetter)
+        ));
     }
 }
