@@ -2,7 +2,11 @@
 """Run the pinned listener diagnostic once and write create-only run receipts.
 
 The JSON configuration supplies an argv vector, never a shell command. Its SHA-256 is pinned
-out-of-band on the command line so it cannot self-assert its own expected digest.
+out-of-band on the command line so it cannot self-assert its own expected digest. One monotonic
+start defines the cooperative native +290s, TERM +295s, cleanup +299s, and total +300s work/log
+boundary. The terminal receipt write/fsync occurs after the recorded finish measurement. Memory
+uses an 8 GiB per-process address-space limit plus sampled aggregate process-group RSS; it has no
+hard cgroup aggregate-memory guarantee.
 """
 from __future__ import annotations
 
@@ -24,10 +28,11 @@ import listener_diagnostic_stage as stage
 
 DISK_FLOOR_BYTES = 512 * 1024 * 1024
 HASH_CHUNK_BYTES = 1024 * 1024
-RECEIPT_SCHEMA = "req063-listener-diagnostic-receipt-v1"
+RECEIPT_SCHEMA = "req063-listener-diagnostic-receipt-v2"
 EVIDENCE_RESERVE_NS = 1_000_000_000
 MAX_PROCESS_SAMPLES = 6_001
 REQUIRED_PIN_ROLES = frozenset({"wrapper", "supervisor", "binary", "input", "cargo_lock"})
+INPUT_ROLE = "input"
 
 
 class ReceiptError(RuntimeError):
@@ -207,6 +212,108 @@ def _pin_snapshot(
     return snapshot, failures
 
 
+def _input_binding(
+    config: dict[str, Any],
+    repo_root: Path,
+    pin_snapshot: dict[str, Any],
+) -> tuple[dict[str, Any], list[str]]:
+    """Bind the one pinned input to the one separate --learn value used by the child."""
+    failures: list[str] = []
+    pins = config.get("files")
+    input_pins = (
+        [item for item in pins if isinstance(item, dict) and item.get("role") == INPUT_ROLE]
+        if isinstance(pins, list)
+        else []
+    )
+    binding: dict[str, Any] = {
+        "status": "invalid",
+        "input_pin_count": len(input_pins),
+    }
+    if len(input_pins) != 1:
+        failures.append("config must contain exactly one input pin")
+        return binding, failures
+
+    pin = input_pins[0]
+    pin_name = pin.get("path")
+    pin_sha = pin.get("sha256")
+    if (
+        not isinstance(pin_name, str)
+        or not pin_name
+        or not isinstance(pin_sha, str)
+        or len(pin_sha) != 64
+        or any(character not in "0123456789abcdefABCDEF" for character in pin_sha)
+    ):
+        failures.append("input pin must have a nonempty path and a valid SHA-256")
+        return binding, failures
+
+    argv = config.get("argv")
+    if not isinstance(argv, list) or not argv or not all(isinstance(argument, str) for argument in argv):
+        failures.append("config argv must be a nonempty array of strings")
+        return binding, failures
+    learn_equals = [argument for argument in argv if argument.startswith("--learn=")]
+    learn_positions = [index for index, argument in enumerate(argv) if argument == "--learn"]
+    binding.update({
+        "learn_argument_count": len(learn_positions),
+        "learn_equals_count": len(learn_equals),
+    })
+    if learn_equals:
+        failures.append("--learn must be a separate option and value; --learn=VALUE is ambiguous")
+    if len(learn_positions) != 1:
+        failures.append("argv must contain exactly one separate --learn option")
+        return binding, failures
+    position = learn_positions[0]
+    if position + 1 >= len(argv) or not argv[position + 1] or argv[position + 1].startswith("--"):
+        failures.append("--learn must be followed by one nonempty path value")
+        return binding, failures
+
+    cwd_value = config.get("cwd", str(repo_root))
+    if not isinstance(cwd_value, str) or not cwd_value:
+        failures.append("config cwd must be a nonempty path string")
+        return binding, failures
+    child_cwd = Path(cwd_value)
+    if not child_cwd.is_absolute():
+        child_cwd = repo_root / child_cwd
+    child_cwd = child_cwd.resolve()
+    pin_path = _resolve(repo_root, pin_name)
+    learn_value = argv[position + 1]
+    invoked_path = Path(learn_value)
+    if not invoked_path.is_absolute():
+        invoked_path = child_cwd / invoked_path
+    invoked_path = invoked_path.resolve()
+
+    pin_records = [
+        item for item in pin_snapshot.get("files", [])
+        if isinstance(item, dict) and item.get("role") == INPUT_ROLE
+    ]
+    pin_verified = (
+        len(pin_records) == 1
+        and pin_records[0].get("matches") is True
+        and pin_records[0].get("actual_sha256", "").lower() == pin_sha.lower()
+    )
+    same_file = pin_path == invoked_path
+    binding.update({
+        "input_pin_path": pin_name,
+        "input_pin_resolved": str(pin_path),
+        "input_pin_sha256": pin_sha.lower(),
+        "input_pin_verified": pin_verified,
+        "child_cwd": str(child_cwd),
+        "learn_value": learn_value,
+        "learn_resolved": str(invoked_path),
+        "same_file": same_file,
+    })
+    if not pin_verified:
+        failures.append("pinned input file is not verified by this digest snapshot")
+    if not child_cwd.is_dir():
+        failures.append("configured child cwd is not an existing directory")
+    if not same_file:
+        failures.append("--learn path does not resolve to the pinned input from child cwd")
+    if same_file and not pin_path.is_file():
+        failures.append("resolved --learn input is not a regular file")
+    if not failures:
+        binding["status"] = "verified"
+    return binding, failures
+
+
 def _disk_read(path: Path) -> dict[str, int]:
     usage = shutil.disk_usage(path)
     return {"total_bytes": usage.total, "free_bytes": usage.free}
@@ -225,6 +332,33 @@ def _write_receipt(stream, value: dict[str, Any]) -> None:
     stream.write("\n")
     stream.flush()
     os.fsync(stream.fileno())
+
+
+def _write_landing_sidecar(
+    path: Path,
+    receipt_path: Path,
+    *,
+    observed_ns: int,
+    deadline_ns: int,
+    work_status: str,
+) -> None:
+    """Create one small landing receipt; its own persistence latency is not measured."""
+    sidecar = {
+        "schema": "req063-listener-diagnostic-landing-v1",
+        "receipt_path": str(receipt_path),
+        "observed_monotonic_ns": observed_ns,
+        "total_deadline_monotonic_ns": deadline_ns,
+        "within_total_deadline": observed_ns <= deadline_ns,
+        "landing_status": "within_total_deadline" if observed_ns <= deadline_ns else "landed_late",
+        "work_status": work_status,
+        "sidecar_write_latency_measured": False,
+        "observation": "clock sampled immediately after terminal receipt fsync; sidecar write/fsync follows and is not measured",
+    }
+    with path.open("x", encoding="utf-8") as stream:
+        json.dump(sidecar, stream, sort_keys=True, separators=(",", ":"))
+        stream.write("\n")
+        stream.flush()
+        os.fsync(stream.fileno())
 
 
 def _paths_outside_repo(config: dict[str, Any], root: Path) -> list[str]:
@@ -265,6 +399,8 @@ def run_receipted_stage(
         "status": "incomplete",
         "start_monotonic_ns": start_ns,
         "started_utc": datetime.now(timezone.utc).isoformat(),
+        "landing_sidecar_path": str(receipt_path.with_name(receipt_path.name + ".landing.json")),
+        "landing_verdict_source": "read valid landing sidecar; absent or invalid means unknown",
         "deadlines": dataclasses.asdict(plan),
         "preflight": None,
         "postflight": None,
@@ -286,6 +422,11 @@ def run_receipted_stage(
             "cpu_ticks_per_second": os.sysconf("SC_CLK_TCK"),
             "process_sample_limit": MAX_PROCESS_SAMPLES,
             "sample_note": "instant process-group samples can miss exited descendants; waited-child CPU is a separate direct-child counter",
+            "deadline_note": "native +290s, TERM +295s, cleanup cutoff +299s, total +300s from one start; cooperative work/log boundary; terminal receipt write/fsync follows the recorded finish",
+            "memory_note": "8 GiB RLIMIT_AS per process plus sampled aggregate process-group RSS; no hard cgroup aggregate-memory guarantee",
+            "aggregate_memory_hard_limit": False,
+            "terminal_receipt_write_in_finish_measurement": False,
+            "terminal_receipt_write_deadline_enforced": False,
         },
     }
     _write_receipt(receipt_stream, receipt)
@@ -310,6 +451,7 @@ def run_receipted_stage(
             raise ReceiptError("CLI create-only receipt path differs from pinned config")
         receipt["config_sha256"] = config_sha256.lower()
         receipt["receipt_path"] = str(receipt_path)
+        receipt["argv"] = config.get("argv")
         _write_receipt(receipt_stream, receipt)
 
         failures = _paths_outside_repo(config, repo_root)
@@ -323,10 +465,16 @@ def run_receipted_stage(
             repo_reader=repo_reader,
         )
         failures.extend(pin_failures)
+        input_binding, input_binding_failures = _input_binding(config, repo_root, snapshot)
+        failures.extend(input_binding_failures)
         config_file_hash = _sha256(config_path, deadline_ns=plan.total_ns, clock=clock)
         if config_file_hash.lower() != config_sha256.lower():
             failures.append("configuration changed during preflight")
-        receipt["preflight"] = {"pins": snapshot, "config_sha256": config_file_hash}
+        receipt["preflight"] = {
+            "pins": snapshot,
+            "config_sha256": config_file_hash,
+            "input_binding": input_binding,
+        }
 
         disk_root_value = config.get("disk_root", str(repo_root))
         if not isinstance(disk_root_value, str):
@@ -433,7 +581,9 @@ def run_receipted_stage(
             clock=clock,
             repo_reader=repo_reader,
         )
-        receipt["postflight"] = {"pins": post_snapshot}
+        post_input_binding, post_binding_failures = _input_binding(config, repo_root, post_snapshot)
+        post_failures.extend(post_binding_failures)
+        receipt["postflight"] = {"pins": post_snapshot, "input_binding": post_input_binding}
         receipt["failures"].extend(post_failures)
         try:
             config_after = _sha256(config_path, deadline_ns=plan.total_ns, clock=clock)
@@ -467,7 +617,9 @@ def run_receipted_stage(
                     clock=clock,
                     repo_reader=repo_reader,
                 )
-                receipt["postflight"] = {"pins": post_snapshot}
+                post_input_binding, post_binding_failures = _input_binding(config, repo_root, post_snapshot)
+                post_failures.extend(post_binding_failures)
+                receipt["postflight"] = {"pins": post_snapshot, "input_binding": post_input_binding}
                 receipt["failures"].extend(post_failures)
                 if post_failures:
                     receipt["status"] = (
@@ -502,7 +654,7 @@ def run_receipted_stage(
         receipt["finish_boundary"] = "after work and log finalization, before terminal receipt write/fsync"
         receipt["elapsed_wall_ns"] = max(0, finished_ns - start_ns)
         receipt["deadline_overrun"] = finished_ns > plan.total_ns
-        if receipt["deadline_overrun"] and receipt["status"] == "complete":
+        if receipt["deadline_overrun"]:
             receipt["status"] = "deadline_overrun"
         process_receipt = receipt.get("process")
         if receipt["status"] == "complete" and isinstance(process_receipt, dict):
@@ -511,8 +663,21 @@ def run_receipted_stage(
         if receipt_stream is not None:
             try:
                 _write_receipt(receipt_stream, receipt)
+                landing_observed_ns = clock()
             finally:
                 receipt_stream.close()
+            landing_path = receipt_path.with_name(receipt_path.name + ".landing.json")
+            try:
+                _write_landing_sidecar(
+                    landing_path,
+                    receipt_path,
+                    observed_ns=landing_observed_ns,
+                    deadline_ns=plan.total_ns,
+                    work_status=receipt["status"],
+                )
+            except OSError:
+                # A missing sidecar leaves landing unknown; it does not rewrite the durable work receipt.
+                pass
     return receipt
 
 

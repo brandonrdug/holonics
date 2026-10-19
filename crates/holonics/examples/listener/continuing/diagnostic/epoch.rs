@@ -314,6 +314,31 @@ fn prior_gram_delta(
     Ok(Some(Matrix::new(values)?))
 }
 
+fn defer_conservation_verdict(
+    failures: &mut Vec<String>,
+    prior_delta_known: bool,
+    adjusted_balance_zero: bool,
+    adjusted_balance: &Matrix,
+) {
+    if !prior_delta_known {
+        failures.push(
+            "native Gram conservation is unsupported across an unaccounted prior declaration or scale change".into(),
+        );
+    } else if !adjusted_balance_zero {
+        failures.push(format!(
+            "native Gram conservation failed after exact prior adjustment: ΔHstored + Δcarry - ΔsampleH + released - Δprior = {adjusted_balance:?}"
+        ));
+    }
+}
+
+fn finish_deferred_failures(failures: Vec<String>) -> Result<()> {
+    if failures.is_empty() {
+        Ok(())
+    } else {
+        Err(failures.join("; ").into())
+    }
+}
+
 fn column_majorizer(gram: &Matrix) -> Result<(Vec<i64>, Vec<Rat>)> {
     if !gram.is_square() {
         return Err("epoch metric is not square".into());
@@ -459,7 +484,8 @@ pub(super) fn report_epoch(
     if receiver_grain == 0 {
         return Err("receiver grain denominator must be positive".into());
     }
-    let (gradient, sample_gram_delta) = super::epoch_statistics(crossing, views)?;
+    let (gradient, sample_gram_delta, exact_metric_scale) =
+        super::epoch_statistics_with_scale(crossing, views)?;
     let native_lw_cross = crossing.native_lattice_exponent;
     let native_lw_end = end.native_lattice_exponent;
     let width = crossing.support.len();
@@ -493,11 +519,19 @@ pub(super) fn report_epoch(
         .transpose()?
         .unwrap_or_else(|| raw_plus_release.clone());
     let exact_gram_balance_zero = adjusted_gram_balance.entries().iter().all(Rat::is_zero);
-    let conservation_failure = prior_delta.is_some() && !exact_gram_balance_zero;
-    let conservation_status = if prior_delta.is_some() {
-        "exact"
+    let mut deferred_failures = Vec::new();
+    defer_conservation_verdict(
+        &mut deferred_failures,
+        prior_delta.is_some(),
+        exact_gram_balance_zero,
+        &adjusted_gram_balance,
+    );
+    let conservation_status = if prior_delta.is_none() {
+        "UNSUPPORTED-prior-change-or-scale-without-declared-prior"
+    } else if exact_gram_balance_zero {
+        "PASS-exact-zero"
     } else {
-        "unsupported-prior-declaration-change"
+        "FAIL-nonzero-exact-balance"
     };
     let max_feature = views
         .iter()
@@ -534,7 +568,7 @@ pub(super) fn report_epoch(
     let native_half_quantum = &grain_unit / Rat::from_integer(BigInt::from(2));
 
     println!(
-        "step0_epoch branch={branch} samples={} W_cross={:?} H_cross_stored={:?} G_cross_projected={:?} sample_H_delta_projected={:?} H_end_stored={:?} H_stored_delta={:?} carry_cross={:?} carry_end={:?} carry_delta={:?} raw_ΔHstored_plus_Δcarry_minus_ΔsampleH={:?} actual_sparse_released_gram_e={:?} exact_ΔP_prior={:?} adjusted_conservation_raw_plus_e_minus_ΔP={:?} adjusted_conservation_exact_zero={} receiving_prior_cross={:?} receiving_prior_end={:?} prior_scale_cross={} prior_scale_end={} conservation_status={}; immutable prior declaration mismatch means ΔP is unavailable and no conservation claim is made W_end={:?} W_actual_delta={:?}",
+        "step0_epoch branch={branch} samples={} W_cross={:?} H_cross_stored={:?} G_cross_projected={:?} exact_metric_scale_s={exact_metric_scale:?} sample_H_delta_projected={:?} H_end_stored={:?} H_stored_delta={:?} carry_cross={:?} carry_end={:?} carry_delta={:?} raw_ΔHstored_plus_Δcarry_minus_ΔsampleH={:?} actual_sparse_released_gram_e={:?} exact_ΔP_prior={:?} adjusted_conservation_raw_plus_e_minus_ΔP={:?} adjusted_conservation_exact_zero={} receiving_prior_cross={:?} receiving_prior_end={:?} prior_scale_cross={} prior_scale_end={} conservation_status={}; when exact ΔP is unavailable no conservation claim is made W_end={:?} W_actual_delta={:?}",
         views.iter().map(|view| view.samples.len()).sum::<usize>(),
         crossing.map,
         crossing.gram,
@@ -558,17 +592,8 @@ pub(super) fn report_epoch(
         end.map,
         actual_map_delta,
     );
-    if prior_delta.is_none() {
-        return Err("native Gram conservation is unsupported across an unaccounted prior declaration or scale change".into());
-    }
-    if conservation_failure {
-        return Err(format!(
-            "native Gram conservation failed after exact prior adjustment: ΔHstored + Δcarry - ΔsampleH + released - Δprior = {adjusted_gram_balance:?}"
-        )
-        .into());
-    }
     println!(
-        "step0_epoch_contract branch={branch} metric=native-stored-H; ridge_is_already_in_stored-H; gram_carry_reported_separately_not_added; G_cross_and_sample_deltaH_are_projected_by_crossing_NormalLaw; gamma=1_hypothetical; incoming_R=0_hypothetical; this_G_is_not_live_PreparedStep.unit; radial_mode=not_exposed; receiving_prior={:?} prior_scale={} support={:?} symmetry={} receiver_grain_unit=1/{receiver_grain}={grain_unit} native_precision_half_quantum={native_half_quantum}",
+        "step0_epoch_contract branch={branch} metric=native-stored-H; ridge_is_already_in_stored-H; gram_carry_reported_separately_not_added; G_cross_uses_native_receiving_metric_samples_when_scale_s_is_Some_and_unscaled_fallback_when_None; sample_deltaH_is_paired_projected; gamma=1_hypothetical; incoming_R=0_hypothetical; this_G_is_not_live_PreparedStep.unit; radial_mode=not_exposed; receiving_prior={:?} prior_scale={} support={:?} symmetry={} receiver_grain_unit=1/{receiver_grain}={grain_unit} native_precision_half_quantum={native_half_quantum}",
         crossing.receiving_prior, crossing.prior_scale, crossing.support, crossing.symmetry,
     );
     println!(
@@ -589,7 +614,7 @@ pub(super) fn report_epoch(
             let sample_count = views.iter().map(|view| view.samples.len()).sum();
             held_readings_for_map(views, &crossing.map, "W_cross", branch, sample_count)?;
             held_readings_for_map(views, &end.map, "W_end", branch, sample_count)?;
-            return Ok(());
+            return finish_deferred_failures(deferred_failures);
         }
     };
     let d_hyp = right_column_scale(&residual_prime, &majorizer_diagonal)?;
@@ -613,7 +638,7 @@ pub(super) fn report_epoch(
             let sample_count = views.iter().map(|view| view.samples.len()).sum();
             held_readings_for_map(views, &crossing.map, "W_cross", branch, sample_count)?;
             held_readings_for_map(views, &end.map, "W_end", branch, sample_count)?;
-            return Ok(());
+            return finish_deferred_failures(deferred_failures);
         }
     };
     let unconstrained_update = matrix_product(&residual_prime, &inverse)?;
@@ -735,12 +760,10 @@ pub(super) fn report_epoch(
         branch,
         sample_count,
     )?;
-    if fall_defect {
-        return Err(Box::new(
-            fall_error.expect("fall defect carries its typed error"),
-        ));
+    if let Some(error) = fall_error {
+        deferred_failures.push(error.to_string());
     }
-    Ok(())
+    finish_deferred_failures(deferred_failures)
 }
 
 #[cfg(test)]
@@ -893,6 +916,31 @@ mod tests {
                 .is_none()
         );
         assert!(prior_gram_delta(1, 1, None, None, 0, 1).unwrap().is_none());
+    }
+
+    #[test]
+    fn conservation_failures_are_deferred_and_survive_fallback_finalization() {
+        let mut unsupported = Vec::new();
+        defer_conservation_verdict(&mut unsupported, false, false, &matrix(&[&[1]]));
+        assert_eq!(unsupported.len(), 1);
+        assert!(finish_deferred_failures(Vec::new()).is_ok());
+        let unsupported_result = finish_deferred_failures(unsupported).unwrap_err();
+        assert!(
+            unsupported_result
+                .to_string()
+                .contains("conservation is unsupported")
+        );
+
+        let mut nonclosing = Vec::new();
+        let nonzero_balance = Matrix::new(vec![vec![Rat::new(3.into(), 8.into())]]).unwrap();
+        defer_conservation_verdict(&mut nonclosing, true, false, &nonzero_balance);
+        // A fallback can record this verdict, finish its later held reads, then report it once.
+        let nonclosing_result = finish_deferred_failures(nonclosing).unwrap_err();
+        assert!(
+            nonclosing_result
+                .to_string()
+                .contains("failed after exact prior adjustment")
+        );
     }
 
     #[test]

@@ -8,7 +8,9 @@ mod timing;
 
 use super::*;
 use holonics::hnn::constitution::Sample;
-use holonics::hnn::constitution::{Carrier, NormalLaw};
+use holonics::hnn::constitution::{
+    Carrier, NormalLaw, receiving_class_metric, receiving_metric_samples,
+};
 use holonics::hnn::contact::{LockDeclaration, lock_address};
 use holonics::hnn::moment::PopulationChart;
 use holonics::hnn::receiving::ReceivingRead;
@@ -438,6 +440,14 @@ fn from_worker<T>(result: std::result::Result<T, String>) -> Result<T> {
     result.map_err(|message| std::io::Error::other(message).into())
 }
 
+fn record_epoch_report_result(branch: &str, report: Result<()>, failures: &mut Vec<String>) {
+    if let Err(error) = report {
+        let message = format!("branch={branch} {error}");
+        println!("step0_epoch_report_deferred_failure {message}");
+        failures.push(message);
+    }
+}
+
 fn source_interventions(field: &Field, classes: &[usize]) -> Result<Vec<(String, usize, u64)>> {
     let first = *classes
         .first()
@@ -538,21 +548,55 @@ fn epoch_statistics(
     crossing: &CutView,
     views: &[CutView],
 ) -> Result<(ExactRatMatrix, ExactRatMatrix)> {
-    let mut reached = Vec::new();
+    let (gradient, gram_delta, _) = epoch_statistics_with_scale(crossing, views)?;
+    Ok((gradient, gram_delta))
+}
+
+fn epoch_statistics_with_scale(
+    crossing: &CutView,
+    views: &[CutView],
+) -> Result<(ExactRatMatrix, ExactRatMatrix, Option<Rat>)> {
+    let mut actual_samples = Vec::new();
+    let mut crossing_covectors = Vec::new();
     for view in views {
         if view.samples.len() != view.crossing_covectors.len() {
             return Err("crossing covector count differs from staged sample count".into());
         }
-        for (sample, covector) in view.samples.iter().zip(&view.crossing_covectors) {
+        actual_samples.extend(view.samples.iter().cloned());
+        crossing_covectors.extend(view.crossing_covectors.iter().cloned());
+    }
+    let (reached, metric_samples, scale) =
+        crossing_metric_samples(&actual_samples, &crossing_covectors)?;
+    let (gradient, _) = crossing.law.projected_statistics(&metric_samples)?;
+    let (_, gram_delta) = crossing.law.projected_statistics(&reached)?;
+    Ok((gradient, gram_delta, scale))
+}
+
+fn crossing_metric_samples(
+    actual_samples: &[Sample],
+    crossing_covectors: &[Vec<Rat>],
+) -> Result<(Vec<Sample>, Vec<Sample>, Option<Rat>)> {
+    if actual_samples.len() != crossing_covectors.len() {
+        return Err("crossing covector count differs from staged sample count".into());
+    }
+    let reached = actual_samples
+        .iter()
+        .zip(crossing_covectors)
+        .map(|(sample, covector)| {
             let mut sample = sample.clone();
             sample.covector = covector.clone();
-            reached.push(sample);
-        }
-    }
-    crossing
-        .law
-        .projected_statistics(&reached)
-        .map_err(Into::into)
+            // Recompute face masses from the crossing-map covector. The producer's attached
+            // masses describe the live-map comparison and cannot set the crossing metric.
+            sample.masses = None;
+            sample
+        })
+        .collect::<Vec<_>>();
+    let scale = receiving_class_metric(&reached);
+    // This matches native prepare: when no class metric is available, its receiving law falls
+    // back to the exact reached samples. Keep `None` visible in the readout rather than calling
+    // that fallback a class-metric correction.
+    let metric_samples = receiving_metric_samples(&reached).unwrap_or_else(|| reached.clone());
+    Ok((reached, metric_samples, scale))
 }
 
 fn causal_differences(
@@ -1232,15 +1276,24 @@ pub(super) fn run(
         "step0_specification_lattice_exponent b_R=log2(2*L_R) support_width={} spec_LW={spec_lw}",
         crossing.support.len()
     );
+    let mut epoch_report_failures = Vec::new();
     let epoch_report_started = Instant::now();
-    epoch::report_epoch("A", &crossing, &a_end, &a_views, receiver_grain)?;
+    record_epoch_report_result(
+        "A",
+        epoch::report_epoch("A", &crossing, &a_end, &a_views, receiver_grain),
+        &mut epoch_report_failures,
+    );
     println!(
         "step0_epoch_report_timing branch=A wall_ns={}",
         epoch_report_started.elapsed().as_nanos()
     );
     for (name, _, _, views, _, end, _) in &b_outputs {
         let epoch_report_started = Instant::now();
-        epoch::report_epoch(name, &crossing, end, views, receiver_grain)?;
+        record_epoch_report_result(
+            name,
+            epoch::report_epoch(name, &crossing, end, views, receiver_grain),
+            &mut epoch_report_failures,
+        );
         println!(
             "step0_epoch_report_timing branch={name} wall_ns={}",
             epoch_report_started.elapsed().as_nanos()
@@ -1255,12 +1308,28 @@ pub(super) fn run(
         );
     }
     println!("step0_AA0 exact_resident_state_equal=true caller_owned_crib_equal=true");
-    let (g_a, _) = epoch_statistics(&crossing, &a_views)?;
-    let (g_b, _) = epoch_statistics(&crossing, b_views)?;
+    let (g_a, g_scale_a) = match epoch_statistics_with_scale(&crossing, &a_views) {
+        Ok((gradient, _, scale)) => (Some(gradient), scale),
+        Err(error) => {
+            let message = format!("branch=A crossing metric statistics: {error}");
+            println!("step0_intervention_deferred_failure {message}");
+            epoch_report_failures.push(message);
+            (None, None)
+        }
+    };
+    let (g_b, g_scale_b) = match epoch_statistics_with_scale(&crossing, b_views) {
+        Ok((gradient, _, scale)) => (Some(gradient), scale),
+        Err(error) => {
+            let message = format!("branch={b_name} crossing metric statistics: {error}");
+            println!("step0_intervention_deferred_failure {message}");
+            epoch_report_failures.push(message);
+            (None, None)
+        }
+    };
     let (max_f_delta, first_f_delta, max_logit_delta, first_logit_delta) =
         causal_differences(&a_views, &a_faces, b_views, b_faces)?;
     println!(
-        "step0_intervention all_alphabet_classes_fit_source_lock={fit_all} first_class={first} changed_class={alternative} primary_branch={b_name} changed_advance={b_advance} alternatives={intervention_specs:?} G_A={g_a:?} G_B={g_b:?} W_table_delta_A={:?} W_table_delta_B={:?}",
+        "step0_intervention all_alphabet_classes_fit_source_lock={fit_all} first_class={first} changed_class={alternative} primary_branch={b_name} changed_advance={b_advance} alternatives={intervention_specs:?} G_A={g_a:?} exact_metric_scale_s_A={g_scale_a:?} G_B={g_b:?} exact_metric_scale_s_B={g_scale_b:?} W_table_delta_A={:?} W_table_delta_B={:?}",
         matrix_delta(&a_end.map, &crossing.map)?,
         matrix_delta(&b_end.map, &crossing.map)?
     );
@@ -1271,9 +1340,17 @@ pub(super) fn run(
         }
         let (max_f, first_f, max_logit, first_logit) =
             causal_differences(&a_views, &a_faces, views, faces)?;
-        let (gradient, _) = epoch_statistics(&crossing, views)?;
+        let (gradient, scale) = match epoch_statistics_with_scale(&crossing, views) {
+            Ok((gradient, _, scale)) => (Some(gradient), scale),
+            Err(error) => {
+                let message = format!("branch={name} crossing metric statistics: {error}");
+                println!("step0_intervention_deferred_failure {message}");
+                epoch_report_failures.push(message);
+                (None, None)
+            }
+        };
         println!(
-            "step0_intervention_variant_vs_A branch={name} changed_class={class} source_advance={advance} baseline_advance={source_base_advance} same_advance_category={} max_abs_delta_f={max_f} first_differing_feature_index={first_f:?} max_abs_delta_logits={max_logit} first_differing_logit_index={first_logit:?} G={gradient:?} W_table_delta={:?} native_LW_end={}",
+            "step0_intervention_variant_vs_A branch={name} changed_class={class} source_advance={advance} baseline_advance={source_base_advance} same_advance_category={} max_abs_delta_f={max_f} first_differing_feature_index={first_f:?} max_abs_delta_logits={max_logit} first_differing_logit_index={first_logit:?} G={gradient:?} exact_metric_scale_s={scale:?} W_table_delta={:?} native_LW_end={}",
             *advance == source_base_advance,
             matrix_delta(&end.map, &crossing.map)?,
             end.native_lattice_exponent
@@ -1343,6 +1420,13 @@ pub(super) fn run(
         distinct_carried.map(|i| a_views[i].pre_lift.clone()),
         distinct_carried.map(|i| b_views[i].pre_lift.clone())
     );
+    if !epoch_report_failures.is_empty() {
+        return Err(format!(
+            "deferred epoch reports failed after all branch, intervention, and finite-future readouts: {}",
+            epoch_report_failures.join("; ")
+        )
+        .into());
+    }
     Ok(())
 }
 
@@ -1403,6 +1487,34 @@ mod tests {
     }
 
     #[test]
+    fn crossing_metric_recomputes_masses_and_changes_g_but_not_gram_delta() {
+        let live = Sample {
+            weight: integer(1),
+            feature: vec![integer(2)],
+            covector: vec![rat(1, 10), integer(0), rat(-1, 10), integer(0)],
+            // These masses belong to the live-map comparison and would imply scale 2.
+            masses: Some(vec![rat(1, 2), rat(1, 2)]),
+        };
+        let crossing_covector = vec![rat(1, 10), integer(0), rat(-1, 10), integer(0)];
+        let (reached, metric, scale) =
+            crossing_metric_samples(&[live.clone()], &[crossing_covector]).unwrap();
+        assert_eq!(scale, Some(integer(4)));
+        assert_eq!(reached[0].masses, None);
+        assert_eq!(
+            metric[0].covector,
+            vec![rat(2, 5), integer(0), rat(-2, 5), integer(0)]
+        );
+
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(4, 1).unwrap());
+        let (gradient_metric, gram_metric) = law.projected_statistics(&metric).unwrap();
+        let (gradient_unscaled, gram_unscaled) = law.projected_statistics(&reached).unwrap();
+        assert_ne!(gradient_metric, gradient_unscaled);
+        assert_eq!(gradient_metric.get(0, 0).unwrap(), &rat(4, 5));
+        assert_eq!(gradient_unscaled.get(0, 0).unwrap(), &rat(1, 5));
+        assert_eq!(gram_metric, gram_unscaled);
+        assert_eq!(gram_metric.to_rows(), vec![vec![integer(4)]]);
+    }
+
     #[test]
     fn source_interventions_keep_one_branch_per_lock_advance_category() {
         fn source_field(lock: Vec<u64>) -> Field {
