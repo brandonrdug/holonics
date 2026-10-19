@@ -27,6 +27,16 @@ class FakeClock:
         self.now_ns += delay_ns
 
 
+class SequenceClock:
+    def __init__(self, *values: int):
+        self.values = list(values)
+
+    def __call__(self) -> int:
+        if len(self.values) > 1:
+            return self.values.pop(0)
+        return self.values[0]
+
+
 class FakeProcess:
     pid = 12345
 
@@ -79,7 +89,85 @@ class StageControls(unittest.TestCase):
 
     def test_mock_process_is_term_then_kill_inside_fixed_cleanup_window(self):
         plan = DeadlinePlan.fixed(10_000)
-        clock = FakeClock(plan.term_ns)
+        clock = FakeClock(plan.start_ns)
+        proc = FakeProcess()
+        signals: list[int] = []
+
+        def started_process(*_args, **_kwargs):
+            clock.now_ns = plan.term_ns
+            return proc
+
+        def signal_group(_pgid: int, sig: int) -> None:
+            signals.append(sig)
+            if sig == signal.SIGKILL:
+                proc.returncode = -signal.SIGKILL
+
+        result = supervise(
+            ["mock-command"],
+            plan=plan,
+            clock=clock,
+            popen_factory=started_process,
+            group_alive=lambda _pgid: proc.returncode is None,
+            rss_reader=lambda _pgid: 1,
+            signal_group=signal_group,
+            sleep_ns=clock.sleep,
+            install_limits=False,
+        )
+        self.assertEqual(signals, [signal.SIGTERM, signal.SIGKILL])
+        self.assertEqual(result.status, "deadline")
+        self.assertTrue(result.deadline_evidence)
+        self.assertLessEqual(result.finished_ns, plan.total_ns)
+        self.assertFalse(result.cleanup_uncertain)
+
+    def test_deadline_kill_reports_actual_finish_and_uncertain_group_cleanup(self):
+        plan = DeadlinePlan.fixed(10_000)
+        clock = FakeClock(plan.start_ns)
+        proc = FakeProcess()
+        signals: list[int] = []
+
+        def started_process(*_args, **_kwargs):
+            clock.now_ns = plan.total_ns + 17
+            return proc
+
+        def signal_group(_pgid: int, sig: int) -> None:
+            signals.append(sig)
+
+        result = supervise(
+            ["mock-command"],
+            plan=plan,
+            clock=clock,
+            popen_factory=started_process,
+            group_alive=lambda _pgid: True,
+            rss_reader=lambda _pgid: 1,
+            signal_group=signal_group,
+            install_limits=False,
+        )
+        self.assertEqual(signals, [signal.SIGTERM, signal.SIGKILL])
+        self.assertEqual(result.status, "deadline")
+        self.assertTrue(result.cleanup_uncertain)
+        self.assertTrue(result.group_alive_at_return)
+        self.assertEqual(result.finished_ns, plan.total_ns + 17)
+
+    def test_preflight_exhaustion_refuses_to_start_a_new_child(self):
+        plan = DeadlinePlan.fixed(10_000)
+        calls = []
+
+        def forbidden_process(*_args, **_kwargs):
+            calls.append("started")
+            raise AssertionError("an expired preflight cannot launch a child")
+
+        result = supervise(
+            ["mock-command"], plan=plan, clock=FakeClock(plan.native_ns),
+            popen_factory=forbidden_process, install_limits=False,
+        )
+        self.assertEqual(result.status, "not_started_deadline")
+        self.assertFalse(calls)
+        self.assertFalse(result.term_sent)
+
+    def test_reserved_evidence_cutoff_keeps_term_then_kill_inside_total(self):
+        plan = DeadlinePlan.fixed(10_000)
+        kill_cutoff = plan.total_ns - 1_000_000_000
+        clock = SequenceClock(plan.start_ns, plan.term_ns, kill_cutoff, kill_cutoff + 1)
         proc = FakeProcess()
         signals: list[int] = []
 
@@ -96,39 +184,15 @@ class StageControls(unittest.TestCase):
             group_alive=lambda _pgid: proc.returncode is None,
             rss_reader=lambda _pgid: 1,
             signal_group=signal_group,
-            sleep_ns=clock.sleep,
+            sleep_ns=lambda _delay: None,
+            kill_cutoff_ns=kill_cutoff,
             install_limits=False,
         )
         self.assertEqual(signals, [signal.SIGTERM, signal.SIGKILL])
-        self.assertEqual(result.status, "deadline")
-        self.assertTrue(result.deadline_evidence)
+        self.assertEqual(result.term_sent_ns, plan.term_ns)
+        self.assertEqual(result.kill_sent_ns, kill_cutoff)
         self.assertLessEqual(result.finished_ns, plan.total_ns)
-        self.assertFalse(result.cleanup_uncertain)
-
-    def test_deadline_kill_reports_actual_finish_and_uncertain_group_cleanup(self):
-        plan = DeadlinePlan.fixed(10_000)
-        clock = FakeClock(plan.total_ns + 17)
-        proc = FakeProcess()
-        signals: list[int] = []
-
-        def signal_group(_pgid: int, sig: int) -> None:
-            signals.append(sig)
-
-        result = supervise(
-            ["mock-command"],
-            plan=plan,
-            clock=clock,
-            popen_factory=lambda *a, **k: proc,
-            group_alive=lambda _pgid: True,
-            rss_reader=lambda _pgid: 1,
-            signal_group=signal_group,
-            install_limits=False,
-        )
-        self.assertEqual(signals, [signal.SIGTERM, signal.SIGKILL])
         self.assertEqual(result.status, "deadline")
-        self.assertTrue(result.cleanup_uncertain)
-        self.assertTrue(result.group_alive_at_return)
-        self.assertEqual(result.finished_ns, plan.total_ns + 17)
 
     def test_memory_cap_cleanup_kill_without_deadline_is_unknown_not_deadline(self):
         plan = DeadlinePlan.fixed(10_000)

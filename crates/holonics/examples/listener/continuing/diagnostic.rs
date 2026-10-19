@@ -7,8 +7,8 @@ mod epoch;
 mod timing;
 
 use super::*;
-use holonics::hnn::constitution::NormalLaw;
 use holonics::hnn::constitution::Sample;
+use holonics::hnn::constitution::{Carrier, NormalLaw};
 use holonics::hnn::contact::{LockDeclaration, lock_address};
 use holonics::hnn::moment::PopulationChart;
 use holonics::hnn::receiving::ReceivingRead;
@@ -56,6 +56,8 @@ struct CutView {
     physical: Option<EndChange>,
     contact_j: Vec<ExactRatMatrix>,
     samples: Vec<Sample>,
+    /// Actual released entries for this receiving Gram carrier from the native deposit receipt.
+    gram_release: Vec<(usize, Rat)>,
     receiving_prior: Option<u32>,
     prior_scale: u32,
     support: Vec<usize>,
@@ -87,6 +89,7 @@ fn cut_view(material: &Constitution, samples: &[Sample]) -> Result<CutView> {
         physical: None,
         contact_j: Vec::new(),
         samples: samples.to_vec(),
+        gram_release: Vec::new(),
         receiving_prior: law.receiving_prior(),
         prior_scale: law.prior_scale(),
         support: law.chart().support().to_vec(),
@@ -214,6 +217,14 @@ fn observe_branch(
             None,
             |_, material, moment, address, reading, samples, frozen| {
                 let view = cut_view(material, samples).and_then(|mut view| {
+                    view.gram_release = reading
+                        .released
+                        .iter()
+                        .filter_map(|(locus, carrier, index, amount)| {
+                            (*locus == Locus::ReceivingMap(2) && *carrier == Carrier::Gram)
+                                .then(|| (*index, amount.clone()))
+                        })
+                        .collect();
                     let mut source_moment = String::new();
                     moment.write(&mut source_moment);
                     if source_moment != pre_moment {
@@ -285,7 +296,7 @@ fn observe_branch(
         lifts.push(resident.current().lift().to_vec());
         let serialization_started = Instant::now();
         let captured = format!(
-            "moment_pre_ingest={} address_pre_ingest={} pre_clocks={:?} pre_lift={:?} pre_call_reception_carry={:?} producing_identity={:?} producing_map={:?} frozen_comparison={:?} samples_f_g_w_masses={:?} crossing_covectors={:?} refine_word_end_change={:?} contact_J={:?} postdeposit_map={:?} H_stored={:?} H_remainder={:?}",
+            "moment_pre_ingest={} address_pre_ingest={} pre_clocks={:?} pre_lift={:?} pre_call_reception_carry={:?} producing_identity={:?} producing_map={:?} frozen_comparison={:?} samples_f_g_w_masses={:?} crossing_covectors={:?} refine_word_end_change={:?} contact_J={:?} postdeposit_map={:?} H_stored={:?} H_remainder={:?} actual_native_released_gram_entries={:?} receiving_prior={:?} current_prior_scale={}",
             view.moment_text,
             view.address_text,
             view.pre_clocks,
@@ -301,6 +312,9 @@ fn observe_branch(
             view.map,
             view.gram,
             view.gram_remainder,
+            view.gram_release,
+            view.receiving_prior,
+            view.prior_scale,
         );
         let serialization_ns = serialization_started.elapsed().as_nanos();
         println!("step0_capture_data branch={branch} index={index} class={class} {captured}");
@@ -518,28 +532,6 @@ fn pre_call_moment_text(resident: &Resident) -> Result<String> {
     let mut text = String::new();
     moment.write(&mut text);
     Ok(text)
-}
-
-fn diagnostic_spec_lattice_exponent(receiver_grain: u64, support_width: usize) -> Result<u32> {
-    let twice_grain = receiver_grain
-        .checked_mul(2)
-        .ok_or("twice the receiver grain overflows u64")?;
-    if !twice_grain.is_power_of_two() || support_width == 0 {
-        return Err(
-            "specification LW requires power-of-two 2*receiver grain and nonzero support width"
-                .into(),
-        );
-    }
-    let width = u64::try_from(support_width).map_err(|_| "support width exceeds u64")?;
-    let ceil_log2_width = if width.is_power_of_two() {
-        width.trailing_zeros()
-    } else {
-        u64::BITS - width.leading_zeros()
-    };
-    twice_grain
-        .trailing_zeros()
-        .checked_add(ceil_log2_width)
-        .ok_or_else(|| "specification LW overflows u32".into())
 }
 
 fn epoch_statistics(
@@ -1193,7 +1185,6 @@ pub(super) fn run(
     let (a_views, a_faces, _a_lifts, _a_times) = from_worker(a_result)?;
     let (_a0_faces, _a0_lifts, _a0_times) = from_worker(a0_result)?;
     let a_end = cut_view(a.constitution(), &[])?;
-    let spec_lw = diagnostic_spec_lattice_exponent(receiver_grain, crossing.support.len())?;
     let mut b_outputs = Vec::with_capacity(b_branches.len());
     for ((name, class, advance, _, branch_resident, _), (result_name, result)) in
         b_branches.iter().zip(b_results)
@@ -1221,24 +1212,35 @@ pub(super) fn run(
             .map(|(name, class, advance, _, _, _, clocks)| (name, class, advance, clocks))
             .collect::<Vec<_>>()
     );
+    let spec_lw = epoch::spec_lattice_exponent(receiver_grain, crossing.support.len())?;
     println!(
-        "step0_lattice_exponents crossing={} A_end={} B_end={:?}",
+        "step0_lattice_exponents spec_LW={spec_lw} crossing={} crossing_native_spec_mismatch={} A_end={} A_native_spec_mismatch={} B_end_and_native_spec_mismatch={:?}",
         crossing.native_lattice_exponent,
+        crossing.native_lattice_exponent != spec_lw,
         a_end.native_lattice_exponent,
+        a_end.native_lattice_exponent != spec_lw,
         b_outputs
             .iter()
-            .map(|(name, _, _, _, _, end, _)| (name, end.native_lattice_exponent))
+            .map(|(name, _, _, _, _, end, _)| (
+                name,
+                end.native_lattice_exponent,
+                end.native_lattice_exponent != spec_lw
+            ))
             .collect::<Vec<_>>()
     );
+    println!(
+        "step0_specification_lattice_exponent b_R=log2(2*L_R) support_width={} spec_LW={spec_lw}",
+        crossing.support.len()
+    );
     let epoch_report_started = Instant::now();
-    epoch::report_epoch("A", &crossing, &a_end, &a_views, receiver_grain, spec_lw)?;
+    epoch::report_epoch("A", &crossing, &a_end, &a_views, receiver_grain)?;
     println!(
         "step0_epoch_report_timing branch=A wall_ns={}",
         epoch_report_started.elapsed().as_nanos()
     );
     for (name, _, _, views, _, end, _) in &b_outputs {
         let epoch_report_started = Instant::now();
-        epoch::report_epoch(name, &crossing, end, views, receiver_grain, spec_lw)?;
+        epoch::report_epoch(name, &crossing, end, views, receiver_grain)?;
         println!(
             "step0_epoch_report_timing branch={name} wall_ns={}",
             epoch_report_started.elapsed().as_nanos()
@@ -1401,12 +1403,6 @@ mod tests {
     }
 
     #[test]
-    fn specification_lattice_argument_is_derived_from_grain_and_support_width() {
-        assert_eq!(diagnostic_spec_lattice_exponent(32, 32).unwrap(), 11);
-        assert!(diagnostic_spec_lattice_exponent(3, 32).is_err());
-        assert!(diagnostic_spec_lattice_exponent(32, 0).is_err());
-    }
-
     #[test]
     fn source_interventions_keep_one_branch_per_lock_advance_category() {
         fn source_field(lock: Vec<u64>) -> Field {

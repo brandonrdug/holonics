@@ -152,19 +152,26 @@ fn exact_log2_power_of_two(value: &BigInt) -> Option<u32> {
     (value == &(BigInt::one() << exponent as usize)).then_some(exponent)
 }
 
-fn spec_lattice_exponent(receiver_grain: u64, support_width: usize) -> Option<u32> {
-    let doubled_grain = BigInt::from(receiver_grain) << 1usize;
-    let b_r = exact_log2_power_of_two(&doubled_grain)?;
-    let width = u64::try_from(support_width).ok()?;
-    if width == 0 {
-        return None;
+pub(super) fn spec_lattice_exponent(receiver_grain: u64, support_width: usize) -> Result<u32> {
+    let doubled_grain = receiver_grain
+        .checked_mul(2)
+        .ok_or("twice the receiver grain overflows u64")?;
+    if receiver_grain == 0 || !doubled_grain.is_power_of_two() || support_width == 0 {
+        return Err(
+            "specification LW requires power-of-two 2*receiver grain and nonzero support width"
+                .into(),
+        );
     }
+    let width = u64::try_from(support_width).map_err(|_| "support width exceeds u64")?;
     let ceil_width = if width.is_power_of_two() {
         width.trailing_zeros()
     } else {
         u64::BITS - width.leading_zeros()
     };
-    b_r.checked_add(ceil_width)
+    doubled_grain
+        .trailing_zeros()
+        .checked_add(ceil_width)
+        .ok_or_else(|| "specification LW overflows u32".into())
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -249,6 +256,62 @@ fn matrix_subtract(left: &Matrix, right: &Matrix) -> Result<Matrix> {
         }
     }
     Ok(Matrix::new(rows)?)
+}
+
+fn released_gram_matrix(views: &[CutView], rows: usize, columns: usize) -> Result<Matrix> {
+    released_gram_entries(
+        views
+            .iter()
+            .flat_map(|view| view.gram_release.iter().cloned()),
+        rows,
+        columns,
+    )
+}
+
+fn released_gram_entries(
+    entries: impl IntoIterator<Item = (usize, Rat)>,
+    rows: usize,
+    columns: usize,
+) -> Result<Matrix> {
+    let entry_count = rows
+        .checked_mul(columns)
+        .ok_or("released Gram shape overflows usize")?;
+    let mut values = Matrix::zero(rows, columns)?.to_rows();
+    for (index, amount) in entries {
+        if columns == 0 || index >= entry_count {
+            return Err(
+                format!("released Gram entry index {index} is outside {rows}x{columns}").into(),
+            );
+        }
+        values[index / columns][index % columns] += amount;
+    }
+    Ok(Matrix::new(values)?)
+}
+
+fn prior_gram_delta(
+    rows: usize,
+    columns: usize,
+    prior_cross: Option<u32>,
+    prior_end: Option<u32>,
+    scale_cross: u32,
+    scale_end: u32,
+) -> Result<Option<Matrix>> {
+    if prior_cross != prior_end || (prior_cross.is_none() && scale_cross != scale_end) {
+        return Ok(None);
+    }
+    let mut values = Matrix::zero(rows, columns)?.to_rows();
+    if prior_cross.is_some() {
+        if rows != columns {
+            return Err("receiving prior ridge requires a square Gram matrix".into());
+        }
+        let ridge_cross = Rat::from_integer(BigInt::one() << scale_cross as usize);
+        let ridge_end = Rat::from_integer(BigInt::one() << scale_end as usize);
+        let delta = ridge_end - ridge_cross;
+        for (i, row) in values.iter_mut().enumerate() {
+            row[i] = delta.clone();
+        }
+    }
+    Ok(Some(Matrix::new(values)?))
 }
 
 fn column_majorizer(gram: &Matrix) -> Result<(Vec<i64>, Vec<Rat>)> {
@@ -392,7 +455,6 @@ pub(super) fn report_epoch(
     end: &CutView,
     views: &[CutView],
     receiver_grain: u64,
-    spec_lattice_exponent_argument: u32,
 ) -> Result<()> {
     if receiver_grain == 0 {
         return Err("receiver grain denominator must be positive".into());
@@ -401,18 +463,42 @@ pub(super) fn report_epoch(
     let native_lw_cross = crossing.native_lattice_exponent;
     let native_lw_end = end.native_lattice_exponent;
     let width = crossing.support.len();
-    let spec_lw = spec_lattice_exponent(receiver_grain, width);
+    let spec_lw = spec_lattice_exponent(receiver_grain, width)?;
     let spec_b_r = exact_log2_power_of_two(&(BigInt::from(receiver_grain) << 1usize));
-    let spec_unit = spec_lw.map(|exponent| rat_pow2(-i64::from(exponent)));
+    let spec_unit = rat_pow2(-i64::from(spec_lw));
     let native_unit_cross = rat_pow2(-i64::from(native_lw_cross));
     let native_unit_end = rat_pow2(-i64::from(native_lw_end));
+    let native_spec_mismatch_cross = native_lw_cross != spec_lw;
+    let native_spec_mismatch_end = native_lw_end != spec_lw;
     let actual_map_delta = matrix_subtract(&end.map, &crossing.map)?;
     let actual_stored_gram_delta = matrix_subtract(&end.gram, &crossing.gram)?;
     let actual_carry_delta = matrix_subtract(&end.gram_remainder, &crossing.gram_remainder)?;
-    let exact_gram_residual = matrix_subtract(
-        &matrix_subtract(&actual_stored_gram_delta, &actual_carry_delta)?,
+    let released_gram = released_gram_matrix(views, crossing.gram.rows(), crossing.gram.columns())?;
+    let raw_gram_delta = matrix_subtract(
+        &matrix_add(&actual_stored_gram_delta, &actual_carry_delta)?,
         &sample_gram_delta,
     )?;
+    let raw_plus_release = matrix_add(&raw_gram_delta, &released_gram)?;
+    let prior_delta = prior_gram_delta(
+        crossing.gram.rows(),
+        crossing.gram.columns(),
+        crossing.receiving_prior,
+        end.receiving_prior,
+        crossing.prior_scale,
+        end.prior_scale,
+    )?;
+    let adjusted_gram_balance = prior_delta
+        .as_ref()
+        .map(|prior| matrix_subtract(&raw_plus_release, prior))
+        .transpose()?
+        .unwrap_or_else(|| raw_plus_release.clone());
+    let exact_gram_balance_zero = adjusted_gram_balance.entries().iter().all(Rat::is_zero);
+    let conservation_failure = prior_delta.is_some() && !exact_gram_balance_zero;
+    let conservation_status = if prior_delta.is_some() {
+        "exact"
+    } else {
+        "unsupported-prior-declaration-change"
+    };
     let max_feature = views
         .iter()
         .flat_map(|view| &view.samples)
@@ -448,7 +534,7 @@ pub(super) fn report_epoch(
     let native_half_quantum = &grain_unit / Rat::from_integer(BigInt::from(2));
 
     println!(
-        "step0_epoch branch={branch} samples={} W_cross={:?} H_cross_stored={:?} G_cross_projected={:?} sample_H_delta_projected={:?} H_end_stored={:?} H_stored_delta={:?} carry_cross={:?} carry_end={:?} carry_delta={:?} exact_Hstored_delta_minus_carry_delta_minus_sample_H_delta={:?} W_end={:?} W_actual_delta={:?}",
+        "step0_epoch branch={branch} samples={} W_cross={:?} H_cross_stored={:?} G_cross_projected={:?} sample_H_delta_projected={:?} H_end_stored={:?} H_stored_delta={:?} carry_cross={:?} carry_end={:?} carry_delta={:?} raw_ΔHstored_plus_Δcarry_minus_ΔsampleH={:?} actual_sparse_released_gram_e={:?} exact_ΔP_prior={:?} adjusted_conservation_raw_plus_e_minus_ΔP={:?} adjusted_conservation_exact_zero={} receiving_prior_cross={:?} receiving_prior_end={:?} prior_scale_cross={} prior_scale_end={} conservation_status={}; immutable prior declaration mismatch means ΔP is unavailable and no conservation claim is made W_end={:?} W_actual_delta={:?}",
         views.iter().map(|view| view.samples.len()).sum::<usize>(),
         crossing.map,
         crossing.gram,
@@ -459,16 +545,34 @@ pub(super) fn report_epoch(
         crossing.gram_remainder,
         end.gram_remainder,
         actual_carry_delta,
-        exact_gram_residual,
+        raw_gram_delta,
+        released_gram,
+        &prior_delta,
+        adjusted_gram_balance,
+        exact_gram_balance_zero,
+        crossing.receiving_prior,
+        end.receiving_prior,
+        crossing.prior_scale,
+        end.prior_scale,
+        conservation_status,
         end.map,
         actual_map_delta,
     );
+    if prior_delta.is_none() {
+        return Err("native Gram conservation is unsupported across an unaccounted prior declaration or scale change".into());
+    }
+    if conservation_failure {
+        return Err(format!(
+            "native Gram conservation failed after exact prior adjustment: ΔHstored + Δcarry - ΔsampleH + released - Δprior = {adjusted_gram_balance:?}"
+        )
+        .into());
+    }
     println!(
         "step0_epoch_contract branch={branch} metric=native-stored-H; ridge_is_already_in_stored-H; gram_carry_reported_separately_not_added; G_cross_and_sample_deltaH_are_projected_by_crossing_NormalLaw; gamma=1_hypothetical; incoming_R=0_hypothetical; this_G_is_not_live_PreparedStep.unit; radial_mode=not_exposed; receiving_prior={:?} prior_scale={} support={:?} symmetry={} receiver_grain_unit=1/{receiver_grain}={grain_unit} native_precision_half_quantum={native_half_quantum}",
         crossing.receiving_prior, crossing.prior_scale, crossing.support, crossing.symmetry,
     );
     println!(
-        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_sample_weight:?} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} spec_b_R=log2(2*L_R)={spec_b_r:?} spec_LW=b_R+ceil(log2(support_width={width}))={spec_lw:?} spec_W_unit={spec_unit:?} passed_spec_LW={spec_lattice_exponent_argument} no_clock_feature_split_claimed",
+        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_sample_weight:?} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_vs_spec_LW_mismatch_cross={native_spec_mismatch_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} native_vs_spec_LW_mismatch_end={native_spec_mismatch_end} spec_b_R=log2(2*L_R)={spec_b_r:?} spec_LW=b_R+ceil(log2(support_width={width}))={spec_lw} spec_W_unit={spec_unit:?} no_clock_feature_split_claimed",
         matrix_max_abs(&gradient),
     );
 
@@ -740,6 +844,55 @@ mod tests {
             rat_pow2(-i64::from(spec)),
             Rat::new(1.into(), BigInt::one() << 11usize)
         );
+        assert!(native_cross != spec);
+        assert!(native_end != spec);
+        assert!(spec_lattice_exponent(3, 32).is_err());
+        assert!(spec_lattice_exponent(32, 0).is_err());
+    }
+
+    #[test]
+    fn actual_sparse_release_closes_nonzero_stored_carry_and_sample_deltas() {
+        // Two observed releases hit the same actual Gram coordinate across deposits; the aggregate
+        // must use those native entries, not a value reconstructed from the balance remainder.
+        let released = released_gram_entries(
+            [
+                (0, Rat::new(1.into(), 8.into())),
+                (0, Rat::new(1.into(), 8.into())),
+            ],
+            1,
+            1,
+        )
+        .unwrap();
+        // The stored-H change contains one unit of native ridge change from scale 0 to 1.
+        let stored_delta = Matrix::new(vec![vec![Rat::from_integer(2.into())]]).unwrap();
+        let carry_delta = Matrix::new(vec![vec![Rat::new(1.into(), 4.into())]]).unwrap();
+        let sample_delta = Matrix::new(vec![vec![Rat::new(3.into(), 2.into())]]).unwrap();
+        let raw = matrix_subtract(
+            &matrix_add(&stored_delta, &carry_delta).unwrap(),
+            &sample_delta,
+        )
+        .unwrap();
+        let raw_plus_release = matrix_add(&raw, &released).unwrap();
+        let prior_delta = prior_gram_delta(1, 1, Some(2), Some(2), 0, 1)
+            .unwrap()
+            .unwrap();
+        let adjusted_balance = matrix_subtract(&raw_plus_release, &prior_delta).unwrap();
+        assert_eq!(
+            released,
+            Matrix::new(vec![vec![Rat::new(1.into(), 4.into())]]).unwrap()
+        );
+        assert_eq!(prior_delta, Matrix::new(vec![vec![Rat::one()]]).unwrap());
+        assert_eq!(
+            raw_plus_release,
+            Matrix::new(vec![vec![Rat::one()]]).unwrap()
+        );
+        assert_eq!(adjusted_balance, Matrix::zero(1, 1).unwrap());
+        assert!(
+            prior_gram_delta(1, 1, Some(2), Some(3), 0, 1)
+                .unwrap()
+                .is_none()
+        );
+        assert!(prior_gram_delta(1, 1, None, None, 0, 1).unwrap().is_none());
     }
 
     #[test]

@@ -12972,6 +12972,63 @@ mod projected_statistics_tests {
     }
 
     #[test]
+    fn synthetic_nonsymmetric_paired_operator_requires_the_chart_transpose() {
+        let symmetry = PortSymmetry::from_parts(
+            vec![1, 0],
+            vec![Some(1), Some(0), Some(3), Some(2)],
+            &[0, 2],
+        )
+        .unwrap();
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(2, 4).unwrap())
+            .with_symmetry(symmetry.clone())
+            .unwrap();
+        let before = law.clone();
+        let sample = Sample {
+            weight: rat(2, 1),
+            feature: vec![rat(1, 1), rat(0, 1), rat(1, 1), rat(0, 1)],
+            covector: vec![rat(3, 1), rat(-1, 1)],
+            masses: None,
+        };
+        let (cross, _) = law.projected_statistics(&[sample.clone()]).unwrap();
+        // Deliberately synthetic: this is a general operator that commutes with the pairing,
+        // not a native SolvedChart. Native chart construction remains symmetric. This fixture
+        // exercises the transpose orientation that a symmetric native chart cannot distinguish.
+        let synthetic_chart = ExactRatMatrix::new(vec![
+            vec![rat(1, 1), rat(0, 1), rat(2, 1), rat(0, 1)],
+            vec![rat(0, 1), rat(1, 1), rat(0, 1), rat(2, 1)],
+            vec![rat(0, 1), rat(0, 1), rat(1, 1), rat(0, 1)],
+            vec![rat(0, 1), rat(0, 1), rat(0, 1), rat(1, 1)],
+        ])
+        .unwrap();
+        let transpose = synthetic_chart.transpose().unwrap();
+        assert_ne!(synthetic_chart, transpose);
+        for row in 0..4 {
+            for column in 0..4 {
+                assert_eq!(
+                    synthetic_chart.get(row, column).unwrap(),
+                    synthetic_chart
+                        .get(symmetry.column(row), symmetry.column(column))
+                        .unwrap()
+                );
+            }
+        }
+        let covector = integral(&sample.covector);
+        let reached = integral(&synthetic_chart.apply(&sample.feature).unwrap());
+        let from_reach = outer_integral(2, 4, &[(&sample.weight, &covector, &reached)])
+            .projected(symmetry.rows(), symmetry.columns());
+        let unit_from_synthetic_reach = ExactRatMatrix::new(from_reach.to_rows()).unwrap();
+        assert_eq!(
+            cross.multiply(&transpose).unwrap(),
+            unit_from_synthetic_reach
+        );
+        assert_ne!(
+            cross.multiply(&synthetic_chart).unwrap(),
+            unit_from_synthetic_reach
+        );
+        assert_eq!(law, before);
+    }
+
+    #[test]
     fn statistics_preserve_empty_shapes_and_refuse_bad_samples_or_outside_pairs() {
         let empty = NormalLaw::with_prior(ExactRatMatrix::zero(0, 3).unwrap());
         let (cross, gram) = empty.projected_statistics(&[]).unwrap();
@@ -12997,6 +13054,61 @@ mod projected_statistics_tests {
             law.projected_statistics(&[sample]),
             Err(HnnError::Shape { .. })
         ));
+    }
+}
+
+#[cfg(test)]
+mod gram_carry_conservation_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    fn gram_release(at: &BudgetedCarry) -> Rat {
+        at.released()
+            .into_iter()
+            .filter_map(|(carrier, entry, value)| {
+                (carrier == Carrier::Gram && entry == 0).then_some(value)
+            })
+            .sum()
+    }
+
+    #[test]
+    fn nonzero_native_gram_carry_closes_with_the_positive_remainder_delta() {
+        let mut carry = Carry::default();
+        let mut stored = [rat(2, 1)];
+        for (clock, update) in [(1, rat(1, 8)), (2, rat(1, 16))] {
+            let before_stored = stored[0].clone();
+            let before_carry = carry.at(0);
+            let mut at = BudgetedCarry::new(Lattice::new(2), clock);
+            carry.deposit_all(&mut at, Carrier::Gram, &mut stored, &[update.clone()]);
+            let stored_delta = &stored[0] - before_stored;
+            let carry_delta = carry.at(0) - before_carry;
+            let release = gram_release(&at);
+            assert!(!carry.at(0).is_zero());
+            assert!(!carry_delta.is_zero());
+            assert!(release.is_zero());
+            assert_eq!(
+                &stored_delta + &carry_delta - &update + &release,
+                Rat::zero()
+            );
+            assert_ne!(stored_delta - carry_delta - update, Rat::zero());
+        }
+    }
+
+    #[test]
+    fn actual_native_gram_release_tail_closes_the_conservation_balance() {
+        let mut carry = Carry::default();
+        let mut stored = [rat(2, 1)];
+        let before_stored = stored[0].clone();
+        let before_carry = carry.at(0);
+        let update = rat(3, 16);
+        let mut at = BudgetedCarry::new(Lattice::new(2), 1);
+        carry.deposit_all(&mut at, Carrier::Gram, &mut stored, &[update.clone()]);
+        let release = gram_release(&at);
+        assert_eq!(at.released(), vec![(Carrier::Gram, 0, rat(-1, 16))]);
+        assert!(!release.is_zero());
+        let residual = (&stored[0] - before_stored) + (carry.at(0) - before_carry) - update;
+        assert_eq!(residual, -&release);
+        assert_eq!(residual + release, Rat::zero());
     }
 }
 

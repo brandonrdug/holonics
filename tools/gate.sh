@@ -18,7 +18,9 @@ run guard-lints cargo clippy -p holonics --all-targets -- -D clippy::disallowed_
 run guard-doctests env RUSTC_BOOTSTRAP=1 cargo test -p holonics --doc
 run diagnostic-timing-controls cargo test -p holonics --example listener continuing::diagnostic::
 run diagnostic-supervisor-controls python3 tools/test_listener_diagnostic_stage.py
+run diagnostic-receipt-controls python3 tools/test_listener_diagnostic_receipts.py
 run listener-continuation-controls cargo test -p holonics --example listener continuing::tests::
 run projected-statistics-controls cargo test -p holonics --lib projected_statistics_tests
 run native-class-advance-controls cargo test -p holonics --lib class_advance_tests
+run native-gram-carry-conservation cargo test -p holonics --lib gram_carry_conservation_tests
 exit $status

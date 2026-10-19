@@ -55,6 +55,9 @@ class DeadlinePlan:
                 "REQ063_NATIVE_DEADLINE_MONOTONIC_NS": str(self.native_ns),
                 "RAYON_NUM_THREADS": "1",
                 "REQ063_CLK_TCK": str(os.sysconf("SC_CLK_TCK")),
+                "CUDA_VISIBLE_DEVICES": "",
+                "HIP_VISIBLE_DEVICES": "",
+                "ROCR_VISIBLE_DEVICES": "",
             }
         )
         return env
@@ -76,9 +79,21 @@ class ProcessResult:
     finished_ns: int
     group_alive_at_return: bool
     cleanup_uncertain: bool
+    waited_child_cpu_user_us: int | None
+    waited_child_cpu_system_us: int | None
+    term_sent_ns: int | None
+    kill_sent_ns: int | None
 
     def as_json(self) -> str:
         return json.dumps(dataclasses.asdict(self), sort_keys=True, separators=(",", ":"))
+
+
+@dataclasses.dataclass(frozen=True)
+class ProcessSample:
+    monotonic_ns: int
+    group_rss_bytes: int | None
+    group_cpu_user_ticks: int | None
+    group_cpu_system_ticks: int | None
 
 
 def classify_returncode(returncode: int | None, *, deadline_evidence: bool) -> str:
@@ -130,6 +145,53 @@ def group_rss_bytes(pgid: int) -> int | None:
     return total if found else 0
 
 
+def group_cpu_ticks(pgid: int) -> tuple[int, int] | None:
+    """Sum raw user/system clock ticks for visible processes in a process group."""
+    if not sys.platform.startswith("linux"):
+        return None
+    user_ticks = 0
+    system_ticks = 0
+    found = False
+    try:
+        entries = os.scandir("/proc")
+    except OSError:
+        return None
+    with entries:
+        for entry in entries:
+            if not entry.name.isdigit():
+                continue
+            try:
+                with open(f"/proc/{entry.name}/stat", encoding="ascii") as stream:
+                    stat = stream.read()
+                close = stat.rfind(")")
+                fields = stat[close + 1 :].split()
+                if int(fields[2]) != pgid:
+                    continue
+                user_ticks += int(fields[11])
+                system_ticks += int(fields[12])
+            except FileNotFoundError:
+                continue
+            except (OSError, ValueError, IndexError):
+                return None
+            found = True
+    return (user_ticks, system_ticks) if found else (0, 0)
+
+
+def _child_cpu_delta(before: resource.struct_rusage | None) -> tuple[int | None, int | None]:
+    if before is None:
+        return None, None
+    try:
+        after = resource.getrusage(resource.RUSAGE_CHILDREN)
+    except (AttributeError, OSError, ValueError):
+        return None, None
+    user_seconds = after.ru_utime - before.ru_utime
+    system_seconds = after.ru_stime - before.ru_stime
+    if user_seconds < 0 or system_seconds < 0:
+        return None, None
+    # getrusage reports CPU time at microsecond precision on the supported Linux host.
+    return round(user_seconds * 1_000_000), round(system_seconds * 1_000_000)
+
+
 def process_group_alive(pgid: int) -> bool:
     try:
         os.killpg(pgid, 0)
@@ -173,6 +235,8 @@ def supervise(
     rss_reader: Callable[[int], int | None] = group_rss_bytes,
     signal_group: Callable[[int, int], None] = _send_group_signal,
     sleep_ns: Callable[[int], None] = lambda delay: time.sleep(delay / 1_000_000_000),
+    sample_hook: Callable[[ProcessSample], None] | None = None,
+    kill_cutoff_ns: int | None = None,
     install_limits: bool = True,
 ) -> ProcessResult:
     """Run exactly one process group; dependencies are injectable for clock/process controls."""
@@ -182,7 +246,21 @@ def supervise(
     plan = DeadlinePlan.fixed(start_ns) if plan is None else plan
     if not plan.valid_fixed_contract():
         raise ValueError("only the fixed 295s TERM / 300s total / 5s native grace contract is valid")
+    cleanup_cutoff_ns = plan.total_ns if kill_cutoff_ns is None else kill_cutoff_ns
+    if not plan.term_ns < cleanup_cutoff_ns <= plan.total_ns:
+        raise ValueError("kill cutoff must follow TERM and remain inside the fixed total deadline")
+    if clock() >= plan.native_ns:
+        finished = clock()
+        return ProcessResult(
+            "not_started_deadline", "native_cutoff_reached_during_preflight", None, True,
+            False, False, None, plan.start_ns, plan.term_ns, plan.native_ns, plan.total_ns,
+            finished, False, False, None, None, None, None
+        )
     env = plan.child_environment(dict(os.environ))
+    try:
+        child_usage_before = resource.getrusage(resource.RUSAGE_CHILDREN)
+    except (AttributeError, OSError, ValueError):
+        child_usage_before = None
     try:
         process = popen_factory(
             list(command),
@@ -195,15 +273,18 @@ def supervise(
         return ProcessResult(
             "launch_failed", "child_launch_or_limit_setup_failed", None, False, False, False,
             None, plan.start_ns, plan.term_ns, plan.native_ns, plan.total_ns, finished,
-            False, False
+            False, False, None, None, None, None
         )
     pgid = process.pid
     term_sent = False
     kill_sent = False
+    term_sent_ns: int | None = None
+    kill_sent_ns: int | None = None
     deadline_evidence = False
     reason = "child_exit"
     peak_rss: int | None = None
     rss_stop = False
+    monitor_stop_status: str | None = None
     cleanup_deadline_ns: int | None = None
     while True:
         now = clock()
@@ -213,29 +294,52 @@ def supervise(
             measured_rss = None
         if measured_rss is not None:
             peak_rss = measured_rss if peak_rss is None else max(peak_rss, measured_rss)
+        cpu_ticks = group_cpu_ticks(pgid)
+        if sample_hook is not None:
+            sample = ProcessSample(
+                now,
+                measured_rss,
+                None if cpu_ticks is None else cpu_ticks[0],
+                None if cpu_ticks is None else cpu_ticks[1],
+            )
+            try:
+                sample_hook(sample)
+            except Exception as error:
+                if not term_sent:
+                    reason = getattr(error, "reason", "receipt_sampling_failed")
+                    monitor_stop_status = getattr(error, "status", "resource_measurement_unavailable")
+                    rss_stop = True
+                    term_sent = True
+                    cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, cleanup_cutoff_ns)
+                    term_sent_ns = now
+                    signal_group(pgid, signal.SIGTERM)
         if not term_sent and measured_rss is None and group_alive(pgid):
             reason = "process_group_rss_unavailable"
             rss_stop = True
             term_sent = True
-            cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, plan.total_ns)
+            cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, cleanup_cutoff_ns)
+            term_sent_ns = now
             signal_group(pgid, signal.SIGTERM)
         if not term_sent and measured_rss is not None and measured_rss >= RSS_CAP_BYTES:
             reason = "process_group_rss_cap"
             rss_stop = True
             term_sent = True
-            cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, plan.total_ns)
+            cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, cleanup_cutoff_ns)
+            term_sent_ns = now
             signal_group(pgid, signal.SIGTERM)
         if not term_sent and now >= plan.term_ns:
             reason = "outer_term_deadline"
             deadline_evidence = True
             term_sent = True
-            cleanup_deadline_ns = plan.total_ns
+            cleanup_deadline_ns = cleanup_cutoff_ns
+            term_sent_ns = now
             signal_group(pgid, signal.SIGTERM)
         returncode = process.poll()
         if returncode is not None and not term_sent and group_alive(pgid):
             reason = "leader_exited_group_cleanup"
             term_sent = True
-            cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, plan.total_ns)
+            cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, cleanup_cutoff_ns)
+            term_sent_ns = now
             signal_group(pgid, signal.SIGTERM)
         alive = group_alive(pgid)
         if returncode is not None and not alive:
@@ -244,6 +348,8 @@ def supervise(
                 status = "deadline"
             elif rss_stop and returncode in (-signal.SIGKILL, 128 + signal.SIGKILL):
                 status = "killed_unknown"
+            elif monitor_stop_status is not None:
+                status = monitor_stop_status
             elif rss_stop and reason == "process_group_rss_cap":
                 status = "resource_cap"
             elif rss_stop:
@@ -253,18 +359,25 @@ def supervise(
             return ProcessResult(
                 status, reason, returncode, deadline_evidence, term_sent, kill_sent, peak_rss,
                 plan.start_ns, plan.term_ns, plan.native_ns, plan.total_ns, clock(),
-                group_alive(pgid), False
+                group_alive(pgid), False, *_child_cpu_delta(child_usage_before),
+                term_sent_ns, kill_sent_ns
             )
         cleanup_due = cleanup_deadline_ns is not None and now >= cleanup_deadline_ns
         if cleanup_due and not kill_sent:
             if deadline_evidence:
                 reason = "fixed_total_deadline"
             kill_sent = True
+            kill_sent_ns = now
             signal_group(pgid, signal.SIGKILL)
-        if now >= plan.total_ns:
-            reason = "fixed_total_deadline"
+        if now >= cleanup_cutoff_ns:
+            reason = (
+                "fixed_total_deadline"
+                if cleanup_cutoff_ns == plan.total_ns
+                else "reserved_evidence_cutoff"
+            )
             deadline_evidence = True
             if not kill_sent:
+                kill_sent_ns = now
                 signal_group(pgid, signal.SIGKILL)
                 kill_sent = True
             # Do not wait past the hard envelope. The result records a missing status honestly.
@@ -272,13 +385,15 @@ def supervise(
             status = classify_returncode(returncode, deadline_evidence=deadline_evidence)
             if deadline_evidence:
                 status = "deadline"
+            waited_cpu = _child_cpu_delta(child_usage_before) if returncode is not None else (None, None)
             alive_at_return = group_alive(pgid)
             return ProcessResult(
                 status, reason, returncode, True, term_sent, kill_sent, peak_rss,
                 plan.start_ns, plan.term_ns, plan.native_ns, plan.total_ns, clock(),
-                alive_at_return, alive_at_return
+                alive_at_return, alive_at_return, *waited_cpu,
+                term_sent_ns, kill_sent_ns
             )
-        delay = min(POLL_NS, plan.total_ns - now)
+        delay = min(POLL_NS, cleanup_cutoff_ns - now)
         if term_sent:
             # The cleanup period is strictly bounded by the fixed total deadline.
             sleep_ns(delay)
