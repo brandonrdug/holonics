@@ -520,6 +520,15 @@ impl Deposit {
         self.reach.as_ref()
     }
 
+    /// The deposit with its word's saturated rings' passages in its reach
+    /// (`hnn::word::Word::tube_passages`; a deposit without a reach is returned as it is).
+    pub(crate) fn with_passages(mut self, passages: Vec<crate::hnn::ring::TubePassage>) -> Self {
+        if let Some(reach) = self.reach.as_mut() {
+            reach.passages = passages;
+        }
+        self
+    }
+
     /// The deposit with the receiving face's steps (ruling A; THE_REBUILD U1).
     pub(crate) fn with_receiving(self, receiving: Vec<ReceivingStep>) -> Self {
         Self { receiving, ..self }

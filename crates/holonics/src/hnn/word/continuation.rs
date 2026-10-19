@@ -443,6 +443,7 @@ impl<'c> Word<'c> {
             entries: vec![0],
             phases: occupied,
             loci: diamond.retained(field),
+            passages: Vec::new(),
         });
         cut.deposit = Some(deposit.clone());
         let read = ComparedRead {

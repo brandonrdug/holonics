@@ -779,6 +779,7 @@ fn finite_loaded_span_carries_the_actual_contact_response_at_its_clock() {
         entries: vec![0],
         phases: 1,
         loci: crate::hnn::retention::loci(&field).into_iter().collect(),
+        passages: Vec::new(),
     };
     let spans = FiniteContactSpans::of(&new, 0, &reach).unwrap();
     let reading = spans.read(&[(integer(4), integer(1))]).unwrap();

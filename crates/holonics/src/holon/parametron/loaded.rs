@@ -372,7 +372,7 @@ fn dominated(m: &ExactRatMatrix) -> Result<Rat, HolonError> {
 }
 
 /// The largest node `ℓ¹` norm of a realified displacement.
-fn node_reach(displacement: &[Rat]) -> Rat {
+pub fn node_reach(displacement: &[Rat]) -> Rat {
     displacement
         .chunks(2)
         .map(|node| node.iter().map(|v| v.abs()).sum::<Rat>())
@@ -391,6 +391,50 @@ fn rate_map(h: &Rat, n: usize) -> Result<ExactRatMatrix, HolonError> {
             Rat::one()
         }
     })?)
+}
+
+/// [definition] **The quartic variation's reach into a metric** (the domain certificate's Young
+/// piece): `a` with `aI ⪰ AᵀGA`, `A = [−h²X; −hX]`, the absolute row norm of the symmetric form
+/// (which bounds its spectral norm), checked by inertia.
+pub fn variation_reach(
+    h: &Rat,
+    inverse: &ExactRatMatrix,
+    metric: &ExactRatMatrix,
+) -> Result<Rat, HolonError> {
+    let n = inverse.rows();
+    let a_map = matrix(2 * n, n, |i, k| {
+        if i < n {
+            -h * h * at(inverse, i, k)
+        } else {
+            -h * at(inverse, i - n, k)
+        }
+    })?;
+    dominated(&a_map.transpose()?.multiply(metric)?.multiply(&a_map)?)
+}
+
+/// [definition] **The quartic Hessian's variation per node** on a node ball of radius `ε` about a
+/// displacement whose largest node `ℓ¹` norm is `U`: `3β(2Uε + ε²)` (the quartic is node-diagonal,
+/// and on a node `|∇²Q(z) − ∇²Q(c)| ≤ β(||z|² − |c|²| + 2|zzᵀ − ccᵀ|) ≤ 3β(2|c|d + d²)` with
+/// `d = |z − c| ≤ ε`).
+pub fn hessian_variation_on(coefficient: &Rat, centre: &[Rat], radius: &Rat) -> Rat {
+    let u = node_reach(centre);
+    integer(3) * coefficient * (integer(2) * u * radius + radius * radius)
+}
+
+/// [definition; agent-inferred, October 18] **The executed drive's reach into a metric**: `d̂` with
+/// `d̂I ⪰ D̂ᵀGD̂`, `D̂ = BhX` the drive's reach into `(u′, w′)` through the solve `X`.
+pub fn drive_reach(
+    h: &Rat,
+    solve: &ExactRatMatrix,
+    metric: &ExactRatMatrix,
+) -> Result<Rat, HolonError> {
+    let response = rate_map(h, solve.rows())?.multiply(&solve.scaled(h))?;
+    dominated(
+        &response
+            .transpose()?
+            .multiply(metric)?
+            .multiply(&response)?,
+    )
 }
 
 /// [definition; agent-inferred, October 18] **The squared floor of the executed envelope** (module
@@ -516,30 +560,13 @@ impl DomainStep {
         let h = law.step();
         let x = element.operator(h)?.inverse()?;
         let j = element.jacobian(h, &x, &p.centre)?;
-        let a_map = matrix(2 * n, n, |i, k| {
-            if i < n {
-                -h * h * at(&x, i, k)
-            } else {
-                -h * at(&x, i - n, k)
-            }
-        })?;
-        let a_gram = a_map
-            .transpose()?
-            .multiply(&next.metric)?
-            .multiply(&a_map)?;
-        // For this symmetric PSD form its absolute row norm bounds its spectral norm.
-        let a: Rat = a_gram
-            .to_rows()
-            .iter()
-            .map(|row| row.iter().map(|v| v.abs()).sum::<Rat>())
-            .max()
-            .unwrap_or_else(Rat::zero);
-        nonnegative_form(&ExactRatMatrix::identity(n)?.scaled(&a).subtract(&a_gram)?)?;
+        let a = variation_reach(h, &x, &next.metric)?;
         // The quartic is node-diagonal: its Hessian varies by `3β(2|c|ε + ε²)` on each node.
-        let u = node_reach(&p.centre[..n]);
-        let eps = &p.euclidean_radius;
-        let delta =
-            integer(3) * element.saturation.coefficient() * (integer(2) * u * eps + eps * eps);
+        let delta = hessian_variation_on(
+            element.saturation.coefficient(),
+            &p.centre[..n],
+            &p.euclidean_radius,
+        );
         let nominal = j.transpose()?.multiply(&next.metric)?.multiply(&j)?;
         let variation =
             (Rat::one() + Rat::one() / &p.young) * a * &delta * &delta / &p.metric_lower;
@@ -834,29 +861,13 @@ impl PeriodicLock {
 /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The locked pair**: two
 /// certified opposite sheets of one executed period, read at its closing boundary (the period's
 /// phase `0`) on one displacement axis, their domains disjoint (`|c⁺ − c⁻| > ε⁺ + ε⁻`, each ball
-/// inside its Euclidean ε-ball). A sample is closed-ball membership: in one ball it is that sheet,
-/// in neither it is unlocked. Sheets are read, never thresholded.
+/// inside its Euclidean ε-ball). Its sheets are read by closed-ball membership
+/// ([`PeriodicLock::contains`]), never thresholded; the lock event that reads them joins with the
+/// event clock that consumes it (the revised plan, step 1b).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LockedPair {
     positive: PeriodicLock,
     negative: PeriodicLock,
-}
-
-/// One sample at the period's closing boundary.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum LockSample {
-    Sheet(i8),
-    Unlocked,
-}
-
-/// [definition; agent-inferred, October 18] **A lock event**: the state entered a ball other than
-/// the one it last lay in (`from`, `None` before any ball), at closing boundary `at`. One event
-/// per change of ball; an unlocked sample is reported and makes none.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct LockEvent {
-    pub from: Option<i8>,
-    pub to: i8,
-    pub at: u64,
 }
 
 impl LockedPair {
@@ -888,29 +899,5 @@ impl LockedPair {
     }
     pub fn negative(&self) -> &PeriodicLock {
         &self.negative
-    }
-    /// Closed-ball membership at the closing boundary.
-    pub fn sample(&self, state: &[Rat]) -> Result<LockSample, HolonError> {
-        Ok(if self.positive.contains(state)? {
-            LockSample::Sheet(1)
-        } else if self.negative.contains(state)? {
-            LockSample::Sheet(-1)
-        } else {
-            LockSample::Unlocked
-        })
-    }
-    /// The sample at boundary `at` and its event against the ball last lain in.
-    pub fn observe(
-        &self,
-        last: Option<i8>,
-        state: &[Rat],
-        at: u64,
-    ) -> Result<(LockSample, Option<LockEvent>), HolonError> {
-        let sample = self.sample(state)?;
-        let event = match sample {
-            LockSample::Sheet(to) if last != Some(to) => Some(LockEvent { from: last, to, at }),
-            _ => None,
-        };
-        Ok((sample, event))
     }
 }

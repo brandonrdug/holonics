@@ -799,6 +799,7 @@ impl Word<'_> {
                 entries: vec![0],
                 phases: occupied,
                 loci,
+                passages: Vec::new(),
             });
             Some((cut.bind_comparison(deposit.clone()), deposit))
         } else {

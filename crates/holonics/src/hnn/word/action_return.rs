@@ -179,6 +179,7 @@ impl Word<'_> {
                     entries: vec![0],
                     phases: composed.phases,
                     loci: diamond.retained(field),
+                    passages: Vec::new(),
                 }),
             )
         };

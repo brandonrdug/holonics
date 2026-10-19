@@ -569,7 +569,8 @@ use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_integral};
 use crate::hnn::receiving::{ReceivingStep, landmark_declaration, receiving_population};
 use crate::hnn::ring::{
-    Floquet, FloquetBound, FloquetReading, ResonatorMaterial, ResonatorOperands, attain_metric,
+    Floquet, FloquetBound, FloquetReading, ResonatorMaterial, ResonatorOperands, TubeMetric,
+    TubePassage, TubeReach, attain_metric,
 };
 use crate::hnn::word::ReceptionCarry;
 use crate::holon::deposition::{
@@ -3842,6 +3843,13 @@ pub struct Reach {
     /// collapse retains them, so a collapse changes no step. The budget `B_Θ` reads the resident's
     /// retention instead ([`Constitution::deposited_within`]).
     pub loci: BTreeSet<Locus>,
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **Each saturated
+    /// ring's passage** (`hnn::ring::TubePassage`, a ring on a one-tick period): the running maximum
+    /// of its displacement's node `ℓ¹` distance to each rest point of its period over the word's
+    /// executed ticks,
+    /// filled where the word builds its reach (`hnn::word::Word::tube_passages`). The ring's reach
+    /// is read on the tube about it (module header, "The pumped medium's reach").
+    pub passages: Vec<TubePassage>,
 }
 
 impl Reach {
@@ -3858,21 +3866,25 @@ impl Reach {
         let powers = Self::powers(growth, self.stations.iter().max().map_or(0, |t| t + 1));
         self.stations
             .iter()
-            .map(|&station| {
-                let sum: Rat = self
-                    .entries
-                    .iter()
-                    .filter(|&&entry| entry <= station)
-                    .map(|&entry| powers[(station - entry) as usize].clone())
-                    .sum();
-                let square = &sum * &sum;
-                let first = self.entries.iter().filter(|&&entry| entry <= station).min();
-                match (factor, first) {
-                    (Some(factor), Some(&first)) => square * &factor[(station - first) as usize],
-                    _ => square,
-                }
-            })
+            .map(|&station| self.entry_at(station, &powers, factor))
             .sum()
+    }
+
+    /// One station's entry gain `(Σ_(n: T_n ≤ T) g^(T − T_n))² F(T − min_n T_n)`, from the powers
+    /// `g^k`, `k ≤ T`.
+    fn entry_at(&self, station: u64, powers: &[Rat], factor: Option<&[Rat]>) -> Rat {
+        let sum: Rat = self
+            .entries
+            .iter()
+            .filter(|&&entry| entry <= station)
+            .map(|&entry| powers[(station - entry) as usize].clone())
+            .sum();
+        let square = &sum * &sum;
+        let first = self.entries.iter().filter(|&&entry| entry <= station).min();
+        match (factor, first) {
+            (Some(factor), Some(&first)) => square * &factor[(station - first) as usize],
+            _ => square,
+        }
     }
 
     /// `Σ_j Σ_(τ < T_j) g^(2(T_j − τ − 1)) F(T_j − τ)`: every tick's energy gain to every station,
@@ -3881,8 +3893,16 @@ impl Reach {
     /// medium's.
     pub(crate) fn tick_gain(&self, growth: &Rat, factor: Option<&[Rat]>) -> Rat {
         let top = self.stations.iter().max().copied().unwrap_or(0);
+        let sums = Self::tick_sums(growth, factor, top);
+        self.stations
+            .iter()
+            .map(|&station| sums[station as usize].clone())
+            .sum()
+    }
+
+    /// `sums[t] = Σ_(k < t) g^(2k) F(k + 1)` for `t ≤ top`: one station's tick gain at `t`.
+    fn tick_sums(growth: &Rat, factor: Option<&[Rat]>, top: u64) -> Vec<Rat> {
         let powers = Self::powers(&(growth * growth), top);
-        // `sums[t] = Σ_(k < t) g^(2k) F(k + 1)`.
         let mut sums = Vec::with_capacity(top as usize + 1);
         sums.push(Rat::zero());
         for (k, power) in powers.iter().enumerate() {
@@ -3892,10 +3912,7 @@ impl Reach {
             };
             sums.push(next);
         }
-        self.stations
-            .iter()
-            .map(|&station| sums[station as usize].clone())
-            .sum()
+        sums
     }
 
     /// `[1, x, x², …, x^(count − 1)]`, each from the one before.
@@ -4040,9 +4057,42 @@ impl DepositReading {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RingReach {
     pub ring: usize,
-    pub reading: FloquetReading,
+    pub reading: RingReading,
     pub bounds: Vec<FloquetBound>,
     pub reach: Vec<Rat>,
+}
+
+/// [definition; agent-inferred, October 18; the design review of step 1a] **What a ring's reach
+/// was read from**: a linear ring's Floquet decision, or a saturated ring's tube about its passage
+/// (`hnn::ring::ResonatorOperands::tube_reach`), whose one bound is the tube's tick factor at
+/// period one.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum RingReading {
+    Floquet(FloquetReading),
+    Tube(Box<TubeReach>),
+}
+
+/// [definition; agent-inferred, October 18; the design review of step 1a] **A saturated ring's
+/// tube closure at a deposit** (module header, "The pumped medium's reach"): the stepped passage
+/// stays in the tube its reach reads. Its rate's deviation at each tick is bounded by the station
+/// gains read at the ring's own drive (`Y_R/Y_r` in the readout's place, a station one tick after
+/// each drive), carried through the tube's tick `σ` and the drive's response `d̂I ⪰ D̂ᵀGD̂`:
+/// `|Δx_t|_G ≤ √d̂ W_t`, `W_t = σ W_(t−1) + Σ_x η_x √(κ²_(x,t) b_x)`, so the displacement's node
+/// `ℓ¹` deviation is at most `2d̂W_t²/γ_lo` squared. The closure holds when that stays within
+/// `(ρ̄ − ρ_c)²` over the stations' span; `rung` is the radius's on its ladder.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TubeClosure {
+    pub ring: usize,
+    pub rung: u32,
+    pub deviation: Rat,
+    pub slack: Rat,
+}
+
+impl TubeClosure {
+    /// `2d̂ max_t W_t² / γ_lo ≤ (ρ̄ − ρ_c)²`.
+    pub fn holds(&self) -> bool {
+        self.deviation <= self.slack
+    }
 }
 
 /// [definition; agent-inferred, September 29] **The medium's reach** ([`Constitution::medium_reach`];
@@ -4074,6 +4124,8 @@ pub struct PumpedReading {
     pub span: u64,
     pub factor: Rat,
     pub held: Vec<(Locus, Family)>,
+    /// Each tube-read ring's closure at the steps taken (empty when no ring is read on a tube).
+    pub closures: Vec<TubeClosure>,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -4660,7 +4712,7 @@ impl Constitution {
     ///
     /// It replaces the founding's half-turn pump at `d/h` on this ring: that pump leaves the
     /// uniform mode deadbeat to the origin (`(1 + 2ph²/r)(1 − 2ph²/r) = 0`), so no sheet stands
-    /// there; a standing pump's lock event is read at every tick, its period's closing boundary.
+    /// there; a standing pump's sheet is read at every tick, its period's closing boundary.
     pub fn with_locking_pump(self, field: &Field, ring: usize) -> Result<Self, HnnError> {
         use crate::hnn::ring::{PumpDeclaration, PumpStep};
         let declared = field.ring(ring);
@@ -6429,10 +6481,24 @@ impl Constitution {
     /// so their least is). When no rung certifies, the decided certificate's bound is read. A
     /// refused decision is the refusal [`HnnError::UncertifiedGain`], with its reason: no step is
     /// certified through that ring.
+    ///
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **A saturated ring on
+    /// a one-tick period is read on its tube** (`reads_tube`): its tick is not linear, so it has no
+    /// monodromy. With its standing pump the tube's centres are the saddle and the two sheets; with
+    /// the pump removed, the origin alone, where the tangent is the unpumped tick's. Its reach is
+    /// the tube's about the passage the deposit's reach carries, read from the tube metric at the
+    /// passage's nearest rest point ([`Constitution::tube_metrics`], `hnn::ring::TubeMetric::at`),
+    /// at the radius `ρ̄ = 2^(k + rung)`, `2^k` the least dyadic above the passage's distance `ρ_c`
+    /// (at least the grain `2^(−g)`); the certified step climbs `rung`
+    /// ([`Constitution::certify_steps`]). A saturated ring the reach carries no passage for is
+    /// refused. A saturated ring on a pump of several phases keeps its linear part's monodromy, as
+    /// before step 1a: its period's tube is owed (#62).
     fn ring_reaches(
         &self,
         span: u64,
         among: impl Fn(usize) -> bool,
+        tubes: &[(TubePassage, TubeMetric)],
+        rung: u32,
     ) -> Result<Vec<RingReach>, HnnError> {
         let mut rings = Vec::new();
         for (ring, material) in self.rings.iter().enumerate() {
@@ -6457,6 +6523,33 @@ impl Constitution {
                 }
                 other => other,
             };
+            if reads_tube(resonator) {
+                let (passage, metric) = tubes
+                    .iter()
+                    .find(|(passage, _)| passage.ring == ring)
+                    .ok_or(HnnError::Resonator {
+                        ring,
+                        what: "a saturated ring's reach reads its passage",
+                    })?;
+                let distance = passage.distance(metric.centre).ok_or(HnnError::Resonator {
+                    ring,
+                    what: "a tube's centre is a rest point of its passage's period",
+                })?;
+                let mut least = -i64::from(grain);
+                while crate::holon::deposition::dyadic(least) <= *distance {
+                    least += 1;
+                }
+                let radius = crate::holon::deposition::dyadic(least + i64::from(rung));
+                let tube = metric.at(passage, &radius, grain)?;
+                let reach = (0..=span).map(|s| ceiling(&tube.bound.reach(s))).collect();
+                rings.push(RingReach {
+                    ring,
+                    bounds: vec![tube.bound.clone()],
+                    reading: RingReading::Tube(Box::new(tube)),
+                    reach,
+                });
+                continue;
+            }
             let operands =
                 ResonatorOperands::at_cut(ring, resonator, &self.admittances[ring], hop, None)?;
             let floquet = Floquet::of(&operands)?;
@@ -6530,7 +6623,7 @@ impl Constitution {
             let bounds = read.into_iter().map(|(_, bound, _)| bound).collect();
             rings.push(RingReach {
                 ring,
-                reading,
+                reading: RingReading::Floquet(reading),
                 bounds,
                 reach,
             });
@@ -6548,13 +6641,55 @@ impl Constitution {
             .collect()
     }
 
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **The tube metric of
+    /// each saturated ring the reach carries a passage for and its diamond holds**, at the
+    /// passage's nearest rest point and the ring's resonator grain (`hnn::ring::ResonatorOperands::
+    /// tube_metric`): read once a deposit, before its radius ladder, each radius then one inertia
+    /// decision.
+    fn tube_metrics(
+        &self,
+        reach: Option<&Reach>,
+    ) -> Result<Vec<(TubePassage, TubeMetric)>, HnnError> {
+        let Some(reach) = reach else {
+            return Ok(Vec::new());
+        };
+        reach
+            .passages
+            .iter()
+            .filter(|passage| {
+                reach.reads_ring(passage.ring)
+                    && self
+                        .rings
+                        .get(passage.ring)
+                        .is_some_and(|material| material.resonator.as_ref().is_some_and(reads_tube))
+            })
+            .map(|passage| {
+                let ring = passage.ring;
+                let material = &self.rings[ring];
+                let resonator = material.resonator.as_ref().expect("filtered");
+                let locus = Locus::Resonator(ring);
+                let hop = material
+                    .resonator_step
+                    .as_ref()
+                    .ok_or(HnnError::Lattice { locus })?;
+                let grain = self.lattice(locus)?.exponent();
+                let operands =
+                    ResonatorOperands::at_cut(ring, resonator, &self.admittances[ring], hop, None)?;
+                let (centre, _) = passage.nearest();
+                Ok((passage.clone(), operands.tube_metric(centre, grain)?))
+            })
+            .collect()
+    }
+
     /// [definition; agent-inferred, September 29] **The medium's reach over the spans `0..=span`**
     /// (module header, "The pumped medium's reach"): the contrast ports' `1 + ω`, each ring not
     /// certified passive with its reach, and the span factors. A consumer's energy bound over a
     /// refinement of `T` ticks reads `F(T)` beside `1 + ω` (Lean `Holon/Deposition.pumped_span_factor`:
-    /// every span within `T` is carried by `F(T)` at most). Refused where a ring's certificate is.
+    /// every span within `T` is carried by `F(T)` at most). Refused where a ring's certificate is,
+    /// and at a saturated ring on a one-tick period: its reach reads a passage, which only a
+    /// deposit's reach carries.
     pub fn medium_reach(&self, span: u64) -> Result<MediumReach, HnnError> {
-        let rings = self.ring_reaches(span, |_| true)?;
+        let rings = self.ring_reaches(span, |_| true, &[], 0)?;
         let factors = Self::factors_of(&rings, span);
         Ok(MediumReach {
             amplitude: self.contrast_amplitude()?,
@@ -6634,6 +6769,16 @@ impl Constitution {
     /// ([`DeclaredStepRefusal::Undeclared`]). A declared step's curvature, bound and joint
     /// readings are read at its own ray and recorded, never enforced: the a posteriori admission
     /// (`hnn::word::continuation::FiniteDecrease`) is its certificate.
+    ///
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **The tube's radius
+    /// climbs its ladder.** Through a ring read on its tube ([`RingReading::Tube`]) the native
+    /// certificate also holds the tube's closure ([`TubeClosure`]): the step that fails it is
+    /// halved like any other. A wider tube reads a larger Hessian variation, so a larger tick
+    /// factor and smaller steps, and leaves more room for the stepped passage: the radius climbs
+    /// from the least dyadic above the passage's distance, one rung at a time within the ring's
+    /// grain, while the certified first-order decrease `Σ η a` grows, and stops where it no longer
+    /// grows (the ring reach's ladder idiom); a rung whose tube is refused ends the climb. A declared
+    /// or candidate source reads the first rung and records the closure without enforcing it.
     fn certify_steps(
         &self,
         reach: Option<&Reach>,
@@ -6642,6 +6787,75 @@ impl Constitution {
         loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
         source: StepSource<'_>,
     ) -> Result<Result<CertifiedSteps, DeclaredStepRefusal>, HnnError> {
+        let metrics = self.tube_metrics(reach)?;
+        let first = self.certify_steps_at(
+            reach,
+            linear,
+            factors,
+            loaded,
+            source,
+            TubeRung {
+                tubes: &metrics,
+                rung: 0,
+            },
+        )?;
+        let tubes: Vec<usize> = match &first {
+            Ok((_, _, Some(pumped), _)) if matches!(source, StepSource::Certified) => {
+                pumped.closures.iter().map(|closure| closure.ring).collect()
+            }
+            _ => Vec::new(),
+        };
+        if tubes.is_empty() {
+            return Ok(first);
+        }
+        let top = tubes
+            .iter()
+            .map(|&ring| Ok(self.lattice(Locus::Resonator(ring))?.exponent()))
+            .collect::<Result<Vec<u32>, HnnError>>()?
+            .into_iter()
+            .max()
+            .unwrap_or(0);
+        let decrease = |read: &Result<CertifiedSteps, DeclaredStepRefusal>| -> Rat {
+            match read {
+                Ok((_, Some(joint), ..)) => joint.decrease.clone(),
+                _ => Rat::zero(),
+            }
+        };
+        let mut best = first;
+        for rung in 1..=top {
+            let Ok(read) = self.certify_steps_at(
+                reach,
+                linear,
+                factors,
+                loaded,
+                source,
+                TubeRung {
+                    tubes: &metrics,
+                    rung,
+                },
+            ) else {
+                break;
+            };
+            if decrease(&read) > decrease(&best) {
+                best = read;
+            } else {
+                break;
+            }
+        }
+        Ok(best)
+    }
+
+    /// The certified steps at one rung of the tubes' radius ladder ([`Constitution::certify_steps`]).
+    fn certify_steps_at(
+        &self,
+        reach: Option<&Reach>,
+        linear: &[(Locus, LinearLocus, PreparedDirectionRef<'_>)],
+        factors: &[(Locus, &FactorPrepared)],
+        loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
+        source: StepSource<'_>,
+        at: TubeRung<'_>,
+    ) -> Result<Result<CertifiedSteps, DeclaredStepRefusal>, HnnError> {
+        let TubeRung { tubes, rung } = at;
         /// A normal law's readings at the certificate's faces: its alignment at its floor, its
         /// covector scale, feature moves and unit step's Schur norms at their ceilings, and (the
         /// receiving map's only) its unit step's certified spectral norm.
@@ -6774,14 +6988,19 @@ impl Constitution {
         let rings = if loaded.is_some() {
             Vec::new()
         } else {
-            self.ring_reaches(span, |ring| {
-                reach.reads_ring(ring)
-                    && !(silent
-                        && self.rings[ring]
-                            .resonator
-                            .as_ref()
-                            .is_some_and(|law| law.saturation().is_some() && !pumped(law)))
-            })?
+            self.ring_reaches(
+                span,
+                |ring| {
+                    reach.reads_ring(ring)
+                        && !(silent
+                            && self.rings[ring]
+                                .resonator
+                                .as_ref()
+                                .is_some_and(|law| law.saturation().is_some() && !pumped(law)))
+                },
+                tubes,
+                rung,
+            )?
         };
         let factors = (!rings.is_empty()).then(|| Self::factors_of(&rings, span));
         let mut held = Vec::new();
@@ -6804,11 +7023,12 @@ impl Constitution {
                 .collect();
             parts.retain(|(locus, ..)| !holds(locus));
         }
-        let pumped_reading = factors.as_ref().map(|factors| PumpedReading {
+        let mut pumped_reading = factors.as_ref().map(|factors| PumpedReading {
             rings: rings.clone(),
             span,
             factor: factors.last().cloned().unwrap_or_else(Rat::one),
             held: held.clone(),
+            closures: Vec::new(),
         });
         if parts.is_empty() {
             return Ok(source
@@ -7093,6 +7313,68 @@ impl Constitution {
                     .map(|((step, bound), _)| (&step.step, &step.alignment, bound)),
             )
         };
+        // The tubes' closures (module header, "The pumped medium's reach"; [`TubeClosure`]): at each
+        // tube-read ring, every realized family's rate deviation at each tick of the stations' span,
+        // its station gain read one tick after the drive with the readout `Y_R/Y_r`, carried through
+        // the tube's tick `σ`, and each family's share of `W` at the tick where `W` is largest. The
+        // receiving map reads the passage and does not move it.
+        let tubes: Vec<(usize, &TubeReach)> = rings
+            .iter()
+            .filter_map(|reached| match &reached.reading {
+                RingReading::Tube(tube) => Some((reached.ring, tube.as_ref())),
+                RingReading::Floquet(_) => None,
+            })
+            .collect();
+        let closure_of =
+            |steps: &[Option<CertifiedStep>]| -> Result<Vec<(TubeClosure, Vec<Rat>)>, HnnError> {
+                if tubes.is_empty() {
+                    return Ok(Vec::new());
+                }
+                let (_, amplitude) = gains(steps);
+                let ticks = Reach::tick_sums(&amplitude, factors.as_deref(), span);
+                let powers = Reach::powers(&amplitude, span + 1);
+                let mut closures = Vec::with_capacity(tubes.len());
+                for &(ring, tube) in &tubes {
+                    let readout = &self.admittances[reach.receiver] / &self.admittances[ring];
+                    let sigma = &tube.bound.growth;
+                    let mut shares = vec![Rat::zero(); parts.len()];
+                    let (mut worst, mut kept) = (Rat::zero(), shares.clone());
+                    for tau in 0..span {
+                        let station = tau + 1;
+                        let sums = (
+                            ceiling(&ticks[station as usize]),
+                            ceiling(&reach.entry_at(station, &powers, factors.as_deref())),
+                        );
+                        let mut total = Rat::zero();
+                        for (index, share) in shares.iter_mut().enumerate() {
+                            *share *= sigma;
+                            let (locus, ..) = &parts[index];
+                            if realized[index] && !matches!(locus, Locus::ReceivingMap(_)) {
+                                let (gain, moves) = curvature(index, steps, &readout, &sums, None)?;
+                                let rate = root_ceiling(&ceiling(&(gain * moves)));
+                                *share += taken(steps, (parts[index].0, parts[index].1)) * rate;
+                            }
+                            total += &*share;
+                        }
+                        if total > worst {
+                            worst = total;
+                            kept = shares.clone();
+                        }
+                    }
+                    let gap = &tube.radius - &tube.distance;
+                    closures.push((
+                        TubeClosure {
+                            ring,
+                            rung,
+                            deviation: rat(2, 1) * &tube.response * &worst * &worst
+                                / &tube.bound.low,
+                            slack: &gap * &gap,
+                        },
+                        kept,
+                    ));
+                }
+                Ok(closures)
+            };
         // The exponent source, the only part of the certificate the two sources do not share.
         let (mut steps, mut read, mut bounds, mut joint) = match source {
             StepSource::Certified | StepSource::Candidate { .. } => {
@@ -7168,6 +7450,46 @@ impl Constitution {
                         *step = step.halved();
                         continue;
                     }
+                    // The stepped passage stays in every tube: while a closure fails, the family
+                    // with the largest share of its deviation is halved (the first at a tie), at
+                    // once as often as its share alone keeps the closure failing and stays above
+                    // the next share (the deviation is linear in each step at fixed gains).
+                    if matches!(source, StepSource::Certified)
+                        && let Some((closure, shares)) = closure_of(&steps)?
+                            .into_iter()
+                            .find(|(closure, _)| !closure.holds())
+                    {
+                        let mut order: Vec<usize> = (0..shares.len()).collect();
+                        order.sort_by(|&a, &b| shares[b].cmp(&shares[a]).then(a.cmp(&b)));
+                        let index = order[0];
+                        let next = order.get(1).map_or_else(Rat::zero, |&i| shares[i].clone());
+                        let rest: Rat = shares
+                            .iter()
+                            .enumerate()
+                            .filter(|&(i, _)| i != index)
+                            .map(|(_, share)| share.clone())
+                            .sum();
+                        let tube = tubes
+                            .iter()
+                            .find(|(ring, _)| *ring == closure.ring)
+                            .map(|(_, tube)| *tube)
+                            .expect("a closure reads its tube");
+                        let closes = |share: &Rat| {
+                            let w = &rest + share;
+                            rat(2, 1) * &tube.response * &w * &w / &tube.bound.low <= closure.slack
+                        };
+                        let mut share = &shares[index] / rat(2, 1);
+                        let mut halvings = 1u32;
+                        while !closes(&share) && share > next && !share.is_zero() {
+                            share /= rat(2, 1);
+                            halvings += 1;
+                        }
+                        let step = steps[index].as_mut().expect("a stepping family");
+                        for _ in 0..halvings {
+                            *step = step.halved();
+                        }
+                        continue;
+                    }
                     break (steps, read, bounds, joint);
                 }
             }
@@ -7235,6 +7557,12 @@ impl Constitution {
                 bounds = bounds_of(&read);
                 joint = joint_of(&steps.iter().flatten().collect::<Vec<_>>(), &bounds);
             }
+        }
+        if let Some(pumped) = pumped_reading.as_mut() {
+            pumped.closures = closure_of(&steps)?
+                .into_iter()
+                .map(|(closure, _)| closure)
+                .collect();
         }
         let (readout, amplitude) = gains(&steps);
         let readings: BTreeMap<(Locus, Family), StepReading> = parts
@@ -9952,6 +10280,22 @@ fn pumped(resonator: &ResonatorMaterial) -> bool {
     resonator
         .pump()
         .is_some_and(|pump| !pump.strength().is_zero())
+}
+
+/// The tube metrics a certified step reads and the rung of their radius ladder
+/// ([`Constitution::certify_steps`]).
+#[derive(Clone, Copy)]
+struct TubeRung<'t> {
+    tubes: &'t [(TubePassage, TubeMetric)],
+    rung: u32,
+}
+
+/// [definition; agent-inferred, October 18; the design review of step 1a] **A resonator read on its
+/// tube**: saturated on a one-tick period (`hnn::ring::ResonatorOperands::reads_tube`, read on the
+/// material: no pump, or one of one phase). Its tick is not linear, so its reach is the tube's about
+/// its passage, not a monodromy's.
+fn reads_tube(resonator: &ResonatorMaterial) -> bool {
+    resonator.saturation().is_some() && resonator.phases() == 1
 }
 
 /// [definition; agent-inferred, September 29] **A resonator certified passive** (module header, "The

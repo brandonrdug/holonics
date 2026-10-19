@@ -3270,6 +3270,32 @@ impl<'c> Word<'c> {
         &self.resonators
     }
 
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **Each saturated
+    /// ring's passage** in this word, a ring on a one-tick period
+    /// (`hnn::ring::ResonatorOperands::{reads_tube, passage}`): the running maximum, per rest point
+    /// of its period, of its displacement's node `ℓ¹` distance over the word's
+    /// executed ticks (each tick's displacement before it, and the state the last one left). The
+    /// deposit's reach carries it to the certified step, which reads the ring on the tube about it.
+    pub fn tube_passages(&self) -> Result<Vec<crate::hnn::ring::TubePassage>, HnnError> {
+        self.operands
+            .resonators()
+            .iter()
+            .zip(&self.resonators)
+            .filter_map(|(operands, resonance)| match (operands, resonance) {
+                (Some(operands), Some(resonance)) if operands.reads_tube() => Some(
+                    operands.passage(
+                        resonance
+                            .steps
+                            .iter()
+                            .map(|step| step.input[0].as_slice())
+                            .chain(std::iter::once(resonance.state[0].as_slice())),
+                    ),
+                ),
+                _ => None,
+            })
+            .collect()
+    }
+
     /// The loaded port's two nested wave-chart remainders, used by its smallest law fixture.
     #[cfg(test)]
     pub(crate) fn loaded_wave_remainders(&self, ring: usize) -> Option<(&[Rat], &[Rat])> {
