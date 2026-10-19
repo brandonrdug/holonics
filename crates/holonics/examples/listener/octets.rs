@@ -169,6 +169,116 @@ pub(crate) fn save_checkpoint<R: ExposedResident>(
     Ok(())
 }
 
+/// Cost discovery for the existing resident codec, with create-only exterior publication.
+/// This does not serialize ObservedCrib and cannot claim an observed-listener resume.
+#[allow(
+    clippy::disallowed_methods,
+    clippy::disallowed_types,
+    reason = "create-only checkpoint cost measurement is exterior example I/O"
+)]
+pub(crate) fn save_checkpoint_cost_profile<R: ExposedResident>(
+    resident: &R,
+    opening: &Constitution,
+    source: usize,
+    directory: &str,
+    completed: usize,
+    receiver_clock: (usize, u64),
+    mut check: impl FnMut(&str) -> Result<()>,
+) -> Result<()> {
+    use std::io::Write;
+    let path = checkpoint_path(directory, completed);
+    let staged_path = format!("{path}.tmp");
+    if std::path::Path::new(&path).exists() || std::path::Path::new(&staged_path).exists() {
+        return Err("cost checkpoint refuses an existing destination or staging file".into());
+    }
+    check("resident snapshot")?;
+    let started = Instant::now();
+    let state = resident
+        .continuing_state(source)?
+        .with_receiver_ingress_ticks(receiver_clock.0, receiver_clock.1)?;
+    println!(
+        "cost_checkpoint component=snapshot elapsed_ns={}",
+        elapsed(started)
+    );
+    if state.passage().is_none() {
+        return Err("cost checkpoint lacks the continuing passage".into());
+    }
+    check("resident serialization")?;
+    let started = Instant::now();
+    let text = state.to_text();
+    println!(
+        "cost_checkpoint component=serialize elapsed_ns={} bytes={}",
+        elapsed(started),
+        text.len()
+    );
+    check("checkpoint create-only I/O")?;
+    let started = Instant::now();
+    if let Some(parent) = std::path::Path::new(&path).parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let mut staged = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&staged_path)?;
+    staged.write_all(text.as_bytes())?;
+    staged.sync_all()?;
+    drop(staged);
+    let staged_bytes = std::fs::read(&staged_path)?;
+    if staged_bytes != text.as_bytes() {
+        return Err("cost checkpoint staged readback differs".into());
+    }
+    // A hard link publishes atomically and refuses a raced-in destination. Keep the exact
+    // staging inode as private evidence; no existing file is replaced or removed.
+    std::fs::hard_link(&staged_path, &path)?;
+    let committed = std::fs::read(&path)?;
+    println!(
+        "cost_checkpoint component=create_sync_read_link_read elapsed_ns={} bytes={} staging_preserved=true",
+        elapsed(started),
+        committed.len()
+    );
+    if committed != text.as_bytes() {
+        return Err("cost checkpoint committed readback differs".into());
+    }
+    check("resident checkpoint parse")?;
+    let started = Instant::now();
+    let parsed = ContinuingState::from_text(std::str::from_utf8(&committed)?)?;
+    println!(
+        "cost_checkpoint component=parse elapsed_ns={}",
+        elapsed(started)
+    );
+    check("resident checkpoint exact state equality")?;
+    let started = Instant::now();
+    if parsed != state {
+        return Err("cost checkpoint parsed state differs".into());
+    }
+    println!(
+        "cost_checkpoint component=state_equality elapsed_ns={}",
+        elapsed(started)
+    );
+    check("checkpoint constitution reconstruction")?;
+    let started = Instant::now();
+    let restored = opening.clone().continued(&parsed)?;
+    println!(
+        "cost_checkpoint component=constitution_reconstruct elapsed_ns={}",
+        elapsed(started)
+    );
+    check("checkpoint constitution equality")?;
+    let started = Instant::now();
+    if &restored != resident.constitution() {
+        return Err("cost checkpoint reconstructed constitution differs".into());
+    }
+    println!(
+        "cost_checkpoint component=constitution_equality elapsed_ns={}",
+        elapsed(started)
+    );
+    check("checkpoint completion")?;
+    println!(
+        "cost_checkpoint complete=true scope=resident_only completed_cells={completed} bytes={} byte_roundtrip_equal=true state_parse_equal=true constitution_equal=true receiver_ingress_clock={receiver_clock:?} observed_crib_codec=false observed_resume=false",
+        committed.len(),
+    );
+    Ok(())
+}
+
 #[allow(
     clippy::disallowed_methods,
     reason = "full resident checkpoints are exterior example I/O"

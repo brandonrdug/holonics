@@ -31,7 +31,82 @@ pub(super) struct RunBudget {
     reserve_ns: u128,
 }
 
+/// A narrower phase ceiling on the same supervisor-origin monotonic clock. It never changes
+/// any supervisor deadline. Checks occur between atomic operations; the external supervisor
+/// remains the hard process stop if one atomic operation outlasts a cooperative check.
+#[derive(Clone, Debug)]
+pub(super) struct WorkCutoff {
+    label: String,
+    deadline_ns: u128,
+}
+
+impl WorkCutoff {
+    pub(super) fn check(&self) -> io::Result<()> {
+        self.check_at(exterior_clock::monotonic_ns()?)
+    }
+
+    fn check_at(&self, now_ns: u128) -> io::Result<()> {
+        if now_ns >= self.deadline_ns {
+            return Err(timed_out(format!(
+                "{} stopped at its fixed phase ceiling; later cost phases must not start",
+                self.label
+            )));
+        }
+        Ok(())
+    }
+
+    pub(super) fn remaining_ns(&self) -> io::Result<u128> {
+        Ok(self
+            .deadline_ns
+            .saturating_sub(exterior_clock::monotonic_ns()?))
+    }
+}
+
+fn work_cutoff_at(
+    label: &str,
+    now_ns: u128,
+    started_ns: u128,
+    allowance_ns: u128,
+    absolute_offset_ns: u128,
+    shared_cutoff_ns: u128,
+) -> io::Result<WorkCutoff> {
+    if allowance_ns == 0 || absolute_offset_ns == 0 {
+        return Err(invalid("a cost phase needs positive fixed ceilings"));
+    }
+    let deadline_ns = now_ns
+        .checked_add(allowance_ns)
+        .zip(started_ns.checked_add(absolute_offset_ns))
+        .map(|(local, absolute)| local.min(absolute).min(shared_cutoff_ns))
+        .ok_or_else(|| invalid("cost phase ceiling overflows monotonic nanoseconds"))?;
+    let cutoff = WorkCutoff {
+        label: label.to_owned(),
+        deadline_ns,
+    };
+    cutoff.check_at(now_ns)?;
+    Ok(cutoff)
+}
+
 impl RunBudget {
+    /// Fixed local allowance and fixed offset from the supervisor start, both narrowed by
+    /// the existing shared report cutoff. The caller's earlier phases cannot extend it.
+    pub(super) fn cost_phase(
+        &self,
+        label: &str,
+        allowance_ns: u128,
+        absolute_offset_ns: u128,
+    ) -> io::Result<WorkCutoff> {
+        work_cutoff_at(
+            label,
+            exterior_clock::monotonic_ns()?,
+            self.deadline.started_ns,
+            allowance_ns,
+            absolute_offset_ns,
+            self.deadline
+                .native_ns
+                .saturating_sub(REPORT_RESERVE_FLOOR_NS),
+        )
+    }
+
     /// Loads the supervisor's absolute monotonic deadlines and reserves time for declared
     /// postwork. Missing/malformed environment values and non-Linux monotonic clocks fail closed.
     pub(super) fn new(reserve_ns: u128) -> io::Result<Self> {
@@ -137,6 +212,27 @@ impl RunBudget {
     }
 }
 
+/// A private synthetic-control clock; it reads no global environment and advances no learner.
+#[cfg(test)]
+pub(super) fn test_run_budget() -> io::Result<RunBudget> {
+    let started_ns = exterior_clock::monotonic_ns()?;
+    Ok(RunBudget {
+        deadline: DeadlineContract {
+            started_ns,
+            term_ns: started_ns
+                .checked_add(TERM_OFFSET_NS)
+                .ok_or_else(|| invalid("test deadline overflow"))?,
+            total_ns: started_ns
+                .checked_add(RUN_WALL_CAP_NS)
+                .ok_or_else(|| invalid("test deadline overflow"))?,
+            native_ns: started_ns
+                .checked_add(TERM_OFFSET_NS - NATIVE_TERM_GRACE_NS)
+                .ok_or_else(|| invalid("test deadline overflow"))?,
+        },
+        reserve_ns: 0,
+    })
+}
+
 #[derive(Clone, Copy, Debug)]
 pub(super) enum ReportWorkKind {
     HeldEval,
@@ -171,6 +267,7 @@ pub(super) struct ReportBudget {
     held_eval: Vec<u128>,
     gram_inverse: Vec<u128>,
     other: Vec<u128>,
+    cutoff: Option<WorkCutoff>,
 }
 
 impl ReportBudget {
@@ -182,10 +279,19 @@ impl ReportBudget {
             held_eval: Vec::new(),
             gram_inverse: Vec::new(),
             other: Vec::new(),
+            cutoff: None,
         }
     }
 
+    pub(super) fn with_cutoff(mut self, cutoff: &WorkCutoff) -> Self {
+        self.cutoff = Some(cutoff.clone());
+        self
+    }
+
     pub(super) fn check_before_work(&self, label: &str) -> io::Result<()> {
+        if let Some(cutoff) = &self.cutoff {
+            cutoff.check()?;
+        }
         if self.run.remaining_report_ns()? == 0 {
             return Err(timed_out(format!(
                 "branch {} cannot start {label}: the shared 285-second phase cutoff was reached (five-second report floor)",
@@ -196,7 +302,11 @@ impl ReportBudget {
     }
 
     pub(super) fn remaining_ns(&self) -> io::Result<u128> {
-        self.run.remaining_report_ns()
+        let shared = self.run.remaining_report_ns()?;
+        match &self.cutoff {
+            Some(cutoff) => Ok(shared.min(cutoff.remaining_ns()?)),
+            None => Ok(shared),
+        }
     }
 
     pub(super) fn record_work(&mut self, kind: ReportWorkKind, elapsed_ns: u128) {
@@ -215,7 +325,7 @@ impl ReportBudget {
         // calibration count supplies no model for a different population. Keep the raw
         // measurements; only the separately pinned empirical admission input may forecast 231.
         let projected_231_ns = None;
-        let remaining_report_ns = self.run.remaining_report_ns().unwrap_or(0);
+        let remaining_report_ns = self.remaining_ns().unwrap_or(0);
         ReportSummary {
             branch: self.branch.clone(),
             held_eval,
@@ -1027,6 +1137,21 @@ mod tests {
             "a".repeat(64),
             "b".repeat(64)
         )
+    }
+
+    #[test]
+    fn cost_phase_ceilings_narrow_local_absolute_and_shared_time_without_extension() {
+        let early = super::work_cutoff_at("report16", 100, 0, 30, 140, 285).unwrap();
+        assert_eq!(early.deadline_ns, 130);
+        let late = super::work_cutoff_at("report16", 120, 0, 30, 140, 285).unwrap();
+        assert_eq!(late.deadline_ns, 140);
+        assert!(late.check_at(139).is_ok());
+        assert!(late.check_at(140).is_err());
+        let shared = super::work_cutoff_at("later", 250, 0, 80, 340, 285).unwrap();
+        assert_eq!(shared.deadline_ns, 285);
+        assert!(super::work_cutoff_at("expired", 140, 0, 30, 140, 285).is_err());
+        assert!(super::work_cutoff_at("overflow", u128::MAX - 1, 0, 30, 140, 285).is_err());
+        assert!(super::work_cutoff_at("empty", 1, 0, 0, 140, 285).is_err());
     }
 
     #[test]

@@ -235,8 +235,13 @@ fn observe_branch(
     budget: &timing::RunBudget,
     abort: &AtomicBool,
     mut crossings: Option<&mut u64>,
+    cutoff: Option<&timing::WorkCutoff>,
 ) -> Result<(Vec<CutView>, Vec<Faces>, Vec<Vec<BigInt>>, Vec<u128>)> {
-    let mut phase = budget.phase(branch, classes.len(), Some(180_000_000_000))?;
+    let cap_ns = match cutoff {
+        Some(cutoff) => cutoff.remaining_ns()?.min(180_000_000_000),
+        None => 180_000_000_000,
+    };
+    let mut phase = budget.phase(branch, classes.len(), Some(cap_ns))?;
     let mut views = Vec::with_capacity(classes.len());
     let mut faces = Vec::with_capacity(classes.len());
     let mut lifts = Vec::with_capacity(classes.len());
@@ -244,6 +249,12 @@ fn observe_branch(
     let mut report_ns = 0u128;
     let mut cell_times = Vec::with_capacity(classes.len());
     for (index, &class) in classes.iter().enumerate() {
+        if let Some(cutoff) = cutoff {
+            if let Err(error) = cutoff.check() {
+                phase.mark_stop(error.to_string());
+                return Err(error.into());
+            }
+        }
         phase.before_cell()?;
         if abort.load(Ordering::Acquire) {
             phase.mark_stop("shared diagnostic guard failure");
@@ -254,6 +265,11 @@ fn observe_branch(
         let cell_started = Instant::now();
         let cpu_started = timing::ThreadCpu::read();
         let wall_before = resident.wall().phases();
+        let receiver_grain = resident
+            .admitted()
+            .first()
+            .ok_or("captured branch has no receiving grain")?
+            .grain();
         let opening_crossings = crossings.as_deref().copied();
         let pre_lift = resident.current().lift().to_vec();
         let pre_clocks = clock_snapshot_at(resident.field(), resident.current())?;
@@ -268,7 +284,7 @@ fn observe_branch(
             pairing,
             class,
             None,
-            |_, material, moment, address, reading, samples, frozen| {
+            |field, material, moment, address, reading, samples, frozen| {
                 let view = cut_view(material, samples).and_then(|mut view| {
                     view.gram_release = reading
                         .released
@@ -295,7 +311,9 @@ fn observe_branch(
                     view.moment_text = pre_moment.clone();
                     view.address_text = format!("{address:?}");
                     view.pre_lift = pre_lift.clone();
-                    view.opening_crossings = opening_crossings;
+                    if let Some(ticks) = opening_crossings {
+                        bind_opening_partition_context(&mut view, field, ticks, receiver_grain)?;
+                    }
                     view.pre_clocks = pre_clocks.clone();
                     view.pre_carried = pre_carried.clone();
                     view.contact_j = pre_contact_j.clone();
@@ -364,6 +382,12 @@ fn observe_branch(
         let cell_ns = native_elapsed + overhead_elapsed;
         cell_times.push(cell_ns);
         phase.finish_cell(cell_ns)?;
+        if let Some(cutoff) = cutoff {
+            if let Err(error) = cutoff.check() {
+                phase.mark_stop(error.to_string());
+                return Err(error.into());
+            }
+        }
         let cpu_delta = cpu_started
             .zip(timing::ThreadCpu::read())
             .and_then(|(start, end)| end.delta_since(start));
@@ -397,14 +421,25 @@ fn observe_plain_branch(
     budget: &timing::RunBudget,
     abort: &AtomicBool,
     mut crossings: Option<&mut u64>,
+    cutoff: Option<&timing::WorkCutoff>,
 ) -> Result<(Vec<Faces>, Vec<Vec<BigInt>>, Vec<u128>)> {
-    let mut phase = budget.phase(branch, classes.len(), Some(180_000_000_000))?;
+    let cap_ns = match cutoff {
+        Some(cutoff) => cutoff.remaining_ns()?.min(180_000_000_000),
+        None => 180_000_000_000,
+    };
+    let mut phase = budget.phase(branch, classes.len(), Some(cap_ns))?;
     let mut faces = Vec::with_capacity(classes.len());
     let mut lifts = Vec::with_capacity(classes.len());
     let mut native_ns = 0u128;
     let mut exterior_ns = 0u128;
     let mut cell_times = Vec::with_capacity(classes.len());
     for (index, &class) in classes.iter().enumerate() {
+        if let Some(cutoff) = cutoff {
+            if let Err(error) = cutoff.check() {
+                phase.mark_stop(error.to_string());
+                return Err(error.into());
+            }
+        }
         phase.before_cell()?;
         if abort.load(Ordering::Acquire) {
             phase.mark_stop("shared diagnostic guard failure");
@@ -445,6 +480,12 @@ fn observe_plain_branch(
         let cell_ns = native_elapsed + exterior;
         cell_times.push(cell_ns);
         phase.finish_cell(cell_ns)?;
+        if let Some(cutoff) = cutoff {
+            if let Err(error) = cutoff.check() {
+                phase.mark_stop(error.to_string());
+                return Err(error.into());
+            }
+        }
         let cpu_delta = cpu_started
             .zip(timing::ThreadCpu::read())
             .and_then(|(start, end)| end.delta_since(start));
@@ -787,6 +828,298 @@ fn count_receiver_crossings(
     Ok(())
 }
 
+fn bind_opening_partition_context(
+    view: &mut CutView,
+    field: &Field,
+    ticks: u64,
+    receiver_grain: u64,
+) -> Result<()> {
+    let (epoch_index, cell_bound) = epoch::opening_partition_context(field, Some(ticks))?;
+    view.opening_crossings = Some(ticks);
+    view.partition_epoch_index = Some(epoch_index);
+    view.partition_cell_bound = Some(cell_bound);
+    view.receiver_partition_exponent =
+        Some(epoch::amended_partition_receiver_exponent(receiver_grain)?);
+    Ok(())
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct HeardPrefix {
+    classes: Vec<usize>,
+    source_cells: usize,
+    teacher_target_cells: usize,
+}
+
+/// Source then teacher target for every section, with no release draw or semantic label.
+fn flatten_heard_prefix(
+    sections: impl IntoIterator<Item = (Vec<usize>, Vec<usize>)>,
+    limit: usize,
+) -> Result<HeardPrefix> {
+    if limit == 0 {
+        return Err("a heard cost prefix needs a positive count".into());
+    }
+    let mut prefix = HeardPrefix {
+        classes: Vec::with_capacity(limit),
+        source_cells: 0,
+        teacher_target_cells: 0,
+    };
+    for (source, target) in sections {
+        for (classes, is_target) in [(source, false), (target, true)] {
+            for class in classes {
+                if prefix.classes.len() == limit {
+                    return Ok(prefix);
+                }
+                prefix.classes.push(class);
+                if is_target {
+                    prefix.teacher_target_cells += 1;
+                } else {
+                    prefix.source_cells += 1;
+                }
+            }
+        }
+    }
+    if prefix.classes.len() != limit {
+        return Err(format!(
+            "cost profile requires {limit} heard cells; input supplies {}",
+            prefix.classes.len()
+        )
+        .into());
+    }
+    Ok(prefix)
+}
+
+fn postdeposit_prefix_cut<T>(cuts: &[T], cells: usize) -> Result<&T> {
+    cells
+        .checked_sub(1)
+        .and_then(|at| cuts.get(at))
+        .ok_or_else(|| "cost report omitted its exact postdeposit prefix cut".into())
+}
+
+fn run_cost_profile_64(
+    port: &Reference,
+    options: &ContinuingOptions,
+    checkpoint_path: &str,
+) -> Result<()> {
+    let budget = timing::RunBudget::new(0)?;
+    let native_cutoff = budget.cost_phase("cost_native_128", 80_000_000_000, 80_000_000_000)?;
+    let checkpoint = format!(
+        "{}/step-000064.state",
+        checkpoint_path.trim_end_matches('/')
+    );
+    if std::path::Path::new(&checkpoint).exists()
+        || std::path::Path::new(&format!("{checkpoint}.tmp")).exists()
+    {
+        return Err("cost profile refuses an existing checkpoint or temporary target".into());
+    }
+    let input_started = Instant::now();
+    let frames = sections_of(Some(&options.learn), options.count)?;
+    let heard = frames
+        .iter()
+        .enumerate()
+        .map(|(at, section)| Ok((section.source_cells(at)?, section.target_cells(at)?)))
+        .collect::<Result<Vec<_>>>()?;
+    let prefix = flatten_heard_prefix(heard, 64)?;
+    println!(
+        "step0_cost_input frame_read_chart_decode_prefix_ns={} sections_loaded={}",
+        input_started.elapsed().as_nanos(),
+        frames.len()
+    );
+    println!(
+        "step0_cost_profile declared_observed_transactions=128 zero_cell_opening_calls=1 heard_cells_per_replica=64 source_cells_per_replica={} teacher_target_cells_per_replica={} order=section_source_then_teacher_target release_draws=0 trunk_cells=0 target_forks=0 B_interventions=0 historical_native_128_ns={} new_source_costs=unmeasured fixed_phase_allowances_ns=[80000000000,30000000000,30000000000,50000000000,80000000000] supervisor_total_ns=300000000000 TERM_offset_ns=295000000000 native_offset_ns=290000000000 report_offset_ns=285000000000 rayon_workers=1 maximum_active_cpu_threads=2 completion_not_certified=true",
+        prefix.source_cells,
+        prefix.teacher_target_cells,
+        historical_native_projection(128)?
+    );
+    native_cutoff.check()?;
+    let setup_started = Instant::now();
+    let (mut fresh, pairing) = mounted(port, options.population)?;
+    let opening = fresh.constitution().clone();
+    let boundary = holonics::hnn::encoding::observed::PairedObservation::admit(
+        fresh.field(),
+        fresh.constitution(),
+        &pairing,
+    )?;
+    let empty = boundary.encode(&[])?;
+    let (moment, empty_opening) = port.ingest(&mut fresh, None, &empty)?;
+    if fresh
+        .moment(&moment)
+        .ok_or("cost empty opening has no source moment")?
+        .cells()
+        != 0
+        || empty_opening
+            .receipt
+            .rings
+            .readings()
+            .iter()
+            .any(|value| !value.is_zero())
+    {
+        return Err("cost setup consumed a heard cell or advanced a ring clock".into());
+    }
+    let mut zero_crossings = 0;
+    count_receiver_crossings(&mut zero_crossings, &empty_opening.receipt)?;
+    if zero_crossings != 0 {
+        return Err("cost empty opening changed the receiver crossing count".into());
+    }
+    native_cutoff.check()?;
+    println!(
+        "step0_cost_setup elapsed_ns={} heard_cells=0 actual_receiver_crossings=0 empty_moment_opened=true",
+        setup_started.elapsed().as_nanos()
+    );
+    let mut crossing = cut_view(fresh.constitution(), &[])?;
+    let receiver_grain = fresh
+        .admitted()
+        .first()
+        .ok_or("cost profile has no receiving grain")?
+        .grain();
+    bind_opening_partition_context(&mut crossing, fresh.field(), 0, receiver_grain)?;
+    let mut captured = fresh.clone();
+    let mut plain = fresh;
+    let mut captured_crib = ObservedCrib::new(0);
+    let mut plain_crib = ObservedCrib::new(0);
+    let mut captured_crossings = 0;
+    let mut plain_crossings = 0;
+    let abort = AtomicBool::new(false);
+    let pool = execution::one_thread_pool()?;
+    let capture_result = pool.install(|| {
+        observe_branch(
+            port,
+            &mut captured,
+            &mut captured_crib,
+            &pairing,
+            &prefix.classes,
+            "cost_capture64",
+            &crossing.map,
+            &budget,
+            &abort,
+            Some(&mut captured_crossings),
+            Some(&native_cutoff),
+        )
+        .map_err(|error| error.to_string())
+    });
+    let (views, captured_faces, _, capture_times) = match capture_result {
+        Ok(value) => value,
+        Err(error) => {
+            println!(
+                "step0_cost_stop phase=capture64 native_complete=false checkpoint_started=false report_started=false partial_counts=step0_phase_summary reason={error:?}"
+            );
+            return Err(error.into());
+        }
+    };
+    native_cutoff.check()?;
+    let plain_result = pool.install(|| {
+        observe_plain_branch(
+            port,
+            &mut plain,
+            &mut plain_crib,
+            &pairing,
+            &prefix.classes,
+            "cost_plain64",
+            &budget,
+            &abort,
+            Some(&mut plain_crossings),
+            Some(&native_cutoff),
+        )
+        .map_err(|error| error.to_string())
+    });
+    let (plain_faces, _, plain_times) = match plain_result {
+        Ok(value) => value,
+        Err(error) => {
+            println!(
+                "step0_cost_stop phase=plain64 captured_cells=64 native_complete=false checkpoint_started=false report_started=false partial_counts=step0_phase_summary reason={error:?}"
+            );
+            return Err(error.into());
+        }
+    };
+    native_cutoff.check()?;
+    let source = captured.field().sources()[0];
+    if captured.continuing_state(source)? != plain.continuing_state(source)?
+        || captured_crib != plain_crib
+        || captured_faces != plain_faces
+        || captured_crossings != plain_crossings
+    {
+        return Err(
+            "cost capture/plain replicas differ in exact resident, crib, faces or crossings".into(),
+        );
+    }
+    native_cutoff.check()?;
+    println!(
+        "step0_cost_native completed_observed_transactions=128 capture_cells=64 plain_cells=64 resident_equal=true crib_equal=true faces_equal=true crossings_equal=true capture_cell_ns={capture_times:?} plain_cell_ns={plain_times:?} actual_crossings={captured_crossings}"
+    );
+    let checkpoint_cutoff =
+        budget.cost_phase("cost_checkpoint64", 30_000_000_000, 110_000_000_000)?;
+    checkpoint_cutoff.check()?;
+    crate::octets::save_checkpoint_cost_profile(
+        &captured,
+        &opening,
+        source,
+        checkpoint_path,
+        64,
+        (2, captured_crossings),
+        |label| {
+            checkpoint_cutoff
+                .check()
+                .map_err(|error| format!("cost checkpoint {label}: {error}"))?;
+            Ok(())
+        },
+    )?;
+    checkpoint_cutoff.check()?;
+    println!(
+        "step0_cost_checkpoint completed=true resident_only=true caller_owned_crib_codec=false observed_resume_not_claimed=true"
+    );
+    if let Err(error) = epoch::require_partition_precision(crossing.receiver_partition_exponent) {
+        for cells in [16, 32, 64] {
+            println!(
+                "step0_cost_report_unavailable prefix_cells={cells} postdeposit_prefix_cut=true source_bound_epoch_index={:?} source_bound_cell_bound={:?} reason={error:?}",
+                crossing.partition_epoch_index, crossing.partition_cell_bound
+            );
+        }
+        println!(
+            "step0_cost_profile_done native_complete=true checkpoint_complete=true reports_complete=false full231_admission_supported=false"
+        );
+        return Ok(());
+    }
+    let receiver_grain = captured
+        .admitted()
+        .first()
+        .ok_or("cost profile has no receiver")?
+        .grain();
+    for (cells, allowance, absolute) in [
+        (16, 30_000_000_000, 140_000_000_000),
+        (32, 50_000_000_000, 190_000_000_000),
+        (64, 80_000_000_000, 270_000_000_000),
+    ] {
+        let cutoff = budget.cost_phase(&format!("cost_report{cells}"), allowance, absolute)?;
+        let end = postdeposit_prefix_cut(&views, cells)?;
+        let mut report_budget =
+            timing::ReportBudget::new(&budget, "cost_prefix", cells).with_cutoff(&cutoff);
+        let mut capture = epoch::ReportCapture::default();
+        let started = Instant::now();
+        let result = pool.install(|| {
+            epoch::report_stall_epoch(
+                "cost_prefix",
+                &crossing,
+                end,
+                &views[..cells],
+                receiver_grain,
+                &mut report_budget,
+                &mut capture,
+            )
+            .map_err(|error| error.to_string())
+        });
+        println!(
+            "step0_cost_report prefix_cells={cells} postdeposit_prefix_cut=true elapsed_ns={} summary={:?} status={result:?} empirical_measurement_only=true",
+            started.elapsed().as_nanos(),
+            report_budget.finish()
+        );
+        result.map_err(|error| -> Box<dyn std::error::Error> { error.into() })?;
+        cutoff.check()?;
+    }
+    println!(
+        "step0_cost_profile_done native_complete=true checkpoint_complete=true reports_complete=true full231_completion_not_certified=true"
+    );
+    Ok(())
+}
+
 /// Full mode has one captured A and one ordinary identical-input A0. Its only epoch report is
 /// the compact stall read; the crossing-statistic producer still uses the frozen comparison.
 fn run_full_aa0(
@@ -822,12 +1155,19 @@ fn run_full_aa0(
         crossing.partition_epoch_index
     );
     let checkpoint_started = Instant::now();
-    crate::octets::save_checkpoint(
+    let checkpoint_cutoff = budget.cost_phase(
+        "full_checkpoint",
+        admission.checkpoint_reserve_ns,
+        285_000_000_000,
+    )?;
+    crate::octets::save_checkpoint_cost_profile(
         resident,
         opening,
         resident.field().sources()[0],
         checkpoint_path,
         source_count,
+        (2, opening_crossings),
+        |_| Ok(checkpoint_cutoff.check()?),
     )?;
     let post_checkpoint = admission.admit_after_checkpoint(
         branch_native_ns,
@@ -870,6 +1210,7 @@ fn run_full_aa0(
                         budget,
                         &abort,
                         Some(&mut a_crossings),
+                        None,
                     )
                 })
             })
@@ -887,6 +1228,7 @@ fn run_full_aa0(
                         budget,
                         &abort,
                         Some(&mut a0_crossings),
+                        None,
                     )
                 })
             })
@@ -966,6 +1308,13 @@ pub(super) fn run(
     options: ContinuingOptions,
     checkpoint_path: Option<&str>,
 ) -> Result<()> {
+    if options.diagnostic_cost_profile_cells64 {
+        return run_cost_profile_64(
+            port,
+            &options,
+            checkpoint_path.ok_or("cost-only profile requires checkpoint directory")?,
+        );
+    }
     let profile_cells = options.diagnostic_profile_trunk_cells;
     let full_run = profile_cells.is_none()
         && !options.diagnostic_calibration_only
@@ -995,9 +1344,6 @@ pub(super) fn run(
             admission_remaining(&budget)?,
             300_000_000_000,
         )?;
-        // The native grain denominator supplies no amended partition exponent. Until the
-        // producing source exposes it, refuse rather than manufacture b from that denominator.
-        epoch::require_partition_precision(None)?;
         Some(pinned)
     } else {
         None
@@ -1135,6 +1481,7 @@ pub(super) fn run(
                 &budget,
                 &abort,
                 None,
+                None,
             )
             .map_err(|error| error.to_string())
         });
@@ -1152,6 +1499,7 @@ pub(super) fn run(
                 &crossing.map,
                 &budget,
                 &abort,
+                None,
                 None,
             )
             .map_err(|error| error.to_string())
@@ -1200,7 +1548,28 @@ pub(super) fn run(
     let base_classes = target[..231].to_vec();
     if full_run {
         let mut crossing = crossing;
-        crossing.opening_crossings = Some(receiver_crossings);
+        let receiver_grain = resident
+            .admitted()
+            .first()
+            .ok_or("full profile has no receiving grain")?
+            .grain();
+        bind_opening_partition_context(
+            &mut crossing,
+            resident.field(),
+            receiver_crossings,
+            receiver_grain,
+        )?;
+        // This fresh step-0 span has crossed no aeon close or rekey. The actual ingress
+        // count therefore agrees with ring 2's lift here; do not generalize after rekey.
+        if source_count != 312
+            || receiver_crossings != 1
+            || resident.current().lift().get(2) != Some(&BigInt::from(1))
+        {
+            return Err(
+                "step0 question-end opening is not cell 312 with one actual ring-2 ingress tick"
+                    .into(),
+            );
+        }
         return run_full_aa0(
             port,
             &resident,
@@ -1233,6 +1602,7 @@ pub(super) fn run(
             &budget,
             &calibration_abort,
             None,
+            None,
         )
         .map_err(|error| error.to_string())
     });
@@ -1252,6 +1622,7 @@ pub(super) fn run(
             &crossing.map,
             &budget,
             &calibration_abort,
+            None,
             None,
         )
         .map_err(|error| error.to_string())
@@ -1338,6 +1709,108 @@ pub(super) fn run(
 mod tests {
     use super::*;
     use holonics::ratio::{integer, rat};
+
+    #[test]
+    fn heard_cost_prefix_keeps_teacher_targets_before_the_next_source() {
+        let prefix = flatten_heard_prefix(
+            [
+                ((0..12).collect(), (12..18).collect()),
+                ((18..80).collect(), (80..90).collect()),
+            ],
+            64,
+        )
+        .unwrap();
+        assert_eq!(prefix.classes, (0..64).collect::<Vec<_>>());
+        assert_eq!((prefix.source_cells, prefix.teacher_target_cells), (58, 6));
+        assert!(flatten_heard_prefix([(vec![1], vec![2])], 3).is_err());
+        assert!(flatten_heard_prefix([(vec![1], vec![2])], 0).is_err());
+        assert_eq!(
+            flatten_heard_prefix([(vec![1], vec![2])], 2)
+                .unwrap()
+                .classes,
+            vec![1, 2]
+        );
+    }
+
+    #[test]
+    fn cost_report_uses_each_prefix_endpoint_instead_of_the_final_native_cut() {
+        let cuts = (1..=64).collect::<Vec<_>>();
+        for prefix in [16, 32, 64] {
+            assert_eq!(*postdeposit_prefix_cut(&cuts, prefix).unwrap(), prefix);
+        }
+        assert!(postdeposit_prefix_cut(&cuts, 0).is_err());
+        assert!(postdeposit_prefix_cut(&cuts, 65).is_err());
+    }
+
+    #[test]
+    fn cost_fresh_empty_opening_captures_the_first_synthetic_cell_exactly() {
+        use holonics::hnn::encoding::observed::PairedObservation;
+        let port = Reference::new(4, BUDGET);
+        let (mut fresh, pairing) = mounted(&port, 65536).unwrap();
+        let boundary =
+            PairedObservation::admit(fresh.field(), fresh.constitution(), &pairing).unwrap();
+        let (moment, receipt) = port
+            .ingest(&mut fresh, None, &boundary.encode(&[]).unwrap())
+            .unwrap();
+        assert_eq!(fresh.moment(&moment).unwrap().cells(), 0);
+        assert!(receipt.receipt.rings.readings().iter().all(Zero::is_zero));
+        let crossing = cut_view(fresh.constitution(), &[]).unwrap();
+        let mut captured = fresh.clone();
+        let mut plain = fresh;
+        let mut capture_crib = ObservedCrib::new(0);
+        let mut plain_crib = ObservedCrib::new(0);
+        let mut capture_clock = 0;
+        let mut plain_clock = 0;
+        let abort = AtomicBool::new(false);
+        let budget = timing::test_run_budget().unwrap();
+        let pool = execution::one_thread_pool().unwrap();
+        let classes = [0, 16];
+        let (cuts, captured_faces, _, _) = pool
+            .install(|| {
+                observe_branch(
+                    &port,
+                    &mut captured,
+                    &mut capture_crib,
+                    &pairing,
+                    &classes,
+                    "synthetic_cost_capture",
+                    &crossing.map,
+                    &budget,
+                    &abort,
+                    Some(&mut capture_clock),
+                    None,
+                )
+                .map_err(|error| error.to_string())
+            })
+            .unwrap();
+        let (plain_faces, _, _) = pool
+            .install(|| {
+                observe_plain_branch(
+                    &port,
+                    &mut plain,
+                    &mut plain_crib,
+                    &pairing,
+                    &classes,
+                    "synthetic_cost_plain",
+                    &budget,
+                    &abort,
+                    Some(&mut plain_clock),
+                    None,
+                )
+                .map_err(|error| error.to_string())
+            })
+            .unwrap();
+        assert_eq!(cuts.len(), 2);
+        assert_eq!(cuts[0].partition_epoch_index, Some(0));
+        assert_eq!(cuts[0].partition_cell_bound, Some(231));
+        assert_eq!(captured_faces, plain_faces);
+        assert_eq!(capture_crib, plain_crib);
+        assert_eq!(capture_clock, plain_clock);
+        assert_eq!(
+            captured.continuing_state(0).unwrap(),
+            plain.continuing_state(0).unwrap()
+        );
+    }
 
     #[test]
     fn opening_crossings_count_ingress_receipts_and_refuse_overflow() {

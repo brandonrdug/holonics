@@ -10455,6 +10455,10 @@ pub struct ContinuingState {
     /// ([`crate::hnn::reference::Reference::mount_continued`]); here its lines are carried inside
     /// the check.
     passage: Option<String>,
+    /// The exterior listener's actual ingress clock, counted from founding. A rekey may change
+    /// a ring's residue without ticking it, so this count cannot be recovered from its lift.
+    /// The listener saves/restores it beside its passage; a legacy state leaves it unavailable.
+    receiver_ingress_ticks: Option<(usize, u64)>,
 }
 
 /// [definition; agent-inferred, October 4; the reception carry §9] **A ring's learned material**:
@@ -10784,6 +10788,7 @@ impl Constitution {
             material: self.material_identity(),
             carry: None,
             passage: None,
+            receiver_ingress_ticks: None,
         })
     }
 
@@ -11383,6 +11388,24 @@ impl ContinuingState {
         Self { passage, ..self }
     }
 
+    /// The saved receiving ring and its actual ingress ticks; absent is unknown, never zero.
+    pub fn receiver_ingress_ticks(&self) -> Option<(usize, u64)> {
+        self.receiver_ingress_ticks
+    }
+
+    /// Save the exterior receipt clock with the resident passage. The caller counts only
+    /// ingest receipts of cells that actually stepped, snapshots at the batch opening, and
+    /// restores this same count on continuation and forks. This does not alter the constitution.
+    pub fn with_receiver_ingress_ticks(self, ring: usize, ticks: u64) -> Result<Self, HnnError> {
+        if self.passage.is_none() || ring >= self.rings.len() {
+            return refuse("a receiving ingress clock without its resident passage or ring");
+        }
+        Ok(Self {
+            receiver_ingress_ticks: Some((ring, ticks)),
+            ..self
+        })
+    }
+
     /// **The state as text**, every value exact (the type's header): `E rows cols`, the rows,
     /// `rho ρ`, `state g`, `founded k` with one `founded-ring ℓ key` line per founded ring in
     /// founding order, `founding o s` (whether the founding law is open, and the staged period or
@@ -11464,6 +11487,9 @@ impl ContinuingState {
         if let Some(passage) = &self.passage {
             s += &format!("passage {}\n", passage.lines().count());
             s += passage;
+        }
+        if let Some((ring, ticks)) = self.receiver_ingress_ticks {
+            s += &format!("receiver-ingress-ticks {ring} {ticks}\n");
         }
         s += &format!("commit {}\n", self.commit);
         s += &format!("storage-product {}\n", self.storage_product);
@@ -11791,6 +11817,29 @@ impl ContinuingState {
         } else {
             None
         };
+        let receiver_ingress_ticks = if line.starts_with("receiver-ingress-ticks ") {
+            let words = head(
+                line,
+                "receiver-ingress-ticks",
+                "the receiving ingress clock",
+            )?;
+            if words.len() != 2 || passage.is_none() {
+                return refuse("the receiving ingress clock without its resident passage");
+            }
+            let ring = number(words.first(), "the receiving ingress ring")?;
+            let ticks = words[1]
+                .parse::<u64>()
+                .map_err(|_| HnnError::ContinuingState {
+                    what: "the receiving ingress ticks",
+                })?;
+            if ring >= rings.len() {
+                return refuse("the receiving ingress ring outside the saved material");
+            }
+            line = next(&mut lines, "the commit")?;
+            Some((ring, ticks))
+        } else {
+            None
+        };
         let commit: u64 = head(line, "commit", "the commit")?
             .first()
             .and_then(|c| c.parse().ok())
@@ -11835,6 +11884,7 @@ impl ContinuingState {
             material,
             carry,
             passage,
+            receiver_ingress_ticks,
         })
     }
 }

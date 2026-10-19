@@ -30,11 +30,82 @@ pub(super) struct ReportCapture {
     pub(super) exact_metric_scale: Option<Rat>,
 }
 
-/// The amended tolerance exponent is not the existing face-grain denominator. An absent binding
-/// refuses before native work; no environment variable or inferred conversion fills this field.
+/// Source binding for the ordinary listener's receiver clock (R12 §3's founding clock,
+/// and Opus 6fd3d3a248954408bbaf128ff701a8c4: c is read at the span's opening).
+///
+/// Ring 0 advances once for every admitted class; rings 1 and 2 advance only by the preceding
+/// carry. Consequently a ring-2 ingress tick closes one lower-two-ring interval. `c` counts those
+/// successful ingress ticks from the fresh mount, including shortened intervals after rekey;
+/// it is neither ring 2's full winding, a physical Word's ticks, nor a quotient of source length.
+/// The receipt counter must travel with a restored opening or the binding is unavailable.
+///
+/// The next interval has at most d0*d1 cells. An uninterrupted d0*d1-cell passage visits every
+/// lower-two-ring residue once; a rekey inside that passage invalidates this coverage statement.
+/// This helper establishes the uniform ordinary lock route only: located occurrence digits and
+/// other receiver/clock families require their own binding. It does not supply a precision b.
+pub(super) fn opening_partition_context(
+    field: &Field,
+    actual_ingress_ticks: Option<u64>,
+) -> Result<(u64, u64)> {
+    let epoch_index = actual_ingress_ticks.ok_or(
+        "receiver epoch index unavailable: the opening lacks its successful-ingress counter from the fresh mount",
+    )?;
+    if field.rings().len() != 3
+        || field.sources() != [0]
+        || field.receivers().len() != 1
+        || field.receivers()[0].ring != 2
+        || field.receivers()[0].aperture != 1
+        || field.alphabet() == 0
+        || field
+            .rings()
+            .iter()
+            .any(|ring| ring.advance() != holonics::hnn::RingAdvance::Lock)
+    {
+        return Err("receiver partition binding requires the ordinary three-ring Lock chain, source 0, and one aperture-one receiver on ring 2".into());
+    }
+    for class in 0..field.alphabet() {
+        if field.class_advance(0, class)? != 1
+            || field.class_advance(1, class)? != 0
+            || field.class_advance(2, class)? != 0
+        {
+            return Err("receiver partition binding refuses a class-dependent or directly driven later-ring clock".into());
+        }
+    }
+    let cell_bound =
+        receiver_partition_cell_bound(field.rings()[0].period(), field.rings()[1].period())?;
+    Ok((epoch_index, cell_bound))
+}
+
+fn receiver_partition_cell_bound(first_period: u64, second_period: u64) -> Result<u64> {
+    if first_period < 2 || second_period < 2 {
+        return Err("receiver partition requires two admitted closing rotor periods".into());
+    }
+    first_period
+        .checked_mul(second_period)
+        .ok_or_else(|| "receiver partition period product overflows u64".into())
+}
+
+/// The amended face partition owes half a receiver cell (Opus 837fb12cbb2341e790cfc73480140467,
+/// upheld by cf792f6d763d4897a6c2ea19e09032b2): b_R = ceil(log2(2 L_R)), where L_R is the native
+/// receiver_grain denominator. This is a conversion of units, never a cast of that denominator
+/// to a bit exponent. Zero has no receiver cell. Non-powers round upward, so 2^(-b_R) <= 1/(2 L_R).
+/// Multiplication widens to u128 before doubling: every u64 grain is admitted without overflow,
+/// and the largest possible exponent is 65. This read changes no native tolerance or lattice.
+pub(super) fn amended_partition_receiver_exponent(receiver_grain: u64) -> Result<u32> {
+    if receiver_grain == 0 {
+        return Err(
+            "amended partition requires a positive native receiver grain denominator".into(),
+        );
+    }
+    let doubled = u128::from(receiver_grain) * 2;
+    Ok(u128::BITS - (doubled - 1).leading_zeros())
+}
+
+/// Require the exponent supplied by the actual opening's grain conversion. An opening without
+/// that source binding still refuses; the native face-grain denominator is not an exponent.
 pub(super) fn require_partition_precision(amended_exponent: Option<u32>) -> Result<u32> {
     amended_exponent.ok_or_else(|| {
-        "compact stall report unavailable: amended receiver partition exponent is not bound to the actual precision owner; the native face-grain denominator is not an exponent".into()
+        "compact stall report unavailable: opening lacks amended_partition_receiver_exponent(native_receiver_grain); the native face-grain denominator is not an exponent".into()
     })
 }
 
@@ -42,7 +113,7 @@ pub(super) fn require_partition_precision(amended_exponent: Option<u32>) -> Resu
 struct PartitionContext {
     receiver_exponent: u32,
     cell_bound: u64,
-    /// R12's c, counted from zero; not a cumulative ring-tick count without its source binding.
+    /// c is the source-bound ring-2 ingress tick count from founding, snapped at the span opening.
     epoch_index: u64,
     phase_period: u64,
 }
@@ -306,7 +377,7 @@ fn partitioned_crossing_statistics(
     let context = PartitionContext {
         receiver_exponent,
         cell_bound: crossing.partition_cell_bound.ok_or("compact stall report unavailable: opening partition cell bound is not source-bound")?,
-        epoch_index: crossing.partition_epoch_index.ok_or("compact stall report unavailable: native receipt crossings are not yet bound to R12's epoch index")?,
+        epoch_index: crossing.partition_epoch_index.ok_or("compact stall report unavailable: opening lacks its persisted ring-2 ingress tick count from founding")?,
         phase_period: views.first().and_then(|view| {
             view.frozen.as_ref().and_then(|frozen| view.pre_clocks.get(frozen.ratio().phases().ring()).map(|clock| clock.0))
         }).ok_or("partitioned phase series requires its actual receiving clock period")?,
@@ -479,34 +550,14 @@ fn gram_commutes_with_symmetry(symmetry: &PortSymmetry, gram: &Matrix) -> bool {
         })
 }
 
-fn exact_log2_power_of_two(value: &BigInt) -> Option<u32> {
-    if value <= &BigInt::zero() {
-        return None;
-    }
-    let bits = value.bits();
-    let exponent = u32::try_from(bits.checked_sub(1)?).ok()?;
-    (value == &(BigInt::one() << exponent as usize)).then_some(exponent)
-}
-
 pub(super) fn spec_lattice_exponent(receiver_grain: u64, support_width: usize) -> Result<u32> {
-    let doubled_grain = receiver_grain
-        .checked_mul(2)
-        .ok_or("twice the receiver grain overflows u64")?;
-    if receiver_grain == 0 || !doubled_grain.is_power_of_two() || support_width == 0 {
-        return Err(
-            "specification LW requires power-of-two 2*receiver grain and nonzero support width"
-                .into(),
-        );
+    let b_r = amended_partition_receiver_exponent(receiver_grain)?;
+    if support_width == 0 {
+        return Err("specification LW requires nonzero support width".into());
     }
     let width = u64::try_from(support_width).map_err(|_| "support width exceeds u64")?;
-    let ceil_width = if width.is_power_of_two() {
-        width.trailing_zeros()
-    } else {
-        u64::BITS - width.leading_zeros()
-    };
-    doubled_grain
-        .trailing_zeros()
-        .checked_add(ceil_width)
+    let ceil_width = u64::BITS - (width - 1).leading_zeros();
+    b_r.checked_add(ceil_width)
         .ok_or_else(|| "specification LW overflows u32".into())
 }
 
@@ -1036,6 +1087,10 @@ fn stall_epoch_readout(
     inverse_ns: &mut u128,
     deferred_failures: &mut Vec<String>,
 ) -> Result<()> {
+    let actual_b = amended_partition_receiver_exponent(receiver_grain)?;
+    if require_partition_precision(crossing.receiver_partition_exponent)? != actual_b {
+        return Err("compact stall report partition exponent disagrees with the native grain's amended half-cell conversion".into());
+    }
     let (partitioned, exact_metric_scale) =
         stall_work(budget, "partitioned crossing statistics", || {
             partitioned_crossing_statistics(crossing, views, budget)
@@ -1086,7 +1141,7 @@ fn stall_epoch_readout(
     let native_lw_end = end.native_lattice_exponent;
     let width = crossing.support.len();
     let spec_lw = spec_lattice_exponent(receiver_grain, width)?;
-    let spec_b_r = exact_log2_power_of_two(&(BigInt::from(receiver_grain) << 1usize));
+    let spec_b_r = amended_partition_receiver_exponent(receiver_grain)?;
     let spec_unit = rat_pow2(-i64::from(spec_lw));
     let native_unit_cross = rat_pow2(-i64::from(native_lw_cross));
     let native_unit_end = rat_pow2(-i64::from(native_lw_end));
@@ -1204,7 +1259,7 @@ fn stall_epoch_readout(
         .map(ToString::to_string)
         .unwrap_or_else(|| "unavailable-no-staged-sample".into());
     println!(
-        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_weight} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_vs_spec_LW_mismatch_cross={native_spec_mismatch_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} native_vs_spec_LW_mismatch_end={native_spec_mismatch_end} spec_b_R=log2(2*L_R)={spec_b_r:?} spec_LW=b_R+ceil(log2(support_width={width}))={spec_lw} spec_W_unit={spec_unit} no_clock_feature_split_claimed",
+        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_weight} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_vs_spec_LW_mismatch_cross={native_spec_mismatch_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} native_vs_spec_LW_mismatch_end={native_spec_mismatch_end} spec_b_R=ceil_log2(2*L_R)={spec_b_r:?} spec_LW=b_R+ceil(log2(support_width={width}))={spec_lw} spec_W_unit={spec_unit} no_clock_feature_split_claimed",
         matrix_max_abs(&gradient),
     );
 
@@ -1448,7 +1503,7 @@ pub(super) fn report_epoch(
     let native_lw_end = end.native_lattice_exponent;
     let width = crossing.support.len();
     let spec_lw = spec_lattice_exponent(receiver_grain, width)?;
-    let spec_b_r = exact_log2_power_of_two(&(BigInt::from(receiver_grain) << 1usize));
+    let spec_b_r = amended_partition_receiver_exponent(receiver_grain)?;
     let spec_unit = rat_pow2(-i64::from(spec_lw));
     let native_unit_cross = rat_pow2(-i64::from(native_lw_cross));
     let native_unit_end = rat_pow2(-i64::from(native_lw_end));
@@ -1555,7 +1610,7 @@ pub(super) fn report_epoch(
         crossing.receiving_prior, crossing.prior_scale, crossing.support, crossing.symmetry,
     );
     println!(
-        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_sample_weight:?} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_vs_spec_LW_mismatch_cross={native_spec_mismatch_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} native_vs_spec_LW_mismatch_end={native_spec_mismatch_end} spec_b_R=log2(2*L_R)={spec_b_r:?} spec_LW=b_R+ceil(log2(support_width={width}))={spec_lw} spec_W_unit={spec_unit:?} no_clock_feature_split_claimed",
+        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_sample_weight:?} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_vs_spec_LW_mismatch_cross={native_spec_mismatch_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} native_vs_spec_LW_mismatch_end={native_spec_mismatch_end} spec_b_R=ceil_log2(2*L_R)={spec_b_r:?} spec_LW=b_R+ceil(log2(support_width={width}))={spec_lw} spec_W_unit={spec_unit:?} no_clock_feature_split_claimed",
         matrix_max_abs(&gradient),
     );
 
@@ -1835,6 +1890,134 @@ mod tests {
         .unwrap()
     }
 
+    fn clock_binding_declaration() -> holonics::hnn::FieldDeclaration {
+        let mut declared = holonics::hnn::FieldDeclaration::campaign_one(1 << 17);
+        declared.rings.truncate(3);
+        declared
+            .contacts
+            .retain(|contact| contact.from < 3 && contact.to < 3);
+        declared.loops.clear();
+        declared.sources = vec![0];
+        declared.rings[0].lock = (0..declared.alphabet as u64).collect();
+        declared.rings[1].lock.clear();
+        declared.rings[2].lock.clear();
+        declared.receivers[0].ring = 2;
+        declared.receivers[0].aperture = 1;
+        declared
+    }
+
+    #[test]
+    fn receiver_clock_binding_uses_actual_ticks_and_distinguishes_full_winding() {
+        let field = Field::declare(clock_binding_declaration().by_lattice_rule()).unwrap();
+        let (_, bound) = opening_partition_context(&field, Some(0)).unwrap();
+        assert_eq!(bound, 5 * 7);
+        let terrain = holonics::holarchy::terrain::KnownTruth::uniform(
+            field.alphabet(),
+            0,
+            1,
+            (2 * bound) as usize,
+        )
+        .unwrap();
+        let word = holonics::hnn::Encoded::identity(&terrain, &field)
+            .unwrap()
+            .remove(0);
+        let mut current = holonics::hnn::Current::at_rest(&field);
+        let mut ticks = 0u64;
+        for at in 0..word.len() {
+            let step = current.step(&field, &word, at).unwrap();
+            ticks += step.ticks[2];
+            let (c, k) = opening_partition_context(&field, Some(ticks)).unwrap();
+            assert_eq!(k, bound);
+            assert_eq!(c, ((at + 1) as u64) / bound);
+        }
+        assert_eq!(ticks, 2);
+        assert_eq!(current.winding(&field, 2).unwrap(), BigInt::zero());
+        // A recorded count is not reconstructed from any supplied source length or lift phase.
+        assert_eq!(
+            opening_partition_context(&field, Some(17)).unwrap(),
+            (17, bound)
+        );
+        assert!(opening_partition_context(&field, None).is_err());
+    }
+
+    #[test]
+    fn receiver_clock_binding_refuses_nonuniform_locks_and_other_receivers() {
+        let mut declared = clock_binding_declaration();
+        declared.rings[0].lock.pop();
+        let field = Field::declare(declared.by_lattice_rule()).unwrap();
+        assert!(opening_partition_context(&field, Some(0)).is_err());
+        let mut declared = clock_binding_declaration();
+        declared.rings[1].lock = vec![0];
+        let field = Field::declare(declared.by_lattice_rule()).unwrap();
+        assert!(opening_partition_context(&field, Some(0)).is_err());
+        let mut declared = clock_binding_declaration();
+        declared.receivers[0].aperture = 2;
+        let field = Field::declare(declared.by_lattice_rule()).unwrap();
+        assert!(opening_partition_context(&field, Some(0)).is_err());
+        assert!(receiver_partition_cell_bound(u64::MAX, 2).is_err());
+        assert!(receiver_partition_cell_bound(1, 7).is_err());
+    }
+
+    #[test]
+    fn amended_partition_exponent_is_exact_ceil_of_the_native_half_cell() {
+        assert!(amended_partition_receiver_exponent(0).is_err());
+        for (grain, expected) in [
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (31, 6),
+            (32, 6),
+            (33, 7),
+            (u64::MAX / 2, 64),
+            (u64::MAX, 65),
+        ] {
+            let b = amended_partition_receiver_exponent(grain).unwrap();
+            assert_eq!(b, expected);
+            let doubled = u128::from(grain) * 2;
+            assert!(doubled <= (1u128 << b));
+            assert!((1u128 << (b - 1)) < doubled);
+        }
+        // The partition is at or finer than half a cell, including a non-dyadic cell.
+        let b = amended_partition_receiver_exponent(3).unwrap();
+        assert!(rat_pow2(-i64::from(b)) <= Rat::new(1.into(), 6.into()));
+        assert_eq!(amended_partition_receiver_exponent(32).unwrap(), 6);
+    }
+
+    #[test]
+    fn amended_native_partition_schedule_matches_the_owner_crossings() {
+        let context = PartitionContext {
+            receiver_exponent: amended_partition_receiver_exponent(32).unwrap(),
+            cell_bound: 231,
+            epoch_index: 0,
+            phase_period: 11,
+        };
+        for (c, expected) in [
+            (0, 15),
+            (1, 17),
+            (2, 19),
+            (3, 19),
+            (4, 21),
+            (5, 21),
+            (6, 21),
+            (7, 21),
+            (8, 23),
+        ] {
+            assert_eq!(
+                partition_exponent_explicit(PartitionContext {
+                    epoch_index: c,
+                    ..context
+                })
+                .unwrap(),
+                expected
+            );
+        }
+        assert_eq!(
+            rat_pow2(-i64::from(context.receiver_exponent)),
+            Rat::new(1.into(), 64.into())
+        );
+        assert_ne!(context.receiver_exponent, 32);
+    }
+
     #[test]
     fn partition_precision_and_epoch_clock_are_explicit_operands() {
         assert!(
@@ -2091,7 +2274,7 @@ mod tests {
     fn native_and_spec_lattice_units_are_reported_independently() {
         let grain = 32;
         let spec = spec_lattice_exponent(grain, 32).unwrap();
-        assert_eq!(exact_log2_power_of_two(&(BigInt::from(2 * grain))), Some(6));
+        assert_eq!(amended_partition_receiver_exponent(grain).unwrap(), 6);
         assert_eq!(spec, 11);
         let native_cross = 37;
         let native_end = 39;
@@ -2111,7 +2294,7 @@ mod tests {
         );
         assert!(native_cross != spec);
         assert!(native_end != spec);
-        assert!(spec_lattice_exponent(3, 32).is_err());
+        assert_eq!(spec_lattice_exponent(3, 32).unwrap(), 8);
         assert!(spec_lattice_exponent(32, 0).is_err());
     }
 

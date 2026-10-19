@@ -31,6 +31,7 @@ struct ContinuingOptions {
     diagnostic_checkpoint: Option<String>,
     diagnostic_profile_trunk_cells: Option<usize>,
     diagnostic_profile_paired_cells64: bool,
+    diagnostic_cost_profile_cells64: bool,
     diagnostic_report_reserve_ns: Option<u128>,
 }
 
@@ -39,6 +40,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         (None, None, None, None, None);
     let mut diagnostic_profile_trunk_cells = None;
     let mut diagnostic_profile_paired_cells64 = false;
+    let mut diagnostic_cost_profile_cells64 = false;
     let mut diagnostic_report_reserve_ns = None;
     let mut diagnostic_step0 = false;
     let mut diagnostic_calibration_only = false;
@@ -52,6 +54,11 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         }
         if option == "--diagnostic-calibration-only" {
             diagnostic_calibration_only = true;
+            at += 1;
+            continue;
+        }
+        if option == "--diagnostic-cost-profile-cells64" {
+            diagnostic_cost_profile_cells64 = true;
             at += 1;
             continue;
         }
@@ -101,6 +108,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         && (diagnostic_checkpoint.is_some()
             || diagnostic_profile_trunk_cells.is_some()
             || diagnostic_profile_paired_cells64
+            || diagnostic_cost_profile_cells64
             || diagnostic_report_reserve_ns.is_some())
     {
         return Err("diagnostic options require --diagnostic-step0".into());
@@ -120,6 +128,15 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     {
         return Err("paired 64+64 profiling is a separate calibration mode and cannot include trunk-only profiling, calibration-only, or checkpoint options".into());
     }
+    if diagnostic_cost_profile_cells64
+        && (diagnostic_profile_trunk_cells.is_some()
+            || diagnostic_profile_paired_cells64
+            || diagnostic_calibration_only
+            || diagnostic_report_reserve_ns.is_some()
+            || diagnostic_checkpoint.is_none())
+    {
+        return Err("cost profiling requires its own create-only checkpoint destination and cannot include another diagnostic mode".into());
+    }
     if diagnostic_report_reserve_ns.is_some_and(|reserve| reserve >= 300_000_000_000) {
         return Err("diagnostic report reserve must fit inside the fixed 300-second budget".into());
     }
@@ -133,6 +150,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         diagnostic_checkpoint,
         diagnostic_profile_trunk_cells,
         diagnostic_profile_paired_cells64,
+        diagnostic_cost_profile_cells64,
         diagnostic_report_reserve_ns,
     })
 }
@@ -961,6 +979,13 @@ fn header_line(resident: &Resident) -> Result<String> {
 pub fn run(port: &Reference, args: &[String]) -> Result<()> {
     let options = parse(args)?;
     if options.diagnostic_step0 {
+        if options.diagnostic_cost_profile_cells64 {
+            let checkpoint = options
+                .diagnostic_checkpoint
+                .clone()
+                .ok_or("cost profiling requires --diagnostic-checkpoint DIR")?;
+            return diagnostic::run(port, options, Some(&checkpoint));
+        }
         if options.diagnostic_calibration_only
             || options.diagnostic_profile_trunk_cells.is_some()
             || options.diagnostic_profile_paired_cells64
@@ -1224,6 +1249,41 @@ mod tests {
     }
 
     #[test]
+    fn cost_profile_is_explicit_exclusive_and_requires_its_checkpoint() {
+        let flag = "--diagnostic-cost-profile-cells64";
+        let base = [
+            "--population",
+            "65536",
+            "--diagnostic-step0",
+            flag,
+            "--diagnostic-checkpoint",
+            "unused",
+        ];
+        assert!(parse(&args(&["--population", "65536", flag])).is_err());
+        assert!(
+            parse(&args(&[
+                "--population",
+                "65536",
+                "--diagnostic-step0",
+                flag
+            ]))
+            .is_err()
+        );
+        assert!(parse(&args(&base)).unwrap().diagnostic_cost_profile_cells64);
+        for extra in [
+            "--diagnostic-calibration-only",
+            "--diagnostic-profile-paired-cells64",
+        ] {
+            let mut all = base.to_vec();
+            all.push(extra);
+            assert!(parse(&args(&all)).is_err());
+        }
+        let mut all = base.to_vec();
+        all.extend(["--diagnostic-profile-trunk-cells", "64"]);
+        assert!(parse(&args(&all)).is_err());
+    }
+
+    #[test]
     fn entropy_stop_uses_exact_lower_endpoint_at_first_drawn_cell() {
         use holonics::ratio::rat;
         assert!(entropy_rate_stop(&integer(100), 0).is_none());
@@ -1457,6 +1517,117 @@ mod tests {
         assert_eq!(answer.len(), 2);
         assert!(answer.into_iter().all(|at| release < at));
     }
+    #[test]
+    #[allow(
+        clippy::disallowed_methods,
+        reason = "synthetic create-only checkpoint boundary control"
+    )]
+    fn cost_checkpoint_roundtrip_is_create_only_and_checks_before_io() {
+        let port = Reference::new(4, BUDGET);
+        let (mut resident, pairing) = mounted(&port, 65536).unwrap();
+        let opening = resident.constitution().clone();
+        let mut crib = ObservedCrib::new(0);
+        port.observe_cell_continuing(
+            &mut resident,
+            &mut crib,
+            &pairing,
+            0,
+            None,
+            |_, _, _, _, _| (),
+        )
+        .unwrap();
+        let stamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let directory = std::env::temp_dir().join(format!(
+            "holonics-cost-checkpoint-{}-{stamp}",
+            std::process::id()
+        ));
+        std::fs::create_dir(&directory).unwrap();
+        let mut checked = Vec::new();
+        crate::octets::save_checkpoint_cost_profile(
+            &resident,
+            &opening,
+            0,
+            directory.to_str().unwrap(),
+            1,
+            (2, 0),
+            |label| {
+                checked.push(label.to_owned());
+                Ok(())
+            },
+        )
+        .unwrap();
+        let path = directory.join("step-000001.state");
+        let staging = directory.join("step-000001.state.tmp");
+        let bytes = std::fs::read(&path).unwrap();
+        assert_eq!(bytes, std::fs::read(&staging).unwrap());
+        let parsed = holonics::hnn::constitution::ContinuingState::from_text(
+            std::str::from_utf8(&bytes).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(parsed.receiver_ingress_ticks(), Some((2, 0)));
+        let fork = parsed.clone();
+        assert_eq!(
+            fork.receiver_ingress_ticks(),
+            parsed.receiver_ingress_ticks()
+        );
+        let saved = resident.continuing_state(0).unwrap();
+        assert_eq!(saved.receiver_ingress_ticks(), None);
+        assert!(saved.clone().with_receiver_ingress_ticks(3, 0).is_err());
+        let carried = saved.with_receiver_ingress_ticks(2, 17).unwrap();
+        assert_eq!(
+            holonics::hnn::constitution::ContinuingState::from_text(&carried.to_text())
+                .unwrap()
+                .receiver_ingress_ticks(),
+            Some((2, 17))
+        );
+        assert!(
+            opening
+                .continuing_state(0)
+                .unwrap()
+                .with_receiver_ingress_ticks(2, 0)
+                .is_err()
+        );
+        assert!(
+            checked
+                .iter()
+                .any(|label| label == "resident checkpoint parse")
+        );
+        assert!(checked.iter().any(|label| label == "checkpoint completion"));
+        assert!(
+            crate::octets::save_checkpoint_cost_profile(
+                &resident,
+                &opening,
+                0,
+                directory.to_str().unwrap(),
+                1,
+                (2, 0),
+                |_| Ok(())
+            )
+            .is_err()
+        );
+        assert_eq!(bytes, std::fs::read(&path).unwrap());
+        let refused = directory.join("refused");
+        assert!(
+            crate::octets::save_checkpoint_cost_profile(
+                &resident,
+                &opening,
+                0,
+                refused.to_str().unwrap(),
+                1,
+                (2, 0),
+                |_| Err(std::io::Error::other("fixed cutoff").into())
+            )
+            .is_err()
+        );
+        assert!(!refused.exists());
+        std::fs::remove_file(&path).unwrap();
+        std::fs::remove_file(&staging).unwrap();
+        std::fs::remove_dir(&directory).unwrap();
+    }
+
     #[test]
     fn header_and_keys_lines_parse_the_native_declarations_and_location() {
         use num_bigint::BigInt;
