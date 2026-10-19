@@ -4705,7 +4705,8 @@ impl Constitution {
     /// `β = 2p/a²` stands the sheet at amplitude `a`. The amplitude is the least power of two whose
     /// two opposite sheets certify on the period the live word executes: the field's word lattice,
     /// the resonator's charts cold-started as every cut starts them, and the transients' unit
-    /// (`ring::ResonatorOperands::executed_lock`). The search ends at `a = 1/δ`, past which the
+    /// (`ring::ResonatorOperands::executed_lock`), each ball's shape derived at the grain the
+    /// resonator locus is founded on. The search ends at `a = 1/δ`, past which the
     /// sheet's relative grain `δ/a` passes `δ²` and a refusal is structural, not rounding; under the
     /// exact law the envelope vanishes and `a = 1` certifies or nothing does. Refused with the last
     /// attempt's refusal.
@@ -4729,6 +4730,9 @@ impl Constitution {
         let lattice = field.word_lattice().copied();
         let transient = lattice.map(|lattice| lattice.transient());
         let limit = transient.as_ref().map_or(0, Lattice::exponent);
+        // The ring's grain: the lattice its resonator locus is founded on
+        // ([`Constitution::with_ring_resonator`]), at which its tube and its balls are read.
+        let grain = lattice_exponent(self.grain, base.width() as u128);
         let mut refusal = None;
         for k in 0..=limit {
             let amplitude = Rat::from_integer(BigInt::one() << k as usize);
@@ -4742,7 +4746,7 @@ impl Constitution {
                 h,
                 lattice.as_ref(),
             )?;
-            match operands.executed_lock(transient.as_ref()) {
+            match operands.executed_lock(transient.as_ref(), grain) {
                 Ok(_) => return self.with_ring_resonator(field, ring, material),
                 Err(error) => refusal = Some(error),
             }

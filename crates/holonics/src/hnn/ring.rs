@@ -1601,71 +1601,159 @@ impl ResonatorOperands {
         }
     }
 
-    /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The standing sheet's
-    /// period proposal** on sheet `sign = ±1`, for the executed solve `solve` (`None`: the exact
-    /// law). Its centre is `±a e^(iφ)` on every node at rest, an exact fixed point checked by the
-    /// certificate (`η = 0`). Its metric is the one derived for the deadbeat sheet, where
-    /// `h²X(K + H(c)) = I` and the Jacobian is `[[0, hQ], [−I/h, Q]]` with `Q = XC`:
-    /// `G = [[I/h², −Q/(2h)], [−Q/(2h), Q + (I − Q)/4]] ⪰ min(1, 1/h²)/4 · I`. The listener's
-    /// founding (`h = 1`, `C = K_b`, `p = r/(4h²)`) is deadbeat; elsewhere the certificate refuses.
-    /// The shape is chosen against the Young test (`ε = a/200`, `r² = gε²`, `λ = 24/25`,
-    /// `s = 1/25`: the Hessian variation `3β(2aε+ε²)` then fits under `λ²` beside the quadrature's
-    /// `ρ(JᵀGJ)`), and the envelope radius is stated in whole units of the split it bounds.
+    /// [definition; agent-inferred, October 18; the revised plan, step 1a; the design review's item
+    /// (d)] **The standing sheet's period proposal** on sheet `sign = ±1`, for the executed solve
+    /// `solve` (`None`: the exact law), read at the ring's grain `2^(−L)`, `L = grain` (the
+    /// resonator locus's lattice, the grain its tube is read at). Its centre is `±a e^(iφ)` on every node at rest, an
+    /// exact fixed point checked by the certificate (`η = 0`). Its metric is the one derived for the
+    /// deadbeat sheet, where `h²X(K + H(c)) = I` and the Jacobian is `[[0, hQ], [−I/h, Q]]` with
+    /// `Q = XC`: `G = [[I/h², −Q/(2h)], [−Q/(2h), Q + (I − Q)/4]] ⪰ gI`, `g = min(1, 1/h²)/4`. The
+    /// listener's founding (`h = 1`, `C = K_b`, `p = r/(4h²)`) is deadbeat.
+    ///
+    /// The ball's shape is derived from the domain certificate's own Young test, not chosen. With
+    /// `J_c` the tick's tangent at the centre, `τ` the least dyadic at the grain with
+    /// `τG ⪰ J_cᵀGJ_c` (the tangent reading of the centre's tube, [`TubeMetric`]), `aI ⪰ AᵀGA` and
+    /// `δ(ε) = 3β(2|c|ε + ε²)`, a shape `(ε, s, λ)` passes the test wherever
+    /// `λ² ≥ (1 + s)τ + (1 + 1/s)aδ(ε)²/g`, since then
+    /// `λ²G − (1 + 1/s)aδ²G/g − (1 + s)J_cᵀGJ_c ⪰ (1 + s)(τG − J_cᵀGJ_c) ⪰ 0`. At each dyadic
+    /// `ε = 2^k ≤ a` the split is the dyadic `s = 2^j` that minimizes that bound (convex in `s`,
+    /// least at `s² = aδ²/(gτ)`) and `λ` the least dyadic at the grain whose square reaches it. The
+    /// shape leaves the inclusion margin `(1 − λ)r − ε_t`, with `r = √g ε` (the Euclidean enclosure
+    /// with equality) and `ε_t` the executed envelope's radius at that shape, in whole units of the
+    /// split it bounds. `ε` descends from the largest dyadic at most `a`, every `ε` whose bound
+    /// reaches `1` is passed over, and the descent stops where the margin no longer grows: the
+    /// shape with the largest margin is proposed. Refused where the centre's tangent does not
+    /// contract at the grain (`τ ≥ 1`) or no shape leaves a positive margin.
     pub fn standing_sheet(
         &self,
         sign: i8,
         solve: Option<&crate::holon::parametron::ExecutedSolve>,
+        grain: u32,
     ) -> Result<Vec<crate::holon::parametron::DomainProposal>, HnnError> {
-        let amplitude = self.sheet_amplitude()? * integer(i64::from(sign.signum()));
+        // `2^k` for `k ∈ ℤ` (this module's own `dyadic` is the grain `2^(−g)`).
+        use crate::holon::deposition::dyadic as two_to;
+        use crate::holon::parametron::{DomainProposal, hessian_variation_on, rounding_floor};
+        use crate::ratio::disk::floor_log2;
+        let refused = |what| HnnError::Resonator {
+            ring: self.ring,
+            what,
+        };
+        let law = self.phases[0].loaded_law.as_ref().ok_or(refused(
+            "a nonlinear period needs the explicit quartic element relation",
+        ))?;
+        let element = law
+            .holon()
+            .loaded_parametron()
+            .ok_or(refused("a standing sheet needs the actual quartic law"))?;
         let n = self.width();
         let h = &self.step;
+        let amplitude = self.sheet_amplitude()?;
         let metric = self.sheet_metric()?;
         let lower = rat(1, 4) * (Rat::one() / (h * h)).min(Rat::one());
-        let euclidean = amplitude.abs() / integer(200);
+        // `√g = min(1, 1/h)/2` is rational, so `r = √g ε` meets `r² ≤ gε²` with equality.
+        let root = (Rat::one() / h).min(Rat::one()) / integer(2);
         let mut centre = self.sheet_displacement(sign)?;
         centre.resize(2 * n, Rat::zero());
-        // `√g = min(1, 1/h)/2` is rational, so `r = √g ε` meets `r² ≤ gε²` with equality.
-        let radius = &euclidean * (Rat::one() / h).min(Rat::one()) / integer(2);
-        let mut proposal = crate::holon::parametron::DomainProposal {
-            centre,
-            drive: vec![Rat::zero(); n],
-            metric: metric.clone(),
-            radius,
-            metric_lower: lower,
-            euclidean_radius: euclidean,
-            lipschitz: rat(24, 25),
-            centre_residual: Rat::zero(),
-            young: rat(1, 25),
-            rounding: Rat::zero(),
-        };
-        if let Some(solve) = solve {
-            let law = self.phases[0]
-                .loaded_law
-                .as_ref()
-                .ok_or(HnnError::Resonator {
-                    ring: self.ring,
-                    what: "a nonlinear period needs the explicit quartic element relation",
-                })?;
-            let floor =
-                crate::holon::parametron::rounding_floor(law, &proposal, &metric, Some(solve))?;
-            let units = (floor / (&solve.unit * &solve.unit)).ceil().to_integer();
-            let mut k = units.sqrt();
-            if &k * &k < units {
-                k += 1;
-            }
-            proposal.rounding = Rat::from_integer(k) * &solve.unit;
+        // The certificate's own operands: the exact solve, the tangent at the centre, `a`.
+        let inverse = element.operator(h)?.inverse()?;
+        let tangent = element.jacobian(h, &inverse, &centre)?;
+        let image = tangent.transpose()?.multiply(&metric)?.multiply(&tangent)?;
+        let reach = crate::holon::parametron::variation_reach(h, &inverse, &metric)?;
+        let beta = element.saturation().coefficient().clone();
+        let contraction = least_dyadic(grain, |value| {
+            Ok(inertia(&symmetric(&metric.scaled(value).subtract(&image)?)?).negative == 0)
+        })?;
+        if !contraction.is_positive() || contraction >= Rat::one() {
+            return Err(refused(
+                "the standing sheet's tangent contracts at its centre",
+            ));
         }
-        Ok(vec![proposal; self.phases.len()])
+        // The bound `(1 + s)τ + (1 + 1/s)·spread` at the dyadic `s = 2^j` that minimizes it.
+        let bound = |j: i64, spread: &Rat| {
+            let s = two_to(j);
+            (Rat::one() + &s) * &contraction + (Rat::one() + Rat::one() / &s) * spread
+        };
+        let split = |spread: &Rat| -> (i64, Rat) {
+            let mut j = floor_log2(&(spread / &contraction)).div_euclid(2);
+            let mut least = bound(j, spread);
+            for step in [1, -1] {
+                loop {
+                    let next = bound(j + step, spread);
+                    if next >= least {
+                        break;
+                    }
+                    least = next;
+                    j += step;
+                }
+            }
+            (j, least)
+        };
+        // The proposal at one shape, its envelope radius in whole units of the split it bounds.
+        let shaped =
+            |epsilon: &Rat, lambda: &Rat, young: &Rat| -> Result<DomainProposal, HnnError> {
+                let mut proposal = DomainProposal {
+                    centre: centre.clone(),
+                    drive: vec![Rat::zero(); n],
+                    metric: metric.clone(),
+                    radius: epsilon * &root,
+                    metric_lower: lower.clone(),
+                    euclidean_radius: epsilon.clone(),
+                    lipschitz: lambda.clone(),
+                    centre_residual: Rat::zero(),
+                    young: young.clone(),
+                    rounding: Rat::zero(),
+                };
+                if let Some(solve) = solve {
+                    let floor = rounding_floor(law, &proposal, &metric, Some(solve))?;
+                    let units = (floor / (&solve.unit * &solve.unit)).ceil().to_integer();
+                    let mut k = units.sqrt();
+                    if &k * &k < units {
+                        k += 1;
+                    }
+                    proposal.rounding = Rat::from_integer(k) * &solve.unit;
+                }
+                Ok(proposal)
+            };
+        let mut best: Option<(Rat, DomainProposal)> = None;
+        // The descent ends: as `ε` falls the bound falls toward `τ < 1`, and the margin
+        // `(1 − λ)√g ε − ε_t` falls with `ε` toward `−ε_t ≤ 0`.
+        let mut k = floor_log2(&amplitude);
+        loop {
+            let epsilon = two_to(k);
+            let delta = hessian_variation_on(&beta, &centre[..n], &epsilon);
+            let spread = &reach * &delta * &delta / &lower;
+            let (j, square) = split(&spread);
+            if square < Rat::one() {
+                let lambda = least_dyadic(grain, |value| Ok(value * value >= square))?;
+                let proposal = shaped(&epsilon, &lambda, &two_to(j))?;
+                let margin = (Rat::one() - &lambda) * &proposal.radius - &proposal.rounding;
+                match &best {
+                    Some((held, _)) if &margin <= held => break,
+                    _ => best = Some((margin, proposal)),
+                }
+            }
+            k -= 1;
+        }
+        match best {
+            Some((margin, proposal)) if margin.is_positive() => {
+                Ok(vec![proposal; self.phases.len()])
+            }
+            _ => Err(refused(
+                "the standing sheet's ball leaves a positive margin",
+            )),
+        }
     }
 
     /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The executed lock**:
     /// both standing sheets certified on the period this word executes, each phase's solve the
     /// chart it applies and its splits at `transient`'s unit (`None`: the exact law, whose solve
-    /// must be the exact inverse), read at the closing boundary on the axis's leading
+    /// must be the exact inverse), each ball's shape derived at the ring's grain `2^(−grain)`
+    /// ([`ResonatorOperands::standing_sheet`]), read at the closing boundary on the axis's leading
     /// displacement coordinate, and joined as a [`crate::holon::parametron::LockedPair`].
     pub fn executed_lock(
         &self,
         transient: Option<&Lattice>,
+        grain: u32,
     ) -> Result<crate::holon::parametron::LockedPair, HnnError> {
         let solves = transient
             .map(|lattice| {
@@ -1685,7 +1773,8 @@ impl ResonatorOperands {
         })?;
         let axis = usize::from(pump.axis().sin().abs() > pump.axis().cos().abs());
         let sheet = |sign: i8| -> Result<crate::holon::parametron::PeriodicLock, HnnError> {
-            let proposals = self.standing_sheet(sign, solves.as_ref().map(|solves| &solves[0]))?;
+            let proposals =
+                self.standing_sheet(sign, solves.as_ref().map(|solves| &solves[0]), grain)?;
             let domain = match &solves {
                 Some(solves) => {
                     let laws = (0..self.phases.len())

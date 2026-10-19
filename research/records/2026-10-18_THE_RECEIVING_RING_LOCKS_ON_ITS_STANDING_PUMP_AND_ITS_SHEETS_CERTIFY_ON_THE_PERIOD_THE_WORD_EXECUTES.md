@@ -35,9 +35,19 @@ not the smooth law.
   [agent-inferred] `d = 1/Y`, loss `r = h(d + 1/Y)`, a Stand pump of strength `p = r/(4h²)` on axis
   `Carrier(0)`, saturation `β = 2p/a²`, so `±a` on every node's in-phase coordinate with `w = 0` is
   an exact fixed point of the saturated period. Metric `G = [[I/h², −Q/(2h)], [−Q/(2h), Q + (I−Q)/4]]`
-  with `Q = XC`; `ε = a/200`, `r = ε·min(1, 1/h)/2`, `λ = 24/25`, `s = 1/25`, `η = 0`. The amplitude is
-  the least `a = 2^k` (`k` up to the transient exponent) whose two sheets certify. The rounding is the
-  least `kδ` whose square reaches the floor.
+  with `Q = XC`; `r = ε·min(1, 1/h)/2` and `η = 0`. The amplitude is the least `a = 2^k` (`k` up to
+  the transient exponent) whose two sheets certify. The rounding is the least `kδ` whose square
+  reaches the floor.
+- **The ball's shape** (`ResonatorOperands::standing_sheet`; the design review's item (d)). Derived
+  from the domain certificate's own Young test, at the ring's grain `2^(−L)` (the resonator locus's
+  lattice, the grain its tube is read at): `τ` is the least dyadic with `τG ⪰ J_cᵀGJ_c` at the
+  centre, and a shape `(ε, s, λ)` passes wherever `λ² ≥ (1 + s)τ + (1 + 1/s)aδ(ε)²/g`, since then
+  the certificate's form is at least `(1 + s)(τG − J_cᵀGJ_c) ⪰ 0`. At each dyadic `ε = 2^k ≤ a` the
+  split is the dyadic `s` minimizing the bound and `λ` the least dyadic at the grain whose square
+  reaches it; `ε` descends while the inclusion margin `(1 − λ)r − ε_t` grows, and the shape with
+  the largest margin is proposed. [agent-inferred] A gap ladder `1 − λ = 2^(−m)` was measured first:
+  it misses the margin between its rungs, so `a = 4` stopped certifying, the founding moved to
+  `a = 8` and arrivals of `1/8` no longer locked in 192 ticks; `λ` is therefore read at the grain.
 - **The loaded return's owner** (`ResonatorOperands::reverse`, called by `Word::pull_back`). The
   quartic and saturated return moved from the port into the resonator's operands, read at the
   producing tick's own displacement: `z̄ = hū′ + c·w̄′ − (2/Y)s̄`, `r̄ = X̂ᵀz̄`, `ē = s̄ + hr̄`,
@@ -49,8 +59,10 @@ Field periods `[33, 7, 11]`; ring 2 has 11 nodes (22 realified coordinates); `h 
 transient unit `δ = 1/32768`. Debug build; the mount takes about 4.2 s and one certify call about
 0.25 s.
 
-- Both sheets certify at amplitude `a = 4` (`k = 0` fails). Rounding `5/16384`; margin
-  `971/10240000`; contraction `24/25`. The smooth law alone refuses the charted solve
+- Both sheets certify at amplitude `a = 4` (`k = 0` fails). The derived shape is `ε = 1/64`,
+  `s = 1/32`, `λ = 973/1024`; rounding `5/16384`; margin `11/131072`. The authored shape it replaces
+  (`ε = a/200`, `s = 1/25`, `λ = 24/25`) left `971/10240000`: its `ε = 1/50` is not dyadic, and
+  the dyadic `ε` either side of it leaves less. The smooth law alone refuses the charted solve
   (`executed_lock(None)` is an error), and `Floquet::of` stays refused.
 - Started in `B⁺` with zero drive, the live resonator stays in its ball for 16 ticks: at the centre
   every drive is zero and the state is the fixed point; offset by `64δ` the field's returned drive
@@ -58,11 +70,11 @@ transient unit `δ = 1/32768`. Debug build; the mount takes about 4.2 s and one 
 - The margin holds an in-phase drive of `1/65536` on every node and refuses `1/32768`; one live
   resonator step at the held drive stays in `B⁺`.
 - A storage wave against the sheet, through the live Word, 192 ticks: amplitude 6 leaves `B⁺` and
-  returns to it (166 unlocked samples, no event); amplitude 8 flips it with one event at tick 99;
+  returns to it (179 unlocked samples, no event); amplitude 8 flips it with one event at tick 109;
   amplitude 16 flips it at tick 118 and rings at the far ball's boundary, leaving and re-entering,
   with no further event.
 - Arrivals of `1/8` at the four quarter-turn carriers, from rest, 192 ticks: `(1,0)` and `(0,1)`
-  lock `+1` (at ticks 156 and 178), `(−1,0)` and `(0,−1)` lock `−1`. A half turn reflects the sheet.
+  lock `+1` by the last tick, `(−1,0)` and `(0,−1)` lock `−1`. A half turn reflects the sheet.
   With the pump strength set to zero (saturation kept), all four are unlocked.
 - On every tick of these runs whose drive the lying sheet's margin held, the next sample lay in the
   same ball. After an arrival, the field's ringing drive (about `10⁻²` per node) exceeds the margin
@@ -113,8 +125,8 @@ the observed deposit: cells 0 and 1 step nothing; cells 2 to 5 read ring 2 on it
 `ρ_c` from `871/8192` to `18045/32768`, `ρ̄` from `1/4` to `1`, `σ` from `1571/1024` to
 `1773/1024`, span 2 and reach from about 29 to 48. The closure holds on every cell and the source
 port's certified step is nonzero through the pumped ring. Inside the lock ball the tube contracts:
-on the ball's own radius `σ = 31383/32768 ≤ λ = 24/25`. Across the saddle it amplifies:
-`σ = 49833/32768`.
+on the ball's own radius `σ = 31133/32768 ≤ λ = 973/1024 = 31136/32768`. Across the saddle it
+amplifies: `σ = 6229/4096`.
 
 With the pump removed (strength zero, the saturation kept) the period's only rest point is the
 origin, and the ring is read on its tube there: cells 0 and 1 step nothing; cells 2 to 5 read the
@@ -139,19 +151,19 @@ and faces of opposite sheets pairwise opposed (aligned after a half turn). The f
 station, the tick after the last lock event of the pumped arrivals. The rate `w` is not read: at a
 sheet it is at the lattice's noise.
 
-Measured. With the pump the arrivals lock `[+1, +1, −1, −1]`, the last lock event at tick 179, so
-the station is tick 180. The signed `cos²` of arrivals 1, 2 and 3 against arrival 0 there, each an
-exact enclosure at `2⁻¹⁵`:
+Measured. With the pump the arrivals lock `[+1, +1, −1, −1]`, `(±1, 0)` at tick 167 and `(0, ±1)`
+at tick 190, so the station is tick 191, the run's last. The signed `cos²` of arrivals 1, 2 and 3
+against arrival 0 there, each an exact enclosure at `2⁻¹⁵`:
 
 | | `v_R` | `Z` |
 |---|---|---|
-| pumped | `+[31453/32768, 15727/16384]`, `−[8189/8192, 32757/32768]`, `−[31359/32768, 245/256]` | `+[32747/32768, 8187/8192]`, `−[32761/32768, 16381/16384]`, `−[8187/8192, 32749/32768]` |
-| pump removed | `+[1353/16384, 2707/32768]`, `−[2097/16384, 4195/32768]`, `+[403/16384, 807/32768]` | `+[16839/32768, 2105/4096]`, `−[28567/32768, 3571/4096]`, `+[28797/32768, 14399/16384]` |
+| pumped | `+[31763/32768, 7941/8192]`, `−[32731/32768, 8183/8192]`, `−[31649/32768, 15825/16384]` | `+[15683/16384, 31367/32768]`, `−[32767/32768, 1]`, `−[31383/32768, 3923/4096]` |
+| pump removed | `+[7/32, 7/32]`, `−[3205/32768, 1603/16384]`, `−[73/32768, 37/16384]` | `+[30757/32768, 15379/16384]`, `+[8039/32768, 1005/4096]`, `−[1245/16384, 2491/32768]` |
 
 The pumped face separates on both readings; the unpumped one on neither: its `v_R` quarter turns
-stay near orthogonal to arrival 0, and its `Z` points arrival 3 with arrival 0. Pumped, the half
-turn (arrival 2) is opposed at every tick read. Unpumped it is opposed through tick 96 and not at
-the station (`−[2097/16384, 4195/32768]`); [inferred] the unlocked response has decayed toward the
+stay within `7/32` of orthogonal to arrival 0, and its `Z` half turn is not opposed. Pumped, the
+half turn (arrival 2) is opposed at every tick read. Unpumped it is opposed through tick 96 and not
+at the station (`v_R`: `−[3205/32768, 1603/16384]`); [inferred] the unlocked response has decayed toward the
 lattice's grain, where the ties-upward rounding is not odd. What the pump adds is that the quarter
 turns join a sheet: pumped, arrival 1's `v_R` reads `+[639/16384, 1279/32768]` at tick 12,
 `+[4893/8192, 19573/32768]` at tick 24 and `+[29855/32768, 933/1024]` at tick 48. The test asserts

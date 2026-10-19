@@ -38,7 +38,7 @@ fn live() -> Live {
     let pair = operands.resonators()[ring]
         .as_ref()
         .unwrap()
-        .executed_lock(Some(&transient))
+        .executed_lock(Some(&transient), grain(&resident, ring))
         .unwrap();
     Live {
         resident,
@@ -46,6 +46,15 @@ fn live() -> Live {
         transient,
         pair,
     }
+}
+
+/// The ring's grain: the lattice its resonator locus is founded on.
+fn grain(resident: &Resident, ring: usize) -> u32 {
+    resident
+        .constitution()
+        .lattice(Locus::Resonator(ring))
+        .unwrap()
+        .exponent()
 }
 
 /// The operands the live word opens on: the resident's field and current, cold charts.
@@ -226,7 +235,9 @@ fn the_founding_certifies_both_sheets_on_the_live_words_rounded_period() {
         resonator.chart_words(0).is_some(),
         "the live word charts its solve"
     );
-    let pair = resonator.executed_lock(Some(&transient)).unwrap();
+    let pair = resonator
+        .executed_lock(Some(&transient), grain(&live.resident, live.ring))
+        .unwrap();
     assert_eq!(pair, live.pair);
     let (positive, negative) = (
         pair.positive().domain().step(0).unwrap(),
@@ -246,15 +257,22 @@ fn the_founding_certifies_both_sheets_on_the_live_words_rounded_period() {
         assert!(rounding * rounding >= *step.rounding_floor());
     }
     eprintln!(
-        "lock amplitude={} unit={} rounding={} margin={} contraction={}",
+        "lock amplitude={} unit={} ball={} lipschitz={} split={} rounding={} margin={} contraction={}",
         resonator.sheet_amplitude().unwrap(),
         transient.unit(),
+        positive.proposal().euclidean_radius,
+        positive.proposal().lipschitz,
+        positive.proposal().young,
         positive.proposal().rounding,
         positive.margin(),
         pair.positive().domain().contraction()
     );
     // The smooth law alone does not certify the charted solve the word executes.
-    assert!(resonator.executed_lock(None).is_err());
+    assert!(
+        resonator
+            .executed_lock(None, grain(&live.resident, live.ring))
+            .is_err()
+    );
     // A saturated period is not a Floquet multiplier problem.
     assert!(Floquet::of(resonator).is_err());
 }
@@ -363,7 +381,7 @@ fn a_drive_below_the_margin_holds_the_sheet_and_one_above_flips_it_once() {
     // field returns it to the same sheet: unlocked samples, no event. Amplitude 8 flips it with
     // one event. Amplitude 16 flips it and rings at the far ball's boundary: one event, however
     // often the samples leave and re-enter that ball.
-    for (z, end, change) in [(6, 1, None), (8, -1, Some(99)), (16, -1, Some(118))] {
+    for (z, end, change) in [(6, 1, None), (8, -1, Some(109)), (16, -1, Some(118))] {
         let mut flipped = word(
             field,
             operands(&live.resident, live.resident.constitution()),
@@ -730,7 +748,7 @@ fn the_receiving_face_separates_by_sheet_and_not_without_the_pump() {
             opened.resonators()[ring]
                 .as_ref()
                 .unwrap()
-                .executed_lock(Some(&transient))
+                .executed_lock(Some(&transient), grain(&resident, ring))
                 .unwrap()
         });
         let faces = quarters
@@ -754,15 +772,18 @@ fn the_receiving_face_separates_by_sheet_and_not_without_the_pump() {
     let mut last_event = 0;
     for (q, face) in pumped.iter().enumerate() {
         let mut last = None;
+        let mut events = Vec::new();
         for (at, state) in face.states.iter().enumerate() {
             let (now, event) = observe(&pair, last, state, at as u64);
             if let LockSample::Sheet(sheet) = now {
                 last = Some(sheet);
             }
-            if event.is_some() {
+            if let Some(event) = event {
                 last_event = last_event.max(at);
+                events.push(event);
             }
         }
+        eprintln!("arrival {q} lock events={events:?}");
         let LockSample::Sheet(sheet) = sample(&pair, face.states.last().unwrap()) else {
             panic!("arrival {q} locks with the pump");
         };
