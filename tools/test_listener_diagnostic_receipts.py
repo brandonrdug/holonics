@@ -1,6 +1,7 @@
 """Synthetic receipt-wrapper controls; only the successful fixture starts a harmless Python child."""
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import json
 import signal
@@ -295,7 +296,7 @@ class ReceiptControls(unittest.TestCase):
             self.assertFalse(self._landing_path(receipt_path).exists())
             self.assertIn("absent or invalid means unknown", durable["landing_verdict_source"])
 
-    def test_work_finish_after_total_is_marked_deadline_overrun(self):
+    def _finish_after_total_with_verified_postflight(self, *, cleanup_uncertain: bool):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             config_path, receipt_path, _config, repo_reader = self._config(root)
@@ -303,26 +304,53 @@ class ReceiptControls(unittest.TestCase):
             started = 10_000_000_000
             now = [started]
 
-            def finish_late(_argv, **kwargs):
-                plan = kwargs["plan"]
-                now[0] = plan.total_ns + 1
-                return self._complete_result(plan)
+            real_hash = receipts._sha256
+            config_hash_calls = []
 
-            result = receipts.run_receipted_stage(
-                config_path,
-                expected,
-                receipt_path,
-                clock=lambda: now[0],
-                repo_reader=repo_reader,
-                disk_reader=self._disk,
-                supervise=finish_late,
-                install_limits=False,
-            )
+            def last_postflight_hash(path, **kwargs):
+                digest = real_hash(path, **kwargs)
+                if path == config_path:
+                    config_hash_calls.append(1)
+                    if len(config_hash_calls) == 2:
+                        # All integrity evidence remains verified; only final work completion
+                        # crosses the total. Do not accidentally test an integrity failure.
+                        now[0] = started + stage.TOTAL_NS + 1
+                return digest
+
+            def controlled_result(_argv, **kwargs):
+                result = self._complete_result(kwargs["plan"])
+                if cleanup_uncertain:
+                    return dataclasses.replace(
+                        result, status="cleanup_uncertain", reason="controlled cleanup uncertainty",
+                        returncode=None, group_alive_at_return=True, cleanup_uncertain=True,
+                    )
+                return result
+
+            with mock.patch.object(receipts, "_sha256", last_postflight_hash):
+                result = receipts.run_receipted_stage(
+                    config_path, expected, receipt_path, clock=lambda: now[0],
+                    repo_reader=repo_reader, disk_reader=self._disk,
+                    supervise=controlled_result, install_limits=False,
+                )
             sidecar = json.loads(self._landing_path(receipt_path).read_text(encoding="utf-8"))
-            self.assertTrue(result["deadline_overrun"])
-            self.assertEqual(result["status"], "deadline_overrun")
-            self.assertFalse(sidecar["within_total_deadline"])
-            self.assertEqual(sidecar["work_status"], "deadline_overrun")
+            self.assertEqual(config_hash_calls, [1, 1])
+            return result, sidecar
+
+    def test_work_finish_after_total_is_marked_deadline_overrun(self):
+        result, sidecar = self._finish_after_total_with_verified_postflight(cleanup_uncertain=False)
+        self.assertTrue(result["deadline_overrun"])
+        self.assertEqual(result["status"], "deadline_overrun")
+        self.assertFalse(sidecar["within_total_deadline"])
+        self.assertEqual(sidecar["work_status"], "deadline_overrun")
+
+    def test_cleanup_uncertain_status_survives_a_simultaneous_deadline_overrun(self):
+        result, sidecar = self._finish_after_total_with_verified_postflight(cleanup_uncertain=True)
+        self.assertTrue(result["deadline_overrun"])
+        self.assertEqual(result["status"], "cleanup_uncertain")
+        self.assertTrue(result["process"]["group_alive_at_return"])
+        self.assertTrue(result["process"]["cleanup_uncertain"])
+        self.assertEqual(sidecar["work_status"], "cleanup_uncertain")
+        self.assertFalse(sidecar["within_total_deadline"])
 
     def test_term_ignoring_child_is_killed_at_cleanup_cutoff_and_never_complete(self):
         class FakeClock:

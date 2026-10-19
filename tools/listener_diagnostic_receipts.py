@@ -654,7 +654,7 @@ def run_receipted_stage(
         receipt["finish_boundary"] = "after work and log finalization, before terminal receipt write/fsync"
         receipt["elapsed_wall_ns"] = max(0, finished_ns - start_ns)
         receipt["deadline_overrun"] = finished_ns > plan.total_ns
-        if receipt["deadline_overrun"]:
+        if receipt["deadline_overrun"] and receipt["status"] == "complete":
             receipt["status"] = "deadline_overrun"
         process_receipt = receipt.get("process")
         if receipt["status"] == "complete" and isinstance(process_receipt, dict):
