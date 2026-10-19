@@ -8,6 +8,7 @@ mod epoch;
 mod execution;
 #[path = "diagnostic/timing.rs"]
 mod timing;
+pub(super) use timing::WorkCutoff;
 #[path = "diagnostic/verdict.rs"]
 mod verdict;
 
@@ -947,6 +948,7 @@ fn run_cost_profile_64(
     port: &Reference,
     options: &ContinuingOptions,
     checkpoint_path: &str,
+    checked_frames: Option<Vec<Section>>,
 ) -> Result<()> {
     let budget = timing::RunBudget::new(0)?;
     let offsets = cost_probe_offsets()?;
@@ -964,7 +966,10 @@ fn run_cost_profile_64(
         return Err("cost profile refuses an existing checkpoint or temporary target".into());
     }
     let input_started = Instant::now();
-    let frames = sections_of(Some(&options.learn), options.count)?;
+    let frames = match checked_frames {
+        Some(frames) => frames,
+        None => sections_of(Some(&options.learn), options.count)?,
+    };
     let heard = frames
         .iter()
         .enumerate()
@@ -1395,12 +1400,14 @@ pub(super) fn run(
     port: &Reference,
     options: ContinuingOptions,
     checkpoint_path: Option<&str>,
+    checked_frames: Option<Vec<Section>>,
 ) -> Result<()> {
     if options.diagnostic_cost_profile_cells64 {
         return run_cost_profile_64(
             port,
             &options,
             checkpoint_path.ok_or("cost-only profile requires checkpoint directory")?,
+            checked_frames,
         );
     }
     let profile_cells = options.diagnostic_profile_trunk_cells;
@@ -1454,7 +1461,10 @@ pub(super) fn run(
     let (mut resident, pairing) = mounted(port, options.population)?;
     let opening = resident.constitution().clone();
     let mut crib = ObservedCrib::new(0);
-    let frames = sections_of(Some(&options.learn), options.count)?;
+    let frames = match checked_frames {
+        Some(frames) => frames,
+        None => sections_of(Some(&options.learn), options.count)?,
+    };
     let input = frames
         .first()
         .ok_or("step0 diagnostic requires section 0")?;

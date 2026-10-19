@@ -57,6 +57,7 @@ dependencies = [
  "holonics",
  "num-bigint",
  "num-traits",
+ "rayon",
  "thiserror",
 ]
 

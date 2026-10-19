@@ -572,6 +572,8 @@ pub enum SectionError {
     Magic,
     /// The file ended inside a field.
     Truncated { at: usize, wanted: &'static str },
+    /// A declared wire extent does not fit the host's checked address space.
+    Extent { at: usize, wanted: &'static str },
     /// A passage kind byte that names no passage.
     Kind { at: usize, kind: u8 },
     /// A raster whose intensities are not `width · height`.
@@ -760,7 +762,10 @@ impl<'b> Reader<'b> {
     }
 
     fn octets(&mut self, wanted: &'static str) -> Result<Vec<u8>, SectionError> {
-        let n = self.u32(wanted)? as usize;
+        let n = usize::try_from(self.u32(wanted)?).map_err(|_| SectionError::Extent {
+            at: self.at,
+            wanted,
+        })?;
         Ok(self.take(n, wanted)?.to_vec())
     }
 }
@@ -783,7 +788,12 @@ pub fn read_frames(bytes: &[u8]) -> Result<Vec<Section>, SectionError> {
                 1 => {
                     let width = reader.u16("raster width")?;
                     let height = reader.u16("raster height")?;
-                    let n = usize::from(width) * usize::from(height);
+                    let n = usize::from(width).checked_mul(usize::from(height)).ok_or(
+                        SectionError::Extent {
+                            at: reader.at,
+                            wanted: "raster intensities",
+                        },
+                    )?;
                     let intensities = reader.take(n, "intensities")?.to_vec();
                     if intensities.len() != n {
                         return Err(SectionError::Raster {
@@ -800,9 +810,18 @@ pub fn read_frames(bytes: &[u8]) -> Result<Vec<Section>, SectionError> {
                 }
                 2 => {
                     let rate = reader.u32("pcm rate")?;
-                    let n = reader.u32("pcm count")? as usize;
+                    let n = usize::try_from(reader.u32("pcm count")?).map_err(|_| {
+                        SectionError::Extent {
+                            at: reader.at,
+                            wanted: "pcm count",
+                        }
+                    })?;
+                    let byte_count = n.checked_mul(2).ok_or(SectionError::Extent {
+                        at: reader.at,
+                        wanted: "pcm samples",
+                    })?;
                     let samples = reader
-                        .take(2 * n, "pcm samples")?
+                        .take(byte_count, "pcm samples")?
                         .chunks_exact(2)
                         .map(|b| i16::from_be_bytes([b[0], b[1]]))
                         .collect();

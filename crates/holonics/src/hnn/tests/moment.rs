@@ -324,6 +324,98 @@ mod resident_pair_face_controls {
     }
 
     #[test]
+    fn pair_ray_integer_chart_matches_whole_table_and_polynomial_with_wide_denominators() {
+        let (field, material) = deposited();
+        let mut current = Current::at_rest(&field);
+        let mut moment = SourceMoment::open(&field, &current);
+        let wide = (BigInt::one() << 137usize) + BigInt::from(11);
+        let mut fed = 0;
+        for count in [0, 1, 8, 31] {
+            while fed < count { feed(&field, &mut current, &mut moment, fed); fed += 1; }
+            for &offset in field.offsets() {
+                let base = material.pair_port(0, offset).unwrap();
+                let adjusted: [Vec<Vec<Rat>>; 3] = std::array::from_fn(|k| {
+                    [base.outputs(), base.current_reads(), base.earlier_reads()][k].iter()
+                        .enumerate().map(|(i, row)| row.iter().enumerate().map(|(j, value)|
+                            value + rat((i + 2*j + k) as i64 - 3, [3,5,7][(i+j+k)%3]))
+                        .collect()).collect()
+                });
+                let pair = PairPort::new(adjusted[0].clone(), adjusted[1].clone(), adjusted[2].clone()).unwrap();
+                let bases = [pair.outputs(), pair.current_reads(), pair.earlier_reads()];
+                let direction: [Vec<Vec<Rat>>; 3] = std::array::from_fn(|k| bases[k].iter()
+                    .enumerate().map(|(i,row)| row.iter().enumerate().map(|(j,_)|
+                        Rat::new(BigInt::from(((17*k + 7*i + j)%13) as i64 - 6),
+                                 &wide * BigInt::from([3,5,7][(i+j+k)%3])))
+                    .collect()).collect());
+                let d = [&direction[0][..], &direction[1][..], &direction[2][..]];
+                let actual = crate::hnn::reference::pair_ray_speed(&field, &moment, 0, offset, &pair, d).unwrap();
+                let table = crate::hnn::reference::whole_pair_ray_speed(&field, &moment, 0, offset, &pair, d).unwrap();
+                assert_eq!(actual, table, "count{count} offset{offset}");
+                assert_eq!(actual, interpolated_ray_speed(&field, &moment, offset, &pair, d));
+                let face = moment.resident_pair_face(0, offset, &pair).unwrap().unwrap();
+                assert_eq!(face.ray_speed(&pair, d, &Rat::zero()).unwrap(), [Rat::zero(),Rat::zero()]);
+                assert_eq!(face.ray_speed(&pair,d,&Rat::one()).unwrap(),
+                           face.ray_speed(&pair,d,&-Rat::one()).unwrap());
+                let bad = [&direction[0][..direction[0].len()-1], &direction[1][..], &direction[2][..]];
+                assert!(face.ray_speed(&pair,bad,&Rat::one()).is_err());
+                let mut changed = pair.current_reads().to_vec(); changed[0][0] += Rat::one();
+                let stale = PairPort::new(pair.outputs().to_vec(),changed,pair.earlier_reads().to_vec()).unwrap();
+                assert!(face.ray_speed(&stale,d,&Rat::one()).is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn prepared_pair_ray_sum_matches_mixed_faces_and_whole_tables() {
+        let (field, material) = deposited();
+        let mut current = Current::at_rest(&field);
+        let mut moment = SourceMoment::open(&field, &current);
+        let mut moments = vec![moment.clone()];
+        for n in 0..31 {
+            feed(&field, &mut current, &mut moment, n);
+            if [0, 7, 30].contains(&n) { moments.push(moment.clone()); }
+        }
+        let leaky = material.clone().with_transport(0, rat(3, 4)).unwrap();
+        let mut current = Current::at_rest(&field);
+        let mut transported = SourceMoment::open_with(&field, &current, &leaky).unwrap();
+        transported.ingest(&field, &mut current, &encoded(&field, &[1,0,1,1,0,1,0,0,1])).unwrap();
+        moments.push(transported);
+        let wide = (BigInt::one() << 137usize) + BigInt::from(11);
+        for &offset in field.offsets() {
+            let pair = material.pair_port(0, offset).unwrap();
+            assert!(moments.last().unwrap().resident_pair_face(0, offset, pair).unwrap().is_none());
+            let bases = [pair.outputs(), pair.current_reads(), pair.earlier_reads()];
+            let direction: [Vec<Vec<Rat>>; 3] = std::array::from_fn(|k| bases[k].iter()
+                .enumerate().map(|(i,row)| row.iter().enumerate().map(|(j,_)|
+                    Rat::new(BigInt::from(((17*k + 7*i + j)%13) as i64 - 6),
+                             &wide * BigInt::from([3,5,7][(i+j+k)%3])))
+                .collect()).collect());
+            let zeros: [Vec<Vec<Rat>>; 3] = std::array::from_fn(|k| bases[k].iter()
+                .map(|row| vec![Rat::zero(); row.len()]).collect());
+            for d in [[&direction[0][..], &direction[1][..], &direction[2][..]],
+                      [&zeros[0][..], &zeros[1][..], &zeros[2][..]]] {
+                for end in 0..=moments.len() {
+                    let mut expected = [Rat::zero(), Rat::zero()];
+                    for m in &moments[..end] {
+                        let speed = crate::hnn::reference::whole_pair_ray_speed(&field,m,0,offset,pair,d).unwrap();
+                        expected[0] += &speed[0]; expected[1] += &speed[1];
+                    }
+                    assert_eq!(crate::hnn::reference::pair_ray_speed_sum(&field,&moments[..end],0,offset,pair,d).unwrap(),expected);
+                }
+            }
+            let bad = [&direction[0][..direction[0].len()-1],&direction[1][..],&direction[2][..]];
+            assert!(crate::hnn::reference::pair_ray_speed_sum(&field,&moments,0,offset,pair,bad).is_err());
+            assert_eq!(crate::hnn::reference::pair_ray_speed_sum(&field,&[],0,offset,pair,bad).unwrap(),[Rat::zero(),Rat::zero()]);
+            let face = moments[3].resident_pair_face(0,offset,pair).unwrap().unwrap();
+            let mut reads = pair.current_reads().to_vec(); reads[0][0] += Rat::one();
+            let changed = PairPort::new(pair.outputs().to_vec(),reads,pair.earlier_reads().to_vec()).unwrap();
+            let d = [&direction[0][..],&direction[1][..],&direction[2][..]];
+            let prepared = crate::hnn::moment::PreparedPairRay::new(&changed,d).unwrap();
+            assert!(face.ray_speed_prepared(&prepared,&Rat::one()).is_err());
+        }
+    }
+
+    #[test]
     fn pair_face_rebuilds_on_changed_reads() {
         let (field, material) = deposited();
         let (current, moment) = passage(&field);

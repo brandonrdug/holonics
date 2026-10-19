@@ -413,7 +413,38 @@ impl PendingRatio {
         charts: &mut Charts,
         opening: &WordOpening,
     ) -> Result<(Word<'c>, Faces), HnnError> {
-        let mut word = self.open_on(field, constitution, charts, opening)?;
+        let word = self.open_on(field, constitution, charts, opening)?;
+        self.read_word(field, constitution, word)
+    }
+
+    pub(crate) fn read_on_scoped<'c>(
+        &self,
+        scope: &mut crate::hnn::propagation::RingScope<'c>,
+        charts: &mut Charts,
+        opening: &WordOpening,
+    ) -> Result<(Word<'c>, Faces), HnnError> {
+        let field = scope.field();
+        let material = scope.material();
+        let word = self.open_on_scoped(scope, charts, opening)?;
+        self.read_word(field, material, word)
+    }
+
+    pub(crate) fn open_on_scoped<'c>(
+        &self,
+        scope: &mut crate::hnn::propagation::RingScope<'c>,
+        charts: &mut Charts,
+        opening: &WordOpening,
+    ) -> Result<Word<'c>, HnnError> {
+        let current = self.current(scope.field())?;
+        Word::open_received_scoped(scope, &current, &self.moment, charts, opening, &self.view)
+    }
+
+    fn read_word<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        mut word: Word<'c>,
+    ) -> Result<(Word<'c>, Faces), HnnError> {
         let anchors = word.forward(&self.phases)?;
         let reads = if matches!(
             constitution.receiving_layout(self.phases.ring()),

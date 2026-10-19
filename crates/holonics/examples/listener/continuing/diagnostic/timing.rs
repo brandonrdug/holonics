@@ -37,13 +37,24 @@ pub(super) struct RunBudget {
 /// any supervisor deadline. Checks occur between atomic operations; the external supervisor
 /// remains the hard process stop if one atomic operation outlasts a cooperative check.
 #[derive(Clone, Debug)]
-pub(super) struct WorkCutoff {
+pub(crate) struct WorkCutoff {
     label: String,
     deadline_ns: u128,
 }
 
 impl WorkCutoff {
-    pub(super) fn check(&self) -> io::Result<()> {
+    /// Ordinary observed work borrows an absolute supervisor-origin monotonic deadline.
+    /// This does not derive, extend or substitute a deadline from the current time.
+    pub(crate) fn at_deadline(label: &str, deadline_ns: u128) -> io::Result<Self> {
+        let cutoff = Self {
+            label: label.to_owned(),
+            deadline_ns,
+        };
+        cutoff.check()?;
+        Ok(cutoff)
+    }
+
+    pub(crate) fn check(&self) -> io::Result<()> {
         self.check_at(exterior_clock::monotonic_ns()?)
     }
 

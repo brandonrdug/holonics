@@ -66,6 +66,73 @@ pub(crate) struct PairFaceGradient {
     pub(crate) covector: Rat,
 }
 
+/// An exact, transient chart for one pair and direction, shared only during a comparison.
+/// Borrowing the port binds both its reads and outputs; this is not a resident/history cache.
+pub(crate) struct PreparedPairRay<'a> {
+    port: &'a PairPort,
+    width: usize,
+    current: Vec<Vec<BigInt>>,
+    earlier: Vec<Vec<BigInt>>,
+    first_weight: Vec<Vec<BigInt>>,
+    first_linear: Vec<Vec<BigInt>>,
+    second: Vec<Vec<BigInt>>,
+    first_den: BigInt,
+    second_den: BigInt,
+}
+
+impl<'a> PreparedPairRay<'a> {
+    pub(crate) fn new(port: &'a PairPort, direction: [&[Vec<Rat>]; 3]) -> Result<Self, HnnError> {
+        if [port.outputs(), port.current_reads(), port.earlier_reads()]
+            .into_iter().zip(direction).any(|(base, delta)| {
+                base.len() != delta.len()
+                    || base.iter().zip(delta).any(|(x, dx)| x.len() != dx.len())
+            }) {
+            return Err(HnnError::Unadmitted {
+                reason: "a pair ray must read its contemporary factors and direction",
+            });
+        }
+        let [de, da, db] = direction;
+        let a: Vec<_> = port.current_reads().iter().map(|row| integral(row)).collect();
+        let b: Vec<_> = port.earlier_reads().iter().map(|row| integral(row)).collect();
+        let e: Vec<_> = port.outputs().iter().map(|row| integral(row)).collect();
+        let de: Vec<_> = de.iter().map(|row| integral(row)).collect();
+        let da: Vec<_> = da.iter().map(|row| integral(row)).collect();
+        let db: Vec<_> = db.iter().map(|row| integral(row)).collect();
+        // L_rho = lcm(Da*B, Db*A). The integer linear coefficient is
+        // l_rho = (da.Cb)*(L/(Da*B)) + (db.Ca)*(L/(Db*A)).
+        // Y1 = weight * sum(de*W/(De*A*B) + e*l/(E*L));
+        // Y2' = weight * sum(de*l/(De*L)). Only the final two squared readings
+        // normalize a rational. Population, phase and every signed term remain exact.
+        let linear_den: Vec<_> = (0..port.rank())
+            .map(|rho| lcm(&(&da[rho].1 * &b[rho].1), &(&db[rho].1 * &a[rho].1))).collect();
+        let weight_den: Vec<_> = (0..port.rank())
+            .map(|rho| &de[rho].1 * &a[rho].1 * &b[rho].1).collect();
+        let read_den: Vec<_> = (0..port.rank()).map(|rho| &e[rho].1 * &linear_den[rho]).collect();
+        let second_den_by_rank: Vec<_> = (0..port.rank()).map(|rho| &de[rho].1 * &linear_den[rho]).collect();
+        let first_den = weight_den.iter().chain(&read_den)
+            .fold(BigInt::one(), |den, value| lcm(&den, value));
+        let second_den = second_den_by_rank.iter()
+            .fold(BigInt::one(), |den, value| lcm(&den, value));
+        let scaled = |row: &[BigInt], scale: BigInt| row.iter().map(|n| n * &scale).collect();
+        Ok(Self {
+            port,
+            width: port.outputs().first().map_or(0, Vec::len),
+            current: (0..port.rank()).map(|rho|
+                scaled(&da[rho].0, &linear_den[rho] / (&da[rho].1 * &b[rho].1))).collect(),
+            earlier: (0..port.rank()).map(|rho|
+                scaled(&db[rho].0, &linear_den[rho] / (&db[rho].1 * &a[rho].1))).collect(),
+            first_weight: (0..port.rank()).map(|rho|
+                scaled(&de[rho].0, &first_den / &weight_den[rho])).collect(),
+            first_linear: (0..port.rank()).map(|rho|
+                scaled(&e[rho].0, &first_den / &read_den[rho])).collect(),
+            second: (0..port.rank()).map(|rho|
+                scaled(&de[rho].0, &second_den / &second_den_by_rank[rho])).collect(),
+            first_den,
+            second_den,
+        })
+    }
+}
+
 impl ResidentPairFace {
     fn build(
         counts: &[u64],
@@ -281,72 +348,67 @@ impl ResidentPairFace {
         })
     }
 
-    /// The two exact squared speeds on this comparison's unscaled direction. W, R and L
-    /// already hold the contemporary reads; only the terms moving both reads need a table
-    /// bound. Nothing here is retained or changes the count face.
+    /// The two exact squared speeds on this comparison's unscaled direction.
     pub(crate) fn ray_speed(
         &self,
         port: &PairPort,
         direction: [&[Vec<Rat>]; 3],
         weight: &Rat,
     ) -> Result<[Rat; 2], HnnError> {
-        let [de, da, db] = direction;
-        if !self.reads.matches(port)
-            || [port.outputs(), port.current_reads(), port.earlier_reads()]
-                .into_iter()
-                .zip(direction)
-                .any(|(base, delta)| {
-                    base.len() != delta.len()
-                        || base.iter().zip(delta).any(|(x, dx)| x.len() != dx.len())
-                })
-        {
+        self.ray_speed_prepared(&PreparedPairRay::new(port, direction)?, weight)
+    }
+
+    /// Reuse one transient direction chart across the source faces in a grouped comparison.
+    /// The borrowed port cannot change while its coefficients are used; every face still checks
+    /// its own contemporary reads. No chart, direction or timing becomes retained state.
+    pub(crate) fn ray_speed_prepared(
+        &self,
+        ray: &PreparedPairRay<'_>,
+        weight: &Rat,
+    ) -> Result<[Rat; 2], HnnError> {
+        if !self.reads.matches(ray.port) {
             return Err(HnnError::Unadmitted {
                 reason: "a pair ray must read its contemporary factors and direction",
             });
         }
-        let width = port.outputs().first().map_or(0, Vec::len);
-        let e: Vec<_> = port.outputs().iter().map(|row| integral(row)).collect();
-        let de: Vec<_> = de.iter().map(|row| integral(row)).collect();
-        let da: Vec<_> = da.iter().map(|row| integral(row)).collect();
-        let db: Vec<_> = db.iter().map(|row| integral(row)).collect();
-        let mut speed = [Rat::zero(), Rat::zero()];
+        let mut squared = [BigInt::zero(), BigInt::zero()];
         for phase in &self.phases {
-            if phase.population == 0 {
-                continue;
+            if phase.population == 0 { continue; }
+            let mut first = vec![BigInt::zero(); ray.width];
+            let mut second = vec![BigInt::zero(); ray.width];
+            for rho in 0..ray.port.rank() {
+                let current: BigInt = ray.current[rho].iter().zip(&phase.current)
+                    .filter(|(dx, row)| !dx.is_zero() && !row[rho].is_zero())
+                    .map(|(dx, row)| dx * &row[rho]).sum();
+                let earlier: BigInt = ray.earlier[rho].iter().zip(&phase.earlier)
+                    .filter(|(dx, row)| !dx.is_zero() && !row[rho].is_zero())
+                    .map(|(dx, row)| dx * &row[rho]).sum();
+                let linear = current + earlier;
+                if !phase.weights[rho].is_zero() {
+                    for (sum, coefficient) in first.iter_mut().zip(&ray.first_weight[rho]) {
+                        if !coefficient.is_zero() { *sum += coefficient * &phase.weights[rho]; }
+                    }
+                }
+                if !linear.is_zero() {
+                    for (sum, coefficient) in first.iter_mut().zip(&ray.first_linear[rho]) {
+                        if !coefficient.is_zero() { *sum += coefficient * &linear; }
+                    }
+                    for (sum, coefficient) in second.iter_mut().zip(&ray.second[rho]) {
+                        if !coefficient.is_zero() { *sum += coefficient * &linear; }
+                    }
+                }
             }
-            let mut weights = Vec::with_capacity(port.rank());
-            let mut linear = Vec::with_capacity(port.rank());
-            for rho in 0..port.rank() {
-                let current: BigInt = da[rho]
-                    .0
-                    .iter()
-                    .zip(&phase.current)
-                    .map(|(dx, row)| dx * &row[rho])
-                    .sum();
-                let earlier: BigInt = db[rho]
-                    .0
-                    .iter()
-                    .zip(&phase.earlier)
-                    .map(|(dx, row)| dx * &row[rho])
-                    .sum();
-                weights.push(Rat::new(
-                    &phase.weights[rho] * weight.numer(),
-                    &self.reads.current[rho].1 * &self.reads.earlier[rho].1 * weight.denom(),
-                ));
-                linear.push(
-                    (Rat::new(current, &da[rho].1 * &self.reads.earlier[rho].1)
-                        + Rat::new(earlier, &db[rho].1 * &self.reads.current[rho].1))
-                        * weight,
-                );
-            }
-            // Y1 = Σ (Ge W + e (Ga·R + L·Gb)); Y2' = Σ Ge (Ga·R + L·Gb).
-            let first = combination(width, weights.iter().zip(&de).chain(linear.iter().zip(&e)));
-            let second = combination(width, linear.iter().zip(&de));
-            speed[0] += first.iter().map(|x| x * x).sum::<Rat>();
-            speed[1] += second.iter().map(|x| x * x).sum::<Rat>();
+            squared[0] += first.iter().map(|x| x * x).sum::<BigInt>();
+            squared[1] += second.iter().map(|x| x * x).sum::<BigInt>();
         }
-        Ok(speed)
+        let weight_square = weight.numer() * weight.numer();
+        let weight_den_square = weight.denom() * weight.denom();
+        Ok([
+            Rat::new(&weight_square * &squared[0], &weight_den_square * &ray.first_den * &ray.first_den),
+            Rat::new(&weight_square * &squared[1], &weight_den_square * &ray.second_den * &ray.second_den),
+        ])
     }
+
 }
 
 #[derive(Clone)]

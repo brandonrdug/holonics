@@ -1,6 +1,7 @@
 //! Continuing host consumer with comparison-derived receiving precision. Roles, CLI strings and receipt formats are exterior
 //! run declarations. Field declarations live in octets; the octet/framing chart lives in sections.
-//! All authored workload values below occur only in tests. Nothing read by this run is unseen.
+//! All authored workload values below occur only in tests. An explicit evaluation suffix hears
+//! sources only; its target bytes remain exterior comparison evidence.
 use crate::octets::{
     BUDGET, RELEASE_KEY_BYTES, Result, drawn_code, elapsed, enclosure, field, read, scored_code,
     sections_of, shown, stepped_families,
@@ -12,7 +13,7 @@ use holonics::hnn::paired::{PairedCarrier, PairingDeclaration};
 use holonics::hnn::port::{Handle, ReceiptDetail};
 use holonics::hnn::receiving::ActiveAddress;
 use holonics::hnn::receiving::cells::CellLaw;
-use holonics::hnn::reference::observed::ObservedCrib;
+use holonics::hnn::reference::observed::{ObservedCrib, ObservedEpochExecution};
 use holonics::hnn::reference::{ClosedLocated, ExposedResident, Reference, Resident};
 use holonics::hnn::{ExecutionPort, Faces, HnnError, SourceMoment};
 use holonics::ratio::Rat;
@@ -27,6 +28,13 @@ struct ContinuingOptions {
     chart_manifest: Option<String>,
     population: u64,
     keys: Option<String>,
+    keys_sha256: Option<String>,
+    work_deadline_ns: Option<u128>,
+    block_upper_ns_per_cell: Option<u128>,
+    sections_per_pass: Option<usize>,
+    stage1_probe_cells: Option<usize>,
+    evaluation_from_section: Option<usize>,
+    diagnostic_release_faces: bool,
     diagnostic_step0: bool,
     diagnostic_calibration_only: bool,
     diagnostic_checkpoint: Option<String>,
@@ -41,6 +49,13 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         (None, None, None, None, None);
     let mut diagnostic_profile_trunk_cells = None;
     let mut chart_manifest = None;
+    let mut keys_sha256 = None;
+    let mut work_deadline_ns = None;
+    let mut block_upper_ns_per_cell = None;
+    let mut sections_per_pass = None;
+    let mut stage1_probe_cells = None;
+    let mut evaluation_from_section = None;
+    let mut diagnostic_release_faces = false;
     let mut diagnostic_profile_paired_cells64 = false;
     let mut diagnostic_cost_profile_cells64 = false;
     let mut diagnostic_report_reserve_ns = None;
@@ -49,6 +64,11 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     let mut at = 0;
     while at < args.len() {
         let option = args[at].as_str();
+        if option == "--diagnostic-release-faces" {
+            diagnostic_release_faces = true;
+            at += 1;
+            continue;
+        }
         if option == "--diagnostic-step0" {
             diagnostic_step0 = true;
             at += 1;
@@ -76,6 +96,12 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
                 | "--chart-manifest"
                 | "--population"
                 | "--keys"
+                | "--keys-sha256"
+                | "--work-deadline-monotonic-ns"
+                | "--block-upper-ns-per-cell"
+                | "--sections-per-pass"
+                | "--stage1-probe-cells"
+                | "--evaluation-from-section"
                 | "--diagnostic-checkpoint"
                 | "--diagnostic-profile-trunk-cells"
                 | "--diagnostic-report-reserve-ns"
@@ -91,6 +117,12 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
             "--chart-manifest" => chart_manifest = Some(value.clone()),
             "--population" => population = Some(value.parse()?),
             "--keys" => keys = Some(value.clone()),
+            "--keys-sha256" => keys_sha256 = Some(value.clone()),
+            "--work-deadline-monotonic-ns" => work_deadline_ns = Some(value.parse()?),
+            "--block-upper-ns-per-cell" => block_upper_ns_per_cell = Some(value.parse()?),
+            "--sections-per-pass" => sections_per_pass = Some(value.parse()?),
+            "--stage1-probe-cells" => stage1_probe_cells = Some(value.parse()?),
+            "--evaluation-from-section" => evaluation_from_section = Some(value.parse()?),
             "--diagnostic-checkpoint" => diagnostic_checkpoint = Some(value.clone()),
             "--diagnostic-profile-trunk-cells" => {
                 diagnostic_profile_trunk_cells = Some(value.parse()?)
@@ -104,6 +136,43 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         .ok_or("--route observed requires explicit --population before frames are read")?;
     if population == 0 {
         return Err("--population must be positive".into());
+    }
+    if keys_sha256.as_ref().is_some_and(|hash: &String| {
+        hash.len() != 64
+            || !hash
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    }) {
+        return Err("--keys-sha256 requires one lowercase SHA256".into());
+    }
+    if keys_sha256.is_some() && keys.is_none() {
+        return Err("--keys-sha256 requires --keys".into());
+    }
+    if work_deadline_ns == Some(0)
+        || block_upper_ns_per_cell == Some(0)
+        || sections_per_pass == Some(0)
+        || stage1_probe_cells == Some(0)
+    {
+        return Err("observed work ceilings, pass extent and probe cells must be positive".into());
+    }
+    if diagnostic_step0
+        && (work_deadline_ns.is_some()
+            || block_upper_ns_per_cell.is_some()
+            || sections_per_pass.is_some()
+            || stage1_probe_cells.is_some())
+    {
+        return Err("stage1 observed options are separate from the historical diagnostic".into());
+    }
+    if evaluation_from_section.is_some()
+        && (diagnostic_step0 || stage1_probe_cells.is_some() || chart_manifest.is_none())
+    {
+        return Err(
+            "evaluation suffix requires --chart-manifest and cannot include a diagnostic or probe"
+                .into(),
+        );
+    }
+    if evaluation_from_section == Some(0) {
+        return Err("evaluation suffix requires a nonempty training prefix".into());
     }
     if diagnostic_calibration_only && !diagnostic_step0 {
         return Err("--diagnostic-calibration-only requires --diagnostic-step0".into());
@@ -144,12 +213,25 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     if diagnostic_report_reserve_ns.is_some_and(|reserve| reserve >= 300_000_000_000) {
         return Err("diagnostic report reserve must fit inside the fixed 300-second budget".into());
     }
+    if diagnostic_release_faces && diagnostic_step0 {
+        return Err(
+            "release-face diagnosis belongs to the ordinary observed life, not step0 calibration"
+                .into(),
+        );
+    }
     Ok(ContinuingOptions {
         learn: learn.ok_or("--route observed requires --learn HLSN1")?,
         count,
         chart_manifest,
         population,
         keys,
+        keys_sha256,
+        work_deadline_ns,
+        block_upper_ns_per_cell,
+        sections_per_pass,
+        stage1_probe_cells,
+        evaluation_from_section,
+        diagnostic_release_faces,
         diagnostic_step0,
         diagnostic_calibration_only,
         diagnostic_checkpoint,
@@ -162,6 +244,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
 
 /// `⌊log₂ x⌋` of a positive rational, the exponent `e` of its dyadic enclosure `2^e ≤ x < 2^(e+1)`;
 /// zero is written `z`.
+#[cfg(test)]
 fn dyadic(x: &Rat) -> String {
     if x.is_zero() {
         return "z".into();
@@ -189,6 +272,7 @@ fn dyadic(x: &Rat) -> String {
 /// parts are the gain `κ²` (with the readout's `‖R‖₂²` and the amplitude growth `1 + ω`) and the
 /// moves `b`; `k` below both was set by the joint certificate, a standing lobe, or `b`'s growth
 /// along a longer ray, which this reading does not separate.
+#[cfg(test)]
 fn step_certificates(reading: &DepositReading) -> String {
     let out: Vec<String> = reading
         .steps
@@ -235,6 +319,7 @@ fn step_certificates(reading: &DepositReading) -> String {
 /// Printed as `g/δ:N|E₂|E₁|a₂|a∞|b₂|b∞|lo|hi`: `N` the most occupied pairs in one phase, the norms
 /// the largest squared over the ranks, every term by its dyadic exponent, and `lo`/`hi` the least
 /// and greatest over the ranks of `⌊log₂⌋` of the ratio `ℓ₂-bound / ℓ₁-bound`.
+#[cfg(test)]
 fn pair_pairings(field: &Field, material: &Constitution, moment: &SourceMoment) -> Result<String> {
     let alphabet = field.alphabet();
     let mut out = Vec::new();
@@ -521,6 +606,7 @@ fn pair_face_line(
     ))
 }
 
+#[cfg(test)]
 fn deliver(
     port: &Reference,
     resident: &mut Resident,
@@ -783,6 +869,7 @@ impl Released {
 }
 
 /// Only private clones receive draws and native ingest; the trunk and its crib stay exact.
+#[cfg(test)]
 fn release_fork(
     port: &Reference,
     trunk: &Resident,
@@ -793,6 +880,35 @@ fn release_fork(
     section: usize,
     emit: &mut dyn FnMut(String),
 ) -> Result<Released> {
+    release_fork_accounted(
+        port,
+        trunk.clone(),
+        trunk_crib.clone(),
+        pairing,
+        maximum,
+        keys,
+        section,
+        None,
+        true,
+        None,
+        emit,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn release_fork_accounted(
+    port: &Reference,
+    mut fork: Resident,
+    mut crib: ObservedCrib,
+    pairing: &PairingDeclaration,
+    maximum: usize,
+    keys: &mut KeyStream,
+    section: usize,
+    mut work: Option<&mut work::ObservedWork>,
+    detailed: bool,
+    mut face_decisions: Option<&mut Vec<holonics::hnn::receiving::cells::CellDecision>>,
+    emit: &mut dyn FnMut(String),
+) -> Result<Released> {
     if maximum == 0 {
         return Ok(Released {
             classes: Vec::new(),
@@ -800,14 +916,19 @@ fn release_fork(
             maximum,
         });
     }
-    let mut fork = trunk.clone();
-    let mut crib = trunk_crib.clone();
     let mut classes = Vec::new();
     let mut stop = Stop::Maximum;
     let mut drawn_lower = Rat::zero();
     for index in 0..maximum {
-        let boundary_before = pair_face_boundary(&fork)?;
+        if let Some(work) = work.as_deref_mut() {
+            work.check()?;
+        }
         let started = Instant::now();
+        let boundary_before = if detailed {
+            Some(pair_face_boundary(&fork)?)
+        } else {
+            None
+        };
         let (moment, _) = fork
             .continuing()
             .ok_or("question end has no continuing moment")?;
@@ -828,15 +949,27 @@ fn release_fork(
             .forward
             .into_present()
             .ok_or("native draw returned no cells")?;
-        port.discard(&mut fork, Handle::Pending(pending))?;
         let draw_ns = elapsed(draw_started);
         let cell = drawn.cells.first().ok_or("native draw decided no cell")?;
+        if let Some(decisions) = face_decisions.as_deref_mut() {
+            decisions.push(cell.clone());
+        }
         let Some(class) = cell.class() else {
+            port.discard(&mut fork, Handle::Pending(pending))?;
             stop = Stop::Held;
+            if let Some(work) = work.as_deref_mut() {
+                work.complete(1, elapsed(started), emit)?;
+            }
             break;
         };
         let ingest_started = Instant::now();
-        let ingestion = port.ingest_class_continuing(&mut fork, &mut crib, pairing, class, None);
+        let ingestion = port
+            .ingest_released_cell_continuing(&mut fork, &mut crib, pairing, pending, cell, None);
+        // The native join preserves its pending operand on refusal. This private caller
+        // abandons the draw as before, including at the typed source horizon.
+        if ingestion.is_err() {
+            port.discard(&mut fork, Handle::Pending(pending))?;
+        }
         let native_ns = draw_ns + elapsed(ingest_started);
         let address = address_text(&active);
         let code = drawn_code(cell, class)?;
@@ -877,13 +1010,18 @@ fn release_fork(
         emit(format!(
             "report section={section} role=drawn index={index} report_ns={report_ns}"
         ));
-        emit(pair_face_line(
-            &fork,
-            section,
-            "drawn",
-            index as u64,
-            &boundary_before,
-        )?);
+        if let Some(boundary_before) = boundary_before {
+            emit(pair_face_line(
+                &fork,
+                section,
+                "drawn",
+                u64::try_from(index)?,
+                &boundary_before,
+            )?);
+        }
+        if let Some(work) = work.as_deref_mut() {
+            work.complete(1, elapsed(started), emit)?;
+        }
         if horizon {
             break;
         }
@@ -901,6 +1039,7 @@ fn release_fork(
     })
 }
 
+#[cfg(test)]
 fn section(
     port: &Reference,
     resident: &mut Resident,
@@ -1034,7 +1173,7 @@ pub(super) fn validate_chart_manifest(
         return Err("chart manifest section count differs from the selected frames".into());
     }
     for index in 0..count {
-        if reader.u64()? != index as u64 {
+        if reader.u64()? != u64::try_from(index)? {
             return Err("chart manifest section order differs".into());
         }
         let passages = usize::try_from(reader.u32()?)?;
@@ -1061,7 +1200,7 @@ pub(super) fn validate_chart_manifest(
             if let Some(frame) = frames.get(index) {
                 let summary = frame.passages[passage_index].encode_chart()?.summary();
                 if summary.kind.byte() != kind
-                    || summary.chart_octets as u64 != octets
+                    || u64::try_from(summary.chart_octets)? != octets
                     || summary.chart_sha256 != chart_digest
                     || summary.fibre_bytes != u128::from(fibre_bytes)
                     || summary.fibre_sha256 != fibre_digest
@@ -1073,7 +1212,7 @@ pub(super) fn validate_chart_manifest(
         let target_octets = reader.u64()?;
         let target_digest = reader.digest()?;
         if let Some(frame) = frames.get(index) {
-            if frame.target.len() as u64 != target_octets
+            if u64::try_from(frame.target.len())? != target_octets
                 || sections::sha256(&frame.target) != target_digest
             {
                 return Err(format!("chart manifest target differs at section {index}").into());
@@ -1087,13 +1226,35 @@ pub(super) fn validate_chart_manifest(
 }
 
 pub fn run(port: &Reference, args: &[String]) -> Result<()> {
+    run_selected(port, args, None)
+}
+
+/// Select an actual observed-epoch realization without changing the native
+/// comparison, transaction, exterior release, or checkpoint owners.
+pub fn run_with_execution(
+    port: &Reference,
+    args: &[String],
+    execution: &dyn ObservedEpochExecution,
+) -> Result<()> {
+    run_selected(port, args, Some(execution))
+}
+
+fn run_selected(
+    port: &Reference,
+    args: &[String],
+    execution: Option<&dyn ObservedEpochExecution>,
+) -> Result<()> {
     let options = parse(args)?;
+    if execution.is_some() && options.diagnostic_step0 {
+        return Err("selected epoch execution requires the ordinary observed route".into());
+    }
     // Exterior codec parity is checked before either ordinary mounting or a diagnostic route.
     // Explicit --learn-count permits only a checked prefix, including the two-frame cost probe.
     let checked_frames = if let Some(path) = &options.chart_manifest {
         let frames = sections_of(Some(&options.learn), options.count)?;
         let manifest = read(path)?;
         validate_chart_manifest(&frames, &manifest, options.count.is_some())?;
+        stage1::validate_evaluation_extent(frames.len(), options.evaluation_from_section)?;
         println!(
             "chart_manifest checked_sections={} sha256={} codec_owner=rust",
             frames.len(),
@@ -1109,13 +1270,13 @@ pub fn run(port: &Reference, args: &[String]) -> Result<()> {
                 .diagnostic_checkpoint
                 .clone()
                 .ok_or("cost profiling requires --diagnostic-checkpoint DIR")?;
-            return diagnostic::run(port, options, Some(&checkpoint));
+            return diagnostic::run(port, options, Some(&checkpoint), checked_frames);
         }
         if options.diagnostic_calibration_only
             || options.diagnostic_profile_trunk_cells.is_some()
             || options.diagnostic_profile_paired_cells64
         {
-            return diagnostic::run(port, options, None);
+            return diagnostic::run(port, options, None, checked_frames);
         }
         if options.diagnostic_report_reserve_ns.is_none() {
             return Err("full diagnostic requires an explicit --diagnostic-report-reserve-ns within the fixed total budget".into());
@@ -1124,70 +1285,59 @@ pub fn run(port: &Reference, args: &[String]) -> Result<()> {
             .diagnostic_checkpoint
             .clone()
             .ok_or("full --diagnostic-step0 requires --diagnostic-checkpoint DIR")?;
-        return diagnostic::run(port, options, Some(&checkpoint));
+        return diagnostic::run(port, options, Some(&checkpoint), checked_frames);
     }
     let keys = options
         .keys
         .as_deref()
         .ok_or("--route observed requires --keys for exterior native draws")?;
+    let key_bytes = read(keys)?;
+    let key_sha256 = sections::sha256(&key_bytes);
+    if options
+        .keys_sha256
+        .as_ref()
+        .is_some_and(|expected| expected != &key_sha256)
+    {
+        return Err("scientific draw-key file differs from --keys-sha256; nothing mounted".into());
+    }
+    println!(
+        "observed_keys sha256={key_sha256} bytes={} key_width_bytes={RELEASE_KEY_BYTES} complete_keys={} trailing_bytes={} expected_pin_checked={}",
+        key_bytes.len(),
+        key_bytes.len() / RELEASE_KEY_BYTES,
+        key_bytes.len() % RELEASE_KEY_BYTES,
+        options.keys_sha256.is_some()
+    );
     let (mut resident, pairing) = mounted(port, options.population)?;
     let mut crib = ObservedCrib::new(0);
-    let mut keys = KeyStream::new(read(keys)?, RELEASE_KEY_BYTES)?;
+    let mut keys = KeyStream::new(key_bytes, RELEASE_KEY_BYTES)?;
     let frames = match checked_frames {
         Some(frames) => frames,
         None => sections_of(Some(&options.learn), options.count)?,
     };
     println!("{}", header_line(&resident)?);
-    let mut longest = ReleaseHistory::default();
-    let mut published_total = 0usize;
-    for (index, input) in frames.iter().enumerate() {
-        let started = Instant::now();
-        let result = section(
-            port,
-            &mut resident,
-            &mut crib,
-            &pairing,
-            input,
-            index,
-            &mut longest,
-            &mut keys,
-            &mut published_total,
-            &mut |line| println!("{line}"),
-        );
-        if let Err(error) = result {
-            if let Some(HnnError::Horizon {
-                population,
-                source_operand_bound,
-            }) = error.downcast_ref::<HnnError>()
-            {
-                println!(
-                    "observed_stop section={index} refusal=horizon population={population} source_operand_bound={source_operand_bound}"
-                );
-                return Ok(());
-            }
-            return Err(error);
-        }
-        println!(
-            "observed_balance section={index} published_events_total={published_total} balance={:?}",
-            resident.ledger().balance()
-        );
-        let (moment, _) = resident
-            .continuing()
-            .ok_or("continuing moment disappeared")?;
-        println!(
-            "observed_section section={index} delivered={} elapsed_ns={}",
-            resident
-                .moment(&moment)
-                .ok_or("continuing moment disappeared")?
-                .cells(),
-            elapsed(started)
-        );
-    }
-    Ok(())
+    stage1::run(
+        port,
+        execution,
+        &mut resident,
+        &mut crib,
+        &pairing,
+        &frames,
+        &options,
+        &mut keys,
+        &mut |line| println!("{line}"),
+    )
 }
 
 #[path = "continuing/diagnostic.rs"]
 mod diagnostic;
+#[path = "continuing/face_readings.rs"]
+mod face_readings;
+#[path = "continuing/mutual.rs"]
+mod mutual;
+#[path = "continuing/stage1.rs"]
+mod stage1;
+#[path = "continuing/work.rs"]
+mod work;
 
 #[cfg(test)]
 mod tests {
@@ -1284,6 +1434,43 @@ mod tests {
     }
 
     #[test]
+    fn evaluation_cli_requires_manifest_and_excludes_probe_and_diagnostic() {
+        for extra in [
+            vec!["--evaluation-from-section", "1"],
+            vec!["--chart-manifest", "m", "--evaluation-from-section", "0"],
+            vec![
+                "--chart-manifest",
+                "m",
+                "--evaluation-from-section",
+                "1",
+                "--stage1-probe-cells",
+                "1",
+            ],
+            vec![
+                "--chart-manifest",
+                "m",
+                "--evaluation-from-section",
+                "1",
+                "--diagnostic-step0",
+            ],
+        ] {
+            let mut supplied = vec!["--population", "65536"];
+            supplied.extend(extra);
+            assert!(parse(&args(&supplied)).is_err());
+        }
+        let options = parse(&args(&[
+            "--population",
+            "65536",
+            "--chart-manifest",
+            "m",
+            "--evaluation-from-section",
+            "30",
+        ]))
+        .unwrap();
+        assert_eq!(options.evaluation_from_section, Some(30));
+    }
+
+    #[test]
     fn diagnostic_only_cli_options_require_explicit_diagnostic_mode() {
         let upper = [
             "--learn",
@@ -1377,6 +1564,118 @@ mod tests {
     }
     fn keys() -> KeyStream {
         KeyStream::new(vec![0; 1 << 16], RELEASE_KEY_BYTES).unwrap()
+    }
+
+    #[test]
+    fn face_diagnosis_is_explicit_and_does_not_change_the_life_plan() {
+        let base = args(&["--population", "65536"]);
+        let plain = parse(&base).unwrap();
+        assert!(!plain.diagnostic_release_faces);
+        let mut traced = base;
+        traced.push("--diagnostic-release-faces".to_owned());
+        let traced = parse(&traced).unwrap();
+        assert!(traced.diagnostic_release_faces);
+        assert_eq!(traced.count, plain.count);
+        assert_eq!(
+            traced.evaluation_from_section,
+            plain.evaluation_from_section
+        );
+        assert_eq!(traced.population, plain.population);
+        assert_eq!(traced.keys, plain.keys);
+        assert_eq!(traced.work_deadline_ns, plain.work_deadline_ns);
+    }
+
+    #[test]
+    fn face_diagnosis_preserves_native_draw_stop_keys_and_trunk() {
+        let port = Reference::new(4, BUDGET);
+        let (mut resident, pairing) = mounted(&port, 65536).unwrap();
+        let mut crib = ObservedCrib::new(0);
+        for class in [0, 1, 2, 3] {
+            port.observe_cell_continuing(
+                &mut resident,
+                &mut crib,
+                &pairing,
+                class,
+                None,
+                |_, _, _, _, _| (),
+            )
+            .unwrap();
+        }
+        let constitution = resident.constitution().clone();
+        let current = resident.current().clone();
+        let mut plain_keys = keys();
+        let mut traced_keys = keys();
+        let mut decisions = Vec::new();
+        let plain = release_fork_accounted(
+            &port,
+            resident.clone(),
+            crib.clone(),
+            &pairing,
+            4,
+            &mut plain_keys,
+            0,
+            None,
+            false,
+            None,
+            &mut |_| (),
+        )
+        .unwrap();
+        let traced = release_fork_accounted(
+            &port,
+            resident.clone(),
+            crib.clone(),
+            &pairing,
+            4,
+            &mut traced_keys,
+            0,
+            None,
+            false,
+            Some(&mut decisions),
+            &mut |_| (),
+        )
+        .unwrap();
+        assert_eq!(traced, plain);
+        assert_eq!(traced_keys.keys_read(), plain_keys.keys_read());
+        assert!(!decisions.is_empty());
+        for decision in &decisions {
+            assert_eq!(
+                decision.face,
+                decision
+                    .scored_face
+                    .as_ref()
+                    .unwrap()
+                    .masses_at(decision.bits)
+                    .unwrap()
+            );
+        }
+        let key_count = traced_keys.keys_read();
+        for target in [
+            b"A".as_slice(),
+            b"an entirely different exterior truth".as_slice(),
+        ] {
+            let mut lines = Vec::new();
+            face_readings::report(
+                0,
+                4,
+                &sections::closed_cells(target),
+                &traced,
+                &decisions,
+                &[],
+                false,
+                (0, 4, 0),
+                &mut |line| lines.push(line),
+            )
+            .unwrap();
+            assert!(lines[0].contains("reference_was_heard=false"));
+            assert!(
+                lines
+                    .iter()
+                    .any(|line| line.starts_with("observed_release_face "))
+            );
+        }
+        assert_eq!(traced_keys.keys_read(), key_count);
+        assert_eq!(resident.constitution(), &constitution);
+        assert_eq!(resident.current(), &current);
     }
     fn one() -> Section {
         Section {
@@ -1519,6 +1818,7 @@ mod tests {
             key: None,
             bits: 0,
             face: vec![ExactInterval::point(mass); CLASSES],
+            scored_face: None,
         };
         let uniform = drawn_code(&face(rat(1, 32)), 1).unwrap();
         assert!(matches!(
@@ -1781,7 +2081,8 @@ mod tests {
             parsed.receiver_ingress_ticks()
         );
         let saved = resident.continuing_state(0).unwrap();
-        assert_eq!(saved.receiver_ingress_ticks(), None);
+        // A fresh observed resident now owns its known zero ingress before the first crossing.
+        assert_eq!(saved.receiver_ingress_ticks(), Some((2, 0)));
         assert!(saved.clone().with_receiver_ingress_ticks(3, 0).is_err());
         let carried = saved.with_receiver_ingress_ticks(2, 17).unwrap();
         assert_eq!(

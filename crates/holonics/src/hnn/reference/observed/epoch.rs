@@ -1,0 +1,2057 @@
+//! The aperture-one observed passage at one fixed physical medium.
+//!
+//! A source section is an exterior cut, never a deposit boundary. Requested prefix snapshots
+//! fork the fixed medium and actual prefix motion/tree; only the actual receiving tick closes
+//! ordinary absorption. The explicit terminal partial is R12 lines 209–210's last 56 cells;
+//! it reports no section tick and seals the result against ordinary continuation.
+
+use super::*;
+use crate::hnn::constitution::epoch::{EpochReceivingRecord, partition_exponent};
+use crate::hnn::reference::epoch::EpochForward;
+use rayon::prelude::*;
+
+/// Exterior prequential readings, in heard-cell order. The first-law resident keeps only its
+/// final arrived occurrence; this complete code series is separate exterior evidence.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ObservedEpochCellReceipt {
+    pub prediction: Faces,
+    pub combined: Faces,
+    pub code: ExactInterval,
+    pub tree: Option<ExactInterval>,
+    /// The actual pre-reception scored face, beside its code of the heard target.
+    pub scored_face: crate::hnn::receiving::cells::ScoredFaceReading,
+    /// The magnitude mass released by the single receiving-face partition, per class.
+    pub released: Vec<Rat>,
+    /// Actual kept-word chart decisions, returned as exterior evidence and never retained.
+    pub word_charts: Vec<crate::hnn::chart::ChartReading>,
+}
+
+/// Actual elapsed batch intervals. Parallel return workers are timed by their joined outer
+/// interval; their individual elapsed times are never summed into a claimed critical path.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ObservedEpochWallTimes {
+    pub forward_batch: Duration,
+    /// Includes the tree's prequential face schedule, score and exact return/compose staging.
+    pub compare_return_compose_batch: Duration,
+    pub grouped_deposit: Duration,
+    pub final_arrived_reread: Duration,
+    pub precision_close: Duration,
+    /// Only explicitly requested prefix forks, including their own joint close when reached.
+    pub prefix_forks: Duration,
+    /// Joined wall windows, not a sum of individual return-worker durations.
+    pub compare_preparation: Duration,
+    pub return_join: Duration,
+    pub ordered_publication: Duration,
+    /// Face partition, pullback, compose, receiving-record staging. Worker elapsed sums
+    /// are workload evidence only and must never be added as a critical-path duration.
+    pub return_worker_sums: [Duration; 4],
+    /// Disjoint intervals observed outside the numerical deposition owner.
+    pub deposit_subphases: Vec<(String, Duration)>,
+}
+
+#[derive(Debug)]
+pub struct ObservedEpochReceipt {
+    pub consumed: usize,
+    pub cells: u64,
+    pub comparison_commit: u64,
+    pub partition_exponent: u32,
+    pub closed_section: bool,
+    pub terminal_partial: bool,
+    pub carry_out: bool,
+    pub reads: Vec<ObservedEpochCellReceipt>,
+    pub deposit: DepositReading,
+    pub precision: ObservedPrecisionReceipt,
+    pub close: Option<ClosedLocated>,
+    /// Only requested cuts. A cut equal to consumed still precedes the closing deposit.
+    pub prefixes: Vec<(usize, Resident, ObservedCrib)>,
+    pub wall: ObservedEpochWallTimes,
+}
+
+struct ComparedRead {
+    ratio: PendingRatio,
+    opening: WordOpening,
+    prediction: Faces,
+    combined: Faces,
+    released: Vec<Rat>,
+    deposit: Deposit,
+    receiving_parts: Vec<EpochReceivingRecord>,
+    word_charts: Vec<crate::hnn::chart::ChartReading>,
+    worker_times: [Duration; 4],
+}
+
+fn refusal(reason: &'static str) -> HnnError {
+    HnnError::Unadmitted { reason }
+}
+
+/// The certificate reads the actual normalized face. The retained RHS has a separately
+/// partitioned foil, so its even-row sum alone cannot reconstruct those masses.
+fn with_receiving_masses(
+    deposit: Deposit,
+    receiver: usize,
+    masses: &[Rat],
+) -> Result<Deposit, HnnError> {
+    let mut linear = deposit.linear().to_vec();
+    for step in &mut linear {
+        if step.locus == LinearLocus::Receiving(receiver) {
+            for sample in &mut step.samples {
+                sample.masses = Some(masses.to_vec());
+            }
+        }
+    }
+    let reach = deposit.reach().cloned().ok_or(HnnError::MissingReach)?;
+    Deposit::new(
+        deposit.commit(),
+        linear,
+        deposit.factors().to_vec(),
+        deposit.loci(),
+    )
+    .with_reach(reach)
+    .with_landmarks(deposit.landmarks().to_vec())
+    .with_landmark_observations(
+        deposit
+            .landmark_partition()
+            .zip(deposit.landmark_observations().map(|paths| paths.to_vec())),
+    )
+    .map(|deposit_with_masses| deposit_with_masses.with_receiving(deposit.receiving().to_vec()))
+}
+
+impl Reference {
+    /// Receive through the next actual receiving section. A short exterior section must be
+    /// joined to later heard data before this call; it cannot force a physical crossing.
+    pub fn observe_epoch_continuing(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        classes: &[usize],
+        placement: Option<&OccurrencePlacement>,
+    ) -> Result<ObservedEpochReceipt, HnnError> {
+        self.observe_epoch_continuing_at_cuts(
+            resident,
+            crib,
+            pairing,
+            classes,
+            placement,
+            &[],
+            false,
+        )
+    }
+
+    /// Execute one actual clock-bounded batch and requested section forks transactionally.
+    /// `terminal` authorizes only the selected finite life's final partial interval, never a
+    /// source-section flush. Such a result is sealed and cannot be resumed as an ordinary epoch.
+    pub fn observe_epoch_continuing_at_cuts(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        classes: &[usize],
+        placement: Option<&OccurrencePlacement>,
+        cuts: &[usize],
+        terminal: bool,
+    ) -> Result<ObservedEpochReceipt, HnnError> {
+        self.observe_epoch_continuing_for(
+            resident,
+            crib,
+            pairing,
+            classes,
+            placement,
+            cuts,
+            terminal,
+            ReturnConsumer::Epoch,
+        )
+    }
+
+    /// Execute the same native observed law with an explicitly selected word/flow
+    /// realization. A refusal at any phase leaves both resident and crib unchanged.
+    /// Source scan, face partition and certification remain owned by this shared
+    /// host owner; this entry point alone claims no fully resident life.
+    #[allow(clippy::too_many_arguments)]
+    pub fn observe_epoch_continuing_at_cuts_with_execution(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        classes: &[usize],
+        placement: Option<&OccurrencePlacement>,
+        cuts: &[usize],
+        terminal: bool,
+        execution: &dyn ObservedEpochExecution,
+    ) -> Result<ObservedEpochReceipt, HnnError> {
+        self.observe_epoch_continuing_for_execution(
+            resident,
+            crib,
+            pairing,
+            classes,
+            placement,
+            cuts,
+            terminal,
+            ReturnConsumer::Epoch,
+            execution,
+            true,
+        )
+    }
+
+    // The ordinary composition is retained as the exact control for the contribution-only
+    // consumer. Both routes publish through the same grouped deposition law.
+    #[allow(clippy::too_many_arguments)]
+    fn observe_epoch_continuing_for(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        classes: &[usize],
+        placement: Option<&OccurrencePlacement>,
+        cuts: &[usize],
+        terminal: bool,
+        consumer: ReturnConsumer,
+    ) -> Result<ObservedEpochReceipt, HnnError> {
+        self.observe_epoch_continuing_for_execution(
+            resident,
+            crib,
+            pairing,
+            classes,
+            placement,
+            cuts,
+            terminal,
+            consumer,
+            &HostObservedEpochExecution,
+            false,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn observe_epoch_continuing_for_execution(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        classes: &[usize],
+        placement: Option<&OccurrencePlacement>,
+        cuts: &[usize],
+        terminal: bool,
+        consumer: ReturnConsumer,
+        execution: &dyn ObservedEpochExecution,
+        selected_forward: bool,
+    ) -> Result<ObservedEpochReceipt, HnnError> {
+        let forward_start = Instant::now();
+        if classes.is_empty() {
+            return Err(refusal("an observed epoch needs at least one heard cell"));
+        }
+        if resident.observed_epoch_terminal {
+            return Err(refusal(
+                "a terminal partial epoch cannot continue as an ordinary observed life",
+            ));
+        }
+        if self.refining {
+            return Err(refusal(
+                "contact-grain scheduling is not wired for observed epoch continuation",
+            ));
+        }
+        if !resident.pending.is_empty() || !resident.staged.is_empty() {
+            return Err(refusal(
+                "an observed epoch requires consumed comparison handles",
+            ));
+        }
+        if cuts.iter().any(|&cut| cut == 0 || cut > classes.len()) {
+            return Err(refusal(
+                "an observed prefix cut belongs to the submitted heard passage",
+            ));
+        }
+        let first_placement = placement.map(|placed| placed.part(0..1)).transpose()?;
+        let (boundary, _) = admit_observed_cell(
+            resident,
+            crib,
+            pairing,
+            classes[0],
+            first_placement.as_ref(),
+        )?;
+        let phases = match resident.admitted.as_slice() {
+            [phases] if phases.aperture() == 1 => phases.clone(),
+            _ => {
+                return Err(refusal(
+                    "observed epochs require one unambiguous aperture-one receiver",
+                ));
+            }
+        };
+        let receiver = phases.ring();
+        let field = resident.field.clone();
+        let encoded = match placement {
+            Some(placed) => boundary.encode_placed(classes, placed)?,
+            None => boundary.encode(classes)?,
+        };
+        field.admit(&encoded)?;
+        encoded.check_observed_material(&resident.constitution)?;
+        let mut clock = resident.current.clone();
+        let mut consumed = 0;
+        let mut closed_section = false;
+        let mut carry_out = false;
+        for at in 0..encoded.len() {
+            let step = clock.step(&field, &encoded, at)?;
+            consumed = at + 1;
+            closed_section = step
+                .ticks
+                .get(receiver)
+                .copied()
+                .ok_or(HnnError::RingOutside {
+                    ring: receiver,
+                    rings: step.ticks.len(),
+                })?
+                != 0;
+            carry_out = step.carry_out;
+            if closed_section || carry_out {
+                break;
+            }
+        }
+        let terminal_partial = !closed_section && !carry_out;
+        if terminal_partial && !terminal {
+            return Err(refusal(
+                "an exterior section ended before the actual receiving tick; join its next heard cells",
+            ));
+        }
+        let actual = encoded.part(0..consumed)?;
+        field.capacity_for(&actual)?;
+        let heard = u64::try_from(consumed).map_err(|_| HnnError::CountOverflow)?;
+        let received = resident
+            .moments
+            .values()
+            .next()
+            .map_or(0, SourceMoment::cells);
+        if received.checked_add(heard).ok_or(HnnError::CountOverflow)? > field.population() {
+            return Err(refusal(
+                "the observed epoch exceeds the declared source horizon",
+            ));
+        }
+        let mut next = resident.clone();
+        let mut next_crib = crib.clone();
+        let epoch_index = match next.observed_epoch_ingress {
+            Some((ring, count)) if ring == receiver => count,
+            Some(_) => {
+                return Err(refusal(
+                    "the observed epoch ingress belongs to this receiving ring",
+                ));
+            }
+            None if received == 0 => {
+                next.observed_epoch_ingress = Some((receiver, 0));
+                0
+            }
+            None => {
+                return Err(refusal(
+                    "a continued observed epoch needs its saved actual receiving ingress",
+                ));
+            }
+        };
+        let moment = match next.moments.keys().next().copied() {
+            Some(moment) => moment,
+            None => self.ingest(&mut next, None, &boundary.encode(&[])?)?.0,
+        };
+        let requested: Vec<_> = cuts
+            .iter()
+            .copied()
+            .filter(|&cut| cut <= consumed)
+            .collect();
+        let forward = if selected_forward {
+            self.read_epoch_at_cuts_with_execution(
+                &next, &moment, &phases, &actual, &requested, execution,
+            )?
+        } else {
+            self.read_epoch_at_cuts(&next, &moment, &phases, &actual, &requested)?
+        };
+        let forward_batch = forward_start.elapsed();
+        let compare_start = Instant::now();
+        let mut prefix_forks = Duration::ZERO;
+        if forward.consumed != consumed
+            || forward.carry_out != carry_out
+            || forward.current != clock
+        {
+            return Err(refusal(
+                "the epoch source scan and actual receiving clock must consume the same prefix",
+            ));
+        }
+        // The tolerance's denominator and its binary exponent are distinct readings.
+        let receiver_grain = crate::hnn::field::lattice_exponent(u128::from(phases.grain()), 1);
+        let exponent = partition_exponent(receiver_grain, heard, epoch_index)?;
+        let comparison_commit = forward.commit;
+        let EpochForward {
+            reads: forwards,
+            mut prefixes,
+            current,
+            source,
+            address,
+            carried,
+            charts,
+            wall: forward_wall,
+            tally: forward_tally,
+            ..
+        } = forward;
+        next.wall = forward_wall;
+        next.tally = forward_tally;
+        let observed: Option<Vec<_>> = if phases.observation_partition().is_some() {
+            Some(
+                forwards
+                    .iter()
+                    .map(|read| {
+                        let mut addresses =
+                            read.ratio.observed_addresses(&[])?.ok_or_else(|| {
+                                refusal("an observed tree needs its own realized observation")
+                            })?;
+                        if addresses.len() != 1 {
+                            return Err(refusal(
+                                "one observed tree address belongs to each heard cell",
+                            ));
+                        }
+                        Ok(addresses.remove(0))
+                    })
+                    .collect::<Result<_, HnnError>>()?,
+            )
+        } else {
+            None
+        };
+        let addresses: Vec<_> = forwards
+            .iter()
+            .map(|read| {
+                let mut addresses = read.ratio.addresses(&[])?;
+                if addresses.len() != 1 {
+                    return Err(refusal(
+                        "one causal tree address belongs to each heard cell",
+                    ));
+                }
+                Ok(addresses.remove(0))
+            })
+            .collect::<Result<_, HnnError>>()?;
+        let opening_tree = next
+            .constitution
+            .landmarks(receiver)
+            .ok_or(HnnError::MissingReceivingMap { ring: receiver })?
+            .clone();
+        let mut tree = opening_tree.clone();
+        let trees = match &observed {
+            Some(addresses) => {
+                tree.receive_observed_arrivals(addresses, &classes[..consumed], phases.grain())?
+            }
+            None => tree.receive_arrivals(&addresses, &classes[..consumed], phases.grain())?,
+        };
+        let combined: Vec<_> = forwards
+            .iter()
+            .zip(&trees)
+            .map(|(read, tree)| phases.combine(&read.faces, std::slice::from_ref(tree)))
+            .collect::<Result<_, _>>()?;
+        let all_combined = Faces {
+            faces: combined
+                .iter()
+                .flat_map(|faces| faces.faces.iter().cloned())
+                .collect(),
+            logits: combined
+                .iter()
+                .flat_map(|faces| faces.logits.iter().cloned())
+                .collect(),
+        };
+        let population = next
+            .constitution
+            .population(receiver)
+            .ok_or(HnnError::MissingReceivingMap { ring: receiver })?;
+        let scored = crate::hnn::receiving::score(
+            population,
+            receiver,
+            &all_combined,
+            &trees,
+            &classes[..consumed],
+        )?;
+        let mut deposits = Vec::with_capacity(consumed);
+        let mut receiving_parts = Vec::with_capacity(consumed);
+        let mut source_operands = Vec::with_capacity(consumed);
+        let mut readings = Vec::with_capacity(consumed);
+        let mut snapshots = Vec::with_capacity(requested.len());
+        let physical = &next.constitution;
+        let map = physical
+            .receiving_map(receiver)
+            .ok_or(HnnError::MissingReceivingMap { ring: receiver })?;
+        // Each return stops at its own opening. Its face partition and native transpose therefore
+        // read only the fixed medium and its own kept word; ordered publication follows the join.
+        let compare_preparation = compare_start.elapsed();
+        let joined_start = Instant::now();
+        let compared: Vec<ComparedRead> = forwards
+            .into_par_iter()
+            .zip(combined.into_par_iter())
+            .enumerate()
+            .map(|(at, (read, combined))| {
+                let face_start = Instant::now();
+                let target = actual.part(at..at + 1)?;
+                let anchors = target_phases(&field, read.ratio.anchor(), receiver, &target)?;
+                let holon = HolonRatio::compare(combined.clone(), &[classes[at]], &anchors)?;
+                let (covector, released) = holon.epoch_covector(exponent)?;
+                let masses = holon.faces().faces[0].odometer_masses()?;
+                // These three series are defined at the receiving comparison itself. There is
+                // one retained RHS upstream; no return is split or partitioned a second time.
+                let descent = covector.descent(0);
+                let mut positive = vec![Rat::zero(); descent.len()];
+                let mut foil = vec![Rat::zero(); descent.len()];
+                let mut phase = vec![Rat::zero(); descent.len()];
+                positive[2 * classes[at]] = Rat::one();
+                for row in 0..descent.len() {
+                    if row % 2 == 0 { foil[row] = &positive[row] - &descent[row]; }
+                    else { phase[row] = descent[row].clone(); }
+                }
+                let word_charts = read.word.charts();
+                let face_partition_wall = face_start.elapsed();
+                let pull_back_start = Instant::now();
+                let back = read.word.return_at(&field, execution, &covector, map, &phases)?;
+                let pull_back_wall = pull_back_start.elapsed();
+                let compose_start = Instant::now();
+                let deposit = match consumer {
+                    ReturnConsumer::Epoch => compose_epoch_contribution(
+                        &field, physical, &read.ratio, &read.opening, &back,
+                        &[classes[at]], &scored.steps[at..at + 1],
+                    )?,
+                    ReturnConsumer::Word => compose(
+                        &field, physical, &read.ratio, &read.opening, &back,
+                        &[classes[at]], &scored.steps[at..at + 1],
+                    )?.1,
+                };
+                let compose_wall = compose_start.elapsed();
+                let records_start = Instant::now();
+                let deposit = with_receiving_masses(deposit, receiver, &masses)?;
+                if deposit.commit() != comparison_commit {
+                    return Err(refusal(
+                        "every observed epoch return belongs to its one producing material",
+                    ));
+                }
+                let receiving_parts = deposit.linear().iter()
+                    .filter(|step| step.locus == LinearLocus::Receiving(receiver))
+                    .flat_map(|step| &step.samples)
+                    .map(|sample| {
+                        if sample.covector != descent {
+                            return Err(refusal("the receiving series and native return share the same retained covector"));
+                        }
+                        Ok(EpochReceivingRecord {
+                            feature: sample.feature.clone(), positive: positive.clone(),
+                            foil: foil.clone(), phase: phase.clone(),
+                        })
+                    }).collect::<Result<_, HnnError>>()?;
+                Ok(ComparedRead {
+                    ratio: read.ratio,
+                    opening: read.opening,
+                    prediction: read.faces,
+                    combined,
+                    released: released.into_iter().next().ok_or_else(|| {
+                        refusal("one released magnitude row belongs to the aperture-one comparison")
+                    })?,
+                    deposit,
+                    receiving_parts,
+                    worker_times: [face_partition_wall, pull_back_wall, compose_wall, records_start.elapsed()],
+                    word_charts,
+                })
+            })
+            .collect::<Result<_, HnnError>>()?;
+        let return_join = joined_start.elapsed();
+        let mut return_worker_sums = [Duration::ZERO; 4];
+        for read in &compared {
+            for (sum, elapsed) in return_worker_sums.iter_mut().zip(read.worker_times) {
+                *sum += elapsed;
+            }
+        }
+        let ordered_start = Instant::now();
+        for (at, read) in compared.into_iter().enumerate() {
+            source_operands.push(read.ratio.moment().clone());
+            deposits.push(read.deposit);
+            receiving_parts.extend(read.receiving_parts);
+            next.ledger.arrive(scored.model[at].clone(), 1);
+            let before = read.ratio.current(&field)?;
+            let cell_placement = placement
+                .map(|placed| placed.part(at..at + 1))
+                .transpose()?;
+            next_crib.push(
+                &field,
+                &before,
+                classes[at],
+                cell_placement.as_ref(),
+                field.crib().window,
+            )?;
+            let arrived = Arrived {
+                ratio: read.ratio,
+                targets: vec![classes[at]],
+                opening: read.opening,
+            };
+            next.arrived = Some(arrived.clone());
+            if let Some(mut prefix) = prefixes.remove(&(at + 1)) {
+                let prefix_start = Instant::now();
+                let mut prefix_tree = opening_tree.clone();
+                match &observed {
+                    Some(addresses) => {
+                        prefix_tree.receive_observed_arrivals(
+                            &addresses[..at + 1],
+                            &classes[..at + 1],
+                            phases.grain(),
+                        )?;
+                    }
+                    None => {
+                        prefix_tree.receive_arrivals(
+                            &addresses[..at + 1],
+                            &classes[..at + 1],
+                            phases.grain(),
+                        )?;
+                    }
+                }
+                prefix.constitution = next.constitution.observed_epoch_prefix(
+                    receiver,
+                    prefix_tree,
+                    &scored.steps[..at + 1],
+                )?;
+                if let Some(founding) = &mut prefix.founding {
+                    for &class in &classes[..at + 1] {
+                        founding.receive(class)?;
+                    }
+                }
+                prefix.ledger = next.ledger.clone();
+                prefix.arrived = Some(arrived);
+                prefix.observed_epoch_ingress = Some((
+                    receiver,
+                    epoch_index
+                        .checked_add(
+                            u64::try_from(
+                                &prefix.current.lift()[receiver]
+                                    - &resident.current.lift()[receiver],
+                            )
+                            .map_err(|_| HnnError::CountOverflow)?,
+                        )
+                        .ok_or(HnnError::CountOverflow)?,
+                ));
+                let mut prefix_crib = next_crib.clone();
+                if prefix.aeon.awaiting {
+                    // A fork at the joint carry closes its own old-medium passage before any
+                    // draw. It receives none of the life's staged covectors or closing deposit.
+                    let boundary = PairedObservation::admit(&field, &prefix.constitution, pairing)?;
+                    let closing = prefix_crib.closing(&field, &boundary, field.crib().window)?;
+                    let family = prefix.admitted.clone();
+                    close_and_locate(self, &mut prefix, &family, &closing)?;
+                    prefix_crib.reopen();
+                }
+                snapshots.push((at + 1, prefix, prefix_crib));
+                prefix_forks += prefix_start.elapsed();
+            }
+            readings.push(ObservedEpochCellReceipt {
+                prediction: read.prediction,
+                combined: read.combined,
+                code: scored.model[at].clone(),
+                tree: Some(scored.tree[at].clone()),
+                scored_face: scored.face_readings[at].clone(),
+                released: read.released,
+                word_charts: read.word_charts,
+            });
+        }
+        let ordered_publication = ordered_start.elapsed().saturating_sub(prefix_forks);
+        let ticks: Vec<u64> = current
+            .lift()
+            .iter()
+            .zip(resident.current.lift())
+            .map(|(after, before)| {
+                u64::try_from(after - before).map_err(|_| HnnError::CountOverflow)
+            })
+            .collect::<Result<_, _>>()?;
+        next.current = current;
+        next.moments.insert(moment, source);
+        next.address = address;
+        next.carried = carried;
+        next.carried_error = None;
+        next.charts = charts;
+        next.aeon.cells = next
+            .aeon
+            .cells
+            .checked_add(heard)
+            .ok_or(HnnError::CountOverflow)?;
+        next.aeon.keys_admitted = false;
+        next.aeon.awaiting = carry_out;
+        next.observed_epoch_ingress = Some((
+            receiver,
+            epoch_index
+                .checked_add(ticks[receiver])
+                .ok_or(HnnError::CountOverflow)?,
+        ));
+        next.observed_epoch_terminal = terminal_partial;
+        if let Some(founding) = &mut next.founding {
+            for &class in &classes[..consumed] {
+                founding.receive(class)?;
+            }
+        }
+        let retention = next.retention();
+        let pair_speed = |ring: usize,
+                          offset: usize,
+                          pair: &crate::hnn::moment::PairPort,
+                          direction: [&[Vec<Rat>]; 3]| {
+            pair_ray_speed_sum(&field, &source_operands, ring, offset, pair, direction)
+        };
+        let compare_return_compose_batch = compare_start.elapsed().saturating_sub(prefix_forks);
+        let deposit_start = Instant::now();
+        let mut deposit_subphases = Vec::new();
+        let mut previous_phase = deposit_start;
+        let mut observe_deposit = |phase: crate::hnn::constitution::epoch::EpochDepositPhase| {
+            let now = Instant::now();
+            deposit_subphases.push((format!("{phase:?}"), now.duration_since(previous_phase)));
+            previous_phase = now;
+        };
+        let (material, deposit) = next.constitution.deposit_observed_epoch_with_execution(
+            &deposits,
+            receiver,
+            field.ring(receiver).period(),
+            heard,
+            heard,
+            epoch_index,
+            exponent,
+            &retention,
+            tree,
+            &pair_speed,
+            &receiving_parts,
+            &mut observe_deposit,
+            execution,
+        )?;
+        let grouped_deposit = deposit_start.elapsed();
+        next.wall.deposited += grouped_deposit;
+        let reread_start = Instant::now();
+        let arrived = next
+            .arrived
+            .as_ref()
+            .ok_or_else(|| refusal("an observed epoch keeps its final arrived occurrence"))?;
+        let (reread, chart_readings) = arrived.code_length(&field, &material, &mut next.charts)?;
+        let final_arrived_reread = reread_start.elapsed();
+        next.wall.reread += final_arrived_reread;
+        next.tally.read(&chart_readings);
+        next.ledger.deposit(reread)?;
+        next.constitution = material;
+        next.forget_kept_reads();
+        let precision_start = Instant::now();
+        let before_commit = next.constitution.commit();
+        let before_exponent = next
+            .constitution
+            .lattice(Locus::ReceivingMap(receiver))?
+            .exponent();
+        let balance_before = next.ledger.balance().clone();
+        let features: Vec<_> = deposits
+            .iter()
+            .flat_map(|deposit| deposit.linear())
+            .filter(|step| step.locus == LinearLocus::Receiving(receiver))
+            .flat_map(|step| step.samples.iter().map(|sample| sample.feature.clone()))
+            .collect();
+        let event =
+            next.constitution
+                .receiving_precision_event(receiver, &features, phases.tolerance())?;
+        if let Some(event) = &event {
+            next.publish_receiving_precision(event)?;
+        }
+        let precision = ObservedPrecisionReceipt {
+            checked: true,
+            features,
+            event,
+            before_commit,
+            after_commit: next.constitution.commit(),
+            before_exponent,
+            after_exponent: next
+                .constitution
+                .lattice(Locus::ReceivingMap(receiver))?
+                .exponent(),
+            balance_before,
+            balance_after: next.ledger.balance().clone(),
+        };
+        let close = if carry_out {
+            let boundary = PairedObservation::admit(&field, &next.constitution, pairing)?;
+            let closing = next_crib.closing(&field, &boundary, field.crib().window)?;
+            let family = next.admitted.clone();
+            let closed = close_and_locate(self, &mut next, &family, &closing)?;
+            next_crib.reopen();
+            Some(closed)
+        } else {
+            None
+        };
+        let precision_close = precision_start.elapsed();
+        let wall = ObservedEpochWallTimes {
+            forward_batch,
+            compare_return_compose_batch,
+            grouped_deposit,
+            final_arrived_reread,
+            precision_close,
+            prefix_forks,
+            compare_preparation,
+            return_join,
+            ordered_publication,
+            return_worker_sums,
+            deposit_subphases,
+        };
+        let cells = next
+            .moments
+            .get(&moment)
+            .ok_or_else(|| refusal("the observed moment remains open at the crossing"))?
+            .cells();
+        *resident = next;
+        *crib = next_crib;
+        Ok(ObservedEpochReceipt {
+            consumed,
+            cells,
+            comparison_commit,
+            partition_exponent: exponent,
+            closed_section,
+            terminal_partial,
+            carry_out,
+            reads: readings,
+            deposit,
+            precision,
+            close,
+            prefixes: snapshots,
+            wall,
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::hnn::paired::PairedCarrier;
+    use crate::hnn::tests::learning::chain_declaration;
+    use crate::ratio::rat;
+
+    fn opening() -> (Reference, Resident, ObservedCrib, PairingDeclaration) {
+        let mut declaration = chain_declaration(1 << 16);
+        declaration.receivers[0].aperture = 1;
+        declaration.rings[2] = declaration.rings[1].clone();
+        declaration.rings[2].lock.clear();
+        declaration.lattice.clear();
+        let field = Field::declare(declaration.by_lattice_rule()).unwrap();
+        let pairing = PairingDeclaration::Family {
+            table: vec![(0, 1), (1, 0), (2, 3), (3, 2)],
+        };
+        let free = ExactRatMatrix::shaped(
+            8,
+            4,
+            (0..8)
+                .map(|row| {
+                    (0..4)
+                        .map(|column| {
+                            if (row == 2 && column == 0) || (row == 3 && column == 2) {
+                                rat(1, 32)
+                            } else {
+                                Rat::zero()
+                            }
+                        })
+                        .collect()
+                })
+                .collect(),
+        )
+        .unwrap();
+        let source = PairedCarrier::complete_port(&field, 0, &pairing, &free).unwrap();
+        let carrier = PairedCarrier::admit(&field, 0, &pairing, &source).unwrap();
+        let material = Constitution::initial(&field, 1 << 40)
+            .unwrap()
+            .with_symmetric_source(0, source, carrier.symmetry())
+            .unwrap();
+        let reference = Reference::new(16, 1 << 40);
+        let resident = reference
+            .mount_with(&field, &Current::at_rest(&field), material)
+            .unwrap();
+        (reference, resident, ObservedCrib::new(0), pairing)
+    }
+
+    fn series_values(series: &crate::hnn::constitution::EpochSeriesReading) -> Vec<Rat> {
+        series
+            .numerators
+            .iter()
+            .enumerate()
+            .map(|(index, value)| {
+                Rat::new(
+                    value.clone(),
+                    BigInt::from(series.row_odd_divisors[index / series.columns])
+                        << series.exponent as usize,
+                )
+            })
+            .collect()
+    }
+
+    /// Compare the complete staged value, restoring only the speed slot whose consumer
+    /// explicitly overwrites it before preparation. This includes all metadata and samples.
+    fn assert_epoch_contribution_matches_word(
+        field: &Field,
+        material: &Constitution,
+        ratio: &PendingRatio,
+        opening: &WordOpening,
+        back: &WordReturn,
+        targets: &[usize],
+        steps: &[ReceivingStep],
+    ) {
+        let (pullback, ordinary) =
+            compose(field, material, ratio, opening, back, targets, steps).unwrap();
+        let complete = compose_return_view(
+            field,
+            material,
+            &Diamond::opened(field, ratio.phases(), &opening.support(field)),
+            ratio.anchor(),
+            &ratio.current(field).unwrap(),
+            ratio.moment(),
+            back,
+            ratio.view(),
+        )
+        .unwrap();
+        assert_eq!(complete.pullback, pullback);
+        assert_eq!(pullback.rings.len(), field.rings().len());
+        assert_eq!(pullback.contacts.len(), field.contacts().len());
+        let staged =
+            compose_epoch_contribution(field, material, ratio, opening, back, targets, steps)
+                .unwrap();
+        assert_eq!(staged.factors().len(), ordinary.factors().len());
+        let mut factors = staged.factors().to_vec();
+        let mut pairs = 0;
+        for (staged, full) in factors.iter_mut().zip(ordinary.factors()) {
+            if let FactorGradient::PairPort { speed, .. } = &mut staged.gradient {
+                assert_eq!(*speed, [Rat::zero(), Rat::zero()]);
+                let FactorGradient::PairPort {
+                    ring,
+                    offset,
+                    outputs,
+                    current,
+                    earlier,
+                    speed: full_speed,
+                } = &full.gradient
+                else {
+                    panic!("the pair direction remains in its ordinary order");
+                };
+                assert_eq!(
+                    *full_speed,
+                    pair_ray_speed(
+                        field,
+                        ratio.moment(),
+                        *ring,
+                        *offset,
+                        material.pair_port(*ring, *offset).unwrap(),
+                        [outputs, current, earlier],
+                    )
+                    .unwrap()
+                );
+                *speed = full_speed.clone();
+                pairs += 1;
+            }
+            assert_eq!(staged, full);
+        }
+        assert!(pairs > 0, "the control reaches a pair contribution");
+        let restored = Deposit::new(
+            staged.commit(),
+            staged.linear().to_vec(),
+            factors,
+            staged.loci(),
+        )
+        .with_reach(staged.reach().unwrap().clone())
+        .with_landmarks(staged.landmarks().to_vec())
+        .with_landmark_observations(
+            staged
+                .landmark_partition()
+                .zip(staged.landmark_observations().map(|paths| paths.to_vec())),
+        )
+        .unwrap()
+        .with_receiving(staged.receiving().to_vec());
+        assert_eq!(restored, ordinary);
+    }
+
+    #[test]
+    fn observed_epoch_reads_match_independent_carried_words_and_prequential_tree() {
+        let (reference, mut resident, mut crib, pairing) = opening();
+        let field = resident.field.clone();
+        let phases = resident.admitted[0].clone();
+        let boundary = PairedObservation::admit(&field, &resident.constitution, &pairing).unwrap();
+        let encoded = boundary.encode(&[0; 32]).unwrap();
+        let mut clock = resident.current.clone();
+        let mut cells = 0;
+        for at in 0..encoded.len() {
+            cells = at + 1;
+            if clock.step(&field, &encoded, at).unwrap().ticks[phases.ring()] != 0 {
+                break;
+            }
+        }
+        assert!(cells > 1);
+        let opening_material = resident.constitution.clone();
+        let mut sequential = resident.clone();
+        let (moment, _) = reference
+            .ingest(&mut sequential, None, &boundary.encode(&[]).unwrap())
+            .unwrap();
+        let mut tree = opening_material.landmarks(phases.ring()).unwrap().clone();
+        let mut population = opening_material.population(phases.ring()).unwrap().clone();
+        let mut expected = Vec::new();
+        let width = field.ring(phases.ring()).width();
+        let mut positive = vec![Rat::zero(); 2 * field.alphabet() * width];
+        let mut foil = positive.clone();
+        let mut phase = positive.clone();
+        let partition = partition_exponent(
+            crate::hnn::field::lattice_exponent(u128::from(phases.grain()), 1),
+            cells as u64,
+            0,
+        )
+        .unwrap();
+        let mut first_prefix = None;
+        for at in 0..cells {
+            let (pending, refined) = reference.refine(&mut sequential, &moment, &phases).unwrap();
+            let slot = sequential.pending.remove(&pending).unwrap();
+            let address = slot.ratio.addresses(&[]).unwrap().remove(0);
+            let face = tree.face(&address, phases.grain()).unwrap();
+            let wave = refined.forward.into_present().unwrap();
+            let combined = phases.combine(&wave, std::slice::from_ref(&face)).unwrap();
+            let target = encoded.part(at..at + 1).unwrap();
+            let anchors =
+                target_phases(&field, slot.ratio.anchor(), phases.ring(), &target).unwrap();
+            let holon = HolonRatio::compare(combined.clone(), &[0], &anchors).unwrap();
+            let whole = holon.covector().unwrap().descent(0);
+            let descent = holon.epoch_covector(partition).unwrap().0.descent(0);
+            let feature = slot
+                .kept
+                .as_ref()
+                .unwrap()
+                .word
+                .receiving_feature(phases.first_epoch(), phases.ring())
+                .unwrap();
+            assert!(feature.iter().all(|value| value.abs() <= Rat::one()));
+            for row in 0..descent.len() {
+                if row % 2 == 1 {
+                    assert_eq!(descent[row], whole[row]);
+                }
+                for (column, value) in feature.iter().enumerate() {
+                    let index = row * width + column;
+                    if row % 2 == 0 {
+                        let q = if row == 0 { Rat::one() } else { Rat::zero() };
+                        positive[index] += &q * value;
+                        foil[index] += (q - &descent[row]) * value;
+                    } else {
+                        phase[index] += &descent[row] * value;
+                    }
+                }
+            }
+            let scored =
+                crate::hnn::receiving::score(&population, phases.ring(), &combined, &[face], &[0])
+                    .unwrap();
+            let word = slot.kept.unwrap().word.resume(&field);
+            let back = word
+                .pull_back(
+                    &holon.epoch_covector(partition).unwrap().0,
+                    opening_material.receiving_map(phases.ring()).unwrap(),
+                    &phases,
+                )
+                .unwrap();
+            assert_epoch_contribution_matches_word(
+                &field,
+                &opening_material,
+                &slot.ratio,
+                &slot.opening,
+                &back,
+                &[0],
+                &scored.steps,
+            );
+            population.receive(&scored.steps[0].faces()).unwrap();
+            tree.deposit(&address, 0).unwrap();
+            reference
+                .ingest(
+                    &mut sequential,
+                    Some(&moment),
+                    &encoded.part(at..at + 1).unwrap(),
+                )
+                .unwrap();
+            expected.push((
+                wave,
+                combined,
+                scored.model[0].clone(),
+                scored.tree[0].clone(),
+            ));
+            if at == 0 {
+                first_prefix = Some((
+                    sequential.current.clone(),
+                    sequential.carried.clone(),
+                    sequential.address.clone(),
+                    tree.clone(),
+                ));
+            }
+        }
+        let receipt = reference
+            .observe_epoch_continuing_at_cuts(
+                &mut resident,
+                &mut crib,
+                &pairing,
+                &[0; 32],
+                None,
+                &[1],
+                false,
+            )
+            .unwrap();
+        assert_eq!(receipt.consumed, cells);
+        assert!(receipt.closed_section);
+        assert!(!receipt.terminal_partial);
+        assert_eq!(receipt.reads.len(), expected.len());
+        let grouped = receipt
+            .deposit
+            .epoch
+            .as_ref()
+            .expect("actual native epoch telemetry");
+        assert_eq!(grouped.heard_cells, cells as u64);
+        assert_eq!(grouped.partition_exponent, partition);
+        assert_eq!(series_values(&grouped.receiving.positive), positive);
+        assert_eq!(series_values(&grouped.receiving.foil), foil);
+        assert_eq!(series_values(&grouped.receiving.phase), phase);
+        assert!(positive.iter().any(|value| !value.is_zero()));
+        assert!(foil.iter().any(|value| !value.is_zero()));
+        assert!(
+            phase.iter().any(|value| !value.is_zero()),
+            "the odd-period target actually reaches phase rows"
+        );
+        assert!(
+            grouped
+                .receiving
+                .phase
+                .row_odd_divisors
+                .iter()
+                .enumerate()
+                .all(|(row, &divisor)| divisor == if row % 2 == 0 { 1 } else { 3 })
+        );
+        let receiving = grouped
+            .loci
+            .iter()
+            .find(|locus| locus.locus == LinearLocus::Receiving(phases.ring()))
+            .unwrap();
+        assert_eq!(receiving.records, cells as u64);
+        assert!(grouped.loci.iter().all(|locus| locus.fall >= Rat::zero()));
+        let unit = Rat::new(
+            BigInt::from(1),
+            BigInt::from(1) << receipt.partition_exponent as usize,
+        );
+        for (actual, (wave, combined, code, tree)) in receipt.reads.iter().zip(expected) {
+            assert_eq!(actual.prediction, wave);
+            assert_eq!(actual.combined, combined);
+            assert_eq!(actual.code, code);
+            assert_eq!(actual.tree, Some(tree));
+            assert!(
+                actual
+                    .released
+                    .iter()
+                    .all(|mass| *mass >= Rat::zero() && mass < &unit)
+            );
+        }
+        let (_, prefix, prefix_crib) = &receipt.prefixes[0];
+        let (current, carried, address, tree) = first_prefix.unwrap();
+        assert_eq!(prefix.current, current);
+        assert_eq!(prefix.carried, carried);
+        assert_eq!(prefix.address, address);
+        assert_eq!(
+            prefix.constitution.receiving_map(phases.ring()),
+            opening_material.receiving_map(phases.ring())
+        );
+        assert_eq!(prefix.constitution.landmarks(phases.ring()), Some(&tree));
+        assert_eq!(prefix_crib.next_position(), 1);
+        // The actual prefix constructor and release reread must expose the same complete
+        // scored-face operands as the next independently heard cell, not only its target code.
+        let mut drawing = prefix.clone();
+        let (draw_moment, _) = drawing.continuing().unwrap();
+        let draw_phases = drawing.admitted[0].clone();
+        let (pending, _) = reference
+            .refine(&mut drawing, &draw_moment, &draw_phases)
+            .unwrap();
+        let mut keys = crate::receiver::release::KeyStream::new(vec![0], 1).unwrap();
+        let sampled = reference
+            .release_cells(
+                &mut drawing,
+                &pending,
+                crate::hnn::receiving::cells::CellLaw::Draw(&mut keys),
+            )
+            .unwrap()
+            .forward
+            .into_present()
+            .unwrap();
+        let decision = &sampled.cells[0];
+        let heard_face = &receipt.reads[1].scored_face;
+        assert_eq!(decision.scored_face.as_ref(), Some(heard_face));
+        assert_eq!(decision.face, heard_face.masses_at(decision.bits).unwrap());
+        assert_eq!(keys.keys_read(), 1);
+        assert_eq!(resident.observed_epoch_ingress, Some((phases.ring(), 1)));
+        // The resident's first-law comparison remains the final cell; the exterior series above
+        // reports all cells and is never installed as a historical arrived operand.
+        assert_eq!(resident.arrived.as_ref().unwrap().targets, vec![0]);
+        assert_eq!(resident.ledger.balance().cells, cells as u64);
+        assert_eq!(resident.ledger.balance().depositions, 1);
+        assert_eq!(receipt.cells, cells as u64);
+    }
+
+    /// Independently stage one blind word and its native return, then invoke
+    /// exactly one grouped deposit with k equal to this partial's heard count.
+    fn one_cell_partial_deposit(
+        reference: &Reference,
+        resident: &Resident,
+        pairing: &PairingDeclaration,
+        class: usize,
+    ) -> (Constitution, DepositReading, Deposit) {
+        let field = &resident.field;
+        let phases = &resident.admitted[0];
+        let receiver = phases.ring();
+        let boundary = PairedObservation::admit(field, &resident.constitution, pairing).unwrap();
+        let mut staging = resident.clone();
+        let (moment, _) = reference
+            .ingest(&mut staging, None, &boundary.encode(&[]).unwrap())
+            .unwrap();
+        let (pending, refined) = reference.refine(&mut staging, &moment, phases).unwrap();
+        let slot = staging.pending.remove(&pending).unwrap();
+        let address = slot.ratio.addresses(&[]).unwrap().remove(0);
+        let mut tree = resident.constitution.landmarks(receiver).unwrap().clone();
+        let tree_face = tree.face(&address, phases.grain()).unwrap();
+        let wave = refined.forward.into_present().unwrap();
+        let combined = phases
+            .combine(&wave, std::slice::from_ref(&tree_face))
+            .unwrap();
+        let target = boundary.encode(&[class]).unwrap();
+        let anchors = target_phases(field, slot.ratio.anchor(), receiver, &target).unwrap();
+        let holon = HolonRatio::compare(combined.clone(), &[class], &anchors).unwrap();
+        let grain = crate::hnn::field::lattice_exponent(u128::from(phases.grain()), 1);
+        let exponent = partition_exponent(grain, 1, 0).unwrap();
+        let (covector, _) = holon.epoch_covector(exponent).unwrap();
+        let descent = covector.descent(0);
+        let scored = crate::hnn::receiving::score(
+            resident.constitution.population(receiver).unwrap(),
+            receiver,
+            &combined,
+            &[tree_face],
+            &[class],
+        )
+        .unwrap();
+        tree.deposit(&address, class).unwrap();
+        let word = slot.kept.unwrap().word.resume(field);
+        let back = word
+            .pull_back(
+                &covector,
+                resident.constitution.receiving_map(receiver).unwrap(),
+                phases,
+            )
+            .unwrap();
+        let (_, deposit) = compose(
+            field,
+            &resident.constitution,
+            &slot.ratio,
+            &slot.opening,
+            &back,
+            &[class],
+            &scored.steps,
+        )
+        .unwrap();
+        let deposit = with_receiving_masses(
+            deposit,
+            receiver,
+            &holon.faces().faces[0].odometer_masses().unwrap(),
+        )
+        .unwrap();
+        let mut positive = vec![Rat::zero(); descent.len()];
+        positive[2 * class] = Rat::one();
+        let mut foil = positive.clone();
+        let mut phase = vec![Rat::zero(); descent.len()];
+        for row in 0..descent.len() {
+            if row % 2 == 0 {
+                foil[row] -= &descent[row];
+            } else {
+                phase[row] = descent[row].clone();
+            }
+        }
+        let receiving: Vec<_> = deposit
+            .linear()
+            .iter()
+            .filter(|step| step.locus == LinearLocus::Receiving(receiver))
+            .flat_map(|step| &step.samples)
+            .map(|sample| EpochReceivingRecord {
+                feature: sample.feature.clone(),
+                positive: positive.clone(),
+                foil: foil.clone(),
+                phase: phase.clone(),
+            })
+            .collect();
+        let source = slot.ratio.moment();
+        let speed =
+            |ring, offset, pair: &crate::hnn::moment::PairPort, direction: [&[Vec<Rat>]; 3]| {
+                pair_ray_speed(field, source, ring, offset, pair, direction)
+            };
+        let (material, reading) = resident
+            .constitution
+            .deposit_observed_epoch(
+                std::slice::from_ref(&deposit),
+                receiver,
+                field.ring(receiver).period(),
+                1,
+                1,
+                0,
+                exponent,
+                &resident.retention(),
+                tree,
+                &speed,
+                &receiving,
+                &mut |_| {},
+            )
+            .unwrap();
+        (material, reading, deposit)
+    }
+
+    fn partial_conserves_each_normal_law(
+        before: &Constitution,
+        after: &Constitution,
+        reading: &DepositReading,
+        deposit: &Deposit,
+        receiver: usize,
+        period: u64,
+    ) {
+        use crate::hnn::constitution::epoch::{EpochFlow, EpochRecord};
+        let normal = |material: &Constitution, locus| match locus {
+            LinearLocus::SourcePort(ring) => material.source_law(ring).unwrap().clone(),
+            LinearLocus::Contrast(ring) => material.contrast_law(ring).clone(),
+            LinearLocus::Receiving(ring) => material.receiving_law(ring).unwrap().clone(),
+        };
+        let epoch = reading.epoch.as_ref().unwrap();
+        assert_eq!(epoch.heard_cells, 1);
+        assert_eq!(epoch.declared_cells, 1);
+        assert_eq!(epoch.actual_receiving_ingress, 0);
+        assert_eq!(
+            epoch.partition_exponent,
+            partition_exponent(epoch.receiver_partition_bits, 1, 0).unwrap()
+        );
+        for locus in &epoch.loci {
+            let old = normal(before, locus.locus);
+            let new = normal(after, locus.locus);
+            let rows: Vec<_> = if locus.locus == LinearLocus::Receiving(receiver) {
+                (1..old.map().rows()).step_by(2).collect()
+            } else {
+                Vec::new()
+            };
+            let records: Vec<_> = deposit
+                .linear()
+                .iter()
+                .filter(|step| step.locus == locus.locus)
+                .flat_map(|step| &step.samples)
+                .map(|sample| {
+                    if rows.is_empty() {
+                        EpochRecord::from_sample(sample).unwrap()
+                    } else {
+                        EpochRecord::from_sample_with_phase_rows(sample, &rows, period).unwrap()
+                    }
+                })
+                .collect();
+            assert_eq!(locus.records, records.len() as u64);
+            let flow = EpochFlow::from_records(
+                old.map().rows(),
+                old.map().columns(),
+                epoch.receiver_partition_bits,
+                1,
+                0,
+                1,
+                &records,
+            )
+            .unwrap();
+            let raw_g = flow.covector.to_matrix().unwrap();
+            let raw_h = flow.gram.to_matrix().unwrap();
+            let (g, h) = if let Some(symmetry) = old.symmetry() {
+                let g = ExactRatMatrix::shaped(
+                    raw_g.rows(),
+                    raw_g.columns(),
+                    (0..raw_g.rows())
+                        .map(|i| {
+                            (0..raw_g.columns())
+                                .map(|j| match symmetry.columns()[j] {
+                                    Some(partner) => {
+                                        (raw_g.get(i, j).unwrap()
+                                            + raw_g.get(symmetry.rows()[i], partner).unwrap())
+                                            / rat(2, 1)
+                                    }
+                                    None => raw_g.get(i, j).unwrap().clone(),
+                                })
+                                .collect()
+                        })
+                        .collect(),
+                )
+                .unwrap();
+                let h = ExactRatMatrix::shaped(
+                    raw_h.rows(),
+                    raw_h.columns(),
+                    (0..raw_h.rows())
+                        .map(|i| {
+                            (0..raw_h.columns())
+                                .map(|j| {
+                                    (raw_h.get(i, j).unwrap()
+                                        + raw_h
+                                            .get(symmetry.column(i), symmetry.column(j))
+                                            .unwrap())
+                                        / rat(2, 1)
+                                })
+                                .collect()
+                        })
+                        .collect(),
+                )
+                .unwrap();
+                (g, h)
+            } else {
+                (raw_g, raw_h)
+            };
+            let canonical = new.epoch_law().unwrap();
+            let h_new = canonical.gram.to_matrix().unwrap();
+            assert_eq!(h_new, old.gram().add(&h).unwrap());
+            let old_news = old.epoch_law().map_or_else(
+                || ExactRatMatrix::zero(old.map().rows(), old.map().columns()).unwrap(),
+                |law| law.news.to_matrix().unwrap(),
+            );
+            let left = new
+                .map()
+                .multiply(&h_new)
+                .unwrap()
+                .add(&canonical.news.to_matrix().unwrap())
+                .unwrap();
+            let right = old
+                .map()
+                .multiply(&h_new)
+                .unwrap()
+                .add(&g.scaled(&locus.gamma))
+                .unwrap()
+                .add(&old_news)
+                .unwrap();
+            assert_eq!(
+                left, right,
+                "partial W_new H_new + R_new = W_old H_new + gamma G + R_old at {:?}",
+                locus.locus
+            );
+            assert_eq!(locus.eta, Rat::one());
+        }
+    }
+
+    fn assert_same_publication(
+        actual: &Resident,
+        expected: &Resident,
+        read: &ObservedEpochReceipt,
+        full: &ObservedEpochReceipt,
+    ) {
+        assert_eq!(read.consumed, full.consumed);
+        assert_eq!(read.cells, full.cells);
+        assert_eq!(read.comparison_commit, full.comparison_commit);
+        assert_eq!(read.partition_exponent, full.partition_exponent);
+        assert_eq!(read.closed_section, full.closed_section);
+        assert_eq!(read.terminal_partial, full.terminal_partial);
+        assert_eq!(read.carry_out, full.carry_out);
+        assert_eq!(read.reads, full.reads);
+        assert_eq!(read.deposit, full.deposit);
+        assert_eq!(read.precision, full.precision);
+        assert_eq!(actual.constitution, expected.constitution);
+        assert_eq!(actual.current, expected.current);
+        assert_eq!(actual.carried, expected.carried);
+        assert_eq!(actual.address, expected.address);
+        assert_eq!(
+            actual.observed_epoch_ingress,
+            expected.observed_epoch_ingress
+        );
+        assert_eq!(
+            actual.observed_epoch_terminal,
+            expected.observed_epoch_terminal
+        );
+        assert_eq!(actual.ledger.balance(), expected.ledger.balance());
+    }
+
+    struct CheckedExecution {
+        returns: std::sync::atomic::AtomicUsize,
+        flows: std::sync::atomic::AtomicUsize,
+        refusal: u8,
+    }
+
+    impl CheckedExecution {
+        fn new(refusal: u8) -> Self {
+            Self {
+                returns: std::sync::atomic::AtomicUsize::new(0),
+                flows: std::sync::atomic::AtomicUsize::new(0),
+                refusal,
+            }
+        }
+    }
+
+    impl ObservedEpochExecution for CheckedExecution {
+        fn forward(
+            &self,
+            field: &Field,
+            constitution: &Constitution,
+            ratio: &PendingRatio,
+            charts: &mut Charts,
+            opening: &WordOpening,
+        ) -> Result<ObservedEpochForwardWord, HnnError> {
+            if self.refusal == 5 {
+                return Err(refusal("selected observed forward execution refused"));
+            }
+            HostObservedEpochExecution.forward(field, constitution, ratio, charts, opening)
+        }
+
+        fn forward_scoped(
+            &self,
+            context: &mut ObservedEpochForwardContext<'_, '_>,
+            ratio: &PendingRatio,
+            charts: &mut Charts,
+            opening: &WordOpening,
+        ) -> Result<ObservedEpochForwardWord, HnnError> {
+            if self.refusal == 5 {
+                return Err(refusal("selected observed forward execution refused"));
+            }
+            let mut forward =
+                HostObservedEpochExecution.forward_scoped(context, ratio, charts, opening)?;
+            if self.refusal == 6 {
+                forward.producing_commit = forward.producing_commit.wrapping_add(1);
+            }
+            Ok(forward)
+        }
+
+        fn pull_back(
+            &self,
+            word: Word<'_>,
+            covector: &crate::hnn::ratio::RatioCovector,
+            map: &ExactRatMatrix,
+            phases: &ReceivingPhases,
+        ) -> Result<crate::hnn::port::WordReturn, HnnError> {
+            self.returns
+                .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            if self.refusal == 1 {
+                return Err(refusal("selected observed return execution refused"));
+            }
+            HostObservedEpochExecution.pull_back(word, covector, map, phases)
+        }
+
+        fn aggregate_records(
+            &self,
+            locus: LinearLocus,
+            rows: usize,
+            columns: usize,
+            receiver_grain: u32,
+            epoch_cells: u64,
+            epoch: u64,
+            heard_cells: u64,
+            records: &[crate::hnn::constitution::EpochProducerRecordReading],
+        ) -> Result<crate::hnn::constitution::EpochRecordFlowReading, HnnError> {
+            let call = self
+                .flows
+                .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            if self.refusal == 2 && call == 1 {
+                return Err(refusal("selected observed grouped execution refused"));
+            }
+            let mut flow = HostObservedEpochExecution.aggregate_records(
+                locus,
+                rows,
+                columns,
+                receiver_grain,
+                epoch_cells,
+                epoch,
+                heard_cells,
+                records,
+            )?;
+            if self.refusal == 3 {
+                flow.partition_exponent += 1;
+            }
+            if self.refusal == 4 && matches!(locus, LinearLocus::Receiving(_)) {
+                // A successful but wrong numerical result must be consumed by the
+                // native certificate, never discarded in favour of a host result.
+                flow.covector.numerators[0] += BigInt::one();
+            }
+            Ok(flow)
+        }
+    }
+
+    #[test]
+    fn selected_observed_execution_consumes_actual_returns_and_grouped_flows() {
+        let (reference, opening, opening_crib, pairing) = opening();
+        let mut actual = opening.clone();
+        let mut expected = opening.clone();
+        let mut crib = opening_crib.clone();
+        let mut expected_crib = opening_crib;
+        let execution = CheckedExecution::new(0);
+        let read = reference
+            .observe_epoch_continuing_at_cuts_with_execution(
+                &mut actual,
+                &mut crib,
+                &pairing,
+                &[1],
+                None,
+                &[1],
+                true,
+                &execution,
+            )
+            .unwrap();
+        let control = reference
+            .observe_epoch_continuing_at_cuts(
+                &mut expected,
+                &mut expected_crib,
+                &pairing,
+                &[1],
+                None,
+                &[1],
+                true,
+            )
+            .unwrap();
+        assert_same_publication(&actual, &expected, &read, &control);
+        assert_eq!(crib, expected_crib);
+        assert_eq!(read.prefixes.len(), control.prefixes.len());
+        assert_eq!(
+            read.prefixes[0].1.continuing_state(0).unwrap().to_text(),
+            control.prefixes[0].1.continuing_state(0).unwrap().to_text()
+        );
+        assert_eq!(read.prefixes[0].2, control.prefixes[0].2);
+        assert_eq!(
+            execution.returns.load(std::sync::atomic::Ordering::Relaxed),
+            1
+        );
+        assert_eq!(
+            execution.flows.load(std::sync::atomic::Ordering::Relaxed),
+            read.deposit.epoch.as_ref().unwrap().loci.len()
+        );
+    }
+
+    #[test]
+    fn selected_observed_execution_chains_actual_words_and_cold_crossings() {
+        let (reference, opening, opening_crib, pairing) = opening();
+        let mut selected = opening.clone();
+        let mut native = opening.clone();
+        let mut selected_crib = opening_crib.clone();
+        let mut native_crib = opening_crib;
+        let execution = CheckedExecution::new(0);
+        for crossing in 0..2 {
+            if crossing != 0 {
+                let saved = selected.continuing_state(0).unwrap().to_text();
+                let state = ContinuingState::from_text(&saved).unwrap();
+                selected = reference
+                    .mount_continued(
+                        &opening.field,
+                        &Current::at_rest(&opening.field),
+                        opening.constitution.clone(),
+                        &state,
+                    )
+                    .unwrap();
+            }
+            let read = reference
+                .observe_epoch_continuing_at_cuts_with_execution(
+                    &mut selected,
+                    &mut selected_crib,
+                    &pairing,
+                    &[0; 32],
+                    None,
+                    &[1],
+                    false,
+                    &execution,
+                )
+                .unwrap();
+            let control = reference
+                .observe_epoch_continuing_at_cuts(
+                    &mut native,
+                    &mut native_crib,
+                    &pairing,
+                    &[0; 32],
+                    None,
+                    &[1],
+                    false,
+                )
+                .unwrap();
+            assert!(read.consumed > 1);
+            assert_same_publication(&selected, &native, &read, &control);
+            assert_eq!(selected_crib, native_crib);
+            assert_eq!(
+                selected.continuing_state(0).unwrap().to_text(),
+                native.continuing_state(0).unwrap().to_text()
+            );
+            assert_eq!(
+                read.prefixes[0].1.continuing_state(0).unwrap().to_text(),
+                control.prefixes[0].1.continuing_state(0).unwrap().to_text()
+            );
+        }
+    }
+
+    #[test]
+    fn selected_observed_execution_refusals_leave_the_whole_opening_unchanged() {
+        let (reference, opening, opening_crib, pairing) = opening();
+        for mode in 1..=6 {
+            let mut actual = opening.clone();
+            let mut crib = opening_crib.clone();
+            let execution = CheckedExecution::new(mode);
+            assert!(
+                reference
+                    .observe_epoch_continuing_at_cuts_with_execution(
+                        &mut actual,
+                        &mut crib,
+                        &pairing,
+                        &[1],
+                        None,
+                        &[1],
+                        true,
+                        &execution,
+                    )
+                    .is_err()
+            );
+            assert_eq!(actual.constitution, opening.constitution);
+            assert_eq!(actual.current, opening.current);
+            assert_eq!(actual.address, opening.address);
+            assert_eq!(actual.carried, opening.carried);
+            assert_eq!(actual.moments, opening.moments);
+            assert_eq!(actual.ledger.balance(), opening.ledger.balance());
+            assert_eq!(
+                actual.observed_epoch_ingress,
+                opening.observed_epoch_ingress
+            );
+            assert_eq!(
+                actual.observed_epoch_terminal,
+                opening.observed_epoch_terminal
+            );
+            assert_eq!(crib, opening_crib);
+            if mode == 1 {
+                assert_eq!(
+                    execution.flows.load(std::sync::atomic::Ordering::Relaxed),
+                    0
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn epoch_contribution_matches_ordinary_grouped_publication_partial_full_and_cold() {
+        let (reference, opening, opening_crib, pairing) = opening();
+        for terminal in [true, false] {
+            let mut actual = opening.clone();
+            let mut expected = opening.clone();
+            let mut crib = opening_crib.clone();
+            let mut full_crib = opening_crib.clone();
+            let classes: &[usize] = if terminal { &[1] } else { &[0; 32] };
+            let read = reference
+                .observe_epoch_continuing_at_cuts(
+                    &mut actual,
+                    &mut crib,
+                    &pairing,
+                    classes,
+                    None,
+                    &[],
+                    terminal,
+                )
+                .unwrap();
+            let full = reference
+                .observe_epoch_continuing_for(
+                    &mut expected,
+                    &mut full_crib,
+                    &pairing,
+                    classes,
+                    None,
+                    &[],
+                    terminal,
+                    ReturnConsumer::Word,
+                )
+                .unwrap();
+            assert_same_publication(&actual, &expected, &read, &full);
+            assert_eq!(crib, full_crib);
+            assert_eq!(read.terminal_partial, terminal);
+            if terminal {
+                continue;
+            }
+
+            // A fresh mount drops transient word/chart state and reads only the continuing
+            // constitution, source and carry. Its next grouped publication still matches Word.
+            let saved = actual.continuing_state(0).unwrap().to_text();
+            let parsed = ContinuingState::from_text(&saved).unwrap();
+            let mut cold = reference
+                .mount_continued(
+                    &opening.field,
+                    &Current::at_rest(&opening.field),
+                    opening.constitution.clone(),
+                    &parsed,
+                )
+                .unwrap();
+            let restored = reference
+                .observe_epoch_continuing(&mut cold, &mut crib, &pairing, &[0; 32], None)
+                .unwrap();
+            let next_full = reference
+                .observe_epoch_continuing_for(
+                    &mut expected,
+                    &mut full_crib,
+                    &pairing,
+                    &[0; 32],
+                    None,
+                    &[],
+                    false,
+                    ReturnConsumer::Word,
+                )
+                .unwrap();
+            assert_same_publication(&cold, &expected, &restored, &next_full);
+            assert_eq!(crib, full_crib);
+            assert_eq!(
+                cold.continuing_state(0).unwrap().to_text(),
+                expected.continuing_state(0).unwrap().to_text()
+            );
+        }
+    }
+
+    #[test]
+    fn observed_subphase_trace_preserves_independent_exact_publication() {
+        let (reference, mut resident, mut crib, pairing) = opening();
+        let (expected, expected_reading, _) =
+            one_cell_partial_deposit(&reference, &resident, &pairing, 1);
+        let receipt = reference
+            .observe_epoch_continuing_at_cuts(
+                &mut resident,
+                &mut crib,
+                &pairing,
+                &[1],
+                None,
+                &[],
+                true,
+            )
+            .unwrap();
+        assert_eq!(resident.constitution, expected);
+        assert_eq!(receipt.deposit, expected_reading);
+        assert!(receipt.terminal_partial);
+        let names: Vec<_> = receipt
+            .wall
+            .deposit_subphases
+            .iter()
+            .map(|(name, _)| name.as_str())
+            .collect();
+        assert_eq!(names.first(), Some(&"GroupedInputs"));
+        assert_eq!(names.last(), Some(&"Publication"));
+        for locus in &receipt.deposit.epoch.as_ref().unwrap().loci {
+            let flow = format!("Flow({:?})", locus.locus);
+            let certificate = format!("Certificate({:?})", locus.locus);
+            let at = names.iter().position(|name| *name == flow).unwrap();
+            assert_eq!(names[at + 1], certificate);
+        }
+        assert_eq!(
+            &names[names.len() - 4..],
+            &[
+                "PairDirections",
+                "RegionPreparation",
+                "JointCertificate",
+                "Publication"
+            ]
+        );
+        assert!(
+            receipt
+                .wall
+                .deposit_subphases
+                .iter()
+                .map(|(_, elapsed)| *elapsed)
+                .sum::<Duration>()
+                <= receipt.wall.grouped_deposit
+        );
+    }
+
+    #[test]
+    fn short_section_refuses_transactionally_and_terminal_partial_is_explicitly_sealed() {
+        let (reference, mut resident, mut crib, pairing) = opening();
+        let material = resident.constitution.clone();
+        let current = resident.current.clone();
+        let address = resident.address.clone();
+        let before_crib = crib.clone();
+        assert!(
+            reference
+                .observe_epoch_continuing(&mut resident, &mut crib, &pairing, &[1], None)
+                .is_err()
+        );
+        assert_eq!(resident.constitution, material);
+        assert_eq!(resident.current, current);
+        assert_eq!(resident.address, address);
+        assert_eq!(crib, before_crib);
+        let (expected, expected_reading, staged) =
+            one_cell_partial_deposit(&reference, &resident, &pairing, 1);
+        let partial = reference
+            .observe_epoch_continuing_at_cuts(
+                &mut resident,
+                &mut crib,
+                &pairing,
+                &[1],
+                None,
+                &[1],
+                true,
+            )
+            .unwrap();
+        assert_eq!(partial.consumed, 1);
+        assert!(!partial.closed_section);
+        assert!(!partial.carry_out);
+        assert!(partial.terminal_partial);
+        assert_eq!(resident.constitution, expected);
+        assert_eq!(partial.deposit, expected_reading);
+        assert_eq!(
+            partial.partition_exponent,
+            partition_exponent(
+                crate::hnn::field::lattice_exponent(u128::from(resident.admitted[0].grain()), 1),
+                1,
+                0,
+            )
+            .unwrap()
+        );
+        partial_conserves_each_normal_law(
+            &material,
+            &resident.constitution,
+            &partial.deposit,
+            &staged,
+            resident.admitted[0].ring(),
+            resident.field.ring(resident.admitted[0].ring()).period(),
+        );
+        assert_eq!(resident.observed_epoch_ingress, Some((2, 0)));
+        assert!(resident.observed_epoch_terminal);
+        assert!(
+            reference
+                .observe_epoch_continuing(&mut resident, &mut crib, &pairing, &[0; 32], None)
+                .is_err()
+        );
+        assert!(!partial.prefixes[0].1.observed_epoch_terminal);
+        assert!(resident.continuing_state(0).is_err());
+        let moment = *resident.moments.keys().next().unwrap();
+        let phases = resident.admitted[0].clone();
+        assert!(reference.refine(&mut resident, &moment, &phases).is_err());
+        let encoded = PairedObservation::admit(&resident.field, &resident.constitution, &pairing)
+            .unwrap()
+            .encode(&[1])
+            .unwrap();
+        assert!(
+            reference
+                .ingest(&mut resident, Some(&moment), &encoded)
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn observed_epoch_cold_resume_preserves_grouped_state_ingress_and_next_crossing() {
+        let (reference, mut uninterrupted, mut crib, pairing) = opening();
+        let field = uninterrupted.field.clone();
+        let opening_material = uninterrupted.constitution.clone();
+        let first = reference
+            .observe_epoch_continuing(&mut uninterrupted, &mut crib, &pairing, &[0; 32], None)
+            .unwrap();
+        assert!(first.closed_section);
+        assert_eq!(uninterrupted.receiver_ingress_ticks(), Some((2, 1)));
+        let state = uninterrupted.continuing_state(0).unwrap();
+        let text = state.to_text();
+        let parsed = ContinuingState::from_text(&text).unwrap();
+        assert_eq!(parsed.to_text(), text);
+        let mut resumed = reference
+            .mount_continued(&field, &Current::at_rest(&field), opening_material, &parsed)
+            .unwrap();
+        let mut resumed_crib = crib.clone();
+        assert_eq!(resumed.continuing_state(0).unwrap().to_text(), text);
+        assert_eq!(
+            resumed.receiver_ingress_ticks(),
+            uninterrupted.receiver_ingress_ticks()
+        );
+        assert_eq!(resumed.constitution, uninterrupted.constitution);
+        assert_eq!(resumed.current, uninterrupted.current);
+        assert_eq!(resumed.carried, uninterrupted.carried);
+        assert_eq!(resumed.address, uninterrupted.address);
+        assert_eq!(resumed.ledger.balance(), uninterrupted.ledger.balance());
+        let next = reference
+            .observe_epoch_continuing(&mut uninterrupted, &mut crib, &pairing, &[0; 32], None)
+            .unwrap();
+        let restored = reference
+            .observe_epoch_continuing(&mut resumed, &mut resumed_crib, &pairing, &[0; 32], None)
+            .unwrap();
+        assert_eq!(restored.consumed, next.consumed);
+        assert_eq!(restored.partition_exponent, next.partition_exponent);
+        assert_eq!(restored.reads, next.reads);
+        assert_eq!(restored.deposit, next.deposit);
+        assert_eq!(resumed.constitution, uninterrupted.constitution);
+        assert_eq!(resumed.current, uninterrupted.current);
+        assert_eq!(resumed.carried, uninterrupted.carried);
+        assert_eq!(resumed.charts, uninterrupted.charts);
+        assert_eq!(resumed.address, uninterrupted.address);
+        assert_eq!(resumed.ledger.balance(), uninterrupted.ledger.balance());
+        assert_eq!(resumed_crib, crib);
+        assert_eq!(
+            resumed.continuing_state(0).unwrap().to_text(),
+            uninterrupted.continuing_state(0).unwrap().to_text()
+        );
+    }
+
+    #[test]
+    fn fixed_medium_forward_reuses_published_normal_map_and_solver_view() {
+        let (reference, mut resident, mut crib, pairing) = opening();
+        reference
+            .observe_epoch_continuing(&mut resident, &mut crib, &pairing, &[0; 32], None)
+            .unwrap();
+        let receiver = resident.admitted[0].ring();
+        let law = resident.constitution.receiving_law(receiver).unwrap();
+        assert!(law.epoch_storage().is_some());
+        let before_law = law.clone();
+        let view = law.map();
+        let moment = *resident.moments.keys().next().unwrap();
+        let boundary =
+            PairedObservation::admit(&resident.field, &resident.constitution, &pairing).unwrap();
+        let encoded = boundary.encode(&[0; 2]).unwrap();
+        let forward = reference
+            .read_epoch(&resident, &moment, &resident.admitted[0], &encoded)
+            .unwrap();
+        assert_eq!(forward.reads.len(), 2);
+        let mut wide_scale = false;
+        for read in forward.reads {
+            assert_eq!(read.commit, resident.constitution.commit());
+            let word = read.word.resume(&resident.field);
+            let operands = word.operands();
+            let chart_exponent = operands.lattice().unwrap().chart_exponent();
+            // Verify the actual published operands against their declared carrier lattices.
+            // A large denominator caused by an off-lattice factor would not justify widening.
+            for (ring, actual) in operands.rings().iter().enumerate() {
+                let lattice = resident.constitution.lattice(Locus::Element(ring)).unwrap();
+                let factor = crate::hnn::field::ConstitutionRead::passive_factor(
+                    &resident.constitution,
+                    ring,
+                );
+                let slices =
+                    crate::hnn::field::ConstitutionRead::slices(&resident.constitution, ring);
+                assert!(factor.entries().iter().all(|value| lattice.contains(value)));
+                assert!(
+                    slices
+                        .iter()
+                        .flat_map(|(u, v)| u.iter().chain(v))
+                        .all(|value| lattice.contains(value))
+                );
+                let matrix = crate::hnn::propagation::ring_operator(actual.element()).unwrap();
+                let (_, denominator) = crate::ratio::linear::vector::integral(matrix.entries());
+                let declared = BigInt::one() << (2 * lattice.exponent() + 1) as usize;
+                assert!((&declared % &denominator).is_zero());
+                eprintln!(
+                    "observed_operator_provenance key=Ring({ring}) D={denominator} declared_factor_and_slice_lattice={} denominator_divides=2^{} L_c={chart_exponent}",
+                    lattice.exponent(),
+                    2 * lattice.exponent() + 1
+                );
+            }
+            let contact = &operands.contacts()[0];
+            let lattice = resident.constitution.lattice(Locus::Channel(0)).unwrap();
+            for factor in [
+                crate::hnn::field::ConstitutionRead::contact_storage(&resident.constitution, 0),
+                crate::hnn::field::ConstitutionRead::contact_stiffness(&resident.constitution, 0),
+                crate::hnn::field::ConstitutionRead::contact_dissipation(&resident.constitution, 0),
+            ] {
+                assert!(factor.entries().iter().all(|value| lattice.contains(value)));
+            }
+            if contact.exponent().carry == BigInt::from(-98) {
+                assert_eq!(operands.step(), &Rat::one());
+                assert_eq!(resident.field.contact(0).admittance(), &rat(2, 1));
+                assert_eq!(
+                    contact.conductance(),
+                    &Rat::new(BigInt::one(), BigInt::one() << 97usize)
+                );
+                let identity = ExactRatMatrix::identity(contact.width()).unwrap();
+                let (capacity, stiffness, dissipation) = contact.forms();
+                assert_eq!(capacity, &identity);
+                assert_eq!(stiffness, &identity.scaled(&rat(1, 4)));
+                assert_eq!(dissipation, &identity.scaled(&rat(1, 4)));
+                let (_, denominator) =
+                    crate::ratio::linear::vector::integral(contact.operator().entries());
+                assert_eq!(denominator, BigInt::one() << 101usize);
+                assert_eq!(chart_exponent, 30);
+                assert_eq!(
+                    &denominator << chart_exponent as usize,
+                    BigInt::one() << 131usize
+                );
+                let declared = BigInt::one() << (2 * lattice.exponent() + 99) as usize;
+                assert!((&declared % &denominator).is_zero());
+                eprintln!(
+                    "observed_operator_provenance key=Contact(0,-98) D_power_of_two=101 D_odd_part=1 L_c={chart_exponent} factor_lattice={} h=1 Y=2 G=2^-97 C=I K=D=I/4 declared_denominator_divides=2^{}",
+                    lattice.exponent(),
+                    2 * lattice.exponent() + 99
+                );
+            }
+            for chart in operands.charts() {
+                if let Some(operator) = chart.operator {
+                    eprintln!("observed_next_operator {operator:?}");
+                    wide_scale |= operator.scale_bits > 127;
+                }
+            }
+        }
+        assert!(
+            wide_scale,
+            "the unchanged next-forward fixture reaches the formerly refused scale"
+        );
+        let after_law = resident.constitution.receiving_law(receiver).unwrap();
+        assert!(std::ptr::eq(view, after_law.map()));
+        assert_eq!(*after_law, before_law);
+        assert_eq!(resident.constitution.receiving_map(receiver), Some(view));
+    }
+}

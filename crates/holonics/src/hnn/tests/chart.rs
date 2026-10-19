@@ -425,3 +425,424 @@ fn a_deposit_moves_the_charts_by_warm_refinement() {
     }
     assert!(after.charts().iter().any(|reading| reading.steps > 0));
 }
+
+/// The reference uses rational matrix algebra and the existing lattice rounding, independently
+/// of integer operator products and their selected representation.
+fn rational_newton(a: &ExactRatMatrix, chart: &ChartWords) -> ChartWords {
+    let x = chart.to_matrix().unwrap();
+    let twice = ExactRatMatrix::identity(a.rows())
+        .unwrap()
+        .scaled(&integer(2));
+    let image = x
+        .multiply(&twice.subtract(&a.multiply(&x).unwrap()).unwrap())
+        .unwrap();
+    ChartWords::of_matrix(&image, chart.exponent()).unwrap()
+}
+
+#[test]
+fn wide_operator_scale_and_newton_intermediates_match_rational_oracle() {
+    use crate::hnn::chart::OperatorWideReason;
+    // At 80 bits S itself fits i128, but Q(2SI-AbarQ) does not. At 120 bits even S does not.
+    // These are small passive matrices with signed off-diagonal entries and unchanged L_c=30.
+    for bits in [80usize, 120] {
+        let epsilon = Rat::new(BigInt::one(), BigInt::one() << bits);
+        let a = ExactRatMatrix::shaped(
+            2,
+            2,
+            vec![
+                vec![rat(3, 2) + &epsilon, rat(-1, 4)],
+                vec![rat(-1, 4), rat(5, 4) + &epsilon],
+            ],
+        )
+        .unwrap();
+        let lattice = WordLattice::new(30, 12, 12);
+        let start =
+            ChartWords::of_matrix(&ExactRatMatrix::identity(2).unwrap().scaled(&rat(1, 2)), 30)
+                .unwrap();
+        let next = newton_schulz_step(&a, &start).unwrap();
+        assert_eq!(next, rational_newton(&a, &start));
+        let residual = ExactRatMatrix::identity(2)
+            .unwrap()
+            .subtract(&a.multiply(&next.to_matrix().unwrap()).unwrap())
+            .unwrap();
+        assert_eq!(certificate(&a, &next).unwrap(), row_norm(&residual));
+        let (actual, read) = refine(ChartKey::Ring(7), &a, Some(&start), &lattice).unwrap();
+        let mut expected = start;
+        let mut steps = 0;
+        while certificate(&a, &expected).unwrap() > lattice.target() {
+            expected = rational_newton(&a, &expected);
+            steps += 1;
+        }
+        assert_eq!(actual, expected);
+        assert_eq!(read.steps, steps);
+        assert_eq!(read.start, ChartStart::Warm);
+        assert_eq!(actual.exponent(), 30);
+        let operator = read.operator.unwrap();
+        assert_eq!(operator.key, ChartKey::Ring(7));
+        assert_eq!(operator.width, 2);
+        assert_eq!(operator.denominator_bits, bits as u64 + 1);
+        assert_eq!(operator.scale_bits, bits as u64 + 31);
+        assert_eq!(operator.entry_bits, bits as u64 + 1);
+        if bits == 80 {
+            assert!(
+                operator
+                    .wide_reasons
+                    .contains(&OperatorWideReason::RefinementProduct)
+            );
+            assert!(!operator.wide_reasons.contains(&OperatorWideReason::Scale));
+        } else {
+            assert!(operator.wide_reasons.contains(&OperatorWideReason::Scale));
+        }
+    }
+}
+
+#[test]
+fn narrow_operator_reading_and_idle_chart_stay_narrow() {
+    let a = ExactRatMatrix::shaped(
+        2,
+        2,
+        vec![vec![integer(2), rat(-1, 4)], vec![rat(-1, 4), integer(2)]],
+    )
+    .unwrap();
+    let lattice = WordLattice::new(28, 12, 12);
+    let (chart, first) = refine(ChartKey::Ring(0), &a, None, &lattice).unwrap();
+    let (again, idle) = refine(ChartKey::Ring(0), &a, Some(&chart), &lattice).unwrap();
+    assert_eq!(chart, again);
+    assert_eq!(idle.steps, 0);
+    assert!(first.operator.unwrap().wide_reasons.is_empty());
+    assert!(idle.operator.unwrap().wide_reasons.is_empty());
+}
+
+#[test]
+fn empty_operator_certificate_and_malformed_chart_remain_checked() {
+    let empty = ExactRatMatrix::shaped(0, 0, vec![]).unwrap();
+    let chart = ChartWords::of_coordinates(0, 0, 30, &[]).unwrap();
+    assert_eq!(certificate(&empty, &chart).unwrap(), Rat::zero());
+    let wrong = ChartWords::of_coordinates(1, 1, 30, &[BigInt::zero()]).unwrap();
+    assert!(certificate(&empty, &wrong).is_err());
+}
+
+#[test]
+fn batch_ring_scope_matches_every_operand_and_chart_with_fresh_moving_contacts() {
+    use crate::hnn::propagation::RingScope;
+    let field = super::learning::chain();
+    let material = crate::hnn::constitution::Constitution::initial(&field, 1 << 40).unwrap();
+    let mut scope = RingScope::new(&field, &material);
+    let mut actual_charts = Charts::new();
+    let mut oracle_charts = Charts::new();
+    let mut carries = std::collections::BTreeSet::new();
+    let mut zero_beta_quadrances = std::collections::BTreeSet::new();
+    for cell in 0..8 {
+        let (current, _) = moment(&field, 27, cell);
+        let actual = scope.at_cut(&current, &mut actual_charts).unwrap();
+        let oracle =
+            Operands::at_cut_charted(&field, &material, &current, &mut oracle_charts).unwrap();
+        // Includes private integer Rows, exact forms, executed solve and its transpose,
+        // all contacts' ExponentReading/G and the current junction weights/certificates.
+        actual.assert_same_execution(&oracle);
+        assert_eq!(actual_charts, oracle_charts, "chart map after cell {cell}");
+        for reading in actual
+            .charts()
+            .iter()
+            .filter(|r| matches!(r.key, ChartKey::Ring(_)))
+        {
+            assert_eq!(reading.start == ChartStart::Reused, cell != 0);
+            if cell != 0 {
+                assert_eq!(reading.steps, 0);
+            }
+            assert!(reading.certificate <= reading.target);
+        }
+        carries.insert(actual.contacts()[0].exponent().carry.clone());
+        zero_beta_quadrances.insert(actual.contacts()[1].exponent().quadrance.clone());
+        assert_eq!(
+            scope.counts(),
+            (field.rings().len(), cell * field.rings().len())
+        );
+    }
+    assert!(
+        carries.len() > 1,
+        "the moving contact actually changes carry"
+    );
+    assert!(
+        zero_beta_quadrances.len() > 1,
+        "beta-zero still receives fresh geometry readings"
+    );
+}
+
+#[test]
+fn batch_ring_scope_reprepares_a_replaced_certified_chart_inside_one_scope() {
+    use crate::hnn::propagation::{RingScope, ring_operator};
+    let field = super::learning::chain();
+    let material = crate::hnn::constitution::Constitution::initial(&field, 1 << 40).unwrap();
+    let mut scope = RingScope::new(&field, &material);
+    let mut charts = Charts::new();
+    let current = Current::at_rest(&field);
+    let first = scope.at_cut(&current, &mut charts).unwrap();
+    let key = ChartKey::Ring(0);
+    let prepared = charts.get(&key).unwrap().clone();
+    let operator = ring_operator(first.rings()[0].element()).unwrap();
+    let target = field.word_lattice().unwrap().target();
+    // An adjacent lattice chart is still certified for the same actual operator, but is
+    // a different warm start. Reusing the old prepared chart would erase the caller's input.
+    let replacement = [-1, 1]
+        .into_iter()
+        .find_map(|change| {
+            let mut words: Vec<BigInt> = prepared.words().iter().copied().map(BigInt::from).collect();
+            words[0] += change;
+            let candidate = ChartWords::of_coordinates(
+                prepared.rows(), prepared.columns(), prepared.exponent(), &words,
+            ).unwrap();
+            (certificate(&operator, &candidate).unwrap() <= target).then_some(candidate)
+        })
+        .expect("an adjacent chart within the actual certificate target");
+    assert_ne!(replacement, prepared);
+    charts.insert(key.clone(), replacement.clone());
+    let mut oracle_charts = charts.clone();
+    let actual = scope.at_cut(&current, &mut charts).unwrap();
+    let oracle = Operands::at_cut_charted(&field, &material, &current, &mut oracle_charts).unwrap();
+    actual.assert_same_execution(&oracle);
+    assert_eq!(charts, oracle_charts);
+    assert_eq!(charts.get(&key), Some(&replacement));
+    assert_eq!(scope.counts(), (2 * field.rings().len(), 0));
+    assert!(actual.charts().iter().filter(|r| matches!(r.key, ChartKey::Ring(_)))
+        .all(|r| r.start != ChartStart::Reused));
+    let again = scope.at_cut(&current, &mut charts).unwrap();
+    let oracle = Operands::at_cut_charted(&field, &material, &current, &mut oracle_charts).unwrap();
+    again.assert_same_execution(&oracle);
+    assert_eq!(charts, oracle_charts);
+    assert_eq!(scope.counts(), (2 * field.rings().len(), field.rings().len()));
+}
+
+#[test]
+fn batch_ring_scope_reprepares_changed_inputs_equal_commit_branches_and_restore() {
+    use crate::hnn::constitution::{Constitution, ContinuingState};
+    use crate::hnn::propagation::RingScope;
+    let field = super::learning::chain();
+    let current = Current::at_rest(&field);
+    let opening = Constitution::initial(&field, 1 << 40).unwrap();
+    let mut charts = Charts::new();
+    {
+        let mut first = RingScope::new(&field, &opening);
+        first.at_cut(&current, &mut charts).unwrap();
+        first.at_cut(&current, &mut charts).unwrap();
+        assert_eq!(first.counts(), (field.rings().len(), field.rings().len()));
+    }
+    let moved_factor = opening.passive_factor(1).scaled(&rat(1025, 1024));
+    let branch = opening
+        .clone()
+        .with_element(
+            1,
+            moved_factor,
+            opening.contrast_port(1).clone(),
+            opening.slices(1).to_vec(),
+        )
+        .unwrap();
+    assert_eq!(
+        opening.commit(),
+        branch.commit(),
+        "equal commit is insufficient binding"
+    );
+    let mut fresh = RingScope::new(&field, &branch);
+    let mut oracle_charts = charts.clone();
+    let actual = fresh.at_cut(&current, &mut charts).unwrap();
+    let oracle = Operands::at_cut_charted(&field, &branch, &current, &mut oracle_charts).unwrap();
+    assert_eq!(actual, oracle);
+    assert_eq!(charts, oracle_charts);
+    assert_eq!(fresh.counts(), (field.rings().len(), 0));
+    drop(fresh);
+
+    let mut standing = opening.standing(0).to_vec();
+    standing[0] += rat(1, 128);
+    let changed_standing = opening
+        .clone()
+        .with_ports(0, Some(standing), None, None)
+        .unwrap();
+    let mut scope = RingScope::new(&field, &changed_standing);
+    let mut oracle_charts = charts.clone();
+    let actual = scope.at_cut(&current, &mut charts).unwrap();
+    let oracle =
+        Operands::at_cut_charted(&field, &changed_standing, &current, &mut oracle_charts).unwrap();
+    assert_eq!(actual, oracle);
+    assert_eq!(scope.counts(), (field.rings().len(), 0));
+    drop(scope);
+
+    let mut declared = field.declaration().clone();
+    declared.receivers[0].tolerance *= rat(1, 2);
+    let finer = Field::declare(declared.by_lattice_rule()).unwrap();
+    assert_ne!(field.word_lattice(), finer.word_lattice());
+    let mut scope = RingScope::new(&finer, &changed_standing);
+    let mut oracle_charts = charts.clone();
+    let actual = scope
+        .at_cut(&Current::at_rest(&finer), &mut charts)
+        .unwrap();
+    let oracle = Operands::at_cut_charted(
+        &finer,
+        &changed_standing,
+        &Current::at_rest(&finer),
+        &mut oracle_charts,
+    )
+    .unwrap();
+    assert_eq!(actual, oracle);
+    assert_eq!(scope.counts(), (finer.rings().len(), 0));
+    drop(scope);
+
+    let saved = opening.continuing_state(0).unwrap();
+    let parsed = ContinuingState::from_text(&saved.to_text()).unwrap();
+    let restored = opening.clone().continued(&parsed).unwrap();
+    let mut scope = RingScope::new(&field, &restored);
+    let mut oracle_charts = charts.clone();
+    let actual = scope.at_cut(&current, &mut charts).unwrap();
+    let oracle = Operands::at_cut_charted(&field, &restored, &current, &mut oracle_charts).unwrap();
+    assert_eq!(actual, oracle);
+    assert_eq!(scope.counts(), (field.rings().len(), 0));
+}
+
+#[test]
+fn batch_ring_scope_empty_and_refused_build_publish_nothing() {
+    use crate::hnn::propagation::RingScope;
+    let mut declaration = super::learning::chain_declaration(1 << 16);
+    declaration.exponent_grain = 2;
+    declaration.contacts[0].exponent = integer(1);
+    for point in &mut declaration.rings[1].placements {
+        point.z = integer(1);
+    }
+    let field = Field::declare(declaration.by_lattice_rule()).unwrap();
+    let material = crate::hnn::constitution::Constitution::initial(&field, 1 << 40).unwrap();
+    // Rings prepare successfully, but the first contact's actual odd quadrance has phase1.
+
+    let mut scope = RingScope::new(&field, &material);
+    let mut charts = Charts::new();
+    let before = charts.clone();
+    assert_eq!(scope.counts(), (0, 0), "an empty scope does no work");
+    let current = Current::at_rest(&field);
+    let actual_error = scope.at_cut(&current, &mut charts).unwrap_err();
+    assert!(matches!(
+        &actual_error,
+        HnnError::ExponentPhase {
+            contact: 0,
+            phase: 1,
+            grain: 2
+        }
+    ));
+    let oracle_error =
+        Operands::at_cut_charted(&field, &material, &current, &mut charts).unwrap_err();
+    assert_eq!(format!("{actual_error:?}"), format!("{oracle_error:?}"));
+    assert_eq!(charts, before);
+    assert_eq!(
+        scope.counts(),
+        (0, 0),
+        "no successful preparation installed after refusal"
+    );
+    assert!(scope.at_cut(&current, &mut charts).is_err());
+    assert_eq!(charts, before);
+}
+
+#[test]
+fn ordinary_epoch_reuses_rings_once_and_reprepares_after_grouped_deposit_and_resume() {
+    use crate::hnn::constitution::{Constitution, ContinuingState};
+    use crate::hnn::paired::{PairedCarrier, PairingDeclaration};
+    use crate::hnn::reference::{Reference, observed::ObservedCrib};
+    let mut declaration = super::learning::chain_declaration(1 << 16);
+    declaration.receivers[0].aperture = 1;
+    declaration.rings[2] = declaration.rings[1].clone();
+    declaration.rings[2].lock.clear();
+    declaration.lattice.clear();
+    let field = Field::declare(declaration.by_lattice_rule()).unwrap();
+    let pairing = PairingDeclaration::Family {
+        table: vec![(0, 1), (1, 0), (2, 3), (3, 2)],
+    };
+    let free = ExactRatMatrix::shaped(
+        8,
+        4,
+        (0..8)
+            .map(|row| {
+                (0..4)
+                    .map(|column| {
+                        if (row == 2 && column == 0) || (row == 3 && column == 2) {
+                            rat(1, 32)
+                        } else {
+                            Rat::zero()
+                        }
+                    })
+                    .collect()
+            })
+            .collect(),
+    )
+    .unwrap();
+    let source = PairedCarrier::complete_port(&field, 0, &pairing, &free).unwrap();
+    let carrier = PairedCarrier::admit(&field, 0, &pairing, &source).unwrap();
+    let opening = Constitution::initial(&field, 1 << 40)
+        .unwrap()
+        .with_symmetric_source(0, source, carrier.symmetry())
+        .unwrap();
+    let reference = Reference::new(16, 1 << 40);
+    let mut resident = reference
+        .mount_with(&field, &Current::at_rest(&field), opening.clone())
+        .unwrap();
+    let mut crib = ObservedCrib::new(0);
+    let check = |receipt: &crate::hnn::reference::observed::ObservedEpochReceipt| {
+        assert!(receipt.closed_section);
+        assert!(
+            receipt.deposit.epoch.is_some(),
+            "this is an actual grouped publication"
+        );
+        assert!(receipt.reads.len() > 1);
+        let mut prepared = 0;
+        let mut reused = 0;
+        for (word, read) in receipt.reads.iter().enumerate() {
+            for chart in read
+                .word_charts
+                .iter()
+                .filter(|r| matches!(r.key, ChartKey::Ring(_)))
+            {
+                if word == 0 {
+                    assert_ne!(
+                        chart.start,
+                        ChartStart::Reused,
+                        "a new batch certifies its actual producer"
+                    );
+                    prepared += 1;
+                } else {
+                    assert_eq!(chart.start, ChartStart::Reused);
+                    assert_eq!(chart.steps, 0);
+                    reused += 1;
+                }
+                assert!(chart.certificate <= chart.target);
+            }
+        }
+        assert_eq!(prepared, field.rings().len());
+        assert_eq!(reused, (receipt.reads.len() - 1) * field.rings().len());
+    };
+    let first = reference
+        .observe_epoch_continuing(&mut resident, &mut crib, &pairing, &[0; 32], None)
+        .unwrap();
+    check(&first);
+    assert!(resident.constitution().commit() > first.comparison_commit);
+    let saved = resident.continuing_state(0).unwrap();
+    let parsed = ContinuingState::from_text(&saved.to_text()).unwrap();
+    let mut resumed = reference
+        .mount_continued(&field, &Current::at_rest(&field), opening, &parsed)
+        .unwrap();
+    let mut resumed_crib = crib.clone();
+    let next = reference
+        .observe_epoch_continuing(&mut resident, &mut crib, &pairing, &[0; 32], None)
+        .unwrap();
+    check(&next);
+    assert!(next.comparison_commit > first.comparison_commit);
+    let restored_next = reference
+        .observe_epoch_continuing(&mut resumed, &mut resumed_crib, &pairing, &[0; 32], None)
+        .unwrap();
+    check(&restored_next);
+    assert_eq!(next.comparison_commit, restored_next.comparison_commit);
+    assert_eq!(resident.constitution(), resumed.constitution());
+    assert_eq!(resident.current(), resumed.current());
+    assert_eq!(resident.charts(), resumed.charts());
+    assert_eq!(
+        next.reads.iter().map(|r| &r.code).collect::<Vec<_>>(),
+        restored_next
+            .reads
+            .iter()
+            .map(|r| &r.code)
+            .collect::<Vec<_>>()
+    );
+}

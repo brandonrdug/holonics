@@ -1391,6 +1391,10 @@ macro_rules! arguments {
 }
 
 impl<'c> ResidentWord<'c> {
+    pub(crate) fn card(&self) -> &'c Card {
+        self.card
+    }
+
     /// **Run a word's forward on the card** (module header): its plan and operands written, its
     /// charts gathered from the store's workspace, the pair ports' weights read against the moment,
     /// one launch of the word, and one read of its record.

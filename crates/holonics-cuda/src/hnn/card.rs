@@ -58,6 +58,8 @@ pub struct DeviceCensus {
     pub name: String,
     pub compute_capability: (u32, u32),
     pub multiprocessors: u32,
+    /// The driver admits cooperative grids whose blocks are simultaneously resident.
+    pub cooperative_launch: bool,
     pub warp: u32,
     pub max_threads_per_block: u32,
     pub max_threads_per_multiprocessor: u32,
@@ -85,6 +87,17 @@ impl DeviceCensus {
         };
         let census = device.launch_census()?;
         let minor = device.attribute(DeviceAttribute::COMPUTE_CAPABILITY_MINOR)?;
+        let cooperative = device.attribute(DeviceAttribute::COOPERATIVE_LAUNCH)?;
+        let cooperative_launch = match cooperative {
+            0 => false,
+            1 => true,
+            value => {
+                return Err(DeviceError::Census {
+                    what: "cooperative launch boolean",
+                    value,
+                });
+            }
+        };
         Ok(Self {
             name: device.name.clone(),
             compute_capability: (
@@ -95,6 +108,7 @@ impl DeviceCensus {
                 })?,
             ),
             multiprocessors: census.multiprocessor_count,
+            cooperative_launch,
             warp: read(DeviceAttribute::WARP_SIZE, "warp")?,
             max_threads_per_block: census.max_threads_per_block,
             max_threads_per_multiprocessor: read(
@@ -149,6 +163,17 @@ pub struct EntryCensus {
 /// block, which a thread, and what a thread loops over).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Realization {
+    /// All `blocks` are simultaneously resident. Threads visit flat work items by whole-grid
+    /// stride for at most `rounds` rounds; every thread participates in each grid barrier, even
+    /// when its current work index is outside the surface. Occupancy is read for this function,
+    /// thread extent and dynamic shared surface, not estimated from device ceilings.
+    CooperativeGrid {
+        work_items: u64,
+        blocks: u32,
+        threads: u32,
+        rounds: u64,
+        resident_blocks: u64,
+    },
     /// Each block is one output entry `(row, vector)` of a read; its `threads` divide the row's
     /// columns, each looping over at most `per_thread` of them (`j ≡ t mod threads`), and the
     /// block reduces their ring words and certificates by a shared-memory tree. `entries` blocks;
@@ -195,6 +220,40 @@ pub struct Layout {
     pub block: Dim3,
     pub shared: u32,
     pub realization: Realization,
+}
+
+/// Admit a one-dimensional cooperative surface from a measured function occupancy. Kept pure
+/// so the admission and its refusal boundaries can be checked without a card.
+fn cooperative_grid(
+    name: &'static str,
+    work_items: u64,
+    threads: u32,
+    shared: u32,
+    resident_blocks: u64,
+    max_grid_x: u32,
+) -> Result<Layout, DeviceError> {
+    if work_items == 0 || threads == 0 || resident_blocks == 0 || max_grid_x == 0 {
+        return Err(DeviceError::Launch {
+            entry: name,
+            clause: "a cooperative grid has positive work, threads and resident block capacity",
+        });
+    }
+    let blocks = work_items
+        .div_ceil(u64::from(threads))
+        .min(resident_blocks)
+        .min(u64::from(max_grid_x)) as u32;
+    Ok(Layout {
+        grid: Dim3::x(blocks),
+        block: Dim3::x(threads),
+        shared,
+        realization: Realization::CooperativeGrid {
+            work_items,
+            blocks,
+            threads,
+            rounds: work_items.div_ceil(u64::from(blocks) * u64::from(threads)),
+            resident_blocks,
+        },
+    })
 }
 
 /// The greatest power of two at most `value` (`value ≥ 1`).
@@ -511,6 +570,92 @@ impl Drop for Card {
 }
 
 impl Card {
+    /// Derive a resident cooperative grid for a flat work surface. A kernel must grid-stride
+    /// that surface and keep every thread at every grid barrier, including idle lanes.
+    pub(crate) fn cooperative_layout(
+        &self,
+        name: &'static str,
+        work_items: usize,
+        threads: Option<u32>,
+        shared: u32,
+    ) -> Result<Layout, DeviceError> {
+        if !self.census.cooperative_launch {
+            return Err(DeviceError::Launch {
+                entry: name,
+                clause: "the device supports cooperative launch",
+            });
+        }
+        self.current()?;
+        let entry = self.entry(name)?;
+        let ceiling = thread_ceiling(&self.census, &entry);
+        let threads = threads.unwrap_or(self.census.warp.min(ceiling));
+        if threads == 0
+            || threads > ceiling
+            || entry
+                .static_shared
+                .checked_add(shared)
+                .is_none_or(|total| total > self.census.shared_per_block)
+        {
+            return Err(DeviceError::Launch {
+                entry: name,
+                clause: "the function and device carry the block and its static plus dynamic shared surface",
+            });
+        }
+        let function = self.module.function(name)?;
+        let active = function.active_blocks_per_multiprocessor(threads, shared)?;
+        cooperative_grid(
+            name,
+            u64::try_from(work_items).map_err(|_| DeviceError::Launch {
+                entry: name,
+                clause: "the cooperative work extent fits its 64-bit wire",
+            })?,
+            threads,
+            shared,
+            u64::from(active) * u64::from(self.census.multiprocessors),
+            self.census.max_grid.x,
+        )
+    }
+
+    /// Launch only the exact geometry re-admitted against this function's current driver
+    /// occupancy. Like `launch`, the caller admits argument buffers and their kernel-wire shape.
+    pub(crate) fn launch_cooperative(
+        &self,
+        name: &'static str,
+        layout: &Layout,
+        params: &mut [*mut c_void],
+    ) -> Result<(), DeviceError> {
+        let Realization::CooperativeGrid {
+            work_items,
+            threads,
+            ..
+        } = layout.realization
+        else {
+            return Err(DeviceError::Launch {
+                entry: name,
+                clause: "a cooperative launch carries a cooperative realization",
+            });
+        };
+        let work_items = usize::try_from(work_items).map_err(|_| DeviceError::Launch {
+            entry: name,
+            clause: "the cooperative work extent fits this host",
+        })?;
+        let admitted = self.cooperative_layout(name, work_items, Some(threads), layout.shared)?;
+        if &admitted != layout {
+            return Err(DeviceError::Launch {
+                entry: name,
+                clause: "the cooperative geometry and report equal the function's admitted resident grid",
+            });
+        }
+        self.module.function(name)?.launch_cooperative_on_shared(
+            &self.stream,
+            layout.grid,
+            layout.block,
+            layout.shared,
+            params,
+        )?;
+        Ok(())
+    }
+
     /// **Open the card at a device ordinal**: a context, the census, the image and a stream.
     /// Refused with [`DeviceError::NoKernels`] when the build had no `nvcc`.
     pub fn open(ordinal: i32) -> Result<Self, DeviceError> {
@@ -798,5 +943,65 @@ impl Operand<'_> {
 impl From<CudaError> for DeviceError {
     fn from(error: CudaError) -> Self {
         DeviceError::Driver(Box::new(error))
+    }
+}
+
+#[cfg(test)]
+mod cooperative_tests {
+    use super::*;
+
+    #[test]
+    fn cooperative_grid_covers_each_work_item_once_with_resident_blocks() {
+        for (work, threads, resident, grid_limit) in [
+            (1, 32, 80, 1000),
+            (257, 7, 3, 1000),
+            (257, 32, 80, 2),
+            (8193, 128, 40, 1000),
+        ] {
+            let layout =
+                cooperative_grid("fixture", work, threads, 16, resident, grid_limit).unwrap();
+            let Realization::CooperativeGrid { blocks, rounds, .. } = layout.realization else {
+                panic!("expected a cooperative realization");
+            };
+            assert!(u64::from(blocks) <= resident);
+            assert!(blocks <= grid_limit);
+            let stride = u64::from(blocks) * u64::from(threads);
+            let mut visits = vec![0; work as usize];
+            // This is the kernel's whole-grid traversal, compared to the serial index set.
+            for round in 0..rounds {
+                for rank in 0..stride {
+                    let at = round * stride + rank;
+                    if at < work {
+                        visits[at as usize] += 1;
+                    }
+                }
+            }
+            assert!(visits.iter().all(|&count| count == 1));
+            assert!((rounds - 1) * stride < work);
+        }
+    }
+
+    #[test]
+    fn cooperative_grid_refuses_empty_capacity_and_retains_wide_work_extent() {
+        for (work, threads, resident, grid) in [
+            (0, 32, 80, 100),
+            (1, 0, 80, 100),
+            (1, 32, 0, 100),
+            (1, 32, 80, 0),
+        ] {
+            assert!(cooperative_grid("fixture", work, threads, 0, resident, grid).is_err());
+        }
+        let layout = cooperative_grid("fixture", u64::MAX, 32, 0, 80, 100).unwrap();
+        assert_eq!(layout.grid, Dim3::x(80));
+        assert_eq!(
+            layout.realization,
+            Realization::CooperativeGrid {
+                work_items: u64::MAX,
+                blocks: 80,
+                threads: 32,
+                rounds: u64::MAX.div_ceil(2560),
+                resident_blocks: 80,
+            }
+        );
     }
 }

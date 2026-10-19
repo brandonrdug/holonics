@@ -134,7 +134,10 @@
 pub mod card;
 mod carry;
 mod dyadic;
+pub mod epoch;
 mod execute;
+mod execute_exact;
+mod inverse_exact;
 pub mod lattice;
 pub mod moment;
 pub mod port;
@@ -157,9 +160,12 @@ pub use card::{
     Card, CardBuffer, DeviceCensus, EntryCensus, KERNELS, Layout, Operand, Realization,
     certificate_layout, copy_layout, ingest_layout, read_layout, word_layout,
 };
+pub use epoch::EpochFlowExecution;
+pub use execute_exact::{ExactWordCarry, ExactWordMatrix, ExactWordStage};
+pub use inverse_exact::{ExactInverseExecution, ExactInverseOperator};
 pub use lattice::{Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};
 pub use moment::{MomentCounts, MomentSnapshot, ResidentMoment};
-pub use port::{Mounted, Resident, Traffic};
+pub use port::{Mounted, ObservedEpochDevice, Resident, Traffic};
 pub use tree::{CardTree, TreeTimes};
 pub use word::{Refusal, ResonatorPlan};
 
@@ -212,6 +218,30 @@ pub enum DeviceError {
     Malformed { entries: Vec<(usize, usize)> },
     #[error("a kernel wrote the status word {status}, which names no refusal")]
     Status { status: u32 },
+    #[error(
+        "epoch aggregation refused before publication: status {status}, required magnitude words {required_words}, entry {failing_entry}"
+    )]
+    EpochFlow {
+        status: u32,
+        required_words: u64,
+        failing_entry: u64,
+    },
+    #[error(
+        "exact inverse refused before chart publication: status {status}, required magnitude words {required_words}, entry {failing_entry}"
+    )]
+    InverseExact {
+        status: u32,
+        required_words: u64,
+        failing_entry: u64,
+    },
+    #[error(
+        "exact word stage refused before publication: status {status}, required magnitude words {required_words}, entry {failing_entry}"
+    )]
+    WordExact {
+        status: u32,
+        required_words: u64,
+        failing_entry: u64,
+    },
     #[error(transparent)]
     Hnn(#[from] HnnError),
 }

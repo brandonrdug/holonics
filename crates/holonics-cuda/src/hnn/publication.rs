@@ -48,6 +48,7 @@ use num_traits::Zero;
 use crate::hnn::DeviceError;
 use crate::hnn::card::{Card, CardBuffer, copy_layout};
 use crate::hnn::dyadic::{DyadicMatrix, refused};
+use crate::hnn::inverse_exact::ExactInverseOperator;
 
 /// The scatter's entry in the image.
 pub const SCATTER_ENTRY: &str = "hnn_scatter_words";
@@ -106,7 +107,7 @@ pub(crate) struct SourceLoci {
 #[derive(Clone, Debug)]
 pub(crate) struct ContactOperator {
     pub(crate) operator: ExactRatMatrix,
-    pub(crate) words: DyadicMatrix,
+    pub(crate) words: Option<DyadicMatrix>,
     pub(crate) norm: Rat,
 }
 
@@ -442,12 +443,14 @@ impl Loci {
         }
         let [storage, stiffness, dissipation] = &self.contacts[contact].forms;
         let operator = contact_operator(storage, stiffness, dissipation, conductance, step)?;
+        let exact = ExactInverseOperator::of(&operator)?;
         let words = DyadicMatrix::of(
             &operator,
             "a contact operator entry off the dyadics or past the word",
-        )?;
+        )
+        .ok();
         let formed = Rc::new(ContactOperator {
-            norm: words.row_norm(),
+            norm: exact.row_norm(),
             words,
             operator,
         });
@@ -598,6 +601,18 @@ impl DeviceError {
             DeviceError::Word { .. } => refused("a coordinate past the signed 64-bit word"),
             DeviceError::Malformed { .. } => refused("a malformed gather"),
             DeviceError::Status { .. } => refused("a status word naming no refusal"),
+            DeviceError::EpochFlow { .. } => {
+                refused("an epoch aggregation refused before publication")
+            }
+            DeviceError::InverseExact { status: 4, .. } => HnnError::Carrier {
+                what: "an exact inverse chart coordinate beyond the signed 64-bit lattice",
+            },
+            DeviceError::InverseExact { .. } => {
+                refused("an exact inverse refused before chart publication")
+            }
+            DeviceError::WordExact { .. } => {
+                refused("an exact word stage refused before publication")
+            }
         }
     }
 }

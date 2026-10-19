@@ -56,7 +56,7 @@
 use num_bigint::BigInt;
 #[cfg(test)]
 use num_bigint::BigUint;
-use num_traits::{One, ToPrimitive, Zero};
+use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::aeon::Reading;
 use crate::hnn::HnnError;
@@ -533,6 +533,59 @@ impl HolonRatio {
         }
         Ok(RatioCovector { logits })
     }
+
+    /// Partition the foil once at the receiving face, then return one reached
+    /// right-hand side for the word's adjoint. The imaginary rows are the whole
+    /// phase comparison; only nonnegative magnitude masses are partitioned.
+    /// `released[j][c]` is exact and is zero at unobserved receiving stations.
+    /// These are transient return operands, never retained normal statistics.
+    pub(crate) fn epoch_covector(
+        &self,
+        exponent: u32,
+    ) -> Result<(RatioCovector, Vec<Vec<Rat>>), HnnError> {
+        use crate::ratio::linear::vector::integral;
+
+        let mut covector = RatioCovector {
+            logits: self
+                .faces
+                .faces
+                .iter()
+                .map(|face| vec![Rat::zero(); 2 * face.cells().len()])
+                .collect(),
+        };
+        let mut released = self
+            .faces
+            .faces
+            .iter()
+            .map(|face| vec![Rat::zero(); face.cells().len()])
+            .collect::<Vec<_>>();
+        let unit = BigInt::one() << exponent as usize;
+        for (ratio, &station) in self.phases.iter().zip(&self.stations) {
+            let face = &self.faces.faces[station];
+            // The native odometer's positive weights are joined before any
+            // normalizer division. One integer Z serves the whole face.
+            let weights = (0..face.cells().len())
+                .map(|class| face.carried(class)?.odometer().map_err(Into::into))
+                .collect::<Result<Vec<Rat>, HnnError>>()?;
+            let (numerators, _) = integral(&weights);
+            let normalizer: BigInt = numerators.iter().sum();
+            if normalizer <= BigInt::zero() || numerators.iter().any(Signed::is_negative) {
+                return Err(HnnError::Unadmitted {
+                    reason: "an epoch foil has nonnegative weights and one positive normalizer",
+                });
+            }
+            for (class, weight) in numerators.iter().enumerate() {
+                let scaled = weight << exponent as usize;
+                let quotient = &scaled / &normalizer;
+                let remainder = scaled - &quotient * &normalizer;
+                covector.logits[station][2 * class] = Rat::new(quotient, unit.clone());
+                released[station][class] = Rat::new(remainder, &normalizer * &unit);
+            }
+            covector.logits[station][2 * ratio.target] -= Rat::one();
+            covector.logits[station][2 * ratio.target + 1] = -ratio.gap.turns() / integer(2);
+        }
+        Ok((covector, released))
+    }
 }
 
 /// A comparison with an actually received complex face, in the same receiving chart.
@@ -818,5 +871,51 @@ mod bulk_code_length_tests {
                 .collect::<Vec<_>>();
             assert_eq!(bulk, individual);
         }
+    }
+}
+
+#[cfg(test)]
+mod epoch_partition_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    #[test]
+    fn epoch_foil_is_partitioned_once_and_phase_is_retained_whole() {
+        let faces = Faces::of_reads(
+            &[
+                ReceivingRead::of_logits(vec![rat(1, 16), rat(3, 8), rat(-1, 16), rat(1, 4)], 16),
+                ReceivingRead::of_logits(vec![Rat::zero(); 4], 16),
+            ],
+            16,
+        )
+        .unwrap();
+        let compared = HolonRatio::compare_partition(
+            faces,
+            &[1, 0],
+            &TargetPhases {
+                branch: BigInt::from(7),
+                phases: vec![rat(2, 11), rat(1, 11)],
+            },
+            &[true, false],
+        )
+        .unwrap();
+        let original = compared.covector().unwrap();
+        let (retained, released) = compared.epoch_covector(9).unwrap();
+        for class in 0..2 {
+            assert_eq!(
+                &retained.logits()[0][2 * class] + &released[0][class],
+                original.logits()[0][2 * class]
+            );
+            assert!(released[0][class] >= Rat::zero());
+            assert!(released[0][class] < rat(1, 512));
+            assert_eq!(
+                retained.logits()[0][2 * class + 1],
+                original.logits()[0][2 * class + 1]
+            );
+            assert!((retained.logits()[0][2 * class].clone() * integer(512)).is_integer());
+        }
+        assert!(retained.logits()[1].iter().all(Zero::is_zero));
+        assert!(released[1].iter().all(Zero::is_zero));
+        assert!(released[0].iter().any(|value| !value.is_zero()));
     }
 }

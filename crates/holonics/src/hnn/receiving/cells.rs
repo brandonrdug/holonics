@@ -77,6 +77,43 @@ pub enum CellLaw<'k> {
     Draw(&'k mut KeyStream),
 }
 
+/// Exterior evidence of the complete producing operands of a scored face, before reception.
+/// Equality certifies the same face expression, not merely overlapping numerical bounds.
+/// Unequal operands do not by themselves prove different probabilities. No receipt is fed
+/// back into the population, the release law or the key stream.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ScoredFaceReading {
+    pub population: PortPopulation,
+    pub tree_probabilities: Vec<Rat>,
+    pub combined: Face,
+}
+
+impl ScoredFaceReading {
+    pub(super) fn new(population: &PortPopulation, tree: &LandmarkFace, combined: &Face) -> Self {
+        Self {
+            population: population.clone(),
+            tree_probabilities: tree.probabilities.clone(),
+            combined: combined.clone(),
+        }
+    }
+
+    /// Re-read these immutable operands at a common explicit precision. This does not draw,
+    /// receive a class, update a chart or consume a key.
+    pub fn masses_at(&self, bits: u32) -> Result<Vec<ExactInterval>, HnnError> {
+        (0..self.tree_probabilities.len())
+            .map(|class| {
+                scored_mass(
+                    &self.population,
+                    &self.tree_probabilities,
+                    &self.combined,
+                    class,
+                    bits,
+                )
+            })
+            .collect()
+    }
+}
+
 /// **One cell's decision.**
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CellDecision {
@@ -94,6 +131,8 @@ pub struct CellDecision {
     pub bits: u32,
     /// Every class's scored face at that depth, before this cell is received.
     pub face: Vec<ExactInterval>,
+    /// Exact producing operands; absent only when no key permits a face decision.
+    pub scored_face: Option<ScoredFaceReading>,
 }
 
 impl CellDecision {
@@ -167,9 +206,19 @@ fn scored_face(
     class: usize,
     bits: u32,
 ) -> Result<ExactInterval, HnnError> {
-    let point = tree.probabilities.get(class).ok_or(HnnError::CellOutside {
+    scored_mass(population, &tree.probabilities, combined, class, bits)
+}
+
+fn scored_mass(
+    population: &PortPopulation,
+    tree: &[Rat],
+    combined: &Face,
+    class: usize,
+    bits: u32,
+) -> Result<ExactInterval, HnnError> {
+    let point = tree.get(class).ok_or(HnnError::CellOutside {
         code: class,
-        alphabet: tree.probabilities.len(),
+        alphabet: tree.len(),
     })?;
     population
         .face_of(&[
@@ -243,6 +292,7 @@ pub fn release_cells(
                             key: None,
                             bits: READING_BITS,
                             face: Vec::new(),
+                            scored_face: None,
                         });
                         break;
                     }
@@ -282,6 +332,7 @@ pub fn release_cells(
                 key: key.clone(),
                 bits,
                 face,
+                scored_face: Some(ScoredFaceReading::new(&local, tree, combined)),
             });
             if emits {
                 break;

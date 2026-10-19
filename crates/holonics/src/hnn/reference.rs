@@ -144,6 +144,7 @@
 //! uncounted rather than estimated from shapes.
 
 mod comparison;
+pub(crate) mod epoch;
 pub use comparison::{
     ComparisonReading, ComparisonTrialReading, ComparisonWaveChanges, FiniteComparisonReceipt,
     FrozenComparison, no_reach_halving,
@@ -542,6 +543,12 @@ pub struct Resident {
     aeon: AeonState,
     ledger: EnclosedLedger,
     arrived: Option<Arrived>,
+    /// Actual receiving ingress ticks since this life was mounted. A key move
+    /// changes a lift residue without creating an ingress tick.
+    observed_epoch_ingress: Option<(usize, u64)>,
+    /// A declared finite passage may end inside a receiver section (REQ063
+    /// lines209-210). Its terminal partial absorption has no continuation square.
+    observed_epoch_terminal: bool,
     released_bits: u64,
     stop: Option<BudgetStop>,
     charts: Charts,
@@ -606,7 +613,7 @@ impl ChartTally {
         for reading in readings {
             self.reads += 1;
             match reading.start {
-                ChartStart::Warm => {}
+                ChartStart::Warm | ChartStart::Reused => {}
                 ChartStart::Transpose => self.cold += 1,
                 ChartStart::Exact => self.seeded += 1,
             }
@@ -809,6 +816,10 @@ impl Resident {
         &self.current
     }
 
+    pub fn receiver_ingress_ticks(&self) -> Option<(usize, u64)> {
+        self.observed_epoch_ingress
+    }
+
     /// The receiving parametron's active suffix address (the landmark tree): the last cells ingested,
     /// newest first, at the deepest declared receiver's depth.
     pub fn address(&self) -> &ActiveAddress {
@@ -908,6 +919,9 @@ impl Resident {
         let staged: u64 = self.staged.values().map(|slot| slot.bits()).sum();
         let arrived = self.arrived.as_ref().map_or(0, Arrived::bits);
         let carried = self.carried.as_ref().map_or(0, carry_bits);
+        let receiver_clock = self.observed_epoch_ingress.map_or(1, |(ring, ticks)| {
+            BigInt::from(ring).bits() + BigInt::from(ticks).bits() + 2
+        }) + 1;
         // An observed chart's decoder forms here on its first read; its port's admission certified
         // `ker E = 0`, so it forms, and a chart that carries no decoder retains none.
         let receiving_chart = self.receiving_chart.as_ref().map_or(0, |chart| {
@@ -943,6 +957,7 @@ impl Resident {
             + pending
             + staged
             + arrived
+            + receiver_clock
             + self.constitution.exact_bits()
             + self.charts.bits()
     }
@@ -1094,6 +1109,7 @@ impl Reference {
         constitution: Constitution,
         saved_family: Option<Vec<ReceivingPhases>>,
     ) -> Result<Resident, HnnError> {
+        constitution.admit_epoch_field(field)?;
         let parametric = field.holarchy(&constitution)?.parametric();
         if parametric != field.parametric() {
             return Err(HnnError::Shape {
@@ -1109,6 +1125,10 @@ impl Reference {
                 .iter()
                 .map(|receiver| ReceivingPhases::declare(field, &constitution, current, receiver))
                 .collect::<Result<Vec<_>, _>>()?,
+        };
+        let observed_epoch_ingress = match admitted.as_slice() {
+            [phases] if phases.aperture() == 1 => Some((phases.ring(), 0)),
+            _ => None,
         };
         Ok(Resident {
             founding: None,
@@ -1132,6 +1152,8 @@ impl Reference {
             },
             ledger: EnclosedLedger::new(),
             arrived: None,
+            observed_epoch_ingress,
+            observed_epoch_terminal: false,
             released_bits: 0,
             stop: None,
             charts: Charts::new(),
@@ -1220,7 +1242,7 @@ impl Reference {
                 &field.founding_candidates()?,
             )?;
         }
-        let constitution = opening.continued(state)?;
+        let constitution = opening.continued_on(field, state)?;
         if let Some(text) = state.passage() {
             let passage = passage::ResidentPassage::from_text(field, &constitution, text)?;
             let parts = passage.parts();
@@ -1245,6 +1267,7 @@ impl Reference {
             resident.carried = state.carry().cloned();
             resident.founding = state.founding().cloned();
             resident.staged_founding = state.staged_founding();
+            resident.observed_epoch_ingress = state.receiver_ingress_ticks();
             return resident.with_passage(passage);
         }
         // A constitution-only save remains a declared narrower material/carry remount.
@@ -1254,6 +1277,7 @@ impl Reference {
         }?;
         resident.founding = state.founding().cloned();
         resident.staged_founding = state.staged_founding();
+        resident.observed_epoch_ingress = state.receiver_ingress_ticks();
         Ok(resident)
     }
 }
@@ -1269,6 +1293,177 @@ fn receipt(
 ) -> Result<PortReceipt, HnnError> {
     let _ = field;
     port_receipt(ticks, unit, work, detail)
+}
+
+impl Reference {
+    // One producer law for ordinary refine and selected observed execution. The
+    // return is still private staging; successful execution publishes its handle.
+    fn prepare_refine(
+        &self,
+        resident: &Resident,
+        moment: &MomentId,
+        phases: &ReceivingPhases,
+        view: &crate::hnn::ring::modes::ModeView,
+        field: &Field,
+        constitution: &Constitution,
+    ) -> Result<(PendingRatio, WordOpening, PendingId), HnnError> {
+        resident.admit_exact_current()?;
+        if resident.pending.len() >= self.pending_capacity {
+            return Err(HnnError::PendingCapacity {
+                capacity: self.pending_capacity,
+            });
+        }
+        // One chain in refine order under the carry: the word opens on the end of the last word
+        // read, whether or not that word's comparison is still pending (the reception carry §8).
+        let opening = match self.reception {
+            Reception::Rest => WordOpening::Rest,
+            Reception::Carry(absorption) => match &resident.carried {
+                Some(carry) => WordOpening::Received {
+                    carry: carry.clone(),
+                    absorption,
+                },
+                None => WordOpening::Rest,
+            },
+        };
+        let source = resident
+            .moments
+            .get(moment)
+            .ok_or(HnnError::UnknownHandle {
+                handle: Handle::Moment(*moment),
+            })?;
+        source.read_retained_faces(field, constitution)?;
+        let ratio = PendingRatio::produce(
+            &resident.current,
+            source,
+            &resident.address,
+            phases,
+            constitution.commit(),
+        )?
+        .with_view(field, view)?;
+        let id = PendingId(resident.next_handle()?);
+        Ok((ratio, opening, id))
+    }
+
+    // The immutable scope owns every field/material read in this call, including retained
+    // source faces, comparison commit and released loci. The local resident holds only the
+    // progressing current/address and staged output; its clone is not a second producer.
+    fn refine_view_scoped(
+        &self,
+        resident: &mut Resident,
+        moment: &MomentId,
+        phases: &ReceivingPhases,
+        view: &crate::hnn::ring::modes::ModeView,
+        rings: Option<&mut crate::hnn::propagation::RingScope<'_>>,
+    ) -> Result<
+        (
+            PendingId,
+            InteractionReturn<Faces, (), (), Vec<ReceivingPhases>, PortReceipt>,
+        ),
+        HnnError,
+    > {
+        let (field, constitution) = match rings.as_ref() {
+            Some(scope) => (scope.field(), scope.material()),
+            None => (&resident.field, &resident.constitution),
+        };
+        let (mut ratio, opening, id) =
+            self.prepare_refine(resident, moment, phases, view, field, constitution)?;
+        let start = Instant::now();
+        let (word, faces) = match rings {
+            Some(scope) => ratio.read_on_scoped(scope, &mut resident.charts, &opening)?,
+            None => ratio.read_on(field, constitution, &mut resident.charts, &opening)?,
+        };
+        ratio.admit_observed_read(field, &word.receiving_anchors(phases)?, &faces)?;
+        let read = start.elapsed();
+        let ended = match self.reception {
+            Reception::Rest => None,
+            Reception::Carry(absorption) => Some(word.reception_end()?.absorbed(absorption)),
+        };
+        let start = Instant::now();
+        let released = word.released()?;
+        resident.tally.read(&released.charts);
+        let path = path_attenuation(
+            field,
+            ratio.anchor(),
+            phases.ring(),
+            phases.last_epoch(),
+            phases.grain(),
+        )?;
+        let reached: Vec<Locus> = Diamond::opened(field, phases, &opening.support(field))
+            .retained(field)
+            .into_iter()
+            .filter(|locus| !constitution.released().contains(locus))
+            .collect();
+        let mut work = ExactWork::nothing();
+        wrote_all(&mut work, faces.logits.iter().flatten());
+        for _ in 0..released.ticks {
+            work.stepped();
+        }
+        let ticks = vec![released.ticks as u64; field.rings().len()];
+        let mut receipt = receipt(
+            field,
+            &ticks,
+            field.step(),
+            work,
+            ReceiptDetail::Refine {
+                view: ratio.view().clone(),
+                reached,
+                released_power: released.power.clone(),
+                peak_bits: released.peak_bits,
+                path,
+                charts: released.charts.clone(),
+                remainders: released.remainders.clone(),
+                last: released.last.clone(),
+                resonators: released.resonators.clone(),
+                // Under `A = 0` the word's motion carries from its last crossing (record B §2.4):
+                // its balance is read to that crossing, whose change the carry holds.
+                word: Box::new(match (&ended, &self.reception) {
+                    (Some(carry), Reception::Carry(Absorption::Nothing)) => {
+                        WordBalance::carried(&released, carry.change.clone())
+                    }
+                    _ => WordBalance::of(&released),
+                }),
+            },
+        )?;
+        receipt.balances = released.balances;
+        receipt.unresolved = faces.faces.iter().map(|face| face.fibres()).collect();
+        let order = source_order(field, ratio.anchor(), ratio.moment().cells());
+        let kept = KeptRead {
+            commit: constitution.commit(),
+            word: word.keep(),
+            faces: faces.clone(),
+        };
+        resident.wall.refine_read += read;
+        resident.wall.release += start.elapsed();
+        resident.next = id.0;
+        resident.pending.insert(
+            id,
+            PendingSlot {
+                ratio,
+                emitted: faces.logits.clone(),
+                kept: Some(kept),
+                opening,
+            },
+        );
+        // The word ran: its end is the motion the next refine opens on, and the motion every
+        // commit until then acts on (the reception carry §8).
+        if ended.is_some() {
+            resident.carried = ended;
+            resident.carried_error = None;
+        }
+        Ok((
+            id,
+            InteractionReturn {
+                forward: Component::Present(faces),
+                pullback: Component::Absent(
+                    "refine is forward only; its word is kept for the compare at its commit",
+                ),
+                deposit: Component::Absent("refine publishes only faces"),
+                order: Component::Present(order),
+                phases: Component::Present(vec![phases.clone()]),
+                receipt,
+            },
+        ))
+    }
 }
 
 impl ExecutionPort for Reference {
@@ -1515,6 +1710,16 @@ impl ExecutionPort for Reference {
             }
         }
         let receipt = receipt(&field, &ticks, &Rat::one(), work, detail)?;
+        if let Some((ring, count)) = resident.observed_epoch_ingress {
+            let passed = *ticks.get(ring).ok_or(HnnError::RingOutside {
+                ring,
+                rings: ticks.len(),
+            })?;
+            resident.observed_epoch_ingress = Some((
+                ring,
+                count.checked_add(passed).ok_or(HnnError::CountOverflow)?,
+            ));
+        }
         Ok((
             id,
             InteractionReturn {
@@ -1641,139 +1846,7 @@ impl ExecutionPort for Reference {
         ),
         HnnError,
     > {
-        resident.admit_exact_current()?;
-        if resident.pending.len() >= self.pending_capacity {
-            return Err(HnnError::PendingCapacity {
-                capacity: self.pending_capacity,
-            });
-        }
-        // One chain in refine order under the carry: the word opens on the end of the last word
-        // read, whether or not that word's comparison is still pending (the reception carry §8).
-        let opening = match self.reception {
-            Reception::Rest => WordOpening::Rest,
-            Reception::Carry(absorption) => match &resident.carried {
-                Some(carry) => WordOpening::Received {
-                    carry: carry.clone(),
-                    absorption,
-                },
-                None => WordOpening::Rest,
-            },
-        };
-        let source = resident
-            .moments
-            .get(moment)
-            .ok_or(HnnError::UnknownHandle {
-                handle: Handle::Moment(*moment),
-            })?;
-        source.read_retained_faces(&resident.field, &resident.constitution)?;
-        let mut ratio = PendingRatio::produce(
-            &resident.current,
-            source,
-            &resident.address,
-            phases,
-            resident.constitution.commit(),
-        )?
-        .with_view(&resident.field, view)?;
-        let id = PendingId(resident.next_handle()?);
-        let field = &resident.field;
-        let start = Instant::now();
-        let (word, faces) = ratio.read_on(
-            field,
-            &resident.constitution,
-            &mut resident.charts,
-            &opening,
-        )?;
-        ratio.admit_observed_read(field, &word.receiving_anchors(phases)?, &faces)?;
-        let read = start.elapsed();
-        let ended = match self.reception {
-            Reception::Rest => None,
-            Reception::Carry(absorption) => Some(word.reception_end()?.absorbed(absorption)),
-        };
-        let start = Instant::now();
-        let released = word.released()?;
-        resident.tally.read(&released.charts);
-        let path = path_attenuation(
-            field,
-            ratio.anchor(),
-            phases.ring(),
-            phases.last_epoch(),
-            phases.grain(),
-        )?;
-        let reached: Vec<Locus> = Diamond::opened(field, phases, &opening.support(field))
-            .retained(field)
-            .into_iter()
-            .filter(|locus| !resident.constitution.released().contains(locus))
-            .collect();
-        let mut work = ExactWork::nothing();
-        wrote_all(&mut work, faces.logits.iter().flatten());
-        for _ in 0..released.ticks {
-            work.stepped();
-        }
-        let ticks = vec![released.ticks as u64; field.rings().len()];
-        let mut receipt = receipt(
-            field,
-            &ticks,
-            field.step(),
-            work,
-            ReceiptDetail::Refine {
-                view: ratio.view().clone(),
-                reached,
-                released_power: released.power.clone(),
-                peak_bits: released.peak_bits,
-                path,
-                charts: released.charts.clone(),
-                remainders: released.remainders.clone(),
-                last: released.last.clone(),
-                resonators: released.resonators.clone(),
-                // Under `A = 0` the word's motion carries from its last crossing (record B §2.4):
-                // its balance is read to that crossing, whose change the carry holds.
-                word: Box::new(match (&ended, &self.reception) {
-                    (Some(carry), Reception::Carry(Absorption::Nothing)) => {
-                        WordBalance::carried(&released, carry.change.clone())
-                    }
-                    _ => WordBalance::of(&released),
-                }),
-            },
-        )?;
-        receipt.balances = released.balances;
-        receipt.unresolved = faces.faces.iter().map(|face| face.fibres()).collect();
-        let order = source_order(field, ratio.anchor(), ratio.moment().cells());
-        let kept = KeptRead {
-            commit: resident.constitution.commit(),
-            word: word.keep(),
-            faces: faces.clone(),
-        };
-        resident.wall.refine_read += read;
-        resident.wall.release += start.elapsed();
-        resident.next = id.0;
-        resident.pending.insert(
-            id,
-            PendingSlot {
-                ratio,
-                emitted: faces.logits.clone(),
-                kept: Some(kept),
-                opening,
-            },
-        );
-        // The word ran: its end is the motion the next refine opens on, and the motion every
-        // commit until then acts on (the reception carry §8).
-        if ended.is_some() {
-            resident.carried = ended;
-            resident.carried_error = None;
-        }
-        Ok((
-            id,
-            InteractionReturn {
-                forward: Component::Present(faces),
-                pullback: Component::Absent(
-                    "refine is forward only; its word is kept for the compare at its commit",
-                ),
-                deposit: Component::Absent("refine publishes only faces"),
-                order: Component::Present(order),
-                phases: Component::Present(vec![phases.clone()]),
-                receipt,
-            },
-        ))
+        self.refine_view_scoped(resident, moment, phases, view, None)
     }
 
     fn compare(
@@ -2523,6 +2596,65 @@ pub fn compose(
     targets: &[usize],
     steps: &[ReceivingStep],
 ) -> Result<(Pullback, Deposit), HnnError> {
+    let (pullback, deposit) = compose_for(
+        field,
+        constitution,
+        ratio,
+        opening,
+        back,
+        targets,
+        steps,
+        ReturnConsumer::Word,
+    )?;
+    Ok((
+        pullback.ok_or(HnnError::Unadmitted {
+            reason: "a word comparison returns its complete pullback",
+        })?,
+        deposit,
+    ))
+}
+
+/// An observed epoch consumes reached covectors; its joint certificate reads the summed pair
+/// direction at close. No ordinary per-word deposit calls this contribution-only entry point.
+fn compose_epoch_contribution(
+    field: &Field,
+    constitution: &Constitution,
+    ratio: &PendingRatio,
+    opening: &WordOpening,
+    back: &WordReturn,
+    targets: &[usize],
+    steps: &[ReceivingStep],
+) -> Result<Deposit, HnnError> {
+    let (_, deposit) = compose_for(
+        field,
+        constitution,
+        ratio,
+        opening,
+        back,
+        targets,
+        steps,
+        ReturnConsumer::Epoch,
+    )?;
+    Ok(deposit)
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ReturnConsumer {
+    Word,
+    Epoch,
+}
+
+/// The one composition owner, with only unconsumed returned readings omitted for an epoch.
+fn compose_for(
+    field: &Field,
+    constitution: &Constitution,
+    ratio: &PendingRatio,
+    opening: &WordOpening,
+    back: &WordReturn,
+    targets: &[usize],
+    steps: &[ReceivingStep],
+    consumer: ReturnConsumer,
+) -> Result<(Option<Pullback>, Deposit), HnnError> {
     let phases = ratio.phases();
     // The word's diamond opened on what it opened on (the reception carry §8): under the carry the
     // carried interior moves from tick 0, so its ticks enter each locus's window.
@@ -2530,7 +2662,7 @@ pub fn compose(
     let released = constitution.released();
     let retained = |locus: Locus| diamond.retains(field, locus) && !released.contains(&locus);
     let receiving = phases.ring();
-    let composed = compose_return_view(
+    let composed = compose_return_view_for(
         field,
         constitution,
         &diamond,
@@ -2539,6 +2671,7 @@ pub fn compose(
         ratio.moment(),
         back,
         ratio.view(),
+        consumer,
     )?;
     // The receiving parametron's landmark tree (`compression::landmark::context`): each compared target deposits on
     // the paths its phase's causal address opens, in cell order, when the comparison reached the
@@ -2610,6 +2743,15 @@ pub struct ComposedReturn {
     pub factors: Vec<FactorStep>,
     pub reached: Vec<Locus>,
     pub phases: u64,
+}
+
+/// Internal parts: an epoch has no consumer of the returned whole Pullback.
+struct ComposedParts {
+    pullback: Option<Pullback>,
+    linear: Vec<LinearStep>,
+    factors: Vec<FactorStep>,
+    reached: Vec<Locus>,
+    phases: u64,
 }
 
 /// **A word return composed onto every locus inside a causal diamond** ([`compose`]'s law, read
@@ -2807,6 +2949,176 @@ pub(crate) fn pair_ray_speed(
     }
 }
 
+/// Sum the speeds on the actual source faces, preparing their common pair/direction only once.
+/// Leaky counts retain the whole-table consumer; an empty operand family keeps its zero sum.
+pub(crate) fn pair_ray_speed_sum(
+    field: &Field,
+    moments: &[SourceMoment],
+    ring: usize,
+    offset: usize,
+    pair: &crate::hnn::moment::PairPort,
+    direction: [&[Vec<Rat>]; 3],
+) -> Result<[Rat; 2], HnnError> {
+    if moments.is_empty() {
+        return Ok([Rat::zero(), Rat::zero()]);
+    }
+    let prepared = crate::hnn::moment::PreparedPairRay::new(pair, direction)?;
+    let population = PopulationChart::of(field);
+    // Each face reads the same immutable pair/direction and writes only its own two
+    // squared norms. Indexed collection preserves the first refusal in source order;
+    // the canonical rational sum is exact and independent of the pool's schedule.
+    let speeds = indexed(moments.len(), |at| {
+        let moment = &moments[at];
+        if let Some(face) = moment.resident_pair_face(ring, offset, pair)? {
+            face.ray_speed_prepared(&prepared, &population.value(face.population()))
+        } else {
+            whole_pair_ray_speed(field, moment, ring, offset, pair, direction)
+        }
+    })?;
+    Ok(speeds
+        .into_iter()
+        .fold([Rat::zero(), Rat::zero()], |sum, speed| {
+            let [first, second] = sum;
+            let [delta_first, delta_second] = speed;
+            [first + delta_first, second + delta_second]
+        }))
+}
+
+#[cfg(test)]
+mod parallel_pair_speed_tests {
+    use super::*;
+    use crate::hnn::tests::learning::{chain_declaration, generic_within};
+    use crate::hnn::tests::support::encoded;
+    use crate::ratio::rat;
+
+    #[test]
+    fn pair_speed_parallel_sum_matches_serial_oracle_on_one_three_and_twelve_workers() {
+        let mut declaration = chain_declaration(1 << 16);
+        declaration.offsets = vec![1, 2];
+        declaration.rings[0].lock = (0..declaration.rings[0].period).collect();
+        let field = Field::declare(declaration.by_lattice_rule()).unwrap();
+        let material = generic_within(&field, 301, 1 << 40);
+        let mut current = Current::at_rest(&field);
+        let mut moment = SourceMoment::open(&field, &current);
+        let mut moments = vec![moment.clone()];
+        for at in 0..31 {
+            moment
+                .ingest(
+                    &field,
+                    &mut current,
+                    &encoded(&field, &[at % field.alphabet()]),
+                )
+                .unwrap();
+            if [0, 7, 30].contains(&at) {
+                moments.push(moment.clone());
+            }
+        }
+        let leaky = material.clone().with_transport(0, rat(3, 4)).unwrap();
+        let mut current = Current::at_rest(&field);
+        let mut transported = SourceMoment::open_with(&field, &current, &leaky).unwrap();
+        transported
+            .ingest(
+                &field,
+                &mut current,
+                &encoded(&field, &[1, 0, 1, 1, 0, 1, 0, 0, 1]),
+            )
+            .unwrap();
+        moments.push(transported);
+        let pools: Vec<_> = [1, 3, 12]
+            .into_iter()
+            .map(|threads| {
+                rayon::ThreadPoolBuilder::new()
+                    .num_threads(threads)
+                    .build()
+                    .unwrap()
+            })
+            .collect();
+        // Separate initially cold slot maps exercise face construction in each pool;
+        // later prefixes also exercise immutable face reuse in that same pool.
+        let pool_moments: Vec<_> = pools.iter().map(|_| moments.clone()).collect();
+        let wide = (BigInt::one() << 137usize) + BigInt::from(11);
+        for &offset in field.offsets() {
+            let pair = material.pair_port(0, offset).unwrap();
+            assert!(
+                moments
+                    .last()
+                    .unwrap()
+                    .resident_pair_face(0, offset, pair)
+                    .unwrap()
+                    .is_none()
+            );
+            let bases = [pair.outputs(), pair.current_reads(), pair.earlier_reads()];
+            let direction: [Vec<Vec<Rat>>; 3] = std::array::from_fn(|k| {
+                bases[k]
+                    .iter()
+                    .enumerate()
+                    .map(|(i, row)| {
+                        row.iter()
+                            .enumerate()
+                            .map(|(j, _)| {
+                                Rat::new(
+                                    BigInt::from(((17 * k + 7 * i + j) % 13) as i64 - 6),
+                                    &wide * BigInt::from([3, 5, 7][(i + j + k) % 3]),
+                                )
+                            })
+                            .collect()
+                    })
+                    .collect()
+            });
+            let zeros: [Vec<Vec<Rat>>; 3] = std::array::from_fn(|k| {
+                bases[k]
+                    .iter()
+                    .map(|row| vec![Rat::zero(); row.len()])
+                    .collect()
+            });
+            for d in [
+                [&direction[0][..], &direction[1][..], &direction[2][..]],
+                [&zeros[0][..], &zeros[1][..], &zeros[2][..]],
+            ] {
+                for end in 0..=moments.len() {
+                    // Independent whole-table arithmetic, with no prepared face or parallel sum.
+                    let mut expected = [Rat::zero(), Rat::zero()];
+                    for moment in &moments[..end] {
+                        let speed =
+                            whole_pair_ray_speed(&field, moment, 0, offset, pair, d).unwrap();
+                        expected[0] += &speed[0];
+                        expected[1] += &speed[1];
+                    }
+                    for (pool, operands) in pools.iter().zip(&pool_moments) {
+                        let actual = pool
+                            .install(|| {
+                                pair_ray_speed_sum(&field, &operands[..end], 0, offset, pair, d)
+                            })
+                            .unwrap();
+                        assert_eq!(
+                            actual,
+                            expected,
+                            "offset {offset}, prefix {end}, workers {}",
+                            pool.current_num_threads()
+                        );
+                    }
+                }
+            }
+            let bad = [
+                &direction[0][..direction[0].len() - 1],
+                &direction[1][..],
+                &direction[2][..],
+            ];
+            for pool in &pools {
+                assert!(
+                    pool.install(|| pair_ray_speed_sum(&field, &moments, 0, offset, pair, bad))
+                        .is_err()
+                );
+                assert_eq!(
+                    pool.install(|| pair_ray_speed_sum(&field, &[], 0, offset, pair, bad))
+                        .unwrap(),
+                    [Rat::zero(), Rat::zero()]
+                );
+            }
+        }
+    }
+}
+
 /// The pair part of the actual composed return, with the whole-table route for leaky counts.
 /// Keeping the FactorStep here lets the equality oracle compare every field of the Native step.
 #[allow(clippy::type_complexity)]
@@ -2819,6 +3131,35 @@ pub(crate) fn compose_pair_return(
     turned: &[Vec<Rat>],
     turned_charts: &[crate::ratio::linear::vector::Chart],
 ) -> Result<(FactorStep, [Vec<Vec<Rat>>; 3]), HnnError> {
+    let (step, pullback) = compose_pair_return_for(
+        field,
+        moment,
+        ring,
+        offset,
+        pair,
+        turned,
+        turned_charts,
+        ReturnConsumer::Word,
+    )?;
+    Ok((
+        step,
+        pullback.ok_or(HnnError::Unadmitted {
+            reason: "a per-word pair return carries its complete pullback",
+        })?,
+    ))
+}
+
+#[allow(clippy::type_complexity)]
+fn compose_pair_return_for(
+    field: &Field,
+    moment: &SourceMoment,
+    ring: usize,
+    offset: usize,
+    pair: &crate::hnn::moment::PairPort,
+    turned: &[Vec<Rat>],
+    turned_charts: &[crate::ratio::linear::vector::Chart],
+    consumer: ReturnConsumer,
+) -> Result<(FactorStep, Option<[Vec<Vec<Rat>>; 3]>), HnnError> {
     let gradient = if let Some(face) = moment.resident_pair_face(ring, offset, pair)? {
         let weight = PopulationChart::of(field).value(face.population());
         face.gradient(pair, turned, turned_charts, &weight)?
@@ -2835,14 +3176,20 @@ pub(crate) fn compose_pair_return(
     let step_outputs: Vec<_> = outputs.iter().map(|x| negated(x)).collect();
     let step_current: Vec<_> = current.iter().map(|x| negated(x)).collect();
     let step_earlier: Vec<_> = earlier.iter().map(|x| negated(x)).collect();
-    let speed = pair_ray_speed(
-        field,
-        moment,
-        ring,
-        offset,
-        pair,
-        [&step_outputs, &step_current, &step_earlier],
-    )?;
+    let speed = if consumer == ReturnConsumer::Word {
+        pair_ray_speed(
+            field,
+            moment,
+            ring,
+            offset,
+            pair,
+            [&step_outputs, &step_current, &step_earlier],
+        )?
+    } else {
+        // This contribution is never certified alone. The epoch overwrites this slot with
+        // the speed of its summed direction before preparing or certifying any factor.
+        [Rat::zero(), Rat::zero()]
+    };
     let step = FactorStep {
         gradient: FactorGradient::PairPort {
             ring,
@@ -2856,7 +3203,10 @@ pub(crate) fn compose_pair_return(
         energy,
         covector,
     };
-    Ok((step, [outputs, current, earlier]))
+    Ok((
+        step,
+        (consumer == ReturnConsumer::Word).then_some([outputs, current, earlier]),
+    ))
 }
 
 /// Compose the exact transpose of the declared source view before E, pair and count returns.
@@ -2871,6 +3221,39 @@ pub fn compose_return_view(
     back: &WordReturn,
     view: &crate::hnn::ring::modes::ModeView,
 ) -> Result<ComposedReturn, HnnError> {
+    let parts = compose_return_view_for(
+        field,
+        constitution,
+        diamond,
+        anchor,
+        current,
+        moment,
+        back,
+        view,
+        ReturnConsumer::Word,
+    )?;
+    Ok(ComposedReturn {
+        pullback: parts.pullback.ok_or(HnnError::Unadmitted {
+            reason: "a word return exposes its complete pullback",
+        })?,
+        linear: parts.linear,
+        factors: parts.factors,
+        reached: parts.reached,
+        phases: parts.phases,
+    })
+}
+
+fn compose_return_view_for(
+    field: &Field,
+    constitution: &Constitution,
+    diamond: &Diamond,
+    anchor: &[BigInt],
+    current: &Current,
+    moment: &SourceMoment,
+    back: &WordReturn,
+    view: &crate::hnn::ring::modes::ModeView,
+    consumer: ReturnConsumer,
+) -> Result<ComposedParts, HnnError> {
     use crate::ratio::linear::vector::{Chart, integral};
     let released = constitution.released();
     let retained = |locus: Locus| diamond.retains(field, locus) && !released.contains(&locus);
@@ -2916,19 +3299,23 @@ pub fn compose_return_view(
             reason: "receiving return features match the declared material layout",
         });
     }
-    let read_charts: Vec<[Chart; 2]> = back
-        .reads
-        .iter()
-        .map(|(feature, gradient)| [integral(gradient), integral(feature)])
-        .collect();
-    let map_gradient = outer_rows(
-        2 * alphabet,
-        width_r,
-        &read_charts
+    let map_gradient = if consumer == ReturnConsumer::Word {
+        let read_charts: Vec<[Chart; 2]> = back
+            .reads
             .iter()
-            .map(|[gradient, feature]| (&one, gradient, feature))
-            .collect::<Vec<_>>(),
-    );
+            .map(|(feature, gradient)| [integral(gradient), integral(feature)])
+            .collect();
+        Some(outer_rows(
+            2 * alphabet,
+            width_r,
+            &read_charts
+                .iter()
+                .map(|[gradient, feature]| (&one, gradient, feature))
+                .collect::<Vec<_>>(),
+        ))
+    } else {
+        None
+    };
     let samples = back
         .reads
         .iter()
@@ -2948,7 +3335,7 @@ pub fn compose_return_view(
 
     // The rings' element material and class covectors, the rings together.
     let parts = indexed(field.rings().len(), |g| {
-        compose_ring(field, constitution, back, diamond, &retained, g)
+        compose_ring(field, constitution, back, diamond, &retained, g, consumer)
     })?;
     let mut ring_pullbacks = Vec::with_capacity(parts.len());
     let mut classes_all: Vec<Vec<Rat>> = Vec::with_capacity(parts.len());
@@ -2999,7 +3386,9 @@ pub fn compose_return_view(
                 covector,
             });
         }
-        ring_pullbacks[g].standing = standing;
+        if let Some(pullback) = &mut ring_pullbacks[g] {
+            pullback.standing = standing;
+        }
     }
 
     // The source rings: E_g, E_g^(δ) and the moment's covector. Qᵀ acts once here,
@@ -3019,22 +3408,24 @@ pub fn compose_return_view(
         // The passage (the request, continued by any placed section, in its one population,
         // `hnn::moment`) enters through `E_g` at the request's frame.
         let modulus = constitution.transport(g);
-        let gradient = moment.encoder_covector(field, &current, g, opening, &modulus)?;
-        let source_t = source.transpose()?;
-        // The covector on the moment's counts at their weights (ruling B: the open reads
-        // `M[c] w(c)`, so `∂/∂M[c] = w(c) Eᵀ h` with the weights held; at a transport of modulus
-        // one `w = ν̂(n)` at every phase, an empty one included).
-        let weights = if modulus.is_one() {
-            vec![PopulationChart::of(field).value(moment.population(g)?); turned.len()]
+        let source_pullback = if consumer == ReturnConsumer::Word {
+            let gradient = moment.encoder_covector(field, current, g, opening, &modulus)?;
+            let source_t = source.transpose()?;
+            let weights = if modulus.is_one() {
+                vec![PopulationChart::of(field).value(moment.population(g)?); turned.len()]
+            } else {
+                moment.phase_weights(field, g, &modulus)?
+            };
+            let moment_covector = indexed(turned.len(), |c| {
+                Ok(apply_rows(&source_t, &turned[c])?
+                    .into_iter()
+                    .map(|x| x * &weights[c])
+                    .collect())
+            })?;
+            Some((gradient, moment_covector))
         } else {
-            moment.phase_weights(field, g, &modulus)?
+            None
         };
-        let moment_covector = indexed(turned.len(), |c| {
-            Ok(apply_rows(&source_t, &turned[c])?
-                .into_iter()
-                .map(|x| x * &weights[c])
-                .collect())
-        })?;
         // One sample per occupied phase: its feature the passage's normalized counts.
         let mut source_samples = Vec::new();
         for (c, h) in turned.iter().enumerate() {
@@ -3055,10 +3446,20 @@ pub fn compose_return_view(
             let pair = constitution
                 .pair_port(g, offset)
                 .ok_or(HnnError::MissingSourcePort { ring: g })?;
-            let (step, pullbacks) =
-                compose_pair_return(field, moment, g, offset, pair, &turned, &turned_charts)?;
+            let (step, pullbacks) = compose_pair_return_for(
+                field,
+                moment,
+                g,
+                offset,
+                pair,
+                &turned,
+                &turned_charts,
+                consumer,
+            )?;
             pair_steps.push(step);
-            pair_pullbacks.push((offset, pullbacks));
+            if let Some(pullbacks) = pullbacks {
+                pair_pullbacks.push((offset, pullbacks));
+            }
         }
         phases = phases.max(source_samples.len() as u64);
         if retained(Locus::SourcePort(g)) {
@@ -3068,9 +3469,13 @@ pub fn compose_return_view(
             });
             factors.extend(pair_steps);
         }
-        ring_pullbacks[g].source = Some(gradient);
-        ring_pullbacks[g].pair = pair_pullbacks;
-        ring_pullbacks[g].moment = Some(moment_covector);
+        if let (Some(pullback), Some((gradient, moment_covector))) =
+            (&mut ring_pullbacks[g], source_pullback)
+        {
+            pullback.source = Some(gradient);
+            pullback.pair = pair_pullbacks;
+            pullback.moment = Some(moment_covector);
+        }
     }
 
     // The loaded resonators: reverse their transient local state in reverse tick order (the word
@@ -3124,11 +3529,6 @@ pub fn compose_return_view(
                 *energy += dot(feature, feature);
             }
         }
-        let pullback = ResonatorPullback {
-            ring: g,
-            gains: loss_gradients.clone(),
-            energy: energies.clone(),
-        };
         if retained(Locus::Resonator(g)) && reached {
             for family in 0..material.gain_count() {
                 factors.push(FactorStep {
@@ -3142,7 +3542,13 @@ pub fn compose_return_view(
                 });
             }
         }
-        resonator_pullbacks.push(pullback);
+        if consumer == ReturnConsumer::Word {
+            resonator_pullbacks.push(ResonatorPullback {
+                ring: g,
+                gains: loss_gradients,
+                energy: energies,
+            });
+        }
     }
 
     // The contacts: their channel factors, conductance and pair geometry, the contacts together.
@@ -3159,13 +3565,22 @@ pub fn compose_return_view(
         .into_iter()
         .filter(|locus| retained(*locus))
         .collect();
-    let pullback = Pullback {
-        rings: ring_pullbacks,
-        contacts: contact_pullbacks,
-        resonators: resonator_pullbacks,
-        receiving: (receiving, matrix_of(map_gradient, width_r)?),
+    let pullback = if let Some(map_gradient) = map_gradient {
+        Some(Pullback {
+            rings: ring_pullbacks
+                .into_iter()
+                .collect::<Option<Vec<_>>>()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "a word return keeps each ring pullback",
+                })?,
+            contacts: contact_pullbacks,
+            resonators: resonator_pullbacks,
+            receiving: (receiving, matrix_of(map_gradient, width_r)?),
+        })
+    } else {
+        None
     };
-    Ok(ComposedReturn {
+    Ok(ComposedParts {
         pullback,
         linear,
         factors,
@@ -3182,7 +3597,7 @@ struct RingPart {
     factors: Vec<FactorStep>,
     /// The largest entry of an adjoint `u_t` in the element's window (its families' covector scale).
     covector: Rat,
-    pullback: RingPullback,
+    pullback: Option<RingPullback>,
     classes: Vec<Rat>,
     energy: Rat,
 }
@@ -3197,6 +3612,7 @@ fn compose_ring(
     diamond: &Diamond,
     retained: &(impl Fn(Locus) -> bool + Sync),
     g: usize,
+    consumer: ReturnConsumer,
 ) -> Result<RingPart, HnnError> {
     use crate::ratio::linear::vector::{Chart, IntegralMatrix, integer_dot, integral, lcm};
     let one = Rat::one();
@@ -3218,14 +3634,18 @@ fn compose_ring(
     // K̄ = Σ_t u_t x̄_tᵀ and the contrast port's Σ_t u_t c_tᵀ.
     let element_gradient =
         IntegralMatrix::outer_sum(n, n, charts.iter().map(|[u, x, _]| (&one, u, x)));
-    let contrast_gradient = outer_rows(
-        n,
-        n,
-        &charts
-            .iter()
-            .map(|[u, _, c]| (&one, u, c))
-            .collect::<Vec<_>>(),
-    );
+    let contrast_gradient = if consumer == ReturnConsumer::Word {
+        Some(outer_rows(
+            n,
+            n,
+            &charts
+                .iter()
+                .map(|[u, _, c]| (&one, u, c))
+                .collect::<Vec<_>>(),
+        ))
+    } else {
+        None
+    };
     // The classes `Σ_t (u·s)(x̄·v) − (u·v)(x̄·s)` and the slices' gradients
     // `σ Σ_t [(x̄·v)u − (u·v)x̄]`, `σ Σ_t [(u·s)x̄ − (x̄·s)u]`, on the common denominator
     // `D = lcm_t(d_u d_x̄)` of the ticks' `u x̄ᵀ`.
@@ -3347,16 +3767,20 @@ fn compose_ring(
         contrast,
         factors,
         covector,
-        pullback: RingPullback {
-            ring: g,
-            passive: matrix_of(passive_gradient, passive.columns())?,
-            contrast: matrix_of(contrast_gradient, n)?,
-            slices: slice_gradient,
-            classes: classes.clone(),
-            standing: Vec::new(),
-            source: None,
-            pair: Vec::new(),
-            moment: None,
+        pullback: if let Some(contrast_gradient) = contrast_gradient {
+            Some(RingPullback {
+                ring: g,
+                passive: matrix_of(passive_gradient, passive.columns())?,
+                contrast: matrix_of(contrast_gradient, n)?,
+                slices: slice_gradient,
+                classes: classes.clone(),
+                standing: Vec::new(),
+                source: None,
+                pair: Vec::new(),
+                moment: None,
+            })
+        } else {
+            None
         },
         classes,
         energy,

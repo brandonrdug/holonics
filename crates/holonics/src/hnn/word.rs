@@ -1894,6 +1894,36 @@ impl<'c> Word<'c> {
         opening: &WordOpening,
         view: &crate::hnn::ring::modes::ModeView,
     ) -> Result<Self, HnnError> {
+        Self::open_received_view_with(field, constitution, current, moment, opening, view, || {
+            Operands::at_cut_charted(field, constitution, current, charts)
+        })
+    }
+
+    pub(crate) fn open_received_scoped(
+        scope: &mut crate::hnn::propagation::RingScope<'c>,
+        current: &Current,
+        moment: &SourceMoment,
+        charts: &mut Charts,
+        opening: &WordOpening,
+        view: &crate::hnn::ring::modes::ModeView,
+    ) -> Result<Self, HnnError> {
+        let field = scope.field();
+        let material = scope.material();
+        Self::open_received_view_with(field, material, current, moment, opening, view, || {
+            scope.at_cut(current, charts)
+        })
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn open_received_view_with(
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        current: &Current,
+        moment: &SourceMoment,
+        opening: &WordOpening,
+        view: &crate::hnn::ring::modes::ModeView,
+        operands: impl FnOnce() -> Result<Operands, HnnError>,
+    ) -> Result<Self, HnnError> {
         let storage = view.apply(field, &moment.open_storage(field, constitution, current)?)?;
         let paired = field.receivers().iter().any(|r| {
             matches!(
@@ -1902,7 +1932,7 @@ impl<'c> Word<'c> {
             )
         });
         let response_source = paired.then(|| storage.clone());
-        let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
+        let operands = operands()?;
         let WordOpening::Received { carry, absorption } = opening else {
             let exact = paired.then(|| EndChange {
                 storage: storage.clone(),
@@ -3545,6 +3575,10 @@ pub(crate) struct KeptWord {
 }
 
 impl KeptWord {
+    pub(crate) fn operands(&self) -> &Operands {
+        &self.operands
+    }
+
     /// The kept word's anchor at a junction step on a ring (read-only; [`Word::anchor`]'s).
     pub(crate) fn anchor(&self, step: usize, ring: usize) -> Option<&[Rat]> {
         self.passage

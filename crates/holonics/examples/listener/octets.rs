@@ -368,7 +368,7 @@ pub(crate) fn field(population: u64) -> Result<Field> {
 
 /// An exact sum of code-length enclosures, reported with integer endpoints `[⌊Σ lower⌋, ⌈Σ upper⌉]`.
 #[derive(Clone, Debug)]
-struct CodeSum {
+pub(super) struct CodeSum {
     lower: Rat,
     upper: Rat,
     cells: u64,
@@ -385,13 +385,13 @@ impl Default for CodeSum {
 }
 
 impl CodeSum {
-    fn add(&mut self, interval: &ExactInterval) {
+    pub(super) fn add(&mut self, interval: &ExactInterval) {
         self.lower += &interval.lower;
         self.upper += &interval.upper;
         self.cells += 1;
     }
 
-    fn merge(&mut self, other: &CodeSum) {
+    pub(super) fn merge(&mut self, other: &CodeSum) {
         self.lower += &other.lower;
         self.upper += &other.upper;
         self.cells += other.cells;
@@ -403,6 +403,15 @@ impl CodeSum {
             self.lower.floor().to_integer(),
             self.upper.ceil().to_integer()
         )
+    }
+
+    /// Exact endpoints of the summed enclosure; no exterior integer rounding.
+    pub(super) fn exact_endpoints(&self) -> String {
+        format!("[{},{}]", self.lower, self.upper)
+    }
+
+    pub(super) fn cells(&self) -> u64 {
+        self.cells
     }
 }
 
@@ -949,6 +958,7 @@ mod diagnostic_tests {
             key: None,
             bits: 4,
             face: vec![ExactInterval::point(rat(1, 4))],
+            scored_face: None,
         };
         let before = cell.clone();
         let code = drawn_code(&cell, 0).unwrap();
