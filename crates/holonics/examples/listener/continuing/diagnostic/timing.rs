@@ -129,10 +129,6 @@ impl RunBudget {
             .saturating_sub(REPORT_RESERVE_FLOOR_NS))
     }
 
-    pub(super) fn reserve_ns(&self) -> u128 {
-        self.reserve_ns
-    }
-
     fn global_remaining_ns_at(&self, now_ns: u128) -> u128 {
         self.deadline
             .native_ns
@@ -874,9 +870,9 @@ mod tests {
     fn fork_admission_includes_concurrent_report_projection() {
         let native_per_branch = 80_u128;
         let report_per_branch = 30_u128;
-        let waves = 1;
+        let waves: usize = 1;
         let remaining = 100_u128;
-        assert!(native_per_branch * waves <= remaining);
+        assert!(native_per_branch * waves as u128 <= remaining);
         assert_eq!(
             fork_and_report_projection(native_per_branch, report_per_branch, waves),
             110

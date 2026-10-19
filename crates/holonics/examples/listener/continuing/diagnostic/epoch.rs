@@ -470,7 +470,7 @@ fn held_readings_for_map(
         let work_label = format!("held comparison {label} cell {cell}");
         budget.check_before_work(&work_label)?;
         let started = Instant::now();
-        let evaluation_result = (|| {
+        let evaluation_result: Result<_> = (|| {
             let wave =
                 held_candidate_wave(frozen, &view.producing_map, candidate_map, &view.samples)?;
             frozen.evaluate(&wave).map_err(Into::into)

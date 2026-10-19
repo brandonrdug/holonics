@@ -1232,6 +1232,9 @@ pub(super) fn run(
         2 + b_pools.len(),
         2 + b_pools.len()
     );
+    let first_b_count = b_branches.len().min(1);
+    let (first_b_branches, later_b_branches) = b_branches.split_at_mut(first_b_count);
+    let (first_b_pools, later_b_pools) = b_pools.split_at(first_b_count);
     let (a_result, a0_result, b_results) = std::thread::scope(|scope| {
         let a_pool = &a_pool;
         let a_worker = scope.spawn(|| {
@@ -1281,117 +1284,116 @@ pub(super) fn run(
         let crossing_map_ref = &crossing.map;
         let budget_ref = &budget;
         let port_ref = port;
-        let b_workers: Vec<_> = b_branches
-            .iter_mut()
-            .zip(&b_pools)
-            .take(1)
-            .map(
-                |((name, _, _, classes, branch_resident, branch_crib), pool)| {
-                    let name = name.clone();
-                    let worker_name = name.clone();
-                    let branch_abort = branch_abort_ref;
-                    let pairing = pairing_ref;
-                    let crossing_map = crossing_map_ref;
-                    let budget = budget_ref;
-                    let port = port_ref;
-                    let pool = pool;
-                    let handle = scope.spawn(move || {
-                        guarded_worker(branch_abort, || {
-                            let result = pool
-                                .install(|| {
-                                    observe_branch(
-                                        port,
-                                        branch_resident,
-                                        branch_crib,
-                                        pairing,
-                                        classes,
-                                        &worker_name,
-                                        crossing_map,
-                                        budget,
-                                        branch_abort,
-                                    )
-                                    .map_err(|error| error.to_string())
-                                })
-                                .map_err(std::io::Error::other)?;
-                            Ok(result)
-                        })
-                    });
-                    (name, handle)
-                },
-            )
-            .collect();
+        let first_b_worker = first_b_branches.first_mut().zip(first_b_pools.first()).map(
+            |((name, _, _, classes, branch_resident, branch_crib), pool)| {
+                let name = name.clone();
+                let worker_name = name.clone();
+                let branch_abort = branch_abort_ref;
+                let pairing = pairing_ref;
+                let crossing_map = crossing_map_ref;
+                let budget = budget_ref;
+                let port = port_ref;
+                let pool = pool;
+                let handle = scope.spawn(move || {
+                    guarded_worker(branch_abort, || {
+                        let result = pool
+                            .install(|| {
+                                observe_branch(
+                                    port,
+                                    branch_resident,
+                                    branch_crib,
+                                    pairing,
+                                    classes,
+                                    &worker_name,
+                                    crossing_map,
+                                    budget,
+                                    branch_abort,
+                                )
+                                .map_err(|error| error.to_string())
+                            })
+                            .map_err(std::io::Error::other)?;
+                        Ok(result)
+                    })
+                });
+                (name, handle)
+            },
+        );
         let a_result = a_worker
             .join()
             .unwrap_or_else(|_| Err("A branch worker panicked".to_owned()));
         let a0_result = a0_worker
             .join()
             .unwrap_or_else(|_| Err("A0 branch worker panicked".to_owned()));
-        let mut b_results = b_workers
-            .into_iter()
+        let mut b_results = first_b_worker
             .map(|(name, worker)| {
                 let result = worker
                     .join()
                     .unwrap_or_else(|_| Err(format!("{name} branch worker panicked")));
                 (name, result)
             })
+            .into_iter()
             .collect::<Vec<_>>();
-        let mut next_b = b_results.len();
-        while next_b < b_branches.len() {
+        for (branch_wave, pool_wave) in later_b_branches.chunks_mut(3).zip(later_b_pools.chunks(3))
+        {
             if branch_abort.load(Ordering::Acquire) {
-                b_results.extend(b_branches[next_b..].iter().map(|(name, ..)| {
+                b_results.extend(branch_wave.iter().map(|(name, ..)| {
                     (
                         name.clone(),
                         Err("shared branch abort before scheduled wave".to_owned()),
                     )
                 }));
-                break;
+                continue;
             }
-            let wave_end = (next_b + 3).min(b_branches.len());
-            let wave_workers: Vec<_> = b_branches[next_b..wave_end]
-                .iter_mut()
-                .zip(&b_pools[next_b..wave_end])
-                .map(
-                    |((name, _, _, classes, branch_resident, branch_crib), pool)| {
-                        let name = name.clone();
-                        let worker_name = name.clone();
-                        let branch_abort = branch_abort_ref;
-                        let pairing = pairing_ref;
-                        let crossing_map = crossing_map_ref;
-                        let budget = budget_ref;
-                        let port = port_ref;
-                        let pool = pool;
-                        let handle = scope.spawn(move || {
-                            guarded_worker(branch_abort, || {
-                                let result = pool
-                                    .install(|| {
-                                        observe_branch(
-                                            port,
-                                            branch_resident,
-                                            branch_crib,
-                                            pairing,
-                                            classes,
-                                            &worker_name,
-                                            crossing_map,
-                                            budget,
-                                            branch_abort,
-                                        )
-                                        .map_err(|error| error.to_string())
-                                    })
-                                    .map_err(std::io::Error::other)?;
-                                Ok(result)
-                            })
-                        });
-                        (name, handle)
-                    },
-                )
-                .collect();
-            b_results.extend(wave_workers.into_iter().map(|(name, worker)| {
-                let result = worker
-                    .join()
-                    .unwrap_or_else(|_| Err(format!("{name} branch worker panicked")));
-                (name, result)
-            }));
-            next_b = wave_end;
+            let wave_results = std::thread::scope(|wave_scope| {
+                let wave_workers = branch_wave
+                    .iter_mut()
+                    .zip(pool_wave)
+                    .map(
+                        |((name, _, _, classes, branch_resident, branch_crib), pool)| {
+                            let name = name.clone();
+                            let worker_name = name.clone();
+                            let branch_abort = branch_abort_ref;
+                            let pairing = pairing_ref;
+                            let crossing_map = crossing_map_ref;
+                            let budget = budget_ref;
+                            let port = port_ref;
+                            let pool = pool;
+                            let worker = wave_scope.spawn(move || {
+                                guarded_worker(branch_abort, || {
+                                    let result = pool
+                                        .install(|| {
+                                            observe_branch(
+                                                port,
+                                                branch_resident,
+                                                branch_crib,
+                                                pairing,
+                                                classes,
+                                                &worker_name,
+                                                crossing_map,
+                                                budget,
+                                                branch_abort,
+                                            )
+                                            .map_err(|error| error.to_string())
+                                        })
+                                        .map_err(std::io::Error::other)?;
+                                    Ok(result)
+                                })
+                            });
+                            (name, worker)
+                        },
+                    )
+                    .collect::<Vec<_>>();
+                wave_workers
+                    .into_iter()
+                    .map(|(name, worker)| {
+                        let result = worker
+                            .join()
+                            .unwrap_or_else(|_| Err(format!("{name} branch worker panicked")));
+                        (name, result)
+                    })
+                    .collect::<Vec<_>>()
+            });
+            b_results.extend(wave_results);
         }
         (a_result, a0_result, b_results)
     });
@@ -1449,7 +1451,7 @@ pub(super) fn run(
     let report_results = std::thread::scope(|scope| {
         let a_pool = &a_pool;
         let run_budget = &budget;
-        let crossing = &crossing;
+        let crossing_ref = &crossing;
         let a_end = &a_end;
         let a_views = &a_views;
         let a_worker = scope.spawn(move || {
@@ -1458,7 +1460,7 @@ pub(super) fn run(
             let report = a_pool.install(|| {
                 epoch::report_epoch(
                     "A",
-                    crossing,
+                    crossing_ref,
                     a_end,
                     a_views,
                     receiver_grain,
@@ -1478,7 +1480,7 @@ pub(super) fn run(
                 let branch = name.clone();
                 let pool = pool;
                 let run_budget = &budget;
-                let crossing = &crossing;
+                let crossing = crossing_ref;
                 let views = views;
                 let end = end;
                 scope.spawn(move || {
@@ -1532,7 +1534,7 @@ pub(super) fn run(
                     let branch = name.clone();
                     let pool = pool;
                     let run_budget = &budget;
-                    let crossing = &crossing;
+                    let crossing = crossing_ref;
                     let views = views;
                     let end = end;
                     scope.spawn(move || {
