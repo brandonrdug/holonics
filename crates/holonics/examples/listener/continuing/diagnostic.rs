@@ -7,6 +7,8 @@ mod epoch;
 mod execution;
 #[path = "diagnostic/timing.rs"]
 mod timing;
+#[path = "diagnostic/verdict.rs"]
+mod verdict;
 
 use super::*;
 use holonics::hnn::constitution::Sample;
@@ -36,6 +38,39 @@ fn guarded_worker<T>(
         Err(_) => {
             abort.store(true, Ordering::Release);
             Err("diagnostic branch worker panicked".to_owned())
+        }
+    }
+}
+
+fn guarded_report_work<T>(
+    budget: &mut timing::ReportBudget,
+    label: &str,
+    work: impl FnOnce() -> Result<T>,
+) -> Result<T> {
+    let started = Instant::now();
+    check_postwork_cutoff(budget, label, started)?;
+    let value = work();
+    budget.record_work(timing::ReportWorkKind::Other, started.elapsed().as_nanos());
+    let value = value?;
+    check_postwork_cutoff(budget, &format!("completion of {label}"), started)?;
+    Ok(value)
+}
+
+fn check_postwork_cutoff(
+    budget: &mut timing::ReportBudget,
+    label: &str,
+    started: Instant,
+) -> Result<()> {
+    match budget.check_before_work(label) {
+        Ok(()) => Ok(()),
+        Err(error) => {
+            let summary = budget.finish();
+            println!(
+                "step0_main_postwork cutoff_position={label:?} elapsed_ns={} remaining_report_ns={}",
+                started.elapsed().as_nanos(),
+                summary.remaining_report_ns
+            );
+            Err(error.into())
         }
     }
 }
@@ -545,14 +580,6 @@ fn pre_call_moment_text(resident: &Resident) -> Result<String> {
     Ok(text)
 }
 
-fn epoch_statistics(
-    crossing: &CutView,
-    views: &[CutView],
-) -> Result<(ExactRatMatrix, ExactRatMatrix)> {
-    let (gradient, gram_delta, _) = epoch_statistics_with_scale(crossing, views)?;
-    Ok((gradient, gram_delta))
-}
-
 fn epoch_statistics_with_scale(
     crossing: &CutView,
     views: &[CutView],
@@ -605,6 +632,7 @@ fn causal_differences(
     a_faces: &[Faces],
     b_views: &[CutView],
     b_faces: &[Faces],
+    budget: &timing::ReportBudget,
 ) -> Result<(
     Rat,
     Option<(usize, usize, usize)>,
@@ -622,6 +650,7 @@ fn causal_differences(
     let mut max_logit_delta = Rat::zero();
     let mut first_logit_delta = None;
     for cell in 0..a_views.len() {
+        budget.check_before_work(&format!("causal A/B cell {cell}"))?;
         let a_samples = &a_views[cell].samples;
         let b_samples = &b_views[cell].samples;
         if a_samples.len() != b_samples.len() {
@@ -662,6 +691,7 @@ fn causal_differences(
                 max_logit_delta = max_logit_delta.max(delta);
             }
         }
+        budget.check_before_work(&format!("causal A/B cell {cell} completion"))?;
     }
     Ok((
         max_feature_delta,
@@ -669,6 +699,34 @@ fn causal_differences(
         max_logit_delta,
         first_logit_delta,
     ))
+}
+
+fn timed_causal_differences(
+    a_views: &[CutView],
+    a_faces: &[Faces],
+    b_views: &[CutView],
+    b_faces: &[Faces],
+    budget: &mut timing::ReportBudget,
+    label: &str,
+) -> Result<(
+    Rat,
+    Option<(usize, usize, usize)>,
+    Rat,
+    Option<(usize, usize, usize)>,
+)> {
+    let started = Instant::now();
+    check_postwork_cutoff(budget, label, started)?;
+    let result = causal_differences(a_views, a_faces, b_views, b_faces, budget);
+    budget.record_work(timing::ReportWorkKind::Other, started.elapsed().as_nanos());
+    let result = match result {
+        Ok(result) => result,
+        Err(error) => {
+            check_postwork_cutoff(budget, &format!("{label} interrupted"), started)?;
+            return Err(error);
+        }
+    };
+    check_postwork_cutoff(budget, &format!("{label} completion"), started)?;
+    Ok(result)
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -985,20 +1043,18 @@ pub(super) fn run(
         .into_iter()
         .chain(timing::completed_block_upper_ns_per_cell(&capture_cell_ns))
         .max();
-    let postwork_started = Instant::now();
-    let _ = epoch_statistics(&crossing, &capture_views)?;
-    let exact_statistics_postwork = postwork_started.elapsed();
     println!(
-        "step0_calibration cells_per_control=64 no_capture_elapsed_ms={} with_actual_capture_elapsed_ms={} captured_samples={captured_samples} plain_samples=0 capture_record_bytes_total={capture_record_bytes} capture_record_bytes_per_cell={}/{} max_observed_cell_ns={max_observed_calibration_cell_ns} completed_block_upper_ns_per_cell={completed_block_upper:?} exact_statistics_computed=true physical_state_equal=true crib_equal=true exact_statistics_postwork_ms={} total_report_output_bytes_per_cell=unavailable; held_reading_record_bytes_per_evaluated_cell=emitted_by_calibration_epoch_report",
+        "step0_calibration cells_per_control=64 no_capture_elapsed_ms={} with_actual_capture_elapsed_ms={} captured_samples={captured_samples} plain_samples=0 capture_record_bytes_total={capture_record_bytes} capture_record_bytes_per_cell={}/{} max_observed_cell_ns={max_observed_calibration_cell_ns} completed_block_upper_ns_per_cell={completed_block_upper:?} exact_statistics=formed_once_inside_epoch_report physical_state_equal=true crib_equal=true total_report_output_bytes_per_cell=unavailable; held_reading_record_bytes_per_evaluated_cell=emitted_by_calibration_epoch_report",
         plain_elapsed.as_millis(),
         capture_elapsed.as_millis(),
         capture_record_bytes,
-        capture_views.len(),
-        exact_statistics_postwork.as_millis()
+        capture_views.len()
     );
     let calibration_end = cut_view(calibration_capture.constitution(), &[])?;
     let mut calibration_report_budget =
         timing::ReportBudget::new(&budget, "calibration_capture", capture_views.len());
+    let mut epoch_report_failures = Vec::new();
+    let mut calibration_report_capture = epoch::ReportCapture::default();
     let calibration_report_result = calibration_pool.install(|| {
         epoch::report_epoch(
             "calibration_capture",
@@ -1011,6 +1067,7 @@ pub(super) fn run(
                 .ok_or("no admitted receiving source")?
                 .grain(),
             &mut calibration_report_budget,
+            &mut calibration_report_capture,
         )
         .map_err(|error| error.to_string())
     });
@@ -1025,12 +1082,16 @@ pub(super) fn run(
         calibration_report.projected_231_ns,
         calibration_report.remaining_report_ns
     );
-    calibration_report_result.map_err(std::io::Error::other)?;
+    verdict::defer_report_result(
+        "calibration_capture",
+        calibration_report_result,
+        &mut epoch_report_failures,
+    );
     if options.diagnostic_calibration_only {
         println!(
             "step0_calibration_only exact_cells=440 (312 trunk + 64 plain + 64 actual capture); no checkpoint or fork written"
         );
-        return Ok(());
+        return verdict::finish_deferred_reports(&epoch_report_failures);
     }
     let first = base_classes[0];
     let source_ring = *resident
@@ -1070,16 +1131,32 @@ pub(super) fn run(
     }
     let checkpoint_path =
         checkpoint_path.ok_or("full diagnostic requires checkpoint destination")?;
-    crate::octets::save_checkpoint(
+    let checkpoint_started = Instant::now();
+    let checkpoint_result = crate::octets::save_checkpoint(
         &resident,
         &opening,
         resident.field().sources()[0],
         checkpoint_path,
         source_count,
-    )?;
-    println!(
-        "step0_checkpoint scope=resident_only crib_sidecar=false; ObservedCrib is caller-owned and no validated roundtrip codec exists, so later observed resume is not claimed"
     );
+    let checkpoint_elapsed_ns = checkpoint_started.elapsed().as_nanos();
+    let checkpoint_remaining_native_ns = budget.remaining_ns()?;
+    let checkpoint_remaining_report_ns = budget.remaining_report_ns()?;
+    let checkpoint_remaining_ns =
+        checkpoint_remaining_native_ns.min(checkpoint_remaining_report_ns);
+    println!(
+        "step0_checkpoint scope=resident_only crib_sidecar=false elapsed_ns={checkpoint_elapsed_ns} remaining_after_explicit_reserve_ns={checkpoint_remaining_native_ns} shared_285s_phase_cutoff_remaining_ns={checkpoint_remaining_report_ns} admission_remaining_ns={checkpoint_remaining_ns}; ObservedCrib is caller-owned and no validated roundtrip codec exists, so later observed resume is not claimed"
+    );
+    checkpoint_result?;
+    if !timing::projection_fits(
+        branch_projection,
+        report_projection,
+        branch_waves,
+        checkpoint_remaining_ns,
+        180_000_000_000,
+    ) {
+        return Err("post-checkpoint native-plus-report projection no longer fits the fixed branch cap or shared deadline; checkpoint receipt is retained and no fork was spawned".into());
+    }
     let mut b_branches: Vec<(String, usize, u64, Vec<usize>, Resident, ObservedCrib)> =
         intervention_specs
             .iter()
@@ -1235,6 +1312,22 @@ pub(super) fn run(
     let first_b_count = b_branches.len().min(1);
     let (first_b_branches, later_b_branches) = b_branches.split_at_mut(first_b_count);
     let (first_b_pools, later_b_pools) = b_pools.split_at(first_b_count);
+    let pre_fork_native_remaining_ns = budget.remaining_ns()?;
+    let pre_fork_report_remaining_ns = budget.remaining_report_ns()?;
+    let pre_fork_admission_remaining_ns =
+        pre_fork_native_remaining_ns.min(pre_fork_report_remaining_ns);
+    println!(
+        "step0_pre_fork_admission native_remaining_ns={pre_fork_native_remaining_ns} report_cutoff_remaining_ns={pre_fork_report_remaining_ns} admission_remaining_ns={pre_fork_admission_remaining_ns} required_projection_ns={projection}"
+    );
+    if !timing::projection_fits(
+        branch_projection,
+        report_projection,
+        branch_waves,
+        pre_fork_admission_remaining_ns,
+        180_000_000_000,
+    ) {
+        return Err("immediate pre-fork projection no longer fits the fixed branch cap or shared deadline; checkpoint receipt is retained and no fork was spawned".into());
+    }
     let (a_result, a0_result, b_results) = std::thread::scope(|scope| {
         let a_pool = &a_pool;
         let a_worker = scope.spawn(|| {
@@ -1447,7 +1540,6 @@ pub(super) fn run(
         "step0_specification_lattice_exponent b_R=log2(2*L_R) support_width={} spec_LW={spec_lw}",
         crossing.support.len()
     );
-    let mut epoch_report_failures = Vec::new();
     let report_results = std::thread::scope(|scope| {
         let a_pool = &a_pool;
         let run_budget = &budget;
@@ -1456,6 +1548,7 @@ pub(super) fn run(
         let a_views = &a_views;
         let a_worker = scope.spawn(move || {
             let mut report_budget = timing::ReportBudget::new(run_budget, "A", a_views.len());
+            let mut capture = epoch::ReportCapture::default();
             let started = Instant::now();
             let report = a_pool.install(|| {
                 epoch::report_epoch(
@@ -1465,11 +1558,12 @@ pub(super) fn run(
                     a_views,
                     receiver_grain,
                     &mut report_budget,
+                    &mut capture,
                 )
                 .map_err(|error| error.to_string())
             });
             let wall_ns = started.elapsed().as_nanos();
-            (report, wall_ns, report_budget.finish())
+            (report, wall_ns, report_budget.finish(), capture)
         });
         let b_workers = b_outputs
             .iter()
@@ -1486,6 +1580,7 @@ pub(super) fn run(
                 scope.spawn(move || {
                     let mut report_budget =
                         timing::ReportBudget::new(run_budget, &branch, views.len());
+                    let mut capture = epoch::ReportCapture::default();
                     let started = Instant::now();
                     let report = pool.install(|| {
                         epoch::report_epoch(
@@ -1495,11 +1590,12 @@ pub(super) fn run(
                             views,
                             receiver_grain,
                             &mut report_budget,
+                            &mut capture,
                         )
                         .map_err(|error| error.to_string())
                     });
                     let wall_ns = started.elapsed().as_nanos();
-                    (name, report, wall_ns, report_budget.finish())
+                    (name, report, wall_ns, report_budget.finish(), capture)
                 })
             })
             .collect::<Vec<_>>();
@@ -1508,6 +1604,7 @@ pub(super) fn run(
                 Err("A report worker panicked".to_owned()),
                 0,
                 timing::ReportBudget::new(&budget, "A", 0).finish(),
+                epoch::ReportCapture::default(),
             )
         });
         let mut b_results = b_workers
@@ -1519,6 +1616,7 @@ pub(super) fn run(
                         Err("report worker panicked".to_owned()),
                         0,
                         timing::ReportBudget::new(&budget, "unknown", 0).finish(),
+                        epoch::ReportCapture::default(),
                     )
                 })
             })
@@ -1540,6 +1638,7 @@ pub(super) fn run(
                     scope.spawn(move || {
                         let mut report_budget =
                             timing::ReportBudget::new(run_budget, &branch, views.len());
+                        let mut capture = epoch::ReportCapture::default();
                         let started = Instant::now();
                         let report = pool.install(|| {
                             epoch::report_epoch(
@@ -1549,11 +1648,12 @@ pub(super) fn run(
                                 views,
                                 receiver_grain,
                                 &mut report_budget,
+                                &mut capture,
                             )
                             .map_err(|error| error.to_string())
                         });
                         let wall_ns = started.elapsed().as_nanos();
-                        (name, report, wall_ns, report_budget.finish())
+                        (name, report, wall_ns, report_budget.finish(), capture)
                     })
                 })
                 .collect::<Vec<_>>();
@@ -1564,6 +1664,7 @@ pub(super) fn run(
                         Err("report worker panicked".to_owned()),
                         0,
                         timing::ReportBudget::new(&budget, "unknown", 0).finish(),
+                        epoch::ReportCapture::default(),
                     )
                 })
             }));
@@ -1571,81 +1672,149 @@ pub(super) fn run(
         }
         (a_result, b_results)
     });
-    let (a_report, a_report_ns, a_report_summary) = report_results.0;
-    if let Err(error) = a_report {
-        let message = format!("branch=A {error}");
-        println!("step0_epoch_report_deferred_failure {message}");
-        epoch_report_failures.push(message);
+    let mut postwork_budget = timing::ReportBudget::new(&budget, "main_postwork", 231);
+    let postwork_started = Instant::now();
+    macro_rules! guarded_println {
+        ($label:expr, $($arg:tt)*) => {
+            guarded_report_work(&mut postwork_budget, $label, || {
+                println!($($arg)*);
+                Ok(())
+            })?;
+        };
     }
-    println!(
+    let (a_report, a_report_ns, a_report_summary, a_report_capture) = report_results.0;
+    guarded_report_work(&mut postwork_budget, "defer A report verdict", || {
+        verdict::defer_report_result("A", a_report, &mut epoch_report_failures);
+        Ok(())
+    })?;
+    guarded_println!(
+        "A report timing summary",
         "step0_epoch_report_timing branch=A wall_ns={a_report_ns} summary={a_report_summary:?}"
     );
-    for (name, report, wall_ns, summary) in report_results.1 {
-        if let Err(error) = report {
-            let message = format!("branch={name} {error}");
-            println!("step0_epoch_report_deferred_failure {message}");
-            epoch_report_failures.push(message);
-        }
-        println!("step0_epoch_report_timing branch={name} wall_ns={wall_ns} summary={summary:?}");
-    }
-    let a_state = a.continuing_state(resident.field().sources()[0])?;
-    let a0_state = a0.continuing_state(resident.field().sources()[0])?;
-    let aa_equal = a_state == a0_state && a_crib == a0_crib;
-    if !aa_equal {
-        return Err(
-            "A/A0 identical-input replicas diverged in exact resident state or crib".into(),
+    let mut b_report_captures = Vec::with_capacity(report_results.1.len());
+    for (name, report, wall_ns, summary, capture) in report_results.1 {
+        guarded_report_work(
+            &mut postwork_budget,
+            &format!("defer {name} report verdict"),
+            || {
+                verdict::defer_report_result(&name, report, &mut epoch_report_failures);
+                Ok(())
+            },
+        )?;
+        guarded_println!(
+            &format!("{name} report timing summary"),
+            "step0_epoch_report_timing branch={name} wall_ns={wall_ns} summary={summary:?}"
         );
+        b_report_captures.push((name, capture));
     }
-    println!("step0_AA0 exact_resident_state_equal=true caller_owned_crib_equal=true");
-    let (g_a, g_scale_a) = match epoch_statistics_with_scale(&crossing, &a_views) {
-        Ok((gradient, _, scale)) => (Some(gradient), scale),
-        Err(error) => {
-            let message = format!("branch=A crossing metric statistics: {error}");
-            println!("step0_intervention_deferred_failure {message}");
-            epoch_report_failures.push(message);
-            (None, None)
-        }
-    };
-    let (g_b, g_scale_b) = match epoch_statistics_with_scale(&crossing, b_views) {
-        Ok((gradient, _, scale)) => (Some(gradient), scale),
-        Err(error) => {
-            let message = format!("branch={b_name} crossing metric statistics: {error}");
-            println!("step0_intervention_deferred_failure {message}");
-            epoch_report_failures.push(message);
-            (None, None)
-        }
-    };
+    let (a_state, a0_state, aa_equal) = guarded_report_work(
+        &mut postwork_budget,
+        "A/A0 resident and crib equality",
+        || {
+            let a_state = a.continuing_state(resident.field().sources()[0])?;
+            let a0_state = a0.continuing_state(resident.field().sources()[0])?;
+            let equal = a_state == a0_state && a_crib == a0_crib;
+            Ok((a_state, a0_state, equal))
+        },
+    )?;
+    guarded_report_work(&mut postwork_budget, "defer A/A0 equality verdict", || {
+        verdict::defer_report_result(
+            "A/A0",
+            if aa_equal {
+                Ok(())
+            } else {
+                Err("identical-input replicas diverged in exact resident state or crib".to_owned())
+            },
+            &mut epoch_report_failures,
+        );
+        Ok(())
+    })?;
+    guarded_println!(
+        "A/A0 equality report",
+        "step0_AA0 exact_resident_state_equal={} caller_owned_crib_equal={}",
+        a_state == a0_state,
+        a_crib == a0_crib
+    );
+    let (g_a, g_scale_a) = guarded_report_work(
+        &mut postwork_budget,
+        "cached A metric report products",
+        || {
+            Ok((
+                a_report_capture.gradient.clone(),
+                a_report_capture.exact_metric_scale.clone(),
+            ))
+        },
+    )?;
+    let (g_b, g_scale_b) = guarded_report_work(
+        &mut postwork_budget,
+        "cached primary B metric report products",
+        || {
+            let capture = b_report_captures
+                .iter()
+                .find(|(name, _)| name == b_name)
+                .map(|(_, capture)| capture);
+            Ok((
+                capture.and_then(|capture| capture.gradient.clone()),
+                capture.and_then(|capture| capture.exact_metric_scale.clone()),
+            ))
+        },
+    )?;
     let (max_f_delta, first_f_delta, max_logit_delta, first_logit_delta) =
-        causal_differences(&a_views, &a_faces, b_views, b_faces)?;
-    println!(
+        timed_causal_differences(
+            &a_views,
+            &a_faces,
+            b_views,
+            b_faces,
+            &mut postwork_budget,
+            "primary A/B causal feature and logit differences",
+        )?;
+    guarded_println!(
+        "primary intervention report",
         "step0_intervention all_alphabet_classes_fit_source_lock={fit_all} first_class={first} changed_class={alternative} primary_branch={b_name} changed_advance={b_advance} alternatives={intervention_specs:?} G_A={g_a:?} exact_metric_scale_s_A={g_scale_a:?} G_B={g_b:?} exact_metric_scale_s_B={g_scale_b:?} W_table_delta_A={:?} W_table_delta_B={:?}",
         matrix_delta(&a_end.map, &crossing.map)?,
         matrix_delta(&b_end.map, &crossing.map)?
     );
-    let source_base_advance = resident.field().class_advance(source_ring, first)?;
+    let source_base_advance = guarded_report_work(
+        &mut postwork_budget,
+        "baseline source class advance read",
+        || Ok(resident.field().class_advance(source_ring, first)?),
+    )?;
     for (name, class, advance, views, faces, end, _) in &b_outputs {
         if name == b_name {
             continue;
         }
-        let (max_f, first_f, max_logit, first_logit) =
-            causal_differences(&a_views, &a_faces, views, faces)?;
-        let (gradient, scale) = match epoch_statistics_with_scale(&crossing, views) {
-            Ok((gradient, _, scale)) => (Some(gradient), scale),
-            Err(error) => {
-                let message = format!("branch={name} crossing metric statistics: {error}");
-                println!("step0_intervention_deferred_failure {message}");
-                epoch_report_failures.push(message);
-                (None, None)
-            }
-        };
-        println!(
+        let (max_f, first_f, max_logit, first_logit) = timed_causal_differences(
+            &a_views,
+            &a_faces,
+            views,
+            faces,
+            &mut postwork_budget,
+            &format!("variant {name} causal feature and logit differences"),
+        )?;
+        let (gradient, scale) = guarded_report_work(
+            &mut postwork_budget,
+            &format!("cached {name} metric report products"),
+            || {
+                let capture = b_report_captures
+                    .iter()
+                    .find(|(branch, _)| branch == name)
+                    .map(|(_, capture)| capture);
+                Ok((
+                    capture.and_then(|capture| capture.gradient.clone()),
+                    capture.and_then(|capture| capture.exact_metric_scale.clone()),
+                ))
+            },
+        )?;
+        guarded_println!(
+            &format!("variant {name} intervention report"),
             "step0_intervention_variant_vs_A branch={name} changed_class={class} source_advance={advance} baseline_advance={source_base_advance} same_advance_category={} max_abs_delta_f={max_f} first_differing_feature_index={first_f:?} max_abs_delta_logits={max_logit} first_differing_logit_index={first_logit:?} G={gradient:?} exact_metric_scale_s={scale:?} W_table_delta={:?} native_LW_end={}",
             *advance == source_base_advance,
             matrix_delta(&end.map, &crossing.map)?,
             end.native_lattice_exponent
         );
     }
-    println!(
+    guarded_println!(
+        "primary causal report",
         "step0_causal_AB max_abs_delta_f={max_f_delta} first_differing_feature_index={first_f_delta:?} max_abs_delta_logits={max_logit_delta} first_differing_logit_index={first_logit_delta:?} coordinates=(cell,sample_or_station,feature_or_class); clock_content_split=not_inferred"
     );
     fn different_indices<T: PartialEq>(left: &[T], right: &[T]) -> Vec<usize> {
@@ -1654,9 +1823,15 @@ pub(super) fn run(
             .collect()
     }
     for (index, (left, right)) in a_views.iter().zip(b_views).enumerate() {
+        check_postwork_cutoff(
+            &mut postwork_budget,
+            &format!("carried-state comparison cell {index}"),
+            postwork_started,
+        )?;
         let a_change = left.physical.as_ref().ok_or("A refine word end missing")?;
         let b_change = right.physical.as_ref().ok_or("B refine word end missing")?;
-        println!(
+        guarded_println!(
+            &format!("carried-state comparison cell {index}"),
             "step0_carried_AB index={index} preclock_equal={} pre_call_reception_carry_equal={} source_moment_counts_and_clock_equal={} producing_constitution_equal={} refine_end_storage_different_rings={:?} refine_end_arrivals_different_contacts={:?} refine_end_states_different_contacts={:?} refine_end_resonators_different_rings={:?} refine_end_resonator_phases_different_rings={:?}; comparisons_keep_pre_call_and_refine_end_cuts_separate",
             left.pre_clocks == right.pre_clocks,
             left.pre_carried == right.pre_carried,
@@ -1669,8 +1844,20 @@ pub(super) fn run(
             different_indices(&a_change.resonator_phases, &b_change.resonator_phases),
         );
     }
-    let distinct_carried = (1..231).find(|&i| {
-        coarse_face_key(&a_faces[i]) == coarse_face_key(&b_faces[i])
+    check_postwork_cutoff(
+        &mut postwork_budget,
+        "candidate carried-pair scan",
+        postwork_started,
+    )?;
+    let candidate_started = Instant::now();
+    let mut distinct_carried = None;
+    for i in 1..231 {
+        check_postwork_cutoff(
+            &mut postwork_budget,
+            &format!("candidate carried-pair cell {i}"),
+            postwork_started,
+        )?;
+        let matches = coarse_face_key(&a_faces[i]) == coarse_face_key(&b_faces[i])
             && a_views[i].pre_clocks == b_views[i].pre_clocks
             && a_views[i].pre_carried == b_views[i].pre_carried
             && a_views[i].address_text == b_views[i].address_text
@@ -1685,38 +1872,93 @@ pub(super) fn run(
                         && (a_views[i].moment_text != b_views[i].moment_text
                             || a_views[i].producing != b_views[i].producing
                             || left != right)
-                })
-    });
-    let suffix_readout = distinct_carried.map(|pair_index| {
-        let start = pair_index + 1;
-        let agrees = (start..231).all(|i| a_faces[i] == b_faces[i]);
-        let first_divergence = (start..231).find(|&i| a_faces[i] != b_faces[i]);
-        let max_logit_delta = a_faces[start..231]
-            .iter()
-            .zip(&b_faces[start..231])
-            .flat_map(|(a, b)| a.logits.iter().zip(&b.logits))
-            .flat_map(|(a, b)| a.iter().zip(b))
-            .map(|(a, b)| (a - b).abs())
-            .max()
-            .unwrap_or_else(Rat::zero);
-        (pair_index, agrees, first_divergence, max_logit_delta)
-    });
-    println!(
+                });
+        if matches {
+            distinct_carried = Some(i);
+            break;
+        }
+    }
+    postwork_budget.record_work(
+        timing::ReportWorkKind::Other,
+        candidate_started.elapsed().as_nanos(),
+    );
+    check_postwork_cutoff(
+        &mut postwork_budget,
+        "candidate carried-pair scan completion",
+        postwork_started,
+    )?;
+
+    check_postwork_cutoff(
+        &mut postwork_budget,
+        "finite-future scan after candidate pair",
+        postwork_started,
+    )?;
+    let future_started = Instant::now();
+    let suffix_readout = if let Some(pair_index) = distinct_carried {
+        let mut agrees = true;
+        let mut first_divergence = None;
+        let mut max_logit_delta = Rat::zero();
+        for i in (pair_index + 1)..231 {
+            check_postwork_cutoff(
+                &mut postwork_budget,
+                &format!("finite-future cell {i}"),
+                postwork_started,
+            )?;
+            if a_faces[i] != b_faces[i] {
+                agrees = false;
+                first_divergence.get_or_insert(i);
+            }
+            for (a_station, b_station) in a_faces[i].logits.iter().zip(&b_faces[i].logits) {
+                for (a, b) in a_station.iter().zip(b_station) {
+                    max_logit_delta = max_logit_delta.max((a - b).abs());
+                }
+            }
+        }
+        Some((pair_index, agrees, first_divergence, max_logit_delta))
+    } else {
+        None
+    };
+    postwork_budget.record_work(
+        timing::ReportWorkKind::Other,
+        future_started.elapsed().as_nanos(),
+    );
+    check_postwork_cutoff(
+        &mut postwork_budget,
+        "finite-future scan completion",
+        postwork_started,
+    )?;
+    guarded_println!(
+        "finite-future readout",
         "step0_finite_future after_candidate_pair={suffix_readout:?} divergence_indices_are_strictly_after_candidate; agreement is finite-horizon evidence only"
     );
-    println!(
+    guarded_println!(
+        "reachable-pair candidate report",
         "step0_reachable_pair_candidate index={distinct_carried:?} criterion=equal_coarse_grain_face_phase_key_preclock_address_contact_J_states_arrivals_and_distinct_full_carried_state pre_lifts_A={:?} pre_lifts_B={:?}; J_is_geometry_signature_only; realized_Ju_equality_and_unread_predicate_are_unavailable_and_not_established; no pair if absent",
         distinct_carried.map(|i| a_views[i].pre_lift.clone()),
         distinct_carried.map(|i| b_views[i].pre_lift.clone())
     );
-    if !epoch_report_failures.is_empty() {
-        return Err(format!(
-            "deferred epoch reports failed after all branch, intervention, and finite-future readouts: {}",
-            epoch_report_failures.join("; ")
-        )
-        .into());
-    }
-    Ok(())
+    let postwork_elapsed_ns = postwork_started.elapsed().as_nanos();
+    let postwork_summary = postwork_budget.finish();
+    check_postwork_cutoff(
+        &mut postwork_budget,
+        "main postwork timing summary",
+        postwork_started,
+    )?;
+    let summary_print_started = Instant::now();
+    println!(
+        "step0_main_postwork elapsed_ns={postwork_elapsed_ns} checked_work={postwork_summary:?} cutoff_remaining_ns={}",
+        postwork_summary.remaining_report_ns
+    );
+    postwork_budget.record_work(
+        timing::ReportWorkKind::Other,
+        summary_print_started.elapsed().as_nanos(),
+    );
+    check_postwork_cutoff(
+        &mut postwork_budget,
+        "deferred scientific verdict finalization",
+        postwork_started,
+    )?;
+    verdict::finish_deferred_reports(&epoch_report_failures)
 }
 
 #[cfg(test)]

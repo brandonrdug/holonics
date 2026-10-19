@@ -18,6 +18,14 @@ use std::fmt;
 
 type Matrix = ExactRatMatrix;
 
+/// Ephemeral products already formed by a branch report, retained for later intervention output.
+/// This is report-local caching, not native state or a persistent listener receipt.
+#[derive(Default)]
+pub(super) struct ReportCapture {
+    pub(super) gradient: Option<Matrix>,
+    pub(super) exact_metric_scale: Option<Rat>,
+}
+
 fn rat_pow2(exponent: i64) -> Rat {
     if exponent >= 0 {
         Rat::from_integer(BigInt::one() << exponent as usize)
@@ -569,6 +577,7 @@ pub(super) fn report_epoch(
     views: &[CutView],
     receiver_grain: u64,
     budget: &mut timing::ReportBudget,
+    capture: &mut ReportCapture,
 ) -> Result<()> {
     if receiver_grain == 0 {
         return Err("receiver grain denominator must be positive".into());
@@ -580,6 +589,8 @@ pub(super) fn report_epoch(
     let mut held_output_stats = HeldOutputStats::default();
     let (gradient, sample_gram_delta, exact_metric_scale) =
         super::epoch_statistics_with_scale(crossing, views)?;
+    capture.gradient = Some(gradient.clone());
+    capture.exact_metric_scale = exact_metric_scale.clone();
     let native_lw_cross = crossing.native_lattice_exponent;
     let native_lw_end = end.native_lattice_exponent;
     let width = crossing.support.len();
