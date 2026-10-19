@@ -613,6 +613,68 @@ pub(super) fn spec_lattice_exponent(receiver_grain: u64, support_width: usize) -
         .ok_or_else(|| "specification LW overflows u32".into())
 }
 
+/// The specification comparison uses the explicitly stored solved-chart support. An empty
+/// block is valid: the native chart still acts by its scaled identity on every declared map
+/// coordinate. The comparison's log2(0) is undefined; it supplies no substitute exponent/unit
+/// and does not prevent independent native-lattice or matrix readings.
+#[derive(Debug, Eq, PartialEq)]
+enum SpecificationLatticeReadout {
+    UndefinedEmptySolvedSupport {
+        declared_width: usize,
+        receiver_exponent: u32,
+    },
+    Defined {
+        declared_width: usize,
+        support_width: usize,
+        receiver_exponent: u32,
+        exponent: u32,
+        unit: Rat,
+        native_cross_mismatch: bool,
+        native_end_mismatch: bool,
+    },
+}
+
+fn specification_lattice_readout(
+    receiver_grain: u64,
+    support: &[usize],
+    declared_width: usize,
+    native_lw_cross: u32,
+    native_lw_end: u32,
+) -> Result<SpecificationLatticeReadout> {
+    let receiver_exponent = amended_partition_receiver_exponent(receiver_grain)?;
+    if declared_width == 0 {
+        return Err(
+            "specification lattice report requires positive declared receiver width".into(),
+        );
+    }
+    if support
+        .iter()
+        .any(|&coordinate| coordinate >= declared_width)
+        || support.windows(2).any(|pair| pair[0] >= pair[1])
+    {
+        return Err(
+            "specification lattice report requires ordered solved support within receiver width"
+                .into(),
+        );
+    }
+    if support.is_empty() {
+        return Ok(SpecificationLatticeReadout::UndefinedEmptySolvedSupport {
+            declared_width,
+            receiver_exponent,
+        });
+    }
+    let exponent = spec_lattice_exponent(receiver_grain, support.len())?;
+    Ok(SpecificationLatticeReadout::Defined {
+        declared_width,
+        support_width: support.len(),
+        receiver_exponent,
+        exponent,
+        unit: rat_pow2(-i64::from(exponent)),
+        native_cross_mismatch: native_lw_cross != exponent,
+        native_end_mismatch: native_lw_end != exponent,
+    })
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum SilenceVerdict {
     BelowGrain,
@@ -1191,14 +1253,16 @@ fn stall_epoch_readout(
     capture.exact_metric_scale = exact_metric_scale.clone();
     let native_lw_cross = crossing.native_lattice_exponent;
     let native_lw_end = end.native_lattice_exponent;
-    let width = crossing.support.len();
-    let spec_lw = spec_lattice_exponent(receiver_grain, width)?;
     let spec_b_r = amended_partition_receiver_exponent(receiver_grain)?;
-    let spec_unit = rat_pow2(-i64::from(spec_lw));
+    let spec_lattice = specification_lattice_readout(
+        receiver_grain,
+        &crossing.support,
+        crossing.map.columns(),
+        native_lw_cross,
+        native_lw_end,
+    )?;
     let native_unit_cross = rat_pow2(-i64::from(native_lw_cross));
     let native_unit_end = rat_pow2(-i64::from(native_lw_end));
-    let native_spec_mismatch_cross = native_lw_cross != spec_lw;
-    let native_spec_mismatch_end = native_lw_end != spec_lw;
     let actual_map_delta = matrix_subtract(&end.map, &crossing.map)?;
     let actual_stored_gram_delta = matrix_subtract(&end.gram, &crossing.gram)?;
     let actual_carry_delta = matrix_subtract(&end.gram_remainder, &crossing.gram_remainder)?;
@@ -1311,7 +1375,7 @@ fn stall_epoch_readout(
         .map(ToString::to_string)
         .unwrap_or_else(|| "unavailable-no-staged-sample".into());
     println!(
-        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_weight} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_vs_spec_LW_mismatch_cross={native_spec_mismatch_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} native_vs_spec_LW_mismatch_end={native_spec_mismatch_end} spec_b_R=ceil_log2(2*L_R)={spec_b_r:?} spec_LW=b_R+ceil(log2(support_width={width}))={spec_lw} spec_W_unit={spec_unit} no_clock_feature_split_claimed",
+        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_weight} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} spec_b_R=ceil_log2(2*L_R)={spec_b_r:?} spec_LW_domain=explicit-solved-chart-support spec_LW_reading={spec_lattice:?} no_clock_feature_split_claimed",
         matrix_max_abs(&gradient),
     );
 
@@ -1553,14 +1617,16 @@ pub(super) fn report_epoch(
     capture.exact_metric_scale = exact_metric_scale.clone();
     let native_lw_cross = crossing.native_lattice_exponent;
     let native_lw_end = end.native_lattice_exponent;
-    let width = crossing.support.len();
-    let spec_lw = spec_lattice_exponent(receiver_grain, width)?;
     let spec_b_r = amended_partition_receiver_exponent(receiver_grain)?;
-    let spec_unit = rat_pow2(-i64::from(spec_lw));
+    let spec_lattice = specification_lattice_readout(
+        receiver_grain,
+        &crossing.support,
+        crossing.map.columns(),
+        native_lw_cross,
+        native_lw_end,
+    )?;
     let native_unit_cross = rat_pow2(-i64::from(native_lw_cross));
     let native_unit_end = rat_pow2(-i64::from(native_lw_end));
-    let native_spec_mismatch_cross = native_lw_cross != spec_lw;
-    let native_spec_mismatch_end = native_lw_end != spec_lw;
     let actual_map_delta = matrix_subtract(&end.map, &crossing.map)?;
     let actual_stored_gram_delta = matrix_subtract(&end.gram, &crossing.gram)?;
     let actual_carry_delta = matrix_subtract(&end.gram_remainder, &crossing.gram_remainder)?;
@@ -1662,7 +1728,7 @@ pub(super) fn report_epoch(
         crossing.receiving_prior, crossing.prior_scale, crossing.support, crossing.symmetry,
     );
     println!(
-        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_sample_weight:?} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_vs_spec_LW_mismatch_cross={native_spec_mismatch_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} native_vs_spec_LW_mismatch_end={native_spec_mismatch_end} spec_b_R=ceil_log2(2*L_R)={spec_b_r:?} spec_LW=b_R+ceil(log2(support_width={width}))={spec_lw} spec_W_unit={spec_unit:?} no_clock_feature_split_claimed",
+        "step0_epoch_observables branch={branch} max_abs_f={max_feature} max_abs_live_sample_g={max_live_g} max_abs_input_crossing_g={max_sample_crossing_g} max_abs_G_cross_projected={} last_staged_sample_weight_as_newest_datum_weight={newest_sample_weight:?} age-derived_nu_weight=not_exposed zero_step_cells={zero_step_cells} vanished_map_cells={vanished_cells} native_LW_cross={native_lw_cross} native_W_unit_cross={native_unit_cross} native_LW_end={native_lw_end} native_W_unit_end={native_unit_end} spec_b_R=ceil_log2(2*L_R)={spec_b_r:?} spec_LW_domain=explicit-solved-chart-support spec_LW_reading={spec_lattice:?} no_clock_feature_split_claimed",
         matrix_max_abs(&gradient),
     );
 
@@ -2380,6 +2446,58 @@ mod tests {
             column_majorizer(&h).unwrap(),
             (vec![1], vec![Rat::from_integer(2.into())])
         );
+    }
+
+    #[test]
+    fn report_lattice_empty_solved_support_is_a_valid_full_prior() {
+        let law = NormalLaw::with_scaled_prior(Matrix::zero(4, 3).unwrap(), 2);
+        assert!(law.chart().support().is_empty());
+        assert_eq!(law.map().columns(), 3);
+        assert_eq!(law.gram(), matrix(&[&[4, 0, 0], &[0, 4, 0], &[0, 0, 4]]));
+        let quarter = Rat::new(1.into(), 4.into());
+        assert_eq!(
+            law.solved(),
+            Matrix::new(vec![
+                vec![quarter.clone(), Rat::zero(), Rat::zero()],
+                vec![Rat::zero(), quarter.clone(), Rat::zero()],
+                vec![Rat::zero(), Rat::zero(), quarter],
+            ])
+            .unwrap()
+        );
+        assert_eq!(
+            specification_lattice_readout(32, law.chart().support(), 3, 10, 11).unwrap(),
+            SpecificationLatticeReadout::UndefinedEmptySolvedSupport {
+                declared_width: 3,
+                receiver_exponent: 6,
+            }
+        );
+        // The mathematical zero-width formula remains undefined, never replaced by width 1/3.
+        assert!(spec_lattice_exponent(32, 0).is_err());
+    }
+
+    #[test]
+    fn report_lattice_nonempty_reading_keeps_its_exact_formula_and_comparisons() {
+        assert_eq!(
+            specification_lattice_readout(32, &[0, 2], 3, 7, 11).unwrap(),
+            SpecificationLatticeReadout::Defined {
+                declared_width: 3,
+                support_width: 2,
+                receiver_exponent: 6,
+                exponent: 7,
+                unit: Rat::new(1.into(), 128.into()),
+                native_cross_mismatch: false,
+                native_end_mismatch: true,
+            }
+        );
+    }
+
+    #[test]
+    fn report_lattice_undefined_comparison_does_not_hide_invalid_inputs() {
+        assert!(specification_lattice_readout(0, &[], 3, 10, 11).is_err());
+        assert!(specification_lattice_readout(32, &[], 0, 10, 11).is_err());
+        assert!(specification_lattice_readout(32, &[3], 3, 10, 11).is_err());
+        assert!(specification_lattice_readout(32, &[1, 1], 3, 10, 11).is_err());
+        assert!(specification_lattice_readout(32, &[2, 1], 3, 10, 11).is_err());
     }
 
     #[test]
