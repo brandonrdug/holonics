@@ -13,8 +13,7 @@ LibriSpeech entries also supply utterance_id and live at
 Paths resolve relative to inputs.json. Names and structure validate the declared
 identity; they do not establish semantic authenticity of arbitrary renamed bytes.
 
-If a recording starts with zeros, inputs must explicitly declare
-`leading_silence: "count_as_run"`; otherwise the H-count convention is unresolved.
+Leading zeros form a sign-2 run heard with the source. H counts signed runs only.
 No data is fetched, no package is installed, and no learner is run. The exact
 boundary fibres are emitted beside the stream in its private .local manifest.
 """
@@ -38,6 +37,8 @@ ORDER = ("text", "digit", "sound", "text", "digit", "sound", "text", "digit", "s
 TRAIN_SPLITS = {"train-clean-100", "train-clean-360", "train-other-500"}
 DIRECTIONS = ((0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1))
 TURNS = (0, 1, 7, 2, 6, 3, 5, 4)
+FIBRE_DOMAIN = b"holonics.listener.fibre.v1\0"
+CHART_MANIFEST_DOMAIN = b"HLCM1\n"
 
 
 class Refusal(ValueError):
@@ -51,6 +52,46 @@ def digest(data):
 def cells(octets):
     """Cell count including exactly one framing end letter, not a chart sample."""
     return 2 * len(octets) + 2
+
+
+def canonical_fibre(kind, fibre):
+    """Exact listener-fibre-v1 bytes, shared with Rust PassageChart's byte writer."""
+    out = bytearray(FIBRE_DOMAIN + bytes([kind]))
+    if kind == 0:
+        if fibre is not None:
+            raise Refusal("octets have no reconstruction fibre")
+    elif kind == 1:
+        out += struct.pack(">HHQQ", fibre["width"], fibre["height"], fibre["jumps"], len(fibre["remainders"]))
+        out += bytes(fibre["remainders"])
+    elif kind == 2:
+        out += struct.pack(">IQ", fibre["rate"], len(fibre["runs"]))
+        for run in fibre["runs"]:
+            samples = run["samples_from_peak"]
+            out += struct.pack(">HQ", run["peak_remainder"], len(samples))
+            out += struct.pack(f">{len(samples)}i", *samples)
+    else:
+        raise Refusal("unknown canonical fibre kind")
+    return bytes(out)
+
+
+def chart_summary(kind, octets, fibre):
+    canonical = canonical_fibre(kind, fibre)
+    return {"kind": kind, "chart_octets": len(octets), "chart_sha256": digest(octets), "fibre_bytes": len(canonical), "fibre_sha256": digest(canonical), "canonical_format": "listener-fibre-v1"}
+
+
+def chart_manifest(items, passes=3):
+    """HLCM1: sections and canonical chart/fibre identities checked by native Rust preflight."""
+    out = bytearray(CHART_MANIFEST_DOMAIN + struct.pack(">Q", len(items) * passes))
+    for index in range(len(items) * passes):
+        item = items[index % len(items)]
+        summary = item["source_chart_summary"]
+        out += struct.pack(">QIBQ", index, 1, summary["kind"], summary["chart_octets"])
+        out += bytes.fromhex(summary["chart_sha256"])
+        out += struct.pack(">Q", summary["fibre_bytes"])
+        out += bytes.fromhex(summary["fibre_sha256"])
+        out += struct.pack(">Q", item["target_octets"])
+        out += bytes.fromhex(item["target_sha256"])
+    return bytes(out)
 
 
 def stroke(width, height, intensities):
@@ -278,16 +319,16 @@ def sound_identity(spec, path):
     return utterance
 
 
-def fragment(rate, samples, digit_source_cells, silence_policy=None):
+def fragment(rate, samples, digit_source_cells):
     runs = runs_of(samples)
-    if runs and runs[0][2] == 2 and silence_policy != "count_as_run":
-        raise Refusal("unresolved: leading silent run's H-count convention; declare leading_silence=count_as_run")
+    silent = int(bool(runs and runs[0][2] == 2))
+    signed_runs = len(runs) - silent
+    if signed_runs == 0:
+        raise Refusal("sound fragment has no signed run")
     best, candidate_costs = None, []
-    for h in range(1, (len(runs) - 1) // 2 + 1):
+    for h in range(1, (signed_runs - 1) // 2 + 1):
         # Both cuts have a following run and must be actual signed crossings, never EOF/silence.
-        if runs[h - 1][2] == 2 or runs[2 * h - 1][2] == 2:
-            continue
-        cut, end = runs[h - 1][1], runs[2 * h - 1][1]
+        cut, end = runs[silent + h - 1][1], runs[silent + 2 * h - 1][1]
         source, target = half_cycles(rate, samples[:cut]), half_cycles(rate, samples[cut:end])
         total = cells(source[0]) + cells(target[0])
         candidate_costs.append({"H": h, "combined_cells": total})
@@ -301,7 +342,7 @@ def fragment(rate, samples, digit_source_cells, silence_policy=None):
     whole = half_cycles(rate, samples[:end])
     if whole[0] != source[0] + target[0] or decode_half_cycles(*source) != samples[:cut] or decode_half_cycles(*target) != samples[cut:end]:
         raise Refusal("half-cycle composition or exact decode failed")
-    metadata = {"H": h, "source_sample_range": [0, cut], "target_sample_range": [cut, end], "source_chart_octets": len(source[0]), "target_chart_octets": len(target[0]), "source_cells": cells(source[0]), "target_cells": cells(target[0]), "combined_cells": cells(source[0]) + cells(target[0]), "digit_source_cell_bound": digit_source_cells, "candidate_costs": candidate_costs, "source_fibre": source[1], "target_fibre": target[1], "source_chart_sha256": digest(source[0]), "target_chart_sha256": digest(target[0]), "fragment_i16be_sha256": digest(struct.pack(f">{end}h", *samples[:end])), "whole_chart_sha256": digest(whole[0]), "whole_chart_is_source_plus_target": True, "cuts_are_sign_changes": True, "leading_silence": silence_policy if runs[0][2] == 2 else "absent"}
+    metadata = {"H": h, "H_counts": "signed_runs_only", "source_sample_range": [0, cut], "target_sample_range": [cut, end], "source_chart_octets": len(source[0]), "target_chart_octets": len(target[0]), "source_cells": cells(source[0]), "target_cells": cells(target[0]), "combined_cells": cells(source[0]) + cells(target[0]), "digit_source_cell_bound": digit_source_cells, "candidate_costs": candidate_costs, "source_fibre": source[1], "target_fibre": target[1], "source_chart_sha256": digest(source[0]), "target_chart_sha256": digest(target[0]), "fragment_i16be_sha256": digest(struct.pack(f">{end}h", *samples[:end])), "whole_chart_sha256": digest(whole[0]), "whole_chart_is_source_plus_target": True, "cuts_are_sign_changes": True, "leading_silence": "heard_with_source" if silent else "absent"}
     return samples[:cut], target[0], metadata
 
 
@@ -320,8 +361,6 @@ def frame_pcm(rate, samples, target):
 def build(config, base):
     if not isinstance(config, dict) or len(config.get("librispeech", [])) != 3:
         raise Refusal("exactly three explicit LibriSpeech train utterances are required")
-    if config.get("leading_silence") not in (None, "count_as_run"):
-        raise Refusal("unsupported leading_silence convention")
     gsm_path, gsm_raw, gsm_identity = pinned(config["gsm8k"], "GSM8K", "train", base)
     if gsm_path.name != "train.jsonl":
         raise Refusal("GSM8K requires the explicitly pinned train.jsonl")
@@ -352,8 +391,8 @@ def build(config, base):
         rate, samples, decoder = audio_input(path, raw)
         pcm_payload = struct.pack(f">{len(samples)}h", *samples)
         identity.update({"decoder": decoder, "pcm_rate": rate, "pcm_samples": len(samples), "pcm_i16be_sha256": digest(pcm_payload)})
-        source, target, metadata = fragment(rate, samples, cells(digit_charts[i][0]), config.get("leading_silence"))
-        sounds.append((frame_pcm(rate, source, target), metadata))
+        source, target, metadata = fragment(rate, samples, cells(digit_charts[i][0]))
+        sounds.append((frame_pcm(rate, source, target), metadata, half_cycles(rate, source)[0], target))
         sound_identities.append(identity)
     frames, items = [], []
     counters = {"text": 0, "digit": 0, "sound": 0}
@@ -363,19 +402,25 @@ def build(config, base):
         item = {"round": len(items), "chart": kind, "train_index": i}
         if kind == "text":
             source, target = texts[i]
+            summary = chart_summary(0, source, None)
             framed = frame_octets(source, target)
             item.update({"source_octets": len(source), "target_octets": len(target), "source_cells": cells(source), "target_cells": cells(target), "source_sha256": digest(source), "target_sha256": digest(target), "split_rule": "first annotation contents, source through its only equals sign"})
         elif kind == "digit":
             width, height, pixels, target = digits[i]
             chart, fibre = digit_charts[i]
+            summary = chart_summary(1, chart, fibre)
             framed = frame_raster(width, height, pixels, target)
             item.update({"source_chart_octets": len(chart), "source_cells": cells(chart), "target_cells": cells(target), "source_pixels_sha256": digest(pixels), "source_chart_sha256": digest(chart), "source_fibre": fibre, "target_sha256": digest(target)})
         else:
-            framed, metadata = sounds[i]
+            framed, metadata, source_chart, target = sounds[i]
+            summary = chart_summary(2, source_chart, metadata["source_fibre"])
             item.update(metadata)
             item["utterance_id"] = sound_identities[i]["utterance_id"]
         item["frame_sha256"] = digest(framed)
         item["frame_bytes"] = len(framed)
+        item["source_chart_summary"] = summary
+        item["target_octets"] = len(target)
+        item["target_sha256"] = digest(target)
         frames.append(framed)
         items.append(item)
     block = b"".join(frames)
@@ -383,13 +428,8 @@ def build(config, base):
     manifests = {"schema": "holonics.listener.micro.v1", "request": "REQ-20261018-064 with origin-jump correction", "identity_validation": "pinned hashes, declared train metadata and filename/path structure; no semantic authenticity claim", "sections": 30, "passes": 3, "one_life": True, "order_per_pass": list(ORDER), "pass_block_bytes": len(block), "pass_block_sha256": [digest(block)] * 3, "stream_sha256": digest(stream), "stream_bytes": len(stream), "inputs": {"gsm8k": gsm_identity, "mnist_images": image_identity, "mnist_labels": label_identity, "librispeech": sound_identities}, "items_per_pass": items, "delivered_cells_per_pass": sum(item["source_cells"] + item["target_cells"] for item in items), "jumps_per_pass": sum(fibre["jumps"] for _, fibre in digit_charts), "framing": "one HLSN1 header; each passage and nonempty target has its own two-cell end letter", "composition_invariant": "raw PCM chart octets concatenate at signed crossings; passage end letters are not samples", "scientific_claim": "boundary framing only; no learner run or unseen-skill result"}
     manifests["delivered_cells_three_passes"] = 3 * manifests["delivered_cells_per_pass"]
     manifests["ordinal_accounting"] = "exact delivered source/target cells exclude runtime fork draws"
-    manifests["request_rough_ordinal_estimate"] = {
-        "constant_approximately": 7400,
-        "jump_coefficient": 24,
-        "J": manifests["jumps_per_pass"],
-        "approximately": 7400 + 24 * manifests["jumps_per_pass"],
-        "basis": "corrected mailbox estimate; exact stream cell counts above are authoritative",
-    }
+    binary_manifest = chart_manifest(items)
+    manifests["chart_manifest"] = {"filename": "micro.charts", "sha256": digest(binary_manifest), "records": len(items) * 3, "bytes": len(binary_manifest), "format": "HLCM1", "runtime_check": "--chart-manifest micro.charts validates native Rust chart/fibre and target identities before mount"}
     return stream, manifests
 
 
@@ -409,6 +449,7 @@ def main(argv=None):
         manifest["inputs_manifest_sha256"] = digest(args.inputs.read_bytes())
         out.mkdir(parents=True, exist_ok=False)
         (out / "micro.hlsn").write_bytes(stream)
+        (out / "micro.charts").write_bytes(chart_manifest(manifest["items_per_pass"]))
         (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(json.dumps({"stream_sha256": manifest["stream_sha256"], "sections": 30, "delivered_cells_three_passes": manifest["delivered_cells_three_passes"], "jumps_per_pass": manifest["jumps_per_pass"]}, sort_keys=True))
         return 0

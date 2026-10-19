@@ -50,6 +50,10 @@
 
 use std::fmt;
 
+#[path = "sections/sha256.rs"]
+mod sha256;
+pub(crate) use sha256::{Sha256, sha256};
+
 /// One item: source passages through their boundary charts, then one target span.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Section {
@@ -79,6 +83,36 @@ pub enum ChartKind {
     Octets,
     Raster,
     Pcm,
+}
+
+impl ChartKind {
+    pub fn byte(self) -> u8 {
+        match self {
+            Self::Octets => 0,
+            Self::Raster => 1,
+            Self::Pcm => 2,
+        }
+    }
+}
+
+/// Compact canonical chart identity. Hashes are exterior checks, not learner operands.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ChartSummary {
+    pub kind: ChartKind,
+    pub chart_octets: usize,
+    pub chart_sha256: String,
+    pub fibre_bytes: u128,
+    pub fibre_sha256: String,
+}
+
+impl fmt::Display for ChartSummary {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "kind={:?} chart_octets={} chart_sha256={} fibre_bytes={} fibre_sha256={} canonical_format=listener-fibre-v1",
+            self.kind, self.chart_octets, self.chart_sha256, self.fibre_bytes, self.fibre_sha256
+        )
+    }
 }
 
 /// The frame and the intensity remainders, in the stroke's pixel order.
@@ -133,6 +167,50 @@ pub struct PassageChart {
 }
 
 impl PassageChart {
+    /// Canonical v1 fibre bytes: domain `holonics.listener.fibre.v1\0`, then kind byte.
+    /// Octets have no payload. Raster carries width/height (u16 BE), jump/remainder counts
+    /// (u64 BE), then the u8 remainders. PCM carries rate (u32 BE), run count (u64 BE), then
+    /// each peak remainder (u16 BE), sample count (u64 BE), and sample residuals (i32 BE).
+    /// Lengths refer to the full canonical bytes, including the domain and kind.
+    pub fn write_canonical_fibre(&self, mut write: impl FnMut(&[u8])) {
+        write(b"holonics.listener.fibre.v1\0");
+        write(&[self.kind.byte()]);
+        match &self.fibre {
+            ChartFibre::Octets => {}
+            ChartFibre::Stroke(fibre) => {
+                write(&fibre.width.to_be_bytes());
+                write(&fibre.height.to_be_bytes());
+                write(&(fibre.jumps as u64).to_be_bytes());
+                write(&(fibre.remainders.len() as u64).to_be_bytes());
+                write(&fibre.remainders);
+            }
+            ChartFibre::HalfCycles(fibre) => {
+                write(&fibre.rate.to_be_bytes());
+                write(&(fibre.runs.len() as u64).to_be_bytes());
+                for run in &fibre.runs {
+                    write(&run.peak_remainder.to_be_bytes());
+                    write(&(run.samples_from_peak.len() as u64).to_be_bytes());
+                    for sample in &run.samples_from_peak {
+                        write(&sample.to_be_bytes());
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn summary(&self) -> ChartSummary {
+        let mut digest = Sha256::new();
+        self.write_canonical_fibre(|bytes| digest.update(bytes));
+        let fibre_bytes = digest.bytes;
+        ChartSummary {
+            kind: self.kind,
+            chart_octets: self.octets.len(),
+            chart_sha256: sha256(&self.octets),
+            fibre_bytes,
+            fibre_sha256: digest.finish(),
+        }
+    }
+
     /// The chart's cells with exactly one passage end letter.
     pub fn cells(&self) -> Vec<usize> {
         closed_cells(&self.octets)
@@ -742,6 +820,49 @@ pub fn read_frames(bytes: &[u8]) -> Result<Vec<Section>, SectionError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn canonical_fibre_bytes_match_the_python_golden_schema() {
+        fn hex(text: &str) -> Vec<u8> {
+            let text: String = text.chars().filter(|c| !c.is_whitespace()).collect();
+            (0..text.len())
+                .step_by(2)
+                .map(|i| u8::from_str_radix(&text[i..i + 2], 16).unwrap())
+                .collect()
+        }
+        let cases = [
+            (Passage::Octets(b"abc".to_vec()), "00"),
+            (
+                raster(1, 1, vec![3]),
+                "01 0001 0001 0000000000000001 0000000000000001 01",
+            ),
+            (
+                pcm(vec![-32768, 0]),
+                "02 00003e80 0000000000000001 0000 0000000000000002 00000000 00008000",
+            ),
+        ];
+        for (passage, payload) in cases {
+            let chart = passage.encode_chart().unwrap();
+            let mut canonical: Vec<u8> = Vec::new();
+            chart.write_canonical_fibre(|bytes| canonical.extend(bytes));
+            let mut expected = b"holonics.listener.fibre.v1\0".to_vec();
+            expected.extend(hex(payload));
+            assert_eq!(canonical, expected);
+            let summary = chart.summary();
+            assert_eq!(summary.fibre_bytes, expected.len() as u128);
+            assert_eq!(summary.fibre_sha256, sha256(&expected));
+        }
+        let summary = Passage::Octets(b"abc".to_vec())
+            .encode_chart()
+            .unwrap()
+            .summary();
+        assert_eq!(
+            summary.chart_sha256,
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
+        assert!(!summary.to_string().contains("samples_from_peak"));
+        assert!(!summary.to_string().contains("remainders="));
+    }
 
     fn round_trip(passage: Passage) -> PassageChart {
         let chart = passage.encode_chart().unwrap();

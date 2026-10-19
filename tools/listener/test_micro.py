@@ -129,17 +129,49 @@ class MicroControls(unittest.TestCase):
         with self.assertRaises(micro.Refusal):
             micro.fragment(16000, samples, 13)
 
-    def test_eof_is_not_a_sign_change_and_leading_silence_is_explicit(self):
+    def test_eof_is_not_a_sign_change_and_silence_is_heard_beside_H_signed_runs(self):
         with self.assertRaises(micro.Refusal):
             micro.fragment(16000, [1, -1], 100)
-        with self.assertRaisesRegex(micro.Refusal, "unresolved"):
-            micro.fragment(16000, [0, 1, -1, 2, -2, 3], 100)
-        _, _, metadata = micro.fragment(16000, [0, 1, -1, 2, -2, 3], 100, "count_as_run")
+        source, target, metadata = micro.fragment(16000, [0, 1, -1, 2, -2, 3], 100)
         self.assertEqual(metadata["H"], 2)
-        self.assertEqual(metadata["leading_silence"], "count_as_run")
-        self.assertEqual(metadata["source_sample_range"], [0, 2])
-        with self.assertRaises(micro.Refusal):
-            micro.fragment(16000, [0] * 12, 100, "count_as_run")
+        self.assertEqual(metadata["H_counts"], "signed_runs_only")
+        self.assertEqual(metadata["leading_silence"], "heard_with_source")
+        self.assertEqual(metadata["source_sample_range"], [0, 3])
+        self.assertEqual(source, [0, 1, -1])
+        self.assertEqual(len(metadata["source_fibre"]["runs"]), 3)
+        self.assertEqual(len(metadata["target_fibre"]["runs"]), 2)
+        self.assertEqual(micro.decode_half_cycles(target, metadata["target_fibre"]), [2, -2])
+        _, _, bounded = micro.fragment(16000, [0, 1, -1, 2, -2, 3], 20)
+        self.assertEqual((bounded["H"], bounded["combined_cells"]), (1, 16))
+        for samples in ([], [0] * 12):
+            with self.assertRaisesRegex(micro.Refusal, "no signed run"):
+                micro.fragment(16000, samples, 100)
+
+    def test_canonical_fibre_bytes_are_cross_language_golden_values(self):
+        domain = b"holonics.listener.fibre.v1\0"
+        self.assertEqual(micro.canonical_fibre(0, None), domain + b"\0")
+        chart, fibre = micro.stroke(1, 1, b"\3")
+        expected_raster = bytes.fromhex("01 0001 0001 0000000000000001 0000000000000001 01")
+        self.assertEqual(micro.canonical_fibre(1, fibre), domain + expected_raster)
+        chart, fibre = micro.half_cycles(16000, [-32768, 0])
+        expected_pcm = bytes.fromhex("02 00003e80 0000000000000001 0000 0000000000000002 00000000 00008000")
+        self.assertEqual(micro.canonical_fibre(2, fibre), domain + expected_pcm)
+        summary = micro.chart_summary(0, b"abc", None)
+        self.assertEqual(summary["chart_sha256"], "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+
+    def test_binary_manifest_binds_every_repeated_source_chart_and_target(self):
+        item = {"source_chart_summary": micro.chart_summary(0, b"abc", None), "target_octets": 1, "target_sha256": micro.digest(b"7")}
+        raw = micro.chart_manifest([item])
+        self.assertEqual(raw[:14], b"HLCM1\n" + bytes.fromhex("0000000000000003"))
+        self.assertEqual(len(raw), 14 + 3 * 133)
+        for index in range(3):
+            start = 14 + index * 133
+            self.assertEqual(raw[start:start + 8], index.to_bytes(8, "big"))
+            self.assertEqual(raw[start + 8:start + 13], b"\0\0\0\1\0")
+            self.assertEqual(raw[start + 13:start + 21], bytes.fromhex("0000000000000003"))
+            self.assertEqual(raw[start + 21:start + 53], bytes.fromhex(item["source_chart_summary"]["chart_sha256"]))
+            self.assertEqual(raw[start + 93:start + 101], bytes.fromhex("0000000000000001"))
+            self.assertEqual(raw[start + 101:start + 133], bytes.fromhex(item["target_sha256"]))
 
     def test_stream_has_one_header_thirty_sections_and_three_identical_blocks(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -159,6 +191,10 @@ class MicroControls(unittest.TestCase):
             self.assertEqual(len(stream), 6 + 3 * block_length)
             self.assertEqual([micro.digest(block) for block in blocks], manifest["pass_block_sha256"])
             self.assertEqual(micro.digest(stream), manifest["stream_sha256"])
+            binary = micro.chart_manifest(manifest["items_per_pass"])
+            self.assertEqual(micro.digest(binary), manifest["chart_manifest"]["sha256"])
+            self.assertEqual(len(binary), manifest["chart_manifest"]["bytes"])
+            self.assertNotIn("request_rough_ordinal_estimate", manifest)
             self.assertEqual(manifest["jumps_per_pass"], 3)
             self.assertEqual(manifest["delivered_cells_three_passes"], 3 * sum(item["source_cells"] + item["target_cells"] for item in manifest["items_per_pass"]))
             for i, item in enumerate(manifest["items_per_pass"]):
@@ -227,6 +263,7 @@ class MicroControls(unittest.TestCase):
             self.assertEqual((output / "micro.hlsn").read_bytes(), original)
             manifest = json.loads((output / "manifest.json").read_text())
             self.assertEqual(manifest["inputs_manifest_sha256"], micro.digest(inputs.read_bytes()))
+            self.assertEqual(micro.digest((output / "micro.charts").read_bytes()), manifest["chart_manifest"]["sha256"])
 
 
 if __name__ == "__main__":
