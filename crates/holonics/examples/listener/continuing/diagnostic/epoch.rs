@@ -112,6 +112,8 @@ pub(super) fn require_partition_precision(amended_exponent: Option<u32>) -> Resu
 #[derive(Clone, Copy)]
 struct PartitionContext {
     receiver_exponent: u32,
+    /// Declared heard-sample bound at this aperture-one receiving map. The live adapter checks
+    /// actual samples per cell before using the clock interval's bound for these records.
     cell_bound: u64,
     /// c is the source-bound ring-2 ingress tick count from founding, snapped at the span opening.
     epoch_index: u64,
@@ -119,8 +121,13 @@ struct PartitionContext {
 }
 
 fn partition_exponent_explicit(context: PartitionContext) -> Result<u32> {
-    if context.cell_bound == 0 || context.phase_period == 0 {
-        return Err("a face partition requires its declared positive cell bound".into());
+    if context.cell_bound == 0 {
+        return Err("a face partition requires its declared positive heard-sample bound".into());
+    }
+    if context.phase_period == 0 {
+        return Err(
+            "a face partition requires its declared positive receiving phase period".into(),
+        );
     }
     let ceil_log2 = |n: u64| {
         if n <= 1 {
@@ -247,7 +254,7 @@ fn partitioned_statistics(
     checkpoint()?;
     let count = u64::try_from(samples.len()).map_err(|_| "partition sample count overflows u64")?;
     if count > context.cell_bound {
-        return Err("partition heard cells exceed the declared bound".into());
+        return Err("actual partition sample count exceeds the declared heard-sample bound".into());
     }
     let exponent = partition_exponent_explicit(context)?;
     let lattice_denominator = BigInt::one() << exponent as usize;
@@ -368,7 +375,37 @@ fn partitioned_statistics(
     })
 }
 
+/// The ordinary one-phase comparison emits at most one receiving sample per heard cell.
+/// Check the actual capture before transferring its clock interval bound to the sample sum;
+/// record multiplicity at source/contrast loci cannot use this receiving-only adapter.
+fn checked_heard_sample_population(
+    samples_per_cell: &[usize],
+    declared_heard_sample_bound: u64,
+) -> Result<u64> {
+    if declared_heard_sample_bound == 0 {
+        return Err("receiving samples require a positive declared heard-sample bound".into());
+    }
+    let mut actual_samples = 0u64;
+    for &samples in samples_per_cell {
+        let samples =
+            u64::try_from(samples).map_err(|_| "actual receiving sample count exceeds u64")?;
+        actual_samples = actual_samples
+            .checked_add(samples)
+            .ok_or("actual receiving sample population overflows u64")?;
+    }
+    if actual_samples > declared_heard_sample_bound {
+        return Err("actual receiving sample count exceeds the declared heard-sample bound".into());
+    }
+    if samples_per_cell.iter().any(|&samples| samples > 1) {
+        return Err(
+            "receiving sample multiplicity exceeds the source-bound aperture-one comparison".into(),
+        );
+    }
+    Ok(actual_samples)
+}
+
 fn partitioned_crossing_statistics(
+    branch: &str,
     crossing: &CutView,
     views: &[CutView],
     budget: &timing::ReportBudget,
@@ -382,6 +419,16 @@ fn partitioned_crossing_statistics(
             view.frozen.as_ref().and_then(|frozen| view.pre_clocks.get(frozen.ratio().phases().ring()).map(|clock| clock.0))
         }).ok_or("partitioned phase series requires its actual receiving clock period")?,
     };
+    let samples_per_cell = views
+        .iter()
+        .map(|view| view.samples.len())
+        .collect::<Vec<_>>();
+    let actual_samples = checked_heard_sample_population(&samples_per_cell, context.cell_bound)?;
+    println!(
+        "step0_epoch_sample_population branch={branch} declared_heard_sample_bound={} actual_heard_cells={} actual_samples={actual_samples} samples_per_cell={samples_per_cell:?} source=actual-staged-receiving-records; aperture_one_multiplicity_checked=true; unit_weight_admission=required-before-sum",
+        context.cell_bound,
+        views.len()
+    );
     let mut records = Vec::new();
     let mut metric_samples = Vec::new();
     for view in views {
@@ -389,6 +436,11 @@ fn partitioned_crossing_statistics(
         let frozen = view.frozen.as_ref().ok_or(
             "partitioned crossing statistics require the actual frozen one-hot comparison",
         )?;
+        if frozen.ratio().phases().ring() != 2 || frozen.ratio().phases().aperture() != 1 {
+            return Err(
+                "receiving sample bound requires the actual ring-2 aperture-one comparison".into(),
+            );
+        }
         let wave = super::held_wave(
             &crossing.map,
             &view.producing_map,
@@ -1093,7 +1145,7 @@ fn stall_epoch_readout(
     }
     let (partitioned, exact_metric_scale) =
         stall_work(budget, "partitioned crossing statistics", || {
-            partitioned_crossing_statistics(crossing, views, budget)
+            partitioned_crossing_statistics(branch, crossing, views, budget)
         })?;
     let gradient = partitioned.gradient.clone();
     let sample_gram_delta = partitioned.gram_delta.clone();
@@ -2148,6 +2200,66 @@ mod tests {
         let result =
             partitioned_statistics(&law, &[], context, None, || Err("shared-cutoff".into()));
         assert!(result.err().unwrap().to_string().contains("shared-cutoff"));
+    }
+
+    #[test]
+    fn receiving_sample_bound_reads_actual_population_and_rejects_multiplicity() {
+        assert_eq!(checked_heard_sample_population(&[0, 1, 1], 231).unwrap(), 2);
+        assert_eq!(
+            checked_heard_sample_population(&[1; 231], 231).unwrap(),
+            231
+        );
+        assert!(checked_heard_sample_population(&[1; 232], 231).is_err());
+        assert!(checked_heard_sample_population(&[2], 231).is_err());
+        assert!(checked_heard_sample_population(&[], 0).is_err());
+    }
+
+    #[test]
+    fn partition_count_and_phase_period_refusals_name_the_actual_operand() {
+        let law = NormalLaw::with_prior(Matrix::zero(4, 1).unwrap());
+        let context = PartitionContext {
+            receiver_exponent: 6,
+            cell_bound: 1,
+            epoch_index: 0,
+            phase_period: 11,
+        };
+        let sample = || PartitionSample {
+            feature: vec![Rat::one()],
+            weights: vec![1.into(), 2.into()],
+            normalizer: 3.into(),
+            target: 0,
+            phase: vec![Rat::zero(); 2],
+        };
+        let excess = partitioned_statistics(&law, &[sample(), sample()], context, None, || Ok(()));
+        assert!(
+            excess
+                .err()
+                .unwrap()
+                .to_string()
+                .contains("actual partition sample count")
+        );
+        let bad_period = partition_exponent_explicit(PartitionContext {
+            phase_period: 0,
+            ..context
+        });
+        assert!(
+            bad_period
+                .err()
+                .unwrap()
+                .to_string()
+                .contains("receiving phase period")
+        );
+        let bad_bound = partition_exponent_explicit(PartitionContext {
+            cell_bound: 0,
+            ..context
+        });
+        assert!(
+            bad_bound
+                .err()
+                .unwrap()
+                .to_string()
+                .contains("heard-sample bound")
+        );
     }
 
     #[test]

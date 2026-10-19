@@ -795,6 +795,54 @@ fn coarse_face_key(wave: &Faces) -> Vec<CoarseFace> {
 // Historical conservative input from the earlier paired control. This is neither a new
 // measurement nor a cost with Debug formatting subtracted. No deadline depends on raising it.
 const HISTORICAL_NATIVE_CELL_NS: u128 = 549_667_971;
+// Same caa497f5 v2 log: the complete uncaptured 312-cell trunk, not 312 captured units.
+const HISTORICAL_TRUNK_NATIVE_NS: u128 = 109_004_074_487;
+// Same v2 log, old mature c=1 report64 including its wider rational calculation. This is a
+// discovery ceiling, not a measured compact/fresh-source report cost or completion promise.
+const HISTORICAL_REPORT64_NS: u128 = 12_581_750_145;
+// Exterior discovery declarations: no matching input/manifest/empty-opening mount interval was
+// measured in the old log (it starts at trunk cell0). Ten seconds bounds wrapper startup, input
+// validation, mount/clone/pool and exact replica-equality overhead. It is explicitly UNMEASURED,
+// cannot grow after refusal, and its measured costs replace this allowance on the next proposal.
+const UNMEASURED_COST_SETUP_ALLOWANCE_NS: u128 = 10_000_000_000;
+// The old run stopped before saving; no checkpoint measurement exists.
+const UNMEASURED_COST_CHECKPOINT_ALLOWANCE_NS: u128 = 30_000_000_000;
+const COST_PROBE_CELLS: usize = 64;
+
+fn historical_full_native_projection() -> Result<u128> {
+    HISTORICAL_TRUNK_NATIVE_NS
+        .checked_add(historical_native_projection(231)?)
+        .ok_or_else(|| "historical trunk-plus-parallel-branch projection overflows".into())
+}
+
+/// Setup, captured64, plain64, checkpoint, report16, report32, report64 absolute offsets.
+/// Every offset is a running sum of named inputs; no later phase can reclaim an expired cap.
+fn cost_probe_offsets() -> Result<[u128; 7]> {
+    let branch = historical_native_projection(COST_PROBE_CELLS)?;
+    let allowances = [
+        UNMEASURED_COST_SETUP_ALLOWANCE_NS,
+        branch,
+        branch,
+        UNMEASURED_COST_CHECKPOINT_ALLOWANCE_NS,
+        HISTORICAL_REPORT64_NS,
+        HISTORICAL_REPORT64_NS,
+        HISTORICAL_REPORT64_NS,
+    ];
+    let mut offsets = [0; 7];
+    let mut cumulative = 0_u128;
+    for (at, allowance) in allowances.into_iter().enumerate() {
+        cumulative = cumulative
+            .checked_add(allowance)
+            .ok_or("cost discovery running offsets overflow")?;
+        offsets[at] = cumulative;
+    }
+    if cumulative >= 285_000_000_000 {
+        return Err(
+            "cost discovery named allowances do not fit the unchanged shared cutoff".into(),
+        );
+    }
+    Ok(offsets)
+}
 
 fn historical_native_projection(cells: usize) -> Result<u128> {
     HISTORICAL_NATIVE_CELL_NS
@@ -901,7 +949,11 @@ fn run_cost_profile_64(
     checkpoint_path: &str,
 ) -> Result<()> {
     let budget = timing::RunBudget::new(0)?;
-    let native_cutoff = budget.cost_phase("cost_native_128", 80_000_000_000, 80_000_000_000)?;
+    let offsets = cost_probe_offsets()?;
+    let branch_cap = historical_native_projection(COST_PROBE_CELLS)?;
+    let setup_cutoff =
+        budget.cost_phase("cost_setup", UNMEASURED_COST_SETUP_ALLOWANCE_NS, offsets[0])?;
+    let native_cutoff = budget.cost_phase("cost_native_and_setup_128", offsets[2], offsets[2])?;
     let checkpoint = format!(
         "{}/step-000064.state",
         checkpoint_path.trim_end_matches('/')
@@ -925,12 +977,12 @@ fn run_cost_profile_64(
         frames.len()
     );
     println!(
-        "step0_cost_profile declared_observed_transactions=128 zero_cell_opening_calls=1 heard_cells_per_replica=64 source_cells_per_replica={} teacher_target_cells_per_replica={} order=section_source_then_teacher_target release_draws=0 trunk_cells=0 target_forks=0 B_interventions=0 historical_native_128_ns={} new_source_costs=unmeasured fixed_phase_allowances_ns=[80000000000,30000000000,30000000000,50000000000,80000000000] supervisor_total_ns=300000000000 TERM_offset_ns=295000000000 native_offset_ns=290000000000 report_offset_ns=285000000000 rayon_workers=1 maximum_active_cpu_threads=2 completion_not_certified=true",
+        "step0_cost_profile declared_observed_transactions=128 zero_cell_opening_calls=1 heard_cells_per_replica=64 source_cells_per_replica={} teacher_target_cells_per_replica={} order=section_source_then_teacher_target release_draws=0 trunk_cells=0 target_forks=0 B_interventions=0 historical_native_128_ns={} new_source_costs=unmeasured setup_allowance_ns={UNMEASURED_COST_SETUP_ALLOWANCE_NS} setup_measured=false each_branch_cap_ns={branch_cap} checkpoint_allowance_ns={UNMEASURED_COST_CHECKPOINT_ALLOWANCE_NS} checkpoint_measured=false each_report_ceiling_ns={HISTORICAL_REPORT64_NS} running_offsets_ns={offsets:?} supervisor_total_ns=300000000000 TERM_offset_ns=295000000000 native_offset_ns=290000000000 report_offset_ns=285000000000 rayon_workers=1 maximum_active_cpu_threads=2 completion_not_certified=true",
         prefix.source_cells,
         prefix.teacher_target_cells,
         historical_native_projection(128)?
     );
-    native_cutoff.check()?;
+    setup_cutoff.check()?;
     let setup_started = Instant::now();
     let (mut fresh, pairing) = mounted(port, options.population)?;
     let opening = fresh.constitution().clone();
@@ -960,7 +1012,7 @@ fn run_cost_profile_64(
     if zero_crossings != 0 {
         return Err("cost empty opening changed the receiver crossing count".into());
     }
-    native_cutoff.check()?;
+    setup_cutoff.check()?;
     println!(
         "step0_cost_setup elapsed_ns={} heard_cells=0 actual_receiver_crossings=0 empty_moment_opened=true",
         setup_started.elapsed().as_nanos()
@@ -980,6 +1032,8 @@ fn run_cost_profile_64(
     let mut plain_crossings = 0;
     let abort = AtomicBool::new(false);
     let pool = execution::one_thread_pool()?;
+    setup_cutoff.check()?;
+    let capture_cutoff = budget.cost_phase("cost_capture64", branch_cap, offsets[1])?;
     let capture_result = pool.install(|| {
         observe_branch(
             port,
@@ -992,7 +1046,7 @@ fn run_cost_profile_64(
             &budget,
             &abort,
             Some(&mut captured_crossings),
-            Some(&native_cutoff),
+            Some(&capture_cutoff),
         )
         .map_err(|error| error.to_string())
     });
@@ -1005,7 +1059,9 @@ fn run_cost_profile_64(
             return Err(error.into());
         }
     };
+    capture_cutoff.check()?;
     native_cutoff.check()?;
+    let plain_cutoff = budget.cost_phase("cost_plain64", branch_cap, offsets[2])?;
     let plain_result = pool.install(|| {
         observe_plain_branch(
             port,
@@ -1017,7 +1073,7 @@ fn run_cost_profile_64(
             &budget,
             &abort,
             Some(&mut plain_crossings),
-            Some(&native_cutoff),
+            Some(&plain_cutoff),
         )
         .map_err(|error| error.to_string())
     });
@@ -1030,6 +1086,7 @@ fn run_cost_profile_64(
             return Err(error.into());
         }
     };
+    plain_cutoff.check()?;
     native_cutoff.check()?;
     let source = captured.field().sources()[0];
     if captured.continuing_state(source)? != plain.continuing_state(source)?
@@ -1045,8 +1102,11 @@ fn run_cost_profile_64(
     println!(
         "step0_cost_native completed_observed_transactions=128 capture_cells=64 plain_cells=64 resident_equal=true crib_equal=true faces_equal=true crossings_equal=true capture_cell_ns={capture_times:?} plain_cell_ns={plain_times:?} actual_crossings={captured_crossings}"
     );
-    let checkpoint_cutoff =
-        budget.cost_phase("cost_checkpoint64", 30_000_000_000, 110_000_000_000)?;
+    let checkpoint_cutoff = budget.cost_phase(
+        "cost_checkpoint64",
+        UNMEASURED_COST_CHECKPOINT_ALLOWANCE_NS,
+        offsets[3],
+    )?;
     checkpoint_cutoff.check()?;
     crate::octets::save_checkpoint_cost_profile(
         &captured,
@@ -1083,11 +1143,9 @@ fn run_cost_profile_64(
         .first()
         .ok_or("cost profile has no receiver")?
         .grain();
-    for (cells, allowance, absolute) in [
-        (16, 30_000_000_000, 140_000_000_000),
-        (32, 50_000_000_000, 190_000_000_000),
-        (64, 80_000_000_000, 270_000_000_000),
-    ] {
+    let mut measured_reports = Vec::new();
+    for (cells, absolute) in [(16, offsets[4]), (32, offsets[5]), (64, offsets[6])] {
+        let allowance = HISTORICAL_REPORT64_NS;
         let cutoff = budget.cost_phase(&format!("cost_report{cells}"), allowance, absolute)?;
         let end = postdeposit_prefix_cut(&views, cells)?;
         let mut report_budget =
@@ -1106,14 +1164,25 @@ fn run_cost_profile_64(
             )
             .map_err(|error| error.to_string())
         });
+        let summary = report_budget.finish();
+        let elapsed_ns = started.elapsed().as_nanos();
         println!(
-            "step0_cost_report prefix_cells={cells} postdeposit_prefix_cut=true elapsed_ns={} summary={:?} status={result:?} empirical_measurement_only=true",
-            started.elapsed().as_nanos(),
-            report_budget.finish()
+            "step0_cost_report prefix_cells={cells} postdeposit_prefix_cut=true elapsed_ns={elapsed_ns} ceiling_ns={HISTORICAL_REPORT64_NS} summary={summary:?} status={result:?} empirical_measurement_only=true"
         );
+        measured_reports.push(elapsed_ns);
         result.map_err(|error| -> Box<dyn std::error::Error> { error.into() })?;
         cutoff.check()?;
     }
+    let growth = timing::empirical_report_growth_floor(
+        measured_reports[0],
+        measured_reports[1],
+        measured_reports[2],
+    )?;
+    let measured_to_floor = growth.measured_to_projected_ratio(growth.floor_231_ns)?;
+    println!(
+        "step0_cost_growth receiver=fresh_micro_prefix own_operands_only=true exponent={} floor_ceil_r64_times_231_pow_e_over_64_pow_e_ns={} measured64_to_forecast_floor_ratio={measured_to_floor:?} full_step0_admission_supported=false",
+        growth.exponent, growth.floor_231_ns,
+    );
     println!(
         "step0_cost_profile_done native_complete=true checkpoint_complete=true reports_complete=true full231_completion_not_certified=true"
     );
@@ -1195,6 +1264,8 @@ fn run_full_aa0(
         180_000_000_000,
     )?;
     println!("step0_full_pre_spawn admission={pre_spawn:?} shared_fixed_deadline=true");
+    let a_cutoff = budget.cost_phase("full_A_admitted", branch_native_ns, 285_000_000_000)?;
+    let a0_cutoff = budget.cost_phase("full_A0_admitted", branch_native_ns, 285_000_000_000)?;
     let (a_result, a0_result) = std::thread::scope(|scope| {
         let a_worker = scope.spawn(|| {
             a_pool.install(|| {
@@ -1210,7 +1281,7 @@ fn run_full_aa0(
                         budget,
                         &abort,
                         Some(&mut a_crossings),
-                        None,
+                        Some(&a_cutoff),
                     )
                 })
             })
@@ -1228,7 +1299,7 @@ fn run_full_aa0(
                         budget,
                         &abort,
                         Some(&mut a0_crossings),
-                        None,
+                        Some(&a0_cutoff),
                     )
                 })
             })
@@ -1253,6 +1324,7 @@ fn run_full_aa0(
         .grain();
     let mut report_budget = timing::ReportBudget::new(budget, "A_stall", classes.len());
     let mut capture = epoch::ReportCapture::default();
+    let report_started = Instant::now();
     let report = a_pool.install(|| {
         epoch::report_stall_epoch(
             "A",
@@ -1265,6 +1337,11 @@ fn run_full_aa0(
         )
         .map_err(|error| error.to_string())
     });
+    let measured_report_ns = report_started.elapsed().as_nanos();
+    println!(
+        "step0_report_measured_to_projected branch=A measured_ns={measured_report_ns} projected_ns={} exact_ratio_numerator={measured_report_ns} exact_ratio_denominator={} empirical_projection_not_certificate=true",
+        admission.projected_report_ns, admission.projected_report_ns,
+    );
     let mut failures = Vec::new();
     verdict::defer_report_result("A", report, &mut failures);
     println!(
@@ -1337,7 +1414,10 @@ pub(super) fn run(
         println!(
             "step0_reporting_growth empirical_forecast=true completion_not_certified=true input={pinned:?}"
         );
-        let initial_native = historical_native_projection(312 + 231)?;
+        let initial_native = historical_full_native_projection()?;
+        println!(
+            "step0_initial_native_horizon provenance=historical_caa497f5_v2 not_new_source_runtime=true measured_trunk312_ns={HISTORICAL_TRUNK_NATIVE_NS} captured_branch_unit_ns={HISTORICAL_NATIVE_CELL_NS} parallel_branch_cells=231 total_ns={initial_native}"
+        );
         pinned.admit(
             initial_native,
             1,
@@ -1833,12 +1913,33 @@ mod tests {
     }
 
     #[test]
-    fn complete_historical_native_horizon_alone_exceeds_fixed_native_cutoff() {
+    fn historical_trunk_is_not_charged_at_captured_branch_cost() {
         assert_eq!(
-            historical_native_projection(312 + 231).unwrap(),
-            298_469_708_253
+            historical_full_native_projection().unwrap(),
+            235_977_375_788
         );
-        assert!(historical_native_projection(312 + 231).unwrap() > 290_000_000_000);
+        assert_eq!(
+            285_000_000_000 - historical_full_native_projection().unwrap(),
+            49_022_624_212
+        );
+        assert!(historical_full_native_projection().unwrap() > HISTORICAL_TRUNK_NATIVE_NS);
+        assert!(historical_native_projection(usize::MAX).is_ok());
+    }
+
+    #[test]
+    fn cost_probe_running_offsets_keep_separate_branch_shares_and_named_reserves() {
+        let offsets = cost_probe_offsets().unwrap();
+        assert_eq!(offsets[1] - offsets[0], 35_178_750_144);
+        assert_eq!(offsets[2] - offsets[1], 35_178_750_144);
+        assert_eq!(offsets[3] - offsets[2], 30_000_000_000);
+        for at in 4..7 {
+            assert_eq!(offsets[at] - offsets[at - 1], HISTORICAL_REPORT64_NS);
+        }
+        assert_eq!(
+            offsets[6],
+            138_102_750_723 + UNMEASURED_COST_SETUP_ALLOWANCE_NS
+        );
+        assert!(offsets.windows(2).all(|pair| pair[0] < pair[1]));
     }
 
     fn sample(weight: Rat, feature: Vec<Rat>, covector: Vec<Rat>) -> Sample {

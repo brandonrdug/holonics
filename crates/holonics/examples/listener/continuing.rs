@@ -24,6 +24,7 @@ use std::time::Instant;
 struct ContinuingOptions {
     learn: String,
     count: Option<usize>,
+    chart_manifest: Option<String>,
     population: u64,
     keys: Option<String>,
     diagnostic_step0: bool,
@@ -39,6 +40,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     let (mut learn, mut count, mut population, mut keys, mut diagnostic_checkpoint) =
         (None, None, None, None, None);
     let mut diagnostic_profile_trunk_cells = None;
+    let mut chart_manifest = None;
     let mut diagnostic_profile_paired_cells64 = false;
     let mut diagnostic_cost_profile_cells64 = false;
     let mut diagnostic_report_reserve_ns = None;
@@ -71,6 +73,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
             option,
             "--learn"
                 | "--learn-count"
+                | "--chart-manifest"
                 | "--population"
                 | "--keys"
                 | "--diagnostic-checkpoint"
@@ -85,6 +88,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
         match option {
             "--learn" => learn = Some(value.clone()),
             "--learn-count" => count = Some(value.parse()?),
+            "--chart-manifest" => chart_manifest = Some(value.clone()),
             "--population" => population = Some(value.parse()?),
             "--keys" => keys = Some(value.clone()),
             "--diagnostic-checkpoint" => diagnostic_checkpoint = Some(value.clone()),
@@ -143,6 +147,7 @@ fn parse(args: &[String]) -> Result<ContinuingOptions> {
     Ok(ContinuingOptions {
         learn: learn.ok_or("--route observed requires --learn HLSN1")?,
         count,
+        chart_manifest,
         population,
         keys,
         diagnostic_step0,
@@ -735,11 +740,14 @@ impl ReleaseHistory {
     }
 }
 
+const _: () = assert!(CLASSES.is_power_of_two());
+const ENTROPY_RATE_BITS: u32 = CLASSES.trailing_zeros();
+
 fn entropy_rate_stop(lower: &Rat, drawn_cells: usize) -> Option<Stop> {
     if drawn_cells == 0 {
         return None;
     }
-    let threshold = Rat::from_integer(BigInt::from(drawn_cells) * BigInt::from(5));
+    let threshold = Rat::from_integer(BigInt::from(drawn_cells) * BigInt::from(ENTROPY_RATE_BITS));
     (lower >= &threshold).then(|| Stop::EntropyRate {
         drawn_cells,
         lower: lower.clone(),
@@ -911,10 +919,8 @@ fn section(
     for passage in &input.passages {
         let chart = passage.encode_chart()?;
         emit(format!(
-            "observed_chart section={index} kind={:?} chart_octets={} fibre={:?}",
-            chart.kind,
-            chart.octets.len(),
-            chart.fibre
+            "observed_chart section={index} {}",
+            chart.summary()
         ));
         let source = chart.cells();
         deliver(
@@ -976,8 +982,127 @@ fn header_line(resident: &Resident) -> Result<String> {
     ))
 }
 
+/// The Python framer's HLCM1 boundary manifest, parsed without a JSON dependency.
+/// Domain `HLCM1\n`, u64 BE record count; each record has section index (u64), passage
+/// count (u32), then per passage kind (u8), chart length (u64), SHA256 (32 raw bytes),
+/// canonical fibre length (u64) and SHA256 (32 raw bytes); finally target-octet length
+/// (u64) and raw-octet SHA256 (32 bytes). Counts describe the framed sections, not hearings.
+struct ChartManifestReader<'a> {
+    bytes: &'a [u8],
+    at: usize,
+}
+impl ChartManifestReader<'_> {
+    fn take(&mut self, count: usize) -> Result<&[u8]> {
+        let end = self
+            .at
+            .checked_add(count)
+            .filter(|&end| end <= self.bytes.len())
+            .ok_or("truncated chart manifest")?;
+        let value = &self.bytes[self.at..end];
+        self.at = end;
+        Ok(value)
+    }
+    fn u64(&mut self) -> Result<u64> {
+        Ok(u64::from_be_bytes(self.take(8)?.try_into()?))
+    }
+    fn u32(&mut self) -> Result<u32> {
+        Ok(u32::from_be_bytes(self.take(4)?.try_into()?))
+    }
+    fn digest(&mut self) -> Result<String> {
+        Ok(self
+            .take(32)?
+            .iter()
+            .map(|value| format!("{value:02x}"))
+            .collect())
+    }
+}
+
+/// Native Rust codecs own this parity comparison. A mismatch refuses before any mount,
+/// source delivery or diagnostic setup; an explicit frame limit can select a manifest prefix.
+pub(super) fn validate_chart_manifest(
+    frames: &[Section],
+    bytes: &[u8],
+    allow_prefix: bool,
+) -> Result<()> {
+    let mut reader = ChartManifestReader { bytes, at: 0 };
+    if reader.take(6)? != b"HLCM1\n" {
+        return Err("wrong chart manifest domain".into());
+    }
+    let count = usize::try_from(reader.u64()?)?;
+    if count > bytes.len() / 52 || frames.len() > count || (!allow_prefix && frames.len() != count)
+    {
+        return Err("chart manifest section count differs from the selected frames".into());
+    }
+    for index in 0..count {
+        if reader.u64()? != index as u64 {
+            return Err("chart manifest section order differs".into());
+        }
+        let passages = usize::try_from(reader.u32()?)?;
+        if let Some(frame) = frames.get(index) {
+            frame.chart_kind()?;
+            if frame.passages.len() != passages {
+                return Err(
+                    format!("chart manifest passage count differs at section {index}").into(),
+                );
+            }
+        }
+        if passages > (reader.bytes.len() - reader.at) / 81 {
+            return Err("chart manifest passage count exceeds its extent".into());
+        }
+        for passage_index in 0..passages {
+            let kind = reader.take(1)?[0];
+            let octets = reader.u64()?;
+            let chart_digest = reader.digest()?;
+            let fibre_bytes = reader.u64()?;
+            let fibre_digest = reader.digest()?;
+            if kind > 2 {
+                return Err("unknown chart manifest kind".into());
+            }
+            if let Some(frame) = frames.get(index) {
+                let summary = frame.passages[passage_index].encode_chart()?.summary();
+                if summary.kind.byte() != kind
+                    || summary.chart_octets as u64 != octets
+                    || summary.chart_sha256 != chart_digest
+                    || summary.fibre_bytes != u128::from(fibre_bytes)
+                    || summary.fibre_sha256 != fibre_digest
+                {
+                    return Err(format!("Rust/Python chart or fibre drift at section {index} passage {passage_index}").into());
+                }
+            }
+        }
+        let target_octets = reader.u64()?;
+        let target_digest = reader.digest()?;
+        if let Some(frame) = frames.get(index) {
+            if frame.target.len() as u64 != target_octets
+                || sections::sha256(&frame.target) != target_digest
+            {
+                return Err(format!("chart manifest target differs at section {index}").into());
+            }
+        }
+    }
+    if reader.at != bytes.len() {
+        return Err("excess chart manifest bytes".into());
+    }
+    Ok(())
+}
+
 pub fn run(port: &Reference, args: &[String]) -> Result<()> {
     let options = parse(args)?;
+    // Exterior codec parity is checked before either ordinary mounting or a diagnostic route.
+    // Explicit --learn-count permits only a checked prefix, including the two-frame cost probe.
+    let checked_frames = if let Some(path) = &options.chart_manifest {
+        let frames = sections_of(Some(&options.learn), options.count)?;
+        let manifest = read(path)?;
+        validate_chart_manifest(&frames, &manifest, options.count.is_some())?;
+        println!(
+            "chart_manifest checked_sections={} sha256={} codec_owner=rust",
+            frames.len(),
+            sections::sha256(&manifest)
+        );
+        Some(frames)
+    } else {
+        None
+    };
     if options.diagnostic_step0 {
         if options.diagnostic_cost_profile_cells64 {
             let checkpoint = options
@@ -1008,7 +1133,10 @@ pub fn run(port: &Reference, args: &[String]) -> Result<()> {
     let (mut resident, pairing) = mounted(port, options.population)?;
     let mut crib = ObservedCrib::new(0);
     let mut keys = KeyStream::new(read(keys)?, RELEASE_KEY_BYTES)?;
-    let frames = sections_of(Some(&options.learn), options.count)?;
+    let frames = match checked_frames {
+        Some(frames) => frames,
+        None => sections_of(Some(&options.learn), options.count)?,
+    };
     println!("{}", header_line(&resident)?);
     let mut longest = ReleaseHistory::default();
     let mut published_total = 0usize;
@@ -1068,6 +1196,85 @@ mod tests {
     use holonics::hnn::encoding::observed::PairedObservation;
     use holonics::ratio::integer;
     use std::collections::BTreeSet;
+
+    fn boundary_manifest(frames: &[Section]) -> Vec<u8> {
+        fn digest(bytes: &mut Vec<u8>, text: &str) {
+            for i in (0..text.len()).step_by(2) {
+                bytes.push(u8::from_str_radix(&text[i..i + 2], 16).unwrap());
+            }
+        }
+        let mut bytes = b"HLCM1\n".to_vec();
+        bytes.extend((frames.len() as u64).to_be_bytes());
+        for (index, frame) in frames.iter().enumerate() {
+            bytes.extend((index as u64).to_be_bytes());
+            bytes.extend((frame.passages.len() as u32).to_be_bytes());
+            for passage in &frame.passages {
+                let summary = passage.encode_chart().unwrap().summary();
+                bytes.push(summary.kind.byte());
+                bytes.extend((summary.chart_octets as u64).to_be_bytes());
+                digest(&mut bytes, &summary.chart_sha256);
+                bytes.extend((summary.fibre_bytes as u64).to_be_bytes());
+                digest(&mut bytes, &summary.fibre_sha256);
+            }
+            bytes.extend((frame.target.len() as u64).to_be_bytes());
+            digest(&mut bytes, &sections::sha256(&frame.target));
+        }
+        bytes
+    }
+
+    #[test]
+    fn native_manifest_refuses_chart_fibre_target_and_frame_count_drift() {
+        let frames = vec![
+            Section {
+                passages: vec![sections::Passage::Octets(b"abc".to_vec())],
+                target: b"7".to_vec(),
+            },
+            Section {
+                passages: vec![sections::Passage::Pcm {
+                    rate: 16000,
+                    samples: vec![0, 1, -2],
+                }],
+                target: b"8".to_vec(),
+            },
+        ];
+        let bytes = boundary_manifest(&frames);
+        validate_chart_manifest(&frames, &bytes, false).unwrap();
+        validate_chart_manifest(&frames[..1], &bytes, true).unwrap();
+        assert!(validate_chart_manifest(&frames[..1], &bytes, false).is_err());
+        let mut wrong_source = frames.clone();
+        wrong_source[0].passages = vec![sections::Passage::Octets(b"abd".to_vec())];
+        assert!(validate_chart_manifest(&wrong_source, &bytes, false).is_err());
+        let mut wrong_target = frames.clone();
+        wrong_target[0].target = b"9".to_vec();
+        assert!(validate_chart_manifest(&wrong_target, &bytes, false).is_err());
+        for at in [14 + 12, 14 + 21, 14 + 61] {
+            let mut drift = bytes.clone();
+            drift[at] ^= 1;
+            assert!(validate_chart_manifest(&frames, &drift, false).is_err());
+        }
+        for length in [0, 5, 14, bytes.len() - 1] {
+            assert!(validate_chart_manifest(&frames, &bytes[..length], false).is_err());
+        }
+        let mut excess = bytes;
+        excess.push(0);
+        assert!(validate_chart_manifest(&frames, &excess, false).is_err());
+    }
+
+    #[test]
+    fn manifest_option_is_an_exterior_input_and_entropy_comes_from_the_aperture() {
+        let options = parse(&args(&[
+            "--population",
+            "65536",
+            "--chart-manifest",
+            "micro.charts",
+            "--learn-count",
+            "2",
+        ]))
+        .unwrap();
+        assert_eq!(options.chart_manifest.as_deref(), Some("micro.charts"));
+        assert_eq!(options.count, Some(2));
+        assert_eq!(1usize << ENTROPY_RATE_BITS, CLASSES);
+    }
     fn args(extra: &[&str]) -> Vec<String> {
         ["--learn", "unread.hlsn", "--keys", "unread.keys"]
             .into_iter()
@@ -1810,7 +2017,15 @@ mod tests {
                     "receiving_exponent",
                 ]
             } else if line.starts_with("observed_chart ") {
-                &["section", "kind", "chart_octets", "fibre"]
+                &[
+                    "section",
+                    "kind",
+                    "chart_octets",
+                    "chart_sha256",
+                    "fibre_bytes",
+                    "fibre_sha256",
+                    "canonical_format",
+                ]
             } else if line.starts_with("keys ") {
                 &[
                     "section",

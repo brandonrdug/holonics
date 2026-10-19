@@ -6,6 +6,8 @@
 #[path = "exterior_clock.rs"]
 mod exterior_clock;
 
+use num_bigint::BigUint;
+use num_traits::ToPrimitive;
 use std::io;
 use std::time::Instant;
 
@@ -181,6 +183,7 @@ impl RunBudget {
             forecast: ForecastBook::default(),
             consecutive_bad_blocks: 0,
             phase_allowance_ns,
+            explicit_phase_cap: cap_ns.is_some(),
             stop_reason: None,
             summary_written: false,
         })
@@ -354,16 +357,19 @@ fn work_summary(values: &[u128]) -> WorkSummary {
 ///
 /// `REQ063_REPORT_GROWTH_INPUT` uses newline-delimited `key=value` fields, exactly once each:
 /// source_sha256, input_sha256, report_variant, measurements (`16:ns,32:ns,64:ns`, for example),
-/// target_cells (`231`), projected_report_ns (the externally computed complete per-branch cost),
+/// target_cells (`231`), projected_report_ns (the pinned complete per-branch cost),
 /// forecast_description (formula, inputs and future rational-bit-growth scope), adequacy
 /// (`empirical_forecast` or `uncertain`), checkpoint_reserve_ns, aa0_postwork_reserve_ns.
-/// Missing, duplicate and unknown fields fail closed. No cost is inferred by scaling counts.
+/// Missing, duplicate and unknown fields fail closed. The 16/32/64 timings are mandatory:
+/// the proposal must cover their exact empirical doubling-growth floor, without turning that
+/// extrapolation into a mathematical bound on future rational bit growth.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(super) struct ReportAdmission {
     pub(super) source_sha256: String,
     pub(super) input_sha256: String,
     pub(super) report_variant: String,
     pub(super) measurements: Vec<ReportGrowthMeasurement>,
+    pub(super) empirical_growth: EmpiricalReportGrowth,
     pub(super) target_cells: usize,
     pub(super) projected_report_ns: u128,
     pub(super) forecast_description: String,
@@ -375,6 +381,63 @@ pub(super) struct ReportAdmission {
 pub(super) struct ReportGrowthMeasurement {
     pub(super) cells: usize,
     pub(super) report_ns: u128,
+}
+
+/// An empirical forecast from the two measured doublings, not an upper-bound certificate.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(super) struct EmpiricalReportGrowth {
+    pub(super) exponent: u32,
+    pub(super) floor_231_ns: u128,
+    pub(super) measured_64_ns: u128,
+}
+
+impl EmpiricalReportGrowth {
+    /// Keep the measured/projected comparison as its exact undivided pair, in nanoseconds.
+    pub(super) fn measured_to_projected_ratio(
+        &self,
+        projected_ns: u128,
+    ) -> io::Result<(u128, u128)> {
+        if projected_ns == 0 {
+            return Err(invalid(
+                "a measured-to-projected ratio needs a positive projection",
+            ));
+        }
+        Ok((self.measured_64_ns, projected_ns))
+    }
+}
+
+/// Smallest integer e >= 1 with r32 <= r16 * 2^e and r64 <= r32 * 2^e, followed by
+/// ceil(r64 * 231^e / 64^e). BigUint keeps the shifted comparisons and powers exact even
+/// when an intermediate exceeds u128. Positive u128 timings need at most e = 128; only an
+/// unrepresentable final nanosecond floor is refused. This forecasts the declared report
+/// variant empirically and establishes no law of future arithmetic cost.
+pub(super) fn empirical_report_growth_floor(
+    r16_ns: u128,
+    r32_ns: u128,
+    r64_ns: u128,
+) -> io::Result<EmpiricalReportGrowth> {
+    if r16_ns == 0 || r32_ns == 0 || r64_ns == 0 {
+        return Err(invalid(
+            "empirical report growth requires positive 16/32/64 timings",
+        ));
+    }
+    let r16 = BigUint::from(r16_ns);
+    let r32 = BigUint::from(r32_ns);
+    let r64 = BigUint::from(r64_ns);
+    let exponent = (1_u32..=u128::BITS)
+        .find(|&exponent| r32 <= (&r16 << exponent as usize) && r64 <= (&r32 << exponent as usize))
+        .ok_or_else(|| invalid("empirical report doubling exponent is unrepresentable"))?;
+    let numerator = r64 * BigUint::from(231_u16).pow(exponent);
+    let denominator = BigUint::from(64_u8).pow(exponent);
+    let floor = (&numerator + &denominator - BigUint::from(1_u8)) / denominator;
+    let floor_231_ns = floor.to_u128().ok_or_else(|| {
+        invalid("empirical 231-cell report-growth floor exceeds u128 nanoseconds")
+    })?;
+    Ok(EmpiricalReportGrowth {
+        exponent,
+        floor_231_ns,
+        measured_64_ns: r64_ns,
+    })
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -488,7 +551,26 @@ impl ReportAdmission {
                 "report-growth forecast requires at least three measured populations",
             ));
         }
+        let measured = |cells| {
+            measurements
+                .iter()
+                .find(|measurement| measurement.cells == cells)
+                .map(|measurement| measurement.report_ns)
+                .ok_or_else(|| {
+                    invalid(format!(
+                        "report-growth measurement at {cells} cells is missing"
+                    ))
+                })
+        };
+        let empirical_growth =
+            empirical_report_growth_floor(measured(16)?, measured(32)?, measured(64)?)?;
         let projected_report_ns = positive("projected_report_ns")?;
+        if projected_report_ns < empirical_growth.floor_231_ns {
+            return Err(invalid(format!(
+                "report-growth proposal {projected_report_ns} ns is below the empirical 231-cell floor {} ns at doubling exponent {}",
+                empirical_growth.floor_231_ns, empirical_growth.exponent
+            )));
+        }
         if measurements
             .iter()
             .any(|measurement| measurement.report_ns > projected_report_ns)
@@ -502,6 +584,7 @@ impl ReportAdmission {
             input_sha256: field("input_sha256")?.to_owned(),
             report_variant: field("report_variant")?.to_owned(),
             measurements,
+            empirical_growth,
             target_cells,
             projected_report_ns,
             forecast_description: field("forecast_description")?.to_owned(),
@@ -644,6 +727,7 @@ pub(super) struct PhaseBudget {
     forecast: ForecastBook,
     consecutive_bad_blocks: usize,
     phase_allowance_ns: u128,
+    explicit_phase_cap: bool,
     stop_reason: Option<String>,
     summary_written: bool,
 }
@@ -652,6 +736,9 @@ impl PhaseBudget {
     /// Check actual native/phase time and whether the latest completed-block upper estimate can
     /// fit the next declared unit. Call before starting that unit.
     pub(super) fn before_cell(&mut self) -> io::Result<()> {
+        if let Some(reason) = &self.stop_reason {
+            return Err(timed_out(reason.clone()));
+        }
         if self.completed_cells >= self.total_cells {
             return Err(self.stop_error("phase has no declared work units remaining"));
         }
@@ -692,8 +779,13 @@ impl PhaseBudget {
     }
 
     /// Records a completed native unit. An individual cell's duration never triggers an abort.
-    /// Complete eight-cell blocks update forecasts; the final partial block is reported separately.
+    /// An explicit fixed cap admits only cap/declared-count per cell: its first completed
+    /// eight-cell block above that rate stops immediately. Uncapped forecasts retain their
+    /// two-block rule; the final partial block is reported separately.
     pub(super) fn finish_cell(&mut self, cell_ns: u128) -> io::Result<()> {
+        if let Some(reason) = &self.stop_reason {
+            return Err(timed_out(reason.clone()));
+        }
         if self.completed_cells >= self.total_cells {
             return Err(self.stop_error("more completed cells than the phase declared"));
         }
@@ -709,9 +801,21 @@ impl PhaseBudget {
                     self.stop_error(format!("monotonic clock unavailable after cell: {error}"))
                 );
             }
+            let exceeds_admitted_rate = self.explicit_phase_cap
+                && completed_block_exceeds_admitted_rate(
+                    self.block_wall_ns,
+                    self.phase_allowance_ns,
+                    self.total_cells,
+                );
             self.report_block(false);
             self.block_cells = 0;
             self.block_wall_ns = 0;
+            if exceeds_admitted_rate {
+                return Err(self.stop_error(format!(
+                    "{} stopped after completed eight-cell block {}: measured block rate exceeds the fixed pre-admitted per-cell rate {}/{} ns; deadline unchanged",
+                    self.label, self.block_index, self.phase_allowance_ns, self.total_cells
+                )));
+            }
         }
         let now = match exterior_clock::monotonic_ns() {
             Ok(now) => now,
@@ -863,6 +967,23 @@ impl PhaseBudget {
             summary.phase_allowance_ns,
             summary.consecutive_bad_blocks,
         );
+    }
+}
+
+fn completed_block_exceeds_admitted_rate(
+    block_wall_ns: u128,
+    phase_allowance_ns: u128,
+    declared_cells: usize,
+) -> bool {
+    match block_wall_ns
+        .checked_mul(declared_cells as u128)
+        .zip(phase_allowance_ns.checked_mul(BLOCK_CELLS as u128))
+    {
+        Some((measured, admitted)) => measured > admitted,
+        None => {
+            BigUint::from(block_wall_ns) * BigUint::from(declared_cells)
+                > BigUint::from(phase_allowance_ns) * BigUint::from(BLOCK_CELLS)
+        }
     }
 }
 
@@ -1133,10 +1254,156 @@ mod tests {
 
     fn empirical_report_input() -> String {
         format!(
-            "source_sha256={}\ninput_sha256={}\nreport_variant=corrected-series-fixture\nmeasurements=16:20,32:50,64:150\ntarget_cells=231\nprojected_report_ns=1000\nforecast_description=external synthetic cost proposal with explicit prospective rational-bit-growth scope; empirical extrapolation only\nadequacy=empirical_forecast\ncheckpoint_reserve_ns=50\naa0_postwork_reserve_ns=100",
+            "source_sha256={}\ninput_sha256={}\nreport_variant=corrected-series-fixture\nmeasurements=16:20,32:50,64:150\ntarget_cells=231\nprojected_report_ns=2000\nforecast_description=external synthetic cost proposal with explicit prospective rational-bit-growth scope; empirical extrapolation only\nadequacy=empirical_forecast\ncheckpoint_reserve_ns=50\naa0_postwork_reserve_ns=100",
             "a".repeat(64),
             "b".repeat(64)
         )
+    }
+
+    #[test]
+    fn empirical_growth_uses_the_smallest_exponent_covering_both_doublings() {
+        let growth = super::empirical_report_growth_floor(16, 32, 64).unwrap();
+        assert_eq!((growth.exponent, growth.floor_231_ns), (1, 231));
+        assert_eq!(growth.measured_to_projected_ratio(231).unwrap(), (64, 231));
+        assert!(growth.measured_to_projected_ratio(0).is_err());
+        assert_eq!(
+            super::empirical_report_growth_floor(10, 20, 40)
+                .unwrap()
+                .exponent,
+            1
+        );
+        assert_eq!(
+            super::empirical_report_growth_floor(10, 21, 40)
+                .unwrap()
+                .exponent,
+            2
+        );
+        assert_eq!(
+            super::empirical_report_growth_floor(10, 10, 21)
+                .unwrap()
+                .exponent,
+            2
+        );
+        assert_eq!(
+            super::empirical_report_growth_floor(1, 4, 16)
+                .unwrap()
+                .exponent,
+            2
+        );
+        assert_eq!(
+            super::empirical_report_growth_floor(1, 5, 16)
+                .unwrap()
+                .exponent,
+            3
+        );
+        // Flat or decreasing timings retain the required e >= 1 floor.
+        assert_eq!(
+            super::empirical_report_growth_floor(3, 2, 1)
+                .unwrap()
+                .exponent,
+            1
+        );
+    }
+
+    #[test]
+    fn empirical_growth_rounds_up_only_after_the_exact_power_ratio() {
+        let rounded = super::empirical_report_growth_floor(20, 50, 150).unwrap();
+        assert_eq!((rounded.exponent, rounded.floor_231_ns), (2, 1955));
+        let integral = super::empirical_report_growth_floor(256, 1024, 4096).unwrap();
+        assert_eq!((integral.exponent, integral.floor_231_ns), (2, 53_361));
+        assert_eq!(
+            super::empirical_report_growth_floor(1, 3, 4)
+                .unwrap()
+                .floor_231_ns,
+            53
+        );
+    }
+
+    #[test]
+    fn empirical_growth_keeps_large_intermediates_and_refuses_only_unrepresentable_floor() {
+        let timing = 1_u128 << 121;
+        let growth = super::empirical_report_growth_floor(timing, timing, timing).unwrap();
+        // timing*231 exceeds u128, while division by 64 gives this exact representable floor.
+        assert_eq!(growth.floor_231_ns, 231_u128 << 115);
+        let last = (u128::MAX / 231) * 64 + ((u128::MAX % 231) * 64) / 231;
+        assert!(super::empirical_report_growth_floor(last, last, last).is_ok());
+        assert!(super::empirical_report_growth_floor(last + 1, last + 1, last + 1).is_err());
+        assert!(super::empirical_report_growth_floor(u128::MAX, u128::MAX, u128::MAX).is_err());
+        assert!(super::empirical_report_growth_floor(1, u128::MAX, 1).is_err());
+        for timings in [(0, 1, 1), (1, 0, 1), (1, 1, 0)] {
+            assert!(super::empirical_report_growth_floor(timings.0, timings.1, timings.2).is_err());
+        }
+    }
+
+    #[test]
+    fn pinned_growth_proposal_must_cover_the_required_exact_empirical_floor() {
+        let input = empirical_report_input();
+        assert!(
+            super::ReportAdmission::parse(
+                &input.replace("projected_report_ns=2000", "projected_report_ns=1954")
+            )
+            .is_err()
+        );
+        let exact = super::ReportAdmission::parse(
+            &input.replace("projected_report_ns=2000", "projected_report_ns=1955"),
+        )
+        .unwrap();
+        assert_eq!(
+            exact.empirical_growth.floor_231_ns,
+            exact.projected_report_ns
+        );
+        assert_eq!(exact.empirical_growth.exponent, 2);
+        assert!(
+            super::ReportAdmission::parse(&input.replace(
+                "measurements=16:20,32:50,64:150",
+                "measurements=8:20,32:50,64:150"
+            ))
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn fixed_phase_cap_stops_the_first_completed_block_above_its_admitted_rate() {
+        let now = super::exterior_clock::monotonic_ns().unwrap();
+        let run = RunBudget {
+            deadline: DeadlineContract {
+                started_ns: now,
+                term_ns: now + 295_000_000_000,
+                total_ns: now + 300_000_000_000,
+                native_ns: now + 290_000_000_000,
+            },
+            reserve_ns: 0,
+        };
+        let mut phase = run
+            .phase("synthetic admitted rate", 16, Some(160_000_000_000))
+            .unwrap();
+        for _ in 0..7 {
+            phase.finish_cell(11_000_000_000).unwrap();
+        }
+        let error = phase.finish_cell(11_000_000_000).unwrap_err();
+        assert!(error.to_string().contains("pre-admitted per-cell rate"));
+        assert_eq!(phase.completed_cells, 8);
+        assert!(
+            phase.before_cell().is_err(),
+            "a stopped phase must not start another cell"
+        );
+        assert_eq!(phase.phase_deadline_ns, phase.started_ns + 160_000_000_000);
+    }
+
+    #[test]
+    fn admitted_block_rate_boundary_and_overflow_are_exact() {
+        assert!(!super::completed_block_exceeds_admitted_rate(80, 160, 16));
+        assert!(super::completed_block_exceeds_admitted_rate(81, 160, 16));
+        assert!(!super::completed_block_exceeds_admitted_rate(
+            u128::MAX,
+            u128::MAX,
+            8
+        ));
+        assert!(super::completed_block_exceeds_admitted_rate(
+            u128::MAX,
+            u128::MAX,
+            9
+        ));
     }
 
     #[test]
@@ -1235,7 +1502,7 @@ mod tests {
         // Timing monotonicity is neither required nor treated as a proof of future cost.
         assert!(
             super::ReportAdmission::parse(
-                &input.replace("16:20,32:50,64:150", "16:50,32:20,64:150")
+                &input.replace("16:20,32:50,64:150", "16:50,32:20,64:60")
             )
             .is_ok()
         );
@@ -1245,7 +1512,7 @@ mod tests {
             "aa0_postwork_reserve_ns",
         ] {
             let original = match field {
-                "projected_report_ns" => 1000,
+                "projected_report_ns" => 2000,
                 "checkpoint_reserve_ns" => 50,
                 _ => 100,
             };
@@ -1261,7 +1528,7 @@ mod tests {
         }
         assert!(
             super::ReportAdmission::parse(
-                &input.replace("projected_report_ns=1000", "projected_report_ns=149")
+                &input.replace("projected_report_ns=2000", "projected_report_ns=149")
             )
             .is_err()
         );
@@ -1270,24 +1537,24 @@ mod tests {
     #[test]
     fn report_admission_keeps_checkpoint_and_aa0_reserves_in_fixed_remaining_time() {
         let model = super::ReportAdmission::parse(&empirical_report_input()).unwrap();
-        let admission = model.admit(200, 2, 2550, 1200).unwrap();
-        assert_eq!(model.report_projection_ns(), 1000);
-        assert_eq!(admission.one_branch_combined_ns, 1200);
-        assert_eq!(admission.fork_horizon_ns, 2400);
-        assert_eq!(admission.total_required_ns, 2550);
-        assert!(model.admit(200, 2, 2549, 1200).is_err());
-        assert!(model.admit(200, 2, 2550, 1199).is_err());
+        let admission = model.admit(200, 2, 4550, 2200).unwrap();
+        assert_eq!(model.report_projection_ns(), 2000);
+        assert_eq!(admission.one_branch_combined_ns, 2200);
+        assert_eq!(admission.fork_horizon_ns, 4400);
+        assert_eq!(admission.total_required_ns, 4550);
+        assert!(model.admit(200, 2, 4549, 2200).is_err());
+        assert!(model.admit(200, 2, 4550, 2199).is_err());
         assert!(model.admit(200, 0, u128::MAX, u128::MAX).is_err());
         // After actual checkpoint time is deducted, only the already spent reserve is omitted.
         assert_eq!(
             model
-                .admit_after_checkpoint(200, 2, 2500, 1200)
+                .admit_after_checkpoint(200, 2, 4500, 2200)
                 .unwrap()
                 .total_required_ns,
-            2500
+            4500
         );
-        assert!(model.admit_after_checkpoint(200, 2, 2499, 1200).is_err());
-        assert!(model.admit(200, 2, 100, 1200).is_err());
+        assert!(model.admit_after_checkpoint(200, 2, 4499, 2200).is_err());
+        assert!(model.admit(200, 2, 100, 2200).is_err());
     }
 
     #[test]
@@ -1295,7 +1562,7 @@ mod tests {
         let input = empirical_report_input();
         assert!(
             super::ReportAdmission::parse(&input.replace(
-                "projected_report_ns=1000",
+                "projected_report_ns=2000",
                 &format!("projected_report_ns={}", u128::MAX)
             ))
             .is_err()
@@ -1532,6 +1799,7 @@ mod tests {
             forecast,
             consecutive_bad_blocks: 0,
             phase_allowance_ns: 1_000,
+            explicit_phase_cap: false,
             stop_reason: None,
             summary_written: false,
         };

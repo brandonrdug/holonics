@@ -231,8 +231,14 @@ pub(crate) fn save_checkpoint_cost_profile<R: ExposedResident>(
     // staging inode as private evidence; no existing file is replaced or removed.
     std::fs::hard_link(&staged_path, &path)?;
     let committed = std::fs::read(&path)?;
+    // Include publication-directory persistence in the measured I/O, as a production save does.
+    // The separate staging name is deliberately preserved as private exact-byte evidence.
+    let parent = std::path::Path::new(&path)
+        .parent()
+        .ok_or("checkpoint has no directory")?;
+    std::fs::File::open(parent)?.sync_all()?;
     println!(
-        "cost_checkpoint component=create_sync_read_link_read elapsed_ns={} bytes={} staging_preserved=true",
+        "cost_checkpoint component=create_sync_read_link_read_directory_fsync elapsed_ns={} bytes={} staging_preserved=true staging_reason=private_exact_byte_evidence directory_fsync=true",
         elapsed(started),
         committed.len()
     );
