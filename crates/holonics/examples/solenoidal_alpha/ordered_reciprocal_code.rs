@@ -597,8 +597,13 @@ struct CountedHost {
     returns: std::sync::atomic::AtomicUsize,
     aggregates: std::sync::atomic::AtomicUsize,
     late_refuse: bool,
+    uncached: bool,
 }
 impl ObservedEpochExecution for CountedHost {
+    fn reuse_receiving_observations(&self) -> bool {
+        !self.uncached
+    }
+
     fn forward(
         &self,
         f: &Field,
@@ -695,17 +700,47 @@ fn actual_owner_counts_and_late_return_refusal_are_atomic() -> Result<()> {
         late_refuse: true,
         ..Default::default()
     };
-    assert!(
-        stream
-            .receive_with_execution(&reference, &pairing, &[2, 3, 3, 2, 1, 0, 0, 1], &late)
-            .is_err()
-    );
+    let cached_error = stream
+        .receive_with_execution(&reference, &pairing, &[2, 3, 3, 2, 1, 0, 0, 1], &late)
+        .unwrap_err();
+    let uncached_late = CountedHost {
+        late_refuse: true,
+        uncached: true,
+        ..Default::default()
+    };
+    let uncached_error = stream
+        .receive_with_execution(
+            &reference,
+            &pairing,
+            &[2, 3, 3, 2, 1, 0, 0, 1],
+            &uncached_late,
+        )
+        .unwrap_err();
+    assert_eq!(cached_error.to_string(), uncached_error.to_string());
+    assert_eq!(load(&uncached_late.aggregates), 1);
     assert_eq!(stream.resident().continuing_state(0)?, before);
     assert_eq!(stream.pending_checkpoint(), before_pending);
     assert_eq!(stream.crib().unplaced_checkpoint()?, before_crib);
     assert_eq!(load(&late.aggregates), 1);
     println!(
-        "V93_ORDERED_OWNER_COUNTS forwards=28 actual_Word_returns=28 aggregates=3 upstream_aggregates=0 late_refusal_atomic=true additional_global_finite_probe_calls=0 low_level_root_log_kernel_transfer_sync_counters=unmeasured"
+        "V93_ORDERED_OWNER_COUNTS forwards=28 actual_Word_returns=28 aggregates=3 upstream_aggregates=0 late_refusal_atomic=true cached_uncached_refusal_equal=true additional_global_finite_probe_calls=0 low_level_root_log_kernel_transfer_sync_counters=unmeasured"
+    );
+    Ok(())
+}
+
+#[test]
+fn cached_and_uncached_ordered_native_cold_and_draws_are_exact() -> Result<()> {
+    let cached = ordered(&CountedHost::default())?;
+    let uncached = ordered(&CountedHost {
+        uncached: true,
+        ..Default::default()
+    })?;
+    assert_eq!(
+        cached, uncached,
+        "complete ordered native/pending/cold state must be identical"
+    );
+    println!(
+        "V93_RECEIVING_REUSE_FULL_NATIVE cached_uncached_exact=true each_fixture_internal_draws_cold_refusals=true"
     );
     Ok(())
 }

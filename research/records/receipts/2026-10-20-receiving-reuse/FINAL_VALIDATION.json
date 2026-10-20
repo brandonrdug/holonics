@@ -1,0 +1,29 @@
+{
+  "base_source": "19bf2238dae6a139f9671b72e656743c57ede2d4",
+  "host_gate_scopes_passed": 22,
+  "doctests_passed": 64,
+  "owner_exact_refinement_context_counter_control": "PASS",
+  "complete_ordered_controls_passed": 4,
+  "cached_uncached_full_native_cold_draw_refusal": "EXACT",
+  "CUDA_actual_dispatch": {
+    "backend": "cuda-observed-epoch-device0",
+    "device_ordinal": 0,
+    "host_fallback": false,
+    "completed": true,
+    "successful_card_forwards": 28,
+    "successful_retained_card_returns": 28,
+    "successful_card_aggregates": 3,
+    "host_owned": "scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks"
+  },
+  "CUDA_host_card_cold": "EXACT",
+  "GPU_peak_own_MiB": 260,
+  "GPU_cleanup_empty": true,
+  "CODE_measured_ns": 496491691915,
+  "CODE_unused_ns": 103508308085,
+  "initial_measurements_preserved": "code02 andcode03 are earlier accepted isolated measurements; finalcode04 includes32->64 andthreadlocal isolation",
+  "performance": "same-work preparation only; see immutable measurement; no training throughput or predictive gain claim",
+  "language_command": "existing complete-language command still V92 NormalMaps; local fresh CLI adapter is separately authorized NEXT, not implemented here",
+  "E_language_scope": "separate addressed bounded JointFamily API only; no automatic generic contextual E or turn-family learner",
+  "dataset_model_jobs": 0,
+  "uploads": 0
+}

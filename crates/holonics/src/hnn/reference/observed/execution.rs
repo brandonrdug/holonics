@@ -114,6 +114,12 @@ impl ObservedEpochWord for NativeEpochWord {
 /// refusal when their selected realization cannot execute the actual operands.
 /// The words are independent after their forward chain has reached its openings.
 pub trait ObservedEpochExecution: Sync {
+    /// Executed same-law uncached CODE control. This selects observation reuse only,
+    /// never material, chronology, a return, precision, or an admission/fallback policy.
+    fn reuse_receiving_observations(&self) -> bool {
+        true
+    }
+
     /// Optional exterior matched C/K ablation. The disposable probe never changes
     /// deposition or admission; ordinary executors do not request this extra work.
     fn channel_storage_ablation_control(&self) -> bool {

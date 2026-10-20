@@ -159,6 +159,9 @@ pub use selected::{
     ReceivingLaw, SelectedComparedScoresAt, SelectedFaceReading, SelectedScored,
     compare_scores_at_law, score_at_law,
 };
+pub(crate) use selected::prepare_retained_section;
+#[cfg(test)]
+mod reuse_work;
 mod aligned_return;
 pub use aligned_return::{RetainedSectionReturn, RetainedStationReturn};
 mod declaration;

@@ -1,0 +1,94 @@
+{
+  "kind": "instrumented synthetic CODE preparation; same8stations",
+  "counts_order": [
+    "complete_section_score",
+    "normalized_combined_mass",
+    "positive_weight",
+    "log2_enclosure_at_entries"
+  ],
+  "uncached_counts": [
+    [
+      2,
+      24,
+      32,
+      176
+    ],
+    [
+      2,
+      24,
+      32,
+      176
+    ],
+    [
+      2,
+      24,
+      32,
+      176
+    ],
+    [
+      2,
+      24,
+      32,
+      176
+    ],
+    [
+      2,
+      24,
+      32,
+      176
+    ]
+  ],
+  "reused_counts": [
+    [
+      1,
+      8,
+      8,
+      72
+    ],
+    [
+      1,
+      8,
+      8,
+      72
+    ],
+    [
+      1,
+      8,
+      8,
+      72
+    ],
+    [
+      1,
+      8,
+      8,
+      72
+    ],
+    [
+      1,
+      8,
+      8,
+      72
+    ]
+  ],
+  "uncached_ns": [
+    336838750,
+    335023851,
+    336501358,
+    333951944,
+    335742728
+  ],
+  "reused_ns": [
+    136533926,
+    135860685,
+    136364258,
+    135952497,
+    136270483
+  ],
+  "reuse_max_below_uncached_min": true,
+  "counter_scope": "measured sequential preparation thread; concurrent-test isolation checked; counters absent from native build",
+  "producer32_return64_exact": true,
+  "original_source128_refinement": true,
+  "physical_return_including_foil_beta_error_exact": true,
+  "predictive_gain_claim": false,
+  "source_log": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-receiving-reuse/code-04-final-owner-controls/log.txt"
+}

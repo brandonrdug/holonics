@@ -964,7 +964,21 @@ impl Reference {
             .constitution
             .population(receiver)
             .ok_or(HnnError::MissingReceivingMap { ring: receiver })?;
-        let scored = if resident.receiving_law() == ReceivingLaw::CoarseGrainV1 {
+        let prepared = if local_receiving && execution.reuse_receiving_observations() {
+            Some(crate::hnn::receiving::prepare_retained_section(
+                population,
+                receiver,
+                &all_combined,
+                &trees,
+                &classes[..consumed],
+                crate::ratio::exponentiated::READING_BITS,
+            )?)
+        } else {
+            None
+        };
+        let scored = if let Some((scored, _)) = &prepared {
+            scored.clone()
+        } else if resident.receiving_law() == ReceivingLaw::CoarseGrainV1 {
             // Keep the historical scorer, including its exact code-reading conventions.
             let old = crate::hnn::receiving::score(
                 population,
@@ -1003,7 +1017,9 @@ impl Reference {
                 crate::ratio::exponentiated::READING_BITS,
             )?
         };
-        let retained_return = if resident.receiving_law() == ReceivingLaw::RetainedFibreV1 {
+        let retained_return = if let Some((_, returned)) = prepared {
+            Some(returned)
+        } else if resident.receiving_law() == ReceivingLaw::RetainedFibreV1 {
             Some(RetainedSectionReturn::at(
                 population,
                 receiver,

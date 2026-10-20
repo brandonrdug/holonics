@@ -135,6 +135,27 @@ impl RetainedSectionReturn {
         trees: &[LandmarkFace],
         targets: &[usize],
     ) -> Result<Self, HnnError> {
+        Self::at_using(population, ring, combined, trees, targets, None)
+    }
+    pub(super) fn at_produced(
+        population: &PortPopulation,
+        ring: usize,
+        combined: &Faces,
+        trees: &[LandmarkFace],
+        targets: &[usize],
+        producer: &super::selected::ProducedRetainedSection,
+    ) -> Result<Self, HnnError> {
+        producer.validate(population, ring, combined, trees, targets)?;
+        Self::at_using(population, ring, combined, trees, targets, Some(producer))
+    }
+    fn at_using(
+        population: &PortPopulation,
+        ring: usize,
+        combined: &Faces,
+        trees: &[LandmarkFace],
+        targets: &[usize],
+        producer: Option<&super::selected::ProducedRetainedSection>,
+    ) -> Result<Self, HnnError> {
         let rho = population.weight(COMBINED).map_err(population_refusal)?;
         if population.description(2).is_some() {
             return Err(fail(
@@ -145,16 +166,29 @@ impl RetainedSectionReturn {
         let mut station_mass_evaluations = 0;
         let mut station_weight_evaluations = 0;
         for bits in cells::demand_ladder() {
-            let scored = score_at_law(
-                ReceivingLaw::RetainedFibreV1,
-                population,
-                ring,
-                combined,
-                trees,
-                targets,
-                bits,
-            )?;
-            section_score_evaluations += 1;
+            let scored = match producer {
+                Some(p) => p.scored().clone(),
+                None => {
+                    let scored = score_at_law(
+                        ReceivingLaw::RetainedFibreV1,
+                        population,
+                        ring,
+                        combined,
+                        trees,
+                        targets,
+                        bits,
+                    )?;
+                    section_score_evaluations += 1;
+                    scored
+                }
+            };
+            let observations = producer.map(|p| p.observations_at(bits)).transpose()?;
+            if let Some(p) = producer {
+                if p.bits() != bits {
+                    station_mass_evaluations += targets.len() as u64;
+                    station_weight_evaluations += targets.len() as u64;
+                }
+            }
             let mut reads = Vec::with_capacity(targets.len());
             let mut q = Rat::one();
             let mut r_lo = Rat::one();
@@ -165,8 +199,13 @@ impl RetainedSectionReturn {
                         "an aligned section retains its selected receiving law",
                     ));
                 };
-                let masses = reading.combined_masses_at(bits)?;
-                station_mass_evaluations += 1;
+                let masses = match &observations {
+                    Some(rows) => rows[at].masses().to_vec(),
+                    None => {
+                        station_mass_evaluations += 1;
+                        reading.combined_masses_at(bits)?
+                    }
+                };
                 let target = targets[at];
                 q *= &reading.tree_probabilities[target];
                 r_lo *= &masses[target].lower;
@@ -191,8 +230,13 @@ impl RetainedSectionReturn {
             let mut error_pairing = Rat::zero();
             let mut exact_zero = true;
             for (at, (reading, masses)) in reads.into_iter().enumerate() {
-                let weights = reading.receiver.weights_at(&reading.read, bits)?;
-                station_weight_evaluations += 1;
+                let weights = match &observations {
+                    Some(rows) => rows[at].weights().to_vec(),
+                    None => {
+                        station_weight_evaluations += 1;
+                        reading.receiver.weights_at(&reading.read, bits)?
+                    }
+                };
                 let representatives: Vec<_> = weights
                     .iter()
                     .map(|w| (&w.lower + &w.upper) / integer(2))

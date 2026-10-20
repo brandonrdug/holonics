@@ -206,6 +206,8 @@ impl RetainedFibreReceiver {
         read: &ReceivingRead,
         bits: u32,
     ) -> Result<Vec<ExactInterval>, HnnError> {
+        #[cfg(test)]
+        super::reuse_work::weight();
         if bits == 0 {
             return Err(HnnError::Unadmitted {
                 reason: "a retained-fibre mass read needs positive enclosure precision",
@@ -294,31 +296,87 @@ impl RetainedFibreReceiver {
         bits: u32,
     ) -> Result<Vec<ExactInterval>, HnnError> {
         let weights = self.weights_at(read, bits)?;
-        let classes = weights.len();
-        let mut masses = Vec::with_capacity(classes);
-        for (class, weight) in weights.iter().enumerate() {
-            let mut other_lower = Rat::zero();
-            let mut other_upper = Rat::zero();
-            for (other, candidate) in weights.iter().enumerate() {
-                if other != class {
-                    other_lower += &candidate.lower;
-                    other_upper += &candidate.upper;
-                }
-            }
-            let lower_denominator = &weight.lower + &other_upper;
-            let upper_denominator = &weight.upper + &other_lower;
-            if lower_denominator <= Rat::zero() || upper_denominator <= Rat::zero() {
-                return Err(HnnError::Unadmitted {
-                    reason: "a retained-fibre normalizer enclosure must be positive",
-                });
-            }
-            masses.push(ExactInterval::new(
-                &weight.lower / lower_denominator,
-                &weight.upper / upper_denominator,
-            )?);
-        }
-        Ok(masses)
+        normalize_weights(&weights)
     }
+}
+
+/// One finite observation produced ONLY by this receiver's authenticating weight owner.
+/// It caches combined r(q,w), never the population mixture or a symbolic exact value.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(super) struct ProducedFibreObservation {
+    source: ReceivingRead,
+    receiver: RetainedFibreReceiver,
+    bits: u32,
+    weights: Vec<ExactInterval>,
+    masses: Vec<ExactInterval>,
+}
+impl ProducedFibreObservation {
+    pub(super) fn at(
+        receiver: &RetainedFibreReceiver,
+        source: &ReceivingRead,
+        bits: u32,
+    ) -> Result<Self, HnnError> {
+        let weights = receiver.weights_at(source, bits)?;
+        let masses = normalize_weights(&weights)?;
+        Ok(Self {
+            source: source.clone(),
+            receiver: receiver.clone(),
+            bits,
+            weights,
+            masses,
+        })
+    }
+    pub(super) fn read_at(
+        &self,
+        receiver: &RetainedFibreReceiver,
+        source: &ReceivingRead,
+        bits: u32,
+    ) -> Result<Self, HnnError> {
+        if receiver != &self.receiver || source != &self.source {
+            return Err(HnnError::Unadmitted {
+                reason: "immutable receiving observation source/receiver mismatch",
+            });
+        }
+        if bits == self.bits {
+            Ok(self.clone())
+        } else {
+            Self::at(receiver, source, bits)
+        }
+    }
+    pub(super) fn masses(&self) -> &[ExactInterval] {
+        &self.masses
+    }
+    pub(super) fn weights(&self) -> &[ExactInterval] {
+        &self.weights
+    }
+}
+fn normalize_weights(weights: &[ExactInterval]) -> Result<Vec<ExactInterval>, HnnError> {
+    #[cfg(test)]
+    super::reuse_work::mass();
+    let classes = weights.len();
+    let mut masses = Vec::with_capacity(classes);
+    for (class, weight) in weights.iter().enumerate() {
+        let mut other_lower = Rat::zero();
+        let mut other_upper = Rat::zero();
+        for (other, candidate) in weights.iter().enumerate() {
+            if other != class {
+                other_lower += &candidate.lower;
+                other_upper += &candidate.upper;
+            }
+        }
+        let lower_denominator = &weight.lower + &other_upper;
+        let upper_denominator = &weight.upper + &other_lower;
+        if lower_denominator <= Rat::zero() || upper_denominator <= Rat::zero() {
+            return Err(HnnError::Unadmitted {
+                reason: "a retained-fibre normalizer enclosure must be positive",
+            });
+        }
+        masses.push(ExactInterval::new(
+            &weight.lower / lower_denominator,
+            &weight.upper / upper_denominator,
+        )?);
+    }
+    Ok(masses)
 }
 
 /// Read `2^exponent` through the scalar carried-power real chart.  The reduced denominator is the

@@ -247,6 +247,35 @@ fn score_retained(
     bits: u32,
     receiver: &RetainedFibreReceiver,
 ) -> Result<SelectedScored, HnnError> {
+    score_retained_producing(
+        population, ring, combined, trees, targets, bits, receiver, false,
+    )
+    .map(|p| p.0)
+}
+
+fn score_retained_producing(
+    population: &PortPopulation,
+    ring: usize,
+    combined: &Faces,
+    trees: &[LandmarkFace],
+    targets: &[usize],
+    bits: u32,
+    receiver: &RetainedFibreReceiver,
+    retain_observations: bool,
+) -> Result<
+    (
+        SelectedScored,
+        Vec<super::single_grain::ProducedFibreObservation>,
+    ),
+    HnnError,
+> {
+    #[cfg(test)]
+    super::reuse_work::score();
+    let mut observations = Vec::with_capacity(if retain_observations {
+        targets.len()
+    } else {
+        0
+    });
     let mut local = population.clone();
     let mut scored = SelectedScored {
         law: ReceivingLaw::RetainedFibreV1,
@@ -265,14 +294,25 @@ fn score_retained(
             read,
             receiver: receiver.clone(),
         };
-        let combined_mass = reading
-            .combined_masses_at(bits)?
-            .get(target)
-            .cloned()
-            .ok_or(HnnError::CellOutside {
-                code: target,
-                alphabet: tree.probabilities.len(),
-            })?;
+        let observation = if retain_observations {
+            Some(super::single_grain::ProducedFibreObservation::at(
+                receiver,
+                &reading.read,
+                bits,
+            )?)
+        } else {
+            None
+        };
+        // The uncached reference retains its original allocation/lifetime behavior: no
+        // producer cache is built merely to discard it. Both arms share the exact normalizer.
+        let combined_mass = match &observation {
+            Some(observation) => observation.masses().get(target).cloned(),
+            None => reading.combined_masses_at(bits)?.get(target).cloned(),
+        }
+        .ok_or(HnnError::CellOutside {
+            code: target,
+            alphabet: tree.probabilities.len(),
+        })?;
         let tree_mass = tree.probabilities[target].clone();
         let log = log2_enclosure_at(&tree_mass, bits)?;
         scored
@@ -292,12 +332,129 @@ fn score_retained(
             .receive(&step.faces())
             .map_err(super::population_refusal)?;
         scored.steps.push(step);
+        if let Some(observation) = observation {
+            observations.push(observation);
+        }
         scored
             .face_readings
             .push(SelectedFaceReading::Retained(reading));
     }
     scored.final_population = local;
-    Ok(scored)
+    Ok((scored, observations))
+}
+
+/// Private actual producer: no caller can attach enclosures to a publicly constructed score.
+/// All identities are kept for this one bounded computation, then dropped before publication.
+pub(super) struct ProducedRetainedSection {
+    population: PortPopulation,
+    ring: usize,
+    combined: Faces,
+    trees: Vec<LandmarkFace>,
+    targets: Vec<usize>,
+    bits: u32,
+    scored: SelectedScored,
+    observations: Vec<super::single_grain::ProducedFibreObservation>,
+}
+impl ProducedRetainedSection {
+    pub(super) fn at(
+        population: &PortPopulation,
+        ring: usize,
+        combined: &Faces,
+        trees: &[LandmarkFace],
+        targets: &[usize],
+        bits: u32,
+    ) -> Result<Self, HnnError> {
+        let receiver = RetainedFibreReceiver::declare(
+            trees
+                .first()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "a producing section has a tree grain",
+                })?
+                .grain,
+        )?;
+        preflight(
+            ReceivingLaw::RetainedFibreV1,
+            combined,
+            trees,
+            targets,
+            bits,
+            Some(&receiver),
+        )?;
+        let (scored, observations) = score_retained_producing(
+            population, ring, combined, trees, targets, bits, &receiver, true,
+        )?;
+        Ok(Self {
+            population: population.clone(),
+            ring,
+            combined: combined.clone(),
+            trees: trees.to_vec(),
+            targets: targets.to_vec(),
+            bits,
+            scored,
+            observations,
+        })
+    }
+    pub(super) fn validate(
+        &self,
+        population: &PortPopulation,
+        ring: usize,
+        combined: &Faces,
+        trees: &[LandmarkFace],
+        targets: &[usize],
+    ) -> Result<(), HnnError> {
+        if &self.population != population
+            || self.ring != ring
+            || &self.combined != combined
+            || self.trees != trees
+            || self.targets != targets
+            || self.scored.law != ReceivingLaw::RetainedFibreV1
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "immutable section observation matches law/population/ring/source/tree/target order",
+            });
+        }
+        Ok(())
+    }
+    pub(super) fn scored(&self) -> &SelectedScored {
+        &self.scored
+    }
+    pub(super) fn observations_at(
+        &self,
+        bits: u32,
+    ) -> Result<Vec<super::single_grain::ProducedFibreObservation>, HnnError> {
+        self.observations
+            .iter()
+            .zip(&self.scored.face_readings)
+            .map(|(o, r)| {
+                let SelectedFaceReading::Retained(r) = r else {
+                    return Err(HnnError::Unadmitted {
+                        reason: "private retained producer has retained readings",
+                    });
+                };
+                o.read_at(&r.receiver, &r.read, bits)
+            })
+            .collect()
+    }
+    pub(super) fn bits(&self) -> u32 {
+        self.bits
+    }
+}
+
+/// One selected-law score and return, owned by the actual native section operands.
+/// Only combined positive weights/masses are reused; mixture p is read at EACH chronological population.
+pub(crate) fn prepare_retained_section(
+    population: &PortPopulation,
+    ring: usize,
+    combined: &Faces,
+    trees: &[LandmarkFace],
+    targets: &[usize],
+    bits: u32,
+) -> Result<(SelectedScored, super::RetainedSectionReturn), HnnError> {
+    let producer = ProducedRetainedSection::at(population, ring, combined, trees, targets, bits)?;
+    let returned = super::RetainedSectionReturn::at_produced(
+        population, ring, combined, trees, targets, &producer,
+    )?;
+    Ok((producer.scored, returned))
 }
 
 /// The result of a correlated finite comparison of two whole selected sections.

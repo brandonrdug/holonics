@@ -231,6 +231,12 @@ pub fn log2_enclosure(value: &Rat) -> Result<ExactInterval, ExactValueError> {
     ExactInterval::new(lower, upper)?.round_out(LOG_OCTAVES)
 }
 
+// Test-only exterior invocation count, excluded from the native release build.
+#[cfg(test)]
+std::thread_local! {
+    pub(crate) static LOG2_OBSERVATION_CALLS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
 /// **`log₂` at the receiver's declared dyadic precision**, enclosed on `2^(−bits)`.
 ///
 /// [proved-standard; sizing agent-inferred] Write `value = 2^e r`, `1 ≤ r < 2`, and keep
@@ -247,6 +253,9 @@ pub fn log2_enclosure(value: &Rat) -> Result<ExactInterval, ExactValueError> {
 /// and precision arithmetic that cannot be represented are refused. The fixed-grid
 /// [`log2_enclosure`] is unchanged.
 pub fn log2_enclosure_at(value: &Rat, bits: u32) -> Result<ExactInterval, ExactValueError> {
+    #[cfg(test)]
+    LOG2_OBSERVATION_CALLS.with(|count| count.set(count.get() + 1));
+
     if !value.is_positive() {
         return Err(ExactValueError::NonPositiveLogarithm);
     }
