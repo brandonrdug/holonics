@@ -104,6 +104,9 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 use crate::geometry::swing::half_turn;
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, Charts, WordLattice, refine};
+
+#[cfg(test)]
+mod material_tangent_tests;
 use crate::hnn::constitution::{Constitution, Lattice};
 use crate::hnn::field::{Current, End, Field, FieldMaterial};
 use crate::hnn::realization::{entries, indexed};

@@ -265,4 +265,15 @@ fn a_carried_change_crosses_the_next_openings_references() {
         carry.crossed(&after, &[&storage, &singular], &[Some(&storage), None]),
         Err(HnnError::HeldMomentum { contact: 1 })
     ));
+    // A nonzero rate in ker(C) belongs to the actual state even though its momentum is zero.
+    // Crossing into the same singular capacity must not replace it by a chosen section of C.
+    let mut kernel_carry = carry.clone();
+    kernel_carry.change.states[1][1] = vec![r(3, 5), r(-7, 4)];
+    kernel_carry.momenta[1] = singular.apply(&kernel_carry.change.states[1][1]).unwrap();
+    let kernel_crossed = kernel_carry
+        .crossed(&after, &[&storage, &singular], &[Some(&storage), None])
+        .unwrap();
+    assert_eq!(kernel_crossed.states[1][1], kernel_carry.change.states[1][1]);
+    assert_eq!(kernel_crossed.resonator_phases, kernel_carry.change.resonator_phases);
+    assert_eq!(kernel_carry.ticks, 5);
 }

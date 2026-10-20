@@ -1783,7 +1783,7 @@ impl MaterialDirection {
 /// whole state along one material direction, of the change's own shape.
 ///
 /// - **Within the Word** (eq. 2): `χ_(k+1) = T_k χ_k + b_(a,k)`, where `T_k` is the tick's full
-///   fixed-operand state map ([`crate::hnn::prediction::physical_signed_tick`]) and `b_(a,k)` the
+///   fixed-operand state map ([`crate::hnn::word::linear::tick`]) and `b_(a,k)` the
 ///   transit's variation at the direction's forms with zero state variation
 ///   (`propagation::transit_variation`). Both are [`Word::contact_forms_variation`], the one tick
 ///   law it shares with the held contact variation's columns. The start state `(u_k, w_k)` and
@@ -1872,8 +1872,9 @@ impl ComparisonCredit {
 }
 
 impl MaterialTangent {
-    /// **The tangent at a held opening** (`χ_0 = 0`) of an exact, unrun Word, along `direction`,
-    /// based at the producing material `commit`.
+    /// **The tangent at a held opening** (`χ_0 = 0`) of an exact, unsplit quadratic, unrun
+    /// Word, along `direction`, based at the producing material `commit`. A charted solve or
+    /// saturated resonator needs its producing-state variation and is refused here.
     pub fn held_opening(
         word: &Word<'_>,
         commit: u64,
@@ -1889,6 +1890,8 @@ impl MaterialTangent {
                 reason: "a material tangent opens with its Word, before any junction step",
             });
         }
+        // A homogeneous signed action is the tangent only on this admitted branch.
+        super::variation::admit(word.operands())?;
         let contacts = word.operands().contacts();
         let contact = contacts
             .get(direction.contact)
@@ -2058,6 +2061,7 @@ impl MaterialTangent {
     /// changes the commit, never the contact; the receiving map stays an exterior control the tangent
     /// does not differentiate.
     pub(crate) fn rebind(&mut self, word: &Word<'_>, commit: u64) -> Result<(), HnnError> {
+        super::variation::admit(word.operands())?;
         let contact = word
             .operands()
             .contacts()
@@ -2253,6 +2257,8 @@ impl MaterialTangent {
                 reason: "a material tangent follows the Word it opened with",
             });
         }
+        // Bind admission to the actual producing Word at this tick, before mutation.
+        super::variation::admit(word.operands())?;
         let k = self.ticks;
         let record = word.recorded().get(k).ok_or(HnnError::Unadmitted {
             reason: "a material tangent follows a full tick the Word has executed",
