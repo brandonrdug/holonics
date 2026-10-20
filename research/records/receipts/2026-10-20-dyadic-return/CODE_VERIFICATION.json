@@ -1,0 +1,106 @@
+{
+  "utc": "2026-10-20T21:09:38.287025+00:00",
+  "status": "CLOSED_CODE_READY_FOR_EXACT_GPU_ASSISTED_PROPOSAL;MODEL_UNAPPROVED",
+  "cap_ns": 480000000000,
+  "measured_charge_ns": 312678875432,
+  "host_gate_coverage": [
+    "gate check: ok (15161 ms)",
+    "gate guard-lints: ok (24879 ms)",
+    "gate guard-doctests: ok (4398 ms)",
+    "gate diagnostic-timing-controls: ok (57585 ms)",
+    "gate diagnostic-supervisor-controls: ok (1507 ms)",
+    "gate diagnostic-receipt-controls: ok (243 ms)",
+    "gate listener-continuation-controls: ok (70805 ms)",
+    "gate projected-statistics-controls: ok (88 ms)",
+    "gate native-class-advance-controls: ok (53 ms)",
+    "gate native-gram-carry-conservation: ok (51 ms)",
+    "gate finite-solenoidal-controls: ok (84 ms)",
+    "gate rational-place-controls: ok (51 ms)",
+    "gate plural-coupling-controls: ok (93 ms)",
+    "gate grouped-tube-controls: ok (295 ms)",
+    "gate observed-tube-controls: ok (981 ms)",
+    "gate source-refinement-controls: ok (51 ms)",
+    "gate actual-source-alignment: ok (50 ms)",
+    "gate actual-ray-joint-controls: ok (64 ms)",
+    "gate actual-factor-refusal: ok (53 ms)",
+    "gate refined-source-native-restore: ok (92 ms)",
+    "gate solenoidal-listener-controls: ok (52 ms)",
+    "gate offline-coupling-controls: ok (343 ms)"
+  ],
+  "host_gates_passed": 22,
+  "doctests_passed": 64,
+  "original_full_gate_command": "INCOMPLETE_FIXED_DEADLINE;10scopes accepted, remaining12 passed separately; no completed scope repeated or deadline extended",
+  "focused_arithmetic_controls_passed": 5,
+  "original_varied_host_admission": "PASS20cells2epochs_cold",
+  "repaired_CUDA_controls": "PASSoriginal-varied, separately-labelledneutral, late-refusalrollback",
+  "independent_source_review": "no blocker; scoped to aligned_return.rs",
+  "optimized_binaries": "PASSopt1sameV91basis",
+  "backend_controller_controls": "PASS8Python+unknownbackend+actualunapprovedcontrollerrefusal",
+  "model_jobs": 0,
+  "native_model_charge_ns": 0,
+  "producer_refusal_custody": "9820fff6e45056a7506b9d56c898f6e6eb67e608",
+  "actual_class_gain_control": {
+    "scope": "ORIGINAL fixed varied20class synthetic CODE fixture, no dataset/model",
+    "cell_count": 20,
+    "epoch_count": 2,
+    "receiving_law": "retained-fibre-v1",
+    "epoch1_outcome": "Whole",
+    "epoch2_outcome": "ReceivingOnly",
+    "epoch2_receiving_only_comparison": "Some(ComparisonReading { before: ExactInterval { lower: Ratio { numer: 185544510792189725485, denom: 20752587082923245568 }, upper: Ratio { numer: 1484356086337517804807, denom: 166020696663385964544 } }, after: ExactInterval { lower: Ratio { numer: 1484284669258001997797, denom: 166020696663385964544 }, upper: Ratio { numer: 371071167314500499663, denom: 41505174165846491136 } }, unchanged: false, strictly_improved: true, objective_change: ExactInterval { lower: Ratio { numer: -7935231057311789, denom: 18446744073709551616 }, upper: Ratio { numer: -7935231057311785, denom: 18446744073709551616 } }, epoch_class_code_change: Some(ExactInterval { lower: Ratio { numer: -7935231057311789, denom: 18446744073709551616 }, upper: Ratio { numer: -7935231057311785, denom: 18446744073709551616 } }), epoch_phase_excess_change: Some(Ratio { numer: 0, denom: 1 }), reading_bits: 64, refinement_rounds: 0, retained_interval_members: 2 })",
+    "actual_native_endpoint_changed": true,
+    "strict_complete_section_class_gain": true,
+    "phase_change_exact_zero": true,
+    "class_code_change_lower": "-7935231057311789/18446744073709551616",
+    "class_code_change_upper": "-7935231057311785/18446744073709551616",
+    "limitation": "finite native ReceivingOnly synthetic control; no language capability, predictive gain or speedup claim; full finite comparison remains owner",
+    "original_witness_sha256": "422d88f304e2d17284a9e44be3797b232132d608493c82460b1cad516a715815"
+  },
+  "matched_host_card": {
+    "fixtures": [
+      {
+        "fixture": "original-varied",
+        "exact_return_and_finite_comparisons_match": true,
+        "epochs": [
+          "Whole",
+          "ReceivingOnly"
+        ],
+        "card_dispatch": {
+          "backend": "cuda-observed-epoch-device0",
+          "device_ordinal": 0,
+          "host_fallback": false,
+          "completed": true,
+          "successful_card_forwards": 40,
+          "successful_retained_card_returns": 20,
+          "successful_card_aggregates": 10,
+          "host_owned": "scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks"
+        },
+        "cold_exact": true
+      },
+      {
+        "fixture": "neutral",
+        "exact_return_and_finite_comparisons_match": true,
+        "epochs": [
+          "Neutral",
+          "Neutral"
+        ],
+        "card_dispatch": {
+          "backend": "cuda-observed-epoch-device0",
+          "device_ordinal": 0,
+          "host_fallback": false,
+          "completed": true,
+          "successful_card_forwards": 40,
+          "successful_retained_card_returns": 20,
+          "successful_card_aggregates": 10,
+          "host_owned": "scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks"
+        },
+        "cold_exact": true
+      }
+    ],
+    "rollback": "PASS; existing late retained-card-return refusal",
+    "commands_completed": 3,
+    "own_GPU_peak_sampled_MiB": 280,
+    "foreign_compute_seen": false,
+    "post_compute": [],
+    "model_jobs": 0
+  }
+}

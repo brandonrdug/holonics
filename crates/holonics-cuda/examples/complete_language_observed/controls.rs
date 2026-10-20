@@ -21,18 +21,18 @@ fn unknown_backend_refuses_before_input_or_output_access() {
     );
 }
 
-#[test]
-#[ignore = "exclusive host CUDA guard; synthetic CODE only"]
-fn shared_complete_language_training_host_card_and_cold_parity() {
+fn exercise_fixture(label: &str, bytes: &[u8]) {
     let root = std::env::var_os("V92_ADAPTER_FIXTURE_DIR")
         .map(std::path::PathBuf::from)
         .unwrap_or_else(|| {
             std::env::temp_dir().join(format!("v92-adapter-{}", std::process::id()))
         });
+    std::fs::create_dir_all(&root).unwrap();
+    let root = root.join(label);
     std::fs::create_dir(&root).unwrap();
     let corpus = root.join("synthetic.bin");
     let cuts = root.join("synthetic-cuts.tsv");
-    std::fs::write(&corpus, [0; 5]).unwrap();
+    std::fs::write(&corpus, bytes).unwrap();
     std::fs::write(&cuts, b"0\tsynthetic-opening\n20\tsynthetic-closed\n").unwrap();
     fn hash(path: &Path) -> String {
         let out = std::process::Command::new("sha256sum")
@@ -98,4 +98,15 @@ fn shared_complete_language_training_host_card_and_cold_parity() {
             .unwrap();
     assert!(receipt.contains("\"completed\":true"));
     eprintln!("SHARED_EXTERIOR_CUDA_PARITY {}", receipt.trim());
+}
+
+#[test]
+#[ignore = "exclusive host CUDA guard; neutral synthetic CODE only"]
+fn shared_complete_language_training_host_card_and_cold_parity() {
+    exercise_fixture("neutral", &[0; 5]);
+}
+#[test]
+#[ignore = "exclusive host CUDA guard; ORIGINAL varied synthetic CODE only"]
+fn original_varied_complete_language_host_card_and_cold_parity() {
+    exercise_fixture("original-varied", &[0x1b, 0xe4, 0x1b, 0xe4, 0x00]);
 }

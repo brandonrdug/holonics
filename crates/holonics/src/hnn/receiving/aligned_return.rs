@@ -8,14 +8,18 @@
 //! producing Word and complete finite candidate comparison still govern that.
 
 use super::*;
-use num_traits::Signed;
+use num_bigint::BigInt;
+use num_traits::{Signed, ToPrimitive};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 /// Rational return carrier and finite certified observations of its defining relation.
-/// `gradient` is an admitted rational direction, not a completed irrational source value.
+/// `gradient` is a certified dyadic return chart, not an exact source gradient or a publication certificate.
 pub struct RetainedStationReturn {
     pub target: usize,
     pub normalized_representative: Vec<Rat>,
+    /// Actual dyadic simplex foil of the return chart; distinct from the true face/masses.
+    pub packed_foil: Vec<Rat>,
+    pub packing_bits: u32,
     pub gradient: Vec<Rat>,
     pub component_bounds: Vec<ExactInterval>,
     pub component_error: Vec<Rat>,
@@ -23,7 +27,7 @@ pub struct RetainedStationReturn {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 /// The shared population operand stays an interval. `beta_representative` belongs only
-/// to the executable rational return chart; component errors and the descent inequality
+/// to the rational simplex anchor of the executable return chart; component errors and the descent inequality
 /// certify its use. Refining an enclosure never changes the symbolic source identity.
 pub struct RetainedSectionReturn {
     pub rho: ExactInterval,
@@ -38,6 +42,79 @@ pub struct RetainedSectionReturn {
 
 fn fail(reason: &'static str) -> HnnError {
     HnnError::Unadmitted { reason }
+}
+
+/// Largest exact remainder on the existing finite row precision. No rounded-sum division.
+fn pack_simplex(anchor: &[Rat], bits: u32) -> Result<Vec<Rat>, HnnError> {
+    if u64::from(bits) > crate::receiver::population::PRECISION
+        || anchor.is_empty()
+        || anchor.iter().any(|x| x < &Rat::zero() || x > &Rat::one())
+        || anchor.iter().cloned().sum::<Rat>() != Rat::one()
+    {
+        return Err(fail(
+            "a dyadic return packs one simplex within the existing precision range",
+        ));
+    }
+    let denominator = BigInt::from(1) << bits as usize;
+    let scale = Rat::from_integer(denominator.clone());
+    let mut numerators = Vec::with_capacity(anchor.len());
+    let mut remainders = Vec::with_capacity(anchor.len());
+    for value in anchor {
+        let scaled = value * &scale;
+        // Nonnegative rational: integer division is the exact floor.
+        let floor = scaled.numer() / scaled.denom();
+        remainders.push(scaled - Rat::from_integer(floor.clone()));
+        numerators.push(floor);
+    }
+    let remaining = (&denominator - numerators.iter().cloned().sum::<BigInt>())
+        .to_usize()
+        .ok_or_else(|| fail("simplex remainder count fits its declared class count"))?;
+    if remaining >= anchor.len() {
+        return Err(fail(
+            "simplex floor deficit is smaller than the class count",
+        ));
+    }
+    let mut order: Vec<_> = (0..anchor.len()).collect();
+    order.sort_by(|&a, &b| remainders[b].cmp(&remainders[a]).then_with(|| a.cmp(&b)));
+    for &class in order.iter().take(remaining) {
+        numerators[class] += 1;
+    }
+    let packed: Vec<_> = numerators
+        .into_iter()
+        .map(|n| Rat::new(n, denominator.clone()))
+        .collect();
+    let unit = Rat::new(BigInt::from(1), denominator);
+    if packed.iter().cloned().sum::<Rat>() != Rat::one()
+        || packed
+            .iter()
+            .zip(anchor)
+            .any(|(p, a)| p < &Rat::zero() || p > &Rat::one() || (p - a).abs() > unit)
+    {
+        return Err(fail(
+            "joint dyadic foil retains normalization, range and one-cell error",
+        ));
+    }
+    Ok(packed)
+}
+
+fn true_foil_bounds(
+    beta: &ExactInterval,
+    mass: &ExactInterval,
+    target: bool,
+) -> Result<ExactInterval, HnnError> {
+    let lower = mass.lower.clone().max(Rat::zero());
+    let upper = mass.upper.clone().min(Rat::one());
+    if target {
+        Ok(ExactInterval::new(
+            Rat::one() - &beta.upper * (Rat::one() - lower),
+            Rat::one() - &beta.lower * (Rat::one() - upper),
+        )?)
+    } else {
+        Ok(ExactInterval::new(
+            &beta.lower * lower,
+            &beta.upper * upper,
+        )?)
+    }
 }
 
 impl RetainedSectionReturn {
@@ -115,6 +192,21 @@ impl RetainedSectionReturn {
                 let normalized_representative: Vec<_> =
                     representatives.into_iter().map(|x| x / &z).collect();
                 let target = targets[at];
+                let anchor: Vec<_> = normalized_representative
+                    .iter()
+                    .enumerate()
+                    .map(|(class, r)| {
+                        let indicator = if class == target {
+                            Rat::one()
+                        } else {
+                            Rat::zero()
+                        };
+                        &indicator + &beta_hat * (r - &indicator)
+                    })
+                    .collect();
+                // Only the executable effective-foil chart is packed. The actual shared
+                // rho/beta, full-fibre face, normalized masses and true score are unchanged.
+                let packed_foil = pack_simplex(&anchor, bits)?;
                 let mut gradient = Vec::with_capacity(masses.len());
                 let mut component_bounds = Vec::with_capacity(masses.len());
                 let mut component_error = Vec::with_capacity(masses.len());
@@ -124,18 +216,11 @@ impl RetainedSectionReturn {
                     } else {
                         Rat::zero()
                     };
-                    let g = &beta_hat * (&normalized_representative[class] - &indicator);
-                    let low = &mass.lower - &indicator;
-                    let high = &mass.upper - &indicator;
-                    let corners = [
-                        &beta.lower * &low,
-                        &beta.lower * &high,
-                        &beta.upper * &low,
-                        &beta.upper * &high,
-                    ];
+                    let g = &packed_foil[class] - &indicator;
+                    let foil_bounds = true_foil_bounds(&beta, mass, class == target)?;
                     let bounds = ExactInterval::new(
-                        corners.iter().min().unwrap().clone(),
-                        corners.iter().max().unwrap().clone(),
+                        foil_bounds.lower - &indicator,
+                        foil_bounds.upper - &indicator,
                     )?;
                     let error = (&bounds.lower - &g).abs().max((&bounds.upper - &g).abs());
                     exact_zero &= bounds.lower.is_zero() && bounds.upper.is_zero();
@@ -153,6 +238,8 @@ impl RetainedSectionReturn {
                 stations.push(RetainedStationReturn {
                     target,
                     normalized_representative,
+                    packed_foil,
+                    packing_bits: bits,
                     gradient,
                     component_bounds,
                     component_error,
@@ -181,6 +268,58 @@ impl RetainedSectionReturn {
 mod tests {
     use super::*;
     use crate::ratio::rat;
+
+    #[test]
+    fn dyadic_foil_singleton_beta_and_shared_interval_keep_true_error_certificate() {
+        let packed = pack_simplex(&[rat(5, 6), rat(1, 6)], 3).unwrap();
+        assert_eq!(packed, vec![rat(7, 8), rat(1, 8)]);
+        let beta = ExactInterval::point(rat(1, 3));
+        let mass = ExactInterval::point(rat(1, 2));
+        let mut norm = Rat::zero();
+        let mut error_pair = Rat::zero();
+        for (class, p) in packed.iter().enumerate() {
+            let h = true_foil_bounds(&beta, &mass, class == 0).unwrap();
+            let error = (p - &h.lower).abs().max((p - &h.upper).abs());
+            assert_eq!(error, rat(1, 24));
+            let g = p - if class == 0 { Rat::one() } else { Rat::zero() };
+            norm += &g * &g;
+            error_pair += error * g.abs();
+        }
+        assert_eq!(norm - error_pair, rat(1, 48));
+        assert_eq!(beta, ExactInterval::point(rat(1, 3)));
+        let interval = ExactInterval::new(rat(1, 4), rat(1, 2)).unwrap();
+        let packed = pack_simplex(&[rat(13, 16), rat(3, 16)], 4).unwrap();
+        let mut margin = Rat::zero();
+        for (class, p) in packed.iter().enumerate() {
+            let h = true_foil_bounds(&interval, &mass, class == 0).unwrap();
+            let error = (p - &h.lower).abs().max((p - &h.upper).abs());
+            let g = p - if class == 0 { Rat::one() } else { Rat::zero() };
+            margin += &g * &g - error * g.abs();
+        }
+        assert_eq!(margin, rat(3, 64));
+        assert_eq!(interval, ExactInterval::new(rat(1, 4), rat(1, 2)).unwrap());
+    }
+
+    #[test]
+    fn dyadic_foil_exact_simplex_ties_zero_and_resolution_limit() {
+        assert_eq!(
+            pack_simplex(&vec![rat(1, 3); 3], 3).unwrap(),
+            vec![rat(3, 8), rat(3, 8), rat(1, 4)]
+        );
+        assert_eq!(
+            pack_simplex(&[Rat::one(), Rat::zero()], 0).unwrap(),
+            vec![Rat::one(), Rat::zero()]
+        );
+        let tiny = Rat::new(BigInt::from(1), BigInt::from(1) << 100usize);
+        let packed = pack_simplex(&[Rat::one() - &tiny, tiny], 32).unwrap();
+        assert_eq!(packed, vec![Rat::one(), Rat::zero()]); // zero represented return, not strict gain
+        for p in packed {
+            assert_eq!(
+                p.denom() >> p.denom().trailing_zeros().unwrap() as usize,
+                BigInt::from(1)
+            );
+        }
+    }
 
     fn section(
         waves: Vec<Vec<Rat>>,
