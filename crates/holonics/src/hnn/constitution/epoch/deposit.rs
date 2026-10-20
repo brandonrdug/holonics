@@ -63,6 +63,7 @@ pub(crate) struct ObservedNormalEpochStage<'a> {
     pair_speed: &'a dyn Fn(usize, usize, &PairPort, [&[Vec<Rat>]; 3]) -> Result<[Rat; 2], HnnError>,
     receiving_parts: &'a [EpochReceivingRecord],
     execution: &'a dyn crate::hnn::reference::observed::ObservedEpochExecution,
+    allow_channel_dissipation: bool,
     prepared: Option<PreparedEpochNormals>,
 }
 
@@ -87,10 +88,14 @@ impl<'a> ObservedNormalEpochStage<'a> {
         ) -> Result<[Rat; 2], HnnError>,
         receiving_parts: &'a [EpochReceivingRecord],
         execution: &'a dyn crate::hnn::reference::observed::ObservedEpochExecution,
+        allow_channel_dissipation: bool,
     ) -> Result<Self, HnnError> {
-        if deposits.iter().any(|deposit| !deposit.factors().is_empty()) {
+        if deposits.iter().flat_map(|deposit| deposit.factors()).any(|factor| {
+            !allow_channel_dissipation
+                || !matches!(&factor.gradient, FactorGradient::Dissipation { .. })
+        }) {
             return Err(refused(
-                "shared normal epoch staging requires the declared NormalMaps physical-factor hold",
+                "shared epoch staging holds every physical family except explicitly scoped channel D",
             ));
         }
         Ok(Self {
@@ -107,6 +112,7 @@ impl<'a> ObservedNormalEpochStage<'a> {
             pair_speed,
             receiving_parts,
             execution,
+            allow_channel_dissipation,
             prepared: None,
         })
     }
@@ -229,6 +235,7 @@ impl<'a> ObservedNormalEpochStage<'a> {
                 &mut trace,
                 Some(&mut self.prepared),
                 quantum,
+                self.allow_channel_dissipation,
             )
             .map_err(|error| {
                 let mut failure = trace.failed(error);
@@ -248,7 +255,7 @@ impl StagedEpochCandidate {
             .filter_map(|locus| locus.joint_direction.clone())
             .collect()
     }
-    /// New physical maps against the predecessor's tree/population context.
+    /// New physical maps and channel D material against predecessor context.
     /// Neither the candidate's independently staged tree nor its received
     /// population may make its own prospective comparison easier.
     pub(crate) fn comparison_material(
@@ -269,8 +276,8 @@ impl StagedEpochCandidate {
         }
         Ok(material)
     }
-    /// Includes every real and phase row of the represented normal maps.
-    /// Physical factors have already passed the zero-displacement guard.
+    /// Includes represented normal maps and an admitted actual channel D ray.
+    /// Physical factors have already passed their scoped endpoint guard.
     pub(crate) fn has_physical_motion(&self) -> bool {
         self.physical_motion
     }
@@ -424,19 +431,21 @@ fn admit_actual_factor_displacements(
     strokes: &BTreeMap<Locus, BudgetedCarry>,
     requests: &[FactorStep],
     certified: &BTreeMap<(Locus, Family), StepReading>,
+    original_faces: &BTreeMap<(Locus, Family), FactorPrepared>,
+    allow_channel_dissipation: bool,
     evidence: &mut Option<EpochStageRefusal>,
-) -> Result<(), HnnError> {
-    // The endpoint is authoritative. Rebasing old C/K/D carry need not leave a fresh staged q.
-    // Read the actual parameter displacement before the quotient-only checks for other families.
-    if let Some(ray) = channel_ray::ChannelFactorDisplacement::read_all(opening, endpoint)?
-        .into_iter().next()
-    {
+) -> Result<Vec<channel_ray::ActualChannelRayFace>, HnnError> {
+    // The endpoint remains authoritative. Only the explicitly scoped D family
+    // can use this first-variation bridge; C/K and every other family stay held.
+    let mut actual_faces = Vec::new();
+    let mut admitted_channel_d = BTreeSet::new();
+    for ray in channel_ray::ChannelFactorDisplacement::read_all(opening, endpoint)? {
         let locus = Locus::Channel(ray.contact);
         let family = Family::Factor(ray.family);
         let mut refusal = EpochStageRefusal::at(
             "actual_factor_displacement",
             EpochStageCondition::NonlinearFactorRay,
-            "the complete changed channel endpoint needs its own actual ray and finite admission",
+            "only a matching actual channel D ray has a finite-admission path",
             Some(locus), Some(family),
         ).read("actual_parameter_displacement", match EpochArray::from_dyadic_matrix(&ray.displacement) {
             Ok(delta) => EpochStageValue::Series(EpochSeriesReading::of(&delta)),
@@ -444,30 +453,35 @@ fn admit_actual_factor_displacements(
         }).read("actual_delta_matches_staged_quotient", EpochStageValue::Index(usize::from(
             strokes.get(&locus).is_some_and(|stroke| ray.matches_stroke(stroke))
         )));
-        let request = requests.iter().find(|step| step.gradient.locus() == locus
-            && step.gradient.family() == family);
-        if let (Some(request), Some(fresh)) = (request, certified.get(&(locus, family))) {
-            if fresh.step.step.is_positive() {
-                let read = ray.fixed_eta(&request.gradient, &fresh.step.step, &opening.hop)?;
-                refusal = refusal
-                    .read("original_certified_eta", EpochStageValue::Ratio(fresh.step.step.clone()))
-                    .read("actual_parameter_alignment", EpochStageValue::Ratio(read.alignment))
-                    .read("actual_direction_l1", EpochStageValue::Ratio(read.direction.entries().iter().map(Signed::abs).sum()))
-                    .read("actual_first_variation_moves", EpochStageValue::Ratio(
-                        read.moves.own(&request.energy, &fresh.step.step)?
-                    ));
-            } else {
-                refusal = refusal.read("actual_ray_rate", EpochStageValue::Unavailable(
-                    "the original family was held; no positive actual rate is invented"
-                ));
-            }
-        } else {
-            refusal = refusal.read("actual_ray_rate", EpochStageValue::Unavailable(
-                "this changed endpoint has no original certified family and rate"
-            ));
+        if !allow_channel_dissipation || ray.family != 2 {
+            refusal.first(evidence);
+            return Err(refused("actual epoch certification still holds C/K and unscoped physical factor rays"));
         }
-        refusal.first(evidence);
-        return Err(refused("actual epoch certification requires the represented nonlinear factor rays"));
+        let request = requests.iter().enumerate().find(|(_, step)| step.gradient.locus() == locus
+            && step.gradient.family() == family);
+        let fresh = certified.get(&(locus, family));
+        let original = original_faces.get(&(locus, family));
+        let (Some((request_index, request)), Some(fresh), Some(original)) = (request, fresh, original) else {
+            refusal = refusal.read("actual_ray_rate", EpochStageValue::Unavailable(
+                "the changed D endpoint has no original request, fresh positive rate, or prepared metadata"
+            ));
+            refusal.first(evidence);
+            return Err(refused("an actual channel D ray needs its original fresh positive rate"));
+        };
+        if !fresh.step.step.is_positive() {
+            refusal = refusal.read("actual_ray_rate", EpochStageValue::Unavailable(
+                "the original D family was held; no positive rate is invented"
+            ));
+            refusal.first(evidence);
+            return Err(refused("an actual channel D ray needs its original fresh positive rate"));
+        }
+        if !strokes.get(&locus).is_some_and(|stroke| ray.matches_stroke(stroke)) {
+            refusal.first(evidence);
+            return Err(refused("the actual channel D endpoint must equal its staged applied quotient"));
+        }
+        let face = ray.actual_face(original, request_index, request, fresh, &opening.hop)?;
+        admitted_channel_d.insert(locus);
+        actual_faces.push(face);
     }
     let first = strokes.iter().find_map(|(locus, at)| {
         at.staged
@@ -483,6 +497,9 @@ fn admit_actual_factor_displacements(
                             | Carrier::Pair { .. }
                             | Carrier::Factor(_)
                     )
+                    && !(allow_channel_dissipation
+                        && admitted_channel_d.contains(locus)
+                        && matches!(carrier, Carrier::Factor(2)))
             })
             .map(|((carrier, entry), (_, q))| (*locus, at, *carrier, *entry, q))
     });
@@ -497,20 +514,14 @@ fn admit_actual_factor_displacements(
         .read("carrier", EpochStageValue::Carrier(carrier))
         .read("entry", EpochStageValue::Index(entry))
         .read("applied_coordinate_q", EpochStageValue::Integer(q.clone()))
-        .read(
-            "lattice_exponent_L",
-            EpochStageValue::Exponent(at.lattice.exponent()),
-        )
-        .read(
-            "displacement_q_times_two_minus_L",
-            EpochStageValue::Ratio(Rat::from_integer(q.clone()) * at.lattice.unit()),
-        )
+        .read("lattice_exponent_L", EpochStageValue::Exponent(at.lattice.exponent()))
+        .read("displacement_q_times_two_minus_L", EpochStageValue::Ratio(
+            Rat::from_integer(q.clone()) * at.lattice.unit(),
+        ))
         .first(evidence);
-        return Err(refused(
-            "actual epoch certification requires the represented nonlinear factor rays",
-        ));
+        return Err(refused("actual epoch certification requires the represented nonlinear factor rays"));
     }
-    Ok(())
+    Ok(actual_faces)
 }
 
 /// The receiving map acts once on fixed producing features, so its logit ray
@@ -1155,6 +1166,7 @@ impl Constitution {
             &mut EpochStageTrace::default(),
             None,
             None,
+            false,
         )?
         .admit_receiving()
     }
@@ -1249,6 +1261,7 @@ impl Constitution {
             &mut trace,
             None,
             None,
+            false,
         )
         .map_err(|error| trace.failed(error))
     }
@@ -1278,6 +1291,7 @@ impl Constitution {
         trace: &mut EpochStageTrace,
         mut prepared: Option<&mut Option<PreparedEpochNormals>>,
         quantum: Option<&QuantumProjection>,
+        allow_channel_dissipation: bool,
     ) -> Result<StagedEpochCandidate, HnnError> {
         if quantum.is_some()
             && (scope != Some(EpochCandidateScope::ReceivingOnly) || prepared.is_none())
@@ -1404,11 +1418,15 @@ impl Constitution {
             }
         }
         kinds.push(LinearLocus::Receiving(receiver));
-        if scope == Some(EpochCandidateScope::ReceivingOnly) && prepared.is_none() {
-            // A refused whole branch contributes no upstream H/R, carries,
-            // factor statistics or lattice changes to this fresh branch.
-            kinds.retain(|kind| *kind == LinearLocus::Receiving(receiver));
+        if scope == Some(EpochCandidateScope::ReceivingOnly) {
+            // A refused whole branch never carries physical factors into the
+            // receiving-only candidate. When shared normals were prepared,
+            // their current-batch statistics may be replayed with zero steps.
             factors.clear();
+            if prepared.is_none() {
+                // A fresh receiving-only branch also has no upstream H/R state.
+                kinds.retain(|kind| *kind == LinearLocus::Receiving(receiver));
+            }
         }
         if scope == Some(EpochCandidateScope::Joint) && prepared.is_none() {
             return Err(refused(
@@ -1739,6 +1757,13 @@ impl Constitution {
             .zip(&ready)
             .flat_map(|((l, ..), p)| p.factors.iter().map(move |p| (*l, p)))
             .collect();
+        let original_channel_faces: BTreeMap<_, _> = factor_faces
+            .iter()
+            .filter(|(locus, face)| {
+                matches!(locus, Locus::Channel(_)) && face.family == Family::Factor(2)
+            })
+            .map(|(locus, face)| ((*locus, face.family), (**face).clone()))
+            .collect();
         let linear_faces: Vec<_> = faces
             .iter()
             .map(|(kind, face)| (kind.locus(), *kind, face.direction()))
@@ -1862,8 +1887,15 @@ impl Constitution {
         // a fresh-direction certificate to different material. Sufficient
         // factor statistics/carries may change while their material stays put.
         trace.at("actual_factor_displacement", None, None);
-        admit_actual_factor_displacements(
-            self, &next, &strokes, &factor_steps, &certified, &mut trace.evidence,
+        let actual_channel_faces = admit_actual_factor_displacements(
+            self,
+            &next,
+            &strokes,
+            &factor_steps,
+            &certified,
+            &original_channel_faces,
+            allow_channel_dissipation,
+            &mut trace.evidence,
         )?;
         let mut candidates = BTreeMap::new();
         let mut actual_faces = Vec::new();
@@ -1954,10 +1986,10 @@ impl Constitution {
         if scope.is_none() {
             admit_actual_normal_domain(receiver, &candidates)?;
         }
-        let upstream = candidates.iter().any(|(kind, candidate)| {
+        let upstream = !actual_channel_faces.is_empty() || candidates.iter().any(|(kind, candidate)| {
             !matches!(kind, LinearLocus::Receiving(_)) && !candidate.step.is_zero()
         });
-        let physical_motion = candidates
+        let physical_motion = !actual_channel_faces.is_empty() || candidates
             .values()
             .any(|candidate| !candidate.step.is_zero());
         for (kind, deposit) in &candidates {
@@ -2017,11 +2049,21 @@ impl Constitution {
             .map(|(kind, face)| (kind.locus(), *kind, face.direction()))
             .collect();
         trace.at("actual_joint_certificate", None, None);
+        let actual_factor_faces: Vec<_> = actual_channel_faces
+            .iter()
+            .map(|face| (Locus::Channel(face.contact()), face.prepared()))
+            .collect();
+        for face in &actual_channel_faces {
+            actual_exponents.steps.insert(
+                (Locus::Channel(face.contact()), Family::Factor(2)),
+                DeclaredExponent { exponent: face.exponent(), reach: None },
+            );
+        }
         let (actual_certified, joint, pumped, loaded) = self
             .certify_steps_with_epoch_evidence(
                 Some(&envelope),
                 &actual_linear,
-                &[],
+                &actual_factor_faces,
                 None,
                 StepSource::Actual(&actual_exponents),
                 Some(&bound),
@@ -2720,6 +2762,7 @@ mod tests {
                 &pair_speed,
                 &parts,
                 &crate::hnn::reference::observed::HostObservedEpochExecution,
+                false,
             )
             .unwrap();
             let _ = probe.stage(EpochCandidateScope::Whole, &mut |_| {});
@@ -2782,6 +2825,7 @@ mod tests {
             &pair_speed,
             &parts,
             &crate::hnn::reference::observed::HostObservedEpochExecution,
+            false,
         )
         .unwrap();
         let _ = stage.stage(EpochCandidateScope::Whole, &mut |_| {});
@@ -2872,6 +2916,7 @@ mod tests {
             &pair_speed,
             &parts,
             &crate::hnn::reference::observed::HostObservedEpochExecution,
+            false,
         )
         .unwrap();
         let before = material.continuing_state(0).unwrap().to_text();
@@ -2916,6 +2961,7 @@ mod tests {
             &pair_speed,
             &parts,
             &crate::hnn::reference::observed::HostObservedEpochExecution,
+            false,
         )
         .unwrap();
         let before = material.continuing_state(0).unwrap().to_text();
@@ -3578,7 +3624,7 @@ mod tests {
         let after = rebased.continuing_state(0).unwrap().to_text();
         let mut evidence = None;
         assert!(admit_actual_factor_displacements(&material, &rebased,
-            &BTreeMap::new(), &[], &BTreeMap::new(), &mut evidence).is_err());
+            &BTreeMap::new(), &[], &BTreeMap::new(), &BTreeMap::new(), false, &mut evidence).is_err());
         let evidence = evidence.unwrap();
         assert_eq!((evidence.locus, evidence.family), (Some(locus), Some(Family::Factor(2))));
         assert_eq!(evidence.condition, EpochStageCondition::NonlinearFactorRay);
@@ -3618,24 +3664,90 @@ mod tests {
             family, step, gain: Rat::one(), moves: Rat::one(), bound: Rat::one(),
             readout: Rat::one(), amplitude: Rat::one(),
         })]);
+        // Synthetic prepared metadata exercises the pure bridge only; its scale
+        // is deliberately non-unit so a fake/reset statistic cannot pass.
+        let original = FactorPrepared {
+            index: 0,
+            family,
+            scale: rat(3, 1),
+            alignment: Rat::one(),
+            covector: rat(2, 1),
+            energy: rat(2, 1),
+            moves: channel_factor_moves(2, factor, (Rat::one(), Rat::one()), &material.hop),
+        };
+        let originals = BTreeMap::from([((locus, family), original)]);
         let mut stroke = BudgetedCarry::new(material.lattice(locus).unwrap(), 1);
         stroke.staged.insert((Carrier::Factor(2), 0), (Rat::zero(), BigInt::one()));
         let before = material.continuing_state(0).unwrap().to_text();
         let after = endpoint.continuing_state(0).unwrap().to_text();
-        let mut evidence = None;
-        assert!(admit_actual_factor_displacements(&material, &endpoint,
-            &BTreeMap::from([(locus, stroke)]), &[request], &certified, &mut evidence).is_err());
-        let reads = evidence.unwrap().readings;
-        assert!(reads.iter().any(|r| r.name == "original_certified_eta"
-            && r.value == EpochStageValue::Ratio(rat(1, 2))));
-        assert!(reads.iter().any(|r| r.name == "actual_parameter_alignment"
-            && r.value == EpochStageValue::Ratio(rat(6, 1) * &unit)));
-        assert!(reads.iter().any(|r| r.name == "actual_delta_matches_staged_quotient"
-            && r.value == EpochStageValue::Index(1)));
-        assert!(reads.iter().any(|r| r.name == "actual_first_variation_moves"
-            && matches!(&r.value, EpochStageValue::Ratio(value) if value.is_positive())));
+        let faces = admit_actual_factor_displacements(&material, &endpoint,
+            &BTreeMap::from([(locus, stroke)]), &[request], &certified, &originals, true, &mut None).unwrap();
+        assert_eq!(faces.len(), 1);
+        assert_eq!(faces[0].contact(), 0);
+        assert_eq!(faces[0].exponent(), certified[&(locus, family)].step.exponent);
+        assert_eq!(faces[0].prepared().scale, rat(3, 1));
+        assert_eq!(faces[0].prepared().energy, rat(2, 1));
+        assert_eq!(faces[0].prepared().covector, rat(2, 1));
+        assert_eq!(faces[0].prepared().alignment, floor(&(rat(6, 1) * &unit)));
+        assert!(faces[0].prepared().moves.own(&rat(2, 1), &rat(1, 2)).unwrap().is_positive());
         assert_eq!(material.continuing_state(0).unwrap().to_text(), before);
         assert_eq!(endpoint.continuing_state(0).unwrap().to_text(), after);
+    }
+
+    #[test]
+    fn d_only_actual_ray_still_holds_storage_and_stiffness() {
+        let (_, material, _, _, _) = normal_domain_fixture(None, true);
+        for family in 0..2 {
+            let mut endpoint = material.clone();
+            let factor = if family == 0 {
+                &mut endpoint.contacts[0].storage
+            } else {
+                &mut endpoint.contacts[0].stiffness
+            };
+            let mut rows = factor.to_rows();
+            rows[0][0] += material.lattice(Locus::Channel(0)).unwrap().unit();
+            *factor = ExactRatMatrix::new(rows).unwrap();
+            let mut evidence = None;
+            assert!(admit_actual_factor_displacements(
+                &material,
+                &endpoint,
+                &BTreeMap::new(),
+                &[],
+                &BTreeMap::new(),
+                &BTreeMap::new(),
+                true,
+                &mut evidence,
+            )
+            .is_err());
+            assert_eq!(evidence.unwrap().family, Some(Family::Factor(family)));
+        }
+    }
+
+    #[test]
+    fn d_only_actual_ray_refuses_when_its_fresh_positive_rate_is_missing() {
+        let (_, material, _, _, _) = normal_domain_fixture(None, true);
+        let locus = Locus::Channel(0);
+        let mut endpoint = material.clone();
+        let mut rows = endpoint.contacts[0].dissipation.to_rows();
+        rows[0][0] += material.lattice(locus).unwrap().unit();
+        endpoint.contacts[0].dissipation = ExactRatMatrix::new(rows).unwrap();
+        let mut stroke = BudgetedCarry::new(material.lattice(locus).unwrap(), 1);
+        stroke.staged.insert((Carrier::Factor(2), 0), (Rat::zero(), BigInt::one()));
+        let mut evidence = None;
+        assert!(admit_actual_factor_displacements(
+            &material,
+            &endpoint,
+            &BTreeMap::from([(locus, stroke)]),
+            &[],
+            &BTreeMap::new(),
+            &BTreeMap::new(),
+            true,
+            &mut evidence,
+        )
+        .is_err());
+        assert!(evidence.unwrap().readings.iter().any(|reading|
+            reading.name == "actual_ray_rate"
+                && matches!(&reading.value, EpochStageValue::Unavailable(_))));
     }
 
     #[test]
@@ -3646,7 +3758,7 @@ mod tests {
         let before = material.continuing_state(0).unwrap().to_text();
         let after = endpoint.continuing_state(0).unwrap().to_text();
         assert!(admit_actual_factor_displacements(&material, &endpoint,
-            &BTreeMap::new(), &[], &BTreeMap::new(), &mut None).is_ok());
+            &BTreeMap::new(), &[], &BTreeMap::new(), &BTreeMap::new(), false, &mut None).is_ok());
         assert_eq!(material.continuing_state(0).unwrap().to_text(), before);
         assert_eq!(endpoint.continuing_state(0).unwrap().to_text(), after);
     }
@@ -3670,7 +3782,7 @@ mod tests {
         let before = strokes.clone();
         let mut evidence = None;
         assert!(admit_actual_factor_displacements(
-            &material, &material, &strokes, &[], &BTreeMap::new(), &mut evidence,
+            &material, &material, &strokes, &[], &BTreeMap::new(), &BTreeMap::new(), false, &mut evidence,
         ).is_err());
         let evidence = evidence.unwrap();
         assert_eq!(
@@ -3692,7 +3804,7 @@ mod tests {
             .insert((Carrier::PairScale, 0), (Rat::zero(), BigInt::one()));
         assert!(
             admit_actual_factor_displacements(&material, &material,
-                &BTreeMap::from([(locus, statistics)]), &[], &BTreeMap::new(), &mut None)
+                &BTreeMap::from([(locus, statistics)]), &[], &BTreeMap::new(), &BTreeMap::new(), false, &mut None)
                 .is_ok()
         );
         for (remainder, admitted) in [
@@ -4084,4 +4196,86 @@ mod tests {
         invalid.foil[0] = rat(1, 8);
         assert!(receiving_series_for(&[sample], &[invalid], 4, 2, 11).is_err());
     }
+    // A declared native synthetic covector tests publication mechanics, not a measured
+    // model improvement. The finite comparison owner remains outside this stage.
+    fn d_only_fixture_stage(
+        field: &Field,
+        material: &Constitution,
+        epoch_index: u64,
+        scope: EpochCandidateScope,
+    ) -> StagedEpochCandidate {
+        let receiver = field.receivers()[0].ring;
+        let k = material.contacts[0].dissipation.rows();
+        let request = FactorStep {
+            gradient: FactorGradient::Dissipation {
+                contact: 0,
+                gradient: scaled_identity(k, rat(8, 1)),
+            },
+            energy: Rat::zero(),
+            covector: Rat::one(),
+        };
+        let retention: BTreeSet<_> = crate::hnn::retention::loci(field).into_iter().collect();
+        let deposit = Deposit::new(material.commit, vec![], vec![request], vec![Locus::Channel(0)])
+            .with_reach(Reach {
+                receiver, stations: vec![2, 4], entries: vec![0], phases: 1,
+                loci: retention.clone(), passages: vec![],
+            });
+        let deposits = [deposit];
+        let pair_speed = |_, _, _: &PairPort, _: [&[Vec<Rat>]; 3]| panic!("D is not a pair-port request");
+        let mut stage = ObservedNormalEpochStage::new(
+            material, &deposits, receiver, field.ring(receiver).period(),
+            1, 1, epoch_index,
+            partition_exponent(material.observed_epoch_grain(receiver).unwrap(), 1, epoch_index).unwrap(),
+            &retention, material.landmarks(receiver).unwrap().clone(), &pair_speed, &[],
+            &crate::hnn::reference::observed::HostObservedEpochExecution, true,
+        ).unwrap();
+        if scope == EpochCandidateScope::ReceivingOnly {
+            let whole = stage.stage(EpochCandidateScope::Whole, &mut |_| {}).unwrap();
+            assert!(whole.requires_comparison());
+            assert_ne!(whole.material.contacts[0].dissipation, material.contacts[0].dissipation);
+            // Drop the unpublished whole before the same-opening receiving retry.
+            assert!(whole.admit_change(&crate::ratio::algebraic::ExactInterval {
+                lower: Rat::zero(), upper: Rat::one(),
+            }).is_none());
+        }
+        stage.stage(scope, &mut |_| {}).unwrap()
+    }
+
+    #[test]
+    fn d_only_real_staging_requires_comparison_and_receiving_retry_discards_factor_state() {
+        let (field, material, _, _, _) = normal_domain_fixture(None, false);
+        let before = material.continuing_state(0).unwrap().to_text();
+        let candidate = d_only_fixture_stage(&field, &material, 0, EpochCandidateScope::Whole);
+        assert!(candidate.requires_comparison());
+        assert!(candidate.has_physical_motion());
+        assert_ne!(candidate.material.contacts[0].dissipation, material.contacts[0].dissipation);
+        for (old, new) in material.contacts.iter().zip(&candidate.material.contacts) {
+            assert_eq!(old.storage, new.storage);
+            assert_eq!(old.stiffness, new.stiffness);
+        }
+        assert!(candidate.admit_receiving().is_err());
+        let fallback = d_only_fixture_stage(&field, &material, 0, EpochCandidateScope::ReceivingOnly);
+        assert!(!fallback.requires_comparison());
+        assert_eq!(fallback.material.contacts, material.contacts,
+            "discarded D parameters and statistics cannot leak to receiving-only publication");
+        assert_eq!(fallback.material.carries.iter().filter(|((l, _), _)| matches!(l, Locus::Channel(_))).collect::<Vec<_>>(),
+            material.carries.iter().filter(|((l, _), _)| matches!(l, Locus::Channel(_))).collect::<Vec<_>>());
+        assert_eq!(material.continuing_state(0).unwrap().to_text(), before);
+    }
+
+    #[test]
+    fn d_only_real_staged_endpoint_roundtrips_complete_state_and_next_staging() {
+        let (field, material, _, _, _) = normal_domain_fixture(None, false);
+        let staged = d_only_fixture_stage(&field, &material, 0, EpochCandidateScope::Whole).material;
+        let text = staged.continuing_state(0).unwrap().to_text();
+        let state = ContinuingState::from_text(&text, material.budget()).unwrap();
+        let cold = material.continued_on(&field, &state).unwrap();
+        assert_eq!(cold, staged);
+        assert_eq!(cold.continuing_state(0).unwrap().to_text(), text);
+        let warm_next = d_only_fixture_stage(&field, &staged, 1, EpochCandidateScope::Whole);
+        let cold_next = d_only_fixture_stage(&field, &cold, 1, EpochCandidateScope::Whole);
+        assert_eq!(warm_next.material, cold_next.material);
+        assert_eq!(warm_next.requires_comparison(), cold_next.requires_comparison());
+    }
+
 }

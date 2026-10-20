@@ -336,6 +336,7 @@ impl ObservedStream {
         let scope = match self.scope {
             ObservedEpochDepositionScope::All => "all",
             ObservedEpochDepositionScope::NormalMaps => "normal-maps",
+            ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => "normal-maps-channel-dissipation",
         };
         format!(
             "observed-stream-pending-v1 {scope} {} {} {}\n{}\n",
@@ -368,6 +369,7 @@ impl ObservedStream {
         let scope = match header[1] {
             "all" => ObservedEpochDepositionScope::All,
             "normal-maps" => ObservedEpochDepositionScope::NormalMaps,
+            "normal-maps-channel-dissipation" => ObservedEpochDepositionScope::NormalMapsAndChannelDissipation,
             _ => return Err(refuse("the saved observed deposition scope")),
         };
         let commit: u64 = header[2]
@@ -562,4 +564,28 @@ mod tests {
         assert_eq!(stream.pending_checkpoint(), saved);
         assert_eq!(stream.resident.continuing_state(0).unwrap(), before);
     }
+    #[test]
+    fn d_only_scope_pending_checkpoint_roundtrips_and_refused_input_is_atomic() {
+        let (reference, mut stream, pairing, _) = opening();
+        stream.scope = ObservedEpochDepositionScope::NormalMapsAndChannelDissipation;
+        stream.receive(&reference, &pairing, &[0, 1, 2]).unwrap();
+        let pending = stream.pending_checkpoint();
+        assert!(pending.starts_with("observed-stream-pending-v1 normal-maps-channel-dissipation "));
+        let before = stream.resident.continuing_state(0).unwrap();
+        let mut cold = ObservedStream::restore_checkpoint(
+            stream.resident.clone(), stream.crib.clone(), &pending,
+        ).unwrap();
+        assert_eq!(cold.scope, stream.scope);
+        assert_eq!(cold.pending_checkpoint(), pending);
+        assert_eq!(cold.resident.continuing_state(0).unwrap(), before);
+        assert!(cold.receive(&reference, &pairing, &[4]).is_err());
+        assert_eq!(cold.pending_checkpoint(), pending);
+        assert_eq!(cold.resident.continuing_state(0).unwrap(), before);
+        // A partial continuation remains below the actual receiving section.
+        stream.receive(&reference, &pairing, &[3]).unwrap();
+        cold.receive(&reference, &pairing, &[3]).unwrap();
+        assert_eq!(stream.pending_checkpoint(), cold.pending_checkpoint());
+        assert_eq!(stream.resident.continuing_state(0).unwrap(), cold.resident.continuing_state(0).unwrap());
+    }
+
 }

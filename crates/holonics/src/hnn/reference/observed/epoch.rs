@@ -70,11 +70,12 @@ pub struct ObservedEpochWallTimes {
 
 /// A declared set of material families eligible to absorb this epoch's return.
 /// Every native covector is still computed. Holding physical factors omits their
-/// deposition requests and statistics; it does not replace their gradients by zero.
+/// deposition requests and statistics; the D-only scope admits channel D alone.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ObservedEpochDepositionScope {
     All,
     NormalMaps,
+    NormalMapsAndChannelDissipation,
 }
 
 /// The comparison law that admitted this atomic publication. Neutral means
@@ -233,6 +234,12 @@ fn with_receiving_masses(
         match scope {
             ObservedEpochDepositionScope::All => deposit.factors().to_vec(),
             ObservedEpochDepositionScope::NormalMaps => Vec::new(),
+            ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => deposit
+                .factors()
+                .iter()
+                .filter(|factor| matches!(&factor.gradient, crate::hnn::constitution::FactorGradient::Dissipation { .. }))
+                .cloned()
+                .collect(),
         },
         deposit.loci(),
     )
@@ -421,10 +428,10 @@ impl Reference {
         )
     }
 
-    /// Select the deposited families before any return is absorbed. All uses
-    /// the ordinary policy and retains the physical-factor refusal. NormalMaps
-    /// holds physical factors and their statistics, while source/contrast/readout
-    /// moves share the same grouped rays and same-opening finite comparison.
+    /// Select deposited families before any return is absorbed. All uses the
+    /// ordinary policy and retains the physical-factor refusal. NormalMaps holds
+    /// physical factors; the D-only scope admits channel dissipation with the same
+    /// grouped rays, actual-ray certificate and same-opening finite comparison.
     #[allow(clippy::too_many_arguments)]
     pub fn observe_epoch_continuing_at_cuts_with_scope(
         &self,
@@ -1037,7 +1044,11 @@ impl Reference {
             deposit_subphases.push((format!("{phase:?}"), now.duration_since(previous_phase)));
             previous_phase = now;
         };
-        let shared_normals = deposition_scope == ObservedEpochDepositionScope::NormalMaps;
+        let shared_normals = matches!(
+            deposition_scope,
+            ObservedEpochDepositionScope::NormalMaps
+                | ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
+        );
         let mut normal_stage = if shared_normals {
             Some(
                 crate::hnn::constitution::epoch::ObservedNormalEpochStage::new(
@@ -1054,6 +1065,8 @@ impl Reference {
                     &pair_speed,
                     &receiving_parts,
                     execution,
+                    deposition_scope
+                        == ObservedEpochDepositionScope::NormalMapsAndChannelDissipation,
                 )?,
             )
         } else {
@@ -1409,6 +1422,13 @@ impl Reference {
             .ok_or_else(|| refusal("the physical deposit retains its executed held-momentum work"))?
             .deposition
             .clone();
+        if deposition_scope == ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
+            && !deposition_work.is_zero()
+        {
+            return Err(refusal(
+                "a D-only physical epoch may publish only with exactly zero held deposition work",
+            ));
+        }
         let energy = ObservedEpochEnergy {
             words: energy_words,
             chained: energy_chained,
@@ -3918,4 +3938,31 @@ mod tests {
         assert!(same.unchanged);
         assert!(!same.strictly_improved);
     }
+    #[test]
+    fn d_only_observed_scope_keeps_c_k_and_zero_producing_work() {
+        let (reference, _, opening, mut crib, pairing) = source_probe_opening();
+        let mut actual = opening.clone();
+        let read = reference.observe_epoch_continuing_at_cuts_with_scope(
+            &mut actual, &mut crib, &pairing, &[0; 32], None, &[], false,
+            &HostObservedEpochExecution,
+            ObservedEpochDepositionScope::NormalMapsAndChannelDissipation,
+        ).unwrap();
+        assert_eq!(read.deposition_scope, ObservedEpochDepositionScope::NormalMapsAndChannelDissipation);
+        assert!(read.energy.closes());
+        assert!(read.energy.deposition_work.is_zero());
+        for contact in 0..opening.field.contacts().len() {
+            assert_eq!(actual.constitution.contact_storage(contact), opening.constitution.contact_storage(contact));
+            assert_eq!(actual.constitution.contact_stiffness(contact), opening.constitution.contact_stiffness(contact));
+        }
+        let before = actual.continuing_state(0).unwrap();
+        let saved_crib = crib.clone();
+        assert!(reference.observe_epoch_continuing_at_cuts_with_scope(
+            &mut actual, &mut crib, &pairing, &[4], None, &[], false,
+            &HostObservedEpochExecution,
+            ObservedEpochDepositionScope::NormalMapsAndChannelDissipation,
+        ).is_err());
+        assert_eq!(actual.continuing_state(0).unwrap(), before);
+        assert_eq!(crib, saved_crib);
+    }
+
 }

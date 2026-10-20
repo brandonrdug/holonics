@@ -10534,6 +10534,7 @@ struct Prepared {
 /// carried statistic `h_x′` (the metric of the unit step `D = G_x / h_x′`), the unit step's alignment
 /// `a = |G_x|² / h_x′`, the covector scale `c`, the feature energy `e`, and the norms its output's
 /// moves read.
+#[derive(Clone)]
 pub(crate) struct FactorPrepared {
     index: usize,
     family: Family,
@@ -10546,6 +10547,7 @@ pub(crate) struct FactorPrepared {
 
 /// **The norms a factor family's output moves read** (module header's table), each Schur pair
 /// `(‖X‖₁, ‖X‖_∞)` exact.
+#[derive(Clone)]
 enum Moves {
     /// A square carrier `w x xᵀ` read at its feature: `weight = 4w²`, the unit step's and the
     /// factor's Schur norms; `b(η) = weight S(D) S(x + ηD) e`.
