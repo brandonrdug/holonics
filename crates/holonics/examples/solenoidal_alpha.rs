@@ -8,7 +8,8 @@
 //! readout maps share the whole candidate probe; a refused whole branch stages the exact
 //! upstream joint proposal, then the held-upstream receiving policy on its domain refusal.
 //! Every nonzero upstream proposal executes the same-opening finite comparison.
-//! Physical factor requests/statistics are explicitly held (NormalMaps).
+//! NormalMaps is the default. An explicit additive scope fork can opt into channel D alone;
+//! every physical endpoint keeps the actual-ray, same-opening finite and held-work guards.
 //! Both rungs reuse the same opening's normal flow and certified gain. Held upstream maps
 //! absorb that news once with zero material move; discarded candidates never publish statistics.
 //! A source end leaves only the bounded current unfinished transaction pending. It is accepted
@@ -309,6 +310,18 @@ impl Checkpoint {
             },
             hash,
         ))
+    }
+    /// Exterior fork: change only the future deposition scope of this bounded transaction.
+    /// Keep the complete native opening, closing crib and unfinished classes verbatim.
+    fn fork_scope(&self, scope: ObservedEpochDepositionScope) -> Result<Self> {
+        Ok(Self {
+            population: self.population,
+            stream: ObservedStream::restore(
+                self.stream.resident().clone(), self.stream.crib().clone(), scope,
+                self.stream.pending_classes().to_vec(),
+            )?,
+            provenance: self.provenance.clone(),
+        })
     }
     fn publish(&self, path: &str) -> Result<(usize, String)> {
         let bytes = self.bytes()?;
@@ -1115,6 +1128,20 @@ fn object(fields: &[(&str, String)]) -> String {
             .join(",")
     )
 }
+fn scope_description(scope: ObservedEpochDepositionScope) -> &'static str {
+    match scope {
+        ObservedEpochDepositionScope::All => "All: ordinary physical-factor policy",
+        ObservedEpochDepositionScope::NormalMaps => "NormalMaps: physical factor deposition requests and statistics held",
+        ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => "NormalMapsAndChannelDissipation: C/K and other physical families held; actual D requires same-opening finite comparison and zero held work",
+    }
+}
+fn parse_fork_scope(value: &str) -> Result<ObservedEpochDepositionScope> {
+    match value {
+        "normal-maps" => Ok(ObservedEpochDepositionScope::NormalMaps),
+        "normal-maps-channel-dissipation" => Ok(ObservedEpochDepositionScope::NormalMapsAndChannelDissipation),
+        _ => Err("scope fork requires normal-maps or normal-maps-channel-dissipation".into()),
+    }
+}
 fn run() -> Result<()> {
     let started = Instant::now();
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -1137,8 +1164,33 @@ fn run() -> Result<()> {
                 ("constitution_sha256", quoted(&constitution)), ("total_cells", "0".into()),
                 ("accepted_total_cells", "0".into()), ("pending_cells", "0".into()),
                 ("physical_epoch_cell_bound", checkpoint.stream.epoch_bound().to_string()),
-                ("deposition_scope", quoted("NormalMaps: physical factor deposition requests and statistics held")),
+                ("deposition_scope", quoted(scope_description(checkpoint.stream.scope()))),
                 ("warm_query", warm), ("elapsed_ns", started.elapsed().as_nanos().to_string()),
+            ]));
+        }
+        Some("fork-scope") if args.len() == 5 => {
+            let (opening, input_hash) = Checkpoint::load(&args[1], args[3].parse()?)?;
+            let scope = parse_fork_scope(&args[4])?;
+            let fork = opening.fork_scope(scope)?;
+            let before = opening.stream.resident().continuing_state(0)?;
+            if fork.stream.resident().continuing_state(0)? != before
+                || fork.stream.crib() != opening.stream.crib()
+                || fork.stream.pending_classes() != opening.stream.pending_classes()
+                || fork.provenance != opening.provenance
+            {
+                return Err("a scope fork must preserve all existing native and unfinished state".into());
+            }
+            let (bytes, hash) = fork.publish(&args[2])?;
+            println!("{}", object(&[
+                ("kind", quoted("fork_scope")), ("input_checkpoint_sha256", quoted(&input_hash)),
+                ("checkpoint_path", quoted(&args[2])), ("checkpoint_sha256", quoted(&hash)),
+                ("checkpoint_bytes", bytes.to_string()), ("native_state_unchanged", "true".into()),
+                ("scope_before", exact(&opening.stream.scope())), ("scope_after", exact(&scope)),
+                ("deposition_scope", quoted(scope_description(scope))),
+                ("published_cells", total(fork.stream.resident())?.to_string()),
+                ("accepted_total_cells", fork.stream.accepted_cells()?.to_string()),
+                ("pending_cells", fork.stream.pending_classes().len().to_string()),
+                ("elapsed_ns", started.elapsed().as_nanos().to_string()),
             ]));
         }
         Some("ingest") if args.len() == 8 || args.len() == 9 || args.len() == 12 => {
@@ -1282,6 +1334,10 @@ fn run() -> Result<()> {
                         ])).collect::<Vec<_>>().join(","))),
                         ("receiving_certificate_exact", exact(&epoch.deposit.epoch)),
                         ("actual_certificate_steps_exact", exact(&epoch.deposit.steps)),
+                        ("actual_channel_d_steps", epoch.deposit.steps.iter().filter(|(locus, step)| {
+                            matches!(locus, holonics::hnn::constitution::Locus::Channel(_))
+                                && step.family == holonics::hnn::constitution::Family::Factor(2)
+                        }).count().to_string()),
                         ("first_law_before_precision_exact", exact(&epoch.precision.balance_before)),
                         ("first_law_after_precision_exact", exact(&epoch.precision.balance_after)),
                         ("physical_energy_closes", epoch.energy.closes().to_string()),
@@ -1338,7 +1394,7 @@ fn run() -> Result<()> {
                 ("native_steps", stepped.to_string()), ("whole_epochs", whole.to_string()),
                 ("joint_epochs", joint.to_string()), ("receiving_only_epochs", receiving_only.to_string()), ("neutral_epochs", neutral.to_string()),
                 ("certification_scope", quoted("atomic same-opening whole then upstream joint proposal with both native normal predicates and actual finite comparison; held-upstream absorption on domain refusal; Neutral requires publication_attempt to identify its branch; unfinished physical interval pending")),
-                ("deposition_scope", quoted("NormalMaps: physical factor deposition requests and statistics held; their complete native return still computed")),
+                ("deposition_scope", quoted(scope_description(checkpoint.stream.scope()))),
                 ("epoch_outcomes", format!("[{}]", outcomes.join(","))),
                 ("class_code_scope", quoted("prequential class comparison through the actual model/tree face; separate tree-only control; phase improvement alone is not class prediction improvement")),
                 ("class_code_series", format!("[{}]", class_series.join(","))),
@@ -1388,7 +1444,7 @@ fn run() -> Result<()> {
                 ("keyed_replies", keyed),
             ]));
         }
-        _ => return Err("usage: solenoidal_alpha init OUTPUT POPULATION | ingest INPUT OUTPUT ORIGINAL_FILE FIRST_LINE LAST_LINE MAX_SOURCE_BYTES MAX_CHECKPOINT_BYTES [SOURCE_CELL_LIMIT | KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT WARM_QUERY_BATCH_TSV] | query INPUT MAX_CHECKPOINT_BYTES [QUERY_UTF8 [SECTION_BYTES ORACLE_BUDGET [KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT ADJACENT_SOURCE_FILE]]]".into()),
+        _ => return Err("usage: solenoidal_alpha init OUTPUT POPULATION | fork-scope INPUT OUTPUT MAX_CHECKPOINT_BYTES normal-maps|normal-maps-channel-dissipation | ingest INPUT OUTPUT ORIGINAL_FILE FIRST_LINE LAST_LINE MAX_SOURCE_BYTES MAX_CHECKPOINT_BYTES [SOURCE_CELL_LIMIT | KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT WARM_QUERY_BATCH_TSV] | query INPUT MAX_CHECKPOINT_BYTES [QUERY_UTF8 [SECTION_BYTES ORACLE_BUDGET [KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT ADJACENT_SOURCE_FILE]]]".into()),
     }
     Ok(())
 }
@@ -1470,4 +1526,33 @@ mod tests {
             .is_err()
         );
     }
+    #[test]
+    fn channel_d_scope_fork_preserves_full_native_and_pending_state() {
+        let (field, initial, pairing) = declaration(4096).unwrap();
+        let reference = port();
+        let mut resident = reference.mount_with(&field, &Current::at_rest(&field), initial).unwrap();
+        let boundary = PairedObservation::admit(&field, resident.constitution(), &pairing).unwrap();
+        reference.ingest(&mut resident, None, &boundary.encode(&[]).unwrap()).unwrap();
+        let mut stream = ObservedStream::new(resident, ObservedCrib::new(0), ObservedEpochDepositionScope::NormalMaps).unwrap();
+        stream.receive(&reference, &pairing, &[0, 1, 2, 3]).unwrap();
+        let opening = Checkpoint { population: 4096, stream, provenance: "existing exterior provenance\n".into() };
+        let old_bytes = opening.bytes().unwrap();
+        let fork = opening.fork_scope(parse_fork_scope("normal-maps-channel-dissipation").unwrap()).unwrap();
+        assert_eq!(fork.stream.scope(), ObservedEpochDepositionScope::NormalMapsAndChannelDissipation);
+        assert_eq!(fork.stream.resident().continuing_state(0).unwrap(), opening.stream.resident().continuing_state(0).unwrap());
+        assert_eq!(fork.stream.crib(), opening.stream.crib());
+        assert_eq!(fork.stream.pending_classes(), opening.stream.pending_classes());
+        assert_eq!(fork.provenance, opening.provenance);
+        assert_eq!(fork.stream.accepted_cells().unwrap(), opening.stream.accepted_cells().unwrap());
+        assert_ne!(fork.bytes().unwrap(), old_bytes);
+        assert_eq!(opening.bytes().unwrap(), old_bytes);
+        let restored = ObservedStream::restore_checkpoint(fork.stream.resident().clone(), fork.stream.crib().clone(), &fork.stream.pending_checkpoint()).unwrap();
+        assert_eq!(restored.scope(), fork.stream.scope());
+        assert_eq!(restored.pending_checkpoint(), fork.stream.pending_checkpoint());
+        let back = fork.fork_scope(parse_fork_scope("normal-maps").unwrap()).unwrap();
+        assert_eq!(back.bytes().unwrap(), old_bytes);
+        assert!(parse_fork_scope("all").is_err());
+        assert!(parse_fork_scope("normal-map").is_err());
+    }
+
 }
