@@ -21,7 +21,7 @@ mod tree_release;
 pub use tree_release::TreeReleaseReceipt;
 mod stream;
 pub use stream::{ObservedStream, ObservedStreamReceipt};
-pub use epoch::{ObservedEpochCellReceipt, ObservedEpochEnergy, ObservedEpochDepositionScope, ObservedEpochOutcome, ObservedEpochReceipt, ObservedEpochWallTimes, ObservedEpochProbeState, EpochStageAttempt, EpochStageCondition, EpochStageReading, EpochStageRefusal, EpochStageValue};
+pub use epoch::{ChannelMaterialProbeRefusal, ObservedChannelStorageAblationReading, ObservedEpochCellReceipt, ObservedEpochEnergy, ObservedEpochDepositionScope, ObservedEpochOutcome, ObservedEpochReceipt, ObservedEpochWallTimes, ObservedEpochProbeState, EpochStageAttempt, EpochStageCondition, EpochStageReading, EpochStageRefusal, EpochStageValue};
 mod execution;
 pub use execution::{
     HostObservedEpochExecution, ScannedHostObservedEpochExecution, ObservedEpochExecution, ObservedEpochForwardContext,

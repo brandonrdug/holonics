@@ -7,6 +7,7 @@
 
 use super::*;
 
+mod channel_endpoint;
 mod channel_grain;
 mod channel_grain_policy;
 pub(crate) use channel_grain_policy::ObservedChannelGrainPlan;

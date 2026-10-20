@@ -20,11 +20,12 @@ pub(super) struct ChannelRayReading {
     pub(super) moves: Moves,
 }
 
-/// A fixed actual D ray together with its original fresh metadata. The wrapped
+/// A fixed actual channel ray together with its original fresh metadata. The wrapped
 /// preparation keeps h', energy and covector-scale from the one preparation pass;
 /// only alignment and first-variation moves are read on P/eta.
 pub(super) struct ActualChannelRayFace {
     contact: usize,
+    family: usize,
     exponent: i64,
     prepared: FactorPrepared,
     raw_alignment: Rat,
@@ -37,6 +38,10 @@ impl ActualChannelRayFace {
 
     pub(super) fn exponent(&self) -> i64 {
         self.exponent
+    }
+
+    pub(super) fn family(&self) -> usize {
+        self.family
     }
 
     pub(super) fn prepared(&self) -> &FactorPrepared {
@@ -192,16 +197,16 @@ impl ChannelFactorDisplacement {
         certified: &StepReading,
         hop: &Rat,
     ) -> Result<ActualChannelRayFace, HnnError> {
-        if self.family != 2
+        if self.family >= 3
             || request.gradient.locus() != Locus::Channel(self.contact)
-            || request.gradient.family() != Family::Factor(2)
-            || certified.family != Family::Factor(2)
+            || request.gradient.family() != Family::Factor(self.family)
+            || certified.family != Family::Factor(self.family)
             || certified.step.step <= Rat::zero()
-            || original.family != Family::Factor(2)
+            || original.family != Family::Factor(self.family)
             || original.index != request_index
         {
             return Err(refused(
-                "an actual channel D ray keeps its original request index and positive certified family",
+                "an actual channel ray keeps its original request index and positive certified family",
             ));
         }
         let reading = self.fixed_eta(&request.gradient, &certified.step.step, hop)?;
@@ -214,6 +219,7 @@ impl ChannelFactorDisplacement {
         prepared.moves = reading.moves;
         Ok(ActualChannelRayFace {
             contact: self.contact,
+            family: self.family,
             exponent: certified.step.exponent,
             prepared,
             raw_alignment: reading.alignment,
@@ -475,33 +481,28 @@ mod tests {
     }
 
     #[test]
-    fn actual_d_face_binds_original_request_index_and_rejects_held_rates() {
+    fn actual_channel_face_binds_family_request_index_and_positive_rate() {
         let opening = ExactRatMatrix::new(vec![vec![Rat::zero()]]).unwrap();
         let endpoint = ExactRatMatrix::new(vec![vec![Rat::one()]]).unwrap();
-        let ray = ChannelFactorDisplacement::between(0, 2, &opening, &endpoint)
-            .unwrap()
-            .unwrap();
-        let request = FactorStep {
-            gradient: FactorGradient::Dissipation {
+        let gradient = ExactRatMatrix::new(vec![vec![Rat::one()]]).unwrap();
+        let make_gradient = |family| match family {
+            0 => FactorGradient::Storage {
                 contact: 0,
-                gradient: ExactRatMatrix::new(vec![vec![Rat::one()]]).unwrap(),
+                gradient: gradient.clone(),
             },
-            energy: Rat::one(),
-            covector: Rat::one(),
+            1 => FactorGradient::Stiffness {
+                contact: 0,
+                gradient: gradient.clone(),
+            },
+            _ => FactorGradient::Dissipation {
+                contact: 0,
+                gradient: gradient.clone(),
+            },
         };
-        let original = FactorPrepared {
-            index: 4,
-            family: Family::Factor(2),
-            scale: Rat::one(),
-            alignment: Rat::one(),
-            covector: Rat::one(),
-            energy: Rat::one(),
-            moves: channel_factor_moves(2, &opening, (Rat::one(), Rat::one()), &Rat::one()),
-        };
-        let make_reading = |step: Rat| StepReading {
-            family: Family::Factor(2),
+        let make_reading = |family, step: Rat| StepReading {
+            family: Family::Factor(family),
             step: CertifiedStep {
-                exponent: 0,
+                exponent: 7,
                 step,
                 alignment: Rat::one(),
                 curvature: Rat::one(),
@@ -513,15 +514,99 @@ mod tests {
             readout: Rat::one(),
             amplitude: Rat::one(),
         };
-        let positive = make_reading(Rat::one());
-        assert!(ray.actual_face(&original, 4, &request, &positive, &Rat::one()).is_ok());
-        assert!(ray.actual_face(&original, 5, &request, &positive, &Rat::one()).is_err());
-        let mut wrong_original = original.clone();
-        wrong_original.index = 5;
-        assert!(ray.actual_face(&wrong_original, 4, &request, &positive, &Rat::one()).is_err());
-        for held in [Rat::zero(), rat(-1, 1)] {
-            let reading = make_reading(held);
-            assert!(ray.actual_face(&original, 4, &request, &reading, &Rat::one()).is_err());
+        for family in 0..3 {
+            let ray = ChannelFactorDisplacement::between(0, family, &opening, &endpoint)
+                .unwrap()
+                .unwrap();
+            let request = FactorStep {
+                gradient: make_gradient(family),
+                energy: rat(5, 3),
+                covector: rat(7, 4),
+            };
+            let original = FactorPrepared {
+                index: 4,
+                family: Family::Factor(family),
+                scale: rat(2, 3),
+                alignment: rat(9, 5),
+                covector: rat(7, 4),
+                energy: rat(5, 3),
+                moves: channel_factor_moves(
+                    family,
+                    &opening,
+                    (Rat::one(), Rat::one()),
+                    &Rat::one(),
+                ),
+            };
+            let positive = make_reading(family, Rat::one());
+            let face = ray
+                .actual_face(&original, 4, &request, &positive, &Rat::one())
+                .unwrap();
+            assert_eq!(face.family(), family);
+            assert_eq!(face.exponent(), 7);
+            assert_eq!(face.prepared().scale, original.scale);
+            assert_eq!(face.prepared().energy, original.energy);
+            assert_eq!(face.prepared().covector, original.covector);
+
+            let negative_gradient = ExactRatMatrix::new(vec![vec![rat(-1, 1)]]).unwrap();
+            let negative_request = FactorStep {
+                gradient: match family {
+                    0 => FactorGradient::Storage {
+                        contact: 0,
+                        gradient: negative_gradient,
+                    },
+                    1 => FactorGradient::Stiffness {
+                        contact: 0,
+                        gradient: negative_gradient,
+                    },
+                    _ => FactorGradient::Dissipation {
+                        contact: 0,
+                        gradient: negative_gradient,
+                    },
+                },
+                ..request.clone()
+            };
+            let negative_face = ray
+                .actual_face(&original, 4, &negative_request, &positive, &Rat::one())
+                .unwrap();
+            assert_eq!(negative_face.raw_alignment(), &rat(-1, 1));
+            assert_eq!(negative_face.prepared().alignment, rat(-1, 1));
+
+            assert!(ray
+                .actual_face(&original, 5, &request, &positive, &Rat::one())
+                .is_err());
+            let mut wrong_original = original.clone();
+            wrong_original.index = 5;
+            assert!(ray
+                .actual_face(&wrong_original, 4, &request, &positive, &Rat::one())
+                .is_err());
+            let other_family = (family + 1) % 3;
+            assert!(ray
+                .actual_face(
+                    &original,
+                    4,
+                    &FactorStep {
+                        gradient: make_gradient(other_family),
+                        ..request.clone()
+                    },
+                    &positive,
+                    &Rat::one(),
+                )
+                .is_err());
+            assert!(ray
+                .actual_face(
+                    &original,
+                    4,
+                    &request,
+                    &make_reading(other_family, Rat::one()),
+                    &Rat::one(),
+                )
+                .is_err());
+            for held in [Rat::zero(), rat(-1, 1)] {
+                let reading = make_reading(family, held);
+                assert!(ray
+                    .actual_face(&original, 4, &request, &reading, &Rat::one())
+                    .is_err());
+            }
         }
     }
 }

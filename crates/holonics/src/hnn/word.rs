@@ -103,6 +103,7 @@ pub mod action;
 mod action_return;
 pub(crate) mod column;
 pub mod continuation;
+pub(crate) mod endpoint;
 pub mod finite_gain;
 pub(crate) mod linear;
 pub mod scan;

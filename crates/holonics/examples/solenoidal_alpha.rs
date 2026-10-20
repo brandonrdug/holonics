@@ -8,8 +8,8 @@
 //! readout maps share the whole candidate probe; a refused whole branch stages the exact
 //! upstream joint proposal, then the held-upstream receiving policy on its domain refusal.
 //! Every nonzero upstream proposal executes the same-opening finite comparison.
-//! NormalMaps is the default. An explicit additive scope fork can opt into channel D alone;
-//! every physical endpoint keeps the actual-ray, same-opening finite and held-work guards.
+//! NormalMaps is the default. Additive scope forks can opt into channel D alone, or actual
+//! C/K/D endpoints; material endpoints retain their bound producing cut and held-work reading.
 //! Both rungs reuse the same opening's normal flow and certified gain. Held upstream maps
 //! absorb that news once with zero material move; discarded candidates never publish statistics.
 //! A source end leaves only the bounded current unfinished transaction pending. It is accepted
@@ -1133,13 +1133,15 @@ fn scope_description(scope: ObservedEpochDepositionScope) -> &'static str {
         ObservedEpochDepositionScope::All => "All: ordinary physical-factor policy",
         ObservedEpochDepositionScope::NormalMaps => "NormalMaps: physical factor deposition requests and statistics held",
         ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => "NormalMapsAndChannelDissipation: C/K and other physical families held; actual D requires same-opening finite comparison and zero held work",
+        ObservedEpochDepositionScope::NormalMapsAndChannelMaterial => "NormalMapsAndChannelMaterial: actual C/K/D endpoint requires same-opening finite comparison and endpoint held-work closure",
     }
 }
 fn parse_fork_scope(value: &str) -> Result<ObservedEpochDepositionScope> {
     match value {
         "normal-maps" => Ok(ObservedEpochDepositionScope::NormalMaps),
         "normal-maps-channel-dissipation" => Ok(ObservedEpochDepositionScope::NormalMapsAndChannelDissipation),
-        _ => Err("scope fork requires normal-maps or normal-maps-channel-dissipation".into()),
+        "normal-maps-channel-material" => Ok(ObservedEpochDepositionScope::NormalMapsAndChannelMaterial),
+        _ => Err("scope fork requires normal-maps, normal-maps-channel-dissipation, or normal-maps-channel-material".into()),
     }
 }
 /// Explicit exterior run policy; it adds no native state or activation history. A caller
@@ -1477,7 +1479,7 @@ fn run() -> Result<()> {
                 ("keyed_replies", keyed),
             ]));
         }
-        _ => return Err("usage: solenoidal_alpha init OUTPUT POPULATION | fork-scope INPUT OUTPUT MAX_CHECKPOINT_BYTES normal-maps|normal-maps-channel-dissipation | ingest|ingest-grain INPUT OUTPUT ORIGINAL_FILE FIRST_LINE LAST_LINE MAX_SOURCE_BYTES MAX_CHECKPOINT_BYTES [SOURCE_CELL_LIMIT [SOURCE_CELL_OFFSET] | KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT WARM_QUERY_BATCH_TSV] | query INPUT MAX_CHECKPOINT_BYTES [QUERY_UTF8 [SECTION_BYTES ORACLE_BUDGET [KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT ADJACENT_SOURCE_FILE]]]".into()),
+        _ => return Err("usage: solenoidal_alpha init OUTPUT POPULATION | fork-scope INPUT OUTPUT MAX_CHECKPOINT_BYTES normal-maps|normal-maps-channel-dissipation|normal-maps-channel-material | ingest|ingest-grain INPUT OUTPUT ORIGINAL_FILE FIRST_LINE LAST_LINE MAX_SOURCE_BYTES MAX_CHECKPOINT_BYTES [SOURCE_CELL_LIMIT [SOURCE_CELL_OFFSET] | KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT WARM_QUERY_BATCH_TSV] | query INPUT MAX_CHECKPOINT_BYTES [QUERY_UTF8 [SECTION_BYTES ORACLE_BUDGET [KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT ADJACENT_SOURCE_FILE]]]".into()),
     }
     Ok(())
 }
@@ -1584,6 +1586,11 @@ mod tests {
         assert_eq!(restored.pending_checkpoint(), fork.stream.pending_checkpoint());
         let back = fork.fork_scope(parse_fork_scope("normal-maps").unwrap()).unwrap();
         assert_eq!(back.bytes().unwrap(), old_bytes);
+        let material_scope = parse_fork_scope("normal-maps-channel-material").unwrap();
+        assert_eq!(material_scope, ObservedEpochDepositionScope::NormalMapsAndChannelMaterial);
+        let material = opening.fork_scope(material_scope).unwrap();
+        assert_eq!(material.stream.scope(), material_scope);
+        assert!(material.stream.pending_checkpoint().contains("normal-maps-channel-material"));
         assert!(parse_fork_scope("all").is_err());
         assert!(parse_fork_scope("normal-map").is_err());
     }

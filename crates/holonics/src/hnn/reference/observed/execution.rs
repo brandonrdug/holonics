@@ -114,6 +114,10 @@ impl ObservedEpochWord for NativeEpochWord {
 /// refusal when their selected realization cannot execute the actual operands.
 /// The words are independent after their forward chain has reached its openings.
 pub trait ObservedEpochExecution: Sync {
+    /// Optional exterior matched C/K ablation. The disposable probe never changes
+    /// deposition or admission; ordinary executors do not request this extra work.
+    fn channel_storage_ablation_control(&self) -> bool { false }
+
     /// Execute the actual producing ratio at its declared opening. The caller
     /// authenticates its observation against these anchors and faces, then chains
     /// this exact reception end into the next word's opening.

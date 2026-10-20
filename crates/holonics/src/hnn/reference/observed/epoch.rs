@@ -71,12 +71,14 @@ pub struct ObservedEpochWallTimes {
 
 /// A declared set of material families eligible to absorb this epoch's return.
 /// Every native covector is still computed. Holding physical factors omits their
-/// deposition requests and statistics; the D-only scope admits channel D alone.
+/// deposition requests and statistics; the channel scopes admit either D alone or
+/// the actual C/K/D endpoint with its producing-cut carry.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ObservedEpochDepositionScope {
     All,
     NormalMaps,
     NormalMapsAndChannelDissipation,
+    NormalMapsAndChannelMaterial,
 }
 
 /// The comparison law that admitted this atomic publication. Neutral means
@@ -135,6 +137,24 @@ pub enum ObservedEpochProbeState {
     FiniteComparisonExecuted,
 }
 
+/// Typed evidence that a channel-material endpoint's actual C change made the
+/// candidate's held-momentum crossing refusal eligible for the scoped fallback.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ChannelMaterialProbeRefusal {
+    pub attempt: EpochStageAttempt,
+    pub contact: usize,
+}
+
+/// An opt-in disposable same-opening comparison with channel C/K storage held
+/// at the epoch's original predecessor. It carries no admission authority.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ObservedChannelStorageAblationReading {
+    pub attempt: EpochStageAttempt,
+    pub actual: ComparisonReading,
+    pub held_ck: Option<ComparisonReading>,
+    pub refusal: Option<String>,
+}
+
 #[derive(Debug)]
 pub struct ObservedEpochReceipt {
     pub consumed: usize,
@@ -151,6 +171,10 @@ pub struct ObservedEpochReceipt {
     pub deposition_scope: ObservedEpochDepositionScope,
     /// One whole-candidate probe, when upstream material actually moved.
     pub comparison: Option<ComparisonReading>,
+    /// Typed endpoint-held-momentum probe refusals, in Whole/Joint attempt order.
+    pub channel_material_probe_refusals: Vec<ChannelMaterialProbeRefusal>,
+    /// Opt-in disposable matched C/K ablations. These readings never affect admission.
+    pub channel_storage_ablations: Vec<ObservedChannelStorageAblationReading>,
     /// A refused whole branch is discarded before receiving-only restaging.
     pub whole_refusal: Option<String>,
     /// First whole-stage evidence; receiving-only restaging never overwrites it.
@@ -206,6 +230,47 @@ fn receiving_restage_permitted(error: &HnnError) -> bool {
     ))
 }
 
+/// A channel material probe may refuse only when its endpoint-held contact momentum
+/// cannot cross the candidate. This policy is local to that explicit scope.
+fn channel_material_probe_refusal(
+    error: &HnnError,
+    scope: ObservedEpochDepositionScope,
+    attempt: EpochStageAttempt,
+    endpoints: &[crate::hnn::constitution::EpochChannelEndpointReading],
+) -> Option<ChannelMaterialProbeRefusal> {
+    if scope != ObservedEpochDepositionScope::NormalMapsAndChannelMaterial
+        || !matches!(attempt, EpochStageAttempt::Whole | EpochStageAttempt::Joint)
+    {
+        return None;
+    }
+    let HnnError::HeldMomentum { contact } = error else {
+        return None;
+    };
+    endpoints
+        .iter()
+        .any(|endpoint| {
+            endpoint.contact == *contact
+                && endpoint.applied_form_delta[0]
+                    .entries()
+                    .iter()
+                    .any(|entry| !entry.is_zero())
+        })
+        .then_some(ChannelMaterialProbeRefusal {
+            attempt,
+            contact: *contact,
+        })
+}
+
+fn has_applied_channel_storage_change(
+    endpoints: &[crate::hnn::constitution::EpochChannelEndpointReading],
+) -> bool {
+    endpoints.iter().any(|endpoint| {
+        endpoint.applied_form_delta.iter().any(|form| {
+            form.entries().iter().any(|entry| !entry.is_zero())
+        })
+    })
+}
+
 /// Only the joint proposal's own post-projection normal predicate is a new domain
 /// refusal. The canonical whole non-descending invariant remains fatal.
 fn joint_restage_permitted(failure: &crate::hnn::constitution::epoch::EpochStageFailure) -> bool {
@@ -257,6 +322,17 @@ fn with_receiving_masses(
                 .factors()
                 .iter()
                 .filter(|factor| matches!(&factor.gradient, crate::hnn::constitution::FactorGradient::Dissipation { .. }))
+                .cloned()
+                .collect(),
+            ObservedEpochDepositionScope::NormalMapsAndChannelMaterial => deposit
+                .factors()
+                .iter()
+                .filter(|factor| matches!(
+                    &factor.gradient,
+                    crate::hnn::constitution::FactorGradient::Storage { .. }
+                        | crate::hnn::constitution::FactorGradient::Stiffness { .. }
+                        | crate::hnn::constitution::FactorGradient::Dissipation { .. }
+                ))
                 .cloned()
                 .collect(),
         },
@@ -449,8 +525,8 @@ impl Reference {
 
     /// Select deposited families before any return is absorbed. All uses the
     /// ordinary policy and retains the physical-factor refusal. NormalMaps holds
-    /// physical factors; the D-only scope admits channel dissipation with the same
-    /// grouped rays, actual-ray certificate and same-opening finite comparison.
+    /// physical factors; the D-only and channel-material scopes admit their selected
+    /// channel factors with the same grouped normals and same-opening finite comparison.
     #[allow(clippy::too_many_arguments)]
     pub fn observe_epoch_continuing_at_cuts_with_scope(
         &self,
@@ -737,6 +813,26 @@ impl Reference {
                 "the epoch energy commit reads its actual carried last crossing",
             ));
         }
+        let channel_endpoint = if deposition_scope
+            == ObservedEpochDepositionScope::NormalMapsAndChannelMaterial
+        {
+            let producing_change = &energy_words
+                .last()
+                .ok_or_else(|| refusal("a channel endpoint has its actual producing change"))?
+                .change;
+            let carry = carried
+                .as_ref()
+                .ok_or_else(|| refusal("a channel endpoint has its actual receiving carry"))?;
+            Some(crate::hnn::word::endpoint::ChannelEndpoint::bind(
+                &field,
+                &comparison_opening.constitution,
+                &producing_current,
+                producing_change,
+                carry,
+            )?)
+        } else {
+            None
+        };
         next.wall = forward_wall;
         next.tally = forward_tally;
         let observed: Option<Vec<_>> = if phases.observation_partition().is_some() {
@@ -1069,11 +1165,12 @@ impl Reference {
             deposition_scope,
             ObservedEpochDepositionScope::NormalMaps
                 | ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
+                | ObservedEpochDepositionScope::NormalMapsAndChannelMaterial
         );
         let mut grain_target_deferred = None;
         let mut normal_stage = if shared_normals {
             let stage =
-                crate::hnn::constitution::epoch::ObservedNormalEpochStage::new(
+                crate::hnn::constitution::epoch::ObservedNormalEpochStage::new_with_endpoint(
                     &comparison_opening.constitution,
                     &deposits,
                     receiver,
@@ -1087,16 +1184,22 @@ impl Reference {
                     &pair_speed,
                     &receiving_parts,
                     execution,
-                    deposition_scope
-                        == ObservedEpochDepositionScope::NormalMapsAndChannelDissipation,
+                    matches!(
+                        deposition_scope,
+                        ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
+                            | ObservedEpochDepositionScope::NormalMapsAndChannelMaterial
+                    ),
+                    channel_endpoint.as_ref(),
                 )?;
-            let plan = if self.refining {
+            let grain_enabled = self.refining
+                && deposition_scope == ObservedEpochDepositionScope::NormalMapsAndChannelDissipation;
+            let plan = if grain_enabled {
                 crate::hnn::constitution::epoch::ObservedChannelGrainPlan::at_section(
                     &field, &retention, receiver, epoch_index,
                     next.observed_epoch_ingress.expect("set above").1,
                 )?
             } else { None };
-            if self.refining && plan.is_none()
+            if grain_enabled && plan.is_none()
                 && next.observed_epoch_ingress.expect("set above").1 > epoch_index {
                 grain_target_deferred = Some(crate::hnn::constitution::EpochChannelGrainDeferralReading {
                     receiver, ingress_before: epoch_index,
@@ -1136,11 +1239,16 @@ impl Reference {
             };
         let mut probe_subphases = Vec::new();
         let mut probe_candidate =
-            |attempt, candidate: &crate::hnn::constitution::epoch::StagedEpochCandidate| {
+            |attempt, candidate: &crate::hnn::constitution::epoch::StagedEpochCandidate, held_ck| {
                 let readmission_start = Instant::now();
                 let mut opening = comparison_opening.clone();
-                opening.constitution =
-                    candidate.comparison_material(&comparison_opening.constitution)?;
+                opening.constitution = if held_ck {
+                    candidate.comparison_material_with_held_channel_storage(
+                        &comparison_opening.constitution,
+                    )?
+                } else {
+                    candidate.comparison_material(&comparison_opening.constitution)?
+                };
                 let boundary = PairedObservation::admit(&field, &opening.constitution, pairing)?;
                 let cells = match placement {
                     Some(placed) => {
@@ -1148,7 +1256,9 @@ impl Reference {
                     }
                     None => boundary.encode(&classes[..consumed])?,
                 };
-                probe_subphases.push((attempt, "source_readmission", readmission_start.elapsed()));
+                if !held_ck {
+                    probe_subphases.push((attempt, "source_readmission", readmission_start.elapsed()));
+                }
                 let forward_start = Instant::now();
                 let forward = if selected_forward {
                     self.read_epoch_probe_at_cuts_with_execution(
@@ -1170,7 +1280,9 @@ impl Reference {
                         "the candidate probe keeps the original source and receiving clocks",
                     ));
                 }
-                probe_subphases.push((attempt, "forward_and_clock_check", forward_start.elapsed()));
+                if !held_ck {
+                    probe_subphases.push((attempt, "forward_and_clock_check", forward_start.elapsed()));
+                }
                 let tree_start = Instant::now();
                 // Rebuild the prequential schedule from the ORIGINAL tree,
                 // never the tree already updated by the staged candidate.
@@ -1217,7 +1329,9 @@ impl Reference {
                         phases.grain(),
                     )?
                 };
-                probe_subphases.push((attempt, "tree_schedule", tree_start.elapsed()));
+                if !held_ck {
+                    probe_subphases.push((attempt, "tree_schedule", tree_start.elapsed()));
+                }
                 let combine_start = Instant::now();
                 let mut combined = Faces {
                     faces: Vec::new(),
@@ -1236,7 +1350,9 @@ impl Reference {
                     combined.faces.extend(face.faces);
                     combined.logits.extend(face.logits);
                 }
-                probe_subphases.push((attempt, "target_phase_and_combine", combine_start.elapsed()));
+                if !held_ck {
+                    probe_subphases.push((attempt, "target_phase_and_combine", combine_start.elapsed()));
+                }
                 let objective_start = Instant::now();
                 let reading = frozen_comparison.evaluate(
                     comparison_opening
@@ -1247,11 +1363,15 @@ impl Reference {
                     &combined,
                     &trees,
                 );
-                probe_subphases.push((attempt, "objective", objective_start.elapsed()));
+                if !held_ck {
+                    probe_subphases.push((attempt, "objective", objective_start.elapsed()));
+                }
                 reading
                 // forward and its counterfactual reception end die here.
             };
         let mut comparison = None;
+        let mut channel_material_probe_refusals = Vec::new();
+        let mut channel_storage_ablations = Vec::new();
         let mut joint_eligible = shared_normals;
         let mut publication_attempt = EpochStageAttempt::Whole;
         let mut joint_attempted = false;
@@ -1299,10 +1419,30 @@ impl Reference {
                     // the SAME exterior class codec, pairing and placement; an old
                     // PairedObservation is correctly refused after E changes.
                     let probe_start = Instant::now();
-                    let probe = probe_candidate(EpochStageAttempt::Whole, &candidate);
+                    let ablation_eligible = execution.channel_storage_ablation_control()
+                        && has_applied_channel_storage_change(candidate.channel_endpoints());
+                    let probe = probe_candidate(EpochStageAttempt::Whole, &candidate, false);
                     whole_probe = Some(probe_start.elapsed());
                     match probe {
                         Ok(reading) => {
+                            if ablation_eligible {
+                                let (held_ck, refusal) = match probe_candidate(
+                                    EpochStageAttempt::Whole,
+                                    &candidate,
+                                    true,
+                                ) {
+                                    Ok(reading) => (Some(reading), None),
+                                    Err(error) => (None, Some(error.to_string())),
+                                };
+                                channel_storage_ablations.push(
+                                    ObservedChannelStorageAblationReading {
+                                        attempt: EpochStageAttempt::Whole,
+                                        actual: reading.clone(),
+                                        held_ck,
+                                        refusal,
+                                    },
+                                );
+                            }
                             probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
                             let neutral = reading.unchanged || reading.objective_equal();
                             let admitted = if neutral {
@@ -1328,10 +1468,24 @@ impl Reference {
                         Err(error) => {
                             // Unknown executor/identity/arithmetic failures do not select another
                             // NormalMaps proposal. Known native mathematical domain refusals may.
-                            if shared_normals && !receiving_restage_permitted(&error) {
+                            let endpoint_refusal = channel_material_probe_refusal(
+                                &error,
+                                deposition_scope,
+                                EpochStageAttempt::Whole,
+                                candidate.channel_endpoints(),
+                            );
+                            if let Some(refusal) = &endpoint_refusal {
+                                channel_material_probe_refusals.push(refusal.clone());
+                            }
+                            if shared_normals
+                                && !receiving_restage_permitted(&error)
+                                && endpoint_refusal.is_none()
+                            {
                                 return Err(error);
                             }
-                            joint_eligible = shared_normals && receiving_restage_permitted(&error);
+                            joint_eligible = shared_normals
+                                && (receiving_restage_permitted(&error)
+                                    || endpoint_refusal.is_some());
                             whole_refusal = Some(error.to_string());
                             None
                         }
@@ -1397,10 +1551,30 @@ impl Reference {
                         joint_directions = candidate.joint_directions();
                         joint_probe_state = ObservedEpochProbeState::ProbeFailed;
                         let probe_start = Instant::now();
-                        let probe = probe_candidate(EpochStageAttempt::Joint, &candidate);
+                        let ablation_eligible = execution.channel_storage_ablation_control()
+                            && has_applied_channel_storage_change(candidate.channel_endpoints());
+                        let probe = probe_candidate(EpochStageAttempt::Joint, &candidate, false);
                         joint_probe = Some(probe_start.elapsed());
                         match probe {
                             Ok(reading) => {
+                                if ablation_eligible {
+                                    let (held_ck, refusal) = match probe_candidate(
+                                        EpochStageAttempt::Joint,
+                                        &candidate,
+                                        true,
+                                    ) {
+                                        Ok(reading) => (Some(reading), None),
+                                        Err(error) => (None, Some(error.to_string())),
+                                    };
+                                    channel_storage_ablations.push(
+                                        ObservedChannelStorageAblationReading {
+                                            attempt: EpochStageAttempt::Joint,
+                                            actual: reading.clone(),
+                                            held_ck,
+                                            refusal,
+                                        },
+                                    );
+                                }
                                 joint_probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
                                 let neutral = reading.unchanged || reading.objective_equal();
                                 let admitted = if neutral {
@@ -1424,7 +1598,18 @@ impl Reference {
                                 });
                             }
                             Err(error) => {
-                                if !receiving_restage_permitted(&error) {
+                                let endpoint_refusal = channel_material_probe_refusal(
+                                    &error,
+                                    deposition_scope,
+                                    EpochStageAttempt::Joint,
+                                    candidate.channel_endpoints(),
+                                );
+                                if let Some(refusal) = &endpoint_refusal {
+                                    channel_material_probe_refusals.push(refusal.clone());
+                                }
+                                if !receiving_restage_permitted(&error)
+                                    && endpoint_refusal.is_none()
+                                {
                                     return Err(error);
                                 }
                                 joint_refusal = Some(error.to_string());
@@ -1530,6 +1715,21 @@ impl Reference {
             return Err(refusal(
                 "a D-only physical epoch may publish only with exactly zero held deposition work",
             ));
+        }
+        if deposition_scope == ObservedEpochDepositionScope::NormalMapsAndChannelMaterial {
+            let applied_channel_work: Rat = deposit
+                .epoch
+                .as_ref()
+                .ok_or_else(|| refusal("a channel material epoch retains endpoint readings"))?
+                .channel_endpoints
+                .iter()
+                .map(|endpoint| endpoint.applied_work.clone())
+                .sum();
+            if applied_channel_work != deposition_work || applied_channel_work > Rat::zero() {
+                return Err(refusal(
+                    "channel material endpoint work closes the same nonpositive held deposition",
+                ));
+            }
         }
         let energy = ObservedEpochEnergy {
             words: energy_words,
@@ -1643,6 +1843,8 @@ impl Reference {
             outcome,
             deposition_scope,
             comparison,
+            channel_material_probe_refusals,
+            channel_storage_ablations,
             whole_refusal,
             whole_stage_refusal,
             probe_state,
@@ -1667,6 +1869,110 @@ mod tests {
     use crate::hnn::paired::PairedCarrier;
     use crate::hnn::tests::learning::chain_declaration;
     use crate::ratio::rat;
+
+    #[test]
+    fn channel_material_probe_refusal_requires_matching_nonzero_c_endpoint() {
+        let zero = ExactRatMatrix::zero(1, 1).unwrap();
+        let nonzero = ExactRatMatrix::new(vec![vec![Rat::one()]]).unwrap();
+        let reading = |contact, c_delta: ExactRatMatrix, k_delta: ExactRatMatrix| {
+            crate::hnn::constitution::EpochChannelEndpointReading {
+                contact,
+                producing_tick: 0,
+                momentum: vec![],
+                rate_before: vec![],
+                rate_after: vec![],
+                attempted_work: None,
+                applied_work: Rat::zero(),
+                reflected: None,
+                attempted_factor_delta: [zero.clone(), zero.clone()],
+                applied_factor_delta: [c_delta.clone(), k_delta.clone()],
+                applied_form_delta: [c_delta, k_delta],
+                reflected_entries: vec![],
+            }
+        };
+        let error = HnnError::HeldMomentum { contact: 2 };
+        let changed_c = reading(2, nonzero.clone(), zero.clone());
+        let unchanged_c_with_k = reading(2, zero.clone(), nonzero.clone());
+        let changed_other_contact = reading(1, nonzero.clone(), zero.clone());
+        let unchanged_forms = reading(2, zero.clone(), zero.clone());
+        assert!(!has_applied_channel_storage_change(std::slice::from_ref(
+            &unchanged_forms,
+        )));
+        assert!(has_applied_channel_storage_change(std::slice::from_ref(
+            &unchanged_c_with_k,
+        )));
+        assert!(has_applied_channel_storage_change(std::slice::from_ref(&changed_c)));
+
+        assert_eq!(
+            channel_material_probe_refusal(
+                &error,
+                ObservedEpochDepositionScope::NormalMaps,
+                EpochStageAttempt::Whole,
+                std::slice::from_ref(&changed_c),
+            ),
+            None,
+        );
+        assert_eq!(
+            channel_material_probe_refusal(
+                &error,
+                ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+                EpochStageAttempt::Whole,
+                std::slice::from_ref(&unchanged_c_with_k),
+            ),
+            None,
+        );
+        assert_eq!(
+            channel_material_probe_refusal(
+                &error,
+                ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+                EpochStageAttempt::Whole,
+                std::slice::from_ref(&changed_other_contact),
+            ),
+            None,
+        );
+        assert_eq!(
+            channel_material_probe_refusal(
+                &error,
+                ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+                EpochStageAttempt::ReceivingOnly,
+                std::slice::from_ref(&changed_c),
+            ),
+            None,
+        );
+        assert_eq!(
+            channel_material_probe_refusal(
+                &error,
+                ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+                EpochStageAttempt::Whole,
+                std::slice::from_ref(&changed_c),
+            ),
+            Some(ChannelMaterialProbeRefusal {
+                attempt: EpochStageAttempt::Whole,
+                contact: 2,
+            }),
+        );
+        assert_eq!(
+            channel_material_probe_refusal(
+                &error,
+                ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+                EpochStageAttempt::Joint,
+                std::slice::from_ref(&changed_c),
+            ),
+            Some(ChannelMaterialProbeRefusal {
+                attempt: EpochStageAttempt::Joint,
+                contact: 2,
+            }),
+        );
+        assert_eq!(
+            channel_material_probe_refusal(
+                &HnnError::MissingReach,
+                ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+                EpochStageAttempt::Whole,
+                std::slice::from_ref(&changed_c),
+            ),
+            None,
+        );
+    }
 
     /// Durations are exterior observations, so the control checks attempted-call presence
     /// and disjoint wall containment, never an arbitrary minimum elapsed time.
@@ -4125,6 +4431,100 @@ mod tests {
         ).is_err());
         assert_eq!(actual.continuing_state(0).unwrap(), before);
         assert_eq!(crib, saved_crib);
+    }
+
+    #[test]
+    fn channel_material_scope_closes_endpoint_work_and_cold_prefix_continuation() {
+        let (reference, _, opening, mut warm_crib, pairing) = source_probe_opening();
+        let field = opening.field.clone();
+        let opening_material = opening.constitution.clone();
+        let mut warm = opening.clone();
+        let first = reference.observe_epoch_continuing_at_cuts_with_scope(
+            &mut warm,
+            &mut warm_crib,
+            &pairing,
+            &[0; 32],
+            None,
+            &[],
+            false,
+            &HostObservedEpochExecution,
+            ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+        ).unwrap();
+        assert_eq!(first.deposition_scope, ObservedEpochDepositionScope::NormalMapsAndChannelMaterial);
+        assert!(first.energy.closes());
+        assert!(first.energy.deposition_work <= Rat::zero());
+        assert!(first.channel_storage_ablations.is_empty());
+        let endpoints = &first.deposit.epoch.as_ref().unwrap().channel_endpoints;
+        let contacts: Vec<_> = endpoints.iter().map(|endpoint| endpoint.contact).collect();
+        assert_eq!(contacts, (0..field.contacts().len()).collect::<Vec<_>>());
+        let endpoint_work: Rat = endpoints.iter().map(|endpoint| endpoint.applied_work.clone()).sum();
+        assert_eq!(endpoint_work, first.energy.deposition_work);
+
+        let saved = warm.continuing_state(0).unwrap().to_text();
+        let parsed = ContinuingState::from_text(&saved, opening_material.budget()).unwrap();
+        let mut cold = reference.mount_continued(
+            &field,
+            &Current::at_rest(&field),
+            opening_material,
+            &parsed,
+        ).unwrap();
+        let mut cold_crib = warm_crib.clone();
+        assert_eq!(cold.continuing_state(0).unwrap().to_text(), saved);
+        assert_eq!(cold.current, warm.current);
+        assert_eq!(cold.constitution, warm.constitution);
+        assert_eq!(cold_crib, warm_crib);
+
+        let warm_next = reference.observe_epoch_continuing_at_cuts_with_scope(
+            &mut warm,
+            &mut warm_crib,
+            &pairing,
+            &[0; 32],
+            None,
+            &[1],
+            false,
+            &HostObservedEpochExecution,
+            ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+        ).unwrap();
+        let cold_next = reference.observe_epoch_continuing_at_cuts_with_scope(
+            &mut cold,
+            &mut cold_crib,
+            &pairing,
+            &[0; 32],
+            None,
+            &[1],
+            false,
+            &HostObservedEpochExecution,
+            ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+        ).unwrap();
+        assert_eq!(warm_next.consumed, cold_next.consumed);
+        assert_eq!(warm_next.reads, cold_next.reads);
+        assert_eq!(warm_next.deposit, cold_next.deposit);
+        assert_eq!(warm_next.energy, cold_next.energy);
+        assert_eq!(warm_next.prefixes.len(), 1);
+        assert_eq!(cold_next.prefixes.len(), 1);
+        assert_eq!(
+            warm_next.prefixes[0].1.continuing_state(0).unwrap(),
+            cold_next.prefixes[0].1.continuing_state(0).unwrap(),
+        );
+        assert_eq!(warm_next.prefixes[0].2, cold_next.prefixes[0].2);
+        assert_eq!(warm.continuing_state(0).unwrap(), cold.continuing_state(0).unwrap());
+        assert_eq!(warm_crib, cold_crib);
+
+        let before = warm.continuing_state(0).unwrap();
+        let saved_crib = warm_crib.clone();
+        assert!(reference.observe_epoch_continuing_at_cuts_with_scope(
+            &mut warm,
+            &mut warm_crib,
+            &pairing,
+            &[4],
+            None,
+            &[],
+            false,
+            &HostObservedEpochExecution,
+            ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+        ).is_err());
+        assert_eq!(warm.continuing_state(0).unwrap(), before);
+        assert_eq!(warm_crib, saved_crib);
     }
 
     #[test]

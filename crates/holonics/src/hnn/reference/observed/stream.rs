@@ -337,6 +337,7 @@ impl ObservedStream {
             ObservedEpochDepositionScope::All => "all",
             ObservedEpochDepositionScope::NormalMaps => "normal-maps",
             ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => "normal-maps-channel-dissipation",
+            ObservedEpochDepositionScope::NormalMapsAndChannelMaterial => "normal-maps-channel-material",
         };
         format!(
             "observed-stream-pending-v1 {scope} {} {} {}\n{}\n",
@@ -370,6 +371,7 @@ impl ObservedStream {
             "all" => ObservedEpochDepositionScope::All,
             "normal-maps" => ObservedEpochDepositionScope::NormalMaps,
             "normal-maps-channel-dissipation" => ObservedEpochDepositionScope::NormalMapsAndChannelDissipation,
+            "normal-maps-channel-material" => ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
             _ => return Err(refuse("the saved observed deposition scope")),
         };
         let commit: u64 = header[2]

@@ -3086,6 +3086,8 @@ pub struct EpochChannelGrainRestageReading {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochDepositReading {
+    /// Actual producing-cut C/K dispositions, only in the explicitly selected material scope.
+    pub channel_endpoints: Vec<EpochChannelEndpointReading>,
     pub channel_grain: Option<EpochChannelGrainReading>,
     pub channel_grain_deferred: Option<EpochChannelGrainDeferralReading>,
     pub channel_grain_restaged: Option<EpochChannelGrainRestageReading>,
@@ -3101,6 +3103,23 @@ pub struct EpochDepositReading {
     pub fresh_joint: Option<JointReading>,
     pub fresh_steps: Vec<(Locus, StepReading)>,
     pub receiving: EpochReceivingSeries,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochChannelEndpointReading {
+    pub contact: usize,
+    pub producing_tick: usize,
+    pub momentum: Vec<Rat>,
+    pub rate_before: Vec<Rat>,
+    pub rate_after: Vec<Rat>,
+    pub attempted_work: Option<Rat>,
+    pub applied_work: Rat,
+    pub reflected: Option<&'static str>,
+    pub attempted_factor_delta: [ExactRatMatrix; 2],
+    pub applied_factor_delta: [ExactRatMatrix; 2],
+    pub applied_form_delta: [ExactRatMatrix; 2],
+    /// Unpublished factor residuals/quotients removed by reflection, kept as evidence only.
+    pub reflected_entries: Vec<(Carrier, usize, Rat, BigInt)>,
 }
 
 impl EpochArrayReading {
@@ -8151,19 +8170,52 @@ impl Constitution {
                     // Exterior operands at the existing refusal, not a substitute ray or rate.
                     // An actually supplied zero-aligned factor is filtered above; distinguish
                     // it from a genuinely absent request without changing certificate admission.
-                    if let Some((_, face)) = supplied_factor_faces.iter().find(|(at, face)| *at == locus && face.family == family) {
+                    if let Some((_, face)) = supplied_factor_faces
+                        .iter()
+                        .find(|(at, face)| *at == locus && face.family == family)
+                    {
                         refusal = refusal
-                            .read("provided_certificate_alignment", epoch::EpochStageValue::Ratio(face.alignment.clone()))
-                            .read("provided_covector", epoch::EpochStageValue::Ratio(face.covector.clone()))
-                            .read("provided_scale", epoch::EpochStageValue::Ratio(face.scale.clone()))
-                            .read("provided_energy", epoch::EpochStageValue::Ratio(face.energy.clone()))
-                            .read("original_request_index", epoch::EpochStageValue::Index(face.index))
-                            .read("supplied_factor_has_zero_alignment", epoch::EpochStageValue::Index(usize::from(face.alignment.is_zero())));
+                            .read(
+                                "provided_certificate_alignment",
+                                epoch::EpochStageValue::Ratio(face.alignment.clone()),
+                            )
+                            .read(
+                                "provided_covector",
+                                epoch::EpochStageValue::Ratio(face.covector.clone()),
+                            )
+                            .read(
+                                "provided_scale",
+                                epoch::EpochStageValue::Ratio(face.scale.clone()),
+                            )
+                            .read(
+                                "provided_energy",
+                                epoch::EpochStageValue::Ratio(face.energy.clone()),
+                            )
+                            .read(
+                                "original_request_index",
+                                epoch::EpochStageValue::Index(face.index),
+                            )
+                            .read(
+                                "supplied_factor_has_zero_alignment",
+                                epoch::EpochStageValue::Index(usize::from(
+                                    face.alignment.is_zero(),
+                                )),
+                            );
                     } else {
-                        refusal = refusal.read("provided_factor", epoch::EpochStageValue::Unavailable("no matching prepared factor was supplied"));
+                        refusal = refusal.read(
+                            "provided_factor",
+                            epoch::EpochStageValue::Unavailable(
+                                "no matching prepared factor was supplied",
+                            ),
+                        );
                     }
                     if let Some(exponent) = declared.exponent(locus, family) {
-                        refusal = refusal.read("declared_eta", epoch::EpochStageValue::Ratio(crate::holon::deposition::dyadic(exponent)));
+                        refusal = refusal.read(
+                            "declared_eta",
+                            epoch::EpochStageValue::Ratio(crate::holon::deposition::dyadic(
+                                exponent,
+                            )),
+                        );
                     }
                     refusal.first(evidence);
                     return Ok(Err(DeclaredStepRefusal::Undeclared { locus, family }));
@@ -9339,12 +9391,21 @@ impl Constitution {
         let stroke = if let Some(lattice) = lattice {
             let index = steps.first().map_or(0, |(index, _)| *index);
             if !matches!(locus, Locus::Channel(_)) {
-                return Err((index, HnnError::Unadmitted { reason: "an epoch lattice override belongs only to a channel" }));
+                return Err((
+                    index,
+                    HnnError::Unadmitted {
+                        reason: "an epoch lattice override belongs only to a channel",
+                    },
+                ));
             }
-            let clock = self.clock(locus).checked_add(1)
+            let clock = self
+                .clock(locus)
+                .checked_add(1)
                 .ok_or_else(|| (index, HnnError::from(ExactLinearError::ExtentOverflow)))?;
             Some(BudgetedCarry::new(lattice, clock))
-        } else { None };
+        } else {
+            None
+        };
         let mut prepared = Prepared {
             stroke,
             linear: None,
@@ -9925,38 +9986,100 @@ mod candidate_relative_step_tests {
 
     #[test]
     fn missing_declared_zero_factor_reports_actual_supplied_operands_without_admission() {
-        let field = Field::declare(crate::hnn::tests::learning::chain_declaration(1 << 16).by_lattice_rule()).unwrap();
+        let field = Field::declare(
+            crate::hnn::tests::learning::chain_declaration(1 << 16).by_lattice_rule(),
+        )
+        .unwrap();
         let material = Constitution::initial(&field, 1 << 40).unwrap();
         let receiver = field.receivers()[0].ring;
         let make = |contact, alignment| FactorPrepared {
-            index: contact, family: Family::Factor(2), scale: rat(3, 2), alignment,
-            covector: Rat::one(), energy: Rat::zero(),
-            moves: channel_factor_moves(2, &material.contacts[contact].dissipation, (Rat::one(), Rat::one()), &material.hop),
+            index: contact,
+            family: Family::Factor(2),
+            scale: rat(3, 2),
+            alignment,
+            covector: Rat::one(),
+            energy: Rat::zero(),
+            moves: channel_factor_moves(
+                2,
+                &material.contacts[contact].dissipation,
+                (Rat::one(), Rat::one()),
+                &material.hop,
+            ),
         };
         let tiny = Rat::new(BigInt::one(), BigInt::one() << 200usize);
         let first = make(0, floor(&tiny));
-        assert!(first.alignment.is_positive() && first.alignment <= tiny,
-            "the relative significant-bit floor preserves arbitrarily small positive alignment");
+        assert!(
+            first.alignment.is_positive() && first.alignment <= tiny,
+            "the relative significant-bit floor preserves arbitrarily small positive alignment"
+        );
         let zero = make(1, Rat::zero());
         let factors = [(Locus::Channel(0), &first), (Locus::Channel(1), &zero)];
-        let declared = DeclaredExponents { steps: (0..2).map(|contact| ((Locus::Channel(contact), Family::Factor(2)), DeclaredExponent { exponent: 0, reach: None })).collect() };
-        let reach = Reach { receiver, stations: vec![2, 4], entries: vec![0], phases: 1,
-            loci: crate::hnn::retention::loci(&field).into_iter().collect(), passages: vec![] };
+        let declared = DeclaredExponents {
+            steps: (0..2)
+                .map(|contact| {
+                    (
+                        (Locus::Channel(contact), Family::Factor(2)),
+                        DeclaredExponent {
+                            exponent: 0,
+                            reach: None,
+                        },
+                    )
+                })
+                .collect(),
+        };
+        let reach = Reach {
+            receiver,
+            stations: vec![2, 4],
+            entries: vec![0],
+            phases: 1,
+            loci: crate::hnn::retention::loci(&field).into_iter().collect(),
+            passages: vec![],
+        };
         let mut evidence = None;
-        let result = material.certify_steps_with_epoch_evidence(Some(&reach), &[], &factors, None,
-            StepSource::Actual(&declared), None, None, &mut evidence).unwrap();
-        assert!(result.is_err(), "a declared zero-aligned moving factor cannot gain admission");
+        let result = material
+            .certify_steps_with_epoch_evidence(
+                Some(&reach),
+                &[],
+                &factors,
+                None,
+                StepSource::Actual(&declared),
+                None,
+                None,
+                &mut evidence,
+            )
+            .unwrap();
+        assert!(
+            result.is_err(),
+            "a declared zero-aligned moving factor cannot gain admission"
+        );
         let evidence = evidence.unwrap();
-        assert_eq!((evidence.locus, evidence.family), (Some(Locus::Channel(1)), Some(Family::Factor(2))));
-        assert_eq!(evidence.condition, epoch::EpochStageCondition::DeclaredFamily);
+        assert_eq!(
+            (evidence.locus, evidence.family),
+            (Some(Locus::Channel(1)), Some(Family::Factor(2)))
+        );
+        assert_eq!(
+            evidence.condition,
+            epoch::EpochStageCondition::DeclaredFamily
+        );
         for (name, expected) in [
-            ("provided_certificate_alignment", epoch::EpochStageValue::Ratio(Rat::zero())),
+            (
+                "provided_certificate_alignment",
+                epoch::EpochStageValue::Ratio(Rat::zero()),
+            ),
             ("provided_scale", epoch::EpochStageValue::Ratio(rat(3, 2))),
             ("original_request_index", epoch::EpochStageValue::Index(1)),
-            ("supplied_factor_has_zero_alignment", epoch::EpochStageValue::Index(1)),
+            (
+                "supplied_factor_has_zero_alignment",
+                epoch::EpochStageValue::Index(1),
+            ),
             ("declared_eta", epoch::EpochStageValue::Ratio(Rat::one())),
         ] {
-            assert!(evidence.readings.iter().any(|r| r.name == name && r.value == expected));
+            assert!(
+                evidence
+                    .readings
+                    .iter()
+                    .any(|r| r.name == name && r.value == expected)
+            );
         }
     }
 
@@ -11078,7 +11201,11 @@ fn channel_factor_moves(
     hop: &Rat,
 ) -> Moves {
     // The transit reads 2C(w-omega), hK(u+h omega/2), hD omega.
-    let weight = if family == 0 { rat(16, 1) } else { rat(4, 1) * hop * hop };
+    let weight = if family == 0 {
+        rat(16, 1)
+    } else {
+        rat(4, 1) * hop * hop
+    };
     Moves::Square {
         weight,
         unit: ceilings(&direction_norms),
@@ -12593,6 +12720,29 @@ impl LearnedRing {
 }
 
 impl ContinuingState {
+    /// Exterior matched C/K ablation. This is a disposable control chart, never
+    /// a deposition/publication law: retain the candidate's complete motion,
+    /// normals, statistics, D and clocks, while restoring only predecessor C/K
+    /// factors and their physical arithmetic fibres on the same channel lattice.
+    pub fn held_channel_storage_control(&self, predecessor: &Self) -> Result<Self, HnnError> {
+        if self.material != predecessor.material || self.contacts.len() != predecessor.contacts.len()
+            || self.lattices.iter().filter(|(l,_)| matches!(l,Locus::Channel(_)))
+                .ne(predecessor.lattices.iter().filter(|(l,_)| matches!(l,Locus::Channel(_)))) {
+            return Err(HnnError::Unadmitted { reason: "a C/K control keeps its original material declaration and channel lattice" });
+        }
+        let mut control = self.clone();
+        for (contact, (next, old)) in control.contacts.iter_mut().zip(&predecessor.contacts).enumerate() {
+            next.storage = old.storage.clone();
+            next.stiffness = old.stiffness.clone();
+            for family in 0..2 {
+                let key = (Locus::Channel(contact), Carrier::Factor(family));
+                control.carries.remove(&key);
+                if let Some(carry) = predecessor.carries.get(&key) { control.carries.insert(key, carry.clone()); }
+            }
+        }
+        Ok(control)
+    }
+
     pub fn founded(&self) -> &[crate::hnn::FoundedRing] {
         &self.founded
     }
