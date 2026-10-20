@@ -1,5 +1,6 @@
-//! A detached receiving-map intervention at an actual kept native read.
-//! No source, clock, tree, population, current, chart, carry or constitution is changed.
+//! Receiving-map interventions at an actual kept native read, with an optional factual-prefix
+//! diagnostic consumer. Read-only interventions change no producing operand. The prefix consumer
+//! stages only actual target reception/ingress on a caller-owned fork, with native R frozen.
 
 use super::*;
 use crate::compression::landmark::context::LandmarkFace;
@@ -7,6 +8,7 @@ use crate::hnn::constitution::ReceivingLayout;
 use crate::hnn::receiving::cells::ScoredFaceReading;
 use crate::hnn::receiving::cells::diagnostic::{ReadoutMapDiagnostic, compare_readout_maps_at};
 use crate::hnn::receiving::ReceivingCarrier;
+use crate::hnn::receiving::cells::diagnostic::{ReadoutClassCodeDiagnostic, compare_readout_class_codes_at};
 
 /// Exterior provenance and both operative R reads from one pending aperture-one word. The
 /// control is a readout substitution on fixed features, never a replacement live constitution.
@@ -24,7 +26,147 @@ pub struct PendingReadoutDiagnostic {
     pub readout: ReadoutMapDiagnostic,
 }
 
+/// Exterior same-prefix R-only class-code observation and its actual target ingress.
+/// The target is ordinary observed boundary input, never a fabricated release decision.
+/// No normal-law sample/deposition is published by this diagnostic consumer.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TargetPrefixReadoutControlReceipt {
+    pub diagnostic: PendingReadoutDiagnostic,
+    pub codes: ReadoutClassCodeDiagnostic,
+    pub ingestion: IngestClassReceipt,
+}
+
 impl Reference {
+    /// Score an actual target on the blind kept word under native and control R, on identical
+    /// feature/tree/population, then receive that factual prefix on a caller-owned private fork.
+    ///
+    /// [agent-inferred consuming join] The sequence uses the existing native score, addressed
+    /// tree reception, `observed_epoch_prefix`, arrival ledger and shared class ingress owners.
+    /// The material maps are never deposited. A supplied frozen native R is checked both before
+    /// and after ingress, including a possible actual aeon close. Every refusal is atomic in
+    /// resident and crib. The caller keeps the main checkpoint apart and bounds the held-out
+    /// source; this one-cell API imposes no guessed EOS, source padding or raised work limit.
+    ///
+    /// Later prefixes follow the factual native population/tree history. The founding-R arm
+    /// is re-read at that SAME history, not a separately adapted counterfactual population.
+    /// Code differences therefore isolate R at the reached feature; they do not attribute a
+    /// whole-life gain to R, source learning or semantics. The returned receipt is exterior
+    /// evidence; the resident retains only its existing contemporary arrival and sufficient
+    /// source/tree/population operands, never a new event list or adjoint tape.
+    #[allow(clippy::too_many_arguments)]
+    pub fn receive_target_prefix_readout_control(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        pending: PendingId,
+        target: usize,
+        expected_native_map: &ExactRatMatrix,
+        control_map: &ExactRatMatrix,
+        bits: u32,
+        placement: Option<&OccurrencePlacement>,
+    ) -> Result<TargetPrefixReadoutControlReceipt, HnnError> {
+        let refuse = |reason| HnnError::Unadmitted { reason };
+        resident.admit_exact_current()?;
+        if resident.pending.len() != 1 || !resident.staged.is_empty() || resident.moments.len() != 1
+        {
+            return Err(refuse(
+                "a target-prefix control consumes one actual pending word and source moment",
+            ));
+        }
+        let slot = resident
+            .pending
+            .get(&pending)
+            .ok_or(HnnError::UnknownHandle {
+                handle: Handle::Pending(pending),
+            })?;
+        if slot.ratio.current(&resident.field)? != resident.current
+            || resident.moments.values().next() != Some(slot.ratio.moment())
+        {
+            return Err(refuse(
+                "a target-prefix control continues its actual producing current and moment",
+            ));
+        }
+        // This authenticates the actual kept feature/face before consulting the target's class.
+        let diagnostic = self.diagnose_pending_readout(resident, &pending, control_map, bits)?;
+        if &diagnostic.native_map != expected_native_map {
+            return Err(refuse(
+                "a target-prefix control keeps the caller's frozen native receiving map",
+            ));
+        }
+        admit_observed_cell(resident, crib, pairing, target, placement)?;
+        let codes = compare_readout_class_codes_at(
+            &diagnostic.scored_face,
+            &diagnostic.tree,
+            &diagnostic.readout.feature,
+            &diagnostic.native_map,
+            &diagnostic.readout.native_wave_logits,
+            control_map,
+            target,
+            bits,
+        )?;
+        let phases = slot.ratio.phases();
+        let receiver = phases.ring();
+        let kept = slot
+            .kept
+            .as_ref()
+            .ok_or_else(|| refuse("a target-prefix code keeps its producing word"))?;
+        let against = slot
+            .ratio
+            .against(&resident.constitution, &kept.faces, &[])?;
+        // Prefix reception uses the ordinary native likelihood precision, independently of
+        // how finely this diagnostic's class codes were requested. This is score's own step.
+        let scored = slot
+            .ratio
+            .scored(&resident.constitution, &against, &[target])?;
+        let mut tree = resident
+            .constitution
+            .landmarks(receiver)
+            .ok_or(HnnError::MissingReceivingMap { ring: receiver })?
+            .clone();
+        let read_tree = match slot.ratio.observed_addresses(&[])? {
+            Some(addresses) => {
+                tree.receive_observed_arrivals(&addresses, &[target], phases.grain())?
+            }
+            None => {
+                tree.receive_arrivals(&slot.ratio.addresses(&[])?, &[target], phases.grain())?
+            }
+        };
+        if read_tree.as_slice() != against.trees.as_slice() {
+            return Err(refuse(
+                "the target code and tree reception keep the same actual address and face",
+            ));
+        }
+        let arrived = Arrived {
+            ratio: slot.ratio.clone(),
+            targets: vec![target],
+            opening: slot.opening.clone(),
+        };
+        let mut next = resident.clone();
+        let mut next_crib = crib.clone();
+        next.constitution =
+            next.constitution
+                .observed_epoch_prefix(receiver, tree, &scored.steps)?;
+        next.ledger.arrive(scored.model[0].clone(), 1);
+        next.arrived = Some(arrived);
+        self.discard(&mut next, Handle::Pending(pending))?;
+        let ingestion =
+            self.ingest_class_step(&mut next, &mut next_crib, pairing, target, placement)?;
+        if next.constitution.receiving_map(receiver) != Some(expected_native_map) {
+            return Err(refuse(
+                "actual target-prefix ingress must preserve the frozen native receiving map",
+            ));
+        }
+        *resident = next;
+        *crib = next_crib;
+        Ok(TargetPrefixReadoutControlReceipt {
+            diagnostic,
+            codes,
+            ingestion,
+        })
+    }
+
+
     /// Compare the native and a declared control R on the *same actual kept-word feature*.
     /// This aperture-one Physical/Anchor diagnostic freezes the tree and the population before
     /// any target/release reception. Other layouts and a missing/stale kept read refuse. The
@@ -146,5 +288,352 @@ mod tests {
         let corrupt = format!("{resident:?}");
         assert!(reference.diagnose_pending_readout(&resident, &pending, &map, READING_BITS).is_err());
         assert_eq!(format!("{resident:?}"), corrupt);
+    }
+    fn target_opening(
+        before_carry: bool,
+    ) -> (
+        Reference,
+        Resident,
+        ObservedCrib,
+        PairingDeclaration,
+        Constitution,
+    ) {
+        use crate::hnn::paired::PairedCarrier;
+        let base = small_field_of(
+            &[5, 2, 3],
+            vec![contact(0, 1, 1, 0), contact(1, 2, 1, 0)],
+            2,
+            4,
+        );
+        let mut declaration = base.declaration().clone();
+        declaration.receivers[0].aperture = 1;
+        declaration.rings[0].lock = (0..4).collect();
+        for ring in &mut declaration.rings[1..] {
+            ring.lock.clear();
+        }
+        declaration.lattice.clear();
+        let field = Field::declare(declaration.by_lattice_rule()).unwrap();
+        let pairing = PairingDeclaration::Family {
+            table: (0..4).map(|class| (class, class ^ 1)).collect(),
+        };
+        let material = PairedCarrier::found(
+            &field,
+            Constitution::initial(&field, 1 << 40).unwrap(),
+            0,
+            &pairing,
+        )
+        .unwrap()
+        .0;
+        let reference = Reference::new(16, 1 << 40);
+        let current = if before_carry {
+            Current::at(
+                &field,
+                field
+                    .rings()
+                    .iter()
+                    .map(|ring| BigInt::from(ring.period() - 1))
+                    .collect(),
+            )
+            .unwrap()
+        } else {
+            Current::at_rest(&field)
+        };
+        let mut resident = reference
+            .mount_with(&field, &current, material.clone())
+            .unwrap();
+        let boundary = PairedObservation::admit(&field, &material, &pairing).unwrap();
+        reference
+            .ingest(&mut resident, None, &boundary.encode(&[]).unwrap())
+            .unwrap();
+        (reference, resident, ObservedCrib::new(0), pairing, material)
+    }
+
+    fn target_pending(port: &Reference, resident: &mut Resident) -> PendingId {
+        let moment = resident.continuing().unwrap().0;
+        let phases = resident.admitted[0].clone();
+        port.refine(resident, &moment, &phases).unwrap().0
+    }
+
+    #[test]
+    fn target_prefix_control_matches_native_score_and_advances_only_factual_prefix_statistics() {
+        let (port, mut resident, mut crib, pairing, _) = target_opening(false);
+        let trunk = resident.clone();
+        let ring = resident.admitted[0].ring();
+        let frozen = resident.constitution.receiving_map(ring).unwrap().clone();
+        for target in [0, 1, 3] {
+            let pending = target_pending(&port, &mut resident);
+            let slot = &resident.pending[&pending];
+            let phases = slot.ratio.phases();
+            let against = slot
+                .ratio
+                .against(
+                    &resident.constitution,
+                    &slot.kept.as_ref().unwrap().faces,
+                    &[],
+                )
+                .unwrap();
+            let scored = slot
+                .ratio
+                .scored(&resident.constitution, &against, &[target])
+                .unwrap();
+            let population_before = resident.constitution.population(ring).unwrap().clone();
+            let mut expected_tree = resident.constitution.landmarks(ring).unwrap().clone();
+            expected_tree
+                .receive(&slot.ratio.addresses(&[]).unwrap()[0], target)
+                .unwrap();
+            let expected = resident
+                .constitution
+                .observed_epoch_prefix(ring, expected_tree, &scored.steps)
+                .unwrap();
+            let maps = (
+                resident.constitution.source_port(0).cloned(),
+                resident.constitution.receiving_map(ring).cloned(),
+            );
+            let commit = resident.constitution.commit();
+            let grain = phases.grain();
+            let receipt = port
+                .receive_target_prefix_readout_control(
+                    &mut resident,
+                    &mut crib,
+                    &pairing,
+                    pending,
+                    target,
+                    &frozen,
+                    &frozen,
+                    READING_BITS,
+                    None,
+                )
+                .unwrap();
+            let direct = crate::hnn::receiving::score_at(
+                &population_before,
+                ring,
+                &against.faces,
+                &against.trees,
+                &[target],
+                READING_BITS,
+            )
+            .unwrap();
+            assert_eq!(receipt.codes.native_code, direct.model[0]);
+            assert_eq!(receipt.codes.tree_code, direct.tree[0]);
+            assert_eq!(
+                receipt.codes.native_minus_control,
+                ExactInterval::point(integer(0))
+            );
+            assert_eq!(receipt.diagnostic.tree.grain, grain);
+            assert_eq!(
+                resident.constitution.landmarks(ring),
+                expected.landmarks(ring)
+            );
+            assert_eq!(
+                resident.constitution.population(ring),
+                expected.population(ring)
+            );
+            assert_eq!(
+                (
+                    resident.constitution.source_port(0).cloned(),
+                    resident.constitution.receiving_map(ring).cloned()
+                ),
+                maps
+            );
+            assert_eq!(resident.constitution.commit(), commit);
+            assert!(resident.pending.is_empty());
+            assert_eq!(receipt.codes.target, target);
+            assert_eq!(crib.entries().last().unwrap().class, target);
+            assert_eq!(resident.arrived.as_ref().unwrap().targets, vec![target]);
+        }
+        assert_eq!(trunk.moments.values().next().unwrap().cells(), 0);
+        assert_eq!(resident.moments.values().next().unwrap().cells(), 3);
+    }
+
+    #[test]
+    fn target_prefix_control_blind_word_does_not_consult_its_target() {
+        let (port, trunk, original_crib, pairing, _) = target_opening(false);
+        let ring = trunk.admitted[0].ring();
+        let frozen = trunk.constitution.receiving_map(ring).unwrap().clone();
+        let mut readings = Vec::new();
+        for target in [0, 3] {
+            let mut resident = trunk.clone();
+            let mut crib = original_crib.clone();
+            let pending = target_pending(&port, &mut resident);
+            readings.push(
+                port.receive_target_prefix_readout_control(
+                    &mut resident,
+                    &mut crib,
+                    &pairing,
+                    pending,
+                    target,
+                    &frozen,
+                    &frozen,
+                    READING_BITS,
+                    None,
+                )
+                .unwrap(),
+            );
+        }
+        assert_eq!(readings[0].diagnostic, readings[1].diagnostic);
+        assert_eq!((readings[0].codes.target, readings[1].codes.target), (0, 3));
+        assert_eq!(trunk.moments.values().next().unwrap().cells(), 0);
+    }
+
+    #[test]
+    fn target_prefix_control_cold_continuation_keeps_codes_and_frozen_maps_exact() {
+        let (port, mut warm, mut warm_crib, pairing, material) = target_opening(false);
+        let ring = warm.admitted[0].ring();
+        let frozen = warm.constitution.receiving_map(ring).unwrap().clone();
+        for target in [0, 1] {
+            let pending = target_pending(&port, &mut warm);
+            port.receive_target_prefix_readout_control(
+                &mut warm,
+                &mut warm_crib,
+                &pairing,
+                pending,
+                target,
+                &frozen,
+                &frozen,
+                READING_BITS,
+                None,
+            )
+            .unwrap();
+        }
+        let saved = warm.continuing_state(0).unwrap();
+        let parsed = ContinuingState::from_text(&saved.to_text(), 1 << 40).unwrap();
+        let field = warm.field.clone();
+        let mut cold = port
+            .mount_continued(&field, &Current::at_rest(&field), material, &parsed)
+            .unwrap();
+        let mut cold_crib = ObservedCrib::from_unplaced_checkpoint(
+            &field,
+            cold.current(),
+            warm_crib.next_position(),
+            &warm_crib.unplaced_checkpoint().unwrap(),
+        )
+        .unwrap();
+        for target in [3, 2, 0] {
+            let a = target_pending(&port, &mut warm);
+            let b = target_pending(&port, &mut cold);
+            let warm_read = port
+                .receive_target_prefix_readout_control(
+                    &mut warm,
+                    &mut warm_crib,
+                    &pairing,
+                    a,
+                    target,
+                    &frozen,
+                    &frozen,
+                    READING_BITS,
+                    None,
+                )
+                .unwrap();
+            let cold_read = port
+                .receive_target_prefix_readout_control(
+                    &mut cold,
+                    &mut cold_crib,
+                    &pairing,
+                    b,
+                    target,
+                    &frozen,
+                    &frozen,
+                    READING_BITS,
+                    None,
+                )
+                .unwrap();
+            assert_eq!(warm_read.diagnostic, cold_read.diagnostic);
+            assert_eq!(warm_read.codes, cold_read.codes);
+            assert_eq!(warm.constitution.receiving_map(ring), Some(&frozen));
+            assert_eq!(cold.constitution.receiving_map(ring), Some(&frozen));
+            assert_eq!(warm_crib, cold_crib);
+            assert_eq!(
+                warm.continuing_state(0).unwrap().to_text(),
+                cold.continuing_state(0).unwrap().to_text()
+            );
+        }
+    }
+
+    #[test]
+    fn target_prefix_control_frozen_readout_and_ordinary_target_admission_refuse_atomically() {
+        for defect in 0..6 {
+            let (port, mut resident, mut crib, pairing, _) = target_opening(false);
+            let pending = target_pending(&port, &mut resident);
+            let ring = resident.admitted[0].ring();
+            let frozen = resident.constitution.receiving_map(ring).unwrap().clone();
+            let wrong = ExactRatMatrix::zero(1, 1).unwrap();
+            if defect == 2 {
+                crib = ObservedCrib::new(1);
+            }
+            if defect == 3 {
+                // The pending word remains authentic at its old cut but no longer belongs to
+                // this resident's actual source/current after an ordinary delivered cell.
+                port.ingest_class_continuing(&mut resident, &mut crib, &pairing, 1, None)
+                    .unwrap();
+            }
+            if defect == 4 {
+                target_pending(&port, &mut resident);
+            }
+            if defect == 5 {
+                resident
+                    .pending
+                    .get_mut(&pending)
+                    .unwrap()
+                    .kept
+                    .as_mut()
+                    .unwrap()
+                    .commit += 1;
+            }
+            let before = format!("{resident:?}");
+            let old_crib = crib.clone();
+            let expected = if defect == 0 { &wrong } else { &frozen };
+            let target = if defect == 1 {
+                resident.field.alphabet()
+            } else {
+                0
+            };
+            assert!(
+                port.receive_target_prefix_readout_control(
+                    &mut resident,
+                    &mut crib,
+                    &pairing,
+                    pending,
+                    target,
+                    expected,
+                    &frozen,
+                    READING_BITS,
+                    None,
+                )
+                .is_err()
+            );
+            assert_eq!(format!("{resident:?}"), before);
+            assert_eq!(crib, old_crib);
+        }
+    }
+
+    #[test]
+    fn target_prefix_control_late_close_refusal_rolls_back_all_factual_reception() {
+        let (port, mut resident, mut crib, pairing, _) = target_opening(true);
+        let pending = target_pending(&port, &mut resident);
+        let ring = resident.admitted[0].ring();
+        let frozen = resident.constitution.receiving_map(ring).unwrap().clone();
+        crib.entries.push(ObservedCribCell {
+            position: 0,
+            class: resident.field.alphabet(),
+            placement: None,
+        });
+        let before = format!("{resident:?}");
+        let old_crib = crib.clone();
+        assert!(
+            port.receive_target_prefix_readout_control(
+                &mut resident,
+                &mut crib,
+                &pairing,
+                pending,
+                0,
+                &frozen,
+                &frozen,
+                READING_BITS,
+                None,
+            )
+            .is_err()
+        );
+        assert_eq!(format!("{resident:?}"), before);
+        assert_eq!(crib, old_crib);
     }
 }

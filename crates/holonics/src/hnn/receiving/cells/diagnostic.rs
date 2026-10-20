@@ -134,6 +134,118 @@ pub fn compare_readout_maps_at(
     })
 }
 
+/// A factual target's code on identical feature/tree/population operands under two R maps.
+/// All code fields are exact intervals in bits. `native_minus_control` uses the existing
+/// correlated population comparison: common tree and population normalization remain shared.
+/// The other two differences compare against the executed tree's own code. No population,
+/// tree, map, class chart or receiving history is changed to form these observations.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReadoutClassCodeDiagnostic {
+    pub target: usize,
+    pub reading_bits: u32,
+    pub native_code: ExactInterval,
+    pub control_code: ExactInterval,
+    pub tree_code: ExactInterval,
+    pub native_minus_control: ExactInterval,
+    pub native_minus_tree: ExactInterval,
+    pub control_minus_tree: ExactInterval,
+    pub native_mass: ExactInterval,
+    pub control_mass: ExactInterval,
+    pub tree_mass: Rat,
+}
+
+/// Read a genuine observed target only after the blind producing feature and face are fixed.
+/// `code_of_at` and `code_change_at` are the existing native scorer owners; this adds no
+/// logarithm, normalization, mixture or learning law. The maps share this one factual prefix's
+/// tree and population. These are R-only interventions, not independently adapted populations.
+#[allow(clippy::too_many_arguments)]
+pub fn compare_readout_class_codes_at(
+    reading: &ScoredFaceReading,
+    tree: &LandmarkFace,
+    feature: &[Rat],
+    native_map: &ExactRatMatrix,
+    native_wave_logits: &[Rat],
+    control_map: &ExactRatMatrix,
+    target: usize,
+    bits: u32,
+) -> Result<ReadoutClassCodeDiagnostic, HnnError> {
+    use crate::receiver::population::port::ComparedFace;
+    // Reuse the full consuming square: native R*feature equals its actual logits and grain
+    // face; the counterfactual changes only R on that same feature, tree and population.
+    let maps = compare_readout_maps_at(
+        reading,
+        tree,
+        feature,
+        native_map,
+        native_wave_logits,
+        control_map,
+        bits,
+    )?;
+    let control_read = ReceivingRead::combined(maps.control_wave_logits, tree, tree.grain)?;
+    let control_face = Face::of_read(&control_read, tree.grain)?;
+    let tree_mass = reading
+        .tree_probabilities
+        .get(target)
+        .ok_or(HnnError::CellOutside {
+            code: target,
+            alphabet: reading.tree_probabilities.len(),
+        })?
+        .clone();
+    let tree_point = ExactInterval::point(tree_mass.clone());
+    let native_combined = face_enclosure_at(&reading.combined, target, bits)?;
+    let control_combined = face_enclosure_at(&control_face, target, bits)?;
+    let native_faces = [tree_point.clone(), native_combined.clone()];
+    let control_faces = [tree_point.clone(), control_combined.clone()];
+    let native_code = reading
+        .population
+        .code_of_at(&native_faces, bits)
+        .map_err(population_refusal)?;
+    let control_code = reading
+        .population
+        .code_of_at(&control_faces, bits)
+        .map_err(population_refusal)?;
+    let log_tree = crate::ratio::algebraic::log2_enclosure_at(&tree_mass, bits)?;
+    let tree_code = ExactInterval::new(-log_tree.upper, -log_tree.lower)?;
+    let combined_change = if reading.combined == control_face {
+        ComparedFace::Shared(native_combined)
+    } else {
+        ComparedFace::Changed {
+            before: control_combined,
+            after: native_combined,
+        }
+    };
+    // code_change_at returns code(after)-code(before), hence native minus control here.
+    let native_minus_control = reading
+        .population
+        .code_change_at(
+            &[vec![ComparedFace::Shared(tree_point), combined_change]],
+            bits,
+        )
+        .map_err(population_refusal)?;
+    let difference = |a: &ExactInterval, b: &ExactInterval| {
+        ExactInterval::new(&a.lower - &b.upper, &a.upper - &b.lower)
+    };
+    Ok(ReadoutClassCodeDiagnostic {
+        target,
+        reading_bits: bits,
+        native_mass: reading
+            .population
+            .face_of_at(&native_faces, bits)
+            .map_err(population_refusal)?,
+        control_mass: reading
+            .population
+            .face_of_at(&control_faces, bits)
+            .map_err(population_refusal)?,
+        native_minus_tree: difference(&native_code, &tree_code)?,
+        control_minus_tree: difference(&control_code, &tree_code)?,
+        native_code,
+        control_code,
+        tree_code,
+        native_minus_control,
+        tree_mass,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -183,5 +295,89 @@ mod tests {
         let mut wrong = wave; wrong[0] += integer(1);
         assert!(compare_readout_maps_at(&reading, &tree, &feature, &map, &wrong,
             &zero, READING_BITS).is_err());
+    }
+    #[test]
+    fn readout_class_codes_match_the_actual_native_scorer_and_keep_operands_frozen() {
+        let (reading, tree, map) = material();
+        let before = reading.clone();
+        let feature = vec![integer(1)];
+        let wave = map.apply(&feature).unwrap();
+        let zero = ExactRatMatrix::new(vec![vec![integer(0)]; 4]).unwrap();
+        let codes = compare_readout_class_codes_at(
+            &reading,
+            &tree,
+            &feature,
+            &map,
+            &wave,
+            &zero,
+            0,
+            READING_BITS,
+        )
+        .unwrap();
+        let scored = crate::hnn::receiving::score_at(
+            &reading.population,
+            0,
+            &crate::hnn::ratio::Faces {
+                faces: vec![reading.combined.clone()],
+                logits: vec![wave.clone()],
+            },
+            &[tree.clone()],
+            &[0],
+            READING_BITS,
+        )
+        .unwrap();
+        assert_eq!(codes.native_code, scored.model[0]);
+        assert_eq!(codes.tree_code, scored.tree[0]);
+        assert!(codes.native_minus_control.upper < Rat::zero());
+        assert!(codes.native_mass.lower > codes.control_mass.upper);
+        assert_eq!(reading, before);
+        let other = compare_readout_class_codes_at(
+            &reading,
+            &tree,
+            &feature,
+            &map,
+            &wave,
+            &zero,
+            1,
+            READING_BITS,
+        )
+        .unwrap();
+        assert!(other.native_minus_control.lower > Rat::zero());
+    }
+
+    #[test]
+    fn readout_class_codes_share_identical_readout_uncertainty_and_refuse_invalid_targets() {
+        let (reading, tree, map) = material();
+        let feature = vec![integer(1)];
+        let wave = map.apply(&feature).unwrap();
+        let codes = compare_readout_class_codes_at(
+            &reading,
+            &tree,
+            &feature,
+            &map,
+            &wave,
+            &map,
+            0,
+            READING_BITS,
+        )
+        .unwrap();
+        assert_eq!(codes.native_code, codes.control_code);
+        assert_eq!(codes.native_minus_control, ExactInterval::point(integer(0)));
+        assert!(matches!(
+            compare_readout_class_codes_at(
+                &reading,
+                &tree,
+                &feature,
+                &map,
+                &wave,
+                &map,
+                2,
+                READING_BITS
+            ),
+            Err(HnnError::CellOutside {
+                code: 2,
+                alphabet: 2
+            })
+        ));
     }
 }

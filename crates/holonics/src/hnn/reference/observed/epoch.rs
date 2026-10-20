@@ -41,6 +41,15 @@ pub struct ObservedEpochWallTimes {
     /// Includes the tree's prequential face schedule, score and exact return/compose staging.
     pub compare_return_compose_batch: Duration,
     pub grouped_deposit: Duration,
+    /// Disjoint outer calls inside grouped_deposit. None means unattempted; a measured zero
+    /// remains Some(Duration::ZERO). Whole staging includes the first shared normal preparation.
+    /// These overlap deposit_subphases, whose unscoped intervals can span rung/probe boundaries.
+    pub whole_stage: Option<Duration>,
+    pub whole_probe: Option<Duration>,
+    pub joint_stage: Option<Duration>,
+    pub joint_probe: Option<Duration>,
+    /// The existing receiving-only fallback stage; it executes no upstream finite probe.
+    pub receiving_only_stage: Option<Duration>,
     pub final_arrived_reread: Duration,
     pub precision_close: Duration,
     /// Only explicitly requested prefix forks, including their own joint close when reached.
@@ -1231,7 +1240,14 @@ impl Reference {
         let mut whole_refusal = None;
         let mut whole_stage_refusal = None;
         let mut probe_state = ObservedEpochProbeState::SealNotFormed;
-        let whole = match stage(EpochCandidateScope::Whole, &mut observe_deposit) {
+        let mut whole_probe = None;
+        let mut joint_stage = None;
+        let mut joint_probe = None;
+        let mut receiving_only_stage = None;
+        let whole_stage_start = Instant::now();
+        let whole_candidate = stage(EpochCandidateScope::Whole, &mut observe_deposit);
+        let whole_stage = Some(whole_stage_start.elapsed());
+        let whole = match whole_candidate {
             Ok(candidate) if !candidate.requires_comparison() => {
                 probe_state = ObservedEpochProbeState::SealedNoProbeRequired;
                 let outcome = if candidate.has_physical_motion() {
@@ -1246,7 +1262,9 @@ impl Reference {
                 // A source port is learner material. Re-admit that port under
                 // the SAME exterior class codec, pairing and placement; an old
                 // PairedObservation is correctly refused after E changes.
+                let probe_start = Instant::now();
                 let probe = probe_candidate(&candidate);
+                whole_probe = Some(probe_start.elapsed());
                 match probe {
                     Ok(reading) => {
                         probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
@@ -1301,7 +1319,10 @@ impl Reference {
         let mut joint_admitted = None;
         if whole.is_none() && joint_eligible {
             joint_attempted = true;
-            match stage(EpochCandidateScope::Joint, &mut observe_deposit) {
+            let stage_start = Instant::now();
+            let candidate = stage(EpochCandidateScope::Joint, &mut observe_deposit);
+            joint_stage = Some(stage_start.elapsed());
+            match candidate {
                 Ok(candidate) if !candidate.requires_comparison() => {
                     // Zero/projected-zero upstream motion uses the established held-map
                     // receiving successor below. No finite probe is fabricated for it.
@@ -1311,7 +1332,10 @@ impl Reference {
                 Ok(candidate) => {
                     joint_directions = candidate.joint_directions();
                     joint_probe_state = ObservedEpochProbeState::ProbeFailed;
-                    match probe_candidate(&candidate) {
+                    let probe_start = Instant::now();
+                    let probe = probe_candidate(&candidate);
+                    joint_probe = Some(probe_start.elapsed());
+                    match probe {
                         Ok(reading) => {
                             joint_probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
                             let neutral = reading.unchanged || reading.objective_equal();
@@ -1372,14 +1396,16 @@ impl Reference {
             Some(admitted) => admitted,
             None => {
                 publication_attempt = EpochStageAttempt::ReceivingOnly;
-                let receiving =
-                    match stage(EpochCandidateScope::ReceivingOnly, &mut observe_deposit) {
-                        Ok(candidate) => candidate,
-                        Err(failure) => {
-                            stage_refused(EpochStageAttempt::ReceivingOnly, &failure.evidence);
-                            return Err(failure.error);
-                        }
-                    };
+                let stage_start = Instant::now();
+                let candidate = stage(EpochCandidateScope::ReceivingOnly, &mut observe_deposit);
+                receiving_only_stage = Some(stage_start.elapsed());
+                let receiving = match candidate {
+                    Ok(candidate) => candidate,
+                    Err(failure) => {
+                        stage_refused(EpochStageAttempt::ReceivingOnly, &failure.evidence);
+                        return Err(failure.error);
+                    }
+                };
                 let outcome = if receiving.has_physical_motion() {
                     ObservedEpochOutcome::ReceivingOnly
                 } else {
@@ -1486,6 +1512,11 @@ impl Reference {
             forward_batch,
             compare_return_compose_batch,
             grouped_deposit,
+            whole_stage,
+            whole_probe,
+            joint_stage,
+            joint_probe,
+            receiving_only_stage,
             final_arrived_reread,
             precision_close,
             prefix_forks,
@@ -1540,6 +1571,40 @@ mod tests {
     use crate::hnn::paired::PairedCarrier;
     use crate::hnn::tests::learning::chain_declaration;
     use crate::ratio::rat;
+
+    /// Durations are exterior observations, so the control checks attempted-call presence
+    /// and disjoint wall containment, never an arbitrary minimum elapsed time.
+    fn assert_rung_wall_receipt(receipt: &ObservedEpochReceipt) {
+        let wall = &receipt.wall;
+        let probed = |state| {
+            matches!(
+                state,
+                ObservedEpochProbeState::ProbeFailed
+                    | ObservedEpochProbeState::FiniteComparisonExecuted
+            )
+        };
+        assert!(wall.whole_stage.is_some());
+        assert_eq!(wall.whole_probe.is_some(), probed(receipt.probe_state));
+        assert_eq!(wall.joint_stage.is_some(), receipt.joint_attempted);
+        assert_eq!(wall.joint_probe.is_some(), probed(receipt.joint_probe_state));
+        assert_eq!(
+            wall.receiving_only_stage.is_some(),
+            receipt.publication_attempt == EpochStageAttempt::ReceivingOnly
+        );
+        assert!(
+            [
+                wall.whole_stage,
+                wall.whole_probe,
+                wall.joint_stage,
+                wall.joint_probe,
+                wall.receiving_only_stage,
+            ]
+            .into_iter()
+            .flatten()
+            .sum::<Duration>()
+                <= wall.grouped_deposit
+        );
+    }
 
     fn opening() -> (Reference, Resident, ObservedCrib, PairingDeclaration) {
         let mut declaration = chain_declaration(1 << 16);
@@ -2033,6 +2098,7 @@ mod tests {
                     ObservedEpochDepositionScope::NormalMaps,
                 )
                 .unwrap();
+            assert_rung_wall_receipt(&receipt);
             assert!(!receipt.terminal_partial);
             assert!(receipt.closed_section || receipt.carry_out);
             assert_eq!(actual.ledger.balance().cells, receipt.consumed as u64);
@@ -3507,6 +3573,7 @@ mod tests {
                 true,
             )
             .unwrap();
+        assert_rung_wall_receipt(&receipt);
         assert_eq!(resident.constitution, expected);
         assert_eq!(receipt.deposit, expected_reading);
         assert!(receipt.terminal_partial);
@@ -3525,11 +3592,12 @@ mod tests {
             assert_eq!(names[at + 1], certificate);
         }
         assert_eq!(
-            &names[names.len() - 4..],
+            &names[names.len() - 5..],
             &[
                 "PairDirections",
                 "RegionPreparation",
                 "JointCertificate",
+                "CandidateStaged",
                 "Publication"
             ]
         );

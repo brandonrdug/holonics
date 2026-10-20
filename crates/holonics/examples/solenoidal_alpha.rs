@@ -40,7 +40,7 @@ use holonics::hnn::reference::observed::{
     PendingReadoutDiagnostic,
 };
 use holonics::hnn::reference::{ExposedResident, Resident};
-use holonics::hnn::{ExecutionPort, HnnError, Reference};
+use holonics::hnn::{ConstitutionRead, ExecutionPort, HnnError, Reference};
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::{Rat, algebraic::ExactInterval, integer, rat};
 use holonics::receiver::release::KeyStream;
@@ -404,6 +404,100 @@ fn query_reading(checkpoint: &Checkpoint, query: &str) -> Result<String> {
     ]);
     reference.discard(&mut resident, Handle::Pending(pending))?;
     Ok(reading)
+}
+
+/// Exterior matched coding experiment on one disposable factual target prefix. No normal
+/// deposit occurs; native R stays fixed while the existing population and tree receive the
+/// actual boundary targets. All controls share that native factual history at each cell.
+fn frozen_r_target_prefix(checkpoint: &Checkpoint, target: &[u8]) -> Result<String> {
+    if target.is_empty() || target.len() > QUERY_BYTE_BUDGET {
+        return Err("a frozen-R target prefix needs 1..=128 declared source bytes".into());
+    }
+    let targets = digits(target);
+    let count = u64::try_from(targets.len())?;
+    if checkpoint.stream.accepted_cells()?.checked_add(count).ok_or("target horizon overflow")?
+        > checkpoint.population
+    {
+        return Err("the frozen-R target prefix exceeds the declared source horizon".into());
+    }
+    let main_before = checkpoint.bytes()?;
+    let reference = port();
+    let (field, founding, pairing) = declaration(checkpoint.population)?;
+    let (mut resident, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
+    let receiver = resident.admitted().first().ok_or("no native receiver")?.ring();
+    let frozen = resident.constitution().receiving_map(receiver)
+        .ok_or("native receiving map is missing")?.clone();
+    let control = founding.receiving_law(receiver)
+        .ok_or("founding receiving map is missing")?.map().clone();
+    let laws = |resident: &Resident| (0..field.rings().len()).map(|ring| (
+        resident.constitution().source_law(ring).cloned(),
+        resident.constitution().contrast_law(ring).clone(),
+        resident.constitution().receiving_law(ring).cloned(),
+    )).collect::<Vec<_>>();
+    let laws_before = laws(&resident);
+    let commit_before = resident.constitution().commit();
+    let mut sums = vec![ExactInterval::point(integer(0)); 6];
+    let mut events = Vec::new();
+    let started = Instant::now();
+    for (at, &class) in targets.iter().enumerate() {
+        let cell_started = Instant::now();
+        let moment = resident.continuing().ok_or("target prefix has no continuing source")?.0;
+        let phases = resident.admitted().first().ok_or("no native receiver")?.clone();
+        let (pending, refined) = reference.refine(&mut resident, &moment, &phases)?;
+        let receipt = reference.receive_target_prefix_readout_control(
+            &mut resident, &mut crib, &pairing, pending, class, &frozen, &control,
+            holonics::ratio::exponentiated::READING_BITS, None,
+        )?;
+        let codes = &receipt.codes;
+        for (sum, value) in sums.iter_mut().zip([
+            &codes.native_code, &codes.control_code, &codes.tree_code,
+            &codes.native_minus_control, &codes.native_minus_tree, &codes.control_minus_tree,
+        ]) {
+            *sum = ExactInterval::new(&sum.lower + &value.lower, &sum.upper + &value.upper)?;
+        }
+        events.push(object(&[
+            ("index", at.to_string()), ("target_base4_class", class.to_string()),
+            ("target_denotes", quoted("actual observed base-4 digit of the pinned target byte passage")),
+            ("source_cells_before_target", receipt.diagnostic.source_cells.to_string()),
+            ("reading_bits", codes.reading_bits.to_string()),
+            ("native_bits", interval(&codes.native_code)),
+            ("founding_R_same_feature_bits", interval(&codes.control_code)),
+            ("same_prefix_tree_bits", interval(&codes.tree_code)),
+            ("native_minus_founding_R_bits", interval(&codes.native_minus_control)),
+            ("native_minus_tree_bits", interval(&codes.native_minus_tree)),
+            ("founding_R_minus_tree_bits", interval(&codes.control_minus_tree)),
+            ("native_mass", interval(&codes.native_mass)),
+            ("founding_R_mass", interval(&codes.control_mass)),
+            ("tree_mass", rational(&codes.tree_mass)),
+            ("readout_intervention_exact", exact(&receipt.diagnostic.readout)),
+            ("producing_refinement_receipt_exact", exact(&refined.receipt)),
+            ("actual_target_ingestion_exact", exact(&receipt.ingestion)),
+            ("end_lift_exact", exact(resident.current().lift())),
+            ("wall_ns", cell_started.elapsed().as_nanos().to_string()),
+        ]));
+        eprintln!("alpha native frozen_R_target cell={at} target={class} elapsed_ns={}", started.elapsed().as_nanos());
+    }
+    if checkpoint.bytes()? != main_before || resident.field() != &field {
+        return Err("a frozen-R target query must preserve its main checkpoint and field".into());
+    }
+    if resident.constitution().receiving_map(receiver) != Some(&frozen)
+        || laws(&resident) != laws_before || resident.constitution().commit() != commit_before
+    {
+        return Err("a frozen-R target query must preserve all material maps".into());
+    }
+    Ok(object(&[
+        ("scope", quoted("frozen material; every target scored before its factual reception; native/founding R/tree share each reached native factual feature/tree/population; population and tree adapt, normal maps do not")),
+        ("target_bytes", target.len().to_string()), ("scored_cells", targets.len().to_string()),
+        ("prior_training_pending_cells_advanced_without_scoring", checkpoint.stream.pending_classes().len().to_string()),
+        ("normal_depositions", "0".into()), ("main_checkpoint_unchanged", "true".into()),
+        ("material_maps_unchanged", "true".into()),
+        ("native_bits", interval(&sums[0])), ("founding_R_same_feature_bits", interval(&sums[1])),
+        ("same_prefix_tree_bits", interval(&sums[2])),
+        ("native_minus_founding_R_bits", interval(&sums[3])),
+        ("native_minus_tree_bits", interval(&sums[4])),
+        ("founding_R_minus_tree_bits", interval(&sums[5])),
+        ("series", format!("[{}]", events.join(","))),
+    ]))
 }
 
 fn diagnose_query_prefix(
@@ -1003,6 +1097,26 @@ fn run() -> Result<()> {
                         ("comparison_exact", exact(&epoch.comparison)), ("whole_refusal", exact(&epoch.whole_refusal)),
                         ("whole_stage_refusal_exact", exact(&epoch.whole_stage_refusal)),
                         ("probe_state", exact(&epoch.probe_state)),
+                        ("wall_ns", object(&[
+                            ("forward_batch", epoch.wall.forward_batch.as_nanos().to_string()),
+                            ("compare_return_compose_batch", epoch.wall.compare_return_compose_batch.as_nanos().to_string()),
+                            ("compare_preparation", epoch.wall.compare_preparation.as_nanos().to_string()),
+                            ("return_join", epoch.wall.return_join.as_nanos().to_string()),
+                            ("ordered_publication", epoch.wall.ordered_publication.as_nanos().to_string()),
+                            ("grouped_deposit", epoch.wall.grouped_deposit.as_nanos().to_string()),
+                            ("whole_stage", epoch.wall.whole_stage.map_or_else(|| "null".into(), |wall| wall.as_nanos().to_string())),
+                            ("whole_probe", epoch.wall.whole_probe.map_or_else(|| "null".into(), |wall| wall.as_nanos().to_string())),
+                            ("joint_stage", epoch.wall.joint_stage.map_or_else(|| "null".into(), |wall| wall.as_nanos().to_string())),
+                            ("joint_probe", epoch.wall.joint_probe.map_or_else(|| "null".into(), |wall| wall.as_nanos().to_string())),
+                            ("receiving_only_stage", epoch.wall.receiving_only_stage.map_or_else(|| "null".into(), |wall| wall.as_nanos().to_string())),
+                            ("final_arrived_reread", epoch.wall.final_arrived_reread.as_nanos().to_string()),
+                            ("precision_close", epoch.wall.precision_close.as_nanos().to_string()),
+                            ("prefix_forks", epoch.wall.prefix_forks.as_nanos().to_string()),
+                        ])),
+                        ("return_worker_elapsed_sums_ns", format!("[{}]", epoch.wall.return_worker_sums.iter().map(|wall| wall.as_nanos().to_string()).collect::<Vec<_>>().join(","))),
+                        ("deposit_subphase_intervals", format!("[{}]", epoch.wall.deposit_subphases.iter().map(|(phase, wall)| object(&[
+                            ("phase", quoted(phase)), ("elapsed_ns", wall.as_nanos().to_string()),
+                        ])).collect::<Vec<_>>().join(","))),
                         ("receiving_certificate_exact", exact(&epoch.deposit.epoch)),
                         ("first_law_before_precision_exact", exact(&epoch.precision.balance_before)),
                         ("first_law_after_precision_exact", exact(&epoch.precision.balance_after)),
@@ -1066,6 +1180,25 @@ fn run() -> Result<()> {
                 ("stage_refusal_events", format!("[{}]", stage_events.join(","))),
                 ("last_deposit", final_deposit.as_ref().map_or_else(|| "null".to_owned(), last_deposit)),
                 ("warm_query", warm), ("warm_keyed_replies", warm_keyed), ("elapsed_ns", started.elapsed().as_nanos().to_string()),
+            ]));
+        }
+        Some("query") if args.len() == 6 && args[3] == "--frozen-r-target-prefix" => {
+            let (checkpoint, hash) = Checkpoint::load(&args[1], args[2].parse()?)?;
+            let maximum: usize = args[5].parse()?;
+            if maximum == 0 || maximum > QUERY_BYTE_BUDGET {
+                return Err("frozen-R target workload declares at most128 source bytes".into());
+            }
+            if std::fs::metadata(&args[4])?.len() > u64::try_from(maximum)? {
+                return Err("target passage exceeds the declared source-byte workload".into());
+            }
+            let target = std::fs::read(&args[4])?;
+            if target.len() > maximum { return Err("target changed beyond its source-byte workload".into()); }
+            let target_hash = sha256(&target)?;
+            let reading = frozen_r_target_prefix(&checkpoint, &target)?;
+            println!("{}", object(&[
+                ("kind", quoted("frozen_r_target_prefix_query")),
+                ("checkpoint_sha256", quoted(&hash)), ("target_sha256", quoted(&target_hash)),
+                ("reading", reading), ("elapsed_ns", started.elapsed().as_nanos().to_string()),
             ]));
         }
         Some("query") if args.len() == 3 || args.len() == 4 || args.len() == 6 || args.len() == 10 => {
