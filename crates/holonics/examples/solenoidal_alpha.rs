@@ -475,6 +475,7 @@ fn frozen_r_target_prefix(checkpoint: &Checkpoint, target: &[u8]) -> Result<Stri
             ("end_lift_exact", exact(resident.current().lift())),
             ("wall_ns", cell_started.elapsed().as_nanos().to_string()),
         ]));
+        eprintln!("alpha native frozen_R_code {}", events.last().expect("one successful target has its exterior receipt"));
         eprintln!("alpha native frozen_R_target cell={at} target={class} elapsed_ns={}", started.elapsed().as_nanos());
     }
     if checkpoint.bytes()? != main_before || resident.field() != &field {
@@ -1125,6 +1126,7 @@ fn run() -> Result<()> {
                         ("physical_deposition_work", rational(&epoch.energy.deposition_work)),
                         ("physical_energy_exact", exact(&epoch.energy)),
                     ]));
+                    eprintln!("alpha native epoch_receipt {}", outcomes.last().expect("one successful epoch has its exterior receipt"));
                     eprintln!("alpha native grouped consumed={} commit={} outcome={:?} accepted={accepted} published={published} pending={} elapsed_ns={}", epoch.consumed, epoch.deposit.commit, epoch.outcome, receipt.pending, started.elapsed().as_nanos());
                     final_deposit = Some(epoch.deposit);
                 }
