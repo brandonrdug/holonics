@@ -1142,6 +1142,34 @@ fn parse_fork_scope(value: &str) -> Result<ObservedEpochDepositionScope> {
         _ => Err("scope fork requires normal-maps or normal-maps-channel-dissipation".into()),
     }
 }
+/// Explicit exterior run policy; it adds no native state or activation history. A caller
+/// continuing with grain requests it again, while the absolute receiver-clock target remains
+/// a function of the saved state. The ordinary ingest and query policies are unchanged.
+fn ingest_reference(command: &str, scope: ObservedEpochDepositionScope) -> Result<Reference> {
+    match command {
+        "ingest" => Ok(port()),
+        "ingest-grain" if scope == ObservedEpochDepositionScope::NormalMapsAndChannelDissipation =>
+            Ok(port().with_refining_grain()),
+        "ingest-grain" => Err("grain ingest requires the explicitly forked channel-D scope".into()),
+        _ => Err("unknown ingest policy".into()),
+    }
+}
+
+/// The codec's exact base4 span, including offsets that are not octet boundaries. This lets a
+/// continuing experiment consume the next heard symbols without replay, padding or skipping.
+fn source_cell_span(excerpt: &[u8], limit: Option<usize>, offset: usize) -> Result<Vec<usize>> {
+    let mut cells = digits(excerpt);
+    if offset >= cells.len() { return Err("source-cell offset must begin within the excerpt".into()); }
+    cells.drain(..offset);
+    if let Some(limit) = limit {
+        if limit == 0 || limit > cells.len() {
+            return Err("source-cell control must select a nonempty actual excerpt span".into());
+        }
+        cells.truncate(limit);
+    }
+    Ok(cells)
+}
+
 fn run() -> Result<()> {
     let started = Instant::now();
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -1193,7 +1221,8 @@ fn run() -> Result<()> {
                 ("elapsed_ns", started.elapsed().as_nanos().to_string()),
             ]));
         }
-        Some("ingest") if args.len() == 8 || args.len() == 9 || args.len() == 12 => {
+        Some(command @ ("ingest" | "ingest-grain"))
+            if args.len() == 8 || args.len() == 9 || args.len() == 10 || args.len() == 12 => {
             let budget: u64 = args[7].parse()?;
             let max_source: usize = args[6].parse()?;
             let (mut checkpoint, input_hash) = Checkpoint::load(&args[1], budget)?;
@@ -1208,15 +1237,12 @@ fn run() -> Result<()> {
             if found != last - first + 1 || excerpt.len() > max_source { return Err("source range absent or exceeds declared source-byte workload".into()); }
             let file_hash = sha256(&source)?; let excerpt_hash = sha256(&excerpt)?;
             let before = material_hash(checkpoint.stream.resident())?;
-            let reference = port(); let pairing = declaration(checkpoint.population)?.2;
-            let mut source_cells = digits(&excerpt);
-            let complete_excerpt_cells = source_cells.len();
-            if args.len() == 9 {
-                let limit = &args[8];
-                let limit: usize = limit.parse()?;
-                if limit == 0 || limit > source_cells.len() { return Err("source-cell control must select a nonempty actual excerpt prefix".into()); }
-                source_cells.truncate(limit);
-            }
+            let reference = ingest_reference(command, checkpoint.stream.scope())?;
+            let pairing = declaration(checkpoint.population)?.2;
+            let complete_excerpt_cells = digits(&excerpt).len();
+            let source_cell_offset = if args.len() == 10 { args[9].parse()? } else { 0 };
+            let limit = if args.len() == 9 || args.len() == 10 { Some(args[8].parse()?) } else { None };
+            let source_cells = source_cell_span(&excerpt, limit, source_cell_offset)?;
             let mut final_deposit = None; let mut stepped = 0u64;
             let mut published = 0usize; let mut accepted = 0usize;
             let mut whole = 0usize; let mut joint = 0usize; let mut receiving_only = 0usize; let mut neutral = 0usize;
@@ -1260,6 +1286,7 @@ fn run() -> Result<()> {
                         ("source_end_exclusive", epoch.cells.to_string()),
                         ("material_commit", epoch.deposit.commit.to_string()),
                         ("actual_receiving_ingress", epoch.deposit.epoch.as_ref().map_or_else(|| "null".into(), |read| read.actual_receiving_ingress.to_string())),
+                        ("channel_grain_exact", epoch.deposit.epoch.as_ref().and_then(|read| read.channel_grain.as_ref()).map_or_else(|| "null".into(), exact)),
                         ("receiving_quantum_projection", epoch.deposit.epoch.as_ref()
                             .and_then(|read| read.quantum_projection.as_ref())
                             .map_or_else(|| "null".into(), |read| object(&[
@@ -1356,6 +1383,8 @@ fn run() -> Result<()> {
                 ("first_line", first.to_string()), ("last_line", last.to_string()),
                 ("excerpt_sha256", quoted(&excerpt_hash)), ("bytes", excerpt.len().to_string()),
                 ("accepted_cells", accepted.to_string()),
+                ("source_cell_offset", source_cell_offset.to_string()),
+                ("receiver_clock_grain_requested", (command == "ingest-grain").to_string()),
             ]));
             checkpoint.provenance.push('\n');
             let warm = query_reading(&checkpoint, WARM_QUERY)?;
@@ -1376,7 +1405,9 @@ fn run() -> Result<()> {
             } else { "null".into() };
             let (bytes, hash) = checkpoint.publish(&args[2])?;
             println!("{}", object(&[
-                ("kind", quoted("ingest")), ("checkpoint_path", quoted(&args[2])),
+                ("kind", quoted(command)), ("checkpoint_path", quoted(&args[2])),
+                ("receiver_clock_grain_requested", (command == "ingest-grain").to_string()),
+                ("source_cell_offset", source_cell_offset.to_string()),
                 ("input_checkpoint_sha256", quoted(&input_hash)), ("checkpoint_sha256", quoted(&hash)),
                 ("checkpoint_bytes", bytes.to_string()), ("before_constitution_sha256", quoted(&before)),
                 ("after_constitution_sha256", quoted(&after)), ("source_file_sha256", quoted(&file_hash)),
@@ -1444,7 +1475,7 @@ fn run() -> Result<()> {
                 ("keyed_replies", keyed),
             ]));
         }
-        _ => return Err("usage: solenoidal_alpha init OUTPUT POPULATION | fork-scope INPUT OUTPUT MAX_CHECKPOINT_BYTES normal-maps|normal-maps-channel-dissipation | ingest INPUT OUTPUT ORIGINAL_FILE FIRST_LINE LAST_LINE MAX_SOURCE_BYTES MAX_CHECKPOINT_BYTES [SOURCE_CELL_LIMIT | KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT WARM_QUERY_BATCH_TSV] | query INPUT MAX_CHECKPOINT_BYTES [QUERY_UTF8 [SECTION_BYTES ORACLE_BUDGET [KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT ADJACENT_SOURCE_FILE]]]".into()),
+        _ => return Err("usage: solenoidal_alpha init OUTPUT POPULATION | fork-scope INPUT OUTPUT MAX_CHECKPOINT_BYTES normal-maps|normal-maps-channel-dissipation | ingest|ingest-grain INPUT OUTPUT ORIGINAL_FILE FIRST_LINE LAST_LINE MAX_SOURCE_BYTES MAX_CHECKPOINT_BYTES [SOURCE_CELL_LIMIT [SOURCE_CELL_OFFSET] | KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT WARM_QUERY_BATCH_TSV] | query INPUT MAX_CHECKPOINT_BYTES [QUERY_UTF8 [SECTION_BYTES ORACLE_BUDGET [KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT ADJACENT_SOURCE_FILE]]]".into()),
     }
     Ok(())
 }
@@ -1553,6 +1584,21 @@ mod tests {
         assert_eq!(back.bytes().unwrap(), old_bytes);
         assert!(parse_fork_scope("all").is_err());
         assert!(parse_fork_scope("normal-map").is_err());
+    }
+
+    #[test]
+    fn grain_ingest_policy_requires_d_scope_and_exact_non_octet_source_span() {
+        assert!(ingest_reference("ingest-grain", ObservedEpochDepositionScope::NormalMapsAndChannelDissipation).is_ok());
+        assert!(ingest_reference("ingest-grain", ObservedEpochDepositionScope::NormalMaps).is_err());
+        assert!(ingest_reference("ingest-grain", ObservedEpochDepositionScope::All).is_err());
+        assert!(ingest_reference("ingest", ObservedEpochDepositionScope::NormalMaps).is_ok());
+        assert!(ingest_reference("unknown", ObservedEpochDepositionScope::NormalMapsAndChannelDissipation).is_err());
+        // 0x1b = 00 01 10 11, 0xe4 = 11 10 01 00. The requested non-octet span is exact.
+        assert_eq!(source_cell_span(&[0x1b, 0xe4], Some(4), 2).unwrap(), vec![2, 3, 3, 2]);
+        assert_eq!(source_cell_span(&[0x1b, 0xe4], None, 0).unwrap(), digits(&[0x1b, 0xe4]));
+        assert!(source_cell_span(&[0x1b], Some(0), 0).is_err());
+        assert!(source_cell_span(&[0x1b], Some(3), 2).is_err());
+        assert!(source_cell_span(&[0x1b], None, 4).is_err());
     }
 
 }
