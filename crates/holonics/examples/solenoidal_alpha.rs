@@ -1379,13 +1379,14 @@ fn run() -> Result<()> {
                 }
             }
             let after = material_hash(checkpoint.stream.resident())?;
+            // Grain opt-in is a policy of this call, reported in its exterior receipt below.
+            // Source provenance in a continuing checkpoint records the admitted span, not that policy.
             checkpoint.provenance.push_str(&object(&[
                 ("source", quoted(&args[3])), ("source_file_sha256", quoted(&file_hash)),
                 ("first_line", first.to_string()), ("last_line", last.to_string()),
                 ("excerpt_sha256", quoted(&excerpt_hash)), ("bytes", excerpt.len().to_string()),
                 ("accepted_cells", accepted.to_string()),
                 ("source_cell_offset", source_cell_offset.to_string()),
-                ("receiver_clock_grain_requested", (command == "ingest-grain").to_string()),
             ]));
             checkpoint.provenance.push('\n');
             let warm = query_reading(&checkpoint, WARM_QUERY)?;
