@@ -372,6 +372,15 @@ impl ObservedStream {
     /// Only the bounded unfinished boundary transaction is serialized here. Native material,
     /// passage and the closing crib retain their existing owners and checkpoint codecs.
     pub fn pending_checkpoint(&self) -> String {
+        let (header, law_field) = match self.resident.receiving_law() {
+            crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 => {
+                ("observed-stream-pending-v1", String::new())
+            }
+            crate::hnn::receiving::ReceivingLaw::RetainedFibreV1 => (
+                "observed-stream-pending-v2",
+                "retained-fibre-v1 ".to_string(),
+            ),
+        };
         let scope = match self.scope {
             ObservedEpochDepositionScope::All => "all",
             ObservedEpochDepositionScope::NormalMaps => "normal-maps",
@@ -383,7 +392,7 @@ impl ObservedStream {
             }
         };
         format!(
-            "observed-stream-pending-v1 {scope} {} {} {}\n{}\n",
+            "{header} {law_field}{scope} {} {} {}\n{}\n",
             self.resident.constitution.commit(),
             self.crib.next_position(),
             self.pending.len(),
@@ -407,10 +416,29 @@ impl ObservedStream {
             .ok_or_else(|| refuse("the unfinished observed transaction header"))?
             .split_whitespace()
             .collect();
-        if header.len() != 5 || header[0] != "observed-stream-pending-v1" {
-            return Err(refuse("the unfinished observed transaction version"));
+        let (law, scope_at, commit_at) = match header.first().copied() {
+            Some("observed-stream-pending-v1") if header.len() == 5 => {
+                (crate::hnn::receiving::ReceivingLaw::CoarseGrainV1, 1, 2)
+            }
+            Some("observed-stream-pending-v2") if header.len() == 6 => {
+                let law = header[1]
+                    .parse::<crate::hnn::receiving::ReceivingLaw>()
+                    .map_err(|_| refuse("the explicit unfinished-stream receiving law"))?;
+                if law != crate::hnn::receiving::ReceivingLaw::RetainedFibreV1 {
+                    return Err(refuse(
+                        "version-2 pending streams explicitly name retained-fibre-v1",
+                    ));
+                }
+                (law, 2, 3)
+            }
+            _ => return Err(refuse("the unfinished observed transaction version")),
+        };
+        if law != resident.receiving_law() {
+            return Err(refuse(
+                "the pending transaction's receiving law matches its restored resident",
+            ));
         }
-        let scope = match header[1] {
+        let scope = match header[scope_at] {
             "all" => ObservedEpochDepositionScope::All,
             "normal-maps" => ObservedEpochDepositionScope::NormalMaps,
             "normal-maps-channel-dissipation" => {
@@ -421,13 +449,13 @@ impl ObservedStream {
             }
             _ => return Err(refuse("the saved observed deposition scope")),
         };
-        let commit: u64 = header[2]
+        let commit: u64 = header[commit_at]
             .parse()
             .map_err(|_| refuse("the unfinished transaction commit"))?;
-        let published: usize = header[3]
+        let published: usize = header[commit_at + 1]
             .parse()
             .map_err(|_| refuse("the unfinished transaction opening"))?;
-        let count: usize = header[4]
+        let count: usize = header[commit_at + 2]
             .parse()
             .map_err(|_| refuse("the unfinished transaction count"))?;
         if commit != resident.constitution.commit()
@@ -541,6 +569,12 @@ mod tests {
     }
 
     fn opening() -> (Reference, ObservedStream, PairingDeclaration, Constitution) {
+        opening_with_law(None)
+    }
+
+    fn opening_with_law(
+        law: Option<crate::hnn::receiving::ReceivingLaw>,
+    ) -> (Reference, ObservedStream, PairingDeclaration, Constitution) {
         // The existing serial small-field declaration, with the always-ticking first source
         // and the grouped phase owner's smallest odd receiving period.
         let base = small_field_of(
@@ -570,6 +604,9 @@ mod tests {
         let mut resident = reference
             .mount_with(&field, &Current::at_rest(&field), material.clone())
             .unwrap();
+        if let Some(law) = law {
+            resident.select_receiving_law(law).unwrap();
+        }
         let boundary = PairedObservation::admit(&field, &material, &pairing).unwrap();
         reference
             .ingest(&mut resident, None, &boundary.encode(&[]).unwrap())
@@ -598,6 +635,7 @@ mod tests {
         assert_eq!(stream.epoch_bound(), 10);
         assert_eq!(stream.resident.continuing_state(0).unwrap(), before);
         let pending_text = stream.pending_checkpoint();
+        assert!(pending_text.starts_with("observed-stream-pending-v1 normal-maps "));
         let parsed = ContinuingState::from_text(&before.to_text(), 1 << 40).unwrap();
         let field = stream.resident.field.clone();
         let cold_resident = reference
@@ -651,6 +689,42 @@ mod tests {
         );
         assert_eq!(stream.pending_checkpoint(), cold.pending_checkpoint());
         assert_eq!(stream.accepted_cells().unwrap(), 10);
+    }
+
+    #[test]
+    fn fine_pending_checkpoint_keeps_law_identity_and_refuses_mismatch_atomically() {
+        use crate::hnn::receiving::ReceivingLaw;
+
+        let (reference, mut stream, pairing, opening) =
+            opening_with_law(Some(ReceivingLaw::RetainedFibreV1));
+        stream.receive(&reference, &pairing, &[0, 1, 2, 3]).unwrap();
+        let pending = stream.pending_checkpoint();
+        assert!(pending.starts_with("observed-stream-pending-v2 retained-fibre-v1 normal-maps "));
+        let saved = stream.resident.continuing_state(0).unwrap();
+        let parsed = ContinuingState::from_text(&saved.to_text(), 1 << 40).unwrap();
+        let field = stream.resident.field.clone();
+        let cold_resident = reference
+            .mount_continued(&field, &Current::at_rest(&field), opening, &parsed)
+            .unwrap();
+        assert_eq!(cold_resident.receiving_law(), ReceivingLaw::RetainedFibreV1);
+        let cold_crib = ObservedCrib::from_unplaced_checkpoint(
+            &field,
+            cold_resident.current(),
+            stream.crib.next_position(),
+            &stream.crib.unplaced_checkpoint().unwrap(),
+        )
+        .unwrap();
+        let cold =
+            ObservedStream::restore_checkpoint(cold_resident, cold_crib.clone(), &pending).unwrap();
+        assert_eq!(cold.pending_checkpoint(), pending);
+        assert_eq!(cold.resident.continuing_state(0).unwrap(), saved);
+
+        let mut wrong_law = cold.resident.clone();
+        wrong_law.receiving_law = ReceivingLaw::CoarseGrainV1;
+        assert!(ObservedStream::restore_checkpoint(wrong_law, cold_crib, &pending).is_err());
+        let before = stream.resident.continuing_state(0).unwrap();
+        assert_eq!(stream.pending_checkpoint(), pending);
+        assert_eq!(before, saved);
     }
 
     #[test]

@@ -13,19 +13,26 @@ use crate::hnn::encoding::observed::PairedObservation;
 use crate::hnn::encoding::placement::OccurrencePlacement;
 use crate::hnn::paired::PairingDeclaration;
 
-mod epoch;
 mod checkpoint;
 mod diagnostic;
-pub use diagnostic::{PendingReadoutDiagnostic, ReceiverPrefixReceipt, TargetPrefixReadoutControlReceipt};
+mod epoch;
+pub use diagnostic::{
+    PendingReadoutDiagnostic, ReceiverPrefixReceipt, TargetPrefixReadoutControlReceipt,
+};
 mod tree_release;
 pub use tree_release::TreeReleaseReceipt;
 mod stream;
+pub use epoch::{
+    ChannelMaterialProbeRefusal, EpochStageAttempt, EpochStageCondition, EpochStageReading,
+    EpochStageRefusal, EpochStageValue, ObservedChannelStorageAblationReading,
+    ObservedEpochCellReceipt, ObservedEpochDepositionScope, ObservedEpochEnergy,
+    ObservedEpochOutcome, ObservedEpochProbeState, ObservedEpochReceipt, ObservedEpochWallTimes,
+};
 pub use stream::{ObservedStream, ObservedStreamReceipt};
-pub use epoch::{ChannelMaterialProbeRefusal, ObservedChannelStorageAblationReading, ObservedEpochCellReceipt, ObservedEpochEnergy, ObservedEpochDepositionScope, ObservedEpochOutcome, ObservedEpochReceipt, ObservedEpochWallTimes, ObservedEpochProbeState, EpochStageAttempt, EpochStageCondition, EpochStageReading, EpochStageRefusal, EpochStageValue};
 mod execution;
 pub use execution::{
-    HostObservedEpochExecution, ScannedHostObservedEpochExecution, ObservedEpochExecution, ObservedEpochForwardContext,
-    ObservedEpochForwardWord, ObservedEpochWord,
+    HostObservedEpochExecution, ObservedEpochExecution, ObservedEpochForwardContext,
+    ObservedEpochForwardWord, ObservedEpochWord, ScannedHostObservedEpochExecution,
 };
 
 /// A delivered cell eligible for the next closing crib, outside the resident.
@@ -290,6 +297,11 @@ impl Reference {
         decision: &crate::hnn::receiving::cells::CellDecision,
         placement: Option<&OccurrencePlacement>,
     ) -> Result<IngestClassReceipt, HnnError> {
+        if resident.receiving_law() != crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
+            return Err(HnnError::Unadmitted {
+                reason: "the selected retained-fibre resident receives its own full-fibre prefix receipt",
+            });
+        }
         let refuse = |reason| HnnError::Unadmitted { reason };
         let class = decision
             .class()

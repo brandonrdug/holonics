@@ -198,10 +198,10 @@ impl RetainedFibreReceiver {
         self.source_grain
     }
 
-    /// The normalized class masses read from the complete retained fibre identities.
-    /// `bits` controls only the exterior real-chart enclosures; it does not change any exact
-    /// fibre or source cell. Common integer powers of two are removed before enclosure.
-    pub fn masses_at(
+    /// Positive weight enclosures in one common integer-power gauge. The aligned return
+    /// chooses its rational representative jointly from these weights, never by independently
+    /// normalizing probability endpoints. They remain enclosures, not exact algebraic values.
+    pub(crate) fn weights_at(
         &self,
         read: &ReceivingRead,
         bits: u32,
@@ -283,7 +283,18 @@ impl RetainedFibreReceiver {
             }
             weights.push(ExactInterval::new(lower, upper)?);
         }
+        Ok(weights)
+    }
 
+    /// The normalized class masses read from the complete retained fibre identities.
+    /// `bits` controls only the exterior real-chart enclosures; it changes no retained fibre.
+    pub fn masses_at(
+        &self,
+        read: &ReceivingRead,
+        bits: u32,
+    ) -> Result<Vec<ExactInterval>, HnnError> {
+        let weights = self.weights_at(read, bits)?;
+        let classes = weights.len();
         let mut masses = Vec::with_capacity(classes);
         for (class, weight) in weights.iter().enumerate() {
             let mut other_lower = Rat::zero();

@@ -154,6 +154,13 @@ mod single_grain;
 pub use single_grain::{LogarithmicFibre, ReceivingCell, ReceivingFibre, RetainedFibreReceiver};
 mod comparison_score;
 pub use comparison_score::{ComparedScoresAt, compare_scores_at};
+mod selected;
+pub use selected::{
+    ReceivingLaw, SelectedComparedScoresAt, SelectedFaceReading, SelectedScored,
+    compare_scores_at_law, score_at_law,
+};
+mod aligned_return;
+pub use aligned_return::{RetainedSectionReturn, RetainedStationReturn};
 mod declaration;
 pub(crate) use declaration::DeclaringFace;
 
@@ -229,7 +236,10 @@ impl ReceivingRead {
     pub fn of_logits(logits: Vec<Rat>, grain: u64) -> Self {
         let classes = logits.len() / 2;
         let cells = indexed(classes, |class| {
-            Ok::<_, HnnError>(ReceivingCell::from(GrainCell::of(&logits[2 * class], grain)))
+            Ok::<_, HnnError>(ReceivingCell::from(GrainCell::of(
+                &logits[2 * class],
+                grain,
+            )))
         })
         .expect("a grain reading refuses nothing");
         let phases = logits.chunks(2).map(|pair| &pair[1] / integer(2)).collect();
@@ -250,7 +260,6 @@ impl ReceivingRead {
     pub fn combined(wave: Vec<Rat>, tree: &LandmarkFace, grain: u64) -> Result<Self, HnnError> {
         single_grain::combined(wave, tree, grain)
     }
-
 }
 
 // -------------------------------------------------------------------------------------------

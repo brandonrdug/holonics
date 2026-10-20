@@ -47,9 +47,20 @@ fn parse_cuts(bytes: &[u8], cells: usize) -> Result<BTreeMap<usize, String>> {
 }
 
 fn fresh_checkpoint(population: u64) -> Result<Checkpoint> {
+    fresh_checkpoint_at_law(
+        population,
+        holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1,
+    )
+}
+
+fn fresh_checkpoint_at_law(
+    population: u64,
+    law: holonics::hnn::receiving::ReceivingLaw,
+) -> Result<Checkpoint> {
     let (field, initial, pairing) = declaration(population)?;
     let reference = port();
     let mut resident = reference.mount_with(&field, &Current::at_rest(&field), initial)?;
+    resident.select_receiving_law(law)?;
     let boundary = PairedObservation::admit(&field, resident.constitution(), &pairing)?;
     reference.ingest(&mut resident, None, &boundary.encode(&[])?)?;
     Ok(Checkpoint {
@@ -208,7 +219,11 @@ fn causal_cut(checkpoint: &Checkpoint, next_class: Option<usize>, label: &str) -
 /// Reusable native training entry. Data are already framed and pinned by the exterior plan.
 /// Backend injection changes only the existing forward/reverse executor, not the epoch law.
 #[allow(clippy::too_many_arguments)]
-fn train(args: &[String], execution: &dyn ObservedEpochExecution) -> Result<()> {
+fn train(
+    args: &[String],
+    execution: &dyn ObservedEpochExecution,
+    law: holonics::hnn::receiving::ReceivingLaw,
+) -> Result<()> {
     if args.len() != 10 {
         return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT".into());
     }
@@ -233,7 +248,11 @@ fn train(args: &[String], execution: &dyn ObservedEpochExecution) -> Result<()> 
     let out = Path::new(&args[9]);
     std::fs::create_dir(out)?;
     let started = Instant::now();
-    let mut checkpoint = fresh_checkpoint(population)?;
+    let mut checkpoint = if law == holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
+        fresh_checkpoint(population)?
+    } else {
+        fresh_checkpoint_at_law(population, law)?
+    };
     checkpoint.provenance = format!(
         "complete Q+LF+A+LF; corpus SHA256 {}; backend {backend}; no record-boundary resets",
         args[3]
@@ -322,7 +341,15 @@ fn train(args: &[String], execution: &dyn ObservedEpochExecution) -> Result<()> 
                 ("carry_out", epoch.carry_out.to_string()),
                 ("commit", epoch.deposit.commit.to_string()),
                 ("outcome", exact(&epoch.outcome)),
-                ("actual_coarse_prequential_code_sum", interval(&coarse)),
+                (
+                    if law == holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
+                        "actual_coarse_prequential_code_sum"
+                    } else {
+                        "actual_retained_prequential_code_sum"
+                    },
+                    interval(&coarse),
+                ),
+                ("receiving_law", quoted(law.as_str())),
                 (
                     "prequential_readings",
                     format!(
@@ -337,7 +364,15 @@ fn train(args: &[String], execution: &dyn ObservedEpochExecution) -> Result<()> 
                                     (epoch.cells - epoch.consumed as u64 + offset as u64)
                                         .to_string()
                                 ),
-                                ("actual_coarse_code", interval(&read.code)),
+                                (
+                                    if law == holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1
+                                    {
+                                        "actual_coarse_code"
+                                    } else {
+                                        "actual_retained_code"
+                                    },
+                                    interval(&read.code)
+                                ),
                                 (
                                     "tree_code",
                                     read.tree.as_ref().map_or_else(|| "null".into(), interval)
@@ -349,6 +384,14 @@ fn train(args: &[String], execution: &dyn ObservedEpochExecution) -> Result<()> 
                 ),
                 ("actual_normal_comparison", exact(&epoch.comparison)),
                 ("actual_joint_comparison", exact(&epoch.joint_comparison)),
+                (
+                    "actual_receiving_only_comparison",
+                    exact(&epoch.receiving_only_comparison),
+                ),
+                (
+                    "retained_section_return",
+                    exact(&epoch.retained_section_return),
+                ),
                 ("whole_refusal", exact(&epoch.whole_stage_refusal)),
                 ("joint_refusal", exact(&epoch.joint_stage_refusal)),
                 ("wall", exact(&epoch.wall)),
@@ -381,6 +424,10 @@ fn train(args: &[String], execution: &dyn ObservedEpochExecution) -> Result<()> 
         &out.join("TRAINING_COMPLETE.json"),
         object(&[
             ("backend", quoted(backend)),
+            (
+                "receiving_law",
+                quoted(checkpoint.stream.resident().receiving_law().as_str()),
+            ),
             ("accepted_cells", at.to_string()),
             (
                 "published_cells",
@@ -477,10 +524,11 @@ fn exact_classes(classes: &[usize]) -> String {
 
 pub(super) fn run(args: &[String]) -> Result<()> {
     match args.first().map(String::as_str) {
-        Some("train") => train(args, &HostObservedEpochExecution),
+        Some("train") => train(args, &HostObservedEpochExecution,holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1),
+        Some("train-retained-fibre-v1") => train(args,&HostObservedEpochExecution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1),
         Some("sample") => sample(args),
         _ => Err(
-            "complete-language requires train or sample; no default backend/model action".into(),
+            "complete-language requires train, explicit train-retained-fibre-v1, or sample; no default backend/model action".into(),
         ),
     }
 }

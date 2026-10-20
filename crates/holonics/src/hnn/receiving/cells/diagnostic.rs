@@ -256,7 +256,8 @@ pub fn compare_readout_class_codes_at(
 }
 
 /// Frozen native operands read by an explicitly declared full-fibre receiver. The population
-/// likelihoods are inherited from the original coarse reader, not calibrated on this receiver.
+/// likelihoods keep the resident's declared training-law lineage; an alternate read of a coarse
+/// resident does not retrospectively calibrate that historical population under this receiver.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RetainedScoredFaceReading {
     pub population: crate::receiver::population::PortPopulation,

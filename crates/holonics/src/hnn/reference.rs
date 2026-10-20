@@ -534,6 +534,9 @@ pub struct Resident {
     current: Current,
     address: ActiveAddress,
     constitution: Constitution,
+    /// Scoring law selected for future observed receptions. It is mounted explicitly and is
+    /// serialized with the native passage; selecting it never rewrites the population.
+    receiving_law: crate::hnn::receiving::ReceivingLaw,
     moments: BTreeMap<MomentId, SourceMoment>,
     pending: BTreeMap<PendingId, PendingSlot>,
     staged: BTreeMap<StagedId, StagedSlot>,
@@ -829,6 +832,58 @@ impl Resident {
     /// The published constitution.
     pub fn constitution(&self) -> &Constitution {
         &self.constitution
+    }
+
+    /// The stable receiving law used by subsequent observed scoring and saved continuation.
+    pub fn receiving_law(&self) -> crate::hnn::receiving::ReceivingLaw {
+        self.receiving_law
+    }
+
+    /// Select a receiving scorer before this resident has received or deposited any source.
+    /// Re-selecting the current law is idempotent. This changes no material, source, clock,
+    /// population weight, carry, or handle.
+    pub fn select_receiving_law(
+        &mut self,
+        law: crate::hnn::receiving::ReceivingLaw,
+    ) -> Result<(), HnnError> {
+        if self.receiving_law == law {
+            return Ok(());
+        }
+        let populations_fresh = self.field.receivers().iter().all(|receiver| {
+            self.constitution
+                .population(receiver.ring)
+                .is_some_and(|p| p.cells() == 0)
+        });
+        let fresh = populations_fresh
+            && self.constitution.commit() == 0
+            && self.current.lift() == self.aeon.opening.as_slice()
+            && self.moments.is_empty()
+            && self.pending.is_empty()
+            && self.staged.is_empty()
+            && self.next == 0
+            && self.carried.is_none()
+            && self.carried_error.is_none()
+            && self.held_contact_variation.is_none()
+            && self.receiving_chart.is_none()
+            && self.participating_world.is_none()
+            && self.world_model.is_none()
+            && self.founding.is_none()
+            && self.staged_founding.is_none()
+            && self.aeon.cells == 0
+            && self.aeon.closed == 0
+            && !self.aeon.awaiting
+            && self.arrived.is_none()
+            && self.ledger == EnclosedLedger::new()
+            && self
+                .observed_epoch_ingress
+                .is_none_or(|(_, ticks)| ticks == 0);
+        if !fresh {
+            return Err(HnnError::ContinuingState {
+                what: "a receiving-law change requires a fresh resident before source or population history",
+            });
+        }
+        self.receiving_law = law;
+        Ok(())
     }
 
     /// The admitted family of the last boundary (the declared receivers before the first).
@@ -1146,6 +1201,7 @@ impl Reference {
             current: current.clone(),
             address: ActiveAddress::of_field(field, current, &constitution)?,
             constitution,
+            receiving_law: crate::hnn::receiving::ReceivingLaw::CoarseGrainV1,
             moments: BTreeMap::new(),
             pending: BTreeMap::new(),
             staged: BTreeMap::new(),
@@ -1871,6 +1927,11 @@ impl ExecutionPort for Reference {
         HnnError,
     > {
         resident.admit_exact_current()?;
+        if resident.receiving_law() != crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
+            return Err(HnnError::Unadmitted {
+                reason: "the selected full-fibre resident uses its aligned observed comparison and receiver release",
+            });
+        }
         // Everything is read from the borrowed pending ratio; it is consumed only once the compare
         // has succeeded, so a refused target or a refused read leaves it open (review S11).
         let field = resident.field.clone();
@@ -2224,6 +2285,11 @@ impl ExecutionPort for Reference {
         decision: &DecisionRule,
     ) -> Result<InteractionReturn<Faces, (), (), Vec<ReceivingPhases>, PortReceipt>, HnnError> {
         resident.admit_exact_current()?;
+        if resident.receiving_law() != crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
+            return Err(HnnError::Unadmitted {
+                reason: "the selected full-fibre resident uses its aligned observed comparison and receiver release",
+            });
+        }
         let slot = resident
             .pending
             .get(pending)
@@ -2307,6 +2373,11 @@ impl ExecutionPort for Reference {
     ) -> Result<InteractionReturn<CellRelease, (), (), Vec<ReceivingPhases>, PortReceipt>, HnnError>
     {
         resident.admit_exact_current()?;
+        if resident.receiving_law() != crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
+            return Err(HnnError::Unadmitted {
+                reason: "the selected full-fibre resident uses its aligned observed comparison and receiver release",
+            });
+        }
         let slot = resident
             .pending
             .get(pending)
@@ -5206,8 +5277,9 @@ pub fn contact_ablation(
                                     .cells()
                                     .iter()
                                     .map(|c| {
-                                        c.rational_value(face.grain())
-                                            .expect("contact ablation reads raw rational wave faces")
+                                        c.rational_value(face.grain()).expect(
+                                            "contact ablation reads raw rational wave faces",
+                                        )
                                     })
                                     .collect();
                                 let hi = v.iter().max().cloned().unwrap_or_else(Rat::zero);

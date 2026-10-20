@@ -64,6 +64,7 @@ use crate::hnn::encoding::Encoded;
 use crate::hnn::field::Field;
 use crate::hnn::realization::indexed;
 use crate::hnn::receiving::ReceivingRead;
+use crate::hnn::receiving::{ReceivingCell, ReceivingFibre};
 use crate::ratio::algebraic::{
     ExactInterval, interval_difference, interval_sum, log2_enclosure, log2_of_enclosure,
 };
@@ -72,7 +73,6 @@ use crate::ratio::exponentiated::{CarriedPower, PhaseField};
 use crate::ratio::exponentiated::{READING_BITS, power_of_two};
 use crate::ratio::gaussian::GaussianRat;
 use crate::ratio::{LogRatio, Rat, integer};
-use crate::hnn::receiving::{ReceivingCell, ReceivingFibre};
 
 // -------------------------------------------------------------------------------------------
 // enclosures of the real chart (the base-two logarithms and their sums are
@@ -179,8 +179,11 @@ impl Face {
     pub fn same_mass_face(&self, other: &Self) -> bool {
         self.grain == other.grain
             && self.cells.len() == other.cells.len()
-            && self.cells.iter().zip(&other.cells)
-                .all(|(a,b)| a.carry == b.carry && a.phase == b.phase)
+            && self
+                .cells
+                .iter()
+                .zip(&other.cells)
+                .all(|(a, b)| a.carry == b.carry && a.phase == b.phase)
     }
 
     /// The receiver's exact fibre identity per class, rational or logarithmic.
@@ -598,6 +601,32 @@ impl HolonRatio {
             covector.logits[station][2 * ratio.target + 1] = -ratio.gap.turns() / integer(2);
         }
         Ok((covector, released))
+    }
+
+    /// Install the admitted rational class return at this actual aperture-one comparison.
+    /// The phase rows stay the ratio owner's own phase objective; they are not the derivative
+    /// of the full-fibre class code. The native section owner has certified the class return
+    /// and must still return it through this comparison's retained producing Word.
+    pub(crate) fn with_aligned_class_return(
+        &self,
+        station: &crate::hnn::receiving::RetainedStationReturn,
+    ) -> Result<RatioCovector, HnnError> {
+        if self.phases.len() != 1
+            || self.stations.len() != 1
+            || self.phases[0].target != station.target
+            || self.faces.faces.len() != 1
+            || station.gradient.len() != self.faces.faces[0].cells().len()
+            || station.gradient.iter().cloned().sum::<Rat>() != Rat::zero()
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the aligned class return belongs to this aperture-one target comparison",
+            });
+        }
+        let mut covector = self.covector()?;
+        for (class, value) in station.gradient.iter().enumerate() {
+            covector.logits[0][2 * class] = value.clone();
+        }
+        Ok(covector)
     }
 }
 
