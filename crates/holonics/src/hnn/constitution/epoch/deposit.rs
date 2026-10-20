@@ -2254,7 +2254,11 @@ impl Constitution {
                 }
                 error
             })?
-            .map_err(|_| refused("the fixed actual epoch rays were not all admitted"))?;
+            .map_err(|_| {
+                enrich_failed_channel_ray(&mut trace.evidence, self, &next, &strokes,
+                    &factor_steps, &certified, &original_channel_faces, &rebases);
+                refused("the fixed actual epoch rays were not all admitted")
+            })?;
         // Every candidate remains local to next until ALL exact actual-ray,
         // tube, storage and budget checks pass. No live resident is mutated.
         let mut normal_moves = 0u64;
