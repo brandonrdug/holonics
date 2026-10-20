@@ -1,4 +1,6 @@
-//! Host-only, aperture-one observed continuation through the existing execution port.
+//! Aperture-one observed continuation through the native transactional owner.
+//! The epoch route can explicitly select execution of its actual return and grouped
+//! reached records; its source, face and publication laws remain this owner's.
 //!
 //! The helical pair interaction keeps its helix, pair, faces and occurrence placement;
 //! cell holonomy, tube and tower laws are unchanged. Comparison reads E_Θ(u,x), then
@@ -10,6 +12,17 @@ use crate::hnn::constitution::Sample;
 use crate::hnn::encoding::observed::PairedObservation;
 use crate::hnn::encoding::placement::OccurrencePlacement;
 use crate::hnn::paired::PairingDeclaration;
+
+mod epoch;
+mod checkpoint;
+mod stream;
+pub use stream::{ObservedStream, ObservedStreamReceipt};
+pub use epoch::{ObservedEpochCellReceipt, ObservedEpochEnergy, ObservedEpochDepositionScope, ObservedEpochOutcome, ObservedEpochReceipt, ObservedEpochWallTimes};
+mod execution;
+pub use execution::{
+    HostObservedEpochExecution, ObservedEpochExecution, ObservedEpochForwardContext,
+    ObservedEpochForwardWord, ObservedEpochWord,
+};
 
 /// A delivered cell eligible for the next closing crib, outside the resident.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -203,6 +216,11 @@ fn admit_observed_cell(
     placement: Option<&OccurrencePlacement>,
 ) -> Result<(PairedObservation, Encoded), HnnError> {
     resident.admit_exact_current()?;
+    if resident.observed_epoch_terminal {
+        return Err(HnnError::Unadmitted {
+            reason: "a terminal partial epoch cannot continue as an ordinary observed life",
+        });
+    }
     if resident.moments.len() > 1 {
         return Err(HnnError::Unadmitted {
             reason: "observed continuation requires at most one moment",
@@ -254,7 +272,130 @@ impl Reference {
         Ok(reading)
     }
 
-    /// The one ingest, population and close step used by both public paths.
+    /// Continue a private release fork with its actual emitted class. The next draw reads
+    /// `P_scored(c | emitted_prefix)`: receive the same family likelihoods as `release_cells`,
+    /// and the same addressed tree arrival as an observed prefix, before advancing ingress.
+    /// Physical maps, comparison/deposition clocks and the trunk do not learn from this receipt.
+    /// A refusal publishes neither the conditional prefix nor the ingest/crib successor.
+    pub fn ingest_released_cell_continuing(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        pending: PendingId,
+        decision: &crate::hnn::receiving::cells::CellDecision,
+        placement: Option<&OccurrencePlacement>,
+    ) -> Result<IngestClassReceipt, HnnError> {
+        let refuse = |reason| HnnError::Unadmitted { reason };
+        let class = decision
+            .class()
+            .ok_or_else(|| refuse("only an emitted release cell advances a conditional prefix"))?;
+        admit_observed_cell(resident, crib, pairing, class, placement)?;
+        if resident.pending.len() != 1 || !resident.staged.is_empty() {
+            return Err(refuse(
+                "a release continuation consumes its one producing pending ratio",
+            ));
+        }
+        let slot = resident
+            .pending
+            .get(&pending)
+            .ok_or(HnnError::UnknownHandle {
+                handle: Handle::Pending(pending),
+            })?;
+        let phases = slot.ratio.phases();
+        let receiver = phases.ring();
+        if phases.aperture() != 1 || decision.phase != 0 {
+            return Err(refuse(
+                "release continuation receives one aperture-one decision",
+            ));
+        }
+        if slot.ratio.commit() != resident.constitution.commit()
+            || slot.ratio.current(&resident.field)? != resident.current
+            || resident.moments.values().next() != Some(slot.ratio.moment())
+        {
+            return Err(refuse(
+                "a released cell continues its producing material and current",
+            ));
+        }
+        let producing = decision
+            .scored_face
+            .as_ref()
+            .ok_or_else(|| refuse("a released cell keeps its producing scored family"))?;
+        let population = resident
+            .constitution
+            .population(receiver)
+            .ok_or(HnnError::MissingReceivingMap { ring: receiver })?;
+        // CellDecision is exterior evidence with public fields. Bind its whole producing
+        // expression to this pending word, using private chart state so a stale/forged
+        // expression cannot change even the resident's solver view on refusal.
+        let mut validation_charts = resident.charts.clone();
+        let (_, wave) = slot.ratio.read_on(
+            &resident.field,
+            &resident.constitution,
+            &mut validation_charts,
+            &slot.opening,
+        )?;
+        let against = slot.ratio.against(&resident.constitution, &wave, &[])?;
+        if against.trees.len() != 1 || against.faces.faces.len() != 1 {
+            return Err(refuse(
+                "one producing tree and combined face belong to the released cell",
+            ));
+        }
+        let actual = crate::hnn::receiving::cells::ScoredFaceReading {
+            population: population.clone(),
+            tree_probabilities: against.trees[0].probabilities.clone(),
+            combined: against.faces.faces[0].clone(),
+        };
+        if producing != &actual || decision.face != actual.masses_at(decision.bits)? {
+            return Err(refuse(
+                "a release continuation receives its actual producing population, tree and combined face",
+            ));
+        }
+        let step = ReceivingStep {
+            ring: receiver,
+            tree: producing
+                .tree_probabilities
+                .get(class)
+                .ok_or(HnnError::CellOutside {
+                    code: class,
+                    alphabet: producing.tree_probabilities.len(),
+                })?
+                .clone(),
+            // As in release_cells/score, family likelihood is received at the declared
+            // reading precision, independently of the demand depth certifying the draw.
+            combined: crate::hnn::receiving::face_enclosure_at(
+                &producing.combined,
+                class,
+                crate::ratio::exponentiated::READING_BITS,
+            )?,
+        };
+        let mut tree = resident
+            .constitution
+            .landmarks(receiver)
+            .ok_or(HnnError::MissingReceivingMap { ring: receiver })?
+            .clone();
+        match slot.ratio.observed_addresses(&[])? {
+            Some(addresses) => {
+                tree.receive_observed_arrivals(&addresses, &[class], phases.grain())?;
+            }
+            None => {
+                tree.receive_arrivals(&slot.ratio.addresses(&[])?, &[class], phases.grain())?;
+            }
+        }
+        let mut next = resident.clone();
+        let mut next_crib = crib.clone();
+        next.constitution = next
+            .constitution
+            .observed_epoch_prefix(receiver, tree, &[step])?;
+        self.discard(&mut next, Handle::Pending(pending))?;
+        let receipt =
+            self.ingest_class_step(&mut next, &mut next_crib, pairing, class, placement)?;
+        *resident = next;
+        *crib = next_crib;
+        Ok(receipt)
+    }
+
+    /// The common source ingest and close step; conditional receiving is joined by its caller.
     fn ingest_class_step(
         &self,
         resident: &mut Resident,
@@ -651,7 +792,7 @@ mod precision_tests {
         );
         super::super::precision_publication_tests::receiving_carry_clock(&mut text, 0, 2);
         let text = ContinuingState::stamped(&text, &resident.constitution).unwrap();
-        let state = ContinuingState::from_text(&text).unwrap();
+        let state = ContinuingState::from_text(&text, resident.constitution().budget()).unwrap();
         resident.constitution = resident.constitution.clone().continued(&state).unwrap();
         (port, resident, pairing, moment)
     }
@@ -892,5 +1033,364 @@ mod precision_tests {
         );
         assert_eq!(format!("{entry:?}"), before);
         assert_eq!(crib, prior_crib);
+    }
+}
+
+#[cfg(test)]
+mod released_prefix_tests {
+    use super::*;
+    use crate::hnn::paired::PairedCarrier;
+    use crate::hnn::receiving::cells::{CellDecision, CellLaw};
+    use crate::hnn::tests::learning::chain_declaration;
+    use crate::ratio::rat;
+    use crate::receiver::release::KeyStream;
+
+    fn opening() -> (Reference, Resident, ObservedCrib, PairingDeclaration) {
+        opening_at(false)
+    }
+
+    fn opening_at(before_carry: bool) -> (Reference, Resident, ObservedCrib, PairingDeclaration) {
+        let mut declaration = chain_declaration(1 << 16);
+        declaration.receivers[0].aperture = 1;
+        declaration.rings[0].lock = (0..declaration.rings[0].period).collect();
+        declaration.rings[2] = declaration.rings[1].clone();
+        declaration.rings[2].lock.clear();
+        declaration.lattice.clear();
+        let field = Field::declare(declaration.by_lattice_rule()).unwrap();
+        let pairing = PairingDeclaration::Family {
+            table: vec![(0, 1), (1, 0), (2, 3), (3, 2)],
+        };
+        let free = ExactRatMatrix::shaped(
+            8,
+            4,
+            (0..8)
+                .map(|row| {
+                    (0..4)
+                        .map(|column| {
+                            if (row == 2 && column == 0) || (row == 3 && column == 2) {
+                                rat(1, 32)
+                            } else {
+                                Rat::zero()
+                            }
+                        })
+                        .collect()
+                })
+                .collect(),
+        )
+        .unwrap();
+        let source = PairedCarrier::complete_port(&field, 0, &pairing, &free).unwrap();
+        let carrier = PairedCarrier::admit(&field, 0, &pairing, &source).unwrap();
+        let material = Constitution::initial(&field, 1 << 40)
+            .unwrap()
+            .with_symmetric_source(0, source, carrier.symmetry())
+            .unwrap();
+        let reference = Reference::new(16, 1 << 40);
+        let current = if before_carry {
+            Current::at(
+                &field,
+                field
+                    .rings()
+                    .iter()
+                    .map(|ring| BigInt::from(ring.period() - 1))
+                    .collect(),
+            )
+            .unwrap()
+        } else {
+            Current::at_rest(&field)
+        };
+        let mut resident = reference.mount_with(&field, &current, material).unwrap();
+        let boundary = PairedObservation::admit(&field, &resident.constitution, &pairing).unwrap();
+        reference
+            .ingest(&mut resident, None, &boundary.encode(&[]).unwrap())
+            .unwrap();
+        (reference, resident, ObservedCrib::new(0), pairing)
+    }
+
+    fn draw(
+        port: &Reference,
+        resident: &mut Resident,
+        keys: &mut KeyStream,
+    ) -> (PendingId, CellDecision) {
+        let (moment, _) = resident.continuing().unwrap();
+        let phases = resident.admitted[0].clone();
+        let (pending, _) = port.refine(resident, &moment, &phases).unwrap();
+        let release = port
+            .release_cells(resident, &pending, CellLaw::Draw(keys))
+            .unwrap()
+            .forward
+            .into_present()
+            .unwrap();
+        (pending, release.cells.into_iter().next().unwrap())
+    }
+
+    fn same_refused_state(
+        actual: &Resident,
+        before: &Resident,
+        crib: &ObservedCrib,
+        old_crib: &ObservedCrib,
+    ) {
+        assert_eq!(actual.constitution, before.constitution);
+        assert_eq!(actual.current, before.current);
+        assert_eq!(actual.address, before.address);
+        assert_eq!(actual.moments, before.moments);
+        assert_eq!(actual.carried, before.carried);
+        assert_eq!(actual.observed_epoch_ingress, before.observed_epoch_ingress);
+        assert_eq!(actual.ledger.balance(), before.ledger.balance());
+        assert_eq!(
+            actual.pending.keys().collect::<Vec<_>>(),
+            before.pending.keys().collect::<Vec<_>>()
+        );
+        assert_eq!(actual.next, before.next);
+        assert_eq!(actual.state_bits(), before.state_bits());
+        assert_eq!(crib, old_crib);
+    }
+
+    #[test]
+    fn released_prefix_matches_scored_conditional_family_and_preserves_first_draw() {
+        let (port, trunk, trunk_crib, pairing) = opening();
+        let untouched = trunk.clone();
+        let mut fork = trunk.clone();
+        let mut crib = trunk_crib.clone();
+        let receiver = trunk.admitted[0].ring();
+        let opening_ingress = trunk.receiver_ingress_ticks();
+        let maximum_cells: usize = trunk.field.rings()[..receiver]
+            .iter()
+            .map(|ring| ring.period() as usize)
+            .product();
+        let mut keys = KeyStream::new(vec![0; maximum_cells], 1).unwrap();
+        let mut classes = Vec::new();
+        let mut decisions = Vec::new();
+        let mut successors = Vec::new();
+        for index in 0..maximum_cells {
+            let (pending, decision) = draw(&port, &mut fork, &mut keys);
+            if index == 0 {
+                let mut old_first = trunk.clone();
+                let mut old_keys = KeyStream::new(vec![0], 1).unwrap();
+                let (_, unchanged) = draw(&port, &mut old_first, &mut old_keys);
+                assert_eq!(decision, unchanged);
+                assert_eq!(old_keys.keys_read(), 1);
+            }
+            let class = decision
+                .class()
+                .expect("the declared key selects one exact class");
+            classes.push(class);
+            let receiver = fork.admitted[0].ring();
+            let material_commit = fork.constitution.commit();
+            let ledger = fork.ledger.balance().clone();
+            port.ingest_released_cell_continuing(
+                &mut fork, &mut crib, &pairing, pending, &decision, None,
+            )
+            .unwrap();
+            assert!(fork.pending.is_empty());
+            assert_eq!(fork.constitution.commit(), material_commit);
+            assert_eq!(fork.ledger.balance().depositions, ledger.depositions);
+            assert_eq!(
+                fork.constitution.receiving_map(receiver),
+                trunk.constitution.receiving_map(receiver)
+            );
+            decisions.push(decision);
+            successors.push(fork.clone());
+            if fork.receiver_ingress_ticks() != opening_ingress {
+                break;
+            }
+        }
+        assert!(
+            classes.len() >= 3,
+            "the fixture reaches two later conditional faces"
+        );
+        assert_ne!(fork.receiver_ingress_ticks(), opening_ingress);
+        // The ordinary batched heard owner is the independent oracle. Its requested cuts
+        // retain the producing physical medium and advance only actual prefix tree/population.
+        let mut teacher = trunk.clone();
+        let mut teacher_crib = trunk_crib.clone();
+        let cuts: Vec<_> = (1..=classes.len()).collect();
+        let receipt = port
+            .observe_epoch_continuing_at_cuts(
+                &mut teacher,
+                &mut teacher_crib,
+                &pairing,
+                &classes,
+                None,
+                &cuts,
+                false,
+            )
+            .unwrap();
+        assert_eq!(receipt.consumed, classes.len());
+        assert!(receipt.closed_section);
+        assert!(!receipt.terminal_partial);
+        assert_eq!(keys.keys_read(), classes.len());
+        for (index, (decision, heard)) in decisions.iter().zip(&receipt.reads).enumerate() {
+            assert_eq!(
+                decision.scored_face.as_ref(),
+                Some(&heard.scored_face),
+                "conditional prefix {index}"
+            );
+            assert_eq!(
+                decision.face,
+                heard.scored_face.masses_at(decision.bits).unwrap()
+            );
+            let (_, prefix, _) = receipt
+                .prefixes
+                .iter()
+                .find(|(at, _, _)| *at == index + 1)
+                .unwrap();
+            let successor = &successors[index];
+            let ring = successor.admitted[0].ring();
+            assert_eq!(
+                successor.constitution.population(ring),
+                prefix.constitution.population(ring)
+            );
+            assert_eq!(
+                successor.constitution.landmarks(ring),
+                prefix.constitution.landmarks(ring)
+            );
+            assert_eq!(successor.current, prefix.current);
+            assert_eq!(successor.address, prefix.address);
+            assert_eq!(successor.moments, prefix.moments);
+            assert_eq!(successor.carried, prefix.carried);
+        }
+        same_refused_state(&trunk, &untouched, &trunk_crib, &ObservedCrib::new(0));
+    }
+
+    #[test]
+    fn released_prefix_late_close_refusal_rolls_back_conditional_reception() {
+        let (port, mut fork, mut crib, pairing) = opening_at(true);
+        let mut keys = KeyStream::new(vec![0], 1).unwrap();
+        let (pending, decision) = draw(&port, &mut fork, &mut keys);
+        let class = decision.class().unwrap();
+        let boundary = PairedObservation::admit(&fork.field, &fork.constitution, &pairing).unwrap();
+        let mut clock = fork.current.clone();
+        assert!(
+            clock
+                .step(&fork.field, &boundary.encode(&[class]).unwrap(), 0)
+                .unwrap()
+                .carry_out
+        );
+        // Admission checks the crib position; only the shared close reads this malformed
+        // prior entry after conditional reception and ingress have already run on the clone.
+        crib.entries.push(ObservedCribCell {
+            position: 0,
+            class: fork.field.alphabet(),
+            placement: None,
+        });
+        let before = fork.clone();
+        let crib_before = crib.clone();
+        assert!(
+            port.ingest_released_cell_continuing(
+                &mut fork, &mut crib, &pairing, pending, &decision, None
+            )
+            .is_err()
+        );
+        same_refused_state(&fork, &before, &crib, &crib_before);
+    }
+
+    #[test]
+    fn released_prefix_refusals_preserve_population_tree_pending_and_crib() {
+        let (port, mut fork, mut crib, pairing) = opening();
+        let mut keys = KeyStream::new(vec![0], 1).unwrap();
+        let (pending, decision) = draw(&port, &mut fork, &mut keys);
+        let before = fork.clone();
+        let old_crib = crib.clone();
+        let mut stale = decision.clone();
+        let class = stale.class().unwrap();
+        let producing = stale.scored_face.as_mut().unwrap();
+        producing
+            .population
+            .receive(&[
+                crate::ratio::algebraic::ExactInterval::point(
+                    producing.tree_probabilities[class].clone(),
+                ),
+                crate::hnn::receiving::face_enclosure_at(
+                    &producing.combined,
+                    class,
+                    crate::ratio::exponentiated::READING_BITS,
+                )
+                .unwrap(),
+            ])
+            .unwrap();
+        assert!(
+            port.ingest_released_cell_continuing(
+                &mut fork, &mut crib, &pairing, pending, &stale, None
+            )
+            .is_err()
+        );
+        same_refused_state(&fork, &before, &crib, &old_crib);
+        let mut wrong_combined = decision.clone();
+        let trees = fork.pending[&pending]
+            .ratio
+            .tree_faces(&fork.constitution, &[])
+            .unwrap();
+        let phases = fork.admitted[0].clone();
+        let mut wave = vec![Rat::zero(); 2 * fork.field.alphabet()];
+        wave[0] = Rat::one();
+        let changed =
+            crate::hnn::receiving::ReceivingRead::combined(wave, &trees[0], phases.grain())
+                .unwrap();
+        let changed = crate::hnn::ratio::Face::of_read(&changed, phases.grain()).unwrap();
+        assert_ne!(
+            changed,
+            wrong_combined.scored_face.as_ref().unwrap().combined
+        );
+        wrong_combined.scored_face.as_mut().unwrap().combined = changed;
+        assert!(
+            port.ingest_released_cell_continuing(
+                &mut fork,
+                &mut crib,
+                &pairing,
+                pending,
+                &wrong_combined,
+                None
+            )
+            .is_err()
+        );
+        same_refused_state(&fork, &before, &crib, &old_crib);
+        let mut wrong_enclosure = decision.clone();
+        wrong_enclosure.face[0].upper += Rat::one();
+        assert!(
+            port.ingest_released_cell_continuing(
+                &mut fork,
+                &mut crib,
+                &pairing,
+                pending,
+                &wrong_enclosure,
+                None
+            )
+            .is_err()
+        );
+        same_refused_state(&fork, &before, &crib, &old_crib);
+        let mut wrong_crib = ObservedCrib::new(1);
+        let old_wrong = wrong_crib.clone();
+        assert!(
+            port.ingest_released_cell_continuing(
+                &mut fork,
+                &mut wrong_crib,
+                &pairing,
+                pending,
+                &decision,
+                None
+            )
+            .is_err()
+        );
+        same_refused_state(&fork, &before, &wrong_crib, &old_wrong);
+        assert_eq!(keys.keys_read(), 1);
+        let (port, mut held, mut held_crib, pairing) = opening();
+        let mut no_keys = KeyStream::new(Vec::new(), 1).unwrap();
+        let (pending, decision) = draw(&port, &mut held, &mut no_keys);
+        assert!(decision.class().is_none());
+        let before = held.clone();
+        let crib_before = held_crib.clone();
+        assert!(
+            port.ingest_released_cell_continuing(
+                &mut held,
+                &mut held_crib,
+                &pairing,
+                pending,
+                &decision,
+                None
+            )
+            .is_err()
+        );
+        same_refused_state(&held, &before, &held_crib, &crib_before);
+        assert_eq!(no_keys.keys_read(), 0);
     }
 }

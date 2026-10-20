@@ -29,6 +29,9 @@
 //!
 //! [definition] **The ceiling is derived, not authored.** An inverse's `2^S` is a carrier word
 //! exactly when `S ≤ 126` ([`INVERSE_EXPONENT_CEILING`]).
+//! The chart store dispatches operators outside this bounded ABI to
+//! `inverse_exact`'s runtime limb residual/refinement/certificate. That path
+//! changes neither this ceiling nor the native signed64 chart coordinates.
 //!
 //! The carried tick and its adjoint as separate launches (`hnn_word_tick`, `hnn_word_adjoint_tick`),
 //! their resident chaining and captured graphs, and the standalone resident inverse charts were

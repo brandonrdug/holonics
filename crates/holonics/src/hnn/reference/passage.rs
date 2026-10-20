@@ -67,6 +67,7 @@ impl ResidentPassage {
         constitution: &Constitution,
         text: &str,
     ) -> Result<Self, HnnError> {
+        constitution.admit_epoch_field(field)?;
         let mut lines = text.lines();
         let mut next = |what: &'static str| lines.next().ok_or(HnnError::ContinuingState { what });
         let (current, admitted, opens) = read_opening(field, &mut next)?;
@@ -237,10 +238,11 @@ impl ContinuingState {
         field: &Field,
         opening: &Constitution,
     ) -> Result<Option<ResidentPassage>, HnnError> {
+        // Bind even a constitution-only save before reporting that no passage was stored.
+        let constitution = opening.clone().continued_on(field, self)?;
         let Some(text) = self.passage() else {
             return Ok(None);
         };
-        let constitution = opening.clone().continued(self)?;
         Ok(Some(ResidentPassage::from_text(
             field,
             &constitution,
@@ -345,12 +347,16 @@ impl Resident {
             }),
         };
         let passage = ResidentPassage::new(&self.field, &self.constitution, parts)?;
-        Ok(self
+        let state = self
             .constitution
             .continuing_state(ring)?
             .with_carry(self.carried.clone())
             .with_founding(self.founding.clone(), self.staged_founding)
-            .with_resident_passage(passage))
+            .with_resident_passage(passage);
+        match self.observed_epoch_ingress {
+            Some((receiver, ticks)) => state.with_receiver_ingress_ticks(receiver, ticks),
+            None => Ok(state),
+        }
     }
 
     /// Restore only after all saved operands have been read and checked. The resident is owned
@@ -598,8 +604,10 @@ mod tests {
     fn main_version_three_save_is_refused_before_changed_law_operands() {
         // Written at 03b949b83006236044e7e15abb2142d00918474d by Resident::continuing_state().to_text().
         let text = include_str!("fixtures/main-v3.state");
-        assert!(matches!(ContinuingState::from_text(text),
-            Err(HnnError::PassageVersion { version }) if version == crate::hnn::SavedPassageVersion::Number(3)));
+        assert!(
+            matches!(ContinuingState::from_text(text, crate::hnn::constitution::CAMPAIGN_ONE_BUDGET),
+            Err(HnnError::PassageVersion { version }) if version == crate::hnn::SavedPassageVersion::Number(3))
+        );
     }
     #[test]
     fn version_four_never_decodes_located_prior_text() {
@@ -611,7 +619,7 @@ mod tests {
         assert!(text.contains("receiving_prior none"));
         let changed = text.replacen("receiving_prior none", "located none", 1);
         let stamped = ContinuingState::stamped(&changed, resident.constitution()).unwrap();
-        assert!(ContinuingState::from_text(&stamped).is_err());
+        assert!(ContinuingState::from_text(&stamped, resident.constitution().budget()).is_err());
     }
     #[test]
     fn superseded_and_unversioned_passages_are_typed_refusals() {

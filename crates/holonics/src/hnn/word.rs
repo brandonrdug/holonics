@@ -1894,6 +1894,36 @@ impl<'c> Word<'c> {
         opening: &WordOpening,
         view: &crate::hnn::ring::modes::ModeView,
     ) -> Result<Self, HnnError> {
+        Self::open_received_view_with(field, constitution, current, moment, opening, view, || {
+            Operands::at_cut_charted(field, constitution, current, charts)
+        })
+    }
+
+    pub(crate) fn open_received_scoped(
+        scope: &mut crate::hnn::propagation::RingScope<'c>,
+        current: &Current,
+        moment: &SourceMoment,
+        charts: &mut Charts,
+        opening: &WordOpening,
+        view: &crate::hnn::ring::modes::ModeView,
+    ) -> Result<Self, HnnError> {
+        let field = scope.field();
+        let material = scope.material();
+        Self::open_received_view_with(field, material, current, moment, opening, view, || {
+            scope.at_cut(current, charts)
+        })
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn open_received_view_with(
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        current: &Current,
+        moment: &SourceMoment,
+        opening: &WordOpening,
+        view: &crate::hnn::ring::modes::ModeView,
+        operands: impl FnOnce() -> Result<Operands, HnnError>,
+    ) -> Result<Self, HnnError> {
         let storage = view.apply(field, &moment.open_storage(field, constitution, current)?)?;
         let paired = field.receivers().iter().any(|r| {
             matches!(
@@ -1902,7 +1932,7 @@ impl<'c> Word<'c> {
             )
         });
         let response_source = paired.then(|| storage.clone());
-        let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
+        let operands = operands()?;
         let WordOpening::Received { carry, absorption } = opening else {
             let exact = paired.then(|| EndChange {
                 storage: storage.clone(),
@@ -3270,6 +3300,16 @@ impl<'c> Word<'c> {
         &self.resonators
     }
 
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **Each saturated
+    /// ring's passage** in this word, a ring on a one-tick period
+    /// (`hnn::ring::ResonatorOperands::{reads_tube, passage}`): the running maximum, per rest point
+    /// of its period, of its displacement's node `ℓ¹` distance over the word's
+    /// executed ticks (each tick's displacement before it, and the state the last one left). The
+    /// deposit's reach carries it to the certified step, which reads the ring on the tube about it.
+    pub fn tube_passages(&self) -> Result<Vec<crate::hnn::ring::TubePassage>, HnnError> {
+        tube_passages_of(&self.operands, &self.resonators)
+    }
+
     /// The loaded port's two nested wave-chart remainders, used by its smallest law fixture.
     #[cfg(test)]
     pub(crate) fn loaded_wave_remainders(&self, ring: usize) -> Option<(&[Rat], &[Rat])> {
@@ -3544,7 +3584,41 @@ pub(crate) struct KeptWord {
     opened_at: usize,
 }
 
+/// Read the exact same transient resonator series before and after a word is kept.
+/// This makes no forward call and retains only one maximum per rest point.
+fn tube_passages_of(
+    operands: &Operands,
+    resonators: &[Option<Resonance>],
+) -> Result<Vec<crate::hnn::ring::TubePassage>, HnnError> {
+    operands
+        .resonators()
+        .iter()
+        .zip(resonators)
+        .filter_map(|(operands, resonance)| match (operands, resonance) {
+            (Some(operands), Some(resonance)) if operands.reads_tube() => Some(
+                operands.passage(
+                    resonance
+                        .steps
+                        .iter()
+                        .map(|step| step.input[0].as_slice())
+                        .chain(std::iter::once(resonance.state[0].as_slice())),
+                ),
+            ),
+            _ => None,
+        })
+        .collect()
+}
+
 impl KeptWord {
+    /// The actual kept word's distance summaries, with no replay or clone.
+    pub(crate) fn tube_passages(&self) -> Result<Vec<crate::hnn::ring::TubePassage>, HnnError> {
+        tube_passages_of(&self.operands, &self.resonators)
+    }
+
+    pub(crate) fn operands(&self) -> &Operands {
+        &self.operands
+    }
+
     /// The kept word's anchor at a junction step on a ring (read-only; [`Word::anchor`]'s).
     pub(crate) fn anchor(&self, step: usize, ring: usize) -> Option<&[Rat]> {
         self.passage

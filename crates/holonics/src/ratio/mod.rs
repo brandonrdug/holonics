@@ -32,6 +32,7 @@ pub mod exponentiated;
 pub mod gaussian;
 pub mod linear;
 mod log_ratio;
+pub mod places;
 pub mod polynomial;
 mod presentation;
 pub(crate) mod primality;

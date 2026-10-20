@@ -107,6 +107,8 @@ use std::collections::BTreeMap;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
+mod input_scan;
+
 use crate::aeon::{ClockLift, Reading};
 use crate::compression::ReflectorMachine;
 use crate::compression::landmark::context::{BaseMeasure, Landmarks, StopPrior};
@@ -2044,20 +2046,27 @@ impl Field {
             found: at,
         })?;
         let mut staged = lift.to_vec();
-        let step = match encoded.advance(at) {
-            None => self.step_class(&mut staged, cell.class(), None)?,
-            Some(digits) => {
-                self.admit_lock_route()?;
-                let before = self.helix_lift(lift)?;
-                let step = self.step_class(&mut staged, cell.class(), Some(digits))?;
-                let after = self.helix_lift(&staged)?;
-                encoded.check_step(at, before, after)?;
-                step
-            }
-        };
-        encoded.check_placement_step(at, lift, &staged)?;
+        let step = self.step_class(&mut staged, cell.class(), encoded.advance(at))?;
+        self.check_occurrence_square(lift, &staged, encoded, at)?;
         lift.clone_from_slice(&staged);
         Ok(step)
+    }
+
+    /// The same consuming squares for a serial step and an input-selected prefix.
+    /// This validates the actual full lift and never replaces the encoding's witness.
+    pub(crate) fn check_occurrence_square(
+        &self,
+        before: &[BigInt],
+        after: &[BigInt],
+        encoded: &Encoded,
+        at: usize,
+    ) -> Result<(), HnnError> {
+        if encoded.advance(at).is_some() {
+            self.admit_lock_route()?;
+            encoded.check_step(at, self.helix_lift(before)?, self.helix_lift(after)?)?;
+        }
+        encoded.check_placement_step(at, before, after)?;
+        Ok(())
     }
 
     /// A ring's native class advance before carry, on the ordinary lock route. An `Own` ring

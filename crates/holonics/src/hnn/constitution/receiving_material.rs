@@ -425,9 +425,10 @@ impl ReceivingMaterial {
         lines: &mut std::str::Lines<'_>,
         key: &str,
         what: &'static str,
+        budget: &mut epoch::CheckpointReadBudget,
     ) -> Result<Option<Self>, HnnError> {
         if lines.clone().next() == Some(format!("{key} none").as_str()) {
-            return read_optional_law(lines, key, what).map(|law| law.map(Self::Single));
+            return read_optional_law(lines, key, what, budget).map(|law| law.map(Self::Single));
         }
         if next(lines, "the receiving read and target phase chart")? != RECEIVING_CHART_HEADER {
             return refuse(
@@ -440,7 +441,7 @@ impl ReceivingMaterial {
             .ok_or(HnnError::ContinuingState { what })?;
         let words = head(line, key, what)?;
         if words.first().map(String::as_str) != Some("arrival-context-v1") {
-            return read_optional_law(lines, key, what).map(|law| law.map(Self::Single));
+            return read_optional_law(lines, key, what, budget).map(|law| law.map(Self::Single));
         }
         let [_, width, carrier] = words.as_slice() else {
             return refuse("the versioned receiving material header");
@@ -514,7 +515,7 @@ impl ReceivingMaterial {
             {
                 return refuse("a receiving block Gram width");
             }
-            let mut law = read_law(lines, map)?;
+            let mut law = read_law(lines, map, budget)?;
             law.carrier = carrier;
             let block = ReceivingBlock { chart, law };
             block.validate().map_err(|_| HnnError::ContinuingState {
@@ -957,12 +958,22 @@ mod tests {
         ReceivingMaterial::write_optional(&mut encoded, "receiving", Some(&material));
         assert_eq!(encoded, format!("{RECEIVING_CHART_HEADER}\n{legacy}"));
         assert!(
-            ReceivingMaterial::read_optional(&mut legacy.lines(), "receiving", "test receiving")
-                .is_err()
+            ReceivingMaterial::read_optional(
+                &mut legacy.lines(),
+                "receiving",
+                "test receiving",
+                &mut epoch::CheckpointReadBudget::new(1 << 20)
+            )
+            .is_err()
         );
         assert_eq!(
-            ReceivingMaterial::read_optional(&mut encoded.lines(), "receiving", "test receiving")
-                .unwrap(),
+            ReceivingMaterial::read_optional(
+                &mut encoded.lines(),
+                "receiving",
+                "test receiving",
+                &mut epoch::CheckpointReadBudget::new(1 << 20)
+            )
+            .unwrap(),
             Some(material)
         );
         legacy.clear();
@@ -971,8 +982,13 @@ mod tests {
         ReceivingMaterial::write_optional(&mut encoded, "receiving", None);
         assert_eq!(encoded, legacy);
         assert_eq!(
-            ReceivingMaterial::read_optional(&mut encoded.lines(), "receiving", "test receiving")
-                .unwrap(),
+            ReceivingMaterial::read_optional(
+                &mut encoded.lines(),
+                "receiving",
+                "test receiving",
+                &mut epoch::CheckpointReadBudget::new(1 << 20)
+            )
+            .unwrap(),
             None
         );
     }
@@ -999,9 +1015,14 @@ mod tests {
         ReceivingMaterial::write_optional(&mut encoded, "receiving", Some(&material));
         encoded += "next-owner\n";
         let mut lines = encoded.lines();
-        let restored = ReceivingMaterial::read_optional(&mut lines, "receiving", "test receiving")
-            .unwrap()
-            .unwrap();
+        let restored = ReceivingMaterial::read_optional(
+            &mut lines,
+            "receiving",
+            "test receiving",
+            &mut epoch::CheckpointReadBudget::new(1 << 20),
+        )
+        .unwrap()
+        .unwrap();
         assert_eq!(restored, material);
         assert_eq!(lines.next(), Some("next-owner"));
         for malformed in [
@@ -1015,7 +1036,8 @@ mod tests {
                 ReceivingMaterial::read_optional(
                     &mut malformed.lines(),
                     "receiving",
-                    "test receiving"
+                    "test receiving",
+                    &mut epoch::CheckpointReadBudget::new(1 << 20)
                 )
                 .is_err()
             );
@@ -1032,8 +1054,13 @@ mod tests {
         ReceivingMaterial::write_optional(&mut encoded, "receiving", Some(&material));
         assert!(encoded.contains("operand-chart 1 none\n"));
         assert_eq!(
-            ReceivingMaterial::read_optional(&mut encoded.lines(), "receiving", "test receiving")
-                .unwrap(),
+            ReceivingMaterial::read_optional(
+                &mut encoded.lines(),
+                "receiving",
+                "test receiving",
+                &mut epoch::CheckpointReadBudget::new(1 << 20)
+            )
+            .unwrap(),
             Some(material)
         );
     }

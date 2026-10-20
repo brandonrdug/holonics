@@ -118,7 +118,7 @@ pub(super) fn write_state(theta: &Constitution, ring: usize) -> String {
 pub(super) fn mount(opening: &Constitution, path: &str) -> Constitution {
     #[allow(clippy::disallowed_methods)]
     let text = std::fs::read_to_string(path).expect("read the state");
-    let state = ContinuingState::from_text(&text)
+    let state = ContinuingState::from_text(&text, opening.budget())
         .unwrap_or_else(|error| panic!("{path}: not a complete continuing state ({error})"));
     opening
         .clone()

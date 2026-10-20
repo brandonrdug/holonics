@@ -87,6 +87,7 @@ impl Draw {
 /// The RTX 4080 SUPER's census as its driver reports it (`the_card_opens_with_its_census`).
 pub(super) fn census() -> DeviceCensus {
     DeviceCensus {
+        cooperative_launch: true,
         name: "fixture".into(),
         compute_capability: (8, 9),
         multiprocessors: 80,

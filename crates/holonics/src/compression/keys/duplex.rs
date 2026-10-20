@@ -818,9 +818,10 @@ impl Receiver {
     }
 }
 
-/// [definition] **A class of the receiver** (module header): the readings `E e_(ℓ_k mod D)` of the
-/// `n + 1` placed lifts and the terminal winding `ℓ_n div D`. A receipt tuple, compared and never
-/// retained.
+/// [definition] **A class of the receiver**: declared coordinate readings and a terminal carry
+/// probe. `Receiver::class` reads `E e_(ℓ_k mod D)` at each of the `n + 1` placed lifts;
+/// `from_receipt` reads the caller's region quotient in its common frame and clock.
+/// This receipt tuple is compared and never retained.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverClass {
     readings: Vec<Vec<Rat>>,
@@ -828,7 +829,20 @@ pub struct ReceiverClass {
 }
 
 impl ReceiverClass {
-    /// The readings, one per position `0..=n`.
+    /// A class read through a caller-declared receipt quotient. Each region is transported
+    /// to its common frame and clock before comparison; the caller supplies the carry probe.
+    /// This does not found an encoding or certify sufficiency for additional futures.
+    /// The listener's fixed phase-count comparison consumes this boundary constructor.
+    pub fn from_receipt(receipt: &crate::receiver::receipt::Receipt, winding: u64) -> Self {
+        Self {
+            readings: (0..receipt.regions())
+                .map(|region| vec![receipt.common(region).expect("existing receipt region")])
+                .collect(),
+            winding,
+        }
+    }
+
+    /// The coordinate readings: one per placed lift or declared receipt region.
     pub fn readings(&self) -> &[Vec<Rat>] {
         &self.readings
     }
@@ -1439,6 +1453,41 @@ fn commit(width: &ReceiverWidth) -> Result<bool, DuplexDefect> {
     let options = LawfulOptions::assemble(width, Rat::zero(), None, true).map_err(law)?;
     let returned = release(&rule, &options).map_err(law)?;
     Ok(matches!(returned, ReleaseReturn::Released { .. }))
+}
+
+#[cfg(test)]
+mod receipt_class_tests {
+    use super::*;
+    use crate::ratio::integer;
+    use crate::receiver::receipt::{Receipt, RegionChart};
+
+    #[test]
+    fn receipt_class_compares_common_coordinates_and_keeps_carry_probe() {
+        let a = Receipt::new(
+            vec![integer(3), integer(0)],
+            vec![RegionChart::new(integer(2), integer(7), 0).unwrap(); 2],
+        )
+        .unwrap();
+        let b = Receipt::new(
+            vec![integer(6), integer(0)],
+            vec![RegionChart::new(integer(1), integer(1), 0).unwrap(); 2],
+        )
+        .unwrap();
+        let class = ReceiverClass::from_receipt(&a, 4);
+        assert_eq!(
+            Absorption::between(&class, &ReceiverClass::from_receipt(&b, 4)),
+            Absorption::Absorbed
+        );
+        assert_eq!(
+            Absorption::between(&class, &ReceiverClass::from_receipt(&b, 5)),
+            Absorption::Residual { at: 2 }
+        );
+        let changed = Receipt::new(vec![integer(6), integer(1)], b.charts().to_vec()).unwrap();
+        assert_eq!(
+            Absorption::between(&class, &ReceiverClass::from_receipt(&changed, 4)),
+            Absorption::Residual { at: 1 }
+        );
+    }
 }
 
 #[cfg(test)]

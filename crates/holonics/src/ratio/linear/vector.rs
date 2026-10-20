@@ -11,27 +11,56 @@
 
 use crate::ratio::Rat;
 use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 
 use crate::ratio::linear::inertia::SymmetricForm;
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
 
-/// A vector in the integral chart ([`integral`]): integer numerators over one positive denominator.
+/// A vector in the integral chart ([`integral`]): integer values over one positive denominator.
 pub(crate) type Chart = (Vec<BigInt>, BigInt);
 
-/// [definition; agent-inferred] **A matrix in the integral chart**: integer numerators over one
+/// [definition; agent-inferred] **A matrix in the integral chart**: integer values over one
 /// common denominator, `M = N / D` exactly. A sum of many rank-one terms is formed over integers and
 /// each entry normalized once when read out; a reduced ratio is canonical, so the entries equal the
 /// termwise rational sums.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct IntegralMatrix {
-    rows: usize,
-    columns: usize,
-    numerators: Vec<BigInt>,
-    denominator: BigInt,
+    pub(crate) rows: usize,
+    pub(crate) columns: usize,
+    pub(crate) values: Vec<BigInt>,
+    /// Shared base denominator; grouped epoch storage uses exactly 2^exponent.
+    pub(crate) denominator: BigInt,
+    pub(crate) exponent: u32,
+    /// A receiving phase row's fixed odd ring period; one on magnitude rows.
+    pub(crate) row_divisors: Vec<u64>,
+    /// Exact l1 bound carried beside each integer reduction.
+    pub(crate) numerator_l1_bound: BigInt,
 }
 
 impl IntegralMatrix {
+    /// Admit an already grouped integer chart without reducing its entries to
+    /// separate fractions. The denominator belongs to the whole array.
+    pub(crate) fn from_grouped(
+        rows: usize,
+        columns: usize,
+        values: Vec<BigInt>,
+        denominator: BigInt,
+    ) -> Result<Self, ExactLinearError> {
+        if rows.checked_mul(columns) != Some(values.len()) || denominator <= BigInt::zero() {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let numerator_l1_bound = values.iter().map(Signed::abs).sum();
+        Ok(Self {
+            numerator_l1_bound,
+            rows,
+            columns,
+            values,
+            denominator,
+            exponent: 0,
+            row_divisors: vec![1; rows],
+        })
+    }
+
     /// **`Σ_t w_t l_t r_tᵀ`** over terms whose vectors are already in the integral chart
     /// ([`integral`]), with rational weights.
     pub(crate) fn outer_sum<'a>(
@@ -50,7 +79,7 @@ impl IntegralMatrix {
         let denominator = terms
             .iter()
             .fold(BigInt::one(), |d, (.., scale)| lcm(&d, scale));
-        let mut numerators = vec![BigInt::zero(); rows * columns];
+        let mut values = vec![BigInt::zero(); rows * columns];
         for (weight, (left, _), (right, _), scale) in terms {
             let factor = weight.numer() * (&denominator / scale);
             for (i, l) in left.iter().enumerate().take(rows) {
@@ -58,7 +87,7 @@ impl IntegralMatrix {
                     continue;
                 }
                 let scaled = l * &factor;
-                let row = &mut numerators[i * columns..(i + 1) * columns];
+                let row = &mut values[i * columns..(i + 1) * columns];
                 for (entry, r) in row.iter_mut().zip(right) {
                     if !r.is_zero() {
                         *entry += &scaled * r;
@@ -66,11 +95,15 @@ impl IntegralMatrix {
                 }
             }
         }
+        let numerator_l1_bound = values.iter().map(Signed::abs).sum();
         Self {
+            numerator_l1_bound,
             rows,
             columns,
-            numerators,
+            values,
             denominator,
+            exponent: 0,
+            row_divisors: vec![1; rows],
         }
     }
 
@@ -86,15 +119,21 @@ impl IntegralMatrix {
             return None;
         }
         let rows = blocks.iter().map(|block| block.rows).sum();
-        let numerators = blocks
-            .into_iter()
-            .flat_map(|block| block.numerators)
+        let row_divisors = blocks
+            .iter()
+            .flat_map(|block| block.row_divisors.iter().copied())
             .collect();
+        let exponent = first.exponent;
+        let values: Vec<BigInt> = blocks.into_iter().flat_map(|block| block.values).collect();
+        let numerator_l1_bound = values.iter().map(Signed::abs).sum();
         Some(Self {
+            numerator_l1_bound,
             rows,
             columns,
-            numerators,
+            values,
             denominator,
+            exponent,
+            row_divisors,
         })
     }
 
@@ -103,53 +142,98 @@ impl IntegralMatrix {
     /// family, with `(B v)[j] = v[rows[j]]`, and the columns outside the family unchanged, over twice
     /// the denominator. `rows` has the matrix's rows and `columns` its columns.
     pub(crate) fn projected(&self, rows: &[usize], columns: &[Option<usize>]) -> Self {
-        let mut numerators = vec![BigInt::zero(); self.rows * self.columns];
+        // A row permutation may exchange magnitude and phase groups. Read
+        // that projection in one transient integral chart rather than adding
+        // unlike numerators or inventing an overflowing machine-word lcm.
+        let keeps_groups = rows
+            .iter()
+            .enumerate()
+            .take(self.rows)
+            .all(|(row, &lifted)| self.row_divisors[row] == self.row_divisors[lifted]);
+        let odd = if keeps_groups {
+            BigInt::one()
+        } else {
+            self.row_divisors
+                .iter()
+                .fold(BigInt::one(), |d, &factor| lcm(&d, &BigInt::from(factor)))
+        };
+        let mut values = vec![BigInt::zero(); self.rows * self.columns];
         for (j, &lifted) in rows.iter().enumerate().take(self.rows) {
             for (a, partner) in columns.iter().enumerate().take(self.columns) {
-                let own = &self.numerators[j * self.columns + a];
-                numerators[j * self.columns + a] = match partner {
-                    Some(partner) => own + &self.numerators[lifted * self.columns + partner],
+                let scale = |row: usize| {
+                    if keeps_groups {
+                        BigInt::one()
+                    } else {
+                        &odd / self.row_divisors[row]
+                    }
+                };
+                let own = &self.values[j * self.columns + a] * scale(j);
+                values[j * self.columns + a] = match partner {
+                    Some(partner) => {
+                        own + &self.values[lifted * self.columns + partner] * scale(lifted)
+                    }
                     None => own << 1usize,
                 };
             }
         }
+        let numerator_l1_bound = values.iter().map(Signed::abs).sum();
         Self {
             rows: self.rows,
             columns: self.columns,
-            numerators,
-            denominator: &self.denominator << 1usize,
+            values,
+            denominator: (&self.denominator << 1usize) * &odd,
+            exponent: if keeps_groups {
+                self.exponent.checked_add(1).unwrap_or(0)
+            } else {
+                0
+            },
+            row_divisors: if keeps_groups {
+                self.row_divisors.clone()
+            } else {
+                vec![1; self.rows]
+            },
+            numerator_l1_bound,
         }
     }
 
     /// **`M v`** for `v` in the integral chart, in the integral chart: `N v / (D · d_v)`.
     pub(crate) fn apply(&self, (values, denominator): &Chart) -> Chart {
+        let odd = self
+            .row_divisors
+            .iter()
+            .fold(BigInt::one(), |d, &factor| lcm(&d, &BigInt::from(factor)));
         let sums = (0..self.rows)
             .map(|i| {
-                let row = &self.numerators[i * self.columns..(i + 1) * self.columns];
+                let row = &self.values[i * self.columns..(i + 1) * self.columns];
                 let mut sum = BigInt::zero();
                 for (entry, value) in row.iter().zip(values) {
                     if !entry.is_zero() && !value.is_zero() {
                         sum += entry * value;
                     }
                 }
-                sum
+                sum * (&odd / self.row_divisors[i])
             })
             .collect();
-        (sums, &self.denominator * denominator)
+        (sums, &self.denominator * denominator * odd)
     }
 
     /// **The Schur test's norms** `(‖M‖₁, ‖M‖_∞)`: the largest absolute column and row sums.
     pub(crate) fn schur_norms(&self) -> (Rat, Rat) {
+        let odd = self
+            .row_divisors
+            .iter()
+            .fold(BigInt::one(), |d, &factor| lcm(&d, &BigInt::from(factor)));
         let mut columns = vec![BigInt::zero(); self.columns];
         let mut row_max = BigInt::zero();
         for i in 0..self.rows {
             let mut row = BigInt::zero();
-            for (j, entry) in self.numerators[i * self.columns..(i + 1) * self.columns]
+            for (j, entry) in self.values[i * self.columns..(i + 1) * self.columns]
                 .iter()
                 .enumerate()
             {
                 if !entry.is_zero() {
-                    let magnitude = BigInt::from(entry.magnitude().clone());
+                    let magnitude =
+                        BigInt::from(entry.magnitude().clone()) * (&odd / self.row_divisors[i]);
                     row += &magnitude;
                     columns[j] += magnitude;
                 }
@@ -160,8 +244,8 @@ impl IntegralMatrix {
         }
         let column_max = columns.into_iter().max().unwrap_or_else(BigInt::zero);
         (
-            Rat::new(column_max, self.denominator.clone()),
-            Rat::new(row_max, self.denominator.clone()),
+            Rat::new(column_max, &self.denominator * &odd),
+            Rat::new(row_max, &self.denominator * &odd),
         )
     }
 
@@ -170,13 +254,13 @@ impl IntegralMatrix {
         let denominator = &self.denominator * scale.denom();
         (0..self.rows)
             .map(|i| {
-                self.numerators[i * self.columns..(i + 1) * self.columns]
+                self.values[i * self.columns..(i + 1) * self.columns]
                     .iter()
                     .map(|n| {
                         if n.is_zero() {
                             Rat::zero()
                         } else {
-                            Rat::new(n * scale.numer(), denominator.clone())
+                            Rat::new(n * scale.numer(), &denominator * self.row_divisors[i])
                         }
                     })
                     .collect()
@@ -188,9 +272,9 @@ impl IntegralMatrix {
     pub(crate) fn to_rows(&self) -> Vec<Vec<Rat>> {
         (0..self.rows)
             .map(|i| {
-                self.numerators[i * self.columns..(i + 1) * self.columns]
+                self.values[i * self.columns..(i + 1) * self.columns]
                     .iter()
-                    .map(|n| Rat::new(n.clone(), self.denominator.clone()))
+                    .map(|n| Rat::new(n.clone(), &self.denominator * self.row_divisors[i]))
                     .collect()
             })
             .collect()
@@ -209,12 +293,17 @@ impl IntegralMatrix {
         }
         let m = factor.columns();
         let (values, factor_denominator) = integral(factor.entries());
-        let denominator = &self.denominator * &factor_denominator;
+        let odd = self
+            .row_divisors
+            .iter()
+            .fold(BigInt::one(), |d, &factor| lcm(&d, &BigInt::from(factor)));
+        let denominator = &self.denominator * &factor_denominator * &odd;
         let mut rows = Vec::with_capacity(n);
         for i in 0..n {
             let mut sums = vec![BigInt::zero(); m];
             for k in 0..n {
-                let weight = &self.numerators[i * n + k] + &self.numerators[k * n + i];
+                let weight = &self.values[i * n + k] * (&odd / self.row_divisors[i])
+                    + &self.values[k * n + i] * (&odd / self.row_divisors[k]);
                 if weight.is_zero() {
                     continue;
                 }
@@ -304,7 +393,7 @@ pub(crate) fn common_denominator<'a>(values: impl IntoIterator<Item = &'a Rat>) 
 /// applied with one normalization per output entry.
 pub(crate) fn integral(values: &[Rat]) -> Chart {
     let denominator = common_denominator(values);
-    let numerators = values
+    let values = values
         .iter()
         .map(|value| {
             if value.denom() == &denominator {
@@ -314,7 +403,7 @@ pub(crate) fn integral(values: &[Rat]) -> Chart {
             }
         })
         .collect();
-    (numerators, denominator)
+    (values, denominator)
 }
 
 /// `Σ a_i b_i` over integers, skipping zero terms.

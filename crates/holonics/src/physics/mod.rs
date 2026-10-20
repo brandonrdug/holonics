@@ -5,6 +5,7 @@
 
 pub mod fluid;
 pub mod information;
+pub mod solenoidal;
 pub mod spacetime;
 pub mod thermal;
 pub mod wave;

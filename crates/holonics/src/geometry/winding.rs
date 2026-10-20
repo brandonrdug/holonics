@@ -172,6 +172,12 @@ impl Odometer {
         &self.radices
     }
 
+    /// The ordered carry cascade's modulus: the product of its declared radices.
+    /// This is not the least common multiple of independent ring clocks.
+    pub fn modulus(&self) -> BigUint {
+        self.radices.iter().fold(BigUint::one(), |n, radix| n * radix)
+    }
+
     pub fn digits(&self) -> &[BigUint] {
         &self.digits
     }

@@ -17,6 +17,42 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 19: the native field, holding contacts and pump sheets join the finite face**
+(#62, #73). `geometry::solenoid::field` consumes the actual Lock/Odometer law;
+`receiver::coupling` retains plural optimal contacts and reads supplied actual phase paths;
+`geometry::solenoid::pump` reads every node sheet without inventing period doubling.
+The listener records actual currents behind `--diagnostic-solenoidal-lock`, off by default.
+The verified four-patch step-1a source is reconciled with grouped per-word epoch bounds;
+observed host and CUDA paths return their actual tube-passage summaries before publication.
+The finite/native foundation and derived signed source precision component are implemented;
+source-qualified receipts record compilation, bounded host controls and actual-card controls.
+The original joined host gate hit its fixed deadline; remaining coverage passed in explicit
+partitions, without a larger cap. Review then required budget-bound checkpoint reads and
+founding-lattice guards. Full upstream comparison admission remains blocked: the fixed
+Gauss–Newton reader lacks the executed second variation, so grouped publication admits only
+receiving-map moves with unchanged upstream material. No source/contrast affine witness is
+invented. No new all-modality life or general learning result is inferred from the component
+and backend controls, and the preserved Source74/88 checkpoints retain their own scopes.
+The [consumer contract](docs/WINDING_CARRY_AND_PLACEMENT.md#10-actual-hnn-clock-faces-and-plural-holding-contacts)
+keeps theorem hypotheses and remaining formal/physical joins explicit.
+
+
+**October 19: finite solenoidal charts consume the physical operators** (#62, #73–#75).
+`geometry::solenoid` joins the existing compatible tower with signed leaf carry and checked finite
+continuation. `physics::solenoidal` consumes contact power/kernels and the LC/sheet owners; its
+`SolenoidalWave` advances the actual `WaveChain` and declared longitudinal clock atomically, with
+the wave's exact energy balance and strict Courant condition. `ratio::places` consumes the existing
+factorizer for signed rational reconstruction and the product formula. The `solenoidal_wave`
+exterior example is their executing caller; these are mathematical/physical operators, not a
+learned-output demonstration. The first thirteen finite chart/contact/wave controls passed in
+28,498,562,971 ns including cold compilation. The extended place/port join is covered by the host
+gate's new focused controls; its receipt names the exact tested source. Full analytic realization,
+branch/gluing maps, physical fluid time/pressure/continuum joins, and any claimed persistent lock
+remain concrete proof/implementation obligations. The guide's [finite-chart contract](docs/WINDING_CARRY_AND_PLACEMENT.md#9-finite-solenoidal-charts-and-their-physical-consumer)
+keeps them separate from the returned finite operators. No learning or generalization result is
+inferred from these controls.
+
+
 **October 8–9 helical code** ([record](research/records/2026-10-08_THE_HELICAL_CODE_IS_HOW_HOLONS_HOLARCHIES_EPOCHS_AND_AEONS_ENCODE.md); #386).
 The helical code, the encoding every Holon carries, is defined in
 [the guide](docs/ELEMENTARY_OBJECTS.md#the-helical-code-how-holons-encode).

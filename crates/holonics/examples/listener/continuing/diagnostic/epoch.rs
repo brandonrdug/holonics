@@ -1225,6 +1225,7 @@ fn stall_epoch_readout(
     inverse_ns: &mut u128,
     deferred_failures: &mut Vec<String>,
 ) -> Result<()> {
+    validate_report_support(&end.support, end.map.columns())?;
     let actual_b = amended_partition_receiver_exponent(receiver_grain)?;
     if require_partition_precision(crossing.receiver_partition_exponent)? != actual_b {
         return Err("compact stall report partition exponent disagrees with the native grain's amended half-cell conversion".into());

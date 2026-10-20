@@ -169,6 +169,25 @@ unsafe extern "C" {
         extra: *mut *mut c_void,
     ) -> CUresult;
 
+    pub fn cuOccupancyMaxActiveBlocksPerMultiprocessor(
+        numBlocks: *mut c_int,
+        func: CUfunction,
+        blockSize: c_int,
+        dynamicSMemSize: usize,
+    ) -> CUresult;
+    pub fn cuLaunchCooperativeKernel(
+        f: CUfunction,
+        gridDimX: c_uint,
+        gridDimY: c_uint,
+        gridDimZ: c_uint,
+        blockDimX: c_uint,
+        blockDimY: c_uint,
+        blockDimZ: c_uint,
+        sharedMemBytes: c_uint,
+        stream: CUstream,
+        kernelParams: *mut *mut c_void,
+    ) -> CUresult;
+
     pub fn cuGetErrorName(err: CUresult, pStr: *mut *const c_char) -> CUresult;
     pub fn cuGetErrorString(err: CUresult, pStr: *mut *const c_char) -> CUresult;
 

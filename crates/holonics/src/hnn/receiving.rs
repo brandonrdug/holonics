@@ -1343,6 +1343,8 @@ pub struct Scored {
     pub model: Vec<ExactInterval>,
     pub tree: Vec<ExactInterval>,
     pub steps: Vec<ReceivingStep>,
+    /// Exterior face operands before each target is received; never retained or used to score.
+    pub face_readings: Vec<cells::ScoredFaceReading>,
 }
 
 /// The receiver's population's first family: the landmark tree's executed face `q_T`.
@@ -1417,8 +1419,12 @@ pub fn score(
         model: Vec::with_capacity(targets.len()),
         tree: Vec::with_capacity(targets.len()),
         steps: Vec::with_capacity(targets.len()),
+        face_readings: Vec::with_capacity(targets.len()),
     };
     for ((face, tree), &target) in combined.faces.iter().zip(trees).zip(targets) {
+        scored
+            .face_readings
+            .push(cells::ScoredFaceReading::new(&local, tree, face));
         let q_tree = tree
             .probabilities
             .get(target)
@@ -1464,8 +1470,12 @@ pub fn score_at(
         model: Vec::with_capacity(targets.len()),
         tree: Vec::with_capacity(targets.len()),
         steps: Vec::with_capacity(targets.len()),
+        face_readings: Vec::with_capacity(targets.len()),
     };
     for ((face, tree), &target) in combined.faces.iter().zip(trees).zip(targets) {
+        scored
+            .face_readings
+            .push(cells::ScoredFaceReading::new(&local, tree, face));
         let q_tree = tree
             .probabilities
             .get(target)

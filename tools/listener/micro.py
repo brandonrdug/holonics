@@ -322,13 +322,13 @@ def sound_identity(spec, path):
 def fragment(rate, samples, digit_source_cells):
     runs = runs_of(samples)
     silent = int(bool(runs and runs[0][2] == 2))
-    signed_runs = len(runs) - silent
-    if signed_runs == 0:
+    signed_runs = [run for run in runs if run[2] != 2]
+    if not signed_runs:
         raise Refusal("sound fragment has no signed run")
     best, candidate_costs = None, []
-    for h in range(1, (signed_runs - 1) // 2 + 1):
+    for h in range(1, (len(signed_runs) - 1) // 2 + 1):
         # Both cuts have a following run and must be actual signed crossings, never EOF/silence.
-        cut, end = runs[silent + h - 1][1], runs[silent + 2 * h - 1][1]
+        cut, end = signed_runs[h - 1][1], signed_runs[2 * h - 1][1]
         source, target = half_cycles(rate, samples[:cut]), half_cycles(rate, samples[cut:end])
         total = cells(source[0]) + cells(target[0])
         candidate_costs.append({"H": h, "combined_cells": total})

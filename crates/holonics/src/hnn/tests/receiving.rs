@@ -1465,7 +1465,7 @@ fn cold_restore_refuses_unversioned_or_unknown_passages() {
     use crate::hnn::constitution::ContinuingState;
     use crate::hnn::reference::Reference;
     let field = chain();
-    let reference = Reference::new(64, u64::MAX);
+    let reference = Reference::new(64, COLD_RESTORE_BUDGET);
     let current = crate::hnn::Current::at_rest(&field);
     let source = field.sources()[0];
     for (payload, expected) in [
@@ -1483,14 +1483,16 @@ fn cold_restore_refuses_unversioned_or_unknown_passages() {
             crate::hnn::SavedPassageVersion::Number(5),
         ),
     ] {
-        let opening = crate::hnn::Constitution::initial(&field, u64::MAX).unwrap();
+        let opening = crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap();
         let state = opening
             .continuing_state(source)
             .unwrap()
             .with_passage(Some(payload.to_string()));
         // The real serializer stamps the checksum; version refusal precedes old law operands.
-        assert!(matches!(ContinuingState::from_text(&state.to_text()),
-            Err(crate::hnn::HnnError::PassageVersion {version}) if version == expected));
+        assert!(
+            matches!(ContinuingState::from_text(&state.to_text(), opening.budget()),
+            Err(crate::hnn::HnnError::PassageVersion {version}) if version == expected)
+        );
         assert!(
             matches!(reference.mount_continued(&field, &current, opening, &state),
             Err(crate::hnn::HnnError::PassageVersion {version}) if version == expected)
@@ -1500,6 +1502,9 @@ fn cold_restore_refuses_unversioned_or_unknown_passages() {
 
 // Change an inner passage operand, then regenerate and verify the real outer checksum.
 // These fixtures must reach the native passage/moment reader, not fail checksum validation.
+// This cold-restore family already declares this budget for its reference and opening.
+const COLD_RESTORE_BUDGET: u64 = u64::MAX;
+
 fn cold_v3_changed_line(
     state: &crate::hnn::constitution::ContinuingState,
     prefix: &str,
@@ -1524,7 +1529,8 @@ fn cold_v3_changed_line(
         "the fixture must change exactly its intended operand"
     );
     let changed = state.clone().with_passage(Some(lines.join("\n") + "\n"));
-    crate::hnn::constitution::ContinuingState::from_text(&changed.to_text()).unwrap()
+    crate::hnn::constitution::ContinuingState::from_text(&changed.to_text(), COLD_RESTORE_BUDGET)
+        .unwrap()
 }
 
 fn cold_v3_initial_state(
@@ -1535,7 +1541,7 @@ fn cold_v3_initial_state(
     crate::hnn::constitution::ContinuingState,
 ) {
     use crate::hnn::port::ExecutionPort;
-    let reference = crate::hnn::reference::Reference::new(64, u64::MAX);
+    let reference = crate::hnn::reference::Reference::new(64, COLD_RESTORE_BUDGET);
     let mut resident = reference
         .mount(field, &crate::hnn::Current::at_rest(field))
         .unwrap();
@@ -1560,7 +1566,7 @@ fn cold_restore_refuses_a_checksummed_exhausted_handle_counter() {
         reference.mount_continued(
             &field,
             &crate::hnn::Current::at_rest(&field),
-            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(),
+            crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap(),
             &invalid,
         ),
         Err(crate::hnn::HnnError::ContinuingState {
@@ -1589,7 +1595,7 @@ fn cold_restore_refuses_a_checksummed_cursor_at_nonempty_window_end() {
         reference.mount_continued(
             &field,
             &crate::hnn::Current::at_rest(&field),
-            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(),
+            crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap(),
             &invalid,
         ),
         Err(crate::hnn::HnnError::ContinuingState {
@@ -1611,12 +1617,14 @@ fn cold_restore_preserves_empty_window_zero_cursor_and_rejects_nonzero() {
             .lines()
             .any(|line| line == "window")
     );
-    let checked = crate::hnn::constitution::ContinuingState::from_text(&state.to_text()).unwrap();
+    let checked =
+        crate::hnn::constitution::ContinuingState::from_text(&state.to_text(), COLD_RESTORE_BUDGET)
+            .unwrap();
     let mut restored = reference
         .mount_continued(
             &field,
             &crate::hnn::Current::at_rest(&field),
-            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(),
+            crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap(),
             &checked,
         )
         .unwrap();
@@ -1646,7 +1654,7 @@ fn cold_restore_preserves_empty_window_zero_cursor_and_rejects_nonzero() {
         reference.mount_continued(
             &field,
             &crate::hnn::Current::at_rest(&field),
-            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(),
+            crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap(),
             &invalid,
         ),
         Err(crate::hnn::HnnError::ContinuingState {
@@ -1669,7 +1677,7 @@ fn cold_restore_handle_exhaustion_is_typed_before_new_ingest_work() {
         .mount_continued(
             &field,
             &crate::hnn::Current::at_rest(&field),
-            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(),
+            crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap(),
             &near_end,
         )
         .unwrap();
@@ -1894,7 +1902,7 @@ fn the_receiving_maps_descent_and_its_priors_move_are_read_apart() {
     let encoded = Encoded::through(&encoding, &located, &field, &[word])
         .unwrap()
         .remove(0);
-    let reference = Reference::new(64, u64::MAX);
+    let reference = Reference::new(64, COLD_RESTORE_BUDGET);
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let feed = |resident: &mut crate::hnn::Resident,
                 moment: Option<crate::hnn::MomentId>,

@@ -2287,7 +2287,7 @@ fn a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposi
         Err(HnnError::Unadmitted { .. })
     ));
     let state = learned.continuing_state(0).unwrap();
-    let read = ContinuingState::from_text(&state.to_text()).unwrap();
+    let read = ContinuingState::from_text(&state.to_text(), learned.budget()).unwrap();
     assert_eq!(read, state);
     let restored = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
         .unwrap()

@@ -147,6 +147,19 @@ class MicroControls(unittest.TestCase):
             with self.assertRaisesRegex(micro.Refusal, "no signed run"):
                 micro.fragment(16000, samples, 100)
 
+    def test_interior_zeros_preserve_signed_crossings_and_exact_fragment_composition(self):
+        samples = [0, 0, 3, 0, -4, 0, 0, 5, 0, -6, 0, 7]
+        source, target, metadata = micro.fragment(16000, samples, 100)
+        self.assertEqual(metadata["H"], 2)
+        self.assertEqual(metadata["source_sample_range"], [0, 7])
+        self.assertEqual(metadata["target_sample_range"], [7, 11])
+        self.assertEqual(source, [0, 0, 3, 0, -4, 0, 0])
+        self.assertEqual(micro.half_cycles(16000, source)[0], b"\2\x20\2\x01\3\x12")
+        self.assertEqual(target, b"\2\x02\2\x12")
+        self.assertEqual(micro.decode_half_cycles(target, metadata["target_fibre"]), [5, 0, -6, 0])
+        self.assertEqual(micro.half_cycles(16000, samples[:11])[0], micro.half_cycles(16000, source)[0] + target)
+        self.assertEqual(metadata["combined_cells"], 24)
+
     def test_canonical_fibre_bytes_are_cross_language_golden_values(self):
         domain = b"holonics.listener.fibre.v1\0"
         self.assertEqual(micro.canonical_fibre(0, None), domain + b"\0")

@@ -48,8 +48,19 @@ pub(crate) fn coordinate(value: &Rat, exponent: u32) -> Option<BigInt> {
 
 /// **A value's coordinate as a signed 64-bit word** at a scale, or the refusal.
 pub(crate) fn word(value: &Rat, exponent: u32, what: &'static str) -> Result<i64, HnnError> {
-    coordinate(value, exponent)
-        .and_then(|coordinate| coordinate.to_i64())
+    let own = exponent_of(value).ok_or_else(|| refused(what))?;
+    let shift = exponent.checked_sub(own).ok_or_else(|| refused(what))?;
+    let numerator = value.numer();
+    if numerator.is_zero() {
+        return Ok(0);
+    }
+    // Material words remain signed i64 even when auxiliary card arithmetic is wider. Check
+    // before shifting: a refused fine source lattice must not allocate its giant coordinate.
+    if numerator.bits().saturating_add(u64::from(shift)) > 64 {
+        return Err(refused(what));
+    }
+    (numerator << shift as usize)
+        .to_i64()
         .ok_or_else(|| refused(what))
 }
 
@@ -209,4 +220,39 @@ pub(crate) fn reduced_word(value: &Rat, what: &'static str) -> Result<(i64, u32)
     let exponent = exponent_of(value).ok_or_else(|| refused(what))?;
     let numerator = value.numer().to_i64().ok_or_else(|| refused(what))?;
     Ok((numerator, exponent))
+}
+
+#[cfg(test)]
+mod material_width_tests {
+    use super::*;
+
+    #[test]
+    fn signed_material_boundaries_are_exact_and_refinement_refuses_before_a_large_shift() {
+        let integer = |n: i64| Rat::from_integer(BigInt::from(n));
+        assert_eq!(word(&integer(i64::MIN), 0, "test").unwrap(), i64::MIN);
+        assert_eq!(word(&integer(i64::MAX), 0, "test").unwrap(), i64::MAX);
+        assert_eq!(word(&integer(-1), 63, "test").unwrap(), i64::MIN);
+        assert!(matches!(
+            word(&integer(1), 63, "test"),
+            Err(HnnError::Realization { .. })
+        ));
+        assert!(matches!(
+            word(&integer(-1), 64, "test"),
+            Err(HnnError::Realization { .. })
+        ));
+        assert!(matches!(
+            word(&integer(1), u32::MAX, "test"),
+            Err(HnnError::Realization { .. })
+        ));
+        assert_eq!(word(&integer(0), u32::MAX, "test").unwrap(), 0);
+    }
+
+    #[test]
+    fn fine_values_are_exact_at_their_scale_and_coarser_or_odd_coordinates_refuse() {
+        let fine = Rat::new(BigInt::from(-3), BigInt::one() << 100usize);
+        assert_eq!(word(&fine, 100, "test").unwrap(), -3);
+        assert_eq!(word(&fine, 103, "test").unwrap(), -24);
+        assert!(word(&fine, 99, "test").is_err());
+        assert!(word(&Rat::new(BigInt::one(), BigInt::from(3)), 100, "test").is_err());
+    }
 }

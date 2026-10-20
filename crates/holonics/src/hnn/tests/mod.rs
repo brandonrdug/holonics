@@ -14,7 +14,7 @@ mod keys;
 pub(crate) mod learning;
 mod loaded_scalar;
 mod material_tangent;
-mod moment;
+pub(crate) mod moment;
 mod observed_continuing;
 mod pending;
 mod physical;

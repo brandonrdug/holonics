@@ -669,8 +669,11 @@ mod tests {
         assert!(neutral_reading.unchanged);
         assert_eq!(admitted.unwrap().0, neutral_material);
         let neutral_state = neutral_material.continuing_state(0).unwrap();
-        let neutral_state =
-            crate::hnn::constitution::ContinuingState::from_text(&neutral_state.to_text()).unwrap();
+        let neutral_state = crate::hnn::constitution::ContinuingState::from_text(
+            &neutral_state.to_text(),
+            before.budget(),
+        )
+        .unwrap();
         assert_eq!(
             before.clone().continued(&neutral_state).unwrap(),
             neutral_material

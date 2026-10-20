@@ -228,7 +228,7 @@ fn r4b_16_save_and_continue_keeps_every_reading_and_rejects_the_old_field() {
     direct.publish_founding().unwrap().unwrap();
     let state = direct.continuing_state(0).unwrap();
     let text = state.to_text();
-    let parsed = ContinuingState::from_text(&text).unwrap();
+    let parsed = ContinuingState::from_text(&text, direct.constitution().budget()).unwrap();
     assert_eq!(state, parsed);
     let field = direct.field.clone();
     let opening = Constitution::initial(&field, 1 << 40).unwrap();
@@ -370,7 +370,7 @@ fn r4b_contact_family_and_arrived_restore_on_the_founded_field_only() {
     );
     let state = resident.continuing_state(0).unwrap();
     let text = state.to_text();
-    let parsed = ContinuingState::from_text(&text).unwrap();
+    let parsed = ContinuingState::from_text(&text, resident.constitution().budget()).unwrap();
     let opening = Constitution::initial(&resident.field, 1 << 40).unwrap();
     let restored = reference
         .mount_continued(
@@ -582,7 +582,7 @@ fn r4b_arrived_crosses_the_founding_then_precision_and_collapse() {
     let opening = resident.constitution.clone();
     let text = ContinuingState::stamped(&text, &opening).unwrap();
     resident.constitution = opening
-        .continued(&ContinuingState::from_text(&text).unwrap())
+        .continued(&ContinuingState::from_text(&text, resident.constitution().budget()).unwrap())
         .unwrap();
     let event = resident
         .constitution

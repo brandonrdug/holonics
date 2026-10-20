@@ -718,7 +718,7 @@ fn the_exposures_retained_state_saves_and_restores_whole() {
         .unwrap()
         .with_carry(exposure.carried.clone());
     let text = state.to_text();
-    let read = ContinuingState::from_text(&text).unwrap();
+    let read = ContinuingState::from_text(&text, OPEN_BUDGET).unwrap();
     assert_eq!(read, state);
     assert_eq!(opening.clone().continued(&read).unwrap(), *retained);
     let current = Current::at_rest(&field);
@@ -1043,7 +1043,7 @@ fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
         let window = &cells[span.clone()];
         if window.len() == phases.aperture() {
             let state = resident.continuing_state(ring).unwrap();
-            let read = ContinuingState::from_text(&state.to_text()).unwrap();
+            let read = ContinuingState::from_text(&state.to_text(), OPEN_BUDGET).unwrap();
             assert_eq!(read, state);
             let opening = Constitution::initial(&field, OPEN_BUDGET).unwrap();
             let mut restored = reference
@@ -1312,7 +1312,7 @@ fn a_saved_passage_continues_at_its_epoch_as_the_whole_run() {
         .unwrap();
     let state = resident.continuing_state(ring).unwrap();
     assert!(state.passage().is_some());
-    let read = ContinuingState::from_text(&state.to_text()).unwrap();
+    let read = ContinuingState::from_text(&state.to_text(), OPEN_BUDGET).unwrap();
     assert_eq!(read, state);
     let opening = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let passage = read.resident_passage(&field, &opening).unwrap().unwrap();
@@ -1359,5 +1359,5 @@ fn a_saved_passage_continues_at_its_epoch_as_the_whole_run() {
     // A damaged passage is refused by the state's check before any line is read.
     let mut damaged = state.to_text();
     damaged = damaged.replacen("\nmoment ", "\nmoment 1", 1);
-    assert!(ContinuingState::from_text(&damaged).is_err());
+    assert!(ContinuingState::from_text(&damaged, OPEN_BUDGET).is_err());
 }

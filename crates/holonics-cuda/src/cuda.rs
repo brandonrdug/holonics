@@ -135,6 +135,7 @@ impl DeviceAttribute {
     pub const COMPUTE_CAPABILITY_MINOR: DeviceAttribute = DeviceAttribute(76);
     pub const MAX_SHARED_MEMORY_PER_MULTIPROCESSOR: DeviceAttribute = DeviceAttribute(81);
     pub const MAX_REGISTERS_PER_MULTIPROCESSOR: DeviceAttribute = DeviceAttribute(82);
+    pub const COOPERATIVE_LAUNCH: DeviceAttribute = DeviceAttribute(95);
     pub const MAX_SHARED_MEMORY_PER_BLOCK_OPTIN: DeviceAttribute = DeviceAttribute(97);
     pub const MAX_BLOCKS_PER_MULTIPROCESSOR: DeviceAttribute = DeviceAttribute(106);
     pub const VIRTUAL_MEMORY_MANAGEMENT_SUPPORTED: DeviceAttribute = DeviceAttribute(102);
@@ -1051,6 +1052,70 @@ impl Dim3 {
 }
 
 impl Function<'_> {
+    /// The driver's active blocks per multiprocessor for this lowered function and the exact
+    /// block/shared surface offered to its cooperative launch. Zero means no resident block.
+    pub(crate) fn active_blocks_per_multiprocessor(
+        &self,
+        threads: u32,
+        shared_bytes: u32,
+    ) -> Result<u32> {
+        let threads = i32::try_from(threads)
+            .ok()
+            .filter(|n| *n > 0)
+            .ok_or_else(|| {
+                invalid_driver_value(
+                    "Function::active_blocks_per_multiprocessor",
+                    "a block has a positive signed-32-bit thread extent".into(),
+                )
+            })?;
+        let mut blocks = 0;
+        unsafe {
+            check(
+                ffi::cuOccupancyMaxActiveBlocksPerMultiprocessor(
+                    &mut blocks,
+                    self.func,
+                    threads,
+                    shared_bytes as usize,
+                ),
+                "cuOccupancyMaxActiveBlocksPerMultiprocessor",
+            )?;
+        }
+        u32::try_from(blocks).map_err(|_| {
+            invalid_driver_value(
+                "Function::active_blocks_per_multiprocessor",
+                "the driver reported negative occupancy".into(),
+            )
+        })
+    }
+
+    /// Launch a grid whose capability and simultaneous residency have been admitted by Card.
+    pub(crate) fn launch_cooperative_on_shared(
+        &self,
+        stream: &Stream,
+        grid: Dim3,
+        block: Dim3,
+        shared_bytes: u32,
+        params: &mut [*mut c_void],
+    ) -> Result<()> {
+        unsafe {
+            check(
+                ffi::cuLaunchCooperativeKernel(
+                    self.func,
+                    grid.x,
+                    grid.y,
+                    grid.z,
+                    block.x,
+                    block.y,
+                    block.z,
+                    shared_bytes,
+                    stream.stream,
+                    params.as_mut_ptr(),
+                ),
+                "cuLaunchCooperativeKernel",
+            )
+        }
+    }
+
     /// Read the driver/JIT's actual block limit for this entry, after PTX has been lowered for the
     /// mounted card. Attribute zero is `CU_FUNC_ATTRIBUTE_MAX_THREADS_PER_BLOCK`.
     pub fn max_threads_per_block(&self) -> Result<u32> {
@@ -2052,6 +2117,7 @@ mod tests {
             81
         );
         assert_eq!(DeviceAttribute::MAX_REGISTERS_PER_MULTIPROCESSOR.raw(), 82);
+        assert_eq!(DeviceAttribute::COOPERATIVE_LAUNCH.raw(), 95);
         assert_eq!(DeviceAttribute::MAX_SHARED_MEMORY_PER_BLOCK_OPTIN.raw(), 97);
         assert_eq!(DeviceAttribute::MAX_BLOCKS_PER_MULTIPROCESSOR.raw(), 106);
         assert_eq!(DeviceAttribute::from_raw(123).raw(), 123);

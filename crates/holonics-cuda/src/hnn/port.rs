@@ -103,6 +103,10 @@ use crate::hnn::readout::{self, Executed};
 use crate::hnn::store::{ChartStore, Pair};
 use crate::hnn::tree::{CardTree, TreeTimes};
 
+#[path = "observed.rs"]
+mod observed;
+pub use observed::ObservedEpochDevice;
+
 fn device(error: DeviceError) -> HnnError {
     error.into_hnn()
 }
@@ -176,6 +180,131 @@ fn rekey_moments(
         first.get_or_insert(error);
     }
     first.map_or(Ok(()), Err)
+}
+
+/// Return through precisely the charts and record retained by the producing card word.
+fn pull_back_word(
+    field: &Field,
+    word: &mut ExecutedWord<'_>,
+    covector: &holonics::hnn::RatioCovector,
+    phases: &ReceivingPhases,
+) -> Result<WordReturn, HnnError> {
+    let publication = Rc::clone(&word.word.publication);
+    let map = &publication.loci.maps[phases.ring()]
+        .as_ref()
+        .ok_or(HnnError::MissingReceivingMap {
+            ring: phases.ring(),
+        })?
+        .matrix;
+    let back = if matches!(
+        word.word.plan.receiving_layout,
+        ReceivingLayout::ArrivalContext { .. }
+    ) {
+        let response_plan = word
+            .word
+            .response_plan_record()
+            .ok_or(HnnError::Unadmitted {
+                reason: "an ArrivalContext comparison retains its executed response record",
+            })?
+            .0
+            .clone();
+        let paired = {
+            let response_record = word
+                .word
+                .response_plan_record()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "an ArrivalContext comparison retains its executed response record",
+                })?
+                .1;
+            readout::paired_source(
+                word.word.card(),
+                field,
+                &word.word.plan,
+                &word.word.record,
+                response_record,
+                covector,
+                map,
+            )?
+        };
+        let actual_reverse = word.word.reverse(&paired.actual.carried)?;
+        let response_reverse = word.word.reverse_response(&paired.fresh.carried)?;
+        let actual_back = readout::word_return(
+            &word.word.plan,
+            &publication.loci,
+            &word.word.record,
+            &actual_reverse,
+            paired.actual,
+        )?;
+        let response_record = word
+            .word
+            .response_plan_record()
+            .ok_or(HnnError::Unadmitted {
+                reason: "the response record survives its independent return",
+            })?
+            .1;
+        let response_back = readout::word_return(
+            &response_plan,
+            &publication.loci,
+            response_record,
+            &response_reverse,
+            paired.fresh,
+        )?;
+        let mut joined =
+            WordReturn::join_response(field, actual_back, response_back, paired.reads)?;
+        let (fresh_errors, actual_errors) =
+            word.word
+                .response_anchor_errors()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "the response return retains both path defect certificates",
+                })?;
+        let fresh = phases
+            .epochs()
+            .map(|crossing| {
+                fresh_errors
+                    .get(crossing)
+                    .and_then(|at| at.get(phases.ring()))
+                    .cloned()
+                    .ok_or(HnnError::WordEnded {
+                        ticks: fresh_errors.len(),
+                    })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let actual = phases
+            .epochs()
+            .map(|crossing| {
+                actual_errors
+                    .get(crossing)
+                    .and_then(|at| at.get(phases.ring()))
+                    .cloned()
+                    .ok_or(HnnError::WordEnded {
+                        ticks: actual_errors.len(),
+                    })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        joined.response_defect = Some(PairedReadDefect {
+            fresh,
+            actual: Some(actual),
+        });
+        joined
+    } else {
+        let source = readout::source(
+            word.word.card(),
+            field,
+            &word.word.plan,
+            &word.word.record,
+            covector,
+            map,
+        )?;
+        let reverse = word.word.reverse(&source.carried)?;
+        readout::word_return(
+            &word.word.plan,
+            &publication.loci,
+            &word.word.record,
+            &reverse,
+            source,
+        )?
+    };
+    Ok(back)
 }
 
 // -------------------------------------------------------------------------------------------
@@ -545,7 +674,7 @@ impl<'c> Mounted<'c> {
             .map(|(g, ring)| Pair {
                 key: ChartKey::Ring(g),
                 matrix: &ring.operator,
-                words: &ring.operator_words,
+                words: Some(&ring.operator_words),
             })
             .collect();
         for (a, operator) in operators.iter().enumerate() {
@@ -555,7 +684,7 @@ impl<'c> Mounted<'c> {
                     carry: plan.contacts[a].carry.clone(),
                 },
                 matrix: &operator.operator,
-                words: &operator.words,
+                words: operator.words.as_ref(),
             });
         }
         let refined = self.store.refine(&pairs)?;
@@ -993,7 +1122,7 @@ impl<'c> Resident<'c> {
                 what: "the card's founding law is owed (#76)",
             });
         }
-        let constitution = opening.continued(state)?;
+        let constitution = opening.continued_on(field, state)?;
         if let Some(carry) = state.carry() {
             if !matches!(self.reception, Reception::Carry(_)) || !carry.fits(field) {
                 return Err(HnnError::ContinuingState {
@@ -1100,8 +1229,8 @@ impl<'c> Resident<'c> {
             what: "a field whose word runs on no declared lattice (the card carries lattice words)",
         })?;
         let admitted = match family {
-            // The sole saved-family caller parsed ResidentPassage through the shared native
-            // owner, which validates every declaring restriction before this device allocation.
+            // Saved continuation and the observed execution facade supply already admitted
+            // native phases and validate their declaring restrictions before this allocation.
             Some(family) => family,
             None => field
                 .receivers()
@@ -1368,114 +1497,7 @@ impl<'c> Resident<'c> {
         )?;
         wall.holon = start.elapsed();
         let start = Instant::now();
-        let publication = Rc::clone(&word.word.publication);
-        let map = &publication.loci.maps[phases.ring()]
-            .as_ref()
-            .ok_or(HnnError::MissingReceivingMap {
-                ring: phases.ring(),
-            })?
-            .matrix;
-        let back = if matches!(
-            word.word.plan.receiving_layout,
-            ReceivingLayout::ArrivalContext { .. }
-        ) {
-            let response_plan = word
-                .word
-                .response_plan_record()
-                .ok_or(HnnError::Unadmitted {
-                    reason: "an ArrivalContext comparison retains its executed response record",
-                })?
-                .0
-                .clone();
-            let paired = {
-                let response_record = word
-                    .word
-                    .response_plan_record()
-                    .ok_or(HnnError::Unadmitted {
-                        reason: "an ArrivalContext comparison retains its executed response record",
-                    })?
-                    .1;
-                readout::paired_source(
-                    field,
-                    &word.word.plan,
-                    &word.word.record,
-                    response_record,
-                    &covector,
-                    map,
-                )?
-            };
-            let actual_reverse = word.word.reverse(&paired.actual.carried)?;
-            let response_reverse = word.word.reverse_response(&paired.fresh.carried)?;
-            let actual_back = readout::word_return(
-                &word.word.plan,
-                &publication.loci,
-                &word.word.record,
-                &actual_reverse,
-                paired.actual,
-            )?;
-            let response_record = word
-                .word
-                .response_plan_record()
-                .ok_or(HnnError::Unadmitted {
-                    reason: "the response record survives its independent return",
-                })?
-                .1;
-            let response_back = readout::word_return(
-                &response_plan,
-                &publication.loci,
-                response_record,
-                &response_reverse,
-                paired.fresh,
-            )?;
-            let mut joined =
-                WordReturn::join_response(field, actual_back, response_back, paired.reads)?;
-            let (fresh_errors, actual_errors) =
-                word.word
-                    .response_anchor_errors()
-                    .ok_or(HnnError::Unadmitted {
-                        reason: "the response return retains both path defect certificates",
-                    })?;
-            let fresh = phases
-                .epochs()
-                .map(|crossing| {
-                    fresh_errors
-                        .get(crossing)
-                        .and_then(|at| at.get(phases.ring()))
-                        .cloned()
-                        .ok_or(HnnError::WordEnded {
-                            ticks: fresh_errors.len(),
-                        })
-                })
-                .collect::<Result<Vec<_>, _>>()?;
-            let actual = phases
-                .epochs()
-                .map(|crossing| {
-                    actual_errors
-                        .get(crossing)
-                        .and_then(|at| at.get(phases.ring()))
-                        .cloned()
-                        .ok_or(HnnError::WordEnded {
-                            ticks: actual_errors.len(),
-                        })
-                })
-                .collect::<Result<Vec<_>, _>>()?;
-            joined.response_defect = Some(PairedReadDefect {
-                fresh,
-                actual: Some(actual),
-            });
-            joined
-        } else {
-            let source =
-                readout::source(field, &word.word.plan, &word.word.record, &covector, map)?;
-            let reverse = word.word.reverse(&source.carried)?;
-            readout::word_return(
-                &word.word.plan,
-                &publication.loci,
-                &word.word.record,
-                &reverse,
-                source,
-            )?
-        };
+        let back = pull_back_word(field, &mut word, &covector, &phases)?;
         let octets = word.word.octets as u64;
         let response_octets = word.word.take_response_octets().unwrap_or(0) as u64;
         resident.count(|traffic| {
@@ -1975,7 +1997,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             contacts: word
                 .operators
                 .iter()
-                .map(|operator| (&operator.words, &operator.norm))
+                .map(|operator| (&operator.operator, &operator.norm))
                 .collect(),
             readings: &word.readings,
         };

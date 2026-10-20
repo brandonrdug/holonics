@@ -435,6 +435,7 @@ impl ChartedPhysicalPrediction<'_, '_> {
                     entries: vec![0],
                     phases: composed.phases,
                     loci: reached.into_iter().collect(),
+                    passages: Vec::new(),
                 });
             let feature_energy = deposit
                 .linear()

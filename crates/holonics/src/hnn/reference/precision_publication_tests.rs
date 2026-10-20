@@ -166,7 +166,7 @@ fn fixture_with_budget(budget: u64) -> (Reference, Resident, MomentId, Receiving
     // unit/8 needs precision 3; gamma_length(2) = 3.
     receiving_carry_clock(&mut text, 0, 2);
     let text = ContinuingState::stamped(&text, &founding).unwrap();
-    let state = ContinuingState::from_text(&text).unwrap();
+    let state = ContinuingState::from_text(&text, founding.budget()).unwrap();
     let theta = founding.continued(&state).unwrap();
     let mut resident = reference
         .mount_with(&field, &Current::at_rest(&field), theta)
@@ -289,7 +289,8 @@ fn receiving_precision_accounts_changed_face_with_open_moment_and_carry_then_clo
     conserved(&before.constitution, &resident.constitution);
     telescope(balance);
     let saved = resident.continuing_state(0).unwrap();
-    let saved = ContinuingState::from_text(&saved.to_text()).unwrap();
+    let saved =
+        ContinuingState::from_text(&saved.to_text(), resident.constitution().budget()).unwrap();
     let field = resident.field.clone();
     let mut cold = reference
         .mount_continued(

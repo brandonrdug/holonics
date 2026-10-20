@@ -2674,7 +2674,7 @@ fn full_resident_continuation_case(field: Field) {
     let saved = d.continuing_state(0).unwrap();
     let text = saved.to_text();
     assert_eq!(text, h.continuing_state(0).unwrap().to_text());
-    let saved = ContinuingState::from_text(&text).unwrap();
+    let saved = ContinuingState::from_text(&text, initial.budget()).unwrap();
     let mut restored = device
         .mount_continued(&field, &current, initial.clone(), &saved)
         .unwrap();
@@ -2897,12 +2897,12 @@ fn the_card_receiving_component_precision_preserves_outputs_and_cold_continuatio
         ),
     );
     assert!(
-        ContinuingState::from_text(&seeded).is_err(),
+        ContinuingState::from_text(&seeded, opening.budget()).is_err(),
         "editing a checksummed state must be refused"
     );
     // These same remainders are refused at clock zero by the native fine-lattice law.
     let clock_zero = ContinuingState::stamped(&seeded, &opening).unwrap();
-    let clock_zero = ContinuingState::from_text(&clock_zero).unwrap();
+    let clock_zero = ContinuingState::from_text(&clock_zero, opening.budget()).unwrap();
     assert!(matches!(
         opening.clone().continued(&clock_zero),
         Err(HnnError::ContinuingState {
@@ -2942,8 +2942,11 @@ fn the_card_receiving_component_precision_preserves_outputs_and_cold_continuatio
     seeded.replace_range(clocks_start..clocks_end, &clock_block);
     // Recompute the text integrity check after constructing this explicit carried-state fixture.
     let seeded = ContinuingState::stamped(&seeded, &opening).unwrap();
-    let state = ContinuingState::from_text(&seeded).unwrap();
-    assert_eq!(ContinuingState::from_text(&state.to_text()).unwrap(), state);
+    let state = ContinuingState::from_text(&seeded, opening.budget()).unwrap();
+    assert_eq!(
+        ContinuingState::from_text(&state.to_text(), opening.budget()).unwrap(),
+        state
+    );
     let theta = opening.clone().continued(&state).unwrap();
     let restored_carry = theta.receiving_law(ring).unwrap().map_remainder();
     assert_eq!(restored_carry.get(2, 0).unwrap(), &(&unit / integer(8)));

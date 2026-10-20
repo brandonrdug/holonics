@@ -253,12 +253,13 @@ use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{Chart, integral, lcm};
 
+mod epoch;
 mod resident_marginal_face;
 mod resident_pair_face;
 pub use resident_marginal_face::MarginalFaceAudit;
 use resident_marginal_face::ResidentMarginalFaces;
 use resident_pair_face::ResidentPairFaces;
-pub(crate) use resident_pair_face::{PairFaceGradient, ResidentPairFace};
+pub(crate) use resident_pair_face::{PairFaceGradient, PreparedPairRay, ResidentPairFace};
 
 // -------------------------------------------------------------------------------------------
 // the capacity

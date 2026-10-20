@@ -150,7 +150,7 @@ pub(crate) fn save_checkpoint<R: ExposedResident>(
         return Err(format!("checkpoint {path:?} differed after write/read-back").into());
     }
     let read_back_text = std::str::from_utf8(&read_back)?;
-    let parsed = ContinuingState::from_text(read_back_text)?;
+    let parsed = ContinuingState::from_text(read_back_text, opening.budget())?;
     if parsed != state {
         return Err(
             format!("checkpoint {path:?} did not parse to its exact resident state").into(),
@@ -247,7 +247,7 @@ pub(crate) fn save_checkpoint_cost_profile<R: ExposedResident>(
     }
     check("resident checkpoint parse")?;
     let started = Instant::now();
-    let parsed = ContinuingState::from_text(std::str::from_utf8(&committed)?)?;
+    let parsed = ContinuingState::from_text(std::str::from_utf8(&committed)?, opening.budget())?;
     println!(
         "cost_checkpoint component=parse elapsed_ns={}",
         elapsed(started)
@@ -305,7 +305,7 @@ fn save_latest_checkpoint<R: ExposedResident>(
     if read_back != text.as_bytes() {
         return Err(format!("latest checkpoint {path:?} differed after write/read-back").into());
     }
-    let parsed = ContinuingState::from_text(std::str::from_utf8(&read_back)?)?;
+    let parsed = ContinuingState::from_text(std::str::from_utf8(&read_back)?, opening.budget())?;
     if parsed != state || opening.clone().continued(&parsed)? != *resident.constitution() {
         return Err(
             format!("latest checkpoint {path:?} failed state/constitution round-trip").into(),
@@ -368,7 +368,7 @@ pub(crate) fn field(population: u64) -> Result<Field> {
 
 /// An exact sum of code-length enclosures, reported with integer endpoints `[⌊Σ lower⌋, ⌈Σ upper⌉]`.
 #[derive(Clone, Debug)]
-struct CodeSum {
+pub(super) struct CodeSum {
     lower: Rat,
     upper: Rat,
     cells: u64,
@@ -385,13 +385,13 @@ impl Default for CodeSum {
 }
 
 impl CodeSum {
-    fn add(&mut self, interval: &ExactInterval) {
+    pub(super) fn add(&mut self, interval: &ExactInterval) {
         self.lower += &interval.lower;
         self.upper += &interval.upper;
         self.cells += 1;
     }
 
-    fn merge(&mut self, other: &CodeSum) {
+    pub(super) fn merge(&mut self, other: &CodeSum) {
         self.lower += &other.lower;
         self.upper += &other.upper;
         self.cells += other.cells;
@@ -403,6 +403,15 @@ impl CodeSum {
             self.lower.floor().to_integer(),
             self.upper.ceil().to_integer()
         )
+    }
+
+    /// Exact endpoints of the summed enclosure; no exterior integer rounding.
+    pub(super) fn exact_endpoints(&self) -> String {
+        format!("[{},{}]", self.lower, self.upper)
+    }
+
+    pub(super) fn cells(&self) -> u64 {
+        self.cells
     }
 }
 
@@ -949,6 +958,7 @@ mod diagnostic_tests {
             key: None,
             bits: 4,
             face: vec![ExactInterval::point(rat(1, 4))],
+            scored_face: None,
         };
         let before = cell.clone();
         let code = drawn_code(&cell, 0).unwrap();
@@ -1430,7 +1440,7 @@ where
     };
     let mut resident = if let Some(path) = &options.checkpoint_in {
         let text = String::from_utf8(read(path)?)?;
-        let state = ContinuingState::from_text(&text)?;
+        let state = ContinuingState::from_text(&text, material.budget())?;
         if state.ring() != 0 || state.passage().is_none() {
             return Err("--checkpoint-in requires a full source-0 resident continuation".into());
         }

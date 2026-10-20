@@ -1520,7 +1520,7 @@ fn a_restored_remainder_off_its_fine_lattice_or_half_cell_is_refused() {
     let restore = |text: &str| {
         Constitution::initial(&field, OPEN_BUDGET)
             .unwrap()
-            .continued(&ContinuingState::from_text(text).unwrap())
+            .continued(&ContinuingState::from_text(text, OPEN_BUDGET).unwrap())
     };
     assert_eq!(restore(&text).unwrap(), first);
     // The same text with `rows` added as contact remainders at channel 0, under the writer's check
@@ -2462,6 +2462,7 @@ fn the_gains_read_the_span_factor_term_by_term() {
         entries: vec![0, 2],
         phases: 1,
         loci: Default::default(),
+        passages: Vec::new(),
     };
     let growth = rat(9, 8);
     let factor: Vec<Rat> = (0..=5)
@@ -3186,7 +3187,7 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
 
     // A checkpoint writes the statistics whole and a restored constitution holds them again.
     let state = next.continuing_state(0).unwrap();
-    let read = ContinuingState::from_text(&state.to_text()).unwrap();
+    let read = ContinuingState::from_text(&state.to_text(), OPEN_BUDGET).unwrap();
     assert_eq!(read, state);
     let restored = Constitution::initial(&field, OPEN_BUDGET)
         .unwrap()
@@ -3250,7 +3251,7 @@ fn a_sparse_checkpoint_restores_and_continues_exactly() {
     };
     let restore = |theta: &Constitution| {
         let state = theta.continuing_state(0).unwrap();
-        let read = ContinuingState::from_text(&state.to_text()).unwrap();
+        let read = ContinuingState::from_text(&state.to_text(), theta.budget()).unwrap();
         assert_eq!(read, state);
         Constitution::initial(&field, OPEN_BUDGET)
             .unwrap()

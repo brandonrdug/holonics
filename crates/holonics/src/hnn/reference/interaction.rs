@@ -38,6 +38,11 @@ impl Resident {
     }
 
     pub(crate) fn admit_exact_current(&self) -> Result<(), HnnError> {
+        if self.observed_epoch_terminal {
+            return Err(HnnError::Unadmitted {
+                reason: "a terminal partial receiver passage has no admitted continuation or save square",
+            });
+        }
         self.admit_no_participating_world()?;
         if self.held_contact_variation.is_some() {
             return Err(HnnError::Unadmitted {

@@ -480,7 +480,7 @@ fn a_restored_checkpoint_continues_exactly_over_successive_deposits() {
     let locus = Locus::SourcePort(0);
     assert!(continued.clock(locus) >= 1);
     let text = continued.continuing_state(0).unwrap().to_text();
-    let state = ContinuingState::from_text(&text).unwrap();
+    let state = ContinuingState::from_text(&text, opening.budget()).unwrap();
     assert_eq!(state, continued.continuing_state(0).unwrap());
     let restored = opening.clone().continued(&state).unwrap();
     assert_eq!(restored, continued);
@@ -494,7 +494,10 @@ fn a_restored_checkpoint_continues_exactly_over_successive_deposits() {
         a = sa;
         b = sb;
         let state = a.continuing_state(0).unwrap();
-        assert_eq!(ContinuingState::from_text(&state.to_text()).unwrap(), state);
+        assert_eq!(
+            ContinuingState::from_text(&state.to_text(), opening.budget()).unwrap(),
+            state
+        );
     }
     // The partial remount: E and ρ alone.
     let rows = continued.source_port(0).unwrap().rows();
@@ -504,7 +507,7 @@ fn a_restored_checkpoint_continues_exactly_over_successive_deposits() {
         .map(|line| format!("{line}\n"))
         .collect();
     assert!(matches!(
-        ContinuingState::from_text(&partial_text),
+        ContinuingState::from_text(&partial_text, opening.budget()),
         Err(HnnError::ContinuingState { .. })
     ));
     let partial = opening
@@ -562,7 +565,7 @@ fn a_checkpoint_is_refused_onto_foreign_material_and_when_damaged() {
     // No deposit changes the declared material.
     assert_eq!(continued.material_identity(), opening.material_identity());
     let text = continued.continuing_state(0).unwrap().to_text();
-    let state = ContinuingState::from_text(&text).unwrap();
+    let state = ContinuingState::from_text(&text, opening.budget()).unwrap();
     assert_eq!(opening.clone().continued(&state).unwrap(), continued);
     assert_eq!(reseeded.clone().continued(&state).unwrap(), continued);
     assert!(matches!(
@@ -578,7 +581,7 @@ fn a_checkpoint_is_refused_onto_foreign_material_and_when_damaged() {
     let damaged = String::from_utf8(damaged).unwrap();
     assert_ne!(damaged, text);
     assert!(matches!(
-        ContinuingState::from_text(&damaged),
+        ContinuingState::from_text(&damaged, opening.budget()),
         Err(HnnError::ContinuingState { what }) if what.contains("damaged")
     ));
     // A changed material line is caught by the check as well.
@@ -588,7 +591,7 @@ fn a_checkpoint_is_refused_onto_foreign_material_and_when_damaged() {
         &format!("material {}", foreign.material_identity()),
     );
     assert_ne!(relabelled, text);
-    assert!(ContinuingState::from_text(&relabelled).is_err());
+    assert!(ContinuingState::from_text(&relabelled, opening.budget()).is_err());
 }
 
 /// [implemented-exact; the reception carry §2.4] **A continuing state carries the reception's end
@@ -662,7 +665,7 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
     assert!(carry.fits(&field));
     let carried = at_rest.clone().with_carry(Some(carry.clone()));
     let text = carried.to_text();
-    let read = ContinuingState::from_text(&text).unwrap();
+    let read = ContinuingState::from_text(&text, opening.budget()).unwrap();
     assert_eq!(read, carried);
     assert_eq!(read.carry(), Some(&carry));
     assert_eq!(opening.clone().continued(&read).unwrap(), continued);
@@ -675,7 +678,7 @@ fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
     damaged[at] = if damaged[at] == b'7' { b'8' } else { b'7' };
     let damaged = String::from_utf8(damaged).unwrap();
     assert!(matches!(
-        ContinuingState::from_text(&damaged),
+        ContinuingState::from_text(&damaged, opening.budget()),
         Err(HnnError::ContinuingState { what }) if what.contains("damaged")
     ));
     // A state at rest mounts with no carry, so its next reception opens with zero carry; a carried
