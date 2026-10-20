@@ -8,7 +8,9 @@
 //! readout maps share the whole candidate probe; a refused whole branch stages the exact
 //! upstream joint proposal, then the held-upstream receiving policy on its domain refusal.
 //! Every nonzero upstream proposal executes the same-opening finite comparison.
-//! NormalMaps is the default. Additive scope forks can opt into channel D alone, or actual
+//! NormalMaps is the default. Explicit complete-language train-local-retained-fibre-v1
+//! uses local R/tree/population only; addressed E-family response remains a separate API.
+//! Additive scope forks can opt into channel D alone, or actual
 //! C/K/D endpoints; material endpoints retain their bound producing cut and held-work reading.
 //! Both rungs reuse the same opening's normal flow and certified gain. Held upstream maps
 //! absorb that news once with zero material move; discarded candidates never publish statistics.
@@ -104,6 +106,13 @@ pub fn code_checkpoint_native_bytes(path: &str) -> std::result::Result<Vec<u8>, 
     // material/current/moment/tree/population/carry/crib/pending, must otherwise agree exactly.
     checkpoint.provenance.clear();
     checkpoint.bytes()
+}
+
+#[cfg(test)]
+pub fn code_checkpoint_scope_and_source(path:&str)->std::result::Result<(String,String,String),Box<dyn Error>>{
+    let (checkpoint,_)=Checkpoint::load(path,64*1024*1024)?;
+    let c=checkpoint.stream.resident().constitution();
+    Ok((format!("{:?}",checkpoint.stream.scope()),format!("{:?}",c.source_law(0)),format!("{:?}",c.receiving_law(2))))
 }
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
@@ -1772,7 +1781,7 @@ fn run() -> Result<()> {
                 ("physical_epoch_cell_bound", checkpoint.stream.epoch_bound().to_string()),
                 ("native_steps", stepped.to_string()), ("whole_epochs", whole.to_string()),
                 ("joint_epochs", joint.to_string()), ("receiving_only_epochs", receiving_only.to_string()), ("neutral_epochs", neutral.to_string()),
-                ("certification_scope", quoted("atomic same-opening whole then upstream joint proposal with both native normal predicates and actual finite comparison; held-upstream absorption on domain refusal; Neutral requires publication_attempt to identify its branch; unfinished physical interval pending")),
+                ("certification_scope", quoted(if checkpoint.stream.scope()==ObservedEpochDepositionScope::LocalReceivingReturn { "local R NormalLaw; complete whole-section finite comparison not requested; unfinished actual input pending; source E family response is separate" } else { "atomic same-opening whole then upstream joint proposal with both native normal predicates and actual finite comparison; held-upstream absorption on domain refusal; Neutral requires publication_attempt to identify its branch; unfinished physical interval pending" })),
                 ("deposition_scope", quoted(scope_description(checkpoint.stream.scope()))),
                 ("epoch_outcomes", format!("[{}]", outcomes.join(","))),
                 ("class_code_scope", quoted("prequential class comparison through the actual model/tree face; separate tree-only control; phase improvement alone is not class prediction improvement")),

@@ -131,7 +131,7 @@ fn checkpoint_at(
     let stream = ObservedStream::restore(
         resident.clone(),
         crib.clone(),
-        ObservedEpochDepositionScope::NormalMaps,
+        parent.stream.scope(),
         Vec::new(),
     )?;
     Ok(Checkpoint {
@@ -587,4 +587,9 @@ pub(super) fn sample_continuing(
         final_state_sha256,
         final_crib_sha256,
     })
+}
+
+#[cfg(test)]
+pub(super) fn code_scope_preserving_checkpoint(parent:&Checkpoint,_reference:&Reference)->Result<Checkpoint>{
+    checkpoint_at(parent,SamplingPolicy::NativeFullFibre,"synthetic",0,parent.stream.resident(),parent.stream.crib())
 }

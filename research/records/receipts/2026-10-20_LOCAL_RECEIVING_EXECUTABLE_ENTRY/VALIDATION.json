@@ -1,0 +1,74 @@
+{
+  "base_source": "011cc525fc55d6395b4d3db666cbdb6cc8d27e51",
+  "host_gate_scopes_passed": [
+    "check",
+    "guard-lints",
+    "guard-doctests",
+    "diagnostic-timing-controls",
+    "diagnostic-supervisor-controls",
+    "diagnostic-receipt-controls",
+    "listener-continuation-controls",
+    "projected-statistics-controls",
+    "native-class-advance-controls",
+    "native-gram-carry-conservation",
+    "finite-solenoidal-controls",
+    "rational-place-controls",
+    "plural-coupling-controls",
+    "grouped-tube-controls",
+    "observed-tube-controls",
+    "source-refinement-controls",
+    "actual-source-alignment",
+    "actual-ray-joint-controls",
+    "actual-factor-refusal",
+    "refined-source-native-restore",
+    "solenoidal-listener-controls",
+    "offline-coupling-controls"
+  ],
+  "doctests_passed": 64,
+  "constructor_scope_cold_continuation": "PASS",
+  "actual_CLI_host_card_control": {
+    "cells": 40,
+    "epochs": 4,
+    "pending": 0,
+    "whole_carry_crossed": 30,
+    "host_card_native_cold": "EXACT",
+    "source_NormalLaw": "unchanged",
+    "receiving_material": "changed",
+    "host_elapsed_ns": 2292530293,
+    "CUDA_elapsed_ns": 2380352902,
+    "actual_CUDA_forwards": 40,
+    "actual_CUDA_retained_returns": 40,
+    "actual_CUDA_aggregates": 4,
+    "host_fallback": false,
+    "kernel_transfer_sync_counts": "not instrumented",
+    "GPU_peak_own_MiB": 260,
+    "GPU_cleanup_empty": true
+  },
+  "binaries": [
+    {
+      "name": "solenoidal_alpha",
+      "sha256": "21e5d0672803399469a5fe94fd27d3973c6bb192f31f80679a879f12e1e2d5b4",
+      "bytes": 19846392,
+      "profile": "dev opt-level1 debug0 incremental0; optimized build PASS"
+    },
+    {
+      "name": "complete_language_observed",
+      "sha256": "aab50efc1232e99df4828df029fd1571d25e5924e36b14c9e62f3c798f0f6696",
+      "bytes": 24927216,
+      "profile": "dev opt-level1 debug0 incremental0; optimized build PASS"
+    }
+  ],
+  "closed_first_CODE_ns": 325613920416,
+  "closed_completion_CODE_ns": 119044172258,
+  "total_CODE_ns": 444658092674,
+  "incomplete_attempts": [
+    "fixed180s original gates accepted7scopes before library compile timeout",
+    "fixed60s missing scopes stopped during library compile; no test result"
+  ],
+  "postflights": "both reported descendant lists verified exited; completion controls empty",
+  "language_scope": "explicit localR plus native tree/population; no automatic pairedE or generic contextual material consumer",
+  "further_scope": "contextual port review only; adapter assigned next in isolated descendant",
+  "model_jobs": 0,
+  "dataset_access": 0,
+  "uploads": 0
+}

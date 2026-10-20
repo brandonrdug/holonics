@@ -61,6 +61,14 @@ fn fresh_checkpoint_at_law(
     population: u64,
     law: holonics::hnn::receiving::ReceivingLaw,
 ) -> Result<Checkpoint> {
+    fresh_checkpoint_at_law_and_scope(population,law,ObservedEpochDepositionScope::NormalMaps)
+}
+
+fn fresh_checkpoint_at_law_and_scope(
+    population:u64,
+    law:holonics::hnn::receiving::ReceivingLaw,
+    scope:ObservedEpochDepositionScope,
+)->Result<Checkpoint>{
     let (field, initial, pairing) = declaration(population)?;
     let reference = port();
     let mut resident = reference.mount_with(&field, &Current::at_rest(&field), initial)?;
@@ -72,7 +80,7 @@ fn fresh_checkpoint_at_law(
         stream: ObservedStream::new(
             resident,
             ObservedCrib::new(0),
-            ObservedEpochDepositionScope::NormalMaps,
+            scope,
         )?,
         provenance: "complete episodes; fresh native initializer; explicit exterior framing".into(),
     })
@@ -227,11 +235,18 @@ fn causal_cut(checkpoint: &Checkpoint, next_class: Option<usize>, label: &str) -
 /// Reusable native training entry. Data are already framed and pinned by the exterior plan.
 /// Backend injection changes only the existing forward/reverse executor, not the epoch law.
 #[allow(clippy::too_many_arguments)]
+fn e_scope(scope:ObservedEpochDepositionScope)->&'static str {
+    if scope==ObservedEpochDepositionScope::LocalReceivingReturn {
+        "R/tree/population only; bounded addressed JointFamily E response is a separate API, not automatically produced or invoked"
+    } else { "preserved legacy normal-map reference; no generic contextual JointFamily producer" }
+}
+
 fn train(
     args: &[String],
     execution: &dyn ObservedEpochExecution,
     law: holonics::hnn::receiving::ReceivingLaw,
     selected_backend: CompleteLanguageTrainingBackend,
+    scope:ObservedEpochDepositionScope,
 ) -> Result<()> {
     if args.len() != 10 {
         return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT".into());
@@ -266,19 +281,19 @@ fn train(
     let started = Instant::now();
     write_new(&out.join("EXECUTION_CONTRACT.json"), object(&[
         ("backend", quoted(backend)),
+        ("command",quoted(&args[0])),
+        ("deposition_scope",exact(&scope)),
+        ("additional_whole_section_monotone_policy_requested",(scope!=ObservedEpochDepositionScope::LocalReceivingReturn).to_string()),
+        ("e_scope",quoted(e_scope(scope))),
         ("training_executor_injected", "true".into()),
         ("device_ordinal", if selected_backend == CompleteLanguageTrainingBackend::CudaObservedEpochDevice0 { "0".into() } else { "null".into() }),
         ("host_owned", quoted("source/clock/normal law; scalar face/root/normalization/scoring/certification; causal cuts; prefix diagnostics; exact decode; independent output forks")),
         ("host_fallback", "false".into()),
     ]).as_bytes())?;
-    let mut checkpoint = if law == holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
-        fresh_checkpoint(population)?
-    } else {
-        fresh_checkpoint_at_law(population, law)?
-    };
+    let mut checkpoint = fresh_checkpoint_at_law_and_scope(population,law,scope)?;
     checkpoint.provenance = format!(
-        "complete Q+LF+A+LF; corpus SHA256 {}; backend {backend}; no record-boundary resets",
-        args[3]
+        "complete Q+LF+A+LF; corpus SHA256 {}; backend {backend}; command {}; scope {scope:?}; no record-boundary resets",
+        args[3],args[0]
     );
     write_new(
         &out.join("CLOCK_CONTRACT.json"),
@@ -334,6 +349,9 @@ fn train(
         )?;
         at = end;
         for epoch in receipt.epochs {
+            if epoch.deposition_scope!=scope || checkpoint.stream.scope()!=scope {
+                return Err("actual training scope differs from explicitly declared command".into());
+            }
             if epoch.consumed != 10
                 || !epoch.closed_section
                 || epoch.terminal_partial
@@ -364,6 +382,8 @@ fn train(
                 ("carry_out", epoch.carry_out.to_string()),
                 ("commit", epoch.deposit.commit.to_string()),
                 ("outcome", exact(&epoch.outcome)),
+                ("deposition_scope",exact(&epoch.deposition_scope)),
+                ("probe_state",exact(&epoch.probe_state)),
                 (
                     if law == holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
                         "actual_coarse_prequential_code_sum"
@@ -447,6 +467,10 @@ fn train(
         &out.join("TRAINING_COMPLETE.json"),
         object(&[
             ("backend", quoted(backend)),
+            ("command",quoted(&args[0])),
+            ("deposition_scope",exact(&checkpoint.stream.scope())),
+            ("e_scope",quoted(e_scope(scope))),
+
             (
                 "actual_rayon_workers",
                 rayon::current_num_threads().to_string(),
@@ -573,11 +597,12 @@ pub(super) fn run_with_execution(
     backend: CompleteLanguageTrainingBackend,
 ) -> Result<()> {
     match args.first().map(String::as_str) {
-        Some("train") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1, backend),
-        Some("train-retained-fibre-v1") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1, backend),
+        Some("train") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1, backend,ObservedEpochDepositionScope::NormalMaps),
+        Some("train-retained-fibre-v1") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1, backend,ObservedEpochDepositionScope::NormalMaps),
+        Some("train-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
         Some("sample") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
-        _ => Err("complete-language requires train, explicit train-retained-fibre-v1, or sample; no default backend/model action".into()),
+        _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), or sample; no default backend/model action".into()),
     }
 }
 pub(super) fn run(args: &[String]) -> Result<()> {
@@ -591,6 +616,19 @@ pub(super) fn run(args: &[String]) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn local_cli_constructor_cold_and_continuation_scope_are_explicit() {
+        let local=fresh_checkpoint_at_law_and_scope(16384,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,ObservedEpochDepositionScope::LocalReceivingReturn).unwrap();
+        let old=fresh_checkpoint_at_law(16384,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1).unwrap();
+        assert_eq!(old.stream.scope(),ObservedEpochDepositionScope::NormalMaps);
+        assert_eq!(local.stream.scope(),ObservedEpochDepositionScope::LocalReceivingReturn);
+        assert_eq!(local.stream.accepted_cells().unwrap(),0);
+        assert!(fresh_checkpoint_at_law_and_scope(16384,holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1,ObservedEpochDepositionScope::LocalReceivingReturn).is_err());
+        let reference=port();
+        let fork=continuation::code_scope_preserving_checkpoint(&local,&reference).unwrap();
+        assert_eq!(fork.stream.scope(),ObservedEpochDepositionScope::LocalReceivingReturn);
+        assert_eq!(fork.stream.resident().continuing_state(0).unwrap(),local.stream.resident().continuing_state(0).unwrap());
+    }
     #[test]
     fn complete_language_cut_parser_refuses_duplicate_or_out_of_horizon() {
         assert!(parse_cuts(b"0\topening\n20\tend\n", 20).is_ok());

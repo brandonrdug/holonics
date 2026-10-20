@@ -22,6 +22,9 @@ fn unknown_backend_refuses_before_input_or_output_access() {
 }
 
 fn exercise_fixture(label: &str, bytes: &[u8]) {
+    exercise_fixture_command(label,bytes,"train-retained-fibre-v1");
+}
+fn exercise_fixture_command(label:&str,bytes:&[u8],command:&str){
     let root = std::env::var_os("V92_ADAPTER_FIXTURE_DIR")
         .map(std::path::PathBuf::from)
         .unwrap_or_else(|| {
@@ -33,7 +36,8 @@ fn exercise_fixture(label: &str, bytes: &[u8]) {
     let corpus = root.join("synthetic.bin");
     let cuts = root.join("synthetic-cuts.tsv");
     std::fs::write(&corpus, bytes).unwrap();
-    std::fs::write(&cuts, b"0\tsynthetic-opening\n20\tsynthetic-closed\n").unwrap();
+    let cells=bytes.len()*4;assert_eq!(cells%10,0);
+    std::fs::write(&cuts,format!("0\tsynthetic-opening\n{cells}\tsynthetic-closed\n")).unwrap();
     fn hash(path: &Path) -> String {
         let out = std::process::Command::new("sha256sum")
             .arg(path)
@@ -50,40 +54,52 @@ fn exercise_fixture(label: &str, bytes: &[u8]) {
     for backend in ["host-reference", "cuda-observed-epoch-device0"] {
         let args = vec![
             "complete-language".into(),
-            "train-retained-fibre-v1".into(),
+            command.into(),
             backend.into(),
             corpus.to_str().unwrap().into(),
             hash(&corpus),
             cuts.to_str().unwrap().into(),
             hash(&cuts),
             "16384".into(),
-            "20".into(),
-            "2".into(),
+            cells.to_string(),
+            (cells/10).to_string(),
             root.join(backend).to_str().unwrap().into(),
         ];
         run(&args).unwrap();
         let complete =
             std::fs::read_to_string(root.join(backend).join("TRAINING_COMPLETE.json")).unwrap();
         assert!(complete.contains("\"cold_exact\":true"));
-        assert!(complete.contains("\"accepted_cells\":20"));
-        assert!(complete.contains("\"actual_epochs\":2"));
+        assert!(complete.contains(&format!("\"accepted_cells\":{cells}")));
+        assert!(complete.contains(&format!("\"actual_epochs\":{}",cells/10)));
+        if command=="train-local-retained-fibre-v1" {
+            assert!(complete.contains("\"deposition_scope\":\"LocalReceivingReturn\""));
+            let execution=std::fs::read_to_string(root.join(backend).join("EXECUTION_CONTRACT.json")).unwrap();
+            assert!(execution.contains("\"command\":\"train-local-retained-fibre-v1\""));
+            assert!(execution.contains("\"additional_whole_section_monotone_policy_requested\":false"));
+            let fresh=exterior::code_checkpoint_scope_and_source(root.join(backend).join("fresh.state").to_str().unwrap()).unwrap();
+            let trained=exterior::code_checkpoint_scope_and_source(root.join(backend).join("trained.state").to_str().unwrap()).unwrap();
+            assert_eq!(fresh.0,"LocalReceivingReturn");assert_eq!(trained.0,fresh.0);
+            assert_eq!(trained.1,fresh.1,"local command cannot silently update source E normal state");
+            assert_ne!(trained.2,fresh.2,"actual local R material must move on this existing varied fixture");
+            eprintln!("V93_LOCAL_CLI_OBSERVED {backend} {}",complete.trim());
+        }
     }
     for checkpoint in [
-        "fresh.state",
-        "trained.state",
-        "cut-00000.state",
-        "cut-00020.state",
+        "fresh.state".to_owned(),
+        "trained.state".to_owned(),
+        "cut-00000.state".to_owned(),
+        format!("cut-{cells:05}.state"),
     ] {
         let host = exterior::code_checkpoint_native_bytes(
             root.join("host-reference")
-                .join(checkpoint)
+                .join(&checkpoint)
                 .to_str()
                 .unwrap(),
         )
         .unwrap();
         let card = exterior::code_checkpoint_native_bytes(
             root.join("cuda-observed-epoch-device0")
-                .join(checkpoint)
+                .join(&checkpoint)
                 .to_str()
                 .unwrap(),
         )
@@ -132,4 +148,10 @@ fn ordered_local_receiving_source_host_card() {
     assert_eq!(host, device);
     card.require_actual_dispatch().unwrap();
     eprintln!("V93_ORDERED_HOST_CARD_PARITY {}", card.receipt(true).trim());
+}
+
+#[test]
+#[ignore = "exclusive supported HOST CUDA guard; local CLI synthetic40-cell whole-carry CODE only"]
+fn local_retained_training_command_host_card_cold_and_scope(){
+    exercise_fixture_command("local-retained",&[0x1b,0xe4,0x1b,0xe4,0x00,0x1b,0xe4,0x1b,0xe4,0x00],"train-local-retained-fibre-v1");
 }
