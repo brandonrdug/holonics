@@ -227,17 +227,20 @@ fn run(period_csv: &str, step_csv: &str) -> Result<String> {
     ))
 }
 
-fn main() {
+fn main() -> std::process::ExitCode {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
     let result = match arguments.as_slice() {
         [operator, periods, steps] if operator == "phase" => run(periods, steps),
         _ => Err("usage: solenoidal_workbench phase PERIOD_CSV STEP_CSV".into()),
     };
     match result {
-        Ok(receipt) => println!("{receipt}"),
+        Ok(receipt) => {
+            println!("{receipt}");
+            std::process::ExitCode::SUCCESS
+        }
         Err(error) => {
             eprintln!("{error}");
-            std::process::exit(2);
+            std::process::ExitCode::from(2)
         }
     }
 }
