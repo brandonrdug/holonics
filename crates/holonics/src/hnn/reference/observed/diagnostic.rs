@@ -303,8 +303,8 @@ impl Reference {
 }
 
 /// One explicitly hypothetical class received under an alternate native receiver. It is an
-/// oracle branch operand, not a fabricated release certificate. The caller publishes no class
-/// until the existing finite section receiver certifies the complete section.
+/// branch operand, not a release certificate. A caller binds its own existing conditional
+/// keyed-draw certificate or whole-section certificate before publishing a class.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceiverPrefixReceipt {
     pub receiver: crate::hnn::receiving::RetainedFibreReceiver,

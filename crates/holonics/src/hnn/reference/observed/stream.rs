@@ -191,7 +191,25 @@ impl ObservedStream {
         pairing: &PairingDeclaration,
         classes: &[usize],
     ) -> Result<ObservedStreamReceipt, HnnError> {
-        self.receive_diagnosed(reference, pairing, classes, &mut |_, _| {})
+        self.receive_with_execution(reference, pairing, classes, &HostObservedEpochExecution)
+    }
+
+    /// Accept source classes through the explicitly selected observed-epoch execution.
+    /// The stream still publishes only after the full delivery succeeds.
+    pub fn receive_with_execution(
+        &mut self,
+        reference: &Reference,
+        pairing: &PairingDeclaration,
+        classes: &[usize],
+        execution: &dyn ObservedEpochExecution,
+    ) -> Result<ObservedStreamReceipt, HnnError> {
+        self.receive_diagnosed_with_execution(
+            reference,
+            pairing,
+            classes,
+            execution,
+            &mut |_, _| {},
+        )
     }
 
     /// The same transaction with an exterior observer for the first failed whole/R stage
@@ -202,6 +220,27 @@ impl ObservedStream {
         reference: &Reference,
         pairing: &PairingDeclaration,
         classes: &[usize],
+        stage_refused: &mut dyn FnMut(EpochStageAttempt, &EpochStageRefusal),
+    ) -> Result<ObservedStreamReceipt, HnnError> {
+        self.receive_diagnosed_with_execution(
+            reference,
+            pairing,
+            classes,
+            &HostObservedEpochExecution,
+            stage_refused,
+        )
+    }
+
+    /// The same transaction with an explicitly selected observed-epoch execution and
+    /// an exterior observer for the first failed whole/R stage in each actual epoch.
+    /// A fatal refusal still reports evidence before returning the original error.
+    /// Neither execution nor evidence is retained in the stream or its checkpoint.
+    pub fn receive_diagnosed_with_execution(
+        &mut self,
+        reference: &Reference,
+        pairing: &PairingDeclaration,
+        classes: &[usize],
+        execution: &dyn ObservedEpochExecution,
         stage_refused: &mut dyn FnMut(EpochStageAttempt, &EpochStageRefusal),
     ) -> Result<ObservedStreamReceipt, HnnError> {
         let mut next = self.clone();
@@ -239,7 +278,7 @@ impl ObservedStream {
                     None,
                     &[],
                     false,
-                    &HostObservedEpochExecution,
+                    execution,
                     next.scope,
                     stage_refused,
                 )?;
@@ -336,8 +375,12 @@ impl ObservedStream {
         let scope = match self.scope {
             ObservedEpochDepositionScope::All => "all",
             ObservedEpochDepositionScope::NormalMaps => "normal-maps",
-            ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => "normal-maps-channel-dissipation",
-            ObservedEpochDepositionScope::NormalMapsAndChannelMaterial => "normal-maps-channel-material",
+            ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => {
+                "normal-maps-channel-dissipation"
+            }
+            ObservedEpochDepositionScope::NormalMapsAndChannelMaterial => {
+                "normal-maps-channel-material"
+            }
         };
         format!(
             "observed-stream-pending-v1 {scope} {} {} {}\n{}\n",
@@ -370,8 +413,12 @@ impl ObservedStream {
         let scope = match header[1] {
             "all" => ObservedEpochDepositionScope::All,
             "normal-maps" => ObservedEpochDepositionScope::NormalMaps,
-            "normal-maps-channel-dissipation" => ObservedEpochDepositionScope::NormalMapsAndChannelDissipation,
-            "normal-maps-channel-material" => ObservedEpochDepositionScope::NormalMapsAndChannelMaterial,
+            "normal-maps-channel-dissipation" => {
+                ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
+            }
+            "normal-maps-channel-material" => {
+                ObservedEpochDepositionScope::NormalMapsAndChannelMaterial
+            }
             _ => return Err(refuse("the saved observed deposition scope")),
         };
         let commit: u64 = header[2]
@@ -419,6 +466,79 @@ mod tests {
     use crate::hnn::constitution::ContinuingState;
     use crate::hnn::paired::PairedCarrier;
     use crate::hnn::tests::support::{contact, small_field_of};
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    struct CountingExecution {
+        forwards: AtomicUsize,
+        returns: AtomicUsize,
+        flows: AtomicUsize,
+        refuse_forward: bool,
+    }
+
+    impl CountingExecution {
+        fn new(refuse_forward: bool) -> Self {
+            Self {
+                forwards: AtomicUsize::new(0),
+                returns: AtomicUsize::new(0),
+                flows: AtomicUsize::new(0),
+                refuse_forward,
+            }
+        }
+    }
+
+    impl ObservedEpochExecution for CountingExecution {
+        fn forward(
+            &self,
+            field: &crate::hnn::field::Field,
+            constitution: &crate::hnn::constitution::Constitution,
+            ratio: &crate::hnn::pending::PendingRatio,
+            charts: &mut crate::hnn::chart::Charts,
+            opening: &crate::hnn::word::WordOpening,
+        ) -> Result<ObservedEpochForwardWord, HnnError> {
+            self.forwards.fetch_add(1, Ordering::Relaxed);
+            if self.refuse_forward {
+                return Err(HnnError::ContinuingState {
+                    what: "selected stream test execution refused forward",
+                });
+            }
+            HostObservedEpochExecution.forward(field, constitution, ratio, charts, opening)
+        }
+
+        fn pull_back(
+            &self,
+            word: crate::hnn::word::Word<'_>,
+            covector: &crate::hnn::ratio::RatioCovector,
+            map: &crate::ratio::linear::ExactRatMatrix,
+            phases: &crate::hnn::receiving::ReceivingPhases,
+        ) -> Result<crate::hnn::port::WordReturn, HnnError> {
+            self.returns.fetch_add(1, Ordering::Relaxed);
+            HostObservedEpochExecution.pull_back(word, covector, map, phases)
+        }
+
+        fn aggregate_records(
+            &self,
+            locus: crate::hnn::constitution::LinearLocus,
+            rows: usize,
+            columns: usize,
+            receiver_grain: u32,
+            epoch_cells: u64,
+            epoch: u64,
+            heard_cells: u64,
+            records: &[crate::hnn::constitution::EpochProducerRecordReading],
+        ) -> Result<crate::hnn::constitution::EpochRecordFlowReading, HnnError> {
+            self.flows.fetch_add(1, Ordering::Relaxed);
+            HostObservedEpochExecution.aggregate_records(
+                locus,
+                rows,
+                columns,
+                receiver_grain,
+                epoch_cells,
+                epoch,
+                heard_cells,
+                records,
+            )
+        }
+    }
 
     fn opening() -> (Reference, ObservedStream, PairingDeclaration, Constitution) {
         // The existing serial small-field declaration, with the always-ticking first source
@@ -575,8 +695,11 @@ mod tests {
         assert!(pending.starts_with("observed-stream-pending-v1 normal-maps-channel-dissipation "));
         let before = stream.resident.continuing_state(0).unwrap();
         let mut cold = ObservedStream::restore_checkpoint(
-            stream.resident.clone(), stream.crib.clone(), &pending,
-        ).unwrap();
+            stream.resident.clone(),
+            stream.crib.clone(),
+            &pending,
+        )
+        .unwrap();
         assert_eq!(cold.scope, stream.scope);
         assert_eq!(cold.pending_checkpoint(), pending);
         assert_eq!(cold.resident.continuing_state(0).unwrap(), before);
@@ -587,7 +710,48 @@ mod tests {
         stream.receive(&reference, &pairing, &[3]).unwrap();
         cold.receive(&reference, &pairing, &[3]).unwrap();
         assert_eq!(stream.pending_checkpoint(), cold.pending_checkpoint());
-        assert_eq!(stream.resident.continuing_state(0).unwrap(), cold.resident.continuing_state(0).unwrap());
+        assert_eq!(
+            stream.resident.continuing_state(0).unwrap(),
+            cold.resident.continuing_state(0).unwrap()
+        );
     }
 
+    #[test]
+    fn selected_stream_execution_delegates_actual_epoch_work() {
+        let (reference, mut selected, pairing, _) = opening();
+        let (_, mut host, _, _) = opening();
+        let execution = CountingExecution::new(false);
+        let classes = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1];
+        selected
+            .receive_with_execution(&reference, &pairing, &classes, &execution)
+            .unwrap();
+        host.receive(&reference, &pairing, &classes).unwrap();
+        assert!(execution.forwards.load(Ordering::Relaxed) > 0);
+        assert!(execution.returns.load(Ordering::Relaxed) > 0);
+        assert!(execution.flows.load(Ordering::Relaxed) > 0);
+        assert_eq!(
+            selected.resident.continuing_state(0).unwrap(),
+            host.resident.continuing_state(0).unwrap()
+        );
+        assert_eq!(selected.pending_checkpoint(), host.pending_checkpoint());
+        assert_eq!(selected.crib, host.crib);
+    }
+
+    #[test]
+    fn selected_stream_execution_refusal_rolls_back_resident_crib_and_pending_input() {
+        let (reference, mut stream, pairing, _) = opening();
+        let before = stream.resident.continuing_state(0).unwrap();
+        let before_crib = stream.crib.clone();
+        let before_pending = stream.pending_checkpoint();
+        let execution = CountingExecution::new(true);
+        let classes = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1];
+        let error = stream
+            .receive_with_execution(&reference, &pairing, &classes, &execution)
+            .unwrap_err();
+        assert!(matches!(error, HnnError::ContinuingState { .. }));
+        assert_eq!(execution.forwards.load(Ordering::Relaxed), 1);
+        assert_eq!(stream.resident.continuing_state(0).unwrap(), before);
+        assert_eq!(stream.crib, before_crib);
+        assert_eq!(stream.pending_checkpoint(), before_pending);
+    }
 }

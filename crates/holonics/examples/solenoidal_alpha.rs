@@ -53,6 +53,9 @@ use std::{
     time::Instant,
 };
 
+#[path = "solenoidal_alpha/complete_language.rs"]
+mod complete_language;
+
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 const MATERIAL_BIT_BUDGET: u64 = 1 << 40; // Existing listener declaration, never raised.
 const MAGIC: &str = "solenoidal-alpha-unplaced-v2";
@@ -1464,6 +1467,7 @@ fn run() -> Result<()> {
     let started = Instant::now();
     let args: Vec<String> = std::env::args().skip(1).collect();
     match args.first().map(String::as_str) {
+        Some("complete-language") => complete_language::run(&args[1..])?,
         Some("init") if args.len() == 3 => {
             let population = args[2].parse()?;
             let (field, initial, pairing) = declaration(population)?;
