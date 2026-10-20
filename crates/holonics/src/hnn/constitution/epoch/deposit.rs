@@ -4205,17 +4205,17 @@ mod tests {
         scope: EpochCandidateScope,
     ) -> StagedEpochCandidate {
         let receiver = field.receivers()[0].ring;
-        let k = material.contacts[0].dissipation.rows();
-        let request = FactorStep {
+        let requests = material.contacts.iter().enumerate().map(|(contact, factor)| FactorStep {
             gradient: FactorGradient::Dissipation {
-                contact: 0,
-                gradient: scaled_identity(k, rat(8, 1)),
+                contact,
+                gradient: scaled_identity(factor.dissipation.rows(), rat(8, 1)),
             },
             energy: Rat::zero(),
             covector: Rat::one(),
-        };
+        }).collect();
         let retention: BTreeSet<_> = crate::hnn::retention::loci(field).into_iter().collect();
-        let deposit = Deposit::new(material.commit, vec![], vec![request], vec![Locus::Channel(0)])
+        let deposit = Deposit::new(material.commit, vec![], requests,
+            (0..material.contacts.len()).map(Locus::Channel).collect())
             .with_reach(Reach {
                 receiver, stations: vec![2, 4], entries: vec![0], phases: 1,
                 loci: retention.clone(), passages: vec![],
@@ -4248,7 +4248,12 @@ mod tests {
         let candidate = d_only_fixture_stage(&field, &material, 0, EpochCandidateScope::Whole);
         assert!(candidate.requires_comparison());
         assert!(candidate.has_physical_motion());
-        assert_ne!(candidate.material.contacts[0].dissipation, material.contacts[0].dissipation);
+        for contact in 0..material.contacts.len() {
+            assert_ne!(candidate.material.contacts[contact].dissipation, material.contacts[contact].dissipation);
+            assert!(candidate.reading.steps.iter().any(|(locus, step)|
+                *locus == Locus::Channel(contact) && step.family == Family::Factor(2)),
+                "each actual D face uses its own original prepared request index, including contact1/index1");
+        }
         for (old, new) in material.contacts.iter().zip(&candidate.material.contacts) {
             assert_eq!(old.storage, new.storage);
             assert_eq!(old.stiffness, new.stiffness);
@@ -4258,6 +4263,11 @@ mod tests {
         assert!(!fallback.requires_comparison());
         assert_eq!(fallback.material.contacts, material.contacts,
             "discarded D parameters and statistics cannot leak to receiving-only publication");
+        for contact in 0..material.contacts.len() {
+            let locus = Locus::Channel(contact);
+            assert_eq!(fallback.material.lattice(locus).unwrap(), material.lattice(locus).unwrap());
+            assert_eq!(fallback.material.clock(locus), material.clock(locus));
+        }
         assert_eq!(fallback.material.carries.iter().filter(|((l, _), _)| matches!(l, Locus::Channel(_))).collect::<Vec<_>>(),
             material.carries.iter().filter(|((l, _), _)| matches!(l, Locus::Channel(_))).collect::<Vec<_>>());
         assert_eq!(material.continuing_state(0).unwrap().to_text(), before);
