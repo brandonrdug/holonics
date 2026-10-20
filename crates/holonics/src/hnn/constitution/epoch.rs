@@ -7,6 +7,7 @@
 
 use super::*;
 
+mod channel_ray;
 mod checkpoint;
 mod deposit;
 pub(crate) mod device;

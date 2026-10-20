@@ -10911,24 +10911,13 @@ fn factor_prepared(
                 &mut material.scales[index],
                 energy,
             )?;
-            // The transit reads `2C(w − ω)`, `hK(u + ½hω)` and `hDω`: the output's weight `w` enters
-            // the moves as `4w²` (16, `4h²`, `4h²`). A boost's signature flips columns only, so the
-            // unit step's norms are the gradient's.
-            let weight = match index {
-                0 => integer(16),
-                _ => integer(4) * hop * hop,
-            };
             let factor = match index {
                 0 => &material.storage,
                 1 => &material.stiffness,
                 _ => &material.dissipation,
             };
             let (column, row) = schur_flat(gradient.entries(), gradient.columns());
-            let moves = Moves::Square {
-                weight,
-                unit: ceilings(&(column / &scale, row / &scale)),
-                factor: ceilings(&schur_norms(factor)),
-            };
+            let moves = channel_factor_moves(index, factor, (column / &scale, row / &scale), hop);
             (scale.clone(), squared(gradient.entries()) / &scale, moves)
         }
         // A factor step's locus is its gradient's, so its material is this locus's.
@@ -10943,6 +10932,24 @@ fn factor_prepared(
         energy: ceiling(energy),
         moves,
     })
+}
+
+/// Pure first-variation reader shared by fresh channel preparation and a fixed actual ray.
+/// Advancing a normalization statistic is deliberately outside this function. This bound is
+/// not a nonlinear comparison-descent certificate; an actual endpoint still owes admission.
+fn channel_factor_moves(
+    family: usize,
+    factor: &ExactRatMatrix,
+    direction_norms: (Rat, Rat),
+    hop: &Rat,
+) -> Moves {
+    // The transit reads 2C(w-omega), hK(u+h omega/2), hD omega.
+    let weight = if family == 0 { rat(16, 1) } else { rat(4, 1) * hop * hop };
+    Moves::Square {
+        weight,
+        unit: ceilings(&direction_norms),
+        factor: ceilings(&schur_norms(factor)),
+    }
 }
 
 /// Whether a resonator is pumped (its declared pump at a nonzero strength).

@@ -419,9 +419,56 @@ fn carrier_family(carrier: Carrier) -> Option<Family> {
 }
 
 fn admit_actual_factor_displacements(
+    opening: &Constitution,
+    endpoint: &Constitution,
     strokes: &BTreeMap<Locus, BudgetedCarry>,
+    requests: &[FactorStep],
+    certified: &BTreeMap<(Locus, Family), StepReading>,
     evidence: &mut Option<EpochStageRefusal>,
 ) -> Result<(), HnnError> {
+    // The endpoint is authoritative. Rebasing old C/K/D carry need not leave a fresh staged q.
+    // Read the actual parameter displacement before the quotient-only checks for other families.
+    if let Some(ray) = channel_ray::ChannelFactorDisplacement::read_all(opening, endpoint)?
+        .into_iter().next()
+    {
+        let locus = Locus::Channel(ray.contact);
+        let family = Family::Factor(ray.family);
+        let mut refusal = EpochStageRefusal::at(
+            "actual_factor_displacement",
+            EpochStageCondition::NonlinearFactorRay,
+            "the complete changed channel endpoint needs its own actual ray and finite admission",
+            Some(locus), Some(family),
+        ).read("actual_parameter_displacement", match EpochArray::from_dyadic_matrix(&ray.displacement) {
+            Ok(delta) => EpochStageValue::Series(EpochSeriesReading::of(&delta)),
+            Err(_) => EpochStageValue::Unavailable("the exact parameter delta is not dyadic"),
+        }).read("actual_delta_matches_staged_quotient", EpochStageValue::Index(usize::from(
+            strokes.get(&locus).is_some_and(|stroke| ray.matches_stroke(stroke))
+        )));
+        let request = requests.iter().find(|step| step.gradient.locus() == locus
+            && step.gradient.family() == family);
+        if let (Some(request), Some(fresh)) = (request, certified.get(&(locus, family))) {
+            if fresh.step.step.is_positive() {
+                let read = ray.fixed_eta(&request.gradient, &fresh.step.step, &opening.hop)?;
+                refusal = refusal
+                    .read("original_certified_eta", EpochStageValue::Ratio(fresh.step.step.clone()))
+                    .read("actual_parameter_alignment", EpochStageValue::Ratio(read.alignment))
+                    .read("actual_direction_l1", EpochStageValue::Ratio(read.direction.entries().iter().map(Signed::abs).sum()))
+                    .read("actual_first_variation_moves", EpochStageValue::Ratio(
+                        read.moves.own(&request.energy, &fresh.step.step)?
+                    ));
+            } else {
+                refusal = refusal.read("actual_ray_rate", EpochStageValue::Unavailable(
+                    "the original family was held; no positive actual rate is invented"
+                ));
+            }
+        } else {
+            refusal = refusal.read("actual_ray_rate", EpochStageValue::Unavailable(
+                "this changed endpoint has no original certified family and rate"
+            ));
+        }
+        refusal.first(evidence);
+        return Err(refused("actual epoch certification requires the represented nonlinear factor rays"));
+    }
     let first = strokes.iter().find_map(|(locus, at)| {
         at.staged
             .iter()
@@ -1814,7 +1861,10 @@ impl Constitution {
         // certificate, refuse a mixed physical factor move rather than attach
         // a fresh-direction certificate to different material. Sufficient
         // factor statistics/carries may change while their material stays put.
-        admit_actual_factor_displacements(&strokes, &mut trace.evidence)?;
+        trace.at("actual_factor_displacement", None, None);
+        admit_actual_factor_displacements(
+            self, &next, &strokes, &factor_steps, &certified, &mut trace.evidence,
+        )?;
         let mut candidates = BTreeMap::new();
         let mut actual_faces = Vec::new();
         let mut actual_exponents = DeclaredExponents {
@@ -3509,7 +3559,101 @@ mod tests {
     }
 
     #[test]
+    fn actual_channel_ray_detects_a_rebased_endpoint_and_preserves_cold_continuation() {
+        let (field, mut material, _, _, _) = normal_domain_fixture(None, true);
+        let opening = material.clone();
+        let locus = Locus::Channel(0);
+        let unit = material.lattice(locus).unwrap().unit();
+        // A legitimate retained subgrain remainder, without any fresh deposition request.
+        material.clocks.insert(locus, 2);
+        material.carries.insert((locus, Carrier::Factor(2)),
+            Carry(BTreeMap::from([(0, &unit / rat(4, 1))])));
+        let retained = crate::hnn::retention::loci(&field).into_iter().collect();
+        let rebased = material.rebased(locus, 2, &retained).unwrap();
+        let rays = channel_ray::ChannelFactorDisplacement::read_all(&material, &rebased).unwrap();
+        assert_eq!(rays.len(), 1);
+        assert_eq!((rays[0].contact, rays[0].family), (0, 2));
+        assert_eq!(rays[0].displacement.entries()[0], &unit / rat(4, 1));
+        let before = material.continuing_state(0).unwrap().to_text();
+        let after = rebased.continuing_state(0).unwrap().to_text();
+        let mut evidence = None;
+        assert!(admit_actual_factor_displacements(&material, &rebased,
+            &BTreeMap::new(), &[], &BTreeMap::new(), &mut evidence).is_err());
+        let evidence = evidence.unwrap();
+        assert_eq!((evidence.locus, evidence.family), (Some(locus), Some(Family::Factor(2))));
+        assert_eq!(evidence.condition, EpochStageCondition::NonlinearFactorRay);
+        assert!(evidence.readings.iter().any(|r| r.name == "actual_delta_matches_staged_quotient"
+            && r.value == EpochStageValue::Index(0)));
+        assert_eq!(material.continuing_state(0).unwrap().to_text(), before);
+        assert_eq!(rebased.continuing_state(0).unwrap().to_text(), after);
+        let state = ContinuingState::from_text(&after, material.budget()).unwrap();
+        let cold = opening.continued_on(&field, &state).unwrap();
+        assert_eq!(cold, rebased);
+        assert_eq!(channel_ray::ChannelFactorDisplacement::read_all(&material, &cold).unwrap(), rays);
+        // The next legitimate rebase agrees after restoring complete carrier state.
+        assert_eq!(cold.rebased(locus, 1, &retained).unwrap(),
+            rebased.rebased(locus, 1, &retained).unwrap());
+    }
+
+    #[test]
+    fn actual_channel_ray_guard_attaches_its_matching_original_rate_and_covector() {
+        let (_, material, _, _, _) = normal_domain_fixture(None, true);
+        let locus = Locus::Channel(0);
+        let family = Family::Factor(2);
+        let unit = material.lattice(locus).unwrap().unit();
+        let mut endpoint = material.clone();
+        let factor = &material.contacts[0].dissipation;
+        let mut rows = factor.to_rows();
+        rows[0][0] += &unit;
+        endpoint.contacts[0].dissipation = ExactRatMatrix::new(rows).unwrap();
+        let mut gradient = ExactRatMatrix::zero(factor.rows(), factor.columns()).unwrap().to_rows();
+        gradient[0][0] = rat(3, 1);
+        let request = FactorStep { gradient: FactorGradient::Dissipation {
+            contact: 0, gradient: ExactRatMatrix::new(gradient).unwrap(),
+        }, energy: rat(2, 1), covector: rat(2, 1) };
+        // Synthetic certificate input for this read-only guard control, never a publication seal.
+        let step = CertifiedStep::certify(&Rat::one(), &Rat::one(), &rat(2, 1)).unwrap().unwrap();
+        assert_eq!(step.step, rat(1, 2));
+        let certified = BTreeMap::from([((locus, family), StepReading {
+            family, step, gain: Rat::one(), moves: Rat::one(), bound: Rat::one(),
+            readout: Rat::one(), amplitude: Rat::one(),
+        })]);
+        let mut stroke = BudgetedCarry::new(material.lattice(locus).unwrap(), 1);
+        stroke.staged.insert((Carrier::Factor(2), 0), (Rat::zero(), BigInt::one()));
+        let before = material.continuing_state(0).unwrap().to_text();
+        let after = endpoint.continuing_state(0).unwrap().to_text();
+        let mut evidence = None;
+        assert!(admit_actual_factor_displacements(&material, &endpoint,
+            &BTreeMap::from([(locus, stroke)]), &[request], &certified, &mut evidence).is_err());
+        let reads = evidence.unwrap().readings;
+        assert!(reads.iter().any(|r| r.name == "original_certified_eta"
+            && r.value == EpochStageValue::Ratio(rat(1, 2))));
+        assert!(reads.iter().any(|r| r.name == "actual_parameter_alignment"
+            && r.value == EpochStageValue::Ratio(rat(6, 1) * &unit)));
+        assert!(reads.iter().any(|r| r.name == "actual_delta_matches_staged_quotient"
+            && r.value == EpochStageValue::Index(1)));
+        assert!(reads.iter().any(|r| r.name == "actual_first_variation_moves"
+            && matches!(&r.value, EpochStageValue::Ratio(value) if value.is_positive())));
+        assert_eq!(material.continuing_state(0).unwrap().to_text(), before);
+        assert_eq!(endpoint.continuing_state(0).unwrap().to_text(), after);
+    }
+
+    #[test]
+    fn actual_channel_ray_ignores_statistic_only_changes_without_absorbing_them_again() {
+        let (_, material, _, _, _) = normal_domain_fixture(None, true);
+        let mut endpoint = material.clone();
+        endpoint.contacts[0].scales[2] += rat(1, 4);
+        let before = material.continuing_state(0).unwrap().to_text();
+        let after = endpoint.continuing_state(0).unwrap().to_text();
+        assert!(admit_actual_factor_displacements(&material, &endpoint,
+            &BTreeMap::new(), &[], &BTreeMap::new(), &mut None).is_ok());
+        assert_eq!(material.continuing_state(0).unwrap().to_text(), before);
+        assert_eq!(endpoint.continuing_state(0).unwrap().to_text(), after);
+    }
+
+    #[test]
     fn nonlinear_material_and_finer_source_carry_refusals_keep_their_operands() {
+        let (_, material, _, _, _) = normal_domain_fixture(None, true);
         let locus = Locus::SourcePort(0);
         let mut at = BudgetedCarry::new(Lattice::new(4), 1);
         at.staged.insert(
@@ -3525,7 +3669,9 @@ mod tests {
         let strokes = BTreeMap::from([(locus, at)]);
         let before = strokes.clone();
         let mut evidence = None;
-        assert!(admit_actual_factor_displacements(&strokes, &mut evidence).is_err());
+        assert!(admit_actual_factor_displacements(
+            &material, &material, &strokes, &[], &BTreeMap::new(), &mut evidence,
+        ).is_err());
         let evidence = evidence.unwrap();
         assert_eq!(
             (evidence.locus, evidence.family),
@@ -3545,7 +3691,8 @@ mod tests {
             .staged
             .insert((Carrier::PairScale, 0), (Rat::zero(), BigInt::one()));
         assert!(
-            admit_actual_factor_displacements(&BTreeMap::from([(locus, statistics)]), &mut None)
+            admit_actual_factor_displacements(&material, &material,
+                &BTreeMap::from([(locus, statistics)]), &[], &BTreeMap::new(), &mut None)
                 .is_ok()
         );
         for (remainder, admitted) in [
