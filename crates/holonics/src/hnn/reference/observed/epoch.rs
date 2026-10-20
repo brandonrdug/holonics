@@ -50,6 +50,9 @@ pub struct ObservedEpochWallTimes {
     pub joint_probe: Option<Duration>,
     /// The existing receiving-only fallback stage; it executes no upstream finite probe.
     pub receiving_only_stage: Option<Duration>,
+    /// Completed disjoint subcalls of each actual probe. These lie inside whole_probe or
+    /// joint_probe, never replace them, and retain no candidate operands in resident state.
+    pub probe_subphases: Vec<(EpochStageAttempt, &'static str, Duration)>,
     pub final_arrived_reread: Duration,
     pub precision_close: Duration,
     /// Only explicitly requested prefix forks, including their own joint close when reached.
@@ -261,7 +264,6 @@ impl EpochComparison {
         combined: &Faces,
         trees: &[LandmarkFace],
     ) -> Result<ComparisonReading, HnnError> {
-        use crate::receiver::population::port::ComparedFace;
         if combined.faces.len() != self.targets.len()
             || combined.logits.len() != self.targets.len()
             || trees.len() != self.targets.len()
@@ -301,69 +303,23 @@ impl EpochComparison {
             .into_iter()
             .enumerate()
         {
-            let mut window = Vec::with_capacity(self.targets.len());
-            for ((((before, after), before_tree), after_tree), &target) in self
-                .combined
-                .faces
-                .iter()
-                .zip(&combined.faces)
-                .zip(&self.trees)
-                .zip(trees)
-                .zip(&self.targets)
-            {
-                let before_mass = crate::hnn::receiving::face_enclosure_at(before, target, bits)?;
-                let same_class_face = before.grain() == after.grain()
-                    && before.cells().len() == after.cells().len()
-                    && before
-                        .cells()
-                        .iter()
-                        .zip(after.cells())
-                        .all(|(a, b)| a.carry == b.carry && a.phase == b.phase);
-                let wave = if same_class_face {
-                    ComparedFace::Shared(before_mass)
-                } else {
-                    ComparedFace::Changed {
-                        before: before_mass,
-                        after: crate::hnn::receiving::face_enclosure_at(after, target, bits)?,
-                    }
-                };
-                let before_mass = ExactInterval::point(before_tree.probabilities[target].clone());
-                let tree = if before_tree.probabilities[target] == after_tree.probabilities[target]
-                {
-                    ComparedFace::Shared(before_mass)
-                } else {
-                    ComparedFace::Changed {
-                        before: before_mass,
-                        after: ExactInterval::point(after_tree.probabilities[target].clone()),
-                    }
-                };
-                window.push(vec![tree, wave]);
-            }
-            let change = population
-                .code_change_at(&window, bits)
-                .map_err(crate::hnn::receiving::population_refusal)?;
-            let objective_change =
-                ExactInterval::new(change.lower + &phase_delta, change.upper + &phase_delta)?;
-            let absolute = |faces: &Faces,
-                            trees: &[LandmarkFace],
-                            phase: &Rat|
-             -> Result<ExactInterval, HnnError> {
-                let scored = crate::hnn::receiving::score_at(
-                    population,
-                    receiver,
-                    faces,
-                    trees,
-                    &self.targets,
-                    bits,
-                )?;
-                Ok(ExactInterval::new(
+            let scored = crate::hnn::receiving::compare_scores_at(
+                population, receiver, &self.combined, &self.trees,
+                combined, trees, &self.targets, bits,
+            )?;
+            let objective_change = ExactInterval::new(
+                scored.change.lower + &phase_delta,
+                scored.change.upper + &phase_delta,
+            )?;
+            let absolute = |scored: &crate::hnn::receiving::Scored, phase: &Rat| {
+                ExactInterval::new(
                     scored.model.iter().map(|code| &code.lower).sum::<Rat>() + phase,
                     scored.model.iter().map(|code| &code.upper).sum::<Rat>() + phase,
-                )?)
+                )
             };
             let reading = ComparisonReading {
-                before: absolute(&self.combined, &self.trees, &before_phase)?,
-                after: absolute(combined, trees, &after_phase)?,
+                before: absolute(&scored.before, &before_phase)?,
+                after: absolute(&scored.after, &after_phase)?,
                 unchanged,
                 strictly_improved: objective_change.upper < Rat::zero(),
                 objective_change,
@@ -1123,8 +1079,10 @@ impl Reference {
                         )
                 }
             };
-        let probe_candidate =
-            |candidate: &crate::hnn::constitution::epoch::StagedEpochCandidate| {
+        let mut probe_subphases = Vec::new();
+        let mut probe_candidate =
+            |attempt, candidate: &crate::hnn::constitution::epoch::StagedEpochCandidate| {
+                let readmission_start = Instant::now();
                 let mut opening = comparison_opening.clone();
                 opening.constitution =
                     candidate.comparison_material(&comparison_opening.constitution)?;
@@ -1135,8 +1093,10 @@ impl Reference {
                     }
                     None => boundary.encode(&classes[..consumed])?,
                 };
+                probe_subphases.push((attempt, "source_readmission", readmission_start.elapsed()));
+                let forward_start = Instant::now();
                 let forward = if selected_forward {
-                    self.read_epoch_at_cuts_with_execution(
+                    self.read_epoch_probe_at_cuts_with_execution(
                         &opening,
                         &moment,
                         &phases,
@@ -1145,7 +1105,7 @@ impl Reference {
                         execution,
                     )?
                 } else {
-                    self.read_epoch_at_cuts(&opening, &moment, &phases, &cells, &[])?
+                    self.read_epoch_probe_at_cuts(&opening, &moment, &phases, &cells, &[])?
                 };
                 if forward.consumed != consumed
                     || forward.current != next.current
@@ -1155,6 +1115,8 @@ impl Reference {
                         "the candidate probe keeps the original source and receiving clocks",
                     ));
                 }
+                probe_subphases.push((attempt, "forward_and_clock_check", forward_start.elapsed()));
+                let tree_start = Instant::now();
                 // Rebuild the prequential schedule from the ORIGINAL tree,
                 // never the tree already updated by the staged candidate.
                 let mut candidate_tree = opening_tree.clone();
@@ -1200,6 +1162,8 @@ impl Reference {
                         phases.grain(),
                     )?
                 };
+                probe_subphases.push((attempt, "tree_schedule", tree_start.elapsed()));
+                let combine_start = Instant::now();
                 let mut combined = Faces {
                     faces: Vec::new(),
                     logits: Vec::new(),
@@ -1217,7 +1181,9 @@ impl Reference {
                     combined.faces.extend(face.faces);
                     combined.logits.extend(face.logits);
                 }
-                frozen_comparison.evaluate(
+                probe_subphases.push((attempt, "target_phase_and_combine", combine_start.elapsed()));
+                let objective_start = Instant::now();
+                let reading = frozen_comparison.evaluate(
                     comparison_opening
                         .constitution
                         .population(receiver)
@@ -1225,7 +1191,9 @@ impl Reference {
                     receiver,
                     &combined,
                     &trees,
-                )
+                );
+                probe_subphases.push((attempt, "objective", objective_start.elapsed()));
+                reading
                 // forward and its counterfactual reception end die here.
             };
         let mut comparison = None;
@@ -1263,7 +1231,7 @@ impl Reference {
                 // the SAME exterior class codec, pairing and placement; an old
                 // PairedObservation is correctly refused after E changes.
                 let probe_start = Instant::now();
-                let probe = probe_candidate(&candidate);
+                let probe = probe_candidate(EpochStageAttempt::Whole, &candidate);
                 whole_probe = Some(probe_start.elapsed());
                 match probe {
                     Ok(reading) => {
@@ -1333,7 +1301,7 @@ impl Reference {
                     joint_directions = candidate.joint_directions();
                     joint_probe_state = ObservedEpochProbeState::ProbeFailed;
                     let probe_start = Instant::now();
-                    let probe = probe_candidate(&candidate);
+                    let probe = probe_candidate(EpochStageAttempt::Joint, &candidate);
                     joint_probe = Some(probe_start.elapsed());
                     match probe {
                         Ok(reading) => {
@@ -1517,6 +1485,7 @@ impl Reference {
             joint_stage,
             joint_probe,
             receiving_only_stage,
+            probe_subphases,
             final_arrived_reread,
             precision_close,
             prefix_forks,
@@ -1591,6 +1560,22 @@ mod tests {
             wall.receiving_only_stage.is_some(),
             receipt.publication_attempt == EpochStageAttempt::ReceivingOnly
         );
+        for (attempt, enclosing, state) in [
+            (EpochStageAttempt::Whole, wall.whole_probe, receipt.probe_state),
+            (EpochStageAttempt::Joint, wall.joint_probe, receipt.joint_probe_state),
+        ] {
+            let parts: Vec<_> = wall.probe_subphases.iter()
+                .filter(|(at, _, _)| *at == attempt).collect();
+            let sum: Duration = parts.iter().map(|(_, _, duration)| *duration).sum();
+            assert!(sum <= enclosing.unwrap_or_default());
+            if enclosing.is_none() { assert!(parts.is_empty()); }
+            if state == ObservedEpochProbeState::FiniteComparisonExecuted {
+                assert_eq!(parts.iter().map(|(_, phase, _)| *phase).collect::<Vec<_>>(), [
+                    "source_readmission", "forward_and_clock_check", "tree_schedule",
+                    "target_phase_and_combine", "objective",
+                ]);
+            }
+        }
         assert!(
             [
                 wall.whole_stage,

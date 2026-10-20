@@ -150,6 +150,8 @@
 use std::ops::Range;
 
 pub mod cells;
+mod comparison_score;
+pub use comparison_score::{ComparedScoresAt, compare_scores_at};
 mod declaration;
 pub(crate) use declaration::DeclaringFace;
 
@@ -1458,6 +1460,36 @@ pub fn score_at(
     targets: &[usize],
     bits: u32,
 ) -> Result<Scored, HnnError> {
+    score_at_with(
+        population,
+        ring,
+        combined,
+        trees,
+        targets,
+        bits,
+        |_, face, target| face_enclosure_at(face, target, bits),
+        |_, probability| tree_code_at(probability, bits),
+    )
+}
+
+fn tree_code_at(probability: &Rat, bits: u32) -> Result<ExactInterval, HnnError> {
+    let log = crate::ratio::algebraic::log2_enclosure_at(probability, bits)?;
+    Ok(ExactInterval::new(-log.upper, -log.lower)?)
+}
+
+// Both public scorers enter this same engine. Only owner-computed target masses and exact
+// same-probability tree codes may replace their repeated expression readings.
+#[allow(clippy::too_many_arguments)]
+fn score_at_with(
+    population: &PortPopulation,
+    ring: usize,
+    combined: &Faces,
+    trees: &[LandmarkFace],
+    targets: &[usize],
+    bits: u32,
+    mut mass: impl FnMut(usize, &Face, usize) -> Result<ExactInterval, HnnError>,
+    mut tree_code: impl FnMut(usize, &Rat) -> Result<ExactInterval, HnnError>,
+) -> Result<Scored, HnnError> {
     if combined.faces.len() != trees.len() || trees.len() != targets.len() {
         return Err(HnnError::Shape {
             what: "one combined face, one tree face and one target per phase",
@@ -1472,7 +1504,9 @@ pub fn score_at(
         steps: Vec::with_capacity(targets.len()),
         face_readings: Vec::with_capacity(targets.len()),
     };
-    for ((face, tree), &target) in combined.faces.iter().zip(trees).zip(targets) {
+    for (phase, ((face, tree), &target)) in
+        combined.faces.iter().zip(trees).zip(targets).enumerate()
+    {
         scored
             .face_readings
             .push(cells::ScoredFaceReading::new(&local, tree, face));
@@ -1484,14 +1518,11 @@ pub fn score_at(
                 alphabet: tree.probabilities.len(),
             })?
             .clone();
-        let log = crate::ratio::algebraic::log2_enclosure_at(&q_tree, bits)?;
-        scored
-            .tree
-            .push(ExactInterval::new(-log.upper, -log.lower)?);
+        scored.tree.push(tree_code(phase, &q_tree)?);
         let step = ReceivingStep {
             ring,
             tree: q_tree,
-            combined: face_enclosure_at(face, target, bits)?,
+            combined: mass(phase, face, target)?,
         };
         scored.model.push(
             local

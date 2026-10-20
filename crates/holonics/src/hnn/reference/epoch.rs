@@ -23,6 +23,25 @@ pub(crate) struct EpochRead {
     pub(crate) chained: Option<ChainedBalance>,
 }
 
+/// The finite candidate comparison consumes these readings, never an adjoint of its words.
+/// Every native/selected forward and physical check still executes before this projection.
+/// The unused word/opening/join dies at its cell, instead of surviving the whole probe.
+#[derive(Debug)]
+pub(crate) struct EpochProbeRead {
+    pub(crate) ratio: PendingRatio,
+    pub(crate) faces: Faces,
+}
+
+fn retain_epoch_return(read: EpochRead) -> (EpochRead, WordBalance) {
+    let previous = read.energy.clone();
+    (read, previous)
+}
+
+fn retain_epoch_probe(read: EpochRead) -> (EpochProbeRead, WordBalance) {
+    let EpochRead { ratio, faces, energy, .. } = read;
+    (EpochProbeRead { ratio, faces }, energy)
+}
+
 /// Either the explicitly native kept word or the selected executor's own
 /// forward record. This enum never manufactures a native Word for a card read.
 #[derive(Debug)]
@@ -85,13 +104,13 @@ impl EpochWord {
     }
 }
 
-/// A tape-free epoch forward result. `reads` is the transient return operand for this one epoch;
+/// A tape-free epoch forward result. `reads` holds this epoch's full or compact transient readings;
 /// `source`, `current` and `address` are the exact closing values after the consumed prefix.
 #[derive(Debug)]
-pub(crate) struct EpochForward {
-    /// Every word and return operand in this batch belongs to this one material version.
+pub(crate) struct EpochForward<R = EpochRead> {
+    /// Every retained reading in this batch belongs to this one material version.
     pub(crate) commit: u64,
-    pub(crate) reads: Vec<EpochRead>,
+    pub(crate) reads: Vec<R>,
     /// Requested transient cuts only, never a per-cell retained state chain.
     pub(crate) prefixes: BTreeMap<usize, Resident>,
     pub(crate) consumed: usize,
@@ -128,7 +147,9 @@ impl Reference {
         cells: &Encoded,
         cuts: &[usize],
     ) -> Result<EpochForward, HnnError> {
-        self.read_epoch_at_cuts_for(resident, moment, phases, cells, cuts, None)
+        self.read_epoch_at_cuts_for(
+            resident, moment, phases, cells, cuts, None, retain_epoch_return,
+        )
     }
 
     pub(crate) fn read_epoch_at_cuts_with_execution(
@@ -140,11 +161,44 @@ impl Reference {
         cuts: &[usize],
         execution: &dyn observed::ObservedEpochExecution,
     ) -> Result<EpochForward, HnnError> {
-        self.read_epoch_at_cuts_for(resident, moment, phases, cells, cuts, Some(execution))
+        self.read_epoch_at_cuts_for(
+            resident, moment, phases, cells, cuts, Some(execution), retain_epoch_return,
+        )
+    }
+
+    /// The same actual candidate chain, retaining only what its finite comparison reads.
+    /// It performs all original admissions, per-word physical checks and closing joins.
+    pub(crate) fn read_epoch_probe_at_cuts(
+        &self,
+        resident: &Resident,
+        moment: &MomentId,
+        phases: &ReceivingPhases,
+        cells: &Encoded,
+        cuts: &[usize],
+    ) -> Result<EpochForward<EpochProbeRead>, HnnError> {
+        self.read_epoch_at_cuts_for(
+            resident, moment, phases, cells, cuts, None, retain_epoch_probe,
+        )
+    }
+
+    /// The explicitly selected executor still supplies each actual candidate Word. Its
+    /// unused return handle is dropped only after authentication and physical checks.
+    pub(crate) fn read_epoch_probe_at_cuts_with_execution(
+        &self,
+        resident: &Resident,
+        moment: &MomentId,
+        phases: &ReceivingPhases,
+        cells: &Encoded,
+        cuts: &[usize],
+        execution: &dyn observed::ObservedEpochExecution,
+    ) -> Result<EpochForward<EpochProbeRead>, HnnError> {
+        self.read_epoch_at_cuts_for(
+            resident, moment, phases, cells, cuts, Some(execution), retain_epoch_probe,
+        )
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn read_epoch_at_cuts_for(
+    fn read_epoch_at_cuts_for<R>(
         &self,
         resident: &Resident,
         moment: &MomentId,
@@ -152,7 +206,8 @@ impl Reference {
         cells: &Encoded,
         cuts: &[usize],
         execution: Option<&dyn observed::ObservedEpochExecution>,
-    ) -> Result<EpochForward, HnnError> {
+        mut retain: impl FnMut(EpochRead) -> (R, WordBalance),
+    ) -> Result<EpochForward<R>, HnnError> {
         if self.reception != Reception::Carry(Absorption::Nothing) {
             return Err(HnnError::Unadmitted {
                 reason: "an epoch's carried forward requires Reception::Carry(Absorption::Nothing)",
@@ -261,7 +316,7 @@ impl Reference {
                 }),
             };
 
-            if let Some(execution) = execution {
+            let mut read = if let Some(execution) = execution {
                 let (mut ratio, opening, id) = self.prepare_refine(
                     &working,
                     moment,
@@ -314,7 +369,7 @@ impl Reference {
                 working.next = id.0;
                 working.carried = Some(forward.reception_end.absorbed(Absorption::Nothing));
                 working.carried_error = None;
-                reads.push(EpochRead {
+                EpochRead {
                     ratio,
                     word: EpochWord::Executed(forward.word),
                     opening,
@@ -322,7 +377,7 @@ impl Reference {
                     commit,
                     energy,
                     chained: None,
-                });
+                }
             } else {
                 let (id, refined) = self.refine_view_scoped(
                     &mut working,
@@ -354,7 +409,7 @@ impl Reference {
                         reason: "an epoch forward reads every word through its opening material version",
                     });
                 }
-                reads.push(EpochRead {
+                EpochRead {
                     ratio: slot.ratio,
                     word: EpochWord::Native(kept.word),
                     opening: slot.opening,
@@ -362,9 +417,8 @@ impl Reference {
                     commit: kept.commit,
                     energy,
                     chained: None,
-                });
-            }
-            let read = reads.last_mut().expect("the successful forward retained this word");
+                }
+            };
             if let (Some(previous), Some((form, carry, opened))) =
                 (&previous_energy, energy_opening)
             {
@@ -376,7 +430,9 @@ impl Reference {
                 }
                 read.chained = Some(joined);
             }
-            previous_energy = Some(read.energy.clone());
+            let (retained, energy) = retain(read);
+            previous_energy = Some(energy);
+            reads.push(retained);
 
             let class = cells.cells()[at].class();
             working.address.receive_at(class, cells.advance(at))?;
@@ -461,6 +517,183 @@ mod tests {
             .ingest(&mut resident, None, &encoded(field, &[]))
             .unwrap();
         (resident, moment, phases)
+    }
+
+    fn assert_compact_probe_parity(
+        full: &EpochForward,
+        compact: &EpochForward<EpochProbeRead>,
+    ) {
+        assert_eq!(compact.commit, full.commit);
+        assert_eq!(compact.consumed, full.consumed);
+        assert_eq!(compact.carry_out, full.carry_out);
+        assert_eq!(compact.current, full.current);
+        assert_eq!(compact.source, full.source);
+        assert_eq!(compact.address, full.address);
+        assert_eq!(compact.carried, full.carried);
+        assert_eq!(compact.charts, full.charts);
+        assert_eq!(compact.tally, full.tally);
+        assert_eq!(compact.reads.len(), full.reads.len());
+        assert_eq!(compact.prefixes.len(), full.prefixes.len());
+        for (got, expected) in compact.reads.iter().zip(&full.reads) {
+            assert_eq!(got.ratio, expected.ratio);
+            assert_eq!(got.faces, expected.faces);
+        }
+    }
+
+    #[test]
+    fn epoch_probe_compact_reads_match_native_and_selected_changed_source_forward() {
+        use crate::hnn::constitution::Sample;
+        let field = single_phase_chain();
+        let reference = Reference::new(16, 1 << 40);
+        let (mut opening, moment, phases) = empty_moment(&reference, &field);
+        // A genuinely carried opening: source counts, pair buffer, warm charts and physical
+        // interior motion precede the new material and the candidate passage.
+        for class in [0, 1, 2] {
+            let (id, _) = reference.refine(&mut opening, &moment, &phases).unwrap();
+            opening.pending.remove(&id).unwrap();
+            reference
+                .ingest(&mut opening, Some(&moment), &encoded(&field, &[class]))
+                .unwrap();
+        }
+        assert!(opening.carried.is_some());
+        let source = field.sources()[0];
+        let old = opening.constitution.source_port(source).unwrap().clone();
+        let unit = |width| {
+            (0..width)
+                .map(|at| integer(i64::from(at == 0)))
+                .collect()
+        };
+        let sample = Sample {
+            weight: Rat::one(),
+            feature: unit(old.columns()),
+            covector: unit(old.rows()),
+            masses: None,
+        };
+        let (candidate, _) = opening
+            .constitution
+            .stepped_source(source, &[sample], &Rat::one(), &opening.retention())
+            .unwrap()
+            .unwrap();
+        assert_ne!(candidate.source_port(source).unwrap(), &old);
+        opening.constitution = candidate;
+        let before = opening.continuing_state(0).unwrap().to_text();
+        let cells = encoded(&field, &[0; 64]);
+        let full = reference
+            .read_epoch_at_cuts(&opening, &moment, &phases, &cells, &[])
+            .unwrap();
+        let compact = reference
+            .read_epoch_probe_at_cuts(&opening, &moment, &phases, &cells, &[])
+            .unwrap();
+        assert_compact_probe_parity(&full, &compact);
+        assert!(compact.carry_out);
+        assert!(compact.consumed < cells.len());
+        let execution = observed::HostObservedEpochExecution;
+        let selected_full = reference
+            .read_epoch_at_cuts_with_execution(
+                &opening, &moment, &phases, &cells, &[], &execution,
+            )
+            .unwrap();
+        let selected_compact = reference
+            .read_epoch_probe_at_cuts_with_execution(
+                &opening, &moment, &phases, &cells, &[], &execution,
+            )
+            .unwrap();
+        assert_compact_probe_parity(&selected_full, &selected_compact);
+        assert_eq!(selected_compact.current, compact.current);
+        assert_eq!(selected_compact.carried, compact.carried);
+        for (selected, native) in selected_compact.reads.iter().zip(&compact.reads) {
+            assert_eq!(selected.ratio, native.ratio);
+            assert_eq!(selected.faces, native.faces);
+        }
+        assert_eq!(opening.continuing_state(0).unwrap().to_text(), before);
+    }
+
+    struct FailSecondProbeForward(std::sync::atomic::AtomicUsize);
+
+    impl observed::ObservedEpochExecution for FailSecondProbeForward {
+        fn forward(
+            &self,
+            field: &Field,
+            constitution: &Constitution,
+            ratio: &PendingRatio,
+            charts: &mut Charts,
+            opening: &WordOpening,
+        ) -> Result<observed::ObservedEpochForwardWord, HnnError> {
+            if self.0.fetch_add(1, std::sync::atomic::Ordering::SeqCst) == 1 {
+                return Err(HnnError::Realization {
+                    what: "the selected candidate's second forward refused",
+                });
+            }
+            observed::ObservedEpochExecution::forward(
+                &observed::HostObservedEpochExecution,
+                field, constitution, ratio, charts, opening,
+            )
+        }
+
+        fn pull_back(
+            &self,
+            _: Word<'_>,
+            _: &RatioCovector,
+            _: &ExactRatMatrix,
+            _: &ReceivingPhases,
+        ) -> Result<WordReturn, HnnError> {
+            panic!("a candidate forward never executes an unused return")
+        }
+
+        fn aggregate_records(
+            &self,
+            _: crate::hnn::constitution::LinearLocus,
+            _: usize,
+            _: usize,
+            _: u32,
+            _: u64,
+            _: u64,
+            _: u64,
+            _: &[crate::hnn::constitution::EpochProducerRecordReading],
+        ) -> Result<crate::hnn::constitution::EpochRecordFlowReading, HnnError> {
+            panic!("a candidate forward never stages another deposit")
+        }
+    }
+
+    #[test]
+    fn epoch_probe_compact_refusals_match_full_forward_without_mutation_or_retry() {
+        let field = single_phase_chain();
+        let reference = Reference::new(16, 1 << 40);
+        let (opening, moment, phases) = empty_moment(&reference, &field);
+        let cells = encoded(&field, &[0, 1, 2]);
+        let before = opening.continuing_state(0).unwrap().to_text();
+        for terminal in [false, true] {
+            let mut refused = opening.clone();
+            refused.observed_epoch_terminal = terminal;
+            // A foreign moment reaches the same handle check unless an earlier terminal
+            // refusal takes precedence. Compact retention cannot reorder either error.
+            let unknown = MomentId(u64::MAX);
+            let full = reference
+                .read_epoch_at_cuts(&refused, &unknown, &phases, &cells, &[])
+                .unwrap_err();
+            let compact = reference
+                .read_epoch_probe_at_cuts(&refused, &unknown, &phases, &cells, &[])
+                .unwrap_err();
+            assert_eq!(full.to_string(), compact.to_string());
+        }
+        let full_execution = FailSecondProbeForward(std::sync::atomic::AtomicUsize::new(0));
+        let compact_execution = FailSecondProbeForward(std::sync::atomic::AtomicUsize::new(0));
+        let full = reference
+            .read_epoch_at_cuts_with_execution(
+                &opening, &moment, &phases, &cells, &[], &full_execution,
+            )
+            .unwrap_err();
+        let compact = reference
+            .read_epoch_probe_at_cuts_with_execution(
+                &opening, &moment, &phases, &cells, &[], &compact_execution,
+            )
+            .unwrap_err();
+        assert!(matches!(full, HnnError::Realization { .. }));
+        assert!(matches!(compact, HnnError::Realization { .. }));
+        assert_eq!(full.to_string(), compact.to_string());
+        assert_eq!(full_execution.0.load(std::sync::atomic::Ordering::SeqCst), 2);
+        assert_eq!(compact_execution.0.load(std::sync::atomic::Ordering::SeqCst), 2);
+        assert_eq!(opening.continuing_state(0).unwrap().to_text(), before);
     }
 
     #[test]

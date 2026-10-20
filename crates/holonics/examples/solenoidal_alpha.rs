@@ -1118,6 +1118,9 @@ fn run() -> Result<()> {
                         ("deposit_subphase_intervals", format!("[{}]", epoch.wall.deposit_subphases.iter().map(|(phase, wall)| object(&[
                             ("phase", quoted(phase)), ("elapsed_ns", wall.as_nanos().to_string()),
                         ])).collect::<Vec<_>>().join(","))),
+                        ("probe_subphase_intervals", format!("[{}]", epoch.wall.probe_subphases.iter().map(|(attempt, phase, wall)| object(&[
+                            ("attempt", exact(attempt)), ("phase", quoted(phase)), ("elapsed_ns", wall.as_nanos().to_string()),
+                        ])).collect::<Vec<_>>().join(","))),
                         ("receiving_certificate_exact", exact(&epoch.deposit.epoch)),
                         ("first_law_before_precision_exact", exact(&epoch.precision.balance_before)),
                         ("first_law_after_precision_exact", exact(&epoch.precision.balance_after)),
