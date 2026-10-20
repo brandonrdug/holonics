@@ -8,6 +8,10 @@ use std::collections::BTreeMap;
 #[path = "complete_language/continuation.rs"]
 mod continuation;
 
+#[cfg(test)]
+#[path = "complete_language/code_parallel_controls.rs"]
+mod code_parallel_controls;
+
 const READ_BUDGET: u64 = 64 * 1024 * 1024;
 const READING_BITS: u32 = holonics::ratio::exponentiated::READING_BITS;
 
@@ -98,6 +102,10 @@ fn clock_contract(checkpoint: &Checkpoint) -> Result<String> {
         advances.push(row);
     }
     Ok(object(&[
+        (
+            "actual_rayon_workers",
+            rayon::current_num_threads().to_string(),
+        ),
         ("periods", "[5,2,3]".into()),
         ("native_class_advances", exact(&advances)),
         ("finite_bound", "10".into()),
@@ -425,6 +433,10 @@ fn train(
         object(&[
             ("backend", quoted(backend)),
             (
+                "actual_rayon_workers",
+                rayon::current_num_threads().to_string(),
+            ),
+            (
                 "receiving_law",
                 quoted(checkpoint.stream.resident().receiving_law().as_str()),
             ),
@@ -459,6 +471,12 @@ fn sample(args: &[String]) -> Result<()> {
         );
     }
     let (checkpoint, _) = Checkpoint::load(&args[2], READ_BUDGET)?;
+    if args[7] == "fresh-native" && checkpoint.stream.accepted_cells()? != 0 {
+        return Err(
+            "fresh-native requires the selected run's saved pre-arrival fresh checkpoint".into(),
+        );
+    }
+
     let prompt = pinned_read(&args[3], &args[4], QUERY_BYTE_BUDGET)?;
     let keys = pinned_read(&args[5], &args[6], 1024)?;
     let policy = match args[7].as_str() {
@@ -489,6 +507,18 @@ fn sample(args: &[String]) -> Result<()> {
         &out.join("OUTPUT.json"),
         object(&[
             ("backend", quoted(&args[1])),
+            (
+                "actual_rayon_workers",
+                rayon::current_num_threads().to_string(),
+            ),
+            (
+                "receiving_law",
+                quoted(checkpoint.stream.resident().receiving_law().as_str()),
+            ),
+            (
+                "opening_accepted_cells",
+                checkpoint.stream.accepted_cells()?.to_string(),
+            ),
             ("policy", quoted(&args[7])),
             ("prompt_sha256", quoted(&receipt.prompt_sha256)),
             ("key_schedule_sha256", quoted(&receipt.key_schedule_sha256)),
