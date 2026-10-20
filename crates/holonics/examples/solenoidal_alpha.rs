@@ -56,6 +56,37 @@ use std::{
 #[path = "solenoidal_alpha/complete_language.rs"]
 mod complete_language;
 
+/// Explicit exterior executor identity; the library gains no device dependency.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CompleteLanguageTrainingBackend {
+    HostReference,
+    CudaObservedEpochDevice0,
+}
+impl CompleteLanguageTrainingBackend {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::HostReference => "host-reference",
+            Self::CudaObservedEpochDevice0 => "cuda-observed-epoch-device0",
+        }
+    }
+}
+/// Shared complete-language exterior. The CUDA-owned wrapper supplies its actual executor.
+pub fn run_complete_language_with_execution(
+    args: &[String],
+    execution: &dyn holonics::hnn::reference::observed::ObservedEpochExecution,
+    backend: CompleteLanguageTrainingBackend,
+) -> std::result::Result<(), Box<dyn Error>> {
+    complete_language::run_with_execution(args, execution, backend)
+}
+#[cfg(test)]
+pub fn code_checkpoint_native_bytes(path: &str) -> std::result::Result<Vec<u8>, Box<dyn Error>> {
+    let (mut checkpoint, _) = Checkpoint::load(path, 64 * 1024 * 1024)?;
+    // This exterior provenance deliberately names different executors. Native bytes, including
+    // material/current/moment/tree/population/carry/crib/pending, must otherwise agree exactly.
+    checkpoint.provenance.clear();
+    checkpoint.bytes()
+}
+
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 const MATERIAL_BIT_BUDGET: u64 = 1 << 40; // Existing listener declaration, never raised.
 const MAGIC: &str = "solenoidal-alpha-unplaced-v2";

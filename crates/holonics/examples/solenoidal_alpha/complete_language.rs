@@ -231,13 +231,21 @@ fn train(
     args: &[String],
     execution: &dyn ObservedEpochExecution,
     law: holonics::hnn::receiving::ReceivingLaw,
+    selected_backend: CompleteLanguageTrainingBackend,
 ) -> Result<()> {
     if args.len() != 10 {
         return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT".into());
     }
-    let backend = &args[1];
-    if backend != "host-reference" {
-        return Err("this CLI adapter implements host-reference; CUDA executor adapter/parity remains unrun; no fallback".into());
+    let backend = selected_backend.as_str();
+    if args[1] != backend {
+        return Err(
+            "training backend does not match the explicitly injected executor; no fallback".into(),
+        );
+    }
+    if selected_backend == CompleteLanguageTrainingBackend::CudaObservedEpochDevice0
+        && law != holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1
+    {
+        return Err("CUDA complete-language training requires explicit RetainedFibreV1".into());
     }
     let data = pinned_read(&args[2], &args[3], 1 << 20)?;
     let cells = digits(&data);
@@ -256,6 +264,13 @@ fn train(
     let out = Path::new(&args[9]);
     std::fs::create_dir(out)?;
     let started = Instant::now();
+    write_new(&out.join("EXECUTION_CONTRACT.json"), object(&[
+        ("backend", quoted(backend)),
+        ("training_executor_injected", "true".into()),
+        ("device_ordinal", if selected_backend == CompleteLanguageTrainingBackend::CudaObservedEpochDevice0 { "0".into() } else { "null".into() }),
+        ("host_owned", quoted("source/clock/normal law; scalar face/root/normalization/scoring/certification; causal cuts; prefix diagnostics; exact decode; independent output forks")),
+        ("host_fallback", "false".into()),
+    ]).as_bytes())?;
     let mut checkpoint = if law == holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
         fresh_checkpoint(population)?
     } else {
@@ -552,15 +567,25 @@ fn exact_classes(classes: &[usize]) -> String {
     format!("{classes:?}")
 }
 
-pub(super) fn run(args: &[String]) -> Result<()> {
+pub(super) fn run_with_execution(
+    args: &[String],
+    execution: &dyn ObservedEpochExecution,
+    backend: CompleteLanguageTrainingBackend,
+) -> Result<()> {
     match args.first().map(String::as_str) {
-        Some("train") => train(args, &HostObservedEpochExecution,holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1),
-        Some("train-retained-fibre-v1") => train(args,&HostObservedEpochExecution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1),
-        Some("sample") => sample(args),
-        _ => Err(
-            "complete-language requires train, explicit train-retained-fibre-v1, or sample; no default backend/model action".into(),
-        ),
+        Some("train") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1, backend),
+        Some("train-retained-fibre-v1") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1, backend),
+        Some("sample") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
+        Some("sample") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
+        _ => Err("complete-language requires train, explicit train-retained-fibre-v1, or sample; no default backend/model action".into()),
     }
+}
+pub(super) fn run(args: &[String]) -> Result<()> {
+    run_with_execution(
+        args,
+        &HostObservedEpochExecution,
+        CompleteLanguageTrainingBackend::HostReference,
+    )
 }
 
 #[cfg(test)]

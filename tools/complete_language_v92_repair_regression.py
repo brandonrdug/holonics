@@ -95,9 +95,11 @@ def verify_manifest(path):
     return data, root, index
 
 
-def prepare(manifest, binary, output, source, backend, output_workers=OUTPUT_POOL_SIZE):
-    if backend != "host-reference":
-        raise ValueError("only the explicit host-reference CLI adapter is currently prepared; no CUDA fallback")
+def prepare(manifest, binary, output, source, backend, output_workers=OUTPUT_POOL_SIZE, training_binary=None, project_gpu_lock=None):
+    if backend not in ("host-reference", "cuda-assisted-training-host-evaluation"):
+        raise ValueError("explicit host-reference or CUDA-assisted training/host evaluation required; no fallback")
+    if backend != "host-reference" and (training_binary is None or project_gpu_lock is None):
+        raise ValueError("CUDA-assisted scope requires its separately pinned wrapper executable and project GPU lock")
     data, root, index = verify_manifest(manifest)
     if output_workers != OUTPUT_POOL_SIZE:
         raise ValueError("SchedulerV3 repair regression fixes output pool size at4")
@@ -165,6 +167,18 @@ def prepare(manifest, binary, output, source, backend, output_workers=OUTPUT_POO
             "rows": [{"row": x["row"], "question_sha256": hashlib.sha256((root/x["path"]).read_bytes()[:-1]).hexdigest()} for x in prompts[2:]],
             "read_rule": "only after all16 outputs terminal and durably hashed; skip unselected raw lines BEFORE JSON decoding"},
     }
+    if backend == "cuda-assisted-training-host-evaluation":
+        training_path = str(Path(training_binary).resolve())
+        plan.update(training_binary=training_path, training_binary_sha256=digest(training_path),
+            training_backend="cuda-observed-epoch-device0", output_backend="host-reference",
+            gpu_guard={"device_ordinal": 0, "own_sampled_memory_limit_MiB": 8192,
+                "graphics_allowed": True, "foreign_compute_allowed": False,
+                "project_lock": str(Path(project_gpu_lock).resolve())},
+            backend_stages={"training_card": "ObservedEpochDevice0 forwards, retained Word returns, grouped statistics",
+                "training_host": "source/clock/normal law; scalar faces/roots/normalization/scoring/certification; finite admission and causal cuts",
+                "evaluation_host": "prefix diagnostics; exact decode; four independent output forks; scoring/certification",
+                "fallback": False},
+            CUDA_full_model_acceptance="UNRUN; targeted synthetic adapter parity only; no speed claim")
     write_new(output, plan)
     return plan
 
@@ -175,6 +189,8 @@ def checked_plan(path, approved_digest=None):
     plan = load(path)
     if digest(plan["binary"]) != plan["binary_sha256"] or digest(plan["data_manifest"]) != plan["data_manifest_sha256"]:
         raise ValueError("launch source/binary/data identity changed")
+    if "training_binary" in plan and digest(plan["training_binary"]) != plan["training_binary_sha256"]:
+        raise ValueError("pinned training executor binary identity changed")
     data, _, _ = verify_manifest(plan["data_manifest"])
     _, partition_path = source_paths(data)
     provenance = data.get("source", data.get("data_source", {}))
@@ -195,7 +211,7 @@ def commands(plan, out):
     base = [plan["binary"], "complete-language"]
     f = plan["files"]
     corpus, cuts, keys = (f[n] for n in ("train-five-pass.bin", "causal-cuts.tsv", "public-keys.bin"))
-    training = base + ["train-retained-fibre-v1", plan["backend"], corpus["absolute"], corpus["sha256"], cuts["absolute"], cuts["sha256"],
+    training = [plan.get("training_binary", plan["binary"]), "complete-language"] + ["train-retained-fibre-v1", plan.get("training_backend", plan["backend"]), corpus["absolute"], corpus["sha256"], cuts["absolute"], cuts["sha256"],
         "16384", "11280", "1128", str(out/"training")]
     samples = []
     for prompt_index, prompt in enumerate(plan["prompts"]):
@@ -204,7 +220,7 @@ def commands(plan, out):
             # splice in the historical coarse-law fresh checkpoint.
             checkpoint = out/"training"/("fresh.state" if policy == "fresh-native" else "trained.state")
             destination = out/"outputs"/f"row-{prompt['row']}-{policy}"
-            argv = base + ["sample", plan["backend"], str(checkpoint), str(Path(plan["data_root"])/prompt["path"]), prompt["sha256"],
+            argv = base + ["sample", plan.get("output_backend", plan["backend"]), str(checkpoint), str(Path(plan["data_root"])/prompt["path"]), prompt["sha256"],
                 keys["absolute"], keys["sha256"], policy,
                 "cold-replay" if prompt_index == 0 and policy == "native" else "no-replay", str(destination)]
             samples.append({"row": prompt["row"], "policy": policy, "argv": argv, "directory": str(destination)})
@@ -231,7 +247,7 @@ def run_phase(argv, log, deadline_ns, rayon_threads=1):
                 # The outer controller owns the one cleanup deadline and all descendants.
 
 
-def verify_training_receipts(out):
+def verify_training_receipts(out, backend="host-reference"):
     """Require the native training law and actual Rayon identity, never infer from env."""
     root = Path(out)
     clock = load(root / "CLOCK_CONTRACT.json")
@@ -243,6 +259,11 @@ def verify_training_receipts(out):
         raise ValueError("training completion receipt is not retained-fibre-v1")
     if complete.get("accepted_cells") != 11280 or complete.get("actual_epochs") != 1128:
         raise ValueError("selected-law training receipt does not close the declared 11,280-cell / 1,128-epoch stream")
+    if backend == "cuda-observed-epoch-device0":
+        from complete_language_cuda_guard import verify_card_receipt
+        if complete.get("backend") != backend:
+            raise ValueError("training completion backend differs from selected card executor")
+        verify_card_receipt(load(root / "CUDA_EXECUTION.json"))
 
 
 def verify_output_receipt(reading, policy):
@@ -450,8 +471,16 @@ def execute(plan_path, out, approved_ns, approved_plan_digest=None):
         "approved_native_cap_ns": approved_ns, "phase_ns": PHASE_NS, "output_workers": workers,
         "scope": "model job; requires trusted prior human budget authorization"})
     training, samples = commands(plan, out)
-    run_phase(training, out/"training.log", started + PHASE_NS["training"], rayon_threads=TRAIN_RAYON_THREADS)
-    verify_training_receipts(out/"training")
+    training_backend = plan.get("training_backend", plan["backend"])
+    if training_backend == "cuda-observed-epoch-device0":
+        from complete_language_cuda_guard import run_gpu_training
+        run_gpu_training(training, out/"training.log", started + PHASE_NS["training"],
+                         plan["gpu_guard"], rayon_threads=TRAIN_RAYON_THREADS)
+    elif training_backend == "host-reference":
+        run_phase(training, out/"training.log", started + PHASE_NS["training"], rayon_threads=TRAIN_RAYON_THREADS)
+    else:
+        raise ValueError("unimplemented training executor; no fallback")
+    verify_training_receipts(out/"training", training_backend)
     training_end = time.monotonic_ns()
     eval_deadline = min(started + PHASE_NS["training"] + PHASE_NS["evaluation"], training_end + PHASE_NS["evaluation"])
     samples = run_output_attempts(samples, out, eval_deadline, workers, plan["cpus"])
@@ -466,7 +495,7 @@ def execute(plan_path, out, approved_ns, approved_plan_digest=None):
     write_new(out/"TERMINAL.json", {"utc": utc(), "status": "ALL_DECLARED_ATTEMPTS_TERMINAL",
         "backend": plan["backend"], "elapsed_ns": time.monotonic_ns()-started,
         "output_workers": workers,
-        "native_controller_owns_final_charge_and_cleanup": True, "GPU_model_validation": "UNRUN; this proposed experiment is host-reference"})
+        "native_controller_owns_final_charge_and_cleanup": True, "GPU_model_validation": "selected CUDA training completed; output evaluation host" if training_backend == "cuda-observed-epoch-device0" else "UNRUN; selected host-reference"})
 
 
 def main():
@@ -475,6 +504,8 @@ def main():
     p = sub.add_parser("prepare")
     for name in ("manifest", "binary", "out", "source", "backend"): p.add_argument("--"+name, required=True)
     p.add_argument("--output-workers", type=int, default=OUTPUT_POOL_SIZE)
+    p.add_argument("--training-binary")
+    p.add_argument("--project-gpu-lock")
     p = sub.add_parser("execute", help="MODEL JOB: requires separate trusted budget authorization and outer resource controller")
     p.add_argument("--plan", required=True); p.add_argument("--out", required=True)
     p.add_argument("--approved-native-cap-ns", required=True, type=int)
@@ -483,7 +514,7 @@ def main():
     p.add_argument("--plan", required=True); p.add_argument("--out", required=True)
     p.add_argument("--plan-sha256", required=True)
     args = parser.parse_args()
-    if args.command == "prepare": prepare(args.manifest,args.binary,args.out,args.source,args.backend,args.output_workers)
+    if args.command == "prepare": prepare(args.manifest,args.binary,args.out,args.source,args.backend,args.output_workers,args.training_binary,args.project_gpu_lock)
     elif args.command == "execute": execute(args.plan,args.out,args.approved_native_cap_ns,args.plan_sha256)
     else: score(checked_plan(args.plan,args.plan_sha256),args.out)
 
