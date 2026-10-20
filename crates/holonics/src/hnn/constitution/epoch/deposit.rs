@@ -27,6 +27,7 @@ pub(crate) struct StagedEpochCandidate {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum EpochCandidateScope {
     Whole,
+    Joint,
     ReceivingOnly,
 }
 
@@ -149,6 +150,15 @@ impl<'a> ObservedNormalEpochStage<'a> {
 }
 
 impl StagedEpochCandidate {
+    pub(crate) fn joint_directions(&self) -> Vec<EpochJointDirectionReading> {
+        self.reading
+            .epoch
+            .as_ref()
+            .into_iter()
+            .flat_map(|epoch| &epoch.loci)
+            .filter_map(|locus| locus.joint_direction.clone())
+            .collect()
+    }
     /// New physical maps against the predecessor's tree/population context.
     /// Neither the candidate's independently staged tree nor its received
     /// population may make its own prospective comparison easier.
@@ -445,7 +455,7 @@ fn admit_refined_source_carries(
 /// The represented normal delta is its own fixed unit ray. Read its true
 /// producing samples, not the fresh Jacobi direction that selected gamma.
 /// Per-sample scalar enclosures keep one dyadic denominator across the epoch.
-fn actual_epoch_face(
+pub(super) fn actual_epoch_face(
     kind: LinearLocus,
     delta: &EpochArray,
     samples: &[Sample],
@@ -665,15 +675,35 @@ fn enrich_failed_normal_ray(
         });
         Ok(readings)
     };
-    match diagnostic() {
-        Ok(readings) => evidence.readings.extend(readings),
-        Err(_) => push(
+    if let Some(joint) = &deposit.joint_direction {
+        push(
             evidence,
-            "normal_alignment_decomposition",
-            EpochStageValue::Unavailable(
-                "the failed candidate's normal diagnostic operands could not be reconstructed; native refusal preserved",
+            "proposal_origin",
+            EpochStageValue::Text(
+                "joint minimum-segment direction; no whole-direction decomposition is asserted",
             ),
-        ),
+        );
+        if !evidence.readings.iter().any(|reading| {
+            matches!(&reading.value,
+            EpochStageValue::JointDirection(existing) if existing.locus == joint.locus)
+        }) {
+            push(
+                evidence,
+                "joint_direction",
+                EpochStageValue::JointDirection(joint.clone()),
+            );
+        }
+    } else {
+        match diagnostic() {
+            Ok(readings) => evidence.readings.extend(readings),
+            Err(_) => push(
+                evidence,
+                "normal_alignment_decomposition",
+                EpochStageValue::Unavailable(
+                    "the failed candidate's normal diagnostic operands could not be reconstructed; native refusal preserved",
+                ),
+            ),
+        }
     }
     if !matches!(kind, LinearLocus::Receiving(_)) {
         let raw_alignment = |delta: &EpochArray| -> Option<Rat> {
@@ -705,11 +735,17 @@ fn enrich_failed_normal_ray(
             push(
                 evidence,
                 name,
-                raw_alignment(delta).map(EpochStageValue::Ratio).unwrap_or(
-                    EpochStageValue::Unavailable(
+                raw_alignment(delta)
+                    .map(|value| {
+                        EpochStageValue::Ratio(if name == "raw_sample_G_dot_D" {
+                            value / Rat::from_integer(deposit.direction_divisor.clone())
+                        } else {
+                            value
+                        })
+                    })
+                    .unwrap_or(EpochStageValue::Unavailable(
                         "the failed sample shape does not pair with this ray",
-                    ),
-                ),
+                    )),
             );
         }
         let guarded_alignment = evidence
@@ -753,6 +789,27 @@ fn enrich_failed_normal_ray(
             EpochStageValue::Unavailable("the actual local step certificate has not been read"),
         );
     }
+}
+
+/// Diagnostic only: the exact same paired normal metric used by every proposal rung.
+fn normal_news_metric_squared(
+    law: &EpochLaw,
+    flow: &EpochFlow,
+    gamma: &Rat,
+) -> Result<(Rat, Rat), HnnError> {
+    let paired = law.symmetry.as_ref().map(|s| flow.paired(s)).transpose()?;
+    let flow = paired.as_ref().unwrap_or(flow);
+    let gram = law.gram.add(&flow.gram)?;
+    let b = flow
+        .covector
+        .scalar_product(&EpochArray::from_dyadic_scalar(gamma)?)?;
+    let a = law.news.add(&b)?;
+    let (a_direction, _) = law.direction(&a, &gram, &flow.support)?;
+    let (b_direction, _) = law.direction(&b, &gram, &flow.support)?;
+    Ok((
+        a.dot(&a_direction)?.scalar_ratio()?,
+        b.dot(&b_direction)?.scalar_ratio()?,
+    ))
 }
 
 impl Constitution {
@@ -1150,6 +1207,11 @@ impl Constitution {
             // factor statistics or lattice changes to this fresh branch.
             kinds.retain(|kind| *kind == LinearLocus::Receiving(receiver));
             factors.clear();
+        }
+        if scope == Some(EpochCandidateScope::Joint) && prepared.is_none() {
+            return Err(refused(
+                "a joint normal proposal needs its bound same-opening staging transaction",
+            ));
         }
         observe(EpochDepositPhase::GroupedInputs);
         let cached = prepared.as_deref().and_then(|slot| slot.as_ref());
@@ -1611,7 +1673,36 @@ impl Constitution {
             let held = prepared.is_some()
                 && scope == Some(EpochCandidateScope::ReceivingOnly)
                 && !matches!(kind, LinearLocus::Receiving(_));
+            let joint = prepared.is_some()
+                && scope == Some(EpochCandidateScope::Joint)
+                && !matches!(kind, LinearLocus::Receiving(_));
+            if joint {
+                trace.at(
+                    "joint_normal_candidate",
+                    Some(kind.locus()),
+                    Some(Family::Map),
+                );
+            }
             let deposit = match *kind {
+                LinearLocus::SourcePort(ring) if joint => laws[kind].deposit_joint(
+                    &flows[kind],
+                    &gain,
+                    *kind,
+                    Some((
+                        self.lattice(kind.locus())?.exponent(),
+                        self.budget,
+                        self.commit,
+                        ring,
+                    )),
+                    &mut trace.evidence,
+                )?,
+                _ if joint => laws[kind].deposit_joint(
+                    &flows[kind],
+                    &gain,
+                    *kind,
+                    None,
+                    &mut trace.evidence,
+                )?,
                 LinearLocus::SourcePort(ring) if held => laws[kind].deposit_source_at_eta(
                     &flows[kind],
                     &gain,
@@ -1728,6 +1819,18 @@ impl Constitution {
                 &mut trace.evidence,
             )
             .map_err(|error| {
+                if scope == Some(EpochCandidateScope::Joint) {
+                    if let Some(evidence) = &mut trace.evidence {
+                        for candidate in candidates.values() {
+                            if let Some(joint) = &candidate.joint_direction {
+                                evidence.readings.push(EpochStageReading {
+                                    name: "joint_direction",
+                                    value: EpochStageValue::JointDirection(joint.clone()),
+                                });
+                            }
+                        }
+                    }
+                }
                 if let Some(kind) = candidates.keys().copied().find(|kind| {
                     trace.evidence.as_ref().is_some_and(|evidence| {
                         evidence.locus == Some(kind.locus()) && evidence.family == Some(Family::Map)
@@ -1790,6 +1893,7 @@ impl Constitution {
                     )?;
                 }
             }
+            let metric_norms = normal_news_metric_squared(&laws[kind], &flows[kind], &gamma).ok();
             let eta = Rat::new(
                 deposit.eta_numerator.clone(),
                 deposit.eta_denominator.clone(),
@@ -1829,6 +1933,10 @@ impl Constitution {
                 gram_update: EpochArrayReading::of(&flows[kind].gram),
                 fresh_news: EpochArrayReading::of(&flows[kind].covector),
                 direction,
+                direction_divisor: deposit.direction_divisor.clone(),
+                joint_direction: deposit.joint_direction.clone(),
+                retained_news_metric_squared: metric_norms.as_ref().map(|norms| norms.0.clone()),
+                fresh_news_metric_squared: metric_norms.map(|norms| norms.1),
                 represented_step,
                 storage: normal
                     .epoch_storage()
@@ -2302,6 +2410,49 @@ mod tests {
     }
 
     #[test]
+    fn a_nonzero_upstream_joint_candidate_cannot_publish_without_its_finite_comparison() {
+        let (field, material, deposit, parts, exponent) =
+            normal_domain_fixture(Some(LinearLocus::SourcePort(0)), false);
+        let receiver = field.receivers()[0].ring;
+        let deposits = [deposit];
+        let retained = crate::hnn::retention::loci(&field).into_iter().collect();
+        let pair_speed =
+            |_, _, _: &PairPort, _: [&[Vec<Rat>]; 3]| panic!("NormalMaps holds physical factors");
+        let mut stage = ObservedNormalEpochStage::new(
+            &material,
+            &deposits,
+            receiver,
+            field.ring(receiver).period(),
+            1,
+            1,
+            0,
+            exponent,
+            &retained,
+            material.landmarks(receiver).unwrap().clone(),
+            &pair_speed,
+            &parts,
+            &crate::hnn::reference::observed::HostObservedEpochExecution,
+        )
+        .unwrap();
+        let before = material.continuing_state(0).unwrap().to_text();
+        let _whole = stage.stage(EpochCandidateScope::Whole, &mut |_| {});
+        let joint = stage
+            .stage(EpochCandidateScope::Joint, &mut |_| {})
+            .unwrap();
+        assert!(joint.requires_comparison());
+        assert!(joint.has_physical_motion());
+        let readings = joint.joint_directions();
+        assert!(readings.iter().any(|reading| !reading.zero_direction));
+        assert!(matches!(
+            joint.admit_receiving(),
+            Err(HnnError::Unadmitted {
+                reason: "an upstream epoch candidate needs its finite comparison"
+            })
+        ));
+        assert_eq!(material.continuing_state(0).unwrap().to_text(), before);
+    }
+
+    #[test]
     fn shared_receiving_restage_absorbs_all_normal_news_once_while_holding_upstream_maps() {
         let (field, material, deposit, parts, exponent) =
             normal_domain_fixture(Some(LinearLocus::SourcePort(0)), true);
@@ -2371,6 +2522,7 @@ mod tests {
             .as_ref()
             .expect("actual whole fresh certificate was formed")
             .clone();
+        let _discarded_joint = stage.stage(EpochCandidateScope::Joint, &mut |_| {});
         let candidate = stage
             .stage(EpochCandidateScope::ReceivingOnly, &mut |_| {})
             .unwrap();
@@ -2747,7 +2899,11 @@ mod tests {
             (Some(Locus::SourcePort(0)), Some(Family::Map))
         );
         assert!(!evidence.seal_formed && !evidence.finite_probe_executed);
-        assert!(evidence.readings.iter().any(|reading| reading.name == "alignment" && matches!(&reading.value, EpochStageValue::Ratio(value) if value.is_negative())));
+        assert!(evidence
+            .readings
+            .iter()
+            .any(|reading| reading.name == "alignment"
+                && matches!(&reading.value, EpochStageValue::Ratio(value) if value.is_negative())));
     }
 
     #[test]
@@ -2820,7 +2976,11 @@ mod tests {
             (evidence.locus, evidence.family),
             (Some(kind.locus()), Some(Family::Map))
         );
-        assert!(evidence.readings.iter().any(|reading| reading.name == "own_curvature_slack" && matches!(&reading.value, EpochStageValue::Ratio(value) if value.is_negative())));
+        assert!(evidence
+            .readings
+            .iter()
+            .any(|reading| reading.name == "own_curvature_slack"
+                && matches!(&reading.value, EpochStageValue::Ratio(value) if value.is_negative())));
         let recorded = evidence
             .readings
             .iter()

@@ -2961,8 +2961,41 @@ pub struct EpochLocusDepositReading {
     pub gram_update: EpochArrayReading,
     pub fresh_news: EpochArrayReading,
     pub direction: EpochArrayReading,
+    /// The actual proposed direction is `direction / direction_divisor`. The divisor is
+    /// transient and never a retained row factor or the material step's eta denominator.
+    pub direction_divisor: BigInt,
+    pub joint_direction: Option<EpochJointDirectionReading>,
+    /// Exact squared normal-metric norms on the actual paired reached support/S.
+    /// Missing means the exterior reading was unavailable; it changes no admission.
+    pub retained_news_metric_squared: Option<Rat>,
+    pub fresh_news_metric_squared: Option<Rat>,
     pub represented_step: EpochArrayReading,
     pub storage: EpochStorageReading,
+}
+
+/// Exterior operands of one exact minimum-segment proposal. `w` and `D` below are their
+/// grouped numerators divided by `divisor`; row divisors/exponents remain operative too.
+/// This is a proposal reading, not a seal, a finite comparison, or retained model state.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochJointDirectionReading {
+    pub locus: LinearLocus,
+    pub alpha: Rat,
+    pub metric_n: Rat,
+    pub metric_q: Rat,
+    pub support: Vec<usize>,
+    /// S_j = 2^shares[j] on support; unreached columns are held.
+    pub shares: Vec<i64>,
+    pub numerator_w: EpochSeriesReading,
+    pub numerator_direction: EpochSeriesReading,
+    pub divisor: BigInt,
+    pub normal_pairing: Rat,
+    pub current_scaled_pairing: Rat,
+    pub squared_norm: Rat,
+    pub zero_direction: bool,
+    pub projected_step: Option<EpochSeriesReading>,
+    pub lattice_exponent: Option<u32>,
+    pub normal_fall: Option<Rat>,
+    pub unit_lower_bound: Option<Rat>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

@@ -70,6 +70,7 @@ pub enum ObservedEpochDepositionScope {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ObservedEpochOutcome {
     Whole,
+    Joint,
     ReceivingOnly,
     Neutral,
 }
@@ -141,6 +142,13 @@ pub struct ObservedEpochReceipt {
     /// First whole-stage evidence; receiving-only restaging never overwrites it.
     pub whole_stage_refusal: Option<EpochStageRefusal>,
     pub probe_state: ObservedEpochProbeState,
+    pub publication_attempt: EpochStageAttempt,
+    pub joint_attempted: bool,
+    pub joint_directions: Vec<crate::hnn::constitution::EpochJointDirectionReading>,
+    pub joint_comparison: Option<ComparisonReading>,
+    pub joint_refusal: Option<String>,
+    pub joint_stage_refusal: Option<EpochStageRefusal>,
+    pub joint_probe_state: ObservedEpochProbeState,
     pub precision: ObservedPrecisionReceipt,
     pub close: Option<ClosedLocated>,
     /// Only requested cuts. A cut equal to consumed still precedes the closing deposit.
@@ -180,6 +188,14 @@ fn receiving_restage_permitted(error: &HnnError) -> bool {
         | "the actual epoch rays leave an executed pump tube"
         | "source refinement needs its pair-factor remainders inside the finer half-cell"
     ))
+}
+
+/// Only the joint proposal's own post-projection normal predicate is a new domain
+/// refusal. The canonical whole non-descending invariant remains fatal.
+fn joint_restage_permitted(failure: &crate::hnn::constitution::epoch::EpochStageFailure) -> bool {
+    receiving_restage_permitted(&failure.error)
+        || (matches!(&failure.error, HnnError::EpochStepNonDescending { .. })
+            && failure.evidence.condition == EpochStageCondition::JointNormalFall)
 }
 
 /// The certificate reads the actual normalized face. The retained RHS has a separately
@@ -1098,7 +1114,120 @@ impl Reference {
                         )
                 }
             };
+        let probe_candidate =
+            |candidate: &crate::hnn::constitution::epoch::StagedEpochCandidate| {
+                let mut opening = comparison_opening.clone();
+                opening.constitution =
+                    candidate.comparison_material(&comparison_opening.constitution)?;
+                let boundary = PairedObservation::admit(&field, &opening.constitution, pairing)?;
+                let cells = match placement {
+                    Some(placed) => {
+                        boundary.encode_placed(&classes[..consumed], &placed.part(0..consumed)?)?
+                    }
+                    None => boundary.encode(&classes[..consumed])?,
+                };
+                let forward = if selected_forward {
+                    self.read_epoch_at_cuts_with_execution(
+                        &opening,
+                        &moment,
+                        &phases,
+                        &cells,
+                        &[],
+                        execution,
+                    )?
+                } else {
+                    self.read_epoch_at_cuts(&opening, &moment, &phases, &cells, &[])?
+                };
+                if forward.consumed != consumed
+                    || forward.current != next.current
+                    || forward.carry_out != carry_out
+                {
+                    return Err(refusal(
+                        "the candidate probe keeps the original source and receiving clocks",
+                    ));
+                }
+                // Rebuild the prequential schedule from the ORIGINAL tree,
+                // never the tree already updated by the staged candidate.
+                let mut candidate_tree = opening_tree.clone();
+                let trees = if phases.observation_partition().is_some() {
+                    let addresses = forward
+                        .reads
+                        .iter()
+                        .map(|read| {
+                            let mut addresses =
+                                read.ratio.observed_addresses(&[])?.ok_or_else(|| {
+                                    refusal("the epoch probe keeps its observed addresses")
+                                })?;
+                            if addresses.len() != 1 {
+                                return Err(refusal(
+                                    "one probe tree address belongs to each heard cell",
+                                ));
+                            }
+                            Ok(addresses.remove(0))
+                        })
+                        .collect::<Result<Vec<_>, HnnError>>()?;
+                    candidate_tree.receive_observed_arrivals(
+                        &addresses,
+                        &classes[..consumed],
+                        phases.grain(),
+                    )?
+                } else {
+                    let addresses = forward
+                        .reads
+                        .iter()
+                        .map(|read| {
+                            let mut addresses = read.ratio.addresses(&[])?;
+                            if addresses.len() != 1 {
+                                return Err(refusal(
+                                    "one probe tree address belongs to each heard cell",
+                                ));
+                            }
+                            Ok(addresses.remove(0))
+                        })
+                        .collect::<Result<Vec<_>, HnnError>>()?;
+                    candidate_tree.receive_arrivals(
+                        &addresses,
+                        &classes[..consumed],
+                        phases.grain(),
+                    )?
+                };
+                let mut combined = Faces {
+                    faces: Vec::new(),
+                    logits: Vec::new(),
+                };
+                for (at, (read, tree)) in forward.reads.iter().zip(&trees).enumerate() {
+                    let target = cells.part(at..at + 1)?;
+                    if target_phases(&field, read.ratio.anchor(), receiver, &target)?
+                        != frozen_comparison.target_phases[at]
+                    {
+                        return Err(refusal(
+                            "the epoch probe keeps the original target phase and anchor",
+                        ));
+                    }
+                    let face = phases.combine(&read.faces, std::slice::from_ref(tree))?;
+                    combined.faces.extend(face.faces);
+                    combined.logits.extend(face.logits);
+                }
+                frozen_comparison.evaluate(
+                    comparison_opening
+                        .constitution
+                        .population(receiver)
+                        .ok_or(HnnError::MissingReceivingMap { ring: receiver })?,
+                    receiver,
+                    &combined,
+                    &trees,
+                )
+                // forward and its counterfactual reception end die here.
+            };
         let mut comparison = None;
+        let mut joint_eligible = shared_normals;
+        let mut publication_attempt = EpochStageAttempt::Whole;
+        let mut joint_attempted = false;
+        let mut joint_directions = Vec::new();
+        let mut joint_comparison = None;
+        let mut joint_refusal = None;
+        let mut joint_stage_refusal = None;
+        let mut joint_probe_state = ObservedEpochProbeState::SealNotFormed;
         let mut whole_refusal = None;
         let mut whole_stage_refusal = None;
         let mut probe_state = ObservedEpochProbeState::SealNotFormed;
@@ -1117,110 +1246,7 @@ impl Reference {
                 // A source port is learner material. Re-admit that port under
                 // the SAME exterior class codec, pairing and placement; an old
                 // PairedObservation is correctly refused after E changes.
-                let probe = (|| {
-                    let mut opening = comparison_opening.clone();
-                    opening.constitution =
-                        candidate.comparison_material(&comparison_opening.constitution)?;
-                    let boundary =
-                        PairedObservation::admit(&field, &opening.constitution, pairing)?;
-                    let cells = match placement {
-                        Some(placed) => boundary
-                            .encode_placed(&classes[..consumed], &placed.part(0..consumed)?)?,
-                        None => boundary.encode(&classes[..consumed])?,
-                    };
-                    let forward = if selected_forward {
-                        self.read_epoch_at_cuts_with_execution(
-                            &opening,
-                            &moment,
-                            &phases,
-                            &cells,
-                            &[],
-                            execution,
-                        )?
-                    } else {
-                        self.read_epoch_at_cuts(&opening, &moment, &phases, &cells, &[])?
-                    };
-                    if forward.consumed != consumed
-                        || forward.current != next.current
-                        || forward.carry_out != carry_out
-                    {
-                        return Err(refusal(
-                            "the candidate probe keeps the original source and receiving clocks",
-                        ));
-                    }
-                    // Rebuild the prequential schedule from the ORIGINAL tree,
-                    // never the tree already updated by the staged candidate.
-                    let mut candidate_tree = opening_tree.clone();
-                    let trees = if phases.observation_partition().is_some() {
-                        let addresses = forward
-                            .reads
-                            .iter()
-                            .map(|read| {
-                                let mut addresses =
-                                    read.ratio.observed_addresses(&[])?.ok_or_else(|| {
-                                        refusal("the epoch probe keeps its observed addresses")
-                                    })?;
-                                if addresses.len() != 1 {
-                                    return Err(refusal(
-                                        "one probe tree address belongs to each heard cell",
-                                    ));
-                                }
-                                Ok(addresses.remove(0))
-                            })
-                            .collect::<Result<Vec<_>, HnnError>>()?;
-                        candidate_tree.receive_observed_arrivals(
-                            &addresses,
-                            &classes[..consumed],
-                            phases.grain(),
-                        )?
-                    } else {
-                        let addresses = forward
-                            .reads
-                            .iter()
-                            .map(|read| {
-                                let mut addresses = read.ratio.addresses(&[])?;
-                                if addresses.len() != 1 {
-                                    return Err(refusal(
-                                        "one probe tree address belongs to each heard cell",
-                                    ));
-                                }
-                                Ok(addresses.remove(0))
-                            })
-                            .collect::<Result<Vec<_>, HnnError>>()?;
-                        candidate_tree.receive_arrivals(
-                            &addresses,
-                            &classes[..consumed],
-                            phases.grain(),
-                        )?
-                    };
-                    let mut combined = Faces {
-                        faces: Vec::new(),
-                        logits: Vec::new(),
-                    };
-                    for (at, (read, tree)) in forward.reads.iter().zip(&trees).enumerate() {
-                        let target = cells.part(at..at + 1)?;
-                        if target_phases(&field, read.ratio.anchor(), receiver, &target)?
-                            != frozen_comparison.target_phases[at]
-                        {
-                            return Err(refusal(
-                                "the epoch probe keeps the original target phase and anchor",
-                            ));
-                        }
-                        let face = phases.combine(&read.faces, std::slice::from_ref(tree))?;
-                        combined.faces.extend(face.faces);
-                        combined.logits.extend(face.logits);
-                    }
-                    frozen_comparison.evaluate(
-                        comparison_opening
-                            .constitution
-                            .population(receiver)
-                            .ok_or(HnnError::MissingReceivingMap { ring: receiver })?,
-                        receiver,
-                        &combined,
-                        &trees,
-                    )
-                    // forward and its counterfactual reception end die here.
-                })();
+                let probe = probe_candidate(&candidate);
                 match probe {
                     Ok(reading) => {
                         probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
@@ -1246,6 +1272,12 @@ impl Reference {
                         })
                     }
                     Err(error) => {
+                        // Unknown executor/identity/arithmetic failures do not select another
+                        // NormalMaps proposal. Known native mathematical domain refusals may.
+                        if shared_normals && !receiving_restage_permitted(&error) {
+                            return Err(error);
+                        }
+                        joint_eligible = shared_normals && receiving_restage_permitted(&error);
                         whole_refusal = Some(error.to_string());
                         None
                     }
@@ -1266,9 +1298,80 @@ impl Reference {
                 None
             }
         };
-        let ((material, deposit), outcome) = match whole {
+        let mut joint_admitted = None;
+        if whole.is_none() && joint_eligible {
+            joint_attempted = true;
+            match stage(EpochCandidateScope::Joint, &mut observe_deposit) {
+                Ok(candidate) if !candidate.requires_comparison() => {
+                    // Zero/projected-zero upstream motion uses the established held-map
+                    // receiving successor below. No finite probe is fabricated for it.
+                    joint_directions = candidate.joint_directions();
+                    joint_probe_state = ObservedEpochProbeState::SealedNoProbeRequired;
+                }
+                Ok(candidate) => {
+                    joint_directions = candidate.joint_directions();
+                    joint_probe_state = ObservedEpochProbeState::ProbeFailed;
+                    match probe_candidate(&candidate) {
+                        Ok(reading) => {
+                            joint_probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
+                            let neutral = reading.unchanged || reading.objective_equal();
+                            let admitted = if neutral {
+                                Some(candidate.admit_neutral())
+                            } else {
+                                candidate.admit_change(&reading.objective_change)
+                            };
+                            if admitted.is_none() {
+                                joint_refusal = Some(reading.unresolved_reason().to_string());
+                            }
+                            joint_comparison = Some(reading);
+                            joint_admitted = admitted.map(|publication| {
+                                (
+                                    publication,
+                                    if neutral {
+                                        ObservedEpochOutcome::Neutral
+                                    } else {
+                                        ObservedEpochOutcome::Joint
+                                    },
+                                )
+                            });
+                        }
+                        Err(error) => {
+                            if !receiving_restage_permitted(&error) {
+                                return Err(error);
+                            }
+                            joint_refusal = Some(error.to_string());
+                        }
+                    }
+                }
+                Err(failure) => {
+                    stage_refused(EpochStageAttempt::Joint, &failure.evidence);
+                    if !joint_restage_permitted(&failure) {
+                        return Err(failure.error);
+                    }
+                    joint_directions = failure
+                        .evidence
+                        .readings
+                        .iter()
+                        .filter_map(|reading| {
+                            if let EpochStageValue::JointDirection(direction) = &reading.value {
+                                Some(direction.clone())
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
+                    joint_refusal = Some(failure.error.to_string());
+                    joint_stage_refusal = Some(failure.evidence);
+                }
+            }
+            if joint_admitted.is_some() {
+                publication_attempt = EpochStageAttempt::Joint;
+            }
+        }
+        let ((material, deposit), outcome) = match whole.or(joint_admitted) {
             Some(admitted) => admitted,
             None => {
+                publication_attempt = EpochStageAttempt::ReceivingOnly;
                 let receiving =
                     match stage(EpochCandidateScope::ReceivingOnly, &mut observe_deposit) {
                         Ok(candidate) => candidate,
@@ -1416,6 +1519,13 @@ impl Reference {
             whole_refusal,
             whole_stage_refusal,
             probe_state,
+            publication_attempt,
+            joint_attempted,
+            joint_directions,
+            joint_comparison,
+            joint_refusal,
+            joint_stage_refusal,
+            joint_probe_state,
             precision,
             close,
             prefixes: snapshots,
@@ -1646,6 +1756,31 @@ mod tests {
             }
         }
         assert_eq!(epoch.loci.len(), flows.len());
+    }
+
+    #[test]
+    fn only_typed_joint_projection_refusal_reaches_zero_absorption() {
+        let fatal = HnnError::EpochStepNonDescending { crossing: 0 };
+        assert!(!receiving_restage_permitted(&fatal));
+        let evidence = EpochStageRefusal::at(
+            "joint_normal_projection",
+            EpochStageCondition::JointNormalFall,
+            "native joint projection normal predicate",
+            Some(Locus::SourcePort(0)),
+            Some(crate::hnn::constitution::Family::Map),
+        );
+        let failure = crate::hnn::constitution::epoch::EpochStageFailure {
+            error: fatal,
+            evidence,
+            normal_inputs_prepared: true,
+        };
+        assert!(joint_restage_permitted(&failure));
+        let mut untyped = failure;
+        untyped.evidence.condition = EpochStageCondition::NativeOwner;
+        assert!(!joint_restage_permitted(&untyped));
+        untyped.error = HnnError::CountOverflow;
+        untyped.evidence.condition = EpochStageCondition::JointNormalFall;
+        assert!(!joint_restage_permitted(&untyped));
     }
 
     #[test]
@@ -1928,6 +2063,17 @@ mod tests {
                 receiver,
                 actual.field.ring(receiver).period(),
             );
+            if receipt.publication_attempt == EpochStageAttempt::Joint {
+                let joint = receipt
+                    .joint_comparison
+                    .as_ref()
+                    .expect("every admitted upstream joint move executes its finite comparison");
+                assert!(joint.strictly_improved || joint.objective_equal() || joint.unchanged);
+                assert_eq!(
+                    receipt.joint_probe_state,
+                    ObservedEpochProbeState::FiniteComparisonExecuted
+                );
+            }
             if let Some(stage) = &receipt.whole_stage_refusal {
                 assert_eq!(receipt.whole_refusal.as_ref(), Some(&stage.reason));
                 assert_eq!(receipt.probe_state, ObservedEpochProbeState::SealNotFormed);
@@ -1953,7 +2099,7 @@ mod tests {
                             assert!(!reading.strictly_improved);
                         }
                     }
-                    ObservedEpochOutcome::ReceivingOnly => {
+                    ObservedEpochOutcome::ReceivingOnly | ObservedEpochOutcome::Joint => {
                         assert!(!reading.strictly_improved);
                         assert!(!reading.unchanged && !reading.objective_equal());
                     }
@@ -1973,8 +2119,10 @@ mod tests {
                 actual.carried.as_ref(),
                 Some(&producing.last().unwrap().end)
             );
-            if receipt.comparison.is_some() {
-                assert_eq!(candidate.len(), receipt.consumed);
+            if receipt.comparison.is_some() || receipt.joint_comparison.is_some() {
+                let probes = usize::from(receipt.comparison.is_some())
+                    + usize::from(receipt.joint_comparison.is_some());
+                assert_eq!(candidate.len(), probes * receipt.consumed);
                 assert_eq!(producing[0].anchor, candidate[0].anchor);
                 assert_eq!(producing[0].source, candidate[0].source);
                 assert_eq!(producing[0].opening, candidate[0].opening);
@@ -2068,6 +2216,10 @@ mod tests {
             )
             .unwrap();
         assert_eq!(a.outcome, b.outcome);
+        assert_eq!(a.publication_attempt, b.publication_attempt);
+        assert_eq!(a.joint_directions, b.joint_directions);
+        assert_eq!(a.joint_comparison, b.joint_comparison);
+        assert_eq!(a.joint_stage_refusal, b.joint_stage_refusal);
         assert_eq!(a.whole_refusal, b.whole_refusal);
         assert_eq!(a.whole_stage_refusal, b.whole_stage_refusal);
         assert_eq!(a.comparison, b.comparison);

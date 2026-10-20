@@ -5,8 +5,10 @@
 //! Retention is ContinuingState (material, tree, clock, moment, address, charts and carry).
 //! Only the bounded current-aeon closing crib is carried beside it. No source tape is saved.
 //! The native grouped comparison publishes only at actual receiving ticks. Source/contrast/
-//! readout maps share the whole candidate probe; a refused whole branch restages the certified
-//! receiving-only policy. Physical factor requests/statistics are explicitly held (NormalMaps).
+//! readout maps share the whole candidate probe; a refused whole branch stages the exact
+//! upstream joint proposal, then the held-upstream receiving policy on its domain refusal.
+//! Every nonzero upstream proposal executes the same-opening finite comparison.
+//! Physical factor requests/statistics are explicitly held (NormalMaps).
 //! Both rungs reuse the same opening's normal flow and certified gain. Held upstream maps
 //! absorb that news once with zero material move; discarded candidates never publish statistics.
 //! A source end leaves only the bounded current unfinished transaction pending. It is accepted
@@ -927,7 +929,7 @@ fn run() -> Result<()> {
             }
             let mut final_deposit = None; let mut stepped = 0u64;
             let mut published = 0usize; let mut accepted = 0usize;
-            let mut whole = 0usize; let mut receiving_only = 0usize; let mut neutral = 0usize;
+            let mut whole = 0usize; let mut joint = 0usize; let mut receiving_only = 0usize; let mut neutral = 0usize;
             let mut outcomes = Vec::new();
             let mut class_series = Vec::new();
             let mut stage_events = Vec::new();
@@ -961,7 +963,7 @@ fn run() -> Result<()> {
                             ("released_class_masses", format!("[{}]", read.released.iter().map(rational).collect::<Vec<_>>().join(","))),
                         ]));
                     }
-                    match epoch.outcome { ObservedEpochOutcome::Whole => whole += 1, ObservedEpochOutcome::ReceivingOnly => receiving_only += 1, ObservedEpochOutcome::Neutral => neutral += 1 }
+                    match epoch.outcome { ObservedEpochOutcome::Whole => whole += 1, ObservedEpochOutcome::Joint => joint += 1, ObservedEpochOutcome::ReceivingOnly => receiving_only += 1, ObservedEpochOutcome::Neutral => neutral += 1 }
                     stepped += epoch.deposit.stepped;
                     outcomes.push(object(&[
                         ("source_start_zero_based", opening.to_string()),
@@ -977,6 +979,10 @@ fn run() -> Result<()> {
                                 ("gamma", rational(&locus.gamma)),
                                 ("eta", rational(&locus.eta)),
                                 ("normal_fall", rational(&locus.fall)),
+                                ("direction_divisor", quoted(&locus.direction_divisor.to_string())),
+                                ("joint_direction_exact", exact(&locus.joint_direction)),
+                                ("retained_news_metric_squared", locus.retained_news_metric_squared.as_ref().map_or_else(|| "null".into(), rational)),
+                                ("fresh_news_metric_squared", locus.fresh_news_metric_squared.as_ref().map_or_else(|| "null".into(), rational)),
                                 ("crossings", locus.storage.crossings.to_string()),
                                 ("map_lattice", locus.storage.map_lattice.to_string()),
                                 ("source_refinement", locus.storage.source_refinement.to_string()),
@@ -987,6 +993,13 @@ fn run() -> Result<()> {
                         })),
                         ("consumed", epoch.consumed.to_string()),
                         ("outcome", exact(&epoch.outcome)), ("deposition_scope", exact(&epoch.deposition_scope)),
+                        ("publication_attempt", exact(&epoch.publication_attempt)),
+                        ("joint_attempted", epoch.joint_attempted.to_string()),
+                        ("joint_directions_exact", exact(&epoch.joint_directions)),
+                        ("joint_comparison_exact", exact(&epoch.joint_comparison)),
+                        ("joint_refusal", exact(&epoch.joint_refusal)),
+                        ("joint_stage_refusal_exact", exact(&epoch.joint_stage_refusal)),
+                        ("joint_probe_state", exact(&epoch.joint_probe_state)),
                         ("comparison_exact", exact(&epoch.comparison)), ("whole_refusal", exact(&epoch.whole_refusal)),
                         ("whole_stage_refusal_exact", exact(&epoch.whole_stage_refusal)),
                         ("probe_state", exact(&epoch.probe_state)),
@@ -1044,8 +1057,8 @@ fn run() -> Result<()> {
                 ("total_cells", total(checkpoint.stream.resident())?.to_string()),
                 ("physical_epoch_cell_bound", checkpoint.stream.epoch_bound().to_string()),
                 ("native_steps", stepped.to_string()), ("whole_epochs", whole.to_string()),
-                ("receiving_only_epochs", receiving_only.to_string()), ("neutral_epochs", neutral.to_string()),
-                ("certification_scope", quoted("atomic grouped same-opening whole probe; certified receiving-only restage on whole refusal; unfinished physical interval pending")),
+                ("joint_epochs", joint.to_string()), ("receiving_only_epochs", receiving_only.to_string()), ("neutral_epochs", neutral.to_string()),
+                ("certification_scope", quoted("atomic same-opening whole then upstream joint proposal with both native normal predicates and actual finite comparison; held-upstream absorption on domain refusal; Neutral requires publication_attempt to identify its branch; unfinished physical interval pending")),
                 ("deposition_scope", quoted("NormalMaps: physical factor deposition requests and statistics held; their complete native return still computed")),
                 ("epoch_outcomes", format!("[{}]", outcomes.join(","))),
                 ("class_code_scope", quoted("prequential class comparison through the actual model/tree face; separate tree-only control; phase improvement alone is not class prediction improvement")),

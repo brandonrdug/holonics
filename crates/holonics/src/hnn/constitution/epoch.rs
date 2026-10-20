@@ -12,6 +12,7 @@ mod deposit;
 pub(crate) mod device;
 pub(crate) use deposit::{
     EpochCandidateScope, EpochDepositPhase, EpochReceivingRecord, ObservedNormalEpochStage,
+    StagedEpochCandidate,
 };
 mod flow;
 #[cfg(test)]
@@ -40,6 +41,7 @@ pub enum EpochStageCondition {
     SampleShape,
     ActualRayAlignment,
     ActualRayCurvature,
+    JointNormalFall,
     JointTriangle,
     PumpTube,
     NonlinearFactorRay,
@@ -63,6 +65,7 @@ pub enum EpochStageValue {
     Array(EpochArrayReading),
     /// Exact transient grouped coordinates, never installed in a continuing state.
     Series(EpochSeriesReading),
+    JointDirection(EpochJointDirectionReading),
     Text(&'static str),
     /// The failing owner had not produced this operand, or its diagnostic could not be read.
     Unavailable(&'static str),
@@ -96,6 +99,7 @@ pub struct EpochStageRefusal {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum EpochStageAttempt {
     Whole,
+    Joint,
     ReceivingOnly,
 }
 
@@ -964,7 +968,18 @@ pub(crate) struct EpochDeposit {
     pub(crate) eta_denominator: BigInt,
     pub(crate) halvings: u64,
     pub(crate) direction: EpochArray,
+    /// Actual D is this grouped numerator divided by this transient positive integer.
+    pub(crate) direction_divisor: BigInt,
+    pub(crate) joint_direction: Option<EpochJointDirectionReading>,
     pub(crate) shares: Vec<i64>,
+}
+
+/// Exact proposed direction only. The live normal owner retains W/H/R, never this wrapper.
+struct EpochProposedDirection {
+    numerator: EpochArray,
+    divisor: BigInt,
+    shares: Vec<i64>,
+    joint: Option<EpochJointDirectionReading>,
 }
 
 /// The fresh news's certificate operands, formed before gamma or carried R is
@@ -1333,6 +1348,148 @@ impl EpochLaw {
         ))
     }
 
+    /// [derived component; #62] Minimum weighted norm on the reached segment from a to b.
+    /// S is read by the existing direction owner; its full column sums, support and row
+    /// divisors remain operative. This theorem does not authorize a projected material move.
+    fn joint_direction(
+        &self,
+        a: &EpochArray,
+        b: &EpochArray,
+        gram: &EpochArray,
+        support: &[usize],
+        locus: LinearLocus,
+        source_budget: Option<(u64, u64, Locus)>,
+    ) -> Result<EpochProposedDirection, HnnError> {
+        let c = b.subtract(a)?;
+        let (scaled_c, shares) = self.direction(&c, gram, support)?;
+        let q = c.dot(&scaled_c)?.scalar_ratio()?;
+        let n = b.dot(&scaled_c)?.scalar_ratio()?;
+        if q.is_negative() {
+            return Err(refused(
+                "the joint segment needs its positive reached normal metric",
+            ));
+        }
+        let alpha = if q.is_zero() {
+            Rat::one()
+        } else {
+            (&n / &q).max(Rat::zero()).min(Rat::one())
+        };
+        let (k, t) = (alpha.numer().clone(), alpha.denom().clone());
+        if let Some((budget, commit, at)) = source_budget {
+            // Bound the transient scaled numerators and common divisor BEFORE their per-entry
+            // multiplication/shifts. This is the original whole budget, never a new allowance.
+            let exponent = a.exponent.max(b.exponent);
+            let bits = |array: &EpochArray| {
+                array
+                    .values
+                    .iter()
+                    .map(BigInt::bits)
+                    .max()
+                    .unwrap_or(0)
+                    .saturating_add(u64::from(exponent - array.exponent))
+            };
+            let width = u64::try_from(a.values.len()).map_err(|_| extent())?;
+            let predicted = width
+                .saturating_mul(
+                    bits(a)
+                        .max(bits(b))
+                        .saturating_add(t.bits())
+                        .saturating_add(2),
+                )
+                .saturating_add(t.bits())
+                .saturating_add(u64::from(exponent));
+            if predicted > budget {
+                return Err(HnnError::ConstitutionBudget {
+                    bits: predicted,
+                    budget,
+                    commit,
+                    loci: vec![at],
+                });
+            }
+        }
+        let integer = |value| EpochArray::from_dyadic_scalar(&Rat::from_integer(value));
+        let weighted = a
+            .scalar_product(&integer(k.clone())?)?
+            .add(&b.scalar_product(&integer(&t - &k)?)?)?;
+        // w is the reached segment, not old unreached news. No default share is divided.
+        let mut reached = vec![false; weighted.columns];
+        for &column in support {
+            reached[column] = true;
+        }
+        let numerator_w = EpochArray::with_row_divisors(
+            weighted.rows,
+            weighted.columns,
+            weighted.exponent,
+            weighted
+                .values
+                .iter()
+                .enumerate()
+                .map(|(at, value)| {
+                    if reached[at % weighted.columns] {
+                        value.clone()
+                    } else {
+                        BigInt::zero()
+                    }
+                })
+                .collect(),
+            weighted.row_divisors.clone(),
+        )?;
+        let (direction, _) = self.direction(&numerator_w, gram, support)?;
+        let divisor = Rat::from_integer(t.clone());
+        let normal_pairing = a.dot(&direction)?.scalar_ratio()? / &divisor;
+        let current_scaled_pairing = b.dot(&direction)?.scalar_ratio()? / &divisor;
+        let squared_norm = numerator_w.dot(&direction)?.scalar_ratio()? / (&divisor * &divisor);
+        let reading = EpochJointDirectionReading {
+            locus,
+            alpha,
+            metric_n: n,
+            metric_q: q,
+            support: support.to_vec(),
+            shares: shares.clone(),
+            numerator_w: EpochSeriesReading::of(&numerator_w),
+            numerator_direction: EpochSeriesReading::of(&direction),
+            divisor: t.clone(),
+            normal_pairing,
+            current_scaled_pairing,
+            squared_norm,
+            zero_direction: direction.is_zero(),
+            projected_step: None,
+            lattice_exponent: None,
+            normal_fall: None,
+            unit_lower_bound: None,
+        };
+        Ok(EpochProposedDirection {
+            numerator: direction,
+            divisor: t,
+            shares,
+            joint: Some(reading),
+        })
+    }
+
+    /// Smallest L with 2^L max|numerator|/(2^exponent*divisor) >= 1.
+    /// The one comparison shifts only to the already present operand's bit width.
+    fn direction_reach(exponent: u32, maximum: &BigInt, divisor: &BigInt) -> Result<u32, HnnError> {
+        if !maximum.is_positive() || !divisor.is_positive() {
+            return Err(refused(
+                "source reach requires positive actual direction magnitude and divisor",
+            ));
+        }
+        let difference = i64::try_from(divisor.bits())
+            .map_err(|_| extent())?
+            .checked_sub(i64::try_from(maximum.bits()).map_err(|_| extent())?)
+            .ok_or_else(extent)?;
+        let above = if difference >= 0 {
+            divisor > &(maximum << usize::try_from(difference).map_err(|_| extent())?)
+        } else {
+            (divisor << usize::try_from(-difference).map_err(|_| extent())?) > *maximum
+        };
+        let reach = i64::from(exponent)
+            .checked_add(difference)
+            .and_then(|value| value.checked_add(if above { 1 } else { 0 }))
+            .ok_or_else(extent)?;
+        u32::try_from(reach.max(0)).map_err(|_| extent())
+    }
+
     pub(crate) fn fresh(&self, flow: &EpochFlow) -> Result<EpochFresh, HnnError> {
         if flow.receiver_grain != self.receiver_grain {
             return Err(refused(
@@ -1414,6 +1571,87 @@ impl EpochLaw {
         ring: usize,
         eta_numerator: BigInt,
     ) -> Result<EpochDeposit, HnnError> {
+        self.deposit_source_proposal(
+            flow,
+            gamma,
+            active_lattice,
+            budget,
+            commit,
+            ring,
+            eta_numerator,
+            false,
+            None,
+        )
+    }
+
+    /// Joint is upstream-only and current-batch transient. The source checks and projection
+    /// tail remain the original owner; a general segment divisor is never an eta denominator.
+    fn deposit_joint(
+        &self,
+        flow: &EpochFlow,
+        gamma: &EpochArray,
+        locus: LinearLocus,
+        source: Option<(u32, u64, u64, usize)>,
+        evidence: &mut Option<EpochStageRefusal>,
+    ) -> Result<EpochDeposit, HnnError> {
+        match locus {
+            LinearLocus::SourcePort(ring) => {
+                let (active, budget, commit, actual_ring) = source.ok_or_else(|| {
+                    refused("a joint source proposal needs its actual source lattice and budget")
+                })?;
+                if ring != actual_ring {
+                    return Err(refused("a joint source proposal keeps its source locus"));
+                }
+                self.deposit_source_proposal(
+                    flow,
+                    gamma,
+                    active,
+                    budget,
+                    commit,
+                    ring,
+                    BigInt::one(),
+                    true,
+                    Some(evidence),
+                )
+            }
+            LinearLocus::Contrast(_) => {
+                if (gamma.rows, gamma.columns) != (1, 1)
+                    || !gamma.is_dyadic()
+                    || gamma.values.iter().any(Signed::is_negative)
+                {
+                    return Err(refused(
+                        "the epoch's certified fresh-news gain is nonnegative",
+                    ));
+                }
+                self.deposited_with_proposal(
+                    flow,
+                    gamma,
+                    BigInt::one(),
+                    BigInt::one(),
+                    None,
+                    Some(locus),
+                    Some(evidence),
+                )
+            }
+            LinearLocus::Receiving(_) => Err(refused(
+                "the joint segment proposal is upstream only; receiving keeps its native certificate",
+            )),
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn deposit_source_proposal(
+        &self,
+        flow: &EpochFlow,
+        gamma: &EpochArray,
+        active_lattice: u32,
+        budget: u64,
+        commit: u64,
+        ring: usize,
+        eta_numerator: BigInt,
+        joint: bool,
+        evidence: Option<&mut Option<EpochStageRefusal>>,
+    ) -> Result<EpochDeposit, HnnError> {
         if !self.news.is_dyadic() || !self.map.is_dyadic() {
             return Err(refused(
                 "source refinement requires dyadic material and news",
@@ -1435,12 +1673,14 @@ impl EpochLaw {
         let mut source = self.clone();
         source.source_refinement = true;
         source.map_lattice = source.map_lattice.max(active_lattice);
-        let mut deposit = source.deposited_with_projection(
+        let mut deposit = source.deposited_with_proposal(
             flow,
             gamma,
             eta_numerator,
             BigInt::one(),
             Some((budget, commit, Locus::SourcePort(ring))),
+            joint.then_some(LinearLocus::SourcePort(ring)),
+            evidence,
         )?;
         if deposit.step.is_zero() {
             // Representation is refined only with an actual admitted move.
@@ -1469,6 +1709,28 @@ impl EpochLaw {
         eta_denominator: BigInt,
         source_budget: Option<(u64, u64, Locus)>,
     ) -> Result<EpochDeposit, HnnError> {
+        self.deposited_with_proposal(
+            flow,
+            gamma,
+            eta_numerator,
+            eta_denominator,
+            source_budget,
+            None,
+            None,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn deposited_with_proposal(
+        &self,
+        flow: &EpochFlow,
+        gamma: &EpochArray,
+        eta_numerator: BigInt,
+        eta_denominator: BigInt,
+        source_budget: Option<(u64, u64, Locus)>,
+        joint_locus: Option<LinearLocus>,
+        mut evidence: Option<&mut Option<EpochStageRefusal>>,
+    ) -> Result<EpochDeposit, HnnError> {
         if eta_numerator.is_negative() || !eta_denominator.is_positive() {
             return Err(refused(
                 "an epoch certificate needs a nonnegative step ratio",
@@ -1485,8 +1747,25 @@ impl EpochLaw {
         self.gram.same_shape(&flow.gram)?;
         self.map.same_shape(&flow.covector)?;
         let gram = self.gram.add(&flow.gram)?;
-        let news = self.news.add(&flow.covector.scalar_product(gamma)?)?;
-        let (direction, shares) = self.direction(&news, &gram, &flow.support)?;
+        let fresh = flow.covector.scalar_product(gamma)?;
+        let news = self.news.add(&fresh)?;
+        let proposed = if let Some(locus) = joint_locus {
+            self.joint_direction(&news, &fresh, &gram, &flow.support, locus, source_budget)?
+        } else {
+            let (direction, shares) = self.direction(&news, &gram, &flow.support)?;
+            EpochProposedDirection {
+                numerator: direction,
+                divisor: BigInt::one(),
+                shares,
+                joint: None,
+            }
+        };
+        let EpochProposedDirection {
+            numerator: direction,
+            divisor: direction_divisor,
+            shares,
+            mut joint,
+        } = proposed;
         let mut map_lattice = self.map_lattice;
         // A zero fresh gain or explicit zero material move certifies no new source motion.
         // Do not refine a lattice for a held map; H/R still absorb their actual operands.
@@ -1501,8 +1780,13 @@ impl EpochLaw {
             // Source rows are dyadic: D = n / 2^e. The smallest l with
             // 2^l max|D| >= 1 is max(0, e-floor(log2(max|n|))).
             let whole = maximum.bits().checked_sub(1).ok_or_else(extent)?;
-            let reach = u64::from(direction.exponent).saturating_sub(whole);
-            map_lattice = map_lattice.max(u32::try_from(reach).map_err(|_| extent())?);
+            let reach = if direction_divisor == BigInt::one() {
+                u32::try_from(u64::from(direction.exponent).saturating_sub(whole))
+                    .map_err(|_| extent())?
+            } else {
+                Self::direction_reach(direction.exponent, &maximum, &direction_divisor)?
+            };
+            map_lattice = map_lattice.max(reach);
         }
         if let Some((budget, commit, locus)) = source_budget {
             // Admit the allocation's actual upper extent before any shift to a
@@ -1523,9 +1807,12 @@ impl EpochLaw {
                 .max()
                 .unwrap_or(0)
                 .saturating_add(u64::from(map_lattice.saturating_sub(direction.exponent)));
-            let predicted = entries
+            let mut predicted = entries
                 .saturating_mul(old_bits.max(move_bits).saturating_add(2))
                 .saturating_add(u64::from(map_lattice));
+            if joint.is_some() {
+                predicted = predicted.saturating_add(direction_divisor.bits());
+            }
             if predicted > budget {
                 return Err(HnnError::ConstitutionBudget {
                     bits: predicted,
@@ -1536,10 +1823,11 @@ impl EpochLaw {
             }
         }
         let shift = i64::from(map_lattice) - i64::from(direction.exponent);
+        let projection_divisor = &eta_denominator * &direction_divisor;
         let denominator = if shift < 0 {
-            &eta_denominator << (-shift) as usize
+            &projection_divisor << (-shift) as usize
         } else {
-            eta_denominator.clone()
+            projection_divisor
         };
         let values = direction
             .values
@@ -1562,7 +1850,40 @@ impl EpochLaw {
         let linear = step.dot(&news)?;
         let quadratic = step.multiply(&gram)?.dot(&step)?.half()?;
         let fall = linear.subtract(&quadratic)?;
+        if let Some(reading) = &mut joint {
+            reading.projected_step = Some(EpochSeriesReading::of(&step));
+            reading.lattice_exponent = Some(map_lattice);
+            reading.normal_fall = Some(fall.scalar_ratio()?);
+        }
         if !step.is_zero() && !fall.values[0].is_positive() {
+            if let (Some(reading), Some(target)) = (&joint, evidence.as_deref_mut()) {
+                EpochStageRefusal::at(
+                    "joint_normal_projection",
+                    EpochStageCondition::JointNormalFall,
+                    "nonzero represented P requires retained normal fall > 0",
+                    Some(reading.locus.locus()),
+                    Some(Family::Map),
+                )
+                .read(
+                    "joint_direction",
+                    EpochStageValue::JointDirection(reading.clone()),
+                )
+                .read(
+                    "normal_linear",
+                    EpochStageValue::Ratio(linear.scalar_ratio()?),
+                )
+                .read(
+                    "normal_quadratic",
+                    EpochStageValue::Ratio(quadratic.scalar_ratio()?),
+                )
+                .read(
+                    "unit_lower_bound",
+                    EpochStageValue::Unavailable(
+                        "not read: the earlier normal positivity guard failed",
+                    ),
+                )
+                .first(target);
+            }
             return Err(HnnError::EpochStepNonDescending {
                 crossing: self.crossings,
             });
@@ -1579,7 +1900,18 @@ impl EpochLaw {
                     Rat::new(square, BigInt::one() << (-exponent) as usize)
                 };
             }
+            if let Some(reading) = &mut joint {
+                reading.unit_lower_bound = Some(lower.clone());
+            }
             if fall.scalar_ratio()? < lower {
+                if let (Some(reading), Some(target)) = (&joint, evidence.as_deref_mut()) {
+                    EpochStageRefusal::at("joint_normal_projection", EpochStageCondition::JointNormalFall,
+                        "at unit eta the retained normal fall >= half the S-weighted represented squared move", Some(reading.locus.locus()), Some(Family::Map))
+                        .read("joint_direction", EpochStageValue::JointDirection(reading.clone()))
+                        .read("normal_linear", EpochStageValue::Ratio(linear.scalar_ratio()?))
+                        .read("normal_quadratic", EpochStageValue::Ratio(quadratic.scalar_ratio()?))
+                        .read("unit_lower_bound", EpochStageValue::Ratio(lower.clone())).first(target);
+                }
                 return Err(HnnError::EpochStepNonDescending {
                     crossing: self.crossings,
                 });
@@ -1646,6 +1978,8 @@ impl EpochLaw {
             eta_denominator,
             halvings: 0,
             direction,
+            direction_divisor,
+            joint_direction: joint,
             shares,
         })
     }
@@ -2063,6 +2397,361 @@ mod tests {
         assert_eq!(state, before);
     }
 
+    fn joint_values(direction: &EpochProposedDirection) -> Vec<Rat> {
+        direction
+            .numerator
+            .to_rows()
+            .into_iter()
+            .flatten()
+            .map(|value| value / Rat::from_integer(direction.divisor.clone()))
+            .collect()
+    }
+
+    #[test]
+    fn exact_joint_segment_endpoints_odd_denominators_support_and_row_metric() {
+        let law = EpochLaw::founded(1, 2, 3, 0).unwrap();
+        let identity = array(2, 2, 0, &[1, 0, 0, 1]);
+        let read = |a: &EpochArray, b: &EpochArray, gram: &EpochArray, support: &[usize]| {
+            law.joint_direction(a, b, gram, support, LinearLocus::SourcePort(0), None)
+                .unwrap()
+        };
+        for (a, b, expected) in [
+            (array(1, 2, 0, &[1, 0]), array(1, 2, 0, &[2, 1]), Rat::one()),
+            (
+                array(1, 2, 0, &[2, 1]),
+                array(1, 2, 0, &[1, 0]),
+                Rat::zero(),
+            ),
+            (array(1, 2, 0, &[1, 0]), array(1, 2, 0, &[1, 0]), Rat::one()),
+            (array(1, 2, 0, &[0, 0]), array(1, 2, 0, &[0, 0]), Rat::one()),
+        ] {
+            let proposal = read(&a, &b, &identity, &[0, 1]);
+            let reading = proposal.joint.as_ref().unwrap();
+            assert_eq!(reading.alpha, expected);
+            assert!(reading.normal_pairing >= reading.squared_norm);
+            assert!(reading.current_scaled_pairing >= reading.squared_norm);
+            if a == b {
+                assert_eq!(reading.metric_q, Rat::zero());
+            }
+        }
+        let proposal = read(
+            &array(1, 2, 0, &[1, 0]),
+            &array(1, 2, 0, &[0, 1]),
+            &array(2, 2, 0, &[1, 0, 0, 4]),
+            &[0, 1],
+        );
+        assert_eq!(
+            proposal.joint.as_ref().unwrap().alpha,
+            integer(1) / integer(5)
+        );
+        assert_eq!(
+            joint_values(&proposal),
+            vec![integer(1) / integer(5), integer(1) / integer(5)]
+        );
+        assert_eq!(
+            proposal.joint.as_ref().unwrap().squared_norm,
+            integer(1) / integer(5)
+        );
+        let empty = read(
+            &array(1, 2, 0, &[5, 7]),
+            &array(1, 2, 0, &[9, 3]),
+            &identity,
+            &[],
+        );
+        assert!(empty.numerator.is_zero());
+        assert_eq!(empty.joint.as_ref().unwrap().alpha, Rat::one());
+        let masked = read(
+            &array(1, 2, 0, &[1, 99]),
+            &array(1, 2, 0, &[1, -99]),
+            &identity,
+            &[0],
+        );
+        assert_eq!(masked.joint.as_ref().unwrap().alpha, Rat::one());
+        assert_eq!(joint_values(&masked), vec![Rat::one(), Rat::zero()]);
+        assert!(
+            law.joint_direction(
+                &array(1, 2, 0, &[1, 0]),
+                &array(1, 2, 0, &[0, 1]),
+                &array(2, 2, 0, &[0, 0, 0, 1]),
+                &[0],
+                LinearLocus::SourcePort(0),
+                None
+            )
+            .is_err()
+        );
+        // Arithmetic law only: actual odd row factors enter both occurrences in the metric.
+        let a = EpochArray::with_row_divisors(1, 2, 0, vec![1.into(), 0.into()], vec![3]).unwrap();
+        let b = EpochArray::with_row_divisors(1, 2, 0, vec![0.into(), 1.into()], vec![3]).unwrap();
+        let odd = read(&a, &b, &identity, &[0, 1]);
+        assert_eq!(
+            joint_values(&odd),
+            vec![integer(1) / integer(6), integer(1) / integer(6)]
+        );
+        assert_eq!(
+            odd.joint.as_ref().unwrap().squared_norm,
+            integer(1) / integer(18)
+        );
+    }
+
+    fn projection_joint_fixture(a: &[i64], b: &[i64]) -> (EpochLaw, EpochFlow, Vec<Sample>) {
+        let mut law = EpochLaw::founded(1, 2, 3, 0).unwrap();
+        law.news = array(1, 2, 5, &[a[0] - b[0], a[1] - b[1]]);
+        let samples: Vec<_> = (0..2)
+            .map(|column| Sample {
+                weight: Rat::one(),
+                feature: (0..2)
+                    .map(|j| if column == j { Rat::one() } else { Rat::zero() })
+                    .collect(),
+                covector: vec![integer(b[column]) / integer(32)],
+                masses: None,
+            })
+            .collect();
+        let records: Vec<_> = samples
+            .iter()
+            .map(|sample| EpochRecord::from_sample(sample).unwrap())
+            .collect();
+        let flow = EpochFlow::from_records(1, 2, 3, 2, 0, 2, &records).unwrap();
+        (law, flow, samples)
+    }
+
+    #[test]
+    fn joint_projection_keeps_both_normal_guards_and_the_present_alignment_refusal() {
+        let gain = scalar(1);
+        for (a, b, alpha, fall, lower) in [
+            (
+                [31, -1],
+                [-4, 6],
+                integer(1) / integer(7),
+                -integer(3) / integer(512),
+                None,
+            ),
+            (
+                [11, 3],
+                [-4, 6],
+                integer(1) / integer(3),
+                integer(1) / integer(512),
+                Some(integer(1) / integer(256)),
+            ),
+        ] {
+            let (law, flow, _) = projection_joint_fixture(&a, &b);
+            let before = law.clone();
+            let mut evidence = None;
+            assert!(matches!(
+                law.deposit_joint(
+                    &flow,
+                    &gain,
+                    LinearLocus::SourcePort(0),
+                    Some((4, 1 << 20, 0, 0)),
+                    &mut evidence
+                ),
+                Err(HnnError::EpochStepNonDescending { crossing: 0 })
+            ));
+            let evidence = evidence.unwrap();
+            assert_eq!(evidence.condition, EpochStageCondition::JointNormalFall);
+            let reading = evidence
+                .readings
+                .iter()
+                .find_map(|r| {
+                    if let EpochStageValue::JointDirection(v) = &r.value {
+                        Some(v)
+                    } else {
+                        None
+                    }
+                })
+                .unwrap();
+            assert_eq!(reading.alpha, alpha);
+            assert_eq!(reading.normal_fall, Some(fall));
+            assert_eq!(reading.unit_lower_bound, lower);
+            assert!(!evidence.seal_formed && !evidence.finite_probe_executed);
+            assert_eq!(law, before);
+        }
+        let (law, flow, samples) = projection_joint_fixture(&[-4, 6], &[31, -1]);
+        let proposal = law
+            .deposit_joint(
+                &flow,
+                &gain,
+                LinearLocus::SourcePort(0),
+                Some((4, 1 << 20, 0, 0)),
+                &mut None,
+            )
+            .unwrap();
+        assert_eq!(proposal.eta_numerator, BigInt::one());
+        assert_eq!(
+            proposal.eta_denominator,
+            BigInt::one(),
+            "the segment divisor must never bypass the unit normal lower-bound guard"
+        );
+        assert_eq!(proposal.direction_divisor, BigInt::from(7));
+        assert_eq!(
+            proposal.fall.scalar_ratio().unwrap(),
+            integer(1) / integer(128)
+        );
+        let reading = proposal.joint_direction.as_ref().unwrap();
+        assert_eq!(reading.alpha, integer(6) / integer(7));
+        assert_eq!(
+            proposal.step.to_rows(),
+            vec![vec![Rat::zero(), integer(1) / integer(16)]]
+        );
+        let mut evidence = None;
+        assert!(matches!(
+            super::deposit::actual_epoch_face(
+                LinearLocus::SourcePort(0),
+                &proposal.step,
+                &samples,
+                &[],
+                8,
+                Rat::one(),
+                &mut evidence
+            ),
+            Err(HnnError::Unadmitted { .. })
+        ));
+        assert_eq!(
+            evidence.unwrap().condition,
+            EpochStageCondition::ActualRayAlignment
+        );
+        let expected = law
+            .news
+            .add(&flow.covector)
+            .unwrap()
+            .subtract(&proposal.step.multiply(&proposal.successor.gram).unwrap())
+            .unwrap();
+        assert_eq!(
+            proposal.successor.news, expected,
+            "the successor retains Rstar-PH, never blended w-PH"
+        );
+    }
+
+    #[test]
+    fn joint_projection_preserves_the_declared_paired_map_and_exact_news() {
+        let symmetry =
+            PortSymmetry::from_parts(vec![1, 0], vec![Some(1), Some(0), None], &[0]).unwrap();
+        let mut law = EpochLaw::founded_paired(2, 3, 3, 0, symmetry).unwrap();
+        law.news = array(2, 3, 0, &[1, -1, 0, -1, 1, 0]);
+        let samples = vec![
+            Sample {
+                weight: Rat::one(),
+                feature: vec![Rat::one(), Rat::zero(), Rat::zero()],
+                covector: vec![Rat::zero(), Rat::one()],
+                masses: None,
+            },
+            Sample {
+                weight: Rat::one(),
+                feature: vec![Rat::zero(), Rat::one(), Rat::zero()],
+                covector: vec![Rat::one(), Rat::zero()],
+                masses: None,
+            },
+        ];
+        let records: Vec<_> = samples
+            .iter()
+            .map(|sample| EpochRecord::from_sample(sample).unwrap())
+            .collect();
+        let flow = EpochFlow::from_records(2, 3, 3, 2, 0, 2, &records).unwrap();
+        let opening = law.clone();
+        let candidate = law
+            .deposit_joint(&flow, &scalar(1), LinearLocus::Contrast(0), None, &mut None)
+            .unwrap();
+        assert_eq!(
+            candidate.joint_direction.as_ref().unwrap().alpha,
+            integer(1) / integer(2)
+        );
+        assert_eq!(candidate.eta_denominator, BigInt::one());
+        assert!(!candidate.step.is_zero());
+        let after = candidate.successor.map.to_rows();
+        let remainder = candidate.successor.news.to_rows();
+        for row in 0..2 {
+            assert_eq!(after[row][0], after[1 - row][1]);
+            assert_eq!(remainder[row][0], remainder[1 - row][1]);
+            assert!(after[row][2].is_zero());
+            assert!(remainder[row][2].is_zero());
+        }
+        let paired = flow.paired(law.declared_symmetry().unwrap()).unwrap();
+        let target = law
+            .map
+            .multiply(&candidate.successor.gram)
+            .unwrap()
+            .add(&law.news)
+            .unwrap()
+            .add(&paired.covector)
+            .unwrap();
+        assert_eq!(
+            candidate
+                .successor
+                .map
+                .multiply(&candidate.successor.gram)
+                .unwrap()
+                .add(&candidate.successor.news)
+                .unwrap(),
+            target
+        );
+        assert_eq!(
+            law, opening,
+            "staging cannot publish into its immutable opening"
+        );
+    }
+
+    #[test]
+    fn joint_source_preflight_refines_for_a_bigint_divisor_without_retaining_it() {
+        let mut law = EpochLaw::founded(1, 2, 3, 0).unwrap();
+        let large = BigInt::one() << 80usize;
+        law.gram =
+            EpochArray::new(2, 2, 0, vec![1.into(), 0.into(), 0.into(), &large - 1]).unwrap();
+        law.news = array(1, 2, 0, &[1, -1]);
+        let samples = vec![
+            Sample {
+                weight: Rat::one(),
+                feature: vec![Rat::one(), Rat::zero()],
+                covector: vec![Rat::zero()],
+                masses: None,
+            },
+            Sample {
+                weight: Rat::one(),
+                feature: vec![Rat::zero(), Rat::one()],
+                covector: vec![Rat::one()],
+                masses: None,
+            },
+        ];
+        let records: Vec<_> = samples
+            .iter()
+            .map(|s| EpochRecord::from_sample(s).unwrap())
+            .collect();
+        let flow = EpochFlow::from_records(1, 2, 3, 2, 0, 2, &records).unwrap();
+        let candidate = law
+            .deposit_joint(
+                &flow,
+                &scalar(1),
+                LinearLocus::SourcePort(0),
+                Some((4, 1 << 20, 0, 0)),
+                &mut None,
+            )
+            .unwrap();
+        assert!(candidate.direction_divisor.bits() > 64);
+        assert_eq!(candidate.eta_denominator, BigInt::one());
+        assert_eq!(candidate.successor.map_lattice, 81);
+        assert_eq!(
+            candidate.step.to_rows(),
+            vec![vec![
+                integer(1) / Rat::from_integer(BigInt::one() << 81usize);
+                2
+            ]]
+        );
+        assert!(matches!(
+            law.deposit_joint(
+                &flow,
+                &scalar(1),
+                LinearLocus::SourcePort(0),
+                Some((4, 64, 0, 0)),
+                &mut None
+            ),
+            Err(HnnError::ConstitutionBudget { .. })
+        ));
+        let saved = candidate.successor.encode_checkpoint();
+        assert!(!saved.contains("joint"));
+        assert_eq!(
+            EpochLaw::decode_checkpoint(&saved, &candidate.successor, 1 << 20).unwrap(),
+            candidate.successor
+        );
+    }
+
     #[test]
     fn opposing_comparisons_obstruct_a_fresh_move_and_held_absorption_is_once() {
         let mut law = EpochLaw::founded(1, 1, 2, 0).unwrap();
@@ -2100,9 +2789,30 @@ mod tests {
         let current_alignment = integer(3) / integer(8) * &fresh_p;
         assert_eq!(normal_fall, -integer(5) / integer(32));
         assert_eq!(current_alignment, integer(3) / integer(64));
+        let joint = law
+            .deposit_joint(
+                &flow,
+                &gain,
+                LinearLocus::SourcePort(0),
+                Some((2, 1 << 20, 0, 0)),
+                &mut None,
+            )
+            .unwrap();
+        assert_eq!(
+            joint.joint_direction.as_ref().unwrap().alpha,
+            integer(1) / integer(4)
+        );
+        assert!(joint.direction.is_zero());
+        assert!(joint.step.is_zero());
+        assert_eq!(joint.successor.map_lattice, law.map_lattice);
+        assert_eq!(joint.successor.source_refinement, law.source_refinement);
         let held = law
             .deposit_source_at_eta(&flow, &gain, 2, 1 << 20, 0, 0, BigInt::zero())
             .unwrap();
+        assert_eq!(
+            joint.successor, held.successor,
+            "a zero segment uses the same exact normal absorption, without invented material"
+        );
         assert_eq!(held.successor.map, law.map);
         assert!(held.step.is_zero());
         assert_eq!(held.successor.gram.scalar_ratio().unwrap(), integer(2));
