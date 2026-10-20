@@ -226,7 +226,6 @@ fn receiving_restage_permitted(error: &HnnError) -> bool {
         | "the actual epoch rays violate the joint triangle bound"
         | "the actual epoch rays leave an executed pump tube"
         | "source refinement needs its pair-factor remainders inside the finer half-cell"
-        | "a scheduled channel rebase waits for its original fresh positive D rate"
     ))
 }
 
@@ -283,16 +282,11 @@ fn grain_failure_restage_permitted(
     attempt: EpochStageAttempt,
     failure: &crate::hnn::constitution::epoch::EpochStageFailure,
 ) -> bool {
-    // A normal map's own Whole alignment is independent of the optional channel endpoint.
-    // Its existing descent to Joint must not acquire a redundant Whole replay.
-    !(attempt == EpochStageAttempt::Whole
-        && failure.evidence.condition == EpochStageCondition::ActualRayAlignment
-        && failure.evidence.family == Some(crate::hnn::constitution::Family::Map))
-        && match attempt {
-            EpochStageAttempt::Whole => receiving_restage_permitted(&failure.error),
-            EpochStageAttempt::Joint => joint_restage_permitted(failure),
-            EpochStageAttempt::ReceivingOnly => false,
-        }
+    // Coarse fallback consumes only the optional rebase guard's closed typed refusal.
+    // A finite nondecrease, held endpoint, normal alignment or opaque executor error
+    // follows its own ordinary policy, without a redundant grain-off replay.
+    matches!(attempt, EpochStageAttempt::Whole | EpochStageAttempt::Joint)
+        && failure.channel_grain_refinement_refusal().is_some()
 }
 
 /// The certificate reads the actual normalized face. The retained RHS has a separately
@@ -642,9 +636,11 @@ impl Reference {
                 "a terminal partial epoch cannot continue as an ordinary observed life",
             ));
         }
-        if self.refining && deposition_scope != ObservedEpochDepositionScope::NormalMapsAndChannelDissipation {
+        if self.refining && !matches!(deposition_scope,
+            ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
+                | ObservedEpochDepositionScope::NormalMapsAndChannelMaterial) {
             return Err(refusal(
-                "observed contact-grain scheduling requires the explicit channel D scope",
+                "observed contact-grain scheduling requires an explicit channel scope",
             ));
         }
         if !resident.pending.is_empty() || !resident.staged.is_empty() {
@@ -1191,8 +1187,9 @@ impl Reference {
                     ),
                     channel_endpoint.as_ref(),
                 )?;
-            let grain_enabled = self.refining
-                && deposition_scope == ObservedEpochDepositionScope::NormalMapsAndChannelDissipation;
+            let grain_enabled = self.refining && matches!(deposition_scope,
+                ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
+                    | ObservedEpochDepositionScope::NormalMapsAndChannelMaterial);
             let plan = if grain_enabled {
                 crate::hnn::constitution::epoch::ObservedChannelGrainPlan::at_section(
                     &field, &retention, receiver, epoch_index,
@@ -1400,7 +1397,7 @@ impl Reference {
                     grain.contacts.iter().any(|contact| contact.levels > 0)),
             };
             let retry_permitted = match &whole_candidate {
-                Ok(_) => true,
+                Ok(_) => false,
                 Err(failure) => grain_failure_restage_permitted(EpochStageAttempt::Whole, failure),
             };
             let admitted = match whole_candidate {
@@ -1498,7 +1495,7 @@ impl Reference {
                     if shared_normals && !failure.normal_inputs_prepared {
                         return Err(failure.error);
                     }
-                    if !receiving_restage_permitted(&failure.error) {
+                    if !receiving_restage_permitted(&failure.error) && !retry_permitted {
                         return Err(failure.error);
                     }
                     whole_refusal = Some(failure.error.to_string());
@@ -1537,7 +1534,7 @@ impl Reference {
                         grain.contacts.iter().any(|contact| contact.levels > 0)),
                 };
                 let retry_permitted = match &candidate {
-                    Ok(_) => true,
+                    Ok(_) => false,
                     Err(failure) => grain_failure_restage_permitted(EpochStageAttempt::Joint, failure),
                 };
                 match candidate {
@@ -1618,7 +1615,8 @@ impl Reference {
                     }
                     Err(failure) => {
                         stage_refused(EpochStageAttempt::Joint, &failure.evidence);
-                        if !failure.normal_inputs_prepared || !joint_restage_permitted(&failure) {
+                        if !failure.normal_inputs_prepared
+                            || (!joint_restage_permitted(&failure) && !retry_permitted) {
                             return Err(failure.error);
                         }
                         joint_directions = failure
@@ -2252,15 +2250,42 @@ mod tests {
         assert!(!grain_failure_restage_permitted(EpochStageAttempt::Whole, &failure));
         failure.evidence.locus = Some(Locus::Channel(1));
         failure.evidence.family = Some(crate::hnn::constitution::Family::Factor(2));
+        assert!(!grain_failure_restage_permitted(EpochStageAttempt::Whole, &failure));
+        assert!(!grain_failure_restage_permitted(EpochStageAttempt::Joint, &failure));
+        failure.evidence.condition = EpochStageCondition::ChannelGrainFreshRate;
+        assert!(!grain_failure_restage_permitted(EpochStageAttempt::Whole, &failure));
+        let contact = crate::hnn::constitution::EpochChannelGrainContactReading {
+            contact:1,founding_exponent:5,target_exponent:8,before_exponent:5,after_exponent:8,
+            levels:3,shortfall:0,limiting_held_factor:None,deferred_without_fresh_update:false,
+            scale_rebase:std::array::from_fn(|_|Rat::zero()),
+            dissipation_rebase:crate::hnn::constitution::EpochSeriesReading {
+                rows:1,columns:1,exponent:0,row_odd_divisors:vec![1],numerators:vec![BigInt::zero()],
+            },dissipation_scale_rebase:Rat::zero(),
+        };
+        failure.channel_grain=Some(crate::hnn::constitution::EpochChannelGrainReading {
+            receiver:2,ingress_before:113,ingress_after:114,grain_exponent:3,contacts:vec![contact],
+        });
         assert!(grain_failure_restage_permitted(EpochStageAttempt::Whole, &failure));
         assert!(grain_failure_restage_permitted(EpochStageAttempt::Joint, &failure));
         assert!(!grain_failure_restage_permitted(EpochStageAttempt::ReceivingOnly, &failure));
+        failure.channel_grain.as_mut().unwrap().contacts[0].contact=0;
+        assert!(!grain_failure_restage_permitted(EpochStageAttempt::Whole,&failure),"another contact's rebase cannot license the refused ray");
+        failure.channel_grain.as_mut().unwrap().contacts[0].contact=1;
+        failure.channel_grain.as_mut().unwrap().contacts[0].levels=0;
+        assert!(!grain_failure_restage_permitted(EpochStageAttempt::Whole,&failure),"a capped zero-level target is no refinement");
+        failure.channel_grain.as_mut().unwrap().contacts[0].levels=3;
         for error in [HnnError::CountOverflow, HnnError::MissingReach,
             HnnError::Shape { what: "unknown executor/shape", expected: 1, found: 2 }] {
             failure.error = error;
             assert!(!grain_failure_restage_permitted(EpochStageAttempt::Whole, &failure));
             assert!(!grain_failure_restage_permitted(EpochStageAttempt::Joint, &failure));
         }
+        failure.error = HnnError::Unadmitted { reason: "unrelated executor refusal" };
+        failure.evidence.condition = EpochStageCondition::NativeOwner;
+        assert!(!grain_failure_restage_permitted(EpochStageAttempt::Whole, &failure));
+        failure.evidence.condition = EpochStageCondition::ChannelGrainFreshRate;
+        failure.evidence.family = Some(crate::hnn::constitution::Family::Map);
+        assert!(!grain_failure_restage_permitted(EpochStageAttempt::Whole, &failure));
     }
 
     #[test]
@@ -4435,7 +4460,20 @@ mod tests {
 
     #[test]
     fn channel_material_scope_closes_endpoint_work_and_cold_prefix_continuation() {
-        let (reference, _, opening, mut warm_crib, pairing) = source_probe_opening();
+        channel_material_scope_continuation(false);
+    }
+
+    #[test]
+    fn channel_material_grain_closes_endpoint_work_and_cold_prefix_continuation() {
+        channel_material_scope_continuation(true);
+    }
+
+    fn channel_material_scope_continuation(refining: bool) {
+        let (reference, _, mut opening, mut warm_crib, pairing) = source_probe_opening();
+        let reference=if refining {
+            opening.observed_epoch_ingress=Some((opening.field.receivers()[0].ring,113));
+            reference.with_refining_grain()
+        } else {reference};
         let field = opening.field.clone();
         let opening_material = opening.constitution.clone();
         let mut warm = opening.clone();

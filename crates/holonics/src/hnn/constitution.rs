@@ -4034,6 +4034,207 @@ pub enum Carrier {
 
 type Carries = BTreeMap<(Locus, Carrier), Carry>;
 
+/// Re-base the predecessor's physical C/K arrays onto a candidate channel's
+/// finer lattice for a held control. This is the existing lossless carry law:
+/// only the two held physical factor arrays are read here because every other
+/// candidate carrier (including D and the three factor scales) remains the
+/// candidate's. The epoch refinement owner is responsible for the all-six
+/// rebase on the actual arm. A control may not make the held predecessor's raw
+/// C/K forms move: if an old carry would land in either form at the candidate
+/// grain, the matched control is refused rather than silently changing the
+/// held material.
+fn held_ck_at_lattice(
+    storage: &ExactRatMatrix,
+    stiffness: &ExactRatMatrix,
+    storage_carry: &Carry,
+    stiffness_carry: &Carry,
+    old_lattice: Lattice,
+    candidate_lattice: Lattice,
+    old_clock: u64,
+    candidate_clock: u64,
+) -> Result<(ExactRatMatrix, ExactRatMatrix, Carry, Carry), HnnError> {
+    let refuse = || HnnError::Unadmitted {
+        reason: "a held C/K predecessor must be canonical and losslessly representable at the candidate channel grain",
+    };
+    if candidate_lattice.exponent() < old_lattice.exponent() || candidate_clock < old_clock {
+        return Err(refuse());
+    }
+    let valid_carry = |carry: &Carry, entries: &[Rat], lattice: Lattice, clock: u64| {
+        if carry.0.keys().any(|&i| i >= entries.len()) {
+            return false;
+        }
+        let precision = gamma_length(clock);
+        let Some(exponent) = lattice.exponent().checked_add(precision) else {
+            return false;
+        };
+        let half = BigInt::one() << (precision - 1) as usize;
+        carry.0.values().all(|remainder| {
+            dyadic_coordinate(remainder, exponent).is_some_and(|rho| -&half <= rho && rho < half)
+        })
+    };
+    if !storage.entries().iter().all(|x| old_lattice.contains(x))
+        || !stiffness.entries().iter().all(|x| old_lattice.contains(x))
+        || !valid_carry(storage_carry, storage.entries(), old_lattice, old_clock)
+        || !valid_carry(stiffness_carry, stiffness.entries(), old_lattice, old_clock)
+    {
+        return Err(refuse());
+    }
+    let levels = candidate_lattice.exponent() - old_lattice.exponent();
+    let mut at = BudgetedCarry::new(old_lattice, old_clock);
+    let mut storage_entries = storage.entries().to_vec();
+    let mut stiffness_entries = stiffness.entries().to_vec();
+    let (mut storage_rem, mut stiffness_rem) = (storage_carry.clone(), stiffness_carry.clone());
+    at.rebase(
+        levels,
+        &mut [
+            (&mut storage_rem, storage_entries.as_mut_slice()),
+            (&mut stiffness_rem, stiffness_entries.as_mut_slice()),
+        ],
+    )?;
+    // The held-C/K cap: a predecessor carry may be re-expressed at the new
+    // grain only when its integer coordinate there is still zero.
+    if storage_entries != storage.entries()
+        || stiffness_entries != stiffness.entries()
+        || !valid_carry(
+            &storage_rem,
+            &storage_entries,
+            candidate_lattice,
+            candidate_clock,
+        )
+        || !valid_carry(
+            &stiffness_rem,
+            &stiffness_entries,
+            candidate_lattice,
+            candidate_clock,
+        )
+    {
+        return Err(refuse());
+    }
+    let storage = flat_matrix(storage.rows(), storage.columns(), storage_entries)?;
+    let stiffness = flat_matrix(stiffness.rows(), stiffness.columns(), stiffness_entries)?;
+    Ok((storage, stiffness, storage_rem, stiffness_rem))
+}
+
+#[cfg(test)]
+mod held_ck_rebase_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    fn factor(value: Rat) -> ExactRatMatrix {
+        ExactRatMatrix::shaped(1, 1, vec![vec![value]]).unwrap()
+    }
+
+    #[test]
+    fn held_ck_refines_a_canonical_remainder_without_moving_the_old_form() {
+        let old_lattice = Lattice::new(2);
+        let candidate_lattice = Lattice::new(3);
+        let old_carry = Carry(BTreeMap::from([(0, rat(1, 32))]));
+        let (storage, stiffness, storage_rem, stiffness_rem) = held_ck_at_lattice(
+            &factor(rat(3, 4)),
+            &factor(rat(1, 2)),
+            &old_carry,
+            &Carry::default(),
+            old_lattice,
+            candidate_lattice,
+            2,
+            2,
+        )
+        .unwrap();
+        assert_eq!(storage, factor(rat(3, 4)));
+        assert_eq!(stiffness, factor(rat(1, 2)));
+        assert_eq!(storage_rem, old_carry);
+        assert_eq!(stiffness_rem, Carry::default());
+    }
+
+    #[test]
+    fn held_ck_refuses_landing_coarsening_bad_shape_and_noncanonical_carry_atomically() {
+        let old_lattice = Lattice::new(2);
+        let storage = factor(rat(3, 4));
+        let stiffness = factor(rat(1, 2));
+        let landing = Carry(BTreeMap::from([(0, rat(1, 32))]));
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &landing,
+                &Carry::default(),
+                old_lattice,
+                Lattice::new(4),
+                2,
+                2,
+            )
+            .is_err()
+        );
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &Carry::default(),
+                &Carry::default(),
+                Lattice::new(4),
+                old_lattice,
+                2,
+                2,
+            )
+            .is_err()
+        );
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &Carry(BTreeMap::from([(1, rat(1, 32))])),
+                &Carry::default(),
+                old_lattice,
+                Lattice::new(3),
+                2,
+                2,
+            )
+            .is_err()
+        );
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &Carry(BTreeMap::from([(0, rat(1, 16))])),
+                &Carry::default(),
+                old_lattice,
+                Lattice::new(3),
+                2,
+                2,
+            )
+            .is_err()
+        );
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &Carry(BTreeMap::from([(0, rat(1, 64))])),
+                &Carry::default(),
+                old_lattice,
+                Lattice::new(3),
+                2,
+                2,
+            )
+            .is_err()
+        );
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &Carry::default(),
+                &Carry::default(),
+                old_lattice,
+                Lattice::new(3),
+                2,
+                1,
+            )
+            .is_err()
+        );
+        assert_eq!(storage, factor(rat(3, 4)));
+        assert_eq!(stiffness, factor(rat(1, 2)));
+    }
+}
+
 /// `h_x' = h_x + Σ w|f|²`, carried on the family's lattice: the family's metric, whose unit step is
 /// `G_x / h_x'`. Refused when the carried statistic is not positive.
 fn advance(
@@ -12137,6 +12338,100 @@ impl Constitution {
         text_residue(&format!("{material:?}"))
     }
 
+    /// Exterior matched C/K control at this candidate's channel grains. Keep
+    /// every candidate field except the physical storage and stiffness forms
+    /// and their physical factor carries; re-express the predecessor's held
+    /// C/K carry losslessly at the candidate lattice under the old-form cap.
+    /// Dissipation, scales, clocks, current, passage, and all other carriers
+    /// remain the candidate's. This is a disposable comparison material, not a
+    /// deposition or publication law.
+    pub(crate) fn held_channel_storage_control(
+        &self,
+        predecessor: &Self,
+    ) -> Result<Self, HnnError> {
+        if self.material_identity() != predecessor.material_identity()
+            || self.contacts.len() != predecessor.contacts.len()
+            || self
+                .lattices
+                .keys()
+                .filter(|l| matches!(l, Locus::Channel(_)))
+                .ne(predecessor
+                    .lattices
+                    .keys()
+                    .filter(|l| matches!(l, Locus::Channel(_))))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a C/K control keeps its original material declarations and channel loci",
+            });
+        }
+        let mut control = self.clone();
+        for (contact, (candidate, old)) in control
+            .contacts
+            .iter_mut()
+            .zip(&predecessor.contacts)
+            .enumerate()
+        {
+            if !same_shape(&candidate.storage, &old.storage) {
+                return Err(HnnError::Shape {
+                    what: "held storage factor",
+                    expected: candidate.storage.entries().len(),
+                    found: old.storage.entries().len(),
+                });
+            }
+            if !same_shape(&candidate.stiffness, &old.stiffness) {
+                return Err(HnnError::Shape {
+                    what: "held stiffness factor",
+                    expected: candidate.stiffness.entries().len(),
+                    found: old.stiffness.entries().len(),
+                });
+            }
+            let locus = Locus::Channel(contact);
+            let candidate_lattice = self
+                .lattices
+                .get(&locus)
+                .copied()
+                .ok_or(HnnError::Lattice { locus })?;
+            let old_lattice = predecessor
+                .lattices
+                .get(&locus)
+                .copied()
+                .ok_or(HnnError::Lattice { locus })?;
+            let clock = |state: &Self| state.clocks.get(&locus).copied().unwrap_or(0);
+            let old_storage_carry = predecessor
+                .carries
+                .get(&(locus, Carrier::Factor(0)))
+                .cloned()
+                .unwrap_or_default();
+            let old_stiffness_carry = predecessor
+                .carries
+                .get(&(locus, Carrier::Factor(1)))
+                .cloned()
+                .unwrap_or_default();
+            let (storage, stiffness, storage_carry, stiffness_carry) = held_ck_at_lattice(
+                &old.storage,
+                &old.stiffness,
+                &old_storage_carry,
+                &old_stiffness_carry,
+                old_lattice,
+                candidate_lattice,
+                clock(predecessor),
+                clock(self),
+            )?;
+            candidate.storage = storage;
+            candidate.stiffness = stiffness;
+            for (carrier, carry) in [
+                (Carrier::Factor(0), storage_carry),
+                (Carrier::Factor(1), stiffness_carry),
+            ] {
+                control.carries.remove(&(locus, carrier));
+                if !carry.0.is_empty() {
+                    control.carries.insert((locus, carrier), carry);
+                }
+            }
+        }
+        Ok(control)
+    }
+
     /// Whether this constitution declares a locus (its ring or contact exists).
     fn declares(&self, locus: &Locus) -> bool {
         match *locus {
@@ -12723,21 +13018,73 @@ impl ContinuingState {
     /// Exterior matched C/K ablation. This is a disposable control chart, never
     /// a deposition/publication law: retain the candidate's complete motion,
     /// normals, statistics, D and clocks, while restoring only predecessor C/K
-    /// factors and their physical arithmetic fibres on the same channel lattice.
+    /// factors and their physical arithmetic fibres at the candidate channel
+    /// grain. A refinement uses the shared lossless re-base law and refuses if
+    /// any old carry would land in a held raw factor.
     pub fn held_channel_storage_control(&self, predecessor: &Self) -> Result<Self, HnnError> {
-        if self.material != predecessor.material || self.contacts.len() != predecessor.contacts.len()
-            || self.lattices.iter().filter(|(l,_)| matches!(l,Locus::Channel(_)))
-                .ne(predecessor.lattices.iter().filter(|(l,_)| matches!(l,Locus::Channel(_)))) {
-            return Err(HnnError::Unadmitted { reason: "a C/K control keeps its original material declaration and channel lattice" });
+        if self.material != predecessor.material
+            || self.contacts.len() != predecessor.contacts.len()
+            || self
+                .lattices
+                .keys()
+                .filter(|l| matches!(l, Locus::Channel(_)))
+                .ne(predecessor
+                    .lattices
+                    .keys()
+                    .filter(|l| matches!(l, Locus::Channel(_))))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a C/K control keeps its original material declaration and channel lattice",
+            });
         }
         let mut control = self.clone();
-        for (contact, (next, old)) in control.contacts.iter_mut().zip(&predecessor.contacts).enumerate() {
-            next.storage = old.storage.clone();
-            next.stiffness = old.stiffness.clone();
-            for family in 0..2 {
-                let key = (Locus::Channel(contact), Carrier::Factor(family));
-                control.carries.remove(&key);
-                if let Some(carry) = predecessor.carries.get(&key) { control.carries.insert(key, carry.clone()); }
+        for (contact, (next, old)) in control
+            .contacts
+            .iter_mut()
+            .zip(&predecessor.contacts)
+            .enumerate()
+        {
+            let locus = Locus::Channel(contact);
+            let candidate_lattice = self
+                .lattices
+                .get(&locus)
+                .copied()
+                .ok_or(HnnError::Lattice { locus })?;
+            let old_lattice = predecessor
+                .lattices
+                .get(&locus)
+                .copied()
+                .ok_or(HnnError::Lattice { locus })?;
+            let old_storage_carry = predecessor
+                .carries
+                .get(&(locus, Carrier::Factor(0)))
+                .cloned()
+                .unwrap_or_default();
+            let old_stiffness_carry = predecessor
+                .carries
+                .get(&(locus, Carrier::Factor(1)))
+                .cloned()
+                .unwrap_or_default();
+            let (storage, stiffness, storage_carry, stiffness_carry) = held_ck_at_lattice(
+                &old.storage,
+                &old.stiffness,
+                &old_storage_carry,
+                &old_stiffness_carry,
+                old_lattice,
+                candidate_lattice,
+                predecessor.clocks.get(&locus).copied().unwrap_or(0),
+                self.clocks.get(&locus).copied().unwrap_or(0),
+            )?;
+            next.storage = storage;
+            next.stiffness = stiffness;
+            for (carrier, carry) in [
+                (Carrier::Factor(0), storage_carry),
+                (Carrier::Factor(1), stiffness_carry),
+            ] {
+                control.carries.remove(&(locus, carrier));
+                if !carry.0.is_empty() {
+                    control.carries.insert((locus, carrier), carry);
+                }
             }
         }
         Ok(control)

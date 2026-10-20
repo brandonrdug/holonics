@@ -1,4 +1,4 @@
-//! Absolute receiver-ingress target for the existing opt-in observed channel-D scope.
+//! Absolute receiver-ingress target for explicit observed channel D and C/K/D scopes.
 //!
 //! [agent-inferred; 2026-10-20] L_target(a,N)=L_founding(a)+k(N). The old
 //! from-zero incremental schedule telescopes to this absolute target. A delayed opt-in

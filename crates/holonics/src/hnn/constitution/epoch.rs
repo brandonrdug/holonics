@@ -52,6 +52,8 @@ pub enum EpochStageCondition {
     JointTriangle,
     PumpTube,
     NonlinearFactorRay,
+    /// An optional channel rebase landed material but its original family has no fresh rate.
+    ChannelGrainFreshRate,
     SourceRefinementHalfCell,
     Lobe,
     CovectorScale,
@@ -195,6 +197,25 @@ pub(crate) struct EpochStageFailure {
     /// Transient same-batch preparation exists; not a retained or transferable certificate.
     pub(crate) normal_inputs_prepared: bool,
     pub(crate) channel_grain: Option<EpochChannelGrainReading>,
+}
+
+/// Closed optional-refinement refusal from its operative stage guard, never an opaque error.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum ChannelGrainRefinementRefusal {
+    FreshRate { contact: usize, family: usize },
+}
+
+impl EpochStageFailure {
+    pub(crate) fn channel_grain_refinement_refusal(&self) -> Option<ChannelGrainRefinementRefusal> {
+        match (&self.error, self.evidence.condition, self.evidence.locus, self.evidence.family) {
+            (HnnError::Unadmitted { .. }, EpochStageCondition::ChannelGrainFreshRate,
+                Some(Locus::Channel(contact)), Some(Family::Factor(family @ 0..=2))) =>
+                self.channel_grain.as_ref().is_some_and(|grain|
+                    grain.contacts.iter().any(|rebase|rebase.contact==contact&&rebase.levels>0))
+                    .then_some(ChannelGrainRefinementRefusal::FreshRate { contact, family }),
+            _ => None,
+        }
+    }
 }
 
 struct EpochStageTrace {
