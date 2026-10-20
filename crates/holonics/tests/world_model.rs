@@ -35,7 +35,7 @@ use holonics::navigator::Clock;
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::linear::inertia::SymmetricForm;
 use holonics::ratio::{Rat, integer, rat};
-use holonics::receiver::face::GrainCell;
+use holonics::hnn::receiving::ReceivingCell;
 use holonics::receiver::receipt::{ReceiptLaw, RegionChart};
 use holonics::receiver::reception::{JointLaw, ReceiverFace};
 use num_bigint::BigInt;
@@ -1338,8 +1338,8 @@ fn a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not
 /// phase `φ_c = Im f_c / 2`. Every cell's unresolved fibre is not part of it. The relative indices
 /// remove only a common offset of whole cells: a common raw shift that crosses a cell boundary can
 /// still move them.
-fn admitted(cells: &[GrainCell], phases: &[Rat], grain: u64) -> (Vec<BigInt>, Vec<BigInt>) {
-    let index = |cell: &GrainCell| &cell.carry * BigInt::from(grain) + BigInt::from(cell.phase);
+fn admitted(cells: &[ReceivingCell], phases: &[Rat], grain: u64) -> (Vec<BigInt>, Vec<BigInt>) {
+    let index = |cell: &ReceivingCell| &cell.carry * BigInt::from(grain) + BigInt::from(cell.phase);
     let first = index(&cells[0]);
     (
         cells[1..].iter().map(|cell| index(cell) - &first).collect(),

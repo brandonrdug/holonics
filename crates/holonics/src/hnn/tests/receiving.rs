@@ -26,7 +26,7 @@ use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::receiving::{
     ActiveAddress, Feature, FeatureFamily, LetterReader, RankScope, ReceivingPhases, ReceivingRead,
-    clock_letters, grain_logits, landmark_declaration, tree_code_length,
+    clock_letters, landmark_declaration, tree_code_length,
 };
 use crate::hnn::reference::{Reference, compose};
 use crate::hnn::ring::ResonatorMaterial;
@@ -339,13 +339,9 @@ fn the_field_declares_the_tree_and_codes_it() {
     assert!(source.entries().iter().any(|x| *x == rat(-1, 2)));
 }
 
-/// The read is `f_j = k(a_j)/L_R + R · v_R` (the combined face): the wave read in the passage frame
-/// (the anchor as it stands, whatever the receiving ring's lift), plus the tree face's grain logits
-/// at phase `j`'s address, read after the epoch's earlier targets (cell order); each class's
-/// real logit read at the grain, its imaginary logit (the wave's alone) halved into turns. The
-/// tree logits lie on the grain, so each cell is the wave's shifted by `k_c/L_R` exactly and keeps
-/// the wave's fibre; the tree's face sums to one exactly and its grain logits alone code each class
-/// within one grain of `−log₂ q(c)` (`grain_code_residual`).
+/// The combined class cell reads log2(q_tree)+R v once, preserving the logarithmic fibre's
+/// identity; the rational port coordinates and imaginary phase remain the wave's. Tree faces
+/// still read the actual prequential addresses and retain their exact executed probabilities.
 #[test]
 fn the_read_adds_the_trees_face_to_the_passage_frame_wave() {
     let field = &chain();
@@ -395,22 +391,35 @@ fn the_read_adds_the_trees_face_to_the_passage_frame_wave() {
     let map = medium.receiving_map(2).unwrap();
     let wave = map.apply(&anchor).unwrap();
     assert_eq!(wave_read.logits, wave);
-    let stored = grain_logits(&faces[0]);
     let read = ReceivingRead::combined(wave.clone(), &faces[0], 16).unwrap();
-    let combined: Vec<Rat> = wave.iter().zip(&stored).map(|(w, k)| w + k).collect();
-    assert_eq!(read.logits, combined);
+    // Rational port coordinates are explicitly the wave; no rational representative pretends
+    // to equal the generally irrational combined real logit.
+    assert_eq!(read.logits, wave);
     assert_eq!(read.logits.len(), 2 * field.alphabet());
     for (class, cell) in read.cells.iter().enumerate() {
-        assert_eq!(
-            cell.representative(16) + &cell.fibre,
-            read.logits[2 * class]
-        );
-        let alone = GrainCell::of(&wave[2 * class], 16);
-        assert_eq!(cell.fibre, alone.fibre);
-        assert_eq!(
-            cell.representative(16),
-            alone.representative(16) + &stored[2 * class]
-        );
+        let probability = &faces[0].probabilities[class];
+        let exact = crate::ratio::algebraic::log2_enclosure_at(
+            probability,
+            crate::ratio::algebraic::LOG_OCTAVES,
+        ).unwrap();
+        let enclosed = cell.enclosure_at(16, crate::ratio::algebraic::LOG_OCTAVES).unwrap();
+        assert!(enclosed.lower <= &exact.upper + &wave[2 * class]);
+        assert!(enclosed.upper >= &exact.lower + &wave[2 * class]);
+        let fibre = cell.fibre.enclosure_at(crate::ratio::algebraic::LOG_OCTAVES).unwrap();
+        assert!(fibre.lower >= Rat::zero());
+        assert!(fibre.upper <= rat(1, 16));
+        match &cell.fibre {
+            crate::hnn::receiving::ReceivingFibre::Rational(_) => {
+                assert_eq!(exact.lower, exact.upper);
+                assert_eq!(cell.rational_value(16).unwrap(), &exact.lower + &wave[2 * class]);
+            }
+            crate::hnn::receiving::ReceivingFibre::Logarithmic(identity) => {
+                assert_eq!(identity.probability(), probability);
+                assert_eq!(identity.wave(), &wave[2 * class]);
+                assert_eq!(identity.representative(), &cell.representative(16));
+                assert!(cell.rational_value(16).is_none());
+            }
+        }
         assert_eq!(read.phases[class], &wave[2 * class + 1] / integer(2));
     }
     assert!(phases.read(field, &medium, &anchor[..2]).is_err());

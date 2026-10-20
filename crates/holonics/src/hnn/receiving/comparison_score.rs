@@ -46,13 +46,7 @@ pub fn compare_scores_at(
         let before_mass = face_enclosure_at(before, target, bits)?;
         // This is exactly the existing epoch predicate. Fibres and produced phases do not
         // enter a class mass; every class's carry and phase, and the grain, do enter it.
-        let same_class_face = before.grain() == after.grain()
-            && before.cells().len() == after.cells().len()
-            && before
-                .cells()
-                .iter()
-                .zip(after.cells())
-                .all(|(a, b)| a.carry == b.carry && a.phase == b.phase);
+        let same_class_face = before.same_mass_face(after);
         let after_mass = if same_class_face {
             before_mass.clone()
         } else {

@@ -84,7 +84,7 @@ use crate::hnn::propagation::{
 };
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector};
 use crate::hnn::realization::{apply_rows, entries, indexed};
-use crate::hnn::receiving::{ReceivingPhases, ReceivingStep};
+use crate::hnn::receiving::{ReceivingFibre, ReceivingPhases, ReceivingStep};
 use crate::hnn::retention::AeonBoundary;
 use crate::hnn::ring::{ResonatorReturn, ReverseSplit};
 use crate::hnn::word::Word;
@@ -259,7 +259,7 @@ pub struct PortReceipt {
     pub rings: Receipt,
     pub balances: Vec<TickBalance>,
     pub work: ExactWork,
-    pub unresolved: Vec<Vec<Rat>>,
+    pub unresolved: Vec<Vec<ReceivingFibre>>,
     pub detail: ReceiptDetail,
 }
 
@@ -332,17 +332,19 @@ pub enum Transpose {
 }
 
 /// **The release's width, read from its receiving phases** (module header): over the epoch's
-/// faces, the largest fibre `ε_c`, the certified bound on how far any code length moves over the
-/// receiver's fibre (Lean `HNN/Ratio.face_code_length_within_grain`), in the supremum norm and
-/// attained at the widest `(phase, class)` coordinate; zero, attained at a point, when every logit
-/// sits on its cell's representative.
+/// faces, the largest certified upper endpoint of a fibre `ε_c`, bounding how far any code
+/// length moves over the receiver's fibre (Lean `HNN/Ratio.face_code_length_within_grain`).
+/// Rational fibres keep their exact old width. A logarithmic fibre remains its constraint
+/// identity in the receipt; its certified enclosure supplies this supremum-norm width, with
+/// the coordinate witnessing the widest enclosure. No enclosure endpoint is used as a logit.
 pub fn release_width(phases: &ReceivingPhases, faces: &Faces) -> Result<ReceiverWidth, HnnError> {
     let mut widest: Option<(usize, Rat)> = None;
     let mut coordinate = 0;
     for face in &faces.faces {
         for fibre in face.fibres() {
-            if widest.as_ref().is_none_or(|(_, width)| &fibre > width) {
-                widest = Some((coordinate, fibre));
+            let upper = fibre.enclosure_at(crate::ratio::algebraic::LOG_OCTAVES)?.upper;
+            if widest.as_ref().is_none_or(|(_, width)| &upper > width) {
+                widest = Some((coordinate, upper));
             }
             coordinate += 1;
         }
@@ -355,7 +357,7 @@ pub fn release_width(phases: &ReceivingPhases, faces: &Faces) -> Result<Receiver
     };
     ReceiverWidth::declared(
         format!("receiving ring {}", phases.ring()),
-        "the code lengths of the pending ratio's faces over the receiver's fibre at its grain",
+        "the certified fibre enclosures of the pending ratio's code lengths at its grain",
         DiameterNorm::Supremum,
         diameter,
         attaining,

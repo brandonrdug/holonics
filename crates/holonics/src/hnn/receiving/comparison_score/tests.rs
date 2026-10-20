@@ -391,6 +391,13 @@ fn malformed_tree_target_is_a_fatal_typed_refusal_without_population_change() {
 // Exact public-source v27 frozen-R receipt: v23 cell 0, target class 0.
 // This fixture documents an existing law, not a proposed rounding correction.
 // See the private audit's pinned control.log SHA and selected receipt JSON.
+fn legacy_combined(wave: Vec<Rat>, tree: &LandmarkFace) -> ReceivingRead {
+    let logits = wave.into_iter().zip(super::super::grain_logits(tree))
+        .map(|(wave, stored)| wave + stored).collect();
+    ReceivingRead::of_logits(logits, tree.grain)
+}
+
+// This helper intentionally recreates the retired double-grain read for historical controls.
 fn v27_first_frozen_receipt() -> (LandmarkFace, Vec<Rat>) {
     let q = |n: &str, d: &str| Rat::new(n.parse().unwrap(), d.parse().unwrap());
     let tree = tree(vec![
@@ -413,11 +420,11 @@ fn v27_first_frozen_receipt() -> (LandmarkFace, Vec<Rat>) {
 }
 
 #[test]
-fn actual_v27_tiny_negative_wave_borrows_a_full_grain_and_positive_wave_stays_in_cell() {
+fn legacy_v27_tiny_negative_wave_borrows_a_full_grain_and_positive_wave_stays_in_cell() {
     let (tree, wave) = v27_first_frozen_receipt();
     assert_eq!(tree.probabilities.iter().sum::<Rat>(), rat(1, 1));
-    let before = ReceivingRead::combined(vec![rat(0, 1); 8], &tree, GRAIN).unwrap();
-    let after = ReceivingRead::combined(wave.clone(), &tree, GRAIN).unwrap();
+    let before = legacy_combined(vec![rat(0, 1); 8], &tree);
+    let after = legacy_combined(wave.clone(), &tree);
     assert_eq!(before.cells[0].carry, BigInt::from(-4));
     assert_eq!(before.cells[0].phase, 0);
     assert_eq!(after.cells[0].carry, BigInt::from(-5));
@@ -432,19 +439,14 @@ fn actual_v27_tiny_negative_wave_borrows_a_full_grain_and_positive_wave_stays_in
         assert_eq!(after.cells[class].phase, before.cells[class].phase);
     }
     // An arbitrarily smaller same-sign wave still has the same magnitude face here.
-    let tiny = ReceivingRead::combined(
-        wave.iter().map(|x| x / rat(1024, 1)).collect(),
-        &tree,
-        GRAIN,
-    )
-    .unwrap();
+    let tiny = legacy_combined(wave.iter().map(|x| x / rat(1024, 1)).collect(), &tree);
     for (native, tiny) in after.cells.iter().zip(&tiny.cells) {
         assert_eq!(native.carry, tiny.carry);
         assert_eq!(native.phase, tiny.phase);
     }
     let mut positive_wave = wave;
     positive_wave[0] = -positive_wave[0].clone();
-    let positive = ReceivingRead::combined(positive_wave, &tree, GRAIN).unwrap();
+    let positive = legacy_combined(positive_wave, &tree);
     for (old, new) in before.cells.iter().zip(&positive.cells) {
         assert_eq!(old.carry, new.carry);
         assert_eq!(old.phase, new.phase);
@@ -463,7 +465,7 @@ fn actual_v27_tiny_negative_wave_borrows_a_full_grain_and_positive_wave_stays_in
 }
 
 #[test]
-fn existing_native_objective_can_improve_phase_while_magnitude_class_code_worsens() {
+fn legacy_read_can_improve_phase_while_magnitude_class_code_worsens() {
     let (tree, actual_wave) = v27_first_frozen_receipt();
     // The magnitude operands are from that actual receipt. The two imaginary rows below form
     // an explicit algebraic control, not a claim about an executed training candidate.
@@ -473,8 +475,8 @@ fn existing_native_objective_can_improve_phase_while_magnitude_class_code_worsen
     for row in (1..8).step_by(2) {
         after_wave[row] = rat(0, 1);
     }
-    let before_read = ReceivingRead::combined(before_wave, &tree, GRAIN).unwrap();
-    let after_read = ReceivingRead::combined(after_wave, &tree, GRAIN).unwrap();
+    let before_read = legacy_combined(before_wave, &tree);
+    let after_read = legacy_combined(after_wave, &tree);
     let before = Faces::of_reads(&[before_read], GRAIN).unwrap();
     let after = Faces::of_reads(&[after_read], GRAIN).unwrap();
     let target = TargetPhases {

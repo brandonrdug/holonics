@@ -8,7 +8,7 @@ use crate::ratio::linear::ExactRatMatrix;
 use crate::receiver::release::ClassCommit;
 
 /// Three distinct executed operands at one pre-reception cut. The combined face includes the
-/// wave and the tree's grain logits; the executed tree is its original rational face.
+/// wave and exact tree logarithm, read at one grain; the executed tree is its rational face.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ScoredFaceDiagnostic {
     pub reading_bits: u32,
@@ -206,7 +206,7 @@ pub fn compare_readout_class_codes_at(
         .map_err(population_refusal)?;
     let log_tree = crate::ratio::algebraic::log2_enclosure_at(&tree_mass, bits)?;
     let tree_code = ExactInterval::new(-log_tree.upper, -log_tree.lower)?;
-    let combined_change = if reading.combined == control_face {
+    let combined_change = if reading.combined.same_mass_face(&control_face) {
         ComparedFace::Shared(native_combined)
     } else {
         ComparedFace::Changed {
@@ -251,6 +251,49 @@ mod tests {
     use super::*;
     use crate::hnn::receiving::receiving_population;
     use crate::ratio::{integer, rat};
+
+    #[test]
+    fn single_grain_readout_same_mass_cells_share_code_but_keep_phase_and_fibre() {
+        let tree = LandmarkFace {
+            grain: 8,
+            probabilities: vec![rat(3, 4), rat(1, 4)],
+            exponents: vec![(-4).into(), (-16).into()],
+        };
+        let feature = vec![integer(1)];
+        let native_map = ExactRatMatrix::zero(4, 1).unwrap();
+        let control_map = ExactRatMatrix::new(vec![
+            vec![rat(1, 64)], vec![rat(1, 4)], vec![integer(0)], vec![integer(0)],
+        ]).unwrap();
+        let native_wave = native_map.apply(&feature).unwrap();
+        let control_wave = control_map.apply(&feature).unwrap();
+        let native_read = ReceivingRead::combined(native_wave.clone(), &tree, 8).unwrap();
+        let control_read = ReceivingRead::combined(control_wave.clone(), &tree, 8).unwrap();
+        let native_face = Face::of_read(&native_read, 8).unwrap();
+        let control_face = Face::of_read(&control_read, 8).unwrap();
+        assert!(native_face.same_mass_face(&control_face));
+        assert_ne!(native_face.fibres(), control_face.fibres());
+        assert_ne!(native_face.phases(), control_face.phases());
+        assert_ne!(native_face, control_face);
+        let reading = ScoredFaceReading::new(&receiving_population(), &tree, &native_face);
+        let before = reading.clone();
+        let codes = compare_readout_class_codes_at(
+            &reading, &tree, &feature, &native_map, &native_wave, &control_map, 0, READING_BITS,
+        ).unwrap();
+        assert_eq!(codes.native_code, codes.control_code);
+        assert_eq!(codes.native_minus_control, ExactInterval::point(integer(0)));
+        let phase_target = crate::hnn::ratio::TargetPhases {
+            branch: 0.into(), phases: vec![integer(0)],
+        };
+        let comparison = |face: Face, wave: Vec<Rat>| {
+            crate::hnn::ratio::HolonRatio::compare(
+                crate::hnn::ratio::Faces { faces: vec![face], logits: vec![wave] },
+                &[0], &phase_target,
+            ).unwrap()
+        };
+        assert_eq!(comparison(native_face, native_wave).excess(), integer(0));
+        assert_eq!(comparison(control_face, control_wave).excess(), rat(1, 128));
+        assert_eq!(reading, before);
+    }
 
     fn material() -> (ScoredFaceReading, LandmarkFace, ExactRatMatrix) {
         let tree = LandmarkFace {

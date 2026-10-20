@@ -5,10 +5,12 @@
 use super::*;
 use crate::compression::landmark::context::LandmarkFace;
 use crate::hnn::constitution::ReceivingLayout;
-use crate::hnn::receiving::cells::ScoredFaceReading;
-use crate::hnn::receiving::cells::diagnostic::{ReadoutMapDiagnostic, compare_readout_maps_at};
 use crate::hnn::receiving::ReceivingCarrier;
-use crate::hnn::receiving::cells::diagnostic::{ReadoutClassCodeDiagnostic, compare_readout_class_codes_at};
+use crate::hnn::receiving::cells::ScoredFaceReading;
+use crate::hnn::receiving::cells::diagnostic::{
+    ReadoutClassCodeDiagnostic, compare_readout_class_codes_at,
+};
+use crate::hnn::receiving::cells::diagnostic::{ReadoutMapDiagnostic, compare_readout_maps_at};
 
 /// Exterior provenance and both operative R reads from one pending aperture-one word. The
 /// control is a readout substitution on fixed features, never a replacement live constitution.
@@ -33,6 +35,11 @@ pub struct PendingReadoutDiagnostic {
 pub struct TargetPrefixReadoutControlReceipt {
     pub diagnostic: PendingReadoutDiagnostic,
     pub codes: ReadoutClassCodeDiagnostic,
+    /// The actual encoded target and both produced phases use the same passage frame.
+    pub target_phase: Rat,
+    pub native_phase_excess: Rat,
+    pub control_phase_excess: Rat,
+    pub native_minus_control_phase_excess: Rat,
     pub ingestion: IngestClassReceipt,
 }
 
@@ -94,7 +101,7 @@ impl Reference {
                 "a target-prefix control keeps the caller's frozen native receiving map",
             ));
         }
-        admit_observed_cell(resident, crib, pairing, target, placement)?;
+        let (_, encoded_target) = admit_observed_cell(resident, crib, pairing, target, placement)?;
         let codes = compare_readout_class_codes_at(
             &diagnostic.scored_face,
             &diagnostic.tree,
@@ -107,6 +114,34 @@ impl Reference {
         )?;
         let phases = slot.ratio.phases();
         let receiver = phases.ring();
+        let target_phase = crate::hnn::ratio::target_phases(
+            &resident.field,
+            slot.ratio.anchor(),
+            receiver,
+            &encoded_target,
+        )?
+        .phases
+        .into_iter()
+        .next()
+        .ok_or_else(|| refuse("a one-cell readout control keeps its actual target phase"))?;
+        // HolonRatio::compare uses precisely half the squared unwrapped phase gap.
+        // The tree contributes no imaginary logit; all produced phase data are rational.
+        let phase_row = target
+            .checked_mul(2)
+            .and_then(|r| r.checked_add(1))
+            .ok_or(HnnError::CountOverflow)?;
+        let phase_excess = |wave: &[Rat]| -> Result<Rat, HnnError> {
+            let produced = wave.get(phase_row).ok_or(HnnError::Shape {
+                what: "a readout control's actual target phase row",
+                expected: phase_row + 1,
+                found: wave.len(),
+            })? / integer(2);
+            let gap = &target_phase - produced;
+            Ok(&gap * &gap / integer(2))
+        };
+        let native_phase_excess = phase_excess(&diagnostic.readout.native_wave_logits)?;
+        let control_phase_excess = phase_excess(&diagnostic.readout.control_wave_logits)?;
+        let native_minus_control_phase_excess = &native_phase_excess - &control_phase_excess;
         let kept = slot
             .kept
             .as_ref()
@@ -162,10 +197,13 @@ impl Reference {
         Ok(TargetPrefixReadoutControlReceipt {
             diagnostic,
             codes,
+            target_phase,
+            native_phase_excess,
+            control_phase_excess,
+            native_minus_control_phase_excess,
             ingestion,
         })
     }
-
 
     /// Compare the native and a declared control R on the *same actual kept-word feature*.
     /// This aperture-one Physical/Anchor diagnostic freezes the tree and the population before
@@ -179,9 +217,12 @@ impl Reference {
         bits: u32,
     ) -> Result<PendingReadoutDiagnostic, HnnError> {
         resident.admit_exact_current()?;
-        let slot = resident.pending.get(pending).ok_or(HnnError::UnknownHandle {
-            handle: Handle::Pending(*pending),
-        })?;
+        let slot = resident
+            .pending
+            .get(pending)
+            .ok_or(HnnError::UnknownHandle {
+                handle: Handle::Pending(*pending),
+            })?;
         let phases = slot.ratio.phases();
         let ring = phases.ring();
         let theta = &resident.constitution;
@@ -201,9 +242,11 @@ impl Reference {
                 reason: "a pending readout control refuses a changed producing constitution",
             });
         }
-        let features = resident.receiving_inputs(pending, phases)?.ok_or(HnnError::Unadmitted {
-            reason: "a pending readout control has no producing receiving feature",
-        })?;
+        let features = resident
+            .receiving_inputs(pending, phases)?
+            .ok_or(HnnError::Unadmitted {
+                reason: "a pending readout control has no producing receiving feature",
+            })?;
         let [feature] = features.as_slice() else {
             return Err(HnnError::Unadmitted {
                 reason: "a pending readout control preserves one complete producing feature",
@@ -211,7 +254,11 @@ impl Reference {
         };
         let native_read = phases.read(&resident.field, theta, feature)?;
         if kept.faces.logits.as_slice() != [native_read.logits.clone()]
-            || kept.faces.faces.as_slice() != [crate::hnn::ratio::Face::of_read(&native_read, phases.grain())?]
+            || kept.faces.faces.as_slice()
+                != [crate::hnn::ratio::Face::of_read(
+                    &native_read,
+                    phases.grain(),
+                )?]
         {
             return Err(HnnError::Unadmitted {
                 reason: "a pending readout control reconstructs its exact kept native read",
@@ -232,7 +279,13 @@ impl Reference {
         let native_map = ConstitutionRead::receiving_map(theta, ring)
             .ok_or(HnnError::MissingReceivingMap { ring })?;
         let readout = compare_readout_maps_at(
-            &scored_face, tree, feature, native_map, &native_read.logits, control_map, bits,
+            &scored_face,
+            tree,
+            feature,
+            native_map,
+            &native_read.logits,
+            control_map,
+            bits,
         )?;
         Ok(PendingReadoutDiagnostic {
             pending: *pending,
@@ -258,7 +311,10 @@ mod tests {
     #[test]
     fn pending_readout_control_consumes_the_actual_kept_word_without_teaching() {
         let base = small_field_of(
-            &[5, 2, 3], vec![contact(0, 1, 1, 0), contact(1, 2, 1, 0)], 2, 4,
+            &[5, 2, 3],
+            vec![contact(0, 1, 1, 0), contact(1, 2, 1, 0)],
+            2,
+            4,
         );
         let mut declaration = base.declaration().clone();
         declaration.receivers[0].aperture = 1;
@@ -267,26 +323,55 @@ mod tests {
         let phases = field.receivers().first().unwrap();
         let map = material.receiving_law(phases.ring).unwrap().map().clone();
         let reference = Reference::new(16, 1 << 40);
-        let mut resident = reference.mount_with(&field, &Current::at_rest(&field), material).unwrap();
-        let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[0, 1, 2])).unwrap();
+        let mut resident = reference
+            .mount_with(&field, &Current::at_rest(&field), material)
+            .unwrap();
+        let (moment, _) = reference
+            .ingest(&mut resident, None, &encoded(&field, &[0, 1, 2]))
+            .unwrap();
         let phases = resident.admitted[0].clone();
         let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
         // A live kept comparison is intentionally not checkpointable. Compare the complete
         // actual resident, including its kept word, without crossing that checkpoint guard.
         let before = format!("{resident:?}");
-        let diagnostic = reference.diagnose_pending_readout(&resident, &pending, &map, READING_BITS).unwrap();
+        let diagnostic = reference
+            .diagnose_pending_readout(&resident, &pending, &map, READING_BITS)
+            .unwrap();
         assert_eq!(diagnostic.readout.native, diagnostic.readout.control);
-        assert_eq!(diagnostic.readout.native_wave_logits,
-            resident.pending[&pending].kept.as_ref().unwrap().faces.logits[0]);
+        assert_eq!(
+            diagnostic.readout.native_wave_logits,
+            resident.pending[&pending]
+                .kept
+                .as_ref()
+                .unwrap()
+                .faces
+                .logits[0]
+        );
         assert_eq!(diagnostic.source_cells, 3);
         assert_eq!(format!("{resident:?}"), before);
         assert!(resident.holds_kept_read(&pending));
         let malformed = ExactRatMatrix::new(vec![vec![integer(0)]]).unwrap();
-        assert!(reference.diagnose_pending_readout(&resident, &pending, &malformed, READING_BITS).is_err());
+        assert!(
+            reference
+                .diagnose_pending_readout(&resident, &pending, &malformed, READING_BITS)
+                .is_err()
+        );
         assert_eq!(format!("{resident:?}"), before);
-        resident.pending.get_mut(&pending).unwrap().kept.as_mut().unwrap().faces.logits[0][0] += integer(1);
+        resident
+            .pending
+            .get_mut(&pending)
+            .unwrap()
+            .kept
+            .as_mut()
+            .unwrap()
+            .faces
+            .logits[0][0] += integer(1);
         let corrupt = format!("{resident:?}");
-        assert!(reference.diagnose_pending_readout(&resident, &pending, &map, READING_BITS).is_err());
+        assert!(
+            reference
+                .diagnose_pending_readout(&resident, &pending, &map, READING_BITS)
+                .is_err()
+        );
         assert_eq!(format!("{resident:?}"), corrupt);
     }
     fn target_opening(
@@ -391,6 +476,22 @@ mod tests {
             );
             let commit = resident.constitution.commit();
             let grain = phases.grain();
+            let (_, encoded_target) =
+                admit_observed_cell(&resident, &crib, &pairing, target, None).unwrap();
+            let target_phases = crate::hnn::ratio::target_phases(
+                &resident.field,
+                slot.ratio.anchor(),
+                ring,
+                &encoded_target,
+            )
+            .unwrap();
+            let expected_phase_excess = crate::hnn::ratio::HolonRatio::compare(
+                against.faces.clone(),
+                &[target],
+                &target_phases,
+            )
+            .unwrap()
+            .excess();
             let receipt = port
                 .receive_target_prefix_readout_control(
                     &mut resident,
@@ -420,6 +521,10 @@ mod tests {
                 ExactInterval::point(integer(0))
             );
             assert_eq!(receipt.diagnostic.tree.grain, grain);
+            assert_eq!(receipt.native_phase_excess, expected_phase_excess);
+            assert_eq!(receipt.control_phase_excess, expected_phase_excess);
+            assert_eq!(receipt.native_minus_control_phase_excess, Rat::zero());
+            assert_eq!(receipt.target_phase, target_phases.phases[0]);
             assert_eq!(
                 resident.constitution.landmarks(ring),
                 expected.landmarks(ring)

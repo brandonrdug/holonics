@@ -2,7 +2,7 @@
 //!
 //! [definition] The loss is the logarithm of a ratio of Holons (design (a), `compare`; "Exact
 //! charts"). At receiving phase `j` the produced Holon `|H⟩` is the logit vector
-//! `f_j = k(a_j)/L_R + R v_R(e_j)` (`v_R` in the passage frame), the landmark tree's grain logits at phase `j`'s causal
+//! `f_j = log2(q_T(. | a_j)) + R v_R(e_j)` (`v_R` in the passage frame), the landmark tree's grain logits at phase `j`'s causal
 //! address plus the wave (the landmark tree, `hnn::receiving::ReceivingRead::combined`; the covector below
 //! is read on this combined face and flows back through `R` alone), and the target `|T⟩` is the byte
 //! `t_j` read in the same exterior chart that `E` reads: the one-hot `q_j`, with the receiving
@@ -72,7 +72,7 @@ use crate::ratio::exponentiated::{CarriedPower, PhaseField};
 use crate::ratio::exponentiated::{READING_BITS, power_of_two};
 use crate::ratio::gaussian::GaussianRat;
 use crate::ratio::{LogRatio, Rat, integer};
-use crate::receiver::face::GrainCell;
+use crate::hnn::receiving::{ReceivingCell, ReceivingFibre};
 
 // -------------------------------------------------------------------------------------------
 // enclosures of the real chart (the base-two logarithms and their sums are
@@ -127,7 +127,7 @@ pub(crate) fn power_of_two_enclosure(x: &Rat) -> Result<ExactInterval, HnnError>
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Face {
     grain: u64,
-    cells: Vec<GrainCell>,
+    cells: Vec<ReceivingCell>,
     phases: Vec<Rat>,
     top: BigInt,
     normalizer: PhaseField,
@@ -151,6 +151,7 @@ impl Face {
             .expect("at least one class");
         let mut normalizer = PhaseField::zero(grain);
         for cell in &read.cells {
+            cell.admit(grain)?;
             normalizer = normalizer
                 .plus(&CarriedPower::new(&cell.carry - &top, cell.phase, grain)?.value()?)?;
         }
@@ -169,12 +170,22 @@ impl Face {
     }
 
     /// The classes' grain cells.
-    pub fn cells(&self) -> &[GrainCell] {
+    pub fn cells(&self) -> &[ReceivingCell] {
         &self.cells
     }
 
-    /// The receiver's fibre `ε_c` per class, returned and never consumed as a value.
-    pub fn fibres(&self) -> Vec<Rat> {
+    /// Equality of the executed magnitude expression only. Fibres, wave coordinates and
+    /// produced phases remain authentic operands and are not identified by this predicate.
+    pub fn same_mass_face(&self, other: &Self) -> bool {
+        self.grain == other.grain
+            && self.cells.len() == other.cells.len()
+            && self.cells.iter().zip(&other.cells)
+                .all(|(a,b)| a.carry == b.carry && a.phase == b.phase)
+    }
+
+    /// The receiver's exact fibre identity per class, rational or logarithmic.
+    /// An enclosure endpoint is never substituted for the identity.
+    pub fn fibres(&self) -> Vec<ReceivingFibre> {
         self.cells.iter().map(|cell| cell.fibre.clone()).collect()
     }
 
@@ -284,7 +295,9 @@ impl Face {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Faces {
     pub faces: Vec<Face>,
-    /// The exact logits `f_j` behind each face (realified `[Re, Im, …]`), a reading of the word.
+    /// Rational port/wave coordinates, realified. A combined face retains log2(q_tree)
+    /// in its typed cell fibre; these coordinates do not claim that irrational sum is rational.
+    /// The exact full real value is cell representative plus typed fibre.
     pub logits: Vec<Vec<Rat>>,
 }
 

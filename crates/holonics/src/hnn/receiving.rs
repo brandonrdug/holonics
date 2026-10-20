@@ -13,7 +13,7 @@
 //!
 //! ```text
 //! a_j = [x_(p+j−1), …, x_p, x_(p−1), …]_D        phase j's address: the epoch's earlier targets, then the active suffix address
-//! f_j = k(a_j)/L_R + R · v_R(e_j)                complex logits over |A| classes, realified [Re, Im, …], v_R in the passage frame
+//! f_j = log2(q_T(. | a_j)) + R · v_R(e_j)                complex logits over |A| classes, realified [Re, Im, …], v_R in the passage frame
 //! 2^(k_c) ≤ q(c | a_j)^(L_R) < 2^(k_c+1)         the tree face's grain exponent (integer comparisons)
 //! Re f_c = n_c + k_c/L_R + ε_c,  ε_c ∈ [0, 1/L_R)   the grain cell (carry, phase class) and the fibre
 //! φ^H_c = Im f_c / 2                             each class's phase, in turns
@@ -150,6 +150,8 @@
 use std::ops::Range;
 
 pub mod cells;
+mod single_grain;
+pub use single_grain::{LogarithmicFibre, ReceivingCell, ReceivingFibre};
 mod comparison_score;
 pub use comparison_score::{ComparedScoresAt, compare_scores_at};
 mod declaration;
@@ -209,12 +211,14 @@ pub fn tree_code_length(face: &LandmarkFace, class: usize) -> Result<ExactInterv
     Face::of_read(&read, face.grain)?.code_length(class)
 }
 
-/// [definition] **One receiving read**: the exact realified logits `f`, each class's grain cell of
-/// `Re f_c`, and each class's phase `φ^H_c = Im f_c / 2` in turns.
+/// One receiving read: rational realified port coordinates, each class's exact grain read,
+/// and phase Im/2. For a wave alone logits is its full rational logit; a combined read keeps
+/// that same rational wave component and carries log2(q_tree) in its cells' typed fibres.
+/// The full real value is never represented by a rational logit surrogate.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceivingRead {
     pub logits: Vec<Rat>,
-    pub cells: Vec<GrainCell>,
+    pub cells: Vec<ReceivingCell>,
     pub phases: Vec<Rat>,
 }
 
@@ -225,7 +229,7 @@ impl ReceivingRead {
     pub fn of_logits(logits: Vec<Rat>, grain: u64) -> Self {
         let classes = logits.len() / 2;
         let cells = indexed(classes, |class| {
-            Ok::<_, HnnError>(GrainCell::of(&logits[2 * class], grain))
+            Ok::<_, HnnError>(ReceivingCell::from(GrainCell::of(&logits[2 * class], grain)))
         })
         .expect("a grain reading refuses nothing");
         let phases = logits.chunks(2).map(|pair| &pair[1] / integer(2)).collect();
@@ -236,31 +240,17 @@ impl ReceivingRead {
         }
     }
 
-    /// **The combined read** (module header): the wave's exact logits `R v_R` plus the
-    /// tree face's grain logits, read at the grain. Refused when the two disagree in length or
-    /// grain. The host reference and every device realization form their faces here.
+    /// One grain read of the exact sum log2(q_tree) + wave, never of the tree's
+    /// already-grained representative plus wave. The exact tree fibre remains a typed
+    /// logarithmic identity; only a straddled cell asks the native log owner for more bits.
+    ///
+    /// logits keeps rational wave/port coordinates, not an approximate full real logit.
+    /// The full real value is the cell representative plus its typed fibre, readable through
+    /// ReceivingCell::enclosure_at. Imaginary coordinates and their phase pullback are unchanged.
     pub fn combined(wave: Vec<Rat>, tree: &LandmarkFace, grain: u64) -> Result<Self, HnnError> {
-        let stored = grain_logits(tree);
-        if stored.len() != wave.len() || tree.grain != grain {
-            return Err(HnnError::Shape {
-                what: "the tree face's grain logits against the wave's logits",
-                expected: wave.len(),
-                found: stored.len(),
-            });
-        }
-        let logits = wave
-            .into_iter()
-            .zip(stored)
-            .map(|(wave, stored)| {
-                if stored.is_zero() {
-                    wave
-                } else {
-                    wave + stored
-                }
-            })
-            .collect();
-        Ok(Self::of_logits(logits, grain))
+        single_grain::combined(wave, tree, grain)
     }
+
 }
 
 // -------------------------------------------------------------------------------------------

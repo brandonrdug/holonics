@@ -23,14 +23,7 @@ use crate::receiver::face::GrainCell;
 
 /// A receiving read of realified logits `[Re, Im, …]` at a grain.
 fn read(logits: Vec<Rat>, grain: u64) -> ReceivingRead {
-    ReceivingRead {
-        cells: logits
-            .chunks(2)
-            .map(|pair| GrainCell::of(&pair[0], grain))
-            .collect(),
-        phases: logits.chunks(2).map(|pair| &pair[1] / integer(2)).collect(),
-        logits,
-    }
+    ReceivingRead::of_logits(logits, grain)
 }
 
 fn logits(values: &[(Rat, Rat)]) -> Vec<Rat> {

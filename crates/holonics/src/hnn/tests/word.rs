@@ -9,7 +9,7 @@ use super::support::Medium;
 use crate::hnn::HnnError;
 use crate::hnn::field::{Current, Field};
 use crate::hnn::moment::SourceMoment;
-use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, ReceivingRead, grain_logits};
+use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, ReceivingRead};
 use crate::hnn::tests::support::encoded;
 use crate::hnn::word::Word;
 use crate::ratio::{Rat, integer};
@@ -142,7 +142,10 @@ fn the_initial_constitution_opens_an_empty_word() {
         let wave = phases.read(field, &medium, &anchor).unwrap();
         assert!(wave.logits.iter().all(Zero::is_zero));
         let read = ReceivingRead::combined(wave.logits, tree, phases.grain()).unwrap();
-        assert_eq!(read.logits, grain_logits(tree));
+        assert!(read.logits.iter().all(Zero::is_zero), "rational port coordinates remain the zero wave");
+        assert!(read.cells.iter().all(|cell| {
+            cell.rational_value(phases.grain()) == Some(crate::ratio::integer(-2))
+        }), "uniform power-of-two tree logits remain exactly -2");
         assert!(read.logits.iter().skip(1).step_by(2).all(Zero::is_zero));
         assert!(
             read.cells

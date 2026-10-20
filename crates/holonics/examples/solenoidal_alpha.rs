@@ -415,7 +415,11 @@ fn frozen_r_target_prefix(checkpoint: &Checkpoint, target: &[u8]) -> Result<Stri
     }
     let targets = digits(target);
     let count = u64::try_from(targets.len())?;
-    if checkpoint.stream.accepted_cells()?.checked_add(count).ok_or("target horizon overflow")?
+    if checkpoint
+        .stream
+        .accepted_cells()?
+        .checked_add(count)
+        .ok_or("target horizon overflow")?
         > checkpoint.population
     {
         return Err("the frozen-R target prefix exceeds the declared source horizon".into());
@@ -424,75 +428,214 @@ fn frozen_r_target_prefix(checkpoint: &Checkpoint, target: &[u8]) -> Result<Stri
     let reference = port();
     let (field, founding, pairing) = declaration(checkpoint.population)?;
     let (mut resident, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
-    let receiver = resident.admitted().first().ok_or("no native receiver")?.ring();
-    let frozen = resident.constitution().receiving_map(receiver)
-        .ok_or("native receiving map is missing")?.clone();
-    let control = founding.receiving_law(receiver)
-        .ok_or("founding receiving map is missing")?.map().clone();
-    let laws = |resident: &Resident| (0..field.rings().len()).map(|ring| (
-        resident.constitution().source_law(ring).cloned(),
-        resident.constitution().contrast_law(ring).clone(),
-        resident.constitution().receiving_law(ring).cloned(),
-    )).collect::<Vec<_>>();
+    let receiver = resident
+        .admitted()
+        .first()
+        .ok_or("no native receiver")?
+        .ring();
+    let frozen = resident
+        .constitution()
+        .receiving_map(receiver)
+        .ok_or("native receiving map is missing")?
+        .clone();
+    let control = founding
+        .receiving_law(receiver)
+        .ok_or("founding receiving map is missing")?
+        .map()
+        .clone();
+    let laws = |resident: &Resident| {
+        (0..field.rings().len())
+            .map(|ring| {
+                (
+                    resident.constitution().source_law(ring).cloned(),
+                    resident.constitution().contrast_law(ring).clone(),
+                    resident.constitution().receiving_law(ring).cloned(),
+                )
+            })
+            .collect::<Vec<_>>()
+    };
     let laws_before = laws(&resident);
     let commit_before = resident.constitution().commit();
     let mut sums = vec![ExactInterval::point(integer(0)); 6];
+    let mut phase_sums = vec![integer(0); 3];
     let mut events = Vec::new();
     let started = Instant::now();
     for (at, &class) in targets.iter().enumerate() {
         let cell_started = Instant::now();
-        let moment = resident.continuing().ok_or("target prefix has no continuing source")?.0;
-        let phases = resident.admitted().first().ok_or("no native receiver")?.clone();
+        let moment = resident
+            .continuing()
+            .ok_or("target prefix has no continuing source")?
+            .0;
+        let phases = resident
+            .admitted()
+            .first()
+            .ok_or("no native receiver")?
+            .clone();
         let (pending, refined) = reference.refine(&mut resident, &moment, &phases)?;
         let receipt = reference.receive_target_prefix_readout_control(
-            &mut resident, &mut crib, &pairing, pending, class, &frozen, &control,
-            holonics::ratio::exponentiated::READING_BITS, None,
+            &mut resident,
+            &mut crib,
+            &pairing,
+            pending,
+            class,
+            &frozen,
+            &control,
+            holonics::ratio::exponentiated::READING_BITS,
+            None,
         )?;
         let codes = &receipt.codes;
+        for (sum, value) in phase_sums.iter_mut().zip([
+            &receipt.native_phase_excess,
+            &receipt.control_phase_excess,
+            &receipt.native_minus_control_phase_excess,
+        ]) {
+            *sum += value;
+        }
         for (sum, value) in sums.iter_mut().zip([
-            &codes.native_code, &codes.control_code, &codes.tree_code,
-            &codes.native_minus_control, &codes.native_minus_tree, &codes.control_minus_tree,
+            &codes.native_code,
+            &codes.control_code,
+            &codes.tree_code,
+            &codes.native_minus_control,
+            &codes.native_minus_tree,
+            &codes.control_minus_tree,
         ]) {
             *sum = ExactInterval::new(&sum.lower + &value.lower, &sum.upper + &value.upper)?;
         }
         events.push(object(&[
-            ("index", at.to_string()), ("target_base4_class", class.to_string()),
-            ("target_denotes", quoted("actual observed base-4 digit of the pinned target byte passage")),
-            ("source_cells_before_target", receipt.diagnostic.source_cells.to_string()),
+            ("index", at.to_string()),
+            ("target_base4_class", class.to_string()),
+            (
+                "target_denotes",
+                quoted("actual observed base-4 digit of the pinned target byte passage"),
+            ),
+            (
+                "source_cells_before_target",
+                receipt.diagnostic.source_cells.to_string(),
+            ),
             ("reading_bits", codes.reading_bits.to_string()),
             ("native_bits", interval(&codes.native_code)),
-            ("founding_R_same_feature_bits", interval(&codes.control_code)),
+            ("target_phase", rational(&receipt.target_phase)),
+            (
+                "native_phase_excess",
+                rational(&receipt.native_phase_excess),
+            ),
+            (
+                "founding_R_phase_excess",
+                rational(&receipt.control_phase_excess),
+            ),
+            (
+                "native_minus_founding_R_phase_excess",
+                rational(&receipt.native_minus_control_phase_excess),
+            ),
+            (
+                "native_combined_cell_indices",
+                format!(
+                    "[{}]",
+                    receipt
+                        .diagnostic
+                        .scored_face
+                        .combined
+                        .cells()
+                        .iter()
+                        .map(|cell| {
+                            quoted(
+                                &(cell.carry.clone()
+                                    * num_bigint::BigInt::from(receipt.diagnostic.tree.grain)
+                                    + num_bigint::BigInt::from(cell.phase))
+                                .to_string(),
+                            )
+                        })
+                        .collect::<Vec<_>>()
+                        .join(",")
+                ),
+            ),
+            (
+                "founding_combined_cell_indices",
+                format!(
+                    "[{}]",
+                    receipt
+                        .diagnostic
+                        .tree
+                        .exponents
+                        .iter()
+                        .map(|value| quoted(&value.to_string()))
+                        .collect::<Vec<_>>()
+                        .join(",")
+                ),
+            ),
+            (
+                "founding_R_same_feature_bits",
+                interval(&codes.control_code),
+            ),
             ("same_prefix_tree_bits", interval(&codes.tree_code)),
-            ("native_minus_founding_R_bits", interval(&codes.native_minus_control)),
+            (
+                "native_minus_founding_R_bits",
+                interval(&codes.native_minus_control),
+            ),
             ("native_minus_tree_bits", interval(&codes.native_minus_tree)),
-            ("founding_R_minus_tree_bits", interval(&codes.control_minus_tree)),
+            (
+                "founding_R_minus_tree_bits",
+                interval(&codes.control_minus_tree),
+            ),
             ("native_mass", interval(&codes.native_mass)),
             ("founding_R_mass", interval(&codes.control_mass)),
             ("tree_mass", rational(&codes.tree_mass)),
-            ("readout_intervention_exact", exact(&receipt.diagnostic.readout)),
-            ("producing_refinement_receipt_exact", exact(&refined.receipt)),
+            (
+                "readout_intervention_exact",
+                exact(&receipt.diagnostic.readout),
+            ),
+            (
+                "producing_refinement_receipt_exact",
+                exact(&refined.receipt),
+            ),
             ("actual_target_ingestion_exact", exact(&receipt.ingestion)),
             ("end_lift_exact", exact(resident.current().lift())),
             ("wall_ns", cell_started.elapsed().as_nanos().to_string()),
         ]));
-        eprintln!("alpha native frozen_R_code {}", events.last().expect("one successful target has its exterior receipt"));
-        eprintln!("alpha native frozen_R_target cell={at} target={class} elapsed_ns={}", started.elapsed().as_nanos());
+        eprintln!(
+            "alpha native frozen_R_code {}",
+            events
+                .last()
+                .expect("one successful target has its exterior receipt")
+        );
+        eprintln!(
+            "alpha native frozen_R_target cell={at} target={class} elapsed_ns={}",
+            started.elapsed().as_nanos()
+        );
     }
     if checkpoint.bytes()? != main_before || resident.field() != &field {
         return Err("a frozen-R target query must preserve its main checkpoint and field".into());
     }
     if resident.constitution().receiving_map(receiver) != Some(&frozen)
-        || laws(&resident) != laws_before || resident.constitution().commit() != commit_before
+        || laws(&resident) != laws_before
+        || resident.constitution().commit() != commit_before
     {
         return Err("a frozen-R target query must preserve all material maps".into());
     }
     Ok(object(&[
-        ("scope", quoted("frozen material; every target scored before its factual reception; native/founding R/tree share each reached native factual feature/tree/population; population and tree adapt, normal maps do not")),
-        ("target_bytes", target.len().to_string()), ("scored_cells", targets.len().to_string()),
-        ("prior_training_pending_cells_advanced_without_scoring", checkpoint.stream.pending_classes().len().to_string()),
-        ("normal_depositions", "0".into()), ("main_checkpoint_unchanged", "true".into()),
+        (
+            "scope",
+            quoted(
+                "frozen material; every target scored before its factual reception; native/founding R/tree share each reached native factual feature/tree/population; population and tree adapt, normal maps do not",
+            ),
+        ),
+        ("target_bytes", target.len().to_string()),
+        ("scored_cells", targets.len().to_string()),
+        (
+            "prior_training_pending_cells_advanced_without_scoring",
+            checkpoint.stream.pending_classes().len().to_string(),
+        ),
+        ("normal_depositions", "0".into()),
+        ("main_checkpoint_unchanged", "true".into()),
+        ("native_phase_excess", rational(&phase_sums[0])),
+        ("founding_R_phase_excess", rational(&phase_sums[1])),
+        (
+            "native_minus_founding_R_phase_excess",
+            rational(&phase_sums[2]),
+        ),
         ("material_maps_unchanged", "true".into()),
-        ("native_bits", interval(&sums[0])), ("founding_R_same_feature_bits", interval(&sums[1])),
+        ("native_bits", interval(&sums[0])),
+        ("founding_R_same_feature_bits", interval(&sums[1])),
         ("same_prefix_tree_bits", interval(&sums[2])),
         ("native_minus_founding_R_bits", interval(&sums[3])),
         ("native_minus_tree_bits", interval(&sums[4])),

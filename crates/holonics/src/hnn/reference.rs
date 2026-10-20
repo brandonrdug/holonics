@@ -4823,10 +4823,9 @@ pub fn contact_ablation(
         let (Some(a), Some(b)) = (a, b) else {
             return Rat::zero();
         };
-        let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
-            Rat::from_integer(c.carry.clone())
-                + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
-                + &c.fibre
+        let value = |c: &crate::hnn::receiving::ReceivingCell, grain: u64| {
+            c.rational_value(grain)
+                .expect("contact ablation reads raw rational wave faces")
         };
         a.faces
             .iter()
@@ -4907,12 +4906,8 @@ pub fn contact_ablation(
                                 .cells()
                                 .iter()
                                 .map(|c| {
-                                    Rat::from_integer(c.carry.clone())
-                                        + Rat::new(
-                                            BigInt::from(c.phase),
-                                            BigInt::from(face.grain()),
-                                        )
-                                        + &c.fibre
+                                    c.rational_value(face.grain())
+                                        .expect("contact ablation reads raw rational wave faces")
                                 })
                                 .collect();
                             v.iter().max().cloned().unwrap_or_else(Rat::zero)
@@ -4944,10 +4939,9 @@ pub fn contact_ablation(
                 loop {
                     if let (Some(a), Some(b)) = (&faces_pair.0, &faces_pair.1) {
                         for (fa, fb) in a.faces.iter().zip(&b.faces) {
-                            let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
-                                Rat::from_integer(c.carry.clone())
-                                    + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
-                                    + &c.fibre
+                            let value = |c: &crate::hnn::receiving::ReceivingCell, grain: u64| {
+                                c.rational_value(grain)
+                                    .expect("contact ablation reads raw rational wave faces")
                             };
                             let delta: Vec<Rat> = fa
                                 .cells()
@@ -5203,12 +5197,8 @@ pub fn contact_ablation(
                                     .cells()
                                     .iter()
                                     .map(|c| {
-                                        Rat::from_integer(c.carry.clone())
-                                            + Rat::new(
-                                                BigInt::from(c.phase),
-                                                BigInt::from(face.grain()),
-                                            )
-                                            + &c.fibre
+                                        c.rational_value(face.grain())
+                                            .expect("contact ablation reads raw rational wave faces")
                                     })
                                     .collect();
                                 let hi = v.iter().max().cloned().unwrap_or_else(Rat::zero);
@@ -5239,10 +5229,9 @@ pub fn contact_ablation(
                     let (after_code, _, after_faces) = read(reference, &mut post, window)?;
                     let (mut a_plus, mut a_minus) = (Rat::zero(), Rat::zero());
                     if let (Some(fa), Some(fb)) = (&before_faces, &after_faces) {
-                        let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
-                            Rat::from_integer(c.carry.clone())
-                                + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
-                                + &c.fibre
+                        let value = |c: &crate::hnn::receiving::ReceivingCell, grain: u64| {
+                            c.rational_value(grain)
+                                .expect("contact ablation reads raw rational wave faces")
                         };
                         for ((x, y), target) in
                             fa.faces.iter().zip(&fb.faces).zip(window.classes_read())

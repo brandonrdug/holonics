@@ -782,7 +782,8 @@ fn population_line(constitution: &Constitution, ring: usize) -> String {
 }
 
 /// The wave face's exact spread over the classes: the number of distinct grain cells
-/// `(carry, phase)` and the number of distinct fibres. A face's mass reads only its grain cell
+/// `(carry, phase)` and distinct rational fibres of the listener's raw wave face.
+/// A face's mass reads only its grain cell
 /// (`p̂_c = 2^(n_c − n_top) θ^(k_c) / Z`, `hnn::ratio::Face`), so the face is exactly uniform iff the
 /// first count is 1: Face validates 0 <= phase < grain, making carry + phase/grain injective.
 /// Distinct fibres under one grain cell are motion that stays below the grain.
@@ -792,7 +793,15 @@ fn face_spread(face: &Face) -> (usize, usize) {
         .iter()
         .map(|cell| (&cell.carry, cell.phase))
         .collect();
-    let fibres: BTreeSet<&Rat> = face.cells().iter().map(|cell| &cell.fibre).collect();
+    let fibres: BTreeSet<&Rat> = face
+        .cells()
+        .iter()
+        .map(|cell| {
+            cell.fibre
+                .as_rational()
+                .expect("listener flatness reads the raw rational wave face")
+        })
+        .collect();
     (cells.len(), fibres.len())
 }
 
