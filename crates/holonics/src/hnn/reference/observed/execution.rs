@@ -49,6 +49,8 @@ pub struct ObservedEpochForwardWord {
     pub anchors: Vec<Vec<crate::ratio::Rat>>,
     pub reception_end: ReceptionCarry,
     pub released: Released,
+    /// Per-word scan/serial work, returned only by the explicitly selected host span executor.
+    pub forward_span: Option<crate::hnn::word::scan::ForwardSpanReading>,
 }
 
 /// An immutable field/material scope shared by consecutive words. The private
@@ -228,6 +230,79 @@ impl ObservedEpochExecution for HostObservedEpochExecution {
     }
 }
 
+
+/// Explicit host span selection. The ordinary host executor remains the serial oracle.
+#[derive(Clone, Debug)]
+pub struct ScannedHostObservedEpochExecution {
+    partitions: usize,
+}
+
+impl ScannedHostObservedEpochExecution {
+    pub fn new(partitions: usize) -> Result<Self, HnnError> {
+        if partitions == 0 {
+            return Err(HnnError::Unadmitted { reason: "a host forward span needs positive partitions" });
+        }
+        Ok(Self { partitions })
+    }
+}
+
+impl ObservedEpochExecution for ScannedHostObservedEpochExecution {
+    fn forward(
+        &self, field: &Field, constitution: &Constitution, ratio: &PendingRatio,
+        charts: &mut Charts, opening: &WordOpening,
+    ) -> Result<ObservedEpochForwardWord, HnnError> {
+        let start = std::time::Instant::now();
+        let (word, faces, mut span) = ratio.read_on_scanned(field, constitution, charts, opening, self.partitions)?;
+        span.elapsed_ns = Some(start.elapsed().as_nanos());
+        let mut result = keep_native(word, faces, ratio.phases(), ratio.commit())?;
+        result.forward_span = Some(span);
+        Ok(result)
+    }
+
+    fn forward_scoped(
+        &self, context: &mut ObservedEpochForwardContext<'_, '_>, ratio: &PendingRatio,
+        charts: &mut Charts, opening: &WordOpening,
+    ) -> Result<ObservedEpochForwardWord, HnnError> {
+        let start = std::time::Instant::now();
+        let (word, faces, mut span) = ratio.read_on_scoped_scanned(context.scope, charts, opening, self.partitions)?;
+        span.elapsed_ns = Some(start.elapsed().as_nanos());
+        let mut result = keep_native(word, faces, ratio.phases(), ratio.commit())?;
+        result.forward_span = Some(span);
+        Ok(result)
+    }
+    fn pull_back(
+        &self,
+        word: Word<'_>,
+        covector: &RatioCovector,
+        map: &ExactRatMatrix,
+        phases: &ReceivingPhases,
+    ) -> Result<WordReturn, HnnError> {
+        HostObservedEpochExecution.pull_back(word, covector, map, phases)
+    }
+
+    fn aggregate_records(
+        &self,
+        _locus: LinearLocus,
+        rows: usize,
+        columns: usize,
+        receiver_grain: u32,
+        epoch_cells: u64,
+        epoch: u64,
+        heard_cells: u64,
+        records: &[EpochProducerRecordReading],
+    ) -> Result<EpochRecordFlowReading, HnnError> {
+        epoch_record_flow_reference(
+            rows,
+            columns,
+            receiver_grain,
+            epoch_cells,
+            epoch,
+            heard_cells,
+            records,
+        )
+    }
+}
+
 fn keep_native(
     word: Word<'_>,
     faces: Faces,
@@ -241,6 +316,7 @@ fn keep_native(
     let passages = word.tube_passages()?;
     Ok(ObservedEpochForwardWord {
         producing_commit,
+        forward_span: None,
         word: Box::new(NativeEpochWord {
             word: word.keep(),
             charts,

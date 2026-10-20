@@ -237,6 +237,7 @@ impl ObservedEpochDevice {
         let reading = self.forward_reading(field, constitution, ratio, charts, opening, scope)?;
         *charts = reading.charts;
         Ok(ObservedEpochForwardWord {
+            forward_span: None,
             producing_commit: reading.producing_commit,
             word: Box::new(DeviceWord {
                 id: Some(reading.id),

@@ -105,6 +105,7 @@ pub(crate) mod column;
 pub mod continuation;
 pub mod finite_gain;
 pub(crate) mod linear;
+pub mod scan;
 pub(crate) mod trajectory;
 pub mod variation;
 pub mod work;

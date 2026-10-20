@@ -446,6 +446,45 @@ impl PendingRatio {
         mut word: Word<'c>,
     ) -> Result<(Word<'c>, Faces), HnnError> {
         let anchors = word.forward(&self.phases)?;
+        self.read_forward_word(field, constitution, word, anchors)
+    }
+
+    pub(crate) fn read_on_scanned<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        charts: &mut Charts,
+        opening: &WordOpening,
+        partitions: usize,
+    ) -> Result<(Word<'c>, Faces, crate::hnn::word::scan::ForwardSpanReading), HnnError> {
+        let mut word = self.open_on(field, constitution, charts, opening)?;
+        let (anchors, span) = word.forward_scanned(&self.phases, partitions)?;
+        let (word, faces) = self.read_forward_word(field, constitution, word, anchors)?;
+        Ok((word, faces, span))
+    }
+
+    pub(crate) fn read_on_scoped_scanned<'c>(
+        &self,
+        scope: &mut crate::hnn::propagation::RingScope<'c>,
+        charts: &mut Charts,
+        opening: &WordOpening,
+        partitions: usize,
+    ) -> Result<(Word<'c>, Faces, crate::hnn::word::scan::ForwardSpanReading), HnnError> {
+        let field = scope.field();
+        let material = scope.material();
+        let mut word = self.open_on_scoped(scope, charts, opening)?;
+        let (anchors, span) = word.forward_scanned(&self.phases, partitions)?;
+        let (word, faces) = self.read_forward_word(field, material, word, anchors)?;
+        Ok((word, faces, span))
+    }
+
+    fn read_forward_word<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        mut word: Word<'c>,
+        anchors: Vec<Vec<Rat>>,
+    ) -> Result<(Word<'c>, Faces), HnnError> {
         let reads = if matches!(
             constitution.receiving_layout(self.phases.ring()),
             Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { .. })

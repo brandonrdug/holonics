@@ -19,6 +19,7 @@ pub(crate) struct EpochRead {
     pub(crate) commit: u64,
     /// The actual producing release's physical balance, at its carried last crossing.
     pub(crate) energy: WordBalance,
+    pub(crate) forward_span: Option<crate::hnn::word::scan::ForwardSpanReading>,
     /// The actual preceding word's join inside this batch; no predecessor is fabricated.
     pub(crate) chained: Option<ChainedBalance>,
 }
@@ -372,6 +373,7 @@ impl Reference {
                 EpochRead {
                     ratio,
                     word: EpochWord::Executed(forward.word),
+                    forward_span: forward.forward_span,
                     opening,
                     faces: forward.faces,
                     commit,
@@ -412,6 +414,7 @@ impl Reference {
                 EpochRead {
                     ratio: slot.ratio,
                     word: EpochWord::Native(kept.word),
+                    forward_span: None,
                     opening: slot.opening,
                     faces: kept.faces,
                     commit: kept.commit,

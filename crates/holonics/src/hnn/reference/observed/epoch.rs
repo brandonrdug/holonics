@@ -31,6 +31,7 @@ pub struct ObservedEpochCellReceipt {
     pub released: Vec<Rat>,
     /// Actual kept-word chart decisions, returned as exterior evidence and never retained.
     pub word_charts: Vec<crate::hnn::chart::ChartReading>,
+    pub forward_span: Option<crate::hnn::word::scan::ForwardSpanReading>,
 }
 
 /// Actual elapsed batch intervals. Parallel return workers are timed by their joined outer
@@ -178,6 +179,7 @@ struct ComparedRead {
     deposit: Deposit,
     receiving_parts: Vec<EpochReceivingRecord>,
     word_charts: Vec<crate::hnn::chart::ChartReading>,
+    forward_span: Option<crate::hnn::word::scan::ForwardSpanReading>,
     worker_times: [Duration; 4],
 }
 
@@ -912,6 +914,7 @@ impl Reference {
                     receiving_parts,
                     worker_times: [face_partition_wall, pull_back_wall, compose_wall, records_start.elapsed()],
                     word_charts,
+                    forward_span: read.forward_span,
                 })
             })
             .collect::<Result<_, HnnError>>()?;
@@ -1009,6 +1012,7 @@ impl Reference {
                 scored_face: scored.face_readings[at].clone(),
                 released: read.released,
                 word_charts: read.word_charts,
+                forward_span: read.forward_span,
             });
         }
         let ordered_publication = ordered_start.elapsed().saturating_sub(prefix_forks);
@@ -3369,6 +3373,43 @@ mod tests {
                 execution.flows.load(std::sync::atomic::Ordering::Relaxed),
                 0
             );
+        }
+    }
+
+    #[test]
+    fn scanned_host_epoch_keeps_actual_cells_carry_energy_and_publication_under_partitions() {
+        for partitions in [1, 2, 7, 64] {
+            let (reference, opening, opening_crib, pairing) = opening();
+            let mut actual = opening.clone();
+            let mut expected = opening.clone();
+            let mut crib = opening_crib.clone();
+            let mut expected_crib = opening_crib;
+            let execution = ScannedHostObservedEpochExecution::new(partitions).unwrap();
+            let mut read = reference.observe_epoch_continuing_at_cuts_with_execution(
+                &mut actual, &mut crib, &pairing, &[1], None, &[1], true, &execution,
+            ).unwrap();
+            let control = reference.observe_epoch_continuing_at_cuts(
+                &mut expected, &mut expected_crib, &pairing, &[1], None, &[1], true,
+            ).unwrap();
+            for cell in &mut read.reads {
+                assert!(!cell.word_charts.is_empty(), "actual selected epoch exercises executed charts");
+                let span = cell.forward_span.take().expect("selected executor supplies per-cell work");
+                assert_eq!(span.partitions, partitions);
+                assert!(span.scanned_ticks + span.serial_ticks > 0);
+                assert!(span.elapsed_ns.is_some());
+                println!("actual epoch partitions={partitions} scanned={} serial={} departures={} elapsed_ns={}",
+                    span.scanned_ticks, span.serial_ticks, span.branch_departures, span.elapsed_ns.unwrap());
+            }
+            // Only exterior scheduling/time evidence differs. Every scientific reading,
+            // producing return, grouped deposit and final continuing state is compared.
+            assert_same_publication(&actual, &expected, &read, &control);
+            assert_eq!(crib, expected_crib);
+            assert_eq!(read.prefixes.len(), control.prefixes.len());
+            for (got, want) in read.prefixes.iter().zip(&control.prefixes) {
+                assert_eq!(got.0, want.0);
+                assert_eq!(got.1.continuing_state(0).unwrap().to_text(), want.1.continuing_state(0).unwrap().to_text());
+                assert_eq!(got.2, want.2);
+            }
         }
     }
 

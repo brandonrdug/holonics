@@ -24,7 +24,7 @@ pub use stream::{ObservedStream, ObservedStreamReceipt};
 pub use epoch::{ObservedEpochCellReceipt, ObservedEpochEnergy, ObservedEpochDepositionScope, ObservedEpochOutcome, ObservedEpochReceipt, ObservedEpochWallTimes, ObservedEpochProbeState, EpochStageAttempt, EpochStageCondition, EpochStageReading, EpochStageRefusal, EpochStageValue};
 mod execution;
 pub use execution::{
-    HostObservedEpochExecution, ObservedEpochExecution, ObservedEpochForwardContext,
+    HostObservedEpochExecution, ScannedHostObservedEpochExecution, ObservedEpochExecution, ObservedEpochForwardContext,
     ObservedEpochForwardWord, ObservedEpochWord,
 };
 
