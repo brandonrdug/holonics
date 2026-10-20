@@ -2215,6 +2215,9 @@ pub struct NormalLaw {
     gram_carry: Carry,
     /// Immutable founding declaration; absent on source and contrast laws.
     receiving_prior: Option<u32>,
+    /// Whether a receiving law was explicitly founded under the unit-prior law.
+    /// This is a declaration, not a retained per-column mask or epoch counter.
+    unit_prior: bool,
     /// [definition; agent-inferred, October 8] The receiving law's exact phase-comparison statistics
     /// ([`PhaseStatistics`]): per class one fixed-size sum of the readings that reached the map, in
     /// the doubled lifted phase targets the map's imaginary rows are regressed on, absorbed in the
@@ -2253,6 +2256,7 @@ impl NormalLaw {
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
             receiving_prior: None,
+            unit_prior: false,
             phase: None,
             symmetry: None,
         }
@@ -2289,6 +2293,7 @@ impl NormalLaw {
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
             receiving_prior: None,
+            unit_prior: false,
             phase: None,
             symmetry: None,
         }
@@ -2311,6 +2316,11 @@ impl NormalLaw {
     /// keeps the unit prior and carries no pair.
     pub fn receiving_prior(&self) -> Option<u32> {
         self.receiving_prior
+    }
+
+    /// Whether this receiving law carries the explicitly declared unit-prior policy.
+    pub fn has_unit_prior(&self) -> bool {
+        self.unit_prior
     }
 
     /// The carrier on which this law's map, Gram, solved chart and prior were founded.
@@ -2489,9 +2499,43 @@ impl NormalLaw {
     }
 
     /// `X̂ ≈ H⁻¹`, the solved chart of the carried Gram, dense: within `δ` of the inverse in its
-    /// left residual, `‖1 − X̂H‖∞ = δ` ([`NormalLaw::chart`]).
+    /// left residual, `‖1 − X̂H‖∞ = δ` ([`NormalLaw::chart`]). Under the unit law,
+    /// this is the exact inverse on reached columns, extended by zero on the unreached kernel.
     pub fn solved(&self) -> ExactRatMatrix {
         match &self.epoch {
+            Some(law) if law.unit_prior => {
+                // The unit law has no metric on never-reached columns. Invert
+                // the certified reached block and extend by zero on its kernel.
+                let width = law.gram.columns;
+                let reached: Vec<_> = (0..width)
+                    .filter(|&j| !law.gram.values[j * width + j].is_zero())
+                    .collect();
+                let gram = law.gram.to_matrix().expect("admitted grouped unit Gram");
+                let mut result = vec![vec![Rat::zero(); width]; width];
+                if !reached.is_empty() {
+                    let block = ExactRatMatrix::new(
+                        reached
+                            .iter()
+                            .map(|&i| {
+                                reached
+                                    .iter()
+                                    .map(|&j| gram.get(i, j).expect("reached Gram entry").clone())
+                                    .collect()
+                            })
+                            .collect(),
+                    )
+                    .expect("reached Gram shape")
+                    .inverse()
+                    .expect("certified reached Gram block");
+                    for (i, &row) in reached.iter().enumerate() {
+                        for (j, &column) in reached.iter().enumerate() {
+                            result[row][column] =
+                                block.get(i, j).expect("reached inverse entry").clone();
+                        }
+                    }
+                }
+                rows_matrix(&result)
+            }
             Some(law) => law
                 .gram
                 .to_matrix()
@@ -2989,6 +3033,11 @@ pub struct EpochLocusScaleReading {
     pub nonzero_proposal_zero_in_step_by_row: Vec<usize>,
     /// Includes the direction's row factors and transient joint divisor.
     pub proposed_maximum_absolute_by_row: Vec<Rat>,
+    /// Actual represented map step in each row, in its declared map units.
+    pub represented_maximum_absolute_by_row: Vec<Rat>,
+    /// First-reaching unit-prior powers, as (column, power-of-four exponent, exact prior).
+    /// The enclosing epoch receipt owns the actual ingress; no reaching mask is retained.
+    pub unit_priors: Vec<(usize, i64, Rat)>,
 }
 
 /// Exterior operands of one exact minimum-segment proposal. `w` and `D` below are their
@@ -5019,6 +5068,69 @@ impl Constitution {
         Ok(material)
     }
 
+    /// Declare the unit-prior law for one receiver at the pristine founding cut.
+    /// The native receiving prior remains in the field declaration as the policy's
+    /// binding identity; grouped epoch state starts from zero Gram under this law.
+    pub fn with_unit_receiving_prior(
+        mut self,
+        field: &Field,
+        receiver: usize,
+    ) -> Result<Self, HnnError> {
+        let declaration = field
+            .receivers()
+            .iter()
+            .find(|declared| declared.ring == receiver)
+            .ok_or(HnnError::Unadmitted {
+                reason: "the unit receiving prior names a declared receiver",
+            })?;
+        if self != Self::initial(field, self.budget)? {
+            return Err(HnnError::Unadmitted {
+                reason: "the unit receiving prior is declared only on the pristine founding constitution",
+            });
+        }
+        let law = match self
+            .rings
+            .get(receiver)
+            .and_then(|ring| ring.receiving.as_ref())
+        {
+            Some(ReceivingMaterial::Single(law)) => law,
+            _ => {
+                return Err(HnnError::Unadmitted {
+                    reason: "the unit prior requires the receiver's original single normal law",
+                });
+            }
+        };
+        let prior = law.receiving_prior().ok_or(HnnError::Unadmitted {
+            reason: "the unit prior retains its native receiving-prior binding",
+        })?;
+        let zero_map = law.map().entries().iter().all(Rat::is_zero);
+        if prior != declaration.receiving_prior
+            || !zero_map
+            || law.unit_prior
+            || law.epoch_law().is_some()
+            || !law.chart.support.is_empty()
+            || !law.map_carry.0.is_empty()
+            || !law.gram_carry.0.is_empty()
+            || *law != NormalLaw::with_receiving_prior(law.map().clone(), prior)
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the unit prior requires a zero map and its exact pristine native Gram, chart, carries, phase and symmetry",
+            });
+        }
+        let receiver_grain = self.observed_epoch_grain(receiver)?;
+        let mut native = law.clone();
+        native.unit_prior = true;
+        let epoch = epoch::EpochLaw::from_normal(&native, receiver_grain)?;
+        let phase_rows: Vec<_> = (1..epoch.map.rows).step_by(2).collect();
+        let epoch = epoch.with_phase_rows(&phase_rows, field.ring(receiver).period())?;
+        let Some(ReceivingMaterial::Single(law)) = self.rings[receiver].receiving.as_mut() else {
+            unreachable!("the original single receiving law was checked above")
+        };
+        law.unit_prior = true;
+        law.publish_epoch(epoch)?;
+        Ok(self)
+    }
+
     /// Extend only the newly derived ring and its contact; publish on the caller's staged copy.
     pub fn found_ring(mut self, field: &Field, ring: usize, budget: u64) -> Result<Self, HnnError> {
         if ring != self.rings.len()
@@ -5355,6 +5467,7 @@ impl Constitution {
                 material.receiving = Some(match law {
                     ReceivingMaterial::Single(law) => ReceivingMaterial::Single(NormalLaw {
                         receiving_prior: None,
+                        unit_prior: false,
                         ..law
                     }),
                     other => other,
@@ -5824,12 +5937,21 @@ impl Constitution {
         if let Some(receiving) = receiving {
             // The replaced map keeps the receiving law's founding member (the unit prior where the
             // ring had no receiving law).
-            let prior = material
+            if material
                 .receiving
                 .as_ref()
                 .and_then(ReceivingMaterial::single)
-                .and_then(NormalLaw::receiving_prior)
-                .unwrap_or(0);
+                .is_some_and(NormalLaw::has_unit_prior)
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "a unit-prior receiving law changes only through its grouped epoch deposit",
+                });
+            }
+            let old = material
+                .receiving
+                .as_ref()
+                .and_then(ReceivingMaterial::single);
+            let prior = old.and_then(NormalLaw::receiving_prior).unwrap_or(0);
             if material
                 .receiving
                 .as_ref()
@@ -11590,6 +11712,7 @@ impl LearnedRing {
                         || saved.laws().iter().zip(declared.laws()).any(|(a, b)| {
                             !same_law_shape(a, b)
                                 || a.receiving_prior() != b.receiving_prior()
+                                || a.has_unit_prior() != b.has_unit_prior()
                                 || a.phase.is_some() != b.phase.is_some()
                         })
                 }
@@ -12534,6 +12657,16 @@ impl ContinuingState {
         self.receiver_ingress_ticks
     }
 
+    /// Whether the saved receiving ring was explicitly founded under the unit-prior law.
+    /// A missing, released, or paired receiving law does not select that policy.
+    pub fn has_unit_receiving_prior(&self, receiver: usize) -> bool {
+        self.rings
+            .get(receiver)
+            .and_then(|ring| ring.receiving.as_ref())
+            .and_then(ReceivingMaterial::single)
+            .is_some_and(NormalLaw::has_unit_prior)
+    }
+
     /// Save the exterior receipt clock with the resident passage. The caller counts only
     /// ingest receipts of cells that actually stepped, snapshots at the batch opening, and
     /// restores this same count on continuation and forks. This does not alter the constitution.
@@ -13100,8 +13233,8 @@ fn read_rows(
 /// **A normal law's parts as text** ([`ContinuingState::to_text`]), its map written by its caller:
 /// `gram n` with its rows, `chart L_s δ k`, `support s` with the support, `block` with the chart's
 /// integer coordinates, `map-carry c` and `gram-carry c` each with `index value` lines,
-/// `receiving_prior k` or `receiving_prior none`, and `phase none` or the phase statistics
-/// ([`write_phase`]).
+/// `receiving_prior k`, `receiving_prior unit k` or `receiving_prior none`, and `phase none` or
+/// the phase statistics ([`write_phase`]). Existing located-prior words remain unchanged.
 fn write_normal_map(s: &mut String, key: &str, law: &NormalLaw) {
     if law.epoch_law().is_some() {
         // The canonical epoch payload owns W. Never save its derived read view.
@@ -13144,9 +13277,11 @@ fn write_law(s: &mut String, law: &NormalLaw) {
             }
         }
     }
-    match law.receiving_prior {
-        Some(k) => *s += &format!("receiving_prior {k}\n"),
-        None => *s += "receiving_prior none\n",
+    match (law.unit_prior, law.receiving_prior) {
+        (true, Some(k)) => *s += &format!("receiving_prior unit {k}\n"),
+        (true, None) => *s += "receiving_prior unit\n",
+        (false, Some(k)) => *s += &format!("receiving_prior {k}\n"),
+        (false, None) => *s += "receiving_prior none\n",
     }
     match &law.phase {
         Some(phase) => write_phase(s, phase),
@@ -13302,15 +13437,27 @@ fn read_epoch_normal_law(
         "receiving_prior",
         "the receiving prior declaration",
     )?;
-    let receiving_prior = match prior.as_slice() {
-        [none] if none == "none" => None,
-        [k] => Some(k.parse().map_err(|_| HnnError::ContinuingState {
-            what: "the receiving prior declaration",
-        })?),
+    let (receiving_prior, unit_prior) = match prior.as_slice() {
+        [none] if none == "none" => (None, false),
+        [k] => (
+            Some(k.parse().map_err(|_| HnnError::ContinuingState {
+                what: "the receiving prior declaration",
+            })?),
+            false,
+        ),
+        [unit, k] if unit == "unit" => (
+            Some(k.parse().map_err(|_| HnnError::ContinuingState {
+                what: "the unit receiving prior declaration",
+            })?),
+            true,
+        ),
         _ => return refuse("the receiving prior declaration"),
     };
     let phase = read_phase(lines, &map)?;
     let symmetry = read_symmetry(lines, &map)?;
+    if unit_prior != epoch.unit_prior || (unit_prior && receiving_prior.is_none()) {
+        return refuse("the normal law and grouped checkpoint agree on the receiving-prior policy");
+    }
     if symmetry.as_ref() != epoch.declared_symmetry() {
         return refuse("an epoch law's paired declaration disagrees with its normal metadata");
     }
@@ -13327,6 +13474,7 @@ fn read_epoch_normal_law(
         map_carry: Carry::default(),
         gram_carry: Carry::default(),
         receiving_prior,
+        unit_prior,
         phase,
         symmetry,
     };
@@ -13449,19 +13597,31 @@ fn read_law(
         }
         carries.push(Carry(carry));
     }
-    let receiving_prior = match head(
+    let (receiving_prior, unit_prior) = match head(
         next(lines, "the receiving prior declaration")?,
         "receiving_prior",
         "the receiving prior declaration",
     )?
     .as_slice()
     {
-        [none] if none == "none" => None,
-        [k] => Some(k.parse().map_err(|_| HnnError::ContinuingState {
-            what: "the receiving prior declaration",
-        })?),
+        [none] if none == "none" => (None, false),
+        [k] => (
+            Some(k.parse().map_err(|_| HnnError::ContinuingState {
+                what: "the receiving prior declaration",
+            })?),
+            false,
+        ),
+        [unit, k] if unit == "unit" => (
+            Some(k.parse().map_err(|_| HnnError::ContinuingState {
+                what: "the unit receiving prior declaration",
+            })?),
+            true,
+        ),
         _ => return refuse("the receiving prior declaration"),
     };
+    if unit_prior {
+        return refuse("a unit-prior receiving law is stored only with its grouped checkpoint");
+    }
     let phase = read_phase(lines, &map)?;
     let symmetry = read_symmetry(lines, &map)?;
     // The scale founds the Gram off its support, the support is exactly the rows that leave
@@ -13517,6 +13677,7 @@ fn read_law(
         map_carry,
         gram_carry,
         receiving_prior,
+        unit_prior,
         phase,
         symmetry,
     };

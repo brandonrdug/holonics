@@ -117,6 +117,12 @@ fn digits(bytes: &[u8]) -> Vec<usize> {
     Base4Bytes::encode(bytes)
 }
 fn declaration(population: u64) -> Result<(Field, Constitution, PairingDeclaration)> {
+    declaration_with_prior(population, false)
+}
+fn declaration_with_prior(
+    population: u64,
+    unit: bool,
+) -> Result<(Field, Constitution, PairingDeclaration)> {
     // Agent-inferred: listener's existing serial law at a smaller explicit test workload.
     // The three rings, contacts, physical depths and pairing are independent of corpus text.
     // Grouped phase rows require an odd receiving ring; three is the smallest admitted odd period.
@@ -167,7 +173,10 @@ fn declaration(population: u64) -> Result<(Field, Constitution, PairingDeclarati
     };
     // Keep the paired response consumer on the existing listener's admitted linear circuit.
     // with_locking_pump installs saturation, which ResponseTube::open currently refuses.
-    let initial = Constitution::initial(&field, MATERIAL_BIT_BUDGET)?;
+    let mut initial = Constitution::initial(&field, MATERIAL_BIT_BUDGET)?;
+    if unit {
+        initial = initial.with_unit_receiving_prior(&field, 2)?;
+    }
     // Keep the physical receiving layout: the grouped owner independently seals its
     // whole-candidate comparison, without the old per-cell ArrivalContext gain gate.
     let initial = PairedCarrier::found(&field, initial, 0, &pairing)?.0;
@@ -289,7 +298,8 @@ impl Checkpoint {
             .ok_or("provenance UTF8 boundary")?
             .to_owned();
         let state = ContinuingState::from_text(native, MATERIAL_BIT_BUDGET)?;
-        let (field, initial, _) = declaration(*population)?;
+        let (field, initial, _) =
+            declaration_with_prior(*population, state.has_unit_receiving_prior(2))?;
         let resident =
             port().mount_continued(&field, &Current::at_rest(&field), initial, &state)?;
         if resident.continuing_state(0)? != state {
@@ -1119,9 +1129,9 @@ fn run() -> Result<()> {
     let started = Instant::now();
     let args: Vec<String> = std::env::args().skip(1).collect();
     match args.first().map(String::as_str) {
-        Some("init") if args.len() == 3 => {
+        Some(command @ ("init" | "init-unit")) if args.len() == 3 => {
             let population = args[2].parse()?;
-            let (field, initial, pairing) = declaration(population)?;
+            let (field, initial, pairing) = declaration_with_prior(population, command == "init-unit")?;
             let reference = port();
             let mut resident = reference.mount_with(&field, &Current::at_rest(&field), initial)?;
             let boundary = PairedObservation::admit(&field, resident.constitution(), &pairing)?;
@@ -1132,7 +1142,7 @@ fn run() -> Result<()> {
             let warm = query_reading(&checkpoint, WARM_QUERY)?;
             let (bytes, hash) = checkpoint.publish(&args[1])?;
             println!("{}", object(&[
-                ("kind", quoted("init")), ("checkpoint_path", quoted(&args[1])),
+                ("kind", quoted(command)), ("checkpoint_path", quoted(&args[1])),
                 ("checkpoint_sha256", quoted(&hash)), ("checkpoint_bytes", bytes.to_string()),
                 ("constitution_sha256", quoted(&constitution)), ("total_cells", "0".into()),
                 ("accepted_total_cells", "0".into()), ("pending_cells", "0".into()),
@@ -1228,6 +1238,9 @@ fn run() -> Result<()> {
                                 ("locus", exact(&locus.locus)),
                                 ("records", locus.records.to_string()),
                                 ("represented_move", (locus.represented_step.numerator_l1_bound > 0.into()).to_string()),
+                                ("represented_entry_count", locus.scale.represented_nonzero_by_row.iter().sum::<usize>().to_string()),
+                                ("represented_maximum_absolute", rational(&locus.scale.represented_maximum_absolute_by_row.iter().cloned().max().unwrap_or_else(|| integer(0)))),
+                                ("unit_prior_first_reaches", format!("[{}]", locus.scale.unit_priors.iter().map(|(column, exponent, prior)| object(&[("column", column.to_string()), ("power_of_four", exponent.to_string()), ("prior", rational(prior))])).collect::<Vec<_>>().join(","))),
                                 ("represented_step_numerator_l1_bound", quoted(&locus.represented_step.numerator_l1_bound.to_string())),
                                 ("gamma", rational(&locus.gamma)),
                                 ("eta", rational(&locus.eta)),
@@ -1388,7 +1401,7 @@ fn run() -> Result<()> {
                 ("keyed_replies", keyed),
             ]));
         }
-        _ => return Err("usage: solenoidal_alpha init OUTPUT POPULATION | ingest INPUT OUTPUT ORIGINAL_FILE FIRST_LINE LAST_LINE MAX_SOURCE_BYTES MAX_CHECKPOINT_BYTES [SOURCE_CELL_LIMIT | KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT WARM_QUERY_BATCH_TSV] | query INPUT MAX_CHECKPOINT_BYTES [QUERY_UTF8 [SECTION_BYTES ORACLE_BUDGET [KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT ADJACENT_SOURCE_FILE]]]".into()),
+        _ => return Err("usage: solenoidal_alpha init|init-unit OUTPUT POPULATION | ingest INPUT OUTPUT ORIGINAL_FILE FIRST_LINE LAST_LINE MAX_SOURCE_BYTES MAX_CHECKPOINT_BYTES [SOURCE_CELL_LIMIT | KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT WARM_QUERY_BATCH_TSV] | query INPUT MAX_CHECKPOINT_BYTES [QUERY_UTF8 [SECTION_BYTES ORACLE_BUDGET [KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT ADJACENT_SOURCE_FILE]]]".into()),
     }
     Ok(())
 }
@@ -1402,6 +1415,50 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unit_prior_native_founding_round_trip_binds_policy_and_phase() {
+        let (field, initial, _) = declaration_with_prior(4096, true).unwrap();
+        let reference = port();
+        let resident = reference
+            .mount_with(&field, &Current::at_rest(&field), initial.clone())
+            .unwrap();
+        let saved = resident.continuing_state(0).unwrap();
+        assert!(saved.has_unit_receiving_prior(2));
+        let text = saved.to_text();
+        let parsed = ContinuingState::from_text(&text, MATERIAL_BIT_BUDGET).unwrap();
+        assert_eq!(parsed.to_text(), text);
+        let restored = reference
+            .mount_continued(&field, &Current::at_rest(&field), initial, &parsed)
+            .unwrap();
+        assert_eq!(restored.continuing_state(0).unwrap(), saved);
+        let located = declaration(4096).unwrap().1;
+        assert!(
+            reference
+                .mount_continued(&field, &Current::at_rest(&field), located, &parsed)
+                .is_err()
+        );
+        assert!(
+            resident
+                .constitution()
+                .receiving_law(2)
+                .unwrap()
+                .gram()
+                .entries()
+                .iter()
+                .all(|v| *v == integer(0))
+        );
+        assert!(
+            resident
+                .constitution()
+                .receiving_law(2)
+                .unwrap()
+                .solved()
+                .entries()
+                .iter()
+                .all(|v| *v == integer(0))
+        );
+    }
 
     #[test]
     fn cumulative_source_total_and_crib_restore_survive_joint_closure() {

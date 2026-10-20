@@ -10,13 +10,18 @@ use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
-const HEADER: &str = "epoch-law-checkpoint-v3";
+const LOCATED_HEADER: &str = "epoch-law-checkpoint-v3";
+const UNIT_PRIOR_HEADER: &str = "epoch-law-checkpoint-v4-unit-prior";
 
 impl EpochLaw {
     /// Write this law's exact, canonical continuation words.
     pub(crate) fn encode_checkpoint(&self) -> String {
         let mut text = String::new();
-        text.push_str(HEADER);
+        text.push_str(if self.unit_prior {
+            UNIT_PRIOR_HEADER
+        } else {
+            LOCATED_HEADER
+        });
         text.push('\n');
         text.push_str(&format!("shape {} {}\n", self.map.rows, self.map.columns));
         text.push_str(&format!(
@@ -60,9 +65,11 @@ impl EpochLaw {
         budget: &mut CheckpointReadBudget,
     ) -> Result<Self, HnnError> {
         let mut lines = text.lines();
-        if take(&mut lines)? != HEADER {
-            return Err(malformed());
-        }
+        let unit_prior = match take(&mut lines)? {
+            LOCATED_HEADER => false,
+            UNIT_PRIOR_HEADER => true,
+            _ => return Err(malformed()),
+        };
         let shape = words(take(&mut lines)?, "shape", 2)?;
         let rows = parse_usize(&shape[0])?;
         let columns = parse_usize(&shape[1])?;
@@ -109,6 +116,7 @@ impl EpochLaw {
             receiver_grain,
             map_lattice,
             source_refinement,
+            unit_prior,
             crossings,
             spectral,
             symmetry,
@@ -149,10 +157,12 @@ fn validate_with_row_binding(
         || (
             law.receiver_grain,
             law.source_refinement,
+            law.unit_prior,
             law.symmetry.as_ref(),
         ) != (
             declaration.receiver_grain,
             declaration.source_refinement,
+            declaration.unit_prior,
             declaration.symmetry.as_ref(),
         )
     {
@@ -197,7 +207,36 @@ fn validate_with_row_binding(
             gram[i][j] = value.clone();
         }
     }
-    if !positive_definite_integer(gram) {
+    if law.unit_prior {
+        let unreached: Vec<usize> = (0..columns)
+            .filter(|&column| gram[column][column].is_zero())
+            .collect();
+        if (0..columns).any(|column| gram[column][column].is_negative())
+            || unreached.iter().any(|&column| {
+                (0..columns).any(|other| !gram[column][other].is_zero())
+                    || (0..rows).any(|row| {
+                        !law.map.values[row * columns + column].is_zero()
+                            || !law.news.values[row * columns + column].is_zero()
+                    })
+            })
+        {
+            return Err(refused(
+                "a unit-prior checkpoint keeps unreached Gram rows, map columns, and news columns exactly zero",
+            ));
+        }
+        let reached: Vec<usize> = (0..columns)
+            .filter(|column| !unreached.contains(column))
+            .collect();
+        let active = reached
+            .iter()
+            .map(|&i| reached.iter().map(|&j| gram[i][j].clone()).collect())
+            .collect();
+        if !positive_definite_integer(active) {
+            return Err(refused(
+                "a unit-prior checkpoint's reached Gram block must be positive definite",
+            ));
+        }
+    } else if !positive_definite_integer(gram) {
         return Err(refused(
             "an epoch checkpoint's metric must be positive definite",
         ));

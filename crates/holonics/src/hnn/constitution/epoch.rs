@@ -19,6 +19,8 @@ mod flow;
 mod mixed_tests;
 mod quantum_projection;
 mod spectral;
+#[cfg(test)]
+mod unit_prior_tests;
 pub(crate) use flow::EpochRecord;
 use quantum_projection::QuantumProjection;
 pub(crate) use spectral::EpochSpectral;
@@ -953,6 +955,9 @@ pub(crate) struct EpochLaw {
     /// Source material alone may refine its dyadic representation at a crossing.
     /// R remains its only unabsorbed normal news; this is not another carry.
     pub(crate) source_refinement: bool,
+    /// The declared first-reach, one-cell prior. Reach is read from H's diagonal;
+    /// no reaching epoch, exponent or mask is retained beside the Gram.
+    pub(crate) unit_prior: bool,
     /// Number of absorbed batches, distinct from actual receiving ingress c.
     pub(crate) crossings: u64,
     /// This bound affects future certified gains, so a continuing checkpoint
@@ -964,6 +969,7 @@ pub(crate) struct EpochLaw {
 #[derive(Clone, Debug)]
 pub(crate) struct EpochDeposit {
     quantum_projection: Option<QuantumProjection>,
+    pub(crate) unit_priors: Vec<(usize, i64, Rat)>,
     pub(crate) successor: EpochLaw,
     pub(crate) step: EpochArray,
     pub(crate) fall: EpochArray,
@@ -1118,7 +1124,26 @@ impl EpochLaw {
                 "an epoch checkpoint must match the native port shape, receiver grain, and paired declaration",
             ));
         }
-        let mut founded = Self::from_normal(declaration, receiver_grain)?;
+        // A unit declaration already has its zero grouped founding installed.
+        // It is not a heard legacy law and must not be re-imported as one.
+        let mut founded = match declaration.epoch_law() {
+            Some(founded)
+                if declaration.has_unit_prior()
+                    && founded.unit_prior
+                    && founded.crossings == 0
+                    && founded.map.is_zero()
+                    && founded.gram.is_zero()
+                    && founded.news.is_zero() =>
+            {
+                founded.clone()
+            }
+            Some(_) => {
+                return Err(refused(
+                    "a native unit declaration is its pristine grouped founding",
+                ));
+            }
+            None => Self::from_normal(declaration, receiver_grain)?,
+        };
         founded.source_refinement = self.source_refinement;
         if declaration.receiving_prior().is_some() {
             // `continued` has the actual native law but not its field period.
@@ -1154,6 +1179,7 @@ impl EpochLaw {
                 .checked_add(ceil_log2_count(width))
                 .ok_or_else(extent)?,
             source_refinement: false,
+            unit_prior: false,
             crossings: 0,
             spectral: EpochSpectral::founded_zero(rows, columns),
             symmetry: None,
@@ -1187,6 +1213,7 @@ impl EpochLaw {
                 .checked_add(ceil_log2_count(columns))
                 .ok_or_else(extent)?,
             source_refinement: false,
+            unit_prior: false,
             crossings,
             spectral,
             symmetry,
@@ -1212,9 +1239,42 @@ impl EpochLaw {
             ));
         }
         let map = EpochArray::from_dyadic_matrix(law.map())?;
-        let gram = EpochArray::from_dyadic_matrix(&law.gram())?;
+        let mut gram = EpochArray::from_dyadic_matrix(&law.gram())?;
+        if law.has_unit_prior() {
+            let scale = law.receiving_prior().ok_or_else(|| {
+                refused("a unit prior imports only a declared native receiving founding")
+            })?;
+            let expected = BigInt::one() << scale as usize;
+            if !map.is_zero()
+                || (0..gram.rows).any(|i| {
+                    (0..gram.columns).any(|j| {
+                        gram.values[i * gram.columns + j]
+                            != if i == j {
+                                &expected << gram.exponent as usize
+                            } else {
+                                BigInt::zero()
+                            }
+                    })
+                })
+            {
+                return Err(refused(
+                    "a unit prior replaces only pristine power-of-two native Gram",
+                ));
+            }
+            gram = EpochArray::zero(map.columns, map.columns)?;
+        }
         let news = EpochArray::zero(map.rows, map.columns)?;
-        Self::from_grouped(map, gram, news, receiver_grain, 0, law.symmetry.clone())
+        if !law.has_unit_prior() {
+            return Self::from_grouped(map, gram, news, receiver_grain, 0, law.symmetry.clone());
+        }
+        let mut candidate = Self::founded(map.rows, map.columns, receiver_grain, 0)?;
+        candidate.map = map;
+        candidate.gram = gram;
+        candidate.news = news;
+        candidate.symmetry = law.symmetry.clone();
+        candidate.unit_prior = true;
+        checkpoint::validate(&candidate, &candidate)?;
+        Ok(candidate)
     }
 
     pub(crate) fn founded_paired(
@@ -1493,6 +1553,67 @@ impl EpochLaw {
         u32::try_from(reach.max(0)).map_err(|_| extent())
     }
 
+    /// Form the exact contemporary H once. For the unit law, an unreached column
+    /// takes one cell's power-of-four prior at its first positive feature Gram.
+    /// Both the fresh certificate and deposition consume this same operation.
+    /// [agent-inferred; plan75a3d45d §4(c); formal obligation #62]
+    fn gram_after(
+        &self,
+        flow: &EpochFlow,
+    ) -> Result<(EpochArray, Vec<(usize, i64, Rat)>), HnnError> {
+        let mut gram = self.gram.add(&flow.gram)?;
+        let mut readings = Vec::new();
+        if !self.unit_prior {
+            return Ok((gram, readings));
+        }
+        let mut prior = EpochArray::zero(self.gram.rows, self.gram.columns)?;
+        for &column in &flow.support {
+            if column >= self.gram.columns {
+                return Err(refused("a unit prior names actual reached columns"));
+            }
+            if !self.gram.values[column * self.gram.columns + column].is_zero() {
+                continue;
+            }
+            if readings.iter().any(|(seen, _, _)| *seen == column) {
+                return Err(refused("a unit prior's reached support is distinct"));
+            }
+            let value = &flow.gram.values[column * flow.gram.columns + column];
+            if !value.is_positive() || flow.records == 0 {
+                return Err(refused(
+                    "a unit prior needs positive first-reaching Gram and actual records",
+                ));
+            }
+            let count = BigInt::from(flow.records);
+            let difference = i64::try_from(value.bits()).map_err(|_| extent())?
+                - i64::try_from(count.bits()).map_err(|_| extent())?;
+            let below = if difference >= 0 {
+                value < &(&count << usize::try_from(difference).map_err(|_| extent())?)
+            } else {
+                (value << usize::try_from(-difference).map_err(|_| extent())?) < count
+            };
+            let log2 = difference - i64::from(below) - i64::from(flow.gram.exponent);
+            let exponent = log2.div_euclid(2);
+            let power = exponent.checked_mul(2).ok_or_else(extent)?;
+            let (dyadic_exponent, numerator) = if power >= 0 {
+                (
+                    0,
+                    BigInt::one() << usize::try_from(power).map_err(|_| extent())?,
+                )
+            } else {
+                (u32::try_from(-power).map_err(|_| extent())?, BigInt::one())
+            };
+            let exact = Rat::new(numerator.clone(), BigInt::one() << dyadic_exponent as usize);
+            let mut entries = vec![BigInt::zero(); self.gram.rows * self.gram.columns];
+            entries[column * self.gram.columns + column] = numerator;
+            let entry =
+                EpochArray::new(self.gram.rows, self.gram.columns, dyadic_exponent, entries)?;
+            prior = prior.add(&entry)?;
+            readings.push((column, exponent, exact));
+        }
+        gram = gram.add(&prior)?;
+        Ok((gram, readings))
+    }
+
     pub(crate) fn fresh(&self, flow: &EpochFlow) -> Result<EpochFresh, HnnError> {
         if flow.receiver_grain != self.receiver_grain {
             return Err(refused(
@@ -1504,7 +1625,7 @@ impl EpochLaw {
         let flow = paired.as_ref().unwrap_or(flow);
         self.gram.same_shape(&flow.gram)?;
         self.map.same_shape(&flow.covector)?;
-        let gram = self.gram.add(&flow.gram)?;
+        let (gram, _) = self.gram_after(flow)?;
         let (direction, shares) = self.direction(&flow.covector, &gram, &flow.support)?;
         let alignment = direction.dot(&flow.covector)?;
         let moves = direction.multiply(&flow.gram)?.dot(&direction)?;
@@ -1810,7 +1931,7 @@ impl EpochLaw {
         let flow = paired.as_ref().unwrap_or(flow);
         self.gram.same_shape(&flow.gram)?;
         self.map.same_shape(&flow.covector)?;
-        let gram = self.gram.add(&flow.gram)?;
+        let (gram, unit_priors) = self.gram_after(flow)?;
         let fresh = flow.covector.scalar_product(gamma)?;
         let news = self.news.add(&fresh)?;
         let proposed = if let Some(locus) = joint_locus {
@@ -2040,6 +2161,7 @@ impl EpochLaw {
         };
         Ok(EpochDeposit {
             quantum_projection: quantum.cloned(),
+            unit_priors,
             successor,
             step,
             fall,

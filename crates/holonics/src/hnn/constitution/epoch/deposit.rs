@@ -892,7 +892,7 @@ fn normal_news_metric_squared(
 ) -> Result<(Rat, Rat), HnnError> {
     let paired = law.symmetry.as_ref().map(|s| flow.paired(s)).transpose()?;
     let flow = paired.as_ref().unwrap_or(flow);
-    let gram = law.gram.add(&flow.gram)?;
+    let (gram, _) = law.gram_after(flow)?;
     let b = flow
         .covector
         .scalar_product(&EpochArray::from_dyadic_scalar(gamma)?)?;
@@ -948,6 +948,20 @@ fn epoch_locus_scale_reading(deposit: &EpochDeposit) -> EpochLocusScaleReading {
         ));
     }
     EpochLocusScaleReading {
+        unit_priors: deposit.unit_priors.clone(),
+        represented_maximum_absolute_by_row: deposit
+            .step
+            .values
+            .chunks_exact(deposit.step.columns)
+            .enumerate()
+            .map(|(row, entries)| {
+                Rat::new(
+                    entries.iter().map(Signed::abs).max().unwrap_or_default(),
+                    (BigInt::one() << deposit.step.exponent as usize)
+                        * deposit.step.row_divisors[row],
+                )
+            })
+            .collect(),
         gram_column_absolute_sums,
         positive_eta: deposit.eta_numerator.is_positive(),
         proposed_nonzero_by_row,
@@ -2646,13 +2660,26 @@ mod tests {
         // Synthetic pre-existing positive curvature makes this fixture's dyadic
         // majorizer gap strict; the original feature happened to land on a power
         // of two. Seed it before producing fresh G/gamma and never alter guards.
-        let mut seed = EpochLaw::from_normal(material.epoch_normal(kind).unwrap(), material.observed_epoch_grain(receiver).unwrap()).unwrap();
+        let mut seed = EpochLaw::from_normal(
+            material.epoch_normal(kind).unwrap(),
+            material.observed_epoch_grain(receiver).unwrap(),
+        )
+        .unwrap();
         let phase_rows: Vec<_> = (1..seed.map.rows).step_by(2).collect();
-        seed = seed.with_phase_rows(&phase_rows, field.ring(receiver).period()).unwrap();
+        seed = seed
+            .with_phase_rows(&phase_rows, field.ring(receiver).period())
+            .unwrap();
         let mut extra = vec![BigInt::zero(); seed.gram.values.len()];
         extra[0] = BigInt::one();
-        seed.gram = seed.gram.add(&EpochArray::new(seed.gram.rows, seed.gram.columns, 1, extra).unwrap()).unwrap();
-        material.epoch_normal_mut(kind).unwrap().publish_epoch(seed).unwrap();
+        seed.gram = seed
+            .gram
+            .add(&EpochArray::new(seed.gram.rows, seed.gram.columns, 1, extra).unwrap())
+            .unwrap();
+        material
+            .epoch_normal_mut(kind)
+            .unwrap()
+            .publish_epoch(seed)
+            .unwrap();
         let retained = crate::hnn::retention::loci(&field).into_iter().collect();
         let pair_speed = |_, _, _: &PairPort, _: [&[Vec<Rat>]; 3]| panic!("no factor proposal");
         let (mut law, flow, gamma) = {
