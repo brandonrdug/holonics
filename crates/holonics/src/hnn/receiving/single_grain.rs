@@ -5,6 +5,7 @@
 
 use super::*;
 use crate::ratio::algebraic::log2_enclosure_at;
+use num_traits::Signed;
 
 /// Exact identity. Ord orders stored identities for distinction sets, not magnitudes;
 /// consumers comparing widths must read certified enclosures instead.
@@ -172,6 +173,161 @@ fn read_cell(probability: &Rat, wave: &Rat, grain: u64) -> Result<ReceivingCell,
         // No fixed precision cap declares a wrong cell. Arithmetic inability to refine is fatal.
         bits = bits.checked_mul(2).ok_or(HnnError::CountOverflow)?;
     }
+}
+
+/// Reads the exact probability mass carried by each retained receiving cell.  The declaration
+/// authenticates the cells' source grain; it does not rebin them.  In particular, a logarithmic
+/// fibre contributes its exact native tree probability times the rational wave power, while a
+/// rational fibre contributes its exact full rational logit.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RetainedFibreReceiver {
+    source_grain: u64,
+}
+
+impl RetainedFibreReceiver {
+    pub fn declare(source_grain: u64) -> Result<Self, HnnError> {
+        if source_grain == 0 {
+            return Err(HnnError::Unadmitted {
+                reason: "a retained-fibre receiver needs a nonzero source grain",
+            });
+        }
+        Ok(Self { source_grain })
+    }
+
+    pub fn source_grain(&self) -> u64 {
+        self.source_grain
+    }
+
+    /// The normalized class masses read from the complete retained fibre identities.
+    /// `bits` controls only the exterior real-chart enclosures; it does not change any exact
+    /// fibre or source cell. Common integer powers of two are removed before enclosure.
+    pub fn masses_at(
+        &self,
+        read: &ReceivingRead,
+        bits: u32,
+    ) -> Result<Vec<ExactInterval>, HnnError> {
+        if bits == 0 {
+            return Err(HnnError::Unadmitted {
+                reason: "a retained-fibre mass read needs positive enclosure precision",
+            });
+        }
+        if read.logits.len() % 2 != 0 {
+            return Err(HnnError::Shape {
+                what: "an even realified receiving logit vector",
+                expected: read.logits.len() + 1,
+                found: read.logits.len(),
+            });
+        }
+        let classes = read.logits.len() / 2;
+        if classes == 0 || read.cells.len() != classes || read.phases.len() != classes {
+            return Err(HnnError::Shape {
+                what: "receiving logits, cells, and phases of one class shape",
+                expected: classes,
+                found: read.cells.len(),
+            });
+        }
+
+        let mut terms = Vec::with_capacity(classes);
+        let mut top = None::<BigInt>;
+        for (class, cell) in read.cells.iter().enumerate() {
+            cell.admit(self.source_grain)?;
+            let expected_phase = &read.logits[2 * class + 1] / integer(2);
+            if read.phases[class] != expected_phase {
+                return Err(HnnError::Unadmitted {
+                    reason: "a retained receiving read's phase disagrees with its imaginary logit",
+                });
+            }
+            let (coefficient, exponent) = match &cell.fibre {
+                ReceivingFibre::Rational(_) => (
+                    Rat::one(),
+                    cell.rational_value(self.source_grain)
+                        .ok_or(HnnError::Unadmitted {
+                            reason: "a rational receiving cell lost its exact full value",
+                        })?,
+                ),
+                ReceivingFibre::Logarithmic(fibre) => {
+                    if !fibre.probability.is_positive()
+                        || fibre.wave != read.logits[2 * class]
+                        || read_cell(&fibre.probability, &fibre.wave, self.source_grain)? != *cell
+                    {
+                        return Err(HnnError::Unadmitted {
+                            reason: "a retained logarithmic fibre is not the canonical source read",
+                        });
+                    }
+                    (fibre.probability.clone(), fibre.wave.clone())
+                }
+            };
+            if !coefficient.is_positive() {
+                return Err(HnnError::Unadmitted {
+                    reason: "a retained-fibre mass must have a positive exact coefficient",
+                });
+            }
+            let integer_part = exponent.floor().to_integer();
+            if top.as_ref().map_or(true, |current| integer_part > *current) {
+                top = Some(integer_part.clone());
+            }
+            terms.push((coefficient, exponent));
+        }
+        let top = top.expect("nonempty class shape checked above");
+
+        let mut weights = Vec::with_capacity(classes);
+        for (coefficient, exponent) in terms {
+            let shifted = exponent - Rat::from_integer(top.clone());
+            let power = rational_power_enclosure(&shifted, bits)?;
+            let lower = coefficient.clone() * power.lower;
+            let upper = coefficient * power.upper;
+            if lower < Rat::zero() || upper <= Rat::zero() {
+                return Err(HnnError::Unadmitted {
+                    reason: "a retained-fibre weight enclosure is not positive",
+                });
+            }
+            weights.push(ExactInterval::new(lower, upper)?);
+        }
+
+        let mut masses = Vec::with_capacity(classes);
+        for (class, weight) in weights.iter().enumerate() {
+            let mut other_lower = Rat::zero();
+            let mut other_upper = Rat::zero();
+            for (other, candidate) in weights.iter().enumerate() {
+                if other != class {
+                    other_lower += &candidate.lower;
+                    other_upper += &candidate.upper;
+                }
+            }
+            let lower_denominator = &weight.lower + &other_upper;
+            let upper_denominator = &weight.upper + &other_lower;
+            if lower_denominator <= Rat::zero() || upper_denominator <= Rat::zero() {
+                return Err(HnnError::Unadmitted {
+                    reason: "a retained-fibre normalizer enclosure must be positive",
+                });
+            }
+            masses.push(ExactInterval::new(
+                &weight.lower / lower_denominator,
+                &weight.upper / upper_denominator,
+            )?);
+        }
+        Ok(masses)
+    }
+}
+
+/// Read `2^exponent` through the scalar carried-power real chart.  The reduced denominator is the
+/// exact phase grain; machine-width limits are typed refusals in this receiver.
+fn rational_power_enclosure(exponent: &Rat, bits: u32) -> Result<ExactInterval, HnnError> {
+    let carry = exponent.floor().to_integer();
+    let fraction = exponent - Rat::from_integer(carry.clone());
+    let phase = fraction.numer().to_u64().ok_or(HnnError::CountOverflow)?;
+    let grain = fraction.denom().to_u64().ok_or(HnnError::CountOverflow)?;
+    if grain == 0 {
+        return Err(HnnError::Unadmitted {
+            reason: "a rational exponent has a nonzero exact phase grain",
+        });
+    }
+    if !grain.is_power_of_two() && u32::try_from(grain).is_err() {
+        return Err(HnnError::CountOverflow);
+    }
+    crate::ratio::exponentiated::CarriedPower::new(carry, phase, grain)?
+        .enclosure_at(bits)
+        .map_err(Into::into)
 }
 
 pub(super) fn combined(

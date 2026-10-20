@@ -302,6 +302,159 @@ impl Reference {
     }
 }
 
+/// One explicitly hypothetical class received under an alternate native receiver. It is an
+/// oracle branch operand, not a fabricated release certificate. The caller publishes no class
+/// until the existing finite section receiver certifies the complete section.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReceiverPrefixReceipt {
+    pub receiver: crate::hnn::receiving::RetainedFibreReceiver,
+    pub class: usize,
+    pub producing: crate::hnn::receiving::cells::diagnostic::RetainedScoredFaceReading,
+    pub ingestion: IngestClassReceipt,
+}
+
+impl Reference {
+    /// Same kept native word and retained map/tree/population, read by an explicitly finer
+    /// receiver. Neither the original declaration nor the immutable checkpoint is changed.
+    pub fn diagnose_pending_readout_at_receiver(
+        &self,
+        resident: &Resident,
+        pending: &PendingId,
+        control_map: &ExactRatMatrix,
+        receiver: &crate::hnn::receiving::RetainedFibreReceiver,
+        bits: u32,
+    ) -> Result<crate::hnn::receiving::cells::diagnostic::RetainedReceiverDiagnostic, HnnError>
+    {
+        let old = self.diagnose_pending_readout(resident, pending, control_map, bits)?;
+        crate::hnn::receiving::cells::diagnostic::compare_readout_maps_at_receiver(
+            &old.scored_face,
+            &old.tree,
+            &old.readout.feature,
+            &old.native_map,
+            &old.readout.native_wave_logits,
+            control_map,
+            receiver,
+            bits,
+        )
+    }
+
+    /// Receive one complete hypothesized prefix class at its actual producing cut, using the
+    /// SAME alternate receiver that supplied the conditional oracle. This joins its native
+    /// population likelihood and addressed tree reception before ordinary continuing ingress:
+    /// L_f' = L_f * p_f(c), T' = receive(T,c), then current/moment/crib advance once. Maps are not
+    /// deposited. Original checkpoint/other branches stay separate; every refusal is atomic.
+    ///
+    /// Source/receiver encoding and physical clocks keep their original declaration. Only the
+    /// explicit observation quotient changes. No class certificate is forged: this API receives
+    /// a hypothesis on a disposable branch, and its receipt remains exterior evidence. The
+    /// consuming chain-rule section and chart-restriction formal joins remain owed in #62.
+    #[allow(clippy::too_many_arguments)]
+    pub fn receive_receiver_prefix_continuing(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        pending: PendingId,
+        class: usize,
+        receiver: &crate::hnn::receiving::RetainedFibreReceiver,
+        placement: Option<&OccurrencePlacement>,
+    ) -> Result<ReceiverPrefixReceipt, HnnError> {
+        let refuse = |reason| HnnError::Unadmitted { reason };
+        resident.admit_exact_current()?;
+        admit_observed_cell(resident, crib, pairing, class, placement)?;
+        if resident.pending.len() != 1 || !resident.staged.is_empty() || resident.moments.len() != 1
+        {
+            return Err(refuse(
+                "an alternate receiver continues one actual pending word and moment",
+            ));
+        }
+        let slot = resident
+            .pending
+            .get(&pending)
+            .ok_or(HnnError::UnknownHandle {
+                handle: Handle::Pending(pending),
+            })?;
+        let phases = slot.ratio.phases();
+        let ring = phases.ring();
+        if phases.aperture() != 1
+            || receiver.source_grain() != phases.grain()
+            || slot.ratio.commit() != resident.constitution.commit()
+            || slot.ratio.current(&resident.field)? != resident.current
+            || resident.moments.values().next() != Some(slot.ratio.moment())
+        {
+            return Err(refuse(
+                "an alternate receiver prefix keeps its actual aperture, grain, material and current",
+            ));
+        }
+        let native_map = resident
+            .constitution
+            .receiving_map(ring)
+            .ok_or(HnnError::MissingReceivingMap { ring })?
+            .clone();
+        let read = self.diagnose_pending_readout_at_receiver(
+            resident,
+            &pending,
+            &native_map,
+            receiver,
+            crate::ratio::exponentiated::READING_BITS,
+        )?;
+        let producing = read.native_reading;
+        let step = crate::hnn::receiving::ReceivingStep {
+            ring,
+            tree: producing
+                .tree_probabilities
+                .get(class)
+                .ok_or(HnnError::CellOutside {
+                    code: class,
+                    alphabet: producing.tree_probabilities.len(),
+                })?
+                .clone(),
+            combined: producing
+                .combined_masses_at(crate::ratio::exponentiated::READING_BITS)?
+                .get(class)
+                .ok_or(HnnError::CellOutside {
+                    code: class,
+                    alphabet: producing.tree_probabilities.len(),
+                })?
+                .clone(),
+        };
+        let mut tree = resident
+            .constitution
+            .landmarks(ring)
+            .ok_or(HnnError::MissingReceivingMap { ring })?
+            .clone();
+        match slot.ratio.observed_addresses(&[])? {
+            Some(addresses) => {
+                tree.receive_observed_arrivals(&addresses, &[class], phases.grain())?;
+            }
+            None => {
+                tree.receive_arrivals(&slot.ratio.addresses(&[])?, &[class], phases.grain())?;
+            }
+        }
+        let mut next = resident.clone();
+        let mut next_crib = crib.clone();
+        next.constitution = next
+            .constitution
+            .observed_epoch_prefix(ring, tree, &[step])?;
+        self.discard(&mut next, Handle::Pending(pending))?;
+        let ingestion =
+            self.ingest_class_step(&mut next, &mut next_crib, pairing, class, placement)?;
+        if next.constitution.receiving_map(ring) != Some(&native_map) {
+            return Err(refuse(
+                "an alternate receiver prefix preserves its frozen native receiving map",
+            ));
+        }
+        *resident = next;
+        *crib = next_crib;
+        Ok(ReceiverPrefixReceipt {
+            receiver: receiver.clone(),
+            class,
+            producing,
+            ingestion,
+        })
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -740,5 +893,134 @@ mod tests {
         );
         assert_eq!(format!("{resident:?}"), before);
         assert_eq!(crib, old_crib);
+    }
+    #[test]
+    fn retained_receiver_prefix_uses_full_likelihood_once_and_restores_cold() {
+        let (port, mut warm, mut crib, pairing, material) = target_opening(false);
+        let ring = warm.admitted[0].ring();
+        let receiver =
+            crate::hnn::receiving::RetainedFibreReceiver::declare(warm.admitted[0].grain())
+                .unwrap();
+        let frozen = warm.constitution.receiving_map(ring).unwrap().clone();
+        for class in [0, 1] {
+            let pending = target_pending(&port, &mut warm);
+            let slot = &warm.pending[&pending];
+            let addresses = slot.ratio.addresses(&[]).unwrap();
+            let read = port
+                .diagnose_pending_readout_at_receiver(
+                    &warm,
+                    &pending,
+                    &frozen,
+                    &receiver,
+                    READING_BITS,
+                )
+                .unwrap();
+            let mut expected_population = warm.constitution.population(ring).unwrap().clone();
+            expected_population
+                .receive(&[
+                    ExactInterval::point(read.native_reading.tree_probabilities[class].clone()),
+                    read.native_reading
+                        .combined_masses_at(READING_BITS)
+                        .unwrap()[class]
+                        .clone(),
+                ])
+                .unwrap();
+            let mut expected_tree = warm.constitution.landmarks(ring).unwrap().clone();
+            expected_tree.receive(&addresses[0], class).unwrap();
+            let before_commit = warm.constitution.commit();
+            let receipt = port
+                .receive_receiver_prefix_continuing(
+                    &mut warm, &mut crib, &pairing, pending, class, &receiver, None,
+                )
+                .unwrap();
+            assert_eq!(receipt.producing, read.native_reading);
+            assert_eq!(
+                warm.constitution.population(ring),
+                Some(&expected_population)
+            );
+            assert_eq!(warm.constitution.landmarks(ring), Some(&expected_tree));
+            assert_eq!(warm.constitution.receiving_map(ring), Some(&frozen));
+            assert_eq!(warm.constitution.commit(), before_commit);
+            assert!(warm.pending.is_empty());
+        }
+        let saved = warm.continuing_state(0).unwrap();
+        let parsed = ContinuingState::from_text(&saved.to_text(), 1 << 40).unwrap();
+        let mut cold = port
+            .mount_continued(
+                &warm.field,
+                &Current::at_rest(&warm.field),
+                material,
+                &parsed,
+            )
+            .unwrap();
+        let mut cold_crib = ObservedCrib::from_unplaced_checkpoint(
+            &warm.field,
+            cold.current(),
+            crib.next_position(),
+            &crib.unplaced_checkpoint().unwrap(),
+        )
+        .unwrap();
+        let a = target_pending(&port, &mut warm);
+        let b = target_pending(&port, &mut cold);
+        let ra = port
+            .receive_receiver_prefix_continuing(
+                &mut warm, &mut crib, &pairing, a, 3, &receiver, None,
+            )
+            .unwrap();
+        let rb = port
+            .receive_receiver_prefix_continuing(
+                &mut cold,
+                &mut cold_crib,
+                &pairing,
+                b,
+                3,
+                &receiver,
+                None,
+            )
+            .unwrap();
+        assert_eq!(ra.producing, rb.producing);
+        assert_eq!(
+            warm.continuing_state(0).unwrap(),
+            cold.continuing_state(0).unwrap()
+        );
+        assert_eq!(crib, cold_crib);
+    }
+
+    #[test]
+    fn retained_receiver_prefix_foreign_grain_and_late_close_refuse_atomically() {
+        for late in [false, true] {
+            let (port, mut resident, mut crib, pairing, _) = target_opening(late);
+            let pending = target_pending(&port, &mut resident);
+            let grain = resident.admitted[0].grain();
+            if late {
+                crib.entries.push(ObservedCribCell {
+                    position: 0,
+                    class: resident.field.alphabet(),
+                    placement: None,
+                });
+            }
+            let receiver = crate::hnn::receiving::RetainedFibreReceiver::declare(if late {
+                grain
+            } else {
+                2 * grain
+            })
+            .unwrap();
+            let before = format!("{resident:?}");
+            let old = crib.clone();
+            assert!(
+                port.receive_receiver_prefix_continuing(
+                    &mut resident,
+                    &mut crib,
+                    &pairing,
+                    pending,
+                    0,
+                    &receiver,
+                    None
+                )
+                .is_err()
+            );
+            assert_eq!(format!("{resident:?}"), before);
+            assert_eq!(crib, old);
+        }
     }
 }

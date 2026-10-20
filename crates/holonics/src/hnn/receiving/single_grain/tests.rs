@@ -338,3 +338,89 @@ fn mirrored_near_power_boundaries_cross_in_both_directions_by_exact_integer_ineq
     assert_eq!(exponent(&edge.cells[0], 4), BigInt::from(-7));
     assert_eq!(edge.cells[0].fibre.as_rational(), Some(&Rat::zero()));
 }
+
+#[test]
+fn retained_fibre_receiver_recovers_exact_tree_masses_and_is_common_offset_invariant() {
+    let tree = split_face(3, 4); // 3/8 and 5/8: neither class probability is a power of two.
+    let receiver = RetainedFibreReceiver::declare(4).unwrap();
+    let zero = ReceivingRead::combined(vec![rat(0, 1); 4], &tree, 4).unwrap();
+    let masses = receiver.masses_at(&zero, 64).unwrap();
+    for (mass, probability) in masses.iter().zip(&tree.probabilities) {
+        assert_eq!(*mass, ExactInterval::point(probability.clone()));
+    }
+
+    // A common fractional real-wave offset cancels after normalization, while the exterior
+    // enclosures still contain the exact tree probabilities.
+    let offset =
+        ReceivingRead::combined(vec![rat(1, 3), rat(0, 1), rat(1, 3), rat(0, 1)], &tree, 4)
+            .unwrap();
+    for (mass, probability) in receiver
+        .masses_at(&offset, 64)
+        .unwrap()
+        .iter()
+        .zip(&tree.probabilities)
+    {
+        assert!(mass.lower <= *probability && *probability <= mass.upper);
+    }
+}
+
+#[test]
+fn retained_fibre_mass_preserves_a_wave_hidden_inside_identical_coarse_cells() {
+    let tree = split_face(4, 1); // equal 1/2 tree masses
+    let read = ReceivingRead::combined(vec![rat(0, 1), rat(0, 1), rat(1, 10), rat(0, 1)], &tree, 1)
+        .unwrap();
+    assert_eq!(read.cells[0].carry, read.cells[1].carry);
+    assert_eq!(read.cells[0].phase, read.cells[1].phase);
+    let masses = RetainedFibreReceiver::declare(1)
+        .unwrap()
+        .masses_at(&read, 64)
+        .unwrap();
+    assert!(masses[1].lower > masses[0].upper);
+}
+
+#[test]
+fn retained_fibre_receiver_refuses_bad_declarations_and_malformed_read_identity() {
+    assert!(RetainedFibreReceiver::declare(0).is_err());
+    let tree = split_face(3, 4);
+    let read = ReceivingRead::combined(vec![rat(0, 1); 4], &tree, 4).unwrap();
+    assert!(
+        RetainedFibreReceiver::declare(8)
+            .unwrap()
+            .masses_at(&read, 64)
+            .is_err()
+    );
+    assert!(
+        RetainedFibreReceiver::declare(4)
+            .unwrap()
+            .masses_at(&read, 0)
+            .is_err()
+    );
+    let mut wrong_phase = read.clone();
+    wrong_phase.phases[0] = rat(1, 3);
+    assert!(
+        RetainedFibreReceiver::declare(4)
+            .unwrap()
+            .masses_at(&wrong_phase, 64)
+            .is_err()
+    );
+    let mut wrong_fibre = read.clone();
+    if let ReceivingFibre::Logarithmic(fibre) = &mut wrong_fibre.cells[0].fibre {
+        fibre.wave += rat(1, 2);
+    } else {
+        panic!("non-power-of-two tree probability retains a logarithmic fibre");
+    }
+    assert!(
+        RetainedFibreReceiver::declare(4)
+            .unwrap()
+            .masses_at(&wrong_fibre, 64)
+            .is_err()
+    );
+    let mut wrong_shape = read;
+    wrong_shape.cells.pop();
+    assert!(
+        RetainedFibreReceiver::declare(4)
+            .unwrap()
+            .masses_at(&wrong_shape, 64)
+            .is_err()
+    );
+}

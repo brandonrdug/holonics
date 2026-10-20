@@ -317,7 +317,9 @@ impl Checkpoint {
         Ok(Self {
             population: self.population,
             stream: ObservedStream::restore(
-                self.stream.resident().clone(), self.stream.crib().clone(), scope,
+                self.stream.resident().clone(),
+                self.stream.crib().clone(),
+                scope,
                 self.stream.pending_classes().to_vec(),
             )?,
             provenance: self.provenance.clone(),
@@ -831,6 +833,281 @@ fn conditional_query_controls(
         ("semantic_answer_claim", "false".into()),
     ]))
 }
+/// One alternate-receiver conditional at a complete hypothetical prefix. The physical body,
+/// source chart and native map stay genuine. Each hypothetical class updates the SAME native
+/// full-fibre likelihood and addressed tree before the next native Word. No branch is retained.
+fn fibre_prefix_state(
+    reference: &Reference,
+    opening: &Resident,
+    opening_crib: &ObservedCrib,
+    pairing: &PairingDeclaration,
+    prefix: &[usize],
+    receiver: &holonics::hnn::receiving::RetainedFibreReceiver,
+) -> std::result::Result<(Resident, ObservedCrib), HnnError> {
+    let mut resident = opening.clone();
+    let mut crib = opening_crib.clone();
+    for &class in prefix {
+        let moment = resident
+            .continuing()
+            .ok_or(HnnError::Unadmitted {
+                reason: "a fibre prefix keeps its actual source moment",
+            })?
+            .0;
+        let phases = resident
+            .admitted()
+            .first()
+            .ok_or(HnnError::Unadmitted {
+                reason: "a fibre prefix keeps its declared receiving phase",
+            })?
+            .clone();
+        let (pending, _) = reference.refine(&mut resident, &moment, &phases)?;
+        reference.receive_receiver_prefix_continuing(
+            &mut resident,
+            &mut crib,
+            pairing,
+            pending,
+            class,
+            receiver,
+            None,
+        )?;
+    }
+    Ok((resident, crib))
+}
+
+fn fibre_prefix_read(
+    reference: &Reference,
+    opening: &Resident,
+    opening_crib: &ObservedCrib,
+    pairing: &PairingDeclaration,
+    prefix: &[usize],
+    control_map: &ExactRatMatrix,
+    receiver: &holonics::hnn::receiving::RetainedFibreReceiver,
+    bits: u32,
+) -> std::result::Result<
+    holonics::hnn::receiving::cells::diagnostic::RetainedReceiverDiagnostic,
+    HnnError,
+> {
+    let (mut resident, _crib) =
+        fibre_prefix_state(reference, opening, opening_crib, pairing, prefix, receiver)?;
+    let moment = resident
+        .continuing()
+        .ok_or(HnnError::Unadmitted {
+            reason: "a fibre oracle keeps its continuing source",
+        })?
+        .0;
+    let phases = resident
+        .admitted()
+        .first()
+        .ok_or(HnnError::Unadmitted {
+            reason: "a fibre oracle keeps its declared phase",
+        })?
+        .clone();
+    let (pending, _) = reference.refine(&mut resident, &moment, &phases)?;
+    let read = reference.diagnose_pending_readout_at_receiver(
+        &resident,
+        &pending,
+        control_map,
+        receiver,
+        bits,
+    )?;
+    reference.discard(&mut resident, Handle::Pending(pending))?;
+    Ok(read)
+}
+
+/// Exact finite section plus literal keyed continuations of the same retained body. Every
+/// arm is explicit: native full fibre, founding-R at the same feature, and the executed tree.
+/// Inherited population likelihoods come from the checkpoint's original coarse receiver.
+/// Readout controls share each hypothesized prefix's native full-fibre reception history;
+/// they are matched local interventions, not independently retrained counterfactual bodies.
+fn retained_fibre_query_controls(
+    checkpoint: &Checkpoint,
+    query: &str,
+    section_bytes: usize,
+    max_oracle_calls: usize,
+    key_bytes: &[u8],
+) -> Result<String> {
+    if query.len() > QUERY_BYTE_BUDGET {
+        return Err("fibre prompt exceeds declared byte workload".into());
+    }
+    let cells = section_bytes
+        .checked_mul(4)
+        .ok_or("fibre aperture overflow")?;
+    if key_bytes.len() != cells.checked_mul(8).ok_or("fibre key workload overflow")? {
+        return Err("fibre draw requires one declared eight-byte key per cell".into());
+    }
+    let horizon = checkpoint
+        .stream
+        .accepted_cells()?
+        .checked_add((query.len().checked_mul(4).ok_or("fibre prompt overflow")?) as u64)
+        .and_then(|n| n.checked_add(cells as u64))
+        .ok_or("fibre horizon overflow")?;
+    if horizon > checkpoint.population {
+        return Err("fibre aperture exceeds the declared source horizon".into());
+    }
+    let before = checkpoint.bytes()?;
+    let reference = port();
+    let (_, founding, pairing) = declaration(checkpoint.population)?;
+    let (mut opening, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
+    for class in digits(query.as_bytes()) {
+        reference.ingest_class_continuing(&mut opening, &mut crib, &pairing, class, None)?;
+    }
+    let phases = opening
+        .admitted()
+        .first()
+        .ok_or("fibre query has no receiver")?;
+    let receiver = holonics::hnn::receiving::RetainedFibreReceiver::declare(phases.grain())?;
+    let control = founding
+        .receiving_law(phases.ring())
+        .ok_or("fibre query has no founding readout")?
+        .map()
+        .clone();
+    let bits = holonics::ratio::exponentiated::READING_BITS;
+    let matched = fibre_prefix_read(
+        &reference,
+        &opening,
+        &crib,
+        &pairing,
+        &[],
+        &control,
+        &receiver,
+        bits,
+    )?;
+    let request = NativeSectionRequest::declare(
+        section_bytes,
+        bits,
+        SectionWorkBudget {
+            max_prefixes: max_oracle_calls
+                .checked_mul(4)
+                .and_then(|n| n.checked_add(1))
+                .ok_or("fibre prefix limit overflow")?,
+            max_oracle_calls,
+        },
+    )?;
+    let mut arms = Vec::new();
+    for policy in [
+        "native_full_fibre",
+        "founding_R_same_feature_full_fibre",
+        "executed_tree",
+    ] {
+        let section = release_native_section(&request, |prefix, depth| {
+            fibre_prefix_read(
+                &reference, &opening, &crib, &pairing, prefix, &control, &receiver, depth,
+            )
+            .map(|read| match policy {
+                "native_full_fibre" => read.native.native_masses,
+                "founding_R_same_feature_full_fibre" => read.control.native_masses,
+                _ => read.native.tree_masses,
+            })
+        })?;
+        let mut resident = opening.clone();
+        let mut local_crib = crib.clone();
+        let mut classes = Vec::new();
+        let mut events = Vec::new();
+        let mut stop = "DeclaredLength";
+        let mut key_stream = KeyStream::new(key_bytes.to_vec(), 8)?;
+        for at in 0..cells {
+            let moment = resident.continuing().ok_or("fibre draw has no source")?.0;
+            let phases = resident
+                .admitted()
+                .first()
+                .ok_or("fibre draw has no phase")?
+                .clone();
+            let (pending, _) = reference.refine(&mut resident, &moment, &phases)?;
+            let prefix = reference.diagnose_pending_readout_at_receiver(
+                &resident, &pending, &control, &receiver, bits,
+            )?;
+            let masses = match policy {
+                "native_full_fibre" => &prefix.native.native_masses,
+                "founding_R_same_feature_full_fibre" => &prefix.control.native_masses,
+                _ => &prefix.native.tree_masses,
+            };
+            let key = key_stream
+                .next_key()
+                .ok_or("declared fibre key stream ended")?;
+            let decision = holonics::receiver::release::draw(masses, &key)?;
+            events.push(object(&[
+                ("cell", at.to_string()),
+                ("key", rational(&key)),
+                ("decision", exact(&decision)),
+                ("matched_receiver", exact(&prefix)),
+            ]));
+            let holonics::receiver::release::ReleaseReturn::Drawn(certified) = decision else {
+                reference.discard(&mut resident, Handle::Pending(pending))?;
+                stop = "Unresolved";
+                break;
+            };
+            let class = certified.class;
+            reference.receive_receiver_prefix_continuing(
+                &mut resident,
+                &mut local_crib,
+                &pairing,
+                pending,
+                class,
+                &receiver,
+                None,
+            )?;
+            classes.push(class);
+            // The focused control compares every emitted-prefix state, including the full
+            // tree/population/material/current/moment/charts and crib, to independent replay.
+            // Production draws advance that checked transition once, without redundant Words.
+            #[cfg(test)]
+            {
+                let (replayed, replayed_crib) =
+                    fibre_prefix_state(&reference, &opening, &crib, &pairing, &classes, &receiver)?;
+                if resident.continuing_state(0)? != replayed.continuing_state(0)?
+                    || local_crib != replayed_crib
+                {
+                    return Err(
+                        "full-fibre keyed continuation disagrees with complete-prefix replay"
+                            .into(),
+                    );
+                }
+            }
+            // The exterior diagnostic dies here; none is native retention.
+        }
+        let decoded = Base4Bytes::decode(&classes, cells)?;
+        let continuation = resident.continuing_state(0)?;
+        let final_state = continuation.to_text();
+        arms.push(object(&[
+            ("policy", quoted(policy)),
+            ("section_exact", exact(&section)),
+            ("draw_stop", quoted(stop)),
+            ("draw_classes", format!("{classes:?}")),
+            ("raw_bytes", format!("{:?}", decoded.bytes)),
+            (
+                "raw_utf8",
+                decoded
+                    .complete_boundary_text()
+                    .map_or_else(|| "null".into(), quoted),
+            ),
+            ("decoded_exact", exact(&decoded)),
+            ("draw_events", format!("[{}]", events.join(","))),
+            ("self_received_cells", classes.len().to_string()),
+            (
+                "continuation_sha256",
+                quoted(&sha256(final_state.as_bytes())?),
+            ),
+        ]));
+    }
+    if checkpoint.bytes()? != before {
+        return Err("fibre query changed its retained checkpoint".into());
+    }
+    Ok(object(&[
+        ("receiver", exact(&receiver)),
+        ("prompt_bytes", query.len().to_string()),
+        ("matched_opening", exact(&matched)),
+        ("arms", format!("[{}]", arms.join(","))),
+        ("retained_checkpoint_unchanged", "true".into()),
+        (
+            "population_scope",
+            quoted(
+                "inherited original coarse likelihoods; matched R interventions share native full-fibre prefix reception; no normal deposition",
+            ),
+        ),
+        ("semantic_answer_claim", "false".into()),
+    ]))
+}
+
 struct KeyedReply {
     json: String,
     classes: Vec<usize>,
@@ -1131,9 +1408,15 @@ fn object(fields: &[(&str, String)]) -> String {
 fn scope_description(scope: ObservedEpochDepositionScope) -> &'static str {
     match scope {
         ObservedEpochDepositionScope::All => "All: ordinary physical-factor policy",
-        ObservedEpochDepositionScope::NormalMaps => "NormalMaps: physical factor deposition requests and statistics held",
-        ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => "NormalMapsAndChannelDissipation: C/K and other physical families held; actual D requires same-opening finite comparison and zero held work",
-        ObservedEpochDepositionScope::NormalMapsAndChannelMaterial => "NormalMapsAndChannelMaterial: actual C/K/D endpoint requires same-opening finite comparison and endpoint held-work closure",
+        ObservedEpochDepositionScope::NormalMaps => {
+            "NormalMaps: physical factor deposition requests and statistics held"
+        }
+        ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => {
+            "NormalMapsAndChannelDissipation: C/K and other physical families held; actual D requires same-opening finite comparison and zero held work"
+        }
+        ObservedEpochDepositionScope::NormalMapsAndChannelMaterial => {
+            "NormalMapsAndChannelMaterial: actual C/K/D endpoint requires same-opening finite comparison and endpoint held-work closure"
+        }
     }
 }
 fn parse_fork_scope(value: &str) -> Result<ObservedEpochDepositionScope> {
@@ -1150,8 +1433,11 @@ fn parse_fork_scope(value: &str) -> Result<ObservedEpochDepositionScope> {
 fn ingest_reference(command: &str, scope: ObservedEpochDepositionScope) -> Result<Reference> {
     match command {
         "ingest" => Ok(port()),
-        "ingest-grain" if scope == ObservedEpochDepositionScope::NormalMapsAndChannelDissipation =>
-            Ok(port().with_refining_grain()),
+        "ingest-grain"
+            if scope == ObservedEpochDepositionScope::NormalMapsAndChannelDissipation =>
+        {
+            Ok(port().with_refining_grain())
+        }
         "ingest-grain" => Err("grain ingest requires the explicitly forked channel-D scope".into()),
         _ => Err("unknown ingest policy".into()),
     }
@@ -1161,7 +1447,9 @@ fn ingest_reference(command: &str, scope: ObservedEpochDepositionScope) -> Resul
 /// continuing experiment consume the next heard symbols without replay, padding or skipping.
 fn source_cell_span(excerpt: &[u8], limit: Option<usize>, offset: usize) -> Result<Vec<usize>> {
     let mut cells = digits(excerpt);
-    if offset >= cells.len() { return Err("source-cell offset must begin within the excerpt".into()); }
+    if offset >= cells.len() {
+        return Err("source-cell offset must begin within the excerpt".into());
+    }
     cells.drain(..offset);
     if let Some(limit) = limit {
         if limit == 0 || limit > cells.len() {
@@ -1438,6 +1726,16 @@ fn run() -> Result<()> {
                 ("warm_query", warm), ("warm_keyed_replies", warm_keyed), ("elapsed_ns", started.elapsed().as_nanos().to_string()),
             ]));
         }
+        Some("query-fibre") if args.len() == 7 => {
+            let (checkpoint, hash) = Checkpoint::load(&args[1], args[2].parse()?)?;
+            let prompt_bytes = std::fs::read(&args[3])?;
+            let prompt = std::str::from_utf8(&prompt_bytes)?;
+            let keys = std::fs::read(&args[6])?;
+            let reading = retained_fibre_query_controls(&checkpoint, prompt, args[4].parse()?, args[5].parse()?, &keys)?;
+            println!("{}", object(&[("kind",quoted("query-fibre")),("checkpoint_sha256",quoted(&hash)),
+                ("prompt_sha256",quoted(&sha256(&prompt_bytes)?)),("keys_sha256",quoted(&sha256(&keys)?)),
+                ("reading",reading),("elapsed_ns",started.elapsed().as_nanos().to_string())]));
+        }
         Some("query") if args.len() == 6 && args[3] == "--frozen-r-target-prefix" => {
             let (checkpoint, hash) = Checkpoint::load(&args[1], args[2].parse()?)?;
             let maximum: usize = args[5].parse()?;
@@ -1565,49 +1863,142 @@ mod tests {
     fn channel_d_scope_fork_preserves_full_native_and_pending_state() {
         let (field, initial, pairing) = declaration(4096).unwrap();
         let reference = port();
-        let mut resident = reference.mount_with(&field, &Current::at_rest(&field), initial).unwrap();
+        let mut resident = reference
+            .mount_with(&field, &Current::at_rest(&field), initial)
+            .unwrap();
         let boundary = PairedObservation::admit(&field, resident.constitution(), &pairing).unwrap();
-        reference.ingest(&mut resident, None, &boundary.encode(&[]).unwrap()).unwrap();
-        let mut stream = ObservedStream::new(resident, ObservedCrib::new(0), ObservedEpochDepositionScope::NormalMaps).unwrap();
+        reference
+            .ingest(&mut resident, None, &boundary.encode(&[]).unwrap())
+            .unwrap();
+        let mut stream = ObservedStream::new(
+            resident,
+            ObservedCrib::new(0),
+            ObservedEpochDepositionScope::NormalMaps,
+        )
+        .unwrap();
         stream.receive(&reference, &pairing, &[0, 1, 2, 3]).unwrap();
-        let opening = Checkpoint { population: 4096, stream, provenance: "existing exterior provenance\n".into() };
+        let opening = Checkpoint {
+            population: 4096,
+            stream,
+            provenance: "existing exterior provenance\n".into(),
+        };
         let old_bytes = opening.bytes().unwrap();
-        let fork = opening.fork_scope(parse_fork_scope("normal-maps-channel-dissipation").unwrap()).unwrap();
-        assert_eq!(fork.stream.scope(), ObservedEpochDepositionScope::NormalMapsAndChannelDissipation);
-        assert_eq!(fork.stream.resident().continuing_state(0).unwrap(), opening.stream.resident().continuing_state(0).unwrap());
+        let fork = opening
+            .fork_scope(parse_fork_scope("normal-maps-channel-dissipation").unwrap())
+            .unwrap();
+        assert_eq!(
+            fork.stream.scope(),
+            ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
+        );
+        assert_eq!(
+            fork.stream.resident().continuing_state(0).unwrap(),
+            opening.stream.resident().continuing_state(0).unwrap()
+        );
         assert_eq!(fork.stream.crib(), opening.stream.crib());
-        assert_eq!(fork.stream.pending_classes(), opening.stream.pending_classes());
+        assert_eq!(
+            fork.stream.pending_classes(),
+            opening.stream.pending_classes()
+        );
         assert_eq!(fork.provenance, opening.provenance);
-        assert_eq!(fork.stream.accepted_cells().unwrap(), opening.stream.accepted_cells().unwrap());
+        assert_eq!(
+            fork.stream.accepted_cells().unwrap(),
+            opening.stream.accepted_cells().unwrap()
+        );
         assert_ne!(fork.bytes().unwrap(), old_bytes);
         assert_eq!(opening.bytes().unwrap(), old_bytes);
-        let restored = ObservedStream::restore_checkpoint(fork.stream.resident().clone(), fork.stream.crib().clone(), &fork.stream.pending_checkpoint()).unwrap();
+        let restored = ObservedStream::restore_checkpoint(
+            fork.stream.resident().clone(),
+            fork.stream.crib().clone(),
+            &fork.stream.pending_checkpoint(),
+        )
+        .unwrap();
         assert_eq!(restored.scope(), fork.stream.scope());
-        assert_eq!(restored.pending_checkpoint(), fork.stream.pending_checkpoint());
-        let back = fork.fork_scope(parse_fork_scope("normal-maps").unwrap()).unwrap();
+        assert_eq!(
+            restored.pending_checkpoint(),
+            fork.stream.pending_checkpoint()
+        );
+        let back = fork
+            .fork_scope(parse_fork_scope("normal-maps").unwrap())
+            .unwrap();
         assert_eq!(back.bytes().unwrap(), old_bytes);
         let material_scope = parse_fork_scope("normal-maps-channel-material").unwrap();
-        assert_eq!(material_scope, ObservedEpochDepositionScope::NormalMapsAndChannelMaterial);
+        assert_eq!(
+            material_scope,
+            ObservedEpochDepositionScope::NormalMapsAndChannelMaterial
+        );
         let material = opening.fork_scope(material_scope).unwrap();
         assert_eq!(material.stream.scope(), material_scope);
-        assert!(material.stream.pending_checkpoint().contains("normal-maps-channel-material"));
+        assert!(
+            material
+                .stream
+                .pending_checkpoint()
+                .contains("normal-maps-channel-material")
+        );
         assert!(parse_fork_scope("all").is_err());
         assert!(parse_fork_scope("normal-map").is_err());
     }
 
     #[test]
     fn grain_ingest_policy_requires_d_scope_and_exact_non_octet_source_span() {
-        assert!(ingest_reference("ingest-grain", ObservedEpochDepositionScope::NormalMapsAndChannelDissipation).is_ok());
-        assert!(ingest_reference("ingest-grain", ObservedEpochDepositionScope::NormalMaps).is_err());
+        assert!(
+            ingest_reference(
+                "ingest-grain",
+                ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
+            )
+            .is_ok()
+        );
+        assert!(
+            ingest_reference("ingest-grain", ObservedEpochDepositionScope::NormalMaps).is_err()
+        );
         assert!(ingest_reference("ingest-grain", ObservedEpochDepositionScope::All).is_err());
         assert!(ingest_reference("ingest", ObservedEpochDepositionScope::NormalMaps).is_ok());
-        assert!(ingest_reference("unknown", ObservedEpochDepositionScope::NormalMapsAndChannelDissipation).is_err());
+        assert!(
+            ingest_reference(
+                "unknown",
+                ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
+            )
+            .is_err()
+        );
         // 0x1b = 00 01 10 11, 0xe4 = 11 10 01 00. The requested non-octet span is exact.
-        assert_eq!(source_cell_span(&[0x1b, 0xe4], Some(4), 2).unwrap(), vec![2, 3, 3, 2]);
-        assert_eq!(source_cell_span(&[0x1b, 0xe4], None, 0).unwrap(), digits(&[0x1b, 0xe4]));
+        assert_eq!(
+            source_cell_span(&[0x1b, 0xe4], Some(4), 2).unwrap(),
+            vec![2, 3, 3, 2]
+        );
+        assert_eq!(
+            source_cell_span(&[0x1b, 0xe4], None, 0).unwrap(),
+            digits(&[0x1b, 0xe4])
+        );
         assert!(source_cell_span(&[0x1b], Some(0), 0).is_err());
         assert!(source_cell_span(&[0x1b], Some(3), 2).is_err());
         assert!(source_cell_span(&[0x1b], None, 4).is_err());
     }
-
+    #[test]
+    fn retained_fibre_section_is_bounded_self_receives_and_preserves_original_checkpoint() {
+        let (field, initial, pairing) = declaration(4096).unwrap();
+        let reference = port();
+        let mut resident = reference
+            .mount_with(&field, &Current::at_rest(&field), initial)
+            .unwrap();
+        let boundary = PairedObservation::admit(&field, resident.constitution(), &pairing).unwrap();
+        reference
+            .ingest(&mut resident, None, &boundary.encode(&[]).unwrap())
+            .unwrap();
+        let checkpoint = Checkpoint {
+            population: 4096,
+            stream: ObservedStream::new(
+                resident,
+                ObservedCrib::new(0),
+                ObservedEpochDepositionScope::NormalMaps,
+            )
+            .unwrap(),
+            provenance: String::new(),
+        };
+        let before = checkpoint.bytes().unwrap();
+        let reading = retained_fibre_query_controls(&checkpoint, "", 1, 1, &[0; 32]).unwrap();
+        assert!(reading.contains("OracleBudget"));
+        assert!(reading.contains("\"self_received_cells\":4"));
+        assert!(reading.contains("\"raw_bytes\":[0]"));
+        assert!(reading.contains("\"retained_checkpoint_unchanged\":true"));
+        assert_eq!(checkpoint.bytes().unwrap(), before);
+    }
 }

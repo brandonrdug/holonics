@@ -2,10 +2,10 @@
 //! none receives a target, changes a constitution or supplies a generation law.
 
 use super::*;
-use num_traits::Zero;
 use crate::hnn::receiving::ReceivingRead;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::receiver::release::ClassCommit;
+use num_traits::Zero;
 
 /// Three distinct executed operands at one pre-reception cut. The combined face includes the
 /// wave and exact tree logarithm, read at one grain; the executed tree is its rational face.
@@ -23,10 +23,13 @@ pub struct ScoredFaceDiagnostic {
 }
 
 fn differences(a: &[ExactInterval], b: &[ExactInterval]) -> Vec<ExactInterval> {
-    a.iter().zip(b).map(|(a, b)| ExactInterval {
-        lower: &a.lower - &b.upper,
-        upper: &a.upper - &b.lower,
-    }).collect()
+    a.iter()
+        .zip(b)
+        .map(|(a, b)| ExactInterval {
+            lower: &a.lower - &b.upper,
+            upper: &a.upper - &b.lower,
+        })
+        .collect()
 }
 
 impl ScoredFaceReading {
@@ -57,8 +60,12 @@ impl ScoredFaceReading {
         let combined_masses = (0..alphabet)
             .map(|c| face_enclosure_at(&self.combined, c, bits))
             .collect::<Result<Vec<_>, _>>()?;
-        let tree_masses: Vec<_> = self.tree_probabilities.iter().cloned()
-            .map(ExactInterval::point).collect();
+        let tree_masses: Vec<_> = self
+            .tree_probabilities
+            .iter()
+            .cloned()
+            .map(ExactInterval::point)
+            .collect();
         Ok(ScoredFaceDiagnostic {
             reading_bits: bits,
             native_minus_tree: differences(&native_masses, &tree_masses),
@@ -96,8 +103,10 @@ pub fn compare_readout_maps_at(
     bits: u32,
 ) -> Result<ReadoutMapDiagnostic, HnnError> {
     let rows = 2 * reading.tree_probabilities.len();
-    if native_map.rows() != rows || control_map.rows() != rows
-        || native_map.columns() != feature.len() || control_map.columns() != feature.len()
+    if native_map.rows() != rows
+        || control_map.rows() != rows
+        || native_map.columns() != feature.len()
+        || control_map.columns() != feature.len()
         || native_wave_logits.len() != rows
         || tree.probabilities != reading.tree_probabilities
         || tree.grain != reading.combined.grain()
@@ -246,6 +255,131 @@ pub fn compare_readout_class_codes_at(
     })
 }
 
+/// Frozen native operands read by an explicitly declared full-fibre receiver. The population
+/// likelihoods are inherited from the original coarse reader, not calibrated on this receiver.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RetainedScoredFaceReading {
+    pub population: crate::receiver::population::PortPopulation,
+    pub tree_probabilities: Vec<Rat>,
+    pub read: ReceivingRead,
+    pub receiver: crate::hnn::receiving::RetainedFibreReceiver,
+}
+
+impl RetainedScoredFaceReading {
+    pub fn combined_masses_at(&self, bits: u32) -> Result<Vec<ExactInterval>, HnnError> {
+        self.receiver.masses_at(&self.read, bits)
+    }
+
+    pub fn masses_at(&self, bits: u32) -> Result<Vec<ExactInterval>, HnnError> {
+        let combined = self.combined_masses_at(bits)?;
+        if combined.len() != self.tree_probabilities.len()
+            || self.tree_probabilities.iter().any(|p| p < &Rat::zero())
+            || self.tree_probabilities.iter().cloned().sum::<Rat>() != Rat::one()
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a full-fibre receiver keeps its normalized tree partition",
+            });
+        }
+        self.tree_probabilities
+            .iter()
+            .zip(combined)
+            .map(|(tree, wave)| {
+                self.population
+                    .face_of_at(&[ExactInterval::point(tree.clone()), wave], bits)
+                    .map_err(population_refusal)
+            })
+            .collect()
+    }
+
+    pub fn diagnostic_at(&self, bits: u32) -> Result<ScoredFaceDiagnostic, HnnError> {
+        if !demand_ladder().contains(&bits) {
+            return Err(HnnError::Unadmitted {
+                reason: "a full-fibre diagnostic reads one native demand depth",
+            });
+        }
+        let combined_masses = self.combined_masses_at(bits)?;
+        let native_masses = self.masses_at(bits)?;
+        let tree_masses: Vec<_> = self
+            .tree_probabilities
+            .iter()
+            .cloned()
+            .map(ExactInterval::point)
+            .collect();
+        Ok(ScoredFaceDiagnostic {
+            reading_bits: bits,
+            native_minus_tree: differences(&native_masses, &tree_masses),
+            combined_minus_tree: differences(&combined_masses, &tree_masses),
+            native_commit: commit(&native_masses).map_err(draw_refusal)?,
+            combined_commit: commit(&combined_masses).map_err(draw_refusal)?,
+            tree_commit: commit(&tree_masses).map_err(draw_refusal)?,
+            native_masses,
+            combined_masses,
+            tree_masses,
+        })
+    }
+}
+
+/// An alternate receiver of the SAME exact retained logits. Every arm retains its complete
+/// symbolic fibre; no fine-grid representative, prior, current, map or target replaces it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RetainedReceiverDiagnostic {
+    pub receiver: crate::hnn::receiving::RetainedFibreReceiver,
+    pub coarse: ReadoutMapDiagnostic,
+    pub native_reading: RetainedScoredFaceReading,
+    pub control_reading: RetainedScoredFaceReading,
+    pub native: ScoredFaceDiagnostic,
+    pub control: ScoredFaceDiagnostic,
+    pub native_minus_control_masses: Vec<ExactInterval>,
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn compare_readout_maps_at_receiver(
+    reading: &ScoredFaceReading,
+    tree: &LandmarkFace,
+    feature: &[Rat],
+    native_map: &ExactRatMatrix,
+    native_wave_logits: &[Rat],
+    control_map: &ExactRatMatrix,
+    receiver: &crate::hnn::receiving::RetainedFibreReceiver,
+    bits: u32,
+) -> Result<RetainedReceiverDiagnostic, HnnError> {
+    let coarse = compare_readout_maps_at(
+        reading,
+        tree,
+        feature,
+        native_map,
+        native_wave_logits,
+        control_map,
+        bits,
+    )?;
+    if receiver.source_grain() != tree.grain {
+        return Err(HnnError::Unadmitted {
+            reason: "a full-fibre receiver keeps its actual producing grain",
+        });
+    }
+    let read_at = |wave: Vec<Rat>| -> Result<RetainedScoredFaceReading, HnnError> {
+        Ok(RetainedScoredFaceReading {
+            population: reading.population.clone(),
+            tree_probabilities: reading.tree_probabilities.clone(),
+            read: ReceivingRead::combined(wave, tree, tree.grain)?,
+            receiver: receiver.clone(),
+        })
+    };
+    let native_reading = read_at(coarse.native_wave_logits.clone())?;
+    let control_reading = read_at(coarse.control_wave_logits.clone())?;
+    let native = native_reading.diagnostic_at(bits)?;
+    let control = control_reading.diagnostic_at(bits)?;
+    Ok(RetainedReceiverDiagnostic {
+        receiver: receiver.clone(),
+        coarse,
+        native_minus_control_masses: differences(&native.native_masses, &control.native_masses),
+        native_reading,
+        control_reading,
+        native,
+        control,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -262,8 +396,12 @@ mod tests {
         let feature = vec![integer(1)];
         let native_map = ExactRatMatrix::zero(4, 1).unwrap();
         let control_map = ExactRatMatrix::new(vec![
-            vec![rat(1, 64)], vec![rat(1, 4)], vec![integer(0)], vec![integer(0)],
-        ]).unwrap();
+            vec![rat(1, 64)],
+            vec![rat(1, 4)],
+            vec![integer(0)],
+            vec![integer(0)],
+        ])
+        .unwrap();
         let native_wave = native_map.apply(&feature).unwrap();
         let control_wave = control_map.apply(&feature).unwrap();
         let native_read = ReceivingRead::combined(native_wave.clone(), &tree, 8).unwrap();
@@ -277,18 +415,32 @@ mod tests {
         let reading = ScoredFaceReading::new(&receiving_population(), &tree, &native_face);
         let before = reading.clone();
         let codes = compare_readout_class_codes_at(
-            &reading, &tree, &feature, &native_map, &native_wave, &control_map, 0, READING_BITS,
-        ).unwrap();
+            &reading,
+            &tree,
+            &feature,
+            &native_map,
+            &native_wave,
+            &control_map,
+            0,
+            READING_BITS,
+        )
+        .unwrap();
         assert_eq!(codes.native_code, codes.control_code);
         assert_eq!(codes.native_minus_control, ExactInterval::point(integer(0)));
         let phase_target = crate::hnn::ratio::TargetPhases {
-            branch: 0.into(), phases: vec![integer(0)],
+            branch: 0.into(),
+            phases: vec![integer(0)],
         };
         let comparison = |face: Face, wave: Vec<Rat>| {
             crate::hnn::ratio::HolonRatio::compare(
-                crate::hnn::ratio::Faces { faces: vec![face], logits: vec![wave] },
-                &[0], &phase_target,
-            ).unwrap()
+                crate::hnn::ratio::Faces {
+                    faces: vec![face],
+                    logits: vec![wave],
+                },
+                &[0],
+                &phase_target,
+            )
+            .unwrap()
         };
         assert_eq!(comparison(native_face, native_wave).excess(), integer(0));
         assert_eq!(comparison(control_face, control_wave).excess(), rat(1, 128));
@@ -301,10 +453,23 @@ mod tests {
             probabilities: vec![rat(1, 2), rat(1, 2)],
             exponents: vec![(-4).into(), (-4).into()],
         };
-        let map = ExactRatMatrix::new(vec![vec![integer(1)], vec![integer(0)],
-            vec![integer(0)], vec![integer(0)]]).unwrap();
+        let map = ExactRatMatrix::new(vec![
+            vec![integer(1)],
+            vec![integer(0)],
+            vec![integer(0)],
+            vec![integer(0)],
+        ])
+        .unwrap();
         let read = ReceivingRead::combined(map.apply(&[integer(1)]).unwrap(), &tree, 4).unwrap();
-        (ScoredFaceReading::new(&receiving_population(), &tree, &Face::of_read(&read, 4).unwrap()), tree, map)
+        (
+            ScoredFaceReading::new(
+                &receiving_population(),
+                &tree,
+                &Face::of_read(&read, 4).unwrap(),
+            ),
+            tree,
+            map,
+        )
     }
 
     #[test]
@@ -326,18 +491,26 @@ mod tests {
         let feature = vec![integer(1)];
         let wave = map.apply(&feature).unwrap();
         let zero = ExactRatMatrix::new(vec![vec![integer(0)]; 4]).unwrap();
-        let diagnostic = compare_readout_maps_at(&reading, &tree, &feature, &map, &wave,
-            &zero, READING_BITS).unwrap();
+        let diagnostic =
+            compare_readout_maps_at(&reading, &tree, &feature, &map, &wave, &zero, READING_BITS)
+                .unwrap();
         assert_eq!(diagnostic.native.native_commit.class(), Some(0));
         assert_eq!(diagnostic.control.native_commit.class(), None);
-        assert_eq!(diagnostic.native.tree_masses, diagnostic.control.tree_masses);
+        assert_eq!(
+            diagnostic.native.tree_masses,
+            diagnostic.control.tree_masses
+        );
         assert_eq!(reading, before);
-        let same = compare_readout_maps_at(&reading, &tree, &feature, &map, &wave,
-            &map, READING_BITS).unwrap();
+        let same =
+            compare_readout_maps_at(&reading, &tree, &feature, &map, &wave, &map, READING_BITS)
+                .unwrap();
         assert_eq!(same.native, same.control);
-        let mut wrong = wave; wrong[0] += integer(1);
-        assert!(compare_readout_maps_at(&reading, &tree, &feature, &map, &wrong,
-            &zero, READING_BITS).is_err());
+        let mut wrong = wave;
+        wrong[0] += integer(1);
+        assert!(
+            compare_readout_maps_at(&reading, &tree, &feature, &map, &wrong, &zero, READING_BITS)
+                .is_err()
+        );
     }
     #[test]
     fn readout_class_codes_match_the_actual_native_scorer_and_keep_operands_frozen() {

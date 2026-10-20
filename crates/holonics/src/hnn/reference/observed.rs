@@ -16,7 +16,7 @@ use crate::hnn::paired::PairingDeclaration;
 mod epoch;
 mod checkpoint;
 mod diagnostic;
-pub use diagnostic::{PendingReadoutDiagnostic, TargetPrefixReadoutControlReceipt};
+pub use diagnostic::{PendingReadoutDiagnostic, ReceiverPrefixReceipt, TargetPrefixReadoutControlReceipt};
 mod tree_release;
 pub use tree_release::TreeReleaseReceipt;
 mod stream;

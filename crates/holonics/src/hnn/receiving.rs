@@ -151,7 +151,7 @@ use std::ops::Range;
 
 pub mod cells;
 mod single_grain;
-pub use single_grain::{LogarithmicFibre, ReceivingCell, ReceivingFibre};
+pub use single_grain::{LogarithmicFibre, ReceivingCell, ReceivingFibre, RetainedFibreReceiver};
 mod comparison_score;
 pub use comparison_score::{ComparedScoresAt, compare_scores_at};
 mod declaration;
