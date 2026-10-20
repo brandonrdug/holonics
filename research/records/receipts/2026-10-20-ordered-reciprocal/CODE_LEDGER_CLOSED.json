@@ -1,0 +1,68 @@
+{
+  "scope": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/CODE_SCOPE.json",
+  "maximum_ns": 600000000000,
+  "measured_ns": 422233915524,
+  "entries": [
+    {
+      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/code-01-check/receipt.json",
+      "wall_ns": 7682445210,
+      "exit": 101,
+      "stop": null,
+      "initial_cleanup_remaining": []
+    },
+    {
+      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/code-02-host-ordered/receipt.json",
+      "wall_ns": 50054752802,
+      "exit": 101,
+      "stop": null,
+      "initial_cleanup_remaining": []
+    },
+    {
+      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/code-03-host-ordered/receipt.json",
+      "wall_ns": 5359172900,
+      "exit": 0,
+      "stop": null,
+      "initial_cleanup_remaining": []
+    },
+    {
+      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/code-04-host-focused/receipt.json",
+      "wall_ns": 11123961917,
+      "exit": 101,
+      "stop": null,
+      "initial_cleanup_remaining": []
+    },
+    {
+      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/code-05-final-focused/receipt.json",
+      "wall_ns": 60639744890,
+      "exit": 0,
+      "stop": null,
+      "initial_cleanup_remaining": []
+    },
+    {
+      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/code-06-host-gates/receipt.json",
+      "wall_ns": 180056125812,
+      "exit": -9,
+      "stop": "fixed_deadline",
+      "initial_cleanup_remaining": [
+        1079153
+      ]
+    },
+    {
+      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/code-07-remaining-host-gates/receipt.json",
+      "wall_ns": 92254927574,
+      "exit": 0,
+      "stop": null,
+      "initial_cleanup_remaining": []
+    },
+    {
+      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/code-08-host-card/receipt.json",
+      "wall_ns": 15062784419,
+      "exit": 0,
+      "stop": null,
+      "initial_cleanup_remaining": []
+    }
+  ],
+  "closed": true,
+  "no_model_or_dataset_jobs": true,
+  "owned_cleanup": "all terminal; code06 transient PID verified exited by CLEANUP_POSTFLIGHT.json; GPU postflight empty"
+}

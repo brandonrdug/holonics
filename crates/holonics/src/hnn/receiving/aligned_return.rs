@@ -5,7 +5,9 @@
 //! responsibility beta = rho product r_t / P. A rational representative is an
 //! explicitly certified return chart, never an exact-irrational-to-rational cast.
 //! Its logit-space certificate authorizes no material publication: the actual
-//! producing Word and complete finite candidate comparison still govern that.
+//! producing Word and the explicitly selected publication policy still govern that.
+//! The certified reference requests a complete finite candidate comparison; an opt-in
+//! local receiving response retains its NormalLaw guards without that additional veto.
 
 use super::*;
 use num_bigint::BigInt;
@@ -38,6 +40,12 @@ pub struct RetainedSectionReturn {
     pub error_pairing: Rat,
     pub exact_zero: bool,
     pub reading_bits: u32,
+    /// Actual completed return-construction owner calls across its demand ladder.
+    /// These exclude the epoch's initial chronological score and all exterior diagnostics;
+    /// they do not infer internal root/log, kernel, transfer or synchronization counts.
+    pub section_score_evaluations: u64,
+    pub station_mass_evaluations: u64,
+    pub station_weight_evaluations: u64,
 }
 
 fn fail(reason: &'static str) -> HnnError {
@@ -133,6 +141,9 @@ impl RetainedSectionReturn {
                 "this aligned return names the declared tree and combined families",
             ));
         }
+        let mut section_score_evaluations = 0;
+        let mut station_mass_evaluations = 0;
+        let mut station_weight_evaluations = 0;
         for bits in cells::demand_ladder() {
             let scored = score_at_law(
                 ReceivingLaw::RetainedFibreV1,
@@ -143,6 +154,7 @@ impl RetainedSectionReturn {
                 targets,
                 bits,
             )?;
+            section_score_evaluations += 1;
             let mut reads = Vec::with_capacity(targets.len());
             let mut q = Rat::one();
             let mut r_lo = Rat::one();
@@ -154,6 +166,7 @@ impl RetainedSectionReturn {
                     ));
                 };
                 let masses = reading.combined_masses_at(bits)?;
+                station_mass_evaluations += 1;
                 let target = targets[at];
                 q *= &reading.tree_probabilities[target];
                 r_lo *= &masses[target].lower;
@@ -179,6 +192,7 @@ impl RetainedSectionReturn {
             let mut exact_zero = true;
             for (at, (reading, masses)) in reads.into_iter().enumerate() {
                 let weights = reading.receiver.weights_at(&reading.read, bits)?;
+                station_weight_evaluations += 1;
                 let representatives: Vec<_> = weights
                     .iter()
                     .map(|w| (&w.lower + &w.upper) / integer(2))
@@ -255,6 +269,9 @@ impl RetainedSectionReturn {
                     error_pairing,
                     exact_zero,
                     reading_bits: bits,
+                    section_score_evaluations,
+                    station_mass_evaluations,
+                    station_weight_evaluations,
                 });
             }
         }

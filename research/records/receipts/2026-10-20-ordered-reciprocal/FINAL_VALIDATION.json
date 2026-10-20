@@ -1,0 +1,57 @@
+{
+  "kind": "V93 ordered local receiving return then new-cut source response CODE",
+  "base_source": "da5310b06d7193c9f5030c0c667194ba33ba9839",
+  "host_gate_scopes_passed": 22,
+  "doctests_passed": 64,
+  "focused_ordered_controls_passed": 3,
+  "source_reciprocal_controls_passed": 5,
+  "CUDA_shared_host_card_cold_control": "PASS",
+  "CUDA_actual_selected_dispatch": {
+    "backend": "cuda-observed-epoch-device0",
+    "device_ordinal": 0,
+    "host_fallback": false,
+    "completed": true,
+    "successful_card_forwards": 28,
+    "successful_retained_card_returns": 28,
+    "successful_card_aggregates": 3,
+    "host_owned": "scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks"
+  },
+  "sampled_peak_own_GPU_MiB": 260,
+  "GPU_cleanup_empty": true,
+  "CPU_cleanup_postflight": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/code-06-host-gates/CLEANUP_POSTFLIGHT.json",
+  "CODE_measured_ns": 422233915524,
+  "unused_CODE_ns": 177766084476,
+  "binary_pins": [
+    {
+      "kind": "host",
+      "path": "/home/b/Documents/Codex/2026-10-17/task/req063-circuit-bpc/.local/wt/a4-ordered-reciprocal-v93-20261020/.local/target/debug/examples/solenoidal_alpha-0f004c22c7bb2530",
+      "sha256": "872f4222d52d3f07008754c19b0602b48d002bcfc859051f1748e8064c3f44b6",
+      "bytes": 20803976,
+      "profile": "optimized test opt1; synthetic CODE entry"
+    },
+    {
+      "kind": "CUDA",
+      "path": "/home/b/Documents/Codex/2026-10-17/task/req063-circuit-bpc/.local/wt/a4-ordered-reciprocal-v93-20261020/.local/target/debug/examples/complete_language_observed-2a0d8bda9a7d1e85",
+      "sha256": "e5aff1e481b065a13f4a256f0dd132d01ec2f311fe62cabec1c3ebc8e060466d",
+      "bytes": 26867320,
+      "profile": "optimized test opt1; synthetic CODE entry"
+    }
+  ],
+  "R_admission": "existing local NormalLaw; no Whole/Joint setup or finite comparison requested",
+  "source_admission": "new-cut actual signed paired slip/source entrance; local slip5->0",
+  "evidence": "R changes7entries by signed1/64; R-only and matched E-only same-law mass changes interval-separated; fixed key1/2 stays class2",
+  "incomplete": [
+    "no dataset/language capability assessment",
+    "no branch-specific native material bank",
+    "no comprehensive scalar-root/log/kernel/transfer/sync counters",
+    "old coarse+fine diagnostic overhead remains; immutable receiving reuse next"
+  ],
+  "preserved_failures": [
+    "code01 Vec/BTreeSet compile error",
+    "code02 missing test import/getter compile errors",
+    "code04 distant exact return at address10 correctly refused",
+    "code06 fixed180s gate deadline; seven completed scopes retained"
+  ],
+  "model_jobs": 0,
+  "uploads": 0
+}

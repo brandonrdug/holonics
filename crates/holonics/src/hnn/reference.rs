@@ -553,7 +553,7 @@ pub struct Resident {
     /// lines209-210). Its terminal partial absorption has no continuation square.
     observed_epoch_terminal: bool,
     /// Bounded monotone encounter frontier per source; repropagation is not new evidence.
-    source_return_frontier: BTreeMap<usize,usize>,
+    source_return_frontier: BTreeMap<usize, usize>,
     released_bits: u64,
     stop: Option<BudgetStop>,
     charts: Charts,
@@ -2723,6 +2723,139 @@ fn compose_epoch_contribution(
     Ok(deposit)
 }
 
+/// The existing receiving sample chart, shared by whole and explicitly local returns.
+/// No source/contact derivative or counterfactual forward is prepared here.
+fn receiving_return_samples(
+    field: &Field,
+    constitution: &Constitution,
+    receiving: usize,
+    back: &WordReturn,
+) -> Result<(usize, Vec<Sample>), HnnError> {
+    let alphabet = field.alphabet();
+    let physical_width = field.ring(receiving).width();
+    let width_r = match constitution.receiving_layout(receiving) {
+        Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { source_width }) => {
+            let bounds = back
+                .response_defect
+                .as_ref()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "paired material requires both reached path defect receipts",
+                })?
+                .context_bounds()?;
+            if source_width != physical_width
+                || bounds.len() != back.reads.len()
+                || bounds.iter().any(|r| r.len() != physical_width)
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "paired material defects match every reached receiving station",
+                });
+            }
+            // Both radii remain in the return/receipt. A paired native deposit uses the
+            // actual rounded candidate replay below, not an unsplit first-order gain claim.
+            2 * source_width
+        }
+        _ => physical_width,
+    };
+    if back
+        .reads
+        .iter()
+        .any(|(feature, gradient)| feature.len() != width_r || gradient.len() != 2 * alphabet)
+    {
+        return Err(HnnError::Unadmitted {
+            reason: "receiving return features match the declared material layout",
+        });
+    }
+    let samples = back
+        .reads
+        .iter()
+        .map(|(feature, gradient)| Sample {
+            weight: Rat::one(),
+            feature: feature.clone(),
+            covector: negated(gradient),
+            masses: None,
+        })
+        .collect();
+    Ok((width_r, samples))
+}
+
+/// Consume only the actually reached receiving rows of this Word return. The source's
+/// occupied phase count is kept as reach metadata, without preparing an upstream direction.
+fn compose_receiving_epoch_contribution(
+    field: &Field,
+    constitution: &Constitution,
+    ratio: &PendingRatio,
+    opening: &WordOpening,
+    back: &WordReturn,
+    targets: &[usize],
+    steps: &[ReceivingStep],
+) -> Result<Deposit, HnnError> {
+    let phases = ratio.phases();
+    let receiver = phases.ring();
+    let locus = Locus::ReceivingMap(receiver);
+    let diamond = Diamond::opened(field, phases, &opening.support(field));
+    if !diamond.retains(field, locus) || constitution.released().contains(&locus) {
+        return Err(HnnError::Unadmitted {
+            reason: "the local receiving return reaches its unreleased receiving map",
+        });
+    }
+    if targets.len() != back.reads.len() {
+        return Err(HnnError::Shape {
+            what: "local receiving targets against actual Word reads",
+            expected: back.reads.len(),
+            found: targets.len(),
+        });
+    }
+    let (_, samples) = receiving_return_samples(field, constitution, receiver, back)?;
+    let occupied = field
+        .sources()
+        .iter()
+        .map(|&g| {
+            (0..field.ring(g).placements().len()).try_fold(0u64, |n, c| {
+                Ok::<_, HnnError>(
+                    n + u64::from(ratio.moment().phase_counts(g, c)?.iter().any(|&x| x != 0)),
+                )
+            })
+        })
+        .collect::<Result<Vec<_>, _>>()?
+        .into_iter()
+        .max()
+        .unwrap_or(0);
+    let landmarks = ratio
+        .addresses(targets)?
+        .into_iter()
+        .zip(targets)
+        .map(|(address, &class)| LandmarkStep {
+            ring: receiver,
+            address,
+            class,
+        })
+        .collect();
+    Deposit::new(
+        constitution.commit(),
+        vec![LinearStep {
+            locus: LinearLocus::Receiving(receiver),
+            samples,
+        }],
+        Vec::new(),
+        vec![locus],
+    )
+    .with_reach(Reach {
+        receiver,
+        stations: phases.epochs().map(|e| e as u64).collect(),
+        entries: vec![0],
+        phases: occupied,
+        loci: [locus].into_iter().collect(),
+        passages: Vec::new(),
+    })
+    .with_landmarks(landmarks)
+    .with_landmark_observations(
+        phases
+            .observation_partition()
+            .zip(ratio.observation_bits().map(|p| p.to_vec())),
+    )
+    .map(|deposit| deposit.with_receiving(steps.to_vec()))
+}
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum ReturnConsumer {
     Word,
@@ -3352,39 +3485,7 @@ fn compose_return_view_for(
 
     // The receiving map: Σ_j g_j ⊗ v_R(e_j) in the passage frame, by row blocks.
     let receiving = diamond.receiver();
-    let physical_width = field.ring(receiving).width();
-    let width_r = match constitution.receiving_layout(receiving) {
-        Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { source_width }) => {
-            let bounds = back
-                .response_defect
-                .as_ref()
-                .ok_or(HnnError::Unadmitted {
-                    reason: "paired material requires both reached path defect receipts",
-                })?
-                .context_bounds()?;
-            if source_width != physical_width
-                || bounds.len() != back.reads.len()
-                || bounds.iter().any(|r| r.len() != physical_width)
-            {
-                return Err(HnnError::Unadmitted {
-                    reason: "paired material defects match every reached receiving station",
-                });
-            }
-            // Both radii remain in the return/receipt. A paired native deposit uses the
-            // actual rounded candidate replay below, not an unsplit first-order gain claim.
-            2 * source_width
-        }
-        _ => physical_width,
-    };
-    if back
-        .reads
-        .iter()
-        .any(|(feature, gradient)| feature.len() != width_r || gradient.len() != 2 * alphabet)
-    {
-        return Err(HnnError::Unadmitted {
-            reason: "receiving return features match the declared material layout",
-        });
-    }
+    let (width_r, samples) = receiving_return_samples(field, constitution, receiving, back)?;
     let map_gradient = if consumer == ReturnConsumer::Word {
         let read_charts: Vec<[Chart; 2]> = back
             .reads
@@ -3402,16 +3503,6 @@ fn compose_return_view_for(
     } else {
         None
     };
-    let samples = back
-        .reads
-        .iter()
-        .map(|(feature, gradient)| Sample {
-            weight: one.clone(),
-            feature: feature.clone(),
-            covector: negated(gradient),
-            masses: None,
-        })
-        .collect();
     if retained(Locus::ReceivingMap(receiving)) {
         linear.push(LinearStep {
             locus: LinearLocus::Receiving(receiving),
@@ -6243,8 +6334,8 @@ pub fn prequential(
 #[cfg(test)]
 mod continuation;
 mod interaction;
-pub mod reciprocal;
 pub mod passage;
+pub mod reciprocal;
 
 #[cfg(test)]
 mod precision_publication_tests;

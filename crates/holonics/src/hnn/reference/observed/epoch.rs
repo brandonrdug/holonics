@@ -78,7 +78,8 @@ pub struct ObservedEpochWallTimes {
 }
 
 /// A declared set of material families eligible to absorb this epoch's return.
-/// Every native covector is still computed. Holding physical factors omits their
+/// The selected Word return is actual; LocalReceivingReturn composes only its R rows.
+/// Holding physical factors omits their
 /// deposition requests and statistics; the channel scopes admit either D alone or
 /// the actual C/K/D endpoint with its producing-cut carry.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -87,10 +88,14 @@ pub enum ObservedEpochDepositionScope {
     NormalMaps,
     NormalMapsAndChannelDissipation,
     NormalMapsAndChannelMaterial,
+    /// Opt-in witnessed RetainedFibreV1 R response: local NormalLaw only, no whole-section
+    /// finite monotone veto, upstream normal preparation, or candidate forward replay.
+    LocalReceivingReturn,
 }
 
-/// The comparison law that admitted this atomic publication. Neutral means
-/// executed objective equality, and never counts as learned motion.
+/// Publication route. Under LocalReceivingReturn, ReceivingOnly denotes the local
+/// NormalLaw admission and Neutral denotes no material motion; no finite objective
+/// comparison is requested. Other policies retain their existing comparison meaning.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ObservedEpochOutcome {
     Whole,
@@ -140,6 +145,8 @@ impl ObservedEpochEnergy {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ObservedEpochProbeState {
     SealNotFormed,
+    /// This explicit local policy did not request a whole-section finite comparison.
+    NotRequestedLocalPolicy,
     SealedNoProbeRequired,
     ProbeFailed,
     FiniteComparisonExecuted,
@@ -324,7 +331,8 @@ fn with_receiving_masses(
         linear,
         match scope {
             ObservedEpochDepositionScope::All => deposit.factors().to_vec(),
-            ObservedEpochDepositionScope::NormalMaps => Vec::new(),
+            ObservedEpochDepositionScope::NormalMaps
+            | ObservedEpochDepositionScope::LocalReceivingReturn => Vec::new(),
             ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => deposit
                 .factors()
                 .iter()
@@ -661,6 +669,13 @@ impl Reference {
         stage_refused: &mut dyn FnMut(EpochStageAttempt, &EpochStageRefusal),
     ) -> Result<ObservedEpochReceipt, HnnError> {
         let forward_start = Instant::now();
+        let local_receiving =
+            deposition_scope == ObservedEpochDepositionScope::LocalReceivingReturn;
+        if local_receiving && resident.receiving_law() != ReceivingLaw::RetainedFibreV1 {
+            return Err(refusal(
+                "the local receiving return explicitly requires RetainedFibreV1",
+            ));
+        }
         if classes.is_empty() {
             return Err(refusal("an observed epoch needs at least one heard cell"));
         }
@@ -1051,7 +1066,12 @@ impl Reference {
                 let back = read.word.return_at(&field, execution, &covector, map, &phases)?;
                 let pull_back_wall = pull_back_start.elapsed();
                 let compose_start = Instant::now();
-                let deposit = match consumer {
+                let deposit = if local_receiving {
+                    compose_receiving_epoch_contribution(
+                        &field, physical, &read.ratio, &read.opening, &back,
+                        &[classes[at]], &scored.steps[at..at + 1],
+                    )?
+                } else { match consumer {
                     ReturnConsumer::Epoch => compose_epoch_contribution(
                         &field, physical, &read.ratio, &read.opening, &back,
                         &[classes[at]], &scored.steps[at..at + 1],
@@ -1060,7 +1080,7 @@ impl Reference {
                         &field, physical, &read.ratio, &read.opening, &back,
                         &[classes[at]], &scored.steps[at..at + 1],
                     )?.1,
-                };
+                }};
                 let compose_wall = compose_start.elapsed();
                 let records_start = Instant::now();
                 // The adapter reconstructs the deposit, so attach the actual
@@ -1517,164 +1537,170 @@ impl Reference {
         let mut grain_restage = None;
         let mut whole_stage_elapsed = std::time::Duration::ZERO;
         let mut retry_without_grain = false;
-        let whole = loop {
-            let whole_stage_start = Instant::now();
-            let whole_candidate = stage(
-                EpochCandidateScope::Whole,
-                retry_without_grain,
-                &mut observe_deposit,
-            );
-            whole_stage_elapsed += whole_stage_start.elapsed();
-            let grain = match &whole_candidate {
-                Ok(candidate) => candidate.channel_grain_rebase(),
-                Err(failure) => failure
-                    .channel_grain
-                    .clone()
-                    .filter(|grain| grain.contacts.iter().any(|contact| contact.levels > 0)),
-            };
-            let retry_permitted = match &whole_candidate {
-                Ok(_) => false,
-                Err(failure) => grain_failure_restage_permitted(EpochStageAttempt::Whole, failure),
-            };
-            let admitted = match whole_candidate {
-                Ok(candidate)
-                    if !candidate.requires_comparison()
-                        && resident.receiving_law() == ReceivingLaw::CoarseGrainV1 =>
-                {
-                    probe_state = ObservedEpochProbeState::SealedNoProbeRequired;
-                    let outcome = if candidate.has_physical_motion() {
-                        ObservedEpochOutcome::Whole
-                    } else {
-                        ObservedEpochOutcome::Neutral
-                    };
-                    Some((candidate.admit_receiving()?, outcome))
-                }
-                Ok(candidate) => {
-                    probe_state = ObservedEpochProbeState::ProbeFailed;
-                    // A source port is learner material. Re-admit that port under
-                    // the SAME exterior class codec, pairing and placement; an old
-                    // PairedObservation is correctly refused after E changes.
-                    let probe_start = Instant::now();
-                    let ablation_eligible = execution.channel_storage_ablation_control()
-                        && has_applied_channel_storage_change(candidate.channel_endpoints());
-                    let probe = probe_candidate(EpochStageAttempt::Whole, &candidate, false);
-                    whole_probe = Some(probe_start.elapsed());
-                    match probe {
-                        Ok(reading) => {
-                            if ablation_eligible {
-                                let (held_ck, refusal) = match probe_candidate(
-                                    EpochStageAttempt::Whole,
-                                    &candidate,
-                                    true,
-                                ) {
-                                    Ok(reading) => (Some(reading), None),
-                                    Err(error) => (None, Some(error.to_string())),
-                                };
-                                channel_storage_ablations.push(
-                                    ObservedChannelStorageAblationReading {
-                                        attempt: EpochStageAttempt::Whole,
-                                        actual: reading.clone(),
-                                        held_ck,
-                                        refusal,
-                                    },
-                                );
-                            }
-                            probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
-                            let neutral = (reading.unchanged || reading.objective_equal())
-                                && (resident.receiving_law() == ReceivingLaw::CoarseGrainV1
-                                    || !candidate.has_physical_motion());
-                            let scope_admitted = resident.receiving_law()
-                                == ReceivingLaw::CoarseGrainV1
-                                || (reading
-                                    .epoch_class_code_change
-                                    .as_ref()
-                                    .is_some_and(|c| c.upper <= Rat::zero())
-                                    && reading
-                                        .epoch_phase_excess_change
+        let whole = if local_receiving {
+            None
+        } else {
+            loop {
+                let whole_stage_start = Instant::now();
+                let whole_candidate = stage(
+                    EpochCandidateScope::Whole,
+                    retry_without_grain,
+                    &mut observe_deposit,
+                );
+                whole_stage_elapsed += whole_stage_start.elapsed();
+                let grain = match &whole_candidate {
+                    Ok(candidate) => candidate.channel_grain_rebase(),
+                    Err(failure) => failure
+                        .channel_grain
+                        .clone()
+                        .filter(|grain| grain.contacts.iter().any(|contact| contact.levels > 0)),
+                };
+                let retry_permitted = match &whole_candidate {
+                    Ok(_) => false,
+                    Err(failure) => {
+                        grain_failure_restage_permitted(EpochStageAttempt::Whole, failure)
+                    }
+                };
+                let admitted = match whole_candidate {
+                    Ok(candidate)
+                        if !candidate.requires_comparison()
+                            && resident.receiving_law() == ReceivingLaw::CoarseGrainV1 =>
+                    {
+                        probe_state = ObservedEpochProbeState::SealedNoProbeRequired;
+                        let outcome = if candidate.has_physical_motion() {
+                            ObservedEpochOutcome::Whole
+                        } else {
+                            ObservedEpochOutcome::Neutral
+                        };
+                        Some((candidate.admit_receiving()?, outcome))
+                    }
+                    Ok(candidate) => {
+                        probe_state = ObservedEpochProbeState::ProbeFailed;
+                        // A source port is learner material. Re-admit that port under
+                        // the SAME exterior class codec, pairing and placement; an old
+                        // PairedObservation is correctly refused after E changes.
+                        let probe_start = Instant::now();
+                        let ablation_eligible = execution.channel_storage_ablation_control()
+                            && has_applied_channel_storage_change(candidate.channel_endpoints());
+                        let probe = probe_candidate(EpochStageAttempt::Whole, &candidate, false);
+                        whole_probe = Some(probe_start.elapsed());
+                        match probe {
+                            Ok(reading) => {
+                                if ablation_eligible {
+                                    let (held_ck, refusal) = match probe_candidate(
+                                        EpochStageAttempt::Whole,
+                                        &candidate,
+                                        true,
+                                    ) {
+                                        Ok(reading) => (Some(reading), None),
+                                        Err(error) => (None, Some(error.to_string())),
+                                    };
+                                    channel_storage_ablations.push(
+                                        ObservedChannelStorageAblationReading {
+                                            attempt: EpochStageAttempt::Whole,
+                                            actual: reading.clone(),
+                                            held_ck,
+                                            refusal,
+                                        },
+                                    );
+                                }
+                                probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
+                                let neutral = (reading.unchanged || reading.objective_equal())
+                                    && (resident.receiving_law() == ReceivingLaw::CoarseGrainV1
+                                        || !candidate.has_physical_motion());
+                                let scope_admitted = resident.receiving_law()
+                                    == ReceivingLaw::CoarseGrainV1
+                                    || (reading
+                                        .epoch_class_code_change
                                         .as_ref()
-                                        .is_some_and(|x| x <= &Rat::zero()));
-                            let admitted = if !scope_admitted {
+                                        .is_some_and(|c| c.upper <= Rat::zero())
+                                        && reading
+                                            .epoch_phase_excess_change
+                                            .as_ref()
+                                            .is_some_and(|x| x <= &Rat::zero()));
+                                let admitted = if !scope_admitted {
+                                    None
+                                } else if neutral {
+                                    Some(candidate.admit_neutral())
+                                } else {
+                                    candidate.admit_change(&reading.objective_change)
+                                };
+                                if admitted.is_none() {
+                                    whole_refusal = Some(reading.unresolved_reason().to_string());
+                                }
+                                comparison = Some(reading);
+                                admitted.map(|publication| {
+                                    (
+                                        publication,
+                                        if neutral {
+                                            ObservedEpochOutcome::Neutral
+                                        } else {
+                                            ObservedEpochOutcome::Whole
+                                        },
+                                    )
+                                })
+                            }
+                            Err(error) => {
+                                // Unknown executor/identity/arithmetic failures do not select another
+                                // NormalMaps proposal. Known native mathematical domain refusals may.
+                                let endpoint_refusal = channel_material_probe_refusal(
+                                    &error,
+                                    deposition_scope,
+                                    EpochStageAttempt::Whole,
+                                    candidate.channel_endpoints(),
+                                );
+                                if let Some(refusal) = &endpoint_refusal {
+                                    channel_material_probe_refusals.push(refusal.clone());
+                                }
+                                if shared_normals
+                                    && !receiving_restage_permitted(&error)
+                                    && endpoint_refusal.is_none()
+                                {
+                                    return Err(error);
+                                }
+                                joint_eligible = shared_normals
+                                    && (receiving_restage_permitted(&error)
+                                        || endpoint_refusal.is_some());
+                                whole_refusal = Some(error.to_string());
                                 None
-                            } else if neutral {
-                                Some(candidate.admit_neutral())
-                            } else {
-                                candidate.admit_change(&reading.objective_change)
-                            };
-                            if admitted.is_none() {
-                                whole_refusal = Some(reading.unresolved_reason().to_string());
                             }
-                            comparison = Some(reading);
-                            admitted.map(|publication| {
-                                (
-                                    publication,
-                                    if neutral {
-                                        ObservedEpochOutcome::Neutral
-                                    } else {
-                                        ObservedEpochOutcome::Whole
-                                    },
-                                )
-                            })
-                        }
-                        Err(error) => {
-                            // Unknown executor/identity/arithmetic failures do not select another
-                            // NormalMaps proposal. Known native mathematical domain refusals may.
-                            let endpoint_refusal = channel_material_probe_refusal(
-                                &error,
-                                deposition_scope,
-                                EpochStageAttempt::Whole,
-                                candidate.channel_endpoints(),
-                            );
-                            if let Some(refusal) = &endpoint_refusal {
-                                channel_material_probe_refusals.push(refusal.clone());
-                            }
-                            if shared_normals
-                                && !receiving_restage_permitted(&error)
-                                && endpoint_refusal.is_none()
-                            {
-                                return Err(error);
-                            }
-                            joint_eligible = shared_normals
-                                && (receiving_restage_permitted(&error)
-                                    || endpoint_refusal.is_some());
-                            whole_refusal = Some(error.to_string());
-                            None
                         }
                     }
-                }
-                Err(failure) => {
-                    stage_refused(EpochStageAttempt::Whole, &failure.evidence);
-                    // Shared zero-move absorption cannot fabricate a missing fresh gain. Keep the
-                    // original native error if preparation failed before it produced those gains.
-                    if shared_normals && !failure.normal_inputs_prepared {
-                        return Err(failure.error);
+                    Err(failure) => {
+                        stage_refused(EpochStageAttempt::Whole, &failure.evidence);
+                        // Shared zero-move absorption cannot fabricate a missing fresh gain. Keep the
+                        // original native error if preparation failed before it produced those gains.
+                        if shared_normals && !failure.normal_inputs_prepared {
+                            return Err(failure.error);
+                        }
+                        if !receiving_restage_permitted(&failure.error) && !retry_permitted {
+                            return Err(failure.error);
+                        }
+                        whole_refusal = Some(failure.error.to_string());
+                        whole_stage_refusal = Some(failure.evidence);
+                        None
                     }
-                    if !receiving_restage_permitted(&failure.error) && !retry_permitted {
-                        return Err(failure.error);
+                };
+                if admitted.is_none() && retry_permitted && grain_restage.is_none() {
+                    if let Some(grain) = grain {
+                        grain_restage =
+                            Some(crate::hnn::constitution::EpochChannelGrainRestageReading {
+                                grain,
+                                refused_attempt: EpochStageAttempt::Whole,
+                                stage_refusal: whole_stage_refusal.take(),
+                                probe_refusal: whole_refusal.take(),
+                            });
+                        retry_without_grain = true;
+                        probe_state = ObservedEpochProbeState::SealNotFormed;
+                        comparison = None;
+                        whole_probe = None;
+                        continue;
                     }
-                    whole_refusal = Some(failure.error.to_string());
-                    whole_stage_refusal = Some(failure.evidence);
-                    None
                 }
-            };
-            if admitted.is_none() && retry_permitted && grain_restage.is_none() {
-                if let Some(grain) = grain {
-                    grain_restage =
-                        Some(crate::hnn::constitution::EpochChannelGrainRestageReading {
-                            grain,
-                            refused_attempt: EpochStageAttempt::Whole,
-                            stage_refusal: whole_stage_refusal.take(),
-                            probe_refusal: whole_refusal.take(),
-                        });
-                    retry_without_grain = true;
-                    probe_state = ObservedEpochProbeState::SealNotFormed;
-                    comparison = None;
-                    whole_probe = None;
-                    continue;
-                }
+                break admitted;
             }
-            break admitted;
         };
-        let whole_stage = Some(whole_stage_elapsed);
+        let whole_stage = (!local_receiving).then_some(whole_stage_elapsed);
         let mut joint_admitted = None;
         if whole.is_none() && joint_eligible {
             joint_attempted = true;
@@ -1867,7 +1893,13 @@ impl Reference {
                 } else {
                     ObservedEpochOutcome::Neutral
                 };
-                if resident.receiving_law() == ReceivingLaw::RetainedFibreV1 {
+                if local_receiving {
+                    probe_state = ObservedEpochProbeState::NotRequestedLocalPolicy;
+                    joint_probe_state = ObservedEpochProbeState::NotRequestedLocalPolicy;
+                    // Only the existing local NormalLaw certificate admits this R-only stage.
+                    // The actual blind endpoint/current/carry are retained, never replayed.
+                    (receiving.admit_receiving()?, outcome)
+                } else if resident.receiving_law() == ReceivingLaw::RetainedFibreV1 {
                     let probe_start = Instant::now();
                     let reading =
                         probe_candidate(EpochStageAttempt::ReceivingOnly, &receiving, false)?;
@@ -1980,6 +2012,11 @@ impl Reference {
         next.ledger.deposit(reread)?;
         next.constitution = material;
         next.forget_kept_reads();
+        if local_receiving {
+            // This actual observed section/Word return is consumed once. A later source
+            // interaction binds the NEW cut; it cannot reinterpret this arrival as fresh R news.
+            next.arrived = None;
+        }
         let precision_start = Instant::now();
         let before_commit = next.constitution.commit();
         let before_exponent = next

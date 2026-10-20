@@ -131,6 +131,13 @@ impl ObservedStream {
         pending: Vec<usize>,
     ) -> Result<Self, HnnError> {
         let bound = Self::finite_bound(&resident)?;
+        if scope == ObservedEpochDepositionScope::LocalReceivingReturn
+            && resident.receiving_law() != crate::hnn::receiving::ReceivingLaw::RetainedFibreV1
+        {
+            return Err(refuse(
+                "local receiving streams explicitly require RetainedFibreV1",
+            ));
+        }
         let published = resident
             .moments
             .values()
@@ -448,6 +455,7 @@ impl ObservedStream {
         };
         let scope = match self.scope {
             ObservedEpochDepositionScope::All => "all",
+            ObservedEpochDepositionScope::LocalReceivingReturn => "local-receiving-return-v1",
             ObservedEpochDepositionScope::NormalMaps => "normal-maps",
             ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => {
                 "normal-maps-channel-dissipation"
@@ -505,6 +513,7 @@ impl ObservedStream {
         }
         let scope = match header[scope_at] {
             "all" => ObservedEpochDepositionScope::All,
+            "local-receiving-return-v1" => ObservedEpochDepositionScope::LocalReceivingReturn,
             "normal-maps" => ObservedEpochDepositionScope::NormalMaps,
             "normal-maps-channel-dissipation" => {
                 ObservedEpochDepositionScope::NormalMapsAndChannelDissipation

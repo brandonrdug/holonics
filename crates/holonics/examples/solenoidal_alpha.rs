@@ -65,6 +65,16 @@ pub fn code_reciprocal_continuity(
     reciprocal_code::continuity(execution)
 }
 
+#[cfg(test)]
+#[path = "solenoidal_alpha/ordered_reciprocal_code.rs"]
+mod ordered_reciprocal_code;
+#[cfg(test)]
+pub fn code_ordered_reciprocal(
+    execution: &dyn holonics::hnn::reference::observed::ObservedEpochExecution,
+) -> std::result::Result<String, Box<dyn std::error::Error>> {
+    ordered_reciprocal_code::ordered(execution)
+}
+
 /// Explicit exterior executor identity; the library gains no device dependency.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CompleteLanguageTrainingBackend {
@@ -1451,6 +1461,7 @@ fn object(fields: &[(&str, String)]) -> String {
 fn scope_description(scope: ObservedEpochDepositionScope) -> &'static str {
     match scope {
         ObservedEpochDepositionScope::All => "All: ordinary physical-factor policy",
+        ObservedEpochDepositionScope::LocalReceivingReturn => "LocalReceivingReturn: actual retained-fibre R-only local response; no whole-section finite comparison requested",
         ObservedEpochDepositionScope::NormalMaps => {
             "NormalMaps: physical factor deposition requests and statistics held"
         }
@@ -1465,6 +1476,7 @@ fn scope_description(scope: ObservedEpochDepositionScope) -> &'static str {
 fn parse_fork_scope(value: &str) -> Result<ObservedEpochDepositionScope> {
     match value {
         "normal-maps" => Ok(ObservedEpochDepositionScope::NormalMaps),
+        "local-receiving-return-v1" => Ok(ObservedEpochDepositionScope::LocalReceivingReturn),
         "normal-maps-channel-dissipation" => Ok(ObservedEpochDepositionScope::NormalMapsAndChannelDissipation),
         "normal-maps-channel-material" => Ok(ObservedEpochDepositionScope::NormalMapsAndChannelMaterial),
         _ => Err("scope fork requires normal-maps, normal-maps-channel-dissipation, or normal-maps-channel-material".into()),

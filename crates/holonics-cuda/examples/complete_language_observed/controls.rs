@@ -122,3 +122,14 @@ fn reciprocal_host_card_continuity() {
     assert!(!receipt.contains("\"successful_card_forwards\":0"));
     eprintln!("V93_RECIPROCAL_HOST_CARD_PARITY {}", receipt.trim());
 }
+
+#[test]
+#[ignore = "exclusive supported HOST CUDA guard; ordered local R then source CODE only"]
+fn ordered_local_receiving_source_host_card() {
+    let host = exterior::code_ordered_reciprocal(&HostObservedEpochExecution).unwrap();
+    let card = dispatch::TracedCard::new(ObservedEpochDevice::open(0).unwrap());
+    let device = exterior::code_ordered_reciprocal(&card).unwrap();
+    assert_eq!(host, device);
+    card.require_actual_dispatch().unwrap();
+    eprintln!("V93_ORDERED_HOST_CARD_PARITY {}", card.receipt(true).trim());
+}
