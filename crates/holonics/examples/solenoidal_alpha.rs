@@ -26,13 +26,20 @@ use holonics::hnn::encoding::observed::PairedObservation;
 use holonics::hnn::field::{ContactDeclaration, Current, Field, FieldDeclaration, RingDeclaration};
 use holonics::hnn::paired::{PairedCarrier, PairingDeclaration};
 use holonics::hnn::port::Handle;
+use holonics::hnn::prediction::byte_release::Base4Bytes;
+use holonics::hnn::prediction::native_section::{
+    NativeSectionDecision, NativeSectionRequest, SectionWorkBudget, release_native_section,
+};
 use holonics::hnn::receiving::cells::CellLaw;
 use holonics::hnn::reference::observed::{
     ObservedCrib, ObservedEpochDepositionScope, ObservedEpochOutcome, ObservedStream,
+    PendingReadoutDiagnostic,
 };
 use holonics::hnn::reference::{ExposedResident, Resident};
-use holonics::hnn::{ExecutionPort, Reference};
+use holonics::hnn::{ExecutionPort, HnnError, Reference};
+use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::{Rat, algebraic::ExactInterval, integer, rat};
+use holonics::receiver::release::KeyStream;
 use std::{
     error::Error,
     io::{Read, Write},
@@ -73,7 +80,10 @@ fn rational(value: &Rat) -> String {
     ])
 }
 fn interval(value: &ExactInterval) -> String {
-    object(&[("lower", rational(&value.lower)), ("upper", rational(&value.upper))])
+    object(&[
+        ("lower", rational(&value.lower)),
+        ("upper", rational(&value.upper)),
+    ])
 }
 fn sha256(bytes: &[u8]) -> Result<String> {
     // SHA belongs to exterior artifact provenance. No checksum enters a native relation.
@@ -100,17 +110,7 @@ fn sha256(bytes: &[u8]) -> Result<String> {
     })
 }
 fn digits(bytes: &[u8]) -> Vec<usize> {
-    bytes
-        .iter()
-        .flat_map(|byte| {
-            [
-                usize::from(byte >> 6),
-                usize::from((byte >> 4) & 3),
-                usize::from((byte >> 2) & 3),
-                usize::from(byte & 3),
-            ]
-        })
-        .collect()
+    Base4Bytes::encode(bytes)
 }
 fn declaration(population: u64) -> Result<(Field, Constitution, PairingDeclaration)> {
     // Agent-inferred: listener's existing serial law at a smaller explicit test workload.
@@ -371,6 +371,7 @@ fn query_reading(checkpoint: &Checkpoint, query: &str) -> Result<String> {
         .forward
         .into_present()
         .ok_or("native query gave no decision")?;
+    let byte_boundary = Base4Bytes::read_release(decision.clone(), phases.aperture())?;
     // This is a read of retained sufficient statistics, with their own prior/tolerance.
     // It is a declared phase family, never a semantic answer or a truth-membership claim.
     let family = resident
@@ -386,6 +387,7 @@ fn query_reading(checkpoint: &Checkpoint, query: &str) -> Result<String> {
         ("lift_exact", exact(resident.current().lift())),
         ("field_faces_exact", exact(faces)),
         ("native_decision_exact", exact(&decision)),
+        ("native_byte_boundary_exact", exact(&byte_boundary)),
         ("codec_exact", format!("[{}]", codec.join(","))),
         ("phase_family_exact", exact(&family)),
         (
@@ -399,6 +401,456 @@ fn query_reading(checkpoint: &Checkpoint, query: &str) -> Result<String> {
     reference.discard(&mut resident, Handle::Pending(pending))?;
     Ok(reading)
 }
+
+fn diagnose_query_prefix(
+    reference: &Reference,
+    opening: &Resident,
+    opening_crib: &ObservedCrib,
+    pairing: &PairingDeclaration,
+    prefix: &[usize],
+    control_map: &ExactRatMatrix,
+    bits: u32,
+) -> std::result::Result<PendingReadoutDiagnostic, HnnError> {
+    let mut resident = opening.clone();
+    let mut crib = opening_crib.clone();
+    for &class in prefix {
+        reference.ingest_class_continuing(&mut resident, &mut crib, pairing, class, None)?;
+    }
+    let moment = resident
+        .continuing()
+        .ok_or(HnnError::Unadmitted {
+            reason: "a conditional query keeps one actual continuing source",
+        })?
+        .0;
+    let phases = resident
+        .admitted()
+        .first()
+        .ok_or(HnnError::Unadmitted {
+            reason: "a conditional query keeps its admitted receiving phase",
+        })?
+        .clone();
+    let (pending, _) = reference.refine(&mut resident, &moment, &phases)?;
+    let diagnostic = reference.diagnose_pending_readout(&resident, &pending, control_map, bits)?;
+    reference.discard(&mut resident, Handle::Pending(pending))?;
+    Ok(diagnostic)
+}
+
+/// Exterior matched controls over the actual immutable prompt opening. Each oracle call
+/// queries this same retained state with a complete hypothetical future prefix; it teaches
+/// nothing. Chain-rule finite-section release is distinct from a Floquet bank or a variable
+/// reply stopping law. No target continuation or corpus lookup enters this operation.
+fn conditional_query_controls(
+    checkpoint: &Checkpoint,
+    query: &str,
+    section_bytes: usize,
+    max_oracle_calls: usize,
+) -> Result<String> {
+    if query.len() > QUERY_BYTE_BUDGET {
+        return Err("query exceeds declared 128-byte boundary workload".into());
+    }
+    let projected = checkpoint
+        .stream
+        .accepted_cells()?
+        .checked_add(query.len().checked_mul(4).ok_or("query cell overflow")? as u64)
+        .and_then(|n| n.checked_add(section_bytes.checked_mul(4)? as u64))
+        .ok_or("conditional section source horizon overflow")?;
+    if projected > checkpoint.population {
+        return Err(
+            "conditional query and complete finite field exceed native source horizon".into(),
+        );
+    }
+    let reference = port();
+    let (_, founding, pairing) = declaration(checkpoint.population)?;
+    let before = checkpoint.bytes()?;
+    let (mut opening, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
+    for class in digits(query.as_bytes()) {
+        reference.ingest_class_continuing(&mut opening, &mut crib, &pairing, class, None)?;
+    }
+    let ring = opening
+        .admitted()
+        .first()
+        .ok_or("query has no receiving phase")?
+        .ring();
+    let control_map = founding
+        .receiving_law(ring)
+        .ok_or("founding readout is missing")?
+        .map()
+        .clone();
+    let bits = holonics::ratio::exponentiated::READING_BITS;
+    let matched = diagnose_query_prefix(
+        &reference,
+        &opening,
+        &crib,
+        &pairing,
+        &[],
+        &control_map,
+        bits,
+    )?;
+    let request = NativeSectionRequest::declare(
+        section_bytes,
+        bits,
+        SectionWorkBudget {
+            max_prefixes: max_oracle_calls
+                .checked_mul(4)
+                .and_then(|n| n.checked_add(1))
+                .ok_or("prefix work overflow")?,
+            max_oracle_calls,
+        },
+    )?;
+    let mut arms = Vec::new();
+    for policy in ["native", "founding_readout_same_feature", "executed_tree"] {
+        let mut costs = Vec::new();
+        let section = release_native_section(&request, |prefix, bits| {
+            let started = Instant::now();
+            let diagnostic = diagnose_query_prefix(
+                &reference,
+                &opening,
+                &crib,
+                &pairing,
+                prefix,
+                &control_map,
+                bits,
+            );
+            costs.push((prefix.len(), started.elapsed().as_nanos()));
+            diagnostic.map(|reading| match policy {
+                "native" => reading.readout.native.native_masses,
+                "founding_readout_same_feature" => reading.readout.control.native_masses,
+                _ => reading.readout.native.tree_masses,
+            })
+        })?;
+        let (classes, bytes, text) = match &section.decision {
+            NativeSectionDecision::Released {
+                classes, decoded, ..
+            } => (
+                format!("{classes:?}"),
+                format!("{:?}", decoded.bytes),
+                decoded
+                    .complete_boundary_text()
+                    .map_or_else(|| "null".into(), quoted),
+            ),
+            _ => ("null".into(), "null".into(), "null".into()),
+        };
+        arms.push(object(&[
+            ("policy", quoted(policy)),
+            ("section_exact", exact(&section)),
+            ("released_classes", classes),
+            ("released_bytes", bytes),
+            ("released_utf8", text),
+            ("oracle_calls", section.oracle_calls.to_string()),
+            (
+                "prefixes_considered",
+                section.prefixes_considered.to_string(),
+            ),
+            (
+                "oracle_cost_series_ns",
+                format!(
+                    "[{}]",
+                    costs
+                        .iter()
+                        .map(|(depth, ns)| format!("[{depth},{ns}]"))
+                        .collect::<Vec<_>>()
+                        .join(",")
+                ),
+            ),
+        ]));
+    }
+    if checkpoint.bytes()? != before {
+        return Err("a read-only conditional section changed its retained checkpoint".into());
+    }
+    Ok(object(&[
+        ("query_bytes", query.len().to_string()),
+        ("section_bytes", section_bytes.to_string()),
+        ("matched_opening_diagnostic_exact", exact(&matched)),
+        ("arms", format!("[{}]", arms.join(","))),
+        (
+            "source_horizon_after_complete_section",
+            projected.to_string(),
+        ),
+        ("retained_checkpoint_unchanged", "true".into()),
+        (
+            "scope",
+            quoted(
+                "exact finite conditional receiving section; matched readout intervention; no material deposition; no variable reply stopping or physical bank claim",
+            ),
+        ),
+        ("semantic_answer_claim", "false".into()),
+    ]))
+}
+struct KeyedReply {
+    json: String,
+    classes: Vec<usize>,
+}
+
+/// The native draw and its existing local receiving continuation, on a disposable query fork.
+/// A caller-declared length ends this exterior read. No byte is EOS and no target is opened here.
+fn keyed_reply(
+    checkpoint: &Checkpoint,
+    query: &str,
+    key_bytes: &[u8],
+    byte_length: usize,
+    tree_only: bool,
+    label: &str,
+) -> Result<KeyedReply> {
+    let cells = byte_length.checked_mul(4).ok_or("draw length overflow")?;
+    if cells == 0 || query.len() > QUERY_BYTE_BUDGET {
+        return Err("a keyed reply needs a positive declared length and a bounded prompt".into());
+    }
+    // Eight bytes denote one exact key k/2^64; these are declared nonsecret release operands.
+    if key_bytes.len() != cells.checked_mul(8).ok_or("key workload overflow")? {
+        return Err("the declared draw supplies exactly one eight-byte key per cell".into());
+    }
+    let horizon = checkpoint
+        .stream
+        .accepted_cells()?
+        .checked_add(u64::try_from(
+            query.len().checked_mul(4).ok_or("query overflow")?,
+        )?)
+        .and_then(|n| n.checked_add(u64::try_from(cells).ok()?))
+        .ok_or("draw horizon overflow")?;
+    if horizon > checkpoint.population {
+        return Err("the declared keyed reply exceeds the native source horizon".into());
+    }
+    let before = checkpoint.bytes()?;
+    let reference = port();
+    let pairing = declaration(checkpoint.population)?.2;
+    let (mut resident, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
+    for class in digits(query.as_bytes()) {
+        reference.ingest_class_continuing(&mut resident, &mut crib, &pairing, class, None)?;
+    }
+    let prompt_lift = exact(resident.current().lift());
+    let phase_family = resident.constitution().receiving_phase_family(
+        resident
+            .admitted()
+            .first()
+            .ok_or("no native receiver")?
+            .ring(),
+        resident
+            .admitted()
+            .first()
+            .ok_or("no native receiver")?
+            .tolerance(),
+    )?;
+    let initial_material = declaration(checkpoint.population)?.1;
+    let receiving_ring = resident
+        .admitted()
+        .first()
+        .ok_or("no native receiver")?
+        .ring();
+    let initial_map = initial_material
+        .receiving_law(receiving_ring)
+        .ok_or("founding readout is missing")?
+        .map()
+        .clone();
+    let mut keys = KeyStream::new(key_bytes.to_vec(), 8)?;
+    let mut classes = Vec::new();
+    let mut events = Vec::new();
+    let mut stop = "DeclaredLength";
+    let started = Instant::now();
+    for at in 0..cells {
+        let cell_started = Instant::now();
+        let moment = resident
+            .continuing()
+            .ok_or("draw has no continuing source")?
+            .0;
+        let phases = resident
+            .admitted()
+            .first()
+            .ok_or("no native receiver")?
+            .clone();
+        let (pending, _) = reference.refine(&mut resident, &moment, &phases)?;
+        let producing_lift = exact(resident.current().lift());
+        let matched = reference.diagnose_pending_readout(
+            &resident,
+            &pending,
+            &initial_map,
+            holonics::ratio::exponentiated::READING_BITS,
+        )?;
+        let (class, decision, receiving) = if tree_only {
+            let read = reference.release_tree_cell_continuing(
+                &mut resident,
+                &mut crib,
+                &pairing,
+                pending,
+                &mut keys,
+                None,
+            )?;
+            let class = read.class();
+            let received = read.ingestion.is_some();
+            (class, exact(&read), received)
+        } else {
+            let release = reference
+                .release_cells(&mut resident, &pending, CellLaw::Draw(&mut keys))?
+                .forward
+                .into_present()
+                .ok_or("native draw gave no release")?;
+            let cell = release.cells.first().ok_or("native draw gave no cell")?;
+            let class = cell.class();
+            if class.is_some() {
+                reference.ingest_released_cell_continuing(
+                    &mut resident,
+                    &mut crib,
+                    &pairing,
+                    pending,
+                    cell,
+                    None,
+                )?;
+            }
+            (class, exact(&release), class.is_some())
+        };
+        events.push(object(&[
+            ("index", at.to_string()),
+            ("producing_lift_exact", producing_lift),
+            ("native_decision_exact", decision),
+            ("landmark_face_exact", exact(&matched.tree)),
+            ("readout_intervention_exact", exact(&matched.readout)),
+            ("locally_received", receiving.to_string()),
+            ("end_lift_exact", exact(resident.current().lift())),
+            ("wall_ns", cell_started.elapsed().as_nanos().to_string()),
+        ]));
+        eprintln!(
+            "alpha native keyed_draw arm={label} cell={at} emitted={} received={receiving} elapsed_ns={}",
+            class.is_some(),
+            started.elapsed().as_nanos()
+        );
+        let Some(class) = class else {
+            reference.discard(&mut resident, Handle::Pending(pending))?;
+            stop = "UnresolvedOrNoKey";
+            break;
+        };
+        if !receiving {
+            return Err("a released cell must be locally received before the next score".into());
+        }
+        classes.push(class);
+    }
+    let boundary = Base4Bytes::decode(&classes, cells)?;
+    if checkpoint.bytes()? != before {
+        return Err("a keyed query changed its immutable retained checkpoint".into());
+    }
+    Ok(KeyedReply {
+        json: object(&[
+            ("policy", quoted(label)),
+            ("declared_bytes", byte_length.to_string()),
+            (
+                "declared_length_reached",
+                (classes.len() == cells).to_string(),
+            ),
+            ("stop", quoted(stop)),
+            ("classes", format!("{classes:?}")),
+            ("released_bytes", format!("{:?}", boundary.bytes)),
+            (
+                "released_utf8",
+                boundary
+                    .complete_boundary_text()
+                    .map_or_else(|| "null".into(), quoted),
+            ),
+            ("byte_boundary_exact", exact(&boundary)),
+            ("keys_read", keys.keys_read().to_string()),
+            ("key_width_bytes", keys.width().to_string()),
+            ("prompt_lift_exact", prompt_lift),
+            ("phase_family_at_prompt_exact", exact(&phase_family)),
+            ("decisions", format!("[{}]", events.join(","))),
+            ("retained_checkpoint_unchanged", "true".into()),
+            ("semantic_answer_claim", "false".into()),
+            (
+                "scope",
+                quoted(
+                    "native certified keyed cell draw with local conditional reception; raw base-four codec; caller-declared length, no EOS",
+                ),
+            ),
+        ]),
+        classes,
+    })
+}
+
+/// Read exterior targets only after every native/control release has completed. The generic
+/// ordered-contact owner consumes raw base-four classes: no base-32 framing end is invented.
+fn keyed_controls(
+    checkpoint: &Checkpoint,
+    founding: &Checkpoint,
+    query: &str,
+    key_path: &str,
+    byte_length: usize,
+    target_path: &str,
+) -> Result<String> {
+    if checkpoint.population != founding.population {
+        return Err("founding control must keep the same declared field".into());
+    }
+    let expected = byte_length
+        .checked_mul(32)
+        .ok_or("key file bound overflow")?;
+    if usize::try_from(std::fs::metadata(key_path)?.len())? != expected {
+        return Err("key file does not fit the declared finite reply".into());
+    }
+    let key_bytes = std::fs::read(key_path)?;
+    let native = keyed_reply(
+        checkpoint,
+        query,
+        &key_bytes,
+        byte_length,
+        false,
+        "native_trained",
+    )?;
+    let initial = keyed_reply(
+        founding,
+        query,
+        &key_bytes,
+        byte_length,
+        false,
+        "founding_constitution",
+    )?;
+    let tree = keyed_reply(
+        checkpoint,
+        query,
+        &key_bytes,
+        byte_length,
+        true,
+        "executed_trained_tree",
+    )?;
+    eprintln!("alpha native keyed_releases_complete target_not_opened=true");
+    // This prefix was fixed by the declared reply length, independently of any released bytes.
+    let target = std::fs::read(target_path)?;
+    let target = target
+        .get(..byte_length)
+        .ok_or("adjacent source is shorter than the declared comparison")?;
+    let target_classes = digits(target);
+    let mut readings = Vec::new();
+    for (policy, reply) in [
+        ("native_trained", &native),
+        ("founding_constitution", &initial),
+        ("executed_trained_tree", &tree),
+    ] {
+        let coupling = holonics::receiver::coupling::coupling(&reply.classes, &target_classes)?;
+        readings.push(object(&[
+            ("policy", quoted(policy)),
+            ("lambda", coupling.lambda.to_string()),
+            ("F_star", coupling.least_friction.to_string()),
+            ("coupling_exact", exact(&coupling)),
+        ]));
+    }
+    Ok(object(&[
+        (
+            "founding_checkpoint_sha256",
+            quoted(&sha256(&founding.bytes()?)?),
+        ),
+        ("key_file_sha256", quoted(&sha256(&key_bytes)?)),
+        ("key_stream_shared_by_all_arms", "true".into()),
+        (
+            "arms",
+            format!("[{},{},{}]", native.json, initial.json, tree.json),
+        ),
+        ("target_read_after_all_releases", "true".into()),
+        (
+            "target_file_sha256",
+            quoted(&sha256(&std::fs::read(target_path)?)?),
+        ),
+        ("target_fixed_prefix_bytes", byte_length.to_string()),
+        (
+            "ordered_contact_readings",
+            format!("[{}]", readings.join(",")),
+        ),
+    ]))
+}
+
 fn last_deposit(reading: &DepositReading) -> String {
     format!(
         "{{\"commit\":{},\"stepped\":{},\"landmarks\":{},\"steps_exact\":{},\"joint_exact\":{},\"rounding_refusals_exact\":{},\"released_exact\":{}}}",
@@ -447,7 +899,7 @@ fn run() -> Result<()> {
                 ("warm_query", warm), ("elapsed_ns", started.elapsed().as_nanos().to_string()),
             ]));
         }
-        Some("ingest") if args.len() == 8 || args.len() == 9 => {
+        Some("ingest") if args.len() == 8 || args.len() == 9 || args.len() == 12 => {
             let budget: u64 = args[7].parse()?;
             let max_source: usize = args[6].parse()?;
             let (mut checkpoint, input_hash) = Checkpoint::load(&args[1], budget)?;
@@ -465,7 +917,8 @@ fn run() -> Result<()> {
             let reference = port(); let pairing = declaration(checkpoint.population)?.2;
             let mut source_cells = digits(&excerpt);
             let complete_excerpt_cells = source_cells.len();
-            if let Some(limit) = args.get(8) {
+            if args.len() == 9 {
+                let limit = &args[8];
                 let limit: usize = limit.parse()?;
                 if limit == 0 || limit > source_cells.len() { return Err("source-cell control must select a nonempty actual excerpt prefix".into()); }
                 source_cells.truncate(limit);
@@ -475,10 +928,21 @@ fn run() -> Result<()> {
             let mut whole = 0usize; let mut receiving_only = 0usize; let mut neutral = 0usize;
             let mut outcomes = Vec::new();
             let mut class_series = Vec::new();
+            let mut stage_events = Vec::new();
             // The chunk bound is the actual maximum time to this declared receiving tick.
             // A chunk may contain multiple actual sections after a key relocation.
             for chunk in source_cells.chunks(checkpoint.stream.epoch_bound()) {
-                let receipt = checkpoint.stream.receive(&reference, &pairing, chunk)?;
+                let delivery_opening = total(checkpoint.stream.resident())?;
+                let receipt = checkpoint.stream.receive_diagnosed(&reference, &pairing, chunk, &mut |attempt, refusal| {
+                    let event = object(&[
+                        ("delivery_opening_published_cells", delivery_opening.to_string()),
+                        ("attempt", exact(&attempt)), ("stage_refusal_exact", exact(refusal)),
+                    ]);
+                    // Emitted before the original native error returns, including a fatal
+                    // receiving-only restage. The resident retains no diagnostic history.
+                    eprintln!("alpha native stage_refusal {event}");
+                    stage_events.push(event);
+                })?;
                 accepted += receipt.accepted; published += receipt.published;
                 for epoch in receipt.epochs {
                     let opening = epoch.cells.checked_sub(u64::try_from(epoch.consumed)?)
@@ -501,6 +965,8 @@ fn run() -> Result<()> {
                         ("consumed", epoch.consumed.to_string()),
                         ("outcome", exact(&epoch.outcome)), ("deposition_scope", exact(&epoch.deposition_scope)),
                         ("comparison_exact", exact(&epoch.comparison)), ("whole_refusal", exact(&epoch.whole_refusal)),
+                        ("whole_stage_refusal_exact", exact(&epoch.whole_stage_refusal)),
+                        ("probe_state", exact(&epoch.probe_state)),
                         ("receiving_certificate_exact", exact(&epoch.deposit.epoch)),
                         ("first_law_before_precision_exact", exact(&epoch.precision.balance_before)),
                         ("first_law_after_precision_exact", exact(&epoch.precision.balance_after)),
@@ -522,6 +988,21 @@ fn run() -> Result<()> {
             ]));
             checkpoint.provenance.push('\n');
             let warm = query_reading(&checkpoint, WARM_QUERY)?;
+            let warm_keyed = if args.len() == 12 {
+                let (founding, _) = Checkpoint::load(&args[10], budget)?;
+                let batch = std::fs::read_to_string(&args[11])?;
+                let mut readings = Vec::new();
+                for row in batch.lines() {
+                    let columns: Vec<_> = row.split('\t').collect();
+                    if columns.len() != 3 || columns[0].is_empty() {
+                        return Err("warm query batch requires id, prompt path, adjacent source path".into());
+                    }
+                    let prompt = std::fs::read_to_string(columns[1])?;
+                    let controls = keyed_controls(&checkpoint, &founding, &prompt, &args[8], args[9].parse()?, columns[2])?;
+                    readings.push(object(&[("query_id", quoted(columns[0])), ("keyed_replies", controls)]));
+                }
+                format!("[{}]", readings.join(","))
+            } else { "null".into() };
             let (bytes, hash) = checkpoint.publish(&args[2])?;
             println!("{}", object(&[
                 ("kind", quoted("ingest")), ("checkpoint_path", quoted(&args[2])),
@@ -546,24 +1027,34 @@ fn run() -> Result<()> {
                 ("epoch_outcomes", format!("[{}]", outcomes.join(","))),
                 ("class_code_scope", quoted("prequential class comparison through the actual model/tree face; separate tree-only control; phase improvement alone is not class prediction improvement")),
                 ("class_code_series", format!("[{}]", class_series.join(","))),
+                ("stage_refusal_events", format!("[{}]", stage_events.join(","))),
                 ("last_deposit", final_deposit.as_ref().map_or_else(|| "null".to_owned(), last_deposit)),
-                ("warm_query", warm), ("elapsed_ns", started.elapsed().as_nanos().to_string()),
+                ("warm_query", warm), ("warm_keyed_replies", warm_keyed), ("elapsed_ns", started.elapsed().as_nanos().to_string()),
             ]));
         }
-        Some("query") if args.len() == 3 || args.len() == 4 => {
+        Some("query") if args.len() == 3 || args.len() == 4 || args.len() == 6 || args.len() == 10 => {
             let (checkpoint, hash) = Checkpoint::load(&args[1], args[2].parse()?)?;
             let query = args.get(3).map_or(WARM_QUERY, String::as_str);
             let constitution = material_hash(checkpoint.stream.resident())?;
             let reading = query_reading(&checkpoint, query)?;
+            let controls = if args.len() >= 6 {
+                conditional_query_controls(&checkpoint, query, args[4].parse()?, args[5].parse()?)?
+            } else { "null".into() };
+            let keyed = if args.len() == 10 {
+                let (founding, _) = Checkpoint::load(&args[8], args[2].parse()?)?;
+                keyed_controls(&checkpoint, &founding, query, &args[6], args[7].parse()?, &args[9])?
+            } else { "null".into() };
             println!("{}", object(&[
                 ("kind", quoted("query")), ("checkpoint_sha256", quoted(&hash)),
                 ("constitution_sha256", quoted(&constitution)), ("total_cells", total(checkpoint.stream.resident())?.to_string()),
                 ("accepted_total_cells", checkpoint.stream.accepted_cells()?.to_string()),
                 ("pending_cells", checkpoint.stream.pending_classes().len().to_string()),
                 ("reading", reading), ("elapsed_ns", started.elapsed().as_nanos().to_string()),
+                ("conditional_sections", controls),
+                ("keyed_replies", keyed),
             ]));
         }
-        _ => return Err("usage: solenoidal_alpha init OUTPUT POPULATION | ingest INPUT OUTPUT ORIGINAL_FILE FIRST_LINE LAST_LINE MAX_SOURCE_BYTES MAX_CHECKPOINT_BYTES [SOURCE_CELL_LIMIT] | query INPUT MAX_CHECKPOINT_BYTES [QUERY_UTF8]".into()),
+        _ => return Err("usage: solenoidal_alpha init OUTPUT POPULATION | ingest INPUT OUTPUT ORIGINAL_FILE FIRST_LINE LAST_LINE MAX_SOURCE_BYTES MAX_CHECKPOINT_BYTES [SOURCE_CELL_LIMIT | KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT WARM_QUERY_BATCH_TSV] | query INPUT MAX_CHECKPOINT_BYTES [QUERY_UTF8 [SECTION_BYTES ORACLE_BUDGET [KEY_FILE DRAW_BYTES FOUNDING_CHECKPOINT ADJACENT_SOURCE_FILE]]]".into()),
     }
     Ok(())
 }

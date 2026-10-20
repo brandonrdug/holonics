@@ -330,6 +330,7 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::aeon::{ClockLift, Cycle};
+use crate::geometry::transport_scan::{OrderedScanError, ordered_prefixes, ordered_reduce};
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, WordLattice, carry, refine};
 use crate::hnn::constitution::Lattice;
@@ -3740,6 +3741,17 @@ impl ReceivingBank {
         member: usize,
         amplitudes: &[GaussianRat],
     ) -> Result<(Vec<ExactRatMatrix>, Vec<Vec<BigInt>>, BigInt), HnnError> {
+        self.turn_monodromy_partitioned(member, amplitudes, rayon::current_num_threads())
+    }
+
+    /// The exact input-selected crossing maps composed in ordered spans. The integer product
+    /// and its unreduced denominator remain the same owners as the serial monodromy.
+    pub(crate) fn turn_monodromy_partitioned(
+        &self,
+        member: usize,
+        amplitudes: &[GaussianRat],
+        partitions: usize,
+    ) -> Result<(Vec<ExactRatMatrix>, Vec<Vec<BigInt>>, BigInt), HnnError> {
         let pump = &self.pumps[member];
         if !amplitudes.len().is_multiple_of(pump.phases()) {
             return Err(HnnError::Resonator {
@@ -3750,10 +3762,10 @@ impl ReceivingBank {
         let schedule = PumpSchedule::placed(pump, amplitudes)?;
         let n = 2 * self.material.width();
         let mut maps = Vec::with_capacity(schedule.period());
-        let mut product: Vec<Vec<BigInt>> = (0..n)
+        let identity: Vec<Vec<BigInt>> = (0..n)
             .map(|i| (0..n).map(|j| BigInt::from(u8::from(i == j))).collect())
             .collect();
-        let mut scale = BigInt::one();
+        let mut integral_maps = Vec::with_capacity(schedule.period());
         for tick in 0..schedule.period() {
             let map = self.crossing(member, &schedule.block(tick), tick)?;
             let denominator = common_denominator(map.entries());
@@ -3767,11 +3779,28 @@ impl ReceivingBank {
                         .collect()
                 })
                 .collect();
-            product = integer_product(&integral, &product);
-            scale *= denominator;
+            integral_maps.push((integral, denominator));
             maps.push(map);
         }
+        let (product, scale) = ordered_reduce(
+            &integral_maps,
+            &(identity, BigInt::one()),
+            partitions,
+            |earlier, later| {
+                Ok::<_, HnnError>((integer_product(&later.0, &earlier.0), &later.1 * &earlier.1))
+            },
+        )
+        .map_err(Self::transport_scan_error)?;
         Ok((maps, product, scale))
+    }
+
+    fn transport_scan_error(error: OrderedScanError<HnnError>) -> HnnError {
+        match error {
+            OrderedScanError::ZeroPartitions => HnnError::Unadmitted {
+                reason: "an exact transport scan needs a nonzero partition count",
+            },
+            OrderedScanError::Composition(error) => error,
+        }
     }
 
     /// One crossing's executed tick map for member `member`: the unpumped stiffness with the node
@@ -4854,23 +4883,60 @@ impl ReceivingBank {
         amplitudes: &[GaussianRat],
         direction: &[GaussianRat],
     ) -> Result<TurnVariation, HnnError> {
+        self.turn_variation_partitioned(member, amplitudes, direction, rayon::current_num_threads())
+    }
+
+    /// Compose exact `(map, variation)` spans by the product rule, and independently read the
+    /// prefix–suffix return through those same producing maps. Rounded disk covectors and the
+    /// state-selected word's chart, lock and split streams keep their separate serial law.
+    pub(crate) fn turn_variation_partitioned(
+        &self,
+        member: usize,
+        amplitudes: &[GaussianRat],
+        direction: &[GaussianRat],
+        partitions: usize,
+    ) -> Result<TurnVariation, HnnError> {
+        if amplitudes.len() != direction.len() {
+            return Err(HnnError::Unadmitted {
+                reason: "a monodromy variation needs one direction for every crossing amplitude",
+            });
+        }
         let (maps, moves) = self.crossing_moves(member, amplitudes, direction)?;
         let n = 2 * self.material.width();
         let identity = ExactRatMatrix::identity(n)?;
-        let (mut product, mut tangent) = (identity.clone(), ExactRatMatrix::zero(n, n)?);
-        for (map, moved) in maps.iter().zip(&moves) {
-            tangent = moved.multiply(&product)?.add(&map.multiply(&tangent)?)?;
-            product = map.multiply(&product)?;
-        }
+        let jets: Vec<_> = maps.iter().cloned().zip(moves.iter().cloned()).collect();
+        let (product, tangent) = ordered_reduce(
+            &jets,
+            &(identity.clone(), ExactRatMatrix::zero(n, n)?),
+            partitions,
+            |earlier, later| {
+                Ok::<_, HnnError>((
+                    later.0.multiply(&earlier.0)?,
+                    later
+                        .1
+                        .multiply(&earlier.0)?
+                        .add(&later.0.multiply(&earlier.1)?)?,
+                ))
+            },
+        )
+        .map_err(Self::transport_scan_error)?;
         let ticks = maps.len();
-        let mut prefix = vec![identity.clone(); ticks + 1];
-        for tick in 0..ticks {
-            prefix[tick + 1] = maps[tick].multiply(&prefix[tick])?;
-        }
-        let mut suffix = vec![identity; ticks + 1];
-        for tick in (0..ticks).rev() {
-            suffix[tick] = suffix[tick + 1].multiply(&maps[tick])?;
-        }
+        let mut prefix = Vec::with_capacity(ticks + 1);
+        prefix.push(identity.clone());
+        prefix.extend(
+            ordered_prefixes(&maps, &identity, partitions, |earlier, later| {
+                Ok::<_, HnnError>(later.multiply(earlier)?)
+            })
+            .map_err(Self::transport_scan_error)?,
+        );
+        let reversed: Vec<_> = maps.iter().rev().cloned().collect();
+        let reversed_suffix =
+            ordered_prefixes(&reversed, &identity, partitions, |earlier, later| {
+                Ok::<_, HnnError>(earlier.multiply(later)?)
+            })
+            .map_err(Self::transport_scan_error)?;
+        let mut suffix: Vec<_> = reversed_suffix.into_iter().rev().collect();
+        suffix.push(identity);
         let mut reverse = ExactRatMatrix::zero(n, n)?;
         for tick in 0..ticks {
             reverse = reverse.add(

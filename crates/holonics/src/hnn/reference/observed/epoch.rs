@@ -10,6 +10,9 @@ use crate::compression::landmark::context::LandmarkFace;
 use crate::hnn::constitution::epoch::{
     EpochCandidateScope, EpochReceivingRecord, partition_exponent,
 };
+pub use crate::hnn::constitution::epoch::{
+    EpochStageAttempt, EpochStageCondition, EpochStageReading, EpochStageRefusal, EpochStageValue,
+};
 use crate::hnn::reference::comparison::ComparisonReading;
 use crate::hnn::reference::epoch::EpochForward;
 use rayon::prelude::*;
@@ -92,11 +95,29 @@ impl ObservedEpochEnergy {
         !self.words.is_empty()
             && self.chained.len() == self.words.len() - 1
             && self.words.iter().all(crate::hnn::word::WordBalance::closes)
-            && self.chained.iter().all(|join| join.closes() && join.lift_emits())
-            && self.words[..self.words.len()-1].iter().all(|word| word.commit.is_none())
-            && self.words.last().and_then(|word| word.commit.as_ref())
+            && self
+                .chained
+                .iter()
+                .all(|join| join.closes() && join.lift_emits())
+            && self.words[..self.words.len() - 1]
+                .iter()
+                .all(|word| word.commit.is_none())
+            && self
+                .words
+                .last()
+                .and_then(|word| word.commit.as_ref())
                 .is_some_and(|commit| commit.deposition == self.deposition_work)
     }
+}
+
+/// Whether the whole candidate existed and its finite comparison actually completed.
+/// ProbeFailed does not claim a completed wave or objective reading.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ObservedEpochProbeState {
+    SealNotFormed,
+    SealedNoProbeRequired,
+    ProbeFailed,
+    FiniteComparisonExecuted,
 }
 
 #[derive(Debug)]
@@ -117,6 +138,9 @@ pub struct ObservedEpochReceipt {
     pub comparison: Option<ComparisonReading>,
     /// A refused whole branch is discarded before receiving-only restaging.
     pub whole_refusal: Option<String>,
+    /// First whole-stage evidence; receiving-only restaging never overwrites it.
+    pub whole_stage_refusal: Option<EpochStageRefusal>,
+    pub probe_state: ObservedEpochProbeState,
     pub precision: ObservedPrecisionReceipt,
     pub close: Option<ClosedLocated>,
     /// Only requested cuts. A cut equal to consumed still precedes the closing deposit.
@@ -407,6 +431,7 @@ impl Reference {
             execution,
             true,
             ObservedEpochDepositionScope::All,
+            &mut |_, _| {},
         )
     }
 
@@ -427,6 +452,37 @@ impl Reference {
         execution: &dyn ObservedEpochExecution,
         scope: ObservedEpochDepositionScope,
     ) -> Result<ObservedEpochReceipt, HnnError> {
+        self.observe_epoch_continuing_at_cuts_with_scope_diagnosed(
+            resident,
+            crib,
+            pairing,
+            classes,
+            placement,
+            cuts,
+            terminal,
+            execution,
+            scope,
+            &mut |_, _| {},
+        )
+    }
+
+    /// Observe at most the first whole and first receiving-only stage refusal of this
+    /// atomic epoch, including a fatal refusal. The callback is exterior evidence only;
+    /// it cannot mutate native operands, and original errors/transaction rollback remain intact.
+    #[allow(clippy::too_many_arguments)]
+    pub fn observe_epoch_continuing_at_cuts_with_scope_diagnosed(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        classes: &[usize],
+        placement: Option<&OccurrencePlacement>,
+        cuts: &[usize],
+        terminal: bool,
+        execution: &dyn ObservedEpochExecution,
+        scope: ObservedEpochDepositionScope,
+        stage_refused: &mut dyn FnMut(EpochStageAttempt, &EpochStageRefusal),
+    ) -> Result<ObservedEpochReceipt, HnnError> {
         self.observe_epoch_continuing_for_execution(
             resident,
             crib,
@@ -439,6 +495,7 @@ impl Reference {
             execution,
             true,
             scope,
+            stage_refused,
         )
     }
 
@@ -468,6 +525,7 @@ impl Reference {
             &HostObservedEpochExecution,
             false,
             ObservedEpochDepositionScope::All,
+            &mut |_, _| {},
         )
     }
 
@@ -485,6 +543,7 @@ impl Reference {
         execution: &dyn ObservedEpochExecution,
         selected_forward: bool,
         deposition_scope: ObservedEpochDepositionScope,
+        stage_refused: &mut dyn FnMut(EpochStageAttempt, &EpochStageRefusal),
     ) -> Result<ObservedEpochReceipt, HnnError> {
         let forward_start = Instant::now();
         if classes.is_empty() {
@@ -641,21 +700,30 @@ impl Reference {
         } = forward;
         // Preserve actual releases before the parallel returns consume their words.
         // The closing source lift is already one cell past the last producing word.
-        let final_read = forwards.last().ok_or_else(|| refusal(
-            "an observed epoch energy receipt needs its actual producing word",
-        ))?;
+        let final_read = forwards.last().ok_or_else(|| {
+            refusal("an observed epoch energy receipt needs its actual producing word")
+        })?;
         let producing_current = final_read.ratio.current(&field)?;
         let before_form = crate::hnn::word::PowerForm::read(
-            &field, &comparison_opening.constitution, &producing_current,
+            &field,
+            &comparison_opening.constitution,
+            &producing_current,
         )?;
         let mut energy_words: Vec<_> = forwards.iter().map(|read| read.energy.clone()).collect();
-        let energy_chained = forwards.iter().filter_map(|read| read.chained.clone()).collect();
+        let energy_chained = forwards
+            .iter()
+            .filter_map(|read| read.chained.clone())
+            .collect();
         let producing_lift = producing_current.lift().to_vec();
         let closing_lift = current.lift().to_vec();
         if carried.as_ref().is_none_or(|carry| {
-            energy_words.last().is_none_or(|word| carry.change != word.change)
+            energy_words
+                .last()
+                .is_none_or(|word| carry.change != word.change)
         }) {
-            return Err(refusal("the epoch energy commit reads its actual carried last crossing"));
+            return Err(refusal(
+                "the epoch energy commit reads its actual carried last crossing",
+            ));
         }
         next.wall = forward_wall;
         next.tally = forward_tally;
@@ -987,7 +1055,7 @@ impl Reference {
             |scope, observe: &mut dyn FnMut(crate::hnn::constitution::epoch::EpochDepositPhase)| {
                 comparison_opening
                     .constitution
-                    .stage_observed_epoch_with_execution(
+                    .stage_observed_epoch_with_evidence(
                         &deposits,
                         receiver,
                         field.ring(receiver).period(),
@@ -1006,8 +1074,11 @@ impl Reference {
             };
         let mut comparison = None;
         let mut whole_refusal = None;
+        let mut whole_stage_refusal = None;
+        let mut probe_state = ObservedEpochProbeState::SealNotFormed;
         let whole = match stage(EpochCandidateScope::Whole, &mut observe_deposit) {
             Ok(candidate) if !candidate.requires_comparison() => {
+                probe_state = ObservedEpochProbeState::SealedNoProbeRequired;
                 let outcome = if candidate.has_physical_motion() {
                     ObservedEpochOutcome::Whole
                 } else {
@@ -1016,6 +1087,7 @@ impl Reference {
                 Some((candidate.admit_receiving()?, outcome))
             }
             Ok(candidate) => {
+                probe_state = ObservedEpochProbeState::ProbeFailed;
                 // A source port is learner material. Re-admit that port under
                 // the SAME exterior class codec, pairing and placement; an old
                 // PairedObservation is correctly refused after E changes.
@@ -1125,6 +1197,7 @@ impl Reference {
                 })();
                 match probe {
                     Ok(reading) => {
+                        probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
                         let neutral = reading.unchanged || reading.objective_equal();
                         let admitted = if neutral {
                             Some(candidate.admit_neutral())
@@ -1152,16 +1225,27 @@ impl Reference {
                     }
                 }
             }
-            Err(error) if receiving_restage_permitted(&error) => {
-                whole_refusal = Some(error.to_string());
+            Err(failure) => {
+                stage_refused(EpochStageAttempt::Whole, &failure.evidence);
+                if !receiving_restage_permitted(&failure.error) {
+                    return Err(failure.error);
+                }
+                whole_refusal = Some(failure.error.to_string());
+                whole_stage_refusal = Some(failure.evidence);
                 None
             }
-            Err(error) => return Err(error),
         };
         let ((material, deposit), outcome) = match whole {
             Some(admitted) => admitted,
             None => {
-                let receiving = stage(EpochCandidateScope::ReceivingOnly, &mut observe_deposit)?;
+                let receiving =
+                    match stage(EpochCandidateScope::ReceivingOnly, &mut observe_deposit) {
+                        Ok(candidate) => candidate,
+                        Err(failure) => {
+                            stage_refused(EpochStageAttempt::ReceivingOnly, &failure.evidence);
+                            return Err(failure.error);
+                        }
+                    };
                 let outcome = if receiving.has_physical_motion() {
                     ObservedEpochOutcome::ReceivingOnly
                 } else {
@@ -1175,18 +1259,23 @@ impl Reference {
         // final source/reference crossing into the constitutive work.
         let after_form = crate::hnn::word::PowerForm::read(&field, &material, &producing_current)?;
         let physical_form_changed = before_form != after_form;
-        let last = energy_words.last_mut().ok_or_else(|| refusal(
-            "an epoch deposit has its producing physical balance",
-        ))?;
+        let last = energy_words
+            .last_mut()
+            .ok_or_else(|| refusal("an epoch deposit has its producing physical balance"))?;
         if before_form.power(&last.change)? != last.end
             || before_form.resonator_power(&last.change)? != last.resonator_end
         {
-            return Err(refusal("the physical deposit keeps the last word's producing form and crossing"));
+            return Err(refusal(
+                "the physical deposit keeps the last word's producing form and crossing",
+            ));
         }
         last.commit_held(&before_form, &after_form)?;
-        let deposition_work = last.commit.as_ref().ok_or_else(|| refusal(
-            "the physical deposit retains its executed held-momentum work",
-        ))?.deposition.clone();
+        let deposition_work = last
+            .commit
+            .as_ref()
+            .ok_or_else(|| refusal("the physical deposit retains its executed held-momentum work"))?
+            .deposition
+            .clone();
         let energy = ObservedEpochEnergy {
             words: energy_words,
             chained: energy_chained,
@@ -1196,7 +1285,9 @@ impl Reference {
             deposition_work,
         };
         if !energy.closes() {
-            return Err(refusal("the admitted epoch retains its closing physical energy series"));
+            return Err(refusal(
+                "the admitted epoch retains its closing physical energy series",
+            ));
         }
         observe_deposit(crate::hnn::constitution::epoch::EpochDepositPhase::Publication);
         let grouped_deposit = deposit_start.elapsed();
@@ -1292,6 +1383,8 @@ impl Reference {
             deposition_scope,
             comparison,
             whole_refusal,
+            whole_stage_refusal,
+            probe_state,
             precision,
             close,
             prefixes: snapshots,
@@ -1692,7 +1785,18 @@ mod tests {
                         .all(|locus| locus.locus == LinearLocus::Receiving(receiver))
                 );
             }
+            if let Some(stage) = &receipt.whole_stage_refusal {
+                assert_eq!(receipt.whole_refusal.as_ref(), Some(&stage.reason));
+                assert_eq!(receipt.probe_state, ObservedEpochProbeState::SealNotFormed);
+                assert!(receipt.comparison.is_none());
+                assert!(!stage.seal_formed && !stage.finite_probe_executed);
+            }
             if let Some(reading) = &receipt.comparison {
+                assert_eq!(
+                    receipt.probe_state,
+                    ObservedEpochProbeState::FiniteComparisonExecuted
+                );
+                assert!(receipt.whole_stage_refusal.is_none());
                 match receipt.outcome {
                     ObservedEpochOutcome::Whole => {
                         assert!(reading.strictly_improved);
@@ -2539,6 +2643,52 @@ mod tests {
     }
 
     #[test]
+    fn diagnosed_fatal_stage_reports_first_native_guard_and_preserves_atomic_opening() {
+        let (reference, _, mut resident, mut crib, pairing) = source_probe_opening();
+        let before = resident.continuing_state(0).unwrap();
+        let old_crib = crib.clone();
+        let execution = CheckedExecution::new(2);
+        let mut failures = Vec::new();
+        let error = reference
+            .observe_epoch_continuing_at_cuts_with_scope_diagnosed(
+                &mut resident,
+                &mut crib,
+                &pairing,
+                &[0; 32],
+                None,
+                &[],
+                false,
+                &execution,
+                ObservedEpochDepositionScope::NormalMaps,
+                &mut |attempt, evidence| failures.push((attempt, evidence.clone())),
+            )
+            .unwrap_err();
+        assert_eq!(
+            failures.len(),
+            1,
+            "an executor refusal cannot be retried as receiving-only"
+        );
+        let (attempt, evidence) = &failures[0];
+        assert_eq!(*attempt, EpochStageAttempt::Whole);
+        assert_eq!(evidence.reason, error.to_string());
+        assert_eq!(evidence.condition, EpochStageCondition::NativeOwner);
+        assert_eq!(
+            (evidence.locus, evidence.family),
+            (
+                Some(Locus::Element(0)),
+                Some(crate::hnn::constitution::Family::Map)
+            )
+        );
+        assert!(!evidence.seal_formed && !evidence.finite_probe_executed);
+        assert_eq!(
+            execution.flows.load(std::sync::atomic::Ordering::Relaxed),
+            2
+        );
+        assert_eq!(resident.continuing_state(0).unwrap(), before);
+        assert_eq!(crib, old_crib);
+    }
+
+    #[test]
     fn observed_epoch_energy_keeps_actual_series_and_zero_normal_work_at_producing_cut() {
         let (reference, _, opening, opening_crib, pairing) = source_probe_opening();
         let mut selected = opening.clone();
@@ -2546,35 +2696,70 @@ mod tests {
         let mut selected_crib = opening_crib.clone();
         let mut native_crib = opening_crib;
         let execution = CheckedExecution::new(0);
-        let read = reference.observe_epoch_continuing_at_cuts_with_scope(
-            &mut selected, &mut selected_crib, &pairing, &[0; 32], None, &[], false,
-            &execution, ObservedEpochDepositionScope::NormalMaps,
-        ).unwrap();
-        let control = reference.observe_epoch_continuing_at_cuts_with_scope(
-            &mut native, &mut native_crib, &pairing, &[0; 32], None, &[], false,
-            &HostObservedEpochExecution, ObservedEpochDepositionScope::NormalMaps,
-        ).unwrap();
+        let read = reference
+            .observe_epoch_continuing_at_cuts_with_scope(
+                &mut selected,
+                &mut selected_crib,
+                &pairing,
+                &[0; 32],
+                None,
+                &[],
+                false,
+                &execution,
+                ObservedEpochDepositionScope::NormalMaps,
+            )
+            .unwrap();
+        let control = reference
+            .observe_epoch_continuing_at_cuts_with_scope(
+                &mut native,
+                &mut native_crib,
+                &pairing,
+                &[0; 32],
+                None,
+                &[],
+                false,
+                &HostObservedEpochExecution,
+                ObservedEpochDepositionScope::NormalMaps,
+            )
+            .unwrap();
         assert_same_publication(&selected, &native, &read, &control);
         assert_eq!(selected_crib, native_crib);
         assert!(read.consumed > 1);
-        assert_ne!(opening.constitution.source_port(0), selected.constitution.source_port(0),
-            "nonzero learned E movement is distinct from physical constitutive work");
+        assert_ne!(
+            opening.constitution.source_port(0),
+            selected.constitution.source_port(0),
+            "nonzero learned E movement is distinct from physical constitutive work"
+        );
         assert_eq!(read.outcome, ObservedEpochOutcome::Whole);
-        assert!(read.comparison.as_ref().unwrap().objective_change.upper.is_negative());
+        assert!(
+            read.comparison
+                .as_ref()
+                .unwrap()
+                .objective_change
+                .upper
+                .is_negative()
+        );
         assert_ne!(read.energy.producing_lift, read.energy.closing_lift);
         assert_eq!(read.energy.closing_lift, selected.current.lift());
         assert_eq!(read.energy.chained.len(), read.consumed - 1);
         assert!(!read.energy.physical_form_changed);
         assert_eq!(read.energy.deposition_work, Rat::zero());
         let cut = Current::at(&opening.field, read.energy.producing_lift.clone()).unwrap();
-        let before = crate::hnn::word::PowerForm::read(&opening.field, &opening.constitution, &cut).unwrap();
-        let after = crate::hnn::word::PowerForm::read(&opening.field, &selected.constitution, &cut).unwrap();
+        let before =
+            crate::hnn::word::PowerForm::read(&opening.field, &opening.constitution, &cut).unwrap();
+        let after = crate::hnn::word::PowerForm::read(&opening.field, &selected.constitution, &cut)
+            .unwrap();
         assert_eq!(before, after);
         let last = read.energy.words.last().unwrap();
         let held = before.held(&after, &last.change).unwrap();
         assert_eq!(held.deposition, read.energy.deposition_work);
         assert_eq!(last.commit.as_ref().unwrap().deposition, held.deposition);
-        assert!(read.energy.words.iter().all(crate::hnn::word::WordBalance::closes));
+        assert!(
+            read.energy
+                .words
+                .iter()
+                .all(crate::hnn::word::WordBalance::closes)
+        );
     }
 
     #[test]
@@ -2584,18 +2769,36 @@ mod tests {
             let mut resident = opening.clone();
             let mut crib = opening_crib.clone();
             let execution = CheckedExecution::new(mode);
-            let error = reference.observe_epoch_continuing_at_cuts_with_execution(
-                &mut resident, &mut crib, &pairing, &[1], None, &[], true, &execution,
-            ).unwrap_err();
+            let error = reference
+                .observe_epoch_continuing_at_cuts_with_execution(
+                    &mut resident,
+                    &mut crib,
+                    &pairing,
+                    &[1],
+                    None,
+                    &[],
+                    true,
+                    &execution,
+                )
+                .unwrap_err();
             assert!(matches!(error, HnnError::Unadmitted { .. }));
             assert_eq!(resident.constitution, opening.constitution);
             assert_eq!(resident.current, opening.current);
             assert_eq!(resident.carried, opening.carried);
             assert_eq!(resident.ledger.balance(), opening.ledger.balance());
-            assert_eq!(resident.continuing_state(0).unwrap().to_text(), opening.continuing_state(0).unwrap().to_text());
+            assert_eq!(
+                resident.continuing_state(0).unwrap().to_text(),
+                opening.continuing_state(0).unwrap().to_text()
+            );
             assert_eq!(crib, opening_crib);
-            assert_eq!(execution.returns.load(std::sync::atomic::Ordering::Relaxed), 0);
-            assert_eq!(execution.flows.load(std::sync::atomic::Ordering::Relaxed), 0);
+            assert_eq!(
+                execution.returns.load(std::sync::atomic::Ordering::Relaxed),
+                0
+            );
+            assert_eq!(
+                execution.flows.load(std::sync::atomic::Ordering::Relaxed),
+                0
+            );
         }
     }
 

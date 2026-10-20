@@ -7186,8 +7186,31 @@ impl Constitution {
         epoch_readout: Option<&Rat>,
         epoch_reaches: Option<&[Reach]>,
     ) -> Result<Result<CertifiedSteps, DeclaredStepRefusal>, HnnError> {
+        self.certify_steps_with_epoch_evidence(
+            reach,
+            linear,
+            factors,
+            loaded,
+            source,
+            epoch_readout,
+            epoch_reaches,
+            &mut None,
+        )
+    }
+
+    fn certify_steps_with_epoch_evidence(
+        &self,
+        reach: Option<&Reach>,
+        linear: &[(Locus, LinearLocus, PreparedDirectionRef<'_>)],
+        factors: &[(Locus, &FactorPrepared)],
+        loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
+        source: StepSource<'_>,
+        epoch_readout: Option<&Rat>,
+        epoch_reaches: Option<&[Reach]>,
+        evidence: &mut Option<epoch::EpochStageRefusal>,
+    ) -> Result<Result<CertifiedSteps, DeclaredStepRefusal>, HnnError> {
         let metrics = self.tube_metrics(reach, epoch_reaches)?;
-        let first = self.certify_steps_at(
+        let first = self.certify_steps_at_with_epoch_evidence(
             reach,
             linear,
             factors,
@@ -7199,6 +7222,7 @@ impl Constitution {
                 epoch_readout,
                 epoch_reaches,
             },
+            evidence,
         )?;
         let tubes: Vec<usize> = match &first {
             Ok((_, _, Some(pumped), _)) if matches!(source, StepSource::Certified) => {
@@ -7224,7 +7248,7 @@ impl Constitution {
         };
         let mut best = first;
         for rung in 1..=top {
-            let Ok(read) = self.certify_steps_at(
+            let Ok(read) = self.certify_steps_at_with_epoch_evidence(
                 reach,
                 linear,
                 factors,
@@ -7236,6 +7260,7 @@ impl Constitution {
                     epoch_readout,
                     epoch_reaches,
                 },
+                evidence,
             ) else {
                 break;
             };
@@ -7249,7 +7274,7 @@ impl Constitution {
     }
 
     /// The certified steps at one rung of the tubes' radius ladder ([`Constitution::certify_steps`]).
-    fn certify_steps_at(
+    fn certify_steps_at_with_epoch_evidence(
         &self,
         reach: Option<&Reach>,
         linear: &[(Locus, LinearLocus, PreparedDirectionRef<'_>)],
@@ -7257,6 +7282,7 @@ impl Constitution {
         loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
         source: StepSource<'_>,
         at: TubeRung<'_>,
+        evidence: &mut Option<epoch::EpochStageRefusal>,
     ) -> Result<Result<CertifiedSteps, DeclaredStepRefusal>, HnnError> {
         let TubeRung {
             tubes,
@@ -7941,6 +7967,14 @@ impl Constitution {
                 let mut steps: Vec<Option<CertifiedStep>> = Vec::with_capacity(parts.len());
                 for (locus, family, part) in &parts {
                     let Some(exponent) = declared.exponent(*locus, *family) else {
+                        epoch::EpochStageRefusal::at(
+                            "declared_certificate",
+                            epoch::EpochStageCondition::DeclaredFamily,
+                            "every reached stepping family must have a declared exponent",
+                            Some(*locus),
+                            Some(*family),
+                        )
+                        .first(evidence);
                         return Ok(Err(DeclaredStepRefusal::Undeclared {
                             locus: *locus,
                             family: *family,
@@ -7949,6 +7983,21 @@ impl Constitution {
                     let (a, c) = alignment(part);
                     let step = crate::holon::deposition::dyadic(exponent);
                     if &step * &c > Rat::one() {
+                        epoch::EpochStageRefusal::at(
+                            "declared_certificate",
+                            epoch::EpochStageCondition::CovectorScale,
+                            "eta * covector <= 1",
+                            Some(*locus),
+                            Some(*family),
+                        )
+                        .read("eta", epoch::EpochStageValue::Ratio(step.clone()))
+                        .read("covector", epoch::EpochStageValue::Ratio(c.clone()))
+                        .read("alignment", epoch::EpochStageValue::Ratio(a.clone()))
+                        .read(
+                            "slack",
+                            epoch::EpochStageValue::Ratio(Rat::one() - &step * &c),
+                        )
+                        .first(evidence);
                         return Ok(Err(DeclaredStepRefusal::CovectorScale {
                             locus: *locus,
                             family: *family,
@@ -7966,6 +8015,14 @@ impl Constitution {
                 if let Some(&(locus, family)) =
                     declared.families().find(|key| !place.contains_key(*key))
                 {
+                    epoch::EpochStageRefusal::at(
+                        "declared_certificate",
+                        epoch::EpochStageCondition::DeclaredFamily,
+                        "every declared family must reach this certificate",
+                        Some(locus),
+                        Some(family),
+                    )
+                    .first(evidence);
                     return Ok(Err(DeclaredStepRefusal::Undeclared { locus, family }));
                 }
                 // The readings at the declared rays' ends, recorded beside the step.
@@ -7982,20 +8039,77 @@ impl Constitution {
                     // A represented epoch move is a fixed candidate. Unlike
                     // Declared/Candidate, it must satisfy the very same bounds
                     // used by Certified, including the executed tube closure.
-                    if certified.iter().any(|step| !step.admits(&step.curvature)) {
+                    use epoch::{
+                        EpochStageCondition as Condition, EpochStageRefusal,
+                        EpochStageValue as Value,
+                    };
+                    if let Some((index, step)) =
+                        steps.iter().enumerate().find_map(|(index, step)| {
+                            step.as_ref()
+                                .filter(|step| !step.admits(&step.curvature))
+                                .map(|step| (index, step))
+                        })
+                    {
+                        EpochStageRefusal::at(
+                            "actual_certificate",
+                            Condition::ActualRayCurvature,
+                            "eta * curvature <= alignment and eta * covector <= 1",
+                            Some(parts[index].0),
+                            Some(parts[index].1),
+                        )
+                        .read("step", Value::Step(step.clone()))
+                        .read("gain", Value::Ratio(read[index].0.clone()))
+                        .read("moves", Value::Ratio(read[index].1.clone()))
+                        .read("score_curvature", Value::Ratio(score.clone()))
+                        .read(
+                            "own_curvature_slack",
+                            Value::Ratio(&step.alignment - &step.step * &step.curvature),
+                        )
+                        .read(
+                            "covector_slack",
+                            Value::Ratio(Rat::one() - &step.step * &step.covector),
+                        )
+                        .fixed_ray_step_diagnostic(step)
+                        .first(evidence);
                         return Err(HnnError::Unadmitted {
                             reason: "the actual epoch ray violates its own curvature bound",
                         });
                     }
                     if !joint.holds() {
+                        let mut failure = EpochStageRefusal::at(
+                            "actual_certificate",
+                            Condition::JointTriangle,
+                            "joint curvature <= joint first-order decrease",
+                            None,
+                            None,
+                        )
+                        .read("joint", Value::Joint(joint.clone()));
+                        failure.participating_families = parts
+                            .iter()
+                            .map(|(locus, family, _)| (*locus, *family))
+                            .collect();
+                        failure.first(evidence);
                         return Err(HnnError::Unadmitted {
                             reason: "the actual epoch rays violate the joint triangle bound",
                         });
                     }
-                    if closure_of(&steps)?
-                        .iter()
-                        .any(|(closure, _)| !closure.holds())
+                    if let Some((closure, _)) = closure_of(&steps)?
+                        .into_iter()
+                        .find(|(closure, _)| !closure.holds())
                     {
+                        let mut failure = EpochStageRefusal::at(
+                            "actual_certificate",
+                            Condition::PumpTube,
+                            "executed tube deviation <= tube slack",
+                            Some(Locus::Resonator(closure.ring)),
+                            None,
+                        )
+                        .read("closure", Value::Tube(closure));
+                        failure.participating_families = parts
+                            .iter()
+                            .map(|(locus, family, _)| (*locus, *family))
+                            .collect();
+                        failure.first(evidence);
                         return Err(HnnError::Unadmitted {
                             reason: "the actual epoch rays leave an executed pump tube",
                         });

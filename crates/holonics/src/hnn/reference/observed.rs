@@ -15,9 +15,13 @@ use crate::hnn::paired::PairingDeclaration;
 
 mod epoch;
 mod checkpoint;
+mod diagnostic;
+pub use diagnostic::PendingReadoutDiagnostic;
+mod tree_release;
+pub use tree_release::TreeReleaseReceipt;
 mod stream;
 pub use stream::{ObservedStream, ObservedStreamReceipt};
-pub use epoch::{ObservedEpochCellReceipt, ObservedEpochEnergy, ObservedEpochDepositionScope, ObservedEpochOutcome, ObservedEpochReceipt, ObservedEpochWallTimes};
+pub use epoch::{ObservedEpochCellReceipt, ObservedEpochEnergy, ObservedEpochDepositionScope, ObservedEpochOutcome, ObservedEpochReceipt, ObservedEpochWallTimes, ObservedEpochProbeState, EpochStageAttempt, EpochStageCondition, EpochStageReading, EpochStageRefusal, EpochStageValue};
 mod execution;
 pub use execution::{
     HostObservedEpochExecution, ObservedEpochExecution, ObservedEpochForwardContext,

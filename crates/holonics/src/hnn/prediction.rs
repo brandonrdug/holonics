@@ -257,6 +257,12 @@
 /// Physical chart compression with a consumed state and covector error contract.
 pub mod charted;
 
+/// Exact exterior byte/text reading of the actual scored receiving release.
+pub mod byte_release;
+
+/// Whole finite byte-section dominance on an actual conditional receiving oracle.
+pub mod native_section;
+
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 

@@ -68,6 +68,8 @@ use crate::receiver::release::{DrawRefusal, KeyStream, ReleaseReturn, commit, dr
 
 use super::{face_enclosure, face_enclosure_at, population_refusal};
 
+pub mod diagnostic;
+
 /// **The arm a release at class grain decides by.**
 #[derive(Debug)]
 pub enum CellLaw<'k> {

@@ -26,6 +26,242 @@ fn extent() -> HnnError {
     ExactLinearError::ExtentOverflow.into()
 }
 
+/// The condition that stopped formation of an atomic epoch candidate. This is stage evidence,
+/// never a finite comparison or a claim that the executed objective increased.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EpochStageCondition {
+    NativeOwner,
+    EpochAdmission,
+    FlowContract,
+    ReceivingSplit,
+    FreshAlignment,
+    SampleShape,
+    ActualRayAlignment,
+    ActualRayCurvature,
+    JointTriangle,
+    PumpTube,
+    NonlinearFactorRay,
+    SourceRefinementHalfCell,
+    Lobe,
+    CovectorScale,
+    DeclaredFamily,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum EpochStageValue {
+    Ratio(Rat),
+    Integer(BigInt),
+    Index(usize),
+    Indices(Vec<usize>),
+    Exponent(u32),
+    Carrier(Carrier),
+    Step(CertifiedStep),
+    Joint(JointReading),
+    Tube(TubeClosure),
+    Array(EpochArrayReading),
+    /// Exact transient grouped coordinates, never installed in a continuing state.
+    Series(EpochSeriesReading),
+    Text(&'static str),
+    /// The failing owner had not produced this operand, or its diagnostic could not be read.
+    Unavailable(&'static str),
+}
+
+/// One operative exact reading, named at the guard that actually consumed it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochStageReading {
+    pub name: &'static str,
+    pub value: EpochStageValue,
+}
+
+/// Exterior evidence for the first failed guard of one staging attempt. No history is retained.
+/// A missing locus/family means the native owner did not identify one; it is never inferred
+/// from another family or from the receiving-only successor. Joint participants are separate
+/// from a single failed family. Every such refusal precedes both seal formation and a probe.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochStageRefusal {
+    pub phase: &'static str,
+    pub condition: EpochStageCondition,
+    pub required: &'static str,
+    pub reason: String,
+    pub locus: Option<Locus>,
+    pub family: Option<Family>,
+    pub participating_families: Vec<(Locus, Family)>,
+    pub readings: Vec<EpochStageReading>,
+    pub seal_formed: bool,
+    pub finite_probe_executed: bool,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EpochStageAttempt {
+    Whole,
+    ReceivingOnly,
+}
+
+impl EpochStageRefusal {
+    pub(crate) fn at(
+        phase: &'static str,
+        condition: EpochStageCondition,
+        required: &'static str,
+        locus: Option<Locus>,
+        family: Option<Family>,
+    ) -> Self {
+        Self {
+            phase,
+            condition,
+            required,
+            reason: String::new(),
+            locus,
+            family,
+            participating_families: Vec::new(),
+            readings: Vec::new(),
+            seal_formed: false,
+            finite_probe_executed: false,
+        }
+    }
+    pub(crate) fn read(mut self, name: &'static str, value: EpochStageValue) -> Self {
+        self.readings.push(EpochStageReading { name, value });
+        self
+    }
+    pub(crate) fn first(self, target: &mut Option<Self>) {
+        if target.is_none() {
+            *target = Some(self);
+        }
+    }
+
+    /// Read the local certificate of this already refused, fixed ray. These values do not
+    /// rescale a candidate or certify a joint ray, rounding, or an executed finite comparison.
+    pub(crate) fn fixed_ray_step_diagnostic(mut self, step: &CertifiedStep) -> Self {
+        self = self.read(
+            "curvature_model",
+            EpochStageValue::Text(
+                "Gauss-Newton: score_curvature * propagation_gain * feature_moves; no executed second-variation/jet term",
+            ),
+        );
+        self = self.read(
+            "alignment_over_curvature",
+            if step.curvature.is_zero() {
+                EpochStageValue::Unavailable("zero curvature has no finite a/C ratio")
+            } else {
+                EpochStageValue::Ratio(&step.alignment / &step.curvature)
+            },
+        );
+        self = self.read(
+            "dyadic_diagnostic_scope",
+            EpochStageValue::Text(
+                "frozen local a/C and 1/c only; not a new candidate, endpoint reread, joint, tube or finite-probe admission",
+            ),
+        );
+        match CertifiedStep::certify(&step.alignment, &step.curvature, &step.covector) {
+            Ok(Some(local)) => self
+                .read(
+                    "largest_local_admissible_dyadic_k",
+                    EpochStageValue::Integer(BigInt::from(local.exponent)),
+                )
+                .read(
+                    "largest_local_admissible_dyadic",
+                    EpochStageValue::Ratio(local.step),
+                ),
+            Ok(None) => self.read(
+                "largest_local_admissible_dyadic_k",
+                EpochStageValue::Unavailable("zero alignment certifies no moving step"),
+            ),
+            Err(_) => self.read(
+                "largest_local_admissible_dyadic_k",
+                EpochStageValue::Unavailable("the frozen local certificate refused its operands"),
+            ),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct EpochStageFailure {
+    pub(crate) error: HnnError,
+    pub(crate) evidence: EpochStageRefusal,
+}
+
+struct EpochStageTrace {
+    phase: &'static str,
+    locus: Option<Locus>,
+    family: Option<Family>,
+    evidence: Option<EpochStageRefusal>,
+}
+impl Default for EpochStageTrace {
+    fn default() -> Self {
+        Self {
+            phase: "admission",
+            locus: None,
+            family: None,
+            evidence: None,
+        }
+    }
+}
+impl EpochStageTrace {
+    fn at(&mut self, phase: &'static str, locus: Option<Locus>, family: Option<Family>) {
+        self.phase = phase;
+        self.locus = locus;
+        self.family = family;
+    }
+    fn failed(mut self, error: HnnError) -> EpochStageFailure {
+        let mut evidence = self.evidence.take().unwrap_or_else(|| EpochStageRefusal::at(
+            self.phase, EpochStageCondition::NativeOwner,
+            "native owner admission; its unexported operative condition and failed family remain unknown",
+            self.locus, self.family,
+        ));
+        // Preserve exact readings already carried by a typed native error. Opaque owners
+        // keep their condition/attribution explicitly unknown rather than reconstructing it.
+        match &error {
+            HnnError::Shape {
+                expected, found, ..
+            } => {
+                evidence.readings.push(EpochStageReading {
+                    name: "expected",
+                    value: EpochStageValue::Index(*expected),
+                });
+                evidence.readings.push(EpochStageReading {
+                    name: "found",
+                    value: EpochStageValue::Index(*found),
+                });
+            }
+            HnnError::FactorStatistic { locus, statistic } => {
+                evidence.locus = Some(*locus);
+                evidence.readings.push(EpochStageReading {
+                    name: "statistic",
+                    value: EpochStageValue::Ratio(statistic.clone()),
+                });
+            }
+            HnnError::ConstitutionBudget {
+                bits,
+                budget,
+                commit,
+                ..
+            } => {
+                for (name, value) in [("bits", *bits), ("budget", *budget), ("commit", *commit)] {
+                    evidence.readings.push(EpochStageReading {
+                        name,
+                        value: EpochStageValue::Integer(BigInt::from(value)),
+                    });
+                }
+            }
+            HnnError::StaleDeposit { staged, published } => {
+                evidence.readings.push(EpochStageReading {
+                    name: "staged_commit",
+                    value: EpochStageValue::Integer(BigInt::from(*staged)),
+                });
+                evidence.readings.push(EpochStageReading {
+                    name: "published_commit",
+                    value: EpochStageValue::Integer(BigInt::from(*published)),
+                });
+            }
+            HnnError::Lattice { locus } | HnnError::ReleasedLocus { locus } => {
+                evidence.locus = Some(*locus)
+            }
+            _ => {}
+        }
+        evidence.reason = error.to_string();
+        EpochStageFailure { error, evidence }
+    }
+}
+
 /// The caller's declared read budget, shared by all grouped laws in one native restore.
 /// It bounds materialization before encoded exponents can allocate a denominator. Derived
 /// dense views are charged too; this conservative read bound is distinct from the retained

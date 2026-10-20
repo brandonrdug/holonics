@@ -188,23 +188,60 @@ fn receiving_epoch_certificate(
     })
 }
 
+fn carrier_family(carrier: Carrier) -> Option<Family> {
+    Some(match carrier {
+        Carrier::Map | Carrier::Gram => Family::Map,
+        Carrier::Passive | Carrier::PassiveScale => Family::Passive,
+        Carrier::Slices | Carrier::SliceScale => Family::Slices,
+        Carrier::Standing | Carrier::StandingScale => Family::Standing,
+        Carrier::Resonator(family) | Carrier::ResonatorScale(family) => Family::Resonator(family),
+        Carrier::Pair { offset, .. } => Family::Pair(offset),
+        Carrier::Factor(family) | Carrier::FactorScale(family) => Family::Factor(family),
+        Carrier::PairScale => return None,
+    })
+}
+
 fn admit_actual_factor_displacements(
     strokes: &BTreeMap<Locus, BudgetedCarry>,
+    evidence: &mut Option<EpochStageRefusal>,
 ) -> Result<(), HnnError> {
-    if strokes.values().any(|at| {
-        at.staged.iter().any(|((carrier, _), (_, q))| {
-            !q.is_zero()
-                && matches!(
-                    carrier,
-                    Carrier::Passive
-                        | Carrier::Slices
-                        | Carrier::Standing
-                        | Carrier::Resonator(_)
-                        | Carrier::Pair { .. }
-                        | Carrier::Factor(_)
-                )
-        })
-    }) {
+    let first = strokes.iter().find_map(|(locus, at)| {
+        at.staged
+            .iter()
+            .find(|((carrier, _), (_, q))| {
+                !q.is_zero()
+                    && matches!(
+                        carrier,
+                        Carrier::Passive
+                            | Carrier::Slices
+                            | Carrier::Standing
+                            | Carrier::Resonator(_)
+                            | Carrier::Pair { .. }
+                            | Carrier::Factor(_)
+                    )
+            })
+            .map(|((carrier, entry), (_, q))| (*locus, at, *carrier, *entry, q))
+    });
+    if let Some((locus, at, carrier, entry, q)) = first {
+        EpochStageRefusal::at(
+            "actual_factor_displacement",
+            EpochStageCondition::NonlinearFactorRay,
+            "represented nonlinear factor displacement q * 2^(-L) must have its own certified ray",
+            Some(locus),
+            carrier_family(carrier),
+        )
+        .read("carrier", EpochStageValue::Carrier(carrier))
+        .read("entry", EpochStageValue::Index(entry))
+        .read("applied_coordinate_q", EpochStageValue::Integer(q.clone()))
+        .read(
+            "lattice_exponent_L",
+            EpochStageValue::Exponent(at.lattice.exponent()),
+        )
+        .read(
+            "displacement_q_times_two_minus_L",
+            EpochStageValue::Ratio(Rat::from_integer(q.clone()) * at.lattice.unit()),
+        )
+        .first(evidence);
         return Err(refused(
             "actual epoch certification requires the represented nonlinear factor rays",
         ));
@@ -251,13 +288,35 @@ fn admit_refined_source_carries(
     locus: Locus,
     finer: u32,
     carries: &Carries,
+    evidence: &mut Option<EpochStageRefusal>,
 ) -> Result<(), HnnError> {
     let half_exponent = finer.checked_add(1).ok_or_else(extent)?;
     let half = Rat::new(BigInt::one(), BigInt::one() << half_exponent as usize);
-    if carries
-        .iter()
-        .any(|((at, _), carry)| *at == locus && carry.0.values().any(|r| *r < -&half || *r >= half))
-    {
+    let first =
+        carries
+            .iter()
+            .filter(|((at, _), _)| *at == locus)
+            .find_map(|((_, carrier), carry)| {
+                carry
+                    .0
+                    .iter()
+                    .find(|(_, r)| **r < -&half || **r >= half)
+                    .map(|(entry, residual)| (*carrier, *entry, residual))
+            });
+    if let Some((carrier, entry, residual)) = first {
+        EpochStageRefusal::at(
+            "source_refinement",
+            EpochStageCondition::SourceRefinementHalfCell,
+            "-half <= carried residual < half on the finer source lattice",
+            Some(locus),
+            carrier_family(carrier),
+        )
+        .read("carrier", EpochStageValue::Carrier(carrier))
+        .read("entry", EpochStageValue::Index(entry))
+        .read("residual", EpochStageValue::Ratio(residual.clone()))
+        .read("half", EpochStageValue::Ratio(half.clone()))
+        .read("finer_lattice_exponent", EpochStageValue::Exponent(finer))
+        .first(evidence);
         return Err(refused(
             "source refinement needs its pair-factor remainders inside the finer half-cell",
         ));
@@ -275,6 +334,7 @@ fn actual_epoch_face(
     receiving_parts: &[EpochReceivingRecord],
     partition_bits: u32,
     admitted_covector: Rat,
+    evidence: &mut Option<EpochStageRefusal>,
 ) -> Result<EpochCertificateFace, HnnError> {
     let rows = delta.to_rows();
     let (alignment, moves) = if matches!(kind, LinearLocus::Receiving(_)) {
@@ -298,6 +358,13 @@ fn actual_epoch_face(
                 || sample.covector.len() != delta.rows
                 || sample.weight.is_negative()
             {
+                EpochStageRefusal::at("actual_ray", EpochStageCondition::SampleShape,
+                    "producing feature/covector dimensions match the represented ray and sample weight >= 0", Some(kind.locus()), Some(Family::Map))
+                    .read("feature_columns", EpochStageValue::Index(sample.feature.len()))
+                    .read("ray_columns", EpochStageValue::Index(delta.columns))
+                    .read("covector_rows", EpochStageValue::Index(sample.covector.len()))
+                    .read("ray_rows", EpochStageValue::Index(delta.rows))
+                    .read("weight", EpochStageValue::Ratio(sample.weight.clone())).first(evidence);
                 return Err(refused(
                     "an actual epoch ray needs its producing sample shapes and metric",
                 ));
@@ -322,6 +389,25 @@ fn actual_epoch_face(
         )
     };
     if !alignment.is_positive() {
+        EpochStageRefusal::at(
+            "actual_ray",
+            EpochStageCondition::ActualRayAlignment,
+            "actual represented ray alignment > 0",
+            Some(kind.locus()),
+            Some(Family::Map),
+        )
+        .read("alignment", EpochStageValue::Ratio(alignment.clone()))
+        .read("moves", EpochStageValue::Ratio(moves.clone()))
+        .read(
+            "admitted_covector",
+            EpochStageValue::Ratio(admitted_covector.clone()),
+        )
+        .read("partition_bits", EpochStageValue::Exponent(partition_bits))
+        .read(
+            "represented_step",
+            EpochStageValue::Array(EpochArrayReading::of(delta)),
+        )
+        .first(evidence);
         return Err(refused(
             "a moving actual epoch ray must descend its contemporary comparison",
         ));
@@ -337,6 +423,218 @@ fn actual_epoch_face(
         unit_norms,
         norm: EpochSpectral::grouped_frobenius(delta),
     })
+}
+
+/// Enrich only the first, already failed normal candidate. Reconstructing these operands is
+/// exterior observation: a diagnostic error cannot replace the native refusal or change its
+/// order. All arrays below die with this staging attempt, never with the continuing state.
+#[allow(clippy::too_many_arguments)]
+fn enrich_failed_normal_ray(
+    evidence: &mut Option<EpochStageRefusal>,
+    kind: LinearLocus,
+    law: &EpochLaw,
+    flow: &EpochFlow,
+    deposit: &EpochDeposit,
+    gamma: &Rat,
+    active_lattice: Option<u32>,
+    samples: &[Sample],
+) {
+    let Some(evidence) = evidence.as_mut().filter(|evidence| {
+        evidence.locus == Some(kind.locus()) && evidence.family == Some(Family::Map)
+    }) else {
+        return;
+    };
+    let push = |evidence: &mut EpochStageRefusal, name, value| {
+        evidence.readings.push(EpochStageReading { name, value });
+    };
+    push(
+        evidence,
+        "active_lattice_L",
+        active_lattice
+            .map(EpochStageValue::Exponent)
+            .unwrap_or(EpochStageValue::Unavailable(
+                "the active material lattice was not exported",
+            )),
+    );
+    push(
+        evidence,
+        "opening_map_lattice_L",
+        EpochStageValue::Exponent(law.map_lattice),
+    );
+    push(
+        evidence,
+        "candidate_map_lattice_L",
+        EpochStageValue::Exponent(deposit.successor.map_lattice),
+    );
+    let refined = match (kind, active_lattice) {
+        (LinearLocus::SourcePort(_), Some(active)) => {
+            EpochStageValue::Text(if deposit.successor.map_lattice > active {
+                "yes"
+            } else {
+                "no"
+            })
+        }
+        (LinearLocus::SourcePort(_), None) => EpochStageValue::Unavailable(
+            "refinement relative to the active lattice is unknown because that lattice was not exported",
+        ),
+        _ => EpochStageValue::Text("not a source refinement"),
+    };
+    push(evidence, "source_lattice_refined", refined);
+    push(
+        evidence,
+        "projection_rule",
+        EpochStageValue::Text("componentwise truncation toward zero on candidate map lattice"),
+    );
+    push(
+        evidence,
+        "fresh_gain_gamma",
+        EpochStageValue::Ratio(gamma.clone()),
+    );
+    let diagnostic = || -> Result<Vec<EpochStageReading>, HnnError> {
+        // Use exactly the normal owner's paired flow, Gram and reached support. Raw producer
+        // sample alignment is reported separately; it is not substituted for paired G.
+        let paired = law.symmetry.as_ref().map(|s| flow.paired(s)).transpose()?;
+        let flow = paired.as_ref().unwrap_or(flow);
+        let gram = &deposit.successor.gram;
+        let scaled_fresh = flow
+            .covector
+            .scalar_product(&EpochArray::from_dyadic_scalar(gamma)?)?;
+        let r_star = law.news.add(&scaled_fresh)?;
+        let (retained_direction, _) = law.direction(&law.news, gram, &flow.support)?;
+        let (fresh_direction, _) = law.direction(&scaled_fresh, gram, &flow.support)?;
+        let residual = deposit.direction.subtract(&deposit.step)?;
+        let scalar = |left: &EpochArray, right: &EpochArray| left.dot(right)?.scalar_ratio();
+        let g_d = scalar(&flow.covector, &deposit.direction)?;
+        let g_p = scalar(&flow.covector, &deposit.step)?;
+        let retained_alignment = scalar(&flow.covector, &retained_direction)?;
+        let fresh_alignment = scalar(&flow.covector, &fresh_direction)?;
+        let projection_alignment = -scalar(&flow.covector, &residual)?;
+        let rows = [
+            ("paired_G_dot_D", g_d.clone()),
+            ("paired_G_dot_P", g_p.clone()),
+            ("Rstar_dot_P", scalar(&r_star, &deposit.step)?),
+            ("Rold_dot_P", scalar(&law.news, &deposit.step)?),
+            ("retained_alignment_component", retained_alignment.clone()),
+            ("fresh_alignment_component", fresh_alignment.clone()),
+            (
+                "projection_alignment_component",
+                projection_alignment.clone(),
+            ),
+            (
+                "direction_decomposition_residual",
+                g_d - &retained_alignment - &fresh_alignment,
+            ),
+            (
+                "represented_alignment_decomposition_residual",
+                g_p - retained_alignment - fresh_alignment - projection_alignment,
+            ),
+            ("normal_quadratic_fall", deposit.fall.scalar_ratio()?),
+        ];
+        let mut readings: Vec<_> = rows
+            .into_iter()
+            .map(|(name, value)| EpochStageReading {
+                name,
+                value: EpochStageValue::Ratio(value),
+            })
+            .collect();
+        readings.push(EpochStageReading {
+            name: "projection_residual_D_minus_P",
+            value: EpochStageValue::Series(EpochSeriesReading::of(&residual)),
+        });
+        readings.push(EpochStageReading {
+            name: "projection_changed_direction",
+            value: EpochStageValue::Text(if residual.is_zero() { "no" } else { "yes" }),
+        });
+        Ok(readings)
+    };
+    match diagnostic() {
+        Ok(readings) => evidence.readings.extend(readings),
+        Err(_) => push(
+            evidence,
+            "normal_alignment_decomposition",
+            EpochStageValue::Unavailable(
+                "the failed candidate's normal diagnostic operands could not be reconstructed; native refusal preserved",
+            ),
+        ),
+    }
+    if !matches!(kind, LinearLocus::Receiving(_)) {
+        let raw_alignment = |delta: &EpochArray| -> Option<Rat> {
+            let rows = delta.to_rows();
+            let mut total = Rat::zero();
+            for sample in samples {
+                if sample.feature.len() != delta.columns || sample.covector.len() != delta.rows {
+                    return None;
+                }
+                total += &sample.weight
+                    * rows
+                        .iter()
+                        .zip(&sample.covector)
+                        .map(|(row, g)| {
+                            g * row
+                                .iter()
+                                .zip(&sample.feature)
+                                .map(|(p, f)| p * f)
+                                .sum::<Rat>()
+                        })
+                        .sum::<Rat>();
+            }
+            Some(total)
+        };
+        for (name, delta) in [
+            ("raw_sample_G_dot_D", &deposit.direction),
+            ("raw_sample_G_dot_P", &deposit.step),
+        ] {
+            push(
+                evidence,
+                name,
+                raw_alignment(delta).map(EpochStageValue::Ratio).unwrap_or(
+                    EpochStageValue::Unavailable(
+                        "the failed sample shape does not pair with this ray",
+                    ),
+                ),
+            );
+        }
+        let guarded_alignment = evidence
+            .readings
+            .iter()
+            .find_map(|reading| match &reading.value {
+                EpochStageValue::Step(step) if reading.name == "step" => {
+                    Some(step.alignment.clone())
+                }
+                EpochStageValue::Ratio(value) if reading.name == "alignment" => Some(value.clone()),
+                _ => None,
+            });
+        if let (Some(raw), Some(guarded)) = (raw_alignment(&deposit.step), guarded_alignment) {
+            push(
+                evidence,
+                "raw_minus_guarded_alignment",
+                EpochStageValue::Ratio(raw - guarded),
+            );
+        }
+    }
+    if !evidence
+        .readings
+        .iter()
+        .any(|reading| reading.name == "curvature_model")
+    {
+        push(
+            evidence,
+            "curvature_model",
+            EpochStageValue::Unavailable(
+                "the actual curvature reader was not reached at this failed guard; no executed jet was read",
+            ),
+        );
+        push(
+            evidence,
+            "alignment_over_curvature",
+            EpochStageValue::Unavailable("actual curvature has not been read"),
+        );
+        push(
+            evidence,
+            "largest_local_admissible_dyadic_k",
+            EpochStageValue::Unavailable("the actual local step certificate has not been read"),
+        );
+    }
 }
 
 impl Constitution {
@@ -487,6 +785,7 @@ impl Constitution {
             observe,
             execution,
             None,
+            &mut EpochStageTrace::default(),
         )?
         .admit_receiving()
     }
@@ -494,6 +793,10 @@ impl Constitution {
     /// Stage once; this method grants no publication capability to a score supplied
     /// outside the actual observed execution owner.
     #[allow(clippy::too_many_arguments)]
+    #[allow(
+        dead_code,
+        reason = "the original staging entry remains a no-observer control for diagnosed staging"
+    )]
     pub(crate) fn stage_observed_epoch_with_execution(
         &self,
         deposits: &[Deposit],
@@ -516,6 +819,49 @@ impl Constitution {
         execution: &dyn crate::hnn::reference::observed::ObservedEpochExecution,
         scope: EpochCandidateScope,
     ) -> Result<StagedEpochCandidate, HnnError> {
+        self.stage_observed_epoch_with_evidence(
+            deposits,
+            receiver,
+            receiving_period,
+            heard_cells,
+            epoch_cells,
+            epoch_index,
+            exponent,
+            retained,
+            tree,
+            pair_speed,
+            receiving_parts,
+            observe,
+            execution,
+            scope,
+        )
+        .map_err(|failure| failure.error)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn stage_observed_epoch_with_evidence(
+        &self,
+        deposits: &[Deposit],
+        receiver: usize,
+        receiving_period: u64,
+        heard_cells: u64,
+        epoch_cells: u64,
+        epoch_index: u64,
+        exponent: u32,
+        retained: &BTreeSet<Locus>,
+        tree: Landmarks,
+        pair_speed: &dyn Fn(
+            usize,
+            usize,
+            &PairPort,
+            [&[Vec<Rat>]; 3],
+        ) -> Result<[Rat; 2], HnnError>,
+        receiving_parts: &[EpochReceivingRecord],
+        observe: &mut dyn FnMut(EpochDepositPhase),
+        execution: &dyn crate::hnn::reference::observed::ObservedEpochExecution,
+        scope: EpochCandidateScope,
+    ) -> Result<StagedEpochCandidate, EpochStageFailure> {
+        let mut trace = EpochStageTrace::default();
         self.prepare_observed_epoch_with_execution(
             deposits,
             receiver,
@@ -531,7 +877,9 @@ impl Constitution {
             observe,
             execution,
             Some(scope),
+            &mut trace,
         )
+        .map_err(|error| trace.failed(error))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -556,14 +904,60 @@ impl Constitution {
         observe: &mut dyn FnMut(EpochDepositPhase),
         execution: &dyn crate::hnn::reference::observed::ObservedEpochExecution,
         scope: Option<EpochCandidateScope>,
+        trace: &mut EpochStageTrace,
     ) -> Result<StagedEpochCandidate, HnnError> {
         let grain = self.observed_epoch_grain(receiver)?;
+        let mut expected_partition = None;
         if heard_cells == 0
             || heard_cells > epoch_cells
             || receiving_period <= 1
             || receiving_period % 2 == 0
-            || partition_exponent(grain, epoch_cells, epoch_index)? != exponent
+            || {
+                let expected = partition_exponent(grain, epoch_cells, epoch_index)?;
+                expected_partition = Some(expected);
+                expected != exponent
+            }
         {
+            let required = if heard_cells == 0 {
+                "heard_cells > 0"
+            } else if heard_cells > epoch_cells {
+                "heard_cells <= declared epoch cells"
+            } else if receiving_period <= 1 {
+                "receiving period > 1"
+            } else if receiving_period % 2 == 0 {
+                "receiving period is odd"
+            } else {
+                "provided partition exponent equals the actual receiver-derived exponent"
+            };
+            let mut failure = EpochStageRefusal::at(
+                "admission",
+                EpochStageCondition::EpochAdmission,
+                required,
+                None,
+                None,
+            )
+            .read("heard_cells", EpochStageValue::Integer(heard_cells.into()))
+            .read(
+                "declared_cells",
+                EpochStageValue::Integer(epoch_cells.into()),
+            )
+            .read(
+                "receiving_period",
+                EpochStageValue::Integer(receiving_period.into()),
+            )
+            .read("epoch_index", EpochStageValue::Integer(epoch_index.into()))
+            .read("receiver_grain", EpochStageValue::Exponent(grain))
+            .read(
+                "provided_partition_exponent",
+                EpochStageValue::Exponent(exponent),
+            );
+            if let Some(expected) = expected_partition {
+                failure = failure.read(
+                    "expected_partition_exponent",
+                    EpochStageValue::Exponent(expected),
+                );
+            }
+            failure.first(&mut trace.evidence);
             return Err(refused(
                 "an epoch close must retain its actual heard count, field period, c and receiver partition",
             ));
@@ -574,6 +968,7 @@ impl Constitution {
         let mut population = Vec::new();
         let mut reached = BTreeSet::new();
         let mut landmarks = 0u64;
+        trace.at("grouped_inputs", None, None);
         for deposit in deposits {
             if deposit.commit() != self.commit {
                 return Err(HnnError::StaleDeposit {
@@ -644,6 +1039,7 @@ impl Constitution {
         let mut raw_alignments = BTreeMap::new();
         let mut alignment_defects = BTreeMap::new();
         for kind in &kinds {
+            trace.at("normal_flow", Some(kind.locus()), Some(Family::Map));
             let normal = self.epoch_normal(*kind)?;
             let law = if let Some(law) = normal.epoch_law() {
                 law.clone()
@@ -704,6 +1100,24 @@ impl Constitution {
                 || reading.partition_exponent != partition_exponent
                 || reading.support != support
             {
+                EpochStageRefusal::at("normal_flow", EpochStageCondition::FlowContract,
+                    "executed flow shapes, producer/heard/declared counts, partition and support equal their producing operands", Some(kind.locus()), Some(Family::Map))
+                    .read("expected_rows", EpochStageValue::Index(law.map.rows))
+                    .read("expected_columns", EpochStageValue::Index(law.map.columns))
+                    .read("actual_gram_rows", EpochStageValue::Index(reading.gram.rows))
+                    .read("actual_gram_columns", EpochStageValue::Index(reading.gram.columns))
+                    .read("actual_covector_rows", EpochStageValue::Index(reading.covector.rows))
+                    .read("actual_covector_columns", EpochStageValue::Index(reading.covector.columns))
+                    .read("expected_records", EpochStageValue::Integer(records_count.into()))
+                    .read("actual_records", EpochStageValue::Integer(reading.records.into()))
+                    .read("expected_heard_cells", EpochStageValue::Integer(heard_cells.into()))
+                    .read("actual_heard_cells", EpochStageValue::Integer(reading.heard_cells.into()))
+                    .read("expected_declared_cells", EpochStageValue::Integer(epoch_cells.into()))
+                    .read("actual_declared_cells", EpochStageValue::Integer(reading.declared_cells.into()))
+                    .read("expected_partition_exponent", EpochStageValue::Exponent(partition_exponent))
+                    .read("actual_partition_exponent", EpochStageValue::Exponent(reading.partition_exponent))
+                    .read("expected_support", EpochStageValue::Indices(support.clone()))
+                    .read("actual_support", EpochStageValue::Indices(reading.support.clone())).first(&mut trace.evidence);
                 return Err(refused(
                     "an executed epoch flow must retain its actual locus, support, producer count and receiving partition",
                 ));
@@ -753,12 +1167,23 @@ impl Constitution {
                     law.map.columns,
                     receiving_period,
                 )?;
-                if !positive
+                let split_residual = positive
                     .subtract(&foil)?
                     .add(&phase)?
-                    .subtract(&flow.covector)?
-                    .is_zero()
-                {
+                    .subtract(&flow.covector)?;
+                if !split_residual.is_zero() {
+                    EpochStageRefusal::at(
+                        "receiving_split",
+                        EpochStageCondition::ReceivingSplit,
+                        "positive - foil + phase equals the actual fresh covector",
+                        Some(kind.locus()),
+                        Some(Family::Map),
+                    )
+                    .read(
+                        "split_residual",
+                        EpochStageValue::Array(EpochArrayReading::of(&split_residual)),
+                    )
+                    .first(&mut trace.evidence);
                     return Err(refused(
                         "receiving positive minus foil plus phase must equal its exact fresh news",
                     ));
@@ -776,7 +1201,21 @@ impl Constitution {
                         &direction,
                         exponent,
                     )?;
-                    if certificate.alignment != fresh.alignment.scalar_ratio()? {
+                    let fresh_alignment = fresh.alignment.scalar_ratio()?;
+                    if certificate.alignment != fresh_alignment {
+                        EpochStageRefusal::at(
+                            "receiving_fresh_alignment",
+                            EpochStageCondition::FreshAlignment,
+                            "Fisher alignment equals the same fresh covector/direction pairing",
+                            Some(kind.locus()),
+                            Some(Family::Map),
+                        )
+                        .read(
+                            "fisher_alignment",
+                            EpochStageValue::Ratio(certificate.alignment.clone()),
+                        )
+                        .read("fresh_alignment", EpochStageValue::Ratio(fresh_alignment))
+                        .first(&mut trace.evidence);
                         return Err(refused(
                             "the receiving Fisher alignment must pair the same fresh G and direction",
                         ));
@@ -822,6 +1261,11 @@ impl Constitution {
         let mut next = self.clone();
         let mut factor_steps: Vec<_> = factors.into_values().collect();
         for step in &mut factor_steps {
+            trace.at(
+                "pair_directions",
+                Some(step.gradient.locus()),
+                Some(step.gradient.family()),
+            );
             if let FactorGradient::PairPort {
                 ring,
                 offset,
@@ -840,6 +1284,7 @@ impl Constitution {
                 *speed = pair_speed(*ring, *offset, pair, [outputs, current, earlier])?;
             }
         }
+        trace.at("pair_directions", None, None);
         observe(EpochDepositPhase::PairDirections);
         let mut groups: BTreeMap<Locus, Vec<(usize, LocusStep<'_>)>> = BTreeMap::new();
         for (index, step) in factor_steps.iter().enumerate() {
@@ -879,9 +1324,20 @@ impl Constitution {
         drop(materials);
         let mut ready = Vec::new();
         for (locus, steps, material, carries) in &mut regions {
+            trace.at("region_preparation", Some(*locus), None);
             let prepared = self
                 .prepare_at(*locus, steps, material.as_mut(), carries)
-                .map_err(|(_, e)| e)?;
+                .map_err(|(index, error)| {
+                    trace.family =
+                        steps
+                            .iter()
+                            .find(|(at, _)| *at == index)
+                            .map(|(_, step)| match step {
+                                LocusStep::Factor(factor) => factor.gradient.family(),
+                                _ => Family::Map,
+                            });
+                    error
+                })?;
             ready.push(prepared);
         }
         observe(EpochDepositPhase::RegionPreparation);
@@ -896,8 +1352,9 @@ impl Constitution {
             .collect();
         let readout = &laws[&LinearLocus::Receiving(receiver)].spectral;
         let bound = readout.upper();
+        trace.at("fresh_joint_certificate", None, None);
         let (mut certified, fresh_joint, _fresh_pumped, _fresh_loaded) = self
-            .certify_steps(
+            .certify_steps_with_epoch_evidence(
                 Some(&envelope),
                 &linear_faces,
                 &factor_faces,
@@ -905,6 +1362,7 @@ impl Constitution {
                 StepSource::Certified,
                 Some(&bound),
                 Some(&reaches),
+                &mut trace.evidence,
             )?
             .map_err(|_| refused("the native epoch joint certificate refused its candidate"))?;
         drop(factor_faces);
@@ -932,10 +1390,28 @@ impl Constitution {
                 Some((ring, gradient, scale))
             })
             .collect();
-        let (lobe, lock) = self.lobe(Some(&envelope), retained, &stepping, &mut certified)?;
+        trace.at("lobe", None, None);
+        let (lobe, lock) = self
+            .lobe(Some(&envelope), retained, &stepping, &mut certified)
+            .map_err(|error| {
+                let mut evidence = EpochStageRefusal::at(
+                    "lobe",
+                    EpochStageCondition::Lobe,
+                    "native lock-chart lobe admission (failed family unknown if not exported)",
+                    None,
+                    None,
+                );
+                evidence.participating_families = stepping
+                    .iter()
+                    .map(|(ring, ..)| (Locus::Standing(*ring), Family::Standing))
+                    .collect();
+                evidence.first(&mut trace.evidence);
+                error
+            })?;
         drop(stepping);
         let mut strokes = BTreeMap::new();
         for ((locus, steps, material, carries), prepared) in regions.iter_mut().zip(ready) {
+            trace.at("factor_carrier_deposition", Some(*locus), None);
             let (stroke, _) = self
                 .deposit_at(
                     *locus,
@@ -945,7 +1421,17 @@ impl Constitution {
                     prepared,
                     &certified,
                 )
-                .map_err(|(_, e)| e)?;
+                .map_err(|(index, error)| {
+                    trace.family =
+                        steps
+                            .iter()
+                            .find(|(at, _)| *at == index)
+                            .map(|(_, step)| match step {
+                                LocusStep::Factor(factor) => factor.gradient.family(),
+                                _ => Family::Map,
+                            });
+                    error
+                })?;
             strokes.insert(*locus, stroke);
         }
         for (locus, _, _, carries) in regions {
@@ -958,13 +1444,14 @@ impl Constitution {
         // certificate, refuse a mixed physical factor move rather than attach
         // a fresh-direction certificate to different material. Sufficient
         // factor statistics/carries may change while their material stays put.
-        admit_actual_factor_displacements(&strokes)?;
+        admit_actual_factor_displacements(&strokes, &mut trace.evidence)?;
         let mut candidates = BTreeMap::new();
         let mut actual_faces = Vec::new();
         let mut actual_exponents = DeclaredExponents {
             steps: BTreeMap::new(),
         };
         for kind in &kinds {
+            trace.at("normal_candidate", Some(kind.locus()), Some(Family::Map));
             let fresh = certified.get(&(kind.locus(), Family::Map));
             let gamma = fresh.map(|r| r.step.step.clone()).unwrap_or_else(Rat::zero);
             let gain = EpochArray::from_dyadic_scalar(&gamma)?;
@@ -982,7 +1469,12 @@ impl Constitution {
             if matches!(kind, LinearLocus::SourcePort(_)) && deposit.successor.source_refinement {
                 let finer = deposit.successor.map_lattice;
                 if finer > self.lattice(kind.locus())?.exponent() {
-                    admit_refined_source_carries(kind.locus(), finer, &next.carries)?;
+                    admit_refined_source_carries(
+                        kind.locus(),
+                        finer,
+                        &next.carries,
+                        &mut trace.evidence,
+                    )?;
                 }
             }
             candidates.insert(*kind, deposit);
@@ -1000,8 +1492,21 @@ impl Constitution {
             .values()
             .any(|candidate| !candidate.step.is_zero());
         for (kind, deposit) in &candidates {
+            trace.at("actual_ray", Some(kind.locus()), Some(Family::Map));
             if !deposit.step.is_zero() {
                 let fresh = certified.get(&(kind.locus(), Family::Map)).ok_or_else(|| {
+                    EpochStageRefusal::at(
+                        "actual_ray",
+                        EpochStageCondition::DeclaredFamily,
+                        "a moving represented normal ray must have its certified fresh family",
+                        Some(kind.locus()),
+                        Some(Family::Map),
+                    )
+                    .read(
+                        "represented_step",
+                        EpochStageValue::Array(EpochArrayReading::of(&deposit.step)),
+                    )
+                    .first(&mut trace.evidence);
                     refused("retained epoch news cannot invent an uncertified fresh family")
                 })?;
                 let face = actual_epoch_face(
@@ -1011,7 +1516,23 @@ impl Constitution {
                     receiving_parts,
                     exponent,
                     &fresh.step.step * &fresh.step.covector,
-                )?;
+                    &mut trace.evidence,
+                )
+                .map_err(|error| {
+                    enrich_failed_normal_ray(
+                        &mut trace.evidence,
+                        *kind,
+                        &laws[kind],
+                        &flows[kind],
+                        deposit,
+                        &fresh.step.step,
+                        self.lattice(kind.locus())
+                            .ok()
+                            .map(|lattice| lattice.exponent()),
+                        samples.get(kind).map(Vec::as_slice).unwrap_or(&[]),
+                    );
+                    error
+                })?;
                 actual_faces.push((*kind, face));
                 actual_exponents.steps.insert(
                     (kind.locus(), Family::Map),
@@ -1026,8 +1547,9 @@ impl Constitution {
             .iter()
             .map(|(kind, face)| (kind.locus(), *kind, face.direction()))
             .collect();
+        trace.at("actual_joint_certificate", None, None);
         let (actual_certified, joint, pumped, loaded) = self
-            .certify_steps(
+            .certify_steps_with_epoch_evidence(
                 Some(&envelope),
                 &actual_linear,
                 &[],
@@ -1035,7 +1557,33 @@ impl Constitution {
                 StepSource::Actual(&actual_exponents),
                 Some(&bound),
                 Some(&reaches),
-            )?
+                &mut trace.evidence,
+            )
+            .map_err(|error| {
+                if let Some(kind) = candidates.keys().copied().find(|kind| {
+                    trace.evidence.as_ref().is_some_and(|evidence| {
+                        evidence.locus == Some(kind.locus()) && evidence.family == Some(Family::Map)
+                    })
+                }) {
+                    let gamma = certified
+                        .get(&(kind.locus(), Family::Map))
+                        .map(|reading| reading.step.step.clone())
+                        .unwrap_or_else(Rat::zero);
+                    enrich_failed_normal_ray(
+                        &mut trace.evidence,
+                        kind,
+                        &laws[&kind],
+                        &flows[&kind],
+                        &candidates[&kind],
+                        &gamma,
+                        self.lattice(kind.locus())
+                            .ok()
+                            .map(|lattice| lattice.exponent()),
+                        samples.get(&kind).map(Vec::as_slice).unwrap_or(&[]),
+                    );
+                }
+                error
+            })?
             .map_err(|_| refused("the fixed actual epoch rays were not all admitted"))?;
         // Every candidate remains local to next until ALL exact actual-ray,
         // tube, storage and budget checks pass. No live resident is mutated.
@@ -1043,6 +1591,7 @@ impl Constitution {
         let mut vanished = Vec::new();
         let mut locus_readings = Vec::new();
         for kind in &kinds {
+            trace.at("normal_publication", Some(kind.locus()), Some(Family::Map));
             let gamma = certified
                 .get(&(kind.locus(), Family::Map))
                 .map(|r| r.step.step.clone())
@@ -1117,6 +1666,7 @@ impl Constitution {
                     .expect("published grouped epoch storage"),
             });
         }
+        trace.at("candidate_finalization", None, None);
         next.rings
             .get_mut(receiver)
             .ok_or(HnnError::MissingReceivingMap { ring: receiver })?
@@ -1715,6 +2265,137 @@ mod tests {
     }
 
     #[test]
+    fn failed_normal_ray_decomposes_retained_fresh_and_projected_alignment_without_mutation() {
+        let kind = LinearLocus::SourcePort(0);
+        let mut law = EpochLaw::founded(1, 1, 2, 0).unwrap();
+        law.news = EpochArray::new(1, 1, 1, vec![(-3).into()]).unwrap();
+        let sample = Sample {
+            weight: Rat::one(),
+            feature: vec![Rat::one()],
+            covector: vec![rat(3, 8)],
+            masses: None,
+        };
+        let record = EpochRecord::from_sample(&sample).unwrap();
+        let flow = EpochFlow::from_records(1, 1, 2, 1, 0, 1, &[record]).unwrap();
+        let gain = EpochArray::from_dyadic_scalar(&Rat::one()).unwrap();
+        let candidate = law.deposit_source(&flow, &gain, 2, u64::MAX, 0, 0).unwrap();
+        let opening = law.clone();
+        let candidate_before = candidate.clone();
+        let mut evidence = None;
+        let error = match actual_epoch_face(
+            kind,
+            &candidate.step,
+            std::slice::from_ref(&sample),
+            &[],
+            2,
+            Rat::one(),
+            &mut evidence,
+        ) {
+            Err(error) => error,
+            Ok(_) => panic!("the represented negative ray must refuse the positive current"),
+        };
+        assert!(matches!(
+            error,
+            HnnError::Unadmitted {
+                reason: "a moving actual epoch ray must descend its contemporary comparison"
+            }
+        ));
+        enrich_failed_normal_ray(
+            &mut evidence,
+            kind,
+            &law,
+            &flow,
+            &candidate,
+            &Rat::one(),
+            Some(2),
+            std::slice::from_ref(&sample),
+        );
+        let evidence = evidence.unwrap();
+        assert_eq!(evidence.condition, EpochStageCondition::ActualRayAlignment);
+        assert_eq!(
+            (evidence.locus, evidence.family),
+            (Some(kind.locus()), Some(Family::Map))
+        );
+        let scalar = |name| {
+            evidence
+                .readings
+                .iter()
+                .find_map(|reading| match &reading.value {
+                    EpochStageValue::Ratio(value) if reading.name == name => Some(value.clone()),
+                    _ => None,
+                })
+                .unwrap()
+        };
+        for (name, expected) in [
+            ("paired_G_dot_D", rat(-27, 128)),
+            ("paired_G_dot_P", rat(-3, 16)),
+            ("Rstar_dot_P", rat(9, 16)),
+            ("Rold_dot_P", rat(3, 4)),
+            ("retained_alignment_component", rat(-9, 32)),
+            ("fresh_alignment_component", rat(9, 128)),
+            ("projection_alignment_component", rat(3, 128)),
+            ("direction_decomposition_residual", Rat::zero()),
+            ("represented_alignment_decomposition_residual", Rat::zero()),
+            ("normal_quadratic_fall", rat(5, 16)),
+            ("raw_sample_G_dot_P", rat(-3, 16)),
+            ("raw_minus_guarded_alignment", Rat::zero()),
+        ] {
+            assert_eq!(scalar(name), expected, "{name}");
+        }
+        let residual = candidate.direction.subtract(&candidate.step).unwrap();
+        assert_eq!(residual.scalar_ratio().unwrap(), rat(-1, 16));
+        assert!(
+            evidence
+                .readings
+                .iter()
+                .any(|reading| reading.name == "projection_residual_D_minus_P"
+                    && reading.value == EpochStageValue::Series(EpochSeriesReading::of(&residual)))
+        );
+        assert!(evidence.readings.iter().any(|reading| reading.name
+            == "largest_local_admissible_dyadic_k"
+            && matches!(reading.value, EpochStageValue::Unavailable(_))));
+        for (name, expected) in [
+            ("active_lattice_L", EpochStageValue::Exponent(2)),
+            ("candidate_map_lattice_L", EpochStageValue::Exponent(2)),
+            ("source_lattice_refined", EpochStageValue::Text("no")),
+            ("projection_changed_direction", EpochStageValue::Text("yes")),
+        ] {
+            assert!(
+                evidence
+                    .readings
+                    .iter()
+                    .any(|reading| reading.name == name && reading.value == expected),
+                "{name}"
+            );
+        }
+        assert!(!evidence.seal_formed && !evidence.finite_probe_executed);
+        assert_eq!(law, opening);
+        assert_eq!(candidate.successor, candidate_before.successor);
+        assert_eq!(candidate.step, candidate_before.step);
+        assert_eq!(candidate.direction, candidate_before.direction);
+        // Evidence from another first failure is not overwritten or enriched by this family.
+        let mut first = Some(EpochStageRefusal::at(
+            "earlier",
+            EpochStageCondition::NativeOwner,
+            "earlier guard",
+            Some(Locus::ReceivingMap(2)),
+            Some(Family::Map),
+        ));
+        let first_before = first.clone();
+        enrich_failed_normal_ray(
+            &mut first,
+            kind,
+            &law,
+            &flow,
+            &candidate,
+            &Rat::one(),
+            Some(2),
+            &[sample],
+        );
+        assert_eq!(first, first_before);
+    }
+
+    #[test]
     fn actual_source_face_reads_the_signed_represented_delta_and_refuses_opposition() {
         let delta = EpochArray::new(1, 1, 24, vec![1.into()]).unwrap();
         let sample = Sample {
@@ -1730,6 +2411,7 @@ mod tests {
             &[],
             16,
             Rat::one(),
+            &mut None,
         )
         .unwrap();
         assert_eq!(face.alignment, rat(1, 8) * delta.scalar_ratio().unwrap());
@@ -1738,6 +2420,7 @@ mod tests {
             delta.scalar_ratio().unwrap() * delta.scalar_ratio().unwrap()
         );
         let opposite = EpochArray::new(1, 1, 24, vec![(-1).into()]).unwrap();
+        let mut evidence = None;
         assert!(matches!(
             actual_epoch_face(
                 LinearLocus::SourcePort(0),
@@ -1745,10 +2428,19 @@ mod tests {
                 &[sample],
                 &[],
                 16,
-                Rat::one()
+                Rat::one(),
+                &mut evidence
             ),
             Err(HnnError::Unadmitted { .. })
         ));
+        let evidence = evidence.unwrap();
+        assert_eq!(evidence.condition, EpochStageCondition::ActualRayAlignment);
+        assert_eq!(
+            (evidence.locus, evidence.family),
+            (Some(Locus::SourcePort(0)), Some(Family::Map))
+        );
+        assert!(!evidence.seal_formed && !evidence.finite_probe_executed);
+        assert!(evidence.readings.iter().any(|reading| reading.name == "alignment" && matches!(&reading.value, EpochStageValue::Ratio(value) if value.is_negative())));
     }
 
     #[test]
@@ -1801,18 +2493,59 @@ mod tests {
             .unwrap();
         assert!(!provisional.0[&(kind.locus(), Family::Map)].step.holds());
         let before = theta.continuing_state(0).unwrap().to_text();
+        let mut evidence = None;
         assert!(matches!(
-            theta.certify_steps(
+            theta.certify_steps_with_epoch_evidence(
                 Some(&reach),
                 &linear,
                 &[],
                 None,
                 StepSource::Actual(&declared),
                 None,
-                None
+                None,
+                &mut evidence
             ),
             Err(HnnError::Unadmitted { .. })
         ));
+        let evidence = evidence.unwrap();
+        assert_eq!(evidence.condition, EpochStageCondition::ActualRayCurvature);
+        assert_eq!(
+            (evidence.locus, evidence.family),
+            (Some(kind.locus()), Some(Family::Map))
+        );
+        assert!(evidence.readings.iter().any(|reading| reading.name == "own_curvature_slack" && matches!(&reading.value, EpochStageValue::Ratio(value) if value.is_negative())));
+        let recorded = evidence
+            .readings
+            .iter()
+            .find_map(|reading| match &reading.value {
+                EpochStageValue::Step(step) => Some(step),
+                _ => None,
+            })
+            .unwrap();
+        assert_eq!(recorded, &provisional.0[&(kind.locus(), Family::Map)].step);
+        let local =
+            CertifiedStep::certify(&recorded.alignment, &recorded.curvature, &recorded.covector)
+                .unwrap()
+                .unwrap();
+        assert!(
+            evidence
+                .readings
+                .iter()
+                .any(|reading| reading.name == "alignment_over_curvature"
+                    && reading.value
+                        == EpochStageValue::Ratio(&recorded.alignment / &recorded.curvature))
+        );
+        assert!(evidence.readings.iter().any(|reading| reading.name
+            == "largest_local_admissible_dyadic_k"
+            && reading.value == EpochStageValue::Integer(BigInt::from(local.exponent))));
+        assert!(
+            evidence
+                .readings
+                .iter()
+                .any(|reading| reading.name == "largest_local_admissible_dyadic"
+                    && reading.value == EpochStageValue::Ratio(local.step.clone()))
+        );
+        assert!(!evidence.seal_formed && !evidence.finite_probe_executed);
         assert_eq!(theta.continuing_state(0).unwrap().to_text(), before);
     }
 
@@ -1882,11 +2615,39 @@ mod tests {
             .unwrap();
         assert!(proposal.0.values().all(|r| r.step.holds()));
         assert!(!proposal.1.unwrap().holds());
+        let linear: Vec<_> = kinds
+            .iter()
+            .zip(&faces)
+            .map(|(kind, face)| (kind.locus(), *kind, face.direction()))
+            .collect();
+        let mut evidence = None;
         assert!(matches!(
-            read(&faces, StepSource::Actual(&declared)),
+            theta.certify_steps_with_epoch_evidence(
+                Some(&reach),
+                &linear,
+                &[],
+                None,
+                StepSource::Actual(&declared),
+                None,
+                None,
+                &mut evidence
+            ),
             Err(HnnError::Unadmitted {
                 reason: "the actual epoch rays violate the joint triangle bound",
             })
+        ));
+        let evidence = evidence.unwrap();
+        assert_eq!(evidence.condition, EpochStageCondition::JointTriangle);
+        assert_eq!((evidence.locus, evidence.family), (None, None));
+        assert_eq!(
+            evidence.participating_families,
+            kinds
+                .iter()
+                .map(|kind| (kind.locus(), Family::Map))
+                .collect::<Vec<_>>()
+        );
+        assert!(evidence.readings.iter().any(
+            |reading| matches!(&reading.value, EpochStageValue::Joint(joint) if !joint.holds())
         ));
     }
 
@@ -1906,13 +2667,30 @@ mod tests {
         );
         let strokes = BTreeMap::from([(locus, at)]);
         let before = strokes.clone();
-        assert!(admit_actual_factor_displacements(&strokes).is_err());
+        let mut evidence = None;
+        assert!(admit_actual_factor_displacements(&strokes, &mut evidence).is_err());
+        let evidence = evidence.unwrap();
+        assert_eq!(
+            (evidence.locus, evidence.family),
+            (Some(locus), Some(Family::Pair(1)))
+        );
+        assert_eq!(evidence.condition, EpochStageCondition::NonlinearFactorRay);
+        assert!(
+            evidence
+                .readings
+                .iter()
+                .any(|reading| reading.name == "displacement_q_times_two_minus_L"
+                    && reading.value == EpochStageValue::Ratio(rat(1, 16)))
+        );
         assert_eq!(strokes, before);
         let mut statistics = BudgetedCarry::new(Lattice::new(4), 1);
         statistics
             .staged
             .insert((Carrier::PairScale, 0), (Rat::zero(), BigInt::one()));
-        assert!(admit_actual_factor_displacements(&BTreeMap::from([(locus, statistics)])).is_ok());
+        assert!(
+            admit_actual_factor_displacements(&BTreeMap::from([(locus, statistics)]), &mut None)
+                .is_ok()
+        );
         for (remainder, admitted) in [
             (rat(1, 64), false),
             (rat(1, 128), false),
@@ -1930,10 +2708,31 @@ mod tests {
                 Carry(BTreeMap::from([(0, remainder)])),
             )]);
             let before = carries.clone();
+            let mut evidence = None;
             assert_eq!(
-                admit_refined_source_carries(locus, 6, &carries).is_ok(),
+                admit_refined_source_carries(locus, 6, &carries, &mut evidence).is_ok(),
                 admitted
             );
+            if !admitted {
+                let evidence = evidence.unwrap();
+                assert_eq!(
+                    evidence.condition,
+                    EpochStageCondition::SourceRefinementHalfCell
+                );
+                assert_eq!(
+                    (evidence.locus, evidence.family),
+                    (Some(locus), Some(Family::Pair(1)))
+                );
+                assert!(
+                    evidence
+                        .readings
+                        .iter()
+                        .any(|reading| reading.name == "half"
+                            && reading.value == EpochStageValue::Ratio(rat(1, 128)))
+                );
+            } else {
+                assert!(evidence.is_none());
+            }
             assert_eq!(carries, before);
         }
     }

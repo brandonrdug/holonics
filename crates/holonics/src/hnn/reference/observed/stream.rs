@@ -191,6 +191,19 @@ impl ObservedStream {
         pairing: &PairingDeclaration,
         classes: &[usize],
     ) -> Result<ObservedStreamReceipt, HnnError> {
+        self.receive_diagnosed(reference, pairing, classes, &mut |_, _| {})
+    }
+
+    /// The same transaction with an exterior observer for the first failed whole/R stage
+    /// in each actual epoch. A fatal refusal still reports evidence before returning the
+    /// original error. No evidence is retained in the stream or its checkpoint.
+    pub fn receive_diagnosed(
+        &mut self,
+        reference: &Reference,
+        pairing: &PairingDeclaration,
+        classes: &[usize],
+        stage_refused: &mut dyn FnMut(EpochStageAttempt, &EpochStageRefusal),
+    ) -> Result<ObservedStreamReceipt, HnnError> {
         let mut next = self.clone();
         if next
             .accepted_cells()?
@@ -218,7 +231,7 @@ impl ObservedStream {
                 ));
             }
             if step.ticks[receiver] != 0 || step.carry_out {
-                let receipt = reference.observe_epoch_continuing_at_cuts_with_scope(
+                let receipt = reference.observe_epoch_continuing_at_cuts_with_scope_diagnosed(
                     &mut next.resident,
                     &mut next.crib,
                     pairing,
@@ -228,6 +241,7 @@ impl ObservedStream {
                     false,
                     &HostObservedEpochExecution,
                     next.scope,
+                    stage_refused,
                 )?;
                 if receipt.consumed != next.pending.len() || receipt.terminal_partial {
                     return Err(refuse(
