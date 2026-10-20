@@ -1051,26 +1051,52 @@ impl Reference {
             deposit_subphases.push((format!("{phase:?}"), now.duration_since(previous_phase)));
             previous_phase = now;
         };
-        let stage =
+        let shared_normals = deposition_scope == ObservedEpochDepositionScope::NormalMaps;
+        let mut normal_stage = if shared_normals {
+            Some(
+                crate::hnn::constitution::epoch::ObservedNormalEpochStage::new(
+                    &comparison_opening.constitution,
+                    &deposits,
+                    receiver,
+                    field.ring(receiver).period(),
+                    heard,
+                    heard,
+                    epoch_index,
+                    exponent,
+                    &retention,
+                    tree.clone(),
+                    &pair_speed,
+                    &receiving_parts,
+                    execution,
+                )?,
+            )
+        } else {
+            None
+        };
+        let mut stage =
             |scope, observe: &mut dyn FnMut(crate::hnn::constitution::epoch::EpochDepositPhase)| {
-                comparison_opening
-                    .constitution
-                    .stage_observed_epoch_with_evidence(
-                        &deposits,
-                        receiver,
-                        field.ring(receiver).period(),
-                        heard,
-                        heard,
-                        epoch_index,
-                        exponent,
-                        &retention,
-                        tree.clone(),
-                        &pair_speed,
-                        &receiving_parts,
-                        observe,
-                        execution,
-                        scope,
-                    )
+                if let Some(stage) = normal_stage.as_mut() {
+                    stage.stage(scope, observe)
+                } else {
+                    comparison_opening
+                        .constitution
+                        .stage_observed_epoch_with_evidence(
+                            &deposits,
+                            receiver,
+                            field.ring(receiver).period(),
+                            heard,
+                            heard,
+                            epoch_index,
+                            exponent,
+                            &retention,
+                            tree.clone(),
+                            &pair_speed,
+                            &receiving_parts,
+                            observe,
+                            execution,
+                            scope,
+                        )
+                }
             };
         let mut comparison = None;
         let mut whole_refusal = None;
@@ -1227,6 +1253,11 @@ impl Reference {
             }
             Err(failure) => {
                 stage_refused(EpochStageAttempt::Whole, &failure.evidence);
+                // Shared zero-move absorption cannot fabricate a missing fresh gain. Keep the
+                // original native error if preparation failed before it produced those gains.
+                if shared_normals && !failure.normal_inputs_prepared {
+                    return Err(failure.error);
+                }
                 if !receiving_restage_permitted(&failure.error) {
                     return Err(failure.error);
                 }
@@ -1455,6 +1486,12 @@ mod tests {
     #[derive(Default)]
     struct ProbeExecution {
         forwards: std::sync::Mutex<Vec<ProbeOpening>>,
+        flows: std::sync::Mutex<
+            Vec<(
+                LinearLocus,
+                crate::hnn::constitution::EpochRecordFlowReading,
+            )>,
+        >,
     }
 
     impl ObservedEpochExecution for ProbeExecution {
@@ -1500,7 +1537,7 @@ mod tests {
             heard_cells: u64,
             records: &[crate::hnn::constitution::EpochProducerRecordReading],
         ) -> Result<crate::hnn::constitution::EpochRecordFlowReading, HnnError> {
-            HostObservedEpochExecution.aggregate_records(
+            let reading = HostObservedEpochExecution.aggregate_records(
                 locus,
                 rows,
                 columns,
@@ -1509,8 +1546,106 @@ mod tests {
                 epoch,
                 heard_cells,
                 records,
-            )
+            )?;
+            self.flows.lock().unwrap().push((locus, reading.clone()));
+            Ok(reading)
         }
+    }
+
+    /// Check the actual executor-produced sufficient statistics, rather than infer learning
+    /// from a map change or a bit count. Discarded rungs never add the batch a second time.
+    fn assert_shared_normal_absorption(
+        before: &Constitution,
+        after: &Constitution,
+        receipt: &ObservedEpochReceipt,
+        execution: &ProbeExecution,
+        receiver: usize,
+        period: u64,
+    ) {
+        use crate::hnn::constitution::epoch::{EpochArray, EpochFlow, EpochLaw};
+        let epoch = receipt.deposit.epoch.as_ref().unwrap();
+        let normal = |material: &Constitution, kind| match kind {
+            LinearLocus::SourcePort(ring) => material.source_law(ring).unwrap().clone(),
+            LinearLocus::Contrast(ring) => material.contrast_law(ring).clone(),
+            LinearLocus::Receiving(ring) => material.receiving_law(ring).unwrap().clone(),
+        };
+        let array = |series: &crate::hnn::constitution::EpochSeriesReading| {
+            EpochArray::with_row_divisors(
+                series.rows,
+                series.columns,
+                series.exponent,
+                series.numerators.clone(),
+                series.row_odd_divisors.clone(),
+            )
+            .unwrap()
+        };
+        let flows = execution.flows.lock().unwrap();
+        for locus in &epoch.loci {
+            let old_normal = normal(before, locus.locus);
+            let new_normal = normal(after, locus.locus);
+            let old = match old_normal.epoch_law() {
+                Some(law) => law.clone(),
+                None => {
+                    let law =
+                        EpochLaw::from_normal(&old_normal, epoch.receiver_partition_bits).unwrap();
+                    if locus.locus == LinearLocus::Receiving(receiver) {
+                        let rows = (1..law.map.rows).step_by(2).collect::<Vec<_>>();
+                        law.with_phase_rows(&rows, period).unwrap()
+                    } else {
+                        law
+                    }
+                }
+            };
+            let matching: Vec<_> = flows
+                .iter()
+                .filter(|(kind, _)| *kind == locus.locus)
+                .collect();
+            assert_eq!(
+                matching.len(),
+                1,
+                "the actual flow is prepared once across all rungs"
+            );
+            let flow = &matching[0].1;
+            let flow = EpochFlow {
+                gram: array(&flow.gram),
+                covector: array(&flow.covector),
+                support: flow.support.clone(),
+                partitions: Vec::new(),
+                cells: epoch.heard_cells,
+                partition_cells: epoch.declared_cells,
+                records: flow.records,
+                partition_exponent: epoch.partition_exponent,
+                receiver_grain: epoch.receiver_partition_bits,
+                epoch: epoch.actual_receiving_ingress,
+            };
+            let paired = old_normal
+                .symmetry()
+                .map(|symmetry| flow.paired(symmetry).unwrap());
+            let flow = paired.as_ref().unwrap_or(&flow);
+            let new = new_normal.epoch_law().unwrap();
+            let h_plus = old.gram.add(&flow.gram).unwrap();
+            let p = new.map.subtract(&old.map).unwrap();
+            let gamma = EpochArray::from_dyadic_scalar(&locus.gamma).unwrap();
+            let expected_r = old
+                .news
+                .add(&flow.covector.scalar_product(&gamma).unwrap())
+                .unwrap()
+                .subtract(&p.multiply(&h_plus).unwrap())
+                .unwrap();
+            assert_eq!(new.gram, h_plus);
+            assert_eq!(new.news, expected_r);
+            assert_eq!(new.crossings, old.crossings + 1);
+            if receipt.outcome == ObservedEpochOutcome::ReceivingOnly
+                && locus.locus != LinearLocus::Receiving(receiver)
+            {
+                assert_eq!(
+                    new_normal.map(),
+                    old_normal.map(),
+                    "upstream physical map is held"
+                );
+            }
+        }
+        assert_eq!(epoch.loci.len(), flows.len());
     }
 
     #[test]
@@ -1771,20 +1906,28 @@ mod tests {
             if receipt.outcome == ObservedEpochOutcome::ReceivingOnly {
                 assert!(receipt.whole_refusal.is_some());
                 assert_eq!(
-                    before.constitution.source_port(0),
-                    actual.constitution.source_port(0)
+                    before.constitution.source_law(0).unwrap().map(),
+                    actual.constitution.source_law(0).unwrap().map()
                 );
-                assert!(
-                    receipt
-                        .deposit
-                        .epoch
-                        .as_ref()
-                        .unwrap()
-                        .loci
-                        .iter()
-                        .all(|locus| locus.locus == LinearLocus::Receiving(receiver))
+                let before_codec =
+                    PairedObservation::admit(&before.field, &before.constitution, &pairing)
+                        .unwrap();
+                let after_codec =
+                    PairedObservation::admit(&actual.field, &actual.constitution, &pairing)
+                        .unwrap();
+                assert_eq!(
+                    before_codec.encode(&[0, 1, 2, 3]).unwrap(),
+                    after_codec.encode(&[0, 1, 2, 3]).unwrap()
                 );
             }
+            assert_shared_normal_absorption(
+                &before.constitution,
+                &actual.constitution,
+                &receipt,
+                &execution,
+                receiver,
+                actual.field.ring(receiver).period(),
+            );
             if let Some(stage) = &receipt.whole_stage_refusal {
                 assert_eq!(receipt.whole_refusal.as_ref(), Some(&stage.reason));
                 assert_eq!(receipt.probe_state, ObservedEpochProbeState::SealNotFormed);
@@ -1859,6 +2002,84 @@ mod tests {
             assert_eq!(cold.current, actual.current);
             assert_eq!(cold.carried, actual.carried);
         }
+    }
+
+    #[test]
+    fn shared_normal_absorption_continues_identically_after_complete_cold_restore() {
+        let (reference, original, mut warm, mut warm_crib, pairing) = source_probe_opening();
+        let first = [0, 1, 2, 3, 0, 2, 1, 3, 3, 1, 0, 2, 1, 3, 2, 0];
+        reference
+            .observe_epoch_continuing_at_cuts_with_scope(
+                &mut warm,
+                &mut warm_crib,
+                &pairing,
+                &first,
+                None,
+                &[],
+                false,
+                &HostObservedEpochExecution,
+                ObservedEpochDepositionScope::NormalMaps,
+            )
+            .unwrap();
+        let checkpoint = warm.continuing_state(0).unwrap().to_text();
+        let crib_text = warm_crib.unplaced_checkpoint().unwrap();
+        let parsed = ContinuingState::from_text(&checkpoint, warm.constitution.budget()).unwrap();
+        let mut cold = reference
+            .mount_continued(
+                &original.field,
+                &original.current,
+                original.constitution.clone(),
+                &parsed,
+            )
+            .unwrap();
+        let expected_next = usize::try_from(cold.moments.values().next().unwrap().cells()).unwrap();
+        let mut cold_crib = ObservedCrib::from_unplaced_checkpoint(
+            &cold.field,
+            &cold.current,
+            expected_next,
+            &crib_text,
+        )
+        .unwrap();
+        let next = [3, 2, 1, 0, 3, 1, 2, 0, 0, 2, 3, 1, 2, 0, 1, 3];
+        let a = reference
+            .observe_epoch_continuing_at_cuts_with_scope(
+                &mut warm,
+                &mut warm_crib,
+                &pairing,
+                &next,
+                None,
+                &[],
+                false,
+                &HostObservedEpochExecution,
+                ObservedEpochDepositionScope::NormalMaps,
+            )
+            .unwrap();
+        let b = reference
+            .observe_epoch_continuing_at_cuts_with_scope(
+                &mut cold,
+                &mut cold_crib,
+                &pairing,
+                &next,
+                None,
+                &[],
+                false,
+                &HostObservedEpochExecution,
+                ObservedEpochDepositionScope::NormalMaps,
+            )
+            .unwrap();
+        assert_eq!(a.outcome, b.outcome);
+        assert_eq!(a.whole_refusal, b.whole_refusal);
+        assert_eq!(a.whole_stage_refusal, b.whole_stage_refusal);
+        assert_eq!(a.comparison, b.comparison);
+        assert_eq!(a.energy, b.energy);
+        assert_eq!(
+            warm.continuing_state(0).unwrap().to_text(),
+            cold.continuing_state(0).unwrap().to_text()
+        );
+        assert_eq!(
+            warm_crib.unplaced_checkpoint().unwrap(),
+            cold_crib.unplaced_checkpoint().unwrap()
+        );
     }
 
     fn series_values(series: &crate::hnn::constitution::EpochSeriesReading) -> Vec<Rat> {

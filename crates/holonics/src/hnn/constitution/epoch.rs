@@ -10,7 +10,9 @@ use super::*;
 mod checkpoint;
 mod deposit;
 pub(crate) mod device;
-pub(crate) use deposit::{EpochCandidateScope, EpochDepositPhase, EpochReceivingRecord};
+pub(crate) use deposit::{
+    EpochCandidateScope, EpochDepositPhase, EpochReceivingRecord, ObservedNormalEpochStage,
+};
 mod flow;
 #[cfg(test)]
 mod mixed_tests;
@@ -177,6 +179,8 @@ impl EpochStageRefusal {
 pub(crate) struct EpochStageFailure {
     pub(crate) error: HnnError,
     pub(crate) evidence: EpochStageRefusal,
+    /// Transient same-batch preparation exists; not a retained or transferable certificate.
+    pub(crate) normal_inputs_prepared: bool,
 }
 
 struct EpochStageTrace {
@@ -258,7 +262,11 @@ impl EpochStageTrace {
             _ => {}
         }
         evidence.reason = error.to_string();
-        EpochStageFailure { error, evidence }
+        EpochStageFailure {
+            error,
+            evidence,
+            normal_inputs_prepared: false,
+        }
     }
 }
 
@@ -569,7 +577,7 @@ impl EpochArray {
         )
     }
 
-    fn scalar_product(&self, scalar: &Self) -> Result<Self, HnnError> {
+    pub(crate) fn scalar_product(&self, scalar: &Self) -> Result<Self, HnnError> {
         self.admit_grouped()?;
         scalar.admit_grouped()?;
         if (scalar.rows, scalar.columns) != (1, 1) {
@@ -774,7 +782,7 @@ impl EpochFlow {
     /// The existing paired-port admission and orthogonal half-sum, applied to the
     /// whole epoch. Outside columns are never reached; the diagonal prior keeps
     /// them uncoupled, so the exact news update preserves the partial family too.
-    fn paired(&self, symmetry: &PortSymmetry) -> Result<Self, HnnError> {
+    pub(crate) fn paired(&self, symmetry: &PortSymmetry) -> Result<Self, HnnError> {
         let (rows, columns) = (self.covector.rows, self.covector.columns);
         if symmetry.rows().len() != rows || symmetry.columns().len() != columns {
             return Err(refused(
@@ -971,6 +979,7 @@ pub(crate) struct EpochFresh {
 
 /// The current tightened certificate's scalar interface. The direction stays
 /// one integer matrix over one denominator; only its scalar readings use Rat.
+#[derive(Clone)]
 pub(crate) struct EpochCertificateFace {
     unit: IntegralMatrix,
     alignment: Rat,
@@ -1383,6 +1392,28 @@ impl EpochLaw {
         commit: u64,
         ring: usize,
     ) -> Result<EpochDeposit, HnnError> {
+        self.deposit_source_at_eta(
+            flow,
+            gamma,
+            active_lattice,
+            budget,
+            commit,
+            ring,
+            BigInt::one(),
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn deposit_source_at_eta(
+        &self,
+        flow: &EpochFlow,
+        gamma: &EpochArray,
+        active_lattice: u32,
+        budget: u64,
+        commit: u64,
+        ring: usize,
+        eta_numerator: BigInt,
+    ) -> Result<EpochDeposit, HnnError> {
         if !self.news.is_dyadic() || !self.map.is_dyadic() {
             return Err(refused(
                 "source refinement requires dyadic material and news",
@@ -1407,7 +1438,7 @@ impl EpochLaw {
         let mut deposit = source.deposited_with_projection(
             flow,
             gamma,
-            BigInt::one(),
+            eta_numerator,
             BigInt::one(),
             Some((budget, commit, Locus::SourcePort(ring))),
         )?;
@@ -1457,9 +1488,9 @@ impl EpochLaw {
         let news = self.news.add(&flow.covector.scalar_product(gamma)?)?;
         let (direction, shares) = self.direction(&news, &gram, &flow.support)?;
         let mut map_lattice = self.map_lattice;
-        // A zero fresh gain certifies no new source motion. Old R is retained,
-        // rather than treated as a freshly certified ray.
-        let source_held = source_budget.is_some() && gamma.is_zero();
+        // A zero fresh gain or explicit zero material move certifies no new source motion.
+        // Do not refine a lattice for a held map; H/R still absorb their actual operands.
+        let source_held = source_budget.is_some() && (gamma.is_zero() || eta_numerator.is_zero());
         if source_budget.is_some() && !source_held && !direction.is_zero() {
             let maximum = direction
                 .values
@@ -2030,6 +2061,64 @@ mod tests {
             Err(HnnError::EpochStepNonDescending { crossing: 0 })
         ));
         assert_eq!(state, before);
+    }
+
+    #[test]
+    fn opposing_comparisons_obstruct_a_fresh_move_and_held_absorption_is_once() {
+        let mut law = EpochLaw::founded(1, 1, 2, 0).unwrap();
+        law.news = EpochArray::new(1, 1, 1, vec![(-3).into()]).unwrap();
+        let sample = Sample {
+            weight: Rat::one(),
+            feature: vec![Rat::one()],
+            covector: vec![integer(3) / integer(8)],
+            masses: None,
+        };
+        let flow = EpochFlow::from_records(
+            1,
+            1,
+            2,
+            1,
+            0,
+            1,
+            &[EpochRecord::from_sample(&sample).unwrap()],
+        )
+        .unwrap();
+        let gain = scalar(1);
+        let before = law.clone();
+        let whole = law.deposit_source(&flow, &gain, 2, 1 << 20, 0, 0).unwrap();
+        assert_eq!(
+            whole.direction.scalar_ratio().unwrap(),
+            -integer(9) / integer(16)
+        );
+        assert_eq!(whole.step.scalar_ratio().unwrap(), -integer(1) / integer(2));
+        assert_eq!(whole.fall.scalar_ratio().unwrap(), integer(5) / integer(16));
+        // The withdrawn fresh-only policy would propose +1/8. Keep the exact obstruction
+        // without introducing that policy into the native material owner.
+        let fresh_p = integer(1) / integer(8);
+        let r_star = -integer(9) / integer(8);
+        let normal_fall = &fresh_p * &r_star - &fresh_p * &fresh_p;
+        let current_alignment = integer(3) / integer(8) * &fresh_p;
+        assert_eq!(normal_fall, -integer(5) / integer(32));
+        assert_eq!(current_alignment, integer(3) / integer(64));
+        let held = law
+            .deposit_source_at_eta(&flow, &gain, 2, 1 << 20, 0, 0, BigInt::zero())
+            .unwrap();
+        assert_eq!(held.successor.map, law.map);
+        assert!(held.step.is_zero());
+        assert_eq!(held.successor.gram.scalar_ratio().unwrap(), integer(2));
+        assert_eq!(
+            held.successor.news.scalar_ratio().unwrap(),
+            -integer(9) / integer(8)
+        );
+        assert_eq!(held.successor.crossings, law.crossings + 1);
+        let again = law
+            .deposit_source_at_eta(&flow, &gain, 2, 1 << 20, 0, 0, BigInt::zero())
+            .unwrap();
+        assert_eq!(
+            again.successor, held.successor,
+            "discarded rungs never absorb this flow twice"
+        );
+        assert_eq!(law, before);
     }
 
     #[test]

@@ -7,6 +7,8 @@
 //! The native grouped comparison publishes only at actual receiving ticks. Source/contrast/
 //! readout maps share the whole candidate probe; a refused whole branch restages the certified
 //! receiving-only policy. Physical factor requests/statistics are explicitly held (NormalMaps).
+//! Both rungs reuse the same opening's normal flow and certified gain. Held upstream maps
+//! absorb that news once with zero material move; discarded candidates never publish statistics.
 //! A source end leaves only the bounded current unfinished transaction pending. It is accepted
 //! boundary input, not a published or learned prefix, and no terminal clock is invented.
 //! This consumer uses listener/octets.rs's unpumped initial circuit. A saturated locking
@@ -962,6 +964,27 @@ fn run() -> Result<()> {
                     match epoch.outcome { ObservedEpochOutcome::Whole => whole += 1, ObservedEpochOutcome::ReceivingOnly => receiving_only += 1, ObservedEpochOutcome::Neutral => neutral += 1 }
                     stepped += epoch.deposit.stepped;
                     outcomes.push(object(&[
+                        ("source_start_zero_based", opening.to_string()),
+                        ("source_end_exclusive", epoch.cells.to_string()),
+                        ("material_commit", epoch.deposit.commit.to_string()),
+                        ("actual_receiving_ingress", epoch.deposit.epoch.as_ref().map_or_else(|| "null".into(), |read| read.actual_receiving_ingress.to_string())),
+                        ("locus_deposits", epoch.deposit.epoch.as_ref().map_or_else(|| "[]".into(), |read| {
+                            format!("[{}]", read.loci.iter().map(|locus| object(&[
+                                ("locus", exact(&locus.locus)),
+                                ("records", locus.records.to_string()),
+                                ("represented_move", (locus.represented_step.numerator_l1_bound > 0.into()).to_string()),
+                                ("represented_step_numerator_l1_bound", quoted(&locus.represented_step.numerator_l1_bound.to_string())),
+                                ("gamma", rational(&locus.gamma)),
+                                ("eta", rational(&locus.eta)),
+                                ("normal_fall", rational(&locus.fall)),
+                                ("crossings", locus.storage.crossings.to_string()),
+                                ("map_lattice", locus.storage.map_lattice.to_string()),
+                                ("source_refinement", locus.storage.source_refinement.to_string()),
+                                ("gram_update_metadata", exact(&locus.gram_update)),
+                                ("fresh_news_metadata", exact(&locus.fresh_news)),
+                                ("retained_news_metadata", exact(&locus.storage.news)),
+                            ])).collect::<Vec<_>>().join(","))
+                        })),
                         ("consumed", epoch.consumed.to_string()),
                         ("outcome", exact(&epoch.outcome)), ("deposition_scope", exact(&epoch.deposition_scope)),
                         ("comparison_exact", exact(&epoch.comparison)), ("whole_refusal", exact(&epoch.whole_refusal)),

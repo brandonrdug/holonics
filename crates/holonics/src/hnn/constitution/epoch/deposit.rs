@@ -30,6 +30,124 @@ pub(crate) enum EpochCandidateScope {
     ReceivingOnly,
 }
 
+/// Sufficient operands of this one unpublished batch. Neither a rejected successor nor a
+/// sample archive is kept here. The enclosing stage binds these readings to all their inputs.
+#[derive(Clone)]
+struct PreparedEpochNormals {
+    laws: BTreeMap<LinearLocus, EpochLaw>,
+    flows: BTreeMap<LinearLocus, EpochFlow>,
+    faces: Vec<(LinearLocus, EpochCertificateFace)>,
+    receiving_series: Option<EpochReceivingSeries>,
+    raw_covector_scales: BTreeMap<LinearLocus, Rat>,
+    raw_alignments: BTreeMap<LinearLocus, Rat>,
+    alignment_defects: BTreeMap<LinearLocus, (Rat, Rat)>,
+    certified: BTreeMap<(Locus, Family), StepReading>,
+    fresh_joint: Option<JointReading>,
+}
+
+/// One same-opening NormalMaps transaction. Borrowed inputs cannot be replaced between rungs;
+/// only current-batch normal statistics and their actually certified fresh gains are shared.
+/// This object is never installed in Constitution or Resident and has no checkpoint codec.
+pub(crate) struct ObservedNormalEpochStage<'a> {
+    opening: &'a Constitution,
+    deposits: &'a [Deposit],
+    receiver: usize,
+    receiving_period: u64,
+    heard_cells: u64,
+    epoch_cells: u64,
+    epoch_index: u64,
+    exponent: u32,
+    retained: &'a BTreeSet<Locus>,
+    tree: Landmarks,
+    pair_speed: &'a dyn Fn(usize, usize, &PairPort, [&[Vec<Rat>]; 3]) -> Result<[Rat; 2], HnnError>,
+    receiving_parts: &'a [EpochReceivingRecord],
+    execution: &'a dyn crate::hnn::reference::observed::ObservedEpochExecution,
+    prepared: Option<PreparedEpochNormals>,
+}
+
+impl<'a> ObservedNormalEpochStage<'a> {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn new(
+        opening: &'a Constitution,
+        deposits: &'a [Deposit],
+        receiver: usize,
+        receiving_period: u64,
+        heard_cells: u64,
+        epoch_cells: u64,
+        epoch_index: u64,
+        exponent: u32,
+        retained: &'a BTreeSet<Locus>,
+        tree: Landmarks,
+        pair_speed: &'a dyn Fn(
+            usize,
+            usize,
+            &PairPort,
+            [&[Vec<Rat>]; 3],
+        ) -> Result<[Rat; 2], HnnError>,
+        receiving_parts: &'a [EpochReceivingRecord],
+        execution: &'a dyn crate::hnn::reference::observed::ObservedEpochExecution,
+    ) -> Result<Self, HnnError> {
+        if deposits.iter().any(|deposit| !deposit.factors().is_empty()) {
+            return Err(refused(
+                "shared normal epoch staging requires the declared NormalMaps physical-factor hold",
+            ));
+        }
+        Ok(Self {
+            opening,
+            deposits,
+            receiver,
+            receiving_period,
+            heard_cells,
+            epoch_cells,
+            epoch_index,
+            exponent,
+            retained,
+            tree,
+            pair_speed,
+            receiving_parts,
+            execution,
+            prepared: None,
+        })
+    }
+
+    pub(crate) fn stage(
+        &mut self,
+        scope: EpochCandidateScope,
+        observe: &mut dyn FnMut(EpochDepositPhase),
+    ) -> Result<StagedEpochCandidate, EpochStageFailure> {
+        let mut trace = EpochStageTrace::default();
+        if scope != EpochCandidateScope::Whole && self.prepared.is_none() {
+            return Err(trace.failed(refused(
+                "a restaged normal epoch needs the same opening's actually certified fresh gains",
+            )));
+        }
+        self.opening
+            .prepare_observed_epoch_with_execution(
+                self.deposits,
+                self.receiver,
+                self.receiving_period,
+                self.heard_cells,
+                self.epoch_cells,
+                self.epoch_index,
+                self.exponent,
+                self.retained,
+                self.tree.clone(),
+                self.pair_speed,
+                self.receiving_parts,
+                observe,
+                self.execution,
+                Some(scope),
+                &mut trace,
+                Some(&mut self.prepared),
+            )
+            .map_err(|error| {
+                let mut failure = trace.failed(error);
+                failure.normal_inputs_prepared = self.prepared.is_some();
+                failure
+            })
+    }
+}
+
 impl StagedEpochCandidate {
     /// New physical maps against the predecessor's tree/population context.
     /// Neither the candidate's independently staged tree nor its received
@@ -786,6 +904,7 @@ impl Constitution {
             execution,
             None,
             &mut EpochStageTrace::default(),
+            None,
         )?
         .admit_receiving()
     }
@@ -878,6 +997,7 @@ impl Constitution {
             execution,
             Some(scope),
             &mut trace,
+            None,
         )
         .map_err(|error| trace.failed(error))
     }
@@ -905,6 +1025,7 @@ impl Constitution {
         execution: &dyn crate::hnn::reference::observed::ObservedEpochExecution,
         scope: Option<EpochCandidateScope>,
         trace: &mut EpochStageTrace,
+        mut prepared: Option<&mut Option<PreparedEpochNormals>>,
     ) -> Result<StagedEpochCandidate, HnnError> {
         let grain = self.observed_epoch_grain(receiver)?;
         let mut expected_partition = None;
@@ -1024,21 +1145,29 @@ impl Constitution {
             }
         }
         kinds.push(LinearLocus::Receiving(receiver));
-        if scope == Some(EpochCandidateScope::ReceivingOnly) {
+        if scope == Some(EpochCandidateScope::ReceivingOnly) && prepared.is_none() {
             // A refused whole branch contributes no upstream H/R, carries,
             // factor statistics or lattice changes to this fresh branch.
             kinds.retain(|kind| *kind == LinearLocus::Receiving(receiver));
             factors.clear();
         }
         observe(EpochDepositPhase::GroupedInputs);
-        let mut laws = BTreeMap::new();
-        let mut flows = BTreeMap::new();
-        let mut faces = Vec::new();
-        let mut receiving_series = None;
-        let mut raw_covector_scales = BTreeMap::new();
-        let mut raw_alignments = BTreeMap::new();
-        let mut alignment_defects = BTreeMap::new();
+        let cached = prepared.as_deref().and_then(|slot| slot.as_ref());
+        let mut laws = cached.map(|p| p.laws.clone()).unwrap_or_default();
+        let mut flows = cached.map(|p| p.flows.clone()).unwrap_or_default();
+        let mut faces = cached.map(|p| p.faces.clone()).unwrap_or_default();
+        let mut receiving_series = cached.and_then(|p| p.receiving_series.clone());
+        let mut raw_covector_scales = cached
+            .map(|p| p.raw_covector_scales.clone())
+            .unwrap_or_default();
+        let mut raw_alignments = cached.map(|p| p.raw_alignments.clone()).unwrap_or_default();
+        let mut alignment_defects = cached
+            .map(|p| p.alignment_defects.clone())
+            .unwrap_or_default();
         for kind in &kinds {
+            if cached.is_some() {
+                continue;
+            }
             trace.at("normal_flow", Some(kind.locus()), Some(Family::Map));
             let normal = self.epoch_normal(*kind)?;
             let law = if let Some(law) = normal.epoch_law() {
@@ -1353,18 +1482,27 @@ impl Constitution {
         let readout = &laws[&LinearLocus::Receiving(receiver)].spectral;
         let bound = readout.upper();
         trace.at("fresh_joint_certificate", None, None);
-        let (mut certified, fresh_joint, _fresh_pumped, _fresh_loaded) = self
-            .certify_steps_with_epoch_evidence(
-                Some(&envelope),
-                &linear_faces,
-                &factor_faces,
-                None,
-                StepSource::Certified,
-                Some(&bound),
-                Some(&reaches),
-                &mut trace.evidence,
-            )?
-            .map_err(|_| refused("the native epoch joint certificate refused its candidate"))?;
+        let (mut certified, fresh_joint, _fresh_pumped, _fresh_loaded) =
+            if let Some(cached) = cached {
+                (
+                    cached.certified.clone(),
+                    cached.fresh_joint.clone(),
+                    None,
+                    None,
+                )
+            } else {
+                self.certify_steps_with_epoch_evidence(
+                    Some(&envelope),
+                    &linear_faces,
+                    &factor_faces,
+                    None,
+                    StepSource::Certified,
+                    Some(&bound),
+                    Some(&reaches),
+                    &mut trace.evidence,
+                )?
+                .map_err(|_| refused("the native epoch joint certificate refused its candidate"))?
+            };
         drop(factor_faces);
         observe(EpochDepositPhase::JointCertificate);
         let stepping: Vec<_> = regions
@@ -1409,6 +1547,21 @@ impl Constitution {
                 error
             })?;
         drop(stepping);
+        if let Some(slot) = prepared.as_deref_mut() {
+            if slot.is_none() {
+                *slot = Some(PreparedEpochNormals {
+                    laws: laws.clone(),
+                    flows: flows.clone(),
+                    faces: faces.clone(),
+                    receiving_series: receiving_series.clone(),
+                    raw_covector_scales: raw_covector_scales.clone(),
+                    raw_alignments: raw_alignments.clone(),
+                    alignment_defects: alignment_defects.clone(),
+                    certified: certified.clone(),
+                    fresh_joint: fresh_joint.clone(),
+                });
+            }
+        }
         let mut strokes = BTreeMap::new();
         for ((locus, steps, material, carries), prepared) in regions.iter_mut().zip(ready) {
             trace.at("factor_carrier_deposition", Some(*locus), None);
@@ -1455,7 +1608,19 @@ impl Constitution {
             let fresh = certified.get(&(kind.locus(), Family::Map));
             let gamma = fresh.map(|r| r.step.step.clone()).unwrap_or_else(Rat::zero);
             let gain = EpochArray::from_dyadic_scalar(&gamma)?;
+            let held = prepared.is_some()
+                && scope == Some(EpochCandidateScope::ReceivingOnly)
+                && !matches!(kind, LinearLocus::Receiving(_));
             let deposit = match *kind {
+                LinearLocus::SourcePort(ring) if held => laws[kind].deposit_source_at_eta(
+                    &flows[kind],
+                    &gain,
+                    self.lattice(kind.locus())?.exponent(),
+                    self.budget,
+                    self.commit,
+                    ring,
+                    BigInt::zero(),
+                )?,
                 LinearLocus::SourcePort(ring) => laws[kind].deposit_source(
                     &flows[kind],
                     &gain,
@@ -1464,6 +1629,9 @@ impl Constitution {
                     self.commit,
                     ring,
                 )?,
+                _ if held => {
+                    laws[kind].deposited_at(&flows[kind], &gain, BigInt::zero(), BigInt::one())?
+                }
                 _ => laws[kind].deposit(&flows[kind], &gain)?,
             };
             if matches!(kind, LinearLocus::SourcePort(_)) && deposit.successor.source_refinement {
@@ -1606,7 +1774,8 @@ impl Constitution {
             normal_moves = normal_moves
                 .checked_add(deposit.step.values.iter().filter(|v| !v.is_zero()).count() as u64)
                 .ok_or_else(extent)?;
-            if gamma.is_positive() && deposit.step.is_zero() {
+            if gamma.is_positive() && deposit.eta_numerator.is_positive() && deposit.step.is_zero()
+            {
                 vanished.push((kind.locus(), Family::Map));
             }
             let normal = next.epoch_normal_mut(*kind)?;
@@ -2133,7 +2302,145 @@ mod tests {
     }
 
     #[test]
-    fn atomic_epoch_receiving_restage_discards_all_upstream_statistics_and_lattice() {
+    fn shared_receiving_restage_absorbs_all_normal_news_once_while_holding_upstream_maps() {
+        let (field, material, deposit, parts, exponent) =
+            normal_domain_fixture(Some(LinearLocus::SourcePort(0)), true);
+        let receiver = field.receivers()[0].ring;
+        let deposits = [deposit];
+        let retained = crate::hnn::retention::loci(&field).into_iter().collect();
+        let pair_speed = |_, _, _: &PairPort, _: [&[Vec<Rat>]; 3]| {
+            panic!("no physical factor proposal in NormalMaps")
+        };
+        let mut stage = ObservedNormalEpochStage::new(
+            &material,
+            &deposits,
+            receiver,
+            field.ring(receiver).period(),
+            1,
+            1,
+            0,
+            exponent,
+            &retained,
+            material.landmarks(receiver).unwrap().clone(),
+            &pair_speed,
+            &parts,
+            &crate::hnn::reference::observed::HostObservedEpochExecution,
+        )
+        .unwrap();
+        let before = material.continuing_state(0).unwrap().to_text();
+        let premature = stage
+            .stage(EpochCandidateScope::ReceivingOnly, &mut |_| {})
+            .unwrap_err();
+        assert!(!premature.normal_inputs_prepared);
+        assert!(stage.prepared.is_none());
+        let legacy = material.stage_observed_epoch_with_execution(
+            &deposits,
+            receiver,
+            field.ring(receiver).period(),
+            1,
+            1,
+            0,
+            exponent,
+            &retained,
+            material.landmarks(receiver).unwrap().clone(),
+            &pair_speed,
+            &parts,
+            &mut |_| {},
+            &crate::hnn::reference::observed::HostObservedEpochExecution,
+            EpochCandidateScope::Whole,
+        );
+        let shared = stage.stage(EpochCandidateScope::Whole, &mut |_| {});
+        match (legacy, shared) {
+            (Ok(legacy), Ok(shared)) => {
+                assert_eq!(
+                    legacy.material, shared.material,
+                    "canonical whole material is unchanged"
+                );
+                assert_eq!(legacy.upstream, shared.upstream);
+                assert_eq!(legacy.physical_motion, shared.physical_motion);
+            }
+            (Err(legacy), Err(shared)) => assert_eq!(
+                legacy.to_string(),
+                shared.error.to_string(),
+                "canonical whole keeps its original refusal"
+            ),
+            _ => panic!("shared preparation must not change whole admission"),
+        }
+        let prepared = stage
+            .prepared
+            .as_ref()
+            .expect("actual whole fresh certificate was formed")
+            .clone();
+        let candidate = stage
+            .stage(EpochCandidateScope::ReceivingOnly, &mut |_| {})
+            .unwrap();
+        assert!(!candidate.requires_comparison());
+        let (next, reading) = candidate.admit_receiving().unwrap();
+        let repeat = stage
+            .stage(EpochCandidateScope::ReceivingOnly, &mut |_| {})
+            .unwrap()
+            .admit_receiving()
+            .unwrap()
+            .0;
+        assert_eq!(
+            repeat, next,
+            "every branch starts at the same opening, never a rejected successor"
+        );
+        for (kind, old) in &prepared.laws {
+            let flow = &prepared.flows[kind];
+            let paired = old
+                .symmetry
+                .as_ref()
+                .map(|symmetry| flow.paired(symmetry).unwrap());
+            let flow = paired.as_ref().unwrap_or(flow);
+            let gamma = prepared
+                .certified
+                .get(&(kind.locus(), Family::Map))
+                .map(|r| r.step.step.clone())
+                .unwrap_or_else(Rat::zero);
+            let new = next.epoch_normal(*kind).unwrap().epoch_law().unwrap();
+            let h_plus = old.gram.add(&flow.gram).unwrap();
+            let p = new.map.subtract(&old.map).unwrap();
+            let expected_r = old
+                .news
+                .add(
+                    &flow
+                        .covector
+                        .scalar_product(&EpochArray::from_dyadic_scalar(&gamma).unwrap())
+                        .unwrap(),
+                )
+                .unwrap()
+                .subtract(&p.multiply(&h_plus).unwrap())
+                .unwrap();
+            assert_eq!(new.gram, h_plus);
+            assert_eq!(new.news, expected_r);
+            assert_eq!(new.crossings, old.crossings + 1);
+            if *kind != LinearLocus::Receiving(receiver) {
+                assert_eq!(new.map, old.map);
+            }
+        }
+        let source = LinearLocus::SourcePort(0);
+        let old = &prepared.laws[&source];
+        let new = next.epoch_normal(source).unwrap().epoch_law().unwrap();
+        assert_ne!(
+            new.news, old.news,
+            "positive actual fresh source news is absorbed despite the held source map"
+        );
+        assert_ne!(new.gram, old.gram);
+        assert_eq!(next.lattices, material.lattices);
+        assert_eq!(next.carries, material.carries);
+        assert_eq!(next.commit, material.commit + 1);
+        assert_eq!(reading.epoch.unwrap().loci.len(), prepared.laws.len());
+        assert_eq!(material.continuing_state(0).unwrap().to_text(), before);
+        let parsed =
+            ContinuingState::from_text(&next.continuing_state(0).unwrap().to_text(), next.budget)
+                .unwrap();
+        let cold = material.continued_on(&field, &parsed).unwrap();
+        assert_eq!(cold, next);
+    }
+
+    #[test]
+    fn legacy_direct_receiving_restage_discards_all_upstream_statistics_and_lattice() {
         let (field, material, deposit, parts, exponent) =
             normal_domain_fixture(Some(LinearLocus::SourcePort(0)), true);
         let receiver = field.receivers()[0].ring;
