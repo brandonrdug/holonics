@@ -812,6 +812,58 @@ fn normal_news_metric_squared(
     ))
 }
 
+fn epoch_locus_scale_reading(deposit: &EpochDeposit) -> EpochLocusScaleReading {
+    let gram = &deposit.successor.gram;
+    let gram_unit = BigInt::one() << gram.exponent as usize;
+    let gram_column_absolute_sums = (0..gram.columns)
+        .map(|column| {
+            (0..gram.rows)
+                .map(|row| {
+                    Rat::new(
+                        gram.values[row * gram.columns + column].abs(),
+                        &gram_unit * gram.row_divisors[row],
+                    )
+                })
+                .sum()
+        })
+        .collect();
+    let columns = deposit.direction.columns;
+    let mut proposed_nonzero_by_row = Vec::with_capacity(deposit.direction.rows);
+    let mut represented_nonzero_by_row = Vec::with_capacity(deposit.direction.rows);
+    let mut nonzero_proposal_zero_in_step_by_row = Vec::with_capacity(deposit.direction.rows);
+    let mut proposed_maximum_absolute_by_row = Vec::with_capacity(deposit.direction.rows);
+    let unit = BigInt::one() << deposit.direction.exponent as usize;
+    for (row, (proposed, represented)) in deposit
+        .direction
+        .values
+        .chunks_exact(columns)
+        .zip(deposit.step.values.chunks_exact(columns))
+        .enumerate()
+    {
+        proposed_nonzero_by_row.push(proposed.iter().filter(|v| !v.is_zero()).count());
+        represented_nonzero_by_row.push(represented.iter().filter(|v| !v.is_zero()).count());
+        nonzero_proposal_zero_in_step_by_row.push(
+            proposed
+                .iter()
+                .zip(represented)
+                .filter(|(a, b)| !a.is_zero() && b.is_zero())
+                .count(),
+        );
+        proposed_maximum_absolute_by_row.push(Rat::new(
+            proposed.iter().map(Signed::abs).max().unwrap_or_default(),
+            &unit * deposit.direction.row_divisors[row] * &deposit.direction_divisor,
+        ));
+    }
+    EpochLocusScaleReading {
+        gram_column_absolute_sums,
+        positive_eta: deposit.eta_numerator.is_positive(),
+        proposed_nonzero_by_row,
+        represented_nonzero_by_row,
+        nonzero_proposal_zero_in_step_by_row,
+        proposed_maximum_absolute_by_row,
+    }
+}
+
 impl Constitution {
     fn epoch_normal(&self, kind: LinearLocus) -> Result<&NormalLaw, HnnError> {
         match kind {
@@ -1902,6 +1954,7 @@ impl Constitution {
             let direction = EpochArrayReading::of(&deposit.direction);
             let represented_step = EpochArrayReading::of(&deposit.step);
             let shares = deposit.shares.clone();
+            let scale = epoch_locus_scale_reading(&deposit);
             normal.publish_epoch(deposit.successor)?;
             let certificate = &faces
                 .iter()
@@ -1938,6 +1991,7 @@ impl Constitution {
                 retained_news_metric_squared: metric_norms.as_ref().map(|norms| norms.0.clone()),
                 fresh_news_metric_squared: metric_norms.map(|norms| norms.1),
                 represented_step,
+                scale,
                 storage: normal
                     .epoch_storage()
                     .expect("published grouped epoch storage"),
@@ -2284,6 +2338,59 @@ fn add_factor(left: &mut FactorStep, right: &FactorStep) -> Result<(), HnnError>
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn epoch_scale_reading_separates_row_projection_from_exact_proposal() {
+        let law = EpochLaw::founded(2, 1, 2, 0).unwrap();
+        let before = law.encode_checkpoint();
+        let sample = Sample {
+            weight: Rat::one(),
+            feature: vec![Rat::one()],
+            covector: vec![rat(1, 4), -Rat::one()],
+            masses: None,
+        };
+        let record = EpochRecord::from_sample(&sample).unwrap();
+        let flow = EpochFlow::from_records(2, 1, 2, 1, 0, 1, &[record]).unwrap();
+        let gain = EpochArray::from_dyadic_scalar(&Rat::one()).unwrap();
+        let candidate = law.deposit(&flow, &gain).unwrap();
+        let reading = epoch_locus_scale_reading(&candidate);
+        // H+=2, D=(1/8,-1/2); on the actual 1/4 lattice only the second row moves.
+        assert_eq!(reading.gram_column_absolute_sums, vec![rat(2, 1)]);
+        assert_eq!(reading.proposed_maximum_absolute_by_row, vec![rat(1, 8), rat(1, 2)]);
+        assert_eq!(reading.proposed_nonzero_by_row, vec![1, 1]);
+        assert_eq!(reading.represented_nonzero_by_row, vec![0, 1]);
+        assert_eq!(reading.nonzero_proposal_zero_in_step_by_row, vec![1, 0]);
+        assert!(reading.positive_eta);
+        assert_eq!(law.encode_checkpoint(), before);
+        assert_eq!(candidate.step.to_matrix().unwrap().to_rows(), vec![vec![Rat::zero()], vec![rat(-1, 2)]]);
+    }
+
+    #[test]
+    fn epoch_scale_reading_distinguishes_held_eta_from_lattice_truncation() {
+        let law = EpochLaw::founded(1, 1, 2, 0).unwrap();
+        let sample = Sample {
+            weight: Rat::one(),
+            feature: vec![Rat::one()],
+            covector: vec![Rat::one()],
+            masses: None,
+        };
+        let record = EpochRecord::from_sample(&sample).unwrap();
+        let flow = EpochFlow::from_records(1, 1, 2, 1, 0, 1, &[record]).unwrap();
+        let gain = EpochArray::from_dyadic_scalar(&Rat::one()).unwrap();
+        let held = law.deposited_at(&flow, &gain, BigInt::zero(), BigInt::one()).unwrap();
+        let moving = law.deposit(&flow, &gain).unwrap();
+        let a = epoch_locus_scale_reading(&held);
+        let b = epoch_locus_scale_reading(&moving);
+        assert_eq!(a.proposed_maximum_absolute_by_row, vec![rat(1, 2)]);
+        assert_eq!(a.proposed_maximum_absolute_by_row, b.proposed_maximum_absolute_by_row);
+        assert!(!a.positive_eta);
+        assert!(b.positive_eta);
+        assert_eq!(a.nonzero_proposal_zero_in_step_by_row, vec![1]);
+        assert_eq!(b.nonzero_proposal_zero_in_step_by_row, vec![0]);
+        assert!(held.step.is_zero());
+        assert!(!moving.step.is_zero());
+        assert_eq!(held.successor.gram, moving.successor.gram);
+    }
 
     /// A real receiving ratio at one fixed anchor. The optional upstream
     /// records probe the close's refusal domain; they assert no upstream

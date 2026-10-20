@@ -2970,7 +2970,25 @@ pub struct EpochLocusDepositReading {
     pub retained_news_metric_squared: Option<Rat>,
     pub fresh_news_metric_squared: Option<Rat>,
     pub represented_step: EpochArrayReading,
+    /// Transient scale/projection operands of this actual candidate, never checkpoint state.
+    pub scale: EpochLocusScaleReading,
     pub storage: EpochStorageReading,
+}
+
+/// Exterior scale operands, after the original candidate passed its physical certificates.
+/// Rows retain the map's declared order (receiving real/phase rows remain separate).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochLocusScaleReading {
+    /// Absolute column sums of the actual paired H+, in its own feature coordinates.
+    /// Compare the existing `shares`' dyadic S only on reached columns.
+    pub gram_column_absolute_sums: Vec<Rat>,
+    pub positive_eta: bool,
+    pub proposed_nonzero_by_row: Vec<usize>,
+    pub represented_nonzero_by_row: Vec<usize>,
+    /// A zero eta holds a proposal; it must not be called lattice truncation.
+    pub nonzero_proposal_zero_in_step_by_row: Vec<usize>,
+    /// Includes the direction's row factors and transient joint divisor.
+    pub proposed_maximum_absolute_by_row: Vec<Rat>,
 }
 
 /// Exterior operands of one exact minimum-segment proposal. `w` and `D` below are their

@@ -1082,6 +1082,7 @@ fn run() -> Result<()> {
                                 ("map_lattice", locus.storage.map_lattice.to_string()),
                                 ("source_refinement", locus.storage.source_refinement.to_string()),
                                 ("gram_update_metadata", exact(&locus.gram_update)),
+                                ("scale_reading_exact", exact(&locus.scale)),
                                 ("fresh_news_metadata", exact(&locus.fresh_news)),
                                 ("retained_news_metadata", exact(&locus.storage.news)),
                             ])).collect::<Vec<_>>().join(","))
@@ -1122,6 +1123,7 @@ fn run() -> Result<()> {
                             ("attempt", exact(attempt)), ("phase", quoted(phase)), ("elapsed_ns", wall.as_nanos().to_string()),
                         ])).collect::<Vec<_>>().join(","))),
                         ("receiving_certificate_exact", exact(&epoch.deposit.epoch)),
+                        ("actual_certificate_steps_exact", exact(&epoch.deposit.steps)),
                         ("first_law_before_precision_exact", exact(&epoch.precision.balance_before)),
                         ("first_law_after_precision_exact", exact(&epoch.precision.balance_after)),
                         ("physical_energy_closes", epoch.energy.closes().to_string()),
