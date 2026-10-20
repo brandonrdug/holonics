@@ -452,6 +452,59 @@ fn admit_actual_factor_displacements(
 }
 
 #[allow(clippy::too_many_arguments)]
+fn enrich_failed_channel_ray(
+    evidence: &mut Option<EpochStageRefusal>,
+    opening: &Constitution, endpoint: &Constitution,
+    strokes: &BTreeMap<Locus, BudgetedCarry>, requests: &[FactorStep],
+    certified: &BTreeMap<(Locus, Family), StepReading>,
+    original_faces: &BTreeMap<(Locus, Family), FactorPrepared>,
+    rebases: &BTreeMap<usize, channel_grain::ChannelGrainRebase>,
+) {
+    let Some(refusal) = evidence.as_mut() else { return };
+    let (Some(locus @ Locus::Channel(contact)), Some(family @ Family::Factor(2))) =
+        (refusal.locus, refusal.family) else { return };
+    // Diagnostic failure cannot replace the operative error or turn missing evidence into zero.
+    let readings = (|| -> Result<Vec<EpochStageReading>, HnnError> {
+        let ray = channel_ray::ChannelFactorDisplacement::read_all(opening, endpoint)?
+            .into_iter().find(|ray| ray.contact == contact && ray.family == 2)
+            .ok_or_else(|| refused("the refused D family has no changed endpoint"))?;
+        let (index, request) = requests.iter().enumerate().find(|(_, request)|
+            request.gradient.locus() == locus && request.gradient.family() == family)
+            .ok_or_else(|| refused("the refused D family has no original reached request"))?;
+        let fresh = certified.get(&(locus, family))
+            .ok_or_else(|| refused("the refused D family has no original fresh certificate"))?;
+        let original = original_faces.get(&(locus, family))
+            .ok_or_else(|| refused("the refused D family has no original prepared face"))?;
+        let stroke = strokes.get(&locus)
+            .ok_or_else(|| refused("the refused D family has no staged stroke"))?;
+        let rebase = rebases.get(&contact);
+        let mut readings = ray.decomposition_readings(&request.gradient, stroke,
+            rebase.map(|r| &r.factor_delta[2]), &fresh.step.step, &opening.hop)?;
+        for (name, value) in [
+            ("D_original_fresh_alignment", EpochStageValue::Ratio(original.alignment.clone())),
+            ("D_original_fresh_scale_h_prime", EpochStageValue::Ratio(original.scale.clone())),
+            ("D_original_fresh_step", EpochStageValue::Step(fresh.step.clone())),
+            ("D_request_index", EpochStageValue::Index(index)),
+            ("D_original_prepared_index", EpochStageValue::Index(original.index)),
+            ("D_opening_lattice_L", EpochStageValue::Exponent(opening.lattice(locus)?.exponent())),
+            ("D_stroke_lattice_L", EpochStageValue::Exponent(stroke.lattice.exponent())),
+            ("D_opening_clock", EpochStageValue::Integer(opening.clock(locus).into())),
+            ("D_stroke_clock", EpochStageValue::Integer(stroke.clock().into())),
+        ] {
+            readings.push(EpochStageReading { name, value });
+        }
+        Ok(readings)
+    })();
+    match readings {
+        Ok(readings) => refusal.readings.extend(readings),
+        Err(_) => refusal.readings.push(EpochStageReading {
+            name: "D_endpoint_decomposition",
+            value: EpochStageValue::Unavailable("the refused ray's exact decomposition could not be read"),
+        }),
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 fn admit_actual_factor_displacements_with_rebases(
     opening: &Constitution,
     endpoint: &Constitution,
@@ -2163,6 +2216,8 @@ impl Constitution {
                 &mut trace.evidence,
             )
             .map_err(|error| {
+                enrich_failed_channel_ray(&mut trace.evidence, self, &next, &strokes,
+                    &factor_steps, &certified, &original_channel_faces, &rebases);
                 if scope == Some(EpochCandidateScope::Joint) {
                     if let Some(evidence) = &mut trace.evidence {
                         for candidate in candidates.values() {

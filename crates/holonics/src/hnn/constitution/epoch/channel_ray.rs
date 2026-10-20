@@ -211,11 +211,107 @@ impl ChannelFactorDisplacement {
             prepared,
         })
     }
+
+    /// Exterior operands of a refused actual ray. Q is read independently from the staged
+    /// integers, never defined as P-R; this reader neither certifies nor changes a candidate.
+    pub(super) fn decomposition_readings(
+        &self, covector: &FactorGradient, stroke: &BudgetedCarry,
+        rebase: Option<&ExactRatMatrix>, eta: &Rat, hop: &Rat,
+    ) -> Result<Vec<EpochStageReading>, HnnError> {
+        let actual = self.fixed_eta(covector, eta, hop)?;
+        let gradient = match covector {
+            FactorGradient::Storage { gradient, .. }
+            | FactorGradient::Stiffness { gradient, .. }
+            | FactorGradient::Dissipation { gradient, .. } => gradient,
+            _ => return Err(refused("an actual channel decomposition needs a channel covector")),
+        };
+        let rows = self.displacement.rows();
+        let columns = self.displacement.columns();
+        let rebase = match rebase {
+            Some(delta) if (delta.rows(), delta.columns()) == (rows, columns) => delta.clone(),
+            Some(_) => return Err(refused("an actual channel decomposition keeps its rebase shape")),
+            None => ExactRatMatrix::zero(rows, columns)?,
+        };
+        let quotient = ExactRatMatrix::shaped(rows, columns, (0..rows).map(|row| {
+            (0..columns).map(|column| {
+                let entry = row * columns + column;
+                let q = stroke.staged.get(&(Carrier::Factor(self.family), entry))
+                    .map(|(_, q)| q.clone()).unwrap_or_else(BigInt::zero);
+                Rat::from_integer(q) * stroke.lattice.unit()
+            }).collect()
+        }).collect())?;
+        let residual = self.displacement.subtract(&rebase)?.subtract(&quotient)?;
+        let pair = |matrix: &ExactRatMatrix| -> Rat {
+            gradient.entries().iter().zip(matrix.entries()).map(|(g, p)| g * p).sum()
+        };
+        let mut readings = Vec::new();
+        for (name, matrix) in [
+            ("D_covector_G", gradient.clone()),
+            ("D_opening_factor", self.opening.clone()),
+            ("D_actual_displacement_P", self.displacement.clone()),
+            ("D_rebase_displacement_R", rebase.clone()),
+            ("D_fresh_applied_displacement_Q", quotient.clone()),
+            ("D_actual_direction_P_over_eta", actual.direction),
+            ("D_reconstruction_residual_P_minus_R_minus_Q", residual.clone()),
+        ] {
+            readings.push(EpochStageReading { name, value: EpochStageValue::RationalMatrix(matrix) });
+        }
+        for (name, value) in [
+            ("D_pairing_G_P", pair(&self.displacement)),
+            ("D_pairing_G_R", pair(&rebase)),
+            ("D_pairing_G_Q", pair(&quotient)),
+            ("D_pairing_G_P_over_eta", actual.alignment),
+            ("D_pairing_reconstruction_residual", pair(&residual)),
+            ("D_covector_squared_norm", pair(gradient)),
+            ("D_original_certified_eta", eta.clone()),
+        ] {
+            readings.push(EpochStageReading { name, value: EpochStageValue::Ratio(value) });
+        }
+        readings.push(EpochStageReading {
+            name: "D_decomposition_matches_staged_quotient",
+            value: EpochStageValue::Index(usize::from(self.matches_stroke_after_rebase(stroke, Some(&rebase)))),
+        });
+        Ok(readings)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn actual_d_decomposition_distinguishes_positive_fresh_alignment_from_carry_cancellation() {
+        let before = ExactRatMatrix::new(vec![vec![Rat::one(), Rat::zero()]]).unwrap();
+        let endpoint = ExactRatMatrix::new(vec![vec![rat(7, 8), rat(1, 16)]]).unwrap();
+        let ray = ChannelFactorDisplacement::between(0, 2, &before, &endpoint).unwrap().unwrap();
+        let gradient = FactorGradient::Dissipation {
+            contact: 0,
+            gradient: ExactRatMatrix::new(vec![vec![rat(1, 3), rat(2, 3)]]).unwrap(),
+        };
+        let rebase = ExactRatMatrix::new(vec![vec![rat(-3, 16), Rat::zero()]]).unwrap();
+        let mut stroke = BudgetedCarry::new(Lattice::new(8), 4);
+        for entry in 0..2 {
+            stroke.staged.insert((Carrier::Factor(2), entry), (Rat::zero(), BigInt::from(16)));
+        }
+        let saved = stroke.clone();
+        let readings = ray.decomposition_readings(&gradient, &stroke, Some(&rebase), &rat(4, 1), &Rat::one()).unwrap();
+        let ratio = |name| readings.iter().find_map(|r| match &r.value {
+            EpochStageValue::Ratio(value) if r.name == name => Some(value.clone()), _ => None,
+        }).unwrap();
+        assert_eq!(ratio("D_pairing_G_R"), rat(-1, 16));
+        assert_eq!(ratio("D_pairing_G_Q"), rat(1, 16));
+        assert_eq!(ratio("D_pairing_G_P_over_eta"), Rat::zero());
+        assert_eq!(ratio("D_covector_squared_norm") / rat(131, 128), rat(640, 1179));
+        assert!(readings.iter().any(|r| r.name == "D_reconstruction_residual_P_minus_R_minus_Q"
+            && r.value == EpochStageValue::RationalMatrix(ExactRatMatrix::zero(1, 2).unwrap())));
+        assert_eq!(stroke, saved);
+        stroke.staged.get_mut(&(Carrier::Factor(2), 0)).unwrap().1 += BigInt::one();
+        let wrong = ray.decomposition_readings(&gradient, &stroke, Some(&rebase), &rat(4, 1), &Rat::one()).unwrap();
+        assert!(wrong.iter().any(|r| r.name == "D_decomposition_matches_staged_quotient"
+            && r.value == EpochStageValue::Index(0)));
+        assert!(wrong.iter().any(|r| r.name == "D_pairing_reconstruction_residual"
+            && r.value == EpochStageValue::Ratio(rat(-1, 768))));
+    }
 
     #[test]
     fn rebased_actual_ray_matches_only_full_rebase_plus_refined_quotient() {

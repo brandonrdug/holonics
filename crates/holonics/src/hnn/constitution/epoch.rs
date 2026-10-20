@@ -71,6 +71,8 @@ pub enum EpochStageValue {
     Array(EpochArrayReading),
     /// Exact transient grouped coordinates, never installed in a continuing state.
     Series(EpochSeriesReading),
+    /// Exact transient parameter operands, including non-dyadic reached covectors.
+    RationalMatrix(ExactRatMatrix),
     JointDirection(EpochJointDirectionReading),
     Text(&'static str),
     /// The failing owner had not produced this operand, or its diagnostic could not be read.
