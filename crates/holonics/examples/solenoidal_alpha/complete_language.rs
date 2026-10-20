@@ -653,6 +653,23 @@ mod tests {
         .unwrap();
         assert_eq!(receipt.classes.len(), 8);
         assert_eq!(receipt.raw_bytes.len(), 2);
+        let decisions = std::fs::read_to_string(out.join("classes.jsonl")).unwrap();
+        assert_eq!(decisions.lines().count(), 8);
+        for line in decisions.lines() {
+            for key in [
+                "certified_draw",
+                "certified_key_margin_lower",
+                "native_masses",
+                "founding_R_masses",
+                "tree_masses",
+                "native_minus_tree",
+                "native_minus_founding_R",
+            ] {
+                assert!(line.contains(key));
+            }
+            assert!(line.contains("\"extra_word_score_root_calls_for_receipt\":0"));
+        }
+
         assert_eq!(receipt.stop, "DeclaredLength");
         assert!(
             receipt

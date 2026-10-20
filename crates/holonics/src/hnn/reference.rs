@@ -552,6 +552,8 @@ pub struct Resident {
     /// A declared finite passage may end inside a receiver section (REQ063
     /// lines209-210). Its terminal partial absorption has no continuation square.
     observed_epoch_terminal: bool,
+    /// Bounded monotone encounter frontier per source; repropagation is not new evidence.
+    source_return_frontier: BTreeMap<usize,usize>,
     released_bits: u64,
     stop: Option<BudgetStop>,
     charts: Charts,
@@ -1219,6 +1221,7 @@ impl Reference {
             arrived: None,
             observed_epoch_ingress,
             observed_epoch_terminal: false,
+            source_return_frontier: BTreeMap::new(),
             released_bits: 0,
             stop: None,
             charts: Charts::new(),
@@ -6240,6 +6243,7 @@ pub fn prequential(
 #[cfg(test)]
 mod continuation;
 mod interaction;
+pub mod reciprocal;
 pub mod passage;
 
 #[cfg(test)]

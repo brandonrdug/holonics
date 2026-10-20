@@ -407,6 +407,8 @@ pub enum HnnError {
     /// encoding's refusals are wide.
     #[error(transparent)]
     Encoding(Box<encoding::EncodingError>),
+    #[error("the addressed reciprocal source port refused: {0}")]
+    ReciprocalPaired(Box<paired::PairedDefect>),
     #[error("a count of the moment would pass the machine word; the moment refuses it")]
     CountOverflow,
     #[error("ring {ring} is a source ring but the constitution carries no source port for it")]

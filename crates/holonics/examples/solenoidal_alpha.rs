@@ -55,6 +55,15 @@ use std::{
 
 #[path = "solenoidal_alpha/complete_language.rs"]
 mod complete_language;
+#[cfg(test)]
+#[path = "solenoidal_alpha/reciprocal_code.rs"]
+mod reciprocal_code;
+#[cfg(test)]
+pub fn code_reciprocal_continuity(
+    execution: &dyn holonics::hnn::reference::observed::ObservedEpochExecution,
+) -> std::result::Result<String, Box<dyn std::error::Error>> {
+    reciprocal_code::continuity(execution)
+}
 
 /// Explicit exterior executor identity; the library gains no device dependency.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

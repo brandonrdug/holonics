@@ -43,6 +43,7 @@ pub struct ResidentPassageParts {
     pub charts: Charts,
     pub address: ActiveAddress,
     pub arrived: Option<ResidentArrived>,
+    pub source_return_frontier: BTreeMap<usize, usize>,
 }
 
 /// The complete, validated resident continuation carried inside `ContinuingState`.
@@ -203,6 +204,33 @@ impl ResidentPassage {
             }
             _ => return refused("the arrived operand"),
         };
+        let mut source_return_frontier = BTreeMap::new();
+        if text.starts_with("resident-passage 6\n") || text.starts_with("resident-passage 7\n") {
+            let header: Vec<usize> = counted(
+                next("the reciprocal frontier count")?,
+                "source-return-frontiers",
+                1,
+                "the reciprocal frontier count",
+            )?;
+            if header[0] == 0 || header[0] > field.sources().len() {
+                return refused("the bounded reciprocal frontier count");
+            }
+            for _ in 0..header[0] {
+                let row: Vec<usize> = counted(
+                    next("the reciprocal frontier")?,
+                    "source-return-frontier",
+                    2,
+                    "the reciprocal frontier",
+                )?;
+                let cells = moment.as_ref().map_or(0, |(_, m)| m.cells());
+                if !field.sources().contains(&row[0])
+                    || u64::try_from(row[1]).map_err(|_| HnnError::CountOverflow)? >= cells
+                    || source_return_frontier.insert(row[0], row[1]).is_some()
+                {
+                    return refused("one actual consumed encounter frontier per source");
+                }
+            }
+        }
         if next("the passage's end").is_ok() {
             return refused("the passage's end");
         }
@@ -225,6 +253,7 @@ impl ResidentPassage {
                 charts,
                 address,
                 arrived,
+                source_return_frontier,
             },
             receiving_law,
         })
@@ -280,10 +309,26 @@ fn write_passage(
     let mut s = String::new();
     match receiving_law {
         crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 => {
-            line(&mut s, "resident-passage", [4]);
+            line(
+                &mut s,
+                "resident-passage",
+                [if parts.source_return_frontier.is_empty() {
+                    4
+                } else {
+                    6
+                }],
+            );
         }
         crate::hnn::receiving::ReceivingLaw::RetainedFibreV1 => {
-            line(&mut s, "resident-passage", [5]);
+            line(
+                &mut s,
+                "resident-passage",
+                [if parts.source_return_frontier.is_empty() {
+                    5
+                } else {
+                    7
+                }],
+            );
             line(&mut s, "receiving-law", [receiving_law.as_str()]);
         }
     }
@@ -327,6 +372,16 @@ fn write_passage(
             arrived.ratio.write_saved(&mut s);
             line(&mut s, "targets", &arrived.targets);
             write_opening(&mut s, &arrived.opening);
+        }
+    }
+    if !parts.source_return_frontier.is_empty() {
+        line(
+            &mut s,
+            "source-return-frontiers",
+            [parts.source_return_frontier.len()],
+        );
+        for (&ring, &position) in &parts.source_return_frontier {
+            line(&mut s, "source-return-frontier", [ring, position]);
         }
     }
     s
@@ -373,6 +428,7 @@ impl Resident {
             balance: self.ledger.balance().clone(),
             charts: self.charts.clone(),
             address: self.address.clone(),
+            source_return_frontier: self.source_return_frontier.clone(),
             arrived: self.arrived.as_ref().map(|arrived| ResidentArrived {
                 ratio: arrived.ratio.clone(),
                 targets: arrived.targets.clone(),
@@ -405,6 +461,7 @@ impl Resident {
         if parts.opens != self.opens {
             return refused("the saved passage against the declared reception");
         }
+        self.source_return_frontier = parts.source_return_frontier;
         self.current = parts.current;
         self.moments.clear();
         if let Some((id, moment)) = parts.moment {
@@ -436,10 +493,10 @@ impl Resident {
 /// Refuse superseded formats before reading operands whose representation changed.
 pub(crate) fn check_version(line: &str) -> Result<crate::hnn::receiving::ReceivingLaw, HnnError> {
     let words: Vec<_> = line.split_whitespace().collect();
-    if words == ["resident-passage", "4"] {
+    if words == ["resident-passage", "4"] || words == ["resident-passage", "6"] {
         return Ok(crate::hnn::receiving::ReceivingLaw::CoarseGrainV1);
     }
-    if words == ["resident-passage", "5"] {
+    if words == ["resident-passage", "5"] || words == ["resident-passage", "7"] {
         return Ok(crate::hnn::receiving::ReceivingLaw::RetainedFibreV1);
     }
     let version = match words.as_slice() {

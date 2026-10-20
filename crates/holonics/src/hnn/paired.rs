@@ -1141,6 +1141,83 @@ impl PairedCarrier {
         let ring = self.ring;
         let port = constitution
             .source_port(ring)
+            .ok_or(PairedDefect::MissingSourcePort { ring })?;
+        self.certify(port)?;
+        self.certify(prior).map_err(|defect| match defect {
+            PairedDefect::Equivariance {
+                ring,
+                column,
+                partner,
+                row,
+            } => PairedDefect::PriorEquivariance {
+                ring,
+                column,
+                partner,
+                row,
+            },
+            other => other,
+        })?;
+        let classes = located
+            .map
+            .iter()
+            .map(|&(from, to)| Ok((class_at(field, ring, from)?, class_at(field, ring, to)?)))
+            .collect::<Result<Vec<(usize, usize)>, HnnError>>()?;
+        let (next, deposited, reversed) = self.deposit_oriented_reads(
+            field,
+            constitution,
+            prior,
+            BigInt::from(located.offset),
+            &classes,
+        )?;
+        Ok((
+            next,
+            PairDeposit {
+                offset: located.offset,
+                classes,
+                reversed,
+                slip_before: deposited.slip_before,
+                slip_after: deposited.slip_after,
+                certificate: deposited.certificate,
+                consumer: deposited.consumer,
+                source: deposited.source,
+            },
+        ))
+    }
+
+    /// A uniquely entailed addressed pair, not a fabricated globally LocatedPair. The reverse
+    /// dyad belongs to this ONE encounter and enters the normal owner in the same batch.
+    pub(crate) fn deposit_oriented_pair(
+        &self,
+        field: &Field,
+        constitution: &Constitution,
+        prior: &ExactRatMatrix,
+        turns: BigInt,
+        pair: (usize, usize),
+    ) -> Result<(Constitution, crate::hnn::executed::DepositedReads), PairedDefect> {
+        let (next, deposited, _) =
+            self.deposit_oriented_reads(field, constitution, prior, turns, &[pair])?;
+        Ok((next, deposited))
+    }
+
+    fn deposit_oriented_reads(
+        &self,
+        field: &Field,
+        constitution: &Constitution,
+        prior: &ExactRatMatrix,
+        forward: BigInt,
+        classes: &[(usize, usize)],
+    ) -> Result<
+        (
+            Constitution,
+            crate::hnn::executed::DepositedReads,
+            Vec<(usize, usize)>,
+        ),
+        PairedDefect,
+    > {
+        self.ring_of(field)?;
+        let ring = self.ring;
+        let port = constitution
+            .source_port(ring)
             .ok_or(PairedDefect::MissingSourcePort { ring })?
             .clone();
         self.certify(&port)?;
@@ -1163,16 +1240,10 @@ impl PairedCarrier {
                 .image(class)
                 .ok_or(PairedDefect::OutsideFamily { ring, class })
         };
-        let classes = located
-            .map
-            .iter()
-            .map(|&(from, to)| Ok((class_at(field, ring, from)?, class_at(field, ring, to)?)))
-            .collect::<Result<Vec<(usize, usize)>, HnnError>>()?;
         let reversed = classes
             .iter()
             .map(|&(y, x)| Ok((image(y)?, image(x)?)))
             .collect::<Result<Vec<(usize, usize)>, PairedDefect>>()?;
-        let forward = BigInt::from(located.offset);
         let backward = -&forward;
         for (&(y, x), &pair) in classes.iter().zip(&reversed) {
             let lifted = self.lift(&oriented_slip(field, ring, &port, prior, &forward, (y, x))?)?;
@@ -1209,19 +1280,7 @@ impl PairedCarrier {
             },
             other => other,
         })?;
-        Ok((
-            next,
-            PairDeposit {
-                offset: located.offset,
-                classes,
-                reversed,
-                slip_before: deposited.slip_before,
-                slip_after: deposited.slip_after,
-                certificate: deposited.certificate,
-                consumer: deposited.consumer,
-                source: deposited.source,
-            },
-        ))
+        Ok((next, deposited, reversed))
     }
 }
 

@@ -95,6 +95,7 @@ pub(super) struct SampleReceipt {
 
 struct OneCell {
     class: Option<usize>,
+    certified: Option<holonics::receiver::release::CertifiedDraw>,
     diagnostic: holonics::hnn::receiving::cells::diagnostic::RetainedReceiverDiagnostic,
     receipt: Option<holonics::hnn::reference::observed::ReceiverPrefixReceipt>,
     stop: &'static str,
@@ -244,6 +245,7 @@ fn advance_one(
         reference.discard(resident, holonics::hnn::port::Handle::Pending(pending))?;
         return Ok(OneCell {
             class: None,
+            certified: None,
             diagnostic,
             receipt: None,
             stop: "Unresolved",
@@ -255,6 +257,7 @@ fn advance_one(
     )?;
     Ok(OneCell {
         class: Some(class),
+        certified: Some(certified),
         diagnostic,
         receipt: Some(receipt),
         stop: "DeclaredLength",
@@ -416,6 +419,32 @@ pub(super) fn sample_continuing(
                 object(&[
                     ("cell", at.to_string()),
                     ("class", class.to_string()),
+                    ("key", rational(&keys[at])),
+                    ("certified_draw", exact(&cell.certified)),
+                    (
+                        "certified_key_margin_lower",
+                        cell.certified.as_ref().map_or("null".into(), |c| rational(
+                            &std::cmp::min(&c.key - &c.prior_upper, &c.through_lower - &c.key)
+                        ))
+                    ),
+                    (
+                        "native_masses",
+                        exact(&cell.diagnostic.native.native_masses)
+                    ),
+                    (
+                        "founding_R_masses",
+                        exact(&cell.diagnostic.control.native_masses)
+                    ),
+                    ("tree_masses", exact(&cell.diagnostic.native.tree_masses)),
+                    (
+                        "native_minus_tree",
+                        exact(&cell.diagnostic.native.native_minus_tree)
+                    ),
+                    (
+                        "native_minus_founding_R",
+                        exact(&cell.diagnostic.native_minus_control_masses)
+                    ),
+                    ("extra_word_score_root_calls_for_receipt", "0".into()),
                     ("elapsed_ns", started.elapsed().as_nanos().to_string())
                 ])
             )?;

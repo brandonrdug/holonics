@@ -116,7 +116,9 @@ impl ObservedEpochWord for NativeEpochWord {
 pub trait ObservedEpochExecution: Sync {
     /// Optional exterior matched C/K ablation. The disposable probe never changes
     /// deposition or admission; ordinary executors do not request this extra work.
-    fn channel_storage_ablation_control(&self) -> bool { false }
+    fn channel_storage_ablation_control(&self) -> bool {
+        false
+    }
 
     /// Execute the actual producing ratio at its declared opening. The caller
     /// authenticates its observation against these anchors and faces, then chains
@@ -234,7 +236,6 @@ impl ObservedEpochExecution for HostObservedEpochExecution {
     }
 }
 
-
 /// Explicit host span selection. The ordinary host executor remains the serial oracle.
 #[derive(Clone, Debug)]
 pub struct ScannedHostObservedEpochExecution {
@@ -244,7 +245,9 @@ pub struct ScannedHostObservedEpochExecution {
 impl ScannedHostObservedEpochExecution {
     pub fn new(partitions: usize) -> Result<Self, HnnError> {
         if partitions == 0 {
-            return Err(HnnError::Unadmitted { reason: "a host forward span needs positive partitions" });
+            return Err(HnnError::Unadmitted {
+                reason: "a host forward span needs positive partitions",
+            });
         }
         Ok(Self { partitions })
     }
@@ -252,11 +255,16 @@ impl ScannedHostObservedEpochExecution {
 
 impl ObservedEpochExecution for ScannedHostObservedEpochExecution {
     fn forward(
-        &self, field: &Field, constitution: &Constitution, ratio: &PendingRatio,
-        charts: &mut Charts, opening: &WordOpening,
+        &self,
+        field: &Field,
+        constitution: &Constitution,
+        ratio: &PendingRatio,
+        charts: &mut Charts,
+        opening: &WordOpening,
     ) -> Result<ObservedEpochForwardWord, HnnError> {
         let start = std::time::Instant::now();
-        let (word, faces, mut span) = ratio.read_on_scanned(field, constitution, charts, opening, self.partitions)?;
+        let (word, faces, mut span) =
+            ratio.read_on_scanned(field, constitution, charts, opening, self.partitions)?;
         span.elapsed_ns = Some(start.elapsed().as_nanos());
         let mut result = keep_native(word, faces, ratio.phases(), ratio.commit())?;
         result.forward_span = Some(span);
@@ -264,11 +272,15 @@ impl ObservedEpochExecution for ScannedHostObservedEpochExecution {
     }
 
     fn forward_scoped(
-        &self, context: &mut ObservedEpochForwardContext<'_, '_>, ratio: &PendingRatio,
-        charts: &mut Charts, opening: &WordOpening,
+        &self,
+        context: &mut ObservedEpochForwardContext<'_, '_>,
+        ratio: &PendingRatio,
+        charts: &mut Charts,
+        opening: &WordOpening,
     ) -> Result<ObservedEpochForwardWord, HnnError> {
         let start = std::time::Instant::now();
-        let (word, faces, mut span) = ratio.read_on_scoped_scanned(context.scope, charts, opening, self.partitions)?;
+        let (word, faces, mut span) =
+            ratio.read_on_scoped_scanned(context.scope, charts, opening, self.partitions)?;
         span.elapsed_ns = Some(start.elapsed().as_nanos());
         let mut result = keep_native(word, faces, ratio.phases(), ratio.commit())?;
         result.forward_span = Some(span);

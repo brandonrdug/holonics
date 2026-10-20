@@ -53,6 +53,37 @@ pub struct ObservedCrib {
 }
 
 impl ObservedCrib {
+    /// Actual post-arrival source lift of one bounded witnessed occurrence. Reconstruct only
+    /// the exterior crib's clock, never a Word/source replay or a guessed latent trajectory.
+    pub(crate) fn addressed_lift(
+        &self,
+        field: &Field,
+        current: &Current,
+        position: usize,
+        class: usize,
+    ) -> Result<Vec<BigInt>, HnnError> {
+        let bad = || HnnError::Unadmitted {
+            reason: "the addressed return must name an actual retained crib occurrence/class and endpoint",
+        };
+        let opening = self.opening_lift.as_ref().ok_or_else(bad)?;
+        let mut at = Current::at(field, opening.clone())?;
+        let mut selected = None;
+        for entry in &self.entries {
+            let mut lift = at.lift().to_vec();
+            field.step_class(&mut lift, entry.class, None)?;
+            at = Current::at(field, lift)?;
+            if entry.position == position {
+                if entry.class != class || entry.placement.is_some() {
+                    return Err(bad());
+                }
+                selected = Some(at.lift().to_vec());
+            }
+        }
+        if &at != current {
+            return Err(bad());
+        }
+        selected.ok_or_else(bad)
+    }
     pub fn new(opening: usize) -> Self {
         Self {
             opening,

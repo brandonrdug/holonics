@@ -1,0 +1,55 @@
+{
+  "kind": "SYNTHETIC_CODE_ONLY_NOT_LANGUAGE",
+  "source_control_log": "validation-2/code-01-last-host-scopes/log.txt",
+  "traces": [
+    {
+      "kind": "synthetic CODE control; not language",
+      "actual_input_classes": [
+        0,
+        1,
+        0,
+        1,
+        2,
+        3,
+        0,
+        1
+      ],
+      "packet": "OrientedPacket { source_ring: 0, receiver_ring: 2, positions: [0, 1], lifts: [[1, 0, 0], [2, 0, 0]], turns: 1, classes: (0, 1) }",
+      "Gamma": "[JointMember { hypothesis: 0, antecedent: 0, consequence: 1 }]",
+      "changed_source_entries_row_column_old_new": "[(0, 0, Ratio { numer: -1, denom: 2 }, Ratio { numer: -1, denom: 1 }), (0, 1, Ratio { numer: -1, denom: 2 }, Ratio { numer: -1, denom: 1 }), (1, 0, Ratio { numer: -1, denom: 2 }, Ratio { numer: 0, denom: 1 }), (1, 1, Ratio { numer: -1, denom: 2 }, Ratio { numer: 0, denom: 1 }), (2, 0, Ratio { numer: 1, denom: 2 }, Ratio { numer: 0, denom: 1 }), (2, 1, Ratio { numer: -1, denom: 2 }, Ratio { numer: -1, denom: 1 }), (3, 0, Ratio { numer: 1, denom: 2 }, Ratio { numer: 1, denom: 1 }), (3, 1, Ratio { numer: 1, denom: 2 }, Ratio { numer: 0, denom: 1 }), (4, 0, Ratio { numer: -1, denom: 2 }, Ratio { numer: -1, denom: 1 }), (4, 1, Ratio { numer: -1, denom: 2 }, Ratio { numer: 0, denom: 1 }), (5, 0, Ratio { numer: 1, denom: 2 }, Ratio { numer: 1, denom: 1 }), (5, 1, Ratio { numer: 1, denom: 2 }, Ratio { numer: 1, denom: 1 }), (6, 0, Ratio { numer: -1, denom: 2 }, Ratio { numer: 0, denom: 1 }), (6, 1, Ratio { numer: -1, denom: 2 }, Ratio { numer: -1, denom: 1 }), (7, 0, Ratio { numer: 1, denom: 2 }, Ratio { numer: 1, denom: 1 }), (7, 1, Ratio { numer: 1, denom: 2 }, Ratio { numer: 1, denom: 1 }), (8, 0, Ratio { numer: -1, denom: 2 }, Ratio { numer: -1, denom: 1 }), (8, 1, Ratio { numer: 1, denom: 2 }, Ratio { numer: 0, denom: 1 }), (9, 0, Ratio { numer: 1, denom: 2 }, Ratio { numer: 0, denom: 1 }), (9, 1, Ratio { numer: 1, denom: 2 }, Ratio { numer: 1, denom: 1 })]",
+      "local_slip_before": {
+        "numerator": "5",
+        "denominator": "1"
+      },
+      "local_slip_after": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "commit_current_preserved": true,
+      "commit_carry_preserved": true,
+      "future_before": "Some(ReceptionCarry { change: EndChange { storage: [[Ratio { numer: -187, denom: 1024 }, Ratio { numer: 153, denom: 512 }, Ratio { numer: -7, denom: 64 }, Ratio { numer: 61, denom: 256 }, Ratio { numer: -133, denom: 1024 }, Ratio { numer: -1, denom: 16 }, Ratio { numer: -7, denom: 64 }, Ratio { numer: 173, denom: 512 }, Ratio { numer: -243, denom: 1024 }, Ratio { numer: 17, denom: 256 }], [Ratio { numer: 1, denom: 512 }, Ratio { numer: 35, denom: 512 }, Ratio { numer: -1, denom: 256 }, Ratio { numer: 25, denom: 512 }], [Ratio { numer: 25, denom: 1024 }, Ratio { numer: 55, denom: 1024 }, Ratio { numer: -5, denom: 256 }, Ratio { numer: -1, denom: 1024 }, Ratio { numer: -1, denom: 1024 }, Ratio { numer: 41, denom: 512 }]], arrivals: [[[Ratio { numer: 23, denom: 128 }, Ratio { numer: 51, denom: 512 }, Ratio { numer: -65, denom: 1024 }, Ratio { numer: -31, denom: 256 }, Ratio { numer: 123, denom: 1024 }, Ratio { numer: -525, denom: 1024 }, Ratio { numer: 337, denom: 1024 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 97, denom: 1024 }, Ratio { numer: -235, denom: 512 }], [Ratio { numer: 91, denom: 512 }, Ratio { numer: -67, denom: 512 }, Ratio { numer: 197, denom: 1024 }, Ratio { numer: -63, denom: 1024 }]], [[Ratio { numer: -189, denom: 512 }, Ratio { numer: -23, denom: 1024 }, Ratio { numer: -315, denom: 1024 }, Ratio { numer: 5, denom: 512 }], [Ratio { numer: 11, denom: 64 }, Ratio { numer: 197, denom: 1024 }, Ratio { numer: 69, denom: 512 }, Ratio { numer: 307, denom: 1024 }, Ratio { numer: -55, denom: 512 }, Ratio { numer: 15, denom: 256 }]]], states: [[[Ratio { numer: -169, denom: 256 }, Ratio { numer: 489, denom: 1024 }, Ratio { numer: -439, denom: 1024 }, Ratio { numer: 537, denom: 1024 }], [Ratio { numer: -29, denom: 1024 }, Ratio { numer: 11, denom: 256 }, Ratio { numer: 15, denom: 128 }, Ratio { numer: -1, denom: 128 }]], [[Ratio { numer: -249, denom: 1024 }, Ratio { numer: 227, denom: 1024 }, Ratio { numer: -193, denom: 1024 }, Ratio { numer: 153, denom: 1024 }], [Ratio { numer: -29, denom: 1024 }, Ratio { numer: 61, denom: 1024 }, Ratio { numer: -5, denom: 512 }, Ratio { numer: 57, denom: 1024 }]]], resonators: [None, None, None], resonator_phases: [None, None, None] }, ticks: 12, conductances: [Ratio { numer: 1, denom: 2 }, Ratio { numer: 1, denom: 8 }], momenta: [[Ratio { numer: -29, denom: 1024 }, Ratio { numer: 11, denom: 256 }, Ratio { numer: 15, denom: 128 }, Ratio { numer: -1, denom: 128 }], [Ratio { numer: -29, denom: 1024 }, Ratio { numer: 61, denom: 1024 }, Ratio { numer: -5, denom: 512 }, Ratio { numer: 57, denom: 1024 }]], resonator_momenta: [None, None, None] })",
+      "future_after": "Some(ReceptionCarry { change: EndChange { storage: [[Ratio { numer: -89, denom: 256 }, Ratio { numer: 51, denom: 128 }, Ratio { numer: -209, denom: 1024 }, Ratio { numer: 65, denom: 128 }, Ratio { numer: -253, denom: 1024 }, Ratio { numer: 49, denom: 1024 }, Ratio { numer: -5, denom: 16 }, Ratio { numer: 479, denom: 1024 }, Ratio { numer: -499, denom: 1024 }, Ratio { numer: 187, denom: 1024 }], [Ratio { numer: -3, denom: 512 }, Ratio { numer: 7, denom: 64 }, Ratio { numer: -75, denom: 1024 }, Ratio { numer: 81, denom: 512 }], [Ratio { numer: 15, denom: 512 }, Ratio { numer: 27, denom: 256 }, Ratio { numer: -23, denom: 1024 }, Ratio { numer: -5, denom: 512 }, Ratio { numer: -5, denom: 512 }, Ratio { numer: 77, denom: 512 }]], arrivals: [[[Ratio { numer: 77, denom: 256 }, Ratio { numer: -9, denom: 1024 }, Ratio { numer: 155, denom: 1024 }, Ratio { numer: -237, denom: 1024 }, Ratio { numer: 137, denom: 512 }, Ratio { numer: -849, denom: 1024 }, Ratio { numer: 427, denom: 1024 }, Ratio { numer: -51, denom: 256 }, Ratio { numer: 165, denom: 1024 }, Ratio { numer: -631, denom: 1024 }], [Ratio { numer: 271, denom: 512 }, Ratio { numer: -191, denom: 512 }, Ratio { numer: 347, denom: 1024 }, Ratio { numer: -61, denom: 1024 }]], [[Ratio { numer: -363, denom: 512 }, Ratio { numer: 7, denom: 512 }, Ratio { numer: -83, denom: 128 }, Ratio { numer: 51, denom: 512 }], [Ratio { numer: 279, denom: 1024 }, Ratio { numer: 221, denom: 512 }, Ratio { numer: 199, denom: 1024 }, Ratio { numer: 239, denom: 512 }, Ratio { numer: -29, denom: 128 }, Ratio { numer: 55, denom: 512 }]]], states: [[[Ratio { numer: -1329, denom: 1024 }, Ratio { numer: 1053, denom: 1024 }, Ratio { numer: -1083, denom: 1024 }, Ratio { numer: 521, denom: 512 }], [Ratio { numer: 19, denom: 1024 }, Ratio { numer: -7, denom: 256 }, Ratio { numer: 277, denom: 1024 }, Ratio { numer: 3, denom: 1024 }]], [[Ratio { numer: -499, denom: 1024 }, Ratio { numer: 451, denom: 1024 }, Ratio { numer: -7, denom: 16 }, Ratio { numer: 327, denom: 1024 }], [Ratio { numer: -77, denom: 1024 }, Ratio { numer: 131, denom: 1024 }, Ratio { numer: -33, denom: 1024 }, Ratio { numer: 113, denom: 1024 }]]], resonators: [None, None, None], resonator_phases: [None, None, None] }, ticks: 12, conductances: [Ratio { numer: 1, denom: 2 }, Ratio { numer: 1, denom: 8 }], momenta: [[Ratio { numer: 19, denom: 1024 }, Ratio { numer: -7, denom: 256 }, Ratio { numer: 277, denom: 1024 }, Ratio { numer: 3, denom: 1024 }], [Ratio { numer: -77, denom: 1024 }, Ratio { numer: 131, denom: 1024 }, Ratio { numer: -33, denom: 1024 }, Ratio { numer: 113, denom: 1024 }]], resonator_momenta: [None, None, None] })",
+      "actual_future_changed": true,
+      "same_actual_future_crib": true,
+      "cold_matches_warm": true
+    },
+    {
+      "kind": "synthetic ambiguous compatibility and actual-return CODE trace",
+      "actual_input_classes": [
+        0,
+        2,
+        3
+      ],
+      "Gamma_before_Hold": "[JointMember { hypothesis: 0, antecedent: 0, consequence: 1 }, JointMember { hypothesis: 0, antecedent: 3, consequence: 2 }]",
+      "hypothetical_relational_future_before_actual_return": "[(JointMember { hypothesis: 0, antecedent: 0, consequence: 1 }, 0), (JointMember { hypothesis: 0, antecedent: 3, consequence: 2 }, 3)]",
+      "observed_return_position": 2,
+      "observed_return_class": 3,
+      "Gamma_after_actual_return": "[JointMember { hypothesis: 0, antecedent: 3, consequence: 2 }]",
+      "source_update": "Published(ReciprocalReceipt { packet: OrientedPacket { source_ring: 0, receiver_ring: 2, positions: [0, 1], lifts: [[1, 0, 0], [2, 0, 0]], turns: 1, classes: (3, 2) }, origin: Entailed { family: \"03526d03011aa3ee2c65fb2f9cf5f0f118f955165e6e585fec7591cb1caec972\", menu: \"sigma\", channel: \"at-most-one-changed\", source: \"synthetic\" }, compatible_branches: 1, slip_before: Ratio { numer: 5, denom: 1 }, slip_after: Ratio { numer: 0, denom: 1 }, source_step: SourceStep { step: Ratio { numer: 2, denom: 1 }, alignment: Ratio { numer: 5, denom: 2 }, unit: Ratio { numer: 5, denom: 2 }, stepped: 22, released: [], chart: ChartReading { exponent: 38, target: Ratio { numer: 1, denom: 8589934592 }, warm: Some(Ratio { numer: 0, denom: 1 }), certificate: Ratio { numer: 0, denom: 1 }, refinements: 0, cold: false, released: Ratio { numer: 0, denom: 1 }, read: Ratio { numer: 0, denom: 1 }, residual_bits: 0, prior: None, radial: None, receiving_block: None }, storage_growth: Ratio { numer: 0, denom: 1 }, largest: Ratio { numer: 1, denom: 1 }, bits: 2213 }, paired_batches: 1, normal_preparations: 2, validation_word_openings: 1 })",
+      "actual_lift_before": "[2, 0, 0]",
+      "actual_lift_after": "[3, 0, 0]",
+      "native_state_advanced": true,
+      "branch_specific_native_material_evolution": "not implemented; no branch was chosen during Hold"
+    }
+  ]
+}

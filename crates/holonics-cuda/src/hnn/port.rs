@@ -455,6 +455,7 @@ pub struct Mounted<'c> {
     aeon: AeonState,
     ledger: EnclosedLedger,
     arrived: Option<Arrived<'c>>,
+    source_return_frontier: BTreeMap<usize, usize>,
     released_bits: u64,
     stop: Option<BudgetStop>,
     tally: ChartTally,
@@ -531,6 +532,7 @@ impl<'c> Mounted<'c> {
             balance: self.ledger.balance().clone(),
             charts: self.store.continuing_charts()?,
             address: self.address.clone(),
+            source_return_frontier: self.source_return_frontier.clone(),
             arrived: self.arrived.as_ref().map(|a| ResidentArrived {
                 ratio: a.ratio.clone(),
                 targets: a.targets.clone(),
@@ -1151,6 +1153,7 @@ impl<'c> Resident<'c> {
             constitution,
             Some(passage.admitted),
         )?;
+        resident.source_return_frontier = passage.source_return_frontier;
         resident.store = ChartStore::continued(self.card, field, &passage.charts)?;
         if let Some((id, host)) = passage.moment {
             let card = ResidentMoment::restored(self.card, field, &passage.current, &host)
@@ -1279,6 +1282,7 @@ impl<'c> Resident<'c> {
             },
             ledger: EnclosedLedger::new(),
             arrived: None,
+            source_return_frontier: BTreeMap::new(),
             released_bits: 0,
             stop: None,
             tally: ChartTally::new(field),

@@ -39,6 +39,41 @@ fn refuse(what: &'static str) -> HnnError {
 }
 
 impl ObservedStream {
+    /// Additive reciprocal return on the published opening. The current unfinished input
+    /// fragment stays exterior and is neither replayed nor flushed. Every validation is staged.
+    #[allow(clippy::too_many_arguments)]
+    pub fn return_source_relation(
+        &mut self,
+        reference: &Reference,
+        pairing: &PairingDeclaration,
+        prior: &crate::ratio::linear::ExactRatMatrix,
+        ring: usize,
+        family: &crate::hnn::reference::reciprocal::JointFamily,
+        origin: crate::hnn::reference::reciprocal::ReturnOrigin,
+    ) -> Result<crate::hnn::reference::reciprocal::ReciprocalOutcome, HnnError> {
+        let mut next = self.clone();
+        let frontier = self.pending_frontier(pairing)?;
+        let accepted = self.accepted_cells()?;
+        let cut = reference.bind_source_return(
+            &next.resident,
+            &next.crib,
+            pairing,
+            prior,
+            ring,
+            family,
+            origin,
+        )?;
+        let result = cut.publish(reference, &mut next.resident, &next.crib)?;
+        next.bound = Self::finite_bound(&next.resident)?;
+        let next = Self::restore(next.resident, next.crib, next.scope, next.pending)?;
+        if next.accepted_cells()? != accepted || next.pending_frontier(pairing)? != frontier {
+            return Err(refuse(
+                "a reciprocal source successor preserves the accepted/pending frontier",
+            ));
+        }
+        *self = next;
+        Ok(result)
+    }
     pub fn new(
         resident: Resident,
         crib: ObservedCrib,
@@ -319,6 +354,26 @@ impl ObservedStream {
         reference: &Reference,
         pairing: &PairingDeclaration,
     ) -> Result<(Resident, ObservedCrib), HnnError> {
+        self.query_fork_selected(reference, pairing, None)
+    }
+
+    /// Same immutable physical prefix, explicitly dispatched through an admitted executor.
+    /// No deposition/scoring or host fallback. The existing host entry retains its old path.
+    pub fn query_fork_with_execution(
+        &self,
+        reference: &Reference,
+        pairing: &PairingDeclaration,
+        execution: &dyn ObservedEpochExecution,
+    ) -> Result<(Resident, ObservedCrib), HnnError> {
+        self.query_fork_selected(reference, pairing, Some(execution))
+    }
+
+    fn query_fork_selected(
+        &self,
+        reference: &Reference,
+        pairing: &PairingDeclaration,
+        execution: Option<&dyn ObservedEpochExecution>,
+    ) -> Result<(Resident, ObservedCrib), HnnError> {
         let frontier = self.pending_frontier(pairing)?;
         if self.pending.is_empty() {
             return Ok((self.resident.clone(), self.crib.clone()));
@@ -332,13 +387,23 @@ impl ObservedStream {
             .keys()
             .next()
             .ok_or_else(|| refuse("the query fork's one continuing moment"))?;
-        let mut forward = reference.read_epoch_at_cuts(
-            &self.resident,
-            &moment,
-            &self.resident.admitted[0],
-            &encoded,
-            &[self.pending.len()],
-        )?;
+        let mut forward = match execution {
+            None => reference.read_epoch_at_cuts(
+                &self.resident,
+                &moment,
+                &self.resident.admitted[0],
+                &encoded,
+                &[self.pending.len()],
+            )?,
+            Some(execution) => reference.read_epoch_at_cuts_with_execution(
+                &self.resident,
+                &moment,
+                &self.resident.admitted[0],
+                &encoded,
+                &[self.pending.len()],
+                execution,
+            )?,
+        };
         if forward.consumed != self.pending.len() || forward.carry_out {
             return Err(refuse("the query fork's unfinished native prefix"));
         }

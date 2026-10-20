@@ -110,3 +110,15 @@ fn shared_complete_language_training_host_card_and_cold_parity() {
 fn original_varied_complete_language_host_card_and_cold_parity() {
     exercise_fixture("original-varied", &[0x1b, 0xe4, 0x1b, 0xe4, 0x00]);
 }
+
+#[test]
+#[ignore = "exclusive supported HOST CUDA guard; reciprocal CODE continuity only"]
+fn reciprocal_host_card_continuity() {
+    let host = exterior::code_reciprocal_continuity(&HostObservedEpochExecution).unwrap();
+    let card = dispatch::TracedCard::new(ObservedEpochDevice::open(0).unwrap());
+    let device = exterior::code_reciprocal_continuity(&card).unwrap();
+    assert_eq!(host, device);
+    let receipt = card.receipt(true);
+    assert!(!receipt.contains("\"successful_card_forwards\":0"));
+    eprintln!("V93_RECIPROCAL_HOST_CARD_PARITY {}", receipt.trim());
+}
