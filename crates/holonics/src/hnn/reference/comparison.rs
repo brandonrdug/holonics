@@ -67,6 +67,14 @@ pub struct ComparisonReading {
     pub unchanged: bool,
     pub strictly_improved: bool,
     pub objective_change: ExactInterval,
+    /// Exterior epoch diagnostic at this same reading demand: the native population class-code
+    /// difference before adding phase excess. None on the legacy frozen-word comparison path.
+    /// This receipt does not alter the objective or any candidate admission decision.
+    pub epoch_class_code_change: Option<ExactInterval>,
+    /// Exterior epoch diagnostic paired with epoch_class_code_change: after minus before phase
+    /// excess, in the existing ratio owner's exact units. Both are Some on an epoch comparison,
+    /// with objective_change = epoch_class_code_change + point(epoch_phase_excess_change).
+    pub epoch_phase_excess_change: Option<Rat>,
     pub reading_bits: u32,
     pub refinement_rounds: u32,
     pub retained_interval_members: usize,
@@ -323,6 +331,8 @@ impl FrozenComparison {
             )?,
             before: self.before.clone(),
             after,
+            epoch_class_code_change: None,
+            epoch_phase_excess_change: None,
             reading_bits: crate::ratio::exponentiated::READING_BITS,
             refinement_rounds: 0,
             retained_interval_members: self
@@ -460,10 +470,14 @@ mod tests {
             unchanged: false,
             strictly_improved: false,
             objective_change: ExactInterval::new(integer(-1), integer(3)).unwrap(),
+            epoch_class_code_change: None,
+            epoch_phase_excess_change: None,
             reading_bits: 96,
             refinement_rounds: 0,
             retained_interval_members: 0,
         };
+        assert_eq!(reading.epoch_class_code_change, None);
+        assert_eq!(reading.epoch_phase_excess_change, None);
         assert!(reading.needs_precision());
         assert_eq!(
             reading.unresolved_reason(),

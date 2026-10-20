@@ -387,3 +387,131 @@ fn malformed_tree_target_is_a_fatal_typed_refusal_without_population_change() {
     // this CellOutside cannot enter receiving/joint candidate-domain fallback.
     assert!(!matches!(error, HnnError::Unadmitted { .. }));
 }
+
+// Exact public-source v27 frozen-R receipt: v23 cell 0, target class 0.
+// This fixture documents an existing law, not a proposed rounding correction.
+// See the private audit's pinned control.log SHA and selected receipt JSON.
+fn v27_first_frozen_receipt() -> (LandmarkFace, Vec<Rat>) {
+    let q = |n: &str, d: &str| Rat::new(n.parse().unwrap(), d.parse().unwrap());
+    let tree = tree(vec![
+        q("79528309465489328205", "1180591620717411303424"),
+        q("1098187783814926579635", "1180591620717411303424"),
+        q("3483812087109724143", "4722366482869645213696"),
+        q("8018297660871858193", "4722366482869645213696"),
+    ]);
+    let wave = vec![
+        rat(-111, 65536),
+        rat(113, 65536),
+        rat(1, 2048),
+        rat(5, 4096),
+        rat(9, 16384),
+        rat(259, 65536),
+        rat(11, 32768),
+        rat(5, 4096),
+    ];
+    (tree, wave)
+}
+
+#[test]
+fn actual_v27_tiny_negative_wave_borrows_a_full_grain_and_positive_wave_stays_in_cell() {
+    let (tree, wave) = v27_first_frozen_receipt();
+    assert_eq!(tree.probabilities.iter().sum::<Rat>(), rat(1, 1));
+    let before = ReceivingRead::combined(vec![rat(0, 1); 8], &tree, GRAIN).unwrap();
+    let after = ReceivingRead::combined(wave.clone(), &tree, GRAIN).unwrap();
+    assert_eq!(before.cells[0].carry, BigInt::from(-4));
+    assert_eq!(before.cells[0].phase, 0);
+    assert_eq!(after.cells[0].carry, BigInt::from(-5));
+    assert_eq!(after.cells[0].phase, 3);
+    assert_eq!(
+        after.cells[0].representative(GRAIN),
+        before.cells[0].representative(GRAIN) - rat(1, 4)
+    );
+    for class in 1..4 {
+        assert!(wave[2 * class] > rat(0, 1) && wave[2 * class] < rat(1, 4));
+        assert_eq!(after.cells[class].carry, before.cells[class].carry);
+        assert_eq!(after.cells[class].phase, before.cells[class].phase);
+    }
+    // An arbitrarily smaller same-sign wave still has the same magnitude face here.
+    let tiny = ReceivingRead::combined(
+        wave.iter().map(|x| x / rat(1024, 1)).collect(),
+        &tree,
+        GRAIN,
+    )
+    .unwrap();
+    for (native, tiny) in after.cells.iter().zip(&tiny.cells) {
+        assert_eq!(native.carry, tiny.carry);
+        assert_eq!(native.phase, tiny.phase);
+    }
+    let mut positive_wave = wave;
+    positive_wave[0] = -positive_wave[0].clone();
+    let positive = ReceivingRead::combined(positive_wave, &tree, GRAIN).unwrap();
+    for (old, new) in before.cells.iter().zip(&positive.cells) {
+        assert_eq!(old.carry, new.carry);
+        assert_eq!(old.phase, new.phase);
+    }
+    let before = Face::of_read(&before, GRAIN).unwrap();
+    let after = Face::of_read(&after, GRAIN).unwrap();
+    let tiny = Face::of_read(&tiny, GRAIN).unwrap();
+    let positive = Face::of_read(&positive, GRAIN).unwrap();
+    for bits in cells::demand_ladder() {
+        let old_mass = face_enclosure_at(&before, 0, bits).unwrap();
+        let new_mass = face_enclosure_at(&after, 0, bits).unwrap();
+        assert!(new_mass.upper < old_mass.lower);
+        assert_eq!(new_mass, face_enclosure_at(&tiny, 0, bits).unwrap());
+        assert_eq!(old_mass, face_enclosure_at(&positive, 0, bits).unwrap());
+    }
+}
+
+#[test]
+fn existing_native_objective_can_improve_phase_while_magnitude_class_code_worsens() {
+    let (tree, actual_wave) = v27_first_frozen_receipt();
+    // The magnitude operands are from that actual receipt. The two imaginary rows below form
+    // an explicit algebraic control, not a claim about an executed training candidate.
+    let mut before_wave = vec![rat(0, 1); 8];
+    before_wave[1] = rat(2, 1); // produced target phase=1 turn
+    let mut after_wave = actual_wave;
+    for row in (1..8).step_by(2) {
+        after_wave[row] = rat(0, 1);
+    }
+    let before_read = ReceivingRead::combined(before_wave, &tree, GRAIN).unwrap();
+    let after_read = ReceivingRead::combined(after_wave, &tree, GRAIN).unwrap();
+    let before = Faces::of_reads(&[before_read], GRAIN).unwrap();
+    let after = Faces::of_reads(&[after_read], GRAIN).unwrap();
+    let target = TargetPhases {
+        branch: 0.into(),
+        phases: vec![rat(0, 1)],
+    };
+    let before_phase = HolonRatio::compare(before.clone(), &[0], &target)
+        .unwrap()
+        .excess();
+    let after_phase = HolonRatio::compare(after.clone(), &[0], &target)
+        .unwrap()
+        .excess();
+    assert_eq!(before_phase, rat(1, 2));
+    assert_eq!(after_phase, rat(0, 1));
+    for bits in cells::demand_ladder() {
+        let scored = compare_scores_at(
+            &receiving_population(),
+            2,
+            &before,
+            std::slice::from_ref(&tree),
+            &after,
+            std::slice::from_ref(&tree),
+            &[0],
+            bits,
+        )
+        .unwrap();
+        assert!(
+            scored.change.lower > rat(0, 1),
+            "magnitude class code is strictly worse"
+        );
+        assert!(scored.change.upper < rat(1, 4));
+        let delta = &after_phase - &before_phase;
+        let objective =
+            ExactInterval::new(scored.change.lower + &delta, scored.change.upper + &delta).unwrap();
+        assert!(
+            objective.upper < rat(0, 1),
+            "class-code-plus-phase objective is strictly better"
+        );
+    }
+}

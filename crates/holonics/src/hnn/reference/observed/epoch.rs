@@ -307,6 +307,9 @@ impl EpochComparison {
                 population, receiver, &self.combined, &self.trees,
                 combined, trees, &self.targets, bits,
             )?;
+            // Preserve the native components as exterior evidence at this same demand.
+            // The existing total and every admission predicate below remain unchanged.
+            let class_code_change = scored.change.clone();
             let objective_change = ExactInterval::new(
                 scored.change.lower + &phase_delta,
                 scored.change.upper + &phase_delta,
@@ -323,6 +326,8 @@ impl EpochComparison {
                 unchanged,
                 strictly_improved: objective_change.upper < Rat::zero(),
                 objective_change,
+                epoch_class_code_change: Some(class_code_change),
+                epoch_phase_excess_change: Some(phase_delta.clone()),
                 reading_bits: bits,
                 refinement_rounds: u32::try_from(round).map_err(|_| HnnError::CountOverflow)?,
                 retained_interval_members: population.retained_interval_members(),
@@ -3827,5 +3832,90 @@ mod tests {
         assert!(std::ptr::eq(view, after_law.map()));
         assert_eq!(*after_law, before_law);
         assert_eq!(resident.constitution.receiving_map(receiver), Some(view));
+    }
+
+    #[test]
+    fn epoch_objective_split_keeps_the_exact_components_and_original_decision() {
+        let grain = 4;
+        let tree = LandmarkFace {
+            grain,
+            probabilities: vec![rat(1, 4); 4],
+            exponents: vec![BigInt::from(-8); 4],
+        };
+        let face = |logits| {
+            Faces::of_reads(
+                &[crate::hnn::receiving::ReceivingRead::of_logits(
+                    logits, grain,
+                )],
+                grain,
+            )
+            .unwrap()
+        };
+        let mut before_logits = vec![rat(0, 1); 8];
+        before_logits[1] = rat(2, 1); // target produced phase=1; target phase=0
+        let before = face(before_logits);
+        let mut after_logits = vec![rat(0, 1); 8];
+        after_logits[0] = rat(-1, 65536);
+        for class in 1..4 {
+            after_logits[2 * class] = rat(1, 65536);
+        }
+        let after = face(after_logits);
+        let comparison = EpochComparison {
+            combined: before.clone(),
+            trees: vec![tree.clone()],
+            targets: vec![0],
+            target_phases: vec![crate::hnn::ratio::TargetPhases {
+                branch: BigInt::zero(),
+                phases: vec![rat(0, 1)],
+            }],
+        };
+        let population = crate::hnn::receiving::receiving_population();
+        let held_population = population.clone();
+        let reading = comparison
+            .evaluate(&population, 2, &after, std::slice::from_ref(&tree))
+            .unwrap();
+        let class = reading.epoch_class_code_change.as_ref().unwrap();
+        let phase = reading.epoch_phase_excess_change.as_ref().unwrap();
+        assert!(
+            class.lower > Rat::zero(),
+            "possible class-code harm, not historical attribution"
+        );
+        assert_eq!(phase, &rat(-1, 2));
+        assert_eq!(
+            reading.objective_change,
+            ExactInterval::new(&class.lower + phase, &class.upper + phase).unwrap()
+        );
+        let original_scores = crate::hnn::receiving::compare_scores_at(
+            &population,
+            2,
+            &before,
+            std::slice::from_ref(&tree),
+            &after,
+            std::slice::from_ref(&tree),
+            &[0],
+            reading.reading_bits,
+        )
+        .unwrap();
+        assert_eq!(class, &original_scores.change);
+        assert_eq!(
+            reading.reading_bits,
+            crate::hnn::receiving::cells::demand_ladder()[0]
+        );
+        assert_eq!(reading.refinement_rounds, 0);
+        assert!(!reading.unchanged);
+        assert!(reading.strictly_improved);
+        assert!(!reading.needs_precision());
+        assert_eq!(population, held_population);
+        let same = comparison
+            .evaluate(&population, 2, &before, std::slice::from_ref(&tree))
+            .unwrap();
+        assert_eq!(
+            same.epoch_class_code_change,
+            Some(ExactInterval::point(Rat::zero()))
+        );
+        assert_eq!(same.epoch_phase_excess_change, Some(Rat::zero()));
+        assert_eq!(same.objective_change, ExactInterval::point(Rat::zero()));
+        assert!(same.unchanged);
+        assert!(!same.strictly_improved);
     }
 }
