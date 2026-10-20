@@ -311,6 +311,7 @@ mod tests {
     fn optional_refusal_requires_exact_typed_actual_ray_evidence() {
         let error = refused("a moving actual epoch ray must descend its contemporary comparison");
         let mut failure = EpochStageFailure {
+            channel_grain: None,
             error,
             evidence: EpochStageRefusal::at(
                 "actual_ray",

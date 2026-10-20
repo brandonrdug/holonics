@@ -193,6 +193,7 @@ pub(crate) struct EpochStageFailure {
     pub(crate) evidence: EpochStageRefusal,
     /// Transient same-batch preparation exists; not a retained or transferable certificate.
     pub(crate) normal_inputs_prepared: bool,
+    pub(crate) channel_grain: Option<EpochChannelGrainReading>,
 }
 
 struct EpochStageTrace {
@@ -200,6 +201,7 @@ struct EpochStageTrace {
     locus: Option<Locus>,
     family: Option<Family>,
     evidence: Option<EpochStageRefusal>,
+    channel_grain: Option<EpochChannelGrainReading>,
 }
 impl Default for EpochStageTrace {
     fn default() -> Self {
@@ -208,6 +210,7 @@ impl Default for EpochStageTrace {
             locus: None,
             family: None,
             evidence: None,
+            channel_grain: None,
         }
     }
 }
@@ -278,6 +281,7 @@ impl EpochStageTrace {
             error,
             evidence,
             normal_inputs_prepared: false,
+            channel_grain: self.channel_grain,
         }
     }
 }

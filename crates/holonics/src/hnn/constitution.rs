@@ -3074,10 +3074,21 @@ pub struct EpochChannelGrainDeferralReading {
     pub reason: &'static str,
 }
 
+/// A discarded optional grain candidate, followed by the ordinary same-opening ladder.
+/// These operands are exterior evidence only; no refusal or schedule history is retained.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochChannelGrainRestageReading {
+    pub grain: EpochChannelGrainReading,
+    pub refused_attempt: epoch::EpochStageAttempt,
+    pub stage_refusal: Option<epoch::EpochStageRefusal>,
+    pub probe_refusal: Option<String>,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochDepositReading {
     pub channel_grain: Option<EpochChannelGrainReading>,
     pub channel_grain_deferred: Option<EpochChannelGrainDeferralReading>,
+    pub channel_grain_restaged: Option<EpochChannelGrainRestageReading>,
     pub quantum_projection: Option<EpochQuantumProjectionReading>,
     pub actual_receiving_ingress: u64,
     pub heard_cells: u64,

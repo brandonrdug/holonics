@@ -1287,6 +1287,7 @@ fn run() -> Result<()> {
                         ("material_commit", epoch.deposit.commit.to_string()),
                         ("actual_receiving_ingress", epoch.deposit.epoch.as_ref().map_or_else(|| "null".into(), |read| read.actual_receiving_ingress.to_string())),
                         ("channel_grain_exact", epoch.deposit.epoch.as_ref().and_then(|read| read.channel_grain.as_ref()).map_or_else(|| "null".into(), exact)),
+                        ("channel_grain_restage_exact", epoch.deposit.epoch.as_ref().and_then(|read| read.channel_grain_restaged.as_ref()).map_or_else(|| "null".into(), exact)),
                         ("receiving_quantum_projection", epoch.deposit.epoch.as_ref()
                             .and_then(|read| read.quantum_projection.as_ref())
                             .map_or_else(|| "null".into(), |read| object(&[

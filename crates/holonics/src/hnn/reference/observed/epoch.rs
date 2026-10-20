@@ -212,6 +212,22 @@ fn joint_restage_permitted(failure: &crate::hnn::constitution::epoch::EpochStage
             && failure.evidence.condition == EpochStageCondition::JointNormalFall)
 }
 
+fn grain_failure_restage_permitted(
+    attempt: EpochStageAttempt,
+    failure: &crate::hnn::constitution::epoch::EpochStageFailure,
+) -> bool {
+    // A normal map's own Whole alignment is independent of the optional channel endpoint.
+    // Its existing descent to Joint must not acquire a redundant Whole replay.
+    !(attempt == EpochStageAttempt::Whole
+        && failure.evidence.condition == EpochStageCondition::ActualRayAlignment
+        && failure.evidence.family == Some(crate::hnn::constitution::Family::Map))
+        && match attempt {
+            EpochStageAttempt::Whole => receiving_restage_permitted(&failure.error),
+            EpochStageAttempt::Joint => joint_restage_permitted(failure),
+            EpochStageAttempt::ReceivingOnly => false,
+        }
+}
+
 /// The certificate reads the actual normalized face. The retained RHS has a separately
 /// partitioned foil, so its even-row sum alone cannot reconstruct those masses.
 fn with_receiving_masses(
@@ -1089,8 +1105,9 @@ impl Reference {
             None
         };
         let mut stage =
-            |scope, observe: &mut dyn FnMut(crate::hnn::constitution::epoch::EpochDepositPhase)| {
+            |scope, without_grain, observe: &mut dyn FnMut(crate::hnn::constitution::epoch::EpochDepositPhase)| {
                 if let Some(stage) = normal_stage.as_mut() {
+                    if without_grain { stage.without_channel_grain(scope)?; }
                     stage.stage(scope, observe)
                 } else {
                     comparison_opening
@@ -1246,100 +1263,43 @@ impl Reference {
         let mut joint_stage = None;
         let mut joint_probe = None;
         let mut receiving_only_stage = None;
-        let whole_stage_start = Instant::now();
-        let whole_candidate = stage(EpochCandidateScope::Whole, &mut observe_deposit);
-        let whole_stage = Some(whole_stage_start.elapsed());
-        let whole = match whole_candidate {
-            Ok(candidate) if !candidate.requires_comparison() => {
-                probe_state = ObservedEpochProbeState::SealedNoProbeRequired;
-                let outcome = if candidate.has_physical_motion() {
-                    ObservedEpochOutcome::Whole
-                } else {
-                    ObservedEpochOutcome::Neutral
-                };
-                Some((candidate.admit_receiving()?, outcome))
-            }
-            Ok(candidate) => {
-                probe_state = ObservedEpochProbeState::ProbeFailed;
-                // A source port is learner material. Re-admit that port under
-                // the SAME exterior class codec, pairing and placement; an old
-                // PairedObservation is correctly refused after E changes.
-                let probe_start = Instant::now();
-                let probe = probe_candidate(EpochStageAttempt::Whole, &candidate);
-                whole_probe = Some(probe_start.elapsed());
-                match probe {
-                    Ok(reading) => {
-                        probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
-                        let neutral = reading.unchanged || reading.objective_equal();
-                        let admitted = if neutral {
-                            Some(candidate.admit_neutral())
-                        } else {
-                            candidate.admit_change(&reading.objective_change)
-                        };
-                        if admitted.is_none() {
-                            whole_refusal = Some(reading.unresolved_reason().to_string());
-                        }
-                        comparison = Some(reading);
-                        admitted.map(|publication| {
-                            (
-                                publication,
-                                if neutral {
-                                    ObservedEpochOutcome::Neutral
-                                } else {
-                                    ObservedEpochOutcome::Whole
-                                },
-                            )
-                        })
-                    }
-                    Err(error) => {
-                        // Unknown executor/identity/arithmetic failures do not select another
-                        // NormalMaps proposal. Known native mathematical domain refusals may.
-                        if shared_normals && !receiving_restage_permitted(&error) {
-                            return Err(error);
-                        }
-                        joint_eligible = shared_normals && receiving_restage_permitted(&error);
-                        whole_refusal = Some(error.to_string());
-                        None
-                    }
-                }
-            }
-            Err(failure) => {
-                stage_refused(EpochStageAttempt::Whole, &failure.evidence);
-                // Shared zero-move absorption cannot fabricate a missing fresh gain. Keep the
-                // original native error if preparation failed before it produced those gains.
-                if shared_normals && !failure.normal_inputs_prepared {
-                    return Err(failure.error);
-                }
-                if !receiving_restage_permitted(&failure.error) {
-                    return Err(failure.error);
-                }
-                whole_refusal = Some(failure.error.to_string());
-                whole_stage_refusal = Some(failure.evidence);
-                None
-            }
-        };
-        let mut joint_admitted = None;
-        if whole.is_none() && joint_eligible {
-            joint_attempted = true;
-            let stage_start = Instant::now();
-            let candidate = stage(EpochCandidateScope::Joint, &mut observe_deposit);
-            joint_stage = Some(stage_start.elapsed());
-            match candidate {
+        let mut grain_restage = None;
+        let mut whole_stage_elapsed = std::time::Duration::ZERO;
+        let mut retry_without_grain = false;
+        let whole = loop {
+            let whole_stage_start = Instant::now();
+            let whole_candidate = stage(EpochCandidateScope::Whole, retry_without_grain, &mut observe_deposit);
+            whole_stage_elapsed += whole_stage_start.elapsed();
+            let grain = match &whole_candidate {
+                Ok(candidate) => candidate.channel_grain_rebase(),
+                Err(failure) => failure.channel_grain.clone().filter(|grain|
+                    grain.contacts.iter().any(|contact| contact.levels > 0)),
+            };
+            let retry_permitted = match &whole_candidate {
+                Ok(_) => true,
+                Err(failure) => grain_failure_restage_permitted(EpochStageAttempt::Whole, failure),
+            };
+            let admitted = match whole_candidate {
                 Ok(candidate) if !candidate.requires_comparison() => {
-                    // Zero/projected-zero upstream motion uses the established held-map
-                    // receiving successor below. No finite probe is fabricated for it.
-                    joint_directions = candidate.joint_directions();
-                    joint_probe_state = ObservedEpochProbeState::SealedNoProbeRequired;
+                    probe_state = ObservedEpochProbeState::SealedNoProbeRequired;
+                    let outcome = if candidate.has_physical_motion() {
+                        ObservedEpochOutcome::Whole
+                    } else {
+                        ObservedEpochOutcome::Neutral
+                    };
+                    Some((candidate.admit_receiving()?, outcome))
                 }
                 Ok(candidate) => {
-                    joint_directions = candidate.joint_directions();
-                    joint_probe_state = ObservedEpochProbeState::ProbeFailed;
+                    probe_state = ObservedEpochProbeState::ProbeFailed;
+                    // A source port is learner material. Re-admit that port under
+                    // the SAME exterior class codec, pairing and placement; an old
+                    // PairedObservation is correctly refused after E changes.
                     let probe_start = Instant::now();
-                    let probe = probe_candidate(EpochStageAttempt::Joint, &candidate);
-                    joint_probe = Some(probe_start.elapsed());
+                    let probe = probe_candidate(EpochStageAttempt::Whole, &candidate);
+                    whole_probe = Some(probe_start.elapsed());
                     match probe {
                         Ok(reading) => {
-                            joint_probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
+                            probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
                             let neutral = reading.unchanged || reading.objective_equal();
                             let admitted = if neutral {
                                 Some(candidate.admit_neutral())
@@ -1347,48 +1307,164 @@ impl Reference {
                                 candidate.admit_change(&reading.objective_change)
                             };
                             if admitted.is_none() {
-                                joint_refusal = Some(reading.unresolved_reason().to_string());
+                                whole_refusal = Some(reading.unresolved_reason().to_string());
                             }
-                            joint_comparison = Some(reading);
-                            joint_admitted = admitted.map(|publication| {
+                            comparison = Some(reading);
+                            admitted.map(|publication| {
                                 (
                                     publication,
                                     if neutral {
                                         ObservedEpochOutcome::Neutral
                                     } else {
-                                        ObservedEpochOutcome::Joint
+                                        ObservedEpochOutcome::Whole
                                     },
                                 )
-                            });
+                            })
                         }
                         Err(error) => {
-                            if !receiving_restage_permitted(&error) {
+                            // Unknown executor/identity/arithmetic failures do not select another
+                            // NormalMaps proposal. Known native mathematical domain refusals may.
+                            if shared_normals && !receiving_restage_permitted(&error) {
                                 return Err(error);
                             }
-                            joint_refusal = Some(error.to_string());
+                            joint_eligible = shared_normals && receiving_restage_permitted(&error);
+                            whole_refusal = Some(error.to_string());
+                            None
                         }
                     }
                 }
                 Err(failure) => {
-                    stage_refused(EpochStageAttempt::Joint, &failure.evidence);
-                    if !joint_restage_permitted(&failure) {
+                    stage_refused(EpochStageAttempt::Whole, &failure.evidence);
+                    // Shared zero-move absorption cannot fabricate a missing fresh gain. Keep the
+                    // original native error if preparation failed before it produced those gains.
+                    if shared_normals && !failure.normal_inputs_prepared {
                         return Err(failure.error);
                     }
-                    joint_directions = failure
-                        .evidence
-                        .readings
-                        .iter()
-                        .filter_map(|reading| {
-                            if let EpochStageValue::JointDirection(direction) = &reading.value {
-                                Some(direction.clone())
-                            } else {
-                                None
-                            }
-                        })
-                        .collect();
-                    joint_refusal = Some(failure.error.to_string());
-                    joint_stage_refusal = Some(failure.evidence);
+                    if !receiving_restage_permitted(&failure.error) {
+                        return Err(failure.error);
+                    }
+                    whole_refusal = Some(failure.error.to_string());
+                    whole_stage_refusal = Some(failure.evidence);
+                    None
                 }
+            };
+            if admitted.is_none() && retry_permitted && grain_restage.is_none() {
+                if let Some(grain) = grain {
+                    grain_restage = Some(crate::hnn::constitution::EpochChannelGrainRestageReading {
+                        grain, refused_attempt: EpochStageAttempt::Whole,
+                        stage_refusal: whole_stage_refusal.take(),
+                        probe_refusal: whole_refusal.take(),
+                    });
+                    retry_without_grain = true;
+                    probe_state = ObservedEpochProbeState::SealNotFormed;
+                    comparison = None;
+                    whole_probe = None;
+                    continue;
+                }
+            }
+            break admitted;
+        };
+        let whole_stage = Some(whole_stage_elapsed);
+        let mut joint_admitted = None;
+        if whole.is_none() && joint_eligible {
+            joint_attempted = true;
+            let mut retry_without_grain = false;
+            loop {
+                let stage_start = Instant::now();
+                let candidate = stage(EpochCandidateScope::Joint, retry_without_grain, &mut observe_deposit);
+                *joint_stage.get_or_insert(std::time::Duration::ZERO) += stage_start.elapsed();
+                let grain = match &candidate {
+                    Ok(candidate) => candidate.channel_grain_rebase(),
+                    Err(failure) => failure.channel_grain.clone().filter(|grain|
+                        grain.contacts.iter().any(|contact| contact.levels > 0)),
+                };
+                let retry_permitted = match &candidate {
+                    Ok(_) => true,
+                    Err(failure) => grain_failure_restage_permitted(EpochStageAttempt::Joint, failure),
+                };
+                match candidate {
+                    Ok(candidate) if !candidate.requires_comparison() => {
+                        // Zero/projected-zero upstream motion uses the established held-map
+                        // receiving successor below. No finite probe is fabricated for it.
+                        joint_directions = candidate.joint_directions();
+                        joint_probe_state = ObservedEpochProbeState::SealedNoProbeRequired;
+                    }
+                    Ok(candidate) => {
+                        joint_directions = candidate.joint_directions();
+                        joint_probe_state = ObservedEpochProbeState::ProbeFailed;
+                        let probe_start = Instant::now();
+                        let probe = probe_candidate(EpochStageAttempt::Joint, &candidate);
+                        joint_probe = Some(probe_start.elapsed());
+                        match probe {
+                            Ok(reading) => {
+                                joint_probe_state = ObservedEpochProbeState::FiniteComparisonExecuted;
+                                let neutral = reading.unchanged || reading.objective_equal();
+                                let admitted = if neutral {
+                                    Some(candidate.admit_neutral())
+                                } else {
+                                    candidate.admit_change(&reading.objective_change)
+                                };
+                                if admitted.is_none() {
+                                    joint_refusal = Some(reading.unresolved_reason().to_string());
+                                }
+                                joint_comparison = Some(reading);
+                                joint_admitted = admitted.map(|publication| {
+                                    (
+                                        publication,
+                                        if neutral {
+                                            ObservedEpochOutcome::Neutral
+                                        } else {
+                                            ObservedEpochOutcome::Joint
+                                        },
+                                    )
+                                });
+                            }
+                            Err(error) => {
+                                if !receiving_restage_permitted(&error) {
+                                    return Err(error);
+                                }
+                                joint_refusal = Some(error.to_string());
+                            }
+                        }
+                    }
+                    Err(failure) => {
+                        stage_refused(EpochStageAttempt::Joint, &failure.evidence);
+                        if !failure.normal_inputs_prepared || !joint_restage_permitted(&failure) {
+                            return Err(failure.error);
+                        }
+                        joint_directions = failure
+                            .evidence
+                            .readings
+                            .iter()
+                            .filter_map(|reading| {
+                                if let EpochStageValue::JointDirection(direction) = &reading.value {
+                                    Some(direction.clone())
+                                } else {
+                                    None
+                                }
+                            })
+                            .collect();
+                        joint_refusal = Some(failure.error.to_string());
+                        joint_stage_refusal = Some(failure.evidence);
+                    }
+                }
+                if joint_admitted.is_none() && retry_permitted && grain_restage.is_none()
+                    && (joint_refusal.is_some() || joint_stage_refusal.is_some()) {
+                    if let Some(grain) = grain {
+                        grain_restage = Some(crate::hnn::constitution::EpochChannelGrainRestageReading {
+                            grain, refused_attempt: EpochStageAttempt::Joint,
+                            stage_refusal: joint_stage_refusal.take(),
+                            probe_refusal: joint_refusal.take(),
+                        });
+                        retry_without_grain = true;
+                        joint_probe_state = ObservedEpochProbeState::SealNotFormed;
+                        joint_comparison = None;
+                        joint_probe = None;
+                        joint_directions.clear();
+                        continue;
+                    }
+                }
+                break;
             }
             if joint_admitted.is_some() {
                 publication_attempt = EpochStageAttempt::Joint;
@@ -1399,7 +1475,7 @@ impl Reference {
             None => {
                 publication_attempt = EpochStageAttempt::ReceivingOnly;
                 let stage_start = Instant::now();
-                let candidate = stage(EpochCandidateScope::ReceivingOnly, &mut observe_deposit);
+                let candidate = stage(EpochCandidateScope::ReceivingOnly, false, &mut observe_deposit);
                 receiving_only_stage = Some(stage_start.elapsed());
                 let receiving = match candidate {
                     Ok(candidate) => candidate,
@@ -1420,6 +1496,8 @@ impl Reference {
             deposit.epoch.as_mut().ok_or_else(|| refusal("an observed epoch keeps its grain deferral reading"))?
                 .channel_grain_deferred = Some(deferred);
         }
+        deposit.epoch.as_mut().ok_or_else(|| refusal("an observed epoch keeps its grain restage reading"))?
+            .channel_grain_restaged = grain_restage;
         // Work belongs to the same LAST PRODUCING cut on both sides of the
         // admitted material change. Reading next.current here would mix the
         // final source/reference crossing into the constitutive work.
@@ -1854,6 +1932,28 @@ mod tests {
     }
 
     #[test]
+    fn grain_restage_keeps_normal_whole_refusal_and_unknown_errors_fatal() {
+        let mut failure = crate::hnn::constitution::epoch::EpochStageFailure {
+            error: HnnError::Unadmitted { reason: "a moving actual epoch ray must descend its contemporary comparison" },
+            evidence: EpochStageRefusal::at("actual_normal_face", EpochStageCondition::ActualRayAlignment,
+                "actual alignment", Some(Locus::SourcePort(0)), Some(crate::hnn::constitution::Family::Map)),
+            normal_inputs_prepared: true, channel_grain: None,
+        };
+        assert!(!grain_failure_restage_permitted(EpochStageAttempt::Whole, &failure));
+        failure.evidence.locus = Some(Locus::Channel(1));
+        failure.evidence.family = Some(crate::hnn::constitution::Family::Factor(2));
+        assert!(grain_failure_restage_permitted(EpochStageAttempt::Whole, &failure));
+        assert!(grain_failure_restage_permitted(EpochStageAttempt::Joint, &failure));
+        assert!(!grain_failure_restage_permitted(EpochStageAttempt::ReceivingOnly, &failure));
+        for error in [HnnError::CountOverflow, HnnError::MissingReach,
+            HnnError::Shape { what: "unknown executor/shape", expected: 1, found: 2 }] {
+            failure.error = error;
+            assert!(!grain_failure_restage_permitted(EpochStageAttempt::Whole, &failure));
+            assert!(!grain_failure_restage_permitted(EpochStageAttempt::Joint, &failure));
+        }
+    }
+
+    #[test]
     fn only_typed_joint_projection_refusal_reaches_zero_absorption() {
         let fatal = HnnError::EpochStepNonDescending { crossing: 0 };
         assert!(!receiving_restage_permitted(&fatal));
@@ -1868,6 +1968,7 @@ mod tests {
             error: fatal,
             evidence,
             normal_inputs_prepared: true,
+            channel_grain: None,
         };
         assert!(joint_restage_permitted(&failure));
         let mut untyped = failure;

@@ -27,6 +27,7 @@ pub(super) struct ActualChannelRayFace {
     contact: usize,
     exponent: i64,
     prepared: FactorPrepared,
+    raw_alignment: Rat,
 }
 
 impl ActualChannelRayFace {
@@ -40,6 +41,10 @@ impl ActualChannelRayFace {
 
     pub(super) fn prepared(&self) -> &FactorPrepared {
         &self.prepared
+    }
+
+    pub(super) fn raw_alignment(&self) -> &Rat {
+        &self.raw_alignment
     }
 }
 
@@ -203,12 +208,15 @@ impl ChannelFactorDisplacement {
         let mut prepared = original.clone();
         // Preserve the original post-advance h', energy and covector bound. Do
         // not fabricate a scale or call the statistic-advancing preparation.
-        prepared.alignment = floor(&reading.alignment);
+        prepared.alignment = if reading.alignment.is_negative() {
+            reading.alignment.clone()
+        } else { floor(&reading.alignment) };
         prepared.moves = reading.moves;
         Ok(ActualChannelRayFace {
             contact: self.contact,
             exponent: certified.step.exponent,
             prepared,
+            raw_alignment: reading.alignment,
         })
     }
 
@@ -241,6 +249,12 @@ impl ChannelFactorDisplacement {
             }).collect()
         }).collect())?;
         let residual = self.displacement.subtract(&rebase)?.subtract(&quotient)?;
+        let entry_pairings = ExactRatMatrix::shaped(rows, columns, (0..rows).map(|row| {
+            (0..columns).map(|column| {
+                let entry = row * columns + column;
+                &gradient.entries()[entry] * &self.displacement.entries()[entry] / eta
+            }).collect()
+        }).collect())?;
         let pair = |matrix: &ExactRatMatrix| -> Rat {
             gradient.entries().iter().zip(matrix.entries()).map(|(g, p)| g * p).sum()
         };
@@ -253,6 +267,7 @@ impl ChannelFactorDisplacement {
             ("D_fresh_applied_displacement_Q", quotient.clone()),
             ("D_actual_direction_P_over_eta", actual.direction),
             ("D_reconstruction_residual_P_minus_R_minus_Q", residual.clone()),
+            ("D_entry_pairings_G_i_P_i_over_eta", entry_pairings),
         ] {
             readings.push(EpochStageReading { name, value: EpochStageValue::RationalMatrix(matrix) });
         }

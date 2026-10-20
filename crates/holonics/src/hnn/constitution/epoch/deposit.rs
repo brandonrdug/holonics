@@ -44,6 +44,7 @@ struct PreparedEpochNormals {
     alignment_defects: BTreeMap<LinearLocus, (Rat, Rat)>,
     certified: BTreeMap<(Locus, Family), StepReading>,
     fresh_joint: Option<JointReading>,
+    certificate_valid: bool,
 }
 
 /// One same-opening NormalMaps transaction. Borrowed inputs cannot be replaced between rungs;
@@ -65,6 +66,7 @@ pub(crate) struct ObservedNormalEpochStage<'a> {
     execution: &'a dyn crate::hnn::reference::observed::ObservedEpochExecution,
     allow_channel_dissipation: bool,
     channel_grain: Option<ObservedChannelGrainPlan>,
+    grain_restage_scope: Option<EpochCandidateScope>,
     prepared: Option<PreparedEpochNormals>,
 }
 
@@ -115,11 +117,12 @@ impl<'a> ObservedNormalEpochStage<'a> {
             execution,
             allow_channel_dissipation,
             channel_grain: None,
+            grain_restage_scope: None,
             prepared: None,
         })
     }
 
-    /// Immutable across Whole/Joint; ReceivingOnly deliberately replays with no channel target.
+    /// Bound across Whole/Joint unless the optional grain candidate is discarded explicitly.
     pub(crate) fn with_channel_grain(mut self, plan: ObservedChannelGrainPlan) -> Result<Self, HnnError> {
         if !self.allow_channel_dissipation || self.prepared.is_some()
             || plan.receiver != self.receiver || plan.ingress_before != self.epoch_index
@@ -128,6 +131,22 @@ impl<'a> ObservedNormalEpochStage<'a> {
         }
         self.channel_grain = Some(plan);
         Ok(self)
+    }
+
+    /// Keep the bound normal operands, invalidate only grain-dependent certification, and
+    /// grant one recertification of the refused rung from the same borrowed opening.
+    pub(crate) fn without_channel_grain(&mut self, scope: EpochCandidateScope) -> Result<(), EpochStageFailure> {
+        if scope == EpochCandidateScope::ReceivingOnly || self.channel_grain.is_none()
+            || self.prepared.is_none() || self.grain_restage_scope.is_some() {
+            return Err(EpochStageTrace::default().failed(refused("a grain restage removes one prepared optional plan at its refused rung")));
+        }
+        self.channel_grain = None;
+        let prepared = self.prepared.as_mut().expect("checked above");
+        prepared.certified.clear();
+        prepared.fresh_joint = None;
+        prepared.certificate_valid = false;
+        self.grain_restage_scope = Some(scope);
+        Ok(())
     }
 
     pub(crate) fn stage(
@@ -229,6 +248,12 @@ impl<'a> ObservedNormalEpochStage<'a> {
                 "a restaged normal epoch needs the same opening's actually certified fresh gains",
             )));
         }
+        if self.prepared.as_ref().is_some_and(|p| !p.certificate_valid) {
+            if self.grain_restage_scope != Some(scope) {
+                return Err(trace.failed(refused("a grain-off fresh certificate belongs to its refused rung exactly once")));
+            }
+            self.grain_restage_scope = None;
+        }
         self.opening
             .prepare_observed_epoch_with_execution(
                 self.deposits,
@@ -260,6 +285,10 @@ impl<'a> ObservedNormalEpochStage<'a> {
 }
 
 impl StagedEpochCandidate {
+    pub(crate) fn channel_grain_rebase(&self) -> Option<EpochChannelGrainReading> {
+        self.reading.epoch.as_ref()?.channel_grain.as_ref()
+            .filter(|grain| grain.contacts.iter().any(|contact| contact.levels > 0)).cloned()
+    }
     pub(crate) fn joint_directions(&self) -> Vec<EpochJointDirectionReading> {
         self.reading
             .epoch
@@ -1786,6 +1815,10 @@ impl Constitution {
             None => BTreeMap::new(),
         };
         let rebased_material = channel_grain.map(|_| next.clone());
+        trace.channel_grain = match channel_grain {
+            Some(plan) => Some(plan.reading(self, &next, &rebases, &eligible_channel_grain)?),
+            None => None,
+        };
         let candidate_lattices = next.lattices.clone();
         let mut factor_steps: Vec<_> = factors.into_values().collect();
         for step in &mut factor_steps {
@@ -1892,7 +1925,7 @@ impl Constitution {
         let bound = readout.upper();
         trace.at("fresh_joint_certificate", None, None);
         let (mut certified, fresh_joint, _fresh_pumped, _fresh_loaded) =
-            if let Some(cached) = cached {
+            if let Some(cached) = cached.filter(|p| p.certificate_valid) {
                 (
                     cached.certified.clone(),
                     cached.fresh_joint.clone(),
@@ -1957,7 +1990,7 @@ impl Constitution {
             })?;
         drop(stepping);
         if let Some(slot) = prepared.as_deref_mut() {
-            if slot.is_none() {
+            if slot.as_ref().is_none_or(|p| !p.certificate_valid) {
                 *slot = Some(PreparedEpochNormals {
                     laws: laws.clone(),
                     flows: flows.clone(),
@@ -1968,6 +2001,7 @@ impl Constitution {
                     alignment_defects: alignment_defects.clone(),
                     certified: certified.clone(),
                     fresh_joint: fresh_joint.clone(),
+                    certificate_valid: true,
                 });
             }
         }
@@ -2025,6 +2059,7 @@ impl Constitution {
             }
             Some(plan.reading(self, &rebase_reading_material, &rebases, &eligible_channel_grain)?)
         } else { None };
+        trace.channel_grain = channel_grain_reading.clone();
         // A budgeted factor's rounded/backtracked displacement is generally
         // not its prepared ray. Until that exact ray is supplied to the shared
         // certificate, refuse a mixed physical factor move rather than attach
@@ -2194,6 +2229,17 @@ impl Constitution {
             .map(|(kind, face)| (kind.locus(), *kind, face.direction()))
             .collect();
         trace.at("actual_joint_certificate", None, None);
+        if let Some(face) = actual_channel_faces.iter().find(|face| face.raw_alignment().is_negative()) {
+            EpochStageRefusal::at("actual_channel_D_alignment", EpochStageCondition::ActualRayAlignment,
+                "the raw actual channel D ray must not oppose its current reached covector",
+                Some(Locus::Channel(face.contact())), Some(Family::Factor(2)))
+                .read("raw_actual_alignment", EpochStageValue::Ratio(face.raw_alignment().clone()))
+                .read("alignment_sign", EpochStageValue::Text("Misaligned: strictly negative before any nonnegative face"))
+                .first(&mut trace.evidence);
+            enrich_failed_channel_ray(&mut trace.evidence, self, &next, &strokes,
+                &factor_steps, &certified, &original_channel_faces, &rebases);
+            return Err(refused("a moving actual epoch ray must descend its contemporary comparison"));
+        }
         let actual_factor_faces: Vec<_> = actual_channel_faces
             .iter()
             .map(|face| (Locus::Channel(face.contact()), face.prepared()))
@@ -2389,6 +2435,7 @@ impl Constitution {
             epoch: Some(EpochDepositReading {
                 channel_grain: channel_grain_reading,
                 channel_grain_deferred: None,
+                channel_grain_restaged: None,
                 quantum_projection: None,
                 actual_receiving_ingress: epoch_index,
                 heard_cells,
@@ -4351,6 +4398,89 @@ mod tests {
     }
     // A declared native synthetic covector tests publication mechanics, not a measured
     // model improvement. The finite comparison owner remains outside this stage.
+    #[test]
+    fn grain_join_off_reprepares_joint_exactly_and_preserves_fresh_accounting_and_cold_next() {
+        let (field, mut opening, _, _, _) = normal_domain_fixture(None, false);
+        let founding = opening.clone();
+        let receiver = field.receivers()[0].ring;
+        for contact in 0..opening.contacts.len() {
+            let locus = Locus::Channel(contact);
+            let amount = -opening.lattice(locus).unwrap().unit() / rat(4, 1);
+            opening.clocks.insert(locus, 7);
+            opening.carries.insert((locus, Carrier::Factor(2)), Carry(BTreeMap::from([(0, amount)])));
+        }
+        let before = opening.continuing_state(0).unwrap().to_text();
+        let retention: BTreeSet<_> = crate::hnn::retention::loci(&field).into_iter().collect();
+        let requests = opening.contacts.iter().enumerate().map(|(contact, factor)| FactorStep {
+            gradient: FactorGradient::Dissipation { contact,
+                gradient: scaled_identity(factor.dissipation.rows(), rat(1, 1 << 20)) },
+            energy: rat(1, 4096), covector: Rat::one(),
+        }).collect();
+        let deposits = [Deposit::new(opening.commit, vec![], requests,
+            (0..opening.contacts.len()).map(Locus::Channel).collect()).with_reach(Reach {
+                receiver, stations: vec![2, 4], entries: vec![0], phases: 1,
+                loci: retention.clone(), passages: vec![],
+            })];
+        let pair_speed = |_, _, _: &PairPort, _: [&[Vec<Rat>]; 3]| panic!("D is not a pair-port request");
+        let make_stage = || ObservedNormalEpochStage::new(&opening, &deposits, receiver,
+            field.ring(receiver).period(), 1, 1, 113,
+            partition_exponent(opening.observed_epoch_grain(receiver).unwrap(), 1, 113).unwrap(),
+            &retention, opening.landmarks(receiver).unwrap().clone(), &pair_speed, &[],
+            &crate::hnn::reference::observed::HostObservedEpochExecution, true).unwrap();
+        let mut ordinary = make_stage();
+        assert!(ordinary.without_channel_grain(EpochCandidateScope::Joint).is_err());
+        assert!(ordinary.stage(EpochCandidateScope::Joint, &mut |_| {}).is_err(),
+            "an arbitrary unprepared Joint remains forbidden");
+        let _ordinary_whole = ordinary.stage(EpochCandidateScope::Whole, &mut |_| {}).unwrap();
+        let expected = ordinary.stage(EpochCandidateScope::Joint, &mut |_| {}).unwrap();
+        let plan = ObservedChannelGrainPlan::at_section(&field, &retention, receiver, 113, 114).unwrap().unwrap();
+        let mut joined = make_stage().with_channel_grain(plan).unwrap();
+        let mut initial_flows = 0;
+        let failure = joined.stage(EpochCandidateScope::Whole, &mut |phase| {
+            if matches!(phase, EpochDepositPhase::Flow(_)) { initial_flows += 1; }
+        }).unwrap_err();
+        assert!(initial_flows > 0);
+        assert!(failure.normal_inputs_prepared);
+        assert!(failure.channel_grain.as_ref().unwrap().contacts.iter().any(|c| c.levels > 0));
+        assert!(failure.evidence.readings.iter().any(|r| r.name == "D_pairing_G_P_over_eta"
+            && matches!(&r.value, EpochStageValue::Ratio(value) if value.is_negative())));
+        joined.without_channel_grain(EpochCandidateScope::Joint).unwrap();
+        assert!(!joined.prepared.as_ref().unwrap().certificate_valid);
+        assert!(joined.prepared.as_ref().unwrap().certified.is_empty(), "grain-dependent certified gains cannot leak");
+        assert!(joined.without_channel_grain(EpochCandidateScope::Joint).is_err(), "there is exactly one removal/retry token");
+        assert!(joined.stage(EpochCandidateScope::Whole, &mut |_| {}).is_err(), "the recertification token binds the refused rung");
+        let mut retried_flows = 0;
+        let actual = joined.stage(EpochCandidateScope::Joint, &mut |phase| {
+            if matches!(phase, EpochDepositPhase::Flow(_)) { retried_flows += 1; }
+        }).unwrap();
+        assert_eq!(retried_flows, 0, "reuse bound normal operands without rerunning the executor");
+        assert_eq!(actual.material, expected.material);
+        assert_eq!(actual.reading, expected.reading);
+        assert!(actual.reading.epoch.as_ref().unwrap().channel_grain.is_none());
+        for contact in 0..opening.contacts.len() {
+            let locus = Locus::Channel(contact);
+            assert_eq!(actual.material.contacts[contact].dissipation, opening.contacts[contact].dissipation);
+            let scale_carry = |material: &Constitution| material.carries
+                .get(&(locus, Carrier::FactorScale(2))).and_then(|carry| carry.0.get(&0))
+                .cloned().unwrap_or_else(Rat::zero);
+            assert_eq!(&actual.material.contacts[contact].scales[2] - &opening.contacts[contact].scales[2]
+                + scale_carry(&actual.material) - scale_carry(&opening), rat(1, 4096),
+                "fresh scale energy stays in its represented value plus exact carry");
+            assert_eq!(actual.material.lattice(locus).unwrap(), opening.lattice(locus).unwrap());
+            assert_eq!(actual.material.clock(locus), opening.clock(locus) + 1);
+        }
+        assert_eq!(opening.continuing_state(0).unwrap().to_text(), before);
+        let text = actual.material.continuing_state(0).unwrap().to_text();
+        let saved = ContinuingState::from_text(&text, opening.budget()).unwrap();
+        let cold = founding.continued_on(&field, &saved).unwrap();
+        assert_eq!(cold, actual.material);
+        assert_eq!(cold.continuing_state(0).unwrap().to_text(), text);
+        let warm_next = d_only_fixture_stage(&field, &actual.material, 114, EpochCandidateScope::Whole);
+        let cold_next = d_only_fixture_stage(&field, &cold, 114, EpochCandidateScope::Whole);
+        assert_eq!(warm_next.material, cold_next.material);
+        assert_eq!(warm_next.reading, cold_next.reading);
+    }
+
     fn d_only_fixture_stage(
         field: &Field,
         material: &Constitution,
