@@ -2329,6 +2329,7 @@ impl Constitution {
         let reading = DepositReading {
             epoch: Some(EpochDepositReading {
                 channel_grain: channel_grain_reading,
+                channel_grain_deferred: None,
                 quantum_projection: None,
                 actual_receiving_ingress: epoch_index,
                 heard_cells,

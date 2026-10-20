@@ -23,13 +23,28 @@ impl ObservedChannelGrainPlan {
         field: &Field, retained: &BTreeSet<Locus>, receiver: usize,
         ingress_before: u64, ingress_after: u64,
     ) -> Result<Option<Self>, HnnError> {
+        Self::at_section_with_reader(field, retained, receiver, ingress_before, ingress_after,
+            crate::hnn::reference::refining_grain_exponent)
+    }
+
+    fn at_section_with_reader(
+        field: &Field, retained: &BTreeSet<Locus>, receiver: usize,
+        ingress_before: u64, ingress_after: u64,
+        read: impl FnOnce(u64) -> Result<u32, HnnError>,
+    ) -> Result<Option<Self>, HnnError> {
         if !field.receivers().iter().any(|declared| declared.ring == receiver)
             || ingress_after < ingress_before {
             return Err(refused("a channel grain target needs its declared receiver and monotone actual ingress"));
         }
         // A terminal source fragment that did not cross the receiver cannot schedule a level.
         if ingress_after == ingress_before { return Ok(None); }
-        let grain_exponent = crate::hnn::reference::refining_grain_exponent(ingress_after)?;
+        let grain_exponent = match read(ingress_after) {
+            Ok(exponent) => exponent,
+            // This single inconclusive mathematical comparison defers only the target.
+            // Shape, identity and arithmetic errors from every other source remain fatal.
+            Err(HnnError::Shape { what: "the refining grain's comparison inside ln 2's enclosure", expected: 0, .. }) => return Ok(None),
+            Err(error) => return Err(error),
+        };
         let mut founding = BTreeMap::new();
         let mut targets = BTreeMap::new();
         for locus in retained {
@@ -79,6 +94,22 @@ impl ObservedChannelGrainPlan {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn grain_enclosure_defers_only_its_named_comparison_and_other_errors_stay_fatal() {
+        let field = Field::declare(crate::hnn::tests::learning::chain_declaration(1 << 16).by_lattice_rule()).unwrap();
+        let receiver = field.receivers()[0].ring;
+        let retained = crate::hnn::retention::loci(&field).into_iter().collect();
+        let ambiguous = |_: u64| Err(HnnError::Shape {
+            what: "the refining grain's comparison inside ln 2's enclosure", expected: 0, found: 114,
+        });
+        assert!(ObservedChannelGrainPlan::at_section_with_reader(&field, &retained, receiver, 113, 114, ambiguous).unwrap().is_none());
+        assert!(ObservedChannelGrainPlan::at_section_with_reader(&field, &retained, receiver, 113, 114, |_| Err(HnnError::CountOverflow)).is_err());
+        assert!(ObservedChannelGrainPlan::at_section_with_reader(&field, &retained, receiver, 113, 114, |_| Err(HnnError::Shape {
+            what: "unrelated shape", expected: 0, found: 114,
+        })).is_err());
+        assert!(ObservedChannelGrainPlan::at_section_with_reader(&field, &retained, receiver, 114, 114, |_| panic!("zero-tick terminal schedules no comparison")).unwrap().is_none());
+    }
 
     #[test]
     fn receiver_clock_grain_targets_founding_lattice_without_activation_history() {

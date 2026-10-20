@@ -3064,9 +3064,20 @@ pub struct EpochChannelGrainContactReading {
     pub dissipation_scale_rebase: Rat,
 }
 
+/// Exterior account of one inconclusive target comparison. No channel target was staged;
+/// the observed epoch keeps its ordinary D-scope admission and retries at its next own N.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochChannelGrainDeferralReading {
+    pub receiver: usize,
+    pub ingress_before: u64,
+    pub ingress_after: u64,
+    pub reason: &'static str,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochDepositReading {
     pub channel_grain: Option<EpochChannelGrainReading>,
+    pub channel_grain_deferred: Option<EpochChannelGrainDeferralReading>,
     pub quantum_projection: Option<EpochQuantumProjectionReading>,
     pub actual_receiving_ingress: u64,
     pub heard_cells: u64,
@@ -7418,6 +7429,9 @@ impl Constitution {
                 Part::Linear(..) => None,
             })
         }
+        // Keep the original faces available after the local Floquet span factors shadow
+        // their parameter name below; exterior refusal evidence must read these operands.
+        let supplied_factor_faces = factors;
         let mut parts: Vec<(Locus, Family, Part<'_>)> = Vec::new();
         for (locus, kind, prepared) in linear {
             let alignment = floor(&prepared.alignment);
@@ -8116,14 +8130,31 @@ impl Constitution {
                 if let Some(&(locus, family)) =
                     declared.families().find(|key| !place.contains_key(*key))
                 {
-                    epoch::EpochStageRefusal::at(
+                    let mut refusal = epoch::EpochStageRefusal::at(
                         "declared_certificate",
                         epoch::EpochStageCondition::DeclaredFamily,
                         "every declared family must reach this certificate",
                         Some(locus),
                         Some(family),
-                    )
-                    .first(evidence);
+                    );
+                    // Exterior operands at the existing refusal, not a substitute ray or rate.
+                    // An actually supplied zero-aligned factor is filtered above; distinguish
+                    // it from a genuinely absent request without changing certificate admission.
+                    if let Some((_, face)) = supplied_factor_faces.iter().find(|(at, face)| *at == locus && face.family == family) {
+                        refusal = refusal
+                            .read("provided_certificate_alignment", epoch::EpochStageValue::Ratio(face.alignment.clone()))
+                            .read("provided_covector", epoch::EpochStageValue::Ratio(face.covector.clone()))
+                            .read("provided_scale", epoch::EpochStageValue::Ratio(face.scale.clone()))
+                            .read("provided_energy", epoch::EpochStageValue::Ratio(face.energy.clone()))
+                            .read("original_request_index", epoch::EpochStageValue::Index(face.index))
+                            .read("supplied_factor_has_zero_alignment", epoch::EpochStageValue::Index(usize::from(face.alignment.is_zero())));
+                    } else {
+                        refusal = refusal.read("provided_factor", epoch::EpochStageValue::Unavailable("no matching prepared factor was supplied"));
+                    }
+                    if let Some(exponent) = declared.exponent(locus, family) {
+                        refusal = refusal.read("declared_eta", epoch::EpochStageValue::Ratio(crate::holon::deposition::dyadic(exponent)));
+                    }
+                    refusal.first(evidence);
                     return Ok(Err(DeclaredStepRefusal::Undeclared { locus, family }));
                 }
                 // The readings at the declared rays' ends, recorded beside the step.
@@ -9880,6 +9911,43 @@ fn refine_candidate_steps(
 #[cfg(test)]
 mod candidate_relative_step_tests {
     use super::*;
+
+    #[test]
+    fn missing_declared_zero_factor_reports_actual_supplied_operands_without_admission() {
+        let field = Field::declare(crate::hnn::tests::learning::chain_declaration(1 << 16).by_lattice_rule()).unwrap();
+        let material = Constitution::initial(&field, 1 << 40).unwrap();
+        let receiver = field.receivers()[0].ring;
+        let make = |contact, alignment| FactorPrepared {
+            index: contact, family: Family::Factor(2), scale: rat(3, 2), alignment,
+            covector: Rat::one(), energy: Rat::zero(),
+            moves: channel_factor_moves(2, &material.contacts[contact].dissipation, (Rat::one(), Rat::one()), &material.hop),
+        };
+        let tiny = Rat::new(BigInt::one(), BigInt::one() << 200usize);
+        let first = make(0, floor(&tiny));
+        assert!(first.alignment.is_positive() && first.alignment <= tiny,
+            "the relative significant-bit floor preserves arbitrarily small positive alignment");
+        let zero = make(1, Rat::zero());
+        let factors = [(Locus::Channel(0), &first), (Locus::Channel(1), &zero)];
+        let declared = DeclaredExponents { steps: (0..2).map(|contact| ((Locus::Channel(contact), Family::Factor(2)), DeclaredExponent { exponent: 0, reach: None })).collect() };
+        let reach = Reach { receiver, stations: vec![2, 4], entries: vec![0], phases: 1,
+            loci: crate::hnn::retention::loci(&field).into_iter().collect(), passages: vec![] };
+        let mut evidence = None;
+        let result = material.certify_steps_with_epoch_evidence(Some(&reach), &[], &factors, None,
+            StepSource::Actual(&declared), None, None, &mut evidence).unwrap();
+        assert!(result.is_err(), "a declared zero-aligned moving factor cannot gain admission");
+        let evidence = evidence.unwrap();
+        assert_eq!((evidence.locus, evidence.family), (Some(Locus::Channel(1)), Some(Family::Factor(2))));
+        assert_eq!(evidence.condition, epoch::EpochStageCondition::DeclaredFamily);
+        for (name, expected) in [
+            ("provided_certificate_alignment", epoch::EpochStageValue::Ratio(Rat::zero())),
+            ("provided_scale", epoch::EpochStageValue::Ratio(rat(3, 2))),
+            ("original_request_index", epoch::EpochStageValue::Index(1)),
+            ("supplied_factor_has_zero_alignment", epoch::EpochStageValue::Index(1)),
+            ("declared_eta", epoch::EpochStageValue::Ratio(Rat::one())),
+        ] {
+            assert!(evidence.readings.iter().any(|r| r.name == name && r.value == expected));
+        }
+    }
 
     #[test]
     fn candidate_halving_preserves_relative_family_exponents() {

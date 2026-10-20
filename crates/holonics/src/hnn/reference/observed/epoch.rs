@@ -1050,6 +1050,7 @@ impl Reference {
             ObservedEpochDepositionScope::NormalMaps
                 | ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
         );
+        let mut grain_target_deferred = None;
         let mut normal_stage = if shared_normals {
             let stage =
                 crate::hnn::constitution::epoch::ObservedNormalEpochStage::new(
@@ -1075,6 +1076,14 @@ impl Reference {
                     next.observed_epoch_ingress.expect("set above").1,
                 )?
             } else { None };
+            if self.refining && plan.is_none()
+                && next.observed_epoch_ingress.expect("set above").1 > epoch_index {
+                grain_target_deferred = Some(crate::hnn::constitution::EpochChannelGrainDeferralReading {
+                    receiver, ingress_before: epoch_index,
+                    ingress_after: next.observed_epoch_ingress.expect("set above").1,
+                    reason: "refining grain comparison inside ln 2 enclosure; no target staged this epoch",
+                });
+            }
             Some(match plan { Some(plan) => stage.with_channel_grain(plan)?, None => stage })
         } else {
             None
@@ -1385,7 +1394,7 @@ impl Reference {
                 publication_attempt = EpochStageAttempt::Joint;
             }
         }
-        let ((material, deposit), outcome) = match whole.or(joint_admitted) {
+        let ((material, mut deposit), outcome) = match whole.or(joint_admitted) {
             Some(admitted) => admitted,
             None => {
                 publication_attempt = EpochStageAttempt::ReceivingOnly;
@@ -1407,6 +1416,10 @@ impl Reference {
                 (receiving.admit_receiving()?, outcome)
             }
         };
+        if let Some(deferred) = grain_target_deferred {
+            deposit.epoch.as_mut().ok_or_else(|| refusal("an observed epoch keeps its grain deferral reading"))?
+                .channel_grain_deferred = Some(deferred);
+        }
         // Work belongs to the same LAST PRODUCING cut on both sides of the
         // admitted material change. Reading next.current here would mix the
         // final source/reference crossing into the constitutive work.
