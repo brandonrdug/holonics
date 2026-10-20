@@ -25,8 +25,63 @@ pub struct ForwardSpanReading {
     pub scanned_ticks: usize,
     pub serial_ticks: usize,
     pub branch_departures: usize,
+    /// Gates read before an actual serial tick. Post-tick affine departures are
+    /// counted separately above, because that tick already executed its owner.
+    pub serial_admissions: Vec<ForwardSpanSerialAdmission>,
     /// Filled by the observed execution boundary, which owns the wall clock.
     pub elapsed_ns: Option<u128>,
+}
+
+/// One existing admission decision, returned only as exterior evidence.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ForwardSpanSerialAdmission {
+    pub absolute_tick: usize,
+    pub remaining_full_ticks: usize,
+    pub nonlinear_resonator: bool,
+    /// First nonzero fibre in the same order used by the admission predicate.
+    /// A physical reception carry alone does not imply a nonzero split fibre.
+    pub remainder: Option<ForwardSpanRemainder>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ForwardSpanRemainderStream {
+    Anchor,
+    Storage,
+    ElementDrive,
+    Solve,
+    Arrival,
+    ContactState,
+    ResonatorRate,
+    ResonatorState,
+}
+
+/// An exact witness from the producing Word, never a retained state or a tolerance.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ForwardSpanRemainder {
+    pub stream: ForwardSpanRemainderStream,
+    pub owner: usize,
+    /// Contact end/state component, or resonator displacement/rate component.
+    /// Zero for a stream with one component per owner.
+    pub component: usize,
+    pub coordinate: usize,
+    pub value: Rat,
+}
+
+fn first_remainder(
+    stream: ForwardSpanRemainderStream,
+    owner: usize,
+    component: usize,
+    values: &[Rat],
+) -> Option<ForwardSpanRemainder> {
+    values.iter().enumerate().find_map(|(coordinate, value)| {
+        (!value.is_zero()).then(|| ForwardSpanRemainder {
+            stream,
+            owner,
+            component,
+            coordinate,
+            value: value.clone(),
+        })
+    })
 }
 
 #[derive(Clone)]
@@ -121,22 +176,52 @@ fn map(operands: &Operands, zero: &EndChange, tick: usize) -> Result<Affine, Hnn
 }
 
 impl Word<'_> {
+    fn first_span_remainder(&self) -> Option<ForwardSpanRemainder> {
+        use ForwardSpanRemainderStream::*;
+        for (stream, rows) in [
+            (Anchor, &self.carried.anchors),
+            (Storage, &self.carried.storage),
+            (ElementDrive, &self.carried.element_drive),
+            (Solve, &self.carried.solves),
+        ] {
+            for (owner, values) in rows.iter().enumerate() {
+                if let Some(witness) = first_remainder(stream, owner, 0, values) {
+                    return Some(witness);
+                }
+            }
+        }
+        for (stream, pairs) in [
+            (Arrival, &self.carried.arrivals),
+            (ContactState, &self.carried.states),
+        ] {
+            for (owner, pair) in pairs.iter().enumerate() {
+                for (component, values) in pair.iter().enumerate() {
+                    if let Some(witness) = first_remainder(stream, owner, component, values) {
+                        return Some(witness);
+                    }
+                }
+            }
+        }
+        for (owner, resonator) in self.resonators.iter().enumerate() {
+            if let Some(resonator) = resonator {
+                if let Some(witness) =
+                    first_remainder(ResonatorRate, owner, 0, &resonator.remainders.rate)
+                {
+                    return Some(witness);
+                }
+                for (component, values) in resonator.remainders.state.iter().enumerate() {
+                    if let Some(witness) = first_remainder(ResonatorState, owner, component, values)
+                    {
+                        return Some(witness);
+                    }
+                }
+            }
+        }
+        None
+    }
+
     fn zero_span_remainders(&self) -> bool {
-        self.carried
-            .anchors
-            .iter()
-            .chain(&self.carried.storage)
-            .chain(&self.carried.element_drive)
-            .chain(&self.carried.solves)
-            .flatten()
-            .chain(self.carried.arrivals.iter().flatten().flatten())
-            .chain(self.carried.states.iter().flatten().flatten())
-            .all(Zero::is_zero)
-            && self
-                .resonators
-                .iter()
-                .flatten()
-                .all(|r| r.remainders.all().all(Zero::is_zero))
+        self.first_span_remainder().is_none()
     }
 
     fn install_span_prefix(&mut self, prefix: EndChange) {
@@ -181,7 +266,17 @@ impl Word<'_> {
             .any(|r| r.material().saturation().is_some());
         while self.passage.len() < full_ticks {
             let remaining = full_ticks - self.passage.len();
-            if nonlinear || !self.zero_span_remainders() || remaining == 1 {
+            let remainder = self.first_span_remainder();
+            if nonlinear || remainder.is_some() || remaining == 1 {
+                reading.serial_admissions.push(ForwardSpanSerialAdmission {
+                    absolute_tick: self
+                        .opened_at
+                        .checked_add(self.passage.len())
+                        .ok_or(HnnError::CountOverflow)?,
+                    remaining_full_ticks: remaining,
+                    nonlinear_resonator: nonlinear,
+                    remainder,
+                });
                 self.tick()?;
                 reading.serial_ticks += 1;
                 continue;
