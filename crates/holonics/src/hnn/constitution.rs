@@ -3035,8 +3035,38 @@ pub struct EpochQuantumTrialReading {
     pub reason: Option<String>,
 }
 
+/// Exterior account of the absolute receiver-clock channel target. No schedule history is
+/// installed in a continuing state; its current lattice and actual ingress suffice.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochChannelGrainReading {
+    pub receiver: usize,
+    pub ingress_before: u64,
+    pub ingress_after: u64,
+    pub grain_exponent: u32,
+    pub contacts: Vec<EpochChannelGrainContactReading>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochChannelGrainContactReading {
+    pub contact: usize,
+    pub founding_exponent: u32,
+    pub target_exponent: u32,
+    pub before_exponent: u32,
+    pub after_exponent: u32,
+    pub levels: u32,
+    pub shortfall: u32,
+    pub limiting_held_factor: Option<(Carrier, usize, Rat)>,
+    pub deferred_without_fresh_update: bool,
+    /// All three scales are statistics; each rebases with its own carry, without fresh energy.
+    pub scale_rebase: [Rat; 3],
+    /// Rebase alone, before the fresh staged quotient; the actual ray reads their sum.
+    pub dissipation_rebase: EpochSeriesReading,
+    pub dissipation_scale_rebase: Rat,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochDepositReading {
+    pub channel_grain: Option<EpochChannelGrainReading>,
     pub quantum_projection: Option<EpochQuantumProjectionReading>,
     pub actual_receiving_ingress: u64,
     pub heard_cells: u64,
@@ -9247,11 +9277,34 @@ impl Constitution {
         &self,
         locus: Locus,
         steps: &[(usize, LocusStep<'_>)],
-        mut material: Option<&mut LocusMaterial<'_>>,
+        material: Option<&mut LocusMaterial<'_>>,
         carries: &mut Carries,
     ) -> Result<Prepared, (usize, HnnError)> {
+        self.prepare_at_on_lattice(locus, steps, material, carries, None)
+    }
+
+    /// A staged channel rebase binds its refined lattice before the first fresh statistic
+    /// advance. The immutable published predecessor still supplies the clock, covector and
+    /// admission owner. This temporary stroke creates no extra persistent clock or commit.
+    fn prepare_at_on_lattice(
+        &self,
+        locus: Locus,
+        steps: &[(usize, LocusStep<'_>)],
+        mut material: Option<&mut LocusMaterial<'_>>,
+        carries: &mut Carries,
+        lattice: Option<Lattice>,
+    ) -> Result<Prepared, (usize, HnnError)> {
+        let stroke = if let Some(lattice) = lattice {
+            let index = steps.first().map_or(0, |(index, _)| *index);
+            if !matches!(locus, Locus::Channel(_)) {
+                return Err((index, HnnError::Unadmitted { reason: "an epoch lattice override belongs only to a channel" }));
+            }
+            let clock = self.clock(locus).checked_add(1)
+                .ok_or_else(|| (index, HnnError::from(ExactLinearError::ExtentOverflow)))?;
+            Some(BudgetedCarry::new(lattice, clock))
+        } else { None };
         let mut prepared = Prepared {
-            stroke: None,
+            stroke,
             linear: None,
             factors: Vec::new(),
         };

@@ -98,7 +98,20 @@ impl ChannelFactorDisplacement {
         Ok(rays)
     }
 
+    #[cfg(test)]
     pub(super) fn matches_stroke(&self, stroke: &BudgetedCarry) -> bool {
+        self.matches_stroke_after_rebase(stroke, None)
+    }
+
+    /// P = rebase_delta + q * new_unit, read from the same published predecessor.
+    /// The rebase witness does not create a staged q or replace the full endpoint ray.
+    pub(super) fn matches_stroke_after_rebase(
+        &self, stroke: &BudgetedCarry, rebase: Option<&ExactRatMatrix>,
+    ) -> bool {
+        if rebase.is_some_and(|delta| (delta.rows(), delta.columns()) !=
+            (self.displacement.rows(), self.displacement.columns())) {
+            return false;
+        }
         self.displacement
             .entries()
             .iter()
@@ -109,7 +122,8 @@ impl ChannelFactorDisplacement {
                     .get(&(Carrier::Factor(self.family), entry))
                     .map(|(_, q)| q.clone())
                     .unwrap_or_else(BigInt::zero);
-                *value == Rat::from_integer(q) * stroke.lattice.unit()
+                *value == rebase.map_or_else(Rat::zero, |delta| delta.entries()[entry].clone())
+                    + Rat::from_integer(q) * stroke.lattice.unit()
             })
             && stroke.staged.keys().all(|(carrier, entry)| {
                 *carrier != Carrier::Factor(self.family)
@@ -202,6 +216,23 @@ impl ChannelFactorDisplacement {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn rebased_actual_ray_matches_only_full_rebase_plus_refined_quotient() {
+        let before = ExactRatMatrix::new(vec![vec![rat(1, 1), rat(0, 1)]]).unwrap();
+        let after = ExactRatMatrix::new(vec![vec![rat(17, 16), rat(1, 32)]]).unwrap();
+        let ray = ChannelFactorDisplacement::between(0, 2, &before, &after).unwrap().unwrap();
+        let mut stroke = BudgetedCarry::new(Lattice::new(5), 8);
+        stroke.staged.insert((Carrier::Factor(2), 1), (Rat::zero(), BigInt::one()));
+        let rebase = ExactRatMatrix::new(vec![vec![rat(1, 16), rat(0, 1)]]).unwrap();
+        assert!(!ray.matches_stroke(&stroke));
+        assert!(ray.matches_stroke_after_rebase(&stroke, Some(&rebase)));
+        assert!(!ray.matches_stroke_after_rebase(&stroke, Some(&rebase.scaled(&rat(2, 1)))));
+        stroke.staged.insert((Carrier::Factor(2), 2), (Rat::zero(), BigInt::one()));
+        assert!(!ray.matches_stroke_after_rebase(&stroke, Some(&rebase)));
+        let malformed = ExactRatMatrix::zero(1, 1).unwrap();
+        assert!(!ray.matches_stroke_after_rebase(&stroke, Some(&malformed)));
+    }
 
     #[test]
     fn actual_channel_ray_uses_the_applied_noncollinear_endpoint_and_original_covector() {

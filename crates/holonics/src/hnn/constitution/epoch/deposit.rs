@@ -64,6 +64,7 @@ pub(crate) struct ObservedNormalEpochStage<'a> {
     receiving_parts: &'a [EpochReceivingRecord],
     execution: &'a dyn crate::hnn::reference::observed::ObservedEpochExecution,
     allow_channel_dissipation: bool,
+    channel_grain: Option<ObservedChannelGrainPlan>,
     prepared: Option<PreparedEpochNormals>,
 }
 
@@ -113,8 +114,20 @@ impl<'a> ObservedNormalEpochStage<'a> {
             receiving_parts,
             execution,
             allow_channel_dissipation,
+            channel_grain: None,
             prepared: None,
         })
+    }
+
+    /// Immutable across Whole/Joint; ReceivingOnly deliberately replays with no channel target.
+    pub(crate) fn with_channel_grain(mut self, plan: ObservedChannelGrainPlan) -> Result<Self, HnnError> {
+        if !self.allow_channel_dissipation || self.prepared.is_some()
+            || plan.receiver != self.receiver || plan.ingress_before != self.epoch_index
+            || plan.ingress_after <= plan.ingress_before {
+            return Err(refused("a channel grain plan binds the original D stage and actual receiver ingress"));
+        }
+        self.channel_grain = Some(plan);
+        Ok(self)
     }
 
     pub(crate) fn stage(
@@ -236,6 +249,7 @@ impl<'a> ObservedNormalEpochStage<'a> {
                 Some(&mut self.prepared),
                 quantum,
                 self.allow_channel_dissipation,
+                if scope == EpochCandidateScope::ReceivingOnly { None } else { self.channel_grain.as_ref() },
             )
             .map_err(|error| {
                 let mut failure = trace.failed(error);
@@ -425,7 +439,20 @@ fn carrier_family(carrier: Carrier) -> Option<Family> {
     })
 }
 
+#[cfg(test)]
 fn admit_actual_factor_displacements(
+    opening: &Constitution, endpoint: &Constitution,
+    strokes: &BTreeMap<Locus, BudgetedCarry>, requests: &[FactorStep],
+    certified: &BTreeMap<(Locus, Family), StepReading>,
+    original_faces: &BTreeMap<(Locus, Family), FactorPrepared>,
+    allow_channel_dissipation: bool, evidence: &mut Option<EpochStageRefusal>,
+) -> Result<Vec<channel_ray::ActualChannelRayFace>, HnnError> {
+    admit_actual_factor_displacements_with_rebases(opening, endpoint, strokes, requests,
+        certified, original_faces, allow_channel_dissipation, &BTreeMap::new(), evidence)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn admit_actual_factor_displacements_with_rebases(
     opening: &Constitution,
     endpoint: &Constitution,
     strokes: &BTreeMap<Locus, BudgetedCarry>,
@@ -433,6 +460,7 @@ fn admit_actual_factor_displacements(
     certified: &BTreeMap<(Locus, Family), StepReading>,
     original_faces: &BTreeMap<(Locus, Family), FactorPrepared>,
     allow_channel_dissipation: bool,
+    rebases: &BTreeMap<usize, channel_grain::ChannelGrainRebase>,
     evidence: &mut Option<EpochStageRefusal>,
 ) -> Result<Vec<channel_ray::ActualChannelRayFace>, HnnError> {
     // The endpoint remains authoritative. Only the explicitly scoped D family
@@ -442,6 +470,7 @@ fn admit_actual_factor_displacements(
     for ray in channel_ray::ChannelFactorDisplacement::read_all(opening, endpoint)? {
         let locus = Locus::Channel(ray.contact);
         let family = Family::Factor(ray.family);
+        let rebase_delta = rebases.get(&ray.contact).map(|r| &r.factor_delta[ray.family]);
         let mut refusal = EpochStageRefusal::at(
             "actual_factor_displacement",
             EpochStageCondition::NonlinearFactorRay,
@@ -451,7 +480,7 @@ fn admit_actual_factor_displacements(
             Ok(delta) => EpochStageValue::Series(EpochSeriesReading::of(&delta)),
             Err(_) => EpochStageValue::Unavailable("the exact parameter delta is not dyadic"),
         }).read("actual_delta_matches_staged_quotient", EpochStageValue::Index(usize::from(
-            strokes.get(&locus).is_some_and(|stroke| ray.matches_stroke(stroke))
+            strokes.get(&locus).is_some_and(|stroke| ray.matches_stroke_after_rebase(stroke, rebase_delta))
         )));
         if !allow_channel_dissipation || ray.family != 2 {
             refusal.first(evidence);
@@ -461,6 +490,13 @@ fn admit_actual_factor_displacements(
             && step.gradient.family() == family);
         let fresh = certified.get(&(locus, family));
         let original = original_faces.get(&(locus, family));
+        if rebases.contains_key(&ray.contact) && request.is_some() && original.is_some()
+            && !fresh.is_some_and(|reading| reading.step.step.is_positive()) {
+            refusal = refusal.read("actual_ray_rate", EpochStageValue::Unavailable(
+                "the scheduled D rebase waits for its actually certified fresh positive rate"));
+            refusal.first(evidence);
+            return Err(refused("a scheduled channel rebase waits for its original fresh positive D rate"));
+        }
         let (Some((request_index, request)), Some(fresh), Some(original)) = (request, fresh, original) else {
             refusal = refusal.read("actual_ray_rate", EpochStageValue::Unavailable(
                 "the changed D endpoint has no original request, fresh positive rate, or prepared metadata"
@@ -475,9 +511,9 @@ fn admit_actual_factor_displacements(
             refusal.first(evidence);
             return Err(refused("an actual channel D ray needs its original fresh positive rate"));
         }
-        if !strokes.get(&locus).is_some_and(|stroke| ray.matches_stroke(stroke)) {
+        if !strokes.get(&locus).is_some_and(|stroke| ray.matches_stroke_after_rebase(stroke, rebase_delta)) {
             refusal.first(evidence);
-            return Err(refused("the actual channel D endpoint must equal its staged applied quotient"));
+            return Err(refused("the actual channel D endpoint must equal its rebase delta plus staged applied quotient"));
         }
         let face = ray.actual_face(original, request_index, request, fresh, &opening.hop)?;
         admitted_channel_d.insert(locus);
@@ -1167,6 +1203,7 @@ impl Constitution {
             None,
             None,
             false,
+            None,
         )?
         .admit_receiving()
     }
@@ -1262,6 +1299,7 @@ impl Constitution {
             None,
             None,
             false,
+            None,
         )
         .map_err(|error| trace.failed(error))
     }
@@ -1292,6 +1330,7 @@ impl Constitution {
         mut prepared: Option<&mut Option<PreparedEpochNormals>>,
         quantum: Option<&QuantumProjection>,
         allow_channel_dissipation: bool,
+        channel_grain: Option<&ObservedChannelGrainPlan>,
     ) -> Result<StagedEpochCandidate, HnnError> {
         if quantum.is_some()
             && (scope != Some(EpochCandidateScope::ReceivingOnly) || prepared.is_none())
@@ -1670,6 +1709,31 @@ impl Constitution {
             passages: Vec::new(),
         };
         let mut next = self.clone();
+        // Published self stays the actual-ray opening. Every rebase is local to the candidate,
+        // before preparation advances a fresh statistic or stages its quotient. Refusal here
+        // precedes fresh certification and cannot invent gains for a receiving-only retry.
+        trace.at("channel_grain_rebase", None, None);
+        let mut eligible_channel_grain = BTreeSet::new();
+        let mut rebases = match channel_grain {
+            Some(plan) => {
+                if !allow_channel_dissipation || scope == Some(EpochCandidateScope::ReceivingOnly)
+                    || plan.receiver != receiver || plan.ingress_before != epoch_index {
+                    return Err(refused("a staged channel target keeps its D scope and actual receiver clock"));
+                }
+                let targets = plan.targets.iter().filter_map(|(&contact, &target)| {
+                    let active = factors.values().any(|step| match &step.gradient {
+                        FactorGradient::Dissipation { contact: at, gradient } => *at == contact &&
+                            (!step.energy.is_zero() || gradient.entries().iter().any(|v| !v.is_zero())),
+                        _ => false,
+                    });
+                    if active { eligible_channel_grain.insert(contact); Some((contact, target)) } else { None }
+                }).collect();
+                channel_grain::stage_rebases(self, &mut next, &targets, retained)?
+            }
+            None => BTreeMap::new(),
+        };
+        let rebased_material = channel_grain.map(|_| next.clone());
+        let candidate_lattices = next.lattices.clone();
         let mut factor_steps: Vec<_> = factors.into_values().collect();
         for step in &mut factor_steps {
             trace.at(
@@ -1737,7 +1801,10 @@ impl Constitution {
         for (locus, steps, material, carries) in &mut regions {
             trace.at("region_preparation", Some(*locus), None);
             let prepared = self
-                .prepare_at(*locus, steps, material.as_mut(), carries)
+                .prepare_at_on_lattice(*locus, steps, material.as_mut(), carries,
+                    if matches!(locus, Locus::Channel(_)) && channel_grain.is_some() {
+                        candidate_lattices.get(locus).copied()
+                    } else { None })
                 .map_err(|(index, error)| {
                     trace.family =
                         steps
@@ -1881,13 +1948,37 @@ impl Constitution {
             let _ = locus;
         }
         next.carries = rest;
+        // A rebase alone never ticks the channel clock. If its one fresh D stroke was held
+        // wholly at zero, restore that channel exactly and let its lattice wait. No statistic
+        // update is lost: moved() is false only when every fresh carrier update was zero.
+        let waiting: Vec<_> = channel_grain.into_iter().flat_map(|plan| plan.targets.keys().copied()).filter(|contact| {
+            !strokes.get(&Locus::Channel(*contact)).is_some_and(BudgetedCarry::moved)
+        }).collect();
+        for contact in waiting {
+            let locus = Locus::Channel(contact);
+            next.contacts[contact] = self.contacts[contact].clone();
+            next.lattices.insert(locus, self.lattice(locus)?);
+            next.carries.retain(|(at, _), _| *at != locus);
+            next.carries.extend(self.carries.iter().filter(|((at, _), _)| *at == locus).map(|(key, value)| (*key, value.clone())));
+            rebases.remove(&contact);
+            eligible_channel_grain.remove(&contact);
+        }
+        let channel_grain_reading = if let (Some(plan), Some(mut rebase_reading_material)) = (channel_grain, rebased_material) {
+            for &contact in plan.targets.keys() {
+                if !eligible_channel_grain.contains(&contact) {
+                    rebase_reading_material.contacts[contact] = self.contacts[contact].clone();
+                    rebase_reading_material.lattices.insert(Locus::Channel(contact), self.lattice(Locus::Channel(contact))?);
+                }
+            }
+            Some(plan.reading(self, &rebase_reading_material, &rebases, &eligible_channel_grain)?)
+        } else { None };
         // A budgeted factor's rounded/backtracked displacement is generally
         // not its prepared ray. Until that exact ray is supplied to the shared
         // certificate, refuse a mixed physical factor move rather than attach
         // a fresh-direction certificate to different material. Sufficient
         // factor statistics/carries may change while their material stays put.
         trace.at("actual_factor_displacement", None, None);
-        let actual_channel_faces = admit_actual_factor_displacements(
+        let actual_channel_faces = admit_actual_factor_displacements_with_rebases(
             self,
             &next,
             &strokes,
@@ -1895,6 +1986,7 @@ impl Constitution {
             &certified,
             &original_channel_faces,
             allow_channel_dissipation,
+            &rebases,
             &mut trace.evidence,
         )?;
         let mut candidates = BTreeMap::new();
@@ -1986,7 +2078,7 @@ impl Constitution {
         if scope.is_none() {
             admit_actual_normal_domain(receiver, &candidates)?;
         }
-        let upstream = !actual_channel_faces.is_empty() || candidates.iter().any(|(kind, candidate)| {
+        let upstream = rebases.values().any(|r| r.after_lattice != r.before_lattice) || !actual_channel_faces.is_empty() || candidates.iter().any(|(kind, candidate)| {
             !matches!(kind, LinearLocus::Receiving(_)) && !candidate.step.is_zero()
         });
         let physical_motion = !actual_channel_faces.is_empty() || candidates
@@ -2236,6 +2328,7 @@ impl Constitution {
         }
         let reading = DepositReading {
             epoch: Some(EpochDepositReading {
+                channel_grain: channel_grain_reading,
                 quantum_projection: None,
                 actual_receiving_ingress: epoch_index,
                 heard_cells,
@@ -4204,11 +4297,25 @@ mod tests {
         epoch_index: u64,
         scope: EpochCandidateScope,
     ) -> StagedEpochCandidate {
+        d_only_fixture_stage_with_grain(field, material, epoch_index, scope, false)
+    }
+
+    fn d_only_fixture_stage_with_grain(
+        field: &Field, material: &Constitution, epoch_index: u64,
+        scope: EpochCandidateScope, refining: bool,
+    ) -> StagedEpochCandidate {
+        d_only_fixture_stage_with_grain_gradient(field, material, epoch_index, scope, refining, rat(8, 1))
+    }
+
+    fn d_only_fixture_stage_with_grain_gradient(
+        field: &Field, material: &Constitution, epoch_index: u64,
+        scope: EpochCandidateScope, refining: bool, gradient: Rat,
+    ) -> StagedEpochCandidate {
         let receiver = field.receivers()[0].ring;
         let requests = material.contacts.iter().enumerate().map(|(contact, factor)| FactorStep {
             gradient: FactorGradient::Dissipation {
                 contact,
-                gradient: scaled_identity(factor.dissipation.rows(), rat(8, 1)),
+                gradient: scaled_identity(factor.dissipation.rows(), gradient.clone()),
             },
             energy: Rat::zero(),
             covector: Rat::one(),
@@ -4229,6 +4336,11 @@ mod tests {
             &retention, material.landmarks(receiver).unwrap().clone(), &pair_speed, &[],
             &crate::hnn::reference::observed::HostObservedEpochExecution, true,
         ).unwrap();
+        if refining {
+            let plan = ObservedChannelGrainPlan::at_section(field, &retention, receiver,
+                epoch_index, epoch_index + 1).unwrap().unwrap();
+            stage = stage.with_channel_grain(plan).unwrap();
+        }
         if scope == EpochCandidateScope::ReceivingOnly {
             let whole = stage.stage(EpochCandidateScope::Whole, &mut |_| {}).unwrap();
             assert!(whole.requires_comparison());
@@ -4286,6 +4398,103 @@ mod tests {
         let cold_next = d_only_fixture_stage(&field, &cold, 1, EpochCandidateScope::Whole);
         assert_eq!(warm_next.material, cold_next.material);
         assert_eq!(warm_next.requires_comparison(), cold_next.requires_comparison());
+    }
+
+    #[test]
+    fn grain_join_stages_two_rebased_d_endpoints_and_discards_all_channels_on_retry() {
+        let (field, mut opening, _, _, _) = normal_domain_fixture(None, false);
+        for contact in 0..opening.contacts.len() {
+            let locus = Locus::Channel(contact);
+            let amount = opening.lattice(locus).unwrap().unit() / rat(4, 1);
+            opening.clocks.insert(locus, 7);
+            for carrier in [Carrier::Factor(2), Carrier::FactorScale(2)] {
+                opening.carries.insert((locus, carrier), Carry(BTreeMap::from([(0, amount.clone())])));
+            }
+        }
+        let before = opening.clone();
+        let staged = d_only_fixture_stage_with_grain(&field, &opening, 113, EpochCandidateScope::Whole, true);
+        assert!(staged.requires_comparison());
+        assert!(staged.has_physical_motion());
+        let grain = staged.reading.epoch.as_ref().unwrap().channel_grain.as_ref().unwrap();
+        assert_eq!((grain.ingress_before, grain.ingress_after, grain.grain_exponent), (113, 114, 3));
+        assert_eq!(grain.contacts.len(), opening.contacts.len());
+        assert_eq!(staged.material.commit, opening.commit + 1);
+        for reading in &grain.contacts {
+            let contact = reading.contact;
+            let locus = Locus::Channel(contact);
+            assert_eq!(reading.levels, 3);
+            assert_eq!(reading.after_exponent, reading.founding_exponent + 3);
+            assert!(reading.dissipation_rebase.numerators.iter().any(|x| !x.is_zero()));
+            assert_eq!(staged.material.lattice(locus).unwrap().exponent(), reading.after_exponent);
+            assert_eq!(staged.material.clock(locus), opening.clock(locus) + 1,
+                "rebase cannot add a second persistent clock advance");
+            assert_eq!(staged.material.contacts[contact].storage, opening.contacts[contact].storage);
+            assert_eq!(staged.material.contacts[contact].stiffness, opening.contacts[contact].stiffness);
+            assert_eq!(staged.material.contacts[contact].scales[..2], opening.contacts[contact].scales[..2]);
+            assert!(staged.reading.steps.iter().any(|(at, step)| *at == locus && step.family == Family::Factor(2)));
+        }
+        assert!(staged.admit_change(&crate::ratio::algebraic::ExactInterval {
+            lower: Rat::zero(), upper: Rat::one(),
+        }).is_none(), "a non-descending same-opening comparison cannot publish the rebased endpoint");
+        let fallback = d_only_fixture_stage_with_grain(&field, &opening, 113, EpochCandidateScope::ReceivingOnly, true);
+        assert!(!fallback.requires_comparison());
+        assert!(fallback.reading.epoch.as_ref().unwrap().channel_grain.is_none());
+        assert_eq!(fallback.material.contacts, opening.contacts);
+        for contact in 0..opening.contacts.len() {
+            let locus = Locus::Channel(contact);
+            assert_eq!(fallback.material.lattice(locus).unwrap(), opening.lattice(locus).unwrap());
+            assert_eq!(fallback.material.clock(locus), opening.clock(locus));
+        }
+        assert_eq!(fallback.material.carries.iter().filter(|((l, _), _)| matches!(l, Locus::Channel(_))).collect::<Vec<_>>(),
+            opening.carries.iter().filter(|((l, _), _)| matches!(l, Locus::Channel(_))).collect::<Vec<_>>());
+        assert_eq!(opening, before);
+    }
+
+    #[test]
+    fn grain_join_complete_cold_restore_and_next_staging_keep_absolute_target() {
+        let (field, mut opening, _, _, _) = normal_domain_fixture(None, false);
+        let founding = opening.clone();
+        for contact in 0..opening.contacts.len() {
+            let locus = Locus::Channel(contact);
+            let amount = opening.lattice(locus).unwrap().unit() / rat(4, 1);
+            opening.clocks.insert(locus, 7);
+            opening.carries.insert((locus, Carrier::Factor(2)), Carry(BTreeMap::from([(0, amount)])));
+        }
+        let staged = d_only_fixture_stage_with_grain(&field, &opening, 113, EpochCandidateScope::Whole, true).material;
+        let text = staged.continuing_state(0).unwrap().to_text();
+        let state = ContinuingState::from_text(&text, staged.budget()).unwrap();
+        let cold = founding.continued_on(&field, &state).unwrap();
+        assert_eq!(cold, staged);
+        assert_eq!(cold.continuing_state(0).unwrap().to_text(), text);
+        let warm_next = d_only_fixture_stage_with_grain(&field, &staged, 114, EpochCandidateScope::Whole, true);
+        let cold_next = d_only_fixture_stage_with_grain(&field, &cold, 114, EpochCandidateScope::Whole, true);
+        assert_eq!(warm_next.material, cold_next.material);
+        assert_eq!(warm_next.reading, cold_next.reading);
+        assert!(warm_next.reading.epoch.unwrap().channel_grain.unwrap().contacts.iter().all(|r| r.levels == 0));
+    }
+
+    #[test]
+    fn grain_join_without_nonzero_fresh_d_update_keeps_all_channel_state() {
+        let (field, mut opening, _, _, _) = normal_domain_fixture(None, false);
+        for contact in 0..opening.contacts.len() {
+            let locus = Locus::Channel(contact);
+            let amount = opening.lattice(locus).unwrap().unit() / rat(4, 1);
+            opening.clocks.insert(locus, 7);
+            opening.carries.insert((locus, Carrier::Factor(2)), Carry(BTreeMap::from([(0, amount)])));
+        }
+        let staged = d_only_fixture_stage_with_grain_gradient(&field, &opening, 113, EpochCandidateScope::Whole, true, Rat::zero());
+        assert_eq!(staged.material.contacts, opening.contacts);
+        let grain = staged.reading.epoch.unwrap().channel_grain.unwrap();
+        for reading in grain.contacts {
+            let locus = Locus::Channel(reading.contact);
+            assert_eq!(reading.levels, 0);
+            assert_eq!(reading.shortfall, 3);
+            assert!(reading.deferred_without_fresh_update);
+            assert_eq!(staged.material.lattice(locus).unwrap(), opening.lattice(locus).unwrap());
+            assert_eq!(staged.material.clock(locus), opening.clock(locus));
+        }
+        assert_eq!(staged.material.carries.iter().filter(|((l, _), _)| matches!(l, Locus::Channel(_))).collect::<Vec<_>>(),
+            opening.carries.iter().filter(|((l, _), _)| matches!(l, Locus::Channel(_))).collect::<Vec<_>>());
     }
 
 }

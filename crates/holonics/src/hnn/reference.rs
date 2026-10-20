@@ -1060,7 +1060,14 @@ impl Reference {
 
     /// [definition; agent-inferred, October 2; the contact loop record §23] **The contacts on the
     /// refining grain**: after each deposit, every retained channel is re-based by the levels the
-    /// readings' dyadic grain exponent grew ([`refining_grain_exponent`]).
+    /// readings' dyadic grain exponent grew ([`refining_grain_exponent`]). In the observed
+    /// channel-D scope the absolute target is the founding lattice plus k(N_close), where N is
+    /// the saved actual receiver-ingress count. Delayed opt-in catches up without resetting N;
+    /// an already finer lattice is held. All six carries rebase inside the unpublished candidate,
+    /// before fresh preparation, with C/K factor entries held and all scales rebased exactly.
+    /// The largest safe level is attained; its C/K bound and target shortfall are reported. The complete
+    /// endpoint requires actual-ray and same-opening finite admission. Other observed scopes
+    /// still refuse this option. Lean obligation: the #62 carrier/consumer refinement join.
     pub fn with_refining_grain(self) -> Self {
         Self {
             refining: true,

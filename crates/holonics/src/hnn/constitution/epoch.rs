@@ -7,6 +7,9 @@
 
 use super::*;
 
+mod channel_grain;
+mod channel_grain_policy;
+pub(crate) use channel_grain_policy::ObservedChannelGrainPlan;
 mod channel_ray;
 mod checkpoint;
 mod deposit;

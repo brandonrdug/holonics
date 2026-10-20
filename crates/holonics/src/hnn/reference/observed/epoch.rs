@@ -200,6 +200,7 @@ fn receiving_restage_permitted(error: &HnnError) -> bool {
         | "the actual epoch rays violate the joint triangle bound"
         | "the actual epoch rays leave an executed pump tube"
         | "source refinement needs its pair-factor remainders inside the finer half-cell"
+        | "a scheduled channel rebase waits for its original fresh positive D rate"
     ))
 }
 
@@ -547,9 +548,9 @@ impl Reference {
                 "a terminal partial epoch cannot continue as an ordinary observed life",
             ));
         }
-        if self.refining {
+        if self.refining && deposition_scope != ObservedEpochDepositionScope::NormalMapsAndChannelDissipation {
             return Err(refusal(
-                "contact-grain scheduling is not wired for observed epoch continuation",
+                "observed contact-grain scheduling requires the explicit channel D scope",
             ));
         }
         if !resident.pending.is_empty() || !resident.staged.is_empty() {
@@ -1050,7 +1051,7 @@ impl Reference {
                 | ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
         );
         let mut normal_stage = if shared_normals {
-            Some(
+            let stage =
                 crate::hnn::constitution::epoch::ObservedNormalEpochStage::new(
                     &comparison_opening.constitution,
                     &deposits,
@@ -1067,8 +1068,14 @@ impl Reference {
                     execution,
                     deposition_scope
                         == ObservedEpochDepositionScope::NormalMapsAndChannelDissipation,
-                )?,
-            )
+                )?;
+            let plan = if self.refining {
+                crate::hnn::constitution::epoch::ObservedChannelGrainPlan::at_section(
+                    &field, &retention, receiver, epoch_index,
+                    next.observed_epoch_ingress.expect("set above").1,
+                )?
+            } else { None };
+            Some(match plan { Some(plan) => stage.with_channel_grain(plan)?, None => stage })
         } else {
             None
         };
@@ -3963,6 +3970,67 @@ mod tests {
         ).is_err());
         assert_eq!(actual.continuing_state(0).unwrap(), before);
         assert_eq!(crib, saved_crib);
+    }
+
+    #[test]
+    fn grain_observed_continuation_uses_saved_receiver_ingress_and_preserves_energy() {
+        let (reference, _, mut actual, mut crib, pairing) = source_probe_opening();
+        let receiver = actual.field.receivers()[0].ring;
+        // Synthetic saved ingress isolates the clock binding: absorption-window count and
+        // source cells remain their fixture values, deliberately different from actual N.
+        actual.observed_epoch_ingress = Some((receiver, 113));
+        let opening = actual.clone();
+        let read = reference.with_refining_grain().observe_epoch_continuing_at_cuts_with_scope(
+            &mut actual, &mut crib, &pairing, &[0; 32], None, &[], false,
+            &HostObservedEpochExecution,
+            ObservedEpochDepositionScope::NormalMapsAndChannelDissipation,
+        ).unwrap();
+        assert_eq!(actual.observed_epoch_ingress, Some((receiver, 114)));
+        assert!(read.energy.closes());
+        assert!(read.energy.deposition_work.is_zero());
+        if let Some(grain) = read.deposit.epoch.as_ref().unwrap().channel_grain.as_ref() {
+            assert_eq!((grain.ingress_before, grain.ingress_after), (113, 114));
+            assert_eq!(grain.grain_exponent, 3);
+            for contact in &grain.contacts {
+                assert_eq!(contact.target_exponent, actual.field.lattice(Locus::Channel(contact.contact)).unwrap().exponent()+3);
+            }
+        } else {
+            assert_eq!(read.publication_attempt, EpochStageAttempt::ReceivingOnly);
+            for contact in 0..opening.field.contacts().len() {
+                assert_eq!(actual.constitution.contact_storage(contact), opening.constitution.contact_storage(contact));
+                assert_eq!(actual.constitution.contact_stiffness(contact), opening.constitution.contact_stiffness(contact));
+                assert_eq!(actual.constitution.lattice(Locus::Channel(contact)).unwrap(), opening.constitution.lattice(Locus::Channel(contact)).unwrap());
+                assert_eq!(actual.constitution.clock(Locus::Channel(contact)), opening.constitution.clock(Locus::Channel(contact)));
+            }
+        }
+    }
+
+    #[test]
+    fn grain_observed_terminal_without_tick_does_not_schedule_and_normal_scope_stays_explicit() {
+        let (reference, _, mut actual, mut crib, pairing) = source_probe_opening();
+        let receiver = actual.field.receivers()[0].ring;
+        actual.observed_epoch_ingress = Some((receiver, 113));
+        let before = actual.continuing_state(0).unwrap();
+        let crib_before = crib.clone();
+        let refining = reference.with_refining_grain();
+        assert!(refining.observe_epoch_continuing_at_cuts_with_scope(
+            &mut actual, &mut crib, &pairing, &[0; 32], None, &[], false,
+            &HostObservedEpochExecution, ObservedEpochDepositionScope::NormalMaps,
+        ).is_err());
+        assert_eq!(actual.continuing_state(0).unwrap(), before);
+        assert_eq!(crib, crib_before);
+        let opening = actual.clone();
+        let read = refining.observe_epoch_continuing_at_cuts_with_scope(
+            &mut actual, &mut crib, &pairing, &[1], None, &[], true,
+            &HostObservedEpochExecution, ObservedEpochDepositionScope::NormalMapsAndChannelDissipation,
+        ).unwrap();
+        assert!(read.terminal_partial);
+        assert_eq!(actual.observed_epoch_ingress, Some((receiver, 113)));
+        assert!(read.deposit.epoch.as_ref().unwrap().channel_grain.is_none());
+        for contact in 0..opening.field.contacts().len() {
+            assert_eq!(actual.constitution.lattice(Locus::Channel(contact)).unwrap(), opening.constitution.lattice(Locus::Channel(contact)).unwrap());
+        }
+        assert!(read.energy.closes());
     }
 
 }
