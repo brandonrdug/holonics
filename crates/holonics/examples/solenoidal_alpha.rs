@@ -1208,6 +1208,21 @@ fn run() -> Result<()> {
                         ("source_end_exclusive", epoch.cells.to_string()),
                         ("material_commit", epoch.deposit.commit.to_string()),
                         ("actual_receiving_ingress", epoch.deposit.epoch.as_ref().map_or_else(|| "null".into(), |read| read.actual_receiving_ingress.to_string())),
+                        ("receiving_quantum_projection", epoch.deposit.epoch.as_ref()
+                            .and_then(|read| read.quantum_projection.as_ref())
+                            .map_or_else(|| "null".into(), |read| object(&[
+                                ("eligible", read.eligible.to_string()),
+                                ("skip_reason", read.skip_reason.map_or_else(|| "null".into(), quoted)),
+                                ("trials", format!("[{}]", read.trials.iter().map(|trial| object(&[
+                                    ("row", trial.row.to_string()),
+                                    ("column", trial.column.to_string()),
+                                    ("sign", trial.sign.to_string()),
+                                    ("normal_admitted", trial.normal_admitted.to_string()),
+                                    ("actual_admitted", trial.actual_admitted.to_string()),
+                                    ("refusal", exact(&trial.refusal)),
+                                    ("reason", trial.reason.as_deref().map_or_else(|| "null".into(), quoted)),
+                                ])).collect::<Vec<_>>().join(","))),
+                            ]))),
                         ("locus_deposits", epoch.deposit.epoch.as_ref().map_or_else(|| "[]".into(), |read| {
                             format!("[{}]", read.loci.iter().map(|locus| object(&[
                                 ("locus", exact(&locus.locus)),

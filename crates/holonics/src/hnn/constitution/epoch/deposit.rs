@@ -116,6 +116,94 @@ impl<'a> ObservedNormalEpochStage<'a> {
         scope: EpochCandidateScope,
         observe: &mut dyn FnMut(EpochDepositPhase),
     ) -> Result<StagedEpochCandidate, EpochStageFailure> {
+        // A zero fallback is an independently fully certified successor, never an error catch.
+        let mut canonical = self.stage_projection(scope, observe, None)?;
+        if scope != EpochCandidateScope::ReceivingOnly {
+            return Ok(canonical);
+        }
+        let mut receipt = EpochQuantumProjectionReading {
+            eligible: false,
+            skip_reason: None,
+            trials: vec![],
+        };
+        let kind = LinearLocus::Receiving(self.receiver);
+        let prepared = self
+            .prepared
+            .as_ref()
+            .expect("successful shared stage prepared its normals");
+        let law = prepared.laws[&kind].clone();
+        let flow = prepared.flows[&kind].clone();
+        let gamma = prepared
+            .certified
+            .get(&(kind.locus(), Family::Map))
+            .map(|r| r.step.step.clone())
+            .unwrap_or_else(Rat::zero);
+        let gain = EpochArray::from_dyadic_scalar(&gamma)
+            .map_err(|e| EpochStageTrace::default().failed(e))?;
+        let (skip, options) = quantum_projection::alternatives(&law, &flow, &gain)
+            .map_err(|e| EpochStageTrace::default().failed(e))?;
+        receipt.skip_reason = skip;
+        receipt.eligible = skip.is_none();
+        for option in options {
+            let mut trial = EpochQuantumTrialReading {
+                row: option.row,
+                column: option.column,
+                sign: option.sign,
+                normal_admitted: false,
+                actual_admitted: false,
+                refusal: None,
+                reason: None,
+            };
+            match law.deposit_quantum(&flow, &gain, &option) {
+                Ok(_) => trial.normal_admitted = true,
+                Err(HnnError::EpochStepNonDescending { .. }) => {
+                    trial.reason = Some(
+                        "one-quantum alternative fails an unchanged retained normal-fall guard"
+                            .into(),
+                    );
+                    receipt.trials.push(trial);
+                    continue;
+                }
+                Err(error) => return Err(EpochStageTrace::default().failed(error)),
+            }
+            // All branches replay original opening with immutable prepared operands.
+            // CandidateStaged callbacks describe these unpublished stages; only this
+            // returned candidate can reach the caller's existing publication owner.
+            match self.stage_projection(scope, observe, Some(&option)) {
+                Ok(mut candidate) => {
+                    trial.actual_admitted = true;
+                    receipt.trials.push(trial);
+                    candidate
+                        .reading
+                        .epoch
+                        .as_mut()
+                        .expect("epoch stage receipt")
+                        .quantum_projection = Some(receipt);
+                    return Ok(candidate);
+                }
+                Err(failure) if quantum_projection::optional_refusal(&failure, self.receiver) => {
+                    trial.reason = Some(failure.error.to_string());
+                    trial.refusal = Some(failure.evidence);
+                    receipt.trials.push(trial);
+                }
+                Err(failure) => return Err(failure),
+            }
+        }
+        canonical
+            .reading
+            .epoch
+            .as_mut()
+            .expect("epoch stage receipt")
+            .quantum_projection = Some(receipt);
+        Ok(canonical)
+    }
+
+    fn stage_projection(
+        &mut self,
+        scope: EpochCandidateScope,
+        observe: &mut dyn FnMut(EpochDepositPhase),
+        quantum: Option<&QuantumProjection>,
+    ) -> Result<StagedEpochCandidate, EpochStageFailure> {
         let mut trace = EpochStageTrace::default();
         if scope != EpochCandidateScope::Whole && self.prepared.is_none() {
             return Err(trace.failed(refused(
@@ -140,6 +228,7 @@ impl<'a> ObservedNormalEpochStage<'a> {
                 Some(scope),
                 &mut trace,
                 Some(&mut self.prepared),
+                quantum,
             )
             .map_err(|error| {
                 let mut failure = trace.failed(error);
@@ -611,7 +700,11 @@ fn enrich_failed_normal_ray(
     push(
         evidence,
         "projection_rule",
-        EpochStageValue::Text("componentwise truncation toward zero on candidate map lattice"),
+        EpochStageValue::Text(if deposit.quantum_projection.is_some() {
+            "one signed existing-lattice coordinate after wholly-zero canonical projection"
+        } else {
+            "componentwise truncation toward zero on candidate map lattice"
+        }),
     );
     push(
         evidence,
@@ -1014,6 +1107,7 @@ impl Constitution {
             None,
             &mut EpochStageTrace::default(),
             None,
+            None,
         )?
         .admit_receiving()
     }
@@ -1107,6 +1201,7 @@ impl Constitution {
             Some(scope),
             &mut trace,
             None,
+            None,
         )
         .map_err(|error| trace.failed(error))
     }
@@ -1135,7 +1230,15 @@ impl Constitution {
         scope: Option<EpochCandidateScope>,
         trace: &mut EpochStageTrace,
         mut prepared: Option<&mut Option<PreparedEpochNormals>>,
+        quantum: Option<&QuantumProjection>,
     ) -> Result<StagedEpochCandidate, HnnError> {
+        if quantum.is_some()
+            && (scope != Some(EpochCandidateScope::ReceivingOnly) || prepared.is_none())
+        {
+            return Err(refused(
+                "a quantum alternative belongs only to the shared receiving-only stage",
+            ));
+        }
         let grain = self.observed_epoch_grain(receiver)?;
         let mut expected_partition = None;
         if heard_cells == 0
@@ -1736,6 +1839,11 @@ impl Constitution {
                 );
             }
             let deposit = match *kind {
+                LinearLocus::Receiving(_) if quantum.is_some() => laws[kind].deposit_quantum(
+                    &flows[kind],
+                    &gain,
+                    quantum.expect("matched quantum alternative"),
+                )?,
                 LinearLocus::SourcePort(ring) if joint => laws[kind].deposit_joint(
                     &flows[kind],
                     &gain,
@@ -2036,6 +2144,7 @@ impl Constitution {
         }
         let reading = DepositReading {
             epoch: Some(EpochDepositReading {
+                quantum_projection: None,
                 actual_receiving_ingress: epoch_index,
                 heard_cells,
                 declared_cells: epoch_cells,
@@ -2356,13 +2465,19 @@ mod tests {
         let reading = epoch_locus_scale_reading(&candidate);
         // H+=2, D=(1/8,-1/2); on the actual 1/4 lattice only the second row moves.
         assert_eq!(reading.gram_column_absolute_sums, vec![rat(2, 1)]);
-        assert_eq!(reading.proposed_maximum_absolute_by_row, vec![rat(1, 8), rat(1, 2)]);
+        assert_eq!(
+            reading.proposed_maximum_absolute_by_row,
+            vec![rat(1, 8), rat(1, 2)]
+        );
         assert_eq!(reading.proposed_nonzero_by_row, vec![1, 1]);
         assert_eq!(reading.represented_nonzero_by_row, vec![0, 1]);
         assert_eq!(reading.nonzero_proposal_zero_in_step_by_row, vec![1, 0]);
         assert!(reading.positive_eta);
         assert_eq!(law.encode_checkpoint(), before);
-        assert_eq!(candidate.step.to_matrix().unwrap().to_rows(), vec![vec![Rat::zero()], vec![rat(-1, 2)]]);
+        assert_eq!(
+            candidate.step.to_matrix().unwrap().to_rows(),
+            vec![vec![Rat::zero()], vec![rat(-1, 2)]]
+        );
     }
 
     #[test]
@@ -2377,12 +2492,17 @@ mod tests {
         let record = EpochRecord::from_sample(&sample).unwrap();
         let flow = EpochFlow::from_records(1, 1, 2, 1, 0, 1, &[record]).unwrap();
         let gain = EpochArray::from_dyadic_scalar(&Rat::one()).unwrap();
-        let held = law.deposited_at(&flow, &gain, BigInt::zero(), BigInt::one()).unwrap();
+        let held = law
+            .deposited_at(&flow, &gain, BigInt::zero(), BigInt::one())
+            .unwrap();
         let moving = law.deposit(&flow, &gain).unwrap();
         let a = epoch_locus_scale_reading(&held);
         let b = epoch_locus_scale_reading(&moving);
         assert_eq!(a.proposed_maximum_absolute_by_row, vec![rat(1, 2)]);
-        assert_eq!(a.proposed_maximum_absolute_by_row, b.proposed_maximum_absolute_by_row);
+        assert_eq!(
+            a.proposed_maximum_absolute_by_row,
+            b.proposed_maximum_absolute_by_row
+        );
         assert!(!a.positive_eta);
         assert!(b.positive_eta);
         assert_eq!(a.nonzero_proposal_zero_in_step_by_row, vec![1]);
@@ -2514,6 +2634,169 @@ mod tests {
             parts,
             &mut |_| {},
         )
+    }
+
+    /// The retained news is a synthetic exact native fixture, not a historical receipt.
+    /// Fresh G/gamma and every physical witness are produced again from the real stage.
+    fn quantum_replay_fixture(opposed: bool) {
+        let (field, mut material, deposit, parts, exponent) = normal_domain_fixture(None, true);
+        let receiver = field.receivers()[0].ring;
+        let kind = LinearLocus::Receiving(receiver);
+        let deposits = [deposit];
+        // Synthetic pre-existing positive curvature makes this fixture's dyadic
+        // majorizer gap strict; the original feature happened to land on a power
+        // of two. Seed it before producing fresh G/gamma and never alter guards.
+        let mut seed = EpochLaw::from_normal(material.epoch_normal(kind).unwrap(), material.observed_epoch_grain(receiver).unwrap()).unwrap();
+        let phase_rows: Vec<_> = (1..seed.map.rows).step_by(2).collect();
+        seed = seed.with_phase_rows(&phase_rows, field.ring(receiver).period()).unwrap();
+        let mut extra = vec![BigInt::zero(); seed.gram.values.len()];
+        extra[0] = BigInt::one();
+        seed.gram = seed.gram.add(&EpochArray::new(seed.gram.rows, seed.gram.columns, 1, extra).unwrap()).unwrap();
+        material.epoch_normal_mut(kind).unwrap().publish_epoch(seed).unwrap();
+        let retained = crate::hnn::retention::loci(&field).into_iter().collect();
+        let pair_speed = |_, _, _: &PairPort, _: [&[Vec<Rat>]; 3]| panic!("no factor proposal");
+        let (mut law, flow, gamma) = {
+            let mut probe = ObservedNormalEpochStage::new(
+                &material,
+                &deposits,
+                receiver,
+                field.ring(receiver).period(),
+                1,
+                1,
+                0,
+                exponent,
+                &retained,
+                material.landmarks(receiver).unwrap().clone(),
+                &pair_speed,
+                &parts,
+                &crate::hnn::reference::observed::HostObservedEpochExecution,
+            )
+            .unwrap();
+            let _ = probe.stage(EpochCandidateScope::Whole, &mut |_| {});
+            let prepared = probe
+                .prepared
+                .as_ref()
+                .expect("fixture fresh normal certificate");
+            (
+                prepared.laws[&kind].clone(),
+                prepared.flows[&kind].clone(),
+                prepared.certified[&(kind.locus(), Family::Map)]
+                    .step
+                    .step
+                    .clone(),
+            )
+        };
+        assert!(gamma.is_positive());
+        assert!(law.symmetry.is_none());
+        let gain = EpochArray::from_dyadic_scalar(&gamma).unwrap();
+        let gram = law.gram.add(&flow.gram).unwrap();
+        let (_, shares) = law.direction(&flow.covector, &gram, &flow.support).unwrap();
+        let column = flow.support[0];
+        let share = shares[column];
+        let s = if share >= 0 {
+            Rat::from_integer(BigInt::one() << share as usize)
+        } else {
+            Rat::new(BigInt::one(), BigInt::one() << (-share) as usize)
+        };
+        let h = Rat::new(BigInt::one(), BigInt::one() << law.map_lattice as usize);
+        let diagonal = gram.to_matrix().unwrap().entries()[column * gram.columns + column].clone();
+        assert!(diagonal < s, "fixture has a strict majorizer gap");
+        let magnitude = &h * (diagonal + s) / Rat::from_integer(2.into());
+        let target =
+            EpochArray::from_dyadic_scalar(&if opposed { -magnitude } else { magnitude }).unwrap();
+        let mut values = vec![BigInt::zero(); law.map.values.len()];
+        values[column] = target.values[0].clone(); // magnitude row 0; phase rows remain exactly zero.
+        let target =
+            EpochArray::new(law.map.rows, law.map.columns, target.exponent, values).unwrap();
+        law.news = target
+            .subtract(&flow.covector.scalar_product(&gain).unwrap())
+            .unwrap();
+        assert!(law.deposit(&flow, &gain).unwrap().step.is_zero());
+        material
+            .epoch_normal_mut(kind)
+            .unwrap()
+            .publish_epoch(law.clone())
+            .unwrap();
+        let before = material.continuing_state(0).unwrap().to_text();
+        let mut stage = ObservedNormalEpochStage::new(
+            &material,
+            &deposits,
+            receiver,
+            field.ring(receiver).period(),
+            1,
+            1,
+            0,
+            exponent,
+            &retained,
+            material.landmarks(receiver).unwrap().clone(),
+            &pair_speed,
+            &parts,
+            &crate::hnn::reference::observed::HostObservedEpochExecution,
+        )
+        .unwrap();
+        let _ = stage.stage(EpochCandidateScope::Whole, &mut |_| {});
+        let actual_gamma = &stage.prepared.as_ref().unwrap().certified
+            [&(kind.locus(), Family::Map)]
+            .step
+            .step;
+        assert_eq!(
+            *actual_gamma, gamma,
+            "retained news cannot change the fresh certificate"
+        );
+        let candidate = stage
+            .stage(EpochCandidateScope::ReceivingOnly, &mut |_| {})
+            .unwrap();
+        let (next, reading) = candidate.admit_receiving().unwrap();
+        let receipt = reading.epoch.unwrap().quantum_projection.unwrap();
+        assert!(receipt.eligible);
+        assert_eq!(receipt.trials.len(), 1);
+        let trial = &receipt.trials[0];
+        assert!(trial.normal_admitted);
+        if opposed {
+            assert!(!trial.actual_admitted);
+            assert_eq!(
+                trial.refusal.as_ref().unwrap().condition,
+                EpochStageCondition::ActualRayAlignment
+            );
+            assert_eq!(
+                next.epoch_normal(kind).unwrap().map(),
+                material.epoch_normal(kind).unwrap().map()
+            );
+        } else {
+            assert!(
+                trial.actual_admitted,
+                "aligned fixture must pass the complete existing physical stage: {:?}",
+                trial.refusal
+            );
+            assert!(trial.refusal.is_none());
+            assert_ne!(
+                next.epoch_normal(kind).unwrap().map(),
+                material.epoch_normal(kind).unwrap().map()
+            );
+        }
+        let successor = next.epoch_normal(kind).unwrap().epoch_law().unwrap();
+        let step = successor.map.subtract(&law.map).unwrap();
+        assert_eq!(successor.gram, gram);
+        assert_eq!(
+            successor.news,
+            law.news
+                .add(&flow.covector.scalar_product(&gain).unwrap())
+                .unwrap()
+                .subtract(&step.multiply(&gram).unwrap())
+                .unwrap()
+        );
+        assert_eq!(successor.crossings, law.crossings + 1);
+        assert_eq!(material.continuing_state(0).unwrap().to_text(), before);
+    }
+
+    #[test]
+    fn quantum_optional_replay_uses_actual_stage_and_absorbs_news_once() {
+        quantum_replay_fixture(false);
+    }
+
+    #[test]
+    fn quantum_retained_normal_fall_cannot_override_opposed_fresh_actual_ray() {
+        quantum_replay_fixture(true);
     }
 
     #[test]

@@ -17,8 +17,10 @@ pub(crate) use deposit::{
 mod flow;
 #[cfg(test)]
 mod mixed_tests;
+mod quantum_projection;
 mod spectral;
 pub(crate) use flow::EpochRecord;
+use quantum_projection::QuantumProjection;
 pub(crate) use spectral::EpochSpectral;
 
 fn refused(reason: &'static str) -> HnnError {
@@ -961,6 +963,7 @@ pub(crate) struct EpochLaw {
 
 #[derive(Clone, Debug)]
 pub(crate) struct EpochDeposit {
+    quantum_projection: Option<QuantumProjection>,
     pub(crate) successor: EpochLaw,
     pub(crate) step: EpochArray,
     pub(crate) fall: EpochArray,
@@ -1729,8 +1732,69 @@ impl EpochLaw {
         eta_denominator: BigInt,
         source_budget: Option<(u64, u64, Locus)>,
         joint_locus: Option<LinearLocus>,
-        mut evidence: Option<&mut Option<EpochStageRefusal>>,
+        evidence: Option<&mut Option<EpochStageRefusal>>,
     ) -> Result<EpochDeposit, HnnError> {
+        self.deposited_with_quantum_proposal(
+            flow,
+            gamma,
+            eta_numerator,
+            eta_denominator,
+            source_budget,
+            joint_locus,
+            evidence,
+            None,
+        )
+    }
+
+    fn deposit_quantum(
+        &self,
+        flow: &EpochFlow,
+        gamma: &EpochArray,
+        projection: &QuantumProjection,
+    ) -> Result<EpochDeposit, HnnError> {
+        if (gamma.rows, gamma.columns) != (1, 1)
+            || !gamma.is_dyadic()
+            || gamma.values.iter().any(Signed::is_negative)
+        {
+            return Err(refused(
+                "the epoch's certified fresh-news gain is nonnegative",
+            ));
+        }
+        self.deposited_with_quantum_proposal(
+            flow,
+            gamma,
+            BigInt::one(),
+            BigInt::one(),
+            None,
+            None,
+            None,
+            Some(projection),
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn deposited_with_quantum_proposal(
+        &self,
+        flow: &EpochFlow,
+        gamma: &EpochArray,
+        eta_numerator: BigInt,
+        eta_denominator: BigInt,
+        source_budget: Option<(u64, u64, Locus)>,
+        joint_locus: Option<LinearLocus>,
+        mut evidence: Option<&mut Option<EpochStageRefusal>>,
+        quantum: Option<&QuantumProjection>,
+    ) -> Result<EpochDeposit, HnnError> {
+        if quantum.is_some()
+            && (eta_numerator != BigInt::one()
+                || eta_denominator != BigInt::one()
+                || source_budget.is_some()
+                || joint_locus.is_some()
+                || !gamma.scalar_ratio()?.is_positive())
+        {
+            return Err(refused(
+                "a quantum alternative needs a positive certified gain at unit receiving eta",
+            ));
+        }
         if eta_numerator.is_negative() || !eta_denominator.is_positive() {
             return Err(refused(
                 "an epoch certificate needs a nonnegative step ratio",
@@ -1846,7 +1910,11 @@ impl EpochLaw {
                 numerator / (&denominator * direction.row_divisors[index / direction.columns])
             })
             .collect();
-        let step = EpochArray::new(self.map.rows, self.map.columns, map_lattice, values)?;
+        let canonical = EpochArray::new(self.map.rows, self.map.columns, map_lattice, values)?;
+        let step = match quantum {
+            Some(projection) => projection.represent(self, flow, &news, &canonical)?,
+            None => canonical,
+        };
         let linear = step.dot(&news)?;
         let quadratic = step.multiply(&gram)?.dot(&step)?.half()?;
         let fall = linear.subtract(&quadratic)?;
@@ -1971,6 +2039,7 @@ impl EpochLaw {
             ..self.clone()
         };
         Ok(EpochDeposit {
+            quantum_projection: quantum.cloned(),
             successor,
             step,
             fall,

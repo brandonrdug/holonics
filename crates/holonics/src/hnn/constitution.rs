@@ -3016,8 +3016,28 @@ pub struct EpochJointDirectionReading {
     pub unit_lower_bound: Option<Rat>,
 }
 
+/// Exterior account of a finite optional receiving projection. No trial is retained material.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochQuantumProjectionReading {
+    pub eligible: bool,
+    pub skip_reason: Option<&'static str>,
+    pub trials: Vec<EpochQuantumTrialReading>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochQuantumTrialReading {
+    pub row: usize,
+    pub column: usize,
+    pub sign: i8,
+    pub normal_admitted: bool,
+    pub actual_admitted: bool,
+    pub refusal: Option<epoch::EpochStageRefusal>,
+    pub reason: Option<String>,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochDepositReading {
+    pub quantum_projection: Option<EpochQuantumProjectionReading>,
     pub actual_receiving_ingress: u64,
     pub heard_cells: u64,
     pub declared_cells: u64,
