@@ -8,7 +8,8 @@ use crate::ratio::{Rat, integer};
 use num_traits::{Signed, Zero};
 use std::collections::BTreeMap;
 mod material;
-pub use material::{Complex, EmpiricalMaterial};
+pub use material::{Complex, EmpiricalMaterial, MaterialFitWork};
+pub(crate) use material::{note_fit_work, reset_fit_work, take_fit_work};
 use material::{complex, features, minus, plus, real};
 fn refusal(reason: &'static str) -> HnnError {
     HnnError::Unadmitted { reason }

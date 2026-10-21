@@ -46,6 +46,9 @@ pub struct ObservedEpochCellReceipt {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ObservedEpochWallTimes {
     pub forward_batch: Duration,
+    /// Nested in forward_batch. Accumulation/fit nest in actual_observation;
+    /// context sealing/contraction nests in source_prepare_refine, not actual_observation.
+    pub prepared_forward: crate::hnn::reference::PreparedForwardWork,
     /// Includes the tree's prequential face schedule, score and exact return/compose staging.
     pub compare_return_compose_batch: Duration,
     pub grouped_deposit: Duration,
@@ -857,6 +860,7 @@ impl Reference {
         let comparison_commit = forward.commit;
         let EpochForward {
             prepared_input,
+            prepared_forward,
             reads: forwards,
             mut prefixes,
             current,
@@ -2137,6 +2141,7 @@ impl Reference {
         let precision_close = precision_start.elapsed();
         let wall = ObservedEpochWallTimes {
             forward_batch,
+            prepared_forward,
             compare_return_compose_batch,
             grouped_deposit,
             whole_stage,

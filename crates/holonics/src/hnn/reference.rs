@@ -725,6 +725,17 @@ impl std::ops::AddAssign for WallTimes {
     }
 }
 
+/// Disjoint outer taps inside epoch forward. Accumulation/fit nest in actual_observation;
+/// context sealing/contraction nests in source_prepare_refine. Fit subphases nest in total_fit.
+/// Measurements do not enter any native/current/material/checkpoint owner.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct PreparedForwardWork {
+    pub source_prepare_refine: Duration,
+    pub execution_forward: Duration,
+    pub actual_observation: Duration,
+    pub material: crate::hnn::physical::action::contextual::MaterialFitWork,
+}
+
 /// [definition] **The compare phase's readings** ([`compare_phase`]): the tree face at the grain's
 /// code lengths, the window scored by the receiver's population, the Holon ratio and its covector.
 #[derive(Clone, Debug)]

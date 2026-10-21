@@ -4,6 +4,40 @@ use super::*;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
+/// Transient completed-operation measurements. Never serialized in material/native state.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct MaterialFitWork {
+    pub stage_calls: u64,
+    pub fit_calls: u64,
+    pub scaled_integer_fits: u64,
+    pub rational_grid_fits: u64,
+    pub accumulation_and_bounds: std::time::Duration,
+    pub initial_grid: std::time::Duration,
+    pub factor: std::time::Duration,
+    pub solve: std::time::Duration,
+    pub true_residual_and_bounds: std::time::Duration,
+    pub total_fit: std::time::Duration,
+    pub context_seal_and_contract: std::time::Duration,
+}
+std::thread_local! {
+    static MATERIAL_WORK: std::cell::Cell<MaterialFitWork> = std::cell::Cell::new(MaterialFitWork::default());
+}
+pub(crate) fn note_fit_work(f: impl FnOnce(&mut MaterialFitWork)) {
+    MATERIAL_WORK.with(|c| {
+        let mut w = c.get();
+        f(&mut w);
+        c.set(w);
+    });
+}
+pub(crate) fn reset_fit_work() {
+    MATERIAL_WORK.with(|c| c.set(MaterialFitWork::default()));
+}
+pub(crate) fn take_fit_work() -> MaterialFitWork {
+    MATERIAL_WORK.with(|c| c.replace(MaterialFitWork::default()))
+}
+
+mod scaled;
+
 pub type Complex = [Rat; 2];
 fn zero() -> Complex {
     [Rat::zero(), Rat::zero()]
@@ -109,6 +143,7 @@ impl EmpiricalMaterial {
         eta: &[Complex],
         bounds: &ContextualBounds,
     ) -> Result<Self, HnnError> {
+        let accumulation_start = std::time::Instant::now();
         if f.len() != self.h.len() || eta.len() != self.b.len() {
             return Err(refusal("the same empirical source and response chart"));
         }
@@ -136,20 +171,35 @@ impl EmpiricalMaterial {
                 .flat_map(|x| x.iter())
                 .chain(std::iter::once(&next.target_energy)),
         )?;
+        note_fit_work(|w| {
+            w.stage_calls += 1;
+            w.accumulation_and_bounds += accumulation_start.elapsed();
+        });
         next.fit(bounds)?;
         Ok(next)
     }
     pub(super) fn fit(&mut self, bounds: &ContextualBounds) -> Result<(), HnnError> {
-        self.fit_with_real_reuse(bounds, true)
+        self.fit_with_backend(bounds, true, true)
     }
-    /// All-real moments have two identical, uncoupled interleaved real blocks.
-    /// Only exact-zero imaginary operands qualify; complex material keeps the
-    /// original realification. This is arithmetic reuse, not a changed fit law.
+    #[cfg(test)]
     fn fit_with_real_reuse(
         &mut self,
         bounds: &ContextualBounds,
         allow_real_reuse: bool,
     ) -> Result<(), HnnError> {
+        self.fit_with_backend(bounds, allow_real_reuse, false)
+    }
+    /// All-real moments have two identical, uncoupled interleaved real blocks.
+    /// Only exact-zero imaginary operands qualify; complex material keeps the
+    /// original realification. This is arithmetic reuse, not a changed fit law.
+    fn fit_with_backend(
+        &mut self,
+        bounds: &ContextualBounds,
+        allow_real_reuse: bool,
+        allow_scaled_integer: bool,
+    ) -> Result<(), HnnError> {
+        let fit_start = std::time::Instant::now();
+        note_fit_work(|w| w.fit_calls += 1);
         let m = self.h.len();
         let full_dimension = 2 * m;
         let all_real = allow_real_reuse
@@ -163,83 +213,96 @@ impl EmpiricalMaterial {
         let d = if all_real { m } else { full_dimension };
         #[cfg(test)]
         fit_work::begin(d, self.b.len(), all_real);
-        let scale = Rat::from_integer(BigInt::one() << bounds.precision_bits);
-        let grid = |v: Rat| {
-            #[cfg(test)]
-            fit_work::grid();
-            let q = v * &scale;
-            Rat::new(q.numer() / q.denom(), scale.numer().clone())
-        };
-        // Same real-block proposal and diagonal majorant as normal_fit_sources.
-        let mut a = vec![vec![Rat::zero(); d]; d];
-        for (i, r) in a.iter_mut().enumerate() {
-            for (j, v) in r.iter_mut().enumerate() {
-                let z = if all_real {
-                    &self.h[i][j]
-                } else {
-                    &self.h[i / 2][j / 2]
-                };
-                *v = grid(if all_real || i % 2 == j % 2 {
-                    z[0].clone()
-                } else if i % 2 == 0 {
-                    -z[1].clone()
-                } else {
-                    z[1].clone()
-                });
-                if i == j {
-                    // Keep the ORIGINAL 2m/scale majorant. Using m here would
-                    // change the rounded proposal, its residual and cold bytes.
-                    *v += Rat::from_integer(BigInt::from(full_dimension)) / &scale;
-                }
-            }
-        }
-        let mut diag = vec![Rat::zero(); d];
-        // Port of enclosed_field_junction's bounded dyadic LDL, each product/division
-        // rounded toward zero in the same order. This is a proposal, never the true H.
-        for k in 0..d {
-            let correction = (0..k)
-                .map(|j| grid(grid(&a[k][j] * &a[k][j]) * &diag[j]))
-                .sum::<Rat>();
-            diag[k] = &a[k][k] - correction;
-            if diag[k] <= Rat::zero() {
-                return Err(refusal("positive bounded dyadic normal LDL proposal"));
-            }
-            for i in k + 1..d {
-                let correction = (0..k)
-                    .map(|j| grid(grid(&a[i][j] * &a[k][j]) * &diag[j]))
-                    .sum::<Rat>();
-                a[i][k] = grid((&a[k][i] - correction) / &diag[k]);
-            }
-        }
-        for (row, b) in self.applied.iter_mut().zip(&self.b) {
-            let mut rhs: Vec<_> = if all_real {
-                b.iter().map(|z| grid(z[0].clone())).collect()
-            } else {
-                b.iter()
-                    .flat_map(|z| [grid(z[0].clone()), grid(-z[1].clone())])
-                    .collect()
+        if all_real && allow_scaled_integer {
+            note_fit_work(|w| w.scaled_integer_fits += 1);
+            scaled::propose(self, bounds)?;
+        } else {
+            note_fit_work(|w| w.rational_grid_fits += 1);
+            let scale = Rat::from_integer(BigInt::one() << bounds.precision_bits);
+            let grid = |v: Rat| {
+                #[cfg(test)]
+                fit_work::grid();
+                let q = v * &scale;
+                Rat::new(q.numer() / q.denom(), scale.numer().clone())
             };
-            for i in 0..d {
-                for j in 0..i {
-                    let term = grid(&a[i][j] * &rhs[j]);
-                    rhs[i] -= term;
+            let grid_start = std::time::Instant::now();
+            // Same real-block proposal and diagonal majorant as normal_fit_sources.
+            let mut a = vec![vec![Rat::zero(); d]; d];
+            for (i, r) in a.iter_mut().enumerate() {
+                for (j, v) in r.iter_mut().enumerate() {
+                    let z = if all_real {
+                        &self.h[i][j]
+                    } else {
+                        &self.h[i / 2][j / 2]
+                    };
+                    *v = grid(if all_real || i % 2 == j % 2 {
+                        z[0].clone()
+                    } else if i % 2 == 0 {
+                        -z[1].clone()
+                    } else {
+                        z[1].clone()
+                    });
+                    if i == j {
+                        // Keep the ORIGINAL 2m/scale majorant. Using m here would
+                        // change the rounded proposal, its residual and cold bytes.
+                        *v += Rat::from_integer(BigInt::from(full_dimension)) / &scale;
+                    }
                 }
             }
-            let mut v: Vec<_> = rhs.iter().zip(&diag).map(|(x, y)| grid(x / y)).collect();
-            for i in (0..d).rev() {
-                for j in i + 1..d {
-                    let term = grid(&a[j][i] * &v[j]);
-                    v[i] -= term;
+            note_fit_work(|w| w.initial_grid += grid_start.elapsed());
+            let factor_start = std::time::Instant::now();
+            let mut diag = vec![Rat::zero(); d];
+            // Port of enclosed_field_junction's bounded dyadic LDL, each product/division
+            // rounded toward zero in the same order. This is a proposal, never the true H.
+            for k in 0..d {
+                let correction = (0..k)
+                    .map(|j| grid(grid(&a[k][j] * &a[k][j]) * &diag[j]))
+                    .sum::<Rat>();
+                diag[k] = &a[k][k] - correction;
+                if diag[k] <= Rat::zero() {
+                    return Err(refusal("positive bounded dyadic normal LDL proposal"));
+                }
+                for i in k + 1..d {
+                    let correction = (0..k)
+                        .map(|j| grid(grid(&a[i][j] * &a[k][j]) * &diag[j]))
+                        .sum::<Rat>();
+                    a[i][k] = grid((&a[k][i] - correction) / &diag[k]);
                 }
             }
-            for (j, z) in row.iter_mut().enumerate() {
-                *z = if all_real {
-                    [v[j].clone(), Rat::zero()]
+            note_fit_work(|w| w.factor += factor_start.elapsed());
+            let solve_start = std::time::Instant::now();
+            for (row, b) in self.applied.iter_mut().zip(&self.b) {
+                let mut rhs: Vec<_> = if all_real {
+                    b.iter().map(|z| grid(z[0].clone())).collect()
                 } else {
-                    [v[2 * j].clone(), -v[2 * j + 1].clone()]
+                    b.iter()
+                        .flat_map(|z| [grid(z[0].clone()), grid(-z[1].clone())])
+                        .collect()
                 };
+                for i in 0..d {
+                    for j in 0..i {
+                        let term = grid(&a[i][j] * &rhs[j]);
+                        rhs[i] -= term;
+                    }
+                }
+                let mut v: Vec<_> = rhs.iter().zip(&diag).map(|(x, y)| grid(x / y)).collect();
+                for i in (0..d).rev() {
+                    for j in i + 1..d {
+                        let term = grid(&a[j][i] * &v[j]);
+                        v[i] -= term;
+                    }
+                }
+                for (j, z) in row.iter_mut().enumerate() {
+                    *z = if all_real {
+                        [v[j].clone(), Rat::zero()]
+                    } else {
+                        [v[2 * j].clone(), -v[2 * j + 1].clone()]
+                    };
+                }
             }
+            note_fit_work(|w| w.solve += solve_start.elapsed());
         }
+        let residual_start = std::time::Instant::now();
         let mut residual = Rat::zero();
         for (r, b) in self.applied.iter().zip(&self.b) {
             for (j, target) in b.iter().enumerate() {
@@ -259,6 +322,10 @@ impl EmpiricalMaterial {
                 .flat_map(|x| x.iter())
                 .chain(std::iter::once(&self.residual_upper)),
         )?;
+        note_fit_work(|w| {
+            w.true_residual_and_bounds += residual_start.elapsed();
+            w.total_fit += fit_start.elapsed();
+        });
         Ok(())
     }
 }
@@ -272,10 +339,14 @@ mod fit_work {
         pub right_hand_sides: usize,
         pub real_reuse: bool,
         pub grid_calls: u64,
+        pub integer_encode_calls: u64,
+        pub integer_mul_calls: u64,
+        pub integer_div_calls: u64,
+        pub integer_decode_calls: u64,
     }
     std::thread_local! {
         static WORK: std::cell::Cell<Reading> = const { std::cell::Cell::new(Reading {
-            dimension: 0, right_hand_sides: 0, real_reuse: false, grid_calls: 0,
+            dimension: 0, right_hand_sides: 0, real_reuse: false, grid_calls: 0, integer_encode_calls:0,integer_mul_calls:0,integer_div_calls:0,integer_decode_calls:0,
         }) };
     }
     pub(super) fn begin(dimension: usize, right_hand_sides: usize, real_reuse: bool) {
@@ -285,6 +356,10 @@ mod fit_work {
                 right_hand_sides,
                 real_reuse,
                 grid_calls: 0,
+                integer_encode_calls: 0,
+                integer_mul_calls: 0,
+                integer_div_calls: 0,
+                integer_decode_calls: 0,
             })
         });
     }
@@ -292,6 +367,18 @@ mod fit_work {
         WORK.with(|c| {
             let mut r = c.get();
             r.grid_calls += 1;
+            c.set(r);
+        });
+    }
+    pub(super) fn integer(kind: usize) {
+        WORK.with(|c| {
+            let mut r = c.get();
+            match kind {
+                0 => r.integer_encode_calls += 1,
+                1 => r.integer_mul_calls += 1,
+                2 => r.integer_div_calls += 1,
+                _ => r.integer_decode_calls += 1,
+            };
             c.set(r);
         });
     }
@@ -419,6 +506,132 @@ mod real_reuse_tests {
         eprintln!(
             "REAL_MATERIAL_REUSE old_ns={old_ns:?} new_ns={new_ns:?} old_work={old_work:?} new_work={new_work:?} timing_ranges_separated={separated} changed_complex_fallback={complex_work:?} actual_observations={} cold_exact=true",
             material.observations
+        );
+    }
+    #[test]
+    fn scaled_integer_fit_matches_current25_production_cold_refusals_and_cost() {
+        let bounds = bounds();
+        let mut material = EmpiricalMaterial::found(25, 4);
+        for n in 0..8 {
+            let eta: Vec<_> = (0..4)
+                .map(|j| [Rat::new(BigInt::from(j - n + 1), 8.into()), Rat::zero()])
+                .collect();
+            material = material.stage(&feature(n), &eta, &bounds).unwrap();
+            let mut current = material.clone();
+            current.fit_with_backend(&bounds, true, false).unwrap();
+            assert_eq!(
+                material, current,
+                "same actual25dim moments,appliedM,residual and observation count"
+            );
+            assert_eq!(material.checkpoint_text(), current.checkpoint_text());
+        }
+        let mut old_ns = Vec::new();
+        let mut new_ns = Vec::new();
+        let mut old_work = Vec::new();
+        let mut new_work = Vec::new();
+        let mut old_phases = Vec::new();
+        let mut new_phases = Vec::new();
+        for trial in 0..5 {
+            let mut old = material.clone();
+            let mut new = material.clone();
+            for scaled in if trial % 2 == 0 {
+                [false, true]
+            } else {
+                [true, false]
+            } {
+                reset_fit_work();
+                let t = Instant::now();
+                let target = if scaled { &mut new } else { &mut old };
+                target.fit_with_backend(&bounds, true, scaled).unwrap();
+                let elapsed = t.elapsed().as_nanos();
+                let work = fit_work::reading();
+                let phases = take_fit_work();
+                assert_eq!(work.dimension, 25);
+                assert!(work.real_reuse);
+                assert_eq!(work.right_hand_sides, 4);
+                if scaled {
+                    new_ns.push(elapsed);
+                    new_work.push(work);
+                    new_phases.push(phases);
+                } else {
+                    old_ns.push(elapsed);
+                    old_work.push(work);
+                    old_phases.push(phases);
+                }
+            }
+            assert_eq!(old, new);
+            assert_eq!(old.checkpoint_text(), new.checkpoint_text());
+        }
+        assert!(
+            old_work
+                .iter()
+                .all(|w| w.grid_calls == 8725 && w.integer_mul_calls == 0)
+        );
+        assert!(new_work.iter().all(|w| w.grid_calls == 0
+            && w.integer_encode_calls == 725
+            && w.integer_decode_calls == 100
+            && w.integer_mul_calls > 0
+            && w.integer_div_calls > 0));
+        let text = material.checkpoint_text();
+        let cold = EmpiricalMaterial::restored_text(&text, 25, 4, &bounds).unwrap();
+        assert_eq!(cold, material);
+        assert_eq!(cold.checkpoint_text(), text);
+        // Same declared precision, including toward-zero and fine-grain cases.
+        for bits in [3, 8, 20, 30] {
+            let mut b = bounds.clone();
+            b.precision_bits = bits;
+            let mut old = material.clone();
+            let mut new = material.clone();
+            let a = old.fit_with_backend(&b, true, false);
+            let c = new.fit_with_backend(&b, true, true);
+            assert_eq!(a, c);
+            if a.is_ok() {
+                assert_eq!(old, new);
+            }
+        }
+        let mut complex = material.clone();
+        complex.h[0][1][1] = Rat::new(1.into(), 8.into());
+        complex.h[1][0][1] = Rat::new((-1).into(), 8.into());
+        let mut fallback = complex.clone();
+        complex.fit_with_backend(&bounds, true, true).unwrap();
+        let work = fit_work::reading();
+        fallback.fit_with_backend(&bounds, true, false).unwrap();
+        assert_eq!(complex, fallback);
+        assert!(!work.real_reuse);
+        assert_eq!(work.integer_mul_calls, 0);
+        let mut bad = material.clone();
+        bad.h[0][0][0] = Rat::from_integer((-100).into());
+        let mut bad_old = bad.clone();
+        assert_eq!(
+            bad.fit_with_backend(&bounds, true, true),
+            bad_old.fit_with_backend(&bounds, true, false)
+        );
+        // Late residual range refusal stays atomic at the existing stage owner.
+        let base = EmpiricalMaterial::found(3, 1);
+        let mut tight = bounds.clone();
+        tight.rational_bits = 64;
+        let f = vec![
+            [
+                Rat::new(BigInt::one() << 23usize, (BigInt::one() << 25usize) + 1),
+                Rat::zero(),
+            ],
+            zero(),
+            zero(),
+        ];
+        let eta = vec![[Rat::one(), Rat::zero()]];
+        let full = base.stage(&f, &eta, &bounds).unwrap();
+        let mut a = full.clone();
+        let mut b = full;
+        assert_eq!(
+            a.fit_with_backend(&tight, true, false),
+            b.fit_with_backend(&tight, true, true)
+        );
+        let before = base.checkpoint_text();
+        assert!(base.stage(&f, &eta, &tight).is_err());
+        assert_eq!(base.checkpoint_text(), before);
+        println!(
+            "SCALED_INTEGER_CURRENT25 old_ns={old_ns:?} new_ns={new_ns:?} old_work={old_work:?} new_work={new_work:?} old_phases={old_phases:?} new_phases={new_phases:?} timing_ranges_separated={} same_full_H_B_C_M_error_cold=true complex_fallback=true precision_and_refusal_equal=true comparator=current25_not_old50",
+            new_ns.iter().max() < old_ns.iter().min()
         );
     }
 }

@@ -111,6 +111,7 @@ impl EpochWord {
 #[derive(Debug)]
 pub(crate) struct EpochForward<R = EpochRead> {
     pub(crate) prepared_input: Option<prepared_input::PreparedInputState>,
+    pub(crate) prepared_forward: PreparedForwardWork,
     /// Every retained reading in this batch belongs to this one material version.
     pub(crate) commit: u64,
     pub(crate) reads: Vec<R>,
@@ -296,6 +297,8 @@ impl Reference {
         let mut prefixes = BTreeMap::new();
         let mut previous_energy: Option<WordBalance> = None;
         let mut rings = crate::hnn::propagation::RingScope::new(field, &resident.constitution);
+        let mut prepared_forward=PreparedForwardWork::default();
+        crate::hnn::physical::action::contextual::reset_fit_work();
         for at in 0..consumed {
             working.current = scan.current_at(field, at)?;
             working.moments.insert(*moment, scan.moment_at(at)?);
@@ -320,6 +323,7 @@ impl Reference {
             };
 
             let mut read = if let Some(execution) = execution {
+                let prepare_start=Instant::now();
                 let (mut ratio, opening, id) = self.prepare_refine(
                     &working,
                     moment,
@@ -328,6 +332,7 @@ impl Reference {
                     field,
                     &resident.constitution,
                 )?;
+                prepared_forward.source_prepare_refine+=prepare_start.elapsed();
                 if ratio.prepared_input().is_some(){execution.admit_prepared_input()?;}
                 let start = Instant::now();
                 let forward = execution.forward_scoped(
@@ -336,6 +341,7 @@ impl Reference {
                     &mut working.charts,
                     &opening,
                 )?;
+                prepared_forward.execution_forward+=start.elapsed();
                 ratio.admit_observed_read(field, &forward.anchors, &forward.faces)?;
                 if forward.producing_commit != commit
                     || forward.anchors.len() != phases.aperture()
@@ -452,10 +458,12 @@ impl Reference {
 
             let class = cells.cells()[at].class();
             if let Some(input)=&mut working.prepared_input{
+                let observation_start=Instant::now();
                 match input.mode(){
                     prepared_input::PrefixMode::Training=>input.after_actual(input_cut.ok_or(HnnError::Unadmitted{reason:"actual prepared epoch retains its original producing packet"})?,class)?,
                     prepared_input::PrefixMode::Forecast|prepared_input::PrefixMode::ForecastZeroControl=>input.after_forecast(class)?,
                 }
+                prepared_forward.actual_observation+=observation_start.elapsed();
             }
             working.address.receive_at(class, cells.advance(at))?;
             working.address.refresh(field, &working.constitution)?;
@@ -493,7 +501,9 @@ impl Reference {
             });
         }
 
+        prepared_forward.material=crate::hnn::physical::action::contextual::take_fit_work();
         Ok(EpochForward {
+            prepared_forward,
             prepared_input: working.prepared_input,
             commit,
             reads,

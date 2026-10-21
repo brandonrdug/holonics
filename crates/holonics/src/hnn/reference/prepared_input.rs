@@ -206,6 +206,7 @@ impl PreparedInputState {
         current: &Current,
         source: &SourceMoment,
     ) -> Result<PreparedInputCut, HnnError> {
+        let seal_start=std::time::Instant::now();
         if source.cells() != self.source_cells() {
             return Err(refuse(
                 "prepared material/context frontier agrees with the single native source",
@@ -228,6 +229,7 @@ impl PreparedInputState {
         } else {
             None
         };
+        crate::hnn::physical::action::contextual::note_fit_work(|w|w.context_seal_and_contract+=seal_start.elapsed());
         Ok(PreparedInputCut {
             source_cells: source.cells(),
             commit: theta.commit(),
