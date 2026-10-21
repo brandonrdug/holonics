@@ -383,3 +383,10 @@ The explicit native quadratic-work policy and same-Word declaration capability a
 and compiled in the descendant of96a90c7ce. Their distinct600second/240attempt qualification is
 pending; no native/model/card readiness follows from compilation. See the quadratic-work record
 and external phase ledger. Coordinate1024 and physical-work65536 limits remain.
+
+The native quadratic-work phase is CLOSED at565,878,893,825ns/600seconds,240attempts reserved and
+194measured. Wide-work/binding/refusal/rank controls pass. The real cut7 work equals the old
+fraction and now admits under the operand-derived carrier; all10staged events execute. Native R
+publication then refuses the genuine-32/2187fresh feature atcut1 against its dyadic EpochFlow
+chart, with exact whole-delivery rollback. Full native successor/card readiness remains open;
+no model/data/output run occurred. See the updated quadratic-work record and external custody.

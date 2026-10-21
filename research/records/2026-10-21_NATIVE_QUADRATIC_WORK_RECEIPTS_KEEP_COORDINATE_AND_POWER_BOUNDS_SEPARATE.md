@@ -35,3 +35,47 @@ wrong bindings, cache equality/invalidation and one fresh deterministic actual p
 EpochFlow/contact/range refusal is preserved, not weakened to turn the control into a pass. Full
 native R/contact/successor/cold and card obligations, and D6-D8, remain open until real receipts
 qualify them. See external `alpha-v93-native-quadratic-work-96a90` custody and results.
+
+## Bounded phase result
+
+The fixed phase closes at565,878,893,825ns/600,000,000,000ns. Immutable native reservations total
+240(40+40+160); measured attempts total194(18+38+138). The first control's generic unqualified
+Word correctly refused a paired read; the fixture was repaired to use the genuine mode-qualified
+source owner without weakening admission. Both executable versions and all failures are kept.
+
+The corrected control passes: captured1043/1041-bit legacy refusal; a genuine operand-derived
+1046/1046-bit work value equal to the existing PowerForm result; signed cross terms; unchanged
+physical/added-coordinate and exhausted-resource refusal; wrong producer/source/frame/metric/
+opening refusal; exact rank/declaration comparison and changed-operator invalidation; same-cut
+native F, return, work and carry equality against the uncached reference and cold-cache result;
+wrong Word refusal even with a valid cached rank. This is primitive CODE evidence, not learned
+language or a sustained timing claim. Numerical warm hits are checked at the declaring owner;
+no separate warm-hit native F timing was measured.
+
+The genuine fresh prefix cold-restores6accepted/0published/6pending with the new policy/resource
+schema and rejects a mismatched resource declaration. All10native events then execute in the
+staged transaction. Atcut7, the actual old opening, added wave, control and metric are recorded;
+independent exact contraction verifies cross/quadratic/work. The work equals the original
+captured fraction exactly, still1043/1041bits and below65536. Derived unreduced bounds are
+1046/1044bits, with268,959/1,048,576charged bit reservations. No old m/u/added array was available
+for a byte comparison; it is not reconstructed. This removes the specific wide-work refusal.
+
+The first R publication subsequently refuses its real exact feature chart: sourcecut1, fresh
+feature coordinate0 is-32/2187, denominator odd part2187=3^7, while EpochRecord's feature divisor
+is1. It is neither a class-return foil nor a phase row. The dyadic EpochFlow adapter therefore
+cannot admit that actual exact-unsplit producer. The entire delivery rolls back exactly to the
+original6pending/source state. No R successor, subsequent contact, second R section, post-update
+cold/frozen continuation or card qualification is claimed.
+
+Source-accounted rank reuse in that10event prefix has8misses/2hits:108constructors minus the
+initial10basis,10actual opens and8prepared reopens leaves80rank-basis Words. Operators are not
+assumed identical merely because graph/shape or outputs agree. These counts establish no time
+fraction or whole-program speedup.
+
+Next native obligation is an authentic bounded chart/split producer with propagated full
+actual/fresh feature/F/return and gain/error authority, or separately reviewed exact rational
+statistic carrier. Do not round/normalize the feature, strip original phase, forge a retained
+origin, classify this arithmetic/chart fault as HeldReceiving, or relax a guard to claim success.
+D0-D5 remains partial/not model-ready, card work and D6-D8 remain incomplete. All owned cleanup
+receipts are empty. No dataset/model/output campaign or GPU dispatch ran. Exact source/binaries,
+operand trace and ledger are in the separate phase custody; no compiler caches are copied.
