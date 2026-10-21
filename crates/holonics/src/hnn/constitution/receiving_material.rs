@@ -72,8 +72,12 @@ impl ReceivingBlock {
             || self.law.phase.is_some()
             || self.law.symmetry.is_some()
             || self.law.receiving_prior.is_none()
-            || self.law.gram.len() != self.width()
-            || self.law.gram.iter().any(|row| row.len() != self.width())
+            || match self.law.epoch_law() {
+                Some(epoch)=>epoch.map.rows!=self.law.map.rows() || epoch.map.columns!=self.width()
+                    || epoch.gram.rows!=self.width() || epoch.gram.columns!=self.width()
+                    || epoch.news.rows!=self.law.map.rows() || epoch.news.columns!=self.width(),
+                None=>self.law.gram.len()!=self.width() || self.law.gram.iter().any(|row|row.len()!=self.width()),
+            }
             || self
                 .law
                 .map_carry
@@ -402,12 +406,18 @@ impl ReceivingMaterial {
                         .as_ref()
                         .map_or_else(|| "none".to_owned(), |chart| chart.scale().to_string());
                     *s += &format!("operand-chart {index} {scale}\n");
-                    *s += &format!(
-                        "receiving-block {index} {} {}\n",
-                        block.law.map.rows(),
-                        block.width()
-                    );
-                    write_rows(s, &block.law.map);
+                    if block.law.epoch_law().is_some() {
+                        // The canonical normal payload owns its map. As with a Single
+                        // law, an empty envelope must not serialize its derived view.
+                        *s += &format!("receiving-block {index} 0 0\n");
+                    } else {
+                        *s += &format!(
+                            "receiving-block {index} {} {}\n",
+                            block.law.map.rows(),
+                            block.width()
+                        );
+                        write_rows(s, &block.law.map);
+                    }
                     write_law(s, &block.law);
                 }
                 write_phase(s, shared_phase);
@@ -493,31 +503,38 @@ impl ReceivingMaterial {
                 return refuse("a receiving block map shape");
             };
             let rows_count = number(Some(rows), "the receiving block rows")?;
+            let columns_count = number(Some(columns), "the receiving block columns")?;
+            let canonical_envelope = (rows_count, columns_count) == (0, 0);
             if number(Some(ordinal), "a receiving block ordinal")? != index
-                || number(Some(columns), "the receiving block columns")? != source_width
-                || rows_count == 0
-                || rows_count % 2 != 0
+                || (!canonical_envelope
+                    && (columns_count != source_width || rows_count == 0 || rows_count % 2 != 0))
             {
                 return refuse("a receiving block's order or shape");
             }
             let map = read_rows(lines, &shape[1..], "a receiving block map")?;
-            // read_law checks the solved chart's certificate. Check its declared
-            // Gram extent against this block before entering that generic parser.
-            let gram_head = head(
-                lines.clone().next().ok_or(HnnError::ContinuingState {
+            // The generic canonical parser applies its full checkpoint budget and
+            // map/Gram/news shape checks. Legacy payloads still preflight their
+            // Gram width before that parser allocates it.
+            let law_head = lines.clone().next().ok_or(HnnError::ContinuingState {
                     what: "a receiving block Gram",
-                })?,
-                "gram",
-                "a receiving block Gram",
-            )?;
-            if gram_head.len() != 1
-                || number(gram_head.first(), "a receiving block Gram")? != source_width
-            {
-                return refuse("a receiving block Gram width");
+                })?;
+            if canonical_envelope != law_head.starts_with("epoch-law ") {
+                return refuse("a receiving block's canonical map envelope");
+            }
+            if !canonical_envelope {
+                let gram_head = head(law_head, "gram", "a receiving block Gram")?;
+                if gram_head.len() != 1
+                    || number(gram_head.first(), "a receiving block Gram")? != source_width
+                {
+                    return refuse("a receiving block Gram width");
+                }
             }
             let mut law = read_law(lines, map, budget)?;
             law.carrier = carrier;
             let block = ReceivingBlock { chart, law };
+            if block.width() != source_width {
+                return refuse("a receiving block's restored width");
+            }
             block.validate().map_err(|_| HnnError::ContinuingState {
                 what: "a receiving block's material invariants",
             })?;

@@ -19,6 +19,7 @@ use std::path::Path;
 pub(super) enum SamplingPolicy {
     NativeFullFibre,
     NativeZeroMControl,
+    NativeContextZeroReadout,
     /// Explicit output-only receiver ablation; no posterior or trained-law mutation.
     CombinedFamilyAblation,
     CombinedFamilyZeroMControl,
@@ -31,6 +32,7 @@ impl SamplingPolicy {
         match self {
             Self::NativeFullFibre => "trained-native-full-fibre",
             Self::NativeZeroMControl => "trained-native-zero-M-control",
+            Self::NativeContextZeroReadout => "trained-native-context-block-zero-readout",
             Self::CombinedFamilyAblation => "combined-family-receiver-ablation",
             Self::CombinedFamilyZeroMControl => "combined-family-zero-M-receiver-ablation",
             Self::FoundingRAtSameHistory => "founding-R-same-history",
@@ -57,7 +59,7 @@ impl SamplingPolicy {
         match self {
             Self::NativeFullFibre | Self::NativeZeroMControl => native,
             Self::CombinedFamilyAblation | Self::CombinedFamilyZeroMControl => combined,
-            Self::FoundingRAtSameHistory => founding,
+            Self::FoundingRAtSameHistory | Self::NativeContextZeroReadout => founding,
             Self::Tree => tree,
         }
     }
@@ -150,8 +152,9 @@ fn frozen_material_identity(resident: &Resident) -> Vec<String> {
     let mut out = vec![format!("{}", c.commit())];
     for ring in 0..resident.field().rings().len() {
         out.push(format!(
-            "{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}",
+            "{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}",
             c.receiving_law(ring),
+            c.receiving_blocks(ring),
             c.source_law(ring),
             c.contrast_law(ring),
             c.receiving_phase_statistics(ring),
@@ -487,11 +490,15 @@ pub(super) fn sample_continuing(
         return Err("query fork no longer matches its declared native field".into());
     }
     let receiver = holonics::hnn::receiving::RetainedFibreReceiver::declare(phases.grain())?;
-    let control_map = founding
-        .receiving_law(phases.ring())
+    let control_map = if policy==SamplingPolicy::NativeContextZeroReadout {
+        let Some(holonics::hnn::constitution::ReceivingLayout::ArrivalContext{source_width})=resident.constitution().receiving_layout(phases.ring()) else{return Err("context-zero readout requires explicit ArrivalContext".into());};
+        let mut rows=resident.constitution().receiving_map(phases.ring()).ok_or("paired map missing")?.to_rows();
+        for row in &mut rows{for value in &mut row[source_width..]{*value=Rat::from_integer(0.into());}}
+        holonics::ratio::linear::ExactRatMatrix::new(rows)?
+    }else{ founding
+        .receiving_map(phases.ring())
         .ok_or("the founding-R control has no receiver map")?
-        .map()
-        .clone();
+        .clone() };
 
     let mut key_stream = KeyStream::new(key_bytes.to_vec(), 8)?;
     let mut keys = Vec::with_capacity(output_cells);
@@ -564,6 +571,7 @@ pub(super) fn sample_continuing(
                     ("class", class.to_string()),
                     ("key", rational(&keys[at])),
                     ("selected_receiver", quoted(policy.label())),
+                    ("comparison_control",quoted(if policy==SamplingPolicy::NativeContextZeroReadout{"contextblockzero receiving readout; actualWord/carry intact"}else{"founding-R"})),
                     ("selected_masses", exact(&policy.masses(&cell.diagnostic))),
                     ("combined_masses", exact(&cell.diagnostic.native.combined_masses)),
                     ("certified_draw", exact(&cell.certified)),
@@ -579,8 +587,10 @@ pub(super) fn sample_continuing(
                     ),
                     (
                         "founding_R_masses",
-                        exact(&cell.diagnostic.control.native_masses)
+                        if policy==SamplingPolicy::NativeContextZeroReadout{"null".into()}else{exact(&cell.diagnostic.control.native_masses)}
                     ),
+                    ("control_masses",exact(&cell.diagnostic.control.native_masses)),
+                    ("native_minus_selected_control",exact(&cell.diagnostic.native_minus_control_masses)),
                     ("tree_masses", exact(&cell.diagnostic.native.tree_masses)),
                     (
                         "native_minus_tree",
@@ -588,7 +598,7 @@ pub(super) fn sample_continuing(
                     ),
                     (
                         "native_minus_founding_R",
-                        exact(&cell.diagnostic.native_minus_control_masses)
+                        if policy==SamplingPolicy::NativeContextZeroReadout{"null".into()}else{exact(&cell.diagnostic.native_minus_control_masses)}
                     ),
                     ("extra_word_score_root_calls_for_receipt", "0".into()),
                     ("elapsed_ns", started.elapsed().as_nanos().to_string())

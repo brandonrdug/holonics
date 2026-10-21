@@ -6,7 +6,10 @@ use holonics::hnn::reference::prepared_input::{PrefixMode, PrefixRole};
 fn unified_prepared_command_crosses_sections_aeon_and_cold_prefix() -> Result<()> {exercise(false)}
 #[test]
 fn source_framing_command_crosses_sections_aeon_and_cold_prefix()->Result<()>{exercise(true)}
-fn exercise(framed:bool)->Result<()> {
+fn exercise(framed:bool)->Result<()> {exercise_at(framed,false)}
+#[test]
+fn arrival_context_framed_command_crosses_sections_cold_and_context_control()->Result<()>{exercise_at(true,true)}
+fn exercise_at(framed:bool,arrival:bool)->Result<()> {
     let root = std::env::var_os("V93_PREPARED_CODE_DIR")
         .map(std::path::PathBuf::from)
         .unwrap_or_else(|| {
@@ -21,7 +24,7 @@ fn exercise(framed:bool)->Result<()> {
     write_new(&root.join("cuts.tsv"), cuts)?;
     let out = root.join("training");
     let args = vec![
-        if framed{"train-source-framing-retained-held-v1".into()}else{"train-prepared-local-retained-fibre-v1".into()},
+        if arrival{"train-source-framing-arrival-context-held-v1".into()}else if framed{"train-source-framing-retained-held-v1".into()}else{"train-prepared-local-retained-fibre-v1".into()},
         "host-reference".into(),
         root.join("input.bin").display().to_string(),
         sha256(&data)?,
@@ -53,7 +56,7 @@ fn exercise(framed:bool)->Result<()> {
         &execution,
         CompleteLanguageTrainingBackend::HostReference,
     )?;
-    assert_eq!(execution.counts(), [40, 40, 4]);
+    assert_eq!(execution.counts(), [40, 40, if arrival{8}else{4}]);
     let training_ns = started.elapsed().as_nanos();
     let (fresh, _) = Checkpoint::load(out.join("fresh.state").to_str().unwrap(), READ_BUDGET)?;
     let (trained, trained_hash) =
@@ -118,14 +121,19 @@ fn exercise(framed:bool)->Result<()> {
     );
     let phases = trained_resident.admitted()[0].clone();
     assert_ne!(
-        trained_resident.constitution().receiving_law(phases.ring()),
+        trained_resident.constitution().receiving_map(phases.ring()),
         fresh
             .stream
             .resident()
             .constitution()
-            .receiving_law(phases.ring()),
+            .receiving_map(phases.ring()),
         "founding R must actually receive a local return"
     );
+    if arrival {
+        let blocks=trained_resident.constitution().receiving_blocks(2).unwrap();
+        assert!(blocks.iter().all(|b|b.chart().is_some()));
+        assert!(blocks[1].law().map().entries().iter().any(|v|v!=&Rat::from_integer(0.into())),"context block must actually learn, not an authored map");
+    }
     let epoch_log = std::fs::read_to_string(out.join("epochs.jsonl"))?;
     assert_eq!(epoch_log.lines().count(), 4);
     assert!(!epoch_log.contains("Some(EpochComparison"));
@@ -144,6 +152,15 @@ fn exercise(framed:bool)->Result<()> {
         &output,
     )?;
     let sampling_ns = sample_started.elapsed().as_nanos();
+    if arrival {
+        let control=continuation::sample_continuing(&trained,&[0x1b],continuation::SamplingPolicy::NativeContextZeroReadout,&[0x55;64],8,&[0,1,4,8],Some(1),&root.join("context-zero-readout"))?;
+        assert!(control.cold_continuation.as_ref().unwrap().matched_warm_state_and_crib);
+        assert_eq!(sha256(&trained.bytes()?)?,trained_hash,"readout control cannot erase live carry/material");
+        // Exact native/control enclosures already emitted by both authentic producers
+        // are compared by the bounded exterior CODE receipt, without another read.
+
+    }
+
     assert_eq!(sample.classes.len(), 8);
     assert!(
         sample
@@ -173,6 +190,7 @@ fn exercise(framed:bool)->Result<()> {
     let forecast = final_output.stream.resident().constitution();
     let observed = trained_resident.constitution();
     assert_eq!(forecast.commit(), observed.commit());
+    for ring in 0..3{assert_eq!(forecast.receiving_blocks(ring),observed.receiving_blocks(ring));assert_eq!(forecast.receiving_phase_statistics(ring),observed.receiving_phase_statistics(ring));}
     for ring in 0..3 {
         assert_eq!(
             forecast.receiving_law(ring),
@@ -277,8 +295,10 @@ fn exercise(framed:bool)->Result<()> {
         ),
         (
             "R_after",
-            exact(&trained_resident.constitution().receiving_law(phases.ring())),
+            exact(&trained_resident.constitution().receiving_blocks(phases.ring()).map(|_|trained_resident.constitution().receiving_map(phases.ring()))),
         ),
+        ("receiving_layout",exact(&trained_resident.constitution().receiving_layout(phases.ring()))),
+        ("receiving_blocks_after",exact(&trained_resident.constitution().receiving_blocks(phases.ring()))),
         ("actual_current", exact(trained_resident.current())),
         ("actual_carried", exact(&trained_resident.carried())),
         ("sample_cells_requested", "8".into()),

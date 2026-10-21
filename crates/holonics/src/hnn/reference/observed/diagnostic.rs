@@ -206,7 +206,8 @@ impl Reference {
     }
 
     /// Compare the native and a declared control R on the *same actual kept-word feature*.
-    /// This aperture-one Physical/Anchor diagnostic freezes the tree and the population before
+    /// This aperture-one Physical/Anchor diagnostic accepts the declared Single or paired
+    /// kept operand and freezes the tree and the population before
     /// any target/release reception. Other layouts and a missing/stale kept read refuse. The
     /// caller may use the founding R as its control; E and all retained moments remain native.
     pub fn diagnose_pending_readout(
@@ -227,7 +228,7 @@ impl Reference {
         let ring = phases.ring();
         let theta = &resident.constitution;
         if phases.aperture() != 1
-            || theta.receiving_layout(ring) != Some(ReceivingLayout::Single)
+            || !matches!(theta.receiving_layout(ring), Some(ReceivingLayout::Single | ReceivingLayout::ArrivalContext{..}))
             || ConstitutionRead::receiving_carrier(theta, ring) != ReceivingCarrier::Anchor
         {
             return Err(HnnError::Unadmitted {
@@ -252,7 +253,16 @@ impl Reference {
                 reason: "a pending readout control preserves one complete producing feature",
             });
         };
-        let native_read = phases.read(&resident.field, theta, feature)?;
+        let native_read = match theta.receiving_layout(ring) {
+            Some(ReceivingLayout::Single)=>phases.read(&resident.field,theta,feature)?,
+            Some(ReceivingLayout::ArrivalContext{source_width}) if feature.len()==source_width*2=>{
+                // These are BOTH operands of this kept Word, not a new observation.
+                let fresh=&feature[..source_width];
+                let actual:Vec<_>=fresh.iter().zip(&feature[source_width..]).map(|(s,c)|s+c).collect();
+                phases.read_paired(&resident.field,theta,&actual,fresh)?
+            },
+            _=>return Err(HnnError::Unadmitted{reason:"readout control keeps its complete declared physical operand"}),
+        };
         if kept.faces.logits.as_slice() != [native_read.logits.clone()]
             || kept.faces.faces.as_slice()
                 != [crate::hnn::ratio::Face::of_read(

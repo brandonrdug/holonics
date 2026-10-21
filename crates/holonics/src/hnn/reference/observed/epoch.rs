@@ -704,8 +704,8 @@ impl Reference {
         let local_receiving = deposition_scope.is_local_receiving();
         let held_policy = deposition_scope == ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap;
         if held_policy && (resident.participating_world.is_some() || resident.prepared_input.is_none()
-            || resident.constitution.receiving_layout(resident.admitted[0].ring()) != Some(crate::hnn::constitution::receiving_blocks::ReceivingLayout::Single)) {
-            return Err(refusal("held receiving continuation requires actual prepared Single input without a participating World"));
+            || !matches!(resident.constitution.receiving_layout(resident.admitted[0].ring()), Some(crate::hnn::constitution::receiving_blocks::ReceivingLayout::Single | crate::hnn::constitution::receiving_blocks::ReceivingLayout::ArrivalContext{..}))) {
+            return Err(refusal("held receiving continuation requires actual prepared supported receiving input without a participating World"));
         }
         if local_receiving && resident.receiving_law() != ReceivingLaw::RetainedFibreV1 {
             return Err(refusal(

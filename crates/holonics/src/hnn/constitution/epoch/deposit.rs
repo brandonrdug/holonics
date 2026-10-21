@@ -3,6 +3,7 @@
 //! Upstream normal moves require a consuming same-epoch finite comparison.
 //! The ordinary close retains its receiving-only certificate and typed refusal.
 use super::*;
+mod paired_receiving;
 
 /// The receiving face's three exact series, produced from the heard class and
 /// its one retained RHS. These operands never stand in for an upstream split.
@@ -71,6 +72,7 @@ pub(crate) struct ObservedNormalEpochStage<'a> {
     grain_restage_scope: Option<EpochCandidateScope>,
     prepared: Option<PreparedEpochNormals>,
     local_receiving_hold: bool,
+    paired_prepared: Option<paired_receiving::Prepared>,
 }
 
 impl<'a> ObservedNormalEpochStage<'a> {
@@ -180,6 +182,7 @@ impl<'a> ObservedNormalEpochStage<'a> {
             grain_restage_scope: None,
             prepared: None,
             local_receiving_hold: false,
+            paired_prepared: None,
         })
     }
 
@@ -187,8 +190,7 @@ impl<'a> ObservedNormalEpochStage<'a> {
     pub(crate) fn for_local_receiving_hold(mut self) -> Result<Self, HnnError> {
         if self.allow_channel_dissipation
             || self.channel_endpoint.is_some()
-            || self.opening.receiving_layout(self.receiver)
-                != Some(crate::hnn::constitution::receiving_blocks::ReceivingLayout::Single)
+            || !matches!(self.opening.receiving_layout(self.receiver), Some(ReceivingLayout::Single | ReceivingLayout::ArrivalContext{..}))
             || self.receiving_parts.is_empty()
             || self
                 .receiving_parts
@@ -202,7 +204,7 @@ impl<'a> ObservedNormalEpochStage<'a> {
             })
         {
             return Err(refused(
-                "held receiving policy requires its genuine retained Single R-only inputs",
+                "held receiving policy requires its genuine retained supported R-only inputs",
             ));
         }
         self.local_receiving_hold = true;
@@ -217,6 +219,9 @@ impl<'a> ObservedNormalEpochStage<'a> {
             return Err(
                 EpochStageTrace::default().failed(refused("local held policy was not selected"))
             );
+        }
+        if matches!(self.opening.receiving_layout(self.receiver),Some(ReceivingLayout::ArrivalContext{..})) {
+            return paired_receiving::stage(self,observe);
         }
         match self.stage_projection(EpochCandidateScope::ReceivingOnly, observe, None) {
             Ok(candidate) => Ok(candidate),
@@ -455,6 +460,105 @@ impl<'a> ObservedNormalEpochStage<'a> {
                 failure
             })
     }
+}
+
+
+/// The same admitted selected-executor aggregation for Single and paired local blocks.
+/// No normal-law or numerical operation is duplicated by the paired publication owner.
+#[allow(clippy::too_many_arguments)]
+fn executed_epoch_flow(
+    kind:LinearLocus, law:&EpochLaw, samples:&[Sample], phase_rows:&[usize],
+    receiving_period:u64, grain:u32, epoch_cells:u64, epoch_index:u64, heard_cells:u64,
+    execution:&dyn crate::hnn::reference::observed::ObservedEpochExecution,
+    evidence:&mut Option<EpochStageRefusal>,
+)->Result<EpochFlow,HnnError>{
+            let records =
+                super::device::epoch_record_operands(samples, &phase_rows, receiving_period)?;
+            // Admission reads the actual reached operands before any selected
+            // executor runs. No host aggregation is performed on this route.
+            let partition_exponent = super::device::epoch_record_flow_admit(
+                law.map.rows,
+                law.map.columns,
+                grain,
+                epoch_cells,
+                epoch_index,
+                heard_cells,
+                &records,
+            )?;
+            let reading =
+                super::device::epoch_record_flow_canonicalize(execution.aggregate_records(
+                    kind,
+                    law.map.rows,
+                    law.map.columns,
+                    grain,
+                    epoch_cells,
+                    epoch_index,
+                    heard_cells,
+                    &records,
+                )?)?;
+            let records_count = u64::try_from(records.len()).map_err(|_| extent())?;
+            let support: Vec<_> = (0..law.map.columns)
+                .filter(|&column| {
+                    records
+                        .iter()
+                        .any(|record| !record.feature.numerators[column].is_zero())
+                })
+                .collect();
+            if reading.gram.rows != law.map.columns
+                || reading.gram.columns != law.map.columns
+                || reading.covector.rows != law.map.rows
+                || reading.covector.columns != law.map.columns
+                || reading.records != records_count
+                || reading.heard_cells != heard_cells
+                || reading.declared_cells != epoch_cells
+                || reading.partition_exponent != partition_exponent
+                || reading.support != support
+            {
+                EpochStageRefusal::at("normal_flow", EpochStageCondition::FlowContract,
+                    "executed flow shapes, producer/heard/declared counts, partition and support equal their producing operands", Some(kind.locus()), Some(Family::Map))
+                    .read("expected_rows", EpochStageValue::Index(law.map.rows))
+                    .read("expected_columns", EpochStageValue::Index(law.map.columns))
+                    .read("actual_gram_rows", EpochStageValue::Index(reading.gram.rows))
+                    .read("actual_gram_columns", EpochStageValue::Index(reading.gram.columns))
+                    .read("actual_covector_rows", EpochStageValue::Index(reading.covector.rows))
+                    .read("actual_covector_columns", EpochStageValue::Index(reading.covector.columns))
+                    .read("expected_records", EpochStageValue::Integer(records_count.into()))
+                    .read("actual_records", EpochStageValue::Integer(reading.records.into()))
+                    .read("expected_heard_cells", EpochStageValue::Integer(heard_cells.into()))
+                    .read("actual_heard_cells", EpochStageValue::Integer(reading.heard_cells.into()))
+                    .read("expected_declared_cells", EpochStageValue::Integer(epoch_cells.into()))
+                    .read("actual_declared_cells", EpochStageValue::Integer(reading.declared_cells.into()))
+                    .read("expected_partition_exponent", EpochStageValue::Exponent(partition_exponent))
+                    .read("actual_partition_exponent", EpochStageValue::Exponent(reading.partition_exponent))
+                    .read("expected_support", EpochStageValue::Indices(support.clone()))
+                    .read("actual_support", EpochStageValue::Indices(reading.support.clone())).first(&mut *evidence);
+                return Err(refused(
+                    "an executed epoch flow must retain its actual locus, support, producer count and receiving partition",
+                ));
+            }
+            let array = |series: &EpochSeriesReading| {
+                EpochArray::with_row_divisors(
+                    series.rows,
+                    series.columns,
+                    series.exponent,
+                    series.numerators.clone(),
+                    series.row_odd_divisors.clone(),
+                )
+            };
+            let flow = EpochFlow {
+                gram: array(&reading.gram)?,
+                covector: array(&reading.covector)?,
+                support: reading.support,
+                partitions: Vec::new(),
+                cells: heard_cells,
+                partition_cells: epoch_cells,
+                records: records_count,
+                partition_exponent,
+                receiver_grain: grain,
+                epoch: epoch_index,
+            };
+
+            Ok(flow)
 }
 
 /// Minted only from this owner's actual canonical refusal after its fresh certificate.
@@ -2217,91 +2321,8 @@ impl Constitution {
                 Vec::new()
             };
             let locus_samples = samples.get(kind).map(Vec::as_slice).unwrap_or(&[]);
-            let records =
-                super::device::epoch_record_operands(locus_samples, &phase_rows, receiving_period)?;
-            // Admission reads the actual reached operands before any selected
-            // executor runs. No host aggregation is performed on this route.
-            let partition_exponent = super::device::epoch_record_flow_admit(
-                law.map.rows,
-                law.map.columns,
-                grain,
-                epoch_cells,
-                epoch_index,
-                heard_cells,
-                &records,
-            )?;
-            let reading =
-                super::device::epoch_record_flow_canonicalize(execution.aggregate_records(
-                    *kind,
-                    law.map.rows,
-                    law.map.columns,
-                    grain,
-                    epoch_cells,
-                    epoch_index,
-                    heard_cells,
-                    &records,
-                )?)?;
-            let records_count = u64::try_from(records.len()).map_err(|_| extent())?;
-            let support: Vec<_> = (0..law.map.columns)
-                .filter(|&column| {
-                    records
-                        .iter()
-                        .any(|record| !record.feature.numerators[column].is_zero())
-                })
-                .collect();
-            if reading.gram.rows != law.map.columns
-                || reading.gram.columns != law.map.columns
-                || reading.covector.rows != law.map.rows
-                || reading.covector.columns != law.map.columns
-                || reading.records != records_count
-                || reading.heard_cells != heard_cells
-                || reading.declared_cells != epoch_cells
-                || reading.partition_exponent != partition_exponent
-                || reading.support != support
-            {
-                EpochStageRefusal::at("normal_flow", EpochStageCondition::FlowContract,
-                    "executed flow shapes, producer/heard/declared counts, partition and support equal their producing operands", Some(kind.locus()), Some(Family::Map))
-                    .read("expected_rows", EpochStageValue::Index(law.map.rows))
-                    .read("expected_columns", EpochStageValue::Index(law.map.columns))
-                    .read("actual_gram_rows", EpochStageValue::Index(reading.gram.rows))
-                    .read("actual_gram_columns", EpochStageValue::Index(reading.gram.columns))
-                    .read("actual_covector_rows", EpochStageValue::Index(reading.covector.rows))
-                    .read("actual_covector_columns", EpochStageValue::Index(reading.covector.columns))
-                    .read("expected_records", EpochStageValue::Integer(records_count.into()))
-                    .read("actual_records", EpochStageValue::Integer(reading.records.into()))
-                    .read("expected_heard_cells", EpochStageValue::Integer(heard_cells.into()))
-                    .read("actual_heard_cells", EpochStageValue::Integer(reading.heard_cells.into()))
-                    .read("expected_declared_cells", EpochStageValue::Integer(epoch_cells.into()))
-                    .read("actual_declared_cells", EpochStageValue::Integer(reading.declared_cells.into()))
-                    .read("expected_partition_exponent", EpochStageValue::Exponent(partition_exponent))
-                    .read("actual_partition_exponent", EpochStageValue::Exponent(reading.partition_exponent))
-                    .read("expected_support", EpochStageValue::Indices(support.clone()))
-                    .read("actual_support", EpochStageValue::Indices(reading.support.clone())).first(&mut trace.evidence);
-                return Err(refused(
-                    "an executed epoch flow must retain its actual locus, support, producer count and receiving partition",
-                ));
-            }
-            let array = |series: &EpochSeriesReading| {
-                EpochArray::with_row_divisors(
-                    series.rows,
-                    series.columns,
-                    series.exponent,
-                    series.numerators.clone(),
-                    series.row_odd_divisors.clone(),
-                )
-            };
-            let flow = EpochFlow {
-                gram: array(&reading.gram)?,
-                covector: array(&reading.covector)?,
-                support: reading.support,
-                partitions: Vec::new(),
-                cells: heard_cells,
-                partition_cells: epoch_cells,
-                records: records_count,
-                partition_exponent,
-                receiver_grain: grain,
-                epoch: epoch_index,
-            };
+            let flow=executed_epoch_flow(*kind,&law,locus_samples,&phase_rows,receiving_period,
+                grain,epoch_cells,epoch_index,heard_cells,execution,&mut trace.evidence)?;
             let fresh = law.fresh(&flow)?;
             observe(EpochDepositPhase::Flow(*kind));
             let c = locus_samples
@@ -3213,6 +3234,7 @@ impl Constitution {
         }
         let reading = DepositReading {
             epoch: Some(EpochDepositReading {
+                paired_receiving: None,
                 channel_endpoints,
                 channel_grain: channel_grain_reading,
                 channel_grain_deferred: None,
@@ -3607,7 +3629,7 @@ mod tests {
     /// A real receiving ratio at one fixed anchor. The optional upstream
     /// records probe the close's refusal domain; they assert no upstream
     /// executed-transport or second-variation witness.
-    fn normal_domain_fixture(
+    pub(super) fn normal_domain_fixture(
         upstream: Option<LinearLocus>,
         receiving: bool,
     ) -> (Field, Constitution, Deposit, Vec<EpochReceivingRecord>, u32) {
@@ -6233,9 +6255,15 @@ mod tests {
     fn held_retained_fixture(
         scale: i64,
     ) -> (Field, Constitution, Deposit, Vec<EpochReceivingRecord>, u32) {
+        held_retained_fixture_at(scale, false)
+    }
+    pub(super) fn held_retained_fixture_at(
+        scale: i64, paired: bool,
+    ) -> (Field, Constitution, Deposit, Vec<EpochReceivingRecord>, u32) {
         use crate::compression::landmark::context::LandmarkFace;
         use crate::hnn::receiving::{ReceivingRead, RetainedSectionReturn};
         let (field, mut material, old, _, exponent) = normal_domain_fixture(None, true);
+        if paired { material.bind_arrival_context_receiving(field.receivers()[0].ring).unwrap(); }
         let receiver = field.receivers()[0].ring;
         let map = material.receiving_map(receiver).unwrap().clone();
         let n = map.rows() / 2;
@@ -6247,6 +6275,7 @@ mod tests {
         };
         let mut feature = vec![Rat::zero(); map.columns()];
         feature[0] = Rat::one();
+        if paired { feature[map.columns()/2] = rat(1,2); }
         let read =
             ReceivingRead::combined(map.apply(&feature).unwrap(), &tree, field.finest_grain())
                 .unwrap();
@@ -6322,14 +6351,24 @@ mod tests {
             &records,
         )
         .unwrap();
-        material
-            .code_seed_held_receiving_news(
-                &field,
-                receiver,
-                &flow.covector,
-                &Rat::from_integer(scale.into()),
-            )
-            .unwrap();
+        if paired {
+            let grain=material.observed_epoch_grain(receiver).unwrap();
+            let mut owner=material.rings[receiver].receiving.clone().unwrap();
+            owner.found_operand_charts(&sample.feature).unwrap();
+            let mut laws=std::array::from_fn(|i|owner.blocks().unwrap()[i].law().clone());
+            for (i,normal) in laws.iter_mut().enumerate() {
+                let local=owner.block_samples(i,std::slice::from_ref(&sample)).unwrap();
+                let g=rows_matrix(&local[0].covector.iter().map(|c|local[0].feature.iter().map(|f|c*f).collect::<Vec<_>>()).collect::<Vec<_>>());
+                let mut law=EpochLaw::from_normal(normal,grain).unwrap().with_phase_rows(&phase_rows,field.ring(receiver).period()).unwrap();
+                let a=EpochArray::from_dyadic_matrix(&g).unwrap();
+                let news=EpochArray::with_row_divisors(a.rows,a.columns,a.exponent,a.values,(0..map.rows()).map(|row|if row%2==1{field.ring(receiver).period()}else{1}).collect()).unwrap();
+                law.news=news.scalar_product(&EpochArray::from_dyadic_scalar(&Rat::from_integer(scale.into())).unwrap()).unwrap();
+                normal.publish_epoch(law).unwrap();
+            }
+            material.rings[receiver].receiving=Some(owner.with_block_laws(laws).unwrap());
+        } else {
+            material.code_seed_held_receiving_news(&field,receiver,&flow.covector,&Rat::from_integer(scale.into())).unwrap();
+        }
         let deposit = Deposit::new(
             material.commit(),
             vec![LinearStep {

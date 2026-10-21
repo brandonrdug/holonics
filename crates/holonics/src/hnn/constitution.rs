@@ -3100,8 +3100,41 @@ pub struct EpochHeldReceivingReading {
     pub news_after: EpochSeriesReading,
 }
 
+/// Transient independently charted normal blocks; never a joined normal law.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochPairedReceivingBlockReading {
+    pub index: usize,
+    pub operand_scale: Rat,
+    pub aggregation_scale: Rat,
+    pub crossings_before: u64,
+    pub crossings_after: u64,
+    pub gamma: Rat,
+    pub eta: Rat,
+    pub normal_fall: Rat,
+    pub gram_update: EpochSeriesReading,
+    pub fresh_covector: EpochSeriesReading,
+    pub news_before: EpochSeriesReading,
+    pub news_after: EpochSeriesReading,
+    pub represented_step_internal: EpochSeriesReading,
+}
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochPairedReceivingReading {
+    pub source_width: usize,
+    pub fresh_physical_alignment: Rat,
+    pub fresh_return_error: Rat,
+    pub fresh_moves: Rat,
+    pub actual_alignment: Option<Rat>,
+    pub actual_moves: Option<Rat>,
+    pub actual_physical_step: EpochSeriesReading,
+    pub held_original_decline: Option<Box<epoch::EpochStageRefusal>>,
+    /// Legacy held scalar fields refer to this explicit representative block.
+    pub held_representative_block: Option<usize>,
+    pub blocks: Vec<EpochPairedReceivingBlockReading>,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochDepositReading {
+    pub paired_receiving: Option<EpochPairedReceivingReading>,
     /// Actual producing-cut C/K dispositions, only in the explicitly selected material scope.
     pub channel_endpoints: Vec<EpochChannelEndpointReading>,
     pub channel_grain: Option<EpochChannelGrainReading>,

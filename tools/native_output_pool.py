@@ -57,7 +57,7 @@ def execute(plan_path, plan_sha, output):
     identities = [arm["id"] for arm in plan["arms"]]
     assert len(set(identities)) == len(identities)
     assert all(re.fullmatch(r"[a-z0-9-]{1,40}", name) for name in identities)
-    assert all(arm["policy"] in ("native", "native-zero-M", "founding-R", "tree") for arm in plan["arms"])
+    assert all(arm["policy"] in ("native", "native-zero-M", "native-context-zero", "founding-R", "tree") for arm in plan["arms"])
     pins = [plan["binary"], plan["checkpoint"], plan["keys"],
             {"path": str(Path(__file__).resolve()), "sha256": plan["controller_sha256"]}] + [arm["prompt"] for arm in plan["arms"]]
 

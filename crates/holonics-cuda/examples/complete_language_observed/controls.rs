@@ -37,7 +37,7 @@ fn exercise_fixture_command(label:&str,bytes:&[u8],command:&str){
     let cuts = root.join("synthetic-cuts.tsv");
     std::fs::write(&corpus, bytes).unwrap();
     let cells=bytes.len()*4;assert_eq!(cells%10,0);
-    std::fs::write(&cuts,if matches!(command,"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"){format!("0\tsynthetic-opening\n13\tthree-pending\n{cells}\tsynthetic-closed\n")}else{format!("0\tsynthetic-opening\n{cells}\tsynthetic-closed\n")}).unwrap();
+    std::fs::write(&cuts,if matches!(command,"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1"){format!("0\tsynthetic-opening\n13\tthree-pending\n{cells}\tsynthetic-closed\n")}else{format!("0\tsynthetic-opening\n{cells}\tsynthetic-closed\n")}).unwrap();
     fn hash(path: &Path) -> String {
         let out = std::process::Command::new("sha256sum")
             .arg(path)
@@ -71,8 +71,8 @@ fn exercise_fixture_command(label:&str,bytes:&[u8],command:&str){
         assert!(complete.contains("\"cold_exact\":true"));
         assert!(complete.contains(&format!("\"accepted_cells\":{cells}")));
         assert!(complete.contains(&format!("\"actual_epochs\":{}",cells/10)));
-        if matches!(command,"train-local-retained-fibre-v1"|"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1") {
-            let scope=if matches!(command,"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1") { "LocalReceivingReturnWithHeldMap" } else { "LocalReceivingReturn" };
+        if matches!(command,"train-local-retained-fibre-v1"|"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1") {
+            let scope=if matches!(command,"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1") { "LocalReceivingReturnWithHeldMap" } else { "LocalReceivingReturn" };
             assert!(complete.contains(&format!("\"deposition_scope\":\"{scope}\"")));
             let execution=std::fs::read_to_string(root.join(backend).join("EXECUTION_CONTRACT.json")).unwrap();
             assert!(execution.contains(&format!("\"command\":\"{command}\"")));
@@ -91,7 +91,7 @@ fn exercise_fixture_command(label:&str,bytes:&[u8],command:&str){
         "cut-00000.state".to_owned(),
         format!("cut-{cells:05}.state"),
     ];
-    if matches!(command,"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"){checkpoints.push("cut-00013.state".into());}
+    if matches!(command,"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1"){checkpoints.push("cut-00013.state".into());}
     for checkpoint in checkpoints {
         let host = exterior::code_checkpoint_native_bytes(
             root.join("host-reference")
@@ -251,4 +251,32 @@ fn source_framing_late_card_fault_is_atomic(){
     assert!(refusal.contains("synthetic late prepared card aggregate refusal"));
     execution.0.require_actual_dispatch().unwrap();
     eprintln!("SOURCE_FRAMING_CARD_FAULT {}",execution.0.receipt(false).trim());
+}
+
+#[test]
+#[ignore = "exclusive HOST CUDA; paired local40class publication/cold"]
+fn paired_context_training_host_card_and_cold(){
+    exercise_fixture_command("paired-context-retained",&[0x1b;10],"train-source-framing-arrival-context-held-v1");
+}
+struct LateSecondAggregate {card:dispatch::TracedCard,calls:std::sync::atomic::AtomicUsize}
+impl holonics::hnn::reference::observed::ObservedEpochExecution for LateSecondAggregate {
+    fn admit_prepared_input(&self)->Result<(),holonics::hnn::HnnError>{self.card.admit_prepared_input()}
+    fn forward(&self,f:&holonics::hnn::Field,c:&holonics::hnn::Constitution,r:&holonics::hnn::pending::PendingRatio,ch:&mut holonics::hnn::chart::Charts,o:&holonics::hnn::word::WordOpening)->Result<holonics::hnn::reference::observed::ObservedEpochForwardWord,holonics::hnn::HnnError>{self.card.forward(f,c,r,ch,o)}
+    fn forward_scoped(&self,c:&mut holonics::hnn::reference::observed::ObservedEpochForwardContext<'_,'_>,r:&holonics::hnn::pending::PendingRatio,ch:&mut holonics::hnn::chart::Charts,o:&holonics::hnn::word::WordOpening)->Result<holonics::hnn::reference::observed::ObservedEpochForwardWord,holonics::hnn::HnnError>{self.card.forward_scoped(c,r,ch,o)}
+    fn pull_back(&self,w:holonics::hnn::Word<'_>,g:&holonics::hnn::RatioCovector,m:&holonics::ratio::linear::ExactRatMatrix,p:&holonics::hnn::ReceivingPhases)->Result<holonics::hnn::port::WordReturn,holonics::hnn::HnnError>{self.card.pull_back(w,g,m,p)}
+    fn aggregate_records(&self,l:holonics::hnn::constitution::LinearLocus,r:usize,c:usize,g:u32,n:u64,e:u64,h:u64,records:&[holonics::hnn::constitution::EpochProducerRecordReading])->Result<holonics::hnn::constitution::EpochRecordFlowReading,holonics::hnn::HnnError>{
+        use holonics::hnn::reference::observed::ObservedEpochExecution;
+        let actual=self.card.aggregate_records(l,r,c,g,n,e,h,records)?;
+        if self.calls.fetch_add(1,std::sync::atomic::Ordering::Relaxed)==1 {Err(holonics::hnn::HnnError::Unadmitted{reason:"synthetic late prepared card aggregate refusal"})} else {Ok(actual)}
+    }
+}
+#[test]
+#[ignore = "exclusive HOST CUDA; SECOND paired aggregate late refusal"]
+fn paired_context_second_block_card_fault_is_atomic(){
+    let execution=LateSecondAggregate{card:dispatch::TracedCard::new(ObservedEpochDevice::open(0).unwrap()),calls:std::sync::atomic::AtomicUsize::new(0)};
+    let refusal=exterior::code_paired_prepared_late_rollback(&execution).unwrap();
+    assert!(refusal.contains("synthetic late prepared card aggregate refusal"));
+    assert_eq!(execution.calls.load(std::sync::atomic::Ordering::Relaxed),2);
+    execution.card.require_actual_dispatch().unwrap();
+    eprintln!("PAIRED_SECOND_BLOCK_CARD_FAULT {}",execution.card.receipt(false).trim());
 }
