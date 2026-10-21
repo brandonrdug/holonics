@@ -54,3 +54,14 @@ General correlated families, richer context/ecology and the 136-QA volume goal
 remain unfinished. No meaningful-data run is part of this CODE scope. The full
 source-context/native-consumer refinement proof remains an explicit obligation
 of #62. Refs #73 #148 #386 #62.
+
+A separate additive diagnostic records successful-forward wall windows without new
+fetches or synchronization. On the same synthetic40 control, mounted execute was
+1.171s: fresh lane398ms includes392ms in its HOST response-error trace; actual
+lane673ms includes663ms in its HOST trace. Thus the two required host proof traces
+account for about90% of that window. Allocation/transfer/launch/decode share the
+remaining lane windows; queued dependencies can be charged there. These are not
+pure GPU kernel timings, a global synchronization census or a full-data trace.
+Ten host/card native/M/crib/pending checkpoint payloads match the sealed predecessor
+exactly. The timers do not enter a law or codec. No proof is skipped or optimized by
+this diagnostic; a later cost repair must preserve the admitted tube and return.

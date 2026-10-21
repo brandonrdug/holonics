@@ -357,6 +357,7 @@ struct MomentSlot<'c> {
 /// record, the contacts' operators its balance read, and its charts' readings.
 struct ExecutedWord<'c> {
     source_preparation_host_ns:u128,
+    response_operands_host_ns:u128,
     source_preparation: Option<holonics::hnn::word::action::PortPreparationReceipt>,
     word: ResidentWord<'c>,
     operators: Vec<Rc<ContactOperator>>,
@@ -701,6 +702,7 @@ impl<'c> Mounted<'c> {
         }
         let refined = self.store.refine(&pairs)?;
         drop(pairs);
+        let response_operands_started = Instant::now();
         let response_operands = if matches!(
             plan.receiving_layout,
             ReceivingLayout::ArrivalContext { .. }
@@ -745,6 +747,7 @@ impl<'c> Mounted<'c> {
             }),
             (None, _) => None,
         };
+        let response_operands_host_ns = response_operands_started.elapsed().as_nanos();
         let (word, launches) = ResidentWord::forward(
             card,
             plan,
@@ -779,6 +782,7 @@ impl<'c> Mounted<'c> {
         Ok((
             ExecutedWord {
                 source_preparation_host_ns,
+                response_operands_host_ns,
                 source_preparation: preparation.map(|p|p.receipt().clone()),
                 word,
                 operators,

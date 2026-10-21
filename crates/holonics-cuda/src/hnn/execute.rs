@@ -1357,8 +1357,20 @@ fn refusal(status: &[u32], forward: bool) -> Option<HnnError> {
 // -------------------------------------------------------------------------------------------
 // the resident word
 
+/// Transient successful-forward wall windows. No checkpoint or law consumes these.
+/// Fresh/actual include host decode and required tube proofs; launch/fetch windows
+/// include queued dependencies and must never be labeled pure GPU kernel time.
+#[derive(Clone, Copy, Debug, Default)]
+pub(crate) struct ForwardLaneCost {
+    pub shared_setup_ns: u128,
+    pub fresh_path_ns: u128,
+    pub fresh_error_trace_ns: u128,
+    pub actual_path_ns: u128,
+    pub actual_error_trace_ns: u128,
+}
 /// [definition] **One word's buffers on the card** (module header).
 pub(crate) struct ResidentWord<'c> {
+    pub(crate) forward_cost: ForwardLaneCost,
     card: &'c Card,
     pub(crate) plan: WordPlan,
     layout: WordLayout,
@@ -1445,6 +1457,7 @@ impl<'c> ResidentWord<'c> {
         response_operands: Option<&Operands>,
         response_opening_base: Option<&EndChange>,
     ) -> Result<(Self, Launches), HnnError> {
+        let forward_started = std::time::Instant::now();
         let launches = Launches::derive(card, &plan)?;
         let layout = WordLayout::new(&plan, plan.contacts.len());
         let plan_words = card.upload(&plan.plan).map_err(device)?;
@@ -1513,6 +1526,10 @@ impl<'c> ResidentWord<'c> {
             card.launch(PAIR_ENTRY, &layout, &mut params)
                 .map_err(device)?;
         }
+        let shared_setup_ns = forward_started.elapsed().as_nanos();
+        let fresh_started = std::time::Instant::now();
+        let mut fresh_error_trace_ns = 0;
+        let mut actual_error_trace_ns = 0;
         let mut response = if matches!(
             plan.receiving_layout,
             ReceivingLayout::ArrivalContext { .. }
@@ -1592,8 +1609,10 @@ impl<'c> ResidentWord<'c> {
             let operands = response_operands.ok_or(HnnError::Unadmitted {
                 reason: "an ArrivalContext CUDA response has the producing charted operands",
             })?;
+            let trace_started = std::time::Instant::now();
             let fresh_anchor_errors =
                 response_error_trace(&response_plan, &record, operands, None)?;
+            fresh_error_trace_ns = trace_started.elapsed().as_nanos();
 
             Some(ResponseLane {
                 plan: response_plan,
@@ -1608,6 +1627,8 @@ impl<'c> ResidentWord<'c> {
         } else {
             None
         };
+        let fresh_path_ns = if response.is_some() { fresh_started.elapsed().as_nanos() } else { 0 };
+        let actual_started = std::time::Instant::now();
         let mut plan_ptr = plan_words.device_ptr();
         let mut operands_ptr = operands.device_ptr();
         let mut published = publication.words.device_ptr();
@@ -1684,12 +1705,17 @@ impl<'c> ResidentWord<'c> {
             let operands = response_operands.ok_or(HnnError::Unadmitted {
                 reason: "the paired CUDA response retains its producing charted operands",
             })?;
+            let trace_started = std::time::Instant::now();
             let errors =
                 response_error_trace(&plan, &actual_record, operands, response_opening_base)?;
+            actual_error_trace_ns = trace_started.elapsed().as_nanos();
             lane.actual_anchor_errors = Some(errors);
         }
         Ok((
             Self {
+                forward_cost: ForwardLaneCost { shared_setup_ns, fresh_path_ns,
+                    fresh_error_trace_ns, actual_path_ns: actual_started.elapsed().as_nanos(),
+                    actual_error_trace_ns },
                 card,
                 plan,
                 layout,

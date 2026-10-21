@@ -83,6 +83,12 @@ pub struct ObservedDeviceReading {
     pub source_preparation_packets:u64,
     pub source_preparation_host_ns:u128,
     pub mounted_execute_ns:u128,
+    pub response_operands_host_ns:u128,
+    pub forward_shared_setup_ns:u128,
+    pub fresh_path_ns:u128,
+    pub fresh_error_trace_ns:u128,
+    pub actual_path_ns:u128,
+    pub actual_error_trace_ns:u128,
     pub native_word_forward_launches:u64,
     pub fresh_response_forward_subset:u64,
     pub forward_phase_transfer_octets:u64,
@@ -600,6 +606,12 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                         m.source_preparation_packets+=u64::from(word.source_preparation.is_some());
                         m.source_preparation_host_ns+=word.source_preparation_host_ns;
                         m.mounted_execute_ns+=execute_ns;
+                        m.response_operands_host_ns+=word.response_operands_host_ns;
+                        m.forward_shared_setup_ns+=word.word.forward_cost.shared_setup_ns;
+                        m.fresh_path_ns+=word.word.forward_cost.fresh_path_ns;
+                        m.fresh_error_trace_ns+=word.word.forward_cost.fresh_error_trace_ns;
+                        m.actual_path_ns+=word.word.forward_cost.actual_path_ns;
+                        m.actual_error_trace_ns+=word.word.forward_cost.actual_error_trace_ns;
                         m.native_word_forward_launches+=traffic_after.word_count-traffic_before.word_count;
                         m.fresh_response_forward_subset+=traffic_after.response_word_count-traffic_before.response_word_count;
                         m.forward_phase_transfer_octets+=traffic_after.words-traffic_before.words;
