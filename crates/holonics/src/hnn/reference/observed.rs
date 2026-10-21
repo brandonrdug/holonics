@@ -376,7 +376,7 @@ impl Reference {
         // expression to this pending word, using private chart state so a stale/forged
         // expression cannot change even the resident's solver view on refusal.
         let mut validation_charts = resident.charts.clone();
-        let (_, wave) = slot.ratio.read_on(
+        let (_, wave) = slot.ratio.read_on_native(
             &resident.field,
             &resident.constitution,
             &mut validation_charts,

@@ -199,6 +199,8 @@ pub struct Word<'c> {
     /// comparison from it and refuses any other. `None` for every other opener. It is the Word's
     /// own present input, released with the Word, never a retained record.
     opened_on: Option<WordOpening>,
+    /// Opt-in computation work paid once before this Word's native tick balances.
+    source_preparation: Option<action::PortPreparationReceipt>,
     /// Transient actual source operand and same-cut response; never retained in reception carry.
     response_source: Option<Vec<Vec<Rat>>>,
     response_opening_exact: Option<EndChange>,
@@ -2521,6 +2523,7 @@ impl<'c> Word<'c> {
         let mut word = Self {
             native_source: None,
             opened_on: None,
+            source_preparation: None,
             response_source: None,
             response_opening_exact: None,
             response: None,
@@ -2671,6 +2674,31 @@ impl<'c> Word<'c> {
             });
         }
         Ok(self.end_change())
+    }
+
+    /// Complete original opening, not the visible representative alone. At an
+    /// unrun opening, on_change put each discarded coordinate in exactly these
+    /// incoming feedback streams. Non-opening streams must still be zero.
+    pub(crate) fn complete_unrun_opening(&self)->Result<EndChange,HnnError>{
+        if self.ticks()!=0 || self.is_ended() || self.carried.anchors.iter().chain(&self.carried.solves).flatten().any(|q|!q.is_zero())
+            || self.resonators.iter().flatten().any(|r|r.remainders.rate.iter().any(|q|!q.is_zero())) {
+            return Err(HnnError::Unadmitted{reason:"complete unrun native opening and its original feedback streams"});
+        }
+        let mut change=self.change()?;
+        for (ring,wave) in change.storage.iter_mut().enumerate(){
+            for ((x,a),b) in wave.iter_mut().zip(&self.carried.storage[ring]).zip(&self.carried.element_drive[ring]){*x+=a+b;}
+        }
+        for (p,r) in change.arrivals.iter_mut().zip(&self.carried.arrivals){for (v,rest) in p.iter_mut().zip(r){for (x,r) in v.iter_mut().zip(rest){*x+=r;}}}
+        for (p,r) in change.states.iter_mut().zip(&self.carried.states){for (v,rest) in p.iter_mut().zip(r){for (x,r) in v.iter_mut().zip(rest){*x+=r;}}}
+        for (state,held) in change.resonators.iter_mut().zip(&self.resonators){if let (Some(state),Some(held))=(state,held){for (v,rest) in state.iter_mut().zip(&held.remainders.state){for (x,r) in v.iter_mut().zip(rest){*x+=r;}}}}
+        Ok(change)
+    }
+    pub fn source_preparation(&self)->Option<&action::PortPreparationReceipt>{self.source_preparation.as_ref()}
+    pub(crate) fn bind_source_producer(&mut self,theta:&crate::hnn::constitution::Constitution,current:&Current,source:std::sync::Arc<SourceMoment>)->Result<(),HnnError>{
+        let opening=self.complete_unrun_opening()?;
+        if self.native_source.is_some(){return Err(HnnError::Unadmitted{reason:"native producing source is bound once"});}
+        self.native_source=Some((theta.clone(),current.clone(),source,opening.support(self.field)));
+        Ok(())
     }
 
     /// The change as the word holds it, with each resonator's form phase: its last executed
@@ -3422,6 +3450,7 @@ impl<'c> Word<'c> {
         let Word {
             native_source: _,
             opened_on: _,
+            source_preparation,
             field: _,
             response_source,
             response_opening_exact,
@@ -3446,6 +3475,7 @@ impl<'c> Word<'c> {
             opened_at,
         } = self;
         KeptWord {
+            source_preparation,
             response_source,
             response_opening_exact,
             response,
@@ -3564,6 +3594,7 @@ fn admittance_total(operands: &Operands, ring: usize) -> Rat {
 /// outlives its return). It is not `Clone`: a clone of the slot drops it and reads again.
 #[derive(Debug)]
 pub(crate) struct KeptWord {
+    source_preparation: Option<action::PortPreparationReceipt>,
     response_source: Option<Vec<Vec<Rat>>>,
     response_opening_exact: Option<EndChange>,
     response: Option<Box<column::ResponseColumn>>,
@@ -3646,6 +3677,7 @@ impl KeptWord {
     /// **Resume the word on its field**: the field it was read on, which the resident owns.
     pub(crate) fn resume(self, field: &Field) -> Word<'_> {
         let KeptWord {
+            source_preparation,
             response_source,
             response_opening_exact,
             response,
@@ -3671,6 +3703,7 @@ impl KeptWord {
         Word {
             native_source: None,
             opened_on: None,
+            source_preparation,
             field,
             response_source,
             response_opening_exact,

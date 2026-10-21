@@ -44,6 +44,7 @@ pub struct ResidentPassageParts {
     pub address: ActiveAddress,
     pub arrived: Option<ResidentArrived>,
     pub source_return_frontier: BTreeMap<usize, usize>,
+    pub prepared_input: Option<prepared_input::PreparedInputState>,
 }
 
 /// The complete, validated resident continuation carried inside `ContinuingState`.
@@ -205,14 +206,14 @@ impl ResidentPassage {
             _ => return refused("the arrived operand"),
         };
         let mut source_return_frontier = BTreeMap::new();
-        if text.starts_with("resident-passage 6\n") || text.starts_with("resident-passage 7\n") {
+        if text.starts_with("resident-passage 6\n") || text.starts_with("resident-passage 7\n") || text.starts_with("resident-passage 8\n") {
             let header: Vec<usize> = counted(
                 next("the reciprocal frontier count")?,
                 "source-return-frontiers",
                 1,
                 "the reciprocal frontier count",
             )?;
-            if header[0] == 0 || header[0] > field.sources().len() {
+            if (header[0] == 0 && !text.starts_with("resident-passage 8\n")) || header[0] > field.sources().len() {
                 return refused("the bounded reciprocal frontier count");
             }
             for _ in 0..header[0] {
@@ -231,6 +232,13 @@ impl ResidentPassage {
                 }
             }
         }
+        let prepared_input=if text.starts_with("resident-passage 8\n"){
+            let row=keyed(next("prepared input continuation")?,"prepared-input","prepared input continuation")?;
+            if row.len()!=1{return refused("one prepared input continuation");}
+            let input=prepared_input::PreparedInputState::from_text(field,constitution,&prepared_input::codec::unhex(row[0])?)?;
+            if moment.as_ref().map(|(_,m)|m.cells())!=Some(input.source_cells()){return refused("prepared input and native source share one frontier");}
+            Some(input)
+        }else{None};
         if next("the passage's end").is_ok() {
             return refused("the passage's end");
         }
@@ -254,6 +262,7 @@ impl ResidentPassage {
                 address,
                 arrived,
                 source_return_frontier,
+                prepared_input,
             },
             receiving_law,
         })
@@ -307,7 +316,10 @@ fn write_passage(
     receiving_law: crate::hnn::receiving::ReceivingLaw,
 ) -> String {
     let mut s = String::new();
-    match receiving_law {
+    if parts.prepared_input.is_some(){
+        line(&mut s,"resident-passage",[8]);
+        line(&mut s,"receiving-law",[crate::hnn::receiving::ReceivingLaw::RetainedFibreV1.as_str()]);
+    }else{match receiving_law {
         crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 => {
             line(
                 &mut s,
@@ -331,6 +343,7 @@ fn write_passage(
             );
             line(&mut s, "receiving-law", [receiving_law.as_str()]);
         }
+    }
     }
     line(
         &mut s,
@@ -374,7 +387,7 @@ fn write_passage(
             write_opening(&mut s, &arrived.opening);
         }
     }
-    if !parts.source_return_frontier.is_empty() {
+    if !parts.source_return_frontier.is_empty() || parts.prepared_input.is_some() {
         line(
             &mut s,
             "source-return-frontiers",
@@ -384,6 +397,7 @@ fn write_passage(
             line(&mut s, "source-return-frontier", [ring, position]);
         }
     }
+    if let Some(input)=&parts.prepared_input{line(&mut s,"prepared-input",[prepared_input::codec::hex(&input.to_text())]);}
     s
 }
 
@@ -429,6 +443,7 @@ impl Resident {
             charts: self.charts.clone(),
             address: self.address.clone(),
             source_return_frontier: self.source_return_frontier.clone(),
+            prepared_input: self.prepared_input.clone(),
             arrived: self.arrived.as_ref().map(|arrived| ResidentArrived {
                 ratio: arrived.ratio.clone(),
                 targets: arrived.targets.clone(),
@@ -462,6 +477,7 @@ impl Resident {
             return refused("the saved passage against the declared reception");
         }
         self.source_return_frontier = parts.source_return_frontier;
+        self.prepared_input=parts.prepared_input;
         self.current = parts.current;
         self.moments.clear();
         if let Some((id, moment)) = parts.moment {
@@ -496,7 +512,7 @@ pub(crate) fn check_version(line: &str) -> Result<crate::hnn::receiving::Receivi
     if words == ["resident-passage", "4"] || words == ["resident-passage", "6"] {
         return Ok(crate::hnn::receiving::ReceivingLaw::CoarseGrainV1);
     }
-    if words == ["resident-passage", "5"] || words == ["resident-passage", "7"] {
+    if words == ["resident-passage", "5"] || words == ["resident-passage", "7"] || words == ["resident-passage", "8"] {
         return Ok(crate::hnn::receiving::ReceivingLaw::RetainedFibreV1);
     }
     let version = match words.as_slice() {

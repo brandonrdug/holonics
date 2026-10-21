@@ -73,6 +73,7 @@ pub struct PendingRatio {
     commit: u64,
     view: crate::hnn::ring::modes::ModeView,
     observation: Option<Vec<Vec<bool>>>,
+    prepared_input: Option<crate::hnn::reference::prepared_input::PreparedInputCut>,
 }
 
 /// [definition] **An epoch's faces at compare**: the combined faces (the tree's at each phase's
@@ -113,7 +114,8 @@ impl PendingRatio {
             header.push(g.to_string());
             header.push(d.to_string());
         }
-        line(s, "ratio-commit", header);
+        line(s, if self.prepared_input.is_some(){"ratio-prepared-commit"}else{"ratio-commit"}, header);
+        if let Some(p)=&self.prepared_input{line(s,"ratio-control",[crate::hnn::reference::prepared_input::codec::hex(&p.to_text())]);}
         line(s, "ratio-anchor", &self.anchor);
         self.moment.write(s);
         self.phases.write_saved(s);
@@ -145,14 +147,14 @@ impl PendingRatio {
         next: crate::hnn::state_text::Next<'_, 'a>,
     ) -> Result<Self, HnnError> {
         use crate::hnn::state_text::{keyed, values};
-        let commit: Vec<u64> = values(
-            &keyed(
-                next("the producing commit")?,
-                "ratio-commit",
-                "the producing commit",
-            )?,
-            "the producing commit",
-        )?;
+        let header=next("the producing commit")?;
+        let prepared=header.starts_with("ratio-prepared-commit ");
+        let commit: Vec<u64> = values(&keyed(header,if prepared{"ratio-prepared-commit"}else{"ratio-commit"},"the producing commit")?,"the producing commit")?;
+        let prepared_input=if prepared{
+            let row=keyed(next("the original prepared input cut")?,"ratio-control","the original prepared input cut")?;
+            if row.len()!=1{return Err(HnnError::Unadmitted{reason:"one complete original prepared cut"});}
+            Some(crate::hnn::reference::prepared_input::PreparedInputCut::from_text(&crate::hnn::reference::prepared_input::codec::unhex(row[0])?)?)
+        }else{None};
         if commit.is_empty() || commit.len() % 2 != 1 {
             return Err(HnnError::Unadmitted {
                 reason: "a saved ratio's commit and mode selections",
@@ -220,6 +222,7 @@ impl PendingRatio {
         Self::produce(&current, &moment, &address, &phases, commit[0]).map(|mut ratio| {
             ratio.view = view;
             ratio.observation = observation;
+            ratio.prepared_input=prepared_input;
             ratio
         })
     }
@@ -243,6 +246,7 @@ impl PendingRatio {
             commit,
             view: crate::hnn::ring::modes::ModeView::whole(),
             observation: None,
+            prepared_input: None,
         })
     }
 
@@ -413,6 +417,7 @@ impl PendingRatio {
         charts: &mut Charts,
         opening: &WordOpening,
     ) -> Result<(Word<'c>, Faces), HnnError> {
+        if self.prepared_input.is_some(){return Err(HnnError::Unadmitted{reason:"prepared input uses the typed native material read route"});}
         let word = self.open_on(field, constitution, charts, opening)?;
         self.read_word(field, constitution, word)
     }
@@ -436,7 +441,9 @@ impl PendingRatio {
         opening: &WordOpening,
     ) -> Result<Word<'c>, HnnError> {
         let current = self.current(scope.field())?;
-        Word::open_received_scoped(scope, &current, &self.moment, charts, opening, &self.view)
+        let field=scope.field();let theta=scope.material();
+        let word=Word::open_received_scoped(scope, &current, &self.moment, charts, opening, &self.view)?;
+        match &self.prepared_input{Some(p)=>p.apply(field,theta,self,word),None=>Ok(word)}
     }
 
     fn read_word<'c>(
@@ -543,6 +550,19 @@ impl PendingRatio {
         ))
     }
 
+    pub(crate) fn with_prepared_input(mut self,cut:crate::hnn::reference::prepared_input::PreparedInputCut)->Result<Self,HnnError>{
+        if cut.source_cells!=self.moment.cells() || cut.lift!=self.anchor || cut.commit!=self.commit{return Err(HnnError::Unadmitted{reason:"prepared cut matches its actual source ratio"});}
+        self.prepared_input=Some(cut);Ok(self)
+    }
+    pub(crate) fn prepared_input(&self)->Option<&crate::hnn::reference::prepared_input::PreparedInputCut>{self.prepared_input.as_ref()}
+    /// Native body route for an opt-in prepared ratio. Generic/counterfactual
+    /// material reads do not silently discard its original input operation.
+    pub fn read_on_native<'c>(&self,field:&'c Field,theta:&crate::hnn::constitution::Constitution,charts:&mut Charts,opening:&WordOpening)->Result<(Word<'c>,Faces),HnnError>{
+        let word=Word::open_received_view(field,theta,&self.current(field)?,&self.moment,charts,opening,&self.view)?;
+        let word=match &self.prepared_input{Some(p)=>p.apply(field,theta,self,word)?,None=>word};
+        self.read_word(field,theta,word)
+    }
+
     /// The contemporary tree faces at each phase's causal address given the epoch's known targets:
     /// what [`PendingRatio::against`] adds to the wave (read-only).
     pub(crate) fn tree_faces(
@@ -641,7 +661,9 @@ impl PendingRatio {
                 reason: "a successor reread cannot precede its producing commit",
             });
         }
-        self.read_against_on(field, constitution, charts, targets, opening)
+        let (word,wave)=self.read_on_native(field,constitution,charts,opening)?;
+        let against=self.against(constitution,&wave,targets)?;
+        Ok((word,against))
     }
 
     /// The pending ratio's exact bits: the anchor's integers, the moment's dense code and the

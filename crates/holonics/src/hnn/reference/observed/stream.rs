@@ -183,6 +183,12 @@ impl ObservedStream {
         Ok(stream)
     }
 
+    /// Fresh explicit opt-in. The existing stream remains the sole ingress owner.
+    pub fn select_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
+        if !self.pending.is_empty() || self.scope!=ObservedEpochDepositionScope::LocalReceivingReturn{return Err(refuse("fresh prepared input uses LocalReceivingReturn with no pending arrivals"));}
+        self.resident.select_prepared_input(pairing)
+    }
+
     pub fn resident(&self) -> &Resident {
         &self.resident
     }
@@ -285,6 +291,7 @@ impl ObservedStream {
         execution: &dyn ObservedEpochExecution,
         stage_refused: &mut dyn FnMut(EpochStageAttempt, &EpochStageRefusal),
     ) -> Result<ObservedStreamReceipt, HnnError> {
+        if self.resident.prepared_input.as_ref().is_some_and(|p|p.mode()!=prepared_input::PrefixMode::Training){return Err(refuse("forecast conditioning advances the frozen prefix receiver, not observed training"));}
         let mut next = self.clone();
         if next
             .accepted_cells()?
@@ -381,9 +388,11 @@ impl ObservedStream {
         pairing: &PairingDeclaration,
         execution: Option<&dyn ObservedEpochExecution>,
     ) -> Result<(Resident, ObservedCrib), HnnError> {
+        let mut forecast=self.resident.clone();
+        if forecast.prepared_input.is_some(){forecast.freeze_prepared_forecast()?;}
         let frontier = self.pending_frontier(pairing)?;
         if self.pending.is_empty() {
-            return Ok((self.resident.clone(), self.crib.clone()));
+            return Ok((forecast.clone(), self.crib.clone()));
         }
         let boundary =
             PairedObservation::admit(&self.resident.field, &self.resident.constitution, pairing)?;
@@ -396,14 +405,14 @@ impl ObservedStream {
             .ok_or_else(|| refuse("the query fork's one continuing moment"))?;
         let mut forward = match execution {
             None => reference.read_epoch_at_cuts(
-                &self.resident,
+                &forecast,
                 &moment,
                 &self.resident.admitted[0],
                 &encoded,
                 &[self.pending.len()],
             )?,
             Some(execution) => reference.read_epoch_at_cuts_with_execution(
-                &self.resident,
+                &forecast,
                 &moment,
                 &self.resident.admitted[0],
                 &encoded,

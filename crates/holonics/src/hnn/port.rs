@@ -180,6 +180,8 @@ pub enum ReceiptDetail {
     /// remainders the word released at its end, the last junction's residual, and each declared
     /// resonator's balance over the word and the word's whole balance (campaign 2).
     Refine {
+        /// Paid once at opening, before all native tick balances.
+        source_preparation: Option<crate::hnn::word::action::PortPreparationReceipt>,
         /// The fresh source injection's actual mode-qualified coupling; clocks and carry remain independent.
         view: crate::hnn::ring::modes::ModeView,
         reached: Vec<Locus>,

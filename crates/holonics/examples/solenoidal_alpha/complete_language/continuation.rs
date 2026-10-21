@@ -333,8 +333,17 @@ pub(super) fn sample_continuing(
     let (field, founding, pairing) = declaration(checkpoint.population)?;
     let (mut resident, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
     for class in digits(prompt) {
-        reference.ingest_class_continuing(&mut resident, &mut crib, &pairing, class, None)?;
+        if resident.prepared_input().is_some() {
+            let (moment, _) = resident.continuing().ok_or("conditioning requires the same native source")?;
+            let phases = resident.admitted().first().ok_or("conditioning receiver")?.clone();
+            let receiver = holonics::hnn::receiving::RetainedFibreReceiver::declare(phases.grain())?;
+            let (pending, _) = reference.refine(&mut resident, &moment, &phases)?;
+            reference.receive_receiver_prefix_continuing(&mut resident, &mut crib, &pairing, pending, class, &receiver, None)?;
+        } else {
+            reference.ingest_class_continuing(&mut resident, &mut crib, &pairing, class, None)?;
+        }
     }
+    if resident.prepared_input().is_some() { resident.begin_hypothesized_output()?; }
     let phases = resident
         .admitted()
         .first()

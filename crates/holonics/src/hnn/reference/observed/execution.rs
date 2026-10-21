@@ -43,6 +43,7 @@ pub trait ObservedEpochWord: std::fmt::Debug + Send + Sync {
 /// None is reconstructed by running a second, native forward.
 #[derive(Debug)]
 pub struct ObservedEpochForwardWord {
+    pub source_preparation: Option<crate::hnn::word::action::PortPreparationReceipt>,
     pub producing_commit: u64,
     pub word: Box<dyn ObservedEpochWord>,
     pub faces: Faces,
@@ -114,6 +115,10 @@ impl ObservedEpochWord for NativeEpochWord {
 /// refusal when their selected realization cannot execute the actual operands.
 /// The words are independent after their forward chain has reached its openings.
 pub trait ObservedEpochExecution: Sync {
+    /// An executor must explicitly admit the prepared opening/work operand. A
+    /// backend that ignores the sealed input operation is never a host fallback.
+    fn admit_prepared_input(&self)->Result<(),HnnError>{Err(HnnError::Unadmitted{reason:"selected executor has no prepared native source opening adapter"})}
+
     /// Executed same-law uncached CODE control. This selects observation reuse only,
     /// never material, chronology, a return, precision, or an admission/fallback policy.
     fn reuse_receiving_observations(&self) -> bool {
@@ -186,6 +191,7 @@ pub trait ObservedEpochExecution: Sync {
 pub struct HostObservedEpochExecution;
 
 impl ObservedEpochExecution for HostObservedEpochExecution {
+    fn admit_prepared_input(&self)->Result<(),HnnError>{Ok(())}
     fn forward(
         &self,
         field: &Field,
@@ -194,7 +200,7 @@ impl ObservedEpochExecution for HostObservedEpochExecution {
         charts: &mut Charts,
         opening: &WordOpening,
     ) -> Result<ObservedEpochForwardWord, HnnError> {
-        let (word, faces) = ratio.read_on(field, constitution, charts, opening)?;
+        let (word, faces) = ratio.read_on_native(field, constitution, charts, opening)?;
         keep_native(word, faces, ratio.phases(), ratio.commit())
     }
 
@@ -337,6 +343,7 @@ fn keep_native(
     let charts = word.operands().charts();
     let passages = word.tube_passages()?;
     Ok(ObservedEpochForwardWord {
+        source_preparation: word.source_preparation().cloned(),
         producing_commit,
         forward_span: None,
         word: Box::new(NativeEpochWord {

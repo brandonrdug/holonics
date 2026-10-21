@@ -109,6 +109,8 @@ pub enum ObservedEpochOutcome {
 /// predecessor balance; `chained` contains exactly the within-batch joins.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ObservedEpochEnergy {
+    /// Opening work already included once in each prepared source imposition.
+    pub source_preparations: Vec<Option<crate::hnn::word::action::PortPreparationReceipt>>,
     pub words: Vec<crate::hnn::word::WordBalance>,
     pub chained: Vec<crate::hnn::word::ChainedBalance>,
     /// Both forms of the deposit are read at this last word's producing lift.
@@ -123,6 +125,8 @@ pub struct ObservedEpochEnergy {
 impl ObservedEpochEnergy {
     pub fn closes(&self) -> bool {
         !self.words.is_empty()
+            && self.source_preparations.len()==self.words.len()
+            && self.source_preparations.iter().flatten().all(|p|p.closes())
             && self.chained.len() == self.words.len() - 1
             && self.words.iter().all(crate::hnn::word::WordBalance::closes)
             && self
@@ -669,6 +673,9 @@ impl Reference {
         stage_refused: &mut dyn FnMut(EpochStageAttempt, &EpochStageRefusal),
     ) -> Result<ObservedEpochReceipt, HnnError> {
         let forward_start = Instant::now();
+        if resident.prepared_input.is_some() && (deposition_scope!=ObservedEpochDepositionScope::LocalReceivingReturn || resident.prepared_input.as_ref().is_some_and(|p|p.mode()!=prepared_input::PrefixMode::Training)) {
+            return Err(refusal("prepared observed training uses its one actual LocalReceivingReturn owner"));
+        }
         let local_receiving =
             deposition_scope == ObservedEpochDepositionScope::LocalReceivingReturn;
         if local_receiving && resident.receiving_law() != ReceivingLaw::RetainedFibreV1 {
@@ -823,6 +830,7 @@ impl Reference {
         let exponent = partition_exponent(receiver_grain, heard, epoch_index)?;
         let comparison_commit = forward.commit;
         let EpochForward {
+            prepared_input,
             reads: forwards,
             mut prefixes,
             current,
@@ -845,6 +853,7 @@ impl Reference {
             &comparison_opening.constitution,
             &producing_current,
         )?;
+        let source_preparations=forwards.iter().map(|r|r.source_preparation.clone()).collect();
         let mut energy_words: Vec<_> = forwards.iter().map(|read| read.energy.clone()).collect();
         let energy_chained = forwards
             .iter()
@@ -1247,6 +1256,7 @@ impl Reference {
             .collect::<Result<_, _>>()?;
         next.current = current;
         next.moments.insert(moment, source);
+        next.prepared_input=prepared_input;
         next.address = address;
         next.carried = carried;
         next.carried_error = None;
@@ -2001,6 +2011,7 @@ impl Reference {
             }
         }
         let energy = ObservedEpochEnergy {
+            source_preparations,
             words: energy_words,
             chained: energy_chained,
             producing_lift,

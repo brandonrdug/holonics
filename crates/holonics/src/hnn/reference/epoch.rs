@@ -12,6 +12,7 @@ use super::*;
 /// resident before the next source prefix is read.
 #[derive(Debug)]
 pub(crate) struct EpochRead {
+    pub(crate) source_preparation: Option<crate::hnn::word::action::PortPreparationReceipt>,
     pub(crate) ratio: PendingRatio,
     pub(crate) word: EpochWord,
     pub(crate) opening: WordOpening,
@@ -109,6 +110,7 @@ impl EpochWord {
 /// `source`, `current` and `address` are the exact closing values after the consumed prefix.
 #[derive(Debug)]
 pub(crate) struct EpochForward<R = EpochRead> {
+    pub(crate) prepared_input: Option<prepared_input::PreparedInputState>,
     /// Every retained reading in this batch belongs to this one material version.
     pub(crate) commit: u64,
     pub(crate) reads: Vec<R>,
@@ -326,6 +328,7 @@ impl Reference {
                     field,
                     &resident.constitution,
                 )?;
+                if ratio.prepared_input().is_some(){execution.admit_prepared_input()?;}
                 let start = Instant::now();
                 let forward = execution.forward_scoped(
                     &mut observed::ObservedEpochForwardContext::new(&mut rings),
@@ -371,6 +374,7 @@ impl Reference {
                 working.carried = Some(forward.reception_end.absorbed(Absorption::Nothing));
                 working.carried_error = None;
                 EpochRead {
+                    source_preparation: forward.source_preparation,
                     ratio,
                     word: EpochWord::Executed(forward.word),
                     forward_span: forward.forward_span,
@@ -388,8 +392,8 @@ impl Reference {
                     &crate::hnn::ring::modes::ModeView::whole(),
                     Some(&mut rings),
                 )?;
-                let energy = match refined.receipt.detail {
-                    ReceiptDetail::Refine { word, .. } => *word,
+                let (energy,source_preparation) = match refined.receipt.detail {
+                    ReceiptDetail::Refine { word, source_preparation, .. } => (*word,source_preparation),
                     _ => return Err(HnnError::Unadmitted {
                         reason: "a native epoch word retains its actual producing physical receipt",
                     }),
@@ -412,6 +416,7 @@ impl Reference {
                     });
                 }
                 EpochRead {
+                    source_preparation,
                     ratio: slot.ratio,
                     word: EpochWord::Native(kept.word),
                     forward_span: None,
@@ -425,6 +430,13 @@ impl Reference {
             if let (Some(previous), Some((form, carry, opened))) =
                 (&previous_energy, energy_opening)
             {
+                let mut opened=opened;
+                if let Some(prep)=&read.source_preparation{
+                    if !prep.closes(){return Err(HnnError::Unadmitted{reason:"prepared opening work closes before ticks"});}
+                    // Source imposition now includes the actual control exactly once.
+                    // No tick/World-return term is fabricated for Wprep.
+                    for(x,d)in opened.storage[0].iter_mut().zip(&prep.added){*x+=d;}
+                }
                 let joined = ChainedBalance::read(field, previous, &form, &carry, &opened, &read.energy)?;
                 if !joined.closes() || !joined.lift_emits() {
                     return Err(HnnError::Unadmitted {
@@ -433,11 +445,18 @@ impl Reference {
                 }
                 read.chained = Some(joined);
             }
+            let input_cut=read.ratio.prepared_input().cloned();
             let (retained, energy) = retain(read);
             previous_energy = Some(energy);
             reads.push(retained);
 
             let class = cells.cells()[at].class();
+            if let Some(input)=&mut working.prepared_input{
+                match input.mode(){
+                    prepared_input::PrefixMode::Training=>input.after_actual(input_cut.ok_or(HnnError::Unadmitted{reason:"actual prepared epoch retains its original producing packet"})?,class)?,
+                    prepared_input::PrefixMode::Forecast=>input.after_forecast(class)?,
+                }
+            }
             working.address.receive_at(class, cells.advance(at))?;
             working.address.refresh(field, &working.constitution)?;
             if cuts.contains(&(at + 1)) {
@@ -475,6 +494,7 @@ impl Reference {
         }
 
         Ok(EpochForward {
+            prepared_input: working.prepared_input,
             commit,
             reads,
             prefixes,

@@ -554,6 +554,7 @@ pub struct Resident {
     observed_epoch_terminal: bool,
     /// Bounded monotone encounter frontier per source; repropagation is not new evidence.
     source_return_frontier: BTreeMap<usize, usize>,
+    prepared_input: Option<prepared_input::PreparedInputState>,
     released_bits: u64,
     stop: Option<BudgetStop>,
     charts: Charts,
@@ -1222,6 +1223,7 @@ impl Reference {
             observed_epoch_ingress,
             observed_epoch_terminal: false,
             source_return_frontier: BTreeMap::new(),
+            prepared_input: None,
             released_bits: 0,
             stop: None,
             charts: Charts::new(),
@@ -1400,14 +1402,11 @@ impl Reference {
                 handle: Handle::Moment(*moment),
             })?;
         source.read_retained_faces(field, constitution)?;
-        let ratio = PendingRatio::produce(
-            &resident.current,
-            source,
-            &resident.address,
-            phases,
-            constitution.commit(),
-        )?
-        .with_view(field, view)?;
+        let mut ratio = PendingRatio::produce(&resident.current,source,&resident.address,phases,constitution.commit())?.with_view(field,view)?;
+        if let Some(input)=&resident.prepared_input{
+            if view!=&crate::hnn::ring::modes::ModeView::whole(){return Err(HnnError::Unadmitted{reason:"prepared input law uses the complete native source view"});}
+            ratio=ratio.with_prepared_input(input.seal(field,constitution,&resident.current,source)?)?;
+        }
         let id = PendingId(resident.next_handle()?);
         Ok((ratio, opening, id))
     }
@@ -1438,7 +1437,7 @@ impl Reference {
         let start = Instant::now();
         let (word, faces) = match rings {
             Some(scope) => ratio.read_on_scoped(scope, &mut resident.charts, &opening)?,
-            None => ratio.read_on(field, constitution, &mut resident.charts, &opening)?,
+            None => ratio.read_on_native(field, constitution, &mut resident.charts, &opening)?,
         };
         ratio.admit_observed_read(field, &word.receiving_anchors(phases)?, &faces)?;
         let read = start.elapsed();
@@ -1473,6 +1472,7 @@ impl Reference {
             field.step(),
             work,
             ReceiptDetail::Refine {
+                source_preparation: word.source_preparation().cloned(),
                 view: ratio.view().clone(),
                 reached,
                 released_power: released.power.clone(),
@@ -1969,7 +1969,7 @@ impl ExecutionPort for Reference {
             Some(KeptRead { word, faces, .. }) => (word.resume(&field), faces),
             None => {
                 let start = Instant::now();
-                let read = ratio.read_on(
+                let read = ratio.read_on_native(
                     &field,
                     &resident.constitution,
                     &mut resident.charts,
@@ -2164,7 +2164,7 @@ impl ExecutionPort for Reference {
                     .as_ref()
                     .expect("paired trial chart snapshot")
                     .clone();
-                let (word, wave) = frozen.ratio().read_on(
+                let (word, wave) = frozen.ratio().read_on_native(
                     &field,
                     candidate.material(),
                     &mut charts,
@@ -2301,7 +2301,7 @@ impl ExecutionPort for Reference {
             })?;
         let field = &resident.field;
         let phases = slot.ratio.phases().clone();
-        let (word, wave) = slot.ratio.read_on(
+        let (word, wave) = slot.ratio.read_on_native(
             field,
             &resident.constitution,
             &mut resident.charts,
@@ -2389,7 +2389,7 @@ impl ExecutionPort for Reference {
             })?;
         let field = &resident.field;
         let phases = slot.ratio.phases().clone();
-        let (word, wave) = slot.ratio.read_on(
+        let (word, wave) = slot.ratio.read_on_native(
             field,
             &resident.constitution,
             &mut resident.charts,
@@ -6502,3 +6502,6 @@ impl Resident {
 
 /// Separate actual class-coordinate response material and prospective source preparation.
 pub mod contextual_input;
+
+/// Unified opt-in computational source preparation and causal prefix state.
+pub mod prepared_input;

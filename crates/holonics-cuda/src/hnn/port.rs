@@ -512,6 +512,7 @@ impl<'c> Mounted<'c> {
                 .map_err(device)?;
         }
         let parts = ResidentPassageParts {
+            prepared_input: None, // No prepared-input adapter is implemented by this Resident.
             current: self.current.clone(),
             admitted: self.admitted.clone(),
             opens: self.opens,
@@ -1142,6 +1143,11 @@ impl<'c> Resident<'c> {
             return Ok(resident);
         };
         let passage = ResidentPassage::from_text(field, &constitution, text)?.into_parts();
+        if passage.prepared_input.is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "device Resident cannot restore a prepared input law without its actual opening adapter",
+            });
+        }
         if passage.opens != self.reception.opens() {
             return Err(HnnError::ContinuingState {
                 what: "a saved device passage against its declared reception",
@@ -2035,6 +2041,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             field.step(),
             work,
             ReceiptDetail::Refine {
+                source_preparation: None, // This device port has no prepared-input Resident law.
                 view: ratio.view().clone(),
                 reached,
                 released_power: released.power.clone(),

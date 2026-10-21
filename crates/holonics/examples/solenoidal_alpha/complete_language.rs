@@ -12,6 +12,10 @@ mod continuation;
 #[path = "complete_language/code_parallel_controls.rs"]
 mod code_parallel_controls;
 
+#[cfg(test)]
+#[path = "complete_language/prepared_controls.rs"]
+mod prepared_controls;
+
 const READ_BUDGET: u64 = 64 * 1024 * 1024;
 const READING_BITS: u32 = holonics::ratio::exponentiated::READING_BITS;
 
@@ -251,6 +255,10 @@ fn train(
     if args.len() != 10 {
         return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT".into());
     }
+    let prepared_input = args[0] == "train-prepared-local-retained-fibre-v1";
+    if prepared_input && selected_backend != CompleteLanguageTrainingBackend::HostReference {
+        return Err("prepared native opening has no selected-device adapter; explicit host command required, no fallback".into());
+    }
     let backend = selected_backend.as_str();
     if args[1] != backend {
         return Err(
@@ -282,6 +290,7 @@ fn train(
     write_new(&out.join("EXECUTION_CONTRACT.json"), object(&[
         ("backend", quoted(backend)),
         ("command",quoted(&args[0])),
+        ("input_preparation_law",if prepared_input {quoted(holonics::hnn::reference::prepared_input::LAW)}else{"null".into()}),
         ("deposition_scope",exact(&scope)),
         ("additional_whole_section_monotone_policy_requested",(scope!=ObservedEpochDepositionScope::LocalReceivingReturn).to_string()),
         ("e_scope",quoted(e_scope(scope))),
@@ -291,6 +300,7 @@ fn train(
         ("host_fallback", "false".into()),
     ]).as_bytes())?;
     let mut checkpoint = fresh_checkpoint_at_law_and_scope(population,law,scope)?;
+    if prepared_input { checkpoint.stream.select_prepared_input(&declaration(population)?.2)?; }
     checkpoint.provenance = format!(
         "complete Q+LF+A+LF; corpus SHA256 {}; backend {backend}; command {}; scope {scope:?}; no record-boundary resets",
         args[3],args[0]
@@ -438,6 +448,7 @@ fn train(
                 ("whole_refusal", exact(&epoch.whole_stage_refusal)),
                 ("joint_refusal", exact(&epoch.joint_stage_refusal)),
                 ("wall", exact(&epoch.wall)),
+                ("actual_preparation_and_energy",exact(&epoch.energy)),
                 ("backend", quoted(backend)),
             ]);
             writeln!(epoch_log, "{record}")?;
@@ -469,6 +480,8 @@ fn train(
             ("backend", quoted(backend)),
             ("command",quoted(&args[0])),
             ("deposition_scope",exact(&checkpoint.stream.scope())),
+            ("input_preparation_law",checkpoint.stream.resident().prepared_input().map_or("null".into(),|p|quoted(p.law()))),
+            ("prepared_input_state",exact(&checkpoint.stream.resident().prepared_input())),
             ("e_scope",quoted(e_scope(scope))),
 
             (
@@ -510,6 +523,10 @@ fn sample(args: &[String]) -> Result<()> {
         );
     }
     let (checkpoint, _) = Checkpoint::load(&args[2], READ_BUDGET)?;
+    let prepared = args[0] == "sample-prepared-retained-fibre-v1";
+    if prepared != checkpoint.stream.resident().prepared_input().is_some() {
+        return Err("sample command and checkpoint input preparation law must match explicitly".into());
+    }
     if args[7] == "fresh-native" && checkpoint.stream.accepted_cells()? != 0 {
         return Err(
             "fresh-native requires the selected run's saved pre-arrival fresh checkpoint".into(),
@@ -546,6 +563,8 @@ fn sample(args: &[String]) -> Result<()> {
         &out.join("OUTPUT.json"),
         object(&[
             ("backend", quoted(&args[1])),
+            ("command",quoted(&args[0])),
+            ("input_preparation_law",checkpoint.stream.resident().prepared_input().map_or("null".into(),|p|quoted(p.law()))),
             (
                 "actual_rayon_workers",
                 rayon::current_num_threads().to_string(),
@@ -600,9 +619,10 @@ pub(super) fn run_with_execution(
         Some("train") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1, backend,ObservedEpochDepositionScope::NormalMaps),
         Some("train-retained-fibre-v1") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1, backend,ObservedEpochDepositionScope::NormalMaps),
         Some("train-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
-        Some("sample") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
-        Some("sample") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
-        _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), or sample; no default backend/model action".into()),
+        Some("train-prepared-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
+        Some("sample" | "sample-prepared-retained-fibre-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
+        Some("sample" | "sample-prepared-retained-fibre-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
+        _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
     }
 }
 pub(super) fn run(args: &[String]) -> Result<()> {

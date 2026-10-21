@@ -444,6 +444,7 @@ impl Reference {
                 "an alternate receiver prefix preserves its frozen native receiving map",
             ));
         }
+        if let Some(input)=&mut next.prepared_input{input.after_forecast(class)?;}
         *resident = next;
         *crib = next_crib;
         Ok(ReceiverPrefixReceipt {

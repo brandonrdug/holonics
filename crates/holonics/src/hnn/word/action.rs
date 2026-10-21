@@ -183,6 +183,15 @@ impl ActionProducer {
         })
     }
 
+    // Direct forward preparation needs no affine response/J claim. The complete
+    // opening (visible values PLUS all existing incoming remainders) is retained.
+    fn native_forward(word:&Word<'_>)->Result<Self,HnnError>{
+        if word.source_preparation.is_some(){return Err(HnnError::Unadmitted{reason:"one source preparation per actual producing Word"});}
+        let opening=word.complete_unrun_opening()?;
+        let (constitution,current,source,support)=word.native_source.as_ref().ok_or(HnnError::Unadmitted{reason:"native forward preparation requires the actual ratio producer"})?;
+        Ok(Self{field:word.field.clone(),constitution:constitution.clone(),current:current.clone(),source:source.clone(),support:support.clone(),operands:word.operands.clone(),opening,opened_at:word.opened_at()})
+    }
+
     fn matches(&self, word: &Word<'_>) -> bool {
         word.field == &self.field
             && word.operands == self.operands
@@ -383,6 +392,9 @@ fn apply_control<'c>(
         opening.clone(),
         baseline.opened_at,
     )?;
+    // Repartitioning the complete original opening must retain every coordinate;
+    // inspecting only Word::change would miss its bounded feedback remainders.
+    if word.complete_unrun_opening()? != opening {return Err(HnnError::Realization{what:"lossless complete source preparation opening including feedback remainders"});}
     producer.opening = opening;
     producer
         .support
@@ -1116,7 +1128,12 @@ impl SourceClassPreparation {
         boundary: &crate::hnn::encoding::observed::PairedObservation,
         ring: usize,
     ) -> Result<Self, HnnError> {
-        let producer = ActionProducer::of(word)?;
+        Self::from_producer(ActionProducer::of(word)?,boundary,ring)
+    }
+    pub(crate) fn at_native_forward(word:&Word<'_>,boundary:&crate::hnn::encoding::observed::PairedObservation,ring:usize)->Result<Self,HnnError>{
+        Self::from_producer(ActionProducer::native_forward(word)?,boundary,ring)
+    }
+    fn from_producer(producer:ActionProducer,boundary:&crate::hnn::encoding::observed::PairedObservation,ring:usize)->Result<Self,HnnError>{
         boundary.check_material(&producer.constitution)?;
         producer.field.admit(&boundary.encode(&[])?)?;
         let port = boundary
@@ -1170,7 +1187,7 @@ impl SourceClassPreparation {
         if !self.producer.matches(&baseline)
             || baseline.ticks() != 0
             || baseline.is_ended()
-            || baseline.change()? != self.producer.opening
+            || baseline.complete_unrun_opening()? != self.producer.opening
         {
             return Err(HnnError::Unadmitted {
                 reason: "the class control consumes its own whole native source opening",
@@ -1192,7 +1209,7 @@ impl SourceClassPreparation {
                 reason: "class control rational range",
             });
         }
-        let (word, receipt, _) =
+        let (mut word, receipt, _) =
             apply_control(self.producer, &self.preparation, &baseline, control)?;
         if !check(&receipt.work)
             || !receipt.added.iter().all(check)
@@ -1202,6 +1219,11 @@ impl SourceClassPreparation {
                 reason: "class control preparation work/range bound",
             });
         }
+        // A paired receiving consumer's fresh column is this prepared input,
+        // while its actual complete opening keeps all the carried interior.
+        word.response_source=baseline.response_source.clone().map(|mut source|{for (x,d) in source[self.preparation.ring].iter_mut().zip(&receipt.added){*x+=d;}source});
+        word.response_opening_exact=baseline.response_opening_exact.clone().map(|mut opening|{for (x,d) in opening.storage[self.preparation.ring].iter_mut().zip(&receipt.added){*x+=d;}opening});
+        word.source_preparation=Some(receipt.clone());
         Ok((word, receipt))
     }
 }

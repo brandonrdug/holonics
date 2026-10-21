@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "-p",
+    "holonics",
+    "--lib"
+  ],
+  "limit_s": 90,
+  "wall_ns": 8734572253,
+  "peak_rss_bytes": 1329664000,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 87,
+  "exit": 0,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 0,
+  "ledger_after_ns": 8734572253,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}
