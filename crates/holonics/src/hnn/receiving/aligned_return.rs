@@ -32,6 +32,9 @@ pub struct RetainedStationReturn {
 /// to the rational simplex anchor of the executable return chart; component errors and the descent inequality
 /// certify its use. Refining an enclosure never changes the symbolic source identity.
 pub struct RetainedSectionReturn {
+    // Issued only with the actual immutable producing section. Public reading
+    // fields cannot be substituted into a material certificate without this owner.
+    origin: std::sync::Arc<RetainedSectionOrigin>,
     pub rho: ExactInterval,
     pub beta: ExactInterval,
     pub beta_representative: Rat,
@@ -46,6 +49,58 @@ pub struct RetainedSectionReturn {
     pub section_score_evaluations: u64,
     pub station_mass_evaluations: u64,
     pub station_weight_evaluations: u64,
+}
+
+#[derive(Clone, PartialEq, Eq)]
+pub(crate) struct RetainedSectionOrigin {
+    pub(crate) population: PortPopulation,
+    pub(crate) ring: usize,
+    pub(crate) combined: Faces,
+    pub(crate) trees: Vec<LandmarkFace>,
+    pub(crate) targets: Vec<usize>,
+    pub(crate) rho: ExactInterval,
+    pub(crate) beta: ExactInterval,
+    pub(crate) stations: Vec<RetainedStationReturn>,
+    pub(crate) bits: u32,
+    _issued: (),
+}
+impl std::fmt::Debug for RetainedSectionOrigin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("OwnerBoundRetainedSection")
+            .field("ring", &self.ring)
+            .field("targets", &self.targets)
+            .field("bits", &self.bits)
+            .finish_non_exhaustive()
+    }
+}
+
+/// Exterior failure evidence, not an admitting constructor or a Word tape.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RetainedSectionSourceReading {
+    pub population: PortPopulation,
+    pub ring: usize,
+    pub waves: Vec<Vec<Rat>>,
+    pub trees: Vec<LandmarkFace>,
+    pub targets: Vec<usize>,
+    pub rho: ExactInterval,
+    pub beta: ExactInterval,
+    pub stations: Vec<RetainedStationReturn>,
+    pub bits: u32,
+}
+impl RetainedSectionOrigin {
+    pub(crate) fn reading(&self) -> RetainedSectionSourceReading {
+        RetainedSectionSourceReading {
+            population: self.population.clone(),
+            ring: self.ring,
+            waves: self.combined.logits.clone(),
+            trees: self.trees.clone(),
+            targets: self.targets.clone(),
+            rho: self.rho.clone(),
+            beta: self.beta.clone(),
+            stations: self.stations.clone(),
+            bits: self.bits,
+        }
+    }
 }
 
 fn fail(reason: &'static str) -> HnnError {
@@ -126,6 +181,31 @@ fn true_foil_bounds(
 }
 
 impl RetainedSectionReturn {
+    pub(crate) fn certificate_origin(
+        &self,
+        population: &PortPopulation,
+        ring: usize,
+        combined: &Faces,
+        trees: &[LandmarkFace],
+        targets: &[usize],
+    ) -> Result<std::sync::Arc<RetainedSectionOrigin>, HnnError> {
+        let o = &self.origin;
+        if &o.population != population
+            || o.ring != ring
+            || &o.combined != combined
+            || o.trees != trees
+            || o.targets != targets
+            || o.rho != self.rho
+            || o.beta != self.beta
+            || o.stations != self.stations
+            || o.bits != self.reading_bits
+        {
+            return Err(fail(
+                "retained certificate uses its immutable producing source/target/population/return",
+            ));
+        }
+        Ok(std::sync::Arc::clone(o))
+    }
     /// Only the native section owner supplies these producing operands. No posterior is
     /// reset or collapsed to a midpoint; rho stays one shared retained interval throughout.
     pub(crate) fn at(
@@ -304,7 +384,20 @@ impl RetainedSectionReturn {
                 });
             }
             if exact_zero || norm_squared > error_pairing {
+                let origin = std::sync::Arc::new(RetainedSectionOrigin {
+                    population: population.clone(),
+                    ring,
+                    combined: combined.clone(),
+                    trees: trees.to_vec(),
+                    targets: targets.to_vec(),
+                    rho: rho.clone(),
+                    beta: beta.clone(),
+                    stations: stations.clone(),
+                    bits,
+                    _issued: (),
+                });
                 return Ok(Self {
+                    origin,
                     rho,
                     beta,
                     beta_representative: beta_hat,

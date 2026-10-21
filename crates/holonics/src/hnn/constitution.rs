@@ -541,6 +541,7 @@
 //! | `HNN/Ring.gain_backtrack_midpoint` | [`GainBacktrack`], [`DepositReading::backtracks`] |
 
 pub(crate) mod epoch;
+pub use epoch::{EpochReceivingRayPacket, EpochReceivingStationReading};
 #[cfg(test)]
 mod tube_tests;
 pub use epoch::device::{
@@ -2178,7 +2179,8 @@ pub struct Sample {
     pub weight: Rat,
     pub feature: Vec<Rat>,
     pub covector: Vec<Rat>,
-    /// The producing face's normalized odometer masses, one per class.
+    /// The selected producing face's normalized masses, one per class.
+    /// The law-tagged receiving owner distinguishes coarse odometer from retained full-fibre values.
     /// They are carried for soft targets and for an epoch's partitioned
     /// magnitude covector q-p_hat, including a one-hot observed target.
     /// Fisher and alignment certificates read this original p_tilde; it is

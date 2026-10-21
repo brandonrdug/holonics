@@ -125,8 +125,12 @@ pub struct ObservedEpochEnergy {
 impl ObservedEpochEnergy {
     pub fn closes(&self) -> bool {
         !self.words.is_empty()
-            && self.source_preparations.len()==self.words.len()
-            && self.source_preparations.iter().flatten().all(|p|p.closes())
+            && self.source_preparations.len() == self.words.len()
+            && self
+                .source_preparations
+                .iter()
+                .flatten()
+                .all(|p| p.closes())
             && self.chained.len() == self.words.len() - 1
             && self.words.iter().all(crate::hnn::word::WordBalance::closes)
             && self
@@ -673,8 +677,16 @@ impl Reference {
         stage_refused: &mut dyn FnMut(EpochStageAttempt, &EpochStageRefusal),
     ) -> Result<ObservedEpochReceipt, HnnError> {
         let forward_start = Instant::now();
-        if resident.prepared_input.is_some() && (deposition_scope!=ObservedEpochDepositionScope::LocalReceivingReturn || resident.prepared_input.as_ref().is_some_and(|p|p.mode()!=prepared_input::PrefixMode::Training)) {
-            return Err(refusal("prepared observed training uses its one actual LocalReceivingReturn owner"));
+        if resident.prepared_input.is_some()
+            && (deposition_scope != ObservedEpochDepositionScope::LocalReceivingReturn
+                || resident
+                    .prepared_input
+                    .as_ref()
+                    .is_some_and(|p| p.mode() != prepared_input::PrefixMode::Training))
+        {
+            return Err(refusal(
+                "prepared observed training uses its one actual LocalReceivingReturn owner",
+            ));
         }
         let local_receiving =
             deposition_scope == ObservedEpochDepositionScope::LocalReceivingReturn;
@@ -853,7 +865,10 @@ impl Reference {
             &comparison_opening.constitution,
             &producing_current,
         )?;
-        let source_preparations=forwards.iter().map(|r|r.source_preparation.clone()).collect();
+        let source_preparations = forwards
+            .iter()
+            .map(|r| r.source_preparation.clone())
+            .collect();
         let mut energy_words: Vec<_> = forwards.iter().map(|read| read.energy.clone()).collect();
         let energy_chained = forwards
             .iter()
@@ -1039,6 +1054,18 @@ impl Reference {
         } else {
             None
         };
+        let retained_origin = retained_return
+            .as_ref()
+            .map(|r| {
+                r.certificate_origin(
+                    population,
+                    receiver,
+                    &all_combined,
+                    &trees,
+                    &classes[..consumed],
+                )
+            })
+            .transpose()?;
         let mut deposits = Vec::with_capacity(consumed);
         let mut receiving_parts = Vec::with_capacity(consumed);
         let mut source_operands = Vec::with_capacity(consumed);
@@ -1124,7 +1151,15 @@ impl Reference {
                         if sample.covector != descent {
                             return Err(refusal("the receiving series and native return share the same retained covector"));
                         }
+                        let law=match &retained_origin {
+                            Some(origin)=>crate::hnn::constitution::epoch::EpochReceivingLaw::retained(
+                                std::sync::Arc::clone(origin),receiver,comparison_commit,at,
+                                received.checked_add(at as u64).ok_or(HnnError::CountOverflow)?,
+                                read.ratio.anchor().to_vec(),map,sample,&positive,&foil,&phase)?,
+                            None=>crate::hnn::constitution::epoch::EpochReceivingLaw::CoarseOdometerV1,
+                        };
                         Ok(EpochReceivingRecord {
+                            law,
                             feature: sample.feature.clone(), positive: positive.clone(),
                             foil: foil.clone(), phase: phase.clone(),
                         })
@@ -1256,7 +1291,7 @@ impl Reference {
             .collect::<Result<_, _>>()?;
         next.current = current;
         next.moments.insert(moment, source);
-        next.prepared_input=prepared_input;
+        next.prepared_input = prepared_input;
         next.address = address;
         next.carried = carried;
         next.carried_error = None;
@@ -3557,6 +3592,7 @@ mod tests {
             .filter(|step| step.locus == LinearLocus::Receiving(receiver))
             .flat_map(|step| &step.samples)
             .map(|sample| EpochReceivingRecord {
+                law: crate::hnn::constitution::epoch::EpochReceivingLaw::CoarseOdometerV1,
                 feature: sample.feature.clone(),
                 positive: positive.clone(),
                 foil: foil.clone(),

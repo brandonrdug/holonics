@@ -8,6 +8,7 @@ use super::*;
 /// its one retained RHS. These operands never stand in for an upstream split.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct EpochReceivingRecord {
+    pub(crate) law: EpochReceivingLaw,
     pub(crate) feature: Vec<Rat>,
     pub(crate) positive: Vec<Rat>,
     pub(crate) foil: Vec<Rat>,
@@ -367,7 +368,11 @@ impl<'a> ObservedNormalEpochStage<'a> {
 
 impl StagedEpochCandidate {
     pub(crate) fn channel_endpoints(&self) -> &[EpochChannelEndpointReading] {
-        self.reading.epoch.as_ref().map(|epoch| epoch.channel_endpoints.as_slice()).unwrap_or(&[])
+        self.reading
+            .epoch
+            .as_ref()
+            .map(|epoch| epoch.channel_endpoints.as_slice())
+            .unwrap_or(&[])
     }
 
     pub(crate) fn channel_grain_rebase(&self) -> Option<EpochChannelGrainReading> {
@@ -413,9 +418,11 @@ impl StagedEpochCandidate {
     /// This returns material only: it grants no publication capability and no
     /// certificate belonging to the candidate can authorize this ablation.
     pub(crate) fn comparison_material_with_held_channel_storage(
-        &self, opening: &Constitution,
+        &self,
+        opening: &Constitution,
     ) -> Result<Constitution, HnnError> {
-        self.comparison_material(opening)?.held_channel_storage_control(opening)
+        self.comparison_material(opening)?
+            .held_channel_storage_control(opening)
     }
     /// Includes represented normal maps and an admitted actual channel D ray.
     /// Physical factors have already passed their scoped endpoint guard.
@@ -477,15 +484,16 @@ pub(crate) enum EpochDepositPhase {
 /// magnitudes and sample count; this is no cap on unrelated downstream gains.
 /// Existing Fisher/soft-target proof obligations remain #62; the directed
 /// integer enclosure and its consumer composition also remain to be formalized.
-struct EpochReceivingCertificate {
-    moves: Rat,
-    oscillation: Rat,
-    alignment: Rat,
-    odometer: Rat,
-    partition: Rat,
+pub(super) struct EpochReceivingCertificate {
+    pub(super) moves: Rat,
+    pub(super) oscillation: Rat,
+    pub(super) alignment: Rat,
+    pub(super) odometer: Rat,
+    pub(super) partition: Rat,
+    pub(super) return_error: Rat,
 }
 
-fn upper_grid_numerator(value: &Rat, denominator: &BigInt) -> BigInt {
+pub(super) fn upper_grid_numerator(value: &Rat, denominator: &BigInt) -> BigInt {
     let scaled = value.numer() * denominator;
     let quotient = &scaled / value.denom();
     // BigInt division truncates towards zero, already the ceiling below zero.
@@ -497,12 +505,17 @@ fn upper_grid_numerator(value: &Rat, denominator: &BigInt) -> BigInt {
     }
 }
 
-fn receiving_epoch_certificate(
+pub(super) fn receiving_epoch_certificate(
     samples: &[Sample],
     parts: &[EpochReceivingRecord],
     direction: &[Vec<Rat>],
     partition_bits: u32,
 ) -> Result<EpochReceivingCertificate, HnnError> {
+    if let Some(face) =
+        super::retained_receiving::certificate(samples, parts, direction, partition_bits)?
+    {
+        return Ok(face);
+    }
     if samples.len() != parts.len() {
         return Err(refused(
             "an epoch certificate needs every producing receiving split",
@@ -550,6 +563,7 @@ fn receiving_epoch_certificate(
         alignment,
         odometer: Rat::new(odometer, denominator.clone()),
         partition: Rat::new(partition, denominator),
+        return_error: Rat::zero(),
     })
 }
 
@@ -716,8 +730,11 @@ fn admit_actual_factor_displacements_with_rebases(
         let mut refusal = EpochStageRefusal::at(
             "actual_factor_displacement",
             EpochStageCondition::NonlinearFactorRay,
-            if ray.family == 2 { "only a matching actual channel D ray has a finite-admission path" }
-            else { "only a matching bound actual channel C/K ray has a finite-admission path" },
+            if ray.family == 2 {
+                "only a matching actual channel D ray has a finite-admission path"
+            } else {
+                "only a matching bound actual channel C/K ray has a finite-admission path"
+            },
             Some(locus),
             Some(family),
         )
@@ -750,10 +767,13 @@ fn admit_actual_factor_displacements_with_rebases(
             .find(|(_, step)| step.gradient.locus() == locus && step.gradient.family() == family);
         let fresh = certified.get(&(locus, family));
         let original = original_faces.get(&(locus, family));
-        if rebases.get(&ray.contact).is_some_and(|rebase|
-                rebase.after_lattice.exponent() > rebase.before_lattice.exponent()
-                    && rebase.factor_delta[ray.family].entries().iter().any(|v| !v.is_zero()))
-            && request.is_some()
+        if rebases.get(&ray.contact).is_some_and(|rebase| {
+            rebase.after_lattice.exponent() > rebase.before_lattice.exponent()
+                && rebase.factor_delta[ray.family]
+                    .entries()
+                    .iter()
+                    .any(|v| !v.is_zero())
+        }) && request.is_some()
             && original.is_some()
             && !fresh.is_some_and(|reading| reading.step.step.is_positive())
         {
@@ -777,34 +797,38 @@ fn admit_actual_factor_displacements_with_rebases(
                 else { "the changed C/K endpoint has no original request, fresh positive rate, or prepared metadata" }
             ));
             refusal.first(evidence);
-            return Err(refused(
-                if ray.family == 2 { "an actual channel D ray needs its original fresh positive rate" }
-                else { "an actual channel C/K ray needs its original fresh positive rate" },
-            ));
+            return Err(refused(if ray.family == 2 {
+                "an actual channel D ray needs its original fresh positive rate"
+            } else {
+                "an actual channel C/K ray needs its original fresh positive rate"
+            }));
         };
         if !fresh.step.step.is_positive() {
             refusal = refusal.read(
                 "actual_ray_rate",
-                EpochStageValue::Unavailable(
-                    if ray.family == 2 { "the original D family was held; no positive rate is invented" }
-                else { "the original C/K family was held; no positive rate is invented" },
-                ),
+                EpochStageValue::Unavailable(if ray.family == 2 {
+                    "the original D family was held; no positive rate is invented"
+                } else {
+                    "the original C/K family was held; no positive rate is invented"
+                }),
             );
             refusal.first(evidence);
-            return Err(refused(
-                if ray.family == 2 { "an actual channel D ray needs its original fresh positive rate" }
-                else { "an actual channel C/K ray needs its original fresh positive rate" },
-            ));
+            return Err(refused(if ray.family == 2 {
+                "an actual channel D ray needs its original fresh positive rate"
+            } else {
+                "an actual channel C/K ray needs its original fresh positive rate"
+            }));
         }
         if !strokes
             .get(&locus)
             .is_some_and(|stroke| ray.matches_stroke_after_rebase(stroke, rebase_delta))
         {
             refusal.first(evidence);
-            return Err(refused(
-                if ray.family == 2 { "the actual channel D endpoint must equal its rebase delta plus staged applied quotient" }
-                else { "the actual channel C/K endpoint must equal its staged applied quotient" },
-            ));
+            return Err(refused(if ray.family == 2 {
+                "the actual channel D endpoint must equal its rebase delta plus staged applied quotient"
+            } else {
+                "the actual channel C/K endpoint must equal its staged applied quotient"
+            }));
         }
         let face = ray.actual_face(original, request_index, request, fresh, &opening.hop)?;
         admitted_channel_families.insert((locus, family));
@@ -944,10 +968,16 @@ pub(super) fn actual_epoch_face(
     evidence: &mut Option<EpochStageRefusal>,
 ) -> Result<EpochCertificateFace, HnnError> {
     let rows = delta.to_rows();
+    let mut retained_ray_reading = None;
     let (alignment, moves) = if matches!(kind, LinearLocus::Receiving(_)) {
         let face = receiving_epoch_certificate(samples, receiving_parts, &rows, partition_bits)?;
+        retained_ray_reading = Some((
+            face.alignment.clone(),
+            face.return_error.clone(),
+            face.oscillation.clone(),
+        ));
         (
-            face.alignment - face.odometer - face.partition.max(Rat::zero()),
+            face.alignment - face.return_error - face.odometer - face.partition.max(Rat::zero()),
             face.moves,
         )
     } else {
@@ -996,7 +1026,7 @@ pub(super) fn actual_epoch_face(
         )
     };
     if !alignment.is_positive() {
-        EpochStageRefusal::at(
+        let mut failure = EpochStageRefusal::at(
             "actual_ray",
             EpochStageCondition::ActualRayAlignment,
             "actual represented ray alignment > 0",
@@ -1013,8 +1043,27 @@ pub(super) fn actual_epoch_face(
         .read(
             "represented_step",
             EpochStageValue::Array(EpochArrayReading::of(delta)),
-        )
-        .first(evidence);
+        );
+        if let Some((nominal, error, oscillation)) = retained_ray_reading {
+            failure = failure
+                .read("actual_nominal_alignment", EpochStageValue::Ratio(nominal))
+                .read(
+                    "actual_retained_component_error",
+                    EpochStageValue::Ratio(error),
+                )
+                .read(
+                    "actual_ray_oscillation",
+                    EpochStageValue::Ratio(oscillation),
+                );
+            attach_receiving_ray_packet(
+                &mut failure,
+                samples,
+                receiving_parts,
+                &rows,
+                partition_bits,
+            );
+        }
+        failure.first(evidence);
         return Err(refused(
             "a moving actual epoch ray must descend its contemporary comparison",
         ));
@@ -1032,6 +1081,51 @@ pub(super) fn actual_epoch_face(
     })
 }
 
+pub(super) fn attach_receiving_ray_packet(
+    evidence: &mut EpochStageRefusal,
+    samples: &[Sample],
+    parts: &[EpochReceivingRecord],
+    rows: &[Vec<Rat>],
+    partition_bits: u32,
+) {
+    if evidence
+        .readings
+        .iter()
+        .any(|r| r.name == "actual_receiving_ray_operands")
+    {
+        return;
+    }
+    let value = super::retained_receiving::failure_packet(samples, parts, rows)
+        .map(|packet| EpochStageValue::ReceivingRay(Box::new(packet)))
+        .unwrap_or(EpochStageValue::Unavailable(
+            "failed receiving packet exceeds declared exterior extent",
+        ));
+    let available = matches!(value, EpochStageValue::ReceivingRay(_));
+    evidence.readings.push(EpochStageReading {
+        name: "actual_receiving_ray_operands",
+        value,
+    });
+    // Scalar rereading is diagnostic only and uses the SAME original operands;
+    // even a diagnostic refusal cannot replace the already operative error.
+    if available {
+        if let Ok(face) = receiving_epoch_certificate(samples, parts, rows, partition_bits) {
+            for (name, value) in [
+                ("actual_nominal_alignment", face.alignment),
+                ("actual_retained_component_error", face.return_error),
+                ("actual_ray_oscillation", face.oscillation),
+                ("actual_receiving_curvature_moves", face.moves),
+            ] {
+                if !evidence.readings.iter().any(|r| r.name == name) {
+                    evidence.readings.push(EpochStageReading {
+                        name,
+                        value: EpochStageValue::Ratio(value),
+                    });
+                }
+            }
+        }
+    }
+}
+
 /// Enrich only the first, already failed normal candidate. Reconstructing these operands is
 /// exterior observation: a diagnostic error cannot replace the native refusal or change its
 /// order. All arrays below die with this staging attempt, never with the continuing state.
@@ -1045,12 +1139,51 @@ fn enrich_failed_normal_ray(
     gamma: &Rat,
     active_lattice: Option<u32>,
     samples: &[Sample],
+    receiving_parts: &[EpochReceivingRecord],
 ) {
     let Some(evidence) = evidence.as_mut().filter(|evidence| {
         evidence.locus == Some(kind.locus()) && evidence.family == Some(Family::Map)
     }) else {
         return;
     };
+    // Shared by alignment and subsequent actual-certificate curvature refusal.
+    // Keep the first operative error even if the bounded exterior packet is unavailable.
+    if matches!(kind, LinearLocus::Receiving(_)) {
+        // Bound the diagnostic conversion from the grouped array before allocating
+        // rational rows. Existing physical certificate computations are unchanged.
+        let mut bits = 0u64;
+        let bounded = deposit.step.values.len() <= 65536
+            && deposit.step.values.iter().enumerate().all(|(i, v)| {
+                bits = bits
+                    .saturating_add(v.bits())
+                    .saturating_add(u64::from(deposit.step.exponent))
+                    .saturating_add(u64::from(
+                        64 - deposit.step.row_divisors[i / deposit.step.columns].leading_zeros(),
+                    ))
+                    .saturating_add(256);
+                bits <= 16 * 1024 * 1024
+            });
+        if bounded {
+            attach_receiving_ray_packet(
+                evidence,
+                samples,
+                receiving_parts,
+                &deposit.step.to_rows(),
+                flow.partition_exponent,
+            );
+        } else if !evidence
+            .readings
+            .iter()
+            .any(|r| r.name == "actual_receiving_ray_operands")
+        {
+            evidence.readings.push(EpochStageReading {
+                name: "actual_receiving_ray_operands",
+                value: EpochStageValue::Unavailable(
+                    "actual grouped ray exceeds declared exterior conversion extent",
+                ),
+            });
+        }
+    }
     let push = |evidence: &mut EpochStageRefusal, name, value| {
         evidence.readings.push(EpochStageReading { name, value });
     };
@@ -1631,6 +1764,14 @@ impl Constitution {
         channel_grain: Option<&ObservedChannelGrainPlan>,
         channel_endpoint: Option<&crate::hnn::word::endpoint::ChannelEndpoint>,
     ) -> Result<StagedEpochCandidate, HnnError> {
+        for part in receiving_parts {
+            part.law.admit_owner(
+                receiver,
+                self.commit(),
+                self.receiving_map(receiver)
+                    .ok_or(HnnError::MissingReceivingMap { ring: receiver })?,
+            )?;
+        }
         if channel_endpoint.is_some_and(|endpoint| !endpoint.admits_predecessor(self)) {
             return Err(refused(
                 "channel material staging binds its actual producing predecessor",
@@ -1980,8 +2121,9 @@ impl Constitution {
                         alignment,
                         odometer,
                         partition,
+                        return_error,
                     } = certificate;
-                    let defect = &odometer + partition.clone().max(Rat::zero());
+                    let defect = &odometer + partition.clone().max(Rat::zero()) + return_error;
                     face.alignment = (alignment - defect).max(Rat::zero());
                     face.moves = moves;
                     face.covector = face.covector.max(oscillation).max(Rat::one());
@@ -2037,7 +2179,8 @@ impl Constitution {
                             FactorGradient::Storage {
                                 contact: at,
                                 gradient,
-                            } | FactorGradient::Stiffness {
+                            }
+                            | FactorGradient::Stiffness {
                                 contact: at,
                                 gradient,
                             } if channel_endpoint.is_some() => {
@@ -2507,6 +2650,7 @@ impl Constitution {
                             .ok()
                             .map(|lattice| lattice.exponent()),
                         samples.get(kind).map(Vec::as_slice).unwrap_or(&[]),
+                        receiving_parts,
                     );
                     error
                 })?;
@@ -2530,10 +2674,17 @@ impl Constitution {
             .find(|face| face.raw_alignment().is_negative())
         {
             EpochStageRefusal::at(
-                if face.family() == 2 { "actual_channel_D_alignment" } else { "actual_channel_CK_alignment" },
+                if face.family() == 2 {
+                    "actual_channel_D_alignment"
+                } else {
+                    "actual_channel_CK_alignment"
+                },
                 EpochStageCondition::ActualRayAlignment,
-                if face.family() == 2 { "the raw actual channel D ray must not oppose its current reached covector" }
-                else { "the raw actual channel C/K ray must not oppose its current reached covector" },
+                if face.family() == 2 {
+                    "the raw actual channel D ray must not oppose its current reached covector"
+                } else {
+                    "the raw actual channel C/K ray must not oppose its current reached covector"
+                },
                 Some(Locus::Channel(face.contact())),
                 Some(Family::Factor(face.family())),
             )
@@ -2630,6 +2781,7 @@ impl Constitution {
                             .ok()
                             .map(|lattice| lattice.exponent()),
                         samples.get(&kind).map(Vec::as_slice).unwrap_or(&[]),
+                        receiving_parts,
                     );
                 }
                 error
@@ -3212,6 +3364,7 @@ mod tests {
                 masses: Some(ratio.faces().faces[0].odometer_masses().unwrap()),
             };
             parts.push(EpochReceivingRecord {
+                law: EpochReceivingLaw::CoarseOdometerV1,
                 feature,
                 positive,
                 foil,
@@ -3817,6 +3970,7 @@ mod tests {
             &Rat::one(),
             Some(2),
             std::slice::from_ref(&sample),
+            &[],
         );
         let evidence = evidence.unwrap();
         assert_eq!(evidence.condition, EpochStageCondition::ActualRayAlignment);
@@ -3899,6 +4053,7 @@ mod tests {
             &Rat::one(),
             Some(2),
             &[sample],
+            &[],
         );
         assert_eq!(first, first_before);
     }
@@ -4539,6 +4694,7 @@ mod tests {
             rat((index % 3) as i64 - 1, 2),
         ];
         let part = EpochReceivingRecord {
+            law: EpochReceivingLaw::CoarseOdometerV1,
             feature: feature.clone(),
             positive: vec![q.clone(), Rat::zero(), Rat::one() - &q, Rat::zero()],
             foil: vec![foil[0].clone(), Rat::zero(), foil[1].clone(), Rat::zero()],
@@ -4797,6 +4953,7 @@ mod tests {
             masses: Some(vec![rat(1, 3), rat(2, 3)]),
         };
         let part = EpochReceivingRecord {
+            law: EpochReceivingLaw::CoarseOdometerV1,
             feature: sample.feature.clone(),
             positive: vec![Rat::one(), Rat::zero(), Rat::zero(), Rat::zero()],
             foil: vec![rat(1, 4), Rat::zero(), rat(1, 2), Rat::zero()],
@@ -5063,113 +5220,291 @@ mod tests {
     }
 
     /// Synthetic zero-motion producing cut: the full endpoint owner still binds Cw=pi.
-    fn resting_channel_endpoint(field: &Field, material: &Constitution) -> crate::hnn::word::endpoint::ChannelEndpoint {
+    fn resting_channel_endpoint(
+        field: &Field,
+        material: &Constitution,
+    ) -> crate::hnn::word::endpoint::ChannelEndpoint {
         use crate::hnn::word::{EndChange, ReceptionCarry};
         let current = crate::hnn::Current::at_rest(field);
         let change = EndChange {
-            storage: field.rings().iter().map(|r| vec![Rat::zero(); r.width()]).collect(),
-            arrivals: field.contacts().iter().map(|c| {
-                let (g,h) = c.ends();
-                [vec![Rat::zero();field.ring(g).width()],vec![Rat::zero();field.ring(h).width()]]
-            }).collect(),
-            states: field.contacts().iter().map(|c| [vec![Rat::zero();c.width()],vec![Rat::zero();c.width()]]).collect(),
-            resonators: vec![None;field.rings().len()],
-            resonator_phases: vec![None;field.rings().len()],
+            storage: field
+                .rings()
+                .iter()
+                .map(|r| vec![Rat::zero(); r.width()])
+                .collect(),
+            arrivals: field
+                .contacts()
+                .iter()
+                .map(|c| {
+                    let (g, h) = c.ends();
+                    [
+                        vec![Rat::zero(); field.ring(g).width()],
+                        vec![Rat::zero(); field.ring(h).width()],
+                    ]
+                })
+                .collect(),
+            states: field
+                .contacts()
+                .iter()
+                .map(|c| [vec![Rat::zero(); c.width()], vec![Rat::zero(); c.width()]])
+                .collect(),
+            resonators: vec![None; field.rings().len()],
+            resonator_phases: vec![None; field.rings().len()],
         };
         let carry = ReceptionCarry {
-            momenta: field.contacts().iter().map(|c|vec![Rat::zero();c.width()]).collect(),
-            resonator_momenta: vec![None;field.rings().len()],
-            conductances: (0..field.contacts().len()).map(|contact| {
-                let e=crate::hnn::propagation::contact_exponent(field,contact,current.lift()).unwrap();
-                crate::ratio::exponentiated::power_of_two(&e.carry).unwrap()*field.contact(contact).admittance()
-            }).collect(),
+            momenta: field
+                .contacts()
+                .iter()
+                .map(|c| vec![Rat::zero(); c.width()])
+                .collect(),
+            resonator_momenta: vec![None; field.rings().len()],
+            conductances: (0..field.contacts().len())
+                .map(|contact| {
+                    let e =
+                        crate::hnn::propagation::contact_exponent(field, contact, current.lift())
+                            .unwrap();
+                    crate::ratio::exponentiated::power_of_two(&e.carry).unwrap()
+                        * field.contact(contact).admittance()
+                })
+                .collect(),
             change,
             ticks: 0,
         };
-        crate::hnn::word::endpoint::ChannelEndpoint::bind(field,material,&current,&carry.change,&carry).unwrap()
+        crate::hnn::word::endpoint::ChannelEndpoint::bind(
+            field,
+            material,
+            &current,
+            &carry.change,
+            &carry,
+        )
+        .unwrap()
     }
 
-    fn ck_fine_capture_stage(field: &Field, material: &Constitution, refining: bool) -> StagedEpochCandidate {
+    fn ck_fine_capture_stage(
+        field: &Field,
+        material: &Constitution,
+        refining: bool,
+    ) -> StagedEpochCandidate {
         let receiver = field.receivers()[0].ring;
         let locus = Locus::Channel(0);
-        let gradient = scaled_identity(material.contacts[0].storage.rows(), material.lattice(locus).unwrap().unit()/rat(128,1));
+        let gradient = scaled_identity(
+            material.contacts[0].storage.rows(),
+            material.lattice(locus).unwrap().unit() / rat(128, 1),
+        );
         let requests = vec![
-            FactorStep { gradient: FactorGradient::Storage { contact:0,gradient:gradient.clone() },energy:Rat::zero(),covector:Rat::one() },
-            FactorStep { gradient: FactorGradient::Stiffness { contact:0,gradient },energy:Rat::zero(),covector:Rat::one() },
+            FactorStep {
+                gradient: FactorGradient::Storage {
+                    contact: 0,
+                    gradient: gradient.clone(),
+                },
+                energy: Rat::zero(),
+                covector: Rat::one(),
+            },
+            FactorStep {
+                gradient: FactorGradient::Stiffness {
+                    contact: 0,
+                    gradient,
+                },
+                energy: Rat::zero(),
+                covector: Rat::one(),
+            },
         ];
         let retained: BTreeSet<_> = crate::hnn::retention::loci(field).into_iter().collect();
-        let deposits = [Deposit::new(material.commit,vec![],requests,vec![locus]).with_reach(Reach {
-            receiver,stations:vec![2,4],entries:vec![0],phases:1,loci:retained.clone(),passages:vec![],
-        })];
-        let endpoint = resting_channel_endpoint(field,material);
-        let pair_speed = |_,_,_:&PairPort,_:[&[Vec<Rat>];3]|panic!("no pair-port request");
+        let deposits = [
+            Deposit::new(material.commit, vec![], requests, vec![locus]).with_reach(Reach {
+                receiver,
+                stations: vec![2, 4],
+                entries: vec![0],
+                phases: 1,
+                loci: retained.clone(),
+                passages: vec![],
+            }),
+        ];
+        let endpoint = resting_channel_endpoint(field, material);
+        let pair_speed = |_, _, _: &PairPort, _: [&[Vec<Rat>]; 3]| panic!("no pair-port request");
         let mut stage = ObservedNormalEpochStage::new_with_endpoint(
-            material,&deposits,receiver,field.ring(receiver).period(),1,1,113,
-            partition_exponent(material.observed_epoch_grain(receiver).unwrap(),1,113).unwrap(),
-            &retained,material.landmarks(receiver).unwrap().clone(),&pair_speed,&[],
-            &crate::hnn::reference::observed::HostObservedEpochExecution,true,Some(&endpoint),
-        ).unwrap();
+            material,
+            &deposits,
+            receiver,
+            field.ring(receiver).period(),
+            1,
+            1,
+            113,
+            partition_exponent(material.observed_epoch_grain(receiver).unwrap(), 1, 113).unwrap(),
+            &retained,
+            material.landmarks(receiver).unwrap().clone(),
+            &pair_speed,
+            &[],
+            &crate::hnn::reference::observed::HostObservedEpochExecution,
+            true,
+            Some(&endpoint),
+        )
+        .unwrap();
         if refining {
-            let plan = ObservedChannelGrainPlan::at_section(field,&retained,receiver,113,114).unwrap().unwrap();
-            stage=stage.with_channel_grain(plan).unwrap();
+            let plan = ObservedChannelGrainPlan::at_section(field, &retained, receiver, 113, 114)
+                .unwrap()
+                .unwrap();
+            stage = stage.with_channel_grain(plan).unwrap();
         }
-        stage.stage(EpochCandidateScope::Whole,&mut |_|{}).unwrap()
+        stage
+            .stage(EpochCandidateScope::Whole, &mut |_| {})
+            .unwrap()
     }
 
     #[test]
     fn ck_ingress_grain_captures_fresh_fine_signal_without_claiming_raw_motion() {
-        let (field,mut opening,_,_,_) = normal_domain_fixture(None,false);
-        let locus=Locus::Channel(0);
-        opening.clocks.insert(locus,5);
-        let original=opening.clone();
-        let coarse=ck_fine_capture_stage(&field,&opening,false);
-        let fine=ck_fine_capture_stage(&field,&opening,true);
-        let grain=fine.reading.epoch.as_ref().unwrap().channel_grain.as_ref().unwrap();
-        let contact=grain.contacts.iter().find(|r|r.contact==0).unwrap();
-        assert_eq!(contact.levels,3);
-        assert!(!contact.deferred_without_fresh_update,"C/K eligibility cannot require incidental D");
+        let (field, mut opening, _, _, _) = normal_domain_fixture(None, false);
+        let locus = Locus::Channel(0);
+        opening.clocks.insert(locus, 5);
+        let original = opening.clone();
+        let coarse = ck_fine_capture_stage(&field, &opening, false);
+        let fine = ck_fine_capture_stage(&field, &opening, true);
+        let grain = fine
+            .reading
+            .epoch
+            .as_ref()
+            .unwrap()
+            .channel_grain
+            .as_ref()
+            .unwrap();
+        let contact = grain.contacts.iter().find(|r| r.contact == 0).unwrap();
+        assert_eq!(contact.levels, 3);
+        assert!(
+            !contact.deferred_without_fresh_update,
+            "C/K eligibility cannot require incidental D"
+        );
         for family in 0..2 {
-            let carrier=Carrier::Factor(family);
-            assert!(coarse.material.carries.get(&(locus,carrier)).is_none_or(|r|r.0.is_empty()));
-            let r=fine.material.carries.get(&(locus,carrier)).expect("fresh fine C/K carry");
-            assert!(!r.0.is_empty(),"fine capture must be nonzero; certified steps: {:?}",fine.reading.steps);
-            assert_eq!(coarse.material.contacts[0].scales[family],fine.material.contacts[0].scales[family]);
-            let coarse_eta=&coarse.reading.epoch.as_ref().unwrap().fresh_steps.iter().find(|(l,s)|*l==locus&&s.family==Family::Factor(family)).unwrap().1.step.step;
-            let fine_eta=&fine.reading.epoch.as_ref().unwrap().fresh_steps.iter().find(|(l,s)|*l==locus&&s.family==Family::Factor(family)).unwrap().1.step.step;
-            assert_eq!(coarse_eta,fine_eta,"zero energy and empty old carry leave fresh operands unchanged");
-            let delta=fine_eta*opening.lattice(locus).unwrap().unit()/rat(128,1);
-            for entry in (0..opening.contacts[0].storage.rows()).map(|i|i*(opening.contacts[0].storage.columns()+1)) {
-                let release=|candidate:&StagedEpochCandidate|candidate.reading.released.iter().find(|(l,c,i,_)|*l==locus&&*c==carrier&&*i==entry).map(|(_,_,_,e)|e.clone()).unwrap_or_else(Rat::zero);
-                assert_eq!(release(&coarse),delta,"the earlier coarse source releases the whole fresh update");
-                assert_eq!(r.at(entry)+release(&fine),delta,"exact entry+carry+release balance at unchanged raw factor");
+            let carrier = Carrier::Factor(family);
+            assert!(
+                coarse
+                    .material
+                    .carries
+                    .get(&(locus, carrier))
+                    .is_none_or(|r| r.0.is_empty())
+            );
+            let r = fine
+                .material
+                .carries
+                .get(&(locus, carrier))
+                .expect("fresh fine C/K carry");
+            assert!(
+                !r.0.is_empty(),
+                "fine capture must be nonzero; certified steps: {:?}",
+                fine.reading.steps
+            );
+            assert_eq!(
+                coarse.material.contacts[0].scales[family],
+                fine.material.contacts[0].scales[family]
+            );
+            let coarse_eta = &coarse
+                .reading
+                .epoch
+                .as_ref()
+                .unwrap()
+                .fresh_steps
+                .iter()
+                .find(|(l, s)| *l == locus && s.family == Family::Factor(family))
+                .unwrap()
+                .1
+                .step
+                .step;
+            let fine_eta = &fine
+                .reading
+                .epoch
+                .as_ref()
+                .unwrap()
+                .fresh_steps
+                .iter()
+                .find(|(l, s)| *l == locus && s.family == Family::Factor(family))
+                .unwrap()
+                .1
+                .step
+                .step;
+            assert_eq!(
+                coarse_eta, fine_eta,
+                "zero energy and empty old carry leave fresh operands unchanged"
+            );
+            let delta = fine_eta * opening.lattice(locus).unwrap().unit() / rat(128, 1);
+            for entry in (0..opening.contacts[0].storage.rows())
+                .map(|i| i * (opening.contacts[0].storage.columns() + 1))
+            {
+                let release = |candidate: &StagedEpochCandidate| {
+                    candidate
+                        .reading
+                        .released
+                        .iter()
+                        .find(|(l, c, i, _)| *l == locus && *c == carrier && *i == entry)
+                        .map(|(_, _, _, e)| e.clone())
+                        .unwrap_or_else(Rat::zero)
+                };
+                assert_eq!(
+                    release(&coarse),
+                    delta,
+                    "the earlier coarse source releases the whole fresh update"
+                );
+                assert_eq!(
+                    r.at(entry) + release(&fine),
+                    delta,
+                    "exact entry+carry+release balance at unchanged raw factor"
+                );
             }
         }
-        assert_eq!(fine.material.contacts[0].storage,opening.contacts[0].storage);
-        assert_eq!(fine.material.contacts[0].stiffness,opening.contacts[0].stiffness);
-        assert_eq!(fine.material.clock(locus),6);
-        assert_eq!(fine.material.commit,opening.commit+1);
-        let state=ContinuingState::from_text(&fine.material.continuing_state(0).unwrap().to_text(),opening.budget()).unwrap();
-        let cold=Constitution::initial(&field,opening.budget()).unwrap().continued_on(&field,&state).unwrap();
-        assert_eq!(cold,fine.material);
-        let warm_next=ck_fine_capture_stage(&field,&fine.material,true);
-        let cold_next=ck_fine_capture_stage(&field,&cold,true);
-        assert_eq!(warm_next.material,cold_next.material);
-        assert_eq!(warm_next.reading,cold_next.reading);
-        let held=fine.comparison_material_with_held_channel_storage(&opening).unwrap();
-        let mut expected=fine.comparison_material(&opening).unwrap();
+        assert_eq!(
+            fine.material.contacts[0].storage,
+            opening.contacts[0].storage
+        );
+        assert_eq!(
+            fine.material.contacts[0].stiffness,
+            opening.contacts[0].stiffness
+        );
+        assert_eq!(fine.material.clock(locus), 6);
+        assert_eq!(fine.material.commit, opening.commit + 1);
+        let state = ContinuingState::from_text(
+            &fine.material.continuing_state(0).unwrap().to_text(),
+            opening.budget(),
+        )
+        .unwrap();
+        let cold = Constitution::initial(&field, opening.budget())
+            .unwrap()
+            .continued_on(&field, &state)
+            .unwrap();
+        assert_eq!(cold, fine.material);
+        let warm_next = ck_fine_capture_stage(&field, &fine.material, true);
+        let cold_next = ck_fine_capture_stage(&field, &cold, true);
+        assert_eq!(warm_next.material, cold_next.material);
+        assert_eq!(warm_next.reading, cold_next.reading);
+        let held = fine
+            .comparison_material_with_held_channel_storage(&opening)
+            .unwrap();
+        let mut expected = fine.comparison_material(&opening).unwrap();
         for contact in 0..opening.contacts.len() {
-            expected.contacts[contact].storage=opening.contacts[contact].storage.clone();
-            expected.contacts[contact].stiffness=opening.contacts[contact].stiffness.clone();
+            expected.contacts[contact].storage = opening.contacts[contact].storage.clone();
+            expected.contacts[contact].stiffness = opening.contacts[contact].stiffness.clone();
             for family in 0..2 {
-                expected.carries.remove(&(Locus::Channel(contact),Carrier::Factor(family)));
+                expected
+                    .carries
+                    .remove(&(Locus::Channel(contact), Carrier::Factor(family)));
             }
         }
-        assert_eq!(held,expected,"every non-C/K candidate field, including refined lattice/D/scales/statistics/clocks, is matched");
-        assert_eq!(held.lattices,fine.material.lattices);
-        let held_state=ContinuingState::from_text(&held.continuing_state(0).unwrap().to_text(),opening.budget()).unwrap();
-        let held_cold=Constitution::initial(&field,opening.budget()).unwrap().continued_on(&field,&held_state).unwrap();
-        assert_eq!(held_cold,held);
-        assert_eq!(opening,original,"neither unpublished arm mutates its opening");
+        assert_eq!(
+            held, expected,
+            "every non-C/K candidate field, including refined lattice/D/scales/statistics/clocks, is matched"
+        );
+        assert_eq!(held.lattices, fine.material.lattices);
+        let held_state = ContinuingState::from_text(
+            &held.continuing_state(0).unwrap().to_text(),
+            opening.budget(),
+        )
+        .unwrap();
+        let held_cold = Constitution::initial(&field, opening.budget())
+            .unwrap()
+            .continued_on(&field, &held_state)
+            .unwrap();
+        assert_eq!(held_cold, held);
+        assert_eq!(
+            opening, original,
+            "neither unpublished arm mutates its opening"
+        );
     }
 
     fn d_only_fixture_stage(

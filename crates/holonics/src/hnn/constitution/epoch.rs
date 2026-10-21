@@ -14,6 +14,9 @@ pub(crate) use channel_grain_policy::ObservedChannelGrainPlan;
 mod channel_ray;
 mod checkpoint;
 mod deposit;
+mod retained_receiving;
+pub(crate) use retained_receiving::EpochReceivingLaw;
+pub use retained_receiving::{EpochReceivingRayPacket, EpochReceivingStationReading};
 pub(crate) mod device;
 pub(crate) use deposit::{
     EpochCandidateScope, EpochDepositPhase, EpochReceivingRecord, ObservedNormalEpochStage,
@@ -76,6 +79,8 @@ pub enum EpochStageValue {
     Series(EpochSeriesReading),
     /// Exact transient parameter operands, including non-dyadic reached covectors.
     RationalMatrix(ExactRatMatrix),
+    /// Bounded exact actual proposal/source operands; exterior failure evidence only.
+    ReceivingRay(Box<EpochReceivingRayPacket>),
     JointDirection(EpochJointDirectionReading),
     Text(&'static str),
     /// The failing owner had not produced this operand, or its diagnostic could not be read.
@@ -207,12 +212,27 @@ pub(crate) enum ChannelGrainRefinementRefusal {
 
 impl EpochStageFailure {
     pub(crate) fn channel_grain_refinement_refusal(&self) -> Option<ChannelGrainRefinementRefusal> {
-        match (&self.error, self.evidence.condition, self.evidence.locus, self.evidence.family) {
-            (HnnError::Unadmitted { .. }, EpochStageCondition::ChannelGrainFreshRate,
-                Some(Locus::Channel(contact)), Some(Family::Factor(family @ 0..=2))) =>
-                self.channel_grain.as_ref().is_some_and(|grain|
-                    grain.contacts.iter().any(|rebase|rebase.contact==contact&&rebase.levels>0))
-                    .then_some(ChannelGrainRefinementRefusal::FreshRate { contact, family }),
+        match (
+            &self.error,
+            self.evidence.condition,
+            self.evidence.locus,
+            self.evidence.family,
+        ) {
+            (
+                HnnError::Unadmitted { .. },
+                EpochStageCondition::ChannelGrainFreshRate,
+                Some(Locus::Channel(contact)),
+                Some(Family::Factor(family @ 0..=2)),
+            ) => self
+                .channel_grain
+                .as_ref()
+                .is_some_and(|grain| {
+                    grain
+                        .contacts
+                        .iter()
+                        .any(|rebase| rebase.contact == contact && rebase.levels > 0)
+                })
+                .then_some(ChannelGrainRefinementRefusal::FreshRate { contact, family }),
             _ => None,
         }
     }
