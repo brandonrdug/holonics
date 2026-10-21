@@ -330,3 +330,14 @@ fn adaptive_receiving_late_fault_atomic() {
     execution.card.require_actual_dispatch().unwrap();
     eprintln!("ADAPTIVE_RECEIVING_LATE_FAULT {}",execution.card.receipt(false).trim());
 }
+
+#[test]
+#[ignore="exclusive supported HOST CUDA; same synthetic durable training loop"]
+fn durable_continuation_host_card_cold() {
+    let root=std::path::PathBuf::from(std::env::var_os("V93_DURABLE_FIXTURE_DIR").unwrap());std::fs::create_dir_all(&root).unwrap();
+    let (host,h)=exterior::code_durable_continuation(&HostObservedEpochExecution,CompleteLanguageTrainingBackend::HostReference,&root.join("host")).unwrap();
+    let card=dispatch::TracedCard::new(ObservedEpochDevice::open(0).unwrap());
+    let (device,d)=exterior::code_durable_continuation(&card,CompleteLanguageTrainingBackend::CudaObservedEpochDevice0,&root.join("card")).unwrap();
+    assert_eq!(host,device,"same complete native/M/crib/pending across host/card split lineages");card.require_actual_dispatch().unwrap();
+    eprintln!("{h}\n{d}\nDURABLE_SHARED_CARD {}",card.receipt(true).trim());
+}

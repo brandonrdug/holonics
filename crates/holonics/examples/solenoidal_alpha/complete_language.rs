@@ -7,6 +7,8 @@ use std::collections::BTreeMap;
 
 #[path = "complete_language/continuation.rs"]
 mod continuation;
+#[path="complete_language/stage.rs"]
+mod stage;
 
 #[cfg(test)]
 #[path = "complete_language/code_parallel_controls.rs"]
@@ -276,10 +278,11 @@ fn train(
     selected_backend: CompleteLanguageTrainingBackend,
     scope: ObservedEpochDepositionScope,
 ) -> Result<()> {
-    if args.len() != 10 {
-        return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT".into());
+    let staged=args.first().is_some_and(|s|s==stage::COMMAND);
+    if args.len()!=if staged{12}else{10} {
+        return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT [STAGE_MANIFEST SHA]".into());
     }
-    let adaptive=args[0]=="train-adaptive-family-local-arrival-held-v1";
+    let adaptive=staged || args[0]=="train-adaptive-family-local-arrival-held-v1";
     let family_local=adaptive || args[0]=="train-family-local-arrival-context-held-v1";
     let arrival=family_local || args[0]=="train-source-framing-arrival-context-held-v1";
     let framed=arrival || args[0]=="train-source-framing-retained-held-v1";
@@ -298,6 +301,7 @@ fn train(
     {
         return Err("CUDA complete-language training requires explicit RetainedFibreV1".into());
     }
+    let started=Instant::now();
     let data = pinned_read(&args[2], &args[3], 1 << 20)?;
     let cells = digits(&data);
     let expected_cells: usize = args[7].parse()?;
@@ -312,9 +316,9 @@ fn train(
     if expected_cells as u64 + (QUERY_BYTE_BUDGET as u64 * 4) + 128 > population {
         return Err("declared horizon cannot contain training and longest continuation".into());
     }
+    let mut stage=if staged{Some(stage::Stage::open(args,&data,&cells,backend,scope)?)}else{None};
     let out = Path::new(&args[9]);
     std::fs::create_dir(out)?;
-    let started = Instant::now();
     write_new(&out.join("EXECUTION_CONTRACT.json"), object(&[
         ("backend", quoted(backend)),
         ("command",quoted(&args[0])),
@@ -331,29 +335,42 @@ fn train(
         ("host_fallback", "false".into()),
         ("evidence_policy",quoted("local: compact outcome/actual-code/wall; full return+energy at predeclared cut crossings or Held; all stage failures retained")),
     ]).as_bytes())?;
-    let mut checkpoint = if family_local {fresh_family_local_checkpoint_at_representation(population,scope,adaptive)?    } else {fresh_checkpoint_at_input_context(population, law, scope,framed,arrival)?};
-    if prepared_input {
+    let resumed=stage.as_ref().is_some_and(|s|s.checkpoint.is_some());
+    let mut checkpoint = if let Some(cp)=stage.as_mut().and_then(|s|s.checkpoint.take()){cp}else if family_local {fresh_family_local_checkpoint_at_representation(population,scope,adaptive)?    } else {fresh_checkpoint_at_input_context(population, law, scope,framed,arrival)?};
+    if prepared_input && !resumed {
         let pairing=declaration_with_source_framing(population,framed)?.2;
         if framed {checkpoint.stream.select_source_framing_prepared_input(&pairing)?;}else{checkpoint.stream.select_prepared_input(&pairing)?;}
     }
-    checkpoint.provenance = format!(
-        "complete Q+LF+A+LF; corpus SHA256 {}; backend {backend}; command {}; scope {scope:?}; no record-boundary resets",
-        args[3], args[0]
-    );
+    if !resumed {
+        checkpoint.provenance = format!(
+            "complete Q+LF+A+LF; corpus SHA256 {}; backend {backend}; command {}; scope {scope:?}; no record-boundary resets",
+            args[3], args[0]
+        );
+    }
+    if let Some(s)=&stage{s.append_provenance(&mut checkpoint);}
     write_new(
         &out.join("CLOCK_CONTRACT.json"),
         clock_contract(&checkpoint)?.as_bytes(),
     )?;
-    checkpoint.publish(out.join("fresh.state").to_str().ok_or("UTF8 path")?)?;
+    checkpoint.publish(out.join(if resumed{"resumed-opening.state"}else{"fresh.state"}).to_str().ok_or("UTF8 path")?)?;
     let reference = port();
     let pairing = declaration(population)?.2;
     let mut epoch_log = std::fs::OpenOptions::new()
         .write(true)
         .create_new(true)
         .open(out.join("epochs.jsonl"))?;
-    let mut at = 0usize;
-    let mut epochs = 0usize;
+    let mut at=stage.as_ref().map_or(0,|s|s.accepted);
+    let mut epochs=stage.as_ref().map_or(0,|s|s.epoch_start);
     loop {
+        if at<cells.len() {
+            if let Some(s)=&stage {
+                if let Some(reason)=s.stop_reason(at,started.elapsed()) {
+                    s.seal(&checkpoint,out,backend,at,epochs,started.elapsed(),reason,false)?;
+                    return Ok(());
+                }
+            }
+        }
+        if let Some(s)=&stage{s.snapshot(&checkpoint,out,at)?;}
         if let Some(label) = cuts.get(&at) {
             write_new(
                 &out.join(format!("cut-{at:05}.json")),
@@ -377,9 +394,14 @@ fn train(
             .epoch_bound()
             .checked_sub(checkpoint.stream.pending_classes().len())
             .ok_or("invalid pending bound")?;
-        let end = next_cut
-            .min(at.checked_add(remaining).ok_or("count overflow")?)
-            .min(cells.len());
+        let mut end = next_cut.min(at.checked_add(remaining).ok_or("count overflow")?).min(cells.len());
+        if let Some(s)=&stage {
+            end=s.next_boundary(at,end);
+            if let Some(reason)=s.stop_reason(at,started.elapsed()) {
+                s.seal(&checkpoint,out,backend,at,epochs,started.elapsed(),reason,false)?;return Ok(());
+            }
+        }
+        if end<=at{return Err("strict forward-only accepted source cursor".into());}
         let receipt = checkpoint.stream.receive_diagnosed_with_execution(
             &reference,
             &pairing,
@@ -412,6 +434,7 @@ fn train(
                 return Err("actual epoch/closure count contradicts declared ten-cell law; no flush or retry".into());
             }
             epochs += 1;
+            if staged && epoch.cells!=epochs as u64*10{return Err("global native epoch lineage cannot reset on stage continuation".into());}
             let coarse = epoch
                 .reads
                 .iter()
@@ -579,6 +602,7 @@ fn train(
         ])
         .as_bytes(),
     )?;
+    if let Some(s)=&stage{s.seal(&checkpoint,out,backend,at,epochs,started.elapsed(),"full_source_complete",true)?;}
     Ok(())
 }
 
@@ -727,7 +751,7 @@ pub(super) fn run_with_execution(
         Some("train-retained-fibre-v1") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1, backend,ObservedEpochDepositionScope::NormalMaps),
         Some("train-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
         Some("train-prepared-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
-        Some("train-adaptive-family-local-arrival-held-v1") | Some("train-family-local-arrival-context-held-v1") | Some("train-source-framing-arrival-context-held-v1") | Some("train-source-framing-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
+        Some(stage::COMMAND) | Some("train-adaptive-family-local-arrival-held-v1") | Some("train-family-local-arrival-context-held-v1") | Some("train-source-framing-arrival-context-held-v1") | Some("train-source-framing-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         Some("train-prepared-local-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
@@ -1020,3 +1044,6 @@ fn code_receiving_late_rollback(execution:&dyn ObservedEpochExecution,adaptive:b
     if checkpoint.bytes()?!=before {return Err("family-local late aggregate refusal changed native/M/crib/pending".into());}
     Ok(error.to_string())
 }
+
+#[cfg(test)]
+pub(super) fn code_durable_continuation(execution:&dyn ObservedEpochExecution,backend:CompleteLanguageTrainingBackend,path:&Path)->Result<(Vec<u8>,String)>{stage::exercise(execution,backend,path)}

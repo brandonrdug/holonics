@@ -2109,3 +2109,8 @@ pub fn code_family_local_late_rollback(execution:&dyn holonics::hnn::reference::
 
 #[cfg(test)]
 pub fn code_adaptive_receiving_late_rollback(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution)->std::result::Result<String,Box<dyn std::error::Error>> {complete_language::code_adaptive_receiving_late_rollback(execution)}
+
+#[cfg(test)]
+pub fn code_durable_continuation(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution,backend:CompleteLanguageTrainingBackend,path:&std::path::Path)->std::result::Result<(Vec<u8>,String),Box<dyn std::error::Error>> {
+    complete_language::code_durable_continuation(execution,backend,path)
+}
