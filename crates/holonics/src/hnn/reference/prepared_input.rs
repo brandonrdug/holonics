@@ -10,6 +10,9 @@ use std::sync::Arc;
 fn refuse(reason: &'static str) -> HnnError {
     HnnError::Unadmitted { reason }
 }
+mod framing;
+pub use framing::{ContextChart, SourceFraming, PreparedMaterial};
+pub const SOURCE_FRAMING_LAW: &str = "prepared-class-source-framing-route-v1";
 pub const LAW: &str = "prepared-class-local-retained-v1";
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PrefixRole {
@@ -46,6 +49,7 @@ fn features(history: &[(usize, PrefixRole)], h: &Rat) -> Option<Vec<Complex>> {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PreparedInputCut {
     pub source_cells: u64,
+    pub framing: Option<SourceFraming>,
     pub commit: u64,
     pub lift: Vec<BigInt>,
     pub history: Vec<(usize, PrefixRole)>,
@@ -74,6 +78,9 @@ impl PreparedInputCut {
                 "prepared input binds the original ratio/source/lift/commit",
             ));
         }
+        if self.framing.map(|f|f.source_cells())!=self.framing.map(|_|self.source_cells){return Err(refuse("prepared framing belongs to original source frontier"));}
+        let declared=field.receiving_context(ratio.phases().ring())==Some(crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1);
+        if declared!=self.framing.is_some(){return Err(refuse("prepared framing and tree declaration agree"));}
         let pairing = PairingDeclaration::Family {
             table: self.pairs.clone(),
         };
@@ -116,7 +123,7 @@ pub struct PreparedInputState {
     pub(crate) bounds: ContextualBounds,
     pub(crate) max_abs_work: Rat,
     pub(crate) history: Vec<(usize, PrefixRole)>,
-    pub(crate) material: EmpiricalMaterial,
+    pub(crate) material: PreparedMaterial,
     pub(crate) training: u64,
     pub(crate) conditioning: u64,
     pub(crate) generated: u64,
@@ -132,6 +139,11 @@ impl PreparedInputState {
         theta: &Constitution,
         pairing: &PairingDeclaration,
     ) -> Result<Self, HnnError> {
+        Self::fresh_with_chart(field,theta,pairing,ContextChart::ScalarV1)
+    }
+    pub(crate) fn fresh_with_chart(field:&Field,theta:&Constitution,pairing:&PairingDeclaration,chart:ContextChart)->Result<Self,HnnError>{
+        let framed=field.receivers().iter().all(|r|field.receiving_context(r.ring)==Some(crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1));
+        if framed != (chart==ContextChart::SourceFramingRouteV1){return Err(refuse("material context schema matches the freshly declared source framing tree"));}
         if field.alphabet() != 4 || field.sources() != [0] {
             return Err(refuse(
                 "prepared language law declares four classes and actual source0",
@@ -164,7 +176,7 @@ impl PreparedInputState {
             },
             max_abs_work: integer(1 << 16),
             history: Vec::new(),
-            material: EmpiricalMaterial::found(25, 4),
+            material: PreparedMaterial::fresh(chart),
             training: 0,
             conditioning: 0,
             generated: 0,
@@ -176,12 +188,13 @@ impl PreparedInputState {
         })
     }
     pub fn law(&self) -> &'static str {
-        LAW
+        match self.material.chart(){ContextChart::ScalarV1=>LAW,ContextChart::SourceFramingRouteV1=>SOURCE_FRAMING_LAW}
     }
+    pub fn context_chart(&self)->ContextChart{self.material.chart()}
     pub fn mode(&self) -> PrefixMode {
         self.mode
     }
-    pub fn material(&self) -> &EmpiricalMaterial {
+    pub fn material(&self) -> &PreparedMaterial {
         &self.material
     }
     pub fn history(&self) -> &[(usize, PrefixRole)] {
@@ -212,13 +225,14 @@ impl PreparedInputState {
                 "prepared material/context frontier agrees with the single native source",
             ));
         }
+        let framing=match self.context_chart(){ContextChart::ScalarV1=>None,ContextChart::SourceFramingRouteV1=>Some(SourceFraming::at(source))};
         let h = source.open_storage(field, theta, current)?[0][0].clone();
         let f = features(&self.history, &h);
         let control = if let Some(f) = &f {
             let response = if self.mode == PrefixMode::ForecastZeroControl {
                 vec![[Rat::zero(), Rat::zero()]; 4]
             } else {
-                self.material.contract(f)?
+                self.material.part(framing)?.contract(f)?
             };
             if response.iter().any(|z| !z[1].is_zero()) {
                 return Err(refuse(
@@ -232,13 +246,14 @@ impl PreparedInputState {
         crate::hnn::physical::action::contextual::note_fit_work(|w|w.context_seal_and_contract+=seal_start.elapsed());
         Ok(PreparedInputCut {
             source_cells: source.cells(),
+            framing,
             commit: theta.commit(),
             lift: current.lift().to_vec(),
             history: self.history.clone(),
             context: h,
             feature: f,
             control,
-            material_observations: self.material.observations(),
+            material_observations: self.material.part(framing)?.observations(),
             boundary_identity: self.boundary_identity.clone(),
             pairs: self.pairs.clone(),
             max_abs_work: self.max_abs_work.clone(),
@@ -310,6 +325,11 @@ impl PreparedInputState {
         }
         Ok(())
     }
+    #[cfg(test)]
+    pub(crate) fn code_defer_actual(&mut self,cut:PreparedInputCut,class:usize)->Result<(),HnnError>{
+        if cut.source_cells!=self.source_cells()||cut.feature.is_none(){return Err(refuse("CODE delayed return keeps actual original source"));}
+        let id=cut.source_cells;self.advance(class,PrefixRole::Observed)?;self.pending.insert(id,MaterialReturn{cut,actual:class});Ok(())
+    }
     pub fn form(&mut self, id: u64) -> Result<(), HnnError> {
         if self.mode != PrefixMode::Training {
             return Err(refuse("forecast cannot fit material from hypotheses"));
@@ -330,9 +350,10 @@ impl PreparedInputState {
             .zip(c)
             .map(|(y, c)| [y - c, Rat::zero()])
             .collect::<Vec<_>>();
-        let next = self.material.stage(f, &eta, &self.bounds)?;
+        let framing=p.cut.framing;
+        let next = self.material.part(framing)?.stage(f, &eta, &self.bounds)?;
         self.fit_proposals += 1;
-        self.material = next;
+        self.material.replace(framing,next)?;
         self.pending.remove(&id);
         self.last_refusal = None;
         Ok(())
@@ -351,6 +372,10 @@ impl PreparedInputState {
 }
 impl Resident {
     pub fn select_prepared_input(&mut self, pairing: &PairingDeclaration) -> Result<(), HnnError> {
+        self.select_prepared_input_chart(pairing,ContextChart::ScalarV1)
+    }
+    pub fn select_source_framing_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{self.select_prepared_input_chart(pairing,ContextChart::SourceFramingRouteV1)}
+    fn select_prepared_input_chart(&mut self,pairing:&PairingDeclaration,chart:ContextChart)->Result<(),HnnError>{
         self.admit_exact_current()?;
         if self.prepared_input.is_some()
             || self.moments.len() != 1
@@ -361,10 +386,10 @@ impl Resident {
                 "prepared input is an explicit fresh retained-fibre law",
             ));
         }
-        self.prepared_input = Some(PreparedInputState::fresh(
+        self.prepared_input = Some(PreparedInputState::fresh_with_chart(
             &self.field,
             &self.constitution,
-            pairing,
+            pairing,chart,
         )?);
         Ok(())
     }

@@ -189,6 +189,12 @@ impl ObservedStream {
         self.resident.select_prepared_input(pairing)
     }
 
+    /// Fresh framed law; four known source contexts, not uncertain branches.
+    pub fn select_source_framing_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
+        if !self.pending.is_empty()||!self.scope.is_local_receiving(){return Err(refuse("fresh source framing uses local receiving and no pending arrivals"));}
+        self.resident.select_source_framing_prepared_input(pairing)
+    }
+
     pub fn resident(&self) -> &Resident {
         &self.resident
     }
@@ -677,6 +683,9 @@ mod tests {
     fn opening_with_law(
         law: Option<crate::hnn::receiving::ReceivingLaw>,
     ) -> (Reference, ObservedStream, PairingDeclaration, Constitution) {
+        opening_at_context(law,false)
+    }
+    pub(crate) fn opening_at_context(law:Option<crate::hnn::receiving::ReceivingLaw>,framed:bool)->(Reference,ObservedStream,PairingDeclaration,Constitution){
         // The existing serial small-field declaration, with the always-ticking first source
         // and the grouped phase owner's smallest odd receiving period.
         let base = small_field_of(
@@ -691,6 +700,7 @@ mod tests {
             ring.lock.clear();
         }
         let field = Field::declare(declaration.by_lattice_rule()).unwrap();
+        let field=if framed{field.with_receiving_context(2,crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1).unwrap()}else{field};
         let pairing = PairingDeclaration::Family {
             table: (0..4).map(|class| (class, class ^ 1)).collect(),
         };
@@ -720,6 +730,39 @@ mod tests {
         )
         .unwrap();
         (reference, stream, pairing, material)
+    }
+
+    #[test]
+    fn source_framing_original_part_delayed_return_and_codec(){
+        use crate::hnn::reference::prepared_input::{ContextChart,PrefixRole,PreparedInputState};
+        use crate::compression::landmark::context::{ObservedAddress,cell_letters};
+        let(reference,mut stream,pairing,_)=opening_at_context(Some(crate::hnn::receiving::ReceivingLaw::RetainedFibreV1),true);
+        stream.scope=ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap;
+        stream.select_source_framing_prepared_input(&pairing).unwrap();
+        let receipt=stream.receive(&reference,&pairing,&[2;10]).unwrap();assert_eq!(receipt.epochs.len(),1);
+        let mut input=stream.resident.prepared_input.take().unwrap();assert_eq!(input.context_chart(),ContextChart::SourceFramingRouteV1);
+        let moment=stream.resident.continuing().unwrap().0;
+        let cut10=input.seal(&stream.resident.field,&stream.resident.constitution,&stream.resident.current,&stream.resident.moments[&moment]).unwrap();
+        let same=input.seal(&stream.resident.field,&stream.resident.constitution,&stream.resident.current,&stream.resident.moments[&moment]).unwrap();assert_eq!(cut10,same,"no future target enters source seal");
+        assert_eq!(cut10.framing.unwrap().part(),2);
+        reference.ingest_class_continuing(&mut stream.resident,&mut stream.crib,&pairing,2,None).unwrap();
+        // Explicit CODE-only deferred scheduling of this already accepted actual return.
+        input.code_defer_actual(cut10.clone(),2).unwrap();
+        let cut11=input.seal(&stream.resident.field,&stream.resident.constitution,&stream.resident.current,&stream.resident.moments[&moment]).unwrap();
+        assert_eq!(cut11.framing.unwrap().part(),3);assert_eq!(cut10.history,cut11.history,"same lasttwo classes at distinct actual framed positions; native h need not equal");
+        let partition=crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1;
+        let tree=stream.resident.constitution.landmarks(2).unwrap();let depth=tree.declaration().depth;
+        let a=ObservedAddress::new(partition.path(cut10.framing.unwrap().bits()).unwrap(),cell_letters(&vec![2;depth]));
+        let b=ObservedAddress::new(partition.path(cut11.framing.unwrap().bits()).unwrap(),cell_letters(&vec![2;depth]));
+        assert_ne!(tree.letters_observed(&a).unwrap(),tree.letters_observed(&b).unwrap());
+        reference.ingest_class_continuing(&mut stream.resident,&mut stream.crib,&pairing,2,None).unwrap();input.after_actual(cut11,2).unwrap();
+        let saved=input.to_text();let mut cold=PreparedInputState::from_text(&stream.resident.field,&stream.resident.constitution,&saved).unwrap();assert_eq!(cold,input);
+        let before=input.material().parts().iter().map(|m|m.observations()).collect::<Vec<_>>();assert_eq!(before,vec![2,2,2,3]);
+        let current=stream.resident.current.clone();let carry=stream.resident.carried.clone();
+        for state in [&mut input,&mut cold]{state.form(10).unwrap();assert!(state.form(10).is_err());assert_eq!(state.material().parts().iter().map(|m|m.observations()).collect::<Vec<_>>(),vec![2,2,3,3]);}
+        assert_eq!(input,cold);assert_eq!(stream.resident.current,current);assert_eq!(stream.resident.carried,carry);
+        assert_eq!(input.history.last().unwrap().1,PrefixRole::Observed);
+        println!("SOURCE_FRAMING_DELAYED original10/part2 current12/part0 nextpart3 before2,2,2,3 after2,2,3,3 pendingcoldexact replayrefused samecausaldifferentroute=true nativecurrentcarryunchangedbyform=true");
     }
 
     #[test]

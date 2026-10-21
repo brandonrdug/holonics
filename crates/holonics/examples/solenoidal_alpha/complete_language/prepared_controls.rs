@@ -3,7 +3,10 @@ use super::*;
 use holonics::hnn::reference::prepared_input::{PrefixMode, PrefixRole};
 
 #[test]
-fn unified_prepared_command_crosses_sections_aeon_and_cold_prefix() -> Result<()> {
+fn unified_prepared_command_crosses_sections_aeon_and_cold_prefix() -> Result<()> {exercise(false)}
+#[test]
+fn source_framing_command_crosses_sections_aeon_and_cold_prefix()->Result<()>{exercise(true)}
+fn exercise(framed:bool)->Result<()> {
     let root = std::env::var_os("V93_PREPARED_CODE_DIR")
         .map(std::path::PathBuf::from)
         .unwrap_or_else(|| {
@@ -18,7 +21,7 @@ fn unified_prepared_command_crosses_sections_aeon_and_cold_prefix() -> Result<()
     write_new(&root.join("cuts.tsv"), cuts)?;
     let out = root.join("training");
     let args = vec![
-        "train-prepared-local-retained-fibre-v1".into(),
+        if framed{"train-source-framing-retained-held-v1".into()}else{"train-prepared-local-retained-fibre-v1".into()},
         "host-reference".into(),
         root.join("input.bin").display().to_string(),
         sha256(&data)?,
@@ -100,6 +103,14 @@ fn unified_prepared_command_crosses_sections_aeon_and_cold_prefix() -> Result<()
     assert_eq!(material.mode(), PrefixMode::Training);
     assert_eq!(material.frontiers(), (40, 0, 0));
     assert_eq!(material.material().observations(), 38);
+    if framed {
+        use holonics::hnn::reference::prepared_input::ContextChart;
+        assert_eq!(material.context_chart(),ContextChart::SourceFramingRouteV1);
+        assert_eq!(material.material().parts().iter().map(|p|p.observations()).collect::<Vec<_>>(),vec![9,9,10,10]);
+        let tree=trained_resident.constitution().landmarks(2).unwrap();
+        assert_eq!(tree.observation_width(),2);assert_eq!(tree.observation_role(),holonics::compression::landmark::context::ObservationRole::Route);
+        assert_eq!(resumed.stream.resident().prepared_input().unwrap().context_chart(),ContextChart::SourceFramingRouteV1);
+    }
     assert!(material.outstanding().is_empty());
     assert_ne!(
         material.material(),
@@ -218,6 +229,16 @@ fn unified_prepared_command_crosses_sections_aeon_and_cold_prefix() -> Result<()
     assert_eq!(exact(&tr.receipt.detail), exact(&fr.receipt.detail));
     reference.discard(&mut training_read, Handle::Pending(tp))?;
     reference.discard(&mut forecast_read, Handle::Pending(fp))?;
+    if framed {
+        let zero_output=root.join("zero-control");
+        let zero=continuation::sample_continuing(&trained,&[0x1b],continuation::SamplingPolicy::NativeZeroMControl,&[0x55;64],8,&[0,1,4,8],Some(1),&zero_output)?;
+        assert!(zero.cold_continuation.as_ref().unwrap().matched_warm_state_and_crib);
+        let(zcold,_)=Checkpoint::load(&zero.cuts[1].checkpoint_path,READ_BUDGET)?;
+        let input=zcold.stream.resident().prepared_input().unwrap();assert_eq!(input.material(),material.material());assert_eq!(input.mode(),PrefixMode::ForecastZeroControl);
+        assert_eq!(input.frontiers(),(40,4,1));
+        let legacy=fresh_checkpoint_at_law_and_scope(16384,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+        assert!(legacy.stream.resident().field().receiving_context(2).is_none());
+    }
     assert_eq!(sha256(&trained.bytes()?)?, trained_hash);
     let trace = object(&[
         (
@@ -353,4 +374,17 @@ impl ObservedEpochExecution for CountedHost {
         self.add(2);
         Ok(out)
     }
+}
+
+#[test]
+#[ignore = "explicit pinned legacy synthetic CODE checkpoints only"]
+fn source_framing_legacy_checkpoint_stays_exact()->Result<()> {
+    let root=std::path::PathBuf::from(std::env::var_os("A21_LEGACY_SYNTHETIC_DIR").ok_or("pinned legacy fixture required")?);
+    for name in ["fresh.state","trained.state"] {
+        let path=root.join(name);let bytes=std::fs::read(&path)?;
+        assert!(bytes.starts_with(format!("{MAGIC}\n").as_bytes()));
+        let (restored,_)=Checkpoint::load(path.to_str().unwrap(),READ_BUDGET)?;
+        assert!(!restored.source_framed());assert_eq!(restored.bytes()?,bytes);
+    }
+    Ok(())
 }

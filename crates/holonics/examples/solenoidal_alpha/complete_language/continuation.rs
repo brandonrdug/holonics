@@ -405,7 +405,7 @@ pub(super) fn sample_continuing(
     let prompt_sha256 = sha256(prompt)?;
     let key_schedule_sha256 = sha256(key_bytes)?;
     let reference = port();
-    let (field, founding, pairing) = declaration(checkpoint.population)?;
+    let (field, founding, pairing) = checkpoint.declaration()?;
     let (mut resident, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
     if policy.zero_m() {
         resident.zero_prepared_forecast_control()?;

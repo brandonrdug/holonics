@@ -66,13 +66,14 @@ fn read_history(
 }
 impl PreparedInputCut {
     pub(crate) fn to_text(&self) -> String {
-        let mut o = String::from("prepared-input-cut-v1 ");
+        let mut o = String::from(if self.framing.is_some(){"prepared-input-cut-framing-v1 "}else{"prepared-input-cut-v1 "});
         put(&mut o, self.source_cells);
         put(&mut o, self.commit);
         put(&mut o, self.material_observations);
         put(&mut o, &self.context);
         put(&mut o, &self.max_abs_work);
         put(&mut o, self.rational_bits);
+        if let Some(frame)=self.framing {put(&mut o,frame.source_cells());put(&mut o,frame.part());}
         put(&mut o, hex(&self.boundary_identity));
         history(&mut o, &self.history);
         put(&mut o, self.lift.len());
@@ -97,15 +98,14 @@ impl PreparedInputCut {
             return Err(refuse("bounded prepared cut"));
         }
         let mut t = text.split_whitespace();
-        if t.next() != Some("prepared-input-cut-v1") {
-            return Err(refuse("prepared cut version"));
-        }
+        let framed=match t.next(){Some("prepared-input-cut-v1")=>false,Some("prepared-input-cut-framing-v1")=>true,_=>return Err(refuse("prepared cut version"))};
         let source_cells = get(&mut t)?;
         let commit = get(&mut t)?;
         let material_observations = get(&mut t)?;
         let context = get(&mut t)?;
         let max_abs_work = get(&mut t)?;
         let rational_bits = get(&mut t)?;
+        let framing=if framed{let cells=get(&mut t)?;let part=get(&mut t)?;if cells!=source_cells{return Err(refuse("original framing frontier"));}Some(SourceFraming::restored(cells,part)?)}else{None};
         let boundary_identity = unhex(t.next().ok_or(refuse("prepared boundary identity"))?)?;
         let history = read_history(&mut t)?;
         let n: usize = get(&mut t)?;
@@ -134,6 +134,7 @@ impl PreparedInputCut {
         }
         Ok(Self {
             source_cells,
+            framing,
             commit,
             lift,
             history,
@@ -150,7 +151,7 @@ impl PreparedInputCut {
 }
 impl PreparedInputState {
     pub(crate) fn to_text(&self) -> String {
-        let mut o = format!("{LAW} ");
+        let mut o = format!("{} ",self.law());
         for v in [
             self.bounds.pending,
             self.bounds.precision_bits as usize,
@@ -189,7 +190,7 @@ impl PreparedInputState {
                 put(&mut o, c);
             }
         }
-        put(&mut o, hex(&self.material.checkpoint_text()));
+        put(&mut o, hex(&self.material.text()));
         put(&mut o, self.pending.len());
         for (id, p) in &self.pending {
             put(&mut o, id);
@@ -208,9 +209,9 @@ impl PreparedInputState {
             return Err(refuse("bounded prepared continuation"));
         }
         let mut t = text.split_whitespace();
-        if t.next() != Some(LAW) {
-            return Err(refuse("prepared input continuation law identity"));
-        }
+        let chart=match t.next(){Some(LAW)=>ContextChart::ScalarV1,Some(SOURCE_FRAMING_LAW)=>ContextChart::SourceFramingRouteV1,_=>return Err(refuse("prepared input continuation law identity"))};
+        let framed=field.receivers().iter().all(|r|field.receiving_context(r.ring)==Some(crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1));
+        if framed!=(chart==ContextChart::SourceFramingRouteV1){return Err(refuse("saved material schema and actual tree framing declaration agree"));}
         let bounds = ContextualBounds {
             branches: 1,
             pending: get(&mut t)?,
@@ -267,22 +268,8 @@ impl PreparedInputState {
         };
         let source_octet = octet()?;
         let generated_octet = octet()?;
-        let material = EmpiricalMaterial::restored_text(
-            &unhex(t.next().ok_or(refuse("prepared material"))?)?,
-            25,
-            4,
-            &bounds,
-        )?;
-        if material
-            .normal()
-            .iter()
-            .chain(material.cross())
-            .chain(material.applied())
-            .flatten()
-            .any(|z| !z[1].is_zero())
-        {
-            return Err(refuse("separate real class material"));
-        }
+        let material = PreparedMaterial::restored(chart,&unhex(t.next().ok_or(refuse("prepared material"))?)?,&bounds)?;
+        if material.parts().iter().flat_map(|m|m.normal().iter().chain(m.cross()).chain(m.applied())).flatten().any(|z|!z[1].is_zero()){return Err(refuse("separate real class material"));}
         let n: usize = get(&mut t)?;
         if n > bounds.pending {
             return Err(refuse("bounded original class returns"));
@@ -298,11 +285,17 @@ impl PreparedInputState {
                 || id != cut.source_cells
                 || id >= training
                 || cut.boundary_identity != boundary_identity
+                || cut.framing.is_some() != (chart==ContextChart::SourceFramingRouteV1)
                 || pending.insert(id, MaterialReturn { cut, actual }).is_some()
             {
                 return Err(refuse("original jointly bound class return"));
             }
         }
+        if chart==ContextChart::SourceFramingRouteV1{for phase in 0..4usize{
+            let reached=training/4+u64::from((phase as u64)<training%4)-u64::from(phase<2&&(phase as u64)<training);
+            let pending_count=pending.values().filter(|p|p.cut.framing.map(SourceFraming::part)==Some(phase)).count() as u64;
+            if material.parts()[phase].observations().checked_add(pending_count)!=Some(reached){return Err(refuse("original phase material and pending evidence accounting"));}
+        }}
         let total = u64::checked_add(training, conditioning)
             .and_then(|n| n.checked_add(generated))
             .ok_or(HnnError::CountOverflow)?;

@@ -2102,6 +2102,8 @@ impl SourceObserverMaterial {
 pub enum ObservationPartition {
     MaximumRealGrainSet,
     ReceivingSection,
+    /// Actual source-frontier framing, sealed before target and native forward.
+    SourceFramingRouteV1,
 }
 
 /// [definition; agent-inferred, L3] **The letters of one section point**: its rest
@@ -2113,12 +2115,13 @@ impl ObservationPartition {
         match self {
             Self::MaximumRealGrainSet => "maximum-real-grain-set-v1",
             Self::ReceivingSection => "receiving-section-v1",
+            Self::SourceFramingRouteV1 => "source-framing-route-v1",
         }
     }
 
     /// The partition read from its saved tag.
     pub fn of_tag(tag: &str) -> Option<Self> {
-        [Self::MaximumRealGrainSet, Self::ReceivingSection]
+        [Self::MaximumRealGrainSet, Self::ReceivingSection, Self::SourceFramingRouteV1]
             .into_iter()
             .find(|partition| partition.tag() == tag)
     }
@@ -2129,6 +2132,7 @@ impl ObservationPartition {
     pub fn outcome_bits(self, field: &Field, ring: usize) -> usize {
         match self {
             Self::MaximumRealGrainSet => field.alphabet(),
+            Self::SourceFramingRouteV1 => 2,
             Self::ReceivingSection => {
                 let n = field.ring(ring).period();
                 let points: u64 = (1..=n).filter(|d| n.is_multiple_of(*d)).sum();
@@ -2140,7 +2144,7 @@ impl ObservationPartition {
     /// How the landmark tree reads the letters ([`ObservationRole`]).
     pub fn role(self) -> ObservationRole {
         match self {
-            Self::MaximumRealGrainSet => ObservationRole::Route,
+            Self::MaximumRealGrainSet | Self::SourceFramingRouteV1 => ObservationRole::Route,
             Self::ReceivingSection => ObservationRole::Refine,
         }
     }
@@ -2151,6 +2155,7 @@ impl ObservationPartition {
         Ok(match self {
             Self::MaximumRealGrainSet => ObservationPath::from_membership_bits(bits)?,
             Self::ReceivingSection => ObservationPath::from_section_bits(bits)?,
+            Self::SourceFramingRouteV1 => ObservationPath::from_source_framing_bits(bits)?,
         })
     }
 
@@ -2194,6 +2199,7 @@ impl ObservationPartition {
                     Ok(path)
                 })
                 .collect(),
+            Self::SourceFramingRouteV1 => Err(HnnError::Unadmitted { reason:"source framing is sealed by its actual source producer, not a receiving-wave callback" }),
             Self::ReceivingSection => anchors
                 .iter()
                 .map(|anchor| section_bits(field, phases.ring(), anchor))

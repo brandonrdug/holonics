@@ -118,6 +118,7 @@ pub fn code_checkpoint_scope_and_source(path:&str)->std::result::Result<(String,
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 const MATERIAL_BIT_BUDGET: u64 = 1 << 40; // Existing listener declaration, never raised.
 const MAGIC: &str = "solenoidal-alpha-unplaced-v2";
+const FRAMED_MAGIC: &str = "solenoidal-alpha-source-framing-v1";
 const QUERY_BYTE_BUDGET: usize = 128; // Explicit exterior tiny-query workload declaration.
 const WARM_QUERY: &str = "carry";
 
@@ -179,7 +180,8 @@ fn sha256(bytes: &[u8]) -> Result<String> {
 fn digits(bytes: &[u8]) -> Vec<usize> {
     Base4Bytes::encode(bytes)
 }
-fn declaration(population: u64) -> Result<(Field, Constitution, PairingDeclaration)> {
+fn declaration(population: u64) -> Result<(Field, Constitution, PairingDeclaration)> {declaration_with_source_framing(population,false)}
+fn declaration_with_source_framing(population:u64,framed:bool)->Result<(Field,Constitution,PairingDeclaration)>{
     // Agent-inferred: listener's existing serial law at a smaller explicit test workload.
     // The three rings, contacts, physical depths and pairing are independent of corpus text.
     // Grouped phase rows require an odd receiving ring; three is the smallest admitted odd period.
@@ -225,6 +227,7 @@ fn declaration(population: u64) -> Result<(Field, Constitution, PairingDeclarati
     declared.receivers[0].tolerance = rat(1, 4);
     declared.lattice.clear();
     let field = Field::declare(declared.by_lattice_rule())?;
+    let field=if framed{field.with_receiving_context(2,holonics::hnn::receiving::ObservationPartition::SourceFramingRouteV1)?}else{field};
     let pairing = PairingDeclaration::Family {
         table: (0..4).map(|c| (c, c ^ 1)).collect(),
     };
@@ -266,12 +269,15 @@ struct Checkpoint {
     provenance: String,
 }
 impl Checkpoint {
+    fn source_framed(&self)->bool { self.stream.resident().field().receiving_context(2)==Some(holonics::hnn::receiving::ObservationPartition::SourceFramingRouteV1) }
+    fn declaration(&self)->Result<(Field,Constitution,PairingDeclaration)>{ declaration_with_source_framing(self.population,self.source_framed()) }
     fn bytes(&self) -> Result<Vec<u8>> {
         let native = self.stream.resident().continuing_state(0)?.to_text();
         let crib = self.stream.crib().unplaced_checkpoint()?;
         let pending = self.stream.pending_checkpoint();
         let header = format!(
-            "{MAGIC}\n{} {} {} {} {}\n",
+            "{}\n{} {} {} {} {}\n",
+            if self.source_framed(){FRAMED_MAGIC}else{MAGIC},
             self.population,
             native.len(),
             crib.len(),
@@ -307,7 +313,7 @@ impl Checkpoint {
         let hash = sha256(&bytes)?;
         let text = std::str::from_utf8(&bytes)?;
         let (magic, rest) = text.split_once('\n').ok_or("missing checkpoint header")?;
-        if magic != MAGIC {
+        if magic != MAGIC && magic != FRAMED_MAGIC {
             return Err("unsupported Alpha checkpoint".into());
         }
         let (sizes, body) = rest.split_once('\n').ok_or("missing checkpoint sizes")?;
@@ -352,7 +358,7 @@ impl Checkpoint {
             .ok_or("provenance UTF8 boundary")?
             .to_owned();
         let state = ContinuingState::from_text(native, MATERIAL_BIT_BUDGET)?;
-        let (field, initial, _) = declaration(*population)?;
+        let (field, initial, _) = declaration_with_source_framing(*population,magic==FRAMED_MAGIC)?;
         let resident =
             port().mount_continued(&field, &Current::at_rest(&field), initial, &state)?;
         if resident.continuing_state(0)? != state {
@@ -419,7 +425,7 @@ fn query_reading(checkpoint: &Checkpoint, query: &str) -> Result<String> {
     if query.len() > QUERY_BYTE_BUDGET {
         return Err("query exceeds declared 128-byte boundary workload".into());
     }
-    let pairing = declaration(checkpoint.population)?.2;
+    let pairing = checkpoint.declaration()?.2;
     let reference = port();
     let (mut resident, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
     for class in digits(query.as_bytes()) {
@@ -503,7 +509,7 @@ fn frozen_r_target_prefix(checkpoint: &Checkpoint, target: &[u8]) -> Result<Stri
     }
     let main_before = checkpoint.bytes()?;
     let reference = port();
-    let (field, founding, pairing) = declaration(checkpoint.population)?;
+    let (field, founding, pairing) = checkpoint.declaration()?;
     let (mut resident, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
     let receiver = resident
         .admitted()
@@ -779,7 +785,7 @@ fn conditional_query_controls(
         );
     }
     let reference = port();
-    let (_, founding, pairing) = declaration(checkpoint.population)?;
+    let (_, founding, pairing) = checkpoint.declaration()?;
     let before = checkpoint.bytes()?;
     let (mut opening, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
     for class in digits(query.as_bytes()) {
@@ -1008,7 +1014,7 @@ fn retained_fibre_query_controls(
     }
     let before = checkpoint.bytes()?;
     let reference = port();
-    let (_, founding, pairing) = declaration(checkpoint.population)?;
+    let (_, founding, pairing) = checkpoint.declaration()?;
     let (mut opening, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
     for class in digits(query.as_bytes()) {
         reference.ingest_class_continuing(&mut opening, &mut crib, &pairing, class, None)?;
@@ -1206,7 +1212,7 @@ fn keyed_reply(
     }
     let before = checkpoint.bytes()?;
     let reference = port();
-    let pairing = declaration(checkpoint.population)?.2;
+    let pairing = checkpoint.declaration()?.2;
     let (mut resident, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
     for class in digits(query.as_bytes()) {
         reference.ingest_class_continuing(&mut resident, &mut crib, &pairing, class, None)?;
@@ -1224,7 +1230,7 @@ fn keyed_reply(
             .ok_or("no native receiver")?
             .tolerance(),
     )?;
-    let initial_material = declaration(checkpoint.population)?.1;
+    let initial_material = checkpoint.declaration()?.1;
     let receiving_ring = resident
         .admitted()
         .first()
@@ -1595,7 +1601,7 @@ fn run() -> Result<()> {
             let file_hash = sha256(&source)?; let excerpt_hash = sha256(&excerpt)?;
             let before = material_hash(checkpoint.stream.resident())?;
             let reference = ingest_reference(command, checkpoint.stream.scope())?;
-            let pairing = declaration(checkpoint.population)?.2;
+            let pairing = checkpoint.declaration()?.2;
             let complete_excerpt_cells = digits(&excerpt).len();
             let source_cell_offset = if args.len() == 10 { args[9].parse()? } else { 0 };
             let limit = if args.len() == 9 || args.len() == 10 { Some(args[8].parse()?) } else { None };
@@ -2079,3 +2085,6 @@ pub fn code_prepared_arrival_context(execution:&dyn holonics::hnn::reference::ob
 
 #[cfg(test)]
 pub fn code_held_prepared_late_rollback(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution)->std::result::Result<String,Box<dyn std::error::Error>>{complete_language::code_held_prepared_late_rollback(execution)}
+
+#[cfg(test)]
+pub fn code_framed_prepared_late_rollback(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution)->std::result::Result<String,Box<dyn std::error::Error>>{complete_language::code_framed_prepared_late_rollback(execution)}

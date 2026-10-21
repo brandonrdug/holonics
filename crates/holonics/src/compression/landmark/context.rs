@@ -760,14 +760,16 @@ impl Letter {
 pub enum ObservationLetter {
     MaximumMass(bool),
     Section(bool),
+    /// Known two-bit position on an explicitly declared four-class byte channel.
+    SourceFraming(bool),
 }
 
 impl ObservationLetter {
     /// The letter's symbol: `0` when absent (or on the near sheet) and `1` when present.
     pub fn code(self) -> u32 {
         match self {
-            Self::MaximumMass(false) | Self::Section(false) => 0,
-            Self::MaximumMass(true) | Self::Section(true) => 1,
+            Self::MaximumMass(false) | Self::Section(false) | Self::SourceFraming(false) => 0,
+            Self::MaximumMass(true) | Self::Section(true) | Self::SourceFraming(true) => 1,
         }
     }
 }
@@ -832,6 +834,12 @@ pub struct ObservationPath {
 }
 
 impl ObservationPath {
+    /// A source-channel declaration, never a receiving-wave/section observation.
+    pub fn from_source_framing_bits(bits:Vec<bool>)->Result<Self,ContextError>{
+        if bits.len()!=2{return Err(ContextError::Extent{what:"two known source framing bits",expected:2,found:bits.len()});}
+        Ok(Self{letters:bits.into_iter().map(ObservationLetter::SourceFraming).collect()})
+    }
+
     /// Construct from a dense membership vector. The vector must describe a nonempty subset;
     /// callers obtain it from the face's exact maximum-mass classes, with ties preserved.
     pub fn from_membership_bits(bits: Vec<bool>) -> Result<Self, ContextError> {

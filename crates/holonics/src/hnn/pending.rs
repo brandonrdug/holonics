@@ -219,11 +219,15 @@ impl PendingRatio {
         let address = prototype
             .truncated(phases.depth())?
             .continued(next("the producing address")?, next)?;
-        Self::produce(&current, &moment, &address, &phases, commit[0]).map(|mut ratio| {
+        Self::produce(&current, &moment, &address, &phases, commit[0]).and_then(|mut ratio| {
             ratio.view = view;
             ratio.observation = observation;
             ratio.prepared_input=prepared_input;
-            ratio
+            if ratio.phases.observation_partition()==Some(crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1){
+                let frame=ratio.prepared_input.as_ref().and_then(|p|p.framing).ok_or(HnnError::Unadmitted{reason:"saved framed ratio keeps original prepared source context"})?;
+                if frame.source_cells()!=ratio.moment.cells() || ratio.observation.as_ref().is_some_and(|o|o!=&vec![frame.bits()]){return Err(HnnError::Unadmitted{reason:"saved source framing and its original source agree"});}
+            }
+            Ok(ratio)
         })
     }
 
@@ -290,7 +294,14 @@ impl PendingRatio {
                 reason: "an observed read belongs to its declared receiving phases",
             });
         }
-        self.observation = Some(partition.read(field, &self.phases, anchors, wave)?);
+        if partition==crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1 {
+            if self.phases.aperture()!=1{return Err(HnnError::Unadmitted{reason:"source framing's declared prepared word has one receiving aperture"});}
+            let frame=self.prepared_input.as_ref().and_then(|p|p.framing).ok_or(HnnError::Unadmitted{reason:"source framing must be sealed by the same prepared input producer"})?;
+            if frame.source_cells()!=self.moment.cells(){return Err(HnnError::Unadmitted{reason:"framing belongs to actual producing source frontier"});}
+            self.observation=Some(vec![frame.bits()]);
+        }else{
+            self.observation = Some(partition.read(field, &self.phases, anchors, wave)?);
+        }
         Ok(())
     }
 
