@@ -633,7 +633,9 @@ fn sample(args: &[String]) -> Result<()> {
         );
     }
     let (checkpoint, _) = Checkpoint::load(&args[2], READ_BUDGET)?;
-    let long = args[0] == "sample-prepared-retained-512-v1";
+    let full_question = args[0] == "sample-prepared-retained-full-question-v1";
+    let prompt_bound = if full_question { 512 } else { QUERY_BYTE_BUDGET };
+    let long = full_question || args[0] == "sample-prepared-retained-512-v1";
     let cells = if long { 512 } else { 128 };
     let prepared = long || args[0] == "sample-prepared-retained-fibre-v1";
     if prepared != checkpoint.stream.resident().prepared_input().is_some() {
@@ -647,7 +649,7 @@ fn sample(args: &[String]) -> Result<()> {
         );
     }
 
-    let prompt = pinned_read(&args[3], &args[4], QUERY_BYTE_BUDGET)?;
+    let prompt = pinned_read(&args[3], &args[4], prompt_bound)?;
     let keys = pinned_read(&args[5], &args[6], cells * 8)?;
     let policy = sampling_policy(&args[7], prepared)?;
     let cold = match args[8].as_str() {
@@ -657,7 +659,8 @@ fn sample(args: &[String]) -> Result<()> {
     };
     let out = Path::new(&args[9]);
     std::fs::create_dir(out)?;
-    let receipt = continuation::sample_continuing(
+    let sample = if full_question { continuation::sample_full_question } else { continuation::sample_continuing };
+    let receipt = sample(
         &checkpoint,
         &prompt,
         policy,
@@ -677,6 +680,8 @@ fn sample(args: &[String]) -> Result<()> {
         object(&[
             ("backend", quoted(&args[1])),
             ("command", quoted(&args[0])),
+            ("prompt_byte_bound", prompt_bound.to_string()),
+            ("prompt_bytes", prompt.len().to_string()),
             ("elapsed_ns", started.elapsed().as_nanos().to_string()),
             (
                 "input_control",
@@ -753,8 +758,8 @@ pub(super) fn run_with_execution(
         Some("train-prepared-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
         Some(stage::COMMAND) | Some("train-adaptive-family-local-arrival-held-v1") | Some("train-family-local-arrival-context-held-v1") | Some("train-source-framing-arrival-context-held-v1") | Some("train-source-framing-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         Some("train-prepared-local-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
-        Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
-        Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
+        Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
+        Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
         _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), train-prepared-local-retained-held-v1 (explicit held-map continuation), train-source-framing-retained-held-v1 (explicit known byte-position context), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
     }
 }

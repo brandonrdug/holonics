@@ -45,11 +45,19 @@ def durable(path, value):
         os.close(fd)
 
 
+def sample_command(plan):
+    default = "sample-prepared-retained-512-v1" if plan["cells"] == 512 else "sample-prepared-retained-fibre-v1"
+    command = plan.get("sample_command", default)
+    assert command == default or (plan["cells"] == 512 and command == "sample-prepared-retained-full-question-v1"), "explicit compatible sample command"
+    return command
+
+
 def execute(plan_path, plan_sha, output):
     assert sha(plan_path) == plan_sha, "plan digest"
     plan = json.loads(Path(plan_path).read_text())
     assert plan["workers"] in (1, 4)
     assert plan["cells"] in (128, 512)
+    selected_command = sample_command(plan)
     assert 0 < plan["deadline_ns"] <= 3_600_000_000_000
     assert plan["aggregate_host_bytes"] == 8 * 1024**3
     assert plan["aggregate_cpus"] == 4
@@ -57,7 +65,7 @@ def execute(plan_path, plan_sha, output):
     identities = [arm["id"] for arm in plan["arms"]]
     assert len(set(identities)) == len(identities)
     assert all(re.fullmatch(r"[a-z0-9-]{1,40}", name) for name in identities)
-    assert all(arm["policy"] in ("native", "native-zero-M", "native-context-zero", "founding-R", "tree") for arm in plan["arms"])
+    assert all(arm["policy"] in ("native", "native-zero-M", "native-context-zero", "combined-family", "founding-R", "tree") for arm in plan["arms"])
     pins = [plan["binary"], plan["checkpoint"], plan["keys"],
             {"path": str(Path(__file__).resolve()), "sha256": plan["controller_sha256"]}] + [arm["prompt"] for arm in plan["arms"]]
 
@@ -164,7 +172,7 @@ def execute(plan_path, plan_sha, output):
             while not stop and next_arm < len(plan["arms"]) and len(running) < plan["workers"]:
                 assert integrity(), "integrity before child"
                 arm = plan["arms"][next_arm]
-                command = "sample-prepared-retained-512-v1" if plan["cells"] == 512 else "sample-prepared-retained-fibre-v1"
+                command = selected_command
                 args = [plan["binary"]["path"], "complete-language", command, "host-reference",
                         plan["checkpoint"]["path"], arm["prompt"]["path"], arm["prompt"]["sha256"],
                         plan["keys"]["path"], plan["keys"]["sha256"], arm["policy"],

@@ -3,9 +3,16 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from native_output_pool import sha, pins_valid, successful
+from native_output_pool import sha, pins_valid, successful, sample_command
 
 class Closure(unittest.TestCase):
+    def test_full_question_command_is_explicit_and_not_a_training_alias(self):
+        self.assertEqual(sample_command({'cells':512}),'sample-prepared-retained-512-v1')
+        self.assertEqual(sample_command({'cells':512,'sample_command':'sample-prepared-retained-full-question-v1'}),'sample-prepared-retained-full-question-v1')
+        for command in ['train','sample','sample-prepared-retained-fibre-v1']:
+            with self.assertRaises(AssertionError):sample_command({'cells':512,'sample_command':command})
+        with self.assertRaises(AssertionError):sample_command({'cells':128,'sample_command':'sample-prepared-retained-full-question-v1'})
+
     def test_changed_noncheckpoint_pin_refuses_even_when_every_output_completed(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);pins=[]

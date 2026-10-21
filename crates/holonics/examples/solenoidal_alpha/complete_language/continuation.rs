@@ -357,7 +357,40 @@ pub(super) fn sample_continuing(
     cold_replay_at: Option<usize>,
     output_dir: &Path,
 ) -> Result<SampleReceipt> {
-    if output_cells == 0 || prompt.len() > QUERY_BYTE_BUDGET {
+    sample_continuing_bounded(checkpoint, prompt, policy, key_bytes, output_cells, cuts,
+        cold_replay_at, output_dir, QUERY_BYTE_BUDGET)
+}
+
+/// Exterior complete-question admission. The continuing producer and frozen material law
+/// are identical to the legacy sampler; only the declared input byte bound differs.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn sample_full_question(
+    checkpoint: &Checkpoint,
+    prompt: &[u8],
+    policy: SamplingPolicy,
+    key_bytes: &[u8],
+    output_cells: usize,
+    cuts: &[usize],
+    cold_replay_at: Option<usize>,
+    output_dir: &Path,
+) -> Result<SampleReceipt> {
+    sample_continuing_bounded(checkpoint, prompt, policy, key_bytes, output_cells, cuts,
+        cold_replay_at, output_dir, 512)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn sample_continuing_bounded(
+    checkpoint: &Checkpoint,
+    prompt: &[u8],
+    policy: SamplingPolicy,
+    key_bytes: &[u8],
+    output_cells: usize,
+    cuts: &[usize],
+    cold_replay_at: Option<usize>,
+    output_dir: &Path,
+    prompt_byte_bound: usize,
+) -> Result<SampleReceipt> {
+    if output_cells == 0 || prompt.len() > prompt_byte_bound {
         return Err("conditional sampling needs a positive output and a bounded prompt".into());
     }
     let horizon = checkpoint
