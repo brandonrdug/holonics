@@ -299,6 +299,7 @@ fn train(
         ("device_ordinal", if selected_backend == CompleteLanguageTrainingBackend::CudaObservedEpochDevice0 { "0".into() } else { "null".into() }),
         ("host_owned", quoted("source/clock/normal law; scalar face/root/normalization/scoring/certification; causal cuts; prefix diagnostics; exact decode; independent output forks")),
         ("host_fallback", "false".into()),
+        ("evidence_policy",quoted("local: compact outcome/actual-code/wall; full return+energy at predeclared cut crossings or Held; all stage failures retained")),
     ]).as_bytes())?;
     let mut checkpoint = fresh_checkpoint_at_law_and_scope(population, law, scope)?;
     if prepared_input {
@@ -391,6 +392,11 @@ fn train(
                         upper: sum.upper + &read.code.upper,
                     }
                 });
+            // Compact authentic evidence; full actual return/energy only at declared cut crossings
+            // or a held publication. This changes no target/model code or native operation.
+            let full_evidence = !scope.is_local_receiving()
+                || cuts.range((epoch.cells as usize - epoch.consumed)..=epoch.cells as usize).next().is_some()
+                || epoch.deposit.epoch.as_ref().is_some_and(|e|e.held_receiving.is_some());
             let record = object(&[
                 ("epoch", epochs.to_string()),
                 ("source_cells", epoch.cells.to_string()),
@@ -456,12 +462,15 @@ fn train(
                 ),
                 (
                     "retained_section_return",
-                    exact(&epoch.retained_section_return),
+                    if full_evidence { exact(&epoch.retained_section_return) } else { "null".into() },
                 ),
                 ("whole_refusal", exact(&epoch.whole_stage_refusal)),
                 ("joint_refusal", exact(&epoch.joint_stage_refusal)),
                 ("wall", exact(&epoch.wall)),
-                ("actual_preparation_and_energy", exact(&epoch.energy)),
+                ("full_evidence_requested",full_evidence.to_string()),
+                ("coarse_diagnostics",quoted(if scope.is_local_receiving(){"deferred; authentic raw retained source kept"}else{"observed"})),
+                ("energy_closes",epoch.energy.closes().to_string()),
+                ("actual_preparation_and_energy", if full_evidence {exact(&epoch.energy)} else {"null".into()}),
                 ("backend", quoted(backend)),
             ]);
             writeln!(epoch_log, "{record}")?;

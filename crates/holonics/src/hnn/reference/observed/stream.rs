@@ -586,6 +586,7 @@ mod tests {
         returns: AtomicUsize,
         flows: AtomicUsize,
         refuse_forward: bool,
+        reuse:bool,
         flow_readings: std::sync::Mutex<Vec<crate::hnn::constitution::EpochRecordFlowReading>>,
         refuse_aggregate_at: Option<usize>,
     }
@@ -597,6 +598,7 @@ mod tests {
                 returns: AtomicUsize::new(0),
                 flows: AtomicUsize::new(0),
                 refuse_forward,
+                reuse:true,
                 flow_readings: std::sync::Mutex::new(Vec::new()),
                 refuse_aggregate_at: None,
             }
@@ -604,6 +606,7 @@ mod tests {
     }
 
     impl ObservedEpochExecution for CountingExecution {
+        fn reuse_receiving_observations(&self)->bool { self.reuse }
         fn admit_prepared_input(&self) -> Result<(),HnnError> { HostObservedEpochExecution.admit_prepared_input() }
         fn forward_scoped(&self, context:&mut ObservedEpochForwardContext<'_,'_>, ratio:&crate::hnn::pending::PendingRatio,
             charts:&mut crate::hnn::chart::Charts, opening:&crate::hnn::word::WordOpening) -> Result<ObservedEpochForwardWord,HnnError> {
@@ -1014,6 +1017,39 @@ mod tests {
         assert_eq!(stream.resident.continuing_state(0).unwrap(),before);assert_eq!(stream.pending_checkpoint(),pending);assert_eq!(stream.crib,crib);
         assert_eq!(stream.accepted_cells().unwrap(),0,"a preceding staged hold is not committed on a later delivery fault");
         assert_eq!(executor.forwards.load(Ordering::Relaxed),20);assert_eq!(executor.returns.load(Ordering::Relaxed),20);assert_eq!(executor.flows.load(Ordering::Relaxed),2);
+    }
+
+    #[test]
+    fn lazy_retained_connected_held_successor_cold_and_late_fault_equal() {
+        let (reference,opening,pairing,initial,_)=held_receiving_seeded_stream();
+        let field=opening.resident.field.clone();
+        let data:Vec<_>=(0..30).map(|i|i%4).collect();
+        let mut old=opening.clone();let mut new=opening.clone();
+        let mut old_exec=CountingExecution::new(false);old_exec.reuse=false;
+        let new_exec=CountingExecution::new(false);
+        let t=std::time::Instant::now();let old_r=old.receive_with_execution(&reference,&pairing,&data[..16],&old_exec).unwrap();let old_ns=t.elapsed().as_nanos();
+        let t=std::time::Instant::now();let new_r=new.receive_with_execution(&reference,&pairing,&data[..16],&new_exec).unwrap();let new_ns=t.elapsed().as_nanos();
+        assert_eq!(old.resident.continuing_state(0).unwrap(),new.resident.continuing_state(0).unwrap());assert_eq!(old.crib,new.crib);assert_eq!(old.pending_checkpoint(),new.pending_checkpoint());
+        assert_eq!((new_r.accepted,new_r.published,new_r.pending),(16,10,6));
+        assert_eq!(old_r.epochs[0].outcome,new_r.epochs[0].outcome);assert_eq!(new_r.epochs[0].outcome,ObservedEpochOutcome::HeldReceiving);
+        assert_eq!(old_r.epochs[0].energy,new_r.epochs[0].energy);
+        assert_eq!(old_r.epochs[0].retained_section_return.as_ref().unwrap().source_reading(),new_r.epochs[0].retained_section_return.as_ref().unwrap().source_reading());
+        assert_eq!(*old_exec.flow_readings.lock().unwrap(),*new_exec.flow_readings.lock().unwrap(),"actual full native returned rows equal");
+        assert!(new_r.epochs[0].reads.iter().all(|r|r.combined.is_none() && r.scored_face.is_none()));
+        for (a,b) in old_r.epochs[0].reads.iter().zip(&new_r.epochs[0].reads) { assert!(a.combined.is_some()); assert_eq!(a.scored_face.as_ref().unwrap(),&b.selected_scored_face.coarse_operands().unwrap());assert_eq!(a.code,b.code);assert_eq!(a.retained_class_return,b.retained_class_return); }
+        let saved=new.resident.continuing_state(0).unwrap();
+        let parsed=ContinuingState::from_text(&saved.to_text(),1<<40).unwrap();
+        let resident=reference.mount_continued(&field,&Current::at_rest(&field),initial,&parsed).unwrap();
+        let crib=ObservedCrib::from_unplaced_checkpoint(&field,resident.current(),10,&new.crib.unplaced_checkpoint().unwrap()).unwrap();
+        let mut cold=ObservedStream::restore_checkpoint(resident,crib,&new.pending_checkpoint()).unwrap();
+        for state in [&mut old,&mut new,&mut cold] { state.receive_with_execution(&reference,&pairing,&data[16..],&new_exec).unwrap(); }
+        assert_eq!(old.resident.continuing_state(0).unwrap(),new.resident.continuing_state(0).unwrap());assert_eq!(cold.resident.continuing_state(0).unwrap(),new.resident.continuing_state(0).unwrap());
+        assert_eq!(old.crib,new.crib);assert_eq!(cold.crib,new.crib);assert_eq!(old.pending_checkpoint(),new.pending_checkpoint());assert_eq!(cold.pending_checkpoint(),new.pending_checkpoint());
+        let mut failed=opening;let before=failed.resident.continuing_state(0).unwrap();let pending=failed.pending_checkpoint();let crib=failed.crib.clone();
+        let mut fault=CountingExecution::new(false);fault.refuse_aggregate_at=Some(2);
+        assert!(matches!(failed.receive_with_execution(&reference,&pairing,&data[..20],&fault),Err(HnnError::CountOverflow)));
+        assert_eq!(failed.resident.continuing_state(0).unwrap(),before);assert_eq!(failed.pending_checkpoint(),pending);assert_eq!(failed.crib,crib);
+        println!("A19_CONNECTED actual_unique_classes30 first16/published10/pending6 host_reference_first_ns={old_ns} lazy_first_ns={new_ns} same_full_native_M_crib_pending=true held_full_flow_equal=true cold_exact=true late_fault_rollback=true diagnostics_explicitly_deferred=true old_forward_return_aggregate={}/{}/{} new_with_cold_and_later_branches={}/{}/{}",old_exec.forwards.load(Ordering::Relaxed),old_exec.returns.load(Ordering::Relaxed),old_exec.flows.load(Ordering::Relaxed),new_exec.forwards.load(Ordering::Relaxed),new_exec.returns.load(Ordering::Relaxed),new_exec.flows.load(Ordering::Relaxed));
     }
 
 }

@@ -74,8 +74,16 @@ impl std::error::Error for ParseReceivingLawError {}
 pub enum SelectedFaceReading {
     Coarse(ScoredFaceReading),
     Retained(RetainedScoredFaceReading),
+    NativeRetained(NativeRetainedScoredFaceReading),
 }
 
+/// Opaque native source-bound retained reading; coarse cells are observed only on demand.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct NativeRetainedScoredFaceReading {
+    population: PortPopulation,
+    tree_probabilities: Vec<Rat>,
+    source: super::single_grain::NativeRetainedRead,
+}
 impl SelectedFaceReading {
     /// An explicitly coarse diagnostic view of the producing operands.
     ///
@@ -84,6 +92,10 @@ impl SelectedFaceReading {
     pub fn coarse_operands(&self) -> Result<ScoredFaceReading, HnnError> {
         match self {
             Self::Coarse(reading) => Ok(reading.clone()),
+            Self::NativeRetained(reading) => {
+                let read = reading.source.coarse()?;
+                Ok(ScoredFaceReading { population: reading.population.clone(), tree_probabilities: reading.tree_probabilities.clone(), combined: Face::of_read(&read, reading.source.grain())? })
+            },
             Self::Retained(reading) => Ok(ScoredFaceReading {
                 population: reading.population.clone(),
                 tree_probabilities: reading.tree_probabilities.clone(),
@@ -91,6 +103,24 @@ impl SelectedFaceReading {
             }),
         }
     }
+    pub(super) fn tree_probabilities(&self) -> Result<&[Rat],HnnError> {
+        match self { Self::Retained(r)=>Ok(&r.tree_probabilities), Self::NativeRetained(r)=>Ok(&r.tree_probabilities), _=>Err(HnnError::Unadmitted { reason: "aligned return has retained producing operands" }) }
+    }
+    pub(super) fn retained_weights_at(&self,bits:u32) -> Result<Vec<ExactInterval>,HnnError> {
+        match self {
+            Self::Retained(r)=>r.receiver.weights_at(&r.read,bits),
+            Self::NativeRetained(r)=>Ok(super::single_grain::ProducedFibreObservation::native_at(&r.source,bits)?.weights().to_vec()),
+            _=>Err(HnnError::Unadmitted { reason: "aligned return has retained producing operands" }),
+        }
+    }
+    pub(super) fn retained_observation(&self, bits:u32) -> Result<super::single_grain::ProducedFibreObservation,HnnError> {
+        match self {
+            Self::Retained(r)=>super::single_grain::ProducedFibreObservation::at(&r.receiver,&r.read,bits),
+            Self::NativeRetained(r)=>super::single_grain::ProducedFibreObservation::native_at(&r.source,bits),
+            _=>Err(HnnError::Unadmitted { reason: "aligned return has retained producing operands" }),
+        }
+    }
+
 }
 
 /// Chronological scores and immutable producing-cut reads from one selected law.
@@ -348,7 +378,8 @@ fn score_retained_producing(
 pub(super) struct ProducedRetainedSection {
     population: PortPopulation,
     ring: usize,
-    combined: Faces,
+    combined: Option<Faces>,
+    waves: Vec<Vec<Rat>>,
     trees: Vec<LandmarkFace>,
     targets: Vec<usize>,
     bits: u32,
@@ -386,13 +417,48 @@ impl ProducedRetainedSection {
         Ok(Self {
             population: population.clone(),
             ring,
-            combined: combined.clone(),
+            combined: Some(combined.clone()),
+            waves: combined.logits.clone(),
             trees: trees.to_vec(),
             targets: targets.to_vec(),
             bits,
             scored,
             observations,
         })
+    }
+    pub(super) fn native_at(population: &PortPopulation, ring:usize, waves:&[Vec<Rat>], trees:&[LandmarkFace], targets:&[usize], bits:u32) -> Result<Self,HnnError> {
+        if bits == 0 || waves.len()!=trees.len() || trees.len()!=targets.len() || trees.is_empty() {
+            return Err(HnnError::Unadmitted { reason: "a native retained section binds one wave/tree/target per station at positive precision" });
+        }
+        #[cfg(test)]
+        super::reuse_work::score();
+        let grain=trees[0].grain;
+        let mut local=population.clone();
+        let mut scored=SelectedScored { law:ReceivingLaw::RetainedFibreV1, producing_population:population.clone(), final_population:population.clone(), model:Vec::new(),tree:Vec::new(),steps:Vec::new(),face_readings:Vec::new() };
+        let mut observations=Vec::new();
+        for ((wave,tree),&target) in waves.iter().zip(trees).zip(targets) {
+            if tree.grain!=grain || target>=tree.probabilities.len() { return Err(HnnError::Unadmitted { reason: "native section target and common receiver grain match actual operands" }); }
+            let source=super::single_grain::NativeRetainedRead::at(wave,tree)?;
+            let observation=super::single_grain::ProducedFibreObservation::native_at(&source,bits)?;
+            let tree_mass=tree.probabilities[target].clone();
+            let log=log2_enclosure_at(&tree_mass,bits)?;
+            scored.tree.push(ExactInterval::new(-log.upper,-log.lower)?);
+            let step=ReceivingStep { ring, tree:tree_mass, combined:observation.masses()[target].clone() };
+            scored.model.push(local.code_of_at(&step.faces(),bits).map_err(super::population_refusal)?);
+            let reading=NativeRetainedScoredFaceReading { population:local.clone(), tree_probabilities:tree.probabilities.clone(), source };
+            local.receive(&step.faces()).map_err(super::population_refusal)?;
+            scored.steps.push(step);
+            scored.face_readings.push(SelectedFaceReading::NativeRetained(reading));
+            observations.push(observation);
+        }
+        scored.final_population=local;
+        Ok(Self { population:population.clone(),ring,combined:None,waves:waves.to_vec(),trees:trees.to_vec(),targets:targets.to_vec(),bits,scored,observations })
+    }
+    pub(super) fn validate_raw(&self,population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usize]) -> Result<(),HnnError> {
+        if self.population!=*population || self.ring!=ring || self.waves!=waves || self.trees!=trees || self.targets!=targets || self.scored.law!=ReceivingLaw::RetainedFibreV1 {
+            return Err(HnnError::Unadmitted { reason: "immutable raw section binds actual population/ring/waves/trees/target order" });
+        }
+        Ok(())
     }
     pub(super) fn validate(
         &self,
@@ -404,7 +470,7 @@ impl ProducedRetainedSection {
     ) -> Result<(), HnnError> {
         if &self.population != population
             || self.ring != ring
-            || &self.combined != combined
+            || self.combined.as_ref() != Some(combined)
             || self.trees != trees
             || self.targets != targets
             || self.scored.law != ReceivingLaw::RetainedFibreV1
@@ -426,12 +492,11 @@ impl ProducedRetainedSection {
             .iter()
             .zip(&self.scored.face_readings)
             .map(|(o, r)| {
-                let SelectedFaceReading::Retained(r) = r else {
-                    return Err(HnnError::Unadmitted {
-                        reason: "private retained producer has retained readings",
-                    });
-                };
-                o.read_at(&r.receiver, &r.read, bits)
+                match r {
+                    SelectedFaceReading::Retained(r) => o.read_at(&r.receiver, &r.read, bits),
+                    SelectedFaceReading::NativeRetained(r) => o.native_read_at(&r.source,bits),
+                    _ => Err(HnnError::Unadmitted { reason: "private retained producer has retained readings" }),
+                }
             })
             .collect()
     }
@@ -455,6 +520,13 @@ pub(crate) fn prepare_retained_section(
         population, ring, combined, trees, targets, &producer,
     )?;
     Ok((producer.scored, returned))
+}
+
+/// Called by the actual native epoch owner, before optional coarse observation.
+pub(crate) fn prepare_native_retained_section(population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usize],bits:u32) -> Result<(SelectedScored,super::RetainedSectionReturn),HnnError> {
+    let producer=ProducedRetainedSection::native_at(population,ring,waves,trees,targets,bits)?;
+    let returned=super::RetainedSectionReturn::at_native_produced(population,ring,waves,trees,targets,&producer)?;
+    Ok((producer.scored,returned))
 }
 
 /// The result of a correlated finite comparison of two whole selected sections.

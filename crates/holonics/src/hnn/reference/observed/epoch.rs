@@ -25,11 +25,11 @@ use rayon::prelude::*;
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ObservedEpochCellReceipt {
     pub prediction: Faces,
-    pub combined: Faces,
+    pub combined: Option<Faces>,
     pub code: ExactInterval,
     pub tree: Option<ExactInterval>,
     /// The actual pre-reception scored face, beside its code of the heard target.
-    pub scored_face: crate::hnn::receiving::cells::ScoredFaceReading,
+    pub scored_face: Option<crate::hnn::receiving::cells::ScoredFaceReading>,
     /// Explicit law and actual producing face; scored_face above remains a coarse diagnostic view.
     pub selected_scored_face: SelectedFaceReading,
     pub receiving_law: ReceivingLaw,
@@ -234,7 +234,7 @@ struct ComparedRead {
     ratio: PendingRatio,
     opening: WordOpening,
     prediction: Faces,
-    combined: Faces,
+    combined: Option<Faces>,
     released: Vec<Rat>,
     deposit: Deposit,
     receiving_parts: Vec<EpochReceivingRecord>,
@@ -965,22 +965,19 @@ impl Reference {
             }
             None => tree.receive_arrivals(&addresses, &classes[..consumed], phases.grain())?,
         };
-        let combined: Vec<_> = forwards
-            .iter()
-            .zip(&trees)
-            .map(|(read, tree)| phases.combine(&read.faces, std::slice::from_ref(tree)))
-            .collect::<Result<_, _>>()?;
-        let all_combined = Faces {
-            faces: combined
-                .iter()
-                .flat_map(|faces| faces.faces.iter().cloned())
-                .collect(),
-            logits: combined
-                .iter()
-                .flat_map(|faces| faces.logits.iter().cloned())
-                .collect(),
-        };
-        let frozen_comparison = EpochComparison {
+        let lazy_retained = local_receiving && execution.reuse_receiving_observations();
+        let raw_waves: Vec<Vec<Rat>> = forwards.iter().map(|read| {
+            if read.faces.logits.len()!=1 { return Err(refusal("one actual native wave belongs to each aperture-one station")); }
+            Ok(read.faces.logits[0].clone())
+        }).collect::<Result<_,HnnError>>()?;
+        let combined: Vec<Option<Faces>> = forwards.iter().zip(&trees).map(|(read,tree)| {
+            if lazy_retained { Ok(None) } else { phases.combine(&read.faces,std::slice::from_ref(tree)).map(Some) }
+        }).collect::<Result<_,HnnError>>()?;
+        let all_combined = if lazy_retained { None } else { Some(Faces {
+            faces:combined.iter().filter_map(Option::as_ref).flat_map(|f| f.faces.iter().cloned()).collect(),
+            logits:raw_waves.clone(),
+        }) };
+        let frozen_comparison = all_combined.as_ref().map(|all_combined| -> Result<_,HnnError> { Ok(EpochComparison {
             law: resident.receiving_law(),
             combined: all_combined.clone(),
             trees: trees.clone(),
@@ -997,16 +994,16 @@ impl Reference {
                     )
                 })
                 .collect::<Result<_, HnnError>>()?,
-        };
+        }) }).transpose()?;
         let population = next
             .constitution
             .population(receiver)
             .ok_or(HnnError::MissingReceivingMap { ring: receiver })?;
-        let prepared = if local_receiving && execution.reuse_receiving_observations() {
-            Some(crate::hnn::receiving::prepare_retained_section(
+        let prepared = if lazy_retained {
+            Some(crate::hnn::receiving::prepare_native_retained_section(
                 population,
                 receiver,
-                &all_combined,
+                &raw_waves,
                 &trees,
                 &classes[..consumed],
                 crate::ratio::exponentiated::READING_BITS,
@@ -1021,7 +1018,7 @@ impl Reference {
             let old = crate::hnn::receiving::score(
                 population,
                 receiver,
-                &all_combined,
+                all_combined.as_ref().ok_or_else(|| refusal("uncached scorer retains its genuine coarse source view"))?,
                 &trees,
                 &classes[..consumed],
             )?;
@@ -1049,7 +1046,7 @@ impl Reference {
                 resident.receiving_law(),
                 population,
                 receiver,
-                &all_combined,
+                all_combined.as_ref().ok_or_else(|| refusal("uncached scorer retains its genuine coarse source view"))?,
                 &trees,
                 &classes[..consumed],
                 crate::ratio::exponentiated::READING_BITS,
@@ -1061,25 +1058,15 @@ impl Reference {
             Some(RetainedSectionReturn::at(
                 population,
                 receiver,
-                &all_combined,
+                all_combined.as_ref().ok_or_else(|| refusal("uncached scorer retains its genuine coarse source view"))?,
                 &trees,
                 &classes[..consumed],
             )?)
         } else {
             None
         };
-        let retained_origin = retained_return
-            .as_ref()
-            .map(|r| {
-                r.certificate_origin(
-                    population,
-                    receiver,
-                    &all_combined,
-                    &trees,
-                    &classes[..consumed],
-                )
-            })
-            .transpose()?;
+        let retained_origin = retained_return.as_ref().map(|r| r.certificate_origin_raw(
+            population,receiver,&raw_waves,&trees,&classes[..consumed])).transpose()?;
         let mut deposits = Vec::with_capacity(consumed);
         let mut receiving_parts = Vec::with_capacity(consumed);
         let mut source_operands = Vec::with_capacity(consumed);
@@ -1101,14 +1088,19 @@ impl Reference {
                 let face_start = Instant::now();
                 let target = actual.part(at..at + 1)?;
                 let anchors = target_phases(&field, read.ratio.anchor(), receiver, &target)?;
-                let holon = HolonRatio::compare(combined.clone(), &[classes[at]], &anchors)?;
-                let (covector, released, masses) = if let Some(section) = &retained_return {
-                    let returned = &section.stations[at];
-                    (holon.with_aligned_class_return(returned)?, vec![vec![Rat::zero(); returned.gradient.len()]],
-                        returned.normalized_representative.clone())
+                let (covector,released,masses) = if lazy_retained {
+                    let section=retained_return.as_ref().ok_or_else(|| refusal("lazy native return keeps its actual retained section"))?;
+                    let returned=&section.stations[at];
+                    (HolonRatio::retained_aperture_return(&raw_waves[at],&anchors,returned)?,vec![vec![Rat::zero();returned.gradient.len()]],returned.normalized_representative.clone())
                 } else {
-                    let (covector,released)=holon.epoch_covector(exponent)?;
-                    (covector,released,holon.faces().faces[0].odometer_masses()?)
+                    let holon=HolonRatio::compare(combined.clone().ok_or_else(|| refusal("coarse comparison has a genuine observed face"))?,&[classes[at]],&anchors)?;
+                    if let Some(section)=&retained_return {
+                        let returned=&section.stations[at];
+                        (holon.with_aligned_class_return(returned)?,vec![vec![Rat::zero();returned.gradient.len()]],returned.normalized_representative.clone())
+                    } else {
+                        let (covector,released)=holon.epoch_covector(exponent)?;
+                        (covector,released,holon.faces().faces[0].odometer_masses()?)
+                    }
                 };
                 // These three series are defined at the receiving comparison itself. There is
                 // one retained RHS upstream; no return is split or partitioned a second time.
@@ -1285,7 +1277,7 @@ impl Reference {
                 combined: read.combined,
                 code: scored.model[at].clone(),
                 tree: Some(scored.tree[at].clone()),
-                scored_face: scored.face_readings[at].coarse_operands()?,
+                scored_face: if lazy_retained { None } else { Some(scored.face_readings[at].coarse_operands()?) },
                 selected_scored_face: scored.face_readings[at].clone(),
                 receiving_law: resident.receiving_law(),
                 retained_class_return: retained_return.as_ref().map(|r| r.stations[at].clone()),
@@ -1551,6 +1543,7 @@ impl Reference {
                 if !held_ck {
                     probe_subphases.push((attempt, "tree_schedule", tree_start.elapsed()));
                 }
+                let frozen_comparison=frozen_comparison.as_ref().ok_or_else(|| refusal("unrequested local finite comparison has no forged coarse operands"))?;
                 let combine_start = Instant::now();
                 let mut combined = Faces {
                     faces: Vec::new(),
@@ -3474,7 +3467,7 @@ mod tests {
         );
         for (actual, (wave, combined, code, tree)) in receipt.reads.iter().zip(expected) {
             assert_eq!(actual.prediction, wave);
-            assert_eq!(actual.combined, combined);
+            assert_eq!(actual.combined, Some(combined));
             assert_eq!(actual.code, code);
             assert_eq!(actual.tree, Some(tree));
             assert!(
@@ -3516,8 +3509,8 @@ mod tests {
             .unwrap();
         let decision = &sampled.cells[0];
         let heard_face = &receipt.reads[1].scored_face;
-        assert_eq!(decision.scored_face.as_ref(), Some(heard_face));
-        assert_eq!(decision.face, heard_face.masses_at(decision.bits).unwrap());
+        assert_eq!(decision.scored_face.as_ref(), heard_face.as_ref());
+        assert_eq!(decision.face, heard_face.as_ref().unwrap().masses_at(decision.bits).unwrap());
         assert_eq!(keys.keys_read(), 1);
         assert_eq!(resident.observed_epoch_ingress, Some((phases.ring(), 1)));
         // The resident's first-law comparison remains the final cell; the exterior series above
@@ -5243,7 +5236,7 @@ mod tests {
             first
                 .reads
                 .iter()
-                .all(|r| matches!(r.selected_scored_face, SelectedFaceReading::Retained(_)))
+                .all(|r| matches!(r.selected_scored_face, SelectedFaceReading::Retained(_) | SelectedFaceReading::NativeRetained(_)))
         );
         let actual = match first.publication_attempt {
             EpochStageAttempt::Whole => first.comparison.as_ref(),

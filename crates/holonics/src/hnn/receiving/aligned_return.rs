@@ -55,7 +55,8 @@ pub struct RetainedSectionReturn {
 pub(crate) struct RetainedSectionOrigin {
     pub(crate) population: PortPopulation,
     pub(crate) ring: usize,
-    pub(crate) combined: Faces,
+    pub(crate) combined: Option<Faces>,
+    pub(crate) waves: Vec<Vec<Rat>>,
     pub(crate) trees: Vec<LandmarkFace>,
     pub(crate) targets: Vec<usize>,
     pub(crate) rho: ExactInterval,
@@ -92,7 +93,7 @@ impl RetainedSectionOrigin {
         RetainedSectionSourceReading {
             population: self.population.clone(),
             ring: self.ring,
-            waves: self.combined.logits.clone(),
+            waves: self.waves.clone(),
             trees: self.trees.clone(),
             targets: self.targets.clone(),
             rho: self.rho.clone(),
@@ -181,6 +182,8 @@ fn true_foil_bounds(
 }
 
 impl RetainedSectionReturn {
+    #[cfg(test)]
+    pub(crate) fn source_reading(&self) -> RetainedSectionSourceReading { self.origin.reading() }
     pub(crate) fn certificate_origin(
         &self,
         population: &PortPopulation,
@@ -192,7 +195,8 @@ impl RetainedSectionReturn {
         let o = &self.origin;
         if &o.population != population
             || o.ring != ring
-            || &o.combined != combined
+            || o.combined.as_ref() != Some(combined)
+            || o.waves != combined.logits
             || o.trees != trees
             || o.targets != targets
             || o.rho != self.rho
@@ -215,7 +219,7 @@ impl RetainedSectionReturn {
         trees: &[LandmarkFace],
         targets: &[usize],
     ) -> Result<Self, HnnError> {
-        Self::at_using(population, ring, combined, trees, targets, None)
+        Self::at_using(population, ring, Some(combined), &combined.logits, trees, targets, None)
     }
     pub(super) fn at_produced(
         population: &PortPopulation,
@@ -226,12 +230,24 @@ impl RetainedSectionReturn {
         producer: &super::selected::ProducedRetainedSection,
     ) -> Result<Self, HnnError> {
         producer.validate(population, ring, combined, trees, targets)?;
-        Self::at_using(population, ring, combined, trees, targets, Some(producer))
+        Self::at_using(population, ring, Some(combined), &combined.logits, trees, targets, Some(producer))
+    }
+    pub(crate) fn certificate_origin_raw(&self,population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usize]) -> Result<std::sync::Arc<RetainedSectionOrigin>,HnnError> {
+        let o=&self.origin;
+        if &o.population!=population || o.ring!=ring || o.waves!=waves || o.trees!=trees || o.targets!=targets || o.rho!=self.rho || o.beta!=self.beta || o.stations!=self.stations || o.bits!=self.reading_bits {
+            return Err(fail("retained certificate binds immutable raw source/target/population/return"));
+        }
+        Ok(std::sync::Arc::clone(o))
+    }
+    pub(super) fn at_native_produced(population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usize],producer:&super::selected::ProducedRetainedSection) -> Result<Self,HnnError> {
+        producer.validate_raw(population,ring,waves,trees,targets)?;
+        Self::at_using(population,ring,None,waves,trees,targets,Some(producer))
     }
     fn at_using(
         population: &PortPopulation,
         ring: usize,
-        combined: &Faces,
+        combined: Option<&Faces>,
+        waves: &[Vec<Rat>],
         trees: &[LandmarkFace],
         targets: &[usize],
         producer: Option<&super::selected::ProducedRetainedSection>,
@@ -253,7 +269,7 @@ impl RetainedSectionReturn {
                         ReceivingLaw::RetainedFibreV1,
                         population,
                         ring,
-                        combined,
+                        combined.ok_or_else(|| fail("uncached retained scoring has genuine coarse operands"))?,
                         trees,
                         targets,
                         bits,
@@ -274,20 +290,16 @@ impl RetainedSectionReturn {
             let mut r_lo = Rat::one();
             let mut r_hi = Rat::one();
             for (at, reading) in scored.face_readings.iter().enumerate() {
-                let SelectedFaceReading::Retained(reading) = reading else {
-                    return Err(fail(
-                        "an aligned section retains its selected receiving law",
-                    ));
-                };
+
                 let masses = match &observations {
                     Some(rows) => rows[at].masses().to_vec(),
                     None => {
                         station_mass_evaluations += 1;
-                        reading.combined_masses_at(bits)?
+                        reading.retained_observation(bits)?.masses().to_vec()
                     }
                 };
                 let target = targets[at];
-                q *= &reading.tree_probabilities[target];
+                q *= &reading.tree_probabilities()?[target];
                 r_lo *= &masses[target].lower;
                 r_hi *= &masses[target].upper;
                 reads.push((reading, masses));
@@ -314,7 +326,7 @@ impl RetainedSectionReturn {
                     Some(rows) => rows[at].weights().to_vec(),
                     None => {
                         station_weight_evaluations += 1;
-                        reading.receiver.weights_at(&reading.read, bits)?
+                        reading.retained_weights_at(bits)?
                     }
                 };
                 let representatives: Vec<_> = weights
@@ -387,7 +399,8 @@ impl RetainedSectionReturn {
                 let origin = std::sync::Arc::new(RetainedSectionOrigin {
                     population: population.clone(),
                     ring,
-                    combined: combined.clone(),
+                    combined: combined.cloned(),
+                    waves: waves.to_vec(),
                     trees: trees.to_vec(),
                     targets: targets.to_vec(),
                     rho: rho.clone(),

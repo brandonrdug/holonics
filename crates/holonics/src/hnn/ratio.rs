@@ -136,6 +136,8 @@ pub struct Face {
 impl Face {
     /// The face of one receiving read at grain `L_R`.
     pub fn of_read(read: &ReceivingRead, grain: u64) -> Result<Self, HnnError> {
+        #[cfg(test)]
+        crate::hnn::receiving::reuse_work::view(false);
         if read.cells.is_empty() {
             return Err(HnnError::Shape {
                 what: "a face over at least one class",
@@ -285,6 +287,8 @@ impl Face {
     /// **The odometer masses** `p̃_c = 2^(n_c)(L + k_c) / Σ_d 2^(n_d)(L + k_d)`: the covector's
     /// rational chart of the face (module header). They sum to one exactly.
     pub fn odometer_masses(&self) -> Result<Vec<Rat>, HnnError> {
+        #[cfg(test)]
+        crate::hnn::receiving::reuse_work::view(true);
         let weights: Vec<Rat> = (0..self.cells.len())
             .map(|class| Ok(self.carried(class)?.odometer()?))
             .collect::<Result<_, HnnError>>()?;
@@ -601,6 +605,23 @@ impl HolonRatio {
             covector.logits[station][2 * ratio.target + 1] = -ratio.gap.turns() / integer(2);
         }
         Ok((covector, released))
+    }
+
+    /// Same original-lift phase covector, without an unrequested grain/code observation.
+    /// Only the native section owner supplies this raw wave and its already-bound class return.
+    pub(crate) fn retained_aperture_return(wave:&[Rat], target_phases:&TargetPhases, station:&crate::hnn::receiving::RetainedStationReturn) -> Result<RatioCovector,HnnError> {
+        if wave.len()!=2*station.gradient.len() || station.target>=station.gradient.len()
+            || target_phases.phases.len()!=1 || station.gradient.iter().cloned().sum::<Rat>()!=Rat::zero() {
+            return Err(HnnError::Unadmitted { reason: "retained aperture phase/class return matches actual source and original target lift" });
+        }
+        let produced_phase=&wave[2*station.target+1]/integer(2);
+        let gap=&target_phases.phases[0]-produced_phase;
+        // Reading retains the same complete signed turn; no residue/centre selection.
+        let gap=Reading::of_turns(&gap);
+        let mut logits=vec![Rat::zero();wave.len()];
+        for (c,g) in station.gradient.iter().enumerate() { logits[2*c]=g.clone(); }
+        logits[2*station.target+1]=-gap.turns()/integer(2);
+        Ok(RatioCovector { logits:vec![logits] })
     }
 
     /// Install the admitted rational class return at this actual aperture-one comparison.

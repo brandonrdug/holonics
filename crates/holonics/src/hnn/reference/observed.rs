@@ -1269,12 +1269,12 @@ mod released_prefix_tests {
         for (index, (decision, heard)) in decisions.iter().zip(&receipt.reads).enumerate() {
             assert_eq!(
                 decision.scored_face.as_ref(),
-                Some(&heard.scored_face),
+                heard.scored_face.as_ref(),
                 "conditional prefix {index}"
             );
             assert_eq!(
                 decision.face,
-                heard.scored_face.masses_at(decision.bits).unwrap()
+                heard.scored_face.as_ref().unwrap().masses_at(decision.bits).unwrap()
             );
             let (_, prefix, _) = receipt
                 .prefixes

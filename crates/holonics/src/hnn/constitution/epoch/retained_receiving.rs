@@ -338,7 +338,7 @@ pub(super) fn failure_packet(
         let (bits, items) = o.population.diagnostic_extent()?;
         extent.add(bits, items)?;
         extent.items(16)?;
-        for wave in &o.combined.logits {
+        for wave in &o.waves {
             extent.rats(wave)?;
         }
         for tree in &o.trees {

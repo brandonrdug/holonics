@@ -142,6 +142,9 @@ impl ReceivingCell {
 }
 
 fn read_cell(probability: &Rat, wave: &Rat, grain: u64) -> Result<ReceivingCell, HnnError> {
+    #[cfg(test)]
+    super::reuse_work::canonical_cell();
+
     let scale = Rat::from_integer(BigInt::from(grain));
     let mut bits = crate::ratio::exponentiated::READING_BITS;
     loop {
@@ -272,20 +275,7 @@ impl RetainedFibreReceiver {
         }
         let top = top.expect("nonempty class shape checked above");
 
-        let mut weights = Vec::with_capacity(classes);
-        for (coefficient, exponent) in terms {
-            let shifted = exponent - Rat::from_integer(top.clone());
-            let power = rational_power_enclosure(&shifted, bits)?;
-            let lower = coefficient.clone() * power.lower;
-            let upper = coefficient * power.upper;
-            if lower < Rat::zero() || upper <= Rat::zero() {
-                return Err(HnnError::Unadmitted {
-                    reason: "a retained-fibre weight enclosure is not positive",
-                });
-            }
-            weights.push(ExactInterval::new(lower, upper)?);
-        }
-        Ok(weights)
+        weights_from_terms(terms, top, bits)
     }
 
     /// The normalized class masses read from the complete retained fibre identities.
@@ -300,11 +290,69 @@ impl RetainedFibreReceiver {
     }
 }
 
+// Shared exact positive-weight algorithm. Both authentic source owners use this gauge/order.
+fn weights_from_terms(terms: Vec<(Rat, Rat)>, top: BigInt, bits: u32) -> Result<Vec<ExactInterval>, HnnError> {
+    let mut weights = Vec::with_capacity(terms.len());
+        for (coefficient, exponent) in terms {
+            let shifted = exponent - Rat::from_integer(top.clone());
+            let power = rational_power_enclosure(&shifted, bits)?;
+            let lower = coefficient.clone() * power.lower;
+            let upper = coefficient * power.upper;
+            if lower < Rat::zero() || upper <= Rat::zero() {
+                return Err(HnnError::Unadmitted {
+                    reason: "a retained-fibre weight enclosure is not positive",
+                });
+            }
+            weights.push(ExactInterval::new(lower, upper)?);
+        }
+        Ok(weights)
+}
+
+/// Immutable raw native operands; no public constructor, no caller-supplied enclosure.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(super) struct NativeRetainedRead {
+    wave: Vec<Rat>,
+    tree: LandmarkFace,
+}
+impl NativeRetainedRead {
+    pub(super) fn at(wave: &[Rat], tree: &LandmarkFace) -> Result<Self, HnnError> {
+        if tree.grain == 0 || tree.probabilities.is_empty()
+            || tree.exponents.len() != tree.probabilities.len()
+            || wave.len() != 2 * tree.probabilities.len()
+            || tree.probabilities.iter().any(|q| q <= &Rat::zero())
+            || tree.probabilities.iter().cloned().sum::<Rat>() != Rat::one() {
+            return Err(HnnError::Unadmitted { reason: "native retained producer has matching positive normalized tree/wave/grain" });
+        }
+        Ok(Self { wave: wave.to_vec(), tree: tree.clone() })
+    }
+    pub(super) fn grain(&self) -> u64 { self.tree.grain }
+    pub(super) fn coarse(&self) -> Result<ReceivingRead, HnnError> {
+        ReceivingRead::combined(self.wave.clone(), &self.tree, self.tree.grain)
+    }
+    fn weights_at(&self, bits: u32) -> Result<Vec<ExactInterval>, HnnError> {
+        #[cfg(test)]
+        super::reuse_work::weight();
+        if bits == 0 { return Err(HnnError::Unadmitted { reason: "a retained-fibre mass read needs positive enclosure precision" }); }
+        let terms: Vec<_> = self.tree.probabilities.iter().enumerate()
+            .map(|(c,q)| {
+                let n=q.numer().bits();let d=q.denom().bits();
+                if n>0 && d>0 && (BigInt::one() << (n-1) as usize)==*q.numer() && (BigInt::one() << (d-1) as usize)==*q.denom() {
+                    (Rat::one(), &self.wave[2*c]+Rat::from_integer(BigInt::from(n)-BigInt::from(d)))
+                } else { (q.clone(),self.wave[2*c].clone()) }
+            }).collect();
+        let top = terms.iter().map(|(_,w)| w.floor().to_integer()).max()
+            .ok_or(HnnError::Unadmitted { reason: "native retained producer has a nonempty class partition" })?;
+        weights_from_terms(terms,top,bits)
+    }
+}
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum FibreSource { Canonical(ReceivingRead), Native(NativeRetainedRead) }
+
 /// One finite observation produced ONLY by this receiver's authenticating weight owner.
 /// It caches combined r(q,w), never the population mixture or a symbolic exact value.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(super) struct ProducedFibreObservation {
-    source: ReceivingRead,
+    source: FibreSource,
     receiver: RetainedFibreReceiver,
     bits: u32,
     weights: Vec<ExactInterval>,
@@ -319,7 +367,7 @@ impl ProducedFibreObservation {
         let weights = receiver.weights_at(source, bits)?;
         let masses = normalize_weights(&weights)?;
         Ok(Self {
-            source: source.clone(),
+            source: FibreSource::Canonical(source.clone()),
             receiver: receiver.clone(),
             bits,
             weights,
@@ -332,7 +380,7 @@ impl ProducedFibreObservation {
         source: &ReceivingRead,
         bits: u32,
     ) -> Result<Self, HnnError> {
-        if receiver != &self.receiver || source != &self.source {
+        if receiver != &self.receiver || self.source != FibreSource::Canonical(source.clone()) {
             return Err(HnnError::Unadmitted {
                 reason: "immutable receiving observation source/receiver mismatch",
             });
@@ -342,6 +390,15 @@ impl ProducedFibreObservation {
         } else {
             Self::at(receiver, source, bits)
         }
+    }
+    pub(super) fn native_at(source: &NativeRetainedRead, bits: u32) -> Result<Self,HnnError> {
+        let weights = source.weights_at(bits)?;
+        let masses = normalize_weights(&weights)?;
+        Ok(Self { source: FibreSource::Native(source.clone()), receiver: RetainedFibreReceiver::declare(source.tree.grain)?, bits, weights, masses })
+    }
+    pub(super) fn native_read_at(&self, source: &NativeRetainedRead, bits: u32) -> Result<Self,HnnError> {
+        if self.source != FibreSource::Native(source.clone()) { return Err(HnnError::Unadmitted { reason: "immutable native receiving source mismatch" }); }
+        if bits == self.bits { Ok(self.clone()) } else { Self::native_at(source,bits) }
     }
     pub(super) fn masses(&self) -> &[ExactInterval] {
         &self.masses

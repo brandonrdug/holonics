@@ -3,7 +3,9 @@ use super::*;
 use crate::compression::landmark::context::LandmarkFace;
 use crate::ratio::{integer, rat};
 use std::time::Instant;
-std::thread_local! {
+std::thread_local! { static CANONICAL_CELLS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) }; }
+pub(super) fn canonical_cell() { CANONICAL_CELLS.with(|c| c.set(c.get()+1)); }
+thread_local! {
     static COUNTS: std::cell::Cell<[u64;3]> = const { std::cell::Cell::new([0;3]) };
 }
 fn note(at: usize) {
@@ -24,6 +26,8 @@ pub(super) fn weight() {
 }
 pub(crate) fn reset() {
     COUNTS.with(|c| c.set([0; 3]));
+    CANONICAL_CELLS.with(|c| c.set(0));
+    VIEWS.with(|c| c.set([0;2]));
     crate::ratio::algebraic::LOG2_OBSERVATION_CALLS.with(|c| c.set(0));
 }
 pub(crate) fn counts() -> [u64; 4] {
@@ -236,4 +240,55 @@ fn producer_reuse_exact_identity_refinement_chronology_and_measured_work() {
     println!(
         "V93_IMMUTABLE_OBSERVATION_REUSE score_mass_weight_log_old={old_counts:?} score_mass_weight_log_new={new_counts:?} uncached_ns={old_times:?} reused_ns={new_times:?} reused_max_below_uncached_min={beyond_spread} samples=5 stations=8 source_cells=8 counter_scope=current_test_thread producer32_return64_exact=true concurrent_counter_isolation=true predictive_gain_claim=false ordinary_producer_reuse=true full_return_error_and_foil_equal=true"
     );
+}
+
+thread_local! { static VIEWS: std::cell::Cell<[u64;2]> = const { std::cell::Cell::new([0;2]) }; }
+pub(crate) fn view(odometer:bool) { VIEWS.with(|c| {let mut n=c.get();n[usize::from(odometer)]+=1;c.set(n);}); }
+pub(crate) fn lazy_counts() -> [u64;3] { let v=VIEWS.with(|c|c.get()); [CANONICAL_CELLS.with(|c|c.get()),v[0],v[1]] }
+
+#[test]
+fn lazy_native_return_preserves_exact_source_phase_refinement_and_counts() {
+    let (population,mut faces,trees,targets)=operands();
+    // Nonzero original-lift phase, both binary-power and nonpower q in each station.
+    for (j,w) in faces.logits.iter_mut().enumerate() { for c in 0..4 { w[2*c+1]=rat((j+c+1) as i64,64); } }
+    let reads=faces.logits.iter().zip(&trees).map(|(w,t)|ReceivingRead::combined(w.clone(),t,t.grain).unwrap()).collect::<Vec<_>>();
+    faces=Faces::of_reads(&reads,4).unwrap();
+    let mut old_ns=Vec::new();let mut new_ns=Vec::new();let mut old_ops=Vec::new();let mut new_ops=Vec::new();
+    for _ in 0..5 {
+        reset();let started=Instant::now();
+        let old_score=score_at_law(ReceivingLaw::RetainedFibreV1,&population,2,&faces,&trees,&targets,64).unwrap();
+        let old=RetainedSectionReturn::at(&population,2,&faces,&trees,&targets).unwrap();
+        old_ns.push(started.elapsed().as_nanos());old_ops.push((counts(),lazy_counts()));
+        reset();let started=Instant::now();
+        let (new_score,new)=prepare_native_retained_section(&population,2,&faces.logits,&trees,&targets,64).unwrap();
+        new_ns.push(started.elapsed().as_nanos());new_ops.push((counts(),lazy_counts()));
+        assert_eq!(old.source_reading(),new.source_reading());
+        assert_eq!(old.beta_representative,new.beta_representative);assert_eq!(old.norm_squared,new.norm_squared);assert_eq!(old.error_pairing,new.error_pairing);assert_eq!(old.exact_zero,new.exact_zero);
+        assert_eq!(old_score.model,new_score.model);assert_eq!(old_score.tree,new_score.tree);assert_eq!(old_score.steps,new_score.steps);assert_eq!(old_score.final_population,new_score.final_population);
+        for (j,((old_read,new_read),station)) in old_score.face_readings.iter().zip(&new_score.face_readings).zip(&new.stations).enumerate() {
+            let targets=crate::hnn::ratio::TargetPhases { branch:(-3).into(), phases:vec![rat((j+1) as i64,3)] };
+            let old_phase=crate::hnn::ratio::HolonRatio::compare(Faces { faces:vec![faces.faces[j].clone()],logits:vec![faces.logits[j].clone()] },&[station.target],&targets).unwrap();
+            assert_eq!(old_phase.with_aligned_class_return(station).unwrap(),crate::hnn::ratio::HolonRatio::retained_aperture_return(&faces.logits[j],&targets,station).unwrap());
+            // A real demanded coarse view is observed, never a fabricated placeholder.
+            assert_eq!(old_read.coarse_operands().unwrap(),new_read.coarse_operands().unwrap());
+        }
+        assert!(lazy_counts()[0]>0,"demanding a genuine coarse view invokes canonical owner");
+    }
+    assert!(new_ops.iter().all(|(c,l)|c[0]==1 && c[1]==8 && c[2]==8 && *l==[0;3]));
+    assert!(old_ops.iter().zip(&new_ops).all(|((a,l),(b,_))|a[3]>b[3] && l[0]>0));
+    let (old32,_)=prepare_retained_section(&population,2,&faces,&trees,&targets,32).unwrap();
+    let (new32,new_return)=prepare_native_retained_section(&population,2,&faces.logits,&trees,&targets,32).unwrap();
+    assert_eq!(old32.model,new32.model);assert_eq!(old32.steps,new32.steps);
+    let old_return=RetainedSectionReturn::at(&population,2,&faces,&trees,&targets).unwrap();
+    assert_eq!(old_return.source_reading(),new_return.source_reading());
+    let producer=selected::ProducedRetainedSection::native_at(&population,2,&faces.logits,&trees,&targets,32).unwrap();
+    let mut wave=faces.logits.clone();wave[0][1]+=rat(1,16);
+    assert!(producer.validate_raw(&population,2,&wave,&trees,&targets).is_err());
+    let mut wrong=targets.clone();wrong.swap(0,1);assert!(producer.validate_raw(&population,2,&faces.logits,&trees,&wrong).is_err());
+    assert!(producer.validate_raw(&population,1,&faces.logits,&trees,&targets).is_err());
+    let mut q=trees.clone();q[0].grain+=1;assert!(producer.validate_raw(&population,2,&faces.logits,&q,&targets).is_err());
+    let mut pop=population.clone();pop.receive(&old32.steps[0].faces()).unwrap();assert!(producer.validate_raw(&pop,2,&faces.logits,&trees,&targets).is_err());
+    let refined=producer.observations_at(128).unwrap();
+    for (j,r) in refined.iter().enumerate() {assert_eq!(r.masses(),old32.face_readings[j].retained_observation(128).unwrap().masses());}
+    println!("A19_LAZY_SOURCE old_ns={old_ns:?} new_ns={new_ns:?} old_score_mass_weight_log_and_cell_face_odometer={old_ops:?} new_score_mass_weight_log_and_cell_face_odometer={new_ops:?} new_max_below_old_min={} semantic_full_source_return_phase_foil_error=true coarse_demand_real=true precision32_return64_refine128=true invalidation=true",new_ns.iter().max()<old_ns.iter().min());
 }

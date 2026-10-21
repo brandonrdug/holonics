@@ -155,7 +155,7 @@ pub use single_grain::{LogarithmicFibre, ReceivingCell, ReceivingFibre, Retained
 mod comparison_score;
 pub use comparison_score::{ComparedScoresAt, compare_scores_at};
 mod selected;
-pub(crate) use selected::prepare_retained_section;
+pub(crate) use selected::{prepare_retained_section, prepare_native_retained_section};
 pub use selected::{
     ReceivingLaw, SelectedComparedScoresAt, SelectedFaceReading, SelectedScored,
     compare_scores_at_law, score_at_law,

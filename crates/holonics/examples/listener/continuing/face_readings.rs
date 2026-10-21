@@ -108,7 +108,7 @@ pub(super) fn report(
             None
         };
         let equality = heard
-            .map(|h| correspondence(decision, &h.scored_face))
+            .and_then(|h| h.scored_face.as_ref()).map(|h| correspondence(decision, h))
             .transpose()?;
         let sampled_expression_matches = decision
             .scored_face
@@ -129,12 +129,12 @@ pub(super) fn report(
             masses_text(&decision.face),
             decision.scored_face,
         ));
-        if let Some(heard) = heard {
+        if let Some(heard) = heard.and_then(|h| h.scored_face.as_ref()) {
             emit(format!(
                 "observed_heard_face section={section} reference_index={index} delivered={} comparison_context_same_prefix={same_prefix} all_mass_at_draw_bits=[{}] scored_operands={:?}",
                 source_cut + index + 1,
-                masses_text(&heard.scored_face.masses_at(decision.bits)?),
-                heard.scored_face,
+                masses_text(&heard.masses_at(decision.bits)?),
+                heard,
             ));
         }
     }
