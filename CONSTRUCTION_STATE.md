@@ -364,3 +364,7 @@ The reusable hearing, carry-word and scale-zeta laws live in `Foundation/Fractal
 `Aeon/Clock/CarryWord`, `Aeon/Production/Zeta`, `Holarchy/Hearing` and the Swing owners.
 [Record](research/records/2026-09-25_THE_MUSIC_IS_IN_THE_HOLES_HEARING_MULTIPLIES_BY_ZETA_AND_A_QUASICRYSTAL_IS_A_HELIX_THAT_NEVER_LOCKS.md).
 `Holonics.Framework.Objects` and the [expression atlas](docs/atlas/README.md) locate their owners.
+
+## Isolated native-current repair, 2026-10-21
+
+The a28 descendant has a private native-current F producer, source-bound paired contact/error witness and a versioned fresh90-feature lagged-context consumer. This is partial host CODE work, not a qualified model path. Native R section publication, card chart/propagation witness, full model-law dispatch and integrated cold continuity remain unjoined. See [the exact status](research/records/2026-10-21_NATIVE_CURRENT_PREDICTION_AND_PAIRED_CONTACT_REMAIN_A_PARTIAL_JOIN.md); prior campaign evidence is preserved and no new training has run.

@@ -151,6 +151,7 @@ use std::ops::Range;
 
 pub mod cells;
 mod single_grain;
+pub(crate) mod native_current;
 pub use single_grain::{LogarithmicFibre, ReceivingCell, ReceivingFibre, RetainedFibreReceiver};
 mod comparison_score;
 pub use comparison_score::{ComparedScoresAt, compare_scores_at};
@@ -161,6 +162,7 @@ pub use selected::{
     compare_scores_at_law, score_at_law,
 };
 mod aligned_return;
+pub(crate) use aligned_return::pack_simplex;
 #[cfg(test)]
 pub(crate) mod reuse_work;
 pub(crate) use aligned_return::RetainedSectionOrigin;

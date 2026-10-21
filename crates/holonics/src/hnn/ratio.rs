@@ -838,6 +838,17 @@ impl ReceivingFaceRatio {
 pub struct RatioCovector {
     logits: Vec<Vec<Rat>>,
 }
+impl RatioCovector {
+    pub(crate) fn native_current(waves:&[Vec<Rat>],phases:&TargetPhases,stations:&[crate::hnn::receiving::RetainedStationReturn])->Result<Self,HnnError>{
+        if waves.len()!=stations.len() || phases.phases.len()!=stations.len(){return Err(HnnError::Unadmitted{reason:"native class/phase return shares its complete producing section"});}
+        let mut logits=Vec::new();
+        for (j,(w,s)) in waves.iter().zip(stations).enumerate(){
+            let p=TargetPhases{branch:phases.branch.clone(),phases:vec![phases.phases[j].clone()]};
+            logits.extend(HolonRatio::retained_aperture_return(w,&p,s)?.logits);
+        }
+        Ok(Self{logits})
+    }
+}
 
 impl RatioCovector {
     /// The gradient on the logits at each receiving phase.

@@ -34,7 +34,9 @@ impl ContextualBounds {
             || self.rational_bits < 64
             || self.rational_bits > 4096
             || self.max_features == 0
-            || self.max_features > 64
+            // The explicitly declared six-coordinate native chart is 12+6+6*12=90.
+            // Existing wave/scalar callers keep their declared limits and work/range bounds.
+            || self.max_features > 90
         {
             return Err(refusal(
                 "finite contextual branch/pending/precision/range declarations",

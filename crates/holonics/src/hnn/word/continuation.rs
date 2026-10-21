@@ -72,6 +72,7 @@ use crate::receiver::reception::{Component, InteractionReturn};
 /// Only a native source-opened word's actual return issues one. No public state constructor.
 #[derive(Debug)]
 pub struct ContactCut {
+    native_prediction: Option<super::native_prediction::NativeContactWitness>,
     field: Field,
     producing: Constitution,
     current: Current,
@@ -516,6 +517,7 @@ impl<'c> Word<'c> {
                 reading.join(&Remainders::of(resonance.remainders.all()))
             });
         Ok(ContactCut {
+            native_prediction: None,
             released,
             deposit: None,
             opening: self.opened_on.clone(),
@@ -561,6 +563,70 @@ impl<'c> Word<'c> {
 }
 
 impl ContactCut {
+    pub(super) fn publish_native_comparison(
+        mut self,
+        prediction:super::native_prediction::NativePredictionReading,
+        stations:&[crate::hnn::receiving::RetainedStationReturn],
+        back:&WordReturn,
+        phases:&ReceivingPhases,
+        covector:&crate::hnn::ratio::RatioCovector,
+        charts:&mut Charts,
+    )->Result<super::native_prediction::NativeContactPublication,HnnError>{
+        if prediction.law!=super::native_prediction::LAW || prediction.producing_commit!=self.producing.commit()
+            || prediction.opened_at!=self.opened_at || prediction.source_cells!=self.source.cells()
+            || prediction.receiver!=phases.ring() || stations.len()!=phases.aperture()
+            || covector.logits().len()!=stations.len() || back.reads.len()!=stations.len()
+            || back.reads.iter().map(|(f,_)|f).ne(prediction.features.iter()) {
+            return Err(HnnError::Unadmitted{reason:"native contact binds its original prediction, return, source, frame and actual cut"});
+        }
+        let geometry=back.response_geometry.as_ref().ok_or(HnnError::Unadmitted{reason:"native contact requires both actually executed response paths"})?;
+        geometry.admit_native_contact(&self.field,&back.reads,&self.operands,phases,self.opened_at)?;
+        let map=self.producing.receiving_map(phases.ring()).ok_or(HnnError::MissingReceivingMap{ring:phases.ring()})?;
+        for (at,((feature,gradient),station)) in back.reads.iter().zip(stations).enumerate(){
+            if gradient!=&covector.logits()[at] || map.apply(feature)?!=prediction.waves[at]
+                || station.component_error.len()*2!=gradient.len() || station.component_error.iter().any(|x|x<&Rat::zero()) {
+                return Err(HnnError::Unadmitted{reason:"native contact error belongs to the actual original predicted class/phase packet"});
+            }
+        }
+        let width=self.field.ring(phases.ring()).width();
+        let source=ExactRatMatrix::new(map.to_rows().iter().map(|r|r[..width].to_vec()).collect())?;
+        let context=ExactRatMatrix::new(map.to_rows().iter().map(|r|r[width..].to_vec()).collect())?;
+        let residual=source.subtract(&context)?;
+        // BOTH path bounds share the loaded input norm; the squared sum includes the cross term.
+        let readout_norm=crate::holon::deposition::spectral_norm(context.rows(),context.columns(),context.entries())
+            +crate::holon::deposition::spectral_norm(residual.rows(),residual.columns(),residual.entries());
+        let diamond=Diamond::opened(&self.field,phases,&self.opening_support);
+        let retained=|locus|matches!(locus,Locus::Channel(_))&&diamond.retains(&self.field,locus);
+        let mut factors=Vec::new();
+        for contact in 0..self.field.contacts().len(){
+            factors.extend(crate::hnn::reference::compose_contact(&self.field,&self.producing,back,&diamond,&retained,self.current.lift(),self.field.step(),contact)?.0);
+        }
+        let loci=diamond.retained(&self.field);
+        let reached=factors.iter().map(|s|s.gradient.locus()).collect();
+        let occupied=self.field.sources().iter().map(|&g|{
+            (0..self.field.ring(g).placements().len()).try_fold(0u64,|n,p|Ok::<_,HnnError>(n+u64::from(self.source.phase_counts(g,p)?.iter().any(|x|*x!=0))))
+        }).collect::<Result<Vec<_>,_>>()?.into_iter().max().unwrap_or(0);
+        let deposit=Deposit::new(self.producing.commit(),Vec::new(),factors,reached).with_reach(Reach{
+            receiver:phases.ring(),stations:phases.epochs().map(|j|j as u64).collect(),entries:vec![0],phases:occupied,loci,passages:Vec::new(),
+        });
+        let witness=super::native_prediction::NativeContactWitness{
+            field:self.field.clone(),current:self.current.clone(),source:self.source.clone(),
+            geometry:geometry.clone(),phases:phases.clone(),opened_at:self.opened_at,reads:back.reads.clone(),
+            producing:self.producing.clone(),deposit:deposit.clone(),readout_norm:readout_norm.clone(),
+            error_l1:stations.iter().flat_map(|s|&s.component_error).cloned().sum(),
+        };
+        let mut spans=super::finite_gain::FiniteContactSpans::of(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?)?;
+        spans.bind_native(witness.clone(),&self.producing,&deposit)?;
+        self.native_prediction=Some(witness);self.deposit=Some(deposit.clone());
+        let field=self.field.clone();let current=self.current.clone();let moment=self.source.clone();let original=self.producing.clone();
+        let (constitution,returned)=self.continue_deposited(&field,&current,&moment,&deposit,charts)?;
+        let (actual_alignment,actual_error_charge)=original.native_contact_actual_ray(&constitution,&deposit,&spans)?;
+        let word=returned.forward.into_present().ok_or(HnnError::Unadmitted{reason:"actual native held-momentum successor"})?;
+        let carry=word.reception_end()?;
+        let publication=returned.deposit.into_present().ok_or(HnnError::Unadmitted{reason:"native factor publication reading"})?;
+        Ok(super::native_prediction::NativeContactPublication{prediction,constitution,carry,publication,continuation:returned.receipt,actual_alignment,actual_error_charge,paired_readout_norm:readout_norm})
+    }
+
     /// Source-private binding by the actual comparison consumer. A caller cannot replace the
     /// covector once the native cut has been issued.
     pub(super) fn bind_comparison(mut self, deposit: Deposit) -> Self {
@@ -715,6 +781,7 @@ impl ContactCut {
                 found: 0,
             });
         }
+        if let Some(native)=&self.native_prediction{native.admit_cut(field,current,source)?;}
         if !contact_only(deposit) {
             return Err(HnnError::Shape {
                 what: "this native return changes contact factors in their same physical coordinates",
@@ -738,11 +805,14 @@ impl ContactCut {
             }) => (successor, publication, Some((end, tick))),
             None => {
                 let (successor, publication) = if self.operands.lattice().is_none() {
-                    let spans = super::finite_gain::FiniteContactSpans::of(
+                    let mut spans = super::finite_gain::FiniteContactSpans::of(
                         &self.operands,
                         self.opened_at,
                         deposit.reach().ok_or(HnnError::MissingReach)?,
                     )?;
+                    if let Some(native)=&self.native_prediction {
+                        spans.bind_native(native.clone(),&self.producing,deposit)?;
+                    }
                     self.producing
                         .deposited_with_contact_spans(deposit, &spans)?
                 } else {
@@ -753,6 +823,11 @@ impl ContactCut {
                 (successor, publication, None)
             }
         };
+        if self.native_prediction.is_some() {
+            let mut spans=super::finite_gain::FiniteContactSpans::of(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?)?;
+            spans.bind_native(self.native_prediction.clone().expect("native witness"),&self.producing,deposit)?;
+            self.producing.native_contact_actual_ray(&successor,deposit,&spans)?;
+        }
         #[cfg(test)]
         eprintln!(
             "unit certificate end elapsed_ms={}",

@@ -11,8 +11,9 @@ fn refuse(reason: &'static str) -> HnnError {
     HnnError::Unadmitted { reason }
 }
 mod framing;
-pub use framing::{ContextChart, SourceFraming, PreparedMaterial};
+pub use framing::{ContextChart, SourceFraming, PreparedMaterial, LaggedReceiverBoundary};
 pub const SOURCE_FRAMING_LAW: &str = "prepared-class-source-framing-route-v1";
+pub const LAGGED_RECEIVER_LAW: &str = "prepared-native-lagged-receiver-v1";
 pub const LAW: &str = "prepared-class-local-retained-v1";
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PrefixRole {
@@ -46,9 +47,20 @@ fn features(history: &[(usize, PrefixRole)], h: &Rat) -> Option<Vec<Complex>> {
     f.extend(a.iter().map(|v| v * h));
     Some(f.into_iter().map(|q| [q, Rat::zero()]).collect())
 }
+fn lagged_features(history:&[(usize,PrefixRole)],lag:Option<&LaggedReceiverBoundary>,lift:&[BigInt])->Option<Vec<Complex>>{
+    if history.len()!=2{return None;}let lag=lag?;
+    if lift.len()!=lag.lift.len(){return None;}
+    // The declared ring action transports the original reached vector into this cut's frame.
+    let h=lag.field.ring(lag.receiver).rotate(&lag.contrast,&(&lift[lag.receiver]-&lag.lift[lag.receiver]));
+    let p=unit(history[0].0);let c=unit(history[1].0);let mut a:Vec<_>=c.iter().zip(&p).map(|(c,p)|c-p).collect();a.extend(c);a.extend(p);
+    let mut f=a.clone();f.extend(h.iter().cloned());for value in &h{f.extend(a.iter().map(|v|value*v));}
+    Some(f.into_iter().map(|q|[q,Rat::zero()]).collect())
+}
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PreparedInputCut {
     pub source_cells: u64,
+    pub(crate) native_lagged: bool,
+    pub(crate) lagged: Option<LaggedReceiverBoundary>,
     pub framing: Option<SourceFraming>,
     pub commit: u64,
     pub lift: Vec<BigInt>,
@@ -131,6 +143,8 @@ pub struct PreparedInputState {
     pub(crate) generated_octet: Vec<usize>,
     pub(crate) pending: BTreeMap<u64, MaterialReturn>,
     pub(crate) fit_proposals: u64,
+    pub(crate) lagged: Option<LaggedReceiverBoundary>,
+    pub(crate) eligible: [u64;4],
     pub(crate) last_refusal: Option<String>,
 }
 impl PreparedInputState {
@@ -143,7 +157,7 @@ impl PreparedInputState {
     }
     pub(crate) fn fresh_with_chart(field:&Field,theta:&Constitution,pairing:&PairingDeclaration,chart:ContextChart)->Result<Self,HnnError>{
         let framed=field.receivers().iter().all(|r|field.receiving_context(r.ring)==Some(crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1));
-        if framed != (chart==ContextChart::SourceFramingRouteV1){return Err(refuse("material context schema matches the freshly declared source framing tree"));}
+        if framed != chart.framed(){return Err(refuse("material context schema matches the freshly declared source framing tree"));}
         if field.alphabet() != 4 || field.sources() != [0] {
             return Err(refuse(
                 "prepared language law declares four classes and actual source0",
@@ -171,8 +185,8 @@ impl PreparedInputState {
                 pending: 64,
                 precision_bits: 20,
                 rational_bits: 1024,
-                max_features: 25,
-                max_scalar_work: 1_000_000,
+                max_features: chart.features(),
+                max_scalar_work: chart.formation_work(),
             },
             max_abs_work: integer(1 << 16),
             history: Vec::new(),
@@ -184,11 +198,12 @@ impl PreparedInputState {
             generated_octet: Vec::new(),
             pending: BTreeMap::new(),
             fit_proposals: 0,
+            lagged: None, eligible: [0;4],
             last_refusal: None,
         })
     }
     pub fn law(&self) -> &'static str {
-        match self.material.chart(){ContextChart::ScalarV1=>LAW,ContextChart::SourceFramingRouteV1=>SOURCE_FRAMING_LAW}
+        match self.material.chart(){ContextChart::ScalarV1=>LAW,ContextChart::SourceFramingRouteV1=>SOURCE_FRAMING_LAW,ContextChart::LaggedReceiverBoundaryV1=>LAGGED_RECEIVER_LAW}
     }
     pub fn context_chart(&self)->ContextChart{self.material.chart()}
     pub fn mode(&self) -> PrefixMode {
@@ -206,6 +221,7 @@ impl PreparedInputState {
     pub fn unfinished_generated(&self) -> &[usize] {
         &self.generated_octet
     }
+    pub fn material_refusal(&self)->Option<&str>{self.last_refusal.as_deref()}
     pub fn outstanding(&self) -> &BTreeMap<u64, MaterialReturn> {
         &self.pending
     }
@@ -225,9 +241,11 @@ impl PreparedInputState {
                 "prepared material/context frontier agrees with the single native source",
             ));
         }
-        let framing=match self.context_chart(){ContextChart::ScalarV1=>None,ContextChart::SourceFramingRouteV1=>Some(SourceFraming::at(source))};
+        let framing=if self.context_chart().framed(){Some(SourceFraming::at(source))}else{None};
+        if let Some(lag)=&self.lagged{if lag.field!=*field||lag.source_cells.checked_add(1)!=Some(source.cells())||lag.lift.len()!=current.lift().len()||lag.commit>theta.commit(){return Err(refuse("lagged context keeps its original reached cut and next-source availability"));}}
         let h = source.open_storage(field, theta, current)?[0][0].clone();
-        let f = features(&self.history, &h);
+        let native_lagged=self.context_chart()==ContextChart::LaggedReceiverBoundaryV1;
+        let f = if native_lagged{lagged_features(&self.history,self.lagged.as_ref(),current.lift())}else{features(&self.history, &h)};
         let control = if let Some(f) = &f {
             let response = if self.mode == PrefixMode::ForecastZeroControl {
                 vec![[Rat::zero(), Rat::zero()]; 4]
@@ -246,6 +264,7 @@ impl PreparedInputState {
         crate::hnn::physical::action::contextual::note_fit_work(|w|w.context_seal_and_contract+=seal_start.elapsed());
         Ok(PreparedInputCut {
             source_cells: source.cells(),
+            native_lagged, lagged:self.lagged.clone(),
             framing,
             commit: theta.commit(),
             lift: current.lift().to_vec(),
@@ -259,6 +278,10 @@ impl PreparedInputState {
             max_abs_work: self.max_abs_work.clone(),
             rational_bits: self.bounds.rational_bits,
         })
+    }
+    pub(crate) fn install_reached_lag(&mut self,lag:LaggedReceiverBoundary)->Result<(),HnnError>{
+        if self.context_chart()!=ContextChart::LaggedReceiverBoundaryV1 || lag.source_cells.checked_add(1)!=Some(self.source_cells()){return Err(refuse("a reached native context is available only to the NEXT actual or hypothetical preparation"));}
+        self.lagged=Some(lag);Ok(())
     }
     fn advance(&mut self, class: usize, role: PrefixRole) -> Result<(), HnnError> {
         if class >= 4 {
@@ -314,6 +337,7 @@ impl PreparedInputState {
         if cut.feature.is_some() && self.pending.len() >= self.bounds.pending {
             return Err(refuse("bounded outstanding original material returns"));
         }
+        if cut.native_lagged && cut.feature.is_some(){let part=cut.framing.ok_or(refuse("native original context part"))?.part();self.eligible[part]=self.eligible[part].checked_add(1).ok_or(HnnError::CountOverflow)?;}
         self.advance(class, PrefixRole::Observed)?;
         if cut.feature.is_some() {
             let id = cut.source_cells;
@@ -351,6 +375,10 @@ impl PreparedInputState {
             .map(|(y, c)| [y - c, Rat::zero()])
             .collect::<Vec<_>>();
         let framing=p.cut.framing;
+        if p.cut.native_lagged{
+            let work=ContextChart::LaggedReceiverBoundaryV1.formation_work();
+            if f.len()!=90||work>self.bounds.max_scalar_work{return Err(refuse("declared bounded native-context normal formation work"));}
+        }
         let next = self.material.part(framing)?.stage(f, &eta, &self.bounds)?;
         self.fit_proposals += 1;
         self.material.replace(framing,next)?;
@@ -374,16 +402,20 @@ impl Resident {
     pub fn select_prepared_input(&mut self, pairing: &PairingDeclaration) -> Result<(), HnnError> {
         self.select_prepared_input_chart(pairing,ContextChart::ScalarV1)
     }
+    /// Fresh native predictor lineage. Legacy receiving/refine entrypoints refuse this scope.
+    pub fn select_native_current_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
+        self.select_prepared_input_chart(pairing,ContextChart::LaggedReceiverBoundaryV1)
+    }
     pub fn select_source_framing_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{self.select_prepared_input_chart(pairing,ContextChart::SourceFramingRouteV1)}
     fn select_prepared_input_chart(&mut self,pairing:&PairingDeclaration,chart:ContextChart)->Result<(),HnnError>{
         self.admit_exact_current()?;
         if self.prepared_input.is_some()
             || self.moments.len() != 1
             || self.moments.values().next().map(SourceMoment::cells) != Some(0)
-            || self.receiving_law() != crate::hnn::receiving::ReceivingLaw::RetainedFibreV1
+            || (chart!=ContextChart::LaggedReceiverBoundaryV1 && self.receiving_law() != crate::hnn::receiving::ReceivingLaw::RetainedFibreV1)
         {
             return Err(refuse(
-                "prepared input is an explicit fresh retained-fibre law",
+                "prepared input is explicit at a fresh source; the legacy scope additionally requires retained-fibre scoring",
             ));
         }
         self.prepared_input = Some(PreparedInputState::fresh_with_chart(

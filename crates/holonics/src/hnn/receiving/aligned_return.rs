@@ -128,7 +128,7 @@ fn fail(reason: &'static str) -> HnnError {
 }
 
 /// Largest exact remainder on the existing finite row precision. No rounded-sum division.
-fn pack_simplex(anchor: &[Rat], bits: u32) -> Result<Vec<Rat>, HnnError> {
+pub(crate) fn pack_simplex(anchor: &[Rat], bits: u32) -> Result<Vec<Rat>, HnnError> {
     if u64::from(bits) > crate::receiver::population::PRECISION
         || anchor.is_empty()
         || anchor.iter().any(|x| x < &Rat::zero() || x > &Rat::one())

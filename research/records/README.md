@@ -555,3 +555,5 @@ This page grows by useful connections rather than by reproducing the entire file
 - [The actual CM tangent current returns its clock through the chart overlap](2026-10-09_THE_ACTUAL_CM_TANGENT_CURRENT_RETURNS_ITS_CLOCK_THROUGH_THE_CHART_OVERLAP.md): mathematical source and consumer retained; final v9 acceptance and publication limits joined above.
 - [The actual CM overlap returns every localized function to its source](2026-10-09_THE_ACTUAL_CM_OVERLAP_RETURNS_EVERY_LOCALIZED_FUNCTION_TO_ITS_SOURCE.md): mathematical source and consumer retained; final v9 acceptance and publication limits joined above.
 - [The actual CM native failures repair the producing proofs without changing the source](2026-10-09_THE_ACTUAL_CM_NATIVE_FAILURES_REPAIR_THE_PRODUCING_PROOFS_WITHOUT_CHANGING_THE_SOURCE.md): mathematical source and consumer retained; final v9 acceptance and publication limits joined above.
+
+- [2026-10-21: Native current prediction and paired contact remain a partial join](2026-10-21_NATIVE_CURRENT_PREDICTION_AND_PAIRED_CONTACT_REMAIN_A_PARTIAL_JOIN.md) — bounded host CODE evidence; native R section/card/current cold qualification unfinished; no dataset run.

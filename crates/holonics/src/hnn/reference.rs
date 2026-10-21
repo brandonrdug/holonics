@@ -1456,6 +1456,7 @@ impl Reference {
         ),
         HnnError,
     > {
+        if resident.prepared_input.as_ref().is_some_and(|p|p.context_chart()==prepared_input::ContextChart::LaggedReceiverBoundaryV1){return Err(HnnError::Unadmitted{reason:"native-current context is consumed by its native prediction owner, not the legacy receiving face"});}
         let (field, constitution) = match rings.as_ref() {
             Some(scope) => (scope.field(), scope.material()),
             None => (&resident.field, &resident.constitution),
@@ -6525,3 +6526,4 @@ pub mod contextual_input;
 
 /// Unified opt-in computational source preparation and causal prefix state.
 pub mod prepared_input;
+pub mod native_context;

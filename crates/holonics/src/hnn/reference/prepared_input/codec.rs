@@ -64,9 +64,22 @@ fn read_history(
         })
         .collect()
 }
+fn lag(out:&mut String,value:Option<&LaggedReceiverBoundary>){
+    put(out,usize::from(value.is_some()));if let Some(v)=value{for n in [v.receiver as u64,v.source_cells,v.commit,v.tick as u64]{put(out,n);}put(out,role(v.role));put(out,v.lift.len());for x in &v.lift{put(out,x);}for x in &v.contrast{put(out,x);}}
+}
+fn read_lag(field:&Field,t:&mut std::str::SplitWhitespace<'_>)->Result<Option<LaggedReceiverBoundary>,HnnError>{
+    match get::<u8>(t)?{0=>Ok(None),1=>{
+        let receiver:usize=get(t)?;let source_cells=get(t)?;let commit=get(t)?;let tick=get(t)?;let role=read_role(t)?;
+        if receiver>=field.rings().len()||field.ring(receiver).width()!=6||get::<usize>(t)?!=field.rings().len(){return Err(refuse("original lagged receiver and complete frame"));}
+        let lift=(0..field.rings().len()).map(|_|get(t)).collect::<Result<Vec<_>,_>>()?;
+        let contrast=(0..6).map(|_|get::<Rat>(t)).collect::<Result<Vec<_>,_>>()?;
+        if contrast.iter().any(|q|q.numer().bits()>4096||q.denom().bits()>4096){return Err(refuse("bounded exact lagged context"));}
+        Ok(Some(LaggedReceiverBoundary{field:field.clone(),receiver,source_cells,commit,tick,lift,contrast,role}))
+    },_=>Err(refuse("explicit lag availability"))}
+}
 impl PreparedInputCut {
     pub(crate) fn to_text(&self) -> String {
-        let mut o = String::from(if self.framing.is_some(){"prepared-input-cut-framing-v1 "}else{"prepared-input-cut-v1 "});
+        let mut o = String::from(if self.native_lagged{"prepared-input-cut-native-lagged-v1 "}else if self.framing.is_some(){"prepared-input-cut-framing-v1 "}else{"prepared-input-cut-v1 "});
         put(&mut o, self.source_cells);
         put(&mut o, self.commit);
         put(&mut o, self.material_observations);
@@ -91,14 +104,15 @@ impl PreparedInputCut {
                 put(&mut o, v);
             }
         }
+        if self.native_lagged{lag(&mut o,self.lagged.as_ref());}
         o
     }
-    pub(crate) fn from_text(text: &str) -> Result<Self, HnnError> {
+    pub(crate) fn from_text(field:&Field,text: &str) -> Result<Self, HnnError> {
         if text.len() > 1024 * 1024 {
             return Err(refuse("bounded prepared cut"));
         }
         let mut t = text.split_whitespace();
-        let framed=match t.next(){Some("prepared-input-cut-v1")=>false,Some("prepared-input-cut-framing-v1")=>true,_=>return Err(refuse("prepared cut version"))};
+        let (framed,native_lagged)=match t.next(){Some("prepared-input-cut-v1")=>(false,false),Some("prepared-input-cut-framing-v1")=>(true,false),Some("prepared-input-cut-native-lagged-v1")=>(true,true),_=>return Err(refuse("prepared cut version"))};
         let source_cells = get(&mut t)?;
         let commit = get(&mut t)?;
         let material_observations = get(&mut t)?;
@@ -119,12 +133,15 @@ impl PreparedInputCut {
         let pairs = (0..4)
             .map(|_| Ok((get(&mut t)?, get(&mut t)?)))
             .collect::<Result<Vec<_>, HnnError>>()?;
-        let feature = features(&history, &context);
         let control = match get::<u8>(&mut t)? {
             0 => None,
             1 => Some((0..4).map(|_| get(&mut t)).collect::<Result<Vec<_>, _>>()?),
             _ => return Err(refuse("prepared control presence")),
         };
+        let lagged=if native_lagged{read_lag(field,&mut t)?}else{None};
+        if let Some(l)=&lagged{if l.source_cells.checked_add(1)!=Some(source_cells)||l.commit>commit{return Err(refuse("original lag and next prepared source cut"));}}
+        if native_lagged && (source_cells>0)!=lagged.is_some(){return Err(refuse("explicit initial lag absence and later reached context"));}
+        let feature=if native_lagged{lagged_features(&history,lagged.as_ref(),&lift)}else{features(&history,&context)};
         if feature.is_some() != control.is_some()
             || t.next().is_some()
             || !(64..=4096).contains(&rational_bits)
@@ -133,7 +150,7 @@ impl PreparedInputCut {
             return Err(refuse("prepared cut complete finite domain"));
         }
         Ok(Self {
-            source_cells,
+            source_cells, native_lagged,lagged,
             framing,
             commit,
             lift,
@@ -197,6 +214,7 @@ impl PreparedInputState {
             put(&mut o, p.actual);
             put(&mut o, hex(&p.cut.to_text()));
         }
+        if self.context_chart()==ContextChart::LaggedReceiverBoundaryV1{for count in self.eligible{put(&mut o,count);}lag(&mut o,self.lagged.as_ref());}
         // Refusal diagnostics are exterior, not constitutive retention.
         o
     }
@@ -209,15 +227,15 @@ impl PreparedInputState {
             return Err(refuse("bounded prepared continuation"));
         }
         let mut t = text.split_whitespace();
-        let chart=match t.next(){Some(LAW)=>ContextChart::ScalarV1,Some(SOURCE_FRAMING_LAW)=>ContextChart::SourceFramingRouteV1,_=>return Err(refuse("prepared input continuation law identity"))};
+        let chart=match t.next(){Some(LAW)=>ContextChart::ScalarV1,Some(SOURCE_FRAMING_LAW)=>ContextChart::SourceFramingRouteV1,Some(LAGGED_RECEIVER_LAW)=>ContextChart::LaggedReceiverBoundaryV1,_=>return Err(refuse("prepared input continuation law identity"))};
         let framed=field.receivers().iter().all(|r|field.receiving_context(r.ring)==Some(crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1));
-        if framed!=(chart==ContextChart::SourceFramingRouteV1){return Err(refuse("saved material schema and actual tree framing declaration agree"));}
+        if framed!=chart.framed(){return Err(refuse("saved material schema and actual tree framing declaration agree"));}
         let bounds = ContextualBounds {
             branches: 1,
             pending: get(&mut t)?,
             precision_bits: get(&mut t)?,
             rational_bits: get(&mut t)?,
-            max_features: 25,
+            max_features: chart.features(),
             max_scalar_work: get(&mut t)?,
         };
         bounds.admit()?;
@@ -278,14 +296,15 @@ impl PreparedInputState {
         for _ in 0..n {
             let id = get(&mut t)?;
             let actual = get(&mut t)?;
-            let cut = PreparedInputCut::from_text(&unhex(
+            let cut = PreparedInputCut::from_text(field,&unhex(
                 t.next().ok_or(refuse("original prepared material cut"))?,
             )?)?;
             if actual >= 4
                 || id != cut.source_cells
                 || id >= training
                 || cut.boundary_identity != boundary_identity
-                || cut.framing.is_some() != (chart==ContextChart::SourceFramingRouteV1)
+                || cut.framing.is_some() != chart.framed()
+                || cut.native_lagged != (chart==ContextChart::LaggedReceiverBoundaryV1)
                 || pending.insert(id, MaterialReturn { cut, actual }).is_some()
             {
                 return Err(refuse("original jointly bound class return"));
@@ -296,6 +315,11 @@ impl PreparedInputState {
             let pending_count=pending.values().filter(|p|p.cut.framing.map(SourceFraming::part)==Some(phase)).count() as u64;
             if material.parts()[phase].observations().checked_add(pending_count)!=Some(reached){return Err(refuse("original phase material and pending evidence accounting"));}
         }}
+        let mut eligible=[0u64;4];let lagged=if chart==ContextChart::LaggedReceiverBoundaryV1{
+            for phase in 0..4{eligible[phase]=get(&mut t)?;let pending_count=pending.values().filter(|p|p.cut.framing.map(SourceFraming::part)==Some(phase)).count() as u64;
+                if material.parts()[phase].observations().checked_add(pending_count)!=Some(eligible[phase])||eligible[phase]!=training/4+u64::from((phase as u64)<training%4)-u64::from(phase<2&&(phase as u64)<training){return Err(refuse("native material evidence is exactly its originally available feature returns"));}}
+            read_lag(field,&mut t)?
+        }else{None};
         let total = u64::checked_add(training, conditioning)
             .and_then(|n| n.checked_add(generated))
             .ok_or(HnnError::CountOverflow)?;
@@ -304,7 +328,7 @@ impl PreparedInputState {
             || history.len() as u64 != total.min(2)
             || source_octet.len() as u64 != total % 4
             || generated_octet.len() as u64 != generated % 4
-            || material.observations() + pending.len() as u64 != training.saturating_sub(2)
+            || material.observations() + pending.len() as u64 != if chart==ContextChart::LaggedReceiverBoundaryV1{eligible.iter().sum()}else{training.saturating_sub(2)}
             || mode == PrefixMode::Training
                 && (conditioning != 0
                     || generated != 0
@@ -315,6 +339,8 @@ impl PreparedInputState {
                 "prepared mode/material/actual and hypothesis frontier accounting",
             ));
         }
+        if chart==ContextChart::LaggedReceiverBoundaryV1 && (total>0)!=lagged.is_some(){return Err(refuse("cold original lag availability"));}
+        if let Some(l)=&lagged{if l.source_cells.checked_add(1)!=Some(total)||l.commit>theta.commit(){return Err(refuse("cold lag keeps its original reached cut and availability"));}}
         Ok(Self {
             mode,
             forecast_role,
@@ -330,7 +356,7 @@ impl PreparedInputState {
             source_octet,
             generated_octet,
             pending,
-            fit_proposals,
+            fit_proposals,lagged,eligible,
             last_refusal: None,
         })
     }

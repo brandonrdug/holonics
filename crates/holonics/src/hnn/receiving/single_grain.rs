@@ -291,7 +291,7 @@ impl RetainedFibreReceiver {
 }
 
 // Shared exact positive-weight algorithm. Both authentic source owners use this gauge/order.
-fn weights_from_terms(terms: Vec<(Rat, Rat)>, top: BigInt, bits: u32) -> Result<Vec<ExactInterval>, HnnError> {
+pub(super) fn weights_from_terms(terms: Vec<(Rat, Rat)>, top: BigInt, bits: u32) -> Result<Vec<ExactInterval>, HnnError> {
     let mut weights = Vec::with_capacity(terms.len());
         for (coefficient, exponent) in terms {
             let shifted = exponent - Rat::from_integer(top.clone());
@@ -407,7 +407,7 @@ impl ProducedFibreObservation {
         &self.weights
     }
 }
-fn normalize_weights(weights: &[ExactInterval]) -> Result<Vec<ExactInterval>, HnnError> {
+pub(super) fn normalize_weights(weights: &[ExactInterval]) -> Result<Vec<ExactInterval>, HnnError> {
     #[cfg(test)]
     super::reuse_work::mass();
     let classes = weights.len();

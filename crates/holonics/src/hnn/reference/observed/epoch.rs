@@ -690,6 +690,7 @@ impl Reference {
         stage_refused: &mut dyn FnMut(EpochStageAttempt, &EpochStageRefusal),
     ) -> Result<ObservedEpochReceipt, HnnError> {
         let forward_start = Instant::now();
+        if resident.prepared_input.as_ref().is_some_and(|p|p.context_chart()==prepared_input::ContextChart::LaggedReceiverBoundaryV1){return Err(refusal("native-current predictions cannot be rebound through a legacy mixture epoch"));}
         if resident.prepared_input.is_some()
             && (!deposition_scope.is_local_receiving()
                 || resident

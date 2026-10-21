@@ -105,6 +105,8 @@ pub struct LoadedSpanReading {
 /// Exact linear execution only: split/chart and quartic returns require their own
 /// additional-input/domain certificate and are refused, rather than omitted.
 pub(crate) struct FiniteContactSpans {
+    origin: Operands,
+    native: Option<super::native_prediction::NativeContactWitness>,
     opened_at: usize,
     stations: Vec<u64>,
     fixed: Vec<Rat>,
@@ -265,6 +267,8 @@ impl FiniteContactSpans {
             .map(|c| (operands.step() * c.conductance(), c.conductance().clone()))
             .collect();
         Ok(Self {
+            origin: operands.clone(),
+            native: None,
             opened_at,
             stations: reach.stations.clone(),
             fixed,
@@ -279,6 +283,15 @@ impl FiniteContactSpans {
             junction_element_bound: junction_element,
         })
     }
+
+    pub(crate) fn bind_native(&mut self,witness:super::native_prediction::NativeContactWitness,theta:&crate::hnn::constitution::Constitution,deposit:&crate::hnn::port::Deposit)->Result<(),HnnError>{
+        witness.admit(theta,deposit)?;
+        let reach=deposit.reach().ok_or(HnnError::MissingReach)?;
+        witness.admit_span(&self.origin,self.opened_at,reach)?;
+        if self.native.is_some() || self.stations!=reach.stations {return Err(HnnError::Unadmitted{reason:"native paired gain belongs to this complete fixed-opening loaded span"});}
+        self.native=Some(witness);Ok(())
+    }
+    pub(crate) fn native(&self)->Option<&super::native_prediction::NativeContactWitness>{self.native.as_ref()}
 
     /// C/K form-norm bounds for *all* contacts over the current joint factor ray.
     /// D remains Gram-positive along its entire ray, so m>=I and ||m^-1||<=1;

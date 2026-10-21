@@ -153,7 +153,7 @@ impl PendingRatio {
         let prepared_input=if prepared{
             let row=keyed(next("the original prepared input cut")?,"ratio-control","the original prepared input cut")?;
             if row.len()!=1{return Err(HnnError::Unadmitted{reason:"one complete original prepared cut"});}
-            Some(crate::hnn::reference::prepared_input::PreparedInputCut::from_text(&crate::hnn::reference::prepared_input::codec::unhex(row[0])?)?)
+            Some(crate::hnn::reference::prepared_input::PreparedInputCut::from_text(field,&crate::hnn::reference::prepared_input::codec::unhex(row[0])?)?)
         }else{None};
         if commit.is_empty() || commit.len() % 2 != 1 {
             return Err(HnnError::Unadmitted {

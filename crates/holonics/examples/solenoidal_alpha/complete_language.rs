@@ -17,6 +17,9 @@ mod code_parallel_controls;
 #[cfg(test)]
 #[path = "complete_language/prepared_controls.rs"]
 mod prepared_controls;
+#[cfg(test)]
+#[path = "complete_language/native_context_controls.rs"]
+mod native_context_controls;
 
 const READ_BUDGET: u64 = 64 * 1024 * 1024;
 const READING_BITS: u32 = holonics::ratio::exponentiated::READING_BITS;

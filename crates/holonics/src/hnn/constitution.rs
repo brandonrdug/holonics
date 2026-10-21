@@ -7838,6 +7838,7 @@ impl Constitution {
             && parts
                 .iter()
                 .any(|(locus, ..)| *locus != Locus::ReceivingMap(reach.receiver))
+            && loaded.and_then(|span|span.native()).is_none()
         {
             return Err(HnnError::Unadmitted {
                 reason: "paired receiving shared-material steps require the joined source/context propagation gain certificate",
@@ -7869,9 +7870,11 @@ impl Constitution {
             })?;
         // The readout's certified spectral norm `‖R‖₂` (module header, "The tightened certificate").
         let map = receiving.map();
-        let readout_base = match epoch_readout {
-            Some(bound) => ceiling(bound),
-            None => ceiling(&spectral_norm(map.rows(), map.columns(), map.entries())),
+        let readout_base = match (loaded.and_then(|span|span.native()),epoch_readout) {
+            (Some(native),None)=>ceiling(native.readout_norm()),
+            (Some(_),Some(_))=>return Err(HnnError::Unadmitted{reason:"native paired contact certificate never mixes an epoch readout witness"}),
+            (None,Some(bound)) => ceiling(bound),
+            (None,None) => ceiling(&spectral_norm(map.rows(), map.columns(), map.entries())),
         };
         // The pumped medium's reach (module header, "The pumped medium's reach"): each ring not
         // certified passive read by its Floquet bound (refused where its certificate is), the span
@@ -8766,6 +8769,43 @@ impl Constitution {
     }
 
     /// The finite contact span's scope: no linear step, and every factor step at a channel.
+    fn native_contact_loaded(&self,loaded:&crate::hnn::word::finite_gain::FiniteContactSpans)->Result<crate::hnn::word::finite_gain::LoadedSpanReading,HnnError>{
+        let forms:Vec<_>=self.contacts.iter().map(|c|{
+            let (a,b)=schur_norms(&c.storage);let (d,e)=schur_norms(&c.stiffness);(a*b,d*e)
+        }).collect();
+        loaded.read(&forms)
+    }
+    /// Actual represented FACTOR direction, after carry/rounding, before any publication.
+    /// This is a first-variation predicate, NOT a finite native-score decrease assertion.
+    pub(crate) fn native_contact_actual_ray(&self,next:&Self,deposit:&Deposit,loaded:&crate::hnn::word::finite_gain::FiniteContactSpans)->Result<(Rat,Rat),HnnError>{
+        let native=loaded.native().ok_or(HnnError::Unadmitted{reason:"actual native contact ray requires its paired source-bound gain/error witness"})?;
+        native.admit(self,deposit)?;
+        let bound=self.native_contact_loaded(loaded)?;
+        let mut pairing=Rat::zero();let mut response_squared=Rat::zero();let mut terms=0u64;
+        for step in deposit.factors(){
+            let (contact,family,gradient)=match &step.gradient{
+                FactorGradient::Storage{contact,gradient}=>(*contact,0,gradient),
+                FactorGradient::Stiffness{contact,gradient}=>(*contact,1,gradient),
+                FactorGradient::Dissipation{contact,gradient}=>(*contact,2,gradient),
+                _=>return Err(HnnError::Unadmitted{reason:"native contact ray only contains reached C/K/D factors"}),
+            };
+            let old=self.contacts.get(contact).ok_or(HnnError::CountOverflow)?;
+            let new=next.contacts.get(contact).ok_or(HnnError::CountOverflow)?;
+            let (a,b)=match family{0=>(&old.storage,&new.storage),1=>(&old.stiffness,&new.stiffness),_=>(&old.dissipation,&new.dissipation)};
+            let delta=b.subtract(a)?;
+            if delta.entries().iter().all(Zero::is_zero){continue;}
+            pairing+=gradient.entries().iter().zip(delta.entries()).map(|(g,d)|g*d).sum::<Rat>();
+            let moves=channel_factor_moves(family,a,schur_norms(&delta),&self.hop).own(&step.energy,&Rat::zero())?;
+            response_squared+=bound.gain(contact,&(native.readout_norm()*native.readout_norm()))*moves;
+            terms+=1;
+        }
+        // Cross effects of all changed factors as well as the actual/fresh cross term are kept.
+        let error=native.error_charge(&(Rat::from_integer(BigInt::from(terms))*response_squared));
+        if terms!=0 && pairing<=error {return Err(HnnError::Unadmitted{reason:"actual represented native contact differential exceeds its authentic class/phase error charge"});}
+        Ok((pairing,error))
+    }
+
+    /// The finite contact span's scope: no linear step, and every factor step at a channel.
     fn contact_only(deposit: &Deposit) -> Result<(), HnnError> {
         if !deposit.linear().is_empty()
             || deposit
@@ -8850,6 +8890,7 @@ impl Constitution {
         loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
         mode: DepositMode<'_>,
     ) -> Result<DepositOutcome, HnnError> {
+        if let Some(native)=loaded.and_then(|span|span.native()) { native.admit(self,deposit)?; }
         if deposit.commit() != self.commit {
             return Err(HnnError::StaleDeposit {
                 staged: deposit.commit(),
@@ -8959,6 +9000,23 @@ impl Constitution {
         }
         if let Some((_, refusal)) = first {
             return Err(refusal);
+        }
+        // Native packed-class uncertainty is charged on each fresh factor direction.
+        // This is paired propagation on the SAME fixed opening, not the R-ray witness.
+        if let Some(span)=loaded {
+            if let Some(native)=span.native(){
+                let physical=self.native_contact_loaded(span)?;
+                for ((locus,..),region) in regions.iter().zip(&mut ready){
+                    let Locus::Channel(contact)=locus else{return Err(HnnError::Unadmitted{reason:"paired native contact gain covers contact-only material"});};
+                    for factor in &mut region.factors{
+                        let motion=factor.moves.own(&factor.energy,&Rat::zero())?;
+                        let gain=physical.gain(*contact,&(native.readout_norm()*native.readout_norm()));
+                        let error=native.error_charge(&(gain*motion));
+                        if !factor.alignment.is_zero() && factor.alignment<=error{return Err(HnnError::Unadmitted{reason:"native fresh contact alignment exceeds its original prediction-error enclosure"});}
+                        factor.alignment=floor(&(&factor.alignment-error));
+                    }
+                }
+            }
         }
         // The certificate reads every prepared step at once.
         let (certified, joint, pumped, loaded) = {

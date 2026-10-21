@@ -743,3 +743,21 @@ impl EmpiricalMaterial {
         Ok(m)
     }
 }
+
+#[cfg(test)]
+mod native_context_pure_controls {
+    use super::*;
+    #[test]
+    fn native_context_pure_ninety_features_fit_and_codec_preserve_exact_moments(){
+        let bounds=ContextualBounds{branches:1,pending:64,precision_bits:20,rational_bits:1024,max_features:90,max_scalar_work:6_157_800};
+        bounds.admit().unwrap();let mut invalid=bounds.clone();invalid.max_features=91;assert!(invalid.admit().is_err());
+        let before=EmpiricalMaterial::found(90,4);let mut f=vec![zero();90];f[0]=[crate::ratio::rat(1,2),Rat::zero()];f[12]=[crate::ratio::rat(-1,4),Rat::zero()];f[89]=[crate::ratio::rat(1,8),Rat::zero()];
+        let eta=vec![[Rat::one(),Rat::zero()],zero(),zero(),zero()];let started=std::time::Instant::now();
+        let next=before.stage(&f,&eta,&bounds).unwrap();
+        assert_eq!(next.h[0][0][0],crate::ratio::rat(5,4));assert_eq!(next.b[0][0][0],crate::ratio::rat(1,2));assert_eq!(next.observations(),1);
+        let cold=EmpiricalMaterial::restored_text(&next.checkpoint_text(),90,4,&bounds).unwrap();assert_eq!(next,cold);assert_eq!(before.observations(),0);
+        let mut too_large=f.clone();too_large[0][0]=Rat::from_integer(num_bigint::BigInt::one()<<1025usize);
+        assert!(next.stage(&too_large,&eta,&bounds).is_err());assert_eq!(next,cold);
+        println!("NATIVE_CONTEXT_PURE90 features=90 original_realification_majorant=180 H00=5/4 B00=1/2 cold_exact=true range_refusal=true fit_and_cold_ns={}",started.elapsed().as_nanos());
+    }
+}

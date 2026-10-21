@@ -105,6 +105,7 @@ pub(crate) mod column;
 pub mod continuation;
 pub(crate) mod endpoint;
 pub mod finite_gain;
+pub mod native_prediction;
 pub(crate) mod linear;
 pub mod scan;
 pub(crate) mod trajectory;
@@ -1921,6 +1922,15 @@ impl<'c> Word<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
+    /// Exact unsplit realization of the SAME source-mode/actual/fresh opening owner.
+    /// This preserves paired preparation and complete carried state; no source is invented.
+    pub(crate) fn open_received_view_exact(
+        field:&'c Field,constitution:&impl ConstitutionRead,current:&Current,moment:&SourceMoment,
+        opening:&WordOpening,view:&crate::hnn::ring::modes::ModeView,
+    )->Result<Self,HnnError>{
+        Self::open_received_view_with(field,constitution,current,moment,opening,view,||Operands::exact_at_cut(field,constitution,current))
+    }
+
     fn open_received_view_with(
         field: &'c Field,
         constitution: &impl ConstitutionRead,
