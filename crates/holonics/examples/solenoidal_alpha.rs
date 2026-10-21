@@ -1471,6 +1471,7 @@ fn scope_description(scope: ObservedEpochDepositionScope) -> &'static str {
     match scope {
         ObservedEpochDepositionScope::All => "All: ordinary physical-factor policy",
         ObservedEpochDepositionScope::LocalReceivingReturn => "LocalReceivingReturn: actual retained-fibre R-only local response; no whole-section finite comparison requested",
+        ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap => "LocalReceivingReturnWithHeldMap: same retained local law; typed R non-admission retains certified news with applied map held; fatal faults stop; no whole-section finite comparison",
         ObservedEpochDepositionScope::NormalMaps => {
             "NormalMaps: physical factor deposition requests and statistics held"
         }
@@ -1486,9 +1487,10 @@ fn parse_fork_scope(value: &str) -> Result<ObservedEpochDepositionScope> {
     match value {
         "normal-maps" => Ok(ObservedEpochDepositionScope::NormalMaps),
         "local-receiving-return-v1" => Ok(ObservedEpochDepositionScope::LocalReceivingReturn),
+        "local-receiving-held-map-v1" => Ok(ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         "normal-maps-channel-dissipation" => Ok(ObservedEpochDepositionScope::NormalMapsAndChannelDissipation),
         "normal-maps-channel-material" => Ok(ObservedEpochDepositionScope::NormalMapsAndChannelMaterial),
-        _ => Err("scope fork requires normal-maps, normal-maps-channel-dissipation, or normal-maps-channel-material".into()),
+        _ => Err("scope fork requires normal-maps, local-receiving-return-v1, local-receiving-held-map-v1, normal-maps-channel-dissipation, or normal-maps-channel-material".into()),
     }
 }
 /// Explicit exterior run policy; it adds no native state or activation history. A caller
@@ -1600,7 +1602,7 @@ fn run() -> Result<()> {
             let source_cells = source_cell_span(&excerpt, limit, source_cell_offset)?;
             let mut final_deposit = None; let mut stepped = 0u64;
             let mut published = 0usize; let mut accepted = 0usize;
-            let mut whole = 0usize; let mut joint = 0usize; let mut receiving_only = 0usize; let mut neutral = 0usize;
+            let mut whole = 0usize; let mut joint = 0usize; let mut receiving_only = 0usize; let mut held_receiving = 0usize; let mut neutral = 0usize;
             let mut outcomes = Vec::new();
             let mut class_series = Vec::new();
             let mut stage_events = Vec::new();
@@ -1634,12 +1636,13 @@ fn run() -> Result<()> {
                             ("released_class_masses", format!("[{}]", read.released.iter().map(rational).collect::<Vec<_>>().join(","))),
                         ]));
                     }
-                    match epoch.outcome { ObservedEpochOutcome::Whole => whole += 1, ObservedEpochOutcome::Joint => joint += 1, ObservedEpochOutcome::ReceivingOnly => receiving_only += 1, ObservedEpochOutcome::Neutral => neutral += 1 }
+                    match epoch.outcome { ObservedEpochOutcome::Whole => whole += 1, ObservedEpochOutcome::Joint => joint += 1, ObservedEpochOutcome::ReceivingOnly => receiving_only += 1, ObservedEpochOutcome::Neutral => neutral += 1, ObservedEpochOutcome::HeldReceiving => held_receiving += 1 }
                     stepped += epoch.deposit.stepped;
                     outcomes.push(object(&[
                         ("source_start_zero_based", opening.to_string()),
                         ("source_end_exclusive", epoch.cells.to_string()),
                         ("material_commit", epoch.deposit.commit.to_string()),
+                        ("held_receiving",epoch.deposit.epoch.as_ref().and_then(|e|e.held_receiving.as_ref()).map_or_else(||"null".into(),exact)),
                         ("actual_receiving_ingress", epoch.deposit.epoch.as_ref().map_or_else(|| "null".into(), |read| read.actual_receiving_ingress.to_string())),
                         ("channel_grain_exact", epoch.deposit.epoch.as_ref().and_then(|read| read.channel_grain.as_ref()).map_or_else(|| "null".into(), exact)),
                         ("channel_grain_restage_exact", epoch.deposit.epoch.as_ref().and_then(|read| read.channel_grain_restaged.as_ref()).map_or_else(|| "null".into(), exact)),
@@ -1780,8 +1783,8 @@ fn run() -> Result<()> {
                 ("total_cells", total(checkpoint.stream.resident())?.to_string()),
                 ("physical_epoch_cell_bound", checkpoint.stream.epoch_bound().to_string()),
                 ("native_steps", stepped.to_string()), ("whole_epochs", whole.to_string()),
-                ("joint_epochs", joint.to_string()), ("receiving_only_epochs", receiving_only.to_string()), ("neutral_epochs", neutral.to_string()),
-                ("certification_scope", quoted(if checkpoint.stream.scope()==ObservedEpochDepositionScope::LocalReceivingReturn { "local R NormalLaw; complete whole-section finite comparison not requested; unfinished actual input pending; source E family response is separate" } else { "atomic same-opening whole then upstream joint proposal with both native normal predicates and actual finite comparison; held-upstream absorption on domain refusal; Neutral requires publication_attempt to identify its branch; unfinished physical interval pending" })),
+                ("joint_epochs", joint.to_string()), ("receiving_only_epochs", receiving_only.to_string()), ("held_receiving_epochs",held_receiving.to_string()), ("neutral_epochs", neutral.to_string()),
+                ("certification_scope", quoted(if checkpoint.stream.scope().is_local_receiving() { "local R NormalLaw; complete whole-section finite comparison not requested; unfinished actual input pending; source E family response is separate" } else { "atomic same-opening whole then upstream joint proposal with both native normal predicates and actual finite comparison; held-upstream absorption on domain refusal; Neutral requires publication_attempt to identify its branch; unfinished physical interval pending" })),
                 ("deposition_scope", quoted(scope_description(checkpoint.stream.scope()))),
                 ("epoch_outcomes", format!("[{}]", outcomes.join(","))),
                 ("class_code_scope", quoted("prequential class comparison through the actual model/tree face; separate tree-only control; phase improvement alone is not class prediction improvement")),
@@ -2073,3 +2076,6 @@ pub fn code_prepared_late_rollback(execution:&dyn holonics::hnn::reference::obse
 
 #[cfg(test)]
 pub fn code_prepared_arrival_context(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution)->std::result::Result<(String,String,String),Box<dyn std::error::Error>>{complete_language::code_prepared_arrival_context(execution)}
+
+#[cfg(test)]
+pub fn code_held_prepared_late_rollback(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution)->std::result::Result<String,Box<dyn std::error::Error>>{complete_language::code_held_prepared_late_rollback(execution)}

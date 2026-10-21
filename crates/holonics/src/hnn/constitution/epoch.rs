@@ -81,6 +81,8 @@ pub enum EpochStageValue {
     RationalMatrix(ExactRatMatrix),
     /// Bounded exact actual proposal/source operands; exterior failure evidence only.
     ReceivingRay(Box<EpochReceivingRayPacket>),
+    /// Original local decline retained by an independently failing held publication.
+    ReceivingDecline(Box<EpochStageRefusal>),
     JointDirection(EpochJointDirectionReading),
     Text(&'static str),
     /// The failing owner had not produced this operand, or its diagnostic could not be read.

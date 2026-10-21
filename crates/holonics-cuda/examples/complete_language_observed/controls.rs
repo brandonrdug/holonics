@@ -37,7 +37,7 @@ fn exercise_fixture_command(label:&str,bytes:&[u8],command:&str){
     let cuts = root.join("synthetic-cuts.tsv");
     std::fs::write(&corpus, bytes).unwrap();
     let cells=bytes.len()*4;assert_eq!(cells%10,0);
-    std::fs::write(&cuts,if command=="train-prepared-local-retained-fibre-v1"{format!("0\tsynthetic-opening\n13\tthree-pending\n{cells}\tsynthetic-closed\n")}else{format!("0\tsynthetic-opening\n{cells}\tsynthetic-closed\n")}).unwrap();
+    std::fs::write(&cuts,if matches!(command,"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"){format!("0\tsynthetic-opening\n13\tthree-pending\n{cells}\tsynthetic-closed\n")}else{format!("0\tsynthetic-opening\n{cells}\tsynthetic-closed\n")}).unwrap();
     fn hash(path: &Path) -> String {
         let out = std::process::Command::new("sha256sum")
             .arg(path)
@@ -71,14 +71,15 @@ fn exercise_fixture_command(label:&str,bytes:&[u8],command:&str){
         assert!(complete.contains("\"cold_exact\":true"));
         assert!(complete.contains(&format!("\"accepted_cells\":{cells}")));
         assert!(complete.contains(&format!("\"actual_epochs\":{}",cells/10)));
-        if matches!(command,"train-local-retained-fibre-v1"|"train-prepared-local-retained-fibre-v1") {
-            assert!(complete.contains("\"deposition_scope\":\"LocalReceivingReturn\""));
+        if matches!(command,"train-local-retained-fibre-v1"|"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1") {
+            let scope=if command=="train-prepared-local-retained-held-v1" { "LocalReceivingReturnWithHeldMap" } else { "LocalReceivingReturn" };
+            assert!(complete.contains(&format!("\"deposition_scope\":\"{scope}\"")));
             let execution=std::fs::read_to_string(root.join(backend).join("EXECUTION_CONTRACT.json")).unwrap();
             assert!(execution.contains(&format!("\"command\":\"{command}\"")));
             assert!(execution.contains("\"additional_whole_section_monotone_policy_requested\":false"));
             let fresh=exterior::code_checkpoint_scope_and_source(root.join(backend).join("fresh.state").to_str().unwrap()).unwrap();
             let trained=exterior::code_checkpoint_scope_and_source(root.join(backend).join("trained.state").to_str().unwrap()).unwrap();
-            assert_eq!(fresh.0,"LocalReceivingReturn");assert_eq!(trained.0,fresh.0);
+            assert_eq!(fresh.0,scope);assert_eq!(trained.0,fresh.0);
             assert_eq!(trained.1,fresh.1,"local command cannot silently update source E normal state");
             assert_ne!(trained.2,fresh.2,"actual local R material must move on this existing varied fixture");
             eprintln!("V93_LOCAL_CLI_OBSERVED {backend} {}",complete.trim());
@@ -90,7 +91,7 @@ fn exercise_fixture_command(label:&str,bytes:&[u8],command:&str){
         "cut-00000.state".to_owned(),
         format!("cut-{cells:05}.state"),
     ];
-    if command=="train-prepared-local-retained-fibre-v1"{checkpoints.push("cut-00013.state".into());}
+    if matches!(command,"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"){checkpoints.push("cut-00013.state".into());}
     for checkpoint in checkpoints {
         let host = exterior::code_checkpoint_native_bytes(
             root.join("host-reference")
@@ -220,4 +221,19 @@ impl holonics::hnn::reference::observed::ObservedEpochExecution for MirroredPrep
     }
     fn pull_back(&self,w:holonics::hnn::Word<'_>,g:&holonics::hnn::RatioCovector,m:&holonics::ratio::linear::ExactRatMatrix,p:&holonics::hnn::ReceivingPhases)->Result<holonics::hnn::port::WordReturn,holonics::hnn::HnnError>{HostObservedEpochExecution.pull_back(w,g,m,p)}
     fn aggregate_records(&self,l:holonics::hnn::constitution::LinearLocus,r:usize,c:usize,g:u32,n:u64,e:u64,h:u64,records:&[holonics::hnn::constitution::EpochProducerRecordReading])->Result<holonics::hnn::constitution::EpochRecordFlowReading,holonics::hnn::HnnError>{self.0.aggregate_records(l,r,c,g,n,e,h,records)}
+}
+
+#[test]
+#[ignore = "exclusive supported HOST CUDA; held-policy ordinary40-class prepared/cold boundary"]
+fn held_prepared_local_training_host_card_and_cold(){
+    exercise_fixture_command("held-prepared-local-retained",&[0x1b;10],"train-prepared-local-retained-held-v1");
+}
+#[test]
+#[ignore = "exclusive supported HOST CUDA; explicit held-policy late10class card fault"]
+fn held_prepared_late_card_fault_is_atomic(){
+    let execution=LateAggregate(dispatch::TracedCard::new(ObservedEpochDevice::open(0).unwrap()));
+    let refusal=exterior::code_held_prepared_late_rollback(&execution).unwrap();
+    assert!(refusal.contains("synthetic late prepared card aggregate refusal"));
+    execution.0.require_actual_dispatch().unwrap();
+    eprintln!("HELD_PREPARED_CARD_FAULT {}",execution.0.receipt(false).trim());
 }

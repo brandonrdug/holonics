@@ -3086,6 +3086,20 @@ pub struct EpochChannelGrainRestageReading {
     pub probe_refusal: Option<String>,
 }
 
+/// A zero-applied-map successor independently admitted after one typed local ray decline.
+/// Transient evidence; actual normal state/frontiers, not this record, survive cold restore.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochHeldReceivingReading {
+    pub original_decline: Box<epoch::EpochStageRefusal>,
+    pub gamma: Rat,
+    pub crossings_before: u64,
+    pub crossings_after: u64,
+    pub gram_update: EpochSeriesReading,
+    pub fresh_covector: EpochSeriesReading,
+    pub news_before: EpochSeriesReading,
+    pub news_after: EpochSeriesReading,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochDepositReading {
     /// Actual producing-cut C/K dispositions, only in the explicitly selected material scope.
@@ -3094,6 +3108,7 @@ pub struct EpochDepositReading {
     pub channel_grain_deferred: Option<EpochChannelGrainDeferralReading>,
     pub channel_grain_restaged: Option<EpochChannelGrainRestageReading>,
     pub quantum_projection: Option<EpochQuantumProjectionReading>,
+    pub held_receiving: Option<EpochHeldReceivingReading>,
     pub actual_receiving_ingress: u64,
     pub heard_cells: u64,
     pub declared_cells: u64,

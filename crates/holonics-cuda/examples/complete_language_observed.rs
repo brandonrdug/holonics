@@ -21,7 +21,7 @@ fn run(args: &[String]) -> Result<(), Box<dyn Error>> {
     match args.get(2).map(String::as_str) {
         Some("host-reference") => run_complete_language_with_execution(
             &args[1..], &HostObservedEpochExecution, CompleteLanguageTrainingBackend::HostReference),
-        Some("cuda-observed-epoch-device0") if matches!(command.as_str(),"train-retained-fibre-v1"|"train-local-retained-fibre-v1"|"train-prepared-local-retained-fibre-v1") => {
+        Some("cuda-observed-epoch-device0") if matches!(command.as_str(),"train-retained-fibre-v1"|"train-local-retained-fibre-v1"|"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1") => {
             // Opening failure propagates before data access or output creation. No host retry.
             let execution = dispatch::TracedCard::new(ObservedEpochDevice::open(0)?);
             let result = run_complete_language_with_execution(

@@ -91,6 +91,14 @@ pub enum ObservedEpochDepositionScope {
     /// Opt-in witnessed RetainedFibreV1 R response: local NormalLaw only, no whole-section
     /// finite monotone veto, upstream normal preparation, or candidate forward replay.
     LocalReceivingReturn,
+    /// Same retained local law; valid fresh news may publish with held R map
+    /// after one narrowly typed actual-ray non-admission. Explicit opt-in only.
+    LocalReceivingReturnWithHeldMap,
+}
+impl ObservedEpochDepositionScope {
+    pub fn is_local_receiving(self) -> bool {
+        matches!(self, Self::LocalReceivingReturn | Self::LocalReceivingReturnWithHeldMap)
+    }
 }
 
 /// Publication route. Under LocalReceivingReturn, ReceivingOnly denotes the local
@@ -101,6 +109,7 @@ pub enum ObservedEpochOutcome {
     Whole,
     Joint,
     ReceivingOnly,
+    HeldReceiving,
     Neutral,
 }
 
@@ -340,7 +349,8 @@ fn with_receiving_masses(
         match scope {
             ObservedEpochDepositionScope::All => deposit.factors().to_vec(),
             ObservedEpochDepositionScope::NormalMaps
-            | ObservedEpochDepositionScope::LocalReceivingReturn => Vec::new(),
+            | ObservedEpochDepositionScope::LocalReceivingReturn
+            | ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap => Vec::new(),
             ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => deposit
                 .factors()
                 .iter()
@@ -678,7 +688,7 @@ impl Reference {
     ) -> Result<ObservedEpochReceipt, HnnError> {
         let forward_start = Instant::now();
         if resident.prepared_input.is_some()
-            && (deposition_scope != ObservedEpochDepositionScope::LocalReceivingReturn
+            && (!deposition_scope.is_local_receiving()
                 || resident
                     .prepared_input
                     .as_ref()
@@ -688,8 +698,12 @@ impl Reference {
                 "prepared observed training uses its one actual LocalReceivingReturn owner",
             ));
         }
-        let local_receiving =
-            deposition_scope == ObservedEpochDepositionScope::LocalReceivingReturn;
+        let local_receiving = deposition_scope.is_local_receiving();
+        let held_policy = deposition_scope == ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap;
+        if held_policy && (resident.participating_world.is_some() || resident.prepared_input.is_none()
+            || resident.constitution.receiving_layout(resident.admitted[0].ring()) != Some(crate::hnn::constitution::receiving_blocks::ReceivingLayout::Single)) {
+            return Err(refusal("held receiving continuation requires actual prepared Single input without a participating World"));
+        }
         if local_receiving && resident.receiving_law() != ReceivingLaw::RetainedFibreV1 {
             return Err(refusal(
                 "the local receiving return explicitly requires RetainedFibreV1",
@@ -1338,7 +1352,7 @@ impl Reference {
                 | ObservedEpochDepositionScope::NormalMapsAndChannelMaterial
         );
         let mut grain_target_deferred = None;
-        let mut normal_stage = if shared_normals {
+        let mut normal_stage = if shared_normals || held_policy {
             let stage =
                 crate::hnn::constitution::epoch::ObservedNormalEpochStage::new_with_endpoint(
                     &comparison_opening.constitution,
@@ -1361,6 +1375,7 @@ impl Reference {
                     ),
                     channel_endpoint.as_ref(),
                 )?;
+            let stage = if held_policy { stage.for_local_receiving_hold()? } else { stage };
             let grain_enabled = self.refining
                 && matches!(
                     deposition_scope,
@@ -1407,7 +1422,9 @@ impl Reference {
                 if without_grain {
                     stage.without_channel_grain(scope)?;
                 }
-                stage.stage(scope, observe)
+                if held_policy && scope == EpochCandidateScope::ReceivingOnly {
+                    stage.stage_local_receiving_with_hold(observe)
+                } else { stage.stage(scope, observe) }
             } else {
                 comparison_opening
                     .constitution
@@ -1949,7 +1966,9 @@ impl Reference {
                         return Err(failure.error);
                     }
                 };
-                let outcome = if receiving.has_physical_motion() {
+                let outcome = if receiving.held_receiving() {
+                    ObservedEpochOutcome::HeldReceiving
+                } else if receiving.has_physical_motion() {
                     ObservedEpochOutcome::ReceivingOnly
                 } else {
                     ObservedEpochOutcome::Neutral
@@ -3054,7 +3073,7 @@ mod tests {
                             assert!(!reading.strictly_improved);
                         }
                     }
-                    ObservedEpochOutcome::ReceivingOnly | ObservedEpochOutcome::Joint => {
+                    ObservedEpochOutcome::ReceivingOnly | ObservedEpochOutcome::Joint | ObservedEpochOutcome::HeldReceiving => {
                         assert!(!reading.strictly_improved);
                         assert!(!reading.unchanged && !reading.objective_equal());
                     }

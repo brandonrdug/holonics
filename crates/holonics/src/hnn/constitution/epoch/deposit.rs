@@ -70,6 +70,7 @@ pub(crate) struct ObservedNormalEpochStage<'a> {
     channel_grain: Option<ObservedChannelGrainPlan>,
     grain_restage_scope: Option<EpochCandidateScope>,
     prepared: Option<PreparedEpochNormals>,
+    local_receiving_hold: bool,
 }
 
 impl<'a> ObservedNormalEpochStage<'a> {
@@ -178,7 +179,92 @@ impl<'a> ObservedNormalEpochStage<'a> {
             channel_grain: None,
             grain_restage_scope: None,
             prepared: None,
+            local_receiving_hold: false,
         })
+    }
+
+    /// One explicit local owner; no Whole/Joint setup is performed to initialize R.
+    pub(crate) fn for_local_receiving_hold(mut self) -> Result<Self, HnnError> {
+        if self.allow_channel_dissipation
+            || self.channel_endpoint.is_some()
+            || self.opening.receiving_layout(self.receiver)
+                != Some(crate::hnn::constitution::receiving_blocks::ReceivingLayout::Single)
+            || self.receiving_parts.is_empty()
+            || self
+                .receiving_parts
+                .iter()
+                .any(|p| p.law.retained_origin().is_none())
+            || self.deposits.iter().any(|d| {
+                !d.factors().is_empty()
+                    || d.linear()
+                        .iter()
+                        .any(|s| s.locus != LinearLocus::Receiving(self.receiver))
+            })
+        {
+            return Err(refused(
+                "held receiving policy requires its genuine retained Single R-only inputs",
+            ));
+        }
+        self.local_receiving_hold = true;
+        Ok(self)
+    }
+
+    pub(crate) fn stage_local_receiving_with_hold(
+        &mut self,
+        observe: &mut dyn FnMut(EpochDepositPhase),
+    ) -> Result<StagedEpochCandidate, EpochStageFailure> {
+        if !self.local_receiving_hold {
+            return Err(
+                EpochStageTrace::default().failed(refused("local held policy was not selected"))
+            );
+        }
+        match self.stage_projection(EpochCandidateScope::ReceivingOnly, observe, None) {
+            Ok(candidate) => Ok(candidate),
+            Err(failure) => {
+                let Some(cap) = LocalRayNotAdmitted::mint(self, &failure) else {
+                    return Err(failure);
+                };
+                // Same already validated immutable samples/fresh gain. No forward,
+                // target return, aggregate or material observation is repeated.
+                let mut trace = EpochStageTrace::default();
+                let candidate = self
+                    .opening
+                    .prepare_observed_epoch_with_execution(
+                        self.deposits,
+                        self.receiver,
+                        self.receiving_period,
+                        self.heard_cells,
+                        self.epoch_cells,
+                        self.epoch_index,
+                        self.exponent,
+                        self.retained,
+                        self.tree.clone(),
+                        self.pair_speed,
+                        self.receiving_parts,
+                        observe,
+                        self.execution,
+                        Some(EpochCandidateScope::ReceivingOnly),
+                        &mut trace,
+                        Some(&mut self.prepared),
+                        None,
+                        false,
+                        None,
+                        None,
+                        true,
+                        Some(&cap),
+                    )
+                    .map_err(|error| {
+                        let mut failed = trace.failed(error);
+                        failed.evidence.readings.push(EpochStageReading {
+                            name: "original_local_ray_decline",
+                            value: EpochStageValue::ReceivingDecline(Box::new(cap.decline.clone())),
+                        });
+                        failed.normal_inputs_prepared = self.prepared.is_some();
+                        failed
+                    })?;
+                Ok(candidate)
+            }
+        }
     }
 
     /// Bound across Whole/Joint unless the optional grain candidate is discarded explicitly.
@@ -318,7 +404,10 @@ impl<'a> ObservedNormalEpochStage<'a> {
         quantum: Option<&QuantumProjection>,
     ) -> Result<StagedEpochCandidate, EpochStageFailure> {
         let mut trace = EpochStageTrace::default();
-        if scope != EpochCandidateScope::Whole && self.prepared.is_none() {
+        if scope != EpochCandidateScope::Whole
+            && self.prepared.is_none()
+            && !(self.local_receiving_hold && scope == EpochCandidateScope::ReceivingOnly)
+        {
             return Err(trace.failed(refused(
                 "a restaged normal epoch needs the same opening's actually certified fresh gains",
             )));
@@ -357,6 +446,8 @@ impl<'a> ObservedNormalEpochStage<'a> {
                     self.channel_grain.as_ref()
                 },
                 self.channel_endpoint,
+                self.local_receiving_hold,
+                None,
             )
             .map_err(|error| {
                 let mut failure = trace.failed(error);
@@ -366,7 +457,137 @@ impl<'a> ObservedNormalEpochStage<'a> {
     }
 }
 
+/// Minted only from this owner's actual canonical refusal after its fresh certificate.
+/// Neither an exterior reason string nor another stage's evidence can construct this.
+struct LocalRayNotAdmitted {
+    commit: u64,
+    receiver: usize,
+    epoch_index: u64,
+    heard: u64,
+    gamma: Rat,
+    origin: std::sync::Arc<crate::hnn::receiving::RetainedSectionOrigin>,
+    decline: EpochStageRefusal,
+}
+impl LocalRayNotAdmitted {
+    fn mint(stage: &ObservedNormalEpochStage<'_>, failure: &EpochStageFailure) -> Option<Self> {
+        let e = &failure.evidence;
+        let native_decline = matches!(
+            (&failure.error, e.phase, e.condition),
+            (
+                HnnError::Unadmitted {
+                    reason: "a moving actual epoch ray must descend its contemporary comparison"
+                },
+                "actual_ray",
+                EpochStageCondition::ActualRayAlignment
+            ) | (
+                HnnError::Unadmitted {
+                    reason: "the actual epoch ray violates its own curvature bound"
+                },
+                "actual_certificate",
+                EpochStageCondition::ActualRayCurvature
+            )
+        );
+        if !native_decline
+            || !stage.local_receiving_hold
+            || !failure.normal_inputs_prepared
+            || e.seal_formed
+            || e.finite_probe_executed
+            || e.locus != Some(Locus::ReceivingMap(stage.receiver))
+            || e.family != Some(Family::Map)
+            || !e.participating_families.is_empty()
+            || !matches!(
+                (e.phase, e.condition),
+                ("actual_ray", EpochStageCondition::ActualRayAlignment)
+                    | (
+                        "actual_certificate",
+                        EpochStageCondition::ActualRayCurvature
+                    )
+            )
+        {
+            return None;
+        }
+        let p = stage.prepared.as_ref()?;
+        let kind = LinearLocus::Receiving(stage.receiver);
+        if !p.certificate_valid
+            || p.laws.len() != 1
+            || p.flows.len() != 1
+            || !p.laws.contains_key(&kind)
+        {
+            return None;
+        }
+        let gamma = p
+            .certified
+            .get(&(kind.locus(), Family::Map))?
+            .step
+            .step
+            .clone();
+        if !gamma.is_positive() {
+            return None;
+        }
+        let origin = std::sync::Arc::clone(stage.receiving_parts.first()?.law.retained_origin()?);
+        if stage.receiving_parts.iter().any(|p| {
+            p.law
+                .retained_origin()
+                .is_none_or(|o| !std::sync::Arc::ptr_eq(o, &origin))
+        }) {
+            return None;
+        }
+        Some(Self {
+            commit: stage.opening.commit(),
+            receiver: stage.receiver,
+            epoch_index: stage.epoch_index,
+            heard: stage.heard_cells,
+            gamma,
+            origin,
+            decline: e.clone(),
+        })
+    }
+    #[allow(clippy::too_many_arguments)]
+    fn admit(
+        &self,
+        opening: &Constitution,
+        receiver: usize,
+        epoch_index: u64,
+        heard: u64,
+        laws: &BTreeMap<LinearLocus, EpochLaw>,
+        flows: &BTreeMap<LinearLocus, EpochFlow>,
+        certified: &BTreeMap<(Locus, Family), StepReading>,
+        parts: &[EpochReceivingRecord],
+    ) -> Result<(), HnnError> {
+        let kind = LinearLocus::Receiving(receiver);
+        if self.commit != opening.commit()
+            || self.receiver != receiver
+            || self.epoch_index != epoch_index
+            || self.heard != heard
+            || laws.len() != 1
+            || flows.len() != 1
+            || !laws.contains_key(&kind)
+            || certified
+                .get(&(kind.locus(), Family::Map))
+                .is_none_or(|r| r.step.step != self.gamma)
+            || !self.gamma.is_positive()
+            || parts.is_empty()
+            || parts.iter().any(|p| {
+                p.law
+                    .retained_origin()
+                    .is_none_or(|o| !std::sync::Arc::ptr_eq(o, &self.origin))
+            })
+        {
+            return Err(refused(
+                "held receiving capability keeps its valid original section and fresh gain",
+            ));
+        }
+        Ok(())
+    }
+}
+
 impl StagedEpochCandidate {
+    pub(crate) fn held_receiving(&self) -> bool {
+        self.reading
+            .epoch
+            .as_ref()
+            .is_some_and(|e| e.held_receiving.is_some())
+    }
     pub(crate) fn channel_endpoints(&self) -> &[EpochChannelEndpointReading] {
         self.reading
             .epoch
@@ -1509,6 +1730,32 @@ impl Constitution {
         .ok_or_else(|| refused("an epoch normal locus must exist as one declared linear law"))
     }
 
+    #[cfg(test)]
+    pub(crate) fn code_seed_held_receiving_news(
+        &mut self,
+        field: &Field,
+        receiver: usize,
+        source: &EpochSeriesReading,
+        scale: &Rat,
+    ) -> Result<(), HnnError> {
+        let kind = LinearLocus::Receiving(receiver);
+        let mut law = EpochLaw::from_normal(
+            self.epoch_normal(kind)?,
+            self.observed_epoch_grain(receiver)?,
+        )?;
+        let phase_rows: Vec<_> = (1..law.map.rows).step_by(2).collect();
+        law = law.with_phase_rows(&phase_rows, field.ring(receiver).period())?;
+        let covector = EpochArray::with_row_divisors(
+            source.rows,
+            source.columns,
+            source.exponent,
+            source.numerators.clone(),
+            source.row_odd_divisors.clone(),
+        )?;
+        law.news = covector.scalar_product(&EpochArray::from_dyadic_scalar(scale)?)?;
+        self.epoch_normal_mut(kind)?.publish_epoch(law)
+    }
+
     /// Absorption count only. The resident's actual receiving ingress count
     /// remains the authority for c and for terminal partial closure.
     pub(crate) fn observed_epoch_index(&self, receiver: usize) -> u64 {
@@ -1634,6 +1881,8 @@ impl Constitution {
             false,
             None,
             None,
+            false,
+            None,
         )?
         .admit_receiving()
     }
@@ -1731,6 +1980,8 @@ impl Constitution {
             false,
             None,
             None,
+            false,
+            None,
         )
         .map_err(|error| trace.failed(error))
     }
@@ -1763,7 +2014,20 @@ impl Constitution {
         allow_channel_dissipation: bool,
         channel_grain: Option<&ObservedChannelGrainPlan>,
         channel_endpoint: Option<&crate::hnn::word::endpoint::ChannelEndpoint>,
+        local_receiving_only: bool,
+        held_receiving: Option<&LocalRayNotAdmitted>,
     ) -> Result<StagedEpochCandidate, HnnError> {
+        if (local_receiving_only || held_receiving.is_some())
+            && (scope != Some(EpochCandidateScope::ReceivingOnly)
+                || quantum.is_some()
+                || allow_channel_dissipation
+                || channel_grain.is_some()
+                || channel_endpoint.is_some())
+        {
+            return Err(refused(
+                "local held receiving stages keep one R-only publication scope",
+            ));
+        }
         for part in receiving_parts {
             part.law.admit_owner(
                 receiver,
@@ -1907,7 +2171,7 @@ impl Constitution {
             // receiving-only candidate. When shared normals were prepared,
             // their current-batch statistics may be replayed with zero steps.
             factors.clear();
-            if prepared.is_none() {
+            if prepared.is_none() || local_receiving_only {
                 // A fresh receiving-only branch also has no upstream H/R state.
                 kinds.retain(|kind| *kind == LinearLocus::Receiving(receiver));
             }
@@ -2348,6 +2612,18 @@ impl Constitution {
                 )?
                 .map_err(|_| refused("the native epoch joint certificate refused its candidate"))?
             };
+        if let Some(cap) = held_receiving {
+            cap.admit(
+                self,
+                receiver,
+                epoch_index,
+                heard_cells,
+                &laws,
+                &flows,
+                &certified,
+                receiving_parts,
+            )?;
+        }
         drop(factor_faces);
         observe(EpochDepositPhase::JointCertificate);
         let stepping: Vec<_> = regions
@@ -2535,6 +2811,9 @@ impl Constitution {
                 );
             }
             let deposit = match *kind {
+                LinearLocus::Receiving(_) if held_receiving.is_some() => {
+                    laws[kind].deposited_at(&flows[kind], &gain, BigInt::zero(), BigInt::one())?
+                }
                 LinearLocus::Receiving(_) if quantum.is_some() => laws[kind].deposit_quantum(
                     &flows[kind],
                     &gain,
@@ -2939,6 +3218,25 @@ impl Constitution {
                 channel_grain_deferred: None,
                 channel_grain_restaged: None,
                 quantum_projection: None,
+                held_receiving: held_receiving.map(|cap| {
+                    let kind = LinearLocus::Receiving(receiver);
+                    let before = &laws[&kind];
+                    let after = next
+                        .epoch_normal(kind)
+                        .expect("validated published receiving law")
+                        .epoch_law()
+                        .expect("published grouped normal");
+                    EpochHeldReceivingReading {
+                        original_decline: Box::new(cap.decline.clone()),
+                        gamma: cap.gamma.clone(),
+                        crossings_before: before.crossings,
+                        crossings_after: after.crossings,
+                        gram_update: EpochSeriesReading::of(&flows[&kind].gram),
+                        fresh_covector: EpochSeriesReading::of(&flows[&kind].covector),
+                        news_before: EpochSeriesReading::of(&before.news),
+                        news_after: EpochSeriesReading::of(&after.news),
+                    }
+                }),
                 actual_receiving_ingress: epoch_index,
                 heard_cells,
                 declared_cells: epoch_cells,
@@ -5931,5 +6229,265 @@ mod tests {
                 .filter(|((l, _), _)| matches!(l, Locus::Channel(_)))
                 .collect::<Vec<_>>()
         );
+    }
+    fn held_retained_fixture(
+        scale: i64,
+    ) -> (Field, Constitution, Deposit, Vec<EpochReceivingRecord>, u32) {
+        use crate::compression::landmark::context::LandmarkFace;
+        use crate::hnn::receiving::{ReceivingRead, RetainedSectionReturn};
+        let (field, mut material, old, _, exponent) = normal_domain_fixture(None, true);
+        let receiver = field.receivers()[0].ring;
+        let map = material.receiving_map(receiver).unwrap().clone();
+        let n = map.rows() / 2;
+        assert!(n.is_power_of_two());
+        let tree = LandmarkFace {
+            grain: field.finest_grain(),
+            probabilities: vec![rat(1, n as i64); n],
+            exponents: vec![BigInt::from(-(n.ilog2() as i64)); n],
+        };
+        let mut feature = vec![Rat::zero(); map.columns()];
+        feature[0] = Rat::one();
+        let read =
+            ReceivingRead::combined(map.apply(&feature).unwrap(), &tree, field.finest_grain())
+                .unwrap();
+        let faces = crate::hnn::ratio::Faces::of_reads(&[read], field.finest_grain()).unwrap();
+        let population = material.rings[receiver].population.as_ref().unwrap();
+        let returned = RetainedSectionReturn::at(
+            population,
+            receiver,
+            &faces,
+            std::slice::from_ref(&tree),
+            &[0],
+        )
+        .unwrap();
+        let origin = returned
+            .certificate_origin(
+                population,
+                receiver,
+                &faces,
+                std::slice::from_ref(&tree),
+                &[0],
+            )
+            .unwrap();
+        let mut covector = vec![Rat::zero(); map.rows()];
+        let mut positive = covector.clone();
+        positive[0] = Rat::one();
+        let mut foil = covector.clone();
+        let phase = covector.clone();
+        for c in 0..n {
+            covector[2 * c] = -returned.stations[0].gradient[c].clone();
+            foil[2 * c] = returned.stations[0].packed_foil[c].clone();
+        }
+        let sample = Sample {
+            weight: Rat::one(),
+            feature: feature.clone(),
+            covector,
+            masses: Some(returned.stations[0].normalized_representative.clone()),
+        };
+        let law = EpochReceivingLaw::retained(
+            origin,
+            receiver,
+            material.commit(),
+            0,
+            0,
+            vec![BigInt::zero(); field.rings().len()],
+            &map,
+            &sample,
+            &positive,
+            &foil,
+            &phase,
+        )
+        .unwrap();
+        let parts = vec![EpochReceivingRecord {
+            law,
+            feature,
+            positive,
+            foil,
+            phase,
+        }];
+        let phase_rows: Vec<_> = (1..map.rows()).step_by(2).collect();
+        let records = super::super::device::epoch_record_operands(
+            std::slice::from_ref(&sample),
+            &phase_rows,
+            field.ring(receiver).period(),
+        )
+        .unwrap();
+        let flow = super::super::device::epoch_record_flow_reference(
+            map.rows(),
+            map.columns(),
+            material.observed_epoch_grain(receiver).unwrap(),
+            1,
+            0,
+            1,
+            &records,
+        )
+        .unwrap();
+        material
+            .code_seed_held_receiving_news(
+                &field,
+                receiver,
+                &flow.covector,
+                &Rat::from_integer(scale.into()),
+            )
+            .unwrap();
+        let deposit = Deposit::new(
+            material.commit(),
+            vec![LinearStep {
+                locus: LinearLocus::Receiving(receiver),
+                samples: vec![sample],
+            }],
+            vec![],
+            [Locus::ReceivingMap(receiver)].into_iter().collect(),
+        )
+        .with_reach(old.reach().unwrap().clone());
+        (field, material, deposit, parts, exponent)
+    }
+    #[test]
+    fn held_receiving_native_alignment_and_curvature_keep_news_once_and_failures_typed() {
+        for (scale, expected) in [
+            (-64, EpochStageCondition::ActualRayAlignment),
+            (64, EpochStageCondition::ActualRayCurvature),
+        ] {
+            let (field, material, deposit, parts, exponent) = held_retained_fixture(scale);
+            let receiver = field.receivers()[0].ring;
+            let kind = LinearLocus::Receiving(receiver);
+            let retained = crate::hnn::retention::loci(&field).into_iter().collect();
+            let deposits = [deposit];
+            let pair_speed = |_, _, _: &PairPort, _: [&[Vec<Rat>]; 3]| panic!("no pair factor");
+            let mut stage = ObservedNormalEpochStage::new(
+                &material,
+                &deposits,
+                receiver,
+                field.ring(receiver).period(),
+                1,
+                1,
+                0,
+                exponent,
+                &retained,
+                material.landmarks(receiver).unwrap().clone(),
+                &pair_speed,
+                &parts,
+                &crate::hnn::reference::observed::HostObservedEpochExecution,
+                false,
+            )
+            .unwrap()
+            .for_local_receiving_hold()
+            .unwrap();
+            let opening = material.continuing_state(0).unwrap().to_text();
+            let mut refusal = stage
+                .stage_projection(EpochCandidateScope::ReceivingOnly, &mut |_| {}, None)
+                .unwrap_err();
+            assert_eq!(refusal.evidence.condition, expected, "{refusal:?}");
+            let cap = LocalRayNotAdmitted::mint(&stage, &refusal)
+                .expect("actual same-owner narrow native cause");
+            assert!(cap.gamma.is_positive());
+            refusal.error = HnnError::CountOverflow;
+            assert!(LocalRayNotAdmitted::mint(&stage, &refusal).is_none());
+            refusal.error = HnnError::ConstitutionBudget {
+                bits: 2,
+                budget: 1,
+                commit: material.commit(),
+                loci: vec![],
+            };
+            assert!(LocalRayNotAdmitted::mint(&stage, &refusal).is_none());
+            let prior = stage.prepared.as_ref().unwrap();
+            let before = prior.laws[&kind].clone();
+            let flow = prior.flows[&kind].clone();
+            // The public owner repeats staging only, not native observation. This
+            // fixture has no executor side effect beyond its cached first aggregate.
+            let candidate = stage.stage_local_receiving_with_hold(&mut |_| {}).unwrap();
+            assert!(candidate.held_receiving() && !candidate.has_physical_motion());
+            let (next, reading) = candidate.admit_receiving().unwrap();
+            let after = next.epoch_normal(kind).unwrap().epoch_law().unwrap();
+            assert_eq!(after.map, before.map);
+            assert_eq!(after.gram, before.gram.add(&flow.gram).unwrap());
+            assert_eq!(
+                after.news,
+                before
+                    .news
+                    .add(
+                        &flow
+                            .covector
+                            .scalar_product(&EpochArray::from_dyadic_scalar(&cap.gamma).unwrap())
+                            .unwrap()
+                    )
+                    .unwrap()
+            );
+            assert_eq!(after.crossings, before.crossings + 1);
+            let held = reading
+                .epoch
+                .as_ref()
+                .unwrap()
+                .held_receiving
+                .as_ref()
+                .unwrap();
+            assert_eq!(held.original_decline.condition, expected);
+            assert_eq!(held.gamma, cap.gamma);
+            let r = &reading.epoch.as_ref().unwrap().loci[0];
+            assert!(r.eta.is_zero() && r.fall.is_zero());
+            assert_eq!(reading.stepped, 0);
+            assert_eq!(material.continuing_state(0).unwrap().to_text(), opening);
+            let state = ContinuingState::from_text(
+                &next.continuing_state(0).unwrap().to_text(),
+                next.budget(),
+            )
+            .unwrap();
+            let cold = Constitution::initial(&field, next.budget())
+                .unwrap()
+                .continued_on(&field, &state)
+                .unwrap();
+            assert_eq!(
+                cold.continuing_state(0).unwrap(),
+                next.continuing_state(0).unwrap()
+            );
+            println!(
+                "HELD_RECEIVING_NATIVE_TRACE scale={scale} cause={expected:?} gamma={} crossings={}=>{} mapheld=true H_increment={:?} news_before={:?} news_after={:?}",
+                cap.gamma, before.crossings, after.crossings, flow.gram, before.news, after.news
+            );
+        }
+    }
+    #[test]
+    fn held_receiving_late_budget_failure_preserves_original_decline_and_material() {
+        let (field, mut material, deposit, parts, exponent) = held_retained_fixture(-64);
+        material.budget = 1;
+        let receiver = field.receivers()[0].ring;
+        let retained = crate::hnn::retention::loci(&field).into_iter().collect();
+        let deposits = [deposit];
+        let pair_speed = |_, _, _: &PairPort, _: [&[Vec<Rat>]; 3]| panic!("no pair factor");
+        let before = material.clone();
+        let mut stage = ObservedNormalEpochStage::new(
+            &material,
+            &deposits,
+            receiver,
+            field.ring(receiver).period(),
+            1,
+            1,
+            0,
+            exponent,
+            &retained,
+            material.landmarks(receiver).unwrap().clone(),
+            &pair_speed,
+            &parts,
+            &crate::hnn::reference::observed::HostObservedEpochExecution,
+            false,
+        )
+        .unwrap()
+        .for_local_receiving_hold()
+        .unwrap();
+        let error = stage
+            .stage_local_receiving_with_hold(&mut |_| {})
+            .unwrap_err();
+        assert!(
+            matches!(error.error, HnnError::ConstitutionBudget { .. }),
+            "{error:?}"
+        );
+        assert!(
+            error
+                .evidence
+                .readings
+                .iter()
+                .any(|r| matches!(r.value, EpochStageValue::ReceivingDecline(_)))
+        );
+        assert_eq!(material, before);
     }
 }

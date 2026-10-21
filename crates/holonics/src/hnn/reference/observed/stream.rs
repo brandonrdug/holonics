@@ -131,7 +131,7 @@ impl ObservedStream {
         pending: Vec<usize>,
     ) -> Result<Self, HnnError> {
         let bound = Self::finite_bound(&resident)?;
-        if scope == ObservedEpochDepositionScope::LocalReceivingReturn
+        if scope.is_local_receiving()
             && resident.receiving_law() != crate::hnn::receiving::ReceivingLaw::RetainedFibreV1
         {
             return Err(refuse(
@@ -185,7 +185,7 @@ impl ObservedStream {
 
     /// Fresh explicit opt-in. The existing stream remains the sole ingress owner.
     pub fn select_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
-        if !self.pending.is_empty() || self.scope!=ObservedEpochDepositionScope::LocalReceivingReturn{return Err(refuse("fresh prepared input uses LocalReceivingReturn with no pending arrivals"));}
+        if !self.pending.is_empty() || !self.scope.is_local_receiving(){return Err(refuse("fresh prepared input uses LocalReceivingReturn with no pending arrivals"));}
         self.resident.select_prepared_input(pairing)
     }
 
@@ -465,6 +465,7 @@ impl ObservedStream {
         let scope = match self.scope {
             ObservedEpochDepositionScope::All => "all",
             ObservedEpochDepositionScope::LocalReceivingReturn => "local-receiving-return-v1",
+            ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap => "local-receiving-held-map-v1",
             ObservedEpochDepositionScope::NormalMaps => "normal-maps",
             ObservedEpochDepositionScope::NormalMapsAndChannelDissipation => {
                 "normal-maps-channel-dissipation"
@@ -523,6 +524,7 @@ impl ObservedStream {
         let scope = match header[scope_at] {
             "all" => ObservedEpochDepositionScope::All,
             "local-receiving-return-v1" => ObservedEpochDepositionScope::LocalReceivingReturn,
+            "local-receiving-held-map-v1" => ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap,
             "normal-maps" => ObservedEpochDepositionScope::NormalMaps,
             "normal-maps-channel-dissipation" => {
                 ObservedEpochDepositionScope::NormalMapsAndChannelDissipation
@@ -584,6 +586,8 @@ mod tests {
         returns: AtomicUsize,
         flows: AtomicUsize,
         refuse_forward: bool,
+        flow_readings: std::sync::Mutex<Vec<crate::hnn::constitution::EpochRecordFlowReading>>,
+        refuse_aggregate_at: Option<usize>,
     }
 
     impl CountingExecution {
@@ -593,11 +597,20 @@ mod tests {
                 returns: AtomicUsize::new(0),
                 flows: AtomicUsize::new(0),
                 refuse_forward,
+                flow_readings: std::sync::Mutex::new(Vec::new()),
+                refuse_aggregate_at: None,
             }
         }
     }
 
     impl ObservedEpochExecution for CountingExecution {
+        fn admit_prepared_input(&self) -> Result<(),HnnError> { HostObservedEpochExecution.admit_prepared_input() }
+        fn forward_scoped(&self, context:&mut ObservedEpochForwardContext<'_,'_>, ratio:&crate::hnn::pending::PendingRatio,
+            charts:&mut crate::hnn::chart::Charts, opening:&crate::hnn::word::WordOpening) -> Result<ObservedEpochForwardWord,HnnError> {
+            self.forwards.fetch_add(1,Ordering::Relaxed);
+            if self.refuse_forward { return Err(HnnError::ContinuingState { what:"selected stream test execution refused forward" }); }
+            HostObservedEpochExecution.forward_scoped(context,ratio,charts,opening)
+        }
         fn forward(
             &self,
             field: &crate::hnn::field::Field,
@@ -637,8 +650,8 @@ mod tests {
             heard_cells: u64,
             records: &[crate::hnn::constitution::EpochProducerRecordReading],
         ) -> Result<crate::hnn::constitution::EpochRecordFlowReading, HnnError> {
-            self.flows.fetch_add(1, Ordering::Relaxed);
-            HostObservedEpochExecution.aggregate_records(
+            let count=self.flows.fetch_add(1, Ordering::Relaxed)+1;
+            let reading=HostObservedEpochExecution.aggregate_records(
                 locus,
                 rows,
                 columns,
@@ -647,7 +660,10 @@ mod tests {
                 epoch,
                 heard_cells,
                 records,
-            )
+            )?;
+            self.flow_readings.lock().unwrap().push(reading.clone());
+            if self.refuse_aggregate_at==Some(count) { return Err(HnnError::CountOverflow); }
+            Ok(reading)
         }
     }
 
@@ -911,4 +927,93 @@ mod tests {
         assert_eq!(stream.crib, before_crib);
         assert_eq!(stream.pending_checkpoint(), before_pending);
     }
+    /// Reuse the genuine ten-cell/whole-carry fixture. Synthetic retained news
+    /// is explicitly declared before any candidate input, never a dataset replay.
+    fn held_receiving_seeded_stream() -> (Reference,ObservedStream,PairingDeclaration,Constitution,ObservedStream) {
+        use crate::hnn::receiving::ReceivingLaw;
+        use num_traits::{One,Zero};
+        let (reference,mut opening,pairing,initial)=opening_with_law(Some(ReceivingLaw::RetainedFibreV1));
+        opening.scope=ObservedEpochDepositionScope::LocalReceivingReturn;
+        opening.select_prepared_input(&pairing).unwrap();
+        let original=opening.clone();
+        let data:Vec<_>=(0..10).map(|i|i%4).collect();
+        let executor=CountingExecution::new(false);
+        let ordinary_started=std::time::Instant::now();
+        let ordinary=opening.receive_with_execution(&reference,&pairing,&data,&executor).unwrap();
+        println!("HELD_RECEIVING_ORDINARY_COST whole_ns={} stage_ns={:?} nativecounts10/10/1 seeded_news=false",ordinary_started.elapsed().as_nanos(),ordinary.epochs[0].wall.receiving_only_stage.map(|d|d.as_nanos()));
+        let flow=executor.flow_readings.lock().unwrap()[0].clone();
+        assert!(flow.covector.numerators.iter().any(|v|!v.is_zero()));
+        let exponent=flow.covector.exponent.checked_add(20).unwrap();
+        assert!(exponent<=256,"finite CODE fixture news scale");
+        let scale=-Rat::from_integer(BigInt::one() << exponent as usize);
+        let mut selected=original;
+        let field=selected.resident.field.clone();let receiver=selected.resident.admitted[0].ring();
+        selected.resident.constitution.code_seed_held_receiving_news(&field,receiver,&flow.covector,&scale).unwrap();
+        selected.scope=ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap;
+        (reference,selected,pairing,initial,opening)
+    }
+    #[test]
+    fn held_receiving_actual_delivery_pending6_cold_and_once_only() {
+        use crate::hnn::reference::prepared_input::PrefixMode;
+        let (reference,mut stream,pairing,initial,baseline)=held_receiving_seeded_stream();
+        let field=stream.resident.field.clone();let receiver=stream.resident.admitted[0].ring();
+        let map=stream.resident.constitution.receiving_map(receiver).unwrap().clone();
+        let executor=CountingExecution::new(false);
+        let started=std::time::Instant::now();
+        let data:Vec<_>=(0..30).map(|i|i%4).collect();
+        let first=stream.receive_with_execution(&reference,&pairing,&data[..16],&executor).unwrap();
+        assert_eq!((first.accepted,first.published,first.pending),(16,10,6));
+        assert_eq!(first.epochs.len(),1);assert_eq!(first.epochs[0].outcome,ObservedEpochOutcome::HeldReceiving);
+        assert_eq!(stream.resident.constitution.receiving_map(receiver).unwrap(),&map);
+        assert_eq!(stream.resident.current,baseline.resident.current);
+        assert_eq!(stream.resident.carried,baseline.resident.carried);
+        assert_eq!(stream.resident.moments,baseline.resident.moments);
+        assert_eq!(stream.resident.prepared_input,baseline.resident.prepared_input);
+        assert_eq!(stream.crib,baseline.crib);
+        let held=first.epochs[0].deposit.epoch.as_ref().unwrap().held_receiving.as_ref().unwrap();
+        println!("HELD_RECEIVING_STAGING_COST stage_ns={:?} canonical_plus_independent_hold=true nativecounts10/10/1 seeded_news=true not_speedup",first.epochs[0].wall.receiving_only_stage.map(|d|d.as_nanos()));
+        assert!(held.gamma>Rat::from_integer(0.into()));assert_eq!(held.crossings_after,held.crossings_before+1);
+        assert_eq!(executor.forwards.load(Ordering::Relaxed),10);
+        assert_eq!(executor.returns.load(Ordering::Relaxed),10);
+        assert_eq!(executor.flows.load(Ordering::Relaxed),1,"held stage does not reaggregate");
+        assert_eq!(stream.resident.prepared_input.as_ref().unwrap().mode(),PrefixMode::Training);
+        assert_eq!(stream.resident.prepared_input.as_ref().unwrap().frontiers(),(10,0,0));
+        let saved=stream.resident.continuing_state(0).unwrap();let pending=stream.pending_checkpoint();
+        assert!(pending.contains("local-receiving-held-map-v1"));
+        let parsed=ContinuingState::from_text(&saved.to_text(),1<<40).unwrap();
+        let cold_resident=reference.mount_continued(&field,&Current::at_rest(&field),initial,&parsed).unwrap();
+        let cold_crib=ObservedCrib::from_unplaced_checkpoint(&field,cold_resident.current(),10,&stream.crib.unplaced_checkpoint().unwrap()).unwrap();
+        let mut cold=ObservedStream::restore_checkpoint(cold_resident,cold_crib,&pending).unwrap();
+        assert_eq!(cold.scope,stream.scope);
+        // No old Arrived/Word is exposed after publication. Empty delivery,
+        // including cold, cannot repeat the consumed target/news/material return.
+        for state in [&mut stream,&mut cold] {
+            let before=state.resident.continuing_state(0).unwrap();
+            let r=state.receive(&reference,&pairing,&[]).unwrap();
+            assert!(r.epochs.is_empty());assert_eq!(state.resident.continuing_state(0).unwrap(),before);
+        }
+        let later=stream.receive_with_execution(&reference,&pairing,&data[16..],&executor).unwrap();
+        let cold_later=cold.receive(&reference,&pairing,&data[16..]).unwrap();
+        assert_eq!((later.accepted,later.published,later.pending),(14,20,0));
+        assert_eq!(later.epochs.len(),2);assert_eq!(cold_later.epochs.len(),2);
+        assert_eq!(stream.resident.continuing_state(0).unwrap(),cold.resident.continuing_state(0).unwrap());
+        assert_eq!(stream.pending_checkpoint(),cold.pending_checkpoint());assert_eq!(stream.crib,cold.crib);
+        assert_eq!(stream.accepted_cells().unwrap(),30);
+        assert_eq!(executor.forwards.load(Ordering::Relaxed),30);assert_eq!(executor.returns.load(Ordering::Relaxed),30);assert_eq!(executor.flows.load(Ordering::Relaxed),3);
+        assert_eq!(stream.resident.prepared_input.as_ref().unwrap().frontiers(),(30,0,0));
+        assert!(later.epochs.iter().any(|r|r.energy.words.last().is_some_and(|_|r.closed_section)));
+        println!("HELD_RECEIVING_STREAM_TRACE unique_actual30 firstaccepted16/published10/pending6 later14/20/0 warmcalls30/30/3 coldseparatebranch20/20/2 elapsed_ns={} firstdecline={:?} gamma={} work={} firstM10 finalM30 coldexact=true",started.elapsed().as_nanos(),held.original_decline.condition,held.gamma,first.epochs[0].energy.deposition_work);
+    }
+    #[test]
+    fn held_receiving_late_delivery_execution_fault_is_atomic() {
+        let (reference,mut stream,pairing,_,_)=held_receiving_seeded_stream();
+        let before=stream.resident.continuing_state(0).unwrap();let pending=stream.pending_checkpoint();let crib=stream.crib.clone();
+        let mut executor=CountingExecution::new(false);executor.refuse_aggregate_at=Some(2);
+        let error=stream.receive_with_execution(&reference,&pairing,&(0..20).map(|i|i%4).collect::<Vec<_>>(),&executor).unwrap_err();
+        assert!(matches!(error,HnnError::CountOverflow));
+        assert_eq!(stream.resident.continuing_state(0).unwrap(),before);assert_eq!(stream.pending_checkpoint(),pending);assert_eq!(stream.crib,crib);
+        assert_eq!(stream.accepted_cells().unwrap(),0,"a preceding staged hold is not committed on a later delivery fault");
+        assert_eq!(executor.forwards.load(Ordering::Relaxed),20);assert_eq!(executor.returns.load(Ordering::Relaxed),20);assert_eq!(executor.flows.load(Ordering::Relaxed),2);
+    }
+
 }

@@ -239,7 +239,7 @@ fn e_scope(scope: ObservedEpochDepositionScope, prepared: bool) -> &'static str 
     if prepared {
         return "class-coordinate contextual M plus local R/tree/population; native E/C/K/D held; general contextual E/family producer is a separate owner";
     }
-    if scope == ObservedEpochDepositionScope::LocalReceivingReturn {
+    if scope.is_local_receiving() {
         "R/tree/population only; bounded addressed JointFamily E response is a separate API, not automatically produced or invoked"
     } else {
         "preserved legacy normal-map reference; no generic contextual JointFamily producer"
@@ -256,7 +256,7 @@ fn train(
     if args.len() != 10 {
         return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT".into());
     }
-    let prepared_input = args[0] == "train-prepared-local-retained-fibre-v1";
+    let prepared_input = matches!(args[0].as_str(), "train-prepared-local-retained-fibre-v1" | "train-prepared-local-retained-held-v1");
     if prepared_input {
         execution.admit_prepared_input()?;
     }
@@ -293,7 +293,7 @@ fn train(
         ("command",quoted(&args[0])),
         ("input_preparation_law",if prepared_input {quoted(holonics::hnn::reference::prepared_input::LAW)}else{"null".into()}),
         ("deposition_scope",exact(&scope)),
-        ("additional_whole_section_monotone_policy_requested",(scope!=ObservedEpochDepositionScope::LocalReceivingReturn).to_string()),
+        ("additional_whole_section_monotone_policy_requested",(!scope.is_local_receiving()).to_string()),
         ("e_scope",quoted(e_scope(scope,prepared_input))),
         ("training_executor_injected", "true".into()),
         ("device_ordinal", if selected_backend == CompleteLanguageTrainingBackend::CudaObservedEpochDevice0 { "0".into() } else { "null".into() }),
@@ -400,6 +400,12 @@ fn train(
                 ("commit", epoch.deposit.commit.to_string()),
                 ("outcome", exact(&epoch.outcome)),
                 ("deposition_scope", exact(&epoch.deposition_scope)),
+                ("held_receiving", epoch.deposit.epoch.as_ref().and_then(|e| e.held_receiving.as_ref()).map_or_else(|| "null".into(), |h| object(&[
+                    ("original_decline", exact(&h.original_decline)), ("gamma", quoted(&h.gamma.to_string())),
+                    ("crossings_before",h.crossings_before.to_string()), ("crossings_after",h.crossings_after.to_string()),
+                    ("gram_update",exact(&h.gram_update)), ("fresh_covector",exact(&h.fresh_covector)),
+                    ("news_before",exact(&h.news_before)), ("news_after",exact(&h.news_after)),
+                ]))),
                 ("probe_state", exact(&epoch.probe_state)),
                 (
                     if law == holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
@@ -664,9 +670,10 @@ pub(super) fn run_with_execution(
         Some("train-retained-fibre-v1") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1, backend,ObservedEpochDepositionScope::NormalMaps),
         Some("train-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
         Some("train-prepared-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
+        Some("train-prepared-local-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
-        _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
+        _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), train-prepared-local-retained-held-v1 (explicit held-map continuation), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
     }
 }
 pub(super) fn run(args: &[String]) -> Result<()> {
@@ -816,11 +823,19 @@ mod tests {
 #[cfg(test)]
 pub(super) fn code_prepared_late_rollback(
     execution: &dyn ObservedEpochExecution,
+) -> Result<String> { code_prepared_late_rollback_at_scope(execution, ObservedEpochDepositionScope::LocalReceivingReturn) }
+#[cfg(test)]
+pub(super) fn code_held_prepared_late_rollback(
+    execution: &dyn ObservedEpochExecution,
+) -> Result<String> { code_prepared_late_rollback_at_scope(execution, ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap) }
+#[cfg(test)]
+fn code_prepared_late_rollback_at_scope(
+    execution: &dyn ObservedEpochExecution, scope: ObservedEpochDepositionScope,
 ) -> Result<String> {
     let mut checkpoint = fresh_checkpoint_at_law_and_scope(
         16384,
         holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,
-        ObservedEpochDepositionScope::LocalReceivingReturn,
+        scope,
     )?;
     let pairing = declaration(16384)?.2;
     checkpoint.stream.select_prepared_input(&pairing)?;

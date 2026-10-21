@@ -55,6 +55,12 @@ impl EpochReceivingLaw {
         bound.admit(sample, positive, foil, phase)?;
         Ok(Self::RetainedFibreV1(bound))
     }
+    pub(super) fn retained_origin(&self) -> Option<&Arc<RetainedSectionOrigin>> {
+        match self {
+            Self::RetainedFibreV1(b) => Some(&b.origin),
+            Self::CoarseOdometerV1 => None,
+        }
+    }
     pub(crate) fn admit_owner(
         &self,
         receiver: usize,
