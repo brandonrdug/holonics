@@ -1173,6 +1173,14 @@ pub(crate) fn holding_sources(
 }
 
 impl Encoded {
+    /// Exact immutable chart identity for a redeclared exterior checkpoint. The
+    /// observed chart's lazy decoder/square initialization is intentionally absent.
+    pub(crate) fn immutable_identity_text(&self)->String {
+        format!("encoded-identity-v1|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}",
+            self.cells,self.placement,self.chart.classes,self.chart.sources,self.chart.decoder,
+            self.chart.fibre,self.chart.labels,self.chart.advances,self.chart.founded,
+            self.chart.observed.as_ref().map(|o|o.immutable_identity_text()))
+    }
     /// **The declared identity encoding of a known truth** (THE_MACHINE guard 9): each passage of
     /// the terrain's own read set, each class its own port cell; `D` the identity on `ℚ^|A|`, the
     /// Preimage Fibre empty, each class's label itself, and no located advance. Refused with

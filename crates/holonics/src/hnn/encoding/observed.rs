@@ -196,6 +196,11 @@ fn paired_gram_inverse(
 }
 
 impl PairedObservation {
+    /// Versioned identity over admitted immutable operands, never lazy decoder/square state.
+    pub(crate) fn immutable_identity_text(&self)->String {
+        let ports:Vec<_>=self.ports.iter().map(|p|(&p.carrier,&p.injection,&p.rotor)).collect();
+        format!("paired-observation-identity-v1|{:?}|{:?}|{:?}|{:?}",self.classes,self.sources,ports,self.witnesses)
+    }
     pub fn admit(
         field: &Field,
         material: &impl ConstitutionRead,

@@ -1,0 +1,12 @@
+Synthetic contextual native instance; no language experiment.
+Three actual returns; two supported branches; six published branch updates; seven successful normal fits include one staged late refusal.
+Producing p/c/h and y are exact in INSPECTABLE_TRACE.json. Unobserved initial priors remain explicitly labeled.
+Branch 0: H00 ['10429842404117/3735733563648', '0'], B00 ['-1210791396569456759/789771432690823680', '16310082004957/63773533001520'], applied M00 ['-80575/262144', '26843/524288'].
+First returned coordinate learned in [204/1024,205/1024]; frozen in [-158/1024,-157/1024]. Exact fractions and complete native feature/work/end receipts are retained.
+Branch 1: H00 ['12609020316245/3735733563648', '0'], B00 ['-1661988520356131039/789771432690823680', '184385481391633/255094132006080'], applied M00 ['-186939/524288', '20101/131072'].
+First returned coordinate learned in [331/1024,332/1024]; frozen in [-158/1024,-157/1024]. Exact fractions and complete native feature/work/end receipts are retained.
+Carrier bits over the three incident+return pairs: learned [122, 251, 426]; frozen [51, 109, 112]. This is a finite representation-growth observation.
+Repeated equal-work prospect 29434303ns; cold restore plus equal prospect 157552082ns. No memoization or speedup claim.
+Actual native constitution/current/carry/charts/admitted/ledger/parametric and World steps matched the unattached twin.
+Family/material/pending cold EXACT; complete participating-World/body passage serialization remains UNJOINED.
+Replay, wrong field/chart/units, lazy-cache identity, late branch-stage refusal, independent stored-M native contraction: PASS.

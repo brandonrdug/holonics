@@ -371,6 +371,8 @@ impl BoundJointWorld {
             usize,
             &WaveJointStep,
         ) -> Result<(), HnnError>,
+        mut contextual:Option<&mut super::contextual::ContextualFamily>,
+        producing_commit:u64,
     ) -> Result<NativeEncounter, NativeEncounterFailure> {
         let before_native_tick = word.opened_at();
         let before_world_tick = self.state.commit;
@@ -405,6 +407,7 @@ impl BoundJointWorld {
                 word.tick()?;
                 encounter.after_native_tick = word.opened_at() + word.ticks();
                 let incident = word.source_wave(source_ring)?.to_vec();
+                let contextual_id=match contextual.as_deref_mut(){Some(f)=>Some(f.before(word,&incident,producing_commit)?),None=>None};
                 let step = self.interact_wave(&incident)?;
                 encounter.after_world_tick = self.state.commit;
                 // Preserve the executed World step even if its native boundary join refuses.
@@ -413,6 +416,7 @@ impl BoundJointWorld {
                     .steps
                     .last()
                     .expect("the actual completed interaction");
+                if let (Some(family),Some(id))=(contextual.as_deref_mut(),contextual_id){family.after(id,step)?;}
                 word.return_source_wave(
                     source_ring,
                     step.native_tick,
