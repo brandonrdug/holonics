@@ -942,8 +942,17 @@ pub struct WordReturn {
     pub released: Remainders,
     pub precision: crate::hnn::chart::ReturnPrecision,
     pub response_defect: Option<PairedReadDefect>,
+    pub response_geometry: Option<PairedReturnGeometry>,
 }
 
+/// Opaque executed-pair geometry, not an unsplit error certificate.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PairedReturnGeometry { field: Field, reads: Vec<(Vec<Rat>,Vec<Rat>)>, width:usize, operands:crate::hnn::propagation::Operands, phases:ReceivingPhases, opened_at:usize }
+impl PairedReturnGeometry {
+    pub(crate) fn admit(&self,field:&Field,reads:&[(Vec<Rat>,Vec<Rat>)],width:usize)->Result<(),HnnError>{
+        if &self.field!=field || self.reads!=reads || self.width!=width {return Err(HnnError::Unadmitted {reason:"paired return geometry binds the same field and complete executed packet"});} Ok(())
+    }
+}
 /// Coordinate radii against the unsplit physical paths, one receiving vector per station.
 /// Absence of the actual path's certificate is explicit; it cannot certify pure context.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -984,6 +993,9 @@ impl WordReturn {
         mut actual: Self,
         fresh: Self,
         reads: Vec<(Vec<Rat>, Vec<Rat>)>,
+        operands: &crate::hnn::propagation::Operands,
+        phases:&ReceivingPhases,
+        opened_at:usize,
     ) -> Result<Self, HnnError> {
         let shape = |back: &Self| {
             back.opening.len() == field.rings().len()
@@ -1002,6 +1014,16 @@ impl WordReturn {
                 reason: "paired returns share one producing shape and return precision",
             });
         }
+        let mut width=None;
+        if reads.len()!=actual.reads.len() || reads.len()!=fresh.reads.len() || reads.is_empty() { return Err(HnnError::Unadmitted {reason:"paired return keeps all actual and fresh station packets"}); }
+        for (((a,ag),(f,fg)),(paired,g)) in actual.reads.iter().zip(&fresh.reads).zip(&reads) {
+            let mut expected=f.clone(); expected.extend(sub(a,f));
+            if a.len()!=f.len() || paired!=&expected || g!=ag || g!=fg || width.is_some_and(|n|n!=f.len()) { return Err(HnnError::Unadmitted {reason:"paired physical feature is fresh plus actual-minus-fresh at the same gradient"}); }
+            width=Some(f.len());
+        }
+        if reads.len()!=phases.aperture() || width!=Some(field.ring(phases.ring()).width()) || operands.rings().len()!=field.rings().len() {return Err(HnnError::Unadmitted {reason:"paired geometry keeps its actual native section, clock and operand shape"});}
+        crate::hnn::prediction::charted::ResponseTube::admit_operands(operands)?;
+        let geometry=PairedReturnGeometry {field:field.clone(),reads:reads.clone(),width:width.unwrap(),operands:operands.clone(),phases:phases.clone(),opened_at};
         for &ring in field.sources() {
             actual.opening[ring] = add(&actual.opening[ring], &fresh.opening[ring]);
         }
@@ -1019,6 +1041,7 @@ impl WordReturn {
         }
         actual.released = actual.released.join(&fresh.released);
         actual.reads = reads;
+        actual.response_geometry=Some(geometry);
         Ok(actual)
     }
 }
@@ -1466,14 +1489,18 @@ pub(crate) fn reverse_response(
         &column.records,
         &column.resonances,
     )?;
-    let (actual, opening) =
+    let (mut actual, opening) =
         reverse_trajectory_joined_at(&actual_view, actual_seeds, None, None, precision.clone())?;
-    let (fresh, _) = reverse_trajectory_joined_at(&fresh_view, fresh_seeds, None, None, precision)?;
-    let mut joined = WordReturn::join_response(word.field(), actual, fresh, reads)?;
+    let (mut fresh, _) = reverse_trajectory_joined_at(&fresh_view, fresh_seeds, None, None, precision)?;
+    actual.reads=phases.epochs().zip(gradients).map(|(t,g)|(word.recorded()[t].anchors[phases.ring()].clone(),g.clone())).collect();
+    fresh.reads=phases.epochs().zip(gradients).map(|(t,g)|(column.records[t].anchors[phases.ring()].clone(),g.clone())).collect();
+    let mut joined = WordReturn::join_response(word.field(), actual, fresh, reads,word.operands(),phases,word.opened_at())?;
+    if word.response_error_requested() {
+    let fresh_errors=column.errors_at(word)?;
     joined.response_defect = Some(PairedReadDefect {
         fresh: phases
             .epochs()
-            .map(|t| column.anchor_errors[t][phases.ring()].clone())
+            .map(|t| fresh_errors[t][phases.ring()].clone())
             .collect(),
         actual: word.response_actual_errors()?.map(|errors| {
             phases
@@ -1482,6 +1509,7 @@ pub(crate) fn reverse_response(
                 .collect()
         }),
     });
+    }
     Ok((joined, opening))
 }
 
@@ -2194,6 +2222,7 @@ fn reverse_trajectory_joined_at(
             released: carried.released(),
             precision,
             response_defect: None,
+            response_geometry: None,
         },
         opening,
     ))

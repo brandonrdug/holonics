@@ -2763,23 +2763,15 @@ fn receiving_return_samples(
     let physical_width = field.ring(receiving).width();
     let width_r = match constitution.receiving_layout(receiving) {
         Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { source_width }) => {
-            let bounds = back
-                .response_defect
-                .as_ref()
-                .ok_or(HnnError::Unadmitted {
-                    reason: "paired material requires both reached path defect receipts",
-                })?
-                .context_bounds()?;
-            if source_width != physical_width
-                || bounds.len() != back.reads.len()
-                || bounds.iter().any(|r| r.len() != physical_width)
-            {
+            back.response_geometry.as_ref().ok_or(HnnError::Unadmitted {reason:"paired material requires its actual executed geometry"})?.admit(field,&back.reads,physical_width)?;
+            if let Some(defect)=&back.response_defect { let bounds=defect.context_bounds()?; if bounds.len()!=back.reads.len() || bounds.iter().any(|r|r.len()!=physical_width) {return Err(HnnError::Unadmitted {reason:"requested paired errors retain complete receiving shape"});} }
+            if source_width != physical_width {
                 return Err(HnnError::Unadmitted {
                     reason: "paired material defects match every reached receiving station",
                 });
             }
-            // Both radii remain in the return/receipt. A paired native deposit uses the
-            // actual rounded candidate replay below, not an unsplit first-order gain claim.
+            // Requested radii remain in the receipt. The selected local certificate
+            // reads executed features and actual retained-return errors, not unsplit gain.
             2 * source_width
         }
         _ => physical_width,

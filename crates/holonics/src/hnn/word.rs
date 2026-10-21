@@ -205,6 +205,7 @@ pub struct Word<'c> {
     response_source: Option<Vec<Vec<Rat>>>,
     response_opening_exact: Option<EndChange>,
     response: Option<Box<column::ResponseColumn>>,
+    response_error_requested: bool,
     field: &'c Field,
     operands: Operands,
     clock: Clock,
@@ -1936,6 +1937,7 @@ impl<'c> Word<'c> {
                 Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { .. })
             )
         });
+        let response_error_requested=field.receivers().iter().all(|r| constitution.receiving_return_policy(r.ring)!=crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
         let response_source = paired.then(|| storage.clone());
         let operands = operands()?;
         let WordOpening::Received { carry, absorption } = opening else {
@@ -1944,7 +1946,8 @@ impl<'c> Word<'c> {
                 ..EndChange::rest(field, &operands)
             });
             let mut word = Self::on_operands(field, operands, storage)?;
-            word.response_source = response_source;
+            word.response_error_requested = response_error_requested;
+        word.response_source = response_source;
             word.response_opening_exact = exact;
             return Ok(word);
         };
@@ -1978,6 +1981,7 @@ impl<'c> Word<'c> {
             exact
         });
         let mut word = Self::continuing(field, operands, &change, &storage, carry.ticks)?;
+        word.response_error_requested = response_error_requested;
         word.response_source = response_source;
         word.response_opening_exact = exact;
         Ok(word)
@@ -2527,6 +2531,7 @@ impl<'c> Word<'c> {
             response_source: None,
             response_opening_exact: None,
             response: None,
+            response_error_requested: true,
             field,
             operands,
             clock,
@@ -2557,6 +2562,9 @@ impl<'c> Word<'c> {
         self.field
     }
 
+    /// Request the authentic retained unsplit report; this changes no native operand.
+    pub fn request_response_error_evidence(&mut self) { self.response_error_requested=true; }
+    pub(crate) fn response_error_requested(&self)->bool { self.response_error_requested }
     pub(crate) fn prepare_response(&mut self) -> Result<(), HnnError> {
         if self.response.is_some() {
             return Ok(());
@@ -3455,6 +3463,7 @@ impl<'c> Word<'c> {
             response_source,
             response_opening_exact,
             response,
+            response_error_requested,
             operands,
             clock,
             storage,
@@ -3479,6 +3488,7 @@ impl<'c> Word<'c> {
             response_source,
             response_opening_exact,
             response,
+            response_error_requested,
             operands,
             clock,
             storage,
@@ -3598,6 +3608,7 @@ pub(crate) struct KeptWord {
     response_source: Option<Vec<Vec<Rat>>>,
     response_opening_exact: Option<EndChange>,
     response: Option<Box<column::ResponseColumn>>,
+    response_error_requested: bool,
     operands: Operands,
     clock: Clock,
     storage: Vec<Vec<Rat>>,
@@ -3681,6 +3692,7 @@ impl KeptWord {
             response_source,
             response_opening_exact,
             response,
+            response_error_requested,
             operands,
             clock,
             storage,
@@ -3708,6 +3720,7 @@ impl KeptWord {
             response_source,
             response_opening_exact,
             response,
+            response_error_requested,
             operands,
             clock,
             storage,

@@ -1702,7 +1702,7 @@ pub(crate) fn word_return(
         reads: source.reads,
         released: Remainders::of(&remainders),
         precision: source.precision,
-        response_defect: None,
+        response_defect: None, response_geometry: None,
     })
 }
 

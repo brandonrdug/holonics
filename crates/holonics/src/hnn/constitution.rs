@@ -5527,6 +5527,18 @@ impl Constitution {
     pub fn receiving_blocks(&self, ring: usize) -> Option<&[ReceivingBlock; 2]> {
         self.rings.get(ring)?.receiving.as_ref()?.blocks()
     }
+    pub fn receiving_return_policy(&self, ring: usize) -> Option<crate::hnn::receiving::RetainedReturnPolicy> {
+        self.rings.get(ring)?.receiving.as_ref().map(ReceivingMaterial::return_policy)
+    }
+    /// Fresh-only constitutive declaration. Existing material history is never retagged.
+    pub fn bind_family_local_receiving_return(&mut self, ring: usize) -> Result<(), HnnError> {
+        let mut next=self.clone();
+        next.rings.get_mut(ring).and_then(|r|r.receiving.as_mut()).ok_or(HnnError::MissingReceivingMap {ring})?.bind_family_local_return()?;
+        let bits=next.exact_bits();
+        if bits>self.budget { return Err(HnnError::ConstitutionBudget {bits,budget:self.budget,commit:self.commit,loci:vec![Locus::ReceivingMap(ring)]}); }
+        next.commit=next.commit.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        *self=next; Ok(())
+    }
     /// Full phase statistics. Paired statistics use the frozen normalized operand chart.
     pub fn receiving_phase_statistics(&self, ring: usize) -> Option<&PhaseStatistics> {
         self.rings.get(ring)?.receiving.as_ref()?.phase_statistics()
@@ -14341,6 +14353,7 @@ impl ConstitutionRead for Constitution {
     fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix {
         &self.contacts[contact].dissipation
     }
+    fn receiving_return_policy(&self, ring:usize) -> crate::hnn::receiving::RetainedReturnPolicy { Constitution::receiving_return_policy(self,ring).unwrap_or(crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1) }
     fn receiving_layout(&self, ring: usize) -> Option<ReceivingLayout> {
         Constitution::receiving_layout(self, ring)
     }

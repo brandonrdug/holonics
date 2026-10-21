@@ -2133,6 +2133,7 @@ impl Constitution {
             ));
         }
         for part in receiving_parts {
+            part.law.admit_policy(self.receiving_return_policy(receiver).ok_or(HnnError::MissingReceivingMap { ring: receiver })?)?;
             part.law.admit_owner(
                 receiver,
                 self.commit(),
@@ -6260,11 +6261,15 @@ mod tests {
     pub(super) fn held_retained_fixture_at(
         scale: i64, paired: bool,
     ) -> (Field, Constitution, Deposit, Vec<EpochReceivingRecord>, u32) {
+        held_retained_fixture_policy(scale,paired,false)
+    }
+    pub(super) fn held_retained_fixture_policy(scale:i64,paired:bool,family_local:bool)->(Field,Constitution,Deposit,Vec<EpochReceivingRecord>,u32){
         use crate::compression::landmark::context::LandmarkFace;
         use crate::hnn::receiving::{ReceivingRead, RetainedSectionReturn};
         let (field, mut material, old, _, exponent) = normal_domain_fixture(None, true);
         if paired { material.bind_arrival_context_receiving(field.receivers()[0].ring).unwrap(); }
         let receiver = field.receivers()[0].ring;
+        if family_local {material.bind_family_local_receiving_return(receiver).unwrap();}
         let map = material.receiving_map(receiver).unwrap().clone();
         let n = map.rows() / 2;
         assert!(n.is_power_of_two());
@@ -6281,7 +6286,8 @@ mod tests {
                 .unwrap();
         let faces = crate::hnn::ratio::Faces::of_reads(&[read], field.finest_grain()).unwrap();
         let population = material.rings[receiver].population.as_ref().unwrap();
-        let returned = RetainedSectionReturn::at(
+        let build=if family_local {RetainedSectionReturn::at_family_local}else{RetainedSectionReturn::at};
+        let returned = build(
             population,
             receiver,
             &faces,

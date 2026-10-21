@@ -207,6 +207,7 @@ fn prepare(
         });
     }
     for p in stage.receiving_parts {
+        p.law.admit_policy(owner.return_policy())?;
         p.law.admit_owner(receiver, opening.commit(), owner.map())?;
         if p.law.retained_origin().is_none() {
             return Err(refused("paired local epoch uses retained full-section law"));
@@ -696,9 +697,11 @@ mod tests {
     use crate::hnn::reference::observed::HostObservedEpochExecution;
     #[test]
     fn paired_context_hold_keeps_both_normals_once_and_cold() {
-        for scale in [-64, 64] {
+        for (scale,family_local) in [(-64,false),(64,false),(-64,true),(64,true)] {
             let (field, material, deposit, parts, exponent) =
-                super::super::tests::held_retained_fixture_at(scale, true);
+                super::super::tests::held_retained_fixture_policy(scale,true,family_local);
+            let expected=if family_local {crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1}else{crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1};
+            for part in &parts {part.law.admit_policy(expected).unwrap(); let other=if family_local {crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1}else{crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1};assert!(part.law.admit_policy(other).is_err());}
             let receiver = field.receivers()[0].ring;
             let retained = crate::hnn::retention::loci(&field).into_iter().collect();
             let deposits = [deposit];
@@ -802,6 +805,7 @@ mod tests {
             .unwrap();
             let mut cold_opening = Constitution::initial(&field, next.budget()).unwrap();
             cold_opening.bind_arrival_context_receiving(receiver).unwrap();
+            if family_local {cold_opening.bind_family_local_receiving_return(receiver).unwrap();}
             let cold = cold_opening.continued_on(&field, &state).unwrap();
             assert_eq!(next.receiving_phase_statistics(receiver).unwrap().cells(),
                 &(material.receiving_phase_statistics(receiver).unwrap().cells()+Rat::one()),

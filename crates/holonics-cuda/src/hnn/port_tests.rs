@@ -239,6 +239,7 @@ fn generic(field: &Field, seed: u64) -> Constitution {
                     // not a claim that these samples were produced by an executed source word.
                     let anchor = half_vector(&mut draw, n);
                     let observation = match partition {
+                        ObservationPartition::SourceFramingRouteV1 => panic!("this wave-only fixture has no authentic SourceMoment framing producer"),
                         ObservationPartition::ReceivingSection => partition
                             .path(section_bits(field, g, &anchor).unwrap())
                             .unwrap(),

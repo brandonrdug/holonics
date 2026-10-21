@@ -61,6 +61,13 @@ impl EpochReceivingLaw {
             Self::CoarseOdometerV1 => None,
         }
     }
+    pub(crate) fn admit_policy(&self, expected: crate::hnn::receiving::RetainedReturnPolicy) -> Result<(), HnnError> {
+        match self {
+            Self::RetainedFibreV1(b) if b.origin.return_policy == expected => Ok(()),
+            Self::CoarseOdometerV1 if expected == crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 => Ok(()),
+            _ => Err(refused("receiving return policy matches its native material declaration")),
+        }
+    }
     pub(crate) fn admit_owner(
         &self,
         receiver: usize,

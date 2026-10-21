@@ -179,6 +179,7 @@ pub trait ConstitutionRead: Sync {
         self.receiving_map(ring)
             .map(|_| crate::hnn::constitution::ReceivingLayout::Single)
     }
+    fn receiving_return_policy(&self, _ring:usize) -> crate::hnn::receiving::RetainedReturnPolicy { crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 }
     /// The carrier whose normal statistics and receiving map are paired. Raw declarations
     /// use the executed anchor; a source observer binds its own law before any comparison.
     fn receiving_carrier(&self, _ring: usize) -> crate::hnn::receiving::ReceivingCarrier {

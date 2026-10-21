@@ -56,7 +56,7 @@ impl TracedCard {
             self.counts.returns.load(Ordering::Relaxed),
             self.counts.aggregates.load(Ordering::Relaxed)
         );
-        let costs=format!("{{\"response_operands_host_ns\":{},\"shared_setup_ns\":{},\"fresh_path_ns\":{},\"fresh_error_trace_ns\":{},\"actual_path_ns\":{},\"actual_error_trace_ns\":{},\"scope\":\"successful forwards only; lane windows include host/decode/transfer/proof; trace subsets nested; no pure kernel or global sync claim\"}}",m.response_operands_host_ns,m.forward_shared_setup_ns,m.fresh_path_ns,m.fresh_error_trace_ns,m.actual_path_ns,m.actual_error_trace_ns);
+        let costs=format!("{{\"response_operands_host_ns\":{},\"shared_setup_ns\":{},\"fresh_path_ns\":{},\"fresh_error_trace_ns\":{},\"actual_path_ns\":{},\"actual_error_trace_ns\":{},\"response_error_trace_calls\":{},\"response_error_reference_calls\":{},\"response_error_reference_ns\":{},\"scope\":\"successful forwards only; lane windows include host/decode/transfer/proof; trace subsets nested; no pure kernel or global sync claim\"}}",m.response_operands_host_ns,m.forward_shared_setup_ns,m.fresh_path_ns,m.fresh_error_trace_ns,m.actual_path_ns,m.actual_error_trace_ns,m.response_error_trace_calls,m.response_error_reference_calls,m.response_error_reference_ns);
         format!("{},\"device_forward_reading\":{device},\"forward_lane_costs\":{costs}}}\n",base.trim().strip_suffix('}').expect("receipt object"))
     }
     pub fn require_actual_dispatch(&self) -> Result<(), HnnError> {

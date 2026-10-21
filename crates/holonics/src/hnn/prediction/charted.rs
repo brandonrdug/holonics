@@ -39,11 +39,22 @@ use linear_radius::ContactRadiusMaps;
 /// This shares the existing native error owner. Each advance charges one unsplit surrogate
 /// tick, whose difference from the executed column includes every signed-feedback split.
 pub struct ResponseTube<'a> {
-    maps: ContactRadiusMaps<'a>,
+    maps: std::rc::Rc<std::cell::RefCell<ContactRadiusMaps<'a>>>,
     radius: EndChange,
 }
 
 impl<'a> ResponseTube<'a> {
+    /// Immutable domain admission; requesting no unsplit report never skips this.
+    pub fn admit_operands(o: &Operands) -> Result<(), HnnError> {
+        let valid=|d:Rat| d>=Rat::zero() && d<Rat::one();
+        if o.rings().iter().any(|r| !valid(r.chart().map_or_else(Rat::zero,|c|c.certificate.clone())))
+            || o.contacts().iter().any(|c| !valid(c.chart().map_or_else(Rat::zero,|c|c.certificate.clone())))
+            || o.resonators().iter().flatten().any(|r| r.material().saturation().is_some() || (0..r.phases()).any(|p|!valid(r.certificate(p)))) {
+            return Err(HnnError::Unadmitted {reason:"paired response operands retain linear resonators and admitted inverse-chart deviations"});
+        }
+        Ok(())
+    }
+
     fn admit_shape(o: &Operands, point: &EndChange, missing_rest: bool) -> Result<(), HnnError> {
         let widths: Vec<_> = o.rings().iter().map(|r| r.width()).collect();
         let valid = point.storage.len() == widths.len()
@@ -86,6 +97,7 @@ impl<'a> ResponseTube<'a> {
         exact: &EndChange,
         executed: &EndChange,
     ) -> Result<Self, HnnError> {
+        Self::admit_operands(o)?;
         Self::admit_shape(o, exact, true)?;
         Self::admit_shape(o, executed, false)?;
         if o.resonators()
@@ -109,11 +121,16 @@ impl<'a> ResponseTube<'a> {
         let mut radius = executed.clone();
         join_change(&mut radius, &exact, |a, b| (a - b).abs());
         Ok(Self {
-            maps: ContactRadiusMaps::new(o),
+            maps: std::rc::Rc::new(std::cell::RefCell::new(ContactRadiusMaps::new(o))),
             radius,
         })
     }
 
+    /// New independent radius/point state; only authentic immutable coefficient columns are shared.
+    pub fn new_track(&self,exact:&EndChange,executed:&EndChange)->Result<Self,HnnError>{
+        let mut track=Self::open(self.maps.borrow().operands,exact,executed)?;
+        track.maps=std::rc::Rc::clone(&self.maps); Ok(track)
+    }
     pub fn radius(&self) -> &EndChange {
         &self.radius
     }
@@ -133,19 +150,19 @@ impl<'a> ResponseTube<'a> {
         point: &EndChange,
         actual: &[Vec<Rat>],
     ) -> Result<Vec<Vec<Rat>>, HnnError> {
-        Self::admit_shape(self.maps.operands, point, false)?;
-        if actual.len() != self.maps.operands.rings().len()
+        Self::admit_shape(self.maps.borrow().operands, point, false)?;
+        if actual.len() != self.maps.borrow().operands.rings().len()
             || actual
                 .iter()
-                .zip(self.maps.operands.rings())
+                .zip(self.maps.borrow().operands.rings())
                 .any(|(v, r)| v.len() != r.width())
         {
             return Err(HnnError::Unadmitted {
                 reason: "the anchor error certificate reads every producing ring coordinate",
             });
         }
-        let centers = physical_signed_junctions(self.maps.operands, point)?;
-        let bounds = junction_error(self.maps.operands, point, &self.radius)?;
+        let centers = physical_signed_junctions(self.maps.borrow().operands, point)?;
+        let bounds = junction_error(self.maps.borrow().operands, point, &self.radius)?;
         Ok(bounds
             .iter()
             .zip(centers)
@@ -160,16 +177,33 @@ impl<'a> ResponseTube<'a> {
             .collect())
     }
 
+    /// One requested crossing: reuse identical signed junctions and radius junctions for
+    /// anchor observation and the following tick. Point and radius remain independent.
+    pub fn crossing(&mut self,point:&EndChange,anchors:&[Vec<Rat>],next:Option<&EndChange>,tick:usize)->Result<Vec<Vec<Rat>>,HnnError>{
+        let o=self.maps.borrow().operands;
+        Self::admit_shape(o,point,false)?;
+        if anchors.len()!=o.rings().len() || anchors.iter().zip(o.rings()).any(|(a,r)|a.len()!=r.width()) {return Err(HnnError::Unadmitted {reason:"requested crossing retains actual anchor shape"});}
+        let centers=physical_signed_junctions(o,point)?;
+        let bounds=junction_error(o,point,&self.radius)?;
+        let error=bounds.iter().zip(&centers).zip(anchors).map(|((e,c),a)|e.anchor.iter().zip(a.iter().zip(&c.anchor)).map(|(e,(a,c))|e+(a-c).abs()).collect()).collect();
+        if let Some(actual)=next {
+            Self::admit_shape(o,actual,false)?;
+            let signed=crate::hnn::word::linear::tick_at_junctions(o,point,tick,&centers)?;
+            let mut radius=tick_error_at_junctions(&mut self.maps.borrow_mut(),point,&self.radius,tick,&centers,&bounds)?;
+            let mut split=actual.clone();join_change(&mut split,&signed,|a,b|(a-b).abs());join_change(&mut radius,&split,|a,b|a+b);self.radius=radius;
+        }
+        Ok(error)
+    }
     pub fn advance(
         &mut self,
         point: &EndChange,
         actual: &EndChange,
         tick: usize,
     ) -> Result<(), HnnError> {
-        Self::admit_shape(self.maps.operands, point, false)?;
-        Self::admit_shape(self.maps.operands, actual, false)?;
-        let signed = physical_signed_tick(self.maps.operands, point, tick)?;
-        let mut next = tick_error_cached(&mut self.maps, point, &self.radius, tick)?;
+        Self::admit_shape(self.maps.borrow().operands, point, false)?;
+        Self::admit_shape(self.maps.borrow().operands, actual, false)?;
+        let signed = physical_signed_tick(self.maps.borrow().operands, point, tick)?;
+        let mut next = tick_error_cached(&mut self.maps.borrow_mut(), point, &self.radius, tick)?;
         let mut split = actual.clone();
         join_change(&mut split, &signed, |a, b| (a - b).abs());
         join_change(&mut next, &split, |a, b| a + b);
@@ -969,6 +1003,10 @@ fn tick_error_cached(
     let o = maps.operands;
     let centers = physical_signed_junctions(o, point)?;
     let bounds = junction_error(o, point, error)?;
+    tick_error_at_junctions(maps,point,error,tick,&centers,&bounds)
+}
+fn tick_error_at_junctions(maps:&mut ContactRadiusMaps<'_>,point:&EndChange,error:&EndChange,tick:usize,centers:&[Junction],bounds:&[Junction])->Result<EndChange,HnnError>{
+    let o=maps.operands;
     let mut next = error.clone();
     let h = o.step();
     for (g, ring) in o.rings().iter().enumerate() {

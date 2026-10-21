@@ -1133,3 +1133,10 @@ mod tests {
         assert_eq!(coarse_view.tree_probabilities, vec![rat(1, 2), rat(1, 2)]);
     }
 }
+
+/// Same authentic chronological scorer, separately declared local material response.
+pub(crate) fn prepare_native_retained_section_with_policy(population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usize],bits:u32,policy:super::RetainedReturnPolicy)->Result<(SelectedScored,super::RetainedSectionReturn),HnnError>{
+    let producer=ProducedRetainedSection::native_at(population,ring,waves,trees,targets,bits)?;
+    let returned=super::RetainedSectionReturn::at_native_produced_with_policy(population,ring,waves,trees,targets,&producer,policy)?;
+    Ok((producer.scored,returned))
+}

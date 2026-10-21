@@ -1004,13 +1004,14 @@ impl Reference {
             .population(receiver)
             .ok_or(HnnError::MissingReceivingMap { ring: receiver })?;
         let prepared = if lazy_retained {
-            Some(crate::hnn::receiving::prepare_native_retained_section(
+            Some(crate::hnn::receiving::prepare_native_retained_section_with_policy(
                 population,
                 receiver,
                 &raw_waves,
                 &trees,
                 &classes[..consumed],
                 crate::ratio::exponentiated::READING_BITS,
+                next.constitution.receiving_return_policy(receiver).ok_or(HnnError::MissingReceivingMap { ring: receiver })?,
             )?)
         } else {
             None
@@ -1059,7 +1060,8 @@ impl Reference {
         let retained_return = if let Some((_, returned)) = prepared {
             Some(returned)
         } else if resident.receiving_law() == ReceivingLaw::RetainedFibreV1 {
-            Some(RetainedSectionReturn::at(
+            let build = if next.constitution.receiving_return_policy(receiver)==Some(crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1) { RetainedSectionReturn::at_family_local } else { RetainedSectionReturn::at };
+            Some(build(
                 population,
                 receiver,
                 all_combined.as_ref().ok_or_else(|| refusal("uncached scorer retains its genuine coarse source view"))?,

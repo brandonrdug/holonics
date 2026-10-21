@@ -40,6 +40,8 @@ enum Request {
         charts: Charts,
         opening: Box<WordOpening>,
         scope: Option<Arc<()>>,
+        force_error_evidence: bool,
+        validate_error_reference: bool,
         reply: Reply<ForwardReading>,
     },
     Return {
@@ -89,6 +91,9 @@ pub struct ObservedDeviceReading {
     pub fresh_error_trace_ns:u128,
     pub actual_path_ns:u128,
     pub actual_error_trace_ns:u128,
+    pub response_error_trace_calls:u64,
+    pub response_error_reference_calls:u64,
+    pub response_error_reference_ns:u128,
     pub native_word_forward_launches:u64,
     pub fresh_response_forward_subset:u64,
     pub forward_phase_transfer_octets:u64,
@@ -127,6 +132,8 @@ impl Drop for Client {
 #[derive(Clone)]
 pub struct ObservedEpochDevice {
     client: Arc<Client>,
+    force_error_evidence: bool,
+    validate_error_reference: bool,
 }
 
 impl fmt::Debug for ObservedEpochDevice {
@@ -150,6 +157,8 @@ impl ObservedEpochDevice {
             .map_err(|_| unavailable())?;
         match ready_rx.recv().map_err(|_| unavailable()) {
             Ok(Ok(())) => Ok(Self {
+                force_error_evidence: false,
+                validate_error_reference: false,
                 client: Arc::new(Client {
                     reading,
                     sender: Some(sender),
@@ -167,6 +176,10 @@ impl ObservedEpochDevice {
         }
     }
 
+    /// Explicit report request; does not alter material or prediction policy.
+    pub fn with_response_error_evidence(mut self)->Self {self.force_error_evidence=true;self}
+    /// Explicit CODE reference check on the SAME retained records, not another forward.
+    pub fn with_response_error_reference_validation(mut self)->Self {self.force_error_evidence=true;self.validate_error_reference=true;self}
     pub fn realization_reading(&self)->ObservedDeviceReading{*self.client.reading.lock().unwrap_or_else(|e|e.into_inner())}
 
     fn forward_reading(
@@ -187,6 +200,8 @@ impl ObservedEpochDevice {
                 charts: charts.clone(),
                 opening: Box::new(opening.clone()),
                 scope,
+                force_error_evidence: self.force_error_evidence,
+                validate_error_reference:self.validate_error_reference,
                 reply,
             })
             .map_err(|_| unavailable())?;
@@ -562,6 +577,8 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                 charts,
                 opening,
                 scope,
+                force_error_evidence,
+                validate_error_reference,
                 reply,
             } => {
                 let result = (|| {
@@ -598,7 +615,7 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                     let publication = Rc::clone(&mounted.publication);
                     let traffic_before=mounted.traffic();let execute_started=std::time::Instant::now();
                     let (word, faces, active) =
-                        mounted.execute(&ratio, &moment, &publication, &card, &opening)?;
+                        if force_error_evidence {mounted.execute_with_response_evidence(&ratio,&moment,&publication,&card,&opening,true,validate_error_reference)?} else { mounted.execute(&ratio, &moment, &publication, &card, &opening)? };
                     let execute_ns=execute_started.elapsed().as_nanos();let traffic_after=mounted.traffic();
                     {
                         let mut m=realization.lock().unwrap_or_else(|e|e.into_inner());
@@ -612,6 +629,9 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                         m.fresh_error_trace_ns+=word.word.forward_cost.fresh_error_trace_ns;
                         m.actual_path_ns+=word.word.forward_cost.actual_path_ns;
                         m.actual_error_trace_ns+=word.word.forward_cost.actual_error_trace_ns;
+                        m.response_error_trace_calls+=word.word.forward_cost.response_error_trace_calls;
+                        m.response_error_reference_calls+=word.word.forward_cost.response_error_reference_calls;
+                        m.response_error_reference_ns+=word.word.forward_cost.response_error_reference_ns;
                         m.native_word_forward_launches+=traffic_after.word_count-traffic_before.word_count;
                         m.fresh_response_forward_subset+=traffic_after.response_word_count-traffic_before.response_word_count;
                         m.forward_phase_transfer_octets+=traffic_after.words-traffic_before.words;

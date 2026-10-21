@@ -122,6 +122,7 @@ pub(super) enum ReceivingMaterial {
     Single(NormalLaw),
     ArrivalContext {
         source_width: usize,
+        return_policy: crate::hnn::receiving::RetainedReturnPolicy,
         blocks: [ReceivingBlock; 2],
         published: ExactRatMatrix,
         shared_phase: PhaseStatistics,
@@ -185,6 +186,7 @@ impl ReceivingMaterial {
                 });
                 Self::ArrivalContext {
                     source_width: *source_width,
+                    return_policy: self.return_policy(),
                     blocks,
                     published: published.scaled(&Rat::zero()),
                     shared_phase: PhaseStatistics::founded(
@@ -399,7 +401,8 @@ impl ReceivingMaterial {
                     crate::hnn::receiving::ReceivingCarrier::Anchor => "anchor",
                     crate::hnn::receiving::ReceivingCarrier::SourceObserver => "source-observer",
                 };
-                *s += &format!("{key} arrival-context-v1 {source_width} {carrier}\n");
+                let tag = if material.unwrap().return_policy() == crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 { "arrival-context-family-local-v1" } else { "arrival-context-v1" };
+                *s += &format!("{key} {tag} {source_width} {carrier}\n");
                 for (index, block) in blocks.iter().enumerate() {
                     let scale = block
                         .chart
@@ -450,12 +453,13 @@ impl ReceivingMaterial {
             .next()
             .ok_or(HnnError::ContinuingState { what })?;
         let words = head(line, key, what)?;
-        if words.first().map(String::as_str) != Some("arrival-context-v1") {
+        if !matches!(words.first().map(String::as_str),Some("arrival-context-v1"|"arrival-context-family-local-v1")) {
             return read_optional_law(lines, key, what, budget).map(|law| law.map(Self::Single));
         }
         let [_, width, carrier] = words.as_slice() else {
             return refuse("the versioned receiving material header");
         };
+        let return_policy = if words[0] == "arrival-context-family-local-v1" { crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 } else { crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 };
         let source_width = number(Some(width), "the receiving source width")?;
         if source_width == 0 || source_width.checked_mul(2).is_none() {
             return refuse("the receiving source width");
@@ -552,6 +556,7 @@ impl ReceivingMaterial {
         }
         let material = Self::ArrivalContext {
             source_width,
+            return_policy,
             blocks,
             published,
             shared_phase,
@@ -601,12 +606,26 @@ impl ReceivingMaterial {
         };
         let result = Self::ArrivalContext {
             source_width,
+            return_policy: crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1,
             blocks: [block(source_width)?, block(context_width)?],
             shared_phase: PhaseStatistics::founded(law.map.rows() / 2, width),
             published: law.map,
         };
         result.validate()?;
         Ok(result)
+    }
+
+    pub(super) fn return_policy(&self) -> crate::hnn::receiving::RetainedReturnPolicy {
+        match self { Self::Single(_) => crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1,
+            Self::ArrivalContext { return_policy, .. } => *return_policy }
+    }
+    pub(super) fn bind_family_local_return(&mut self) -> Result<(), HnnError> {
+        if self != &self.founding() || self.return_policy() != crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 {
+            return Err(HnnError::Unadmitted { reason: "family-local return is declared only on fresh receiving material" });
+        }
+        match self { Self::ArrivalContext { return_policy, .. } => *return_policy=crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1,
+            _ => return Err(HnnError::Unadmitted { reason: "family-local return requires explicit arrival/context material" }) }
+        Ok(())
     }
 
     pub(super) fn map(&self) -> &ExactRatMatrix {
@@ -651,6 +670,7 @@ impl ReceivingMaterial {
                 ..
             } => {
                 let mut count = CarrierBits::default();
+                count.entries += u64::from(self.return_policy()==crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
                 for block in blocks {
                     count.add(block.law.carrier_bits());
                     count.entries += block.chart.as_ref().map_or(0, |chart| bits(chart.scale()));
@@ -708,6 +728,7 @@ impl ReceivingMaterial {
             blocks,
             published,
             shared_phase,
+            ..
         } = self
         {
             if *source_width != blocks[0].width()
@@ -1205,4 +1226,19 @@ mod tests {
                 .all(|b| b.law.phase.is_none())
         );
     }
+    #[test]
+    fn family_local_native_material_tag_roundtrip_and_fresh_only() {
+        use crate::hnn::receiving::RetainedReturnPolicy;
+        let law=NormalLaw::with_receiving_prior(ExactRatMatrix::zero(4,4).unwrap(),0);
+        let mut material=ReceivingMaterial::arrival_context(law,2,2).unwrap();
+        material.bind_family_local_return().unwrap();
+        assert_eq!(material.return_policy(),RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
+        assert!(material.bind_family_local_return().is_err());
+        let mut text=String::new();ReceivingMaterial::write_optional(&mut text,"receiving",Some(&material));
+        assert!(text.contains("arrival-context-family-local-v1"));
+        let mut budget=epoch::CheckpointReadBudget::new(1<<30);
+        let restored=ReceivingMaterial::read_optional(&mut text.lines(),"receiving","family local test",&mut budget).unwrap().unwrap();
+        assert_eq!(restored,material);
+    }
+
 }

@@ -1,10 +1,12 @@
 //! The class return of one complete full-fibre receiving section.
 //!
-//! With the producing tree schedule and population held, its probability is
+//! The preserved population-mixture return holds producing tree/population: its probability is
 //! P = (1-rho) product q_t + rho product r_t. Every station uses the SAME final
 //! responsibility beta = rho product r_t / P. A rational representative is an
 //! explicitly certified return chart, never an exact-irrational-to-rational cast.
-//! Its logit-space certificate authorizes no material publication: the actual
+//! A separately declared fresh FamilyLocalRetainedReturnV1 instead returns r-e,
+//! with the same authentic r and packed-simplex errors; rho/beta remain prediction evidence.
+//! Neither policy's logit-space certificate authorizes material publication: the actual
 //! producing Word and the explicitly selected publication policy still govern that.
 //! The certified reference requests a complete finite candidate comparison; an opt-in
 //! local receiving response retains its NormalLaw guards without that additional veto.
@@ -12,6 +14,19 @@
 use super::*;
 use num_bigint::BigInt;
 use num_traits::{Signed, ToPrimitive};
+
+/// Constitutive response declaration, independent of the prediction/score law.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RetainedReturnPolicy {
+    PopulationMixtureSectionV1,
+    FamilyLocalRetainedReturnV1,
+}
+impl RetainedReturnPolicy {
+    pub fn tag(self)->&'static str { match self {
+        Self::PopulationMixtureSectionV1=>"population-mixture-section-return-v1",
+        Self::FamilyLocalRetainedReturnV1=>"family-local-retained-return-v1",
+    }}
+}
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 /// Rational return carrier and finite certified observations of its defining relation.
@@ -32,6 +47,7 @@ pub struct RetainedStationReturn {
 /// to the rational simplex anchor of the executable return chart; component errors and the descent inequality
 /// certify its use. Refining an enclosure never changes the symbolic source identity.
 pub struct RetainedSectionReturn {
+    pub return_policy: RetainedReturnPolicy,
     // Issued only with the actual immutable producing section. Public reading
     // fields cannot be substituted into a material certificate without this owner.
     origin: std::sync::Arc<RetainedSectionOrigin>,
@@ -53,6 +69,7 @@ pub struct RetainedSectionReturn {
 
 #[derive(Clone, PartialEq, Eq)]
 pub(crate) struct RetainedSectionOrigin {
+    pub(crate) return_policy: RetainedReturnPolicy,
     pub(crate) population: PortPopulation,
     pub(crate) ring: usize,
     pub(crate) combined: Option<Faces>,
@@ -78,6 +95,7 @@ impl std::fmt::Debug for RetainedSectionOrigin {
 /// Exterior failure evidence, not an admitting constructor or a Word tape.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RetainedSectionSourceReading {
+    pub return_policy: RetainedReturnPolicy,
     pub population: PortPopulation,
     pub ring: usize,
     pub waves: Vec<Vec<Rat>>,
@@ -91,6 +109,7 @@ pub struct RetainedSectionSourceReading {
 impl RetainedSectionOrigin {
     pub(crate) fn reading(&self) -> RetainedSectionSourceReading {
         RetainedSectionSourceReading {
+            return_policy: self.return_policy,
             population: self.population.clone(),
             ring: self.ring,
             waves: self.waves.clone(),
@@ -193,7 +212,7 @@ impl RetainedSectionReturn {
         targets: &[usize],
     ) -> Result<std::sync::Arc<RetainedSectionOrigin>, HnnError> {
         let o = &self.origin;
-        if &o.population != population
+        if o.return_policy != self.return_policy || &o.population != population
             || o.ring != ring
             || o.combined.as_ref() != Some(combined)
             || o.waves != combined.logits
@@ -219,7 +238,7 @@ impl RetainedSectionReturn {
         trees: &[LandmarkFace],
         targets: &[usize],
     ) -> Result<Self, HnnError> {
-        Self::at_using(population, ring, Some(combined), &combined.logits, trees, targets, None)
+        Self::at_using(population, ring, Some(combined), &combined.logits, trees, targets, None, RetainedReturnPolicy::PopulationMixtureSectionV1)
     }
     pub(super) fn at_produced(
         population: &PortPopulation,
@@ -230,19 +249,27 @@ impl RetainedSectionReturn {
         producer: &super::selected::ProducedRetainedSection,
     ) -> Result<Self, HnnError> {
         producer.validate(population, ring, combined, trees, targets)?;
-        Self::at_using(population, ring, Some(combined), &combined.logits, trees, targets, Some(producer))
+        Self::at_using(population, ring, Some(combined), &combined.logits, trees, targets, Some(producer), RetainedReturnPolicy::PopulationMixtureSectionV1)
     }
     pub(crate) fn certificate_origin_raw(&self,population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usize]) -> Result<std::sync::Arc<RetainedSectionOrigin>,HnnError> {
         let o=&self.origin;
-        if &o.population!=population || o.ring!=ring || o.waves!=waves || o.trees!=trees || o.targets!=targets || o.rho!=self.rho || o.beta!=self.beta || o.stations!=self.stations || o.bits!=self.reading_bits {
+        if o.return_policy!=self.return_policy || &o.population!=population || o.ring!=ring || o.waves!=waves || o.trees!=trees || o.targets!=targets || o.rho!=self.rho || o.beta!=self.beta || o.stations!=self.stations || o.bits!=self.reading_bits {
             return Err(fail("retained certificate binds immutable raw source/target/population/return"));
         }
         Ok(std::sync::Arc::clone(o))
     }
     pub(super) fn at_native_produced(population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usize],producer:&super::selected::ProducedRetainedSection) -> Result<Self,HnnError> {
         producer.validate_raw(population,ring,waves,trees,targets)?;
-        Self::at_using(population,ring,None,waves,trees,targets,Some(producer))
+        Self::at_native_produced_with_policy(population,ring,waves,trees,targets,producer,RetainedReturnPolicy::PopulationMixtureSectionV1)
     }
+    pub(super) fn at_native_produced_with_policy(population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usize],producer:&super::selected::ProducedRetainedSection,policy:RetainedReturnPolicy)->Result<Self,HnnError>{
+        producer.validate_raw(population,ring,waves,trees,targets)?;
+        Self::at_using(population,ring,None,waves,trees,targets,Some(producer),policy)
+    }
+    pub(crate) fn at_family_local(population:&PortPopulation,ring:usize,combined:&Faces,trees:&[LandmarkFace],targets:&[usize])->Result<Self,HnnError>{
+        Self::at_using(population,ring,Some(combined),&combined.logits,trees,targets,None,RetainedReturnPolicy::FamilyLocalRetainedReturnV1)
+    }
+    #[allow(clippy::too_many_arguments)]
     fn at_using(
         population: &PortPopulation,
         ring: usize,
@@ -251,6 +278,7 @@ impl RetainedSectionReturn {
         trees: &[LandmarkFace],
         targets: &[usize],
         producer: Option<&super::selected::ProducedRetainedSection>,
+        return_policy: RetainedReturnPolicy,
     ) -> Result<Self, HnnError> {
         let rho = population.weight(COMBINED).map_err(population_refusal)?;
         if population.description(2).is_some() {
@@ -351,7 +379,10 @@ impl RetainedSectionReturn {
                         } else {
                             Rat::zero()
                         };
-                        &indicator + &beta_hat * (r - &indicator)
+                        match return_policy {
+                            RetainedReturnPolicy::PopulationMixtureSectionV1=>&indicator + &beta_hat * (r - &indicator),
+                            RetainedReturnPolicy::FamilyLocalRetainedReturnV1=>r.clone(),
+                        }
                     })
                     .collect();
                 // Only the executable effective-foil chart is packed. The actual shared
@@ -367,7 +398,10 @@ impl RetainedSectionReturn {
                         Rat::zero()
                     };
                     let g = &packed_foil[class] - &indicator;
-                    let foil_bounds = true_foil_bounds(&beta, mass, class == target)?;
+                    let foil_bounds = match return_policy {
+                        RetainedReturnPolicy::PopulationMixtureSectionV1=>true_foil_bounds(&beta,mass,class==target)?,
+                        RetainedReturnPolicy::FamilyLocalRetainedReturnV1=>ExactInterval::new(mass.lower.clone().max(Rat::zero()),mass.upper.clone().min(Rat::one()))?,
+                    };
                     let bounds = ExactInterval::new(
                         foil_bounds.lower - &indicator,
                         foil_bounds.upper - &indicator,
@@ -397,6 +431,7 @@ impl RetainedSectionReturn {
             }
             if exact_zero || norm_squared > error_pairing {
                 let origin = std::sync::Arc::new(RetainedSectionOrigin {
+                    return_policy,
                     population: population.clone(),
                     ring,
                     combined: combined.cloned(),
@@ -410,6 +445,7 @@ impl RetainedSectionReturn {
                     _issued: (),
                 });
                 return Ok(Self {
+                    return_policy,
                     origin,
                     rho,
                     beta,
@@ -546,4 +582,30 @@ mod tests {
         assert_eq!(read.stations[0].gradient, vec![integer(0); 2]);
         assert_eq!(population, original);
     }
+    #[test]
+    fn family_local_return_keeps_authentic_low_rho_prediction_and_distinct_binding() {
+        let tree=LandmarkFace {grain:4, probabilities:vec![rat(1,2),rat(1,2)],exponents:vec![(-4).into();2]};
+        let trees=vec![tree.clone();2];
+        let waves=vec![vec![integer(0);4];2];
+        let reads=waves.iter().zip(&trees).map(|(w,q)|ReceivingRead::combined(w.clone(),q,4).unwrap()).collect::<Vec<_>>();
+        let faces=Faces::of_reads(&reads,4).unwrap();
+        let mut population=receiving_population();
+        for _ in 0..20 { population.receive(&[ExactInterval::point(rat(1,2)),ExactInterval::point(rat(1,4))]).unwrap(); }
+        let saved=population.clone();let targets=[0,1];
+        let before=score_at_law(ReceivingLaw::RetainedFibreV1,&population,2,&faces,&trees,&targets,64).unwrap();
+        let old=RetainedSectionReturn::at(&population,2,&faces,&trees,&targets).unwrap();
+        let local=RetainedSectionReturn::at_family_local(&population,2,&faces,&trees,&targets).unwrap();
+        assert_eq!(local.rho,old.rho);assert_eq!(local.beta,old.beta);assert!(local.rho.upper<rat(1,1000000));
+        assert_eq!(local.stations[0].gradient,vec![rat(-1,2),rat(1,2)]);
+        assert_eq!(local.stations[1].gradient,vec![rat(1,2),rat(-1,2)]);
+        assert!(local.stations.iter().all(|s|s.component_error.iter().all(Zero::is_zero)));
+        assert_eq!(population,saved);
+        assert_eq!(score_at_law(ReceivingLaw::RetainedFibreV1,&population,2,&faces,&trees,&targets,64).unwrap(),before);
+        assert!(local.norm_squared>old.norm_squared);
+        let mut wrong=local.clone();wrong.return_policy=RetainedReturnPolicy::PopulationMixtureSectionV1;
+        assert!(wrong.certificate_origin(&population,2,&faces,&trees,&targets).is_err());
+        assert!(local.certificate_origin(&population,2,&faces,&trees,&[1,0]).is_err());
+        println!("FAMILY_LOCAL_LOW_RHO rho={:?} beta={:?} mixture_gradient={:?} local_gradient={:?} prediction_and_history_unchanged=true",local.rho,local.beta,old.stations[0].gradient,local.stations[0].gradient);
+    }
+
 }

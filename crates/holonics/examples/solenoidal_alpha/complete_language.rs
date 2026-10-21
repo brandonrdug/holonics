@@ -89,6 +89,17 @@ fn fresh_checkpoint_at_input_context(population:u64,law:holonics::hnn::receiving
     })
 }
 
+fn fresh_family_local_checkpoint(population:u64,scope:ObservedEpochDepositionScope)->Result<Checkpoint> { Ok({
+        let (field,mut initial,pairing)=declaration_with_input_context(population,true,true)?;
+        initial.bind_family_local_receiving_return(2)?;
+        let reference=port();
+        let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
+        let boundary=PairedObservation::admit(&field,resident.constitution(),&pairing)?;
+        reference.ingest(&mut resident,None,&boundary.encode(&[])?)?;
+        Checkpoint {population, stream:ObservedStream::new(resident,ObservedCrib::new(0),scope)?,provenance:"fresh FamilyLocalRetainedReturnV1; unchanged RetainedFibreV1 release/history; framed paired source".into()}
+
+    }) }
+
 /// A structural witness, independent of subject bytes. These advance operands are the native
 /// lock route: every class advances ring0 once, with no own advance on rings1/2. Periods5,2
 /// therefore give the actual receiver tick every10 source arrivals, including whole carries.
@@ -258,7 +269,8 @@ fn train(
     if args.len() != 10 {
         return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT".into());
     }
-    let arrival=args[0]=="train-source-framing-arrival-context-held-v1";
+    let family_local=args[0]=="train-family-local-arrival-context-held-v1";
+    let arrival=family_local || args[0]=="train-source-framing-arrival-context-held-v1";
     let framed=arrival || args[0]=="train-source-framing-retained-held-v1";
     let prepared_input = framed || matches!(args[0].as_str(), "train-prepared-local-retained-fibre-v1" | "train-prepared-local-retained-held-v1");
     if prepared_input {
@@ -297,6 +309,7 @@ fn train(
         ("command",quoted(&args[0])),
         ("input_preparation_law",if prepared_input {quoted(if framed{holonics::hnn::reference::prepared_input::SOURCE_FRAMING_LAW}else{holonics::hnn::reference::prepared_input::LAW})}else{"null".into()}),
         ("deposition_scope",exact(&scope)),
+        ("constitutive_return_policy",quoted(if family_local {"family-local-retained-return-v1"} else {"population-mixture-section-return-v1"})),
         ("receiving_layout",quoted(if arrival{"ArrivalContext-source6/context6"}else{"Single6"})),
         ("additional_whole_section_monotone_policy_requested",(!scope.is_local_receiving()).to_string()),
         ("e_scope",quoted(e_scope(scope,prepared_input))),
@@ -306,7 +319,7 @@ fn train(
         ("host_fallback", "false".into()),
         ("evidence_policy",quoted("local: compact outcome/actual-code/wall; full return+energy at predeclared cut crossings or Held; all stage failures retained")),
     ]).as_bytes())?;
-    let mut checkpoint = fresh_checkpoint_at_input_context(population, law, scope,framed,arrival)?;
+    let mut checkpoint = if family_local {fresh_family_local_checkpoint(population,scope)?    } else {fresh_checkpoint_at_input_context(population, law, scope,framed,arrival)?};
     if prepared_input {
         let pairing=declaration_with_source_framing(population,framed)?.2;
         if framed {checkpoint.stream.select_source_framing_prepared_input(&pairing)?;}else{checkpoint.stream.select_prepared_input(&pairing)?;}
@@ -514,6 +527,7 @@ fn train(
         object(&[
             ("backend", quoted(backend)),
             ("command", quoted(&args[0])),
+            ("constitutive_return_policy",quoted(checkpoint.stream.resident().constitution().receiving_return_policy(2).ok_or("receiving return owner")?.tag())),
             ("deposition_scope", exact(&checkpoint.stream.scope())),
             (
                 "input_preparation_law",
@@ -699,7 +713,7 @@ pub(super) fn run_with_execution(
         Some("train-retained-fibre-v1") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1, backend,ObservedEpochDepositionScope::NormalMaps),
         Some("train-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
         Some("train-prepared-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
-        Some("train-source-framing-arrival-context-held-v1") | Some("train-source-framing-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
+        Some("train-family-local-arrival-context-held-v1") | Some("train-source-framing-arrival-context-held-v1") | Some("train-source-framing-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         Some("train-prepared-local-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
@@ -976,4 +990,15 @@ pub(super) fn code_prepared_arrival_context(
         "paired local R publication UNJOINED; actual prepared words/returns compared by executor"
             .into(),
     ))
+}
+
+#[cfg(test)]
+pub(super) fn code_family_local_late_rollback(execution:&dyn ObservedEpochExecution)->Result<String>{
+    let mut checkpoint=fresh_family_local_checkpoint(16384,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+    let pairing=checkpoint.declaration()?.2;
+    checkpoint.stream.select_source_framing_prepared_input(&pairing)?;
+    let before=checkpoint.bytes()?;
+    let error=checkpoint.stream.receive_with_execution(&port(),&pairing,&digits(&[0x1b;3])[..10],execution).unwrap_err();
+    if checkpoint.bytes()?!=before {return Err("family-local late aggregate refusal changed native/M/crib/pending".into());}
+    Ok(error.to_string())
 }

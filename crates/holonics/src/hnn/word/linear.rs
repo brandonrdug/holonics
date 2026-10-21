@@ -45,6 +45,9 @@ pub(crate) fn tick(
     tick: usize,
 ) -> Result<crate::hnn::word::EndChange, HnnError> {
     let junctions = junctions(operands, state)?;
+    tick_at_junctions(operands,state,tick,&junctions)
+}
+pub(crate) fn tick_at_junctions(operands:&crate::hnn::propagation::Operands,state:&crate::hnn::word::EndChange,tick:usize,junctions:&[crate::hnn::propagation::Junction])->Result<crate::hnn::word::EndChange,HnnError>{
     let mut next = state.clone();
     for (ring, junction) in junctions.iter().enumerate() {
         let drive = crate::hnn::propagation::element_step(

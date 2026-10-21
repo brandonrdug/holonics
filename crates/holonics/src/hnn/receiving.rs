@@ -155,7 +155,7 @@ pub use single_grain::{LogarithmicFibre, ReceivingCell, ReceivingFibre, Retained
 mod comparison_score;
 pub use comparison_score::{ComparedScoresAt, compare_scores_at};
 mod selected;
-pub(crate) use selected::{prepare_retained_section, prepare_native_retained_section};
+pub(crate) use selected::{prepare_retained_section, prepare_native_retained_section, prepare_native_retained_section_with_policy};
 pub use selected::{
     ReceivingLaw, SelectedComparedScoresAt, SelectedFaceReading, SelectedScored,
     compare_scores_at_law, score_at_law,
@@ -165,7 +165,7 @@ mod aligned_return;
 pub(crate) mod reuse_work;
 pub(crate) use aligned_return::RetainedSectionOrigin;
 pub use aligned_return::{
-    RetainedSectionReturn, RetainedSectionSourceReading, RetainedStationReturn,
+    RetainedReturnPolicy, RetainedSectionReturn, RetainedSectionSourceReading, RetainedStationReturn,
 };
 mod declaration;
 pub(crate) use declaration::DeclaringFace;

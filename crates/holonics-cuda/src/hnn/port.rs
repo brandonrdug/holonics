@@ -250,7 +250,9 @@ fn pull_back_word(
             paired.fresh,
         )?;
         let mut joined =
-            WordReturn::join_response(field, actual_back, response_back, paired.reads)?;
+            WordReturn::join_response(field, actual_back, response_back, paired.reads,word.word.response_producing_operands().ok_or(HnnError::Unadmitted {reason:"paired native operands remain with their record"})?,phases,word.word.plan.opened_at)?;
+        if word.word.response_error_requested() {
+        word.word.request_response_anchor_errors()?;
         let (fresh_errors, actual_errors) =
             word.word
                 .response_anchor_errors()
@@ -285,6 +287,7 @@ fn pull_back_word(
             fresh,
             actual: Some(actual),
         });
+        }
         joined
     } else {
         let source = readout::source(
@@ -623,6 +626,10 @@ impl<'c> Mounted<'c> {
         card: &'c Card,
         opening: &CardOpening<'c>,
     ) -> Result<(ExecutedWord<'c>, Faces, Rc<Publication<'c>>), HnnError> {
+        let demand=self.constitution.receiving_return_policy(ratio.phases().ring())!=Some(holonics::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
+        self.execute_with_response_evidence(ratio,moment,publication,card,opening,demand,false)
+    }
+    fn execute_with_response_evidence(&mut self,ratio:&PendingRatio,moment:&MomentSnapshot<'c>,publication:&Rc<Publication<'c>>,card:&'c Card,opening:&CardOpening<'c>,response_error_requested:bool,validate_error_reference:bool)->Result<(ExecutedWord<'c>,Faces,Rc<Publication<'c>>),HnnError>{
         let field = &self.field;
         let current = ratio.current(field)?;
         let active_publication = if ratio.view().is_whole() {
@@ -758,6 +765,8 @@ impl<'c> Mounted<'c> {
             carried,
             response_operands.as_ref(),
             response_opening_base.as_ref(),
+            response_error_requested,
+            validate_error_reference,
         )?;
         self.layouts.set(Some(launches.layouts()));
         let mut word = word;

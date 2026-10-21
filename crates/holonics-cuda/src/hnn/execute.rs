@@ -1358,7 +1358,7 @@ fn refusal(status: &[u32], forward: bool) -> Option<HnnError> {
 // the resident word
 
 /// Transient successful-forward wall windows. No checkpoint or law consumes these.
-/// Fresh/actual include host decode and required tube proofs; launch/fetch windows
+/// Fresh/actual include host decode and any requested tube reports; launch/fetch windows
 /// include queued dependencies and must never be labeled pure GPU kernel time.
 #[derive(Clone, Copy, Debug, Default)]
 pub(crate) struct ForwardLaneCost {
@@ -1367,6 +1367,9 @@ pub(crate) struct ForwardLaneCost {
     pub fresh_error_trace_ns: u128,
     pub actual_path_ns: u128,
     pub actual_error_trace_ns: u128,
+    pub response_error_trace_calls: u64,
+    pub response_error_reference_calls: u64,
+    pub response_error_reference_ns:u128,
 }
 /// [definition] **One word's buffers on the card** (module header).
 pub(crate) struct ResidentWord<'c> {
@@ -1397,6 +1400,10 @@ struct ResponseLane<'c> {
     octets: usize,
     storage_octets: usize,
     fresh_anchor_errors: Vec<Vec<Vec<Rat>>>,
+    report_requested: bool,
+    error_operands: Operands,
+    actual_error_record: Option<ForwardRecord>,
+    actual_opening_base: Option<EndChange>,
     actual_anchor_errors: Option<Vec<Vec<Vec<Rat>>>>,
 }
 
@@ -1456,8 +1463,12 @@ impl<'c> ResidentWord<'c> {
         carried: Option<&CardBuffer<'c, u8>>,
         response_operands: Option<&Operands>,
         response_opening_base: Option<&EndChange>,
+        response_error_requested: bool,
+        validate_error_reference:bool,
     ) -> Result<(Self, Launches), HnnError> {
         let forward_started = std::time::Instant::now();
+        let mut fresh_error_tube=None;
+        let mut response_error_reference_ns=0;
         let launches = Launches::derive(card, &plan)?;
         let layout = WordLayout::new(&plan, plan.contacts.len());
         let plan_words = card.upload(&plan.plan).map_err(device)?;
@@ -1609,10 +1620,16 @@ impl<'c> ResidentWord<'c> {
             let operands = response_operands.ok_or(HnnError::Unadmitted {
                 reason: "an ArrivalContext CUDA response has the producing charted operands",
             })?;
-            let trace_started = std::time::Instant::now();
-            let fresh_anchor_errors =
-                response_error_trace(&response_plan, &record, operands, None)?;
-            fresh_error_trace_ns = trace_started.elapsed().as_nanos();
+            ResponseTube::admit_operands(operands)?;
+            // The actual/fresh records are retained. Reports are requested separately;
+            // no empty numerical certificate is published in demand-off mode.
+            let fresh_anchor_errors=if response_error_requested {
+                let started=std::time::Instant::now();
+                let (exact,executed)=crate::hnn::readout::response_openings(&response_plan,&record)?;
+                let mut tube=ResponseTube::open(operands,&exact,&executed)?;
+                let errors=trace_response_tube(&response_plan,&record,&mut tube)?;
+                fresh_error_tube=Some(tube);fresh_error_trace_ns=started.elapsed().as_nanos();errors
+            } else {Vec::new()};
 
             Some(ResponseLane {
                 plan: response_plan,
@@ -1622,6 +1639,10 @@ impl<'c> ResidentWord<'c> {
                 octets: response_octets,
                 storage_octets: response_storage_octets,
                 fresh_anchor_errors,
+                report_requested: response_error_requested,
+                error_operands: operands.clone(),
+                actual_error_record: None,
+                actual_opening_base: response_opening_base.cloned(),
                 actual_anchor_errors: None,
             })
         } else {
@@ -1705,17 +1726,31 @@ impl<'c> ResidentWord<'c> {
             let operands = response_operands.ok_or(HnnError::Unadmitted {
                 reason: "the paired CUDA response retains its producing charted operands",
             })?;
-            let trace_started = std::time::Instant::now();
-            let errors =
-                response_error_trace(&plan, &actual_record, operands, response_opening_base)?;
-            actual_error_trace_ns = trace_started.elapsed().as_nanos();
-            lane.actual_anchor_errors = Some(errors);
+            ResponseTube::admit_operands(operands)?;
+            lane.actual_error_record=Some(actual_record);
+            if response_error_requested {
+                let started=std::time::Instant::now();
+                let record=lane.actual_error_record.as_ref().unwrap();
+                let (exact,executed)=match response_opening_base {Some(base)=>crate::hnn::readout::response_openings_from(&plan,record,base)?,None=>crate::hnn::readout::response_openings(&plan,record)?};
+                let mut tube=fresh_error_tube.as_ref().unwrap().new_track(&exact,&executed)?;
+                let actual=trace_response_tube(&plan,record,&mut tube)?;
+                actual_error_trace_ns=started.elapsed().as_nanos();
+                if validate_error_reference || cfg!(test) {
+                    let reference_started=std::time::Instant::now();
+                    let old_fresh=response_error_trace(&lane.plan,&lane.record,&lane.error_operands,None)?;
+                    let old_actual=response_error_trace(&plan,record,&lane.error_operands,lane.actual_opening_base.as_ref())?;
+                    if lane.fresh_anchor_errors!=old_fresh || actual!=old_actual {return Err(refused("requested shared fresh/actual radii differ from independent original trace"));}
+                    response_error_reference_ns=reference_started.elapsed().as_nanos();
+                    #[cfg(test)] eprintln!("REQUESTED_NUMERICAL_TRACE_REFERENCE_EQUAL fresh_and_actual=true");
+                }
+                lane.actual_anchor_errors=Some(actual);
+            }
         }
         Ok((
             Self {
                 forward_cost: ForwardLaneCost { shared_setup_ns, fresh_path_ns,
                     fresh_error_trace_ns, actual_path_ns: actual_started.elapsed().as_nanos(),
-                    actual_error_trace_ns },
+                    actual_error_trace_ns, response_error_trace_calls: if response_error_requested && response.is_some(){2}else{0}, response_error_reference_calls:if response_error_reference_ns>0{2}else{0}, response_error_reference_ns },
                 card,
                 plan,
                 layout,
@@ -1894,6 +1929,18 @@ impl<'c> ResidentWord<'c> {
             .map(|lane| (&lane.plan, &lane.record))
     }
 
+    pub(crate) fn response_producing_operands(&self)->Option<&Operands>{self.response.as_ref().map(|r|&r.error_operands)}
+    pub(crate) fn response_error_requested(&self)->bool {self.response.as_ref().is_some_and(|r|r.report_requested)}
+    /// Real original records/operands, available only while this actual Word is retained.
+    pub(crate) fn request_response_anchor_errors(&mut self)->Result<(),HnnError> {
+        let lane=self.response.as_mut().ok_or_else(||refused("no paired producing records remain for an unsplit report"))?;
+        if lane.actual_anchor_errors.is_none() {
+            let (fresh,actual,_,_)=response_error_pair(&lane.plan,&lane.record,&self.plan,lane.actual_error_record.as_ref().ok_or_else(||refused("the actual report record is unavailable"))?,&lane.error_operands,lane.actual_opening_base.as_ref())?;
+            lane.fresh_anchor_errors=fresh;lane.actual_anchor_errors=Some(actual);
+            self.forward_cost.response_error_trace_calls+=2;
+        }
+        lane.report_requested=true;Ok(())
+    }
     pub(crate) fn response_anchor_errors(&self) -> Option<(&[Vec<Vec<Rat>>], &[Vec<Vec<Rat>>])> {
         self.response.as_ref().and_then(|lane| {
             lane.actual_anchor_errors
@@ -1913,6 +1960,17 @@ impl<'c> ResidentWord<'c> {
     }
 }
 
+fn response_error_pair(fresh_plan:&WordPlan,fresh_record:&ForwardRecord,actual_plan:&WordPlan,actual_record:&ForwardRecord,operands:&Operands,base:Option<&EndChange>)->Result<(Vec<Vec<Vec<Rat>>>,Vec<Vec<Vec<Rat>>>,u128,u128),HnnError>{
+    let started=std::time::Instant::now();
+    let (fe,fx)=crate::hnn::readout::response_openings(fresh_plan,fresh_record)?;
+    let (ae,ax)=match base {Some(b)=>crate::hnn::readout::response_openings_from(actual_plan,actual_record,b)?,None=>crate::hnn::readout::response_openings(actual_plan,actual_record)?};
+    let mut fresh=ResponseTube::open(operands,&fe,&fx)?;
+    let mut actual=fresh.new_track(&ae,&ax)?;
+    let f=trace_response_tube(fresh_plan,fresh_record,&mut fresh)?;
+    let fresh_ns=started.elapsed().as_nanos();let started=std::time::Instant::now();
+    let a=trace_response_tube(actual_plan,actual_record,&mut actual)?;
+    Ok((f,a,fresh_ns,started.elapsed().as_nanos()))
+}
 fn response_error_trace(
     plan: &WordPlan,
     record: &ForwardRecord,
@@ -1924,21 +1982,17 @@ fn response_error_trace(
         None => crate::hnn::readout::response_openings(plan, record)?,
     };
     let mut tube = ResponseTube::open(operands, &exact_opening, &executed_opening)?;
+    let mut errors=Vec::with_capacity(plan.steps);
+    for t in 0..plan.steps {let point=crate::hnn::readout::crossing_at(plan,record,t)?;let anchors=crate::hnn::readout::crossing_anchors(plan,record,t)?;errors.push(tube.anchors(&point,&anchors)?);if t+1<plan.steps {let next=crate::hnn::readout::crossing_at(plan,record,t+1)?;tube.advance(&point,&next,plan.opened_at.checked_add(t).ok_or(HnnError::CountOverflow)?)?;}}
+    Ok(errors)
+}
+fn trace_response_tube(plan:&WordPlan,record:&ForwardRecord,tube:&mut ResponseTube<'_>)->Result<Vec<Vec<Vec<Rat>>>,HnnError>{
     let mut anchor_errors = Vec::with_capacity(plan.steps);
     for crossing in 0..plan.steps {
         let point = crate::hnn::readout::crossing_at(plan, record, crossing)?;
         let anchors = crate::hnn::readout::crossing_anchors(plan, record, crossing)?;
-        anchor_errors.push(tube.anchors(&point, &anchors)?);
-        if crossing + 1 < plan.steps {
-            let next = crate::hnn::readout::crossing_at(plan, record, crossing + 1)?;
-            tube.advance(
-                &point,
-                &next,
-                plan.opened_at
-                    .checked_add(crossing)
-                    .ok_or(HnnError::CountOverflow)?,
-            )?;
-        }
+        let next=if crossing+1<plan.steps {Some(crate::hnn::readout::crossing_at(plan,record,crossing+1)?)}else{None};
+        anchor_errors.push(tube.crossing(&point,&anchors,next.as_ref(),plan.opened_at.checked_add(crossing).ok_or(HnnError::CountOverflow)?)?);
     }
     Ok(anchor_errors)
 }
