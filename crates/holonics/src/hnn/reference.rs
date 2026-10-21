@@ -1270,6 +1270,23 @@ impl Reference {
         Ok(resident)
     }
 
+    /// Declare the receiving law when a NEW native body is constructed. This
+    /// does not switch an existing Resident or reinterpret any saved history.
+    /// Material declaration may itself have commits (e.g. a pristine paired layout).
+    pub fn mount_declared_receiving_law(
+        &self,field:&Field,current:&Current,constitution:Constitution,
+        law:crate::hnn::receiving::ReceivingLaw,
+    )->Result<Resident,HnnError>{
+        if field.receivers().iter().any(|r|constitution.population(r.ring).is_none_or(|p|p.cells()!=0)){
+            return Err(HnnError::ContinuingState{what:"declare a new receiving law before population history, never reinterpret a saved population"});
+        }
+        let mut resident=self.mount_with(field,current,constitution)?;
+        // A new owner with zero population has no source/pending history;
+        // selecting its declared law precedes every interaction with it.
+        resident.receiving_law=law;
+        Ok(resident)
+    }
+
     /// [definition; October 4, the reception carry §8] **Mount a saved state**: the declared opening
     /// continued from it ([`Constitution::continued`], which refuses another opening's material or
     /// a moved opening; a damaged text is refused when it is read), with its carried end beside it

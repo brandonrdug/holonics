@@ -356,6 +356,8 @@ struct MomentSlot<'c> {
 /// [definition] **A word executed on the card, kept for its return**: its resident buffers and
 /// record, the contacts' operators its balance read, and its charts' readings.
 struct ExecutedWord<'c> {
+    source_preparation_host_ns:u128,
+    source_preparation: Option<holonics::hnn::word::action::PortPreparationReceipt>,
     word: ResidentWord<'c>,
     operators: Vec<Rc<ContactOperator>>,
     readings: Vec<ChartReading>,
@@ -644,7 +646,14 @@ impl<'c> Mounted<'c> {
         };
         // The normalized open (it reads no held cell), read from the pending ratio's copy of the
         // moment.
-        let opens = SourceOpen::of(field, ratio.moment())?;
+        let preparation_started=Instant::now();
+        let preparation=if ratio.uses_prepared_input(){
+            let mut native_charts=self.store.continuing_charts()?;
+            ratio.source_opening_preparation(field,&self.constitution,&mut native_charts,&opening.host())?
+        }else{None};
+        let source_preparation_host_ns=preparation_started.elapsed().as_nanos();
+        let mut opens = SourceOpen::of(field, ratio.moment())?;
+        if let Some(packet)=&preparation{SourceOpen::prepare(&mut opens,packet)?;}
         // The host's declared resonator operands and charts at this publication, formed once per
         // publication (`Loci::resonator_operands`); ring/contact chart refinement remains resident
         // below.
@@ -769,6 +778,8 @@ impl<'c> Mounted<'c> {
         let faces = readout::faces(&word.plan, &word.record)?;
         Ok((
             ExecutedWord {
+                source_preparation_host_ns,
+                source_preparation: preparation.map(|p|p.receipt().clone()),
                 word,
                 operators,
                 readings: refined.readings,

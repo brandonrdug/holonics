@@ -563,6 +563,16 @@ impl PendingRatio {
         self.read_word(field,theta,word)
     }
 
+    /// Authenticate the existing source operation without executing a forward or J.
+    /// The private packet can only be formed from this actual native producer.
+    pub fn uses_prepared_input(&self)->bool{self.prepared_input.is_some()}
+    pub fn source_opening_preparation(&self,field:&Field,theta:&crate::hnn::constitution::Constitution,charts:&mut Charts,opening:&WordOpening)->Result<Option<SourceOpeningPreparation>,HnnError>{
+        let Some(cut)=&self.prepared_input else{return Ok(None)};
+        let word=Word::open_received_view(field,theta,&self.current(field)?,&self.moment,charts,opening,&self.view)?;
+        let prepared=cut.apply(field,theta,self,word)?;
+        Ok(prepared.source_preparation().cloned().map(|receipt|SourceOpeningPreparation{ring:0,receipt}))
+    }
+
     /// The contemporary tree faces at each phase's causal address given the epoch's known targets:
     /// what [`PendingRatio::against`] adds to the wave (read-only).
     pub(crate) fn tree_faces(
@@ -678,4 +688,16 @@ impl PendingRatio {
             + self.moment.dense_bits()
             + self.address.bits(self.moment.alphabet())
     }
+}
+
+/// An authenticated exact source-opening control; it is not a new observation or moment.
+#[derive(Clone,Debug,PartialEq,Eq)]
+pub struct SourceOpeningPreparation {
+    ring:usize,
+    receipt:crate::hnn::word::action::PortPreparationReceipt,
+}
+impl SourceOpeningPreparation {
+    pub fn ring(&self)->usize{self.ring}
+    pub fn added(&self)->&[Rat]{&self.receipt.added}
+    pub fn receipt(&self)->&crate::hnn::word::action::PortPreparationReceipt{&self.receipt}
 }

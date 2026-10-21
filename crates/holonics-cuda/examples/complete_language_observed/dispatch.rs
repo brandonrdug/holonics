@@ -48,12 +48,15 @@ impl TracedCard {
         reading
     }
     pub fn receipt(&self, completed: bool) -> String {
-        format!(
-            "{{\"backend\":\"cuda-observed-epoch-device0\",\"device_ordinal\":0,\"host_fallback\":false,\"completed\":{completed},\"successful_card_forwards\":{},\"successful_retained_card_returns\":{},\"successful_card_aggregates\":{},\"host_owned\":\"scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks\"}}\n",
+        let m=self.card.realization_reading();
+        let device=format!("{{\"successful_forwards\":{},\"opening_packets\":{},\"opening_preparation_host_ns\":{},\"mounted_execute_ns\":{},\"native_word_forward_launches\":{},\"fresh_response_forward_subset\":{},\"forward_phase_transfer_octets\":{},\"response_forward_transfer_subset_octets\":{}}}",m.successful_forwards,m.source_preparation_packets,m.source_preparation_host_ns,m.mounted_execute_ns,m.native_word_forward_launches,m.fresh_response_forward_subset,m.forward_phase_transfer_octets,m.response_forward_transfer_subset_octets);
+        let base=format!(
+            "{{\"backend\":\"cuda-observed-epoch-device0\",\"device_ordinal\":0,\"host_fallback\":false,\"completed\":{completed},\"successful_card_forwards\":{},\"successful_retained_card_returns\":{},\"successful_card_aggregates\":{},\"host_owned\":\"empirical M formation/authentic opening work; scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks\"}}\n",
             self.counts.forwards.load(Ordering::Relaxed),
             self.counts.returns.load(Ordering::Relaxed),
             self.counts.aggregates.load(Ordering::Relaxed)
-        )
+        );
+        format!("{},\"device_forward_reading\":{device}}}\n",base.trim().strip_suffix('}').expect("receipt object"))
     }
     pub fn require_actual_dispatch(&self) -> Result<(), HnnError> {
         if self.counts.forwards.load(Ordering::Relaxed) == 0
@@ -99,6 +102,7 @@ impl ObservedEpochWord for CountedWord {
     }
 }
 impl ObservedEpochExecution for TracedCard {
+    fn admit_prepared_input(&self)->Result<(),HnnError>{self.card.admit_prepared_input()}
     fn forward(
         &self,
         field: &Field,

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "bash",
+    "tools/gate.sh"
+  ],
+  "limit_s": 180,
+  "wall_ns": 180102675688,
+  "peak_rss_bytes": 3004522496,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 1793,
+  "exit": -9,
+  "stop": "fixed_deadline",
+  "owned_cleanup_remaining": [
+    2596
+  ],
+  "ledger_before_ns": 262951045914,
+  "ledger_after_ns": 443053721602,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

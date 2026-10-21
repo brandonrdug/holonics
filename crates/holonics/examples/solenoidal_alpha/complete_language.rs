@@ -239,7 +239,8 @@ fn causal_cut(checkpoint: &Checkpoint, next_class: Option<usize>, label: &str) -
 /// Reusable native training entry. Data are already framed and pinned by the exterior plan.
 /// Backend injection changes only the existing forward/reverse executor, not the epoch law.
 #[allow(clippy::too_many_arguments)]
-fn e_scope(scope:ObservedEpochDepositionScope)->&'static str {
+fn e_scope(scope:ObservedEpochDepositionScope,prepared:bool)->&'static str {
+    if prepared {return "class-coordinate contextual M plus local R/tree/population; native E/C/K/D held; general contextual E/family producer is a separate owner";}
     if scope==ObservedEpochDepositionScope::LocalReceivingReturn {
         "R/tree/population only; bounded addressed JointFamily E response is a separate API, not automatically produced or invoked"
     } else { "preserved legacy normal-map reference; no generic contextual JointFamily producer" }
@@ -256,9 +257,7 @@ fn train(
         return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT".into());
     }
     let prepared_input = args[0] == "train-prepared-local-retained-fibre-v1";
-    if prepared_input && selected_backend != CompleteLanguageTrainingBackend::HostReference {
-        return Err("prepared native opening has no selected-device adapter; explicit host command required, no fallback".into());
-    }
+    if prepared_input { execution.admit_prepared_input()?; }
     let backend = selected_backend.as_str();
     if args[1] != backend {
         return Err(
@@ -293,7 +292,7 @@ fn train(
         ("input_preparation_law",if prepared_input {quoted(holonics::hnn::reference::prepared_input::LAW)}else{"null".into()}),
         ("deposition_scope",exact(&scope)),
         ("additional_whole_section_monotone_policy_requested",(scope!=ObservedEpochDepositionScope::LocalReceivingReturn).to_string()),
-        ("e_scope",quoted(e_scope(scope))),
+        ("e_scope",quoted(e_scope(scope,prepared_input))),
         ("training_executor_injected", "true".into()),
         ("device_ordinal", if selected_backend == CompleteLanguageTrainingBackend::CudaObservedEpochDevice0 { "0".into() } else { "null".into() }),
         ("host_owned", quoted("source/clock/normal law; scalar face/root/normalization/scoring/certification; causal cuts; prefix diagnostics; exact decode; independent output forks")),
@@ -482,7 +481,7 @@ fn train(
             ("deposition_scope",exact(&checkpoint.stream.scope())),
             ("input_preparation_law",checkpoint.stream.resident().prepared_input().map_or("null".into(),|p|quoted(p.law()))),
             ("prepared_input_state",exact(&checkpoint.stream.resident().prepared_input())),
-            ("e_scope",quoted(e_scope(scope))),
+            ("e_scope",quoted(e_scope(scope,prepared_input))),
 
             (
                 "actual_rayon_workers",
@@ -742,4 +741,34 @@ mod tests {
         }
         std::fs::remove_dir(out).unwrap();
     }
+}
+
+#[cfg(test)]
+pub(super) fn code_prepared_late_rollback(execution:&dyn ObservedEpochExecution)->Result<String>{
+    let mut checkpoint=fresh_checkpoint_at_law_and_scope(16384,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,ObservedEpochDepositionScope::LocalReceivingReturn)?;
+    let pairing=declaration(16384)?.2;
+    checkpoint.stream.select_prepared_input(&pairing)?;
+    let before=checkpoint.bytes()?;
+    let err=checkpoint.stream.receive_with_execution(&port(),&pairing,&digits(&[0x1b;3])[..10],execution).unwrap_err();
+    if checkpoint.bytes()?!=before{return Err("late card refusal must preserve native/M/pending/carry exactly".into());}
+    Ok(err.to_string())
+}
+
+#[cfg(test)]
+pub(super) fn code_prepared_arrival_context(execution:&dyn ObservedEpochExecution)->Result<(String,String,String)>{
+    let (field,mut initial,pairing)=declaration(16384)?;
+    initial.bind_arrival_context_receiving(2)?;
+    let opening=initial.clone();
+    let reference=port();let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
+    let boundary=PairedObservation::admit(&field,resident.constitution(),&pairing)?;
+    reference.ingest(&mut resident,None,&boundary.encode(&[])?)?;
+    let mut stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturn)?;
+    stream.select_prepared_input(&pairing)?;
+    let before=stream.resident().continuing_state(0)?;
+    let refusal=stream.receive_with_execution(&reference,&pairing,&digits(&[0x1b;3])[..10],execution).unwrap_err();
+    assert!(refusal.to_string().contains("an epoch normal locus must exist as one declared linear law"));
+    assert_eq!(stream.resident().continuing_state(0)?,before,"unsupported paired local normal publication is atomic");
+    let cold=reference.mount_continued(&field,&Current::at_rest(&field),opening,&before)?;
+    assert_eq!(cold.continuing_state(0)?,before);
+    Ok((before.to_text(),refusal.to_string(),"paired local R publication UNJOINED; actual prepared words/returns compared by executor".into()))
 }

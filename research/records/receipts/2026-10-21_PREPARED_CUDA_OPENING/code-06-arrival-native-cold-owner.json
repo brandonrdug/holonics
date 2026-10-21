@@ -1,0 +1,23 @@
+{
+  "command": [
+    "python3",
+    "<CODE-artifacts>/host_gpu_guard_arrival_v2.py"
+  ],
+  "limit_s": 180,
+  "wall_ns": 8339468052,
+  "peak_rss_bytes": 40255488,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 79,
+  "exit": 1,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 130773836282,
+  "ledger_after_ns": 139113304334,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

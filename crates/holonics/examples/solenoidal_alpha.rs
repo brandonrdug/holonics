@@ -2067,3 +2067,9 @@ mod tests {
         assert_eq!(checkpoint.bytes().unwrap(), before);
     }
 }
+
+#[cfg(test)]
+pub fn code_prepared_late_rollback(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution)->std::result::Result<String,Box<dyn std::error::Error>>{complete_language::code_prepared_late_rollback(execution)}
+
+#[cfg(test)]
+pub fn code_prepared_arrival_context(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution)->std::result::Result<(String,String,String),Box<dyn std::error::Error>>{complete_language::code_prepared_arrival_context(execution)}

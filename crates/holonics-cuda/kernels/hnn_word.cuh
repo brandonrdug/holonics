@@ -163,7 +163,7 @@
 #define WA_COORD 3
 #define WA_CHANNEL 4
 
-#define WS_STRIDE 10
+#define WS_STRIDE 11
 #define WS_RING 0
 #define WS_PHASES 1
 #define WS_E 2
@@ -174,6 +174,7 @@
 #define WS_PAIRS 7
 #define WS_PAIR_BASE 8
 #define WS_NU 9
+#define WS_PREPARATION 10
 
 #define WQ_STRIDE 8
 #define WQ_RANK 0
@@ -767,6 +768,11 @@ extern "C" __global__ void hnn_word_forward(
                         }
                         hnn_add(image, hnn_shifted(hnn_read(driven, &st), pair[WQ_SHIFT], &st));
                     }
+                }
+                // The shared owner already authenticated B*u and its work at this cut.
+                // Both actual/fresh plans carry it at the SAME common exact source scale.
+                if (src[WS_PREPARATION] >= 0) {
+                    hnn_add(image, (wide)plan[src[WS_PREPARATION] + i]);
                 }
                 const wide value = hnn_read(image, &st);
                 source_opening[base + i] = value;

@@ -145,7 +145,7 @@ const WC_SHIFT_GAIN: usize = 17;
 const WC_SHIFT_GAIN_EXP: usize = 18;
 const WC_ZETA_EXP: usize = 19;
 
-const WS_STRIDE: usize = 10;
+const WS_STRIDE: usize = 11;
 const WQ_STRIDE: usize = 8;
 
 /// The word buffer's arrays, in the kernels' `WL_*` order.
@@ -444,7 +444,8 @@ impl WordPlan {
                 .sources
                 .iter()
                 .find(|source| source.ring == g)
-                .map(|source| open_exponent(source, population))
+                .map(|source| { let base=open_exponent(source,population)?;
+                    opens.iter().find(|o|o.ring==source.ring).ok_or_else(||refused("actual source-open operand"))?.prepared_exponent(base) })
                 .transpose()?;
             let storage_exp = (lc + swc + lw).max(open_exp.unwrap_or(0));
             let anchor_exp = lw + swc.max(h_shift);
@@ -653,11 +654,17 @@ impl WordPlan {
             for c in 0..phases_g {
                 plan.extend(gather(field, g, &(&lift[g] - BigInt::from(c))));
             }
-            let open_exp = open_exponent(source, population)?;
             let open = opens
                 .get(s)
                 .filter(|open| open.ring == g && open.pairs.len() == source.pairs.len())
                 .ok_or_else(|| refused("the source's normalized open against its loci"))?;
+            let open_exp = open.prepared_exponent(open_exponent(source,population)?)?;
+            let preparation_at=if let Some(control)=&open.preparation {
+                if control.len()!=widths[g]{return Err(refused("prepared opening has the actual source width"));}
+                let at=plan.len();
+                for value in control {plan.push(word(value,open_exp,"exact prepared source coordinate fits the signed card word")?);}
+                at as i64
+            }else{-1};
             let first_pair = pair_entries.len();
             for (o, pair) in source.pairs.iter().enumerate() {
                 let rank = pair.rank;
@@ -690,6 +697,7 @@ impl WordPlan {
             record[6] = i64::from(marginal_shift);
             record[7] = source.pairs.len() as i64;
             record[8] = first_pair as i64;
+            record[10] = preparation_at;
             record[9] = i64::try_from(open.marginal)
                 .map_err(|_| refused("a population chart numerator past the signed word"))?;
         }
@@ -915,6 +923,20 @@ mod source_scale_tests {
     }
 
     #[test]
+    fn prepared_source_common_scale_is_lossless_or_refused() {
+        use super::SourceOpen;
+        use holonics::ratio::{integer,rat};
+        let mut open=SourceOpen{ring:0,marginal:1,pairs:Vec::new(),preparation:Some(vec![rat(1,1<<24)])};
+        assert_eq!(open.prepared_exponent(17).unwrap(),24);
+        assert!(crate::hnn::dyadic::word(&open.preparation.as_ref().unwrap()[0],17,"old source scale cannot carry delta").is_err());
+        assert_eq!(crate::hnn::dyadic::word(&open.preparation.as_ref().unwrap()[0],24,"new scale").unwrap(),1);
+        open.preparation=Some(vec![rat(1,3)]);assert!(open.prepared_exponent(17).is_err());
+        open.preparation=Some(vec![integer(1)/(num_bigint::BigInt::from(1)<<121usize),integer(1)]);
+        let wide=open.prepared_exponent(17).unwrap();
+        assert!(crate::hnn::dyadic::word(&integer(1),wide,"existing signed word bound refuses the common scale").is_err());
+    }
+
+    #[test]
     fn pair_scale_tracks_projected_output_with_unprojected_read_factors() {
         let original = PairLoci {
             rank: 1,
@@ -1007,9 +1029,22 @@ pub(crate) struct SourceOpen {
     pub(crate) ring: usize,
     pub(crate) marginal: u64,
     pub(crate) pairs: Vec<u64>,
+    preparation: Option<Vec<Rat>>,
 }
 
 impl SourceOpen {
+    fn prepared_exponent(&self,base:u32)->Result<u32,HnnError>{
+        let extra=crate::hnn::dyadic::common_exponent(self.preparation.iter().flatten(),"prepared source control is dyadic")?;
+        let result=base.max(extra);
+        Ok(result)
+    }
+    pub(crate) fn prepare(opens:&mut [Self],packet:&holonics::hnn::pending::SourceOpeningPreparation)->Result<(),HnnError>{
+        if !packet.receipt().closes(){return Err(refused("shared native preparation work closes"));}
+        let source=opens.iter_mut().find(|s|s.ring==packet.ring()).ok_or_else(||refused("prepared actual source ring"))?;
+        if source.preparation.is_some(){return Err(refused("one source opening preparation per card Word"));}
+        source.preparation=Some(packet.added().to_vec());Ok(())
+    }
+
     /// The open of every source ring of a field from a moment (the host's mirror), in the order of
     /// the published sources (the field's source rings).
     pub(crate) fn of(field: &Field, moment: &SourceMoment) -> Result<Vec<Self>, HnnError> {
@@ -1027,6 +1062,7 @@ impl SourceOpen {
                     ring,
                     marginal: chart.numerator(moment.population(ring)?),
                     pairs,
+                    preparation: None,
                 })
             })
             .collect()

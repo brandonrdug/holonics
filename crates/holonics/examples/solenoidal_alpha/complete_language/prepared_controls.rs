@@ -30,14 +30,14 @@ fn unified_prepared_command_crosses_sections_aeon_and_cold_prefix() -> Result<()
         out.display().to_string(),
     ];
     let mut unavailable = args.clone();
-    unavailable[1] = "cuda-observed-epoch-device0".into();
+    unavailable[1] = "unavailable-backend".into();
     let refusal = run_with_execution(
         &unavailable,
         &HostObservedEpochExecution,
-        CompleteLanguageTrainingBackend::CudaObservedEpochDevice0,
+        CompleteLanguageTrainingBackend::HostReference,
     )
     .unwrap_err();
-    assert!(refusal.to_string().contains("no selected-device adapter"));
+    assert!(refusal.to_string().contains("training backend does not match"));
     assert!(!out.exists());
     let execution = CountedHost::default();
     let started = Instant::now();
@@ -79,6 +79,7 @@ fn unified_prepared_command_crosses_sections_aeon_and_cold_prefix() -> Result<()
     );
     assert_eq!(resumed.stream.crib(), trained.stream.crib());
     let trained_resident = trained.stream.resident();
+    assert!(port().mount_declared_receiving_law(trained_resident.field(),trained_resident.current(),trained_resident.constitution().clone(),holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1).is_err(),"new constructor cannot reinterpret a saved population");
     let material = trained_resident
         .prepared_input()
         .ok_or("prepared state missing")?;
@@ -216,7 +217,7 @@ fn unified_prepared_command_crosses_sections_aeon_and_cold_prefix() -> Result<()
         (
             "backend",
             quoted(
-                "host-reference; prepared device adapter UNJOINED; refusal verified before files",
+                "host-reference; mismatched backend refusal verified before files",
             ),
         ),
         (

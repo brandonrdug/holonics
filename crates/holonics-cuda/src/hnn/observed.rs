@@ -11,7 +11,7 @@
 //! an explicit hybrid observed executor.
 
 use std::fmt;
-use std::sync::{Arc, Weak, mpsc};
+use std::sync::{Arc, Weak, Mutex, mpsc};
 
 use holonics::hnn::constitution::{EpochProducerRecordReading, EpochRecordFlowReading};
 use holonics::hnn::reference::observed::{
@@ -63,6 +63,7 @@ enum Request {
 }
 
 struct ForwardReading {
+    source_preparation: Option<holonics::hnn::word::action::PortPreparationReceipt>,
     id: u64,
     producing_commit: u64,
     charts: Charts,
@@ -74,7 +75,22 @@ struct ForwardReading {
     passages: Vec<TubePassage>,
 }
 
+/// Scoped realization counters; no law or checkpoint consumes them. Subset counts
+/// are identified explicitly, not added to their totals. No global sync census.
+#[derive(Clone,Copy,Debug,Default)]
+pub struct ObservedDeviceReading {
+    pub successful_forwards:u64,
+    pub source_preparation_packets:u64,
+    pub source_preparation_host_ns:u128,
+    pub mounted_execute_ns:u128,
+    pub native_word_forward_launches:u64,
+    pub fresh_response_forward_subset:u64,
+    pub forward_phase_transfer_octets:u64,
+    pub response_forward_transfer_subset_octets:u64,
+}
+
 struct Client {
+    reading:Arc<Mutex<ObservedDeviceReading>>,
     sender: Option<mpsc::Sender<Request>>,
     worker: Option<std::thread::JoinHandle<()>>,
 }
@@ -119,14 +135,17 @@ impl ObservedEpochDevice {
     /// returned before this executor can be selected by an observed passage.
     pub fn open(ordinal: i32) -> Result<Self, HnnError> {
         let (sender, receiver) = mpsc::channel();
+        let reading=Arc::new(Mutex::new(ObservedDeviceReading::default()));
+        let actor_reading=Arc::clone(&reading);
         let (ready_tx, ready_rx) = mpsc::channel();
         let worker = std::thread::Builder::new()
             .name("hnn-observed-card".into())
-            .spawn(move || actor(ordinal, receiver, ready_tx))
+            .spawn(move || actor(ordinal, receiver, ready_tx,actor_reading))
             .map_err(|_| unavailable())?;
         match ready_rx.recv().map_err(|_| unavailable()) {
             Ok(Ok(())) => Ok(Self {
                 client: Arc::new(Client {
+                    reading,
                     sender: Some(sender),
                     worker: Some(worker),
                 }),
@@ -141,6 +160,8 @@ impl ObservedEpochDevice {
             }
         }
     }
+
+    pub fn realization_reading(&self)->ObservedDeviceReading{*self.client.reading.lock().unwrap_or_else(|e|e.into_inner())}
 
     fn forward_reading(
         &self,
@@ -237,7 +258,7 @@ impl ObservedEpochDevice {
         let reading = self.forward_reading(field, constitution, ratio, charts, opening, scope)?;
         *charts = reading.charts;
         Ok(ObservedEpochForwardWord {
-            source_preparation: None, // prepared device admission remains unsupported, not stripped
+            source_preparation: reading.source_preparation,
             forward_span: None,
             producing_commit: reading.producing_commit,
             word: Box::new(DeviceWord {
@@ -255,6 +276,7 @@ impl ObservedEpochDevice {
 }
 
 impl ObservedEpochExecution for ObservedEpochDevice {
+    fn admit_prepared_input(&self)->Result<(),HnnError>{Ok(())}
     fn forward(
         &self,
         field: &Field,
@@ -507,7 +529,7 @@ fn prepare_observed_mount<'c>(
     })
 }
 
-fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>) {
+fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, realization:Arc<Mutex<ObservedDeviceReading>>) {
     // No context, module, stream or device pointer crosses this thread boundary.
     let card = match Card::open(ordinal) {
         Ok(card) => card,
@@ -568,8 +590,21 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>) {
                         },
                     };
                     let publication = Rc::clone(&mounted.publication);
+                    let traffic_before=mounted.traffic();let execute_started=std::time::Instant::now();
                     let (word, faces, active) =
                         mounted.execute(&ratio, &moment, &publication, &card, &opening)?;
+                    let execute_ns=execute_started.elapsed().as_nanos();let traffic_after=mounted.traffic();
+                    {
+                        let mut m=realization.lock().unwrap_or_else(|e|e.into_inner());
+                        m.successful_forwards+=1;
+                        m.source_preparation_packets+=u64::from(word.source_preparation.is_some());
+                        m.source_preparation_host_ns+=word.source_preparation_host_ns;
+                        m.mounted_execute_ns+=execute_ns;
+                        m.native_word_forward_launches+=traffic_after.word_count-traffic_before.word_count;
+                        m.fresh_response_forward_subset+=traffic_after.response_word_count-traffic_before.response_word_count;
+                        m.forward_phase_transfer_octets+=traffic_after.words-traffic_before.words;
+                        m.response_forward_transfer_subset_octets+=traffic_after.response_words-traffic_before.response_words;
+                    }
                     let anchors = readout::anchors(&word.word.plan, &word.word.record);
                     let reception_end =
                         CardCarry::ended(&word.word, opening.ticks(), Absorption::Nothing)?.host;
@@ -597,6 +632,7 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>) {
                         .clone();
                     let exported_charts = mounted.store.continuing_charts()?;
                     let reading = ForwardReading {
+                        source_preparation: word.source_preparation.clone(),
                         id,
                         producing_commit: ratio.commit(),
                         charts: exported_charts.clone(),

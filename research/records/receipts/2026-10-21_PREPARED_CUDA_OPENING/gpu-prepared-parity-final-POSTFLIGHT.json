@@ -1,0 +1,465 @@
+{
+  "exit": 0,
+  "stop": null,
+  "wall_ns": 26756165486,
+  "samples": [
+    {
+      "elapsed_ns": 17280712,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 12566528,
+      "own_MiB": 0,
+      "device": "41, 1345"
+    },
+    {
+      "elapsed_ns": 548262556,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 256294912,
+      "own_MiB": 0,
+      "device": "38, 1345"
+    },
+    {
+      "elapsed_ns": 1079449102,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 247455744,
+      "own_MiB": 0,
+      "device": "36, 1345"
+    },
+    {
+      "elapsed_ns": 1609910159,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 247910400,
+      "own_MiB": 0,
+      "device": "38, 1345"
+    },
+    {
+      "elapsed_ns": 2141840959,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 247910400,
+      "own_MiB": 0,
+      "device": "39, 1345"
+    },
+    {
+      "elapsed_ns": 2673587635,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 248688640,
+      "own_MiB": 0,
+      "device": "38, 1345"
+    },
+    {
+      "elapsed_ns": 3205130318,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 38871040,
+      "own_MiB": 0,
+      "device": "39, 1345"
+    },
+    {
+      "elapsed_ns": 3737301219,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 148615168,
+      "own_MiB": 0,
+      "device": "38, 1345"
+    },
+    {
+      "elapsed_ns": 4268755386,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 153018368,
+      "own_MiB": 0,
+      "device": "37, 1345"
+    },
+    {
+      "elapsed_ns": 4801534957,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 153649152,
+      "own_MiB": 0,
+      "device": "38, 1345"
+    },
+    {
+      "elapsed_ns": 5334128108,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 161423360,
+      "own_MiB": 0,
+      "device": "37, 1345"
+    },
+    {
+      "elapsed_ns": 5865702600,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 172756992,
+      "own_MiB": 0,
+      "device": "38, 1345"
+    },
+    {
+      "elapsed_ns": 6399081864,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 306720768,
+      "own_MiB": 0,
+      "device": "39, 1345"
+    },
+    {
+      "elapsed_ns": 6931708477,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 413806592,
+      "own_MiB": 0,
+      "device": "43, 1345"
+    },
+    {
+      "elapsed_ns": 7474101151,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 581197824,
+      "own_MiB": 0,
+      "device": "40, 1345"
+    },
+    {
+      "elapsed_ns": 8019127569,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 569876480,
+      "own_MiB": 0,
+      "device": "41, 1345"
+    },
+    {
+      "elapsed_ns": 8561142465,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 453713920,
+      "own_MiB": 0,
+      "device": "38, 1345"
+    },
+    {
+      "elapsed_ns": 9105782349,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 552431616,
+      "own_MiB": 0,
+      "device": "39, 1345"
+    },
+    {
+      "elapsed_ns": 9660190177,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 533319680,
+      "own_MiB": 0,
+      "device": "39, 1345"
+    },
+    {
+      "elapsed_ns": 10217528606,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 544768000,
+      "own_MiB": 0,
+      "device": "40, 1345"
+    },
+    {
+      "elapsed_ns": 10760149837,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 477401088,
+      "own_MiB": 0,
+      "device": "41, 1345"
+    },
+    {
+      "elapsed_ns": 11292452673,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 299143168,
+      "own_MiB": 0,
+      "device": "38, 1345"
+    },
+    {
+      "elapsed_ns": 11835868052,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 426893312,
+      "own_MiB": 0,
+      "device": "39, 1345"
+    },
+    {
+      "elapsed_ns": 12383539546,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 378986496,
+      "own_MiB": 0,
+      "device": "39, 1345"
+    },
+    {
+      "elapsed_ns": 12936194789,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 367218688,
+      "own_MiB": 0,
+      "device": "40, 1345"
+    },
+    {
+      "elapsed_ns": 13483084618,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 540491776,
+      "own_MiB": 0,
+      "device": "40, 1345"
+    },
+    {
+      "elapsed_ns": 14014427754,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 260
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 155906048,
+      "own_MiB": 260,
+      "device": "32, 1613"
+    },
+    {
+      "elapsed_ns": 14544284114,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 75640832,
+      "own_MiB": 0,
+      "device": "21, 1348"
+    },
+    {
+      "elapsed_ns": 15074818635,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 76615680,
+      "own_MiB": 0,
+      "device": "20, 1348"
+    },
+    {
+      "elapsed_ns": 15605581614,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 77438976,
+      "own_MiB": 0,
+      "device": "20, 1348"
+    },
+    {
+      "elapsed_ns": 16134495358,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 77488128,
+      "own_MiB": 0,
+      "device": "20, 1348"
+    },
+    {
+      "elapsed_ns": 16673778712,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 77504512,
+      "own_MiB": 0,
+      "device": "29, 1348"
+    },
+    {
+      "elapsed_ns": 17204741926,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 78135296,
+      "own_MiB": 0,
+      "device": "28, 1348"
+    },
+    {
+      "elapsed_ns": 17738071584,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 78135296,
+      "own_MiB": 0,
+      "device": "28, 1348"
+    },
+    {
+      "elapsed_ns": 18269135536,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 78389248,
+      "own_MiB": 0,
+      "device": "28, 1348"
+    },
+    {
+      "elapsed_ns": 18808505062,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 78389248,
+      "own_MiB": 0,
+      "device": "29, 1348"
+    },
+    {
+      "elapsed_ns": 19341062703,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 78512128,
+      "own_MiB": 0,
+      "device": "29, 1348"
+    },
+    {
+      "elapsed_ns": 19871859323,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 250
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 161828864,
+      "own_MiB": 250,
+      "device": "33, 1613"
+    },
+    {
+      "elapsed_ns": 20403754663,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 260
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 166223872,
+      "own_MiB": 260,
+      "device": "22, 1614"
+    },
+    {
+      "elapsed_ns": 20932553169,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 250
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 166223872,
+      "own_MiB": 250,
+      "device": "23, 1604"
+    },
+    {
+      "elapsed_ns": 21461709836,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 260
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 166273024,
+      "own_MiB": 260,
+      "device": "22, 1614"
+    },
+    {
+      "elapsed_ns": 21990251782,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 260
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 166273024,
+      "own_MiB": 260,
+      "device": "20, 1614"
+    },
+    {
+      "elapsed_ns": 22519019330,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 260
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 166273024,
+      "own_MiB": 260,
+      "device": "20, 1614"
+    },
+    {
+      "elapsed_ns": 23049530705,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 260
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 166273024,
+      "own_MiB": 260,
+      "device": "22, 1614"
+    },
+    {
+      "elapsed_ns": 23579538126,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 260
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 166273024,
+      "own_MiB": 260,
+      "device": "21, 1614"
+    },
+    {
+      "elapsed_ns": 24109429159,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 260
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 166273024,
+      "own_MiB": 260,
+      "device": "22, 1614"
+    },
+    {
+      "elapsed_ns": 24639947878,
+      "own_compute": [
+        {
+          "pid": 1242702,
+          "MiB": 250
+        }
+      ],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 166273024,
+      "own_MiB": 250,
+      "device": "21, 1604"
+    },
+    {
+      "elapsed_ns": 25168639753,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 92278784,
+      "own_MiB": 0,
+      "device": "22, 1349"
+    },
+    {
+      "elapsed_ns": 25698623479,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 92291072,
+      "own_MiB": 0,
+      "device": "21, 1348"
+    },
+    {
+      "elapsed_ns": 26228372265,
+      "own_compute": [],
+      "foreign_compute": [],
+      "own_host_rss_bytes": 92291072,
+      "own_MiB": 0,
+      "device": "21, 1348"
+    }
+  ],
+  "final_compute": [],
+  "owned_GPU_cleanup_empty": true,
+  "model_jobs": 0
+}
