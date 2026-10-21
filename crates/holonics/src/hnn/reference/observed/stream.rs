@@ -464,7 +464,8 @@ impl ObservedStream {
         let local_family = self.resident.constitution.receiving_return_policy(self.resident.admitted[0].ring()) == Some(crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
         let adaptive = self.resident.constitution.receiving_representation_policy(self.resident.admitted[0].ring()) == Some(crate::hnn::constitution::ReceivingRepresentationPolicy::BoundedSubquantumV1);
         let native=self.resident.prepared_input.as_ref().is_some_and(|p|p.context_chart()==prepared_input::ContextChart::LaggedReceiverBoundaryV1);
-        let (header, law_field) = if native {("observed-stream-pending-native-current-v1",format!("{} {} {} ",crate::hnn::word::native_prediction::LAW,self.resident.constitution.receiving_return_policy(self.resident.admitted[0].ring()).expect("native receiving owner").tag(),if adaptive{"bounded-subquantum20-v1"}else{"fixed-lattice-v1"}))} else if adaptive {("observed-stream-pending-v4", "retained-fibre-v1 family-local-retained-return-v1 bounded-subquantum20-v1 ".to_string())} else if local_family { ("observed-stream-pending-v3", "retained-fibre-v1 family-local-retained-return-v1 ".to_string()) } else { match self.resident.receiving_law() {
+        let quadratic=self.resident.prepared_input.as_ref().map(|p|p.work_receipt_policy());
+        let (header, law_field) = if let Some(crate::hnn::word::action::PreparationWorkPolicy::NativeQuadraticV1(b))=quadratic {("observed-stream-pending-native-current-v2",format!("{} {} {} native-quadratic-work-v1 {} {} {} ",crate::hnn::word::native_prediction::LAW,self.resident.constitution.receiving_return_policy(self.resident.admitted[0].ring()).expect("native receiving owner").tag(),if adaptive{"bounded-subquantum20-v1"}else{"fixed-lattice-v1"},b.aggregate_bits,b.integer_bits,b.coordinates))} else if native {("observed-stream-pending-native-current-v1",format!("{} {} {} ",crate::hnn::word::native_prediction::LAW,self.resident.constitution.receiving_return_policy(self.resident.admitted[0].ring()).expect("native receiving owner").tag(),if adaptive{"bounded-subquantum20-v1"}else{"fixed-lattice-v1"}))} else if adaptive {("observed-stream-pending-v4", "retained-fibre-v1 family-local-retained-return-v1 bounded-subquantum20-v1 ".to_string())} else if local_family { ("observed-stream-pending-v3", "retained-fibre-v1 family-local-retained-return-v1 ".to_string()) } else { match self.resident.receiving_law() {
             crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 => {
                 ("observed-stream-pending-v1", String::new())
             }
@@ -510,7 +511,13 @@ impl ObservedStream {
             .ok_or_else(|| refuse("the unfinished observed transaction header"))?
             .split_whitespace()
             .collect();
-        let native=header.first().copied()==Some("observed-stream-pending-native-current-v1");
+        let native=matches!(header.first().copied(),Some("observed-stream-pending-native-current-v1"|"observed-stream-pending-native-current-v2"));
+        let quadratic=header.first().copied()==Some("observed-stream-pending-native-current-v2");
+        let owner_policy=resident.prepared_input.as_ref().map(|p|p.work_receipt_policy());
+        if quadratic!=matches!(owner_policy,Some(crate::hnn::word::action::PreparationWorkPolicy::NativeQuadraticV1(_))){return Err(refuse("native pending keeps its original work receipt policy"));}
+        if let Some(crate::hnn::word::action::PreparationWorkPolicy::NativeQuadraticV1(b))=owner_policy{
+            if header.get(4).copied()!=Some("native-quadratic-work-v1")||header.get(5).and_then(|s|s.parse::<u64>().ok())!=Some(b.aggregate_bits)||header.get(6).and_then(|s|s.parse::<u64>().ok())!=Some(b.integer_bits)||header.get(7).and_then(|s|s.parse::<usize>().ok())!=Some(b.coordinates){return Err(refuse("native pending work resource declaration"));}
+        }
         let native_owner=resident.prepared_input.as_ref().is_some_and(|p|p.context_chart()==prepared_input::ContextChart::LaggedReceiverBoundaryV1);
         if native!=native_owner{return Err(refuse("native prediction pending schema matches its original model"));}
         let adaptive = if native{header.get(3).copied()==Some("bounded-subquantum20-v1")}else{header.first().copied()==Some("observed-stream-pending-v4")};
@@ -518,6 +525,7 @@ impl ObservedStream {
         let family_local = if native{header.get(2).copied()==Some("family-local-retained-return-v1")}else{matches!(header.first().copied(),Some("observed-stream-pending-v3"|"observed-stream-pending-v4"))};
         if family_local != (resident.constitution.receiving_return_policy(resident.admitted[0].ring()) == Some(crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1)) { return Err(refuse("pending return policy matches native material")); }
         let (law, scope_at, commit_at) = match header.first().copied() {
+            Some("observed-stream-pending-native-current-v2") if header.len()==12&&header[1]==crate::hnn::word::native_prediction::LAW&&matches!(header[3],"fixed-lattice-v1"|"bounded-subquantum20-v1")=>(resident.receiving_law(),8,9),
             Some("observed-stream-pending-native-current-v1") if header.len()==8 && header[1]==crate::hnn::word::native_prediction::LAW && matches!(header[3],"fixed-lattice-v1"|"bounded-subquantum20-v1") => (resident.receiving_law(),4,5),
             Some("observed-stream-pending-v4") if header.len()==8 && header[1]=="retained-fibre-v1" && header[2]=="family-local-retained-return-v1" && header[3]=="bounded-subquantum20-v1" => (crate::hnn::receiving::ReceivingLaw::RetainedFibreV1,4,5),
             Some("observed-stream-pending-v3") if header.len()==7 && header[1]=="retained-fibre-v1" && header[2]=="family-local-retained-return-v1" => (crate::hnn::receiving::ReceivingLaw::RetainedFibreV1,3,4),
@@ -1117,7 +1125,14 @@ impl ObservedStream {
         if !self.pending.is_empty()||self.scope!=ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap{return Err(refuse("native model selection is fresh at its one held local receiving owner"));}
         self.resident.select_native_current_prepared_input(pairing)
     }
+    pub fn select_native_quadratic_work_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
+        if !self.pending.is_empty()||self.scope!=ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap{return Err(refuse("native work policy selected before actual input"));}
+        self.resident.select_native_quadratic_work_prepared_input(pairing)
+    }
     pub fn receive_native_current(&mut self,reference:&Reference,pairing:&PairingDeclaration,classes:&[usize],bits:u32)->Result<Vec<crate::hnn::reference::native_context::NativeReceivingSectionEvent>,HnnError>{
+        self.receive_native_current_diagnosed(reference,pairing,classes,bits,&mut |_|{})
+    }
+    pub fn receive_native_current_diagnosed(&mut self,reference:&Reference,pairing:&PairingDeclaration,classes:&[usize],bits:u32,observe:&mut dyn FnMut(&crate::hnn::reference::native_context::NativeContextEvent))->Result<Vec<crate::hnn::reference::native_context::NativeReceivingSectionEvent>,HnnError>{
         if self.resident.prepared_input.as_ref().is_none_or(|p|p.context_chart()!=prepared_input::ContextChart::LaggedReceiverBoundaryV1||p.mode()!=prepared_input::PrefixMode::Training){return Err(refuse("actual native section delivery requires its native training model"));}
         let mut next=self.clone();let mut frontier=next.pending_frontier(pairing)?;let mut sections=Vec::new();
         for &class in classes{
@@ -1126,7 +1141,7 @@ impl ObservedStream {
             let encoded=boundary.encode(&[class])?;let step=frontier.step(&next.resident.field,&encoded,0)?;
             next.pending.push(class);if next.pending.len()>next.bound{return Err(refuse("native pending remains bounded by the original physical section"));}
             if step.ticks[next.resident.admitted[0].ring()]!=0||step.carry_out{
-                sections.push(reference.observe_native_current_section(&mut next.resident,&mut next.crib,pairing,&next.pending,bits)?);
+                sections.push(reference.observe_native_current_section_diagnosed(&mut next.resident,&mut next.crib,pairing,&next.pending,bits,observe)?);
                 next.pending.clear();next.bound=Self::finite_bound(&next.resident)?;frontier=next.resident.current.clone();
             }
         }

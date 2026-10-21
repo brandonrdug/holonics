@@ -170,7 +170,7 @@ pub use aligned_return::{
     RetainedReturnPolicy, RetainedSectionReturn, RetainedSectionSourceReading, RetainedStationReturn,
 };
 mod declaration;
-pub(crate) use declaration::DeclaringFace;
+pub(crate) use declaration::{DeclaringFace,NativeRankCache};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, ToPrimitive, Zero};

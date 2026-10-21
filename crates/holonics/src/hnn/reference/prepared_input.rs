@@ -4,7 +4,7 @@ use super::*;
 use crate::hnn::encoding::observed::PairedObservation;
 use crate::hnn::paired::PairingDeclaration;
 use crate::hnn::physical::action::contextual::{Complex, ContextualBounds, EmpiricalMaterial};
-use crate::hnn::word::action::SourceClassPreparation;
+use crate::hnn::word::action::{SourceClassPreparation,PreparationWorkPolicy,NativeWorkBudget};
 use num_traits::{One, Zero};
 use std::sync::Arc;
 fn refuse(reason: &'static str) -> HnnError {
@@ -13,6 +13,7 @@ fn refuse(reason: &'static str) -> HnnError {
 mod framing;
 pub use framing::{ContextChart, SourceFraming, PreparedMaterial, LaggedReceiverBoundary};
 pub const SOURCE_FRAMING_LAW: &str = "prepared-class-source-framing-route-v1";
+pub const LAGGED_RECEIVER_QUADRATIC_LAW:&str="prepared-native-lagged-receiver-quadratic-work-v1";
 pub const LAGGED_RECEIVER_LAW: &str = "prepared-native-lagged-receiver-v1";
 pub const LAW: &str = "prepared-class-local-retained-v1";
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -73,6 +74,7 @@ pub struct PreparedInputCut {
     pub pairs: Vec<(usize, usize)>,
     pub max_abs_work: Rat,
     pub rational_bits: u64,
+    pub work_policy:PreparationWorkPolicy,
 }
 impl PreparedInputCut {
     pub(crate) fn apply<'a>(
@@ -114,9 +116,10 @@ impl PreparedInputCut {
             ));
         }
         match &self.control {
-            Some(u) => Ok(binding
-                .apply(word, u, &self.max_abs_work, self.rational_bits)?
-                .0),
+            Some(u) => Ok(match self.work_policy{
+                PreparationWorkPolicy::LegacyCoordinateV1=>binding.apply(word,u,&self.max_abs_work,self.rational_bits)?.0,
+                PreparationWorkPolicy::NativeQuadraticV1(b)=>binding.apply_quadratic(word,u,&self.max_abs_work,self.rational_bits,b)?.0,
+            }),
             None => Ok(word),
         }
     }
@@ -134,6 +137,7 @@ pub struct PreparedInputState {
     pub(crate) boundary_identity: String,
     pub(crate) bounds: ContextualBounds,
     pub(crate) max_abs_work: Rat,
+    pub(crate) work_policy:PreparationWorkPolicy,
     pub(crate) history: Vec<(usize, PrefixRole)>,
     pub(crate) material: PreparedMaterial,
     pub(crate) training: u64,
@@ -189,6 +193,7 @@ impl PreparedInputState {
                 max_scalar_work: chart.formation_work(),
             },
             max_abs_work: integer(1 << 16),
+            work_policy:PreparationWorkPolicy::LegacyCoordinateV1,
             history: Vec::new(),
             material: PreparedMaterial::fresh(chart),
             training: 0,
@@ -203,8 +208,9 @@ impl PreparedInputState {
         })
     }
     pub fn law(&self) -> &'static str {
-        match self.material.chart(){ContextChart::ScalarV1=>LAW,ContextChart::SourceFramingRouteV1=>SOURCE_FRAMING_LAW,ContextChart::LaggedReceiverBoundaryV1=>LAGGED_RECEIVER_LAW}
+        match self.material.chart(){ContextChart::ScalarV1=>LAW,ContextChart::SourceFramingRouteV1=>SOURCE_FRAMING_LAW,ContextChart::LaggedReceiverBoundaryV1=>if matches!(self.work_policy,PreparationWorkPolicy::NativeQuadraticV1(_)){LAGGED_RECEIVER_QUADRATIC_LAW}else{LAGGED_RECEIVER_LAW}}
     }
+    pub fn work_receipt_policy(&self)->PreparationWorkPolicy{self.work_policy}
     pub fn context_chart(&self)->ContextChart{self.material.chart()}
     pub fn mode(&self) -> PrefixMode {
         self.mode
@@ -277,6 +283,7 @@ impl PreparedInputState {
             pairs: self.pairs.clone(),
             max_abs_work: self.max_abs_work.clone(),
             rational_bits: self.bounds.rational_bits,
+            work_policy:self.work_policy,
         })
     }
     pub(crate) fn install_reached_lag(&mut self,lag:LaggedReceiverBoundary)->Result<(),HnnError>{
@@ -406,6 +413,10 @@ impl Resident {
     pub fn select_native_current_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
         if self.field.receivers().iter().any(|r|self.constitution.receiving_return_policy(r.ring)!=Some(crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1)){return Err(refuse("native F declares a family-local receiving current before input, without repurposing population responsibility"));}
         self.select_prepared_input_chart(pairing,ContextChart::LaggedReceiverBoundaryV1)
+    }
+    pub fn select_native_quadratic_work_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
+        self.select_native_current_prepared_input(pairing)?;
+        self.prepared_input.as_mut().expect("fresh native owner").work_policy=PreparationWorkPolicy::NativeQuadraticV1(NativeWorkBudget::V1);Ok(())
     }
     pub fn select_source_framing_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{self.select_prepared_input_chart(pairing,ContextChart::SourceFramingRouteV1)}
     fn select_prepared_input_chart(&mut self,pairing:&PairingDeclaration,chart:ContextChart)->Result<(),HnnError>{

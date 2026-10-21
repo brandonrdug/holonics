@@ -400,6 +400,8 @@ pub enum HnnError {
         added_denominator_bits: u64,
         rational_bits: u64,
     },
+    #[error("quadratic work extent at {stage}: requested {requested_bits}, integer cap {integer_limit}, aggregate {aggregate_used}/{aggregate_limit}")]
+    QuadraticWorkExtent {stage:&'static str,requested_bits:u64,integer_limit:u64,aggregate_used:u64,aggregate_limit:u64},
     /// Publication requires one reached occurrence and its bounded contemporary operand.
     #[error("receiving precision occurrence mismatch: ledger={occurrence}, arrived={arrived}")]
     PrecisionOccurrence { occurrence: bool, arrived: bool },

@@ -378,3 +378,8 @@ pending6 cold admission passed; the first R delivery refused source-preparation 
 and rolled back exactly. The typed diagnostic and its data-only bound tests compile/pass;
 no new native R/contact/successor or card qualification is claimed. See the same partial
 record and the separate qualification custody. Original900second ledger remains closed.
+
+The explicit native quadratic-work policy and same-Word declaration capability are implemented
+and compiled in the descendant of96a90c7ce. Their distinct600second/240attempt qualification is
+pending; no native/model/card readiness follows from compilation. See the quadratic-work record
+and external phase ledger. Coordinate1024 and physical-work65536 limits remain.

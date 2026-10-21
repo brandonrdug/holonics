@@ -152,6 +152,22 @@ impl NativeContactWitness {
         &self.error_l1 * crate::holon::deposition::sqrt_ceiling(squared_response, 64)
     }
 }
+pub(crate) struct NativePredictionDeclaration{
+    id:std::sync::Arc<()>,field:Field,theta:crate::hnn::constitution::Constitution,current:Current,
+    source:std::sync::Arc<crate::hnn::moment::SourceMoment>,ops:crate::hnn::propagation::Operands,
+    opening:EndChange,opened_at:usize,phases:ReceivingPhases,
+}
+impl NativePredictionDeclaration{
+    fn admit(&self,word:&Word<'_>)->Result<(),HnnError>{
+        let valid=word.native_source.as_ref().is_some_and(|(theta,current,source,_)|theta==&self.theta&&current==&self.current&&std::sync::Arc::ptr_eq(source,&self.source));
+        if !valid||word.field!=&self.field||word.operands!=self.ops||word.opened_at()!=self.opened_at||!word.native_declaration_id.as_ref().is_some_and(|id|std::sync::Arc::ptr_eq(id,&self.id)){return Err(HnnError::Unadmitted{reason:"native declaration cannot rebind Word/source/current/material/clock"});}Ok(())
+    }
+    pub(crate) fn run_and_read<'a>(self,mut word:Word<'a>,bits:u32)->Result<NativePredictionWord<'a>,HnnError>{
+        self.admit(&word)?;
+        if word.complete_unrun_opening()?!=self.opening{return Err(HnnError::Unadmitted{reason:"native declaration keeps complete prepared opening"});}
+        word.run(self.phases.junction_steps())?;word.native_current_prediction_declared(self,bits)
+    }
+}
 impl<'a> Word<'a> {
     /// Read only already-executed stations; never runs or reinjects the source.
     pub fn native_current_prediction(
@@ -170,6 +186,25 @@ impl<'a> Word<'a> {
                 reason: "native prediction names an admitted receiver",
             })?;
         let phases = ReceivingPhases::declare(self.field, theta, current, decl)?;
+        self.read_native_current(phases,bits)
+    }
+    pub(crate) fn declare_native_prediction(&mut self,receiver:usize,cache:&mut crate::hnn::receiving::NativeRankCache)->Result<NativePredictionDeclaration,HnnError>{
+        let (theta,current,_,_)=self.native_source.as_ref().ok_or(HnnError::Unadmitted{reason:"declaring capability requires actual native producer"})?;
+        let decl=self.field.receivers().get(receiver).ok_or(HnnError::Unadmitted{reason:"native declaration receiver"})?;
+        let phases=cache.declare(self.field,theta,current,decl)?;self.issue_native_declaration(phases)
+    }
+    fn issue_native_declaration(&mut self,phases:ReceivingPhases)->Result<NativePredictionDeclaration,HnnError>{
+        let (theta,current,source,_)=self.native_source.as_ref().ok_or(HnnError::Unadmitted{reason:"native declaration source"})?;
+        if self.ticks()!=0||self.is_ended()||self.native_declaration_id.is_some(){return Err(HnnError::Unadmitted{reason:"same-cut declaration seals the one complete unrun prepared Word"});}
+        let opening=self.complete_unrun_opening()?;let id=std::sync::Arc::new(());self.native_declaration_id=Some(id.clone());
+        Ok(NativePredictionDeclaration{id,field:self.field.clone(),theta:theta.clone(),current:current.clone(),source:source.clone(),ops:self.operands.clone(),opening,opened_at:self.opened_at(),phases})
+    }
+    fn native_current_prediction_declared(mut self,cap:NativePredictionDeclaration,bits:u32)->Result<NativePredictionWord<'a>,HnnError>{
+        cap.admit(&self)?;
+        self.read_native_current(cap.phases,bits)
+    }
+    fn read_native_current(mut self,phases:ReceivingPhases,bits:u32)->Result<NativePredictionWord<'a>,HnnError>{
+        let theta=&self.native_source.as_ref().ok_or(HnnError::Unadmitted{reason:"actual native source"})?.0;
         let map = theta
             .receiving_map(phases.ring())
             .ok_or(HnnError::MissingReceivingMap {

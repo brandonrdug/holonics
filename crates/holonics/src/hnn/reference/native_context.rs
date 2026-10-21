@@ -69,7 +69,6 @@ impl Reference {
         } else {
             word.bind_source_producer(theta, &resident.current, Arc::new(ratio.moment().clone()))?;
         }
-        word.run(phases.junction_steps())?;
         let receiver = field
             .receivers()
             .iter()
@@ -77,9 +76,8 @@ impl Reference {
             .ok_or(HnnError::MissingReceivingMap {
                 ring: phases.ring(),
             })?;
-        Ok(word
-            .native_current_prediction(receiver, bits)?
-            .with_prepared_cut(ratio.prepared_input().cloned()))
+        let declaration=word.declare_native_prediction(receiver,&mut resident.native_rank.borrow_mut())?;
+        Ok(declaration.run_and_read(word,bits)?.with_prepared_cut(ratio.prepared_input().cloned()))
     }
 }
 
@@ -301,6 +299,9 @@ impl Reference {
         classes: &[usize],
         bits: u32,
     ) -> Result<NativeReceivingSectionEvent, HnnError> {
+        self.observe_native_current_section_diagnosed(resident,crib,pairing,classes,bits,&mut |_|{})
+    }
+    pub fn observe_native_current_section_diagnosed(&self,resident:&mut Resident,crib:&mut observed::ObservedCrib,pairing:&crate::hnn::paired::PairingDeclaration,classes:&[usize],bits:u32,observe:&mut dyn FnMut(&NativeContextEvent))->Result<NativeReceivingSectionEvent,HnnError>{
         use crate::hnn::constitution::{
             Locus,
             epoch::{ObservedNormalEpochStage, partition_exponent},
@@ -389,7 +390,7 @@ impl Reference {
                     reason: "no material commit can rebind the native R section's earlier predictions",
                 });
             }
-            events.push(NativeContextEvent {
+            let event=NativeContextEvent {
                 prediction,
                 scores,
                 forward,
@@ -398,7 +399,7 @@ impl Reference {
                 input,
                 selected_class: class,
                 draw: None,
-            });
+            };observe(&event);events.push(event);
         }
         let (_, deposits, records) =
             crate::hnn::word::native_prediction::NativeRPacket::section(packets)?;
@@ -513,3 +514,5 @@ impl Reference {
         self.native_current_event(resident, crib, pairing, NativeInput::Key(key), bits, false)
     }
 }
+
+impl Resident{pub fn native_rank_reuse_reading(&self)->(u64,u64){let c=self.native_rank.borrow();(c.hits,c.misses)}}

@@ -201,6 +201,7 @@ pub struct Word<'c> {
     /// own present input, released with the Word, never a retained record.
     opened_on: Option<WordOpening>,
     /// Opt-in computation work paid once before this Word's native tick balances.
+    native_declaration_id:Option<std::sync::Arc<()>>,
     source_preparation: Option<action::PortPreparationReceipt>,
     /// Transient actual source operand and same-cut response; never retained in reception carry.
     response_source: Option<Vec<Vec<Rat>>>,
@@ -2537,6 +2538,7 @@ impl<'c> Word<'c> {
         let mut word = Self {
             native_source: None,
             opened_on: None,
+            native_declaration_id:None,
             source_preparation: None,
             response_source: None,
             response_opening_exact: None,
@@ -3467,6 +3469,7 @@ impl<'c> Word<'c> {
     pub(crate) fn keep(self) -> KeptWord {
         let Word {
             native_source: _,
+            native_declaration_id:_,
             opened_on: _,
             source_preparation,
             field: _,
@@ -3723,6 +3726,7 @@ impl KeptWord {
             opened_at,
         } = self;
         Word {
+            native_declaration_id:None,
             native_source: None,
             opened_on: None,
             source_preparation,

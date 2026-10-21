@@ -47,6 +47,8 @@
 //! fixtures.
 
 use std::sync::Arc;
+mod quadratic_work;
+pub use quadratic_work::{NativeWorkBudget,PreparationWorkPolicy,QuadraticWorkReading};
 
 use num_traits::{One, Zero};
 
@@ -360,13 +362,17 @@ fn apply_control<'c>(
     control: &[Rat],
 ) -> Result<(Word<'c>, PortPreparationReceipt, ActionProducer), HnnError> {
     let added = preparation.map.apply(control)?;
+    apply_control_added(producer,preparation,baseline,added,None)
+}
+fn apply_control_added<'c>(mut producer:ActionProducer,preparation:&PortPreparation,baseline:&Word<'c>,added:Vec<Rat>,supplied_form:Option<&PowerForm>)->Result<(Word<'c>,PortPreparationReceipt,ActionProducer),HnnError>{
     let ring = preparation.ring;
     let mut opening = producer.opening.clone();
     let old = opening.storage[ring].clone();
     for (x, delta) in opening.storage[ring].iter_mut().zip(&added) {
         *x += delta;
     }
-    let form = PowerForm::read(baseline.field, &producer.constitution, &producer.current)?;
+    let owned_form;
+    let form=if let Some(f)=supplied_form{f}else{owned_form=PowerForm::read(baseline.field,&producer.constitution,&producer.current)?;&owned_form};
     let before = form.power(&producer.opening)? + form.resonator_power(&producer.opening)?;
     let after = form.power(&opening)? + form.resonator_power(&opening)?;
     let quadratic = form.ring_power(ring, &added);
@@ -379,6 +385,7 @@ fn apply_control<'c>(
         cross,
         quadratic,
         added,
+        quadratic_work:None,
     };
     if !receipt.closes() {
         return Err(HnnError::Realization {
@@ -420,6 +427,7 @@ pub struct PortPreparationReceipt {
     pub cross: Rat,
     pub quadratic: Rat,
     pub added: Vec<Rat>,
+    pub quadratic_work:Option<QuadraticWorkReading>,
 }
 
 impl PortPreparationReceipt {
@@ -1246,7 +1254,7 @@ mod preparation_bound_tests {
     #[test]
     fn exact_data_only_work_and_range_refusals_keep_distinct_operands(){
         use num_bigint::BigInt;
-        let before=crate::hnn::word::work::process_native_calls();
+        let before=crate::hnn::word::work::read();
         let bound=Rat::from_integer(BigInt::from(65536));
         assert!(admit_class_preparation_bound(7,&bound,&[Rat::one()],&bound,1024).is_ok());
         let cases=[(Rat::from_integer(BigInt::from(65537)),vec![Rat::zero()]),
@@ -1269,6 +1277,6 @@ mod preparation_bound_tests {
             HnnError::ClassPreparationBound{work:None,work_numerator_bits:8193,work_magnitude_exceeded:true,work_range_exceeded:true,..}=>{},
             _=>panic!("oversized diagnostics keep extents without copying the exact scalar")
         }
-        assert_eq!(crate::hnn::word::work::process_native_calls(),before);
+        assert_eq!(crate::hnn::word::work::read(),before);
     }
 }

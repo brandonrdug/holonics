@@ -199,3 +199,53 @@ fn native_fresh_r_contact_successor_connected()->Result<()>{
     println!("NATIVE_CONNECTED_PASS actual20 fresh_R_then_NEWcontact_then_R9 cold_pending6=true same_producer_four_frozen=true elapsed_ns={} attempts={:?}",started.elapsed().as_nanos(),work::process_native_calls());
     Ok(())
 }
+
+#[test]
+#[ignore="isolated fixed CODE/attempt envelope"]
+fn native_quadratic_work_connected_prefix()->Result<()>{
+    use holonics::hnn::word::work;
+    struct Meter;impl Drop for Meter{fn drop(&mut self){let c=work::process_native_calls();let t=c.forward_attempts+c.response_attempts+c.return_attempts+c.response_return_attempts;let s=format!("{{\"final\":true,\"total_attempts\":{t},\"forward_constructors\":{},\"response_companions\":{},\"actual_returns\":{},\"fresh_returns\":{}}}\n",c.forward_attempts,c.response_attempts,c.return_attempts,c.response_return_attempts);println!("QUADRATIC_CONNECTED_FINAL {s}");if let Some(p)=std::env::var_os("V93_NATIVE_COUNT_PATH"){std::fs::write(p,s).unwrap();}}}
+    let _meter=Meter;work::limit_process_native_attempts(std::env::var("V93_NATIVE_ATTEMPT_LIMIT")?.parse()?);
+    let started=Instant::now();let reference=port();let(field,mut initial,pairing)=declaration_with_input_context(16384,true,true)?;initial.bind_family_local_receiving_return(2)?;initial.bind_bounded_receiving_representation(2)?;
+    let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
+    let empty=PairedObservation::admit(&field,resident.constitution(),&pairing)?.encode(&[])?;reference.ingest(&mut resident,None,&empty)?;resident.refine_contact_grain(24)?;resident.select_native_quadratic_work_prepared_input(&pairing)?;
+    assert!(resident.constitution().receiving_map(2).unwrap().entries().iter().all(num_traits::Zero::is_zero));
+    let opening=resident.constitution().clone();let mut stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+    fn cold(reference:&Reference,stream:&ObservedStream,opening:&Constitution)->Result<ObservedStream>{
+        let state=stream.resident().continuing_state(0)?;let parsed=ContinuingState::from_text(&state.to_text(),READ_BUDGET)?;let field=stream.resident().field();let resident=reference.mount_continued(field,&Current::at_rest(field),opening.clone(),&parsed)?;assert_eq!(resident.continuing_state(0)?,state);
+        let crib=ObservedCrib::from_unplaced_checkpoint(field,resident.current(),stream.crib().next_position(),&stream.crib().unplaced_checkpoint()?)?;
+        let text=stream.pending_checkpoint();assert!(text.starts_with("observed-stream-pending-native-current-v2"));
+        let changed=text.replacen("1048576","1048575",1);assert!(ObservedStream::restore_checkpoint(resident.clone(),crib.clone(),&changed).is_err());
+        let restored=ObservedStream::restore_checkpoint(resident,crib,&text)?;assert_eq!(restored.pending_checkpoint(),text);Ok(restored)
+    }
+    let data:Vec<_>=(0..30).map(|i|i%4).collect();stream.receive_native_current(&reference,&pairing,&data[..6],64)?;stream=cold(&reference,&stream,&opening)?;
+    println!("QUADRATIC_PENDING_COLD accepted6/published0/pending6 native_policy_resources_exact=true mismatch_refused=true");
+    let before=stream.resident().continuing_state(0)?;let pending=stream.pending_checkpoint();let mut seen7=false;let mut observed=0;
+    let outcome=stream.receive_native_current_diagnosed(&reference,&pairing,&data[6..10],64,&mut |e|{
+        observed+=1;
+        if e.prediction.source_cells==7{
+            let receipt=e.preparation.as_ref().expect("source7 actual preparation");let r=receipt.quadratic_work.as_ref().expect("new private work carrier");
+            assert_eq!((receipt.work.numer().bits(),receipt.work.denom().bits()),(1043,1041));assert!(receipt.work<integer(65536));assert!(receipt.closes());
+            assert!(r.added.iter().all(|x|x.numer().bits()<=1024&&x.denom().bits()<=1024));
+            println!("QUADRATIC_REAL_CUT7 staged_not_published=true source={} metric={:?} old={:?} added={:?} control={:?} work={:?} cross={:?} quadratic={:?} derived_bound={}/{} bitwork={}",r.source_cells,r.metric,r.old,r.added,r.control,receipt.work,receipt.cross,receipt.quadratic,r.numerator_bound_bits,r.denominator_bound_bits,r.charged_arithmetic_bits);seen7=true;
+        }
+        // Exact producer feature witness for any later unchanged EpochFlow packing refusal.
+        if let Some((at,x))=e.prediction.features[0].iter().enumerate().find(|(_,x)|{let z=x.denom().trailing_zeros().unwrap();(x.denom()>>z as usize)!=num_bigint::BigInt::from(1)}){
+            println!("QUADRATIC_NATIVE_FEATURE source={} coordinate={at} value={x} declared_feature_divisor=1",e.prediction.source_cells);
+        }
+    });
+    match outcome{
+        Err(e)=>{assert!(seen7,"the reviewed wide-work case must be reached before any later refusal");assert_eq!(stream.resident().continuing_state(0)?,before);assert_eq!(stream.pending_checkpoint(),pending);println!("QUADRATIC_LATER_REFUSAL staged_events={observed} cut7_accepted=true whole_delivery_rollback=true error={e:?}");return Err(e.into());},
+        Ok(events)=>{assert!(seen7);assert_eq!(events.len(),1);println!("QUADRATIC_FIRST_R publication={:?} reuse={:?}",events[0].publication,stream.resident().native_rank_reuse_reading());}
+    }
+    stream=cold(&reference,&stream,&opening)?;
+    let c=work::process_native_calls();let used=c.forward_attempts+c.response_attempts+c.return_attempts+c.response_return_attempts;
+    // Fixed conservative branch reservation. Never start a suffix that cannot fit.
+    let limit=std::env::var("V93_NATIVE_ATTEMPT_LIMIT")?.parse::<u64>()?;
+    if limit-used<180{println!("QUADRATIC_SUCCESSOR_NOT_RUN remaining_attempts={} required_conservative180 elapsed_ns={}",limit-used,started.elapsed().as_nanos());return Ok(());}
+    let event=stream.observe_native_current_contact(&reference,&pairing,data[10],64)?;println!("QUADRATIC_CONTACT source10_new=true changed_receipt={:?}",event.contact.as_ref().map(|x|&x.publication));
+    stream.receive_native_current(&reference,&pairing,&data[11..20],64)?;stream=cold(&reference,&stream,&opening)?;
+    let(mut fork,mut crib)=stream.native_current_query_fork(&reference,&pairing,64)?;fork.begin_hypothesized_output()?;let material=fork.constitution().clone();let m=fork.prepared_input().unwrap().material().clone();
+    for key in [rat(1,7),rat(2,7),rat(3,7),rat(4,7)]{reference.release_native_current_forecast(&mut fork,&mut crib,&pairing,&key,64)?;assert_eq!(fork.constitution(),&material);assert_eq!(fork.prepared_input().unwrap().material(),&m);}
+    println!("QUADRATIC_CONNECTED_SUCCESSOR_PASS actual20 four_frozen=true elapsed_ns={}",started.elapsed().as_nanos());Ok(())
+}

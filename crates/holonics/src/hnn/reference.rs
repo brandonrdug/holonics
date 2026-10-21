@@ -528,6 +528,8 @@ struct AeonState {
 /// budget stop once it comes.
 #[derive(Clone, Debug)]
 pub struct Resident {
+    // Optional numerical rank reuse; not constitutive state or cold authority.
+    native_rank:std::cell::RefCell<crate::hnn::receiving::NativeRankCache>,
     founding: Option<crate::hnn::founding::FoundingLaw>,
     staged_founding: Option<u64>,
     field: Field,
@@ -1209,6 +1211,7 @@ impl Reference {
             _ => None,
         };
         Ok(Resident {
+            native_rank:std::cell::RefCell::new(Default::default()),
             founding: None,
             staged_founding: None,
             field: field.clone(),
