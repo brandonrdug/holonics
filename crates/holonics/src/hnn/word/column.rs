@@ -24,6 +24,7 @@ impl ResponseColumn {
     /// storage outside source rings. Interior contact and resonator states open at zero.
     /// Held exterior returns overwrite the corresponding response by zero at the actual tick.
     pub(crate) fn execute(word: &Word<'_>, source: Vec<Vec<Rat>>) -> Result<Self, HnnError> {
+        work::response_call();
         let ops = word.operands();
         let widths: Vec<_> = word.field().rings().iter().map(|r| r.width()).collect();
         if source.len() != widths.len()

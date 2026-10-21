@@ -404,6 +404,7 @@ impl Resident {
     }
     /// Fresh native predictor lineage. Legacy receiving/refine entrypoints refuse this scope.
     pub fn select_native_current_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
+        if self.field.receivers().iter().any(|r|self.constitution.receiving_return_policy(r.ring)!=Some(crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1)){return Err(refuse("native F declares a family-local receiving current before input, without repurposing population responsibility"));}
         self.select_prepared_input_chart(pairing,ContextChart::LaggedReceiverBoundaryV1)
     }
     pub fn select_source_framing_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{self.select_prepared_input_chart(pairing,ContextChart::SourceFramingRouteV1)}

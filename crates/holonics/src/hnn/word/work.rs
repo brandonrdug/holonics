@@ -91,6 +91,7 @@ pub(crate) enum Event {
 }
 
 pub(crate) fn reached(event: Event) {
+    match event{Event::WordOpenAttempt=>{FORWARD_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},Event::ReturnAttempt=>{RETURN_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},Event::ResponseReturnAttempt=>{RESPONSE_RETURN_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},_=>{}}
     WORK.with(|cell| {
         let mut reading = cell.get();
         let counter = match event {
@@ -175,3 +176,14 @@ mod tests {
         assert_eq!(refused.junctions, 0);
     }
 }
+
+/// Monotone process-wide native call counts, including worker threads and declaring Words.
+/// No reset and no retained-state field. Earlier processes cannot be reconstructed from this.
+#[derive(Clone,Copy,Debug,Default,PartialEq,Eq)]
+pub struct ProcessNativeCalls{pub forward_attempts:u64,pub response_attempts:u64,pub return_attempts:u64,pub response_return_attempts:u64}
+static FORWARD_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
+static RESPONSE_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
+static RETURN_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
+static RESPONSE_RETURN_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
+pub fn process_native_calls()->ProcessNativeCalls{use std::sync::atomic::Ordering::Relaxed;ProcessNativeCalls{forward_attempts:FORWARD_CALLS.load(Relaxed),response_attempts:RESPONSE_CALLS.load(Relaxed),return_attempts:RETURN_CALLS.load(Relaxed),response_return_attempts:RESPONSE_RETURN_CALLS.load(Relaxed)}}
+pub(crate) fn response_call(){RESPONSE_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);}

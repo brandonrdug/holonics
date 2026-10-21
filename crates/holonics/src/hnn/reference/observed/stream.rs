@@ -131,8 +131,10 @@ impl ObservedStream {
         pending: Vec<usize>,
     ) -> Result<Self, HnnError> {
         let bound = Self::finite_bound(&resident)?;
+        if resident.prepared_input.as_ref().is_some_and(|p|p.context_chart()==prepared_input::ContextChart::LaggedReceiverBoundaryV1) && scope!=ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap{return Err(refuse("native section explicitly retains its held local publication policy"));}
         if scope.is_local_receiving()
             && resident.receiving_law() != crate::hnn::receiving::ReceivingLaw::RetainedFibreV1
+            && !resident.prepared_input.as_ref().is_some_and(|p|p.context_chart()==prepared_input::ContextChart::LaggedReceiverBoundaryV1)
         {
             return Err(refuse(
                 "local receiving streams explicitly require RetainedFibreV1",
@@ -461,7 +463,8 @@ impl ObservedStream {
     pub fn pending_checkpoint(&self) -> String {
         let local_family = self.resident.constitution.receiving_return_policy(self.resident.admitted[0].ring()) == Some(crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
         let adaptive = self.resident.constitution.receiving_representation_policy(self.resident.admitted[0].ring()) == Some(crate::hnn::constitution::ReceivingRepresentationPolicy::BoundedSubquantumV1);
-        let (header, law_field) = if adaptive {("observed-stream-pending-v4", "retained-fibre-v1 family-local-retained-return-v1 bounded-subquantum20-v1 ".to_string())} else if local_family { ("observed-stream-pending-v3", "retained-fibre-v1 family-local-retained-return-v1 ".to_string()) } else { match self.resident.receiving_law() {
+        let native=self.resident.prepared_input.as_ref().is_some_and(|p|p.context_chart()==prepared_input::ContextChart::LaggedReceiverBoundaryV1);
+        let (header, law_field) = if native {("observed-stream-pending-native-current-v1",format!("{} {} {} ",crate::hnn::word::native_prediction::LAW,self.resident.constitution.receiving_return_policy(self.resident.admitted[0].ring()).expect("native receiving owner").tag(),if adaptive{"bounded-subquantum20-v1"}else{"fixed-lattice-v1"}))} else if adaptive {("observed-stream-pending-v4", "retained-fibre-v1 family-local-retained-return-v1 bounded-subquantum20-v1 ".to_string())} else if local_family { ("observed-stream-pending-v3", "retained-fibre-v1 family-local-retained-return-v1 ".to_string()) } else { match self.resident.receiving_law() {
             crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 => {
                 ("observed-stream-pending-v1", String::new())
             }
@@ -507,11 +510,15 @@ impl ObservedStream {
             .ok_or_else(|| refuse("the unfinished observed transaction header"))?
             .split_whitespace()
             .collect();
-        let adaptive = header.first().copied()==Some("observed-stream-pending-v4");
+        let native=header.first().copied()==Some("observed-stream-pending-native-current-v1");
+        let native_owner=resident.prepared_input.as_ref().is_some_and(|p|p.context_chart()==prepared_input::ContextChart::LaggedReceiverBoundaryV1);
+        if native!=native_owner{return Err(refuse("native prediction pending schema matches its original model"));}
+        let adaptive = if native{header.get(3).copied()==Some("bounded-subquantum20-v1")}else{header.first().copied()==Some("observed-stream-pending-v4")};
         if adaptive != (resident.constitution.receiving_representation_policy(resident.admitted[0].ring())==Some(crate::hnn::constitution::ReceivingRepresentationPolicy::BoundedSubquantumV1)) {return Err(refuse("pending representation policy matches native material"));}
-        let family_local = matches!(header.first().copied(),Some("observed-stream-pending-v3"|"observed-stream-pending-v4"));
+        let family_local = if native{header.get(2).copied()==Some("family-local-retained-return-v1")}else{matches!(header.first().copied(),Some("observed-stream-pending-v3"|"observed-stream-pending-v4"))};
         if family_local != (resident.constitution.receiving_return_policy(resident.admitted[0].ring()) == Some(crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1)) { return Err(refuse("pending return policy matches native material")); }
         let (law, scope_at, commit_at) = match header.first().copied() {
+            Some("observed-stream-pending-native-current-v1") if header.len()==8 && header[1]==crate::hnn::word::native_prediction::LAW && matches!(header[3],"fixed-lattice-v1"|"bounded-subquantum20-v1") => (resident.receiving_law(),4,5),
             Some("observed-stream-pending-v4") if header.len()==8 && header[1]=="retained-fibre-v1" && header[2]=="family-local-retained-return-v1" && header[3]=="bounded-subquantum20-v1" => (crate::hnn::receiving::ReceivingLaw::RetainedFibreV1,4,5),
             Some("observed-stream-pending-v3") if header.len()==7 && header[1]=="retained-fibre-v1" && header[2]=="family-local-retained-return-v1" => (crate::hnn::receiving::ReceivingLaw::RetainedFibreV1,3,4),
             Some("observed-stream-pending-v1") if header.len() == 5 => {
@@ -1103,4 +1110,43 @@ mod tests {
         println!("A19_CONNECTED actual_unique_classes30 first16/published10/pending6 host_reference_first_ns={old_ns} lazy_first_ns={new_ns} same_full_native_M_crib_pending=true held_full_flow_equal=true cold_exact=true late_fault_rollback=true diagnostics_explicitly_deferred=true old_forward_return_aggregate={}/{}/{} new_with_cold_and_later_branches={}/{}/{}",old_exec.forwards.load(Ordering::Relaxed),old_exec.returns.load(Ordering::Relaxed),old_exec.flows.load(Ordering::Relaxed),new_exec.forwards.load(Ordering::Relaxed),new_exec.returns.load(Ordering::Relaxed),new_exec.flows.load(Ordering::Relaxed));
     }
 
+}
+
+impl ObservedStream {
+    pub fn select_native_current_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
+        if !self.pending.is_empty()||self.scope!=ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap{return Err(refuse("native model selection is fresh at its one held local receiving owner"));}
+        self.resident.select_native_current_prepared_input(pairing)
+    }
+    pub fn receive_native_current(&mut self,reference:&Reference,pairing:&PairingDeclaration,classes:&[usize],bits:u32)->Result<Vec<crate::hnn::reference::native_context::NativeReceivingSectionEvent>,HnnError>{
+        if self.resident.prepared_input.as_ref().is_none_or(|p|p.context_chart()!=prepared_input::ContextChart::LaggedReceiverBoundaryV1||p.mode()!=prepared_input::PrefixMode::Training){return Err(refuse("actual native section delivery requires its native training model"));}
+        let mut next=self.clone();let mut frontier=next.pending_frontier(pairing)?;let mut sections=Vec::new();
+        for &class in classes{
+            if next.accepted_cells()? >= next.resident.field.population(){return Err(refuse("native input respects its declared source horizon"));}
+            let boundary=PairedObservation::admit(&next.resident.field,&next.resident.constitution,pairing)?;
+            let encoded=boundary.encode(&[class])?;let step=frontier.step(&next.resident.field,&encoded,0)?;
+            next.pending.push(class);if next.pending.len()>next.bound{return Err(refuse("native pending remains bounded by the original physical section"));}
+            if step.ticks[next.resident.admitted[0].ring()]!=0||step.carry_out{
+                sections.push(reference.observe_native_current_section(&mut next.resident,&mut next.crib,pairing,&next.pending,bits)?);
+                next.pending.clear();next.bound=Self::finite_bound(&next.resident)?;frontier=next.resident.current.clone();
+            }
+        }
+        let next=Self::restore(next.resident,next.crib,next.scope,next.pending)?;*self=next;Ok(sections)
+    }
+    /// Querying a native partial prefix consumes its pending cells exactly once on the private
+    /// frozen fork. They are conditioning testimony, never synthetic material observations.
+    pub fn native_current_query_fork(&self,reference:&Reference,pairing:&PairingDeclaration,bits:u32)->Result<(Resident,ObservedCrib),HnnError>{
+        let mut resident=self.resident.clone();let mut crib=self.crib.clone();resident.freeze_prepared_forecast()?;
+        for &class in &self.pending{reference.continue_native_current_forecast(&mut resident,&mut crib,pairing,class,bits)?;}
+        Ok((resident,crib))
+    }
+}
+
+impl ObservedStream {
+    /// An actual contact-only event precedes any new R section; it cannot cross an accepted
+    /// unfinished interval or silently rebind a prediction produced under earlier material.
+    pub fn observe_native_current_contact(&mut self,reference:&Reference,pairing:&PairingDeclaration,class:usize,bits:u32)->Result<crate::hnn::reference::native_context::NativeContextEvent,HnnError>{
+        if !self.pending.is_empty()||self.scope!=ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap{return Err(refuse("native contact publication requires its closed held-local source frontier"));}
+        let mut next=self.clone();let event=reference.observe_native_current_contact(&mut next.resident,&mut next.crib,pairing,class,bits)?;
+        next.bound=Self::finite_bound(&next.resident)?;let next=Self::restore(next.resident,next.crib,next.scope,next.pending)?;*self=next;Ok(event)
+    }
 }

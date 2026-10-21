@@ -451,6 +451,12 @@ impl Reference {
         class: usize,
         placement: Option<&OccurrencePlacement>,
     ) -> Result<IngestClassReceipt, HnnError> {
+        self.ingest_class_step_kind(resident,crib,pairing,class,placement,false)
+    }
+    pub(in crate::hnn::reference) fn ingest_class_step_deferred(&self,resident:&mut Resident,crib:&mut ObservedCrib,pairing:&PairingDeclaration,class:usize,placement:Option<&OccurrencePlacement>)->Result<IngestClassReceipt,HnnError>{
+        self.ingest_class_step_kind(resident,crib,pairing,class,placement,true)
+    }
+    fn ingest_class_step_kind(&self,resident:&mut Resident,crib:&mut ObservedCrib,pairing:&PairingDeclaration,class:usize,placement:Option<&OccurrencePlacement>,defer:bool)->Result<IngestClassReceipt,HnnError>{
         let (boundary, encoded) = admit_observed_cell(resident, crib, pairing, class, placement)?;
         let field = resident.field.clone();
         let moment = match resident.moments.keys().next().copied() {
@@ -469,7 +475,7 @@ impl Reference {
             });
         }
         crib.push(&field, &before, class, placement, field.crib().window)?;
-        let close = if consumed.carry_out {
+        let close = if consumed.carry_out && !defer {
             let closing = PairedObservation::admit(&field, &resident.constitution, pairing)?;
             let encoded_crib = crib.closing(&field, &closing, field.crib().window)?;
             let family = resident.admitted.clone();
@@ -488,6 +494,13 @@ impl Reference {
             ingest: ingested.receipt,
             close,
         })
+    }
+
+    pub(in crate::hnn::reference) fn close_deferred_native_input(&self,resident:&mut Resident,crib:&mut ObservedCrib,pairing:&PairingDeclaration)->Result<(),HnnError>{
+        if !resident.aeon.awaiting{return Err(HnnError::Unadmitted{reason:"native deferred close is the actually reached carry-out only"});}
+        let boundary=PairedObservation::admit(&resident.field,&resident.constitution,pairing)?;
+        let encoded=crib.closing(&resident.field,&boundary,resident.field.crib().window)?;
+        let family=resident.admitted.clone();close_and_locate(self,resident,&family,&encoded)?;crib.reopen();Ok(())
     }
 
     /// Compare and deposit one actually delivered cell, then use the shared ingest step.

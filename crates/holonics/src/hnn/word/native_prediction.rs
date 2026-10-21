@@ -5,6 +5,8 @@ use crate::hnn::receiving::RetainedStationReturn;
 use crate::hnn::receiving::native_current::NativeCurrentFace;
 use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::release::ReleaseReturn;
+use num_bigint::BigInt;
+use num_traits::One;
 
 pub const LAW: &str = "native-current-prediction-v1";
 
@@ -36,6 +38,9 @@ pub struct NativePredictionReturn {
     pub(crate) cut: continuation::ContactCut,
     pub(crate) covector: crate::hnn::ratio::RatioCovector,
     phases: ReceivingPhases,
+    producer: crate::hnn::constitution::Constitution,
+    anchor: Vec<BigInt>,
+    reach: crate::hnn::constitution::Reach,
 }
 impl NativePredictionReturn {
     pub fn reading(&self) -> &NativePredictionReading {
@@ -335,6 +340,51 @@ impl NativePredictionWord<'_> {
             .native_source
             .as_ref()
             .expect("native source owner");
+        let (_, _, source, support) = self
+            .word
+            .native_source
+            .as_ref()
+            .expect("native source owner");
+        let locus = crate::hnn::constitution::Locus::ReceivingMap(self.phases.ring());
+        let diamond =
+            crate::hnn::retention::Diamond::opened(self.word.field, &self.phases, support);
+        if !diamond.retains(self.word.field, locus) {
+            return Err(HnnError::Unadmitted {
+                reason: "native return actually reaches its declared receiver",
+            });
+        }
+        let occupied = self
+            .word
+            .field
+            .sources()
+            .iter()
+            .map(|&g| {
+                (0..self.word.field.ring(g).placements().len()).try_fold(0u64, |n, p| {
+                    Ok::<_, HnnError>(
+                        n + u64::from(source.phase_counts(g, p)?.iter().any(|&x| x != 0)),
+                    )
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?
+            .into_iter()
+            .max()
+            .unwrap_or(0);
+        let reach = crate::hnn::constitution::Reach {
+            receiver: self.phases.ring(),
+            stations: self.phases.epochs().map(|j| j as u64).collect(),
+            entries: vec![0],
+            phases: occupied,
+            loci: std::iter::once(locus).collect(),
+            passages: Vec::new(),
+        };
+        let producer = self
+            .word
+            .native_source
+            .as_ref()
+            .expect("native source owner")
+            .0
+            .clone();
+        let anchor = current.lift().to_vec();
         let phases = crate::hnn::ratio::target_phases(
             self.word.field,
             current.lift(),
@@ -371,6 +421,176 @@ impl NativePredictionWord<'_> {
             cut,
             covector,
             phases: self.phases,
+            producer,
+            anchor,
+            reach,
         })
+    }
+}
+
+/// One actual consumed Word return. No public constructor and no retained Word tape.
+pub(crate) struct NativeRPacket {
+    producer: crate::hnn::constitution::Constitution,
+    reading: NativePredictionReading,
+    station: RetainedStationReturn,
+    sample: crate::hnn::constitution::Sample,
+    positive: Vec<Rat>,
+    foil: Vec<Rat>,
+    phase: Vec<Rat>,
+    anchor: Vec<BigInt>,
+    reach: crate::hnn::constitution::Reach,
+}
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct NativeRSection {
+    ring: usize,
+    commit: u64,
+    map: ExactRatMatrix,
+    stations: Vec<RetainedStationReturn>,
+    predictions: Vec<NativePredictionReading>,
+    anchors: Vec<Vec<BigInt>>,
+}
+impl NativePredictionReturn {
+    pub(crate) fn into_receiving_packet(self) -> Result<NativeRPacket, HnnError> {
+        if self.stations.len() != 1 || self.back.reads.len() != 1 {
+            return Err(HnnError::Unadmitted {
+                reason: "one native R return per actual aperture-one Word",
+            });
+        }
+        let station = self.stations[0].clone();
+        let descent = self.covector.descent(0);
+        let mut positive = vec![Rat::zero(); descent.len()];
+        positive[2 * station.target] = Rat::one();
+        let mut foil = vec![Rat::zero(); descent.len()];
+        let mut phase = foil.clone();
+        for i in 0..descent.len() {
+            if i % 2 == 0 {
+                foil[i] = &positive[i] - &descent[i];
+            } else {
+                phase[i] = descent[i].clone();
+            }
+        }
+        let sample = crate::hnn::constitution::Sample {
+            weight: Rat::one(),
+            feature: self.back.reads[0].0.clone(),
+            covector: descent,
+            masses: Some(station.normalized_representative.clone()),
+        };
+        if self.reading.features != vec![sample.feature.clone()] {
+            return Err(HnnError::Unadmitted {
+                reason: "native R retains the actual Word's complete paired feature",
+            });
+        }
+        Ok(NativeRPacket {
+            producer: self.producer,
+            reading: self.reading,
+            station,
+            sample,
+            positive,
+            foil,
+            phase,
+            anchor: self.anchor,
+            reach: self.reach,
+        })
+    }
+}
+impl NativeRPacket {
+    pub(crate) fn section(
+        packets: Vec<Self>,
+    ) -> Result<
+        (
+            std::sync::Arc<NativeRSection>,
+            Vec<crate::hnn::port::Deposit>,
+            Vec<crate::hnn::constitution::epoch::EpochReceivingRecord>,
+        ),
+        HnnError,
+    > {
+        use crate::hnn::constitution::epoch::{EpochReceivingLaw, EpochReceivingRecord};
+        use crate::hnn::constitution::{LinearLocus, LinearStep, Locus, Reach};
+        let first = packets.first().ok_or(HnnError::Unadmitted {
+            reason: "a nonempty actual native receiving section",
+        })?;
+        let ring = first.reading.receiver;
+        let theta = &first.producer;
+        let map = theta
+            .receiving_map(ring)
+            .ok_or(HnnError::MissingReceivingMap { ring })?
+            .clone();
+        for (at, p) in packets.iter().enumerate() {
+            if &p.producer != theta
+                || p.reading.receiver != ring
+                || p.reading.producing_commit != theta.commit()
+                || p.reading.source_cells
+                    != first
+                        .reading
+                        .source_cells
+                        .checked_add(at as u64)
+                        .ok_or(HnnError::CountOverflow)?
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "native R section preserves each original consecutive source cut at ONE producing material",
+                });
+            }
+        }
+        let origin = std::sync::Arc::new(NativeRSection {
+            ring,
+            commit: theta.commit(),
+            map: map.clone(),
+            stations: packets.iter().map(|p| p.station.clone()).collect(),
+            predictions: packets.iter().map(|p| p.reading.clone()).collect(),
+            anchors: packets.iter().map(|p| p.anchor.clone()).collect(),
+        });
+        let mut deposits = Vec::new();
+        let mut records = Vec::new();
+        for (at, p) in packets.into_iter().enumerate() {
+            let law = EpochReceivingLaw::native(
+                std::sync::Arc::clone(&origin),
+                at,
+                &p.sample,
+                &p.positive,
+                &p.foil,
+                &p.phase,
+            )?;
+            records.push(EpochReceivingRecord {
+                law,
+                feature: p.sample.feature.clone(),
+                positive: p.positive,
+                foil: p.foil,
+                phase: p.phase,
+            });
+            deposits.push(
+                crate::hnn::port::Deposit::new(
+                    origin.commit,
+                    vec![LinearStep {
+                        locus: LinearLocus::Receiving(ring),
+                        samples: vec![p.sample],
+                    }],
+                    Vec::new(),
+                    vec![Locus::ReceivingMap(ring)],
+                )
+                .with_reach(p.reach),
+            );
+        }
+        Ok((origin, deposits, records))
+    }
+}
+
+impl NativeRSection {
+    pub(crate) fn ring(&self) -> usize {
+        self.ring
+    }
+    pub(crate) fn commit(&self) -> u64 {
+        self.commit
+    }
+    pub(crate) fn map(&self) -> &ExactRatMatrix {
+        &self.map
+    }
+    pub(crate) fn stations(&self) -> &[RetainedStationReturn] {
+        &self.stations
+    }
+    pub(crate) fn predictions(&self) -> &[NativePredictionReading] {
+        &self.predictions
+    }
+    pub(crate) fn anchors(&self) -> &[Vec<BigInt>] {
+        &self.anchors
     }
 }

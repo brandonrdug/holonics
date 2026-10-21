@@ -195,7 +195,7 @@ impl<'a> ObservedNormalEpochStage<'a> {
             || self
                 .receiving_parts
                 .iter()
-                .any(|p| p.law.retained_origin().is_none())
+                .any(|p| !p.law.has_numerical_origin())
             || self.deposits.iter().any(|d| {
                 !d.factors().is_empty()
                     || d.linear()
@@ -569,7 +569,7 @@ struct LocalRayNotAdmitted {
     epoch_index: u64,
     heard: u64,
     gamma: Rat,
-    origin: std::sync::Arc<crate::hnn::receiving::RetainedSectionOrigin>,
+    origin: EpochReceivingLaw,
     decline: EpochStageRefusal,
 }
 impl LocalRayNotAdmitted {
@@ -628,11 +628,10 @@ impl LocalRayNotAdmitted {
         if !gamma.is_positive() {
             return None;
         }
-        let origin = std::sync::Arc::clone(stage.receiving_parts.first()?.law.retained_origin()?);
+        let origin = stage.receiving_parts.first()?.law.clone();
+        if !origin.has_numerical_origin(){return None;}
         if stage.receiving_parts.iter().any(|p| {
-            p.law
-                .retained_origin()
-                .is_none_or(|o| !std::sync::Arc::ptr_eq(o, &origin))
+            !p.law.same_section(&origin)
         }) {
             return None;
         }
@@ -672,9 +671,7 @@ impl LocalRayNotAdmitted {
             || !self.gamma.is_positive()
             || parts.is_empty()
             || parts.iter().any(|p| {
-                p.law
-                    .retained_origin()
-                    .is_none_or(|o| !std::sync::Arc::ptr_eq(o, &self.origin))
+                !p.law.same_section(&self.origin)
             })
         {
             return Err(refused(

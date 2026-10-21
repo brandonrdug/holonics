@@ -8,10 +8,11 @@ use std::sync::Arc;
 pub(crate) enum EpochReceivingLaw {
     CoarseOdometerV1,
     RetainedFibreV1(RetainedStationBinding),
+    NativeCurrentV1(RetainedStationBinding),
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct RetainedStationBinding {
-    origin: Arc<RetainedSectionOrigin>,
+    origin: SectionOrigin,
     commit: u64,
     station: usize,
     source_cells: u64,
@@ -22,7 +23,26 @@ pub(crate) struct RetainedStationBinding {
     foil: Vec<Rat>,
     phase: Vec<Rat>,
 }
+#[derive(Clone,Debug,PartialEq,Eq)]
+enum SectionOrigin{Retained(Arc<RetainedSectionOrigin>),Native(Arc<crate::hnn::word::native_prediction::NativeRSection>)}
+impl SectionOrigin{
+ fn ring(&self)->usize{match self{Self::Retained(o)=>o.ring,Self::Native(o)=>o.ring()}}
+ fn stations(&self)->&[crate::hnn::receiving::RetainedStationReturn]{match self{Self::Retained(o)=>&o.stations,Self::Native(o)=>o.stations()}}
+ fn target(&self,at:usize)->Option<usize>{self.stations().get(at).map(|s|s.target)}
+ fn policy(&self)->crate::hnn::receiving::RetainedReturnPolicy{match self{Self::Retained(o)=>o.return_policy,Self::Native(_)=>crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1}}
+ fn retained_reading(&self)->Option<RetainedSectionSourceReading>{match self{Self::Retained(o)=>Some(o.reading()),Self::Native(_)=>None}}
+ fn same(&self,other:&Self)->bool{match(self,other){(Self::Retained(a),Self::Retained(b))=>Arc::ptr_eq(a,b),(Self::Native(a),Self::Native(b))=>Arc::ptr_eq(a,b),_=>false}}
+}
 impl EpochReceivingLaw {
+    pub(crate) fn native(origin:Arc<crate::hnn::word::native_prediction::NativeRSection>,station:usize,sample:&Sample,positive:&[Rat],foil:&[Rat],phase:&[Rat])->Result<Self,HnnError>{
+        let p=origin.predictions().get(station).ok_or_else(||refused("native station has its original private producer"))?;
+        if p.law!=crate::hnn::word::native_prediction::LAW||p.producing_commit!=origin.commit()||p.receiver!=origin.ring()||p.features!=vec![sample.feature.clone()]||p.waves!=vec![origin.map().apply(&sample.feature)?]{return Err(refused("native R witness binds actual score/return/feature/map/source identity"));}
+        let b=RetainedStationBinding{commit:origin.commit(),station,source_cells:p.source_cells,anchor:origin.anchors()[station].clone(),map:origin.map().clone(),sample:sample.clone(),positive:positive.to_vec(),foil:foil.to_vec(),phase:phase.to_vec(),origin:SectionOrigin::Native(origin)};
+        b.admit(sample,positive,foil,phase)?;Ok(Self::NativeCurrentV1(b))
+    }
+    fn binding(&self)->Option<&RetainedStationBinding>{match self{Self::RetainedFibreV1(b)|Self::NativeCurrentV1(b)=>Some(b),Self::CoarseOdometerV1=>None}}
+    pub(super) fn has_numerical_origin(&self)->bool{self.binding().is_some()}
+    pub(super) fn same_section(&self,other:&Self)->bool{self.binding().zip(other.binding()).is_some_and(|(a,b)|a.origin.same(&b.origin))}
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn retained(
         origin: Arc<RetainedSectionOrigin>,
@@ -41,7 +61,7 @@ impl EpochReceivingLaw {
             return Err(refused("retained return's actual receiver"));
         }
         let bound = RetainedStationBinding {
-            origin,
+            origin:SectionOrigin::Retained(origin),
             commit,
             station,
             source_cells,
@@ -57,13 +77,13 @@ impl EpochReceivingLaw {
     }
     pub(super) fn retained_origin(&self) -> Option<&Arc<RetainedSectionOrigin>> {
         match self {
-            Self::RetainedFibreV1(b) => Some(&b.origin),
-            Self::CoarseOdometerV1 => None,
+            Self::RetainedFibreV1(b) => match &b.origin{SectionOrigin::Retained(o)=>Some(o),_=>None},
+            Self::CoarseOdometerV1|Self::NativeCurrentV1(_) => None,
         }
     }
     pub(crate) fn admit_policy(&self, expected: crate::hnn::receiving::RetainedReturnPolicy) -> Result<(), HnnError> {
         match self {
-            Self::RetainedFibreV1(b) if b.origin.return_policy == expected => Ok(()),
+            Self::RetainedFibreV1(b)|Self::NativeCurrentV1(b) if b.origin.policy() == expected => Ok(()),
             Self::CoarseOdometerV1 if expected == crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 => Ok(()),
             _ => Err(refused("receiving return policy matches its native material declaration")),
         }
@@ -74,8 +94,8 @@ impl EpochReceivingLaw {
         commit: u64,
         map: &ExactRatMatrix,
     ) -> Result<(), HnnError> {
-        if let Self::RetainedFibreV1(b) = self {
-            if b.origin.ring != receiver || b.commit != commit || &b.map != map {
+        if let Self::RetainedFibreV1(b)|Self::NativeCurrentV1(b) = self {
+            if b.origin.ring() != receiver || b.commit != commit || &b.map != map {
                 return Err(refused(
                     "retained receiving witness keeps actual receiver/commit/map",
                 ));
@@ -94,7 +114,7 @@ impl RetainedStationBinding {
     ) -> Result<(), HnnError> {
         let station = self
             .origin
-            .stations
+            .stations()
             .get(self.station)
             .ok_or_else(|| refused("retained station in its section"))?;
         let n = station.gradient.len();
@@ -109,7 +129,7 @@ impl RetainedStationBinding {
             || phase.len() != 2 * n
             || station.component_error.len() != n
             || station.packed_foil.len() != n
-            || self.origin.targets.get(self.station) != Some(&station.target)
+            || self.origin.target(self.station) != Some(station.target)
             || station.gradient.iter().cloned().sum::<Rat>() != Rat::zero()
             || sample.masses.as_ref() != Some(&station.normalized_representative)
             || station.component_error.iter().any(Signed::is_negative)
@@ -157,10 +177,10 @@ pub(super) fn certificate(
     if samples.len() != parts.len() || parts.is_empty() {
         return Err(refused("one retained receiving sample per station"));
     }
-    let EpochReceivingLaw::RetainedFibreV1(first) = &parts[0].law else {
+    let (EpochReceivingLaw::RetainedFibreV1(first)|EpochReceivingLaw::NativeCurrentV1(first)) = &parts[0].law else {
         return Err(refused("one receiving certificate law per section"));
     };
-    if first.origin.stations.len() != parts.len() {
+    if first.origin.stations().len() != parts.len() {
         return Err(refused(
             "the complete retained section supplies the certificate",
         ));
@@ -171,10 +191,10 @@ pub(super) fn certificate(
     let mut curvature = BigInt::zero();
     let mut oscillation = Rat::zero();
     for (at, (sample, part)) in samples.iter().zip(parts).enumerate() {
-        let EpochReceivingLaw::RetainedFibreV1(b) = &part.law else {
+        let (EpochReceivingLaw::RetainedFibreV1(b)|EpochReceivingLaw::NativeCurrentV1(b)) = &part.law else {
             return Err(refused("mixed retained/coarse receiving certificate"));
         };
-        if !Arc::ptr_eq(&first.origin, &b.origin)
+        if !first.origin.same(&b.origin)
             || b.station != at
             || b.commit != first.commit
             || b.map != first.map
@@ -199,7 +219,7 @@ pub(super) fn certificate(
             .map(|row| row.iter().zip(&sample.feature).map(|(p, f)| p * f).sum())
             .collect();
         let real: Vec<_> = delta.iter().step_by(2).collect();
-        let eps = &b.origin.stations[at].component_error;
+        let eps = &b.origin.stations()[at].component_error;
         let local_error = (0..real.len())
             .map(|s| {
                 eps.iter()
@@ -255,10 +275,16 @@ pub struct EpochReceivingRayPacket {
     pub actual_ray: ExactRatMatrix,
     pub stations: Vec<EpochReceivingStationReading>,
     pub retained_source: Option<RetainedSectionSourceReading>,
+    pub native_source:Option<NativeReceivingSourceReading>,
     /// Preflight includes every numeric field and all vector/record metadata below.
     /// This is an operand extent, not a claim about allocator or encoded byte size.
     pub operand_integer_bits: u64,
     pub operand_structural_items: u64,
+}
+#[derive(Clone,Debug,PartialEq,Eq)]
+pub struct NativeReceivingSourceReading {
+    pub predictions:Vec<crate::hnn::word::native_prediction::NativePredictionReading>,
+    pub stations:Vec<crate::hnn::receiving::RetainedStationReturn>,
 }
 #[derive(Default)]
 struct PacketExtent {
@@ -313,6 +339,7 @@ pub(super) fn failure_packet(
         return None;
     }
     let first = parts.first()?;
+
     // Preflight by reference BEFORE any map/source/sample clone. Independent numeric
     // and structural caps also bound zero-heavy vectors; an unavailable diagnostic
     // never changes the operative native refusal.
@@ -332,7 +359,7 @@ pub(super) fn failure_packet(
         extent.rats(&part.positive)?;
         extent.rats(&part.foil)?;
         extent.rats(&part.phase)?;
-        if let EpochReceivingLaw::RetainedFibreV1(b) = &part.law {
+        if let EpochReceivingLaw::RetainedFibreV1(b)|EpochReceivingLaw::NativeCurrentV1(b) = &part.law {
             extent.items(8)?;
             for x in &b.anchor {
                 extent.integer(x)?;
@@ -341,7 +368,7 @@ pub(super) fn failure_packet(
     }
     if let EpochReceivingLaw::RetainedFibreV1(b) = &first.law {
         extent.rats(b.map.entries())?;
-        let o = &b.origin;
+        let SectionOrigin::Retained(o)=&b.origin else{return None;};
         let (bits, items) = o.population.diagnostic_extent()?;
         extent.add(bits, items)?;
         extent.items(16)?;
@@ -369,13 +396,21 @@ pub(super) fn failure_packet(
             }
         }
     }
+    let native_source=if let EpochReceivingLaw::NativeCurrentV1(b)=&first.law{
+        let SectionOrigin::Native(o)=&b.origin else{return None;};
+        extent.rats(b.map.entries())?;extent.items(4)?;
+        for p in o.predictions(){extent.items(10)?;for f in &p.features{extent.rats(f)?;}for w in &p.waves{extent.rats(w)?;}for masses in &p.masses{for m in masses{extent.interval(m)?;}}}
+        for st in o.stations(){extent.items(8)?;extent.rats(&st.normalized_representative)?;extent.rats(&st.packed_foil)?;extent.rats(&st.gradient)?;extent.rats(&st.component_error)?;for b in &st.component_bounds{extent.interval(b)?;}}
+        Some(NativeReceivingSourceReading{predictions:o.predictions().to_vec(),stations:o.stations().to_vec()})
+    }else{None};
     let (law, commit, map, source) = match &first.law {
         EpochReceivingLaw::CoarseOdometerV1 => ("coarse-grain-v1", None, None, None),
+        EpochReceivingLaw::NativeCurrentV1(b)=>(crate::hnn::word::native_prediction::LAW,Some(b.commit),Some(b.map.clone()),None),
         EpochReceivingLaw::RetainedFibreV1(b) => (
             "retained-fibre-v1",
             Some(b.commit),
             Some(b.map.clone()),
-            Some(b.origin.reading()),
+            b.origin.retained_reading(),
         ),
     };
     let stations = samples
@@ -384,7 +419,7 @@ pub(super) fn failure_packet(
         .map(|(sample, p)| {
             let (station, cells, anchor) = match &p.law {
                 EpochReceivingLaw::CoarseOdometerV1 => (None, None, None),
-                EpochReceivingLaw::RetainedFibreV1(b) => (
+                EpochReceivingLaw::RetainedFibreV1(b)|EpochReceivingLaw::NativeCurrentV1(b) => (
                     Some(b.station),
                     Some(b.source_cells),
                     Some(b.anchor.clone()),
@@ -407,7 +442,7 @@ pub(super) fn failure_packet(
         original_map: map,
         actual_ray: ExactRatMatrix::new(direction.to_vec()).ok()?,
         stations,
-        retained_source: source,
+        retained_source: source,native_source,
         operand_integer_bits: extent.bits,
         operand_structural_items: extent.items,
     })
@@ -698,9 +733,9 @@ mod tests {
                 unreachable!()
             };
             match field {
-                0 => Arc::make_mut(&mut binding.origin).beta.lower = huge.clone(),
+                0 => Arc::make_mut(match &mut binding.origin{SectionOrigin::Retained(o)=>o,_=>panic!("retained fixture")}).beta.lower = huge.clone(),
                 1 => {
-                    Arc::make_mut(&mut binding.origin).stations[0].component_error[0] = huge.clone()
+                    Arc::make_mut(match &mut binding.origin{SectionOrigin::Retained(o)=>o,_=>panic!("retained fixture")}).stations[0].component_error[0] = huge.clone()
                 }
                 2 => binding.anchor[0] = huge.numer().clone(),
                 _ => binding.map = ExactRatMatrix::new(vec![vec![huge.clone()]; 4]).unwrap(),

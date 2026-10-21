@@ -16,7 +16,7 @@ mod checkpoint;
 mod deposit;
 mod retained_receiving;
 pub(crate) use retained_receiving::EpochReceivingLaw;
-pub use retained_receiving::{EpochReceivingRayPacket, EpochReceivingStationReading};
+pub use retained_receiving::{EpochReceivingRayPacket, EpochReceivingStationReading,NativeReceivingSourceReading};
 pub(crate) mod device;
 pub(crate) use deposit::{
     EpochCandidateScope, EpochDepositPhase, EpochReceivingRecord, ObservedNormalEpochStage,

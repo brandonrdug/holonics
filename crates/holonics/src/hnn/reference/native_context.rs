@@ -92,6 +92,8 @@ pub struct NativeContextEvent {
     pub preparation: Option<crate::hnn::word::action::PortPreparationReceipt>,
     pub contact: Option<crate::hnn::word::native_prediction::NativeContactPublication>,
     pub input: observed::IngestClassReceipt,
+    pub selected_class: usize,
+    pub draw: Option<crate::receiver::release::ReleaseReturn>,
 }
 impl Resident {
     pub(crate) fn native_context_chart(&self) -> Result<Option<Encoded>, HnnError> {
@@ -123,7 +125,14 @@ impl Reference {
         class: usize,
         bits: u32,
     ) -> Result<NativeContextEvent, HnnError> {
-        self.native_current_event(resident, crib, pairing, class, bits, true)
+        self.native_current_event(
+            resident,
+            crib,
+            pairing,
+            NativeInput::Class(class),
+            bits,
+            true,
+        )
     }
     /// Same F/prefix computation on a frozen forecast fork. The chosen class is a hypothesis,
     /// not a material-forming observation. Contact, receiving and M moments remain fixed.
@@ -135,14 +144,21 @@ impl Reference {
         class: usize,
         bits: u32,
     ) -> Result<NativeContextEvent, HnnError> {
-        self.native_current_event(resident, crib, pairing, class, bits, false)
+        self.native_current_event(
+            resident,
+            crib,
+            pairing,
+            NativeInput::Class(class),
+            bits,
+            false,
+        )
     }
     fn native_current_event(
         &self,
         resident: &mut Resident,
         crib: &mut observed::ObservedCrib,
         pairing: &crate::hnn::paired::PairingDeclaration,
-        class: usize,
+        choice: NativeInput<'_>,
         bits: u32,
         actual: bool,
     ) -> Result<NativeContextEvent, HnnError> {
@@ -171,13 +187,29 @@ impl Reference {
                 reason: "native event uses its unchanged original input chart",
             });
         }
-        let target = boundary.encode(&[class])?;
+        if let NativeInput::Class(class) = &choice {
+            boundary.encode(&[*class])?;
+        }
         let chart = boundary.encode(&[])?;
         let predictor = self.prepare_native_current_prediction(
             &next,
             NativeExecutionChart::ExactUnsplit,
             bits,
         )?;
+        let draw = match choice {
+            NativeInput::Class(_) => None,
+            NativeInput::Key(key) => Some(predictor.draw(0, key)?),
+        };
+        let class =
+            match choice {
+                NativeInput::Class(c) => c,
+                NativeInput::Key(_) => draw.as_ref().and_then(|d| d.drawn_class()).ok_or(
+                    HnnError::Unadmitted {
+                        reason: "native CDF retains an unresolved key without hypothesis ingress",
+                    },
+                )?,
+            };
+        let target = boundary.encode(&[class])?;
         let prepared = predictor
             .prepared_cut()
             .cloned()
@@ -244,6 +276,240 @@ impl Reference {
             preparation,
             contact,
             input: ingested,
+            selected_class: class,
+            draw,
         })
+    }
+}
+
+/// One physical receiver barrier. Only NEW actual inputs after the preceding contact cut
+/// enter this R-only section. No old prediction is rebound and no C/K/D step is staged.
+pub struct NativeReceivingSectionEvent {
+    pub events: Vec<NativeContextEvent>,
+    pub publication: crate::hnn::constitution::DepositReading,
+    pub start_source: u64,
+    pub end_source: u64,
+    pub declared_section_cells: u64,
+    pub contact_prefix_cells: u64,
+}
+impl Reference {
+    pub fn observe_native_current_section(
+        &self,
+        resident: &mut Resident,
+        crib: &mut observed::ObservedCrib,
+        pairing: &crate::hnn::paired::PairingDeclaration,
+        classes: &[usize],
+        bits: u32,
+    ) -> Result<NativeReceivingSectionEvent, HnnError> {
+        use crate::hnn::constitution::{
+            Locus,
+            epoch::{ObservedNormalEpochStage, partition_exponent},
+        };
+        let mut next = resident.clone();
+        let mut next_crib = crib.clone();
+        next.admit_exact_current()?;
+        let (_, start) = next.continuing().ok_or(HnnError::Unadmitted {
+            reason: "native section retains ONE continuing source",
+        })?;
+        let receiver = next
+            .admitted
+            .first()
+            .ok_or(HnnError::Unadmitted {
+                reason: "one native receiver section",
+            })?
+            .ring();
+        let width = next.field.rings()[..receiver]
+            .iter()
+            .try_fold(1u64, |n, r| {
+                n.checked_mul(r.period()).ok_or(HnnError::CountOverflow)
+            })?;
+        let remainder = start % width;
+        let wanted = width - remainder;
+        if classes.len() as u64 != wanted {
+            return Err(HnnError::Unadmitted {
+                reason: "native R consumes exactly the NEW suffix to the original physical receiver barrier",
+            });
+        }
+        if next.prepared_input.as_ref().is_none_or(|p| {
+            p.context_chart() != prepared_input::ContextChart::LaggedReceiverBoundaryV1
+                || p.mode() != prepared_input::PrefixMode::Training
+        }) {
+            return Err(HnnError::Unadmitted {
+                reason: "native R is an actual-input consequence of its versioned native model",
+            });
+        }
+        let mut packets = Vec::new();
+        let mut events = Vec::new();
+        let producing = next.constitution.clone();
+        for &class in classes {
+            let boundary = crate::hnn::encoding::observed::PairedObservation::admit(
+                &next.field,
+                &next.constitution,
+                pairing,
+            )?;
+            let target = boundary.encode(&[class])?;
+            let chart = boundary.encode(&[])?;
+            let predictor = self.prepare_native_current_prediction(
+                &next,
+                NativeExecutionChart::ExactUnsplit,
+                bits,
+            )?;
+            let prepared = predictor
+                .prepared_cut()
+                .cloned()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "the actual native R Word keeps its original preparation",
+                })?;
+            let lag = predictor.lagged_boundary(prepared_input::PrefixRole::Observed)?;
+            let (carry, forward, preparation) = predictor.forward_receipt()?;
+            let prediction = predictor.reading();
+            let returned = predictor.observe(&target)?;
+            let scores = returned.scores().to_vec();
+            packets.push(returned.into_receiving_packet()?);
+            next.publish_reception(
+                None,
+                crate::holon::HolonState {
+                    commit: next.constitution.commit(),
+                    configuration: carry,
+                },
+                None,
+                None,
+                &chart,
+            )?;
+            let input =
+                self.ingest_class_step_deferred(&mut next, &mut next_crib, pairing, class, None)?;
+            let owner = next
+                .prepared_input
+                .as_mut()
+                .expect("same native context owner");
+            owner.after_actual(prepared, class)?;
+            owner.install_reached_lag(lag)?;
+            if next.constitution != producing {
+                return Err(HnnError::Unadmitted {
+                    reason: "no material commit can rebind the native R section's earlier predictions",
+                });
+            }
+            events.push(NativeContextEvent {
+                prediction,
+                scores,
+                forward,
+                preparation,
+                contact: None,
+                input,
+                selected_class: class,
+                draw: None,
+            });
+        }
+        let (_, deposits, records) =
+            crate::hnn::word::native_prediction::NativeRPacket::section(packets)?;
+        let tree = producing
+            .landmarks(receiver)
+            .ok_or(HnnError::Unadmitted {
+                reason: "the native R publication retains its existing unused legacy tree",
+            })?
+            .clone();
+        let retained = std::iter::once(Locus::ReceivingMap(receiver)).collect();
+        let period = next.field.ring(receiver).period();
+        // ArrivalContext has two block crossing counters, not a Single-law counter.
+        // The actual original source frontier owns this physical receiver section.
+        let index = start / width;
+        let exponent = partition_exponent(producing.observed_epoch_grain(receiver)?, width, index)?;
+        let pair_speed = |_a: usize,
+                          _b: usize,
+                          _p: &crate::hnn::moment::PairPort,
+                          _m: [&[Vec<Rat>]; 3]|
+         -> Result<[Rat; 2], HnnError> {
+            Err(HnnError::Unadmitted {
+                reason: "native R-only publication cannot request a source pair update",
+            })
+        };
+        let execution = crate::hnn::reference::observed::HostObservedEpochExecution;
+        let mut stage = ObservedNormalEpochStage::new(
+            &producing,
+            &deposits,
+            receiver,
+            period,
+            wanted,
+            width,
+            index,
+            exponent,
+            &retained,
+            tree,
+            &pair_speed,
+            &records,
+            &execution,
+            false,
+        )?
+        .for_local_receiving_hold()?;
+        let candidate = stage
+            .stage_local_receiving_with_hold(&mut |_| {})
+            .map_err(|f| f.error)?;
+        let (material, publication) = candidate.admit_receiving()?;
+        let chart = next.native_context_chart()?.ok_or(HnnError::Unadmitted {
+            reason: "native section retains its original input chart",
+        })?;
+        let carry = next.carried.clone().ok_or(HnnError::Unadmitted {
+            reason: "native R publishes after its actual blind carried endpoint",
+        })?;
+        next.publish_receiving_translation(
+            material.clone(),
+            crate::holon::HolonState {
+                commit: material.commit(),
+                configuration: carry,
+            },
+            &chart,
+        )?;
+        let end = next
+            .continuing()
+            .ok_or(HnnError::Unadmitted {
+                reason: "native closing source",
+            })?
+            .1;
+        if end != start.checked_add(wanted).ok_or(HnnError::CountOverflow)? || end % width != 0 {
+            return Err(HnnError::Unadmitted {
+                reason: "native R closes the original section without replay, flush or target omission",
+            });
+        }
+        if next.aeon.awaiting {
+            self.close_deferred_native_input(&mut next, &mut next_crib, pairing)?;
+        }
+        *resident = next;
+        *crib = next_crib;
+        Ok(NativeReceivingSectionEvent {
+            events,
+            publication,
+            start_source: start,
+            end_source: end,
+            declared_section_cells: width,
+            contact_prefix_cells: remainder,
+        })
+    }
+}
+
+#[derive(Clone, Copy)]
+enum NativeInput<'a> {
+    Class(usize),
+    Key(&'a Rat),
+}
+impl Reference {
+    /// The one F producer draws, scores and advances its actual frozen hypothesis prefix.
+    pub fn release_native_current_forecast(
+        &self,
+        resident: &mut Resident,
+        crib: &mut observed::ObservedCrib,
+        pairing: &crate::hnn::paired::PairingDeclaration,
+        key: &Rat,
+        bits: u32,
+    ) -> Result<NativeContextEvent, HnnError> {
+        if resident
+            .prepared_input
+            .as_ref()
+            .is_none_or(|p| p.forecast_role != prepared_input::PrefixRole::Hypothesized)
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "native release is explicitly hypothetical after frozen conditioning",
+            });
+        }
+        self.native_current_event(resident, crib, pairing, NativeInput::Key(key), bits, false)
     }
 }

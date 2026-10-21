@@ -209,7 +209,7 @@ fn prepare(
     for p in stage.receiving_parts {
         p.law.admit_policy(owner.return_policy())?;
         p.law.admit_owner(receiver, opening.commit(), owner.map())?;
-        if p.law.retained_origin().is_none() {
+        if !p.law.has_numerical_origin() {
             return Err(refused("paired local epoch uses retained full-section law"));
         }
     }
