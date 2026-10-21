@@ -1,0 +1,47 @@
+{
+  "predecessor_source": "0523b142138929e74d4356b6b0391a0bbee6b76b",
+  "checked": [
+    [
+      "host-reference",
+      "fresh.state"
+    ],
+    [
+      "host-reference",
+      "cut-00000.state"
+    ],
+    [
+      "host-reference",
+      "cut-00013.state"
+    ],
+    [
+      "host-reference",
+      "cut-00040.state"
+    ],
+    [
+      "host-reference",
+      "trained.state"
+    ],
+    [
+      "cuda-observed-epoch-device0",
+      "fresh.state"
+    ],
+    [
+      "cuda-observed-epoch-device0",
+      "cut-00000.state"
+    ],
+    [
+      "cuda-observed-epoch-device0",
+      "cut-00013.state"
+    ],
+    [
+      "cuda-observed-epoch-device0",
+      "cut-00040.state"
+    ],
+    [
+      "cuda-observed-epoch-device0",
+      "trained.state"
+    ]
+  ],
+  "native_M_crib_pending_bytes": "exact; only exterior provenance omitted",
+  "new_dataset_or_model_job": false
+}

@@ -140,10 +140,33 @@ impl EmpiricalMaterial {
         Ok(next)
     }
     pub(super) fn fit(&mut self, bounds: &ContextualBounds) -> Result<(), HnnError> {
+        self.fit_with_real_reuse(bounds, true)
+    }
+    /// All-real moments have two identical, uncoupled interleaved real blocks.
+    /// Only exact-zero imaginary operands qualify; complex material keeps the
+    /// original realification. This is arithmetic reuse, not a changed fit law.
+    fn fit_with_real_reuse(
+        &mut self,
+        bounds: &ContextualBounds,
+        allow_real_reuse: bool,
+    ) -> Result<(), HnnError> {
         let m = self.h.len();
-        let d = 2 * m;
+        let full_dimension = 2 * m;
+        let all_real = allow_real_reuse
+            && self
+                .h
+                .iter()
+                .chain(&self.b)
+                .chain(&self.applied)
+                .flatten()
+                .all(|z| z[1].is_zero());
+        let d = if all_real { m } else { full_dimension };
+        #[cfg(test)]
+        fit_work::begin(d, self.b.len(), all_real);
         let scale = Rat::from_integer(BigInt::one() << bounds.precision_bits);
         let grid = |v: Rat| {
+            #[cfg(test)]
+            fit_work::grid();
             let q = v * &scale;
             Rat::new(q.numer() / q.denom(), scale.numer().clone())
         };
@@ -151,8 +174,12 @@ impl EmpiricalMaterial {
         let mut a = vec![vec![Rat::zero(); d]; d];
         for (i, r) in a.iter_mut().enumerate() {
             for (j, v) in r.iter_mut().enumerate() {
-                let z = &self.h[i / 2][j / 2];
-                *v = grid(if i % 2 == j % 2 {
+                let z = if all_real {
+                    &self.h[i][j]
+                } else {
+                    &self.h[i / 2][j / 2]
+                };
+                *v = grid(if all_real || i % 2 == j % 2 {
                     z[0].clone()
                 } else if i % 2 == 0 {
                     -z[1].clone()
@@ -160,7 +187,9 @@ impl EmpiricalMaterial {
                     z[1].clone()
                 });
                 if i == j {
-                    *v += Rat::from_integer(BigInt::from(d)) / &scale;
+                    // Keep the ORIGINAL 2m/scale majorant. Using m here would
+                    // change the rounded proposal, its residual and cold bytes.
+                    *v += Rat::from_integer(BigInt::from(full_dimension)) / &scale;
                 }
             }
         }
@@ -183,10 +212,13 @@ impl EmpiricalMaterial {
             }
         }
         for (row, b) in self.applied.iter_mut().zip(&self.b) {
-            let mut rhs: Vec<_> = b
-                .iter()
-                .flat_map(|z| [grid(z[0].clone()), grid(-z[1].clone())])
-                .collect();
+            let mut rhs: Vec<_> = if all_real {
+                b.iter().map(|z| grid(z[0].clone())).collect()
+            } else {
+                b.iter()
+                    .flat_map(|z| [grid(z[0].clone()), grid(-z[1].clone())])
+                    .collect()
+            };
             for i in 0..d {
                 for j in 0..i {
                     let term = grid(&a[i][j] * &rhs[j]);
@@ -201,7 +233,11 @@ impl EmpiricalMaterial {
                 }
             }
             for (j, z) in row.iter_mut().enumerate() {
-                *z = [v[2 * j].clone(), -v[2 * j + 1].clone()];
+                *z = if all_real {
+                    [v[j].clone(), Rat::zero()]
+                } else {
+                    [v[2 * j].clone(), -v[2 * j + 1].clone()]
+                };
             }
         }
         let mut residual = Rat::zero();
@@ -224,6 +260,166 @@ impl EmpiricalMaterial {
                 .chain(std::iter::once(&self.residual_upper)),
         )?;
         Ok(())
+    }
+}
+
+/// Scoped test observations only; never part of material/codec/publication state.
+#[cfg(test)]
+mod fit_work {
+    #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+    pub(super) struct Reading {
+        pub dimension: usize,
+        pub right_hand_sides: usize,
+        pub real_reuse: bool,
+        pub grid_calls: u64,
+    }
+    std::thread_local! {
+        static WORK: std::cell::Cell<Reading> = const { std::cell::Cell::new(Reading {
+            dimension: 0, right_hand_sides: 0, real_reuse: false, grid_calls: 0,
+        }) };
+    }
+    pub(super) fn begin(dimension: usize, right_hand_sides: usize, real_reuse: bool) {
+        WORK.with(|c| {
+            c.set(Reading {
+                dimension,
+                right_hand_sides,
+                real_reuse,
+                grid_calls: 0,
+            })
+        });
+    }
+    pub(super) fn grid() {
+        WORK.with(|c| {
+            let mut r = c.get();
+            r.grid_calls += 1;
+            c.set(r);
+        });
+    }
+    pub(super) fn reading() -> Reading {
+        WORK.with(|c| c.get())
+    }
+}
+
+#[cfg(test)]
+mod real_reuse_tests {
+    use super::*;
+    use std::time::Instant;
+
+    fn bounds() -> ContextualBounds {
+        ContextualBounds {
+            branches: 1,
+            pending: 8,
+            precision_bits: 20,
+            rational_bits: 1024,
+            max_features: 32,
+            max_scalar_work: 1_000_000,
+        }
+    }
+    fn feature(arrival: i64) -> Vec<Complex> {
+        (0..25)
+            .map(|j| {
+                [
+                    Rat::new(
+                        BigInt::from((j + 2 * arrival) % 9 - 4),
+                        BigInt::one() << ((j + arrival) % 4) as usize,
+                    ),
+                    Rat::zero(),
+                ]
+            })
+            .collect()
+    }
+    #[test]
+    fn all_real_reuse_preserves_complete_material_cold_bytes_and_measured_work() {
+        let bounds = bounds();
+        let mut material = EmpiricalMaterial::found(25, 4);
+        for n in 0..8 {
+            let eta: Vec<_> = (0..4)
+                .map(|j| {
+                    [
+                        Rat::new(BigInt::from(j - n + 1), BigInt::from(8)),
+                        Rat::zero(),
+                    ]
+                })
+                .collect();
+            material = material.stage(&feature(n), &eta, &bounds).unwrap();
+            let mut legacy = material.clone();
+            legacy.fit_with_real_reuse(&bounds, false).unwrap();
+            assert_eq!(
+                material, legacy,
+                "all original moments and applied fit at each arrival"
+            );
+            assert_eq!(material.checkpoint_text(), legacy.checkpoint_text());
+        }
+        let mut old_ns = Vec::new();
+        let mut new_ns = Vec::new();
+        let mut old_work = Vec::new();
+        let mut new_work = Vec::new();
+        for trial in 0..5 {
+            // Alternate order at identical geometry; cloning is outside both timed fits.
+            let mut old = material.clone();
+            let mut new = material.clone();
+            for fast in if trial % 2 == 0 {
+                [false, true]
+            } else {
+                [true, false]
+            } {
+                let target = if fast { &mut new } else { &mut old };
+                let at = Instant::now();
+                target.fit_with_real_reuse(&bounds, fast).unwrap();
+                let elapsed = at.elapsed().as_nanos();
+                let work = fit_work::reading();
+                if fast {
+                    new_ns.push(elapsed);
+                    new_work.push(work);
+                } else {
+                    old_ns.push(elapsed);
+                    old_work.push(work);
+                }
+            }
+            assert_eq!(old, new);
+            assert_eq!(old.checkpoint_text(), new.checkpoint_text());
+        }
+        assert!(
+            old_work
+                .iter()
+                .all(|r| r.dimension == 50 && !r.real_reuse && r.right_hand_sides == 4)
+        );
+        assert!(
+            new_work
+                .iter()
+                .all(|r| r.dimension == 25 && r.real_reuse && r.right_hand_sides == 4)
+        );
+        assert!(
+            old_work
+                .iter()
+                .zip(&new_work)
+                .all(|(a, b)| a.grid_calls > b.grid_calls)
+        );
+        assert!(material.applied.iter().flatten().all(|z| z[1].is_zero()));
+        let saved = material.checkpoint_text();
+        let cold = EmpiricalMaterial::restored_text(&saved, 25, 4, &bounds).unwrap();
+        assert_eq!(cold, material);
+        assert_eq!(saved, cold.checkpoint_text());
+        // Changed complex context must choose the unchanged generic algorithm.
+        let mut f = feature(8);
+        f[0][1] = Rat::new(1.into(), 8.into());
+        let complex = material
+            .stage(&f, &vec![[Rat::one(), Rat::zero()]; 4], &bounds)
+            .unwrap();
+        let mut fast = complex.clone();
+        fast.fit_with_real_reuse(&bounds, true).unwrap();
+        let complex_work = fit_work::reading();
+        let mut old = complex.clone();
+        old.fit_with_real_reuse(&bounds, false).unwrap();
+        assert!(!complex_work.real_reuse);
+        assert_eq!(complex_work, fit_work::reading());
+        assert_eq!(fast, old);
+        assert_eq!(fast.checkpoint_text(), old.checkpoint_text());
+        let separated = new_ns.iter().max().unwrap() < old_ns.iter().min().unwrap();
+        eprintln!(
+            "REAL_MATERIAL_REUSE old_ns={old_ns:?} new_ns={new_ns:?} old_work={old_work:?} new_work={new_work:?} timing_ranges_separated={separated} changed_complex_fallback={complex_work:?} actual_observations={} cold_exact=true",
+            material.observations
+        );
     }
 }
 

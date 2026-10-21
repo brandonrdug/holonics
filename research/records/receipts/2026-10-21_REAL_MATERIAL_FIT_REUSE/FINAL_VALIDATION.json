@@ -1,0 +1,376 @@
+{
+  "kind": "V93 all-real empirical fit arithmetic reuse CODE closure",
+  "parent_source": "0523b142138929e74d4356b6b0391a0bbee6b76b",
+  "host_gates_pass": 22,
+  "doctests_pass": 64,
+  "host_gate_markers": [
+    {
+      "scope": "check",
+      "ms": 18941,
+      "receipt": "code-02-required-host-gates"
+    },
+    {
+      "scope": "guard-lints",
+      "ms": 27505,
+      "receipt": "code-02-required-host-gates"
+    },
+    {
+      "scope": "guard-doctests",
+      "ms": 60892,
+      "receipt": "code-02-required-host-gates"
+    },
+    {
+      "scope": "diagnostic-timing-controls",
+      "ms": 7191,
+      "receipt": "code-02-required-host-gates"
+    },
+    {
+      "scope": "diagnostic-supervisor-controls",
+      "ms": 167,
+      "receipt": "code-02-required-host-gates"
+    },
+    {
+      "scope": "diagnostic-receipt-controls",
+      "ms": 223,
+      "receipt": "code-02-required-host-gates"
+    },
+    {
+      "scope": "listener-continuation-controls",
+      "ms": 69903,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "projected-statistics-controls",
+      "ms": 86,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "native-class-advance-controls",
+      "ms": 50,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "native-gram-carry-conservation",
+      "ms": 48,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "finite-solenoidal-controls",
+      "ms": 64,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "rational-place-controls",
+      "ms": 46,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "plural-coupling-controls",
+      "ms": 53,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "grouped-tube-controls",
+      "ms": 140,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "observed-tube-controls",
+      "ms": 347,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "source-refinement-controls",
+      "ms": 51,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "actual-source-alignment",
+      "ms": 50,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "actual-ray-joint-controls",
+      "ms": 52,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "actual-factor-refusal",
+      "ms": 50,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "refined-source-native-restore",
+      "ms": 64,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "solenoidal-listener-controls",
+      "ms": 49,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    },
+    {
+      "scope": "offline-coupling-controls",
+      "ms": 261,
+      "receipt": "code-03-only-missing-gates-and-complex-control"
+    }
+  ],
+  "focused_fit": "complete material/cold bytes match original realification across8successive arrivals and5matched fits; complex fallback exact",
+  "fit_measurement": {
+    "kind": "isolated instrumented same-geometry CODE fit; not whole-command speedup",
+    "sources": 25,
+    "targets": 4,
+    "majorant_dimension": 50,
+    "grid_calls": {
+      "original": 55575,
+      "guarded": 8725
+    },
+    "factor_dimension": {
+      "original": 50,
+      "guarded": 25
+    },
+    "original_fit_ns": [
+      62216125,
+      61481620,
+      62018085,
+      61132165,
+      60105072
+    ],
+    "guarded_fit_ns": [
+      24993312,
+      24934663,
+      24637857,
+      25385437,
+      24364194
+    ],
+    "ranges_separated": true,
+    "median_original_ns": 61481620,
+    "median_guarded_ns": 24934663,
+    "original_moments_applied_residual_codec": "exact across8successive arrivals and5pairedfit repetitions",
+    "cold": "exact material bytes",
+    "changed_complex_context": "original50dimension fallback; exact outputs",
+    "reused_structure": "identical uncoupled all-real blocks within one fit; no cross-event memoization",
+    "predictive_or_language_gain": "not assessed"
+  },
+  "whole_command_timing": {
+    "kind": "matched unchanged40class full command; one historical and one current sample perbackend, not randomized timing replicates",
+    "values": {
+      "host-reference": {
+        "predecessor_command_ns": 5122560539,
+        "current_command_ns": 3582868471,
+        "actual_cells": 40,
+        "actual_epochs": 4,
+        "workers": 4,
+        "cold_exact": true
+      },
+      "cuda-observed-epoch-device0": {
+        "predecessor_command_ns": 5250418083,
+        "current_command_ns": 3727878281,
+        "actual_cells": 40,
+        "actual_epochs": 4,
+        "workers": 4,
+        "cold_exact": true
+      }
+    },
+    "fit_level_repetition": "FIT_REUSE_MEASUREMENT.json",
+    "training_budget_target_ns": 3400000000,
+    "target_met": {
+      "host-reference": false,
+      "cuda-observed-epoch-device0": false
+    },
+    "scope": "no dataset throughput/ETA or CUDA speedup claim; native/M/crib/pending bytes exact against predecessor",
+    "next_language_proposal": "NOT_READY; no launch authority"
+  },
+  "shared_exterior": "3actual supported host/card controls PASS: Single40full training/cold, Arrival10dual-lane Word/return with paired-R publication still refused, late10cardaggregate atomic rollback",
+  "predecessor_native_M_crib_pending": "10checkpointpayloads exact at bothbackends: fresh/cut0/cut13/cut40/trained; exterior provenance omitted",
+  "final_host": "combined40class/4section training+cold13+8output/nonbytecold PASS",
+  "optimized_binaries": "host and CUDA wrapper built",
+  "CODE": {
+    "cap_ns": 600000000000,
+    "charged_ns": 409975822822,
+    "unused_ns": 190024177178,
+    "closed": true,
+    "unused_not_model_authority": true,
+    "attempts": [
+      {
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "holonics",
+          "--lib",
+          "all_real_reuse_preserves_complete_material_cold_bytes_and_measured_work",
+          "--",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "limit_s": 180,
+        "wall_ns": 102597244456,
+        "peak_rss_bytes": 3003662336,
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "samples": 1022,
+        "exit": 0,
+        "stop": null,
+        "owned_cleanup_remaining": [],
+        "ledger_before_ns": 0,
+        "ledger_after_ns": 102597244456,
+        "model_jobs": 0,
+        "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt",
+        "name": "code-01-exact-real-fit-controls"
+      },
+      {
+        "command": [
+          "bash",
+          "tools/gate.sh"
+        ],
+        "limit_s": 180,
+        "wall_ns": 180060162548,
+        "peak_rss_bytes": 2491138048,
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "samples": 1793,
+        "exit": -9,
+        "stop": "fixed_deadline",
+        "owned_cleanup_remaining": [
+          1174,
+          1180
+        ],
+        "ledger_before_ns": 102597244456,
+        "ledger_after_ns": 282657407004,
+        "model_jobs": 0,
+        "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt",
+        "name": "code-02-required-host-gates"
+      },
+      {
+        "command": [
+          "bash",
+          "<CODE-artifacts>/missing-gates.sh"
+        ],
+        "limit_s": 100,
+        "wall_ns": 71387081291,
+        "peak_rss_bytes": 286986240,
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "samples": 711,
+        "exit": 0,
+        "stop": null,
+        "owned_cleanup_remaining": [],
+        "ledger_before_ns": 282657407004,
+        "ledger_after_ns": 354044488295,
+        "model_jobs": 0,
+        "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt",
+        "name": "code-03-only-missing-gates-and-complex-control"
+      },
+      {
+        "command": [
+          "python3",
+          "<CODE-artifacts>/host_gpu_guard.py"
+        ],
+        "limit_s": 180,
+        "wall_ns": 28012552792,
+        "peak_rss_bytes": 40374272,
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "samples": 266,
+        "exit": 0,
+        "stop": null,
+        "owned_cleanup_remaining": [],
+        "ledger_before_ns": 354044488295,
+        "ledger_after_ns": 382057041087,
+        "model_jobs": 0,
+        "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt",
+        "name": "code-04-supported-shared-host-card-parity"
+      },
+      {
+        "command": [
+          "bash",
+          "<CODE-artifacts>/final-host-and-binaries.sh"
+        ],
+        "limit_s": 90,
+        "wall_ns": 2511681773,
+        "peak_rss_bytes": 427581440,
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "samples": 25,
+        "exit": 101,
+        "stop": null,
+        "owned_cleanup_remaining": [],
+        "ledger_before_ns": 382057041087,
+        "ledger_after_ns": 384568722860,
+        "model_jobs": 0,
+        "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt",
+        "name": "code-05-final-shared-host-and-optimized-binaries"
+      },
+      {
+        "command": [
+          "bash",
+          "<CODE-artifacts>/final-host-and-binaries-explicit-artifacts.sh"
+        ],
+        "limit_s": 90,
+        "wall_ns": 25407099962,
+        "peak_rss_bytes": 595300352,
+        "cpu_affinity": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "samples": 253,
+        "exit": 0,
+        "stop": null,
+        "owned_cleanup_remaining": [],
+        "ledger_before_ns": 384568722860,
+        "ledger_after_ns": 409975822822,
+        "model_jobs": 0,
+        "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt",
+        "name": "code-06-explicit-artifact-host-and-binaries"
+      }
+    ]
+  },
+  "preserved_failures": {
+    "code02": "fixed180s gate stop;6scopepasses retained; listed sandboxPIDs1174/1180 no matching owned HOST process; only16missing scopes completed",
+    "code05": "AlreadyExists defaultPID/tmp output path before nativework;2.511681773s charged; additive explicit new root in06PASS"
+  },
+  "counts_scope": "test-local rounded grid calls/factor dimension/RHS count; unchanged exact residual work not separately instrumented",
+  "timing_scope": "five repeated instrumented fit pairs; whole commands one historical/current sample perbackend, not randomized replicates or dataset ETA",
+  "unchanged": "unitprior H/B/C/observations/appliedM/fitresidual, actual M+R/tree/population law and frozen E/C/K/D, prepared Word/work/return/current/carry, codec",
+  "supported_CUDA": "HOST executor with normal escalation, project GPU lock/no foreign compute/display permitted; sandbox NVIDIAerror9 is access evidence only",
+  "resource_notes": {
+    "host_cores": 4,
+    "host_bytes": 8589934592,
+    "sampled_device_bytes": 8589934592,
+    "GPU_guard_peak_group_RSS_bytes": 597262336,
+    "GPU_guard_peak_owned_MiB": 260
+  },
+  "cleanup": {
+    "owned_processes_remaining": [],
+    "GPU_compute_final": []
+  },
+  "full_ignored_GPU_suite": "UNRUN",
+  "global_kernel_or_sync_census": "unmeasured",
+  "next_experiment": "NOT_READY;512cells/zeroM/readout/pool driver missing;1800s candidate budget unapproved; both current40class timings miss3.4s planningtarget",
+  "model_jobs": 0,
+  "uploads": 0,
+  "cloud_operations": 0
+}

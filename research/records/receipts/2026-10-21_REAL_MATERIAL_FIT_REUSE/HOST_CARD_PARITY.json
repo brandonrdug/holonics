@@ -1,0 +1,35 @@
+{
+  "epochs": 4,
+  "matched_exact_fields": [
+    "actual_preparation_and_energy",
+    "retained_section_return",
+    "prequential_readings",
+    "actual_normal_comparison",
+    "actual_joint_comparison",
+    "actual_receiving_only_comparison"
+  ],
+  "native_cold_checkpoints": "opening/cut13/trained40 compared by shared exterior control",
+  "native_E_C_K_D_held": true,
+  "device": {
+    "backend": "cuda-observed-epoch-device0",
+    "device_ordinal": 0,
+    "host_fallback": false,
+    "completed": true,
+    "successful_card_forwards": 40,
+    "successful_retained_card_returns": 40,
+    "successful_card_aggregates": 4,
+    "host_owned": "empirical M formation/authentic opening work; scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks",
+    "device_forward_reading": {
+      "successful_forwards": 40,
+      "opening_packets": 38,
+      "opening_preparation_host_ns": 51469569,
+      "mounted_execute_ns": 93432409,
+      "native_word_forward_launches": 40,
+      "fresh_response_forward_subset": 0,
+      "forward_phase_transfer_octets": 470432,
+      "response_forward_transfer_subset_octets": 0
+    }
+  },
+  "global_sync_census": "unmeasured; no zero or speedup inferred",
+  "output_sampling": "host consumer; not CUDA sampling parity"
+}

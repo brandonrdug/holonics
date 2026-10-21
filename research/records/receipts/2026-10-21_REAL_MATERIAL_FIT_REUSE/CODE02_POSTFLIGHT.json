@@ -1,0 +1,9 @@
+{
+  "kind": "supported HOST read-only postflight; sandbox identifiers not assumed host PIDs",
+  "listed_sandbox_pids": [
+    1174,
+    1180
+  ],
+  "matching_owned_host_processes": [],
+  "utc": "2026-10-21T02:31:45.327745+00:00"
+}

@@ -1,0 +1,30 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "holonics",
+    "--lib",
+    "all_real_reuse_preserves_complete_material_cold_bytes_and_measured_work",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "limit_s": 180,
+  "wall_ns": 102597244456,
+  "peak_rss_bytes": 3003662336,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 1022,
+  "exit": 0,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 0,
+  "ledger_after_ns": 102597244456,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}
