@@ -1,0 +1,30 @@
+{
+  "kind": "actual native five-arm128cell serial-versus-fourfork equal-work comparison",
+  "all_output_bytes_final_native_states_cribs_exact": true,
+  "canonical_order": [
+    "native-0",
+    "native-1",
+    "native-2",
+    "native-3",
+    "zero-m-0"
+  ],
+  "serial_elapsed_ns": 95743999275,
+  "pool_elapsed_ns": 38906360976,
+  "serial_peak_RSS_bytes": 67330048,
+  "pool_peak_RSS_bytes": 121561088,
+  "serial_OS_CPU": {
+    "controller_user": 0.45,
+    "controller_system": 0.24,
+    "children_user": 93.62,
+    "children_system": 0.51
+  },
+  "pool_OS_CPU": {
+    "controller_user": 0.27,
+    "controller_system": 0.13,
+    "children_user": 95.51,
+    "children_system": 0.5
+  },
+  "scope": "one matched serial/pool pair; same5arms/640decisions/160bytes, actual cold native0+zeroM. Scheduling improvement, not training/CUDA speedup or predictive gain.",
+  "fourCPU_eightGiB": "controller+children bound and measured",
+  "targets_or_scorer": false
+}

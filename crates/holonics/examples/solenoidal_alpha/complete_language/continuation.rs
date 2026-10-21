@@ -18,6 +18,7 @@ use std::path::Path;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(super) enum SamplingPolicy {
     NativeFullFibre,
+    NativeZeroMControl,
     FoundingRAtSameHistory,
     Tree,
 }
@@ -26,6 +27,7 @@ impl SamplingPolicy {
     pub(super) fn label(self) -> &'static str {
         match self {
             Self::NativeFullFibre => "trained-native-full-fibre",
+            Self::NativeZeroMControl => "trained-native-zero-M-control",
             Self::FoundingRAtSameHistory => "founding-R-same-history",
             Self::Tree => "executed-tree",
         }
@@ -36,7 +38,7 @@ impl SamplingPolicy {
         reading: &'a holonics::hnn::receiving::cells::diagnostic::RetainedReceiverDiagnostic,
     ) -> &'a [ExactInterval] {
         match self {
-            Self::NativeFullFibre => &reading.native.native_masses,
+            Self::NativeFullFibre | Self::NativeZeroMControl => &reading.native.native_masses,
             Self::FoundingRAtSameHistory => &reading.control.native_masses,
             Self::Tree => &reading.native.tree_masses,
         }
@@ -99,6 +101,35 @@ struct OneCell {
     diagnostic: holonics::hnn::receiving::cells::diagnostic::RetainedReceiverDiagnostic,
     receipt: Option<holonics::hnn::reference::observed::ReceiverPrefixReceipt>,
     stop: &'static str,
+}
+
+fn frozen_material_identity(resident: &Resident) -> Vec<String> {
+    let c = resident.constitution();
+    let mut out = vec![format!("{}", c.commit())];
+    for ring in 0..resident.field().rings().len() {
+        out.push(format!(
+            "{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}|{:?}",
+            c.receiving_law(ring),
+            c.source_law(ring),
+            c.contrast_law(ring),
+            c.receiving_phase_statistics(ring),
+            c.standing(ring),
+            c.passive_factor(ring),
+            c.slices(ring),
+            c.source_symmetry(ring),
+            c.ring_resonator(ring),
+            c.transport(ring)
+        ));
+    }
+    for contact in 0..resident.field().contacts().len() {
+        out.push(format!(
+            "{:?}|{:?}|{:?}",
+            c.contact_storage(contact),
+            c.contact_stiffness(contact),
+            c.contact_dissipation(contact)
+        ));
+    }
+    out
 }
 
 fn native_and_crib_hashes(
@@ -233,16 +264,20 @@ fn advance_one(
         .ok_or("the conditional path has no admitted receiver")?
         .clone();
     let (pending, _) = reference.refine(resident, &moment, &phases)?;
-    let diagnostic = reference.diagnose_pending_readout_at_receiver(
+    let producer = reference.prepare_receiver_prefix(
         resident,
-        &pending,
+        crib,
+        pairing,
+        pending,
         control_map,
         receiver,
         holonics::ratio::exponentiated::READING_BITS,
+        None,
     )?;
+    let diagnostic = producer.diagnostic().clone();
     let decision = holonics::receiver::release::draw(policy.masses(&diagnostic), key)?;
     let holonics::receiver::release::ReleaseReturn::Drawn(certified) = decision else {
-        reference.discard(resident, holonics::hnn::port::Handle::Pending(pending))?;
+        producer.discard()?;
         return Ok(OneCell {
             class: None,
             certified: None,
@@ -252,9 +287,7 @@ fn advance_one(
         });
     };
     let class = certified.class;
-    let receipt = reference.receive_receiver_prefix_continuing(
-        resident, crib, pairing, pending, class, receiver, None,
-    )?;
+    let receipt = producer.receive(class)?;
     Ok(OneCell {
         class: Some(class),
         certified: Some(certified),
@@ -332,18 +365,77 @@ pub(super) fn sample_continuing(
     let reference = port();
     let (field, founding, pairing) = declaration(checkpoint.population)?;
     let (mut resident, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
-    for class in digits(prompt) {
+    if policy == SamplingPolicy::NativeZeroMControl {
+        resident.zero_prepared_forecast_control()?;
+    }
+    let frozen_native = frozen_material_identity(&resident);
+    let frozen_empirical = resident.prepared_input().map(|p| p.material().clone());
+    for (conditioning_index, class) in digits(prompt).into_iter().enumerate() {
         if resident.prepared_input().is_some() {
-            let (moment, _) = resident.continuing().ok_or("conditioning requires the same native source")?;
-            let phases = resident.admitted().first().ok_or("conditioning receiver")?.clone();
-            let receiver = holonics::hnn::receiving::RetainedFibreReceiver::declare(phases.grain())?;
-            let (pending, _) = reference.refine(&mut resident, &moment, &phases)?;
-            reference.receive_receiver_prefix_continuing(&mut resident, &mut crib, &pairing, pending, class, &receiver, None)?;
+            let (moment, _) = resident
+                .continuing()
+                .ok_or("conditioning requires the same native source")?;
+            let phases = resident
+                .admitted()
+                .first()
+                .ok_or("conditioning receiver")?
+                .clone();
+            let receiver =
+                holonics::hnn::receiving::RetainedFibreReceiver::declare(phases.grain())?;
+            let (pending, refined) = reference.refine(&mut resident, &moment, &phases)?;
+            if conditioning_index == 0 {
+                let preparation = match &refined.receipt.detail {
+                    holonics::hnn::port::ReceiptDetail::Refine {
+                        source_preparation, ..
+                    } => source_preparation,
+                    _ => {
+                        return Err(
+                            "conditioning must keep actual refine preparation receipt".into()
+                        );
+                    }
+                };
+                let zero = preparation.as_ref().map_or(true, |p| {
+                    p.added.iter().all(|q| q == &Rat::from_integer(0.into()))
+                        && p.work == Rat::from_integer(0.into())
+                });
+                if policy == SamplingPolicy::NativeZeroMControl && !zero {
+                    return Err(
+                        "zero-M forecast applied nonzero preparation at first conditioning".into(),
+                    );
+                }
+                super::write_new(
+                    &output_dir.join("CONDITIONING_FIRST.json"),
+                    object(&[
+                        (
+                            "role",
+                            quoted("conditioning hypothesis, not exterior testimony"),
+                        ),
+                        ("mode", exact(&resident.prepared_input().unwrap().mode())),
+                        ("class", class.to_string()),
+                        ("preparation", exact(preparation)),
+                        ("added_and_work_zero", zero.to_string()),
+                        ("actual_produced_faces", exact(&refined.forward)),
+                        ("extra_word_or_root_calls", "0".into()),
+                    ])
+                    .as_bytes(),
+                )?;
+            }
+            reference.receive_receiver_prefix_continuing(
+                &mut resident,
+                &mut crib,
+                &pairing,
+                pending,
+                class,
+                &receiver,
+                None,
+            )?;
         } else {
             reference.ingest_class_continuing(&mut resident, &mut crib, &pairing, class, None)?;
         }
     }
-    if resident.prepared_input().is_some() { resident.begin_hypothesized_output()?; }
+    if resident.prepared_input().is_some() {
+        resident.begin_hypothesized_output()?;
+    }
     let phases = resident
         .admitted()
         .first()
@@ -571,6 +663,20 @@ pub(super) fn sample_continuing(
         }
     }
 
+    if frozen_material_identity(&resident) != frozen_native
+        || resident.prepared_input().map(|p| p.material()) != frozen_empirical.as_ref()
+    {
+        return Err("forecast altered frozen empirical or native plastic laws".into());
+    }
+    super::write_new(
+        &output_dir.join("FROZEN_MATERIAL.json"),
+        object(&[
+            ("native_laws_unchanged", "true".into()),
+            ("empirical_material_unchanged", "true".into()),
+            ("generated_classes_are_observed", "false".into()),
+        ])
+        .as_bytes(),
+    )?;
     if checkpoint.bytes()? != original_checkpoint {
         return Err("conditional output changed its immutable opening checkpoint".into());
     }
@@ -599,6 +705,16 @@ pub(super) fn sample_continuing(
 }
 
 #[cfg(test)]
-pub(super) fn code_scope_preserving_checkpoint(parent:&Checkpoint,_reference:&Reference)->Result<Checkpoint>{
-    checkpoint_at(parent,SamplingPolicy::NativeFullFibre,"synthetic",0,parent.stream.resident(),parent.stream.crib())
+pub(super) fn code_scope_preserving_checkpoint(
+    parent: &Checkpoint,
+    _reference: &Reference,
+) -> Result<Checkpoint> {
+    checkpoint_at(
+        parent,
+        SamplingPolicy::NativeFullFibre,
+        "synthetic",
+        0,
+        parent.stream.resident(),
+        parent.stream.crib(),
+    )
 }

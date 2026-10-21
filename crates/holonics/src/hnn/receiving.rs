@@ -161,7 +161,7 @@ pub use selected::{
 };
 pub(crate) use selected::prepare_retained_section;
 #[cfg(test)]
-mod reuse_work;
+pub(crate) mod reuse_work;
 mod aligned_return;
 pub use aligned_return::{RetainedSectionReturn, RetainedStationReturn};
 mod declaration;

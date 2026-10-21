@@ -17,7 +17,7 @@ mod checkpoint;
 mod diagnostic;
 mod epoch;
 pub use diagnostic::{
-    PendingReadoutDiagnostic, ReceiverPrefixReceipt, TargetPrefixReadoutControlReceipt,
+    PendingReadoutDiagnostic, ReceiverPrefixProducer, ReceiverPrefixReceipt, TargetPrefixReadoutControlReceipt,
 };
 mod tree_release;
 pub use tree_release::TreeReleaseReceipt;

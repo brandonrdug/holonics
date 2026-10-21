@@ -1,0 +1,11 @@
+{
+  "seed_ascii": "holonics-gsm8k-complete-language-v91-public-keys",
+  "index_input": "eight-byte big-endian0..511 appended toseed",
+  "digest": "SHA256 first8bytes each",
+  "bytes": 4096,
+  "sha256": "aab75418da5aaeaaec0d3c545cfe9e3a8cc2de1ff80fe0be7a7fdaa453f48cd2",
+  "first128keys_sha256": "75e63a9ab10a7db40f4b6b814634931612386a5b974863e1fc1f4f63acb2c4e1",
+  "first128_preserved": true,
+  "key_search": false,
+  "no_data_or_target_access": true
+}

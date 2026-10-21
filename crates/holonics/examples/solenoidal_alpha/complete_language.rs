@@ -65,14 +65,14 @@ fn fresh_checkpoint_at_law(
     population: u64,
     law: holonics::hnn::receiving::ReceivingLaw,
 ) -> Result<Checkpoint> {
-    fresh_checkpoint_at_law_and_scope(population,law,ObservedEpochDepositionScope::NormalMaps)
+    fresh_checkpoint_at_law_and_scope(population, law, ObservedEpochDepositionScope::NormalMaps)
 }
 
 fn fresh_checkpoint_at_law_and_scope(
-    population:u64,
-    law:holonics::hnn::receiving::ReceivingLaw,
-    scope:ObservedEpochDepositionScope,
-)->Result<Checkpoint>{
+    population: u64,
+    law: holonics::hnn::receiving::ReceivingLaw,
+    scope: ObservedEpochDepositionScope,
+) -> Result<Checkpoint> {
     let (field, initial, pairing) = declaration(population)?;
     let reference = port();
     let mut resident = reference.mount_with(&field, &Current::at_rest(&field), initial)?;
@@ -81,11 +81,7 @@ fn fresh_checkpoint_at_law_and_scope(
     reference.ingest(&mut resident, None, &boundary.encode(&[])?)?;
     Ok(Checkpoint {
         population,
-        stream: ObservedStream::new(
-            resident,
-            ObservedCrib::new(0),
-            scope,
-        )?,
+        stream: ObservedStream::new(resident, ObservedCrib::new(0), scope)?,
         provenance: "complete episodes; fresh native initializer; explicit exterior framing".into(),
     })
 }
@@ -239,11 +235,15 @@ fn causal_cut(checkpoint: &Checkpoint, next_class: Option<usize>, label: &str) -
 /// Reusable native training entry. Data are already framed and pinned by the exterior plan.
 /// Backend injection changes only the existing forward/reverse executor, not the epoch law.
 #[allow(clippy::too_many_arguments)]
-fn e_scope(scope:ObservedEpochDepositionScope,prepared:bool)->&'static str {
-    if prepared {return "class-coordinate contextual M plus local R/tree/population; native E/C/K/D held; general contextual E/family producer is a separate owner";}
-    if scope==ObservedEpochDepositionScope::LocalReceivingReturn {
+fn e_scope(scope: ObservedEpochDepositionScope, prepared: bool) -> &'static str {
+    if prepared {
+        return "class-coordinate contextual M plus local R/tree/population; native E/C/K/D held; general contextual E/family producer is a separate owner";
+    }
+    if scope == ObservedEpochDepositionScope::LocalReceivingReturn {
         "R/tree/population only; bounded addressed JointFamily E response is a separate API, not automatically produced or invoked"
-    } else { "preserved legacy normal-map reference; no generic contextual JointFamily producer" }
+    } else {
+        "preserved legacy normal-map reference; no generic contextual JointFamily producer"
+    }
 }
 
 fn train(
@@ -251,13 +251,15 @@ fn train(
     execution: &dyn ObservedEpochExecution,
     law: holonics::hnn::receiving::ReceivingLaw,
     selected_backend: CompleteLanguageTrainingBackend,
-    scope:ObservedEpochDepositionScope,
+    scope: ObservedEpochDepositionScope,
 ) -> Result<()> {
     if args.len() != 10 {
         return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT".into());
     }
     let prepared_input = args[0] == "train-prepared-local-retained-fibre-v1";
-    if prepared_input { execution.admit_prepared_input()?; }
+    if prepared_input {
+        execution.admit_prepared_input()?;
+    }
     let backend = selected_backend.as_str();
     if args[1] != backend {
         return Err(
@@ -298,11 +300,15 @@ fn train(
         ("host_owned", quoted("source/clock/normal law; scalar face/root/normalization/scoring/certification; causal cuts; prefix diagnostics; exact decode; independent output forks")),
         ("host_fallback", "false".into()),
     ]).as_bytes())?;
-    let mut checkpoint = fresh_checkpoint_at_law_and_scope(population,law,scope)?;
-    if prepared_input { checkpoint.stream.select_prepared_input(&declaration(population)?.2)?; }
+    let mut checkpoint = fresh_checkpoint_at_law_and_scope(population, law, scope)?;
+    if prepared_input {
+        checkpoint
+            .stream
+            .select_prepared_input(&declaration(population)?.2)?;
+    }
     checkpoint.provenance = format!(
         "complete Q+LF+A+LF; corpus SHA256 {}; backend {backend}; command {}; scope {scope:?}; no record-boundary resets",
-        args[3],args[0]
+        args[3], args[0]
     );
     write_new(
         &out.join("CLOCK_CONTRACT.json"),
@@ -358,8 +364,10 @@ fn train(
         )?;
         at = end;
         for epoch in receipt.epochs {
-            if epoch.deposition_scope!=scope || checkpoint.stream.scope()!=scope {
-                return Err("actual training scope differs from explicitly declared command".into());
+            if epoch.deposition_scope != scope || checkpoint.stream.scope() != scope {
+                return Err(
+                    "actual training scope differs from explicitly declared command".into(),
+                );
             }
             if epoch.consumed != 10
                 || !epoch.closed_section
@@ -391,8 +399,8 @@ fn train(
                 ("carry_out", epoch.carry_out.to_string()),
                 ("commit", epoch.deposit.commit.to_string()),
                 ("outcome", exact(&epoch.outcome)),
-                ("deposition_scope",exact(&epoch.deposition_scope)),
-                ("probe_state",exact(&epoch.probe_state)),
+                ("deposition_scope", exact(&epoch.deposition_scope)),
+                ("probe_state", exact(&epoch.probe_state)),
                 (
                     if law == holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1 {
                         "actual_coarse_prequential_code_sum"
@@ -447,7 +455,7 @@ fn train(
                 ("whole_refusal", exact(&epoch.whole_stage_refusal)),
                 ("joint_refusal", exact(&epoch.joint_stage_refusal)),
                 ("wall", exact(&epoch.wall)),
-                ("actual_preparation_and_energy",exact(&epoch.energy)),
+                ("actual_preparation_and_energy", exact(&epoch.energy)),
                 ("backend", quoted(backend)),
             ]);
             writeln!(epoch_log, "{record}")?;
@@ -477,12 +485,21 @@ fn train(
         &out.join("TRAINING_COMPLETE.json"),
         object(&[
             ("backend", quoted(backend)),
-            ("command",quoted(&args[0])),
-            ("deposition_scope",exact(&checkpoint.stream.scope())),
-            ("input_preparation_law",checkpoint.stream.resident().prepared_input().map_or("null".into(),|p|quoted(p.law()))),
-            ("prepared_input_state",exact(&checkpoint.stream.resident().prepared_input())),
-            ("e_scope",quoted(e_scope(scope,prepared_input))),
-
+            ("command", quoted(&args[0])),
+            ("deposition_scope", exact(&checkpoint.stream.scope())),
+            (
+                "input_preparation_law",
+                checkpoint
+                    .stream
+                    .resident()
+                    .prepared_input()
+                    .map_or("null".into(), |p| quoted(p.law())),
+            ),
+            (
+                "prepared_input_state",
+                exact(&checkpoint.stream.resident().prepared_input()),
+            ),
+            ("e_scope", quoted(e_scope(scope, prepared_input))),
             (
                 "actual_rayon_workers",
                 rayon::current_num_threads().to_string(),
@@ -510,6 +527,7 @@ fn train(
 }
 
 fn sample(args: &[String]) -> Result<()> {
+    let started = Instant::now();
     // Targets are intentionally absent from this command's interface.
     if args.len() != 10 {
         return Err(
@@ -522,9 +540,13 @@ fn sample(args: &[String]) -> Result<()> {
         );
     }
     let (checkpoint, _) = Checkpoint::load(&args[2], READ_BUDGET)?;
-    let prepared = args[0] == "sample-prepared-retained-fibre-v1";
+    let long = args[0] == "sample-prepared-retained-512-v1";
+    let cells = if long { 512 } else { 128 };
+    let prepared = long || args[0] == "sample-prepared-retained-fibre-v1";
     if prepared != checkpoint.stream.resident().prepared_input().is_some() {
-        return Err("sample command and checkpoint input preparation law must match explicitly".into());
+        return Err(
+            "sample command and checkpoint input preparation law must match explicitly".into(),
+        );
     }
     if args[7] == "fresh-native" && checkpoint.stream.accepted_cells()? != 0 {
         return Err(
@@ -533,15 +555,16 @@ fn sample(args: &[String]) -> Result<()> {
     }
 
     let prompt = pinned_read(&args[3], &args[4], QUERY_BYTE_BUDGET)?;
-    let keys = pinned_read(&args[5], &args[6], 1024)?;
+    let keys = pinned_read(&args[5], &args[6], cells * 8)?;
     let policy = match args[7].as_str() {
         "native" | "fresh-native" => continuation::SamplingPolicy::NativeFullFibre,
+        "native-zero-M" if prepared => continuation::SamplingPolicy::NativeZeroMControl,
         "founding-R" => continuation::SamplingPolicy::FoundingRAtSameHistory,
         "tree" => continuation::SamplingPolicy::Tree,
         _ => return Err("unknown explicitly selected conditional sampling policy".into()),
     };
     let cold = match args[8].as_str() {
-        "cold-replay" => Some(64),
+        "cold-replay" => Some(if long { 1 } else { 64 }),
         "no-replay" => None,
         _ => return Err("invalid cold replay declaration".into()),
     };
@@ -552,8 +575,12 @@ fn sample(args: &[String]) -> Result<()> {
         &prompt,
         policy,
         &keys,
-        128,
-        &[0, 1, 4, 16, 64, 128],
+        cells,
+        if long {
+            &[0, 1, 4, 16, 64, 128, 256, 512]
+        } else {
+            &[0, 1, 4, 16, 64, 128]
+        },
         cold,
         out,
     )?;
@@ -562,8 +589,26 @@ fn sample(args: &[String]) -> Result<()> {
         &out.join("OUTPUT.json"),
         object(&[
             ("backend", quoted(&args[1])),
-            ("command",quoted(&args[0])),
-            ("input_preparation_law",checkpoint.stream.resident().prepared_input().map_or("null".into(),|p|quoted(p.law()))),
+            ("command", quoted(&args[0])),
+            ("elapsed_ns", started.elapsed().as_nanos().to_string()),
+            (
+                "input_control",
+                quoted(
+                    if policy == continuation::SamplingPolicy::NativeZeroMControl {
+                        "u=0 from first conditioning; learned M retained"
+                    } else {
+                        "learned u=eta_M"
+                    },
+                ),
+            ),
+            (
+                "input_preparation_law",
+                checkpoint
+                    .stream
+                    .resident()
+                    .prepared_input()
+                    .map_or("null".into(), |p| quoted(p.law())),
+            ),
             (
                 "actual_rayon_workers",
                 rayon::current_num_threads().to_string(),
@@ -619,8 +664,8 @@ pub(super) fn run_with_execution(
         Some("train-retained-fibre-v1") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1, backend,ObservedEpochDepositionScope::NormalMaps),
         Some("train-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
         Some("train-prepared-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
-        Some("sample" | "sample-prepared-retained-fibre-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
-        Some("sample" | "sample-prepared-retained-fibre-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
+        Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
+        Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
         _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
     }
 }
@@ -637,16 +682,41 @@ mod tests {
     use super::*;
     #[test]
     fn local_cli_constructor_cold_and_continuation_scope_are_explicit() {
-        let local=fresh_checkpoint_at_law_and_scope(16384,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,ObservedEpochDepositionScope::LocalReceivingReturn).unwrap();
-        let old=fresh_checkpoint_at_law(16384,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1).unwrap();
-        assert_eq!(old.stream.scope(),ObservedEpochDepositionScope::NormalMaps);
-        assert_eq!(local.stream.scope(),ObservedEpochDepositionScope::LocalReceivingReturn);
-        assert_eq!(local.stream.accepted_cells().unwrap(),0);
-        assert!(fresh_checkpoint_at_law_and_scope(16384,holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1,ObservedEpochDepositionScope::LocalReceivingReturn).is_err());
-        let reference=port();
-        let fork=continuation::code_scope_preserving_checkpoint(&local,&reference).unwrap();
-        assert_eq!(fork.stream.scope(),ObservedEpochDepositionScope::LocalReceivingReturn);
-        assert_eq!(fork.stream.resident().continuing_state(0).unwrap(),local.stream.resident().continuing_state(0).unwrap());
+        let local = fresh_checkpoint_at_law_and_scope(
+            16384,
+            holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,
+            ObservedEpochDepositionScope::LocalReceivingReturn,
+        )
+        .unwrap();
+        let old = fresh_checkpoint_at_law(
+            16384,
+            holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,
+        )
+        .unwrap();
+        assert_eq!(old.stream.scope(), ObservedEpochDepositionScope::NormalMaps);
+        assert_eq!(
+            local.stream.scope(),
+            ObservedEpochDepositionScope::LocalReceivingReturn
+        );
+        assert_eq!(local.stream.accepted_cells().unwrap(), 0);
+        assert!(
+            fresh_checkpoint_at_law_and_scope(
+                16384,
+                holonics::hnn::receiving::ReceivingLaw::CoarseGrainV1,
+                ObservedEpochDepositionScope::LocalReceivingReturn
+            )
+            .is_err()
+        );
+        let reference = port();
+        let fork = continuation::code_scope_preserving_checkpoint(&local, &reference).unwrap();
+        assert_eq!(
+            fork.stream.scope(),
+            ObservedEpochDepositionScope::LocalReceivingReturn
+        );
+        assert_eq!(
+            fork.stream.resident().continuing_state(0).unwrap(),
+            local.stream.resident().continuing_state(0).unwrap()
+        );
     }
     #[test]
     fn complete_language_cut_parser_refuses_duplicate_or_out_of_horizon() {
@@ -744,31 +814,69 @@ mod tests {
 }
 
 #[cfg(test)]
-pub(super) fn code_prepared_late_rollback(execution:&dyn ObservedEpochExecution)->Result<String>{
-    let mut checkpoint=fresh_checkpoint_at_law_and_scope(16384,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,ObservedEpochDepositionScope::LocalReceivingReturn)?;
-    let pairing=declaration(16384)?.2;
+pub(super) fn code_prepared_late_rollback(
+    execution: &dyn ObservedEpochExecution,
+) -> Result<String> {
+    let mut checkpoint = fresh_checkpoint_at_law_and_scope(
+        16384,
+        holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,
+        ObservedEpochDepositionScope::LocalReceivingReturn,
+    )?;
+    let pairing = declaration(16384)?.2;
     checkpoint.stream.select_prepared_input(&pairing)?;
-    let before=checkpoint.bytes()?;
-    let err=checkpoint.stream.receive_with_execution(&port(),&pairing,&digits(&[0x1b;3])[..10],execution).unwrap_err();
-    if checkpoint.bytes()?!=before{return Err("late card refusal must preserve native/M/pending/carry exactly".into());}
+    let before = checkpoint.bytes()?;
+    let err = checkpoint
+        .stream
+        .receive_with_execution(&port(), &pairing, &digits(&[0x1b; 3])[..10], execution)
+        .unwrap_err();
+    if checkpoint.bytes()? != before {
+        return Err("late card refusal must preserve native/M/pending/carry exactly".into());
+    }
     Ok(err.to_string())
 }
 
 #[cfg(test)]
-pub(super) fn code_prepared_arrival_context(execution:&dyn ObservedEpochExecution)->Result<(String,String,String)>{
-    let (field,mut initial,pairing)=declaration(16384)?;
+pub(super) fn code_prepared_arrival_context(
+    execution: &dyn ObservedEpochExecution,
+) -> Result<(String, String, String)> {
+    let (field, mut initial, pairing) = declaration(16384)?;
     initial.bind_arrival_context_receiving(2)?;
-    let opening=initial.clone();
-    let reference=port();let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
-    let boundary=PairedObservation::admit(&field,resident.constitution(),&pairing)?;
-    reference.ingest(&mut resident,None,&boundary.encode(&[])?)?;
-    let mut stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturn)?;
+    let opening = initial.clone();
+    let reference = port();
+    let mut resident = reference.mount_declared_receiving_law(
+        &field,
+        &Current::at_rest(&field),
+        initial,
+        holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,
+    )?;
+    let boundary = PairedObservation::admit(&field, resident.constitution(), &pairing)?;
+    reference.ingest(&mut resident, None, &boundary.encode(&[])?)?;
+    let mut stream = ObservedStream::new(
+        resident,
+        ObservedCrib::new(0),
+        ObservedEpochDepositionScope::LocalReceivingReturn,
+    )?;
     stream.select_prepared_input(&pairing)?;
-    let before=stream.resident().continuing_state(0)?;
-    let refusal=stream.receive_with_execution(&reference,&pairing,&digits(&[0x1b;3])[..10],execution).unwrap_err();
-    assert!(refusal.to_string().contains("an epoch normal locus must exist as one declared linear law"));
-    assert_eq!(stream.resident().continuing_state(0)?,before,"unsupported paired local normal publication is atomic");
-    let cold=reference.mount_continued(&field,&Current::at_rest(&field),opening,&before)?;
-    assert_eq!(cold.continuing_state(0)?,before);
-    Ok((before.to_text(),refusal.to_string(),"paired local R publication UNJOINED; actual prepared words/returns compared by executor".into()))
+    let before = stream.resident().continuing_state(0)?;
+    let refusal = stream
+        .receive_with_execution(&reference, &pairing, &digits(&[0x1b; 3])[..10], execution)
+        .unwrap_err();
+    assert!(
+        refusal
+            .to_string()
+            .contains("an epoch normal locus must exist as one declared linear law")
+    );
+    assert_eq!(
+        stream.resident().continuing_state(0)?,
+        before,
+        "unsupported paired local normal publication is atomic"
+    );
+    let cold = reference.mount_continued(&field, &Current::at_rest(&field), opening, &before)?;
+    assert_eq!(cold.continuing_state(0)?, before);
+    Ok((
+        before.to_text(),
+        refusal.to_string(),
+        "paired local R publication UNJOINED; actual prepared words/returns compared by executor"
+            .into(),
+    ))
 }

@@ -313,7 +313,88 @@ pub struct ReceiverPrefixReceipt {
     pub ingestion: IngestClassReceipt,
 }
 
+/// One authentic read and its exclusive pending consumer. Private fields prevent
+/// caller-supplied masses; the mutable borrow prevents material/context changes
+/// between the observation and its once-only hypothetical ingress. No cache survives
+/// this decision or a cold restore.
+pub struct ReceiverPrefixProducer<'a> {
+    reference: &'a Reference,
+    resident: &'a mut Resident,
+    crib: &'a mut ObservedCrib,
+    pairing: &'a PairingDeclaration,
+    pending: PendingId,
+    receiver: crate::hnn::receiving::RetainedFibreReceiver,
+    diagnostic: crate::hnn::receiving::cells::diagnostic::RetainedReceiverDiagnostic,
+    bits: u32,
+    placement: Option<&'a OccurrencePlacement>,
+}
+impl ReceiverPrefixProducer<'_> {
+    pub fn diagnostic(
+        &self,
+    ) -> &crate::hnn::receiving::cells::diagnostic::RetainedReceiverDiagnostic {
+        &self.diagnostic
+    }
+    pub fn reading_bits(&self) -> u32 {
+        self.bits
+    }
+    pub fn receive(self, class: usize) -> Result<ReceiverPrefixReceipt, HnnError> {
+        self.reference.receive_receiver_prefix_using(
+            self.resident,
+            self.crib,
+            self.pairing,
+            self.pending,
+            class,
+            &self.receiver,
+            self.placement,
+            Some(self.diagnostic),
+        )
+    }
+    pub fn discard(self) -> Result<(), HnnError> {
+        self.reference
+            .discard(self.resident, Handle::Pending(self.pending))
+            .map(|_| ())
+    }
+}
+
 impl Reference {
+    /// Produce one decision at the actual kept Word, retaining its produced precision.
+    #[allow(clippy::too_many_arguments)]
+    pub fn prepare_receiver_prefix<'a>(
+        &'a self,
+        resident: &'a mut Resident,
+        crib: &'a mut ObservedCrib,
+        pairing: &'a PairingDeclaration,
+        pending: PendingId,
+        control_map: &ExactRatMatrix,
+        receiver: &crate::hnn::receiving::RetainedFibreReceiver,
+        bits: u32,
+        placement: Option<&'a OccurrencePlacement>,
+    ) -> Result<ReceiverPrefixProducer<'a>, HnnError> {
+        if bits != crate::ratio::exponentiated::READING_BITS {
+            return Err(HnnError::Unadmitted {
+                reason: "prefix population reception keeps its native produced likelihood precision",
+            });
+        }
+        let diagnostic = self.diagnose_pending_readout_at_receiver(
+            resident,
+            &pending,
+            control_map,
+            receiver,
+            bits,
+        )?;
+        Ok(ReceiverPrefixProducer {
+            reference: self,
+            resident,
+            crib,
+            pairing,
+            pending,
+            receiver: receiver.clone(),
+            diagnostic,
+            bits,
+            placement,
+        })
+    }
+
     /// Same kept native word and retained map/tree/population, read by an explicitly finer
     /// receiver. Neither the original declaration nor the immutable checkpoint is changed.
     pub fn diagnose_pending_readout_at_receiver(
@@ -359,6 +440,23 @@ impl Reference {
         receiver: &crate::hnn::receiving::RetainedFibreReceiver,
         placement: Option<&OccurrencePlacement>,
     ) -> Result<ReceiverPrefixReceipt, HnnError> {
+        self.receive_receiver_prefix_using(
+            resident, crib, pairing, pending, class, receiver, placement, None,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn receive_receiver_prefix_using(
+        &self,
+        resident: &mut Resident,
+        crib: &mut ObservedCrib,
+        pairing: &PairingDeclaration,
+        pending: PendingId,
+        class: usize,
+        receiver: &crate::hnn::receiving::RetainedFibreReceiver,
+        placement: Option<&OccurrencePlacement>,
+        prepared: Option<crate::hnn::receiving::cells::diagnostic::RetainedReceiverDiagnostic>,
+    ) -> Result<ReceiverPrefixReceipt, HnnError> {
         let refuse = |reason| HnnError::Unadmitted { reason };
         resident.admit_exact_current()?;
         admit_observed_cell(resident, crib, pairing, class, placement)?;
@@ -391,13 +489,19 @@ impl Reference {
             .receiving_map(ring)
             .ok_or(HnnError::MissingReceivingMap { ring })?
             .clone();
-        let read = self.diagnose_pending_readout_at_receiver(
-            resident,
-            &pending,
-            &native_map,
-            receiver,
-            crate::ratio::exponentiated::READING_BITS,
-        )?;
+        let read = match prepared {
+            Some(read) => read,
+            None => self.diagnose_pending_readout_at_receiver(
+                resident,
+                &pending,
+                &native_map,
+                receiver,
+                crate::ratio::exponentiated::READING_BITS,
+            )?,
+        };
+        // This unmixtured face is the native producing likelihood component, even
+        // when the selected class came from the founding-R or tree draw policy.
+        let combined = read.native.combined_masses;
         let producing = read.native_reading;
         let step = crate::hnn::receiving::ReceivingStep {
             ring,
@@ -409,8 +513,7 @@ impl Reference {
                     alphabet: producing.tree_probabilities.len(),
                 })?
                 .clone(),
-            combined: producing
-                .combined_masses_at(crate::ratio::exponentiated::READING_BITS)?
+            combined: combined
                 .get(class)
                 .ok_or(HnnError::CellOutside {
                     code: class,
@@ -444,7 +547,9 @@ impl Reference {
                 "an alternate receiver prefix preserves its frozen native receiving map",
             ));
         }
-        if let Some(input)=&mut next.prepared_input{input.after_forecast(class)?;}
+        if let Some(input) = &mut next.prepared_input {
+            input.after_forecast(class)?;
+        }
         *resident = next;
         *crib = next_crib;
         Ok(ReceiverPrefixReceipt {
@@ -895,6 +1000,161 @@ mod tests {
         assert_eq!(format!("{resident:?}"), before);
         assert_eq!(crib, old_crib);
     }
+    #[test]
+    fn exclusive_prefix_producer_reuses_native_unmixtured_read_and_preserves_guards() {
+        use crate::hnn::receiving::reuse_work;
+        use crate::ratio::rat;
+        let (port, mut old, mut old_crib, pairing, _) = target_opening(false);
+        let mut new = old.clone();
+        let mut new_crib = old_crib.clone();
+        let ring = old.admitted[0].ring();
+        let receiver =
+            crate::hnn::receiving::RetainedFibreReceiver::declare(old.admitted[0].grain()).unwrap();
+        let control = old.constitution.receiving_map(ring).unwrap().clone();
+        let mut counts = Vec::new();
+        let mut times = Vec::new();
+        for policy in 0..3 {
+            let a = target_pending(&port, &mut old);
+            let b = target_pending(&port, &mut new);
+            reuse_work::reset();
+            let at = std::time::Instant::now();
+            let reading = port
+                .diagnose_pending_readout_at_receiver(&old, &a, &control, &receiver, READING_BITS)
+                .unwrap();
+            let masses = match policy {
+                0 => &reading.native.native_masses,
+                1 => &reading.control.native_masses,
+                _ => &reading.native.tree_masses,
+            };
+            let crate::receiver::release::ReleaseReturn::Drawn(draw) =
+                crate::receiver::release::draw(masses, &rat(1, 2)).unwrap()
+            else {
+                panic!("synthetic exact draw")
+            };
+            let first = port
+                .receive_receiver_prefix_continuing(
+                    &mut old,
+                    &mut old_crib,
+                    &pairing,
+                    a,
+                    draw.class,
+                    &receiver,
+                    None,
+                )
+                .unwrap();
+            let old_ns = at.elapsed().as_nanos();
+            let old_work = reuse_work::counts();
+            let mut expected = new.constitution.population(ring).unwrap().clone();
+            expected
+                .receive(&[
+                    ExactInterval::point(
+                        reading.native_reading.tree_probabilities[draw.class].clone(),
+                    ),
+                    reading.native.combined_masses[draw.class].clone(),
+                ])
+                .unwrap();
+            reuse_work::reset();
+            let at = std::time::Instant::now();
+            let producer = port
+                .prepare_receiver_prefix(
+                    &mut new,
+                    &mut new_crib,
+                    &pairing,
+                    b,
+                    &control,
+                    &receiver,
+                    READING_BITS,
+                    None,
+                )
+                .unwrap();
+            assert_eq!(producer.reading_bits(), READING_BITS);
+            assert_eq!(producer.diagnostic(), &reading);
+            let second = producer.receive(draw.class).unwrap();
+            let new_ns = at.elapsed().as_nanos();
+            let new_work = reuse_work::counts();
+            assert_eq!(first, second);
+            assert_eq!(new.constitution.population(ring), Some(&expected));
+            assert_eq!(
+                old.continuing_state(0).unwrap(),
+                new.continuing_state(0).unwrap()
+            );
+            assert_eq!(old_crib, new_crib);
+            assert!(
+                old_work[1] > new_work[1] && old_work[2] > new_work[2] && old_work[3] > new_work[3]
+            );
+            counts.push((old_work, new_work));
+            times.push((old_ns, new_ns));
+        }
+        let pending = target_pending(&port, &mut new);
+        assert!(
+            port.prepare_receiver_prefix(
+                &mut new,
+                &mut new_crib,
+                &pairing,
+                pending,
+                &control,
+                &receiver,
+                32,
+                None
+            )
+            .is_err()
+        );
+        let before = format!("{new:?}");
+        let crib_before = new_crib.clone();
+        let p = port
+            .prepare_receiver_prefix(
+                &mut new,
+                &mut new_crib,
+                &pairing,
+                pending,
+                &control,
+                &receiver,
+                READING_BITS,
+                None,
+            )
+            .unwrap();
+        assert!(p.receive(4).is_err());
+        assert_eq!(format!("{new:?}"), before);
+        assert_eq!(new_crib, crib_before);
+        let p = port
+            .prepare_receiver_prefix(
+                &mut new,
+                &mut new_crib,
+                &pairing,
+                pending,
+                &control,
+                &receiver,
+                READING_BITS,
+                None,
+            )
+            .unwrap();
+        p.discard().unwrap();
+        assert!(new.pending.is_empty());
+        assert!(
+            port.prepare_receiver_prefix(
+                &mut new,
+                &mut new_crib,
+                &pairing,
+                pending,
+                &control,
+                &receiver,
+                READING_BITS,
+                None
+            )
+            .is_err()
+        );
+        let saved = new.continuing_state(0).unwrap().to_text();
+        assert_eq!(
+            ContinuingState::from_text(&saved, 1 << 40)
+                .unwrap()
+                .to_text(),
+            saved
+        );
+        eprintln!(
+            "EXCLUSIVE_PREFIX_REUSE old_new_score_mass_weight_log={counts:?} old_new_ns={times:?} guards=precision,class,discard,stale,cold passed"
+        );
+    }
+
     #[test]
     fn retained_receiver_prefix_uses_full_likelihood_once_and_restores_cold() {
         let (port, mut warm, mut crib, pairing, material) = target_opening(false);

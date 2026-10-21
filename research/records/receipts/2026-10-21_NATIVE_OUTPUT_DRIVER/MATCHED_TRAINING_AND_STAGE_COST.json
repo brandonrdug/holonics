@@ -1,0 +1,37 @@
+{
+  "host-reference": {
+    "elapsed_ns": 3523307807,
+    "accepted_cells": 40,
+    "actual_epochs": 4,
+    "actual_rayon_workers": 4,
+    "cold_exact": true,
+    "final_pending_cells": 0,
+    "stages": {
+      "forward_batch_ns": 905045405,
+      "compare_return_compose_batch_ns": 1717377540,
+      "grouped_deposit_ns": 37468737,
+      "final_arrived_reread_ns": 49549193,
+      "precision_close_ns": 529030,
+      "compare_preparation_ns": 1624317936,
+      "return_join_ns": 91925832
+    }
+  },
+  "cuda-observed-epoch-device0": {
+    "elapsed_ns": 3654130695,
+    "accepted_cells": 40,
+    "actual_epochs": 4,
+    "actual_rayon_workers": 4,
+    "cold_exact": true,
+    "final_pending_cells": 0,
+    "stages": {
+      "forward_batch_ns": 1022423545,
+      "compare_return_compose_batch_ns": 1733838924,
+      "grouped_deposit_ns": 39818459,
+      "final_arrived_reread_ns": 50387833,
+      "precision_close_ns": 565959,
+      "compare_preparation_ns": 1623922300,
+      "return_join_ns": 108785726
+    }
+  },
+  "qualification": "one unchanged synthetic40-class whole-command sample/backend; nested compare_preparation is not additive; not GSM throughput/ETA or CUDA speedup"
+}

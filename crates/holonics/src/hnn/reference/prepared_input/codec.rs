@@ -165,6 +165,7 @@ impl PreparedInputState {
             match self.mode {
                 PrefixMode::Training => 0,
                 PrefixMode::Forecast => 1,
+                PrefixMode::ForecastZeroControl => 2,
             },
         );
         put(&mut o, role(self.forecast_role));
@@ -223,6 +224,7 @@ impl PreparedInputState {
         let mode = match get::<u8>(&mut t)? {
             0 => PrefixMode::Training,
             1 => PrefixMode::Forecast,
+            2 => PrefixMode::ForecastZeroControl,
             _ => return Err(refuse("prepared mode")),
         };
         let forecast_role = read_role(&mut t)?;
@@ -314,7 +316,7 @@ impl PreparedInputState {
                 && (conditioning != 0
                     || generated != 0
                     || history.iter().any(|(_, r)| *r != PrefixRole::Observed))
-            || mode == PrefixMode::Forecast && forecast_role == PrefixRole::Observed
+            || mode != PrefixMode::Training && forecast_role == PrefixRole::Observed
         {
             return Err(refuse(
                 "prepared mode/material/actual and hypothesis frontier accounting",

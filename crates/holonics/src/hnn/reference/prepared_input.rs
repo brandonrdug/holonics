@@ -21,6 +21,8 @@ pub enum PrefixRole {
 pub enum PrefixMode {
     Training,
     Forecast,
+    /// Applied u=0 intervention, with the learned material and its moments retained.
+    ForecastZeroControl,
 }
 fn unit(k: usize) -> Vec<Rat> {
     (0..4)
@@ -212,7 +214,11 @@ impl PreparedInputState {
         let h = source.open_storage(field, theta, current)?[0][0].clone();
         let f = features(&self.history, &h);
         let control = if let Some(f) = &f {
-            let response = self.material.contract(f)?;
+            let response = if self.mode == PrefixMode::ForecastZeroControl {
+                vec![[Rat::zero(), Rat::zero()]; 4]
+            } else {
+                self.material.contract(f)?
+            };
             if response.iter().any(|z| !z[1].is_zero()) {
                 return Err(refuse(
                     "class material uses real coordinates without imaginary projection",
@@ -330,7 +336,10 @@ impl PreparedInputState {
         Ok(())
     }
     pub(crate) fn after_forecast(&mut self, class: usize) -> Result<(), HnnError> {
-        if self.mode != PrefixMode::Forecast {
+        if !matches!(
+            self.mode,
+            PrefixMode::Forecast | PrefixMode::ForecastZeroControl
+        ) {
             return Err(refuse(
                 "hypothesized prefix requires an explicit frozen forecast owner",
             ));
@@ -371,12 +380,32 @@ impl Resident {
         }
         Ok(())
     }
+    /// Select u=0 BEFORE any conditioning/hypothesis, without altering trained M/R.
+    pub fn zero_prepared_forecast_control(&mut self) -> Result<(), HnnError> {
+        let p = self.prepared_input.as_mut().ok_or(refuse(
+            "prepared forecast control requires actual learned material",
+        ))?;
+        if p.mode != PrefixMode::Forecast
+            || p.conditioning != 0
+            || p.generated != 0
+            || !p.pending.is_empty()
+        {
+            return Err(refuse(
+                "zero control is declared before first conditioning on a closed forecast fork",
+            ));
+        }
+        p.mode = PrefixMode::ForecastZeroControl;
+        Ok(())
+    }
     pub fn begin_hypothesized_output(&mut self) -> Result<(), HnnError> {
         let p = self
             .prepared_input
             .as_mut()
             .ok_or(refuse("an explicit prepared input forecast"))?;
-        if p.mode != PrefixMode::Forecast {
+        if !matches!(
+            p.mode,
+            PrefixMode::Forecast | PrefixMode::ForecastZeroControl
+        ) {
             return Err(refuse("freeze material before hypothesized output"));
         }
         p.forecast_role = PrefixRole::Hypothesized;

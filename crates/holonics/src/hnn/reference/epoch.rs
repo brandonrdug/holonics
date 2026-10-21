@@ -454,7 +454,7 @@ impl Reference {
             if let Some(input)=&mut working.prepared_input{
                 match input.mode(){
                     prepared_input::PrefixMode::Training=>input.after_actual(input_cut.ok_or(HnnError::Unadmitted{reason:"actual prepared epoch retains its original producing packet"})?,class)?,
-                    prepared_input::PrefixMode::Forecast=>input.after_forecast(class)?,
+                    prepared_input::PrefixMode::Forecast|prepared_input::PrefixMode::ForecastZeroControl=>input.after_forecast(class)?,
                 }
             }
             working.address.receive_at(class, cells.advance(at))?;

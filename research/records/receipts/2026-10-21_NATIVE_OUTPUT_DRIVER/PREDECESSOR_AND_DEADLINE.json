@@ -1,0 +1,81 @@
+{
+  "old_native128_vs_reused": "exact bytes/classes/final native state/crib",
+  "matched_fields": [
+    "classes",
+    "raw_bytes",
+    "unfinished_cells",
+    "stop",
+    "final_state_sha256",
+    "final_crib_sha256"
+  ],
+  "actual_deadline": "real native child stopped and terminal refusal durable; no leftover owned process",
+  "deadline_receipt": {
+    "plan_sha256": "e7ec71253c294fe797e41a13bac5ac73245dae1a8bc733a63a680badd4447ca0",
+    "cells": 128,
+    "workers": 4,
+    "canonical_order": [
+      "native-0"
+    ],
+    "results": [
+      {
+        "index": 0,
+        "id": "native-0",
+        "policy": "native",
+        "prompt_sha256": "77adfc95029e73b173f60e556f915b0cd8850848111358b1c370fb7c154e61fd",
+        "checkpoint_sha256": "4c8b3ee020e3bf81550e75c0b388c851c6275dabc53a8a0ab84b4c90ff0f1007",
+        "binary_sha256": "ea831df89b044418c503cb2674da9b459ce944e7fe7164f3c40d2850e9f9d39a",
+        "exit": -9,
+        "elapsed_ns": 313672033,
+        "stop": "shared_elapsed_deadline",
+        "complete": false,
+        "terminal": true,
+        "durable_progress_lines": 0,
+        "owned_cleanup_remaining": []
+      }
+    ],
+    "all_terminal": true,
+    "all_complete": false,
+    "final_integrity_all_pins": true,
+    "elapsed_ns": 337301460,
+    "stop": "shared_elapsed_deadline",
+    "original_checkpoint_immutable": true,
+    "aggregate_cpu_affinity": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "rayon_workers_per_child": 1,
+    "controller_and_child_CPU_seconds_OS_reading": {
+      "controller_user": 0.03,
+      "controller_system": 0.01,
+      "children_user": 0.28,
+      "children_system": 0.0
+    },
+    "peak_aggregate_rss_bytes": 58585088,
+    "samples": [
+      {
+        "elapsed_ns": 12796847,
+        "aggregate_rss_bytes": 44593152,
+        "active_forks": 1
+      },
+      {
+        "elapsed_ns": 113257074,
+        "aggregate_rss_bytes": 58302464,
+        "active_forks": 1
+      },
+      {
+        "elapsed_ns": 213737599,
+        "aggregate_rss_bytes": 58433536,
+        "active_forks": 1
+      },
+      {
+        "elapsed_ns": 314256306,
+        "aggregate_rss_bytes": 58585088,
+        "active_forks": 1
+      }
+    ],
+    "targets_or_scorer_opened": false
+  },
+  "model_dataset_job": false
+}

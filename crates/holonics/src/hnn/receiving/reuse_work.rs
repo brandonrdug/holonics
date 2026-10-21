@@ -22,11 +22,11 @@ pub(super) fn mass() {
 pub(super) fn weight() {
     note(2);
 }
-fn reset() {
+pub(crate) fn reset() {
     COUNTS.with(|c| c.set([0; 3]));
     crate::ratio::algebraic::LOG2_OBSERVATION_CALLS.with(|c| c.set(0));
 }
-fn counts() -> [u64; 4] {
+pub(crate) fn counts() -> [u64; 4] {
     let n = COUNTS.with(|c| c.get());
     [
         n[0],

@@ -1,0 +1,1 @@
+Finite synthetic CODE evidence only. Absolute exterior paths are normalized in these publication copies; original artifact-root files and their independent hashes remain preserved. All literal bytes are synthetic; no private conversations, dataset targets or credentials.
