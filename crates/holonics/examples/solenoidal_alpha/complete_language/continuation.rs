@@ -2,8 +2,8 @@
 //!
 //! Each selected class is read at the actual pending native word and then received once through
 //! `Reference::receive_receiver_prefix_continuing` before the next read. The three policies change
-//! only the face used to choose that class: trained full-fibre native, founding R on the same
-//! native history, or the executed tree. This is sequential conditional sampling, not global mode
+//! only the face used to choose that class: trained mixture, founding R, executed tree, or an
+//! explicitly labeled combined-family ablation. This is sequential conditional sampling, not global mode
 //! search. Fresh-body comparison is a separate caller-owned trajectory.
 //!
 //! The computational object remains the helical pair interaction with its current, source moment,
@@ -19,6 +19,9 @@ use std::path::Path;
 pub(super) enum SamplingPolicy {
     NativeFullFibre,
     NativeZeroMControl,
+    /// Explicit output-only receiver ablation; no posterior or trained-law mutation.
+    CombinedFamilyAblation,
+    CombinedFamilyZeroMControl,
     FoundingRAtSameHistory,
     Tree,
 }
@@ -28,6 +31,8 @@ impl SamplingPolicy {
         match self {
             Self::NativeFullFibre => "trained-native-full-fibre",
             Self::NativeZeroMControl => "trained-native-zero-M-control",
+            Self::CombinedFamilyAblation => "combined-family-receiver-ablation",
+            Self::CombinedFamilyZeroMControl => "combined-family-zero-M-receiver-ablation",
             Self::FoundingRAtSameHistory => "founding-R-same-history",
             Self::Tree => "executed-tree",
         }
@@ -37,11 +42,47 @@ impl SamplingPolicy {
         self,
         reading: &'a holonics::hnn::receiving::cells::diagnostic::RetainedReceiverDiagnostic,
     ) -> &'a [ExactInterval] {
+        self.produced_masses(&reading.native.native_masses,&reading.native.combined_masses,
+            &reading.control.native_masses,&reading.native.tree_masses)
+    }
+
+    fn zero_m(self) -> bool {
+        matches!(self,Self::NativeZeroMControl|Self::CombinedFamilyZeroMControl)
+    }
+
+    /// Select only a face already produced by this authentic pending reading.
+    /// The returned native likelihood used for prefix continuation is unchanged.
+    fn produced_masses<'a>(self, native:&'a [ExactInterval], combined:&'a [ExactInterval],
+        founding:&'a [ExactInterval],tree:&'a [ExactInterval]) -> &'a [ExactInterval] {
         match self {
-            Self::NativeFullFibre | Self::NativeZeroMControl => &reading.native.native_masses,
-            Self::FoundingRAtSameHistory => &reading.control.native_masses,
-            Self::Tree => &reading.native.tree_masses,
+            Self::NativeFullFibre | Self::NativeZeroMControl => native,
+            Self::CombinedFamilyAblation | Self::CombinedFamilyZeroMControl => combined,
+            Self::FoundingRAtSameHistory => founding,
+            Self::Tree => tree,
         }
+    }
+}
+
+#[cfg(test)]
+mod receiver_ablation_controls {
+    use super::*;
+    #[test]
+    fn policy_chooses_only_the_declared_authentic_face_and_control() {
+        let faces:Vec<Vec<ExactInterval>>=(0..4).map(|j|(0..4).map(|k|
+            ExactInterval::point(Rat::from_integer(if j==k {1.into()} else {0.into()}))).collect()).collect();
+        let [native,combined,founding,tree]=[&faces[0][..],&faces[1][..],&faces[2][..],&faces[3][..]];
+        for (policy,expected,zero) in [
+            (SamplingPolicy::NativeFullFibre,native,false),
+            (SamplingPolicy::NativeZeroMControl,native,true),
+            (SamplingPolicy::CombinedFamilyAblation,combined,false),
+            (SamplingPolicy::CombinedFamilyZeroMControl,combined,true),
+            (SamplingPolicy::FoundingRAtSameHistory,founding,false),
+            (SamplingPolicy::Tree,tree,false),
+        ] {
+            assert!(std::ptr::eq(policy.produced_masses(native,combined,founding,tree),expected));
+            assert_eq!(policy.zero_m(),zero);
+        }
+        assert_ne!(SamplingPolicy::CombinedFamilyAblation.label(),SamplingPolicy::NativeFullFibre.label());
     }
 }
 
@@ -63,7 +104,8 @@ pub(super) struct CutReceipt {
     pub last_receipt: Option<holonics::hnn::reference::observed::ReceiverPrefixReceipt>,
 }
 
-/// The cold restore control made at output boundary 64 and continued with keys 64 through 67.
+/// The cold restore control at the caller-declared cut, continued with the next four keys.
+/// The public512-cell command uses cut1, crossing an unfinished-octet boundary.
 #[derive(Clone, Debug)]
 pub(super) struct ColdContinuationCheck {
     pub checkpoint_sha256: String,
@@ -365,7 +407,7 @@ pub(super) fn sample_continuing(
     let reference = port();
     let (field, founding, pairing) = declaration(checkpoint.population)?;
     let (mut resident, mut crib) = checkpoint.stream.query_fork(&reference, &pairing)?;
-    if policy == SamplingPolicy::NativeZeroMControl {
+    if policy.zero_m() {
         resident.zero_prepared_forecast_control()?;
     }
     let frozen_native = frozen_material_identity(&resident);
@@ -398,7 +440,7 @@ pub(super) fn sample_continuing(
                     p.added.iter().all(|q| q == &Rat::from_integer(0.into()))
                         && p.work == Rat::from_integer(0.into())
                 });
-                if policy == SamplingPolicy::NativeZeroMControl && !zero {
+                if policy.zero_m() && !zero {
                     return Err(
                         "zero-M forecast applied nonzero preparation at first conditioning".into(),
                     );
@@ -521,6 +563,9 @@ pub(super) fn sample_continuing(
                     ("cell", at.to_string()),
                     ("class", class.to_string()),
                     ("key", rational(&keys[at])),
+                    ("selected_receiver", quoted(policy.label())),
+                    ("selected_masses", exact(&policy.masses(&cell.diagnostic))),
+                    ("combined_masses", exact(&cell.diagnostic.native.combined_masses)),
                     ("certified_draw", exact(&cell.certified)),
                     (
                         "certified_key_margin_lower",

@@ -532,6 +532,18 @@ fn train(
     Ok(())
 }
 
+fn sampling_policy(label: &str, prepared: bool) -> Result<continuation::SamplingPolicy> {
+    match label {
+        "native" | "fresh-native" => Ok(continuation::SamplingPolicy::NativeFullFibre),
+        "native-zero-M" if prepared => Ok(continuation::SamplingPolicy::NativeZeroMControl),
+        "combined-family" if prepared => Ok(continuation::SamplingPolicy::CombinedFamilyAblation),
+        "combined-family-zero-M" if prepared => Ok(continuation::SamplingPolicy::CombinedFamilyZeroMControl),
+        "founding-R" => Ok(continuation::SamplingPolicy::FoundingRAtSameHistory),
+        "tree" => Ok(continuation::SamplingPolicy::Tree),
+        _ => Err("unknown explicitly selected conditional sampling policy".into()),
+    }
+}
+
 fn sample(args: &[String]) -> Result<()> {
     let started = Instant::now();
     // Targets are intentionally absent from this command's interface.
@@ -562,13 +574,7 @@ fn sample(args: &[String]) -> Result<()> {
 
     let prompt = pinned_read(&args[3], &args[4], QUERY_BYTE_BUDGET)?;
     let keys = pinned_read(&args[5], &args[6], cells * 8)?;
-    let policy = match args[7].as_str() {
-        "native" | "fresh-native" => continuation::SamplingPolicy::NativeFullFibre,
-        "native-zero-M" if prepared => continuation::SamplingPolicy::NativeZeroMControl,
-        "founding-R" => continuation::SamplingPolicy::FoundingRAtSameHistory,
-        "tree" => continuation::SamplingPolicy::Tree,
-        _ => return Err("unknown explicitly selected conditional sampling policy".into()),
-    };
+    let policy = sampling_policy(&args[7], prepared)?;
     let cold = match args[8].as_str() {
         "cold-replay" => Some(if long { 1 } else { 64 }),
         "no-replay" => None,
@@ -687,6 +693,49 @@ pub(super) fn run(args: &[String]) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn receiver_ablation_cli_is_explicit_and_requires_prepared_state() {
+        assert_eq!(sampling_policy("combined-family",true).unwrap(),continuation::SamplingPolicy::CombinedFamilyAblation);
+        assert_eq!(sampling_policy("combined-family-zero-M",true).unwrap(),continuation::SamplingPolicy::CombinedFamilyZeroMControl);
+        assert!(sampling_policy("combined-family",false).is_err());
+        assert!(sampling_policy("combined-family-zero-M",false).is_err());
+        assert_eq!(sampling_policy("native",true).unwrap(),continuation::SamplingPolicy::NativeFullFibre);
+        assert_eq!(sampling_policy("native-zero-M",true).unwrap(),continuation::SamplingPolicy::NativeZeroMControl);
+        assert!(sampling_policy("combined-family-rho-one",true).is_err());
+    }
+    #[test]
+    #[ignore = "bounded CODE control requires the explicitly pinned existing synthetic checkpoint"]
+    fn receiver_ablation_synthetic_prepared_cold_and_frozen_owner() {
+        let path=std::env::var("A18_SYNTHETIC_CHECKPOINT").expect("explicit synthetic fixture");
+        let expected=std::env::var("A18_SYNTHETIC_SHA256").expect("fixture hash");
+        assert_eq!(sha256(&std::fs::read(&path).unwrap()).unwrap(),expected);
+        let (checkpoint,_)=Checkpoint::load(&path,READ_BUDGET).unwrap();
+        let before=checkpoint.bytes().unwrap();
+        assert_eq!(checkpoint.stream.accepted_cells().unwrap(),40);
+        for policy in [continuation::SamplingPolicy::NativeFullFibre,
+            continuation::SamplingPolicy::CombinedFamilyAblation,
+            continuation::SamplingPolicy::CombinedFamilyZeroMControl] {
+            let out=std::path::Path::new(&std::env::var("A18_CODE_OUTPUT").unwrap()).join(policy.label());
+            std::fs::create_dir(&out).unwrap();
+            let result=continuation::sample_continuing(&checkpoint,b"A",policy,&[0x55;64],8,
+                &[0,1,4,8],Some(1),&out).unwrap();
+            assert_eq!(result.classes.len(),8);
+            assert_eq!(result.raw_bytes,Base4Bytes::decode(&result.classes,8).unwrap().bytes);
+            assert!(result.cold_continuation.unwrap().matched_warm_state_and_crib);
+            assert_eq!(checkpoint.bytes().unwrap(),before);
+            let freeze=std::fs::read_to_string(out.join("FROZEN_MATERIAL.json")).unwrap();
+            assert!(freeze.contains("\"native_laws_unchanged\":true"));
+            assert!(freeze.contains("\"empirical_material_unchanged\":true"));
+            let progress=std::fs::read_to_string(out.join("classes.jsonl")).unwrap();
+            assert!(progress.lines().all(|r|r.contains("\"selected_receiver\"")&&r.contains("\"selected_masses\"")&&r.contains("\"combined_masses\"")));
+            if policy==continuation::SamplingPolicy::CombinedFamilyZeroMControl {
+                let first=std::fs::read_to_string(out.join("CONDITIONING_FIRST.json")).unwrap();
+                assert!(first.contains("ForecastZeroControl"));
+                assert!(first.contains("\"added_and_work_zero\":true"));
+            }
+            println!("A18_SYNTHETIC_CONTROL policy={} output_classes=8 prompt_classes=4 cold_replayed_classes=4 frozen=true",policy.label());
+        }
+    }
     #[test]
     fn local_cli_constructor_cold_and_continuation_scope_are_explicit() {
         let local = fresh_checkpoint_at_law_and_scope(
