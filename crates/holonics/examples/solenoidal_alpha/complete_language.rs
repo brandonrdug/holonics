@@ -89,14 +89,24 @@ fn fresh_checkpoint_at_input_context(population:u64,law:holonics::hnn::receiving
     })
 }
 
-fn fresh_family_local_checkpoint(population:u64,scope:ObservedEpochDepositionScope)->Result<Checkpoint> { Ok({
+// Scalar exterior evidence from the already-produced representation receipt;
+// compact rows do not reread the normal, Word, target or certificate.
+fn representation_evidence(r:&holonics::hnn::constitution::EpochReceivingRepresentationReading)->String {
+    object(&[("before",r.before.to_string()),("proposed",r.proposed.to_string()),("ceiling",r.ceiling.to_string()),
+        ("minimum_nonzero",r.minimum_nonzero.map_or_else(||"null".into(),|v|v.to_string())),
+        ("disposition",exact(&r.disposition)),
+        ("predicted_whole_bits",r.predicted_whole_bits.map_or_else(||"null".into(),|v|v.to_string()))])
+}
+fn fresh_family_local_checkpoint(population:u64,scope:ObservedEpochDepositionScope)->Result<Checkpoint> {fresh_family_local_checkpoint_at_representation(population,scope,false)}
+fn fresh_family_local_checkpoint_at_representation(population:u64,scope:ObservedEpochDepositionScope,adaptive:bool)->Result<Checkpoint> { Ok({
         let (field,mut initial,pairing)=declaration_with_input_context(population,true,true)?;
         initial.bind_family_local_receiving_return(2)?;
+        if adaptive {initial.bind_bounded_receiving_representation(2)?;}
         let reference=port();
         let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
         let boundary=PairedObservation::admit(&field,resident.constitution(),&pairing)?;
         reference.ingest(&mut resident,None,&boundary.encode(&[])?)?;
-        Checkpoint {population, stream:ObservedStream::new(resident,ObservedCrib::new(0),scope)?,provenance:"fresh FamilyLocalRetainedReturnV1; unchanged RetainedFibreV1 release/history; framed paired source".into()}
+        Checkpoint {population, stream:ObservedStream::new(resident,ObservedCrib::new(0),scope)?,provenance:if adaptive {"fresh FamilyLocalRetainedReturnV1 + BoundedSubquantum20V1 representation; no previous moments migrated".into()} else {"fresh FamilyLocalRetainedReturnV1; unchanged RetainedFibreV1 release/history; framed paired source".into()}}
 
     }) }
 
@@ -269,7 +279,8 @@ fn train(
     if args.len() != 10 {
         return Err("train BACKEND CORPUS SHA CUTS CUTSHA POPULATION CELLS EPOCHS OUT".into());
     }
-    let family_local=args[0]=="train-family-local-arrival-context-held-v1";
+    let adaptive=args[0]=="train-adaptive-family-local-arrival-held-v1";
+    let family_local=adaptive || args[0]=="train-family-local-arrival-context-held-v1";
     let arrival=family_local || args[0]=="train-source-framing-arrival-context-held-v1";
     let framed=arrival || args[0]=="train-source-framing-retained-held-v1";
     let prepared_input = framed || matches!(args[0].as_str(), "train-prepared-local-retained-fibre-v1" | "train-prepared-local-retained-held-v1");
@@ -309,6 +320,7 @@ fn train(
         ("command",quoted(&args[0])),
         ("input_preparation_law",if prepared_input {quoted(if framed{holonics::hnn::reference::prepared_input::SOURCE_FRAMING_LAW}else{holonics::hnn::reference::prepared_input::LAW})}else{"null".into()}),
         ("deposition_scope",exact(&scope)),
+        ("receiving_representation_policy",quoted(if adaptive {"bounded-subquantum20-v1"} else {"fixed-lattice-v1"})),
         ("constitutive_return_policy",quoted(if family_local {"family-local-retained-return-v1"} else {"population-mixture-section-return-v1"})),
         ("receiving_layout",quoted(if arrival{"ArrivalContext-source6/context6"}else{"Single6"})),
         ("additional_whole_section_monotone_policy_requested",(!scope.is_local_receiving()).to_string()),
@@ -319,7 +331,7 @@ fn train(
         ("host_fallback", "false".into()),
         ("evidence_policy",quoted("local: compact outcome/actual-code/wall; full return+energy at predeclared cut crossings or Held; all stage failures retained")),
     ]).as_bytes())?;
-    let mut checkpoint = if family_local {fresh_family_local_checkpoint(population,scope)?    } else {fresh_checkpoint_at_input_context(population, law, scope,framed,arrival)?};
+    let mut checkpoint = if family_local {fresh_family_local_checkpoint_at_representation(population,scope,adaptive)?    } else {fresh_checkpoint_at_input_context(population, law, scope,framed,arrival)?};
     if prepared_input {
         let pairing=declaration_with_source_framing(population,framed)?.2;
         if framed {checkpoint.stream.select_source_framing_prepared_input(&pairing)?;}else{checkpoint.stream.select_prepared_input(&pairing)?;}
@@ -424,11 +436,12 @@ fn train(
                 ("outcome", exact(&epoch.outcome)),
                 ("deposition_scope", exact(&epoch.deposition_scope)),
                 ("paired_receiving",epoch.deposit.epoch.as_ref().and_then(|e|e.paired_receiving.as_ref()).map_or_else(||"null".into(),|p|if full_evidence { exact(p) } else {object(&[
+                    ("representation_policy",exact(&p.representation_policy)),
                     ("source_width",p.source_width.to_string()),
                     ("fresh_physical_alignment",quoted(&p.fresh_physical_alignment.to_string())),
                     ("fresh_return_error",quoted(&p.fresh_return_error.to_string())),
                     ("actual_alignment",p.actual_alignment.as_ref().map_or_else(||"null".into(),|v|quoted(&v.to_string()))),
-                    ("blocks",format!("[{}]",p.blocks.iter().map(|b|object(&[("index",b.index.to_string()),("crossings_before",b.crossings_before.to_string()),("crossings_after",b.crossings_after.to_string()),("gamma",quoted(&b.gamma.to_string())),("eta",quoted(&b.eta.to_string())),("normal_fall",quoted(&b.normal_fall.to_string()))])).collect::<Vec<_>>().join(","))),
+                    ("blocks",format!("[{}]",p.blocks.iter().map(|b|object(&[("index",b.index.to_string()),("representation",b.representation.as_ref().map_or_else(||"null".into(),representation_evidence)),("crossings_before",b.crossings_before.to_string()),("crossings_after",b.crossings_after.to_string()),("gamma",quoted(&b.gamma.to_string())),("eta",quoted(&b.eta.to_string())),("normal_fall",quoted(&b.normal_fall.to_string()))])).collect::<Vec<_>>().join(","))),
                     ("full_evidence_deferred", "true".into()),
                 ])})),
                 ("held_receiving", epoch.deposit.epoch.as_ref().and_then(|e| e.held_receiving.as_ref()).map_or_else(|| "null".into(), |h| object(&[
@@ -527,6 +540,7 @@ fn train(
         object(&[
             ("backend", quoted(backend)),
             ("command", quoted(&args[0])),
+            ("receiving_representation_policy",exact(&checkpoint.stream.resident().constitution().receiving_representation_policy(2))),
             ("constitutive_return_policy",quoted(checkpoint.stream.resident().constitution().receiving_return_policy(2).ok_or("receiving return owner")?.tag())),
             ("deposition_scope", exact(&checkpoint.stream.scope())),
             (
@@ -713,7 +727,7 @@ pub(super) fn run_with_execution(
         Some("train-retained-fibre-v1") => train(args, execution, holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1, backend,ObservedEpochDepositionScope::NormalMaps),
         Some("train-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
         Some("train-prepared-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
-        Some("train-family-local-arrival-context-held-v1") | Some("train-source-framing-arrival-context-held-v1") | Some("train-source-framing-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
+        Some("train-adaptive-family-local-arrival-held-v1") | Some("train-family-local-arrival-context-held-v1") | Some("train-source-framing-arrival-context-held-v1") | Some("train-source-framing-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         Some("train-prepared-local-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
@@ -993,8 +1007,12 @@ pub(super) fn code_prepared_arrival_context(
 }
 
 #[cfg(test)]
-pub(super) fn code_family_local_late_rollback(execution:&dyn ObservedEpochExecution)->Result<String>{
-    let mut checkpoint=fresh_family_local_checkpoint(16384,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+pub(super) fn code_family_local_late_rollback(execution:&dyn ObservedEpochExecution)->Result<String>{code_receiving_late_rollback(execution,false)}
+#[cfg(test)]
+pub(super) fn code_adaptive_receiving_late_rollback(execution:&dyn ObservedEpochExecution)->Result<String>{code_receiving_late_rollback(execution,true)}
+#[cfg(test)]
+fn code_receiving_late_rollback(execution:&dyn ObservedEpochExecution,adaptive:bool)->Result<String>{
+    let mut checkpoint=fresh_family_local_checkpoint_at_representation(16384,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap,adaptive)?;
     let pairing=checkpoint.declaration()?.2;
     checkpoint.stream.select_source_framing_prepared_input(&pairing)?;
     let before=checkpoint.bytes()?;

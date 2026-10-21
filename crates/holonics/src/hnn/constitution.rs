@@ -2843,11 +2843,11 @@ impl NormalLaw {
                 + self.symmetry.as_ref().map_or(0, PortSymmetry::bits)
                 // An adaptive source lattice is future-sufficient material,
                 // even when W cancels to a smaller canonical exponent.
-                + if law.source_refinement {
+                + if law.source_refinement || law.receiving_refinement.is_some() {
                     u64::from(law.map_lattice) + 1
                 } else {
                     1
-                };
+                } + law.receiving_refinement.map_or(0,|cap| u64::from(cap)+1);
             let (_, _, base, moves) = law.spectral.checkpoint_words();
             return CarrierBits {
                 entries,
@@ -3100,9 +3100,42 @@ pub struct EpochHeldReceivingReading {
     pub news_after: EpochSeriesReading,
 }
 
+/// A fresh, versioned material representation declaration. It changes neither
+/// the receiver observation grain nor the normal law/returned current.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReceivingRepresentationPolicy {
+    FixedLatticeV1,
+    BoundedSubquantumV1,
+}
+impl ReceivingRepresentationPolicy {
+    /// Declared engineering ceiling, not an exact-arithmetic or physical constant.
+    pub const CEILING: u32 = 20;
+    pub(crate) fn ceiling(self) -> Option<u32> {
+        match self { Self::FixedLatticeV1 => None, Self::BoundedSubquantumV1 => Some(Self::CEILING) }
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReceivingRepresentationDisposition {
+    Unchanged, ExactZero, NoFreshGain, AlreadyRepresentable, Refined,
+    CeilingUnresolved, BudgetUnresolved,
+}
+/// Exact transient operands of the one directly derived representation candidate.
+/// An attempted finer ray can still be refused by the actual native certificate.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochReceivingRepresentationReading {
+    pub before: u32,
+    pub proposed: u32,
+    pub ceiling: u32,
+    pub minimum_nonzero: Option<u32>,
+    pub disposition: ReceivingRepresentationDisposition,
+    pub direction: EpochSeriesReading,
+    pub predicted_whole_bits: Option<u64>,
+}
+
 /// Transient independently charted normal blocks; never a joined normal law.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochPairedReceivingBlockReading {
+    pub representation: Option<EpochReceivingRepresentationReading>,
     pub index: usize,
     pub operand_scale: Rat,
     pub aggregation_scale: Rat,
@@ -3119,6 +3152,7 @@ pub struct EpochPairedReceivingBlockReading {
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochPairedReceivingReading {
+    pub representation_policy: ReceivingRepresentationPolicy,
     pub source_width: usize,
     pub fresh_physical_alignment: Rat,
     pub fresh_return_error: Rat,
@@ -5538,6 +5572,26 @@ impl Constitution {
         if bits>self.budget { return Err(HnnError::ConstitutionBudget {bits,budget:self.budget,commit:self.commit,loci:vec![Locus::ReceivingMap(ring)]}); }
         next.commit=next.commit.checked_add(1).ok_or(HnnError::CountOverflow)?;
         *self=next; Ok(())
+    }
+    pub fn receiving_representation_policy(&self, ring: usize) -> Option<ReceivingRepresentationPolicy> {
+        self.rings.get(ring)?.receiving.as_ref().map(ReceivingMaterial::representation_policy)
+    }
+    /// No learned state is migrated. The new policy is founded only on fresh,
+    /// family-local, independently charted arrival/context material.
+    pub fn bind_bounded_receiving_representation(&mut self, ring: usize) -> Result<(), HnnError> {
+        let mut next = self.clone();
+        next.rings.get_mut(ring).and_then(|r|r.receiving.as_mut())
+            .ok_or(HnnError::MissingReceivingMap {ring})?.bind_bounded_representation()?;
+        let grain=lattice_exponent(next.grain,1);
+        for law in next.rings[ring].receiving.as_ref().expect("bound owner").laws() {
+            if epoch::EpochLaw::from_normal(law,grain)?.map_lattice > ReceivingRepresentationPolicy::CEILING {
+                return Err(HnnError::Unadmitted {reason:"the founding receiving lattice exceeds the declared bounded representation ceiling"});
+            }
+        }
+        let bits = next.exact_bits();
+        if bits > self.budget { return Err(HnnError::ConstitutionBudget {bits,budget:self.budget,commit:self.commit,loci:vec![Locus::ReceivingMap(ring)]}); }
+        next.commit = next.commit.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        *self = next; Ok(())
     }
     /// Full phase statistics. Paired statistics use the frozen normalized operand chart.
     pub fn receiving_phase_statistics(&self, ring: usize) -> Option<&PhaseStatistics> {
@@ -12634,7 +12688,7 @@ impl Constitution {
                             });
                         }
                     }
-                    if epoch.news.row_divisors.iter().any(|&d| d != 1) {
+                    if epoch.receiving_refinement.is_some() || epoch.news.row_divisors.iter().any(|&d| d != 1) {
                         return Err(refuse(
                             "odd receiving phase factors outside a receiving normal locus",
                         ));
@@ -12642,6 +12696,17 @@ impl Constitution {
                 }
             }
             if let (Some(saved), Some(declared)) = (&saved.receiving, &material.receiving) {
+                if saved.representation_policy() != declared.representation_policy() {
+                    return Err(refuse("the receiving representation policy belongs to its founding material"));
+                }
+                saved.validate()?;
+                if saved.representation_policy()==ReceivingRepresentationPolicy::BoundedSubquantumV1 {
+                    if let Some(finer)=saved.laws().iter().filter_map(|l|l.epoch_law().map(|e|e.map_lattice)).max() {
+                        if state.lattices.get(&Locus::ReceivingMap(ring)).map(Lattice::exponent)!=Some(finer) {
+                            return Err(refuse("the receiving normal lattices disagree with their active material lattice"));
+                        }
+                    }
+                }
                 for (saved, declared) in saved.laws().into_iter().zip(declared.laws()) {
                     if let Some(epoch) = saved.epoch_law() {
                         epoch.validate_against_native(declared, receiver_exponent, false)?;

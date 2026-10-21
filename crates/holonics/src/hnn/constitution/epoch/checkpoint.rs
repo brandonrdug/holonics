@@ -16,7 +16,7 @@ impl EpochLaw {
     /// Write this law's exact, canonical continuation words.
     pub(crate) fn encode_checkpoint(&self) -> String {
         let mut text = String::new();
-        text.push_str(HEADER);
+        text.push_str(if self.receiving_refinement.is_some() {"epoch-law-receiving-refinement-v1"} else {HEADER});
         text.push('\n');
         text.push_str(&format!("shape {} {}\n", self.map.rows, self.map.columns));
         text.push_str(&format!(
@@ -27,6 +27,7 @@ impl EpochLaw {
             "source-refinement {}\n",
             u8::from(self.source_refinement)
         ));
+        if let Some(cap) = self.receiving_refinement { text.push_str(&format!("receiving-refinement {cap}\n")); }
         write_array(&mut text, "map", &self.map);
         write_array(&mut text, "gram", &self.gram);
         write_array(&mut text, "news", &self.news);
@@ -60,7 +61,8 @@ impl EpochLaw {
         budget: &mut CheckpointReadBudget,
     ) -> Result<Self, HnnError> {
         let mut lines = text.lines();
-        if take(&mut lines)? != HEADER {
+        let header = take(&mut lines)?;
+        if header != HEADER && header != "epoch-law-receiving-refinement-v1" {
             return Err(malformed());
         }
         let shape = words(take(&mut lines)?, "shape", 2)?;
@@ -77,6 +79,11 @@ impl EpochLaw {
             "1" => true,
             _ => return Err(malformed()),
         };
+        let receiving_refinement = if header == "epoch-law-receiving-refinement-v1" {
+            let cap = parse_u32(words(take(&mut lines)?,"receiving-refinement",1)?[0])?;
+            if cap != super::ReceivingRepresentationPolicy::CEILING || source_refinement { return Err(malformed()); }
+            Some(cap)
+        } else {None};
         let map = read_array(&mut lines, "map", budget)?;
         let gram = read_array(&mut lines, "gram", budget)?;
         let news = read_array(&mut lines, "news", budget)?;
@@ -109,6 +116,7 @@ impl EpochLaw {
             receiver_grain,
             map_lattice,
             source_refinement,
+            receiving_refinement,
             crossings,
             spectral,
             symmetry,
@@ -149,10 +157,12 @@ fn validate_with_row_binding(
         || (
             law.receiver_grain,
             law.source_refinement,
+            law.receiving_refinement,
             law.symmetry.as_ref(),
         ) != (
             declaration.receiver_grain,
             declaration.source_refinement,
+            declaration.receiving_refinement,
             declaration.symmetry.as_ref(),
         )
     {
@@ -176,6 +186,8 @@ fn validate_with_row_binding(
     }
     if (if law.source_refinement {
         law.map_lattice < expected_lattice || !law.news.is_dyadic()
+    } else if let Some(cap) = law.receiving_refinement {
+        cap != super::ReceivingRepresentationPolicy::CEILING || law.map_lattice < expected_lattice || law.map_lattice > cap
     } else {
         law.map_lattice != expected_lattice
     }) || law.map.exponent > law.map_lattice

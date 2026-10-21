@@ -37,7 +37,7 @@ fn exercise_fixture_command(label:&str,bytes:&[u8],command:&str){
     let cuts = root.join("synthetic-cuts.tsv");
     std::fs::write(&corpus, bytes).unwrap();
     let cells=bytes.len()*4;assert_eq!(cells%10,0);
-    std::fs::write(&cuts,if matches!(command,"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1"|"train-family-local-arrival-context-held-v1"){format!("0\tsynthetic-opening\n13\tthree-pending\n{cells}\tsynthetic-closed\n")}else{format!("0\tsynthetic-opening\n{cells}\tsynthetic-closed\n")}).unwrap();
+    std::fs::write(&cuts,if matches!(command,"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1"|"train-family-local-arrival-context-held-v1"|"train-adaptive-family-local-arrival-held-v1"){format!("0\tsynthetic-opening\n13\tthree-pending\n{cells}\tsynthetic-closed\n")}else{format!("0\tsynthetic-opening\n{cells}\tsynthetic-closed\n")}).unwrap();
     fn hash(path: &Path) -> String {
         let out = std::process::Command::new("sha256sum")
             .arg(path)
@@ -71,8 +71,8 @@ fn exercise_fixture_command(label:&str,bytes:&[u8],command:&str){
         assert!(complete.contains("\"cold_exact\":true"));
         assert!(complete.contains(&format!("\"accepted_cells\":{cells}")));
         assert!(complete.contains(&format!("\"actual_epochs\":{}",cells/10)));
-        if matches!(command,"train-local-retained-fibre-v1"|"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1"|"train-family-local-arrival-context-held-v1") {
-            let scope=if matches!(command,"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1"|"train-family-local-arrival-context-held-v1") { "LocalReceivingReturnWithHeldMap" } else { "LocalReceivingReturn" };
+        if matches!(command,"train-local-retained-fibre-v1"|"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1"|"train-family-local-arrival-context-held-v1"|"train-adaptive-family-local-arrival-held-v1") {
+            let scope=if matches!(command,"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1"|"train-family-local-arrival-context-held-v1"|"train-adaptive-family-local-arrival-held-v1") { "LocalReceivingReturnWithHeldMap" } else { "LocalReceivingReturn" };
             assert!(complete.contains(&format!("\"deposition_scope\":\"{scope}\"")));
             let execution=std::fs::read_to_string(root.join(backend).join("EXECUTION_CONTRACT.json")).unwrap();
             assert!(execution.contains(&format!("\"command\":\"{command}\"")));
@@ -91,7 +91,7 @@ fn exercise_fixture_command(label:&str,bytes:&[u8],command:&str){
         "cut-00000.state".to_owned(),
         format!("cut-{cells:05}.state"),
     ];
-    if matches!(command,"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1"|"train-family-local-arrival-context-held-v1"){checkpoints.push("cut-00013.state".into());}
+    if matches!(command,"train-prepared-local-retained-fibre-v1"|"train-prepared-local-retained-held-v1"|"train-source-framing-retained-held-v1"|"train-source-framing-arrival-context-held-v1"|"train-family-local-arrival-context-held-v1"|"train-adaptive-family-local-arrival-held-v1"){checkpoints.push("cut-00013.state".into());}
     for checkpoint in checkpoints {
         let host = exterior::code_checkpoint_native_bytes(
             root.join("host-reference")
@@ -312,4 +312,21 @@ fn family_local_late_card_fault_is_atomic(){
     execution.card.require_actual_dispatch().unwrap();
     assert!(execution.card.receipt(false).contains("\"response_error_trace_calls\":0"));
     eprintln!("FAMILY_LOCAL_SECOND_BLOCK_CARD_FAULT {}",execution.card.receipt(false).trim());
+}
+
+#[test]
+#[ignore="exclusive HOST CUDA; bounded receiving representation same shared exterior"]
+fn adaptive_receiving_host_card_cold() {
+    exercise_fixture_command("adaptive-receiving",&[0x1b;10],"train-adaptive-family-local-arrival-held-v1");
+}
+
+#[test]
+#[ignore="exclusive HOST CUDA; bounded representation SECOND aggregate late refusal"]
+fn adaptive_receiving_late_fault_atomic() {
+    let execution=LateSecondAggregate{card:dispatch::TracedCard::new(ObservedEpochDevice::open(0).unwrap()),calls:std::sync::atomic::AtomicUsize::new(0)};
+    let refusal=exterior::code_adaptive_receiving_late_rollback(&execution).unwrap();
+    assert!(refusal.contains("synthetic late prepared card aggregate refusal"));
+    assert_eq!(execution.calls.load(std::sync::atomic::Ordering::Relaxed),2);
+    execution.card.require_actual_dispatch().unwrap();
+    eprintln!("ADAPTIVE_RECEIVING_LATE_FAULT {}",execution.card.receipt(false).trim());
 }

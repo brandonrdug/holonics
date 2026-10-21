@@ -58,6 +58,7 @@ pub enum EpochStageCondition {
     /// An optional channel rebase landed material but its original family has no fresh rate.
     ChannelGrainFreshRate,
     SourceRefinementHalfCell,
+    ReceivingRepresentationHalfCell,
     Lobe,
     CovectorScale,
     DeclaredFamily,
@@ -84,6 +85,7 @@ pub enum EpochStageValue {
     /// Original local decline retained by an independently failing held publication.
     ReceivingDecline(Box<EpochStageRefusal>),
     JointDirection(EpochJointDirectionReading),
+    ReceivingRepresentation(EpochReceivingRepresentationReading),
     Text(&'static str),
     /// The failing owner had not produced this operand, or its diagnostic could not be read.
     Unavailable(&'static str),
@@ -246,6 +248,7 @@ struct EpochStageTrace {
     family: Option<Family>,
     evidence: Option<EpochStageRefusal>,
     channel_grain: Option<EpochChannelGrainReading>,
+    receiving_representations: Vec<EpochReceivingRepresentationReading>,
 }
 impl Default for EpochStageTrace {
     fn default() -> Self {
@@ -255,6 +258,7 @@ impl Default for EpochStageTrace {
             family: None,
             evidence: None,
             channel_grain: None,
+            receiving_representations: Vec::new(),
         }
     }
 }
@@ -320,6 +324,9 @@ impl EpochStageTrace {
             }
             _ => {}
         }
+        evidence.readings.extend(self.receiving_representations.into_iter().map(|r| EpochStageReading {
+            name:"receiving_representation", value:EpochStageValue::ReceivingRepresentation(r)
+        }));
         evidence.reason = error.to_string();
         EpochStageFailure {
             error,
@@ -1007,6 +1014,8 @@ pub(crate) struct EpochLaw {
     /// Source material alone may refine its dyadic representation at a crossing.
     /// R remains its only unabsorbed normal news; this is not another carry.
     pub(crate) source_refinement: bool,
+    /// Explicit receiving representation policy, independent of receiver/flow grain.
+    pub(crate) receiving_refinement: Option<u32>,
     /// Number of absorbed batches, distinct from actual receiving ingress c.
     pub(crate) crossings: u64,
     /// This bound affects future certified gains, so a continuing checkpoint
@@ -1029,6 +1038,7 @@ pub(crate) struct EpochDeposit {
     pub(crate) direction_divisor: BigInt,
     pub(crate) joint_direction: Option<EpochJointDirectionReading>,
     pub(crate) shares: Vec<i64>,
+    pub(crate) receiving_representation: Option<EpochReceivingRepresentationReading>,
 }
 
 /// Exact proposed direction only. The live normal owner retains W/H/R, never this wrapper.
@@ -1172,8 +1182,12 @@ impl EpochLaw {
                 "an epoch checkpoint must match the native port shape, receiver grain, and paired declaration",
             ));
         }
+        if self.receiving_refinement.is_some() && (source_refinement || declaration.receiving_prior().is_none() || self.source_refinement) {
+            return Err(refused("receiving representation refinement belongs only to a declared receiving normal"));
+        }
         let mut founded = Self::from_normal(declaration, receiver_grain)?;
         founded.source_refinement = self.source_refinement;
+        founded.receiving_refinement = self.receiving_refinement;
         if declaration.receiving_prior().is_some() {
             // `continued` has the actual native law but not its field period.
             // Only that declared receiving role may defer the row binding;
@@ -1208,6 +1222,7 @@ impl EpochLaw {
                 .checked_add(ceil_log2_count(width))
                 .ok_or_else(extent)?,
             source_refinement: false,
+            receiving_refinement: None,
             crossings: 0,
             spectral: EpochSpectral::founded_zero(rows, columns),
             symmetry: None,
@@ -1241,6 +1256,7 @@ impl EpochLaw {
                 .checked_add(ceil_log2_count(columns))
                 .ok_or_else(extent)?,
             source_refinement: false,
+            receiving_refinement: None,
             crossings,
             spectral,
             symmetry,
@@ -1797,6 +1813,7 @@ impl EpochLaw {
             joint_locus,
             evidence,
             None,
+            None,
         )
     }
 
@@ -1823,7 +1840,21 @@ impl EpochLaw {
             None,
             None,
             Some(projection),
+            None,
         )
+    }
+
+    /// One minimum nonzero representation, not a precision/admission search. The
+    /// whole material occupancy and budget are provided by the paired native owner.
+    fn deposit_receiving(&self, flow: &EpochFlow, gamma: &EpochArray,
+        budget: u64, occupied: u64, physical_scale_bits: u64) -> Result<EpochDeposit, HnnError> {
+        if self.receiving_refinement != Some(ReceivingRepresentationPolicy::CEILING)
+            || self.source_refinement || (gamma.rows, gamma.columns)!=(1,1)
+            || !gamma.is_dyadic() || gamma.values.iter().any(Signed::is_negative) {
+            return Err(refused("a bounded receiving proposal needs its declared policy and actual nonnegative fresh gain"));
+        }
+        self.deposited_with_quantum_proposal(flow,gamma,BigInt::one(),BigInt::one(),
+            None,None,None,None,Some((budget,occupied,physical_scale_bits)))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -1837,6 +1868,7 @@ impl EpochLaw {
         joint_locus: Option<LinearLocus>,
         mut evidence: Option<&mut Option<EpochStageRefusal>>,
         quantum: Option<&QuantumProjection>,
+        receiving_budget: Option<(u64, u64, u64)>,
     ) -> Result<EpochDeposit, HnnError> {
         if quantum.is_some()
             && (eta_numerator != BigInt::one()
@@ -1939,6 +1971,54 @@ impl EpochLaw {
                     loci: vec![locus],
                 });
             }
+        }
+        let mut receiving_representation = None;
+        if let Some((budget, occupied, physical_scale_bits)) = receiving_budget {
+            let ceiling = self.receiving_refinement.ok_or_else(|| refused("a receiving refinement declaration"))?;
+            let mut reading = EpochReceivingRepresentationReading {
+                before: self.map_lattice, proposed: self.map_lattice, ceiling,
+                minimum_nonzero: None, disposition: ReceivingRepresentationDisposition::Unchanged,
+                direction: EpochSeriesReading::of(&direction), predicted_whole_bits: None,
+            };
+            if direction.is_zero() { reading.disposition = ReceivingRepresentationDisposition::ExactZero; }
+            else if gamma.is_zero() { reading.disposition = ReceivingRepresentationDisposition::NoFreshGain; }
+            else {
+                // Odd phase factors remain in their original row, rather than being
+                // approximated or absorbed into a changed operand/normal metric.
+                let mut required = u32::MAX;
+                for row in 0..direction.rows {
+                    let maximum = direction.values[row*direction.columns..(row+1)*direction.columns]
+                        .iter().map(Signed::abs).max().unwrap_or_default();
+                    if maximum.is_positive() {
+                        let divisor = &direction_divisor * direction.row_divisors[row];
+                        required = required.min(Self::direction_reach(direction.exponent,&maximum,&divisor)?);
+                    }
+                }
+                reading.minimum_nonzero = Some(required);
+                if required <= map_lattice { reading.disposition = ReceivingRepresentationDisposition::AlreadyRepresentable; }
+                else if required > ceiling { reading.disposition = ReceivingRepresentationDisposition::CeilingUnresolved; }
+                else {
+                    // BEFORE shifting or forming a finer dense map: bound both retained
+                    // grouped coordinates and the dense rational map publication. The
+                    // existing final exact whole-material guard remains authoritative.
+                    let n = u64::try_from(direction.values.len()).map_err(|_| extent())?;
+                    let limb = [&self.map,&direction,&gram,&news].into_iter()
+                        .map(|a| a.values.iter().map(BigInt::bits).max().unwrap_or(0)
+                            .saturating_add(u64::from(a.exponent)).saturating_add(u64::from(required)))
+                        .max().unwrap_or(0).saturating_add(physical_scale_bits);
+                    let row_bits = direction.row_divisors.iter().map(|d|u64::from(u64::BITS-d.leading_zeros())).max().unwrap_or(0);
+                    let column_bits = u64::from(usize::BITS-direction.columns.leading_zeros());
+                    let growth = n.saturating_mul(limb.saturating_mul(4)
+                        .saturating_add(u64::from(required)*4)
+                        .saturating_add(row_bits.saturating_mul(2)).saturating_add(column_bits.saturating_mul(2)).saturating_add(4));
+                    let predicted = occupied.saturating_add(growth);
+                    reading.predicted_whole_bits = Some(predicted);
+                    if predicted > budget { reading.disposition = ReceivingRepresentationDisposition::BudgetUnresolved; }
+                    else { map_lattice = required; reading.proposed = required;
+                        reading.disposition = ReceivingRepresentationDisposition::Refined; }
+                }
+            }
+            receiving_representation = Some(reading);
         }
         let shift = i64::from(map_lattice) - i64::from(direction.exponent);
         let projection_divisor = &eta_denominator * &direction_divisor;
@@ -2104,6 +2184,7 @@ impl EpochLaw {
             direction_divisor,
             joint_direction: joint,
             shares,
+            receiving_representation,
         })
     }
 
@@ -3309,5 +3390,45 @@ mod source_refinement_tests {
             )
             .is_err()
         );
+    }
+}
+
+#[cfg(test)]
+mod receiving_representation_controls {
+    use super::*;
+    #[test]
+    fn minimum_receiving_lattice_preserves_odd_rows_bounds_and_normal_identity() {
+        let mut law=EpochLaw::founded(2,1,3,0).unwrap().with_phase_rows(&[1],5).unwrap();
+        law.receiving_refinement=Some(20);
+        let sample=EpochSample {
+            feature:EpochArray::new(1,1,0,vec![1.into()]).unwrap(),
+            positive:EpochArray::new(2,1,0,vec![1.into(),0.into()]).unwrap(),
+            foil:EpochSeries {rows:2,columns:1,numerators:vec![BigInt::from(1023),BigInt::from(-1)],denominator:1024.into()},
+            metric_weight:EpochSeries {rows:1,columns:1,numerators:vec![1.into()],denominator:1.into()},
+        };
+        let flow=EpochFlow::from_samples(2,1,3,1,0,&[sample]).unwrap();
+        let gain=EpochArray::from_dyadic_scalar(&Rat::one()).unwrap();
+        assert!(law.deposit(&flow,&gain).unwrap().step.is_zero());
+        let d=law.deposit_receiving(&flow,&gain,1<<20,100,0).unwrap();
+        assert!(!d.step.is_zero()); assert!(d.successor.map_lattice>3 && d.successor.map_lattice<=20);
+        assert_eq!(d.successor.news.row_divisors,vec![1,5]);
+        assert_eq!(d.receiving_representation.as_ref().unwrap().disposition,ReceivingRepresentationDisposition::Refined);
+        assert!(d.fall.scalar_ratio().unwrap().is_positive());
+        let h=law.gram.add(&flow.gram).unwrap();
+        assert_eq!(d.successor.map.multiply(&h).unwrap().add(&d.successor.news).unwrap(),law.map.multiply(&h).unwrap().add(&law.news).unwrap().add(&flow.covector).unwrap());
+        let limited=law.deposit_receiving(&flow,&gain,100,100,0).unwrap();
+        assert!(limited.step.is_zero());assert_eq!(limited.successor.map_lattice,3);
+        assert_eq!(limited.receiving_representation.unwrap().disposition,ReceivingRepresentationDisposition::BudgetUnresolved);
+        let chart_limited=law.deposit_receiving(&flow,&gain,10000,100,10000).unwrap();
+        assert!(chart_limited.step.is_zero());
+        assert_eq!(chart_limited.receiving_representation.unwrap().disposition,ReceivingRepresentationDisposition::BudgetUnresolved);
+        let tiny_gain=EpochArray::new(1,1,30,vec![1.into()]).unwrap();
+        let capped=law.deposit_receiving(&flow,&tiny_gain,1<<20,100,0).unwrap();
+        assert!(capped.step.is_zero());assert_eq!(capped.successor.map_lattice,3);
+        assert_eq!(capped.receiving_representation.unwrap().disposition,ReceivingRepresentationDisposition::CeilingUnresolved);
+        let text=d.successor.encode_checkpoint();
+        assert_eq!(EpochLaw::decode_checkpoint(&text,&law,1<<20).unwrap(),d.successor);
+        assert!(EpochLaw::decode_checkpoint(&text.replace("receiving-refinement 20","receiving-refinement 21"),&law,1<<20).is_err());
+        println!("BOUNDED_RECEIVING_CORE old_lattice=3 new_lattice={} normal_fall={} cap20_unresolved=true budget_unresolved=true odd_phase5_preserved=true",d.successor.map_lattice,d.fall.scalar_ratio().unwrap());
     }
 }

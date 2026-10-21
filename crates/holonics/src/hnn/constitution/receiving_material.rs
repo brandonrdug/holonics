@@ -123,6 +123,7 @@ pub(super) enum ReceivingMaterial {
     ArrivalContext {
         source_width: usize,
         return_policy: crate::hnn::receiving::RetainedReturnPolicy,
+        representation_policy: ReceivingRepresentationPolicy,
         blocks: [ReceivingBlock; 2],
         published: ExactRatMatrix,
         shared_phase: PhaseStatistics,
@@ -187,6 +188,7 @@ impl ReceivingMaterial {
                 Self::ArrivalContext {
                     source_width: *source_width,
                     return_policy: self.return_policy(),
+                    representation_policy: self.representation_policy(),
                     blocks,
                     published: published.scaled(&Rat::zero()),
                     shared_phase: PhaseStatistics::founded(
@@ -401,7 +403,9 @@ impl ReceivingMaterial {
                     crate::hnn::receiving::ReceivingCarrier::Anchor => "anchor",
                     crate::hnn::receiving::ReceivingCarrier::SourceObserver => "source-observer",
                 };
-                let tag = if material.unwrap().return_policy() == crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 { "arrival-context-family-local-v1" } else { "arrival-context-v1" };
+                let tag = if material.unwrap().representation_policy() == ReceivingRepresentationPolicy::BoundedSubquantumV1 {
+                    "arrival-context-family-local-subquantum20-v1"
+                } else if material.unwrap().return_policy() == crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 { "arrival-context-family-local-v1" } else { "arrival-context-v1" };
                 *s += &format!("{key} {tag} {source_width} {carrier}\n");
                 for (index, block) in blocks.iter().enumerate() {
                     let scale = block
@@ -453,13 +457,16 @@ impl ReceivingMaterial {
             .next()
             .ok_or(HnnError::ContinuingState { what })?;
         let words = head(line, key, what)?;
-        if !matches!(words.first().map(String::as_str),Some("arrival-context-v1"|"arrival-context-family-local-v1")) {
+        if !matches!(words.first().map(String::as_str),Some("arrival-context-v1"|"arrival-context-family-local-v1"|"arrival-context-family-local-subquantum20-v1")) {
             return read_optional_law(lines, key, what, budget).map(|law| law.map(Self::Single));
         }
         let [_, width, carrier] = words.as_slice() else {
             return refuse("the versioned receiving material header");
         };
-        let return_policy = if words[0] == "arrival-context-family-local-v1" { crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 } else { crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 };
+        let return_policy = if words[0] != "arrival-context-v1" { crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 } else { crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 };
+        let representation_policy = if words[0] == "arrival-context-family-local-subquantum20-v1" {
+            ReceivingRepresentationPolicy::BoundedSubquantumV1
+        } else { ReceivingRepresentationPolicy::FixedLatticeV1 };
         let source_width = number(Some(width), "the receiving source width")?;
         if source_width == 0 || source_width.checked_mul(2).is_none() {
             return refuse("the receiving source width");
@@ -557,6 +564,7 @@ impl ReceivingMaterial {
         let material = Self::ArrivalContext {
             source_width,
             return_policy,
+            representation_policy,
             blocks,
             published,
             shared_phase,
@@ -607,6 +615,7 @@ impl ReceivingMaterial {
         let result = Self::ArrivalContext {
             source_width,
             return_policy: crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1,
+            representation_policy: ReceivingRepresentationPolicy::FixedLatticeV1,
             blocks: [block(source_width)?, block(context_width)?],
             shared_phase: PhaseStatistics::founded(law.map.rows() / 2, width),
             published: law.map,
@@ -625,6 +634,20 @@ impl ReceivingMaterial {
         }
         match self { Self::ArrivalContext { return_policy, .. } => *return_policy=crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1,
             _ => return Err(HnnError::Unadmitted { reason: "family-local return requires explicit arrival/context material" }) }
+        Ok(())
+    }
+
+    pub(super) fn representation_policy(&self) -> ReceivingRepresentationPolicy {
+        match self { Self::Single(_) => ReceivingRepresentationPolicy::FixedLatticeV1,
+            Self::ArrivalContext { representation_policy, .. } => *representation_policy }
+    }
+    pub(super) fn bind_bounded_representation(&mut self) -> Result<(), HnnError> {
+        if self != &self.founding() || self.representation_policy()!=ReceivingRepresentationPolicy::FixedLatticeV1
+            || self.return_policy()!=crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 {
+            return Err(HnnError::Unadmitted {reason:"bounded receiving representation is declared only on fresh family-local arrival/context material"});
+        }
+        match self {Self::ArrivalContext {representation_policy,..} => *representation_policy=ReceivingRepresentationPolicy::BoundedSubquantumV1,
+            _ => return Err(HnnError::Unadmitted {reason:"bounded receiving representation requires two explicit receiving blocks"})}
         Ok(())
     }
 
@@ -671,6 +694,7 @@ impl ReceivingMaterial {
             } => {
                 let mut count = CarrierBits::default();
                 count.entries += u64::from(self.return_policy()==crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
+                if let Some(cap) = self.representation_policy().ceiling() { count.entries += u64::from(cap) + 1; }
                 for block in blocks {
                     count.add(block.law.carrier_bits());
                     count.entries += block.chart.as_ref().map_or(0, |chart| bits(chart.scale()));
@@ -723,6 +747,19 @@ impl ReceivingMaterial {
 
     /// Validate cache equality exactly; never silently repair a malformed owner.
     pub(super) fn validate(&self) -> Result<(), HnnError> {
+        let policy = self.representation_policy();
+        if policy == ReceivingRepresentationPolicy::BoundedSubquantumV1
+            && self.return_policy()!=crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 {
+            return Err(HnnError::Unadmitted {reason:"bounded receiving representation retains its family-local policy"});
+        }
+        for law in self.laws() {
+            if let Some(epoch) = law.epoch_law() {
+                if epoch.receiving_refinement != policy.ceiling() || epoch.source_refinement
+                    || policy.ceiling().is_some_and(|cap|epoch.map_lattice > cap) {
+                    return Err(HnnError::Unadmitted {reason:"receiving normal lattice and refinement declaration must match their material owner"});
+                }
+            }
+        }
         if let Self::ArrivalContext {
             source_width,
             blocks,

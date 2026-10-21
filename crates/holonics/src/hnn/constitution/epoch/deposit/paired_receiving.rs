@@ -233,13 +233,17 @@ fn prepare(
             directions.push(ExactRatMatrix::zero(rows, width)?);
             continue;
         }
-        let law = match block.law().epoch_law() {
+        let mut law = match block.law().epoch_law() {
             Some(l) => l.clone(),
             None => EpochLaw::from_normal(block.law(), grain)?.with_phase_rows(
                 &(1..rows).step_by(2).collect::<Vec<_>>(),
                 stage.receiving_period,
             )?,
         };
+        law.receiving_refinement = owner.representation_policy().ceiling();
+        if law.receiving_refinement.is_some_and(|cap|law.map_lattice > cap) {
+            return Err(refused("the initial receiving lattice exceeds the explicit representation ceiling"));
+        }
         let local = owner.block_samples(i, &samples)?;
         trace.at("paired_normal_flow", Some(kind.locus()), Some(Family::Map));
         let (flow, scale) = block_flow(stage, &law, &local, grain, trace)?;
@@ -391,13 +395,23 @@ fn publish(
     let mut normal_laws = std::array::from_fn(|i| p.owner.blocks().unwrap()[i].law().clone());
     let mut steps = Vec::new();
     let mut block_readings = Vec::new();
+    // The second block must reserve the first block's proposed growth too. These
+    // conservative transient reservations never become normal state or new budget.
+    let mut occupied = stage.opening.bits_within(stage.retained);
     for i in 0..2 {
         if let (Some(law), Some(flow)) = (&p.laws[i], &p.flows[i]) {
             let d = if held.is_some() {
                 law.deposited_at(flow, &gain, BigInt::zero(), BigInt::one())?
+            } else if p.owner.representation_policy() == ReceivingRepresentationPolicy::BoundedSubquantumV1 {
+                let scale = p.owner.blocks().unwrap()[i].chart().expect("reached chart").scale();
+                law.deposit_receiving(flow,&gain,stage.opening.budget,occupied,bits(scale))?
             } else {
                 law.deposit(flow, &gain)?
             };
+            if let Some(r) = &d.receiving_representation {
+                if r.disposition==ReceivingRepresentationDisposition::Refined {occupied=r.predicted_whole_bits.expect("preflight admitted");}
+                trace.receiving_representations.push(r.clone());
+            }
             steps.push(p.owner.blocks().unwrap()[i].physical_direction(&d.step.to_matrix()?)?);
             candidates[i] = Some(d);
         } else {
@@ -522,6 +536,7 @@ fn publish(
                 }
             }
             block_readings.push(EpochPairedReceivingBlockReading {
+                representation: d.receiving_representation.clone(),
                 index: i,
                 operand_scale: p.owner.blocks().unwrap()[i]
                     .chart()
@@ -545,6 +560,14 @@ fn publish(
     }
     owner = owner.with_block_laws(normal_laws)?;
     let mut next = stage.opening.clone();
+    if owner.representation_policy() == ReceivingRepresentationPolicy::BoundedSubquantumV1 {
+        let finer = owner.laws().iter().filter_map(|l|l.epoch_law().map(|e|e.map_lattice)).max()
+            .unwrap_or(stage.opening.lattice(kind.locus())?.exponent());
+        if finer > stage.opening.lattice(kind.locus())?.exponent() {
+            admit_refined_receiving_carries(kind.locus(),finer,&next.carries,&mut trace.evidence)?;
+            next.lattices.insert(kind.locus(),Lattice::new(finer));
+        }
+    }
     next.rings[stage.receiver].receiving = Some(owner);
     next.rings[stage.receiver].tree = Some(stage.tree.clone());
     for step in &p.population {
@@ -577,6 +600,7 @@ fn publish(
         });
     }
     let paired = EpochPairedReceivingReading {
+        representation_policy: p.owner.representation_policy(),
         source_width: p.owner.blocks().unwrap()[0].width(),
         fresh_physical_alignment: p.certificate.alignment.clone(),
         fresh_return_error: p.certificate.return_error.clone(),
@@ -916,6 +940,62 @@ mod tests {
                     &(&sample.covector[i] * &sample.feature[j])
                 );
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod representation_controls {
+    use super::*;
+    use crate::hnn::reference::observed::HostObservedEpochExecution;
+    #[test]
+    fn bounded_receiving_representation_native_cold() {
+        for scale in [0,-64] {
+            let start=std::time::Instant::now();
+            let (field,material,deposit,parts,exponent)=super::super::tests::held_retained_fixture_representation(scale,true,true,true);
+            let receiver=field.receivers()[0].ring;
+            let retained=crate::hnn::retention::loci(&field).into_iter().collect();
+            let deposits=[deposit];
+            let pair_speed=|_,_,_:&PairPort,_:[&[Vec<Rat>];3]|panic!("no pair factor");
+            let mut stage=ObservedNormalEpochStage::new(&material,&deposits,receiver,field.ring(receiver).period(),1,1,0,exponent,&retained,
+                material.landmarks(receiver).unwrap().clone(),&pair_speed,&parts,&HostObservedEpochExecution,false).unwrap().for_local_receiving_hold().unwrap();
+            let mut trace=EpochStageTrace::default();
+            let p=prepare(&stage,&mut |_|{},&mut trace).unwrap();
+            let gamma=p.certified[&(Locus::ReceivingMap(receiver),Family::Map)].step.step.clone();
+            let gain=EpochArray::from_dyadic_scalar(&gamma).unwrap();
+            for i in 0..2 {
+                let law=p.laws[i].as_ref().unwrap();let flow=p.flows[i].as_ref().unwrap();
+                let old=law.deposit(flow,&gain).unwrap();
+                if scale==0 {assert!(old.step.is_zero());assert!(!old.direction.is_zero());}
+            }
+            let before=material.continuing_state(0).unwrap();
+            stage.paired_prepared=Some(p);
+            let candidate=stage.stage_local_receiving_with_hold(&mut |_|{}).unwrap();
+            let (next,reading)=candidate.admit_receiving().unwrap();
+            let paired=reading.epoch.as_ref().unwrap().paired_receiving.as_ref().unwrap();
+            if scale==0 {
+                assert!(paired.blocks.iter().any(|b|b.representation.as_ref().is_some_and(|r|r.disposition==ReceivingRepresentationDisposition::Refined)),"{paired:?}");
+                assert_ne!(next.receiving_map(receiver),material.receiving_map(receiver));
+                assert!(paired.actual_alignment.as_ref().is_some_and(Signed::is_positive));
+                assert!(paired.held_original_decline.is_none());
+            } else {assert!(paired.held_original_decline.is_some()); assert_eq!(next.receiving_map(receiver),material.receiving_map(receiver));}
+            for block in &paired.blocks {
+                let old=material.receiving_blocks(receiver).unwrap()[block.index].law().epoch_law().unwrap();
+                let new=next.receiving_blocks(receiver).unwrap()[block.index].law().epoch_law().unwrap();
+                assert_eq!(new.crossings,old.crossings+1);
+                assert_eq!(new.receiving_refinement,Some(20));
+                assert!(new.map_lattice<=20 && !new.source_refinement);
+            }
+            let state=ContinuingState::from_text(&next.continuing_state(0).unwrap().to_text(),next.budget()).unwrap();
+            let mut declaration=Constitution::initial(&field,next.budget()).unwrap();
+            declaration.bind_arrival_context_receiving(receiver).unwrap();
+            declaration.bind_family_local_receiving_return(receiver).unwrap();
+            assert!(declaration.clone().continued_on(&field,&state).is_err(),"old policy cannot silently consume a finer state");
+            declaration.bind_bounded_receiving_representation(receiver).unwrap();
+            let cold=declaration.continued_on(&field,&state).unwrap();
+            assert_eq!(cold.continuing_state(0).unwrap(),next.continuing_state(0).unwrap());
+            assert_eq!(material.continuing_state(0).unwrap(),before);
+            println!("BOUNDED_REPRESENTATION_NATIVE scale={scale} elapsed_ns={} gamma={gamma} map_changed={} cold_exact=true reading={paired:?}",start.elapsed().as_nanos(),next.receiving_map(receiver)!=material.receiving_map(receiver));
         }
     }
 }

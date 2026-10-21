@@ -120,6 +120,7 @@ const MATERIAL_BIT_BUDGET: u64 = 1 << 40; // Existing listener declaration, neve
 const MAGIC: &str = "solenoidal-alpha-unplaced-v2";
 const FRAMED_MAGIC: &str = "solenoidal-alpha-source-framing-v1";
 const FAMILY_LOCAL_MAGIC: &str = "solenoidal-alpha-family-local-arrival-v1";
+const ADAPTIVE_RECEIVING_MAGIC: &str = "solenoidal-alpha-family-local-subquantum20-v1";
 const ARRIVAL_FRAMED_MAGIC: &str = "solenoidal-alpha-source-framing-arrival-v1";
 const QUERY_BYTE_BUDGET: usize = 128; // Explicit exterior tiny-query workload declaration.
 const WARM_QUERY: &str = "carry";
@@ -276,14 +277,15 @@ impl Checkpoint {
     fn source_framed(&self)->bool { self.stream.resident().field().receiving_context(2)==Some(holonics::hnn::receiving::ObservationPartition::SourceFramingRouteV1) }
     fn arrival_context(&self)->bool{matches!(self.stream.resident().constitution().receiving_layout(2),Some(holonics::hnn::constitution::ReceivingLayout::ArrivalContext{..}))}
     fn family_local(&self)->bool { self.stream.resident().constitution().receiving_return_policy(2)==Some(holonics::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1) }
-    fn declaration(&self)->Result<(Field,Constitution,PairingDeclaration)>{ let (f,mut c,p)=declaration_with_input_context(self.population,self.source_framed(),self.arrival_context())?; if self.family_local(){c.bind_family_local_receiving_return(2)?;} Ok((f,c,p)) }
+    fn adaptive_receiving(&self)->bool {self.stream.resident().constitution().receiving_representation_policy(2)==Some(holonics::hnn::constitution::ReceivingRepresentationPolicy::BoundedSubquantumV1)}
+    fn declaration(&self)->Result<(Field,Constitution,PairingDeclaration)>{ let (f,mut c,p)=declaration_with_input_context(self.population,self.source_framed(),self.arrival_context())?; if self.family_local(){c.bind_family_local_receiving_return(2)?;} if self.adaptive_receiving(){c.bind_bounded_receiving_representation(2)?;} Ok((f,c,p)) }
     fn bytes(&self) -> Result<Vec<u8>> {
         let native = self.stream.resident().continuing_state(0)?.to_text();
         let crib = self.stream.crib().unplaced_checkpoint()?;
         let pending = self.stream.pending_checkpoint();
         let header = format!(
             "{}\n{} {} {} {} {}\n",
-            if self.family_local(){FAMILY_LOCAL_MAGIC}else if self.arrival_context(){ARRIVAL_FRAMED_MAGIC}else if self.source_framed(){FRAMED_MAGIC}else{MAGIC},
+            if self.adaptive_receiving(){ADAPTIVE_RECEIVING_MAGIC}else if self.family_local(){FAMILY_LOCAL_MAGIC}else if self.arrival_context(){ARRIVAL_FRAMED_MAGIC}else if self.source_framed(){FRAMED_MAGIC}else{MAGIC},
             self.population,
             native.len(),
             crib.len(),
@@ -319,7 +321,7 @@ impl Checkpoint {
         let hash = sha256(&bytes)?;
         let text = std::str::from_utf8(&bytes)?;
         let (magic, rest) = text.split_once('\n').ok_or("missing checkpoint header")?;
-        if magic != MAGIC && magic != FRAMED_MAGIC && magic != ARRIVAL_FRAMED_MAGIC && magic != FAMILY_LOCAL_MAGIC {
+        if magic != MAGIC && magic != FRAMED_MAGIC && magic != ARRIVAL_FRAMED_MAGIC && magic != FAMILY_LOCAL_MAGIC && magic != ADAPTIVE_RECEIVING_MAGIC {
             return Err("unsupported Alpha checkpoint".into());
         }
         let (sizes, body) = rest.split_once('\n').ok_or("missing checkpoint sizes")?;
@@ -364,11 +366,13 @@ impl Checkpoint {
             .ok_or("provenance UTF8 boundary")?
             .to_owned();
         let state = ContinuingState::from_text(native, MATERIAL_BIT_BUDGET)?;
-        let (field, mut initial, _) = declaration_with_input_context(*population,magic!=MAGIC,matches!(magic,ARRIVAL_FRAMED_MAGIC|FAMILY_LOCAL_MAGIC))?;
-        if magic==FAMILY_LOCAL_MAGIC {initial.bind_family_local_receiving_return(2)?;}
+        let (field, mut initial, _) = declaration_with_input_context(*population,magic!=MAGIC,matches!(magic,ARRIVAL_FRAMED_MAGIC|FAMILY_LOCAL_MAGIC|ADAPTIVE_RECEIVING_MAGIC))?;
+        if matches!(magic,FAMILY_LOCAL_MAGIC|ADAPTIVE_RECEIVING_MAGIC) {initial.bind_family_local_receiving_return(2)?;}
+        if magic==ADAPTIVE_RECEIVING_MAGIC {initial.bind_bounded_receiving_representation(2)?;}
         let resident =
             port().mount_continued(&field, &Current::at_rest(&field), initial, &state)?;
-        if (resident.constitution().receiving_return_policy(2)==Some(holonics::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1)) != (magic==FAMILY_LOCAL_MAGIC) { return Err("outer checkpoint return tag does not match native material".into()); }
+        if (resident.constitution().receiving_return_policy(2)==Some(holonics::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1)) != matches!(magic,FAMILY_LOCAL_MAGIC|ADAPTIVE_RECEIVING_MAGIC) { return Err("outer checkpoint return tag does not match native material".into()); }
+        if (resident.constitution().receiving_representation_policy(2)==Some(holonics::hnn::constitution::ReceivingRepresentationPolicy::BoundedSubquantumV1)) != (magic==ADAPTIVE_RECEIVING_MAGIC) {return Err("outer checkpoint representation tag does not match native material".into());}
         if resident.continuing_state(0)? != state {
             return Err("cold native restore changed saved state".into());
         }
@@ -2102,3 +2106,6 @@ pub fn code_paired_prepared_late_rollback(execution:&dyn holonics::hnn::referenc
 
 #[cfg(test)]
 pub fn code_family_local_late_rollback(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution)->std::result::Result<String,Box<dyn std::error::Error>> { complete_language::code_family_local_late_rollback(execution) }
+
+#[cfg(test)]
+pub fn code_adaptive_receiving_late_rollback(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution)->std::result::Result<String,Box<dyn std::error::Error>> {complete_language::code_adaptive_receiving_late_rollback(execution)}

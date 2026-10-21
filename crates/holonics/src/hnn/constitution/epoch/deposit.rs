@@ -1246,6 +1246,12 @@ fn admit_refined_source_carries(
     carries: &Carries,
     evidence: &mut Option<EpochStageRefusal>,
 ) -> Result<(), HnnError> {
+    admit_refined_normal_carries(locus,finer,carries,evidence,false)
+}
+fn admit_refined_receiving_carries(locus:Locus,finer:u32,carries:&Carries,evidence:&mut Option<EpochStageRefusal>)->Result<(),HnnError> {
+    admit_refined_normal_carries(locus,finer,carries,evidence,true)
+}
+fn admit_refined_normal_carries(locus:Locus,finer:u32,carries:&Carries,evidence:&mut Option<EpochStageRefusal>,receiving:bool)->Result<(),HnnError> {
     let half_exponent = finer.checked_add(1).ok_or_else(extent)?;
     let half = Rat::new(BigInt::one(), BigInt::one() << half_exponent as usize);
     let first =
@@ -1261,9 +1267,9 @@ fn admit_refined_source_carries(
             });
     if let Some((carrier, entry, residual)) = first {
         EpochStageRefusal::at(
-            "source_refinement",
-            EpochStageCondition::SourceRefinementHalfCell,
-            "-half <= carried residual < half on the finer source lattice",
+            if receiving {"receiving_representation"} else {"source_refinement"},
+            if receiving {EpochStageCondition::ReceivingRepresentationHalfCell} else {EpochStageCondition::SourceRefinementHalfCell},
+            if receiving {"-half <= carried residual < half on the finer receiving lattice"} else {"-half <= carried residual < half on the finer source lattice"},
             Some(locus),
             carrier_family(carrier),
         )
@@ -1274,7 +1280,7 @@ fn admit_refined_source_carries(
         .read("finer_lattice_exponent", EpochStageValue::Exponent(finer))
         .first(evidence);
         return Err(refused(
-            "source refinement needs its pair-factor remainders inside the finer half-cell",
+            if receiving {"receiving refinement retains its original carried residual inside the finer half-cell"} else {"source refinement needs its pair-factor remainders inside the finer half-cell"},
         ));
     }
     Ok(())
@@ -6264,12 +6270,16 @@ mod tests {
         held_retained_fixture_policy(scale,paired,false)
     }
     pub(super) fn held_retained_fixture_policy(scale:i64,paired:bool,family_local:bool)->(Field,Constitution,Deposit,Vec<EpochReceivingRecord>,u32){
+        held_retained_fixture_representation(scale,paired,family_local,false)
+    }
+    pub(super) fn held_retained_fixture_representation(scale:i64,paired:bool,family_local:bool,adaptive:bool)->(Field,Constitution,Deposit,Vec<EpochReceivingRecord>,u32){
         use crate::compression::landmark::context::LandmarkFace;
         use crate::hnn::receiving::{ReceivingRead, RetainedSectionReturn};
         let (field, mut material, old, _, exponent) = normal_domain_fixture(None, true);
         if paired { material.bind_arrival_context_receiving(field.receivers()[0].ring).unwrap(); }
         let receiver = field.receivers()[0].ring;
         if family_local {material.bind_family_local_receiving_return(receiver).unwrap();}
+        if adaptive {material.bind_bounded_receiving_representation(receiver).unwrap();}
         let map = material.receiving_map(receiver).unwrap().clone();
         let n = map.rows() / 2;
         assert!(n.is_power_of_two());
@@ -6366,6 +6376,13 @@ mod tests {
                 let local=owner.block_samples(i,std::slice::from_ref(&sample)).unwrap();
                 let g=rows_matrix(&local[0].covector.iter().map(|c|local[0].feature.iter().map(|f|c*f).collect::<Vec<_>>()).collect::<Vec<_>>());
                 let mut law=EpochLaw::from_normal(normal,grain).unwrap().with_phase_rows(&phase_rows,field.ring(receiver).period()).unwrap();
+                law.receiving_refinement=owner.representation_policy().ceiling();
+                // Synthetic reached Gram: its declared factor guarantees a subquantum
+                // direction relative to THIS fixture's actual lattice, without gain tuning.
+                if adaptive && scale==0 {
+                    let factor=BigInt::one() << (law.map_lattice+2) as usize;
+                    law.gram=law.gram.scalar_product(&EpochArray::from_dyadic_scalar(&Rat::from_integer(factor)).unwrap()).unwrap();
+                }
                 let a=EpochArray::from_dyadic_matrix(&g).unwrap();
                 let news=EpochArray::with_row_divisors(a.rows,a.columns,a.exponent,a.values,(0..map.rows()).map(|row|if row%2==1{field.ring(receiver).period()}else{1}).collect()).unwrap();
                 law.news=news.scalar_product(&EpochArray::from_dyadic_scalar(&Rat::from_integer(scale.into())).unwrap()).unwrap();

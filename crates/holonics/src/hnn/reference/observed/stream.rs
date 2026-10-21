@@ -460,7 +460,8 @@ impl ObservedStream {
     /// passage and the closing crib retain their existing owners and checkpoint codecs.
     pub fn pending_checkpoint(&self) -> String {
         let local_family = self.resident.constitution.receiving_return_policy(self.resident.admitted[0].ring()) == Some(crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
-        let (header, law_field) = if local_family { ("observed-stream-pending-v3", "retained-fibre-v1 family-local-retained-return-v1 ".to_string()) } else { match self.resident.receiving_law() {
+        let adaptive = self.resident.constitution.receiving_representation_policy(self.resident.admitted[0].ring()) == Some(crate::hnn::constitution::ReceivingRepresentationPolicy::BoundedSubquantumV1);
+        let (header, law_field) = if adaptive {("observed-stream-pending-v4", "retained-fibre-v1 family-local-retained-return-v1 bounded-subquantum20-v1 ".to_string())} else if local_family { ("observed-stream-pending-v3", "retained-fibre-v1 family-local-retained-return-v1 ".to_string()) } else { match self.resident.receiving_law() {
             crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 => {
                 ("observed-stream-pending-v1", String::new())
             }
@@ -506,9 +507,12 @@ impl ObservedStream {
             .ok_or_else(|| refuse("the unfinished observed transaction header"))?
             .split_whitespace()
             .collect();
-        let family_local = header.first().copied()==Some("observed-stream-pending-v3");
+        let adaptive = header.first().copied()==Some("observed-stream-pending-v4");
+        if adaptive != (resident.constitution.receiving_representation_policy(resident.admitted[0].ring())==Some(crate::hnn::constitution::ReceivingRepresentationPolicy::BoundedSubquantumV1)) {return Err(refuse("pending representation policy matches native material"));}
+        let family_local = matches!(header.first().copied(),Some("observed-stream-pending-v3"|"observed-stream-pending-v4"));
         if family_local != (resident.constitution.receiving_return_policy(resident.admitted[0].ring()) == Some(crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1)) { return Err(refuse("pending return policy matches native material")); }
         let (law, scope_at, commit_at) = match header.first().copied() {
+            Some("observed-stream-pending-v4") if header.len()==8 && header[1]=="retained-fibre-v1" && header[2]=="family-local-retained-return-v1" && header[3]=="bounded-subquantum20-v1" => (crate::hnn::receiving::ReceivingLaw::RetainedFibreV1,4,5),
             Some("observed-stream-pending-v3") if header.len()==7 && header[1]=="retained-fibre-v1" && header[2]=="family-local-retained-return-v1" => (crate::hnn::receiving::ReceivingLaw::RetainedFibreV1,3,4),
             Some("observed-stream-pending-v1") if header.len() == 5 => {
                 (crate::hnn::receiving::ReceivingLaw::CoarseGrainV1, 1, 2)
