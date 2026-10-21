@@ -91,7 +91,7 @@ pub(crate) enum Event {
 }
 
 pub(crate) fn reached(event: Event) {
-    match event{Event::WordOpenAttempt=>{FORWARD_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},Event::ReturnAttempt=>{RETURN_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},Event::ResponseReturnAttempt=>{RESPONSE_RETURN_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},_=>{}}
+    match event{Event::WordOpenAttempt=>{reserve_attempt();FORWARD_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},Event::ReturnAttempt=>{reserve_attempt();RETURN_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},Event::ResponseReturnAttempt=>{reserve_attempt();RESPONSE_RETURN_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},_=>{}}
     WORK.with(|cell| {
         let mut reading = cell.get();
         let counter = match event {
@@ -186,4 +186,20 @@ static RESPONSE_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64:
 static RETURN_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
 static RESPONSE_RETURN_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
 pub fn process_native_calls()->ProcessNativeCalls{use std::sync::atomic::Ordering::Relaxed;ProcessNativeCalls{forward_attempts:FORWARD_CALLS.load(Relaxed),response_attempts:RESPONSE_CALLS.load(Relaxed),return_attempts:RETURN_CALLS.load(Relaxed),response_return_attempts:RESPONSE_RETURN_CALLS.load(Relaxed)}}
-pub(crate) fn response_call(){RESPONSE_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);}
+pub(crate) fn response_call(){reserve_attempt();RESPONSE_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);}
+
+// Exterior synthetic qualification guard. No field, law, arithmetic or retained codec uses it.
+// Set once, before the first constructor, in a dedicated finite control process. Exhaustion
+// panics BEFORE entering the attempted owner; the control's RAII receipt survives unwinding.
+static ATTEMPT_LIMIT:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(u64::MAX);
+static ATTEMPTS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
+pub fn limit_process_native_attempts(limit:u64){
+    use std::sync::atomic::Ordering::SeqCst;
+    assert!(limit>0 && ATTEMPTS.load(SeqCst)==0,"configure qualification before native construction");
+    ATTEMPT_LIMIT.compare_exchange(u64::MAX,limit,SeqCst,SeqCst).expect("one process qualification limit");
+}
+fn reserve_attempt(){
+    use std::sync::atomic::Ordering::SeqCst;
+    ATTEMPTS.fetch_update(SeqCst,SeqCst,|n|n.checked_add(1).filter(|next|*next<=ATTEMPT_LIMIT.load(SeqCst)))
+        .expect("finite exterior native-attempt reservation exhausted BEFORE owner dispatch");
+}

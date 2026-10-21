@@ -109,3 +109,93 @@ fn native_charted_contact_refuses()->Result<()>{
     assert!(format!("{error:?}").contains("exact unsplit"));assert_eq!(charts,before_charts);assert_eq!(resident.continuing_state(0)?,before);
     println!("NATIVE_CHARTED_GUARD exact_refusal={error:?} immutable=true no_fallback=true");Ok(())
 }
+
+
+/// Distinct qualification from 7c3e: fresh native R -> NEW contact -> next R suffix.
+/// Deliberately independent of V93_NATIVE_CODE_SEED and all old fitted material.
+#[test]
+fn native_fresh_r_contact_successor_connected()->Result<()>{
+    use holonics::hnn::word::work;
+    struct FinalCount;
+    impl Drop for FinalCount {fn drop(&mut self){
+        let c=work::process_native_calls();let total=c.forward_attempts+c.response_attempts+c.return_attempts+c.response_return_attempts;
+        let text=format!("{{\"final\":true,\"total_attempts\":{total},\"forward_constructors\":{},\"response_companions\":{},\"actual_returns\":{},\"fresh_returns\":{}}}\n",c.forward_attempts,c.response_attempts,c.return_attempts,c.response_return_attempts);
+        println!("NATIVE_PROCESS_FINAL {text}");
+        if let Some(path)=std::env::var_os("V93_NATIVE_COUNT_PATH"){std::fs::write(path,text).expect("durable native count receipt");}
+    }}
+    let _final_count=FinalCount;
+    let limit=std::env::var("V93_NATIVE_ATTEMPT_LIMIT")?.parse()?;
+    work::limit_process_native_attempts(limit);
+    let started=Instant::now();let reference=port();
+    let (field,mut initial,pairing)=declaration_with_input_context(16384,true,true)?;
+    initial.bind_family_local_receiving_return(2)?;initial.bind_bounded_receiving_representation(2)?;
+    let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
+    let empty=PairedObservation::admit(&field,resident.constitution(),&pairing)?.encode(&[])?;
+    reference.ingest(&mut resident,None,&empty)?;
+    resident.refine_contact_grain(24)?; // ONE fixed lossless representation, before any prediction.
+    resident.select_native_current_prepared_input(&pairing)?;
+    assert!(resident.constitution().receiving_map(2).unwrap().entries().iter().all(num_traits::Zero::is_zero));
+    let opening=resident.constitution().clone();
+    let mut stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+    fn cold(reference:&Reference,stream:&ObservedStream,opening:&Constitution)->Result<ObservedStream>{
+        let before=stream.resident().continuing_state(0)?;
+        let parsed=ContinuingState::from_text(&before.to_text(),READ_BUDGET)?;
+        let field=stream.resident().field();
+        let resident=reference.mount_continued(field,&Current::at_rest(field),opening.clone(),&parsed)?;
+        assert_eq!(resident.continuing_state(0)?,before);
+        let published=stream.crib().next_position();
+        let crib=ObservedCrib::from_unplaced_checkpoint(field,resident.current(),published,&stream.crib().unplaced_checkpoint()?)?;
+        let result=ObservedStream::restore_checkpoint(resident,crib,&stream.pending_checkpoint())?;
+        assert_eq!(result.pending_checkpoint(),stream.pending_checkpoint());Ok(result)
+    }
+    let data:Vec<usize>=(0..30).map(|j|j%4).collect();
+    let mut one_shot=stream.clone();
+    stream.receive_native_current(&reference,&pairing,&data[..6],64)?;
+    assert_eq!(stream.accepted_cells()?,6);assert_eq!(stream.pending_classes().len(),6);
+    stream=cold(&reference,&stream,&opening)?;
+    println!("NATIVE_CONNECTED_CUT accepted6/published0/pending6 cold_exact=true attempts={:?}",work::process_native_calls());
+    let before_r=stream.resident().continuing_state(0)?;
+    let first=match stream.receive_native_current(&reference,&pairing,&data[6..10],64){Ok(x)=>x,Err(e)=>{
+        assert_eq!(stream.resident().continuing_state(0)?,before_r);assert_eq!(stream.pending_classes(),&data[..6]);
+        println!("NATIVE_CONNECTED_REFUSAL stage=fresh_R actual_source0 accepted6/pending6 immutable=true error={e:?}");return Err(e.into());}};
+    assert_eq!(first.len(),1);assert_eq!(first[0].events.len(),10);
+    one_shot.receive_native_current(&reference,&pairing,&data[..10],64)?;
+    assert_eq!(one_shot.resident().continuing_state(0)?,stream.resident().continuing_state(0)?);
+    assert_eq!(one_shot.pending_checkpoint(),stream.pending_checkpoint());assert_eq!(one_shot.crib(),stream.crib());
+    let r_changed=stream.resident().constitution().receiving_map(2)!=opening.receiving_map(2);
+    println!("NATIVE_CONNECTED_FIRST_R changed={r_changed} publication={:?} source={}/{} attempts={:?}",first[0].publication,first[0].start_source,first[0].end_source,work::process_native_calls());
+    assert!(r_changed,"positive native R causal control remains unestablished if only Held/no motion");
+    let before_contact=stream.resident().continuing_state(0)?;let material_before=stream.resident().constitution().clone();
+    let e=stream.observe_native_current_contact(&reference,&pairing,data[10],64)?;
+    let contact=e.contact.as_ref().ok_or("actual contact receipt")?;
+    let changed=(0..field.contacts().len()).any(|a|contact.constitution.contact_storage(a)!=material_before.contact_storage(a)||contact.constitution.contact_stiffness(a)!=material_before.contact_stiffness(a)||contact.constitution.contact_dissipation(a)!=material_before.contact_dissipation(a));
+    assert_eq!(contact.constitution.receiving_map(2),material_before.receiving_map(2));
+    println!("NATIVE_CONNECTED_NEW_CONTACT source10/11 factors_changed={changed} alignment={:?} error={:?} work={:?} attempts={:?}",contact.actual_alignment,contact.actual_error_charge,contact.continuation.deposition_work,work::process_native_calls());
+    assert!(changed,"fresh native contact factor effect is required, never forced");
+    assert_ne!(stream.resident().continuing_state(0)?,before_contact);
+    let second=stream.receive_native_current(&reference,&pairing,&data[11..20],64)?;
+    assert_eq!(second.len(),1);assert_eq!(second[0].events.len(),9);assert_eq!(second[0].contact_prefix_cells,1);
+    assert_eq!((second[0].start_source,second[0].end_source),(11,20));
+    let material=stream.resident().prepared_input().unwrap();
+    println!("NATIVE_CONNECTED_M actual={:?} formed={} pending={} range_refusal={:?}",material.frontiers(),material.material().observations(),material.outstanding().len(),material.material_refusal());
+    stream=cold(&reference,&stream,&opening)?;
+    let (mut warm,mut warm_crib)=stream.native_current_query_fork(&reference,&pairing,64)?;
+    warm.begin_hypothesized_output()?;
+    let state=warm.continuing_state(0)?;let parsed=ContinuingState::from_text(&state.to_text(),READ_BUDGET)?;
+    let mut restored=reference.mount_continued(&field,&Current::at_rest(&field),opening.clone(),&parsed)?;
+    let mut cold_crib=ObservedCrib::from_unplaced_checkpoint(&field,restored.current(),warm_crib.next_position(),&warm_crib.unplaced_checkpoint()?)?;
+    assert_eq!(restored.continuing_state(0)?,state);
+    let plastic=warm.constitution().clone();let m=warm.prepared_input().unwrap().material().clone();
+    for (i,key) in [rat(1,7),rat(2,7),rat(3,7),rat(4,7)].iter().enumerate(){
+        let a=reference.release_native_current_forecast(&mut warm,&mut warm_crib,&pairing,key,64)?;
+        let b=reference.release_native_current_forecast(&mut restored,&mut cold_crib,&pairing,key,64)?;
+        assert_eq!(a.prediction,b.prediction);assert_eq!(a.scores,b.scores);assert_eq!(a.draw,b.draw);assert_eq!(a.selected_class,b.selected_class);
+        assert_eq!(warm.continuing_state(0)?,restored.continuing_state(0)?);
+        assert_eq!(warm.constitution(),&plastic);assert_eq!(warm.prepared_input().unwrap().material(),&m);
+        println!("NATIVE_CONNECTED_FROZEN decision={i} class={} source={} draw={:?}",a.selected_class,a.prediction.source_cells,a.draw);
+    }
+    assert_eq!(warm.prepared_input().unwrap().frontiers(),(20,0,4));
+    assert_eq!(stream.accepted_cells()?,20);assert_eq!(stream.pending_classes().len(),0);
+    println!("NATIVE_CONNECTED_PASS actual20 fresh_R_then_NEWcontact_then_R9 cold_pending6=true same_producer_four_frozen=true elapsed_ns={} attempts={:?}",started.elapsed().as_nanos(),work::process_native_calls());
+    Ok(())
+}

@@ -1209,21 +1209,66 @@ impl SourceClassPreparation {
                 reason: "class control rational range",
             });
         }
+        let source_cells=self.producer.source.cells();
         let (mut word, receipt, _) =
             apply_control(self.producer, &self.preparation, &baseline, control)?;
-        if !check(&receipt.work)
-            || !receipt.added.iter().all(check)
-            || num_traits::Signed::abs(&receipt.work) > *max_abs_work
-        {
-            return Err(HnnError::Unadmitted {
-                reason: "class control preparation work/range bound",
-            });
-        }
+        admit_class_preparation_bound(source_cells,&receipt.work,&receipt.added,max_abs_work,rational_bits)?;
         // A paired receiving consumer's fresh column is this prepared input,
         // while its actual complete opening keeps all the carried interior.
         word.response_source=baseline.response_source.clone().map(|mut source|{for (x,d) in source[self.preparation.ring].iter_mut().zip(&receipt.added){*x+=d;}source});
         word.response_opening_exact=baseline.response_opening_exact.clone().map(|mut opening|{for (x,d) in opening.storage[self.preparation.ring].iter_mut().zip(&receipt.added){*x+=d;}opening});
         word.source_preparation=Some(receipt.clone());
         Ok((word, receipt))
+    }
+}
+
+
+// Same predicate as the class application owner, exposed only to data-only unit controls.
+// Bit extents and predicate outcomes are always kept. Exact diagnostic scalars are copied only
+// up to8192 combined numerator/denominator bits each; no added-vector/Word tape is copied.
+// The failed finite control had no saved operand packet; this does not reconstruct that event.
+fn admit_class_preparation_bound(source_cells:u64,work:&Rat,added:&[Rat],max_abs_work:&Rat,rational_bits:u64)->Result<(),HnnError>{
+    let check=|q:&Rat|q.numer().bits()<=rational_bits&&q.denom().bits()<=rational_bits;
+    let work_range_exceeded=!check(work);let added_range_exceeded=!added.iter().all(check);
+    let work_magnitude_exceeded=num_traits::Signed::abs(work)>*max_abs_work;
+    if work_range_exceeded||added_range_exceeded||work_magnitude_exceeded{
+        let bounded_copy=|q:&Rat|(q.numer().bits().saturating_add(q.denom().bits())<=8192).then(||Box::new(q.clone()));
+        return Err(HnnError::ClassPreparationBound{source_cells,work:bounded_copy(work),max_abs_work:bounded_copy(max_abs_work),work_magnitude_exceeded,work_range_exceeded,added_range_exceeded,
+            work_numerator_bits:work.numer().bits(),work_denominator_bits:work.denom().bits(),
+            added_numerator_bits:added.iter().map(|q|q.numer().bits()).max().unwrap_or(0),
+            added_denominator_bits:added.iter().map(|q|q.denom().bits()).max().unwrap_or(0),rational_bits});
+    }
+    Ok(())
+}
+#[cfg(test)]
+mod preparation_bound_tests {
+    use super::*;
+    #[test]
+    fn exact_data_only_work_and_range_refusals_keep_distinct_operands(){
+        use num_bigint::BigInt;
+        let before=crate::hnn::word::work::process_native_calls();
+        let bound=Rat::from_integer(BigInt::from(65536));
+        assert!(admit_class_preparation_bound(7,&bound,&[Rat::one()],&bound,1024).is_ok());
+        let cases=[(Rat::from_integer(BigInt::from(65537)),vec![Rat::zero()]),
+            (Rat::new(BigInt::from(1),BigInt::from(1)<<1024),vec![Rat::zero()]),
+            (Rat::zero(),vec![Rat::new(BigInt::from(1),BigInt::from(1)<<1024)])];
+        for (work,added) in cases {
+            match admit_class_preparation_bound(7,&work,&added,&bound,1024).unwrap_err(){
+                HnnError::ClassPreparationBound{source_cells,work:actual,max_abs_work,work_numerator_bits,work_denominator_bits,added_numerator_bits,added_denominator_bits,rational_bits,work_magnitude_exceeded,work_range_exceeded,added_range_exceeded}=>{
+                    assert_eq!(source_cells,7);assert_eq!(*actual.unwrap(),work);assert_eq!(*max_abs_work.unwrap(),bound);assert_eq!(rational_bits,1024);
+                    assert_eq!(work_magnitude_exceeded,num_traits::Signed::abs(&work)>bound);
+                    assert_eq!(work_range_exceeded,work.numer().bits()>1024||work.denom().bits()>1024);
+                    assert_eq!(added_range_exceeded,added[0].numer().bits()>1024||added[0].denom().bits()>1024);
+                    assert_eq!(work_numerator_bits,work.numer().bits());assert_eq!(work_denominator_bits,work.denom().bits());
+                    assert_eq!(added_numerator_bits,added[0].numer().bits());assert_eq!(added_denominator_bits,added[0].denom().bits());
+                },_=>panic!("typed exact source bound")
+            }
+        }
+        let huge=Rat::from_integer(BigInt::from(1)<<8192);
+        match admit_class_preparation_bound(7,&huge,&[],&bound,1024).unwrap_err(){
+            HnnError::ClassPreparationBound{work:None,work_numerator_bits:8193,work_magnitude_exceeded:true,work_range_exceeded:true,..}=>{},
+            _=>panic!("oversized diagnostics keep extents without copying the exact scalar")
+        }
+        assert_eq!(crate::hnn::word::work::process_native_calls(),before);
     }
 }

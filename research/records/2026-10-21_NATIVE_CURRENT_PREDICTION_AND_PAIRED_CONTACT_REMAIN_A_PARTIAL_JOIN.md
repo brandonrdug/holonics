@@ -48,3 +48,58 @@ New source joins:
 These joins are COMPILED, not qualified native behavior. The final small section-index/policy/frontier wrapper changes passed `cargo check`; the full test targets were built immediately before them. The five executed controls are arithmetic/source-witness regressions, not a real native R update. Full R movement/held/future probability effect, the original range-refused pending material return through native cold restore, split-versus-continuous frontier equality, and exclusive native forecast/cold behavior remain unexecuted obligations. No passing card path exists. Exact unsplit features may still refuse the current EpochFlow dyadic/declared-phase packing chart; do not round or forge a legacy origin to make that admission pass.
 
 Next bounded proposal: a separately declared600-second compile/test qualification slice, at most150seconds per call,4CPU/8GiB host, with a NEW explicit240-call native allowance counted from process start and durably summed across attempts (including declaration, actual/fresh, cold and returns). First use one precommitted synthetic source through the shared native stream, R barrier, subsequent contact, genuine partial pending/cold and four frozen forecast decisions. Preserve a typed packing/range refusal if reached. Then, only if its authentic chart/error/propagation witness is implemented, perform one small supported-HOST card parity check under the project GPU lock/no-foreign-compute guard, permitting recorded display activity and sampled8GiB GPU memory. A charted surrogate must not masquerade as the unsplit physical law. Do not launch this proposal from the current closed ledger; it is the next concrete qualification scope, not training authority.
+
+
+## Distinct qualification from7c3e,600seconds/240attempts
+
+The reviewed phase is separate from the closed891,467,280,881ns/900second ledger;
+that historical400-operation claim remains unverified. Its declaration, all seven
+receipts and failed log are in `alpha-v93-native-context-return/qualification-from-7c3e`
+outside the worktree. The exact sealed7c3e library/example test targets were rebuilt
+first. The phase closes at419,557,867,062ns of600,000,000,000ns. No live deadline was
+extended. Every guard reports empty owned cleanup.
+
+A new process-wide qualification limit is set before fixture declaration. It charges
+Word construction attempts (including failed/unrun/declaring Words), companion execute,
+actual return and fresh return across workers before entering those owners. One process
+reserved200 of the new240 attempts; its unwind-safe final receipt reports115:
+94 constructors,7 companion executions,7 actual returns and7 fresh returns. The remaining
+40 attempts were never reserved or dispatched. Reservations are not recycled in this
+phase; a missing final count or killed process would consume its full reservation.
+These are named owner attempts, not115 executed forward passages or arithmetic operations.
+
+The one fresh connected control imports NO fitted material. R is initially zero and all
+four90-feature M parts are fresh. It buffers6 accepted actual classes (0,1,2,3,0,1),
+with0published/6pending, and round-trips the full native state, crib and native pending
+schema through a cold mount. This assertion PASSES in memory. The subsequent delivery
+of classes6..10 refuses before the first R publication at the existing `class control
+preparation work/range bound`. The full delivery rolls back: the source/native state and
+original6pending inputs remain exact. Seven actual/fresh returns occurred inside the
+unpublished transaction. There is no durable new R successor, new contact event, next R
+section or four-decision forecast result. The test remains FAILED, not an accepted hold.
+No claim is made that the acknowledged dyadic EpochFlow packing boundary was reached.
+
+The generic refusal did not distinguish preparation work magnitude from rational range,
+and its actual preparation operands were not captured. Source now emits a typed
+`ClassPreparationBound` with source cut, each predicate outcome, exact bit extents and
+exact work/bound scalars only when each fits8192 combined numerator/denominator bits.
+Oversized diagnostics retain extents without cloning the scalar. The original bound,
+work formula, M fit, carried endpoint and actual-ingress atomicity are unchanged. A
+zero-Word data-only control passes work-magnitude, denominator-range, added-range and
+bounded-diagnostic cases. Both final test targets compile. This diagnostic was NOT
+replayed on the failed native trajectory and does not establish its unique cause.
+
+The failed-runtime source is7c3e plus the two recorded qualification/counter payloads.
+Its shared test executable was subsequently overwritten by the diagnostic rebuild before
+it was copied: no pre-dispatch executable hash is claimed. Final current test executables
+are copied and pinned separately. This is a custody limitation of the failed CODE attempt,
+not an inferred native pass or a reconstructed model packet.
+
+D0-D5 remains PARTIAL_NOT_MODEL_READY. Fresh native R movement/held publication, new-cut
+C/K/D change, successor R/pending/cold equality and frozen decisions remain unqualified.
+The opaque card producer and paired chart/split/error/loaded-gain domain were NOT installed
+or exercised after host refusal. Existing guards remain; no GPU/driver availability
+inference follows. D6-D8 are still unfinished. No dataset, training, language output,
+private upload or automatic retry occurred. The next obligation is the actual bounded
+preparation/representation domain, not forced motion, zero control, a legacy prior,
+relaxed rational limits or a receiving-only completion claim.

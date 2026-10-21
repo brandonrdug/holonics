@@ -385,6 +385,21 @@ pub enum HnnError {
     /// THE_MACHINE guard 9: an encoded passage this field does not read.
     #[error("the encoded passage does not enter this field: {reason}")]
     Unadmitted { reason: &'static str },
+    /// Exact source-preparation refusal; diagnostic operands never weaken the bound.
+    #[error("class control preparation work/range bound at source {source_cells}: work {work:?} (bound {max_abs_work:?}), work bits {work_numerator_bits}/{work_denominator_bits}, added max bits {added_numerator_bits}/{added_denominator_bits}, limit {rational_bits}")]
+    ClassPreparationBound {
+        source_cells: u64,
+        work: Option<Box<Rat>>,
+        max_abs_work: Option<Box<Rat>>,
+        work_magnitude_exceeded: bool,
+        work_range_exceeded: bool,
+        added_range_exceeded: bool,
+        work_numerator_bits: u64,
+        work_denominator_bits: u64,
+        added_numerator_bits: u64,
+        added_denominator_bits: u64,
+        rational_bits: u64,
+    },
     /// Publication requires one reached occurrence and its bounded contemporary operand.
     #[error("receiving precision occurrence mismatch: ledger={occurrence}, arrived={arrived}")]
     PrecisionOccurrence { occurrence: bool, arrived: bool },

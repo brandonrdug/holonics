@@ -370,3 +370,11 @@ The reusable hearing, carry-word and scale-zeta laws live in `Foundation/Fractal
 The a28 descendant has a private native-current F producer, source-bound paired contact/error witness and a versioned fresh90-feature lagged-context consumer. This is partial host CODE work, not a qualified model path. Native R section publication, card chart/propagation witness, full model-law dispatch and integrated cold continuity remain unjoined. See [the exact status](research/records/2026-10-21_NATIVE_CURRENT_PREDICTION_AND_PAIRED_CONTACT_REMAIN_A_PARTIAL_JOIN.md); prior campaign evidence is preserved and no new training has run.
 
 The same-ledger continuation adds compiled native R section/held publication and one-owner native pending/forecast routing. The native R/stream runtime and card witness remain unqualified; no new model run occurred. Current cumulative CODE charge is891,467,280,881ns of900,000,000,000ns.
+
+
+The distinct qualification from7c3e closes at419,557,867,062ns/600seconds, with200/240
+attempts reserved and115 measured (94constructors+7companions+14returns). Fresh native
+pending6 cold admission passed; the first R delivery refused source-preparation work/range
+and rolled back exactly. The typed diagnostic and its data-only bound tests compile/pass;
+no new native R/contact/successor or card qualification is claimed. See the same partial
+record and the separate qualification custody. Original900second ledger remains closed.
