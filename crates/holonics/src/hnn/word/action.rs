@@ -1100,3 +1100,108 @@ impl<'f> Word<'f> {
         ))
     }
 }
+
+/// A forward-only, producer-bound class-coordinate preparation. No receiving
+/// Jacobian, inverse, target or requested output is constructed. B=P^lift E is
+/// read from the actual admitted source snapshot, with the full native rotor.
+#[derive(Clone, Debug)]
+pub struct SourceClassPreparation {
+    producer: ActionProducer,
+    preparation: PortPreparation,
+    boundary: crate::hnn::encoding::observed::PairedObservation,
+}
+impl SourceClassPreparation {
+    pub fn at(
+        word: &Word<'_>,
+        boundary: &crate::hnn::encoding::observed::PairedObservation,
+        ring: usize,
+    ) -> Result<Self, HnnError> {
+        let producer = ActionProducer::of(word)?;
+        boundary.check_material(&producer.constitution)?;
+        producer.field.admit(&boundary.encode(&[])?)?;
+        let port = boundary
+            .ports()
+            .iter()
+            .find(|p| p.carrier().ring() == ring)
+            .ok_or(HnnError::Unadmitted {
+                reason: "a class preparation uses an admitted observed source port",
+            })?;
+        let geometry = producer.field.ring(ring);
+        let lift = &producer.current.lift()[ring];
+        let e = port.injection();
+        let columns = (0..e.columns())
+            .map(|j| {
+                let v = (0..e.rows())
+                    .map(|i| e.get(i, j).cloned())
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(geometry.rotate(&v, lift))
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        let rows = (0..e.rows())
+            .map(|i| columns.iter().map(|c| c[i].clone()).collect())
+            .collect();
+        let preparation = PortPreparation::new(
+            &producer.field,
+            ring,
+            ExactRatMatrix::shaped(e.rows(), e.columns(), rows)?,
+        )?;
+        Ok(Self {
+            producer,
+            preparation,
+            boundary: boundary.clone(),
+        })
+    }
+    pub fn preparation(&self) -> &PortPreparation {
+        &self.preparation
+    }
+    pub fn lift(&self) -> &num_bigint::BigInt {
+        &self.producer.current.lift()[self.preparation.ring]
+    }
+    pub fn source_opening(&self) -> &[Rat] {
+        &self.producer.opening.storage[self.preparation.ring]
+    }
+    pub fn apply<'c>(
+        self,
+        baseline: Word<'c>,
+        control: &[Rat],
+        max_abs_work: &Rat,
+        rational_bits: u64,
+    ) -> Result<(Word<'c>, PortPreparationReceipt), HnnError> {
+        if !self.producer.matches(&baseline)
+            || baseline.ticks() != 0
+            || baseline.is_ended()
+            || baseline.change()? != self.producer.opening
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the class control consumes its own whole native source opening",
+            });
+        }
+        self.boundary.check_material(&self.producer.constitution)?;
+        if control.len() != self.preparation.controls()
+            || max_abs_work < &Rat::zero()
+            || !(64..=4096).contains(&rational_bits)
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "declared class-control domain/work/range bounds",
+            });
+        }
+        let check =
+            |q: &Rat| q.numer().bits() <= rational_bits && q.denom().bits() <= rational_bits;
+        if !control.iter().all(check) {
+            return Err(HnnError::Unadmitted {
+                reason: "class control rational range",
+            });
+        }
+        let (word, receipt, _) =
+            apply_control(self.producer, &self.preparation, &baseline, control)?;
+        if !check(&receipt.work)
+            || !receipt.added.iter().all(check)
+            || num_traits::Signed::abs(&receipt.work) > *max_abs_work
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "class control preparation work/range bound",
+            });
+        }
+        Ok((word, receipt))
+    }
+}

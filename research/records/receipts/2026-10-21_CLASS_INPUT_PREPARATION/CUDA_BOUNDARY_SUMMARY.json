@@ -1,0 +1,14 @@
+{
+  "backend": "cuda-observed-epoch-device0",
+  "device_ordinal": 0,
+  "host_fallback": false,
+  "completed": true,
+  "successful_card_forwards": 40,
+  "successful_retained_card_returns": 40,
+  "successful_card_aggregates": 4,
+  "host_owned": "scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks",
+  "scope": "existing observed training boundary regression, NOT new class M or preparation device parity",
+  "sampled_own_peak_MiB": 260,
+  "foreign_compute": [],
+  "cleanup_empty": true
+}

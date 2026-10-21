@@ -6499,3 +6499,6 @@ impl Resident {
         Ok(Some(founded))
     }
 }
+
+/// Separate actual class-coordinate response material and prospective source preparation.
+pub mod contextual_input;

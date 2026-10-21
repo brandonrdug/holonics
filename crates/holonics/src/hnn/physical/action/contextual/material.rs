@@ -55,7 +55,7 @@ pub struct EmpiricalMaterial {
     pub(super) observations: u64,
 }
 impl EmpiricalMaterial {
-    pub(super) fn found(sources: usize, targets: usize) -> Self {
+    pub(crate) fn found(sources: usize, targets: usize) -> Self {
         let mut h = vec![vec![zero(); sources]; sources];
         for (i, r) in h.iter_mut().enumerate() {
             r[i][0] = Rat::one();
@@ -103,7 +103,7 @@ impl EmpiricalMaterial {
             })
             .collect())
     }
-    pub(super) fn stage(
+    pub(crate) fn stage(
         &self,
         f: &[Complex],
         eta: &[Complex],
@@ -224,5 +224,113 @@ impl EmpiricalMaterial {
                 .chain(std::iter::once(&self.residual_upper)),
         )?;
         Ok(())
+    }
+}
+
+impl EmpiricalMaterial {
+    pub(crate) fn checkpoint_text(&self) -> String {
+        let mut out = format!(
+            "{} {} {} {} {} ",
+            self.h.len(),
+            self.b.len(),
+            self.observations,
+            self.target_energy,
+            self.residual_upper
+        );
+        use std::fmt::Write;
+        for z in self.h.iter().chain(&self.b).chain(&self.applied).flatten() {
+            write!(out, "{} {} ", z[0], z[1]).expect("string");
+        }
+        out
+    }
+    pub(crate) fn restored_text(
+        text: &str,
+        sources: usize,
+        targets: usize,
+        bounds: &ContextualBounds,
+    ) -> Result<Self, HnnError> {
+        let mut t = text.split_whitespace();
+        fn get<T: std::str::FromStr>(t: &mut std::str::SplitWhitespace<'_>) -> Result<T, HnnError> {
+            t.next()
+                .and_then(|s| s.parse().ok())
+                .ok_or(refusal("complete empirical material fields"))
+        }
+        if get::<usize>(&mut t)? != sources
+            || get::<usize>(&mut t)? != targets
+            || sources > bounds.max_features
+        {
+            return Err(refusal("declared empirical material dimensions"));
+        }
+        let observations = get(&mut t)?;
+        let target_energy = get(&mut t)?;
+        let residual_upper = get(&mut t)?;
+        let mut matrix = |rows: usize| -> Result<Vec<Vec<Complex>>, HnnError> {
+            (0..rows)
+                .map(|_| {
+                    (0..sources)
+                        .map(|_| Ok([get(&mut t)?, get(&mut t)?]))
+                        .collect()
+                })
+                .collect()
+        };
+        let h = matrix(sources)?;
+        let b = matrix(targets)?;
+        let applied = matrix(targets)?;
+        if t.next().is_some() {
+            return Err(refusal("no trailing empirical fields"));
+        }
+        let m = Self {
+            h,
+            b,
+            applied,
+            target_energy,
+            residual_upper,
+            observations,
+        };
+        bounds.check(
+            m.h.iter()
+                .chain(&m.b)
+                .chain(&m.applied)
+                .flatten()
+                .flat_map(|z| z.iter())
+                .chain([&m.target_energy, &m.residual_upper]),
+        )?;
+        let mut rows = vec![vec![Rat::zero(); 2 * sources]; 2 * sources];
+        for i in 0..2 * sources {
+            for j in 0..2 * sources {
+                let z = &m.h[i / 2][j / 2];
+                rows[i][j] = if i % 2 == j % 2 {
+                    z[0].clone()
+                } else if i % 2 == 0 {
+                    -z[1].clone()
+                } else {
+                    z[1].clone()
+                };
+                if i == j {
+                    rows[i][j] -= integer(1);
+                }
+            }
+        }
+        let form = crate::ratio::linear::inertia::SymmetricForm::from_rows(rows)
+            .map_err(|_| refusal("Hermitian empirical source normal"))?;
+        if crate::ratio::linear::inertia::inertia(&form).negative != 0
+            || m.target_energy < Rat::zero()
+        {
+            return Err(refusal(
+                "unit-prior empirical geometry H>=I and nonnegative targetenergy",
+            ));
+        }
+        if observations == 0 {
+            if m != Self::found(sources, targets) {
+                return Err(refusal("founding empirical material"));
+            }
+        } else {
+            let mut checked = m.clone();
+            checked.fit(bounds)?;
+            if checked.applied != m.applied || checked.residual_upper != m.residual_upper {
+                return Err(refusal("exact applied material and fit realization bound"));
+            }
+        }
+        Ok(m)
     }
 }

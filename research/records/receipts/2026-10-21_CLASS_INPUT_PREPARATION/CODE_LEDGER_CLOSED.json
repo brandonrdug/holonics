@@ -1,0 +1,66 @@
+{
+  "kind": "CODE_ONLY_closed",
+  "cap_ns": 600000000000,
+  "charged_ns": 491198021637,
+  "unspent_ns": 108801978363,
+  "attempts": [
+    {
+      "name": "code-01-first-focused",
+      "wall_ns": 15653458508,
+      "exit": 101,
+      "stop": null,
+      "cleanup_empty": true
+    },
+    {
+      "name": "code-02-first-focused",
+      "wall_ns": 89823108972,
+      "exit": 101,
+      "stop": null,
+      "cleanup_empty": true
+    },
+    {
+      "name": "code-03-injective-boundary-focused",
+      "wall_ns": 92434185355,
+      "exit": 101,
+      "stop": null,
+      "cleanup_empty": true
+    },
+    {
+      "name": "code-04-closure-and-cold-controls",
+      "wall_ns": 92162861091,
+      "exit": 0,
+      "stop": null,
+      "cleanup_empty": true
+    },
+    {
+      "name": "code-04a-exterior-parser-syntax",
+      "wall_ns": 92469380,
+      "exit": 0,
+      "stop": null,
+      "cleanup_empty": true
+    },
+    {
+      "name": "code-05-required-host-gates",
+      "wall_ns": 171569112868,
+      "exit": 0,
+      "stop": null,
+      "cleanup_empty": true
+    },
+    {
+      "name": "code-06-supported-cuda-boundary",
+      "wall_ns": 14328321559,
+      "exit": 1,
+      "stop": null,
+      "cleanup_empty": true
+    },
+    {
+      "name": "code-07-supported-cuda-fresh-fixture",
+      "wall_ns": 15134503904,
+      "exit": 0,
+      "stop": null,
+      "cleanup_empty": true
+    }
+  ],
+  "model_jobs": 0,
+  "note": "includes conservative92469380ns fulltoolwall exterior syntax check, failedcompiles/fixtureadmission/coldcontrol and predispatchfixtureAlreadyExists; no deadlineextended"
+}

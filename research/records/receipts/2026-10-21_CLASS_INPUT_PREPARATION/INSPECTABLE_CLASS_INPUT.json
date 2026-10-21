@@ -1,0 +1,49 @@
+{
+  "kind": "synthetic_CODE_class_input_preparation",
+  "p": 1,
+  "c": 0,
+  "y": 1,
+  "known_prefix_h": "699051/1048576",
+  "future_h": "0",
+  "source_lift": "4",
+  "u_eta_M": [
+    "27439/32768",
+    "-27439/32768"
+  ],
+  "added_Bu": [
+    "-27439/32768",
+    "0",
+    "0",
+    "0",
+    "27439/32768",
+    "0"
+  ],
+  "preparation_work": "1202459297/1073741824",
+  "cross": "27439/65536",
+  "quadratic": "752898721/1073741824",
+  "H00": "3",
+  "B00": "-2",
+  "M00": "-134249/524288",
+  "fit_bound": "56618710764479/576460752303423488",
+  "learned_logits": [
+    "-27439/221184",
+    "0",
+    "2/27",
+    "0"
+  ],
+  "frozen_logits": [
+    "0",
+    "0",
+    "2/27",
+    "0"
+  ],
+  "contraction_ns": 39945,
+  "preparation_ns": 514975,
+  "forward_ns": 365665,
+  "total_ns": 54501307,
+  "actual_arrivals": 4,
+  "class_bytes": 4,
+  "direct_adjoint_calls": 0,
+  "warm_cold_exact": true,
+  "actual_unchanged_by_prospect": true
+}

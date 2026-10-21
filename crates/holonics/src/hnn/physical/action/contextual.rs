@@ -24,7 +24,7 @@ pub struct ContextualBounds {
     pub max_scalar_work: u64,
 }
 impl ContextualBounds {
-    fn admit(&self) -> Result<(), HnnError> {
+    pub(crate) fn admit(&self) -> Result<(), HnnError> {
         if self.branches == 0
             || self.branches > 64
             || self.pending == 0
@@ -41,7 +41,7 @@ impl ContextualBounds {
         }
         Ok(())
     }
-    fn check<'a>(&self, values: impl Iterator<Item = &'a Rat>) -> Result<(), HnnError> {
+    pub(crate) fn check<'a>(&self, values: impl Iterator<Item = &'a Rat>) -> Result<(), HnnError> {
         if values
             .into_iter()
             .any(|q| q.numer().bits() > self.rational_bits || q.denom().bits() > self.rational_bits)
