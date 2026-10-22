@@ -1,0 +1,10 @@
+
+running 5 tests
+test hnn::word::material_ray::represented_material_ray_data::component_tangent_radius_preserves_remote_support_and_encloses_existing_linear_action ... ok
+test hnn::word::material_ray::represented_material_ray_data::composed_stage_uses_simultaneous_old_first_derivative ... ok
+test hnn::word::material_ray::represented_material_ray_data::original_midpoint_and_inverse_error_charge_cover_material_forcing_and_feedback ... ok
+test hnn::word::material_ray::represented_material_ray_data::physical_contact_envelope_covers_inverse_and_both_derivatives_on_declared_ray ... ok
+test hnn::word::material_ray::represented_material_ray_data::point_radius_and_reverse_parity_are_not_material_certificates ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 1795 filtered out; finished in 0.05s
+
