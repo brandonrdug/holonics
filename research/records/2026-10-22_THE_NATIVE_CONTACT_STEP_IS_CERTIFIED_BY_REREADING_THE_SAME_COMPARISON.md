@@ -152,6 +152,35 @@ without LTO, 4 cores. Receipts:
 At about 4 s per byte, the native route cannot yet train on a real text. Its per-cell cost is the
 next loop's subject.
 
+### The first cost cuts
+
+[definition; agent-inferred, October 22] A call-graph profile of 20 cells (optimized build) put
+65% of each receiving cell in `NativePredictionWord::observe`'s contact pull-back
+(`return_contact`), whose result the R section discarded: R publication reads only the receiving
+face. Three cuts, each leaving the saved state byte-identical
+(`eb028b8a558151c6331b4cb28027b87f6ab49df82eb9be8cfec7c66769c5e6b3`):
+
+1. A receiving cell returns its face alone (`NativePredictionWord::observe_receiving`); the
+   contact pull-back runs only at the contact. Return attempts on the 64 cells fell from 61 to 7.
+   57.6 s became 41.5 s.
+2. The ladder staged the admitted candidate, and read its first variation, once; the publication
+   and its continuation staged it twice more and read the first variation twice more, once
+   discarded. The ladder now hands its deposit, loaded spans, candidate, deposit reading and
+   first-variation reading to the publication (`NativeRereadAdmission`). 31.2 s.
+3. The state is saved where the aeon closes and after the last cell, not after every section.
+   27.8 s.
+
+Each steady section of 10 cells now takes about 4.6 s: the contact cell about 2.3 s, the nine
+receiving cells about 2.2 s. That is about 1.9 s per byte, still far from a real text.
+
+Both controls read the same values as before on the optimized build: every cold-restore size,
+reread and verdict of the continuity control, and every held-out code of the learning control. The
+continuity control's native attempts fall from 506 to 448 (actual and fresh returns 30 + 30 →
+1 + 1). Receipts: [train_native_16_bytes_staged_once.txt](2026-10-22_native_contact_reread_receipts/train_native_16_bytes_staged_once.txt),
+[train_native_16_bytes_aeon_save.txt](2026-10-22_native_contact_reread_receipts/train_native_16_bytes_aeon_save.txt),
+[control_after_cost_cuts.txt](2026-10-22_native_contact_reread_receipts/control_after_cost_cuts.txt),
+[held_out_after_cost_cuts.txt](2026-10-22_native_contact_reread_receipts/held_out_after_cost_cuts.txt).
+
 ## What stays owed (#62)
 
 - The Lean statement that the ladder's admitted step decreases the declared comparison

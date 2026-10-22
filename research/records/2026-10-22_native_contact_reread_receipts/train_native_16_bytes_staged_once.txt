@@ -1,0 +1,10 @@
+# complete-language train-native on d16 (The HNN is a Hol), optimized build without LTO, 4 cores; contact staged once
+NATIVE_TRAIN_OPEN bytes=16 cells=64 section_cells=10 opening_ms=27
+NATIVE_TRAIN cells=10/64 scored=10 pending=0 contacts=1 refusals=0 chunk_code_bits_per_cell=[2.000,2.000] flat=2.000 learn_ms=1236 contact_ms=141 state_bytes=1527293 save_ms=414 elapsed_ms=1679 native_calls=[109,10,1,1]
+NATIVE_TRAIN cells=20/64 scored=10 pending=0 contacts=2 refusals=0 chunk_code_bits_per_cell=[1.905,1.905] flat=2.000 learn_ms=3501 contact_ms=1385 state_bytes=1944768 save_ms=562 elapsed_ms=5743 native_calls=[232,21,2,2]
+NATIVE_TRAIN cells=30/64 scored=10 pending=0 contacts=3 refusals=0 chunk_code_bits_per_cell=[1.917,1.917] flat=2.000 learn_ms=4582 contact_ms=2521 state_bytes=2212191 save_ms=652 elapsed_ms=10978 native_calls=[355,32,3,3]
+NATIVE_TRAIN cells=40/64 scored=10 pending=0 contacts=4 refusals=0 chunk_code_bits_per_cell=[2.163,2.163] flat=2.000 learn_ms=4669 contact_ms=2414 state_bytes=2396353 save_ms=784 elapsed_ms=16432 native_calls=[478,43,4,4]
+NATIVE_TRAIN cells=50/64 scored=10 pending=0 contacts=5 refusals=0 chunk_code_bits_per_cell=[1.926,1.926] flat=2.000 learn_ms=5113 contact_ms=2715 state_bytes=2551310 save_ms=803 elapsed_ms=22350 native_calls=[601,54,5,5]
+NATIVE_TRAIN cells=60/64 scored=10 pending=0 contacts=6 refusals=0 chunk_code_bits_per_cell=[2.278,2.278] flat=2.000 learn_ms=4666 contact_ms=2312 state_bytes=2587305 save_ms=897 elapsed_ms=27916 native_calls=[724,65,6,6]
+NATIVE_TRAIN cells=64/64 scored=1 pending=3 contacts=7 refusals=0 chunk_code_bits_per_cell=[1.399,1.399] flat=2.000 learn_ms=2331 contact_ms=2327 state_bytes=2595587 save_ms=959 elapsed_ms=31208 native_calls=[749,67,7,7]
+NATIVE_TRAIN_DONE cells=64 scored=61 contacts=7 refusals=0 code_bits_per_cell=[2.021,2.021] flat=2.000 state_sha256=eb028b8a558151c6331b4cb28027b87f6ab49df82eb9be8cfec7c66769c5e6b3 elapsed_ms=31226

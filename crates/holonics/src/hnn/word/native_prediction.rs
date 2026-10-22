@@ -92,11 +92,11 @@ impl NativePredictionReturn {
     ) -> Result<NativeContactPublication, HnnError> {
         self.publish_contact_carry_at(charts, None)
     }
-    /// The publication at the certified step (`None`) or at the reread-admitted halving.
+    /// The publication at the certified step (`None`) or at the candidate the reread admitted.
     pub(crate) fn publish_contact_carry_at(
         self,
         charts: &mut Charts,
-        reread: Option<u32>,
+        reread: Option<continuation::NativeRereadAdmission>,
     ) -> Result<NativeContactPublication, HnnError> {
         self.cut.publish_native_comparison(
             self.represented_policy,
@@ -115,7 +115,7 @@ impl NativePredictionReturn {
     pub(crate) fn reread_ladder(
         &self,
         judge: &mut dyn FnMut(u32, &crate::hnn::constitution::Constitution, bool) -> Result<bool, HnnError>,
-    ) -> Result<Option<u32>, HnnError> {
+    ) -> Result<Option<continuation::NativeRereadAdmission>, HnnError> {
         self.cut.native_reread_ladder(
             self.represented_policy,
             &self.reading,
@@ -525,12 +525,11 @@ impl NativePredictionWord<'_> {
             .map(|(f, t)| f.score(t))
             .collect()
     }
-    pub fn observe(
-        mut self,
-        targets: &crate::hnn::encoding::Encoded,
-    ) -> Result<NativePredictionReturn, HnnError> {
+    /// The receiver face of an actual return: its scores, station returns, reach and the
+    /// descent covector at the receiver. Both the contact return ([`Self::observe`]) and the
+    /// receiving-only return ([`Self::observe_receiving`]) read it.
+    fn receiving_face(&self, targets: &crate::hnn::encoding::Encoded) -> Result<ReceivingFace, HnnError> {
         let scores = self.score(targets)?;
-        let represented_policy=self.prepared.as_ref().is_some_and(|p|p.native_lagged&&p.work_policy.represented());
         let reading = self.reading();
         let stations = self
             .faces
@@ -596,6 +595,14 @@ impl NativePredictionWord<'_> {
         )?;
         let covector =
             crate::hnn::ratio::RatioCovector::native_current(&reading.waves, &phases, &stations)?;
+        Ok(ReceivingFace{scores,reading,stations,covector,producer,anchor,reach})
+    }
+    pub fn observe(
+        mut self,
+        targets: &crate::hnn::encoding::Encoded,
+    ) -> Result<NativePredictionReturn, HnnError> {
+        let represented_policy=self.prepared.as_ref().is_some_and(|p|p.native_lagged&&p.work_policy.represented());
+        let ReceivingFace{scores,reading,stations,covector,producer,anchor,reach}=self.receiving_face(targets)?;
         let (cut,back)=if let Some((r,stages))=self.external.take(){
             let cut=self.word.external_contact_cut(&r.reception_end,&r.released,self.phases.junction_steps())?;
             let mut back=r.returned.return_native(&covector,&self.map,&self.phases)?;
@@ -628,6 +635,37 @@ impl NativePredictionWord<'_> {
             reach,
         })
     }
+    /// [definition; agent-inferred, October 22] **The receiving-only return of an actual native
+    /// R event.** An R section publishes the receiving map alone, and its packet reads only the
+    /// receiver face: the produced feature, the station's return and the descent covector there.
+    /// The contact pull-back ([`Word::return_contact`]) feeds contact material that an R section
+    /// never publishes, so it is not run. The packet is the one `observe(..)?.into_receiving_packet()`
+    /// builds: that path checks the pull-back's read feature equals the produced feature, which
+    /// is the feature taken here.
+    pub(crate) fn observe_receiving(
+        self,
+        targets: &crate::hnn::encoding::Encoded,
+    ) -> Result<(Vec<ExactInterval>, NativeRPacket), HnnError> {
+        let ReceivingFace{scores,reading,stations,covector,producer,anchor,reach}=self.receiving_face(targets)?;
+        let feature = match self.features.as_slice() {
+            [feature] => feature.clone(),
+            _ => return Err(HnnError::Unadmitted {
+                reason: "one native R return per actual aperture-one Word",
+            }),
+        };
+        let packet = NativeRPacket::of(producer, reading, &stations, &covector, feature, anchor, reach)?;
+        Ok((scores, packet))
+    }
+}
+
+struct ReceivingFace {
+    scores: Vec<ExactInterval>,
+    reading: NativePredictionReading,
+    stations: Vec<RetainedStationReturn>,
+    covector: crate::hnn::ratio::RatioCovector,
+    producer: crate::hnn::constitution::Constitution,
+    anchor: Vec<BigInt>,
+    reach: crate::hnn::constitution::Reach,
 }
 
 /// One actual consumed Word return. No public constructor and no retained Word tape.
@@ -653,13 +691,32 @@ pub(crate) struct NativeRSection {
 }
 impl NativePredictionReturn {
     pub(crate) fn into_receiving_packet(self) -> Result<NativeRPacket, HnnError> {
-        if self.stations.len() != 1 || self.back.reads.len() != 1 {
+        if self.back.reads.len() != 1 {
             return Err(HnnError::Unadmitted {
                 reason: "one native R return per actual aperture-one Word",
             });
         }
-        let station = self.stations[0].clone();
-        let descent = self.covector.descent(0);
+        let feature = self.back.reads[0].0.clone();
+        NativeRPacket::of(self.producer, self.reading, &self.stations, &self.covector, feature, self.anchor, self.reach)
+    }
+}
+impl NativeRPacket {
+    fn of(
+        producer: crate::hnn::constitution::Constitution,
+        reading: NativePredictionReading,
+        stations: &[RetainedStationReturn],
+        covector: &crate::hnn::ratio::RatioCovector,
+        feature: Vec<Rat>,
+        anchor: Vec<BigInt>,
+        reach: crate::hnn::constitution::Reach,
+    ) -> Result<Self, HnnError> {
+        if stations.len() != 1 {
+            return Err(HnnError::Unadmitted {
+                reason: "one native R return per actual aperture-one Word",
+            });
+        }
+        let station = stations[0].clone();
+        let descent = covector.descent(0);
         let mut positive = vec![Rat::zero(); descent.len()];
         positive[2 * station.target] = Rat::one();
         let mut foil = vec![Rat::zero(); descent.len()];
@@ -673,25 +730,25 @@ impl NativePredictionReturn {
         }
         let sample = crate::hnn::constitution::Sample {
             weight: Rat::one(),
-            feature: self.back.reads[0].0.clone(),
+            feature,
             covector: descent,
             masses: Some(station.normalized_representative.clone()),
         };
-        if self.reading.features != vec![sample.feature.clone()] {
+        if reading.features != vec![sample.feature.clone()] {
             return Err(HnnError::Unadmitted {
                 reason: "native R retains the actual Word's complete paired feature",
             });
         }
         Ok(NativeRPacket {
-            producer: self.producer,
-            reading: self.reading,
+            producer,
+            reading,
             station,
             sample,
             positive,
             foil,
             phase,
-            anchor: self.anchor,
-            reach: self.reach,
+            anchor,
+            reach,
         })
     }
 }

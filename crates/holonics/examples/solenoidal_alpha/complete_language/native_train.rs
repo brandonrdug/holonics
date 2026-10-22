@@ -4,9 +4,11 @@
 //! (`ObservedStream::receive_native_current_learning`, record
 //! `2026-10-22_THE_NATIVE_CONTACT_STEP_IS_CERTIFIED_BY_REREADING_THE_SAME_COMPARISON`). Text enters
 //! as base-four cells (`Base4Bytes`), the exterior byte chart; nothing else about it reaches the
-//! machine. Delivery goes one receiver section at a time, so each progress line and saved state
-//! falls where the receiver's own passage puts it. A sample is a frozen fork of the saved state,
-//! conditioned on a prompt without learning, then released one keyed cell at a time.
+//! machine. Delivery goes one receiver section at a time, so each progress line falls where the
+//! receiver's own passage puts it. The whole state is saved where its aeon closes and after the
+//! last cell, so a saved state stands at a closed cycle or at the corpus end. A sample is a frozen
+//! fork of the saved state, conditioned on a prompt without learning, then released one keyed cell
+//! at a time.
 use super::*;
 use holonics::hnn::reference::native_context::NativeContextEvent;
 
@@ -153,7 +155,7 @@ pub(super) fn train(args: &[String]) -> Result<()> {
     let flat = rat(2, 1);
     let mut total = (integer(0), integer(0), 0i64);
     let (mut contacts, mut refusals) = (0usize, Vec::new());
-    for chunk in cells.chunks(width) {
+    for (index, chunk) in cells.chunks(width).enumerate() {
         let at = usize::try_from(stream.accepted_cells()?)? + stream.pending_classes().len();
         let chunk_started = Instant::now();
         let mut code = (integer(0), integer(0), 0i64);
@@ -170,15 +172,21 @@ pub(super) fn train(args: &[String]) -> Result<()> {
             refusals.push((at + offset, reason.clone()));
         }
         let saved = Instant::now();
-        let text = state_text(&stream, population, &provenance)?;
-        let part = out.join("STATE.part");
-        std::fs::write(&part, &text)?;
-        std::fs::rename(&part, out.join("STATE"))?;
+        let last = (index + 1) * width >= cells.len();
+        let state_bytes = if last || stream.resident().native_source_frontier()?.aeon_cells() == 0 {
+            let text = state_text(&stream, population, &provenance)?;
+            let part = out.join("STATE.part");
+            std::fs::write(&part, &text)?;
+            std::fs::rename(&part, out.join("STATE"))?;
+            text.len()
+        } else {
+            0
+        };
         let calls = holonics::hnn::word::work::process_native_calls();
         println!(
             "NATIVE_TRAIN cells={}/{} scored={} pending={} contacts={contacts} refusals={} chunk_code_bits_per_cell={} flat={} learn_ms={learn_ms} contact_ms={contact_ms} state_bytes={} save_ms={} elapsed_ms={} native_calls=[{},{},{},{}]",
             at + chunk.len(), cells.len(), code.2, stream.pending_classes().len(), refusals.len(), per_cell(&code), bits(&flat),
-            text.len(), saved.elapsed().as_millis(), started.elapsed().as_millis(),
+            state_bytes, saved.elapsed().as_millis(), started.elapsed().as_millis(),
             calls.forward_attempts, calls.response_attempts, calls.return_attempts, calls.response_return_attempts
         );
         total.0 += &code.0;

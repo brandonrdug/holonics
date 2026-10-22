@@ -310,8 +310,8 @@ impl Reference {
             let returned = predictor.observe(&target)?;
             let scores = returned.scores().to_vec();
             let mut charts = reached_charts;
-            let receipt = self.native_contact_reread(&next, &returned, &prediction, &target, chart_policy, bits, execution)?;
-            let published = returned.publish_contact_carry_at(&mut charts, receipt.admitted)?;
+            let (receipt, admission) = self.native_contact_reread(&next, &returned, &prediction, &target, chart_policy, bits, execution)?;
+            let published = returned.publish_contact_carry_at(&mut charts, admission)?;
             reread = Some(receipt);
             (scores, Some(published), None, None, charts)
         } else {
@@ -386,7 +386,7 @@ impl Reference {
         chart: NativeExecutionChart,
         bits: u32,
         execution: Option<&dyn crate::hnn::word::native_prediction::NativePredictionExecution>,
-    ) -> Result<NativeRereadReceipt, HnnError> {
+    ) -> Result<(NativeRereadReceipt, Option<crate::hnn::word::continuation::NativeRereadAdmission>), HnnError> {
         use crate::hnn::word::continuation::decide;
         use crate::hnn::word::native_prediction::native_objective;
         const FINEST: u32 = 128;
@@ -435,9 +435,9 @@ impl Reference {
             });
             Ok(admitted)
         };
-        let admitted = returned.reread_ladder(&mut judge)?;
-        receipt.admitted = admitted;
-        Ok(receipt)
+        let admission = returned.reread_ladder(&mut judge)?;
+        receipt.admitted = admission.as_ref().map(|a| a.halvings());
+        Ok((receipt, admission))
     }
 }
 
@@ -591,9 +591,8 @@ impl Reference {
             let (carry, forward, preparation) = predictor.forward_receipt()?;
             let prediction = predictor.reading();
             let reached_charts=predictor.prepared_charts().cloned();
-            let returned = predictor.observe(&target)?;
-            let scores = returned.scores().to_vec();
-            packets.push(returned.into_receiving_packet()?);
+            let (scores, packet) = predictor.observe_receiving(&target)?;
+            packets.push(packet);
             next.publish_reception(
                 None,
                 crate::holon::HolonState {
