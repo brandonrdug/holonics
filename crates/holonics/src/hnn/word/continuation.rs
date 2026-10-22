@@ -93,6 +93,17 @@ pub struct ContactCut {
     landing: Option<LandingBinding>,
     /// Set by the held-variation route's binding, which the landing does not admit.
     held: bool,
+    /// [definition; agent-inferred, October 22] The native contact step the same comparison's
+    /// reread admitted, as its halving of the covector-scale start; `None` keeps the certified step.
+    native_reread: Option<u32>,
+}
+
+/// The native contact deposit a cut's comparison issues, with its witness and loaded spans.
+struct NativeContactDeposit {
+    deposit: Deposit,
+    witness: super::native_prediction::NativeContactWitness,
+    spans: super::finite_gain::FiniteContactSpans,
+    readout_norm: Rat,
 }
 
 /// What the landing's comparison bound into its cut: the receiver, the targets and mask, the
@@ -478,7 +489,7 @@ impl<'c> Word<'c> {
         if self.ticks()!=0||self.native_declaration_id.is_none()||carry.ticks!=next||reading.end!=carry.change||reading.ticks!=full||reading.balances.len()!=full||!WordBalance::of(reading).closes(){return Err(HnnError::Unadmitted{reason:"external contact cut is the actual complete balanced full-tick endpoint"});}
         if carry.conductances!=self.operands.contacts().iter().map(|c|c.conductance().clone()).collect::<Vec<_>>()||carry.momenta.len()!=self.operands.contacts().len(){return Err(HnnError::Unadmitted{reason:"external carry preserves producing contact reference"});}
         for (a,c) in self.operands.contacts().iter().enumerate(){if c.forms().0.apply(&carry.change.states[a][1])?!=carry.momenta[a]{return Err(HnnError::Unadmitted{reason:"external contact endpoint preserves actual canonical momentum"});}}
-        Ok(ContactCut{native_declaration:self.native_declaration_id.clone(),native_prediction:None,field:self.field.clone(),producing:producing.clone(),current:current.clone(),source:source.clone(),opening_support:support.clone(),operands:self.operands.clone(),change:carry.change.clone(),opened_at:self.opened_at,next_tick:next,released:reading.remainders.clone(),deposit:None,opening:self.opened_on.clone(),landing:None,held:false})
+        Ok(ContactCut{native_declaration:self.native_declaration_id.clone(),native_prediction:None,native_reread:None,field:self.field.clone(),producing:producing.clone(),current:current.clone(),source:source.clone(),opening_support:support.clone(),operands:self.operands.clone(),change:carry.change.clone(),opened_at:self.opened_at,next_tick:next,released:reading.remainders.clone(),deposit:None,opening:self.opened_on.clone(),landing:None,held:false})
     }
     pub(super) fn contact_cut(&self) -> Result<ContactCut, HnnError> {
         let (producing, current, source, opening_support) =
@@ -533,6 +544,7 @@ impl<'c> Word<'c> {
             opening: self.opened_on.clone(),
             landing: None,
             held: false,
+            native_reread: None,
             field: self.field.clone(),
             producing: producing.clone(),
             current: current.clone(),
@@ -596,16 +608,17 @@ impl ContactCut {
             &self.operands,phases,self.opened_at,stages,back.response_defect.as_ref(),&reading.masses,history)
     }
 
-    pub(super) fn publish_native_comparison(
-        mut self,
+    /// The native contact deposit this cut's comparison issues: its factors, reach, witness and
+    /// loaded spans, read from the original prediction and return. Nothing is published here.
+    fn native_contact_deposit(
+        &self,
         represented_policy:bool,
-        prediction:super::native_prediction::NativePredictionReading,
+        prediction:&super::native_prediction::NativePredictionReading,
         stations:&[crate::hnn::receiving::RetainedStationReturn],
         back:&WordReturn,
         phases:&ReceivingPhases,
         covector:&crate::hnn::ratio::RatioCovector,
-        charts:&mut Charts,
-    )->Result<super::native_prediction::NativeContactPublication,HnnError>{
+    )->Result<NativeContactDeposit,HnnError>{
         if prediction.law!=super::native_prediction::LAW || prediction.producing_commit!=self.producing.commit()
             || prediction.opened_at!=self.opened_at || prediction.source_cells!=self.source.cells()
             || prediction.receiver!=phases.ring() || stations.len()!=phases.aperture()
@@ -664,7 +677,57 @@ impl ContactCut {
         let mut spans=if witness.represented(){super::finite_gain::FiniteContactSpans::represented(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?,&witness)?}
             else{super::finite_gain::FiniteContactSpans::of(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?)?};
         spans.bind_native(witness.clone(),&self.producing,&deposit)?;
-        self.native_prediction=Some(witness);self.deposit=Some(deposit.clone());
+        Ok(NativeContactDeposit{deposit,witness,spans,readout_norm})
+    }
+
+    /// [definition; agent-inferred, October 22] **The native contact ladder**: this cut's own
+    /// deposit staged at `h = 0, 1, 2, …` halvings below the covector-scale start
+    /// ([`Constitution::deposited_with_contact_spans_reread`]), each candidate handed to `judge`,
+    /// which rereads the same comparison at it and answers whether it is admitted. The first
+    /// admitted `h` is returned. The ladder ends with `None` at the first candidate whose factors
+    /// do not move, or past the least halving at which no entry reaches its cell: finitely many
+    /// exact entries give that bound, so no trial budget is authored. Nothing is published.
+    pub(super) fn native_reread_ladder(
+        &self,
+        represented_policy:bool,
+        prediction:&super::native_prediction::NativePredictionReading,
+        stations:&[crate::hnn::receiving::RetainedStationReturn],
+        back:&WordReturn,
+        phases:&ReceivingPhases,
+        covector:&crate::hnn::ratio::RatioCovector,
+        judge:&mut dyn FnMut(u32,&Constitution,bool)->Result<bool,HnnError>,
+    )->Result<Option<u32>,HnnError>{
+        let native=self.native_contact_deposit(represented_policy,prediction,stations,back,phases,covector)?;
+        let mut bound=None;
+        for halvings in 0u32.. {
+            if bound.is_some_and(|b|halvings>b){return Ok(None);}
+            let (candidate,_,no_reach)=self.producing.deposited_with_contact_spans_reread(&native.deposit,&native.spans,halvings)?;
+            if halvings==0{bound=Some(no_reach.ok_or(HnnError::Realization{what:"the first reread candidate reads its no-reach halving"})?);}
+            if !candidate.contact_factors_moved(&self.producing){return Ok(None);}
+            // A move answers to every comparison that reads it: the actual represented first
+            // variation the publication checks is read here first, and a candidate it refuses is
+            // halved, never published (`judge` is told, and rereads nothing).
+            let refused=self.producing.native_contact_actual_ray(&candidate,&native.deposit,&native.spans).is_err();
+            if judge(halvings,&candidate,refused)? && !refused{return Ok(Some(halvings));}
+        }
+        Ok(None)
+    }
+
+    /// Publish the native contact deposit: at the certified step, or (`reread = Some(h)`) at the
+    /// candidate the same comparison's reread admitted.
+    pub(super) fn publish_native_comparison(
+        mut self,
+        represented_policy:bool,
+        prediction:super::native_prediction::NativePredictionReading,
+        stations:&[crate::hnn::receiving::RetainedStationReturn],
+        back:&WordReturn,
+        phases:&ReceivingPhases,
+        covector:&crate::hnn::ratio::RatioCovector,
+        charts:&mut Charts,
+        reread:Option<u32>,
+    )->Result<super::native_prediction::NativeContactPublication,HnnError>{
+        let NativeContactDeposit{deposit,witness,spans,readout_norm}=self.native_contact_deposit(represented_policy,&prediction,stations,back,phases,covector)?;
+        self.native_prediction=Some(witness);self.deposit=Some(deposit.clone());self.native_reread=reread;
         let field=self.field.clone();let current=self.current.clone();let moment=self.source.clone();let original=self.producing.clone();
         let (constitution,returned)=self.continue_deposited(&field,&current,&moment,&deposit,charts)?;
         let (actual_alignment,actual_error_charge,physical_reference)=original.native_contact_actual_ray(&constitution,&deposit,&spans)?;
@@ -862,8 +925,15 @@ impl ContactCut {
                     if let Some(native)=&self.native_prediction {
                         spans.bind_native(native.clone(),&self.producing,deposit)?;
                     }
-                    self.producing
-                        .deposited_with_contact_spans(deposit, &spans)?
+                    match self.native_reread {
+                        Some(halvings) => {
+                            let (successor, publication, _) = self
+                                .producing
+                                .deposited_with_contact_spans_reread(deposit, &spans, halvings)?;
+                            (successor, publication)
+                        }
+                        None => self.producing.deposited_with_contact_spans(deposit, &spans)?,
+                    }
                 } else {
                     // Historical charted consumer keeps its conditional certificate. It issues
                     // no loaded witness: rounding/split residual inputs are not covered here.

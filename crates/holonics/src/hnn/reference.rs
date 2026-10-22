@@ -143,7 +143,7 @@
 //! `ExactWork` threaded through each of those owners' loops (most outside `hnn`), so they are left
 //! uncounted rather than estimated from shapes.
 
-mod comparison;
+pub(crate) mod comparison;
 pub(crate) mod epoch;
 pub use comparison::{
     ComparisonReading, ComparisonTrialReading, ComparisonWaveChanges, FiniteComparisonReceipt,

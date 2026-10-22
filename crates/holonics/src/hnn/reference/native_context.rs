@@ -154,6 +154,8 @@ pub struct NativeContextEvent {
     pub input: observed::IngestClassReceipt,
     pub selected_class: usize,
     pub draw: Option<crate::receiver::release::ReleaseReturn>,
+    /// The native contact ladder, on an event that publishes contact material.
+    pub reread: Option<NativeRereadReceipt>,
 }
 impl Resident {
     pub(crate) fn native_context_chart(&self) -> Result<Option<Encoded>, HnnError> {
@@ -268,9 +270,10 @@ impl Reference {
             boundary.encode(&[*class])?;
         }
         let chart = boundary.encode(&[])?;
+        let chart_policy=if next.prepared_input.as_ref().is_some_and(|p|p.work_receipt_policy().represented()){NativeExecutionChart::RepresentedV1}else{NativeExecutionChart::ExactUnsplit};
         let predictor=if let Some(execution)=execution{self.prepare_native_current_prediction_with_execution(&next,bits,execution)?}else{self.prepare_native_current_prediction(
             &next,
-            if next.prepared_input.as_ref().is_some_and(|p|p.work_receipt_policy().represented()){NativeExecutionChart::RepresentedV1}else{NativeExecutionChart::ExactUnsplit},
+            chart_policy,
             bits,
         )?};
         let draw = match choice {
@@ -302,11 +305,14 @@ impl Reference {
         let lag = predictor.lagged_boundary(role)?;
         let (carry, forward, preparation) = predictor.forward_receipt()?;
         let reached_charts=predictor.prepared_charts().cloned().unwrap_or_else(||next.reception_charts());
+        let mut reread = None;
         let (scores, contact, material, carry, charts) = if actual && publish_contact {
             let returned = predictor.observe(&target)?;
             let scores = returned.scores().to_vec();
             let mut charts = reached_charts;
-            let published = returned.publish_contact_carry(&mut charts)?;
+            let receipt = self.native_contact_reread(&next, &returned, &prediction, &target, chart_policy, bits, execution)?;
+            let published = returned.publish_contact_carry_at(&mut charts, receipt.admitted)?;
+            reread = Some(receipt);
             (scores, Some(published), None, None, charts)
         } else {
             let scores=if actual {let returned=predictor.observe(&target)?;returned.scores().to_vec()}else{let scores=predictor.score(&target)?;drop(predictor);scores};
@@ -351,8 +357,119 @@ impl Reference {
             input: ingested,
             selected_class: class,
             draw,
+            reread,
         })
     }
+
+    /// [definition; agent-inferred, October 22; the plan's §16] **The native contact step is
+    /// certified by rereading the same comparison.** The a priori curvature envelope of the
+    /// represented contact route (`C = ½·response²`, about `2^42` on the Athena fixture) sized every
+    /// step at `2^-52..2^-37`, below the factors' fine unit, so nothing moved. Here each candidate
+    /// of the native ladder (`NativePredictionReturn::reread_ladder`: the covector-scale start, then
+    /// halvings) is read by the same prediction: the same opening, source, prepared input, frame,
+    /// receiver and target, entered through the candidate material. It is admitted only on
+    /// [`decide`]'s exact strict improvement of that comparison (code and phase excess), with the
+    /// code enclosures refined to the face's finest grain when they overlap. The first admitted
+    /// halving is published; with none, the certified step is published as before.
+    ///
+    /// [`decide`]: crate::hnn::word::continuation::decide
+    #[allow(clippy::too_many_arguments)]
+    fn native_contact_reread(
+        &self,
+        resident: &Resident,
+        returned: &crate::hnn::word::native_prediction::NativePredictionReturn,
+        prediction: &crate::hnn::word::native_prediction::NativePredictionReading,
+        target: &Encoded,
+        chart: NativeExecutionChart,
+        bits: u32,
+        execution: Option<&dyn crate::hnn::word::native_prediction::NativePredictionExecution>,
+    ) -> Result<NativeRereadReceipt, HnnError> {
+        use crate::hnn::word::continuation::decide;
+        use crate::hnn::word::native_prediction::native_objective;
+        const FINEST: u32 = 128;
+        let field = &resident.field;
+        let lift = resident.current.lift().to_vec();
+        let ring = prediction.receiver;
+        let (before, excess) = native_objective(field, &lift, ring, &prediction.waves, target, bits)?;
+        let mut receipt = NativeRereadReceipt {
+            before: before.clone(),
+            excess: excess.clone(),
+            trials: Vec::new(),
+            admitted: None,
+        };
+        let mut judge = |halvings: u32, theta: &crate::hnn::constitution::Constitution, refused: bool| -> Result<bool, HnnError> {
+            if refused {
+                receipt.trials.push(NativeRereadTrial { halvings, reading: None, first_variation_refused: true });
+                return Ok(false);
+            }
+            let mut fork = resident.clone();
+            fork.constitution = theta.clone();
+            let waves = {
+                let read = match execution {
+                    Some(execution) => self.prepare_native_current_prediction_with_execution(&fork, bits, execution)?,
+                    None => self.prepare_native_current_prediction(&fork, chart, bits)?,
+                };
+                read.reading().waves
+            };
+            let witness = waves == prediction.waves;
+            let (mut after, after_excess) = native_objective(field, &lift, ring, &waves, target, bits)?;
+            let mut reading_bits = bits;
+            let mut decision = decide(&before, &excess, &after, &after_excess, witness);
+            if bits < FINEST
+                && matches!(
+                    decision,
+                    Err(crate::hnn::word::continuation::AdmissionRefusal::Overlap
+                        | crate::hnn::word::continuation::AdmissionRefusal::EqualEndpoints)
+                )
+            {
+                let (fine_before, _) = native_objective(field, &lift, ring, &prediction.waves, target, FINEST)?;
+                let (fine_after, _) = native_objective(field, &lift, ring, &waves, target, FINEST)?;
+                decision = decide(&fine_before, &excess, &fine_after, &after_excess, witness);
+                after = fine_after;
+                reading_bits = FINEST;
+            }
+            let admitted = decision.is_ok();
+            receipt.trials.push(NativeRereadTrial {
+                halvings,
+                reading: Some(NativeRereadReading { after, excess: after_excess, reading_bits, decision }),
+                first_variation_refused: false,
+            });
+            Ok(admitted)
+        };
+        let admitted = returned.reread_ladder(&mut judge)?;
+        receipt.admitted = admitted;
+        Ok(receipt)
+    }
+}
+
+/// [definition; agent-inferred, October 22] The native contact ladder as read: the producing
+/// comparison's code and phase excess, each candidate's reread, and the halving published.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct NativeRereadReceipt {
+    pub before: crate::ratio::algebraic::ExactInterval,
+    pub excess: Rat,
+    pub trials: Vec<NativeRereadTrial>,
+    /// The first admitted halving of the covector-scale start; `None` publishes the certified step.
+    pub admitted: Option<u32>,
+}
+
+/// One candidate of the ladder.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct NativeRereadTrial {
+    pub halvings: u32,
+    /// The candidate's reread; `None` when the actual first variation refused it before any read.
+    pub reading: Option<NativeRereadReading>,
+    pub first_variation_refused: bool,
+}
+
+/// The candidate's comparison at its opening: its code at `reading_bits`, its phase excess, and the
+/// exact decision against the producing comparison.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct NativeRereadReading {
+    pub after: crate::ratio::algebraic::ExactInterval,
+    pub excess: Rat,
+    pub reading_bits: u32,
+    pub decision: Result<crate::hnn::word::continuation::Admitted, crate::hnn::word::continuation::AdmissionRefusal>,
 }
 
 /// Private and single-use: the last actual return has reached its original Word,
@@ -513,6 +630,7 @@ impl Reference {
                 input,
                 selected_class: class,
                 draw: None,
+                reread: None,
             };observe(&event);events.push(event);
         }
         let final_arrival=final_arrival.ok_or(HnnError::Unadmitted{reason:"one actual final returned arrival per native section"})?;
@@ -590,7 +708,7 @@ impl Reference {
         let owner=next.prepared_input.as_mut().expect("same native context owner");
         owner.after_actual(prepared,class)?;
         owner.install_reached_lag(lag)?;
-        let final_event=NativeContextEvent{prediction,scores,forward,preparation,contact:None,input,selected_class:class,draw:None};
+        let final_event=NativeContextEvent{prediction,scores,forward,preparation,contact:None,input,selected_class:class,draw:None,reread:None};
         observe(&final_event);events.push(final_event);
         let final_frontier=next.native_source_frontier()?;
         let end=final_frontier.source_cells();

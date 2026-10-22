@@ -8496,6 +8496,20 @@ impl Constitution {
                     break (steps, read, bounds, joint);
                 }
             }
+            StepSource::Reread { .. } => {
+                // Each family's covector-scale bound alone; the halving below scales them together.
+                let steps: Vec<Option<CertifiedStep>> = parts
+                    .iter()
+                    .map(|(.., part)| {
+                        let (a, c) = alignment(part);
+                        CertifiedStep::certify(&a, &Rat::zero(), &c)
+                    })
+                    .collect::<Result<_, _>>()?;
+                let read = reading(&steps)?;
+                let bounds = bounds_of(&read);
+                let joint = joint_of(&steps.iter().flatten().collect::<Vec<_>>(), &bounds);
+                (steps, read, bounds, joint)
+            }
             StepSource::Declared(declared) | StepSource::Actual(declared) => {
                 // One declared candidate: each stepping family at its declared exponent, the
                 // covector-scale bound kept, nothing halved and nothing searched.
@@ -8705,7 +8719,7 @@ impl Constitution {
         };
         // These bounds only propose a candidate. A finite reread owns its admission;
         // in particular this is not a nonlinear score-descent certificate.
-        if let StepSource::Candidate { halvings } = source {
+        if let StepSource::Candidate { halvings } | StepSource::Reread { halvings } = source {
             if steps.iter().any(Option::is_some) {
                 // Preserve the native relative locus rates. One common halving
                 // scales this fixed joint direction; it does not replace every
@@ -8836,6 +8850,46 @@ impl Constitution {
         Self::contact_only(deposit)?;
         self.deposited_in(deposit, &self.held(), Some(loaded), DepositMode::Certified)?
             .published()
+    }
+
+    /// [definition; agent-inferred, October 22] **The native contact candidate at `halvings`**:
+    /// [`Constitution::deposited_with_contact_spans`] with each family started at its
+    /// covector-scale bound ([`StepSource::Reread`]) instead of the a priori curvature envelope,
+    /// every other law shared. It certifies nothing: the caller rereads the same comparison at
+    /// the candidate and publishes it only on exact strict improvement. At `halvings = 0` it also
+    /// returns the least halving at which no entry reaches its cell
+    /// (`reference::comparison::no_reach_halving_of`), where the ladder ends.
+    pub(crate) fn deposited_with_contact_spans_reread(
+        &self,
+        deposit: &Deposit,
+        loaded: &crate::hnn::word::finite_gain::FiniteContactSpans,
+        halvings: u32,
+    ) -> Result<(Self, DepositReading, Option<u32>), HnnError> {
+        Self::contact_only(deposit)?;
+        match self.deposited_in(
+            deposit,
+            &self.held(),
+            Some(loaded),
+            DepositMode::Reread { halvings },
+        )? {
+            DepositOutcome::Published(next, reading, _, starting) => {
+                let no_reach = starting
+                    .as_deref()
+                    .map(crate::hnn::reference::comparison::no_reach_halving_of)
+                    .transpose()?;
+                Ok((next, reading, no_reach))
+            }
+            DepositOutcome::Reached(_) | DepositOutcome::Refused(_) => Err(HnnError::Realization {
+                what: "a native reread candidate publishes its trial successor",
+            }),
+        }
+    }
+
+    /// Whether any contact factor entry differs from `other`'s.
+    pub(crate) fn contact_factors_moved(&self, other: &Self) -> bool {
+        self.contacts.iter().zip(&other.contacts).any(|(a, b)| {
+            a.storage != b.storage || a.stiffness != b.stiffness || a.dissipation != b.dissipation
+        })
     }
 
     /// The finite contact span's scope: no linear step, and every factor step at a channel.
@@ -9150,6 +9204,7 @@ impl Constitution {
             let source = match mode {
                 DepositMode::Declared(declared) => StepSource::Declared(declared),
                 DepositMode::Candidate { halvings } => StepSource::Candidate { halvings },
+                DepositMode::Reread { halvings } => StepSource::Reread { halvings },
                 DepositMode::Certified | DepositMode::FirstReach => StepSource::Certified,
             };
             match self.certify_steps(
@@ -9282,7 +9337,10 @@ impl Constitution {
         // pass-1 owners as first_reach_scan and the exact directions pass 2 actually deposits.
         // Paired receiving blocks round in their normalized internal coordinates, not the
         // joined direction's physical operand coordinates. No statistic or carry is published here.
-        let starting_updates = if matches!(mode, DepositMode::Candidate { halvings: 0 }) {
+        let starting_updates = if matches!(
+            mode,
+            DepositMode::Candidate { halvings: 0 } | DepositMode::Reread { halvings: 0 }
+        ) {
             let mut parts = Vec::new();
             for ((locus, steps, _, _), region) in regions.iter().zip(&ready) {
                 let step_of = |family| {
@@ -9503,9 +9561,10 @@ impl Constitution {
                 }
                 Some(CommittedReach { families })
             }
-            DepositMode::Certified | DepositMode::FirstReach | DepositMode::Candidate { .. } => {
-                None
-            }
+            DepositMode::Certified
+            | DepositMode::FirstReach
+            | DepositMode::Candidate { .. }
+            | DepositMode::Reread { .. } => None,
         };
         let reading = DepositReading {
             epoch: None,
@@ -10609,6 +10668,12 @@ enum StepSource<'d> {
     Candidate {
         halvings: u32,
     },
+    /// [definition; agent-inferred, October 22] The native contact candidate the same comparison
+    /// rereads: each family starts at its covector-scale bound alone (`ηc ≤ 1`), then one common
+    /// halving. The a priori curvature envelope selects nothing; the reread owns admission.
+    Reread {
+        halvings: u32,
+    },
     Declared(&'d DeclaredExponents),
     /// Fixed represented deltas: shared ray reads, enforced bounds, no search.
     Actual(&'d DeclaredExponents),
@@ -10618,7 +10683,9 @@ impl StepSource<'_> {
     /// A deposit in which no family steps: a declaration then names none.
     fn unstepped(&self) -> Result<(), DeclaredStepRefusal> {
         match self {
-            StepSource::Certified | StepSource::Candidate { .. } => Ok(()),
+            StepSource::Certified | StepSource::Candidate { .. } | StepSource::Reread { .. } => {
+                Ok(())
+            }
             StepSource::Declared(declared) | StepSource::Actual(declared) => match declared
                 .families()
                 .next()
@@ -10636,6 +10703,7 @@ impl StepSource<'_> {
 enum DepositMode<'d> {
     Certified,
     Candidate { halvings: u32 },
+    Reread { halvings: u32 },
     FirstReach,
     Declared(&'d DeclaredExponents),
 }

@@ -27,7 +27,7 @@ pub fn no_reach_halving(candidate: &ComparisonCandidate) -> Result<u32, HnnError
     no_reach_halving_of(candidate.starting_updates()?)
 }
 
-fn no_reach_halving_of(
+pub(crate) fn no_reach_halving_of(
     parts: &[crate::hnn::constitution::ComparisonStepEntries],
 ) -> Result<u32, HnnError> {
     let mut halving = 0;

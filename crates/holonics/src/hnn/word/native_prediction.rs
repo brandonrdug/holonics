@@ -6,7 +6,7 @@ use crate::hnn::receiving::native_current::NativeCurrentFace;
 use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::release::ReleaseReturn;
 use num_bigint::BigInt;
-use num_traits::One;
+use num_traits::{One, Zero};
 
 pub use super::native_execution::{NativePredictionExecution,NativeExecutedPrediction,NativeExecutedPath,NativeExecutedReturn};
 
@@ -90,6 +90,14 @@ impl NativePredictionReturn {
         self,
         charts: &mut Charts,
     ) -> Result<NativeContactPublication, HnnError> {
+        self.publish_contact_carry_at(charts, None)
+    }
+    /// The publication at the certified step (`None`) or at the reread-admitted halving.
+    pub(crate) fn publish_contact_carry_at(
+        self,
+        charts: &mut Charts,
+        reread: Option<u32>,
+    ) -> Result<NativeContactPublication, HnnError> {
         self.cut.publish_native_comparison(
             self.represented_policy,
             self.reading,
@@ -98,6 +106,24 @@ impl NativePredictionReturn {
             &self.phases,
             &self.covector,
             charts,
+            reread,
+        )
+    }
+    /// [definition; agent-inferred, October 22] The native contact ladder on this return's own
+    /// deposit (`ContactCut::native_reread_ladder`): `judge` rereads the same comparison at each
+    /// candidate. Nothing is published.
+    pub(crate) fn reread_ladder(
+        &self,
+        judge: &mut dyn FnMut(u32, &crate::hnn::constitution::Constitution, bool) -> Result<bool, HnnError>,
+    ) -> Result<Option<u32>, HnnError> {
+        self.cut.native_reread_ladder(
+            self.represented_policy,
+            &self.reading,
+            &self.stations,
+            &self.back,
+            &self.phases,
+            &self.covector,
+            judge,
         )
     }
 }
@@ -770,4 +796,41 @@ impl NativeRSection {
     pub(crate) fn anchors(&self) -> &[Vec<BigInt>] {
         &self.anchors
     }
+}
+
+/// [definition; agent-inferred, October 22] **The native comparison's objective** at one opening,
+/// read from its produced waves: the targets' code `Σ −log₂ p̂(t)` at `bits` (the classical face,
+/// [`NativeCurrentFace::score`], summed exactly with no outward grid) and the phase excess
+/// `Σ ½ gap²`, `gap` the target's phase minus the produced phase `w_(2t+1)/2` in turns, the face
+/// whose gradient is the native covector's phase row (`HolonRatio::retained_aperture_return`).
+pub(crate) fn native_objective(
+    field: &Field,
+    lift: &[BigInt],
+    ring: usize,
+    waves: &[Vec<Rat>],
+    targets: &crate::hnn::encoding::Encoded,
+    bits: u32,
+) -> Result<(ExactInterval, Rat), HnnError> {
+    field.admit(targets)?;
+    let phases = crate::hnn::ratio::target_phases(field, lift, ring, targets)?;
+    if waves.len() != phases.phases.len() || targets.len() != waves.len() {
+        return Err(HnnError::Unadmitted {
+            reason: "one target and one target phase for each native prediction",
+        });
+    }
+    let (mut lower, mut upper, mut excess) = (Rat::zero(), Rat::zero(), Rat::zero());
+    for ((wave, target), phase) in waves.iter().zip(targets.classes_read()).zip(&phases.phases) {
+        let score = NativeCurrentFace::at(wave.clone(), bits)?.score(target)?;
+        lower += score.lower;
+        upper += score.upper;
+        let produced = wave
+            .get(2 * target + 1)
+            .ok_or(HnnError::Unadmitted {
+                reason: "the target's phase row in the native wave",
+            })?
+            / Rat::from_integer(BigInt::from(2));
+        let gap = phase - produced;
+        excess += &gap * &gap / Rat::from_integer(BigInt::from(2));
+    }
+    Ok((ExactInterval::new(lower, upper)?, excess))
 }

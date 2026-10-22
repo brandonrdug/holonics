@@ -622,6 +622,11 @@ fn represented_native_zero_motion_continuity()->Result<()>{
     let contact_carry=|theta:&Constitution|theta.carried_remainders().into_iter().filter(|(l,..)|matches!(l,holonics::hnn::constitution::Locus::Channel(_))).collect::<Vec<_>>();
     let packet=format!("ZERO_MOTION_CONTINUITY_CONTACT_PACKET original_prediction={:?} current_after={:?} full_actual_factor_delta={actual_delta:?} before_scales={before_scales:?} after_scales={after_scales:?} before_contact_carry={:?} after_contact_carry={:?} publication={:?} physical_reference={proof:?} continuation={:?} input={:?}\n",contact.prediction,stream.resident().current(),contact_carry(&theta10),contact_carry(&p.constitution),p.publication,p.continuation,contact.input);
     println!("{packet}");let root=std::path::PathBuf::from(std::env::var("V93_CONTROL_ARTIFACT_DIR")?);std::fs::create_dir_all(&root)?;std::fs::write(root.join("contact_packet.txt"),packet)?;
+    if let Some(r)=&contact.reread{
+        println!("ZERO_MOTION_CONTINUITY_REREAD before={:?} excess={} admitted={:?} trials={}",r.before,r.excess,r.admitted,r.trials.len());
+        for t in &r.trials{println!("ZERO_MOTION_CONTINUITY_REREAD_TRIAL halvings={} first_variation_refused={} reading={:?}",t.halvings,t.first_variation_refused,t.reading);}
+    }
+    println!("ZERO_MOTION_CONTINUITY_STEPS {:?}",p.publication.steps.iter().map(|(l,s)|(l,s.family,s.step.exponent)).collect::<Vec<_>>());
     // Continuity is distinct from the stronger positive-material influence requirement.
     if moved{assert!(proof.lower>integer(0));assert!(p.actual_alignment>p.actual_error_charge);}
     else{assert_eq!(proof.stored_pairing,integer(0));assert_eq!(proof.lower,integer(0));}
