@@ -20,6 +20,7 @@ pub(crate) struct ResponseColumn {
 }
 
 impl ResponseColumn {
+    pub(super) fn original_opening(&self)->&EndChange { &self.exact_opening }
     /// `source` is the mode-qualified physical injection before its opening split, with zero
     /// storage outside source rings. Interior contact and resonator states open at zero.
     /// Held exterior returns overwrite the corresponding response by zero at the actual tick.

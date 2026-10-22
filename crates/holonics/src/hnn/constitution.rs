@@ -8088,12 +8088,26 @@ impl Constitution {
                 })
                 .transpose()
         };
+        // Actual joint range of all prepared factors, without another statistic arrival.
+        // This bounds the physical derivative throughout the proposed ray; the final rounded
+        // direction is independently queried at publication, on the SAME original records.
+        let native_extent=|steps:&[Option<CertifiedStep>]|->Result<crate::hnn::word::material_ray::ContactDirections,HnnError>{
+            let span=loaded.ok_or(HnnError::Unadmitted{reason:"native physical extent has its source-owned span"})?;
+            let native=span.native().ok_or(HnnError::Unadmitted{reason:"native physical extent has its original returned packet"})?;
+            let mut extent=self.native_zero_contact_direction()?;
+            for (locus,family,part)in &parts{
+                let (Locus::Channel(a),Family::Factor(f),Part::Factor(prepared))=(locus,family,part)else{return Err(HnnError::Unadmitted{reason:"physical native extent contains contact factors only"});};
+                let step=taken(steps,(*locus,*family));
+                let unit=self.native_unit_contact_direction(native.deposit(),*a,*f,&prepared.scale)?;
+                extent[*a][*f]=unit[*a][*f].scaled(&step);
+            }Ok(extent)
+        };
         // Each family's gain `κ²` and moves `b` at the end of every ray.
         let curvature = |index: usize,
                          steps: &[Option<CertifiedStep>],
                          readout: &Rat,
                          sums: &(Rat, Rat),
-                         loaded: Option<&crate::hnn::word::finite_gain::LoadedSpanReading>|
+                         loaded_reading: Option<&crate::hnn::word::finite_gain::LoadedSpanReading>|
          -> Result<(Rat, Rat), HnnError> {
             let (locus, family, part) = &parts[index];
             let prepared = match part {
@@ -8149,7 +8163,21 @@ impl Constitution {
                     moves.own(&prepared.energy, own)?,
                 )),
                 (Locus::Channel(a), moves) => {
-                    if let Some(loaded) = loaded {
+                    if let Some(span)=loaded.filter(|s|s.native().is_some_and(|n|n.represented())){
+                        let native=span.native().expect("source-bound native span");
+                        let Family::Factor(f)=prepared.family else{return Err(HnnError::Unadmitted{reason:"native physical gain has its factor family"});};
+                        let direction=self.native_unit_contact_direction(native.deposit(),a,f,&prepared.scale)?;
+                        let reading=span.physical_query(&direction,&native_extent(steps)?)?;
+                        let b=moves.own(&prepared.energy,own)?;
+                        if b.is_zero(){
+                            if !reading.response_squared.is_zero(){return Err(native.physical_refusal("nonzero physical response cannot be calibrated by zero local moves",reading));}
+                            return Ok((Rat::zero(),b));
+                        }
+                        // kappa^2*b is calibrated to the actual physical RESPONSE bound. It
+                        // is neither a class-score Hessian assertion nor a finite CE veto.
+                        return Ok((reading.response_squared/&b,b));
+                    }
+                    if let Some(loaded) = loaded_reading {
                         return Ok((loaded.gain(a, readout), moves.own(&prepared.energy, own)?));
                     }
                     let conductance = self.conductances[a]
@@ -8796,11 +8824,36 @@ impl Constitution {
         }).collect();
         loaded.read(&forms)
     }
+    fn native_zero_contact_direction(&self)->Result<crate::hnn::word::material_ray::ContactDirections,HnnError>{
+        self.contacts.iter().map(|c|Ok([ExactRatMatrix::zero(c.storage.rows(),c.storage.columns())?,
+            ExactRatMatrix::zero(c.stiffness.rows(),c.stiffness.columns())?,ExactRatMatrix::zero(c.dissipation.rows(),c.dissipation.columns())?])).collect()
+    }
+    fn native_unit_contact_direction(&self,deposit:&Deposit,contact:usize,family:usize,scale:&Rat)
+        ->Result<crate::hnn::word::material_ray::ContactDirections,HnnError>{
+        if scale<=&Rat::zero(){return Err(HnnError::Unadmitted{reason:"physical contact query retains its actual positive prepared statistic"});}
+        let mut result=self.native_zero_contact_direction()?;let mut found=false;
+        for step in deposit.factors(){let(a,f,g)=match &step.gradient{
+            FactorGradient::Storage{contact,gradient}=>(*contact,0,gradient),FactorGradient::Stiffness{contact,gradient}=>(*contact,1,gradient),FactorGradient::Dissipation{contact,gradient}=>(*contact,2,gradient),
+            _=>return Err(HnnError::Unadmitted{reason:"physical contact query has only reached native C/K/D"})};
+            if a==contact&&f==family{if found{return Err(HnnError::Unadmitted{reason:"one prepared native factor direction per original reached family"});}result[a][f]=g.scaled(&scale.recip());found=true;}
+        }
+        if !found{return Err(HnnError::Unadmitted{reason:"physical direction is the original prepared reached factor"});}Ok(result)
+    }
     /// Actual represented FACTOR direction, after carry/rounding, before any publication.
     /// This is a first-variation predicate, NOT a finite native-score decrease assertion.
-    pub(crate) fn native_contact_actual_ray(&self,next:&Self,deposit:&Deposit,loaded:&crate::hnn::word::finite_gain::FiniteContactSpans)->Result<(Rat,Rat),HnnError>{
+    pub(crate) fn native_contact_actual_ray(&self,next:&Self,deposit:&Deposit,loaded:&crate::hnn::word::finite_gain::FiniteContactSpans)->Result<(Rat,Rat,Option<crate::hnn::word::native_prediction::NativePhysicalRayReading>),HnnError>{
         let native=loaded.native().ok_or(HnnError::Unadmitted{reason:"actual native contact ray requires its paired source-bound gain/error witness"})?;
         native.admit(self,deposit)?;
+        if native.represented(){
+            let mut direction=self.native_zero_contact_direction()?;
+            for (a,(old,new))in self.contacts.iter().zip(&next.contacts).enumerate(){
+                direction[a]=[new.storage.subtract(&old.storage)?,new.stiffness.subtract(&old.stiffness)?,new.dissipation.subtract(&old.dissipation)?];
+            }
+            let moved=direction.iter().flatten().any(|m|m.entries().iter().any(|x|!x.is_zero()));
+            let reading=loaded.physical_query(&direction,&direction)?;
+            if moved&&reading.lower<=Rat::zero(){return Err(native.physical_refusal("actual represented factor delta / physical first variation",reading));}
+            return Ok((reading.stored_pairing.clone(),&reading.reverse_discrepancy+&reading.class_error_charge+&reading.response_error_charge,Some(reading)));
+        }
         let bound=self.native_contact_loaded(loaded)?;
         let mut pairing=Rat::zero();let mut response_squared=Rat::zero();let mut terms=0u64;
         for step in deposit.factors(){
@@ -8823,7 +8876,7 @@ impl Constitution {
         // Cross effects of all changed factors as well as the actual/fresh cross term are kept.
         let error=native.error_charge(&(Rat::from_integer(BigInt::from(terms))*response_squared));
         if terms!=0 && pairing<=error {return Err(HnnError::Unadmitted{reason:"actual represented native contact differential exceeds its authentic class/phase error charge"});}
-        Ok((pairing,error))
+        Ok((pairing,error,None))
     }
 
     /// The finite contact span's scope: no linear step, and every factor step at a channel.
@@ -9030,6 +9083,14 @@ impl Constitution {
                 for ((locus,..),region) in regions.iter().zip(&mut ready){
                     let Locus::Channel(contact)=locus else{return Err(HnnError::Unadmitted{reason:"paired native contact gain covers contact-only material"});};
                     for factor in &mut region.factors{
+                        if native.represented(){
+                            let Family::Factor(family)=factor.family else{return Err(HnnError::Unadmitted{reason:"physical native query covers actual contact factors"});};
+                            let direction=self.native_unit_contact_direction(deposit,*contact,family,&factor.scale)?;
+                            let reading=span.physical_query(&direction,&self.native_zero_contact_direction()?)?;
+                            if direction.iter().flatten().any(|m|m.entries().iter().any(|x|!x.is_zero()))&&reading.lower<=Rat::zero(){return Err(native.physical_refusal("fresh prepared unit / physical first variation",reading));}
+                            factor.alignment=floor(&factor.alignment.clone().min(reading.lower));
+                            continue;
+                        }
                         let motion=factor.moves.own(&factor.energy,&Rat::zero())?;
                         let gain=physical.gain(*contact,&(native.readout_norm()*native.readout_norm()));
                         let error=native.error_charge(&(gain*motion));

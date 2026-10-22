@@ -140,9 +140,15 @@ impl<'a, 'c> TrajectoryView<'a, 'c> {
     pub(crate) fn is_ended(&self) -> bool {
         self.producing.is_ended()
     }
-    #[cfg(test)]
     pub(crate) fn opened_at(&self) -> usize {
         self.producing.opened_at()
+    }
+    /// Borrowed original stage state, including the actual loaded state/phase. No replay.
+    pub(crate) fn point(&self,t:usize)->Result<super::EndChange,HnnError>{
+        let r=self.records.get(t).ok_or(HnnError::WordEnded{ticks:self.records.len()})?;
+        Ok(super::EndChange{storage:r.storage.clone(),arrivals:r.arrivals.clone(),states:r.states.clone(),
+            resonators:self.resonances.iter().map(|r|r.as_ref().map(|r|r.steps.get(t).map_or_else(||r.state.clone(),|s|s.input.clone()))).collect(),
+            resonator_phases:self.operands().resonators().iter().map(|r|r.as_ref().map(|r|r.phase_at((self.opened_at()+t).saturating_sub(1)))).collect()})
     }
     pub(crate) fn source_returns(&self) -> &[SourceWaveReturn] {
         self.producing.source_returns()

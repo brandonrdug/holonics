@@ -9,6 +9,7 @@ use num_bigint::BigInt;
 use num_traits::One;
 
 pub const LAW: &str = "native-current-prediction-v1";
+pub use super::material_ray::PhysicalRayReading as NativePhysicalRayReading;
 
 /// Consumes the actual Word; callers cannot construct a face, change the predictor or rebind y.
 pub struct NativePredictionWord<'a> {
@@ -34,6 +35,7 @@ pub struct NativePredictionReading {
     pub masses: Vec<Vec<ExactInterval>>,
 }
 pub struct NativePredictionReturn {
+    represented_policy:bool,
     reading: NativePredictionReading,
     scores: Vec<ExactInterval>,
     stations: Vec<RetainedStationReturn>,
@@ -61,6 +63,7 @@ impl NativePredictionReturn {
         charts: &mut Charts,
     ) -> Result<NativeContactPublication, HnnError> {
         self.cut.publish_native_comparison(
+            self.represented_policy,
             self.reading,
             &self.stations,
             &self.back,
@@ -80,6 +83,9 @@ pub struct NativeContactPublication {
     pub actual_alignment: Rat,
     pub actual_error_charge: Rat,
     pub paired_readout_norm: Rat,
+    /// Explicit physical-reference first variation against the original represented face.
+    /// None on the preserved exact route; never a finite represented-score claim.
+    pub physical_reference:Option<NativePhysicalRayReading>,
 }
 
 /// Private admitting input, issued only by the actual native Word comparison consumer.
@@ -96,8 +102,22 @@ pub(crate) struct NativeContactWitness {
     pub(super) deposit: crate::hnn::port::Deposit,
     pub(super) readout_norm: Rat,
     pub(super) error_l1: Rat,
+    pub(super) component_errors:Vec<Vec<Rat>>,
+    pub(super) represented:Option<std::sync::Arc<super::material_ray::PhysicalContactProof>>,
 }
 impl NativeContactWitness {
+    pub(crate) fn represented(&self)->bool{self.represented.is_some()}
+    pub(crate) fn deposit(&self)->&crate::hnn::port::Deposit{&self.deposit}
+    pub(crate) fn physical_refusal(&self,stage:&'static str,reading:NativePhysicalRayReading)->HnnError{
+        HnnError::RepresentedNativeRayNotAdmitted{source_cells:self.source.cells(),commit:self.producing.commit(),stage,reading:Box::new(reading)}
+    }
+    pub(crate) fn physical_query(&self,o:&crate::hnn::propagation::Operands,
+        direction:&super::material_ray::ContactDirections,extent:&super::material_ray::ContactDirections)
+        ->Result<NativePhysicalRayReading,HnnError>{
+        self.geometry.admit_native_contact(&self.field,&self.reads,o,&self.phases,self.opened_at)?;
+        self.represented.as_ref().ok_or(HnnError::Unadmitted{reason:"physical represented ray requires its original stage issuer"})?
+            .query(self,o,direction,extent,&self.component_errors)
+    }
     pub(crate) fn admit_cut(
         &self,
         field: &Field,
@@ -371,6 +391,7 @@ impl NativePredictionWord<'_> {
         targets: &crate::hnn::encoding::Encoded,
     ) -> Result<NativePredictionReturn, HnnError> {
         let scores = self.score(targets)?;
+        let represented_policy=self.prepared.as_ref().is_some_and(|p|p.native_lagged&&p.work_policy.represented());
         let reading = self.reading();
         let stations = self
             .faces
@@ -457,6 +478,7 @@ impl NativePredictionWord<'_> {
             });
         }
         Ok(NativePredictionReturn {
+            represented_policy,
             reading,
             scores,
             stations,

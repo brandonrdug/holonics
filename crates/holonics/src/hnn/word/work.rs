@@ -23,6 +23,9 @@ pub struct WorkRead {
     pub response_returns: u64,
     /// Unsplit surrogate evaluations used to certify response-column coordinate errors.
     pub response_certificate_ticks: u64,
+    /// Algebraic paired material-ray queries/ticks on original returned records; no new Word.
+    pub material_ray_queries:u64,
+    pub material_ray_ticks:u64,
     /// A counter overflow makes the exterior reading unusable; it changes no native law.
     pub overflowed: bool,
 }
@@ -68,6 +71,8 @@ impl WorkRead {
             response_certificate_ticks: self
                 .response_certificate_ticks
                 .checked_sub(before.response_certificate_ticks)?,
+            material_ray_queries:self.material_ray_queries.checked_sub(before.material_ray_queries)?,
+            material_ray_ticks:self.material_ray_ticks.checked_sub(before.material_ray_ticks)?,
             overflowed: false,
         })
     }
@@ -88,6 +93,8 @@ pub(crate) enum Event {
     ResponseReturnAttempt,
     ResponseReturn,
     ResponseCertificateTick,
+    MaterialRayQuery,
+    MaterialRayTick,
 }
 
 pub(crate) fn reached(event: Event) {
@@ -109,6 +116,8 @@ pub(crate) fn reached(event: Event) {
             Event::ResponseReturnAttempt => &mut reading.response_return_attempts,
             Event::ResponseReturn => &mut reading.response_returns,
             Event::ResponseCertificateTick => &mut reading.response_certificate_ticks,
+            Event::MaterialRayQuery=>&mut reading.material_ray_queries,
+            Event::MaterialRayTick=>&mut reading.material_ray_ticks,
         };
         match counter.checked_add(1) {
             Some(next) => *counter = next,

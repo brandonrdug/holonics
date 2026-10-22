@@ -486,9 +486,80 @@ fn represented_native_policy_pending_cold_and_guard()->Result<()>{
             Err(holonics::hnn::HnnError::RepresentedNativeGainUnavailable{source_cells,commit,lattice,state_radii,class_error_l1})=>{
                 let context=state_radii.context_bounds()?;assert_eq!(source_cells,6);assert_eq!(context.len(),reading.features.len());
                 println!("REPRESENTED_CONTACT_BOUNDARY name={name} source={source_cells} commit={commit} lattice={lattice:?} genuine_actual_fresh_radii={state_radii:?} class_error={class_error_l1} missing=uniform_changed_chart_material_ray_response no_publication=true release={:?}",balance.released);
-            },Err(e)=>return Err(e.into()),Ok(_)=>return Err("unqualified represented contact must not publish".into()),
+            },Err(e)=>return Err(e.into()),Ok(p)=>{
+                let physical=p.physical_reference.as_ref().ok_or("represented physical-reference reading")?;
+                assert_eq!(physical.stored_pairing,integer(0));assert_eq!(physical.lower,integer(0));
+                println!("REPRESENTED_CONTACT_ZERO_R name={name} physical_reference={physical:?} no_general_positive_ray_claim=true");
+            },
         }
         assert_eq!(r.continuing_state(0)?,state);
     }
     println!("REPRESENTED_FORWARD_COLD_PASS frozen_material=true same_represented_face_and_balance=true unsplit_equivalence_claim=false elapsed_ns={}",started.elapsed().as_nanos());Ok(())
+}
+
+#[test]
+#[ignore="one pre-reserved represented native connected/640-attempt guard; no dataset"]
+fn represented_native_full_transition()->Result<()>{
+    use holonics::hnn::word::work;
+    use holonics::hnn::field::ConstitutionRead;
+    struct Meter;impl Drop for Meter{fn drop(&mut self){let c=work::process_native_calls();let total=c.forward_attempts+c.response_attempts+c.return_attempts+c.response_return_attempts;let s=format!("{{\"final\":true,\"total_attempts\":{total},\"forward_constructors\":{},\"response_companions\":{},\"actual_returns\":{},\"fresh_returns\":{}}}\n",c.forward_attempts,c.response_attempts,c.return_attempts,c.response_return_attempts);println!("REPRESENTED_CONNECTED_COUNTS {s} work={:?}",work::read());if let Some(p)=std::env::var_os("V93_NATIVE_COUNT_PATH"){std::fs::write(p,s).unwrap();}}}
+    let _meter=Meter;work::limit_process_native_attempts(std::env::var("V93_NATIVE_ATTEMPT_LIMIT")?.parse()?);
+    let started=Instant::now();let reference=port();let(field,mut initial,pairing)=declaration_with_input_context(16384,true,true)?;
+    initial.bind_family_local_receiving_return(2)?;initial.bind_bounded_receiving_representation(2)?;initial.bind_native_rational_receiving(2)?;
+    let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
+    let empty=PairedObservation::admit(&field,resident.constitution(),&pairing)?.encode(&[])?;reference.ingest(&mut resident,None,&empty)?;
+    resident.refine_contact_grain(24)?;resident.select_represented_native_prepared_input(&pairing)?;
+    let opening=resident.constitution().clone();let mut stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+    fn cold(reference:&Reference,stream:&ObservedStream,opening:&Constitution,label:&str)->Result<ObservedStream>{
+        let state=stream.resident().continuing_state(0)?;let text=state.to_text();let parsed=ContinuingState::from_text(&text,READ_BUDGET)?;
+        let field=stream.resident().field();let resident=reference.mount_continued(field,&Current::at_rest(field),opening.clone(),&parsed)?;
+        assert_eq!(resident.continuing_state(0)?,state);
+        let crib=ObservedCrib::from_unplaced_checkpoint(field,resident.current(),stream.crib().next_position(),&stream.crib().unplaced_checkpoint()?)?;
+        let pending=stream.pending_checkpoint();assert!(pending.starts_with("observed-stream-pending-native-represented-v1"));
+        assert!(ObservedStream::restore_checkpoint(resident.clone(),crib.clone(),&pending.replacen("observed-stream-pending-native-represented-v1","observed-stream-pending-native-rational-v1",1)).is_err());
+        let restored=ObservedStream::restore_checkpoint(resident,crib,&pending)?;assert_eq!(restored.pending_checkpoint(),pending);
+        println!("REPRESENTED_CONNECTED_COLD_PASS boundary={label} bytes={} pending_equal=true",text.len());Ok(restored)
+    }
+    let data:Vec<_>=(0..30).map(|i|i%4).collect();stream.receive_native_current(&reference,&pairing,&data[..6],64)?;
+    stream=cold(&reference,&stream,&opening,"pending-six")?;
+    let at6=stream.resident().continuing_state(0)?;let pending6=stream.pending_checkpoint();
+    // Print only existing reached readings; no diagnostic Word or inverse trajectory.
+    let first=stream.receive_native_current_diagnosed(&reference,&pairing,&data[6..10],64,&mut|e|{
+        let bits=e.prediction.features.iter().flatten().map(|q|q.numer().bits().max(q.denom().bits())).max().unwrap_or(0);
+        println!("REPRESENTED_CONNECTED_SOURCE source={} commit={} feature_max_bits={bits} lattice={:?} work={:?}",e.prediction.source_cells,e.prediction.producing_commit,e.prediction.execution_lattice,e.preparation.as_ref().map(|p|&p.work));
+    });
+    let first=match first{Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,at6);assert_eq!(stream.pending_checkpoint(),pending6);println!("REPRESENTED_CONNECTED_REFUSAL boundary=first-R rollback_exact=true error={e:?}");return Err(e.into());}};
+    assert_eq!(first.len(),1);assert_eq!(first[0].publication_source,9);assert!(first[0].blind_carry_preserved);
+    assert!(stream.resident().constitution().receiving_map(2).unwrap().entries().iter().any(|q|!num_traits::Zero::is_zero(q)));
+    println!("REPRESENTED_CONNECTED_FIRST_R_PASS publication={:?}",first[0].publication);
+    stream=cold(&reference,&stream,&opening,"post-first-R")?;
+    let at10=stream.resident().continuing_state(0)?;let pending10=stream.pending_checkpoint();let theta10=stream.resident().constitution().clone();
+    let contact=match stream.observe_native_current_contact(&reference,&pairing,data[10],64){Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,at10);assert_eq!(stream.pending_checkpoint(),pending10);println!("REPRESENTED_CONNECTED_REFUSAL boundary=contact10to11 rollback_exact=true error={e:?}");return Err(e.into());}};
+    let p=contact.contact.as_ref().ok_or("actual new represented contact owner")?;let proof=p.physical_reference.as_ref().ok_or("physical-reference witness")?;
+    assert!(proof.lower>integer(0));assert!(p.actual_alignment>p.actual_error_charge);
+    let moved=(0..field.contacts().len()).any(|a|theta10.contact_storage(a)!=p.constitution.contact_storage(a)||theta10.contact_stiffness(a)!=p.constitution.contact_stiffness(a)||theta10.contact_dissipation(a)!=p.constitution.contact_dissipation(a));
+    assert!(moved,"genuine contact requires actual represented C/K/D motion, not statistic-only publication");
+    println!("REPRESENTED_CONNECTED_CONTACT_PASS source10to11=true actual_factor_motion=true physical_reference={proof:?} work={:?}",p.continuation);
+    for (label,start,end) in [("next-R",11,20),("source30-close",20,30)]{
+        let before=stream.resident().continuing_state(0)?;let pending=stream.pending_checkpoint();
+        let outcome=stream.receive_native_current_diagnosed(&reference,&pairing,&data[start..end],64,&mut|e|{
+            let bits=e.prediction.features.iter().flatten().map(|q|q.numer().bits().max(q.denom().bits())).max().unwrap_or(0);
+            println!("REPRESENTED_CONNECTED_SOURCE source={} commit={} feature_max_bits={bits}",e.prediction.source_cells,e.prediction.producing_commit);
+        });
+        let sections=match outcome{Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,before);assert_eq!(stream.pending_checkpoint(),pending);println!("REPRESENTED_CONNECTED_REFUSAL boundary={label} rollback_exact=true error={e:?}");return Err(e.into());}};
+        assert_eq!(sections.len(),1);assert_eq!(sections[0].publication_source,end as u64-1);assert!(sections[0].blind_carry_preserved);
+        if end==30{assert!(sections[0].aeon_closed);}
+        println!("REPRESENTED_CONNECTED_SECTION_PASS boundary={label} publication={:?}",sections[0].publication);
+    }
+    let retained=stream.resident().continuing_state(0)?;let cold=cold(&reference,&stream,&opening,"final-source30")?;
+    let(mut a,mut ac)=stream.native_current_query_fork(&reference,&pairing,64)?;let(mut b,mut bc)=cold.native_current_query_fork(&reference,&pairing,64)?;
+    a.begin_hypothesized_output()?;b.begin_hypothesized_output()?;let theta=a.constitution().clone();let m=a.prepared_input().unwrap().material().clone();
+    for(index,key)in [rat(1,7),rat(2,7),rat(3,7),rat(4,7)].into_iter().enumerate(){
+        let x=reference.release_native_current_forecast(&mut a,&mut ac,&pairing,&key,64)?;let y=reference.release_native_current_forecast(&mut b,&mut bc,&pairing,&key,64)?;
+        assert_eq!(x.prediction,y.prediction);assert_eq!(x.selected_class,y.selected_class);assert_eq!(a.carried(),b.carried());
+        assert_eq!(a.constitution(),&theta);assert_eq!(b.constitution(),&theta);assert_eq!(a.prepared_input().unwrap().material(),&m);assert_eq!(b.prepared_input().unwrap().material(),&m);
+        println!("REPRESENTED_CONNECTED_FROZEN_PASS decision={index} key={key} class={}",x.selected_class);
+    }
+    assert_eq!(stream.resident().continuing_state(0)?,retained);
+    println!("REPRESENTED_CONNECTED_COMPLETE_PASS actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true unsplit_trajectory_equivalence=false elapsed_ns={}",started.elapsed().as_nanos());Ok(())
 }

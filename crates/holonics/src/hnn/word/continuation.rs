@@ -72,6 +72,7 @@ use crate::receiver::reception::{Component, InteractionReturn};
 /// Only a native source-opened word's actual return issues one. No public state constructor.
 #[derive(Debug)]
 pub struct ContactCut {
+    native_declaration:Option<Arc<()>>,
     native_prediction: Option<super::native_prediction::NativeContactWitness>,
     field: Field,
     producing: Constitution,
@@ -517,6 +518,7 @@ impl<'c> Word<'c> {
                 reading.join(&Remainders::of(resonance.remainders.all()))
             });
         Ok(ContactCut {
+            native_declaration:self.native_declaration_id.clone(),
             native_prediction: None,
             released,
             deposit: None,
@@ -565,6 +567,7 @@ impl<'c> Word<'c> {
 impl ContactCut {
     pub(super) fn publish_native_comparison(
         mut self,
+        represented_policy:bool,
         prediction:super::native_prediction::NativePredictionReading,
         stations:&[crate::hnn::receiving::RetainedStationReturn],
         back:&WordReturn,
@@ -588,14 +591,17 @@ impl ContactCut {
                 return Err(HnnError::Unadmitted{reason:"native contact error belongs to the actual original predicted class/phase packet"});
             }
         }
-        // The executed pair's requested state tube is authentic, but cannot mint
-        // a uniform changed-operator/material-ray certificate. Preserve that gap
-        // before the exact-only loaded-gain constructor or any material proposal.
-        if let Some(lattice)=self.operands.lattice(){
+        // State radii alone cannot mint this witness. Only the explicit new policy,
+        // the original stage issuer and the separate physical first-variation consumer can.
+        if self.operands.lattice().is_some()&&!represented_policy{return Err(HnnError::Unadmitted{reason:"native contact retains the exact unsplit guard unless its explicit versioned represented policy and original preparation own this return"});}
+        let represented=if let Some(lattice)=self.operands.lattice(){
             let radii=back.response_defect.as_ref().ok_or(HnnError::Unadmitted{reason:"represented native contact explicitly requires requested actual AND fresh state radii"})?;
             radii.context_bounds()?;
-            return Err(HnnError::RepresentedNativeGainUnavailable{source_cells:self.source.cells(),commit:self.producing.commit(),lattice:*lattice,state_radii:Box::new(radii.clone()),class_error_l1:Box::new(stations.iter().flat_map(|s|&s.component_error).cloned().sum())});
-        }
+            let Some(stages)=geometry.native_material_stages.as_ref() else{
+                return Err(HnnError::RepresentedNativeGainUnavailable{source_cells:self.source.cells(),commit:self.producing.commit(),lattice:*lattice,state_radii:Box::new(radii.clone()),class_error_l1:Box::new(stations.iter().flat_map(|s|&s.component_error).cloned().sum())});};
+            stages.admit_declaration(&self.operands,self.native_declaration.as_ref().ok_or(HnnError::Unadmitted{reason:"represented native contact retains the original prepared opening declaration"})?)?;
+            Some(std::sync::Arc::new(super::material_ray::PhysicalContactProof::issue(&self.operands,stages,back,&stations.iter().map(|s|s.component_error.clone()).collect::<Vec<_>>())?))
+        }else{None};
         let width=self.field.ring(phases.ring()).width();
         let source=ExactRatMatrix::new(map.to_rows().iter().map(|r|r[..width].to_vec()).collect())?;
         let context=ExactRatMatrix::new(map.to_rows().iter().map(|r|r[width..].to_vec()).collect())?;
@@ -622,17 +628,19 @@ impl ContactCut {
             geometry:geometry.clone(),phases:phases.clone(),opened_at:self.opened_at,reads:back.reads.clone(),
             producing:self.producing.clone(),deposit:deposit.clone(),readout_norm:readout_norm.clone(),
             error_l1:stations.iter().flat_map(|s|&s.component_error).cloned().sum(),
+            component_errors:stations.iter().map(|s|s.component_error.clone()).collect(),represented,
         };
-        let mut spans=super::finite_gain::FiniteContactSpans::of(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?)?;
+        let mut spans=if witness.represented(){super::finite_gain::FiniteContactSpans::represented(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?,&witness)?}
+            else{super::finite_gain::FiniteContactSpans::of(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?)?};
         spans.bind_native(witness.clone(),&self.producing,&deposit)?;
         self.native_prediction=Some(witness);self.deposit=Some(deposit.clone());
         let field=self.field.clone();let current=self.current.clone();let moment=self.source.clone();let original=self.producing.clone();
         let (constitution,returned)=self.continue_deposited(&field,&current,&moment,&deposit,charts)?;
-        let (actual_alignment,actual_error_charge)=original.native_contact_actual_ray(&constitution,&deposit,&spans)?;
+        let (actual_alignment,actual_error_charge,physical_reference)=original.native_contact_actual_ray(&constitution,&deposit,&spans)?;
         let word=returned.forward.into_present().ok_or(HnnError::Unadmitted{reason:"actual native held-momentum successor"})?;
         let carry=word.reception_end()?;
         let publication=returned.deposit.into_present().ok_or(HnnError::Unadmitted{reason:"native factor publication reading"})?;
-        Ok(super::native_prediction::NativeContactPublication{prediction,constitution,carry,publication,continuation:returned.receipt,actual_alignment,actual_error_charge,paired_readout_norm:readout_norm})
+        Ok(super::native_prediction::NativeContactPublication{prediction,constitution,carry,publication,continuation:returned.receipt,actual_alignment,actual_error_charge,paired_readout_norm:readout_norm,physical_reference})
     }
 
     /// Source-private binding by the actual comparison consumer. A caller cannot replace the
@@ -812,12 +820,14 @@ impl ContactCut {
                 tick,
             }) => (successor, publication, Some((end, tick))),
             None => {
-                let (successor, publication) = if self.operands.lattice().is_none() {
-                    let mut spans = super::finite_gain::FiniteContactSpans::of(
+                let (successor, publication) = if self.operands.lattice().is_none() || self.native_prediction.as_ref().is_some_and(|n|n.represented()) {
+                    let mut spans = if let Some(native)=self.native_prediction.as_ref().filter(|n|n.represented()){
+                        super::finite_gain::FiniteContactSpans::represented(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?,native)?
+                    }else{super::finite_gain::FiniteContactSpans::of(
                         &self.operands,
                         self.opened_at,
                         deposit.reach().ok_or(HnnError::MissingReach)?,
-                    )?;
+                    )?};
                     if let Some(native)=&self.native_prediction {
                         spans.bind_native(native.clone(),&self.producing,deposit)?;
                     }
@@ -832,7 +842,9 @@ impl ContactCut {
             }
         };
         if self.native_prediction.is_some() {
-            let mut spans=super::finite_gain::FiniteContactSpans::of(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?)?;
+            let native=self.native_prediction.as_ref().expect("native witness");
+            let mut spans=if native.represented(){super::finite_gain::FiniteContactSpans::represented(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?,native)?}
+                else{super::finite_gain::FiniteContactSpans::of(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?)?};
             spans.bind_native(self.native_prediction.clone().expect("native witness"),&self.producing,deposit)?;
             self.producing.native_contact_actual_ray(&successor,deposit,&spans)?;
         }

@@ -135,6 +135,66 @@ impl<'a> ResponseTube<'a> {
         &self.radius
     }
 
+    /// Direction-independent contact readings at the original executed intermediate.
+    /// The actual anchor split is included before selecting channel coordinates. These are
+    /// state/midpoint operands for a later tangent certificate, never a material-ray proof.
+    pub(crate) fn material_contact_stages(&self,point:&EndChange,anchors:&[Vec<Rat>],midpoints:&[Vec<Rat>])
+        ->Result<Vec<crate::hnn::word::material_ray::OriginalContactStage>,HnnError>{
+        let o=self.maps.borrow().operands;
+        Self::admit_shape(o,point,false)?;
+        let centers=crate::hnn::word::linear::junctions(o,point)?;
+        let bounds=junction_error(o,point,&self.radius)?;
+        if anchors.len()!=centers.len() || midpoints.len()!=o.contacts().len() || anchors.iter().zip(&centers).any(|(a,c)|a.len()!=c.anchor.len()) {
+            return Err(HnnError::Unadmitted{reason:"material stage readings keep every original anchor/midpoint"});
+        }
+        o.contacts().iter().enumerate().map(|(a,c)|{
+            let (from,to)=c.ends();let (sf,st)=c.selection();
+            let actual_outgoing=|r:usize|->Vec<Rat>{let incoming=&point.arrivals[a][o.end_slot(a,r)];anchors[r].iter().zip(incoming).map(|(v,x)|crate::ratio::integer(2)*v-x).collect()};
+            let out_error=|r:usize|->Vec<Rat>{outgoing(o,&bounds,r,a).iter().zip(anchors[r].iter().zip(&centers[r].anchor)).map(|(e,(v,c))|e+crate::ratio::integer(2)*(v-c).abs()).collect()};
+            let af=actual_outgoing(from);let at=actual_outgoing(to);let ef=out_error(from);let et=out_error(to);
+            let h=o.step();let g=c.conductance();
+            let selected=sf.iter().map(|&i|af[i].clone()).chain(st.iter().map(|&i|at[i].clone()))
+                .chain(point.states[a][0].iter().map(|x|x/(h*g))).chain(point.states[a][1].iter().map(|x|x/g)).collect::<Vec<_>>();
+            let errors=sf.iter().map(|&i|ef[i].clone()).chain(st.iter().map(|&i|et[i].clone()))
+                .chain(self.radius.states[a][0].iter().map(|x|x/(h*g))).chain(self.radius.states[a][1].iter().map(|x|x/g)).collect::<Vec<_>>();
+            if midpoints[a].len()!=c.width(){return Err(HnnError::Unadmitted{reason:"material stage has its actual complete midpoint"});}
+            let (_,image)=crate::hnn::propagation::transit_solve(c,h,&af,&at,&point.states[a][0],&point.states[a][1])?;
+            let residual=midpoints[a].iter().zip(image).map(|(w,z)|crate::ratio::integer(2)*h/g*w-z).collect::<Vec<_>>();
+            Ok(crate::hnn::word::material_ray::OriginalContactStage{
+                input_norm:crate::hnn::word::material_ray::vector_norm(&selected),
+                input_error:crate::hnn::word::material_ray::vector_norm(&errors),
+                solve_residual:crate::hnn::word::material_ray::vector_norm(&residual)})
+        }).collect()
+    }
+
+    /// A whole physical tick norm from the existing nonnegative radius action. A Euclidean
+    /// unit ball lies in this normalized component box. Shared inputs/copies are all counted.
+    /// This is one coefficient-bound computation, not a basis Word or physical tick.
+    pub(crate) fn physical_tick_norms(o:&Operands,tick:usize)->Result<(Rat,Rat),HnnError>{
+        let point=EndChange{
+            storage:o.rings().iter().map(|r|vec![Rat::zero();r.width()]).collect(),
+            arrivals:o.contacts().iter().map(|c|{let(a,b)=c.ends();[vec![Rat::zero();o.rings()[a].width()],vec![Rat::zero();o.rings()[b].width()]]}).collect(),
+            states:o.contacts().iter().map(|c|[vec![Rat::zero();c.width()],vec![Rat::zero();c.width()]]).collect(),
+            resonators:o.resonators().iter().map(|r|r.as_ref().map(|r|[vec![Rat::zero();r.width()],vec![Rat::zero();r.width()]])).collect(),
+            resonator_phases:o.resonators().iter().map(|r|r.as_ref().map(|r|r.phase_at(tick.saturating_sub(1)))).collect()};
+        let mut radius=point.clone();
+        for v in radius.storage.iter_mut().chain(radius.arrivals.iter_mut().flatten()){v.fill(Rat::one());}
+        for (s,c) in radius.states.iter_mut().zip(o.contacts()){s[0].fill(o.step()*c.conductance());s[1].fill(c.conductance().clone());}
+        for (s,r) in radius.resonators.iter_mut().zip(o.resonators()){if let(Some(s),Some(r))=(s,r){s[0].fill(o.step()*r.admittance());s[1].fill(r.admittance().clone());}}
+        // Keep the declared phases; zero values are a coefficient origin, not an exterior event.
+        let mut bound=tick_error_cached(&mut ContactRadiusMaps::new(o),&point,&radius,tick)?;
+        let full=crate::hnn::word::material_ray::state_norm(o,&bound)?;
+        // The intermediate cut is AFTER the fixed junction/element/load stage and
+        // BEFORE contact transits: carry every outgoing wave and unchanged contact state.
+        // Shared storage/outgoing inputs are counted together in this full vector norm.
+        let junction=junction_error(o,&point,&radius)?;
+        for(a,c)in o.contacts().iter().enumerate(){let(f,t)=c.ends();
+            bound.arrivals[a]=[outgoing(o,&junction,f,a).to_vec(),outgoing(o,&junction,t,a).to_vec()];
+            bound.states[a]=radius.states[a].clone();
+        }
+        Ok((full,crate::hnn::word::material_ray::state_norm(o,&bound)?))
+    }
+
     pub fn held_overwrite(&mut self, ring: usize) -> Result<(), HnnError> {
         let rings = self.radius.storage.len();
         self.radius

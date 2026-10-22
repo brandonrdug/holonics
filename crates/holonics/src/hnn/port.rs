@@ -947,7 +947,8 @@ pub struct WordReturn {
 
 /// Opaque executed-pair geometry, not an unsplit error certificate.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PairedReturnGeometry { field: Field, reads: Vec<(Vec<Rat>,Vec<Rat>)>, width:usize, operands:crate::hnn::propagation::Operands, phases:ReceivingPhases, opened_at:usize }
+pub struct PairedReturnGeometry { field: Field, reads: Vec<(Vec<Rat>,Vec<Rat>)>, width:usize, operands:crate::hnn::propagation::Operands, phases:ReceivingPhases, opened_at:usize,
+    pub(crate) native_material_stages:Option<crate::hnn::word::material_ray::OriginalPairStages> }
 impl PairedReturnGeometry {
     pub(crate) fn admit_native_contact(&self,field:&Field,reads:&[(Vec<Rat>,Vec<Rat>)],operands:&crate::hnn::propagation::Operands,phases:&ReceivingPhases,opened_at:usize)->Result<(),HnnError>{
         self.admit(field,reads,field.ring(phases.ring()).width())?;
@@ -1028,7 +1029,7 @@ impl WordReturn {
         }
         if reads.len()!=phases.aperture() || width!=Some(field.ring(phases.ring()).width()) || operands.rings().len()!=field.rings().len() {return Err(HnnError::Unadmitted {reason:"paired geometry keeps its actual native section, clock and operand shape"});}
         crate::hnn::prediction::charted::ResponseTube::admit_operands(operands)?;
-        let geometry=PairedReturnGeometry {field:field.clone(),reads:reads.clone(),width:width.unwrap(),operands:operands.clone(),phases:phases.clone(),opened_at};
+        let geometry=PairedReturnGeometry {field:field.clone(),reads:reads.clone(),width:width.unwrap(),operands:operands.clone(),phases:phases.clone(),opened_at,native_material_stages:None};
         for &ring in field.sources() {
             actual.opening[ring] = add(&actual.opening[ring], &fresh.opening[ring]);
         }
@@ -1500,6 +1501,10 @@ pub(crate) fn reverse_response(
     actual.reads=phases.epochs().zip(gradients).map(|(t,g)|(word.recorded()[t].anchors[phases.ring()].clone(),g.clone())).collect();
     fresh.reads=phases.epochs().zip(gradients).map(|(t,g)|(column.records[t].anchors[phases.ring()].clone(),g.clone())).collect();
     let mut joined = WordReturn::join_response(word.field(), actual, fresh, reads,word.operands(),phases,word.opened_at())?;
+    if word.operands().lattice().is_some() && word.has_native_prediction_producer() && word.response_error_requested() {
+        let stages=crate::hnn::word::material_ray::OriginalPairStages::issue(word)?;
+        joined.response_geometry.as_mut().expect("native joined geometry").native_material_stages=Some(stages);
+    }
     if word.response_error_requested() {
     let fresh_errors=column.errors_at(word)?;
     joined.response_defect = Some(PairedReadDefect {

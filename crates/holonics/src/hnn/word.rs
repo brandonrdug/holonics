@@ -105,6 +105,7 @@ pub(crate) mod column;
 pub mod continuation;
 pub(crate) mod endpoint;
 pub mod finite_gain;
+pub(crate) mod material_ray;
 pub mod native_prediction;
 pub(crate) mod linear;
 pub mod scan;
@@ -2577,6 +2578,7 @@ impl<'c> Word<'c> {
     /// Request the authentic retained unsplit report; this changes no native operand.
     pub fn request_response_error_evidence(&mut self) { self.response_error_requested=true; }
     pub(crate) fn response_error_requested(&self)->bool { self.response_error_requested }
+    pub(crate) fn has_native_prediction_producer(&self)->bool { self.native_declaration_id.is_some() }
     pub(crate) fn prepare_response(&mut self) -> Result<(), HnnError> {
         if self.response.is_some() {
             return Ok(());

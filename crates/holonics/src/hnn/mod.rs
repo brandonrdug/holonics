@@ -461,6 +461,10 @@ pub enum HnnError {
     /// Genuine state radii are not the missing changed-material response proof.
     #[error("represented native contact at source {source_cells} has actual/fresh state radii but no admitted uniform changed-chart material-ray response bound")]
     RepresentedNativeGainUnavailable {source_cells:u64,commit:u64,lattice:chart::WordLattice,state_radii:Box<port::PairedReadDefect>,class_error_l1:Box<Rat>},
+    /// Physical-reference first variation against the ORIGINAL represented return, not a
+    /// derivative through rounding or finite score-decrease claim. Operative error preserved.
+    #[error("represented native physical ray not admitted at source {source_cells}, commit {commit}, {stage}: {reading:?}")]
+    RepresentedNativeRayNotAdmitted {source_cells:u64,commit:u64,stage:&'static str,reading:Box<word::native_prediction::NativePhysicalRayReading>},
     /// Bounded exterior operands preserve the original operative refusal.
     #[error("native preparation refused: {source}; source operands: {evidence}")]
     NativePreparationRefusal {source:Box<HnnError>,evidence:String},
