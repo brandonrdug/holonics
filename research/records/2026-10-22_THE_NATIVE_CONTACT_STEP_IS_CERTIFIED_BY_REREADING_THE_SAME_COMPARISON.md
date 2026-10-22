@@ -181,6 +181,72 @@ continuity control's native attempts fall from 506 to 448 (actual and fresh retu
 [control_after_cost_cuts.txt](2026-10-22_native_contact_reread_receipts/control_after_cost_cuts.txt),
 [held_out_after_cost_cuts.txt](2026-10-22_native_contact_reread_receipts/held_out_after_cost_cuts.txt).
 
+### The arithmetic cuts
+
+[definition; agent-inferred, October 22] The next profile put 60% of all instructions in the
+greatest common divisor of `num-bigint` 0.4.8. Its binary gcd removes one bit per step, so reducing
+an odd numerator against a denominator `2^k` walks the numerator's whole length, and every rational
+product calls it three times. Three cuts, each leaving every saved state byte-identical:
+
+4. `vendor/num-bigint` is that crate with one changed routine (`[patch.crates-io]` in the
+   workspace manifest): the gcd splits off the common twos once, reduces by remainder while the
+   operands differ in length by more than a bit and by subtraction otherwise, and finishes in one
+   machine word. Its test compares it with Euclid's algorithm.
+5. The context memory's moments `H += f fᴴ` and `B += η fᴴ` are formed over each vector's one
+   shared denominator: Gaussian-integer numerator products, reduced once per entry. H is Hermitian,
+   so each off-diagonal entry is formed once and its mirror is its conjugate.
+6. The fit's residual `‖M H − B‖₁` sums `M_k H_kj` over the shared denominators of H and of the
+   applied row, reduced once per entry, and the dyadic proposal divides by its power-of-two scale
+   with a signed shift. The atlas row is `hnn.material-shared-denominator-moments`.
+
+On the first 40 bytes of THE_MACHINE (160 cells) the run fell from 79.7 s to 58.1 s with the same
+state (`db4b4f5597d616f47b432cdba6f28636375bf4caa9dc240f17d4acc57c4c8d78`); a steady section from
+4.9 s to 3.4 s (the contact cell 2.5 to 1.9 s, the nine receiving cells 2.4 to 1.5 s). The 16-byte
+state stays `eb028b8a…`. Both controls read the same values and the same native work counts; the
+continuity control took 9.6 s instead of 15.5 s, the held-out control 10.3 s instead of 13.3 s.
+Receipts: [train_native_160_cells_arithmetic_cuts.txt](2026-10-22_native_contact_reread_receipts/train_native_160_cells_arithmetic_cuts.txt),
+[control_after_material_cuts.txt](2026-10-22_native_contact_reread_receipts/control_after_material_cuts.txt),
+[held_out_after_material_cuts.txt](2026-10-22_native_contact_reread_receipts/held_out_after_material_cuts.txt).
+
+### The first kilobyte, incomplete
+
+The first 1024 bytes of THE_MACHINE (4096 cells), on the binary before the arithmetic cuts and
+sharing the 4 cores with a profile, were projected at about 35 minutes with a 40-minute deadline.
+After 830 s and 1030 cells the measured rate, 0.8 s per cell, showed the deadline would pass, and
+the run was stopped. Receipt: [train_native_1k_partial.txt](2026-10-22_native_contact_reread_receipts/train_native_1k_partial.txt).
+
+| Cells | 1–100 | 101–200 | 201–300 | 301–400 | 401–500 | 501–600 | 601–700 | 701–800 | 801–900 | 901–1000 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Code, bits per cell | 1.977 | 1.909 | 1.889 | 1.830 | 2.018 | 1.973 | 1.936 | 1.888 | 1.880 | 1.970 |
+
+- Flat over four classes is 2 bits per cell. The code stays a little below it and does not fall
+  steadily over the first thousand cells.
+- 85 contacts were published and 18 refused, the first at cell 350. A section whose contact is
+  refused took 17.7 s against 5.1 s for one that publishes: its ladder halves to the end without
+  an admission. Refused sections took about 40% of the run.
+- From the state saved at cell 1020, after the prompt `# The machine: ` (the corpus's own opening,
+  which the prompt reread coded at 1.86 bits per cell), 80 released cells decode to the bytes
+  `64 5f f5 cf ce 4e 22 69 84 b7 7f 3f 2e 1a 34 4f 25 11 14 b4`, not text. Six of the twenty have
+  a first base-four digit above 1, which ASCII text never has. Receipt:
+  [sample_native_1020_cells.txt](2026-10-22_native_contact_reread_receipts/sample_native_1020_cells.txt).
+
+### A repeating sequence is learned slowly
+
+64 bytes of `0x1B` give 256 cells whose base-four digits repeat `0,1,2,3` exactly, so a receiver
+that holds the period can code every cell after the first period at 0 bits. With the arithmetic
+cuts and the per-digit reading, the run took 89.7 s against a 90 s projection (deadline 300 s).
+Receipt: [train_native_periodic_256_cells.txt](2026-10-22_native_contact_reread_receipts/train_native_periodic_256_cells.txt).
+
+| Cells | 1–60 | 61–120 | 121–180 | 181–240 | 241–251 |
+|---|---|---|---|---|---|
+| Code, bits per cell | 1.898 | 1.661 | 1.584 | 1.539 | 1.647 |
+
+- The code falls, so the contacts and the context material do learn, but after 25 contacts it is
+  still 1.67 bits per cell over the whole run; by digit position `[1.542, 1.779, 1.674, 1.683]`.
+- One contact was refused (cell 240), at 13.2 s for its section against about 3.1 s for the others.
+- This is the measured blocker for text: the learning per contact is too small to hold even an
+  exact period within a few hundred cells. It is the next loop's subject, before any longer text.
+
 ## What stays owed (#62)
 
 - The Lean statement that the ladder's admitted step decreases the declared comparison

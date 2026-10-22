@@ -1,0 +1,52 @@
+# solenoidal_alpha complete_language::native_context_controls::represented_native_zero_motion_continuity
+# host optimized build without LTO, after the shared-denominator material cuts; V93_NATIVE_ATTEMPT_LIMIT=1000000; lines longer than 400 characters are cut
+ZERO_MOTION_CONTINUITY_COLD_PASS boundary=pending-six bytes=1154295 pending_equal=true
+ZERO_MOTION_CONTINUITY_SOURCE source=0 commit=5 feature_max_bits=1 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=None
+ZERO_MOTION_CONTINUITY_SOURCE source=1 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=None
+ZERO_MOTION_CONTINUITY_SOURCE source=2 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 0, denom: 1 })
+ZERO_MOTION_CONTINUITY_SOURCE source=3 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 0, denom: 1 })
+ZERO_MOTION_CONTINUITY_SOURCE source=4 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 0, denom: 1 })
+ZERO_MOTION_CONTINUITY_SOURCE source=5 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 0, denom: 1 })
+ZERO_MOTION_CONTINUITY_SOURCE source=6 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 2638637278965, denom: 2199023255552 })
+ZERO_MOTION_CONTINUITY_SOURCE source=7 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 168652935020511201, denom: 72057594037927936 })
+ZERO_MOTION_CONTINUITY_SOURCE source=8 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 3932996686400607525, denom: 2305843009213693952 })
+ZERO_MOTION_CONTINUITY_SOURCE source=9 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 38595568193588729, denom: 72057594037927936 })
+ZERO_MOTION_CONTINUITY_FIRST_R_PASS publication=DepositReading { epoch: Some(EpochDepositReading { paired_receiving: Some(EpochPairedReceivingReading { representation_policy: BoundedSubquantumV1, source_width: 6, fresh_physical_alignment: Ratio { numer: 4799999, denom: 2359296 }, fresh_return_error: Ratio { numer: 0, denom: 1 }, fresh_moves: Ratio { numer: 20471, denom: 32768 }, actual_alignment: 
+ZERO_MOTION_CONTINUITY_COLD_PASS boundary=post-first-R bytes=1517869 pending_equal=true
+ZERO_MOTION_CONTINUITY_CONTACT_PACKET original_prediction=NativePredictionReading { law: "native-current-prediction-v1", execution_lattice: Some(WordLattice { chart: 26, target: 13, transient: 10 }), producing_commit: 6, opened_at: 30, source_cells: 10, receiver: 2, features: [[Ratio { numer: 23, denom: 1024 }, Ratio { numer: 37, denom: 1024 }, Ratio { numer: -7, denom: 1024 }, Ratio { numer: 7, d
+ZERO_MOTION_CONTINUITY_REREAD before=ExactInterval { lower: Ratio { numer: 39500519731543959171, denom: 18446744073709551616 }, upper: Ratio { numer: 9875129932885989793, denom: 4611686018427387904 } } excess=0 admitted=Some(0) trials=1
+ZERO_MOTION_CONTINUITY_REREAD_TRIAL halvings=0 first_variation_refused=false reading=Some(NativeRereadReading { after: ExactInterval { lower: Ratio { numer: 18344894552933922075, denom: 9223372036854775808 }, upper: Ratio { numer: 36689789105867844151, denom: 18446744073709551616 } }, excess: Ratio { numer: 0, denom: 1 }, reading_bits: 64, decision: Ok(Classical) })
+ZERO_MOTION_CONTINUITY_STEPS [(Channel(0), Factor(0), 2), (Channel(0), Factor(1), 2), (Channel(0), Factor(2), 2), (Channel(1), Factor(0), -1), (Channel(1), Factor(1), -1), (Channel(1), Factor(2), -1)]
+ZERO_MOTION_CONTINUITY_CONTACT_VERDICT outcome=Applied positive_material_influence=true selected_steps=6 vanished=[] retained_tails=44 released_tails=96 original_positive_motion_fixture_unchanged=true
+ZERO_MOTION_CONTINUITY_COLD_PASS boundary=post-contact-source11 bytes=1534082 pending_equal=true
+ZERO_MOTION_CONTINUITY_SOURCE source=11 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=12 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=13 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=14 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=15 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=16 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=17 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=18 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=19 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SECTION_PASS boundary=next-R publication=DepositReading { epoch: Some(EpochDepositReading { paired_receiving: Some(EpochPairedReceivingReading { representation_policy: BoundedSubquantumV1, source_width: 6, fresh_physical_alignment: Ratio { numer: 180557823858055172839252187184958985468932191, denom: 89202980794122492566142873090593446023921664 }, fresh_return_error: Ratio { 
+ZERO_MOTION_CONTINUITY_SOURCE source=20 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=21 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=22 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=23 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=24 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=25 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=26 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=27 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=28 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=29 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SECTION_PASS boundary=source30-close publication=DepositReading { epoch: Some(EpochDepositReading { paired_receiving: Some(EpochPairedReceivingReading { representation_policy: BoundedSubquantumV1, source_width: 6, fresh_physical_alignment: Ratio { numer: 181540144390521493813674873943670945229851117, denom: 200706706786775608273821464453835253553823744 }, fresh_return_error:
+ZERO_MOTION_CONTINUITY_COLD_PASS boundary=final-source30 bytes=1570015 pending_equal=true
+ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=0 key=1/7 class=0 cumulative=31 aeon_local=1 aeon_origin=30 actual_frontier=30 M_R_frozen=true
+ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=1 key=2/7 class=1 cumulative=32 aeon_local=2 aeon_origin=30 actual_frontier=30 M_R_frozen=true
+ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=2 key=3/7 class=1 cumulative=33 aeon_local=3 aeon_origin=30 actual_frontier=30 M_R_frozen=true
+ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=3 key=4/7 class=2 cumulative=34 aeon_local=4 aeon_origin=30 actual_frontier=30 M_R_frozen=true
+ZERO_MOTION_CONTINUITY_COMPLETE_PASS continuity=true positive_material_influence=true actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true unsplit_trajectory_equivalence=false elapsed_ns=9585426248
+ZERO_MOTION_CONTINUITY_COUNTS {"final":true,"total_attempts":448,"forward_constructors":407,"response_companions":39,"actual_returns":1,"fresh_returns":1}
+ work=WorkRead { material_cut_attempts: 118, material_cuts: 118, word_open_attempts: 407, words_opened: 407, junction_attempts: 1107, junctions: 1107, full_ticks: 777, return_attempts: 1, returns: 1, response_crossings: 117, response_ticks: 117, response_return_attempts: 1, response_returns: 1, response_certificate_ticks: 126, material_ray_queries: 13, material_ray_ticks: 42, overflowed: false }
+ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 39 filtered out; finished in 9.60s

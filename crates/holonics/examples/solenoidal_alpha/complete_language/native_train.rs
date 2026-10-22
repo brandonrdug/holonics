@@ -125,6 +125,17 @@ fn add_score(event: &NativeContextEvent, code: &mut (Rat, Rat, i64)) {
     }
 }
 
+/// The code read by the exterior byte chart's digit position (`Base4Bytes`, most significant
+/// first): a reading beside the training, never delivered to the machine.
+fn add_digit_score(event: &NativeContextEvent, by_digit: &mut [(Rat, Rat, i64); 4]) {
+    add_score(event, &mut by_digit[(event.prediction.source_cells % 4) as usize]);
+}
+
+fn per_digit(by_digit: &[(Rat, Rat, i64); 4]) -> String {
+    let lower = by_digit.iter().map(|c| bits(&(&c.0 / integer(c.2.max(1))))).collect::<Vec<_>>();
+    format!("[{}]", lower.join(","))
+}
+
 fn per_cell(code: &(Rat, Rat, i64)) -> String {
     let n = integer(code.2.max(1));
     format!("[{},{}]", bits(&(&code.0 / &n)), bits(&(&code.1 / &n)))
@@ -155,6 +166,8 @@ pub(super) fn train(args: &[String]) -> Result<()> {
     let flat = rat(2, 1);
     let mut total = (integer(0), integer(0), 0i64);
     let (mut contacts, mut refusals) = (0usize, Vec::new());
+    let zero = || (integer(0), integer(0), 0i64);
+    let mut by_digit = [zero(), zero(), zero(), zero()];
     for (index, chunk) in cells.chunks(width).enumerate() {
         let at = usize::try_from(stream.accepted_cells()?)? + stream.pending_classes().len();
         let chunk_started = Instant::now();
@@ -164,7 +177,8 @@ pub(super) fn train(args: &[String]) -> Result<()> {
             if e.reread.is_some() {
                 contact_ms = chunk_started.elapsed().as_millis();
             }
-            add_score(e, &mut code)
+            add_score(e, &mut code);
+            add_digit_score(e, &mut by_digit)
         })?;
         let learn_ms = chunk_started.elapsed().as_millis();
         contacts += receipt.contacts.len();
@@ -184,8 +198,8 @@ pub(super) fn train(args: &[String]) -> Result<()> {
         };
         let calls = holonics::hnn::word::work::process_native_calls();
         println!(
-            "NATIVE_TRAIN cells={}/{} scored={} pending={} contacts={contacts} refusals={} chunk_code_bits_per_cell={} flat={} learn_ms={learn_ms} contact_ms={contact_ms} state_bytes={} save_ms={} elapsed_ms={} native_calls=[{},{},{},{}]",
-            at + chunk.len(), cells.len(), code.2, stream.pending_classes().len(), refusals.len(), per_cell(&code), bits(&flat),
+            "NATIVE_TRAIN cells={}/{} scored={} pending={} contacts={contacts} refusals={} chunk_code_bits_per_cell={} flat={} code_by_byte_digit={} learn_ms={learn_ms} contact_ms={contact_ms} state_bytes={} save_ms={} elapsed_ms={} native_calls=[{},{},{},{}]",
+            at + chunk.len(), cells.len(), code.2, stream.pending_classes().len(), refusals.len(), per_cell(&code), bits(&flat), per_digit(&by_digit),
             state_bytes, saved.elapsed().as_millis(), started.elapsed().as_millis(),
             calls.forward_attempts, calls.response_attempts, calls.return_attempts, calls.response_return_attempts
         );
@@ -204,11 +218,12 @@ pub(super) fn train(args: &[String]) -> Result<()> {
         ("contacts", contacts.to_string()),
         ("contact_refusals", exact(&refusals)),
         ("prequential_code_bits", exact(&(&total.0, &total.1))),
+        ("code_bits_by_byte_digit", exact(&by_digit.iter().map(|c| (&c.0, &c.1, c.2)).collect::<Vec<_>>())),
         ("scored_cells", total.2.to_string()),
         ("state_sha256", quoted(&sha256(&state)?)),
         ("elapsed_ns", started.elapsed().as_nanos().to_string()),
     ]).as_bytes())?;
-    println!("NATIVE_TRAIN_DONE cells={} scored={} contacts={contacts} refusals={} code_bits_per_cell={} flat={} state_sha256={} elapsed_ms={}", cells.len(), total.2, refusals.len(), per_cell(&total), bits(&flat), sha256(&state)?, started.elapsed().as_millis());
+    println!("NATIVE_TRAIN_DONE cells={} scored={} contacts={contacts} refusals={} code_bits_per_cell={} flat={} code_by_byte_digit={} state_sha256={} elapsed_ms={}", cells.len(), total.2, refusals.len(), per_cell(&total), bits(&flat), per_digit(&by_digit), sha256(&state)?, started.elapsed().as_millis());
     Ok(())
 }
 

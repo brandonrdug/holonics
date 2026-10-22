@@ -13,12 +13,20 @@ members = [
 # so the host workspace carries that boundary artifact without carrying the toolchain.
 exclude = [
   "accelerators/cuda-smoke",
+  "vendor/num-bigint",
 ]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+
+# num-bigint 0.4.8 with one change: its `gcd` splits off the common power of two first and returns
+# at once when an odd part is one, so a power-of-two denominator no longer costs a walk down the
+# other operand one bit at a time (60% of Athena's native training time was that gcd). The values
+# are the same; `vendor/num-bigint/src/biguint.rs` carries the patch.
+[patch.crates-io]
+num-bigint = { path = "vendor/num-bigint" }
 
 [workspace.dependencies]
 num-bigint = "0.4"

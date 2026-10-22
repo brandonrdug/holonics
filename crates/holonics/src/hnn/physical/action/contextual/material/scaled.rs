@@ -8,10 +8,21 @@ fn encode(value: &Rat, scale: &BigInt) -> BigInt {
     fit_work::integer(0);
     (value.numer() * scale) / value.denom()
 }
+/// `v / scale` toward zero. On the dyadic lattice the scale is a power of two, so the quotient is
+/// the magnitude shifted with its sign kept: the same integer as the division.
+fn unscale(v: BigInt, scale: &BigInt) -> BigInt {
+    match scale.trailing_zeros() {
+        Some(bits) if scale.is_positive() && scale.magnitude().count_ones() == 1 => {
+            let (sign, magnitude) = v.into_parts();
+            BigInt::from_biguint(sign, magnitude >> bits)
+        }
+        _ => v / scale,
+    }
+}
 fn mul_grid(x: &BigInt, y: &BigInt, scale: &BigInt) -> BigInt {
     #[cfg(test)]
     fit_work::integer(1);
-    (x * y) / scale
+    unscale(x * y, scale)
 }
 fn div_grid(x: &BigInt, y: &BigInt, scale: &BigInt) -> Result<BigInt, HnnError> {
     #[cfg(test)]

@@ -27,9 +27,13 @@ fixture the two contacts lower their own comparisons (2.141 → 1.989 and 2.194 
 on ten held-out cells the retained state codes 18.563 bits against 18.736 for R-only training
 from the same opening. Athena's train commands (`complete-language train`, observed-epoch
 `NormalMaps`) still learn receiving maps only; `complete-language train-native` and
-`sample-native` now train and sample on the native route. On 16 bytes of English they code at
-flat (2.021 bits per cell); three cost cuts with byte-identical state took them from about 0.9 to
-about 0.45 s per cell (about 1.9 s per byte, host, optimized), and that cost is still the subject. The card route is not measured. The
+`sample-native` now train and sample on the native route. Six cost cuts with byte-identical state
+took a steady section from about 0.95 to 0.34 s per cell (host, optimized). On the first thousand
+cells of THE_MACHINE the code stays a little below flat (1.83 to 2.02 bits per cell per hundred
+cells) without falling steadily, 18 of 103 contacts were refused at 3.5 times a
+section's cost, and a sample is not text. An exactly repeating four-digit period still codes 1.67
+bits per cell over 256 cells (1.90 falling to 1.54), so learning per contact is the subject.
+The card route is not measured. The
 [record](research/records/2026-10-22_THE_NATIVE_CONTACT_STEP_IS_CERTIFIED_BY_REREADING_THE_SAME_COMPARISON.md)
 holds the decisions and receipts. The zero-motion paragraphs below are historical at their source.
 

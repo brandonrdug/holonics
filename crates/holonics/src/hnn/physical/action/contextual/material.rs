@@ -54,6 +54,25 @@ pub(super) fn product(a: &Complex, b: &Complex) -> Complex {
 fn conjugate(a: &Complex) -> Complex {
     [a[0].clone(), -a[1].clone()]
 }
+/// A complex vector over its one shared denominator: the Gaussian-integer numerators and the least
+/// common denominator of every component.
+fn shared_numerators(v: &[Complex]) -> (Vec<[BigInt; 2]>, BigInt) {
+    let d = v
+        .iter()
+        .flatten()
+        .fold(BigInt::one(), |d, x| &d / crate::ratio::gcd(&d, x.denom()) * x.denom());
+    let lift = |x: &Rat| x.numer() * (&d / x.denom());
+    (v.iter().map(|x| [lift(&x[0]), lift(&x[1])]).collect(), d)
+}
+/// The numerators of `x·ȳ` for Gaussian integers `x` and `y`.
+fn conjugate_product(x: &[BigInt; 2], y: &[BigInt; 2]) -> [BigInt; 2] {
+    [&x[0] * &y[0] + &x[1] * &y[1], &x[1] * &y[0] - &x[0] * &y[1]]
+}
+/// Gaussian-integer numerators over one denominator, as an exact complex value.
+fn over(n: [BigInt; 2], d: &BigInt) -> Complex {
+    let [re, im] = n;
+    [Rat::new(re, d.clone()), Rat::new(im, d.clone())]
+}
 pub(super) fn complex(v: &[Rat]) -> Result<Vec<Complex>, HnnError> {
     if v.is_empty() || v.len() % 2 != 0 {
         return Err(refusal("a complete declared complex wave chart"));
@@ -152,15 +171,29 @@ impl EmpiricalMaterial {
             .observations
             .checked_add(1)
             .ok_or(HnnError::CountOverflow)?;
-        for (i, x) in f.iter().enumerate() {
-            for (j, y) in f.iter().enumerate() {
-                next.h[i][j] = plus(&next.h[i][j], &product(x, &conjugate(y)));
+        // [definition; agent-inferred, October 22] The moments' terms are formed over each
+        // vector's one shared denominator: a term's numerator is a Gaussian-integer product and
+        // its denominator the product of the two shared denominators, so no term is reduced before
+        // it joins its moment. H starts at I and every term f fᴴ is Hermitian, so each
+        // off-diagonal entry is formed once and its mirror is its conjugate. The moments are the
+        // same exact values as the entry-by-entry sums.
+        let (fs, fd) = shared_numerators(f);
+        let (es, ed) = shared_numerators(eta);
+        let ff = &fd * &fd;
+        for i in 0..fs.len() {
+            for j in i..fs.len() {
+                let sum = plus(&next.h[i][j], &over(conjugate_product(&fs[i], &fs[j]), &ff));
+                if i != j {
+                    next.h[j][i] = conjugate(&sum);
+                }
+                next.h[i][j] = sum;
             }
         }
+        let ef = &ed * &fd;
         for (i, y) in eta.iter().enumerate() {
             next.target_energy += &y[0] * &y[0] + &y[1] * &y[1];
-            for (j, x) in f.iter().enumerate() {
-                next.b[i][j] = plus(&next.b[i][j], &product(y, &conjugate(x)));
+            for (j, x) in fs.iter().enumerate() {
+                next.b[i][j] = plus(&next.b[i][j], &over(conjugate_product(&es[i], x), &ef));
             }
         }
         bounds.check(
@@ -303,14 +336,23 @@ impl EmpiricalMaterial {
             note_fit_work(|w| w.solve += solve_start.elapsed());
         }
         let residual_start = std::time::Instant::now();
+        // [definition; agent-inferred, October 22] `(M H)_j = Σ_k M_k H_kj` is formed over the one
+        // shared denominator of H times that of the applied row: the numerators are summed as
+        // Gaussian integers and the entry is reduced once. It is the same exact value as the
+        // term-by-term rational sum.
+        let (hs, hd) = shared_numerators(&self.h.concat());
         let mut residual = Rat::zero();
         for (r, b) in self.applied.iter().zip(&self.b) {
+            let (rs, rd) = shared_numerators(r);
+            let den = &rd * &hd;
             for (j, target) in b.iter().enumerate() {
-                let got = r
-                    .iter()
-                    .enumerate()
-                    .fold(zero(), |s, (k, v)| plus(&s, &product(v, &self.h[k][j])));
-                let e = minus(&got, target);
+                let mut sum = [BigInt::zero(), BigInt::zero()];
+                for (k, v) in rs.iter().enumerate() {
+                    let h = &hs[k * m + j];
+                    sum[0] += &v[0] * &h[0] - &v[1] * &h[1];
+                    sum[1] += &v[0] * &h[1] + &v[1] * &h[0];
+                }
+                let e = minus(&over(sum, &den), target);
                 residual += e[0].abs() + e[1].abs();
             }
         }
