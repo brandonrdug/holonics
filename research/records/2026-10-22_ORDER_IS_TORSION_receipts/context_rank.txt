@@ -1,0 +1,19 @@
+train contexts seen 5186 of 16384; digits 2027360
+singular values (first 12): 792 643 543 357 319 294 263 234 201 174 169 159
+  rank  1 keeps 0.2973 of the weighted energy
+  rank  2 keeps 0.4934 of the weighted energy
+  rank  4 keeps 0.6934 of the weighted energy
+  rank  8 keeps 0.8412 of the weighted energy
+  rank 16 keeps 0.9320 of the weighted energy
+  rank 32 keeps 0.9818 of the weighted energy
+  rank 64 keeps 0.9998 of the weighted energy
+  rank 84 keeps 1.0000 of the weighted energy
+held-out bits/digit at rank 1    2.054  (test contexts seen in training 1.000)
+held-out bits/digit at rank 2    1.475  (test contexts seen in training 1.000)
+held-out bits/digit at rank 4    1.032  (test contexts seen in training 1.000)
+held-out bits/digit at rank 8    0.931  (test contexts seen in training 1.000)
+held-out bits/digit at rank 16   0.922  (test contexts seen in training 1.000)
+held-out bits/digit at rank 32   0.917  (test contexts seen in training 1.000)
+held-out bits/digit at rank 64   0.915  (test contexts seen in training 1.000)
+held-out bits/digit at rank full 0.915  (test contexts seen in training 1.000)
+wall 1.7 s

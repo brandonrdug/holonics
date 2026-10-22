@@ -112,10 +112,12 @@ Sent to the Athena design thread on October 22 with the derivations.
    release is the receiver's quotient. Coarse entropy rises only where a release drops a
    remainder, and retention stays sufficient while no admitted probe separates what that drop
    merges.
-2. **Why the input barely reaches the receiver.** [hypothesis until measured] If every symbol's
-   ring move shares one linear part and the input only adds, the ring state is a linear function
-   of (symbol, lag modulo the ring's period) counts, and a readout of it cannot beat context counts
-   because it is context counts. A lossless ring also shrinks the newest symbol's share like `1/n`.
+2. **Why the input barely reaches the receiver.** [proved-derived; formal-checked] If every
+   symbol's ring move shares one linear part `M` with `M^N = 1` and the input only adds, the ring
+   state is a linear function of its (symbol, lag modulo `N`) counts, and equal counts give equal
+   states (`Geometry/ScrewTorsion`: `laggedRun_closed`, `laggedRun_lag_residue`,
+   `laggedRun_eq_of_counts`). A readout of it cannot beat context counts because it is context
+   counts; the design thread confirmed that the alpha field runs in this case. A lossless ring also shrinks the newest symbol's share like `1/n`.
    Carrying more than counts needs a linear part that depends on the symbol: the input modulating
    the constitution, which is the parametron's pump. The measurements: the carry `δ_uv` of a few
    symbol pairs on the actual moves, the newest contribution's share of the state across cells, and
@@ -152,12 +154,36 @@ Sent to the Athena design thread on October 22 with the derivations.
    put the codec's grain into the field. The contacts `(1,2)` read nodes 0 and 1 only, so the
    period-3 receiving ring's node 2 is never driven directly: a defect, but the smaller one. The
    additive fits ran 100 Adam steps, not to convergence.
+5. **The modes the field needs are few, and they must be located.** [measured] On the same text,
+   the conditional futures (the next one, two and three digits) of the 5,186 six-digit contexts
+   with their frame phase, each row weighted by its occurrences, form a matrix of small rank at
+   tolerance. Its rank-`r` projection, scored as a predictor of the next digit on the held-out
+   20%, gives:
+
+   | rank | weighted energy kept | bits per digit |
+   |---|---|---|
+   | 1 | 0.297 | 2.054 |
+   | 4 | 0.693 | 1.032 |
+   | 8 | 0.841 | 0.931 |
+   | 16 | 0.932 | 0.922 |
+   | 32 | 0.982 | 0.917 |
+   | full (84) | 1.000 | 0.915 |
+
+   A readout through 16 located directions loses 0.007 bits a digit against every conjunction of
+   the last six digits. A field of 32 modes whose transports depend on the symbol but are drawn at
+   random (orthogonal, damped by 9/10), with a fitted softmax readout of the state and the frame
+   phase, scores 1.433; the same field with one shared transport scores 1.440, the additive
+   ceiling above. Symbol dependence chosen at random buys 0.007 bits a digit, where 16 located
+   directions buy 0.52. The pump's transports must be located from the comparison: at a settled
+   state the residual `r` the state cannot absorb still pairs with the state as the covector
+   `(W r) z*` on the constitution, and that covector is what deposition spends. A 128-mode run of
+   both fields gave no reading: its readout fit did not converge in 100 steps (both scored worse
+   than the marginal).
 
 ## 7. Owed (#410)
 
 Each is a box in #410 except the neck.
 
-- The factorization of a one-linear-part stream through its lag-residue counts, stated in Lean.
 - de Bruijn's identity on the receiver's partition, and the entropy balance `σ ≥ 0` on a complex.
 - The neck with no comma: `dr² + κ²r²dτ²` is smooth at `r = 0` exactly when `τ` has period `2π/κ`
   (Gibbons and Hawking). It stays a standard citation until a consumer needs it.
@@ -171,10 +197,20 @@ Each is a box in #410 except the neck.
   completed (3,454 jobs, exit 0, 16 s wall; Mathlib reused, only `Holonics.Geometry.Motion` and the
   two targets recompiled), with no errors, no warnings and no `sorry` in either module. All
   eighteen theorems are formal-checked; no proof was changed.
-- Atlas rows (formal-checked): `motion.commutator-carry`, `screw.burgers-loop-carry`,
-  `motion.squeeze-ratio-dilation`, `gr.teleparallel-fifth-torsion`, `gr.redshift-loop`,
-  `release.carried-residue`, and the counterexample `release.plain-rounding-annihilates`.
-- No Rust changed. The one run is §6.4's measurement, an exterior read with its scripts and outputs
-  in [`2026-10-22_ORDER_IS_TORSION_receipts/`](2026-10-22_ORDER_IS_TORSION_receipts/): the count
-  read took 9.6 s at 44 MiB peak; the two additive fits took 225.8 s and 222.3 s against 224 s
-  projected each (peak resident not measured).
+- The lag-residue factorization (`laggedRun_closed`, `laggedRun_lag_residue`,
+  `laggedRun_eq_of_counts`) was added at `7213b44` and checked on the PC the same way:
+  `bash tools/lean_check.sh HolonicsResearch.Geometry.ScrewTorsion` completed (3,396 jobs, exit 0,
+  17.2 s wall against a 1,200 s deadline), with no errors, no warnings in the module and no `sorry`.
+- Atlas rows (formal-checked): `motion.commutator-carry`, `motion.lag-residue-factorization`,
+  `screw.burgers-loop-carry`, `motion.squeeze-ratio-dilation`, `gr.teleparallel-fifth-torsion`,
+  `gr.redshift-loop`, `release.carried-residue`, and the counterexample
+  `release.plain-rounding-annihilates`.
+- No Rust changed. The runs are §6.4's and §6.5's measurements, exterior reads with their scripts
+  and outputs in [`2026-10-22_ORDER_IS_TORSION_receipts/`](2026-10-22_ORDER_IS_TORSION_receipts/):
+  the count read took 9.6 s at 44 MiB peak; the two additive fits took 225.8 s and 222.3 s against
+  224 s projected each (peak resident not measured). §6.5's rank read (`context_rank.py`, output `context_rank.txt`) took 1.7 s. The 32-mode fields
+  (`pumped_field.py` with float64 states, every training cell and 150 readout steps) took 83.3 s
+  and 82.4 s under a 200 s deadline. The 128-mode fields first passed their 240 s deadline and were
+  stopped, because float64 readout weights promoted the float32 states at every step; with float32
+  weights and every second training cell (the receipt's version of the script) they took 59 s wall
+  under a 150 s deadline, at 2.1 GiB peak each (`random_field.txt`).

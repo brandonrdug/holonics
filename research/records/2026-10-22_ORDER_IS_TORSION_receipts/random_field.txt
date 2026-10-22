@@ -1,0 +1,6 @@
+shared r= 32 rho=0.90: held-out 1.440 bits/digit  (state 15.6 s, readout 150 steps 67.7 s)
+pumped r= 32 rho=0.90: held-out 1.433 bits/digit  (state 15.3 s, readout 150 steps 67.1 s)
+shared r=128 rho=0.90: held-out 2.132 bits/digit  (state 27.8 s, readout 100 steps 30.0 s) peak 2122 MiB
+shared exit 0
+pumped r=128 rho=0.90: held-out 1.992 bits/digit  (state 29.5 s, readout 100 steps 29.4 s) peak 2123 MiB
+pumped exit 0
