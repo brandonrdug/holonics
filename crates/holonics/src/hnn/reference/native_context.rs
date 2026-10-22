@@ -653,7 +653,7 @@ impl Reference {
     }
 }
 
-impl Resident{pub fn native_rank_reuse_reading(&self)->(u64,u64){let c=self.native_rank.borrow();(c.hits,c.misses)}}
+impl Resident{pub fn native_rank_reuse_reading(&self)->(u64,u64){let c=self.native_rank.lock();(c.hits,c.misses)}}
 
 #[cfg(test)]
 mod frontier_tests {
