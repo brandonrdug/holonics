@@ -63,7 +63,7 @@ fn matrix_delta(before: &ExactRatMatrix, after: &ExactRatMatrix) -> Result<Exact
 /// Quotient-zero is monotone as the exponent decreases. The half-open tie is read by
 /// div_rem itself: a negative half-unit is held, a positive half-unit lands. Binary search
 /// therefore finds the largest safe exponent without inspecting every intervening level.
-fn largest_held_factor_lattice(
+pub(super) fn largest_held_factor_lattice(
     opening: &Constitution, contact: usize, current: Lattice, target: Lattice,
 ) -> Result<(Lattice, Option<(Carrier, usize, Rat)>), HnnError> {
     let locus = Locus::Channel(contact);

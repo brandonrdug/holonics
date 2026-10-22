@@ -4026,6 +4026,9 @@ struct RingMaterial {
     transport: Rat,
 }
 
+/// Only the actual new-material constructor can issue historical-release origin.
+pub(crate) struct NativeRoundingFoundingSeal(());
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct ContactMaterial {
     storage: ExactRatMatrix,
@@ -5291,6 +5294,17 @@ pub struct LockReading {
 }
 
 impl Constitution {
+    /// Opt-in provenance origin for the UNWIRED joint rounding modulus. This
+    /// constructs a genuinely new constitution; no used checkpoint is relabeled.
+    pub(crate) fn initial_with_joint_rounding_history(
+        field:&Field,budget:u64,limits:&crate::hnn::word::material_ray::rounding::ModulusResources,
+    )->Result<(Self,crate::hnn::word::material_ray::rounding::NativeReleaseHistory),crate::hnn::word::material_ray::rounding::ModulusObstruction>{
+        let material=Self::initial(field,budget)?;
+        let history=crate::hnn::word::material_ray::rounding::NativeReleaseHistory::newly_founded(
+            field,&material,limits,&NativeRoundingFoundingSeal(()))?;
+        Ok((material,history))
+    }
+
     /// **Campaign 1's initial constitution and its priors** (design (d), R3 D2):
     ///
     /// | Locus | Initial value | Update |
@@ -5783,6 +5797,13 @@ impl Constitution {
             &material.slice_scale,
             &material.pair_scale,
         ]
+    }
+
+    /// Borrow only a genuine six-carrier entry; no allocated global remainder
+    /// view or exterior release receipt is accepted by the opt-in issuer.
+    pub(crate) fn native_rounding_carry_at(&self,contact:usize,family:usize,entry:usize)->Option<&Rat>{
+        let carrier=match family{0..=2=>Carrier::Factor(family),3..=5=>Carrier::FactorScale(family-3),_=>return None};
+        self.carries.get(&(Locus::Channel(contact),carrier)).and_then(|carry|carry.0.get(&entry))
     }
 
     /// Contact `a`'s factor statistics `h_x`: storage, stiffness, dissipation.

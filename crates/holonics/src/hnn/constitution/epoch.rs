@@ -3489,3 +3489,16 @@ mod receiving_representation_controls {
         println!("BOUNDED_RECEIVING_CORE old_lattice=3 new_lattice={} normal_fall={} cap20_unresolved=true budget_unresolved=true odd_phase5_preserved=true",d.successor.map_lattice,d.fall.scalar_ratio().unwrap());
     }
 }
+
+// Opt-in source-only read of the EXISTING half-open C/K carry limiter. It does
+// not rebase, deposit, advance a clock, or authorize any physical movement.
+impl Constitution {
+    pub(crate) fn native_rounding_attainable_lattice(&self,contact:usize,target:Lattice)
+        ->Result<(Lattice,Option<(Carrier,usize,Rat)>),HnnError>{
+        let locus=Locus::Channel(contact);
+        if self.released.contains(&locus){return Err(HnnError::ReleasedLocus{locus});}
+        let current=self.lattice(locus)?;
+        if target.exponent()<current.exponent(){return Err(HnnError::Unadmitted{reason:"rounding modulus never coarsens current material"});}
+        channel_grain::largest_held_factor_lattice(self,contact,current,target)
+    }
+}

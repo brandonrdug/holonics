@@ -335,3 +335,87 @@ remaining decision is above, rather than an unqualified finer-grid patch or anot
 The current local status index points to this diagnosis and the separate zero-motion card
 result. General contextual E/family/ecology work and the failed material-effect requirement
 remain open.
+
+
+## Joint rounding-response issuer: implemented source, unwired and unqualified
+
+[implemented source only, October22; Refs #62 #73] The next source child of `84dece1b`
+adds `word/material_ray/rounding.rs` and small private owner hooks. **No build, test,
+native operation, dataset or output invocation was performed.** This is uncompiled and
+untested source, not a replacement for runtimeb3e9f84's qualification. The closed
+678.698571974-second/1,185-operation phase is unchanged. No new resolution/publication
+policy, default tolerance, unseen future or recovery of old released coordinates is selected.
+
+The implemented computation follows the math owner's **NATIVE JOINT ROUNDING-ERROR RESPONSE
+MODULUS** and design's **NativeReceiverResolutionV1 proposal**, pinned in the local scope
+receipt. It reuses `ContactEnvelope::tighten_norm`'s resolvent perturbation, now factored
+into a shared difference-bound method. A separate box helper returns uniform stage norms,
+three form-perturbation coefficients and genuine tightening/fallback status. A skipped
+optional exact-center tightening keeps a sound scalar bound; it is never read as zero error.
+The original publication/release selectors do not call the new issuer. The shared algebra
+refactor itself still needs compilation/equivalence qualification; no newer CUDA pass is claimed.
+
+Three opt-in internal entry points establish the intended ownership:
+
+- `Constitution::initial_with_joint_rounding_history` creates a genuinely new constitution
+  and opaque live historical-release origin; a private founding seal prevents creating it
+  by relabeling a used checkpoint. The sidecar stores bounded current contact snapshots,
+  clocks and conservative per-coordinate release uncertainty, not old observations or
+  released-vector news. Source-private publication/rebase hooks preserve existing clocks,
+  six-carrier identities and old release floors. The publication summary uses the coarsest
+  authenticated predecessor unit; a finer successor label cannot prove an earlier stroke
+  released at that finer level. The hooks are not called by the current runtime.
+- `NativePredictionDeclaration::declare_joint_rounding_modulus` seals explicit read norm,
+  units, grade, same-actual-opening scope, complete material box, tolerances and resource
+  range on the existing pre-target producer identity. No target or returned direction
+  selects those declarations retroactively.
+- `NativePredictionReturn::joint_rounding_modulus` borrows the same `ContactCut`, original
+  actual/fresh records, frozen decoder and genuine defect/read intervals. It performs no
+  additional Word execution, fit, return, ingress or publication.
+
+The polynomial construction retains the Gram cross term `2*f*r+r²`, historical `S²` and
+`S*t` terms, both lanes and all occurrences. Uniform changed-material stage bounds transport
+prior error, including the `DeltaL*e` interaction. A conservative additive contact embedding
+avoids assuming independent/disjoint perturbations. The original complete actual opening
+and current/carry are retained; its already authenticated norm and the genuine fresh opening
+norm are reused. Receiving rows combine `Rc*actual+(Rs-Rc)*fresh`; probability units use
+the owned exact ln2 enclosure and only the interleaved real rows. Source probability
+intervals remain intervals, never invented midpoint representatives.
+
+For explicitly declared demands the source evaluates
+`E+C+A*2^-s+B*2^-2s` using bounded exact arithmetic and a finite monotone integer search.
+Historical/numerical floors are separate. A constant-floor failure is an obstruction to
+this enclosure, not a proof that the physical read violates tolerance. Resource/integer,
+domain, missing-history and finite-refinement-ceiling failures have separate typed results.
+The existing `largest_held_factor_lattice` is exposed through a read-only Constitution
+adapter: requested/current/arithmetic-attainable exponents and the actual signed half-tie
+limiter are reported without staging anything. A held-carry shortfall never receives the
+requested target's resolution predicate; conservative bounds are evaluated at the common
+attainable level only where the numerical floor supports that comparison.
+
+[explicitly incomplete] Supported calculations are componentwise continuous wave/native
+probability reads of the original finite fixed-opening schedule. P grade compares physical
+reads. H grade can use the authentic producing landed numerical floor and enlarge its
+actual probability intervals; a changed candidate receives a **missing uniform candidate
+floor** result when that point-floor cannot certify it. R grade requires the missing
+uniform represented-history floor. A whole-block norm, an unknown past physical opening,
+whole-future release anchor, same discrete output or complete held-momentum successor
+requires its own witness and is explicitly refused. A continuous error bound grants no
+key/cell-boundary margin, storage-rank assumption or held-momentum admission.
+
+The result exposes original source/current/opening/domain/read units, current carried
+entries, historical uncertainty, per-read coefficients/floors, conditional targets and
+arithmetic work. `candidate_domain_checked` and `material_publication_admitted` remain
+false. The future owning consumer must bind the actual complete candidate/history boxes,
+actual attained units, original physical ray/work, resource/publication frontier and cold
+history lineage. No legacy history import/codec, automatic ingress-demand schedule or
+Resident/publication integration is installed. A live history capability must remain with
+its actual owner; numerical state equality alone is not permission to transplant a branch's
+release uncertainty. Missing provenance stays missing.
+
+No new tests were added or run as a substitute for that implementation. The existing
+half-tie/six-carrier/rebase/cold, actual joint-ray and native host/card evidence retain their
+source-specific scopes. The next qualification must first compile this exact source and
+check the new issuer; it cannot be called passed from the mathematical derivation or the
+older zero-motion fixture. The current local index distinguishes this unqualified source
+from the last runtime-qualified b3e9f84 result and the still-unselected policy proposal.

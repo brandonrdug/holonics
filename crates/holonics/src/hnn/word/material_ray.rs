@@ -4,6 +4,9 @@
 //! neither derivatives of chart selection nor an admission for a represented material update.
 //! In particular, composing this envelope does not supply the missing represented defect floor.
 
+// Unwired source-only local-read modulus; not a publication policy.
+pub(crate) mod rounding;
+
 use super::{EndChange, Word};
 use crate::hnn::HnnError;
 use crate::hnn::propagation::Operands;
@@ -375,14 +378,14 @@ impl ContactEnvelope {
     /// Centered physical block bound. This observes the exact contact operator,
     /// including cancellations in D0+J X P, rather than adding their norms. The
     /// resolvent identity covers the ENTIRE declared factor box around that cut.
-    fn tighten_norm(&mut self, base:[&ExactRatMatrix;3], extent:[&ExactRatMatrix;3],h:&Rat,g:&Rat)->Result<(),HnnError>{
+    fn tighten_norm(&mut self, base:[&ExactRatMatrix;3], extent:[&ExactRatMatrix;3],h:&Rat,g:&Rat)->Result<bool,HnnError>{
         let n=base[0].rows();
         // Optional tightening never turns an unaffordable block calculation into
         // an unbounded allocation; the already-issued scalar envelope stays sound.
-        if n>super::action::NativeWorkBudget::V1.coordinates/4{return Ok(());}
+        if n>super::action::NativeWorkBudget::V1.coordinates/4{return Ok(false);}
         let input_bits=base.iter().flat_map(|m|m.entries()).try_fold(0u64,|sum,q|sum.checked_add(q.numer().bits())?.checked_add(q.denom().bits()));
         let scratch=input_bits.and_then(|bits|(n as u64).checked_pow(3)?.checked_mul(64)?.checked_mul(bits));
-        if scratch.is_none_or(|bits|bits>super::action::NativeWorkBudget::V1.aggregate_bits){return Ok(());}
+        if scratch.is_none_or(|bits|bits>super::action::NativeWorkBudget::V1.aggregate_bits){return Ok(false);}
         let forms=base.iter().map(|f|f.multiply(&f.transpose()?)).collect::<Result<Vec<_>,_>>()?;
         let identity=ExactRatMatrix::identity(n)?;
         let m=identity.add(&forms[0].scaled(&(g/h)))?.add(&forms[2].scaled(&(g/int(2))))?.add(&forms[1].scaled(&(g*h/int(4))))?;
@@ -395,12 +398,18 @@ impl ContactEnvelope {
         let l=ExactRatMatrix::new((0..4*n).map(|row|(0..4*n).map(|col|{
             &j[row/n]*xp.get(row%n,col).unwrap()+if row==col{if row/n==3{-Rat::one()}else{Rat::one()}}else{Rat::zero()}
         }).collect()).collect())?;
-        let df=base.iter().zip(extent).map(|(b,e)|{let e=norm(e);int(2)*norm(b)*&e+square(&e)}).collect::<Vec<_>>();
-        let dm=g/h*&df[0]+g/int(2)*&df[2]+g*h/int(4)*&df[1];
-        let dp=sqrt_ceiling(&(square(&square(h))*square(g)*square(&df[1])+int(4)*square(g)*square(&df[0])),64);
-        let perturb=&self.j*&self.inverse_bound*(dp+dm*norm(&x)*norm(&p));
+        let df=std::array::from_fn(|i|{let e=norm(extent[i]);int(2)*norm(base[i])*&e+square(&e)});
+        let perturb=self.box_perturbation(&df,h,g,&(norm(&x)*norm(&p)));
         self.stage.norm=self.stage.norm.clone().min(norm(&l)+perturb);
-        Ok(())
+        Ok(true)
+    }
+    /// The same resolvent difference bound used by the centered norm and by the
+    /// opt-in joint rounding issuer. `xp` bounds ||X0|| ||P0||; it is never the
+    /// difference of two operator-norm upper bounds.
+    fn box_perturbation(&self, forms:&[Rat;3], h:&Rat, g:&Rat, xp:&Rat)->Rat {
+        let dm=g/h*&forms[0]+g/int(2)*&forms[2]+g*h/int(4)*&forms[1];
+        let dp=sqrt_ceiling(&(square(&square(h))*square(g)*square(&forms[1])+int(4)*square(g)*square(&forms[0])),64);
+        &self.j*&self.inverse_bound*(dp+dm*xp)
     }
     fn of(forms: [FormEnvelope; 3], h: &Rat, g: &Rat) -> Result<Self, HnnError> {
         if h <= &Rat::zero() || g <= &Rat::zero() {
@@ -475,6 +484,30 @@ pub(super) fn contact_envelope(
     let mut envelope=ContactEnvelope::of(forms,h,g)?;
     envelope.tighten_norm(base,extent.each_ref(),h,g)?;
     Ok(envelope.stage)
+}
+
+/// Uniform finite operator norm plus three Gram-form perturbation coefficients.
+/// Both centers may range in the SAME declared box. The scalar fallback uses
+/// ||X||<=1 and the domain q0; optional exact-center tightening affects only the
+/// operator norm. No skipped tightening is interpreted as zero response.
+fn joint_box_envelope(
+    base:[&ExactRatMatrix;3], extent:[&ExactRatMatrix;3], h:&Rat, g:&Rat,
+    tighten:bool,
+)->Result<(Rat,[Rat;3],bool),HnnError>{
+    if extent.iter().any(|m|m.entries().iter().any(|q|q<&Rat::zero())) {
+        return Err(HnnError::Unadmitted{reason:"joint material box has nonnegative coordinate radii"});
+    }
+    let zero=[ExactRatMatrix::zero(base[0].rows(),base[0].columns())?,
+        ExactRatMatrix::zero(base[1].rows(),base[1].columns())?,ExactRatMatrix::zero(base[2].rows(),base[2].columns())?];
+    let forms=[FormEnvelope::domain(base[0],extent[0],&zero[0])?,
+        FormEnvelope::domain(base[1],extent[1],&zero[1])?,FormEnvelope::domain(base[2],extent[2],&zero[2])?];
+    let mut envelope=ContactEnvelope::of(forms,h,g)?;
+    let alpha=std::array::from_fn(|i|{
+        let form=std::array::from_fn(|j|if i==j{Rat::one()}else{Rat::zero()});
+        envelope.box_perturbation(&form,h,g,&envelope.q0)
+    });
+    let tightened=if tighten { envelope.tighten_norm(base,extent,h,g)? }else{false};
+    Ok((envelope.stage.norm,alpha,tightened))
 }
 
 /// One queried direction on the original factor chart. `extent` is the jointly declared

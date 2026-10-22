@@ -51,6 +51,12 @@ pub struct NativePredictionReturn {
     reach: crate::hnn::constitution::Reach,
 }
 impl NativePredictionReturn {
+    /// Pure opt-in certificate calculation. No material/carry/frontier publication.
+    pub(crate) fn joint_rounding_modulus(&self,plan:&super::material_ray::rounding::DeclaredJointModulus,
+        history:Option<&super::material_ray::rounding::NativeReleaseHistory>)
+        ->Result<super::material_ray::rounding::JointModulusReading,super::material_ray::rounding::ModulusObstruction>{
+        self.cut.joint_rounding_modulus(plan,&self.back,&self.reading,&self.phases,history)
+    }
     pub fn reading(&self) -> &NativePredictionReading {
         &self.reading
     }
@@ -184,6 +190,12 @@ pub(crate) struct NativePredictionDeclaration{
     opening:EndChange,opened_at:usize,phases:ReceivingPhases,
 }
 impl NativePredictionDeclaration{
+    /// Unwired opt-in declaration on this SAME pre-target unrun producer.
+    pub(crate) fn declare_joint_rounding_modulus(&self,request:super::material_ray::rounding::ModulusRequest)
+        ->Result<super::material_ray::rounding::DeclaredJointModulus,super::material_ray::rounding::ModulusObstruction>{
+        super::material_ray::rounding::DeclaredJointModulus::seal(&self.id,&self.field,&self.current,&self.source,
+            &self.theta,self.opened_at,&self.phases,&self.opening,request)
+    }
     pub(crate) fn phases(&self)->&ReceivingPhases{&self.phases}
     fn admit(&self,word:&Word<'_>)->Result<(),HnnError>{
         let valid=word.native_source.as_ref().is_some_and(|(theta,current,source,_)|theta==&self.theta&&current==&self.current&&std::sync::Arc::ptr_eq(source,&self.source));

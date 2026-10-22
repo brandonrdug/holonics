@@ -573,6 +573,26 @@ impl<'c> Word<'c> {
 }
 
 impl ContactCut {
+    /// Optional calculation only. Live publication selects no resolution policy.
+    pub(super) fn joint_rounding_modulus(&self,plan:&super::material_ray::rounding::DeclaredJointModulus,
+        back:&WordReturn,reading:&super::native_prediction::NativePredictionReading,phases:&ReceivingPhases,
+        history:Option<&super::material_ray::rounding::NativeReleaseHistory>)
+        ->Result<super::material_ray::rounding::JointModulusReading,super::material_ray::rounding::ModulusObstruction>{
+        use super::material_ray::rounding::ModulusObstruction;
+        let id=self.native_declaration.as_ref().ok_or(ModulusObstruction::Invalid("original native declaration unavailable"))?;
+        let geometry=back.response_geometry.as_ref().ok_or(ModulusObstruction::Invalid("original executed paired geometry unavailable"))?;
+        geometry.admit_native_contact(&self.field,&back.reads,&self.operands,phases,self.opened_at)?;
+        let stages=geometry.native_material_stages.as_ref().ok_or(ModulusObstruction::Invalid("original bounded stages unavailable"))?;
+        stages.admit_declaration(&self.operands,id)?;
+        if reading.law!=super::native_prediction::LAW || reading.producing_commit!=self.producing.commit()
+            || reading.opened_at!=self.opened_at || reading.source_cells!=self.source.cells()
+            || reading.receiver!=phases.ring() || back.reads.iter().map(|(f,_)|f).ne(reading.features.iter()){
+            return Err(ModulusObstruction::Invalid("source-owned native read beside its original pair"));
+        }
+        super::material_ray::rounding::issue(plan,id,&self.field,&self.current,&self.source,&self.producing,
+            &self.operands,phases,self.opened_at,stages,back.response_defect.as_ref(),&reading.masses,history)
+    }
+
     pub(super) fn publish_native_comparison(
         mut self,
         represented_policy:bool,
