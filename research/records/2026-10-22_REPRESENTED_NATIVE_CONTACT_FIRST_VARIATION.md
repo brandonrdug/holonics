@@ -339,6 +339,10 @@ remain open.
 
 ## Joint rounding-response issuer: implemented source, unwired and unqualified
 
+This initial `6c24a91` source account is historical. Its pre-target binding and history/resource
+claims had six source-review gaps; the additive correction below supersedes those claims.
+The original commit, review, handoff and receipts remain preserved.
+
 [implemented source only, October22; Refs #62 #73] The next source child of `84dece1b`
 adds `word/material_ray/rounding.rs` and small private owner hooks. **No build, test,
 native operation, dataset or output invocation was performed.** This is uncompiled and
@@ -422,3 +426,69 @@ was rejected by automatic approval review because another agent owns that worksp
 Until that owner applies the patch, its prior active-source row may be stale. This
 record and the source-only receipt distinguish the new unqualified source from the last
 runtime-qualified b3e9f84 result and the still-unselected policy proposal.
+
+## Six findings in the initial modulus source: corrected in source only
+
+[implemented source only, October22; Refs #62 #73] Code
+`e8a843154801268a50fd209453d186a0548af7bc`, descending from documentation child
+`e7c6341b`, addresses the six findings pinned to `6c24a91`. The independent review is
+`/home/b/Documents/Codex/2026-10-20/task-2/JOINT_RESPONSE_6C24_SOURCE_REVIEW.txt`
+(SHA256 `02740c2e5473bb4865553c1277ad36c17466e207caccb7091b5779527e84c09c`).
+This is a new, **uncompiled, untested, unwired source identity**. It is not a runtime
+qualification, a claim that all resource allocations are measured, or a new material-effect
+result. Zero builds/tests/native calls/datasets/outputs occurred. The previous phase stays
+closed at 678.698571974 seconds and 1,185 operations.
+
+- **R1, Result conversion:** `row_norm` now uses `m.get(row,j)?`, reusing the actual
+  `ExactLinearError` conversion instead of calling an Option method on a Result.
+- **R2, selected producer timing:** `select_joint_rounding_modulus(self, word, request)`
+  checks the actual complete still-unrun opening and consumes the Word and declaration
+  into `SelectedModulusProducer`. Its host path executes there; its external path dispatches
+  there and accepts no earlier raw device record. A private execution-selected token moves
+  through `NativePredictionWord::observe` into the return. Both the selected token and the
+  original paired-stage/source identity are checked. Ordinary generic execution/read paths
+  cannot retroactively acquire that token. The adapter is not called by current training.
+- **R3, H point versus candidate:** producing-point H bounds and probability images have
+  their own fields. H never performs prospective target search or issues a candidate
+  enclosure refusal from the original point floor. Every prospective H target reports
+  `MissingUniformCandidateNumericalFloor`, including zero additional refinement, until a
+  complete unchanged-numerical-identity or candidate/uniform-floor consumer is supplied.
+  Physical P retains the finite conditional target search; R remains unsupported.
+- **R4, one original history transition:** the opt-in source-owner adapter stages chart and
+  history publication together against the same original predecessor. An unchanged-clock
+  contact may pass a shape-checked, lossless six-carrier value-plus-carry rebase without
+  charging a release. A genuine advanced clock charges one conservative release using
+  the authenticated coarsest predecessor unit. No intermediate history mutation rebinds
+  the original producing witness; refusal leaves caller-visible charts/history unchanged.
+- **R5, bounded arithmetic/accounting:** history snapshots, staged replacements, copied
+  release vectors and the numeric kernel now share cumulative lifetime rational-payload
+  admission. It never frees a previous batch speculatively. The contact perturbation
+  formula is shared through a checked arithmetic interface. The modulus uses the genuine
+  scalar positive-Gram fallback; exact-center Gram/inverse tightening is unavailable to
+  it until separately bounded, rather than protected by a heuristic estimate. Existing
+  physical consumers keep their exact formula. The signed carry limiter receives a
+  conservative integer/query preflight. Probability conversion borrows the already-owned
+  ln2 enclosure or refuses a missing prepared operand; it cannot initialize unmetered
+  transcendental work. The resource scope is numeric kernel/history payload, explicitly
+  **not** shared model-graph, structural allocator or RSS certification. These source
+  bounds and the shared refactor still need compilation and qualification.
+- **R6, publication authenticity:** the new optional `publish_contact_carry_with_history`
+  consumer constructs an opaque `NativeCompletedPublication` borrow inside the actual
+  guarded return owner before its mutable public result escapes. Only that private owner
+  can mint the history input. Independent mutable `NativeContactPublication` fields and
+  matching labels cannot be submitted to the history hook. No existing live caller was
+  changed to use this adapter.
+
+The conditional P/domain polynomial retains history/Gram cross terms, both actual/fresh
+lanes, changed-operator propagation, exact units and original source/carry/frame bindings.
+No default tolerance, future anchor, class-boundary margin, held-momentum extension,
+retrospective recovery of released tails, live policy or checkpoint migration is selected.
+Missing interfaces remain the actual candidate/uniform numerical witness, candidate domain
+and attained physical admission, atomic Resident/cold provenance consumer, and qualification.
+There is no new positive C/K/D motion or useful-language evidence. Qualified b3e9f84 and all
+failed/zero-motion packets remain unchanged.
+
+Delivery evidence is additive under
+`/home/b/Documents/Codex/2026-10-17/task/alpha-v93-joint-rounding-modulus-source-only/review-6c24-correction/`.
+The shared current index is owned by design; its update is supplied as an inspectable patch,
+not applied by this implementation owner. The earlier denied direct index edit is not retried.

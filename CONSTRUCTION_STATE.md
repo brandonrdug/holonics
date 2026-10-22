@@ -17,14 +17,16 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
-**October22 source-only joint rounding modulus: implemented, UNCOMPILED/UNTESTED/UNWIRED.**
-The [existing native-contact record](research/records/2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md#joint-rounding-response-issuer-implemented-source-unwired-and-unqualified)
-now describes the actual pre-target declaration, original paired-record issuer, historical
-release provenance and exact polynomial/attainment calculations in
-`word/material_ray/rounding.rs`. It selects no default tolerance or release/publication
-policy and grants no held/discrete/future guarantee. Missing history and numerical floors
-remain typed obstructions. Runtime qualification remains b3e9f84 below; no build, test or
-native call occurred in this source-only step.
+**October22 joint modulus source review corrections: UNCOMPILED/UNTESTED/UNWIRED.**
+Code `e8a843154801268a50fd209453d186a0548af7bc` corrects the six findings in the pinned
+`6c24a91` source review. The [existing native-contact record](research/records/2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md#six-findings-in-the-initial-modulus-source-corrected-in-source-only)
+now distinguishes the owning still-unrun selected producer from a detached declaration,
+current-point H images from prospective H targets, and authenticated atomic history from
+mutable exterior readings. Bounded scalar perturbation arithmetic and cumulative rational
+payload accounting replace the unmetered helper/per-batch path. Allocator/RSS certification
+and compilation remain unqualified. This opts into no live resolution/publication policy,
+default tolerance, held/discrete/future guarantee or Resident/cold history consumer.
+Runtime qualification remains b3e9f84 below; no build, test or native call occurred here.
 
 **October22 source-only retention audit; production unchanged.** The96 released factor
 terms follow the selected first-deposit fine split (channel clock0→1, lattice29,
