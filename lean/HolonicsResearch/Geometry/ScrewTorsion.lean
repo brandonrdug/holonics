@@ -45,6 +45,12 @@ What is proved.
 7. **The squeeze is the ratio's dilation** (`squeeze_dilates_ratio`): `diag(λ, λ⁻¹)` acting on the
    undivided pair `(a, b)` multiplies its ratio by `λ²`. The det-1 squeeze of the turn·boost·shear
    factorization and the ratio dilation `MoveKind::Boost` are one boost read in two charts.
+8. **The lag-residue factorization** (`laggedRun_closed`, `laggedRun_lag_residue`,
+   `laggedRun_eq_of_counts`): a stream of moves with one linear part `M`, each adding `E (u k)`,
+   reaches `Mᵗ x₀ + Σ_k M^(t−1−k) E (u k)`; when `M^N = 1` this is
+   `Mᵗ x₀ + Σ_(r < N) Σ_a n(a, r) • M^r E a`, with `n(a, r)` the number of cells `k < t` carrying
+   symbol `a` at lag residue `r`. Two streams with the same counts reach the same state, so every
+   reading of such a stream is a function of its (symbol, lag residue) counts.
 
 No `sorry`, no `axiom`.
 -/
@@ -123,6 +129,83 @@ theorem translation_basepoint (b t x : V) :
   rw [move_basepoint, Module.End.one_apply, sub_self, add_zero]
 
 end AffineTorsion
+
+/-! ## 2b. The lag-residue factorization -/
+
+section LagResidue
+
+variable {R V α : Type*} [Ring R] [AddCommGroup V] [Module R V]
+
+/-- [definition] **A stream of moves with one linear part:** from `x₀`, each cell `k` applies `M`
+and adds `E (u k)`. -/
+def laggedRun (M : Module.End R V) (E : α → V) (u : ℕ → α) (x₀ : V) : ℕ → V
+  | 0 => x₀
+  | t + 1 => M (laggedRun M E u x₀ t) + E (u t)
+
+/-- [proved-derived] **The stream's closed form:** `Mᵗ x₀ + Σ_(k < t) M^(t−1−k) E (u k)`. -/
+theorem laggedRun_closed (M : Module.End R V) (E : α → V) (u : ℕ → α) (x₀ : V) (t : ℕ) :
+    laggedRun M E u x₀ t = (M ^ t) x₀ + ∑ k ∈ Finset.range t, (M ^ (t - 1 - k)) (E (u k)) := by
+  induction t with
+  | zero => simp [laggedRun]
+  | succ t ih =>
+    have hstep : laggedRun M E u x₀ (t + 1) = M (laggedRun M E u x₀ t) + E (u t) := rfl
+    have h1 : (M ^ (t + 1)) x₀ = M ((M ^ t) x₀) := by
+      rw [pow_succ', Module.End.mul_apply]
+    have h2 : ∀ k ∈ Finset.range t,
+        M ((M ^ (t - 1 - k)) (E (u k))) = (M ^ (t + 1 - 1 - k)) (E (u k)) := by
+      intro k hk
+      have hk' : k < t := Finset.mem_range.mp hk
+      have he : t + 1 - 1 - k = (t - 1 - k) + 1 := by omega
+      rw [he, pow_succ', Module.End.mul_apply]
+    have h3 : (M ^ (t + 1 - 1 - t)) (E (u t)) = E (u t) := by
+      have he : t + 1 - 1 - t = 0 := by omega
+      rw [he, pow_zero, Module.End.one_apply]
+    rw [hstep, ih, map_add, map_sum, Finset.sum_range_succ, h1, Finset.sum_congr rfl h2, h3]
+    abel
+
+/-- [proved-derived] **The lag-residue factorization:** when `M^N = 1`, the stream's state is
+`Mᵗ x₀ + Σ_(r < N) Σ_a n(a, r) • M^r E a`, where `n(a, r)` counts the cells `k < t` at lag residue
+`(t − 1 − k) mod N = r` that carry symbol `a`. -/
+theorem laggedRun_lag_residue [Fintype α] [DecidableEq α] (M : Module.End R V) (E : α → V)
+    (u : ℕ → α) (x₀ : V) {N : ℕ} (hN : 0 < N) (hM : M ^ N = 1) (t : ℕ) :
+    laggedRun M E u x₀ t = (M ^ t) x₀ +
+      ∑ r ∈ Finset.range N, ∑ a : α,
+        ((Finset.range t).filter (fun k => (t - 1 - k) % N = r ∧ u k = a)).card •
+          (M ^ r) (E a) := by
+  rw [laggedRun_closed]
+  congr 1
+  have hpow : ∀ k, M ^ (t - 1 - k) = M ^ ((t - 1 - k) % N) := by
+    intro k
+    conv_lhs => rw [← Nat.div_add_mod (t - 1 - k) N, pow_add, pow_mul, hM, one_pow, one_mul]
+  have hsum : ∑ k ∈ Finset.range t, (M ^ (t - 1 - k)) (E (u k)) =
+      ∑ k ∈ Finset.range t, (M ^ ((t - 1 - k) % N)) (E (u k)) :=
+    Finset.sum_congr rfl (fun k _ => by rw [hpow k])
+  have hmaps : ∀ k ∈ Finset.range t, (t - 1 - k) % N ∈ Finset.range N :=
+    fun k _ => Finset.mem_range.mpr (Nat.mod_lt _ hN)
+  rw [hsum, ← Finset.sum_fiberwise_of_maps_to hmaps]
+  refine Finset.sum_congr rfl (fun r _ => ?_)
+  rw [← Finset.sum_fiberwise _ u]
+  refine Finset.sum_congr rfl (fun a _ => ?_)
+  rw [Finset.filter_filter]
+  have hc : ∀ k ∈ (Finset.range t).filter (fun k => (t - 1 - k) % N = r ∧ u k = a),
+      (M ^ ((t - 1 - k) % N)) (E (u k)) = (M ^ r) (E a) := by
+    intro k hk
+    obtain ⟨-, h1, h2⟩ := Finset.mem_filter.mp hk
+    rw [h1, h2]
+  rw [Finset.sum_congr rfl hc, Finset.sum_const]
+
+/-- [proved-derived] **Counts determine the state:** two streams with the same number of cells of
+each symbol at each lag residue reach the same state, so every reading of a stream of moves with
+one linear part of finite order is a function of its (symbol, lag residue) counts. -/
+theorem laggedRun_eq_of_counts [Fintype α] [DecidableEq α] (M : Module.End R V) (E : α → V)
+    (u w : ℕ → α) (x₀ : V) {N : ℕ} (hN : 0 < N) (hM : M ^ N = 1) (t : ℕ)
+    (hc : ∀ r a, ((Finset.range t).filter (fun k => (t - 1 - k) % N = r ∧ u k = a)).card =
+      ((Finset.range t).filter (fun k => (t - 1 - k) % N = r ∧ w k = a)).card) :
+    laggedRun M E u x₀ t = laggedRun M E w x₀ t := by
+  rw [laggedRun_lag_residue M E u x₀ hN hM, laggedRun_lag_residue M E w x₀ hN hM]
+  simp_rw [hc]
+
+end LagResidue
 
 /-! ## 3. The fifth torsion, the redshift loop and the squeeze -/
 
