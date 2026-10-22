@@ -1,0 +1,34 @@
+{
+  "native_attempt_reservation": 640,
+  "native_attempt_charge": 153,
+  "native_counts": {
+    "final": true,
+    "total_attempts": 153,
+    "forward_constructors": 120,
+    "response_companions": 11,
+    "actual_returns": 11,
+    "fresh_returns": 11
+  },
+  "command": [
+    "bash",
+    "-c",
+    "exec <private-runtime>/alpha-v93-represented-native-7ca320/binaries/represented-connected complete_language::native_context_controls::represented_native_full_transition --ignored --exact --nocapture --test-threads=1"
+  ],
+  "limit_s": 90,
+  "wall_ns": 3310845802,
+  "peak_rss_bytes": 72826880,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 33,
+  "exit": 101,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 549594570190,
+  "ledger_after_ns": 552905415992,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

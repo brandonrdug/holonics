@@ -1,0 +1,27 @@
+{
+  "native_attempt_reservation": 0,
+  "native_attempt_charge": 0,
+  "native_counts": null,
+  "command": [
+    "bash",
+    "-c",
+    "exec <private-runtime>/alpha-v93-represented-native-7ca320/binaries/ray-data represented_material_ray_data --nocapture --test-threads=1"
+  ],
+  "limit_s": 15,
+  "wall_ns": 101958448,
+  "peak_rss_bytes": 1458176,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 1,
+  "exit": 0,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 491979760593,
+  "ledger_after_ns": 492081719041,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

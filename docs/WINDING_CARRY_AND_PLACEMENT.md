@@ -546,3 +546,6 @@ post-R cold/contact/next-R/source30/frozen execution remains unqualified.
 [measured; October22] Native rational receiving cold continuity now passes firstR and a genuine new contact; the next control-coordinate bound remains unresolved. [Scoped control and exact limits](../research/records/2026-10-22_NATIVE_RATIONAL_COLD_CONTINUES_TO_A_NEW_CONTACT.md).
 
 [measured; October22] An authentic native M/context/source packet separates physical work from numerical coordinate extent: the source12 control needs1,803bits while exact work≈1.7502 is below65,536. [Control refusal and joined carrier obligation](../research/records/2026-10-22_NATIVE_CONTROL_REFUSAL_IS_REPRESENTATION_GROWTH.md).
+
+
+The [represented native contact record](../research/records/2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md) separates a physical-reference material first variation at the original held opening from differentiation of chart selection or a finite represented score claim. Both actual/fresh paths, component radii, original return and reverse-rounding discrepancy stay source-bound. The connected control passed first R/cold but refused its fresh contact bound; the later component-radius source is data-qualified only, and native contact/next-R/close/frozen/card readiness remains open.

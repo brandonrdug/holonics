@@ -134,6 +134,19 @@ impl<'a> ResponseTube<'a> {
     pub fn radius(&self) -> &EndChange {
         &self.radius
     }
+    /// Add a previously derived contact-local Euclidean force-error bound in the SAME
+    /// normalized wave chart. Each selected component is bounded by that norm. This preserves
+    /// causal support; it does not mint a bound or turn an arbitrary radius into a native witness.
+    pub(crate) fn add_material_contact_error(&mut self,a:usize,bound:&Rat)->Result<(),HnnError>{
+        if bound<&Rat::zero(){return Err(HnnError::Unadmitted{reason:"native material force error is nonnegative"});}
+        let o=self.maps.borrow().operands;let c=o.contacts().get(a).ok_or(HnnError::CountOverflow)?;
+        let (from,to)=c.selection();
+        for &i in from{self.radius.arrivals[a][0][i]+=bound;}
+        for &i in to{self.radius.arrivals[a][1][i]+=bound;}
+        for e in &mut self.radius.states[a][0]{*e+=o.step()*c.conductance()*bound;}
+        for e in &mut self.radius.states[a][1]{*e+=c.conductance()*bound;}
+        Ok(())
+    }
 
     /// Direction-independent contact readings at the original executed intermediate.
     /// The actual anchor split is included before selecting channel coordinates. These are

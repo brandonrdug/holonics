@@ -27,6 +27,8 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
+- [Represented native contact: physical-reference first variation](2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md): original held opening and paired stage/tangent/return error; first R and cold pass, fresh contact bound refuses, component-radius refinement is data-qualified but not yet native-qualified.
+
 - [Native R publishes at the original final Word](2026-10-22_NATIVE_R_PUBLISHES_AT_THE_ORIGINAL_FINAL_WORD.md): first actual R publication and31 map coordinates pass; post-R cold stops at the legacy Gram lattice check; scoped correction is compile-only.
 
 - [Native rational working set and port-reference boundary](2026-10-22_NATIVE_RATIONAL_WORKING_SET_AND_PORT_REFERENCE_BOUNDARY.md): width-six exact accounting passes; full connected control stops at the original-carry/new-Current publication guard.

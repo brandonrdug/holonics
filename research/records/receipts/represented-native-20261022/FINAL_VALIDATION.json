@@ -1,0 +1,341 @@
+{
+  "utc": "2026-10-22T04:21:12.153652+00:00",
+  "status": "SCOPED_INCOMPLETE_CONNECTED_REFUSAL_COMPONENT_SOURCE_DATA_QUALIFIED",
+  "fixed_code_ceiling_ns": 900000000000,
+  "charged_compile_test_ns": 817276984686,
+  "unused_ns": 82723015314,
+  "old_phases_unchanged": true,
+  "native_attempts": {
+    "data_reserved": 160,
+    "data_measured": 96,
+    "connected_reserved": 640,
+    "connected_measured": 153,
+    "reservation_total": 800,
+    "measured_total": 249,
+    "no_unused_reservation_recycled": true,
+    "single_connected_invocation": true
+  },
+  "native_runtime_source": "f3b7534ad68fa0e7104536e9c56fb0af44dcd24d",
+  "native_runtime_binary_sha256": "29d6bf16d54406f7f3d77bce283c29c25390f05c98231645a98565ebcd2a1bad",
+  "native_runtime_wall_ns": 3310845802,
+  "native_completed": [
+    "pending-six native+pending cold",
+    "first native R with31 represented coordinate updates",
+    "post-R native cold",
+    "new contact actual/fresh forward and returns",
+    "source10 fresh-factor physical first-variation query",
+    "nonpositive bound refusal/exact rollback"
+  ],
+  "native_incomplete": [
+    "contact factor successor",
+    "next R20",
+    "source30close",
+    "finalcold",
+    "four warm/cold frozen decisions",
+    "CUDA/card witness"
+  ],
+  "final_component_source": {
+    "library_data_build": true,
+    "pure_data_tests_passed": 5,
+    "coefficient_control_native_calls": 0,
+    "connected_executable_rebuilt": true,
+    "native_prefix_exercised": false,
+    "tighter_bound_pass_claim": false,
+    "new_diagnostics": [
+      "actual/fresh stage error norms",
+      "surrogate receiving response",
+      "row response-error enclosures"
+    ],
+    "new_cache_values_extent_admitted": true
+  },
+  "guards": [
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-01-check/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 9839040195,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-02-check/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 9836670345,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-03-build/receipt.json",
+      "exit": 101,
+      "stop": null,
+      "wall_ns": 54700394827,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-04-build/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 58017649977,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-05-saved-data/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 101721095,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-06-represented-data/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 1104837621,
+      "native_attempt_reservation": 160,
+      "native_attempt_charge": 96,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-07-data-build/receipt.json",
+      "exit": 101,
+      "stop": null,
+      "wall_ns": 17169155223,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-08-data-build/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 98472194205,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-09-source-data/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 101533686,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-10-policy-build/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 99482759084,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-11-policy-data/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 101748430,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-12-ray-check/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 9842246291,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-13-stage-check/receipt.json",
+      "exit": 101,
+      "stop": null,
+      "wall_ns": 9137348357,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-14-tangent-check/receipt.json",
+      "exit": 101,
+      "stop": null,
+      "wall_ns": 8635292288,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-15-bound-check/receipt.json",
+      "exit": 101,
+      "stop": null,
+      "wall_ns": 8336055827,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-16-integrated-check/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 10040963290,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-17-ray-data-build/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 97060149852,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-18-ray-data/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 101958448,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-19-connected-build/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 57512851149,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-20-connected/receipt.json",
+      "exit": 101,
+      "stop": null,
+      "wall_ns": 3310845802,
+      "native_attempt_reservation": 640,
+      "native_attempt_charge": 153,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-21-component-check/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 9431826492,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-22-component-data-build/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 97061109035,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-23-component-data/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 101938493,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-24-final-data-build/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 98255479182,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-25-final-data/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 101796888,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    },
+    {
+      "path": "<private-runtime>/alpha-v93-represented-native-7ca320/code-26-final-connected-build/receipt.json",
+      "exit": 0,
+      "stop": null,
+      "wall_ns": 59419418604,
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "owned_cleanup_remaining": []
+    }
+  ],
+  "full_workspace_gate": "not run in this specifically bounded affected-path phase",
+  "GPU": 0,
+  "dataset_jobs": 0,
+  "training_jobs": 0,
+  "output_jobs": 0,
+  "model_ready": false,
+  "speedup_claim": false,
+  "actual_versus_represented_trajectory_equivalence_claim": false,
+  "all_completed_owned_cleanup_empty": true,
+  "binaries": {
+    "represented-data": {
+      "sha256": "9bf483687037c0b725d7f6edbe2de567a1f133dc9c5b1b139b3e845c70fb4cae",
+      "bytes": 25225528
+    },
+    "source-data": {
+      "sha256": "e3bdd9b873d726e84595c1af2c8cc938d8753335027eb4f0207ff8047dfa8fa8",
+      "bytes": 56773224
+    },
+    "policy-data": {
+      "sha256": "1a8b07f13842a150c688502716840f4aa9f56b46f676dda0c1ce2ebce9d47f33",
+      "bytes": 56799376
+    },
+    "ray-data": {
+      "sha256": "b47631778268c78d525c6161474ab0a10b9182c6a70d496d904afaadcd2950b4",
+      "bytes": 57208544
+    },
+    "represented-connected": {
+      "sha256": "29d6bf16d54406f7f3d77bce283c29c25390f05c98231645a98565ebcd2a1bad",
+      "bytes": 25602688
+    },
+    "component-data": {
+      "sha256": "289c9b001a3f4ac67507864fec5bac365850a1b6d3f5db49007db37f01108804",
+      "bytes": 57099928
+    },
+    "final-ray-data": {
+      "sha256": "3775fd3ab84737035607142946e4035e90fe97716f6f0c43e1e44f8f57c4146a",
+      "bytes": 57181888
+    },
+    "represented-component-connected-unrun": {
+      "sha256": "79e1b4852240c8f6dd9bbc45e780e1144aaa66786b712f7aa1ec436e3a60eaf5",
+      "bytes": 25632112
+    }
+  },
+  "next_qualification_proposal": {
+    "total_max_s": 120,
+    "single_native_max_s": 90,
+    "native_attempts_reserved": 640,
+    "rebuild": false,
+    "retry": false,
+    "same_connected_fixture": true,
+    "requires_separate_declared_phase": true,
+    "GPU": 0,
+    "dataset": 0
+  }
+}

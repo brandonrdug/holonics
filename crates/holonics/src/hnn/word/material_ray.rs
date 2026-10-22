@@ -400,6 +400,31 @@ pub struct PhysicalRayReading {
     pub lower: Rat,
     pub response_squared: Rat,
     pub tangent_queries: usize,
+    /// Actual/fresh stage error norms before and after local forcing. Exterior evidence only.
+    pub stage_error_norms: Vec<(bool, usize, Rat, Rat)>,
+    pub surrogate_response: Vec<Vec<Rat>>,
+    pub response_component_error: Vec<Vec<Rat>>,
+}
+impl PhysicalRayReading {
+    fn values(&self) -> impl Iterator<Item = &Rat> {
+        [
+            &self.stored_pairing,
+            &self.surrogate_pairing,
+            &self.reverse_discrepancy,
+            &self.class_error_charge,
+            &self.response_error_charge,
+            &self.lower,
+            &self.response_squared,
+        ]
+        .into_iter()
+        .chain(
+            self.stage_error_norms
+                .iter()
+                .flat_map(|(_, _, a, b)| [a, b]),
+        )
+        .chain(self.surrogate_response.iter().flatten())
+        .chain(self.response_component_error.iter().flatten())
+    }
 }
 /// This transient proof owns only scalar original-stage readings and the ALREADY returned
 /// per-contact original u/w/midpoint operands. It owns no Word, new observation or state history.
@@ -621,100 +646,89 @@ impl PhysicalContactProof {
                 Ok([form(0)?, form(1)?, form(2)?])
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
-        let run = |path: &OriginalPathStages,
-                   records: &[Vec<OriginalPrimalTransit>]|
-         -> Result<Vec<(Vec<Rat>, Rat)>, HnnError> {
-            let mut tangent = zero_state(o, self.stages.opened_at);
-            let mut error = Rat::zero();
-            let mut out = Vec::new();
-            for t in 0..=self.stages.full_ticks {
-                let junction = super::linear::junctions(o, &tangent)?;
-                if witness.phases.epochs().any(|j| j == t) {
-                    let centers = junction
-                        .iter()
-                        .map(|j| j.anchor.clone())
-                        .collect::<Vec<_>>();
-                    let tube =
-                        crate::hnn::prediction::charted::ResponseTube::open(o, &tangent, &tangent)?;
-                    let local = tube.anchors(&tangent, &centers)?;
-                    let projection = sqrt_ceiling(
-                        &o.exact_weights(witness.phases.ring())
-                            .iter()
-                            .map(square)
-                            .sum(),
-                        64,
-                    );
-                    out.push((
-                        centers[witness.phases.ring()].clone(),
-                        projection * &error + vector_norm(&local[witness.phases.ring()]),
-                    ));
-                }
-                if t == self.stages.full_ticks {
-                    break;
-                }
-                let mut next = super::linear::tick(o, &tangent, self.stages.opened_at + t)?;
+        let run =
+            |path: &OriginalPathStages,
+             records: &[Vec<OriginalPrimalTransit>]|
+             -> Result<(Vec<(Vec<Rat>, Vec<Rat>)>, Vec<(usize, Rat, Rat)>), HnnError> {
+                let mut tangent = zero_state(o, self.stages.opened_at);
                 let mut tube =
                     crate::hnn::prediction::charted::ResponseTube::open(o, &tangent, &tangent)?;
-                tube.advance(&tangent, &next, self.stages.opened_at + t)?;
-                let hom = state_norm(o, tube.radius())?;
-                let mut forcing = Rat::zero();
-                for (a, c) in o.contacts().iter().enumerate() {
-                    if direction[a]
-                        .iter()
-                        .all(|m| m.entries().iter().all(Zero::is_zero))
-                    {
-                        continue;
-                    }
-                    let record =
-                        records[a]
+                let mut out = Vec::new();
+                let mut trace = Vec::new();
+                for t in 0..=self.stages.full_ticks {
+                    let junction = super::linear::junctions(o, &tangent)?;
+                    if witness.phases.epochs().any(|j| j == t) {
+                        let centers = junction
                             .iter()
-                            .find(|r| r.tick == t)
-                            .ok_or(HnnError::Unadmitted {
+                            .map(|j| j.anchor.clone())
+                            .collect::<Vec<_>>();
+                        let local = tube.anchors(&tangent, &centers)?;
+                        out.push((
+                            centers[witness.phases.ring()].clone(),
+                            local[witness.phases.ring()].clone(),
+                        ));
+                    }
+                    if t == self.stages.full_ticks {
+                        break;
+                    }
+                    let mut next = super::linear::tick(o, &tangent, self.stages.opened_at + t)?;
+                    tube.advance(&tangent, &next, self.stages.opened_at + t)?;
+                    let hom = state_norm(o, tube.radius())?;
+                    for (a, c) in o.contacts().iter().enumerate() {
+                        if direction[a]
+                            .iter()
+                            .all(|m| m.entries().iter().all(Zero::is_zero))
+                        {
+                            continue;
+                        }
+                        let record = records[a].iter().find(|r| r.tick == t).ok_or(
+                            HnnError::Unadmitted {
                                 reason: "native tangent forcing uses the original returned stage",
-                            })?;
-                    let (f, to) = c.ends();
-                    let zf = vec![Rat::zero(); o.rings()[f].width()];
-                    let zt = vec![Rat::zero(); o.rings()[to].width()];
-                    let zs = vec![Rat::zero(); c.width()];
-                    let forced = crate::hnn::propagation::transit_variation(
-                        c,
-                        o.step(),
-                        &zf,
-                        &zt,
-                        &zs,
-                        &zs,
-                        &record.displacement,
-                        &record.rate,
-                        &record.midpoint,
-                        &forms[a],
-                    )?;
-                    for (x, d) in next.arrivals[a][0].iter_mut().zip(forced.arrive_from) {
-                        *x += d;
+                            },
+                        )?;
+                        let (f, to) = c.ends();
+                        let zf = vec![Rat::zero(); o.rings()[f].width()];
+                        let zt = vec![Rat::zero(); o.rings()[to].width()];
+                        let zs = vec![Rat::zero(); c.width()];
+                        let forced = crate::hnn::propagation::transit_variation(
+                            c,
+                            o.step(),
+                            &zf,
+                            &zt,
+                            &zs,
+                            &zs,
+                            &record.displacement,
+                            &record.rate,
+                            &record.midpoint,
+                            &forms[a],
+                        )?;
+                        for (x, d) in next.arrivals[a][0].iter_mut().zip(forced.arrive_from) {
+                            *x += d;
+                        }
+                        for (x, d) in next.arrivals[a][1].iter_mut().zip(forced.arrive_to) {
+                            *x += d;
+                        }
+                        for (x, d) in next.states[a][0].iter_mut().zip(forced.displacement) {
+                            *x += d;
+                        }
+                        for (x, d) in next.states[a][1].iter_mut().zip(forced.rate) {
+                            *x += d;
+                        }
+                        let chi = sqrt_ceiling(&int(c.width()), 64)
+                            * c.chart().map_or_else(Rat::zero, |c| c.certificate.clone());
+                        let stage = &path.contacts[t][a];
+                        let e = &point_envelopes[a].stage.first * &stage.input_error
+                            + point_envelopes[a].forcing_error(&chi, stage);
+                        tube.add_material_contact_error(a, &e)?;
                     }
-                    for (x, d) in next.arrivals[a][1].iter_mut().zip(forced.arrive_to) {
-                        *x += d;
-                    }
-                    for (x, d) in next.states[a][0].iter_mut().zip(forced.displacement) {
-                        *x += d;
-                    }
-                    for (x, d) in next.states[a][1].iter_mut().zip(forced.rate) {
-                        *x += d;
-                    }
-                    let chi = sqrt_ceiling(&int(c.width()), 64)
-                        * c.chart().map_or_else(Rat::zero, |c| c.certificate.clone());
-                    let stage = &path.contacts[t][a];
-                    let e = &point_envelopes[a].stage.first * &stage.input_error
-                        + point_envelopes[a].forcing_error(&chi, stage);
-                    forcing += square(&e);
+                    trace.push((t, hom, state_norm(o, tube.radius())?));
+                    tangent = next;
+                    super::work::reached(super::work::Event::MaterialRayTick);
                 }
-                error = &self.stages.physical_ticks[t] * error + hom + sqrt_ceiling(&forcing, 64);
-                tangent = next;
-                super::work::reached(super::work::Event::MaterialRayTick);
-            }
-            Ok(out)
-        };
-        let actual = run(&self.stages.actual, &self.actual)?;
-        let fresh = run(&self.stages.fresh, &self.fresh)?;
+                Ok((out, trace))
+            };
+        let (actual, actual_trace) = run(&self.stages.actual, &self.actual)?;
+        let (fresh, fresh_trace) = run(&self.stages.fresh, &self.fresh)?;
         if actual.len() != witness.reads.len() || fresh.len() != actual.len() {
             return Err(HnnError::Unadmitted {
                 reason: "physical ray reads every original receiving station once",
@@ -748,6 +762,8 @@ impl PhysicalContactProof {
         let mut paired = Rat::zero();
         let mut class_charge = Rat::zero();
         let mut response_charge = Rat::zero();
+        let mut surrogate_response = Vec::new();
+        let mut response_component_error = Vec::new();
         for (j, ((a, ea), (s, es))) in actual.iter().zip(&fresh).enumerate() {
             let feature = s
                 .iter()
@@ -759,6 +775,7 @@ impl PhysicalContactProof {
                 .into_iter()
                 .map(|x| -x)
                 .collect::<Vec<_>>();
+            let mut row_errors = Vec::new();
             for row in 0..map.rows() {
                 let coefficients = map.row(row)?;
                 let rc = &coefficients[width..];
@@ -767,7 +784,9 @@ impl PhysicalContactProof {
                     .zip(rc)
                     .map(|(s, c)| s - c)
                     .collect::<Vec<_>>();
-                let ev = vector_norm(rc) * ea + vector_norm(&rs) * es;
+                let ev = rc.iter().zip(ea).map(|(c, e)| c.abs() * e).sum::<Rat>()
+                    + rs.iter().zip(es).map(|(c, e)| c.abs() * e).sum::<Rat>();
+                row_errors.push(ev.clone());
                 let eg = if row % 2 == 0 {
                     eps[j][row / 2].clone()
                 } else {
@@ -778,6 +797,8 @@ impl PhysicalContactProof {
                 class_charge += &eg * v[row].abs();
                 response_charge += (g.abs() + eg) * ev;
             }
+            surrogate_response.push(v);
+            response_component_error.push(row_errors);
         }
         let response_squared = self.uniform_response(witness, o, direction, extent)?;
         let discrepancy = (&stored - &paired).abs();
@@ -791,6 +812,13 @@ impl PhysicalContactProof {
             lower,
             response_squared,
             tangent_queries: 2,
+            stage_error_norms: actual_trace
+                .into_iter()
+                .map(|(t, a, b)| (true, t, a, b))
+                .chain(fresh_trace.into_iter().map(|(t, a, b)| (false, t, a, b)))
+                .collect(),
+            surrogate_response,
+            response_component_error,
         };
         let mut cache = self.cache.lock().map_err(|_| HnnError::Unadmitted {
             reason: "native immutable ray cache is available",
@@ -798,7 +826,9 @@ impl PhysicalContactProof {
         let retained = cache
             .iter()
             .flat_map(|(d, _)| d.iter().flatten().flat_map(|m| m.entries()))
-            .chain(direction.iter().flatten().flat_map(|m| m.entries()));
+            .chain(cache.iter().flat_map(|(_, r)| r.values()))
+            .chain(direction.iter().flatten().flat_map(|m| m.entries()))
+            .chain(reading.values());
         admit_extent(retained)?;
         cache.push((direction.clone(), reading.clone()));
         Ok(reading)
@@ -1147,5 +1177,60 @@ mod represented_material_ray_data {
             }
         }
         assert!(admit_extent([&Rat::new(BigInt::one() << 65_537usize, BigInt::one())]).is_err());
+    }
+    #[test]
+    fn component_tangent_radius_preserves_remote_support_and_encloses_existing_linear_action() {
+        use crate::hnn::tests::support::{contact, small_field};
+        use crate::hnn::{Constitution, Current};
+        let calls = super::super::work::process_native_calls();
+        let field = small_field(
+            &[2, 3, 5],
+            vec![contact(0, 1, 2, 0), contact(1, 2, 2, 0)],
+            2,
+        );
+        let theta =
+            Constitution::initial(&field, crate::hnn::constitution::CAMPAIGN_ONE_BUDGET).unwrap();
+        let ops = Operands::exact_at_cut(&field, &theta, &Current::at_rest(&field)).unwrap();
+        let zero = zero_state(&ops, 0);
+        let mut tube =
+            crate::hnn::prediction::charted::ResponseTube::open(&ops, &zero, &zero).unwrap();
+        let epsilon = rat(1, 1024);
+        tube.add_material_contact_error(0, &epsilon).unwrap();
+        assert!(
+            tube.add_material_contact_error(0, &-epsilon.clone())
+                .is_err()
+        );
+        let anchors = super::super::linear::junctions(&ops, &zero)
+            .unwrap()
+            .into_iter()
+            .map(|j| j.anchor)
+            .collect::<Vec<_>>();
+        assert!(
+            tube.anchors(&zero, &anchors).unwrap()[2]
+                .iter()
+                .all(Zero::is_zero),
+            "a local error is not instantly present at a remote receiver"
+        );
+        let mut point = zero.clone();
+        point.arrivals[0][1][0] = epsilon;
+        let image = super::super::linear::tick(&ops, &point, 0).unwrap();
+        let zero_image = super::super::linear::tick(&ops, &zero, 0).unwrap();
+        tube.advance(&zero, &zero_image, 0).unwrap();
+        let actual = super::super::linear::junctions(&ops, &image).unwrap();
+        let center = super::super::linear::junctions(&ops, &zero_image)
+            .unwrap()
+            .into_iter()
+            .map(|j| j.anchor)
+            .collect::<Vec<_>>();
+        let bound = tube.anchors(&zero_image, &center).unwrap();
+        assert!(actual[2].anchor.iter().any(|x| !x.is_zero()));
+        for (value, error) in actual[2].anchor.iter().zip(&bound[2]) {
+            assert!(value.abs() <= *error);
+        }
+        assert_eq!(
+            super::super::work::process_native_calls(),
+            calls,
+            "coefficient/data control opens no Word, response or return"
+        );
     }
 }
