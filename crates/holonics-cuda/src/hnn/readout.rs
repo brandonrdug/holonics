@@ -901,6 +901,10 @@ pub(crate) fn released(
     record: &ForwardRecord,
     executed: &Executed<'_>,
 ) -> Result<Released, HnnError> {
+    released_on(plan,loci,record,executed,None)
+}
+pub(crate) fn released_native(plan:&WordPlan,loci:&Loci,record:&ForwardRecord,executed:&Executed<'_>,operands:&holonics::hnn::propagation::Operands)->Result<Released,HnnError>{released_on(plan,loci,record,executed,Some(operands))}
+fn released_on(plan:&WordPlan,loci:&Loci,record:&ForwardRecord,executed:&Executed<'_>,native:Option<&holonics::hnn::propagation::Operands>)->Result<Released,HnnError>{
     let (steps, lw) = (plan.steps, plan.lw);
     let rings = plan.rings.len();
     let certificate = |pair: usize| &executed.readings[pair].certificate;
@@ -970,12 +974,15 @@ pub(crate) fn released(
     }
     // Every carried remainder, released at the word's end.
     let mut remainders: Vec<Rat> = Vec::new();
-    for ring in &plan.rings {
+    for (r,ring) in plan.rings.iter().enumerate() {
+        let anchor_increment=if let Some(o)=native{
+            let point=crossing_at(plan,record,steps-1)?;let anchors=crossing_anchors(plan,record,steps-1)?;
+            let incoming=o.incident(r).iter().map(|&a|point.arrivals[a][o.end_slot(a,r)].as_slice()).collect::<Vec<_>>();
+            let image=holonics::hnn::propagation::participation(o.weights(r),&point.storage[r],&incoming)?;
+            Some(image.iter().zip(&anchors[r]).map(|(x,a)|x-a).collect::<Vec<_>>())
+        }else{None};
         for i in 0..ring.width {
-            remainders.push(rat(
-                BigInt::from(record.rem_anchor[ring.rows + i]),
-                plan.lc + lw,
-            ));
+            remainders.push(rat(BigInt::from(record.rem_anchor[ring.rows+i]),plan.lc+lw)-anchor_increment.as_ref().map_or_else(Rat::zero,|v|v[i].clone()));
             remainders.push(rat(
                 BigInt::from(record.rem_storage[ring.rows + i]),
                 ring.storage_exp,
@@ -1021,14 +1028,15 @@ pub(crate) fn released(
         .iter()
         .map(|resonator| resonator_balance(plan, record, resonator))
         .collect::<Result<Vec<_>, _>>()?;
+    let full=native.is_some();
     Ok(Released {
-        power: power(plan, loci, &Change::after(plan, record)),
-        ticks: steps,
+        power: if full{before}else{power(plan, loci, &Change::after(plan, record))},
+        ticks: steps-usize::from(full),
         peak_bits: peak,
         balances,
-        last,
-        last_bound,
-        end: Change::after(plan, record).end(plan),
+        last:if full{Rat::zero()}else{last},
+        last_bound:if full{Rat::zero()}else{last_bound},
+        end:if full{crossing(plan,record)}else{Change::after(plan, record).end(plan)},
         remainders: Remainders::of(&remainders),
         charts: executed.readings.to_vec(),
         resonators: resonator_balances,
@@ -1073,6 +1081,17 @@ pub(crate) fn crossing_anchors(
                 .collect()
         })
         .collect())
+}
+
+/// Authentic original full-tick stage operands, decoded from the retained GPU
+/// record. No new Word, solve or inverse trajectory is executed here.
+pub(crate) fn native_path(plan:&WordPlan,record:&ForwardRecord,base:Option<&EndChange>)->Result<holonics::hnn::word::native_prediction::NativeExecutedPath,HnnError>{
+    let full=plan.steps.checked_sub(1).ok_or(HnnError::CountOverflow)?;
+    let exact_opening=match base{Some(base)=>response_openings_from(plan,record,base)?.0,None=>response_openings(plan,record)?.0};
+    let points=(0..=full).map(|t|crossing_at(plan,record,t)).collect::<Result<Vec<_>,_>>()?;
+    let anchors=(0..full).map(|t|crossing_anchors(plan,record,t)).collect::<Result<Vec<_>,_>>()?;
+    let midpoints=(0..full).map(|t|plan.contacts.iter().map(|c|slice(&record.omega,t*plan.k+c.rows,c.width).iter().map(|x|rat(BigInt::from(*x),plan.lw+c.gain_exp)).collect()).collect()).collect();
+    Ok(holonics::hnn::word::native_prediction::NativeExecutedPath{exact_opening,points,anchors,midpoints})
 }
 
 /// The exact unsplit source opening and the executed first crossing from the response record.

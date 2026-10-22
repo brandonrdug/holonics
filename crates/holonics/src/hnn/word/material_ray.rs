@@ -96,6 +96,34 @@ pub(crate) struct OriginalPairStages {
     fixed_ticks: Vec<Rat>,
 }
 impl OriginalPairStages {
+    pub(crate) fn issue_external(word:&Word<'_>,phases:&crate::hnn::receiving::ReceivingPhases,r:&super::native_execution::NativeExecutedPrediction)->Result<Self,HnnError>{
+        let o=word.operands();let full=phases.junction_steps();
+        if word.ticks()!=0||word.is_ended()||word.native_declaration_id.is_none()||o.lattice().is_none()||o.resonators().iter().any(Option::is_some)
+            ||word.complete_unrun_opening()?!=r.actual.exact_opening||r.released.balances.len()!=full||r.released.ticks!=full
+            ||r.actual.points.last()!=Some(&r.reception_end.change)||r.released.end!=r.reception_end.change||r.reception_end.ticks!=word.opened_at()+full {
+            return Err(HnnError::Unadmitted{reason:"external native stage issuer requires original complete no-loaded full-tick producer"});
+        }
+        let mut fresh=zero_state(o,word.opened_at());fresh.storage=word.response_source.as_ref().ok_or(HnnError::Unadmitted{reason:"external native producer retains its genuine fresh source"})?.clone();
+        if fresh!=r.fresh.exact_opening{return Err(HnnError::Unadmitted{reason:"external fresh path preserves actual source preparation with zero interior"});}
+        let mut remaining=super::action::NativeWorkBudget::V1.aggregate_bits;
+        let check=|s:&EndChange,remaining:&mut u64|->Result<(),HnnError>{
+            for q in s.storage.iter().flatten().chain(s.arrivals.iter().flatten().flatten()).chain(s.states.iter().flatten().flatten()).chain(s.resonators.iter().flatten().flatten().flatten()){
+                let bits=q.numer().bits()+q.denom().bits();*remaining=remaining.checked_sub(bits).ok_or(HnnError::Unadmitted{reason:"external native record finite total extent"})?;
+                if q.numer().bits()>super::action::NativeWorkBudget::V1.integer_bits||q.denom().bits()>super::action::NativeWorkBudget::V1.integer_bits{return Err(HnnError::Unadmitted{reason:"external native coordinate finite extent"});}
+            }Ok(())
+        };
+        let issue=|p:&super::native_execution::NativeExecutedPath,remaining:&mut u64|->Result<OriginalPathStages,HnnError>{
+            if p.points.len()!=full+1||p.anchors.len()!=full||p.midpoints.len()!=full{return Err(HnnError::Unadmitted{reason:"external native record retains every original full-tick stage"});}
+            check(&p.exact_opening,remaining)?;for s in &p.points{check(s,remaining)?;}
+            for q in p.anchors.iter().chain(&p.midpoints).flatten().flatten(){let bits=q.numer().bits()+q.denom().bits();*remaining=remaining.checked_sub(bits).ok_or(HnnError::Unadmitted{reason:"external native stage extent"})?;if q.numer().bits()>super::action::NativeWorkBudget::V1.integer_bits||q.denom().bits()>super::action::NativeWorkBudget::V1.integer_bits{return Err(HnnError::Unadmitted{reason:"external native stage coordinate extent"});}}
+            let mut tube=crate::hnn::prediction::charted::ResponseTube::open(o,&p.exact_opening,&p.points[0])?;let mut contacts=Vec::new();
+            for t in 0..full{contacts.push(tube.material_contact_stages(&p.points[t],&p.anchors[t],&p.midpoints[t])?);tube.advance(&p.points[t],&p.points[t+1],word.opened_at()+t)?;super::work::reached(super::work::Event::ResponseCertificateTick);}
+            Ok(OriginalPathStages{opening_norm:state_norm(o,&p.exact_opening)?,contacts})
+        };
+        let actual=issue(&r.actual,&mut remaining)?;let fresh=issue(&r.fresh,&mut remaining)?;
+        let norms=(0..full).map(|t|crate::hnn::prediction::charted::ResponseTube::physical_tick_norms(o,word.opened_at()+t)).collect::<Result<Vec<_>,_>>()?;
+        Ok(Self{declaration:word.native_declaration_id.clone().expect("admitted"),lattice:*o.lattice().expect("admitted"),opened_at:word.opened_at(),full_ticks:full,actual,fresh,physical_ticks:norms.iter().map(|x|x.0.clone()).collect(),fixed_ticks:norms.into_iter().map(|x|x.1).collect()})
+    }
     pub(crate) fn issue(word: &Word<'_>) -> Result<Self, HnnError> {
         let o = word.operands();
         if o.lattice().is_none()
@@ -264,6 +292,8 @@ impl StageEnvelope {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct FormEnvelope {
+    /// A uniform lower eigenvalue enclosure for this positive Gram form.
+    lower: Rat,
     value: Rat,
     first: Rat,
     second: Rat,
@@ -283,10 +313,21 @@ impl FormEnvelope {
             });
         }
         let v = norm(direction);
-        let f = norm(base) + eta_max * &v;
+        let base_norm=norm(base);
+        let change=eta_max*&v;
+        let f = &base_norm + &change;
+        let gram=base.multiply(&base.transpose()?)?;
+        let lower=(0..gram.rows()).map(|i|{
+            gram.get(i,i).expect("Gram diagonal").clone()
+                -(0..gram.columns()).filter(|&j|j!=i).map(|j|gram.get(i,j).expect("Gram row").abs()).sum::<Rat>()
+        }).min().unwrap_or_else(Rat::zero).max(Rat::zero());
+        // Weyl plus ||FF* - F0F0*|| <=2||F0||||DeltaF||+||DeltaF||².
+        // Positivity is still the original Gram law; no assumed contraction.
+        let lower=(lower-int(2)*&base_norm*&change-square(&change)).max(Rat::zero());
         // F F* on F(eta)=F0+eta V. A signature is not silently admitted here: m>=I
         // below requires the actual positive Gram families of the physical contact.
         Ok(Self {
+            lower,
             value: square(&f),
             first: int(2) * &f * &v,
             second: int(2) * square(&v),
@@ -304,7 +345,9 @@ impl FormEnvelope {
         }
         let mut result = Self::of(base, direction, &Rat::zero())?;
         let v = norm(direction);
-        let f = norm(base) + norm(extent);
+        let base_norm=norm(base);let change=norm(extent);
+        let f = &base_norm + &change;
+        result.lower=(result.lower-int(2)*base_norm*&change-square(&change)).max(Rat::zero());
         result.value = square(&f);
         result.first = int(2) * f * v;
         Ok(result)
@@ -317,8 +360,39 @@ struct ContactEnvelope {
     q0: Rat,
     q1: Rat,
     mu1: Rat,
+    inverse_bound: Rat,
 }
 impl ContactEnvelope {
+    /// Centered physical block bound. This observes the exact contact operator,
+    /// including cancellations in D0+J X P, rather than adding their norms. The
+    /// resolvent identity covers the ENTIRE declared factor box around that cut.
+    fn tighten_norm(&mut self, base:[&ExactRatMatrix;3], extent:[&ExactRatMatrix;3],h:&Rat,g:&Rat)->Result<(),HnnError>{
+        let n=base[0].rows();
+        // Optional tightening never turns an unaffordable block calculation into
+        // an unbounded allocation; the already-issued scalar envelope stays sound.
+        if n>super::action::NativeWorkBudget::V1.coordinates/4{return Ok(());}
+        let input_bits=base.iter().flat_map(|m|m.entries()).try_fold(0u64,|sum,q|sum.checked_add(q.numer().bits())?.checked_add(q.denom().bits()));
+        let scratch=input_bits.and_then(|bits|(n as u64).checked_pow(3)?.checked_mul(64)?.checked_mul(bits));
+        if scratch.is_none_or(|bits|bits>super::action::NativeWorkBudget::V1.aggregate_bits){return Ok(());}
+        let forms=base.iter().map(|f|f.multiply(&f.transpose()?)).collect::<Result<Vec<_>,_>>()?;
+        let identity=ExactRatMatrix::identity(n)?;
+        let m=identity.add(&forms[0].scaled(&(g/h)))?.add(&forms[2].scaled(&(g/int(2))))?.add(&forms[1].scaled(&(g*h/int(4))))?;
+        let x=m.inverse()?;
+        let p=ExactRatMatrix::new((0..n).map(|i|(0..4*n).map(|col|{
+            let k=col%n;match col/n{0=>if i==k{h.clone()}else{Rat::zero()},1=>if i==k{-h}else{Rat::zero()},2=>-square(h)*g*forms[1].get(i,k).unwrap(),_=>int(2)*g*forms[0].get(i,k).unwrap()}
+        }).collect()).collect())?;
+        let xp=x.multiply(&p)?;
+        let j=[-h.recip(),h.recip(),Rat::one()/(int(2)*h),h.recip()];
+        let l=ExactRatMatrix::new((0..4*n).map(|row|(0..4*n).map(|col|{
+            &j[row/n]*xp.get(row%n,col).unwrap()+if row==col{if row/n==3{-Rat::one()}else{Rat::one()}}else{Rat::zero()}
+        }).collect()).collect())?;
+        let df=base.iter().zip(extent).map(|(b,e)|{let e=norm(e);int(2)*norm(b)*&e+square(&e)}).collect::<Vec<_>>();
+        let dm=g/h*&df[0]+g/int(2)*&df[2]+g*h/int(4)*&df[1];
+        let dp=sqrt_ceiling(&(square(&square(h))*square(g)*square(&df[1])+int(4)*square(g)*square(&df[0])),64);
+        let perturb=&self.j*&self.inverse_bound*(dp+dm*norm(&x)*norm(&p));
+        self.stage.norm=self.stage.norm.clone().min(norm(&l)+perturb);
+        Ok(())
+    }
     fn of(forms: [FormEnvelope; 3], h: &Rat, g: &Rat) -> Result<Self, HnnError> {
         if h <= &Rat::zero() || g <= &Rat::zero() {
             return Err(HnnError::NonpositiveDeclaration);
@@ -342,10 +416,14 @@ impl ContactEnvelope {
         let mu1 = mu(&c.first, &k.first, &d.first);
         let mu2 = mu(&c.second, &k.second, &d.second);
         let j = sqrt_ceiling(&(int(13) / (int(4) * square(h))), 64);
+        let inverse_bound=Rat::one()/(Rat::one()+mu(&c.lower,&k.lower,&d.lower));
+        // X=m^-1: use the authentic uniform lower form enclosures, including
+        // every reached family. The old <=1 bound is recovered when all lower=0.
+        let v=&inverse_bound;let v2=square(v);
         let stage = StageEnvelope {
-            norm: Rat::one() + &j * &q0,
-            first: &j * (&mu1 * &q0 + &q1),
-            second: &j * ((int(2) * square(&mu1) + mu2) * &q0 + int(2) * &mu1 * &q1 + q2),
+            norm: Rat::one() + &j * v * &q0,
+            first: &j * (&v2 * &mu1 * &q0 + v * &q1),
+            second: &j * ((int(2) * &v2*v*square(&mu1)+&v2*mu2)*&q0 + int(2)*&v2*&mu1*&q1+v*q2),
         };
         Ok(Self {
             stage,
@@ -353,6 +431,7 @@ impl ContactEnvelope {
             q0,
             q1,
             mu1,
+            inverse_bound,
         })
     }
     fn forcing_error(&self, chi: &Rat, point: &OriginalContactStage) -> Rat {
@@ -383,7 +462,10 @@ pub(super) fn contact_envelope(
     ];
     // Positive Gram C/K/D imply m>=I uniformly; no chart inverse or rounded endpoint
     // is used as a substitute for this physical inverse bound.
-    Ok(ContactEnvelope::of(forms, h, g)?.stage)
+    let extent=direction.map(|v|v.scaled(eta_max));
+    let mut envelope=ContactEnvelope::of(forms,h,g)?;
+    envelope.tighten_norm(base,extent.each_ref(),h,g)?;
+    Ok(envelope.stage)
 }
 
 /// One queried direction on the original factor chart. `extent` is the jointly declared
@@ -865,7 +947,7 @@ impl PhysicalContactProof {
             .zip(extent)
             .zip(o.contacts())
             .map(|(((b, v), d), c)| {
-                ContactEnvelope::of(
+                let mut envelope=ContactEnvelope::of(
                     [
                         FormEnvelope::domain(b[0], &d[0], &v[0])?,
                         FormEnvelope::domain(b[1], &d[1], &v[1])?,
@@ -873,7 +955,9 @@ impl PhysicalContactProof {
                     ],
                     o.step(),
                     c.conductance(),
-                )
+                )?;
+                envelope.tighten_norm(*b,[&d[0],&d[1],&d[2]],o.step(),c.conductance())?;
+                Ok(envelope)
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
         let mut parallel = StageEnvelope::identity();
@@ -1232,5 +1316,28 @@ mod represented_material_ray_data {
             calls,
             "coefficient/data control opens no Word, response or return"
         );
+    }
+}
+
+#[cfg(test)]
+mod inverse_enclosure_tests {
+    use super::*;
+    #[test]
+    fn gram_lower_enclosure_retains_uniform_inverse_and_both_derivatives(){
+        let base=ExactRatMatrix::new(vec![vec![int(2),Rat::zero()],vec![Rat::zero(),int(2)]]).unwrap();
+        let direction=ExactRatMatrix::new(vec![vec![Rat::new(1.into(),8.into()),Rat::zero()],vec![Rat::zero(),Rat::new((-1).into(),8.into())]]).unwrap();
+        let f=FormEnvelope::of(&base,&direction,&Rat::one()).unwrap();
+        assert!(f.lower>Rat::zero());
+        let c=ContactEnvelope::of([f.clone(),f.clone(),f.clone()],&Rat::one(),&Rat::one()).unwrap();
+        assert!(c.inverse_bound<Rat::one());
+        let old=Rat::one()+&c.j*&c.q0;assert!(c.stage.norm<old);
+        for t in [Rat::zero(),Rat::new(1.into(),2.into()),Rat::one()]{
+            let a=base.add(&direction.scaled(&t)).unwrap();let g=a.multiply(&a.transpose().unwrap()).unwrap();
+            for i in 0..2 {assert!(g.get(i,i).unwrap()>=&f.lower);}
+        }
+        let full=ExactRatMatrix::new(vec![vec![int(4),Rat::zero()],vec![Rat::zero(),int(4)]]).unwrap();
+        assert_eq!(FormEnvelope::of(&base,&full,&Rat::one()).unwrap().lower,Rat::zero());
+        let unbounded=FormEnvelope{lower:Rat::zero(),..f};
+        assert_eq!(ContactEnvelope::of([unbounded.clone(),unbounded.clone(),unbounded],&Rat::one(),&Rat::one()).unwrap().inverse_bound,Rat::one());
     }
 }

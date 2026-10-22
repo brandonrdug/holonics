@@ -60,6 +60,13 @@ impl Reference {
         chart: NativeExecutionChart,
         bits: u32,
     ) -> Result<crate::hnn::word::native_prediction::NativePredictionWord<'a>, HnnError> {
+        self.prepare_native_current_prediction_on(resident,chart,bits,None)
+    }
+    /// Explicit real execution realization. No host forward fallback is selected.
+    pub fn prepare_native_current_prediction_with_execution<'a>(&self,resident:&'a Resident,bits:u32,execution:&dyn crate::hnn::word::native_prediction::NativePredictionExecution)->Result<crate::hnn::word::native_prediction::NativePredictionWord<'a>,HnnError>{
+        self.prepare_native_current_prediction_on(resident,NativeExecutionChart::RepresentedV1,bits,Some(execution))
+    }
+    fn prepare_native_current_prediction_on<'a>(&self,resident:&'a Resident,chart:NativeExecutionChart,bits:u32,execution:Option<&dyn crate::hnn::word::native_prediction::NativePredictionExecution>)->Result<crate::hnn::word::native_prediction::NativePredictionWord<'a>,HnnError>{
         resident.admit_no_participating_world()?;
         let represented=resident.prepared_input.as_ref().is_some_and(|p|p.work_receipt_policy().represented());
         if represented!=(chart==NativeExecutionChart::RepresentedV1) && (represented||chart==NativeExecutionChart::RepresentedV1){
@@ -128,7 +135,11 @@ impl Reference {
                 ring: phases.ring(),
             })?;
         let declaration=word.declare_native_prediction(receiver,&mut resident.native_rank.borrow_mut())?;
-        Ok(declaration.run_and_read(word,bits)?.with_prepared_cut(ratio.prepared_input().cloned()).with_charts(charts))
+        let predictor=if let Some(execution)=execution{
+            let record=execution.forward_native(field,theta,&ratio,&mut charts,&opening,declaration.phases())?;
+            declaration.read_external(word,record,bits)?
+        }else{declaration.run_and_read(word,bits)?};
+        Ok(predictor.with_prepared_cut(ratio.prepared_input().cloned()).with_charts(charts))
     }
 }
 
@@ -181,7 +192,15 @@ impl Reference {
             NativeInput::Class(class),
             bits,
             true,
+            true,
+            None,
         )
+    }
+    /// Explicit causal-control arm: consume the same actual native target return,
+    /// actual ingress and original M/lag formation, withholding only contact material
+    /// publication. No output policy/controller selects this arm implicitly.
+    pub fn observe_native_current_without_contact_material(&self,resident:&mut Resident,crib:&mut observed::ObservedCrib,pairing:&crate::hnn::paired::PairingDeclaration,class:usize,bits:u32)->Result<NativeContextEvent,HnnError>{
+        self.native_current_event(resident,crib,pairing,NativeInput::Class(class),bits,true,false,None)
     }
     /// Same F/prefix computation on a frozen forecast fork. The chosen class is a hypothesis,
     /// not a material-forming observation. Contact, receiving and M moments remain fixed.
@@ -200,7 +219,16 @@ impl Reference {
             NativeInput::Class(class),
             bits,
             false,
+            false,
+            None,
         )
+    }
+    /// Actual original contact return through an explicitly selected realization.
+    pub fn observe_native_current_contact_with_execution(&self,resident:&mut Resident,crib:&mut observed::ObservedCrib,pairing:&crate::hnn::paired::PairingDeclaration,class:usize,bits:u32,execution:&dyn crate::hnn::word::native_prediction::NativePredictionExecution)->Result<NativeContextEvent,HnnError>{
+        self.native_current_event(resident,crib,pairing,NativeInput::Class(class),bits,true,true,Some(execution))
+    }
+    pub fn continue_native_current_forecast_with_execution(&self,resident:&mut Resident,crib:&mut observed::ObservedCrib,pairing:&crate::hnn::paired::PairingDeclaration,class:usize,bits:u32,execution:&dyn crate::hnn::word::native_prediction::NativePredictionExecution)->Result<NativeContextEvent,HnnError>{
+        self.native_current_event(resident,crib,pairing,NativeInput::Class(class),bits,false,false,Some(execution))
     }
     fn native_current_event(
         &self,
@@ -210,6 +238,8 @@ impl Reference {
         choice: NativeInput<'_>,
         bits: u32,
         actual: bool,
+        publish_contact: bool,
+        execution:Option<&dyn crate::hnn::word::native_prediction::NativePredictionExecution>,
     ) -> Result<NativeContextEvent, HnnError> {
         let mut next = resident.clone();
         let mut next_crib = crib.clone();
@@ -238,11 +268,11 @@ impl Reference {
             boundary.encode(&[*class])?;
         }
         let chart = boundary.encode(&[])?;
-        let predictor = self.prepare_native_current_prediction(
+        let predictor=if let Some(execution)=execution{self.prepare_native_current_prediction_with_execution(&next,bits,execution)?}else{self.prepare_native_current_prediction(
             &next,
             if next.prepared_input.as_ref().is_some_and(|p|p.work_receipt_policy().represented()){NativeExecutionChart::RepresentedV1}else{NativeExecutionChart::ExactUnsplit},
             bits,
-        )?;
+        )?};
         let draw = match choice {
             NativeInput::Class(_) => None,
             NativeInput::Key(key) => Some(predictor.draw(0, key)?),
@@ -272,15 +302,14 @@ impl Reference {
         let lag = predictor.lagged_boundary(role)?;
         let (carry, forward, preparation) = predictor.forward_receipt()?;
         let reached_charts=predictor.prepared_charts().cloned().unwrap_or_else(||next.reception_charts());
-        let (scores, contact, material, carry, charts) = if actual {
+        let (scores, contact, material, carry, charts) = if actual && publish_contact {
             let returned = predictor.observe(&target)?;
             let scores = returned.scores().to_vec();
             let mut charts = reached_charts;
             let published = returned.publish_contact_carry(&mut charts)?;
             (scores, Some(published), None, None, charts)
         } else {
-            let scores = predictor.score(&target)?;
-            drop(predictor);
+            let scores=if actual {let returned=predictor.observe(&target)?;returned.scores().to_vec()}else{let scores=predictor.score(&target)?;drop(predictor);scores};
             (
                 scores,
                 None,
@@ -620,7 +649,7 @@ impl Reference {
                 reason: "native release is explicitly hypothetical after frozen conditioning",
             });
         }
-        self.native_current_event(resident, crib, pairing, NativeInput::Key(key), bits, false)
+        self.native_current_event(resident, crib, pairing, NativeInput::Key(key), bits, false, false,None)
     }
 }
 

@@ -107,6 +107,7 @@ pub(crate) mod endpoint;
 pub mod finite_gain;
 pub(crate) mod material_ray;
 pub mod native_prediction;
+pub mod native_execution;
 pub(crate) mod linear;
 pub mod scan;
 pub(crate) mod trajectory;

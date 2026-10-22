@@ -343,6 +343,14 @@ fn gather(field: &Field, ring: usize, k: &BigInt) -> Vec<i64> {
 impl WordPlan {
     /// **Form a word's plan** at a lift point on a publication, for a receiving epoch (module
     /// header), with the moment's count layout (its phase rows' and offset blocks' bases).
+    /// The native contact receiver keeps a FULL tick after its last read.
+    /// One extra terminal junction is executed solely to expose that endpoint;
+    /// no target or additional physical hop is inserted.
+    pub(crate) fn native_full_ticks(&mut self,full:usize)->Result<(),HnnError>{
+        if full!=self.steps||!self.resonators.is_empty(){return Err(refused("native card full-tick contract and no loaded stages"));}
+        self.steps=full.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        self.plan[WP_STEPS]=self.steps as i64;Ok(())
+    }
     pub(crate) fn form(
         field: &Field,
         current: &Current,
@@ -1929,6 +1937,7 @@ impl<'c> ResidentWord<'c> {
             .map(|lane| (&lane.plan, &lane.record))
     }
 
+    pub(crate) fn response_actual_opening(&self)->Option<&EndChange>{self.response.as_ref().and_then(|r|r.actual_opening_base.as_ref())}
     pub(crate) fn response_producing_operands(&self)->Option<&Operands>{self.response.as_ref().map(|r|&r.error_operands)}
     pub(crate) fn response_error_requested(&self)->bool {self.response.as_ref().is_some_and(|r|r.report_requested)}
     /// Real original records/operands, available only while this actual Word is retained.

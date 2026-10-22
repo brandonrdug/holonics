@@ -8,12 +8,15 @@ use crate::receiver::release::ReleaseReturn;
 use num_bigint::BigInt;
 use num_traits::One;
 
+pub use super::native_execution::{NativePredictionExecution,NativeExecutedPrediction,NativeExecutedPath,NativeExecutedReturn};
+
 pub const LAW: &str = "native-current-prediction-v1";
 pub use super::material_ray::PhysicalRayReading as NativePhysicalRayReading;
 
 /// Consumes the actual Word; callers cannot construct a face, change the predictor or rebind y.
 pub struct NativePredictionWord<'a> {
     word: Word<'a>,
+    external:Option<(NativeExecutedPrediction,super::material_ray::OriginalPairStages)>,
     prepared: Option<crate::hnn::reference::prepared_input::PreparedInputCut>,
     charts:Option<Charts>,
     phases: ReceivingPhases,
@@ -181,9 +184,25 @@ pub(crate) struct NativePredictionDeclaration{
     opening:EndChange,opened_at:usize,phases:ReceivingPhases,
 }
 impl NativePredictionDeclaration{
+    pub(crate) fn phases(&self)->&ReceivingPhases{&self.phases}
     fn admit(&self,word:&Word<'_>)->Result<(),HnnError>{
         let valid=word.native_source.as_ref().is_some_and(|(theta,current,source,_)|theta==&self.theta&&current==&self.current&&std::sync::Arc::ptr_eq(source,&self.source));
         if !valid||word.field!=&self.field||word.operands!=self.ops||word.opened_at()!=self.opened_at||!word.native_declaration_id.as_ref().is_some_and(|id|std::sync::Arc::ptr_eq(id,&self.id)){return Err(HnnError::Unadmitted{reason:"native declaration cannot rebind Word/source/current/material/clock"});}Ok(())
+    }
+    pub(crate) fn read_external<'a>(self,word:Word<'a>,record:NativeExecutedPrediction,bits:u32)->Result<NativePredictionWord<'a>,HnnError>{
+        self.admit(&word)?;
+        if !record.operands.same_native_execution(&self.ops){return Err(HnnError::NativePreparationRefusal{evidence:format!("native_realization_binding source={} commit={} operator_readings={:?} declared_readings={:?}",self.source.cells(),self.theta.commit(),record.operands.charts(),self.ops.charts()),source:Box::new(HnnError::Unadmitted{reason:"native executor preserves every original numerical operator, chart word and error certificate"})});}
+        if record.source_preparation.as_ref()!=word.source_preparation(){return Err(HnnError::NativePreparationRefusal{evidence:format!("native_preparation_binding source={} commit={} executed={:?} declared={:?}",self.source.cells(),self.theta.commit(),record.source_preparation,word.source_preparation()),source:Box::new(HnnError::Unadmitted{reason:"native executor preserves original preparation work"})});}
+        let stages=super::material_ray::OriginalPairStages::issue_external(&word,&self.phases,&record)?;
+        let theta=&word.native_source.as_ref().expect("declared producer").0;
+        let map=theta.receiving_map(self.phases.ring()).ok_or(HnnError::MissingReceivingMap{ring:self.phases.ring()})?.clone();
+        let mut faces=Vec::new();let mut features=Vec::new();
+        for t in self.phases.epochs(){
+            let a=&record.actual.anchors[t][self.phases.ring()];let f=&record.fresh.anchors[t][self.phases.ring()];
+            let mut feature=f.clone();feature.extend(a.iter().zip(f).map(|(a,f)|a-f));
+            faces.push(NativeCurrentFace::at(map.apply(&feature)?,bits)?);features.push(feature);
+        }
+        Ok(NativePredictionWord{word,external:Some((record,stages)),prepared:None,charts:None,phases:self.phases,map,faces,features})
     }
     pub(crate) fn run_and_read<'a>(self,mut word:Word<'a>,bits:u32)->Result<NativePredictionWord<'a>,HnnError>{
         self.admit(&word)?;
@@ -268,6 +287,7 @@ impl<'a> Word<'a> {
         }
         Ok(NativePredictionWord {
             word: self,
+            external:None,
             prepared: None,
             charts:None,
             phases,
@@ -278,6 +298,7 @@ impl<'a> Word<'a> {
     }
 }
 impl NativePredictionWord<'_> {
+    fn executed_ticks(&self)->usize{self.external.as_ref().map_or_else(||self.word.ticks(),|(r,_)|r.actual.points.len()-1)}
     pub(crate) fn with_charts(mut self,charts:Charts)->Self{self.charts=Some(charts);self}
     pub(crate) fn prepared_charts(&self)->Option<&Charts>{self.charts.as_ref()}
 
@@ -330,7 +351,7 @@ impl NativePredictionWord<'_> {
             theta.commit(),
             self.word
                 .opened_at()
-                .checked_add(self.word.ticks())
+                .checked_add(self.executed_ticks())
                 .ok_or(HnnError::CountOverflow)?,
             current.lift(),
             &self.features[0],
@@ -347,6 +368,11 @@ impl NativePredictionWord<'_> {
         ),
         HnnError,
     > {
+        if let Some((r,_))=&self.external{
+            let balance=WordBalance::of(&r.released);
+            if !balance.closes()||r.source_preparation.as_ref().is_some_and(|p|!p.closes()){return Err(HnnError::Unadmitted{reason:"native device full-tick and preparation balance close"});}
+            return Ok((r.reception_end.clone(),balance,r.source_preparation.clone()));
+        }
         let released = self.word.released()?;
         let balance = WordBalance::of(&released);
         if !balance.closes() {
@@ -387,7 +413,7 @@ impl NativePredictionWord<'_> {
             .collect()
     }
     pub fn observe(
-        self,
+        mut self,
         targets: &crate::hnn::encoding::Encoded,
     ) -> Result<NativePredictionReturn, HnnError> {
         let scores = self.score(targets)?;
@@ -457,21 +483,18 @@ impl NativePredictionWord<'_> {
         )?;
         let covector =
             crate::hnn::ratio::RatioCovector::native_current(&reading.waves, &phases, &stations)?;
-        let returned = self
-            .word
-            .return_contact(&covector, &self.map, &self.phases)?;
-        let cut = returned
-            .forward
-            .into_present()
-            .ok_or(HnnError::Unadmitted {
-                reason: "actual native contact cut",
-            })?;
-        let back = returned
-            .pullback
-            .into_present()
-            .ok_or(HnnError::Unadmitted {
-                reason: "actual native same-Word return",
-            })?;
+        let (cut,back)=if let Some((r,stages))=self.external.take(){
+            let cut=self.word.external_contact_cut(&r.reception_end,&r.released,self.phases.junction_steps())?;
+            let mut back=r.returned.return_native(&covector,&self.map,&self.phases)?;
+            let geometry=back.response_geometry.as_mut().ok_or(HnnError::Unadmitted{reason:"native device reverse retains paired producing geometry"})?;
+            geometry.admit_native_contact(self.word.field,&back.reads,&self.word.operands,&self.phases,self.word.opened_at())?;
+            geometry.native_material_stages=Some(stages);
+            (cut,back)
+        }else{
+            let returned=self.word.return_contact(&covector,&self.map,&self.phases)?;
+            (returned.forward.into_present().ok_or(HnnError::Unadmitted{reason:"actual native contact cut"})?,
+             returned.pullback.into_present().ok_or(HnnError::Unadmitted{reason:"actual native same-Word return"})?)
+        };
         if back.reads.iter().map(|(f, _)| f).ne(self.features.iter()) {
             return Err(HnnError::Unadmitted {
                 reason: "native return preserves complete actual/fresh producing feature",

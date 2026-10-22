@@ -52,3 +52,7 @@ mod controls;
 #[cfg(test)]
 #[path = "complete_language_observed/refusal_control.rs"]
 mod refusal_control;
+
+#[cfg(test)]
+#[path="complete_language_observed/native_material_control.rs"]
+mod native_material_control;

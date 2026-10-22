@@ -952,7 +952,7 @@ pub struct PairedReturnGeometry { field: Field, reads: Vec<(Vec<Rat>,Vec<Rat>)>,
 impl PairedReturnGeometry {
     pub(crate) fn admit_native_contact(&self,field:&Field,reads:&[(Vec<Rat>,Vec<Rat>)],operands:&crate::hnn::propagation::Operands,phases:&ReceivingPhases,opened_at:usize)->Result<(),HnnError>{
         self.admit(field,reads,field.ring(phases.ring()).width())?;
-        if &self.operands!=operands || &self.phases!=phases || self.opened_at!=opened_at {return Err(HnnError::Unadmitted{reason:"native contact actual/fresh geometry has the same original operators, frame, receiver and absolute clock"});}
+        if !self.operands.same_native_execution(operands) || &self.phases!=phases || self.opened_at!=opened_at {return Err(HnnError::Unadmitted{reason:"native contact actual/fresh geometry has the same original operators, frame, receiver and absolute clock"});}
         Ok(())
     }
     pub(crate) fn admit(&self,field:&Field,reads:&[(Vec<Rat>,Vec<Rat>)],width:usize)->Result<(),HnnError>{

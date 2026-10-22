@@ -472,6 +472,14 @@ impl<'c> Word<'c> {
 
     /// Capture the actual full-tick end before consuming this Word's adjoint. Both ordinary
     /// and continuing-material comparisons use this one producer/clock/phase admission.
+    pub(super) fn external_contact_cut(&self,carry:&ReceptionCarry,reading:&Released,full:usize)->Result<ContactCut,HnnError>{
+        let (producing,current,source,support)=self.native_source.as_ref().ok_or(HnnError::Unadmitted{reason:"external cut has actual source producer"})?;
+        let next=self.opened_at.checked_add(full).ok_or(HnnError::CountOverflow)?;
+        if self.ticks()!=0||self.native_declaration_id.is_none()||carry.ticks!=next||reading.end!=carry.change||reading.ticks!=full||reading.balances.len()!=full||!WordBalance::of(reading).closes(){return Err(HnnError::Unadmitted{reason:"external contact cut is the actual complete balanced full-tick endpoint"});}
+        if carry.conductances!=self.operands.contacts().iter().map(|c|c.conductance().clone()).collect::<Vec<_>>()||carry.momenta.len()!=self.operands.contacts().len(){return Err(HnnError::Unadmitted{reason:"external carry preserves producing contact reference"});}
+        for (a,c) in self.operands.contacts().iter().enumerate(){if c.forms().0.apply(&carry.change.states[a][1])?!=carry.momenta[a]{return Err(HnnError::Unadmitted{reason:"external contact endpoint preserves actual canonical momentum"});}}
+        Ok(ContactCut{native_declaration:self.native_declaration_id.clone(),native_prediction:None,field:self.field.clone(),producing:producing.clone(),current:current.clone(),source:source.clone(),opening_support:support.clone(),operands:self.operands.clone(),change:carry.change.clone(),opened_at:self.opened_at,next_tick:next,released:reading.remainders.clone(),deposit:None,opening:self.opened_on.clone(),landing:None,held:false})
+    }
     pub(super) fn contact_cut(&self) -> Result<ContactCut, HnnError> {
         let (producing, current, source, opening_support) =
             self.native_source.as_ref().ok_or(HnnError::Shape {

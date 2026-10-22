@@ -630,6 +630,9 @@ impl<'c> Mounted<'c> {
         self.execute_with_response_evidence(ratio,moment,publication,card,opening,demand,false)
     }
     fn execute_with_response_evidence(&mut self,ratio:&PendingRatio,moment:&MomentSnapshot<'c>,publication:&Rc<Publication<'c>>,card:&'c Card,opening:&CardOpening<'c>,response_error_requested:bool,validate_error_reference:bool)->Result<(ExecutedWord<'c>,Faces,Rc<Publication<'c>>),HnnError>{
+        self.execute_with_native_ticks(ratio,moment,publication,card,opening,response_error_requested,validate_error_reference,None)
+    }
+    fn execute_with_native_ticks(&mut self,ratio:&PendingRatio,moment:&MomentSnapshot<'c>,publication:&Rc<Publication<'c>>,card:&'c Card,opening:&CardOpening<'c>,response_error_requested:bool,validate_error_reference:bool,native_phases:Option<&ReceivingPhases>)->Result<(ExecutedWord<'c>,Faces,Rc<Publication<'c>>),HnnError>{
         let field = &self.field;
         let current = ratio.current(field)?;
         let active_publication = if ratio.view().is_whole() {
@@ -666,15 +669,16 @@ impl<'c> Mounted<'c> {
         // publication (`Loci::resonator_operands`); ring/contact chart refinement remains resident
         // below.
         let resonators = active_publication.loci.resonator_operands(field)?;
-        let plan = WordPlan::form(
+        let mut plan = WordPlan::form(
             field,
             &current,
             &active_publication,
-            ratio.phases(),
+            native_phases.unwrap_or_else(||ratio.phases()),
             moment,
             &opens,
             &resonators,
         )?;
+        if let Some(phases)=native_phases {plan.native_full_ticks(phases.junction_steps())?;}
         // A received opening's carry table and its words on the card (the reception carry).
         let (plan, carried) = opening.plan(plan, &active_publication.loci)?;
         let loci = &active_publication.loci;

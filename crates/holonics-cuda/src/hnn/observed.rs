@@ -11,6 +11,7 @@
 //! an explicit hybrid observed executor.
 
 use std::fmt;
+use num_traits::Zero;
 use std::sync::{Arc, Weak, Mutex, mpsc};
 
 use holonics::hnn::constitution::{EpochProducerRecordReading, EpochRecordFlowReading};
@@ -30,6 +31,8 @@ fn unavailable() -> HnnError {
     }
 }
 
+use holonics::hnn::word::native_prediction::{NativePredictionExecution,NativeExecutedPrediction,NativeExecutedPath,NativeExecutedReturn};
+
 type Reply<T> = mpsc::Sender<Result<T, HnnError>>;
 
 enum Request {
@@ -41,6 +44,7 @@ enum Request {
         opening: Box<WordOpening>,
         scope: Option<Arc<()>>,
         force_error_evidence: bool,
+        native_phases:Option<ReceivingPhases>,
         validate_error_reference: bool,
         reply: Reply<ForwardReading>,
     },
@@ -64,7 +68,9 @@ enum Request {
     Retire(u64),
 }
 
+struct NativeForwardParts{operands:holonics::hnn::propagation::Operands,actual:NativeExecutedPath,fresh:NativeExecutedPath}
 struct ForwardReading {
+    native:Option<NativeForwardParts>,
     source_preparation: Option<holonics::hnn::word::action::PortPreparationReceipt>,
     id: u64,
     producing_commit: u64,
@@ -82,6 +88,12 @@ struct ForwardReading {
 #[derive(Clone,Copy,Debug,Default)]
 pub struct ObservedDeviceReading {
     pub successful_forwards:u64,
+    pub successful_returns:u64,
+    pub native_dispatch_attempts:u64,
+    pub native_full_tick_forwards:u64,
+    pub native_full_tick_returns:u64,
+    pub native_reverse_launches:u64,
+    pub fresh_response_reverse_subset:u64,
     pub source_preparation_packets:u64,
     pub source_preparation_host_ns:u128,
     pub mounted_execute_ns:u128,
@@ -190,8 +202,10 @@ impl ObservedEpochDevice {
         charts: &Charts,
         opening: &WordOpening,
         scope: Option<Arc<()>>,
+        native_phases:Option<ReceivingPhases>,
     ) -> Result<ForwardReading, HnnError> {
         let (reply, result) = mpsc::channel();
+        if native_phases.is_some(){self.client.reading.lock().unwrap_or_else(|e|e.into_inner()).native_dispatch_attempts+=2;}
         self.client
             .send(Request::Forward {
                 field: Box::new(field.clone()),
@@ -200,7 +214,8 @@ impl ObservedEpochDevice {
                 charts: charts.clone(),
                 opening: Box::new(opening.clone()),
                 scope,
-                force_error_evidence: self.force_error_evidence,
+                force_error_evidence: self.force_error_evidence||native_phases.is_some(),
+                native_phases,
                 validate_error_reference:self.validate_error_reference,
                 reply,
             })
@@ -276,7 +291,7 @@ impl ObservedEpochDevice {
         opening: &WordOpening,
         scope: Option<Arc<()>>,
     ) -> Result<ObservedEpochForwardWord, HnnError> {
-        let reading = self.forward_reading(field, constitution, ratio, charts, opening, scope)?;
+        let reading = self.forward_reading(field, constitution, ratio, charts, opening, scope,None)?;
         *charts = reading.charts;
         Ok(ObservedEpochForwardWord {
             source_preparation: reading.source_preparation,
@@ -293,6 +308,24 @@ impl ObservedEpochDevice {
             reception_end: reading.reception_end,
             released: reading.released,
         })
+    }
+}
+
+impl NativeExecutedReturn for DeviceWord {
+    fn return_native(mut self:Box<Self>,covector:&RatioCovector,map:&ExactRatMatrix,phases:&ReceivingPhases)->Result<WordReturn,HnnError>{
+        let id=self.id.take().ok_or_else(unavailable)?;let(reply,result)=mpsc::channel();
+        self.client.reading.lock().unwrap_or_else(|e|e.into_inner()).native_dispatch_attempts+=2;
+        self.client.send(Request::Return{id,covector:covector.clone(),map:map.clone(),phases:phases.clone(),reply})?;
+        result.recv().map_err(|_|unavailable())?
+    }
+}
+impl NativePredictionExecution for ObservedEpochDevice{
+    fn attempted_native_operations(&self)->u64{self.realization_reading().native_dispatch_attempts}
+    fn forward_native(&self,field:&Field,constitution:&Constitution,ratio:&PendingRatio,charts:&mut Charts,opening:&WordOpening,phases:&ReceivingPhases)->Result<NativeExecutedPrediction,HnnError>{
+        let reading=self.forward_reading(field,constitution,ratio,charts,opening,None,Some(phases.clone()))?;
+        *charts=reading.charts;let native=reading.native.ok_or_else(unavailable)?;
+        Ok(NativeExecutedPrediction{operands:native.operands,actual:native.actual,fresh:native.fresh,reception_end:reading.reception_end,released:reading.released,source_preparation:reading.source_preparation,
+            returned:Box::new(DeviceWord{id:Some(reading.id),client:self.client.clone(),readings:reading.readings,passages:reading.passages})})
     }
 }
 
@@ -373,6 +406,7 @@ struct RetainedWord<'c> {
     field: Field,
     phases: ReceivingPhases,
     map: ExactRatMatrix,
+    native:bool,
 }
 
 /// Read the same displacement series as native `Word::tube_passages`, directly
@@ -578,6 +612,7 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                 opening,
                 scope,
                 force_error_evidence,
+                native_phases,
                 validate_error_reference,
                 reply,
             } => {
@@ -597,7 +632,7 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                         &field,
                         &constitution,
                         &current,
-                        ratio.phases(),
+                        native_phases.as_ref().unwrap_or_else(||ratio.phases()),
                         &charts,
                     )?;
                     let mounted = &mut mounted_scope.mounted;
@@ -615,11 +650,11 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                     let publication = Rc::clone(&mounted.publication);
                     let traffic_before=mounted.traffic();let execute_started=std::time::Instant::now();
                     let (word, faces, active) =
-                        if force_error_evidence {mounted.execute_with_response_evidence(&ratio,&moment,&publication,&card,&opening,true,validate_error_reference)?} else { mounted.execute(&ratio, &moment, &publication, &card, &opening)? };
+                        if native_phases.is_some(){mounted.execute_with_native_ticks(&ratio,&moment,&publication,&card,&opening,true,validate_error_reference,native_phases.as_ref())?}else if force_error_evidence {mounted.execute_with_response_evidence(&ratio,&moment,&publication,&card,&opening,true,validate_error_reference)?} else { mounted.execute(&ratio, &moment, &publication, &card, &opening)? };
                     let execute_ns=execute_started.elapsed().as_nanos();let traffic_after=mounted.traffic();
                     {
                         let mut m=realization.lock().unwrap_or_else(|e|e.into_inner());
-                        m.successful_forwards+=1;
+                        m.successful_forwards+=1;m.native_full_tick_forwards+=u64::from(native_phases.is_some());
                         m.source_preparation_packets+=u64::from(word.source_preparation.is_some());
                         m.source_preparation_host_ns+=word.source_preparation_host_ns;
                         m.mounted_execute_ns+=execute_ns;
@@ -648,12 +683,17 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                             .collect(),
                         readings: &word.readings,
                     };
-                    let released = readout::released(
-                        &word.word.plan,
-                        &active.loci,
-                        &word.word.record,
-                        &executed,
-                    )?;
+                    let released=if native_phases.is_some(){readout::released_native(&word.word.plan,&active.loci,&word.word.record,&executed,word.word.response_producing_operands().ok_or_else(unavailable)?)?}else{readout::released(&word.word.plan,&active.loci,&word.word.record,&executed)?};
+                    let native=if let Some(native_phases)=&native_phases{
+                        let full=native_phases.junction_steps();
+                        let operands=word.word.response_producing_operands().ok_or_else(unavailable)?.clone();
+                        let actual=readout::native_path(&word.word.plan,&word.word.record,word.word.response_actual_opening())?;
+                        let (fp,fr)=word.word.response_plan_record().ok_or_else(unavailable)?;
+                        let fresh=readout::native_path(fp,fr,None)?;
+                        if released.balances.len()!=full{return Err(unavailable());}
+                        if released.end!=reception_end.change||released.ticks!=full{return Err(unavailable());}
+                        Some(NativeForwardParts{operands,actual,fresh})
+                    }else{None};
                     let passages = executed_tube_passages(&word, &field)?;
                     let map = mounted
                         .constitution
@@ -664,6 +704,7 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                         .clone();
                     let exported_charts = mounted.store.continuing_charts()?;
                     let reading = ForwardReading {
+                        native,
                         source_preparation: word.source_preparation.clone(),
                         id,
                         producing_commit: ratio.commit(),
@@ -686,8 +727,9 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                         RetainedWord {
                             word,
                             field: *field,
-                            phases: ratio.phases().clone(),
+                            phases: native_phases.as_ref().unwrap_or_else(||ratio.phases()).clone(),
                             map,
+                            native:native_phases.is_some(),
                         },
                     );
                     Ok(reading)
@@ -711,7 +753,9 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                             reason: "the observed return preserves its producing map and receiving phases",
                         });
                     }
-                    pull_back_word(&retained.field, &mut retained.word, &covector, &phases)
+                    let back=pull_back_word(&retained.field, &mut retained.word, &covector, &phases)?;
+                    {let mut m=realization.lock().unwrap_or_else(|e|e.into_inner());m.successful_returns+=1;m.native_reverse_launches+=if retained.word.word.response_plan_record().is_some(){2}else{1};m.fresh_response_reverse_subset+=u64::from(retained.word.word.response_plan_record().is_some());m.native_full_tick_returns+=u64::from(retained.native);}
+                    Ok(back)
                 })();
                 let _ = reply.send(result);
             }

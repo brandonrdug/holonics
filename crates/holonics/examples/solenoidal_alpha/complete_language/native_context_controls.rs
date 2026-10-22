@@ -677,3 +677,151 @@ fn native_frontier_saved_source30_codec_data_only()->Result<()>{
     println!("NATIVE_SOURCE30_CODEC_DATA_PASS cumulative_moment30=true aeon_local0=true aeon_origin30_derived=true prepared_owner_preserved=true full_state_exact=true native_calls=0");
     Ok(())
 }
+
+#[test]
+#[ignore="one scoped material-causal control reusing the qualified30-class chain"]
+fn represented_native_material_response_connected()->Result<()>{material_response_connected_on(None)}
+pub(crate) fn material_response_connected_on(execution:Option<&dyn holonics::hnn::word::native_prediction::NativePredictionExecution>)->Result<()>{
+    use holonics::hnn::word::work;
+    use holonics::hnn::field::ConstitutionRead;
+    struct Meter<'a>(Option<&'a dyn holonics::hnn::word::native_prediction::NativePredictionExecution>);
+    impl Drop for Meter<'_>{fn drop(&mut self){let c=work::process_native_calls();let card=self.0.map_or(0,|e|e.attempted_native_operations());let total=c.forward_attempts+c.response_attempts+c.return_attempts+c.response_return_attempts+card;let s=format!("{{\"final\":true,\"total_attempts\":{total},\"forward_constructors\":{},\"response_companions\":{},\"actual_returns\":{},\"fresh_returns\":{},\"conservative_card_launch_attempts\":{card}}}\n",c.forward_attempts,c.response_attempts,c.return_attempts,c.response_return_attempts);println!("MATERIAL_RESPONSE_CONNECTED_COUNTS {s} work={:?}",work::read());if let Some(p)=std::env::var_os("V93_NATIVE_COUNT_PATH"){std::fs::write(p,s).unwrap();}}}
+    let _meter=Meter(execution);work::limit_process_native_attempts(std::env::var("V93_NATIVE_ATTEMPT_LIMIT")?.parse::<u64>()?-if execution.is_some(){4}else{0});
+    let started=Instant::now();let reference=port();let(field,mut initial,pairing)=declaration_with_input_context(16384,true,true)?;
+    initial.bind_family_local_receiving_return(2)?;initial.bind_bounded_receiving_representation(2)?;initial.bind_native_rational_receiving(2)?;
+    let reused=std::env::var_os("V93_REUSE_PENDING_SIX").map(std::path::PathBuf::from);
+    let (opening,mut stream)=if let Some(path)=&reused{
+        let text=std::fs::read_to_string(path.join("native.state"))?;let state=ContinuingState::from_text(&text,READ_BUDGET)?;
+        let resident=reference.mount_continued(&field,&Current::at_rest(&field),initial.clone(),&state)?;
+        assert_eq!(resident.continuing_state(0)?,state);assert_eq!(resident.native_source_frontier()?.source_cells(),6);
+        let crib=ObservedCrib::from_unplaced_checkpoint(&field,resident.current(),6,&std::fs::read_to_string(path.join("crib.txt"))?)?;
+        let stream=ObservedStream::restore_checkpoint(resident,crib,&std::fs::read_to_string(path.join("pending.txt"))?)?;
+        assert_eq!(stream.pending_classes(),&[0,1,2,3,0,1]);
+        println!("NATIVE_REUSED_AUTHENTIC_PENDING6 cold=true native_sha256={} no_replay=true",sha256(text.as_bytes())?);
+        (initial,stream)
+    }else{
+    let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
+    let empty=PairedObservation::admit(&field,resident.constitution(),&pairing)?.encode(&[])?;reference.ingest(&mut resident,None,&empty)?;
+    resident.refine_contact_grain(24)?;resident.select_represented_native_prepared_input(&pairing)?;
+    let opening=resident.constitution().clone();let stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+    (opening,stream)
+    };
+    fn cold(reference:&Reference,stream:&ObservedStream,opening:&Constitution,label:&str)->Result<ObservedStream>{
+        let state=stream.resident().continuing_state(0)?;let text=state.to_text();let parsed=ContinuingState::from_text(&text,READ_BUDGET)?;
+        let root=std::path::PathBuf::from(std::env::var("V93_CONTROL_ARTIFACT_DIR")?);let folder=root.join(label);std::fs::create_dir_all(&folder)?;
+        let crib_text=stream.crib().unplaced_checkpoint()?;let pending_text=stream.pending_checkpoint();
+        std::fs::write(folder.join("native.state"),&text)?;std::fs::write(folder.join("crib.txt"),&crib_text)?;std::fs::write(folder.join("pending.txt"),&pending_text)?;
+        std::fs::write(folder.join("opening-material.state"),opening.continuing_state(0)?.to_text())?;
+        let frontier=stream.resident().native_source_frontier()?;
+        let meta=format!("{{\"accepted\":{},\"cumulative_source\":{},\"aeon_local\":{},\"aeon_origin\":{},\"exterior_pending\":{},\"native_sha256\":\"{}\",\"crib_sha256\":\"{}\",\"pending_sha256\":\"{}\"}}\n",stream.accepted_cells()?,frontier.source_cells(),frontier.aeon_cells(),frontier.aeon_origin(),stream.pending_classes().len(),sha256(text.as_bytes())?,sha256(crib_text.as_bytes())?,sha256(pending_text.as_bytes())?);std::fs::write(folder.join("META.json"),meta)?;
+        let field=stream.resident().field();let resident=reference.mount_continued(field,&Current::at_rest(field),opening.clone(),&parsed)?;
+        assert_eq!(resident.continuing_state(0)?,state);
+        assert_eq!(resident.native_source_frontier()?,frontier);
+        let crib=ObservedCrib::from_unplaced_checkpoint(field,resident.current(),stream.crib().next_position(),&stream.crib().unplaced_checkpoint()?)?;
+        let pending=stream.pending_checkpoint();assert!(pending.starts_with("observed-stream-pending-native-represented-v1"));
+        assert!(ObservedStream::restore_checkpoint(resident.clone(),crib.clone(),&pending.replacen("observed-stream-pending-native-represented-v1","observed-stream-pending-native-rational-v1",1)).is_err());
+        let restored=ObservedStream::restore_checkpoint(resident,crib,&pending)?;assert_eq!(restored.pending_checkpoint(),pending);
+        println!("MATERIAL_RESPONSE_CONNECTED_COLD_PASS boundary={label} bytes={} pending_equal=true",text.len());Ok(restored)
+    }
+    let data:Vec<_>=(0..30).map(|i|i%4).collect();if reused.is_none(){stream.receive_native_current(&reference,&pairing,&data[..6],64)?;stream=cold(&reference,&stream,&opening,"pending-six")?;}
+    let at6=stream.resident().continuing_state(0)?;let pending6=stream.pending_checkpoint();
+    // Print only existing reached readings; no diagnostic Word or inverse trajectory.
+    let first=stream.receive_native_current_diagnosed(&reference,&pairing,&data[6..10],64,&mut|e|{
+        let bits=e.prediction.features.iter().flatten().map(|q|q.numer().bits().max(q.denom().bits())).max().unwrap_or(0);
+        println!("MATERIAL_RESPONSE_CONNECTED_SOURCE source={} commit={} feature_max_bits={bits} lattice={:?} work={:?}",e.prediction.source_cells,e.prediction.producing_commit,e.prediction.execution_lattice,e.preparation.as_ref().map(|p|&p.work));
+    });
+    let first=match first{Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,at6);assert_eq!(stream.pending_checkpoint(),pending6);println!("MATERIAL_RESPONSE_CONNECTED_REFUSAL boundary=first-R rollback_exact=true error={e:?}");return Err(e.into());}};
+    assert_eq!(first.len(),1);assert_eq!(first[0].publication_source,9);assert!(first[0].blind_carry_preserved);
+    assert!(stream.resident().constitution().receiving_map(2).unwrap().entries().iter().any(|q|!num_traits::Zero::is_zero(q)));
+    println!("MATERIAL_RESPONSE_CONNECTED_FIRST_R_PASS publication={:?}",first[0].publication);
+    stream=cold(&reference,&stream,&opening,"post-first-R")?;
+    let at10=stream.resident().continuing_state(0)?;let pending10=stream.pending_checkpoint();let theta10=stream.resident().constitution().clone();
+    let mut without=stream.resident().clone();let mut without_crib=stream.crib().clone();
+    let mut card=execution.map(|_|(stream.resident().clone(),stream.crib().clone()));
+
+    let contact=match stream.observe_native_current_contact(&reference,&pairing,data[10],64){Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,at10);assert_eq!(stream.pending_checkpoint(),pending10);println!("MATERIAL_RESPONSE_CONNECTED_REFUSAL boundary=contact10to11 rollback_exact=true error={e:?}");return Err(e.into());}};
+    let p=contact.contact.as_ref().ok_or("actual new represented contact owner")?;let proof=p.physical_reference.as_ref().ok_or("physical-reference witness")?;
+    let mut actual_delta=Vec::new();
+    for a in 0..field.contacts().len(){
+        let before=[theta10.contact_storage(a),theta10.contact_stiffness(a),theta10.contact_dissipation(a)];
+        let after=[p.constitution.contact_storage(a),p.constitution.contact_stiffness(a),p.constitution.contact_dissipation(a)];
+        for family in 0..3{actual_delta.push((a,family,before[family].clone(),after[family].clone(),after[family].subtract(before[family])?));}
+    }
+    let moved=actual_delta.iter().any(|(_,_,_,_,d)|d.entries().iter().any(|q|!num_traits::Zero::is_zero(q)));
+    let before_scales=(0..field.contacts().len()).map(|a|(a,theta10.contact_scales(a).clone())).collect::<Vec<_>>();
+    let after_scales=(0..field.contacts().len()).map(|a|(a,p.constitution.contact_scales(a).clone())).collect::<Vec<_>>();
+    let contact_carry=|theta:&Constitution|theta.carried_remainders().into_iter().filter(|(l,..)|matches!(l,holonics::hnn::constitution::Locus::Channel(_))).collect::<Vec<_>>();
+    let packet=format!("MATERIAL_RESPONSE_CONNECTED_CONTACT_PACKET original_prediction={:?} current_after={:?} full_actual_factor_delta={actual_delta:?} before_scales={before_scales:?} after_scales={after_scales:?} before_contact_carry={:?} after_contact_carry={:?} publication={:?} physical_reference={proof:?} continuation={:?} input={:?}\n",contact.prediction,stream.resident().current(),contact_carry(&theta10),contact_carry(&p.constitution),p.publication,p.continuation,contact.input);
+    println!("{packet}");let root=std::path::PathBuf::from(std::env::var("V93_CONTROL_ARTIFACT_DIR")?);std::fs::create_dir_all(&root)?;std::fs::write(root.join("contact_packet.txt"),packet)?;
+    // Continuity is distinct from the stronger positive-material influence requirement.
+    if moved{assert!(proof.lower>integer(0));assert!(p.actual_alignment>p.actual_error_charge);}
+    else{assert_eq!(proof.stored_pairing,integer(0));assert_eq!(proof.lower,integer(0));}
+    assert_eq!(stream.accepted_cells()?,11);assert_eq!(stream.resident().prepared_input().unwrap().frontiers(),(11,0,0));
+    println!("MATERIAL_RESPONSE_CONNECTED_CONTACT_VERDICT outcome={} positive_material_influence={} selected_steps={} vanished={:?} retained_tails={} released_tails={} original_positive_motion_fixture_unchanged=true",if moved{"Applied"}else{"NoRealizedMotion"},moved,p.publication.steps.len(),p.publication.vanished,p.publication.unresolved_contact_material.len(),p.publication.released.len());
+    // Matched causal intervention, not another training observation into the trunk:
+    // this fork consumes the same original y/Word reverse and M formation, while
+    // withholding ONLY C/K/D publication. Subsequent class is fixed by the fixture.
+    let no_update=reference.observe_native_current_without_contact_material(&mut without,&mut without_crib,&pairing,data[10],64)?;
+    assert_eq!(contact.prediction,no_update.prediction);
+    assert_eq!(without.current(),stream.resident().current());
+    let id=without.continuing().unwrap().0;let uid=stream.resident().continuing().unwrap().0;
+    assert_eq!(without.moment(&id),stream.resident().moment(&uid));
+    assert_eq!(without.constitution().receiving_map(2),stream.resident().constitution().receiving_map(2));
+    assert_eq!(without.prepared_input().unwrap().material(),stream.resident().prepared_input().unwrap().material());
+    let mut learned=stream.resident().clone();let mut learned_crib=stream.crib().clone();
+    learned.freeze_prepared_forecast()?;without.freeze_prepared_forecast()?;
+    learned.begin_hypothesized_output()?;without.begin_hypothesized_output()?;
+    let learned_material=learned.constitution().clone();let no_update_material=without.constitution().clone();
+    let learned_future=reference.continue_native_current_forecast(&mut learned,&mut learned_crib,&pairing,data[11],64)?;
+    let no_update_future=reference.continue_native_current_forecast(&mut without,&mut without_crib,&pairing,data[11],64)?;
+    assert_eq!(learned_future.selected_class,no_update_future.selected_class);
+    assert_eq!(learned.constitution(),&learned_material);assert_eq!(without.constitution(),&no_update_material);
+    let changed_wave=learned_future.prediction.waves!=no_update_future.prediction.waves;
+    let separated=learned_future.prediction.masses.iter().flatten().zip(no_update_future.prediction.masses.iter().flatten()).any(|(a,b)|a.upper<b.lower||b.upper<a.lower);
+    let causal=format!("MATERIAL_RESPONSE_CAUSAL actual_source_cut=10 actual_class={} next_identical_hypothesis={} receiving_map_equal=true source_moment_equal=true M_equal=true material_changed={moved} future_wave_changed={changed_wave} probability_interval_separated={separated}\nupdated={:?}\nwithout_CKD_update={:?}\nupdated_end={:?}\nwithout_update_end={:?}\n",data[10],data[11],learned_future.prediction,no_update_future.prediction,learned.carried(),without.carried());
+    println!("{causal}");std::fs::write(root.join("causal_response.txt"),causal)?;
+    if let (Some(execution),Some((card,crib)))=(execution,card.as_mut()){
+        let start=Instant::now();
+        let result=reference.observe_native_current_contact_with_execution(card,crib,&pairing,data[10],64,execution);
+        println!("NATIVE_CARD_CONTACT_RESULT elapsed_ns={} result={:?}",start.elapsed().as_nanos(),result.as_ref().map(|e|(&e.prediction,&e.forward,e.contact.as_ref().map(|c|(&c.publication,&c.physical_reference,&c.continuation)))));
+        let card_event=result?;
+        assert_eq!(card_event.prediction,contact.prediction,"same actual/fresh native F, not legacy Faces");
+        assert_eq!(card_event.scores,contact.scores);assert_eq!(card_event.preparation,contact.preparation);
+        assert_eq!(card.constitution(),stream.resident().constitution(),"complete physical and receiving material, not just selected class");
+        assert_eq!(card.carried(),stream.resident().carried(),"actual full-tick canonical continuation");
+        assert_eq!(card.prepared_input().unwrap().material(),stream.resident().prepared_input().unwrap().material());
+        assert_eq!(card.continuing_state(0)?,stream.resident().continuing_state(0)?,"full native/M/carry/source state parity");
+        println!("NATIVE_CARD_CONTACT_PARITY_PASS actual_fresh_F=true same_retained_card_return=true full_material_carry_M_source_state_equal=true actual_target_ingress_once=true");
+    }
+    stream=cold(&reference,&stream,&opening,"post-contact-source11")?;
+    for (label,start,end) in [("next-R",11,20),("source30-close",20,30)]{
+        let before=stream.resident().continuing_state(0)?;let pending=stream.pending_checkpoint();
+        let outcome=stream.receive_native_current_diagnosed(&reference,&pairing,&data[start..end],64,&mut|e|{
+            let bits=e.prediction.features.iter().flatten().map(|q|q.numer().bits().max(q.denom().bits())).max().unwrap_or(0);
+            println!("MATERIAL_RESPONSE_CONNECTED_SOURCE source={} commit={} feature_max_bits={bits}",e.prediction.source_cells,e.prediction.producing_commit);
+        });
+        let sections=match outcome{Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,before);assert_eq!(stream.pending_checkpoint(),pending);println!("MATERIAL_RESPONSE_CONNECTED_REFUSAL boundary={label} rollback_exact=true error={e:?}");return Err(e.into());}};
+        assert_eq!(sections.len(),1);assert_eq!(sections[0].publication_source,end as u64-1);assert!(sections[0].blind_carry_preserved);
+        if end==30{assert!(sections[0].aeon_closed);}
+        println!("MATERIAL_RESPONSE_CONNECTED_SECTION_PASS boundary={label} publication={:?}",sections[0].publication);
+    }
+    let retained=stream.resident().continuing_state(0)?;let cold=cold(&reference,&stream,&opening,"final-source30")?;
+    let(mut a,mut ac)=stream.native_current_query_fork(&reference,&pairing,64)?;let(mut b,mut bc)=cold.native_current_query_fork(&reference,&pairing,64)?;
+    a.begin_hypothesized_output()?;b.begin_hypothesized_output()?;let theta=a.constitution().clone();let m=a.prepared_input().unwrap().material().clone();
+    let frozen_origin=a.native_source_frontier()?;
+    assert_eq!((frozen_origin.source_cells(),frozen_origin.aeon_cells(),frozen_origin.aeon_origin()),(30,0,30));
+    for(index,key)in [rat(1,7),rat(2,7),rat(3,7),rat(4,7)].into_iter().enumerate(){
+        let x=reference.release_native_current_forecast(&mut a,&mut ac,&pairing,&key,64)?;let y=reference.release_native_current_forecast(&mut b,&mut bc,&pairing,&key,64)?;
+        assert_eq!(x.prediction,y.prediction);assert_eq!(x.selected_class,y.selected_class);assert_eq!(a.carried(),b.carried());
+        let af=a.native_source_frontier()?;assert_eq!(af,b.native_source_frontier()?);
+        assert_eq!(x.prediction.source_cells,30+index as u64);
+        assert_eq!((af.source_cells(),af.aeon_cells(),af.aeon_origin()),(31+index as u64,1+index as u64,30));
+        assert_eq!(a.prepared_input().unwrap().frontiers(),(30,0,1+index as u64));
+        assert_eq!(a.prepared_input().unwrap().frontiers(),b.prepared_input().unwrap().frontiers());
+        assert_eq!(a.constitution(),&theta);assert_eq!(b.constitution(),&theta);assert_eq!(a.prepared_input().unwrap().material(),&m);assert_eq!(b.prepared_input().unwrap().material(),&m);
+        println!("MATERIAL_RESPONSE_CONNECTED_FROZEN_PASS decision={index} key={key} class={} cumulative={} aeon_local={} aeon_origin={} actual_frontier=30 M_R_frozen=true",x.selected_class,af.source_cells(),af.aeon_cells(),af.aeon_origin());
+    }
+    assert_eq!(stream.resident().continuing_state(0)?,retained);
+    println!("MATERIAL_RESPONSE_CONNECTED_COMPLETE_PASS continuity=true positive_material_influence={moved} actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true causal_wave_changed={changed_wave} causal_probability_separated={separated} unsplit_trajectory_equivalence=false elapsed_ns={}",started.elapsed().as_nanos());
+    assert!(moved&&changed_wave&&separated,"continuity alone does not establish contact-material causal influence");Ok(())
+}

@@ -944,6 +944,17 @@ pub fn junction_weights(
 }
 
 impl Operands {
+    /// Native realization binding: retain EVERY numerical operator, solve word,
+    /// lattice, frame, target and inverse-error certificate. Only exterior chart
+    /// preparation diagnostics (seed/reuse label, step count, cost) may differ.
+    pub(crate) fn same_native_execution(&self,other:&Self)->bool{
+        let mut a=self.clone();let mut b=other.clone();
+        let same=|a:&Option<ChartReading>,b:&Option<ChartReading>|match(a,b){(None,None)=>true,(Some(a),Some(b))=>a.key==b.key&&a.width==b.width&&a.certificate==b.certificate&&a.target==b.target,_=>false};
+        if a.rings.len()!=b.rings.len()||a.contacts.len()!=b.contacts.len(){return false;}
+        for(a,b)in a.rings.iter_mut().zip(&mut b.rings){if !same(&a.chart,&b.chart){return false;}a.chart=None;b.chart=None;}
+        for(a,b)in a.contacts.iter_mut().zip(&mut b.contacts){if !same(&a.chart,&b.chart){return false;}a.chart=None;b.chart=None;}
+        a==b
+    }
     /// **The operands at the cut** `(Θ, λ)` on the field's declared word: each contact's exponent
     /// from the pair quadrance of its rings' screws at `λ`, each ring's sheet classes from the
     /// standing contrast `Δ_r = Σ_(a∋r) U_(r←a) q_(other end) − q_r`, the constitution's factors,
@@ -1824,4 +1835,22 @@ pub fn gram(factor: &ExactRatMatrix) -> Result<ExactRatMatrix, HnnError> {
         }
     }
     Ok(ExactRatMatrix::shaped(n, n, values)?)
+}
+
+#[cfg(test)]
+mod native_execution_identity_tests{
+    use super::*;
+    #[test]
+    fn numerical_identity_keeps_operator_and_error_but_not_preparation_cost(){
+        use crate::hnn::tests::support::{small_field,contact};
+        let field=small_field(&[2,3],vec![contact(0,1,2,0)],1);
+        let theta=crate::hnn::constitution::Constitution::initial(&field,crate::hnn::constitution::CAMPAIGN_ONE_BUDGET).unwrap();
+        let mut a=Operands::exact_at_cut(&field,&theta,&Current::at_rest(&field)).unwrap();
+        a.rings[0].chart=Some(ChartReading{key:crate::hnn::chart::ChartKey::Ring(0),width:a.rings[0].width(),certificate:crate::ratio::rat(1,32),target:crate::ratio::rat(1,4),steps:2,start:crate::hnn::chart::ChartStart::Transpose,operator:None});
+        let mut b=a.clone();let r=b.rings[0].chart.as_mut().unwrap();r.steps=0;r.start=crate::hnn::chart::ChartStart::Warm;
+        assert_ne!(a,b);assert!(a.same_native_execution(&b));
+        let mut bad=b.clone();bad.weights[0][0]+=crate::ratio::integer(1);assert!(!a.same_native_execution(&bad));
+        let mut bad=b.clone();bad.rings[0].chart.as_mut().unwrap().certificate=crate::ratio::rat(1,16);assert!(!a.same_native_execution(&bad));
+        let mut bad=b.clone();bad.rings[0].solve=Solve::exact(&ExactRatMatrix::identity(a.rings[0].width()).unwrap()).unwrap();assert!(!a.same_native_execution(&bad));
+    }
 }

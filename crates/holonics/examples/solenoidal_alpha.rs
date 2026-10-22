@@ -2114,3 +2114,8 @@ pub fn code_adaptive_receiving_late_rollback(execution:&dyn holonics::hnn::refer
 pub fn code_durable_continuation(execution:&dyn holonics::hnn::reference::observed::ObservedEpochExecution,backend:CompleteLanguageTrainingBackend,path:&std::path::Path)->std::result::Result<(Vec<u8>,String),Box<dyn std::error::Error>> {
     complete_language::code_durable_continuation(execution,backend,path)
 }
+
+#[cfg(test)]
+pub(crate) fn code_native_material_response_device(execution:&dyn holonics::hnn::word::native_prediction::NativePredictionExecution)->Result<()>{
+    complete_language::native_context_controls::material_response_connected_on(Some(execution))
+}
