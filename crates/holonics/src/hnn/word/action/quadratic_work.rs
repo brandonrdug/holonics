@@ -118,7 +118,15 @@ impl SourceClassPreparation{
     pub(crate) fn apply_quadratic<'c>(self,baseline:Word<'c>,control:&[Rat],max_abs_work:&Rat,rational_bits:u64,policy:NativeWorkBudget)->Result<(Word<'c>,PortPreparationReceipt),HnnError>{
         if !self.producer.matches(&baseline)||baseline.ticks()!=0||baseline.is_ended()||baseline.complete_unrun_opening()?!=self.producer.opening{return Err(HnnError::Unadmitted{reason:"class quadratic control consumes its whole unrun native source opening"});}
         self.boundary.check_material(&self.producer.constitution)?;
-        admit_control(self.producer.source.cells(),self.producer.constitution.commit(),self.preparation.ring,self.producer.opened_at,self.preparation.controls(),control,max_abs_work,rational_bits)?;
+        if let Err(source)=admit_control(self.producer.source.cells(),self.producer.constitution.commit(),self.preparation.ring,self.producer.opened_at,self.preparation.controls(),control,max_abs_work,rational_bits){
+            let qs=self.preparation.map.entries().iter().chain(self.producer.opening.storage[self.preparation.ring].iter());
+            let bits=qs.fold(0u64,|s,q|s.saturating_add(q.numer().bits()).saturating_add(q.denom().bits())).saturating_add(self.producer.current.lift().iter().map(|x|x.bits()).sum::<u64>());
+            let evidence=if bits<=NativeWorkBudget::V1.aggregate_bits && self.preparation.map.entries().len()<=4096{
+                let k=PowerForm::read(baseline.field,&self.producer.constitution,&self.producer.current).and_then(|f|metric(&f,self.preparation.ring,&mut Arithmetic::new(policy)?));
+                format!("kind=authentic_source_geometry source={} commit={} ring={} lift={:?} B={:?} old={:?} metric={:?} coordinate_bits={} max_abs_work={} native_policy={:?} operand_bits={bits}",self.producer.source.cells(),self.producer.constitution.commit(),self.preparation.ring,self.producer.current.lift(),self.preparation.map,self.producer.opening.storage[self.preparation.ring],k,rational_bits,max_abs_work,policy)
+            }else{format!("authentic_source_geometry diagnostic_extent_refused bits={bits}")};
+            return Err(HnnError::NativePreparationRefusal{source:Box::new(source),evidence});
+        }
         let form=PowerForm::read(baseline.field,&self.producer.constitution,&self.producer.current)?;
         let witness=Witness::issue(&self.producer,&self.preparation,control,&form,&baseline,policy)?;
         let mut admitted=witness.admit(&self.producer,&self.preparation,control,&form,&baseline,max_abs_work,rational_bits)?;

@@ -458,6 +458,9 @@ pub enum HnnError {
     Crib { cells: usize, offset: usize },
     #[error("native receiving section refused: {source}; evidence: {evidence:?}")]
     NativeEpochRefusal { source:Box<HnnError>, evidence:Box<reference::observed::EpochStageRefusal> },
+    /// Bounded exterior operands preserve the original operative refusal.
+    #[error("native preparation refused: {source}; source operands: {evidence}")]
+    NativePreparationRefusal {source:Box<HnnError>,evidence:String},
     #[error("NativeRationalMomentsV1 extent: integer {integer_bits}/{integer_limit} bits, aggregate {aggregate_bits}/{aggregate_limit} bits")]
     NativeRationalExtent { integer_bits:u64, integer_limit:u64, aggregate_bits:u64, aggregate_limit:u64 },
     #[error(

@@ -65,7 +65,11 @@ impl Reference {
             )?,
         };
         if let Some(cut) = ratio.prepared_input() {
-            word = cut.apply(field, theta, &ratio, word)?;
+            word = cut.apply(field, theta, &ratio, word).map_err(|source|{
+                if matches!(&source,HnnError::NativePreparationRefusal{..}){
+                    HnnError::NativePreparationRefusal{evidence:resident.prepared_input.as_ref().expect("same admitted input owner").native_refusal_reading(cut),source:Box::new(source)}
+                }else{source}
+            })?;
         } else {
             word.bind_source_producer(theta, &resident.current, Arc::new(ratio.moment().clone()))?;
         }

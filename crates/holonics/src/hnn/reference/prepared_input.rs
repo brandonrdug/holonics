@@ -234,6 +234,15 @@ impl PreparedInputState {
     pub fn source_cells(&self) -> u64 {
         self.training + self.conditioning + self.generated
     }
+    /// No new observation, solve or Word: bounded copy of the actual contraction's inputs.
+    pub(crate) fn native_refusal_reading(&self,cut:&PreparedInputCut)->String{
+        let m=match self.material.part(cut.framing){Ok(m)=>m,Err(e)=>return format!("material diagnostic unavailable: {e:?}")};
+        let bits=m.applied().iter().flatten().flat_map(|z|z.iter()).chain(cut.feature.iter().flatten().flat_map(|z|z.iter())).chain(cut.control.iter().flatten()).chain(std::iter::once(&cut.context)).chain(std::iter::once(m.coefficient_error_upper())).chain(std::iter::once(m.target_energy())).chain(cut.lagged.iter().flat_map(|l|l.contrast.iter())).fold(0u64,|s,q|s.saturating_add(q.numer().bits()).saturating_add(q.denom().bits()));
+        let bits=bits.saturating_add(cut.lift.iter().map(|x|x.bits()).sum::<u64>()).saturating_add(cut.lagged.iter().flat_map(|l|l.lift.iter()).map(|x|x.bits()).sum::<u64>());
+        if bits>1_048_576||cut.boundary_identity.len()>65536||m.applied().iter().map(Vec::len).sum::<usize>()>4096{return format!("material diagnostic extent refused bits={bits}");}
+        let lag=cut.lagged.as_ref().map(|l|(l.receiver,l.source_cells,l.commit,l.tick,&l.lift,&l.contrast,l.role,l.field.rings().iter().map(|r|r.period()).collect::<Vec<_>>()));
+        format!("kind=original_material_contraction schema={} source={} commit={} lift={:?} framing={:?} history={:?} lag={lag:?} scalar_open_context={} feature={:?} control={:?} M={:?} M_observations={} coefficient_error={} target_energy={} boundary={} coordinate_bits={} max_abs_work={} material_bounds={:?} numeric_bits={bits}",self.law(),cut.source_cells,cut.commit,cut.lift,cut.framing,cut.history,cut.context,cut.feature,cut.control,m.applied(),m.observations(),m.coefficient_error_upper(),m.target_energy(),cut.boundary_identity,cut.rational_bits,cut.max_abs_work,self.bounds)
+    }
     pub(crate) fn seal(
         &self,
         field: &Field,
