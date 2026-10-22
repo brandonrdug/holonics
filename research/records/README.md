@@ -27,7 +27,7 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
-- [Represented native contact: physical-reference first variation](2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md): original held opening and paired stage/tangent/return error; first R and cold pass, fresh contact bound refuses, component-radius refinement is data-qualified but not yet native-qualified.
+- [Represented native contact: physical-reference first variation and October22 closeout](2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md): `ef08972` passes30-class host continuity and four frozen warm/cold decisions; contact realizes zero factor motion with96 released tails. CUDA and useful language remain unqualified. Links the completed136-record old-law campaign, canonical Claude audit and remaining D6–D8 dependencies.
 
 - [Native R publishes at the original final Word](2026-10-22_NATIVE_R_PUBLISHES_AT_THE_ORIGINAL_FINAL_WORD.md): first actual R publication and31 map coordinates pass; post-R cold stops at the legacy Gram lattice check; scoped correction is compile-only.
 

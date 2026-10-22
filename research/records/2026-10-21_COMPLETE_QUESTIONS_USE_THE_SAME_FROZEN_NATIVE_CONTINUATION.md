@@ -13,3 +13,12 @@ integrity, resource and canonical-order checks. The training executable remains
 the sealed durable-stage source87ef7a2; no learner or checkpoint codec changes.
 Finite CODE evidence lives outside the repository; no dataset execution is
 part of these controls. Full consumer formalization remains owed in #62.
+
+
+### Dated successor status, October22
+
+The historical proposal/qualification boundaries above remain preserved. The
+[represented-contact closeout](2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md#campaign-and-architectural-boundary)
+records the completed136-record old-law campaign and the separate `ef08972` host
+continuity result, with pinned evidence and explicit unproved material/CUDA/language
+claims. Its canonical Claude-audit reference avoids a second architecture synthesis.

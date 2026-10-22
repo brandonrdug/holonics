@@ -365,7 +365,27 @@ The reusable hearing, carry-word and scale-zeta laws live in `Foundation/Fractal
 [Record](research/records/2026-09-25_THE_MUSIC_IS_IN_THE_HOLES_HEARING_MULTIPLIES_BY_ZETA_AND_A_QUASICRYSTAL_IS_A_HELIX_THAT_NEVER_LOCKS.md).
 `Holonics.Framework.Objects` and the [expression atlas](docs/atlas/README.md) locate their owners.
 
-## Isolated native-current repair, 2026-10-21
+## Native-current position, 2026-10-22
+
+Source `ef08972f4c6ffdeb39fafa0a9db79303aa197c11` passes the unchanged30-class
+host sequence through pending-six cold, R10, actual contact, R20, source30 close,
+final cold and four matching frozen warm/cold decisions. Counter domains now retain
+cumulative SourceMoment history and explicit aeon origin. The contact realizes **zero
+C/K/D factor motion**:96 tails released,0retained; normalization statistics advance.
+Positive contact-material influence, the new CUDA witness/path and useful language remain
+unqualified. See the [represented-contact closeout](research/records/2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md#october-22-closeout-host-continuity-passes-material-influence-remains-separate)
+and its compact source/evidence receipt. Prior milestones below are historical statuses.
+
+The preceding old-law136-record campaign completed73,580 unique bytes/294,320 base-four
+classes in eight durable stages with0pending; all eight outputs completed but were
+incoherent nonanswers. This completes that coverage target, not useful language or the
+new native predictor. The same closeout links its durable/full-question consumers and
+pins the complete private result. Canonical design recovery remains the design owner's
+Claude return audit, whose identity is pinned there. No branch/source merge, experiment
+restart or claim that depth-six alone explains the failure follows from this update.
+D6–D8/general E, participation/value/frame and branch/topology/ecology joins remain open.
+
+## Historical initial native-current repair, 2026-10-21
 
 The a28 descendant has a private native-current F producer, source-bound paired contact/error witness and a versioned fresh90-feature lagged-context consumer. This is partial host CODE work, not a qualified model path. Native R section publication, card chart/propagation witness, full model-law dispatch and integrated cold continuity remain unjoined. See [the exact status](research/records/2026-10-21_NATIVE_CURRENT_PREDICTION_AND_PAIRED_CONTACT_REMAIN_A_PARTIAL_JOIN.md); prior campaign evidence is preserved and no new training has run.
 

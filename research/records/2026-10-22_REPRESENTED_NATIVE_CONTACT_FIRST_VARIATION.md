@@ -103,3 +103,75 @@ measured (96earlierdata +153connected), and no reservation is recycled. All comp
 process groups have empty cleanup receipts. Final five-data test and the final connected
 executable build pass; the final component executable is UNRUN. No further unchanged check,
 native prefix, GPU, model/data run or deadline extension occurs in this phase.
+
+
+## October 22 closeout: host continuity passes, material influence remains separate
+
+[measured] Source `ef08972f4c6ffdeb39fafa0a9db79303aa197c11`, tree
+`71041d59e8da7436f5666d7cd6d70f7d49494f5c`, now passes the unchanged connected
+30-class **host** control: pending-six cold → first R10 → post-R cold → actual
+contact10-to11 → source11 cold → R20 → R30/real close → final cold → four matching
+warm/cold frozen decisions. Keys `1/7,2/7,3/7,4/7` select classes `0,1,1,2`;
+cumulative counts31–34, aeon-local1–4 and explicit origin30 agree. M/R remain frozen
+on the hypothetical forks and the actual source30 owner stays unchanged. Two selected
+counter/codec data controls pass. Counter repair preserves cumulative SourceMoment
+history, original return/Word identity and the legacy aeon-local `continuing()` contract;
+the saved format is unchanged. Earlier stopped boundaries above remain historical evidence,
+not the current qualification verdict.
+
+[measured] Contact admission is **NoRealizedMotion**, not witness refusal. All96 C/K/D
+factor-delta entries are zero. Six selected step exponents are
+`−52,−42,−43,−45,−37,−37`; on lattice29 the first fine unit is `2^-30`. All96 nonzero
+proposed updates are below half that unit and released; retained factor tails0.
+Normalization scales advance. This is not R-held Gram/news accumulation. Positive
+contact-material influence and its future-F consequence remain unproved; neither
+continuity nor successful no-motion publication establishes useful learning.
+
+The actual contact packet and complete saved native/M,crib,pending,opening payloads
+at6/10/11/30 are byte-identical to the preceding invocation. No missing failed packet
+was reconstructed. Native walltime10,645,266,043ns and493/640 reserved attempts;
+phase charge174,218,452,765/240,000,000,000ns, cleanupempty. Filter/path failures and
+the earlier stopped build remain in private custody. The earlier120-second phase's
+2,982,173,456ns reporting overrun remains recorded; budgets are not pooled or reset.
+The original positive-motion assertion failure is preserved and has not been relabeled.
+See [compact closeout receipt](receipts/2026-10-22_NATIVE_HOST_CONTINUITY/CLOSEOUT.json).
+No GPU, dataset, training or useful-language result belongs to this qualification.
+
+## Campaign and architectural boundary
+
+[measured] The earlier, different-law durable campaign completed one model over136
+complete GSM8K records,73,580 unique bytes,one pass/294,320 base-four classes in eight
+stages, ending294,320 accepted/published and0pending. It recorded29,392 Applied R
+updates and40 Held outcomes. All eight128-byte outputs completed and were valid ASCII
+but incoherent nonanswers; six were identical. The [durable-stage owner](2026-10-21_DURABLE_TRAINING_STAGES_CONTINUE_THE_SAME_NATIVE_OWNER.md)
+and [full-question driver](2026-10-21_COMPLETE_QUESTIONS_USE_THE_SAME_FROZEN_NATIVE_CONTINUATION.md)
+are the campaign's consumers. Training source `87ef7a2d714a591d4c53f949a46b5a1b7b78c20a`,
+reader `eb83bf4855dcbb9d86fdfbb0b1e53b5c3b5ed321`, checkpoint
+`f5835ead167473923f0101c65fdb5c573eb475ae4160e309954d976a6f2c9bc9`.
+The compact receipt pins the complete private result; no questions, literal outputs or
+model files are copied here. This closes the136-record coverage goal under that old
+law, not useful language or qualification of the new native predictor.
+
+[implementation audit] The old q predictor's known framing route/depth-six class suffix
+influenced both training and output; q was not merely an output filter, and six classes
+were not the lifetime of the whole recurrent machine. Family-local R return removed
+mixture-responsibility attenuation while still depending on q. The new private native F
+producer instead supplies the same face for scoring, release and actual return; its
+fresh90-feature M parts use the previous reached receiver contrast. The early
+ExactUnsplit workaround caused rational representation growth; represented passage,
+feedback and explicit residuals restore the intended bounded representation without
+removing the original guards. A wider suffix alone is not the architectural repair.
+
+The design owner's **Claude return audit, October22** is the canonical synthesis;
+its title and exact hash are pinned in the receipt rather than copied into a duplicate
+record. Recover its original requirements through [the computational Holon](2026-09-14_ATTENTION_LEARNING_AND_GENERATION_SHARE_A_COMPUTATIONAL_HOLON.md),
+[HNN formula](../../docs/HNN_FORMULA.md), [text-scaffold antipattern](2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)
+and [representation-residual policy](2026-09-25_THE_CLASSICAL_LOSS_IS_THE_PERCEIVED_DIFFERENCE_AND_THE_DEPOSITION_REMAINDER_IS_A_REPRESENTATION_RESIDUAL.md).
+
+[open] Authentic DeviceWord actual/fresh chart/split/error/gain publication is still
+unqualified; the old campaign's card dispatch cannot establish it. General contextual E
+return, learned participation/value/frame transport, correlated branch-conditioned
+material/pending-source evolution and topology/ecology/adaptive computation remain
+unfinished (D6–D8; #62,#73,#76). Four known framing parts are not uncertain semantic
+families. The next common material-response/device witness must distinguish continuity,
+nonzero admitted influence and real host/card qualification; none is promised here.

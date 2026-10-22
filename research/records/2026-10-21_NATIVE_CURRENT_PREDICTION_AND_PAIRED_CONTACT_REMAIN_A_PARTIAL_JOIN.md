@@ -103,3 +103,12 @@ inference follows. D6-D8 are still unfinished. No dataset, training, language ou
 private upload or automatic retry occurred. The next obligation is the actual bounded
 preparation/representation domain, not forced motion, zero control, a legacy prior,
 relaxed rational limits or a receiving-only completion claim.
+
+
+### Dated successor status, October22
+
+The historical proposal/qualification boundaries above remain preserved. The
+[represented-contact closeout](2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md#campaign-and-architectural-boundary)
+records the completed136-record old-law campaign and the separate `ef08972` host
+continuity result, with pinned evidence and explicit unproved material/CUDA/language
+claims. Its canonical Claude-audit reference avoids a second architecture synthesis.

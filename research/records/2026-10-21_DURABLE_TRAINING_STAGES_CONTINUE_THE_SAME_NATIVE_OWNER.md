@@ -38,3 +38,12 @@ A proposed eight-stage campaign has an explicit13300s ceiling, not an extension
 of an existing run. It remains a proposal until separately scoped for execution.
 Useful-language quality and the full136-record target remain unfinished. The
 broader native/formal consumer join remains owed under #62.
+
+
+### Dated successor status, October22
+
+The historical proposal/qualification boundaries above remain preserved. The
+[represented-contact closeout](2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md#campaign-and-architectural-boundary)
+records the completed136-record old-law campaign and the separate `ef08972` host
+continuity result, with pinned evidence and explicit unproved material/CUDA/language
+claims. Its canonical Claude-audit reference avoids a second architecture synthesis.
