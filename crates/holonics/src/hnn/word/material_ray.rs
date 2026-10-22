@@ -407,9 +407,11 @@ impl ContactEnvelope {
     /// opt-in joint rounding issuer. `xp` bounds ||X0|| ||P0||; it is never the
     /// difference of two operator-norm upper bounds.
     fn box_perturbation(&self, forms:&[Rat;3], h:&Rat, g:&Rat, xp:&Rat)->Rat {
-        let dm=g/h*&forms[0]+g/int(2)*&forms[2]+g*h/int(4)*&forms[1];
-        let dp=sqrt_ceiling(&(square(&square(h))*square(g)*square(&forms[1])+int(4)*square(g)*square(&forms[0])),64);
-        &self.j*&self.inverse_bound*(dp+dm*xp)
+        // One algebraic owner. The source-only modulus supplies a bounded
+        // arithmetic consumer; existing physical consumers retain their route.
+        match box_perturbation_with(&self.j,&self.inverse_bound,forms,h,g,xp,&mut ExactBoxArithmetic) {
+            Ok(v)=>v,Err(never)=>match never{},
+        }
     }
     fn of(forms: [FormEnvelope; 3], h: &Rat, g: &Rat) -> Result<Self, HnnError> {
         if h <= &Rat::zero() || g <= &Rat::zero() {
@@ -486,28 +488,58 @@ pub(super) fn contact_envelope(
     Ok(envelope.stage)
 }
 
-/// Uniform finite operator norm plus three Gram-form perturbation coefficients.
-/// Both centers may range in the SAME declared box. The scalar fallback uses
-/// ||X||<=1 and the domain q0; optional exact-center tightening affects only the
-/// operator norm. No skipped tightening is interpreted as zero response.
-fn joint_box_envelope(
-    base:[&ExactRatMatrix;3], extent:[&ExactRatMatrix;3], h:&Rat, g:&Rat,
-    tighten:bool,
-)->Result<(Rat,[Rat;3],bool),HnnError>{
-    if extent.iter().any(|m|m.entries().iter().any(|q|q<&Rat::zero())) {
-        return Err(HnnError::Unadmitted{reason:"joint material box has nonnegative coordinate radii"});
+/// Arithmetic contract of the SAME contact resolvent perturbation formula.
+/// The modulus must bound every intermediate before it is constructed, rather
+/// than reserve a heuristic payload around an unbounded matrix inverse.
+pub(super) trait BoxArithmetic {
+    type Error;
+    fn add(&mut self,a:&Rat,b:&Rat)->Result<Rat,Self::Error>;
+    fn mul(&mut self,a:&Rat,b:&Rat)->Result<Rat,Self::Error>;
+    fn div(&mut self,a:&Rat,b:&Rat)->Result<Rat,Self::Error>;
+    fn sqrt(&mut self,a:&Rat)->Result<Rat,Self::Error>;
+}
+struct ExactBoxArithmetic;
+impl BoxArithmetic for ExactBoxArithmetic {
+    type Error=std::convert::Infallible;
+    fn add(&mut self,a:&Rat,b:&Rat)->Result<Rat,Self::Error>{Ok(a+b)}
+    fn mul(&mut self,a:&Rat,b:&Rat)->Result<Rat,Self::Error>{Ok(a*b)}
+    fn div(&mut self,a:&Rat,b:&Rat)->Result<Rat,Self::Error>{Ok(a/b)}
+    fn sqrt(&mut self,a:&Rat)->Result<Rat,Self::Error>{Ok(sqrt_ceiling(a,64))}
+}
+fn box_perturbation_with<A:BoxArithmetic>(j:&Rat,inverse:&Rat,forms:&[Rat;3],h:&Rat,g:&Rat,xp:&Rat,w:&mut A)
+    ->Result<Rat,A::Error>{
+    let gh=w.div(g,h)?;let dm_c=w.mul(&gh,&forms[0])?;
+    let g2=w.div(g,&int(2))?;let dm_d=w.mul(&g2,&forms[2])?;
+    let gh=w.mul(g,h)?;let gh4=w.div(&gh,&int(4))?;let dm_k=w.mul(&gh4,&forms[1])?;
+    let dm=w.add(&dm_c,&dm_d)?;let dm=w.add(&dm,&dm_k)?;
+    let h2=w.mul(h,h)?;let h4=w.mul(&h2,&h2)?;let gg=w.mul(g,g)?;
+    let kk=w.mul(&forms[1],&forms[1])?;let cc=w.mul(&forms[0],&forms[0])?;
+    let k=w.mul(&h4,&gg)?;let k=w.mul(&k,&kk)?;
+    let c=w.mul(&int(4),&gg)?;let c=w.mul(&c,&cc)?;
+    let dp=w.add(&k,&c)?;let dp=w.sqrt(&dp)?;
+    let change=w.mul(&dm,xp)?;let change=w.add(&dp,&change)?;
+    let scale=w.mul(j,inverse)?;w.mul(&scale,&change)
+}
+/// The genuine scalar fallback for a positive-Gram joint factor box. `forms`
+/// contains uniform form-norm bounds from the complete box, not a gradient ray.
+/// Uses ||m^-1||<=1. Optional centered Gram/inverse tightening is deliberately
+/// unavailable to this bounded consumer until its exact arithmetic has the same
+/// preflight contract; a heuristic scratch estimate is not that contract.
+fn bounded_joint_box_envelope<A:BoxArithmetic>(forms:&[Rat;3],h:&Rat,g:&Rat,w:&mut A)
+    ->Result<(Rat,[Rat;3]),A::Error>{
+    let h2=w.mul(h,h)?;let h4=w.mul(&h2,&h2)?;let gg=w.mul(g,g)?;
+    let kk=w.mul(&forms[1],&forms[1])?;let cc=w.mul(&forms[0],&forms[0])?;
+    let k=w.mul(&h4,&gg)?;let k=w.mul(&k,&kk)?;
+    let c=w.mul(&int(4),&gg)?;let c=w.mul(&c,&cc)?;
+    let base=w.mul(&int(2),&h2)?;let q=w.add(&base,&k)?;let q=w.add(&q,&c)?;let q=w.sqrt(&q)?;
+    let denom=w.mul(&int(4),&h2)?;let j=w.div(&int(13),&denom)?;let j=w.sqrt(&j)?;
+    let n=w.mul(&j,&q)?;let n=w.add(&Rat::one(),&n)?;
+    let mut alpha=[Rat::zero(),Rat::zero(),Rat::zero()];
+    for i in 0..3 {
+        let unit=std::array::from_fn(|f|if f==i{Rat::one()}else{Rat::zero()});
+        alpha[i]=box_perturbation_with(&j,&Rat::one(),&unit,h,g,&q,w)?;
     }
-    let zero=[ExactRatMatrix::zero(base[0].rows(),base[0].columns())?,
-        ExactRatMatrix::zero(base[1].rows(),base[1].columns())?,ExactRatMatrix::zero(base[2].rows(),base[2].columns())?];
-    let forms=[FormEnvelope::domain(base[0],extent[0],&zero[0])?,
-        FormEnvelope::domain(base[1],extent[1],&zero[1])?,FormEnvelope::domain(base[2],extent[2],&zero[2])?];
-    let mut envelope=ContactEnvelope::of(forms,h,g)?;
-    let alpha=std::array::from_fn(|i|{
-        let form=std::array::from_fn(|j|if i==j{Rat::one()}else{Rat::zero()});
-        envelope.box_perturbation(&form,h,g,&envelope.q0)
-    });
-    let tightened=if tighten { envelope.tighten_norm(base,extent,h,g)? }else{false};
-    Ok((envelope.stage.norm,alpha,tightened))
+    Ok((n,alpha))
 }
 
 /// One queried direction on the original factor chart. `extent` is the jointly declared

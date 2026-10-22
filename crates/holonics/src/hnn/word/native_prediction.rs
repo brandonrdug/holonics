@@ -16,6 +16,7 @@ pub use super::material_ray::PhysicalRayReading as NativePhysicalRayReading;
 /// Consumes the actual Word; callers cannot construct a face, change the predictor or rebind y.
 pub struct NativePredictionWord<'a> {
     word: Word<'a>,
+    modulus_selection:Option<ExecutedModulusSelection>,
     external:Option<(NativeExecutedPrediction,super::material_ray::OriginalPairStages)>,
     prepared: Option<crate::hnn::reference::prepared_input::PreparedInputCut>,
     charts:Option<Charts>,
@@ -38,6 +39,7 @@ pub struct NativePredictionReading {
     pub masses: Vec<Vec<ExactInterval>>,
 }
 pub struct NativePredictionReturn {
+    modulus_selection:Option<ExecutedModulusSelection>,
     represented_policy:bool,
     reading: NativePredictionReading,
     scores: Vec<ExactInterval>,
@@ -55,7 +57,9 @@ impl NativePredictionReturn {
     pub(crate) fn joint_rounding_modulus(&self,plan:&super::material_ray::rounding::DeclaredJointModulus,
         history:Option<&super::material_ray::rounding::NativeReleaseHistory>)
         ->Result<super::material_ray::rounding::JointModulusReading,super::material_ray::rounding::ModulusObstruction>{
-        self.cut.joint_rounding_modulus(plan,&self.back,&self.reading,&self.phases,history)
+        let selection=self.modulus_selection.as_ref().ok_or(
+            super::material_ray::rounding::ModulusObstruction::Invalid("modulus request was not selected inside this producer before execution"))?;
+        self.cut.joint_rounding_modulus(plan,selection,&self.back,&self.reading,&self.phases,history)
     }
     pub fn reading(&self) -> &NativePredictionReading {
         &self.reading
@@ -65,6 +69,21 @@ impl NativePredictionReturn {
     }
     pub fn stations(&self) -> &[RetainedStationReturn] {
         &self.stations
+    }
+    /// Unwired opt-in source-owner adapter. It reuses the EXISTING guarded
+    /// publication law; it selects no receiver tolerance or release policy.
+    /// Stage charts and history together. If history/resource admission fails,
+    /// no caller-visible chart/history successor is installed. The immutable
+    /// proof is consumed before the mutable public result can escape.
+    pub(crate) fn publish_contact_carry_with_history(self,charts:&mut Charts,
+        history:&mut super::material_ray::rounding::NativeReleaseHistory,
+        resources:&super::material_ray::rounding::ModulusResources)
+        ->Result<NativeContactPublication,super::material_ray::rounding::ModulusObstruction>{
+        let field=self.cut.native_history_field().clone();let original=self.producer.clone();
+        let mut staged_charts=charts.clone();
+        let published=self.publish_contact_carry(&mut staged_charts)?;
+        history.record_native_publication(&NativeCompletedPublication{field:&field,original:&original,published:&published},resources)?;
+        *charts=staged_charts;Ok(published)
     }
     /// Actual factor publication only. Unsupported paired/split input is refused, not rerouted.
     pub fn publish_contact_carry(
@@ -81,6 +100,17 @@ impl NativePredictionReturn {
             charts,
         )
     }
+}
+/// Not constructible from a public publication. This borrow exists only inside
+/// the actual consuming return owner AFTER its native guards succeed and BEFORE
+/// any mutable result is returned. No detached witness/label tuple can mint it.
+pub(in crate::hnn::word) struct NativeCompletedPublication<'a> {
+    field:&'a Field,original:&'a crate::hnn::constitution::Constitution,published:&'a NativeContactPublication,
+}
+impl NativeCompletedPublication<'_> {
+    pub(in crate::hnn::word) fn field(&self)->&Field{self.field}
+    pub(in crate::hnn::word) fn original(&self)->&crate::hnn::constitution::Constitution{self.original}
+    pub(in crate::hnn::word) fn published(&self)->&NativeContactPublication{self.published}
 }
 /// No Word tape is retained. The complete actual contact successor carries forward once.
 pub struct NativeContactPublication {
@@ -190,11 +220,19 @@ pub(crate) struct NativePredictionDeclaration{
     opening:EndChange,opened_at:usize,phases:ReceivingPhases,
 }
 impl NativePredictionDeclaration{
-    /// Unwired opt-in declaration on this SAME pre-target unrun producer.
-    pub(crate) fn declare_joint_rounding_modulus(&self,request:super::material_ray::rounding::ModulusRequest)
-        ->Result<super::material_ray::rounding::DeclaredJointModulus,super::material_ray::rounding::ModulusObstruction>{
-        super::material_ray::rounding::DeclaredJointModulus::seal(&self.id,&self.field,&self.current,&self.source,
-            &self.theta,self.opened_at,&self.phases,&self.opening,request)
+    /// Unwired opt-in admission. Move the SAME unrun Word into the selected
+    /// producer: a detached declaration id is not evidence of pre-target timing.
+    /// The wrapper has no raw-record reader and never lends the Word back out.
+    pub(crate) fn select_joint_rounding_modulus<'a>(self,word:Word<'a>,
+        request:super::material_ray::rounding::ModulusRequest)
+        ->Result<SelectedModulusProducer<'a>,super::material_ray::rounding::ModulusObstruction>{
+        self.admit(&word)?;
+        if word.complete_unrun_opening()?!=self.opening {
+            return Err(super::material_ray::rounding::ModulusObstruction::Invalid("modulus selection keeps the complete still-unrun opening"));
+        }
+        let plan=super::material_ray::rounding::DeclaredJointModulus::seal(&self.id,&self.field,&self.current,&self.source,
+            &self.theta,self.opened_at,&self.phases,&self.opening,request)?;
+        Ok(SelectedModulusProducer{word,declaration:self,plan})
     }
     pub(crate) fn phases(&self)->&ReceivingPhases{&self.phases}
     fn admit(&self,word:&Word<'_>)->Result<(),HnnError>{
@@ -214,12 +252,48 @@ impl NativePredictionDeclaration{
             let mut feature=f.clone();feature.extend(a.iter().zip(f).map(|(a,f)|a-f));
             faces.push(NativeCurrentFace::at(map.apply(&feature)?,bits)?);features.push(feature);
         }
-        Ok(NativePredictionWord{word,external:Some((record,stages)),prepared:None,charts:None,phases:self.phases,map,faces,features})
+        Ok(NativePredictionWord{word,modulus_selection:None,external:Some((record,stages)),prepared:None,charts:None,phases:self.phases,map,faces,features})
     }
     pub(crate) fn run_and_read<'a>(self,mut word:Word<'a>,bits:u32)->Result<NativePredictionWord<'a>,HnnError>{
         self.admit(&word)?;
         if word.complete_unrun_opening()?!=self.opening{return Err(HnnError::Unadmitted{reason:"native declaration keeps complete prepared opening"});}
         word.run(self.phases.junction_steps())?;word.native_current_prediction_declared(self,bits)
+    }
+}
+/// Only this owner can mint an execution-selected token. It is neither a
+/// declaration id nor a caller-provided promise about when y became available.
+pub(in crate::hnn::word) struct ExecutedModulusSelection { id:std::sync::Arc<()> }
+impl ExecutedModulusSelection {
+    pub(in crate::hnn::word) fn admits(&self,plan:&super::material_ray::rounding::DeclaredJointModulus)->bool{
+        plan.admits_selection(&self.id)
+    }
+}
+/// Source-only opt-in adapter; NOT a live publication or resolution policy.
+/// Selection consumes the unrun Word and seals the request before either host
+/// execution or device dispatch. An earlier arbitrary external record cannot be
+/// submitted to this owner and a later generic read cannot acquire its token.
+pub(crate) struct SelectedModulusProducer<'a> {
+    word:Word<'a>,declaration:NativePredictionDeclaration,
+    plan:super::material_ray::rounding::DeclaredJointModulus,
+}
+impl<'a> SelectedModulusProducer<'a> {
+    pub(crate) fn run_and_read(self,bits:u32)
+        ->Result<(NativePredictionWord<'a>,super::material_ray::rounding::DeclaredJointModulus),HnnError>{
+        let Self{word,declaration,plan}=self;
+        let mut prediction=declaration.run_and_read(word,bits)?;
+        prediction.modulus_selection=Some(ExecutedModulusSelection{id:plan.selection_id().clone()});
+        Ok((prediction,plan))
+    }
+    pub(crate) fn execute_and_read(self,execution:&dyn NativePredictionExecution,
+        ratio:&crate::hnn::pending::PendingRatio,charts:&mut Charts,opening:&WordOpening,bits:u32)
+        ->Result<(NativePredictionWord<'a>,super::material_ray::rounding::DeclaredJointModulus),HnnError>{
+        let Self{word,declaration,plan}=self;
+        // This dispatch happens INSIDE the selected owner, not through an
+        // already-executed record supplied after the request was chosen.
+        let record=execution.forward_native(&declaration.field,&declaration.theta,ratio,charts,opening,&declaration.phases)?;
+        let mut prediction=declaration.read_external(word,record,bits)?;
+        prediction.modulus_selection=Some(ExecutedModulusSelection{id:plan.selection_id().clone()});
+        Ok((prediction,plan))
     }
 }
 impl<'a> Word<'a> {
@@ -299,6 +373,7 @@ impl<'a> Word<'a> {
         }
         Ok(NativePredictionWord {
             word: self,
+            modulus_selection:None,
             external:None,
             prepared: None,
             charts:None,
@@ -513,6 +588,7 @@ impl NativePredictionWord<'_> {
             });
         }
         Ok(NativePredictionReturn {
+            modulus_selection:self.modulus_selection,
             represented_policy,
             reading,
             scores,

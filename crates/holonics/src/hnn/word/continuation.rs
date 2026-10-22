@@ -573,12 +573,15 @@ impl<'c> Word<'c> {
 }
 
 impl ContactCut {
+    /// Source-owned field borrow for the unwired atomic history adapter.
+    pub(super) fn native_history_field(&self)->&Field{&self.field}
     /// Optional calculation only. Live publication selects no resolution policy.
     pub(super) fn joint_rounding_modulus(&self,plan:&super::material_ray::rounding::DeclaredJointModulus,
-        back:&WordReturn,reading:&super::native_prediction::NativePredictionReading,phases:&ReceivingPhases,
+        selection:&super::native_prediction::ExecutedModulusSelection,back:&WordReturn,reading:&super::native_prediction::NativePredictionReading,phases:&ReceivingPhases,
         history:Option<&super::material_ray::rounding::NativeReleaseHistory>)
         ->Result<super::material_ray::rounding::JointModulusReading,super::material_ray::rounding::ModulusObstruction>{
         use super::material_ray::rounding::ModulusObstruction;
+        if !selection.admits(plan){return Err(ModulusObstruction::Invalid("this original execution did not select this immutable modulus request"));}
         let id=self.native_declaration.as_ref().ok_or(ModulusObstruction::Invalid("original native declaration unavailable"))?;
         let geometry=back.response_geometry.as_ref().ok_or(ModulusObstruction::Invalid("original executed paired geometry unavailable"))?;
         geometry.admit_native_contact(&self.field,&back.reads,&self.operands,phases,self.opened_at)?;

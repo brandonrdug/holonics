@@ -10,7 +10,7 @@ use crate::hnn::field::{ConstitutionRead, Field};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::port::PairedReadDefect;
 use crate::hnn::receiving::ReceivingPhases;
-use crate::hnn::word::native_prediction::NativeContactPublication;
+use crate::hnn::word::native_prediction::NativeCompletedPublication;
 use crate::hnn::Current;
 use crate::ratio::algebraic::ExactInterval;
 use std::sync::Arc;
@@ -44,6 +44,9 @@ pub(crate) enum RequestedGuarantee {
 #[derive(Clone, Debug)]
 pub(crate) struct ModulusResources {
     pub integer_bits: u64,
+    /// Conservative lifetime sum of admitted rational payloads (inputs,
+    /// retained copies and arithmetic temporaries); bounds their peak payload.
+    /// Not a heap/RSS cap for shared model objects or structural allocation.
     pub live_operand_bits: u64,
     /// Conservative sum of preflight arithmetic payloads, not an RSS measurement.
     pub arithmetic_bit_work: u64,
@@ -75,6 +78,7 @@ pub(crate) enum ModulusObstruction {
     MissingMonotoneFutureAnchor,
     UnsupportedReadNorm,
     MissingUniformRepresentedHistoryFloor,
+    MissingPreparedProbabilityConstant,
     MissingDiscreteBoundaryMargin,
     MissingHeldMomentumDomain,
     UnsupportedFuture,
@@ -91,7 +95,7 @@ impl From<crate::ratio::linear::ExactLinearError> for ModulusObstruction {
 }
 type Result<T> = std::result::Result<T, ModulusObstruction>;
 
-struct Arithmetic { limits: ModulusResources, spent: u64 }
+struct Arithmetic { limits: ModulusResources, spent: u64, admitted_payload:u64 }
 impl Arithmetic {
     fn new(limits: &ModulusResources) -> Result<Self> {
         if limits.integer_bits < 64 || limits.live_operand_bits == 0
@@ -99,7 +103,7 @@ impl Arithmetic {
             || limits.schedule_steps == 0 || u64::from(limits.additional_levels) >= limits.integer_bits {
             return Err(ModulusObstruction::Invalid("finite explicit modulus resources"));
         }
-        Ok(Self { limits: limits.clone(), spent: 0 })
+        Ok(Self { limits: limits.clone(), spent: 0, admitted_payload:0 })
     }
     fn reserve(&mut self, bits: u64) -> Result<()> {
         let next=self.spent.checked_add(bits).ok_or(ModulusObstruction::Resource {
@@ -107,6 +111,13 @@ impl Arithmetic {
         if next>self.limits.arithmetic_bit_work { return Err(ModulusObstruction::Resource {
             stage:"arithmetic bit work",required:next,limit:self.limits.arithmetic_bit_work }); }
         self.spent=next; Ok(())
+    }
+    fn retain(&mut self,bits:u64)->Result<()> {
+        let next=self.admitted_payload.checked_add(bits).ok_or(ModulusObstruction::Resource{
+            stage:"joint lifetime rational payload overflow",required:u64::MAX,limit:self.limits.live_operand_bits})?;
+        if next>self.limits.live_operand_bits{return Err(ModulusObstruction::Resource{
+            stage:"joint lifetime rational payload",required:next,limit:self.limits.live_operand_bits});}
+        self.admitted_payload=next;Ok(())
     }
     fn values<'a>(&mut self, values:impl IntoIterator<Item=&'a Rat>)->Result<()> {
         let mut sum=0u64;
@@ -118,14 +129,21 @@ impl Arithmetic {
             sum=sum.checked_add(n).and_then(|s|s.checked_add(d)).ok_or(ModulusObstruction::Resource {
                 stage:"operand extent",required:u64::MAX,limit:self.limits.live_operand_bits})?;
         }
-        if sum>self.limits.live_operand_bits {return Err(ModulusObstruction::Resource {
-            stage:"live operand payload",required:sum,limit:self.limits.live_operand_bits});}
-        self.reserve(sum)
+        self.retain(sum)?;self.reserve(sum)
     }
     fn operation(&mut self,n:u64,d:u64)->Result<()> {
         if n>self.limits.integer_bits || d>self.limits.integer_bits {return Err(ModulusObstruction::Resource {
             stage:"arithmetic integer preflight",required:n.max(d),limit:self.limits.integer_bits});}
-        self.reserve(n.saturating_add(d))
+        // Keep the conservative lifetime allocation, including unreduced
+        // products/sums and normalization scratch, until this calculation ends.
+        // Never reclaim an earlier batch while its snapshots may still be live.
+        let pair=n.checked_add(d).ok_or(ModulusObstruction::Resource{
+            stage:"arithmetic payload overflow",required:u64::MAX,limit:self.limits.live_operand_bits})?;
+        // Rational-kernel admission: result pair, cross-products and
+        // normalization/division integer workspace. This is not heap capacity.
+        let payload=pair.checked_mul(8).ok_or(ModulusObstruction::Resource{
+            stage:"arithmetic workspace payload overflow",required:u64::MAX,limit:self.limits.live_operand_bits})?;
+        self.retain(payload)?;self.reserve(pair)
     }
     fn add(&mut self,a:&Rat,b:&Rat)->Result<Rat> {
         let n=a.numer().bits().saturating_add(b.denom().bits())
@@ -134,6 +152,10 @@ impl Arithmetic {
     }
     fn mul(&mut self,a:&Rat,b:&Rat)->Result<Rat> {
         self.operation(a.numer().bits().saturating_add(b.numer().bits()),a.denom().bits().saturating_add(b.denom().bits()))?;Ok(a*b)
+    }
+    fn div(&mut self,a:&Rat,b:&Rat)->Result<Rat> {
+        if b.is_zero(){return Err(ModulusObstruction::Invalid("zero bound divisor"));}
+        self.operation(a.numer().bits().saturating_add(b.denom().bits()),a.denom().bits().saturating_add(b.numer().bits()))?;Ok(a/b)
     }
     fn sqrt(&mut self,a:&Rat)->Result<Rat> {
         if a<&Rat::zero(){return Err(ModulusObstruction::Invalid("negative norm square"));}
@@ -149,6 +171,14 @@ impl Arithmetic {
         self.operation(1,u64::from(exponent).saturating_add(1))?;
         Ok(Rat::new(BigInt::one(),BigInt::one()<<exponent as usize))
     }
+}
+
+impl BoxArithmetic for Arithmetic {
+    type Error=ModulusObstruction;
+    fn add(&mut self,a:&Rat,b:&Rat)->Result<Rat>{Arithmetic::add(self,a,b)}
+    fn mul(&mut self,a:&Rat,b:&Rat)->Result<Rat>{Arithmetic::mul(self,a,b)}
+    fn div(&mut self,a:&Rat,b:&Rat)->Result<Rat>{Arithmetic::div(self,a,b)}
+    fn sqrt(&mut self,a:&Rat)->Result<Rat>{Arithmetic::sqrt(self,a)}
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -172,6 +202,25 @@ impl ChannelSnapshot {
             }),
             lattice:theta.lattice(Locus::Channel(contact))?.exponent(),clock:theta.clock(Locus::Channel(contact)),
         })
+    }
+    fn values(&self)->impl Iterator<Item=&Rat>{
+        self.factors.iter().flat_map(|m|m.entries()).chain(self.scales.iter()).chain(self.carries.iter().flatten())
+    }
+    /// One lossless six-carrier endpoint, including a legitimate unchanged-clock
+    /// prefix inside the SAME publication. This is not a new physical stroke.
+    fn admit_lossless_rebase(&self,next:&Self,work:&mut Arithmetic)->Result<()> {
+        if next.clock!=self.clock||next.lattice<self.lattice{return Err(ModulusObstruction::Invalid("rebase preserves clock and never coarsens"));}
+        for f in 0..6 {
+            if f<3&&(self.factors[f].rows()!=next.factors[f].rows()||self.factors[f].columns()!=next.factors[f].columns()){
+                return Err(ModulusObstruction::Invalid("same six-carrier factor chart"));
+            }
+            let x=if f<3{self.factors[f].entries()}else{std::slice::from_ref(&self.scales[f-3])};
+            let y=if f<3{next.factors[f].entries()}else{std::slice::from_ref(&next.scales[f-3])};
+            if x.len()!=y.len()||self.carries[f].len()!=x.len()||next.carries[f].len()!=y.len(){return Err(ModulusObstruction::Invalid("six-carrier rebase shape"));}
+            for i in 0..x.len(){let a=work.add(&x[i],&self.carries[f][i])?;let b=work.add(&y[i],&next.carries[f][i])?;
+                if a!=b{return Err(ModulusObstruction::Invalid("six-carrier value plus carry conservation"));}}
+        }
+        Ok(())
     }
     fn matches(&self,theta:&Constitution,contact:usize)->bool{
         let factors=[theta.contact_storage(contact),theta.contact_stiffness(contact),theta.contact_dissipation(contact)];
@@ -205,6 +254,9 @@ impl NativeReleaseHistory {
             channels.push(snapshot);
         }
         if entries>limits.material_entries{return Err(ModulusObstruction::Resource{stage:"material coordinates",required:entries as u64,limit:limits.material_entries as u64});}
+        // Charge the simultaneously retained release vector as well as EVERY
+        // previously admitted channel, rather than resetting a per-batch cap.
+        let zero=Rat::zero();work.values((0..channels.len()).map(|_|&zero))?;
         Ok(Self{field:field.clone(),absolute_release:vec![Rat::zero();channels.len()],channels})
     }
     fn admit(&self,field:&Field,theta:&Constitution)->Result<()> {
@@ -212,32 +264,37 @@ impl NativeReleaseHistory {
         for(c,s)in self.channels.iter().enumerate(){if !s.matches(theta,c){return Err(ModulusObstruction::MissingHistoricalRelease{contact:c,clock:theta.clock(Locus::Channel(c))});}}
         Ok(())
     }
-    /// Future owner hook only: checks a genuine completed native publication,
-    /// then charges worst-case release at its EXISTING clock. The predecessor
-    /// unit is the coarsest authenticated unit; a finer successor label alone
-    /// cannot prove which unit an intermediate stroke actually released on.
-    /// The current publisher does not call this hook.
-    pub(in crate::hnn::word) fn record_native_publication(&mut self,witness:&crate::hnn::word::native_prediction::NativeContactWitness,
-        original:&Constitution,published:&NativeContactPublication,limits:&ModulusResources)->Result<()> {
-        witness.admit(original,witness.deposit())?;
-        if witness.field!=self.field || published.prediction.opened_at!=witness.opened_at
-            || published.prediction.source_cells!=witness.source.cells() || published.prediction.receiver!=witness.phases.ring(){
-            return Err(ModulusObstruction::Invalid("historical successor is the original source-owned native contact"));
-        }
-        self.admit(&self.field,original)?;
+    /// Future source-owner hook only. An opaque completed-publication borrow
+    /// can be constructed ONLY before the actual native owner's public result
+    /// escapes. Mutating NativeContactPublication labels/fields cannot mint it.
+    /// A rebase+stroke is checked atomically against ONE original predecessor.
+    pub(in crate::hnn::word) fn record_native_publication(&mut self,proof:&NativeCompletedPublication<'_>,
+        limits:&ModulusResources)->Result<()> {
+        let original=proof.original();let published=proof.published();
+        self.admit(proof.field(),original)?;
         if published.prediction.producing_commit!=original.commit()
             ||original.commit().checked_add(1)!=Some(published.constitution.commit())
             ||published.publication.commit!=published.constitution.commit(){
             return Err(ModulusObstruction::Invalid("one original native publication"));
         }
-        let mut work=Arithmetic::new(limits)?;work.values(self.absolute_release.iter())?;
+        let mut work=Arithmetic::new(limits)?;
+        // Original history and all staged replacements/errors coexist until
+        // this method commits. Lifetime accounting covers both together.
+        work.values(self.channels.iter().flat_map(|s|s.values()).chain(self.absolute_release.iter()))?;
+        work.values(self.absolute_release.iter())?;
         let mut channels=Vec::new();let mut errors=self.absolute_release.clone();
         for(c,old)in self.channels.iter().enumerate(){
             let next=ChannelSnapshot::take(&published.constitution,c,&mut work)?;
             if next.lattice<old.lattice||next.clock<old.clock||next.clock>old.clock.saturating_add(1){return Err(ModulusObstruction::Invalid("monotone actual release unit and once-only contact clock"));}
             if next.clock==old.clock {
-                if next!=*old{return Err(ModulusObstruction::Invalid("no silent material change without contact crossing"));}
+                // A lawful representation prefix may move a value into its
+                // carry without a new release. Do not first mutate history to
+                // the prefix and then invalidate the original witness.
+                old.admit_lossless_rebase(&next,&mut work)?;
             }else{
+                // The authenticated original unit is coarsest over the genuine
+                // noncoarsening prefix+stroke. It conservatively covers the
+                // fine release even when the actual stroke used a finer unit.
                 let precision=crate::hnn::constitution::gamma_length(next.clock);
                 let exponent=old.lattice.checked_add(precision).and_then(|v|v.checked_add(1)).ok_or(ModulusObstruction::Invalid("release exponent"))?;
                 let e=work.dyadic(exponent)?;errors[c]=work.add(&errors[c],&e)?;
@@ -249,17 +306,12 @@ impl NativeReleaseHistory {
     /// Lossless representation hook; never reads exterior release receipts.
     /// It is not authority to land a C/K carry or publish a held successor.
     pub(crate) fn record_rebase(&mut self,original:&Constitution,next:&Constitution,limits:&ModulusResources)->Result<()> {
-        self.admit(&self.field,original)?;let mut work=Arithmetic::new(limits)?;let mut channels=Vec::new();
+        self.admit(&self.field,original)?;let mut work=Arithmetic::new(limits)?;
+        work.values(self.channels.iter().flat_map(|s|s.values()).chain(self.absolute_release.iter()))?;
+        let mut channels=Vec::new();
         for(c,old)in self.channels.iter().enumerate(){
             let n=ChannelSnapshot::take(next,c,&mut work)?;
-            if n.clock!=old.clock||n.lattice<old.lattice{return Err(ModulusObstruction::Invalid("rebase preserves clock and never coarsens"));}
-            for f in 0..6 {
-                let x=if f<3{old.factors[f].entries()}else{std::slice::from_ref(&old.scales[f-3])};
-                let y=if f<3{n.factors[f].entries()}else{std::slice::from_ref(&n.scales[f-3])};
-                if x.len()!=y.len(){return Err(ModulusObstruction::Invalid("six-carrier rebase shape"));}
-                for i in 0..x.len(){let a=work.add(&x[i],&old.carries[f][i])?;let b=work.add(&y[i],&n.carries[f][i])?;
-                    if a!=b{return Err(ModulusObstruction::Invalid("six-carrier value plus carry conservation"));}}
-            }
+            old.admit_lossless_rebase(&n,&mut work)?;
             channels.push(n);
         }
         self.channels=channels;Ok(())
@@ -269,10 +321,12 @@ impl NativeReleaseHistory {
 /// Sealed before y by NativePredictionDeclaration. No public fields can relabel
 /// the read, tolerance, opening, domain or resource range after return.
 pub(crate) struct DeclaredJointModulus {
-    id:Arc<()>,field:Field,current:Current,source:Arc<SourceMoment>,commit:u64,
+    id:Arc<()>,selection:Arc<()>,field:Field,current:Current,source:Arc<SourceMoment>,commit:u64,
     opened_at:usize,phases:ReceivingPhases,opening:EndChange,request:ModulusRequest,
 }
 impl DeclaredJointModulus {
+    pub(in crate::hnn::word) fn selection_id(&self)->&Arc<()>{&self.selection}
+    pub(in crate::hnn::word) fn admits_selection(&self,id:&Arc<()>)->bool{Arc::ptr_eq(&self.selection,id)}
     #[allow(clippy::too_many_arguments)]
     pub(in crate::hnn::word) fn seal(id:&Arc<()>,field:&Field,current:&Current,source:&Arc<SourceMoment>,theta:&Constitution,
         opened_at:usize,phases:&ReceivingPhases,opening:&EndChange,request:ModulusRequest)->Result<Self>{
@@ -294,7 +348,7 @@ impl DeclaredJointModulus {
             .chain(opening.storage.iter().flatten()).chain(opening.arrivals.iter().flatten().flatten())
             .chain(opening.states.iter().flatten().flatten()).chain(opening.resonators.iter().flatten().flatten().flatten()))?;
         if request.domain.iter().flatten().flat_map(|m|m.entries()).any(|q|q<&Rat::zero()){return Err(ModulusObstruction::Invalid("nonnegative joint domain radii"));}
-        Ok(Self{id:id.clone(),field:field.clone(),current:current.clone(),source:source.clone(),commit:theta.commit(),opened_at,phases:phases.clone(),opening:opening.clone(),request})
+        Ok(Self{id:id.clone(),selection:Arc::new(()),field:field.clone(),current:current.clone(),source:source.clone(),commit:theta.commit(),opened_at,phases:phases.clone(),opening:opening.clone(),request})
     }
 }
 #[derive(Clone, Debug)]
@@ -334,7 +388,14 @@ pub(crate) struct JointModulusReading {
     /// Conditional evaluation at the common attainable level, absent if the
     /// producing-point numerical floor cannot qualify a changed candidate.
     pub arithmetic_bounds_at_common_attainment:Option<Vec<Rat>>,
+    /// Authentic H evaluation ONLY at the complete unchanged producing numerical
+    /// identity. It never certifies a candidate, even when needed levels is zero.
+    pub producing_point_h_bounds:Option<Vec<Rat>>,
     pub current_absolute_exponents:Vec<u32>,pub arithmetic_bit_work:u64,
+    pub admitted_lifetime_rational_bits:u64,
+    /// This is rational-kernel/history payload admission, not a model-graph,
+    /// structural allocation or allocator/RSS resource certificate.
+    pub allocator_resource_certified:bool,
     /// Actual source-owned enclosures, never midpoint probability representatives.
     pub source_probability_intervals:Option<Vec<Vec<ExactInterval>>>,
     /// H grade only: enlarged current landed intervals, a joint-box overapproximation
@@ -359,7 +420,7 @@ fn evaluated(p:&ReadPolynomial,s:u32,w:&mut Arithmetic)->Result<Rat>{
     let v=w.add(&p.numerical_floor,&p.constant)?;let v=w.add(&v,&a)?;w.add(&v,&b)
 }
 fn row_norm(m:&ExactRatMatrix,row:usize,work:&mut Arithmetic)->Result<Rat>{
-    let mut sum=Rat::zero();for j in 0..m.columns(){let q=m.get(row,j).ok_or(ModulusObstruction::Invalid("native decoder row"))?;let q=work.mul(q,q)?;sum=work.add(&sum,&q)?;}work.sqrt(&sum)
+    let mut sum=Rat::zero();for j in 0..m.columns(){let q=m.get(row,j)?;let q=work.mul(q,q)?;sum=work.add(&sum,&q)?;}work.sqrt(&sum)
 }
 
 /// No Word execution. This reads original immutable pair records, not a response
@@ -402,13 +463,13 @@ pub(in crate::hnn::word) fn issue(plan:&DeclaredJointModulus,id:&Arc<()>,field:&
         let half=work.dyadic(snapshot.lattice.checked_add(1).ok_or(ModulusObstruction::Invalid("material half-cell exponent"))?)?;
         let tail=work.dyadic(snapshot.lattice.checked_add(k).and_then(|s|s.checked_add(1)).ok_or(ModulusObstruction::Invalid("fine-release exponent"))?)?;
         let h=work.add(&half,&tail)?;let s=&history.absolute_release[c];let cover=work.add(s,&h)?;
-        let mut forms:Vec<Polynomial>=Vec::new();
+        let mut forms:Vec<Polynomial>=Vec::new();let mut form_bounds=[Rat::zero(),Rat::zero(),Rat::zero()];
         for f in 0..3 {
             if base[f].rows()!=domain[f].rows()||base[f].columns()!=domain[f].columns()||base[f].rows()!=contact.width(){return Err(ModulusObstruction::Invalid("original factor box shape"));}
             entries=entries.checked_add(base[f].entries().len()).ok_or(ModulusObstruction::Invalid("material extent"))?;
             if entries>request.resources.material_entries{return Err(ModulusObstruction::Resource{stage:"joint factor coordinates",required:entries as u64,limit:request.resources.material_entries as u64});}
             for(i,d)in domain[f].entries().iter().enumerate(){if d<&cover{return Err(ModulusObstruction::DomainDoesNotCover{contact:c,family:f,entry:i});}}
-            let bn=work.norm(base[f])?;let dn=work.norm(&domain[f])?;let fbar=work.add(&bn,&dn)?;
+            let bn=work.norm(base[f])?;let dn=work.norm(&domain[f])?;let fbar=work.add(&bn,&dn)?;form_bounds[f]=work.mul(&fbar,&fbar)?;
             let count=Rat::from_integer(BigInt::from(base[f].entries().len()));let dimension=work.sqrt(&count)?;
             let sr=work.mul(&dimension,s)?;let hr=work.mul(&dimension,&h)?;
             let twice=work.mul(&int(2),&fbar)?;let c0=work.mul(&twice,&sr)?;let ss=work.mul(&sr,&sr)?;
@@ -416,22 +477,18 @@ pub(in crate::hnn::word) fn issue(plan:&DeclaredJointModulus,id:&Arc<()>,field:&
             forms.push(Polynomial{c:c0,a:aa,b:bb});
         }
         work.values(base.iter().flat_map(|m|m.entries()).chain(domain.iter().flat_map(|m|m.entries())))?;
-        // Reuse the original envelope/resolvent. Pre-authorize dense scratch;
-        // skipping this optional tightening keeps the genuine scalar envelope.
-        let input_bits=base.iter().flat_map(|m|m.entries()).chain(domain.iter().flat_map(|m|m.entries()))
-            .try_fold(0u64,|n,q|n.checked_add(q.numer().bits())?.checked_add(q.denom().bits()))
-            .ok_or(ModulusObstruction::Invalid("box input extent"))?;
-        let scalar=input_bits.saturating_mul((contact.width() as u64).saturating_pow(3)).saturating_mul(16);
-        work.reserve(scalar)?;
-        let dense=scalar.saturating_mul(4);
-        let tighten=dense<=request.resources.live_operand_bits&&work.spent.checked_add(dense).is_some_and(|n|n<=request.resources.arithmetic_bit_work);
-        if tighten{work.reserve(dense)?;}
-        let (n,alpha,tightened)=joint_box_envelope(base,domain.each_ref(),o.step(),contact.conductance(),tighten)?;
-        if !tightened{fallback.push(c);}
+        // The exact centered matrix/inverse helper does not have a request-
+        // bounded intermediate carrier yet. Reuse its SAME box perturbation
+        // algebra via the bounded scalar fallback; no unmetered helper runs.
+        work.values([o.step(),contact.conductance()])?;
+        if o.step()<=&Rat::zero()||contact.conductance()<=&Rat::zero(){return Err(ModulusObstruction::Invalid("positive original step and conductance"));}
+        let (n,alpha)=bounded_joint_box_envelope(&form_bounds,o.step(),contact.conductance(),&mut work)?;
+        fallback.push(c);
         work.values(alpha.iter().chain(std::iter::once(&n)))?;
         // Conservative overlapping-block embedding: no unproved max/disjoint claim.
         let one_plus=work.add(&Rat::one(),&n)?;contact_norm=work.add(&contact_norm,&one_plus)?;
         for f in 0..3{forcing=forcing.add(&forms[f].scale(&alpha[f],&mut work)?,&mut work)?;}
+        work.values(snapshot.carries.iter().flatten().chain([s,&h]))?;
         radii.push(RadiusReading{contact:c,clock:snapshot.clock,lattice:snapshot.lattice,historical_coordinate_bound:s.clone(),
             actual_factor_carry:std::array::from_fn(|f|snapshot.carries[f].clone()),actual_scale_carry:std::array::from_fn(|f|snapshot.carries[f+3].clone()),prospective_half_cell_plus_release:h});
     }
@@ -439,6 +496,8 @@ pub(in crate::hnn::word) fn issue(plan:&DeclaredJointModulus,id:&Arc<()>,field:&
     let width=o.rings()[phases.ring()].width();
     if map.columns()!=width*2{return Err(ModulusObstruction::Invalid("original paired receiver columns"));}
     work.values(map.entries())?;
+    work.values(map.entries())?; // simultaneously held row copy
+    work.values(map.entries())?; // split decoder storage, conservatively full map
     let rows=map.to_rows();
     let rc=ExactRatMatrix::new(rows.iter().map(|r|r[width..].to_vec()).collect())?;
     let mut residual_rows=Vec::new();
@@ -469,20 +528,29 @@ pub(in crate::hnn::word) fn issue(plan:&DeclaredJointModulus,id:&Arc<()>,field:&
                 waves.push((p,floor));
             }
             match request.units{
-                ReadUnits::InterleavedWaveCoordinates=>for(row,(p,e))in waves.into_iter().enumerate(){reads.push(ReadPolynomial{station,row,numerical_floor:e,constant:p.c,linear:p.a,quadratic:p.b,demand:request.tolerances[station][row].clone()});},
+                ReadUnits::InterleavedWaveCoordinates=>for(row,(p,e))in waves.into_iter().enumerate(){
+                    work.values([&request.tolerances[station][row]])?;
+                    reads.push(ReadPolynomial{station,row,numerical_floor:e,constant:p.c,linear:p.a,quadratic:p.b,demand:request.tolerances[station][row].clone()});
+                },
                 ReadUnits::NativeProbabilityMass=>{
                     // 2*p_i*(1-p_i)*ln2 <= ln2/2 <7/20. Only even rows
                     // drive the real native base-two normalization.
                     let mut max=Polynomial::zero();let mut e=Rat::zero();
                     for(p,floor)in waves.iter().step_by(2){max.c=max.c.max(p.c.clone());max.a=max.a.max(p.a.clone());max.b=max.b.max(p.b.clone());e=e.max(floor.clone());}
-                    let ln2=crate::hnn::executed::ln_two()?;
+                    // Do not initialize an unmetered transcendental helper
+                    // inside this bounded issuer. Borrow the authentic already-
+                    // prepared owner value or report the missing operand.
+                    let ln2=crate::hnn::executed::prepared_ln_two().ok_or(ModulusObstruction::MissingPreparedProbabilityConstant)?;
                     work.values([&ln2.lower,&ln2.upper])?;
                     let ratio=work.mul(&ln2.upper,&Rat::new(1.into(),2.into()))?;
                     if ratio<=Rat::zero()||ratio>=Rat::new(7.into(),20.into()){
                         return Err(ModulusObstruction::Invalid("owned ln2 enclosure for probability units"));
                     }
                     max=max.scale(&ratio,&mut work)?;e=work.mul(&e,&ratio)?;
-                    for row in 0..map.rows()/2{reads.push(ReadPolynomial{station,row,numerical_floor:e.clone(),constant:max.c.clone(),linear:max.a.clone(),quadratic:max.b.clone(),demand:request.tolerances[station][row].clone()});}
+                    for row in 0..map.rows()/2{
+                        work.values([&e,&max.c,&max.a,&max.b,&request.tolerances[station][row]])?;
+                        reads.push(ReadPolynomial{station,row,numerical_floor:e.clone(),constant:max.c.clone(),linear:max.a.clone(),quadratic:max.b.clone(),demand:request.tolerances[station][row].clone()});
+                    }
                 }
             }
             station+=1;
@@ -498,15 +566,19 @@ pub(in crate::hnn::word) fn issue(plan:&DeclaredJointModulus,id:&Arc<()>,field:&
     }
     if station!=phases.aperture(){return Err(ModulusObstruction::Invalid("complete original read schedule"));}
     let mut needed=0u32;
-    for p in &reads{
-        let constant=work.add(&p.numerical_floor,&p.constant)?;
-        if constant>p.demand||(constant==p.demand&&(!p.linear.is_zero()||!p.quadratic.is_zero())){
-            return Err(ModulusObstruction::UnattainableEnclosure{station:p.station,row:p.row,floor:constant,demand:p.demand.clone(),read:Box::new(p.clone())});
+    // A producing-point H floor cannot even prove a prospective enclosure
+    // failure. Do NOT perform candidate search/refusal from that floor.
+    if request.grade!=ComparisonGrade::PhysicalHistoryVersusRepresentedLanded {
+        for p in &reads{
+            let constant=work.add(&p.numerical_floor,&p.constant)?;
+            if constant>p.demand||(constant==p.demand&&(!p.linear.is_zero()||!p.quadratic.is_zero())){
+                return Err(ModulusObstruction::UnattainableEnclosure{station:p.station,row:p.row,floor:constant,demand:p.demand.clone(),read:Box::new(p.clone())});
+            }
+            if evaluated(p,0,&mut work)?<=p.demand{continue;}
+            let cap=request.resources.additional_levels;let at_cap=evaluated(p,cap,&mut work)?;
+            if at_cap>p.demand{return Err(ModulusObstruction::RefinementCeiling{station:p.station,row:p.row,ceiling:cap,upper:at_cap,demand:p.demand.clone(),read:Box::new(p.clone())});}
+            let(mut low,mut high)=(0,cap);while low<high{let mid=low+(high-low)/2;if evaluated(p,mid,&mut work)?<=p.demand{high=mid;}else{low=mid+1;}}needed=needed.max(low);
         }
-        if evaluated(p,0,&mut work)?<=p.demand{continue;}
-        let cap=request.resources.additional_levels;let at_cap=evaluated(p,cap,&mut work)?;
-        if at_cap>p.demand{return Err(ModulusObstruction::RefinementCeiling{station:p.station,row:p.row,ceiling:cap,upper:at_cap,demand:p.demand.clone(),read:Box::new(p.clone())});}
-        let(mut low,mut high)=(0,cap);while low<high{let mid=low+(high-low)/2;if evaluated(p,mid,&mut work)?<=p.demand{high=mid;}else{low=mid+1;}}needed=needed.max(low);
     }
     let mut source_intervals=None;let mut probability_image=None;
     if request.units==ReadUnits::NativeProbabilityMass {
@@ -530,6 +602,17 @@ pub(in crate::hnn::word) fn issue(plan:&DeclaredJointModulus,id:&Arc<()>,field:&
     let mut attainment=Vec::new();let mut common_attainable=needed;
     for r in &radii{
         let requested=r.lattice.checked_add(needed).ok_or(ModulusObstruction::Invalid("absolute target overflow"))?;
+        // largest_held_factor_lattice calls Lattice::div_rem on at most
+        // current + 32 bisection queries + the first obstructing level. For
+        // r=a/b, its scaled/top/bottom/quotient/remainder/whole intermediates
+        // have <= bits(a)+bits(b)+requested+4 bits (signed half-tie included).
+        // Reserve EVERY possible query and its integer temporaries BEFORE
+        // invoking that exact existing owner, then keep its canonical result.
+        let snapshot=&history.channels[r.contact];
+        for q in snapshot.carries[..2].iter().flatten(){
+            let extent=q.numer().bits().saturating_add(q.denom().bits()).saturating_add(u64::from(requested)).saturating_add(4);
+            for _ in 0..(u32::BITS+2){work.operation(extent,extent)?;}
+        }
         let (at,limiting)=theta.native_rounding_attainable_lattice(r.contact,Lattice::new(requested))?;
         common_attainable=common_attainable.min(at.exponent()-r.lattice);
         attainment.push(AttainmentReading{contact:r.contact,current_exponent:r.lattice,requested_exponent:requested,
@@ -537,16 +620,23 @@ pub(in crate::hnn::word) fn issue(plan:&DeclaredJointModulus,id:&Arc<()>,field:&
     }
     // For different attained units, min(levels) is a conservative common level.
     // A shortfall never receives the requested target's resolution predicate.
-    let target=if request.grade==ComparisonGrade::PhysicalHistoryVersusRepresentedLanded&&needed>0{
+    let target=if request.grade==ComparisonGrade::PhysicalHistoryVersusRepresentedLanded{
         TargetResult::MissingUniformCandidateNumericalFloor
     }else if common_attainable<needed{
         TargetResult::HeldCarryLimitsRepresentationOnly{required_levels:needed,common_attainable_levels:common_attainable}
     }else{
         TargetResult::ConditionalTarget{additional_levels:needed,absolute_exponents:attainment.iter().map(|r|r.requested_exponent).collect()}
     };
-    let attained_bounds=if request.grade==ComparisonGrade::PhysicalHistoryVersusRepresentedLanded&&common_attainable>0{None}
+    // A zero requested refinement does not authenticate a changed candidate's
+    // numerical chart/feedback/rounding errors. H is producing-point ONLY until
+    // a complete unchanged-identity or candidate/uniform floor issuer exists.
+    let producing_point_h_bounds=if request.grade==ComparisonGrade::PhysicalHistoryVersusRepresentedLanded{
+        Some(reads.iter().map(|p|evaluated(p,0,&mut work)).collect::<Result<Vec<_>>>()?)
+    }else{None};
+    let attained_bounds=if request.grade==ComparisonGrade::PhysicalHistoryVersusRepresentedLanded{None}
         else{Some(reads.iter().map(|p|evaluated(p,common_attainable,&mut work)).collect::<Result<Vec<_>>>()?)};
     work.values(reads.iter().flat_map(|p|[&p.numerical_floor,&p.constant,&p.linear,&p.quadratic,&p.demand]))?;
+    work.values([&actual,&stages.fresh.opening_norm])?;
     work.values(request.domain.iter().flatten().flat_map(|m|m.entries())
         .chain(plan.opening.storage.iter().flatten()).chain(plan.opening.arrivals.iter().flatten().flatten())
         .chain(plan.opening.states.iter().flatten().flatten()).chain(plan.opening.resonators.iter().flatten().flatten().flatten()))?;
@@ -554,7 +644,7 @@ pub(in crate::hnn::word) fn issue(plan:&DeclaredJointModulus,id:&Arc<()>,field:&
         producing_current:current.clone(),original_actual_opening:plan.opening.clone(),original_station_ticks:phases.epochs().collect(),declared_joint_domain:request.domain.clone(),
         actual_opening_norm:actual,fresh_opening_norm:stages.fresh.opening_norm.clone(),
         current_absolute_exponents:radii.iter().map(|r|r.lattice).collect(),radii,reads,target,
-        representation_only_attainment:attainment,arithmetic_bounds_at_common_attainment:attained_bounds,arithmetic_bit_work:work.spent,
+        representation_only_attainment:attainment,arithmetic_bounds_at_common_attainment:attained_bounds,producing_point_h_bounds,arithmetic_bit_work:work.spent,admitted_lifetime_rational_bits:work.admitted_payload,allocator_resource_certified:false,
         source_probability_intervals:source_intervals,current_probability_image:probability_image,
         scalar_box_fallback_contacts:fallback,fixed_opening_only:true,discrete_boundary_certified:false,candidate_domain_checked:false,material_publication_admitted:false})
 }

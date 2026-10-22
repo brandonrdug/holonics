@@ -60,8 +60,11 @@ pub fn entry_bound() -> Rat {
 
 /// `ln 2` enclosed on the declared grid, formed once (the reference's refining grain and the
 /// receiving prior's grid member read it).
+static LN_TWO: OnceLock<ExactInterval> = OnceLock::new();
+/// Read-only optional access for a separately resource-bounded certificate.
+/// Does not initialize or clone the constant on behalf of that consumer.
+pub(crate) fn prepared_ln_two() -> Option<&'static ExactInterval> { LN_TWO.get() }
 pub(crate) fn ln_two() -> Result<ExactInterval, HnnError> {
-    static LN_TWO: OnceLock<ExactInterval> = OnceLock::new();
     if let Some(value) = LN_TWO.get() {
         return Ok(value.clone());
     }
