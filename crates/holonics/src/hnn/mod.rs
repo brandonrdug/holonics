@@ -400,6 +400,16 @@ pub enum HnnError {
         added_denominator_bits: u64,
         rational_bits: u64,
     },
+    /// Exact class control refusal, captured only after authentic producing-cut admission.
+    #[error("quadratic class control refused at source {source_cells}/commit {commit}, ring {ring}: controls {found}/{expected}, max numerator {numerator_bits}, denominator {denominator_bits}, coordinate cap {rational_bits}; evidence {control:?}")]
+    QuadraticControlBound {
+        source_cells:u64, commit:u64, ring:usize, opened_at:usize,
+        found:usize, expected:usize, rational_bits:u64,
+        numerator_bits:u64, denominator_bits:u64,
+        max_nonnegative:bool, valid_precision:bool,
+        /// Bounded actual values; None means diagnostic extent refused, never acceptance.
+        control:Option<Vec<Rat>>, max_abs_work:Option<Box<Rat>>,
+    },
     #[error("quadratic work extent at {stage}: requested {requested_bits}, integer cap {integer_limit}, aggregate {aggregate_used}/{aggregate_limit}")]
     QuadraticWorkExtent {stage:&'static str,requested_bits:u64,integer_limit:u64,aggregate_used:u64,aggregate_limit:u64},
     /// Publication requires one reached occurrence and its bounded contemporary operand.

@@ -103,12 +103,22 @@ fn admit_coordinates_and_magnitude(source_cells:u64,d:&Derived,added:&[Rat],max:
     admit_class_preparation_bound(source_cells,&Rat::zero(),added,max,bits)?;
     if d.work.abs()>*max{return Err(HnnError::ClassPreparationBound{source_cells,work:(d.work.numer().bits().saturating_add(d.work.denom().bits())<=8192).then(||Box::new(d.work.clone())),max_abs_work:(max.numer().bits().saturating_add(max.denom().bits())<=8192).then(||Box::new(max.clone())),work_magnitude_exceeded:true,work_range_exceeded:false,added_range_exceeded:false,work_numerator_bits:d.work.numer().bits(),work_denominator_bits:d.work.denom().bits(),added_numerator_bits:added.iter().map(|x|x.numer().bits()).max().unwrap_or(0),added_denominator_bits:added.iter().map(|x|x.denom().bits()).max().unwrap_or(0),rational_bits:bits});}Ok(())
 }
+// Preserve the original admission predicate. Extent preflight precedes diagnostic
+// copies; a missing optional packet cannot replace or suppress the operative refusal.
+fn admit_control(source_cells:u64,commit:u64,ring:usize,opened_at:usize,expected:usize,control:&[Rat],max:&Rat,bits:u64)->Result<(),HnnError>{
+    let numerator_bits=control.iter().map(|q|q.numer().bits()).max().unwrap_or(0);
+    let denominator_bits=control.iter().map(|q|q.denom().bits()).max().unwrap_or(0);
+    if control.len()==expected && max>=&Rat::zero() && (64..=4096).contains(&bits) && numerator_bits<=bits && denominator_bits<=bits{return Ok(());}
+    let extent=control.iter().try_fold(0u64,|n,q|n.checked_add(q.numer().bits())?.checked_add(q.denom().bits()));
+    let copy=control.len()<=128 && numerator_bits<=NativeWorkBudget::V1.integer_bits && denominator_bits<=NativeWorkBudget::V1.integer_bits && extent.is_some_and(|n|n<=NativeWorkBudget::V1.aggregate_bits);
+    Err(HnnError::QuadraticControlBound{source_cells,commit,ring,opened_at,found:control.len(),expected,rational_bits:bits,numerator_bits,denominator_bits,max_nonnegative:max>=&Rat::zero(),valid_precision:(64..=4096).contains(&bits),control:copy.then(||control.to_vec()),max_abs_work:(max.numer().bits().saturating_add(max.denom().bits())<=8192).then(||Box::new(max.clone()))})
+}
 struct Admitted{added:Vec<Rat>,derived:Derived,budget:Arithmetic,reading:QuadraticWorkReading}
 impl SourceClassPreparation{
     pub(crate) fn apply_quadratic<'c>(self,baseline:Word<'c>,control:&[Rat],max_abs_work:&Rat,rational_bits:u64,policy:NativeWorkBudget)->Result<(Word<'c>,PortPreparationReceipt),HnnError>{
         if !self.producer.matches(&baseline)||baseline.ticks()!=0||baseline.is_ended()||baseline.complete_unrun_opening()?!=self.producer.opening{return Err(HnnError::Unadmitted{reason:"class quadratic control consumes its whole unrun native source opening"});}
         self.boundary.check_material(&self.producer.constitution)?;
-        if control.len()!=self.preparation.controls()||max_abs_work<&Rat::zero()||!(64..=4096).contains(&rational_bits)||control.iter().any(|q|q.numer().bits()>rational_bits||q.denom().bits()>rational_bits){return Err(HnnError::Unadmitted{reason:"unchanged quadratic class-coordinate control bounds"});}
+        admit_control(self.producer.source.cells(),self.producer.constitution.commit(),self.preparation.ring,self.producer.opened_at,self.preparation.controls(),control,max_abs_work,rational_bits)?;
         let form=PowerForm::read(baseline.field,&self.producer.constitution,&self.producer.current)?;
         let witness=Witness::issue(&self.producer,&self.preparation,control,&form,&baseline,policy)?;
         let mut admitted=witness.admit(&self.producer,&self.preparation,control,&form,&baseline,max_abs_work,rational_bits)?;
@@ -128,6 +138,20 @@ impl SourceClassPreparation{
 #[cfg(test)]
 mod controls{
     use super::*;
+    #[test]
+    fn quadratic_control_refusal_data_only(){
+        let good=vec![Rat::new(BigInt::one(),BigInt::one()<<1023usize);4];
+        assert!(admit_control(12,7,0,0,4,&good,&integer(65536),1024).is_ok());
+        let mut bad=good.clone();bad[2]=Rat::new(BigInt::one(),BigInt::one()<<1024usize);
+        match admit_control(12,7,0,0,4,&bad,&integer(65536),1024).unwrap_err(){
+            HnnError::QuadraticControlBound{source_cells:12,commit:7,found:4,expected:4,denominator_bits:1025,rational_bits:1024,control:Some(actual),..}=>assert_eq!(actual,bad),x=>panic!("{x:?}")}
+        assert!(admit_control(12,7,0,0,3,&good,&integer(65536),1024).is_err());
+        assert!(admit_control(12,7,0,0,4,&good,&integer(-1),1024).is_err());
+        assert!(admit_control(12,7,0,0,4,&good,&integer(65536),63).is_err());
+        let huge=vec![Rat::new(BigInt::one(),BigInt::one()<<65537usize)];
+        match admit_control(12,7,0,0,1,&huge,&integer(65536),1024).unwrap_err(){HnnError::QuadraticControlBound{control:None,denominator_bits:65538,..}=>(),x=>panic!("{x:?}")}
+        println!("QUADRATIC_CONTROL_DIAGNOSTIC_PASS actual_values_bound_to_source_commit=true 1024bit_accept_1025refuse=true dimension_work_precision_unchanged=true oversized_diagnostic_omitted_still_refuses=true native_calls=0");
+    }
     #[test]
     #[ignore="one isolated finite CODE process with pre-reserved native attempts"]
     fn native_quadratic_carrier_and_rank_controls(){
