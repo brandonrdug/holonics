@@ -280,6 +280,30 @@ impl Reference {
     }
 }
 
+/// Private and single-use: the last actual return has reached its original Word,
+/// but its source ingress cannot advance Current until R publication at that cut.
+struct NativeFinalArrival {
+    prepared: prepared_input::PreparedInputCut,
+    lag: prepared_input::LaggedReceiverBoundary,
+    prediction: crate::hnn::word::native_prediction::NativePredictionReading,
+    scores: Vec<crate::ratio::algebraic::ExactInterval>,
+    forward: WordBalance,
+    preparation: Option<crate::hnn::word::action::PortPreparationReceipt>,
+    class: usize,
+}
+impl NativeFinalArrival {
+    fn admit_original(&self,resident:&Resident)->Result<(),HnnError>{
+        let source=resident.continuing().ok_or(HnnError::Unadmitted{reason:"one final original native source"})?.1;
+        if source!=self.prepared.source_cells || source!=self.prediction.source_cells
+            || self.prepared.commit!=resident.constitution.commit()
+            || self.prepared.commit!=self.prediction.producing_commit
+            || self.prepared.lift!=resident.current.lift()
+            || self.lag.produced_source_cells()!=source {
+            return Err(HnnError::Unadmitted{reason:"the final native arrival retains its original Word/cut/lag before R publication"});
+        }Ok(())
+    }
+}
+
 /// One physical receiver barrier. Only NEW actual inputs after the preceding contact cut
 /// enter this R-only section. No old prediction is rebound and no C/K/D step is staged.
 pub struct NativeReceivingSectionEvent {
@@ -289,6 +313,12 @@ pub struct NativeReceivingSectionEvent {
     pub end_source: u64,
     pub declared_section_cells: u64,
     pub contact_prefix_cells: u64,
+    /// Actual original Word cut at which the R-only successor was published.
+    pub publication_source: u64,
+    pub original_final_commit: u64,
+    pub receiving_commit: u64,
+    pub blind_carry_preserved: bool,
+    pub aeon_closed: bool,
 }
 impl Reference {
     pub fn observe_native_current_section(
@@ -342,7 +372,8 @@ impl Reference {
         let mut packets = Vec::new();
         let mut events = Vec::new();
         let producing = next.constitution.clone();
-        for &class in classes {
+        let mut final_arrival = None;
+        for (station,&class) in classes.iter().enumerate() {
             let boundary = crate::hnn::encoding::observed::PairedObservation::admit(
                 &next.field,
                 &next.constitution,
@@ -377,6 +408,12 @@ impl Reference {
                 None,
                 &chart,
             )?;
+            if station+1==classes.len(){
+                let arrival=NativeFinalArrival{prepared,lag,prediction,scores,forward,preparation,class};
+                arrival.admit_original(&next)?;
+                final_arrival=Some(arrival);
+                break;
+            }
             let input =
                 self.ingest_class_step_deferred(&mut next, &mut next_crib, pairing, class, None)?;
             let owner = next
@@ -401,6 +438,9 @@ impl Reference {
                 draw: None,
             };observe(&event);events.push(event);
         }
+        let final_arrival=final_arrival.ok_or(HnnError::Unadmitted{reason:"one actual final returned arrival per native section"})?;
+        final_arrival.admit_original(&next)?;
+        if next.constitution!=producing{return Err(HnnError::Unadmitted{reason:"all native section packets keep the same original material"});}
         let (_, deposits, records) =
             crate::hnn::word::native_prediction::NativeRPacket::section(packets)?;
         let tree = producing
@@ -452,6 +492,10 @@ impl Reference {
         let carry = next.carried.clone().ok_or(HnnError::Unadmitted {
             reason: "native R publishes after its actual blind carried endpoint",
         })?;
+        let publication_source=next.continuing().ok_or(HnnError::Unadmitted{reason:"final native publication source"})?.1;
+        let original_final_commit=final_arrival.prediction.producing_commit;
+        let receiving_commit=material.commit();
+        let original_carry=carry.clone();
         next.publish_receiving_translation(
             material.clone(),
             crate::holon::HolonState {
@@ -460,6 +504,16 @@ impl Reference {
             },
             &chart,
         )?;
+        if next.carried.as_ref()!=Some(&original_carry) || next.continuing().map(|s|s.1)!=Some(publication_source){return Err(HnnError::Unadmitted{reason:"R-only publication preserves its original full blind carry and pre-ingress source frontier"});}
+        // The genuine new boundary is admitted against the R successor. Nothing
+        // rewrites the original prediction, prepared material cut, target or lag.
+        let NativeFinalArrival{prepared,lag,prediction,scores,forward,preparation,class}=final_arrival;
+        let input=self.ingest_class_step_deferred(&mut next,&mut next_crib,pairing,class,None)?;
+        let owner=next.prepared_input.as_mut().expect("same native context owner");
+        owner.after_actual(prepared,class)?;
+        owner.install_reached_lag(lag)?;
+        let final_event=NativeContextEvent{prediction,scores,forward,preparation,contact:None,input,selected_class:class,draw:None};
+        observe(&final_event);events.push(final_event);
         let end = next
             .continuing()
             .ok_or(HnnError::Unadmitted {
@@ -471,7 +525,8 @@ impl Reference {
                 reason: "native R closes the original section without replay, flush or target omission",
             });
         }
-        if next.aeon.awaiting {
+        let aeon_closed=next.aeon.awaiting;
+        if aeon_closed {
             self.close_deferred_native_input(&mut next, &mut next_crib, pairing)?;
         }
         *resident = next;
@@ -483,6 +538,11 @@ impl Reference {
             end_source: end,
             declared_section_cells: width,
             contact_prefix_cells: remainder,
+            publication_source,
+            original_final_commit,
+            receiving_commit,
+            blind_carry_preserved: true,
+            aeon_closed,
         })
     }
 }

@@ -370,3 +370,80 @@ fn native_rational_full_transition()->Result<()>{
     assert_ne!(at10,retained);
     println!("RESOURCE_TRANSITION_COMPLETE_PASS actual20 R_contact_R=true pending6_cold=true final_native_cold=true four_warm_cold_frozen_equal=true elapsed_ns={}",started.elapsed().as_nanos());Ok(())
 }
+
+#[test]
+#[ignore="isolated fixed CODE/attempt envelope"]
+fn native_original_word_final_ingress_transition()->Result<()>{
+    use holonics::hnn::word::work;
+    struct Meter;impl Drop for Meter{fn drop(&mut self){let c=work::process_native_calls();let t=c.forward_attempts+c.response_attempts+c.return_attempts+c.response_return_attempts;let s=format!("{{\"final\":true,\"total_attempts\":{t},\"forward_constructors\":{},\"response_companions\":{},\"actual_returns\":{},\"fresh_returns\":{}}}\n",c.forward_attempts,c.response_attempts,c.return_attempts,c.response_return_attempts);println!("FINAL_INGRESS_CONNECTED_FINAL {s}");if let Some(p)=std::env::var_os("V93_NATIVE_COUNT_PATH"){std::fs::write(p,s).unwrap();}}}
+    let _meter=Meter;work::limit_process_native_attempts(std::env::var("V93_NATIVE_ATTEMPT_LIMIT")?.parse()?);
+    let started=Instant::now();let reference=port();let(field,mut initial,pairing)=declaration_with_input_context(16384,true,true)?;initial.bind_family_local_receiving_return(2)?;initial.bind_bounded_receiving_representation(2)?;initial.bind_native_rational_receiving(2)?;
+    let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
+    let empty=PairedObservation::admit(&field,resident.constitution(),&pairing)?.encode(&[])?;reference.ingest(&mut resident,None,&empty)?;resident.refine_contact_grain(24)?;resident.select_native_quadratic_work_prepared_input(&pairing)?;
+    assert!(resident.constitution().receiving_map(2).unwrap().entries().iter().all(num_traits::Zero::is_zero));
+    let opening=resident.constitution().clone();let mut stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+    fn cold(reference:&Reference,stream:&ObservedStream,opening:&Constitution)->Result<ObservedStream>{
+        let state=stream.resident().continuing_state(0)?;let parsed=ContinuingState::from_text(&state.to_text(),READ_BUDGET)?;let field=stream.resident().field();let resident=reference.mount_continued(field,&Current::at_rest(field),opening.clone(),&parsed)?;assert_eq!(resident.continuing_state(0)?,state);
+        let crib=ObservedCrib::from_unplaced_checkpoint(field,resident.current(),stream.crib().next_position(),&stream.crib().unplaced_checkpoint()?)?;
+        let text=stream.pending_checkpoint();assert!(text.starts_with("observed-stream-pending-native-rational-v1"));
+        let changed=text.replacen("1048576","1048575",1);assert!(ObservedStream::restore_checkpoint(resident.clone(),crib.clone(),&changed).is_err());
+        let restored=ObservedStream::restore_checkpoint(resident,crib,&text)?;assert_eq!(restored.pending_checkpoint(),text);Ok(restored)
+    }
+    let data:Vec<_>=(0..30).map(|i|i%4).collect();stream.receive_native_current(&reference,&pairing,&data[..6],64)?;stream=cold(&reference,&stream,&opening)?;
+    println!("FINAL_INGRESS_PENDING_COLD accepted6/published0/pending6 native_policy_resources_exact=true mismatch_refused=true");
+    let before=stream.resident().continuing_state(0)?;let pending=stream.pending_checkpoint();let mut seen7=false;let mut observed=0;
+    let outcome=stream.receive_native_current_diagnosed(&reference,&pairing,&data[6..10],64,&mut |e|{
+        observed+=1;
+        println!("FINAL_INGRESS_PRODUCER source={} commit={} features={:?} waves={:?}",e.prediction.source_cells,e.prediction.producing_commit,e.prediction.features,e.prediction.waves);
+        if e.prediction.source_cells==7{
+            let receipt=e.preparation.as_ref().expect("source7 actual preparation");let r=receipt.quadratic_work.as_ref().expect("new private work carrier");
+            let captured=Rat::new("51564025503142025724633702171333565477839602018262442180103416381733773829048987453642701117582441066181057391566130098304758509976933898410653964848328685074019118599927583053254770629577698244842880393017724348808904362643832108931305119651518354414673594465825438666030285830918268463504266119585360990590528111".parse().unwrap(),"22047267733340713048940158349214507467643823909519974157522241104760090223066576032924786842675813207198282257472108484449990867834675484277115873809660291195993146826927099026296864779242370390778269105246036983513853630109287239444143229113361694201038019485686046577441025195335936000000000000000000000000000000".parse().unwrap());assert_eq!(receipt.work,captured);
+            assert_eq!(r.metric,rat(1,2));assert!(r.charged_arithmetic_bits<=1048576);
+            let cross=&r.metric*integer(2)*r.old.iter().zip(&r.added).map(|(m,a)|m*a).sum::<Rat>();let quadratic=&r.metric*r.added.iter().map(|a|a*a).sum::<Rat>();assert_eq!(cross,receipt.cross);assert_eq!(quadratic,receipt.quadratic);assert_eq!(&cross+&quadratic,receipt.work);
+            assert_eq!((receipt.work.numer().bits(),receipt.work.denom().bits()),(1043,1041));assert!(receipt.work<integer(65536));assert!(receipt.closes());
+            assert!(r.added.iter().all(|x|x.numer().bits()<=1024&&x.denom().bits()<=1024));
+            println!("FINAL_INGRESS_REAL_CUT7 staged_not_published=true source={} metric={:?} old={:?} added={:?} control={:?} work={:?} cross={:?} quadratic={:?} derived_bound={}/{} bitwork={}",r.source_cells,r.metric,r.old,r.added,r.control,receipt.work,receipt.cross,receipt.quadratic,r.numerator_bound_bits,r.denominator_bound_bits,r.charged_arithmetic_bits);seen7=true;
+        }
+        // Exact producer feature witness for any later unchanged EpochFlow packing refusal.
+        if let Some((at,x))=e.prediction.features[0].iter().enumerate().find(|(_,x)|{let z=x.denom().trailing_zeros().unwrap();(x.denom()>>z as usize)!=num_bigint::BigInt::from(1)}){
+            println!("FINAL_INGRESS_NATIVE_FEATURE source={} coordinate={at} value={x} declared_feature_divisor=1",e.prediction.source_cells);
+        }
+    });
+    match outcome{
+        Err(e)=>{assert!(seen7,"the reviewed wide-work case must be reached before any later refusal");assert_eq!(stream.resident().continuing_state(0)?,before);assert_eq!(stream.pending_checkpoint(),pending);println!("FINAL_INGRESS_LATER_REFUSAL staged_events={observed} cut7_accepted=true whole_delivery_rollback=true error={e:?}");return Err(e.into());},
+        Ok(events)=>{assert!(seen7);assert_eq!(events.len(),1);assert_eq!(events[0].publication_source,9);assert!(events[0].blind_carry_preserved);assert_eq!(events[0].events.last().unwrap().prediction.source_cells,9);println!("FINAL_INGRESS_FIRST_R publication={:?} reuse={:?}",events[0].publication,stream.resident().native_rank_reuse_reading());}
+    }
+    stream=cold(&reference,&stream,&opening)?;
+    assert!(stream.pending_checkpoint().ends_with("\n"));
+    let at10=stream.resident().continuing_state(0)?;
+    let contact=stream.observe_native_current_contact(&reference,&pairing,data[10],64)?;
+    assert_eq!(contact.prediction.source_cells,10);
+    assert!(contact.contact.is_some(),"a new actual contact event must execute its own publication owner");
+    println!("FINAL_INGRESS_NEW_CONTACT source10to11=true publication={:?}",contact.contact.as_ref().map(|c|&c.publication));
+    let before_second=stream.resident().continuing_state(0)?;let pending_second=stream.pending_checkpoint();
+    let second=stream.receive_native_current_diagnosed(&reference,&pairing,&data[11..20],64,&mut|e|println!("FINAL_INGRESS_SECOND_PRODUCER source={} commit={} features={:?} waves={:?}",e.prediction.source_cells,e.prediction.producing_commit,e.prediction.features,e.prediction.waves));
+    let sections=match second{Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,before_second);assert_eq!(stream.pending_checkpoint(),pending_second);println!("FINAL_INGRESS_SECOND_REFUSAL rollback_source11_exact=true error={e:?}");return Err(e.into());}};
+    assert_eq!(sections.len(),1);assert_eq!(sections[0].start_source,11);assert_eq!(sections[0].end_source,20);assert_eq!(sections[0].contact_prefix_cells,1);assert_eq!(sections[0].publication_source,19);assert!(sections[0].blind_carry_preserved);
+    println!("FINAL_INGRESS_SECOND_R source11to20=true publication={:?}",sections[0].publication);
+    let before_third=stream.resident().continuing_state(0)?;let pending_third=stream.pending_checkpoint();
+    let third=stream.receive_native_current_diagnosed(&reference,&pairing,&data[20..30],64,&mut|e|println!("FINAL_INGRESS_THIRD_PRODUCER source={} commit={} features={:?} waves={:?}",e.prediction.source_cells,e.prediction.producing_commit,e.prediction.features,e.prediction.waves));
+    let last=match third{Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,before_third);assert_eq!(stream.pending_checkpoint(),pending_third);println!("FINAL_INGRESS_THIRD_REFUSAL rollback_source20_exact=true error={e:?}");return Err(e.into());}};
+    assert_eq!(last.len(),1);assert_eq!((last[0].start_source,last[0].end_source,last[0].publication_source),(20,30,29));assert!(last[0].blind_carry_preserved);assert!(last[0].aeon_closed,"actual source30 deferred whole-carry close must execute");
+    assert!(last[0].events.last().unwrap().input.close.is_none()); // close belongs to deferred whole section, not duplicate ingress
+    println!("FINAL_INGRESS_THIRD_R source20to30=true publication_before_ingress29=true publication={:?} final_pending={}",last[0].publication,stream.pending_checkpoint());
+    let warm=stream.clone();let cold_stream=cold(&reference,&stream,&opening)?;
+    assert_eq!(warm.resident().continuing_state(0)?,cold_stream.resident().continuing_state(0)?);assert_eq!(warm.pending_checkpoint(),cold_stream.pending_checkpoint());
+    let retained=warm.resident().continuing_state(0)?;
+    let(mut a,mut ac)=warm.native_current_query_fork(&reference,&pairing,64)?;let(mut b,mut bc)=cold_stream.native_current_query_fork(&reference,&pairing,64)?;
+    a.begin_hypothesized_output()?;b.begin_hypothesized_output()?;
+    let material=a.constitution().clone();let m=a.prepared_input().unwrap().material().clone();
+    for (index,key) in [rat(1,7),rat(2,7),rat(3,7),rat(4,7)].into_iter().enumerate(){
+        let ar=reference.release_native_current_forecast(&mut a,&mut ac,&pairing,&key,64)?;let br=reference.release_native_current_forecast(&mut b,&mut bc,&pairing,&key,64)?;
+        assert_eq!(ar.prediction,br.prediction);assert_eq!(ar.selected_class,br.selected_class);assert_eq!(a.carried(),b.carried());
+        assert_eq!(a.constitution(),&material);assert_eq!(b.constitution(),&material);assert_eq!(a.prepared_input().unwrap().material(),&m);assert_eq!(b.prepared_input().unwrap().material(),&m);
+        println!("FINAL_INGRESS_FROZEN decision={index} key={key} class={} warm_cold_prediction_equal=true",ar.selected_class);
+    }
+    assert_eq!(warm.resident().continuing_state(0)?,retained);
+    assert_ne!(at10,retained);
+    println!("FINAL_INGRESS_COMPLETE_PASS actual30 R_contact_R_close30=true pending6_cold=true final_native_cold=true four_warm_cold_frozen_equal=true elapsed_ns={}",started.elapsed().as_nanos());Ok(())
+}

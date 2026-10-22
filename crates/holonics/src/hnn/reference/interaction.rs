@@ -400,12 +400,15 @@ impl Resident {
                 return Err(HnnError::HeldMomentum { contact: a });
             }
             let exponent = contact_exponent(&self.field, a, self.current.lift())?;
-            if exponent.phase != 0
-                || power_of_two(&exponent.carry)? * self.field.contact(a).admittance()
-                    != carry.conductances[a]
-            {
-                return Err(HnnError::ContinuingState {
-                    what: "the returned current keeps its actual port reference frame",
+            // Preserve the original short circuit: an invalid phase refuses
+            // before any power-of-two allocation solely for a diagnostic.
+            let expected=if exponent.phase==0{Some(power_of_two(&exponent.carry)? * self.field.contact(a).admittance())}else{None};
+            if exponent.phase != 0 || expected.as_ref() != Some(&carry.conductances[a]) {
+                return Err(HnnError::ReturnedPortReference {
+                    contact:a,lift:self.current.lift().to_vec(),word_ticks:carry.ticks,
+                    phase:exponent.phase,exponent:Box::new(exponent.exponent),carry_exponent:exponent.carry,
+                    admittance:Box::new(self.field.contact(a).admittance().clone()),
+                    expected:expected.map(Box::new),carried:Box::new(carry.conductances[a].clone()),
                 });
             }
         }

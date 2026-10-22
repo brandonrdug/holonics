@@ -541,6 +541,8 @@ pub enum HnnError {
     StaleDeposit { staged: u64, published: u64 },
     #[error("the locus {locus:?} is released; no deposit reaches it")]
     ReleasedLocus { locus: Locus },
+    #[error("returned current contact {contact} port reference refused: lift={lift:?}, word_ticks={word_ticks}, phase={phase}, exponent={exponent}, carry_exponent={carry_exponent}, admittance={admittance}, expected_G={expected:?}, carried_G={carried}")]
+    ReturnedPortReference { contact:usize, lift:Vec<num_bigint::BigInt>, word_ticks:usize, phase:u64, exponent:Box<Rat>, carry_exponent:num_bigint::BigInt, admittance:Box<Rat>, expected:Option<Box<Rat>>, carried:Box<Rat> },
     #[error("the continuing state refused: {what}")]
     ContinuingState { what: &'static str },
     #[error("the admitted family adds receivers on rings {receivers:?} to the previous boundary's")]
