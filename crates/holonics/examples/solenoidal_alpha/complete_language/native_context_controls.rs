@@ -563,3 +563,89 @@ fn represented_native_full_transition()->Result<()>{
     assert_eq!(stream.resident().continuing_state(0)?,retained);
     println!("REPRESENTED_CONNECTED_COMPLETE_PASS actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true unsplit_trajectory_equivalence=false elapsed_ns={}",started.elapsed().as_nanos());Ok(())
 }
+
+#[test]
+#[ignore="one bounded continuity control; positive factor influence is a separate verdict"]
+fn represented_native_zero_motion_continuity()->Result<()>{
+    use holonics::hnn::word::work;
+    use holonics::hnn::field::ConstitutionRead;
+    struct Meter;impl Drop for Meter{fn drop(&mut self){let c=work::process_native_calls();let total=c.forward_attempts+c.response_attempts+c.return_attempts+c.response_return_attempts;let s=format!("{{\"final\":true,\"total_attempts\":{total},\"forward_constructors\":{},\"response_companions\":{},\"actual_returns\":{},\"fresh_returns\":{}}}\n",c.forward_attempts,c.response_attempts,c.return_attempts,c.response_return_attempts);println!("ZERO_MOTION_CONTINUITY_COUNTS {s} work={:?}",work::read());if let Some(p)=std::env::var_os("V93_NATIVE_COUNT_PATH"){std::fs::write(p,s).unwrap();}}}
+    let _meter=Meter;work::limit_process_native_attempts(std::env::var("V93_NATIVE_ATTEMPT_LIMIT")?.parse()?);
+    let started=Instant::now();let reference=port();let(field,mut initial,pairing)=declaration_with_input_context(16384,true,true)?;
+    initial.bind_family_local_receiving_return(2)?;initial.bind_bounded_receiving_representation(2)?;initial.bind_native_rational_receiving(2)?;
+    let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
+    let empty=PairedObservation::admit(&field,resident.constitution(),&pairing)?.encode(&[])?;reference.ingest(&mut resident,None,&empty)?;
+    resident.refine_contact_grain(24)?;resident.select_represented_native_prepared_input(&pairing)?;
+    let opening=resident.constitution().clone();let mut stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+    fn cold(reference:&Reference,stream:&ObservedStream,opening:&Constitution,label:&str)->Result<ObservedStream>{
+        let state=stream.resident().continuing_state(0)?;let text=state.to_text();let parsed=ContinuingState::from_text(&text,READ_BUDGET)?;
+        let root=std::path::PathBuf::from(std::env::var("V93_CONTROL_ARTIFACT_DIR")?);let folder=root.join(label);std::fs::create_dir_all(&folder)?;
+        let crib_text=stream.crib().unplaced_checkpoint()?;let pending_text=stream.pending_checkpoint();
+        std::fs::write(folder.join("native.state"),&text)?;std::fs::write(folder.join("crib.txt"),&crib_text)?;std::fs::write(folder.join("pending.txt"),&pending_text)?;
+        std::fs::write(folder.join("opening-material.state"),opening.continuing_state(0)?.to_text())?;
+        let meta=format!("{{\"accepted\":{},\"native_published\":{},\"exterior_pending\":{},\"native_sha256\":\"{}\",\"crib_sha256\":\"{}\",\"pending_sha256\":\"{}\"}}\n",stream.accepted_cells()?,stream.resident().continuing().ok_or("same native source")?.1,stream.pending_classes().len(),sha256(text.as_bytes())?,sha256(crib_text.as_bytes())?,sha256(pending_text.as_bytes())?);std::fs::write(folder.join("META.json"),meta)?;
+        let field=stream.resident().field();let resident=reference.mount_continued(field,&Current::at_rest(field),opening.clone(),&parsed)?;
+        assert_eq!(resident.continuing_state(0)?,state);
+        let crib=ObservedCrib::from_unplaced_checkpoint(field,resident.current(),stream.crib().next_position(),&stream.crib().unplaced_checkpoint()?)?;
+        let pending=stream.pending_checkpoint();assert!(pending.starts_with("observed-stream-pending-native-represented-v1"));
+        assert!(ObservedStream::restore_checkpoint(resident.clone(),crib.clone(),&pending.replacen("observed-stream-pending-native-represented-v1","observed-stream-pending-native-rational-v1",1)).is_err());
+        let restored=ObservedStream::restore_checkpoint(resident,crib,&pending)?;assert_eq!(restored.pending_checkpoint(),pending);
+        println!("ZERO_MOTION_CONTINUITY_COLD_PASS boundary={label} bytes={} pending_equal=true",text.len());Ok(restored)
+    }
+    let data:Vec<_>=(0..30).map(|i|i%4).collect();stream.receive_native_current(&reference,&pairing,&data[..6],64)?;
+    stream=cold(&reference,&stream,&opening,"pending-six")?;
+    let at6=stream.resident().continuing_state(0)?;let pending6=stream.pending_checkpoint();
+    // Print only existing reached readings; no diagnostic Word or inverse trajectory.
+    let first=stream.receive_native_current_diagnosed(&reference,&pairing,&data[6..10],64,&mut|e|{
+        let bits=e.prediction.features.iter().flatten().map(|q|q.numer().bits().max(q.denom().bits())).max().unwrap_or(0);
+        println!("ZERO_MOTION_CONTINUITY_SOURCE source={} commit={} feature_max_bits={bits} lattice={:?} work={:?}",e.prediction.source_cells,e.prediction.producing_commit,e.prediction.execution_lattice,e.preparation.as_ref().map(|p|&p.work));
+    });
+    let first=match first{Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,at6);assert_eq!(stream.pending_checkpoint(),pending6);println!("ZERO_MOTION_CONTINUITY_REFUSAL boundary=first-R rollback_exact=true error={e:?}");return Err(e.into());}};
+    assert_eq!(first.len(),1);assert_eq!(first[0].publication_source,9);assert!(first[0].blind_carry_preserved);
+    assert!(stream.resident().constitution().receiving_map(2).unwrap().entries().iter().any(|q|!num_traits::Zero::is_zero(q)));
+    println!("ZERO_MOTION_CONTINUITY_FIRST_R_PASS publication={:?}",first[0].publication);
+    stream=cold(&reference,&stream,&opening,"post-first-R")?;
+    let at10=stream.resident().continuing_state(0)?;let pending10=stream.pending_checkpoint();let theta10=stream.resident().constitution().clone();
+    let contact=match stream.observe_native_current_contact(&reference,&pairing,data[10],64){Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,at10);assert_eq!(stream.pending_checkpoint(),pending10);println!("ZERO_MOTION_CONTINUITY_REFUSAL boundary=contact10to11 rollback_exact=true error={e:?}");return Err(e.into());}};
+    let p=contact.contact.as_ref().ok_or("actual new represented contact owner")?;let proof=p.physical_reference.as_ref().ok_or("physical-reference witness")?;
+    let mut actual_delta=Vec::new();
+    for a in 0..field.contacts().len(){
+        let before=[theta10.contact_storage(a),theta10.contact_stiffness(a),theta10.contact_dissipation(a)];
+        let after=[p.constitution.contact_storage(a),p.constitution.contact_stiffness(a),p.constitution.contact_dissipation(a)];
+        for family in 0..3{actual_delta.push((a,family,before[family].clone(),after[family].clone(),after[family].subtract(before[family])?));}
+    }
+    let moved=actual_delta.iter().any(|(_,_,_,_,d)|d.entries().iter().any(|q|!num_traits::Zero::is_zero(q)));
+    let before_scales=(0..field.contacts().len()).map(|a|(a,theta10.contact_scales(a).clone())).collect::<Vec<_>>();
+    let after_scales=(0..field.contacts().len()).map(|a|(a,p.constitution.contact_scales(a).clone())).collect::<Vec<_>>();
+    let contact_carry=|theta:&Constitution|theta.carried_remainders().into_iter().filter(|(l,..)|matches!(l,holonics::hnn::constitution::Locus::Channel(_))).collect::<Vec<_>>();
+    let packet=format!("ZERO_MOTION_CONTINUITY_CONTACT_PACKET original_prediction={:?} current_after={:?} full_actual_factor_delta={actual_delta:?} before_scales={before_scales:?} after_scales={after_scales:?} before_contact_carry={:?} after_contact_carry={:?} publication={:?} physical_reference={proof:?} continuation={:?} input={:?}\n",contact.prediction,stream.resident().current(),contact_carry(&theta10),contact_carry(&p.constitution),p.publication,p.continuation,contact.input);
+    println!("{packet}");let root=std::path::PathBuf::from(std::env::var("V93_CONTROL_ARTIFACT_DIR")?);std::fs::create_dir_all(&root)?;std::fs::write(root.join("contact_packet.txt"),packet)?;
+    // Continuity is distinct from the stronger positive-material influence requirement.
+    if moved{assert!(proof.lower>integer(0));assert!(p.actual_alignment>p.actual_error_charge);}
+    else{assert_eq!(proof.stored_pairing,integer(0));assert_eq!(proof.lower,integer(0));}
+    assert_eq!(stream.accepted_cells()?,11);assert_eq!(stream.resident().prepared_input().unwrap().frontiers(),(11,0,0));
+    println!("ZERO_MOTION_CONTINUITY_CONTACT_VERDICT outcome={} positive_material_influence={} selected_steps={} vanished={:?} retained_tails={} released_tails={} original_positive_motion_fixture_unchanged=true",if moved{"Applied"}else{"NoRealizedMotion"},moved,p.publication.steps.len(),p.publication.vanished,p.publication.unresolved_contact_material.len(),p.publication.released.len());
+    stream=cold(&reference,&stream,&opening,"post-contact-source11")?;
+    for (label,start,end) in [("next-R",11,20),("source30-close",20,30)]{
+        let before=stream.resident().continuing_state(0)?;let pending=stream.pending_checkpoint();
+        let outcome=stream.receive_native_current_diagnosed(&reference,&pairing,&data[start..end],64,&mut|e|{
+            let bits=e.prediction.features.iter().flatten().map(|q|q.numer().bits().max(q.denom().bits())).max().unwrap_or(0);
+            println!("ZERO_MOTION_CONTINUITY_SOURCE source={} commit={} feature_max_bits={bits}",e.prediction.source_cells,e.prediction.producing_commit);
+        });
+        let sections=match outcome{Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,before);assert_eq!(stream.pending_checkpoint(),pending);println!("ZERO_MOTION_CONTINUITY_REFUSAL boundary={label} rollback_exact=true error={e:?}");return Err(e.into());}};
+        assert_eq!(sections.len(),1);assert_eq!(sections[0].publication_source,end as u64-1);assert!(sections[0].blind_carry_preserved);
+        if end==30{assert!(sections[0].aeon_closed);}
+        println!("ZERO_MOTION_CONTINUITY_SECTION_PASS boundary={label} publication={:?}",sections[0].publication);
+    }
+    let retained=stream.resident().continuing_state(0)?;let cold=cold(&reference,&stream,&opening,"final-source30")?;
+    let(mut a,mut ac)=stream.native_current_query_fork(&reference,&pairing,64)?;let(mut b,mut bc)=cold.native_current_query_fork(&reference,&pairing,64)?;
+    a.begin_hypothesized_output()?;b.begin_hypothesized_output()?;let theta=a.constitution().clone();let m=a.prepared_input().unwrap().material().clone();
+    for(index,key)in [rat(1,7),rat(2,7),rat(3,7),rat(4,7)].into_iter().enumerate(){
+        let x=reference.release_native_current_forecast(&mut a,&mut ac,&pairing,&key,64)?;let y=reference.release_native_current_forecast(&mut b,&mut bc,&pairing,&key,64)?;
+        assert_eq!(x.prediction,y.prediction);assert_eq!(x.selected_class,y.selected_class);assert_eq!(a.carried(),b.carried());
+        assert_eq!(a.constitution(),&theta);assert_eq!(b.constitution(),&theta);assert_eq!(a.prepared_input().unwrap().material(),&m);assert_eq!(b.prepared_input().unwrap().material(),&m);
+        println!("ZERO_MOTION_CONTINUITY_FROZEN_PASS decision={index} key={key} class={}",x.selected_class);
+    }
+    assert_eq!(stream.resident().continuing_state(0)?,retained);
+    println!("ZERO_MOTION_CONTINUITY_COMPLETE_PASS continuity=true positive_material_influence={moved} actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true unsplit_trajectory_equivalence=false elapsed_ns={}",started.elapsed().as_nanos());Ok(())
+}
