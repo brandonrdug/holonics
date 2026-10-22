@@ -3371,6 +3371,9 @@ fn receiving_series_for(
     columns: usize,
     period: u64,
 ) -> Result<(EpochArray, EpochArray, EpochArray), HnnError> {
+    receiving_series_in_carrier(samples,parts,rows,columns,period,false)
+}
+pub(super) fn receiving_series_in_carrier(samples:&[Sample],parts:&[EpochReceivingRecord],rows:usize,columns:usize,period:u64,native:bool)->Result<(EpochArray,EpochArray,EpochArray),HnnError>{
     if samples.len() != parts.len() {
         return Err(refused(
             "one receiving positive/foil/phase split is required per actual receiving record",
@@ -3429,7 +3432,11 @@ fn receiving_series_for(
                 covector: covector.to_vec(),
                 masses: None,
             };
-            if phase {
+            if native {
+                let feature=EpochArray::from_native_rows(&[sample.feature],vec![1],NativeRationalBudget::V1)?;
+                let covector=EpochArray::from_native_rows(&sample.covector.into_iter().map(|q|vec![q]).collect::<Vec<_>>(),(0..rows).map(|r|if phase&&r%2==1{period}else{1}).collect(),NativeRationalBudget::V1)?;
+                Ok(EpochRecord{feature,covector})
+            } else if phase {
                 EpochRecord::from_sample_with_phase_rows(&sample, &phase_rows, period)
             } else {
                 EpochRecord::from_sample(&sample)

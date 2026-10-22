@@ -444,7 +444,7 @@ impl Reference {
         .for_local_receiving_hold()?;
         let candidate = stage
             .stage_local_receiving_with_hold(&mut |_| {})
-            .map_err(|f| f.error)?;
+            .map_err(|f| HnnError::NativeEpochRefusal{source:Box::new(f.error),evidence:Box::new(f.evidence)})?;
         let (material, publication) = candidate.admit_receiving()?;
         let chart = next.native_context_chart()?.ok_or(HnnError::Unadmitted {
             reason: "native section retains its original input chart",

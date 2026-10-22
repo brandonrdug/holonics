@@ -16,7 +16,7 @@ impl EpochLaw {
     /// Write this law's exact, canonical continuation words.
     pub(crate) fn encode_checkpoint(&self) -> String {
         let mut text = String::new();
-        text.push_str(if self.receiving_refinement.is_some() {"epoch-law-receiving-refinement-v1"} else {HEADER});
+        text.push_str(if self.native_rational.is_some(){"epoch-law-native-rational-moments-v1"}else if self.receiving_refinement.is_some() {"epoch-law-receiving-refinement-v1"} else {HEADER});
         text.push('\n');
         text.push_str(&format!("shape {} {}\n", self.map.rows, self.map.columns));
         text.push_str(&format!(
@@ -62,7 +62,7 @@ impl EpochLaw {
     ) -> Result<Self, HnnError> {
         let mut lines = text.lines();
         let header = take(&mut lines)?;
-        if header != HEADER && header != "epoch-law-receiving-refinement-v1" {
+        if header != HEADER && header != "epoch-law-receiving-refinement-v1" && header != "epoch-law-native-rational-moments-v1" {
             return Err(malformed());
         }
         let shape = words(take(&mut lines)?, "shape", 2)?;
@@ -79,11 +79,12 @@ impl EpochLaw {
             "1" => true,
             _ => return Err(malformed()),
         };
-        let receiving_refinement = if header == "epoch-law-receiving-refinement-v1" {
+        let receiving_refinement = if matches!(header,"epoch-law-receiving-refinement-v1"|"epoch-law-native-rational-moments-v1") {
             let cap = parse_u32(words(take(&mut lines)?,"receiving-refinement",1)?[0])?;
             if cap != super::ReceivingRepresentationPolicy::CEILING || source_refinement { return Err(malformed()); }
             Some(cap)
         } else {None};
+        let native_rational=(header=="epoch-law-native-rational-moments-v1").then_some(super::NativeRationalBudget::V1);
         let map = read_array(&mut lines, "map", budget)?;
         let gram = read_array(&mut lines, "gram", budget)?;
         let news = read_array(&mut lines, "news", budget)?;
@@ -110,6 +111,7 @@ impl EpochLaw {
             &map,
         )?;
         let candidate = Self {
+            native_rational,
             map,
             gram,
             news,
@@ -178,7 +180,7 @@ fn validate_with_row_binding(
         .ok_or_else(malformed)?;
     if (bind_rows && law.news.row_divisors != declaration.news.row_divisors)
         || !law.map.is_dyadic()
-        || !law.gram.is_dyadic()
+        || (law.native_rational.is_none() && !law.gram.is_dyadic())
     {
         return Err(refused(
             "an epoch checkpoint must preserve its declared dyadic map/Gram and receiving phase rows",
@@ -199,6 +201,8 @@ fn validate_with_row_binding(
             "an epoch checkpoint's arrays must meet its receiver lattice and normal-locus shape",
         ));
     }
+    if law.native_rational != declaration.native_rational || law.native_rational != law.gram.native_rational || law.native_rational != law.news.native_rational || law.gram.row_divisors.iter().any(|d|*d!=1) || law.map.native_rational.is_some(){return Err(refused("normal checkpoint keeps its declared statistics carrier and dyadic realization"));}
+    law.gram.admit_grouped()?;law.news.admit_grouped()?;
     let mut gram = vec![vec![BigInt::zero(); columns]; columns];
     for i in 0..columns {
         for j in 0..columns {
@@ -208,6 +212,13 @@ fn validate_with_row_binding(
             }
             gram[i][j] = value.clone();
         }
+    }
+    if let Some(b)=law.native_rational {
+        // Fraction-free determinant numerators are bounded by the product of n
+        // row norms. Preflight both two-product elimination scratch and its sum.
+        let limb=law.gram.values.iter().map(BigInt::bits).max().unwrap_or(0);
+        let n=columns as u64;let det=limb.saturating_add(n.ilog2() as u64+1).saturating_mul(n).saturating_mul(2).saturating_add(4);
+        b.check(det,det.saturating_mul(n.saturating_mul(n).saturating_mul(6).saturating_add(4)))?;
     }
     if !positive_definite_integer(gram) {
         return Err(refused(
@@ -284,9 +295,7 @@ fn validate_with_row_binding(
 }
 
 fn same_dyadic_coordinate(left: &EpochArray, right: &EpochArray, index: usize) -> bool {
-    let exponent = left.exponent.max(right.exponent);
-    (&left.values[index] << (exponent - left.exponent) as usize)
-        == (&right.values[index] << (exponent - right.exponent) as usize)
+    &left.values[index]*&right.denominator == &right.values[index]*&left.denominator
 }
 
 /// Sylvester's criterion with fraction-free Bareiss elimination. The Gram's shared
@@ -322,6 +331,7 @@ fn write_array(text: &mut String, name: &str, array: &EpochArray) {
         "{name} {} {} {}\n",
         array.rows, array.columns, array.exponent
     ));
+    if let Some(b)=array.native_rational {text.push_str(&format!("native-rational {} {} {}\n",array.denominator,b.integer_bits,b.aggregate_bits));}
     write_values(
         text,
         &array
@@ -354,6 +364,13 @@ fn read_array(
     let columns = parse_usize(&header[1])?;
     let exponent = parse_u32(&header[2])?;
     let count = rows.checked_mul(columns).ok_or_else(malformed)?;
+    let numerical=if lines.clone().next().is_some_and(|s|s.starts_with("native-rational ")){
+        let w=words(take(lines)?,"native-rational",3)?;
+        budget.check((w[0].len() as u64).saturating_mul(4))?;
+        let d=w[0].parse::<BigInt>().map_err(|_|malformed())?;
+        let b=super::NativeRationalBudget{integer_bits:parse_u64(w[1])?,aggregate_bits:parse_u64(w[2])?};b.check(d.bits(),d.bits())?;
+        if d<=BigInt::zero()||exponent!=0{return Err(malformed());}Some((d,b))
+    }else{None};
     let mut payload = u64::from(exponent)
         .checked_add(1)
         .ok_or_else(malformed)?
@@ -410,7 +427,10 @@ fn read_array(
     budget.charge(payload)?;
     // Canonicality was checked above; move the numerator family rather than retaining a
     // duplicate allocation merely to compare it after the constructor's power-of-two cancel.
-    let array = EpochArray::with_row_divisors(rows, columns, exponent, values, row_divisors)?;
+    let array = if let Some((denominator,b))=numerical{
+        budget.charge(denominator.bits())?;
+        let a=EpochArray{rows,columns,exponent,denominator,numerator_l1_bound:values.iter().map(Signed::abs).sum(),values,row_divisors,native_rational:Some(b)};b.admit_array(&a)?;a
+    }else{EpochArray::with_row_divisors(rows, columns, exponent, values, row_divisors)?};
     if array.exponent != exponent || array.values.len() != count {
         return Err(refused(
             "an epoch checkpoint array must use canonical shared dyadics",

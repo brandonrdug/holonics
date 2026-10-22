@@ -520,3 +520,13 @@ reports that law's actual strict/neutral receipts and halving count separately f
 grouped probe. Its unplaced closing-crib codec joins the complete native ContinuingState for
 cold restart; source provenance is exterior metadata. Neither corpus ingestion nor a query
 reading establishes semantic research answers.
+
+
+### Native rational normal statistics (bounded CODE owner)
+
+The explicit native receiving policy separates numerical denominators from semantic
+phase rows while preserving the map lattice and represented-delta news identity.
+Its owner is `hnn/constitution/epoch/rational.rs`; its scoped evidence and incomplete
+connected qualification are recorded in
+[Native rational moments keep phase and represented news](../research/records/2026-10-22_NATIVE_RATIONAL_MOMENTS_KEEP_PHASE_AND_REPRESENTED_NEWS.md).
+The legacy grouped carrier and device admission remain separate.

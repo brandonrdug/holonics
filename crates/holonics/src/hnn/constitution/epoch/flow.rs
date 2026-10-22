@@ -129,6 +129,25 @@ fn scale_values(values: &[Rat], exponent: u32) -> Result<Vec<BigInt>, HnnError> 
 }
 
 impl EpochFlow {
+    pub(super) fn from_native_samples(rows:usize,columns:usize,grain:u32,cells:u64,epoch:u64,heard:u64,samples:&[Sample],phase_rows:&[usize],period:u64)->Result<Self,HnnError>{
+        use num_traits::Signed;
+        let b=super::NativeRationalBudget::V1;
+        if rows==0||columns==0||cells==0||heard>cells||heard==0||period<=1||period%2==0||samples.is_empty(){return Err(refused("native rational flow retains actual count and phase declaration"));}
+        let mut div=vec![1;rows];for &i in phase_rows{if i>=rows||div[i]!=1{return Err(refused("native rational phase rows are distinct"));}div[i]=period;}
+        let mut gram=EpochArray::from_native_rows(&vec![vec![Rat::zero();columns];columns],vec![1;columns],b)?;
+        let mut covector=EpochArray::from_native_rows(&vec![vec![Rat::zero();columns];rows],div.clone(),b)?;
+        let mut reached=vec![false;columns];
+        for s in samples{
+            if s.weight!=Rat::one()||s.feature.len()!=columns||s.covector.len()!=rows||s.feature.iter().any(|x|x.abs()>Rat::one()){return Err(refused("native rational producer retains unit multiplicity, shape and transported unit bound"));}
+            let f=EpochArray::from_native_rows(&[s.feature.clone()],vec![1],b)?;
+            // Preserve every numerical denominator at transpose; no EpochArray::new here.
+            let t=EpochArray::from_native_rows(&s.feature.iter().map(|q|vec![q.clone()]).collect::<Vec<_>>(),vec![1;columns],b)?;
+            let d=EpochArray::from_native_rows(&s.covector.iter().map(|q|vec![q.clone()]).collect::<Vec<_>>(),div.clone(),b)?;
+            gram=gram.add(&t.multiply(&f)?)?;covector=covector.add(&d.multiply(&f)?)?;
+            for (a,x) in reached.iter_mut().zip(&s.feature){*a|=!x.is_zero();}
+        }
+        Ok(Self{gram,covector,support:reached.iter().enumerate().filter_map(|(j,x)|x.then_some(j)).collect(),partitions:vec![],cells:heard,partition_cells:cells,records:samples.len() as u64,partition_exponent:partition_exponent(grain,cells,epoch)?,receiver_grain:grain,epoch})
+    }
     /// Validate the same producer records without forming any aggregation.
     /// The card boundary uses this admission before exact packing and execution.
     #[allow(clippy::too_many_arguments)]

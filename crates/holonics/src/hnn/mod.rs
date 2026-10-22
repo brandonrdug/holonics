@@ -446,6 +446,10 @@ pub enum HnnError {
     WordEnded { ticks: usize },
     #[error("the crib of {cells} cells has no pair at offset {offset}")]
     Crib { cells: usize, offset: usize },
+    #[error("native receiving section refused: {source}; evidence: {evidence:?}")]
+    NativeEpochRefusal { source:Box<HnnError>, evidence:Box<reference::observed::EpochStageRefusal> },
+    #[error("NativeRationalMomentsV1 extent: integer {integer_bits}/{integer_limit} bits, aggregate {aggregate_bits}/{aggregate_limit} bits")]
+    NativeRationalExtent { integer_bits:u64, integer_limit:u64, aggregate_bits:u64, aggregate_limit:u64 },
     #[error(
         "the successor constitution's {bits} exact bits exceed its budget of {budget} at commit {commit}; the loci that grew most: {loci:?}"
     )]

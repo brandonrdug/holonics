@@ -115,6 +115,10 @@ impl ObservedEpochWord for NativeEpochWord {
 /// refusal when their selected realization cannot execute the actual operands.
 /// The words are independent after their forward chain has reached its openings.
 pub trait ObservedEpochExecution: Sync {
+    /// Numerical normal statistics require an explicit host capability. Device
+    /// packing is still dyadic and may never silently fall back.
+    fn admit_native_rational_moments(&self)->Result<(),HnnError>{Err(HnnError::Unadmitted{reason:"selected executor has no NativeRationalMomentsV1 aggregation capability"})}
+
     /// An executor must explicitly admit the prepared opening/work operand. A
     /// backend that ignores the sealed input operation is never a host fallback.
     fn admit_prepared_input(&self)->Result<(),HnnError>{Err(HnnError::Unadmitted{reason:"selected executor has no prepared native source opening adapter"})}
@@ -191,6 +195,7 @@ pub trait ObservedEpochExecution: Sync {
 pub struct HostObservedEpochExecution;
 
 impl ObservedEpochExecution for HostObservedEpochExecution {
+    fn admit_native_rational_moments(&self)->Result<(),HnnError>{Ok(())}
     fn admit_prepared_input(&self)->Result<(),HnnError>{Ok(())}
     fn forward(
         &self,

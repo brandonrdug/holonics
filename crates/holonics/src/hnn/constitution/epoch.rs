@@ -23,6 +23,8 @@ pub(crate) use deposit::{
     StagedEpochCandidate,
 };
 mod flow;
+mod rational;
+pub(super) use rational::NativeRationalBudget;
 #[cfg(test)]
 mod mixed_tests;
 mod quantum_projection;
@@ -373,7 +375,7 @@ impl CheckpointReadBudget {
     pub(super) fn admit_map_view(&mut self, map: &EpochArray) -> Result<(), HnnError> {
         let mut bits = 0u64;
         for (row, &divisor) in map.row_divisors.iter().enumerate() {
-            let denominator = u64::from(map.exponent)
+            let denominator = map.denominator.bits()
                 .checked_add(u64::from(u64::BITS - divisor.leading_zeros()))
                 .ok_or_else(extent)?;
             for numerator in &map.values[row * map.columns..(row + 1) * map.columns] {
@@ -434,9 +436,18 @@ pub(crate) fn lifetime_release_bound(
 /// Grouped exact rows: one shared power of two, with the receiving phase rows'
 /// declared odd period retained separately. W and H use only divisor-one rows.
 /// Coordinates are never individually reduced. Content reduction is a shift.
-// The grouped epoch coordinates extend the existing integral-chart owner.
-// This alias introduces no independent retained array implementation.
-pub(crate) type EpochArray = IntegralMatrix;
+// GroupedV1 keeps the original dyadic/semantic-row carrier. The explicit
+// NativeRationalMomentsV1 tag admits a separately bounded numerical denominator;
+// untagged common-rational integral charts remain unadmitted.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct EpochArray {
+    pub(crate) rows: usize, pub(crate) columns: usize,
+    pub(crate) values: Vec<BigInt>, pub(crate) denominator: BigInt,
+    pub(crate) exponent: u32, pub(crate) row_divisors: Vec<u64>,
+    pub(crate) numerator_l1_bound: BigInt,
+    // Explicit bounded numerical carrier; None retains the original grouped law.
+    pub(super) native_rational: Option<NativeRationalBudget>,
+}
 
 impl EpochArray {
     pub(crate) fn new(
@@ -465,6 +476,7 @@ impl EpochArray {
         }
         let numerator_l1_bound = values.iter().map(Signed::abs).sum();
         let mut array = Self {
+            native_rational: None,
             numerator_l1_bound,
             rows,
             columns,
@@ -511,6 +523,7 @@ impl EpochArray {
     }
 
     fn admit_grouped(&self) -> Result<(), HnnError> {
+        if let Some(b) = self.native_rational { return b.admit_array(self); }
         if self.denominator != (BigInt::one() << self.exponent as usize) {
             return Err(refused(
                 "epoch arithmetic requires an admitted grouped dyadic base, not a legacy common-rational chart",
@@ -535,6 +548,7 @@ impl EpochArray {
 
     pub(crate) fn add(&self, other: &Self) -> Result<Self, HnnError> {
         self.same_shape(other)?;
+        if let Some(b)=self.native_budget_with(other)? {return self.native_binary(other,b,false);}
         let exponent = self.exponent.max(other.exponent);
         let divisors = self
             .row_divisors
@@ -559,6 +573,7 @@ impl EpochArray {
     }
 
     pub(crate) fn subtract(&self, other: &Self) -> Result<Self, HnnError> {
+        if let Some(b)=self.native_budget_with(other)? { return self.native_binary(other,b,true); }
         let negative = Self::with_row_divisors(
             other.rows,
             other.columns,
@@ -570,6 +585,7 @@ impl EpochArray {
     }
 
     pub(crate) fn multiply(&self, other: &Self) -> Result<Self, HnnError> {
+        if let Some(b)=self.native_budget_with(other)? {return self.native_multiply(other,b);}
         self.admit_grouped()?;
         other.admit_grouped()?;
         if self.columns != other.rows {
@@ -607,6 +623,7 @@ impl EpochArray {
     }
 
     fn dot(&self, other: &Self) -> Result<Self, HnnError> {
+        if let Some(b)=self.native_budget_with(other)? {return self.native_dot(other,b);}
         self.same_shape(other)?;
         let divisors = self
             .row_divisors
@@ -634,6 +651,7 @@ impl EpochArray {
     }
 
     fn half(&self) -> Result<Self, HnnError> {
+        if let Some(b)=self.native_rational {return self.native_scale(&Rat::new(1.into(),2.into()),b);}
         self.admit_grouped()?;
         Self::with_row_divisors(
             self.rows,
@@ -645,6 +663,7 @@ impl EpochArray {
     }
 
     pub(crate) fn scalar_product(&self, scalar: &Self) -> Result<Self, HnnError> {
+        if let Some(b)=self.native_budget_with(scalar)? {return self.native_scale(&scalar.scalar_ratio()?,b);}
         self.admit_grouped()?;
         scalar.admit_grouped()?;
         if (scalar.rows, scalar.columns) != (1, 1) {
@@ -680,7 +699,7 @@ impl EpochArray {
             .enumerate()
             .map(|(i, v)| v * (divisor / self.row_divisors[i / self.columns]))
             .collect();
-        Ok((values, BigInt::from(divisor) << self.exponent as usize))
+        Ok((values, BigInt::from(divisor) * &self.denominator))
     }
 
     pub(crate) fn scalar_ratio(&self) -> Result<Rat, HnnError> {
@@ -690,7 +709,7 @@ impl EpochArray {
         }
         Ok(Rat::new(
             self.values[0].clone(),
-            BigInt::from(self.row_divisors[0]) << self.exponent as usize,
+            BigInt::from(self.row_divisors[0]) * &self.denominator,
         ))
     }
 
@@ -745,6 +764,18 @@ impl EpochArray {
             .collect();
         Ok(ExactRatMatrix::shaped(self.rows, self.columns, rows)?)
     }
+
+    #[cfg(test)]
+    fn legacy_view(&self)->IntegralMatrix{IntegralMatrix{rows:self.rows,columns:self.columns,values:self.values.clone(),denominator:self.denominator.clone(),exponent:self.exponent,row_divisors:self.row_divisors.clone(),numerator_l1_bound:self.numerator_l1_bound.clone()}}
+    #[cfg(test)]
+    fn from_unadmitted_integral(a:IntegralMatrix)->Self{Self{rows:a.rows,columns:a.columns,values:a.values,denominator:a.denominator,exponent:a.exponent,row_divisors:a.row_divisors,numerator_l1_bound:a.numerator_l1_bound,native_rational:None}}
+    #[cfg(test)]
+    fn apply(&self,v:&crate::ratio::linear::vector::Chart)->crate::ratio::linear::vector::Chart{self.legacy_view().apply(v)}
+    #[cfg(test)]
+    fn schur_norms(&self)->(Rat,Rat){self.legacy_view().schur_norms()}
+    #[cfg(test)]
+    fn projected(&self,r:&[usize],c:&[Option<usize>])->Self{Self::from_unadmitted_integral(self.legacy_view().projected(r,c))}
+    pub(crate) fn to_rows(&self) -> Vec<Vec<Rat>> { self.to_matrix().expect("admitted epoch array").to_rows() }
 
     pub(crate) fn is_zero(&self) -> bool {
         self.values.iter().all(Zero::is_zero)
@@ -1006,6 +1037,7 @@ impl EpochFlow {
 /// Retained normal-locus constitution. `B` is implicit: `B = W H + R`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct EpochLaw {
+    pub(super) native_rational: Option<NativeRationalBudget>,
     pub(crate) map: EpochArray,
     pub(crate) gram: EpochArray,
     pub(crate) news: EpochArray,
@@ -1095,7 +1127,7 @@ impl EpochFresh {
         let scalar = |value: &EpochArray| {
             Rat::new(
                 value.values[0].clone(),
-                BigInt::from(value.row_divisors[0]) << value.exponent as usize,
+                BigInt::from(value.row_divisors[0]) * &value.denominator,
             )
         };
         let unit_norms = unit.schur_norms();
@@ -1108,7 +1140,7 @@ impl EpochFresh {
                 phase_covector_scale.denominator.clone(),
             ),
             unit_norms,
-            norm: EpochSpectral::grouped_frobenius(&self.direction),
+            norm: EpochSpectral::try_grouped_frobenius(&self.direction)?,
         })
     }
 }
@@ -1188,6 +1220,7 @@ impl EpochLaw {
         let mut founded = Self::from_normal(declaration, receiver_grain)?;
         founded.source_refinement = self.source_refinement;
         founded.receiving_refinement = self.receiving_refinement;
+        if self.native_rational.is_some(){founded=founded.into_native_rational()?;}
         if declaration.receiving_prior().is_some() {
             // `continued` has the actual native law but not its field period.
             // Only that declared receiving role may defer the row binding;
@@ -1214,6 +1247,7 @@ impl EpochLaw {
         gram.numerator_l1_bound = gram.values.iter().map(Signed::abs).sum();
         let width = u64::try_from(columns).map_err(|_| extent())?;
         Ok(Self {
+            native_rational: None,
             map: EpochArray::zero(rows, columns)?,
             gram,
             news: EpochArray::zero(rows, columns)?,
@@ -1248,6 +1282,7 @@ impl EpochLaw {
         let mut spectral = EpochSpectral::founded_zero(map.rows, map.columns);
         spectral.refresh(&map)?;
         let candidate = Self {
+            native_rational: None,
             map,
             gram,
             news,
@@ -1352,9 +1387,10 @@ impl EpochLaw {
                 "an epoch flow must preserve its actual face bound, ingress c, partition exponent, and exact release bound",
             ));
         }
-        if !self.map.is_dyadic() || !self.gram.is_dyadic() || !flow.gram.is_dyadic() {
+        if !self.map.is_dyadic() || (self.native_rational.is_none() && (!self.gram.is_dyadic() || !flow.gram.is_dyadic())) {
             return Err(refused("the epoch map and Gram must remain dyadic"));
         }
+        if self.native_rational != flow.gram.native_rational || self.native_rational != flow.covector.native_rational {return Err(refused("normal flow keeps its explicitly declared numerical carrier"));}
         self.news.same_shape(&flow.covector)?;
         if self
             .news
@@ -1376,6 +1412,7 @@ impl EpochLaw {
         gram: &EpochArray,
         support: &[usize],
     ) -> Result<(EpochArray, Vec<i64>), HnnError> {
+        if let Some(b)=self.native_rational {return self.native_direction(news,gram,support,b);}
         let columns = self.map.columns;
         let mut shares = vec![0i64; columns];
         let mut reached = vec![false; columns];
@@ -1990,7 +2027,7 @@ impl EpochLaw {
                     let maximum = direction.values[row*direction.columns..(row+1)*direction.columns]
                         .iter().map(Signed::abs).max().unwrap_or_default();
                     if maximum.is_positive() {
-                        let divisor = &direction_divisor * direction.row_divisors[row];
+                        let divisor = &direction_divisor * direction.row_divisors[row] * if direction.native_rational.is_some(){direction.denominator.clone()}else{BigInt::one()};
                         required = required.min(Self::direction_reach(direction.exponent,&maximum,&divisor)?);
                     }
                 }
@@ -2021,7 +2058,7 @@ impl EpochLaw {
             receiving_representation = Some(reading);
         }
         let shift = i64::from(map_lattice) - i64::from(direction.exponent);
-        let projection_divisor = &eta_denominator * &direction_divisor;
+        let projection_divisor = &eta_denominator * &direction_divisor * if direction.native_rational.is_some(){direction.denominator.clone()}else{BigInt::one()};
         let denominator = if shift < 0 {
             &projection_divisor << (-shift) as usize
         } else {

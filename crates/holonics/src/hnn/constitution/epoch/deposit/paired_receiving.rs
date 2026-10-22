@@ -69,7 +69,7 @@ fn face(
         moves: c.moves.clone(),
         covector: covector.max(c.oscillation.clone()).max(Rat::one()),
         unit_norms,
-        norm: EpochSpectral::grouped_frobenius(direction),
+        norm: EpochSpectral::try_grouped_frobenius(direction)?,
     })
 }
 
@@ -99,7 +99,18 @@ fn block_flow(
         }
     }
     let rows: Vec<_> = (1..law.map.rows).step_by(2).collect();
-    let mut flow = executed_epoch_flow(
+    let mut flow = if law.native_rational.is_some() {
+        stage.execution.admit_native_rational_moments()?;
+        EpochFlow::from_native_samples(law.map.rows,law.map.columns,grain,stage.epoch_cells,stage.epoch_index,stage.heard_cells,&transport,&rows,stage.receiving_period).map_err(|error|{
+            let mut e=EpochStageRefusal::at("native_rational_flow",EpochStageCondition::FlowContract,"bounded exact native features/covectors with unchanged semantic phase",Some(Locus::ReceivingMap(stage.receiver)),Some(Family::Map));
+            let extent=transport.iter().flat_map(|s|s.feature.iter().chain(&s.covector)).map(|q|q.numer().bits().saturating_add(q.denom().bits()).saturating_add(2)).sum::<u64>();
+            if extent<=NativeRationalBudget::V1.aggregate_bits {
+                e=e.read("actual_transported_features",EpochStageValue::RationalMatrix(rows_matrix(&transport.iter().map(|s|s.feature.clone()).collect::<Vec<_>>())))
+                    .read("actual_covectors",EpochStageValue::RationalMatrix(rows_matrix(&transport.iter().map(|s|s.covector.clone()).collect::<Vec<_>>())));
+            }else{e=e.read("actual_samples",EpochStageValue::Unavailable("diagnostic extent exceeds declared native rational aggregate bound"));}
+            e=e.read("semantic_phase_period",EpochStageValue::Integer(stage.receiving_period.into())).read("transport_power_two",EpochStageValue::Ratio(scale.clone()));e.first(&mut trace.evidence);error
+        })?
+    } else { executed_epoch_flow(
         LinearLocus::Receiving(stage.receiver),
         law,
         &transport,
@@ -111,7 +122,7 @@ fn block_flow(
         stage.heard_cells,
         stage.execution,
         &mut trace.evidence,
-    )?;
+    )? };
     flow.gram = flow
         .gram
         .scalar_product(&EpochArray::from_dyadic_scalar(&(&scale * &scale))?)?;
@@ -241,6 +252,10 @@ fn prepare(
             )?,
         };
         law.receiving_refinement = owner.representation_policy().ceiling();
+        if owner.native_rational(){
+            if stage.receiving_parts.iter().any(|p|!matches!(p.law,EpochReceivingLaw::NativeCurrentV1(_))){return Err(refused("rational normal policy requires authentic native section returns"));}
+            if law.native_rational.is_none(){law=law.into_native_rational()?;}
+        }else if law.native_rational.is_some(){return Err(refused("rational moments cannot be rebound to the legacy receiving policy"));}
         if law.receiving_refinement.is_some_and(|cap|law.map_lattice > cap) {
             return Err(refused("the initial receiving lattice exceeds the explicit representation ceiling"));
         }
@@ -254,10 +269,8 @@ fn prepare(
         scales[i] = scale;
         observe(EpochDepositPhase::Flow(kind));
     }
-    let direction = physical_array(
-        &joined(&directions[0], &directions[1])?,
-        stage.receiving_period,
-    )?;
+    let proposed = joined(&directions[0], &directions[1])?;
+    let direction = if owner.native_rational() { EpochArray::from_native_rows(&proposed.to_rows(),(0..rows).map(|r|if r%2==1{stage.receiving_period}else{1}).collect(),NativeRationalBudget::V1)? } else { physical_array(&proposed,stage.receiving_period)? };
     let certificate = receiving_epoch_certificate(
         &samples,
         stage.receiving_parts,
@@ -317,12 +330,13 @@ fn prepare(
         )?
         .map_err(|_| refused("paired fresh physical receiving certificate refused"))?;
     observe(EpochDepositPhase::JointCertificate);
-    let (p, f, h) = receiving_series_for(
+    let (p, f, h) = receiving_series_in_carrier(
         &samples,
         stage.receiving_parts,
         rows,
         width * 2,
         stage.receiving_period,
+        owner.native_rational(),
     )?;
     Ok(Prepared {
         owner,

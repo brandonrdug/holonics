@@ -2656,6 +2656,7 @@ mod tests {
             deferred_without_fresh_update: false,
             scale_rebase: std::array::from_fn(|_| Rat::zero()),
             dissipation_rebase: crate::hnn::constitution::EpochSeriesReading {
+                numerical_denominator: None,
                 rows: 1,
                 columns: 1,
                 exponent: 0,

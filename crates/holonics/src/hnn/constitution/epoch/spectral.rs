@@ -58,17 +58,13 @@ impl EpochSpectral {
 
     /// A certified Frobenius upper bound computed directly from one grouped dyadic array.
     pub(crate) fn grouped_frobenius(array: &EpochArray) -> Rat {
-        // Sum rows separately in the scalar certificate. The represented map
-        // stays dyadic; fresh receiving directions may have the fixed odd phase factor.
-        let squared = array
-            .dot(array)
-            .and_then(|s| s.scalar_ratio())
-            .expect("a valid epoch array has its exact scalar square");
-        if squared.is_zero() {
-            Rat::zero()
-        } else {
-            root_ceiling(&squared)
-        }
+        Self::try_grouped_frobenius(array).expect("a valid legacy grouped array has its scalar square")
+    }
+    /// Native rational transient arithmetic may refuse its declared resource
+    /// preflight. Propagate that refusal instead of panicking or forging a norm.
+    pub(super) fn try_grouped_frobenius(array:&EpochArray)->Result<Rat,HnnError>{
+        let squared=array.dot(array)?.scalar_ratio()?;
+        Ok(if squared.is_zero(){Rat::zero()}else{root_ceiling(&squared)})
     }
 
     /// Exact scalar cache words for the epoch-law checkpoint. These are the last

@@ -2416,6 +2416,7 @@ impl NormalLaw {
     pub fn epoch_storage(&self) -> Option<EpochStorageReading> {
         let law = self.epoch.as_deref()?;
         let read = |array: &epoch::EpochArray| EpochArrayReading {
+            numerical_denominator: array.native_rational.map(|_|array.denominator.clone()),
             rows: array.rows,
             columns: array.columns,
             exponent: array.exponent,
@@ -2425,7 +2426,7 @@ impl NormalLaw {
             numerator_l1_bound: array.numerator_l1_bound.clone(),
         };
         let (_, _, base, moves) = law.spectral.checkpoint_words();
-        let prior = BigInt::one() << (self.chart.scale as usize + law.gram.exponent as usize);
+        let prior = &law.gram.denominator << self.chart.scale as usize;
         let gram_departed_prior_rows = (0..law.gram.rows)
             .filter(|&row| {
                 (0..law.gram.columns).any(|column| {
@@ -2831,7 +2832,8 @@ impl NormalLaw {
                         .iter()
                         .map(|v| v.bits().saturating_add(1))
                         .sum::<u64>()
-                        + u64::from(array.exponent)
+                        + array.denominator.bits()
+                        + if array.native_rational.is_some(){128}else{0}
                         + array
                             .row_divisors
                             .iter()
@@ -2894,6 +2896,8 @@ impl NormalLaw {
 /// integer numerator bounds; the row divisors preserve phase/magnitude identity.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochArrayReading {
+    /// Explicit numerical carrier denominator; None retains the old dyadic base.
+    pub numerical_denominator: Option<BigInt>,
     pub rows: usize,
     pub columns: usize,
     pub exponent: u32,
@@ -2923,6 +2927,8 @@ pub struct EpochStorageReading {
 /// Exact grouped series in a transient crossing receipt.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EpochSeriesReading {
+    /// Explicit numerical carrier denominator; None retains the old dyadic base.
+    pub numerical_denominator: Option<BigInt>,
     pub rows: usize,
     pub columns: usize,
     pub exponent: u32,
@@ -3209,6 +3215,7 @@ pub struct EpochChannelEndpointReading {
 impl EpochArrayReading {
     pub(crate) fn of(array: &epoch::EpochArray) -> Self {
         Self {
+            numerical_denominator: array.native_rational.map(|_|array.denominator.clone()),
             rows: array.rows,
             columns: array.columns,
             exponent: array.exponent,
@@ -3222,6 +3229,7 @@ impl EpochArrayReading {
 impl EpochSeriesReading {
     pub(crate) fn of(array: &epoch::EpochArray) -> Self {
         Self {
+            numerical_denominator: array.native_rational.map(|_|array.denominator.clone()),
             rows: array.rows,
             columns: array.columns,
             exponent: array.exponent,
@@ -5578,6 +5586,11 @@ impl Constitution {
     }
     /// No learned state is migrated. The new policy is founded only on fresh,
     /// family-local, independently charted arrival/context material.
+    /// Explicit host-only rational normal-statistics policy; no archived moments migrate.
+    pub fn bind_native_rational_receiving(&mut self,ring:usize)->Result<(),HnnError>{
+        self.rings.get_mut(ring).and_then(|r|r.receiving.as_mut()).ok_or(HnnError::MissingReceivingMap{ring})?.bind_native_rational()
+    }
+    pub fn native_rational_receiving(&self,ring:usize)->bool{self.rings.get(ring).and_then(|r|r.receiving.as_ref()).is_some_and(|r|r.native_rational())}
     pub fn bind_bounded_receiving_representation(&mut self, ring: usize) -> Result<(), HnnError> {
         let mut next = self.clone();
         next.rings.get_mut(ring).and_then(|r|r.receiving.as_mut())
@@ -12754,7 +12767,7 @@ impl Constitution {
                 }
             }
             if let (Some(saved), Some(declared)) = (&saved.receiving, &material.receiving) {
-                if saved.representation_policy() != declared.representation_policy() {
+                if saved.representation_policy() != declared.representation_policy() || saved.native_rational()!=declared.native_rational() {
                     return Err(refuse("the receiving representation policy belongs to its founding material"));
                 }
                 saved.validate()?;

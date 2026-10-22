@@ -346,6 +346,7 @@ impl Card {
             bounds.push(bound);
         }
         let gram = EpochSeriesReading {
+            numerical_denominator: None,
             rows: columns,
             columns,
             exponent: gram_exp,
@@ -353,6 +354,7 @@ impl Card {
             numerators: values.split_off(g_entries),
         };
         let covector = EpochSeriesReading {
+            numerical_denominator: None,
             rows,
             columns,
             exponent: cov_exp,
@@ -398,6 +400,7 @@ mod tests {
         divisors: Vec<u64>,
     ) -> EpochSeriesReading {
         EpochSeriesReading {
+            numerical_denominator: None,
             rows,
             columns,
             exponent,

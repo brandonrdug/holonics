@@ -27,6 +27,8 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
+- [Native rational moments keep phase and represented news](2026-10-22_NATIVE_RATIONAL_MOMENTS_KEEP_PHASE_AND_REPRESENTED_NEWS.md): explicit bounded receiving statistics, unchanged lattice/phase, data checks and preserved first-R resource refusal.
+
 - [The navigator port enters only with its located source](2026-10-18_THE_NAVIGATOR_PORT_ENTERS_ONLY_WITH_ITS_LOCATED_SOURCE.md) (#73, #76, #62): a located linear navigator's state enters its source ring through a second material port at the opening's phase; admission is `ker N ⊆ ker c`, the decoder is a fibre, the covector is tape-free and the dimension is located; the port waits for its consumer (a located linear source, whose single-trajectory identification is not derived).
 
 - [The continuing listener locates keys at its close and writes its release before the answer](2026-10-16_BOUNDED_OBSERVED_CONTINUING_LISTENER.md) (#73, #148, #62): one finite continuing host moment, shared close and native key location, read-only comparison receipts and workload-derived release maximum; fixed precision, device fork and resume scope remain explicit.

@@ -45,6 +45,7 @@ pub fn epoch_record_operands(
 }
 
 fn array(reading: &EpochSeriesReading) -> Result<EpochArray, HnnError> {
+    if reading.numerical_denominator.is_some(){return Err(refused("device packing has no native rational statistics qualification"));}
     EpochArray::with_row_divisors(
         reading.rows,
         reading.columns,

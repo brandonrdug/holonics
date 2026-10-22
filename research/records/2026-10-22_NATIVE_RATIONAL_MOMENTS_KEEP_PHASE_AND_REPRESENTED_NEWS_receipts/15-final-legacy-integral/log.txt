@@ -1,0 +1,7 @@
+
+running 2 tests
+test hnn::constitution::epoch::mixed_tests::integral_owner_reads_mixed_rows_and_projects_unlike_groups_exactly ... ok
+test hnn::constitution::epoch::mixed_tests::integral_projection_keeps_large_odd_factors_without_machine_word_lcm_overflow ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 1787 filtered out; finished in 0.00s
+

@@ -280,7 +280,7 @@ fn integral_owner_reads_mixed_rows_and_projects_unlike_groups_exactly() {
     // This result is a transient common integral chart, not a receiving
     // row-group declaration. Re-entry into grouped epoch arithmetic is typed.
     assert!(projected.add(&mixed).is_err());
-    let legacy = IntegralMatrix::from_grouped(1, 1, vec![1.into()], 3.into()).unwrap();
+    let legacy = EpochArray::from_unadmitted_integral(IntegralMatrix::from_grouped(1, 1, vec![1.into()], 3.into()).unwrap());
     assert_eq!(legacy.to_rows(), vec![vec![rat(1, 3)]]);
     assert!(legacy.add(&a(1, 1, 0, &[1])).is_err());
     assert_eq!(legacy.to_matrix().unwrap().to_rows(), vec![vec![rat(1, 3)]]);

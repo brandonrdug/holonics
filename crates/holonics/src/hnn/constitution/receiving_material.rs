@@ -124,6 +124,7 @@ pub(super) enum ReceivingMaterial {
         source_width: usize,
         return_policy: crate::hnn::receiving::RetainedReturnPolicy,
         representation_policy: ReceivingRepresentationPolicy,
+        native_rational: bool,
         blocks: [ReceivingBlock; 2],
         published: ExactRatMatrix,
         shared_phase: PhaseStatistics,
@@ -189,6 +190,7 @@ impl ReceivingMaterial {
                     source_width: *source_width,
                     return_policy: self.return_policy(),
                     representation_policy: self.representation_policy(),
+                    native_rational: self.native_rational(),
                     blocks,
                     published: published.scaled(&Rat::zero()),
                     shared_phase: PhaseStatistics::founded(
@@ -403,7 +405,7 @@ impl ReceivingMaterial {
                     crate::hnn::receiving::ReceivingCarrier::Anchor => "anchor",
                     crate::hnn::receiving::ReceivingCarrier::SourceObserver => "source-observer",
                 };
-                let tag = if material.unwrap().representation_policy() == ReceivingRepresentationPolicy::BoundedSubquantumV1 {
+                let tag = if material.unwrap().native_rational() {"arrival-context-native-rational-moments-v1"} else if material.unwrap().representation_policy() == ReceivingRepresentationPolicy::BoundedSubquantumV1 {
                     "arrival-context-family-local-subquantum20-v1"
                 } else if material.unwrap().return_policy() == crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 { "arrival-context-family-local-v1" } else { "arrival-context-v1" };
                 *s += &format!("{key} {tag} {source_width} {carrier}\n");
@@ -457,14 +459,15 @@ impl ReceivingMaterial {
             .next()
             .ok_or(HnnError::ContinuingState { what })?;
         let words = head(line, key, what)?;
-        if !matches!(words.first().map(String::as_str),Some("arrival-context-v1"|"arrival-context-family-local-v1"|"arrival-context-family-local-subquantum20-v1")) {
+        if !matches!(words.first().map(String::as_str),Some("arrival-context-v1"|"arrival-context-family-local-v1"|"arrival-context-family-local-subquantum20-v1"|"arrival-context-native-rational-moments-v1")) {
             return read_optional_law(lines, key, what, budget).map(|law| law.map(Self::Single));
         }
         let [_, width, carrier] = words.as_slice() else {
             return refuse("the versioned receiving material header");
         };
         let return_policy = if words[0] != "arrival-context-v1" { crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 } else { crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 };
-        let representation_policy = if words[0] == "arrival-context-family-local-subquantum20-v1" {
+        let native_rational = words[0] == "arrival-context-native-rational-moments-v1";
+        let representation_policy = if native_rational || words[0] == "arrival-context-family-local-subquantum20-v1" {
             ReceivingRepresentationPolicy::BoundedSubquantumV1
         } else { ReceivingRepresentationPolicy::FixedLatticeV1 };
         let source_width = number(Some(width), "the receiving source width")?;
@@ -565,6 +568,7 @@ impl ReceivingMaterial {
             source_width,
             return_policy,
             representation_policy,
+            native_rational,
             blocks,
             published,
             shared_phase,
@@ -616,6 +620,7 @@ impl ReceivingMaterial {
             source_width,
             return_policy: crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1,
             representation_policy: ReceivingRepresentationPolicy::FixedLatticeV1,
+            native_rational: false,
             blocks: [block(source_width)?, block(context_width)?],
             shared_phase: PhaseStatistics::founded(law.map.rows() / 2, width),
             published: law.map,
@@ -637,6 +642,11 @@ impl ReceivingMaterial {
         Ok(())
     }
 
+    pub(super) fn native_rational(&self)->bool{matches!(self,Self::ArrivalContext{native_rational:true,..})}
+    pub(super) fn bind_native_rational(&mut self)->Result<(),HnnError>{
+        if self!=&self.founding() || self.representation_policy()!=ReceivingRepresentationPolicy::BoundedSubquantumV1 || self.native_rational(){return Err(HnnError::Unadmitted{reason:"NativeRationalMomentsV1 is an explicit fresh paired receiving declaration"});}
+        if let Self::ArrivalContext{native_rational,..}=self{*native_rational=true;}Ok(())
+    }
     pub(super) fn representation_policy(&self) -> ReceivingRepresentationPolicy {
         match self { Self::Single(_) => ReceivingRepresentationPolicy::FixedLatticeV1,
             Self::ArrivalContext { representation_policy, .. } => *representation_policy }
@@ -754,7 +764,7 @@ impl ReceivingMaterial {
         }
         for law in self.laws() {
             if let Some(epoch) = law.epoch_law() {
-                if epoch.receiving_refinement != policy.ceiling() || epoch.source_refinement
+                if epoch.native_rational.is_some()!=self.native_rational() || epoch.receiving_refinement != policy.ceiling() || epoch.source_refinement
                     || policy.ceiling().is_some_and(|cap|epoch.map_lattice > cap) {
                     return Err(HnnError::Unadmitted {reason:"receiving normal lattice and refinement declaration must match their material owner"});
                 }
