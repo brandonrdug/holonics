@@ -3,7 +3,7 @@
 Scope: the separately declared360-second CODE phase from
 `e4199f8ebfa5c95019f753ed9cfa1b039d2df748`. No GPU, dataset, training or
 output campaign. The phase closes at288.033856053 seconds with640 reserved,
-138 measured native attempts, and no retry. All eight build/check/data/native
+138 measured native attempts, and no retry. All seven build/check/data/native
 outcomes (seven guards) are preserved; every guard reports cleanup empty.
 
 ## Original final-arrival owner
