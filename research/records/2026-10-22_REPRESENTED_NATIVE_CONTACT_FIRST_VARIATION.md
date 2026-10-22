@@ -417,5 +417,8 @@ No new tests were added or run as a substitute for that implementation. The exis
 half-tie/six-carrier/rebase/cold, actual joint-ray and native host/card evidence retain their
 source-specific scopes. The next qualification must first compile this exact source and
 check the new issuer; it cannot be called passed from the mathematical derivation or the
-older zero-motion fixture. The current local index distinguishes this unqualified source
-from the last runtime-qualified b3e9f84 result and the still-unselected policy proposal.
+older zero-motion fixture. The shared index correction is supplied as an owner-applicable patch: direct mutation
+was rejected by automatic approval review because another agent owns that workspace.
+Until that owner applies the patch, its prior active-source row may be stale. This
+record and the source-only receipt distinguish the new unqualified source from the last
+runtime-qualified b3e9f84 result and the still-unselected policy proposal.
