@@ -79,7 +79,7 @@ Rust core implement this object, and every native owner implements or charts it.
 | Pair contact: slip `J`, `Q=⟨Δ\|Δ⟩`, `DQ=2J*Δ`, Farey lock address | contact material `ΣwJ*DJ` |
 | Parametron: incidence, `C`, `L`, and a pump that is a periodic modulation of the constitution (each tick a reflection of the stiffness); its monodromy over a period is certified by `G ≻ 0` with `M_TᵀGM_T ⪯ ρ²G`; past the bifurcation the in-phase axis boosts and the quadrature turns (phase-sensitive amplification), and the half-turn sheets are an Ising lock with exchange polynomial `Π = 1 + a/K`; a perceptron is its locked-sheet receiver face | storage↔flow exchange at `ω=1/√(LC)`; a section crossing is a clock tick; two pumped reflections compose into a turn by their relative phase, so relative phase is read through the pump (no linear threshold reads it); capacity is the lock count, the winding is the carry, coupled locks leave the real axis (Lee–Yang); a silent mode reopens when the constitution changes (dormancy) |
 | Tube (longitudinal clocked span) and tower (transverse restriction; gluing unique/plural/obstructed); world tube; `Λ_DN` eliminates an interior | holonomy only on declared circuits |
-| Relatively complete region (globe): a boundary that bounds the interior, interior coupled to the exterior (conserved charges count) but not determined by it, with persistent interior motion | completeness is only relative to a receiver family; the full theorem is owed (#62) |
+| Relatively complete region (globe): a boundary that bounds the interior, interior coupled to the exterior (conserved charges count) but not determined by it, with persistent interior motion | completeness is only relative to a receiver family; the full theorem is owed (#410) |
 | Deposition: the only law changing a constitution, from covectors that actually reached that locus | retention is the future-sufficient quotient of the constitution (the constitution suffices but is not minimal), never a record of fluxes |
 | Ratio: "one per two", a typed comparison of two Holons/coholons/transports carried as an undivided pair, with division-with-remainder, residue/modulo, inversion with its nonunit fibre, lift/carry and jets | `ℓ=log R` with winding branch; `R⁻¹dR`; its jet (velocity, acceleration, jerk, …); loss is `log Ĝ_(T←H)` |
 | Receiver and receipt: a receiver is a role of a participating Holon; reception `I_C(\|H_S⟩,\|H_R⟩)=(\|H'_S⟩,\|H'_R⟩,f_R)` changes both and returns a receipt, a field of readings over a partition, each region in its own frame and clock | no global scalar or global gradient; per-region variability over its own ticks, joined to interface flux |
@@ -401,21 +401,32 @@ older one.
 - The primary inspects source and integrates the returns; worker measurements are receipts.
 - Honour a request to work without agents.
 
-[project-postulate] Each campaign has a GitHub issue and cites it in its plan and commits
-(`Refs #n` / `Closes #n`). The milestones are the rebuild's open steps (4–5, 6, 7, 8). The open
-issues are:
-- the rebuild parent #63;
-- steps 4–5, the helical code #386 (critical), the HNN #73 and device debts #76; campaign 2's
-  contact issues #28, #30, #31 and #48 (label `campaign-2`), and campaign 4's serial chain #27
-  (label `campaign-4`);
-- step 6, equation extraction #146 and the target laws #20, #22, #23 and #32;
+[project-postulate] **Issues** (Brandon, October 22: the issues had become a comment warehouse).
+An issue is one piece of work with a done condition.
+- Its body holds a dated status line at the top, the goal in a sentence and a "Done when" checklist.
+  Edit the status line and tick boxes in place.
+- Comment only when the state changes (a box ticked, a blocker found, a PR merged), in one or two
+  lines with a link to the commit, PR or record. Run logs, derivations, owed lists and handoffs go
+  to records, PRs and threads, never into an issue.
+- Each campaign has an issue. Its plan, commits and PRs cite it with `Refs #n`; an issue is closed
+  by hand once its boxes are ticked, with the commit and the verification.
+- The labels are `athena`, `lean`, `cuda`, `physics` and `parked`. The milestones are the rebuild's
+  steps (4–5, 6, 7, 8).
+
+The open issues (October 22):
+- step 8, Athena alpha #404, with its sub-issues #405 (learning per contact), #406 (text release)
+  and #407 (the card route);
+- steps 4–5, the HNN learning law #73, device debts #76, the helical code #386 (critical) and the
+  contact and chain laws #408 (which merged #27, #28 and #48);
 - step 7, Lean curation #147;
-- step 8, applications #148;
-- formal obligations #62, which carries every owed Lean statement.
+- formal obligations #410, which carries every owed Lean statement as one box each;
+- parked work #409: step 6's equation extraction #146 and target laws #20, #22, #23 and #32, and
+  the contact terms #30 and #31, closed until their work starts.
 
 Closed and done: K1 #72, compression and landmarks #145, physics #74–#75, the Lean package #70.
-Every open issue has a milestone or is #62 or #63. Close an issue with the commit, the verification
-and the remaining scope, and carry any surviving obligation into #62.
+#62 and #63 closed on October 22; older references to #62 resolve through its closing pointer to
+#410. Every open issue has a milestone except #409 and #410. Close an issue with the commit, the
+verification and the remaining scope, and carry any surviving obligation into #410.
 
 [project-postulate] **Git.**
 - Stage explicit paths.
@@ -450,4 +461,4 @@ Commands use Bash; with a fish shell, invoke Bash explicitly. CUDA may need
 
 Record one verification receipt per step, in its PR or issue. A timeout is incomplete evidence. A
 change that adds or changes a mathematical law lands with its Lean counterpart, or names the
-obligation it leaves in #62.
+obligation it leaves in #410.
