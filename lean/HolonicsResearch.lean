@@ -19,6 +19,7 @@ import HolonicsResearch.Foundation.ExactPartition
 import Holonics.Foundation.LatticeTransport
 import HolonicsResearch.Foundation.PrimeValuationRadixAtlas
 import HolonicsResearch.Foundation.EuclideanResidueTransport
+import HolonicsResearch.Foundation.CarriedRelease
 import Holonics.Foundation.Lineage
 import Holonics.Foundation.AddressedBoundary
 import Holonics.Foundation.AperturedGradedComplex
@@ -564,6 +565,7 @@ import Holonics.Geometry.PartitionFunction
 import HolonicsResearch.Zeta.OneInvolution
 import HolonicsResearch.Geometry.Farey
 import HolonicsResearch.Geometry.TurnBoostNormality
+import HolonicsResearch.Geometry.ScrewTorsion
 import HolonicsResearch.Geometry.EggModular
 import HolonicsResearch.Geometry.Rigidity
 import HolonicsResearch.EllipticCurve.Descent
