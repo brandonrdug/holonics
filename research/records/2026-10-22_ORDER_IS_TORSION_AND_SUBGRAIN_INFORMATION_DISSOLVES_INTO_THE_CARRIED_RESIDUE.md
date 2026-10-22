@@ -1,6 +1,6 @@
 # Order is torsion, and information below the grid dissolves into the carried residue
 
-October 22. Refs #62, #73.
+October 22. Refs #410, #73.
 
 This record settles the open items of the October 22 synthesis of Holonics with teleparallel
 gravity (the loop intercept: a loop of moves fails to close by a turn, which is curvature, or by a
@@ -106,7 +106,12 @@ Sent to the Athena design thread on October 22 with the derivations.
 
 1. **Where sub-grain information goes.** Into the receiver's kernel, released at the grid with its
    remainder accounted. A certificate owes only its direction, so outward rounding of bounds at a
-   fixed width is lawful as it stands. Deposits keep `HNN/LatticeDeposit`.
+   fixed width is lawful as it stands. Deposits keep `HNN/LatticeDeposit`. The carried remainder
+   is not dissipation: the release conserves exactly, so the remainder stays in the state as its
+   open phase. `D ⪰ 0` is a contact's material law on flows and belongs to the dynamics; a grain
+   release is the receiver's quotient. Coarse entropy rises only where a release drops a
+   remainder, and retention stays sufficient while no admitted probe separates what that drop
+   merges.
 2. **Why the input barely reaches the receiver.** [hypothesis until measured] If every symbol's
    ring move shares one linear part and the input only adds, the ring state is a linear function
    of (symbol, lag modulo the ring's period) counts, and a readout of it cannot beat context counts
@@ -120,8 +125,37 @@ Sent to the Athena design thread on October 22 with the derivations.
    forward owes outward bounds, exact integer carries and residues. A check that cannot flip a
    decision is not owed. With a certified curvature bound `L` (softmax cross-entropy has logit
    Hessian norm at most ½), the descent lemma admits the step `1/L` without a halving search.
+4. **The declared clock cannot see the source's own period.** [measured] The alpha field declares
+   rings of periods 5, 2 and 3 (`crates/holonics/examples/solenoidal_alpha.rs`), so if each ring
+   ticks once a cell its clock closes at 30. The byte codec (`Base4Bytes`) writes four base-four
+   digits a byte, so the source's own period is 4, and 4 does not divide 30: the field's phases
+   resolve the byte frame only modulo 2. Read on 507 KB of the repository's own English
+   (`docs/ELEMENTARY_OBJECTS.md`, `docs/THE_MACHINE.md`, `CONSTRUCTION_STATE.md`,
+   `docs/plans/THE_REBUILD.md` at `a37a7e3`), with Krichevsky–Trofimov counts fitted on the first
+   80% and scored on the held-out 20%:
 
-## 7. Owed (#62)
+   | receiver | bits per digit |
+   |---|---|
+   | marginal | 1.959 |
+   | phase modulo 30 (the declared clock) | 1.765 |
+   | phase modulo 4 (the source's frame) | 1.522 |
+   | best readout additive in the last six digits, with a frame bias | 1.440 |
+   | the same, its lag weights depending on the frame phase | 1.266 |
+   | conjunctions of the last six digits (context counts) | 0.971 |
+   | the same with the frame | 0.915 |
+
+   The additive rows bound what a field that is linear in its input carries between depositions
+   (the paired consumer keeps the linear circuit; the locking pump is refused). The gap from 1.27
+   to 0.92 is conjunction, which needs a linear part that depends on the symbol, as item 2 says.
+   The period-4 dependence is what the founding law tests (`Field::found`, the founding null of
+   #398), so the lawful route is that the passage founds the ring; authoring a period of 4 would
+   put the codec's grain into the field. The contacts `(1,2)` read nodes 0 and 1 only, so the
+   period-3 receiving ring's node 2 is never driven directly: a defect, but the smaller one. The
+   additive fits ran 100 Adam steps, not to convergence.
+
+## 7. Owed (#410)
+
+Each is a box in #410 except the neck.
 
 - The factorization of a one-linear-part stream through its lag-residue counts, stated in Lean.
 - de Bruijn's identity on the receiver's partition, and the entropy balance `σ ≥ 0` on a complex.
@@ -140,4 +174,7 @@ Sent to the Athena design thread on October 22 with the derivations.
 - Atlas rows (formal-checked): `motion.commutator-carry`, `screw.burgers-loop-carry`,
   `motion.squeeze-ratio-dilation`, `gr.teleparallel-fifth-torsion`, `gr.redshift-loop`,
   `release.carried-residue`, and the counterexample `release.plain-rounding-annihilates`.
-- No Rust changed; no run was made.
+- No Rust changed. The one run is §6.4's measurement, an exterior read with its scripts and outputs
+  in [`2026-10-22_ORDER_IS_TORSION_receipts/`](2026-10-22_ORDER_IS_TORSION_receipts/): the count
+  read took 9.6 s at 44 MiB peak; the two additive fits took 225.8 s and 222.3 s against 224 s
+  projected each (peak resident not measured).
