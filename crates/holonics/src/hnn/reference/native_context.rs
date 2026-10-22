@@ -7,6 +7,8 @@ use std::sync::Arc;
 pub enum NativeExecutionChart {
     Declared,
     ExactUnsplit,
+    /// Executed declared charts/splits with genuine requested paired error evidence.
+    RepresentedV1,
 }
 
 impl Reference {
@@ -54,7 +56,7 @@ impl Reference {
         )?;
         let mut charts = resident.reception_charts();
         let mut word = match chart {
-            NativeExecutionChart::Declared => ratio.open_on(field, theta, &mut charts, &opening)?,
+            NativeExecutionChart::Declared | NativeExecutionChart::RepresentedV1 => ratio.open_on(field, theta, &mut charts, &opening)?,
             NativeExecutionChart::ExactUnsplit => Word::open_received_view_exact(
                 field,
                 theta,
@@ -73,6 +75,7 @@ impl Reference {
         } else {
             word.bind_source_producer(theta, &resident.current, Arc::new(ratio.moment().clone()))?;
         }
+        if chart==NativeExecutionChart::RepresentedV1 {word.request_response_error_evidence();}
         let receiver = field
             .receivers()
             .iter()
@@ -81,7 +84,7 @@ impl Reference {
                 ring: phases.ring(),
             })?;
         let declaration=word.declare_native_prediction(receiver,&mut resident.native_rank.borrow_mut())?;
-        Ok(declaration.run_and_read(word,bits)?.with_prepared_cut(ratio.prepared_input().cloned()))
+        Ok(declaration.run_and_read(word,bits)?.with_prepared_cut(ratio.prepared_input().cloned()).with_charts(charts))
     }
 }
 
@@ -195,7 +198,7 @@ impl Reference {
         let chart = boundary.encode(&[])?;
         let predictor = self.prepare_native_current_prediction(
             &next,
-            NativeExecutionChart::ExactUnsplit,
+            if next.prepared_input.as_ref().is_some_and(|p|p.work_receipt_policy().represented()){NativeExecutionChart::RepresentedV1}else{NativeExecutionChart::ExactUnsplit},
             bits,
         )?;
         let draw = match choice {
@@ -226,10 +229,11 @@ impl Reference {
         };
         let lag = predictor.lagged_boundary(role)?;
         let (carry, forward, preparation) = predictor.forward_receipt()?;
+        let reached_charts=predictor.prepared_charts().cloned().unwrap_or_else(||next.reception_charts());
         let (scores, contact, material, carry, charts) = if actual {
             let returned = predictor.observe(&target)?;
             let scores = returned.scores().to_vec();
-            let mut charts = next.reception_charts();
+            let mut charts = reached_charts;
             let published = returned.publish_contact_carry(&mut charts)?;
             (scores, Some(published), None, None, charts)
         } else {
@@ -240,7 +244,7 @@ impl Reference {
                 None,
                 Some(next.constitution.clone()),
                 Some(carry),
-                next.reception_charts(),
+                reached_charts,
             )
         };
         let (material, carry) = match &contact {
@@ -387,7 +391,7 @@ impl Reference {
             let chart = boundary.encode(&[])?;
             let predictor = self.prepare_native_current_prediction(
                 &next,
-                NativeExecutionChart::ExactUnsplit,
+                if next.prepared_input.as_ref().is_some_and(|p|p.work_receipt_policy().represented()){NativeExecutionChart::RepresentedV1}else{NativeExecutionChart::ExactUnsplit},
                 bits,
             )?;
             let prepared = predictor
@@ -399,6 +403,7 @@ impl Reference {
             let lag = predictor.lagged_boundary(prepared_input::PrefixRole::Observed)?;
             let (carry, forward, preparation) = predictor.forward_receipt()?;
             let prediction = predictor.reading();
+            let reached_charts=predictor.prepared_charts().cloned();
             let returned = predictor.observe(&target)?;
             let scores = returned.scores().to_vec();
             packets.push(returned.into_receiving_packet()?);
@@ -408,7 +413,7 @@ impl Reference {
                     commit: next.constitution.commit(),
                     configuration: carry,
                 },
-                None,
+                reached_charts,
                 None,
                 &chart,
             )?;

@@ -588,6 +588,14 @@ impl ContactCut {
                 return Err(HnnError::Unadmitted{reason:"native contact error belongs to the actual original predicted class/phase packet"});
             }
         }
+        // The executed pair's requested state tube is authentic, but cannot mint
+        // a uniform changed-operator/material-ray certificate. Preserve that gap
+        // before the exact-only loaded-gain constructor or any material proposal.
+        if let Some(lattice)=self.operands.lattice(){
+            let radii=back.response_defect.as_ref().ok_or(HnnError::Unadmitted{reason:"represented native contact explicitly requires requested actual AND fresh state radii"})?;
+            radii.context_bounds()?;
+            return Err(HnnError::RepresentedNativeGainUnavailable{source_cells:self.source.cells(),commit:self.producing.commit(),lattice:*lattice,state_radii:Box::new(radii.clone()),class_error_l1:Box::new(stations.iter().flat_map(|s|&s.component_error).cloned().sum())});
+        }
         let width=self.field.ring(phases.ring()).width();
         let source=ExactRatMatrix::new(map.to_rows().iter().map(|r|r[..width].to_vec()).collect())?;
         let context=ExactRatMatrix::new(map.to_rows().iter().map(|r|r[width..].to_vec()).collect())?;

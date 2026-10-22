@@ -12,7 +12,11 @@ impl NativeWorkBudget {
     }
 }
 #[derive(Clone,Copy,Debug,PartialEq,Eq)]
-pub enum PreparationWorkPolicy {LegacyCoordinateV1,NativeQuadraticV1(NativeWorkBudget)}
+pub enum PreparationWorkPolicy {LegacyCoordinateV1,NativeQuadraticV1(NativeWorkBudget),RepresentedNativeV1(NativeWorkBudget)}
+impl PreparationWorkPolicy {
+    pub fn native_budget(self)->Option<NativeWorkBudget>{match self{Self::LegacyCoordinateV1=>None,Self::NativeQuadraticV1(b)|Self::RepresentedNativeV1(b)=>Some(b)}}
+    pub fn represented(self)->bool{matches!(self,Self::RepresentedNativeV1(_))}
+}
 #[derive(Clone,Debug,PartialEq,Eq)]
 pub struct QuadraticWorkReading {
     pub policy:NativeWorkBudget,pub source_cells:u64,pub ring:usize,pub old:Vec<Rat>,pub added:Vec<Rat>,pub control:Vec<Rat>,pub metric:Rat,

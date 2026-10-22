@@ -77,11 +77,11 @@ fn read_lag(field:&Field,t:&mut std::str::SplitWhitespace<'_>)->Result<Option<La
         Ok(Some(LaggedReceiverBoundary{field:field.clone(),receiver,source_cells,commit,tick,lift,contrast,role}))
     },_=>Err(refuse("explicit lag availability"))}
 }
-fn put_work_policy(o:&mut String,p:PreparationWorkPolicy){if let PreparationWorkPolicy::NativeQuadraticV1(b)=p{put(o,b.aggregate_bits);put(o,b.integer_bits);put(o,b.coordinates);}}
-fn read_work_policy(t:&mut std::str::SplitWhitespace<'_>,quadratic:bool)->Result<PreparationWorkPolicy,HnnError>{if quadratic{let b=NativeWorkBudget{aggregate_bits:get(t)?,integer_bits:get(t)?,coordinates:get(t)?};b.admit()?;Ok(PreparationWorkPolicy::NativeQuadraticV1(b))}else{Ok(PreparationWorkPolicy::LegacyCoordinateV1)}}
+fn put_work_policy(o:&mut String,p:PreparationWorkPolicy){if let Some(b)=p.native_budget(){put(o,b.aggregate_bits);put(o,b.integer_bits);put(o,b.coordinates);}}
+fn read_work_policy(t:&mut std::str::SplitWhitespace<'_>,quadratic:bool,represented:bool)->Result<PreparationWorkPolicy,HnnError>{if quadratic{let b=NativeWorkBudget{aggregate_bits:get(t)?,integer_bits:get(t)?,coordinates:get(t)?};b.admit()?;Ok(if represented{PreparationWorkPolicy::RepresentedNativeV1(b)}else{PreparationWorkPolicy::NativeQuadraticV1(b)})}else{Ok(PreparationWorkPolicy::LegacyCoordinateV1)}}
 impl PreparedInputCut {
     pub(crate) fn to_text(&self) -> String {
-        let mut o = String::from(if self.native_lagged&&matches!(self.work_policy,PreparationWorkPolicy::NativeQuadraticV1(_)){"prepared-input-cut-native-lagged-quadratic-v1 "}else if self.native_lagged{"prepared-input-cut-native-lagged-v1 "}else if self.framing.is_some(){"prepared-input-cut-framing-v1 "}else{"prepared-input-cut-v1 "});
+        let mut o = String::from(if self.native_lagged&&self.work_policy.represented(){"prepared-input-cut-native-represented-v1 "}else if self.native_lagged&&self.work_policy.native_budget().is_some(){"prepared-input-cut-native-lagged-quadratic-v1 "}else if self.native_lagged{"prepared-input-cut-native-lagged-v1 "}else if self.framing.is_some(){"prepared-input-cut-framing-v1 "}else{"prepared-input-cut-v1 "});
         put(&mut o, self.source_cells);
         put(&mut o, self.commit);
         put(&mut o, self.material_observations);
@@ -115,14 +115,14 @@ impl PreparedInputCut {
             return Err(refuse("bounded prepared cut"));
         }
         let mut t = text.split_whitespace();
-        let (framed,native_lagged,quadratic)=match t.next(){Some("prepared-input-cut-v1")=>(false,false,false),Some("prepared-input-cut-framing-v1")=>(true,false,false),Some("prepared-input-cut-native-lagged-v1")=>(true,true,false),Some("prepared-input-cut-native-lagged-quadratic-v1")=>(true,true,true),_=>return Err(refuse("prepared cut version"))};
+        let (framed,native_lagged,quadratic,represented)=match t.next(){Some("prepared-input-cut-v1")=>(false,false,false,false),Some("prepared-input-cut-framing-v1")=>(true,false,false,false),Some("prepared-input-cut-native-lagged-v1")=>(true,true,false,false),Some("prepared-input-cut-native-lagged-quadratic-v1")=>(true,true,true,false),Some("prepared-input-cut-native-represented-v1")=>(true,true,true,true),_=>return Err(refuse("prepared cut version"))};
         let source_cells = get(&mut t)?;
         let commit = get(&mut t)?;
         let material_observations = get(&mut t)?;
         let context = get(&mut t)?;
         let max_abs_work = get(&mut t)?;
         let rational_bits = get(&mut t)?;
-        let work_policy=read_work_policy(&mut t,quadratic)?;
+        let work_policy=read_work_policy(&mut t,quadratic,represented)?;
         let framing=if framed{let cells=get(&mut t)?;let part=get(&mut t)?;if cells!=source_cells{return Err(refuse("original framing frontier"));}Some(SourceFraming::restored(cells,part)?)}else{None};
         let boundary_identity = unhex(t.next().ok_or(refuse("prepared boundary identity"))?)?;
         let history = read_history(&mut t)?;
@@ -232,8 +232,8 @@ impl PreparedInputState {
             return Err(refuse("bounded prepared continuation"));
         }
         let mut t = text.split_whitespace();
-        let tag=t.next();let quadratic=tag==Some(LAGGED_RECEIVER_QUADRATIC_LAW);
-        let chart=match tag{Some(LAW)=>ContextChart::ScalarV1,Some(SOURCE_FRAMING_LAW)=>ContextChart::SourceFramingRouteV1,Some(LAGGED_RECEIVER_LAW)|Some(LAGGED_RECEIVER_QUADRATIC_LAW)=>ContextChart::LaggedReceiverBoundaryV1,_=>return Err(refuse("prepared input continuation law identity"))};
+        let tag=t.next();let represented=tag==Some(REPRESENTED_NATIVE_LAW);let quadratic=represented||tag==Some(LAGGED_RECEIVER_QUADRATIC_LAW);
+        let chart=match tag{Some(LAW)=>ContextChart::ScalarV1,Some(SOURCE_FRAMING_LAW)=>ContextChart::SourceFramingRouteV1,Some(LAGGED_RECEIVER_LAW)|Some(LAGGED_RECEIVER_QUADRATIC_LAW)|Some(REPRESENTED_NATIVE_LAW)=>ContextChart::LaggedReceiverBoundaryV1,_=>return Err(refuse("prepared input continuation law identity"))};
         let framed=field.receivers().iter().all(|r|field.receiving_context(r.ring)==Some(crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1));
         if framed!=chart.framed(){return Err(refuse("saved material schema and actual tree framing declaration agree"));}
         let bounds = ContextualBounds {
@@ -246,7 +246,7 @@ impl PreparedInputState {
         };
         bounds.admit()?;
         let max_abs_work = get(&mut t)?;
-        let work_policy=read_work_policy(&mut t,quadratic)?;
+        let work_policy=read_work_policy(&mut t,quadratic,represented)?;
         let mode = match get::<u8>(&mut t)? {
             0 => PrefixMode::Training,
             1 => PrefixMode::Forecast,

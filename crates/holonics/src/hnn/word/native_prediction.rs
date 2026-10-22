@@ -14,6 +14,7 @@ pub const LAW: &str = "native-current-prediction-v1";
 pub struct NativePredictionWord<'a> {
     word: Word<'a>,
     prepared: Option<crate::hnn::reference::prepared_input::PreparedInputCut>,
+    charts:Option<Charts>,
     phases: ReceivingPhases,
     map: ExactRatMatrix,
     faces: Vec<NativeCurrentFace>,
@@ -22,6 +23,8 @@ pub struct NativePredictionWord<'a> {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NativePredictionReading {
     pub law: &'static str,
+    /// The actual execution declaration; never an exact-unsplit equivalence claim.
+    pub execution_lattice: Option<crate::hnn::chart::WordLattice>,
     pub producing_commit: u64,
     pub opened_at: usize,
     pub source_cells: u64,
@@ -246,6 +249,7 @@ impl<'a> Word<'a> {
         Ok(NativePredictionWord {
             word: self,
             prepared: None,
+            charts:None,
             phases,
             map,
             faces,
@@ -254,6 +258,9 @@ impl<'a> Word<'a> {
     }
 }
 impl NativePredictionWord<'_> {
+    pub(crate) fn with_charts(mut self,charts:Charts)->Self{self.charts=Some(charts);self}
+    pub(crate) fn prepared_charts(&self)->Option<&Charts>{self.charts.as_ref()}
+
     pub(crate) fn with_prepared_cut(
         mut self,
         cut: Option<crate::hnn::reference::prepared_input::PreparedInputCut>,
@@ -274,6 +281,7 @@ impl NativePredictionWord<'_> {
             .expect("issued native producer");
         NativePredictionReading {
             law: LAW,
+            execution_lattice:self.word.operands.lattice().copied(),
             producing_commit: theta.commit(),
             opened_at: self.word.opened_at(),
             source_cells: source.cells(),
@@ -309,7 +317,7 @@ impl NativePredictionWord<'_> {
             role,
         )
     }
-    pub(crate) fn forward_receipt(
+    pub fn forward_receipt(
         &self,
     ) -> Result<
         (
@@ -552,6 +560,7 @@ impl NativeRPacket {
             .clone();
         for (at, p) in packets.iter().enumerate() {
             if &p.producer != theta
+                || p.reading.execution_lattice!=first.reading.execution_lattice
                 || p.reading.receiver != ring
                 || p.reading.producing_commit != theta.commit()
                 || p.reading.source_cells

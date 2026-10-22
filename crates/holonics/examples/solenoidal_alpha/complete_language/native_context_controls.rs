@@ -450,3 +450,45 @@ fn native_original_word_final_ingress_transition()->Result<()>{
     assert_ne!(at10,retained);
     println!("FINAL_INGRESS_COMPLETE_PASS actual30 R_contact_R_close30=true pending6_cold=true final_native_cold=true four_warm_cold_frozen_equal=true elapsed_ns={}",started.elapsed().as_nanos());Ok(())
 }
+
+#[test]
+#[ignore="isolated represented native data/160-attempt envelope"]
+fn represented_native_policy_pending_cold_and_guard()->Result<()>{
+    use holonics::hnn::word::work;
+    use holonics::hnn::reference::native_context::NativeExecutionChart;
+    struct Meter;impl Drop for Meter{fn drop(&mut self){let c=work::process_native_calls();let total=c.forward_attempts+c.response_attempts+c.return_attempts+c.response_return_attempts;let s=format!("{{\"final\":true,\"total_attempts\":{total},\"forward_constructors\":{},\"response_companions\":{},\"actual_returns\":{},\"fresh_returns\":{}}}\n",c.forward_attempts,c.response_attempts,c.return_attempts,c.response_return_attempts);println!("REPRESENTED_DATA_COUNTS {s}");if let Some(p)=std::env::var_os("V93_NATIVE_COUNT_PATH"){std::fs::write(p,s).unwrap();}}}
+    let _meter=Meter;work::limit_process_native_attempts(std::env::var("V93_NATIVE_ATTEMPT_LIMIT")?.parse()?);
+    let started=Instant::now();let reference=port();let(field,mut initial,pairing)=declaration_with_input_context(16384,true,true)?;
+    initial.bind_family_local_receiving_return(2)?;initial.bind_bounded_receiving_representation(2)?;initial.bind_native_rational_receiving(2)?;
+    let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
+    let empty=PairedObservation::admit(&field,resident.constitution(),&pairing)?.encode(&[])?;reference.ingest(&mut resident,None,&empty)?;
+    resident.select_represented_native_prepared_input(&pairing)?;
+    let opening=resident.constitution().clone();let mut stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+    stream.receive_native_current(&reference,&pairing,&[0,1,2,3,0,1],64)?;
+    let pending=stream.pending_checkpoint();assert!(pending.starts_with("observed-stream-pending-native-represented-v1"));
+    let saved=stream.resident().continuing_state(0)?;let parsed=ContinuingState::from_text(&saved.to_text(),READ_BUDGET)?;
+    let restored=reference.mount_continued(&field,&Current::at_rest(&field),opening.clone(),&parsed)?;
+    let crib=ObservedCrib::from_unplaced_checkpoint(&field,restored.current(),stream.crib().next_position(),&stream.crib().unplaced_checkpoint()?)?;
+    assert!(ObservedStream::restore_checkpoint(restored.clone(),crib.clone(),&pending.replacen("observed-stream-pending-native-represented-v1","observed-stream-pending-native-rational-v1",1)).is_err());
+    let restored=ObservedStream::restore_checkpoint(restored,crib,&pending)?;assert_eq!(restored.resident().continuing_state(0)?,saved);
+    println!("REPRESENTED_PENDING6_COLD_PASS explicit_policy=true exact_policy_substitution_refused=true");
+    let(warm,_)=restored.native_current_query_fork(&reference,&pairing,64)?;
+    let state=warm.continuing_state(0)?;let parsed=ContinuingState::from_text(&state.to_text(),READ_BUDGET)?;
+    let cold=reference.mount_continued(&field,&Current::at_rest(&field),opening,&parsed)?;assert_eq!(cold.continuing_state(0)?,state);
+    let mut prior=None;
+    for (name,r) in [("warm",&warm),("cold",&cold)]{
+        let predicted=reference.prepare_native_current_prediction(r,NativeExecutionChart::RepresentedV1,64)?;
+        let reading=predicted.reading();assert!(reading.execution_lattice.is_some());let(_,balance,preparation)=predicted.forward_receipt()?;assert!(balance.closes());assert!(preparation.as_ref().is_none_or(|p|p.closes()));
+        if let Some((old,old_balance))=&prior{assert_eq!(&reading,old);assert_eq!(&balance,old_balance);}else{prior=Some((reading.clone(),balance.clone()));}
+        let target=PairedObservation::admit(&field,r.constitution(),&pairing)?.encode(&[2])?;
+        let returned=predicted.observe(&target)?;let mut charts=holonics::hnn::chart::Charts::default();
+        match returned.publish_contact_carry(&mut charts){
+            Err(holonics::hnn::HnnError::RepresentedNativeGainUnavailable{source_cells,commit,lattice,state_radii,class_error_l1})=>{
+                let context=state_radii.context_bounds()?;assert_eq!(source_cells,6);assert_eq!(context.len(),reading.features.len());
+                println!("REPRESENTED_CONTACT_BOUNDARY name={name} source={source_cells} commit={commit} lattice={lattice:?} genuine_actual_fresh_radii={state_radii:?} class_error={class_error_l1} missing=uniform_changed_chart_material_ray_response no_publication=true release={:?}",balance.released);
+            },Err(e)=>return Err(e.into()),Ok(_)=>return Err("unqualified represented contact must not publish".into()),
+        }
+        assert_eq!(r.continuing_state(0)?,state);
+    }
+    println!("REPRESENTED_FORWARD_COLD_PASS frozen_material=true same_represented_face_and_balance=true unsplit_equivalence_claim=false elapsed_ns={}",started.elapsed().as_nanos());Ok(())
+}

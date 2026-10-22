@@ -458,6 +458,9 @@ pub enum HnnError {
     Crib { cells: usize, offset: usize },
     #[error("native receiving section refused: {source}; evidence: {evidence:?}")]
     NativeEpochRefusal { source:Box<HnnError>, evidence:Box<reference::observed::EpochStageRefusal> },
+    /// Genuine state radii are not the missing changed-material response proof.
+    #[error("represented native contact at source {source_cells} has actual/fresh state radii but no admitted uniform changed-chart material-ray response bound")]
+    RepresentedNativeGainUnavailable {source_cells:u64,commit:u64,lattice:chart::WordLattice,state_radii:Box<port::PairedReadDefect>,class_error_l1:Box<Rat>},
     /// Bounded exterior operands preserve the original operative refusal.
     #[error("native preparation refused: {source}; source operands: {evidence}")]
     NativePreparationRefusal {source:Box<HnnError>,evidence:String},

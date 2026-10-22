@@ -13,6 +13,7 @@ fn refuse(reason: &'static str) -> HnnError {
 mod framing;
 pub use framing::{ContextChart, SourceFraming, PreparedMaterial, LaggedReceiverBoundary};
 pub const SOURCE_FRAMING_LAW: &str = "prepared-class-source-framing-route-v1";
+pub const REPRESENTED_NATIVE_LAW:&str="prepared-represented-native-passage-v1";
 pub const LAGGED_RECEIVER_QUADRATIC_LAW:&str="prepared-native-lagged-receiver-quadratic-work-v1";
 pub const LAGGED_RECEIVER_LAW: &str = "prepared-native-lagged-receiver-v1";
 pub const LAW: &str = "prepared-class-local-retained-v1";
@@ -118,7 +119,7 @@ impl PreparedInputCut {
         match &self.control {
             Some(u) => Ok(match self.work_policy{
                 PreparationWorkPolicy::LegacyCoordinateV1=>binding.apply(word,u,&self.max_abs_work,self.rational_bits)?.0,
-                PreparationWorkPolicy::NativeQuadraticV1(b)=>binding.apply_quadratic(word,u,&self.max_abs_work,self.rational_bits,b)?.0,
+                PreparationWorkPolicy::NativeQuadraticV1(b)|PreparationWorkPolicy::RepresentedNativeV1(b)=>binding.apply_quadratic(word,u,&self.max_abs_work,self.rational_bits,b)?.0,
             }),
             None => Ok(word),
         }
@@ -208,7 +209,7 @@ impl PreparedInputState {
         })
     }
     pub fn law(&self) -> &'static str {
-        match self.material.chart(){ContextChart::ScalarV1=>LAW,ContextChart::SourceFramingRouteV1=>SOURCE_FRAMING_LAW,ContextChart::LaggedReceiverBoundaryV1=>if matches!(self.work_policy,PreparationWorkPolicy::NativeQuadraticV1(_)){LAGGED_RECEIVER_QUADRATIC_LAW}else{LAGGED_RECEIVER_LAW}}
+        match self.material.chart(){ContextChart::ScalarV1=>LAW,ContextChart::SourceFramingRouteV1=>SOURCE_FRAMING_LAW,ContextChart::LaggedReceiverBoundaryV1=>if self.work_policy.represented(){REPRESENTED_NATIVE_LAW}else if self.work_policy.native_budget().is_some(){LAGGED_RECEIVER_QUADRATIC_LAW}else{LAGGED_RECEIVER_LAW}}
     }
     pub fn work_receipt_policy(&self)->PreparationWorkPolicy{self.work_policy}
     pub fn context_chart(&self)->ContextChart{self.material.chart()}
@@ -422,6 +423,13 @@ impl Resident {
     pub fn select_native_current_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
         if self.field.receivers().iter().any(|r|self.constitution.receiving_return_policy(r.ring)!=Some(crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1)){return Err(refuse("native F declares a family-local receiving current before input, without repurposing population responsibility"));}
         self.select_prepared_input_chart(pairing,ContextChart::LaggedReceiverBoundaryV1)
+    }
+    /// Fresh opt-in represented computation. Released feedback tails are reported per Word;
+    /// this version does not pretend ReceptionCarry is a residual-vector decoder.
+    pub fn select_represented_native_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
+        if self.admitted.iter().any(|r|!self.constitution.native_rational_receiving(r.ring())){return Err(refuse("represented native passage explicitly declares its receiving statistics policy"));}
+        self.select_native_current_prepared_input(pairing)?;
+        self.prepared_input.as_mut().expect("fresh native owner").work_policy=PreparationWorkPolicy::RepresentedNativeV1(NativeWorkBudget::V1);Ok(())
     }
     pub fn select_native_quadratic_work_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
         self.select_native_current_prepared_input(pairing)?;
