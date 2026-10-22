@@ -5,7 +5,7 @@ import Mathlib.Tactic
 /-!
 # The carried release: a stream released onto a grid keeps its residue
 
-[proved-derived] October 22
+[proved-derived; formal-checked] October 22
 ([record](../../../research/records/2026-10-22_ORDER_IS_TORSION_AND_SUBGRAIN_INFORMATION_DISSOLVES_INTO_THE_CARRIED_RESIDUE.md)).
 A stream of readings `x₁, x₂, …` released onto a grid (the unit grid here; a grid `g > 0` is the
 unit grid of `x / g`) either rounds each reading alone or carries the residue:
@@ -53,13 +53,13 @@ def releaseRun : R → List R → List ℤ × R
       (windings (r + x) :: (releaseRun (openPhase (r + x)) xs).1,
         (releaseRun (openPhase (r + x)) xs).2)
 
-/-- [proved-derived] **The step error is a coboundary:** `y − x = r − r'`. -/
+/-- [proved-derived; formal-checked] **The step error is a coboundary:** `y − x = r − r'`. -/
 theorem release_step_error (r x : R) :
     (windings (r + x) : R) - x = r - openPhase (r + x) := by
   have h := (reading_split (r + x)).1
   linarith
 
-/-- [proved-derived] **The carried release conserves:** `Σ y + r_n = r_0 + Σ x`. -/
+/-- [proved-derived; formal-checked] **The carried release conserves:** `Σ y + r_n = r_0 + Σ x`. -/
 theorem release_conserves (r : R) (xs : List R) :
     (((releaseRun r xs).1.sum : ℤ) : R) + (releaseRun r xs).2 = r + xs.sum := by
   induction xs generalizing r with
@@ -70,7 +70,7 @@ theorem release_conserves (r : R) (xs : List R) :
     simp only [releaseRun, List.sum_cons, Int.cast_add]
     linarith
 
-/-- [proved-derived] **The residue stays inside one grid step.** -/
+/-- [proved-derived; formal-checked] **The residue stays inside one grid step.** -/
 theorem release_residue_bounds (r : R) (h0 : 0 ≤ r) (h1 : r < 1) (xs : List R) :
     0 ≤ (releaseRun r xs).2 ∧ (releaseRun r xs).2 < 1 := by
   induction xs generalizing r with
@@ -79,7 +79,7 @@ theorem release_residue_bounds (r : R) (h0 : 0 ≤ r) (h1 : r < 1) (xs : List R)
     simp only [releaseRun]
     exact ih (openPhase (r + x)) (reading_split (r + x)).2.1 (reading_split (r + x)).2.2
 
-/-- [proved-derived] **The released sum tracks the stream within one grid step.** -/
+/-- [proved-derived; formal-checked] **The released sum tracks the stream within one grid step.** -/
 theorem release_tracks (r : R) (h0 : 0 ≤ r) (h1 : r < 1) (xs : List R) :
     |(((releaseRun r xs).1.sum : ℤ) : R) - xs.sum| < 1 := by
   have hc := release_conserves r xs
@@ -87,7 +87,7 @@ theorem release_tracks (r : R) (h0 : 0 ≤ r) (h1 : r < 1) (xs : List R) :
   rw [abs_lt]
   constructor <;> linarith [hb.1, hb.2]
 
-/-- [proved-derived] **The release is the winding of the running sum**, and the residue is its
+/-- [proved-derived; formal-checked] **The release is the winding of the running sum**, and the residue is its
 open phase. -/
 theorem release_is_winding_of_running_sum (r : R) (h0 : 0 ≤ r) (h1 : r < 1) (xs : List R) :
     (releaseRun r xs).1.sum = windings (r + xs.sum) ∧
@@ -95,7 +95,7 @@ theorem release_is_winding_of_running_sum (r : R) (h0 : 0 ≤ r) (h1 : r < 1) (x
   split_unique _ _ (release_conserves r xs) (release_residue_bounds r h0 h1 xs).1
     (release_residue_bounds r h0 h1 xs).2
 
-/-- [counterexample] **Plain rounding annihilates a constant reading below half a grid step.** -/
+/-- [counterexample; formal-checked] **Plain rounding annihilates a constant reading below half a grid step.** -/
 theorem plain_rounding_silences {x : R} (h0 : 0 ≤ x) (h1 : x < 1 / 2) (n : ℕ) :
     ((List.replicate n x).map round).sum = 0 := by
   have hz : round x = (0 : ℤ) := by
@@ -103,7 +103,7 @@ theorem plain_rounding_silences {x : R} (h0 : 0 ≤ x) (h1 : x < 1 / 2) (n : ℕ
     constructor <;> push_cast <;> linarith
   simp [hz]
 
-/-- [proved-derived] **The carried release keeps the rate** of the same constant reading. -/
+/-- [proved-derived; formal-checked] **The carried release keeps the rate** of the same constant reading. -/
 theorem release_keeps_constant_rate (x : R) (n : ℕ) :
     (n : R) * x - 1 < (((releaseRun 0 (List.replicate n x)).1.sum : ℤ) : R) := by
   have hc := release_conserves (0 : R) (List.replicate n x)
@@ -111,7 +111,7 @@ theorem release_keeps_constant_rate (x : R) (n : ℕ) :
   rw [List.sum_replicate, nsmul_eq_mul, zero_add] at hc
   linarith [hb.2]
 
-/-- [proved-derived] **A bound is released outward,** and the outward pair widens the band by less
+/-- [proved-derived; formal-checked] **A bound is released outward,** and the outward pair widens the band by less
 than two grid steps. -/
 theorem outward_release {l x u : R} (hl : l ≤ x) (hu : x ≤ u) :
     ((⌊l⌋ : ℤ) : R) ≤ x ∧ x ≤ ((⌈u⌉ : ℤ) : R) ∧

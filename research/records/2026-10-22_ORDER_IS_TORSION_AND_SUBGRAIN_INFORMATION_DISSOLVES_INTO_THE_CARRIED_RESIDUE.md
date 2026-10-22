@@ -10,7 +10,7 @@ how information dissolves into geometry, and says what the account gives Athena.
 
 ## 1. Order is torsion
 
-[proved-derived] For two turns `z ↦ k_u z + b_u` and `z ↦ k_v z + b_v` with pivots
+[proved-derived; formal-checked] For two turns `z ↦ k_u z + b_u` and `z ↦ k_v z + b_v` with pivots
 `(1 − k) O = b`, the two orders differ by
 
 ```text
@@ -28,7 +28,7 @@ common shift, which is the Bombe's loop closure read on moves: a key is located 
 
 ## 2. The Burgers vector and the base point
 
-[proved-derived] A loop of pure translations closes by the sum of its carries, its Burgers vector
+[proved-derived; formal-checked] A loop of pure translations closes by the sum of its carries, its Burgers vector
 (`flat_loop_carry`). Read from a base point shifted by `t`, a move keeps its turn and its carry
 gains `(M − 1) t` (`move_basepoint`), so the carry is free of the base point only when the turn is
 trivial (`translation_basepoint`). Teleparallel gravity is the case where every loop closes in turn
@@ -37,19 +37,19 @@ and fails only in carry, which is why its torsion is base-point free. The Rust s
 
 ## 3. The fifth torsion and the redshift loop
 
-[proved-derived] For a teleparallel Kaluza–Klein frame `e⁵ = dy + A`, the exact part never reaches
+[proved-derived; formal-checked] For a teleparallel Kaluza–Klein frame `e⁵ = dy + A`, the exact part never reaches
 the coboundary, so `T⁵ = d e⁵ = dA = F` (`fifth_torsion_is_field`); charge is the carry around the
 fifth circle, and it is a whole number only because that fibre is compact
 (`Complex.exp_eq_one_iff` in Mathlib supplies the quantization).
 
-[proved-derived] For the time coframe `e⁰ = N dt`, the coboundary summed over a grid of cells is
+[proved-derived; formal-checked] For the time coframe `e⁰ = N dt`, the coboundary summed over a grid of cells is
 the lapse difference times the clock difference across the grid (`redshift_loop`). A static lapse
 difference therefore leaves a carry around every loop that spans it: a static mass is read as a
 carry in the time coframe, and the fall toward slower clocks is `a = c² ∇ ln N`.
 
 ## 4. The two boosts are one boost
 
-[proved-derived] The det-1 squeeze `diag(λ, λ⁻¹)` of the turn·boost·shear factorization
+[proved-derived; formal-checked] The det-1 squeeze `diag(λ, λ⁻¹)` of the turn·boost·shear factorization
 (`Geometry/Motion`, `iwasawa`) and the ratio dilation `v′ = s v` of `MoveKind::Boost` collided as
 names. Read on the undivided pair `(a, b)`, the squeeze multiplies the ratio by `λ²`
 (`squeeze_dilates_ratio`), so the two are one boost in two charts. The synthesis's sentence that
@@ -83,12 +83,12 @@ names. Read on the undivided pair `(a, b)`, the squeeze multiplies the ratio by 
    quotient identifies two states the admitted future would separate. Releasing into the kernel,
    what no admitted receiver reads, merges nothing readable.
 
-[proved-derived] The grid case is formal (`Foundation/CarriedRelease`). A stream released onto a
+[proved-derived; formal-checked] The grid case is formal (`Foundation/CarriedRelease`). A stream released onto a
 grid with its residue carried conserves exactly (`release_conserves`), keeps the residue inside one
 step (`release_residue_bounds`), tracks the stream within one step at every length
 (`release_tracks`), and is the winding of its running sum with the residue as its open phase
 (`release_is_winding_of_running_sum`, joining `Aeon/Clock/Winding.split_unique`). Its step error is
-a coboundary (`release_step_error`), invisible to every closed window. [counterexample] Plain
+a coboundary (`release_step_error`), invisible to every closed window. [counterexample; formal-checked] Plain
 rounding annihilates a constant reading below half a step at every length
 (`plain_rounding_silences`), while the carried release turns it into a rate
 (`release_keeps_constant_rate`). A bound owes only its direction and is released outward
@@ -130,11 +130,12 @@ Sent to the Athena design thread on October 22 with the derivations.
 
 - New Lean: `lean/HolonicsResearch/Geometry/ScrewTorsion.lean` and
   `lean/HolonicsResearch/Foundation/CarriedRelease.lean`, imported from `HolonicsResearch.lean`.
-  They were written in a cloud container with no Lean toolchain reachable, so they are graded
-  `proved-derived` and **not yet formal-checked**. The check is
-  `bash tools/lean_check.sh HolonicsResearch.Geometry.ScrewTorsion HolonicsResearch.Foundation.CarriedRelease`;
-  on success the atlas rows and docstrings move to `formal-checked`.
-- Atlas rows: `motion.commutator-carry`, `screw.burgers-loop-carry`,
+  Written in a cloud container with no Lean toolchain, then checked on the PC at `ce16afb`:
+  `bash tools/lean_check.sh HolonicsResearch.Geometry.ScrewTorsion HolonicsResearch.Foundation.CarriedRelease`
+  completed (3,454 jobs, exit 0, 16 s wall; Mathlib reused, only `Holonics.Geometry.Motion` and the
+  two targets recompiled), with no errors, no warnings and no `sorry` in either module. All
+  eighteen theorems are formal-checked; no proof was changed.
+- Atlas rows (formal-checked): `motion.commutator-carry`, `screw.burgers-loop-carry`,
   `motion.squeeze-ratio-dilation`, `gr.teleparallel-fifth-torsion`, `gr.redshift-loop`,
-  `release.carried-residue`, `release.plain-rounding-annihilates`.
+  `release.carried-residue`, and the counterexample `release.plain-rounding-annihilates`.
 - No Rust changed; no run was made.
