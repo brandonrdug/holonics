@@ -687,7 +687,7 @@ fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, real
                     let native=if let Some(native_phases)=&native_phases{
                         let full=native_phases.junction_steps();
                         let operands=word.word.response_producing_operands().ok_or_else(unavailable)?.clone();
-                        let actual=readout::native_path(&word.word.plan,&word.word.record,word.word.response_actual_opening())?;
+                        let actual=readout::native_path(&word.word.plan,word.word.native_actual_record().ok_or_else(unavailable)?,word.word.response_actual_opening())?;
                         let (fp,fr)=word.word.response_plan_record().ok_or_else(unavailable)?;
                         let fresh=readout::native_path(fp,fr,None)?;
                         if released.balances.len()!=full{return Err(unavailable());}

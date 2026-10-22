@@ -1938,6 +1938,9 @@ impl<'c> ResidentWord<'c> {
     }
 
     pub(crate) fn response_actual_opening(&self)->Option<&EndChange>{self.response.as_ref().and_then(|r|r.actual_opening_base.as_ref())}
+    /// Same actual GPU trajectory, WITH the separately fetched original source
+    /// numerators. The lean ordinary forward record deliberately omits them.
+    pub(crate) fn native_actual_record(&self)->Option<&ForwardRecord>{self.response.as_ref().and_then(|r|r.actual_error_record.as_ref())}
     pub(crate) fn response_producing_operands(&self)->Option<&Operands>{self.response.as_ref().map(|r|&r.error_operands)}
     pub(crate) fn response_error_requested(&self)->bool {self.response.as_ref().is_some_and(|r|r.report_requested)}
     /// Real original records/operands, available only while this actual Word is retained.
