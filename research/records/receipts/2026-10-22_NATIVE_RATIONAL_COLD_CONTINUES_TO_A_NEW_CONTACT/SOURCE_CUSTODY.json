@@ -1,0 +1,88 @@
+{
+  "code_source": "ac4283284489cbca97f2505a5cbe83a9f96a917f",
+  "code_tree": "39dbc9fff079257736c6e7f814114e7cd163f37b",
+  "runtime_source": "73d22f1fcaa828f50d127eff7e337c65897214f3",
+  "runtime_tree": "1edb831bf16d5f526e5c71fa99e613967e02c9d9",
+  "payloads": [
+    {
+      "path": "crates/holonics/src/hnn/constitution.rs",
+      "sha256": "1257b1acb9136853599ee1262c8101ac1c0edd210f70f32509728c16a2d226a0",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch.rs",
+      "sha256": "c07544626dc5797afec3dfe409861c554ab577e21f5e4612f8bd0152b8ca0a08",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/checkpoint.rs",
+      "sha256": "6c7cf712132cf0a9641686b9b5871b4a8985bd4b09020b9874b965ca3a30f513",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/rational.rs",
+      "sha256": "f1d5782e1c33cffdd0cf4f9ec0fd65462254b122b3ff211ccd1a955b3b4a4b11",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/receiving_material.rs",
+      "sha256": "c4cfb4252a6837fe62168d0626f406d6035bcb54e28e471fd77b8c27499871d3",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference.rs",
+      "sha256": "0998de5891fabe4cf0d08138d71a8e8819fad1d43671858e3468adcfce9c86f6",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/native_context.rs",
+      "sha256": "7255140a5f8113c46a452a07d2661cd135cbd7484aa073fa443c4e25115c5d9a",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/prepared_input/codec.rs",
+      "sha256": "f37415b605e20eb567daa2a9912ee602fe929fcbf165308c9032a5876ef19a24",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/observed/stream.rs",
+      "sha256": "c09e6f0b97c3177ea9a7e5d2b28cd35c5a4bf7a76c3e9a98ac3bfd2a296ff5dc",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/mod.rs",
+      "sha256": "c670da1dc20787416ee29ab0459cdf407193c0dc54f2af61cc7f10fe2a09d414",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/word/action/quadratic_work.rs",
+      "sha256": "6e78264c83ad396d8957a0e2c99ed403ed6845dcfbdf5b6866295b7800c640a7",
+      "git_blob_matches": true
+    },
+    {
+      "path": "crates/holonics/examples/solenoidal_alpha/complete_language/native_context_controls.rs",
+      "sha256": "d439b3de22a860157cbcb87208ee4d6a02629efa0690a2e08bcf665fe4615e51",
+      "git_blob_matches": true
+    }
+  ],
+  "binaries": [
+    {
+      "path": "binaries/data",
+      "sha256": "4b27299036013eedbeae0e48674dfa1919d0018c485b8f8250f05dedceab0c6f",
+      "source": "73d22f1fcaa828f50d127eff7e337c65897214f3",
+      "runtime_scope": "original connected/data test executable"
+    },
+    {
+      "path": "binaries/connected",
+      "sha256": "dedf703ea3b78386d38a0517c46083c5e7a6d251a7e30717970792ebe573ab70",
+      "source": "73d22f1fcaa828f50d127eff7e337c65897214f3",
+      "runtime_scope": "original connected/data test executable"
+    },
+    {
+      "path": "binaries/data-diagnostic",
+      "sha256": "451c498d34b3a10a6a17ba63caa9397eb0c33bc80896f8321c646fc4786742fb",
+      "source": "ac4283284489cbca97f2505a5cbe83a9f96a917f",
+      "runtime_scope": "data-only diagnostic executable; no subsequent native execution"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "runtime_source": "73d22f1fcaa828f50d127eff7e337c65897214f3",
+  "diagnostic_source_deltas": {
+    "crates/holonics/src/hnn/mod.rs": "c670da1dc20787416ee29ab0459cdf407193c0dc54f2af61cc7f10fe2a09d414",
+    "crates/holonics/src/hnn/word/action/quadratic_work.rs": "6e78264c83ad396d8957a0e2c99ed403ed6845dcfbdf5b6866295b7800c640a7"
+  },
+  "binary_sha256": "451c498d34b3a10a6a17ba63caa9397eb0c33bc80896f8321c646fc4786742fb",
+  "native_retry_allowed": false
+}

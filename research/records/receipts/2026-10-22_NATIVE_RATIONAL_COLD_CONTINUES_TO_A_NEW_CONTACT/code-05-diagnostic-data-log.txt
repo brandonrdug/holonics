@@ -1,0 +1,7 @@
+
+running 1 test
+test hnn::word::action::quadratic_work::controls::quadratic_control_refusal_data_only ... QUADRATIC_CONTROL_DIAGNOSTIC_PASS actual_values_bound_to_source_commit=true 1024bit_accept_1025refuse=true dimension_work_precision_unchanged=true oversized_diagnostic_omitted_still_refuses=true native_calls=0
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1791 filtered out; finished in 0.00s
+

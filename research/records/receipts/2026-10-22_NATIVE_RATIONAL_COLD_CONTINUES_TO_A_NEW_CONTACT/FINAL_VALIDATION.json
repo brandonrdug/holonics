@@ -1,0 +1,323 @@
+{
+  "utc": "2026-10-22T01:45:34.246346+00:00",
+  "status": "CLOSED_PARTIAL_NATIVE_TRANSITION",
+  "code_source": "ac4283284489cbca97f2505a5cbe83a9f96a917f",
+  "connected_runtime_source": "73d22f1fcaa828f50d127eff7e337c65897214f3",
+  "base": "43c33bc69b86dcc8f4b703bcf6812effdc8a5320",
+  "old_phase_closed_ns": 288033856053,
+  "fixed_code_ceiling_ns": 360000000000,
+  "charged_code_ns": 245569538603,
+  "unused_code_ns": 114430461397,
+  "native_reservation": 640,
+  "native_measured_attempts": 170,
+  "unused_reservation_not_recycled": 470,
+  "native_calls": 1,
+  "retry": false,
+  "data_controls_passed": 4,
+  "passes": [
+    "exact runtime source lib+example test build",
+    "three rational data controls including full paired cold policy and positivity/refusal",
+    "pending-six full cold",
+    "first R at original source9, then ingress to10",
+    "post-first-R full cold",
+    "new actual contact source10 ->11",
+    "bounded quadratic-control diagnostic library build/data control",
+    "final-source example check"
+  ],
+  "refusal": {
+    "boundary": "next R section",
+    "status": "REFUSED",
+    "start_source": 11,
+    "staged_word_producers": [
+      {
+        "source": 11,
+        "commit": 7,
+        "scalar_count": 12,
+        "max_numerator_bits": 1777,
+        "max_denominator_bits": 1784,
+        "coordinate_bits": [
+          [
+            1457,
+            1462
+          ],
+          [
+            1457,
+            1462
+          ],
+          [
+            1455,
+            1462
+          ],
+          [
+            1455,
+            1462
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1777,
+            1784
+          ],
+          [
+            1775,
+            1779
+          ],
+          [
+            1777,
+            1779
+          ],
+          [
+            1775,
+            1779
+          ],
+          [
+            1272,
+            1276
+          ],
+          [
+            1272,
+            1276
+          ]
+        ]
+      }
+    ],
+    "failure": "unchanged quadratic class-coordinate control bounds",
+    "operative_guard": "word/action/quadratic_work.rs apply_quadratic control shape/max-work-sign/precision/control-numerator-denominator bound",
+    "actual_rollback_source": 11,
+    "actual_rollback_exact": true,
+    "pending_rollback_exact": true,
+    "failed_producing_source": {
+      "value": 12,
+      "status": "inferred from sole source11 completed staged producer and deterministic ordered loop, not a captured failed packet"
+    },
+    "actual_rejected_control": "NOT CAPTURED by original generic error; no reconstruction/replay",
+    "limit_rational_bits": 1024,
+    "max_abs_work": 65536
+  },
+  "not_reached": [
+    "next R publication",
+    "source30 close",
+    "final cold",
+    "four paired frozen decisions"
+  ],
+  "final_diagnostic_not_runtime_replayed": true,
+  "failed_actual_control_values_unavailable": true,
+  "all_guard_receipts_terminal": true,
+  "owned_cleanup_remaining": [],
+  "model_ready": false,
+  "gpu_calls": 0,
+  "dataset_jobs": 0,
+  "training_campaigns": 0,
+  "receipts": [
+    {
+      "path": "code-01-build/receipt.json",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--lib",
+        "--example",
+        "solenoidal_alpha",
+        "--no-run"
+      ],
+      "limit_s": 180,
+      "wall_ns": 124508093901,
+      "peak_rss_bytes": 4312498176,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 1240,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 0,
+      "ledger_after_ns": 124508093901,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "path": "code-02-data/receipt.json",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "bash",
+        "-c",
+        "exec \"$@\"",
+        "_",
+        "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-cold-transition-43c33/binaries/data",
+        "native_rational",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "limit_s": 15,
+      "wall_ns": 101645378,
+      "peak_rss_bytes": 1462272,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 1,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 124508093901,
+      "ledger_after_ns": 124609739279,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "path": "code-03-native/receipt.json",
+      "native_attempt_reservation": 640,
+      "native_attempt_charge": 170,
+      "native_counts": {
+        "final": true,
+        "total_attempts": 170,
+        "forward_constructors": 134,
+        "response_companions": 12,
+        "actual_returns": 12,
+        "fresh_returns": 12
+      },
+      "command": [
+        "bash",
+        "-c",
+        "exec \"$@\"",
+        "_",
+        "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-cold-transition-43c33/binaries/connected",
+        "complete_language::native_context_controls::native_original_word_final_ingress_transition",
+        "--ignored",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "limit_s": 90,
+      "wall_ns": 13843748870,
+      "peak_rss_bytes": 171794432,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 138,
+      "exit": 101,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 124609739279,
+      "ledger_after_ns": 138453488149,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "path": "code-04-diagnostic-build/receipt.json",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--lib",
+        "--no-run"
+      ],
+      "limit_s": 150,
+      "wall_ns": 97162890487,
+      "peak_rss_bytes": 2997096448,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 968,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 138453488149,
+      "ledger_after_ns": 235616378636,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "path": "code-05-diagnostic-data/receipt.json",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "bash",
+        "-c",
+        "exec \"$@\"",
+        "_",
+        "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-cold-transition-43c33/binaries/data-diagnostic",
+        "hnn::word::action::quadratic_work::controls::quadratic_control_refusal_data_only",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "limit_s": 10,
+      "wall_ns": 101503868,
+      "peak_rss_bytes": 1462272,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 1,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 235616378636,
+      "ledger_after_ns": 235717882504,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "path": "code-06-example-check/receipt.json",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "holonics",
+        "--example",
+        "solenoidal_alpha"
+      ],
+      "limit_s": 30,
+      "wall_ns": 9851656099,
+      "peak_rss_bytes": 1284341760,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 98,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 235717882504,
+      "ledger_after_ns": 245569538603,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    }
+  ]
+}

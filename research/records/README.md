@@ -563,3 +563,5 @@ This page grows by useful connections rather than by reproducing the entire file
 - [The actual CM native failures repair the producing proofs without changing the source](2026-10-09_THE_ACTUAL_CM_NATIVE_FAILURES_REPAIR_THE_PRODUCING_PROOFS_WITHOUT_CHANGING_THE_SOURCE.md): mathematical source and consumer retained; final v9 acceptance and publication limits joined above.
 
 - [2026-10-21: Native current prediction and paired contact remain a partial join](2026-10-21_NATIVE_CURRENT_PREDICTION_AND_PAIRED_CONTACT_REMAIN_A_PARTIAL_JOIN.md) — bounded host CODE evidence; native R section/card/current cold qualification unfinished; no dataset run.
+
+- [Native rational cold restore reaches a new contact; next control bound remains explicit](2026-10-22_NATIVE_RATIONAL_COLD_CONTINUES_TO_A_NEW_CONTACT.md) — October22, scoped host control and diagnostic, no model run.

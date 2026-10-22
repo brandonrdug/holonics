@@ -542,3 +542,5 @@ places the R-only update before final source ingress, retaining the original Wor
 carry, prepared cut and lag. Its first R publication passes. The subsequently found
 legacy Gram-lattice cold mismatch has a scoped compile-checked correction; full
 post-R cold/contact/next-R/source30/frozen execution remains unqualified.
+
+[measured; October22] Native rational receiving cold continuity now passes firstR and a genuine new contact; the next control-coordinate bound remains unresolved. [Scoped control and exact limits](../research/records/2026-10-22_NATIVE_RATIONAL_COLD_CONTINUES_TO_A_NEW_CONTACT.md).

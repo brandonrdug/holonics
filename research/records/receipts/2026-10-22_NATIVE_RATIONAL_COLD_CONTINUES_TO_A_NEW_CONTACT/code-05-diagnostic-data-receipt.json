@@ -1,0 +1,33 @@
+{
+  "native_attempt_reservation": 0,
+  "native_attempt_charge": 0,
+  "native_counts": null,
+  "command": [
+    "bash",
+    "-c",
+    "exec \"$@\"",
+    "_",
+    "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-cold-transition-43c33/binaries/data-diagnostic",
+    "hnn::word::action::quadratic_work::controls::quadratic_control_refusal_data_only",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "limit_s": 10,
+  "wall_ns": 101503868,
+  "peak_rss_bytes": 1462272,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 1,
+  "exit": 0,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 235616378636,
+  "ledger_after_ns": 235717882504,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}
