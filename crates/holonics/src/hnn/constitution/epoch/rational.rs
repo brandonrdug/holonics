@@ -180,6 +180,48 @@ mod tests{
  use super::*;
  fn q(n:i64,d:i64)->Rat{Rat::new(n.into(),d.into())}
  #[test]
+ fn native_rational_cold_policy_branches()->Result<(),HnnError>{
+    use crate::hnn::constitution::receiving_material::ReceivingMaterial;
+    let b=NativeRationalBudget::V1;
+    let mut material=ReceivingMaterial::arrival_context(NormalLaw::with_receiving_prior(ExactRatMatrix::zero(4,12)?,0),6,6)?;
+    material.bind_family_local_return()?;material.bind_bounded_representation()?;material.bind_native_rational()?;
+    material.found_operand_charts(&vec![Rat::one();12])?;
+    for law in material.laws_mut(){
+        let mut e=EpochLaw::from_normal(law,3)?.with_phase_rows(&[1,3],11)?.into_native_rational()?;
+        e.receiving_refinement=Some(20);
+        let v=(1..=6).map(|i|q(i,3)).collect::<Vec<_>>();
+        let h=(0..6).map(|i|(0..6).map(|j|&v[i]*&v[j]+if i==j{Rat::one()}else{Rat::zero()}).collect()).collect::<Vec<_>>();
+        e.gram=EpochArray::from_native_rows(&h,vec![1;6],b)?;
+        e.news=EpochArray::from_native_rows(&vec![vec![q(1,33);6];4],vec![1,11,1,11],b)?;
+        assert!(!e.gram.is_dyadic());e.admit_native_statistics()?;
+        let mut declared=EpochLaw::from_normal(law,3)?.with_phase_rows(&[1,3],11)?.into_native_rational()?;declared.receiving_refinement=Some(20);
+        assert_eq!(EpochLaw::decode_checkpoint(&e.encode_checkpoint(),&declared,1<<24)?,e);
+        for kind in 0..4{
+            let mut bad=e.clone();
+            match kind{
+                0=>{bad.native_rational=None;},
+                1=>{bad.gram.row_divisors[0]=3;},
+                2=>{bad.news.row_divisors[1]=13;},
+                _=>{bad.gram.values[0]=-bad.gram.values[0].abs();bad.gram.numerator_l1_bound=bad.gram.values.iter().map(Signed::abs).sum();},
+            }
+            assert!(EpochLaw::decode_checkpoint(&bad.encode_checkpoint(),&declared,1<<24).is_err(),"bad policy/phase/positivity/cache kind {kind}");
+        }
+        let mut corrupt_cache=e.clone();corrupt_cache.news.numerator_l1_bound+=1;assert!(corrupt_cache.admit_native_statistics().is_err());
+        let mut legacy=e.clone();legacy.native_rational=None;legacy.gram.native_rational=None;legacy.news.native_rational=None;
+        let mut legacy_law=law.clone();legacy_law.install_epoch(legacy);assert!(!legacy_law.on_lattice(&Lattice::new(6)));
+        law.install_epoch(e);assert!(law.on_lattice(&Lattice::new(6)));
+        let mut wrong_role=law.clone();wrong_role.receiving_prior=None;assert!(!wrong_role.on_lattice(&Lattice::new(6)));
+    }
+    material.validate()?;assert!(material.on_lattice(&Lattice::new(6)));
+    let mut text=String::new();ReceivingMaterial::write_optional(&mut text,"receiving",Some(&material));
+    let mut budget=super::super::CheckpointReadBudget::new(1<<24);
+    let restored=ReceivingMaterial::read_optional(&mut text.lines(),"receiving","native cold policy",&mut budget)?.unwrap();
+    assert_eq!(restored,material);assert!(restored.on_lattice(&Lattice::new(6)));
+    let mut budget=super::super::CheckpointReadBudget::new(1<<24);
+    assert!(ReceivingMaterial::read_optional(&mut text.replace("arrival-context-native-rational-moments-v1","arrival-context-family-local-subquantum20-v1").lines(),"receiving","native cold policy",&mut budget).is_err());
+    println!("NATIVE_RATIONAL_COLD_POLICY_PASS width6 paired_material_roundtrip_exact=true native_H_news_odd=true semantic_phase11=true legacy_dyadic_refusal=true bad_policy_phase_gram_positivity_cache_role_refused=true native_calls=0");Ok(())
+ }
+ #[test]
  fn native_rational_full_normal_phase_codec()->Result<(),HnnError>{
     let b=NativeRationalBudget::V1;
     let mut first=EpochLaw::founded(4,2,6,0)?.with_phase_rows(&[1,3],11)?.into_native_rational()?;

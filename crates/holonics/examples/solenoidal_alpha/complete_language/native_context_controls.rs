@@ -383,11 +383,12 @@ fn native_original_word_final_ingress_transition()->Result<()>{
     assert!(resident.constitution().receiving_map(2).unwrap().entries().iter().all(num_traits::Zero::is_zero));
     let opening=resident.constitution().clone();let mut stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
     fn cold(reference:&Reference,stream:&ObservedStream,opening:&Constitution)->Result<ObservedStream>{
-        let state=stream.resident().continuing_state(0)?;let parsed=ContinuingState::from_text(&state.to_text(),READ_BUDGET)?;let field=stream.resident().field();let resident=reference.mount_continued(field,&Current::at_rest(field),opening.clone(),&parsed)?;assert_eq!(resident.continuing_state(0)?,state);
+        let state=stream.resident().continuing_state(0)?;let text_state=state.to_text();let at=stream.crib().next_position();println!("FINAL_INGRESS_COLD_BEGIN addressed_frontier={at:?} state_bytes={} pending={}",text_state.len(),stream.pending_checkpoint());
+        let parsed=ContinuingState::from_text(&text_state,READ_BUDGET).map_err(|e|{println!("FINAL_INGRESS_COLD_REFUSAL boundary=decode addressed_frontier={at:?} error={e:?}");e})?;let field=stream.resident().field();let resident=reference.mount_continued(field,&Current::at_rest(field),opening.clone(),&parsed).map_err(|e|{println!("FINAL_INGRESS_COLD_REFUSAL boundary=mount addressed_frontier={at:?} error={e:?}");e})?;assert_eq!(resident.continuing_state(0)?,state);
         let crib=ObservedCrib::from_unplaced_checkpoint(field,resident.current(),stream.crib().next_position(),&stream.crib().unplaced_checkpoint()?)?;
         let text=stream.pending_checkpoint();assert!(text.starts_with("observed-stream-pending-native-rational-v1"));
         let changed=text.replacen("1048576","1048575",1);assert!(ObservedStream::restore_checkpoint(resident.clone(),crib.clone(),&changed).is_err());
-        let restored=ObservedStream::restore_checkpoint(resident,crib,&text)?;assert_eq!(restored.pending_checkpoint(),text);Ok(restored)
+        let restored=ObservedStream::restore_checkpoint(resident,crib,&text).map_err(|e|{println!("FINAL_INGRESS_COLD_REFUSAL boundary=pending addressed_frontier={at:?} error={e:?}");e})?;assert_eq!(restored.pending_checkpoint(),text);println!("FINAL_INGRESS_COLD_PASS addressed_frontier={at:?} full_native_and_pending_equal=true");Ok(restored)
     }
     let data:Vec<_>=(0..30).map(|i|i%4).collect();stream.receive_native_current(&reference,&pairing,&data[..6],64)?;stream=cold(&reference,&stream,&opening)?;
     println!("FINAL_INGRESS_PENDING_COLD accepted6/published0/pending6 native_policy_resources_exact=true mismatch_refused=true");
@@ -416,7 +417,8 @@ fn native_original_word_final_ingress_transition()->Result<()>{
     stream=cold(&reference,&stream,&opening)?;
     assert!(stream.pending_checkpoint().ends_with("\n"));
     let at10=stream.resident().continuing_state(0)?;
-    let contact=stream.observe_native_current_contact(&reference,&pairing,data[10],64)?;
+    let pending10=stream.pending_checkpoint();
+    let contact=match stream.observe_native_current_contact(&reference,&pairing,data[10],64){Ok(x)=>x,Err(e)=>{assert_eq!(stream.resident().continuing_state(0)?,at10);assert_eq!(stream.pending_checkpoint(),pending10);println!("FINAL_INGRESS_CONTACT_REFUSAL source10 target={} rollback_exact=true error={e:?}",data[10]);return Err(e.into());}};
     assert_eq!(contact.prediction.source_cells,10);
     assert!(contact.contact.is_some(),"a new actual contact event must execute its own publication owner");
     println!("FINAL_INGRESS_NEW_CONTACT source10to11=true publication={:?}",contact.contact.as_ref().map(|c|&c.publication));
