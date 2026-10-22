@@ -17,6 +17,18 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 22: the native contact moves, certified by rereading the same comparison (host).**
+The contact step now starts each family at its covector-scale bound, halves in common, and
+publishes the first halving whose reread of the same native prediction is an exact strict
+decrease; otherwise the certified step stands. On the connected host control the contact
+publishes six moving C/K/D families (exponents 2 and −1, against −52..−37 before), the same
+comparison falls from about 2.141 to 1.989 bits, and pending-six → first R → contact → next R →
+source 30 → cold restores → four frozen decisions all pass (506 native attempts, 70 s). The card
+route and a held-out reading are not measured. The native training stream still publishes no
+contact material: `receive_native_current` delivers R sections only. The
+[record](research/records/2026-10-22_THE_NATIVE_CONTACT_STEP_IS_CERTIFIED_BY_REREADING_THE_SAME_COMPARISON.md)
+holds the decision and receipts. The zero-motion paragraphs below are historical at their source.
+
 **October22 joint modulus source review corrections: UNCOMPILED/UNTESTED/UNWIRED.**
 Code `e8a843154801268a50fd209453d186a0548af7bc` corrects the six findings in the pinned
 `6c24a91` source review. The [existing native-contact record](research/records/2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md#six-findings-in-the-initial-modulus-source-corrected-in-source-only)

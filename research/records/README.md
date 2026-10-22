@@ -27,6 +27,8 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
+- [The native contact step is certified by rereading the same comparison](2026-10-22_THE_NATIVE_CONTACT_STEP_IS_CERTIFIED_BY_REREADING_THE_SAME_COMPARISON.md) (#73, #62): the envelope step (`C = ½·response²`) sized every contact family at `2^-52..2^-37` and released all 96 updates; a ladder from the covector-scale bound, halved in common and admitted by an exact strict decrease of the same native comparison, publishes six moving families at exponents 2 and −1, lowers that comparison from about 2.141 to 1.989 bits, and keeps the whole host continuity control; the native training stream itself publishes no contact material.
+
 - [Represented native contact: physical-reference first variation and October22 closeout](2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md): `ef08972` passes30-class host continuity and four frozen warm/cold decisions; contact realizes zero factor motion with96 released tails. CUDA and useful language remain unqualified. Links the completed136-record old-law campaign, canonical Claude audit and remaining D6–D8 dependencies.
 
 - [Native R publishes at the original final Word](2026-10-22_NATIVE_R_PUBLISHES_AT_THE_ORIGINAL_FINAL_WORD.md): first actual R publication and31 map coordinates pass; post-R cold stops at the legacy Gram lattice check; scoped correction is compile-only.
