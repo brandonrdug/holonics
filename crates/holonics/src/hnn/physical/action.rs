@@ -89,6 +89,7 @@ pub use model::{
     ReturnImage, StateFibre, WorldModel,
 };
 pub use world::{BoundJointWorld, NativeEncounter, NativeEncounterFailure, WaveJointStep};
+pub mod contextual;
 
 use super::{PhysicalReceiver, communication::PhysicalBoundary};
 use crate::hnn::HnnError;
@@ -440,6 +441,26 @@ impl PreparedPhysicalAction<'_, '_> {
     /// Execute against the one actual World retained by this receiver's common Resident.
     /// A plural fibre remains held; no World branch, reset or guessed point is released.
     pub fn encounter(self) -> Result<ActionCommunication, HnnError> {
+        self.encounter_attached(None)
+    }
+    /// Attach the declared empirical wave observer to this actual encounter.
+    /// It changes contextual M only; actual ingress/carry and existing R owners stay separate.
+    pub fn encounter_contextual(self, family:&mut contextual::ContextualFamily) -> Result<ActionCommunication,HnnError> {
+        self.encounter_attached(Some(family))
+    }
+    /// A disposable, source-bound controlled opening for prospective consumers.
+    /// It neither executes the actual World nor replaces the actual continuation.
+    pub fn controlled_native_word(&self)->Result<Word<'_>,HnnError>{
+        self.prospective.controlled_word(&self.word)
+    }
+    /// Branch-specific native prospects of the same controlled opening, never actuation.
+    pub fn contextual_prospects(&self,family:&contextual::ContextualFamily)->Result<Vec<contextual::ContextualProspect<'_>>,HnnError>{
+        let word=self.prospective.controlled_word(&self.word)?;
+        let ring=self.prospective.preparation().ring();
+        family.admit(self.owner.field,self.section.chart(),ring,word.source_wave(ring)?.len(),self.owner.field.ring(ring).admittance(),self.owner.field.step(),word.opened_at())?;
+        family.prospects(&word,self.prospective.phases(),self.prospective.compared())
+    }
+    fn encounter_attached(self, contextual:Option<&mut contextual::ContextualFamily>) -> Result<ActionCommunication,HnnError>{
         let Self {
             owner,
             word,
@@ -474,6 +495,7 @@ impl PreparedPhysicalAction<'_, '_> {
             &[],
             Vec::new(),
             &mut Vec::new(),
+            contextual,
         )
     }
 }
@@ -1624,6 +1646,7 @@ impl<'f> PhysicalReceiver<'f> {
         directions: &[MaterialDirection],
         continued: Vec<MaterialTangent>,
         tangents: &mut Vec<MaterialTangent>,
+        contextual:Option<&mut contextual::ContextualFamily>,
     ) -> Result<ActionCommunication, HnnError> {
         let ActionFrame {
             section,
@@ -1645,6 +1668,9 @@ impl<'f> PhysicalReceiver<'f> {
                 self.field.step(),
                 word.opened_at(),
             )?;
+        if let Some(family)=contextual.as_deref(){
+            family.admit(self.field,section.chart(),applied.ring(),applied.actual_source_wave().len(),self.field.ring(applied.ring()).admittance(),self.field.step(),word.opened_at())?;
+        }
         let producing = self.constitution().clone();
         let epochs = phases.epochs().collect::<Vec<_>>();
         // [definition; agent-inferred, October 9; the held-carry record §3] The declared material
@@ -1736,6 +1762,8 @@ impl<'f> PhysicalReceiver<'f> {
             applied.compared(),
             phases.grain(),
             &mut observe,
+            contextual,
+            producing.commit(),
         );
         // The World model absorbs every actually executed step, completed or interrupted, before
         // any later exit, so its tick never lags the actual World's and no later refusal rolls it
@@ -2730,6 +2758,7 @@ impl PreparedPhysicalProbe<'_, '_> {
             directions,
             continued,
             &mut tangents,
+            None,
         )?;
         let discrepancy = discrepancy_of(&reception, station, grain, prediction.as_ref());
         Ok((

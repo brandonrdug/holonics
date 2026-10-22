@@ -39,11 +39,22 @@ use linear_radius::ContactRadiusMaps;
 /// This shares the existing native error owner. Each advance charges one unsplit surrogate
 /// tick, whose difference from the executed column includes every signed-feedback split.
 pub struct ResponseTube<'a> {
-    maps: ContactRadiusMaps<'a>,
+    maps: std::rc::Rc<std::cell::RefCell<ContactRadiusMaps<'a>>>,
     radius: EndChange,
 }
 
 impl<'a> ResponseTube<'a> {
+    /// Immutable domain admission; requesting no unsplit report never skips this.
+    pub fn admit_operands(o: &Operands) -> Result<(), HnnError> {
+        let valid=|d:Rat| d>=Rat::zero() && d<Rat::one();
+        if o.rings().iter().any(|r| !valid(r.chart().map_or_else(Rat::zero,|c|c.certificate.clone())))
+            || o.contacts().iter().any(|c| !valid(c.chart().map_or_else(Rat::zero,|c|c.certificate.clone())))
+            || o.resonators().iter().flatten().any(|r| r.material().saturation().is_some() || (0..r.phases()).any(|p|!valid(r.certificate(p)))) {
+            return Err(HnnError::Unadmitted {reason:"paired response operands retain linear resonators and admitted inverse-chart deviations"});
+        }
+        Ok(())
+    }
+
     fn admit_shape(o: &Operands, point: &EndChange, missing_rest: bool) -> Result<(), HnnError> {
         let widths: Vec<_> = o.rings().iter().map(|r| r.width()).collect();
         let valid = point.storage.len() == widths.len()
@@ -86,6 +97,7 @@ impl<'a> ResponseTube<'a> {
         exact: &EndChange,
         executed: &EndChange,
     ) -> Result<Self, HnnError> {
+        Self::admit_operands(o)?;
         Self::admit_shape(o, exact, true)?;
         Self::admit_shape(o, executed, false)?;
         if o.resonators()
@@ -109,13 +121,91 @@ impl<'a> ResponseTube<'a> {
         let mut radius = executed.clone();
         join_change(&mut radius, &exact, |a, b| (a - b).abs());
         Ok(Self {
-            maps: ContactRadiusMaps::new(o),
+            maps: std::rc::Rc::new(std::cell::RefCell::new(ContactRadiusMaps::new(o))),
             radius,
         })
     }
 
+    /// New independent radius/point state; only authentic immutable coefficient columns are shared.
+    pub fn new_track(&self,exact:&EndChange,executed:&EndChange)->Result<Self,HnnError>{
+        let mut track=Self::open(self.maps.borrow().operands,exact,executed)?;
+        track.maps=std::rc::Rc::clone(&self.maps); Ok(track)
+    }
     pub fn radius(&self) -> &EndChange {
         &self.radius
+    }
+    /// Add a previously derived contact-local Euclidean force-error bound in the SAME
+    /// normalized wave chart. Each selected component is bounded by that norm. This preserves
+    /// causal support; it does not mint a bound or turn an arbitrary radius into a native witness.
+    pub(crate) fn add_material_contact_error(&mut self,a:usize,bound:&Rat)->Result<(),HnnError>{
+        if bound<&Rat::zero(){return Err(HnnError::Unadmitted{reason:"native material force error is nonnegative"});}
+        let o=self.maps.borrow().operands;let c=o.contacts().get(a).ok_or(HnnError::CountOverflow)?;
+        let (from,to)=c.selection();
+        for &i in from{self.radius.arrivals[a][0][i]+=bound;}
+        for &i in to{self.radius.arrivals[a][1][i]+=bound;}
+        for e in &mut self.radius.states[a][0]{*e+=o.step()*c.conductance()*bound;}
+        for e in &mut self.radius.states[a][1]{*e+=c.conductance()*bound;}
+        Ok(())
+    }
+
+    /// Direction-independent contact readings at the original executed intermediate.
+    /// The actual anchor split is included before selecting channel coordinates. These are
+    /// state/midpoint operands for a later tangent certificate, never a material-ray proof.
+    pub(crate) fn material_contact_stages(&self,point:&EndChange,anchors:&[Vec<Rat>],midpoints:&[Vec<Rat>])
+        ->Result<Vec<crate::hnn::word::material_ray::OriginalContactStage>,HnnError>{
+        let o=self.maps.borrow().operands;
+        Self::admit_shape(o,point,false)?;
+        let centers=crate::hnn::word::linear::junctions(o,point)?;
+        let bounds=junction_error(o,point,&self.radius)?;
+        if anchors.len()!=centers.len() || midpoints.len()!=o.contacts().len() || anchors.iter().zip(&centers).any(|(a,c)|a.len()!=c.anchor.len()) {
+            return Err(HnnError::Unadmitted{reason:"material stage readings keep every original anchor/midpoint"});
+        }
+        o.contacts().iter().enumerate().map(|(a,c)|{
+            let (from,to)=c.ends();let (sf,st)=c.selection();
+            let actual_outgoing=|r:usize|->Vec<Rat>{let incoming=&point.arrivals[a][o.end_slot(a,r)];anchors[r].iter().zip(incoming).map(|(v,x)|crate::ratio::integer(2)*v-x).collect()};
+            let out_error=|r:usize|->Vec<Rat>{outgoing(o,&bounds,r,a).iter().zip(anchors[r].iter().zip(&centers[r].anchor)).map(|(e,(v,c))|e+crate::ratio::integer(2)*(v-c).abs()).collect()};
+            let af=actual_outgoing(from);let at=actual_outgoing(to);let ef=out_error(from);let et=out_error(to);
+            let h=o.step();let g=c.conductance();
+            let selected=sf.iter().map(|&i|af[i].clone()).chain(st.iter().map(|&i|at[i].clone()))
+                .chain(point.states[a][0].iter().map(|x|x/(h*g))).chain(point.states[a][1].iter().map(|x|x/g)).collect::<Vec<_>>();
+            let errors=sf.iter().map(|&i|ef[i].clone()).chain(st.iter().map(|&i|et[i].clone()))
+                .chain(self.radius.states[a][0].iter().map(|x|x/(h*g))).chain(self.radius.states[a][1].iter().map(|x|x/g)).collect::<Vec<_>>();
+            if midpoints[a].len()!=c.width(){return Err(HnnError::Unadmitted{reason:"material stage has its actual complete midpoint"});}
+            let (_,image)=crate::hnn::propagation::transit_solve(c,h,&af,&at,&point.states[a][0],&point.states[a][1])?;
+            let residual=midpoints[a].iter().zip(image).map(|(w,z)|crate::ratio::integer(2)*h/g*w-z).collect::<Vec<_>>();
+            Ok(crate::hnn::word::material_ray::OriginalContactStage{
+                input_norm:crate::hnn::word::material_ray::vector_norm(&selected),
+                input_error:crate::hnn::word::material_ray::vector_norm(&errors),
+                solve_residual:crate::hnn::word::material_ray::vector_norm(&residual)})
+        }).collect()
+    }
+
+    /// A whole physical tick norm from the existing nonnegative radius action. A Euclidean
+    /// unit ball lies in this normalized component box. Shared inputs/copies are all counted.
+    /// This is one coefficient-bound computation, not a basis Word or physical tick.
+    pub(crate) fn physical_tick_norms(o:&Operands,tick:usize)->Result<(Rat,Rat),HnnError>{
+        let point=EndChange{
+            storage:o.rings().iter().map(|r|vec![Rat::zero();r.width()]).collect(),
+            arrivals:o.contacts().iter().map(|c|{let(a,b)=c.ends();[vec![Rat::zero();o.rings()[a].width()],vec![Rat::zero();o.rings()[b].width()]]}).collect(),
+            states:o.contacts().iter().map(|c|[vec![Rat::zero();c.width()],vec![Rat::zero();c.width()]]).collect(),
+            resonators:o.resonators().iter().map(|r|r.as_ref().map(|r|[vec![Rat::zero();r.width()],vec![Rat::zero();r.width()]])).collect(),
+            resonator_phases:o.resonators().iter().map(|r|r.as_ref().map(|r|r.phase_at(tick.saturating_sub(1)))).collect()};
+        let mut radius=point.clone();
+        for v in radius.storage.iter_mut().chain(radius.arrivals.iter_mut().flatten()){v.fill(Rat::one());}
+        for (s,c) in radius.states.iter_mut().zip(o.contacts()){s[0].fill(o.step()*c.conductance());s[1].fill(c.conductance().clone());}
+        for (s,r) in radius.resonators.iter_mut().zip(o.resonators()){if let(Some(s),Some(r))=(s,r){s[0].fill(o.step()*r.admittance());s[1].fill(r.admittance().clone());}}
+        // Keep the declared phases; zero values are a coefficient origin, not an exterior event.
+        let mut bound=tick_error_cached(&mut ContactRadiusMaps::new(o),&point,&radius,tick)?;
+        let full=crate::hnn::word::material_ray::state_norm(o,&bound)?;
+        // The intermediate cut is AFTER the fixed junction/element/load stage and
+        // BEFORE contact transits: carry every outgoing wave and unchanged contact state.
+        // Shared storage/outgoing inputs are counted together in this full vector norm.
+        let junction=junction_error(o,&point,&radius)?;
+        for(a,c)in o.contacts().iter().enumerate(){let(f,t)=c.ends();
+            bound.arrivals[a]=[outgoing(o,&junction,f,a).to_vec(),outgoing(o,&junction,t,a).to_vec()];
+            bound.states[a]=radius.states[a].clone();
+        }
+        Ok((full,crate::hnn::word::material_ray::state_norm(o,&bound)?))
     }
 
     pub fn held_overwrite(&mut self, ring: usize) -> Result<(), HnnError> {
@@ -133,19 +223,19 @@ impl<'a> ResponseTube<'a> {
         point: &EndChange,
         actual: &[Vec<Rat>],
     ) -> Result<Vec<Vec<Rat>>, HnnError> {
-        Self::admit_shape(self.maps.operands, point, false)?;
-        if actual.len() != self.maps.operands.rings().len()
+        Self::admit_shape(self.maps.borrow().operands, point, false)?;
+        if actual.len() != self.maps.borrow().operands.rings().len()
             || actual
                 .iter()
-                .zip(self.maps.operands.rings())
+                .zip(self.maps.borrow().operands.rings())
                 .any(|(v, r)| v.len() != r.width())
         {
             return Err(HnnError::Unadmitted {
                 reason: "the anchor error certificate reads every producing ring coordinate",
             });
         }
-        let centers = physical_signed_junctions(self.maps.operands, point)?;
-        let bounds = junction_error(self.maps.operands, point, &self.radius)?;
+        let centers = physical_signed_junctions(self.maps.borrow().operands, point)?;
+        let bounds = junction_error(self.maps.borrow().operands, point, &self.radius)?;
         Ok(bounds
             .iter()
             .zip(centers)
@@ -160,16 +250,33 @@ impl<'a> ResponseTube<'a> {
             .collect())
     }
 
+    /// One requested crossing: reuse identical signed junctions and radius junctions for
+    /// anchor observation and the following tick. Point and radius remain independent.
+    pub fn crossing(&mut self,point:&EndChange,anchors:&[Vec<Rat>],next:Option<&EndChange>,tick:usize)->Result<Vec<Vec<Rat>>,HnnError>{
+        let o=self.maps.borrow().operands;
+        Self::admit_shape(o,point,false)?;
+        if anchors.len()!=o.rings().len() || anchors.iter().zip(o.rings()).any(|(a,r)|a.len()!=r.width()) {return Err(HnnError::Unadmitted {reason:"requested crossing retains actual anchor shape"});}
+        let centers=physical_signed_junctions(o,point)?;
+        let bounds=junction_error(o,point,&self.radius)?;
+        let error=bounds.iter().zip(&centers).zip(anchors).map(|((e,c),a)|e.anchor.iter().zip(a.iter().zip(&c.anchor)).map(|(e,(a,c))|e+(a-c).abs()).collect()).collect();
+        if let Some(actual)=next {
+            Self::admit_shape(o,actual,false)?;
+            let signed=crate::hnn::word::linear::tick_at_junctions(o,point,tick,&centers)?;
+            let mut radius=tick_error_at_junctions(&mut self.maps.borrow_mut(),point,&self.radius,tick,&centers,&bounds)?;
+            let mut split=actual.clone();join_change(&mut split,&signed,|a,b|(a-b).abs());join_change(&mut radius,&split,|a,b|a+b);self.radius=radius;
+        }
+        Ok(error)
+    }
     pub fn advance(
         &mut self,
         point: &EndChange,
         actual: &EndChange,
         tick: usize,
     ) -> Result<(), HnnError> {
-        Self::admit_shape(self.maps.operands, point, false)?;
-        Self::admit_shape(self.maps.operands, actual, false)?;
-        let signed = physical_signed_tick(self.maps.operands, point, tick)?;
-        let mut next = tick_error_cached(&mut self.maps, point, &self.radius, tick)?;
+        Self::admit_shape(self.maps.borrow().operands, point, false)?;
+        Self::admit_shape(self.maps.borrow().operands, actual, false)?;
+        let signed = physical_signed_tick(self.maps.borrow().operands, point, tick)?;
+        let mut next = tick_error_cached(&mut self.maps.borrow_mut(), point, &self.radius, tick)?;
         let mut split = actual.clone();
         join_change(&mut split, &signed, |a, b| (a - b).abs());
         join_change(&mut next, &split, |a, b| a + b);
@@ -435,6 +542,7 @@ impl ChartedPhysicalPrediction<'_, '_> {
                     entries: vec![0],
                     phases: composed.phases,
                     loci: reached.into_iter().collect(),
+                    passages: Vec::new(),
                 });
             let feature_energy = deposit
                 .linear()
@@ -968,6 +1076,10 @@ fn tick_error_cached(
     let o = maps.operands;
     let centers = physical_signed_junctions(o, point)?;
     let bounds = junction_error(o, point, error)?;
+    tick_error_at_junctions(maps,point,error,tick,&centers,&bounds)
+}
+fn tick_error_at_junctions(maps:&mut ContactRadiusMaps<'_>,point:&EndChange,error:&EndChange,tick:usize,centers:&[Junction],bounds:&[Junction])->Result<EndChange,HnnError>{
+    let o=maps.operands;
     let mut next = error.clone();
     let h = o.step();
     for (g, ring) in o.rings().iter().enumerate() {

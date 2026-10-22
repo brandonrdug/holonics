@@ -1070,6 +1070,7 @@ fn a_collapse_releasing_a_standings_neighbours_changes_no_lobe_hold() {
             entries: vec![0],
             phases: 1,
             loci: Diamond::of(&field, &admitted[0]).retained(&field),
+            passages: Vec::new(),
         })
     };
     let (mut first, whole) = theta.deposited(&deposit(theta.commit())).unwrap();

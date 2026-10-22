@@ -1,0 +1,36 @@
+{
+  "source": "42521565eadaef7ab614a0bde80c4612fed2da3d",
+  "payloads": [
+    {
+      "path": "crates/holonics/examples/solenoidal_alpha/complete_language/native_context_controls.rs",
+      "sha256": "70e20f65d052c247ce0faeafd48b67d666c1be6f2b5d03022e212d70d1f8d850",
+      "runtime_git_matches_compiled": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/mod.rs",
+      "sha256": "eed98dcc090a8e7349811032bb31a2fb2105a67c00d9487d3783469f30b9127e",
+      "runtime_git_matches_compiled": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/interaction.rs",
+      "sha256": "f14e592ca99553ad3b8743c4088571ebfab9f2ef0da480d1858da90b9f2d8b14",
+      "runtime_git_matches_compiled": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/native_context.rs",
+      "sha256": "7255140a5f8113c46a452a07d2661cd135cbd7484aa073fa443c4e25115c5d9a",
+      "runtime_git_matches_compiled": true
+    }
+  ],
+  "binaries": [
+    {
+      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data",
+      "sha256": "c16b65821de25375e1c5a4cbce0658ac09e2b2107cbf8679c9dd1e9b9faf7e59"
+    },
+    {
+      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/connected",
+      "sha256": "2617a290892c2ea375c43b7424a1c9645d761e44889b28ea5611c8d2f7128388"
+    }
+  ],
+  "qualification": "first R publication PASS, post-R cold FAIL; full transition incomplete"
+}

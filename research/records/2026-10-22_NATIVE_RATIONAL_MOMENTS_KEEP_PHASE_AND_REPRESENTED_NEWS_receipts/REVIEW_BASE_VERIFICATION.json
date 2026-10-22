@@ -1,0 +1,56 @@
+{
+  "review_sha256": "f1482a081a20f40e75cf93281115d9509c7ad490a49ec9f548b6e30e54ca60ec",
+  "checks": [
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/flow.rs",
+      "expected": "d1d737c806434627e15aebd4d68746da1737f3bcd5c7ce7e2c45803b487a0306",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch.rs",
+      "expected": "ee127de0a6b875363b9605e41bb4e287da710a309ac03c632eb86ee3facd8faa",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/device.rs",
+      "expected": "ed591b184438644c13a5f8a249d2ef4d53d6b557d4336c7ff43d35d1e3cb3d35",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/deposit.rs",
+      "expected": "8153038c4b2382df8f67914bad8bd1df0398d6b0bbaa0ac55ef6669fb0accca3",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/deposit/paired_receiving.rs",
+      "expected": "583f5d3d0eb9929b432cfa2e711bf4c9e9b3b751d6ca8e431e18753403e62554",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/receiving_material.rs",
+      "expected": "9d39ab93da4efc5495dcf3c2ffaa6dea387f54ac28eee59f7579fb7054f6faaa",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/receiving_blocks.rs",
+      "expected": "773a2588dc8cb11c65ad00530c0feb176f939ee7149b8e9e89560d6b5e7fb83d",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/native_context.rs",
+      "expected": "b9548aad36c56a646de64b49f9307f4dc0b61286306efa6dc531089aa95db032",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/word/native_prediction.rs",
+      "expected": "98af6286a3af39e802e156aa33f6ba14485a93ed41595581a8aefda1668dd656",
+      "base_matches": true
+    },
+    {
+      "path": "docs/HNN_FORMULA.md",
+      "expected": "e10812b93b5a342428ce60d079c7c273e23caa2045a9a95b85e9076c4fac6edb",
+      "base_matches": true
+    }
+  ],
+  "all_match": true
+}

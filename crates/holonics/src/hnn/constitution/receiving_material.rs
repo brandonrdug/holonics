@@ -72,8 +72,12 @@ impl ReceivingBlock {
             || self.law.phase.is_some()
             || self.law.symmetry.is_some()
             || self.law.receiving_prior.is_none()
-            || self.law.gram.len() != self.width()
-            || self.law.gram.iter().any(|row| row.len() != self.width())
+            || match self.law.epoch_law() {
+                Some(epoch)=>epoch.map.rows!=self.law.map.rows() || epoch.map.columns!=self.width()
+                    || epoch.gram.rows!=self.width() || epoch.gram.columns!=self.width()
+                    || epoch.news.rows!=self.law.map.rows() || epoch.news.columns!=self.width(),
+                None=>self.law.gram.len()!=self.width() || self.law.gram.iter().any(|row|row.len()!=self.width()),
+            }
             || self
                 .law
                 .map_carry
@@ -118,6 +122,9 @@ pub(super) enum ReceivingMaterial {
     Single(NormalLaw),
     ArrivalContext {
         source_width: usize,
+        return_policy: crate::hnn::receiving::RetainedReturnPolicy,
+        representation_policy: ReceivingRepresentationPolicy,
+        native_rational: bool,
         blocks: [ReceivingBlock; 2],
         published: ExactRatMatrix,
         shared_phase: PhaseStatistics,
@@ -181,6 +188,9 @@ impl ReceivingMaterial {
                 });
                 Self::ArrivalContext {
                     source_width: *source_width,
+                    return_policy: self.return_policy(),
+                    representation_policy: self.representation_policy(),
+                    native_rational: self.native_rational(),
                     blocks,
                     published: published.scaled(&Rat::zero()),
                     shared_phase: PhaseStatistics::founded(
@@ -395,19 +405,28 @@ impl ReceivingMaterial {
                     crate::hnn::receiving::ReceivingCarrier::Anchor => "anchor",
                     crate::hnn::receiving::ReceivingCarrier::SourceObserver => "source-observer",
                 };
-                *s += &format!("{key} arrival-context-v1 {source_width} {carrier}\n");
+                let tag = if material.unwrap().native_rational() {"arrival-context-native-rational-moments-v1"} else if material.unwrap().representation_policy() == ReceivingRepresentationPolicy::BoundedSubquantumV1 {
+                    "arrival-context-family-local-subquantum20-v1"
+                } else if material.unwrap().return_policy() == crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 { "arrival-context-family-local-v1" } else { "arrival-context-v1" };
+                *s += &format!("{key} {tag} {source_width} {carrier}\n");
                 for (index, block) in blocks.iter().enumerate() {
                     let scale = block
                         .chart
                         .as_ref()
                         .map_or_else(|| "none".to_owned(), |chart| chart.scale().to_string());
                     *s += &format!("operand-chart {index} {scale}\n");
-                    *s += &format!(
-                        "receiving-block {index} {} {}\n",
-                        block.law.map.rows(),
-                        block.width()
-                    );
-                    write_rows(s, &block.law.map);
+                    if block.law.epoch_law().is_some() {
+                        // The canonical normal payload owns its map. As with a Single
+                        // law, an empty envelope must not serialize its derived view.
+                        *s += &format!("receiving-block {index} 0 0\n");
+                    } else {
+                        *s += &format!(
+                            "receiving-block {index} {} {}\n",
+                            block.law.map.rows(),
+                            block.width()
+                        );
+                        write_rows(s, &block.law.map);
+                    }
                     write_law(s, &block.law);
                 }
                 write_phase(s, shared_phase);
@@ -425,9 +444,10 @@ impl ReceivingMaterial {
         lines: &mut std::str::Lines<'_>,
         key: &str,
         what: &'static str,
+        budget: &mut epoch::CheckpointReadBudget,
     ) -> Result<Option<Self>, HnnError> {
         if lines.clone().next() == Some(format!("{key} none").as_str()) {
-            return read_optional_law(lines, key, what).map(|law| law.map(Self::Single));
+            return read_optional_law(lines, key, what, budget).map(|law| law.map(Self::Single));
         }
         if next(lines, "the receiving read and target phase chart")? != RECEIVING_CHART_HEADER {
             return refuse(
@@ -439,12 +459,17 @@ impl ReceivingMaterial {
             .next()
             .ok_or(HnnError::ContinuingState { what })?;
         let words = head(line, key, what)?;
-        if words.first().map(String::as_str) != Some("arrival-context-v1") {
-            return read_optional_law(lines, key, what).map(|law| law.map(Self::Single));
+        if !matches!(words.first().map(String::as_str),Some("arrival-context-v1"|"arrival-context-family-local-v1"|"arrival-context-family-local-subquantum20-v1"|"arrival-context-native-rational-moments-v1")) {
+            return read_optional_law(lines, key, what, budget).map(|law| law.map(Self::Single));
         }
         let [_, width, carrier] = words.as_slice() else {
             return refuse("the versioned receiving material header");
         };
+        let return_policy = if words[0] != "arrival-context-v1" { crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 } else { crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 };
+        let native_rational = words[0] == "arrival-context-native-rational-moments-v1";
+        let representation_policy = if native_rational || words[0] == "arrival-context-family-local-subquantum20-v1" {
+            ReceivingRepresentationPolicy::BoundedSubquantumV1
+        } else { ReceivingRepresentationPolicy::FixedLatticeV1 };
         let source_width = number(Some(width), "the receiving source width")?;
         if source_width == 0 || source_width.checked_mul(2).is_none() {
             return refuse("the receiving source width");
@@ -492,31 +517,38 @@ impl ReceivingMaterial {
                 return refuse("a receiving block map shape");
             };
             let rows_count = number(Some(rows), "the receiving block rows")?;
+            let columns_count = number(Some(columns), "the receiving block columns")?;
+            let canonical_envelope = (rows_count, columns_count) == (0, 0);
             if number(Some(ordinal), "a receiving block ordinal")? != index
-                || number(Some(columns), "the receiving block columns")? != source_width
-                || rows_count == 0
-                || rows_count % 2 != 0
+                || (!canonical_envelope
+                    && (columns_count != source_width || rows_count == 0 || rows_count % 2 != 0))
             {
                 return refuse("a receiving block's order or shape");
             }
             let map = read_rows(lines, &shape[1..], "a receiving block map")?;
-            // read_law checks the solved chart's certificate. Check its declared
-            // Gram extent against this block before entering that generic parser.
-            let gram_head = head(
-                lines.clone().next().ok_or(HnnError::ContinuingState {
+            // The generic canonical parser applies its full checkpoint budget and
+            // map/Gram/news shape checks. Legacy payloads still preflight their
+            // Gram width before that parser allocates it.
+            let law_head = lines.clone().next().ok_or(HnnError::ContinuingState {
                     what: "a receiving block Gram",
-                })?,
-                "gram",
-                "a receiving block Gram",
-            )?;
-            if gram_head.len() != 1
-                || number(gram_head.first(), "a receiving block Gram")? != source_width
-            {
-                return refuse("a receiving block Gram width");
+                })?;
+            if canonical_envelope != law_head.starts_with("epoch-law ") {
+                return refuse("a receiving block's canonical map envelope");
             }
-            let mut law = read_law(lines, map)?;
+            if !canonical_envelope {
+                let gram_head = head(law_head, "gram", "a receiving block Gram")?;
+                if gram_head.len() != 1
+                    || number(gram_head.first(), "a receiving block Gram")? != source_width
+                {
+                    return refuse("a receiving block Gram width");
+                }
+            }
+            let mut law = read_law(lines, map, budget)?;
             law.carrier = carrier;
             let block = ReceivingBlock { chart, law };
+            if block.width() != source_width {
+                return refuse("a receiving block's restored width");
+            }
             block.validate().map_err(|_| HnnError::ContinuingState {
                 what: "a receiving block's material invariants",
             })?;
@@ -534,6 +566,9 @@ impl ReceivingMaterial {
         }
         let material = Self::ArrivalContext {
             source_width,
+            return_policy,
+            representation_policy,
+            native_rational,
             blocks,
             published,
             shared_phase,
@@ -583,12 +618,48 @@ impl ReceivingMaterial {
         };
         let result = Self::ArrivalContext {
             source_width,
+            return_policy: crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1,
+            representation_policy: ReceivingRepresentationPolicy::FixedLatticeV1,
+            native_rational: false,
             blocks: [block(source_width)?, block(context_width)?],
             shared_phase: PhaseStatistics::founded(law.map.rows() / 2, width),
             published: law.map,
         };
         result.validate()?;
         Ok(result)
+    }
+
+    pub(super) fn return_policy(&self) -> crate::hnn::receiving::RetainedReturnPolicy {
+        match self { Self::Single(_) => crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1,
+            Self::ArrivalContext { return_policy, .. } => *return_policy }
+    }
+    pub(super) fn bind_family_local_return(&mut self) -> Result<(), HnnError> {
+        if self != &self.founding() || self.return_policy() != crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 {
+            return Err(HnnError::Unadmitted { reason: "family-local return is declared only on fresh receiving material" });
+        }
+        match self { Self::ArrivalContext { return_policy, .. } => *return_policy=crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1,
+            _ => return Err(HnnError::Unadmitted { reason: "family-local return requires explicit arrival/context material" }) }
+        Ok(())
+    }
+
+    pub(super) fn pristine_native(&self)->bool{self.native_rational() && self==&self.founding()}
+    pub(super) fn native_rational(&self)->bool{matches!(self,Self::ArrivalContext{native_rational:true,..})}
+    pub(super) fn bind_native_rational(&mut self)->Result<(),HnnError>{
+        if self!=&self.founding() || self.representation_policy()!=ReceivingRepresentationPolicy::BoundedSubquantumV1 || self.native_rational(){return Err(HnnError::Unadmitted{reason:"NativeRationalMomentsV1 is an explicit fresh paired receiving declaration"});}
+        if let Self::ArrivalContext{native_rational,..}=self{*native_rational=true;}Ok(())
+    }
+    pub(super) fn representation_policy(&self) -> ReceivingRepresentationPolicy {
+        match self { Self::Single(_) => ReceivingRepresentationPolicy::FixedLatticeV1,
+            Self::ArrivalContext { representation_policy, .. } => *representation_policy }
+    }
+    pub(super) fn bind_bounded_representation(&mut self) -> Result<(), HnnError> {
+        if self != &self.founding() || self.representation_policy()!=ReceivingRepresentationPolicy::FixedLatticeV1
+            || self.return_policy()!=crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 {
+            return Err(HnnError::Unadmitted {reason:"bounded receiving representation is declared only on fresh family-local arrival/context material"});
+        }
+        match self {Self::ArrivalContext {representation_policy,..} => *representation_policy=ReceivingRepresentationPolicy::BoundedSubquantumV1,
+            _ => return Err(HnnError::Unadmitted {reason:"bounded receiving representation requires two explicit receiving blocks"})}
+        Ok(())
     }
 
     pub(super) fn map(&self) -> &ExactRatMatrix {
@@ -633,6 +704,8 @@ impl ReceivingMaterial {
                 ..
             } => {
                 let mut count = CarrierBits::default();
+                count.entries += u64::from(self.return_policy()==crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
+                if let Some(cap) = self.representation_policy().ceiling() { count.entries += u64::from(cap) + 1; }
                 for block in blocks {
                     count.add(block.law.carrier_bits());
                     count.entries += block.chart.as_ref().map_or(0, |chart| bits(chart.scale()));
@@ -685,11 +758,25 @@ impl ReceivingMaterial {
 
     /// Validate cache equality exactly; never silently repair a malformed owner.
     pub(super) fn validate(&self) -> Result<(), HnnError> {
+        let policy = self.representation_policy();
+        if policy == ReceivingRepresentationPolicy::BoundedSubquantumV1
+            && self.return_policy()!=crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1 {
+            return Err(HnnError::Unadmitted {reason:"bounded receiving representation retains its family-local policy"});
+        }
+        for law in self.laws() {
+            if let Some(epoch) = law.epoch_law() {
+                if epoch.native_rational.is_some()!=self.native_rational() || epoch.receiving_refinement != policy.ceiling() || epoch.source_refinement
+                    || policy.ceiling().is_some_and(|cap|epoch.map_lattice > cap) {
+                    return Err(HnnError::Unadmitted {reason:"receiving normal lattice and refinement declaration must match their material owner"});
+                }
+            }
+        }
         if let Self::ArrivalContext {
             source_width,
             blocks,
             published,
             shared_phase,
+            ..
         } = self
         {
             if *source_width != blocks[0].width()
@@ -957,12 +1044,22 @@ mod tests {
         ReceivingMaterial::write_optional(&mut encoded, "receiving", Some(&material));
         assert_eq!(encoded, format!("{RECEIVING_CHART_HEADER}\n{legacy}"));
         assert!(
-            ReceivingMaterial::read_optional(&mut legacy.lines(), "receiving", "test receiving")
-                .is_err()
+            ReceivingMaterial::read_optional(
+                &mut legacy.lines(),
+                "receiving",
+                "test receiving",
+                &mut epoch::CheckpointReadBudget::new(1 << 20)
+            )
+            .is_err()
         );
         assert_eq!(
-            ReceivingMaterial::read_optional(&mut encoded.lines(), "receiving", "test receiving")
-                .unwrap(),
+            ReceivingMaterial::read_optional(
+                &mut encoded.lines(),
+                "receiving",
+                "test receiving",
+                &mut epoch::CheckpointReadBudget::new(1 << 20)
+            )
+            .unwrap(),
             Some(material)
         );
         legacy.clear();
@@ -971,8 +1068,13 @@ mod tests {
         ReceivingMaterial::write_optional(&mut encoded, "receiving", None);
         assert_eq!(encoded, legacy);
         assert_eq!(
-            ReceivingMaterial::read_optional(&mut encoded.lines(), "receiving", "test receiving")
-                .unwrap(),
+            ReceivingMaterial::read_optional(
+                &mut encoded.lines(),
+                "receiving",
+                "test receiving",
+                &mut epoch::CheckpointReadBudget::new(1 << 20)
+            )
+            .unwrap(),
             None
         );
     }
@@ -999,9 +1101,14 @@ mod tests {
         ReceivingMaterial::write_optional(&mut encoded, "receiving", Some(&material));
         encoded += "next-owner\n";
         let mut lines = encoded.lines();
-        let restored = ReceivingMaterial::read_optional(&mut lines, "receiving", "test receiving")
-            .unwrap()
-            .unwrap();
+        let restored = ReceivingMaterial::read_optional(
+            &mut lines,
+            "receiving",
+            "test receiving",
+            &mut epoch::CheckpointReadBudget::new(1 << 20),
+        )
+        .unwrap()
+        .unwrap();
         assert_eq!(restored, material);
         assert_eq!(lines.next(), Some("next-owner"));
         for malformed in [
@@ -1015,7 +1122,8 @@ mod tests {
                 ReceivingMaterial::read_optional(
                     &mut malformed.lines(),
                     "receiving",
-                    "test receiving"
+                    "test receiving",
+                    &mut epoch::CheckpointReadBudget::new(1 << 20)
                 )
                 .is_err()
             );
@@ -1032,8 +1140,13 @@ mod tests {
         ReceivingMaterial::write_optional(&mut encoded, "receiving", Some(&material));
         assert!(encoded.contains("operand-chart 1 none\n"));
         assert_eq!(
-            ReceivingMaterial::read_optional(&mut encoded.lines(), "receiving", "test receiving")
-                .unwrap(),
+            ReceivingMaterial::read_optional(
+                &mut encoded.lines(),
+                "receiving",
+                "test receiving",
+                &mut epoch::CheckpointReadBudget::new(1 << 20)
+            )
+            .unwrap(),
             Some(material)
         );
     }
@@ -1161,4 +1274,28 @@ mod tests {
                 .all(|b| b.law.phase.is_none())
         );
     }
+    #[test]
+    fn family_local_native_material_tag_roundtrip_and_fresh_only() {
+        use crate::hnn::receiving::RetainedReturnPolicy;
+        let law=NormalLaw::with_receiving_prior(ExactRatMatrix::zero(4,4).unwrap(),0);
+        let mut material=ReceivingMaterial::arrival_context(law,2,2).unwrap();
+        material.bind_family_local_return().unwrap();
+        assert_eq!(material.return_policy(),RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
+        assert!(material.bind_family_local_return().is_err());
+        let mut text=String::new();ReceivingMaterial::write_optional(&mut text,"receiving",Some(&material));
+        assert!(text.contains("arrival-context-family-local-v1"));
+        let mut budget=epoch::CheckpointReadBudget::new(1<<30);
+        let restored=ReceivingMaterial::read_optional(&mut text.lines(),"receiving","family local test",&mut budget).unwrap().unwrap();
+        assert_eq!(restored,material);
+    }
+
+    #[test]
+    fn represented_native_declaration_does_not_reinterpret_reached_blocks(){
+        let law=NormalLaw::with_receiving_prior(ExactRatMatrix::zero(4,12).unwrap(),0);
+        let mut m=ReceivingMaterial::arrival_context(law,6,6).unwrap();assert!(!m.pristine_native());
+        m.bind_family_local_return().unwrap();m.bind_bounded_representation().unwrap();m.bind_native_rational().unwrap();assert!(m.pristine_native());
+        m.found_operand_charts(&vec![Rat::one();12]).unwrap();assert!(!m.pristine_native());
+        println!("REPRESENTED_FRESH_NATIVE_DATA_PASS no_reached_block_retagging=true native_calls=0");
+    }
+
 }

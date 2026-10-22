@@ -1,0 +1,40 @@
+{
+  "kind": "additive saved receipt reanalysis; no native rerun",
+  "native_control": "PASS; outer code08 reporting failure from stale artifact path remains preserved",
+  "layout": "ArrivalContext, distinct ten-class CODE declaration",
+  "card": {
+    "backend": "cuda-observed-epoch-device0",
+    "device_ordinal": 0,
+    "host_fallback": false,
+    "completed": false,
+    "successful_card_forwards": 10,
+    "successful_retained_card_returns": 10,
+    "successful_card_aggregates": 0,
+    "host_owned": "empirical M formation/authentic opening work; scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks",
+    "device_forward_reading": {
+      "successful_forwards": 10,
+      "opening_packets": 8,
+      "opening_preparation_host_ns": 12365490,
+      "mounted_execute_ns": 292185937,
+      "native_word_forward_launches": 20,
+      "fresh_response_forward_subset": 10,
+      "forward_phase_transfer_octets": 440960,
+      "response_forward_transfer_subset_octets": 282672
+    }
+  },
+  "matched_exact_fields": [
+    "actual_preparation_receipt",
+    "faces_and_anchors",
+    "reception_end",
+    "complete_reached_WordReturn_under_same_section_covector"
+  ],
+  "publication": "UNJOINED: existing paired-R normal locus refuses as not one declared linear NormalLaw; zero aggregates published",
+  "cold": "unchanged initial native/M checkpoint exact after refusal",
+  "artifact_qualification": {
+    "NATIVE_M.state": "unchanged initial state, not learned state",
+    "ENERGY.txt": "expected refusal text, not numeric energy",
+    "ALIGNED_RETURN.txt": "qualification text, not a covector dump"
+  },
+  "owned_GPU_cleanup_empty": true,
+  "global_sync_census": "unmeasured"
+}

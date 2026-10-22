@@ -1,0 +1,23 @@
+{
+  "command": [
+    "bash",
+    "<CODE-artifacts>/final-host-and-binaries.sh"
+  ],
+  "limit_s": 90,
+  "wall_ns": 2511681773,
+  "peak_rss_bytes": 427581440,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 25,
+  "exit": 101,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 382057041087,
+  "ledger_after_ns": 384568722860,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

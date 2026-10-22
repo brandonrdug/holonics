@@ -103,7 +103,13 @@ pub mod action;
 mod action_return;
 pub(crate) mod column;
 pub mod continuation;
+pub(crate) mod endpoint;
 pub mod finite_gain;
+pub(crate) mod material_ray;
+pub mod native_prediction;
+pub mod native_execution;
+pub(crate) mod linear;
+pub mod scan;
 pub(crate) mod trajectory;
 pub mod variation;
 pub mod work;
@@ -196,10 +202,14 @@ pub struct Word<'c> {
     /// comparison from it and refuses any other. `None` for every other opener. It is the Word's
     /// own present input, released with the Word, never a retained record.
     opened_on: Option<WordOpening>,
+    /// Opt-in computation work paid once before this Word's native tick balances.
+    native_declaration_id:Option<std::sync::Arc<()>>,
+    source_preparation: Option<action::PortPreparationReceipt>,
     /// Transient actual source operand and same-cut response; never retained in reception carry.
     response_source: Option<Vec<Vec<Rat>>>,
     response_opening_exact: Option<EndChange>,
     response: Option<Box<column::ResponseColumn>>,
+    response_error_requested: bool,
     field: &'c Field,
     operands: Operands,
     clock: Clock,
@@ -1894,6 +1904,45 @@ impl<'c> Word<'c> {
         opening: &WordOpening,
         view: &crate::hnn::ring::modes::ModeView,
     ) -> Result<Self, HnnError> {
+        Self::open_received_view_with(field, constitution, current, moment, opening, view, || {
+            Operands::at_cut_charted(field, constitution, current, charts)
+        })
+    }
+
+    pub(crate) fn open_received_scoped(
+        scope: &mut crate::hnn::propagation::RingScope<'c>,
+        current: &Current,
+        moment: &SourceMoment,
+        charts: &mut Charts,
+        opening: &WordOpening,
+        view: &crate::hnn::ring::modes::ModeView,
+    ) -> Result<Self, HnnError> {
+        let field = scope.field();
+        let material = scope.material();
+        Self::open_received_view_with(field, material, current, moment, opening, view, || {
+            scope.at_cut(current, charts)
+        })
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    /// Exact unsplit realization of the SAME source-mode/actual/fresh opening owner.
+    /// This preserves paired preparation and complete carried state; no source is invented.
+    pub(crate) fn open_received_view_exact(
+        field:&'c Field,constitution:&impl ConstitutionRead,current:&Current,moment:&SourceMoment,
+        opening:&WordOpening,view:&crate::hnn::ring::modes::ModeView,
+    )->Result<Self,HnnError>{
+        Self::open_received_view_with(field,constitution,current,moment,opening,view,||Operands::exact_at_cut(field,constitution,current))
+    }
+
+    fn open_received_view_with(
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        current: &Current,
+        moment: &SourceMoment,
+        opening: &WordOpening,
+        view: &crate::hnn::ring::modes::ModeView,
+        operands: impl FnOnce() -> Result<Operands, HnnError>,
+    ) -> Result<Self, HnnError> {
         let storage = view.apply(field, &moment.open_storage(field, constitution, current)?)?;
         let paired = field.receivers().iter().any(|r| {
             matches!(
@@ -1901,15 +1950,17 @@ impl<'c> Word<'c> {
                 Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { .. })
             )
         });
+        let response_error_requested=field.receivers().iter().all(|r| constitution.receiving_return_policy(r.ring)!=crate::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
         let response_source = paired.then(|| storage.clone());
-        let operands = Operands::at_cut_charted(field, constitution, current, charts)?;
+        let operands = operands()?;
         let WordOpening::Received { carry, absorption } = opening else {
             let exact = paired.then(|| EndChange {
                 storage: storage.clone(),
                 ..EndChange::rest(field, &operands)
             });
             let mut word = Self::on_operands(field, operands, storage)?;
-            word.response_source = response_source;
+            word.response_error_requested = response_error_requested;
+        word.response_source = response_source;
             word.response_opening_exact = exact;
             return Ok(word);
         };
@@ -1943,6 +1994,7 @@ impl<'c> Word<'c> {
             exact
         });
         let mut word = Self::continuing(field, operands, &change, &storage, carry.ticks)?;
+        word.response_error_requested = response_error_requested;
         word.response_source = response_source;
         word.response_opening_exact = exact;
         Ok(word)
@@ -2488,9 +2540,12 @@ impl<'c> Word<'c> {
         let mut word = Self {
             native_source: None,
             opened_on: None,
+            native_declaration_id:None,
+            source_preparation: None,
             response_source: None,
             response_opening_exact: None,
             response: None,
+            response_error_requested: true,
             field,
             operands,
             clock,
@@ -2521,6 +2576,10 @@ impl<'c> Word<'c> {
         self.field
     }
 
+    /// Request the authentic retained unsplit report; this changes no native operand.
+    pub fn request_response_error_evidence(&mut self) { self.response_error_requested=true; }
+    pub(crate) fn response_error_requested(&self)->bool { self.response_error_requested }
+    pub(crate) fn has_native_prediction_producer(&self)->bool { self.native_declaration_id.is_some() }
     pub(crate) fn prepare_response(&mut self) -> Result<(), HnnError> {
         if self.response.is_some() {
             return Ok(());
@@ -2638,6 +2697,31 @@ impl<'c> Word<'c> {
             });
         }
         Ok(self.end_change())
+    }
+
+    /// Complete original opening, not the visible representative alone. At an
+    /// unrun opening, on_change put each discarded coordinate in exactly these
+    /// incoming feedback streams. Non-opening streams must still be zero.
+    pub(crate) fn complete_unrun_opening(&self)->Result<EndChange,HnnError>{
+        if self.ticks()!=0 || self.is_ended() || self.carried.anchors.iter().chain(&self.carried.solves).flatten().any(|q|!q.is_zero())
+            || self.resonators.iter().flatten().any(|r|r.remainders.rate.iter().any(|q|!q.is_zero())) {
+            return Err(HnnError::Unadmitted{reason:"complete unrun native opening and its original feedback streams"});
+        }
+        let mut change=self.change()?;
+        for (ring,wave) in change.storage.iter_mut().enumerate(){
+            for ((x,a),b) in wave.iter_mut().zip(&self.carried.storage[ring]).zip(&self.carried.element_drive[ring]){*x+=a+b;}
+        }
+        for (p,r) in change.arrivals.iter_mut().zip(&self.carried.arrivals){for (v,rest) in p.iter_mut().zip(r){for (x,r) in v.iter_mut().zip(rest){*x+=r;}}}
+        for (p,r) in change.states.iter_mut().zip(&self.carried.states){for (v,rest) in p.iter_mut().zip(r){for (x,r) in v.iter_mut().zip(rest){*x+=r;}}}
+        for (state,held) in change.resonators.iter_mut().zip(&self.resonators){if let (Some(state),Some(held))=(state,held){for (v,rest) in state.iter_mut().zip(&held.remainders.state){for (x,r) in v.iter_mut().zip(rest){*x+=r;}}}}
+        Ok(change)
+    }
+    pub fn source_preparation(&self)->Option<&action::PortPreparationReceipt>{self.source_preparation.as_ref()}
+    pub(crate) fn bind_source_producer(&mut self,theta:&crate::hnn::constitution::Constitution,current:&Current,source:std::sync::Arc<SourceMoment>)->Result<(),HnnError>{
+        let opening=self.complete_unrun_opening()?;
+        if self.native_source.is_some(){return Err(HnnError::Unadmitted{reason:"native producing source is bound once"});}
+        self.native_source=Some((theta.clone(),current.clone(),source,opening.support(self.field)));
+        Ok(())
     }
 
     /// The change as the word holds it, with each resonator's form phase: its last executed
@@ -3270,6 +3354,16 @@ impl<'c> Word<'c> {
         &self.resonators
     }
 
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **Each saturated
+    /// ring's passage** in this word, a ring on a one-tick period
+    /// (`hnn::ring::ResonatorOperands::{reads_tube, passage}`): the running maximum, per rest point
+    /// of its period, of its displacement's node `ℓ¹` distance over the word's
+    /// executed ticks (each tick's displacement before it, and the state the last one left). The
+    /// deposit's reach carries it to the certified step, which reads the ring on the tube about it.
+    pub fn tube_passages(&self) -> Result<Vec<crate::hnn::ring::TubePassage>, HnnError> {
+        tube_passages_of(&self.operands, &self.resonators)
+    }
+
     /// The loaded port's two nested wave-chart remainders, used by its smallest law fixture.
     #[cfg(test)]
     pub(crate) fn loaded_wave_remainders(&self, ring: usize) -> Option<(&[Rat], &[Rat])> {
@@ -3378,11 +3472,14 @@ impl<'c> Word<'c> {
     pub(crate) fn keep(self) -> KeptWord {
         let Word {
             native_source: _,
+            native_declaration_id:_,
             opened_on: _,
+            source_preparation,
             field: _,
             response_source,
             response_opening_exact,
             response,
+            response_error_requested,
             operands,
             clock,
             storage,
@@ -3403,9 +3500,11 @@ impl<'c> Word<'c> {
             opened_at,
         } = self;
         KeptWord {
+            source_preparation,
             response_source,
             response_opening_exact,
             response,
+            response_error_requested,
             operands,
             clock,
             storage,
@@ -3521,9 +3620,11 @@ fn admittance_total(operands: &Operands, ring: usize) -> Rat {
 /// outlives its return). It is not `Clone`: a clone of the slot drops it and reads again.
 #[derive(Debug)]
 pub(crate) struct KeptWord {
+    source_preparation: Option<action::PortPreparationReceipt>,
     response_source: Option<Vec<Vec<Rat>>>,
     response_opening_exact: Option<EndChange>,
     response: Option<Box<column::ResponseColumn>>,
+    response_error_requested: bool,
     operands: Operands,
     clock: Clock,
     storage: Vec<Vec<Rat>>,
@@ -3544,7 +3645,41 @@ pub(crate) struct KeptWord {
     opened_at: usize,
 }
 
+/// Read the exact same transient resonator series before and after a word is kept.
+/// This makes no forward call and retains only one maximum per rest point.
+fn tube_passages_of(
+    operands: &Operands,
+    resonators: &[Option<Resonance>],
+) -> Result<Vec<crate::hnn::ring::TubePassage>, HnnError> {
+    operands
+        .resonators()
+        .iter()
+        .zip(resonators)
+        .filter_map(|(operands, resonance)| match (operands, resonance) {
+            (Some(operands), Some(resonance)) if operands.reads_tube() => Some(
+                operands.passage(
+                    resonance
+                        .steps
+                        .iter()
+                        .map(|step| step.input[0].as_slice())
+                        .chain(std::iter::once(resonance.state[0].as_slice())),
+                ),
+            ),
+            _ => None,
+        })
+        .collect()
+}
+
 impl KeptWord {
+    /// The actual kept word's distance summaries, with no replay or clone.
+    pub(crate) fn tube_passages(&self) -> Result<Vec<crate::hnn::ring::TubePassage>, HnnError> {
+        tube_passages_of(&self.operands, &self.resonators)
+    }
+
+    pub(crate) fn operands(&self) -> &Operands {
+        &self.operands
+    }
+
     /// The kept word's anchor at a junction step on a ring (read-only; [`Word::anchor`]'s).
     pub(crate) fn anchor(&self, step: usize, ring: usize) -> Option<&[Rat]> {
         self.passage
@@ -3569,9 +3704,11 @@ impl KeptWord {
     /// **Resume the word on its field**: the field it was read on, which the resident owns.
     pub(crate) fn resume(self, field: &Field) -> Word<'_> {
         let KeptWord {
+            source_preparation,
             response_source,
             response_opening_exact,
             response,
+            response_error_requested,
             operands,
             clock,
             storage,
@@ -3592,12 +3729,15 @@ impl KeptWord {
             opened_at,
         } = self;
         Word {
+            native_declaration_id:None,
             native_source: None,
             opened_on: None,
+            source_preparation,
             field,
             response_source,
             response_opening_exact,
             response,
+            response_error_requested,
             operands,
             clock,
             storage,

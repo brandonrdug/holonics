@@ -1,0 +1,15 @@
+{
+  "guard": "reference/interaction.rs publish_reception_with_variation_kind contact reference admission",
+  "predicate": "exponent.phase !=0 OR 2^exponent.carry * field.contact(a).admittance != carry.conductances[a]",
+  "native_path": [
+    "native_context section executes/publishes last blind Word at source9",
+    "ingest_class_step_deferred advances SourceMoment/Current to source10, keeping carried Word state",
+    "stage/admit local R candidate",
+    "publish_receiving_translation reuses exactly that carry at advanced Current",
+    "common publication reference guard refuses"
+  ],
+  "evidence": "unique source error site plus10successfully staged observer callbacks; not a replay or reconstructed failed packet",
+  "numeric_failed_contact_operands": "not emitted by this guard; contact index/phase/exponents/conductances unavailable; no numeric values invented",
+  "existing_reference_crossing": "ReceptionCarry::crossed at next Word opening transports arrivals and retains momentum; reflected work has its own owner",
+  "remedy_boundary": "typed original Word/carry reference and current-lift identity through R-only publication/cold, or a separately proved ordering/join; no skip, conductance overwrite or extra Word/ingress"
+}

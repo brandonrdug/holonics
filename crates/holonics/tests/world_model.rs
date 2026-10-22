@@ -35,7 +35,7 @@ use holonics::navigator::Clock;
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::linear::inertia::SymmetricForm;
 use holonics::ratio::{Rat, integer, rat};
-use holonics::receiver::face::GrainCell;
+use holonics::hnn::receiving::ReceivingCell;
 use holonics::receiver::receipt::{ReceiptLaw, RegionChart};
 use holonics::receiver::reception::{JointLaw, ReceiverFace};
 use num_bigint::BigInt;
@@ -1338,8 +1338,8 @@ fn a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not
 /// phase `φ_c = Im f_c / 2`. Every cell's unresolved fibre is not part of it. The relative indices
 /// remove only a common offset of whole cells: a common raw shift that crosses a cell boundary can
 /// still move them.
-fn admitted(cells: &[GrainCell], phases: &[Rat], grain: u64) -> (Vec<BigInt>, Vec<BigInt>) {
-    let index = |cell: &GrainCell| &cell.carry * BigInt::from(grain) + BigInt::from(cell.phase);
+fn admitted(cells: &[ReceivingCell], phases: &[Rat], grain: u64) -> (Vec<BigInt>, Vec<BigInt>) {
+    let index = |cell: &ReceivingCell| &cell.carry * BigInt::from(grain) + BigInt::from(cell.phase);
     let first = index(&cells[0]);
     (
         cells[1..].iter().map(|cell| index(cell) - &first).collect(),
@@ -1703,4 +1703,98 @@ fn retained_world_history_fixes_the_next_reading_that_its_state_only_control_lea
             .unwrap(),
         receiver.resident().carried().unwrap().ticks
     );
+}
+
+#[test]
+fn contextual_actual_return_changes_branch_native_prospect_without_rewriting_actual_carry(){
+ use holonics::hnn::physical::action::contextual::{ContextualBounds,ContextualFamily,ContextualPrior,WaveObservationPort};
+ let started=std::time::Instant::now();
+ let(field,theta,source)=fixture();let chart=source.part(0..0).unwrap();
+ let mut attached=receiver(&field,theta.clone());let mut untouched=receiver(&field,theta);
+ for r in [&mut attached,&mut untouched]{r.bind_world(world(&field,chart.clone(),medium(&unit_storage(),source_input(true)))).unwrap();}
+ let port=WaveObservationPort{ring:0,width:N,units:"native source wave Cartesian units; incident-only context".into(),chart,field:field.clone(),admittance:integer(2),step:field.step().clone()};
+ let bounds=ContextualBounds{branches:2,pending:16,precision_bits:20,rational_bits:2048,max_features:24,max_scalar_work:1_000_000};
+ let priors=vec![ContextualPrior{id:0,previous:vec![integer(0);N],current:vec![integer(0);N],observed:false},ContextualPrior{id:1,previous:vec![integer(0);N],current:vec![rat(1,4);N],observed:false}];
+ let mut family=ContextualFamily::found(port.clone(),bounds.clone(),priors,0,false).unwrap();
+ let preparation=PortPreparation::new(&field,0,ExactRatMatrix::identity(N).unwrap()).unwrap();
+ let request=vec![vec![Rat::zero();N],vec![rat(1,4),rat(1,8),rat(1,16),rat(-1,32)]];
+ let result=prepare(&mut attached,&field,&source,&preparation,&request).encounter_contextual(&mut family).unwrap();
+ let control=prepare(&mut untouched,&field,&source,&preparation,&request).encounter().unwrap();
+ let actual=steps_of(&result);let unchanged=steps_of(&control);assert!(!actual.is_empty());assert_eq!(actual.len(),unchanged.len());
+ for(a,b)in actual.iter().zip(&unchanged){assert_eq!((&a.incident,&a.reflected,&a.next),(&b.incident,&b.reflected,&b.next));}
+ assert_eq!(attached.constitution(),untouched.constitution());assert_eq!(attached.current(),untouched.current());assert_eq!(attached.resident().carried(),untouched.resident().carried());assert_eq!(attached.resident().charts(),untouched.resident().charts());assert_eq!(attached.resident().admitted(),untouched.resident().admitted());assert_eq!(attached.resident().ledger(),untouched.resident().ledger());assert_eq!(attached.resident().parametric(),untouched.resident().parametric());
+ assert!(attached.resident().continuing_state(0).is_err(),"participating World passage serialization is an existing unjoined interface");
+ let pending=family.pending_ids();assert!(pending.len()>=2);let cold=family.to_text();let mut restored=ContextualFamily::restored(port.clone(),&cold).unwrap();assert_eq!(restored,family);
+ let before_material=family.branches().to_vec();let before_tick=family.actual_tick();
+ assert!(family.form_with_work_bound(pending[0],1).is_err());assert!(restored.form_with_work_bound(pending[0],1).is_err());
+ assert_eq!(family.branches(),before_material);assert_eq!(family.pending_ids(),pending);assert_eq!(family.actual_tick(),before_tick);assert_eq!(restored,family);
+ // Out-of-order formation uses original p,c,h on contemporary branch material.
+ for id in pending.iter().rev(){family.form(*id).unwrap();restored.form(*id).unwrap();assert_eq!(restored,family);assert!(family.form(*id).is_err());}
+ assert!(family.pending_ids().is_empty());assert_eq!(family.work().actual_returns,actual.len()as u64);assert_eq!(family.work().branch_formations,2*actual.len()as u64);assert_eq!(family.work().ce_candidate_word_replays,0);
+ let cold2=family.to_text();let again=ContextualFamily::restored(port.clone(),&cold2).unwrap();assert_eq!(again,family);
+ let frozen_priors=family.branches().iter().map(|b|ContextualPrior{id:b.id,previous:b.previous.iter().flat_map(|z|z.clone()).collect(),current:b.current.iter().flat_map(|z|z.clone()).collect(),observed:b.prior_is_observed}).collect();
+ let frozen=ContextualFamily::found(port.clone(),bounds.clone(),frozen_priors,family.actual_tick(),false).unwrap();
+ let stable_actual=(attached.constitution().clone(),attached.current().clone(),attached.resident().carried().cloned(),attached.resident().charts().clone(),attached.resident().admitted().to_vec(),attached.resident().ledger().clone());
+ let mut wrong_chart=port.clone();wrong_chart.chart=source.clone();
+ let negative_priors=||frozen.branches().iter().map(|b|ContextualPrior{id:b.id,previous:b.previous.iter().flat_map(|z|z.clone()).collect(),current:b.current.iter().flat_map(|z|z.clone()).collect(),observed:b.prior_is_observed}).collect();
+ let wrong_chart=ContextualFamily::found(wrong_chart,bounds.clone(),negative_priors(),family.actual_tick(),false).unwrap();
+ let mut wrong_field=port.clone();let mut d=field.declaration().clone();d.population*=2;d.lattice.clear();wrong_field.field=Field::declare(d.by_lattice_rule()).unwrap();
+ let wrong_field=ContextualFamily::found(wrong_field,bounds.clone(),negative_priors(),family.actual_tick(),false).unwrap();
+ let prepared=prepare(&mut attached,&field,&source,&preparation,&request);assert!(prepared.contextual_prospects(&wrong_chart).is_err());assert!(prepared.contextual_prospects(&wrong_field).is_err());let live=prepared.contextual_prospects(&family).unwrap();let held=prepared.contextual_prospects(&frozen).unwrap();
+ assert_eq!(live.len(),2);assert_eq!(held.len(),2);assert_ne!(live[0].passage.waves,held[0].passage.waves);assert_ne!(live[0].passage.features,held[0].passage.features);assert_ne!(live[0].passage.features[0].2,held[0].passage.features[0].2);assert_ne!(live[0].passage,live[1].passage);
+ for result in &live{let p=&result.passage;assert!(p.word.closes());assert_eq!(p.waves.len(),prepared.receiving_phases().junction_steps());assert_eq!(result.response_contractions,p.waves.len()as u64);assert_eq!(result.native_word_passages,1);assert_eq!(result.native.reception_end().unwrap(),p.end);}
+ // Independent contraction of stored M, not the material.contract helper or a
+ // prefilled incident tape; each next a is emitted by the native returned Word.
+ let branch=&family.branches()[0];let mut p=branch.previous.clone();let mut c=branch.current.clone();let mut calls=0;
+ let mul=|a:&[Rat;2],b:&[Rat;2]|[&a[0]*&b[0]-&a[1]*&b[1],&a[0]*&b[1]+&a[1]*&b[0]];
+ let mut independent=|_:usize,incident:&[Rat]|{
+  calls+=1;let h:Vec<_>=incident.chunks_exact(2).map(|x|[x[0].clone(),x[1].clone()]).collect();
+  let mut a:Vec<_>=c.iter().zip(&p).map(|(x,y)|[&x[0]-&y[0],&x[1]-&y[1]]).collect();a.extend_from_slice(&c);a.extend_from_slice(&p);
+  let mut f=a.clone();f.extend_from_slice(&h);for x in &h{for y in &a{f.push(mul(x,y));}}
+  let eta:Vec<_>=branch.material.applied().iter().map(|row|row.iter().zip(&f).fold([Rat::zero(),Rat::zero()],|mut s,(x,y)|{let v=mul(x,y);s[0]+=&v[0];s[1]+=&v[1];s})).collect();
+  let next:Vec<_>=c.iter().zip(eta).map(|(x,y)|[&x[0]+&y[0],&x[1]+&y[1]]).collect();p=std::mem::replace(&mut c,next.clone());Ok(next.into_iter().flatten().collect())
+ };
+ let opening=prepared.controlled_native_word().unwrap();
+ let(proof,native)=opening.prospective_coupled_passage(0,prepared.receiving_phases(),prepared.prospective().compared(),&mut independent,&mut|_,_|Ok(())).unwrap();
+ assert_eq!(proof,live[0].passage);assert_eq!(native.reception_end().unwrap(),live[0].passage.end);assert_eq!(calls,3);
+ // Cold and repeat do equal native work and return equal complete results. No cache
+ // is implemented here, and this is not a speedup or compression test.
+ let repeat_start=std::time::Instant::now();let repeated=prepared.contextual_prospects(&family).unwrap();let repeat_ns=repeat_start.elapsed().as_nanos();
+ let cold_start=std::time::Instant::now();let restored=ContextualFamily::restored(family.port().clone(),&cold2).unwrap();let cold_future=prepared.contextual_prospects(&restored).unwrap();let cold_ns=cold_start.elapsed().as_nanos();
+ for(i,r)in repeated.iter().enumerate(){assert_eq!(r.passage,live[i].passage);assert_eq!(cold_future[i].passage,r.passage);}
+ assert!(ContextualFamily::restored(family.port().clone(),&(cold2.clone()+"extra")).is_err());
+ let mut wrong=family.port().clone();wrong.units.push_str(" changed");assert!(ContextualFamily::restored(wrong,&cold2).is_err());
+ assert!(family.form(pending[0]).is_err());let mut replay_cold=ContextualFamily::restored(family.port().clone(),&cold2).unwrap();assert!(replay_cold.form(pending[0]).is_err());
+ // Separate, declared paired source fixture: a ring-four opposite-node pair,
+ // the same admissible construction used by observed-continuation controls.
+ let pairing=holonics::hnn::paired::PairingDeclaration::Family{table:vec![(0,1),(1,0)]};
+ let mut declaration=field.declaration().clone();declaration.rings[0].period=4;
+ declaration.rings[0].placements=(0..4).map(|node|FieldDeclaration::quarter_turn(node,4)).collect();
+ declaration.rings[0].lock=vec![0,1];declaration.rings[0].reflector=vec![0,3,2,1];declaration.lattice.clear();
+ let cache_field=Field::declare(declaration.by_lattice_rule()).unwrap();
+ let free=ExactRatMatrix::new((0..8).map(|r|vec![integer(i64::from(r==2)),integer(0)]).collect()).unwrap();
+ let e=holonics::hnn::paired::PairedCarrier::complete_port(&cache_field,0,&pairing,&free).unwrap();
+ let carrier=holonics::hnn::paired::PairedCarrier::admit(&cache_field,0,&pairing,&e).unwrap();
+ let paired_material=Constitution::initial(&cache_field,CAMPAIGN_ONE_BUDGET).unwrap().with_symmetric_source(0,e,carrier.symmetry()).unwrap();
+ let observation=holonics::hnn::encoding::observed::PairedObservation::admit(&cache_field,&paired_material,&pairing).unwrap();
+ let observed_port=WaveObservationPort{ring:0,width:8,units:"separate paired cache-identity CODE declaration".into(),chart:observation.encode(&[]).unwrap(),field:cache_field,admittance:integer(2),step:integer(1)};
+ let cache_bounds=ContextualBounds{branches:1,pending:1,precision_bits:20,rational_bits:2048,max_features:64,max_scalar_work:10_000_000};
+ let cache_prior=ContextualPrior{id:0,previous:vec![integer(0);8],current:vec![integer(0);8],observed:false};
+ let observed=ContextualFamily::found(observed_port.clone(),cache_bounds,vec![cache_prior],0,false).unwrap();let before_lazy=observed.to_text();
+ for p in observation.ports(){p.decoder().unwrap();p.square().unwrap();}
+ let after_lazy=ContextualFamily::restored(observed_port,&before_lazy).unwrap();assert_eq!(after_lazy.to_text(),before_lazy);
+ let bits=|p:&holonics::hnn::word::action::CoupledPassage|p.waves.iter().map(|(a,b)|a.iter().chain(b).map(|q|q.numer().bits().max(q.denom().bits())).max().unwrap()).collect::<Vec<_>>();
+ // Emit typed receipts only. Files are captured by the exterior parser, never
+ // written from this machinery/test consumer (repository guard7).
+ eprintln!("CONTEXTUAL_PACKET_ORIGINAL_BEGIN\n{}CONTEXTUAL_PACKET_ORIGINAL_END",cold);
+ eprintln!("CONTEXTUAL_PACKET_LEARNED_BEGIN\n{}CONTEXTUAL_PACKET_LEARNED_END",cold2);
+ let mut packet=format!("SYNTHETIC CODE; not language or actual forecast actuation.\nActual p/c/h, producer IDs/ticks/commits, actual y, prior/observed role: ORIGINAL_PRODUCING_AND_ACTUAL_PENDING.state\nActual native constitution/current/carry/charts/admitted/ledger/parametric unchanged versus unattached twin: EXACT; complete participating-World passage serialization is UNJOINED.\nLate branch-stage refusal preserves materials/pending/actual clock; out-of-order original IDs; warm/cold replay refusal: PASS.\nIndependent stored-M contraction + native Word/waves/features/work/end: EXACT.\nPer-step wave carrier bits learned={:?}, frozen={:?}.\n",bits(&live[0].passage),bits(&held[0].passage));
+ for b in family.branches(){packet+=&format!("branch{} H00={:?} B00={:?} M00={:?} normal_fit_realization_bound={} targetEnergy={} observations={}\n",b.id,b.material.normal()[0][0],b.material.cross()[0][0],b.material.applied()[0][0],b.material.coefficient_error_upper(),b.material.target_energy(),b.material.observations());}
+ for(i,r)in live.iter().enumerate(){packet+=&format!("branch{} LEARNED {:?}\nFROZEN {:?}\ncompleted_response_contractions={} native_word_passages={}\n",r.branch_id,r.passage,held[i].passage,r.response_contractions,r.native_word_passages);}
+ eprintln!("CONTEXTUAL_PACKET_NATIVE_BEGIN\n{}CONTEXTUAL_PACKET_NATIVE_END",packet);
+ eprintln!("CONTEXTUAL_PACKET_MEASUREMENT_BEGIN\n{}CONTEXTUAL_PACKET_MEASUREMENT_END",format!("{{\"kind\":\"synthetic-code\",\"actual_steps\":{},\"branches\":2,\"published_branch_formations\":{},\"successful_normal_fits_including_late_refusal\":{},\"available_native_owners_equal\":true,\"participating_World_passage_serialization\":false,\"independent_native_contraction_equal\":true,\"learned_wave_bits\":{:?},\"frozen_wave_bits\":{:?},\"repeat_ns\":{},\"cold_restore_plus_prospect_ns\":{},\"memoization\":false,\"kernel_transfer_sync_root_counts\":null}}\n",actual.len(),family.work().branch_formations,family.work().normal_fits,bits(&live[0].passage),bits(&held[0].passage),repeat_ns,cold_ns));
+ eprintln!("CONTEXTUAL_COUNTS actual_unique_steps={} scalar_branch_formations={} fits={} independent_callbacks={} native_prospect_branches={} callbacks_per_branch=3 repeated_ns={} cold_restore_plus_equal_prospect_ns={} memoization=none root_kernel_transfer_sync_counts=uninstrumented",actual.len(),family.work().branch_formations,family.work().normal_fits,calls,live.len(),repeat_ns,cold_ns);
+ assert_eq!(family.to_text(),cold2,"prospects cannot update actual material/history");
+ eprintln!("CONTEXTUAL_NATIVE_TRACE actual_steps={} branches={} formations={} fits={} pending={} elapsed_ns={} learned_waves={:?} frozen_waves={:?} learned_features={:?} frozen_features={:?} learned_end={:?} frozen_end={:?} work={:?}",actual.len(),family.branches().len(),family.work().branch_formations,family.work().normal_fits,family.pending_ids().len(),started.elapsed().as_nanos(),live[0].passage.waves,held[0].passage.waves,live[0].passage.features,held[0].passage.features,live[0].passage.end,held[0].passage.end,live[0].passage.word);
+ drop((live,held,repeated,cold_future,native,opening));drop(prepared);assert_eq!((attached.constitution().clone(),attached.current().clone(),attached.resident().carried().cloned(),attached.resident().charts().clone(),attached.resident().admitted().to_vec(),attached.resident().ledger().clone()),stable_actual);
 }

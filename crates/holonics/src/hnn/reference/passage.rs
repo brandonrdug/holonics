@@ -26,9 +26,10 @@ pub struct ResidentArrived {
 
 /// Validated resident passage fields shared by host and device realizations.
 ///
-/// Construct with [`ResidentPassage::new`] or read the version-4 text with
+/// Construct with [`ResidentPassage::new`] or read its versioned text with
 /// [`ResidentPassage::from_text`]. Both routes validate by the same parser; `to_text` is the sole
-/// passage serializer used by host and CUDA.
+/// passage serializer used by host and CUDA. Coarse-law version 4 remains byte-compatible; the
+/// retained-fibre law is explicit in version 5.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResidentPassageParts {
     pub current: Current,
@@ -42,12 +43,15 @@ pub struct ResidentPassageParts {
     pub charts: Charts,
     pub address: ActiveAddress,
     pub arrived: Option<ResidentArrived>,
+    pub source_return_frontier: BTreeMap<usize, usize>,
+    pub prepared_input: Option<prepared_input::PreparedInputState>,
 }
 
 /// The complete, validated resident continuation carried inside `ContinuingState`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResidentPassage {
     parts: ResidentPassageParts,
+    receiving_law: crate::hnn::receiving::ReceivingLaw,
 }
 
 impl ResidentPassage {
@@ -57,19 +61,35 @@ impl ResidentPassage {
         constitution: &Constitution,
         parts: ResidentPassageParts,
     ) -> Result<Self, HnnError> {
-        let text = write_passage(&parts);
+        Self::new_with_law(
+            field,
+            constitution,
+            parts,
+            crate::hnn::receiving::ReceivingLaw::CoarseGrainV1,
+        )
+    }
+
+    /// Validate a passage while retaining its explicitly selected receiving law.
+    pub fn new_with_law(
+        field: &Field,
+        constitution: &Constitution,
+        parts: ResidentPassageParts,
+        receiving_law: crate::hnn::receiving::ReceivingLaw,
+    ) -> Result<Self, HnnError> {
+        let text = write_passage(&parts, receiving_law);
         Self::from_text(field, constitution, &text)
     }
 
-    /// Read the one native version-4 passage format against its field and contemporary material.
+    /// Read a versioned native passage against its field and contemporary material.
     pub fn from_text(
         field: &Field,
         constitution: &Constitution,
         text: &str,
     ) -> Result<Self, HnnError> {
+        constitution.admit_epoch_field(field)?;
         let mut lines = text.lines();
         let mut next = |what: &'static str| lines.next().ok_or(HnnError::ContinuingState { what });
-        let (current, admitted, opens) = read_opening(field, &mut next)?;
+        let (current, admitted, opens, receiving_law) = read_opening(field, &mut next)?;
         let counter: Vec<u64> = counted(
             next("the handle counter")?,
             "handle-counter",
@@ -185,6 +205,45 @@ impl ResidentPassage {
             }
             _ => return refused("the arrived operand"),
         };
+        let mut source_return_frontier = BTreeMap::new();
+        if text.starts_with("resident-passage 6\n") || text.starts_with("resident-passage 7\n") || text.starts_with("resident-passage 8\n") {
+            let header: Vec<usize> = counted(
+                next("the reciprocal frontier count")?,
+                "source-return-frontiers",
+                1,
+                "the reciprocal frontier count",
+            )?;
+            if (header[0] == 0 && !text.starts_with("resident-passage 8\n")) || header[0] > field.sources().len() {
+                return refused("the bounded reciprocal frontier count");
+            }
+            for _ in 0..header[0] {
+                let row: Vec<usize> = counted(
+                    next("the reciprocal frontier")?,
+                    "source-return-frontier",
+                    2,
+                    "the reciprocal frontier",
+                )?;
+                let cells = moment.as_ref().map_or(0, |(_, m)| m.cells());
+                if !field.sources().contains(&row[0])
+                    || u64::try_from(row[1]).map_err(|_| HnnError::CountOverflow)? >= cells
+                    || source_return_frontier.insert(row[0], row[1]).is_some()
+                {
+                    return refused("one actual consumed encounter frontier per source");
+                }
+            }
+        }
+        let prepared_input=if text.starts_with("resident-passage 8\n"){
+            let row=keyed(next("prepared input continuation")?,"prepared-input","prepared input continuation")?;
+            if row.len()!=1{return refused("one prepared input continuation");}
+            let input=prepared_input::PreparedInputState::from_text(field,constitution,&prepared_input::codec::unhex(row[0])?)?;
+            if moment.as_ref().map(|(_,m)|m.cells())!=Some(input.source_cells()){return refused("prepared input and native source share one frontier");}
+            if input.context_chart()==prepared_input::ContextChart::LaggedReceiverBoundaryV1{
+                // Both counters are already saved: retain the cumulative source,
+                // validate its aeon-local subinterval and derive the explicit origin.
+                native_context::NativeSourceFrontier::from_counts(input.source_cells(),aeon[2])?;
+            }
+            Some(input)
+        }else{None};
         if next("the passage's end").is_ok() {
             return refused("the passage's end");
         }
@@ -207,13 +266,20 @@ impl ResidentPassage {
                 charts,
                 address,
                 arrived,
+                source_return_frontier,
+                prepared_input,
             },
+            receiving_law,
         })
     }
 
-    /// The exact native v4 passage text, including all arrived and mode-view operands.
+    /// The exact native passage text, including all arrived and mode-view operands.
     pub fn to_text(&self) -> String {
-        write_passage(&self.parts)
+        write_passage(&self.parts, self.receiving_law)
+    }
+
+    pub fn receiving_law(&self) -> crate::hnn::receiving::ReceivingLaw {
+        self.receiving_law
     }
 
     pub fn parts(&self) -> &ResidentPassageParts {
@@ -237,10 +303,11 @@ impl ContinuingState {
         field: &Field,
         opening: &Constitution,
     ) -> Result<Option<ResidentPassage>, HnnError> {
+        // Bind even a constitution-only save before reporting that no passage was stored.
+        let constitution = opening.clone().continued_on(field, self)?;
         let Some(text) = self.passage() else {
             return Ok(None);
         };
-        let constitution = opening.clone().continued(self)?;
         Ok(Some(ResidentPassage::from_text(
             field,
             &constitution,
@@ -249,9 +316,40 @@ impl ContinuingState {
     }
 }
 
-fn write_passage(parts: &ResidentPassageParts) -> String {
+fn write_passage(
+    parts: &ResidentPassageParts,
+    receiving_law: crate::hnn::receiving::ReceivingLaw,
+) -> String {
     let mut s = String::new();
-    line(&mut s, "resident-passage", [4]);
+    if parts.prepared_input.is_some(){
+        line(&mut s,"resident-passage",[8]);
+        line(&mut s,"receiving-law",[crate::hnn::receiving::ReceivingLaw::RetainedFibreV1.as_str()]);
+    }else{match receiving_law {
+        crate::hnn::receiving::ReceivingLaw::CoarseGrainV1 => {
+            line(
+                &mut s,
+                "resident-passage",
+                [if parts.source_return_frontier.is_empty() {
+                    4
+                } else {
+                    6
+                }],
+            );
+        }
+        crate::hnn::receiving::ReceivingLaw::RetainedFibreV1 => {
+            line(
+                &mut s,
+                "resident-passage",
+                [if parts.source_return_frontier.is_empty() {
+                    5
+                } else {
+                    7
+                }],
+            );
+            line(&mut s, "receiving-law", [receiving_law.as_str()]);
+        }
+    }
+    }
     line(
         &mut s,
         "opens",
@@ -294,6 +392,17 @@ fn write_passage(parts: &ResidentPassageParts) -> String {
             write_opening(&mut s, &arrived.opening);
         }
     }
+    if !parts.source_return_frontier.is_empty() || parts.prepared_input.is_some() {
+        line(
+            &mut s,
+            "source-return-frontiers",
+            [parts.source_return_frontier.len()],
+        );
+        for (&ring, &position) in &parts.source_return_frontier {
+            line(&mut s, "source-return-frontier", [ring, position]);
+        }
+    }
+    if let Some(input)=&parts.prepared_input{line(&mut s,"prepared-input",[prepared_input::codec::hex(&input.to_text())]);}
     s
 }
 
@@ -302,8 +411,8 @@ impl Resident {
     /// multiple open moments. A passage is retained even when no moment is open.
     pub fn continuing_state(&self, ring: usize) -> Result<ContinuingState, HnnError> {
         self.admit_exact_current()?;
-        if self.receiving_chart.is_some() {
-            return refused("a receiving codec chart whose passage serialization is not admitted");
+        if let Some(chart)=&self.receiving_chart {
+            if self.native_context_chart()?.as_ref()!=Some(chart){return refused("a receiving codec chart whose passage serialization is not admitted");}
         }
         if !self.pending.is_empty() || !self.staged.is_empty() {
             return refused("a resident with an open pending ratio or staged deposit");
@@ -338,28 +447,43 @@ impl Resident {
             balance: self.ledger.balance().clone(),
             charts: self.charts.clone(),
             address: self.address.clone(),
+            source_return_frontier: self.source_return_frontier.clone(),
+            prepared_input: self.prepared_input.clone(),
             arrived: self.arrived.as_ref().map(|arrived| ResidentArrived {
                 ratio: arrived.ratio.clone(),
                 targets: arrived.targets.clone(),
                 opening: arrived.opening.clone(),
             }),
         };
-        let passage = ResidentPassage::new(&self.field, &self.constitution, parts)?;
-        Ok(self
+        let passage = ResidentPassage::new_with_law(
+            &self.field,
+            &self.constitution,
+            parts,
+            self.receiving_law,
+        )?;
+        let state = self
             .constitution
             .continuing_state(ring)?
             .with_carry(self.carried.clone())
             .with_founding(self.founding.clone(), self.staged_founding)
-            .with_resident_passage(passage))
+            .with_resident_passage(passage);
+        match self.observed_epoch_ingress {
+            Some((receiver, ticks)) => state.with_receiver_ingress_ticks(receiver, ticks),
+            None => Ok(state),
+        }
     }
 
     /// Restore only after all saved operands have been read and checked. The resident is owned
     /// privately throughout this method; an error publishes no partially restored resident.
     pub(super) fn with_passage(mut self, passage: ResidentPassage) -> Result<Self, HnnError> {
+        let receiving_law = passage.receiving_law();
         let parts = passage.into_parts();
         if parts.opens != self.opens {
             return refused("the saved passage against the declared reception");
         }
+        self.source_return_frontier = parts.source_return_frontier;
+        self.prepared_input=parts.prepared_input;
+        self.receiving_chart=self.native_context_chart()?;
         self.current = parts.current;
         self.moments.clear();
         if let Some((id, moment)) = parts.moment {
@@ -378,6 +502,7 @@ impl Resident {
         self.charts = parts.charts;
         self.address = parts.address;
         self.admitted = parts.admitted;
+        self.receiving_law = receiving_law;
         self.arrived = parts.arrived.map(|arrived| Arrived {
             ratio: arrived.ratio,
             targets: arrived.targets,
@@ -388,10 +513,13 @@ impl Resident {
 }
 
 /// Refuse superseded formats before reading operands whose representation changed.
-pub(crate) fn check_version(line: &str) -> Result<(), HnnError> {
+pub(crate) fn check_version(line: &str) -> Result<crate::hnn::receiving::ReceivingLaw, HnnError> {
     let words: Vec<_> = line.split_whitespace().collect();
-    if words == ["resident-passage", "4"] {
-        return Ok(());
+    if words == ["resident-passage", "4"] || words == ["resident-passage", "6"] {
+        return Ok(crate::hnn::receiving::ReceivingLaw::CoarseGrainV1);
+    }
+    if words == ["resident-passage", "5"] || words == ["resident-passage", "7"] || words == ["resident-passage", "8"] {
+        return Ok(crate::hnn::receiving::ReceivingLaw::RetainedFibreV1);
     }
     let version = match words.as_slice() {
         ["resident-passage", number] => number
@@ -407,8 +535,26 @@ pub(crate) fn check_version(line: &str) -> Result<(), HnnError> {
 fn read_opening<'a>(
     field: &Field,
     next: Next<'_, 'a>,
-) -> Result<(Current, Vec<ReceivingPhases>, Opens), HnnError> {
-    check_version(next("the resident passage version")?)?;
+) -> Result<
+    (
+        Current,
+        Vec<ReceivingPhases>,
+        Opens,
+        crate::hnn::receiving::ReceivingLaw,
+    ),
+    HnnError,
+> {
+    let receiving_law = check_version(next("the resident passage version")?)?;
+    if receiving_law == crate::hnn::receiving::ReceivingLaw::RetainedFibreV1 {
+        let law = keyed(
+            next("the explicit receiving law")?,
+            "receiving-law",
+            "the explicit receiving law",
+        )?;
+        if law.as_slice() != [receiving_law.as_str()] {
+            return refused("the retained-fibre passage's explicit receiving law");
+        }
+    }
     let opens = match keyed(
         next("the declared opening")?,
         "opens",
@@ -439,7 +585,7 @@ fn read_opening<'a>(
         &keyed(next("the lift point")?, "lift", "the lift point")?,
         "the lift point",
     )?;
-    Ok((Current::at(field, lift)?, admitted, opens))
+    Ok((Current::at(field, lift)?, admitted, opens, receiving_law))
 }
 
 fn validate_address(field: &Field, address: &ActiveAddress) -> Result<(), HnnError> {
@@ -598,8 +744,10 @@ mod tests {
     fn main_version_three_save_is_refused_before_changed_law_operands() {
         // Written at 03b949b83006236044e7e15abb2142d00918474d by Resident::continuing_state().to_text().
         let text = include_str!("fixtures/main-v3.state");
-        assert!(matches!(ContinuingState::from_text(text),
-            Err(HnnError::PassageVersion { version }) if version == crate::hnn::SavedPassageVersion::Number(3)));
+        assert!(
+            matches!(ContinuingState::from_text(text, crate::hnn::constitution::CAMPAIGN_ONE_BUDGET),
+            Err(HnnError::PassageVersion { version }) if version == crate::hnn::SavedPassageVersion::Number(3))
+        );
     }
     #[test]
     fn version_four_never_decodes_located_prior_text() {
@@ -609,9 +757,78 @@ mod tests {
             .unwrap();
         let text = state.to_text();
         assert!(text.contains("receiving_prior none"));
+        assert!(state.passage().unwrap().starts_with("resident-passage 4\n"));
+        let decoded = ResidentPassage::from_text(
+            &resident.field,
+            resident.constitution(),
+            state.passage().unwrap(),
+        )
+        .unwrap();
+        assert_eq!(decoded.to_text(), state.passage().unwrap());
         let changed = text.replacen("receiving_prior none", "located none", 1);
         let stamped = ContinuingState::stamped(&changed, resident.constitution()).unwrap();
-        assert!(ContinuingState::from_text(&stamped).is_err());
+        assert!(ContinuingState::from_text(&stamped, resident.constitution().budget()).is_err());
+    }
+
+    #[test]
+    fn retained_fibre_selection_is_fresh_only_and_passage_roundtrips_its_identity() {
+        use crate::hnn::receiving::ReceivingLaw;
+        use crate::hnn::tests::{learning, support};
+
+        let field = learning::chain();
+        let reference = Reference::campaign_one();
+        let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+        assert_eq!(resident.receiving_law(), ReceivingLaw::CoarseGrainV1);
+        resident
+            .select_receiving_law(ReceivingLaw::CoarseGrainV1)
+            .unwrap();
+        resident
+            .select_receiving_law(ReceivingLaw::RetainedFibreV1)
+            .unwrap();
+        assert_eq!(resident.receiving_law(), ReceivingLaw::RetainedFibreV1);
+        let saved = resident
+            .continuing_state(resident.field.sources()[0])
+            .unwrap();
+        let passage = saved.passage().unwrap();
+        assert!(passage.starts_with("resident-passage 5\nreceiving-law retained-fibre-v1\n"));
+        let loaded =
+            ContinuingState::from_text(&saved.to_text(), resident.constitution().budget()).unwrap();
+        let cold = reference
+            .mount_continued(
+                &field,
+                &Current::at_rest(&field),
+                resident.constitution().clone(),
+                &loaded,
+            )
+            .unwrap();
+        assert_eq!(cold.receiving_law(), ReceivingLaw::RetainedFibreV1);
+        assert_eq!(
+            cold.continuing_state(resident.field.sources()[0]).unwrap(),
+            saved
+        );
+
+        let mut momentful = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+        reference
+            .ingest(&mut momentful, None, &support::encoded(&field, &[0]))
+            .unwrap();
+        momentful
+            .select_receiving_law(ReceivingLaw::CoarseGrainV1)
+            .unwrap();
+        let before = momentful
+            .continuing_state(momentful.field.sources()[0])
+            .unwrap();
+        assert!(
+            momentful
+                .select_receiving_law(ReceivingLaw::RetainedFibreV1)
+                .is_err()
+        );
+        assert_eq!(momentful.receiving_law(), ReceivingLaw::CoarseGrainV1);
+        assert_eq!(
+            momentful
+                .continuing_state(momentful.field.sources()[0])
+                .unwrap(),
+            before
+        );
     }
     #[test]
     fn superseded_and_unversioned_passages_are_typed_refusals() {

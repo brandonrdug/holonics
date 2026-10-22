@@ -1,0 +1,20 @@
+Synthetic CODE instance, not language or prediction evidence.
+Actual classes: [0,1,0,1], before learned source E. Fitting starts only after two actual observations.
+Last original return: p=1 c=0 actualy=1; prefix h=699051/1048576 sealed BEFORE y.
+Future prefix h=0; source lift=4; explicit full frame B=P^4E.
+Independent M contraction gives u=eta_M=['27439/32768', '-27439/32768'], not c+eta or a predicted token.
+Native source addition B*u=['-27439/32768', '0', '0', '0', '27439/32768', '0'].
+Preparation work 1202459297/1073741824 = cross 27439/65536 + quadratic 752898721/1073741824.
+H00=3; B00=-2; appliedM00=-134249/524288; normal-fit realization bound=56618710764479/576460752303423488.
+Learned native logits: ['-27439/221184', '0', '2/27', '0']
+Same-opening frozen native logits: ['0', '0', '2/27', '0']
+Raw receiving effect is nonzero; no selected-class, predictive, language or speedup claim.
+Full native+classmaterial cold, nextactual arrival, once-only latefit retry, staleWord/frame/E/work and cacheinit controls PASS.
+Two co-indexed fixture material IDs start equal and remain equal; this control does not claim two distinct latent materials.
+First-branch contraction 39945ns, B/application prep 514975ns, forward 365665ns.
+Word construction/sharedprefix setup are included only in fixture wall; no unused J/adjoints in direct prep.
+Fixture total 54501307ns including cold/independent validation; wholefocused3controls0.23s. Compiles are charged separately.
+Replay: cargo test -p holonics --lib contextual_input -- --nocapture (same opted profile/cut).
+Material/readout remains a library consumer. Existing LocalReceivingReturn CLI is NOT yet joined to this class preparation.
+No World attached; full native+material cold applies here. New class-M/preparedWord CUDA parity is UNJOINED.
+Existing CUDA boundary regression alone passed40forwards/40returns/4aggregates with emptycleanup; it does not establish newconsumer parity.

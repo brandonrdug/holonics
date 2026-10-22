@@ -1,0 +1,9 @@
+{
+  "name": "07-data-control",
+  "maximum_attempts": 0,
+  "command": [
+    "bash",
+    "-c",
+    "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-rational-flow-62b584/binaries/data-control-final --exact hnn::constitution::epoch::rational::tests::native_rational_full_normal_phase_codec --nocapture"
+  ]
+}

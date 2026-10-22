@@ -2,7 +2,7 @@
 //!
 //! [definition] The loss is the logarithm of a ratio of Holons (design (a), `compare`; "Exact
 //! charts"). At receiving phase `j` the produced Holon `|H⟩` is the logit vector
-//! `f_j = k(a_j)/L_R + R v_R(e_j)` (`v_R` in the passage frame), the landmark tree's grain logits at phase `j`'s causal
+//! `f_j = log2(q_T(. | a_j)) + R v_R(e_j)` (`v_R` in the passage frame), the landmark tree's grain logits at phase `j`'s causal
 //! address plus the wave (the landmark tree, `hnn::receiving::ReceivingRead::combined`; the covector below
 //! is read on this combined face and flows back through `R` alone), and the target `|T⟩` is the byte
 //! `t_j` read in the same exterior chart that `E` reads: the one-hot `q_j`, with the receiving
@@ -56,7 +56,7 @@
 use num_bigint::BigInt;
 #[cfg(test)]
 use num_bigint::BigUint;
-use num_traits::{One, ToPrimitive, Zero};
+use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::aeon::Reading;
 use crate::hnn::HnnError;
@@ -64,6 +64,7 @@ use crate::hnn::encoding::Encoded;
 use crate::hnn::field::Field;
 use crate::hnn::realization::indexed;
 use crate::hnn::receiving::ReceivingRead;
+use crate::hnn::receiving::{ReceivingCell, ReceivingFibre};
 use crate::ratio::algebraic::{
     ExactInterval, interval_difference, interval_sum, log2_enclosure, log2_of_enclosure,
 };
@@ -72,7 +73,6 @@ use crate::ratio::exponentiated::{CarriedPower, PhaseField};
 use crate::ratio::exponentiated::{READING_BITS, power_of_two};
 use crate::ratio::gaussian::GaussianRat;
 use crate::ratio::{LogRatio, Rat, integer};
-use crate::receiver::face::GrainCell;
 
 // -------------------------------------------------------------------------------------------
 // enclosures of the real chart (the base-two logarithms and their sums are
@@ -127,7 +127,7 @@ pub(crate) fn power_of_two_enclosure(x: &Rat) -> Result<ExactInterval, HnnError>
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Face {
     grain: u64,
-    cells: Vec<GrainCell>,
+    cells: Vec<ReceivingCell>,
     phases: Vec<Rat>,
     top: BigInt,
     normalizer: PhaseField,
@@ -136,6 +136,8 @@ pub struct Face {
 impl Face {
     /// The face of one receiving read at grain `L_R`.
     pub fn of_read(read: &ReceivingRead, grain: u64) -> Result<Self, HnnError> {
+        #[cfg(test)]
+        crate::hnn::receiving::reuse_work::view(false);
         if read.cells.is_empty() {
             return Err(HnnError::Shape {
                 what: "a face over at least one class",
@@ -151,6 +153,7 @@ impl Face {
             .expect("at least one class");
         let mut normalizer = PhaseField::zero(grain);
         for cell in &read.cells {
+            cell.admit(grain)?;
             normalizer = normalizer
                 .plus(&CarriedPower::new(&cell.carry - &top, cell.phase, grain)?.value()?)?;
         }
@@ -169,12 +172,25 @@ impl Face {
     }
 
     /// The classes' grain cells.
-    pub fn cells(&self) -> &[GrainCell] {
+    pub fn cells(&self) -> &[ReceivingCell] {
         &self.cells
     }
 
-    /// The receiver's fibre `ε_c` per class, returned and never consumed as a value.
-    pub fn fibres(&self) -> Vec<Rat> {
+    /// Equality of the executed magnitude expression only. Fibres, wave coordinates and
+    /// produced phases remain authentic operands and are not identified by this predicate.
+    pub fn same_mass_face(&self, other: &Self) -> bool {
+        self.grain == other.grain
+            && self.cells.len() == other.cells.len()
+            && self
+                .cells
+                .iter()
+                .zip(&other.cells)
+                .all(|(a, b)| a.carry == b.carry && a.phase == b.phase)
+    }
+
+    /// The receiver's exact fibre identity per class, rational or logarithmic.
+    /// An enclosure endpoint is never substituted for the identity.
+    pub fn fibres(&self) -> Vec<ReceivingFibre> {
         self.cells.iter().map(|cell| cell.fibre.clone()).collect()
     }
 
@@ -271,6 +287,8 @@ impl Face {
     /// **The odometer masses** `p̃_c = 2^(n_c)(L + k_c) / Σ_d 2^(n_d)(L + k_d)`: the covector's
     /// rational chart of the face (module header). They sum to one exactly.
     pub fn odometer_masses(&self) -> Result<Vec<Rat>, HnnError> {
+        #[cfg(test)]
+        crate::hnn::receiving::reuse_work::view(true);
         let weights: Vec<Rat> = (0..self.cells.len())
             .map(|class| Ok(self.carried(class)?.odometer()?))
             .collect::<Result<_, HnnError>>()?;
@@ -284,7 +302,9 @@ impl Face {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Faces {
     pub faces: Vec<Face>,
-    /// The exact logits `f_j` behind each face (realified `[Re, Im, …]`), a reading of the word.
+    /// Rational port/wave coordinates, realified. A combined face retains log2(q_tree)
+    /// in its typed cell fibre; these coordinates do not claim that irrational sum is rational.
+    /// The exact full real value is cell representative plus typed fibre.
     pub logits: Vec<Vec<Rat>>,
 }
 
@@ -533,6 +553,102 @@ impl HolonRatio {
         }
         Ok(RatioCovector { logits })
     }
+
+    /// Partition the foil once at the receiving face, then return one reached
+    /// right-hand side for the word's adjoint. The imaginary rows are the whole
+    /// phase comparison; only nonnegative magnitude masses are partitioned.
+    /// `released[j][c]` is exact and is zero at unobserved receiving stations.
+    /// These are transient return operands, never retained normal statistics.
+    pub(crate) fn epoch_covector(
+        &self,
+        exponent: u32,
+    ) -> Result<(RatioCovector, Vec<Vec<Rat>>), HnnError> {
+        use crate::ratio::linear::vector::integral;
+
+        let mut covector = RatioCovector {
+            logits: self
+                .faces
+                .faces
+                .iter()
+                .map(|face| vec![Rat::zero(); 2 * face.cells().len()])
+                .collect(),
+        };
+        let mut released = self
+            .faces
+            .faces
+            .iter()
+            .map(|face| vec![Rat::zero(); face.cells().len()])
+            .collect::<Vec<_>>();
+        let unit = BigInt::one() << exponent as usize;
+        for (ratio, &station) in self.phases.iter().zip(&self.stations) {
+            let face = &self.faces.faces[station];
+            // The native odometer's positive weights are joined before any
+            // normalizer division. One integer Z serves the whole face.
+            let weights = (0..face.cells().len())
+                .map(|class| face.carried(class)?.odometer().map_err(Into::into))
+                .collect::<Result<Vec<Rat>, HnnError>>()?;
+            let (numerators, _) = integral(&weights);
+            let normalizer: BigInt = numerators.iter().sum();
+            if normalizer <= BigInt::zero() || numerators.iter().any(Signed::is_negative) {
+                return Err(HnnError::Unadmitted {
+                    reason: "an epoch foil has nonnegative weights and one positive normalizer",
+                });
+            }
+            for (class, weight) in numerators.iter().enumerate() {
+                let scaled = weight << exponent as usize;
+                let quotient = &scaled / &normalizer;
+                let remainder = scaled - &quotient * &normalizer;
+                covector.logits[station][2 * class] = Rat::new(quotient, unit.clone());
+                released[station][class] = Rat::new(remainder, &normalizer * &unit);
+            }
+            covector.logits[station][2 * ratio.target] -= Rat::one();
+            covector.logits[station][2 * ratio.target + 1] = -ratio.gap.turns() / integer(2);
+        }
+        Ok((covector, released))
+    }
+
+    /// Same original-lift phase covector, without an unrequested grain/code observation.
+    /// Only the native section owner supplies this raw wave and its already-bound class return.
+    pub(crate) fn retained_aperture_return(wave:&[Rat], target_phases:&TargetPhases, station:&crate::hnn::receiving::RetainedStationReturn) -> Result<RatioCovector,HnnError> {
+        if wave.len()!=2*station.gradient.len() || station.target>=station.gradient.len()
+            || target_phases.phases.len()!=1 || station.gradient.iter().cloned().sum::<Rat>()!=Rat::zero() {
+            return Err(HnnError::Unadmitted { reason: "retained aperture phase/class return matches actual source and original target lift" });
+        }
+        let produced_phase=&wave[2*station.target+1]/integer(2);
+        let gap=&target_phases.phases[0]-produced_phase;
+        // Reading retains the same complete signed turn; no residue/centre selection.
+        let gap=Reading::of_turns(&gap);
+        let mut logits=vec![Rat::zero();wave.len()];
+        for (c,g) in station.gradient.iter().enumerate() { logits[2*c]=g.clone(); }
+        logits[2*station.target+1]=-gap.turns()/integer(2);
+        Ok(RatioCovector { logits:vec![logits] })
+    }
+
+    /// Install the admitted rational class return at this actual aperture-one comparison.
+    /// The phase rows stay the ratio owner's own phase objective; they are not the derivative
+    /// of the full-fibre class code. The native section owner has certified the class return
+    /// and must still return it through this comparison's retained producing Word.
+    pub(crate) fn with_aligned_class_return(
+        &self,
+        station: &crate::hnn::receiving::RetainedStationReturn,
+    ) -> Result<RatioCovector, HnnError> {
+        if self.phases.len() != 1
+            || self.stations.len() != 1
+            || self.phases[0].target != station.target
+            || self.faces.faces.len() != 1
+            || station.gradient.len() != self.faces.faces[0].cells().len()
+            || station.gradient.iter().cloned().sum::<Rat>() != Rat::zero()
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the aligned class return belongs to this aperture-one target comparison",
+            });
+        }
+        let mut covector = self.covector()?;
+        for (class, value) in station.gradient.iter().enumerate() {
+            covector.logits[0][2 * class] = value.clone();
+        }
+        Ok(covector)
+    }
 }
 
 /// A comparison with an actually received complex face, in the same receiving chart.
@@ -722,6 +838,17 @@ impl ReceivingFaceRatio {
 pub struct RatioCovector {
     logits: Vec<Vec<Rat>>,
 }
+impl RatioCovector {
+    pub(crate) fn native_current(waves:&[Vec<Rat>],phases:&TargetPhases,stations:&[crate::hnn::receiving::RetainedStationReturn])->Result<Self,HnnError>{
+        if waves.len()!=stations.len() || phases.phases.len()!=stations.len(){return Err(HnnError::Unadmitted{reason:"native class/phase return shares its complete producing section"});}
+        let mut logits=Vec::new();
+        for (j,(w,s)) in waves.iter().zip(stations).enumerate(){
+            let p=TargetPhases{branch:phases.branch.clone(),phases:vec![phases.phases[j].clone()]};
+            logits.extend(HolonRatio::retained_aperture_return(w,&p,s)?.logits);
+        }
+        Ok(Self{logits})
+    }
+}
 
 impl RatioCovector {
     /// The gradient on the logits at each receiving phase.
@@ -818,5 +945,51 @@ mod bulk_code_length_tests {
                 .collect::<Vec<_>>();
             assert_eq!(bulk, individual);
         }
+    }
+}
+
+#[cfg(test)]
+mod epoch_partition_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    #[test]
+    fn epoch_foil_is_partitioned_once_and_phase_is_retained_whole() {
+        let faces = Faces::of_reads(
+            &[
+                ReceivingRead::of_logits(vec![rat(1, 16), rat(3, 8), rat(-1, 16), rat(1, 4)], 16),
+                ReceivingRead::of_logits(vec![Rat::zero(); 4], 16),
+            ],
+            16,
+        )
+        .unwrap();
+        let compared = HolonRatio::compare_partition(
+            faces,
+            &[1, 0],
+            &TargetPhases {
+                branch: BigInt::from(7),
+                phases: vec![rat(2, 11), rat(1, 11)],
+            },
+            &[true, false],
+        )
+        .unwrap();
+        let original = compared.covector().unwrap();
+        let (retained, released) = compared.epoch_covector(9).unwrap();
+        for class in 0..2 {
+            assert_eq!(
+                &retained.logits()[0][2 * class] + &released[0][class],
+                original.logits()[0][2 * class]
+            );
+            assert!(released[0][class] >= Rat::zero());
+            assert!(released[0][class] < rat(1, 512));
+            assert_eq!(
+                retained.logits()[0][2 * class + 1],
+                original.logits()[0][2 * class + 1]
+            );
+            assert!((retained.logits()[0][2 * class].clone() * integer(512)).is_integer());
+        }
+        assert!(retained.logits()[1].iter().all(Zero::is_zero));
+        assert!(released[1].iter().all(Zero::is_zero));
+        assert!(released[0].iter().any(|value| !value.is_zero()));
     }
 }

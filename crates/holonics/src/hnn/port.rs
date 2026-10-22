@@ -84,8 +84,9 @@ use crate::hnn::propagation::{
 };
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector};
 use crate::hnn::realization::{apply_rows, entries, indexed};
-use crate::hnn::receiving::{ReceivingPhases, ReceivingStep};
+use crate::hnn::receiving::{ReceivingFibre, ReceivingPhases, ReceivingStep};
 use crate::hnn::retention::AeonBoundary;
+use crate::hnn::ring::{ResonatorReturn, ReverseSplit};
 use crate::hnn::word::Word;
 use crate::holon::HolonError;
 use crate::holon::contact::FeatureCovector;
@@ -179,6 +180,8 @@ pub enum ReceiptDetail {
     /// remainders the word released at its end, the last junction's residual, and each declared
     /// resonator's balance over the word and the word's whole balance (campaign 2).
     Refine {
+        /// Paid once at opening, before all native tick balances.
+        source_preparation: Option<crate::hnn::word::action::PortPreparationReceipt>,
         /// The fresh source injection's actual mode-qualified coupling; clocks and carry remain independent.
         view: crate::hnn::ring::modes::ModeView,
         reached: Vec<Locus>,
@@ -258,7 +261,7 @@ pub struct PortReceipt {
     pub rings: Receipt,
     pub balances: Vec<TickBalance>,
     pub work: ExactWork,
-    pub unresolved: Vec<Vec<Rat>>,
+    pub unresolved: Vec<Vec<ReceivingFibre>>,
     pub detail: ReceiptDetail,
 }
 
@@ -331,17 +334,19 @@ pub enum Transpose {
 }
 
 /// **The release's width, read from its receiving phases** (module header): over the epoch's
-/// faces, the largest fibre `ε_c`, the certified bound on how far any code length moves over the
-/// receiver's fibre (Lean `HNN/Ratio.face_code_length_within_grain`), in the supremum norm and
-/// attained at the widest `(phase, class)` coordinate; zero, attained at a point, when every logit
-/// sits on its cell's representative.
+/// faces, the largest certified upper endpoint of a fibre `ε_c`, bounding how far any code
+/// length moves over the receiver's fibre (Lean `HNN/Ratio.face_code_length_within_grain`).
+/// Rational fibres keep their exact old width. A logarithmic fibre remains its constraint
+/// identity in the receipt; its certified enclosure supplies this supremum-norm width, with
+/// the coordinate witnessing the widest enclosure. No enclosure endpoint is used as a logit.
 pub fn release_width(phases: &ReceivingPhases, faces: &Faces) -> Result<ReceiverWidth, HnnError> {
     let mut widest: Option<(usize, Rat)> = None;
     let mut coordinate = 0;
     for face in &faces.faces {
         for fibre in face.fibres() {
-            if widest.as_ref().is_none_or(|(_, width)| &fibre > width) {
-                widest = Some((coordinate, fibre));
+            let upper = fibre.enclosure_at(crate::ratio::algebraic::LOG_OCTAVES)?.upper;
+            if widest.as_ref().is_none_or(|(_, width)| &upper > width) {
+                widest = Some((coordinate, upper));
             }
             coordinate += 1;
         }
@@ -354,7 +359,7 @@ pub fn release_width(phases: &ReceivingPhases, faces: &Faces) -> Result<Receiver
     };
     ReceiverWidth::declared(
         format!("receiving ring {}", phases.ring()),
-        "the code lengths of the pending ratio's faces over the receiver's fibre at its grain",
+        "the certified fibre enclosures of the pending ratio's code lengths at its grain",
         DiameterNorm::Supremum,
         diameter,
         attaining,
@@ -517,6 +522,15 @@ impl Deposit {
     /// Its reach, when declared.
     pub fn reach(&self) -> Option<&Reach> {
         self.reach.as_ref()
+    }
+
+    /// The deposit with its word's saturated rings' passages in its reach
+    /// (`hnn::word::Word::tube_passages`; a deposit without a reach is returned as it is).
+    pub(crate) fn with_passages(mut self, passages: Vec<crate::hnn::ring::TubePassage>) -> Self {
+        if let Some(reach) = self.reach.as_mut() {
+            reach.passages = passages;
+        }
+        self
     }
 
     /// The deposit with the receiving face's steps (ruling A; THE_REBUILD U1).
@@ -928,8 +942,23 @@ pub struct WordReturn {
     pub released: Remainders,
     pub precision: crate::hnn::chart::ReturnPrecision,
     pub response_defect: Option<PairedReadDefect>,
+    pub response_geometry: Option<PairedReturnGeometry>,
 }
 
+/// Opaque executed-pair geometry, not an unsplit error certificate.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PairedReturnGeometry { field: Field, reads: Vec<(Vec<Rat>,Vec<Rat>)>, width:usize, operands:crate::hnn::propagation::Operands, phases:ReceivingPhases, opened_at:usize,
+    pub(crate) native_material_stages:Option<crate::hnn::word::material_ray::OriginalPairStages> }
+impl PairedReturnGeometry {
+    pub(crate) fn admit_native_contact(&self,field:&Field,reads:&[(Vec<Rat>,Vec<Rat>)],operands:&crate::hnn::propagation::Operands,phases:&ReceivingPhases,opened_at:usize)->Result<(),HnnError>{
+        self.admit(field,reads,field.ring(phases.ring()).width())?;
+        if !self.operands.same_native_execution(operands) || &self.phases!=phases || self.opened_at!=opened_at {return Err(HnnError::Unadmitted{reason:"native contact actual/fresh geometry has the same original operators, frame, receiver and absolute clock"});}
+        Ok(())
+    }
+    pub(crate) fn admit(&self,field:&Field,reads:&[(Vec<Rat>,Vec<Rat>)],width:usize)->Result<(),HnnError>{
+        if &self.field!=field || self.reads!=reads || self.width!=width {return Err(HnnError::Unadmitted {reason:"paired return geometry binds the same field and complete executed packet"});} Ok(())
+    }
+}
 /// Coordinate radii against the unsplit physical paths, one receiving vector per station.
 /// Absence of the actual path's certificate is explicit; it cannot certify pure context.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -970,6 +999,9 @@ impl WordReturn {
         mut actual: Self,
         fresh: Self,
         reads: Vec<(Vec<Rat>, Vec<Rat>)>,
+        operands: &crate::hnn::propagation::Operands,
+        phases:&ReceivingPhases,
+        opened_at:usize,
     ) -> Result<Self, HnnError> {
         let shape = |back: &Self| {
             back.opening.len() == field.rings().len()
@@ -988,6 +1020,16 @@ impl WordReturn {
                 reason: "paired returns share one producing shape and return precision",
             });
         }
+        let mut width=None;
+        if reads.len()!=actual.reads.len() || reads.len()!=fresh.reads.len() || reads.is_empty() { return Err(HnnError::Unadmitted {reason:"paired return keeps all actual and fresh station packets"}); }
+        for (((a,ag),(f,fg)),(paired,g)) in actual.reads.iter().zip(&fresh.reads).zip(&reads) {
+            let mut expected=f.clone(); expected.extend(sub(a,f));
+            if a.len()!=f.len() || paired!=&expected || g!=ag || g!=fg || width.is_some_and(|n|n!=f.len()) { return Err(HnnError::Unadmitted {reason:"paired physical feature is fresh plus actual-minus-fresh at the same gradient"}); }
+            width=Some(f.len());
+        }
+        if reads.len()!=phases.aperture() || width!=Some(field.ring(phases.ring()).width()) || operands.rings().len()!=field.rings().len() {return Err(HnnError::Unadmitted {reason:"paired geometry keeps its actual native section, clock and operand shape"});}
+        crate::hnn::prediction::charted::ResponseTube::admit_operands(operands)?;
+        let geometry=PairedReturnGeometry {field:field.clone(),reads:reads.clone(),width:width.unwrap(),operands:operands.clone(),phases:phases.clone(),opened_at,native_material_stages:None};
         for &ring in field.sources() {
             actual.opening[ring] = add(&actual.opening[ring], &fresh.opening[ring]);
         }
@@ -1005,6 +1047,7 @@ impl WordReturn {
         }
         actual.released = actual.released.join(&fresh.released);
         actual.reads = reads;
+        actual.response_geometry=Some(geometry);
         Ok(actual)
     }
 }
@@ -1452,14 +1495,22 @@ pub(crate) fn reverse_response(
         &column.records,
         &column.resonances,
     )?;
-    let (actual, opening) =
+    let (mut actual, opening) =
         reverse_trajectory_joined_at(&actual_view, actual_seeds, None, None, precision.clone())?;
-    let (fresh, _) = reverse_trajectory_joined_at(&fresh_view, fresh_seeds, None, None, precision)?;
-    let mut joined = WordReturn::join_response(word.field(), actual, fresh, reads)?;
+    let (mut fresh, _) = reverse_trajectory_joined_at(&fresh_view, fresh_seeds, None, None, precision)?;
+    actual.reads=phases.epochs().zip(gradients).map(|(t,g)|(word.recorded()[t].anchors[phases.ring()].clone(),g.clone())).collect();
+    fresh.reads=phases.epochs().zip(gradients).map(|(t,g)|(column.records[t].anchors[phases.ring()].clone(),g.clone())).collect();
+    let mut joined = WordReturn::join_response(word.field(), actual, fresh, reads,word.operands(),phases,word.opened_at())?;
+    if word.operands().lattice().is_some() && word.has_native_prediction_producer() && word.response_error_requested() {
+        let stages=crate::hnn::word::material_ray::OriginalPairStages::issue(word)?;
+        joined.response_geometry.as_mut().expect("native joined geometry").native_material_stages=Some(stages);
+    }
+    if word.response_error_requested() {
+    let fresh_errors=column.errors_at(word)?;
     joined.response_defect = Some(PairedReadDefect {
         fresh: phases
             .epochs()
-            .map(|t| column.anchor_errors[t][phases.ring()].clone())
+            .map(|t| fresh_errors[t][phases.ring()].clone())
             .collect(),
         actual: word.response_actual_errors()?.map(|errors| {
             phases
@@ -1468,6 +1519,7 @@ pub(crate) fn reverse_response(
                 .collect()
         }),
     });
+    }
     Ok((joined, opening))
 }
 
@@ -1844,44 +1896,37 @@ fn reverse_trajectory_joined_at(
                     expected: 1,
                     found: 0,
                 })?;
-                let nonlinear = resonator.material().saturation().is_some();
-                let velocity_factor = if nonlinear { integer(1) } else { integer(2) };
-                let z_image = entries(widths[r], |i| {
-                    &h * &state_bar[0][i] + &velocity_factor * &state_bar[1][i]
-                        - integer(2) / resonator.admittance() * &storage_bar[r][i]
-                });
-                let (zbar, zbar_remainder) =
-                    split(lattice.as_ref(), z_image, &carried.resonator_rate[r]);
-                let image = resonator.solve_transpose(step.phase, &zbar)?;
-                let (solved, solved_remainder) =
-                    split(lattice.as_ref(), image, &carried.resonator_solve[r]);
-                let drive_image = entries(widths[r], |i| &storage_bar[r][i] + &h * &solved[i]);
-                let (drive, drive_remainder) =
-                    split(lattice.as_ref(), drive_image, &carried.resonator_drive[r]);
-                let capacity = resonator.material().forms().0;
-                // The Hessian is read at the displacement that produced this tick, with its
-                // own executed transpose solve. The nonlinear kick has w'=omega, not 2omega-w.
-                let hessian = resonator.force_hessian(step.phase, &step.input[0])?;
-                let u_image = sub(&state_bar[0], &scale(&h, &apply_rows(&hessian, &solved)?));
-                let capacity_return = apply_rows(capacity, &solved)?;
-                let w_image = if nonlinear {
-                    capacity_return
-                } else {
-                    add(
-                        &scale(&integer(-1), &state_bar[1]),
-                        &scale(&integer(2), &capacity_return),
-                    )
-                };
-                let (u_bar, u_remainder) = split(
-                    lattice.as_ref(),
-                    u_image,
-                    &carried.resonator_state[r].as_ref().expect("declared state")[0],
-                );
-                let (w_bar, w_remainder) = split(
-                    lattice.as_ref(),
-                    w_image,
-                    &carried.resonator_state[r].as_ref().expect("declared state")[1],
-                );
+                let mut remainders: [Vec<Rat>; 5] = Default::default();
+                let state_carried = carried.resonator_state[r].as_ref().expect("declared state");
+                let returned = resonator.reverse(
+                    step,
+                    [&state_bar[0], &state_bar[1]],
+                    &storage_bar[r],
+                    &mut |at, image| {
+                        let (slot, remainder) = match at {
+                            ReverseSplit::Rate => (0, &carried.resonator_rate[r]),
+                            ReverseSplit::Solve => (1, &carried.resonator_solve[r]),
+                            ReverseSplit::Drive => (2, &carried.resonator_drive[r]),
+                            ReverseSplit::Displacement => (3, &state_carried[0]),
+                            ReverseSplit::Velocity => (4, &state_carried[1]),
+                        };
+                        let (carried, next) = split(lattice.as_ref(), image, remainder);
+                        remainders[slot] = next;
+                        carried
+                    },
+                )?;
+                let [
+                    zbar_remainder,
+                    solved_remainder,
+                    drive_remainder,
+                    u_remainder,
+                    w_remainder,
+                ] = remainders;
+                let ResonatorReturn {
+                    drive,
+                    state: [u_bar, w_bar],
+                    solved,
+                } = returned;
                 Ok(Some((
                     drive,
                     [u_bar, w_bar],
@@ -2187,6 +2232,7 @@ fn reverse_trajectory_joined_at(
             released: carried.released(),
             precision,
             response_defect: None,
+            response_geometry: None,
         },
         opening,
     ))

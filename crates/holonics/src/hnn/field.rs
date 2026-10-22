@@ -107,6 +107,8 @@ use std::collections::BTreeMap;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
+mod input_scan;
+
 use crate::aeon::{ClockLift, Reading};
 use crate::compression::ReflectorMachine;
 use crate::compression::landmark::context::{BaseMeasure, Landmarks, StopPrior};
@@ -177,6 +179,7 @@ pub trait ConstitutionRead: Sync {
         self.receiving_map(ring)
             .map(|_| crate::hnn::constitution::ReceivingLayout::Single)
     }
+    fn receiving_return_policy(&self, _ring:usize) -> crate::hnn::receiving::RetainedReturnPolicy { crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1 }
     /// The carrier whose normal statistics and receiving map are paired. Raw declarations
     /// use the executed anchor; a source observer binds its own law before any comparison.
     fn receiving_carrier(&self, _ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
@@ -2048,20 +2051,46 @@ impl Field {
             found: at,
         })?;
         let mut staged = lift.to_vec();
-        let step = match encoded.advance(at) {
-            None => self.step_class(&mut staged, cell.class(), None)?,
-            Some(digits) => {
-                self.admit_lock_route()?;
-                let before = self.helix_lift(lift)?;
-                let step = self.step_class(&mut staged, cell.class(), Some(digits))?;
-                let after = self.helix_lift(&staged)?;
-                encoded.check_step(at, before, after)?;
-                step
-            }
-        };
-        encoded.check_placement_step(at, lift, &staged)?;
+        let step = self.step_class(&mut staged, cell.class(), encoded.advance(at))?;
+        self.check_occurrence_square(lift, &staged, encoded, at)?;
         lift.clone_from_slice(&staged);
         Ok(step)
+    }
+
+    /// The same consuming squares for a serial step and an input-selected prefix.
+    /// This validates the actual full lift and never replaces the encoding's witness.
+    pub(crate) fn check_occurrence_square(
+        &self,
+        before: &[BigInt],
+        after: &[BigInt],
+        encoded: &Encoded,
+        at: usize,
+    ) -> Result<(), HnnError> {
+        if encoded.advance(at).is_some() {
+            self.admit_lock_route()?;
+            encoded.check_step(at, self.helix_lift(before)?, self.helix_lift(after)?)?;
+        }
+        encoded.check_placement_step(at, before, after)?;
+        Ok(())
+    }
+
+    /// A ring's native class advance before carry, on the ordinary lock route. An `Own` ring
+    /// advances once for every admitted class, including classes outside its lock. Located route
+    /// digits belong to an encoded occurrence and are read by [`Field::selective_step`] instead.
+    pub fn class_advance(&self, ring: usize, class: usize) -> Result<u64, HnnError> {
+        if ring >= self.rings.len() {
+            return Err(HnnError::RingOutside {
+                ring,
+                rings: self.rings.len(),
+            });
+        }
+        if class >= self.alphabet {
+            return Err(HnnError::CellOutside {
+                code: class,
+                alphabet: self.alphabet,
+            });
+        }
+        Ok(self.advance_of(ring, class, None))
     }
 
     /// **Ring `g`'s advance on a class before its carry**: the class's located digit `a_g(c)` on
@@ -3167,3 +3196,36 @@ fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
 
 #[cfg(test)]
 pub(crate) mod founding_tests;
+
+#[cfg(test)]
+mod class_advance_tests {
+    use super::*;
+
+    #[test]
+    fn native_class_read_distinguishes_lock_fit_and_own_advance() {
+        let mut field =
+            Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
+        assert_eq!(field.class_advance(0, 0).unwrap(), 1);
+        assert_eq!(field.class_advance(0, 1).unwrap(), 0);
+        for class in 0..field.alphabet {
+            assert_eq!(
+                field.class_advance(0, class).unwrap(),
+                field.advance_of(0, class, None)
+            );
+        }
+        // An Own ring's step is independent of its lock. Exercise a zero-fit fixture explicitly.
+        field.rings[0].advance = RingAdvance::Own;
+        field.rings[0].lock.fill(false);
+        for class in 0..field.alphabet {
+            assert_eq!(field.class_advance(0, class).unwrap(), 1);
+        }
+        assert!(matches!(
+            field.class_advance(field.rings.len(), 0),
+            Err(HnnError::RingOutside { .. })
+        ));
+        assert!(matches!(
+            field.class_advance(0, field.alphabet),
+            Err(HnnError::CellOutside { .. })
+        ));
+    }
+}

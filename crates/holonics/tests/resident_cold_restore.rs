@@ -152,7 +152,8 @@ fn cold_equivalence(ingest_after_restore: bool, discard_moment: bool, remount_af
     let source = field.sources()[0];
     let state = original.continuing_state(source).unwrap();
     assert!(state.passage().is_some());
-    let state = ContinuingState::from_text(&state.to_text()).unwrap();
+    let state =
+        ContinuingState::from_text(&state.to_text(), original.constitution().budget()).unwrap();
     // The cold mount reads only the immutable field, a fresh founding constitution and saved
     // exact text. No predecessor material, clock, moment, address, chart or comparison is borrowed.
     let mut restored = reference
@@ -211,9 +212,11 @@ fn cold_equivalence(ingest_after_restore: bool, discard_moment: bool, remount_af
     if remount_after_close {
         // No moment may remain, and the newly restricted admitted family is empty. The saved
         // resident still retains its next action operands rather than falling back to a material save.
-        let state =
-            ContinuingState::from_text(&restored.continuing_state(source).unwrap().to_text())
-                .unwrap();
+        let state = ContinuingState::from_text(
+            &restored.continuing_state(source).unwrap().to_text(),
+            restored.constitution().budget(),
+        )
+        .unwrap();
         let resumed_again = reference
             .mount_continued(
                 &field,
@@ -226,9 +229,11 @@ fn cold_equivalence(ingest_after_restore: bool, discard_moment: bool, remount_af
         assert_same_endpoint(&reference, &restored, &resumed_again);
 
         // Repeat the cold mount from the post-close endpoint and check the same exact operands.
-        let state =
-            ContinuingState::from_text(&resumed_again.continuing_state(source).unwrap().to_text())
-                .unwrap();
+        let state = ContinuingState::from_text(
+            &resumed_again.continuing_state(source).unwrap().to_text(),
+            resumed_again.constitution().budget(),
+        )
+        .unwrap();
         let resumed_twice = reference
             .mount_continued(
                 &field,
@@ -301,8 +306,11 @@ fn pending_producer_survives_close_under_a_changed_future_family() {
         .unwrap();
 
     let source = field.sources()[0];
-    let state =
-        ContinuingState::from_text(&resident.continuing_state(source).unwrap().to_text()).unwrap();
+    let state = ContinuingState::from_text(
+        &resident.continuing_state(source).unwrap().to_text(),
+        resident.constitution().budget(),
+    )
+    .unwrap();
     let restored = reference
         .mount_continued(
             &field,
@@ -374,8 +382,11 @@ fn staged_survivor_deposits_after_close_with_arrived_intact() {
     assert_eq!(resident.ledger().balance().opening, before_deposit.opening);
 
     let source = field.sources()[0];
-    let state =
-        ContinuingState::from_text(&resident.continuing_state(source).unwrap().to_text()).unwrap();
+    let state = ContinuingState::from_text(
+        &resident.continuing_state(source).unwrap().to_text(),
+        resident.constitution().budget(),
+    )
+    .unwrap();
     let restored = reference
         .mount_continued(
             &field,

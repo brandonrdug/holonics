@@ -166,6 +166,7 @@ fn quartic_domain(sheet: i64) -> crate::holon::parametron::DomainProposal {
         lipschitz: rat(4, 5),
         centre_residual: Rat::zero(),
         young: rat(1, 4),
+        rounding: Rat::zero(),
     }
 }
 
@@ -336,6 +337,7 @@ fn half_pump_domains(owner: &ResonatorOperands) -> Vec<crate::holon::parametron:
             lipschitz: rat(13, 10),
             centre_residual: Rat::zero(),
             young: rat(1, 100),
+            rounding: Rat::zero(),
         },
         DomainProposal {
             centre: next,
@@ -347,6 +349,7 @@ fn half_pump_domains(owner: &ResonatorOperands) -> Vec<crate::holon::parametron:
             lipschitz: rat(3, 4),
             centre_residual: rat(1, 5000),
             young: rat(1, 100),
+            rounding: Rat::zero(),
         },
     ]
 }

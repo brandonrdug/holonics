@@ -26,7 +26,7 @@ use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::receiving::{
     ActiveAddress, Feature, FeatureFamily, LetterReader, RankScope, ReceivingPhases, ReceivingRead,
-    clock_letters, grain_logits, landmark_declaration, tree_code_length,
+    clock_letters, landmark_declaration, tree_code_length,
 };
 use crate::hnn::reference::{Reference, compose};
 use crate::hnn::ring::ResonatorMaterial;
@@ -339,13 +339,9 @@ fn the_field_declares_the_tree_and_codes_it() {
     assert!(source.entries().iter().any(|x| *x == rat(-1, 2)));
 }
 
-/// The read is `f_j = k(a_j)/L_R + R · v_R` (the combined face): the wave read in the passage frame
-/// (the anchor as it stands, whatever the receiving ring's lift), plus the tree face's grain logits
-/// at phase `j`'s address, read after the epoch's earlier targets (cell order); each class's
-/// real logit read at the grain, its imaginary logit (the wave's alone) halved into turns. The
-/// tree logits lie on the grain, so each cell is the wave's shifted by `k_c/L_R` exactly and keeps
-/// the wave's fibre; the tree's face sums to one exactly and its grain logits alone code each class
-/// within one grain of `−log₂ q(c)` (`grain_code_residual`).
+/// The combined class cell reads log2(q_tree)+R v once, preserving the logarithmic fibre's
+/// identity; the rational port coordinates and imaginary phase remain the wave's. Tree faces
+/// still read the actual prequential addresses and retain their exact executed probabilities.
 #[test]
 fn the_read_adds_the_trees_face_to_the_passage_frame_wave() {
     let field = &chain();
@@ -395,22 +391,35 @@ fn the_read_adds_the_trees_face_to_the_passage_frame_wave() {
     let map = medium.receiving_map(2).unwrap();
     let wave = map.apply(&anchor).unwrap();
     assert_eq!(wave_read.logits, wave);
-    let stored = grain_logits(&faces[0]);
     let read = ReceivingRead::combined(wave.clone(), &faces[0], 16).unwrap();
-    let combined: Vec<Rat> = wave.iter().zip(&stored).map(|(w, k)| w + k).collect();
-    assert_eq!(read.logits, combined);
+    // Rational port coordinates are explicitly the wave; no rational representative pretends
+    // to equal the generally irrational combined real logit.
+    assert_eq!(read.logits, wave);
     assert_eq!(read.logits.len(), 2 * field.alphabet());
     for (class, cell) in read.cells.iter().enumerate() {
-        assert_eq!(
-            cell.representative(16) + &cell.fibre,
-            read.logits[2 * class]
-        );
-        let alone = GrainCell::of(&wave[2 * class], 16);
-        assert_eq!(cell.fibre, alone.fibre);
-        assert_eq!(
-            cell.representative(16),
-            alone.representative(16) + &stored[2 * class]
-        );
+        let probability = &faces[0].probabilities[class];
+        let exact = crate::ratio::algebraic::log2_enclosure_at(
+            probability,
+            crate::ratio::algebraic::LOG_OCTAVES,
+        ).unwrap();
+        let enclosed = cell.enclosure_at(16, crate::ratio::algebraic::LOG_OCTAVES).unwrap();
+        assert!(enclosed.lower <= &exact.upper + &wave[2 * class]);
+        assert!(enclosed.upper >= &exact.lower + &wave[2 * class]);
+        let fibre = cell.fibre.enclosure_at(crate::ratio::algebraic::LOG_OCTAVES).unwrap();
+        assert!(fibre.lower >= Rat::zero());
+        assert!(fibre.upper <= rat(1, 16));
+        match &cell.fibre {
+            crate::hnn::receiving::ReceivingFibre::Rational(_) => {
+                assert_eq!(exact.lower, exact.upper);
+                assert_eq!(cell.rational_value(16).unwrap(), &exact.lower + &wave[2 * class]);
+            }
+            crate::hnn::receiving::ReceivingFibre::Logarithmic(identity) => {
+                assert_eq!(identity.probability(), probability);
+                assert_eq!(identity.wave(), &wave[2 * class]);
+                assert_eq!(identity.representative(), &cell.representative(16));
+                assert!(cell.rational_value(16).is_none());
+            }
+        }
         assert_eq!(read.phases[class], &wave[2 * class + 1] / integer(2));
     }
     assert!(phases.read(field, &medium, &anchor[..2]).is_err());
@@ -1465,7 +1474,7 @@ fn cold_restore_refuses_unversioned_or_unknown_passages() {
     use crate::hnn::constitution::ContinuingState;
     use crate::hnn::reference::Reference;
     let field = chain();
-    let reference = Reference::new(64, u64::MAX);
+    let reference = Reference::new(64, COLD_RESTORE_BUDGET);
     let current = crate::hnn::Current::at_rest(&field);
     let source = field.sources()[0];
     for (payload, expected) in [
@@ -1483,14 +1492,16 @@ fn cold_restore_refuses_unversioned_or_unknown_passages() {
             crate::hnn::SavedPassageVersion::Number(5),
         ),
     ] {
-        let opening = crate::hnn::Constitution::initial(&field, u64::MAX).unwrap();
+        let opening = crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap();
         let state = opening
             .continuing_state(source)
             .unwrap()
             .with_passage(Some(payload.to_string()));
         // The real serializer stamps the checksum; version refusal precedes old law operands.
-        assert!(matches!(ContinuingState::from_text(&state.to_text()),
-            Err(crate::hnn::HnnError::PassageVersion {version}) if version == expected));
+        assert!(
+            matches!(ContinuingState::from_text(&state.to_text(), opening.budget()),
+            Err(crate::hnn::HnnError::PassageVersion {version}) if version == expected)
+        );
         assert!(
             matches!(reference.mount_continued(&field, &current, opening, &state),
             Err(crate::hnn::HnnError::PassageVersion {version}) if version == expected)
@@ -1500,6 +1511,9 @@ fn cold_restore_refuses_unversioned_or_unknown_passages() {
 
 // Change an inner passage operand, then regenerate and verify the real outer checksum.
 // These fixtures must reach the native passage/moment reader, not fail checksum validation.
+// This cold-restore family already declares this budget for its reference and opening.
+const COLD_RESTORE_BUDGET: u64 = u64::MAX;
+
 fn cold_v3_changed_line(
     state: &crate::hnn::constitution::ContinuingState,
     prefix: &str,
@@ -1524,7 +1538,8 @@ fn cold_v3_changed_line(
         "the fixture must change exactly its intended operand"
     );
     let changed = state.clone().with_passage(Some(lines.join("\n") + "\n"));
-    crate::hnn::constitution::ContinuingState::from_text(&changed.to_text()).unwrap()
+    crate::hnn::constitution::ContinuingState::from_text(&changed.to_text(), COLD_RESTORE_BUDGET)
+        .unwrap()
 }
 
 fn cold_v3_initial_state(
@@ -1535,7 +1550,7 @@ fn cold_v3_initial_state(
     crate::hnn::constitution::ContinuingState,
 ) {
     use crate::hnn::port::ExecutionPort;
-    let reference = crate::hnn::reference::Reference::new(64, u64::MAX);
+    let reference = crate::hnn::reference::Reference::new(64, COLD_RESTORE_BUDGET);
     let mut resident = reference
         .mount(field, &crate::hnn::Current::at_rest(field))
         .unwrap();
@@ -1560,7 +1575,7 @@ fn cold_restore_refuses_a_checksummed_exhausted_handle_counter() {
         reference.mount_continued(
             &field,
             &crate::hnn::Current::at_rest(&field),
-            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(),
+            crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap(),
             &invalid,
         ),
         Err(crate::hnn::HnnError::ContinuingState {
@@ -1589,7 +1604,7 @@ fn cold_restore_refuses_a_checksummed_cursor_at_nonempty_window_end() {
         reference.mount_continued(
             &field,
             &crate::hnn::Current::at_rest(&field),
-            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(),
+            crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap(),
             &invalid,
         ),
         Err(crate::hnn::HnnError::ContinuingState {
@@ -1611,12 +1626,14 @@ fn cold_restore_preserves_empty_window_zero_cursor_and_rejects_nonzero() {
             .lines()
             .any(|line| line == "window")
     );
-    let checked = crate::hnn::constitution::ContinuingState::from_text(&state.to_text()).unwrap();
+    let checked =
+        crate::hnn::constitution::ContinuingState::from_text(&state.to_text(), COLD_RESTORE_BUDGET)
+            .unwrap();
     let mut restored = reference
         .mount_continued(
             &field,
             &crate::hnn::Current::at_rest(&field),
-            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(),
+            crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap(),
             &checked,
         )
         .unwrap();
@@ -1646,7 +1663,7 @@ fn cold_restore_preserves_empty_window_zero_cursor_and_rejects_nonzero() {
         reference.mount_continued(
             &field,
             &crate::hnn::Current::at_rest(&field),
-            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(),
+            crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap(),
             &invalid,
         ),
         Err(crate::hnn::HnnError::ContinuingState {
@@ -1669,7 +1686,7 @@ fn cold_restore_handle_exhaustion_is_typed_before_new_ingest_work() {
         .mount_continued(
             &field,
             &crate::hnn::Current::at_rest(&field),
-            crate::hnn::Constitution::initial(&field, u64::MAX).unwrap(),
+            crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap(),
             &near_end,
         )
         .unwrap();
@@ -1894,7 +1911,7 @@ fn the_receiving_maps_descent_and_its_priors_move_are_read_apart() {
     let encoded = Encoded::through(&encoding, &located, &field, &[word])
         .unwrap()
         .remove(0);
-    let reference = Reference::new(64, u64::MAX);
+    let reference = Reference::new(64, COLD_RESTORE_BUDGET);
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let feed = |resident: &mut crate::hnn::Resident,
                 moment: Option<crate::hnn::MomentId>,

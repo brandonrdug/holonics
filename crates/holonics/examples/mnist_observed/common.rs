@@ -63,11 +63,15 @@ fn read_checkpoint_file(path: &str) -> Result<Vec<u8>> {
 }
 
 /// Load only a constitution checkpoint of this exact declared layout.
-fn load_evaluation_material(path: &str, opening: &Constitution) -> Result<Constitution> {
+fn load_evaluation_material(
+    field: &Field,
+    path: &str,
+    opening: &Constitution,
+) -> Result<Constitution> {
     let bytes = read_checkpoint_file(path)?;
     let original = std::str::from_utf8(&bytes)?;
-    let state = ContinuingState::from_text(original)?;
-    let material = opening.clone().continued(&state)?;
+    let state = ContinuingState::from_text(original, opening.budget())?;
+    let material = opening.clone().continued_on(field, &state)?;
     println!(
         "checkpoint_input path={path:?} bytes={} training_updates=0 constitution_only=true current_at_rest=true carry_fresh=true address_fresh=true selector_fresh=true",
         bytes.len()
@@ -1142,6 +1146,7 @@ impl Metrics {
 /// Save and exact-roundtrip-check the trained constitution. This intentionally does not claim
 /// to checkpoint the complete host/CUDA resident passage or its current reception state.
 fn write_constitution_checkpoint<P: ExecutionPort>(
+    field: &Field,
     resident: &P::Resident,
     declared_opening: &Constitution,
     sources: &[usize],
@@ -1176,7 +1181,7 @@ where
         return Err("constitution checkpoint bytes differed after write/read-back".into());
     }
     let read_back_text = std::str::from_utf8(&read_back)?;
-    let parsed = ContinuingState::from_text(read_back_text)?;
+    let parsed = ContinuingState::from_text(read_back_text, resident.constitution().budget())?;
     exterior_cost.exterior("constitution_checkpoint_parses", 1);
     if parsed != state {
         return Err("constitution checkpoint parse did not reproduce its exact state".into());
@@ -1184,7 +1189,7 @@ where
     // Reuse the exact declared opening retained before learning/restoration. Rebuilding a
     // Single receiver here would erase the explicit ArrivalContext declaration and correctly
     // fail the core material-identity check; never repair that mismatch by restamping a save.
-    let restored = declared_opening.clone().continued(&parsed)?;
+    let restored = declared_opening.clone().continued_on(field, &parsed)?;
     exterior_cost.exterior("constitution_checkpoint_restores", 1);
     if &restored != resident.constitution() {
         return Err("constitution checkpoint restored on its declared opening did not equal the live constitution".into());
@@ -1561,7 +1566,7 @@ where
     configure_arrival_context(&field, &mut material, arrival_context)?;
     let full_opening = material.clone();
     if let Some(path) = checkpoint_in {
-        material = load_evaluation_material(path, &full_opening)?;
+        material = load_evaluation_material(&field, path, &full_opening)?;
         exterior_cost.exterior("evaluation_checkpoint_reads", 1);
         exterior_cost.exterior("evaluation_checkpoint_restores", 1);
     }
@@ -2087,6 +2092,7 @@ where
             let prefix = checkpoint_prefix.expect("validated when options were parsed");
             let path = format!("{prefix}-train-{:05}-constitution.txt", index + 1);
             write_constitution_checkpoint::<P>(
+                &field,
                 &resident,
                 &full_opening,
                 sources,
@@ -2110,6 +2116,7 @@ where
     // The periodic checkpoint path uses the same equality-checked constitution-only format.
     if let Some(path) = checkpoint_out {
         write_constitution_checkpoint::<P>(
+            &field,
             &resident,
             &full_opening,
             sources,
@@ -2573,7 +2580,7 @@ mod arrival_context_tests {
         );
         PairedObservation::admit(&field, &material, &pairing).unwrap();
         let state = material.continuing_state(0).unwrap();
-        let parsed = ContinuingState::from_text(&state.to_text()).unwrap();
+        let parsed = ContinuingState::from_text(&state.to_text(), material.budget()).unwrap();
         assert!(matches!(
             single_opening.continued(&parsed),
             Err(HnnError::ContinuingState { .. })

@@ -1,0 +1,99 @@
+{
+  "base_source": "d06bbe2e4c99d01572771aedc3e72f3180043cdd",
+  "historical_kernel": "b27588d26a1ceac513d359d37b0134a6d1a049cf",
+  "host_gate_scopes_passed": [
+    "guard-doctests",
+    "diagnostic-timing-controls",
+    "diagnostic-supervisor-controls",
+    "diagnostic-receipt-controls",
+    "listener-continuation-controls",
+    "check",
+    "guard-lints",
+    "projected-statistics-controls",
+    "native-class-advance-controls",
+    "native-gram-carry-conservation",
+    "finite-solenoidal-controls",
+    "rational-place-controls",
+    "plural-coupling-controls",
+    "grouped-tube-controls",
+    "observed-tube-controls",
+    "source-refinement-controls",
+    "actual-source-alignment",
+    "actual-ray-joint-controls",
+    "actual-factor-refusal",
+    "refined-source-native-restore",
+    "solenoidal-listener-controls",
+    "offline-coupling-controls"
+  ],
+  "doctests_passed": 64,
+  "kernel_controls_current": 2,
+  "actual_native_contextual_control": "PASS; final exteriorprotocol/coldrole version2",
+  "measurement": {
+    "kind": "synthetic-code",
+    "actual_steps": 3,
+    "branches": 2,
+    "published_branch_formations": 6,
+    "successful_normal_fits_including_late_refusal": 7,
+    "available_native_owners_equal": true,
+    "participating_World_passage_serialization": false,
+    "independent_native_contraction_equal": true,
+    "learned_wave_bits": [
+      122,
+      251,
+      426
+    ],
+    "frozen_wave_bits": [
+      51,
+      109,
+      112
+    ],
+    "repeat_ns": 29642253,
+    "cold_restore_plus_prospect_ns": 156716606,
+    "memoization": false,
+    "kernel_transfer_sync_root_counts": null
+  },
+  "retained_material_causality": "same last-two actual p/c across branches; different H/B/M and native futures",
+  "initial_roles": "explicit unobserved priors; immutable pending previous/current roles preserved false/false then false/true then true/true",
+  "both_fit_realization_bounds": "strictly below1/2048; fixed-geometry normal-fit enclosure, not CE or per-arrival decrease",
+  "cold_scope": {
+    "contextual_family_material_pending": "EXACT",
+    "whole_participating_World_passage": "UNJOINED; existingownerrefuses; no waiver"
+  },
+  "actual_unchanged_scope": "Word material formation holds actualnative constitution/current/carry/charts/admitted/ledger/parametric; actualWorldsteps/next matchunattachedtwin",
+  "bindings_refusals": [
+    "same-tick wrong field",
+    "wrong source chart",
+    "wrong units coldidentity",
+    "replayed ID warm/cold",
+    "late boundedbranchstage",
+    "unexpected codec payload"
+  ],
+  "counter_scope": "primaryowner:3actualreturns/6publishedbranchupdates/7successfulstagedfitsincllatefailure; other mirrored/coldvalidation work included in walltime but no unified scalar/root counter; one2branchprospect=2Wordpassages/6callbacks; independentreplay=1/3",
+  "CUDA": {
+    "type": "existing observed-epoch boundary REGRESSION",
+    "successful_forwards": 40,
+    "successful_retained_returns": 40,
+    "successful_aggregates": 4,
+    "host_card_cold": "EXACT",
+    "fallback": false,
+    "peak_own_MiB": 260,
+    "cleanup_empty": true,
+    "new_contextual_empirical_World_prospect": "HOST ONLY; no device execution injection for dynamicWorld/WaveReturns",
+    "full_ignored_GPU_suite": "UNRUN"
+  },
+  "CODE_closed_first_ns": 536175275803,
+  "CODE_closed_completion_ns": 211008182524,
+  "CODE_total_ns": 747183458327,
+  "incomplete_failed_evidence": "all compiler stops, missingportEq/typefix, unavailableWorldserialization assertion, invalid/singularcachefixture and guard7testIO failure preserved; terminalpostflights verified",
+  "runnable_entry": "PreparedPhysicalAction::{encounter_contextual,contextual_prospects}; cargo test -p holonics --test world_model contextual -- --nocapture; publiclibrary+syntheticCODE, no new language CLI",
+  "binary": {
+    "sha256": "6bee74eac8e3959f6d6df6ac96641822f7f2b96ea0b5a3ca32a1b8756cd0e442",
+    "bytes": 16502552,
+    "profile": "test optimized opt1 debug0 incremental0"
+  },
+  "trace": "INSPECTABLE_TRACE_V2.json / READABLE_INSTANCE_V2.txt; exteriorparser tools/capture_contextual_receipts.py",
+  "language_application": "separate class-coordinate material + u=eta_M + B=T_cut E native prospective preparation assigned next; not installed by wave consumer",
+  "model_jobs": 0,
+  "dataset_access": 0,
+  "uploads": 0
+}

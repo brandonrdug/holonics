@@ -103,6 +103,10 @@ use crate::hnn::readout::{self, Executed};
 use crate::hnn::store::{ChartStore, Pair};
 use crate::hnn::tree::{CardTree, TreeTimes};
 
+#[path = "observed.rs"]
+mod observed;
+pub use observed::ObservedEpochDevice;
+
 fn device(error: DeviceError) -> HnnError {
     error.into_hnn()
 }
@@ -178,6 +182,134 @@ fn rekey_moments(
     first.map_or(Ok(()), Err)
 }
 
+/// Return through precisely the charts and record retained by the producing card word.
+fn pull_back_word(
+    field: &Field,
+    word: &mut ExecutedWord<'_>,
+    covector: &holonics::hnn::RatioCovector,
+    phases: &ReceivingPhases,
+) -> Result<WordReturn, HnnError> {
+    let publication = Rc::clone(&word.word.publication);
+    let map = &publication.loci.maps[phases.ring()]
+        .as_ref()
+        .ok_or(HnnError::MissingReceivingMap {
+            ring: phases.ring(),
+        })?
+        .matrix;
+    let back = if matches!(
+        word.word.plan.receiving_layout,
+        ReceivingLayout::ArrivalContext { .. }
+    ) {
+        let response_plan = word
+            .word
+            .response_plan_record()
+            .ok_or(HnnError::Unadmitted {
+                reason: "an ArrivalContext comparison retains its executed response record",
+            })?
+            .0
+            .clone();
+        let paired = {
+            let response_record = word
+                .word
+                .response_plan_record()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "an ArrivalContext comparison retains its executed response record",
+                })?
+                .1;
+            readout::paired_source(
+                word.word.card(),
+                field,
+                &word.word.plan,
+                &word.word.record,
+                response_record,
+                covector,
+                map,
+            )?
+        };
+        let actual_reverse = word.word.reverse(&paired.actual.carried)?;
+        let response_reverse = word.word.reverse_response(&paired.fresh.carried)?;
+        let actual_back = readout::word_return(
+            &word.word.plan,
+            &publication.loci,
+            &word.word.record,
+            &actual_reverse,
+            paired.actual,
+        )?;
+        let response_record = word
+            .word
+            .response_plan_record()
+            .ok_or(HnnError::Unadmitted {
+                reason: "the response record survives its independent return",
+            })?
+            .1;
+        let response_back = readout::word_return(
+            &response_plan,
+            &publication.loci,
+            response_record,
+            &response_reverse,
+            paired.fresh,
+        )?;
+        let mut joined =
+            WordReturn::join_response(field, actual_back, response_back, paired.reads,word.word.response_producing_operands().ok_or(HnnError::Unadmitted {reason:"paired native operands remain with their record"})?,phases,word.word.plan.opened_at)?;
+        if word.word.response_error_requested() {
+        word.word.request_response_anchor_errors()?;
+        let (fresh_errors, actual_errors) =
+            word.word
+                .response_anchor_errors()
+                .ok_or(HnnError::Unadmitted {
+                    reason: "the response return retains both path defect certificates",
+                })?;
+        let fresh = phases
+            .epochs()
+            .map(|crossing| {
+                fresh_errors
+                    .get(crossing)
+                    .and_then(|at| at.get(phases.ring()))
+                    .cloned()
+                    .ok_or(HnnError::WordEnded {
+                        ticks: fresh_errors.len(),
+                    })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let actual = phases
+            .epochs()
+            .map(|crossing| {
+                actual_errors
+                    .get(crossing)
+                    .and_then(|at| at.get(phases.ring()))
+                    .cloned()
+                    .ok_or(HnnError::WordEnded {
+                        ticks: actual_errors.len(),
+                    })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        joined.response_defect = Some(PairedReadDefect {
+            fresh,
+            actual: Some(actual),
+        });
+        }
+        joined
+    } else {
+        let source = readout::source(
+            word.word.card(),
+            field,
+            &word.word.plan,
+            &word.word.record,
+            covector,
+            map,
+        )?;
+        let reverse = word.word.reverse(&source.carried)?;
+        readout::word_return(
+            &word.word.plan,
+            &publication.loci,
+            &word.word.record,
+            &reverse,
+            source,
+        )?
+    };
+    Ok(back)
+}
+
 // -------------------------------------------------------------------------------------------
 // the traffic
 
@@ -227,6 +359,9 @@ struct MomentSlot<'c> {
 /// [definition] **A word executed on the card, kept for its return**: its resident buffers and
 /// record, the contacts' operators its balance read, and its charts' readings.
 struct ExecutedWord<'c> {
+    source_preparation_host_ns:u128,
+    response_operands_host_ns:u128,
+    source_preparation: Option<holonics::hnn::word::action::PortPreparationReceipt>,
     word: ResidentWord<'c>,
     operators: Vec<Rc<ContactOperator>>,
     readings: Vec<ChartReading>,
@@ -326,6 +461,7 @@ pub struct Mounted<'c> {
     aeon: AeonState,
     ledger: EnclosedLedger,
     arrived: Option<Arrived<'c>>,
+    source_return_frontier: BTreeMap<usize, usize>,
     released_bits: u64,
     stop: Option<BudgetStop>,
     tally: ChartTally,
@@ -382,6 +518,7 @@ impl<'c> Mounted<'c> {
                 .map_err(device)?;
         }
         let parts = ResidentPassageParts {
+            prepared_input: None, // No prepared-input adapter is implemented by this Resident.
             current: self.current.clone(),
             admitted: self.admitted.clone(),
             opens: self.opens,
@@ -402,6 +539,7 @@ impl<'c> Mounted<'c> {
             balance: self.ledger.balance().clone(),
             charts: self.store.continuing_charts()?,
             address: self.address.clone(),
+            source_return_frontier: self.source_return_frontier.clone(),
             arrived: self.arrived.as_ref().map(|a| ResidentArrived {
                 ratio: a.ratio.clone(),
                 targets: a.targets.clone(),
@@ -488,6 +626,13 @@ impl<'c> Mounted<'c> {
         card: &'c Card,
         opening: &CardOpening<'c>,
     ) -> Result<(ExecutedWord<'c>, Faces, Rc<Publication<'c>>), HnnError> {
+        let demand=self.constitution.receiving_return_policy(ratio.phases().ring())!=Some(holonics::hnn::receiving::RetainedReturnPolicy::FamilyLocalRetainedReturnV1);
+        self.execute_with_response_evidence(ratio,moment,publication,card,opening,demand,false)
+    }
+    fn execute_with_response_evidence(&mut self,ratio:&PendingRatio,moment:&MomentSnapshot<'c>,publication:&Rc<Publication<'c>>,card:&'c Card,opening:&CardOpening<'c>,response_error_requested:bool,validate_error_reference:bool)->Result<(ExecutedWord<'c>,Faces,Rc<Publication<'c>>),HnnError>{
+        self.execute_with_native_ticks(ratio,moment,publication,card,opening,response_error_requested,validate_error_reference,None)
+    }
+    fn execute_with_native_ticks(&mut self,ratio:&PendingRatio,moment:&MomentSnapshot<'c>,publication:&Rc<Publication<'c>>,card:&'c Card,opening:&CardOpening<'c>,response_error_requested:bool,validate_error_reference:bool,native_phases:Option<&ReceivingPhases>)->Result<(ExecutedWord<'c>,Faces,Rc<Publication<'c>>),HnnError>{
         let field = &self.field;
         let current = ratio.current(field)?;
         let active_publication = if ratio.view().is_whole() {
@@ -512,20 +657,28 @@ impl<'c> Mounted<'c> {
         };
         // The normalized open (it reads no held cell), read from the pending ratio's copy of the
         // moment.
-        let opens = SourceOpen::of(field, ratio.moment())?;
+        let preparation_started=Instant::now();
+        let preparation=if ratio.uses_prepared_input(){
+            let mut native_charts=self.store.continuing_charts()?;
+            ratio.source_opening_preparation(field,&self.constitution,&mut native_charts,&opening.host())?
+        }else{None};
+        let source_preparation_host_ns=preparation_started.elapsed().as_nanos();
+        let mut opens = SourceOpen::of(field, ratio.moment())?;
+        if let Some(packet)=&preparation{SourceOpen::prepare(&mut opens,packet)?;}
         // The host's declared resonator operands and charts at this publication, formed once per
         // publication (`Loci::resonator_operands`); ring/contact chart refinement remains resident
         // below.
         let resonators = active_publication.loci.resonator_operands(field)?;
-        let plan = WordPlan::form(
+        let mut plan = WordPlan::form(
             field,
             &current,
             &active_publication,
-            ratio.phases(),
+            native_phases.unwrap_or_else(||ratio.phases()),
             moment,
             &opens,
             &resonators,
         )?;
+        if let Some(phases)=native_phases {plan.native_full_ticks(phases.junction_steps())?;}
         // A received opening's carry table and its words on the card (the reception carry).
         let (plan, carried) = opening.plan(plan, &active_publication.loci)?;
         let loci = &active_publication.loci;
@@ -545,7 +698,7 @@ impl<'c> Mounted<'c> {
             .map(|(g, ring)| Pair {
                 key: ChartKey::Ring(g),
                 matrix: &ring.operator,
-                words: &ring.operator_words,
+                words: Some(&ring.operator_words),
             })
             .collect();
         for (a, operator) in operators.iter().enumerate() {
@@ -555,11 +708,12 @@ impl<'c> Mounted<'c> {
                     carry: plan.contacts[a].carry.clone(),
                 },
                 matrix: &operator.operator,
-                words: &operator.words,
+                words: operator.words.as_ref(),
             });
         }
         let refined = self.store.refine(&pairs)?;
         drop(pairs);
+        let response_operands_started = Instant::now();
         let response_operands = if matches!(
             plan.receiving_layout,
             ReceivingLayout::ArrivalContext { .. }
@@ -604,6 +758,7 @@ impl<'c> Mounted<'c> {
             }),
             (None, _) => None,
         };
+        let response_operands_host_ns = response_operands_started.elapsed().as_nanos();
         let (word, launches) = ResidentWord::forward(
             card,
             plan,
@@ -614,6 +769,8 @@ impl<'c> Mounted<'c> {
             carried,
             response_operands.as_ref(),
             response_opening_base.as_ref(),
+            response_error_requested,
+            validate_error_reference,
         )?;
         self.layouts.set(Some(launches.layouts()));
         let mut word = word;
@@ -637,6 +794,9 @@ impl<'c> Mounted<'c> {
         let faces = readout::faces(&word.plan, &word.record)?;
         Ok((
             ExecutedWord {
+                source_preparation_host_ns,
+                response_operands_host_ns,
+                source_preparation: preparation.map(|p|p.receipt().clone()),
                 word,
                 operators,
                 readings: refined.readings,
@@ -993,7 +1153,7 @@ impl<'c> Resident<'c> {
                 what: "the card's founding law is owed (#76)",
             });
         }
-        let constitution = opening.continued(state)?;
+        let constitution = opening.continued_on(field, state)?;
         if let Some(carry) = state.carry() {
             if !matches!(self.reception, Reception::Carry(_)) || !carry.fits(field) {
                 return Err(HnnError::ContinuingState {
@@ -1011,6 +1171,11 @@ impl<'c> Resident<'c> {
             return Ok(resident);
         };
         let passage = ResidentPassage::from_text(field, &constitution, text)?.into_parts();
+        if passage.prepared_input.is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "device Resident cannot restore a prepared input law without its actual opening adapter",
+            });
+        }
         if passage.opens != self.reception.opens() {
             return Err(HnnError::ContinuingState {
                 what: "a saved device passage against its declared reception",
@@ -1022,6 +1187,7 @@ impl<'c> Resident<'c> {
             constitution,
             Some(passage.admitted),
         )?;
+        resident.source_return_frontier = passage.source_return_frontier;
         resident.store = ChartStore::continued(self.card, field, &passage.charts)?;
         if let Some((id, host)) = passage.moment {
             let card = ResidentMoment::restored(self.card, field, &passage.current, &host)
@@ -1100,8 +1266,8 @@ impl<'c> Resident<'c> {
             what: "a field whose word runs on no declared lattice (the card carries lattice words)",
         })?;
         let admitted = match family {
-            // The sole saved-family caller parsed ResidentPassage through the shared native
-            // owner, which validates every declaring restriction before this device allocation.
+            // Saved continuation and the observed execution facade supply already admitted
+            // native phases and validate their declaring restrictions before this allocation.
             Some(family) => family,
             None => field
                 .receivers()
@@ -1150,6 +1316,7 @@ impl<'c> Resident<'c> {
             },
             ledger: EnclosedLedger::new(),
             arrived: None,
+            source_return_frontier: BTreeMap::new(),
             released_bits: 0,
             stop: None,
             tally: ChartTally::new(field),
@@ -1368,114 +1535,7 @@ impl<'c> Resident<'c> {
         )?;
         wall.holon = start.elapsed();
         let start = Instant::now();
-        let publication = Rc::clone(&word.word.publication);
-        let map = &publication.loci.maps[phases.ring()]
-            .as_ref()
-            .ok_or(HnnError::MissingReceivingMap {
-                ring: phases.ring(),
-            })?
-            .matrix;
-        let back = if matches!(
-            word.word.plan.receiving_layout,
-            ReceivingLayout::ArrivalContext { .. }
-        ) {
-            let response_plan = word
-                .word
-                .response_plan_record()
-                .ok_or(HnnError::Unadmitted {
-                    reason: "an ArrivalContext comparison retains its executed response record",
-                })?
-                .0
-                .clone();
-            let paired = {
-                let response_record = word
-                    .word
-                    .response_plan_record()
-                    .ok_or(HnnError::Unadmitted {
-                        reason: "an ArrivalContext comparison retains its executed response record",
-                    })?
-                    .1;
-                readout::paired_source(
-                    field,
-                    &word.word.plan,
-                    &word.word.record,
-                    response_record,
-                    &covector,
-                    map,
-                )?
-            };
-            let actual_reverse = word.word.reverse(&paired.actual.carried)?;
-            let response_reverse = word.word.reverse_response(&paired.fresh.carried)?;
-            let actual_back = readout::word_return(
-                &word.word.plan,
-                &publication.loci,
-                &word.word.record,
-                &actual_reverse,
-                paired.actual,
-            )?;
-            let response_record = word
-                .word
-                .response_plan_record()
-                .ok_or(HnnError::Unadmitted {
-                    reason: "the response record survives its independent return",
-                })?
-                .1;
-            let response_back = readout::word_return(
-                &response_plan,
-                &publication.loci,
-                response_record,
-                &response_reverse,
-                paired.fresh,
-            )?;
-            let mut joined =
-                WordReturn::join_response(field, actual_back, response_back, paired.reads)?;
-            let (fresh_errors, actual_errors) =
-                word.word
-                    .response_anchor_errors()
-                    .ok_or(HnnError::Unadmitted {
-                        reason: "the response return retains both path defect certificates",
-                    })?;
-            let fresh = phases
-                .epochs()
-                .map(|crossing| {
-                    fresh_errors
-                        .get(crossing)
-                        .and_then(|at| at.get(phases.ring()))
-                        .cloned()
-                        .ok_or(HnnError::WordEnded {
-                            ticks: fresh_errors.len(),
-                        })
-                })
-                .collect::<Result<Vec<_>, _>>()?;
-            let actual = phases
-                .epochs()
-                .map(|crossing| {
-                    actual_errors
-                        .get(crossing)
-                        .and_then(|at| at.get(phases.ring()))
-                        .cloned()
-                        .ok_or(HnnError::WordEnded {
-                            ticks: actual_errors.len(),
-                        })
-                })
-                .collect::<Result<Vec<_>, _>>()?;
-            joined.response_defect = Some(PairedReadDefect {
-                fresh,
-                actual: Some(actual),
-            });
-            joined
-        } else {
-            let source =
-                readout::source(field, &word.word.plan, &word.word.record, &covector, map)?;
-            let reverse = word.word.reverse(&source.carried)?;
-            readout::word_return(
-                &word.word.plan,
-                &publication.loci,
-                &word.word.record,
-                &reverse,
-                source,
-            )?
-        };
+        let back = pull_back_word(field, &mut word, &covector, &phases)?;
         let octets = word.word.octets as u64;
         let response_octets = word.word.take_response_octets().unwrap_or(0) as u64;
         resident.count(|traffic| {
@@ -1941,7 +2001,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             })?;
         source
             .host
-            .read_retained_pair_faces(&resident.field, &resident.constitution)?;
+            .read_retained_faces(&resident.field, &resident.constitution)?;
         let mut ratio = PendingRatio::produce(
             &resident.current,
             &source.host,
@@ -1975,7 +2035,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             contacts: word
                 .operators
                 .iter()
-                .map(|operator| (&operator.words, &operator.norm))
+                .map(|operator| (&operator.operator, &operator.norm))
                 .collect(),
             readings: &word.readings,
         };
@@ -2009,6 +2069,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             field.step(),
             work,
             ReceiptDetail::Refine {
+                source_preparation: None, // This device port has no prepared-input Resident law.
                 view: ratio.view().clone(),
                 reached,
                 released_power: released.power.clone(),

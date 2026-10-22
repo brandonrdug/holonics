@@ -540,6 +540,14 @@
 //! | `HNN/LatticeDeposit.lattice_deposit_descends` | [`Constitution::deposited`] with `hnn::retention::collapse` |
 //! | `HNN/Ring.gain_backtrack_midpoint` | [`GainBacktrack`], [`DepositReading::backtracks`] |
 
+pub(crate) mod epoch;
+pub use epoch::{EpochReceivingRayPacket, EpochReceivingStationReading};
+#[cfg(test)]
+mod tube_tests;
+pub use epoch::device::{
+    EpochProducerRecordReading, EpochRecordFlowReading, epoch_record_flow_admit,
+    epoch_record_flow_canonicalize, epoch_record_flow_reference, epoch_record_operands,
+};
 pub mod receiving_blocks;
 mod receiving_material;
 mod receiving_prepared;
@@ -569,7 +577,8 @@ use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_integral};
 use crate::hnn::receiving::{ReceivingStep, landmark_declaration, receiving_population};
 use crate::hnn::ring::{
-    Floquet, FloquetBound, FloquetReading, ResonatorMaterial, ResonatorOperands, attain_metric,
+    Floquet, FloquetBound, FloquetReading, ResonatorMaterial, ResonatorOperands, TubeMetric,
+    TubePassage, TubeReach, attain_metric,
 };
 use crate::hnn::word::ReceptionCarry;
 use crate::holon::deposition::{
@@ -2170,18 +2179,15 @@ pub struct Sample {
     pub weight: Rat,
     pub feature: Vec<Rat>,
     pub covector: Vec<Rat>,
-    /// [definition; agent-inferred, October 8] **The face's own odometer masses `p̃`** on its classes
-    /// (one entry per class, nonnegative, summing to one exactly): the very `p̃` the covector's
-    /// magnitude entries `q − p̃` were formed from, `None` where the producer has none. A receiving
-    /// covector is one equation in two distributions, `g_(2c) = q_c − p̃_c`, and
-    /// [`face_masses`] can split it alone only for a one-hot `q` (it reads `q` as the class whose
-    /// entry is positive). A soft observed face (`hnn::ratio::ReceivingFaceRatio`: the World's
-    /// actual face) is not one-hot: with `p̃ = (½, ½)` against `q = (⅔, ⅓)` the covector `(⅙, −⅙)`
-    /// would be read as `p̃ = (⅚, ⅙)`, a distribution too, and accepted. A producer whose target is not
-    /// one-hot therefore carries `p̃` beside the covector, and every consumer of the face's masses
-    /// reads them here ([`face_masses`]). Every one-hot comparison and every source and contrast
-    /// sample leaves it `None`. The class metric's copy ([`receiving_metric_samples`]) carries it
-    /// through although its scaled covector is no longer `q − p̃`.
+    /// The selected producing face's normalized masses, one per class.
+    /// The law-tagged receiving owner distinguishes coarse odometer from retained full-fibre values.
+    /// They are carried for soft targets and for an epoch's partitioned
+    /// magnitude covector q-p_hat, including a one-hot observed target.
+    /// Fisher and alignment certificates read this original p_tilde; it is
+    /// neither another return RHS nor a second partition. Legacy one-hot
+    /// comparisons may leave it None when q-p_tilde identifies the masses.
+    /// Source and contrast samples leave it None. The receiving class metric
+    /// preserves it even when shaping its copy of the covector.
     pub masses: Option<Vec<Rat>>,
 }
 
@@ -2198,6 +2204,9 @@ pub struct Sample {
 /// an exact `(H, B)`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NormalLaw {
+    /// Epoch mode owns W/H/R once, in grouped coordinates. Legacy map and Gram
+    /// are empty in this mode and never act as publication caches.
+    epoch: Option<Box<epoch::EpochLaw>>,
     map: ExactRatMatrix,
     /// Receiving carrier identity, preserved by every normal-law successor. Source and
     /// contrast laws leave this at Anchor; observer binding is a fresh receiving declaration.
@@ -2220,6 +2229,11 @@ pub struct NormalLaw {
     symmetry: Option<PortSymmetry>,
 }
 
+struct NormalStatistics<'a> {
+    samples: Vec<(&'a Sample, Chart)>,
+    gram: Vec<Rat>,
+}
+
 impl NormalLaw {
     /// **The unit prior at a map**: `H_0 = I` (so `B_0 = W_0`), no remainder, and the founding chart
     /// `X̂ = I` exact (`δ = 0`). [agent-inferred, October 2; the
@@ -2233,6 +2247,7 @@ impl NormalLaw {
         let n = map.columns();
         let identity: Vec<Vec<Rat>> = (0..n).map(|i| unit(n, i)).collect();
         Self {
+            epoch: None,
             gram: identity,
             chart: SolvedChart::identity(),
             map,
@@ -2268,6 +2283,7 @@ impl NormalLaw {
             })
             .collect();
         Self {
+            epoch: None,
             gram,
             chart: SolvedChart::founded(scale),
             map,
@@ -2321,7 +2337,7 @@ impl NormalLaw {
     /// Whether the law is at its founding: the unit prior, no remainder, the identity chart, no
     /// founding declaration, statistics or symmetry; only its map is declared.
     fn is_founding(&self) -> bool {
-        *self == Self::with_prior(self.map.clone())
+        self.epoch.is_none() && *self == Self::with_prior(self.map.clone())
     }
 
     /// The paired port's declared symmetry, `None` unless the law's port is paired.
@@ -2333,7 +2349,8 @@ impl NormalLaw {
     /// unless the symmetry has the map's shape, the map lies on the subspace and the Gram commutes
     /// with `Σ`.
     pub(crate) fn with_symmetry(self, symmetry: PortSymmetry) -> Result<Self, HnnError> {
-        let (m, n) = (self.map.rows(), self.map.columns());
+        let view = self.map();
+        let (m, n) = (view.rows(), view.columns());
         if symmetry.rows().len() != m || symmetry.columns().len() != n {
             return Err(HnnError::Shape {
                 what: "a port symmetry against its law's map",
@@ -2354,7 +2371,9 @@ impl NormalLaw {
     /// `Σ r_H Σ = r_H`), and the solved chart commuting with `Σ` on a support closed under it. A law
     /// that does not is refused, never repaired.
     fn admits_symmetry(&self, symmetry: &PortSymmetry) -> Result<(), HnnError> {
-        for map in [&self.map, &self.map_remainder()] {
+        let map_view = self.map();
+        let remainder = self.map_remainder();
+        for map in [map_view, &remainder] {
             if let Some((column, partner, row)) = symmetry.first_failure(map)? {
                 return Err(HnnError::PairedPort {
                     column,
@@ -2363,7 +2382,8 @@ impl NormalLaw {
                 });
             }
         }
-        let n = self.gram.len();
+        let gram = self.gram().to_rows();
+        let n = gram.len();
         let commutes = |matrix: &[Vec<Rat>]| {
             (0..n).all(|i| {
                 (0..n).all(|j| matrix[i][j] == matrix[symmetry.column(i)][symmetry.column(j)])
@@ -2374,7 +2394,7 @@ impl NormalLaw {
             .support
             .iter()
             .all(|&i| self.chart.support.contains(&symmetry.column(i)));
-        if !commutes(&self.gram)
+        if !commutes(&gram)
             || !commutes(&self.gram_remainder().to_rows())
             || !commutes(&self.chart.dense(n))
             || !closed
@@ -2388,18 +2408,100 @@ impl NormalLaw {
 
     /// `W`.
     pub fn map(&self) -> &ExactRatMatrix {
+        // Epoch mode's read-only publication view is built once at crossing,
+        // never saved or charged as a second canonical constitutive payload.
         &self.map
+    }
+
+    pub fn epoch_storage(&self) -> Option<EpochStorageReading> {
+        let law = self.epoch.as_deref()?;
+        let read = |array: &epoch::EpochArray| EpochArrayReading {
+            numerical_denominator: array.native_rational.map(|_|array.denominator.clone()),
+            rows: array.rows,
+            columns: array.columns,
+            exponent: array.exponent,
+            maximum_integer_bits: array.values.iter().map(BigInt::bits).max().unwrap_or(0),
+            magnitude_limbs: array.magnitude_limbs(),
+            row_odd_divisors: array.row_divisors.clone(),
+            numerator_l1_bound: array.numerator_l1_bound.clone(),
+        };
+        let (_, _, base, moves) = law.spectral.checkpoint_words();
+        let prior = &law.gram.denominator << self.chart.scale as usize;
+        let gram_departed_prior_rows = (0..law.gram.rows)
+            .filter(|&row| {
+                (0..law.gram.columns).any(|column| {
+                    let value = &law.gram.values[row * law.gram.columns + column];
+                    if row == column {
+                        value != &prior
+                    } else {
+                        !value.is_zero()
+                    }
+                })
+            })
+            .count();
+        Some(EpochStorageReading {
+            map_lattice: law.map_lattice,
+            source_refinement: law.source_refinement,
+            crossings: law.crossings,
+            gram_departed_prior_rows,
+            map: read(&law.map),
+            gram: read(&law.gram),
+            news: read(&law.news),
+            spectral_gram_bound: base.clone(),
+            spectral_move_bound: moves.clone(),
+        })
+    }
+
+    pub(crate) fn epoch_law(&self) -> Option<&epoch::EpochLaw> {
+        self.epoch.as_deref()
+    }
+
+    pub(crate) fn publish_epoch(&mut self, law: epoch::EpochLaw) -> Result<(), HnnError> {
+        self.map = law.map.to_matrix()?;
+        self.install_epoch(law);
+        Ok(())
+    }
+
+    /// Install the canonical payload after its map read view has been built.
+    /// Native decode already needs that same view for its phase metadata.
+    fn install_epoch(&mut self, law: epoch::EpochLaw) {
+        // No duplicate retained W/H or stale native carry is kept beside the
+        // canonical grouped owner. Scalar prior identity remains a declaration.
+        self.gram.clear();
+        self.map_carry = Carry::default();
+        self.gram_carry = Carry::default();
+        self.chart = SolvedChart::founded(self.chart.scale);
+        self.epoch = Some(Box::new(law));
+    }
+
+    fn require_legacy(&self) -> Result<(), HnnError> {
+        if self.epoch.is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "an epoch normal law requires its grouped deposit, not the legacy solved-chart step",
+            });
+        }
+        Ok(())
     }
 
     /// `H`, the carried Gram.
     pub fn gram(&self) -> ExactRatMatrix {
-        rows_matrix(&self.gram)
+        match &self.epoch {
+            Some(law) => law.gram.to_matrix().expect("admitted grouped epoch Gram"),
+            None => rows_matrix(&self.gram),
+        }
     }
 
     /// `X̂ ≈ H⁻¹`, the solved chart of the carried Gram, dense: within `δ` of the inverse in its
     /// left residual, `‖1 − X̂H‖∞ = δ` ([`NormalLaw::chart`]).
     pub fn solved(&self) -> ExactRatMatrix {
-        rows_matrix(&self.chart.dense(self.gram.len()))
+        match &self.epoch {
+            Some(law) => law
+                .gram
+                .to_matrix()
+                .and_then(|gram| Ok(gram.inverse()?))
+                .expect("an admitted epoch Gram is positive definite"),
+            None => rows_matrix(&self.chart.dense(self.gram.len())),
+        }
     }
 
     /// The solved chart, with its lattice and certificate.
@@ -2410,6 +2512,7 @@ impl NormalLaw {
     /// The chart's rule exponent at this carried Gram and prior, before a paired mean's
     /// possible extra level. Reads the same Gram norm that deposition and prior motion use.
     pub fn chart_rule_exponent(&self, rule: &ChartRule) -> Result<u32, HnnError> {
+        self.require_legacy()?;
         let carried = GramBlock::of(&self.gram, &self.chart.prior(), None, None, None, None)?;
         Ok(rule
             .exponent(self.gram.len(), carried.norm)
@@ -2423,7 +2526,8 @@ impl NormalLaw {
 
     /// `W`'s carried remainders, dense.
     pub fn map_remainder(&self) -> ExactRatMatrix {
-        let (m, n) = (self.map.rows(), self.map.columns());
+        let view = self.map();
+        let (m, n) = (view.rows(), view.columns());
         rows_matrix(
             &(0..m)
                 .map(|i| (0..n).map(|j| self.map_carry.at(i * n + j)).collect())
@@ -2433,7 +2537,7 @@ impl NormalLaw {
 
     /// `H`'s carried remainders, dense.
     pub fn gram_remainder(&self) -> ExactRatMatrix {
-        let n = self.gram.len();
+        let n = self.map().columns();
         rows_matrix(
             &(0..n)
                 .map(|i| (0..n).map(|j| self.gram_carry.at(i * n + j)).collect())
@@ -2441,33 +2545,55 @@ impl NormalLaw {
         )
     }
 
-    /// **The carried prox step through the solved chart, prepared at its unit step** (Lean
-    /// `HNN/Normal.normal_prox_step`, `HNN/LatticeDeposit.carry`, `HNN/LatticeWord.prox_chart_residual`;
-    /// module header, "The certified step"): `ΔH = Σ w f fᵀ` carried onto `H` gives `H'`; the chart of
-    /// `H'` follows from the previous chart ([`SolvedChart`]: the warm start, its exact certificate
-    /// and the rounded refinements to `δ ≤ δ_ℓ` of the locus's [`ChartRule`]); then the **unit step**
-    /// `D = Σ w g (X̂f)ᵀ` is formed in the integral chart with the readings its certificate needs: the
-    /// alignment `a = Σ_t w ⟨g_t, D f_t⟩` (checked, never assumed), the feature moves
-    /// `b = Σ_t w |D f_t|²`, the lattice's covector scale `c = max_t |w g_t|_∞`, and the Schur norms of
-    /// `W` and `D`. The step `η` is certified by the constitution (it reads every locus's gains) and
-    /// applied by [`PreparedStep::stepped`]: `ΔW = η D`, so `(W + ΔW)H' = WH' + ηG − ηG(1 − X̂H')`
-    /// exactly, with `G = Σ w g fᵀ`. The Gram's carry is at the budgeted carry `at` of the locus's
-    /// deposit (its residuals staged there). `None` when nothing reached the locus (no nonzero
-    /// weighted feature), which moves nothing.
-    ///
-    /// [definition; agent-inferred] **The sums are read in the integral chart**: each sample's
-    /// feature and covector is charted once as integers over its least common denominator
-    /// (`ratio::linear::vector::integral`), each reach `X̂f` is an integer product over the feature's
-    /// denominator times `2^(L_s)`, each sum of rank-one terms is formed over integers and each entry
-    /// normalized once (`D` by row blocks, the symmetric `ΔH` on its upper triangle and mirrored). A
-    /// reduced ratio is canonical, so every value equals the termwise rational sum's.
-    pub(crate) fn prepare(
+    /// The exact statistics of readings at this law: `(G, ΔH)`, before lattice carry or a solved
+    /// chart is applied. A paired port uses the same projection of `G` and symmetrization of `ΔH`
+    /// as [`NormalLaw::prepare`] (Lean `HNN/PairedDeposit.mul_commuting_stays`). This read does not
+    /// prepare or deposit a step and does not change the law. In particular, `G` is not the native
+    /// prepared unit step, which also depends on the successor's solved chart.
+    pub fn projected_statistics(
         &self,
         samples: &[Sample],
-        rule: &ChartRule,
-        at: &mut BudgetedCarry,
-    ) -> Result<Option<PreparedStep>, HnnError> {
-        let (m, n) = (self.map.rows(), self.map.columns());
+    ) -> Result<(ExactRatMatrix, ExactRatMatrix), HnnError> {
+        let view = self.map();
+        let (m, n) = (view.rows(), view.columns());
+        let Some(NormalStatistics {
+            samples: active,
+            gram,
+        }) = self.sample_statistics(samples)?
+        else {
+            return Ok((ExactRatMatrix::zero(m, n)?, ExactRatMatrix::zero(n, n)?));
+        };
+        let covectors: Vec<Chart> = active
+            .iter()
+            .map(|(sample, _)| integral(&sample.covector))
+            .collect();
+        let cross = outer_integral(
+            m,
+            n,
+            &active
+                .iter()
+                .zip(&covectors)
+                .map(|((sample, feature), covector)| (&sample.weight, covector, feature))
+                .collect::<Vec<_>>(),
+        );
+        let cross = match &self.symmetry {
+            Some(symmetry) => cross.projected(symmetry.rows(), symmetry.columns()),
+            None => cross,
+        };
+        Ok((
+            ExactRatMatrix::shaped(m, n, cross.to_rows())?,
+            ExactRatMatrix::shaped(n, n, gram.chunks(n).map(<[Rat]>::to_vec).collect())?,
+        ))
+    }
+
+    /// Validate and chart the reached samples and form their native Gram update once, for
+    /// both deposition and read-only statistics. Empty input keeps prepare's no-step path.
+    fn sample_statistics<'a>(
+        &self,
+        samples: &'a [Sample],
+    ) -> Result<Option<NormalStatistics<'a>>, HnnError> {
+        let view = self.map();
+        let (m, n) = (view.rows(), view.columns());
         for sample in samples {
             if sample.feature.len() != n || sample.covector.len() != m {
                 return Err(HnnError::Shape {
@@ -2497,7 +2623,6 @@ impl NormalLaw {
                 }
             }
         }
-        let mut law = self.clone();
         // ΔH = Σ w f fᵀ, carried onto H; on a paired port ½(ΔH + Σ ΔH Σ), so H keeps commuting with Σ.
         let gram_update = gram_sum(
             n,
@@ -2509,6 +2634,49 @@ impl NormalLaw {
             Some(symmetry) => symmetrized_gram(n, &gram_update, symmetry),
             None => gram_update,
         };
+        Ok(Some(NormalStatistics {
+            samples: active,
+            gram: gram_update,
+        }))
+    }
+
+    /// **The carried prox step through the solved chart, prepared at its unit step** (Lean
+    /// `HNN/Normal.normal_prox_step`, `HNN/LatticeDeposit.carry`, `HNN/LatticeWord.prox_chart_residual`;
+    /// module header, "The certified step"): `ΔH = Σ w f fᵀ` carried onto `H` gives `H'`; the chart of
+    /// `H'` follows from the previous chart ([`SolvedChart`]: the warm start, its exact certificate
+    /// and the rounded refinements to `δ ≤ δ_ℓ` of the locus's [`ChartRule`]); then the **unit step**
+    /// `D = Σ w g (X̂f)ᵀ` is formed in the integral chart with the readings its certificate needs: the
+    /// alignment `a = Σ_t w ⟨g_t, D f_t⟩` (checked, never assumed), the feature moves
+    /// `b = Σ_t w |D f_t|²`, the lattice's covector scale `c = max_t |w g_t|_∞`, and the Schur norms of
+    /// `W` and `D`. The step `η` is certified by the constitution (it reads every locus's gains) and
+    /// applied by [`PreparedStep::stepped`]: `ΔW = η D`, so `(W + ΔW)H' = WH' + ηG − ηG(1 − X̂H')`
+    /// exactly, with `G = Σ w g fᵀ`. The Gram's carry is at the budgeted carry `at` of the locus's
+    /// deposit (its residuals staged there). `None` when nothing reached the locus (no nonzero
+    /// weighted feature), which moves nothing.
+    ///
+    /// [definition; agent-inferred] **The sums are read in the integral chart**: each sample's
+    /// feature and covector is charted once as integers over its least common denominator
+    /// (`ratio::linear::vector::integral`), each reach `X̂f` is an integer product over the feature's
+    /// denominator times `2^(L_s)`, each sum of rank-one terms is formed over integers and each entry
+    /// normalized once (`D` by row blocks, the symmetric `ΔH` on its upper triangle and mirrored). A
+    /// reduced ratio is canonical, so every value equals the termwise rational sum's.
+    pub(crate) fn prepare(
+        &self,
+        samples: &[Sample],
+        rule: &ChartRule,
+        at: &mut BudgetedCarry,
+    ) -> Result<Option<PreparedStep>, HnnError> {
+        self.require_legacy()?;
+        let view = self.map();
+        let (m, n) = (view.rows(), view.columns());
+        let Some(NormalStatistics {
+            samples: active,
+            gram: gram_update,
+        }) = self.sample_statistics(samples)?
+        else {
+            return Ok(None);
+        };
+        let mut law = self.clone();
         let mut gram: Vec<Rat> = self.gram.iter().flatten().cloned().collect();
         law.gram_carry
             .deposit_all(at, Carrier::Gram, &mut gram, &gram_update);
@@ -2655,6 +2823,42 @@ impl NormalLaw {
     /// (Epime's review, October 8: retained and checkpointed, they are charged to the census the
     /// budget admits against, never carried outside it).
     fn carrier_bits(&self) -> CarrierBits {
+        if let Some(law) = &self.epoch {
+            let entries = [&law.map, &law.gram, &law.news]
+                .iter()
+                .map(|array| {
+                    array
+                        .values
+                        .iter()
+                        .map(|v| v.bits().saturating_add(1))
+                        .sum::<u64>()
+                        + array.denominator.bits()
+                        + if array.native_rational.is_some(){128}else{0}
+                        + array
+                            .row_divisors
+                            .iter()
+                            .map(|d| u64::from(u64::BITS - d.leading_zeros()))
+                            .sum::<u64>()
+                })
+                .sum::<u64>()
+                + self.phase.as_ref().map_or(0, |phase| phase.bits())
+                + self.symmetry.as_ref().map_or(0, PortSymmetry::bits)
+                // An adaptive source lattice is future-sufficient material,
+                // even when W cancels to a smaller canonical exponent.
+                + if law.source_refinement || law.receiving_refinement.is_some() {
+                    u64::from(law.map_lattice) + 1
+                } else {
+                    1
+                } + law.receiving_refinement.map_or(0,|cap| u64::from(cap)+1);
+            let (_, _, base, moves) = law.spectral.checkpoint_words();
+            return CarrierBits {
+                entries,
+                remainders: 0,
+                solved: bits(base)
+                    + bits(moves)
+                    + u64::from(u64::BITS - law.crossings.leading_zeros()),
+            };
+        }
         CarrierBits {
             entries: self
                 .map
@@ -2672,11 +2876,373 @@ impl NormalLaw {
 
     /// Whether every entry of `W` and `H` lies on the lattice.
     fn on_lattice(&self, lattice: &Lattice) -> bool {
+        if let Some(law) = &self.epoch {
+            // The realization lattice constrains W. Explicit native rational
+            // H/news retain their own bounded numerical carrier, admitted by
+            // the versioned normal codec/field owner, rather than being rounded
+            // onto that material lattice. Legacy grouped Gram stays dyadic.
+            let statistics = if law.native_rational.is_some() {
+                self.receiving_prior.is_some() && law.admit_native_statistics().is_ok()
+            } else { law.gram.is_dyadic() };
+            return law.map.is_dyadic()
+                && statistics
+                && law
+                    .map
+                    .to_matrix()
+                    .is_ok_and(|map| map.entries().iter().all(|value| lattice.contains(value)));
+        }
         self.map
             .entries()
             .iter()
             .chain(self.gram.iter().flatten())
             .all(|value| lattice.contains(value))
+    }
+}
+
+/// A grouped array's actual storage words at a crossing. Bounds are exact
+/// integer numerator bounds; the row divisors preserve phase/magnitude identity.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochArrayReading {
+    /// Explicit numerical carrier denominator; None retains the old dyadic base.
+    pub numerical_denominator: Option<BigInt>,
+    pub rows: usize,
+    pub columns: usize,
+    pub exponent: u32,
+    pub maximum_integer_bits: u64,
+    pub magnitude_limbs: u64,
+    pub row_odd_divisors: Vec<u64>,
+    pub numerator_l1_bound: BigInt,
+}
+
+/// Contemporary grouped constitution storage. Record multiplicities belong to
+/// the crossing receipt, not to this future-sufficient retained state.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochStorageReading {
+    pub map_lattice: u32,
+    pub source_refinement: bool,
+    pub crossings: u64,
+    /// Rows of canonical H differing from its declared scaled diagonal prior.
+    /// This is an actual statistic support, independent of any retired solve.
+    pub gram_departed_prior_rows: usize,
+    pub map: EpochArrayReading,
+    pub gram: EpochArrayReading,
+    pub news: EpochArrayReading,
+    pub spectral_gram_bound: Rat,
+    pub spectral_move_bound: Rat,
+}
+
+/// Exact grouped series in a transient crossing receipt.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochSeriesReading {
+    /// Explicit numerical carrier denominator; None retains the old dyadic base.
+    pub numerical_denominator: Option<BigInt>,
+    pub rows: usize,
+    pub columns: usize,
+    pub exponent: u32,
+    pub row_odd_divisors: Vec<u64>,
+    pub numerators: Vec<BigInt>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochReceivingSeries {
+    pub positive: EpochSeriesReading,
+    pub foil: EpochSeriesReading,
+    pub phase: EpochSeriesReading,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochLocusDepositReading {
+    pub locus: LinearLocus,
+    pub records: u64,
+    pub fresh_covector_scale: Rat,
+    pub fresh_alignment: Rat,
+    /// Conservative upper endpoint on `2^(-2 receiver_partition_bits)`.
+    pub odometer_alignment_defect: Rat,
+    /// Signed upper endpoint on the same grid, clipped at zero only in the
+    /// certificate. Raw producing masses remain exact within each sample.
+    pub partition_alignment_extra: Rat,
+    pub certificate_alignment: Rat,
+    /// Conservative Fisher-move upper endpoint on the epoch certificate grid.
+    pub certificate_moves: Rat,
+    pub certificate_covector_scale: Rat,
+    pub gamma: Rat,
+    /// Actual represented delta's comparison alignment/moves at step one.
+    pub actual_alignment: Rat,
+    pub actual_moves: Rat,
+    pub eta: Rat,
+    pub fall: Rat,
+    /// The local dyadic junction conductance shares, M_jj=2^shares[j].
+    pub shares: Vec<i64>,
+    pub gram_update: EpochArrayReading,
+    pub fresh_news: EpochArrayReading,
+    pub direction: EpochArrayReading,
+    /// The actual proposed direction is `direction / direction_divisor`. The divisor is
+    /// transient and never a retained row factor or the material step's eta denominator.
+    pub direction_divisor: BigInt,
+    pub joint_direction: Option<EpochJointDirectionReading>,
+    /// Exact squared normal-metric norms on the actual paired reached support/S.
+    /// Missing means the exterior reading was unavailable; it changes no admission.
+    pub retained_news_metric_squared: Option<Rat>,
+    pub fresh_news_metric_squared: Option<Rat>,
+    pub represented_step: EpochArrayReading,
+    /// Transient scale/projection operands of this actual candidate, never checkpoint state.
+    pub scale: EpochLocusScaleReading,
+    pub storage: EpochStorageReading,
+}
+
+/// Exterior scale operands, after the original candidate passed its physical certificates.
+/// Rows retain the map's declared order (receiving real/phase rows remain separate).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochLocusScaleReading {
+    /// Absolute column sums of the actual paired H+, in its own feature coordinates.
+    /// Compare the existing `shares`' dyadic S only on reached columns.
+    pub gram_column_absolute_sums: Vec<Rat>,
+    pub positive_eta: bool,
+    pub proposed_nonzero_by_row: Vec<usize>,
+    pub represented_nonzero_by_row: Vec<usize>,
+    /// A zero eta holds a proposal; it must not be called lattice truncation.
+    pub nonzero_proposal_zero_in_step_by_row: Vec<usize>,
+    /// Includes the direction's row factors and transient joint divisor.
+    pub proposed_maximum_absolute_by_row: Vec<Rat>,
+}
+
+/// Exterior operands of one exact minimum-segment proposal. `w` and `D` below are their
+/// grouped numerators divided by `divisor`; row divisors/exponents remain operative too.
+/// This is a proposal reading, not a seal, a finite comparison, or retained model state.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochJointDirectionReading {
+    pub locus: LinearLocus,
+    pub alpha: Rat,
+    pub metric_n: Rat,
+    pub metric_q: Rat,
+    pub support: Vec<usize>,
+    /// S_j = 2^shares[j] on support; unreached columns are held.
+    pub shares: Vec<i64>,
+    pub numerator_w: EpochSeriesReading,
+    pub numerator_direction: EpochSeriesReading,
+    pub divisor: BigInt,
+    pub normal_pairing: Rat,
+    pub current_scaled_pairing: Rat,
+    pub squared_norm: Rat,
+    pub zero_direction: bool,
+    pub projected_step: Option<EpochSeriesReading>,
+    pub lattice_exponent: Option<u32>,
+    pub normal_fall: Option<Rat>,
+    pub unit_lower_bound: Option<Rat>,
+}
+
+/// Exterior account of a finite optional receiving projection. No trial is retained material.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochQuantumProjectionReading {
+    pub eligible: bool,
+    pub skip_reason: Option<&'static str>,
+    pub trials: Vec<EpochQuantumTrialReading>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochQuantumTrialReading {
+    pub row: usize,
+    pub column: usize,
+    pub sign: i8,
+    pub normal_admitted: bool,
+    pub actual_admitted: bool,
+    pub refusal: Option<epoch::EpochStageRefusal>,
+    pub reason: Option<String>,
+}
+
+/// Exterior account of the absolute receiver-clock channel target. No schedule history is
+/// installed in a continuing state; its current lattice and actual ingress suffice.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochChannelGrainReading {
+    pub receiver: usize,
+    pub ingress_before: u64,
+    pub ingress_after: u64,
+    pub grain_exponent: u32,
+    pub contacts: Vec<EpochChannelGrainContactReading>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochChannelGrainContactReading {
+    pub contact: usize,
+    pub founding_exponent: u32,
+    pub target_exponent: u32,
+    pub before_exponent: u32,
+    pub after_exponent: u32,
+    pub levels: u32,
+    pub shortfall: u32,
+    pub limiting_held_factor: Option<(Carrier, usize, Rat)>,
+    pub deferred_without_fresh_update: bool,
+    /// All three scales are statistics; each rebases with its own carry, without fresh energy.
+    pub scale_rebase: [Rat; 3],
+    /// Rebase alone, before the fresh staged quotient; the actual ray reads their sum.
+    pub dissipation_rebase: EpochSeriesReading,
+    pub dissipation_scale_rebase: Rat,
+}
+
+/// Exterior account of one inconclusive target comparison. No channel target was staged;
+/// the observed epoch keeps its ordinary D-scope admission and retries at its next own N.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochChannelGrainDeferralReading {
+    pub receiver: usize,
+    pub ingress_before: u64,
+    pub ingress_after: u64,
+    pub reason: &'static str,
+}
+
+/// A discarded optional grain candidate, followed by the ordinary same-opening ladder.
+/// These operands are exterior evidence only; no refusal or schedule history is retained.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochChannelGrainRestageReading {
+    pub grain: EpochChannelGrainReading,
+    pub refused_attempt: epoch::EpochStageAttempt,
+    pub stage_refusal: Option<epoch::EpochStageRefusal>,
+    pub probe_refusal: Option<String>,
+}
+
+/// A zero-applied-map successor independently admitted after one typed local ray decline.
+/// Transient evidence; actual normal state/frontiers, not this record, survive cold restore.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochHeldReceivingReading {
+    pub original_decline: Box<epoch::EpochStageRefusal>,
+    pub gamma: Rat,
+    pub crossings_before: u64,
+    pub crossings_after: u64,
+    pub gram_update: EpochSeriesReading,
+    pub fresh_covector: EpochSeriesReading,
+    pub news_before: EpochSeriesReading,
+    pub news_after: EpochSeriesReading,
+}
+
+/// A fresh, versioned material representation declaration. It changes neither
+/// the receiver observation grain nor the normal law/returned current.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReceivingRepresentationPolicy {
+    FixedLatticeV1,
+    BoundedSubquantumV1,
+}
+impl ReceivingRepresentationPolicy {
+    /// Declared engineering ceiling, not an exact-arithmetic or physical constant.
+    pub const CEILING: u32 = 20;
+    pub(crate) fn ceiling(self) -> Option<u32> {
+        match self { Self::FixedLatticeV1 => None, Self::BoundedSubquantumV1 => Some(Self::CEILING) }
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReceivingRepresentationDisposition {
+    Unchanged, ExactZero, NoFreshGain, AlreadyRepresentable, Refined,
+    CeilingUnresolved, BudgetUnresolved,
+}
+/// Exact transient operands of the one directly derived representation candidate.
+/// An attempted finer ray can still be refused by the actual native certificate.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochReceivingRepresentationReading {
+    pub before: u32,
+    pub proposed: u32,
+    pub ceiling: u32,
+    pub minimum_nonzero: Option<u32>,
+    pub disposition: ReceivingRepresentationDisposition,
+    pub direction: EpochSeriesReading,
+    pub predicted_whole_bits: Option<u64>,
+}
+
+/// Transient independently charted normal blocks; never a joined normal law.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochPairedReceivingBlockReading {
+    pub representation: Option<EpochReceivingRepresentationReading>,
+    pub index: usize,
+    pub operand_scale: Rat,
+    pub aggregation_scale: Rat,
+    pub crossings_before: u64,
+    pub crossings_after: u64,
+    pub gamma: Rat,
+    pub eta: Rat,
+    pub normal_fall: Rat,
+    pub gram_update: EpochSeriesReading,
+    pub fresh_covector: EpochSeriesReading,
+    pub news_before: EpochSeriesReading,
+    pub news_after: EpochSeriesReading,
+    pub represented_step_internal: EpochSeriesReading,
+}
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochPairedReceivingReading {
+    pub representation_policy: ReceivingRepresentationPolicy,
+    pub source_width: usize,
+    pub fresh_physical_alignment: Rat,
+    pub fresh_return_error: Rat,
+    pub fresh_moves: Rat,
+    pub actual_alignment: Option<Rat>,
+    pub actual_moves: Option<Rat>,
+    pub actual_physical_step: EpochSeriesReading,
+    pub held_original_decline: Option<Box<epoch::EpochStageRefusal>>,
+    /// Legacy held scalar fields refer to this explicit representative block.
+    pub held_representative_block: Option<usize>,
+    pub blocks: Vec<EpochPairedReceivingBlockReading>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochDepositReading {
+    pub paired_receiving: Option<EpochPairedReceivingReading>,
+    /// Actual producing-cut C/K dispositions, only in the explicitly selected material scope.
+    pub channel_endpoints: Vec<EpochChannelEndpointReading>,
+    pub channel_grain: Option<EpochChannelGrainReading>,
+    pub channel_grain_deferred: Option<EpochChannelGrainDeferralReading>,
+    pub channel_grain_restaged: Option<EpochChannelGrainRestageReading>,
+    pub quantum_projection: Option<EpochQuantumProjectionReading>,
+    pub held_receiving: Option<EpochHeldReceivingReading>,
+    pub actual_receiving_ingress: u64,
+    pub heard_cells: u64,
+    pub declared_cells: u64,
+    pub receiver_partition_bits: u32,
+    pub partition_exponent: u32,
+    pub loci: Vec<EpochLocusDepositReading>,
+    /// Fresh rays selected gamma; only DepositReading::joint/steps certify
+    /// the actual represented normal deltas after retained R was consumed.
+    pub fresh_joint: Option<JointReading>,
+    pub fresh_steps: Vec<(Locus, StepReading)>,
+    pub receiving: EpochReceivingSeries,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct EpochChannelEndpointReading {
+    pub contact: usize,
+    pub producing_tick: usize,
+    pub momentum: Vec<Rat>,
+    pub rate_before: Vec<Rat>,
+    pub rate_after: Vec<Rat>,
+    pub attempted_work: Option<Rat>,
+    pub applied_work: Rat,
+    pub reflected: Option<&'static str>,
+    pub attempted_factor_delta: [ExactRatMatrix; 2],
+    pub applied_factor_delta: [ExactRatMatrix; 2],
+    pub applied_form_delta: [ExactRatMatrix; 2],
+    /// Unpublished factor residuals/quotients removed by reflection, kept as evidence only.
+    pub reflected_entries: Vec<(Carrier, usize, Rat, BigInt)>,
+}
+
+impl EpochArrayReading {
+    pub(crate) fn of(array: &epoch::EpochArray) -> Self {
+        Self {
+            numerical_denominator: array.native_rational.map(|_|array.denominator.clone()),
+            rows: array.rows,
+            columns: array.columns,
+            exponent: array.exponent,
+            maximum_integer_bits: array.values.iter().map(BigInt::bits).max().unwrap_or(0),
+            magnitude_limbs: array.magnitude_limbs(),
+            row_odd_divisors: array.row_divisors.clone(),
+            numerator_l1_bound: array.numerator_l1_bound.clone(),
+        }
+    }
+}
+impl EpochSeriesReading {
+    pub(crate) fn of(array: &epoch::EpochArray) -> Self {
+        Self {
+            numerical_denominator: array.native_rational.map(|_|array.denominator.clone()),
+            rows: array.rows,
+            columns: array.columns,
+            exponent: array.exponent,
+            row_odd_divisors: array.row_divisors.clone(),
+            numerators: array.values.clone(),
+        }
     }
 }
 
@@ -3460,6 +4026,9 @@ struct RingMaterial {
     transport: Rat,
 }
 
+/// Only the actual new-material constructor can issue historical-release origin.
+pub(crate) struct NativeRoundingFoundingSeal(());
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct ContactMaterial {
     storage: ExactRatMatrix,
@@ -3566,6 +4135,207 @@ pub enum Carrier {
 }
 
 type Carries = BTreeMap<(Locus, Carrier), Carry>;
+
+/// Re-base the predecessor's physical C/K arrays onto a candidate channel's
+/// finer lattice for a held control. This is the existing lossless carry law:
+/// only the two held physical factor arrays are read here because every other
+/// candidate carrier (including D and the three factor scales) remains the
+/// candidate's. The epoch refinement owner is responsible for the all-six
+/// rebase on the actual arm. A control may not make the held predecessor's raw
+/// C/K forms move: if an old carry would land in either form at the candidate
+/// grain, the matched control is refused rather than silently changing the
+/// held material.
+fn held_ck_at_lattice(
+    storage: &ExactRatMatrix,
+    stiffness: &ExactRatMatrix,
+    storage_carry: &Carry,
+    stiffness_carry: &Carry,
+    old_lattice: Lattice,
+    candidate_lattice: Lattice,
+    old_clock: u64,
+    candidate_clock: u64,
+) -> Result<(ExactRatMatrix, ExactRatMatrix, Carry, Carry), HnnError> {
+    let refuse = || HnnError::Unadmitted {
+        reason: "a held C/K predecessor must be canonical and losslessly representable at the candidate channel grain",
+    };
+    if candidate_lattice.exponent() < old_lattice.exponent() || candidate_clock < old_clock {
+        return Err(refuse());
+    }
+    let valid_carry = |carry: &Carry, entries: &[Rat], lattice: Lattice, clock: u64| {
+        if carry.0.keys().any(|&i| i >= entries.len()) {
+            return false;
+        }
+        let precision = gamma_length(clock);
+        let Some(exponent) = lattice.exponent().checked_add(precision) else {
+            return false;
+        };
+        let half = BigInt::one() << (precision - 1) as usize;
+        carry.0.values().all(|remainder| {
+            dyadic_coordinate(remainder, exponent).is_some_and(|rho| -&half <= rho && rho < half)
+        })
+    };
+    if !storage.entries().iter().all(|x| old_lattice.contains(x))
+        || !stiffness.entries().iter().all(|x| old_lattice.contains(x))
+        || !valid_carry(storage_carry, storage.entries(), old_lattice, old_clock)
+        || !valid_carry(stiffness_carry, stiffness.entries(), old_lattice, old_clock)
+    {
+        return Err(refuse());
+    }
+    let levels = candidate_lattice.exponent() - old_lattice.exponent();
+    let mut at = BudgetedCarry::new(old_lattice, old_clock);
+    let mut storage_entries = storage.entries().to_vec();
+    let mut stiffness_entries = stiffness.entries().to_vec();
+    let (mut storage_rem, mut stiffness_rem) = (storage_carry.clone(), stiffness_carry.clone());
+    at.rebase(
+        levels,
+        &mut [
+            (&mut storage_rem, storage_entries.as_mut_slice()),
+            (&mut stiffness_rem, stiffness_entries.as_mut_slice()),
+        ],
+    )?;
+    // The held-C/K cap: a predecessor carry may be re-expressed at the new
+    // grain only when its integer coordinate there is still zero.
+    if storage_entries != storage.entries()
+        || stiffness_entries != stiffness.entries()
+        || !valid_carry(
+            &storage_rem,
+            &storage_entries,
+            candidate_lattice,
+            candidate_clock,
+        )
+        || !valid_carry(
+            &stiffness_rem,
+            &stiffness_entries,
+            candidate_lattice,
+            candidate_clock,
+        )
+    {
+        return Err(refuse());
+    }
+    let storage = flat_matrix(storage.rows(), storage.columns(), storage_entries)?;
+    let stiffness = flat_matrix(stiffness.rows(), stiffness.columns(), stiffness_entries)?;
+    Ok((storage, stiffness, storage_rem, stiffness_rem))
+}
+
+#[cfg(test)]
+mod held_ck_rebase_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    fn factor(value: Rat) -> ExactRatMatrix {
+        ExactRatMatrix::shaped(1, 1, vec![vec![value]]).unwrap()
+    }
+
+    #[test]
+    fn held_ck_refines_a_canonical_remainder_without_moving_the_old_form() {
+        let old_lattice = Lattice::new(2);
+        let candidate_lattice = Lattice::new(3);
+        let old_carry = Carry(BTreeMap::from([(0, rat(1, 32))]));
+        let (storage, stiffness, storage_rem, stiffness_rem) = held_ck_at_lattice(
+            &factor(rat(3, 4)),
+            &factor(rat(1, 2)),
+            &old_carry,
+            &Carry::default(),
+            old_lattice,
+            candidate_lattice,
+            2,
+            2,
+        )
+        .unwrap();
+        assert_eq!(storage, factor(rat(3, 4)));
+        assert_eq!(stiffness, factor(rat(1, 2)));
+        assert_eq!(storage_rem, old_carry);
+        assert_eq!(stiffness_rem, Carry::default());
+    }
+
+    #[test]
+    fn held_ck_refuses_landing_coarsening_bad_shape_and_noncanonical_carry_atomically() {
+        let old_lattice = Lattice::new(2);
+        let storage = factor(rat(3, 4));
+        let stiffness = factor(rat(1, 2));
+        let landing = Carry(BTreeMap::from([(0, rat(1, 32))]));
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &landing,
+                &Carry::default(),
+                old_lattice,
+                Lattice::new(4),
+                2,
+                2,
+            )
+            .is_err()
+        );
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &Carry::default(),
+                &Carry::default(),
+                Lattice::new(4),
+                old_lattice,
+                2,
+                2,
+            )
+            .is_err()
+        );
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &Carry(BTreeMap::from([(1, rat(1, 32))])),
+                &Carry::default(),
+                old_lattice,
+                Lattice::new(3),
+                2,
+                2,
+            )
+            .is_err()
+        );
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &Carry(BTreeMap::from([(0, rat(1, 16))])),
+                &Carry::default(),
+                old_lattice,
+                Lattice::new(3),
+                2,
+                2,
+            )
+            .is_err()
+        );
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &Carry(BTreeMap::from([(0, rat(1, 64))])),
+                &Carry::default(),
+                old_lattice,
+                Lattice::new(3),
+                2,
+                2,
+            )
+            .is_err()
+        );
+        assert!(
+            held_ck_at_lattice(
+                &storage,
+                &stiffness,
+                &Carry::default(),
+                &Carry::default(),
+                old_lattice,
+                Lattice::new(3),
+                2,
+                1,
+            )
+            .is_err()
+        );
+        assert_eq!(storage, factor(rat(3, 4)));
+        assert_eq!(stiffness, factor(rat(1, 2)));
+    }
+}
 
 /// `h_x' = h_x + Σ w|f|²`, carried on the family's lattice: the family's metric, whose unit step is
 /// `G_x / h_x'`. Refused when the carried statistic is not positive.
@@ -3842,6 +4612,13 @@ pub struct Reach {
     /// collapse retains them, so a collapse changes no step. The budget `B_Θ` reads the resident's
     /// retention instead ([`Constitution::deposited_within`]).
     pub loci: BTreeSet<Locus>,
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **Each saturated
+    /// ring's passage** (`hnn::ring::TubePassage`, a ring on a one-tick period): the running maximum
+    /// of its displacement's node `ℓ¹` distance to each rest point of its period over the word's
+    /// executed ticks,
+    /// filled where the word builds its reach (`hnn::word::Word::tube_passages`). The ring's reach
+    /// is read on the tube about it (module header, "The pumped medium's reach").
+    pub passages: Vec<TubePassage>,
 }
 
 impl Reach {
@@ -3858,21 +4635,25 @@ impl Reach {
         let powers = Self::powers(growth, self.stations.iter().max().map_or(0, |t| t + 1));
         self.stations
             .iter()
-            .map(|&station| {
-                let sum: Rat = self
-                    .entries
-                    .iter()
-                    .filter(|&&entry| entry <= station)
-                    .map(|&entry| powers[(station - entry) as usize].clone())
-                    .sum();
-                let square = &sum * &sum;
-                let first = self.entries.iter().filter(|&&entry| entry <= station).min();
-                match (factor, first) {
-                    (Some(factor), Some(&first)) => square * &factor[(station - first) as usize],
-                    _ => square,
-                }
-            })
+            .map(|&station| self.entry_at(station, &powers, factor))
             .sum()
+    }
+
+    /// One station's entry gain `(Σ_(n: T_n ≤ T) g^(T − T_n))² F(T − min_n T_n)`, from the powers
+    /// `g^k`, `k ≤ T`.
+    fn entry_at(&self, station: u64, powers: &[Rat], factor: Option<&[Rat]>) -> Rat {
+        let sum: Rat = self
+            .entries
+            .iter()
+            .filter(|&&entry| entry <= station)
+            .map(|&entry| powers[(station - entry) as usize].clone())
+            .sum();
+        let square = &sum * &sum;
+        let first = self.entries.iter().filter(|&&entry| entry <= station).min();
+        match (factor, first) {
+            (Some(factor), Some(&first)) => square * &factor[(station - first) as usize],
+            _ => square,
+        }
     }
 
     /// `Σ_j Σ_(τ < T_j) g^(2(T_j − τ − 1)) F(T_j − τ)`: every tick's energy gain to every station,
@@ -3881,8 +4662,16 @@ impl Reach {
     /// medium's.
     pub(crate) fn tick_gain(&self, growth: &Rat, factor: Option<&[Rat]>) -> Rat {
         let top = self.stations.iter().max().copied().unwrap_or(0);
+        let sums = Self::tick_sums(growth, factor, top);
+        self.stations
+            .iter()
+            .map(|&station| sums[station as usize].clone())
+            .sum()
+    }
+
+    /// `sums[t] = Σ_(k < t) g^(2k) F(k + 1)` for `t ≤ top`: one station's tick gain at `t`.
+    fn tick_sums(growth: &Rat, factor: Option<&[Rat]>, top: u64) -> Vec<Rat> {
         let powers = Self::powers(&(growth * growth), top);
-        // `sums[t] = Σ_(k < t) g^(2k) F(k + 1)`.
         let mut sums = Vec::with_capacity(top as usize + 1);
         sums.push(Rat::zero());
         for (k, power) in powers.iter().enumerate() {
@@ -3892,10 +4681,7 @@ impl Reach {
             };
             sums.push(next);
         }
-        self.stations
-            .iter()
-            .map(|&station| sums[station as usize].clone())
-            .sum()
+        sums
     }
 
     /// `[1, x, x², …, x^(count − 1)]`, each from the one before.
@@ -3963,6 +4749,8 @@ pub struct SourceStep {
 /// never silent.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DepositReading {
+    /// Present only for the grouped native circuit's one crossing publication.
+    pub epoch: Option<EpochDepositReading>,
     pub storage_growth: Rat,
     pub storage_product: Rat,
     pub steps: Vec<(Locus, StepReading)>,
@@ -4040,9 +4828,42 @@ impl DepositReading {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RingReach {
     pub ring: usize,
-    pub reading: FloquetReading,
+    pub reading: RingReading,
     pub bounds: Vec<FloquetBound>,
     pub reach: Vec<Rat>,
+}
+
+/// [definition; agent-inferred, October 18; the design review of step 1a] **What a ring's reach
+/// was read from**: a linear ring's Floquet decision, or a saturated ring's tube about its passage
+/// (`hnn::ring::ResonatorOperands::tube_reach`), whose one bound is the tube's tick factor at
+/// period one.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum RingReading {
+    Floquet(FloquetReading),
+    Tube(Box<TubeReach>),
+}
+
+/// [definition; agent-inferred, October 18; the design review of step 1a] **A saturated ring's
+/// tube closure at a deposit** (module header, "The pumped medium's reach"): the stepped passage
+/// stays in the tube its reach reads. Its rate's deviation at each tick is bounded by the station
+/// gains read at the ring's own drive (`Y_R/Y_r` in the readout's place, a station one tick after
+/// each drive), carried through the tube's tick `σ` and the drive's response `d̂I ⪰ D̂ᵀGD̂`:
+/// `|Δx_t|_G ≤ √d̂ W_t`, `W_t = σ W_(t−1) + Σ_x η_x √(κ²_(x,t) b_x)`, so the displacement's node
+/// `ℓ¹` deviation is at most `2d̂W_t²/γ_lo` squared. The closure holds when that stays within
+/// `(ρ̄ − ρ_c)²` over the stations' span; `rung` is the radius's on its ladder.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TubeClosure {
+    pub ring: usize,
+    pub rung: u32,
+    pub deviation: Rat,
+    pub slack: Rat,
+}
+
+impl TubeClosure {
+    /// `2d̂ max_t W_t² / γ_lo ≤ (ρ̄ − ρ_c)²`.
+    pub fn holds(&self) -> bool {
+        self.deviation <= self.slack
+    }
 }
 
 /// [definition; agent-inferred, September 29] **The medium's reach** ([`Constitution::medium_reach`];
@@ -4074,6 +4895,8 @@ pub struct PumpedReading {
     pub span: u64,
     pub factor: Rat,
     pub held: Vec<(Locus, Family)>,
+    /// Each tube-read ring's closure at the steps taken (empty when no ring is read on a tube).
+    pub closures: Vec<TubeClosure>,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -4471,6 +5294,17 @@ pub struct LockReading {
 }
 
 impl Constitution {
+    /// Opt-in provenance origin for the UNWIRED joint rounding modulus. This
+    /// constructs a genuinely new constitution; no used checkpoint is relabeled.
+    pub(crate) fn initial_with_joint_rounding_history(
+        field:&Field,budget:u64,limits:&crate::hnn::word::material_ray::rounding::ModulusResources,
+    )->Result<(Self,crate::hnn::word::material_ray::rounding::NativeReleaseHistory),crate::hnn::word::material_ray::rounding::ModulusObstruction>{
+        let material=Self::initial(field,budget)?;
+        let history=crate::hnn::word::material_ray::rounding::NativeReleaseHistory::newly_founded(
+            field,&material,limits,&NativeRoundingFoundingSeal(()))?;
+        Ok((material,history))
+    }
+
     /// **Campaign 1's initial constitution and its priors** (design (d), R3 D2):
     ///
     /// | Locus | Initial value | Update |
@@ -4645,6 +5479,63 @@ impl Constitution {
         Ok(self)
     }
 
+    /// [definition; agent-inferred, October 18; the revised plan, step 1a] **The locking pump**:
+    /// ring `g`'s resonator founded saturated, with no linear stage. Its dissipation is the
+    /// founding's `d = 1/Y`. Its pump stands (`PumpStep::Stand`) at axis `1` with strength
+    /// `p = r/(4h²)`, `r = h(d + 1/Y)`, so at `h = 1` the uniform in-phase mode is deadbeat at the
+    /// sheet (`h²X(K + H(c)) = I`, `ring::ResonatorOperands::standing_sheet`). Its saturation
+    /// `β = 2p/a²` stands the sheet at amplitude `a`. The amplitude is the least power of two whose
+    /// two opposite sheets certify on the period the live word executes: the field's word lattice,
+    /// the resonator's charts cold-started as every cut starts them, and the transients' unit
+    /// (`ring::ResonatorOperands::executed_lock`), each ball's shape derived at the grain the
+    /// resonator locus is founded on. The search ends at `a = 1/δ`, past which the
+    /// sheet's relative grain `δ/a` passes `δ²` and a refusal is structural, not rounding; under the
+    /// exact law the envelope vanishes and `a = 1` certifies or nothing does. Refused with the last
+    /// attempt's refusal.
+    ///
+    /// It replaces the founding's half-turn pump at `d/h` on this ring: that pump leaves the
+    /// uniform mode deadbeat to the origin (`(1 + 2ph²/r)(1 − 2ph²/r) = 0`), so no sheet stands
+    /// there; a standing pump's sheet is read at every tick, its period's closing boundary.
+    pub fn with_locking_pump(self, field: &Field, ring: usize) -> Result<Self, HnnError> {
+        use crate::hnn::ring::{PumpDeclaration, PumpStep};
+        let declared = field.ring(ring);
+        let d = declared.admittance().recip();
+        let h = field.step();
+        let loss = h * (&d + declared.admittance().recip());
+        let strength = &loss / (Rat::from_integer(BigInt::from(4)) * h * h);
+        let pump = PumpDeclaration::new(
+            strength.clone(),
+            crate::holon::parametron::Carrier::at(&Rat::zero()),
+            PumpStep::Stand,
+        )?;
+        let base = ResonatorMaterial::of_parametron(declared.parametron(), &d, Some(pump))?;
+        let lattice = field.word_lattice().copied();
+        let transient = lattice.map(|lattice| lattice.transient());
+        let limit = transient.as_ref().map_or(0, Lattice::exponent);
+        // The ring's grain: the lattice its resonator locus is founded on, at which its tube and its
+        // balls are read.
+        let grain = self.resonator_lattice(&base).exponent();
+        let mut refusal = None;
+        for k in 0..=limit {
+            let amplitude = Rat::from_integer(BigInt::one() << k as usize);
+            let material = base.clone().with_symmetric_saturation(
+                Rat::from_integer(BigInt::from(2)) * &strength / (&amplitude * &amplitude),
+            )?;
+            let operands = ResonatorOperands::at_cut(
+                ring,
+                &material,
+                declared.admittance(),
+                h,
+                lattice.as_ref(),
+            )?;
+            match operands.executed_lock(transient.as_ref(), grain) {
+                Ok(_) => return self.with_ring_resonator(field, ring, material),
+                Err(error) => refusal = Some(error),
+            }
+        }
+        Err(refusal.expect("the search tries at least one amplitude"))
+    }
+
     /// The commit counter.
     pub fn commit(&self) -> u64 {
         self.commit
@@ -4688,6 +5579,7 @@ impl Constitution {
             .and_then(ReceivingMaterial::single)
     }
 
+    pub(crate) fn pristine_native_receiving(&self,ring:usize)->bool{self.rings.get(ring).and_then(|m|m.receiving.as_ref()).is_some_and(ReceivingMaterial::pristine_native)}
     /// Explicit receiving operand layout; a paired map is never inferred from its width.
     pub fn receiving_layout(&self, ring: usize) -> Option<ReceivingLayout> {
         self.rings
@@ -4698,6 +5590,43 @@ impl Constitution {
     }
     pub fn receiving_blocks(&self, ring: usize) -> Option<&[ReceivingBlock; 2]> {
         self.rings.get(ring)?.receiving.as_ref()?.blocks()
+    }
+    pub fn receiving_return_policy(&self, ring: usize) -> Option<crate::hnn::receiving::RetainedReturnPolicy> {
+        self.rings.get(ring)?.receiving.as_ref().map(ReceivingMaterial::return_policy)
+    }
+    /// Fresh-only constitutive declaration. Existing material history is never retagged.
+    pub fn bind_family_local_receiving_return(&mut self, ring: usize) -> Result<(), HnnError> {
+        let mut next=self.clone();
+        next.rings.get_mut(ring).and_then(|r|r.receiving.as_mut()).ok_or(HnnError::MissingReceivingMap {ring})?.bind_family_local_return()?;
+        let bits=next.exact_bits();
+        if bits>self.budget { return Err(HnnError::ConstitutionBudget {bits,budget:self.budget,commit:self.commit,loci:vec![Locus::ReceivingMap(ring)]}); }
+        next.commit=next.commit.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        *self=next; Ok(())
+    }
+    pub fn receiving_representation_policy(&self, ring: usize) -> Option<ReceivingRepresentationPolicy> {
+        self.rings.get(ring)?.receiving.as_ref().map(ReceivingMaterial::representation_policy)
+    }
+    /// No learned state is migrated. The new policy is founded only on fresh,
+    /// family-local, independently charted arrival/context material.
+    /// Explicit host-only rational normal-statistics policy; no archived moments migrate.
+    pub fn bind_native_rational_receiving(&mut self,ring:usize)->Result<(),HnnError>{
+        self.rings.get_mut(ring).and_then(|r|r.receiving.as_mut()).ok_or(HnnError::MissingReceivingMap{ring})?.bind_native_rational()
+    }
+    pub fn native_rational_receiving(&self,ring:usize)->bool{self.rings.get(ring).and_then(|r|r.receiving.as_ref()).is_some_and(|r|r.native_rational())}
+    pub fn bind_bounded_receiving_representation(&mut self, ring: usize) -> Result<(), HnnError> {
+        let mut next = self.clone();
+        next.rings.get_mut(ring).and_then(|r|r.receiving.as_mut())
+            .ok_or(HnnError::MissingReceivingMap {ring})?.bind_bounded_representation()?;
+        let grain=lattice_exponent(next.grain,1);
+        for law in next.rings[ring].receiving.as_ref().expect("bound owner").laws() {
+            if epoch::EpochLaw::from_normal(law,grain)?.map_lattice > ReceivingRepresentationPolicy::CEILING {
+                return Err(HnnError::Unadmitted {reason:"the founding receiving lattice exceeds the declared bounded representation ceiling"});
+            }
+        }
+        let bits = next.exact_bits();
+        if bits > self.budget { return Err(HnnError::ConstitutionBudget {bits,budget:self.budget,commit:self.commit,loci:vec![Locus::ReceivingMap(ring)]}); }
+        next.commit = next.commit.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        *self = next; Ok(())
     }
     /// Full phase statistics. Paired statistics use the frozen normalized operand chart.
     pub fn receiving_phase_statistics(&self, ring: usize) -> Option<&PhaseStatistics> {
@@ -4870,6 +5799,13 @@ impl Constitution {
         ]
     }
 
+    /// Borrow only a genuine six-carrier entry; no allocated global remainder
+    /// view or exterior release receipt is accepted by the opt-in issuer.
+    pub(crate) fn native_rounding_carry_at(&self,contact:usize,family:usize,entry:usize)->Option<&Rat>{
+        let carrier=match family{0..=2=>Carrier::Factor(family),3..=5=>Carrier::FactorScale(family-3),_=>return None};
+        self.carries.get(&(Locus::Channel(contact),carrier)).and_then(|carry|carry.0.get(&entry))
+    }
+
     /// Contact `a`'s factor statistics `h_x`: storage, stiffness, dissipation.
     pub fn contact_scales(&self, contact: usize) -> &[Rat; 3] {
         &self.contacts[contact].scales
@@ -4994,6 +5930,13 @@ impl Constitution {
         Ok(self)
     }
 
+    /// The lattice a resonator of this material is founded on: the lattice rule's at its realified
+    /// width ([`Constitution::with_ring_resonator`]). The locking pump's founding reads its balls at
+    /// this grain, so the founding and the mounted locus read one lattice.
+    fn resonator_lattice(&self, material: &ResonatorMaterial) -> Lattice {
+        Lattice::new(lattice_exponent(self.grain, material.width() as u128))
+    }
+
     /// **Declare a ring's resonator** (campaign 2, `hnn::ring`), certified at every pump phase at the
     /// field's hop on the ring's realified width.
     ///
@@ -5026,7 +5969,7 @@ impl Constitution {
             });
         }
         material.certify(ring, field.step())?;
-        let lattice = Lattice::new(lattice_exponent(self.grain, material.width() as u128));
+        let lattice = self.resonator_lattice(&material);
         self.rings[ring].resonator_scales = vec![Rat::one(); material.gain_count()];
         self.rings[ring].resonator = Some(material);
         self.rings[ring].resonator_step = Some(field.step().clone());
@@ -5999,6 +6942,24 @@ impl Constitution {
             .get(ring)
             .and_then(|r| r.receiving.as_ref())
             .ok_or(HnnError::MissingReceivingMap { ring })?;
+        let epoch_laws = law.laws();
+        if epoch_laws.iter().any(|law| law.epoch_law().is_some()) {
+            if epoch_laws.iter().any(|law| law.epoch_law().is_none()) {
+                return Err(HnnError::Unadmitted {
+                    reason: "a receiving publication cannot mix legacy map carries with grouped news",
+                });
+            }
+            let width = law.map().columns();
+            if features.iter().any(|feature| feature.len() != width) {
+                return Err(HnnError::Unadmitted {
+                    reason: "an epoch precision reading uses actual receiving features of its declared width",
+                });
+            }
+            // R = B-WH is unabsorbed news, not an unpublished map value.
+            // Stage1 has no legacy map carry to promote; its represented map
+            // uses the declared receiver lattice and its next flow reads R.
+            return Ok(None);
+        }
         let remainder = law.map_remainder()?;
         let mut erased = Vec::new();
         let mut unresolved_reads = Vec::new();
@@ -6162,6 +7123,11 @@ impl Constitution {
             .receiving
             .as_mut()
             .ok_or(HnnError::MissingReceivingMap { ring })?;
+        if receiving.laws().iter().any(|law| law.epoch_law().is_some()) {
+            return Err(HnnError::Unadmitted {
+                reason: "grouped epoch news is not a legacy map remainder and cannot be promoted by that rebase",
+            });
+        }
         let active = receiving.blocks().map(|blocks| {
             blocks
                 .iter()
@@ -6376,10 +7342,24 @@ impl Constitution {
     /// so their least is). When no rung certifies, the decided certificate's bound is read. A
     /// refused decision is the refusal [`HnnError::UncertifiedGain`], with its reason: no step is
     /// certified through that ring.
+    ///
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **A saturated ring on
+    /// a one-tick period is read on its tube** (`reads_tube`): its tick is not linear, so it has no
+    /// monodromy. With its standing pump the tube's centres are the saddle and the two sheets; with
+    /// the pump removed, the origin alone, where the tangent is the unpumped tick's. Its reach is
+    /// the tube's about the passage the deposit's reach carries, read from the tube metric at the
+    /// passage's nearest rest point ([`Constitution::tube_metrics`], `hnn::ring::TubeMetric::at`),
+    /// at the radius `ρ̄ = 2^(k + rung)`, `2^k` the least dyadic above the passage's distance `ρ_c`
+    /// (at least the grain `2^(−g)`); the certified step climbs `rung`
+    /// ([`Constitution::certify_steps`]). A saturated ring the reach carries no passage for is
+    /// refused. A saturated ring on a pump of several phases keeps its linear part's monodromy, as
+    /// before step 1a: its period's tube is owed (#62).
     fn ring_reaches(
         &self,
         span: u64,
         among: impl Fn(usize) -> bool,
+        tubes: &[(TubePassage, TubeMetric)],
+        rung: u32,
     ) -> Result<Vec<RingReach>, HnnError> {
         let mut rings = Vec::new();
         for (ring, material) in self.rings.iter().enumerate() {
@@ -6404,6 +7384,33 @@ impl Constitution {
                 }
                 other => other,
             };
+            if reads_tube(resonator) {
+                let (passage, metric) = tubes
+                    .iter()
+                    .find(|(passage, _)| passage.ring == ring)
+                    .ok_or(HnnError::Resonator {
+                        ring,
+                        what: "a saturated ring's reach reads its passage",
+                    })?;
+                let distance = passage.distance(metric.centre).ok_or(HnnError::Resonator {
+                    ring,
+                    what: "a tube's centre is a rest point of its passage's period",
+                })?;
+                let mut least = -i64::from(grain);
+                while crate::holon::deposition::dyadic(least) <= *distance {
+                    least += 1;
+                }
+                let radius = crate::holon::deposition::dyadic(least + i64::from(rung));
+                let tube = metric.at(passage, &radius, grain)?;
+                let reach = (0..=span).map(|s| ceiling(&tube.bound.reach(s))).collect();
+                rings.push(RingReach {
+                    ring,
+                    bounds: vec![tube.bound.clone()],
+                    reading: RingReading::Tube(Box::new(tube)),
+                    reach,
+                });
+                continue;
+            }
             let operands =
                 ResonatorOperands::at_cut(ring, resonator, &self.admittances[ring], hop, None)?;
             let floquet = Floquet::of(&operands)?;
@@ -6477,7 +7484,7 @@ impl Constitution {
             let bounds = read.into_iter().map(|(_, bound, _)| bound).collect();
             rings.push(RingReach {
                 ring,
-                reading,
+                reading: RingReading::Floquet(reading),
                 bounds,
                 reach,
             });
@@ -6495,13 +7502,90 @@ impl Constitution {
             .collect()
     }
 
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **The tube metric of
+    /// each saturated ring the reach carries a passage for and its diamond holds**, at the
+    /// passage's nearest rest point and the ring's resonator grain (`hnn::ring::ResonatorOperands::
+    /// tube_metric`): read once a deposit, before its radius ladder, each radius then one inertia
+    /// decision.
+    fn tube_metrics(
+        &self,
+        reach: Option<&Reach>,
+        epoch_reaches: Option<&[Reach]>,
+    ) -> Result<Vec<(TubePassage, TubeMetric)>, HnnError> {
+        let Some(reach) = reach else {
+            return Ok(Vec::new());
+        };
+        // A grouped epoch keeps every word's local clock. Only the distances are
+        // enclosed together: each centre's maximum covers every actual passage,
+        // and the common nearest centre is selected after taking those maxima.
+        let readings = epoch_reaches.unwrap_or(std::slice::from_ref(reach));
+        let mut passages: BTreeMap<usize, TubePassage> = BTreeMap::new();
+        for local in readings {
+            for passage in local.passages.iter().filter(|passage| {
+                local.reads_ring(passage.ring)
+                    && self
+                        .rings
+                        .get(passage.ring)
+                        .is_some_and(|material| material.resonator.as_ref().is_some_and(reads_tube))
+            }) {
+                if let Some(envelope) = passages.get_mut(&passage.ring) {
+                    if envelope.distances.len() != passage.distances.len()
+                        || envelope
+                            .distances
+                            .iter()
+                            .zip(&passage.distances)
+                            .any(|((left, _), (right, _))| left != right)
+                    {
+                        return Err(HnnError::Resonator {
+                            ring: passage.ring,
+                            what: "an epoch's tube passages share their producing period's rest points",
+                        });
+                    }
+                    for ((_, held), (_, distance)) in
+                        envelope.distances.iter_mut().zip(&passage.distances)
+                    {
+                        if distance > &*held {
+                            *held = distance.clone();
+                        }
+                    }
+                } else {
+                    passages.insert(passage.ring, passage.clone());
+                }
+            }
+        }
+        passages.into_values().map(|passage| {
+            let ring = passage.ring;
+            // An absent local passage cannot be hidden by a different word's
+            // summary. A required ring with no summary at all is refused by
+            // ring_reaches, as on the single-word route.
+            if readings.iter().any(|local| local.reads_ring(ring)
+                && !local.passages.iter().any(|at| at.ring == ring)) {
+                return Err(HnnError::Resonator {
+                    ring,
+                    what: "every word reaching a saturated ring carries its actual tube passage",
+                });
+            }
+            let material = &self.rings[ring];
+            let resonator = material.resonator.as_ref().expect("filtered");
+            let locus = Locus::Resonator(ring);
+            let hop = material.resonator_step.as_ref().ok_or(HnnError::Lattice { locus })?;
+            let grain = self.lattice(locus)?.exponent();
+            let operands = ResonatorOperands::at_cut(ring, resonator, &self.admittances[ring], hop, None)?;
+            let (centre, _) = passage.nearest();
+            let metric = operands.tube_metric(centre, grain)?;
+            Ok((passage, metric))
+        }).collect()
+    }
+
     /// [definition; agent-inferred, September 29] **The medium's reach over the spans `0..=span`**
     /// (module header, "The pumped medium's reach"): the contrast ports' `1 + ω`, each ring not
     /// certified passive with its reach, and the span factors. A consumer's energy bound over a
     /// refinement of `T` ticks reads `F(T)` beside `1 + ω` (Lean `Holon/Deposition.pumped_span_factor`:
-    /// every span within `T` is carried by `F(T)` at most). Refused where a ring's certificate is.
+    /// every span within `T` is carried by `F(T)` at most). Refused where a ring's certificate is,
+    /// and at a saturated ring on a one-tick period: its reach reads a passage, which only a
+    /// deposit's reach carries.
     pub fn medium_reach(&self, span: u64) -> Result<MediumReach, HnnError> {
-        let rings = self.ring_reaches(span, |_| true)?;
+        let rings = self.ring_reaches(span, |_| true, &[], 0)?;
         let factors = Self::factors_of(&rings, span);
         Ok(MediumReach {
             amplitude: self.contrast_amplitude()?,
@@ -6581,6 +7665,18 @@ impl Constitution {
     /// ([`DeclaredStepRefusal::Undeclared`]). A declared step's curvature, bound and joint
     /// readings are read at its own ray and recorded, never enforced: the a posteriori admission
     /// (`hnn::word::continuation::FiniteDecrease`) is its certificate.
+    ///
+    /// [definition; agent-inferred, October 18; the design review of step 1a] **The tube's radius
+    /// climbs its ladder.** Through a ring read on its tube ([`RingReading::Tube`]) the native
+    /// certificate also holds the tube's closure ([`TubeClosure`]): the step that fails it is
+    /// halved like any other. A wider tube reads a larger Hessian variation, so a larger tick
+    /// factor and smaller steps, and leaves more room for the stepped passage: the radius climbs
+    /// from the least dyadic above the passage's distance, one rung at a time within the ring's
+    /// grain, while the certified first-order decrease `Σ η a` grows, and stops where it no longer
+    /// grows (the ring reach's ladder idiom); a rung whose tube is refused ends the climb. A declared
+    /// or candidate source reads the first rung and records the closure without enforcing it.
+    /// An Actual source reads the first rung and enforces its fixed candidate's
+    /// own curvature, joint triangle and every tube closure without searching.
     fn certify_steps(
         &self,
         reach: Option<&Reach>,
@@ -6588,7 +7684,113 @@ impl Constitution {
         factors: &[(Locus, &FactorPrepared)],
         loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
         source: StepSource<'_>,
+        epoch_readout: Option<&Rat>,
+        epoch_reaches: Option<&[Reach]>,
     ) -> Result<Result<CertifiedSteps, DeclaredStepRefusal>, HnnError> {
+        self.certify_steps_with_epoch_evidence(
+            reach,
+            linear,
+            factors,
+            loaded,
+            source,
+            epoch_readout,
+            epoch_reaches,
+            &mut None,
+        )
+    }
+
+    fn certify_steps_with_epoch_evidence(
+        &self,
+        reach: Option<&Reach>,
+        linear: &[(Locus, LinearLocus, PreparedDirectionRef<'_>)],
+        factors: &[(Locus, &FactorPrepared)],
+        loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
+        source: StepSource<'_>,
+        epoch_readout: Option<&Rat>,
+        epoch_reaches: Option<&[Reach]>,
+        evidence: &mut Option<epoch::EpochStageRefusal>,
+    ) -> Result<Result<CertifiedSteps, DeclaredStepRefusal>, HnnError> {
+        let metrics = self.tube_metrics(reach, epoch_reaches)?;
+        let first = self.certify_steps_at_with_epoch_evidence(
+            reach,
+            linear,
+            factors,
+            loaded,
+            source,
+            TubeRung {
+                tubes: &metrics,
+                rung: 0,
+                epoch_readout,
+                epoch_reaches,
+            },
+            evidence,
+        )?;
+        let tubes: Vec<usize> = match &first {
+            Ok((_, _, Some(pumped), _)) if matches!(source, StepSource::Certified) => {
+                pumped.closures.iter().map(|closure| closure.ring).collect()
+            }
+            _ => Vec::new(),
+        };
+        if tubes.is_empty() {
+            return Ok(first);
+        }
+        let top = tubes
+            .iter()
+            .map(|&ring| Ok(self.lattice(Locus::Resonator(ring))?.exponent()))
+            .collect::<Result<Vec<u32>, HnnError>>()?
+            .into_iter()
+            .max()
+            .unwrap_or(0);
+        let decrease = |read: &Result<CertifiedSteps, DeclaredStepRefusal>| -> Rat {
+            match read {
+                Ok((_, Some(joint), ..)) => joint.decrease.clone(),
+                _ => Rat::zero(),
+            }
+        };
+        let mut best = first;
+        for rung in 1..=top {
+            let Ok(read) = self.certify_steps_at_with_epoch_evidence(
+                reach,
+                linear,
+                factors,
+                loaded,
+                source,
+                TubeRung {
+                    tubes: &metrics,
+                    rung,
+                    epoch_readout,
+                    epoch_reaches,
+                },
+                evidence,
+            ) else {
+                break;
+            };
+            if decrease(&read) > decrease(&best) {
+                best = read;
+            } else {
+                break;
+            }
+        }
+        Ok(best)
+    }
+
+    /// The certified steps at one rung of the tubes' radius ladder ([`Constitution::certify_steps`]).
+    fn certify_steps_at_with_epoch_evidence(
+        &self,
+        reach: Option<&Reach>,
+        linear: &[(Locus, LinearLocus, PreparedDirectionRef<'_>)],
+        factors: &[(Locus, &FactorPrepared)],
+        loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
+        source: StepSource<'_>,
+        at: TubeRung<'_>,
+        evidence: &mut Option<epoch::EpochStageRefusal>,
+    ) -> Result<Result<CertifiedSteps, DeclaredStepRefusal>, HnnError> {
+        let TubeRung {
+            tubes,
+            rung,
+            epoch_readout,
+            epoch_reaches,
+        } = at;
         /// A normal law's readings at the certificate's faces: its alignment at its floor, its
         /// covector scale, feature moves and unit step's Schur norms at their ceilings, and (the
         /// receiving map's only) its unit step's certified spectral norm.
@@ -6616,6 +7818,9 @@ impl Constitution {
                 Part::Linear(..) => None,
             })
         }
+        // Keep the original faces available after the local Floquet span factors shadow
+        // their parameter name below; exterior refusal evidence must read these operands.
+        let supplied_factor_faces = factors;
         let mut parts: Vec<(Locus, Family, Part<'_>)> = Vec::new();
         for (locus, kind, prepared) in linear {
             let alignment = floor(&prepared.alignment);
@@ -6626,6 +7831,9 @@ impl Constitution {
             // The receiving map's unit step moves the readout every other family's gain reads: its
             // certified spectral norm (the other maps' rays read their Schur norms).
             let norm = match kind {
+                LinearLocus::Receiving(_) if prepared.epoch_norm.is_some() => {
+                    ceiling(prepared.epoch_norm.expect("matched epoch norm"))
+                }
                 LinearLocus::Receiving(_) => {
                     let rows = prepared.unit.to_rows();
                     let columns = rows.first().map_or(0, Vec::len);
@@ -6672,6 +7880,7 @@ impl Constitution {
             && parts
                 .iter()
                 .any(|(locus, ..)| *locus != Locus::ReceivingMap(reach.receiver))
+            && loaded.and_then(|span|span.native()).is_none()
         {
             return Err(HnnError::Unadmitted {
                 reason: "paired receiving shared-material steps require the joined source/context propagation gain certificate",
@@ -6703,7 +7912,12 @@ impl Constitution {
             })?;
         // The readout's certified spectral norm `‖R‖₂` (module header, "The tightened certificate").
         let map = receiving.map();
-        let readout_base = ceiling(&spectral_norm(map.rows(), map.columns(), map.entries()));
+        let readout_base = match (loaded.and_then(|span|span.native()),epoch_readout) {
+            (Some(native),None)=>ceiling(native.readout_norm()),
+            (Some(_),Some(_))=>return Err(HnnError::Unadmitted{reason:"native paired contact certificate never mixes an epoch readout witness"}),
+            (None,Some(bound)) => ceiling(bound),
+            (None,None) => ceiling(&spectral_norm(map.rows(), map.columns(), map.entries())),
+        };
         // The pumped medium's reach (module header, "The pumped medium's reach"): each ring not
         // certified passive read by its Floquet bound (refused where its certificate is), the span
         // factors over the stations' spans, and the ring's own gain families held where their rays
@@ -6721,14 +7935,19 @@ impl Constitution {
         let rings = if loaded.is_some() {
             Vec::new()
         } else {
-            self.ring_reaches(span, |ring| {
-                reach.reads_ring(ring)
-                    && !(silent
-                        && self.rings[ring]
-                            .resonator
-                            .as_ref()
-                            .is_some_and(|law| law.saturation().is_some() && !pumped(law)))
-            })?
+            self.ring_reaches(
+                span,
+                |ring| {
+                    reach.reads_ring(ring)
+                        && !(silent
+                            && self.rings[ring]
+                                .resonator
+                                .as_ref()
+                                .is_some_and(|law| law.saturation().is_some() && !pumped(law)))
+                },
+                tubes,
+                rung,
+            )?
         };
         let factors = (!rings.is_empty()).then(|| Self::factors_of(&rings, span));
         let mut held = Vec::new();
@@ -6751,11 +7970,12 @@ impl Constitution {
                 .collect();
             parts.retain(|(locus, ..)| !holds(locus));
         }
-        let pumped_reading = factors.as_ref().map(|factors| PumpedReading {
+        let mut pumped_reading = factors.as_ref().map(|factors| PumpedReading {
             rings: rings.clone(),
             span,
             factor: factors.last().cloned().unwrap_or_else(Rat::one),
             held: held.clone(),
+            closures: Vec::new(),
         });
         if parts.is_empty() {
             return Ok(source
@@ -6889,12 +8109,26 @@ impl Constitution {
                 })
                 .transpose()
         };
+        // Actual joint range of all prepared factors, without another statistic arrival.
+        // This bounds the physical derivative throughout the proposed ray; the final rounded
+        // direction is independently queried at publication, on the SAME original records.
+        let native_extent=|steps:&[Option<CertifiedStep>]|->Result<crate::hnn::word::material_ray::ContactDirections,HnnError>{
+            let span=loaded.ok_or(HnnError::Unadmitted{reason:"native physical extent has its source-owned span"})?;
+            let native=span.native().ok_or(HnnError::Unadmitted{reason:"native physical extent has its original returned packet"})?;
+            let mut extent=self.native_zero_contact_direction()?;
+            for (locus,family,part)in &parts{
+                let (Locus::Channel(a),Family::Factor(f),Part::Factor(prepared))=(locus,family,part)else{return Err(HnnError::Unadmitted{reason:"physical native extent contains contact factors only"});};
+                let step=taken(steps,(*locus,*family));
+                let unit=self.native_unit_contact_direction(native.deposit(),*a,*f,&prepared.scale)?;
+                extent[*a][*f]=unit[*a][*f].scaled(&step);
+            }Ok(extent)
+        };
         // Each family's gain `κ²` and moves `b` at the end of every ray.
         let curvature = |index: usize,
                          steps: &[Option<CertifiedStep>],
                          readout: &Rat,
                          sums: &(Rat, Rat),
-                         loaded: Option<&crate::hnn::word::finite_gain::LoadedSpanReading>|
+                         loaded_reading: Option<&crate::hnn::word::finite_gain::LoadedSpanReading>|
          -> Result<(Rat, Rat), HnnError> {
             let (locus, family, part) = &parts[index];
             let prepared = match part {
@@ -6950,7 +8184,21 @@ impl Constitution {
                     moves.own(&prepared.energy, own)?,
                 )),
                 (Locus::Channel(a), moves) => {
-                    if let Some(loaded) = loaded {
+                    if let Some(span)=loaded.filter(|s|s.native().is_some_and(|n|n.represented())){
+                        let native=span.native().expect("source-bound native span");
+                        let Family::Factor(f)=prepared.family else{return Err(HnnError::Unadmitted{reason:"native physical gain has its factor family"});};
+                        let direction=self.native_unit_contact_direction(native.deposit(),a,f,&prepared.scale)?;
+                        let reading=span.physical_query(&direction,&native_extent(steps)?)?;
+                        let b=moves.own(&prepared.energy,own)?;
+                        if b.is_zero(){
+                            if !reading.response_squared.is_zero(){return Err(native.physical_refusal("nonzero physical response cannot be calibrated by zero local moves",reading));}
+                            return Ok((Rat::zero(),b));
+                        }
+                        // kappa^2*b is calibrated to the actual physical RESPONSE bound. It
+                        // is neither a class-score Hessian assertion nor a finite CE veto.
+                        return Ok((reading.response_squared/&b,b));
+                    }
+                    if let Some(loaded) = loaded_reading {
                         return Ok((loaded.gain(a, readout), moves.own(&prepared.energy, own)?));
                     }
                     let conductance = self.conductances[a]
@@ -6996,9 +8244,21 @@ impl Constitution {
         // The reach's tick and entry sums at an amplitude growth, at their ceilings, read once a
         // pass.
         let sums = |amplitude: &Rat| {
+            // Epoch returns end at their own openings. Their common grouped
+            // move reads a certified envelope of their actual local gains; no
+            // synthetic timeline joins an entry of one word to another's station.
+            let readings = epoch_reaches.unwrap_or(std::slice::from_ref(reach));
             (
-                ceiling(&reach.tick_gain(amplitude, factors.as_deref())),
-                ceiling(&reach.entry_gain(amplitude, factors.as_deref())),
+                readings
+                    .iter()
+                    .map(|r| ceiling(&r.tick_gain(amplitude, factors.as_deref())))
+                    .max()
+                    .unwrap_or_else(Rat::zero),
+                readings
+                    .iter()
+                    .map(|r| ceiling(&r.entry_gain(amplitude, factors.as_deref())))
+                    .max()
+                    .unwrap_or_else(Rat::zero),
             )
         };
         let reading = |steps: &[Option<CertifiedStep>]| -> Result<Vec<(Rat, Rat)>, HnnError> {
@@ -7040,6 +8300,84 @@ impl Constitution {
                     .map(|((step, bound), _)| (&step.step, &step.alignment, bound)),
             )
         };
+        // The tubes' closures (module header, "The pumped medium's reach"; [`TubeClosure`]): at each
+        // tube-read ring, every realized family's rate deviation at each tick of the stations' span,
+        // its station gain read one tick after the drive with the readout `Y_R/Y_r`, carried through
+        // the tube's tick `σ`, and each family's share of `W` at the tick where `W` is largest. The
+        // receiving map reads the passage and does not move it.
+        let tubes: Vec<(usize, &TubeReach)> = rings
+            .iter()
+            .filter_map(|reached| match &reached.reading {
+                RingReading::Tube(tube) => Some((reached.ring, tube.as_ref())),
+                RingReading::Floquet(_) => None,
+            })
+            .collect();
+        let closure_of =
+            |steps: &[Option<CertifiedStep>]| -> Result<Vec<(TubeClosure, Vec<Rat>)>, HnnError> {
+                if tubes.is_empty() {
+                    return Ok(Vec::new());
+                }
+                let (_, amplitude) = gains(steps);
+                let ticks = Reach::tick_sums(&amplitude, factors.as_deref(), span);
+                let powers = Reach::powers(&amplitude, span + 1);
+                let mut closures = Vec::with_capacity(tubes.len());
+                for &(ring, tube) in &tubes {
+                    let readout = &self.admittances[reach.receiver] / &self.admittances[ring];
+                    let sigma = &tube.bound.growth;
+                    let mut shares = vec![Rat::zero(); parts.len()];
+                    let (mut worst, mut kept) = (Rat::zero(), shares.clone());
+                    for tau in 0..span {
+                        let station = tau + 1;
+                        let readings = epoch_reaches.unwrap_or(std::slice::from_ref(reach));
+                        let local = || {
+                            readings.iter().filter(|local| {
+                                local.stations.iter().copied().max().unwrap_or(0) >= station
+                            })
+                        };
+                        // Maxima at the same local tick bound each independently
+                        // opened word. Entries of different words never add.
+                        let sums = (
+                            local()
+                                .map(|_| ceiling(&ticks[station as usize]))
+                                .max()
+                                .unwrap_or_else(Rat::zero),
+                            local()
+                                .map(|local| {
+                                    ceiling(&local.entry_at(station, &powers, factors.as_deref()))
+                                })
+                                .max()
+                                .unwrap_or_else(Rat::zero),
+                        );
+                        let mut total = Rat::zero();
+                        for (index, share) in shares.iter_mut().enumerate() {
+                            *share *= sigma;
+                            let (locus, ..) = &parts[index];
+                            if realized[index] && !matches!(locus, Locus::ReceivingMap(_)) {
+                                let (gain, moves) = curvature(index, steps, &readout, &sums, None)?;
+                                let rate = root_ceiling(&ceiling(&(gain * moves)));
+                                *share += taken(steps, (parts[index].0, parts[index].1)) * rate;
+                            }
+                            total += &*share;
+                        }
+                        if total > worst {
+                            worst = total;
+                            kept = shares.clone();
+                        }
+                    }
+                    let gap = &tube.radius - &tube.distance;
+                    closures.push((
+                        TubeClosure {
+                            ring,
+                            rung,
+                            deviation: rat(2, 1) * &tube.response * &worst * &worst
+                                / &tube.bound.low,
+                            slack: &gap * &gap,
+                        },
+                        kept,
+                    ));
+                }
+                Ok(closures)
+            };
         // The exponent source, the only part of the certificate the two sources do not share.
         let (mut steps, mut read, mut bounds, mut joint) = match source {
             StepSource::Certified | StepSource::Candidate { .. } => {
@@ -7115,15 +8453,63 @@ impl Constitution {
                         *step = step.halved();
                         continue;
                     }
+                    // The stepped passage stays in every tube: while a closure fails, the family
+                    // with the largest share of its deviation is halved (the first at a tie), at
+                    // once as often as its share alone keeps the closure failing and stays above
+                    // the next share (the deviation is linear in each step at fixed gains).
+                    if matches!(source, StepSource::Certified)
+                        && let Some((closure, shares)) = closure_of(&steps)?
+                            .into_iter()
+                            .find(|(closure, _)| !closure.holds())
+                    {
+                        let mut order: Vec<usize> = (0..shares.len()).collect();
+                        order.sort_by(|&a, &b| shares[b].cmp(&shares[a]).then(a.cmp(&b)));
+                        let index = order[0];
+                        let next = order.get(1).map_or_else(Rat::zero, |&i| shares[i].clone());
+                        let rest: Rat = shares
+                            .iter()
+                            .enumerate()
+                            .filter(|&(i, _)| i != index)
+                            .map(|(_, share)| share.clone())
+                            .sum();
+                        let tube = tubes
+                            .iter()
+                            .find(|(ring, _)| *ring == closure.ring)
+                            .map(|(_, tube)| *tube)
+                            .expect("a closure reads its tube");
+                        let closes = |share: &Rat| {
+                            let w = &rest + share;
+                            rat(2, 1) * &tube.response * &w * &w / &tube.bound.low <= closure.slack
+                        };
+                        let mut share = &shares[index] / rat(2, 1);
+                        let mut halvings = 1u32;
+                        while !closes(&share) && share > next && !share.is_zero() {
+                            share /= rat(2, 1);
+                            halvings += 1;
+                        }
+                        let step = steps[index].as_mut().expect("a stepping family");
+                        for _ in 0..halvings {
+                            *step = step.halved();
+                        }
+                        continue;
+                    }
                     break (steps, read, bounds, joint);
                 }
             }
-            StepSource::Declared(declared) => {
+            StepSource::Declared(declared) | StepSource::Actual(declared) => {
                 // One declared candidate: each stepping family at its declared exponent, the
                 // covector-scale bound kept, nothing halved and nothing searched.
                 let mut steps: Vec<Option<CertifiedStep>> = Vec::with_capacity(parts.len());
                 for (locus, family, part) in &parts {
                     let Some(exponent) = declared.exponent(*locus, *family) else {
+                        epoch::EpochStageRefusal::at(
+                            "declared_certificate",
+                            epoch::EpochStageCondition::DeclaredFamily,
+                            "every reached stepping family must have a declared exponent",
+                            Some(*locus),
+                            Some(*family),
+                        )
+                        .first(evidence);
                         return Ok(Err(DeclaredStepRefusal::Undeclared {
                             locus: *locus,
                             family: *family,
@@ -7132,6 +8518,21 @@ impl Constitution {
                     let (a, c) = alignment(part);
                     let step = crate::holon::deposition::dyadic(exponent);
                     if &step * &c > Rat::one() {
+                        epoch::EpochStageRefusal::at(
+                            "declared_certificate",
+                            epoch::EpochStageCondition::CovectorScale,
+                            "eta * covector <= 1",
+                            Some(*locus),
+                            Some(*family),
+                        )
+                        .read("eta", epoch::EpochStageValue::Ratio(step.clone()))
+                        .read("covector", epoch::EpochStageValue::Ratio(c.clone()))
+                        .read("alignment", epoch::EpochStageValue::Ratio(a.clone()))
+                        .read(
+                            "slack",
+                            epoch::EpochStageValue::Ratio(Rat::one() - &step * &c),
+                        )
+                        .first(evidence);
                         return Ok(Err(DeclaredStepRefusal::CovectorScale {
                             locus: *locus,
                             family: *family,
@@ -7149,6 +8550,64 @@ impl Constitution {
                 if let Some(&(locus, family)) =
                     declared.families().find(|key| !place.contains_key(*key))
                 {
+                    let mut refusal = epoch::EpochStageRefusal::at(
+                        "declared_certificate",
+                        epoch::EpochStageCondition::DeclaredFamily,
+                        "every declared family must reach this certificate",
+                        Some(locus),
+                        Some(family),
+                    );
+                    // Exterior operands at the existing refusal, not a substitute ray or rate.
+                    // An actually supplied zero-aligned factor is filtered above; distinguish
+                    // it from a genuinely absent request without changing certificate admission.
+                    if let Some((_, face)) = supplied_factor_faces
+                        .iter()
+                        .find(|(at, face)| *at == locus && face.family == family)
+                    {
+                        refusal = refusal
+                            .read(
+                                "provided_certificate_alignment",
+                                epoch::EpochStageValue::Ratio(face.alignment.clone()),
+                            )
+                            .read(
+                                "provided_covector",
+                                epoch::EpochStageValue::Ratio(face.covector.clone()),
+                            )
+                            .read(
+                                "provided_scale",
+                                epoch::EpochStageValue::Ratio(face.scale.clone()),
+                            )
+                            .read(
+                                "provided_energy",
+                                epoch::EpochStageValue::Ratio(face.energy.clone()),
+                            )
+                            .read(
+                                "original_request_index",
+                                epoch::EpochStageValue::Index(face.index),
+                            )
+                            .read(
+                                "supplied_factor_has_zero_alignment",
+                                epoch::EpochStageValue::Index(usize::from(
+                                    face.alignment.is_zero(),
+                                )),
+                            );
+                    } else {
+                        refusal = refusal.read(
+                            "provided_factor",
+                            epoch::EpochStageValue::Unavailable(
+                                "no matching prepared factor was supplied",
+                            ),
+                        );
+                    }
+                    if let Some(exponent) = declared.exponent(locus, family) {
+                        refusal = refusal.read(
+                            "declared_eta",
+                            epoch::EpochStageValue::Ratio(crate::holon::deposition::dyadic(
+                                exponent,
+                            )),
+                        );
+                    }
+                    refusal.first(evidence);
                     return Ok(Err(DeclaredStepRefusal::Undeclared { locus, family }));
                 }
                 // The readings at the declared rays' ends, recorded beside the step.
@@ -7161,6 +8620,86 @@ impl Constitution {
                 let bounds = bounds_of(&read);
                 let certified: Vec<&CertifiedStep> = steps.iter().flatten().collect();
                 let joint = joint_of(&certified, &bounds);
+                if matches!(source, StepSource::Actual(_)) {
+                    // A represented epoch move is a fixed candidate. Unlike
+                    // Declared/Candidate, it must satisfy the very same bounds
+                    // used by Certified, including the executed tube closure.
+                    use epoch::{
+                        EpochStageCondition as Condition, EpochStageRefusal,
+                        EpochStageValue as Value,
+                    };
+                    if let Some((index, step)) =
+                        steps.iter().enumerate().find_map(|(index, step)| {
+                            step.as_ref()
+                                .filter(|step| !step.admits(&step.curvature))
+                                .map(|step| (index, step))
+                        })
+                    {
+                        EpochStageRefusal::at(
+                            "actual_certificate",
+                            Condition::ActualRayCurvature,
+                            "eta * curvature <= alignment and eta * covector <= 1",
+                            Some(parts[index].0),
+                            Some(parts[index].1),
+                        )
+                        .read("step", Value::Step(step.clone()))
+                        .read("gain", Value::Ratio(read[index].0.clone()))
+                        .read("moves", Value::Ratio(read[index].1.clone()))
+                        .read("score_curvature", Value::Ratio(score.clone()))
+                        .read(
+                            "own_curvature_slack",
+                            Value::Ratio(&step.alignment - &step.step * &step.curvature),
+                        )
+                        .read(
+                            "covector_slack",
+                            Value::Ratio(Rat::one() - &step.step * &step.covector),
+                        )
+                        .fixed_ray_step_diagnostic(step)
+                        .first(evidence);
+                        return Err(HnnError::Unadmitted {
+                            reason: "the actual epoch ray violates its own curvature bound",
+                        });
+                    }
+                    if !joint.holds() {
+                        let mut failure = EpochStageRefusal::at(
+                            "actual_certificate",
+                            Condition::JointTriangle,
+                            "joint curvature <= joint first-order decrease",
+                            None,
+                            None,
+                        )
+                        .read("joint", Value::Joint(joint.clone()));
+                        failure.participating_families = parts
+                            .iter()
+                            .map(|(locus, family, _)| (*locus, *family))
+                            .collect();
+                        failure.first(evidence);
+                        return Err(HnnError::Unadmitted {
+                            reason: "the actual epoch rays violate the joint triangle bound",
+                        });
+                    }
+                    if let Some((closure, _)) = closure_of(&steps)?
+                        .into_iter()
+                        .find(|(closure, _)| !closure.holds())
+                    {
+                        let mut failure = EpochStageRefusal::at(
+                            "actual_certificate",
+                            Condition::PumpTube,
+                            "executed tube deviation <= tube slack",
+                            Some(Locus::Resonator(closure.ring)),
+                            None,
+                        )
+                        .read("closure", Value::Tube(closure));
+                        failure.participating_families = parts
+                            .iter()
+                            .map(|(locus, family, _)| (*locus, *family))
+                            .collect();
+                        failure.first(evidence);
+                        return Err(HnnError::Unadmitted {
+                            reason: "the actual epoch rays leave an executed pump tube",
+                        });
+                    }
+                }
                 (steps, read, bounds, joint)
             }
         };
@@ -7182,6 +8721,12 @@ impl Constitution {
                 bounds = bounds_of(&read);
                 joint = joint_of(&steps.iter().flatten().collect::<Vec<_>>(), &bounds);
             }
+        }
+        if let Some(pumped) = pumped_reading.as_mut() {
+            pumped.closures = closure_of(&steps)?
+                .into_iter()
+                .map(|(closure, _)| closure)
+                .collect();
         }
         let (readout, amplitude) = gains(&steps);
         let readings: BTreeMap<(Locus, Family), StepReading> = parts
@@ -7294,6 +8839,68 @@ impl Constitution {
     }
 
     /// The finite contact span's scope: no linear step, and every factor step at a channel.
+    fn native_contact_loaded(&self,loaded:&crate::hnn::word::finite_gain::FiniteContactSpans)->Result<crate::hnn::word::finite_gain::LoadedSpanReading,HnnError>{
+        let forms:Vec<_>=self.contacts.iter().map(|c|{
+            let (a,b)=schur_norms(&c.storage);let (d,e)=schur_norms(&c.stiffness);(a*b,d*e)
+        }).collect();
+        loaded.read(&forms)
+    }
+    fn native_zero_contact_direction(&self)->Result<crate::hnn::word::material_ray::ContactDirections,HnnError>{
+        self.contacts.iter().map(|c|Ok([ExactRatMatrix::zero(c.storage.rows(),c.storage.columns())?,
+            ExactRatMatrix::zero(c.stiffness.rows(),c.stiffness.columns())?,ExactRatMatrix::zero(c.dissipation.rows(),c.dissipation.columns())?])).collect()
+    }
+    fn native_unit_contact_direction(&self,deposit:&Deposit,contact:usize,family:usize,scale:&Rat)
+        ->Result<crate::hnn::word::material_ray::ContactDirections,HnnError>{
+        if scale<=&Rat::zero(){return Err(HnnError::Unadmitted{reason:"physical contact query retains its actual positive prepared statistic"});}
+        let mut result=self.native_zero_contact_direction()?;let mut found=false;
+        for step in deposit.factors(){let(a,f,g)=match &step.gradient{
+            FactorGradient::Storage{contact,gradient}=>(*contact,0,gradient),FactorGradient::Stiffness{contact,gradient}=>(*contact,1,gradient),FactorGradient::Dissipation{contact,gradient}=>(*contact,2,gradient),
+            _=>return Err(HnnError::Unadmitted{reason:"physical contact query has only reached native C/K/D"})};
+            if a==contact&&f==family{if found{return Err(HnnError::Unadmitted{reason:"one prepared native factor direction per original reached family"});}result[a][f]=g.scaled(&scale.recip());found=true;}
+        }
+        if !found{return Err(HnnError::Unadmitted{reason:"physical direction is the original prepared reached factor"});}Ok(result)
+    }
+    /// Actual represented FACTOR direction, after carry/rounding, before any publication.
+    /// This is a first-variation predicate, NOT a finite native-score decrease assertion.
+    pub(crate) fn native_contact_actual_ray(&self,next:&Self,deposit:&Deposit,loaded:&crate::hnn::word::finite_gain::FiniteContactSpans)->Result<(Rat,Rat,Option<crate::hnn::word::native_prediction::NativePhysicalRayReading>),HnnError>{
+        let native=loaded.native().ok_or(HnnError::Unadmitted{reason:"actual native contact ray requires its paired source-bound gain/error witness"})?;
+        native.admit(self,deposit)?;
+        if native.represented(){
+            let mut direction=self.native_zero_contact_direction()?;
+            for (a,(old,new))in self.contacts.iter().zip(&next.contacts).enumerate(){
+                direction[a]=[new.storage.subtract(&old.storage)?,new.stiffness.subtract(&old.stiffness)?,new.dissipation.subtract(&old.dissipation)?];
+            }
+            let moved=direction.iter().flatten().any(|m|m.entries().iter().any(|x|!x.is_zero()));
+            let reading=loaded.physical_query(&direction,&direction)?;
+            if moved&&reading.lower<=Rat::zero(){return Err(native.physical_refusal("actual represented factor delta / physical first variation",reading));}
+            return Ok((reading.stored_pairing.clone(),&reading.reverse_discrepancy+&reading.class_error_charge+&reading.response_error_charge,Some(reading)));
+        }
+        let bound=self.native_contact_loaded(loaded)?;
+        let mut pairing=Rat::zero();let mut response_squared=Rat::zero();let mut terms=0u64;
+        for step in deposit.factors(){
+            let (contact,family,gradient)=match &step.gradient{
+                FactorGradient::Storage{contact,gradient}=>(*contact,0,gradient),
+                FactorGradient::Stiffness{contact,gradient}=>(*contact,1,gradient),
+                FactorGradient::Dissipation{contact,gradient}=>(*contact,2,gradient),
+                _=>return Err(HnnError::Unadmitted{reason:"native contact ray only contains reached C/K/D factors"}),
+            };
+            let old=self.contacts.get(contact).ok_or(HnnError::CountOverflow)?;
+            let new=next.contacts.get(contact).ok_or(HnnError::CountOverflow)?;
+            let (a,b)=match family{0=>(&old.storage,&new.storage),1=>(&old.stiffness,&new.stiffness),_=>(&old.dissipation,&new.dissipation)};
+            let delta=b.subtract(a)?;
+            if delta.entries().iter().all(Zero::is_zero){continue;}
+            pairing+=gradient.entries().iter().zip(delta.entries()).map(|(g,d)|g*d).sum::<Rat>();
+            let moves=channel_factor_moves(family,a,schur_norms(&delta),&self.hop).own(&step.energy,&Rat::zero())?;
+            response_squared+=bound.gain(contact,&(native.readout_norm()*native.readout_norm()))*moves;
+            terms+=1;
+        }
+        // Cross effects of all changed factors as well as the actual/fresh cross term are kept.
+        let error=native.error_charge(&(Rat::from_integer(BigInt::from(terms))*response_squared));
+        if terms!=0 && pairing<=error {return Err(HnnError::Unadmitted{reason:"actual represented native contact differential exceeds its authentic class/phase error charge"});}
+        Ok((pairing,error,None))
+    }
+
+    /// The finite contact span's scope: no linear step, and every factor step at a channel.
     fn contact_only(deposit: &Deposit) -> Result<(), HnnError> {
         if !deposit.linear().is_empty()
             || deposit
@@ -7378,6 +8985,7 @@ impl Constitution {
         loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
         mode: DepositMode<'_>,
     ) -> Result<DepositOutcome, HnnError> {
+        if let Some(native)=loaded.and_then(|span|span.native()) { native.admit(self,deposit)?; }
         if deposit.commit() != self.commit {
             return Err(HnnError::StaleDeposit {
                 staged: deposit.commit(),
@@ -7488,6 +9096,31 @@ impl Constitution {
         if let Some((_, refusal)) = first {
             return Err(refusal);
         }
+        // Native packed-class uncertainty is charged on each fresh factor direction.
+        // This is paired propagation on the SAME fixed opening, not the R-ray witness.
+        if let Some(span)=loaded {
+            if let Some(native)=span.native(){
+                let physical=self.native_contact_loaded(span)?;
+                for ((locus,..),region) in regions.iter().zip(&mut ready){
+                    let Locus::Channel(contact)=locus else{return Err(HnnError::Unadmitted{reason:"paired native contact gain covers contact-only material"});};
+                    for factor in &mut region.factors{
+                        if native.represented(){
+                            let Family::Factor(family)=factor.family else{return Err(HnnError::Unadmitted{reason:"physical native query covers actual contact factors"});};
+                            let direction=self.native_unit_contact_direction(deposit,*contact,family,&factor.scale)?;
+                            let reading=span.physical_query(&direction,&self.native_zero_contact_direction()?)?;
+                            if direction.iter().flatten().any(|m|m.entries().iter().any(|x|!x.is_zero()))&&reading.lower<=Rat::zero(){return Err(native.physical_refusal("fresh prepared unit / physical first variation",reading));}
+                            factor.alignment=floor(&factor.alignment.clone().min(reading.lower));
+                            continue;
+                        }
+                        let motion=factor.moves.own(&factor.energy,&Rat::zero())?;
+                        let gain=physical.gain(*contact,&(native.readout_norm()*native.readout_norm()));
+                        let error=native.error_charge(&(gain*motion));
+                        if !factor.alignment.is_zero() && factor.alignment<=error{return Err(HnnError::Unadmitted{reason:"native fresh contact alignment exceeds its original prediction-error enclosure"});}
+                        factor.alignment=floor(&(&factor.alignment-error));
+                    }
+                }
+            }
+        }
         // The certificate reads every prepared step at once.
         let (certified, joint, pumped, loaded) = {
             let linear: Vec<(Locus, LinearLocus, PreparedDirectionRef<'_>)> = regions
@@ -7519,7 +9152,15 @@ impl Constitution {
                 DepositMode::Candidate { halvings } => StepSource::Candidate { halvings },
                 DepositMode::Certified | DepositMode::FirstReach => StepSource::Certified,
             };
-            match self.certify_steps(deposit.reach(), &linear, &factors, loaded, source)? {
+            match self.certify_steps(
+                deposit.reach(),
+                &linear,
+                &factors,
+                loaded,
+                source,
+                None,
+                None,
+            )? {
                 Ok(steps) => steps,
                 Err(refusal) => return Ok(DepositOutcome::Refused(refusal)),
             }
@@ -7867,6 +9508,7 @@ impl Constitution {
             }
         };
         let reading = DepositReading {
+            epoch: None,
             storage_growth,
             storage_product: next.storage_product.clone(),
             unresolved_contact_material: next
@@ -8207,11 +9849,43 @@ impl Constitution {
         &self,
         locus: Locus,
         steps: &[(usize, LocusStep<'_>)],
-        mut material: Option<&mut LocusMaterial<'_>>,
+        material: Option<&mut LocusMaterial<'_>>,
         carries: &mut Carries,
     ) -> Result<Prepared, (usize, HnnError)> {
+        self.prepare_at_on_lattice(locus, steps, material, carries, None)
+    }
+
+    /// A staged channel rebase binds its refined lattice before the first fresh statistic
+    /// advance. The immutable published predecessor still supplies the clock, covector and
+    /// admission owner. This temporary stroke creates no extra persistent clock or commit.
+    fn prepare_at_on_lattice(
+        &self,
+        locus: Locus,
+        steps: &[(usize, LocusStep<'_>)],
+        mut material: Option<&mut LocusMaterial<'_>>,
+        carries: &mut Carries,
+        lattice: Option<Lattice>,
+    ) -> Result<Prepared, (usize, HnnError)> {
+        let stroke = if let Some(lattice) = lattice {
+            let index = steps.first().map_or(0, |(index, _)| *index);
+            if !matches!(locus, Locus::Channel(_)) {
+                return Err((
+                    index,
+                    HnnError::Unadmitted {
+                        reason: "an epoch lattice override belongs only to a channel",
+                    },
+                ));
+            }
+            let clock = self
+                .clock(locus)
+                .checked_add(1)
+                .ok_or_else(|| (index, HnnError::from(ExactLinearError::ExtentOverflow)))?;
+            Some(BudgetedCarry::new(lattice, clock))
+        } else {
+            None
+        };
         let mut prepared = Prepared {
-            stroke: None,
+            stroke,
             linear: None,
             factors: Vec::new(),
         };
@@ -8251,6 +9925,7 @@ impl Constitution {
                             },
                         })
                         .map_err(refused)?;
+                    law.require_legacy().map_err(refused)?;
                     let at = self.stroke(locus, &mut prepared.stroke).map_err(refused)?;
                     let rule = self.chart_rule(locus).map_err(refused)?;
                     // The receiving map's step in its class Fisher metric (the contact loop record
@@ -8788,6 +10463,105 @@ mod candidate_relative_step_tests {
     use super::*;
 
     #[test]
+    fn missing_declared_zero_factor_reports_actual_supplied_operands_without_admission() {
+        let field = Field::declare(
+            crate::hnn::tests::learning::chain_declaration(1 << 16).by_lattice_rule(),
+        )
+        .unwrap();
+        let material = Constitution::initial(&field, 1 << 40).unwrap();
+        let receiver = field.receivers()[0].ring;
+        let make = |contact, alignment| FactorPrepared {
+            index: contact,
+            family: Family::Factor(2),
+            scale: rat(3, 2),
+            alignment,
+            covector: Rat::one(),
+            energy: Rat::zero(),
+            moves: channel_factor_moves(
+                2,
+                &material.contacts[contact].dissipation,
+                (Rat::one(), Rat::one()),
+                &material.hop,
+            ),
+        };
+        let tiny = Rat::new(BigInt::one(), BigInt::one() << 200usize);
+        let first = make(0, floor(&tiny));
+        assert!(
+            first.alignment.is_positive() && first.alignment <= tiny,
+            "the relative significant-bit floor preserves arbitrarily small positive alignment"
+        );
+        let zero = make(1, Rat::zero());
+        let factors = [(Locus::Channel(0), &first), (Locus::Channel(1), &zero)];
+        let declared = DeclaredExponents {
+            steps: (0..2)
+                .map(|contact| {
+                    (
+                        (Locus::Channel(contact), Family::Factor(2)),
+                        DeclaredExponent {
+                            exponent: 0,
+                            reach: None,
+                        },
+                    )
+                })
+                .collect(),
+        };
+        let reach = Reach {
+            receiver,
+            stations: vec![2, 4],
+            entries: vec![0],
+            phases: 1,
+            loci: crate::hnn::retention::loci(&field).into_iter().collect(),
+            passages: vec![],
+        };
+        let mut evidence = None;
+        let result = material
+            .certify_steps_with_epoch_evidence(
+                Some(&reach),
+                &[],
+                &factors,
+                None,
+                StepSource::Actual(&declared),
+                None,
+                None,
+                &mut evidence,
+            )
+            .unwrap();
+        assert!(
+            result.is_err(),
+            "a declared zero-aligned moving factor cannot gain admission"
+        );
+        let evidence = evidence.unwrap();
+        assert_eq!(
+            (evidence.locus, evidence.family),
+            (Some(Locus::Channel(1)), Some(Family::Factor(2)))
+        );
+        assert_eq!(
+            evidence.condition,
+            epoch::EpochStageCondition::DeclaredFamily
+        );
+        for (name, expected) in [
+            (
+                "provided_certificate_alignment",
+                epoch::EpochStageValue::Ratio(Rat::zero()),
+            ),
+            ("provided_scale", epoch::EpochStageValue::Ratio(rat(3, 2))),
+            ("original_request_index", epoch::EpochStageValue::Index(1)),
+            (
+                "supplied_factor_has_zero_alignment",
+                epoch::EpochStageValue::Index(1),
+            ),
+            ("declared_eta", epoch::EpochStageValue::Ratio(Rat::one())),
+        ] {
+            assert!(
+                evidence
+                    .readings
+                    .iter()
+                    .any(|r| r.name == name && r.value == expected)
+            );
+        }
+    }
+
+    #[test]
     fn candidate_halving_preserves_relative_family_exponents() {
         let make = |exponent| {
             Some(CertifiedStep {
@@ -8832,8 +10606,12 @@ mod candidate_relative_step_tests {
 #[derive(Clone, Copy)]
 enum StepSource<'d> {
     Certified,
-    Candidate { halvings: u32 },
+    Candidate {
+        halvings: u32,
+    },
     Declared(&'d DeclaredExponents),
+    /// Fixed represented deltas: shared ray reads, enforced bounds, no search.
+    Actual(&'d DeclaredExponents),
 }
 
 impl StepSource<'_> {
@@ -8841,7 +10619,10 @@ impl StepSource<'_> {
     fn unstepped(&self) -> Result<(), DeclaredStepRefusal> {
         match self {
             StepSource::Certified | StepSource::Candidate { .. } => Ok(()),
-            StepSource::Declared(declared) => match declared.families().next() {
+            StepSource::Declared(declared) | StepSource::Actual(declared) => match declared
+                .families()
+                .next()
+            {
                 Some(&(locus, family)) => Err(DeclaredStepRefusal::Undeclared { locus, family }),
                 None => Ok(()),
             },
@@ -9444,6 +11225,7 @@ struct PreparedDirectionRef<'a> {
     moves: &'a Rat,
     covector: &'a Rat,
     unit_norms: &'a (Rat, Rat),
+    epoch_norm: Option<&'a Rat>,
 }
 enum PreparedLinear {
     Single(PreparedStep),
@@ -9458,6 +11240,7 @@ impl PreparedLinear {
                 moves: &p.moves,
                 covector: &p.covector,
                 unit_norms: &p.unit_norms,
+                epoch_norm: None,
             },
             Self::Blocks(p) => {
                 let d = p.direction();
@@ -9467,6 +11250,7 @@ impl PreparedLinear {
                     moves: &d.moves,
                     covector: &d.covector,
                     unit_norms: &d.unit_norms,
+                    epoch_norm: None,
                 }
             }
         }
@@ -9483,6 +11267,7 @@ struct Prepared {
 /// carried statistic `h_x′` (the metric of the unit step `D = G_x / h_x′`), the unit step's alignment
 /// `a = |G_x|² / h_x′`, the covector scale `c`, the feature energy `e`, and the norms its output's
 /// moves read.
+#[derive(Clone)]
 pub(crate) struct FactorPrepared {
     index: usize,
     family: Family,
@@ -9495,6 +11280,7 @@ pub(crate) struct FactorPrepared {
 
 /// **The norms a factor family's output moves read** (module header's table), each Schur pair
 /// `(‖X‖₁, ‖X‖_∞)` exact.
+#[derive(Clone)]
 enum Moves {
     /// A square carrier `w x xᵀ` read at its feature: `weight = 4w²`, the unit step's and the
     /// factor's Schur norms; `b(η) = weight S(D) S(x + ηD) e`.
@@ -9860,24 +11646,13 @@ fn factor_prepared(
                 &mut material.scales[index],
                 energy,
             )?;
-            // The transit reads `2C(w − ω)`, `hK(u + ½hω)` and `hDω`: the output's weight `w` enters
-            // the moves as `4w²` (16, `4h²`, `4h²`). A boost's signature flips columns only, so the
-            // unit step's norms are the gradient's.
-            let weight = match index {
-                0 => integer(16),
-                _ => integer(4) * hop * hop,
-            };
             let factor = match index {
                 0 => &material.storage,
                 1 => &material.stiffness,
                 _ => &material.dissipation,
             };
             let (column, row) = schur_flat(gradient.entries(), gradient.columns());
-            let moves = Moves::Square {
-                weight,
-                unit: ceilings(&(column / &scale, row / &scale)),
-                factor: ceilings(&schur_norms(factor)),
-            };
+            let moves = channel_factor_moves(index, factor, (column / &scale, row / &scale), hop);
             (scale.clone(), squared(gradient.entries()) / &scale, moves)
         }
         // A factor step's locus is its gradient's, so its material is this locus's.
@@ -9894,11 +11669,52 @@ fn factor_prepared(
     })
 }
 
+/// Pure first-variation reader shared by fresh channel preparation and a fixed actual ray.
+/// Advancing a normalization statistic is deliberately outside this function. This bound is
+/// not a nonlinear comparison-descent certificate; an actual endpoint still owes admission.
+fn channel_factor_moves(
+    family: usize,
+    factor: &ExactRatMatrix,
+    direction_norms: (Rat, Rat),
+    hop: &Rat,
+) -> Moves {
+    // The transit reads 2C(w-omega), hK(u+h omega/2), hD omega.
+    let weight = if family == 0 {
+        rat(16, 1)
+    } else {
+        rat(4, 1) * hop * hop
+    };
+    Moves::Square {
+        weight,
+        unit: ceilings(&direction_norms),
+        factor: ceilings(&schur_norms(factor)),
+    }
+}
+
 /// Whether a resonator is pumped (its declared pump at a nonzero strength).
 fn pumped(resonator: &ResonatorMaterial) -> bool {
     resonator
         .pump()
         .is_some_and(|pump| !pump.strength().is_zero())
+}
+
+/// The tube metrics a certified step reads and the rung of their radius ladder
+/// ([`Constitution::certify_steps`]).
+#[derive(Clone, Copy)]
+struct TubeRung<'t> {
+    tubes: &'t [(TubePassage, TubeMetric)],
+    rung: u32,
+    /// The active epoch's maintained readout bound and independent local reaches.
+    epoch_readout: Option<&'t Rat>,
+    epoch_reaches: Option<&'t [Reach]>,
+}
+
+/// [definition; agent-inferred, October 18; the design review of step 1a] **A resonator read on its
+/// tube**: saturated on a one-tick period (`hnn::ring::ResonatorOperands::reads_tube`, read on the
+/// material: no pump, or one of one phase). Its tick is not linear, so its reach is the tube's about
+/// its passage, not a monodromy's.
+fn reads_tube(resonator: &ResonatorMaterial) -> bool {
+    resonator.saturation().is_some() && resonator.phases() == 1
 }
 
 /// [definition; agent-inferred, September 29] **A resonator certified passive** (module header, "The
@@ -10390,6 +12206,10 @@ pub struct ContinuingState {
     /// ([`crate::hnn::reference::Reference::mount_continued`]); here its lines are carried inside
     /// the check.
     passage: Option<String>,
+    /// The exterior listener's actual ingress clock, counted from founding. A rekey may change
+    /// a ring's residue without ticking it, so this count cannot be recovered from its lift.
+    /// The listener saves/restores it beside its passage; a legacy state leaves it unavailable.
+    receiver_ingress_ticks: Option<(usize, u64)>,
 }
 
 /// [definition; agent-inferred, October 4; the reception carry §9] **A ring's learned material**:
@@ -10431,7 +12251,11 @@ fn same_shape(a: &ExactRatMatrix, b: &ExactRatMatrix) -> bool {
 }
 
 fn same_law_shape(a: &NormalLaw, b: &NormalLaw) -> bool {
-    same_shape(&a.map, &b.map) && a.gram.len() == b.gram.len()
+    let gram_shape = |law: &NormalLaw| match law.epoch_law() {
+        Some(epoch) => (epoch.gram.rows, epoch.gram.columns),
+        None => (law.gram.len(), law.gram.first().map_or(0, Vec::len)),
+    };
+    same_shape(a.map(), b.map()) && gram_shape(a) == gram_shape(b)
 }
 
 fn widths(family: &[Vec<Rat>]) -> Vec<usize> {
@@ -10612,7 +12436,7 @@ impl RingMaterial {
         self.standing_scale = zero.clone();
         self.passive = self.passive.scaled(&zero);
         self.passive_scale = zero.clone();
-        self.contrast = NormalLaw::with_prior(self.contrast.map.scaled(&zero));
+        self.contrast = NormalLaw::with_prior(self.contrast.map().scaled(&zero));
         self.slices = self
             .slices
             .iter()
@@ -10682,6 +12506,46 @@ pub fn text_residue(text: &str) -> u128 {
 }
 
 impl Constitution {
+    /// Bind restored grouped phase rows to the actual receiving field. A
+    /// checkpoint supplies values and certificates, never another ring period.
+    pub(crate) fn admit_epoch_field(&self, field: &Field) -> Result<(), HnnError> {
+        let receiver_exponent = lattice_exponent(u128::from(field.finest_grain()), 1);
+        for (ring, material) in self.rings.iter().enumerate() {
+            for law in std::iter::once(&material.contrast).chain(material.source.iter()) {
+                if let Some(epoch) = law.epoch_law()
+                    && (epoch.receiver_grain != receiver_exponent
+                        || epoch.news.row_divisors.iter().any(|&d| d != 1))
+                {
+                    return Err(HnnError::ContinuingState {
+                        what: "a grouped source or contrast against the field's receiver precision",
+                    });
+                }
+            }
+            if let Some(receiving) = &material.receiving {
+                let period = field.ring(ring).period();
+                for law in receiving.laws() {
+                    if let Some(epoch) = law.epoch_law() {
+                        if period <= 1
+                            || period % 2 == 0
+                            || epoch.receiver_grain != receiver_exponent
+                            || epoch
+                                .news
+                                .row_divisors
+                                .iter()
+                                .enumerate()
+                                .any(|(row, &d)| d != if row % 2 == 0 { 1 } else { period })
+                        {
+                            return Err(HnnError::ContinuingState {
+                                what: "grouped receiving phase rows against the actual field period and precision",
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
     /// **The complete continuing state** ([`ContinuingState`]) headed by ring `g`'s source port:
     /// refused off a source ring, and complete wherever the constitution has moved.
     pub fn continuing_state(&self, ring: usize) -> Result<ContinuingState, HnnError> {
@@ -10719,6 +12583,7 @@ impl Constitution {
             material: self.material_identity(),
             carry: None,
             passage: None,
+            receiver_ingress_ticks: None,
         })
     }
 
@@ -10750,6 +12615,100 @@ impl Constitution {
         text_residue(&format!("{material:?}"))
     }
 
+    /// Exterior matched C/K control at this candidate's channel grains. Keep
+    /// every candidate field except the physical storage and stiffness forms
+    /// and their physical factor carries; re-express the predecessor's held
+    /// C/K carry losslessly at the candidate lattice under the old-form cap.
+    /// Dissipation, scales, clocks, current, passage, and all other carriers
+    /// remain the candidate's. This is a disposable comparison material, not a
+    /// deposition or publication law.
+    pub(crate) fn held_channel_storage_control(
+        &self,
+        predecessor: &Self,
+    ) -> Result<Self, HnnError> {
+        if self.material_identity() != predecessor.material_identity()
+            || self.contacts.len() != predecessor.contacts.len()
+            || self
+                .lattices
+                .keys()
+                .filter(|l| matches!(l, Locus::Channel(_)))
+                .ne(predecessor
+                    .lattices
+                    .keys()
+                    .filter(|l| matches!(l, Locus::Channel(_))))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a C/K control keeps its original material declarations and channel loci",
+            });
+        }
+        let mut control = self.clone();
+        for (contact, (candidate, old)) in control
+            .contacts
+            .iter_mut()
+            .zip(&predecessor.contacts)
+            .enumerate()
+        {
+            if !same_shape(&candidate.storage, &old.storage) {
+                return Err(HnnError::Shape {
+                    what: "held storage factor",
+                    expected: candidate.storage.entries().len(),
+                    found: old.storage.entries().len(),
+                });
+            }
+            if !same_shape(&candidate.stiffness, &old.stiffness) {
+                return Err(HnnError::Shape {
+                    what: "held stiffness factor",
+                    expected: candidate.stiffness.entries().len(),
+                    found: old.stiffness.entries().len(),
+                });
+            }
+            let locus = Locus::Channel(contact);
+            let candidate_lattice = self
+                .lattices
+                .get(&locus)
+                .copied()
+                .ok_or(HnnError::Lattice { locus })?;
+            let old_lattice = predecessor
+                .lattices
+                .get(&locus)
+                .copied()
+                .ok_or(HnnError::Lattice { locus })?;
+            let clock = |state: &Self| state.clocks.get(&locus).copied().unwrap_or(0);
+            let old_storage_carry = predecessor
+                .carries
+                .get(&(locus, Carrier::Factor(0)))
+                .cloned()
+                .unwrap_or_default();
+            let old_stiffness_carry = predecessor
+                .carries
+                .get(&(locus, Carrier::Factor(1)))
+                .cloned()
+                .unwrap_or_default();
+            let (storage, stiffness, storage_carry, stiffness_carry) = held_ck_at_lattice(
+                &old.storage,
+                &old.stiffness,
+                &old_storage_carry,
+                &old_stiffness_carry,
+                old_lattice,
+                candidate_lattice,
+                clock(predecessor),
+                clock(self),
+            )?;
+            candidate.storage = storage;
+            candidate.stiffness = stiffness;
+            for (carrier, carry) in [
+                (Carrier::Factor(0), storage_carry),
+                (Carrier::Factor(1), stiffness_carry),
+            ] {
+                control.carries.remove(&(locus, carrier));
+                if !carry.0.is_empty() {
+                    control.carries.insert((locus, carrier), carry);
+                }
+            }
+        }
+        Ok(control)
+    }
+
     /// Whether this constitution declares a locus (its ring or contact exists).
     fn declares(&self, locus: &Locus) -> bool {
         match *locus {
@@ -10761,6 +12720,16 @@ impl Constitution {
             | Locus::ReceivingMap(g) => g < self.rings.len(),
             Locus::Channel(a) | Locus::Conductance(a) => a < self.contacts.len(),
         }
+    }
+
+    /// Restore this declared opening and bind every grouped law to its actual field before
+    /// any resident, passage or boundary caller can consume the saved material. Fieldless
+    /// `continued` validates native structure only; deferred receiving row periods are not
+    /// admitted until this owner checks the field's period and receiver precision.
+    pub fn continued_on(self, field: &Field, state: &ContinuingState) -> Result<Self, HnnError> {
+        let restored = self.continued(state)?;
+        restored.admit_epoch_field(field)?;
+        Ok(restored)
     }
 
     /// **The constitution continued from a checkpoint** ([`ContinuingState`]): this constitution,
@@ -10809,11 +12778,102 @@ impl Constitution {
                 "the state continues another opening's material (its loci)",
             ));
         }
+        // A saved lattice is an active material law even when its normal has no epoch or has
+        // not yet made an adaptive source move. Validate every locus before placing material
+        // or calling contains(), which forms 2^L. Legitimate finer rebases remain admitted.
+        for (locus, saved) in &state.lattices {
+            let founding = self.lattices.get(locus).expect("the locus keys agree");
+            if saved.exponent() < founding.exponent() {
+                return Err(refuse(
+                    "a continued lattice cannot coarsen its founding declaration",
+                ));
+            }
+            let precision = gamma_length(state.clocks.get(locus).copied().unwrap_or(0));
+            let fine = saved.exponent().checked_add(precision).ok_or_else(|| {
+                refuse("a continued lattice and clock exceed the exact exponent carrier")
+            })?;
+            if u64::from(fine) > self.budget {
+                return Err(HnnError::ConstitutionBudget {
+                    bits: u64::from(fine),
+                    budget: self.budget,
+                    commit: state.commit,
+                    loci: vec![*locus],
+                });
+            }
+        }
         self.release(&state.released)?;
         if self.material_identity() != state.material {
             return Err(refuse("the state continues another opening's material"));
         }
-        for (material, saved) in self.rings.iter_mut().zip(&state.rings) {
+        let receiver_exponent = lattice_exponent(self.grain, 1);
+        for (ring, (material, saved)) in self.rings.iter_mut().zip(&state.rings).enumerate() {
+            for (saved, declared, source) in [
+                (Some(&saved.contrast), Some(&material.contrast), false),
+                (saved.source.as_ref(), material.source.as_ref(), true),
+            ] {
+                if let (Some(saved), Some(declared)) = (saved, declared)
+                    && let Some(epoch) = saved.epoch_law()
+                {
+                    epoch.validate_against_native(declared, receiver_exponent, source)?;
+                    if source
+                        && epoch.source_refinement
+                        && state
+                            .lattices
+                            .get(&Locus::SourcePort(ring))
+                            .map(Lattice::exponent)
+                            != Some(epoch.map_lattice)
+                    {
+                        return Err(refuse(
+                            "the source epoch disagrees with its active material lattice",
+                        ));
+                    }
+                    if source && epoch.source_refinement {
+                        let founding = self
+                            .lattices
+                            .get(&Locus::SourcePort(ring))
+                            .map(Lattice::exponent)
+                            .ok_or_else(|| refuse("a source lattice declaration"))?;
+                        if epoch.map_lattice < founding {
+                            return Err(refuse(
+                                "a continued source lattice cannot coarsen its founding declaration",
+                            ));
+                        }
+                        // Check before on_lattice can materialize 2^L from an
+                        // untrusted active-lattice word.
+                        if u64::from(epoch.map_lattice) > self.budget {
+                            return Err(HnnError::ConstitutionBudget {
+                                bits: u64::from(epoch.map_lattice),
+                                budget: self.budget,
+                                commit: state.commit,
+                                loci: vec![Locus::SourcePort(ring)],
+                            });
+                        }
+                    }
+                    if epoch.receiving_refinement.is_some() || epoch.news.row_divisors.iter().any(|&d| d != 1) {
+                        return Err(refuse(
+                            "odd receiving phase factors outside a receiving normal locus",
+                        ));
+                    }
+                }
+            }
+            if let (Some(saved), Some(declared)) = (&saved.receiving, &material.receiving) {
+                if saved.representation_policy() != declared.representation_policy() || saved.native_rational()!=declared.native_rational() {
+                    return Err(refuse("the receiving representation policy belongs to its founding material"));
+                }
+                saved.validate()?;
+                if saved.representation_policy()==ReceivingRepresentationPolicy::BoundedSubquantumV1 {
+                    if let Some(finer)=saved.laws().iter().filter_map(|l|l.epoch_law().map(|e|e.map_lattice)).max() {
+                        if state.lattices.get(&Locus::ReceivingMap(ring)).map(Lattice::exponent)!=Some(finer) {
+                            return Err(refuse("the receiving normal lattices disagree with their active material lattice"));
+                        }
+                    }
+                }
+                for (saved, declared) in saved.laws().into_iter().zip(declared.laws()) {
+                    if let Some(epoch) = saved.epoch_law() {
+                        epoch.validate_against_native(declared, receiver_exponent, false)?;
+                    }
+                }
+            }
             saved.place(material)?;
         }
         for (material, saved) in self.contacts.iter_mut().zip(&state.contacts) {
@@ -11007,7 +13067,7 @@ fn read_matrix(
 fn write_optional_law(s: &mut String, key: &str, law: Option<&NormalLaw>) {
     match law {
         Some(law) => {
-            write_matrix(s, key, &law.map);
+            write_normal_map(s, key, law);
             write_law(s, law);
         }
         None => *s += &format!("{key} none\n"),
@@ -11019,13 +13079,14 @@ fn read_optional_law(
     lines: &mut std::str::Lines<'_>,
     key: &str,
     what: &'static str,
+    budget: &mut epoch::CheckpointReadBudget,
 ) -> Result<Option<NormalLaw>, HnnError> {
     let shape = head(next(lines, what)?, key, what)?;
     if shape.first().map(String::as_str) == Some("none") {
         return Ok(None);
     }
     let map = read_rows(lines, &shape, what)?;
-    Ok(Some(read_law(lines, map)?))
+    Ok(Some(read_law(lines, map, budget)?))
 }
 
 /// Exact values of a keyed line, `count` of them ([`write_keyed`]).
@@ -11055,7 +13116,7 @@ impl LearnedRing {
         write_keyed(s, "standing-scale", [&self.standing_scale].into_iter());
         write_matrix(s, "passive", &self.passive);
         write_keyed(s, "passive-scale", [&self.passive_scale].into_iter());
-        write_matrix(s, "contrast", &self.contrast.map);
+        write_normal_map(s, "contrast", &self.contrast);
         write_law(s, &self.contrast);
         *s += &format!("slices {}\n", self.slices.len());
         for (u, v) in &self.slices {
@@ -11101,6 +13162,7 @@ impl LearnedRing {
         lines: &mut std::str::Lines<'_>,
         head_law: &NormalLaw,
         is_head: bool,
+        budget: &mut epoch::CheckpointReadBudget,
     ) -> Result<Self, HnnError> {
         let n = number(
             head(
@@ -11125,7 +13187,7 @@ impl LearnedRing {
         let passive = read_matrix(lines, "passive", "a ring's passive map")?;
         let passive_scale = scalar(lines, "passive-scale", "a ring's passive scale")?;
         let contrast_map = read_matrix(lines, "contrast", "a ring's contrast")?;
-        let contrast = read_law(lines, contrast_map)?;
+        let contrast = read_law(lines, contrast_map, budget)?;
         if contrast.phase.is_some() {
             return refuse("a contrast law (it carries no phase statistics)");
         }
@@ -11146,7 +13208,7 @@ impl LearnedRing {
             }
             Some(head_law.clone())
         } else {
-            read_optional_law(lines, "source", "a ring's source law")?
+            read_optional_law(lines, "source", "a ring's source law", budget)?
         };
         if let Some(law) = &source {
             if law.receiving_prior.is_some() || law.phase.is_some() || law.chart.scale != 0 {
@@ -11181,7 +13243,7 @@ impl LearnedRing {
         }
         let pair_scale = scalar(lines, "pair-scale", "a ring's pair scale")?;
         let receiving =
-            ReceivingMaterial::read_optional(lines, "receiving", "a ring's receiving law")?;
+            ReceivingMaterial::read_optional(lines, "receiving", "a ring's receiving law", budget)?;
         let tree = if lines.clone().next() == Some("tree none") {
             lines.next();
             None
@@ -11241,6 +13303,81 @@ impl LearnedRing {
 }
 
 impl ContinuingState {
+    /// Exterior matched C/K ablation. This is a disposable control chart, never
+    /// a deposition/publication law: retain the candidate's complete motion,
+    /// normals, statistics, D and clocks, while restoring only predecessor C/K
+    /// factors and their physical arithmetic fibres at the candidate channel
+    /// grain. A refinement uses the shared lossless re-base law and refuses if
+    /// any old carry would land in a held raw factor.
+    pub fn held_channel_storage_control(&self, predecessor: &Self) -> Result<Self, HnnError> {
+        if self.material != predecessor.material
+            || self.contacts.len() != predecessor.contacts.len()
+            || self
+                .lattices
+                .keys()
+                .filter(|l| matches!(l, Locus::Channel(_)))
+                .ne(predecessor
+                    .lattices
+                    .keys()
+                    .filter(|l| matches!(l, Locus::Channel(_))))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a C/K control keeps its original material declaration and channel lattice",
+            });
+        }
+        let mut control = self.clone();
+        for (contact, (next, old)) in control
+            .contacts
+            .iter_mut()
+            .zip(&predecessor.contacts)
+            .enumerate()
+        {
+            let locus = Locus::Channel(contact);
+            let candidate_lattice = self
+                .lattices
+                .get(&locus)
+                .copied()
+                .ok_or(HnnError::Lattice { locus })?;
+            let old_lattice = predecessor
+                .lattices
+                .get(&locus)
+                .copied()
+                .ok_or(HnnError::Lattice { locus })?;
+            let old_storage_carry = predecessor
+                .carries
+                .get(&(locus, Carrier::Factor(0)))
+                .cloned()
+                .unwrap_or_default();
+            let old_stiffness_carry = predecessor
+                .carries
+                .get(&(locus, Carrier::Factor(1)))
+                .cloned()
+                .unwrap_or_default();
+            let (storage, stiffness, storage_carry, stiffness_carry) = held_ck_at_lattice(
+                &old.storage,
+                &old.stiffness,
+                &old_storage_carry,
+                &old_stiffness_carry,
+                old_lattice,
+                candidate_lattice,
+                predecessor.clocks.get(&locus).copied().unwrap_or(0),
+                self.clocks.get(&locus).copied().unwrap_or(0),
+            )?;
+            next.storage = storage;
+            next.stiffness = stiffness;
+            for (carrier, carry) in [
+                (Carrier::Factor(0), storage_carry),
+                (Carrier::Factor(1), stiffness_carry),
+            ] {
+                control.carries.remove(&(locus, carrier));
+                if !carry.0.is_empty() {
+                    control.carries.insert((locus, carrier), carry);
+                }
+            }
+        }
+        Ok(control)
+    }
+
     pub fn founded(&self) -> &[crate::hnn::FoundedRing] {
         &self.founded
     }
@@ -11318,6 +13455,24 @@ impl ContinuingState {
         Self { passage, ..self }
     }
 
+    /// The saved receiving ring and its actual ingress ticks; absent is unknown, never zero.
+    pub fn receiver_ingress_ticks(&self) -> Option<(usize, u64)> {
+        self.receiver_ingress_ticks
+    }
+
+    /// Save the exterior receipt clock with the resident passage. The caller counts only
+    /// ingest receipts of cells that actually stepped, snapshots at the batch opening, and
+    /// restores this same count on continuation and forks. This does not alter the constitution.
+    pub fn with_receiver_ingress_ticks(self, ring: usize, ticks: u64) -> Result<Self, HnnError> {
+        if self.passage.is_none() || ring >= self.rings.len() {
+            return refuse("a receiving ingress clock without its resident passage or ring");
+        }
+        Ok(Self {
+            receiver_ingress_ticks: Some((ring, ticks)),
+            ..self
+        })
+    }
+
     /// **The state as text**, every value exact (the type's header): `E rows cols`, the rows,
     /// `rho ρ`, `state g`, `founded k` with one `founded-ring ℓ key` line per founded ring in
     /// founding order, `founding o s` (whether the founding law is open, and the staged period or
@@ -11335,7 +13490,7 @@ impl ContinuingState {
     pub fn to_text(&self) -> String {
         let law = self.head_law();
         let mut s = String::new();
-        write_matrix(&mut s, "E", &law.map);
+        write_normal_map(&mut s, "E", law);
         s += &format!("rho {}\n", self.transport());
         s += &format!("state {}\n", self.ring);
         s += &format!("founded {}\n", self.founded.len());
@@ -11400,6 +13555,9 @@ impl ContinuingState {
             s += &format!("passage {}\n", passage.lines().count());
             s += passage;
         }
+        if let Some((ring, ticks)) = self.receiver_ingress_ticks {
+            s += &format!("receiver-ingress-ticks {ring} {ticks}\n");
+        }
         s += &format!("commit {}\n", self.commit);
         s += &format!("storage-product {}\n", self.storage_product);
         s += &format!("material {}\n", self.material);
@@ -11444,8 +13602,10 @@ impl ContinuingState {
 
     /// **The state read back from its text** ([`ContinuingState::to_text`]); refused, typed, on any
     /// line out of its form (a remount of `E` and `ρ` alone has no `state` line and is refused here:
-    /// it is partial).
-    pub fn from_text(text: &str) -> Result<Self, HnnError> {
+    /// it is partial). The caller supplies its actual declared constitution/read budget;
+    /// grouped denominators and derived map views are admitted before materialization.
+    pub fn from_text(text: &str, budget: u64) -> Result<Self, HnnError> {
+        let mut budget = epoch::CheckpointReadBudget::new(budget);
         // The check covers every byte before its own line: a damaged state is refused whole.
         let at = text.rfind("\ncheck ").ok_or(HnnError::ContinuingState {
             what: "the check line",
@@ -11553,7 +13713,7 @@ impl ContinuingState {
         }) {
             return refuse("the staged period among the founding candidates");
         }
-        let law = read_law(&mut lines, map)?;
+        let law = read_law(&mut lines, map, &mut budget)?;
         let counts = head(
             next(&mut lines, "the rings' head")?,
             "rings",
@@ -11578,7 +13738,7 @@ impl ContinuingState {
             {
                 return refuse("a ring's head (in order)");
             }
-            rings.push(LearnedRing::read(&mut lines, &law, h == ring)?);
+            rings.push(LearnedRing::read(&mut lines, &law, h == ring, &mut budget)?);
         }
         if rings[ring].transport != transport {
             return refuse("the head's modulus against its ring's");
@@ -11631,6 +13791,7 @@ impl ContinuingState {
             let exponent: u32 = exponent.parse().map_err(|_| HnnError::ContinuingState {
                 what: "a lattice's exponent",
             })?;
+            budget.check(u64::from(exponent))?;
             lattices.insert(read_locus(kind, index)?, Lattice::new(exponent));
         }
         let count = number(
@@ -11726,6 +13887,29 @@ impl ContinuingState {
         } else {
             None
         };
+        let receiver_ingress_ticks = if line.starts_with("receiver-ingress-ticks ") {
+            let words = head(
+                line,
+                "receiver-ingress-ticks",
+                "the receiving ingress clock",
+            )?;
+            if words.len() != 2 || passage.is_none() {
+                return refuse("the receiving ingress clock without its resident passage");
+            }
+            let ring = number(words.first(), "the receiving ingress ring")?;
+            let ticks = words[1]
+                .parse::<u64>()
+                .map_err(|_| HnnError::ContinuingState {
+                    what: "the receiving ingress ticks",
+                })?;
+            if ring >= rings.len() {
+                return refuse("the receiving ingress ring outside the saved material");
+            }
+            line = next(&mut lines, "the commit")?;
+            Some((ring, ticks))
+        } else {
+            None
+        };
         let commit: u64 = head(line, "commit", "the commit")?
             .first()
             .and_then(|c| c.parse().ok())
@@ -11770,6 +13954,7 @@ impl ContinuingState {
             material,
             carry,
             passage,
+            receiver_ingress_ticks,
         })
     }
 }
@@ -11843,31 +14028,46 @@ fn read_rows(
 /// integer coordinates, `map-carry c` and `gram-carry c` each with `index value` lines,
 /// `receiving_prior k` or `receiving_prior none`, and `phase none` or the phase statistics
 /// ([`write_phase`]).
+fn write_normal_map(s: &mut String, key: &str, law: &NormalLaw) {
+    if law.epoch_law().is_some() {
+        // The canonical epoch payload owns W. Never save its derived read view.
+        *s += &format!("{key} 0 0\n");
+    } else {
+        write_matrix(s, key, law.map());
+    }
+}
+
 fn write_law(s: &mut String, law: &NormalLaw) {
     let join = |values: &mut dyn Iterator<Item = String>| values.collect::<Vec<_>>().join(" ");
-    *s += &format!("gram {}\n", law.gram.len());
-    for row in &law.gram {
-        *s += &join(&mut row.iter().map(ToString::to_string));
+    if let Some(epoch) = law.epoch_law() {
+        let payload = epoch.encode_checkpoint();
+        *s += &format!("epoch-law {}\n", payload.lines().count());
+        *s += &payload;
+    } else {
+        *s += &format!("gram {}\n", law.gram.len());
+        for row in &law.gram {
+            *s += &join(&mut row.iter().map(ToString::to_string));
+            s.push('\n');
+        }
+        let chart = &law.chart;
+        *s += &format!(
+            "chart {} {} {}\n",
+            chart.exponent, chart.certificate, chart.scale
+        );
+        *s += &format!("support {}\n", chart.support.len());
+        *s += &join(&mut chart.support.iter().map(ToString::to_string));
         s.push('\n');
-    }
-    let chart = &law.chart;
-    *s += &format!(
-        "chart {} {} {}\n",
-        chart.exponent, chart.certificate, chart.scale
-    );
-    *s += &format!("support {}\n", chart.support.len());
-    *s += &join(&mut chart.support.iter().map(ToString::to_string));
-    s.push('\n');
-    *s += "block\n";
-    *s += &join(&mut chart.block.iter().map(ToString::to_string));
-    s.push('\n');
-    for (name, carry) in [
-        ("map-carry", &law.map_carry),
-        ("gram-carry", &law.gram_carry),
-    ] {
-        *s += &format!("{name} {}\n", carry.0.len());
-        for (index, value) in &carry.0 {
-            *s += &format!("{index} {value}\n");
+        *s += "block\n";
+        *s += &join(&mut chart.block.iter().map(ToString::to_string));
+        s.push('\n');
+        for (name, carry) in [
+            ("map-carry", &law.map_carry),
+            ("gram-carry", &law.gram_carry),
+        ] {
+            *s += &format!("{name} {}\n", carry.0.len());
+            for (index, value) in &carry.0 {
+                *s += &format!("{index} {value}\n");
+            }
         }
     }
     match law.receiving_prior {
@@ -11998,7 +14198,80 @@ fn read_phase(
 /// **A normal law read from its parts** ([`write_law`]) beside its map. Refused where the chart's
 /// support is not exactly the Gram's rows that leave the scale's prior `2^k I`, or its lattice is
 /// coarser than its scale.
-fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<NormalLaw, HnnError> {
+fn read_epoch_normal_law(
+    lines: &mut std::str::Lines<'_>,
+    envelope: ExactRatMatrix,
+    budget: &mut epoch::CheckpointReadBudget,
+) -> Result<NormalLaw, HnnError> {
+    if (envelope.rows(), envelope.columns()) != (0, 0) {
+        return refuse("an epoch law must not save a second copy of its map read view");
+    }
+    let count = head(
+        next(lines, "the epoch law envelope")?,
+        "epoch-law",
+        "the epoch law envelope",
+    )?;
+    if count.len() != 1 {
+        return refuse("the epoch law envelope");
+    }
+    let count = number(count.first(), "the epoch law line count")?;
+    let mut payload = String::new();
+    for _ in 0..count {
+        payload.push_str(next(lines, "the epoch law payload")?);
+        payload.push('\n');
+    }
+    let epoch = epoch::EpochLaw::decode_checkpoint_unbound(&payload, budget)?;
+    budget.admit_map_view(&epoch.map)?;
+    let map = epoch.map.to_matrix()?;
+    let prior = head(
+        next(lines, "the receiving prior declaration")?,
+        "receiving_prior",
+        "the receiving prior declaration",
+    )?;
+    let receiving_prior = match prior.as_slice() {
+        [none] if none == "none" => None,
+        [k] => Some(k.parse().map_err(|_| HnnError::ContinuingState {
+            what: "the receiving prior declaration",
+        })?),
+        _ => return refuse("the receiving prior declaration"),
+    };
+    let phase = read_phase(lines, &map)?;
+    let symmetry = read_symmetry(lines, &map)?;
+    if symmetry.as_ref() != epoch.declared_symmetry() {
+        return refuse("an epoch law's paired declaration disagrees with its normal metadata");
+    }
+    let scale = receiving_prior.unwrap_or(0);
+    budget.check(u64::from(scale) + 1)?;
+    // The grouped owner already contains H. Do not construct a dense 2^scale I only to discard
+    // it in install_epoch; the native prior's scalar identity remains checked at binding.
+    let mut law = NormalLaw {
+        map,
+        epoch: None,
+        carrier: crate::hnn::receiving::ReceivingCarrier::Anchor,
+        gram: Vec::new(),
+        chart: SolvedChart::founded(scale),
+        map_carry: Carry::default(),
+        gram_carry: Carry::default(),
+        receiving_prior,
+        phase,
+        symmetry,
+    };
+    law.install_epoch(epoch);
+    Ok(law)
+}
+
+fn read_law(
+    lines: &mut std::str::Lines<'_>,
+    map: ExactRatMatrix,
+    budget: &mut epoch::CheckpointReadBudget,
+) -> Result<NormalLaw, HnnError> {
+    if lines
+        .clone()
+        .next()
+        .is_some_and(|line| line.starts_with("epoch-law "))
+    {
+        return read_epoch_normal_law(lines, map, budget);
+    }
     let n = number(
         head(next(lines, "the Gram's head")?, "gram", "the Gram's head")?.first(),
         "the Gram's width",
@@ -12033,6 +14306,9 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
             what: "the chart's scale",
         }
     })?;
+    // The non-epoch chart parser shares the same declared read bound: its saved scale is also
+    // a compressed 2^k word and must not bypass the grouped checkpoint's pre-shift admission.
+    budget.check(u64::from(exponent) + u64::from(scale) + 1)?;
     let k = number(
         head(
             next(lines, "the support's head")?,
@@ -12154,6 +14430,7 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
     let map_carry = carries.pop().expect("two carries");
     let law = NormalLaw {
         map,
+        epoch: None,
         carrier: crate::hnn::receiving::ReceivingCarrier::Anchor,
         gram,
         chart: SolvedChart {
@@ -12302,6 +14579,7 @@ impl ConstitutionRead for Constitution {
     fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix {
         &self.contacts[contact].dissipation
     }
+    fn receiving_return_policy(&self, ring:usize) -> crate::hnn::receiving::RetainedReturnPolicy { Constitution::receiving_return_policy(self,ring).unwrap_or(crate::hnn::receiving::RetainedReturnPolicy::PopulationMixtureSectionV1) }
     fn receiving_layout(&self, ring: usize) -> Option<ReceivingLayout> {
         Constitution::receiving_layout(self, ring)
     }
@@ -12494,7 +14772,7 @@ mod receiving_precision_tests {
                 .is_none()
         );
         let state = next.continuing_state(field.sources()[0]).unwrap();
-        let state = ContinuingState::from_text(&state.to_text()).unwrap();
+        let state = ContinuingState::from_text(&state.to_text(), opening.budget()).unwrap();
         assert!(
             theta.clone().continued(&state).is_err(),
             "a moved clock is not a declared opening"
@@ -12801,6 +15079,253 @@ mod solved_chart_wide_tests {
 }
 
 #[cfg(test)]
+mod projected_statistics_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    #[test]
+    fn signed_statistics_are_exact_and_leave_the_law_unchanged() {
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(2, 2).unwrap());
+        let before = law.clone();
+        let samples = [
+            Sample {
+                weight: rat(1, 2),
+                feature: vec![rat(1, 1), rat(2, 1)],
+                covector: vec![rat(3, 1), rat(-1, 1)],
+                masses: None,
+            },
+            Sample {
+                weight: rat(-1, 3),
+                feature: vec![rat(2, 1), rat(-1, 1)],
+                covector: vec![rat(1, 1), rat(4, 1)],
+                masses: None,
+            },
+        ];
+        let (cross, gram) = law.projected_statistics(&samples).unwrap();
+        assert_eq!(
+            cross.to_rows(),
+            vec![vec![rat(5, 6), rat(10, 3)], vec![rat(-19, 6), rat(1, 3)]]
+        );
+        assert_eq!(
+            gram.to_rows(),
+            vec![vec![rat(-5, 6), rat(5, 3)], vec![rat(5, 3), rat(5, 3)]]
+        );
+        assert_eq!(law, before);
+    }
+
+    #[test]
+    fn paired_statistics_share_the_native_projection_and_gram_deposit() {
+        let symmetry = PortSymmetry::from_parts(vec![1, 0], vec![Some(1), Some(0)], &[0]).unwrap();
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(2, 2).unwrap())
+            .with_symmetry(symmetry.clone())
+            .unwrap();
+        let samples = [Sample {
+            weight: rat(2, 1),
+            feature: vec![rat(1, 1), rat(0, 1)],
+            covector: vec![rat(3, 1), rat(-1, 1)],
+            masses: None,
+        }];
+        let (cross, gram) = law.projected_statistics(&samples).unwrap();
+        assert_eq!(
+            cross.to_rows(),
+            vec![vec![rat(3, 1), rat(-1, 1)], vec![rat(-1, 1), rat(3, 1)]]
+        );
+        assert_eq!(symmetry.first_failure(&cross).unwrap(), None);
+        assert_eq!(gram, ExactRatMatrix::identity(2).unwrap());
+        let lattice = Lattice::new(16);
+        let rule = ChartRule::new(lattice, 16);
+        let prepared = law
+            .prepare(&samples, &rule, &mut BudgetedCarry::new(lattice, 1))
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            &prepared.law.gram,
+            &vec![vec![rat(2, 1), rat(0, 1)], vec![rat(0, 1), rat(2, 1)]]
+        );
+        assert_eq!(
+            &law.gram,
+            &vec![vec![rat(1, 1), rat(0, 1)], vec![rat(0, 1), rat(1, 1)]]
+        );
+    }
+
+    #[test]
+    fn projected_g_times_chart_transpose_matches_native_reach_sum_and_prepared_unit() {
+        let symmetry = PortSymmetry::from_parts(vec![1, 0], vec![Some(1), Some(0)], &[0]).unwrap();
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(2, 2).unwrap())
+            .with_symmetry(symmetry.clone())
+            .unwrap();
+        let samples = [Sample {
+            weight: rat(2, 1),
+            feature: vec![rat(1, 1), rat(2, 1)],
+            covector: vec![rat(3, 1), rat(-1, 1)],
+            masses: None,
+        }];
+        let (cross, _) = law.projected_statistics(&samples).unwrap();
+        let lattice = Lattice::new(16);
+        let prepared = law
+            .prepare(
+                &samples,
+                &ChartRule::new(lattice, 16),
+                &mut BudgetedCarry::new(lattice, 1),
+            )
+            .unwrap()
+            .unwrap();
+        let covector = integral(&samples[0].covector);
+        let reached = prepared.law.chart.reach(&integral(&samples[0].feature));
+        let from_reach = outer_integral(2, 2, &[(&samples[0].weight, &covector, &reached)])
+            .projected(symmetry.rows(), symmetry.columns());
+        let native_unit = ExactRatMatrix::new(prepared.unit.to_rows()).unwrap();
+        assert_eq!(native_unit.to_rows(), from_reach.to_rows());
+        // The outer product has (Xhat f)^T on its right. Do not assume Xhat is symmetric.
+        let chart_transpose = ExactRatMatrix::new(prepared.law.chart.dense(2))
+            .unwrap()
+            .transpose()
+            .unwrap();
+        assert_eq!(cross.multiply(&chart_transpose).unwrap(), native_unit);
+    }
+
+    #[test]
+    fn synthetic_nonsymmetric_paired_operator_requires_the_chart_transpose() {
+        let symmetry = PortSymmetry::from_parts(
+            vec![1, 0],
+            vec![Some(1), Some(0), Some(3), Some(2)],
+            &[0, 2],
+        )
+        .unwrap();
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(2, 4).unwrap())
+            .with_symmetry(symmetry.clone())
+            .unwrap();
+        let before = law.clone();
+        let sample = Sample {
+            weight: rat(2, 1),
+            feature: vec![rat(1, 1), rat(0, 1), rat(1, 1), rat(0, 1)],
+            covector: vec![rat(3, 1), rat(-1, 1)],
+            masses: None,
+        };
+        let (cross, _) = law.projected_statistics(&[sample.clone()]).unwrap();
+        // Deliberately synthetic: this is a general operator that commutes with the pairing,
+        // not a native SolvedChart. Native chart construction remains symmetric. This fixture
+        // exercises the transpose orientation that a symmetric native chart cannot distinguish.
+        let synthetic_chart = ExactRatMatrix::new(vec![
+            vec![rat(1, 1), rat(0, 1), rat(2, 1), rat(0, 1)],
+            vec![rat(0, 1), rat(1, 1), rat(0, 1), rat(2, 1)],
+            vec![rat(0, 1), rat(0, 1), rat(1, 1), rat(0, 1)],
+            vec![rat(0, 1), rat(0, 1), rat(0, 1), rat(1, 1)],
+        ])
+        .unwrap();
+        let transpose = synthetic_chart.transpose().unwrap();
+        assert_ne!(synthetic_chart, transpose);
+        for row in 0..4 {
+            for column in 0..4 {
+                assert_eq!(
+                    synthetic_chart.get(row, column).unwrap(),
+                    synthetic_chart
+                        .get(symmetry.column(row), symmetry.column(column))
+                        .unwrap()
+                );
+            }
+        }
+        let covector = integral(&sample.covector);
+        let reached = integral(&synthetic_chart.apply(&sample.feature).unwrap());
+        let from_reach = outer_integral(2, 4, &[(&sample.weight, &covector, &reached)])
+            .projected(symmetry.rows(), symmetry.columns());
+        let unit_from_synthetic_reach = ExactRatMatrix::new(from_reach.to_rows()).unwrap();
+        assert_eq!(
+            cross.multiply(&transpose).unwrap(),
+            unit_from_synthetic_reach
+        );
+        assert_ne!(
+            cross.multiply(&synthetic_chart).unwrap(),
+            unit_from_synthetic_reach
+        );
+        assert_eq!(law, before);
+    }
+
+    #[test]
+    fn statistics_preserve_empty_shapes_and_refuse_bad_samples_or_outside_pairs() {
+        let empty = NormalLaw::with_prior(ExactRatMatrix::zero(0, 3).unwrap());
+        let (cross, gram) = empty.projected_statistics(&[]).unwrap();
+        assert_eq!((cross.rows(), cross.columns()), (0, 3));
+        assert_eq!((gram.rows(), gram.columns()), (3, 3));
+        let symmetry =
+            PortSymmetry::from_parts(vec![0], vec![Some(1), Some(0), None], &[0]).unwrap();
+        let law = NormalLaw::with_prior(ExactRatMatrix::zero(1, 3).unwrap())
+            .with_symmetry(symmetry)
+            .unwrap();
+        let mut sample = Sample {
+            weight: Rat::one(),
+            feature: vec![Rat::zero(), Rat::zero(), Rat::one()],
+            covector: vec![Rat::one()],
+            masses: None,
+        };
+        assert!(matches!(
+            law.projected_statistics(&[sample.clone()]),
+            Err(HnnError::PairedOutside { class: 2 })
+        ));
+        sample.feature.pop();
+        assert!(matches!(
+            law.projected_statistics(&[sample]),
+            Err(HnnError::Shape { .. })
+        ));
+    }
+}
+
+#[cfg(test)]
+mod gram_carry_conservation_tests {
+    use super::*;
+    use crate::ratio::rat;
+
+    fn gram_release(at: &BudgetedCarry) -> Rat {
+        at.released()
+            .into_iter()
+            .filter_map(|(carrier, entry, value)| {
+                (carrier == Carrier::Gram && entry == 0).then_some(value)
+            })
+            .sum()
+    }
+
+    #[test]
+    fn nonzero_native_gram_carry_closes_with_the_positive_remainder_delta() {
+        let mut carry = Carry::default();
+        let mut stored = [rat(2, 1)];
+        for (clock, update) in [(1, rat(1, 8)), (2, rat(1, 16))] {
+            let before_stored = stored[0].clone();
+            let before_carry = carry.at(0);
+            let mut at = BudgetedCarry::new(Lattice::new(2), clock);
+            carry.deposit_all(&mut at, Carrier::Gram, &mut stored, &[update.clone()]);
+            let stored_delta = &stored[0] - before_stored;
+            let carry_delta = carry.at(0) - before_carry;
+            let release = gram_release(&at);
+            assert!(!carry.at(0).is_zero());
+            assert!(!carry_delta.is_zero());
+            assert!(release.is_zero());
+            assert_eq!(
+                &stored_delta + &carry_delta - &update + &release,
+                Rat::zero()
+            );
+            assert_ne!(stored_delta - carry_delta - update, Rat::zero());
+        }
+    }
+
+    #[test]
+    fn actual_native_gram_release_tail_closes_the_conservation_balance() {
+        let mut carry = Carry::default();
+        let mut stored = [rat(2, 1)];
+        let before_stored = stored[0].clone();
+        let before_carry = carry.at(0);
+        let update = rat(3, 16);
+        let mut at = BudgetedCarry::new(Lattice::new(2), 1);
+        carry.deposit_all(&mut at, Carrier::Gram, &mut stored, &[update.clone()]);
+        let release = gram_release(&at);
+        assert_eq!(at.released(), vec![(Carrier::Gram, 0, rat(-1, 16))]);
+        assert!(!release.is_zero());
+        let residual = (&stored[0] - before_stored) + (carry.at(0) - before_carry) - update;
+        assert_eq!(residual, -&release);
+        assert_eq!(residual + release, Rat::zero());
+    }
+}
+
+#[cfg(test)]
 mod solved_chart_wide_persistence_tests {
     use super::*;
     #[test]
@@ -12844,7 +15369,12 @@ mod solved_chart_wide_persistence_tests {
         assert_eq!(next.chart.bits(1), original_bits);
         let mut saved = String::new();
         write_law(&mut saved, &next);
-        let restored = read_law(&mut saved.lines(), next.map.clone()).unwrap();
+        let restored = read_law(
+            &mut saved.lines(),
+            next.map.clone(),
+            &mut epoch::CheckpointReadBudget::new(1 << 20),
+        )
+        .unwrap();
         assert_eq!(restored, next);
         let carried = GramBlock::of(
             &restored.gram,
@@ -12932,7 +15462,7 @@ mod wide_restore_budget_tests {
         law.chart.exponent += 200;
         assert!(law.chart.block.iter().any(|x| x.bits() > 128));
         let state = theta.continuing_state(field.sources()[0]).unwrap();
-        let parsed = ContinuingState::from_text(&state.to_text()).unwrap();
+        let parsed = ContinuingState::from_text(&state.to_text(), opening.budget()).unwrap();
         assert_eq!(opening.clone().continued(&parsed).unwrap(), theta);
         let bits = theta.exact_bits();
         let mut limited = opening;
@@ -12947,6 +15477,7 @@ mod wide_restore_budget_tests {
                 .continuing_state(field.sources()[0])
                 .unwrap()
                 .to_text(),
+            theta.budget(),
         )
         .unwrap();
         let result = limited.continued(&over_budget);
@@ -13435,6 +15966,437 @@ mod pair_ray_speed_tests {
                     moves.own(&energy, &eta).unwrap() <= old_bound(&port, &delta, &energy, &eta)
                 );
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod epoch_native_checkpoint_tests {
+    use super::epoch::{EpochArray, EpochFlow, EpochLaw, EpochRecord};
+    use super::*;
+    use crate::ratio::rat;
+
+    fn native_field() -> Field {
+        let mut declaration = crate::hnn::tests::learning::chain_declaration(1 << 16);
+        declaration.receivers[0].aperture = 1;
+        declaration.rings[2] = declaration.rings[1].clone();
+        declaration.rings[2].lock.clear();
+        declaration.lattice.clear();
+        Field::declare(declaration.by_lattice_rule()).unwrap()
+    }
+
+    #[test]
+    fn native_continued_refuses_a_canonical_changed_outside_gram_prior() {
+        let field = native_field();
+        let symmetry =
+            PortSymmetry::from_parts((0..8).collect(), vec![Some(1), Some(0), None, None], &[0])
+                .unwrap();
+        let opening = Constitution::initial(&field, 1 << 40)
+            .unwrap()
+            .with_symmetric_source(0, ExactRatMatrix::zero(8, 4).unwrap(), symmetry)
+            .unwrap();
+        let grain = lattice_exponent(u128::from(field.finest_grain()), 1);
+        let founded = EpochLaw::from_normal(opening.source_law(0).unwrap(), grain).unwrap();
+        let mut saved = opening.clone();
+        saved.rings[0]
+            .source
+            .as_mut()
+            .unwrap()
+            .publish_epoch(founded.clone())
+            .unwrap();
+        let parse = |material: &Constitution| {
+            ContinuingState::from_text(
+                &material.continuing_state(0).unwrap().to_text(),
+                material.budget(),
+            )
+            .unwrap()
+        };
+        assert_eq!(opening.clone().continued(&parse(&saved)).unwrap(), saved);
+
+        let mut tampered = founded;
+        let mut gram = tampered.gram.values.clone();
+        gram[2 * 4 + 2] += BigInt::one();
+        tampered.gram = EpochArray::new(4, 4, tampered.gram.exponent, gram).unwrap();
+        saved.rings[0]
+            .source
+            .as_mut()
+            .unwrap()
+            .publish_epoch(tampered)
+            .unwrap();
+        // Structural/canonical decode succeeds; the actual opening must refuse
+        // this positive, symmetric metric's changed inactive prior.
+        let state = parse(&saved);
+        assert!(matches!(
+            opening.clone().continued(&state),
+            Err(HnnError::Unadmitted { reason })
+                if reason == "an epoch checkpoint's inactive outside metric block must keep its founded prior"
+        ));
+        assert!(
+            crate::hnn::reference::Reference::new(16, 1 << 40)
+                .mount_continued(
+                    &field,
+                    &crate::hnn::field::Current::at_rest(&field),
+                    opening,
+                    &state
+                )
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn native_mount_binds_deferred_receiving_rows_to_the_actual_field_period() {
+        let field = native_field();
+        let opening = Constitution::initial(&field, 1 << 40).unwrap();
+        let receiver = field.receivers()[0].ring;
+        let normal = opening.receiving_law(receiver).unwrap();
+        let grain = lattice_exponent(u128::from(field.finest_grain()), 1);
+        let rows: Vec<_> = (1..normal.map().rows()).step_by(2).collect();
+        let founded = EpochLaw::from_normal(normal, grain).unwrap();
+        let reference = crate::hnn::reference::Reference::new(16, 1 << 40);
+        let passage = reference
+            .mount_with(
+                &field,
+                &crate::hnn::field::Current::at_rest(&field),
+                opening.clone(),
+            )
+            .unwrap()
+            .continuing_state(0)
+            .unwrap();
+        let passage = crate::hnn::reference::passage::ResidentPassage::from_text(
+            &field,
+            &opening,
+            passage.passage().unwrap(),
+        )
+        .unwrap();
+        for period in [field.ring(receiver).period(), 11] {
+            let mut saved = opening.clone();
+            let law = saved.rings[receiver]
+                .receiving
+                .as_mut()
+                .unwrap()
+                .laws_mut()
+                .remove(0);
+            law.publish_epoch(founded.clone().with_phase_rows(&rows, period).unwrap())
+                .unwrap();
+            let state = ContinuingState::from_text(
+                &saved.continuing_state(0).unwrap().to_text(),
+                saved.budget(),
+            )
+            .unwrap();
+            // There is no field period in Constitution::continued; its native
+            // metric check applies before mount binds the deferred row factors.
+            assert!(opening.clone().continued(&state).is_ok());
+            for state in [state.clone(), state.with_resident_passage(passage.clone())] {
+                let bound = opening.clone().continued_on(&field, &state);
+                let decoded = state.resident_passage(&field, &opening);
+                let restored = reference.mount_continued(
+                    &field,
+                    &crate::hnn::field::Current::at_rest(&field),
+                    opening.clone(),
+                    &state,
+                );
+                let direct_passage = crate::hnn::reference::passage::ResidentPassage::from_text(
+                    &field,
+                    &saved,
+                    &passage.to_text(),
+                );
+                if period == field.ring(receiver).period() {
+                    assert_eq!(bound.unwrap(), saved);
+                    assert_eq!(decoded.unwrap().is_some(), state.passage().is_some());
+                    assert!(restored.is_ok());
+                    assert!(direct_passage.is_ok());
+                } else {
+                    for error in [
+                        bound.unwrap_err(),
+                        decoded.unwrap_err(),
+                        restored.unwrap_err(),
+                        direct_passage.unwrap_err(),
+                    ] {
+                        assert!(matches!(error, HnnError::ContinuingState { what }
+                            if what == "grouped receiving phase rows against the actual field period and precision"));
+                    }
+                }
+            }
+        }
+    }
+
+    /// Projection and real source-consumer control. This supplies a normal
+    /// flow directly; it does not claim a learned native comparison or output.
+    #[test]
+    fn refined_source_map_is_consumed_by_encoded_opening_after_cold_mount() {
+        use crate::hnn::{Current, Encoded, SourceMoment, Word, WordOpening};
+        use crate::holarchy::terrain::{CyclicLaw, KnownTruth};
+        use std::sync::Arc;
+        let field = native_field();
+        let opening = Constitution::initial(&field, 1 << 40).unwrap();
+        let normal = opening.source_law(0).unwrap();
+        let (rows, columns) = (normal.map().rows(), normal.map().columns());
+        let opening = opening
+            .with_ports(
+                0,
+                None,
+                Some(ExactRatMatrix::zero(rows, columns).unwrap()),
+                None,
+            )
+            .unwrap()
+            .with_transport(0, Rat::one())
+            .unwrap();
+        let grain = lattice_exponent(u128::from(field.finest_grain()), 1);
+        let law = EpochLaw::from_normal(opening.source_law(0).unwrap(), grain).unwrap();
+        let mut feature = vec![Rat::zero(); columns];
+        feature[0] = Rat::one();
+        let sample = Sample {
+            weight: Rat::one(),
+            feature,
+            covector: vec![Rat::new(BigInt::one(), BigInt::one() << grain as usize); rows],
+            masses: None,
+        };
+        let record = EpochRecord::from_sample_with_phase_rows(&sample, &[], 1).unwrap();
+        let flow =
+            EpochFlow::from_records(rows, columns, grain, 1, 0, 1, &[record.clone()]).unwrap();
+        let gain =
+            EpochArray::from_dyadic_scalar(&Rat::new(BigInt::one(), BigInt::one() << 24usize))
+                .unwrap();
+        let prepared = law
+            .deposit_source(
+                &flow,
+                &gain,
+                opening.lattice(Locus::SourcePort(0)).unwrap().exponent(),
+                1 << 40,
+                0,
+                0,
+            )
+            .unwrap();
+        assert!(!prepared.step.is_zero());
+        let second_flow =
+            EpochFlow::from_records(rows, columns, grain, 1, 1, 1, &[record]).unwrap();
+        let active = prepared.successor.map_lattice;
+        let prepared = prepared
+            .successor
+            .deposit_source(&second_flow, &gain, active, 1 << 40, 0, 0)
+            .unwrap();
+        assert!(!prepared.step.is_zero());
+        assert!(!prepared.successor.news.is_zero());
+        let active = prepared.successor.map_lattice;
+        let mut learned = opening.clone();
+        learned.rings[0]
+            .source
+            .as_mut()
+            .unwrap()
+            .publish_epoch(prepared.successor)
+            .unwrap();
+        learned
+            .lattices
+            .insert(Locus::SourcePort(0), Lattice::new(active));
+        assert!(learned.on_lattice());
+        let text = learned.continuing_state(0).unwrap().to_text();
+        let parsed = ContinuingState::from_text(&text, opening.budget()).unwrap();
+        let current = Current::at_rest(&field);
+        let mounted = crate::hnn::reference::Reference::new(16, 1 << 40)
+            .mount_continued(&field, &current, opening.clone(), &parsed)
+            .unwrap();
+        assert_eq!(mounted.constitution(), &learned);
+        assert_eq!(
+            mounted
+                .constitution()
+                .continuing_state(0)
+                .unwrap()
+                .to_text(),
+            text
+        );
+
+        // The boundary enters through Encoded and its actual source moment;
+        // Wm and the exact Word opening must consume the refined publication.
+        let truth = KnownTruth::cyclic(CyclicLaw::Line, 1, 0, 1, 1).unwrap();
+        let cells = Encoded::identity(&truth, &field).unwrap().remove(0);
+        let mut entered = current.clone();
+        let mut moment = SourceMoment::open(&field, &current);
+        moment.ingest(&field, &mut entered, &cells).unwrap();
+        let before = moment.open_storage(&field, &opening, &entered).unwrap();
+        let after = moment
+            .open_storage(&field, mounted.constitution(), &entered)
+            .unwrap();
+        assert!(before[0].iter().all(Zero::is_zero));
+        assert!(after[0].iter().any(|x| !x.is_zero()));
+        let moment = Arc::new(moment);
+        let (mut word, receipt) = Word::open_source_exact_received(
+            &field,
+            mounted.constitution(),
+            &entered,
+            Arc::clone(&moment),
+            &WordOpening::Rest,
+        )
+        .unwrap();
+        assert!(receipt.closes());
+        assert_eq!(word.change().unwrap().storage, after);
+        let (mut uninterrupted, opening_receipt) = Word::open_source_exact_received(
+            &field,
+            &learned,
+            &entered,
+            moment,
+            &WordOpening::Rest,
+        )
+        .unwrap();
+        assert_eq!(opening_receipt, receipt);
+        for _ in 0..2 {
+            word.tick().unwrap();
+            uninterrupted.tick().unwrap();
+            assert_eq!(word.change().unwrap(), uninterrupted.change().unwrap());
+            assert_eq!(word.field_balances(), uninterrupted.field_balances());
+            assert!(word.field_balances().last().unwrap().closes());
+        }
+
+        let mut mismatched = parsed;
+        mismatched
+            .lattices
+            .insert(Locus::SourcePort(0), Lattice::new(active - 1));
+        assert!(opening.clone().continued(&mismatched).is_err());
+        assert_eq!(
+            opening.rings[0]
+                .source
+                .as_ref()
+                .unwrap()
+                .map()
+                .entries()
+                .iter()
+                .filter(|x| !x.is_zero())
+                .count(),
+            0
+        );
+    }
+
+    #[test]
+    fn canonical_epoch_checkpoint_keeps_odd_news_and_never_saves_the_read_view() {
+        let mut normal = NormalLaw::with_receiving_prior(ExactRatMatrix::zero(4, 2).unwrap(), 0);
+        let epoch = EpochLaw::from_normal(&normal, 6)
+            .unwrap()
+            .with_phase_rows(&[1, 3], 11)
+            .unwrap();
+        let sample = Sample {
+            weight: Rat::one(),
+            feature: vec![rat(1, 2), rat(-1, 4)],
+            covector: vec![
+                rat(1, 1 << 30),
+                Rat::new(BigInt::one(), BigInt::from(11) << 30usize),
+                Rat::zero(),
+                Rat::zero(),
+            ],
+            masses: None,
+        };
+        let record = EpochRecord::from_sample_with_phase_rows(&sample, &[1, 3], 11).unwrap();
+        let flow = EpochFlow::from_records(4, 2, 6, 231, 3, 1, &[record]).unwrap();
+        let gamma = EpochArray::from_dyadic_scalar(&Rat::one()).unwrap();
+        let successor = epoch.deposit(&flow, &gamma).unwrap().successor;
+        assert!(successor.news.values.iter().any(|value| !value.is_zero()));
+        normal.publish_epoch(successor).unwrap();
+        assert!(normal.gram.is_empty());
+        assert!(normal.map_carry.0.is_empty() && normal.gram_carry.0.is_empty());
+        let mut encoded = String::new();
+        write_normal_map(&mut encoded, "E", &normal);
+        write_law(&mut encoded, &normal);
+        assert!(encoded.starts_with("E 0 0\nepoch-law "));
+        assert_eq!(encoded.matches("epoch-law-checkpoint-v3").count(), 1);
+        let mut lines = encoded.lines();
+        let envelope = read_matrix(&mut lines, "E", "a synthetic source envelope").unwrap();
+        let restored = read_law(
+            &mut lines,
+            envelope,
+            &mut epoch::CheckpointReadBudget::new(1 << 20),
+        )
+        .unwrap();
+        assert!(lines.next().is_none());
+        assert_eq!(restored, normal);
+        let mut rewritten = String::new();
+        write_normal_map(&mut rewritten, "E", &restored);
+        write_law(&mut rewritten, &restored);
+        assert_eq!(rewritten, encoded);
+    }
+}
+
+#[cfg(test)]
+mod bounded_checkpoint_restore_tests {
+    use super::epoch::EpochLaw;
+    use super::*;
+    use crate::hnn::field::FieldDeclaration;
+
+    #[test]
+    fn saved_lattice_clock_sum_refuses_before_any_scale_is_materialized() {
+        let field =
+            Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
+        let opening = Constitution::initial(&field, 1 << 40).unwrap();
+        let mut state = opening.continuing_state(0).unwrap();
+        // This is only a metadata word, not a constructed 2^L value. Its own L fits the declared
+        // logical budget, but its required fine-grid exponent does not fit the exact carrier.
+        state
+            .lattices
+            .insert(Locus::SourcePort(0), Lattice::new(u32::MAX));
+        assert!(matches!(
+            opening.continued(&state),
+            Err(HnnError::ContinuingState {
+                what: "a continued lattice and clock exceed the exact exponent carrier"
+            })
+        ));
+    }
+
+    #[test]
+    fn every_saved_lattice_is_bound_before_placement_even_without_adaptive_source_policy() {
+        let field =
+            Field::declare(FieldDeclaration::campaign_one(1 << 17).by_lattice_rule()).unwrap();
+        let opening = Constitution::initial(&field, 1 << 20).unwrap();
+        for with_epoch in [false, true] {
+            let mut saved = opening.clone();
+            if with_epoch {
+                let grain = lattice_exponent(saved.grain, 1);
+                let epoch = EpochLaw::from_normal(saved.source_law(0).unwrap(), grain).unwrap();
+                assert!(!epoch.source_refinement);
+                saved.rings[0]
+                    .source
+                    .as_mut()
+                    .unwrap()
+                    .publish_epoch(epoch)
+                    .unwrap();
+            }
+            let state = saved.continuing_state(0).unwrap();
+            for locus in [
+                Locus::SourcePort(0),
+                Locus::Element(0),
+                Locus::ReceivingMap(2),
+            ] {
+                let founding = opening.lattice(locus).unwrap().exponent();
+                assert!(founding > 0);
+                let mut coarser = state.clone();
+                coarser.lattices.insert(locus, Lattice::new(founding - 1));
+                assert!(matches!(
+                    opening.clone().continued(&coarser),
+                    Err(HnnError::ContinuingState {
+                        what: "a continued lattice cannot coarsen its founding declaration"
+                    })
+                ));
+                let mut excessive = state.clone();
+                excessive.lattices.insert(
+                    locus,
+                    Lattice::new(u32::try_from(opening.budget() + 1).unwrap()),
+                );
+                assert!(matches!(
+                    opening.clone().continued(&excessive),
+                    Err(HnnError::ConstitutionBudget { .. })
+                ));
+                assert!(matches!(
+                    ContinuingState::from_text(&excessive.to_text(), opening.budget()),
+                    Err(HnnError::ConstitutionBudget { .. })
+                ));
+            }
+            // A finer existing representation is legal independently of the source policy.
+            // No values or remainders need rebasing in this opening; only its active grain changes.
+            let locus = Locus::SourcePort(0);
+            let mut finer = saved.clone();
+            finer.lattices.insert(
+                locus,
+                Lattice::new(opening.lattice(locus).unwrap().exponent() + 1),
+            );
+            let text = finer.continuing_state(0).unwrap().to_text();
+            let parsed = ContinuingState::from_text(&text, opening.budget()).unwrap();
+            assert_eq!(opening.clone().continued(&parsed).unwrap(), finer);
         }
     }
 }

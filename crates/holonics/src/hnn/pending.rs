@@ -73,6 +73,7 @@ pub struct PendingRatio {
     commit: u64,
     view: crate::hnn::ring::modes::ModeView,
     observation: Option<Vec<Vec<bool>>>,
+    prepared_input: Option<crate::hnn::reference::prepared_input::PreparedInputCut>,
 }
 
 /// [definition] **An epoch's faces at compare**: the combined faces (the tree's at each phase's
@@ -113,7 +114,8 @@ impl PendingRatio {
             header.push(g.to_string());
             header.push(d.to_string());
         }
-        line(s, "ratio-commit", header);
+        line(s, if self.prepared_input.is_some(){"ratio-prepared-commit"}else{"ratio-commit"}, header);
+        if let Some(p)=&self.prepared_input{line(s,"ratio-control",[crate::hnn::reference::prepared_input::codec::hex(&p.to_text())]);}
         line(s, "ratio-anchor", &self.anchor);
         self.moment.write(s);
         self.phases.write_saved(s);
@@ -145,14 +147,14 @@ impl PendingRatio {
         next: crate::hnn::state_text::Next<'_, 'a>,
     ) -> Result<Self, HnnError> {
         use crate::hnn::state_text::{keyed, values};
-        let commit: Vec<u64> = values(
-            &keyed(
-                next("the producing commit")?,
-                "ratio-commit",
-                "the producing commit",
-            )?,
-            "the producing commit",
-        )?;
+        let header=next("the producing commit")?;
+        let prepared=header.starts_with("ratio-prepared-commit ");
+        let commit: Vec<u64> = values(&keyed(header,if prepared{"ratio-prepared-commit"}else{"ratio-commit"},"the producing commit")?,"the producing commit")?;
+        let prepared_input=if prepared{
+            let row=keyed(next("the original prepared input cut")?,"ratio-control","the original prepared input cut")?;
+            if row.len()!=1{return Err(HnnError::Unadmitted{reason:"one complete original prepared cut"});}
+            Some(crate::hnn::reference::prepared_input::PreparedInputCut::from_text(field,&crate::hnn::reference::prepared_input::codec::unhex(row[0])?)?)
+        }else{None};
         if commit.is_empty() || commit.len() % 2 != 1 {
             return Err(HnnError::Unadmitted {
                 reason: "a saved ratio's commit and mode selections",
@@ -217,10 +219,15 @@ impl PendingRatio {
         let address = prototype
             .truncated(phases.depth())?
             .continued(next("the producing address")?, next)?;
-        Self::produce(&current, &moment, &address, &phases, commit[0]).map(|mut ratio| {
+        Self::produce(&current, &moment, &address, &phases, commit[0]).and_then(|mut ratio| {
             ratio.view = view;
             ratio.observation = observation;
-            ratio
+            ratio.prepared_input=prepared_input;
+            if ratio.phases.observation_partition()==Some(crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1){
+                let frame=ratio.prepared_input.as_ref().and_then(|p|p.framing).ok_or(HnnError::Unadmitted{reason:"saved framed ratio keeps original prepared source context"})?;
+                if frame.source_cells()!=ratio.moment.cells() || ratio.observation.as_ref().is_some_and(|o|o!=&vec![frame.bits()]){return Err(HnnError::Unadmitted{reason:"saved source framing and its original source agree"});}
+            }
+            Ok(ratio)
         })
     }
 
@@ -243,6 +250,7 @@ impl PendingRatio {
             commit,
             view: crate::hnn::ring::modes::ModeView::whole(),
             observation: None,
+            prepared_input: None,
         })
     }
 
@@ -286,7 +294,14 @@ impl PendingRatio {
                 reason: "an observed read belongs to its declared receiving phases",
             });
         }
-        self.observation = Some(partition.read(field, &self.phases, anchors, wave)?);
+        if partition==crate::hnn::receiving::ObservationPartition::SourceFramingRouteV1 {
+            if self.phases.aperture()!=1{return Err(HnnError::Unadmitted{reason:"source framing's declared prepared word has one receiving aperture"});}
+            let frame=self.prepared_input.as_ref().and_then(|p|p.framing).ok_or(HnnError::Unadmitted{reason:"source framing must be sealed by the same prepared input producer"})?;
+            if frame.source_cells()!=self.moment.cells(){return Err(HnnError::Unadmitted{reason:"framing belongs to actual producing source frontier"});}
+            self.observation=Some(vec![frame.bits()]);
+        }else{
+            self.observation = Some(partition.read(field, &self.phases, anchors, wave)?);
+        }
         Ok(())
     }
 
@@ -413,8 +428,81 @@ impl PendingRatio {
         charts: &mut Charts,
         opening: &WordOpening,
     ) -> Result<(Word<'c>, Faces), HnnError> {
-        let mut word = self.open_on(field, constitution, charts, opening)?;
+        if self.prepared_input.is_some(){return Err(HnnError::Unadmitted{reason:"prepared input uses the typed native material read route"});}
+        let word = self.open_on(field, constitution, charts, opening)?;
+        self.read_word(field, constitution, word)
+    }
+
+    pub(crate) fn read_on_scoped<'c>(
+        &self,
+        scope: &mut crate::hnn::propagation::RingScope<'c>,
+        charts: &mut Charts,
+        opening: &WordOpening,
+    ) -> Result<(Word<'c>, Faces), HnnError> {
+        let field = scope.field();
+        let material = scope.material();
+        let word = self.open_on_scoped(scope, charts, opening)?;
+        self.read_word(field, material, word)
+    }
+
+    pub(crate) fn open_on_scoped<'c>(
+        &self,
+        scope: &mut crate::hnn::propagation::RingScope<'c>,
+        charts: &mut Charts,
+        opening: &WordOpening,
+    ) -> Result<Word<'c>, HnnError> {
+        let current = self.current(scope.field())?;
+        let field=scope.field();let theta=scope.material();
+        let word=Word::open_received_scoped(scope, &current, &self.moment, charts, opening, &self.view)?;
+        match &self.prepared_input{Some(p)=>p.apply(field,theta,self,word),None=>Ok(word)}
+    }
+
+    fn read_word<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        mut word: Word<'c>,
+    ) -> Result<(Word<'c>, Faces), HnnError> {
         let anchors = word.forward(&self.phases)?;
+        self.read_forward_word(field, constitution, word, anchors)
+    }
+
+    pub(crate) fn read_on_scanned<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        charts: &mut Charts,
+        opening: &WordOpening,
+        partitions: usize,
+    ) -> Result<(Word<'c>, Faces, crate::hnn::word::scan::ForwardSpanReading), HnnError> {
+        let mut word = self.open_on(field, constitution, charts, opening)?;
+        let (anchors, span) = word.forward_scanned(&self.phases, partitions)?;
+        let (word, faces) = self.read_forward_word(field, constitution, word, anchors)?;
+        Ok((word, faces, span))
+    }
+
+    pub(crate) fn read_on_scoped_scanned<'c>(
+        &self,
+        scope: &mut crate::hnn::propagation::RingScope<'c>,
+        charts: &mut Charts,
+        opening: &WordOpening,
+        partitions: usize,
+    ) -> Result<(Word<'c>, Faces, crate::hnn::word::scan::ForwardSpanReading), HnnError> {
+        let field = scope.field();
+        let material = scope.material();
+        let mut word = self.open_on_scoped(scope, charts, opening)?;
+        let (anchors, span) = word.forward_scanned(&self.phases, partitions)?;
+        let (word, faces) = self.read_forward_word(field, material, word, anchors)?;
+        Ok((word, faces, span))
+    }
+
+    fn read_forward_word<'c>(
+        &self,
+        field: &'c Field,
+        constitution: &impl ConstitutionRead,
+        mut word: Word<'c>,
+        anchors: Vec<Vec<Rat>>,
+    ) -> Result<(Word<'c>, Faces), HnnError> {
         let reads = if matches!(
             constitution.receiving_layout(self.phases.ring()),
             Some(crate::hnn::constitution::ReceivingLayout::ArrivalContext { .. })
@@ -471,6 +559,29 @@ impl PendingRatio {
                 })
                 .collect::<Result<Vec<_>, HnnError>>()?,
         ))
+    }
+
+    pub(crate) fn with_prepared_input(mut self,cut:crate::hnn::reference::prepared_input::PreparedInputCut)->Result<Self,HnnError>{
+        if cut.source_cells!=self.moment.cells() || cut.lift!=self.anchor || cut.commit!=self.commit{return Err(HnnError::Unadmitted{reason:"prepared cut matches its actual source ratio"});}
+        self.prepared_input=Some(cut);Ok(self)
+    }
+    pub(crate) fn prepared_input(&self)->Option<&crate::hnn::reference::prepared_input::PreparedInputCut>{self.prepared_input.as_ref()}
+    /// Native body route for an opt-in prepared ratio. Generic/counterfactual
+    /// material reads do not silently discard its original input operation.
+    pub fn read_on_native<'c>(&self,field:&'c Field,theta:&crate::hnn::constitution::Constitution,charts:&mut Charts,opening:&WordOpening)->Result<(Word<'c>,Faces),HnnError>{
+        let word=Word::open_received_view(field,theta,&self.current(field)?,&self.moment,charts,opening,&self.view)?;
+        let word=match &self.prepared_input{Some(p)=>p.apply(field,theta,self,word)?,None=>word};
+        self.read_word(field,theta,word)
+    }
+
+    /// Authenticate the existing source operation without executing a forward or J.
+    /// The private packet can only be formed from this actual native producer.
+    pub fn uses_prepared_input(&self)->bool{self.prepared_input.is_some()}
+    pub fn source_opening_preparation(&self,field:&Field,theta:&crate::hnn::constitution::Constitution,charts:&mut Charts,opening:&WordOpening)->Result<Option<SourceOpeningPreparation>,HnnError>{
+        let Some(cut)=&self.prepared_input else{return Ok(None)};
+        let word=Word::open_received_view(field,theta,&self.current(field)?,&self.moment,charts,opening,&self.view)?;
+        let prepared=cut.apply(field,theta,self,word)?;
+        Ok(prepared.source_preparation().cloned().map(|receipt|SourceOpeningPreparation{ring:0,receipt}))
     }
 
     /// The contemporary tree faces at each phase's causal address given the epoch's known targets:
@@ -571,7 +682,9 @@ impl PendingRatio {
                 reason: "a successor reread cannot precede its producing commit",
             });
         }
-        self.read_against_on(field, constitution, charts, targets, opening)
+        let (word,wave)=self.read_on_native(field,constitution,charts,opening)?;
+        let against=self.against(constitution,&wave,targets)?;
+        Ok((word,against))
     }
 
     /// The pending ratio's exact bits: the anchor's integers, the moment's dense code and the
@@ -586,4 +699,16 @@ impl PendingRatio {
             + self.moment.dense_bits()
             + self.address.bits(self.moment.alphabet())
     }
+}
+
+/// An authenticated exact source-opening control; it is not a new observation or moment.
+#[derive(Clone,Debug,PartialEq,Eq)]
+pub struct SourceOpeningPreparation {
+    ring:usize,
+    receipt:crate::hnn::word::action::PortPreparationReceipt,
+}
+impl SourceOpeningPreparation {
+    pub fn ring(&self)->usize{self.ring}
+    pub fn added(&self)->&[Rat]{&self.receipt.added}
+    pub fn receipt(&self)->&crate::hnn::word::action::PortPreparationReceipt{&self.receipt}
 }

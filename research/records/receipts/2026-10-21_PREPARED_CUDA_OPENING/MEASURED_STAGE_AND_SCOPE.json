@@ -1,0 +1,68 @@
+{
+  "host-reference": {
+    "complete_command_elapsed_ns": 5122560539,
+    "actual_epochs": 4,
+    "actual_cells": 40,
+    "recorded_walls": [
+      "ObservedEpochWallTimes { forward_batch: 367.395801ms, compare_return_compose_batch: 309.893139ms, grouped_deposit: 7.637091ms, whole_stage: None, whole_probe: None, joint_stage: None, joint_probe: None, receiving_only_stage: Some(7.248773ms), receiving_only_probe: None, probe_subphases: [], final_arrived_reread: 12.445612ms, precision_close: 6.964\u00b5s, prefix_forks: 0ns, compare_preparation: 292.43797ms, return_join: 17.163722ms, ordered_publication: 265.347\u00b5s, return_worker_sums: [62.276036ms, 4.08239ms, 84.209\u00b5s, 31.119\u00b5s], deposit_subphases: [(\"GroupedInputs\", 16.441\u00b5s), (\"Flow(Receiving(2))\", 227.235\u00b5s), (\"Certificate(Receiving(2))\", 4.764428ms), (\"PairDirections\", 52.539\u00b5s), (\"RegionPreparation\", 9.708\u00b5s), (\"JointCertificate\", 186.249\u00b5s), (\"CandidateStaged\", 1.977556ms), (\"Publication\", 402.754\u00b5s)] }",
+      "ObservedEpochWallTimes { forward_batch: 554.713279ms, compare_return_compose_batch: 475.254443ms, grouped_deposit: 10.204522ms, whole_stage: None, whole_probe: None, joint_stage: None, joint_probe: None, receiving_only_stage: Some(9.779907ms), receiving_only_probe: None, probe_subphases: [], final_arrived_reread: 14.562438ms, precision_close: 16.631\u00b5s, prefix_forks: 0ns, compare_preparation: 448.090642ms, return_join: 26.810469ms, ordered_publication: 326.01\u00b5s, return_worker_sums: [88.572222ms, 8.035969ms, 84.598\u00b5s, 36.948\u00b5s], deposit_subphases: [(\"GroupedInputs\", 20.338\u00b5s), (\"Flow(Receiving(2))\", 207.178\u00b5s), (\"Certificate(Receiving(2))\", 8.304232ms), (\"PairDirections\", 109.916\u00b5s), (\"RegionPreparation\", 17.372\u00b5s), (\"JointCertificate\", 241.663\u00b5s), (\"CandidateStaged\", 843.601\u00b5s), (\"Publication\", 460.062\u00b5s)] }",
+      "ObservedEpochWallTimes { forward_batch: 562.819939ms, compare_return_compose_batch: 486.431868ms, grouped_deposit: 9.685529ms, whole_stage: None, whole_probe: None, joint_stage: None, joint_probe: None, receiving_only_stage: Some(9.235777ms), receiving_only_probe: None, probe_subphases: [], final_arrived_reread: 12.2954ms, precision_close: 551.474\u00b5s, prefix_forks: 0ns, compare_preparation: 455.771274ms, return_join: 30.307813ms, ordered_publication: 325.961\u00b5s, return_worker_sums: [97.875756ms, 9.597236ms, 86.5\u00b5s, 40.193\u00b5s], deposit_subphases: [(\"GroupedInputs\", 20.659\u00b5s), (\"Flow(Receiving(2))\", 200.886\u00b5s), (\"Certificate(Receiving(2))\", 7.953103ms), (\"PairDirections\", 68.148\u00b5s), (\"RegionPreparation\", 10.91\u00b5s), (\"JointCertificate\", 189.345\u00b5s), (\"CandidateStaged\", 772.277\u00b5s), (\"Publication\", 470.041\u00b5s)] }",
+      "ObservedEpochWallTimes { forward_batch: 568.015254ms, compare_return_compose_batch: 479.248056ms, grouped_deposit: 11.072608ms, whole_stage: None, whole_probe: None, joint_stage: None, joint_probe: None, receiving_only_stage: Some(10.467505ms), receiving_only_probe: None, probe_subphases: [], final_arrived_reread: 12.905894ms, precision_close: 7.083\u00b5s, prefix_forks: 0ns, compare_preparation: 452.750674ms, return_join: 26.1603ms, ordered_publication: 309.049\u00b5s, return_worker_sums: [85.320929ms, 6.609105ms, 88.666\u00b5s, 39.293\u00b5s], deposit_subphases: [(\"GroupedInputs\", 21.129\u00b5s), (\"Flow(Receiving(2))\", 200.997\u00b5s), (\"Certificate(Receiving(2))\", 7.984341ms), (\"PairDirections\", 65.363\u00b5s), (\"RegionPreparation\", 9.578\u00b5s), (\"JointCertificate\", 179.847\u00b5s), (\"CandidateStaged\", 1.987364ms), (\"Publication\", 623.498\u00b5s)] }"
+    ],
+    "scope": "one40class synthetic CODE control, not dataset throughput or an ETA"
+  },
+  "cuda-observed-epoch-device0": {
+    "complete_command_elapsed_ns": 5250418083,
+    "actual_epochs": 4,
+    "actual_cells": 40,
+    "recorded_walls": [
+      "ObservedEpochWallTimes { forward_batch: 396.777828ms, compare_return_compose_batch: 317.535538ms, grouped_deposit: 7.96172ms, whole_stage: None, whole_probe: None, joint_stage: None, joint_probe: None, receiving_only_stage: Some(7.574293ms), receiving_only_probe: None, probe_subphases: [], final_arrived_reread: 12.495815ms, precision_close: 7.044\u00b5s, prefix_forks: 0ns, compare_preparation: 292.508621ms, return_join: 24.747223ms, ordered_publication: 255.599\u00b5s, return_worker_sums: [62.232987ms, 19.914378ms, 86.701\u00b5s, 35.515\u00b5s], deposit_subphases: [(\"GroupedInputs\", 18.144\u00b5s), (\"Flow(Receiving(2))\", 561.002\u00b5s), (\"Certificate(Receiving(2))\", 4.786098ms), (\"PairDirections\", 74.51\u00b5s), (\"RegionPreparation\", 10.98\u00b5s), (\"JointCertificate\", 190.277\u00b5s), (\"CandidateStaged\", 1.918816ms), (\"Publication\", 401.672\u00b5s)] }",
+      "ObservedEpochWallTimes { forward_batch: 581.836052ms, compare_return_compose_batch: 476.53921ms, grouped_deposit: 10.481381ms, whole_stage: None, whole_probe: None, joint_stage: None, joint_probe: None, receiving_only_stage: Some(10.028231ms), receiving_only_probe: None, probe_subphases: [], final_arrived_reread: 12.683356ms, precision_close: 6.232\u00b5s, prefix_forks: 0ns, compare_preparation: 446.436702ms, return_join: 29.738706ms, ordered_publication: 328.816\u00b5s, return_worker_sums: [78.177403ms, 22.770308ms, 90.2\u00b5s, 40.025\u00b5s], deposit_subphases: [(\"GroupedInputs\", 22.933\u00b5s), (\"Flow(Receiving(2))\", 478.416\u00b5s), (\"Certificate(Receiving(2))\", 7.770992ms), (\"PairDirections\", 224.671\u00b5s), (\"RegionPreparation\", 29.215\u00b5s), (\"JointCertificate\", 270.467\u00b5s), (\"CandidateStaged\", 1.211269ms), (\"Publication\", 473.047\u00b5s)] }",
+      "ObservedEpochWallTimes { forward_batch: 592.116525ms, compare_return_compose_batch: 485.671391ms, grouped_deposit: 10.110766ms, whole_stage: None, whole_probe: None, joint_stage: None, joint_probe: None, receiving_only_stage: Some(9.690629ms), receiving_only_probe: None, probe_subphases: [], final_arrived_reread: 12.150668ms, precision_close: 546.995\u00b5s, prefix_forks: 0ns, compare_preparation: 455.277447ms, return_join: 30.056813ms, ordered_publication: 312.495\u00b5s, return_worker_sums: [77.632262ms, 29.646504ms, 100.62\u00b5s, 48.6\u00b5s], deposit_subphases: [(\"GroupedInputs\", 21.4\u00b5s), (\"Flow(Receiving(2))\", 420.779\u00b5s), (\"Certificate(Receiving(2))\", 8.181731ms), (\"PairDirections\", 73.889\u00b5s), (\"RegionPreparation\", 11.02\u00b5s), (\"JointCertificate\", 214.061\u00b5s), (\"CandidateStaged\", 750.857\u00b5s), (\"Publication\", 436.849\u00b5s)] }",
+      "ObservedEpochWallTimes { forward_batch: 598.3314ms, compare_return_compose_batch: 479.107211ms, grouped_deposit: 11.267804ms, whole_stage: None, whole_probe: None, joint_stage: None, joint_probe: None, receiving_only_stage: Some(10.745886ms), receiving_only_probe: None, probe_subphases: [], final_arrived_reread: 12.973811ms, precision_close: 6.622\u00b5s, prefix_forks: 0ns, compare_preparation: 449.588096ms, return_join: 29.210787ms, ordered_publication: 284.203\u00b5s, return_worker_sums: [77.665646ms, 23.318745ms, 92.573\u00b5s, 41.927\u00b5s], deposit_subphases: [(\"GroupedInputs\", 18.614\u00b5s), (\"Flow(Receiving(2))\", 430.167\u00b5s), (\"Certificate(Receiving(2))\", 7.929859ms), (\"PairDirections\", 55.444\u00b5s), (\"RegionPreparation\", 9.017\u00b5s), (\"JointCertificate\", 198.832\u00b5s), (\"CandidateStaged\", 2.084977ms), (\"Publication\", 540.493\u00b5s)] }"
+    ],
+    "scope": "one40class synthetic CODE control, not dataset throughput or an ETA"
+  },
+  "card": {
+    "backend": "cuda-observed-epoch-device0",
+    "device_ordinal": 0,
+    "host_fallback": false,
+    "completed": true,
+    "successful_card_forwards": 40,
+    "successful_retained_card_returns": 40,
+    "successful_card_aggregates": 4,
+    "host_owned": "empirical M formation/authentic opening work; scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks",
+    "device_forward_reading": {
+      "successful_forwards": 40,
+      "opening_packets": 38,
+      "opening_preparation_host_ns": 53453846,
+      "mounted_execute_ns": 93074305,
+      "native_word_forward_launches": 40,
+      "fresh_response_forward_subset": 0,
+      "forward_phase_transfer_octets": 470432,
+      "response_forward_transfer_subset_octets": 0
+    }
+  },
+  "timing_scope": "mounted_execute includes authentic source preparation and actual device forward/record work; source_preparation_host is nested in mounted_execute. M formation, actor mounts/moment transfer, exact scalar scores and publications are outside that sub-timer. No global launch/synchronization census.",
+  "both_lanes": {
+    "backend": "cuda-observed-epoch-device0",
+    "device_ordinal": 0,
+    "host_fallback": false,
+    "completed": false,
+    "successful_card_forwards": 10,
+    "successful_retained_card_returns": 10,
+    "successful_card_aggregates": 0,
+    "host_owned": "empirical M formation/authentic opening work; scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks",
+    "device_forward_reading": {
+      "successful_forwards": 10,
+      "opening_packets": 8,
+      "opening_preparation_host_ns": 12365490,
+      "mounted_execute_ns": 292185937,
+      "native_word_forward_launches": 20,
+      "fresh_response_forward_subset": 10,
+      "forward_phase_transfer_octets": 440960,
+      "response_forward_transfer_subset_octets": 282672
+    }
+  },
+  "both_lanes_scope": "ten actual attempted section classes, two forward lanes, exact actual read/end/work/retained-return comparisons; paired local-R normal publication refused and unchanged cold state retained"
+}

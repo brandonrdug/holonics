@@ -1,0 +1,36 @@
+{
+  "kind": "isolated instrumented same-geometry CODE fit; not whole-command speedup",
+  "sources": 25,
+  "targets": 4,
+  "majorant_dimension": 50,
+  "grid_calls": {
+    "original": 55575,
+    "guarded": 8725
+  },
+  "factor_dimension": {
+    "original": 50,
+    "guarded": 25
+  },
+  "original_fit_ns": [
+    62216125,
+    61481620,
+    62018085,
+    61132165,
+    60105072
+  ],
+  "guarded_fit_ns": [
+    24993312,
+    24934663,
+    24637857,
+    25385437,
+    24364194
+  ],
+  "ranges_separated": true,
+  "median_original_ns": 61481620,
+  "median_guarded_ns": 24934663,
+  "original_moments_applied_residual_codec": "exact across8successive arrivals and5pairedfit repetitions",
+  "cold": "exact material bytes",
+  "changed_complex_context": "original50dimension fallback; exact outputs",
+  "reused_structure": "identical uncoupled all-real blocks within one fit; no cross-event memoization",
+  "predictive_or_language_gain": "not assessed"
+}

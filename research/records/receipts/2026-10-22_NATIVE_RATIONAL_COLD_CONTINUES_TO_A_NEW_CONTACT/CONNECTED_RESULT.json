@@ -1,0 +1,173 @@
+{
+  "kind": "synthetic CODE connected qualification, no dataset",
+  "runtime_source_base": "43c33bc69b86dcc8f4b703bcf6812effdc8a5320 plus exact pre-dispatch payloads",
+  "data_policy_pass": true,
+  "transitions": [
+    {
+      "boundary": "pending-six cold",
+      "status": "PASS",
+      "accepted": 6,
+      "published": 0,
+      "pending": 6
+    },
+    {
+      "boundary": "first R",
+      "status": "PASS",
+      "publication_source": 9,
+      "end_source": 10,
+      "receiving_map_coordinates_changed": 31,
+      "commit": 6,
+      "blind_carry_preserved": true
+    },
+    {
+      "boundary": "post-R cold",
+      "status": "PASS",
+      "accepted": 10,
+      "published": 10,
+      "pending": 0,
+      "full_native_state_and_external_pending_exact": true
+    },
+    {
+      "boundary": "new actual contact",
+      "status": "PASS",
+      "producing_source": 10,
+      "class": 2,
+      "end_source": 11,
+      "publication_commit": 7
+    },
+    {
+      "boundary": "next R section",
+      "status": "REFUSED",
+      "start_source": 11,
+      "staged_word_producers": [
+        {
+          "source": 11,
+          "commit": 7,
+          "scalar_count": 12,
+          "max_numerator_bits": 1777,
+          "max_denominator_bits": 1784,
+          "coordinate_bits": [
+            [
+              1457,
+              1462
+            ],
+            [
+              1457,
+              1462
+            ],
+            [
+              1455,
+              1462
+            ],
+            [
+              1455,
+              1462
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              1777,
+              1784
+            ],
+            [
+              1775,
+              1779
+            ],
+            [
+              1777,
+              1779
+            ],
+            [
+              1775,
+              1779
+            ],
+            [
+              1272,
+              1276
+            ],
+            [
+              1272,
+              1276
+            ]
+          ]
+        }
+      ],
+      "failure": "unchanged quadratic class-coordinate control bounds",
+      "operative_guard": "word/action/quadratic_work.rs apply_quadratic control shape/max-work-sign/precision/control-numerator-denominator bound",
+      "actual_rollback_source": 11,
+      "actual_rollback_exact": true,
+      "pending_rollback_exact": true,
+      "failed_producing_source": {
+        "value": 12,
+        "status": "inferred from sole source11 completed staged producer and deterministic ordered loop, not a captured failed packet"
+      },
+      "actual_rejected_control": "NOT CAPTURED by original generic error; no reconstruction/replay",
+      "limit_rational_bits": 1024,
+      "max_abs_work": 65536
+    },
+    {
+      "boundary": "source30 close",
+      "status": "NOT_REACHED"
+    },
+    {
+      "boundary": "final cold",
+      "status": "NOT_REACHED"
+    },
+    {
+      "boundary": "four warm/cold frozen decisions",
+      "status": "NOT_REACHED"
+    }
+  ],
+  "native_receipt": {
+    "native_attempt_reservation": 640,
+    "native_attempt_charge": 170,
+    "native_counts": {
+      "final": true,
+      "total_attempts": 170,
+      "forward_constructors": 134,
+      "response_companions": 12,
+      "actual_returns": 12,
+      "fresh_returns": 12
+    },
+    "command": [
+      "bash",
+      "-c",
+      "exec \"$@\"",
+      "_",
+      "<private-runtime>/alpha-v93-native-cold-transition-43c33/binaries/connected",
+      "complete_language::native_context_controls::native_original_word_final_ingress_transition",
+      "--ignored",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "limit_s": 90,
+    "wall_ns": 13843748870,
+    "peak_rss_bytes": 171794432,
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "samples": 138,
+    "exit": 101,
+    "stop": null,
+    "owned_cleanup_remaining": [],
+    "ledger_before_ns": 124609739279,
+    "ledger_after_ns": 138453488149,
+    "model_jobs": 0,
+    "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+  },
+  "log_sha256": "fd500ad571bddbeb871cf012888dc24d6ff378b1436292a16ef1eac767cae6f5",
+  "source_analysis": "Preparation authenticates complete original source/cut/frame before generic control guard. Configuration fixes 4 real controls, nonnegative work ceiling65536 and coordinate bits1024. Rejected vector absent, so exact failing coordinate and its width remain unproven. Last completed producer features show actual rational widths listed; they are not the failed control.",
+  "no_retry": true,
+  "no_guard_relaxed": true,
+  "runtime_source": "73d22f1fcaa828f50d127eff7e337c65897214f3"
+}

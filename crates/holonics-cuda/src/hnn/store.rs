@@ -24,6 +24,11 @@
 //! rounded step's chart is the nearest lattice point of `X̂(2 − AX̂)` whatever the operator's
 //! denominator, so the charts are the host's charts.
 //!
+//! Operators outside the signed64/bounded128 inverse ABI use `inverse_exact`'s
+//! resident runtime limb arena. The same phases, starts, targets, tie rule and
+//! native signed64 chart admission apply. Wide pairs do not enter the bounded
+//! inverse kernels; the old carrier and its refusal law remain unchanged.
+//!
 //! [definition] **The workspace.** A word refines its pairs in a workspace of two chart blocks per
 //! pair (the kept charts copied in, or the cold starts written), so a refusal mid-way leaves every
 //! kept chart as it was, as the host's `Operands::at_cut_charted` leaves the resident's charts when
@@ -35,7 +40,7 @@ use std::collections::BTreeMap;
 
 use core::ffi::c_void;
 
-use holonics::hnn::chart::transpose_start;
+use holonics::hnn::chart::{OperatorWideReason, transpose_start};
 use holonics::hnn::{ChartKey, ChartReading, ChartStart, ChartWords, HnnError, WordLattice};
 use holonics::ratio::Rat;
 use holonics::ratio::linear::ExactRatMatrix;
@@ -46,6 +51,7 @@ use crate::ffi::CUdeviceptr;
 use crate::hnn::DeviceError;
 use crate::hnn::card::{Card, CardBuffer, Layout, certificate_layout, copy_layout, read_layout};
 use crate::hnn::dyadic::{DyadicMatrix, refused, value};
+use crate::hnn::inverse_exact::{ExactInverseOperator, ExactInverseWorkspace};
 use crate::hnn::word::{
     CERTIFICATE_ENTRY, INVERSE_EXPONENT_CEILING, REFINE_ENTRY, RESIDUAL_ENTRY, Refusal,
 };
@@ -72,7 +78,8 @@ struct Slot {
 pub(crate) struct Pair<'a> {
     pub(crate) key: ChartKey,
     pub(crate) matrix: &'a ExactRatMatrix,
-    pub(crate) words: &'a DyadicMatrix,
+    /// Absent when the exact operator's coordinates exceed the old signed64 ABI.
+    pub(crate) words: Option<&'a DyadicMatrix>,
 }
 
 /// [definition] **A word's refined charts in the workspace**: per pair its width and the offset of
@@ -108,6 +115,25 @@ struct State {
     certify: bool,
     step: bool,
     refusal: Option<HnnError>,
+    wide: bool,
+    exact_operator: ExactInverseOperator,
+    operator_reasons: Vec<OperatorWideReason>,
+    /// Known start words or the actual device-refined coordinates, for the
+    /// native owner's structural provenance check only.
+    provenance_words: Option<Vec<i64>>,
+    reused_reading: Option<ChartReading>,
+}
+
+/// Certified inverse preparations belonging to the caller's immutable batch.
+/// This transient proof cache never enters a continuation payload.
+#[derive(Clone)]
+pub(crate) struct RingPreparations(BTreeMap<usize, RingPreparation>);
+
+#[derive(Clone)]
+struct RingPreparation {
+    operator: ExactInverseOperator,
+    chart: ChartWords,
+    reading: ChartReading,
 }
 
 /// [definition] **The executed charts resident on a card**, keyed (module header).
@@ -128,6 +154,10 @@ pub(crate) struct ChartStore<'c> {
     mirror: BTreeMap<ChartKey, ChartWords>,
     /// The pairs' tables, kept between refinements and rewritten for each.
     tables: Option<Tables<'c>>,
+    /// Transient exact operator/intermediate arenas; retained charts stay in `kept`.
+    wide: BTreeMap<ChartKey, ExactInverseWorkspace<'c>>,
+    reuse_rings: Option<RingPreparations>,
+    prepared_rings: Option<RingPreparations>,
     /// The octets the store's refinements took across the bus, and the launches it made.
     pub(crate) octets: usize,
     pub(crate) launches: u64,
@@ -165,6 +195,9 @@ impl<'c> ChartStore<'c> {
             reading: card.alloc(2).map_err(device)?,
             mirror: BTreeMap::new(),
             tables: None,
+            wide: BTreeMap::new(),
+            reuse_rings: None,
+            prepared_rings: None,
             octets: 0,
             launches: 0,
         })
@@ -173,6 +206,16 @@ impl<'c> ChartStore<'c> {
     /// The kept charts' bits, a reading (`holonics::hnn::Charts::bits`).
     pub(crate) fn bits(&self) -> u64 {
         self.mirror.values().map(ChartWords::bits).sum()
+    }
+
+    pub(crate) fn ring_preparations(&self) -> Option<RingPreparations> {
+        self.prepared_rings.clone()
+    }
+
+    /// Only an authenticated immutable scope supplies the cache. Refinement
+    /// rechecks the actual operators, lattice and every input ring chart.
+    pub(crate) fn reuse_ring_preparations(&mut self, prepared: RingPreparations) {
+        self.reuse_rings = Some(prepared);
     }
 
     /// Export actual kept device charts through the shared native owner. A mismatching mirror
@@ -269,6 +312,8 @@ impl<'c> ChartStore<'c> {
         self.used = state.used;
         self.mirror = state.mirror;
         self.tables = None;
+        self.reuse_rings = None;
+        self.prepared_rings = None;
         Ok(())
     }
 
@@ -337,27 +382,83 @@ impl<'c> ChartStore<'c> {
     pub(crate) fn refine(&mut self, pairs: &[Pair<'_>]) -> Result<Refined, HnnError> {
         let card = self.card;
         let lc = self.exponent;
+        self.wide.clear();
+        let ring_pairs: Vec<_> = pairs
+            .iter()
+            .filter(|p| matches!(p.key, ChartKey::Ring(_)))
+            .collect();
+        let reuse_rings = self.reuse_rings.take().filter(|prepared| {
+            self.target < Rat::one()
+                && prepared.0.len() == ring_pairs.len()
+                && ring_pairs.iter().all(|pair| {
+                    let ChartKey::Ring(ring) = pair.key else {
+                        return false;
+                    };
+                    prepared.0.get(&ring).is_some_and(|kept| {
+                        kept.chart.exponent() == lc
+                            && kept.reading.target == self.target
+                            && self.mirror.get(&pair.key) == Some(&kept.chart)
+                            && ExactInverseOperator::of(pair.matrix)
+                                .is_ok_and(|actual| actual == kept.operator)
+                    })
+                })
+        });
         // Place every key and move its operator words onto the card when they changed.
         let mut words = 0usize;
         let mut states = Vec::with_capacity(pairs.len());
         for pair in pairs {
-            let n = pair.words.rows;
-            if pair.words.columns != n {
-                return Err(refused("a chart's operator is square"));
-            }
-            self.place(&pair.key, n)?;
-            let shift = pair.words.exponent + lc;
-            if shift > INVERSE_EXPONENT_CEILING {
+            let exact = ExactInverseOperator::of(pair.matrix)?;
+            let n = exact.width;
+            let reused = match (&reuse_rings, &pair.key) {
+                (Some(prepared), ChartKey::Ring(ring)) => prepared.0.get(ring),
+                _ => None,
+            };
+            if let Some(operator) = pair.words
+                && (operator.rows != n
+                    || operator.columns != n
+                    || operator.words.len() != exact.numerators.len()
+                    || operator
+                        .words
+                        .iter()
+                        .zip(pair.matrix.entries())
+                        .any(|(word, entry)| value(*word, operator.exponent) != *entry))
+            {
                 return Err(refused(
-                    "an operator's S = L_A + L_c past the carrier's 126 (2^S a carrier word)",
+                    "a bounded inverse operator decodes to its actual native matrix",
                 ));
             }
+            self.place(&pair.key, n)?;
+            let exponent = pair
+                .words
+                .map_or(exact.exponent, |operator| operator.exponent);
+            let bounded_shift = exponent.checked_add(lc).ok_or(HnnError::CountOverflow)?;
+            let wide = pair.words.is_none()
+                || bounded_shift > INVERSE_EXPONENT_CEILING
+                || !exact.bounded(lc);
+            let shift = if wide {
+                exact
+                    .exponent
+                    .checked_add(lc)
+                    .ok_or(HnnError::CountOverflow)?
+            } else {
+                bounded_shift
+            };
+            if wide && reused.is_none() {
+                let workspace = ExactInverseWorkspace::new(card, &exact, lc).map_err(device)?;
+                self.octets += workspace.octets;
+                self.wide.insert(pair.key.clone(), workspace);
+            }
             let slot = self.slots.get_mut(&pair.key).expect("placed");
-            if slot.operator.as_ref() != Some(pair.words) {
-                card.write(&self.operators, slot.offset, &pair.words.words)
-                    .map_err(device)?;
-                self.octets += 8 * pair.words.words.len();
-                slot.operator = Some(pair.words.clone());
+            if !wide && reused.is_none() {
+                let operator = pair.words.expect("a bounded operator has signed64 words");
+                if slot.operator.as_ref() != Some(operator) {
+                    card.write(&self.operators, slot.offset, &operator.words)
+                        .map_err(device)?;
+                    self.octets += 8 * operator.words.len();
+                    slot.operator = Some(operator.clone());
+                }
+            } else {
+                slot.operator = None;
             }
             states.push(State {
                 key: pair.key.clone(),
@@ -365,17 +466,31 @@ impl<'c> ChartStore<'c> {
                 shift,
                 base: words,
                 half: 0,
-                phase: if slot.present {
+                phase: if reused.is_some() {
+                    Phase::Done
+                } else if slot.present {
                     Phase::CheckWarm
                 } else {
                     Phase::StartCold
                 },
                 steps: 0,
-                start: ChartStart::Warm,
-                delta: None,
+                start: if reused.is_some() {
+                    ChartStart::Reused
+                } else {
+                    ChartStart::Warm
+                },
+                delta: reused.map(|r| r.reading.certificate.clone()),
                 certify: false,
                 step: false,
                 refusal: None,
+                wide,
+                exact_operator: exact,
+                operator_reasons: Vec::new(),
+                provenance_words: self
+                    .mirror
+                    .get(&pair.key)
+                    .map(|chart| chart.words().to_vec()),
+                reused_reading: reused.map(|r| r.reading.clone()),
             });
             words += n * n;
         }
@@ -385,7 +500,7 @@ impl<'c> ChartStore<'c> {
         // The kept charts are the warm starts, copied into each pair's first block.
         let warm: Vec<[u64; 3]> = states
             .iter()
-            .filter(|state| state.phase == Phase::CheckWarm)
+            .filter(|state| state.phase == Phase::CheckWarm || state.reused_reading.is_some())
             .map(|state| {
                 let slot = &self.slots[&state.key];
                 [
@@ -446,6 +561,7 @@ impl<'c> ChartStore<'c> {
                     _ => None,
                 };
                 if let Some(chart) = written {
+                    state.provenance_words = Some(chart.words().to_vec());
                     let at = 2 * state.base + state.half * state.width * state.width;
                     card.write(&self.work, at, chart.words()).map_err(device)?;
                     card.zero_octets(&self.work_status, 4 * at, 4 * chart.words().len())
@@ -457,7 +573,7 @@ impl<'c> ChartStore<'c> {
             }
             // Certify the pairs that need it.
             if states.iter().any(|state| state.certify) {
-                let deltas = self.certify(tables, &states)?;
+                let deltas = self.certify(tables, &mut states)?;
                 for (state, delta) in states.iter_mut().zip(deltas) {
                     if !state.certify {
                         continue;
@@ -524,12 +640,13 @@ impl<'c> ChartStore<'c> {
                 }
             }
             if states.iter().any(|state| state.step) {
-                self.step(tables, &states)?;
+                self.step(tables, &mut states)?;
                 for state in &mut states {
                     if state.step {
                         state.half = 1 - state.half;
                         state.steps += 1;
                         state.certify = true;
+                        state.provenance_words = None;
                     }
                 }
             }
@@ -546,7 +663,9 @@ impl<'c> ChartStore<'c> {
         // Commit the moved charts to their keys, and read them to the host's mirror.
         let moved: Vec<&State> = states
             .iter()
-            .filter(|state| state.steps > 0 || state.start != ChartStart::Warm)
+            .filter(|state| {
+                state.steps > 0 || !matches!(state.start, ChartStart::Warm | ChartStart::Reused)
+            })
             .collect();
         if !moved.is_empty() {
             let table: Vec<[u64; 3]> = moved
@@ -577,6 +696,50 @@ impl<'c> ChartStore<'c> {
         for state in &states {
             self.slots.get_mut(&state.key).expect("placed").present = true;
         }
+        let readings: Vec<_> = states
+            .iter()
+            .map(|state| {
+                if let Some(original) = &state.reused_reading {
+                    let mut reading = original.clone();
+                    reading.start = ChartStart::Reused;
+                    reading.steps = 0;
+                    reading
+                } else {
+                    ChartReading {
+                        key: state.key.clone(),
+                        width: state.width,
+                        certificate: state.delta.clone().expect("a finished chart is certified"),
+                        target: self.target.clone(),
+                        steps: state.steps,
+                        start: state.start,
+                        operator: Some(state.exact_operator.native_reading(
+                            state.key.clone(),
+                            lc,
+                            &state.operator_reasons,
+                        )),
+                    }
+                }
+            })
+            .collect();
+        self.prepared_rings = Some(RingPreparations(
+            states
+                .iter()
+                .zip(&readings)
+                .filter_map(|(state, reading)| {
+                    let ChartKey::Ring(ring) = state.key else {
+                        return None;
+                    };
+                    Some((
+                        ring,
+                        RingPreparation {
+                            operator: state.exact_operator.clone(),
+                            chart: self.mirror[&state.key].clone(),
+                            reading: reading.clone(),
+                        },
+                    ))
+                })
+                .collect(),
+        ));
         Ok(Refined {
             charts: states
                 .iter()
@@ -587,18 +750,49 @@ impl<'c> ChartStore<'c> {
                     )
                 })
                 .collect(),
-            readings: states
-                .iter()
-                .map(|state| ChartReading {
-                    key: state.key.clone(),
-                    width: state.width,
-                    certificate: state.delta.clone().expect("a finished chart is certified"),
-                    target: self.target.clone(),
-                    steps: state.steps,
-                    start: state.start,
-                })
-                .collect(),
+            readings,
         })
+    }
+
+    /// Report the native preflight decision on the very coordinates consumed
+    /// by this launch. Width/scale failures need no read; chart-dependent
+    /// decisions use starts already known to the host or a counted device read.
+    fn provenance(&mut self, states: &mut [State], newton: bool) -> Result<(), HnnError> {
+        for state in states
+            .iter_mut()
+            .filter(|s| if newton { s.step } else { s.certify })
+        {
+            let reason = if let Some(reason) = state
+                .exact_operator
+                .native_independent_reason(self.exponent)
+            {
+                Some(reason)
+            } else {
+                if state.provenance_words.is_none() {
+                    let n2 = state.width * state.width;
+                    state.provenance_words = Some(
+                        self.card
+                            .fetch_range(&self.work, 2 * state.base + state.half * n2, n2)
+                            .map_err(device)?,
+                    );
+                    self.octets += 8 * n2;
+                }
+                state.exact_operator.native_wide_reason(
+                    state
+                        .provenance_words
+                        .as_ref()
+                        .expect("actual chart provenance words"),
+                    self.exponent,
+                    newton,
+                )
+            };
+            if let Some(reason) = reason
+                && !state.operator_reasons.contains(&reason)
+            {
+                state.operator_reasons.push(reason);
+            }
+        }
+        Ok(())
     }
 
     /// The residual of every pair that needs a certificate, then every pair's certificate (one
@@ -606,10 +800,50 @@ impl<'c> ChartStore<'c> {
     fn certify(
         &mut self,
         tables: &Tables<'c>,
+        states: &mut [State],
+    ) -> Result<Vec<Result<Rat, HnnError>>, HnnError> {
+        self.provenance(states, false)?;
+        let mut deltas = if states.iter().any(|s| s.certify && !s.wide) {
+            self.certify_bounded(tables, states)?
+        } else {
+            states
+                .iter()
+                .map(|_| Ok(Rat::from_integer(BigInt::from(0))))
+                .collect()
+        };
+        for (state, delta) in states.iter().zip(&mut deltas) {
+            if !state.certify || !state.wide {
+                continue;
+            }
+            let workspace = self
+                .wide
+                .get_mut(&state.key)
+                .expect("admitted exact operator");
+            let octets = workspace.octets;
+            let launches = workspace.launches;
+            *delta = workspace
+                .certify(
+                    &self.work,
+                    &self.work_status,
+                    2 * state.base + state.half * state.width * state.width,
+                )
+                .map_err(device);
+            self.octets += workspace.octets - octets;
+            self.launches += workspace.launches - launches;
+        }
+        Ok(deltas)
+    }
+
+    fn certify_bounded(
+        &mut self,
+        tables: &Tables<'c>,
         states: &[State],
     ) -> Result<Vec<Result<Rat, HnnError>>, HnnError> {
         let card = self.card;
-        let active: Vec<u32> = states.iter().map(|s| u32::from(s.certify)).collect();
+        let active: Vec<u32> = states
+            .iter()
+            .map(|s| u32::from(s.certify && !s.wide))
+            .collect();
         let chart_base: Vec<u64> = states
             .iter()
             .map(|s| (2 * s.base + s.half * s.width * s.width) as u64)
@@ -676,6 +910,9 @@ impl<'c> ChartStore<'c> {
             .iter()
             .zip(numerators.iter().zip(statuses))
             .map(|(state, (&numerator, &status))| {
+                if !state.certify || state.wide {
+                    return Ok(Rat::from_integer(BigInt::from(0)));
+                }
                 let status = u32::try_from(status).unwrap_or(u32::MAX);
                 match Refusal::of_status(status).map_err(device)? {
                     None => Ok(value(BigInt::from(numerator), state.shift)),
@@ -688,9 +925,38 @@ impl<'c> ChartStore<'c> {
     }
 
     /// One rounded Newton–Schulz step of the pairs that step, each into its other block.
-    fn step(&mut self, tables: &Tables<'c>, states: &[State]) -> Result<(), HnnError> {
+    fn step(&mut self, tables: &Tables<'c>, states: &mut [State]) -> Result<(), HnnError> {
+        self.provenance(states, true)?;
+        if states.iter().any(|s| s.step && !s.wide) {
+            self.step_bounded(tables, states)?;
+        }
+        for state in states.iter().filter(|s| s.step && s.wide) {
+            let workspace = self
+                .wide
+                .get_mut(&state.key)
+                .expect("admitted exact operator");
+            let octets = workspace.octets;
+            let launches = workspace.launches;
+            let n2 = state.width * state.width;
+            let result = workspace.refine(
+                &self.work,
+                &self.work_status,
+                2 * state.base + state.half * n2,
+                2 * state.base + (1 - state.half) * n2,
+            );
+            self.octets += workspace.octets - octets;
+            self.launches += workspace.launches - launches;
+            result.map_err(device)?;
+        }
+        Ok(())
+    }
+
+    fn step_bounded(&mut self, tables: &Tables<'c>, states: &[State]) -> Result<(), HnnError> {
         let card = self.card;
-        let active: Vec<u32> = states.iter().map(|s| u32::from(s.step)).collect();
+        let active: Vec<u32> = states
+            .iter()
+            .map(|s| u32::from(s.step && !s.wide))
+            .collect();
         let chart_base: Vec<u64> = states
             .iter()
             .map(|s| (2 * s.base + s.half * s.width * s.width) as u64)
@@ -830,7 +1096,19 @@ impl<'c> Tables<'c> {
             rows += state.width;
             row_region.extend(core::iter::repeat_n(g as u32, state.width));
         }
-        let widths: Vec<u32> = states.iter().map(|s| s.width as u32).collect();
+        // A wide pair has a separate exact arena. The bounded certificate has
+        // no active mask, so its width is zero rather than reading that pair's
+        // uninitialized bounded residual or shifting its S past the old ceiling.
+        let widths: Vec<u32> = states
+            .iter()
+            .map(|s| {
+                if s.wide || s.reused_reading.is_some() {
+                    0
+                } else {
+                    s.width as u32
+                }
+            })
+            .collect();
         let shifts: Vec<u32> = states.iter().map(|s| s.shift).collect();
         let operator_base: Vec<u64> = states.iter().map(|s| slots[&s.key].offset as u64).collect();
         let residual_base: Vec<u64> = states.iter().map(|s| s.base as u64).collect();

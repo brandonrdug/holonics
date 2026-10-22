@@ -184,7 +184,7 @@ fn a_saved_state_restores_across_a_move() {
     let text = state.to_text();
     assert!(text.contains("\nreceiving_prior 6\n"));
     assert!(!text.lines().any(|line| line.starts_with("located ")));
-    let read = ContinuingState::from_text(&text).unwrap();
+    let read = ContinuingState::from_text(&text, opening.budget()).unwrap();
     assert_eq!(read, state);
     let restored = opening.clone().continued(&read).unwrap();
     assert_eq!(restored, theta);
@@ -208,7 +208,7 @@ fn a_saved_state_restores_across_a_move() {
     let changed = format!("{}{}{}", &text[..line], words.join(" "), &text[end..]);
     let stamped = ContinuingState::stamped(&changed, &opening).unwrap();
     assert!(matches!(
-        ContinuingState::from_text(&stamped),
+        ContinuingState::from_text(&stamped, opening.budget()),
         Err(HnnError::ContinuingState { what }) if what.contains("scale")
     ));
 }
@@ -537,12 +537,12 @@ fn arrival_context_receiving_deposit_is_dyadically_covariant_and_restores() {
     let untagged = text.replace("receiving-chart passage-relative-read-and-target-v1\n", "");
     let old_chart = ContinuingState::stamped(&untagged, &opening).unwrap();
     assert!(matches!(
-        ContinuingState::from_text(&old_chart),
+        ContinuingState::from_text(&old_chart, opening.budget()),
         Err(HnnError::ContinuingState {
             what: "the receiving read and target phase chart (requires passage-relative-read-and-target-v1)"
         })
     ));
-    let saved = ContinuingState::from_text(&text).unwrap();
+    let saved = ContinuingState::from_text(&text, opening.budget()).unwrap();
     let restored = opening.clone().continued(&saved).unwrap();
     assert_eq!(restored, next);
     assert!(

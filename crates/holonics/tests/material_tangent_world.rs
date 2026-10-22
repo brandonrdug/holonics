@@ -1349,7 +1349,7 @@ fn the_landed_material_survives_a_cold_restore() {
         .unwrap()
         .with_carry(resident.carried().cloned())
         .to_text();
-    let state = ContinuingState::from_text(&text).unwrap();
+    let state = ContinuingState::from_text(&text, theta.budget()).unwrap();
     let restored = Reference::campaign_one()
         .mount_continued(&field, &Current::at_rest(&field), theta.clone(), &state)
         .unwrap();

@@ -1,0 +1,29 @@
+{
+  "kind": "matched unchanged40class full command; one historical and one current sample perbackend, not randomized timing replicates",
+  "values": {
+    "host-reference": {
+      "predecessor_command_ns": 5122560539,
+      "current_command_ns": 3582868471,
+      "actual_cells": 40,
+      "actual_epochs": 4,
+      "workers": 4,
+      "cold_exact": true
+    },
+    "cuda-observed-epoch-device0": {
+      "predecessor_command_ns": 5250418083,
+      "current_command_ns": 3727878281,
+      "actual_cells": 40,
+      "actual_epochs": 4,
+      "workers": 4,
+      "cold_exact": true
+    }
+  },
+  "fit_level_repetition": "FIT_REUSE_MEASUREMENT.json",
+  "training_budget_target_ns": 3400000000,
+  "target_met": {
+    "host-reference": false,
+    "cuda-observed-epoch-device0": false
+  },
+  "scope": "no dataset throughput/ETA or CUDA speedup claim; native/M/crib/pending bytes exact against predecessor",
+  "next_language_proposal": "NOT_READY; no launch authority"
+}

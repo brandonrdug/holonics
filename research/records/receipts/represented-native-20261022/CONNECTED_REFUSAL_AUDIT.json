@@ -1,0 +1,124 @@
+{
+  "source": "f3b7534ad68fa0e7104536e9c56fb0af44dcd24d",
+  "log": "<private-runtime>/alpha-v93-represented-native-7ca320/code-20-connected/log.txt",
+  "log_sha256": "1fbd7d6dedd5971b7478e9abe914c6317b384664e3c165ea26e9c7a46a63648b",
+  "operative_stage": "fresh prepared unit / physical first variation",
+  "source_cells": 10,
+  "commit": 6,
+  "exact_readings": {
+    "stored_pairing": {
+      "numerator": "43550073721",
+      "denominator": "691077120000",
+      "numerator_bits": 36,
+      "denominator_bits": 40
+    },
+    "surrogate_pairing": {
+      "numerator": "4362390006247896553753327260359367624064200482032088661",
+      "denominator": "69216717543991562206126513677443163810904965235343360000",
+      "numerator_bits": 182,
+      "denominator_bits": 186
+    },
+    "reverse_discrepancy": {
+      "numerator": "29261414243276379312671970782086668861168485173582061",
+      "denominator": "3945352900007519045749211279614260337221583018414571520000",
+      "numerator_bits": 175,
+      "denominator_bits": 192
+    },
+    "class_error_charge": {
+      "numerator": "121808804338983684110536214333461781549486347751183764663381964106380062069111269280121953133623916539671925860831234412227202799697380956792562337288373",
+      "denominator": "27239900032757937452040793144430575685061421511996666964821056906659342819797688185981260740514868915133808837890773663089782501237658958261295887651894486144706307686400000",
+      "numerator_bits": 506,
+      "denominator_bits": 573
+    },
+    "response_error_charge": {
+      "numerator": "226455738200163795143460802629888292185457411039271426937021508327545578161089086699878520349348225929925363839065121018365016848375476954082765111709088722036916248918701984790383307221277717609734423044665170067",
+      "denominator": "27814209876125032185408488617346962352074883754106622096332712911538780073850906440604839964947683317642290045683907432714099728324769008479962330302873824080647493631219353229844752645534400807735767313185505280",
+      "numerator_bits": 706,
+      "denominator_bits": 703
+    },
+    "lower": {
+      "numerator": "-1678392148066305151863754678652621887811496021537388691034402137106164069385693088994012925480527825861218413462399591203716579755199512952150651088046900372562072467680617456068763424347483004864548618197620859432814381",
+      "denominator": "207754763893481412279885529666195966918529334840830150420795157503624975414120114294792776513181102080714380209980236080228878658255821512715018630906028169742386372741689056531171649291738515033281346974924983500800000",
+      "numerator_bits": 729,
+      "denominator_bits": 726
+    },
+    "response_squared": {
+      "numerator": "40479890313401835718812019171544944517972765073113768393041867956040016345906523344157346716433711673376481749974509998191771402882395079998425517354673650295437999618238230817077989436873193694640261138329244567375834483720552261042793707923242418610938381818317732073543845754610860638556449075662332101329847417493284846311665568364462977822806093193618831133701643048027956890625",
+      "denominator": "4622050384501541079063198370564118606036557611490203003743065735166521106191233191578966207005907034163181996235483687392512826552037215014641050195044389764708782979147558987242120731436393810330968987786310813708687240518612639513557072749900038873486151696084416697258142197059285474066136970301829657013867090765986365597716572168322172422029426139705149135001747456",
+      "numerator_bits": 1271,
+      "denominator_bits": 1229
+    }
+  },
+  "exact_comparisons": {
+    "1/16 < stored_pairing < 1/15": true,
+    "0 < reverse_discrepancy < 1/100000": true,
+    "0 < class_error_charge < 1/10^20": true,
+    "8 < response_error_charge < 9": true,
+    "-9 < lower < -8": true,
+    "response_error_exceeds_128_times_stored_pairing": true
+  },
+  "completed": [
+    "represented pending6 full native/pending cold",
+    "source0..9 prepared native forwards/actual returns",
+    "first R publication with31 represented coordinate changes",
+    "post-R full cold restore",
+    "real source10 contact forward/actual-fresh return",
+    "one paired algebraic tangent query",
+    "nonpositive certificate refusal and exact source10 delivery rollback"
+  ],
+  "not_completed": [
+    "native contact material publication",
+    "next R at20",
+    "source30 close",
+    "final cold",
+    "four matched frozen decisions",
+    "CUDA",
+    "datasets/training/outputs"
+  ],
+  "failure_is_not": [
+    "coordinate/work/resource cap",
+    "negative returned alignment",
+    "an executed material step failing its endpoint guard",
+    "finite CE decline failure"
+  ],
+  "interpretation": "The scalar full-state response enclosure is too wide to certify this physical-reference derivative. No true unfavorable derivative or physical impossibility is proved.",
+  "not_recorded_in_this_runtime": [
+    "per-stage error-charge decomposition",
+    "full rejected direction/transit operand packet outside the exact scalar reading"
+  ],
+  "no_counterfactual_claim": "A component-radius refinement is being checked separately; no claim it passes this prefix without execution.",
+  "receipt": {
+    "native_attempt_reservation": 640,
+    "native_attempt_charge": 153,
+    "native_counts": {
+      "final": true,
+      "total_attempts": 153,
+      "forward_constructors": 120,
+      "response_companions": 11,
+      "actual_returns": 11,
+      "fresh_returns": 11
+    },
+    "command": [
+      "bash",
+      "-c",
+      "exec <private-runtime>/alpha-v93-represented-native-7ca320/binaries/represented-connected complete_language::native_context_controls::represented_native_full_transition --ignored --exact --nocapture --test-threads=1"
+    ],
+    "limit_s": 90,
+    "wall_ns": 3310845802,
+    "peak_rss_bytes": 72826880,
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "samples": 33,
+    "exit": 101,
+    "stop": null,
+    "owned_cleanup_remaining": [],
+    "ledger_before_ns": 549594570190,
+    "ledger_after_ns": 552905415992,
+    "model_jobs": 0,
+    "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+  }
+}

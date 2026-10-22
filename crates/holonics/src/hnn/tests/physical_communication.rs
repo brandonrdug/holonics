@@ -779,6 +779,7 @@ fn finite_loaded_span_carries_the_actual_contact_response_at_its_clock() {
         entries: vec![0],
         phases: 1,
         loci: crate::hnn::retention::loci(&field).into_iter().collect(),
+        passages: Vec::new(),
     };
     let spans = FiniteContactSpans::of(&new, 0, &reach).unwrap();
     let reading = spans.read(&[(integer(4), integer(1))]).unwrap();
@@ -1441,33 +1442,60 @@ fn the_actual_unresolved_contact_return_survives_a_different_physical_passage() 
     // 2026-10-16_THE_CONTACT_FACTORS_TAKE_THE_COMMON_LATTICE_LAW_AND_THEIR_RELEASE_STAYS_BELOW_HALF_THE_FOUNDING_UNIT):
     // each factor and normalization remainder lies on its clock's fine grid in the half cell, and
     // each release there is at most half a fine unit.
-    let on_the_lattice_law = |theta: &Constitution,
-                              publication: &crate::hnn::physical::contact::ContactPublication| {
-        let locus = Locus::Channel(0);
-        let exponent = theta.lattice(locus).unwrap().exponent() + gamma_length(theta.clock(locus));
-        let fine = Lattice::new(exponent).unit();
-        let contact = |c: &Carrier| matches!(c, Carrier::Factor(_) | Carrier::FactorScale(_));
-        assert!(publication.publication.released.iter()
-            .filter(|(l,c,_,_)| *l==locus && contact(c))
-            .all(|(..,e)| e.abs() <= &fine / integer(2)));
-        let half = theta.lattice(locus).unwrap().unit() / integer(2);
-        assert!(publication.publication.unresolved_contact_material.iter().all(|(_,_,_,r)|
-            (r / &fine).is_integer() && -&half <= *r && *r < half));
-    };
-    let field=field();
-    let initial=contact_material(&field);
-    let mut actual=PhysicalReceiver::new(&field,initial.clone(),Current::at_rest(&field),WordOpening::Rest).unwrap();
-    let taught=actual.communicate_contact(&encoded(&field,&[0,1]),&receiver(), |_| {
-        Some(ContactObservation { observed:encoded(&field,&[0,1,3]),compared:vec![false,false,true] })
-    }).unwrap();
+    let on_the_lattice_law =
+        |theta: &Constitution, publication: &crate::hnn::physical::contact::ContactPublication| {
+            let locus = Locus::Channel(0);
+            let exponent =
+                theta.lattice(locus).unwrap().exponent() + gamma_length(theta.clock(locus));
+            let fine = Lattice::new(exponent).unit();
+            let contact = |c: &Carrier| matches!(c, Carrier::Factor(_) | Carrier::FactorScale(_));
+            assert!(
+                publication
+                    .publication
+                    .released
+                    .iter()
+                    .filter(|(l, c, _, _)| *l == locus && contact(c))
+                    .all(|(.., e)| e.abs() <= &fine / integer(2))
+            );
+            let half = theta.lattice(locus).unwrap().unit() / integer(2);
+            assert!(
+                publication
+                    .publication
+                    .unresolved_contact_material
+                    .iter()
+                    .all(|(_, _, _, r)| (r / &fine).is_integer() && -&half <= *r && *r < half)
+            );
+        };
+    let field = field();
+    let initial = contact_material(&field);
+    let mut actual = PhysicalReceiver::new(
+        &field,
+        initial.clone(),
+        Current::at_rest(&field),
+        WordOpening::Rest,
+    )
+    .unwrap();
+    let taught = actual
+        .communicate_contact(&encoded(&field, &[0, 1]), &receiver(), |_| {
+            Some(ContactObservation {
+                observed: encoded(&field, &[0, 1, 3]),
+                compared: vec![false, false, true],
+            })
+        })
+        .unwrap();
     assert!(taught.closes());
-    let publication=taught.comparison.as_ref().unwrap().as_ref().unwrap();
-    contact_causal_receipt(&initial,actual.constitution(),publication);
-    let learned=actual.constitution().clone();
-    let pending:Vec<_>=learned.carried_remainders().into_iter().filter(|(l,c,_,_)|
-        *l==Locus::Channel(0) && matches!(c,Carrier::Factor(_) | Carrier::FactorScale(_))).collect();
-    assert_eq!(pending,publication.publication.unresolved_contact_material);
-    on_the_lattice_law(&learned,publication);
+    let publication = taught.comparison.as_ref().unwrap().as_ref().unwrap();
+    contact_causal_receipt(&initial, actual.constitution(), publication);
+    let learned = actual.constitution().clone();
+    let pending: Vec<_> = learned
+        .carried_remainders()
+        .into_iter()
+        .filter(|(l, c, _, _)| {
+            *l == Locus::Channel(0) && matches!(c, Carrier::Factor(_) | Carrier::FactorScale(_))
+        })
+        .collect();
+    assert_eq!(pending, publication.publication.unresolved_contact_material);
+    on_the_lattice_law(&learned, publication);
     // Conditioned on the actual sub-cell displacement (Epime's review, October 8): the storage
     // family's move stays below its cell exactly when the publication reads it as vanished, and
     // only then is the unresolved direction not an immediate physical storage move, with every
@@ -1475,14 +1503,37 @@ fn the_actual_unresolved_contact_return_survives_a_different_physical_passage() 
     // complete_contact_return_publishes_held_point_before_existing_communication demands that move
     // on these same operands and stays the failed acceptance while it vanishes; a move that leaves
     // its cell is a physical storage move here too.
-    if publication.publication.vanished.contains(&(Locus::Channel(0), Family::Factor(0))) {
-        let storage = |entries: &mut dyn Iterator<Item=usize>| entries.collect::<std::collections::BTreeSet<_>>();
-        let carried = storage(&mut pending.iter().filter(|(_,c,_,_)| *c==Carrier::Factor(0)).map(|(_,_,i,_)| *i));
-        let released = storage(&mut publication.publication.released.iter()
-            .filter(|(l,c,_,_)| *l==Locus::Channel(0) && *c==Carrier::Factor(0)).map(|(_,_,i,_)| *i));
-        assert!((0..initial.contact_storage(0).entries().len()).all(|i| carried.contains(&i) || released.contains(&i)));
-        assert_eq!(learned.contact_storage(0),initial.contact_storage(0),
-            "an unresolved direction is not an immediate physical storage move");
+    if publication
+        .publication
+        .vanished
+        .contains(&(Locus::Channel(0), Family::Factor(0)))
+    {
+        let storage = |entries: &mut dyn Iterator<Item = usize>| {
+            entries.collect::<std::collections::BTreeSet<_>>()
+        };
+        let carried = storage(
+            &mut pending
+                .iter()
+                .filter(|(_, c, _, _)| *c == Carrier::Factor(0))
+                .map(|(_, _, i, _)| *i),
+        );
+        let released = storage(
+            &mut publication
+                .publication
+                .released
+                .iter()
+                .filter(|(l, c, _, _)| *l == Locus::Channel(0) && *c == Carrier::Factor(0))
+                .map(|(_, _, i, _)| *i),
+        );
+        assert!(
+            (0..initial.contact_storage(0).entries().len())
+                .all(|i| carried.contains(&i) || released.contains(&i))
+        );
+        assert_eq!(
+            learned.contact_storage(0),
+            initial.contact_storage(0),
+            "an unresolved direction is not an immediate physical storage move"
+        );
     } else {
         assert_ne!(
             learned.contact_storage(0),
@@ -1506,13 +1557,25 @@ fn the_actual_unresolved_contact_return_survives_a_different_physical_passage() 
         })
         .unwrap();
     assert!(next.closes());
-    let publication=next.comparison.as_ref().unwrap().as_ref().unwrap();
-    contact_causal_receipt(&prior,actual.constitution(),publication);
-    on_the_lattice_law(actual.constitution(),publication);
-    println!("whole ordinary boundary carrying unresolved contact material: {:?}",ordinary.boundary);
-    println!("whole next blind boundary with a different source: {:?}",next.boundary);
-    println!("exact successor unresolved contact material: {:?}",publication.publication.unresolved_contact_material);
-    println!("actual successor carrier costs: {:?}",actual.constitution().carrier_bits());
+    let publication = next.comparison.as_ref().unwrap().as_ref().unwrap();
+    contact_causal_receipt(&prior, actual.constitution(), publication);
+    on_the_lattice_law(actual.constitution(), publication);
+    println!(
+        "whole ordinary boundary carrying unresolved contact material: {:?}",
+        ordinary.boundary
+    );
+    println!(
+        "whole next blind boundary with a different source: {:?}",
+        next.boundary
+    );
+    println!(
+        "exact successor unresolved contact material: {:?}",
+        publication.publication.unresolved_contact_material
+    );
+    println!(
+        "actual successor carrier costs: {:?}",
+        actual.constitution().carrier_bits()
+    );
     // The second declared comparison consumes its own source and the same retained material;
     // contact_causal_receipt proves delta+r_old=dF+r_new exactly, including its normalization.
     // No changed grain/step, repeated teacher, storage-gain or useful-output assertion.
@@ -2216,7 +2279,7 @@ fn acceptance_cold(
         .continuing_state(field.sources()[0])?
         .with_carry(resident.carried().cloned());
     let text = saved.to_text();
-    let state = ContinuingState::from_text(&text)?;
+    let state = ContinuingState::from_text(&text, resident.constitution().budget())?;
     let founding = Constitution::initial(field, resident.constitution().budget())?;
     let restored = Reference::campaign_one().mount_continued(
         field,

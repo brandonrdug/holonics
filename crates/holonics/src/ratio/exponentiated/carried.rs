@@ -249,6 +249,68 @@ fn theta_power_bounds(i: u64, grain: u64, reading: u32) -> (Rat, Rat) {
     (lower, upper)
 }
 
+// A scalar chart of an existing carried power, without a grain-wide field allocation.
+// For dyadic L=2^k, k interval square roots construct theta; binary powering reads theta^i.
+// Both operations are outward on a dyadic grid. Refine INTERNAL precision only until the
+// endpoints identify one reading cell. Its canonical floor/+unit enclosure therefore nests
+// across reading depths just like theta_power_bounds, without an integer of bits*L bits.
+fn scalar_dyadic_power_bounds(i: u64, grain: u64, reading: u32) -> Result<(Rat, Rat), RatioError> {
+    let unit = Rat::new(BigInt::one(), BigInt::one() << reading as usize);
+    let scale = unit.recip();
+    let mut precision = reading.checked_add(64).ok_or(RatioError::Enclosure)?;
+    loop {
+        let square_root = |x: &Rat| -> Result<(Rat, Rat), RatioError> {
+            let numerator = x.numer().to_biguint().ok_or(RatioError::Enclosure)?;
+            let denominator = x.denom().to_biguint().ok_or(RatioError::Enclosure)?;
+            let shift = precision.checked_mul(2).ok_or(RatioError::Enclosure)?;
+            let top = numerator << shift as usize;
+            let root = (&top / &denominator).sqrt();
+            let exact = &root * &root * &denominator == top;
+            let divisor = BigInt::one() << precision as usize;
+            let lower = Rat::new(BigInt::from(root.clone()), divisor.clone());
+            let upper = if exact {
+                lower.clone()
+            } else {
+                Rat::new(BigInt::from(root + 1u32), divisor)
+            };
+            Ok((lower, upper))
+        };
+        let mut theta = (integer(2), integer(2));
+        for _ in 0..grain.trailing_zeros() {
+            theta = (square_root(&theta.0)?.0, square_root(&theta.1)?.1);
+        }
+        let multiply = |a: &(Rat, Rat), b: &(Rat, Rat)| -> Result<(Rat, Rat), RatioError> {
+            let interval = ExactInterval::new(&a.0 * &b.0, &a.1 * &b.1)
+                .map_err(|_| RatioError::Enclosure)?
+                .round_out(precision)
+                .map_err(|_| RatioError::Enclosure)?;
+            Ok((interval.lower, interval.upper))
+        };
+        let mut power = (Rat::one(), Rat::one());
+        let mut exponent = i;
+        while exponent != 0 {
+            if exponent & 1 != 0 {
+                power = multiply(&power, &theta)?;
+            }
+            exponent >>= 1;
+            if exponent != 0 {
+                theta = multiply(&theta, &theta)?;
+            }
+        }
+        let lower_cell = (&power.0 * &scale).floor().to_integer();
+        let upper_cell = (&power.1 * &scale).floor().to_integer();
+        if lower_cell == upper_cell {
+            return Ok((
+                Rat::from_integer(lower_cell.clone()) * &unit,
+                Rat::from_integer(lower_cell + 1u32) * &unit,
+            ));
+        }
+        // i/L is a nonintegral dyadic, so 2^(i/L) is irrational and cannot lie on a rational
+        // reading edge. Converging interval operations eventually identify its unique cell.
+        precision = precision.checked_mul(2).ok_or(RatioError::Enclosure)?;
+    }
+}
+
 // -------------------------------------------------------------------------------------------
 // the carried power
 
@@ -309,6 +371,29 @@ impl CarriedPower {
         Ok(PhaseField::rational(power_of_two(&self.carry)?, self.grain).shifted(self.phase))
     }
 
+    /// Read this SAME exact carried power in its real chart, without allocating its dense
+    /// phase field. Dyadic grains use nested square roots and certified binary powering;
+    /// other machine-sized grains use the existing native theta-root owner. No enclosure
+    /// endpoint becomes the value. Consuming sparse chart/refinement proof join: owed in #62.
+    pub fn enclosure_at(&self, bits: u32) -> Result<ExactInterval, RatioError> {
+        if bits == 0 {
+            return Err(RatioError::Enclosure);
+        }
+        let carry = power_of_two(&self.carry)?;
+        if self.phase == 0 {
+            return Ok(ExactInterval::point(carry));
+        }
+        let (lower, upper) = if self.grain.is_power_of_two() {
+            scalar_dyadic_power_bounds(self.phase, self.grain, bits)?
+        } else {
+            if self.grain > u64::from(u32::MAX) {
+                return Err(RatioError::Enclosure);
+            }
+            theta_power_bounds(self.phase, self.grain, bits)
+        };
+        ExactInterval::new(&carry * lower, carry * upper).map_err(|_| RatioError::Enclosure)
+    }
+
     /// **The odometer chart** `2^n (1 + k/L)`: exact at every carry, continuous across it
     /// (`2^n · 2 = 2^(n+1) · 1`), monotone and rational; the HNN's declared learning chart
     /// (`crate::hnn::ratio`, Lean `HNN/Ratio.odometer_covector_descends`).
@@ -365,6 +450,33 @@ mod tests {
         assert!(
             a.times(&CarriedPower::new(BigInt::zero(), 0, 2).unwrap())
                 .is_err()
+        );
+    }
+    #[test]
+    fn sparse_real_chart_matches_existing_small_fields_and_nests_at_large_dyadic_grain() {
+        for grain in [1, 2, 3, 4, 8, 16] {
+            for phase in 0..grain {
+                let value = CarriedPower::new((-1).into(), phase, grain).unwrap();
+                for bits in [16, 32] {
+                    assert_eq!(
+                        value.enclosure_at(bits).unwrap(),
+                        value.value().unwrap().enclosure_at(bits).unwrap()
+                    );
+                }
+            }
+        }
+        let value = CarriedPower::new((-1).into(), 65535, 65536).unwrap();
+        let a = value.enclosure_at(64).unwrap();
+        let b = value.enclosure_at(128).unwrap();
+        assert!(a.lower <= b.lower && b.upper <= a.upper);
+        assert!(a.lower > crate::ratio::rat(99, 100) && a.upper < Rat::one());
+        assert!(value.enclosure_at(0).is_err());
+        assert_eq!(
+            CarriedPower::new(3.into(), 0, 65536)
+                .unwrap()
+                .enclosure_at(64)
+                .unwrap(),
+            ExactInterval::point(integer(8))
         );
     }
 }

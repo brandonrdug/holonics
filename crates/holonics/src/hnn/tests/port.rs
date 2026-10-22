@@ -34,6 +34,59 @@ use crate::ratio::{Rat, integer, rat};
 use crate::receiver::reception::{Component, InteractionReturn};
 use crate::receiver::release::{BeyondTolerance, DecisionRule, WithinTolerance};
 
+#[test]
+fn single_grain_release_width_keeps_exact_rational_wave_width() {
+    let field = chain();
+    let reference = Reference::campaign_one();
+    let resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let phases = resident.admitted()[0].clone();
+    let grain = phases.grain();
+    let fibre = Rat::new(1.into(), BigInt::from(grain) * 2);
+    let read = crate::hnn::receiving::ReceivingRead::of_logits(
+        vec![fibre.clone(), integer(0), -&fibre, integer(0),
+            integer(0), integer(0), integer(0), integer(0)], grain,
+    );
+    let faces = Faces::of_reads(&[read], grain).unwrap();
+    let width = crate::hnn::port::release_width(&phases, &faces).unwrap();
+    assert_eq!(width.diameter(), &fibre);
+    assert!(faces.faces[0].fibres().iter().all(|f| f.as_rational().is_some()));
+}
+
+#[test]
+fn single_grain_release_width_encloses_logarithmic_identity_without_erasing_it() {
+    let field = chain();
+    let reference = Reference::campaign_one();
+    let resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let phases = resident.admitted()[0].clone();
+    let grain = phases.grain();
+    let probabilities = vec![rat(3, 8), rat(1, 8), rat(1, 4), rat(1, 4)];
+    let exponents = probabilities.iter().map(|q| {
+        crate::receiver::face::grain_exponent(
+            q.numer().magnitude(), q.denom().magnitude(), grain,
+        ).unwrap()
+    }).collect();
+    let tree = crate::compression::landmark::context::LandmarkFace {
+        grain, probabilities, exponents,
+    };
+    let read = crate::hnn::receiving::ReceivingRead::combined(vec![Rat::zero(); 8], &tree, grain).unwrap();
+    let faces = Faces::of_reads(&[read], grain).unwrap();
+    let width = crate::hnn::port::release_width(&phases, &faces).unwrap();
+    let fibre = &faces.faces[0].cells()[0].fibre;
+    assert!(fibre.as_rational().is_none());
+    let enclosed = fibre.enclosure_at(crate::ratio::algebraic::LOG_OCTAVES).unwrap();
+    assert!(enclosed.lower.is_positive());
+    assert_eq!(width.diameter(), &enclosed.upper);
+    assert!(width.diameter() <= &Rat::new(1.into(), BigInt::from(grain)));
+    assert!(!width.is_zero());
+    let mut returned = crate::hnn::port::port_receipt(
+        &vec![0; field.rings().len()], field.step(),
+        crate::ratio::work::ExactWork::nothing(), ReceiptDetail::Boundary,
+    ).unwrap();
+    returned.unresolved = faces.faces.iter().map(|face| face.fibres()).collect();
+    assert_eq!(&returned.unresolved[0][0], fibre);
+    assert!(returned.unresolved[0][0].as_rational().is_none());
+}
+
 /// A word opened on a storage injection on every ring, its wave's logits and a covector from a
 /// ratio against drawn targets.
 fn injected(
@@ -1287,6 +1340,7 @@ fn the_release_reads_its_width_and_the_boundary_returns_the_transpose() {
         .faces
         .iter()
         .flat_map(|face| face.fibres())
+        .map(|fibre| fibre.as_rational().expect("refine returns raw rational wave fibres").clone())
         .max()
         .unwrap();
     let released = reference

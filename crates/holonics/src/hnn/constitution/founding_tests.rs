@@ -58,13 +58,13 @@ fn r4b_a_state_without_its_founded_lines_is_refused_at_them() {
         .to_text();
     assert!(text.starts_with("E "));
     assert!(text.contains("\nstate 0\nfounded 0\nfounding 0 -\n"));
-    assert!(ContinuingState::from_text(&text).is_ok());
+    assert!(ContinuingState::from_text(&text, 1 << 40).is_ok());
     let earlier = text.replacen("\nfounded 0\nfounding 0 -\n", "\n", 1);
     let check_at = earlier.rfind("\ncheck ").unwrap();
     let body = &earlier[..check_at + 1];
     let earlier = format!("{body}check {} {}\nend\n", body.len(), text_residue(body));
     assert!(matches!(
-        ContinuingState::from_text(&earlier),
+        ContinuingState::from_text(&earlier, 1 << 40),
         Err(HnnError::ContinuingState {
             what: "the founded rings"
         })

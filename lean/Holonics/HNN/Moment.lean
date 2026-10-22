@@ -426,6 +426,31 @@ theorem encoder_covector_tape_free {P : (Module.End R S)ˣ} {d : ℕ} (hd : 0 < 
     refine Finset.sum_congr rfl fun c hc => Finset.sum_congr rfl fun a _ => ?_
     rw [hcounts c (Finset.mem_range.mp hc) a]
 
+/-- [definition] The phase's marginal read through the contemporary source port. -/
+def marginalRead (E : (A → R) →ₗ[R] X) (M : ℕ → A → ℕ) (c : ℕ) : X :=
+  ∑ a, (M c a : R) • E (Pi.single a 1)
+
+/-- [proved-derived] The source moment is the phase-carried sum of its marginal reads. -/
+theorem encoderMoment_eq_marginalRead {P : (Module.End R S)ˣ} {d : ℕ} (hd : 0 < d)
+    (hP : P ^ d = 1) (I : X →ₗ[R] S) (E : (A → R) →ₗ[R] X) (u : ℕ → A) (τ : ℕ → ℕ) (n : ℕ) :
+    encoderMoment P I E u τ n =
+      ∑ c ∈ Finset.range d, back P c (I (marginalRead E (counts u τ d (Finset.range n)) c)) := by
+  rw [encoderMoment_contract hd hP]
+  simp only [marginalRead, map_sum, map_smul]
+
+/-- [proved-derived] A changed port and changed counts move only their own terms. -/
+theorem marginalRead_change (E δE : (A → R) →ₗ[R] X) (M δM : ℕ → A → ℕ) (c : ℕ) :
+    marginalRead (E + δE) (fun c a => M c a + δM c a) c =
+      marginalRead E M c + marginalRead δE M c + marginalRead (E + δE) δM c := by
+  simp only [marginalRead, Nat.cast_add, LinearMap.add_apply, add_smul, smul_add,
+    Finset.sum_add_distrib]
+  abel
+
+/-- [proved-derived] The integral chart's scale passes through the read. -/
+theorem marginalRead_smul (r : R) (E : (A → R) →ₗ[R] X) (M : ℕ → A → ℕ) (c : ℕ) :
+    marginalRead (r • E) M c = r • marginalRead E M c := by
+  simp [marginalRead, Finset.smul_sum, smul_smul, mul_comm]
+
 /-! ### Offset counts on the exterior pair chart -/
 
 /-- [definition] The offset counts `C δ c a b = #{k < n | δ ≤ k, τ_k ≡ c, u_k = a, u_(k−δ) = b}`,
@@ -1182,6 +1207,10 @@ section Audit
 #print axioms nonclosing_binning_fails
 #print axioms encoderMoment_contract
 #print axioms encoder_covector_tape_free
+#print axioms marginalRead
+#print axioms encoderMoment_eq_marginalRead
+#print axioms marginalRead_change
+#print axioms marginalRead_smul
 #print axioms exteriorOffset_independent_of_E
 #print axioms open_eq_clockedRing_moment
 #print axioms SourceDecl.selectiveClock_stream_descent

@@ -27,6 +27,14 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
+- [Represented native contact: physical-reference first variation and October22 closeout](2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md): `ef08972` passes30-class host continuity and four frozen warm/cold decisions; contact realizes zero factor motion with96 released tails. CUDA and useful language remain unqualified. Links the completed136-record old-law campaign, canonical Claude audit and remaining D6–D8 dependencies.
+
+- [Native R publishes at the original final Word](2026-10-22_NATIVE_R_PUBLISHES_AT_THE_ORIGINAL_FINAL_WORD.md): first actual R publication and31 map coordinates pass; post-R cold stops at the legacy Gram lattice check; scoped correction is compile-only.
+
+- [Native rational working set and port-reference boundary](2026-10-22_NATIVE_RATIONAL_WORKING_SET_AND_PORT_REFERENCE_BOUNDARY.md): width-six exact accounting passes; full connected control stops at the original-carry/new-Current publication guard.
+
+- [Native rational moments keep phase and represented news](2026-10-22_NATIVE_RATIONAL_MOMENTS_KEEP_PHASE_AND_REPRESENTED_NEWS.md): explicit bounded receiving statistics, unchanged lattice/phase, data checks and preserved first-R resource refusal.
+
 - [The navigator port enters only with its located source](2026-10-18_THE_NAVIGATOR_PORT_ENTERS_ONLY_WITH_ITS_LOCATED_SOURCE.md) (#73, #76, #62): a located linear navigator's state enters its source ring through a second material port at the opening's phase; admission is `ker N ⊆ ker c`, the decoder is a fibre, the covector is tape-free and the dimension is located; the port waits for its consumer (a located linear source, whose single-trajectory identification is not derived).
 
 - [The continuing listener locates keys at its close and writes its release before the answer](2026-10-16_BOUNDED_OBSERVED_CONTINUING_LISTENER.md) (#73, #148, #62): one finite continuing host moment, shared close and native key location, read-only comparison receipts and workload-derived release maximum; fixed precision, device fork and resume scope remain explicit.
@@ -556,3 +564,9 @@ This page grows by useful connections rather than by reproducing the entire file
 - [The actual CM tangent current returns its clock through the chart overlap](2026-10-09_THE_ACTUAL_CM_TANGENT_CURRENT_RETURNS_ITS_CLOCK_THROUGH_THE_CHART_OVERLAP.md): mathematical source and consumer retained; final v9 acceptance and publication limits joined above.
 - [The actual CM overlap returns every localized function to its source](2026-10-09_THE_ACTUAL_CM_OVERLAP_RETURNS_EVERY_LOCALIZED_FUNCTION_TO_ITS_SOURCE.md): mathematical source and consumer retained; final v9 acceptance and publication limits joined above.
 - [The actual CM native failures repair the producing proofs without changing the source](2026-10-09_THE_ACTUAL_CM_NATIVE_FAILURES_REPAIR_THE_PRODUCING_PROOFS_WITHOUT_CHANGING_THE_SOURCE.md): mathematical source and consumer retained; final v9 acceptance and publication limits joined above.
+
+- [2026-10-21: Native current prediction and paired contact remain a partial join](2026-10-21_NATIVE_CURRENT_PREDICTION_AND_PAIRED_CONTACT_REMAIN_A_PARTIAL_JOIN.md) — bounded host CODE evidence; native R section/card/current cold qualification unfinished; no dataset run.
+
+- [Native rational cold restore reaches a new contact; next control bound remains explicit](2026-10-22_NATIVE_RATIONAL_COLD_CONTINUES_TO_A_NEW_CONTACT.md) — October22, scoped host control and diagnostic, no model run.
+
+- [The native control refusal is representation growth](2026-10-22_NATIVE_CONTROL_REFUSAL_IS_REPRESENTATION_GROWTH.md) — exact original M/context/source packet; physical work fits, transient coordinate extent refuses.

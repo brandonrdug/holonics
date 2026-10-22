@@ -1,0 +1,82 @@
+{
+  "binaries": [
+    {
+      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-rational-flow-62b584/binaries/data-final",
+      "sha256": "1ff01612f74a70aed9c0c478822beb4880cfa1b1d2b377ccb13be356be16b088"
+    },
+    {
+      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-rational-flow-62b584/binaries/connected-final",
+      "sha256": "149009a29d387222c5f4cfd93af2e54d9ef315cc9b76d589867cfd259b729d99"
+    }
+  ],
+  "source": [
+    {
+      "path": "crates/holonics-cuda/src/hnn/epoch.rs",
+      "sha256": "b79a0314e97157fb852c9b4aca186513975f31b125a6b95da19808164e3fa411"
+    },
+    {
+      "path": "crates/holonics/examples/solenoidal_alpha/complete_language/native_context_controls.rs",
+      "sha256": "8847769cb767566249c97f79aa1a2075d8a78a2a9e2c7907c83f2328d43d5f4e"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution.rs",
+      "sha256": "085101c48514022b2404cc3be933f6b719cf246b8994cf9031c8354826744c61"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch.rs",
+      "sha256": "108b4821b3fb194dd50bdb2104268f3cf25291847849e6529c205b5b5734f8f6"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/checkpoint.rs",
+      "sha256": "9b58d969c7e0553e3b5a0d5bd127e9bdd5beaa07545f431f5a052eef9443aa3b"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/deposit.rs",
+      "sha256": "651be4754cdeb5bd98c81892c4c8527aadf70792d2b990b08f288246648eed13"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/deposit/paired_receiving.rs",
+      "sha256": "759e2da17b4d754f739d854fabeebf94afc1ccf7d2b6edda49d7f1b1d50b8032"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/device.rs",
+      "sha256": "4585d092e06c5c2e628f7856814b7a925fef6bb88f80ad95f42b5925882c3b1f"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/flow.rs",
+      "sha256": "4f7f24b8ba426dfcfadadc9618b65c9cc59e4a04ebad20fa6f5dfd38323f1b2a"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/mixed_tests.rs",
+      "sha256": "546e5e12363b2a0618912394d6e50b3eda856dc50409945b47b2e85a79cf82bc"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/spectral.rs",
+      "sha256": "cb6c7da3c6cfdee612ca013e26b91f1a972fa91b569eafafce25c6ef6dc871b6"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/receiving_material.rs",
+      "sha256": "c4cfb4252a6837fe62168d0626f406d6035bcb54e28e471fd77b8c27499871d3"
+    },
+    {
+      "path": "crates/holonics/src/hnn/mod.rs",
+      "sha256": "c82c27ab1f2f3637cc119af78047ddaf94483400c2f3e0ab2097c17599e42441"
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/observed/epoch.rs",
+      "sha256": "7c98141a61f9540af1f660828ceb9a27259edc9389a9744ff05e8b0fea8c4c00"
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/observed/execution.rs",
+      "sha256": "960be1b4066870200d210bb3364a426eb246e0d686520dd5c8533ac5cc4b3b94"
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/observed/stream.rs",
+      "sha256": "c09e6f0b97c3177ea9a7e5d2b28cd35c5a4bf7a76c3e9a98ac3bfd2a296ff5dc"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/rational.rs",
+      "sha256": "328a37ab74e62da71b2ead2ea456c6561836207ab307e79e60d02752842b0cd2"
+    }
+  ]
+}

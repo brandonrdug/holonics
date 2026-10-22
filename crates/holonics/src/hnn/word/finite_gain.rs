@@ -13,7 +13,7 @@ use num_traits::{One, Signed, Zero};
 use crate::hnn::HnnError;
 use crate::hnn::constitution::Reach;
 use crate::hnn::propagation::Operands;
-use crate::holon::deposition::schur_norms;
+use crate::holon::deposition::{schur_norms,sqrt_ceiling};
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 
@@ -26,6 +26,11 @@ fn square(x: &Rat) -> Rat {
 fn norm_squared(matrix: &ExactRatMatrix) -> Rat {
     let (column, row) = schur_norms(matrix);
     column * row
+}
+fn inverse_error(inverse:&ExactRatMatrix,delta:Rat)->Result<Rat,HnnError>{
+    if delta<Rat::zero()||delta>=Rat::one(){return Err(HnnError::Unadmitted{reason:"physical fixed-stage inverse requires an admitted original residual"});}
+    let (_,row)=schur_norms(inverse);
+    Ok(sqrt_ceiling(&integer(inverse.rows()),64)*row*&delta/(Rat::one()-delta))
 }
 
 /// The ACTUAL local map in the fixed wave chart (e,U=u/(hY),W=w/Y).
@@ -102,9 +107,12 @@ pub struct LoadedSpanReading {
 }
 
 /// Bound source-owned by ContactCut's producing Operands, opened clock and station partition.
-/// Exact linear execution only: split/chart and quartic returns require their own
-/// additional-input/domain certificate and are refused, rather than omitted.
+/// `of` admits exact linear execution only. The distinct private `represented` issuer
+/// binds physical-reference propagation to original paired stage/tangent/error evidence.
+/// Neither constructor admits quartic/signed contact motion or differentiates rounding.
 pub(crate) struct FiniteContactSpans {
+    origin: Operands,
+    native: Option<super::native_prediction::NativeContactWitness>,
     opened_at: usize,
     stations: Vec<u64>,
     fixed: Vec<Rat>,
@@ -133,6 +141,21 @@ impl FiniteContactSpans {
                 what: "finite loaded gain requires the exact unsplit producing word",
             });
         }
+        Self::build(operands,opened_at,reach,false)
+    }
+
+    /// A separate physical-reference issuer. The exact execution guard above stays intact.
+    /// Its consumer must also read the original paired tangent/error witness; this norm alone
+    /// is never a represented passage or reverse-rounding admission.
+    pub(crate) fn represented(operands:&Operands,opened_at:usize,reach:&Reach,
+        witness:&super::native_prediction::NativeContactWitness)->Result<Self,HnnError>{
+        witness.admit_span(operands,opened_at,reach)?;
+        if operands.lattice().is_none() || !witness.represented(){return Err(HnnError::Unadmitted{reason:"physical represented spans require the distinct original paired material witness"});}
+        Self::build(operands,opened_at,reach,true)
+    }
+
+    fn build(operands:&Operands,opened_at:usize,reach:&Reach,physical:bool)->Result<Self,HnnError>{
+        crate::hnn::prediction::charted::ResponseTube::admit_operands(operands)?;
         let h2 = square(operands.step());
         let top = usize::try_from(reach.stations.iter().max().copied().unwrap_or(0))
             .map_err(|_| HnnError::CountOverflow)?;
@@ -143,7 +166,7 @@ impl FiniteContactSpans {
             .ok_or(HnnError::MissingReceivingMap {
                 ring: reach.receiver,
             })?;
-        let projection = operands.weights(reach.receiver).iter().map(square).sum();
+        let projection = if physical{operands.exact_weights(reach.receiver)}else{operands.weights(reach.receiver)}.iter().map(square).sum();
         let mut junction_element = Rat::one();
         let mut loaded_by_ring = Vec::new();
         let mut solve_columns = 0usize;
@@ -152,7 +175,7 @@ impl FiniteContactSpans {
         for (g, ring) in operands.rings().iter().enumerate() {
             // Junction J=2 1 w^T-I; c=(w-e_storage)^T x is a simultaneous
             // output of the same junction, not a fixed external contrast drive.
-            let weights = operands.weights(g);
+            let weights = if physical{operands.exact_weights(g)}else{operands.weights(g)};
             let p = weights.len();
             let column = weights
                 .iter()
@@ -175,16 +198,19 @@ impl FiniteContactSpans {
                 .scaled(&integer(2))
                 .subtract(&ExactRatMatrix::identity(ring.width())?)?;
             let drive = solve.multiply(ring.contrast())?;
+            let chi=if physical {inverse_error(&solve,ring.chart().map_or_else(Rat::zero,|c|c.certificate.clone()))?}else{Rat::zero()};
+            let element_norm=sqrt_ceiling(&norm_squared(&element),64)+integer(2)*&chi;
+            let drive_norm=sqrt_ceiling(&norm_squared(&drive),64)+&chi*sqrt_ceiling(&norm_squared(ring.contrast()),64);
             // s'=E b+X Wc c, with every outgoing contact wave kept as well.
-            let stage = (integer(2) * norm_squared(&element)).max(Rat::one()) * junction
-                + integer(2) * norm_squared(&drive) * contrast_projection;
+            let stage = if physical{(integer(2)*square(&element_norm)).max(Rat::one())*junction+integer(2)*square(&drive_norm)*contrast_projection}
+                else{(integer(2) * norm_squared(&element)).max(Rat::one()) * junction+integer(2) * norm_squared(&drive) * contrast_projection};
             junction_element = junction_element.max(stage);
             let Some(resonator) = &operands.resonators()[g] else {
                 loaded_by_ring.push(None);
                 ring_coordinates.push(None);
                 continue;
             };
-            if resonator.material().saturation().is_some() || !resonator.charts().is_empty() {
+            if resonator.material().saturation().is_some() || (!physical && !resonator.charts().is_empty()) {
                 return Err(HnnError::Realization {
                     what: "finite loaded gain requires a linear exact loaded-ring law",
                 });
@@ -209,19 +235,25 @@ impl FiniteContactSpans {
                         .ok_or(HnnError::CountOverflow)?;
                 }
                 let inverse = ExactRatMatrix::shaped(n, n, entries)?;
+                // Loaded M contains h/Y, so its physical inverse is NOT assumed <=1.
+                let chi=if physical{inverse_error(&inverse,resonator.certificate(phase))?}else{Rat::zero()};
                 let right = &h2
                     + square(&h2) * square(y) * norm_squared(resonator.stiffness(phase))
                     + integer(4) * square(y) * &capacity;
                 // [e,u/(hY),w/Y] -> [e,u/(hY),-w/Y] + [-2,1,2] omega/Y.
-                let triangle =
-                    integer(2) * (Rat::one() + &decoder * norm_squared(&inverse) * right);
-                let schur = norm_squared(&loaded_block(
+                let inverse_norm=sqrt_ceiling(&norm_squared(&inverse),64)+&chi;
+                let triangle = integer(2) * (Rat::one() + &decoder * if physical{square(&inverse_norm)}else{norm_squared(&inverse)} * &right);
+                let executed_block=loaded_block(
                     &inverse,
                     resonator.material().forms().0,
                     resonator.stiffness(phase),
                     operands.step(),
                     y,
-                )?);
+                )?;
+                let schur = if physical{
+                    let q=sqrt_ceiling(&(right/square(y)),64);
+                    square(&(sqrt_ceiling(&norm_squared(&executed_block),64)+integer(3)*chi*q))
+                }else{norm_squared(&executed_block)};
                 let selected = triangle.clone().min(schur.clone());
                 phases.push(selected.clone());
                 loaded_phase_bounds.push(LoadedPhaseBound {
@@ -265,6 +297,8 @@ impl FiniteContactSpans {
             .map(|c| (operands.step() * c.conductance(), c.conductance().clone()))
             .collect();
         Ok(Self {
+            origin: operands.clone(),
+            native: None,
             opened_at,
             stations: reach.stations.clone(),
             fixed,
@@ -278,6 +312,19 @@ impl FiniteContactSpans {
             loaded_phase_bounds,
             junction_element_bound: junction_element,
         })
+    }
+
+    pub(crate) fn bind_native(&mut self,witness:super::native_prediction::NativeContactWitness,theta:&crate::hnn::constitution::Constitution,deposit:&crate::hnn::port::Deposit)->Result<(),HnnError>{
+        witness.admit(theta,deposit)?;
+        let reach=deposit.reach().ok_or(HnnError::MissingReach)?;
+        witness.admit_span(&self.origin,self.opened_at,reach)?;
+        if self.native.is_some() || self.stations!=reach.stations {return Err(HnnError::Unadmitted{reason:"native paired gain belongs to this complete fixed-opening loaded span"});}
+        self.native=Some(witness);Ok(())
+    }
+    pub(crate) fn native(&self)->Option<&super::native_prediction::NativeContactWitness>{self.native.as_ref()}
+    pub(crate) fn physical_query(&self,direction:&super::material_ray::ContactDirections,extent:&super::material_ray::ContactDirections)
+        ->Result<super::native_prediction::NativePhysicalRayReading,HnnError>{
+        self.native.as_ref().ok_or(HnnError::Unadmitted{reason:"physical ray query needs its original native return"})?.physical_query(&self.origin,direction,extent)
     }
 
     /// C/K form-norm bounds for *all* contacts over the current joint factor ray.

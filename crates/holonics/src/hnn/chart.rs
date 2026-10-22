@@ -53,7 +53,10 @@
 //! Wider operands are signed radix-2^32 limbs. Each limb separately satisfies the same primitive
 //! certificate; BigInt reconstruction computes `Q n = Σ_k 2^(32k) Q n_k` exactly. The assembled
 //! wide product is NOT asserted to satisfy the original whole-operand bound. No chart coordinate,
-//! refinement, tolerance or rounding law changes. Cost is proportional to the limb count; allocation
+//! tolerance or rounding law changes. Host operator refinement also uses these limbs when exact
+//! scale, entry, residual or Newton product bounds exceed the single-word representation. The
+//! choice precedes the products; all primitive limb dots retain the strict bound above. Chart
+//! coordinates and the refinement order remain unchanged. Cost is proportional to the limb count; allocation
 //! extents are checked. The shared host response tube uses this representation on both backends;
 //! direct CUDA lattice mounting remains i64-limited and is not extended here.
 //! [open] The limb reconstruction identity's Lean counterpart remains owed in #62.
@@ -238,7 +241,7 @@ fn word(value: &BigInt, what: &'static str) -> Result<i64, HnnError> {
 /// [definition; representation extension] Wider coordinates are signed radix-2^32 limbs, each read
 /// under the existing integer-dot certificate. Reconstruction is exact BigInt arithmetic:
 /// `Q n = Σ_k 2^(32k) Q n_k`. This extends operand representation, not chart coordinates,
-/// operator refinement, tolerance, or any individual limb's carrier certificate.
+/// tolerance, or any individual limb's carrier certificate.
 struct Operand {
     limbs: Vec<Vec<i64>>,
     denominator: BigInt,
@@ -256,38 +259,45 @@ fn operand(vector: &[Rat]) -> Result<Operand, HnnError> {
             denominator,
         });
     }
-    let count = numerators
-        .iter()
-        .map(|n| n.bits().div_ceil(32))
-        .max()
-        .unwrap_or(0);
-    let count = usize::try_from(count).map_err(|_| carrier("operand limb count"))?;
-    checked_limb_extent(count, numerators.len())?;
-    // Borrow the existing digits; do not allocate a second copy before validating the extent.
-    let mut digits = Vec::new();
-    digits
-        .try_reserve_exact(numerators.len())
-        .map_err(|_| carrier("operand digit iterators"))?;
-    digits.extend(numerators.iter().map(|n| (n.sign(), n.iter_u32_digits())));
-    let mut limbs = Vec::new();
-    limbs
-        .try_reserve_exact(count)
-        .map_err(|_| carrier("operand limb allocation"))?;
-    for _ in 0..count {
-        let mut limb = Vec::new();
-        limb.try_reserve_exact(numerators.len())
+    Operand::from_integers(&numerators, denominator)
+}
+
+impl Operand {
+    /// Force signed radix-2^32 limbs for an operator product; each dot keeps the primitive bound.
+    fn from_integers(numerators: &[BigInt], denominator: BigInt) -> Result<Self, HnnError> {
+        let count = numerators
+            .iter()
+            .map(|n| n.bits().div_ceil(32))
+            .max()
+            .unwrap_or(0);
+        let count = usize::try_from(count).map_err(|_| carrier("operand limb count"))?;
+        checked_limb_extent(count, numerators.len())?;
+        // Borrow the existing digits; do not allocate a second copy before validating the extent.
+        let mut digits = Vec::new();
+        digits
+            .try_reserve_exact(numerators.len())
+            .map_err(|_| carrier("operand digit iterators"))?;
+        digits.extend(numerators.iter().map(|n| (n.sign(), n.iter_u32_digits())));
+        let mut limbs = Vec::new();
+        limbs
+            .try_reserve_exact(count)
             .map_err(|_| carrier("operand limb allocation"))?;
-        for (sign, digits) in &mut digits {
-            let digit = i64::from(digits.next().unwrap_or(0));
-            limb.push(if *sign == num_bigint::Sign::Minus {
-                -digit
-            } else {
-                digit
-            });
+        for _ in 0..count {
+            let mut limb = Vec::new();
+            limb.try_reserve_exact(numerators.len())
+                .map_err(|_| carrier("operand limb allocation"))?;
+            for (sign, digits) in &mut digits {
+                let digit = i64::from(digits.next().unwrap_or(0));
+                limb.push(if *sign == num_bigint::Sign::Minus {
+                    -digit
+                } else {
+                    digit
+                });
+            }
+            limbs.push(limb);
         }
-        limbs.push(limb);
+        Ok(Operand { limbs, denominator })
     }
-    Ok(Operand { limbs, denominator })
 }
 
 fn checked_limb_extent(count: usize, width: usize) -> Result<(), HnnError> {
@@ -297,6 +307,24 @@ fn checked_limb_extent(count: usize, width: usize) -> Result<(), HnnError> {
         .filter(|bytes| *bytes <= isize::MAX as usize)
         .ok_or_else(|| carrier("operand limb allocation extent"))?;
     Ok(())
+}
+
+/// Check the actual element size, then reserve before building an operator workspace.
+fn checked_workspace_extent<T>(length: usize) -> Result<(), HnnError> {
+    length
+        .checked_mul(std::mem::size_of::<T>())
+        .filter(|bytes| *bytes <= isize::MAX as usize)
+        .ok_or_else(|| carrier("operator workspace extent"))?;
+    Ok(())
+}
+
+fn workspace<T>(length: usize) -> Result<Vec<T>, HnnError> {
+    checked_workspace_extent::<T>(length)?;
+    let mut values = Vec::new();
+    values
+        .try_reserve_exact(length)
+        .map_err(|_| carrier("operator workspace allocation"))?;
+    Ok(values)
 }
 
 impl Operand {
@@ -469,62 +497,201 @@ impl ChartWords {
 /// A square operator `A = Ā/D` as its integer coordinates over one positive denominator.
 struct Operator {
     n: usize,
-    entries: Vec<i128>,
-    denominator: i128,
+    entries: Vec<BigInt>,
+    narrow_entries: Option<Vec<i128>>,
+    denominator: BigInt,
+    // Transient diagnostics only; never part of a chart or checkpoint.
+    wide_reasons: std::cell::Cell<u16>,
+}
+
+/// Why the host selected limb products before executing an operator refinement.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum OperatorWideReason {
+    Entry,
+    Scale,
+    Product,
+    Residual,
+    CertificateRow,
+    RefinementProduct,
+    Rounding,
+}
+
+/// Exact widths of the operator reached by this read, rather than a backend capability claim.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OperatorReading {
+    pub key: ChartKey,
+    pub width: usize,
+    pub denominator_bits: u64,
+    pub scale_bits: u64,
+    pub entry_bits: u64,
+    pub wide_reasons: Vec<OperatorWideReason>,
 }
 
 impl Operator {
     fn of(matrix: &ExactRatMatrix) -> Result<Self, HnnError> {
-        let (numerators, denominator) = integral(matrix.entries());
-        let as_word = |value: &BigInt| {
-            value
-                .to_i128()
-                .ok_or_else(|| carrier("an operator's coordinate beyond the 128-bit word"))
+        let n = matrix.rows();
+        let extent = n
+            .checked_mul(n)
+            .ok_or_else(|| carrier("operator square extent"))?;
+        checked_workspace_extent::<BigInt>(extent)?;
+        if matrix.columns() != n || matrix.entries().len() != extent {
+            return Err(carrier("a non-square inverse operator"));
+        }
+        let (entries, denominator) = integral(matrix.entries());
+        let narrow_entries = if entries.iter().all(|x| x.to_i128().is_some()) {
+            let mut words = workspace(entries.len())?;
+            words.extend(
+                entries
+                    .iter()
+                    .map(|x| x.to_i128().expect("checked integer coordinate")),
+            );
+            Some(words)
+        } else {
+            None
         };
         Ok(Self {
-            n: matrix.rows(),
-            entries: numerators.iter().map(as_word).collect::<Result<_, _>>()?,
-            denominator: as_word(&denominator)?,
+            n,
+            entries,
+            narrow_entries,
+            denominator,
+            wide_reasons: std::cell::Cell::new(0),
         })
     }
 
-    /// `S = D·2^L`, the scale of `A X̂`.
-    fn scale(&self, exponent: u32) -> Result<i128, HnnError> {
-        1i128
-            .checked_shl(exponent)
-            .filter(|unit| *unit > 0)
-            .and_then(|unit| unit.checked_mul(self.denominator))
-            .ok_or_else(|| carrier("the certificate's scale D·2^L_c beyond the 128-bit word"))
+    fn validate_chart(&self, chart: &ChartWords) -> Result<(), HnnError> {
+        if chart.rows != self.n
+            || chart.columns != self.n
+            || chart.words.len() != self.entries.len()
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "an inverse chart outside its operator shape",
+            });
+        }
+        Ok(())
     }
 
-    /// `Ā Q`, each entry under the ℓ1 certificate.
-    fn times(&self, chart: &ChartWords) -> Result<Vec<i128>, HnnError> {
-        let n = self.n;
-        let mut product = Vec::with_capacity(n * n);
-        for i in 0..n {
-            let row = &self.entries[i * n..(i + 1) * n];
-            for j in 0..n {
-                product.push(certified_dot(
-                    (0..n).map(|k| (row[k], i128::from(chart.words[k * n + j]))),
-                )?);
+    fn scale(&self, exponent: u32) -> BigInt {
+        &self.denominator << exponent as usize
+    }
+
+    fn wide(&self, reason: OperatorWideReason) -> bool {
+        self.wide_reasons
+            .set(self.wide_reasons.get() | (1 << reason as u16));
+        false
+    }
+
+    /// Select the representation from structural absolute bounds BEFORE a primitive is run.
+    /// Row-l1(Abar)*max|Q| bounds every product dot independently of cancellation.
+    fn narrow(&self, chart: &ChartWords, newton: bool) -> bool {
+        let max = BigInt::from(i128::MAX);
+        let carrier = BigInt::one() << 127usize;
+        if self.narrow_entries.is_none() {
+            return self.wide(OperatorWideReason::Entry);
+        }
+        let scale = self.scale(chart.exponent);
+        if scale > max {
+            return self.wide(OperatorWideReason::Scale);
+        }
+        let qmax = chart
+            .words
+            .iter()
+            .map(|x| BigInt::from(*x).abs())
+            .max()
+            .unwrap_or_default();
+        let mut product = BigInt::zero();
+        let mut qrow = BigInt::zero();
+        for i in 0..self.n {
+            let row = self.entries[i * self.n..(i + 1) * self.n]
+                .iter()
+                .map(Signed::abs)
+                .sum::<BigInt>();
+            product = product.max(row * &qmax);
+            qrow = qrow.max(
+                chart.words[i * self.n..(i + 1) * self.n]
+                    .iter()
+                    .map(|x| BigInt::from(*x).abs())
+                    .sum(),
+            );
+        }
+        if product >= carrier {
+            return self.wide(OperatorWideReason::Product);
+        }
+        let residual = &scale + &product;
+        if residual > max {
+            return self.wide(OperatorWideReason::Residual);
+        }
+        if &residual * self.n > BigInt::from(u128::MAX) {
+            return self.wide(OperatorWideReason::CertificateRow);
+        }
+        if newton {
+            let twice = (&scale << 1usize) + product;
+            if twice > max {
+                return self.wide(OperatorWideReason::RefinementProduct);
+            }
+            let bound = qrow * twice;
+            if bound >= carrier {
+                return self.wide(OperatorWideReason::RefinementProduct);
+            }
+            if (&bound << 1usize) + &scale > max || (&scale << 1usize) > max {
+                return self.wide(OperatorWideReason::Rounding);
             }
         }
-        Ok(product)
+        true
     }
 
-    /// `S·1 − Ā Q` at scale `1/S`: the right residual's integer coordinates.
-    fn residual(&self, chart: &ChartWords) -> Result<(Vec<i128>, i128), HnnError> {
-        let scale = self.scale(chart.exponent)?;
-        let mut residual = self.times(chart)?;
-        for (index, entry) in residual.iter_mut().enumerate() {
-            let diagonal = if index / self.n == index % self.n {
-                scale
-            } else {
-                0
-            };
-            *entry = diagonal
-                .checked_sub(*entry)
-                .ok_or_else(|| carrier("a residual's coordinate beyond the 128-bit word"))?;
+    fn reading(&self, key: ChartKey, exponent: u32) -> OperatorReading {
+        let reasons = [
+            OperatorWideReason::Entry,
+            OperatorWideReason::Scale,
+            OperatorWideReason::Product,
+            OperatorWideReason::Residual,
+            OperatorWideReason::CertificateRow,
+            OperatorWideReason::RefinementProduct,
+            OperatorWideReason::Rounding,
+        ];
+        OperatorReading {
+            key,
+            width: self.n,
+            denominator_bits: self.denominator.bits(),
+            scale_bits: self.scale(exponent).bits(),
+            entry_bits: self.entries.iter().map(BigInt::bits).max().unwrap_or(0),
+            wide_reasons: reasons
+                .into_iter()
+                .filter(|r| self.wide_reasons.get() & (1 << *r as u16) != 0)
+                .collect(),
+        }
+    }
+
+    fn residual_narrow(&self, chart: &ChartWords) -> Result<(Vec<i128>, i128), HnnError> {
+        let scale = self
+            .scale(chart.exponent)
+            .to_i128()
+            .expect("preflight scale");
+        let mut residual = workspace(self.entries.len())?;
+        for i in 0..self.n {
+            for j in 0..self.n {
+                let sum = certified_dot((0..self.n).map(|k| {
+                    (
+                        self.narrow_entries.as_ref().expect("preflight entries")[i * self.n + k],
+                        i128::from(chart.words[k * self.n + j]),
+                    )
+                }))?;
+                residual.push(if i == j { scale - sum } else { -sum });
+            }
+        }
+        Ok((residual, scale))
+    }
+
+    fn residual_wide(&self, chart: &ChartWords) -> Result<(Vec<BigInt>, BigInt), HnnError> {
+        let scale = self.scale(chart.exponent);
+        let mut residual = workspace(self.entries.len())?;
+        for i in 0..self.n {
+            let row =
+                Operand::from_integers(&self.entries[i * self.n..(i + 1) * self.n], BigInt::one())?;
+            for j in 0..self.n {
+                let sum = row.dot(|k| chart.words[k * self.n + j])?;
+                residual.push(if i == j { &scale - sum } else { -sum });
+            }
         }
         Ok((residual, scale))
     }
@@ -533,19 +700,27 @@ impl Operator {
 /// **The certificate** `δ = ‖1 − A X̂‖∞` (Lean `rowNorm`), exact: the largest absolute row sum of
 /// the right residual's integer coordinates, over their scale.
 fn certificate_of(operator: &Operator, chart: &ChartWords) -> Result<Rat, HnnError> {
-    let (residual, scale) = operator.residual(chart)?;
-    let n = operator.n;
-    let mut largest = 0u128;
-    for i in 0..n {
-        let mut sum = 0u128;
-        for entry in &residual[i * n..(i + 1) * n] {
-            sum = sum
-                .checked_add(entry.unsigned_abs())
-                .ok_or_else(|| carrier("a certificate's row sum beyond the 128-bit word"))?;
-        }
-        largest = largest.max(sum);
+    operator.validate_chart(chart)?;
+    if operator.n == 0 {
+        return Ok(Rat::zero());
     }
-    Ok(Rat::new(BigInt::from(largest), BigInt::from(scale)))
+    if operator.narrow(chart, false) {
+        let (residual, scale) = operator.residual_narrow(chart)?;
+        let largest = residual
+            .chunks(operator.n)
+            .map(|row| row.iter().map(|x| x.unsigned_abs()).sum::<u128>())
+            .max()
+            .unwrap_or(0);
+        Ok(Rat::new(BigInt::from(largest), BigInt::from(scale)))
+    } else {
+        let (residual, scale) = operator.residual_wide(chart)?;
+        let largest = residual
+            .chunks(operator.n)
+            .map(|row| row.iter().map(Signed::abs).sum::<BigInt>())
+            .max()
+            .unwrap_or_default();
+        Ok(Rat::new(largest, scale))
+    }
 }
 
 /// **The certificate of a chart of `A⁻¹`**: `‖1 − A X̂‖∞`, exact.
@@ -565,11 +740,49 @@ fn nearest(numerator: i128, denominator: i128) -> Result<i128, HnnError> {
     Ok(twice.div_euclid(divisor))
 }
 
+/// The identical ties-up quotient in an exact integer representation (division truncates at zero).
+fn nearest_wide(numerator: &BigInt, denominator: &BigInt) -> BigInt {
+    let top = (numerator << 1usize) + denominator;
+    let bottom = denominator << 1usize;
+    let mut quotient = &top / &bottom;
+    if (&top % &bottom).is_negative() {
+        quotient -= 1;
+    }
+    quotient
+}
+
 /// **One rounded Newton–Schulz step** (Lean `nsStep` then `latticeChart`): `X(2 − AX)` in integers
 /// at scale `1/(D·2^(2L_c))`, rounded to `2^(−L_c)ℤ`, ties upward.
 fn newton_schulz(operator: &Operator, chart: &ChartWords) -> Result<ChartWords, HnnError> {
+    operator.validate_chart(chart)?;
     let n = operator.n;
-    let (residual, scale) = operator.residual(chart)?;
+    if !operator.narrow(chart, true) {
+        let (mut twice, scale) = operator.residual_wide(chart)?;
+        for i in 0..n {
+            twice[i * n + i] += &scale;
+        }
+        let mut words = workspace(operator.entries.len())?;
+        words.resize(operator.entries.len(), 0i64);
+        for j in 0..n {
+            let mut column = workspace(n)?;
+            column.extend((0..n).map(|k| twice[k * n + j].clone()));
+            let operand = Operand::from_integers(&column, BigInt::one())?;
+            for i in 0..n {
+                let sum = operand.dot(|k| chart.words[i * n + k])?;
+                words[i * n + j] = word(
+                    &nearest_wide(&sum, &scale),
+                    "a chart coordinate beyond the 64-bit word",
+                )?;
+            }
+        }
+        return Ok(ChartWords {
+            rows: n,
+            columns: n,
+            exponent: chart.exponent,
+            words,
+        });
+    }
+    let (residual, scale) = operator.residual_narrow(chart)?;
     // 2S·1 − ĀQ = S·1 + (S·1 − ĀQ).
     let mut twice = residual;
     for i in 0..n {
@@ -577,7 +790,7 @@ fn newton_schulz(operator: &Operator, chart: &ChartWords) -> Result<ChartWords, 
             .checked_add(scale)
             .ok_or_else(|| carrier("a refinement's coordinate beyond the 128-bit word"))?;
     }
-    let mut words = Vec::with_capacity(n * n);
+    let mut words = workspace(operator.entries.len())?;
     for i in 0..n {
         let row = &chart.words[i * n..(i + 1) * n];
         for j in 0..n {
@@ -613,6 +826,8 @@ pub(crate) fn newton_schulz_step(
 /// fallback when neither reaches the certified regime).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ChartStart {
+    /// The same immutable batch producer supplied this already certified ring solve.
+    Reused,
     Warm,
     Transpose,
     Exact,
@@ -629,6 +844,10 @@ pub struct ChartReading {
     pub target: Rat,
     pub steps: u32,
     pub start: ChartStart,
+    /// Transient host operator diagnostics; absent on owners that do not provide them.
+    /// On Reused this records the original preparation's width and wide reasons; it
+    /// does not claim any new operator arithmetic happened in the reused call.
+    pub operator: Option<OperatorReading>,
 }
 
 /// [definition] **Which operator a chart inverts**: a ring's `I − ½K_r`, or a contact's `m_a` at the
@@ -671,29 +890,31 @@ impl Operator {
     /// absorbs the roundings (each at most `‖A‖∞ n 2^(−L_c)/2`).
     fn transpose_start(&self, exponent: u32) -> Result<(ChartWords, u32), HnnError> {
         let n = self.n;
-        let (mut rows, mut columns) = (0u128, 0u128);
+        let (mut rows, mut columns) = (BigInt::zero(), BigInt::zero());
         for i in 0..n {
-            let (mut row, mut column) = (0u128, 0u128);
-            for j in 0..n {
-                row = row.saturating_add(self.entries[i * n + j].unsigned_abs());
-                column = column.saturating_add(self.entries[j * n + i].unsigned_abs());
-            }
+            let row = (0..n)
+                .map(|j| self.entries[i * n + j].abs())
+                .sum::<BigInt>();
+            let column = (0..n)
+                .map(|j| self.entries[j * n + i].abs())
+                .sum::<BigInt>();
             rows = rows.max(row);
             columns = columns.max(column);
         }
-        let product = BigInt::from(rows) * BigInt::from(columns);
-        let square = BigInt::from(self.denominator) * BigInt::from(self.denominator);
-        let power = ceil_log2_ratio(&product.max(BigInt::one()), &square).max(0) as u32;
+        let product = rows * columns;
+        let square = &self.denominator * &self.denominator;
+        let power = u32::try_from(ceil_log2_ratio(&product.max(BigInt::one()), &square).max(0))
+            .map_err(|_| carrier("transpose start exponent"))?;
         // (2^(−p)Aᵀ)_ij = Ā_ji 2^(L_c − p)/D, at its nearest lattice point, ties upward.
         let shift = i64::from(exponent) - i64::from(power);
-        let mut words = Vec::with_capacity(n * n);
+        let mut words = workspace(self.entries.len())?;
         for i in 0..n {
             for j in 0..n {
-                let entry = BigInt::from(self.entries[j * n + i]);
+                let entry = self.entries[j * n + i].clone();
                 let (top, bottom) = if shift >= 0 {
-                    (entry << shift as usize, BigInt::from(self.denominator))
+                    (entry << shift as usize, self.denominator.clone())
                 } else {
-                    (entry, BigInt::from(self.denominator) << (-shift) as usize)
+                    (entry, self.denominator.clone() << (-shift) as usize)
                 };
                 // ⌊(2t + b)/(2b)⌋, b > 0: the nearest integer to t/b, ties upward.
                 let (twice, divisor) = ((&top << 1usize) + &bottom, &bottom << 1usize);
@@ -706,7 +927,10 @@ impl Operator {
         }
         // k = p + ⌈log₂(1 + ⌈log₂ n⌉)⌉ + 1.
         let width_bits = u64::from(ceil_log2(n.max(1) as u128));
-        let bound = power + ceil_log2(u128::from(1 + width_bits)) + 1;
+        let bound = power
+            .checked_add(ceil_log2(u128::from(1 + width_bits)))
+            .and_then(|k| k.checked_add(1))
+            .ok_or_else(|| carrier("transpose start step bound"))?;
         Ok((
             ChartWords {
                 rows: n,
@@ -789,12 +1013,13 @@ pub fn refine(
     Ok((
         chart,
         ChartReading {
-            key,
+            key: key.clone(),
             width: n,
             certificate: delta,
             target,
             steps,
             start: begun,
+            operator: Some(operator.reading(key.clone(), exponent)),
         },
     ))
 }
@@ -1061,6 +1286,52 @@ mod witness {
     use super::*;
     use crate::ratio::{integer, rat};
 
+    #[test]
+    fn wide_ties_up_and_signed_limbs_preserve_exact_integer_algebra() {
+        for (n, d, want) in [
+            (-3, 2, -1),
+            (-2, 3, -1),
+            (-1, 2, 0),
+            (-5, 2, -2),
+            (1, 2, 1),
+            (0, 3, 0),
+        ] {
+            assert_eq!(
+                nearest_wide(&BigInt::from(n), &BigInt::from(d)),
+                BigInt::from(want)
+            );
+            assert_eq!(nearest(n, d).unwrap(), want);
+        }
+        let big: BigInt = (BigInt::one() << 173usize) + 17;
+        let entries = [big.clone(), -big.clone(), BigInt::zero(), BigInt::from(-1)];
+        let op = Operand::from_integers(&entries, BigInt::one()).unwrap();
+        assert_eq!(op.dot(|_| 3).unwrap(), BigInt::from(-3));
+        // The representation never relaxes the per-limb certificate.
+        assert!(matches!(
+            certified_dot([(i128::MAX, 2)].into_iter()),
+            Err(HnnError::Carrier { .. })
+        ));
+    }
+
+    #[test]
+    fn wide_entry_selection_and_workspace_extents_are_checked() {
+        let a = ExactRatMatrix::shaped(
+            1,
+            1,
+            vec![vec![Rat::from_integer(BigInt::one() << 140usize)]],
+        )
+        .unwrap();
+        let operator = Operator::of(&a).unwrap();
+        let chart = ChartWords::of_coordinates(1, 1, 0, &[BigInt::zero()]).unwrap();
+        assert_eq!(certificate_of(&operator, &chart).unwrap(), Rat::one());
+        assert_eq!(newton_schulz(&operator, &chart).unwrap(), chart);
+        let read = operator.reading(ChartKey::Ring(3), 0);
+        assert_eq!(read.entry_bits, 141);
+        assert_eq!(read.wide_reasons, vec![OperatorWideReason::Entry]);
+        assert!(checked_workspace_extent::<BigInt>(usize::MAX).is_err());
+        assert!(checked_limb_extent(usize::MAX, 2).is_err());
+    }
+
     /// **Two certified charts of one operator can split one image into different representatives**
     /// (the October 8 trace of the carry-chain regressions). The word's face reads the junction's
     /// carried representatives (`Word::anchor`), never their remainders, and a representative is the
@@ -1307,5 +1578,43 @@ mod operand_limb_regression {
             chart.apply_transpose(&x).unwrap(),
             oracle.transpose().unwrap().apply(&x).unwrap()
         );
+    }
+}
+
+#[cfg(test)]
+mod native_represented_policy_data {
+    use super::*;
+    #[test]
+    fn represented_saved_source12_opening_feedback_and_work(){
+        let u=vec![Rat::new("311399584134125337661939609191022657751456983024648686588304225193680274287871895809310325262411097318280285366278954162700627447337459242747999188326416235484513806166678809046729835805199413597157908081799065573809955055687466255555888169894086559242749161853168751456299930677674980711014444480337388750832505134603747050487651509654948030638244933613344478811485568929807966065264944564163019700443082933582541431721349961533813998411386840198171414814622814262003380767748634236632755738658752472366498252668834573393375234962487979703913".parse().unwrap(),"436177012947852338555777372173673496612958908202777764008919518296336285727921914374726173395316820993535759703404009090143456024255616019034059478955173218392001905178435419601918140245942472244256321898018929433422722125287540167922274444224300104519279644789180240336224648620590187425134631036874417947595349544332786105732333445179696971931780536255470971634449948971057684973095542317262729585996379144081277833951266970870212530794012714573814692927016822314494075997937047531548806552944571850664021578125000000000000000000000000000000".parse().unwrap()),Rat::new("0".parse().unwrap(),"1".parse().unwrap()),Rat::new("0".parse().unwrap(),"1".parse().unwrap()),Rat::new("-311399584134125337661939609191022657751456983024648686588304225193680274287871895809310325262411097318280285366278954162700627447337459242747999188326416235484513806166678809046729835805199413597157908081799065573809955055687466255555888169894086559242749161853168751456299930677674980711014444480337388750832505134603747050487651509654948030638244933613344478811485568929807966065264944564163019700443082933582541431721349961533813998411386840198171414814622814262003380767748634236632755738658752472366498252668834573393375234962487979703913".parse().unwrap(),"436177012947852338555777372173673496612958908202777764008919518296336285727921914374726173395316820993535759703404009090143456024255616019034059478955173218392001905178435419601918140245942472244256321898018929433422722125287540167922274444224300104519279644789180240336224648620590187425134631036874417947595349544332786105732333445179696971931780536255470971634449948971057684973095542317262729585996379144081277833951266970870212530794012714573814692927016822314494075997937047531548806552944571850664021578125000000000000000000000000000000".parse().unwrap())];
+        let b=vec![Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("1".parse().unwrap(),"2".parse().unwrap()),Rat::new("-1".parse().unwrap(),"2".parse().unwrap())];
+        let old=vec![Rat::new("-10923".parse().unwrap(),"131072".parse().unwrap()),Rat::new("10923".parse().unwrap(),"65536".parse().unwrap()),Rat::new("-10923".parse().unwrap(),"131072".parse().unwrap()),Rat::new("10923".parse().unwrap(),"65536".parse().unwrap()),Rat::new("-32769".parse().unwrap(),"131072".parse().unwrap()),Rat::new("10923".parse().unwrap(),"65536".parse().unwrap()),Rat::new("-10923".parse().unwrap(),"131072".parse().unwrap()),Rat::new("32769".parse().unwrap(),"131072".parse().unwrap()),Rat::new("0".parse().unwrap(),"1".parse().unwrap()),Rat::new("32769".parse().unwrap(),"131072".parse().unwrap())];
+        let expected_work=Rat::new("133190897132576732374323042302992144921993392141039025198955263504098252839426390345000393003112035519910937342739726799874881446965711941535856850882102215834551814312576323223449313333135119438044246127452967441314911064359953506957197316482958145426551894969897969256015308681342274267962221084983433383545342390142682040584005211027336343409887655387416384485031101609415116337637345111333100387072676253550379856231553906784157240126983103439658302913310455572428590888658677565463905653264568306331286203587774494664544694552001301339806856965156945538586120900216594047828598088913351553552067838708642366587729998469876830038735103944778272956524138426592720595949758099863887698450307229409292646985905917692482672496217239686873917909451320227646265755893335500062493905445404023043595616736232234090385662490341583909870319018415380737137523717353441081201069378227182408301330779306043702015729779409315560663647737909150340054177415739646086119072810860341155961179891766171081922522117094421977780639697519894372971870874442017173317830468144622842563693304043019147511569".parse().unwrap(),"76100154649644378638146717907802283674391477265628055193651506725645362710153302432032899120558282917038418913967128120303999044514633826768419874558880978671731146238053309904356232745984072495356591037114810365027213785038351773377246405606722004309745343614280186034197493268516888627105473748675823446162979624075997170649836960845362721924139423642242024389274955228466870488074144832340874691252198979899848480598378480215755510842954388801269035141432835906252028650776967277834409140007925349166093395788250770321070987271932538676508793123143783302956088218389462437287850298561371302815542593595470435394467118091658315799401725030336747319952222503042855289004960236201816491097727692602237295409153120815056646270969208439255469444993182354726120549971087262239068358617085189469527609197212810663119314390067507240718532767132977529092199094507999461374476973996810326285259169875214087165974162959240331572976252682074086593106903536273767960770660104243105602628717175090434754122245772567930487486246191406250000000000000000000000000000000000000000000000000000000000000".parse().unwrap());
+        let added=(0..10).map(|i|(0..4).map(|j|&b[i*4+j]*&u[j]).sum::<Rat>()).collect::<Vec<_>>();
+        let complete=old.iter().zip(&added).map(|(a,b)|a+b).collect::<Vec<_>>();
+        let lattice=Lattice::new(10);let mut incoming=vec![Rat::zero();10];
+        incoming[0]=Rat::new(1.into(),4096.into());incoming[9]=-incoming[0].clone();
+        let previous=incoming.clone();let represented=carry(&lattice,&complete,&mut incoming);
+        for j in 0..10{assert_eq!(&represented[j]+&incoming[j],&complete[j]+&previous[j]);assert!(lattice.contains(&represented[j]));assert!(incoming[j]>=-lattice.unit()/Rat::from_integer(2.into())&&incoming[j]<lattice.unit()/Rat::from_integer(2.into()));}
+        let before=old.iter().map(|q|q*q).sum::<Rat>()/Rat::from_integer(2.into());let after=complete.iter().map(|q|q*q).sum::<Rat>()/Rat::from_integer(2.into());
+        assert_eq!(&after-&before,expected_work);assert!(expected_work.abs()<Rat::from_integer(65536.into()));
+        let mut zero=vec![Rat::zero();10];let visible=carry(&lattice,&complete,&mut zero);let visible_power=visible.iter().map(|q|q*q).sum::<Rat>()/Rat::from_integer(2.into());
+        let split_work=&visible_power-&after;assert_eq!(before+expected_work+split_work,visible_power);
+        assert!(zero.iter().any(|q|q.denom().bits()>1024)); // exact finite decoder is counted, not scalable retention
+        println!("REPRESENTED_SOURCE12_DATA_PASS full10control4=true decoder_exact=true incoming_feedback_once=true work_once_separate_split=true raw_tail_not_claimed_fixed_width=true native_calls=0");
+    }
+    #[test]
+    fn represented_requested_pair_and_material_ray_enclosure_are_distinct(){
+        use crate::hnn::port::PairedReadDefect;
+        let one=Rat::from_integer(1.into());let tenth=Rat::new(1.into(),10.into());
+        let mut defect=PairedReadDefect{fresh:vec![vec![tenth.clone();6]],actual:None};assert!(defect.context_bounds().is_err());
+        defect.actual=Some(vec![vec![tenth.clone();6]]);assert_eq!(defect.context_bounds().unwrap(),vec![vec![&tenth*Rat::from_integer(2.into());6]]);
+        defect.fresh[0][0]=-tenth.clone();assert!(defect.context_bounds().is_err());
+        // Formula G with caller-declared scalar enclosures. This tests algebra,
+        // NOT the existence of the still-missing native material-ray enclosure.
+        let lower=|g:&Rat,v:&Rat,eg:&Rat,ev:&Rat|g*v-eg*v.abs()-(g.abs()+eg)*ev;
+        assert!(lower(&one,&one,&tenth,&Rat::from_integer(2.into())).is_negative());
+        for i in [-1,1]{for j in [-1,1]{let actual=(&one+Rat::from_integer(i.into())*&tenth)*(&one+Rat::from_integer(j.into())*&tenth);assert!(actual>=lower(&one,&one,&tenth,&tenth));}}
+        println!("REPRESENTED_PAIR_DATA_PASS missing_actual_and_negative_radius_refuse=true too_wide_response_no_alignment=true algebra_does_not_mint_native_witness=true native_calls=0");
     }
 }

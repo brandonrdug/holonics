@@ -23,6 +23,9 @@ pub struct WorkRead {
     pub response_returns: u64,
     /// Unsplit surrogate evaluations used to certify response-column coordinate errors.
     pub response_certificate_ticks: u64,
+    /// Algebraic paired material-ray queries/ticks on original returned records; no new Word.
+    pub material_ray_queries:u64,
+    pub material_ray_ticks:u64,
     /// A counter overflow makes the exterior reading unusable; it changes no native law.
     pub overflowed: bool,
 }
@@ -68,6 +71,8 @@ impl WorkRead {
             response_certificate_ticks: self
                 .response_certificate_ticks
                 .checked_sub(before.response_certificate_ticks)?,
+            material_ray_queries:self.material_ray_queries.checked_sub(before.material_ray_queries)?,
+            material_ray_ticks:self.material_ray_ticks.checked_sub(before.material_ray_ticks)?,
             overflowed: false,
         })
     }
@@ -88,9 +93,12 @@ pub(crate) enum Event {
     ResponseReturnAttempt,
     ResponseReturn,
     ResponseCertificateTick,
+    MaterialRayQuery,
+    MaterialRayTick,
 }
 
 pub(crate) fn reached(event: Event) {
+    match event{Event::WordOpenAttempt=>{reserve_attempt();FORWARD_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},Event::ReturnAttempt=>{reserve_attempt();RETURN_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},Event::ResponseReturnAttempt=>{reserve_attempt();RESPONSE_RETURN_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);},_=>{}}
     WORK.with(|cell| {
         let mut reading = cell.get();
         let counter = match event {
@@ -108,6 +116,8 @@ pub(crate) fn reached(event: Event) {
             Event::ResponseReturnAttempt => &mut reading.response_return_attempts,
             Event::ResponseReturn => &mut reading.response_returns,
             Event::ResponseCertificateTick => &mut reading.response_certificate_ticks,
+            Event::MaterialRayQuery=>&mut reading.material_ray_queries,
+            Event::MaterialRayTick=>&mut reading.material_ray_ticks,
         };
         match counter.checked_add(1) {
             Some(next) => *counter = next,
@@ -174,4 +184,31 @@ mod tests {
         assert_eq!(refused.words_opened, 0);
         assert_eq!(refused.junctions, 0);
     }
+}
+
+/// Monotone process-wide native call counts, including worker threads and declaring Words.
+/// No reset and no retained-state field. Earlier processes cannot be reconstructed from this.
+#[derive(Clone,Copy,Debug,Default,PartialEq,Eq)]
+pub struct ProcessNativeCalls{pub forward_attempts:u64,pub response_attempts:u64,pub return_attempts:u64,pub response_return_attempts:u64}
+static FORWARD_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
+static RESPONSE_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
+static RETURN_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
+static RESPONSE_RETURN_CALLS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
+pub fn process_native_calls()->ProcessNativeCalls{use std::sync::atomic::Ordering::Relaxed;ProcessNativeCalls{forward_attempts:FORWARD_CALLS.load(Relaxed),response_attempts:RESPONSE_CALLS.load(Relaxed),return_attempts:RETURN_CALLS.load(Relaxed),response_return_attempts:RESPONSE_RETURN_CALLS.load(Relaxed)}}
+pub(crate) fn response_call(){reserve_attempt();RESPONSE_CALLS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);}
+
+// Exterior synthetic qualification guard. No field, law, arithmetic or retained codec uses it.
+// Set once, before the first constructor, in a dedicated finite control process. Exhaustion
+// panics BEFORE entering the attempted owner; the control's RAII receipt survives unwinding.
+static ATTEMPT_LIMIT:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(u64::MAX);
+static ATTEMPTS:std::sync::atomic::AtomicU64=std::sync::atomic::AtomicU64::new(0);
+pub fn limit_process_native_attempts(limit:u64){
+    use std::sync::atomic::Ordering::SeqCst;
+    assert!(limit>0 && ATTEMPTS.load(SeqCst)==0,"configure qualification before native construction");
+    ATTEMPT_LIMIT.compare_exchange(u64::MAX,limit,SeqCst,SeqCst).expect("one process qualification limit");
+}
+fn reserve_attempt(){
+    use std::sync::atomic::Ordering::SeqCst;
+    ATTEMPTS.fetch_update(SeqCst,SeqCst,|n|n.checked_add(1).filter(|next|*next<=ATTEMPT_LIMIT.load(SeqCst)))
+        .expect("finite exterior native-attempt reservation exhausted BEFORE owner dispatch");
 }

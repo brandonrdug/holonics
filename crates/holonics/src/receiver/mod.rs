@@ -26,6 +26,7 @@
 //! Lean: `Holarchy/{Reception,Receipt}`, `Foundation/{Receiver,ReceiverRelease,Standing}`,
 //! `Holon/Law`, `Compression/Landmark/Context/Population`.
 
+pub mod coupling;
 pub mod face;
 pub mod population;
 pub mod receipt;

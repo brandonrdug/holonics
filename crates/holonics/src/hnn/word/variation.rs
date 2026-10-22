@@ -134,7 +134,7 @@ fn factors(theta: &Constitution, a: usize) -> [&ExactRatMatrix; 3] {
     ]
 }
 
-fn admit(ops: &Operands) -> Result<(), HnnError> {
+pub(super) fn admit(ops: &Operands) -> Result<(), HnnError> {
     if ops.lattice().is_some()
         || ops.rings().iter().any(|r| r.chart().is_some())
         || ops.contacts().iter().any(|a| a.chart().is_some())
@@ -602,16 +602,37 @@ impl Word<'_> {
         a: usize,
         forms: &[ExactRatMatrix; 3],
     ) -> Result<EndChange, HnnError> {
-        let ops = &self.operands;
         let record = &self.passage[t];
-        let mut next = crate::hnn::prediction::physical_signed_tick(ops, chi, self.opened_at + t)?;
+        let mut next = super::linear::tick(&self.operands, chi, self.opened_at + t)?;
+        let forced = self.contact_forms_forcing(record, a, forms)?;
+        next.arrivals[a] = [
+            add(&next.arrivals[a][0], &forced.arrive_from),
+            add(&next.arrivals[a][1], &forced.arrive_to),
+        ];
+        next.states[a] = [
+            add(&next.states[a][0], &forced.displacement),
+            add(&next.states[a][1], &forced.rate),
+        ];
+        Ok(next)
+    }
+
+    /// The material-only forcing of the existing transit first variation at the actual
+    /// producing midpoint/state. The homogeneous signed tick stays with the shared Word
+    /// owner; no second tangent engine or retained history is introduced.
+    fn contact_forms_forcing(
+        &self,
+        record: &Passage,
+        a: usize,
+        forms: &[ExactRatMatrix; 3],
+    ) -> Result<crate::hnn::propagation::Transit, HnnError> {
+        let ops = &self.operands;
         let contact = &ops.contacts()[a];
         let (from, to) = contact.ends();
         let width = contact.width();
         let zero_from = vec![Rat::zero(); ops.rings()[from].width()];
         let zero_to = vec![Rat::zero(); ops.rings()[to].width()];
         let zero_state = vec![Rat::zero(); width];
-        let forced = transit_variation(
+        transit_variation(
             contact,
             ops.step(),
             &zero_from,
@@ -622,16 +643,7 @@ impl Word<'_> {
             &record.states[a][1],
             &record.rates[a],
             forms,
-        )?;
-        next.arrivals[a] = [
-            add(&next.arrivals[a][0], &forced.arrive_from),
-            add(&next.arrivals[a][1], &forced.arrive_to),
-        ];
-        next.states[a] = [
-            add(&next.states[a][0], &forced.displacement),
-            add(&next.states[a][1], &forced.rate),
-        ];
-        Ok(next)
+        )
     }
 
     pub(crate) fn compare_contacts_held(
@@ -799,6 +811,7 @@ impl Word<'_> {
                 entries: vec![0],
                 phases: occupied,
                 loci,
+                passages: Vec::new(),
             });
             Some((cut.bind_comparison(deposit.clone()), deposit))
         } else {

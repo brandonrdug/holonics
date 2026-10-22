@@ -19,8 +19,10 @@ pub mod complex;
 mod exact;
 pub mod motion;
 pub mod screw;
+pub mod solenoid;
 pub mod spatial;
 pub mod swing;
+pub(crate) mod transport_scan;
 pub mod winding;
 
 pub use exact::{

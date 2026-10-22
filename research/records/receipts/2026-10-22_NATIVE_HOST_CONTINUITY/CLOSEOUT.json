@@ -1,0 +1,129 @@
+{
+  "kind": "documentation-only consolidation of existing measured evidence; no new execution",
+  "implementation_source": "ef08972f4c6ffdeb39fafa0a9db79303aa197c11",
+  "implementation_tree": "71041d59e8da7436f5666d7cd6d70f7d49494f5c",
+  "host_executable_sha256": "5d6b29519d7accac5078eac929b8ac52c8c5389fbfcc2e85fb52ed378fb0a11c",
+  "continuity": [
+    "pending6cold",
+    "firstR10",
+    "postRcold",
+    "actual_admitted_zero_motion_contact10to11",
+    "source11cold",
+    "nextR20",
+    "R30_and_actual_source30_close",
+    "full_source30cold",
+    "4matching_warm_cold_frozen_decisions"
+  ],
+  "frozen_decisions": [
+    {
+      "decision": 0,
+      "key": "1/7",
+      "class": 0,
+      "cumulative": 31,
+      "aeon_local": 1,
+      "aeon_origin": 30
+    },
+    {
+      "decision": 1,
+      "key": "2/7",
+      "class": 1,
+      "cumulative": 32,
+      "aeon_local": 2,
+      "aeon_origin": 30
+    },
+    {
+      "decision": 2,
+      "key": "3/7",
+      "class": 1,
+      "cumulative": 33,
+      "aeon_local": 3,
+      "aeon_origin": 30
+    },
+    {
+      "decision": 3,
+      "key": "4/7",
+      "class": 2,
+      "cumulative": 34,
+      "aeon_local": 4,
+      "aeon_origin": 30
+    }
+  ],
+  "positive_CKD_influence": false,
+  "contact": {
+    "full_delta_zero": true,
+    "selected_exponents": [
+      -52,
+      -42,
+      -43,
+      -45,
+      -37,
+      -37
+    ],
+    "released_tails": 96,
+    "retained_tails": 0,
+    "fine_unit": "1/1073741824",
+    "max_abs_released_tail": "890245/2005245051394850816"
+  },
+  "CODE_charge_ns": 174218452765,
+  "CODE_cap_ns": 240000000000,
+  "native_wall_ns": 10645266043,
+  "native_attempts": 493,
+  "reserved_attempts": 640,
+  "native_cleanup": [],
+  "common_saved_payloads_byte_equal": true,
+  "CUDA_new_native_path": "UNQUALIFIED",
+  "useful_language": "NOT_DEMONSTRATED",
+  "old_campaign": {
+    "records": 136,
+    "unique_training_bytes": 73580,
+    "passes": 1,
+    "accepted": 294320,
+    "published": 294320,
+    "pending": 0,
+    "stage_count": 8,
+    "outcomes": {
+      "Applied(ReceivingOnly)": 29392,
+      "HeldReceiving": 40,
+      "Neutral": 0
+    },
+    "training_source": "87ef7a2d714a591d4c53f949a46b5a1b7b78c20a",
+    "output_source": "eb83bf4855dcbb9d86fdfbb0b1e53b5c3b5ed321",
+    "actual_card_dispatch": {
+      "successful_card_forwards": 294320,
+      "successful_retained_card_returns": 294320,
+      "successful_card_aggregates": 58864
+    },
+    "campaign_charge_ns": 11631705942654,
+    "campaign_cap_ns": 13300000000000,
+    "evaluation_ns": 459805831237,
+    "all8outputs_complete": true,
+    "assessment": "training and all8outputs complete; validASCII but incoherent nonanswers; no useful-language or Alpha claim"
+  },
+  "old_campaign_checkpoint_sha256": "f5835ead167473923f0101c65fdb5c573eb475ae4160e309954d976a6f2c9bc9",
+  "external_private_custody": [
+    {
+      "label": "native-frontier-domain-442006/FINAL_RESULT.json",
+      "sha256": "916579ed1592456e778593208ebf946ea7c8b903ed884dc53cf15704130e707c"
+    },
+    {
+      "label": "native-frontier-domain-442006/SAVED_FRONTIER_AUDIT.json",
+      "sha256": "f2c115ce352cefef0c461fa1e9634e7fb0eafd502239eb7bf674dccd5d295d55"
+    },
+    {
+      "label": "136-campaign/FINAL_RESULT.json",
+      "sha256": "b7e04d1d80ba1f647d5b32922119fb00b432e25cc8272ead4aec4eb7adbe5169"
+    },
+    {
+      "label": "design/CLAUDE_RETURN_AUDIT_HANDOFF_2026-10-22.txt",
+      "sha256": "04cc800500b0bfa9b6ecfbd1236961785d16e7978f42453a37b6052e61ab4b99"
+    }
+  ],
+  "privacy": "compact facts and source identities only; no prompts,generated private outputs,checkpoints,raw logs or machine paths copied",
+  "repository_issues": {
+    "formal": "#62",
+    "HNN": "#73",
+    "device": "#76",
+    "parent": "#63",
+    "status_changes": false
+  }
+}

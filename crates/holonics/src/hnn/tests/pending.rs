@@ -329,7 +329,7 @@ fn observation_context_flows_through_compare_deposit_and_cold_continuation() {
     );
     // Arrived retains the original observation after material changes; saved passage carries it.
     let state = resident.continuing_state(field.sources()[0]).unwrap();
-    let state = ContinuingState::from_text(&state.to_text()).unwrap();
+    let state = ContinuingState::from_text(&state.to_text(), opening.budget()).unwrap();
     let passage = state.resident_passage(&field, &opening).unwrap().unwrap();
     assert_eq!(
         passage
@@ -508,7 +508,7 @@ fn section_observation_flows_through_compare_deposit_and_cold_continuation() {
         assert_ne!(learned.standing(), opening.landmarks(2).unwrap().standing());
 
         let state = resident.continuing_state(field.sources()[0]).unwrap();
-        let state = ContinuingState::from_text(&state.to_text()).unwrap();
+        let state = ContinuingState::from_text(&state.to_text(), opening.budget()).unwrap();
         let mut restored = reference
             .mount_continued(&field, &Current::at_rest(&field), opening.clone(), &state)
             .unwrap();

@@ -1,0 +1,419 @@
+#!/usr/bin/env python3
+"""Run one generic diagnostic command under the fixed REQ-063 outer envelope.
+
+This supervisor is source code only; it knows no dataset, private paths, or listener workload.
+The child receives CLOCK_MONOTONIC absolute cutoffs before it starts. No retry is performed.
+"""
+from __future__ import annotations
+
+import argparse
+import dataclasses
+import errno
+import json
+import os
+import resource
+import signal
+import subprocess
+import sys
+import time
+from collections.abc import Callable, Sequence
+
+TOTAL_NS = 300_000_000_000
+TERM_NS = 295_000_000_000
+NATIVE_GRACE_NS = 5_000_000_000
+RSS_CAP_BYTES = 8 * 1024**3
+CPU_COUNT = 3
+POLL_NS = 50_000_000
+
+
+@dataclasses.dataclass(frozen=True)
+class DeadlinePlan:
+    start_ns: int
+    term_ns: int
+    total_ns: int
+    native_ns: int
+
+    @classmethod
+    def fixed(cls, start_ns: int) -> "DeadlinePlan":
+        term = start_ns + TERM_NS
+        return cls(start_ns, term, start_ns + TOTAL_NS, term - NATIVE_GRACE_NS)
+
+    def valid_fixed_contract(self) -> bool:
+        return (
+            self.term_ns - self.start_ns == TERM_NS
+            and self.total_ns - self.start_ns == TOTAL_NS
+            and self.term_ns - self.native_ns == NATIVE_GRACE_NS
+        )
+
+    def child_environment(self, base: dict[str, str]) -> dict[str, str]:
+        env = dict(base)
+        env.update(
+            {
+                "REQ063_SUPERVISOR_START_MONOTONIC_NS": str(self.start_ns),
+                "REQ063_TERM_DEADLINE_MONOTONIC_NS": str(self.term_ns),
+                "REQ063_TOTAL_DEADLINE_MONOTONIC_NS": str(self.total_ns),
+                "REQ063_NATIVE_DEADLINE_MONOTONIC_NS": str(self.native_ns),
+                "RAYON_NUM_THREADS": "1",
+                "REQ063_CLK_TCK": str(os.sysconf("SC_CLK_TCK")),
+                "CUDA_VISIBLE_DEVICES": "",
+                "HIP_VISIBLE_DEVICES": "",
+                "ROCR_VISIBLE_DEVICES": "",
+            }
+        )
+        return env
+
+
+@dataclasses.dataclass(frozen=True)
+class ProcessResult:
+    status: str
+    reason: str
+    returncode: int | None
+    deadline_evidence: bool
+    term_sent: bool
+    kill_sent: bool
+    peak_group_rss_bytes: int | None
+    start_ns: int
+    term_ns: int
+    native_ns: int
+    total_ns: int
+    finished_ns: int
+    group_alive_at_return: bool
+    cleanup_uncertain: bool
+    waited_child_cpu_user_us: int | None
+    waited_child_cpu_system_us: int | None
+    term_sent_ns: int | None
+    kill_sent_ns: int | None
+
+    def as_json(self) -> str:
+        return json.dumps(dataclasses.asdict(self), sort_keys=True, separators=(",", ":"))
+
+
+@dataclasses.dataclass(frozen=True)
+class ProcessSample:
+    monotonic_ns: int
+    group_rss_bytes: int | None
+    group_cpu_user_ticks: int | None
+    group_cpu_system_ticks: int | None
+
+
+def classify_returncode(returncode: int | None, *, deadline_evidence: bool) -> str:
+    """Never infer deadline from SIGKILL status alone."""
+    if returncode is None:
+        return "killed_unknown"
+    if returncode in (-signal.SIGKILL, 128 + signal.SIGKILL):
+        return "deadline" if deadline_evidence else "killed_unknown"
+    if returncode < 0 and -returncode == signal.SIGTERM and deadline_evidence:
+        return "deadline"
+    return "complete" if returncode == 0 else "exited_nonzero"
+
+
+def group_rss_bytes(pgid: int) -> int | None:
+    """Sum resident pages for visible processes in a process group; unavailable stays unknown."""
+    if not sys.platform.startswith("linux"):
+        return None
+    page_size = os.sysconf("SC_PAGE_SIZE")
+    total = 0
+    found = False
+    try:
+        entries = os.scandir("/proc")
+    except OSError:
+        return None
+    with entries:
+        for entry in entries:
+            if not entry.name.isdigit():
+                continue
+            proc = f"/proc/{entry.name}"
+            try:
+                with open(f"{proc}/stat", encoding="ascii") as stream:
+                    stat = stream.read()
+                close = stat.rfind(")")
+                fields = stat[close + 1 :].split()
+                if int(fields[2]) != pgid:
+                    continue
+                with open(f"{proc}/statm", encoding="ascii") as stream:
+                    statm = stream.read().split()
+                resident_pages = int(statm[1])
+            except FileNotFoundError:
+                # A process can exit between reading /proc/<pid>/stat and statm.
+                continue
+            except PermissionError:
+                return None
+            except (OSError, ValueError, IndexError):
+                return None
+            found = True
+            total += resident_pages * page_size
+    return total if found else 0
+
+
+def group_cpu_ticks(pgid: int) -> tuple[int, int] | None:
+    """Sum raw user/system clock ticks for visible processes in a process group."""
+    if not sys.platform.startswith("linux"):
+        return None
+    user_ticks = 0
+    system_ticks = 0
+    found = False
+    try:
+        entries = os.scandir("/proc")
+    except OSError:
+        return None
+    with entries:
+        for entry in entries:
+            if not entry.name.isdigit():
+                continue
+            try:
+                with open(f"/proc/{entry.name}/stat", encoding="ascii") as stream:
+                    stat = stream.read()
+                close = stat.rfind(")")
+                fields = stat[close + 1 :].split()
+                if int(fields[2]) != pgid:
+                    continue
+                user_ticks += int(fields[11])
+                system_ticks += int(fields[12])
+            except FileNotFoundError:
+                continue
+            except (OSError, ValueError, IndexError):
+                return None
+            found = True
+    return (user_ticks, system_ticks) if found else (0, 0)
+
+
+def _child_cpu_delta(before: resource.struct_rusage | None) -> tuple[int | None, int | None]:
+    if before is None:
+        return None, None
+    try:
+        after = resource.getrusage(resource.RUSAGE_CHILDREN)
+    except (AttributeError, OSError, ValueError):
+        return None, None
+    user_seconds = after.ru_utime - before.ru_utime
+    system_seconds = after.ru_stime - before.ru_stime
+    if user_seconds < 0 or system_seconds < 0:
+        return None, None
+    # getrusage reports CPU time at microsecond precision on the supported Linux host.
+    return round(user_seconds * 1_000_000), round(system_seconds * 1_000_000)
+
+
+def process_group_alive(pgid: int) -> bool:
+    try:
+        os.killpg(pgid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def select_cpu_affinity(available: Sequence[int]) -> tuple[int, ...]:
+    """Choose exactly three visible logical CPUs or fail closed."""
+    cpus = tuple(sorted(set(available))[:CPU_COUNT])
+    if len(cpus) != CPU_COUNT:
+        raise RuntimeError("fewer than three CPUs are available for the declared envelope")
+    return cpus
+
+
+def _child_limits() -> None:
+    """Install fixed address-space/affinity limits in the new child before exec."""
+    resource.setrlimit(resource.RLIMIT_AS, (RSS_CAP_BYTES, RSS_CAP_BYTES))
+    if not hasattr(os, "sched_getaffinity") or not hasattr(os, "sched_setaffinity"):
+        raise RuntimeError("three-CPU affinity requires Linux sched affinity support")
+    os.sched_setaffinity(0, set(select_cpu_affinity(os.sched_getaffinity(0))))
+
+
+def _send_group_signal(pgid: int, sig: int) -> None:
+    try:
+        os.killpg(pgid, sig)
+    except ProcessLookupError:
+        pass
+
+
+def supervise(
+    command: Sequence[str],
+    *,
+    plan: DeadlinePlan | None = None,
+    clock: Callable[[], int] = time.monotonic_ns,
+    popen_factory: Callable[..., subprocess.Popen[bytes]] = subprocess.Popen,
+    group_alive: Callable[[int], bool] = process_group_alive,
+    rss_reader: Callable[[int], int | None] = group_rss_bytes,
+    signal_group: Callable[[int, int], None] = _send_group_signal,
+    sleep_ns: Callable[[int], None] = lambda delay: time.sleep(delay / 1_000_000_000),
+    sample_hook: Callable[[ProcessSample], None] | None = None,
+    kill_cutoff_ns: int | None = None,
+    install_limits: bool = True,
+) -> ProcessResult:
+    """Run exactly one process group; dependencies are injectable for clock/process controls."""
+    if not command:
+        raise ValueError("a command after -- is required")
+    start_ns = clock() if plan is None else plan.start_ns
+    plan = DeadlinePlan.fixed(start_ns) if plan is None else plan
+    if not plan.valid_fixed_contract():
+        raise ValueError("only the fixed 295s TERM / 300s total / 5s native grace contract is valid")
+    cleanup_cutoff_ns = plan.total_ns if kill_cutoff_ns is None else kill_cutoff_ns
+    if not plan.term_ns < cleanup_cutoff_ns <= plan.total_ns:
+        raise ValueError("kill cutoff must follow TERM and remain inside the fixed total deadline")
+    if clock() >= plan.native_ns:
+        finished = clock()
+        return ProcessResult(
+            "not_started_deadline", "native_cutoff_reached_during_preflight", None, True,
+            False, False, None, plan.start_ns, plan.term_ns, plan.native_ns, plan.total_ns,
+            finished, False, False, None, None, None, None
+        )
+    env = plan.child_environment(dict(os.environ))
+    try:
+        child_usage_before = resource.getrusage(resource.RUSAGE_CHILDREN)
+    except (AttributeError, OSError, ValueError):
+        child_usage_before = None
+    try:
+        process = popen_factory(
+            list(command),
+            env=env,
+            start_new_session=True,
+            preexec_fn=_child_limits if install_limits else None,
+        )
+    except (OSError, subprocess.SubprocessError):
+        finished = clock()
+        return ProcessResult(
+            "launch_failed", "child_launch_or_limit_setup_failed", None, False, False, False,
+            None, plan.start_ns, plan.term_ns, plan.native_ns, plan.total_ns, finished,
+            False, False, None, None, None, None
+        )
+    pgid = process.pid
+    term_sent = False
+    kill_sent = False
+    term_sent_ns: int | None = None
+    kill_sent_ns: int | None = None
+    deadline_evidence = False
+    reason = "child_exit"
+    peak_rss: int | None = None
+    rss_stop = False
+    monitor_stop_status: str | None = None
+    cleanup_deadline_ns: int | None = None
+    while True:
+        now = clock()
+        try:
+            measured_rss = rss_reader(pgid)
+        except OSError:
+            measured_rss = None
+        if measured_rss is not None:
+            peak_rss = measured_rss if peak_rss is None else max(peak_rss, measured_rss)
+        cpu_ticks = group_cpu_ticks(pgid)
+        if sample_hook is not None:
+            sample = ProcessSample(
+                now,
+                measured_rss,
+                None if cpu_ticks is None else cpu_ticks[0],
+                None if cpu_ticks is None else cpu_ticks[1],
+            )
+            try:
+                sample_hook(sample)
+            except Exception as error:
+                if not term_sent:
+                    reason = getattr(error, "reason", "receipt_sampling_failed")
+                    monitor_stop_status = getattr(error, "status", "resource_measurement_unavailable")
+                    rss_stop = True
+                    term_sent = True
+                    cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, cleanup_cutoff_ns)
+                    term_sent_ns = now
+                    signal_group(pgid, signal.SIGTERM)
+        if not term_sent and measured_rss is None and group_alive(pgid):
+            reason = "process_group_rss_unavailable"
+            rss_stop = True
+            term_sent = True
+            cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, cleanup_cutoff_ns)
+            term_sent_ns = now
+            signal_group(pgid, signal.SIGTERM)
+        if not term_sent and measured_rss is not None and measured_rss >= RSS_CAP_BYTES:
+            reason = "process_group_rss_cap"
+            rss_stop = True
+            term_sent = True
+            cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, cleanup_cutoff_ns)
+            term_sent_ns = now
+            signal_group(pgid, signal.SIGTERM)
+        if not term_sent and now >= plan.term_ns:
+            reason = "outer_term_deadline"
+            deadline_evidence = True
+            term_sent = True
+            cleanup_deadline_ns = cleanup_cutoff_ns
+            term_sent_ns = now
+            signal_group(pgid, signal.SIGTERM)
+        returncode = process.poll()
+        if returncode is not None and not term_sent and group_alive(pgid):
+            reason = "leader_exited_group_cleanup"
+            term_sent = True
+            cleanup_deadline_ns = min(now + NATIVE_GRACE_NS, cleanup_cutoff_ns)
+            term_sent_ns = now
+            signal_group(pgid, signal.SIGTERM)
+        alive = group_alive(pgid)
+        if returncode is not None and not alive:
+            status = classify_returncode(returncode, deadline_evidence=deadline_evidence)
+            if deadline_evidence:
+                status = "deadline"
+            elif rss_stop and returncode in (-signal.SIGKILL, 128 + signal.SIGKILL):
+                status = "killed_unknown"
+            elif monitor_stop_status is not None:
+                status = monitor_stop_status
+            elif rss_stop and reason == "process_group_rss_cap":
+                status = "resource_cap"
+            elif rss_stop:
+                status = "resource_measurement_unavailable"
+            elif reason == "leader_exited_group_cleanup":
+                status = "incomplete_group_cleanup"
+            return ProcessResult(
+                status, reason, returncode, deadline_evidence, term_sent, kill_sent, peak_rss,
+                plan.start_ns, plan.term_ns, plan.native_ns, plan.total_ns, clock(),
+                group_alive(pgid), False, *_child_cpu_delta(child_usage_before),
+                term_sent_ns, kill_sent_ns
+            )
+        cleanup_due = cleanup_deadline_ns is not None and now >= cleanup_deadline_ns
+        if cleanup_due and not kill_sent:
+            if deadline_evidence:
+                reason = "fixed_total_deadline"
+            kill_sent = True
+            kill_sent_ns = now
+            signal_group(pgid, signal.SIGKILL)
+        if now >= cleanup_cutoff_ns:
+            reason = (
+                "fixed_total_deadline"
+                if cleanup_cutoff_ns == plan.total_ns
+                else "reserved_evidence_cutoff"
+            )
+            deadline_evidence = True
+            if not kill_sent:
+                kill_sent_ns = now
+                signal_group(pgid, signal.SIGKILL)
+                kill_sent = True
+            # Do not wait past the hard envelope. The result records a missing status honestly.
+            returncode = process.poll()
+            status = classify_returncode(returncode, deadline_evidence=deadline_evidence)
+            if deadline_evidence:
+                status = "deadline"
+            waited_cpu = _child_cpu_delta(child_usage_before) if returncode is not None else (None, None)
+            alive_at_return = group_alive(pgid)
+            return ProcessResult(
+                status, reason, returncode, True, term_sent, kill_sent, peak_rss,
+                plan.start_ns, plan.term_ns, plan.native_ns, plan.total_ns, clock(),
+                alive_at_return, alive_at_return, *waited_cpu,
+                term_sent_ns, kill_sent_ns
+            )
+        delay = min(POLL_NS, cleanup_cutoff_ns - now)
+        if term_sent:
+            # The cleanup period is strictly bounded by the fixed total deadline.
+            sleep_ns(delay)
+        else:
+            sleep_ns(min(delay, max(1, plan.term_ns - now)))
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("command", nargs=argparse.REMAINDER, help="command to run after --")
+    args = parser.parse_args(argv)
+    command = list(args.command)
+    if command and command[0] == "--":
+        command.pop(0)
+    if not command:
+        parser.error("provide one command after --")
+    result = supervise(command)
+    print(result.as_json(), flush=True)
+    return 0 if result.status == "complete" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

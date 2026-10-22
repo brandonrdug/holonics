@@ -1,0 +1,34 @@
+{
+  "native_attempt_reservation": 240,
+  "native_attempt_charge": 138,
+  "native_counts": {
+    "final": true,
+    "total_attempts": 138,
+    "forward_constructors": 108,
+    "response_companions": 10,
+    "actual_returns": 10,
+    "fresh_returns": 10
+  },
+  "command": [
+    "bash",
+    "-c",
+    "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-rational-flow-62b584/binaries/connected-final --exact complete_language::native_context_controls::native_rational_flow_connected_prefix --ignored --nocapture"
+  ],
+  "limit_s": 45,
+  "wall_ns": 3211315183,
+  "peak_rss_bytes": 60338176,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 32,
+  "exit": 101,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 355773937360,
+  "ledger_after_ns": 358985252543,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

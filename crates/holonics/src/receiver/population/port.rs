@@ -765,6 +765,34 @@ impl PortPopulation {
             .sum::<u64>()
             + BigInt::from(self.cells).bits().max(1)
     }
+
+    /// Full immutable diagnostic payload extent, without cloning its retained reading.
+    /// Unlike physical `bits`, this includes descriptions, deaths, mass and metadata.
+    /// The pair counts integer magnitude/sign bits and conservative structural items.
+    pub(crate) fn diagnostic_extent(&self) -> Option<(u64, u64)> {
+        let rat = |x: &Rat| {
+            x.numer()
+                .bits()
+                .checked_add(x.denom().bits())?
+                .checked_add(2)
+        };
+        let mut bits = rat(&self.mass)?.checked_add(128)?;
+        for member in &self.members {
+            bits = bits
+                .checked_add(rat(&member.prior)?)?
+                .checked_add(member.likelihood.0.mantissa.bits())?
+                .checked_add(member.likelihood.1.mantissa.bits())?
+                // Both signed exponents, description, optional death and flags.
+                .checked_add(320)?;
+        }
+        Some((
+            bits,
+            u64::try_from(self.members.len())
+                .ok()?
+                .checked_mul(16)?
+                .checked_add(8)?,
+        ))
+    }
 }
 
 #[cfg(test)]

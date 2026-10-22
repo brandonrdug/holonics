@@ -257,6 +257,15 @@
 /// Physical chart compression with a consumed state and covector error contract.
 pub mod charted;
 
+/// Exact exterior byte/text reading of the actual scored receiving release.
+pub mod byte_release;
+
+/// Whole finite byte-section dominance on an actual conditional receiving oracle.
+pub mod native_section;
+
+// Keep the established local names for the charted child module's existing consumers.
+use crate::hnn::word::linear::junctions as physical_signed_junctions;
+pub(crate) use crate::hnn::word::linear::tick as physical_signed_tick;
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
@@ -2329,91 +2338,6 @@ fn physical_completion_opening(
     }))
 }
 
-/// Signed junction and full tick of the admitted linear relation. The native element,
-/// resonator and contact owners supply the images at the actual pump tick. In particular, the
-/// rate, displacement, velocity and arriving waves remain correlated with their source label.
-fn physical_signed_junctions(
-    operands: &crate::hnn::propagation::Operands,
-    state: &crate::hnn::word::EndChange,
-) -> Result<Vec<crate::hnn::propagation::Junction>, HnnError> {
-    (0..operands.rings().len())
-        .map(|ring| {
-            let incoming: Vec<_> = operands
-                .incident(ring)
-                .iter()
-                .map(|&a| state.arrivals[a][operands.end_slot(a, ring)].as_slice())
-                .collect();
-            let anchor = crate::hnn::propagation::participation(
-                operands.weights(ring),
-                &state.storage[ring],
-                &incoming,
-            )?;
-            Ok(crate::hnn::propagation::scattering_about(
-                anchor,
-                &state.storage[ring],
-                &incoming,
-            ))
-        })
-        .collect()
-}
-
-pub(crate) fn physical_signed_tick(
-    operands: &crate::hnn::propagation::Operands,
-    state: &crate::hnn::word::EndChange,
-    tick: usize,
-) -> Result<crate::hnn::word::EndChange, HnnError> {
-    let junctions = physical_signed_junctions(operands, state)?;
-    let mut next = state.clone();
-    for (ring, junction) in junctions.iter().enumerate() {
-        let drive = crate::hnn::propagation::element_step(
-            &operands.rings()[ring],
-            &junction.storage_wave,
-            &junction.contrast,
-        )?
-        .next;
-        if let Some(resonator) = &operands.resonators()[ring] {
-            let local = state.resonators[ring]
-                .as_ref()
-                .ok_or(HnnError::ContinuingState {
-                    what: "the affine completion needs the full producing resonator state",
-                })?;
-            let driven = resonator.step(
-                tick,
-                &drive,
-                [&local[0], &local[1]],
-                &crate::hnn::ring::ResonatorRemainders::default(),
-                None,
-            )?;
-            next.storage[ring] = driven.output;
-            next.resonators[ring] = Some(driven.state);
-            next.resonator_phases[ring] = Some(resonator.phase_at(tick));
-        } else {
-            next.storage[ring] = drive;
-        }
-    }
-    for (a, contact) in operands.contacts().iter().enumerate() {
-        let (from, to) = contact.ends();
-        let outgoing = |ring: usize| {
-            &junctions[ring].outgoing[operands
-                .incident(ring)
-                .iter()
-                .position(|&index| index == a)
-                .unwrap()]
-        };
-        let passed = crate::hnn::propagation::transit(
-            contact,
-            operands.step(),
-            outgoing(from),
-            outgoing(to),
-            &state.states[a][0],
-            &state.states[a][1],
-        )?;
-        next.arrivals[a] = [passed.arrive_from, passed.arrive_to];
-        next.states[a] = [passed.displacement, passed.rate];
-    }
-    Ok(next)
-}
-
 fn physical_completion_read(
     field: &Field,
     material: &dyn FieldMaterial,
@@ -3574,6 +3498,7 @@ impl SourceObserverPrediction<'_, '_> {
                 entries: vec![observation.anchors[0].2 as u64],
                 phases: samples.len() as u64,
                 loci: [locus].into_iter().collect(),
+                passages: Vec::new(),
             };
             let deposit = Deposit::new(
                 theta.commit(),
@@ -4176,6 +4101,7 @@ impl PhysicalPrediction<'_, '_> {
                     PhysicalLearning::Receiving => reached.iter().copied().collect(),
                     PhysicalLearning::SourcePorts | PhysicalLearning::PairOutputs => full_reach,
                 },
+                passages: Vec::new(),
             };
             let deposit =
                 Deposit::new(material.commit(), linear, factors, reached).with_reach(reach);

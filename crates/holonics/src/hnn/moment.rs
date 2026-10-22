@@ -253,9 +253,13 @@ use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{Chart, integral, lcm};
 
+mod epoch;
+mod resident_marginal_face;
 mod resident_pair_face;
+pub use resident_marginal_face::MarginalFaceAudit;
+use resident_marginal_face::ResidentMarginalFaces;
 use resident_pair_face::ResidentPairFaces;
-pub(crate) use resident_pair_face::{PairFaceGradient, ResidentPairFace};
+pub(crate) use resident_pair_face::{PairFaceGradient, PreparedPairRay, ResidentPairFace};
 
 // -------------------------------------------------------------------------------------------
 // the capacity
@@ -1678,6 +1682,7 @@ pub struct SourceMoment {
     partition: SourcePartition,
     /// The counts' derived pair face, shared by read-only clones; not retained or serialized.
     pair_faces: ResidentPairFaces,
+    marginal_faces: ResidentMarginalFaces,
 }
 
 impl SourceMoment {
@@ -1723,6 +1728,7 @@ impl SourceMoment {
             located: false,
             partition: SourcePartition::of(field),
             pair_faces: ResidentPairFaces::default(),
+            marginal_faces: ResidentMarginalFaces::default(),
         }
     }
 
@@ -2435,6 +2441,7 @@ impl SourceMoment {
             located,
             partition,
             pair_faces: ResidentPairFaces::default(),
+            marginal_faces: ResidentMarginalFaces::default(),
         })
     }
 
@@ -2714,12 +2721,17 @@ impl SourceMoment {
     /// The retained moment reads its port's face before the pending ratio copies the moment.
     /// Each copy owns its slot map and shares only already materialized immutable faces.
     /// Derived cache only; no law reads this preparation's audit bookkeeping.
-    pub fn read_retained_pair_faces(
+    pub fn read_retained_faces(
         &self,
         field: &Field,
         material: &dyn FieldMaterial,
     ) -> Result<(), HnnError> {
         for &ring in field.sources() {
+            if let Some(port) = material.source_port(ring) {
+                let counts = self.counts(ring)?;
+                self.marginal_faces
+                    .read(ring, &counts.first, counts.period, port)?;
+            }
             for &offset in &self.offsets {
                 if let Some(port) = material.pair_port(ring, offset) {
                     self.resident_pair_face(ring, offset, port)?;
@@ -2727,6 +2739,30 @@ impl SourceMoment {
             }
         }
         Ok(())
+    }
+
+    /// Exterior totals over this moment and its copies; no counter is retained or read by a law.
+    pub fn marginal_face_audit(&self) -> Vec<(usize, MarginalFaceAudit)> {
+        self.marginal_faces.audit()
+    }
+
+    /// Whether each held marginal is on the current counts and source port, before any read.
+    pub fn marginal_face_matches(
+        &self,
+        field: &Field,
+        material: &dyn FieldMaterial,
+    ) -> Result<Vec<(usize, Option<bool>)>, HnnError> {
+        field
+            .sources()
+            .iter()
+            .map(|&ring| {
+                let counts = self.counts(ring)?;
+                let port = material
+                    .source_port(ring)
+                    .ok_or(HnnError::MissingSourcePort { ring })?;
+                Ok((ring, self.marginal_faces.matches(ring, &counts.first, port)))
+            })
+            .collect()
     }
 
     /// Exterior build counter over this moment and its copies. Only the number is shared;
@@ -2903,25 +2939,14 @@ impl SourceMoment {
                     .map_or(Ok(None), |series| Ok(Some(series)))
             })
             .collect::<Result<Vec<Option<Vec<Vec<Rat>>>>, HnnError>>()?;
-        let mut reads = Vec::new();
+        let reads = self
+            .marginal_faces
+            .read(ring, &counts.first, counts.period, port)?
+            .into_iter()
+            .map(|(phase, read)| (phase, geometry.rotate(&read, &-BigInt::from(phase))))
+            .collect();
         let mut pairs = vec![Rat::zero(); width];
-        let a = self.alphabet;
         for phase in 0..counts.period {
-            let mut binned = vec![Rat::zero(); width];
-            let mut occupied = false;
-            for (code, &count) in counts.first[phase * a..(phase + 1) * a].iter().enumerate() {
-                if count == 0 {
-                    continue;
-                }
-                occupied = true;
-                let count = Rat::from_integer(BigInt::from(count));
-                for (row, value) in binned.iter_mut().enumerate() {
-                    *value += &count * port.get(row, code)?;
-                }
-            }
-            if occupied {
-                reads.push((phase, geometry.rotate(&binned, &-BigInt::from(phase))));
-            }
             let mut driven = vec![Rat::zero(); width];
             for series in pair_series.iter().flatten() {
                 for (sum, value) in driven.iter_mut().zip(&series[phase]) {
@@ -3360,6 +3385,7 @@ impl SourceMoment {
             located: false,
             partition: self.partition.clone(),
             pair_faces: ResidentPairFaces::default(),
+            marginal_faces: ResidentMarginalFaces::default(),
         })
     }
 }

@@ -1,0 +1,78 @@
+{
+  "kind": "SYNTHETIC_CODE_VALIDATION_NOT_LANGUAGE_NOT_MODEL_TRAINING",
+  "base_source": "88ae0b68b3d91cf38cd325efd8491983025682bc",
+  "gate_scopes": [
+    "check",
+    "guard-lints",
+    "guard-doctests",
+    "diagnostic-timing-controls",
+    "diagnostic-supervisor-controls",
+    "diagnostic-receipt-controls",
+    "listener-continuation-controls",
+    "projected-statistics-controls",
+    "native-class-advance-controls",
+    "native-gram-carry-conservation",
+    "finite-solenoidal-controls",
+    "rational-place-controls",
+    "plural-coupling-controls",
+    "grouped-tube-controls",
+    "observed-tube-controls",
+    "source-refinement-controls",
+    "actual-source-alignment",
+    "actual-ray-joint-controls",
+    "actual-factor-refusal",
+    "refined-source-native-restore",
+    "solenoidal-listener-controls",
+    "offline-coupling-controls"
+  ],
+  "doctests": 64,
+  "focused_controls": 5,
+  "host_shared_continuity_controls": 2,
+  "diagnostic_conditional_control_cells": 8,
+  "diagnostic_additional_word_score_root_passes": 0,
+  "original_paired_law_control": "PASS",
+  "native_passage_controls": "PASS",
+  "failed_attempts_preserved": [
+    "first pending6 clock fixture failed legitimately before publication:3passed1failed",
+    "180s hostgate stop after7acceptedscopes",
+    "120s continuation stop after13moreacceptedscopes"
+  ],
+  "code_ledger1": {
+    "reservation_ns": 600000000000,
+    "charged_ns": 479884755312,
+    "closed": true
+  },
+  "code_ledger2": {
+    "reservation_ns": 360000000000,
+    "charged_ns": 108160008194,
+    "closed": true
+  },
+  "total_measured_compile_test_ns": 588044763506,
+  "peak_sampled_owned_CPU_RSS_bytes": 3695874048,
+  "configured_CPU_affinity_cores": 4,
+  "CUDA_dispatch": {
+    "backend": "cuda-observed-epoch-device0",
+    "device_ordinal": 0,
+    "host_fallback": false,
+    "completed": true,
+    "successful_card_forwards": 18,
+    "successful_retained_card_returns": 0,
+    "successful_card_aggregates": 0,
+    "host_owned": "scalar faces/roots/normalization/scoring/certification; prefix diagnostics; exact decode; four output forks"
+  },
+  "CUDA_peak_sampled_owned_MiB": 10,
+  "CUDA_samples": 14,
+  "GPU_compute_cleanup": [],
+  "kernel_transfer_sync_counters": "not instrumented; successful owner-level calls counted",
+  "root_call_counts": "not comprehensively instrumented; no extra readout calls introduced by receipt hook",
+  "learning_scope": "source only; R held; no branch-conditioned separate native material evolution; no CLI learner replacement",
+  "reuse": "immutable-cut memoization with complete-result equality and context invalidation, not learned compression",
+  "paired_slip": {
+    "before": "5",
+    "after": "0"
+  },
+  "inspectable_trace_sha256": "7b29d515aec55423f105050d617a5c246ee55fdf303505ad06335e13cf471e35",
+  "new_dataset_or_model_jobs": 0,
+  "remote_uploads": 0,
+  "formal_obligations": "#62 finite joint-family/source-passage consumer joins"
+}

@@ -20,14 +20,15 @@
 //! - **the release** (`Word::released`): the unread change's power, the peak bits of the change,
 //!   the last junction's residual, and every carried remainder, released and read;
 //! - **the return** (`port::Word::pull_back`): the reads' covectors formed on the host (the
-//!   covector `p̃ − q` lives on `(1/W)ℤ`, not on a lattice, so its pull through `Rᵀ` and its first
-//!   split are the host's, and its remainder is released with the return's), the elements', loaded
+//!   covector `p̃ − q` lives on `(1/W)ℤ`, not on a lattice); its exact `Rᵀ` image and first carried
+//!   split execute in `execute_exact` with the full positive denominator and dynamic limbs.
+//!   The seed-driven ReturnPrecision policy reads those exact images on the host. Its remainder
+//!   is released with the return's. The elements', loaded
 //!   resonators' and transits' ticks, the conductance covector (its junction parts divide by the
 //!   admittance sum, which is not dyadic) and the return's remainders. A loaded `ResonatorTick`
 //!   reads its drive, state, rate, returned wave and post-split reverse solve from the resident word
 //!   record; the host contracts it with the declared material gain family.
 
-use holonics::hnn::chart::carry;
 use holonics::hnn::constitution::ReceivingLayout;
 use holonics::hnn::port::{ElementTick, ResonatorTick, TransitTick, WordReturn};
 use holonics::hnn::propagation::TickBalance;
@@ -40,8 +41,9 @@ use holonics::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 
-use crate::hnn::dyadic::{DyadicMatrix, dot, integral, l1, lift, sup, value, wide, wider};
+use crate::hnn::dyadic::{DyadicMatrix, dot, l1, lift, sup, value, wide, wider};
 use crate::hnn::execute::{ForwardRecord, ReverseRecord, WordPlan};
+use crate::hnn::execute_exact::ExactWordMatrix;
 use crate::hnn::publication::Loci;
 
 fn rat(numerator: BigInt, exponent: u32) -> Rat {
@@ -748,16 +750,16 @@ fn transit(
     let zeta = wide(slice(&record.zeta, at, contact.width));
     let omega = wider(slice(&record.omega, at, contact.width));
     let right = wider(slice(&record.right, at, contact.width));
-    // ⟨ω, m ζ − right⟩ on a common scale.
-    let mz = operator.apply(&zeta);
-    let smz = operator.exponent + lw;
-    let common = smz.max(contact.right_exp);
-    let residual: Vec<BigInt> = lift(&mz, common - smz)
-        .iter()
-        .zip(lift(&right, common - contact.right_exp))
-        .map(|(m, r)| m - r)
-        .collect();
-    let chart_term = rat(dot(&omega, &residual), common + so);
+    // ⟨ω, m ζ − right⟩ read exactly as a receipt, including an operator
+    // whose lawful dyadic coordinate is wider than the legacy i64 matrix.
+    let chart_term: Rat = (0..contact.width)
+        .map(|i| {
+            let mz: Rat = (0..contact.width)
+                .map(|j| &operator.entries()[i * contact.width + j] * rat(zeta[j].clone(), lw))
+                .sum();
+            rat(omega[i].clone(), so) * (mz - rat(right[i].clone(), contact.right_exp))
+        })
+        .sum();
     let unit = rat(BigInt::from(1), lw);
     let chart_bound =
         rat(l1(&omega), so) * (certificate * rat(sup(&right), contact.right_exp) + norm * &unit);
@@ -855,7 +857,7 @@ fn transit(
 /// contact's operator words and row norm at its carry, and every chart's certificate (rings then
 /// contacts, the refinement's readings).
 pub(crate) struct Executed<'a> {
-    pub(crate) contacts: Vec<(&'a DyadicMatrix, &'a Rat)>,
+    pub(crate) contacts: Vec<(&'a holonics::ratio::linear::ExactRatMatrix, &'a Rat)>,
     pub(crate) readings: &'a [ChartReading],
 }
 
@@ -899,6 +901,10 @@ pub(crate) fn released(
     record: &ForwardRecord,
     executed: &Executed<'_>,
 ) -> Result<Released, HnnError> {
+    released_on(plan,loci,record,executed,None)
+}
+pub(crate) fn released_native(plan:&WordPlan,loci:&Loci,record:&ForwardRecord,executed:&Executed<'_>,operands:&holonics::hnn::propagation::Operands)->Result<Released,HnnError>{released_on(plan,loci,record,executed,Some(operands))}
+fn released_on(plan:&WordPlan,loci:&Loci,record:&ForwardRecord,executed:&Executed<'_>,native:Option<&holonics::hnn::propagation::Operands>)->Result<Released,HnnError>{
     let (steps, lw) = (plan.steps, plan.lw);
     let rings = plan.rings.len();
     let certificate = |pair: usize| &executed.readings[pair].certificate;
@@ -968,12 +974,15 @@ pub(crate) fn released(
     }
     // Every carried remainder, released at the word's end.
     let mut remainders: Vec<Rat> = Vec::new();
-    for ring in &plan.rings {
+    for (r,ring) in plan.rings.iter().enumerate() {
+        let anchor_increment=if let Some(o)=native{
+            let point=crossing_at(plan,record,steps-1)?;let anchors=crossing_anchors(plan,record,steps-1)?;
+            let incoming=o.incident(r).iter().map(|&a|point.arrivals[a][o.end_slot(a,r)].as_slice()).collect::<Vec<_>>();
+            let image=holonics::hnn::propagation::participation(o.weights(r),&point.storage[r],&incoming)?;
+            Some(image.iter().zip(&anchors[r]).map(|(x,a)|x-a).collect::<Vec<_>>())
+        }else{None};
         for i in 0..ring.width {
-            remainders.push(rat(
-                BigInt::from(record.rem_anchor[ring.rows + i]),
-                plan.lc + lw,
-            ));
+            remainders.push(rat(BigInt::from(record.rem_anchor[ring.rows+i]),plan.lc+lw)-anchor_increment.as_ref().map_or_else(Rat::zero,|v|v[i].clone()));
             remainders.push(rat(
                 BigInt::from(record.rem_storage[ring.rows + i]),
                 ring.storage_exp,
@@ -1019,14 +1028,15 @@ pub(crate) fn released(
         .iter()
         .map(|resonator| resonator_balance(plan, record, resonator))
         .collect::<Result<Vec<_>, _>>()?;
+    let full=native.is_some();
     Ok(Released {
-        power: power(plan, loci, &Change::after(plan, record)),
-        ticks: steps,
+        power: if full{before}else{power(plan, loci, &Change::after(plan, record))},
+        ticks: steps-usize::from(full),
         peak_bits: peak,
         balances,
-        last,
-        last_bound,
-        end: Change::after(plan, record).end(plan),
+        last:if full{Rat::zero()}else{last},
+        last_bound:if full{Rat::zero()}else{last_bound},
+        end:if full{crossing(plan,record)}else{Change::after(plan, record).end(plan)},
         remainders: Remainders::of(&remainders),
         charts: executed.readings.to_vec(),
         resonators: resonator_balances,
@@ -1071,6 +1081,17 @@ pub(crate) fn crossing_anchors(
                 .collect()
         })
         .collect())
+}
+
+/// Authentic original full-tick stage operands, decoded from the retained GPU
+/// record. No new Word, solve or inverse trajectory is executed here.
+pub(crate) fn native_path(plan:&WordPlan,record:&ForwardRecord,base:Option<&EndChange>)->Result<holonics::hnn::word::native_prediction::NativeExecutedPath,HnnError>{
+    let full=plan.steps.checked_sub(1).ok_or(HnnError::CountOverflow)?;
+    let exact_opening=match base{Some(base)=>response_openings_from(plan,record,base)?.0,None=>response_openings(plan,record)?.0};
+    let points=(0..=full).map(|t|crossing_at(plan,record,t)).collect::<Result<Vec<_>,_>>()?;
+    let anchors=(0..full).map(|t|crossing_anchors(plan,record,t)).collect::<Result<Vec<_>,_>>()?;
+    let midpoints=(0..full).map(|t|plan.contacts.iter().map(|c|slice(&record.omega,t*plan.k+c.rows,c.width).iter().map(|x|rat(BigInt::from(*x),plan.lw+c.gain_exp)).collect()).collect()).collect();
+    Ok(holonics::hnn::word::native_prediction::NativeExecutedPath{exact_opening,points,anchors,midpoints})
 }
 
 /// The exact unsplit source opening and the executed first crossing from the response record.
@@ -1152,6 +1173,7 @@ pub(crate) struct PairedSource {
 
 /// Multiply an exact rational by `2^levels`, cancelling denominator powers before allocating a
 /// shifted numerator. This is the reverse-only seed normalization; forward operands stay put.
+#[cfg(test)]
 fn scale_pow2(value: &Rat, levels: u32) -> Result<Rat, HnnError> {
     if levels == 0 || value.is_zero() {
         return Ok(value.clone());
@@ -1199,6 +1221,7 @@ fn return_wide_coordinate(value: i128, exponent: u32, levels: u32) -> Result<Rat
 /// **Form the return's source** from the ratio's covector and the receiving map's words; the read
 /// is in the passage frame, so no rotor enters.
 pub(crate) fn source(
+    card: &crate::hnn::card::Card,
     field: &Field,
     plan: &WordPlan,
     record: &ForwardRecord,
@@ -1214,6 +1237,13 @@ pub(crate) fn source(
     }
     let ring = field.ring(plan.receiver);
     let width = ring.width();
+    if map.columns != width {
+        return Err(HnnError::Shape {
+            what: "the receiving map columns against its ring width",
+            expected: width,
+            found: map.columns,
+        });
+    }
     let lattice =
         field
             .word_lattice()
@@ -1227,24 +1257,18 @@ pub(crate) fn source(
         });
     }
     let anchors = anchors(plan, record);
-    let mut images = Vec::with_capacity(plan.aperture);
+    let matrix = ExactWordMatrix {
+        rows: map.rows,
+        columns: map.columns,
+        exponent: map.exponent,
+        numerators: map.words.iter().map(|&n| BigInt::from(n)).collect(),
+    };
+    let stage = card
+        .exact_word_stage(&matrix, covector.logits(), true)
+        .map_err(|error| error.into_hnn())?;
+    let images = stage.images().map_err(|error| error.into_hnn())?;
     let mut reads = Vec::with_capacity(plan.aperture);
     for (j, gradient) in covector.logits().iter().enumerate() {
-        // Rᵀ g: the gradient in its integral chart against the map's words.
-        let (numerators, denominator) = integral(gradient);
-        let scale: BigInt = &denominator * (BigInt::from(1) << map.exponent as usize);
-        let pulled: Vec<Rat> = (0..width)
-            .map(|column| {
-                let sum: BigInt = (0..map.rows)
-                    .filter(|&row| !numerators[row].is_zero())
-                    .map(|row| {
-                        BigInt::from(map.words[row * map.columns + column]) * &numerators[row]
-                    })
-                    .sum();
-                Rat::new(sum, scale.clone())
-            })
-            .collect();
-        images.push(pulled);
         reads.push((anchors[j].clone(), gradient.clone()));
     }
     // The policy is driven by the actual transported, post-map, post-rotation seed in each
@@ -1262,33 +1286,29 @@ pub(crate) fn source(
             reason: "the return precision must refine this word's declared transient lattice",
         });
     }
-    let normalized = images
+    let split = stage
+        .carry(plan.lw, precision.levels(), true)
+        .map_err(|error| error.into_hnn())?;
+    let carried = split
+        .coordinates
         .iter()
-        .map(|image| {
-            image
-                .iter()
-                .map(|coordinate| scale_pow2(coordinate, precision.levels()))
-                .collect::<Result<Vec<_>, _>>()
+        .flatten()
+        .map(|coordinate| {
+            num_traits::ToPrimitive::to_i64(coordinate).ok_or(HnnError::Carrier {
+            what: "a receiving covector past the legacy reverse word's signed 64-bit coordinate",
+        })
         })
         .collect::<Result<Vec<_>, _>>()?;
-    let mut remainder = vec![Rat::zero(); width];
-    let mut carried = vec![0i64; plan.aperture * width];
-    for j in (0..plan.aperture).rev() {
-        // Scaling the seed and splitting on the original fixed lattice is exactly the same
-        // integer read as splitting the seed on Lw+k, while keeping the reverse kernel's plan at
-        // its original Lw.
-        let split = carry(&lattice, &normalized[j], &mut remainder);
-        for (i, value) in split.iter().enumerate() {
-            let coordinate = value * Rat::from_integer(BigInt::from(1) << plan.lw as usize);
-            carried[j * width + i] = num_traits::ToPrimitive::to_i64(&coordinate.to_integer())
-                .ok_or(HnnError::Carrier {
-                    what: "a receiving covector past the signed 64-bit word",
-                })?;
-        }
+    if split.remainders.len() != width {
+        return Err(HnnError::Shape {
+            what: "the exact receiving source's width",
+            expected: width,
+            found: split.remainders.len(),
+        });
     }
     Ok(Source {
         carried,
-        remainder,
+        remainder: split.remainders,
         reads,
         precision,
     })
@@ -1300,6 +1320,7 @@ pub(crate) fn source(
 /// receives `(B_s-B_c)^T g`. Both are normalized with one ReturnPrecision selected from the union
 /// of their actual per-phase seeds, then split on their own carried remainder streams.
 pub(crate) fn paired_source(
+    card: &crate::hnn::card::Card,
     field: &Field,
     plan: &WordPlan,
     actual_record: &ForwardRecord,
@@ -1349,8 +1370,29 @@ pub(crate) fn paired_source(
             .map(|x| rat(BigInt::from(*x), plan.lw))
             .collect())
     };
-    let mut actual_images = Vec::with_capacity(plan.aperture);
-    let mut fresh_images = Vec::with_capacity(plan.aperture);
+    // [B_c, B_s-B_c] is the actual dual of the physical feature
+    // [fresh, actual-fresh]. Only immutable map coordinates are combined here;
+    // the map/covector products and both independent carry streams run on card.
+    let mut dual = Vec::with_capacity(map.words.len());
+    for row in 0..map.rows {
+        dual.extend(
+            (0..width).map(|column| BigInt::from(map.words[row * map.columns + width + column])),
+        );
+        dual.extend((0..width).map(|column| {
+            BigInt::from(map.words[row * map.columns + column])
+                - BigInt::from(map.words[row * map.columns + width + column])
+        }));
+    }
+    let matrix = ExactWordMatrix {
+        rows: map.rows,
+        columns: map.columns,
+        exponent: map.exponent,
+        numerators: dual,
+    };
+    let stage = card
+        .exact_word_stage(&matrix, covector.logits(), true)
+        .map_err(|error| error.into_hnn())?;
+    let images = stage.images().map_err(|error| error.into_hnn())?;
     let mut actual_reads = Vec::with_capacity(plan.aperture);
     let mut fresh_reads = Vec::with_capacity(plan.aperture);
     let mut paired_reads = Vec::with_capacity(plan.aperture);
@@ -1374,34 +1416,13 @@ pub(crate) fn paired_source(
         let mut physical_feature = fresh_anchor.clone();
         physical_feature.extend(context);
 
-        let (numerators, denominator) = integral(gradient);
-        let scale: BigInt = &denominator * (BigInt::from(1) << map.exponent as usize);
-        let pulled: Vec<Rat> = (0..map.columns)
-            .map(|column| {
-                let sum: BigInt = (0..map.rows)
-                    .filter(|&row| !numerators[row].is_zero())
-                    .map(|row| {
-                        BigInt::from(map.words[row * map.columns + column]) * &numerators[row]
-                    })
-                    .sum();
-                Rat::new(sum, scale.clone())
-            })
-            .collect();
-        let actual_seed = pulled[width..].to_vec();
-        let fresh_seed: Vec<Rat> = pulled[..width]
-            .iter()
-            .zip(&pulled[width..])
-            .map(|(source, context)| source - context)
-            .collect();
-
-        actual_images.push(actual_seed);
-        fresh_images.push(fresh_seed);
         actual_reads.push((actual_anchor, gradient.clone()));
         fresh_reads.push((fresh_anchor, gradient.clone()));
         paired_reads.push((physical_feature, gradient.clone()));
     }
-    let mut seed_groups = actual_images.clone();
-    seed_groups.extend(fresh_images.clone());
+    let mut seed_groups: Vec<Vec<Rat>> =
+        images.iter().map(|image| image[..width].to_vec()).collect();
+    seed_groups.extend(images.iter().map(|image| image[width..].to_vec()));
     let precision = holonics::hnn::chart::ReturnPrecision::for_seeds(Some(lattice), &seed_groups)?;
     let expected_fine = lattice
         .exponent()
@@ -1414,66 +1435,31 @@ pub(crate) fn paired_source(
             reason: "paired reverse lanes share a refinement of the fixed forward transient lattice",
         });
     }
-    let actual = source_from_images(field, plan, actual_images, actual_reads, precision.clone())?;
-    let fresh = source_from_images(field, plan, fresh_images, fresh_reads, precision)?;
+    let split = stage
+        .carry(plan.lw, precision.levels(), true)
+        .map_err(|error| error.into_hnn())?;
+    let carried = |start: usize| -> Result<Vec<i64>, HnnError> {
+        split.coordinates.iter().flat_map(|row| row[start..start + width].iter())
+            .map(|value| num_traits::ToPrimitive::to_i64(value).ok_or(HnnError::Carrier {
+                what: "a paired receiving covector past the legacy reverse word's signed 64-bit coordinate",
+            })).collect()
+    };
+    let actual = Source {
+        carried: carried(0)?,
+        remainder: split.remainders[..width].to_vec(),
+        reads: actual_reads,
+        precision: precision.clone(),
+    };
+    let fresh = Source {
+        carried: carried(width)?,
+        remainder: split.remainders[width..].to_vec(),
+        reads: fresh_reads,
+        precision,
+    };
     Ok(PairedSource {
         actual,
         fresh,
         reads: paired_reads,
-    })
-}
-
-fn source_from_images(
-    field: &Field,
-    plan: &WordPlan,
-    images: Vec<Vec<Rat>>,
-    reads: Vec<(Vec<Rat>, Vec<Rat>)>,
-    precision: holonics::hnn::chart::ReturnPrecision,
-) -> Result<Source, HnnError> {
-    let width = field.ring(plan.receiver).width();
-    if images.len() != plan.aperture
-        || reads.len() != plan.aperture
-        || images.iter().any(|image| image.len() != width)
-    {
-        return Err(HnnError::Shape {
-            what: "one paired reverse image and read per receiving phase",
-            expected: plan.aperture,
-            found: images.len(),
-        });
-    }
-    let lattice =
-        field
-            .word_lattice()
-            .map(|word| word.transient())
-            .ok_or(HnnError::Realization {
-                what: "a field whose word runs on no declared lattice",
-            })?;
-    let normalized = images
-        .iter()
-        .map(|image| {
-            image
-                .iter()
-                .map(|coordinate| scale_pow2(coordinate, precision.levels()))
-                .collect::<Result<Vec<_>, _>>()
-        })
-        .collect::<Result<Vec<_>, _>>()?;
-    let mut remainder = vec![Rat::zero(); width];
-    let mut carried = vec![0i64; plan.aperture * width];
-    for phase in (0..plan.aperture).rev() {
-        let split = carry(&lattice, &normalized[phase], &mut remainder);
-        for (coordinate, value) in split.iter().enumerate() {
-            let value = value * Rat::from_integer(BigInt::from(1) << plan.lw as usize);
-            carried[phase * width + coordinate] =
-                num_traits::ToPrimitive::to_i64(&value.to_integer()).ok_or(HnnError::Carrier {
-                    what: "a paired receiving covector past the signed 64-bit word",
-                })?;
-        }
-    }
-    Ok(Source {
-        carried,
-        remainder,
-        reads,
-        precision,
     })
 }
 
@@ -1735,7 +1721,7 @@ pub(crate) fn word_return(
         reads: source.reads,
         released: Remainders::of(&remainders),
         precision: source.precision,
-        response_defect: None,
+        response_defect: None, response_geometry: None,
     })
 }
 

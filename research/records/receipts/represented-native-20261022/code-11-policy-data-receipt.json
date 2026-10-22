@@ -1,0 +1,33 @@
+{
+  "native_attempt_reservation": 0,
+  "native_attempt_charge": 0,
+  "native_counts": null,
+  "command": [
+    "bash",
+    "-c",
+    "exec \"$@\"",
+    "_",
+    "<private-runtime>/alpha-v93-represented-native-7ca320/binaries/policy-data",
+    "hnn::constitution::receiving_material::tests::represented_native_declaration_does_not_reinterpret_reached_blocks",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "limit_s": 15,
+  "wall_ns": 101748430,
+  "peak_rss_bytes": 1490944,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 1,
+  "exit": 0,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 348825956258,
+  "ledger_after_ns": 348927704688,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

@@ -385,6 +385,33 @@ pub enum HnnError {
     /// THE_MACHINE guard 9: an encoded passage this field does not read.
     #[error("the encoded passage does not enter this field: {reason}")]
     Unadmitted { reason: &'static str },
+    /// Exact source-preparation refusal; diagnostic operands never weaken the bound.
+    #[error("class control preparation work/range bound at source {source_cells}: work {work:?} (bound {max_abs_work:?}), work bits {work_numerator_bits}/{work_denominator_bits}, added max bits {added_numerator_bits}/{added_denominator_bits}, limit {rational_bits}")]
+    ClassPreparationBound {
+        source_cells: u64,
+        work: Option<Box<Rat>>,
+        max_abs_work: Option<Box<Rat>>,
+        work_magnitude_exceeded: bool,
+        work_range_exceeded: bool,
+        added_range_exceeded: bool,
+        work_numerator_bits: u64,
+        work_denominator_bits: u64,
+        added_numerator_bits: u64,
+        added_denominator_bits: u64,
+        rational_bits: u64,
+    },
+    /// Exact class control refusal, captured only after authentic producing-cut admission.
+    #[error("quadratic class control refused at source {source_cells}/commit {commit}, ring {ring}: controls {found}/{expected}, max numerator {numerator_bits}, denominator {denominator_bits}, coordinate cap {rational_bits}; evidence {control:?}")]
+    QuadraticControlBound {
+        source_cells:u64, commit:u64, ring:usize, opened_at:usize,
+        found:usize, expected:usize, rational_bits:u64,
+        numerator_bits:u64, denominator_bits:u64,
+        max_nonnegative:bool, valid_precision:bool,
+        /// Bounded actual values; None means diagnostic extent refused, never acceptance.
+        control:Option<Vec<Rat>>, max_abs_work:Option<Box<Rat>>,
+    },
+    #[error("quadratic work extent at {stage}: requested {requested_bits}, integer cap {integer_limit}, aggregate {aggregate_used}/{aggregate_limit}")]
+    QuadraticWorkExtent {stage:&'static str,requested_bits:u64,integer_limit:u64,aggregate_used:u64,aggregate_limit:u64},
     /// Publication requires one reached occurrence and its bounded contemporary operand.
     #[error("receiving precision occurrence mismatch: ledger={occurrence}, arrived={arrived}")]
     PrecisionOccurrence { occurrence: bool, arrived: bool },
@@ -407,6 +434,8 @@ pub enum HnnError {
     /// encoding's refusals are wide.
     #[error(transparent)]
     Encoding(Box<encoding::EncodingError>),
+    #[error("the addressed reciprocal source port refused: {0}")]
+    ReciprocalPaired(Box<paired::PairedDefect>),
     #[error("a count of the moment would pass the machine word; the moment refuses it")]
     CountOverflow,
     #[error("ring {ring} is a source ring but the constitution carries no source port for it")]
@@ -427,6 +456,20 @@ pub enum HnnError {
     WordEnded { ticks: usize },
     #[error("the crib of {cells} cells has no pair at offset {offset}")]
     Crib { cells: usize, offset: usize },
+    #[error("native receiving section refused: {source}; evidence: {evidence:?}")]
+    NativeEpochRefusal { source:Box<HnnError>, evidence:Box<reference::observed::EpochStageRefusal> },
+    /// Genuine state radii are not the missing changed-material response proof.
+    #[error("represented native contact at source {source_cells} has actual/fresh state radii but no admitted uniform changed-chart material-ray response bound")]
+    RepresentedNativeGainUnavailable {source_cells:u64,commit:u64,lattice:chart::WordLattice,state_radii:Box<port::PairedReadDefect>,class_error_l1:Box<Rat>},
+    /// Physical-reference first variation against the ORIGINAL represented return, not a
+    /// derivative through rounding or finite score-decrease claim. Operative error preserved.
+    #[error("represented native physical ray not admitted at source {source_cells}, commit {commit}, {stage}: {reading:?}")]
+    RepresentedNativeRayNotAdmitted {source_cells:u64,commit:u64,stage:&'static str,reading:Box<word::native_prediction::NativePhysicalRayReading>},
+    /// Bounded exterior operands preserve the original operative refusal.
+    #[error("native preparation refused: {source}; source operands: {evidence}")]
+    NativePreparationRefusal {source:Box<HnnError>,evidence:String},
+    #[error("NativeRationalMomentsV1 extent: integer {integer_bits}/{integer_limit} bits, aggregate {aggregate_bits}/{aggregate_limit} bits")]
+    NativeRationalExtent { integer_bits:u64, integer_limit:u64, aggregate_bits:u64, aggregate_limit:u64 },
     #[error(
         "the successor constitution's {bits} exact bits exceed its budget of {budget} at commit {commit}; the loci that grew most: {loci:?}"
     )]
@@ -508,6 +551,8 @@ pub enum HnnError {
         "the deposit's storage growth is not certified: no dyadic ε in the declared search makes Q_(k+1) ⪯ (1 + ε) Q_k on the contacts' and resonators' storage forms"
     )]
     UncertifiedStorage,
+    #[error("epoch {crossing}'s nonzero represented step has no strictly positive exact fall")]
+    EpochStepNonDescending { crossing: u64 },
     #[error("deposits stopped at commit {commit}, when the constitution reached its budget")]
     DepositsStopped { commit: u64 },
     #[error(
@@ -516,6 +561,8 @@ pub enum HnnError {
     StaleDeposit { staged: u64, published: u64 },
     #[error("the locus {locus:?} is released; no deposit reaches it")]
     ReleasedLocus { locus: Locus },
+    #[error("returned current contact {contact} port reference refused: lift={lift:?}, word_ticks={word_ticks}, phase={phase}, exponent={exponent}, carry_exponent={carry_exponent}, admittance={admittance}, expected_G={expected:?}, carried_G={carried}")]
+    ReturnedPortReference { contact:usize, lift:Vec<num_bigint::BigInt>, word_ticks:usize, phase:u64, exponent:Box<Rat>, carry_exponent:num_bigint::BigInt, admittance:Box<Rat>, expected:Option<Box<Rat>>, carried:Box<Rat> },
     #[error("the continuing state refused: {what}")]
     ContinuingState { what: &'static str },
     #[error("the admitted family adds receivers on rings {receivers:?} to the previous boundary's")]

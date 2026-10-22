@@ -1,0 +1,7 @@
+
+running 1 test
+test hnn::constitution::epoch::rational::tests::native_rational_full_normal_phase_codec ... NATIVE_RATIONAL_FULL_ROUTE_PASS feature=-32/2187 two_station_mixed_2_3_5 numerical_odd_gt_u64 phase_period11 support=[0, 1] shares=[1, 1] represented_delta=[[Ratio { numer: 241, denom: 524288 }, Ratio { numer: 1, denom: 1024 }], [Ratio { numer: -7, denom: 131072 }, Ratio { numer: 85, denom: 524288 }], [Ratio { numer: -241, denom: 524288 }, Ratio { numer: -1, denom: 1024 }], [Ratio { numer: 9, denom: 262144 }, Ratio { numer: -51, denom: 524288 }]] H=[[Ratio { numer: 23918941, denom: 19131876 }, Ratio { numer: -793, denom: 7290 }], [Ratio { numer: -793, denom: 7290 }, Ratio { numer: 7, denom: 5 }]] news=[[Ratio { numer: 22616475967, denom: 50153065021440 }, Ratio { numer: 2430601, denom: 3822059520 }], [Ratio { numer: -9262344557, denom: 386178600665088 }, Ratio { numer: 2704351, denom: 29429858304 }], [Ratio { numer: -22616475967, denom: 50153065021440 }, Ratio { numer: -2430601, denom: 3822059520 }], [Ratio { numer: 1282712323, denom: 84285012049920 }, Ratio { numer: -3620213, denom: 64231833600 }]] held_once=true dyadic_subset_equal=true cold_exact=true device_refuses=true
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1788 filtered out; finished in 0.00s
+

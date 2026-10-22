@@ -1,0 +1,322 @@
+{
+  "utc": "2026-10-22T01:27:24.823556+00:00",
+  "closed": true,
+  "code_charge_ns": 288033856053,
+  "code_ceiling_ns": 360000000000,
+  "native_reservation": 640,
+  "native_attempts_measured": 138,
+  "native_unused_non_recyclable": 502,
+  "native_invocations": 1,
+  "no_retry": true,
+  "runtime_source": "42521565eadaef7ab614a0bde80c4612fed2da3d",
+  "runtime_source_payloads": [
+    {
+      "path": "crates/holonics/examples/solenoidal_alpha/complete_language/native_context_controls.rs",
+      "sha256": "70e20f65d052c247ce0faeafd48b67d666c1be6f2b5d03022e212d70d1f8d850",
+      "runtime_git_matches_compiled": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/mod.rs",
+      "sha256": "eed98dcc090a8e7349811032bb31a2fb2105a67c00d9487d3783469f30b9127e",
+      "runtime_git_matches_compiled": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/interaction.rs",
+      "sha256": "f14e592ca99553ad3b8743c4088571ebfab9f2ef0da480d1858da90b9f2d8b14",
+      "runtime_git_matches_compiled": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/native_context.rs",
+      "sha256": "7255140a5f8113c46a452a07d2661cd135cbd7484aa073fa443c4e25115c5d9a",
+      "runtime_git_matches_compiled": true
+    }
+  ],
+  "binaries": [
+    {
+      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data",
+      "sha256": "c16b65821de25375e1c5a4cbce0658ac09e2b2107cbf8679c9dd1e9b9faf7e59"
+    },
+    {
+      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/connected",
+      "sha256": "2617a290892c2ea375c43b7424a1c9645d761e44889b28ea5611c8d2f7128388"
+    }
+  ],
+  "all_guards_terminal": true,
+  "all_owned_cleanup_empty": true,
+  "passed": [
+    "runtime library/unit/example builds",
+    "two rational data controls",
+    "original pending6 full native cold restore and wrong work-budget refusal",
+    "original cut7 work accepted",
+    "firstR publication at original source9, original carry preserved",
+    "R Applied31 map coordinates, no Held decline",
+    "final actual source ingress9to10 once with original M cut/lag"
+  ],
+  "runtime_terminal": {
+    "error": "ContinuingState: the state's material off its loci's lattices",
+    "location": "post-firstR cold mount",
+    "native_wall_ns": 5113864250,
+    "first_R_live_published": true,
+    "first_R_checkpoint_file_not_written": true,
+    "applied_coordinates": 31,
+    "held": false,
+    "actual_inputs": 10,
+    "post_R_cold_pass": false
+  },
+  "follow_on_code": {
+    "cause": "NormalLaw::on_lattice unconditionally checked gram.is_dyadic for explicitly native rational statistics",
+    "repair": "Native policy admits bounded canonical H/news via EpochLaw owner; keeps map dyadic/lattice and legacy Gram rule",
+    "validation": "cargo check library+example PASS code07; not executed in native/cold test",
+    "new_runtime_elf": false
+  },
+  "transitions": {
+    "pending6_cold": "PASS",
+    "R0to10": "PASS",
+    "post_R_cold": "FAILED before scoped compatibility correction",
+    "actual_contact10to11": "NOT_REACHED",
+    "R11to20": "NOT_REACHED",
+    "R20to30_close": "NOT_REACHED",
+    "final_cold": "NOT_REACHED",
+    "four_warm_cold_frozen": "NOT_REACHED"
+  },
+  "still_incomplete": [
+    "native cold restore after scoped compatibility correction",
+    "genuine contact after R",
+    "next R and source30 deferred close",
+    "full final native cold and four matching warm/cold decisions",
+    "explicit injected late-final-ingress fault control not run; atomic source/crib clone and publication guards preserved",
+    "CUDA producer/chart/error/gain/rational packing and D6-D8"
+  ],
+  "gpu": 0,
+  "datasets": 0,
+  "training_campaigns": 0,
+  "output_campaigns": 0,
+  "receipts": [
+    {
+      "name": "code-01-build",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--lib",
+        "--example",
+        "solenoidal_alpha",
+        "--no-run"
+      ],
+      "limit_s": 180,
+      "wall_ns": 16167412263,
+      "peak_rss_bytes": 2272002048,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 161,
+      "exit": 101,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 0,
+      "ledger_after_ns": 16167412263,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "name": "code-02-build",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--lib",
+        "--example",
+        "solenoidal_alpha",
+        "--no-run"
+      ],
+      "limit_s": 180,
+      "wall_ns": 124184386385,
+      "peak_rss_bytes": 3836026880,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 1237,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 16167412263,
+      "ledger_after_ns": 140351798648,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "name": "code-03-final-build",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--lib",
+        "--example",
+        "solenoidal_alpha",
+        "--no-run"
+      ],
+      "limit_s": 180,
+      "wall_ns": 123993339546,
+      "peak_rss_bytes": 3941453824,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 1235,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 140351798648,
+      "ledger_after_ns": 264345138194,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "name": "code-04-data",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "bash",
+        "-c",
+        "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data hnn::constitution::epoch::rational:: --nocapture"
+      ],
+      "limit_s": 10,
+      "wall_ns": 101894921,
+      "peak_rss_bytes": 1503232,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 1,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 264345138194,
+      "ledger_after_ns": 264447033115,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "name": "code-05-native",
+      "native_attempt_reservation": 640,
+      "native_attempt_charge": 138,
+      "native_counts": {
+        "final": true,
+        "total_attempts": 138,
+        "forward_constructors": 108,
+        "response_companions": 10,
+        "actual_returns": 10,
+        "fresh_returns": 10
+      },
+      "command": [
+        "bash",
+        "-c",
+        "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/connected --exact complete_language::native_context_controls::native_original_word_final_ingress_transition --ignored --nocapture"
+      ],
+      "limit_s": 90,
+      "wall_ns": 5113864250,
+      "peak_rss_bytes": 123977728,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 51,
+      "exit": 101,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 264447033115,
+      "ledger_after_ns": 269560897365,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "name": "code-06-cold-compatibility-check",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "holonics",
+        "--lib",
+        "--example",
+        "solenoidal_alpha"
+      ],
+      "limit_s": 45,
+      "wall_ns": 8333023745,
+      "peak_rss_bytes": 1338667008,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 83,
+      "exit": 101,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 269560897365,
+      "ledger_after_ns": 277893921110,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "name": "code-07-cold-compatibility-check",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "check",
+        "-p",
+        "holonics",
+        "--lib",
+        "--example",
+        "solenoidal_alpha"
+      ],
+      "limit_s": 45,
+      "wall_ns": 10139934943,
+      "peak_rss_bytes": 1231798272,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 101,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 277893921110,
+      "ledger_after_ns": 288033856053,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    }
+  ]
+}

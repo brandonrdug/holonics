@@ -1,0 +1,7 @@
+{
+  "context": "supported HOST executor",
+  "status": "0, NVIDIA GeForce RTX 4080 SUPER, 595.71.05, 16376, 1341, 38",
+  "compute": [],
+  "project_lock": "<repository>/.local/gpu.lock",
+  "display_permitted": true
+}

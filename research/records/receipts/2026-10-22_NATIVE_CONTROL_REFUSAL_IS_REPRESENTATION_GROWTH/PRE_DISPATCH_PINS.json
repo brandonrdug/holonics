@@ -1,0 +1,18 @@
+{
+  "source": "80cb6dfaab78c7de88e160f631c3df33be9885ae",
+  "base": "7cacbf49710015b6d860e7654dba6b8918a87dd0",
+  "binary_sha256": "2eb66c171b1a9f3965280e355f6444209133b98abf52086f93f21bb985f990d9",
+  "binary_bytes": 25135432,
+  "typed_diagnostic_markers_verified": true,
+  "payloads": {
+    "crates/holonics/examples/solenoidal_alpha/complete_language/native_context_controls.rs": "08a4f94ef86e974952465106e34c792c8440916211a31235c5445d0fb403034d",
+    "crates/holonics/src/hnn/mod.rs": "46837d588065d9c82f150db3cb87d896e15f34e8f8a51ad0083f6d2bcd42b9c8",
+    "crates/holonics/src/hnn/reference/native_context.rs": "5c57f796174140d709df37c524292455a64e5b04fc5caf2b98bab766e1356db1",
+    "crates/holonics/src/hnn/reference/prepared_input.rs": "fcb8470c5dde6ed471774e8595f21ac826d547a58cadd65a9e8a45eb0aa6bf71",
+    "crates/holonics/src/hnn/word/action/quadratic_work.rs": "d65371242b05db2cc83a2da76a90089a1b8b7cbb56252ad294e0be7102fe0281"
+  },
+  "one_native_max_seconds": 30,
+  "reservation": 220,
+  "no_retry": true,
+  "scope_sha256": "2cc8bf351f8265cfb237c8c0ef681d66de64fdfd02468431b592e413614465bc"
+}

@@ -16,4 +16,23 @@ run check cargo check --workspace --all-targets
 run guard-lints cargo clippy -p holonics --all-targets -- -D clippy::disallowed_types \
   -D clippy::disallowed_methods -D clippy::float_arithmetic
 run guard-doctests env RUSTC_BOOTSTRAP=1 cargo test -p holonics --doc
+run diagnostic-timing-controls cargo test -p holonics --example listener continuing::diagnostic::
+run diagnostic-supervisor-controls python3 tools/test_listener_diagnostic_stage.py
+run diagnostic-receipt-controls python3 tools/test_listener_diagnostic_receipts.py
+run listener-continuation-controls cargo test -p holonics --example listener continuing::tests::
+run projected-statistics-controls cargo test -p holonics --lib projected_statistics_tests
+run native-class-advance-controls cargo test -p holonics --lib class_advance_tests
+run native-gram-carry-conservation cargo test -p holonics --lib gram_carry_conservation_tests
+run finite-solenoidal-controls cargo test -p holonics --lib solenoid
+run rational-place-controls cargo test -p holonics --lib ratio::places::tests::
+run plural-coupling-controls cargo test -p holonics --lib receiver::coupling::tests::
+run grouped-tube-controls cargo test -p holonics --lib constitution::tube_tests
+run observed-tube-controls cargo test -p holonics --lib observed_tube_passage
+run source-refinement-controls cargo test -p holonics --lib source_refinement_tests
+run actual-source-alignment cargo test -p holonics --lib actual_source_face_reads
+run actual-ray-joint-controls cargo test -p holonics --lib actual_ray_
+run actual-factor-refusal cargo test -p holonics --lib nonlinear_material_and_finer_source
+run refined-source-native-restore cargo test -p holonics --lib refined_source_map_is_consumed
+run solenoidal-listener-controls cargo test -p holonics --example listener solenoidal
+run offline-coupling-controls cargo test -p holonics --example solenoidal_coupling
 exit $status

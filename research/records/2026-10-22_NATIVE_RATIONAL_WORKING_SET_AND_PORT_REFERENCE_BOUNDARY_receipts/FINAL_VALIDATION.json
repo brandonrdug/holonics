@@ -1,0 +1,271 @@
+{
+  "utc": "2026-10-22T00:54:20.396811+00:00",
+  "closed": true,
+  "parent": "fcf6de9d8d461771b901aaad9677ed09453ed6fe",
+  "code_charge_ns": 237842881492,
+  "code_ceiling_ns": 300000000000,
+  "native_reservation": 512,
+  "native_attempts": 138,
+  "unused_reservation_non_recyclable": 374,
+  "all_guards_terminal": true,
+  "all_owned_cleanup_empty": true,
+  "passed": [
+    "final library and example test builds",
+    "two rational data controls",
+    "width6 exact H=I+v*vT cold positivity and codec",
+    "grouped integer direction agrees with exact rational majorants",
+    "actual LCM addition and shared denominator checks",
+    "expanded-view and genuine-product resource refusals",
+    "pending6 full native cold equality and wrong pending resource refusal",
+    "original cut7 work and ten actual staged events",
+    "post-refusal accepted6/published0/pending6 whole-delivery rollback exact"
+  ],
+  "resource_width6": {
+    "gram_integer_bits": 1537,
+    "old_false_aggregate": 4066480,
+    "minor_bound_bits": 9242,
+    "scalar_product_bound_bits": 18486,
+    "live_working_bits": 383847,
+    "integer_cap": 65536,
+    "aggregate_cap": 1048576
+  },
+  "native_terminal": {
+    "exit": 101,
+    "wall_ns": 3311796785,
+    "error": "ContinuingState: the returned current keeps its actual port reference frame",
+    "events_staged": 10,
+    "first_R_committed": false,
+    "new_contact_reached": false,
+    "next_R_reached": false,
+    "frozen_decisions_reached": 0
+  },
+  "diagnosis": {
+    "guard": "reference/interaction.rs publish_reception_with_variation_kind contact reference admission",
+    "predicate": "exponent.phase !=0 OR 2^exponent.carry * field.contact(a).admittance != carry.conductances[a]",
+    "native_path": [
+      "native_context section executes/publishes last blind Word at source9",
+      "ingest_class_step_deferred advances SourceMoment/Current to source10, keeping carried Word state",
+      "stage/admit local R candidate",
+      "publish_receiving_translation reuses exactly that carry at advanced Current",
+      "common publication reference guard refuses"
+    ],
+    "evidence": "unique source error site plus10successfully staged observer callbacks; not a replay or reconstructed failed packet",
+    "numeric_failed_contact_operands": "not emitted by this guard; contact index/phase/exponents/conductances unavailable; no numeric values invented",
+    "existing_reference_crossing": "ReceptionCarry::crossed at next Word opening transports arrivals and retains momentum; reflected work has its own owner",
+    "remedy_boundary": "typed original Word/carry reference and current-lift identity through R-only publication/cold, or a separately proved ordering/join; no skip, conductance overwrite or extra Word/ingress"
+  },
+  "incomplete": [
+    "first R continuation publication",
+    "post-R native cold mount",
+    "new actual ContactCut publication after R",
+    "next R section",
+    "four matching frozen warm/cold decisions",
+    "card producer/chart/error/gain/rational packing and D6-D8"
+  ],
+  "no_retry": true,
+  "gpu": 0,
+  "dataset": 0,
+  "training": 0,
+  "output_campaign": 0,
+  "pins": {
+    "binaries": [
+      {
+        "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-resource-connected-fcf6de9/binaries/data",
+        "sha256": "30ae53b988ea955dfa661613d8be6c3cfae9d53e518b28bd26e367244c47b404"
+      },
+      {
+        "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-resource-connected-fcf6de9/binaries/connected",
+        "sha256": "8d402a86ef5b837bbc08a147312c341be0c9640c52244763155fe62aa95c64b5"
+      }
+    ],
+    "source": [
+      {
+        "path": "crates/holonics/examples/solenoidal_alpha/complete_language/native_context_controls.rs",
+        "sha256": "5ed5c7aaac62adc0c92ac29410155a9c381b260c488bcb12e5efd4ae52de0e54"
+      },
+      {
+        "path": "crates/holonics/src/hnn/constitution/epoch.rs",
+        "sha256": "d01b31d2c5a2577e9af956b6c76ef0014f5a18905db8a2b0ed907c95f693abe1"
+      },
+      {
+        "path": "crates/holonics/src/hnn/constitution/epoch/checkpoint.rs",
+        "sha256": "6c7cf712132cf0a9641686b9b5871b4a8985bd4b09020b9874b965ca3a30f513"
+      },
+      {
+        "path": "crates/holonics/src/hnn/constitution/epoch/deposit/paired_receiving.rs",
+        "sha256": "ed003f74efbdf5e062b34afa0670aa0d7fa4275d248eb3e5336b404102ae2bcc"
+      },
+      {
+        "path": "crates/holonics/src/hnn/constitution/epoch/rational.rs",
+        "sha256": "62c33e5c040b6afdf2e9eb785c4993a3d74f203274cc52d10a1e451e4719abff"
+      }
+    ],
+    "phase_native_reservation": 512,
+    "planned_native_guard_s": 60,
+    "native_guard_reason": "within <=90 per-call and remaining300-second cumulative scope; no extension"
+  },
+  "receipts": [
+    {
+      "name": "code-01-build",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--lib",
+        "--example",
+        "solenoidal_alpha",
+        "--no-run"
+      ],
+      "limit_s": 150,
+      "wall_ns": 55011668045,
+      "peak_rss_bytes": 4332199936,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 548,
+      "exit": 101,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 0,
+      "ledger_after_ns": 55011668045,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "name": "code-02-build",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--lib",
+        "--example",
+        "solenoidal_alpha",
+        "--no-run"
+      ],
+      "limit_s": 150,
+      "wall_ns": 55009355801,
+      "peak_rss_bytes": 3589648384,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 548,
+      "exit": 101,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 55011668045,
+      "ledger_after_ns": 110021023846,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "name": "code-03-build",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "holonics",
+        "--lib",
+        "--example",
+        "solenoidal_alpha",
+        "--no-run"
+      ],
+      "limit_s": 150,
+      "wall_ns": 124408088190,
+      "peak_rss_bytes": 3903389696,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 1239,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 110021023846,
+      "ledger_after_ns": 234429112036,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "name": "code-04-data",
+      "native_attempt_reservation": 0,
+      "native_attempt_charge": 0,
+      "native_counts": null,
+      "command": [
+        "bash",
+        "-c",
+        "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-resource-connected-fcf6de9/binaries/data hnn::constitution::epoch::rational:: --nocapture"
+      ],
+      "limit_s": 15,
+      "wall_ns": 101972671,
+      "peak_rss_bytes": 1896448,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 1,
+      "exit": 0,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 234429112036,
+      "ledger_after_ns": 234531084707,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    },
+    {
+      "name": "code-05-full-transition",
+      "native_attempt_reservation": 512,
+      "native_attempt_charge": 138,
+      "native_counts": {
+        "final": true,
+        "total_attempts": 138,
+        "forward_constructors": 108,
+        "response_companions": 10,
+        "actual_returns": 10,
+        "fresh_returns": 10
+      },
+      "command": [
+        "bash",
+        "-c",
+        "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-resource-connected-fcf6de9/binaries/connected --exact complete_language::native_context_controls::native_rational_full_transition --ignored --nocapture"
+      ],
+      "limit_s": 60,
+      "wall_ns": 3311796785,
+      "peak_rss_bytes": 63500288,
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "samples": 33,
+      "exit": 101,
+      "stop": null,
+      "owned_cleanup_remaining": [],
+      "ledger_before_ns": 234531084707,
+      "ledger_after_ns": 237842881492,
+      "model_jobs": 0,
+      "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+    }
+  ]
+}

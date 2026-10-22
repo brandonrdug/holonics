@@ -1,0 +1,16 @@
+{
+  "base": "43c33bc69b86dcc8f4b703bcf6812effdc8a5320",
+  "build_receipt_sha256": "c17d61cacfaa1a666fcd5c34ab1d775337560d7cdfe92b696c0f52349449303d",
+  "source": {
+    "crates/holonics/src/hnn/constitution.rs": "1257b1acb9136853599ee1262c8101ac1c0edd210f70f32509728c16a2d226a0",
+    "crates/holonics/src/hnn/constitution/epoch.rs": "c07544626dc5797afec3dfe409861c554ab577e21f5e4612f8bd0152b8ca0a08",
+    "crates/holonics/src/hnn/constitution/epoch/rational.rs": "f1d5782e1c33cffdd0cf4f9ec0fd65462254b122b3ff211ccd1a955b3b4a4b11",
+    "crates/holonics/examples/solenoidal_alpha/complete_language/native_context_controls.rs": "d439b3de22a860157cbcb87208ee4d6a02629efa0690a2e08bcf665fe4615e51"
+  },
+  "binaries": {
+    "data": "4b27299036013eedbeae0e48674dfa1919d0018c485b8f8250f05dedceab0c6f",
+    "connected": "dedf703ea3b78386d38a0517c46083c5e7a6d251a7e30717970792ebe573ab70"
+  },
+  "native_dispatched": false,
+  "native_reservation": 640
+}

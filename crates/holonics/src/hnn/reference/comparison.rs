@@ -18,7 +18,7 @@
 use super::*;
 use crate::compression::landmark::context::LandmarkFace;
 use crate::hnn::constitution::ComparisonCandidate;
-use crate::hnn::ratio::TargetPhases;
+use crate::hnn::ratio::{HolonRatio, TargetPhases};
 
 /// The least h with 2^(-h)|d_i| < u_i 2^(-k_m-1) at every stepped entry.
 /// The h=0 candidate supplies pass 1's lattice/clock and pass 2's exact update coordinates.
@@ -67,6 +67,14 @@ pub struct ComparisonReading {
     pub unchanged: bool,
     pub strictly_improved: bool,
     pub objective_change: ExactInterval,
+    /// Exterior epoch diagnostic at this same reading demand: the native population class-code
+    /// difference before adding phase excess. None on the legacy frozen-word comparison path.
+    /// This receipt does not alter the objective or any candidate admission decision.
+    pub epoch_class_code_change: Option<ExactInterval>,
+    /// Exterior epoch diagnostic paired with epoch_class_code_change: after minus before phase
+    /// excess, in the existing ratio owner's exact units. Both are Some on an epoch comparison,
+    /// with objective_change = epoch_class_code_change + point(epoch_phase_excess_change).
+    pub epoch_phase_excess_change: Option<Rat>,
     pub reading_bits: u32,
     pub refinement_rounds: u32,
     pub retained_interval_members: usize,
@@ -203,6 +211,32 @@ impl FrozenComparison {
         &self.before
     }
 
+    /// The exact wave already used by this live comparison. A diagnostic may adjust these
+    /// logits under a fixed map while retaining this comparison's saved target phases and tree
+    /// faces; it does not refine, ingest, or manufacture a second target.
+    pub fn wave(&self) -> &Faces {
+        &self.wave
+    }
+
+    /// Rebuild the combined ratio faces using this comparison's retained tree faces and target
+    /// phase context. Read-only callers can compare a held wave without re-hearing or rebuilding
+    /// the frozen opening.
+    pub fn combined_faces(&self, wave: &Faces) -> Result<Faces, HnnError> {
+        self.ratio.phases().combine(wave, &self.trees)
+    }
+
+    /// Re-evaluate the descent covector against the frozen target, phase and tree context for a
+    /// supplied wave. The return uses the normal law's descent convention (`q - p̃`, including
+    /// the phase part), the negation of `HolonRatio::covector()`'s objective gradient.
+    pub fn recompare_covector(&self, wave: &Faces) -> Result<Vec<Vec<Rat>>, HnnError> {
+        let faces = self.combined_faces(wave)?;
+        let comparison = HolonRatio::compare(faces, &self.targets, &self.target_phases)?;
+        let covector = comparison.covector()?;
+        Ok((0..wave.faces.len())
+            .map(|phase| covector.descent(phase))
+            .collect())
+    }
+
     /// Exact executed-logit diagnostics, independent of objective enclosure precision.
     pub fn wave_changes(&self, wave: &Faces) -> ComparisonWaveChanges {
         let deltas = wave
@@ -297,6 +331,8 @@ impl FrozenComparison {
             )?,
             before: self.before.clone(),
             after,
+            epoch_class_code_change: None,
+            epoch_phase_excess_change: None,
             reading_bits: crate::ratio::exponentiated::READING_BITS,
             refinement_rounds: 0,
             retained_interval_members: self
@@ -434,10 +470,14 @@ mod tests {
             unchanged: false,
             strictly_improved: false,
             objective_change: ExactInterval::new(integer(-1), integer(3)).unwrap(),
+            epoch_class_code_change: None,
+            epoch_phase_excess_change: None,
             reading_bits: 96,
             refinement_rounds: 0,
             retained_interval_members: 0,
         };
+        assert_eq!(reading.epoch_class_code_change, None);
+        assert_eq!(reading.epoch_phase_excess_change, None);
         assert!(reading.needs_precision());
         assert_eq!(
             reading.unresolved_reason(),
@@ -643,8 +683,11 @@ mod tests {
         assert!(neutral_reading.unchanged);
         assert_eq!(admitted.unwrap().0, neutral_material);
         let neutral_state = neutral_material.continuing_state(0).unwrap();
-        let neutral_state =
-            crate::hnn::constitution::ContinuingState::from_text(&neutral_state.to_text()).unwrap();
+        let neutral_state = crate::hnn::constitution::ContinuingState::from_text(
+            &neutral_state.to_text(),
+            before.budget(),
+        )
+        .unwrap();
         assert_eq!(
             before.clone().continued(&neutral_state).unwrap(),
             neutral_material

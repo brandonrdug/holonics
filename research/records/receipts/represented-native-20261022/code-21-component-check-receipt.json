@@ -1,0 +1,29 @@
+{
+  "native_attempt_reservation": 0,
+  "native_attempt_charge": 0,
+  "native_counts": null,
+  "command": [
+    "cargo",
+    "check",
+    "-p",
+    "holonics",
+    "--lib"
+  ],
+  "limit_s": 90,
+  "wall_ns": 9431826492,
+  "peak_rss_bytes": 1403064320,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 94,
+  "exit": 0,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 552905415992,
+  "ledger_after_ns": 562337242484,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

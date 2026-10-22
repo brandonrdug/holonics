@@ -1,0 +1,30 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "holonics",
+    "--example",
+    "solenoidal_alpha",
+    "unified_prepared_command_crosses_sections_aeon_and_cold_prefix",
+    "--",
+    "--nocapture"
+  ],
+  "limit_s": 180,
+  "wall_ns": 3114660812,
+  "peak_rss_bytes": 406409216,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 31,
+  "exit": 101,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 66331786636,
+  "ledger_after_ns": 69446447448,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

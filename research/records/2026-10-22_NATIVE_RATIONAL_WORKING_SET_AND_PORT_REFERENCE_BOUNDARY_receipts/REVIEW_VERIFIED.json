@@ -1,0 +1,30 @@
+{
+  "receipt_sha256": "8bcd362b34d1e0092030347cfe517575206a9327a2dc234c6f9831714d592c7f",
+  "checks": [
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/rational.rs",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/checkpoint.rs",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch.rs",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/deposit/paired_receiving.rs",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution.rs",
+      "base_matches": true
+    },
+    {
+      "path": "crates/holonics/examples/solenoidal_alpha/complete_language/native_context_controls.rs",
+      "base_matches": true
+    }
+  ],
+  "all_match": true
+}

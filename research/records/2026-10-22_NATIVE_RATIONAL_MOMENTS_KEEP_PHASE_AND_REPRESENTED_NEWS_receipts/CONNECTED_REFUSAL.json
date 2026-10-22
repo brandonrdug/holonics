@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-22T00:18:32.936673+00:00",
+  "status": "connected_refused_preserved; data_only_resource_accounting_repair_build_active",
+  "failure": {
+    "error": "NativeRationalExtent",
+    "integer_bits": 17952,
+    "integer_limit": 65536,
+    "aggregate_bits": 2656896,
+    "aggregate_limit": 1048576,
+    "publication": false,
+    "rollback": "accepted6 published0 pending6 exact",
+    "events_staged": 10,
+    "source7_work_accepted": true
+  },
+  "attempts": {
+    "reserved": 240,
+    "actual": 138,
+    "unrecyclable_unused": 102
+  },
+  "closed_code_charge_ns": 374953862202,
+  "ceiling_ns": 600000000000,
+  "active": "13-final-data-build max150s zero native attempts",
+  "native_rerun_authorized_in_phase": false,
+  "next_native_obligation": "one pinned final binary pending6 firstR cold four frozen in a distinct separately declared envelope; no rebuild needed if final build passes",
+  "full_failed_samples_captured": false,
+  "raw_evidence": "preserved control log includes original first odd feature coordinate at every exposed cut; before-refusal structured stage evidence was discarded by native_context map_err in that tested source; final source now retains it",
+  "gpu": "unfinished, no GPU dispatch/model/data work"
+}

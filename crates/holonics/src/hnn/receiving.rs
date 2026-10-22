@@ -13,7 +13,7 @@
 //!
 //! ```text
 //! a_j = [x_(p+j−1), …, x_p, x_(p−1), …]_D        phase j's address: the epoch's earlier targets, then the active suffix address
-//! f_j = k(a_j)/L_R + R · v_R(e_j)                complex logits over |A| classes, realified [Re, Im, …], v_R in the passage frame
+//! f_j = log2(q_T(. | a_j)) + R · v_R(e_j)                complex logits over |A| classes, realified [Re, Im, …], v_R in the passage frame
 //! 2^(k_c) ≤ q(c | a_j)^(L_R) < 2^(k_c+1)         the tree face's grain exponent (integer comparisons)
 //! Re f_c = n_c + k_c/L_R + ε_c,  ε_c ∈ [0, 1/L_R)   the grain cell (carry, phase class) and the fibre
 //! φ^H_c = Im f_c / 2                             each class's phase, in turns
@@ -150,8 +150,27 @@
 use std::ops::Range;
 
 pub mod cells;
+mod single_grain;
+pub(crate) mod native_current;
+pub use single_grain::{LogarithmicFibre, ReceivingCell, ReceivingFibre, RetainedFibreReceiver};
+mod comparison_score;
+pub use comparison_score::{ComparedScoresAt, compare_scores_at};
+mod selected;
+pub(crate) use selected::{prepare_retained_section, prepare_native_retained_section, prepare_native_retained_section_with_policy};
+pub use selected::{
+    ReceivingLaw, SelectedComparedScoresAt, SelectedFaceReading, SelectedScored,
+    compare_scores_at_law, score_at_law,
+};
+mod aligned_return;
+pub(crate) use aligned_return::pack_simplex;
+#[cfg(test)]
+pub(crate) mod reuse_work;
+pub(crate) use aligned_return::RetainedSectionOrigin;
+pub use aligned_return::{
+    RetainedReturnPolicy, RetainedSectionReturn, RetainedSectionSourceReading, RetainedStationReturn,
+};
 mod declaration;
-pub(crate) use declaration::DeclaringFace;
+pub(crate) use declaration::{DeclaringFace,NativeRankCache};
 
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, ToPrimitive, Zero};
@@ -207,12 +226,14 @@ pub fn tree_code_length(face: &LandmarkFace, class: usize) -> Result<ExactInterv
     Face::of_read(&read, face.grain)?.code_length(class)
 }
 
-/// [definition] **One receiving read**: the exact realified logits `f`, each class's grain cell of
-/// `Re f_c`, and each class's phase `φ^H_c = Im f_c / 2` in turns.
+/// One receiving read: rational realified port coordinates, each class's exact grain read,
+/// and phase Im/2. For a wave alone logits is its full rational logit; a combined read keeps
+/// that same rational wave component and carries log2(q_tree) in its cells' typed fibres.
+/// The full real value is never represented by a rational logit surrogate.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceivingRead {
     pub logits: Vec<Rat>,
-    pub cells: Vec<GrainCell>,
+    pub cells: Vec<ReceivingCell>,
     pub phases: Vec<Rat>,
 }
 
@@ -223,7 +244,10 @@ impl ReceivingRead {
     pub fn of_logits(logits: Vec<Rat>, grain: u64) -> Self {
         let classes = logits.len() / 2;
         let cells = indexed(classes, |class| {
-            Ok::<_, HnnError>(GrainCell::of(&logits[2 * class], grain))
+            Ok::<_, HnnError>(ReceivingCell::from(GrainCell::of(
+                &logits[2 * class],
+                grain,
+            )))
         })
         .expect("a grain reading refuses nothing");
         let phases = logits.chunks(2).map(|pair| &pair[1] / integer(2)).collect();
@@ -234,30 +258,15 @@ impl ReceivingRead {
         }
     }
 
-    /// **The combined read** (module header): the wave's exact logits `R v_R` plus the
-    /// tree face's grain logits, read at the grain. Refused when the two disagree in length or
-    /// grain. The host reference and every device realization form their faces here.
+    /// One grain read of the exact sum log2(q_tree) + wave, never of the tree's
+    /// already-grained representative plus wave. The exact tree fibre remains a typed
+    /// logarithmic identity; only a straddled cell asks the native log owner for more bits.
+    ///
+    /// logits keeps rational wave/port coordinates, not an approximate full real logit.
+    /// The full real value is the cell representative plus its typed fibre, readable through
+    /// ReceivingCell::enclosure_at. Imaginary coordinates and their phase pullback are unchanged.
     pub fn combined(wave: Vec<Rat>, tree: &LandmarkFace, grain: u64) -> Result<Self, HnnError> {
-        let stored = grain_logits(tree);
-        if stored.len() != wave.len() || tree.grain != grain {
-            return Err(HnnError::Shape {
-                what: "the tree face's grain logits against the wave's logits",
-                expected: wave.len(),
-                found: stored.len(),
-            });
-        }
-        let logits = wave
-            .into_iter()
-            .zip(stored)
-            .map(|(wave, stored)| {
-                if stored.is_zero() {
-                    wave
-                } else {
-                    wave + stored
-                }
-            })
-            .collect();
-        Ok(Self::of_logits(logits, grain))
+        single_grain::combined(wave, tree, grain)
     }
 }
 
@@ -1343,6 +1352,8 @@ pub struct Scored {
     pub model: Vec<ExactInterval>,
     pub tree: Vec<ExactInterval>,
     pub steps: Vec<ReceivingStep>,
+    /// Exterior face operands before each target is received; never retained or used to score.
+    pub face_readings: Vec<cells::ScoredFaceReading>,
 }
 
 /// The receiver's population's first family: the landmark tree's executed face `q_T`.
@@ -1417,8 +1428,12 @@ pub fn score(
         model: Vec::with_capacity(targets.len()),
         tree: Vec::with_capacity(targets.len()),
         steps: Vec::with_capacity(targets.len()),
+        face_readings: Vec::with_capacity(targets.len()),
     };
     for ((face, tree), &target) in combined.faces.iter().zip(trees).zip(targets) {
+        scored
+            .face_readings
+            .push(cells::ScoredFaceReading::new(&local, tree, face));
         let q_tree = tree
             .probabilities
             .get(target)
@@ -1452,6 +1467,36 @@ pub fn score_at(
     targets: &[usize],
     bits: u32,
 ) -> Result<Scored, HnnError> {
+    score_at_with(
+        population,
+        ring,
+        combined,
+        trees,
+        targets,
+        bits,
+        |_, face, target| face_enclosure_at(face, target, bits),
+        |_, probability| tree_code_at(probability, bits),
+    )
+}
+
+fn tree_code_at(probability: &Rat, bits: u32) -> Result<ExactInterval, HnnError> {
+    let log = crate::ratio::algebraic::log2_enclosure_at(probability, bits)?;
+    Ok(ExactInterval::new(-log.upper, -log.lower)?)
+}
+
+// Both public scorers enter this same engine. Only owner-computed target masses and exact
+// same-probability tree codes may replace their repeated expression readings.
+#[allow(clippy::too_many_arguments)]
+fn score_at_with(
+    population: &PortPopulation,
+    ring: usize,
+    combined: &Faces,
+    trees: &[LandmarkFace],
+    targets: &[usize],
+    bits: u32,
+    mut mass: impl FnMut(usize, &Face, usize) -> Result<ExactInterval, HnnError>,
+    mut tree_code: impl FnMut(usize, &Rat) -> Result<ExactInterval, HnnError>,
+) -> Result<Scored, HnnError> {
     if combined.faces.len() != trees.len() || trees.len() != targets.len() {
         return Err(HnnError::Shape {
             what: "one combined face, one tree face and one target per phase",
@@ -1464,8 +1509,14 @@ pub fn score_at(
         model: Vec::with_capacity(targets.len()),
         tree: Vec::with_capacity(targets.len()),
         steps: Vec::with_capacity(targets.len()),
+        face_readings: Vec::with_capacity(targets.len()),
     };
-    for ((face, tree), &target) in combined.faces.iter().zip(trees).zip(targets) {
+    for (phase, ((face, tree), &target)) in
+        combined.faces.iter().zip(trees).zip(targets).enumerate()
+    {
+        scored
+            .face_readings
+            .push(cells::ScoredFaceReading::new(&local, tree, face));
         let q_tree = tree
             .probabilities
             .get(target)
@@ -1474,14 +1525,11 @@ pub fn score_at(
                 alphabet: tree.probabilities.len(),
             })?
             .clone();
-        let log = crate::ratio::algebraic::log2_enclosure_at(&q_tree, bits)?;
-        scored
-            .tree
-            .push(ExactInterval::new(-log.upper, -log.lower)?);
+        scored.tree.push(tree_code(phase, &q_tree)?);
         let step = ReceivingStep {
             ring,
             tree: q_tree,
-            combined: face_enclosure_at(face, target, bits)?,
+            combined: mass(phase, face, target)?,
         };
         scored.model.push(
             local
@@ -2056,6 +2104,8 @@ impl SourceObserverMaterial {
 pub enum ObservationPartition {
     MaximumRealGrainSet,
     ReceivingSection,
+    /// Actual source-frontier framing, sealed before target and native forward.
+    SourceFramingRouteV1,
 }
 
 /// [definition; agent-inferred, L3] **The letters of one section point**: its rest
@@ -2067,12 +2117,13 @@ impl ObservationPartition {
         match self {
             Self::MaximumRealGrainSet => "maximum-real-grain-set-v1",
             Self::ReceivingSection => "receiving-section-v1",
+            Self::SourceFramingRouteV1 => "source-framing-route-v1",
         }
     }
 
     /// The partition read from its saved tag.
     pub fn of_tag(tag: &str) -> Option<Self> {
-        [Self::MaximumRealGrainSet, Self::ReceivingSection]
+        [Self::MaximumRealGrainSet, Self::ReceivingSection, Self::SourceFramingRouteV1]
             .into_iter()
             .find(|partition| partition.tag() == tag)
     }
@@ -2083,6 +2134,7 @@ impl ObservationPartition {
     pub fn outcome_bits(self, field: &Field, ring: usize) -> usize {
         match self {
             Self::MaximumRealGrainSet => field.alphabet(),
+            Self::SourceFramingRouteV1 => 2,
             Self::ReceivingSection => {
                 let n = field.ring(ring).period();
                 let points: u64 = (1..=n).filter(|d| n.is_multiple_of(*d)).sum();
@@ -2094,7 +2146,7 @@ impl ObservationPartition {
     /// How the landmark tree reads the letters ([`ObservationRole`]).
     pub fn role(self) -> ObservationRole {
         match self {
-            Self::MaximumRealGrainSet => ObservationRole::Route,
+            Self::MaximumRealGrainSet | Self::SourceFramingRouteV1 => ObservationRole::Route,
             Self::ReceivingSection => ObservationRole::Refine,
         }
     }
@@ -2105,6 +2157,7 @@ impl ObservationPartition {
         Ok(match self {
             Self::MaximumRealGrainSet => ObservationPath::from_membership_bits(bits)?,
             Self::ReceivingSection => ObservationPath::from_section_bits(bits)?,
+            Self::SourceFramingRouteV1 => ObservationPath::from_source_framing_bits(bits)?,
         })
     }
 
@@ -2148,6 +2201,7 @@ impl ObservationPartition {
                     Ok(path)
                 })
                 .collect(),
+            Self::SourceFramingRouteV1 => Err(HnnError::Unadmitted { reason:"source framing is sealed by its actual source producer, not a receiving-wave callback" }),
             Self::ReceivingSection => anchors
                 .iter()
                 .map(|anchor| section_bits(field, phases.ring(), anchor))

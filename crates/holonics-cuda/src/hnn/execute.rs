@@ -145,7 +145,7 @@ const WC_SHIFT_GAIN: usize = 17;
 const WC_SHIFT_GAIN_EXP: usize = 18;
 const WC_ZETA_EXP: usize = 19;
 
-const WS_STRIDE: usize = 10;
+const WS_STRIDE: usize = 11;
 const WQ_STRIDE: usize = 8;
 
 /// The word buffer's arrays, in the kernels' `WL_*` order.
@@ -343,6 +343,14 @@ fn gather(field: &Field, ring: usize, k: &BigInt) -> Vec<i64> {
 impl WordPlan {
     /// **Form a word's plan** at a lift point on a publication, for a receiving epoch (module
     /// header), with the moment's count layout (its phase rows' and offset blocks' bases).
+    /// The native contact receiver keeps a FULL tick after its last read.
+    /// One extra terminal junction is executed solely to expose that endpoint;
+    /// no target or additional physical hop is inserted.
+    pub(crate) fn native_full_ticks(&mut self,full:usize)->Result<(),HnnError>{
+        if full!=self.steps||!self.resonators.is_empty(){return Err(refused("native card full-tick contract and no loaded stages"));}
+        self.steps=full.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        self.plan[WP_STEPS]=self.steps as i64;Ok(())
+    }
     pub(crate) fn form(
         field: &Field,
         current: &Current,
@@ -444,7 +452,8 @@ impl WordPlan {
                 .sources
                 .iter()
                 .find(|source| source.ring == g)
-                .map(|source| open_exponent(source, population))
+                .map(|source| { let base=open_exponent(source,population)?;
+                    opens.iter().find(|o|o.ring==source.ring).ok_or_else(||refused("actual source-open operand"))?.prepared_exponent(base) })
                 .transpose()?;
             let storage_exp = (lc + swc + lw).max(open_exp.unwrap_or(0));
             let anchor_exp = lw + swc.max(h_shift);
@@ -653,11 +662,17 @@ impl WordPlan {
             for c in 0..phases_g {
                 plan.extend(gather(field, g, &(&lift[g] - BigInt::from(c))));
             }
-            let open_exp = open_exponent(source, population)?;
             let open = opens
                 .get(s)
                 .filter(|open| open.ring == g && open.pairs.len() == source.pairs.len())
                 .ok_or_else(|| refused("the source's normalized open against its loci"))?;
+            let open_exp = open.prepared_exponent(open_exponent(source,population)?)?;
+            let preparation_at=if let Some(control)=&open.preparation {
+                if control.len()!=widths[g]{return Err(refused("prepared opening has the actual source width"));}
+                let at=plan.len();
+                for value in control {plan.push(word(value,open_exp,"exact prepared source coordinate fits the signed card word")?);}
+                at as i64
+            }else{-1};
             let first_pair = pair_entries.len();
             for (o, pair) in source.pairs.iter().enumerate() {
                 let rank = pair.rank;
@@ -690,6 +705,7 @@ impl WordPlan {
             record[6] = i64::from(marginal_shift);
             record[7] = source.pairs.len() as i64;
             record[8] = first_pair as i64;
+            record[10] = preparation_at;
             record[9] = i64::try_from(open.marginal)
                 .map_err(|_| refused("a population chart numerator past the signed word"))?;
         }
@@ -915,6 +931,20 @@ mod source_scale_tests {
     }
 
     #[test]
+    fn prepared_source_common_scale_is_lossless_or_refused() {
+        use super::SourceOpen;
+        use holonics::ratio::{integer,rat};
+        let mut open=SourceOpen{ring:0,marginal:1,pairs:Vec::new(),preparation:Some(vec![rat(1,1<<24)])};
+        assert_eq!(open.prepared_exponent(17).unwrap(),24);
+        assert!(crate::hnn::dyadic::word(&open.preparation.as_ref().unwrap()[0],17,"old source scale cannot carry delta").is_err());
+        assert_eq!(crate::hnn::dyadic::word(&open.preparation.as_ref().unwrap()[0],24,"new scale").unwrap(),1);
+        open.preparation=Some(vec![rat(1,3)]);assert!(open.prepared_exponent(17).is_err());
+        open.preparation=Some(vec![integer(1)/(num_bigint::BigInt::from(1)<<121usize),integer(1)]);
+        let wide=open.prepared_exponent(17).unwrap();
+        assert!(crate::hnn::dyadic::word(&integer(1),wide,"existing signed word bound refuses the common scale").is_err());
+    }
+
+    #[test]
     fn pair_scale_tracks_projected_output_with_unprojected_read_factors() {
         let original = PairLoci {
             rank: 1,
@@ -1007,9 +1037,22 @@ pub(crate) struct SourceOpen {
     pub(crate) ring: usize,
     pub(crate) marginal: u64,
     pub(crate) pairs: Vec<u64>,
+    preparation: Option<Vec<Rat>>,
 }
 
 impl SourceOpen {
+    fn prepared_exponent(&self,base:u32)->Result<u32,HnnError>{
+        let extra=crate::hnn::dyadic::common_exponent(self.preparation.iter().flatten(),"prepared source control is dyadic")?;
+        let result=base.max(extra);
+        Ok(result)
+    }
+    pub(crate) fn prepare(opens:&mut [Self],packet:&holonics::hnn::pending::SourceOpeningPreparation)->Result<(),HnnError>{
+        if !packet.receipt().closes(){return Err(refused("shared native preparation work closes"));}
+        let source=opens.iter_mut().find(|s|s.ring==packet.ring()).ok_or_else(||refused("prepared actual source ring"))?;
+        if source.preparation.is_some(){return Err(refused("one source opening preparation per card Word"));}
+        source.preparation=Some(packet.added().to_vec());Ok(())
+    }
+
     /// The open of every source ring of a field from a moment (the host's mirror), in the order of
     /// the published sources (the field's source rings).
     pub(crate) fn of(field: &Field, moment: &SourceMoment) -> Result<Vec<Self>, HnnError> {
@@ -1027,6 +1070,7 @@ impl SourceOpen {
                     ring,
                     marginal: chart.numerator(moment.population(ring)?),
                     pairs,
+                    preparation: None,
                 })
             })
             .collect()
@@ -1321,8 +1365,23 @@ fn refusal(status: &[u32], forward: bool) -> Option<HnnError> {
 // -------------------------------------------------------------------------------------------
 // the resident word
 
+/// Transient successful-forward wall windows. No checkpoint or law consumes these.
+/// Fresh/actual include host decode and any requested tube reports; launch/fetch windows
+/// include queued dependencies and must never be labeled pure GPU kernel time.
+#[derive(Clone, Copy, Debug, Default)]
+pub(crate) struct ForwardLaneCost {
+    pub shared_setup_ns: u128,
+    pub fresh_path_ns: u128,
+    pub fresh_error_trace_ns: u128,
+    pub actual_path_ns: u128,
+    pub actual_error_trace_ns: u128,
+    pub response_error_trace_calls: u64,
+    pub response_error_reference_calls: u64,
+    pub response_error_reference_ns:u128,
+}
 /// [definition] **One word's buffers on the card** (module header).
 pub(crate) struct ResidentWord<'c> {
+    pub(crate) forward_cost: ForwardLaneCost,
     card: &'c Card,
     pub(crate) plan: WordPlan,
     layout: WordLayout,
@@ -1349,6 +1408,10 @@ struct ResponseLane<'c> {
     octets: usize,
     storage_octets: usize,
     fresh_anchor_errors: Vec<Vec<Vec<Rat>>>,
+    report_requested: bool,
+    error_operands: Operands,
+    actual_error_record: Option<ForwardRecord>,
+    actual_opening_base: Option<EndChange>,
     actual_anchor_errors: Option<Vec<Vec<Vec<Rat>>>>,
 }
 
@@ -1391,6 +1454,10 @@ macro_rules! arguments {
 }
 
 impl<'c> ResidentWord<'c> {
+    pub(crate) fn card(&self) -> &'c Card {
+        self.card
+    }
+
     /// **Run a word's forward on the card** (module header): its plan and operands written, its
     /// charts gathered from the store's workspace, the pair ports' weights read against the moment,
     /// one launch of the word, and one read of its record.
@@ -1404,7 +1471,12 @@ impl<'c> ResidentWord<'c> {
         carried: Option<&CardBuffer<'c, u8>>,
         response_operands: Option<&Operands>,
         response_opening_base: Option<&EndChange>,
+        response_error_requested: bool,
+        validate_error_reference:bool,
     ) -> Result<(Self, Launches), HnnError> {
+        let forward_started = std::time::Instant::now();
+        let mut fresh_error_tube=None;
+        let mut response_error_reference_ns=0;
         let launches = Launches::derive(card, &plan)?;
         let layout = WordLayout::new(&plan, plan.contacts.len());
         let plan_words = card.upload(&plan.plan).map_err(device)?;
@@ -1473,6 +1545,10 @@ impl<'c> ResidentWord<'c> {
             card.launch(PAIR_ENTRY, &layout, &mut params)
                 .map_err(device)?;
         }
+        let shared_setup_ns = forward_started.elapsed().as_nanos();
+        let fresh_started = std::time::Instant::now();
+        let mut fresh_error_trace_ns = 0;
+        let mut actual_error_trace_ns = 0;
         let mut response = if matches!(
             plan.receiving_layout,
             ReceivingLayout::ArrivalContext { .. }
@@ -1552,8 +1628,16 @@ impl<'c> ResidentWord<'c> {
             let operands = response_operands.ok_or(HnnError::Unadmitted {
                 reason: "an ArrivalContext CUDA response has the producing charted operands",
             })?;
-            let fresh_anchor_errors =
-                response_error_trace(&response_plan, &record, operands, None)?;
+            ResponseTube::admit_operands(operands)?;
+            // The actual/fresh records are retained. Reports are requested separately;
+            // no empty numerical certificate is published in demand-off mode.
+            let fresh_anchor_errors=if response_error_requested {
+                let started=std::time::Instant::now();
+                let (exact,executed)=crate::hnn::readout::response_openings(&response_plan,&record)?;
+                let mut tube=ResponseTube::open(operands,&exact,&executed)?;
+                let errors=trace_response_tube(&response_plan,&record,&mut tube)?;
+                fresh_error_tube=Some(tube);fresh_error_trace_ns=started.elapsed().as_nanos();errors
+            } else {Vec::new()};
 
             Some(ResponseLane {
                 plan: response_plan,
@@ -1563,11 +1647,17 @@ impl<'c> ResidentWord<'c> {
                 octets: response_octets,
                 storage_octets: response_storage_octets,
                 fresh_anchor_errors,
+                report_requested: response_error_requested,
+                error_operands: operands.clone(),
+                actual_error_record: None,
+                actual_opening_base: response_opening_base.cloned(),
                 actual_anchor_errors: None,
             })
         } else {
             None
         };
+        let fresh_path_ns = if response.is_some() { fresh_started.elapsed().as_nanos() } else { 0 };
+        let actual_started = std::time::Instant::now();
         let mut plan_ptr = plan_words.device_ptr();
         let mut operands_ptr = operands.device_ptr();
         let mut published = publication.words.device_ptr();
@@ -1644,12 +1734,31 @@ impl<'c> ResidentWord<'c> {
             let operands = response_operands.ok_or(HnnError::Unadmitted {
                 reason: "the paired CUDA response retains its producing charted operands",
             })?;
-            let errors =
-                response_error_trace(&plan, &actual_record, operands, response_opening_base)?;
-            lane.actual_anchor_errors = Some(errors);
+            ResponseTube::admit_operands(operands)?;
+            lane.actual_error_record=Some(actual_record);
+            if response_error_requested {
+                let started=std::time::Instant::now();
+                let record=lane.actual_error_record.as_ref().unwrap();
+                let (exact,executed)=match response_opening_base {Some(base)=>crate::hnn::readout::response_openings_from(&plan,record,base)?,None=>crate::hnn::readout::response_openings(&plan,record)?};
+                let mut tube=fresh_error_tube.as_ref().unwrap().new_track(&exact,&executed)?;
+                let actual=trace_response_tube(&plan,record,&mut tube)?;
+                actual_error_trace_ns=started.elapsed().as_nanos();
+                if validate_error_reference || cfg!(test) {
+                    let reference_started=std::time::Instant::now();
+                    let old_fresh=response_error_trace(&lane.plan,&lane.record,&lane.error_operands,None)?;
+                    let old_actual=response_error_trace(&plan,record,&lane.error_operands,lane.actual_opening_base.as_ref())?;
+                    if lane.fresh_anchor_errors!=old_fresh || actual!=old_actual {return Err(refused("requested shared fresh/actual radii differ from independent original trace"));}
+                    response_error_reference_ns=reference_started.elapsed().as_nanos();
+                    #[cfg(test)] eprintln!("REQUESTED_NUMERICAL_TRACE_REFERENCE_EQUAL fresh_and_actual=true");
+                }
+                lane.actual_anchor_errors=Some(actual);
+            }
         }
         Ok((
             Self {
+                forward_cost: ForwardLaneCost { shared_setup_ns, fresh_path_ns,
+                    fresh_error_trace_ns, actual_path_ns: actual_started.elapsed().as_nanos(),
+                    actual_error_trace_ns, response_error_trace_calls: if response_error_requested && response.is_some(){2}else{0}, response_error_reference_calls:if response_error_reference_ns>0{2}else{0}, response_error_reference_ns },
                 card,
                 plan,
                 layout,
@@ -1828,6 +1937,22 @@ impl<'c> ResidentWord<'c> {
             .map(|lane| (&lane.plan, &lane.record))
     }
 
+    pub(crate) fn response_actual_opening(&self)->Option<&EndChange>{self.response.as_ref().and_then(|r|r.actual_opening_base.as_ref())}
+    /// Same actual GPU trajectory, WITH the separately fetched original source
+    /// numerators. The lean ordinary forward record deliberately omits them.
+    pub(crate) fn native_actual_record(&self)->Option<&ForwardRecord>{self.response.as_ref().and_then(|r|r.actual_error_record.as_ref())}
+    pub(crate) fn response_producing_operands(&self)->Option<&Operands>{self.response.as_ref().map(|r|&r.error_operands)}
+    pub(crate) fn response_error_requested(&self)->bool {self.response.as_ref().is_some_and(|r|r.report_requested)}
+    /// Real original records/operands, available only while this actual Word is retained.
+    pub(crate) fn request_response_anchor_errors(&mut self)->Result<(),HnnError> {
+        let lane=self.response.as_mut().ok_or_else(||refused("no paired producing records remain for an unsplit report"))?;
+        if lane.actual_anchor_errors.is_none() {
+            let (fresh,actual,_,_)=response_error_pair(&lane.plan,&lane.record,&self.plan,lane.actual_error_record.as_ref().ok_or_else(||refused("the actual report record is unavailable"))?,&lane.error_operands,lane.actual_opening_base.as_ref())?;
+            lane.fresh_anchor_errors=fresh;lane.actual_anchor_errors=Some(actual);
+            self.forward_cost.response_error_trace_calls+=2;
+        }
+        lane.report_requested=true;Ok(())
+    }
     pub(crate) fn response_anchor_errors(&self) -> Option<(&[Vec<Vec<Rat>>], &[Vec<Vec<Rat>>])> {
         self.response.as_ref().and_then(|lane| {
             lane.actual_anchor_errors
@@ -1847,6 +1972,17 @@ impl<'c> ResidentWord<'c> {
     }
 }
 
+fn response_error_pair(fresh_plan:&WordPlan,fresh_record:&ForwardRecord,actual_plan:&WordPlan,actual_record:&ForwardRecord,operands:&Operands,base:Option<&EndChange>)->Result<(Vec<Vec<Vec<Rat>>>,Vec<Vec<Vec<Rat>>>,u128,u128),HnnError>{
+    let started=std::time::Instant::now();
+    let (fe,fx)=crate::hnn::readout::response_openings(fresh_plan,fresh_record)?;
+    let (ae,ax)=match base {Some(b)=>crate::hnn::readout::response_openings_from(actual_plan,actual_record,b)?,None=>crate::hnn::readout::response_openings(actual_plan,actual_record)?};
+    let mut fresh=ResponseTube::open(operands,&fe,&fx)?;
+    let mut actual=fresh.new_track(&ae,&ax)?;
+    let f=trace_response_tube(fresh_plan,fresh_record,&mut fresh)?;
+    let fresh_ns=started.elapsed().as_nanos();let started=std::time::Instant::now();
+    let a=trace_response_tube(actual_plan,actual_record,&mut actual)?;
+    Ok((f,a,fresh_ns,started.elapsed().as_nanos()))
+}
 fn response_error_trace(
     plan: &WordPlan,
     record: &ForwardRecord,
@@ -1858,21 +1994,17 @@ fn response_error_trace(
         None => crate::hnn::readout::response_openings(plan, record)?,
     };
     let mut tube = ResponseTube::open(operands, &exact_opening, &executed_opening)?;
+    let mut errors=Vec::with_capacity(plan.steps);
+    for t in 0..plan.steps {let point=crate::hnn::readout::crossing_at(plan,record,t)?;let anchors=crate::hnn::readout::crossing_anchors(plan,record,t)?;errors.push(tube.anchors(&point,&anchors)?);if t+1<plan.steps {let next=crate::hnn::readout::crossing_at(plan,record,t+1)?;tube.advance(&point,&next,plan.opened_at.checked_add(t).ok_or(HnnError::CountOverflow)?)?;}}
+    Ok(errors)
+}
+fn trace_response_tube(plan:&WordPlan,record:&ForwardRecord,tube:&mut ResponseTube<'_>)->Result<Vec<Vec<Vec<Rat>>>,HnnError>{
     let mut anchor_errors = Vec::with_capacity(plan.steps);
     for crossing in 0..plan.steps {
         let point = crate::hnn::readout::crossing_at(plan, record, crossing)?;
         let anchors = crate::hnn::readout::crossing_anchors(plan, record, crossing)?;
-        anchor_errors.push(tube.anchors(&point, &anchors)?);
-        if crossing + 1 < plan.steps {
-            let next = crate::hnn::readout::crossing_at(plan, record, crossing + 1)?;
-            tube.advance(
-                &point,
-                &next,
-                plan.opened_at
-                    .checked_add(crossing)
-                    .ok_or(HnnError::CountOverflow)?,
-            )?;
-        }
+        let next=if crossing+1<plan.steps {Some(crate::hnn::readout::crossing_at(plan,record,crossing+1)?)}else{None};
+        anchor_errors.push(tube.crossing(&point,&anchors,next.as_ref(),plan.opened_at.checked_add(crossing).ok_or(HnnError::CountOverflow)?)?);
     }
     Ok(anchor_errors)
 }

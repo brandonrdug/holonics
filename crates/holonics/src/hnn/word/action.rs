@@ -47,6 +47,8 @@
 //! fixtures.
 
 use std::sync::Arc;
+mod quadratic_work;
+pub use quadratic_work::{NativeWorkBudget,PreparationWorkPolicy,QuadraticWorkReading};
 
 use num_traits::{One, Zero};
 
@@ -181,6 +183,15 @@ impl ActionProducer {
             opening: word.change()?,
             opened_at: word.opened_at(),
         })
+    }
+
+    // Direct forward preparation needs no affine response/J claim. The complete
+    // opening (visible values PLUS all existing incoming remainders) is retained.
+    fn native_forward(word:&Word<'_>)->Result<Self,HnnError>{
+        if word.source_preparation.is_some(){return Err(HnnError::Unadmitted{reason:"one source preparation per actual producing Word"});}
+        let opening=word.complete_unrun_opening()?;
+        let (constitution,current,source,support)=word.native_source.as_ref().ok_or(HnnError::Unadmitted{reason:"native forward preparation requires the actual ratio producer"})?;
+        Ok(Self{field:word.field.clone(),constitution:constitution.clone(),current:current.clone(),source:source.clone(),support:support.clone(),operands:word.operands.clone(),opening,opened_at:word.opened_at()})
     }
 
     fn matches(&self, word: &Word<'_>) -> bool {
@@ -351,13 +362,17 @@ fn apply_control<'c>(
     control: &[Rat],
 ) -> Result<(Word<'c>, PortPreparationReceipt, ActionProducer), HnnError> {
     let added = preparation.map.apply(control)?;
+    apply_control_added(producer,preparation,baseline,added,None)
+}
+fn apply_control_added<'c>(mut producer:ActionProducer,preparation:&PortPreparation,baseline:&Word<'c>,added:Vec<Rat>,supplied_form:Option<&PowerForm>)->Result<(Word<'c>,PortPreparationReceipt,ActionProducer),HnnError>{
     let ring = preparation.ring;
     let mut opening = producer.opening.clone();
     let old = opening.storage[ring].clone();
     for (x, delta) in opening.storage[ring].iter_mut().zip(&added) {
         *x += delta;
     }
-    let form = PowerForm::read(baseline.field, &producer.constitution, &producer.current)?;
+    let owned_form;
+    let form=if let Some(f)=supplied_form{f}else{owned_form=PowerForm::read(baseline.field,&producer.constitution,&producer.current)?;&owned_form};
     let before = form.power(&producer.opening)? + form.resonator_power(&producer.opening)?;
     let after = form.power(&opening)? + form.resonator_power(&opening)?;
     let quadratic = form.ring_power(ring, &added);
@@ -370,6 +385,7 @@ fn apply_control<'c>(
         cross,
         quadratic,
         added,
+        quadratic_work:None,
     };
     if !receipt.closes() {
         return Err(HnnError::Realization {
@@ -383,6 +399,9 @@ fn apply_control<'c>(
         opening.clone(),
         baseline.opened_at,
     )?;
+    // Repartitioning the complete original opening must retain every coordinate;
+    // inspecting only Word::change would miss its bounded feedback remainders.
+    if word.complete_unrun_opening()? != opening {return Err(HnnError::Realization{what:"lossless complete source preparation opening including feedback remainders"});}
     producer.opening = opening;
     producer
         .support
@@ -408,6 +427,7 @@ pub struct PortPreparationReceipt {
     pub cross: Rat,
     pub quadratic: Rat,
     pub added: Vec<Rat>,
+    pub quadratic_work:Option<QuadraticWorkReading>,
 }
 
 impl PortPreparationReceipt {
@@ -1098,5 +1118,165 @@ impl<'f> Word<'f> {
             },
             word,
         ))
+    }
+}
+
+/// A forward-only, producer-bound class-coordinate preparation. No receiving
+/// Jacobian, inverse, target or requested output is constructed. B=P^lift E is
+/// read from the actual admitted source snapshot, with the full native rotor.
+#[derive(Clone, Debug)]
+pub struct SourceClassPreparation {
+    producer: ActionProducer,
+    preparation: PortPreparation,
+    boundary: crate::hnn::encoding::observed::PairedObservation,
+}
+impl SourceClassPreparation {
+    pub fn at(
+        word: &Word<'_>,
+        boundary: &crate::hnn::encoding::observed::PairedObservation,
+        ring: usize,
+    ) -> Result<Self, HnnError> {
+        Self::from_producer(ActionProducer::of(word)?,boundary,ring)
+    }
+    pub(crate) fn at_native_forward(word:&Word<'_>,boundary:&crate::hnn::encoding::observed::PairedObservation,ring:usize)->Result<Self,HnnError>{
+        Self::from_producer(ActionProducer::native_forward(word)?,boundary,ring)
+    }
+    fn from_producer(producer:ActionProducer,boundary:&crate::hnn::encoding::observed::PairedObservation,ring:usize)->Result<Self,HnnError>{
+        boundary.check_material(&producer.constitution)?;
+        producer.field.admit(&boundary.encode(&[])?)?;
+        let port = boundary
+            .ports()
+            .iter()
+            .find(|p| p.carrier().ring() == ring)
+            .ok_or(HnnError::Unadmitted {
+                reason: "a class preparation uses an admitted observed source port",
+            })?;
+        let geometry = producer.field.ring(ring);
+        let lift = &producer.current.lift()[ring];
+        let e = port.injection();
+        let columns = (0..e.columns())
+            .map(|j| {
+                let v = (0..e.rows())
+                    .map(|i| e.get(i, j).cloned())
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(geometry.rotate(&v, lift))
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        let rows = (0..e.rows())
+            .map(|i| columns.iter().map(|c| c[i].clone()).collect())
+            .collect();
+        let preparation = PortPreparation::new(
+            &producer.field,
+            ring,
+            ExactRatMatrix::shaped(e.rows(), e.columns(), rows)?,
+        )?;
+        Ok(Self {
+            producer,
+            preparation,
+            boundary: boundary.clone(),
+        })
+    }
+    pub fn preparation(&self) -> &PortPreparation {
+        &self.preparation
+    }
+    pub fn lift(&self) -> &num_bigint::BigInt {
+        &self.producer.current.lift()[self.preparation.ring]
+    }
+    pub fn source_opening(&self) -> &[Rat] {
+        &self.producer.opening.storage[self.preparation.ring]
+    }
+    pub fn apply<'c>(
+        self,
+        baseline: Word<'c>,
+        control: &[Rat],
+        max_abs_work: &Rat,
+        rational_bits: u64,
+    ) -> Result<(Word<'c>, PortPreparationReceipt), HnnError> {
+        if !self.producer.matches(&baseline)
+            || baseline.ticks() != 0
+            || baseline.is_ended()
+            || baseline.complete_unrun_opening()? != self.producer.opening
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the class control consumes its own whole native source opening",
+            });
+        }
+        self.boundary.check_material(&self.producer.constitution)?;
+        if control.len() != self.preparation.controls()
+            || max_abs_work < &Rat::zero()
+            || !(64..=4096).contains(&rational_bits)
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "declared class-control domain/work/range bounds",
+            });
+        }
+        let check =
+            |q: &Rat| q.numer().bits() <= rational_bits && q.denom().bits() <= rational_bits;
+        if !control.iter().all(check) {
+            return Err(HnnError::Unadmitted {
+                reason: "class control rational range",
+            });
+        }
+        let source_cells=self.producer.source.cells();
+        let (mut word, receipt, _) =
+            apply_control(self.producer, &self.preparation, &baseline, control)?;
+        admit_class_preparation_bound(source_cells,&receipt.work,&receipt.added,max_abs_work,rational_bits)?;
+        // A paired receiving consumer's fresh column is this prepared input,
+        // while its actual complete opening keeps all the carried interior.
+        word.response_source=baseline.response_source.clone().map(|mut source|{for (x,d) in source[self.preparation.ring].iter_mut().zip(&receipt.added){*x+=d;}source});
+        word.response_opening_exact=baseline.response_opening_exact.clone().map(|mut opening|{for (x,d) in opening.storage[self.preparation.ring].iter_mut().zip(&receipt.added){*x+=d;}opening});
+        word.source_preparation=Some(receipt.clone());
+        Ok((word, receipt))
+    }
+}
+
+
+// Same predicate as the class application owner, exposed only to data-only unit controls.
+// Bit extents and predicate outcomes are always kept. Exact diagnostic scalars are copied only
+// up to8192 combined numerator/denominator bits each; no added-vector/Word tape is copied.
+// The failed finite control had no saved operand packet; this does not reconstruct that event.
+fn admit_class_preparation_bound(source_cells:u64,work:&Rat,added:&[Rat],max_abs_work:&Rat,rational_bits:u64)->Result<(),HnnError>{
+    let check=|q:&Rat|q.numer().bits()<=rational_bits&&q.denom().bits()<=rational_bits;
+    let work_range_exceeded=!check(work);let added_range_exceeded=!added.iter().all(check);
+    let work_magnitude_exceeded=num_traits::Signed::abs(work)>*max_abs_work;
+    if work_range_exceeded||added_range_exceeded||work_magnitude_exceeded{
+        let bounded_copy=|q:&Rat|(q.numer().bits().saturating_add(q.denom().bits())<=8192).then(||Box::new(q.clone()));
+        return Err(HnnError::ClassPreparationBound{source_cells,work:bounded_copy(work),max_abs_work:bounded_copy(max_abs_work),work_magnitude_exceeded,work_range_exceeded,added_range_exceeded,
+            work_numerator_bits:work.numer().bits(),work_denominator_bits:work.denom().bits(),
+            added_numerator_bits:added.iter().map(|q|q.numer().bits()).max().unwrap_or(0),
+            added_denominator_bits:added.iter().map(|q|q.denom().bits()).max().unwrap_or(0),rational_bits});
+    }
+    Ok(())
+}
+#[cfg(test)]
+mod preparation_bound_tests {
+    use super::*;
+    #[test]
+    fn exact_data_only_work_and_range_refusals_keep_distinct_operands(){
+        use num_bigint::BigInt;
+        let before=crate::hnn::word::work::read();
+        let bound=Rat::from_integer(BigInt::from(65536));
+        assert!(admit_class_preparation_bound(7,&bound,&[Rat::one()],&bound,1024).is_ok());
+        let cases=[(Rat::from_integer(BigInt::from(65537)),vec![Rat::zero()]),
+            (Rat::new(BigInt::from(1),BigInt::from(1)<<1024),vec![Rat::zero()]),
+            (Rat::zero(),vec![Rat::new(BigInt::from(1),BigInt::from(1)<<1024)])];
+        for (work,added) in cases {
+            match admit_class_preparation_bound(7,&work,&added,&bound,1024).unwrap_err(){
+                HnnError::ClassPreparationBound{source_cells,work:actual,max_abs_work,work_numerator_bits,work_denominator_bits,added_numerator_bits,added_denominator_bits,rational_bits,work_magnitude_exceeded,work_range_exceeded,added_range_exceeded}=>{
+                    assert_eq!(source_cells,7);assert_eq!(*actual.unwrap(),work);assert_eq!(*max_abs_work.unwrap(),bound);assert_eq!(rational_bits,1024);
+                    assert_eq!(work_magnitude_exceeded,num_traits::Signed::abs(&work)>bound);
+                    assert_eq!(work_range_exceeded,work.numer().bits()>1024||work.denom().bits()>1024);
+                    assert_eq!(added_range_exceeded,added[0].numer().bits()>1024||added[0].denom().bits()>1024);
+                    assert_eq!(work_numerator_bits,work.numer().bits());assert_eq!(work_denominator_bits,work.denom().bits());
+                    assert_eq!(added_numerator_bits,added[0].numer().bits());assert_eq!(added_denominator_bits,added[0].denom().bits());
+                },_=>panic!("typed exact source bound")
+            }
+        }
+        let huge=Rat::from_integer(BigInt::from(1)<<8192);
+        match admit_class_preparation_bound(7,&huge,&[],&bound,1024).unwrap_err(){
+            HnnError::ClassPreparationBound{work:None,work_numerator_bits:8193,work_magnitude_exceeded:true,work_range_exceeded:true,..}=>{},
+            _=>panic!("oversized diagnostics keep extents without copying the exact scalar")
+        }
+        assert_eq!(crate::hnn::word::work::read(),before);
     }
 }

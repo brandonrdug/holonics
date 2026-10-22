@@ -523,7 +523,7 @@ fn the_quartic_gain_is_deposited_saved_and_counted_in_its_declared_family() {
     let text = state.to_text();
     let restored = opening
         .clone()
-        .continued(&ContinuingState::from_text(&text).unwrap())
+        .continued(&ContinuingState::from_text(&text, opening.budget()).unwrap())
         .unwrap();
     assert_eq!(restored.resonator_gains(), next.resonator_gains());
     assert_eq!(restored.resonator_scales(0), next.resonator_scales(0));

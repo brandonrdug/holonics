@@ -132,7 +132,7 @@ fn checkpoint_counts(value: &str) -> Result<Vec<usize>> {
     Ok(counts)
 }
 
-fn save_checkpoint<R: ExposedResident>(
+pub(crate) fn save_checkpoint<R: ExposedResident>(
     resident: &R,
     opening: &Constitution,
     source: usize,
@@ -150,7 +150,7 @@ fn save_checkpoint<R: ExposedResident>(
         return Err(format!("checkpoint {path:?} differed after write/read-back").into());
     }
     let read_back_text = std::str::from_utf8(&read_back)?;
-    let parsed = ContinuingState::from_text(read_back_text)?;
+    let parsed = ContinuingState::from_text(read_back_text, opening.budget())?;
     if parsed != state {
         return Err(
             format!("checkpoint {path:?} did not parse to its exact resident state").into(),
@@ -165,6 +165,122 @@ fn save_checkpoint<R: ExposedResident>(
     println!(
         "checkpoint completed_sections={completed} kind=full_resident path={path:?} source_ring={source} bytes={} byte_roundtrip_equal=true state_parse_equal=true constitution_equal=true passage_included=true",
         read_back.len(),
+    );
+    Ok(())
+}
+
+/// Cost discovery for the existing resident codec, with create-only exterior publication.
+/// This does not serialize ObservedCrib and cannot claim an observed-listener resume.
+#[allow(
+    clippy::disallowed_methods,
+    clippy::disallowed_types,
+    reason = "create-only checkpoint cost measurement is exterior example I/O"
+)]
+pub(crate) fn save_checkpoint_cost_profile<R: ExposedResident>(
+    resident: &R,
+    opening: &Constitution,
+    source: usize,
+    directory: &str,
+    completed: usize,
+    receiver_clock: (usize, u64),
+    mut check: impl FnMut(&str) -> Result<()>,
+) -> Result<()> {
+    use std::io::Write;
+    let path = checkpoint_path(directory, completed);
+    let staged_path = format!("{path}.tmp");
+    if std::path::Path::new(&path).exists() || std::path::Path::new(&staged_path).exists() {
+        return Err("cost checkpoint refuses an existing destination or staging file".into());
+    }
+    check("resident snapshot")?;
+    let started = Instant::now();
+    let state = resident
+        .continuing_state(source)?
+        .with_receiver_ingress_ticks(receiver_clock.0, receiver_clock.1)?;
+    println!(
+        "cost_checkpoint component=snapshot elapsed_ns={}",
+        elapsed(started)
+    );
+    if state.passage().is_none() {
+        return Err("cost checkpoint lacks the continuing passage".into());
+    }
+    check("resident serialization")?;
+    let started = Instant::now();
+    let text = state.to_text();
+    println!(
+        "cost_checkpoint component=serialize elapsed_ns={} bytes={}",
+        elapsed(started),
+        text.len()
+    );
+    check("checkpoint create-only I/O")?;
+    let started = Instant::now();
+    if let Some(parent) = std::path::Path::new(&path).parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let mut staged = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&staged_path)?;
+    staged.write_all(text.as_bytes())?;
+    staged.sync_all()?;
+    drop(staged);
+    let staged_bytes = std::fs::read(&staged_path)?;
+    if staged_bytes != text.as_bytes() {
+        return Err("cost checkpoint staged readback differs".into());
+    }
+    // A hard link publishes atomically and refuses a raced-in destination. Keep the exact
+    // staging inode as private evidence; no existing file is replaced or removed.
+    std::fs::hard_link(&staged_path, &path)?;
+    let committed = std::fs::read(&path)?;
+    // Include publication-directory persistence in the measured I/O, as a production save does.
+    // The separate staging name is deliberately preserved as private exact-byte evidence.
+    let parent = std::path::Path::new(&path)
+        .parent()
+        .ok_or("checkpoint has no directory")?;
+    std::fs::File::open(parent)?.sync_all()?;
+    println!(
+        "cost_checkpoint component=create_sync_read_link_read_directory_fsync elapsed_ns={} bytes={} staging_preserved=true staging_reason=private_exact_byte_evidence directory_fsync=true",
+        elapsed(started),
+        committed.len()
+    );
+    if committed != text.as_bytes() {
+        return Err("cost checkpoint committed readback differs".into());
+    }
+    check("resident checkpoint parse")?;
+    let started = Instant::now();
+    let parsed = ContinuingState::from_text(std::str::from_utf8(&committed)?, opening.budget())?;
+    println!(
+        "cost_checkpoint component=parse elapsed_ns={}",
+        elapsed(started)
+    );
+    check("resident checkpoint exact state equality")?;
+    let started = Instant::now();
+    if parsed != state {
+        return Err("cost checkpoint parsed state differs".into());
+    }
+    println!(
+        "cost_checkpoint component=state_equality elapsed_ns={}",
+        elapsed(started)
+    );
+    check("checkpoint constitution reconstruction")?;
+    let started = Instant::now();
+    let restored = opening.clone().continued(&parsed)?;
+    println!(
+        "cost_checkpoint component=constitution_reconstruct elapsed_ns={}",
+        elapsed(started)
+    );
+    check("checkpoint constitution equality")?;
+    let started = Instant::now();
+    if &restored != resident.constitution() {
+        return Err("cost checkpoint reconstructed constitution differs".into());
+    }
+    println!(
+        "cost_checkpoint component=constitution_equality elapsed_ns={}",
+        elapsed(started)
+    );
+    check("checkpoint completion")?;
+    println!(
+        "cost_checkpoint complete=true scope=resident_only completed_cells={completed} bytes={} byte_roundtrip_equal=true state_parse_equal=true constitution_equal=true receiver_ingress_clock={receiver_clock:?} observed_crib_codec=false observed_resume=false",
+        committed.len(),
     );
     Ok(())
 }
@@ -189,7 +305,7 @@ fn save_latest_checkpoint<R: ExposedResident>(
     if read_back != text.as_bytes() {
         return Err(format!("latest checkpoint {path:?} differed after write/read-back").into());
     }
-    let parsed = ContinuingState::from_text(std::str::from_utf8(&read_back)?)?;
+    let parsed = ContinuingState::from_text(std::str::from_utf8(&read_back)?, opening.budget())?;
     if parsed != state || opening.clone().continued(&parsed)? != *resident.constitution() {
         return Err(
             format!("latest checkpoint {path:?} failed state/constitution round-trip").into(),
@@ -252,7 +368,7 @@ pub(crate) fn field(population: u64) -> Result<Field> {
 
 /// An exact sum of code-length enclosures, reported with integer endpoints `[⌊Σ lower⌋, ⌈Σ upper⌉]`.
 #[derive(Clone, Debug)]
-struct CodeSum {
+pub(super) struct CodeSum {
     lower: Rat,
     upper: Rat,
     cells: u64,
@@ -269,13 +385,13 @@ impl Default for CodeSum {
 }
 
 impl CodeSum {
-    fn add(&mut self, interval: &ExactInterval) {
+    pub(super) fn add(&mut self, interval: &ExactInterval) {
         self.lower += &interval.lower;
         self.upper += &interval.upper;
         self.cells += 1;
     }
 
-    fn merge(&mut self, other: &CodeSum) {
+    pub(super) fn merge(&mut self, other: &CodeSum) {
         self.lower += &other.lower;
         self.upper += &other.upper;
         self.cells += other.cells;
@@ -287,6 +403,15 @@ impl CodeSum {
             self.lower.floor().to_integer(),
             self.upper.ceil().to_integer()
         )
+    }
+
+    /// Exact endpoints of the summed enclosure; no exterior integer rounding.
+    pub(super) fn exact_endpoints(&self) -> String {
+        format!("[{},{}]", self.lower, self.upper)
+    }
+
+    pub(super) fn cells(&self) -> u64 {
+        self.cells
     }
 }
 
@@ -657,7 +782,8 @@ fn population_line(constitution: &Constitution, ring: usize) -> String {
 }
 
 /// The wave face's exact spread over the classes: the number of distinct grain cells
-/// `(carry, phase)` and the number of distinct fibres. A face's mass reads only its grain cell
+/// `(carry, phase)` and distinct rational fibres of the listener's raw wave face.
+/// A face's mass reads only its grain cell
 /// (`p̂_c = 2^(n_c − n_top) θ^(k_c) / Z`, `hnn::ratio::Face`), so the face is exactly uniform iff the
 /// first count is 1: Face validates 0 <= phase < grain, making carry + phase/grain injective.
 /// Distinct fibres under one grain cell are motion that stays below the grain.
@@ -667,7 +793,15 @@ fn face_spread(face: &Face) -> (usize, usize) {
         .iter()
         .map(|cell| (&cell.carry, cell.phase))
         .collect();
-    let fibres: BTreeSet<&Rat> = face.cells().iter().map(|cell| &cell.fibre).collect();
+    let fibres: BTreeSet<&Rat> = face
+        .cells()
+        .iter()
+        .map(|cell| {
+            cell.fibre
+                .as_rational()
+                .expect("listener flatness reads the raw rational wave face")
+        })
+        .collect();
     (cells.len(), fibres.len())
 }
 
@@ -833,6 +967,7 @@ mod diagnostic_tests {
             key: None,
             bits: 4,
             face: vec![ExactInterval::point(rat(1, 4))],
+            scored_face: None,
         };
         let before = cell.clone();
         let code = drawn_code(&cell, 0).unwrap();
@@ -1314,7 +1449,7 @@ where
     };
     let mut resident = if let Some(path) = &options.checkpoint_in {
         let text = String::from_utf8(read(path)?)?;
-        let state = ContinuingState::from_text(&text)?;
+        let state = ContinuingState::from_text(&text, material.budget())?;
         if state.ring() != 0 || state.passage().is_none() {
             return Err("--checkpoint-in requires a full source-0 resident continuation".into());
         }

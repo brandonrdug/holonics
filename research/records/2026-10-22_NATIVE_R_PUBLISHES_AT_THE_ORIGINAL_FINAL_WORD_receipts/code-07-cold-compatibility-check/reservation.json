@@ -1,0 +1,13 @@
+{
+  "name": "07-cold-compatibility-check",
+  "maximum_attempts": 0,
+  "command": [
+    "cargo",
+    "check",
+    "-p",
+    "holonics",
+    "--lib",
+    "--example",
+    "solenoidal_alpha"
+  ]
+}

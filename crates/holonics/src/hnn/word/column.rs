@@ -3,7 +3,8 @@
 //! This transient operand producer opens no Word and advances no physical clock. It executes
 //! the producing Word's operators and crossings; the ordinary transpose is the executed linear
 //! surrogate, not a derivative through nearest-cell rounding. Admission to a receiving read
-//! additionally requires a propagated column defect certificate (owned by the paired read).
+//! requires its authenticated executed paired geometry. Unsplit path radii are separate
+//! requested evidence; omission never denotes a zero radius or unsplit gain proof.
 
 use super::*;
 
@@ -15,13 +16,16 @@ pub(crate) struct ResponseColumn {
     /// Coordinate bounds against the unsplit physical source response at every crossing.
     pub(crate) anchor_errors: Vec<Vec<Vec<Rat>>>,
     carried: Carried,
+    exact_opening: EndChange,
 }
 
 impl ResponseColumn {
+    pub(super) fn original_opening(&self)->&EndChange { &self.exact_opening }
     /// `source` is the mode-qualified physical injection before its opening split, with zero
     /// storage outside source rings. Interior contact and resonator states open at zero.
     /// Held exterior returns overwrite the corresponding response by zero at the actual tick.
     pub(crate) fn execute(word: &Word<'_>, source: Vec<Vec<Rat>>) -> Result<Self, HnnError> {
+        work::response_call();
         let ops = word.operands();
         let widths: Vec<_> = word.field().rings().iter().map(|r| r.width()).collect();
         if source.len() != widths.len()
@@ -105,30 +109,30 @@ impl ResponseColumn {
             storage: exact_source,
             ..end.clone()
         };
-        let mut tube = crate::hnn::prediction::charted::ResponseTube::open(ops, &exact, &end)?;
+        crate::hnn::prediction::charted::ResponseTube::admit_operands(ops)?;
+        let mut tube = if word.response_error_requested() {Some(crate::hnn::prediction::charted::ResponseTube::open(ops, &exact, &end)?)} else {None};
         let mut result = Self {
             records: Vec::new(),
             resonances,
             end,
             carried,
             anchor_errors: Vec::new(),
+            exact_opening: exact,
         };
         for crossing in 0..word.recorded().len() {
             // The actual return is imposed after `tick` full ticks and before this crossing.
             for overwrite in word.source_returns().iter().filter(|r| r.tick == crossing) {
                 result.end.storage[overwrite.ring].fill(Rat::zero());
-                tube.held_overwrite(overwrite.ring)?;
+                if let Some(tube)=&mut tube {tube.held_overwrite(overwrite.ring)?;}
             }
             let point = result.end.clone();
             result.crossing(word, crossing)?;
             work::reached(work::Event::ResponseCrossing);
-            result
-                .anchor_errors
-                .push(tube.anchors(&point, &result.records[crossing].anchors)?);
+            if let Some(tube)=&mut tube { result.anchor_errors.push(tube.anchors(&point,&result.records[crossing].anchors)?); }
             if !(word.is_ended() && crossing + 1 == word.recorded().len()) {
                 work::reached(work::Event::ResponseTick);
-                tube.advance(&point, &result.end, word.opened_at() + crossing)?;
-                work::reached(work::Event::ResponseCertificateTick);
+                if let Some(tube)=&mut tube {tube.advance(&point, &result.end, word.opened_at() + crossing)?;
+                    work::reached(work::Event::ResponseCertificateTick);}
             }
         }
         if !word.is_ended() {
@@ -144,6 +148,21 @@ impl ResponseColumn {
         Ok(result)
     }
 
+    pub(crate) fn errors_at(&self, word:&Word<'_>)->Result<Vec<Vec<Vec<Rat>>>,HnnError> {
+        if self.anchor_errors.len()==self.records.len() {return Ok(self.anchor_errors.clone());}
+        let point=|t:usize| -> EndChange { let r=&self.records[t]; EndChange {
+            storage:r.storage.clone(),arrivals:r.arrivals.clone(),states:r.states.clone(),
+            resonators:self.resonances.iter().map(|r|r.as_ref().map(|r|r.steps.get(t).map_or_else(||r.state.clone(),|s|s.input.clone()))).collect(),
+            resonator_phases:word.operands().resonators().iter().map(|r|r.as_ref().map(|r|r.phase_at((word.opened_at()+t).saturating_sub(1)))).collect() } };
+        let mut tube=crate::hnn::prediction::charted::ResponseTube::open(word.operands(),&self.exact_opening,&point(0))?;
+        let mut errors=Vec::new();
+        for t in 0..self.records.len() {
+            for overwrite in word.source_returns().iter().filter(|r|r.tick==t) {tube.held_overwrite(overwrite.ring)?;}
+            let before=point(t); errors.push(tube.anchors(&before,&self.records[t].anchors)?);
+            if t+1<self.records.len() || !word.is_ended() {let after=if t+1<self.records.len(){point(t+1)}else{self.end.clone()}; tube.advance(&before,&after,word.opened_at()+t)?;}
+        }
+        Ok(errors)
+    }
     /// The two executed-surrogate seeds and the physical paired feature, in a caller-supplied
     /// passage frame. F1 makes its transport the identity; both paths share one covector.
     pub(crate) fn receiving_seed(
@@ -357,7 +376,13 @@ mod tests {
                     word.tick().unwrap();
                 }
                 word.last_junction().unwrap();
-                let column = ResponseColumn::execute(&word, source).unwrap();
+                let column = ResponseColumn::execute(&word, source.clone()).unwrap();
+                word.response_error_requested=false;
+                let deferred=ResponseColumn::execute(&word,source).unwrap();
+                assert!(deferred.anchor_errors.is_empty(),"NotRequested stays absent rather than a numerical proof");
+                assert_eq!(deferred.records,column.records);
+                assert_eq!(deferred.end,column.end);
+                assert_eq!(deferred.errors_at(&word).unwrap(),column.anchor_errors,"a later genuine demand uses original records/operands");
                 assert_eq!(column.records, word.passage);
                 assert_eq!(column.resonances, word.resonators);
                 assert_eq!(column.carried, word.carried);
@@ -594,6 +619,11 @@ mod tests {
                 .iter()
                 .all(|(f, _)| f.len() == 2 * field.ring(receiving).width())
         );
+        let geometry=back.response_geometry.as_ref().unwrap();let width=field.ring(receiving).width();
+        geometry.admit(&field,&back.reads,width).unwrap();
+        let mut stale=back.reads.clone();stale[0].0[0]+=crate::ratio::integer(1);
+        assert!(geometry.admit(&field,&stale,width).is_err());
+        assert!(geometry.admit(&field,&back.reads,width+1).is_err());
         let defect = back.response_defect.unwrap();
         let context = defect.context_bounds().unwrap();
         assert_eq!(context.len(), phases.aperture());

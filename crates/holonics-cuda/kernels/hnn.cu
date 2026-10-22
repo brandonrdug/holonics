@@ -538,3 +538,10 @@ extern "C" __global__ void hnn_budgeted_split(
     }
     status[e] = read;
 }
+
+// Exact grouped record flow; the cooperative grid is admitted by Card.
+#include "epoch_flow.cuh"
+
+// Runtime-limb exact chart and word stages, with refusal before publication.
+#include "hnn_inverse_exact.cuh"
+#include "hnn_word_exact.cuh"

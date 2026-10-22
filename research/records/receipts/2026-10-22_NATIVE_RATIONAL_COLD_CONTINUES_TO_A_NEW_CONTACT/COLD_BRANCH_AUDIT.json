@@ -1,0 +1,66 @@
+{
+  "base": "43c33bc69b86dcc8f4b703bcf6812effdc8a5320",
+  "native_execution_dispatched": false,
+  "audit": [
+    {
+      "branch": "ContinuingState parse and epoch decode",
+      "checks": "version binds explicit native numerical denominator; native budget/shape/symmetry/positive-definite integer Gram; canonical encoding; phase semantic rows retained",
+      "source": "constitution.rs:read_epoch_normal_law -> epoch/checkpoint.rs:decode_checkpoint_unbound/validate_with_row_binding"
+    },
+    {
+      "branch": "Constitution continued placement",
+      "checks": "saved/declaration receiving policies equal; receiving.validate; epoch.validate_against_native; active map lattice; material identity; full remainder and retained storage checks unchanged",
+      "source": "constitution.rs:12658..12880"
+    },
+    {
+      "branch": "late material lattice census",
+      "checks": "NormalLaw::on_lattice permits rational H/news only explicit receiving role plus admit_native_statistics; W remains dyadic/on lattice; old law still requires dyadic Gram",
+      "source": "constitution.rs:2878"
+    },
+    {
+      "branch": "field binding",
+      "checks": "admit_epoch_field binds actual receiver grain and odd row factor to real period, separately from numerical denominator",
+      "source": "constitution.rs:12428"
+    },
+    {
+      "branch": "Reference mount: passage, carry-only, rest",
+      "checks": "all call opening.continued_on before either branch; passage/current/carry admission preserved, no Gram alternate bypass",
+      "source": "reference.rs:1313..1390"
+    },
+    {
+      "branch": "prepared native lag and material",
+      "checks": "native chart/work policy, original cut, full evidence counts, lag source/commit and domain; no dyadic statistics check in this separate M codec",
+      "source": "reference/prepared_input/codec.rs"
+    },
+    {
+      "branch": "external pending",
+      "checks": "native rational tag equals receiving owner; native quadratic resource policy; original chart/family/refinement/scope/commit; no pending replay or flush",
+      "source": "reference/observed/stream.rs:514..550"
+    }
+  ],
+  "remaining_dyadic_checks": [
+    {
+      "source": "epoch/checkpoint.rs:190",
+      "scope": "source refinement only, native rational receiving explicitly excludes source refinement"
+    },
+    {
+      "source": "epoch.rs:1785",
+      "scope": "legacy/source direction admission, native_direction dispatched earlier"
+    },
+    {
+      "source": "epoch/device.rs:115",
+      "scope": "unsupported device packing, no device call in this phase"
+    }
+  ],
+  "data_test_required_before_native": true,
+  "source_hashes": {
+    "crates/holonics/src/hnn/constitution.rs": "1257b1acb9136853599ee1262c8101ac1c0edd210f70f32509728c16a2d226a0",
+    "crates/holonics/src/hnn/constitution/epoch.rs": "c07544626dc5797afec3dfe409861c554ab577e21f5e4612f8bd0152b8ca0a08",
+    "crates/holonics/src/hnn/constitution/epoch/checkpoint.rs": "6c7cf712132cf0a9641686b9b5871b4a8985bd4b09020b9874b965ca3a30f513",
+    "crates/holonics/src/hnn/constitution/epoch/rational.rs": "f1d5782e1c33cffdd0cf4f9ec0fd65462254b122b3ff211ccd1a955b3b4a4b11",
+    "crates/holonics/src/hnn/constitution/receiving_material.rs": "c4cfb4252a6837fe62168d0626f406d6035bcb54e28e471fd77b8c27499871d3",
+    "crates/holonics/src/hnn/reference.rs": "0998de5891fabe4cf0d08138d71a8e8819fad1d43671858e3468adcfce9c86f6",
+    "crates/holonics/src/hnn/reference/prepared_input/codec.rs": "f37415b605e20eb567daa2a9912ee602fe929fcbf165308c9032a5876ef19a24",
+    "crates/holonics/src/hnn/reference/observed/stream.rs": "c09e6f0b97c3177ea9a7e5d2b28cd35c5a4bf7a76c3e9a98ac3bfd2a296ff5dc"
+  }
+}

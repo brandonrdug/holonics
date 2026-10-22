@@ -72,6 +72,8 @@ use crate::receiver::reception::{Component, InteractionReturn};
 /// Only a native source-opened word's actual return issues one. No public state constructor.
 #[derive(Debug)]
 pub struct ContactCut {
+    native_declaration:Option<Arc<()>>,
+    native_prediction: Option<super::native_prediction::NativeContactWitness>,
     field: Field,
     producing: Constitution,
     current: Current,
@@ -443,6 +445,7 @@ impl<'c> Word<'c> {
             entries: vec![0],
             phases: occupied,
             loci: diamond.retained(field),
+            passages: Vec::new(),
         });
         cut.deposit = Some(deposit.clone());
         let read = ComparedRead {
@@ -469,6 +472,14 @@ impl<'c> Word<'c> {
 
     /// Capture the actual full-tick end before consuming this Word's adjoint. Both ordinary
     /// and continuing-material comparisons use this one producer/clock/phase admission.
+    pub(super) fn external_contact_cut(&self,carry:&ReceptionCarry,reading:&Released,full:usize)->Result<ContactCut,HnnError>{
+        let (producing,current,source,support)=self.native_source.as_ref().ok_or(HnnError::Unadmitted{reason:"external cut has actual source producer"})?;
+        let next=self.opened_at.checked_add(full).ok_or(HnnError::CountOverflow)?;
+        if self.ticks()!=0||self.native_declaration_id.is_none()||carry.ticks!=next||reading.end!=carry.change||reading.ticks!=full||reading.balances.len()!=full||!WordBalance::of(reading).closes(){return Err(HnnError::Unadmitted{reason:"external contact cut is the actual complete balanced full-tick endpoint"});}
+        if carry.conductances!=self.operands.contacts().iter().map(|c|c.conductance().clone()).collect::<Vec<_>>()||carry.momenta.len()!=self.operands.contacts().len(){return Err(HnnError::Unadmitted{reason:"external carry preserves producing contact reference"});}
+        for (a,c) in self.operands.contacts().iter().enumerate(){if c.forms().0.apply(&carry.change.states[a][1])?!=carry.momenta[a]{return Err(HnnError::Unadmitted{reason:"external contact endpoint preserves actual canonical momentum"});}}
+        Ok(ContactCut{native_declaration:self.native_declaration_id.clone(),native_prediction:None,field:self.field.clone(),producing:producing.clone(),current:current.clone(),source:source.clone(),opening_support:support.clone(),operands:self.operands.clone(),change:carry.change.clone(),opened_at:self.opened_at,next_tick:next,released:reading.remainders.clone(),deposit:None,opening:self.opened_on.clone(),landing:None,held:false})
+    }
     pub(super) fn contact_cut(&self) -> Result<ContactCut, HnnError> {
         let (producing, current, source, opening_support) =
             self.native_source.as_ref().ok_or(HnnError::Shape {
@@ -515,6 +526,8 @@ impl<'c> Word<'c> {
                 reading.join(&Remainders::of(resonance.remainders.all()))
             });
         Ok(ContactCut {
+            native_declaration:self.native_declaration_id.clone(),
+            native_prediction: None,
             released,
             deposit: None,
             opening: self.opened_on.clone(),
@@ -560,6 +573,107 @@ impl<'c> Word<'c> {
 }
 
 impl ContactCut {
+    /// Source-owned field borrow for the unwired atomic history adapter.
+    pub(super) fn native_history_field(&self)->&Field{&self.field}
+    /// Optional calculation only. Live publication selects no resolution policy.
+    pub(super) fn joint_rounding_modulus(&self,plan:&super::material_ray::rounding::DeclaredJointModulus,
+        selection:&super::native_prediction::ExecutedModulusSelection,back:&WordReturn,reading:&super::native_prediction::NativePredictionReading,phases:&ReceivingPhases,
+        history:Option<&super::material_ray::rounding::NativeReleaseHistory>)
+        ->Result<super::material_ray::rounding::JointModulusReading,super::material_ray::rounding::ModulusObstruction>{
+        use super::material_ray::rounding::ModulusObstruction;
+        if !selection.admits(plan){return Err(ModulusObstruction::Invalid("this original execution did not select this immutable modulus request"));}
+        let id=self.native_declaration.as_ref().ok_or(ModulusObstruction::Invalid("original native declaration unavailable"))?;
+        let geometry=back.response_geometry.as_ref().ok_or(ModulusObstruction::Invalid("original executed paired geometry unavailable"))?;
+        geometry.admit_native_contact(&self.field,&back.reads,&self.operands,phases,self.opened_at)?;
+        let stages=geometry.native_material_stages.as_ref().ok_or(ModulusObstruction::Invalid("original bounded stages unavailable"))?;
+        stages.admit_declaration(&self.operands,id)?;
+        if reading.law!=super::native_prediction::LAW || reading.producing_commit!=self.producing.commit()
+            || reading.opened_at!=self.opened_at || reading.source_cells!=self.source.cells()
+            || reading.receiver!=phases.ring() || back.reads.iter().map(|(f,_)|f).ne(reading.features.iter()){
+            return Err(ModulusObstruction::Invalid("source-owned native read beside its original pair"));
+        }
+        super::material_ray::rounding::issue(plan,id,&self.field,&self.current,&self.source,&self.producing,
+            &self.operands,phases,self.opened_at,stages,back.response_defect.as_ref(),&reading.masses,history)
+    }
+
+    pub(super) fn publish_native_comparison(
+        mut self,
+        represented_policy:bool,
+        prediction:super::native_prediction::NativePredictionReading,
+        stations:&[crate::hnn::receiving::RetainedStationReturn],
+        back:&WordReturn,
+        phases:&ReceivingPhases,
+        covector:&crate::hnn::ratio::RatioCovector,
+        charts:&mut Charts,
+    )->Result<super::native_prediction::NativeContactPublication,HnnError>{
+        if prediction.law!=super::native_prediction::LAW || prediction.producing_commit!=self.producing.commit()
+            || prediction.opened_at!=self.opened_at || prediction.source_cells!=self.source.cells()
+            || prediction.receiver!=phases.ring() || stations.len()!=phases.aperture()
+            || covector.logits().len()!=stations.len() || back.reads.len()!=stations.len()
+            || back.reads.iter().map(|(f,_)|f).ne(prediction.features.iter()) {
+            return Err(HnnError::Unadmitted{reason:"native contact binds its original prediction, return, source, frame and actual cut"});
+        }
+        let geometry=back.response_geometry.as_ref().ok_or(HnnError::Unadmitted{reason:"native contact requires both actually executed response paths"})?;
+        geometry.admit_native_contact(&self.field,&back.reads,&self.operands,phases,self.opened_at)?;
+        let map=self.producing.receiving_map(phases.ring()).ok_or(HnnError::MissingReceivingMap{ring:phases.ring()})?;
+        for (at,((feature,gradient),station)) in back.reads.iter().zip(stations).enumerate(){
+            if gradient!=&covector.logits()[at] || map.apply(feature)?!=prediction.waves[at]
+                || station.component_error.len()*2!=gradient.len() || station.component_error.iter().any(|x|x<&Rat::zero()) {
+                return Err(HnnError::Unadmitted{reason:"native contact error belongs to the actual original predicted class/phase packet"});
+            }
+        }
+        // State radii alone cannot mint this witness. Only the explicit new policy,
+        // the original stage issuer and the separate physical first-variation consumer can.
+        if self.operands.lattice().is_some()&&!represented_policy{return Err(HnnError::Unadmitted{reason:"native contact retains the exact unsplit guard unless its explicit versioned represented policy and original preparation own this return"});}
+        let represented=if let Some(lattice)=self.operands.lattice(){
+            let radii=back.response_defect.as_ref().ok_or(HnnError::Unadmitted{reason:"represented native contact explicitly requires requested actual AND fresh state radii"})?;
+            radii.context_bounds()?;
+            let Some(stages)=geometry.native_material_stages.as_ref() else{
+                return Err(HnnError::RepresentedNativeGainUnavailable{source_cells:self.source.cells(),commit:self.producing.commit(),lattice:*lattice,state_radii:Box::new(radii.clone()),class_error_l1:Box::new(stations.iter().flat_map(|s|&s.component_error).cloned().sum())});};
+            stages.admit_declaration(&self.operands,self.native_declaration.as_ref().ok_or(HnnError::Unadmitted{reason:"represented native contact retains the original prepared opening declaration"})?)?;
+            Some(std::sync::Arc::new(super::material_ray::PhysicalContactProof::issue(&self.operands,stages,back,&stations.iter().map(|s|s.component_error.clone()).collect::<Vec<_>>())?))
+        }else{None};
+        let width=self.field.ring(phases.ring()).width();
+        let source=ExactRatMatrix::new(map.to_rows().iter().map(|r|r[..width].to_vec()).collect())?;
+        let context=ExactRatMatrix::new(map.to_rows().iter().map(|r|r[width..].to_vec()).collect())?;
+        let residual=source.subtract(&context)?;
+        // BOTH path bounds share the loaded input norm; the squared sum includes the cross term.
+        let readout_norm=crate::holon::deposition::spectral_norm(context.rows(),context.columns(),context.entries())
+            +crate::holon::deposition::spectral_norm(residual.rows(),residual.columns(),residual.entries());
+        let diamond=Diamond::opened(&self.field,phases,&self.opening_support);
+        let retained=|locus|matches!(locus,Locus::Channel(_))&&diamond.retains(&self.field,locus);
+        let mut factors=Vec::new();
+        for contact in 0..self.field.contacts().len(){
+            factors.extend(crate::hnn::reference::compose_contact(&self.field,&self.producing,back,&diamond,&retained,self.current.lift(),self.field.step(),contact)?.0);
+        }
+        let loci=diamond.retained(&self.field);
+        let reached=factors.iter().map(|s|s.gradient.locus()).collect();
+        let occupied=self.field.sources().iter().map(|&g|{
+            (0..self.field.ring(g).placements().len()).try_fold(0u64,|n,p|Ok::<_,HnnError>(n+u64::from(self.source.phase_counts(g,p)?.iter().any(|x|*x!=0))))
+        }).collect::<Result<Vec<_>,_>>()?.into_iter().max().unwrap_or(0);
+        let deposit=Deposit::new(self.producing.commit(),Vec::new(),factors,reached).with_reach(Reach{
+            receiver:phases.ring(),stations:phases.epochs().map(|j|j as u64).collect(),entries:vec![0],phases:occupied,loci,passages:Vec::new(),
+        });
+        let witness=super::native_prediction::NativeContactWitness{
+            field:self.field.clone(),current:self.current.clone(),source:self.source.clone(),
+            geometry:geometry.clone(),phases:phases.clone(),opened_at:self.opened_at,reads:back.reads.clone(),
+            producing:self.producing.clone(),deposit:deposit.clone(),readout_norm:readout_norm.clone(),
+            error_l1:stations.iter().flat_map(|s|&s.component_error).cloned().sum(),
+            component_errors:stations.iter().map(|s|s.component_error.clone()).collect(),represented,
+        };
+        let mut spans=if witness.represented(){super::finite_gain::FiniteContactSpans::represented(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?,&witness)?}
+            else{super::finite_gain::FiniteContactSpans::of(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?)?};
+        spans.bind_native(witness.clone(),&self.producing,&deposit)?;
+        self.native_prediction=Some(witness);self.deposit=Some(deposit.clone());
+        let field=self.field.clone();let current=self.current.clone();let moment=self.source.clone();let original=self.producing.clone();
+        let (constitution,returned)=self.continue_deposited(&field,&current,&moment,&deposit,charts)?;
+        let (actual_alignment,actual_error_charge,physical_reference)=original.native_contact_actual_ray(&constitution,&deposit,&spans)?;
+        let word=returned.forward.into_present().ok_or(HnnError::Unadmitted{reason:"actual native held-momentum successor"})?;
+        let carry=word.reception_end()?;
+        let publication=returned.deposit.into_present().ok_or(HnnError::Unadmitted{reason:"native factor publication reading"})?;
+        Ok(super::native_prediction::NativeContactPublication{prediction,constitution,carry,publication,continuation:returned.receipt,actual_alignment,actual_error_charge,paired_readout_norm:readout_norm,physical_reference})
+    }
+
     /// Source-private binding by the actual comparison consumer. A caller cannot replace the
     /// covector once the native cut has been issued.
     pub(super) fn bind_comparison(mut self, deposit: Deposit) -> Self {
@@ -714,6 +828,7 @@ impl ContactCut {
                 found: 0,
             });
         }
+        if let Some(native)=&self.native_prediction{native.admit_cut(field,current,source)?;}
         if !contact_only(deposit) {
             return Err(HnnError::Shape {
                 what: "this native return changes contact factors in their same physical coordinates",
@@ -736,12 +851,17 @@ impl ContactCut {
                 tick,
             }) => (successor, publication, Some((end, tick))),
             None => {
-                let (successor, publication) = if self.operands.lattice().is_none() {
-                    let spans = super::finite_gain::FiniteContactSpans::of(
+                let (successor, publication) = if self.operands.lattice().is_none() || self.native_prediction.as_ref().is_some_and(|n|n.represented()) {
+                    let mut spans = if let Some(native)=self.native_prediction.as_ref().filter(|n|n.represented()){
+                        super::finite_gain::FiniteContactSpans::represented(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?,native)?
+                    }else{super::finite_gain::FiniteContactSpans::of(
                         &self.operands,
                         self.opened_at,
                         deposit.reach().ok_or(HnnError::MissingReach)?,
-                    )?;
+                    )?};
+                    if let Some(native)=&self.native_prediction {
+                        spans.bind_native(native.clone(),&self.producing,deposit)?;
+                    }
                     self.producing
                         .deposited_with_contact_spans(deposit, &spans)?
                 } else {
@@ -752,6 +872,13 @@ impl ContactCut {
                 (successor, publication, None)
             }
         };
+        if self.native_prediction.is_some() {
+            let native=self.native_prediction.as_ref().expect("native witness");
+            let mut spans=if native.represented(){super::finite_gain::FiniteContactSpans::represented(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?,native)?}
+                else{super::finite_gain::FiniteContactSpans::of(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?)?};
+            spans.bind_native(self.native_prediction.clone().expect("native witness"),&self.producing,deposit)?;
+            self.producing.native_contact_actual_ray(&successor,deposit,&spans)?;
+        }
         #[cfg(test)]
         eprintln!(
             "unit certificate end elapsed_ms={}",
@@ -1782,7 +1909,7 @@ impl MaterialDirection {
 /// whole state along one material direction, of the change's own shape.
 ///
 /// - **Within the Word** (eq. 2): `χ_(k+1) = T_k χ_k + b_(a,k)`, where `T_k` is the tick's full
-///   fixed-operand state map ([`crate::hnn::prediction::physical_signed_tick`]) and `b_(a,k)` the
+///   fixed-operand state map ([`crate::hnn::word::linear::tick`]) and `b_(a,k)` the
 ///   transit's variation at the direction's forms with zero state variation
 ///   (`propagation::transit_variation`). Both are [`Word::contact_forms_variation`], the one tick
 ///   law it shares with the held contact variation's columns. The start state `(u_k, w_k)` and
@@ -1871,8 +1998,9 @@ impl ComparisonCredit {
 }
 
 impl MaterialTangent {
-    /// **The tangent at a held opening** (`χ_0 = 0`) of an exact, unrun Word, along `direction`,
-    /// based at the producing material `commit`.
+    /// **The tangent at a held opening** (`χ_0 = 0`) of an exact, unsplit quadratic, unrun
+    /// Word, along `direction`, based at the producing material `commit`. A charted solve or
+    /// saturated resonator needs its producing-state variation and is refused here.
     pub fn held_opening(
         word: &Word<'_>,
         commit: u64,
@@ -1888,6 +2016,8 @@ impl MaterialTangent {
                 reason: "a material tangent opens with its Word, before any junction step",
             });
         }
+        // A homogeneous signed action is the tangent only on this admitted branch.
+        super::variation::admit(word.operands())?;
         let contacts = word.operands().contacts();
         let contact = contacts
             .get(direction.contact)
@@ -2057,6 +2187,7 @@ impl MaterialTangent {
     /// changes the commit, never the contact; the receiving map stays an exterior control the tangent
     /// does not differentiate.
     pub(crate) fn rebind(&mut self, word: &Word<'_>, commit: u64) -> Result<(), HnnError> {
+        super::variation::admit(word.operands())?;
         let contact = word
             .operands()
             .contacts()
@@ -2252,6 +2383,8 @@ impl MaterialTangent {
                 reason: "a material tangent follows the Word it opened with",
             });
         }
+        // Bind admission to the actual producing Word at this tick, before mutation.
+        super::variation::admit(word.operands())?;
         let k = self.ticks;
         let record = word.recorded().get(k).ok_or(HnnError::Unadmitted {
             reason: "a material tangent follows a full tick the Word has executed",

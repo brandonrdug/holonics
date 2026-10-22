@@ -1,0 +1,23 @@
+{
+  "command": [
+    "bash",
+    "<CODE-artifacts>/missing-gates.sh"
+  ],
+  "limit_s": 150,
+  "wall_ns": 94361272387,
+  "peak_rss_bytes": 3385532416,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 940,
+  "exit": 0,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 333359140814,
+  "ledger_after_ns": 427720413201,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

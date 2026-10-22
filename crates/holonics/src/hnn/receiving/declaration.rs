@@ -347,3 +347,19 @@ mod tests {
         assert!(!face.declare(&changed, &lifted, receiver).unwrap().1);
     }
 }
+
+/// Optional one-entry numerical cache: exact complete raw operators and schedules only.
+/// Every consumer still receives a fresh Word/source/current/material binding.
+#[derive(Clone,Debug,Default)]
+pub(crate) struct NativeRankCache {saved:Option<NativeRankData>,pub(crate) hits:u64,pub(crate) misses:u64}
+#[derive(Clone,Debug)]
+struct NativeRankData{field:Field,ops:crate::hnn::propagation::Operands,receiver:ReceiverDeclaration,phases:ReceivingPhases}
+impl NativeRankCache{
+    pub(crate) fn declare(&mut self,field:&Field,material:&Constitution,current:&Current,receiver:&ReceiverDeclaration)->Result<ReceivingPhases,HnnError>{
+        let ops=crate::hnn::propagation::Operands::exact_at_cut(field,material,current)?;
+        if let Some(s)=&self.saved{if s.field==*field&&s.ops==ops&&s.receiver==*receiver{self.hits=self.hits.saturating_add(1);return Ok(s.phases.clone());}}
+        self.misses=self.misses.saturating_add(1);self.saved=None;
+        let phases=ReceivingPhases::declare(field,material,current,receiver)?;
+        self.saved=Some(NativeRankData{field:field.clone(),ops,receiver:receiver.clone(),phases:phases.clone()});Ok(phases)
+    }
+}

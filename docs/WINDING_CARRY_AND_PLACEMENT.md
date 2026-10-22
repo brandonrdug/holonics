@@ -312,3 +312,240 @@ Foster sum `flux_eq_tankSum` as a `contactForm` over a population of pair faces.
 
 Each Rust packet lands with the Lean statement of the law it adds under the matching
 `Framework` entry point, or names the obligation it leaves in #62.
+
+
+## 9. Finite solenoidal charts and their physical consumer
+
+[definition; implemented-exact] `geometry::solenoid::{FiniteSolenoidalTower,SolenoidalChart}`
+joins the existing `Tower`/`CompatibleSection` restriction law to the longitudinal carry.
+The caller declares positive moduli `N_i | N_(i+1)`, a normalized rational phase `s`, signed
+winding `w`, and compatible transverse residues `z_i`. The circle face is
+`theta_i=(s+z_i)/N_i`. Advance by `a` uses `c=floor(s+a)` and publishes
+`(s+a-c, w+c, z_i+c mod N_i)`. Restriction commutes with addition and advance; the current
+also keeps the longitudinal lift `w+s`. Equal finite faces do not erase different windings.
+A supplied finer continuation must restrict to the retained section; it is not guessed.
+Negative motion uses Euclidean floor rather than truncation. The finite chart contains no
+occurrence archive. Its Rust controls check these equations and genuine incompatible inputs;
+a Lean proof of this joined operator remains owed in #62.
+
+[proved-standard] The additive universal solenoid uses all positive moduli indexed by
+**divisibility**: for `m|n`, `[x]_(nZ)` maps to `[x]_(mZ)`. In unit-circle coordinates this is
+the degree-`n/m` covering. Its character group is the discrete additive group `Q`.
+A single prime-power chain instead has character group `Z[1/p]`; arbitrary unbounded moduli
+do not imply divisibility-cofinality. An actual inverse limit needs the unbounded compatible
+family and real-circle completion that this finite rational implementation does not supply
+([Burgos–Verjovsky, §2](https://arxiv.org/html/1603.05676v4)). The finite implementation is a
+chart with a retained longitudinal lift, not an implementation of the completed compact group.
+
+[proved-derived] The natural translation flow on that full additive solenoid has no nonzero
+return period: return at time `t` means `t in nZ` for every positive integer `n`; the level
+`n=1` makes `t` integral, and choosing `n>|t|` forces `t=0`. Thus `log(p)` is not a primitive
+closed-orbit period of this particular flow. Prime-power terms in an explicit formula require
+a different specified carrier/action, archimedean and pole terms, and convergence conditions.
+The noncommutative adele-class trace constructions are substantial existing mathematics;
+they are not supplied by an arbitrary finite rotor ([Connes](https://arxiv.org/abs/math/9811068),
+[Connes–Consani–Marcolli](https://arxiv.org/abs/math/0703392)).
+
+[interpretation] The surface counterpart is a lamination with leafwise Riemann-surface
+structure. For a chosen torsion-free cocompact Fuchsian group `Gamma`, the universal
+hyperbolic solenoid uses `(H x Gamma_hat)/Gamma` with the **full** profinite completion and
+its actual diagonal action. `SL(2,Z_hat)` describes a congruence completion, and the modular
+base has cusps; those are not automatically the closed-surface universal object
+([Šarić, §2](https://msp.org/pjm/2007/233-1/pjm-v233-n1-p09-s.pdf)). Identifying an HNN
+parametron with a branched sheet additionally owes the covering/branch map, holomorphic
+charts and compatible transition maps. LC coefficients alone do not construct them.
+
+[definition; implemented-exact] `physics::solenoidal::flow::SolenoidalWave` is an executing
+consumer. Its retained current is the finite chart plus the existing `WaveChain` state.
+The caller supplies turns per physical time. Each actual wave tick advances the chart by
+`rate*tick`, returns the existing exact energy balance, and publishes both successors only
+when both succeed. A source/chart refusal leaves both unchanged. The constructor checks the
+**strict** condition `tick^2 * courant_bound < 4`, rather than silently using the existing
+non-strict convenience predicate. Transverse restriction preserves the physical state and
+commutes with the actual dissipative wave tick. The wave law, storage, source power and heat
+remain owned by `physics::wave`; no LC mode certificate substitutes for its evolution.
+The exterior `solenoidal_wave` example runs these operators and reports every exact balance.
+
+[definition; implemented-exact] `physics::solenoidal::{ContactReading,LcMode,ReflectedPair}`
+consumes the existing contact, port and parametron owners. A contact return carries slip,
+its actual resistive bond, dissipated power, both kernels and definiteness on attainable
+slips. The bond's power is checked to be the negative dissipated power. Zero power is
+material silence; no-slip is checked separately. A declared rational reflected pair has
+power `(2*sigma-1)^2`; a positive Foster LC certificate requires `sigma=1/2` **and**
+`gamma!=0`, and yields `L=2/gamma^2`, `C=1/2`, `omega_squared=gamma^2`. The constructor
+accepts no assertion that these coordinates are zeros of a function. Existing Lean
+`ZeroPairLock`/`FosterTanks` prove the scoped algebra, not the location of actual zeros.
+The equal-angular reflection and the analytic `rho -> 1-rho` pairing need their conjugation
+symmetry map before they are identified.
+
+[conditional] Simultaneous primitive ring ticks close at their LCM; product is valid under
+pairwise coprimality. For `[7,11,33]` the LCM is `231`, whereas the product is `2541`;
+`11` divides `33`, so these periods are not pairwise coprime. An HNN's carried clock cascade
+must be read through its actual tick/carry law rather than ticking every ring once per cell.
+A mounted pump does not by itself certify attraction, stable lock or invariance across cuts:
+consume its executed monodromy/Floquet bound and nonlinear lock domain. Linear pump
+reflections and affine point half-turns are different representations. Fluid interpretation
+additionally owes its velocity/pressure/divergence, viscous/thermal balance and time advance;
+classical circulation is not universally quantized. The exact local joins above are
+subclaims used to build that bridge, not substitutes for these missing maps.
+
+[definition; implemented-exact] `ratio::places::PlaceReading::of` is the executable arithmetic
+place receiver from §7's `PlaceLedger`. It consumes the existing exact factorizer and returns
+the sign, ascending prime valuation series, exact factors `p^(-v_p(x))`, and `|x|`.
+Its constructor checks both signed reconstruction from the finite factors and the exact
+product-one identity before returning. Zero and raw zero denominators are typed refusals;
+valid raw ratios are normalized. Factoring cost remains operand-dependent trial division
+owned by `ratio::surprisal`, not a new constant-cost or probabilistic owner. The wave example
+reads its actual declared longitudinal step through this receiver; the arithmetic identity
+is reported separately from the wave's own physical energy balance. No physical conservation
+law is inferred from product-one.
+
+
+## 10. Actual HNN clock faces and plural holding contacts
+
+[definition; implemented-exact, combined acceptance pending] `geometry::solenoid::field`
+reads the existing `Field`, `Current::step` and `Odometer`. Only the ordered Lock rings enter
+its mixed-radix face; Own rings remain individual leaves. For radices `r_i`, the Lock modulus
+is their product, and class increment is derived from the actual field fits and native carry
+law. It is not an independent simultaneous-tick model and its modulus is not an LCM.
+The retained signed lift distinguishes equal finite faces with different windings.
+Refinement reads a declared finite face restriction; a new fine declaration cannot guess
+missing historical winding. Character phases are exact rational turns on this finite group.
+No infinite solenoid, real-circle completion or general continuation theorem is inferred.
+
+[definition; implemented-exact, combined acceptance pending] `receiver::coupling` reads two
+supplied cell strands: `lambda` is the longest order-consistent equal-cell coupling and
+`F_star=|H|+|T|-2*lambda`. Prefix and suffix recurrences keep every optimal contact and
+maximal contiguous diagonal plateau. Their union can contain crossing alternatives, so it
+is never presented as one selected alignment. Actual supplied `LockPhase` paths annotate
+plateaus with mixed-radix differences, signed lifts, whole windings and both carry series.
+A constant plateau phase follows from matching successive native increments; no content
+identity follows from phase alone. Equal multisets with the same key cancel at the terminal
+group sum, while intermediate plateaus can have nonzero differences. In particular `[a,b]`
+and `[b,a]` have terminal difference zero but their contact on `a` can read `-A(b)`.
+The exact optimal-contact/phase join remains a Lean obligation in #62.
+
+The listener's `--diagnostic-solenoidal-lock` reads actual currents before each emitted class
+and at the accepted terminal section. It is off by default. A change of field declaration
+returns a typed unavailable reading; it never substitutes a guessed key or zero origin.
+Targets enter this acceptance receiver after the release. They do not condition prediction,
+locating keys or deposition. Historical logs lacking actual anchor currents admit class
+coupling reads but do not establish either strand's absolute winding or phase path.
+
+[definition; implemented-exact, combined acceptance pending] `geometry::solenoid::pump`
+reads the actual `ResonatorOperands` and displacement through `ring::sheets`. Each node
+returns its own half-turn bit and projection; zero in-phase projection keeps both fibre
+digits unresolved. A common instantaneous sheet is reported only when all node projections
+are nonzero and agree. Absent or zero-strength pump leaves the base clock alone. The actual
+standing, saturated pump has period-one fixed sheets: a two-element fibre over the clock is
+not evidence of a subharmonic orbit or a new carried cover digit. Scheduled-axis readings
+need an actual schedule witness. Stable locking requires the existing nonlinear ball,
+Floquet and executed tube certificates, rather than a mounted-pump flag.
+
+
+## 11. Source precision and the actual represented move
+
+[definition; implemented component law] The normal epoch already retains
+`R=B-WH`. With fresh gain `gamma`, the exact recurrence is `H+=H+F`,
+`R*=R+gamma*G`, `D=R* S^-1`, `W+=W+P`, `R+=R*-P H+`. Thus
+`W+ H+ + R+ = W H+ + R + gamma G`. Another displacement accumulator would count
+unapplied news twice. A fixed source lattice can nevertheless erase every material move:
+with scalar `g=2^-15`, `H_n=n+1`, `R_n=n*g`, the Jacobi direction remains below `g`
+while the lattice is `2^-11`. Retaining news alone does not cure that representation.
+
+For a SourcePort with admitted positive fresh gain and nonzero dyadic direction, choose
+`L+ = min { l>=L : 2^l max|D_ij| >= 1 }`, then
+`P_ij=trunc_toward_zero(2^L+ D_ij)*2^-L+`. One bit-length calculation derives the
+refinement. It never coarsens, changes the source clock or releases a residual. Zero fresh
+gain holds source material; cancellation, absent support, budget and admission refusals
+remain possible. Source row factors must be dyadic. Receiving and contrast keep their
+existing projection until their own crossing law is supplied.
+
+[proved-derived, scoped algebra] Componentwise `sign(P)=sign(D)` where nonzero and
+`|P|<=|D|` give `<P,R*> >= sum_j S_j P_ij^2`. The same Jacobi/Gershgorin bound gives
+`tr(P H+ P^T) <= sum_j S_j P_ij^2`, so the normal quadratic fall is at least half
+that positive sum. This statement concerns the normal objective. It does not certify
+current comparison descent when retained `R` differs from the fresh covector.
+
+Every nonzero represented normal move would need admission using its actual `P` as a unit ray. Producing samples supply its actual
+alignment and feature moves; receiving retains its odometer and partition defects. The
+existing shared tightened reader enforces curvature, joint triangle and executed pump tube
+bounds. Fresh `G S^-1` certification alone cannot authorize a different carried move.
+All candidates stage before publication, and any failure leaves the live resident intact.
+The current bounded implementation admits only a receiving-map move on the fixed actual
+feature trajectory, with every upstream represented SourcePort/Contrast move and every
+physical factor displacement zero. Reach, chart and tube records do not authenticate an
+affine executed source transport: chart splits/carry feedback and loaded dynamics can have
+nonzero second variation. Source-only, contrast and mixed source/readout moves therefore
+refuse before any publication, including any source refinement. They need an actual affine
+executed-transport witness or a full second-variation bound; no default `J=0` is supplied.
+The existing shared Gauss–Newton bound omits `grad(loss) dot y_second` and remains a necessary
+proposal bound on those routes. A normal quadratic fall does not fill that gap. The signed
+source precision and cold-opening operators above are component laws, not a claim that the
+closed source-learning route is now admitted. The implementation also refuses physical
+nonlinear factor moves whose rounded or backtracked ray has not been joined to that check. Refinement also refuses a
+same-locus pair remainder outside the finer half-cell; silently moving its pair factor
+would need that additional ray certificate. These are explicit remaining consumer joins.
+
+`ContinuingState::from_text(text, budget)` requires the caller's declared read budget.
+All law readers share it: grouped exponents/integers and derived dense maps are admitted
+before materialization, and noncanonical zero/reducible words are rejected before a large
+denominator can be constructed. This logical bit/read-view budget is separate from process
+RSS. Every saved active lattice is checked against its actual founding declaration and budget
+before material placement, including sources without an adaptive epoch; lattice plus clock
+precision is checked before its shift too. There is no unbounded reader fallback.
+
+The active SourcePort lattice, its normal map lattice and checkpoint v3 must agree. The
+checkpoint retains the active exponent and exact `W/H/R`, checks the founding lower bound
+and dyadic shape, and accepts no old epoch decoder. Census charges the precision metadata;
+allocation and total state budget are checked before publication. CUDA publishes the map at
+the admitted active exponent while unchanged pair factors keep their own exact exponents.
+Material coordinates still use signed i64: a width refusal happens before a large shift or
+acknowledgement, with no host fallback or rounding back to the old grid. Wider auxiliary
+arithmetic is not a wider material carrier. General formal proof of the refinement, actual
+ray composition, finite-budget limitations and full backend continuation remains in #62.
+
+### Finite comparison consumer and local research boundary (October 20)
+
+The observed grouped epoch now stages its actual SourcePort/Contrast candidate and probes the
+same batch from the immutable opening, with the original target phases and a prequential tree
+rebuilt from the opening tree. Exact negative joint class-plus-phase change admits, exact
+equality is neutral, and a mathematical refusal restages receiving only. Physical-factor
+displacements still refuse; an executor fault remains a fault. The probe is transient inside
+the transaction. Direct normal close still needs its once-linear receiving witness.
+
+The exterior `solenoidal_alpha` consumer uses the existing ArrivalContext per-cell finite
+comparison law for all cells, preserving ordinary continuation at arbitrary source cuts. It
+reports that law's actual strict/neutral receipts and halving count separately from the new
+grouped probe. Its unplaced closing-crib codec joins the complete native ContinuingState for
+cold restart; source provenance is exterior metadata. Neither corpus ingestion nor a query
+reading establishes semantic research answers.
+
+
+### Native rational normal statistics (bounded CODE owner)
+
+The explicit native receiving policy separates numerical denominators from semantic
+phase rows while preserving the map lattice and represented-delta news identity.
+Its owner is `hnn/constitution/epoch/rational.rs`; its scoped evidence and incomplete
+connected qualification are recorded in
+[Native rational moments keep phase and represented news](../research/records/2026-10-22_NATIVE_RATIONAL_MOMENTS_KEEP_PHASE_AND_REPRESENTED_NEWS.md).
+The legacy grouped carrier and device admission remain separate.
+
+The subsequent [working-set and port-reference record](../research/records/2026-10-22_NATIVE_RATIONAL_WORKING_SET_AND_PORT_REFERENCE_BOUNDARY.md)
+qualifies real width-six cold arithmetic without changing the caps. Its single
+connected control reaches a distinct continuation guard: a retained Word carry's
+reference versus the actual-ingress-advanced Current. That join remains unfinished;
+reference transmission belongs to the carried opening owner, not a scalar R guard.
+
+The [original-final-Word publication record](../research/records/2026-10-22_NATIVE_R_PUBLISHES_AT_THE_ORIGINAL_FINAL_WORD.md)
+places the R-only update before final source ingress, retaining the original Word,
+carry, prepared cut and lag. Its first R publication passes. The subsequently found
+legacy Gram-lattice cold mismatch has a scoped compile-checked correction; full
+post-R cold/contact/next-R/source30/frozen execution remains unqualified.
+
+[measured; October22] Native rational receiving cold continuity now passes firstR and a genuine new contact; the next control-coordinate bound remains unresolved. [Scoped control and exact limits](../research/records/2026-10-22_NATIVE_RATIONAL_COLD_CONTINUES_TO_A_NEW_CONTACT.md).
+
+[measured; October22] An authentic native M/context/source packet separates physical work from numerical coordinate extent: the source12 control needs1,803bits while exact work≈1.7502 is below65,536. [Control refusal and joined carrier obligation](../research/records/2026-10-22_NATIVE_CONTROL_REFUSAL_IS_REPRESENTATION_GROWTH.md).
+
+
+The [represented native contact record](../research/records/2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md) separates a physical-reference material first variation at the original held opening from differentiation of chart selection or a finite represented score claim. Both actual/fresh paths, component radii, original return and reverse-rounding discrepancy stay source-bound. The connected control passed first R/cold but refused its fresh contact bound; the later component-radius source is data-qualified only, and native contact/next-R/close/frozen/card readiness remains open.

@@ -2779,7 +2779,7 @@ struct CausalRead {
     sparse: [Rat; 2],
     fixed: [Rat; 2],
     columns: Vec<[Rat; 2]>,
-    real_cells: Vec<[GrainCell; 2]>,
+    real_cells: Vec<[holonics::hnn::receiving::ReceivingCell; 2]>,
     phase_cells: Vec<GrainCell>,
     leaders: Vec<usize>,
 }

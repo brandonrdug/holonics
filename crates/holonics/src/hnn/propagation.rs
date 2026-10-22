@@ -104,7 +104,10 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 use crate::geometry::swing::half_turn;
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, Charts, WordLattice, refine};
-use crate::hnn::constitution::Lattice;
+
+#[cfg(test)]
+mod material_tangent_tests;
+use crate::hnn::constitution::{Constitution, Lattice};
 use crate::hnn::field::{Current, End, Field, FieldMaterial};
 use crate::hnn::realization::{entries, indexed};
 use crate::hnn::ring::ResonatorOperands;
@@ -781,6 +784,94 @@ pub struct Operands {
     lattice: Option<WordLattice>,
 }
 
+/// One immutable ordinary-read batch. Its shared producer borrow binds every argument of
+/// RingOperands::build: field admittances/grid and material standings/contrast/factors/slices.
+/// The concrete native Constitution has no interior-mutating read interface; a generic
+/// ConstitutionRead shared borrow alone would not establish this binding. It cannot be
+/// rebound and never survives a batch, deposit, restore or fork.
+pub(crate) struct RingScope<'a> {
+    field: &'a Field,
+    material: &'a Constitution,
+    // Transient execution capability: identity and lifetime only, never native
+    // material, a clock, or retained continuing state.
+    execution_scope: std::sync::Arc<()>,
+    rings: Option<Vec<RingOperands>>,
+    preparations: usize,
+    reuses: usize,
+}
+
+impl<'a> RingScope<'a> {
+    pub(crate) fn new(field: &'a Field, material: &'a Constitution) -> Self {
+        Self {
+            field,
+            material,
+            execution_scope: std::sync::Arc::new(()),
+            rings: None,
+            preparations: 0,
+            reuses: 0,
+        }
+    }
+
+    pub(crate) fn field(&self) -> &'a Field {
+        self.field
+    }
+    pub(crate) fn material(&self) -> &'a Constitution {
+        self.material
+    }
+
+    pub(crate) fn execution_scope(&self) -> std::sync::Arc<()> {
+        std::sync::Arc::clone(&self.execution_scope)
+    }
+
+    pub(crate) fn at_cut(
+        &mut self,
+        current: &Current,
+        charts: &mut Charts,
+    ) -> Result<Operands, HnnError> {
+        // The caller may update contacts' warm charts, but a changed ring start is a new
+        // build input. Clear before preparing it, so a failed rebuild installs nothing.
+        // by_rule has D_c >= 3 (all positive operands are at least one), hence its
+        // target is within the warm-admission half. A future zero-exponent declaration
+        // must always prepare: target one alone does not establish a warm fixed point.
+        if self
+            .field
+            .word_lattice()
+            .is_some_and(|lattice| lattice.target_exponent() == 0)
+            || self.rings.as_ref().is_some_and(|rings| {
+                rings.iter().any(|ring| {
+                    ring.chart
+                        .as_ref()
+                        .is_some_and(|r| ring.chart_words() != charts.get(&r.key))
+                })
+            })
+        {
+            self.rings = None;
+        }
+        // A refusal publishes neither prepared operands nor chart coordinates.
+        let operands = Operands::build(
+            self.field,
+            self.material,
+            current,
+            self.field.word_lattice().copied(),
+            charts,
+            self.rings.as_deref(),
+        )?;
+        if self.rings.is_none() {
+            self.preparations += operands.rings.len();
+            self.rings = Some(operands.rings.clone());
+        } else {
+            self.reuses += operands.rings.len();
+        }
+        operands.keep_charts(charts);
+        Ok(operands)
+    }
+
+    #[cfg(test)]
+    pub(crate) fn counts(&self) -> (usize, usize) {
+        (self.preparations, self.reuses)
+    }
+}
+
 /// **One ring's operands from the constitution**: its admittance and element material at the sheet
 /// classes of its standing contrast `Δ_r = Σ_(a∋r) U_(r←a) q_(other end) − q_r`
 /// ([`Field::standing_contrast`], read from the connection incidence's blocks), under the exact law.
@@ -853,6 +944,17 @@ pub fn junction_weights(
 }
 
 impl Operands {
+    /// Native realization binding: retain EVERY numerical operator, solve word,
+    /// lattice, frame, target and inverse-error certificate. Only exterior chart
+    /// preparation diagnostics (seed/reuse label, step count, cost) may differ.
+    pub(crate) fn same_native_execution(&self,other:&Self)->bool{
+        let mut a=self.clone();let mut b=other.clone();
+        let same=|a:&Option<ChartReading>,b:&Option<ChartReading>|match(a,b){(None,None)=>true,(Some(a),Some(b))=>a.key==b.key&&a.width==b.width&&a.certificate==b.certificate&&a.target==b.target,_=>false};
+        if a.rings.len()!=b.rings.len()||a.contacts.len()!=b.contacts.len(){return false;}
+        for(a,b)in a.rings.iter_mut().zip(&mut b.rings){if !same(&a.chart,&b.chart){return false;}a.chart=None;b.chart=None;}
+        for(a,b)in a.contacts.iter_mut().zip(&mut b.contacts){if !same(&a.chart,&b.chart){return false;}a.chart=None;b.chart=None;}
+        a==b
+    }
     /// **The operands at the cut** `(Θ, λ)` on the field's declared word: each contact's exponent
     /// from the pair quadrance of its rings' screws at `λ`, each ring's sheet classes from the
     /// standing contrast `Δ_r = Σ_(a∋r) U_(r←a) q_(other end) − q_r`, the constitution's factors,
@@ -880,18 +982,23 @@ impl Operands {
             current,
             field.word_lattice().copied(),
             charts,
+            None,
         )?;
-        for ring in &operands.rings {
+        operands.keep_charts(charts);
+        Ok(operands)
+    }
+
+    fn keep_charts(&self, charts: &mut Charts) {
+        for ring in &self.rings {
             if let (Some(reading), Some(chart)) = (&ring.chart, ring.chart_words()) {
                 charts.insert(reading.key.clone(), chart.clone());
             }
         }
-        for contact in &operands.contacts {
+        for contact in &self.contacts {
             if let (Some(reading), Some(chart)) = (&contact.chart, contact.chart_words()) {
                 charts.insert(reading.key.clone(), chart.clone());
             }
         }
-        Ok(operands)
     }
 
     /// **The operands at the cut under the exact law**: every solve the exact inverse and every
@@ -902,7 +1009,7 @@ impl Operands {
         constitution: &dyn FieldMaterial,
         current: &Current,
     ) -> Result<Self, HnnError> {
-        Self::build(field, constitution, current, None, &Charts::new())
+        Self::build(field, constitution, current, None, &Charts::new(), None)
     }
 
     fn build(
@@ -911,21 +1018,36 @@ impl Operands {
         current: &Current,
         lattice: Option<WordLattice>,
         charts: &Charts,
+        prepared_rings: Option<&[RingOperands]>,
     ) -> Result<Self, HnnError> {
         crate::hnn::word::work::reached(crate::hnn::word::work::Event::MaterialCutAttempt);
         // Each ring's operands read only its own material, the standings and its own chart; each
         // contact's only its own factors, its two rings' screws and its own chart: the rings, then
         // the contacts, run together.
-        let rings = indexed(field.rings().len(), |index| {
-            ring_operands_on(
-                field,
-                constitution,
-                index,
-                lattice
-                    .as_ref()
-                    .map(|lattice| (lattice, charts.get(&ChartKey::Ring(index)))),
-            )
-        })?;
+        let rings = if let Some(prepared) = prepared_rings {
+            prepared
+                .iter()
+                .cloned()
+                .map(|mut ring| {
+                    if let Some(reading) = &mut ring.chart {
+                        reading.start = crate::hnn::chart::ChartStart::Reused;
+                        reading.steps = 0;
+                    }
+                    ring
+                })
+                .collect()
+        } else {
+            indexed(field.rings().len(), |index| {
+                ring_operands_on(
+                    field,
+                    constitution,
+                    index,
+                    lattice
+                        .as_ref()
+                        .map(|lattice| (lattice, charts.get(&ChartKey::Ring(index)))),
+                )
+            })?
+        };
         let contacts = indexed(field.contacts().len(), |index| {
             let contact = field.contact(index);
             let exponent = contact_exponent(field, index, current.lift())?;
@@ -1007,6 +1129,28 @@ impl Operands {
             junction_certificates,
             lattice,
         })
+    }
+
+    /// Test the entire executed representation, including private row forms and transpose.
+    /// Only the named preparation diagnostics differ when a proof is reused.
+    #[cfg(test)]
+    pub(crate) fn assert_same_execution(&self, other: &Self) {
+        let mut actual = self.clone();
+        for (ring, oracle) in actual.rings.iter_mut().zip(&other.rings) {
+            if let (Some(read), Some(reference)) = (&mut ring.chart, &oracle.chart) {
+                if read.start == crate::hnn::chart::ChartStart::Reused {
+                    assert_eq!(read.steps, 0);
+                    read.start = reference.start;
+                    read.steps = reference.steps;
+                    if let (Some(op), Some(reference_op)) =
+                        (&mut read.operator, &reference.operator)
+                    {
+                        op.wide_reasons = reference_op.wide_reasons.clone();
+                    }
+                }
+            }
+        }
+        assert_eq!(actual, *other);
     }
 
     /// `h`.
@@ -1691,4 +1835,22 @@ pub fn gram(factor: &ExactRatMatrix) -> Result<ExactRatMatrix, HnnError> {
         }
     }
     Ok(ExactRatMatrix::shaped(n, n, values)?)
+}
+
+#[cfg(test)]
+mod native_execution_identity_tests{
+    use super::*;
+    #[test]
+    fn numerical_identity_keeps_operator_and_error_but_not_preparation_cost(){
+        use crate::hnn::tests::support::{small_field,contact};
+        let field=small_field(&[2,3],vec![contact(0,1,2,0)],1);
+        let theta=crate::hnn::constitution::Constitution::initial(&field,crate::hnn::constitution::CAMPAIGN_ONE_BUDGET).unwrap();
+        let mut a=Operands::exact_at_cut(&field,&theta,&Current::at_rest(&field)).unwrap();
+        a.rings[0].chart=Some(ChartReading{key:crate::hnn::chart::ChartKey::Ring(0),width:a.rings[0].width(),certificate:crate::ratio::rat(1,32),target:crate::ratio::rat(1,4),steps:2,start:crate::hnn::chart::ChartStart::Transpose,operator:None});
+        let mut b=a.clone();let r=b.rings[0].chart.as_mut().unwrap();r.steps=0;r.start=crate::hnn::chart::ChartStart::Warm;
+        assert_ne!(a,b);assert!(a.same_native_execution(&b));
+        let mut bad=b.clone();bad.weights[0][0]+=crate::ratio::integer(1);assert!(!a.same_native_execution(&bad));
+        let mut bad=b.clone();bad.rings[0].chart.as_mut().unwrap().certificate=crate::ratio::rat(1,16);assert!(!a.same_native_execution(&bad));
+        let mut bad=b.clone();bad.rings[0].solve=Solve::exact(&ExactRatMatrix::identity(a.rings[0].width()).unwrap()).unwrap();assert!(!a.same_native_execution(&bad));
+    }
 }

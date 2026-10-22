@@ -317,7 +317,7 @@ where
         .admitted
         .first()
         .ok_or("view probe needs admitted receiver")?;
-    let material = opening.clone().continued(state)?;
+    let material = opening.clone().continued_on(field, state)?;
     let word_opening = match (parts.opens, state.carry()) {
         (Opens::OnMotion, Some(carry)) => WordOpening::Received {
             carry: carry.clone(),

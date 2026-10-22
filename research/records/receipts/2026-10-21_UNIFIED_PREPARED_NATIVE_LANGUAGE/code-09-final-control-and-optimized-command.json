@@ -1,0 +1,23 @@
+{
+  "command": [
+    "bash",
+    "<CODE-artifacts>/final-controls-and-build.sh"
+  ],
+  "limit_s": 90,
+  "wall_ns": 19674128573,
+  "peak_rss_bytes": 471769088,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 196,
+  "exit": 0,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 427720413201,
+  "ledger_after_ns": 447394541774,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}

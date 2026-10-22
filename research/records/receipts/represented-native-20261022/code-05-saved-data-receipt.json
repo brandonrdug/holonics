@@ -1,0 +1,26 @@
+{
+  "native_attempt_reservation": 0,
+  "native_attempt_charge": 0,
+  "native_counts": null,
+  "command": [
+    "python3",
+    "<private-runtime>/alpha-v93-represented-native-7ca320/represented_saved_data.py"
+  ],
+  "limit_s": 15,
+  "wall_ns": 101721095,
+  "peak_rss_bytes": 1773568,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 1,
+  "exit": 0,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 132393755344,
+  "ledger_after_ns": 132495476439,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}
