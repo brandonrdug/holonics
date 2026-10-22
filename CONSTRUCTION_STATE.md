@@ -17,6 +17,19 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 22 local successor: native card contact boundary, material-effect requirement still open.**
+Runtime source `b3e9f84ca0deedf56edd1855670e0a95662cc4b3` executes genuine retained
+actual/fresh CUDA forward and reverse through the private native F/return owner. One
+zero-realized-motion publication matches the host's native face, complete constitution,
+carry, M and source state exactly. A reused exact first-R checkpoint plus the live suffix
+reaches source30, cold restore and four matching frozen decisions. The stronger causal
+requirement **fails**: all96 C/K/D-factor deltas remain zero, all96 tails are released,
+and identical subsequent input gives identical native waves/probabilities. This is neither
+nonzero material learning nor useful language; loaded/World/native-R card integration and
+D6–D8 remain unqualified. The [dated owner and exact closeout](research/records/2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md#native-card-boundary-and-the-still-failing-material-effect-requirement)
+separate runtime evidence from a later reporting-only test correction. Earlier status below
+is historical at its named source. No further dataset or output campaign was run.
+
 **October 19: the native field, holding contacts and pump sheets join the finite face**
 (#62, #73). `geometry::solenoid::field` consumes the actual Lock/Odometer law;
 `receiver::coupling` retains plural optimal contacts and reads supplied actual phase paths;

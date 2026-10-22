@@ -168,10 +168,92 @@ record. Recover its original requirements through [the computational Holon](2026
 [HNN formula](../../docs/HNN_FORMULA.md), [text-scaffold antipattern](2026-09-29_ANTIPATTERN_CATERED_MACHINERY_A_TASKS_SOLUTION_ROUTINE_NEVER_STANDS_IN_FOR_LEARNING.md)
 and [representation-residual policy](2026-09-25_THE_CLASSICAL_LOSS_IS_THE_PERCEIVED_DIFFERENCE_AND_THE_DEPOSITION_REMAINDER_IS_A_REPRESENTATION_RESIDUAL.md).
 
-[open] Authentic DeviceWord actual/fresh chart/split/error/gain publication is still
+[open at the preceding ef08972 closeout] Authentic DeviceWord actual/fresh chart/split/error/gain publication is still
 unqualified; the old campaign's card dispatch cannot establish it. General contextual E
 return, learned participation/value/frame transport, correlated branch-conditioned
 material/pending-source evolution and topology/ecology/adaptive computation remain
 unfinished (D6–D8; #62,#73,#76). Four known framing parts are not uncertain semantic
 families. The next common material-response/device witness must distinguish continuity,
 nonzero admitted influence and real host/card qualification; none is promised here.
+
+
+## Native card boundary and the still-failing material-effect requirement
+
+[implemented; measured, October22] Runtime source
+`b3e9f84ca0deedf56edd1855670e0a95662cc4b3` joins the **same private native F** to a
+retained `DeviceWord`: actual/fresh forward records, same-id paired CUDA reverse,
+original source/field/current/operator/receiver/clock binding, scalar original-stage
+readings and the existing physical-reference error/gain consumer. No host physical
+forward is rerun to stand in for the card. The native full tick is preserved; the
+backend's terminal diagnostic junction is excluded from physical work and its last
+anchor-feedback increment is removed from the full-tick remainder view. Preparation
+work is charged once. Loaded/World native device paths still refuse.
+
+Two narrow integration distinctions mattered. Numerical chart words, matrices,
+certificates and targets must agree, while seed/reuse labels and preparation cost are
+transient diagnostics. Also the ordinary lean CUDA forward record deliberately lacks
+the separately fetched source-opening numerators. The native issuer now reads the
+existing complete **actual error record**, not zeros from that lean view; it neither
+synthesizes source values nor weakens the opening guard. The stopped diagnostic pinned
+source10/commit6, opened_at30, full3, carry tick33 and matching final point, with only
+the opening comparison failing. Its first source coordinate was1438075/2097152 versus
+an omitted-record zero. The actual GPU forward source itself was not shown to be zero.
+
+The final invocation cold-reused the existing, complete-byte-equal first-R source10
+checkpoint (SHA e94f54645679f4843b0fe3cf23bb8971c04c4c1967c2f40c1d29070cfba93a08).
+It did not replay those ten observations. The live suffix consumed20new actual inputs,
+reached the contact, nextR,source30close, final cold restore and four matching warm/cold
+frozen choices0,1,1,2. The card event's native F features/waves/masses, score, preparation
+receipt, entire published constitution, actual canonical carry, M and source state
+matched the host exactly. This is real native **zero-motion** card publication parity,
+not qualification of native R aggregation, nonzero material change or a language CLI.
+The measured card event took886,957,712ns (whole event, not kernel time); the native
+invocation took10,306,833,767ns, sampled GPU peak260MiB and verified cleanupempty.
+
+[failed stronger acceptance] The same-source10 update/no-C/K/D-publication comparison
+consumed actual class2 and identical next hypothesis3. R, M and SourceMoment equality
+controls isolate the contact intervention. All96 actual factor differences were exactly
+zero. Selected C/K/D step exponents by contact were−39,−32,−33 and−38,−33,−32;
+normalization scales changed, but96 nonzero factor tails were released and0retained.
+Saved-operand exact analysis verifies every tail is below the existing fine-grid half
+cell2^-31. Both next native waves were exactly
+`[211/2048,0,49/2048,0,-125/2048,0,-51/2048,0]`; their probability intervals did not
+separate. There is no demonstrated C/K/D-caused later response change. This identifies
+packing loss in this event, not a proof that all future adaptation freezes or that the
+sound gain is wrong. No grain/input/step tuning or forced motion was performed.
+
+The shared physical bound now also uses a Gram lower-eigenvalue enclosure for the
+passive inverse and a centered exact contact block plus a uniform resolvent-identity
+perturbation bound. It preserves the original scalar fallback at an unaffordable
+block extent, fixed-opening ArmA meaning and all physical/error/range/work guards.
+This tightening did **not** close the material-effect requirement. Existing
+`constitution/epoch/channel_grain.rs::stage_rebases` remains the rebase owner; its
+C/K held-factor limits and retained-locus requirements mean it cannot recover these
+96 already released tails. No duplicate generic rebase or new retention policy was
+invented. Further work must resolve that gain/representation/retention obligation
+before another long native learning claim; simply repeating the fixture is not repair.
+
+The six focused matrix/error controls and numerical-identity data control passed.
+Affected-library disallowed-type/method/float guards and exact changed-example builds
+passed. The broad repository gate/native suite was not run as a proxy within the fixed
+operation allowance. The overall Rust control still failed its positive-material
+assertion **after** native parity and continuity assertions. That assertion also
+unwound before the outer wrapper's separate device-counter assertions; those were not
+claimed as passed. Reporting-only source
+`011f4dbc4fa77db7f03911e9205226707c8d60ae` moves telemetry/narrower assertions before
+the final material assertion and compiles; it was not given another native run.
+
+The phase closes at678,698,571,974/900,000,000,000 guarded CODE ns and1,185/1,200
+settled native attempts, including constructors, fresh companions, actual/fresh returns
+and conservative card-launch attempts. Failed phases/attempts were not erased; missing
+or killed counters would charge their full reservation. Total scope wall time also
+includes implementation, audit and orchestration, separately recorded. Owned process
+and GPU cleanup is verified. The [compact receipt](receipts/2026-10-22_NATIVE_MATERIAL_CARD/CLOSEOUT.json)
+records exact limitations, including the pre-bridge executable whose hash was pinned
+but whose shared Cargo file was overwritten before an immutable copy was made. Later
+executables, current source and all receipts are preserved; custody is not overstated.
+
+No training, dataset/output campaign, upload, push, PR change or useful-intelligence
+result belongs to this phase. The completed136-record campaign and D6–D8 obligations
+above remain distinct. The design owner's current-index/coverage-reuse work is linked
+by its canonical titles rather than copied into another audit.

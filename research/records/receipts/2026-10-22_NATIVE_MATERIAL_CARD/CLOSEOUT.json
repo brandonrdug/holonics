@@ -1,0 +1,137 @@
+{
+  "kind": "synthetic CODE result; not language",
+  "runtime_source": "b3e9f84ca0deedf56edd1855670e0a95662cc4b3",
+  "reporting_only_source": "011f4dbc4fa77db7f03911e9205226707c8d60ae",
+  "phase_status": "CLOSED_INCOMPLETE_MATERIAL_EFFECT",
+  "continuity": {
+    "passed": true,
+    "first_R_checkpoint_reused_exact": true,
+    "saved_source_before": 10,
+    "new_actual_inputs": 20,
+    "history_after": 30,
+    "pending_after": 0,
+    "following_R_sections": 2,
+    "final_cold_exact": true,
+    "frozen_warm_cold_classes": [
+      0,
+      1,
+      1,
+      2
+    ],
+    "frozen_keys": [
+      "1/7",
+      "2/7",
+      "3/7",
+      "4/7"
+    ]
+  },
+  "material_causal_requirement": {
+    "passed": false,
+    "actual_class": 2,
+    "same_subsequent_hypothesis": 3,
+    "receiving_map_M_source_moment_equal": true,
+    "factor_delta_coordinates": 96,
+    "all_factor_deltas_exact_zero": true,
+    "selected_step_exponents_CKD_by_contact": [
+      -39,
+      -32,
+      -33,
+      -38,
+      -33,
+      -32
+    ],
+    "retained_factor_tails": 0,
+    "released_factor_tails": 96,
+    "both_next_waves": [
+      "211/2048",
+      "0",
+      "49/2048",
+      "0",
+      "-125/2048",
+      "0",
+      "-51/2048",
+      "0"
+    ],
+    "future_wave_changed": false,
+    "probability_intervals_separated": false,
+    "no_claim_all_future_material_evolution_frozen": true
+  },
+  "cuda": {
+    "native_F_scores_preparation_full_material_carry_M_source_exact_parity": true,
+    "actual_record_and_same_id_return": true,
+    "contact_publication": "admitted zero realized motion",
+    "loaded_world_native_R_aggregation_unqualified": true,
+    "card_event_ns": 886957712,
+    "native_test_wall_ns": 10306833767,
+    "native_request_counts": "one paired forward and one paired return;4conservative kernel launch attempts recorded",
+    "outer_wrapper_counter_assertions_reached": false,
+    "counter_assertion_limitation": "stronger material assertion unwound before outer telemetry/counter assertions; source-only reporting fix moves them earlier; no further native rerun",
+    "GPU_peak_sampled_MiB": 260,
+    "GPU_cleanup_empty": true
+  },
+  "final_CODE_ns": 678698571974,
+  "native_settled_attempts": 1185,
+  "native_ceiling": 1200,
+  "CODE_ceiling_ns": 900000000000,
+  "all_guard_owned_cleanup_empty": true,
+  "remaining_native_operations": 15,
+  "full_repository_gate": "not run: broad native controls exceed remaining15operations and requested targeted scope; affected library disallowed/float guards and exact changed example build passed",
+  "custody_limitation": "code06 failed pre-bridge binary SHA is pinned but was overwritten in shared Cargo target before immutable copying; later executables, logs and current source are preserved. No claim all interim failed executables remain available.",
+  "private_evidence_hashes": {
+    "log.txt-0": "03cea216ee10d64aac01672e7e0b56bab438d782c7e84cfe33eeedca4c620bf4",
+    "contact_packet.txt-1": "a095c92411cb8f933e5e1803a30724793934dbefd67db721ec08ff9bb6244120",
+    "causal_response.txt-2": "fb11b6e5eee13598bc29c63d24a9d3b357b90457d5db78a82be457e7ff8f2440",
+    "receipt.json-3": "253001c0317af8a4d4d15fd584f9c6607ce63fc35f9eb7c6938c524591c4de62",
+    "GPU_QUALIFICATION.json-4": "fc0121e6da125349b6ce80833c3c03551210696f5b33223cd851524b53fa5148"
+  },
+  "saved_tail_groups": [
+    {
+      "contact": 0,
+      "family": "C",
+      "entries": 16,
+      "max_absolute_released": "20417/90580860272640000",
+      "max_to_half_cell": "20417/42180000",
+      "all_below_half_cell": true
+    },
+    {
+      "contact": 0,
+      "family": "K",
+      "entries": 16,
+      "max_absolute_released": "36343/32785418105651200",
+      "max_to_half_cell": "36343/15266900",
+      "all_below_half_cell": true
+    },
+    {
+      "contact": 0,
+      "family": "D",
+      "entries": 16,
+      "max_absolute_released": "92205/22924886158606336",
+      "max_to_half_cell": "92205/10675232",
+      "all_below_half_cell": true
+    },
+    {
+      "contact": 1,
+      "family": "C",
+      "entries": 16,
+      "max_absolute_released": "189975/591094427435401216",
+      "max_to_half_cell": "189975/275249792",
+      "all_below_half_cell": true
+    },
+    {
+      "contact": 1,
+      "family": "K",
+      "entries": 16,
+      "max_absolute_released": "890245/125327815712178176",
+      "max_to_half_cell": "890245/58360312",
+      "all_below_half_cell": true
+    },
+    {
+      "contact": 1,
+      "family": "D",
+      "entries": 16,
+      "max_absolute_released": "198823/37630510582726656",
+      "max_to_half_cell": "198823/17523072",
+      "all_below_half_cell": true
+    }
+  ]
+}
