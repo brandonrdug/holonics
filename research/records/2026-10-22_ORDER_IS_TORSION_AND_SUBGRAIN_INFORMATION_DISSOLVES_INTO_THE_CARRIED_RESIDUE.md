@@ -125,6 +125,8 @@ Sent to the Athena design thread on October 22 with the derivations.
 
 - The factorization of a one-linear-part stream through its lag-residue counts, stated in Lean.
 - de Bruijn's identity on the receiver's partition, and the entropy balance `σ ≥ 0` on a complex.
+- The neck with no comma: `dr² + κ²r²dτ²` is smooth at `r = 0` exactly when `τ` has period `2π/κ`
+  (Gibbons and Hawking). It stays a standard citation until a consumer needs it.
 
 ## Receipts
 
