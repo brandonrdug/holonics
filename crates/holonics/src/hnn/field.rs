@@ -623,7 +623,11 @@ impl FieldDeclaration {
     /// factor loci enter the word quadratically or trilinearly (`C = ccᵀ`, `K = bbᵀ`, `D = FFᵀ`,
     /// `W_s = −ffᵀ`, the slices `uvᵀ − vuᵀ`, the pair port `e(a·x)(b·y)`): the rule bounds each
     /// factor entry the same way, not their product, and the bound on a read through them is the
-    /// word-level certificate owed in #62 ("Step 4 (#73) owed: the word-level certificate"). The remainder
+    /// word-level certificate owed in #62 ("Step 4 (#73) owed: the word-level certificate").
+    /// [definition; agent-inferred, October 22] They take this rule with `X_ℓ` replaced by their
+    /// word-level modulus `X_F` (the product rule times the contact solve's modulus), their entry
+    /// bound declared as the admitted domain (record
+    /// `2026-10-22_RETENTION_RELEASES_ONLY_WHAT_NO_RECEIVER_CAN_READ_AND_THE_FACTOR_LOCI_TAKE_THE_LATTICE_RULE`). The remainder
     /// is carried, never released by the aeon collapse, which releases only exact complements
     /// (the lattice deposit); each deposit releases only its tail below the refining precision `k_m`, and
     /// the tails of one entry sum below half a unit since the locus's founding
