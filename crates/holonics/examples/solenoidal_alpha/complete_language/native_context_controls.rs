@@ -689,15 +689,15 @@ pub(crate) fn material_response_connected_on(execution:Option<&dyn holonics::hnn
     let _meter=Meter(execution);work::limit_process_native_attempts(std::env::var("V93_NATIVE_ATTEMPT_LIMIT")?.parse::<u64>()?-if execution.is_some(){4}else{0});
     let started=Instant::now();let reference=port();let(field,mut initial,pairing)=declaration_with_input_context(16384,true,true)?;
     initial.bind_family_local_receiving_return(2)?;initial.bind_bounded_receiving_representation(2)?;initial.bind_native_rational_receiving(2)?;
-    let reused=std::env::var_os("V93_REUSE_PENDING_SIX").map(std::path::PathBuf::from);
+    let reused=std::env::var_os("V93_REUSE_POST_FIRST_R").map(std::path::PathBuf::from);
     let (opening,mut stream)=if let Some(path)=&reused{
         let text=std::fs::read_to_string(path.join("native.state"))?;let state=ContinuingState::from_text(&text,READ_BUDGET)?;
         let resident=reference.mount_continued(&field,&Current::at_rest(&field),initial.clone(),&state)?;
-        assert_eq!(resident.continuing_state(0)?,state);assert_eq!(resident.native_source_frontier()?.source_cells(),6);
-        let crib=ObservedCrib::from_unplaced_checkpoint(&field,resident.current(),6,&std::fs::read_to_string(path.join("crib.txt"))?)?;
+        assert_eq!(resident.continuing_state(0)?,state);assert_eq!(resident.native_source_frontier()?.source_cells(),10);
+        let crib=ObservedCrib::from_unplaced_checkpoint(&field,resident.current(),10,&std::fs::read_to_string(path.join("crib.txt"))?)?;
         let stream=ObservedStream::restore_checkpoint(resident,crib,&std::fs::read_to_string(path.join("pending.txt"))?)?;
-        assert_eq!(stream.pending_classes(),&[0,1,2,3,0,1]);
-        println!("NATIVE_REUSED_AUTHENTIC_PENDING6 cold=true native_sha256={} no_replay=true",sha256(text.as_bytes())?);
+        assert_eq!(stream.accepted_cells()?,10);assert!(stream.pending_classes().is_empty());
+        println!("NATIVE_REUSED_AUTHENTIC_FIRST_R source_cells=10 exterior_pending=0 cold=true native_sha256={} no_replay=true",sha256(text.as_bytes())?);
         (initial,stream)
     }else{
     let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
@@ -724,6 +724,7 @@ pub(crate) fn material_response_connected_on(execution:Option<&dyn holonics::hnn
         println!("MATERIAL_RESPONSE_CONNECTED_COLD_PASS boundary={label} bytes={} pending_equal=true",text.len());Ok(restored)
     }
     let data:Vec<_>=(0..30).map(|i|i%4).collect();if reused.is_none(){stream.receive_native_current(&reference,&pairing,&data[..6],64)?;stream=cold(&reference,&stream,&opening,"pending-six")?;}
+    if reused.is_none(){
     let at6=stream.resident().continuing_state(0)?;let pending6=stream.pending_checkpoint();
     // Print only existing reached readings; no diagnostic Word or inverse trajectory.
     let first=stream.receive_native_current_diagnosed(&reference,&pairing,&data[6..10],64,&mut|e|{
@@ -735,6 +736,10 @@ pub(crate) fn material_response_connected_on(execution:Option<&dyn holonics::hnn
     assert!(stream.resident().constitution().receiving_map(2).unwrap().entries().iter().any(|q|!num_traits::Zero::is_zero(q)));
     println!("MATERIAL_RESPONSE_CONNECTED_FIRST_R_PASS publication={:?}",first[0].publication);
     stream=cold(&reference,&stream,&opening,"post-first-R")?;
+    }else{
+        assert!(stream.resident().constitution().receiving_map(2).unwrap().entries().iter().any(|q|!num_traits::Zero::is_zero(q)));
+        println!("REUSED_PRIOR_FIRST_R_EVIDENCE exact_checkpoint=true first_R_not_reexecuted=true native_history10=true");
+    }
     let at10=stream.resident().continuing_state(0)?;let pending10=stream.pending_checkpoint();let theta10=stream.resident().constitution().clone();
     let mut without=stream.resident().clone();let mut without_crib=stream.crib().clone();
     let mut card=execution.map(|_|(stream.resident().clone(),stream.crib().clone()));
