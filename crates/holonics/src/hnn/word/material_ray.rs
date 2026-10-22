@@ -98,10 +98,19 @@ pub(crate) struct OriginalPairStages {
 impl OriginalPairStages {
     pub(crate) fn issue_external(word:&Word<'_>,phases:&crate::hnn::receiving::ReceivingPhases,r:&super::native_execution::NativeExecutedPrediction)->Result<Self,HnnError>{
         let o=word.operands();let full=phases.junction_steps();
+        let original=word.complete_unrun_opening()?;
         if word.ticks()!=0||word.is_ended()||word.native_declaration_id.is_none()||o.lattice().is_none()||o.resonators().iter().any(Option::is_some)
-            ||word.complete_unrun_opening()?!=r.actual.exact_opening||r.released.balances.len()!=full||r.released.ticks!=full
+            ||original!=r.actual.exact_opening||r.released.balances.len()!=full||r.released.ticks!=full
             ||r.actual.points.last()!=Some(&r.reception_end.change)||r.released.end!=r.reception_end.change||r.reception_end.ticks!=word.opened_at()+full {
-            return Err(HnnError::Unadmitted{reason:"external native stage issuer requires original complete no-loaded full-tick producer"});
+            let value=|q:&Rat|if q.numer().bits()<=1024&&q.denom().bits()<=1024{q.to_string()}else{format!("extent(n={},d={})",q.numer().bits(),q.denom().bits())};
+            let difference=|a:&EndChange,b:&EndChange|{
+                a.storage.iter().flatten().chain(a.arrivals.iter().flatten().flatten()).chain(a.states.iter().flatten().flatten())
+                    .zip(b.storage.iter().flatten().chain(b.arrivals.iter().flatten().flatten()).chain(b.states.iter().flatten().flatten()))
+                    .enumerate().filter(|(_, (a,b))|a!=b).take(8).map(|(i,(a,b))|format!("coordinate={i} original={} executed={}",value(a),value(b))).collect::<Vec<_>>()
+            };
+            let evidence=format!("native_full_stage source={} commit={} word_ticks={} ended={} declaration={} lattice={} loaded={} opening_equal={} opening_first_differences={:?} expected_full={full} balance_count={} released_ticks={} carry_ticks={} opened_at={} final_point_equal={} release_end_equal={} final_first_differences={:?}",
+                word.native_source.as_ref().map_or(0,|x|x.2.cells()),word.native_source.as_ref().map_or(0,|x|x.0.commit()),word.ticks(),word.is_ended(),word.native_declaration_id.is_some(),o.lattice().is_some(),o.resonators().iter().any(Option::is_some),original==r.actual.exact_opening,difference(&original,&r.actual.exact_opening),r.released.balances.len(),r.released.ticks,r.reception_end.ticks,word.opened_at(),r.actual.points.last()==Some(&r.reception_end.change),r.released.end==r.reception_end.change,r.actual.points.last().map(|a|difference(a,&r.reception_end.change)));
+            return Err(HnnError::NativePreparationRefusal{evidence,source:Box::new(HnnError::Unadmitted{reason:"external native stage issuer requires original complete no-loaded full-tick producer"})});
         }
         let mut fresh=zero_state(o,word.opened_at());fresh.storage=word.response_source.as_ref().ok_or(HnnError::Unadmitted{reason:"external native producer retains its genuine fresh source"})?.clone();
         if fresh!=r.fresh.exact_opening{return Err(HnnError::Unadmitted{reason:"external fresh path preserves actual source preparation with zero interior"});}
