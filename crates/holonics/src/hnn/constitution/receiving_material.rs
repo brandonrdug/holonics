@@ -642,6 +642,7 @@ impl ReceivingMaterial {
         Ok(())
     }
 
+    pub(super) fn pristine_native(&self)->bool{self.native_rational() && self==&self.founding()}
     pub(super) fn native_rational(&self)->bool{matches!(self,Self::ArrivalContext{native_rational:true,..})}
     pub(super) fn bind_native_rational(&mut self)->Result<(),HnnError>{
         if self!=&self.founding() || self.representation_policy()!=ReceivingRepresentationPolicy::BoundedSubquantumV1 || self.native_rational(){return Err(HnnError::Unadmitted{reason:"NativeRationalMomentsV1 is an explicit fresh paired receiving declaration"});}
@@ -1286,6 +1287,15 @@ mod tests {
         let mut budget=epoch::CheckpointReadBudget::new(1<<30);
         let restored=ReceivingMaterial::read_optional(&mut text.lines(),"receiving","family local test",&mut budget).unwrap().unwrap();
         assert_eq!(restored,material);
+    }
+
+    #[test]
+    fn represented_native_declaration_does_not_reinterpret_reached_blocks(){
+        let law=NormalLaw::with_receiving_prior(ExactRatMatrix::zero(4,12).unwrap(),0);
+        let mut m=ReceivingMaterial::arrival_context(law,6,6).unwrap();assert!(!m.pristine_native());
+        m.bind_family_local_return().unwrap();m.bind_bounded_representation().unwrap();m.bind_native_rational().unwrap();assert!(m.pristine_native());
+        m.found_operand_charts(&vec![Rat::one();12]).unwrap();assert!(!m.pristine_native());
+        println!("REPRESENTED_FRESH_NATIVE_DATA_PASS no_reached_block_retagging=true native_calls=0");
     }
 
 }

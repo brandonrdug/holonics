@@ -427,7 +427,7 @@ impl Resident {
     /// Fresh opt-in represented computation. Released feedback tails are reported per Word;
     /// this version does not pretend ReceptionCarry is a residual-vector decoder.
     pub fn select_represented_native_prepared_input(&mut self,pairing:&PairingDeclaration)->Result<(),HnnError>{
-        if self.admitted.iter().any(|r|!self.constitution.native_rational_receiving(r.ring())){return Err(refuse("represented native passage explicitly declares its receiving statistics policy"));}
+        if self.admitted.iter().any(|r|!self.constitution.pristine_native_receiving(r.ring())){return Err(refuse("represented native passage explicitly declares its receiving statistics policy"));}
         self.select_native_current_prepared_input(pairing)?;
         self.prepared_input.as_mut().expect("fresh native owner").work_policy=PreparationWorkPolicy::RepresentedNativeV1(NativeWorkBudget::V1);Ok(())
     }

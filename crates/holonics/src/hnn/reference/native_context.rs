@@ -21,6 +21,10 @@ impl Reference {
         bits: u32,
     ) -> Result<crate::hnn::word::native_prediction::NativePredictionWord<'a>, HnnError> {
         resident.admit_no_participating_world()?;
+        let represented=resident.prepared_input.as_ref().is_some_and(|p|p.work_receipt_policy().represented());
+        if represented!=(chart==NativeExecutionChart::RepresentedV1) && (represented||chart==NativeExecutionChart::RepresentedV1){
+            return Err(HnnError::Unadmitted{reason:"native represented prediction cannot switch its declared execution policy"});
+        }
         if !resident.pending.is_empty() || !resident.staged.is_empty() || resident.arrived.is_some()
         {
             return Err(HnnError::Unadmitted {

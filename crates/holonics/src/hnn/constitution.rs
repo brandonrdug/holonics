@@ -5565,6 +5565,7 @@ impl Constitution {
             .and_then(ReceivingMaterial::single)
     }
 
+    pub(crate) fn pristine_native_receiving(&self,ring:usize)->bool{self.rings.get(ring).and_then(|m|m.receiving.as_ref()).is_some_and(ReceivingMaterial::pristine_native)}
     /// Explicit receiving operand layout; a paired map is never inferred from its width.
     pub fn receiving_layout(&self, ring: usize) -> Option<ReceivingLayout> {
         self.rings
