@@ -544,3 +544,5 @@ legacy Gram-lattice cold mismatch has a scoped compile-checked correction; full
 post-R cold/contact/next-R/source30/frozen execution remains unqualified.
 
 [measured; October22] Native rational receiving cold continuity now passes firstR and a genuine new contact; the next control-coordinate bound remains unresolved. [Scoped control and exact limits](../research/records/2026-10-22_NATIVE_RATIONAL_COLD_CONTINUES_TO_A_NEW_CONTACT.md).
+
+[measured; October22] An authentic native M/context/source packet separates physical work from numerical coordinate extent: the source12 control needs1,803bits while exact work≈1.7502 is below65,536. [Control refusal and joined carrier obligation](../research/records/2026-10-22_NATIVE_CONTROL_REFUSAL_IS_REPRESENTATION_GROWTH.md).

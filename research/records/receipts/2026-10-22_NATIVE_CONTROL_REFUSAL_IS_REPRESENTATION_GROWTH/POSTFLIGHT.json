@@ -1,0 +1,5 @@
+{
+  "all_receipts_terminal": true,
+  "all_owned_groups_cleanup_empty": true,
+  "scope": "owned guard groups only; no host-wide assertion"
+}

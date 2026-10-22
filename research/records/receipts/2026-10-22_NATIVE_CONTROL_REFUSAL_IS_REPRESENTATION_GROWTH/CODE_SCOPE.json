@@ -1,0 +1,30 @@
+{
+  "utc": "2026-10-22T01:56:43.603064+00:00",
+  "base": "7cacbf49710015b6d860e7654dba6b8918a87dd0",
+  "ceiling_ns": 180000000000,
+  "max_build_ns": 150000000000,
+  "single_native_ns": 30000000000,
+  "native_reserved": 220,
+  "no_retry": true,
+  "diagnostic_only_changes": "bounded original material/cut and source geometry failure enrichment; stop harness at the next-R refusal",
+  "native_inventory": {
+    "actual_word_prefix_at_most12_worst15_each": 180,
+    "initial_mount_cold_allowance": 30,
+    "contact_successor": 1,
+    "headroom": 9,
+    "total": 220,
+    "prior_exact_measured_same_prefix": 170
+  },
+  "native_hard_counter_enforced": true,
+  "no_extra_Word_for_diagnostic": true,
+  "old360_phase_closed_ns": 245569538603,
+  "no_transfer": true,
+  "GPU": 0,
+  "dataset": 0,
+  "training": 0,
+  "old_non_dispatch_scope_execution_ns": 0,
+  "resources": {
+    "CPU": 4,
+    "host_bytes": 8589934592
+  }
+}
