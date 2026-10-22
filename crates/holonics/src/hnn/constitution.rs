@@ -2877,8 +2877,15 @@ impl NormalLaw {
     /// Whether every entry of `W` and `H` lies on the lattice.
     fn on_lattice(&self, lattice: &Lattice) -> bool {
         if let Some(law) = &self.epoch {
+            // The realization lattice constrains W. Explicit native rational
+            // H/news retain their own bounded numerical carrier, admitted by
+            // the versioned normal codec/field owner, rather than being rounded
+            // onto that material lattice. Legacy grouped Gram stays dyadic.
+            let statistics = if law.native_rational.is_some() {
+                self.receiving_prior.is_some() && law.admit_native_statistics().is_ok()
+            } else { law.gram.is_dyadic() };
             return law.map.is_dyadic()
-                && law.gram.is_dyadic()
+                && statistics
                 && law
                     .map
                     .to_matrix()

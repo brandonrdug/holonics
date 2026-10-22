@@ -1197,6 +1197,19 @@ impl Constitution {
 }
 
 impl EpochLaw {
+    /// Admission of the explicitly declared statistics carrier. This is not a
+    /// material lattice relaxation: W remains a separate dyadic realization.
+    pub(super) fn admit_native_statistics(&self)->Result<(),HnnError>{
+        let b=self.native_rational.ok_or_else(||refused("an explicit native rational statistics policy"))?;
+        if self.source_refinement || self.receiving_refinement!=Some(ReceivingRepresentationPolicy::CEILING)
+            || self.map.native_rational.is_some() || self.gram.native_rational!=Some(b) || self.news.native_rational!=Some(b)
+            || self.gram.row_divisors.iter().any(|d|*d!=1)
+            || (self.gram.rows,self.gram.columns)!=(self.map.columns,self.map.columns)
+            || (self.news.rows,self.news.columns)!=(self.map.rows,self.map.columns){
+            return Err(refused("native rational H/news keep their receiving role, shape, resource declaration and separate map carrier"));
+        }
+        self.gram.admit_grouped()?;self.news.admit_grouped()
+    }
     pub(crate) fn declared_symmetry(&self) -> Option<&PortSymmetry> {
         self.symmetry.as_ref()
     }

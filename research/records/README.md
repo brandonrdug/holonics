@@ -27,6 +27,8 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
+- [Native R publishes at the original final Word](2026-10-22_NATIVE_R_PUBLISHES_AT_THE_ORIGINAL_FINAL_WORD.md): first actual R publication and31 map coordinates pass; post-R cold stops at the legacy Gram lattice check; scoped correction is compile-only.
+
 - [Native rational working set and port-reference boundary](2026-10-22_NATIVE_RATIONAL_WORKING_SET_AND_PORT_REFERENCE_BOUNDARY.md): width-six exact accounting passes; full connected control stops at the original-carry/new-Current publication guard.
 
 - [Native rational moments keep phase and represented news](2026-10-22_NATIVE_RATIONAL_MOMENTS_KEEP_PHASE_AND_REPRESENTED_NEWS.md): explicit bounded receiving statistics, unchanged lattice/phase, data checks and preserved first-R resource refusal.

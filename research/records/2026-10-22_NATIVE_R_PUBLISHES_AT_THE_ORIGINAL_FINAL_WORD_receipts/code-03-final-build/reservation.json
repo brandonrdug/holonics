@@ -1,0 +1,14 @@
+{
+  "name": "03-final-build",
+  "maximum_attempts": 0,
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "holonics",
+    "--lib",
+    "--example",
+    "solenoidal_alpha",
+    "--no-run"
+  ]
+}

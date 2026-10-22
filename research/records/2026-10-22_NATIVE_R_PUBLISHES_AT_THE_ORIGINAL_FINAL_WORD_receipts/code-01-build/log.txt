@@ -1,0 +1,113 @@
+   Compiling holonics v0.1.0 (/home/b/Documents/Codex/2026-10-17/task/req063-circuit-bpc/.local/wt/a28-native-context-return-v93-20261021/crates/holonics)
+error[E0412]: cannot find type `BigInt` in this scope
+   --> crates/holonics/src/hnn/mod.rs:545:53
+    |
+545 |     ReturnedPortReference { contact:usize, lift:Vec<BigInt>, word_ticks:usize, phase:u64, exponent:Box<Rat>, carry_exponent:BigInt, admit...
+    |                                                     ^^^^^^ not found in this scope
+    |
+    = note: struct `crate::hnn::ring::modes::compiled::BigInt` exists but is inaccessible
+help: consider importing this struct
+    |
+194 + use num_bigint::BigInt;
+    |
+
+error[E0412]: cannot find type `BigInt` in this scope
+   --> crates/holonics/src/hnn/mod.rs:545:125
+    |
+545 | ...usize, phase:u64, exponent:Box<Rat>, carry_exponent:BigInt, admittance:Box<Rat>, expected:Box<Rat>, carried:Box<Rat> },
+    |                                                        ^^^^^^ not found in this scope
+    |
+    = note: struct `crate::hnn::ring::modes::compiled::BigInt` exists but is inaccessible
+help: consider importing this struct
+    |
+194 + use num_bigint::BigInt;
+    |
+
+warning: unused import: `NativeReceivingSourceReading`
+  --> crates/holonics/src/hnn/constitution/epoch.rs:19:84
+   |
+19 | pub use retained_receiving::{EpochReceivingRayPacket, EpochReceivingStationReading,NativeReceivingSourceReading};
+   |                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::ratio::linear::vector::combination`
+ --> crates/holonics/src/hnn/moment/resident_pair_face.rs:3:5
+  |
+3 | use crate::ratio::linear::vector::combination;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Signed`
+ --> crates/holonics/src/hnn/physical/action/contextual.rs:8:18
+  |
+8 | use num_traits::{Signed, Zero};
+  |                  ^^^^^^
+
+warning: unused imports: `prepare_native_retained_section` and `prepare_retained_section`
+   --> crates/holonics/src/hnn/receiving.rs:159:27
+    |
+159 | pub(crate) use selected::{prepare_retained_section, prepare_native_retained_section, prepare_native_retained_section_with_policy};
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Reach`
+   --> crates/holonics/src/hnn/word/native_prediction.rs:543:72
+    |
+543 |         use crate::hnn::constitution::{LinearLocus, LinearStep, Locus, Reach};
+    |                                                                        ^^^^^
+
+error[E0412]: cannot find type `BigInt` in this scope
+   --> crates/holonics/src/hnn/mod.rs:545:53
+    |
+545 |     ReturnedPortReference { contact:usize, lift:Vec<BigInt>, word_ticks:usize, phase:u64, exponent:Box<Rat>, carry_exponent:BigInt, admit...
+    |                                                     ^^^^^^ not found in this scope
+    |
+    = note: struct `crate::receiver::population::evolution_tests::BigInt` exists but is inaccessible
+help: consider importing this struct
+    |
+194 + use num_bigint::BigInt;
+    |
+
+error[E0412]: cannot find type `BigInt` in this scope
+   --> crates/holonics/src/hnn/mod.rs:545:125
+    |
+545 | ...usize, phase:u64, exponent:Box<Rat>, carry_exponent:BigInt, admittance:Box<Rat>, expected:Box<Rat>, carried:Box<Rat> },
+    |                                                        ^^^^^^ not found in this scope
+    |
+    = note: struct `crate::receiver::population::evolution_tests::BigInt` exists but is inaccessible
+help: consider importing this struct
+    |
+194 + use num_bigint::BigInt;
+    |
+
+warning: variable does not need to be mutable
+   --> crates/holonics/src/hnn/word/action.rs:359:5
+    |
+359 |     mut producer: ActionProducer,
+    |     ----^^^^^^^^
+    |     |
+    |     help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> crates/holonics/src/hnn/word/native_prediction.rs:174:9
+    |
+174 |         mut self,
+    |         ----^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/holonics/src/hnn/word/native_prediction.rs:202:43
+    |
+202 |     fn native_current_prediction_declared(mut self,cap:NativePredictionDeclaration,bits:u32)->Result<NativePredictionWord<'a>,HnnError>{
+    |                                           ----^^^^
+    |                                           |
+    |                                           help: remove this `mut`
+
+For more information about this error, try `rustc --explain E0412`.
+warning: `holonics` (lib) generated 8 warnings
+error: could not compile `holonics` (lib) due to 2 previous errors; 8 warnings emitted
+warning: build failed, waiting for other jobs to finish...
+warning: `holonics` (lib test) generated 6 warnings (6 duplicates)
+error: could not compile `holonics` (lib test) due to 2 previous errors; 6 warnings emitted

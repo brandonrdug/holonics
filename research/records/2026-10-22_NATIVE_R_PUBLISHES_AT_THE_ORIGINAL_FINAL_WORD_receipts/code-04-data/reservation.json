@@ -1,0 +1,9 @@
+{
+  "name": "04-data",
+  "maximum_attempts": 0,
+  "command": [
+    "bash",
+    "-c",
+    "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data hnn::constitution::epoch::rational:: --nocapture"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "utc": "2026-10-22T01:10:22.218317+00:00",
+  "base": "e4199f8ebfa5c95019f753ed9cfa1b039d2df748",
+  "review": "/home/b/Documents/Codex/2026-10-20/task/NATIVE_ORIGINAL_WORD_FINAL_INGRESS_REPAIR_REVIEW.txt",
+  "review_sha256": "c52a36df109644d5f405cbd1075bc529ae69712e8255ee8be6315a153d0be57d",
+  "fixed_code_ceiling_ns": 360000000000,
+  "max_build_call_ns": 180000000000,
+  "single_native_call_max_ns": 90000000000,
+  "new_native_attempt_reservation": 640,
+  "native_inventory": {
+    "actual30_worst15": 450,
+    "frozen8_worst13": 104,
+    "initial_cold_query": 30,
+    "contact_successor": 1,
+    "headroom": 55,
+    "total": 640
+  },
+  "CPU": 4,
+  "host_bytes": 8589934592,
+  "no_retry": true,
+  "old_phase_closed_ns": 237842881492,
+  "old_phase_reservation": 512,
+  "allowance_transfer": false,
+  "sequence": [
+    "pending6 cold",
+    "R0..10",
+    "postR cold",
+    "actualcontact10..11",
+    "R11..20",
+    "R20..30 deferred close",
+    "full native cold",
+    "four same-key warm/cold frozen decisions"
+  ],
+  "gpu": 0,
+  "dataset": 0,
+  "training_campaign": 0,
+  "output_campaign": 0,
+  "guards_unchanged": [
+    "current port reference",
+    "propagation/power equality",
+    "held momentum",
+    "actual R ray",
+    "rational/cold/resource",
+    "physical work/range",
+    "original Mcut and lag",
+    "atomic whole delivery"
+  ]
+}

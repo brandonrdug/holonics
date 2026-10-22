@@ -536,3 +536,9 @@ qualifies real width-six cold arithmetic without changing the caps. Its single
 connected control reaches a distinct continuation guard: a retained Word carry's
 reference versus the actual-ingress-advanced Current. That join remains unfinished;
 reference transmission belongs to the carried opening owner, not a scalar R guard.
+
+The [original-final-Word publication record](../research/records/2026-10-22_NATIVE_R_PUBLISHES_AT_THE_ORIGINAL_FINAL_WORD.md)
+places the R-only update before final source ingress, retaining the original Word,
+carry, prepared cut and lag. Its first R publication passes. The subsequently found
+legacy Gram-lattice cold mismatch has a scoped compile-checked correction; full
+post-R cold/contact/next-R/source30/frozen execution remains unqualified.

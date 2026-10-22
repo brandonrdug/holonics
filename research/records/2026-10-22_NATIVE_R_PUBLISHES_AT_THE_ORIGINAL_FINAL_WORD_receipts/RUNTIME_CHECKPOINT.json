@@ -1,0 +1,15 @@
+{
+  "tested_payload_manifest": "PRE_DISPATCH_PINS.json",
+  "first_R_published": true,
+  "first_R_applied_coordinates": 31,
+  "held": false,
+  "native_wall_ns": 5113864250,
+  "native_attempts": 138,
+  "native_reservation": 640,
+  "code_charge_before_cold_fix_ns": 269560897365,
+  "no_retry": true,
+  "failure": "ContinuingState: the state material off its loci lattices",
+  "cold_source": "NormalLaw::on_lattice unconditionally requires gram.is_dyadic even when NativeRationalMomentsV1 is explicit",
+  "later_transitions": "not reached",
+  "whole_native_first_R_checkpoint_not_written_by_control": true
+}

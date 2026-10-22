@@ -1,0 +1,27 @@
+{
+  "native_attempt_reservation": 0,
+  "native_attempt_charge": 0,
+  "native_counts": null,
+  "command": [
+    "bash",
+    "-c",
+    "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data hnn::constitution::epoch::rational:: --nocapture"
+  ],
+  "limit_s": 10,
+  "wall_ns": 101894921,
+  "peak_rss_bytes": 1503232,
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "samples": 1,
+  "exit": 0,
+  "stop": null,
+  "owned_cleanup_remaining": [],
+  "ledger_before_ns": 264345138194,
+  "ledger_after_ns": 264447033115,
+  "model_jobs": 0,
+  "gpu_dispatch": "not inferred by process guard; see any dedicated CUDA context/dispatch receipt"
+}
