@@ -257,3 +257,81 @@ No training, dataset/output campaign, upload, push, PR change or useful-intellig
 result belongs to this phase. The completed136-record campaign and D6–D8 obligations
 above remain distinct. The design owner's current-index/coverage-reuse work is linked
 by its canonical titles rather than copied into another audit.
+
+
+## Source-only retention diagnosis and the prospective policy decision
+
+[source and saved operands only, October22; Refs #62 #73] The following audit starts at
+`1f5587622e6c8644ff0ca513ce22fa665039a4df` and preserves runtime `b3e9f84` and its
+closed678.698571974-second/1,185-operation phase. No build, test, native Word, fit,
+checkpoint restore, training or output invocation was used for this audit. Production
+behavior is unchanged; the existing controls below were read, not rerun.
+
+The saved first-R state has lattice29 on both channels, no carries and no channel deposit
+clock. The post-contact state still has lattice29 and no carries, with each channel clock1.
+For that first deposit `k_m=1`: the unit is2^-29, the first fine unit2^-30 and its half-cell
+2^-31. Every one of the96 nonzero saved factor releases is strictly smaller in magnitude
+than2^-31. In `constitution.rs::carried_entry`, the nearest fine point is therefore0;
+the second split gives applied coordinate0 and retained remainder0. Accounting assigns
+the supplied update to the release residual. This is source-derived accounting using the
+recorded releases and saved zero-carry states, not a second independently recorded raw
+covector. No carry was dropped by publication/cold restore and the channel clock did not
+reset. The six selected step exponents remain−39,−32,−33,−38,−33,−32.
+
+This is the common carry law adopted in the [October16 factor record](2026-10-16_THE_CONTACT_FACTORS_TAKE_THE_COMMON_LATTICE_LAW_AND_THEIR_RELEASE_STAYS_BELOW_HALF_THE_FOUNDING_UNIT.md),
+not the superseded October7 exact-coarse-remainder law. Its Kraft bound covers the supplied
+coefficient-update history in the **founding** unit. The [original September25 policy](2026-09-25_THE_CLASSICAL_LOSS_IS_THE_PERCEIVED_DIFFERENCE_AND_THE_DEPOSITION_REMAINDER_IS_A_REPRESENTATION_RESIDUAL.md#5-the-law-the-remainders-precision-refines-with-the-locuss-own-count)
+and `field.rs::lattice_by_rule` explicitly leave the nonlinear factor-to-future-receiver
+bound open. A finite current-Word response gain does not discharge that admitted-future
+obligation. Public PR401 declares dynamic series width and tolerance-partitioned release;
+it is documentation, not a new factor-policy implementation. The active fixed-grid lane
+cannot be described as having proved that these nonzero physical directions are irrelevant.
+
+The fixture's physical tolerance is1/4; the declared channel fan-in yields founding
+lattice5, then its single explicit24-level pre-refinement gives29. Its `port()` never
+selects `with_refining_grain`. The64-bit score enclosure is not a declaration of physical
+receiver tolerance2^-64. `ContactCut::publish_native_comparison` calls the certified
+`continue_deposited -> deposited_with_contact_spans` path. It neither selects the older
+first-reach/finite-decrease path nor supplies an `ObservedChannelGrainPlan`. Thus this is
+an absent native physical-resolution policy join, not a selected schedule silently lost.
+The current gain already queries each prepared direction over the joint proposed extent,
+and the actual witness re-queries the complete rounded factor delta; no proven gain-domain
+wiring correction was found. Tightness or a larger admissible nonzero step is not inferred.
+
+Reuse remains concrete. `BudgetedCarry::rebase` and
+`constitution/epoch/channel_grain.rs::stage_rebases` conserve all six factor/scale
+value-plus-carry arrays. Its five existing controls read half ties, two-contact/all-six
+carriage, D landing/cold/no-repeat, C/K limiting levels, rollback and invalid/released
+inputs. Its largest-held-factor rule deliberately prevents representation-only C/K
+motion. `channel_ray.rs` already distinguishes the complete before/after displacement
+from rebase plus fresh quotient, with cancellation/noncollinearity controls. These owners
+should be joined, not recreated. They accept **genuine retained carry**, never the96
+released receipt terms. A later rebase cannot revive those terms; a finer lattice also
+does not erase the founding-unit error already released.
+
+C/K/D retain their factors, three scalar normalization statistics and lawful carries.
+They do not have receiving-style vector `news` or empirical-M H/B moments. Advancing
+those scalar statistics once is preserved, but cannot be called retention of the released
+factor direction. Importing R's eta0/H/news successor into contact material would introduce
+a different constitutive update. Likewise increasing eta to a first reach would import a
+different step/admission path, not correct the two-stage split.
+
+[decision required, not installed] Select an explicit **prospective version** of native
+material resolution/retention before the fine split: identify the admitted receiver,
+physical metric/domain/tolerance, bounded resource target and residual transport rule.
+It must state whether it retains the present bounded coefficient-release policy with an
+authentic refinement target, or changes which new terms are retained/released. The latter
+is a representation/constitutive policy change and must not be shipped as a wiring fix.
+For an admitted refinement, use the existing six-carrier rebase at a producing boundary;
+keep original Word/field/source/frame binding and never retroactively rebind its proof.
+Any genuine C/K landing must be part of the total native material ray and held-momentum,
+work/storage/range/error admission; count statistics/actual input only once. Record the
+selected version/target, attained shortfall, pending material and cold continuation.
+Unavailable bounded tolerance/resource proof refuses; it does not force motion or retain
+an unbounded operation archive. Existing released evidence remains exterior and immutable.
+
+No established source-only production correction was selected in this audit. The exact
+remaining decision is above, rather than an unqualified finer-grid patch or another run.
+The current local status index points to this diagnosis and the separate zero-motion card
+result. General contextual E/family/ecology work and the failed material-effect requirement
+remain open.

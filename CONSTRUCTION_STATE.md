@@ -17,6 +17,14 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October22 source-only retention audit; production unchanged.** The96 released factor
+terms follow the selected first-deposit fine split (channel clock0→1, lattice29,
+half-cell2^-31), not a publication/cold carry loss. Native automatic physical-resolution
+selection is still unjoined; importing exact tails, first-reach steps or R-normal news
+would change the policy. The [exact decision and existing reuse owners](research/records/2026-10-22_REPRESENTED_NATIVE_CONTACT_FIRST_VARIATION.md#source-only-retention-diagnosis-and-the-prospective-policy-decision)
+are recorded without a new build/test/native invocation. The closed runtime evidence
+below remains unchanged.
+
 **October 22 local successor: native card contact boundary, material-effect requirement still open.**
 Runtime source `b3e9f84ca0deedf56edd1855670e0a95662cc4b3` executes genuine retained
 actual/fresh CUDA forward and reverse through the private native F/return owner. One
