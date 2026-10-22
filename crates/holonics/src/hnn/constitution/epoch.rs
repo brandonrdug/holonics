@@ -693,6 +693,11 @@ impl EpochArray {
             .row_divisors
             .iter()
             .try_fold(1, |a, &b| common_odd(a, b))?;
+        if let Some(b)=self.native_rational {
+            let factor=u64::from(u64::BITS-divisor.leading_zeros());let max=self.values.iter().map(BigInt::bits).max().unwrap_or(0).saturating_add(factor);
+            let d=self.denominator.bits().saturating_add(factor);
+            b.check(max.max(d),b.payload(self).saturating_add(self.values.len() as u64*max).saturating_add(d).saturating_add(12*max.max(d)))?;
+        }
         let values = self
             .values
             .iter()
@@ -707,6 +712,7 @@ impl EpochArray {
         if (self.rows, self.columns) != (1, 1) {
             return Err(refused("an epoch scalar has one coordinate"));
         }
+        if let Some(b)=self.native_rational {b.admit_view(self,1)?;}
         Ok(Rat::new(
             self.values[0].clone(),
             BigInt::from(self.row_divisors[0]) * &self.denominator,
@@ -749,6 +755,7 @@ impl EpochArray {
     /// Materialize a boundary view for native forward operators. This is exact
     /// and does not repartition or mutate the retained grouped constitution.
     pub(crate) fn to_matrix(&self) -> Result<ExactRatMatrix, HnnError> {
+        if let Some(b)=self.native_rational {b.admit_view(self,2)?;}
         let rows = (0..self.rows)
             .map(|row| {
                 let denominator = &self.denominator * self.row_divisors[row];
@@ -2041,7 +2048,7 @@ impl EpochLaw {
                     let n = u64::try_from(direction.values.len()).map_err(|_| extent())?;
                     let limb = [&self.map,&direction,&gram,&news].into_iter()
                         .map(|a| a.values.iter().map(BigInt::bits).max().unwrap_or(0)
-                            .saturating_add(u64::from(a.exponent)).saturating_add(u64::from(required)))
+                            .saturating_add(a.denominator.bits()).saturating_add(a.row_divisors.iter().map(|d|u64::from(u64::BITS-d.leading_zeros())).max().unwrap_or(0)).saturating_add(u64::from(a.exponent)).saturating_add(u64::from(required)))
                         .max().unwrap_or(0).saturating_add(physical_scale_bits);
                     let row_bits = direction.row_divisors.iter().map(|d|u64::from(u64::BITS-d.leading_zeros())).max().unwrap_or(0);
                     let column_bits = u64::from(usize::BITS-direction.columns.leading_zeros());

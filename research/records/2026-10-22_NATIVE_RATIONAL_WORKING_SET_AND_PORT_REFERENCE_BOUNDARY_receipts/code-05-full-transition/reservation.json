@@ -1,0 +1,9 @@
+{
+  "name": "05-full-transition",
+  "maximum_attempts": 512,
+  "command": [
+    "bash",
+    "-c",
+    "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-resource-connected-fcf6de9/binaries/connected --exact complete_language::native_context_controls::native_rational_full_transition --ignored --nocapture"
+  ]
+}

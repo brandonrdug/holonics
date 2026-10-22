@@ -1,0 +1,37 @@
+{
+  "binaries": [
+    {
+      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-resource-connected-fcf6de9/binaries/data",
+      "sha256": "30ae53b988ea955dfa661613d8be6c3cfae9d53e518b28bd26e367244c47b404"
+    },
+    {
+      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-resource-connected-fcf6de9/binaries/connected",
+      "sha256": "8d402a86ef5b837bbc08a147312c341be0c9640c52244763155fe62aa95c64b5"
+    }
+  ],
+  "source": [
+    {
+      "path": "crates/holonics/examples/solenoidal_alpha/complete_language/native_context_controls.rs",
+      "sha256": "5ed5c7aaac62adc0c92ac29410155a9c381b260c488bcb12e5efd4ae52de0e54"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch.rs",
+      "sha256": "d01b31d2c5a2577e9af956b6c76ef0014f5a18905db8a2b0ed907c95f693abe1"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/checkpoint.rs",
+      "sha256": "6c7cf712132cf0a9641686b9b5871b4a8985bd4b09020b9874b965ca3a30f513"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/deposit/paired_receiving.rs",
+      "sha256": "ed003f74efbdf5e062b34afa0670aa0d7fa4275d248eb3e5336b404102ae2bcc"
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution/epoch/rational.rs",
+      "sha256": "62c33e5c040b6afdf2e9eb785c4993a3d74f203274cc52d10a1e451e4719abff"
+    }
+  ],
+  "phase_native_reservation": 512,
+  "planned_native_guard_s": 60,
+  "native_guard_reason": "within <=90 per-call and remaining300-second cumulative scope; no extension"
+}

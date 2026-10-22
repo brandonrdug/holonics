@@ -530,3 +530,9 @@ Its owner is `hnn/constitution/epoch/rational.rs`; its scoped evidence and incom
 connected qualification are recorded in
 [Native rational moments keep phase and represented news](../research/records/2026-10-22_NATIVE_RATIONAL_MOMENTS_KEEP_PHASE_AND_REPRESENTED_NEWS.md).
 The legacy grouped carrier and device admission remain separate.
+
+The subsequent [working-set and port-reference record](../research/records/2026-10-22_NATIVE_RATIONAL_WORKING_SET_AND_PORT_REFERENCE_BOUNDARY.md)
+qualifies real width-six cold arithmetic without changing the caps. Its single
+connected control reaches a distinct continuation guard: a retained Word carry's
+reference versus the actual-ingress-advanced Current. That join remains unfinished;
+reference transmission belongs to the carried opening owner, not a scalar R guard.

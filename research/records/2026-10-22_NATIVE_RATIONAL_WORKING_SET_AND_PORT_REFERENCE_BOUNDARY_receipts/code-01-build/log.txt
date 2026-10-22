@@ -1,0 +1,251 @@
+   Compiling holonics v0.1.0 (/home/b/Documents/Codex/2026-10-17/task/req063-circuit-bpc/.local/wt/a28-native-context-return-v93-20261021/crates/holonics)
+warning: unused import: `NativeReceivingSourceReading`
+  --> crates/holonics/src/hnn/constitution/epoch.rs:19:84
+   |
+19 | pub use retained_receiving::{EpochReceivingRayPacket, EpochReceivingStationReading,NativeReceivingSourceReading};
+   |                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::ratio::linear::vector::combination`
+ --> crates/holonics/src/hnn/moment/resident_pair_face.rs:3:5
+  |
+3 | use crate::ratio::linear::vector::combination;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Signed`
+ --> crates/holonics/src/hnn/physical/action/contextual.rs:8:18
+  |
+8 | use num_traits::{Signed, Zero};
+  |                  ^^^^^^
+
+warning: unused imports: `prepare_native_retained_section` and `prepare_retained_section`
+   --> crates/holonics/src/hnn/receiving.rs:159:27
+    |
+159 | pub(crate) use selected::{prepare_retained_section, prepare_native_retained_section, prepare_native_retained_section_with_policy};
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Reach`
+   --> crates/holonics/src/hnn/word/native_prediction.rs:543:72
+    |
+543 |         use crate::hnn::constitution::{LinearLocus, LinearStep, Locus, Reach};
+    |                                                                        ^^^^^
+
+warning: variable does not need to be mutable
+   --> crates/holonics/src/hnn/word/action.rs:359:5
+    |
+359 |     mut producer: ActionProducer,
+    |     ----^^^^^^^^
+    |     |
+    |     help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> crates/holonics/src/hnn/word/native_prediction.rs:174:9
+    |
+174 |         mut self,
+    |         ----^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/holonics/src/hnn/word/native_prediction.rs:202:43
+    |
+202 |     fn native_current_prediction_declared(mut self,cap:NativePredictionDeclaration,bits:u32)->Result<NativePredictionWord<'a>,HnnError>{
+    |                                           ----^^^^
+    |                                           |
+    |                                           help: remove this `mut`
+
+warning: function `flatten_checked` is never used
+   --> crates/holonics/src/compression/landmark/context/arrivals.rs:172:4
+    |
+172 | fn flatten_checked(
+    |    ^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `build` is never used
+   --> crates/holonics/src/compression/landmark/context/arrivals.rs:275:15
+    |
+275 | pub(super) fn build(
+    |               ^^^^^
+
+warning: function `path_level_for_segment` is never used
+   --> crates/holonics/src/compression/landmark/context/arrivals.rs:711:4
+    |
+711 | fn path_level_for_segment(path: &BranchPath, segment: SegmentId) -> Option<usize> {
+    |    ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `lifetime_release_bound` is never used
+   --> crates/holonics/src/hnn/constitution/epoch.rs:420:15
+    |
+420 | pub(crate) fn lifetime_release_bound(
+    |               ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `partition` is never used
+   --> crates/holonics/src/hnn/constitution/epoch.rs:833:19
+    |
+832 | impl EpochSeries {
+    | ---------------- method in this implementation
+833 |     pub(crate) fn partition(&self, exponent: u32) -> Result<EpochPartition, HnnError> {
+    |                   ^^^^^^^^^
+
+warning: field `halvings` is never read
+    --> crates/holonics/src/hnn/constitution/epoch.rs:1074:16
+     |
+1067 | pub(crate) struct EpochDeposit {
+     |                   ------------ field in this struct
+...
+1074 |     pub(crate) halvings: u64,
+     |                ^^^^^^^^
+     |
+     = note: `EpochDeposit` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: field `shares` is never read
+    --> crates/holonics/src/hnn/constitution/epoch.rs:1098:16
+     |
+1094 | pub(crate) struct EpochFresh {
+     |                   ---------- field in this struct
+...
+1098 |     pub(crate) shares: Vec<i64>,
+     |                ^^^^^^
+     |
+     = note: `EpochFresh` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: associated items `founded`, `founded_paired`, and `refresh_spectral` are never used
+    --> crates/holonics/src/hnn/constitution/epoch.rs:1241:19
+     |
+1199 | impl EpochLaw {
+     | ------------- associated items in this implementation
+...
+1241 |     pub(crate) fn founded(
+     |                   ^^^^^^^
+...
+1332 |     pub(crate) fn founded_paired(
+     |                   ^^^^^^^^^^^^^^
+...
+2236 |     pub(crate) fn refresh_spectral(&mut self) -> Result<(), HnnError> {
+     |                   ^^^^^^^^^^^^^^^^
+
+warning: methods `observed_epoch_index`, `deposit_observed_epoch`, and `deposit_observed_epoch_with_execution` are never used
+    --> crates/holonics/src/hnn/constitution/epoch/deposit.rs:1868:19
+     |
+1811 | impl Constitution {
+     | ----------------- methods in this implementation
+...
+1868 |     pub(crate) fn observed_epoch_index(&self, receiver: usize) -> u64 {
+     |                   ^^^^^^^^^^^^^^^^^^^^
+...
+1911 |     pub(crate) fn deposit_observed_epoch(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^
+...
+1949 |     pub(crate) fn deposit_observed_epoch_with_execution(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `retained_origin` is never used
+  --> crates/holonics/src/hnn/constitution/epoch/retained_receiving.rs:78:19
+   |
+36 | impl EpochReceivingLaw {
+   | ---------------------- method in this implementation
+...
+78 |     pub(super) fn retained_origin(&self) -> Option<&Arc<RetainedSectionOrigin>> {
+   |                   ^^^^^^^^^^^^^^^
+
+warning: field `combined` is never read
+   --> crates/holonics/src/hnn/receiving/selected.rs:381:5
+    |
+378 | pub(super) struct ProducedRetainedSection {
+    |                   ----------------------- field in this struct
+...
+381 |     combined: Option<Faces>,
+    |     ^^^^^^^^
+
+warning: associated items `at` and `validate` are never used
+   --> crates/holonics/src/hnn/receiving/selected.rs:390:19
+    |
+389 | impl ProducedRetainedSection {
+    | ---------------------------- associated items in this implementation
+390 |     pub(super) fn at(
+    |                   ^^
+...
+463 |     pub(super) fn validate(
+    |                   ^^^^^^^^
+
+warning: function `prepare_retained_section` is never used
+   --> crates/holonics/src/hnn/receiving/selected.rs:510:15
+    |
+510 | pub(crate) fn prepare_retained_section(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `prepare_native_retained_section` is never used
+   --> crates/holonics/src/hnn/receiving/selected.rs:526:15
+    |
+526 | pub(crate) fn prepare_native_retained_section(population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usi...
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `certificate_origin`, `at_produced`, and `at_native_produced` are never used
+   --> crates/holonics/src/hnn/receiving/aligned_return.rs:206:19
+    |
+203 | impl RetainedSectionReturn {
+    | -------------------------- associated items in this implementation
+...
+206 |     pub(crate) fn certificate_origin(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+243 |     pub(super) fn at_produced(
+    |                   ^^^^^^^^^^^
+...
+261 |     pub(super) fn at_native_produced(population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usize],produ...
+    |                   ^^^^^^^^^^^^^^^^^^
+
+warning: function `compose_pair_return` is never used
+    --> crates/holonics/src/hnn/reference.rs:3368:15
+     |
+3368 | pub(crate) fn compose_pair_return(
+     |               ^^^^^^^^^^^^^^^^^^^
+
+warning: field `commit` is never read
+  --> crates/holonics/src/hnn/reference/epoch.rs:20:16
+   |
+14 | pub(crate) struct EpochRead {
+   |                   --------- field in this struct
+...
+20 |     pub(crate) commit: u64,
+   |                ^^^^^^
+   |
+   = note: `EpochRead` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `read_epoch` is never used
+   --> crates/holonics/src/hnn/reference/epoch.rs:136:19
+    |
+131 | impl Reference {
+    | -------------- method in this implementation
+...
+136 |     pub(crate) fn read_epoch(
+    |                   ^^^^^^^^^^
+
+warning: associated function `fresh` is never used
+   --> crates/holonics/src/hnn/reference/prepared_input.rs:155:19
+    |
+154 | impl PreparedInputState {
+    | ----------------------- associated function in this implementation
+155 |     pub(crate) fn fresh(
+    |                   ^^^^^
+
+error[E0382]: borrow of moved value: `p`
+   --> crates/holonics/src/hnn/constitution/epoch/rational.rs:246:303
+    |
+246 | ...et p=if shares[j]>=0{Rat::from_integer(BigInt::one()<<shares[j] as usize)}else{Rat::new(1.into(),BigInt::one()<<(-shares[j]) as usize)};assert!(mass<=p&&mass>p/Rat::from_integer(2.into()));for i in 0..4{assert_eq!(actual[i][j],&n[i][j]/&p);}}
+    |       - move occurs because `p` has type `Ratio<num_bigint::BigInt>`, which does not implement the `Copy` trait                                                  - value moved here                                                            ^^ value borrowed here after move
+    |
+help: consider cloning the value if the performance cost is acceptable
+    |
+246 |     for j in 0..6{let mass:Rat=h.iter().map(|r|r[j].abs()).sum();let p=if shares[j]>=0{Rat::from_integer(BigInt::one()<<shares[j] as usize)}else{Rat::new(1.into(),BigInt::one()<<(-shares[j]) as usize)};assert!(mass<=p&&mass>p.clone()/Rat::from_integer(2.into()));for i in 0..4{assert_eq!(actual[i][j],&n[i][j]/&p);}}
+    |                                                                                                                                                                                                                                  ++++++++
+
+For more information about this error, try `rustc --explain E0382`.
+warning: `holonics` (lib test) generated 6 warnings (6 duplicates)
+error: could not compile `holonics` (lib test) due to 1 previous error; 6 warnings emitted
+warning: build failed, waiting for other jobs to finish...
+warning: `holonics` (lib) generated 27 warnings (run `cargo fix --lib -p holonics` to apply 8 suggestions)

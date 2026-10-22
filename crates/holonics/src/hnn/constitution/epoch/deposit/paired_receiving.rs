@@ -269,12 +269,13 @@ fn prepare(
         scales[i] = scale;
         observe(EpochDepositPhase::Flow(kind));
     }
+    if owner.native_rational(){NativeRationalBudget::V1.admit_rat_join(&directions)?;}
     let proposed = joined(&directions[0], &directions[1])?;
     let direction = if owner.native_rational() { EpochArray::from_native_rows(&proposed.to_rows(),(0..rows).map(|r|if r%2==1{stage.receiving_period}else{1}).collect(),NativeRationalBudget::V1)? } else { physical_array(&proposed,stage.receiving_period)? };
     let certificate = receiving_epoch_certificate(
         &samples,
         stage.receiving_parts,
-        &direction.to_rows(),
+        &direction.to_matrix()?.to_rows(),
         stage.exponent,
     )?;
     let raw: Rat = laws

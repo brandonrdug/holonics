@@ -27,6 +27,8 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
+- [Native rational working set and port-reference boundary](2026-10-22_NATIVE_RATIONAL_WORKING_SET_AND_PORT_REFERENCE_BOUNDARY.md): width-six exact accounting passes; full connected control stops at the original-carry/new-Current publication guard.
+
 - [Native rational moments keep phase and represented news](2026-10-22_NATIVE_RATIONAL_MOMENTS_KEEP_PHASE_AND_REPRESENTED_NEWS.md): explicit bounded receiving statistics, unchanged lattice/phase, data checks and preserved first-R resource refusal.
 
 - [The navigator port enters only with its located source](2026-10-18_THE_NAVIGATOR_PORT_ENTERS_ONLY_WITH_ITS_LOCATED_SOURCE.md) (#73, #76, #62): a located linear navigator's state enters its source ring through a second material port at the opening's phase; admission is `ker N ⊆ ker c`, the decoder is a fibre, the covector is tape-free and the dimension is located; the port waits for its consumer (a located linear source, whose single-trajectory identification is not derived).

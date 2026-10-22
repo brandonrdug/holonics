@@ -12,10 +12,28 @@ impl NativeRationalBudget {
             return Err(HnnError::NativeRationalExtent{integer_bits:integer,integer_limit:self.integer_bits,aggregate_bits:aggregate,aggregate_limit:self.aggregate_bits});
         } Ok(())
     }
+    /// Numeric bit extent of the retained array, including its cached L1.
+    /// Local working-set checks add actual input arrays and transient copies.
+    /// Whole-model retention still has the separate Constitution census.
+    pub(super) fn payload(self,a:&EpochArray)->u64{
+        a.values.iter().map(|x|x.bits()+1).sum::<u64>().saturating_add(a.denominator.bits())
+            .saturating_add(a.numerator_l1_bound.bits()).saturating_add(a.row_divisors.iter().map(|x|u64::from(u64::BITS-x.leading_zeros())).sum::<u64>()).saturating_add(128)
+    }
+    pub(super) fn admit_view(self,a:&EpochArray,rat_copies:u64)->Result<(),HnnError>{
+        let phase=a.row_divisors.iter().map(|d|u64::from(u64::BITS-d.leading_zeros())).max().unwrap_or(0);
+        let d=a.denominator.bits().saturating_add(phase);let n=a.values.iter().map(BigInt::bits).max().unwrap_or(0);
+        let view=a.values.iter().map(|v|v.bits().saturating_add(d).saturating_add(2)).sum::<u64>();
+        self.check(n.max(d),self.payload(a).saturating_add(view.saturating_mul(rat_copies)).saturating_add(n.max(d).saturating_mul(12)))
+    }
+    pub(super) fn admit_rat_join(self,matrices:&[ExactRatMatrix])->Result<(),HnnError>{
+        let bits=matrices.iter().flat_map(|m|m.entries()).map(|q|q.numer().bits().saturating_add(q.denom().bits()).saturating_add(2)).sum::<u64>();
+        let limb=matrices.iter().flat_map(|m|m.entries()).map(|q|q.numer().bits().max(q.denom().bits())).max().unwrap_or(0);
+        self.check(limb,bits.saturating_mul(2).saturating_add(limb.saturating_mul(12)))
+    }
     pub(super) fn admit_array(self,a:&EpochArray)->Result<(),HnnError>{
         if !a.denominator.is_positive() || a.exponent!=0 || a.rows.checked_mul(a.columns)!=Some(a.values.len()) || a.row_divisors.len()!=a.rows || a.row_divisors.iter().any(|d|*d==0||d%2==0){return Err(refused("native rational array has canonical numerical denominator and semantic rows"));}
         let max=a.values.iter().map(BigInt::bits).max().unwrap_or(0).max(a.denominator.bits()).max(a.numerator_l1_bound.bits());
-        let total=a.values.iter().map(|x|x.bits()+1).sum::<u64>().saturating_add(a.denominator.bits()).saturating_add(a.row_divisors.len() as u64*64);
+        let total=self.payload(a).saturating_add(max.saturating_mul(12));
         self.check(max,total)?;
         let mut common=a.denominator.clone();for v in &a.values{common=gcd(common,v.clone());}
         if common!=BigInt::one() || a.numerator_l1_bound!=a.values.iter().map(Signed::abs).sum(){return Err(refused("native rational coordinates and exact numerator census are canonical"));}Ok(())
@@ -34,15 +52,20 @@ impl EpochArray {
         if rows.iter().any(|r|r.len()!=m)||divisors.len()!=n||divisors.iter().any(|d|*d==0||d%2==0){return Err(refused("native rational operand shape and semantic rows"));}
         let count=n.checked_mul(m).ok_or_else(extent)? as u64;
         let max_n=rows.iter().flatten().map(|q|q.numer().bits()).max().unwrap_or(0);
+        let max_d=rows.iter().flatten().map(|q|q.denom().bits()).max().unwrap_or(0);
         let input=rows.iter().flatten().map(|q|q.numer().bits().saturating_add(q.denom().bits()).saturating_add(2)).sum::<u64>();
+        b.check(max_n.max(max_d),input.saturating_add(max_n.max(max_d).saturating_mul(12)))?;
         let mut denominator=BigInt::one();
         for q in rows.iter().flatten(){
-            b.check(q.numer().bits().max(q.denom().bits()),input)?;
             let left=&denominator/gcd(denominator.clone(),q.denom().clone());
-            // Preflight the ACTUAL LCM factors after gcd, before multiplication.
-            // Repeated denominators are not charged as independent products.
-            let limb=left.bits().saturating_add(q.denom().bits()).saturating_add(max_n).saturating_add(66);
-            b.check(limb,limb.saturating_mul(count.saturating_mul(4).saturating_add(4)).saturating_add(input))?;
+            let d=left.bits().saturating_add(q.denom().bits());
+            let mut total_n=0u64;let mut largest=0u64;
+            for (i,r) in rows.iter().enumerate(){for x in r{
+                let bits=if x.is_zero(){0}else{x.numer().bits().saturating_add(d.saturating_sub(x.denom().bits().saturating_sub(1))).saturating_add(u64::from(u64::BITS-divisors[i].leading_zeros()))};
+                total_n=total_n.saturating_add(bits+1);largest=largest.max(bits);
+            }}
+            let l1=largest.saturating_add(u64::from(u64::BITS-count.max(1).leading_zeros()));
+            b.check(largest.max(d).max(l1),input.saturating_add(total_n).saturating_add(d).saturating_add(l1).saturating_add(largest.max(d).saturating_mul(12)))?;
             denominator=left*q.denom();
         }
         let mut values=Vec::with_capacity(count as usize);
@@ -50,19 +73,23 @@ impl EpochArray {
         Self::from_native_parts(n,m,values,denominator,divisors,b)
     }
     fn from_native_parts(rows:usize,columns:usize,mut values:Vec<BigInt>,mut denominator:BigInt,row_divisors:Vec<u64>,b:NativeRationalBudget)->Result<Self,HnnError>{
+        let max=values.iter().map(BigInt::bits).max().unwrap_or(0);let l1=max.saturating_add(usize::BITS as u64-values.len().max(1).leading_zeros() as u64);
+        let live=values.iter().map(|n|n.bits()+1).sum::<u64>().saturating_add(denominator.bits()).saturating_add(l1).saturating_add(12*max.max(denominator.bits()));
+        b.check(max.max(denominator.bits()).max(l1),live)?;
         let mut common=denominator.clone();for v in &values{common=gcd(common,v.clone());}
         if common>BigInt::one(){denominator/=&common;for v in &mut values{*v/=&common;}}
         let a=Self{rows,columns,numerator_l1_bound:values.iter().map(Signed::abs).sum(),values,denominator,exponent:0,row_divisors,native_rational:Some(b)};
         b.admit_array(&a)?;Ok(a)
     }
-    fn native_preflight(&self,other:&Self,b:NativeRationalBudget,count:usize,terms:usize)->Result<(),HnnError>{
+
+    fn native_preflight(&self,other:&Self,b:NativeRationalBudget,count:usize,terms:usize,phase_bits:u64)->Result<(),HnnError>{
         // Every summand has one shared numerical denominator. Summation adds
         // log2(terms) numerator bits, not terms independent denominator products.
         let n=|a:&Self|a.values.iter().map(BigInt::bits).max().unwrap_or(0);
         let numerator=n(self).saturating_add(n(other)).max(n(self).saturating_add(other.denominator.bits())).max(n(other).saturating_add(self.denominator.bits()))
-            .saturating_add(128).saturating_add(usize::BITS as u64-terms.max(1).leading_zeros() as u64).saturating_add(4);
-        let denominator=self.denominator.bits().saturating_add(other.denominator.bits()).saturating_add(128);
-        let inputs=self.values.iter().chain(&other.values).map(|n|n.bits()+1).sum::<u64>().saturating_add(self.denominator.bits()).saturating_add(other.denominator.bits());
+            .saturating_add(phase_bits).saturating_add(usize::BITS as u64-terms.max(1).leading_zeros() as u64).saturating_add(4);
+        let denominator=self.denominator.bits().saturating_add(other.denominator.bits()).saturating_add(phase_bits);
+        let inputs=b.payload(self).saturating_add(b.payload(other));
         // Shared D is allocated once. Dense output N plus at most six integer
         // product/sum/gcd scratch operands; no per-entry rational normalization.
         let total=(count as u64).saturating_add(6).saturating_mul(numerator).saturating_add(denominator.saturating_mul(6)).saturating_add(inputs);
@@ -70,8 +97,21 @@ impl EpochArray {
     }
 
     pub(super) fn native_binary(&self,other:&Self,b:NativeRationalBudget,subtract:bool)->Result<Self,HnnError>{
-        self.same_shape(other)?;self.native_preflight(other,b,self.values.len(),1)?;
-        let denominator=(&self.denominator/gcd(self.denominator.clone(),other.denominator.clone()))*&other.denominator;
+        self.same_shape(other)?;
+        let inputs=b.payload(self).saturating_add(b.payload(other));let scratch=self.denominator.bits().max(other.denominator.bits());b.check(scratch,inputs.saturating_add(12*scratch))?;
+        let common=gcd(self.denominator.clone(),other.denominator.clone());
+        let left=&other.denominator/&common;let right=&self.denominator/&common;
+        let d=right.bits().saturating_add(other.denominator.bits());
+        let mut sum=0u64;let mut largest=d;
+        for (i,(x,y)) in self.values.iter().zip(&other.values).enumerate(){
+            let row=i/self.columns;let div=common_odd(self.row_divisors[row],other.row_divisors[row])?;
+            let a=x.bits().saturating_add(left.bits()).saturating_add(u64::from(u64::BITS-(div/self.row_divisors[row]).leading_zeros()));
+            let c=y.bits().saturating_add(right.bits()).saturating_add(u64::from(u64::BITS-(div/other.row_divisors[row]).leading_zeros()));
+            let n=a.max(c).saturating_add(1);largest=largest.max(n);sum=sum.saturating_add(n+1);
+        }
+        let l1=largest.saturating_add(usize::BITS as u64-self.values.len().max(1).leading_zeros() as u64);
+        b.check(l1,inputs.saturating_add(sum).saturating_add(d).saturating_add(l1).saturating_add(12*largest))?;
+        let denominator=&right*&other.denominator;
         let divisors=self.row_divisors.iter().zip(&other.row_divisors).map(|(a,c)|common_odd(*a,*c)).collect::<Result<Vec<_>,_>>()?;
         let left=&denominator/&self.denominator;let right=&denominator/&other.denominator;
         let values=self.values.iter().zip(&other.values).enumerate().map(|(i,(x,y))|{
@@ -81,22 +121,25 @@ impl EpochArray {
     }
     pub(super) fn native_multiply(&self,other:&Self,b:NativeRationalBudget)->Result<Self,HnnError>{
         if self.columns!=other.rows{return Err(refused("native rational product meets its ports"));}
-        self.native_preflight(other,b,self.rows.checked_mul(other.columns).ok_or_else(extent)?,self.columns)?;
         let odd=other.row_divisors.iter().try_fold(1,|a,&v|common_odd(a,v))?;
+        self.native_preflight(other,b,self.rows.checked_mul(other.columns).ok_or_else(extent)?,self.columns,u64::from(u64::BITS-odd.leading_zeros()))?;
         let denominator=&self.denominator*&other.denominator*odd;
         let mut values=vec![BigInt::zero();self.rows*other.columns];
         for i in 0..self.rows{for k in 0..self.columns{for j in 0..other.columns{values[i*other.columns+j]+=&self.values[i*self.columns+k]*&other.values[k*other.columns+j]*(odd/other.row_divisors[k]);}}}
         Self::from_native_parts(self.rows,other.columns,values,denominator,self.row_divisors.clone(),b)
     }
     pub(super) fn native_dot(&self,other:&Self,b:NativeRationalBudget)->Result<Self,HnnError>{
-        self.same_shape(other)?;self.native_preflight(other,b,1,self.values.len())?;
+        self.same_shape(other)?;
         // Phase products are numerical here, never a new semantic period/u64.
-        let mut odd=BigInt::one();for (a,c) in self.row_divisors.iter().zip(&other.row_divisors){let p=BigInt::from(*a)*c;odd=(&odd/gcd(odd.clone(),p.clone()))*p;}
+        let mut odd=BigInt::one();for (a,c) in self.row_divisors.iter().zip(&other.row_divisors){let p=BigInt::from(*a)*c;
+            b.check(odd.bits().saturating_add(p.bits()),b.payload(self).saturating_add(b.payload(other)).saturating_add(12*(odd.bits()+p.bits())))?;
+            odd=(&odd/gcd(odd.clone(),p.clone()))*p;}
+        self.native_preflight(other,b,1,self.values.len(),odd.bits())?;
         let numerator=self.values.iter().zip(&other.values).enumerate().map(|(i,(a,c))|a*c*(&odd/(BigInt::from(self.row_divisors[i/self.columns])*other.row_divisors[i/self.columns]))).sum();
         Self::from_native_parts(1,1,vec![numerator],&self.denominator*&other.denominator*odd,vec![1],b)
     }
     pub(super) fn native_scale(&self,q:&Rat,b:NativeRationalBudget)->Result<Self,HnnError>{
-        let scalar=Self::from_native_rows(&[vec![q.clone()]],vec![1],b)?;self.native_preflight(&scalar,b,self.values.len(),1)?;
+        let scalar=Self::from_native_rows(&[vec![q.clone()]],vec![1],b)?;self.native_preflight(&scalar,b,self.values.len(),1,0)?;
         Self::from_native_parts(self.rows,self.columns,self.values.iter().map(|v|v*q.numer()).collect(),&self.denominator*q.denom(),self.row_divisors.clone(),b)
     }
 
@@ -112,16 +155,23 @@ impl EpochLaw {
         self.native_rational=Some(b);Ok(self)
     }
     pub(super) fn native_direction(&self,news:&EpochArray,gram:&EpochArray,support:&[usize],b:NativeRationalBudget)->Result<(EpochArray,Vec<i64>),HnnError>{
-        let h=gram.to_rows();let n=news.to_rows();let mut shares=vec![0;self.map.columns];let mut reached=vec![false;shares.len()];
+        if gram.row_divisors.iter().any(|d|*d!=1){return Err(refused("native normal Gram has no semantic phase rows"));}
+        let mut shares=vec![0;self.map.columns];let mut reached=vec![false;shares.len()];
+        let input=b.payload(gram).saturating_add(b.payload(news));
+        let max=gram.values.iter().map(BigInt::bits).max().unwrap_or(0).saturating_add(usize::BITS as u64-gram.rows.max(1).leading_zeros() as u64);
+        b.check(max.max(gram.denominator.bits()),input.saturating_add(12*max.max(gram.denominator.bits())))?;
         for &j in support{if j>=shares.len(){return Err(refused("native rational direction has declared support"));}reached[j]=true;
-            let mass:Rat=h.iter().map(|r|r[j].abs()).sum();if !mass.is_positive(){return Err(refused("reached native column has positive conductance"));}
-            // Exact ceil(log2 rational column mass), including denominator.
-            let mut k=mass.numer().bits() as i64-mass.denom().bits() as i64;
-            let power=|k:i64|if k>=0{Rat::from_integer(BigInt::one()<<k as usize)}else{Rat::new(BigInt::one(),BigInt::one()<<(-k) as usize)};
-            if power(k)<mass{k+=1;}shares[j]=k;
+            let mass:BigInt=(0..gram.rows).map(|i|gram.values[i*gram.columns+j].abs()).sum();if !mass.is_positive(){return Err(refused("reached native column has positive conductance"));}
+            let mut k=mass.bits() as i64-gram.denominator.bits() as i64;
+            let below=if k>=0{(&gram.denominator<<k as usize)<mass}else{gram.denominator<(&mass<<(-k) as usize)};
+            if below{k+=1;}shares[j]=k;
         }
-        let rows=n.into_iter().map(|r|r.into_iter().enumerate().map(|(j,x)|if !reached[j]{Rat::zero()}else if shares[j]>=0{x/Rat::from_integer(BigInt::one()<<shares[j] as usize)}else{x*Rat::from_integer(BigInt::one()<<(-shares[j]) as usize)}).collect()).collect::<Vec<_>>();
-        Ok((EpochArray::from_native_rows(&rows,news.row_divisors.clone(),b)?,shares))
+        let shift=support.iter().map(|j|shares[*j]).max().unwrap_or(0).max(0) as u64;
+        let d=news.denominator.bits().saturating_add(shift);let mut sum=0u64;let mut largest=d;
+        for (i,n) in news.values.iter().enumerate(){if reached[i%news.columns]{let bits=n.bits().saturating_add((shift as i64-shares[i%news.columns]) as u64);sum=sum.saturating_add(bits+1);largest=largest.max(bits);}}
+        b.check(largest,input.saturating_add(sum).saturating_add(d).saturating_add(12*largest))?;
+        let values=news.values.iter().enumerate().map(|(i,n)|if reached[i%news.columns]{n<<((shift as i64-shares[i%news.columns]) as usize)}else{BigInt::zero()}).collect();
+        Ok((EpochArray::from_native_parts(news.rows,news.columns,values,&news.denominator<<shift as usize,news.row_divisors.clone(),b)?,shares))
     }
 }
 
@@ -172,5 +222,35 @@ mod tests{
     for (a,c) in [(&od.successor.map,&nd.successor.map),(&od.successor.gram,&nd.successor.gram),(&od.successor.news,&nd.successor.news),(&od.step,&nd.step)]{assert_eq!(a.to_rows(),c.to_rows());}
     assert_eq!(od.fall.scalar_ratio()?,nd.fall.scalar_ratio()?);
     println!("NATIVE_RATIONAL_FULL_ROUTE_PASS feature=-32/2187 two_station_mixed_2_3_5 numerical_odd_gt_u64 phase_period11 support={:?} shares={:?} represented_delta={:?} H={:?} news={:?} held_once=true dyadic_subset_equal=true cold_exact=true device_refuses=true",flow.support,fresh.shares,d.step.to_rows(),d.successor.gram.to_rows(),d.successor.news.to_rows());Ok(())
+ }
+}
+
+#[cfg(test)]
+mod resource_controls{
+ use super::*;
+ #[test]
+ fn native_rational_resource_width6()->Result<(),HnnError>{
+    let b=NativeRationalBudget::V1;
+    let d=(BigInt::one()<<768usize)+BigInt::from(17);
+    let v=(0..6).map(|i|Rat::new((BigInt::one()<<766usize)+BigInt::from(i*2+1),d.clone())).collect::<Vec<_>>();
+    let h=(0..6).map(|i|(0..6).map(|j|&v[i]*&v[j]+if i==j{Rat::one()}else{Rat::zero()}).collect()).collect::<Vec<_>>();
+    let mut law=EpochLaw::founded(4,6,6,0)?.with_phase_rows(&[1,3],11)?.into_native_rational()?;law.receiving_refinement=Some(20);
+    law.gram=EpochArray::from_native_rows(&h,vec![1;6],b)?;
+    let gram_limb=law.gram.values.iter().map(BigInt::bits).max().unwrap();assert!(gram_limb>=1535);
+    let (minor,temp,live)=super::super::checkpoint::native_bareiss_workspace(&law,b)?;
+    let old=gram_limb.saturating_mul(2640).saturating_add(8800);assert!(old>b.aggregate_bits&&live<=b.aggregate_bits);
+    let text=law.encode_checkpoint();assert_eq!(EpochLaw::decode_checkpoint(&text,&law,1<<24)?,law);
+    let news=EpochArray::from_native_rows(&vec![vec![Rat::new(1.into(),3.into());6];4],vec![1,11,1,11],b)?;
+    let support=(0..6).collect::<Vec<_>>();let (direction,shares)=law.native_direction(&news,&law.gram,&support,b)?;
+    let n=news.to_rows();let actual=direction.to_matrix()?.to_rows();
+    for j in 0..6{let mass:Rat=h.iter().map(|r|r[j].abs()).sum();let p=if shares[j]>=0{Rat::from_integer(BigInt::one()<<shares[j] as usize)}else{Rat::new(1.into(),BigInt::one()<<(-shares[j]) as usize)};assert!(mass<=p&&mass>&p/Rat::from_integer(2.into()));for i in 0..4{assert_eq!(actual[i][j],&n[i][j]/&p);}}
+    let mut bad=law.clone();bad.gram.values[0]=-bad.gram.values[0].abs();bad.gram.numerator_l1_bound=bad.gram.values.iter().map(Signed::abs).sum();assert!(EpochLaw::decode_checkpoint(&bad.encode_checkpoint(),&law,1<<24).is_err());
+    let compact=EpochArray::from_native_parts(6,6,vec![BigInt::one();36],(BigInt::one()<<25000usize)+BigInt::one(),vec![1;6],b)?;
+    assert!(compact.to_matrix().is_err()); // grouped payload fits, expanded Rat copies do not
+    let sum=compact.add(&compact)?;assert_eq!(sum.denominator,compact.denominator);assert!(sum.values.iter().all(|n|n==&BigInt::from(2)));
+    assert!(sum.subtract(&sum)?.is_zero());
+    let huge=EpochArray::from_native_parts(1,1,vec![BigInt::one()],(BigInt::one()<<40000usize)+BigInt::one(),vec![1],b)?;
+    assert!(huge.multiply(&huge).is_err()); // genuine product extent still refuses
+    println!("RATIONAL_RESOURCE_WIDTH6_PASS gram_integer_bits={gram_limb} old_false_aggregate={old} in_place_minor_bits={minor} scalar_product_bits={temp} live_working_bits={live} caps=65536/1048576 cached_l1_counted=true expanded_view_refused=true actual_lcm_add_pass=true positive_definite_check_preserved=true shares={shares:?}");Ok(())
  }
 }

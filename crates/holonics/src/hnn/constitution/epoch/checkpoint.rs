@@ -85,9 +85,9 @@ impl EpochLaw {
             Some(cap)
         } else {None};
         let native_rational=(header=="epoch-law-native-rational-moments-v1").then_some(super::NativeRationalBudget::V1);
-        let map = read_array(&mut lines, "map", budget)?;
-        let gram = read_array(&mut lines, "gram", budget)?;
-        let news = read_array(&mut lines, "news", budget)?;
+        let map = read_array(&mut lines, "map", budget,0)?;
+        let gram = read_array(&mut lines, "gram", budget,native_rational.map_or(0,|b|b.payload(&map)))?;
+        let news = read_array(&mut lines, "news", budget,native_rational.map_or(0,|b|b.payload(&map).saturating_add(b.payload(&gram))))?;
         if (rows, columns) != (map.rows, map.columns) {
             return Err(refused(
                 "an epoch checkpoint's header must match its map shape",
@@ -202,6 +202,7 @@ fn validate_with_row_binding(
         ));
     }
     if law.native_rational != declaration.native_rational || law.native_rational != law.gram.native_rational || law.native_rational != law.news.native_rational || law.gram.row_divisors.iter().any(|d|*d!=1) || law.map.native_rational.is_some(){return Err(refused("normal checkpoint keeps its declared statistics carrier and dyadic realization"));}
+    if let Some(b)=law.native_rational { native_bareiss_workspace(law,b)?; }
     law.gram.admit_grouped()?;law.news.admit_grouped()?;
     let mut gram = vec![vec![BigInt::zero(); columns]; columns];
     for i in 0..columns {
@@ -212,13 +213,6 @@ fn validate_with_row_binding(
             }
             gram[i][j] = value.clone();
         }
-    }
-    if let Some(b)=law.native_rational {
-        // Fraction-free determinant numerators are bounded by the product of n
-        // row norms. Preflight both two-product elimination scratch and its sum.
-        let limb=law.gram.values.iter().map(BigInt::bits).max().unwrap_or(0);
-        let n=columns as u64;let det=limb.saturating_add(n.ilog2() as u64+1).saturating_mul(n).saturating_mul(2).saturating_add(4);
-        b.check(det,det.saturating_mul(n.saturating_mul(n).saturating_mul(6).saturating_add(4)))?;
     }
     if !positive_definite_integer(gram) {
         return Err(refused(
@@ -298,6 +292,23 @@ fn same_dyadic_coordinate(left: &EpochArray, right: &EpochArray, index: usize) -
     &left.values[index]*&right.denominator == &right.values[index]*&left.denominator
 }
 
+/// In-place Bareiss live integer workspace. A stored entry (i,j) is at most
+/// a minor of order min(i,j)+1: eliminated rows/columns remain in place and
+/// only the trailing block advances. Hadamard bounds each order-k minor by
+/// k*(input_limb+ceil(log2 n))+2 bits. Two products/subtraction need T=2B+2.
+/// Reserve eight T-sized scalar scratch integers and four B-sized pivot,
+/// previous/remainder/quotient slots, plus the ONE matrix and original W/H/N.
+/// This deliberately includes BigInt arithmetic scratch, not six dense copies.
+pub(super) fn native_bareiss_workspace(law:&EpochLaw,b:super::NativeRationalBudget)->Result<(u64,u64,u64),HnnError>{
+    let n=law.gram.rows as u64;let limb=law.gram.values.iter().map(BigInt::bits).max().unwrap_or(0);
+    let unit=limb.saturating_add(u64::from(super::ceil_log2_count(n)));
+    let bound=n.saturating_mul(unit).saturating_add(2);let temporary=bound.saturating_mul(2).saturating_add(2);
+    let mut matrix=0u64;for i in 0..n{for j in 0..n{matrix=matrix.saturating_add((i.min(j)+1).saturating_mul(unit).saturating_add(2));}}
+    let inputs=[&law.map,&law.gram,&law.news].into_iter().map(|a|b.payload(a)).sum::<u64>();
+    let live=inputs.saturating_add(matrix).saturating_add(temporary.saturating_mul(8)).saturating_add(bound.saturating_mul(4));
+    b.check(temporary,live)?;Ok((bound,temporary,live))
+}
+
 /// Sylvester's criterion with fraction-free Bareiss elimination. The Gram's shared
 /// denominator is positive, so its integer numerator has the same definiteness.
 fn positive_definite_integer(mut matrix: Vec<Vec<BigInt>>) -> bool {
@@ -358,6 +369,7 @@ fn read_array(
     lines: &mut std::str::Lines<'_>,
     name: &str,
     budget: &mut CheckpointReadBudget,
+    native_live_before:u64,
 ) -> Result<EpochArray, HnnError> {
     let header = words(take(lines)?, name, 3)?;
     let rows = parse_usize(&header[0])?;
@@ -367,9 +379,10 @@ fn read_array(
     let numerical=if lines.clone().next().is_some_and(|s|s.starts_with("native-rational ")){
         let w=words(take(lines)?,"native-rational",3)?;
         budget.check((w[0].len() as u64).saturating_mul(4))?;
-        let d=w[0].parse::<BigInt>().map_err(|_|malformed())?;
-        let b=super::NativeRationalBudget{integer_bits:parse_u64(w[1])?,aggregate_bits:parse_u64(w[2])?};b.check(d.bits(),d.bits())?;
-        if d<=BigInt::zero()||exponent!=0{return Err(malformed());}Some((d,b))
+        let b=super::NativeRationalBudget{integer_bits:parse_u64(w[1])?,aggregate_bits:parse_u64(w[2])?};
+        let parse_bits=(w[0].len() as u64).saturating_mul(4);b.check(parse_bits,native_live_before.saturating_add(12*parse_bits))?;
+        let d=w[0].parse::<BigInt>().map_err(|_|malformed())?;b.check(d.bits(),native_live_before.saturating_add(d.bits()))?;
+        if d<=BigInt::zero()||exponent!=0{return Err(malformed());}budget.charge(d.bits())?;Some((d,b))
     }else{None};
     let mut payload = u64::from(exponent)
         .checked_add(1)
@@ -399,6 +412,10 @@ fn read_array(
             .and_then(|n| n.checked_add(payload))
             .ok_or_else(malformed)?;
         budget.check(temporary)?;
+        if let Some((d,b))=&numerical {
+            let bits=(word.len() as u64).saturating_mul(4);
+            b.check(bits,native_live_before.saturating_add(payload).saturating_add(d.bits()).saturating_add(12*bits))?;
+        }
         let value = word.parse::<BigInt>().map_err(|_| malformed())?;
         if value.to_string() != word {
             return Err(malformed());
@@ -428,7 +445,10 @@ fn read_array(
     // Canonicality was checked above; move the numerator family rather than retaining a
     // duplicate allocation merely to compare it after the constructor's power-of-two cancel.
     let array = if let Some((denominator,b))=numerical{
-        budget.charge(denominator.bits())?;
+        let max=values.iter().map(BigInt::bits).max().unwrap_or(0);let cached=max.saturating_add(usize::BITS as u64-count.max(1).leading_zeros() as u64);
+        budget.check(cached.saturating_add(max.saturating_mul(12)))?;
+        budget.charge(cached)?;
+        b.check(max.max(denominator.bits()),native_live_before.saturating_add(values.iter().map(|n|n.bits()+1).sum::<u64>()).saturating_add(row_divisors.iter().map(|d|u64::from(u64::BITS-d.leading_zeros())).sum::<u64>()).saturating_add(128).saturating_add(denominator.bits()).saturating_add(cached).saturating_add(12*max.max(denominator.bits())))?;
         let a=EpochArray{rows,columns,exponent,denominator,numerator_l1_bound:values.iter().map(Signed::abs).sum(),values,row_divisors,native_rational:Some(b)};b.admit_array(&a)?;a
     }else{EpochArray::with_row_divisors(rows, columns, exponent, values, row_divisors)?};
     if array.exponent != exponent || array.values.len() != count {
@@ -612,9 +632,9 @@ mod tests {
     #[test]
     fn checkpoint_read_rejects_noncanonical_zero_before_charging_a_denominator() {
         let mut budget = CheckpointReadBudget::new(1 << 20);
-        assert!(read_array(&mut "map 1 1 4096\n1\n0\n".lines(), "map", &mut budget).is_err());
+        assert!(read_array(&mut "map 1 1 4096\n1\n0\n".lines(), "map", &mut budget,0).is_err());
         assert_eq!(budget.used, 0);
-        assert!(read_array(&mut "map 1 1 4096\n1\n2\n".lines(), "map", &mut budget).is_err());
+        assert!(read_array(&mut "map 1 1 4096\n1\n2\n".lines(), "map", &mut budget,0).is_err());
         assert_eq!(budget.used, 0);
     }
 
