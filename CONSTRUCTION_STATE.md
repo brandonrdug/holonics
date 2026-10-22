@@ -17,17 +17,18 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
-**October 22: the native contact moves, certified by rereading the same comparison (host).**
-The contact step now starts each family at its covector-scale bound, halves in common, and
-publishes the first halving whose reread of the same native prediction is an exact strict
-decrease; otherwise the certified step stands. On the connected host control the contact
-publishes six moving C/K/D families (exponents 2 and −1, against −52..−37 before), the same
-comparison falls from about 2.141 to 1.989 bits, and pending-six → first R → contact → next R →
-source 30 → cold restores → four frozen decisions all pass (506 native attempts, 70 s). The card
-route and a held-out reading are not measured. The native training stream still publishes no
-contact material: `receive_native_current` delivers R sections only. The
+**October 22: the native contacts learn, certified by rereading the same comparison (host).**
+The contact step starts each family at its covector-scale bound, halves in common, and publishes
+the first halving whose reread of the same native prediction is an exact strict decrease;
+otherwise the certified step stands. The first-variation enclosure is read beside each candidate
+and gates only that fallback. Native ingestion (`ObservedStream::receive_native_current_learning`)
+now publishes one contact at each of the receiver's section crossings. On the connected host
+fixture the two contacts lower their own comparisons (2.141 → 1.989 and 2.194 → 2.102 bits), and
+on ten held-out cells the retained state codes 18.563 bits against 18.736 for R-only training
+from the same opening. Athena's train commands (`complete-language train`, observed-epoch
+`NormalMaps`) still learn receiving maps only; the card route is not measured. The
 [record](research/records/2026-10-22_THE_NATIVE_CONTACT_STEP_IS_CERTIFIED_BY_REREADING_THE_SAME_COMPARISON.md)
-holds the decision and receipts. The zero-motion paragraphs below are historical at their source.
+holds the decisions and receipts. The zero-motion paragraphs below are historical at their source.
 
 **October22 joint modulus source review corrections: UNCOMPILED/UNTESTED/UNWIRED.**
 Code `e8a843154801268a50fd209453d186a0548af7bc` corrects the six findings in the pinned

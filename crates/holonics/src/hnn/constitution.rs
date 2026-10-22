@@ -8917,6 +8917,11 @@ impl Constitution {
     /// Actual represented FACTOR direction, after carry/rounding, before any publication.
     /// This is a first-variation predicate, NOT a finite native-score decrease assertion.
     pub(crate) fn native_contact_actual_ray(&self,next:&Self,deposit:&Deposit,loaded:&crate::hnn::word::finite_gain::FiniteContactSpans)->Result<(Rat,Rat,Option<crate::hnn::word::native_prediction::NativePhysicalRayReading>),HnnError>{
+        self.native_contact_actual_ray_at(next,deposit,loaded,true)
+    }
+    /// The represented first variation, as a gate (`gate`) or, under the reread whose exact strict
+    /// decrease certifies the step, as a reading only.
+    pub(crate) fn native_contact_actual_ray_at(&self,next:&Self,deposit:&Deposit,loaded:&crate::hnn::word::finite_gain::FiniteContactSpans,gate:bool)->Result<(Rat,Rat,Option<crate::hnn::word::native_prediction::NativePhysicalRayReading>),HnnError>{
         let native=loaded.native().ok_or(HnnError::Unadmitted{reason:"actual native contact ray requires its paired source-bound gain/error witness"})?;
         native.admit(self,deposit)?;
         if native.represented(){
@@ -8926,7 +8931,7 @@ impl Constitution {
             }
             let moved=direction.iter().flatten().any(|m|m.entries().iter().any(|x|!x.is_zero()));
             let reading=loaded.physical_query(&direction,&direction)?;
-            if moved&&reading.lower<=Rat::zero(){return Err(native.physical_refusal("actual represented factor delta / physical first variation",reading));}
+            if gate&&moved&&reading.lower<=Rat::zero(){return Err(native.physical_refusal("actual represented factor delta / physical first variation",reading));}
             return Ok((reading.stored_pairing.clone(),&reading.reverse_discrepancy+&reading.class_error_charge+&reading.response_error_charge,Some(reading)));
         }
         let bound=self.native_contact_loaded(loaded)?;
@@ -9159,6 +9164,11 @@ impl Constitution {
                     let Locus::Channel(contact)=locus else{return Err(HnnError::Unadmitted{reason:"paired native contact gain covers contact-only material"});};
                     for factor in &mut region.factors{
                         if native.represented(){
+                            // [agent-inferred, October 22] Under the reread the exact strict
+                            // decrease of the same comparison is the certificate (the plan's §16,
+                            // the finite-decrease landing); the first-variation enclosure, whose
+                            // charges exceed the stored pairing on the fixture, is not a gate there.
+                            if matches!(mode,DepositMode::Reread{..}){continue;}
                             let Family::Factor(family)=factor.family else{return Err(HnnError::Unadmitted{reason:"physical native query covers actual contact factors"});};
                             let direction=self.native_unit_contact_direction(deposit,*contact,family,&factor.scale)?;
                             let reading=span.physical_query(&direction,&self.native_zero_contact_direction()?)?;

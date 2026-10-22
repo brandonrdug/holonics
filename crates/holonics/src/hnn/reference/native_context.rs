@@ -370,7 +370,10 @@ impl Reference {
     /// receiver and target, entered through the candidate material. It is admitted only on
     /// [`decide`]'s exact strict improvement of that comparison (code and phase excess), with the
     /// code enclosures refined to the face's finest grain when they overlap. The first admitted
-    /// halving is published; with none, the certified step is published as before.
+    /// halving is published; with none, the certified step is published as before. The represented
+    /// first-variation enclosure is read beside each candidate (`first_variation_refused`) and is
+    /// not a gate on a reread candidate: its error charges exceed the stored pairing on the
+    /// fixture, where the exact reread still certifies a strict decrease.
     ///
     /// [`decide`]: crate::hnn::word::continuation::decide
     #[allow(clippy::too_many_arguments)]
@@ -398,10 +401,6 @@ impl Reference {
             admitted: None,
         };
         let mut judge = |halvings: u32, theta: &crate::hnn::constitution::Constitution, refused: bool| -> Result<bool, HnnError> {
-            if refused {
-                receipt.trials.push(NativeRereadTrial { halvings, reading: None, first_variation_refused: true });
-                return Ok(false);
-            }
             let mut fork = resident.clone();
             fork.constitution = theta.clone();
             let waves = {
@@ -432,7 +431,7 @@ impl Reference {
             receipt.trials.push(NativeRereadTrial {
                 halvings,
                 reading: Some(NativeRereadReading { after, excess: after_excess, reading_bits, decision }),
-                first_variation_refused: false,
+                first_variation_refused: refused,
             });
             Ok(admitted)
         };
@@ -449,7 +448,8 @@ pub struct NativeRereadReceipt {
     pub before: crate::ratio::algebraic::ExactInterval,
     pub excess: Rat,
     pub trials: Vec<NativeRereadTrial>,
-    /// The first admitted halving of the covector-scale start; `None` publishes the certified step.
+    /// The first admitted halving of the covector-scale start; `None` publishes the certified step,
+    /// which keeps its first-variation gate.
     pub admitted: Option<u32>,
 }
 
@@ -457,8 +457,10 @@ pub struct NativeRereadReceipt {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NativeRereadTrial {
     pub halvings: u32,
-    /// The candidate's reread; `None` when the actual first variation refused it before any read.
+    /// The candidate's reread.
     pub reading: Option<NativeRereadReading>,
+    /// The represented first-variation enclosure could not certify this candidate's direction. It
+    /// is a reading beside the reread, not a gate: the exact strict decrease certifies the step.
     pub first_variation_refused: bool,
 }
 

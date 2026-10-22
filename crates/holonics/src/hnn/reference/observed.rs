@@ -28,7 +28,7 @@ pub use epoch::{
     ObservedEpochCellReceipt, ObservedEpochDepositionScope, ObservedEpochEnergy,
     ObservedEpochOutcome, ObservedEpochProbeState, ObservedEpochReceipt, ObservedEpochWallTimes,
 };
-pub use stream::{ObservedStream, ObservedStreamReceipt};
+pub use stream::{NativeLearningReceipt, ObservedStream, ObservedStreamReceipt};
 mod execution;
 pub use execution::{
     HostObservedEpochExecution, ObservedEpochExecution, ObservedEpochForwardContext,

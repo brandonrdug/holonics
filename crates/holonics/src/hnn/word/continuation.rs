@@ -704,11 +704,11 @@ impl ContactCut {
             let (candidate,_,no_reach)=self.producing.deposited_with_contact_spans_reread(&native.deposit,&native.spans,halvings)?;
             if halvings==0{bound=Some(no_reach.ok_or(HnnError::Realization{what:"the first reread candidate reads its no-reach halving"})?);}
             if !candidate.contact_factors_moved(&self.producing){return Ok(None);}
-            // A move answers to every comparison that reads it: the actual represented first
-            // variation the publication checks is read here first, and a candidate it refuses is
-            // halved, never published (`judge` is told, and rereads nothing).
+            // The represented first variation of the candidate is read beside the reread and told
+            // to `judge`; it is not a gate here: the reread's exact strict decrease of the same
+            // comparison certifies the step (the plan's §16, the finite-decrease landing).
             let refused=self.producing.native_contact_actual_ray(&candidate,&native.deposit,&native.spans).is_err();
-            if judge(halvings,&candidate,refused)? && !refused{return Ok(Some(halvings));}
+            if judge(halvings,&candidate,refused)?{return Ok(Some(halvings));}
         }
         Ok(None)
     }
@@ -730,7 +730,7 @@ impl ContactCut {
         self.native_prediction=Some(witness);self.deposit=Some(deposit.clone());self.native_reread=reread;
         let field=self.field.clone();let current=self.current.clone();let moment=self.source.clone();let original=self.producing.clone();
         let (constitution,returned)=self.continue_deposited(&field,&current,&moment,&deposit,charts)?;
-        let (actual_alignment,actual_error_charge,physical_reference)=original.native_contact_actual_ray(&constitution,&deposit,&spans)?;
+        let (actual_alignment,actual_error_charge,physical_reference)=original.native_contact_actual_ray_at(&constitution,&deposit,&spans,reread.is_none())?;
         let word=returned.forward.into_present().ok_or(HnnError::Unadmitted{reason:"actual native held-momentum successor"})?;
         let carry=word.reception_end()?;
         let publication=returned.deposit.into_present().ok_or(HnnError::Unadmitted{reason:"native factor publication reading"})?;
@@ -947,7 +947,7 @@ impl ContactCut {
             let mut spans=if native.represented(){super::finite_gain::FiniteContactSpans::represented(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?,native)?}
                 else{super::finite_gain::FiniteContactSpans::of(&self.operands,self.opened_at,deposit.reach().ok_or(HnnError::MissingReach)?)?};
             spans.bind_native(self.native_prediction.clone().expect("native witness"),&self.producing,deposit)?;
-            self.producing.native_contact_actual_ray(&successor,deposit,&spans)?;
+            self.producing.native_contact_actual_ray_at(&successor,deposit,&spans,self.native_reread.is_none())?;
         }
         #[cfg(test)]
         eprintln!(

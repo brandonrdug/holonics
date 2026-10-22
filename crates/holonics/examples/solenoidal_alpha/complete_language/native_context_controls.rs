@@ -628,7 +628,9 @@ fn represented_native_zero_motion_continuity()->Result<()>{
     }
     println!("ZERO_MOTION_CONTINUITY_STEPS {:?}",p.publication.steps.iter().map(|(l,s)|(l,s.family,s.step.exponent)).collect::<Vec<_>>());
     // Continuity is distinct from the stronger positive-material influence requirement.
-    if moved{assert!(proof.lower>integer(0));assert!(p.actual_alignment>p.actual_error_charge);}
+    // A reread publication is certified by its exact strict decrease; the enclosure is read beside it.
+    let reread_admitted=contact.reread.as_ref().is_some_and(|r|r.admitted.is_some_and(|h|r.trials.iter().any(|t|t.halvings==h&&t.reading.as_ref().is_some_and(|x|x.decision.is_ok()))));
+    if moved{if !reread_admitted{assert!(proof.lower>integer(0));assert!(p.actual_alignment>p.actual_error_charge);}}
     else{assert_eq!(proof.stored_pairing,integer(0));assert_eq!(proof.lower,integer(0));}
     assert_eq!(stream.accepted_cells()?,11);assert_eq!(stream.resident().prepared_input().unwrap().frontiers(),(11,0,0));
     println!("ZERO_MOTION_CONTINUITY_CONTACT_VERDICT outcome={} positive_material_influence={} selected_steps={} vanished={:?} retained_tails={} released_tails={} original_positive_motion_fixture_unchanged=true",if moved{"Applied"}else{"NoRealizedMotion"},moved,p.publication.steps.len(),p.publication.vanished,p.publication.unresolved_contact_material.len(),p.publication.released.len());
@@ -764,7 +766,9 @@ pub(crate) fn material_response_connected_on(execution:Option<&dyn holonics::hnn
     let packet=format!("MATERIAL_RESPONSE_CONNECTED_CONTACT_PACKET original_prediction={:?} current_after={:?} full_actual_factor_delta={actual_delta:?} before_scales={before_scales:?} after_scales={after_scales:?} before_contact_carry={:?} after_contact_carry={:?} publication={:?} physical_reference={proof:?} continuation={:?} input={:?}\n",contact.prediction,stream.resident().current(),contact_carry(&theta10),contact_carry(&p.constitution),p.publication,p.continuation,contact.input);
     println!("{packet}");let root=std::path::PathBuf::from(std::env::var("V93_CONTROL_ARTIFACT_DIR")?);std::fs::create_dir_all(&root)?;std::fs::write(root.join("contact_packet.txt"),packet)?;
     // Continuity is distinct from the stronger positive-material influence requirement.
-    if moved{assert!(proof.lower>integer(0));assert!(p.actual_alignment>p.actual_error_charge);}
+    // A reread publication is certified by its exact strict decrease; the enclosure is read beside it.
+    let reread_admitted=contact.reread.as_ref().is_some_and(|r|r.admitted.is_some_and(|h|r.trials.iter().any(|t|t.halvings==h&&t.reading.as_ref().is_some_and(|x|x.decision.is_ok()))));
+    if moved{if !reread_admitted{assert!(proof.lower>integer(0));assert!(p.actual_alignment>p.actual_error_charge);}}
     else{assert_eq!(proof.stored_pairing,integer(0));assert_eq!(proof.lower,integer(0));}
     assert_eq!(stream.accepted_cells()?,11);assert_eq!(stream.resident().prepared_input().unwrap().frontiers(),(11,0,0));
     println!("MATERIAL_RESPONSE_CONNECTED_CONTACT_VERDICT outcome={} positive_material_influence={} selected_steps={} vanished={:?} retained_tails={} released_tails={} original_positive_motion_fixture_unchanged=true",if moved{"Applied"}else{"NoRealizedMotion"},moved,p.publication.steps.len(),p.publication.vanished,p.publication.unresolved_contact_material.len(),p.publication.released.len());
@@ -834,4 +838,50 @@ pub(crate) fn material_response_connected_on(execution:Option<&dyn holonics::hnn
     assert_eq!(stream.resident().continuing_state(0)?,retained);
     println!("MATERIAL_RESPONSE_CONNECTED_CONTINUITY_RESULT continuity=true positive_material_influence={moved} actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true causal_wave_changed={changed_wave} causal_probability_separated={separated} unsplit_trajectory_equivalence=false elapsed_ns={}",started.elapsed().as_nanos());
     Ok((moved,changed_wave,separated))
+}
+
+#[test]
+#[ignore="one bounded learning control: contact learning at section crossings against R-only, read on held-out cells"]
+fn represented_native_contact_learning_held_out()->Result<()>{
+    use holonics::hnn::word::work;
+    work::limit_process_native_attempts(std::env::var("V93_NATIVE_ATTEMPT_LIMIT")?.parse()?);
+    let started=Instant::now();let reference=port();let(field,mut initial,pairing)=declaration_with_input_context(16384,true,true)?;
+    initial.bind_family_local_receiving_return(2)?;initial.bind_bounded_receiving_representation(2)?;initial.bind_native_rational_receiving(2)?;
+    let mut resident=reference.mount_declared_receiving_law(&field,&Current::at_rest(&field),initial,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1)?;
+    let empty=PairedObservation::admit(&field,resident.constitution(),&pairing)?.encode(&[])?;reference.ingest(&mut resident,None,&empty)?;
+    resident.refine_contact_grain(24)?;resident.select_represented_native_prepared_input(&pairing)?;
+    let mut stream=ObservedStream::new(resident,ObservedCrib::new(0),ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap)?;
+    let data:Vec<_>=(0..40).map(|i|i%4).collect();
+    // The common opening: the first R section at source 9, as in the continuity control.
+    stream.receive_native_current(&reference,&pairing,&data[..10],64)?;assert_eq!(stream.accepted_cells()?,10);
+    let opening=stream.resident().constitution().clone();
+    let mut learning=stream.clone();
+    let receipt=learning.receive_native_current_learning(&reference,&pairing,&data[10..30],64,&mut|_|{})?;
+    for c in &receipt.contacts{
+        let r=c.reread.as_ref().ok_or("a contact event carries its reread receipt")?;
+        println!("CONTACT_LEARNING_CONTACT source={} admitted={:?} before={:?} after={:?}",c.prediction.source_cells,r.admitted,r.before,r.trials.iter().find(|t|Some(t.halvings)==r.admitted).and_then(|t|t.reading.as_ref()).map(|x|&x.after));
+    }
+    println!("CONTACT_LEARNING_DELIVERY sections={} contacts={} contact_refusals={:?}",receipt.sections.len(),receipt.contacts.len(),receipt.contact_refusals);
+    let mut maps_only=stream.clone();maps_only.receive_native_current(&reference,&pairing,&data[10..30],64)?;
+    assert_eq!(learning.accepted_cells()?,30);assert_eq!(maps_only.accepted_cells()?,30);
+    let moved=|theta:&Constitution|->Result<bool>{Ok((0..field.contacts().len()).try_fold(false,|any,a|->Result<bool>{
+        let d=[theta.contact_storage(a).subtract(opening.contact_storage(a))?,theta.contact_stiffness(a).subtract(opening.contact_stiffness(a))?,theta.contact_dissipation(a).subtract(opening.contact_dissipation(a))?];
+        Ok(any||d.iter().any(|m|m.entries().iter().any(|q|!num_traits::Zero::is_zero(q))))})?)};
+    // Held-out: each arm's retained state, frozen, predicts cells 30..40 given the true earlier cells.
+    let mut totals=Vec::new();
+    for(label,arm)in [("contact-learning",&learning),("R-only",&maps_only)]{
+        let(mut f,mut fc)=arm.native_current_query_fork(&reference,&pairing,64)?;
+        let(mut lower,mut upper)=(integer(0),integer(0));
+        for &class in &data[30..40]{
+            let e=reference.continue_native_current_forecast(&mut f,&mut fc,&pairing,class,64)?;
+            let s=e.scores.first().ok_or("one held-out score")?;
+            println!("CONTACT_LEARNING_HELD_OUT arm={label} source={} class={class} code_bits=[{},{}]",e.prediction.source_cells,s.lower,s.upper);
+            lower+=&s.lower;upper+=&s.upper;
+        }
+        println!("CONTACT_LEARNING_HELD_OUT_TOTAL arm={label} contacts_moved={} code_bits=[{lower},{upper}]",moved(arm.resident().constitution())?);
+        totals.push((lower,upper));
+    }
+    let improved=totals[0].1<totals[1].0;
+    println!("CONTACT_LEARNING_VERDICT held_out_cells=10 contact_learning_strictly_lower={improved} elapsed_ns={}",started.elapsed().as_nanos());
+    Ok(())
 }

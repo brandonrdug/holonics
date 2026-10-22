@@ -1168,4 +1168,44 @@ impl ObservedStream {
         let mut next=self.clone();let event=reference.observe_native_current_contact(&mut next.resident,&mut next.crib,pairing,class,bits)?;
         next.bound=Self::finite_bound(&next.resident)?;let next=Self::restore(next.resident,next.crib,next.scope,next.pending)?;*self=next;Ok(event)
     }
+    /// [definition; agent-inferred, October 22] **Native ingestion learns its contacts at the
+    /// receiver's own section crossings.** The R-only delivery above never publishes contact
+    /// material, so its C/K/D never learn. Here, whenever the source frontier stands at a section
+    /// start with nothing pending (the receiver has just crossed its section), the next actual
+    /// class enters as one contact event: it is predicted under the material the crossing just
+    /// published and its comparison deposits C/K/D by the reread ladder
+    /// (`Reference::observe_native_current_contact`). The remaining classes of the section enter R
+    /// as before. The schedule is the receiver's passage (Athena plan: contact grain follows the
+    /// receiver's own section crossings, never a count of deposits). A contact the native route
+    /// refuses leaves the stream unchanged; its class then enters R and the refusal is returned.
+    /// The whole delivery is one transaction: any section refusal rolls everything back.
+    pub fn receive_native_current_learning(&mut self,reference:&Reference,pairing:&PairingDeclaration,classes:&[usize],bits:u32,observe:&mut dyn FnMut(&crate::hnn::reference::native_context::NativeContextEvent))->Result<NativeLearningReceipt,HnnError>{
+        let mut next=self.clone();let mut receipt=NativeLearningReceipt{sections:Vec::new(),contacts:Vec::new(),contact_refusals:Vec::new()};
+        let receiver=next.resident.admitted.first().ok_or(refuse("one native receiver section"))?.ring();
+        let width=next.resident.field.rings()[..receiver].iter().try_fold(1u64,|n,r|n.checked_mul(r.period()).ok_or(HnnError::CountOverflow))?;
+        let mut at=0;
+        while at<classes.len(){
+            let position=next.resident.native_source_frontier()?.aeon_cells()%width;
+            if next.pending.is_empty()&&position==0{
+                match next.observe_native_current_contact(reference,pairing,classes[at],bits){
+                    Ok(event)=>{observe(&event);receipt.contacts.push(event);at+=1;continue;}
+                    Err(error)=>receipt.contact_refusals.push((at,error.to_string())),
+                }
+            }
+            let wanted=usize::try_from(width-position).map_err(|_|HnnError::CountOverflow)?.checked_sub(next.pending.len()).ok_or(refuse("native pending stays inside its section"))?;
+            let end=at.checked_add(wanted.max(1)).ok_or(HnnError::CountOverflow)?.min(classes.len());
+            receipt.sections.extend(next.receive_native_current_diagnosed(reference,pairing,&classes[at..end],bits,observe)?);
+            at=end;
+        }
+        *self=next;Ok(receipt)
+    }
+}
+
+/// Exterior evidence of one learning delivery, never retained by the stream.
+pub struct NativeLearningReceipt {
+    pub sections: Vec<crate::hnn::reference::native_context::NativeReceivingSectionEvent>,
+    /// One per section crossing whose next class published contact material.
+    pub contacts: Vec<crate::hnn::reference::native_context::NativeContextEvent>,
+    /// Classes (index in this delivery) whose contact the native route refused; each entered R.
+    pub contact_refusals: Vec<(usize, String)>,
 }

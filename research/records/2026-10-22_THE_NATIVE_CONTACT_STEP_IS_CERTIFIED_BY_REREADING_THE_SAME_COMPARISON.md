@@ -67,18 +67,61 @@ cold restore and four frozen decisions. Receipts:
 
 The improvement is on the comparison the step learned from, one cell. It is not a held-out reading.
 
-## What the measurement found
+## The stream learns its contacts at its section crossings
 
-The native training stream never publishes contact material.
-`ObservedStream::receive_native_current` (`observed/stream.rs`) delivers R sections only: the
-receiving map learns, the contact factors do not. Contacts publish only through
-`observe_native_current_contact`, which needs a closed, empty pending frontier, and only the
-control calls it. The join owed next is the stream's own contact publication at its closed
-section boundaries, so that ingestion moves C/K/D as well as R.
+[definition; agent-inferred, October 22] The R-only delivery (`ObservedStream::receive_native_current`)
+never published contact material. `ObservedStream::receive_native_current_learning` now publishes
+one contact event wherever the source frontier stands at a section start with nothing pending,
+that is, right after the receiver crosses its section. The next actual class is predicted under
+the material the crossing just published, and its comparison deposits C/K/D by the ladder above.
+The remaining classes of the section enter R as before. The schedule is the receiver's own
+passage, as the Athena plan requires of contact grain, never a count of deposits. A contact the
+native route refuses leaves the stream unchanged, its class enters R, and the refusal is returned.
+
+**The first-variation enclosure is a reading under the reread.** The first held-out run refused
+the second contact (source 20) at the represented first-variation enclosure: its error charges
+exceeded the stored pairing, so its lower bound was not positive. That enclosure bounds a
+derivative; the reread reads the finite step's consequence exactly, the same certificate the
+finite-decrease landing uses. Under `StepSource::Reread` the enclosure is therefore read beside
+each candidate (`NativeRereadTrial::first_variation_refused`) and gates nothing; the certified
+fallback keeps its gate (`Constitution::native_contact_actual_ray_at`).
+
+`represented_native_contact_learning_held_out` (same fixture and opening as above; cells 10–30
+delivered two ways from the same state after the first R section):
+
+| Arm | Contacts | Held-out code, cells 30–39 |
+|---|---|---|
+| R-only (`receive_native_current`) | none | 18.736 bits |
+| Contact learning (`receive_native_current_learning`) | 2 published, 0 refused | 18.563 bits |
+
+- At source 10 the contact lowers its own comparison from 2.141 to 1.989 bits; at source 20 from
+  2.194 to 2.102 bits. Both are admitted at halving 0.
+- The held-out read freezes each arm's retained state and predicts cells 30–39 one at a time,
+  conditioned on the true earlier cells, with no learning (`native_current_query_fork`,
+  `continue_native_current_forecast`). The contact arm's total is strictly lower:
+  `342424543189510055705/2^64 < 345611777425719661287/2^64`. Five of the ten cells are lower.
+- Flat over four classes is 20 bits; the data are periodic with period 4, so both arms are far
+  from what the source allows. This is 30 training cells; it shows the contacts' learning reaches
+  unseen cells, not that the learner is good.
+- 80.8 s wall, host, debug build. Receipt:
+  [held_out.txt](2026-10-22_native_contact_reread_receipts/held_out.txt).
+
+## Athena's training commands never train contacts
+
+The complete-language driver (`tools/complete_language.py`) runs `complete-language train`, which
+is the observed-epoch route with scope `NormalMaps` (`examples/solenoidal_alpha/complete_language.rs`):
+receiving maps only. No train command selects a scope with contact material. The observed-epoch
+route's own material scope (`NormalMapsAndChannelMaterial`, reachable through the Alpha CLI's
+`fork-scope`) sizes its steps by the a-priori certified step and admits only a non-increase; on a
+64-cell excerpt it published no factor motion in any of its six epochs (one whole, three neutral,
+two receiving-only after "the actual epoch ray violates its own curvature bound"). Athena's
+training has so far learned its receiving maps alone. The native route with contact learning is
+the route that now learns both.
 
 ## What stays owed (#62)
 
 - The Lean statement that the ladder's admitted step decreases the declared comparison
   (the composition of `decide`'s strict-decrease clause with the native objective).
-- A downstream reading: whether the published motion lowers the code of later, unseen cells.
+- The native route's training command: `receive_native_current_learning` driven over a corpus,
+  with its sampler, in place of the observed-epoch `NormalMaps` train.
 - The phase excess reads 0 on this fixture, so the phase part of the comparison is untested here.

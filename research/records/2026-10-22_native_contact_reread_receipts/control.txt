@@ -1,5 +1,5 @@
 # solenoidal_alpha complete_language::native_context_controls::represented_native_zero_motion_continuity
-# source c8fd280bd; host debug build; V93_NATIVE_ATTEMPT_LIMIT=1000000; lines longer than 400 characters are cut
+# host debug build after the first-variation reading change; V93_NATIVE_ATTEMPT_LIMIT=1000000; lines longer than 400 characters are cut
 ZERO_MOTION_CONTINUITY_COLD_PASS boundary=pending-six bytes=1154295 pending_equal=true
 ZERO_MOTION_CONTINUITY_SOURCE source=0 commit=5 feature_max_bits=1 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=None
 ZERO_MOTION_CONTINUITY_SOURCE source=1 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=None
@@ -45,6 +45,6 @@ ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=0 key=1/7 class=0 cumulative=31 aeon
 ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=1 key=2/7 class=1 cumulative=32 aeon_local=2 aeon_origin=30 actual_frontier=30 M_R_frozen=true
 ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=2 key=3/7 class=1 cumulative=33 aeon_local=3 aeon_origin=30 actual_frontier=30 M_R_frozen=true
 ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=3 key=4/7 class=2 cumulative=34 aeon_local=4 aeon_origin=30 actual_frontier=30 M_R_frozen=true
-ZERO_MOTION_CONTINUITY_COMPLETE_PASS continuity=true positive_material_influence=true actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true unsplit_trajectory_equivalence=false elapsed_ns=69965965539
+ZERO_MOTION_CONTINUITY_COMPLETE_PASS continuity=true positive_material_influence=true actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true unsplit_trajectory_equivalence=false elapsed_ns=69417608041
 ZERO_MOTION_CONTINUITY_COUNTS {"final":true,"total_attempts":506,"forward_constructors":407,"response_companions":39,"actual_returns":30,"fresh_returns":30}
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 38 filtered out; finished in 69.98s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 39 filtered out; finished in 69.44s
