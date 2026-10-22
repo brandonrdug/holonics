@@ -5,7 +5,7 @@
   "command": [
     "bash",
     "-c",
-    "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-rational-flow-62b584/binaries/data-final hnn::constitution::epoch::mixed_tests::integral_ --nocapture"
+    "exec <run-directory>/alpha-v93-native-rational-flow-62b584/binaries/data-final hnn::constitution::epoch::mixed_tests::integral_ --nocapture"
   ],
   "limit_s": 15,
   "wall_ns": 101677635,

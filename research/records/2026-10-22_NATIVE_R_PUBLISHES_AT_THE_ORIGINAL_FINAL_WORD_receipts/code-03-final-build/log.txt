@@ -1,4 +1,4 @@
-   Compiling holonics v0.1.0 (/home/b/Documents/Codex/2026-10-17/task/req063-circuit-bpc/.local/wt/a28-native-context-return-v93-20261021/crates/holonics)
+   Compiling holonics v0.1.0 (.local/wt/a28-native-context-return-v93-20261021/crates/holonics)
 warning: unused import: `NativeReceivingSourceReading`
   --> crates/holonics/src/hnn/constitution/epoch.rs:19:84
    |
@@ -338,5 +338,5 @@ warning: function `ambiguity_holds_source_but_local_R_and_actual_ingress_continu
 warning: `holonics` (example "solenoidal_alpha" test) generated 6 warnings
 warning: `holonics` (lib test) generated 11 warnings (8 duplicates)
     Finished `test` profile [optimized] target(s) in 2m 03s
-  Executable unittests src/lib.rs (/home/b/Documents/Codex/2026-10-17/task/req063-circuit-bpc/.local/wt/a27-full-question-v93-20261021/.local/target/debug/deps/holonics-1628dd6a57f0a4a7)
-  Executable unittests examples/solenoidal_alpha.rs (/home/b/Documents/Codex/2026-10-17/task/req063-circuit-bpc/.local/wt/a27-full-question-v93-20261021/.local/target/debug/examples/solenoidal_alpha-0f004c22c7bb2530)
+  Executable unittests src/lib.rs (.local/wt/a27-full-question-v93-20261021/.local/target/debug/deps/holonics-1628dd6a57f0a4a7)
+  Executable unittests examples/solenoidal_alpha.rs (.local/wt/a27-full-question-v93-20261021/.local/target/debug/examples/solenoidal_alpha-0f004c22c7bb2530)

@@ -12,7 +12,7 @@
   "command": [
     "bash",
     "-c",
-    "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-rational-flow-62b584/binaries/connected-final --exact complete_language::native_context_controls::native_rational_flow_connected_prefix --ignored --nocapture"
+    "exec <run-directory>/alpha-v93-native-rational-flow-62b584/binaries/connected-final --exact complete_language::native_context_controls::native_rational_flow_connected_prefix --ignored --nocapture"
   ],
   "limit_s": 45,
   "wall_ns": 3211315183,

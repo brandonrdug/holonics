@@ -24,7 +24,7 @@ The exterior records compact real outcome/code/wall evidence, with full return a
 predeclared cut crossings or Held publications; native failure evidence remains complete.
 No target code, population likelihood, ledger arrival or native material operation is omitted.
 
-Finite CODE evidence is retained at /home/b/Documents/Codex/2026-10-17/task/alpha-v93-lazy-retained-return.
+Finite CODE evidence is retained at <run-directory>/alpha-v93-lazy-retained-return.
 Two new connected controls preserve semantic source/phase/foil/error and complete native/M/
 crib/pending successors, genuine demanded coarse views, same-source refinement and foreign
 operand refusal, pending-six cold continuation and late fault rollback. Existing legacy reuse

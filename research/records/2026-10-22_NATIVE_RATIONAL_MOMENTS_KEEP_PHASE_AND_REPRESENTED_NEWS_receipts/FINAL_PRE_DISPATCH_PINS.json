@@ -1,11 +1,11 @@
 {
   "binaries": [
     {
-      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-rational-flow-62b584/binaries/data-final",
+      "path": "<run-directory>/alpha-v93-native-rational-flow-62b584/binaries/data-final",
       "sha256": "1ff01612f74a70aed9c0c478822beb4880cfa1b1d2b377ccb13be356be16b088"
     },
     {
-      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-rational-flow-62b584/binaries/connected-final",
+      "path": "<run-directory>/alpha-v93-native-rational-flow-62b584/binaries/connected-final",
       "sha256": "149009a29d387222c5f4cfd93af2e54d9ef315cc9b76d589867cfd259b729d99"
     }
   ],

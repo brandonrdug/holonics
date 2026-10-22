@@ -1,7 +1,7 @@
 {
   "kind": "NativeRationalMomentsV1 CODE-only",
   "parent": "62b584eab6b196329d506cc11ac35f414361c04d",
-  "contract": "/home/b/Documents/Codex/2026-10-20/task/NATIVE_RATIONAL_EPOCH_FLOW_REPAIR_CONTRACT.txt",
+  "contract": "<run-directory>/NATIVE_RATIONAL_EPOCH_FLOW_REPAIR_CONTRACT.txt",
   "contract_sha256": "462741ee0a1b810a0cb0433293475669098c93dc0d29919cb5186bca072b057e",
   "compile_test_ns": 600000000000,
   "max_call_ns": 150000000000,

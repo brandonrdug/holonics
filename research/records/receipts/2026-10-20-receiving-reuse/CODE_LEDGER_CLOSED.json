@@ -4,49 +4,49 @@
   "closed": true,
   "entries": [
     {
-      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-receiving-reuse/code-01-check/receipt.json",
+      "receipt": "<run-directory>/alpha-v93-receiving-reuse/code-01-check/receipt.json",
       "wall_ns": 8716665768,
       "exit": 0,
       "stop": null,
       "owned_cleanup_remaining": []
     },
     {
-      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-receiving-reuse/code-02-owner-controls/receipt.json",
+      "receipt": "<run-directory>/alpha-v93-receiving-reuse/code-02-owner-controls/receipt.json",
       "wall_ns": 95784863134,
       "exit": 0,
       "stop": null,
       "owned_cleanup_remaining": []
     },
     {
-      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-receiving-reuse/code-03-reference-owner-controls/receipt.json",
+      "receipt": "<run-directory>/alpha-v93-receiving-reuse/code-03-reference-owner-controls/receipt.json",
       "wall_ns": 97091147347,
       "exit": 0,
       "stop": null,
       "owned_cleanup_remaining": []
     },
     {
-      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-receiving-reuse/code-04-final-owner-controls/receipt.json",
+      "receipt": "<run-directory>/alpha-v93-receiving-reuse/code-04-final-owner-controls/receipt.json",
       "wall_ns": 95537715467,
       "exit": 0,
       "stop": null,
       "owned_cleanup_remaining": []
     },
     {
-      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-receiving-reuse/code-05-native-equivalence/receipt.json",
+      "receipt": "<run-directory>/alpha-v93-receiving-reuse/code-05-native-equivalence/receipt.json",
       "wall_ns": 62962110122,
       "exit": 0,
       "stop": null,
       "owned_cleanup_remaining": []
     },
     {
-      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-receiving-reuse/code-06-final-host-gates/receipt.json",
+      "receipt": "<run-directory>/alpha-v93-receiving-reuse/code-06-final-host-gates/receipt.json",
       "wall_ns": 123471042153,
       "exit": 0,
       "stop": null,
       "owned_cleanup_remaining": []
     },
     {
-      "receipt": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-receiving-reuse/code-07-host-card-parity/receipt.json",
+      "receipt": "<run-directory>/alpha-v93-receiving-reuse/code-07-host-card-parity/receipt.json",
       "wall_ns": 12928147924,
       "exit": 0,
       "stop": null,

@@ -5,7 +5,7 @@
   "command": [
     "bash",
     "-c",
-    "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data hnn::constitution::epoch::rational:: --nocapture"
+    "exec <run-directory>/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data hnn::constitution::epoch::rational:: --nocapture"
   ],
   "limit_s": 10,
   "wall_ns": 101894921,

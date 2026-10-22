@@ -1,6 +1,6 @@
 {
   "kind": "synthetic CODE; no dataset/model run",
-  "source_control_log": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-ordered-return/code-05-final-focused/log.txt",
+  "source_control_log": "<run-directory>/alpha-v93-ordered-return/code-05-final-focused/log.txt",
   "traces": [
     {
       "kind": "synthetic CODE local-R then new-cut E; not language",

@@ -1,7 +1,7 @@
 {
   "utc": "2026-10-22T00:35:58.871565+00:00",
   "source_parent": "fcf6de9d8d461771b901aaad9677ed09453ed6fe",
-  "review": "/home/b/Documents/Codex/2026-10-20/task/NATIVE_RATIONAL_RESOURCE_AND_CONNECTED_TRANSITION_REVIEW.txt",
+  "review": "<run-directory>/NATIVE_RATIONAL_RESOURCE_AND_CONNECTED_TRANSITION_REVIEW.txt",
   "review_sha256": "ac575fc9c1c9b4841d8e2cce76bc9d00610448c6c62032c02ca6c3b16c9f39aa",
   "compile_test_ceiling_ns": 300000000000,
   "max_build_data_call_ns": 150000000000,

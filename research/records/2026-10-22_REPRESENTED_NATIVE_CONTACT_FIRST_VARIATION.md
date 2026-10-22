@@ -432,7 +432,7 @@ runtime-qualified b3e9f84 result and the still-unselected policy proposal.
 [implemented source only, October22; Refs #62 #73] Code
 `e8a843154801268a50fd209453d186a0548af7bc`, descending from documentation child
 `e7c6341b`, addresses the six findings pinned to `6c24a91`. The independent review is
-`/home/b/Documents/Codex/2026-10-20/task-2/JOINT_RESPONSE_6C24_SOURCE_REVIEW.txt`
+`<run-directory>/JOINT_RESPONSE_6C24_SOURCE_REVIEW.txt`
 (SHA256 `02740c2e5473bb4865553c1277ad36c17466e207caccb7091b5779527e84c09c`).
 This is a new, **uncompiled, untested, unwired source identity**. It is not a runtime
 qualification, a claim that all resource allocations are measured, or a new material-effect
@@ -489,6 +489,6 @@ There is no new positive C/K/D motion or useful-language evidence. Qualified b3e
 failed/zero-motion packets remain unchanged.
 
 Delivery evidence is additive under
-`/home/b/Documents/Codex/2026-10-17/task/alpha-v93-joint-rounding-modulus-source-only/review-6c24-correction/`.
+`<run-directory>/alpha-v93-joint-rounding-modulus-source-only/review-6c24-correction/`.
 The shared current index is owned by design; its update is supplied as an inspectable patch,
 not applied by this implementation owner. The earlier denied direct index edit is not retried.

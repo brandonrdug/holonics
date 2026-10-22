@@ -1,7 +1,7 @@
 {
   "utc": "2026-10-22T01:10:22.218317+00:00",
   "base": "e4199f8ebfa5c95019f753ed9cfa1b039d2df748",
-  "review": "/home/b/Documents/Codex/2026-10-20/task/NATIVE_ORIGINAL_WORD_FINAL_INGRESS_REPAIR_REVIEW.txt",
+  "review": "<run-directory>/NATIVE_ORIGINAL_WORD_FINAL_INGRESS_REPAIR_REVIEW.txt",
   "review_sha256": "c52a36df109644d5f405cbd1075bc529ae69712e8255ee8be6315a153d0be57d",
   "fixed_code_ceiling_ns": 360000000000,
   "max_build_call_ns": 180000000000,

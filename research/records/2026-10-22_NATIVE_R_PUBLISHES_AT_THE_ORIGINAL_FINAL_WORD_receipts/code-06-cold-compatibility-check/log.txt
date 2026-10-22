@@ -1,4 +1,4 @@
-    Checking holonics v0.1.0 (/home/b/Documents/Codex/2026-10-17/task/req063-circuit-bpc/.local/wt/a28-native-context-return-v93-20261021/crates/holonics)
+    Checking holonics v0.1.0 (.local/wt/a28-native-context-return-v93-20261021/crates/holonics)
 warning: unused import: `NativeReceivingSourceReading`
   --> crates/holonics/src/hnn/constitution/epoch.rs:19:84
    |

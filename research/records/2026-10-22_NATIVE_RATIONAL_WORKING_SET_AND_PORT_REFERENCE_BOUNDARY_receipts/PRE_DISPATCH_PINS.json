@@ -1,11 +1,11 @@
 {
   "binaries": [
     {
-      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-resource-connected-fcf6de9/binaries/data",
+      "path": "<run-directory>/alpha-v93-native-resource-connected-fcf6de9/binaries/data",
       "sha256": "30ae53b988ea955dfa661613d8be6c3cfae9d53e518b28bd26e367244c47b404"
     },
     {
-      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-resource-connected-fcf6de9/binaries/connected",
+      "path": "<run-directory>/alpha-v93-native-resource-connected-fcf6de9/binaries/connected",
       "sha256": "8d402a86ef5b837bbc08a147312c341be0c9640c52244763155fe62aa95c64b5"
     }
   ],

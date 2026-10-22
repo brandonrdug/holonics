@@ -1,4 +1,4 @@
-   Compiling holonics v0.1.0 (/home/b/Documents/Codex/2026-10-17/task/req063-circuit-bpc/.local/wt/a28-native-context-return-v93-20261021/crates/holonics)
+   Compiling holonics v0.1.0 (.local/wt/a28-native-context-return-v93-20261021/crates/holonics)
 error[E0412]: cannot find type `BigInt` in this scope
    --> crates/holonics/src/hnn/mod.rs:545:53
     |

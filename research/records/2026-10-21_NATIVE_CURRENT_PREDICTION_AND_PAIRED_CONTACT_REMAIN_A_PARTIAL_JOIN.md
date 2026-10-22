@@ -15,7 +15,7 @@ The native return reuses the actual Word's paired reverse owner. A private witne
 
 ## Evidence and limits
 
-The CODE ledger is fixed at900 cumulative compile/test seconds, with at most180 per call,4CPU and8GiB host. All receipts, including failed imports, duplicate binding, coarse no-motion, root-degree refusal, early material/cold failures, are preserved outside the worktree at `/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-context-return`. No dataset/model/output campaign ran in this milestone.
+The CODE ledger is fixed at900 cumulative compile/test seconds, with at most180 per call,4CPU and8GiB host. All receipts, including failed imports, duplicate binding, coarse no-motion, root-degree refusal, early material/cold failures, are preserved outside the worktree at `<run-directory>/alpha-v93-native-context-return`. No dataset/model/output campaign ran in this milestone.
 
 - Exact host contact control: actual C/K/D entries changed with R held, authentic represented alignment exceeded the class-error bound, and held-momentum work was returned. It used one predeclared fine representation established before prediction, not a precision search.
 - The live host event control showed a later F interval-separated effect after contact publication with R/M held in the comparison. Its CODE prior is explicitly calibrated from the earlier synthetic20-class fixture; it does NOT establish new native R learning or a production initializer.

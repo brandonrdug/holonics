@@ -90,5 +90,5 @@
   "original_source128_refinement": true,
   "physical_return_including_foil_beta_error_exact": true,
   "predictive_gain_claim": false,
-  "source_log": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-receiving-reuse/code-04-final-owner-controls/log.txt"
+  "source_log": "<run-directory>/alpha-v93-receiving-reuse/code-04-final-owner-controls/log.txt"
 }

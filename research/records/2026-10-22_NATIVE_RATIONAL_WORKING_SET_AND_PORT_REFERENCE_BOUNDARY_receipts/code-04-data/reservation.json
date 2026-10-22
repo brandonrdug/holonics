@@ -4,6 +4,6 @@
   "command": [
     "bash",
     "-c",
-    "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-resource-connected-fcf6de9/binaries/data hnn::constitution::epoch::rational:: --nocapture"
+    "exec <run-directory>/alpha-v93-native-resource-connected-fcf6de9/binaries/data hnn::constitution::epoch::rational:: --nocapture"
   ]
 }

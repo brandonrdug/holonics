@@ -33,11 +33,11 @@
   ],
   "binaries": [
     {
-      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data",
+      "path": "<run-directory>/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data",
       "sha256": "c16b65821de25375e1c5a4cbce0658ac09e2b2107cbf8679c9dd1e9b9faf7e59"
     },
     {
-      "path": "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/connected",
+      "path": "<run-directory>/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/connected",
       "sha256": "2617a290892c2ea375c43b7424a1c9645d761e44889b28ea5611c8d2f7128388"
     }
   ],
@@ -199,7 +199,7 @@
       "command": [
         "bash",
         "-c",
-        "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data hnn::constitution::epoch::rational:: --nocapture"
+        "exec <run-directory>/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/data hnn::constitution::epoch::rational:: --nocapture"
       ],
       "limit_s": 10,
       "wall_ns": 101894921,
@@ -234,7 +234,7 @@
       "command": [
         "bash",
         "-c",
-        "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/connected --exact complete_language::native_context_controls::native_original_word_final_ingress_transition --ignored --nocapture"
+        "exec <run-directory>/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/connected --exact complete_language::native_context_controls::native_original_word_final_ingress_transition --ignored --nocapture"
       ],
       "limit_s": 90,
       "wall_ns": 5113864250,

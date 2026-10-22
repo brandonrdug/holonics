@@ -24,7 +24,6 @@ POLICIES = ("native", "founding-R", "tree", "fresh-native")
 TRAIN_RAYON_THREADS = 4
 OUTPUT_POOL_SIZE = 4
 OUTPUT_CHILD_RAYON_THREADS = 1
-DATA_MANIFEST = "/home/b/Documents/Codex/2026-10-17/task/alpha-complete-language-v91/approved-data-v2/native-inputs.json"
 RAW_SHA = "17f347dc51477c50d4efb83959dbb7c56297aba886e5544ee2aaed3024813465"
 
 

@@ -4,6 +4,6 @@
   "command": [
     "bash",
     "-c",
-    "exec /home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/connected --exact complete_language::native_context_controls::native_original_word_final_ingress_transition --ignored --nocapture"
+    "exec <run-directory>/alpha-v93-native-original-word-final-ingress-e4199f8/binaries/connected --exact complete_language::native_context_controls::native_original_word_final_ingress_transition --ignored --nocapture"
   ]
 }
