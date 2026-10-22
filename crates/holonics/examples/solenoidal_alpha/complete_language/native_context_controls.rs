@@ -680,8 +680,8 @@ fn native_frontier_saved_source30_codec_data_only()->Result<()>{
 
 #[test]
 #[ignore="one scoped material-causal control reusing the qualified30-class chain"]
-fn represented_native_material_response_connected()->Result<()>{material_response_connected_on(None)}
-pub(crate) fn material_response_connected_on(execution:Option<&dyn holonics::hnn::word::native_prediction::NativePredictionExecution>)->Result<()>{
+fn represented_native_material_response_connected()->Result<()>{let(m,w,p)=material_response_connected_on(None)?;assert!(m&&w&&p,"continuity alone does not establish contact-material causal influence");Ok(())}
+pub(crate) fn material_response_connected_on(execution:Option<&dyn holonics::hnn::word::native_prediction::NativePredictionExecution>)->Result<(bool,bool,bool)>{
     use holonics::hnn::word::work;
     use holonics::hnn::field::ConstitutionRead;
     struct Meter<'a>(Option<&'a dyn holonics::hnn::word::native_prediction::NativePredictionExecution>);
@@ -827,6 +827,6 @@ pub(crate) fn material_response_connected_on(execution:Option<&dyn holonics::hnn
         println!("MATERIAL_RESPONSE_CONNECTED_FROZEN_PASS decision={index} key={key} class={} cumulative={} aeon_local={} aeon_origin={} actual_frontier=30 M_R_frozen=true",x.selected_class,af.source_cells(),af.aeon_cells(),af.aeon_origin());
     }
     assert_eq!(stream.resident().continuing_state(0)?,retained);
-    println!("MATERIAL_RESPONSE_CONNECTED_COMPLETE_PASS continuity=true positive_material_influence={moved} actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true causal_wave_changed={changed_wave} causal_probability_separated={separated} unsplit_trajectory_equivalence=false elapsed_ns={}",started.elapsed().as_nanos());
-    assert!(moved&&changed_wave&&separated,"continuity alone does not establish contact-material causal influence");Ok(())
+    println!("MATERIAL_RESPONSE_CONNECTED_CONTINUITY_RESULT continuity=true positive_material_influence={moved} actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true causal_wave_changed={changed_wave} causal_probability_separated={separated} unsplit_trajectory_equivalence=false elapsed_ns={}",started.elapsed().as_nanos());
+    Ok((moved,changed_wave,separated))
 }

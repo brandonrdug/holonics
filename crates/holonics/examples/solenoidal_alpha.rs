@@ -2116,6 +2116,6 @@ pub fn code_durable_continuation(execution:&dyn holonics::hnn::reference::observ
 }
 
 #[cfg(test)]
-pub(crate) fn code_native_material_response_device(execution:&dyn holonics::hnn::word::native_prediction::NativePredictionExecution)->Result<()>{
+pub(crate) fn code_native_material_response_device(execution:&dyn holonics::hnn::word::native_prediction::NativePredictionExecution)->Result<(bool,bool,bool)>{
     complete_language::native_context_controls::material_response_connected_on(Some(execution))
 }
