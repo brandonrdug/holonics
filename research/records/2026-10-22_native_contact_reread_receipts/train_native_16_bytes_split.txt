@@ -1,0 +1,9 @@
+NATIVE_TRAIN_OPEN bytes=16 cells=64 section_cells=10 opening_ms=30
+NATIVE_TRAIN cells=10/64 scored=10 pending=0 contacts=1 refusals=0 chunk_code_bits_per_cell=[2.000,2.000] flat=2.000 learn_ms=2904 contact_ms=162 state_bytes=1527293 save_ms=411 elapsed_ms=3345 native_calls=[109,10,10,10]
+NATIVE_TRAIN cells=20/64 scored=10 pending=0 contacts=2 refusals=0 chunk_code_bits_per_cell=[1.905,1.905] flat=2.000 learn_ms=7500 contact_ms=2412 state_bytes=1944768 save_ms=541 elapsed_ms=11388 native_calls=[232,21,20,20]
+NATIVE_TRAIN cells=30/64 scored=10 pending=0 contacts=3 refusals=0 chunk_code_bits_per_cell=[1.917,1.917] flat=2.000 learn_ms=9762 contact_ms=4175 state_bytes=2212191 save_ms=649 elapsed_ms=21800 native_calls=[355,32,30,30]
+NATIVE_TRAIN cells=40/64 scored=10 pending=0 contacts=4 refusals=0 chunk_code_bits_per_cell=[2.163,2.163] flat=2.000 learn_ms=9570 contact_ms=3951 state_bytes=2396353 save_ms=717 elapsed_ms=32089 native_calls=[478,43,40,40]
+NATIVE_TRAIN cells=50/64 scored=10 pending=0 contacts=5 refusals=0 chunk_code_bits_per_cell=[1.926,1.926] flat=2.000 learn_ms=9557 contact_ms=4204 state_bytes=2551310 save_ms=821 elapsed_ms=42469 native_calls=[601,54,50,50]
+NATIVE_TRAIN cells=60/64 scored=10 pending=0 contacts=6 refusals=0 chunk_code_bits_per_cell=[2.278,2.278] flat=2.000 learn_ms=9145 contact_ms=3889 state_bytes=2587305 save_ms=942 elapsed_ms=52556 native_calls=[724,65,60,60]
+NATIVE_TRAIN cells=64/64 scored=1 pending=3 contacts=7 refusals=0 chunk_code_bits_per_cell=[1.399,1.399] flat=2.000 learn_ms=3670 contact_ms=3667 state_bytes=2595587 save_ms=919 elapsed_ms=57147 native_calls=[749,67,61,61]
+NATIVE_TRAIN_DONE cells=64 scored=61 contacts=7 refusals=0 code_bits_per_cell=[2.021,2.021] flat=2.000 state_sha256=eb028b8a558151c6331b4cb28027b87f6ab49df82eb9be8cfec7c66769c5e6b3 elapsed_ms=57162

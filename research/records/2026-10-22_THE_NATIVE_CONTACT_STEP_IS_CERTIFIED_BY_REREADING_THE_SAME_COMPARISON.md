@@ -118,10 +118,42 @@ two receiving-only after "the actual epoch ray violates its own curvature bound"
 training has so far learned its receiving maps alone. The native route with contact learning is
 the route that now learns both.
 
+## Athena's native training command
+
+`complete-language train-native CORPUS SHA POPULATION OUT` and `complete-language sample-native
+STATE STATE_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA CELLS OUT`
+(`examples/solenoidal_alpha/complete_language/native_train.rs`, host only). Training opens the
+native resident the controls use, turns the corpus into base-four cells and delivers it one
+receiver section at a time through `receive_native_current_learning`, so each section's crossing
+publishes one contact. After every section it prints the prequential code of the cells it scored
+(each event's score of its actual class before learning it) and saves the whole state (native
+continuing state, crib and pending cells). Sampling restores that state cold, conditions a frozen
+fork on the prompt without learning, and releases one keyed cell at a time
+(`release_native_current_forecast`), decoded by `Base4Bytes`.
+
+First reading: the 16 bytes `The HNN is a Hol` (from THE_MACHINE), 64 cells, host, optimized build
+without LTO, 4 cores. Receipts:
+[train_native_16_bytes.txt](2026-10-22_native_contact_reread_receipts/train_native_16_bytes.txt)
+(its first run), [train_native_16_bytes_split.txt](2026-10-22_native_contact_reread_receipts/train_native_16_bytes_split.txt)
+(the same run with the contact time and Word opens per section),
+[sample_native_16_cells.txt](2026-10-22_native_contact_reread_receipts/sample_native_16_cells.txt).
+
+- 7 contacts published, none refused. Debug and optimized builds saved byte-identical states.
+- Prequential code over the 61 scored cells: 2.021 bits per cell, against 2 for a flat guess.
+  Sixteen bytes teach nothing measurable.
+- Cost: 57.6 s, about 0.9 s per cell. Each steady section of 10 cells takes about 9.5 s: the
+  contact (one cell and its ladder) about 4 s, the 9 receiving cells about 5.5 s; 123 Word opens
+  per section. The saved state is about 2.6 MB of text, almost all of it the lagged receiver
+  material M (four exact matrices of 17,646 entries each); it widens slowly with the cells but
+  does not grow in count, and saving it costs about 0.9 s per section.
+- Sampling 16 cells took 4.3 s (0.14 s per released cell, 1.6 s for the cold restore). The four
+  released bytes are `B4 9E BA CF`, not text.
+
+At about 4 s per byte, the native route cannot yet train on a real text. Its per-cell cost is the
+next loop's subject.
+
 ## What stays owed (#62)
 
 - The Lean statement that the ladder's admitted step decreases the declared comparison
   (the composition of `decide`'s strict-decrease clause with the native objective).
-- The native route's training command: `receive_native_current_learning` driven over a corpus,
-  with its sampler, in place of the observed-epoch `NormalMaps` train.
 - The phase excess reads 0 on this fixture, so the phase part of the comparison is untested here.

@@ -1,0 +1,22 @@
+NATIVE_SAMPLE_RESTORED accepted=64 pending=3 restore_ms=1628
+NATIVE_SAMPLE cell=1 class=2 ms=158
+NATIVE_SAMPLE cell=2 class=3 ms=173
+NATIVE_SAMPLE cell=3 class=1 ms=116
+NATIVE_SAMPLE cell=4 class=0 ms=150
+NATIVE_SAMPLE cell=5 class=2 ms=128
+NATIVE_SAMPLE cell=6 class=1 ms=145
+NATIVE_SAMPLE cell=7 class=3 ms=139
+NATIVE_SAMPLE cell=8 class=2 ms=84
+NATIVE_SAMPLE cell=9 class=2 ms=138
+NATIVE_SAMPLE cell=10 class=3 ms=175
+NATIVE_SAMPLE cell=11 class=2 ms=160
+NATIVE_SAMPLE cell=12 class=2 ms=146
+NATIVE_SAMPLE cell=13 class=3 ms=98
+NATIVE_SAMPLE cell=14 class=0 ms=149
+NATIVE_SAMPLE cell=15 class=3 ms=180
+NATIVE_SAMPLE cell=16 class=3 ms=144
+NATIVE_SAMPLE_TEXT "����"
+NATIVE_SAMPLE_DONE cells=16 elapsed_ms=4345
+EXIT 0
+
+{"command":"sample-native","state_sha256":"eb028b8a558151c6331b4cb28027b87f6ab49df82eb9be8cfec7c66769c5e6b3","prompt_sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","keys_sha256":"8dde0d4c18866c5532f0730c27bc76ad71e03b23bfc4fd117585859426961e6a","prompt_code_bits":"(Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, 0)","classes":"[2, 3, 1, 0, 2, 1, 3, 2, 2, 3, 2, 2, 3, 0, 3, 3]","utf8":"Invalid { valid_prefix: \"\", invalid_from: 0, invalid_length: 1 }","unfinished_cells":"[]","elapsed_ns":4344887121}

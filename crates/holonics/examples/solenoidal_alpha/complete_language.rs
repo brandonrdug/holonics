@@ -9,6 +9,8 @@ use std::collections::BTreeMap;
 mod continuation;
 #[path="complete_language/stage.rs"]
 mod stage;
+#[path = "complete_language/native_train.rs"]
+mod native_train;
 
 #[cfg(test)]
 #[path = "complete_language/code_parallel_controls.rs"]
@@ -761,6 +763,9 @@ pub(super) fn run_with_execution(
         Some("train-prepared-local-retained-fibre-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturn),
         Some(stage::COMMAND) | Some("train-adaptive-family-local-arrival-held-v1") | Some("train-family-local-arrival-context-held-v1") | Some("train-source-framing-arrival-context-held-v1") | Some("train-source-framing-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         Some("train-prepared-local-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
+        Some("train-native") if backend == CompleteLanguageTrainingBackend::HostReference => native_train::train(args),
+        Some("sample-native") if backend == CompleteLanguageTrainingBackend::HostReference => native_train::sample(args),
+        Some("train-native" | "sample-native") => Err("the native route's commands are host-owned; no CUDA fallback".into()),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
         _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), train-prepared-local-retained-held-v1 (explicit held-map continuation), train-source-framing-retained-held-v1 (explicit known byte-position context), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
