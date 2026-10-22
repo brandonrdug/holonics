@@ -1,14 +1,16 @@
 //! Exact record-to-flow aggregation for one receiver epoch.
 //!
-//! Each heard record contributes its own unweighted `f fᵀ` and `g fᵀ` term. The
-//! face partition is counted by heard cells elsewhere; records add no partitions.
+//! Each heard record contributes its own `f fᵀ` and `g fᵀ` term. Native samples that
+//! carry their face masses weight the metric term by the dyadic Fisher bound of that
+//! face (`native_fisher_weight`); records without masses stay unweighted. The face
+//! partition is counted by heard cells elsewhere; records add no partitions.
 
 use super::{EpochArray, EpochFlow, extent, partition_exponent, refused};
 use crate::hnn::HnnError;
 use crate::hnn::constitution::Sample;
 use crate::ratio::Rat;
 use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 
 /// One locus's exact producer feature and the carried covector that reached it.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -128,6 +130,37 @@ fn scale_values(values: &[Rat], exponent: u32) -> Result<Vec<BigInt>, HnnError> 
         .collect()
 }
 
+/// [definition; agent-inferred, October 22] **The native receiving metric is the comparison's
+/// factored Fisher form.** A reading's code curvature along a logit move `v` is its face variance,
+/// and both `Var_p(v) ≤ p_max Σ_c (v_c − v̄)²` (`faceVariance_le_centred`) and
+/// `Var_p(v) ≤ 2(1 − p_k) Σ_c (v_c − v̄)²` for every class `k` (the second moment about `v_k`, each
+/// `(v_c − v_k)²` at most twice the centred sum) hold, so the reading enters the feature Gram at
+/// `μ = min(p_max, 2(1 − p_max))` (atlas `receiver.factored-fisher-certificate`). It is read from the
+/// producing face's own masses and held at its dyadic ceiling, so the Gram's lattice grows by a
+/// shift. A face the receiver already reads sharply adds little curvature, and a unit weight (every
+/// reading counted as uniform-stiff) shrank every later step against a metric that kept growing:
+/// one repeated class still coded about 0.7 bits per cell after 250 cells. The step is certified as
+/// before (`receiving_fisher_face`), so any positive metric descends; this one is the curvature the
+/// accumulated code actually has. `None` (no producing masses) keeps the unit weight. The
+/// complement bound's Lean statement is owed in #62.
+fn native_fisher_weight(masses: Option<&[Rat]>) -> Option<Rat> {
+    let largest = masses?.iter().max()?.clone();
+    let complement = (Rat::one() - &largest) * Rat::from_integer(BigInt::from(2));
+    let mu = largest.min(complement);
+    if !mu.is_positive() {
+        return Some(Rat::zero());
+    }
+    let mut ceiling = Rat::one();
+    while ceiling < mu {
+        ceiling *= Rat::from_integer(BigInt::from(2));
+    }
+    let half = Rat::new(BigInt::one(), BigInt::from(2));
+    while &ceiling * &half >= mu {
+        ceiling *= &half;
+    }
+    Some(ceiling)
+}
+
 impl EpochFlow {
     pub(super) fn from_native_samples(rows:usize,columns:usize,grain:u32,cells:u64,epoch:u64,heard:u64,samples:&[Sample],phase_rows:&[usize],period:u64)->Result<Self,HnnError>{
         use num_traits::Signed;
@@ -143,7 +176,9 @@ impl EpochFlow {
             // Preserve every numerical denominator at transpose; no EpochArray::new here.
             let t=EpochArray::from_native_rows(&s.feature.iter().map(|q|vec![q.clone()]).collect::<Vec<_>>(),vec![1;columns],b)?;
             let d=EpochArray::from_native_rows(&s.covector.iter().map(|q|vec![q.clone()]).collect::<Vec<_>>(),div.clone(),b)?;
-            gram=gram.add(&t.multiply(&f)?)?;covector=covector.add(&d.multiply(&f)?)?;
+            let metric=t.multiply(&f)?;
+            let metric=match native_fisher_weight(s.masses.as_deref()){Some(mu)=>metric.scalar_product(&EpochArray::from_dyadic_scalar(&mu)?)?,None=>metric};
+            gram=gram.add(&metric)?;covector=covector.add(&d.multiply(&f)?)?;
             for (a,x) in reached.iter_mut().zip(&s.feature){*a|=!x.is_zero();}
         }
         Ok(Self{gram,covector,support:reached.iter().enumerate().filter_map(|(j,x)|x.then_some(j)).collect(),partitions:vec![],cells:heard,partition_cells:cells,records:samples.len() as u64,partition_exponent:partition_exponent(grain,cells,epoch)?,receiver_grain:grain,epoch})

@@ -131,9 +131,27 @@ fn add_digit_score(event: &NativeContextEvent, by_digit: &mut [(Rat, Rat, i64); 
     add_score(event, &mut by_digit[(event.prediction.source_cells % 4) as usize]);
 }
 
+/// The receiving tree's face alone at the same cell, `−log₂ q(t)`: the count-only code the joined
+/// face is measured against (a reading beside the training).
+fn add_tree_score(event: &NativeContextEvent, code: &mut (Rat, Rat, i64)) {
+    let Some(q) = event.prediction.trees.first().and_then(|t| t.probabilities.get(event.selected_class)) else { return };
+    if let Ok(log) = holonics::ratio::algebraic::log2_enclosure_at(q, READING_BITS) {
+        code.0 -= &log.upper;
+        code.1 -= &log.lower;
+        code.2 += 1;
+    }
+}
+
 fn per_digit(by_digit: &[(Rat, Rat, i64); 4]) -> String {
     let lower = by_digit.iter().map(|c| bits(&(&c.0 / integer(c.2.max(1))))).collect::<Vec<_>>();
     format!("[{}]", lower.join(","))
+}
+
+/// The step exponents `k` (`η = 2^k`) a publication certified, by family, with the entries that
+/// moved: a reading of how far the deposit went, beside the code.
+fn steps(reading: &holonics::hnn::constitution::DepositReading) -> String {
+    let each = reading.steps.iter().map(|(_, s)| format!("{:?}:{}", s.family, s.step.exponent)).collect::<Vec<_>>();
+    format!("{}/{}", each.join("+"), reading.stepped)
 }
 
 fn per_cell(code: &(Rat, Rat, i64)) -> String {
@@ -168,19 +186,26 @@ pub(super) fn train(args: &[String]) -> Result<()> {
     let (mut contacts, mut refusals) = (0usize, Vec::new());
     let zero = || (integer(0), integer(0), 0i64);
     let mut by_digit = [zero(), zero(), zero(), zero()];
+    let mut tree_total = zero();
     for (index, chunk) in cells.chunks(width).enumerate() {
         let at = usize::try_from(stream.accepted_cells()?)? + stream.pending_classes().len();
         let chunk_started = Instant::now();
         let mut code = (integer(0), integer(0), 0i64);
+        let mut tree_code = zero();
         let mut contact_ms = 0u128;
         let receipt = stream.receive_native_current_learning(&reference, &pairing, chunk, READING_BITS, &mut |e| {
             if e.reread.is_some() {
                 contact_ms = chunk_started.elapsed().as_millis();
             }
             add_score(e, &mut code);
-            add_digit_score(e, &mut by_digit)
+            add_digit_score(e, &mut by_digit);
+            add_tree_score(e, &mut tree_code);
         })?;
         let learn_ms = chunk_started.elapsed().as_millis();
+        let r_steps = receipt.sections.iter().map(|s| steps(&s.publication)).collect::<Vec<_>>().join(",");
+        let contact_steps = receipt.contacts.iter().filter_map(|e| e.contact.as_ref().map(|c| {
+            format!("{}@h{}", steps(&c.publication), e.reread.as_ref().and_then(|r| r.admitted).map_or("-".to_string(), |h| h.to_string()))
+        })).collect::<Vec<_>>().join(",");
         contacts += receipt.contacts.len();
         for (offset, reason) in &receipt.contact_refusals {
             refusals.push((at + offset, reason.clone()));
@@ -198,14 +223,17 @@ pub(super) fn train(args: &[String]) -> Result<()> {
         };
         let calls = holonics::hnn::word::work::process_native_calls();
         println!(
-            "NATIVE_TRAIN cells={}/{} scored={} pending={} contacts={contacts} refusals={} chunk_code_bits_per_cell={} flat={} code_by_byte_digit={} learn_ms={learn_ms} contact_ms={contact_ms} state_bytes={} save_ms={} elapsed_ms={} native_calls=[{},{},{},{}]",
-            at + chunk.len(), cells.len(), code.2, stream.pending_classes().len(), refusals.len(), per_cell(&code), bits(&flat), per_digit(&by_digit),
+            "NATIVE_TRAIN cells={}/{} scored={} pending={} contacts={contacts} refusals={} chunk_code_bits_per_cell={} tree_only={} flat={} code_by_byte_digit={} r_steps=[{r_steps}] contact_steps=[{contact_steps}] learn_ms={learn_ms} contact_ms={contact_ms} state_bytes={} save_ms={} elapsed_ms={} native_calls=[{},{},{},{}]",
+            at + chunk.len(), cells.len(), code.2, stream.pending_classes().len(), refusals.len(), per_cell(&code), per_cell(&tree_code), bits(&flat), per_digit(&by_digit),
             state_bytes, saved.elapsed().as_millis(), started.elapsed().as_millis(),
             calls.forward_attempts, calls.response_attempts, calls.return_attempts, calls.response_return_attempts
         );
         total.0 += &code.0;
         total.1 += &code.1;
         total.2 += code.2;
+        tree_total.0 += &tree_code.0;
+        tree_total.1 += &tree_code.1;
+        tree_total.2 += tree_code.2;
     }
     let state = std::fs::read(out.join("STATE"))?;
     write_new(&out.join("RECEIPT.json"), object(&[
@@ -218,12 +246,13 @@ pub(super) fn train(args: &[String]) -> Result<()> {
         ("contacts", contacts.to_string()),
         ("contact_refusals", exact(&refusals)),
         ("prequential_code_bits", exact(&(&total.0, &total.1))),
+        ("tree_only_code_bits", exact(&(&tree_total.0, &tree_total.1))),
         ("code_bits_by_byte_digit", exact(&by_digit.iter().map(|c| (&c.0, &c.1, c.2)).collect::<Vec<_>>())),
         ("scored_cells", total.2.to_string()),
         ("state_sha256", quoted(&sha256(&state)?)),
         ("elapsed_ns", started.elapsed().as_nanos().to_string()),
     ]).as_bytes())?;
-    println!("NATIVE_TRAIN_DONE cells={} scored={} contacts={contacts} refusals={} code_bits_per_cell={} flat={} code_by_byte_digit={} state_sha256={} elapsed_ms={}", cells.len(), total.2, refusals.len(), per_cell(&total), bits(&flat), per_digit(&by_digit), sha256(&state)?, started.elapsed().as_millis());
+    println!("NATIVE_TRAIN_DONE cells={} scored={} contacts={contacts} refusals={} code_bits_per_cell={} tree_only={} flat={} code_by_byte_digit={} state_sha256={} elapsed_ms={}", cells.len(), total.2, refusals.len(), per_cell(&total), per_cell(&tree_total), bits(&flat), per_digit(&by_digit), sha256(&state)?, started.elapsed().as_millis());
     Ok(())
 }
 

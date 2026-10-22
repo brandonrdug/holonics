@@ -17,6 +17,19 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 22: the native face reads its own receiving tree (host).** The native route never read
+the receiving tree its constitution carried, and its readout's features do not separate the next
+digit. The native face is now the tree's face at the cell's address times the readout's native
+power, and every actual cell deposits its class at the address it was read at. The readout's
+metric takes each producing face's Fisher bound. Prequential bits per digit (flat 2), before → joined:
+a constant byte 0.96 → 0.082, a period-4 byte 1.55 → 0.066, THE_MACHINE's first 256 bytes
+1.926 → 1.368 (1.242 over the last 200 cells). A 128-byte sample from that state is printable
+babble from the corpus's alphabet ("al.iner.imsc", "enteods"), with no run longer than 3 bytes
+copied from the corpus. On text the readout's wave does not yet add to the tree (the tree alone
+codes 1.347), so the readout's features are the next subject. Both native controls pass. The
+[record](research/records/2026-10-22_THE_NATIVE_FACE_READS_ITS_OWN_RECEIVING_TREE.md) holds the
+decision and receipts. The paragraph below is historical at its source.
+
 **October 22: the native contacts learn, certified by rereading the same comparison (host).**
 The contact step starts each family at its covector-scale bound, halves in common, and publishes
 the first halving whose reread of the same native prediction is an exact strict decrease;

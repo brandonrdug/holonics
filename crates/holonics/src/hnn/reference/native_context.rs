@@ -60,13 +60,15 @@ impl Reference {
         chart: NativeExecutionChart,
         bits: u32,
     ) -> Result<crate::hnn::word::native_prediction::NativePredictionWord<'a>, HnnError> {
-        self.prepare_native_current_prediction_on(resident,chart,bits,None)
+        self.prepare_native_current_prediction_on(resident,chart,bits,None,None)
     }
     /// Explicit real execution realization. No host forward fallback is selected.
     pub fn prepare_native_current_prediction_with_execution<'a>(&self,resident:&'a Resident,bits:u32,execution:&dyn crate::hnn::word::native_prediction::NativePredictionExecution)->Result<crate::hnn::word::native_prediction::NativePredictionWord<'a>,HnnError>{
-        self.prepare_native_current_prediction_on(resident,NativeExecutionChart::RepresentedV1,bits,Some(execution))
+        self.prepare_native_current_prediction_on(resident,NativeExecutionChart::RepresentedV1,bits,Some(execution),None)
     }
-    fn prepare_native_current_prediction_on<'a>(&self,resident:&'a Resident,chart:NativeExecutionChart,bits:u32,execution:Option<&dyn crate::hnn::word::native_prediction::NativePredictionExecution>)->Result<crate::hnn::word::native_prediction::NativePredictionWord<'a>,HnnError>{
+    /// `tree` is the section's working receiving tree when the section has deposited earlier
+    /// cells into it; otherwise the published tree is read.
+    fn prepare_native_current_prediction_on<'a>(&self,resident:&'a Resident,chart:NativeExecutionChart,bits:u32,execution:Option<&dyn crate::hnn::word::native_prediction::NativePredictionExecution>,tree:Option<&crate::compression::landmark::context::Landmarks>)->Result<crate::hnn::word::native_prediction::NativePredictionWord<'a>,HnnError>{
         resident.admit_no_participating_world()?;
         let represented=resident.prepared_input.as_ref().is_some_and(|p|p.work_receipt_policy().represented());
         if represented!=(chart==NativeExecutionChart::RepresentedV1) && (represented||chart==NativeExecutionChart::RepresentedV1){
@@ -139,7 +141,78 @@ impl Reference {
             let record=execution.forward_native(field,theta,&ratio,&mut charts,&opening,declaration.phases())?;
             declaration.read_external(word,record,bits)?
         }else{declaration.run_and_read(word,bits)?};
+        let tree = tree.or_else(|| theta.landmarks(phases.ring()));
+        let predictor = match tree {
+            Some(tree) => {
+                let address = NativeTreeAddress::of(resident, ratio.prepared_input(), tree)?;
+                predictor.join_tree(vec![address.face(tree, phases.grain())?])?
+            }
+            None => predictor,
+        };
         Ok(predictor.with_prepared_cut(ratio.prepared_input().cloned()).with_charts(charts))
+    }
+}
+
+/// [definition; agent-inferred, October 22] **The receiving tree's address of the cell a native
+/// Word predicts**: the resident's register at the receiver's depth (the preceding cells, newest
+/// first, `Boundary` before the first), behind the cell's source framing path where the tree
+/// declares observation letters (`ObservationPartition::SourceFramingRouteV1`: the cell's place in
+/// its source frame). The same address reads the face before the cell and receives its class after.
+pub(crate) enum NativeTreeAddress {
+    Causal(Vec<crate::compression::landmark::context::Letter>),
+    Observed(crate::compression::landmark::context::ObservedAddress),
+}
+impl NativeTreeAddress {
+    pub(crate) fn of(
+        resident: &Resident,
+        cut: Option<&prepared_input::PreparedInputCut>,
+        tree: &crate::compression::landmark::context::Landmarks,
+    ) -> Result<Self, HnnError> {
+        let phases = resident.admitted.first().ok_or(HnnError::Unadmitted {
+            reason: "one native model receiver",
+        })?;
+        let causal = phases
+            .addresses(&resident.address.truncated(phases.depth())?, &[])?
+            .into_iter()
+            .next()
+            .ok_or(HnnError::Unadmitted {
+                reason: "one native receiving phase address",
+            })?;
+        if tree.observation_width() == 0 {
+            return Ok(Self::Causal(causal));
+        }
+        let partition = phases.observation_partition().ok_or(HnnError::Unadmitted {
+            reason: "an observed receiving tree reads its declared observation partition",
+        })?;
+        let framing = cut.and_then(|cut| cut.framing).ok_or(HnnError::Unadmitted {
+            reason: "an observed native receiving tree reads the cell's source framing",
+        })?;
+        Ok(Self::Observed(
+            crate::compression::landmark::context::ObservedAddress::new(
+                partition.path(framing.bits())?,
+                causal,
+            ),
+        ))
+    }
+    pub(crate) fn face(
+        &self,
+        tree: &crate::compression::landmark::context::Landmarks,
+        grain: u64,
+    ) -> Result<crate::compression::landmark::context::LandmarkFace, HnnError> {
+        Ok(match self {
+            Self::Causal(address) => tree.face(address, grain),
+            Self::Observed(address) => tree.face_observed(address, grain),
+        }?)
+    }
+    pub(crate) fn deposit(
+        &self,
+        tree: &mut crate::compression::landmark::context::Landmarks,
+        class: usize,
+    ) -> Result<(), HnnError> {
+        Ok(match self {
+            Self::Causal(address) => tree.deposit(address, class),
+            Self::Observed(address) => tree.deposit_observed(address, class),
+        }?)
     }
 }
 
@@ -297,6 +370,12 @@ impl Reference {
                 reason: "one kept original native preparation cut",
             })?;
         let prediction = predictor.reading();
+        // An actual cell is received by the receiving tree at the address its face was read at.
+        let ring = prediction.receiver;
+        let arrival = match (actual, next.constitution.landmarks(ring)) {
+            (true, Some(tree)) => Some(NativeTreeAddress::of(&next, predictor.prepared_cut(), tree)?),
+            _ => None,
+        };
         let role = if actual {
             prepared_input::PrefixRole::Observed
         } else {
@@ -336,6 +415,15 @@ impl Reference {
             configuration: carry,
         };
         next.publish_reception(Some(material), point, Some(charts), None, &chart)?;
+        if let Some(address) = arrival {
+            let mut tree = next
+                .constitution
+                .landmarks(ring)
+                .cloned()
+                .ok_or(HnnError::MissingReceivingMap { ring })?;
+            address.deposit(&mut tree, class)?;
+            next.constitution = next.constitution.observed_epoch_prefix(ring, tree, &[])?;
+        }
         let ingested =
             self.ingest_class_continuing(&mut next, &mut next_crib, pairing, class, None)?;
         source_frontier.admit_one_ingress(next.native_source_frontier()?,ingested.cells,ingested.close.is_some())?;
@@ -393,7 +481,7 @@ impl Reference {
         let field = &resident.field;
         let lift = resident.current.lift().to_vec();
         let ring = prediction.receiver;
-        let (before, excess) = native_objective(field, &lift, ring, &prediction.waves, target, bits)?;
+        let (before, excess) = native_objective(field, &lift, ring, &prediction.waves, &prediction.trees, target, bits)?;
         let mut receipt = NativeRereadReceipt {
             before: before.clone(),
             excess: excess.clone(),
@@ -411,7 +499,7 @@ impl Reference {
                 read.reading().waves
             };
             let witness = waves == prediction.waves;
-            let (mut after, after_excess) = native_objective(field, &lift, ring, &waves, target, bits)?;
+            let (mut after, after_excess) = native_objective(field, &lift, ring, &waves, &prediction.trees, target, bits)?;
             let mut reading_bits = bits;
             let mut decision = decide(&before, &excess, &after, &after_excess, witness);
             if bits < FINEST
@@ -421,8 +509,8 @@ impl Reference {
                         | crate::hnn::word::continuation::AdmissionRefusal::EqualEndpoints)
                 )
             {
-                let (fine_before, _) = native_objective(field, &lift, ring, &prediction.waves, target, FINEST)?;
-                let (fine_after, _) = native_objective(field, &lift, ring, &waves, target, FINEST)?;
+                let (fine_before, _) = native_objective(field, &lift, ring, &prediction.waves, &prediction.trees, target, FINEST)?;
+                let (fine_after, _) = native_objective(field, &lift, ring, &waves, &prediction.trees, target, FINEST)?;
                 decision = decide(&fine_before, &excess, &fine_after, &after_excess, witness);
                 after = fine_after;
                 reading_bits = FINEST;
@@ -567,6 +655,10 @@ impl Reference {
         let mut packets = Vec::new();
         let mut events = Vec::new();
         let producing = next.constitution.clone();
+        // The section's working receiving tree: each cell is read at the standing after the
+        // section's earlier arrivals and deposited after its own; the material stays the producer's
+        // until the section publishes the tree with R.
+        let mut tree = producing.landmarks(receiver).cloned();
         let mut final_arrival = None;
         for (station,&class) in classes.iter().enumerate() {
             let boundary = crate::hnn::encoding::observed::PairedObservation::admit(
@@ -576,11 +668,17 @@ impl Reference {
             )?;
             let target = boundary.encode(&[class])?;
             let chart = boundary.encode(&[])?;
-            let predictor = self.prepare_native_current_prediction(
+            let predictor = self.prepare_native_current_prediction_on(
                 &next,
                 if next.prepared_input.as_ref().is_some_and(|p|p.work_receipt_policy().represented()){NativeExecutionChart::RepresentedV1}else{NativeExecutionChart::ExactUnsplit},
                 bits,
+                None,
+                tree.as_ref(),
             )?;
+            let address = match &tree {
+                Some(tree) => Some(NativeTreeAddress::of(&next, predictor.prepared_cut(), tree)?),
+                None => None,
+            };
             let prepared = predictor
                 .prepared_cut()
                 .cloned()
@@ -593,6 +691,9 @@ impl Reference {
             let reached_charts=predictor.prepared_charts().cloned();
             let (scores, packet) = predictor.observe_receiving(&target)?;
             packets.push(packet);
+            if let (Some(tree), Some(address)) = (tree.as_mut(), address.as_ref()) {
+                address.deposit(tree, class)?;
+            }
             next.publish_reception(
                 None,
                 crate::holon::HolonState {
@@ -639,12 +740,9 @@ impl Reference {
         if next.constitution!=producing{return Err(HnnError::Unadmitted{reason:"all native section packets keep the same original material"});}
         let (_, deposits, records) =
             crate::hnn::word::native_prediction::NativeRPacket::section(packets)?;
-        let tree = producing
-            .landmarks(receiver)
-            .ok_or(HnnError::Unadmitted {
-                reason: "the native R publication retains its existing unused legacy tree",
-            })?
-            .clone();
+        let tree = tree.ok_or(HnnError::Unadmitted {
+            reason: "the native R publication carries the section's receiving tree",
+        })?;
         let retained = std::iter::once(Locus::ReceivingMap(receiver)).collect();
         let period = next.field.ring(receiver).period();
         // ArrivalContext has two block crossing counters, not a Single-law counter.

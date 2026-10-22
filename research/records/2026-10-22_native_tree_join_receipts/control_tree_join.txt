@@ -1,0 +1,47 @@
+ZERO_MOTION_CONTINUITY_SOURCE source=0 commit=5 feature_max_bits=1 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=None
+ZERO_MOTION_CONTINUITY_SOURCE source=1 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=None
+ZERO_MOTION_CONTINUITY_SOURCE source=2 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 0, denom: 1 })
+ZERO_MOTION_CONTINUITY_SOURCE source=3 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 0, denom: 1 })
+ZERO_MOTION_CONTINUITY_SOURCE source=4 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 0, denom: 1 })
+ZERO_MOTION_CONTINUITY_SOURCE source=5 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 0, denom: 1 })
+ZERO_MOTION_CONTINUITY_SOURCE source=6 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 2638637278965, denom: 2199023255552 })
+ZERO_MOTION_CONTINUITY_SOURCE source=7 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 168652935020511201, denom: 72057594037927936 })
+ZERO_MOTION_CONTINUITY_SOURCE source=8 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 3932996686400607525, denom: 2305843009213693952 })
+ZERO_MOTION_CONTINUITY_SOURCE source=9 commit=5 feature_max_bits=11 lattice=Some(WordLattice { chart: 26, target: 13, transient: 10 }) work=Some(Ratio { numer: 38595568193588729, denom: 72057594037927936 })
+ZERO_MOTION_CONTINUITY_FIRST_R_PASS publication=DepositReading { epoch: Some(EpochDepositReading { paired_receiving: Some(EpochPairedReceivingReading { representation_policy: BoundedSubquantumV1, source_width: 6, fresh_physical_alignment: Ratio { numer: 45101660378031048495294932107358980112427701, denom: 22300745198530623141535718272648361505980416 }, fresh_return_error: Ratio { numer: 1, denom: 16384 }, fresh_moves: Ratio { numer: 34637, denom: 32768 }, actual_alignment: Some(Ratio { numer: 3884782594875247236115, denom: 4722366482869645213696 }), actual_moves: Some(Ratio { numer: 759, denom: 4096 }), actual_physical_step: EpochSeriesReading { numerical_denominator: None, rows: 8, columns:
+ZERO_MOTION_CONTINUITY_COLD_PASS boundary=post-first-R bytes=1520746 pending_equal=true
+ZERO_MOTION_CONTINUITY_CONTACT_PACKET original_prediction=NativePredictionReading { law: "native-current-prediction-v1", execution_lattice: Some(WordLattice { chart: 26, target: 13, transient: 10 }), producing_commit: 6, opened_at: 30, source_cells: 10, receiver: 2, features: [[Ratio { numer: 23, denom: 1024 }, Ratio { numer: 37, denom: 1024 }, Ratio { numer: -7, denom: 1024 }, Ratio { numer: 7, denom: 1024 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -7, denom: 512 }, Ratio { numer: 9, denom: 1024 }, Ratio { numer: -101, denom: 512 }, Ratio { numer: -31, denom: 512 }, Ratio { numer: -51, denom: 1024 }, Ratio { numer: -71, denom: 1024 }]], waves: [[Ratio { nu
+ZERO_MOTION_CONTINUITY_REREAD before=ExactInterval { lower: Ratio { numer: 1755133519229992293, denom: 9223372036854775808 }, upper: Ratio { numer: 3510267038459984587, denom: 18446744073709551616 } } excess=0 admitted=Some(0) trials=1
+ZERO_MOTION_CONTINUITY_REREAD_TRIAL halvings=0 first_variation_refused=false reading=Some(NativeRereadReading { after: ExactInterval { lower: Ratio { numer: 1561629637609097567, denom: 9223372036854775808 }, upper: Ratio { numer: 3123259275218195135, denom: 18446744073709551616 } }, excess: Ratio { numer: 0, denom: 1 }, reading_bits: 64, decision: Ok(Classical) })
+ZERO_MOTION_CONTINUITY_STEPS [(Channel(0), Factor(0), 5), (Channel(0), Factor(1), 5), (Channel(0), Factor(2), 5), (Channel(1), Factor(0), 3), (Channel(1), Factor(1), 3), (Channel(1), Factor(2), 3)]
+ZERO_MOTION_CONTINUITY_CONTACT_VERDICT outcome=Applied positive_material_influence=true selected_steps=6 vanished=[] retained_tails=47 released_tails=96 original_positive_motion_fixture_unchanged=true
+ZERO_MOTION_CONTINUITY_COLD_PASS boundary=post-contact-source11 bytes=1537088 pending_equal=true
+ZERO_MOTION_CONTINUITY_SOURCE source=11 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=12 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=13 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=14 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=15 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=16 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=17 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=18 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=19 commit=7 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SECTION_PASS boundary=next-R publication=DepositReading { epoch: Some(EpochDepositReading { paired_receiving: Some(EpochPairedReceivingReading { representation_policy: BoundedSubquantumV1, source_width: 6, fresh_physical_alignment: Ratio { numer: 46253696404449854800904607731568312064571743, denom: 401413413573551216547642928907670507107647488 }, fresh_return_error: Ratio { numer: 9, denom: 1048576 }, fresh_moves: Ratio { numer: 58195, denom: 524288 }, actual_alignment: Some(Ratio { numer: 3387115840492072865449, denom: 75557863725914323419136 }), actual_moves: Some(Ratio { numer: 23095, denom: 524288 }), actual_physical_step: EpochSeriesReading { numerical_denominator
+ZERO_MOTION_CONTINUITY_SOURCE source=20 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=21 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=22 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=23 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=24 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=25 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=26 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=27 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=28 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SOURCE source=29 commit=8 feature_max_bits=11
+ZERO_MOTION_CONTINUITY_SECTION_PASS boundary=source30-close publication=DepositReading { epoch: Some(EpochDepositReading { paired_receiving: Some(EpochPairedReceivingReading { representation_policy: BoundedSubquantumV1, source_width: 6, fresh_physical_alignment: Ratio { numer: 11073044171606373056244787108532766452183831, denom: 401413413573551216547642928907670507107647488 }, fresh_return_error: Ratio { numer: 5, denom: 8388608 }, fresh_moves: Ratio { numer: 114327, denom: 8388608 }, actual_alignment: Some(Ratio { numer: 2299008046707764218733, denom: 226673591177742970257408 }), actual_moves: Some(Ratio { numer: 3629, denom: 524288 }), actual_physical_step: EpochSeriesReading { numerical_d
+ZERO_MOTION_CONTINUITY_COLD_PASS boundary=final-source30 bytes=1574795 pending_equal=true
+ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=0 key=1/7 class=2 cumulative=31 aeon_local=1 aeon_origin=30 actual_frontier=30 M_R_frozen=true
+ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=1 key=2/7 class=3 cumulative=32 aeon_local=2 aeon_origin=30 actual_frontier=30 M_R_frozen=true
+ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=2 key=3/7 class=0 cumulative=33 aeon_local=3 aeon_origin=30 actual_frontier=30 M_R_frozen=true
+ZERO_MOTION_CONTINUITY_FROZEN_PASS decision=3 key=4/7 class=1 cumulative=34 aeon_local=4 aeon_origin=30 actual_frontier=30 M_R_frozen=true
+ZERO_MOTION_CONTINUITY_COMPLETE_PASS continuity=true positive_material_influence=true actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true unsplit_trajectory_equivalence=false elapsed_ns=8986685211
+ZERO_MOTION_CONTINUITY_COUNTS {"final":true,"total_attempts":448,"forward_constructors":407,"response_companions":39,"actual_returns":1,"fresh_returns":1}
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 39 filtered out; finished in 9.00s

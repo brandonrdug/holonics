@@ -1,4 +1,5 @@
-//! NativeCurrentPredictionV1: one actual native logit source, no landmark/population operand.
+//! NativeCurrentPredictionV1: one actual native logit source, joined to the receiving tree's
+//! face where the native route reads it ([`NativeCurrentFace::joined`]); no population operand.
 use super::*;
 use crate::ratio::algebraic::{ExactInterval, log2_enclosure_at};
 use num_traits::{One, Signed, Zero};
@@ -38,6 +39,34 @@ impl NativeCurrentFace {
             masses,
             weights,
             bits,
+        })
+    }
+    /// [definition; agent-inferred, October 22] **The native face joined to the receiving tree**:
+    /// the receiving parametron's landmark tree read at the cell's address, `q`, times the wave's
+    /// power, `p̂_c ∝ q_c·2^(w_(2c))` (the combined face of `ReceivingRead::combined`, here with
+    /// [`native_power`] so a wave of any denominator is read). The wave is the correction measured
+    /// against the count-only face; its covector `p̂ − e_t` is taken on this joined face.
+    pub(crate) fn joined(&self, tree: &crate::compression::landmark::context::LandmarkFace) -> Result<Self, HnnError> {
+        if tree.probabilities.len() * 2 != self.wave.len()
+            || tree.probabilities.iter().any(|q| !q.is_positive())
+            || tree.probabilities.iter().cloned().sum::<Rat>() != Rat::one()
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a joined native face has one positive normalized tree mass per class",
+            });
+        }
+        let weights = self
+            .weights
+            .iter()
+            .zip(&tree.probabilities)
+            .map(|(w, q)| ExactInterval::new(&w.lower * q, &w.upper * q))
+            .collect::<Result<Vec<_>, _>>()?;
+        let masses = super::single_grain::normalize_weights(&weights)?;
+        Ok(Self {
+            wave: self.wave.clone(),
+            masses,
+            weights,
+            bits: self.bits,
         })
     }
     pub(crate) fn wave(&self) -> &[Rat] {

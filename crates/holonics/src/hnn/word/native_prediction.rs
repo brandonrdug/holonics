@@ -24,6 +24,7 @@ pub struct NativePredictionWord<'a> {
     map: ExactRatMatrix,
     faces: Vec<NativeCurrentFace>,
     features: Vec<Vec<Rat>>,
+    trees: Vec<crate::compression::landmark::context::LandmarkFace>,
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NativePredictionReading {
@@ -37,6 +38,8 @@ pub struct NativePredictionReading {
     pub features: Vec<Vec<Rat>>,
     pub waves: Vec<Vec<Rat>>,
     pub masses: Vec<Vec<ExactInterval>>,
+    /// The receiving tree's face each phase was joined to (empty where none was read).
+    pub trees: Vec<crate::compression::landmark::context::LandmarkFace>,
 }
 pub struct NativePredictionReturn {
     modulus_selection:Option<ExecutedModulusSelection>,
@@ -278,7 +281,7 @@ impl NativePredictionDeclaration{
             let mut feature=f.clone();feature.extend(a.iter().zip(f).map(|(a,f)|a-f));
             faces.push(NativeCurrentFace::at(map.apply(&feature)?,bits)?);features.push(feature);
         }
-        Ok(NativePredictionWord{word,modulus_selection:None,external:Some((record,stages)),prepared:None,charts:None,phases:self.phases,map,faces,features})
+        Ok(NativePredictionWord{word,modulus_selection:None,external:Some((record,stages)),prepared:None,charts:None,phases:self.phases,map,faces,features,trees:Vec::new()})
     }
     pub(crate) fn run_and_read<'a>(self,mut word:Word<'a>,bits:u32)->Result<NativePredictionWord<'a>,HnnError>{
         self.admit(&word)?;
@@ -407,6 +410,7 @@ impl<'a> Word<'a> {
             map,
             faces,
             features,
+            trees: Vec::new(),
         })
     }
 }
@@ -443,7 +447,29 @@ impl NativePredictionWord<'_> {
             features: self.features.clone(),
             waves: self.faces.iter().map(|f| f.wave().to_vec()).collect(),
             masses: self.faces.iter().map(|f| f.masses().to_vec()).collect(),
+            trees: self.trees.clone(),
         }
+    }
+    /// Join each phase's face to the receiving tree's face at its address
+    /// ([`NativeCurrentFace::joined`]). Scores, draws, the returned covector and the R sample's
+    /// masses all read the joined face. Refused once joined, or at a count other than one per phase.
+    pub(crate) fn join_tree(
+        mut self,
+        trees: Vec<crate::compression::landmark::context::LandmarkFace>,
+    ) -> Result<Self, HnnError> {
+        if !self.trees.is_empty() || trees.len() != self.faces.len() {
+            return Err(HnnError::Unadmitted {
+                reason: "a native face joins one receiving tree face per phase, once",
+            });
+        }
+        self.faces = self
+            .faces
+            .iter()
+            .zip(&trees)
+            .map(|(face, tree)| face.joined(tree))
+            .collect::<Result<_, _>>()?;
+        self.trees = trees;
+        Ok(self)
     }
     /// The pre-target reached contrast. It can prepare only a later input, never this Word.
     pub(crate) fn lagged_boundary(
@@ -857,7 +883,8 @@ impl NativeRSection {
 
 /// [definition; agent-inferred, October 22] **The native comparison's objective** at one opening,
 /// read from its produced waves: the targets' code `Σ −log₂ p̂(t)` at `bits` (the classical face,
-/// [`NativeCurrentFace::score`], summed exactly with no outward grid) and the phase excess
+/// [`NativeCurrentFace::score`], joined to the same receiving tree faces the producer read, summed
+/// exactly with no outward grid) and the phase excess
 /// `Σ ½ gap²`, `gap` the target's phase minus the produced phase `w_(2t+1)/2` in turns, the face
 /// whose gradient is the native covector's phase row (`HolonRatio::retained_aperture_return`).
 pub(crate) fn native_objective(
@@ -865,10 +892,16 @@ pub(crate) fn native_objective(
     lift: &[BigInt],
     ring: usize,
     waves: &[Vec<Rat>],
+    trees: &[crate::compression::landmark::context::LandmarkFace],
     targets: &crate::hnn::encoding::Encoded,
     bits: u32,
 ) -> Result<(ExactInterval, Rat), HnnError> {
     field.admit(targets)?;
+    if !trees.is_empty() && trees.len() != waves.len() {
+        return Err(HnnError::Unadmitted {
+            reason: "the native objective reads one tree face per wave or none",
+        });
+    }
     let phases = crate::hnn::ratio::target_phases(field, lift, ring, targets)?;
     if waves.len() != phases.phases.len() || targets.len() != waves.len() {
         return Err(HnnError::Unadmitted {
@@ -876,8 +909,13 @@ pub(crate) fn native_objective(
         });
     }
     let (mut lower, mut upper, mut excess) = (Rat::zero(), Rat::zero(), Rat::zero());
-    for ((wave, target), phase) in waves.iter().zip(targets.classes_read()).zip(&phases.phases) {
-        let score = NativeCurrentFace::at(wave.clone(), bits)?.score(target)?;
+    for (j, ((wave, target), phase)) in waves.iter().zip(targets.classes_read()).zip(&phases.phases).enumerate() {
+        let face = NativeCurrentFace::at(wave.clone(), bits)?;
+        let face = match trees.get(j) {
+            Some(tree) => face.joined(tree)?,
+            None => face,
+        };
+        let score = face.score(target)?;
         lower += score.lower;
         upper += score.upper;
         let produced = wave
