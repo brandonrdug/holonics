@@ -237,6 +237,11 @@ impl ResidentPassage {
             if row.len()!=1{return refused("one prepared input continuation");}
             let input=prepared_input::PreparedInputState::from_text(field,constitution,&prepared_input::codec::unhex(row[0])?)?;
             if moment.as_ref().map(|(_,m)|m.cells())!=Some(input.source_cells()){return refused("prepared input and native source share one frontier");}
+            if input.context_chart()==prepared_input::ContextChart::LaggedReceiverBoundaryV1{
+                // Both counters are already saved: retain the cumulative source,
+                // validate its aeon-local subinterval and derive the explicit origin.
+                native_context::NativeSourceFrontier::from_counts(input.source_cells(),aeon[2])?;
+            }
             Some(input)
         }else{None};
         if next("the passage's end").is_ok() {

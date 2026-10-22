@@ -583,9 +583,11 @@ fn represented_native_zero_motion_continuity()->Result<()>{
         let crib_text=stream.crib().unplaced_checkpoint()?;let pending_text=stream.pending_checkpoint();
         std::fs::write(folder.join("native.state"),&text)?;std::fs::write(folder.join("crib.txt"),&crib_text)?;std::fs::write(folder.join("pending.txt"),&pending_text)?;
         std::fs::write(folder.join("opening-material.state"),opening.continuing_state(0)?.to_text())?;
-        let meta=format!("{{\"accepted\":{},\"native_published\":{},\"exterior_pending\":{},\"native_sha256\":\"{}\",\"crib_sha256\":\"{}\",\"pending_sha256\":\"{}\"}}\n",stream.accepted_cells()?,stream.resident().continuing().ok_or("same native source")?.1,stream.pending_classes().len(),sha256(text.as_bytes())?,sha256(crib_text.as_bytes())?,sha256(pending_text.as_bytes())?);std::fs::write(folder.join("META.json"),meta)?;
+        let frontier=stream.resident().native_source_frontier()?;
+        let meta=format!("{{\"accepted\":{},\"cumulative_source\":{},\"aeon_local\":{},\"aeon_origin\":{},\"exterior_pending\":{},\"native_sha256\":\"{}\",\"crib_sha256\":\"{}\",\"pending_sha256\":\"{}\"}}\n",stream.accepted_cells()?,frontier.source_cells(),frontier.aeon_cells(),frontier.aeon_origin(),stream.pending_classes().len(),sha256(text.as_bytes())?,sha256(crib_text.as_bytes())?,sha256(pending_text.as_bytes())?);std::fs::write(folder.join("META.json"),meta)?;
         let field=stream.resident().field();let resident=reference.mount_continued(field,&Current::at_rest(field),opening.clone(),&parsed)?;
         assert_eq!(resident.continuing_state(0)?,state);
+        assert_eq!(resident.native_source_frontier()?,frontier);
         let crib=ObservedCrib::from_unplaced_checkpoint(field,resident.current(),stream.crib().next_position(),&stream.crib().unplaced_checkpoint()?)?;
         let pending=stream.pending_checkpoint();assert!(pending.starts_with("observed-stream-pending-native-represented-v1"));
         assert!(ObservedStream::restore_checkpoint(resident.clone(),crib.clone(),&pending.replacen("observed-stream-pending-native-represented-v1","observed-stream-pending-native-rational-v1",1)).is_err());
@@ -640,12 +642,38 @@ fn represented_native_zero_motion_continuity()->Result<()>{
     let retained=stream.resident().continuing_state(0)?;let cold=cold(&reference,&stream,&opening,"final-source30")?;
     let(mut a,mut ac)=stream.native_current_query_fork(&reference,&pairing,64)?;let(mut b,mut bc)=cold.native_current_query_fork(&reference,&pairing,64)?;
     a.begin_hypothesized_output()?;b.begin_hypothesized_output()?;let theta=a.constitution().clone();let m=a.prepared_input().unwrap().material().clone();
+    let frozen_origin=a.native_source_frontier()?;
+    assert_eq!((frozen_origin.source_cells(),frozen_origin.aeon_cells(),frozen_origin.aeon_origin()),(30,0,30));
     for(index,key)in [rat(1,7),rat(2,7),rat(3,7),rat(4,7)].into_iter().enumerate(){
         let x=reference.release_native_current_forecast(&mut a,&mut ac,&pairing,&key,64)?;let y=reference.release_native_current_forecast(&mut b,&mut bc,&pairing,&key,64)?;
         assert_eq!(x.prediction,y.prediction);assert_eq!(x.selected_class,y.selected_class);assert_eq!(a.carried(),b.carried());
+        let af=a.native_source_frontier()?;assert_eq!(af,b.native_source_frontier()?);
+        assert_eq!(x.prediction.source_cells,30+index as u64);
+        assert_eq!((af.source_cells(),af.aeon_cells(),af.aeon_origin()),(31+index as u64,1+index as u64,30));
+        assert_eq!(a.prepared_input().unwrap().frontiers(),(30,0,1+index as u64));
+        assert_eq!(a.prepared_input().unwrap().frontiers(),b.prepared_input().unwrap().frontiers());
         assert_eq!(a.constitution(),&theta);assert_eq!(b.constitution(),&theta);assert_eq!(a.prepared_input().unwrap().material(),&m);assert_eq!(b.prepared_input().unwrap().material(),&m);
-        println!("ZERO_MOTION_CONTINUITY_FROZEN_PASS decision={index} key={key} class={}",x.selected_class);
+        println!("ZERO_MOTION_CONTINUITY_FROZEN_PASS decision={index} key={key} class={} cumulative={} aeon_local={} aeon_origin={} actual_frontier=30 M_R_frozen=true",x.selected_class,af.source_cells(),af.aeon_cells(),af.aeon_origin());
     }
     assert_eq!(stream.resident().continuing_state(0)?,retained);
     println!("ZERO_MOTION_CONTINUITY_COMPLETE_PASS continuity=true positive_material_influence={moved} actual30=true firstR_contact_nextR_source30=true cold_and_frozen=true unsplit_trajectory_equivalence=false elapsed_ns={}",started.elapsed().as_nanos());Ok(())
+}
+
+#[test]
+fn native_frontier_saved_source30_codec_data_only()->Result<()>{
+    // Existing file parsing only: no Field construction, Word, mount, forward or return.
+    let path=std::env::var("V93_SOURCE30_DATA_STATE")?;
+    let text=std::fs::read_to_string(path)?;
+    let state=ContinuingState::from_text(&text,READ_BUDGET)?;
+    let again=ContinuingState::from_text(&state.to_text(),READ_BUDGET)?;
+    assert_eq!(again,state);
+    let passage=state.passage().ok_or("full native passage")?;
+    assert!(passage.lines().any(|x|x=="moment 30 0 1 identity"));
+    assert!(passage.lines().any(|x|x=="aeon 0 1 0 30"));
+    let prepared=passage.lines().find_map(|x|x.strip_prefix("prepared-input ")).ok_or("original prepared owner")?;
+    let bytes=(0..prepared.len()).step_by(2).map(|i|u8::from_str_radix(&prepared[i..i+2],16)).collect::<std::result::Result<Vec<_>,_>>()?;
+    let decoded=String::from_utf8(bytes)?;
+    assert!(decoded.starts_with("prepared-represented-native-passage-v1 "));
+    println!("NATIVE_SOURCE30_CODEC_DATA_PASS cumulative_moment30=true aeon_local0=true aeon_origin30_derived=true prepared_owner_preserved=true full_state_exact=true native_calls=0");
+    Ok(())
 }

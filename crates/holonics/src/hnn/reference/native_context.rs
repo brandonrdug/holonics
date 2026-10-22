@@ -11,6 +11,46 @@ pub enum NativeExecutionChart {
     RepresentedV1,
 }
 
+/// Read-only counter domains of ONE continuing native source. The source history is
+/// cumulative; the aeon-local count intentionally resets at close. Their difference
+/// is the explicit cumulative origin of the current aeon, derived from the saved
+/// native operands rather than a new mutable clock or a rewritten history.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct NativeSourceFrontier {
+    source_cells: u64,
+    aeon_cells: u64,
+    aeon_origin: u64,
+}
+impl NativeSourceFrontier {
+    pub(super) fn from_counts(source_cells:u64,aeon_cells:u64)->Result<Self,HnnError>{
+        let aeon_origin=source_cells.checked_sub(aeon_cells).ok_or(HnnError::Unadmitted{
+            reason:"native source history contains its complete current aeon",
+        })?;
+        Ok(Self{source_cells,aeon_cells,aeon_origin})
+    }
+    pub fn source_cells(self)->u64{self.source_cells}
+    pub fn aeon_cells(self)->u64{self.aeon_cells}
+    pub fn aeon_origin(self)->u64{self.aeon_origin}
+    fn admit_one_ingress(self,after:Self,returned_cells:u64,closed:bool)->Result<(),HnnError>{
+        let wanted=self.source_cells.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        let local=if closed{0}else{self.aeon_cells.checked_add(1).ok_or(HnnError::CountOverflow)?};
+        let origin=if closed{wanted}else{self.aeon_origin};
+        if returned_cells!=wanted||after.source_cells!=wanted||after.aeon_cells!=local||after.aeon_origin!=origin{
+            return Err(HnnError::Unadmitted{reason:"native event ingests its class exactly once in matching cumulative and aeon-local domains"});
+        }
+        Ok(())
+    }
+}
+impl Resident {
+    /// No Word, arrival or clock mutation. Cold and warm residents read the same
+    /// cumulative SourceMoment and explicit saved aeon-local state.
+    pub fn native_source_frontier(&self)->Result<NativeSourceFrontier,HnnError>{
+        let (id,local)=self.continuing().ok_or(HnnError::Unadmitted{reason:"one continuing native source frontier"})?;
+        let source=self.moment(&id).ok_or(HnnError::Unadmitted{reason:"the continuing native source moment remains open"})?;
+        NativeSourceFrontier::from_counts(source.cells(),local)
+    }
+}
+
 impl Reference {
     /// One complete native Word, without q/tree/population reads or a second source ingress.
     /// The resident is borrowed until its score/draw/actual return consumes this producer.
@@ -183,9 +223,7 @@ impl Reference {
                 reason: "native event keeps explicit observed versus frozen hypothetical lineage",
             });
         }
-        let (_, source_cells) = next.continuing().ok_or(HnnError::Unadmitted {
-            reason: "one actual native source",
-        })?;
+        let source_frontier = next.native_source_frontier()?;
         let boundary = crate::hnn::encoding::observed::PairedObservation::admit(
             &next.field,
             &next.constitution,
@@ -265,11 +303,7 @@ impl Reference {
         next.publish_reception(Some(material), point, Some(charts), None, &chart)?;
         let ingested =
             self.ingest_class_continuing(&mut next, &mut next_crib, pairing, class, None)?;
-        if ingested.cells != source_cells.checked_add(1).ok_or(HnnError::CountOverflow)? {
-            return Err(HnnError::Unadmitted {
-                reason: "native event ingests its actual class exactly once",
-            });
-        }
+        source_frontier.admit_one_ingress(next.native_source_frontier()?,ingested.cells,ingested.close.is_some())?;
         let input = next.prepared_input.as_mut().expect("same material owner");
         if actual {
             input.after_actual(prepared, class)?;
@@ -305,7 +339,7 @@ struct NativeFinalArrival {
 }
 impl NativeFinalArrival {
     fn admit_original(&self,resident:&Resident)->Result<(),HnnError>{
-        let source=resident.continuing().ok_or(HnnError::Unadmitted{reason:"one final original native source"})?.1;
+        let source=resident.native_source_frontier()?.source_cells();
         if source!=self.prepared.source_cells || source!=self.prediction.source_cells
             || self.prepared.commit!=resident.constitution.commit()
             || self.prepared.commit!=self.prediction.producing_commit
@@ -351,9 +385,8 @@ impl Reference {
         let mut next = resident.clone();
         let mut next_crib = crib.clone();
         next.admit_exact_current()?;
-        let (_, start) = next.continuing().ok_or(HnnError::Unadmitted {
-            reason: "native section retains ONE continuing source",
-        })?;
+        let original_frontier=next.native_source_frontier()?;
+        let start=original_frontier.source_cells();
         let receiver = next
             .admitted
             .first()
@@ -366,7 +399,9 @@ impl Reference {
             .try_fold(1u64, |n, r| {
                 n.checked_mul(r.period()).ok_or(HnnError::CountOverflow)
             })?;
-        let remainder = start % width;
+        // Physical scheduling remains aeon-local; publication identities and the
+        // retained-statistic crossing index remain cumulative across close.
+        let remainder = original_frontier.aeon_cells() % width;
         let wanted = width - remainder;
         if classes.len() as u64 != wanted {
             return Err(HnnError::Unadmitted {
@@ -505,7 +540,8 @@ impl Reference {
         let carry = next.carried.clone().ok_or(HnnError::Unadmitted {
             reason: "native R publishes after its actual blind carried endpoint",
         })?;
-        let publication_source=next.continuing().ok_or(HnnError::Unadmitted{reason:"final native publication source"})?.1;
+        let publication_frontier=next.native_source_frontier()?;
+        let publication_source=publication_frontier.source_cells();
         let original_final_commit=final_arrival.prediction.producing_commit;
         let receiving_commit=material.commit();
         let original_carry=carry.clone();
@@ -517,7 +553,7 @@ impl Reference {
             },
             &chart,
         )?;
-        if next.carried.as_ref()!=Some(&original_carry) || next.continuing().map(|s|s.1)!=Some(publication_source){return Err(HnnError::Unadmitted{reason:"R-only publication preserves its original full blind carry and pre-ingress source frontier"});}
+        if next.carried.as_ref()!=Some(&original_carry) || next.native_source_frontier()?!=publication_frontier{return Err(HnnError::Unadmitted{reason:"R-only publication preserves its original full blind carry and pre-ingress source frontier"});}
         // The genuine new boundary is admitted against the R successor. Nothing
         // rewrites the original prediction, prepared material cut, target or lag.
         let NativeFinalArrival{prepared,lag,prediction,scores,forward,preparation,class}=final_arrival;
@@ -527,12 +563,8 @@ impl Reference {
         owner.install_reached_lag(lag)?;
         let final_event=NativeContextEvent{prediction,scores,forward,preparation,contact:None,input,selected_class:class,draw:None};
         observe(&final_event);events.push(final_event);
-        let end = next
-            .continuing()
-            .ok_or(HnnError::Unadmitted {
-                reason: "native closing source",
-            })?
-            .1;
+        let final_frontier=next.native_source_frontier()?;
+        let end=final_frontier.source_cells();
         if end != start.checked_add(wanted).ok_or(HnnError::CountOverflow)? || end % width != 0 {
             return Err(HnnError::Unadmitted {
                 reason: "native R closes the original section without replay, flush or target omission",
@@ -541,6 +573,10 @@ impl Reference {
         let aeon_closed=next.aeon.awaiting;
         if aeon_closed {
             self.close_deferred_native_input(&mut next, &mut next_crib, pairing)?;
+            let closed=next.native_source_frontier()?;
+            if closed.source_cells()!=end||closed.aeon_cells()!=0||closed.aeon_origin()!=end{
+                return Err(HnnError::Unadmitted{reason:"native aeon close preserves cumulative source history and advances only its aeon origin"});
+            }
         }
         *resident = next;
         *crib = next_crib;
@@ -589,3 +625,25 @@ impl Reference {
 }
 
 impl Resident{pub fn native_rank_reuse_reading(&self)->(u64,u64){let c=self.native_rank.borrow();(c.hits,c.misses)}}
+
+#[cfg(test)]
+mod frontier_tests {
+    use super::*;
+    #[test]
+    fn native_source_counter_domains_preserve_history_and_origins(){
+        for origin in [0,30,60,90,30000] {
+            let before=NativeSourceFrontier::from_counts(origin,0).unwrap();
+            let after=NativeSourceFrontier::from_counts(origin+1,1).unwrap();
+            before.admit_one_ingress(after,origin+1,false).unwrap();
+            assert_eq!(after.aeon_origin(),origin);
+            if origin>0{assert!(before.admit_one_ingress(after,1,false).is_err());}
+            let before_close=NativeSourceFrontier::from_counts(origin+29,29).unwrap();
+            let after_close=NativeSourceFrontier::from_counts(origin+30,0).unwrap();
+            before_close.admit_one_ingress(after_close,origin+30,true).unwrap();
+            assert!(before_close.admit_one_ingress(after_close,origin+30,false).is_err());
+            assert!(before.admit_one_ingress(NativeSourceFrontier::from_counts(origin+1,0).unwrap(),origin+1,false).is_err());
+        }
+        assert!(NativeSourceFrontier::from_counts(1,2).is_err());
+        assert!(NativeSourceFrontier::from_counts(u64::MAX,0).unwrap().admit_one_ingress(NativeSourceFrontier::from_counts(0,0).unwrap(),0,true).is_err());
+    }
+}
