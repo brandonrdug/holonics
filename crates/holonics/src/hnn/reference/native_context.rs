@@ -134,7 +134,7 @@ impl Reference {
             .ok_or(HnnError::MissingReceivingMap {
                 ring: phases.ring(),
             })?;
-        let declaration=word.declare_native_prediction(receiver,&mut resident.native_rank.borrow_mut())?;
+        let declaration=word.declare_native_prediction(receiver,&mut resident.native_rank.lock())?;
         let predictor=if let Some(execution)=execution{
             let record=execution.forward_native(field,theta,&ratio,&mut charts,&opening,declaration.phases())?;
             declaration.read_external(word,record,bits)?

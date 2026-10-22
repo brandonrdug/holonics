@@ -520,6 +520,24 @@ struct AeonState {
     closed: u64,
 }
 
+/// The resident's optional rank reuse, behind a lock so that one resident can be read from several
+/// threads (the listener's calibration pool reads it through `&Resident`). It is not constitutive
+/// state: a clone takes a copy of the cache as it stands.
+#[derive(Debug, Default)]
+pub(crate) struct NativeRankCell(std::sync::Mutex<crate::hnn::receiving::NativeRankCache>);
+
+impl NativeRankCell {
+    pub(crate) fn lock(&self) -> std::sync::MutexGuard<'_, crate::hnn::receiving::NativeRankCache> {
+        self.0.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+}
+
+impl Clone for NativeRankCell {
+    fn clone(&self) -> Self {
+        Self(std::sync::Mutex::new(self.lock().clone()))
+    }
+}
+
 /// [definition] **The resident of the host reference**: the field, the lift point, the receiving
 /// parametron's active suffix address, the constitution, the open moments, pending ratios and
 /// staged deposits, the admitted family of the
@@ -529,7 +547,7 @@ struct AeonState {
 #[derive(Clone, Debug)]
 pub struct Resident {
     // Optional numerical rank reuse; not constitutive state or cold authority.
-    native_rank:std::cell::RefCell<crate::hnn::receiving::NativeRankCache>,
+    native_rank: NativeRankCell,
     founding: Option<crate::hnn::founding::FoundingLaw>,
     staged_founding: Option<u64>,
     field: Field,
@@ -1211,7 +1229,7 @@ impl Reference {
             _ => None,
         };
         Ok(Resident {
-            native_rank:std::cell::RefCell::new(Default::default()),
+            native_rank: NativeRankCell::default(),
             founding: None,
             staged_founding: None,
             field: field.clone(),
