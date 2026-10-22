@@ -7,7 +7,7 @@
     "-c",
     "exec \"$@\"",
     "_",
-    "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-cold-transition-43c33/binaries/data-diagnostic",
+    "<private-runtime>/alpha-v93-native-cold-transition-43c33/binaries/data-diagnostic",
     "hnn::word::action::quadratic_work::controls::quadratic_control_refusal_data_only",
     "--exact",
     "--nocapture",

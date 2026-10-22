@@ -7,7 +7,7 @@
     "-c",
     "exec \"$@\"",
     "_",
-    "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-cold-transition-43c33/binaries/data",
+    "<private-runtime>/alpha-v93-native-cold-transition-43c33/binaries/data",
     "native_rational",
     "--nocapture",
     "--test-threads=1"

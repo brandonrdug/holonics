@@ -14,7 +14,7 @@
     "-c",
     "exec \"$@\"",
     "_",
-    "/home/b/Documents/Codex/2026-10-17/task/alpha-v93-native-cold-transition-43c33/binaries/connected",
+    "<private-runtime>/alpha-v93-native-cold-transition-43c33/binaries/connected",
     "complete_language::native_context_controls::native_original_word_final_ingress_transition",
     "--ignored",
     "--exact",
