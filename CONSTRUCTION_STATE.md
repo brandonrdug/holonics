@@ -17,6 +17,20 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 23: on GSM8K the tree's depth carries the code and the passage adds its news (host).**
+`complete-language train-modes` and `sample-modes` join the receiving tree, the keyed modes
+(`hnn::keyed_modes`) and the passage tree (`hnn::passage`) at the receiver's face, at 40 to 55 µs a
+cell. Online on the first 1,000 GSM8K training problems at depth 24: the tree alone codes 0.507
+bits a cell; 32 keyed modes, with or without the square law, add nothing past it (0.509), as the
+mathematics thread's bound predicts; the passage tree's news over the tree's face, with each
+evidence depth's weight set by the Newton step of the comparison's own curvature, codes 0.469
+(1.88 bits a character). A sample opens its passage at the prompt and does not count its own
+release; from a held-out prompt it carries the prompt's words and the problems' question shape,
+with no loop and no copied run over 20 bytes, and is not yet sentences. The
+[record](research/records/2026-10-23_ON_GSM8K_THE_TREE_DEPTH_CARRIES_THE_CODE_AND_THE_PASSAGE_ADDS_ITS_NEWS.md)
+holds the measurements, the sample and the receipts. The paragraph below is historical at its
+source.
+
 **October 22: the native face reads its own receiving tree (host).** The native route never read
 the receiving tree its constitution carried, and its readout's features do not separate the next
 digit. The native face is now the tree's face at the cell's address times the readout's native
