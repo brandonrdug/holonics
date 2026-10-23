@@ -17,6 +17,15 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 23: the node lock joins the route (host).** Each passage-tree node keeps the class that
+followed its last visit, so the deepest recurred context predicts a copy (the mathematics thread's
+located equality, without a strand of the passage); its binned weight takes the passage weights'
+Newton step. It is right at 84% of cells and codes all 6,726 GSM8K problems at 0.410 bits a cell
+against 0.413; the sample is no more readable. A context of 8 characters codes 1% below 6 at twice
+the cost, and 12 no lower. The
+[record](research/records/2026-10-23_THE_NODE_LOCK_READS_THE_LOCATED_EQUALITY_AND_CONTEXT_PAST_EIGHT_CHARACTERS_ADDS_NOTHING.md)
+holds the measurements and receipts.
+
 **October 23: the released ratio opens the whole GSM8K partition (host).** The receiving tree
 refused every population past `2^21` cells at depth 24, because it certified its face against
 the unreleased mixture ratio. Its ratio is now released into `[2^(−K), 2^K]` after every step and

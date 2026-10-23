@@ -5,8 +5,11 @@
 //! field's receiver behind the cell's source framing path, at a declared depth), the passage tree
 //! (`holonics::hnn::passage`, the same contexts' counts at the passage's horizon) and the keyed
 //! modes (`holonics::hnn::keyed_modes`): `p̂(c) ∝ q(c) 2^(w_c)` with
-//! `w_c = (the modes' read) + α_e f_c`, `f_c = log₂ p_loc(c) − log₂ q(c)` the passage's news over
-//! the tree's face (the passage backs off to the tree's face, not to a flat one). Text enters as
+//! `w_c = (the modes' read) + α_e f_c + α_b [c = ĉ]`, `f_c = log₂ p_loc(c) − log₂ q(c)` the
+//! passage's news over the tree's face (the passage backs off to the tree's face, not to a flat
+//! one), and `ĉ` the passage tree's lock, the located equality: the class that followed the
+//! deepest visited node's last visit. Its weight `α_b` sits in the bin `b` of the run of correct
+//! locks (its octave) and the locating depth (its quarter). Text enters as
 //! base-four cells (`Base4Bytes`), the exterior byte chart. Each cell's face is read before its
 //! class arrives (the prequential code); the trees then receive the class at the context its face
 //! was read at, and the modes take the class's keyed move. A section of the native route's width
@@ -20,15 +23,18 @@
 //! 0.507, where 32 keyed modes, with or without the square law, add nothing (0.509): their memory
 //! sits inside the tree's horizon. The passage's news, its weights set by the curvature step,
 //! brings the 1,000 problems to 0.469 (record
-//! `2026-10-23_ON_GSM8K_THE_TREE_DEPTH_CARRIES_THE_CODE_AND_THE_PASSAGE_ADDS_ITS_NEWS`).
+//! `2026-10-23_ON_GSM8K_THE_TREE_DEPTH_CARRIES_THE_CODE_AND_THE_PASSAGE_ADDS_ITS_NEWS`). The lock,
+//! right at 84% of cells, brings them from 0.467 to 0.463 and all 6,726 from 0.413 to 0.410; a
+//! depth of 32 cells codes 0.462 and 48 no lower (record
+//! `2026-10-23_THE_NODE_LOCK_READS_THE_LOCATED_EQUALITY_AND_CONTEXT_PAST_EIGHT_CHARACTERS_ADDS_NOTHING`).
 use super::*;
 use holonics::compression::landmark::context::{
     address, Landmarks, Letter, ObservationPath, ObservedAddress, RatioLaw, TreeStanding,
 };
-use holonics::hnn::keyed_modes::{Declaration, Grains, JoinedFace, KeyedLearner, KeyedModes, PassageReading};
+use holonics::hnn::keyed_modes::{Declaration, Grains, JoinedFace, KeyedLearner, KeyedModes, Lock, PassageReading};
 use holonics::hnn::passage::{log2_face, PassageDeclaration, PassageTree};
 
-const STATE_MAGIC: &str = "complete-language-keyed-modes-v2";
+const STATE_MAGIC: &str = "complete-language-keyed-modes-v3";
 /// The face numerators' common grain, `2^(−62)` (the modes' joined face reads `q ≤ 2^62`).
 const FACE_BITS: u32 = 62;
 /// The reading grain of a code length, `2^(−20)` bits (a reading beside the training).
@@ -45,6 +51,18 @@ const PASSAGE_HORIZON: u32 = 13;
 /// The passage tree's backoff `β`, one occurrence of the parent's face (agent-inferred): the
 /// located weight `α_e` sets how far the passage's face is trusted.
 const PASSAGE_BACKOFF: u64 = 1;
+/// The lock's run octaves (agent-inferred): a run of `r` correct locks sits in octave
+/// `⌈log₂(r + 1)⌉`, and runs past `2^15` cells (some 8 KB held verbatim, past any GSM8K problem)
+/// share the last.
+const LOCK_OCTAVES: usize = 16;
+/// The lock's depth quarters: the locating depth `d` sits in quarter `⌊d/4⌋` (the mathematics
+/// thread's bins, §8).
+const LOCK_QUARTER: usize = 4;
+
+/// The lock's bins at a passage depth: run octaves times depth quarters.
+fn lock_bins(depth: usize) -> usize {
+    LOCK_OCTAVES * (depth / LOCK_QUARTER + 1)
+}
 
 /// The native route's receiving tree at the declared `depth` (the native route declares 6), its
 /// grain and its section width, from the same field.
@@ -128,7 +146,7 @@ fn thousandths(code: i64, cells: i64) -> String {
 }
 
 fn declared_modes(modes: usize, depth: usize) -> Result<KeyedModes> {
-    Ok(KeyedModes::new(Declaration { modes, alphabet: 4, evidence: depth + 2, grains: Grains::DECLARED })?)
+    Ok(KeyedModes::new(Declaration { modes, alphabet: 4, evidence: depth + 2, locks: lock_bins(depth), grains: Grains::DECLARED })?)
 }
 
 fn declared_passage(depth: usize) -> Result<PassageTree> {
@@ -142,7 +160,7 @@ fn declared_passage(depth: usize) -> Result<PassageTree> {
 }
 
 /// [definition; agent-inferred] **The route at one cell**: the trees, the bank, the last `depth`
-/// cells (oldest first) and how many cells were received.
+/// cells (oldest first), how many cells were received and the run of correct locks.
 struct Route {
     tree: Landmarks,
     grain: u64,
@@ -152,6 +170,7 @@ struct Route {
     passage: PassageTree,
     register: Vec<usize>,
     position: usize,
+    run: u64,
 }
 
 /// One cell's reading: the tree's face, the passage tree's reading and the joined face.
@@ -174,6 +193,7 @@ impl Route {
             passage: declared_passage(depth)?,
             register: Vec::with_capacity(depth + 1),
             position: 0,
+            run: 0,
         })
     }
 
@@ -195,6 +215,10 @@ impl Route {
                 .map(|(&p, &t)| log2_face(p.max(1), exponent) - log2_face(t.max(1), exponent))
                 .collect(),
             evidence: local.evidence,
+            lock: local.lock.map(|(class, d)| {
+                let octave = ((u64::BITS - self.run.leading_zeros()) as usize).min(LOCK_OCTAVES - 1);
+                Lock { class, bin: octave * (self.depth / LOCK_QUARTER + 1) + d / LOCK_QUARTER }
+            }),
         };
         let joined = self.learner.face(&q, Some(&passage))?;
         Ok(Reading { address, q, passage, joined })
@@ -204,6 +228,10 @@ impl Route {
     /// comparison; the bank takes its keyed move; and the passage tree counts it when it was
     /// `received` from the world (a cell the route released itself is not evidence of the passage).
     fn take(&mut self, reading: Reading, class: usize, learning: bool, received: bool) -> Result<()> {
+        self.run = match reading.passage.lock {
+            Some(lock) if lock.class == class => self.run + 1,
+            _ => 0,
+        };
         if learning {
             self.tree.deposit_observed(&reading.address, class)?;
             self.learner.receive(reading.q, Some(reading.passage), &reading.joined, class);
@@ -232,10 +260,11 @@ impl Route {
         let passage = self.passage.to_text();
         let cells = self.register.iter().map(usize::to_string).collect::<Vec<_>>().join(" ");
         Ok(format!(
-            "{STATE_MAGIC}\n{} {} {} {} {} {}\n{standing}{modes}{passage}{cells}\n{provenance}\n",
+            "{STATE_MAGIC}\n{} {} {} {} {} {} {}\n{standing}{modes}{passage}{cells}\n{provenance}\n",
             self.population,
             self.position,
             self.depth,
+            self.run,
             standing.len(),
             modes.len(),
             passage.len()
@@ -248,7 +277,7 @@ impl Route {
             return Err("not a keyed-modes state".into());
         }
         let sizes: Vec<u64> = lines.next().ok_or("state sizes")?.split_whitespace().map(str::parse).collect::<std::result::Result<_, _>>()?;
-        let [population, position, depth, standing, modes, passage] = sizes[..] else { return Err("state sizes".into()) };
+        let [population, position, depth, run, standing, modes, passage] = sizes[..] else { return Err("state sizes".into()) };
         let body = lines.next().ok_or("state body")?;
         let (standing_text, rest) = body.split_at(usize::try_from(standing)?);
         let (modes_text, rest) = rest.split_at(usize::try_from(modes)?);
@@ -263,7 +292,7 @@ impl Route {
         if register.len() != position.min(depth) || passage.declaration.depth != depth {
             return Err("the state's register and passage depth".into());
         }
-        Ok(Self { tree, grain, depth, population, learner, passage, register, position })
+        Ok(Self { tree, grain, depth, population, learner, passage, register, position, run })
     }
 }
 
@@ -294,12 +323,14 @@ pub(super) fn train(args: &[String]) -> Result<()> {
     let (mut joined_chunk, mut tree_chunk, mut chunk_cells) = (0i64, 0i64, 0i64);
     let mut chunk_started = Instant::now();
     let (mut read_ns, mut take_ns, mut close_ns) = (0u128, 0u128, 0u128);
+    let mut locked_right = 0u64;
     let report_every = width * 100;
     for (position, &class) in cells.iter().enumerate() {
         let t0 = Instant::now();
         let reading = route.read()?;
         let code = code_reading(reading.joined.masses[class], reading.joined.total);
         let tree_code = code_reading(reading.q[class], reading.q.iter().sum());
+        locked_right += u64::from(reading.passage.lock.is_some_and(|l| l.class == class));
         let t1 = Instant::now();
         route.take(reading, class, true, true)?;
         read_ns += (t1 - t0).as_nanos();
@@ -320,10 +351,15 @@ pub(super) fn train(args: &[String]) -> Result<()> {
             let n = (position + 1) as i64;
             let digit = by_digit.iter().map(|(c, n)| thousandths(*c, *n)).collect::<Vec<_>>().join(",");
             let weights: Vec<String> = route.learner.modes.passage.iter().map(|a| thousandths(a.re as i64, 1i64 << (30 - READ_BITS))).collect();
+            let quarters = route.depth / LOCK_QUARTER + 1;
+            let locks: Vec<String> = route.learner.modes.lock.chunks(quarters).map(|octave| {
+                octave.iter().map(|a| thousandths(a.re as i64, 1i64 << (30 - READ_BITS))).collect::<Vec<_>>().join(",")
+            }).collect();
             println!(
-                "MODES_TRAIN cells={}/{} chunk_bits_per_cell={} tree_only={} total={} tree_total={} by_digit=[{digit}] passage_nodes={} passage_weights=[{}] us_per_cell={} read_us={} take_us={} close_us={} elapsed_ms={}",
+                "MODES_TRAIN cells={}/{} chunk_bits_per_cell={} tree_only={} total={} tree_total={} by_digit=[{digit}] passage_nodes={} lock_right={} passage_weights=[{}] lock_weights=[{}] us_per_cell={} read_us={} take_us={} close_us={} elapsed_ms={}",
                 position + 1, cells.len(), thousandths(joined_chunk, chunk_cells), thousandths(tree_chunk, chunk_cells),
-                thousandths(joined_total, n), thousandths(tree_total, n), route.passage.len(), weights.join(","),
+                thousandths(joined_total, n), thousandths(tree_total, n), route.passage.len(),
+                thousandths((locked_right as i64) << READ_BITS, n), weights.join(","), locks.join(";"),
                 chunk_started.elapsed().as_micros() / chunk_cells.max(1) as u128,
                 read_ns / 1000 / n as u128, take_ns / 1000 / n as u128, close_ns / 1000 / n as u128,
                 started.elapsed().as_millis()
@@ -367,6 +403,7 @@ pub(super) fn sample(args: &[String]) -> Result<()> {
     // The sample's passage opens at its prompt: the trained passage belongs to the training
     // stream's own recent past, which the sample does not continue.
     route.passage = declared_passage(route.depth)?;
+    route.run = 0;
     let mut prompt_code = 0i64;
     for &class in &digits(&prompt) {
         let reading = route.read()?;

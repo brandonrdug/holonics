@@ -15,9 +15,10 @@
 //!
 //! ```text
 //! move        z_k' = λ_(k,s) z_k + β_(k,s)                 |λ_(k,s)| ≤ 1 − 2^(−m)
-//! exponent    w_c = Σ_k Re(conj(R_(c,k)) z_k) + zᴴ H_c z + α_e f_c    in bits, at the receiver's face
+//! exponent    w_c = Σ_k Re(conj(R_(c,k)) z_k) + zᴴ H_c z + α_e f_c + α_b [c = ĉ]   in bits, at the receiver's face
 //!             H_c Hermitian (the square law); f_c = log₂ p_loc(c) − log₂ q(c), the passage tree's
-//!             news over the tree's face, α_e its weight at the evidence depth e it reached
+//!             news over the tree's face, α_e its weight at the evidence depth e it reached; ĉ the
+//!             passage tree's lock, α_b its weight in the lock's bin b
 //! joined      p̂(c) = q(c) 2^(w_c) / Σ_d q(d) 2^(w_d)        q the receiving tree's face
 //! covector    δ_c = p̂(c) − [c = t],   g_k = Σ_c δ_c (R_(c,k) + 2 (H_c z)_k)   (−log₂ p̂(t) descends along −δ)
 //! jets        J'_(k,a) = λ_(k,s) J_(k,a) + [s = a] z_k       J = ∂z_k/∂λ_(k,a)
@@ -28,6 +29,7 @@
 //! certificate the section reread from its opening state under the deposit codes strictly fewer
 //!             bits than it did (an exact comparison of the products of its faces); else e + 1
 //! passage     α_e ← α_e − G_α(e) / (ln 2 · Σ_sections C_e)     the curvature the comparison measured
+//! lock        G_b = Σ_t (p̂(ĉ) − [t = ĉ]),  C_b = Σ_t p̂(ĉ)(1 − p̂(ĉ)),  α_b ← α_b − G_b / (ln 2 · (1 + Σ_sections C_b))
 //! ```
 //!
 //! The jets are the adjoint carried forward: a mode's move is diagonal, so the derivative of its
@@ -150,6 +152,9 @@ const SQUARE_BITS: u32 = 8;
 /// The passage weights' declared reach, `|α| ≤ 2^4`: `α f` stays inside the carrier for
 /// `p_loc, q ≥ 2^(−62)`.
 const PASSAGE_BITS: u32 = 4;
+/// The lock's prior curvature, one (the mathematics thread's §8, agent-inferred): the first step
+/// of a bin is at most `1/ln 2` octaves per unit of covector.
+const LOCK_PRIOR: i128 = 1;
 /// The grain of `ln 2`'s face, `2^(−30)`.
 const LN2_BITS: u32 = 30;
 
@@ -192,23 +197,35 @@ impl Exponential {
 
 /// [definition; agent-inferred] **The bank's declared law**: `K` modes, an alphabet of `A` classes
 /// (the keys and the faces' classes), the passage tree's evidence depths `E` (`0`: no passage
-/// term; [`crate::hnn::passage`]) and its grains.
+/// term; [`crate::hnn::passage`]), the lock's bins `B` (`0`: no lock term) and its grains.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Declaration {
     pub modes: usize,
     pub alphabet: usize,
     pub evidence: usize,
+    pub locks: usize,
     pub grains: Grains,
 }
 
 /// [definition; agent-inferred] **The passage tree's reading at one cell**: its news over the tree's
 /// face, `f_c = log₂ p_loc(c) − log₂ q(c)`, for each class on `2^(−X)`
-/// ([`crate::hnn::passage::log2_face`]), and its evidence depth, which keys the weight the
-/// comparison locates for it.
+/// ([`crate::hnn::passage::log2_face`]), its evidence depth, which keys the weight the
+/// comparison locates for it, and its lock.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PassageReading {
     pub logs: Vec<i128>,
     pub evidence: usize,
+    pub lock: Option<Lock>,
+}
+
+/// [definition; agent-inferred] **The lock at one cell** (§8 of the mathematics thread's record,
+/// PR #412): the class `ĉ` the passage tree's deepest visited node kept, and the bin `b` that keys
+/// its weight (the reader declares the bins: the octave of the run of correct locks and the
+/// locating depth).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Lock {
+    pub class: usize,
+    pub bin: usize,
 }
 
 /// Refusals of the bank's law.
@@ -219,10 +236,10 @@ pub enum KeyedModesError {
 }
 
 /// [definition; agent-inferred] **The located material**: each mode's keyed moves and pushes, the
-/// linear readout, each class's square law and the passage weights. `lambda[k·A + a]`,
-/// `beta[k·A + a]`, `readout[c·K + k]`, `square[c·K·K + j·K + k]` (the upper triangle `j ≤ k` of a
-/// Hermitian form; a diagonal entry is real) and `passage[e]` (real, one per evidence depth), all
-/// on `2^(−P)`.
+/// linear readout, each class's square law, the passage weights and the lock weights.
+/// `lambda[k·A + a]`, `beta[k·A + a]`, `readout[c·K + k]`, `square[c·K·K + j·K + k]` (the upper
+/// triangle `j ≤ k` of a Hermitian form; a diagonal entry is real), `passage[e]` (real, one per
+/// evidence depth) and `lock[b]` (real, one per bin), all on `2^(−P)`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct KeyedModes {
     pub declaration: Declaration,
@@ -231,6 +248,7 @@ pub struct KeyedModes {
     pub readout: Vec<Gaussian>,
     pub square: Vec<Gaussian>,
     pub passage: Vec<Gaussian>,
+    pub lock: Vec<Gaussian>,
     exponential: Exponential,
 }
 
@@ -293,7 +311,7 @@ impl KeyedModes {
     /// tree's face exactly. `A` is a power of two and `K` a multiple of `J`.
     pub fn new(declaration: Declaration) -> Result<Self, KeyedModesError> {
         const TURNS: usize = 4;
-        let Declaration { modes, alphabet, grains, evidence } = declaration;
+        let Declaration { modes, alphabet, grains, evidence, locks } = declaration;
         if alphabet < 2 || !alphabet.is_power_of_two() {
             return Err(KeyedModesError::Refused("an alphabet that is a power of two, at least two"));
         }
@@ -349,6 +367,7 @@ impl KeyedModes {
             readout: vec![Gaussian::ZERO; alphabet * modes],
             square: vec![Gaussian::ZERO; alphabet * modes * modes],
             passage: vec![Gaussian::ZERO; evidence],
+            lock: vec![Gaussian::ZERO; locks],
             exponential: Exponential::new(grains.exponent),
         })
     }
@@ -386,12 +405,20 @@ impl KeyedModes {
         pairs
     }
 
-    /// The readout exponents `w_c = Σ_k Re(conj(R_(c,k)) z_k) + zᴴ H_c z + α_e f_c` on
-    /// `2^(−(L+P))`.
+    /// The readout exponents `w_c = Σ_k Re(conj(R_(c,k)) z_k) + zᴴ H_c z + α_e f_c + α_b [c = ĉ]`
+    /// on `2^(−(L+P))`.
     fn exponents(&self, state: &ModeState, passage: Option<&PassageReading>) -> Vec<i128> {
         let Declaration { modes, alphabet, grains, .. } = self.declaration;
         let local = |c: usize| match passage {
-            Some(r) => (self.passage[r.evidence].re * r.logs[c]) << (grains.face - grains.exponent),
+            Some(r) => {
+                let news = (self.passage[r.evidence].re * r.logs[c]) << (grains.face - grains.exponent);
+                // [c = ĉ] is one bit: α_b on 2^(−P) re-based to 2^(−(L+P)).
+                let lock = match r.lock {
+                    Some(l) if l.class == c => self.lock[l.bin].re << grains.face,
+                    _ => 0,
+                };
+                news + lock
+            }
             None => 0,
         };
         let faces: Vec<Gaussian> = (0..modes).map(|k| self.face_of(state, k)).collect();
@@ -422,7 +449,9 @@ impl KeyedModes {
             return Err(KeyedModesError::Refused("one tree mass per class"));
         }
         if let Some(r) = passage
-            && (r.logs.len() != alphabet || r.evidence >= self.passage.len())
+            && (r.logs.len() != alphabet
+                || r.evidence >= self.passage.len()
+                || r.lock.is_some_and(|l| l.class >= alphabet || l.bin >= self.lock.len()))
         {
             return Err(KeyedModesError::Refused("a passage reading inside the declaration"));
         }
@@ -545,6 +574,14 @@ impl KeyedModes {
             let first = release((0..r.logs.len()).map(|c| p(c) * r.logs[c]).sum(), s);
             let second = release((0..r.logs.len()).map(|c| p(c) * r.logs[c] * r.logs[c]).sum(), s);
             gradient.curvature[r.evidence] += (second - first * first).max(0);
+            if let Some(l) = r.lock {
+                // ∂/∂α_b = δ_ĉ (the feature is one bit, on 2^(−X)), on 2^(−(S+X)); the curvature
+                // ln 2 · p̂(ĉ)(1 − p̂(ĉ)), the variance on 2^(−2S) re-based to 2^(−2X).
+                let x = self.declaration.grains.exponent;
+                gradient.lock[l.bin].re += delta[l.class] << x;
+                let pc = p(l.class);
+                gradient.lock_curvature[l.bin] += release(pc * ((1i128 << s) - pc), 2 * s - 2 * x).max(0);
+            }
         }
         let coarse = self.coarse_faces(state);
         let reached = self.reach(&coarse, &delta);
@@ -581,15 +618,27 @@ impl KeyedModes {
     /// with `G_e` this section's covector and `H_e` the variance of `f` summed over every cell its
     /// evidence depth has met (so the step falls as its evidence grows), projected into `|α| ≤ 2^4`.
     fn passage_stepped(&self, gradient: &Gradient, curvature: &[i128]) -> Vec<Gaussian> {
+        self.newton_stepped(&self.passage, &gradient.passage, curvature)
+    }
+
+    /// **The lock weights' step**, the same Newton step of their cumulative curvature (which
+    /// carries the lock's prior), projected into `|α| ≤ 2^4`.
+    fn lock_stepped(&self, gradient: &Gradient, curvature: &[i128]) -> Vec<Gaussian> {
+        self.newton_stepped(&self.lock, &gradient.lock, curvature)
+    }
+
+    /// `α ← α − G / (ln 2 · H)` for real weights on `2^(−P)`, `G` on `2^(−(S+X))`, `H` on
+    /// `2^(−2X)`, to the nearest numerator, projected into `|α| ≤ 2^4`.
+    fn newton_stepped(&self, weights: &[Gaussian], gradient: &[Gaussian], curvature: &[i128]) -> Vec<Gaussian> {
         use num_bigint::BigInt;
         let g = self.declaration.grains;
         // Δα on 2^(−P) = G 2^(P − S + X + LN2_BITS) / (ln2 2^LN2_BITS · H).
         let shift = (g.moves + g.exponent + LN2_BITS) as usize - g.covector as usize;
         let ln2 = BigInt::from(ln2_face());
         let reach = 1i128 << (g.moves + PASSAGE_BITS);
-        self.passage
+        weights
             .iter()
-            .zip(&gradient.passage)
+            .zip(gradient)
             .zip(curvature)
             .map(|((a, grad), &h)| {
                 if h <= 0 || grad.re == 0 {
@@ -675,6 +724,7 @@ impl KeyedModes {
             readout: step(&self.readout, &gradient.readout),
             square,
             passage: self.passage.clone(),
+            lock: self.lock.clone(),
             exponential: self.exponential.clone(),
         }
     }
@@ -691,6 +741,9 @@ pub struct Gradient {
     pub passage: Vec<Gaussian>,
     /// The passage term's curvature `Σ Var_p̂(f)` at each evidence depth, on `2^(−2X)`.
     pub curvature: Vec<i128>,
+    pub lock: Vec<Gaussian>,
+    /// The lock term's curvature `Σ p̂(ĉ)(1 − p̂(ĉ))` in each bin, on `2^(−2X)`.
+    pub lock_curvature: Vec<i128>,
 }
 
 impl Gradient {
@@ -702,6 +755,8 @@ impl Gradient {
             square: vec![Gaussian::ZERO; d.alphabet * d.modes * d.modes],
             passage: vec![Gaussian::ZERO; d.evidence],
             curvature: vec![0; d.evidence],
+            lock: vec![Gaussian::ZERO; d.locks],
+            lock_curvature: vec![0; d.locks],
         }
     }
 }
@@ -737,6 +792,8 @@ pub struct KeyedLearner {
     pub pending: Option<Gradient>,
     /// The passage term's curvature summed over every section closed, at each evidence depth.
     pub curvature: Vec<i128>,
+    /// The lock term's curvature, from its prior, summed over every section closed, in each bin.
+    pub lock_curvature: Vec<i128>,
 }
 
 /// The ladder: rungs `e = FIRST..=LAST`, opened one rung coarser than the last certified step.
@@ -748,7 +805,9 @@ impl KeyedLearner {
         let state = modes.rest();
         let section = Section::open(&modes, &state);
         let curvature = vec![0; modes.declaration.evidence];
-        Self { modes, state, section, rung: 8, pending: None, curvature }
+        let prior = LOCK_PRIOR << (2 * modes.declaration.grains.exponent);
+        let lock_curvature = vec![prior; modes.declaration.locks];
+        Self { modes, state, section, rung: 8, pending: None, curvature, lock_curvature }
     }
 
     /// The joined face the next cell meets.
@@ -773,7 +832,7 @@ impl KeyedLearner {
     /// as unseen: measured October 23 on four GSM8K problems, it certified every section at the
     /// largest step and coded 1.068 bits a digit against the tree's 1.003. The passage weights:
     /// this section's curvature joins their accumulated curvature and they take its Newton step
-    /// ([`KeyedModes::passage_stepped`]).
+    /// ([`KeyedModes::passage_stepped`]); the lock weights likewise ([`KeyedModes::lock_stepped`]).
     pub fn close(&mut self) -> Result<DepositReceipt, KeyedModesError> {
         let mut rungs = 0;
         let mut certified = None;
@@ -798,13 +857,17 @@ impl KeyedLearner {
             *h += v;
         }
         self.modes.passage = self.modes.passage_stepped(&closed.gradient, &self.curvature);
+        for (h, v) in self.lock_curvature.iter_mut().zip(&closed.gradient.lock_curvature) {
+            *h += v;
+        }
+        self.modes.lock = self.modes.lock_stepped(&closed.gradient, &self.lock_curvature);
         self.section = Section::open(&self.modes, &self.state);
         self.pending = Some(closed.gradient);
         Ok(DepositReceipt { certified, rungs })
     }
 }
 
-const LEARNER_MAGIC: &str = "keyed-modes-learner-v2";
+const LEARNER_MAGIC: &str = "keyed-modes-learner-v3";
 
 fn write_line(out: &mut String, values: &[Gaussian]) {
     let words: Vec<String> = values.iter().flat_map(|g| [g.re.to_string(), g.im.to_string()]).collect();
@@ -848,8 +911,8 @@ impl KeyedLearner {
         let d = self.modes.declaration;
         let g = d.grains;
         let mut out = format!(
-            "{LEARNER_MAGIC}\n{} {} {} {} {} {} {} {} {} {}\n",
-            d.modes, d.alphabet, d.evidence, g.moves, g.face, g.covector, g.exponent, g.margin, g.square, self.rung
+            "{LEARNER_MAGIC}\n{} {} {} {} {} {} {} {} {} {} {}\n",
+            d.modes, d.alphabet, d.evidence, d.locks, g.moves, g.face, g.covector, g.exponent, g.margin, g.square, self.rung
         );
         for values in [
             &self.modes.lambda,
@@ -857,23 +920,28 @@ impl KeyedLearner {
             &self.modes.readout,
             &self.modes.square,
             &self.modes.passage,
+            &self.modes.lock,
             &self.state.z,
             &self.state.jet_lambda,
             &self.state.jet_beta,
         ] {
             write_line(&mut out, values);
         }
-        out.push_str(&self.curvature.iter().map(i128::to_string).collect::<Vec<_>>().join(" "));
-        out.push('\n');
+        for curvature in [&self.curvature, &self.lock_curvature] {
+            out.push_str(&curvature.iter().map(i128::to_string).collect::<Vec<_>>().join(" "));
+            out.push('\n');
+        }
         match &self.pending {
             None => out.push_str("none\n"),
             Some(g) => {
                 out.push_str("pending\n");
-                for values in [&g.lambda, &g.beta, &g.readout, &g.square, &g.passage] {
+                for values in [&g.lambda, &g.beta, &g.readout, &g.square, &g.passage, &g.lock] {
                     write_line(&mut out, values);
                 }
-                out.push_str(&g.curvature.iter().map(i128::to_string).collect::<Vec<_>>().join(" "));
-                out.push('\n');
+                for curvature in [&g.curvature, &g.lock_curvature] {
+                    out.push_str(&curvature.iter().map(i128::to_string).collect::<Vec<_>>().join(" "));
+                    out.push('\n');
+                }
             }
         }
         Ok(out)
@@ -892,7 +960,7 @@ impl KeyedLearner {
             .map(str::parse)
             .collect::<Result<_, _>>()
             .map_err(|_| KeyedModesError::Refused("a saved learner's declaration"))?;
-        let [modes, alphabet, evidence, moves, face, covector, exponent, margin, square, rung] = head[..] else {
+        let [modes, alphabet, evidence, locks, moves, face, covector, exponent, margin, square, rung] = head[..] else {
             return Err(KeyedModesError::Refused("a saved learner's declaration width"));
         };
         let to = |v: u64| u32::try_from(v).map_err(|_| KeyedModesError::Refused("a declared grain"));
@@ -900,6 +968,7 @@ impl KeyedLearner {
             modes: modes as usize,
             alphabet: alphabet as usize,
             evidence: evidence as usize,
+            locks: locks as usize,
             grains: Grains {
                 moves: to(moves)?,
                 face: to(face)?,
@@ -916,12 +985,14 @@ impl KeyedLearner {
         bank.readout = read_line(lines.next(), a * m)?;
         bank.square = read_line(lines.next(), a * m * m)?;
         bank.passage = read_line(lines.next(), declaration.evidence)?;
+        bank.lock = read_line(lines.next(), declaration.locks)?;
         let state = ModeState {
             z: read_line(lines.next(), m)?,
             jet_lambda: read_line(lines.next(), m * a)?,
             jet_beta: read_line(lines.next(), m * a)?,
         };
         let curvature = read_integers(lines.next(), declaration.evidence)?;
+        let lock_curvature = read_integers(lines.next(), declaration.locks)?;
         let pending = match lines.next() {
             Some("none") => None,
             Some("pending") => Some(Gradient {
@@ -930,7 +1001,9 @@ impl KeyedLearner {
                 readout: read_line(lines.next(), a * m)?,
                 square: read_line(lines.next(), a * m * m)?,
                 passage: read_line(lines.next(), declaration.evidence)?,
+                lock: read_line(lines.next(), declaration.locks)?,
                 curvature: read_integers(lines.next(), declaration.evidence)?,
+                lock_curvature: read_integers(lines.next(), declaration.locks)?,
             }),
             _ => return Err(KeyedModesError::Refused("a saved learner's pending covector")),
         };
@@ -938,7 +1011,7 @@ impl KeyedLearner {
             return Err(KeyedModesError::Refused("a saved learner ends after its state"));
         }
         let section = Section::open(&bank, &state);
-        Ok(Self { modes: bank, state, section, rung: to(rung)?, pending, curvature })
+        Ok(Self { modes: bank, state, section, rung: to(rung)?, pending, curvature, lock_curvature })
     }
 
     /// **Advance without learning** (a frozen fork: a prompt, or a released cell): the class keys
@@ -983,7 +1056,7 @@ mod tests {
     use super::*;
 
     fn bank() -> KeyedModes {
-        KeyedModes::new(Declaration { modes: 8, alphabet: 4, evidence: 3, grains: Grains::DECLARED }).unwrap()
+        KeyedModes::new(Declaration { modes: 8, alphabet: 4, evidence: 3, locks: 2, grains: Grains::DECLARED }).unwrap()
     }
 
     #[test]
@@ -1116,7 +1189,7 @@ mod tests {
         // w_c is linear in the passage weight: Σ_c δ_c Δw_c is the accumulated gradient times the step.
         let (mut b, s) = shaped();
         b.passage[1] = Gaussian::new(3 << 28, 0);
-        let reading = PassageReading { logs: vec![-(1 << 24), -(3 << 23), -(5 << 24), -(1 << 22)], evidence: 1 };
+        let reading = PassageReading { logs: vec![-(1 << 24), -(3 << 23), -(5 << 24), -(1 << 22)], evidence: 1, lock: None };
         let face = b.joined(&s, &[1u128 << 60; 4], Some(&reading)).unwrap();
         let mut gradient = Gradient::zero(&b.declaration);
         b.accumulate(&s, Some(&reading), &face, 0, &mut gradient);
@@ -1129,6 +1202,48 @@ mod tests {
         let g = b.declaration.grains;
         assert_eq!(change, gradient.passage[1].re << (20 + g.face - g.exponent));
         assert_eq!(gradient.passage[0], Gaussian::ZERO);
+    }
+
+    #[test]
+    fn lock_weight_gradient_is_exact() {
+        // w_ĉ is linear in its bin's weight: Σ_c δ_c Δw_c is the accumulated gradient times the step.
+        let (mut b, s) = shaped();
+        b.lock[1] = Gaussian::new(5 << 28, 0);
+        let lock = Some(Lock { class: 2, bin: 1 });
+        let reading = PassageReading { logs: vec![-(1 << 24), -(3 << 23), -(5 << 24), -(1 << 22)], evidence: 1, lock };
+        let face = b.joined(&s, &[1u128 << 60; 4], Some(&reading)).unwrap();
+        let mut gradient = Gradient::zero(&b.declaration);
+        b.accumulate(&s, Some(&reading), &face, 0, &mut gradient);
+        let delta = b.covector(&face, 0);
+        let w = b.exponents(&s, Some(&reading));
+        let mut moved = b.clone();
+        moved.lock[1].re += 1 << 20;
+        let w2 = moved.exponents(&s, Some(&reading));
+        let change: i128 = (0..4).map(|c| delta[c] * (w2[c] - w[c])).sum();
+        let g = b.declaration.grains;
+        assert_eq!(change, gradient.lock[1].re << (20 + g.face - g.exponent));
+        assert_eq!(gradient.lock[0], Gaussian::ZERO);
+        assert!(gradient.lock_curvature[1] > 0 && gradient.lock_curvature[0] == 0);
+    }
+
+    #[test]
+    fn a_held_lock_weight_grows() {
+        // A passage whose lock is always right: the bin's weight rises and the lock's class gains.
+        let mut learner = KeyedLearner::new(bank());
+        let flat = vec![1u128 << 60; 4];
+        let reading = PassageReading { logs: vec![0; 4], evidence: 0, lock: Some(Lock { class: 3, bin: 0 }) };
+        for _ in 0..3 {
+            for _ in 0..10 {
+                let face = learner.face(&flat, Some(&reading)).unwrap();
+                learner.receive(flat.clone(), Some(reading.clone()), &face, 3);
+            }
+            learner.close().unwrap();
+        }
+        assert!(learner.modes.lock[0].re > 0 && learner.modes.lock[1] == Gaussian::ZERO);
+        let face = learner.face(&flat, Some(&reading)).unwrap();
+        assert!(face.masses[3] > face.masses[0]);
+        let text = learner.to_text().unwrap();
+        assert_eq!(KeyedLearner::from_text(&text).unwrap(), learner);
     }
 
     #[test]

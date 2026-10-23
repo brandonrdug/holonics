@@ -29,7 +29,23 @@
 //! under `2^(−COUNT_BITS)` of an occurrence, dissolves with it.
 //!
 //! No routine looks up an earlier occurrence. The counts are the receiver's own at a second
-//! placement, and copying is what they read when the passage repeats itself. The tree reads classes
+//! placement, and copying is what they read when the passage repeats itself.
+//!
+//! **The node lock** ([definition; agent-inferred, October 23], §8 of the mathematics thread's
+//! record, PR #412): each node also keeps the class that followed its last visit, the indicator's
+//! `λ = 0` placement beside the `λ = 1` count and the `γ` count. A located equality is the pair
+//! contact `(t, t − δ)` with slip `[u_t ≠ u_(t−δ)]`; a run of `ℓ` held contacts is `ℓ` closed
+//! squares, so the offset `δ` is located by loop closure. The deepest node on the path with an
+//! earlier visit locates it (`δ = t − last`), and its kept class `ĉ = u_(t−δ)` is the lock's
+//! prediction, read without a strand of the passage. Holding `δ` past the tree's depth would read
+//! a cell `δ` back that no node keeps: a strand, which retention refuses.
+//!
+//! ```text
+//! lock        ĉ = next(deepest node with an earlier visit),  d its depth
+//! deposit     next(node) ← actual, at every node on the path
+//! ```
+//!
+//! The tree reads classes
 //! of a declared alphabet and a frame phase; a text, image, acoustic or motor boundary chart
 //! supplies both.
 use std::collections::HashMap;
@@ -60,12 +76,14 @@ pub enum PassageError {
 }
 
 /// One node's decayed counts (numerators on `2^(−COUNT_BITS)`), their carried residues (on
-/// `2^(−(COUNT_BITS + 62))`) and the cell at which they were last brought to the present.
+/// `2^(−(COUNT_BITS + 62))`), the cell at which they were last brought to the present and the
+/// class that followed its last visit (the lock).
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Node {
     counts: Vec<u64>,
     residues: Vec<u64>,
     last: u64,
+    next: usize,
 }
 
 /// [definition; agent-inferred] **The passage tree**: its declaration, the decay navigator's
@@ -74,16 +92,18 @@ struct Node {
 pub struct PassageTree {
     pub declaration: PassageDeclaration,
     powers: Vec<u128>,
-    nodes: HashMap<u64, Node>,
+    nodes: HashMap<u128, Node>,
 }
 
 /// [definition; agent-inferred] **The passage's face at one cell**: each class's probability on
-/// `2^(−62)` and the evidence depth (`0`: no node holds an occurrence; `d + 1`: depth `d` is the
-/// deepest that does).
+/// `2^(−62)`, the evidence depth (`0`: no node holds an occurrence; `d + 1`: depth `d` is the
+/// deepest that does) and the lock: the class that followed the deepest visited node's last visit,
+/// with that node's depth (`None` before any node is visited).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PassageFace {
     pub probabilities: Vec<u128>,
     pub evidence: usize,
+    pub lock: Option<(usize, usize)>,
 }
 
 impl PassageTree {
@@ -94,8 +114,8 @@ impl PassageTree {
         }
         let cell_bits = alphabet.trailing_zeros() as usize;
         let phase_bits = (usize::BITS - phases.saturating_sub(1).leading_zeros()) as usize;
-        if phases == 0 || depth * cell_bits + phase_bits + 8 > 64 || depth > 255 {
-            return Err(PassageError::Refused("a node key of depth, phase and context inside 64 bits"));
+        if phases == 0 || depth * cell_bits + phase_bits + 8 > 128 || depth > 255 {
+            return Err(PassageError::Refused("a node key of depth, phase and context inside 128 bits"));
         }
         if horizon == 0 || horizon >= UNIT_BITS || backoff == 0 {
             return Err(PassageError::Refused("a horizon inside the face's grain and a positive backoff"));
@@ -144,14 +164,14 @@ impl PassageTree {
     }
 
     /// The node key at `depth` behind `context` (newest first) in `phase`.
-    fn key(&self, depth: usize, phase: usize, context: &[usize]) -> u64 {
+    fn key(&self, depth: usize, phase: usize, context: &[usize]) -> u128 {
         let cell_bits = self.declaration.alphabet.trailing_zeros();
-        let mut key = 0u64;
+        let mut key = 0u128;
         for &class in &context[..depth] {
-            key = (key << cell_bits) | class as u64;
+            key = (key << cell_bits) | class as u128;
         }
         let phase_bits = usize::BITS - self.declaration.phases.saturating_sub(1).leading_zeros();
-        (((key << phase_bits) | phase as u64) << 8) | depth as u64
+        (((key << phase_bits) | phase as u128) << 8) | depth as u128
     }
 
     /// **The passage's face** at cell `now` in `phase`, behind `context` (the preceding cells,
@@ -164,10 +184,12 @@ impl PassageTree {
         let beta = (backoff as u128) << COUNT_BITS;
         let mut p: Vec<u128> = base.to_vec();
         let mut evidence = 0;
+        let mut lock = None;
         for d in 0..=depth.min(context.len()) {
             let Some(node) = self.nodes.get(&self.key(d, phase, context)) else {
                 continue;
             };
+            lock = Some((node.next, d));
             let g = self.decay(now - node.last);
             let counts: Vec<u128> = node
                 .counts
@@ -182,7 +204,7 @@ impl PassageTree {
             // p_d(a) = (l(a) 2^62 + β p_(d−1)(a)) / (L + β), on 2^(−62).
             p = counts.iter().zip(&p).map(|(&l, &q)| ((l << UNIT_BITS) + beta * q) / (total + beta)).collect();
         }
-        Ok(PassageFace { probabilities: p, evidence })
+        Ok(PassageFace { probabilities: p, evidence, lock })
     }
 
     /// **Deposit the actual class** at cell `now`: every node on the context's path is brought to
@@ -199,6 +221,7 @@ impl PassageTree {
                 counts: vec![0; alphabet],
                 residues: vec![0; alphabet],
                 last: now,
+                next: actual,
             });
             if let Some(g) = g {
                 for (n, r) in node.counts.iter_mut().zip(node.residues.iter_mut()) {
@@ -206,6 +229,7 @@ impl PassageTree {
                 }
             }
             node.last = now;
+            node.next = actual;
             node.counts[actual] += 1 << COUNT_BITS;
         }
         Ok(())
@@ -240,19 +264,17 @@ impl PassageTree {
     }
 
     /// **The passage tree at rest, as text**: the declaration line, then one line per live node
-    /// (key, last, counts, residues), in key order.
+    /// (key, last, next, counts, residues), in key order.
     pub fn to_text(&self) -> String {
         let d = self.declaration;
-        let mut out = format!("passage-tree-v1\n{} {} {} {} {} {}\n", d.alphabet, d.phases, d.depth, d.horizon, d.backoff, self.nodes.len());
-        let mut keys: Vec<&u64> = self.nodes.keys().collect();
+        let mut out = format!("passage-tree-v2\n{} {} {} {} {} {}\n", d.alphabet, d.phases, d.depth, d.horizon, d.backoff, self.nodes.len());
+        let mut keys: Vec<&u128> = self.nodes.keys().collect();
         keys.sort_unstable();
         for key in keys {
             let node = &self.nodes[key];
-            let words: Vec<String> = [*key, node.last]
+            let words: Vec<String> = [key.to_string(), node.last.to_string(), node.next.to_string()]
                 .into_iter()
-                .chain(node.counts.iter().copied())
-                .chain(node.residues.iter().copied())
-                .map(|v| v.to_string())
+                .chain(node.counts.iter().chain(&node.residues).map(|v| v.to_string()))
                 .collect();
             out.push_str(&words.join(" "));
             out.push('\n');
@@ -262,7 +284,7 @@ impl PassageTree {
 
     /// The passage tree restored from [`PassageTree::to_text`], and the lines it read.
     pub fn from_lines<'a>(lines: &mut impl Iterator<Item = &'a str>) -> Result<Self, PassageError> {
-        if lines.next() != Some("passage-tree-v1") {
+        if lines.next() != Some("passage-tree-v2") {
             return Err(PassageError::Refused("a passage tree's text"));
         }
         let head: Vec<u64> = lines
@@ -285,19 +307,26 @@ impl PassageTree {
         })?;
         let a = alphabet as usize;
         for _ in 0..count {
-            let words: Vec<u64> = lines
+            let mut fields = lines.next().ok_or(PassageError::Refused("a passage tree's node"))?.split_whitespace();
+            let key: u128 = fields
                 .next()
-                .ok_or(PassageError::Refused("a passage tree's node"))?
-                .split_whitespace()
+                .and_then(|k| k.parse().ok())
+                .ok_or(PassageError::Refused("a passage tree node's key"))?;
+            let words: Vec<u64> = fields
                 .map(str::parse)
                 .collect::<Result<_, _>>()
                 .map_err(|_| PassageError::Refused("a passage tree's node"))?;
-            if words.len() != 2 + 2 * a {
-                return Err(PassageError::Refused("a passage tree node's width"));
+            if words.len() != 2 + 2 * a || words[1] >= alphabet {
+                return Err(PassageError::Refused("a passage tree node's width and lock"));
             }
             tree.nodes.insert(
-                words[0],
-                Node { last: words[1], counts: words[2..2 + a].to_vec(), residues: words[2 + a..].to_vec() },
+                key,
+                Node {
+                    last: words[0],
+                    next: words[1] as usize,
+                    counts: words[2..2 + a].to_vec(),
+                    residues: words[2 + a..].to_vec(),
+                },
             );
         }
         Ok(tree)
@@ -388,6 +417,37 @@ mod tests {
         one.release(10);
         let (a, b) = (&one.nodes.values().next().unwrap().counts[3], &many.nodes.values().next().unwrap().counts[3]);
         assert!(a.abs_diff(*b) <= 1, "{a} {b}");
+    }
+
+    #[test]
+    fn a_deep_context_keeps_its_far_cells() {
+        // Four classes at depth 48 key 96 context bits: past one word, inside the 128-bit key.
+        let declaration = PassageDeclaration { depth: 48, ..declared() };
+        let mut tree = PassageTree::new(declaration).unwrap();
+        let near = [1usize; 48];
+        let mut far = near;
+        far[40] = 2;
+        for t in 0..4 {
+            tree.deposit(0, &near, 3, t).unwrap();
+        }
+        assert_eq!(tree.face(0, &near, 4, &[1u128 << 60; 4]).unwrap().evidence, 49);
+        // The context that differs only 41 cells back meets its common suffix, not the deep node.
+        assert_eq!(tree.face(0, &far, 4, &[1u128 << 60; 4]).unwrap().evidence, 41);
+        let text = tree.to_text();
+        assert_eq!(PassageTree::from_lines(&mut text.lines()).unwrap(), tree);
+        assert!(PassageTree::new(PassageDeclaration { depth: 60, ..declared() }).is_err());
+    }
+
+    #[test]
+    fn the_lock_is_the_deepest_visit_s_continuation() {
+        let mut tree = PassageTree::new(declared()).unwrap();
+        assert_eq!(tree.face(0, &[1, 2, 3], 0, &[1u128 << 60; 4]).unwrap().lock, None);
+        // [1, 2, 3] was followed by 0; the shallower [1, 2] last by 3.
+        tree.deposit(0, &[1, 2, 3], 0, 0).unwrap();
+        tree.deposit(0, &[1, 2, 0], 3, 1).unwrap();
+        assert_eq!(tree.face(0, &[1, 2, 3], 2, &[1u128 << 60; 4]).unwrap().lock, Some((0, 3)));
+        assert_eq!(tree.face(0, &[1, 2, 2], 2, &[1u128 << 60; 4]).unwrap().lock, Some((3, 2)));
+        assert_eq!(tree.face(1, &[1, 2, 3], 2, &[1u128 << 60; 4]).unwrap().lock, None);
     }
 
     #[test]

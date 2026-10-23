@@ -1,0 +1,2 @@
+sample	state_sha256	prompt_bits_a_cell	cells	release	deadline_s	wall_s	peak_rss_mib	longest_copied_run	chars_in_copied_runs_of_20_or_more	output_sha256
+samp_lockall	a2eb835fceb98a8eea50e91d6e778127f83d0e746aed082b0502352c536b44ce	0.371	2048	exact draw p, the previous record's keys	120	12.1	2679	23	23/512	f3a7e3d0d395d2e69f7a9d3026d14c853083242a06584899255571660bdbf6a5
