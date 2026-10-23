@@ -302,6 +302,7 @@ fn standing_of(cells: &[usize]) -> Landmarks {
         capacity: Capacity::Unbounded,
         mass: 1,
         base: crate::compression::landmark::context::BaseMeasure::Even,
+        ratio: crate::compression::landmark::context::RatioLaw::Carried,
     };
     let mut standing = Landmarks::new(declaration).unwrap();
     for (position, &cell) in cells.iter().enumerate() {

@@ -1549,6 +1549,7 @@ mod tests {
             capacity,
             mass: 1,
             base,
+            ratio: crate::compression::landmark::context::RatioLaw::Carried,
         })
         .unwrap()
     }
@@ -1815,6 +1816,7 @@ mod tests {
                 capacity,
                 mass: 1,
                 base,
+                ratio: crate::compression::landmark::context::RatioLaw::Carried,
             })
             .unwrap();
             let addresses: Vec<Vec<Letter>> = (0..24)

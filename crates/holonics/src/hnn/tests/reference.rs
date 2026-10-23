@@ -425,6 +425,7 @@ fn tree_declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
         capacity: Capacity::Unbounded,
         mass: 1,
         base: crate::compression::landmark::context::BaseMeasure::Even,
+        ratio: crate::compression::landmark::context::RatioLaw::Carried,
     }
 }
 

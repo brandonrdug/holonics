@@ -23,6 +23,7 @@ fn receiver() -> ReceiverDeclaration {
         mass: 1,
         base: BaseMeasure::Even,
         receiving_prior: 0,
+        ratio: crate::compression::landmark::context::RatioLaw::Carried,
     }
 }
 

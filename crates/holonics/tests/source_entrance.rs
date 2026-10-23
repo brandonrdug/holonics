@@ -44,6 +44,7 @@ fn receiver(ring: usize, aperture: usize) -> ReceiverDeclaration {
         mass: 1,
         base: BaseMeasure::Even,
         receiving_prior: 0,
+        ratio: holonics::compression::landmark::context::RatioLaw::Carried,
     }
 }
 

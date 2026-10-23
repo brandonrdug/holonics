@@ -137,6 +137,7 @@ fn declare() -> Result<(Field, ReceiverDeclaration), holonics::hnn::HnnError> {
         mass: 1,
         base: BaseMeasure::Even,
         receiving_prior: 0,
+        ratio: holonics::compression::landmark::context::RatioLaw::Carried,
     };
     // Source period four holds both classes at distinct phase addresses and exceeds aperture
     // three. The legal period-two interior has width four and keeps the actual Half pump clock.

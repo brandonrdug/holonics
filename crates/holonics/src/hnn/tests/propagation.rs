@@ -784,6 +784,7 @@ fn quarter_turn_path(periods: &[u64], exponents: &[i64], grain: u64) -> FieldDec
             mass: 1,
             base: crate::compression::landmark::context::BaseMeasure::Even,
             receiving_prior: 0,
+            ratio: crate::compression::landmark::context::RatioLaw::Carried,
         }],
         crib: crate::hnn::field::CribDeclaration {
             window: 16,

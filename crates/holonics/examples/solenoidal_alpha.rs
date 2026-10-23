@@ -186,6 +186,21 @@ fn digits(bytes: &[u8]) -> Vec<usize> {
 fn declaration(population: u64) -> Result<(Field, Constitution, PairingDeclaration)> {declaration_with_source_framing(population,false)}
 fn declaration_with_source_framing(population:u64,framed:bool)->Result<(Field,Constitution,PairingDeclaration)>{declaration_with_input_context(population,framed,false)}
 fn declaration_with_input_context(population:u64,framed:bool,arrival:bool)->Result<(Field,Constitution,PairingDeclaration)>{
+    let field=input_context_field(population,framed,holonics::compression::landmark::context::RatioLaw::Carried)?;
+    let pairing = PairingDeclaration::Family {
+        table: (0..4).map(|c| (c, c ^ 1)).collect(),
+    };
+    // Keep the paired response consumer on the existing listener's admitted linear circuit.
+    // with_locking_pump installs saturation, which ResponseTube::open currently refuses.
+    let initial = Constitution::initial(&field, MATERIAL_BIT_BUDGET)?;
+    // Keep the physical receiving layout: the grouped owner independently seals its
+    // whole-candidate comparison, without the old per-cell ArrivalContext gain gate.
+    let mut initial = PairedCarrier::found(&field, initial, 0, &pairing)?.0;
+    if arrival{initial.bind_arrival_context_receiving(2)?;}
+    Ok((field, initial, pairing))
+}
+/// The listener's field, its receiver's tree declaring the mixture-ratio law `ratio`.
+fn input_context_field(population:u64,framed:bool,ratio:holonics::compression::landmark::context::RatioLaw)->Result<Field>{
     // Agent-inferred: listener's existing serial law at a smaller explicit test workload.
     // The three rings, contacts, physical depths and pairing are independent of corpus text.
     // Grouped phase rows require an odd receiving ring; three is the smallest admitted odd period.
@@ -229,20 +244,10 @@ fn declaration_with_input_context(population:u64,framed:bool,arrival:bool)->Resu
     declared.receivers[0].aperture = 1;
     declared.receivers[0].depth = 6;
     declared.receivers[0].tolerance = rat(1, 4);
+    declared.receivers[0].ratio = ratio;
     declared.lattice.clear();
     let field = Field::declare(declared.by_lattice_rule())?;
-    let field=if framed{field.with_receiving_context(2,holonics::hnn::receiving::ObservationPartition::SourceFramingRouteV1)?}else{field};
-    let pairing = PairingDeclaration::Family {
-        table: (0..4).map(|c| (c, c ^ 1)).collect(),
-    };
-    // Keep the paired response consumer on the existing listener's admitted linear circuit.
-    // with_locking_pump installs saturation, which ResponseTube::open currently refuses.
-    let initial = Constitution::initial(&field, MATERIAL_BIT_BUDGET)?;
-    // Keep the physical receiving layout: the grouped owner independently seals its
-    // whole-candidate comparison, without the old per-cell ArrivalContext gain gate.
-    let mut initial = PairedCarrier::found(&field, initial, 0, &pairing)?.0;
-    if arrival{initial.bind_arrival_context_receiving(2)?;}
-    Ok((field, initial, pairing))
+    Ok(if framed{field.with_receiving_context(2,holonics::hnn::receiving::ObservationPartition::SourceFramingRouteV1)?}else{field})
 }
 fn port() -> Reference {
     Reference::new(16, MATERIAL_BIT_BUDGET)

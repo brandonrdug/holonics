@@ -187,6 +187,7 @@ fn crib_field() -> Field {
                 mass: 1,
                 base: crate::compression::landmark::context::BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: crate::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -423,6 +424,7 @@ fn sixty_field() -> Field {
                 mass: 1,
                 base: crate::compression::landmark::context::BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: crate::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 16,
