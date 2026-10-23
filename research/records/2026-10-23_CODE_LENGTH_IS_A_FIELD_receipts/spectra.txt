@@ -1,0 +1,9 @@
+IC floor (independent draws) 0.05742; IC at lags 1..8: 0.0445 0.0409 0.0569 0.0755 0.0705 0.0646 0.0646 0.0675
+  lags       1-8       IC/floor mean 1.056 min 0.713 max 1.314
+  lags       9-64      IC/floor mean 1.078 min 1.039 max 1.255
+  lags      65-512     IC/floor mean 1.030 min 1.006 max 1.101
+  lags     513-4096    IC/floor mean 1.003 min 0.994 max 1.014
+  lags    4097-65536   IC/floor mean 1.000 min 0.996 max 1.010
+  lags   65537-2097152 IC/floor mean 1.000 min 0.995 max 1.007
+code spectral slope (log2 power per log2 frequency, 1e-4..0.05 cycles a byte): -0.314; strongest periods (bytes): 4194304.0, 2097152.0, 1398101.3, 1048576.0, 699050.7, 599186.3, 838860.8, 524288.0
+lock saving spectral slope (log2 power per log2 frequency, 1e-4..0.05 cycles a byte): -0.180; strongest periods (bytes): 4194304.0, 2097152.0, 1398101.3, 838860.8, 466033.8, 699050.7, 322638.8, 349525.3
