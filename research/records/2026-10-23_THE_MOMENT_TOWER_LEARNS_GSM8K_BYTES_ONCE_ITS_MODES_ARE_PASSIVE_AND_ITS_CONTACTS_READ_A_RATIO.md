@@ -289,6 +289,18 @@ The source as committed, rebuilt from clean, releases both samples byte for byte
 hashes are in `SAMPLES.tsv`). `bash tools/gate.sh` passes, and the six `hnn::tower` tests pass in
 release.
 
+**The section waited on the allocator.** Stack samples of the four workers (gdb, 100 samples
+during one narrow pass on 100 problems) found 35 in the allocator, most blocked on the main
+arena's lock: the reads' fallible maps collected into vectors that grew by reallocation, and a
+chunk that had crossed threads through a thread's cache takes its first owner's lock. Each such
+map now collects into one exact allocation (`collect_exact`), the reverse scan sums a section's
+outer products over its cells before they reach the gradient (`outer_sum`: integer addition is
+associative, so the bits are those of one product a cell), and the workspace builds for the host's
+own vector units (`.cargo/config.toml`). The pass (the 100 problems and their held-out read)
+went from 12.8–13.2 s to 11.7–12.5 s with the sums, to 7.4–7.9 s with the exact collects and to
+5.2–5.3 s built for the host, 2.4 times faster, and every build writes the same state
+(`d74b4e78…`). The rows `speed_*` in `RUNS.tsv` hold the reads.
+
 [`RUNS.tsv`](2026-10-23_THE_MOMENT_TOWER_LEARNS_GSM8K_BYTES_ONCE_ITS_MODES_ARE_PASSIVE_AND_ITS_CONTACTS_READ_A_RATIO_receipts/RUNS.tsv)
 and [`SAMPLES.tsv`](2026-10-23_THE_MOMENT_TOWER_LEARNS_GSM8K_BYTES_ONCE_ITS_MODES_ARE_PASSIVE_AND_ITS_CONTACTS_READ_A_RATIO_receipts/SAMPLES.tsv)
 hold every run with its binary, projection, deadline, wall time, peak resident set and hashes;

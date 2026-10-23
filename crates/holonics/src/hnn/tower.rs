@@ -305,21 +305,34 @@ fn transposed(w: &[i32], wmax: u64, cols: usize, y: &[i64], shift: u32, out: &mu
     Ok(())
 }
 
-/// `g[o·cols + i] += y[o] x[i]`: a covector's outer product with a face, at their summed grain.
-fn outer(g: &mut [i128], cols: usize, y: &[i64], x: &[i32]) {
-    let narrow = (reach64(y) as u128) * (reach(x) as u128) < (1u128 << 62);
-    for (o, &yo) in y.iter().enumerate() {
-        if yo == 0 {
-            continue;
-        }
-        let row = &mut g[o * cols..(o + 1) * cols];
-        if narrow {
-            for (a, &xv) in row.iter_mut().zip(x) {
-                *a += (yo * xv as i64) as i128;
+/// `g[o·cols + i] += Σ_t y_t[o] x_t[i]`: a section's outer products of covectors with faces, at
+/// their summed grain. Integer addition is associative, so summing over the section's cells before
+/// the sum reaches the gradient gives the bits one product a cell gives; the sum runs in `i64` where
+/// the terms' bound `Σ_t max|y_t| max|x_t|` allows it.
+fn outer_sum<Y: AsRef<[i64]>, X: AsRef<[i32]>>(g: &mut [i128], cols: usize, ys: &[Y], xs: &[X]) {
+    let bound: u128 = ys.iter().zip(xs).map(|(y, x)| reach64(y.as_ref()) as u128 * reach(x.as_ref()) as u128).sum();
+    for (o, row) in g.chunks_exact_mut(cols).enumerate() {
+        if bound < (1u128 << 62) {
+            let mut acc = vec![0i64; cols];
+            for (y, x) in ys.iter().zip(xs) {
+                let yo = y.as_ref()[o];
+                if yo != 0 {
+                    for (a, &xv) in acc.iter_mut().zip(x.as_ref()) {
+                        *a += yo * xv as i64;
+                    }
+                }
+            }
+            for (slot, a) in row.iter_mut().zip(acc) {
+                *slot += a as i128;
             }
         } else {
-            for (a, &xv) in row.iter_mut().zip(x) {
-                *a += yo as i128 * xv as i128;
+            for (y, x) in ys.iter().zip(xs) {
+                let yo = y.as_ref()[o] as i128;
+                if yo != 0 {
+                    for (slot, &xv) in row.iter_mut().zip(x.as_ref()) {
+                        *slot += yo * xv as i128;
+                    }
+                }
             }
         }
     }
@@ -330,8 +343,19 @@ fn reach64(y: &[i64]) -> u64 {
     y.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0)
 }
 
+/// A fallible map of known length collected into one allocation: `collect::<Result<Vec<_>>>`
+/// cannot read the length through its adapter and grows the vector by reallocation, which crosses
+/// the allocator's lock between the parallel streams.
+fn collect_exact<T>(items: impl ExactSizeIterator<Item = Result<T>>) -> Result<Vec<T>> {
+    let mut out = Vec::with_capacity(items.len());
+    for item in items {
+        out.push(item?);
+    }
+    Ok(out)
+}
+
 fn to32(v: &[i64], what: &'static str) -> Result<Vec<i32>> {
-    v.iter().map(|&x| fit32(x as i128, what)).collect()
+    collect_exact(v.iter().map(|&x| fit32(x as i128, what)))
 }
 
 /// One level's forward temporaries at one cell.
@@ -404,7 +428,7 @@ fn ratio_to_power(r: &[i64]) -> Result<(Vec<i32>, i128)> {
     if scale == 0 {
         return Ok((vec![0; r.len()], 0));
     }
-    let read = r.iter().map(|&v| fit32(div_nearest((v as i128) << FACE_BITS, scale), "a read's ratio outgrew its 32-bit carrier")).collect::<Result<_>>()?;
+    let read = collect_exact(r.iter().map(|&v| fit32(div_nearest((v as i128) << FACE_BITS, scale), "a read's ratio outgrew its 32-bit carrier")))?;
     Ok((read, scale))
 }
 
@@ -416,10 +440,7 @@ fn ratio_adjoint(read: &[i32], scale: i128, cov: &[i64]) -> Result<Vec<i64>> {
     }
     let dot: i128 = read.iter().zip(cov).map(|(&a, &b)| a as i128 * b as i128).sum(); // 2^(−40)
     let mean = div_nearest(dot, read.len() as i128);
-    read.iter()
-        .zip(cov)
-        .map(|(&a, &b)| fit64(div_nearest((b as i128 - release(mean * a as i128, 2 * FACE_BITS)) << FACE_BITS, scale)))
-        .collect()
+    collect_exact(read.iter().zip(cov).map(|(&a, &b)| fit64(div_nearest((b as i128 - release(mean * a as i128, 2 * FACE_BITS)) << FACE_BITS, scale))))
 }
 
 /// `|λ|` on `2^(−30)` and `γ = √(1 − |λ|²)` on `2^(−30)`.
@@ -567,11 +588,7 @@ impl Tower {
             affine(&t[lv.read_im..lv.read_im + w * n], r[3], n, &face[n..], None, 0, 0, &mut read_b)?;
             // The raw read is carried in 64 bits: only its direction reaches the contacts, so its
             // scale is a gauge, and the normalized step lets it grow (see "The read's carrier").
-            let raw: Vec<i64> = read_a
-                .iter()
-                .zip(&read_b)
-                .map(|(a, b)| fit64(release(*a as i128 - *b as i128, MATERIAL_BITS)))
-                .collect::<Result<_>>()?;
+            let raw: Vec<i64> = collect_exact(read_a.iter().zip(&read_b).map(|(a, b)| fit64(release(*a as i128 - *b as i128, MATERIAL_BITS))))?;
             let (read, read_scale) = ratio_to_power(&raw)?;
             let drive_buf = &mut buf[..f];
             affine(&t[lv.contact..lv.contact + f * w], r[4], w, &read, Some(&t[lv.contact_bias..lv.contact_bias + f]), MATERIAL_BITS, MATERIAL_BITS, drive_buf)?;
@@ -579,7 +596,7 @@ impl Tower {
             let conduct: Vec<i32> = drive.iter().map(|&a| a.max(0)).collect();
             let mut ret = vec![0i64; w];
             affine(&t[lv.ret..lv.ret + w * f], r[5], f, &conduct, Some(&t[lv.ret_bias..lv.ret_bias + w]), MATERIAL_BITS, MATERIAL_BITS, &mut ret)?;
-            let next: Vec<i32> = x.iter().zip(&ret).map(|(a, b)| fit32(*a as i128 + *b as i128, "the residual stream outgrew its 32-bit carrier")).collect::<Result<_>>()?;
+            let next: Vec<i32> = collect_exact(x.iter().zip(&ret).map(|(a, b)| fit32(*a as i128 + *b as i128, "the residual stream outgrew its 32-bit carrier")))?;
             let state_copy = modes.clone();
             let push = push_re.into_iter().zip(push_im).collect();
             levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, conduct });
@@ -603,7 +620,7 @@ impl Tower {
 
     /// A section's forward: `classes[0..T]` arrive, `classes[1..=T]` are coded.
     fn forward(&self, state: &mut TowerState, classes: &[usize], reaches: &Reaches) -> Result<Vec<Cell>> {
-        classes[..classes.len() - 1].iter().map(|&u| self.step(state, u, reaches)).collect()
+        collect_exact(classes[..classes.len() - 1].iter().map(|&u| self.step(state, u, reaches)))
     }
 
     /// The reverse scan of one stream's section: the covector of every family, on its natural
@@ -617,6 +634,7 @@ impl Tower {
         let cells_n = cells.len();
         // The face's covector and the top's.
         let mut dx: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
+        let mut dzs: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
         let ro = self.layout.readout;
         let rb = self.layout.readout_bias;
         for (i, cell) in cells.iter().enumerate() {
@@ -628,44 +646,57 @@ impl Tower {
                     p as i64 - if c == target { 1i64 << COVECTOR_BITS } else { 0 }
                 })
                 .collect();
-            outer(&mut g[ro..ro + a * w], w, &dz, &cell.top);
             for (slot, &v) in g[rb..rb + a].iter_mut().zip(&dz) {
                 *slot += v as i128;
             }
             let mut back = vec![0i64; w];
             transposed(&t[ro..ro + a * w], reaches.readout, w, &dz, MATERIAL_BITS, &mut back)?;
             dx.push(back);
+            dzs.push(dz);
         }
+        let tops: Vec<&[i32]> = cells.iter().map(|cell| cell.top.as_slice()).collect();
+        outer_sum(&mut g[ro..ro + a * w], w, &dzs, &tops);
         for l in (0..d.levels).rev() {
             let lv = self.layout.levels[l];
             let r = &reaches.levels[l];
             let mut read_cov: Vec<Vec<(i64, i64)>> = Vec::with_capacity(cells_n);
+            let mut das: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
+            let mut dreads: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
+            let mut negs: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             for (i, cell) in cells.iter().enumerate() {
                 let lc = &cell.levels[l];
                 let dy = &dx[i];
-                outer(&mut g[lv.ret..lv.ret + w * f], f, dy, &lc.conduct);
                 for (slot, &v) in g[lv.ret_bias..lv.ret_bias + w].iter_mut().zip(dy) {
                     *slot += v as i128;
                 }
                 let mut dv = vec![0i64; f];
                 transposed(&t[lv.ret..lv.ret + w * f], r[5], f, dy, MATERIAL_BITS, &mut dv)?;
                 let da: Vec<i64> = dv.iter().zip(&lc.drive).map(|(&v, &drive)| if drive > 0 { v } else { 0 }).collect();
-                outer(&mut g[lv.contact..lv.contact + f * w], w, &da, &lc.read);
                 for (slot, &v) in g[lv.contact_bias..lv.contact_bias + f].iter_mut().zip(&da) {
                     *slot += v as i128;
                 }
                 let mut dr = vec![0i64; w];
                 transposed(&t[lv.contact..lv.contact + f * w], r[4], w, &da, MATERIAL_BITS, &mut dr)?;
                 let dread = ratio_adjoint(&lc.read, lc.read_scale, &dr)?;
-                outer(&mut g[lv.read_re..lv.read_re + w * n], n, &dread, &lc.state_face[..n]);
                 let neg: Vec<i64> = dread.iter().map(|v| -v).collect();
-                outer(&mut g[lv.read_im..lv.read_im + w * n], n, &neg, &lc.state_face[n..]);
                 let mut hre = vec![0i64; n];
                 let mut him = vec![0i64; n];
                 transposed(&t[lv.read_re..lv.read_re + w * n], r[2], n, &dread, MATERIAL_BITS, &mut hre)?;
                 transposed(&t[lv.read_im..lv.read_im + w * n], r[3], n, &neg, MATERIAL_BITS, &mut him)?;
                 read_cov.push(hre.into_iter().zip(him).collect());
+                das.push(da);
+                dreads.push(dread);
+                negs.push(neg);
             }
+            let level = |i: usize| &cells[i].levels[l];
+            let conducts: Vec<&[i32]> = (0..cells_n).map(|i| level(i).conduct.as_slice()).collect();
+            let reads: Vec<&[i32]> = (0..cells_n).map(|i| level(i).read.as_slice()).collect();
+            let faces_re: Vec<&[i32]> = (0..cells_n).map(|i| &level(i).state_face[..n]).collect();
+            let faces_im: Vec<&[i32]> = (0..cells_n).map(|i| &level(i).state_face[n..]).collect();
+            outer_sum(&mut g[lv.ret..lv.ret + w * f], f, &dx, &conducts);
+            outer_sum(&mut g[lv.contact..lv.contact + f * w], w, &das, &reads);
+            outer_sum(&mut g[lv.read_re..lv.read_re + w * n], n, &dreads, &faces_re);
+            outer_sum(&mut g[lv.read_im..lv.read_im + w * n], n, &negs, &faces_im);
             // The reverse scan of the modes: G_h(t) = read covector + conj(λ) G_h(t+1).
             let mut carried: Vec<(i64, i64)> = vec![(0, 0); n];
             let mut gh_all: Vec<Vec<(i64, i64)>> = vec![Vec::new(); cells_n];
@@ -684,6 +715,8 @@ impl Tower {
             let gammas = &reaches.gammas[l];
             // S_k = Σ_t Re(conj(G_h) B x): the covector of the mode's γ, on 2^(−48).
             let mut through_gamma = vec![0i128; n];
+            let mut gres: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
+            let mut gims: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             for (i, cell) in cells.iter().enumerate() {
                 let lc = &cell.levels[l];
                 let previous: &[(i64, i64)] = if i == 0 { &opening.modes[l] } else { &cells[i - 1].levels[l].state };
@@ -695,21 +728,20 @@ impl Tower {
                     g[lv.move_im + k] += hr * gi - hi * gr;
                     through_gamma[k] += gr * lc.push[k].0 as i128 + gi * lc.push[k].1 as i128;
                 }
-                let gre: Vec<i64> = gh.iter().zip(gammas).map(|(v, &c)| fit64(release(c * v.0 as i128, MOVE_BITS))).collect::<Result<_>>()?;
-                let gim: Vec<i64> = gh.iter().zip(gammas).map(|(v, &c)| fit64(release(c * v.1 as i128, MOVE_BITS))).collect::<Result<_>>()?;
-                outer(&mut g[lv.push_re..lv.push_re + n * w], w, &gre, &lc.input);
-                outer(&mut g[lv.push_im..lv.push_im + n * w], w, &gim, &lc.input);
+                let gre: Vec<i64> = collect_exact(gh.iter().zip(gammas).map(|(v, &c)| fit64(release(c * v.0 as i128, MOVE_BITS))))?;
+                let gim: Vec<i64> = collect_exact(gh.iter().zip(gammas).map(|(v, &c)| fit64(release(c * v.1 as i128, MOVE_BITS))))?;
                 let mut back_re = vec![0i64; w];
                 let mut back_im = vec![0i64; w];
                 transposed(&t[lv.push_re..lv.push_re + n * w], r[0], w, &gre, MATERIAL_BITS, &mut back_re)?;
                 transposed(&t[lv.push_im..lv.push_im + n * w], r[1], w, &gim, MATERIAL_BITS, &mut back_im)?;
-                let next: Vec<i64> = dx[i]
-                    .iter()
-                    .zip(back_re.iter().zip(&back_im))
-                    .map(|(v, (a, b))| fit64(*v as i128 + *a as i128 + *b as i128))
-                    .collect::<Result<_>>()?;
+                let next: Vec<i64> = collect_exact(dx[i].iter().zip(back_re.iter().zip(&back_im)).map(|(v, (a, b))| fit64(*v as i128 + *a as i128 + *b as i128)))?;
                 dx[i] = next;
+                gres.push(gre);
+                gims.push(gim);
             }
+            let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].input.as_slice()).collect();
+            outer_sum(&mut g[lv.push_re..lv.push_re + n * w], w, &gres, &inputs);
+            outer_sum(&mut g[lv.push_im..lv.push_im + n * w], w, &gims, &inputs);
             // ∂γ/∂λ = −λ/γ.
             for k in 0..n {
                 let (lr, li) = (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128);

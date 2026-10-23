@@ -1,0 +1,8 @@
+# The machine's laws are exact integer arithmetic, so the host's own vector units change no bit of
+# a result and only its time: on the tower's training section, building for the host's CPU took a
+# timing read from 7.6 s to 5.3 s with the same state (the moment tower's record of October 23,
+# "Speed and receipts").
+# Every binary is built on the machine that runs it. A build for another machine sets RUSTFLAGS,
+# which replaces this.
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-C", "target-cpu=native"]
