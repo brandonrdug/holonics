@@ -1,0 +1,43 @@
+# passage_ctw on the first 1,000 GSM8K training problems (2,084,620 cells), every arm one thread.
+# Columns: depth D, passage horizon 2^m cells (m = 0: plain tree), passage weight w.
+# Development read (100 problems, 217,152 cells):
+D= 6 m= 0 w=0 online 0.8760 (1.42 us/cell)
+D=16 m= 0 w=0 online 0.6926 (5.48 us/cell)
+D=24 m= 0 w=0 online 0.6903 (12.74 us/cell)
+D=16 m=11 w=1 online 0.6687 (5.35 us/cell)
+# Grid 1 (four runs together, then two):
+D=16 m= 0 w=0 cells 2084620: online 0.5700 bits/digit; quarters 0.6350 0.5656 0.5441 0.5354; nodes 687636  (11.6 s, 5.55 us/cell, peak 74 MiB)
+D=16 m= 9 w=1 cells 2084620: online 0.5639 bits/digit; quarters 0.6249 0.5602 0.5393 0.5309; nodes 687636  (12.6 s, 6.04 us/cell, peak 74 MiB)
+D=16 m=13 w=1 cells 2084620: online 0.5561 bits/digit; quarters 0.6125 0.5532 0.5331 0.5254; nodes 687636  (12.7 s, 6.10 us/cell, peak 74 MiB)
+D=16 m=11 w=1 cells 2084620: online 0.5586 bits/digit; quarters 0.6165 0.5556 0.5351 0.5272; nodes 687636  (12.7 s, 6.11 us/cell, peak 74 MiB)
+D=16 m=11 w=0.25 cells 2084620: online 0.5666 bits/digit; quarters 0.6294 0.5627 0.5415 0.5330; nodes 687636  (12.1 s, 5.83 us/cell, peak 74 MiB)
+D=16 m=11 w=4 cells 2084620: online 0.5404 bits/digit; quarters 0.5893 0.5391 0.5199 0.5134; nodes 687636  (12.2 s, 5.83 us/cell, peak 74 MiB)
+D=24 m= 0 w=0 cells 2084620: online 0.5553 bits/digit; quarters 0.6290 0.5533 0.5260 0.5130; nodes 4246939  (25.4 s, 12.17 us/cell, peak 489 MiB)
+D=24 m=13 w=1 cells 2084620: online 0.5411 bits/digit; quarters 0.6064 0.5406 0.5147 0.5028; nodes 4246939  (27.3 s, 13.09 us/cell, peak 489 MiB)
+D=24 m=11 w=1 cells 2084620: online 0.5437 bits/digit; quarters 0.6106 0.5430 0.5168 0.5046; nodes 4246939  (27.7 s, 13.27 us/cell, peak 489 MiB)
+D=24 m= 9 w=1 cells 2084620: online 0.5490 bits/digit; quarters 0.6190 0.5477 0.5211 0.5084; nodes 4246939  (28.0 s, 13.43 us/cell, peak 489 MiB)
+D=24 m=11 w=4 cells 2084620: online 0.5258 bits/digit; quarters 0.5836 0.5267 0.5018 0.4912; nodes 4246939  (25.2 s, 12.09 us/cell, peak 489 MiB)
+D=24 m=11 w=0.25 cells 2084620: online 0.5519 bits/digit; quarters 0.6235 0.5502 0.5233 0.5105; nodes 4246939  (26.0 s, 12.49 us/cell, peak 489 MiB)
+done
+# Grid 2:
+D=16 m=12 w=8 cells 2084620: online 0.5253 bits/digit; quarters 0.5702 0.5243 0.5061 0.5007; nodes 687636  (11.7 s, 5.64 us/cell, peak 74 MiB)
+D=16 m=11 w=16 cells 2084620: online 0.5151 bits/digit; quarters 0.5575 0.5144 0.4967 0.4917; nodes 687636  (12.1 s, 5.82 us/cell, peak 74 MiB)
+D=16 m=13 w=4 cells 2084620: online 0.5364 bits/digit; quarters 0.5846 0.5349 0.5161 0.5101; nodes 687636  (12.2 s, 5.85 us/cell, peak 74 MiB)
+D=16 m=13 w=16 cells 2084620: online 0.5139 bits/digit; quarters 0.5616 0.5121 0.4936 0.4883; nodes 687636  (12.6 s, 6.05 us/cell, peak 74 MiB)
+D=24 m=13 w=16 cells 2084620: online 0.5003 bits/digit; quarters 0.5556 0.5006 0.4770 0.4680; nodes 4246939  (26.3 s, 12.64 us/cell, peak 489 MiB)
+D=24 m=13 w=4 cells 2084620: online 0.5217 bits/digit; quarters 0.5785 0.5224 0.4980 0.4877; nodes 4246939  (27.1 s, 13.00 us/cell, peak 489 MiB)
+D=24 m=12 w=8 cells 2084620: online 0.5113 bits/digit; quarters 0.5646 0.5124 0.4888 0.4793; nodes 4246939  (27.6 s, 13.22 us/cell, peak 489 MiB)
+D=24 m=11 w=16 cells 2084620: online 0.5019 bits/digit; quarters 0.5525 0.5033 0.4802 0.4714; nodes 4246939  (28.0 s, 13.42 us/cell, peak 489 MiB)
+done
+# Control: m = 24 (horizon past the passage), so c ~ (1 + w) n: sharpening without locality:
+D=16 m=24 w=4 cells 2084620: online 0.5487 bits/digit; quarters 0.5996 0.5470 0.5274 0.5206; nodes 687636  (12.4 s, 5.96 us/cell, peak 74 MiB)
+D=16 m=24 w=16 cells 2084620: online 0.5522 bits/digit; quarters 0.6033 0.5511 0.5307 0.5237; nodes 687636  (12.6 s, 6.03 us/cell, peak 74 MiB)
+D=24 m=24 w=4 cells 2084620: online 0.5288 bits/digit; quarters 0.5896 0.5298 0.5038 0.4921; nodes 4246939  (25.6 s, 12.29 us/cell, peak 489 MiB)
+D=24 m=24 w=16 cells 2084620: online 0.5320 bits/digit; quarters 0.5921 0.5335 0.5068 0.4956; nodes 4246939  (25.8 s, 12.40 us/cell, peak 489 MiB)
+done
+# Grid 3 (bracketing w at D = 24):
+D=24 m=13 w=32 cells 2084620: online 0.4937 bits/digit; quarters 0.5530 0.4936 0.4687 0.4595; nodes 4246939  (27.0 s, 12.98 us/cell, peak 489 MiB)
+D=24 m=15 w=32 cells 2084620: online 0.5065 bits/digit; quarters 0.5712 0.5081 0.4796 0.4671; nodes 4246939  (27.2 s, 13.06 us/cell, peak 489 MiB)
+D=24 m=15 w=16 cells 2084620: online 0.5068 bits/digit; quarters 0.5681 0.5075 0.4813 0.4703; nodes 4246939  (27.3 s, 13.12 us/cell, peak 489 MiB)
+D=24 m=13 w=64 cells 2084620: online 0.4922 bits/digit; quarters 0.5571 0.4924 0.4651 0.4543; nodes 4246939  (27.5 s, 13.20 us/cell, peak 488 MiB)
+done

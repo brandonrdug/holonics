@@ -121,7 +121,62 @@ What the table says:
 - The linear arm reproduces the earlier harness exactly (1.271 and 1.388), which checks the new
   harness.
 
-## 5. Owed (#410)
+## 5. The tree's second spectral placement: the passage tree
+
+The design thread measured that diagonal modes add nothing once the receiving tree reaches depth 16
+(0.614 against 0.613 bits a cell, GSM8K). It asked what a mode bank should carry that the tree
+cannot.
+
+**The bound.** Beyond a tree of depth `D` with context `C_t`, any read adds at most
+`I(u_t ; u_(<t−D) | C_t)`. A mode splits as `z_t = N_t + λ^D z_(t−D)` with `N_t` a function of
+`C_t`, so only the damped far part can add anything, and a shared read sees it mixed with `N_t`.
+At `|λ| = 0.95` a cell the far share of a mode's energy is `|λ|^(2D)`: 0.19 at `D = 16` and 0.085 at
+`D = 24`. The bank's memory, `1/(1 − |λ|) = 20` cells, sits inside the tree's horizon.
+
+**The address.** In text, what the far past says given `C_t` is mostly the passage's own
+statistics: this problem's names, numbers and units recur, and global counts dilute them. That is
+a function of (context, next symbol), which a bank addressed only by the current symbol cannot
+hold. A KT count `n(c, a)` is the `λ = 1` mode of the indicator `[context c, next a]`. The passage
+term is the same indicator's mode at `λ = 1 − 2^(−m)`, a decayed count `l(c, a)` at every node.
+This makes a two-by-two table:
+
+| address | `λ = 1` | `|λ| = 1 − 2^(−m)` |
+|---|---|---|
+| the current symbol only | unigram counts | the design's diagonal bank |
+| tree context | the tree | the passage tree |
+
+In exact arithmetic the decay is a dyadic release with the residue carried
+(`CarriedRelease.residueRun_conserves`); the plain floor silences counts below `2^m`
+(`plainTransported_silences`). No routine looks up an earlier occurrence. Copying is what the
+counts read when the passage repeats itself.
+
+**Measurement.** The read is an exterior float read on the first 1,000 GSM8K training problems,
+2,084,620 quarter-character cells, scored before each cell is counted. The tree is context-tree
+weighting over depths `0..D`, one tree per frame phase, with each node's estimator
+`q(a) = (c_a + ½)/(C + 2)`. The plain tree has `c = n`, and the passage tree has `c = n + w·l`. The
+control uses a horizon of `2^24` cells, longer than the passage, so `c ≈ (1 + w) n`: the same
+sharpening of the estimator with no locality.
+
+| arm | `D = 16` | `D = 24` |
+|---|---|---|
+| plain tree | 0.5700 | 0.5553 |
+| control, `w = 4` (the best control) | 0.5487 | 0.5288 |
+| passage tree, horizon `2^13`, `w = 16` | 0.5139 | 0.5003 |
+| passage tree, horizon `2^13`, `w = 64` | | 0.4922 |
+
+- Over the best control, the passage tree gains 0.035 bits a cell at `D = 16` (`w = 16`) and
+  0.037 at `D = 24` (`w = 64`), 6 to 7%.
+- The gain holds through the passage: in the last quarter, 0.4543 against 0.4921 at `D = 24`.
+- A horizon of `2^13` cells (about 2,000 characters, four problems) beats `2^11` (0.5019) and
+  `2^15` (0.5068) at `D = 24`.
+- The weight is not bracketed: 16, 32 and 64 give 0.5003, 0.4937 and 0.4922.
+- The horizon and weight were chosen over 17 arms on the same online run. In the machine they are
+  located by deposition, not taken from this grid.
+- This tree is weaker than the design's own (0.533 and 0.507 at `D = 16` and `24` on the design's
+  rendering of the same 1,000 problems). How much of the gain survives on that tree is not
+  measured.
+
+## 6. Owed (#410)
 
 - The summed contact material is the sheaf Laplacian: `Σ_e w_e J_e*DJ_e = δᵀ W δ`, its kernel the
   global sections, and the tower's obstruction the cokernel of `δ`, at the contact and tower
@@ -138,4 +193,15 @@ What the table says:
   the tree, three runs together). The projection was 232 s and the deadline 240 s.
 - The three full runs went together, one thread each: 110.9 s, 176.2 s and 228.3 s, all at 48 to
   49 MiB peak. The ratio of measured to projected for the slowest run is 0.98.
-- No Rust or Lean changed.
+- [`passage_ctw.rs`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/passage_ctw.rs)
+  (built with `rustc -O`), the rendering
+  [`render_gsm8k.py`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/render_gsm8k.py),
+  and every arm's output in
+  [`passage_ctw.txt`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/passage_ctw.txt).
+  The rendering is `question\nanswer\n` a problem, 153 bytes longer over 100 problems than the
+  design's.
+- A development read on 100 problems measured at most 12.74 µs a cell, at `D = 24`. Allowing twice
+  that for the larger table, the projection was at most 53 s a run, and the deadline was 60 s a run.
+  Runs went four together, one thread each. The slowest took 28.0 s (ratio 0.53), with a peak of
+  489 MiB.
+- No Rust or Lean in the crates or the Lean package changed.
