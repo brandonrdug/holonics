@@ -1,0 +1,84 @@
+{
+ "size + ring 10": {
+  "leading first": {
+   "per place (units, tens, hundreds, thousands)": [
+    0.0,
+    0.902,
+    1.545,
+    0.426
+   ],
+   "total": 2.873
+  },
+  "units first": {
+   "per place (units, tens, hundreds, thousands)": [
+    0.0,
+    2.182,
+    0.689,
+    0.002
+   ],
+   "total": 2.873
+  },
+  "joint (each place given all others)": [
+   0.0,
+   0.902,
+   0.502,
+   0.002
+  ],
+  "whole word given the held faces": 2.872
+ },
+ "size + ring 10 + ring 9": {
+  "leading first": {
+   "per place (units, tens, hundreds, thousands)": [
+    0.0,
+    0.023,
+    0.551,
+    0.224
+   ],
+   "total": 0.798
+  },
+  "units first": {
+   "per place (units, tens, hundreds, thousands)": [
+    0.0,
+    0.789,
+    0.009,
+    0.0
+   ],
+   "total": 0.798
+  },
+  "joint (each place given all others)": [
+   0.0,
+   0.023,
+   0.001,
+   0.0
+  ],
+  "whole word given the held faces": 0.798
+ },
+ "size + ring 10 + ring 9 + ring 11": {
+  "leading first": {
+   "per place (units, tens, hundreds, thousands)": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "total": 0.0
+  },
+  "units first": {
+   "per place (units, tens, hundreds, thousands)": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "total": 0.0
+  },
+  "joint (each place given all others)": [
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "whole word given the held faces": 0.0
+ },
+ "elapsed_ms": 1296
+}

@@ -1,0 +1,80 @@
+{
+ "chains": [
+  {
+   "summands": 2,
+   "base": 2,
+   "stationary is Eulerian/n!": true,
+   "eigenvalues 1, 1/b, ..": true,
+   "stationary": [
+    "1/2",
+    "1/2"
+   ]
+  },
+  {
+   "summands": 2,
+   "base": 10,
+   "stationary is Eulerian/n!": true,
+   "eigenvalues 1, 1/b, ..": true,
+   "stationary": [
+    "1/2",
+    "1/2"
+   ]
+  },
+  {
+   "summands": 3,
+   "base": 2,
+   "stationary is Eulerian/n!": true,
+   "eigenvalues 1, 1/b, ..": true,
+   "stationary": [
+    "1/6",
+    "2/3",
+    "1/6"
+   ]
+  },
+  {
+   "summands": 3,
+   "base": 10,
+   "stationary is Eulerian/n!": true,
+   "eigenvalues 1, 1/b, ..": true,
+   "stationary": [
+    "1/6",
+    "2/3",
+    "1/6"
+   ]
+  },
+  {
+   "summands": 4,
+   "base": 3,
+   "stationary is Eulerian/n!": true,
+   "eigenvalues 1, 1/b, ..": true,
+   "stationary": [
+    "1/24",
+    "11/24",
+    "11/24",
+    "1/24"
+   ]
+  }
+ ],
+ "passage sums: places with both digits, carries out, by place from the units (3 = 3 and above)": {
+  "0": [
+   3815,
+   926
+  ],
+  "1": [
+   2261,
+   419
+  ],
+  "2": [
+   655,
+   118
+  ],
+  "3": [
+   247,
+   29
+  ]
+ },
+ "passage sums: all": [
+  6978,
+  1492
+ ]
+}

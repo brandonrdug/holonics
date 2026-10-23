@@ -1,0 +1,13 @@
+# ctw_beta D K m w file; K = 0 never releases. Development reads on the first 100 problems:
+D=24 K=0 m= 0 w=0 cells 217152: online 0.6903 bits/digit; quarters 0.7859 0.6963 0.6423 0.6368; max |log2 beta| 67164.0; releases 0; nodes 992119  (1.1 s, 5.20 us/cell, peak 109 MiB)
+D=24 K=4 m= 0 w=0 cells 217152: online 0.8080 bits/digit; quarters 0.8739 0.8120 0.7741 0.7722; max |log2 beta| 4.0; releases 1330266; nodes 992119  (0.8 s, 3.58 us/cell, peak 109 MiB)
+D=24 K=8 m= 0 w=0 cells 217152: online 0.6926 bits/digit; quarters 0.7859 0.6996 0.6436 0.6412; max |log2 beta| 8.0; releases 1112256; nodes 992119  (0.9 s, 4.37 us/cell, peak 109 MiB)
+D=24 K=16 m= 0 w=0 cells 217152: online 0.6897 bits/digit; quarters 0.7854 0.6960 0.6416 0.6357; max |log2 beta| 16.0; releases 927361; nodes 992119  (0.8 s, 3.86 us/cell, peak 109 MiB)
+# the first 1,000 problems; projection 31 s a run, deadline 60 s a run, four together, then three together:
+D=24 K=16 m= 0 w=0 cells 2084620: online 0.5544 bits/digit; quarters 0.6282 0.5524 0.5250 0.5121; max |log2 beta| 16.0; releases 13370295; nodes 4246939  (10.7 s, 5.12 us/cell, peak 432 MiB)
+D=24 K=32 m= 0 w=0 cells 2084620: online 0.5553 bits/digit; quarters 0.6290 0.5532 0.5260 0.5130; max |log2 beta| 32.0; releases 11686757; nodes 4246939  (10.9 s, 5.21 us/cell, peak 432 MiB)
+D=24 K=0 m= 0 w=0 cells 2084620: online 0.5553 bits/digit; quarters 0.6290 0.5533 0.5260 0.5130; max |log2 beta| 720804.9; releases 0; nodes 4246939  (11.2 s, 5.38 us/cell, peak 432 MiB)
+D=24 K=16 m=13 w=64 cells 2084620: online 0.4902 bits/digit; quarters 0.5547 0.4904 0.4632 0.4525; max |log2 beta| 16.0; releases 13017425; nodes 4246939  (13.5 s, 6.50 us/cell, peak 432 MiB)
+D=16 K=16 m= 0 w=0 cells 2084620: online 0.5691 bits/digit; quarters 0.6341 0.5648 0.5431 0.5344; max |log2 beta| 16.0; releases 12502860; nodes 687636  (3.2 s, 1.54 us/cell, peak 64 MiB)
+D=24 K=8 m= 0 w=0 cells 2084620: online 0.5624 bits/digit; quarters 0.6333 0.5604 0.5340 0.5217; max |log2 beta| 8.0; releases 15496439; nodes 4246939  (8.8 s, 4.22 us/cell, peak 432 MiB)
+D=24 K=12 m= 0 w=0 cells 2084620: online 0.5538 bits/digit; quarters 0.6273 0.5518 0.5244 0.5116; max |log2 beta| 12.0; releases 14198912; nodes 4246939  (9.2 s, 4.43 us/cell, peak 433 MiB)

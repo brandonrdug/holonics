@@ -1,0 +1,7 @@
+command: python3 -I additive_ceiling.py 100 docs/ELEMENTARY_OBJECTS.md docs/THE_MACHINE.md CONSTRUCTION_STATE.md docs/plans/THE_REBUILD.md (corpus at a37a7e3)
+projection: 2.24 s per step measured over 5 steps, so 224 s per fit; deadline 520 s for both fits; peak resident not measured
+  100 iters 225.8 s
+additive lags 1..6 + frame bias:           1.440 bits/digit
+  100 iters 222.3 s
+additive lags 1..6, weights by frame phase: 1.266 bits/digit
+measured/projected: 225.8/224 and 222.3/224

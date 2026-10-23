@@ -1,0 +1,9 @@
+question / context                   best boost | turn rms 0.3733 {'h': 2.1647} | shear rms 0.1584 {'h': 1.9261, 'k': 12206.7878} | boost rms 0.0120 {'h': 1.1865, 'c': 12.0655, 'alpha': 0.22}
+question / alone                     best boost | turn rms 0.3546 {'h': 2.1368} | shear rms 0.1557 {'h': 1.912, 'k': 11503.725} | boost rms 0.0161 {'h': 1.0059, 'c': 8.9294, 'alpha': 0.18}
+answer prose / context               best boost | turn rms 0.1328 {'h': 1.4612} | shear rms 0.0527 {'h': 1.3751, 'k': 4403.87} | boost rms 0.0297 {'h': 1.2091, 'c': 7.4819, 'alpha': 0.3}
+answer prose / alone                 best boost | turn rms 0.3026 {'h': 1.8293} | shear rms 0.1470 {'h': 1.6426, 'k': 9551.5789} | boost rms 0.0530 {'h': 0.6047, 'c': 6.1567, 'alpha': 0.14}
+answer numbers / context             best boost | turn rms 0.0726 {'h': 2.633} | shear rms 0.0297 {'h': 2.5679, 'k': 2236.1092} | boost rms 0.0072 {'h': -0.6431, 'c': 4.0556, 'alpha': 0.02}
+answer numbers / alone               best boost | turn rms 0.0491 {'h': 2.8222} | shear rms 0.0397 {'h': 2.7938, 'k': 974.8737} | boost rms 0.0262 {'h': 0.937, 'c': 2.3336, 'alpha': 0.02}
+calculation markup / context         best boost | turn rms 0.1894 {'h': 1.938} | shear rms 0.0872 {'h': 1.7926, 'k': 5782.0555} | boost rms 0.0330 {'h': -5.4627, 'c': 9.2179, 'alpha': 0.02}
+calculation markup / alone           best boost | turn rms 0.1705 {'h': 1.9524} | shear rms 0.1031 {'h': 1.8349, 'k': 4670.5133} | boost rms 0.0460 {'h': -4.5641, 'c': 8.1166, 'alpha': 0.02}
+whole passage                        best boost | turn rms 0.3059 {'h': 1.968} | shear rms 0.1385 {'h': 1.7897, 'k': 10133.554} | boost rms 0.0224 {'h': 1.2197, 'c': 8.7557, 'alpha': 0.21}

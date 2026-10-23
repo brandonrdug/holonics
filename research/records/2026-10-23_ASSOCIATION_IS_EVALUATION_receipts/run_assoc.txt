@@ -1,0 +1,33 @@
+met/lead                  8194  ring 1.105  base 1.955
+met/left/0               11066  ring 1.078  base 1.919
+met/left/1                8194  ring 0.705  base 1.425
+met/left/2                2024  ring 0.718  base 1.403
+met/left/3                 338  ring 0.920  base 1.710
+met/middle                2362  ring 0.911  base 1.702
+met/right/0              11066  ring 0.747  base 1.472
+met/right/1               8194  ring 0.973  base 1.783
+met/right/2               2024  ring 1.334  base 2.265
+met/right/3                338  ring 1.582  base 2.502
+met/units                 8194  ring 0.657  base 1.351
+unmet/lead                8347  ring 3.536  base 3.444
+unmet/left/0              9400  ring 3.620  base 3.522
+unmet/left/1              8347  ring 3.781  base 3.704
+unmet/left/2              4380  ring 3.182  base 3.211
+unmet/left/3              2316  ring 2.329  base 2.354
+unmet/middle              6696  ring 3.365  base 3.341
+unmet/right/0             9400  ring 3.497  base 3.450
+unmet/right/1             8347  ring 3.590  base 3.519
+unmet/right/2             4380  ring 3.332  base 3.285
+unmet/right/3             2316  ring 3.229  base 3.177
+unmet/units               8347  ring 3.397  base 3.363
+units|operand units +                          3815  H 0.0000  contexts 100
+lead|operand lead+lengths +                    3398  H 0.5208  contexts 522
+lead|operand two leading+lengths +             3398  H 0.0000  contexts 1773
+units|operand units *                          6287  H 0.0000  contexts 98
+lead|operand lead+lengths *                    5619  H 0.5585  contexts 591
+lead|operand two leading+lengths *             5619  H 0.0014  contexts 1476
+units|operand units -                          3389  H 0.0000  contexts 100
+lead|operand lead+lengths -                    2580  H 1.0548  contexts 326
+lead|operand two leading+lengths -             2580  H 0.0311  contexts 1466
+calculations 21268 integer results 20466
+exit 0 wall 1.5 s peak 260 MiB (largest child so far)

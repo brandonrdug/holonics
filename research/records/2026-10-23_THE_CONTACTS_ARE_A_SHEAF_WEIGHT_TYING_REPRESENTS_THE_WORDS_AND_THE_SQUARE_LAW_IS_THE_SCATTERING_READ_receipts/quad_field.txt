@@ -1,0 +1,6 @@
+lin  alone K= 8 eta=0.02 rho=0.950 cells 2027360: online 1.2710 held-out 1.3878 bits/digit; per 500k 1.2884 1.2650 1.2635 1.3395  (110.9 s, 54.69 us/cell, peak 48 MiB)
+lin alone exit 0
+quad alone K= 8 eta=0.02 rho=0.950 cells 2027360: online 1.2163 held-out 1.3444 bits/digit; per 500k 1.2362 1.2086 1.2093 1.2876  (176.2 s, 86.93 us/cell, peak 48 MiB)
+quad alone exit 0
+quad tree  K= 8 eta=0.02 rho=0.950 cells 2027360: online 0.9196 bits/digit; per 500k 0.9629 0.9150 0.9041 0.8976  (228.3 s, 112.62 us/cell, peak 49 MiB)
+quad tree exit 0
