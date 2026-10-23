@@ -235,7 +235,35 @@ correction. Coupled binary sites are the parametron's locks, and ferromagnetic c
 of their partition function on the unit circle (`parametron.coupled-locks-lee-yang`), the RH-shaped
 statement already inside the machine's objects.
 
-### 4e. So arithmetic is learned as Brandon describes
+### 4e. The carry is a heat bath `[proved-standard; proved-derived where marked]`
+
+Add `n` numbers place by place, with uniform digits. The carry out of each place is a Markov chain on
+`{0, …, n − 1}` (Holte 1997):
+- its eigenvalues are `1, 1/b, …, 1/b^(n−1)`;
+- its stationary law is `A(n, j)/n!`, the Eulerian numbers, in every base. For two summands that is
+  `1/2, 1/2`; for three, `1/6, 2/3, 1/6`; for four, `1/24, 11/24, 11/24, 1/24`.
+
+It is the same chain as the descents of a `b`-riffle shuffle of `n` cards (Diaconis–Fulman 2009):
+adding numbers is shuffling. The combinatorial potential of the carry is the count of permutations
+with `j` descents.
+
+**The binary potential that integrates at each place** `[proved-derived]`. A place of two summands
+**generates** a carry when its digit-pair sum is at least `b`, **kills** it when the sum is at most
+`b − 2`, and **propagates** the incoming carry when the sum is `b − 1`. In base 2, generate is the AND and
+propagate the XOR, the bitwise operations of Brandon's second lens. The carry into a place is still
+unread after `m` lower places exactly when all `m` propagate, which for uniform digits has probability
+`b^(−m)`: the chain's second eigenvalue to the `m`-th power. So the uncertainty about a carry relaxes by
+a factor of `b` for each place read below it. This is why each further leading digit of the operands
+closes the leading fibre (§3).
+
+`[interpretation]` The carry is a bath that relaxes at `1/b` per place: its value, once read, is held
+exactly and carried, while the uncertainty about it decays geometrically down the places.
+
+`[measured]` The passage's sums carry out of 1,492 of their 6,978 places with two digits (21%). Uniform
+digits would carry out of 45% at the units and 50% in the stationary law: the passage's round amounts
+rarely carry.
+
+### 4f. So arithmetic is learned as Brandon describes
 
 The conserved faces are the base's atom rings (trailing, exact) and the energy circle (leading, up to
 the carry fibre) `[proved-derived]`. The digit distributions of interacting digits are pushforwards of
@@ -267,7 +295,8 @@ gives 498.
    mode.
 4. **The carry is the carried residue.** A dormant mode holds it, with `|λ|` at one while a numeral
    passes, and its residue is carried, never rounded away (`release.carried-residue` against
-   `release.plain-rounding-annihilates`).
+   `release.plain-rounding-annihilates`). The uncertainty about it, read from the places below, relaxes
+   by `1/b` per place (§4e): a located carry key shows that rate.
 5. **Place is right-anchored.** A digit's place is known only when its numeral ends, and the result is
    written leading digit first. The leading face needs the operands' two leading digits and lengths to
    close its fibre (98–99% of sums and products here). The units face closes exactly from the operands'
@@ -309,10 +338,11 @@ gives 498.
     `9x ≡ −x` and `n⁵ ≡ n (mod 10)`; the unit ring's discrete log;
   - `tr(A^p) ≡ tr(A) (mod p)` for integer matrices, which extends #410's box on necklace integrality
     for a general return map (the map case is `PrimitiveCycle`);
+  - the carries chain's stationary Eulerian law and spectrum, and carry lookahead's `b^(−m)`;
   - the clock cast of `w`.
 - **Atlas rows:** `arith.association-is-evaluation`, `radix.difference-leading-cancellation`,
   `radix.multiplier-face-action`, `radix.product-digit-law-factors`, `arith.fermat-ring-partition`,
-  `radix.leading-face-gas` and `code.clock-cast`.
+  `radix.leading-face-gas`, `radix.carry-chain-eulerian` and `code.clock-cast`.
 
 ## Receipts
 
@@ -326,11 +356,15 @@ gives 498.
 - `digits.py` reads the products' trailing and leading digit laws and writes `digits.json`.
 - `fermat.py` checks §4's identities exactly, including 3,600 congruence checks over random integer
   matrices, with no failure.
+- `carries.py` checks the carries chain (stationary law and eigenvalues for two to four summands in
+  bases 2, 3 and 10) and carry lookahead exactly, reads the passage's carries, and writes
+  `carries.json`.
 
-**Run receipts** `run_assoc.txt`, `run_fibre.txt`, `run_digits.txt` and `run_fermat.txt`.
+**Run receipts** `run_assoc.txt`, `run_fibre.txt`, `run_digits.txt`, `run_fermat.txt` and
+`run_carries.txt`.
 
 **Time.** The runs were unmeasured beforehand, so they were planned under the one-to-three-minute rule,
 with deadlines of 120 s (`assoc.py`) and 60 s (the others).
 - `assoc.py` took 16.9 s with a cold read and 1.5 s warm, with a peak of 260 MiB. That is 0.14 of its
   deadline.
-- `fibre.py` took 0.1 s, `digits.py` under a second and `fermat.py` 2.2 s.
+- `fibre.py` took 0.1 s, `digits.py` under a second, `fermat.py` 2.2 s and `carries.py` 0.3 s.
