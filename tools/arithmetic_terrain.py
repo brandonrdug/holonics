@@ -16,9 +16,22 @@ Writes to OUT_DIR (which must not exist):
   3: everything else (operands, signs, the line's end).
 
 usage: python3 -I arithmetic_terrain.py N HELD_PER_MILLE KEY OUT_DIR
+
+The drawn terrain, for a passage's own markup:
+  python3 -I arithmetic_terrain.py drawn LENGTH COUNT KEY EXCLUDE_TEXT OUT_DIR
+draws COUNT expressions of each of +, -, * and / with each operand's length uniform in 1..LENGTH and
+its digits uniform (a leading digit nonzero); a quotient is exact, a = q*b with q and b drawn so. It
+writes OUT_DIR/terrain.txt, one `<<a op b=c>>c` a line (the calculation markup of the prepared
+GSM8K text), and leaves out every operand pair that EXCLUDE_TEXT calculates (unordered for + and *),
+so a held-out problem's calculation is never met in the terrain.
+
+  python3 -I arithmetic_terrain.py interleave PASSAGE TERRAIN OUT
+spreads the terrain's lines evenly through a passage of problems separated by a blank line: after
+problem i the lines from floor(i T / P) to floor((i + 1) T / P), as one paragraph of their own.
 """
 import hashlib
 import os
+import re
 import sys
 
 OPERATIONS = "+-*"
@@ -84,5 +97,74 @@ def main():
           f"dev_bytes={len(dev)} unseen_digits={counts[0]} seen_digits={counts[1]} scale_zeros={counts[2]} rest={counts[3]}")
 
 
+def number(key, label, length):
+    """A number of `length` digits, each uniform, its leading digit nonzero unless it is one digit."""
+    raw = int.from_bytes(keyed(key, label)[:8], "big")
+    low = 0 if length == 1 else 10 ** (length - 1)
+    return low + raw % (10**length - low)
+
+
+def calculations(text):
+    pairs = set()
+    for a, op, b in re.findall(rb"<<(\d+)([-+*/])(\d+)=", text):
+        a, b, op = int(a), int(b), op.decode()
+        pairs.add((op, min(a, b), max(a, b)) if op in "+*" else (op, a, b))
+    return pairs
+
+
+def drawn(length, count, key, exclude, out):
+    os.mkdir(out)
+    excluded = calculations(open(exclude, "rb").read())
+    lines, left_out = [], 0
+    for op in "+-*/":
+        k, kept = 0, 0
+        while kept < count:
+            label = f"drawn:{op}:{k}"
+            k += 1
+            la = 1 + keyed(key, label + ":la")[0] % length
+            lb = 1 + keyed(key, label + ":lb")[0] % length
+            a, b = number(key, label + ":a", la), number(key, label + ":b", lb)
+            if op == "-" and a < b:
+                a, b = b, a
+            if op == "/":
+                if b == 0:
+                    continue
+                a, b = a * b, b
+            pair = (op, min(a, b), max(a, b)) if op in "+*" else (op, a, b)
+            if pair in excluded:
+                left_out += 1
+                continue
+            c = a + b if op == "+" else a - b if op == "-" else a * b if op == "*" else a // b
+            lines.append((op, f"<<{a}{op}{b}={c}>>{c}\n"))
+            kept += 1
+    lines.sort(key=lambda l: keyed(key, "order:" + l[1]))
+    text = "".join(l[1] for l in lines)
+    with open(os.path.join(out, "terrain.txt"), "x") as f:
+        f.write(text)
+    print(f"TERRAIN_DRAWN length={length} count={count} lines={len(lines)} bytes={len(text)} left_out={left_out}")
+
+
+def interleave(passage, terrain, out):
+    problems = open(passage, "rb").read().split(b"\n\n")
+    if problems[-1] == b"":
+        problems.pop()
+    lines = open(terrain, "rb").read().splitlines(keepends=True)
+    p, t = len(problems), len(lines)
+    parts = []
+    for i, problem in enumerate(problems):
+        parts.append(problem + b"\n\n")
+        block = lines[i * t // p:(i + 1) * t // p]
+        if block:
+            parts.append(b"".join(block) + b"\n")
+    with open(out, "xb") as f:
+        f.write(b"".join(parts))
+    print(f"INTERLEAVED problems={p} terrain_lines={t} bytes={sum(len(x) for x in parts)}")
+
+
 if __name__ == "__main__":
-    main()
+    if sys.argv[1] == "drawn":
+        drawn(int(sys.argv[2]), int(sys.argv[3]), sys.argv[4], sys.argv[5], sys.argv[6])
+    elif sys.argv[1] == "interleave":
+        interleave(sys.argv[2], sys.argv[3], sys.argv[4])
+    else:
+        main()
