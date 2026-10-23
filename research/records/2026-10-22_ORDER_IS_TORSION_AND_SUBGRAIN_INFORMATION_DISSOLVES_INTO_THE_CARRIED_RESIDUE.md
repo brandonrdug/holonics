@@ -292,8 +292,10 @@ Each is a box in #410 except the neck.
 - §6.6's Lean (`ScrewTorsion` §2c and the transported residue in `CarriedRelease`) was added at
   `7beead7` and checked on the PC: the same command completed (3,454 jobs, exit 0, 12.55 s wall
   against a 1,200 s deadline; only the two targets recompiled), no errors and no `sorry`. One
-  linter warning (`[FloorRing R]` unused in `exactOrbit_damped`) was removed with `omit` at the
-  next commit, which was checked again (RECHECK).
+  linter warning (`[FloorRing R]` unused in `exactOrbit_damped`) was removed with `omit`. The
+  first placement, between the doc comment and its theorem, did not parse (`5ba90b2`, exit 1);
+  moved above the doc comment at `05a8ed1`, the check completed (3,454 jobs, exit 0, 5.6 s), with
+  no errors, no warnings in either module and no `sorry`.
 - Atlas rows (formal-checked): `motion.commutator-carry`, `motion.lag-residue-factorization`,
   `screw.burgers-loop-carry`, `motion.squeeze-ratio-dilation`, `gr.teleparallel-fifth-torsion`,
   `gr.redshift-loop`, `release.carried-residue`, `motion.selected-move-forward-jet`,
