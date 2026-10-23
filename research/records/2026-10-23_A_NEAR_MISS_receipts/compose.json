@@ -1,0 +1,13 @@
+{
+ "defect composition holds": true,
+ "Da nonzero": true,
+ "carry cocycle holds (0..99)^3": true,
+ "carry composes along the passage": true,
+ "face return = Laplacian return": true,
+ "face return sums to zero (gauge)": true,
+ "face return": [
+  "149/864",
+  "17/432",
+  "-61/288"
+ ]
+}

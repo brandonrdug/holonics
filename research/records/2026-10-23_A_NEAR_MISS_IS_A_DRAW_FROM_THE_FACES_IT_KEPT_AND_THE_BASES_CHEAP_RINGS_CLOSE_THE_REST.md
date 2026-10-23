@@ -24,7 +24,8 @@ the constraint up to its fibre. (`73+31=104` is correct.)
 `radix.euclidean-chart` (Lean `Foundation/EuclideanResidueTransport`),
 `radix.difference-leading-cancellation`, `radix.carry-chain-eulerian`, `linalg.relational-preimage`
 (a middle constraint enters as an intersection), `motion.lag-residue-factorization` (which modes read
-which faces), and the
+which faces), `tower.scale-square` and `winding.carry-cocycle` (the carry's composition),
+`norm.laplacian-return` (a face's learned return), `receipt.finite-mixed-difference`, and the
 [rereading record](2026-10-22_THE_NATIVE_CONTACT_STEP_IS_CERTIFIED_BY_REREADING_THE_SAME_COMPARISON.md).
 
 ## 1. The law
@@ -194,7 +195,54 @@ operation on the ring (a pair contact for `×`), and the residual `ρ_q = x_q(re
 read through the ring as the phase `e^(2πi ρ_q/q)`. A release is closed when every `ρ_q = 0`; the
 reread redraws inside the fibre of a face with `ρ_q ≠ 0`.
 
-## 7. What the design thread builds
+## 7. A face needs a pair contact exactly where its four-cycle does not vanish
+
+Epime's second review of this record adds three statements, and each holds. The learned return is a
+law the repository already owns, the carry's composition generalizes one it owns, and the binding is
+new.
+
+**The binding.** For a face `G(a, b)` of a two-operand operation, the four-cycle
+`□G = G(i, j) − G(i, l) − G(k, j) + G(k, l)` vanishes on every rectangle exactly when
+`G = f(a) + g(b)`. Then each operand's own face, transported, composes the result by one crossing and
+no contact is needed. A nonzero four-cycle is what neither operand shows alone, and it is what a pair
+contact carries. Every rectangle is a signed sum of unit squares, so unit squares decide. For
+operands 0 to 99 (`binding.py`):
+
+| Face | Chart | Unit squares with `□G ≠ 0` (of 9,801) | Where the binding sits |
+|---|---|---|---|
+| sum, ring 9, 10 or 11 | phase `(a + b)/q` | 0 | nowhere: `+` is one crossing on every ring |
+| sum, tens digit | phase on ring 10 | 1,961, values `±1/10` | every one straddles a carry line `a + b = 10m` |
+| product, ring 10, 9, 11 or 101 | phase `ab/q` | 9,801, all equal to `1/q` | everywhere, one constant: the ring's pairing |
+| product, units of `ℤ/q` | index (a primitive root) | 0 | nowhere: the index chart makes `×` one crossing |
+| product, size (number of digits) | integer | 130 | every one straddles a hyperbola `ab = 10ᵏ` |
+
+This is the exact form of §2: an operation is one crossing in the chart where its four-cycle
+vanishes. The binding is not spread evenly. A sum needs none except where the units carry, on the
+additive caustic, and a product's size needs none except on its multiplicative caustic. A product's
+ring face carries one constant, `□(ab/q) = (i − k)(j − l)/q`, so a pair contact for `×` on ring `q`
+holds one number: the ring's pairing. On the units of the ring the index chart removes even that,
+and what still binds are the operands that share a prime with `q`, where the product collapses
+(`radix.multiplier-face-action`). The four products Brandon named keep their size, which binds only
+on its caustic, and lose ring 9, which binds on every square.
+
+**The carry composes along a passage.** Epime writes a coarse reading's defect as
+`q T_a = S_a q + D_a`. Then `q T_b T_a = S_b S_a q + D_b T_a + S_b D_a`: the defect of a composite is
+the outer defect read at the inner's output plus the inner defect carried by the outer coarse map. It
+is an identity of the operator ring, the composition law of the scale square's defect
+(`tower.scale-square`, Lean `Holon/Restriction:squareDefect`), checked on rational matrices
+(`compose.py`). Its additive instance, with `q` the winding, `T_a = +a` and `S_b` acting on a defect
+by its linear part (the identity), is the carry cocycle `carry(x, a) + carry(x + a, b) = carry(a, b) + carry(x, a + b)` (`winding.carry-cocycle`,
+formal-checked). A carry changes a word's digit sum by `−(b − 1)` and its alternating sum by
+`±(b + 1)`, so on the cheap rings it composes to nothing (§3).
+
+**The learned face's return.** A reader that weighs its located faces by a normalized exponential,
+`m = Σ p_i φ_i`, returns to face `i` the covector `p_i Re⟨g, φ_i − m⟩`: its weight times how much
+more it agrees with the downstream covector `g` than the mixture does. This is the normalized
+exponential's Laplacian return (`norm.laplacian-return`) with `δ_i = Re⟨g, φ_i⟩` (checked in
+`compose.py`). It sums to zero, so it moves only the faces' relative weights. Its consumer is the face
+selection in the design thread: a ring face is located by this return, never authored.
+
+## 8. What the design thread builds
 
 - The duplex the design thread chose (a second strand reading right to left, meeting the first at
   every place through a pair contact, and a release that redraws any place until its own faces
@@ -203,23 +251,28 @@ reread redraws inside the fibre of a face with `ρ_q ≠ 0`.
 - By §6, the duplex reads consistency and spreads the covector, but it does not create a face that
   is not held. The face that the tens needs is the operands' composition on ring 9 and ring 11,
   held at the release; a leading-first reader holding it pays the gain at the tens and hundreds.
+- By §7, the pair contact for `×` on ring `q` carries one constant, the ring's pairing; sums need
+  a contact only across a carry, on the caustic.
 - Readings at every place over all held-back problems: the share inside the size fibre; the units'
   2-axis and 5-axis hit rates separately; the ring 9 and ring 11 hit rates before and after a
   reread; the half-turn test on differences; at a sum's tens, how often a wrong digit keeps the turn
   and loses the residue.
 
-## 8. Owed
+## 9. Owed
 
 - Lean: `radix.cheap-ring-path-collapse` (the convolution's value on `q | b ± 1` is the product of the
   operands' cheap faces), from `cheap_faces` and the digit convolution, and
   `radix.held-face-reading-order` (the fold reading of a word's face; a held face's gain is the same
-  in every order) (#410).
-- The readings in §7 on the trained machine.
+  in every order), `arith.binding-four-cycle` (`□G ≡ 0 ⇔ G = f(a) + g(b)`; `□(ab/q) = (i − k)(j − l)/q`)
+  and `tower.square-defect-composition` (`squareDefect π (B_f A_f) (B_c A_c) = squareDefect π B_f B_c · A_f
+  + B_c · squareDefect π A_f A_c`) (#410).
+- The readings in §8 on the trained machine.
 
 ## Receipts
 
 [`2026-10-23_A_NEAR_MISS_receipts/`](2026-10-23_A_NEAR_MISS_receipts/): `faces.py` (each draw's kept
 and lost faces, and per-place costs of sums and differences), `intersect.py` (fibre closure by the
 cheap rings), `rings.py` (per-place product cost with ring faces held), `order.py` (the same cost in
-three reading orders), their JSON outputs, and
+three reading orders), `binding.py` (the four-cycle of each result face), `compose.py` (the defect
+composition, the carry cocycle and the face return, exactly), their JSON outputs, and
 `RUN.md`. Exact integer work; the entropies are exterior readings.
