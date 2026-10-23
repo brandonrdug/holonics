@@ -100,8 +100,8 @@ one early octave of the numbers read alone (−1.006).
 - The calculation's result digits contract from about `log₂ 10` to 2.04 bits a byte. The result's
   first digit is read inside the lens's six-byte reach (`48/2=` before `24`), so the lens is learning
   the small calculations it has met. That is evaluation at the lens's grain, at faces arithmetic does
-  not conserve, so it reaches only calculations met: on unmet ones it pays 3.40 bits for a units digit
-  the operands fix exactly ([association record](2026-10-23_ASSOCIATION_IS_EVALUATION_AT_CONSERVED_FACES_AND_A_NUMBERS_DIGITS_ARE_A_GAS_OF_THE_BASES_ATOMS.md) §3, which corrects
+  not keep, so it reaches only calculations met: on unmet ones it pays more than a uniform digit at
+  every place, even for a last digit the operands fix exactly ([association record](2026-10-23_ASSOCIATION_IS_EVALUATION_A_NUMBER_IS_A_WORD_OF_TURNING_DIGITS_AT_A_LEVEL_OF_THE_BASES_TOWER.md) §3, which corrects
   the earlier wording "a table, not arithmetic").
 - Answer prose stops contracting after the first quarter of the passage: its late slope is
   +0.0009 bits a byte per block.
@@ -280,7 +280,7 @@ that is not constant changes `w`: in general `w′ = w · d ln V/d ln V′`. On 
 units spanning `N_k` bytes, `w_unit = w_byte · d ln N_k/d ln k`, so a region at its byte floor reads
 `w_unit = −d ln N_k/d ln k < −1` while its units lengthen. That phantom reading is the cast, not
 hardening, and it agrees with §1: founding longer units changes the clock's material. A report on a
-unit clock declares its cast ([association record](2026-10-23_ASSOCIATION_IS_EVALUATION_AT_CONSERVED_FACES_AND_A_NUMBERS_DIGITS_ARE_A_GAS_OF_THE_BASES_ATOMS.md) §6).
+unit clock declares its cast ([association record](2026-10-23_ASSOCIATION_IS_EVALUATION_A_NUMBER_IS_A_WORD_OF_TURNING_DIGITS_AT_A_LEVEL_OF_THE_BASES_TOWER.md) §6).
 
 **The alphabet cast.**
 - μ coded in four-valued cells pays for the value it never uses: 0.0045 bits a cell overall, 0.215 in
