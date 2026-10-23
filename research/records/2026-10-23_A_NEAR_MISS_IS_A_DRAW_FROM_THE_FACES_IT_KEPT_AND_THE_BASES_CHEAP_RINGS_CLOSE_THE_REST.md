@@ -148,29 +148,78 @@ the subject, the tense. A near miss in language keeps some of them and loses one
 release against the faces its antecedents compose is the general critic: conservation of faces
 across a composition, with the plural fibre kept where the faces do not close it.
 
-## 6. What the design thread builds
+## 6. The reading order moves where a face pays, not what it pays
+
+The design thread asked which faces a reader that writes left to right can locate, and which need a
+reading of every place given all the others. The chain rule answers it. For held faces `F` and any
+reading order `σ` of the word's places,
+`H(W | F) = Σ_k H(d_σ(k) | d_σ(<k), F)`, so the code of the result given what the reader holds is the
+same in every order, and a held face `q` gains `I(W; q | F)` in every order. The order only decides at
+which places the gain is paid: the places it leaves free (`radix.held-face-reading-order`).
+
+Products of operands 0 to 99, padded to four places (bits; places from the units):
+
+| Faces held | Leading first | Units first | Each place given all others | Whole word |
+|---|---|---|---|---|
+| size + ring 10 | 0, 0.902, 1.545, 0.426 | 0, 2.182, 0.689, 0.002 | 0, 0.902, 0.502, 0.002 | 2.873 |
+| + ring 9 | 0, 0.023, 0.551, 0.224 | 0, 0.789, 0.009, 0 | 0, 0.023, 0.001, 0 | 0.798 |
+| + ring 11 | 0, 0, 0, 0 | 0, 0, 0, 0 | 0, 0, 0, 0 | 0 |
+
+Read leading first, ring 9 pays 0.879 bits at the tens, 0.994 at the hundreds and 0.202 at the
+thousands: not only at the last place. So a reader that writes left to right can locate a ring face,
+on one condition: it holds the face composed from the operands, `T_q(q a, q b)`, before it writes. A
+face of its own release alone gains nothing in any order, since it is a function of what is already
+written; it gains only against the operands' composition. The tens of a product are blind in the
+measured tower because that composition is not held, not because of the order.
+
+A one-sided reader carries its own release's face as it writes. On `ℤ/q` the face of a word read
+leading first is the fold `x ↦ b x + d` (Horner; Mathlib `Nat.zmodeq_ofDigits_digits`), the
+lag-residue mode with `M ≡ b`: no turn on ring 9, a half-turn on ring 11, a quarter-turn on ring 101.
+The same mode reads the operands' faces, and a pair contact composes them.
+
+Each place given all the others is not a code: its sum (0.024 bits with ring 9) is far below the
+word's 0.798. It is the consistency read of the reread: with the faces held, every place is pinned by
+the others, so a place whose cost stays high marks the fibre of a failing face, and the learning
+covector arrives at every place instead of only the free ones.
+
+**Conservation of faces** is the right name for the law `q ∘ T = T_q ∘ (q × q)`. Every residue ring
+is conserved by `+` and `×` (a ring homomorphism), and carries drop out on all of them. What makes 9,
+11 and 101 the base's cheap rings is the shortest place period, `ord_q(b) = 1, 2, 4`; ring 7 is
+conserved as well but its place mode has period 6. The size is conserved by `×` only up to its
+enclosure (`radix.leading-fibre`), and not by `−` (`radix.difference-leading-cancellation`).
+
+**The consumer equation.** For every located face `q`:
+`x_q(release) = T_q(x_q(a), x_q(b))` on `ℤ/q`, with `x_q` the fold `x ↦ b x + d`, `T_q` the
+operation on the ring (a pair contact for `×`), and the residual `ρ_q = x_q(release) − T_q(x_q(a), x_q(b))`
+read through the ring as the phase `e^(2πi ρ_q/q)`. A release is closed when every `ρ_q = 0`; the
+reread redraws inside the fibre of a face with `ρ_q ≠ 0`.
+
+## 7. What the design thread builds
 
 - The duplex the design thread chose (a second strand reading right to left, meeting the first at
   every place through a pair contact, and a release that redraws any place until its own faces
   agree) is the reread above. Its fixed claim (a product's tens well below blind, products matching
-  mod 9 and mod 11 above chance) reads directly against the tables in §3.
-- Holding the result's faces before the release (composed from the operands' faces through a pair
-  contact) gives a leading-first reader the gain at every place, not only the last (§3's second
-  table).
+  mod 9 and mod 11 above chance) reads directly against the tables in §3 and §6.
+- By §6, the duplex reads consistency and spreads the covector, but it does not create a face that
+  is not held. The face that the tens needs is the operands' composition on ring 9 and ring 11,
+  held at the release; a leading-first reader holding it pays the gain at the tens and hundreds.
 - Readings at every place over all held-back problems: the share inside the size fibre; the units'
   2-axis and 5-axis hit rates separately; the ring 9 and ring 11 hit rates before and after a
   reread; the half-turn test on differences; at a sum's tens, how often a wrong digit keeps the turn
   and loses the residue.
 
-## 7. Owed
+## 8. Owed
 
 - Lean: `radix.cheap-ring-path-collapse` (the convolution's value on `q | b ± 1` is the product of the
-  operands' cheap faces), from `cheap_faces` and the digit convolution (#410).
-- The readings in §6 on the trained machine.
+  operands' cheap faces), from `cheap_faces` and the digit convolution, and
+  `radix.held-face-reading-order` (the fold reading of a word's face; a held face's gain is the same
+  in every order) (#410).
+- The readings in §7 on the trained machine.
 
 ## Receipts
 
 [`2026-10-23_A_NEAR_MISS_receipts/`](2026-10-23_A_NEAR_MISS_receipts/): `faces.py` (each draw's kept
 and lost faces, and per-place costs of sums and differences), `intersect.py` (fibre closure by the
-cheap rings), `rings.py` (per-place product cost with ring faces held), their JSON outputs, and
+cheap rings), `rings.py` (per-place product cost with ring faces held), `order.py` (the same cost in
+three reading orders), their JSON outputs, and
 `RUN.md`. Exact integer work; the entropies are exterior readings.
