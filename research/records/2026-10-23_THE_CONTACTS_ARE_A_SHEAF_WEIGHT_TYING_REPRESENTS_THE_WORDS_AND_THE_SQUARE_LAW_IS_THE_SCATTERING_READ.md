@@ -249,7 +249,75 @@ the lag-residue factorization, a bank reads lagged counts, and recovering one pa
 value from them takes a register as long as the lag. A located equality is a pair contact whose
 offset is a key located by loop closure.
 
-## 7. Owed (#410)
+## 7. The receiving tree's width is set by its tolerance once its ratio is released
+
+The design thread reported that the receiving tree's exact width rule refuses past `2^21` cells:
+a population of `2^22` to `2^24` asks for operands of 129 to 133 bits at every depth, so the first
+1,000 problems are its ceiling and the full GSM8K partition cannot be carried.
+
+**Where the widths come from.** The rule in `compression::landmark::context` certifies that the
+executed tree stays within a quarter grain a cell of the *unreleased* ideal mixture. A node's
+drift from that ideal is summed over its arrivals (`weight_log_lipschitz`), so the carrier and the
+face lattice must hold `n* P²` rounding units: `2^W ≥ 12 B L_R (2n* + 1) P²` and
+`2^(M_p) ≥ 3 B L_R K (n* P² + 2P + 1)`. The passage length `n*` enters every width. The ideal ratio
+itself grows with the passage: in the exterior read below, `|log₂ β|` reaches 67,164 bits on 100
+problems and 720,805 bits on 1,000. Its exact carrier would be as wide as the passage's code.
+
+**The telescope.** [derived] At a node with its own face `e`, its children's face `k` and the
+ratio `β`, the conditional is `q(u) = (β e(u) + k(u))/(β + 1)` and the step is
+`β' = β e(u)/k(u)`. Then `1 + β' = (1 + β) q(u)/k(u)` and `1 + 1/β' = (1 + 1/β) q(u)/e(u)`, so for
+any release `β_(t+1) = R(β'_t)`:
+
+```text
+Σ_t −ln q_t = Σ_t −ln k_t + ln(1 + β_0) − ln(1 + β_n) + Σ_t [ln(1 + β_(t+1)) − ln(1 + β'_t)]
+Σ_t −ln q_t = Σ_t −ln e_t + ln(1 + 1/β_0) − ln(1 + 1/β_n) + Σ_t [ln(1 + 1/β_(t+1)) − ln(1 + 1/β'_t)]
+```
+
+It holds for the executed faces and the executed ratio, with no ideal to track. Release the
+ratio into `[2^(−K), 2^K]` on a mantissa of `w` bits:
+- a release at the upper bound costs at most `log₂(1 + 2^(−K))` bits against `e`, the face the ratio
+  favours, and nothing against `k`; the lower bound mirrors it; a rounding costs at most
+  `2^(−w) log₂ e` against either;
+- so at every node, `code_q ≤ min(code_e, code_k) + 1 + Σ_t (log₂(1 + 2^(−K)) + 2^(−w) log₂ e)`;
+- over any stretch of the passage the boundary terms are at most `log₂(1 + 2^K) ≤ K + 1` bits, so
+  the released node tracks the better of its two faces stretch by stretch, paying at most `K + 1`
+  bits a switch, which the unreleased node cannot (its ratio must first unwind what it gathered).
+
+Each term is one cell's. Along a cell's path of `P` nodes and `B` digits, the excess over the
+released law is at most `B P (log₂(1 + 2^(−K)) + 2^(−w) log₂ e)` plus the face lattice's own
+rounding, a cell at a time. So `K` and `w` are set by the grain alone, `2^K, 2^w ≈ 12 B L_R P`, and
+the face lattice needs `log₂ K_kt` bits for the KT floor `1/(2n* + 2)` plus the same grain term:
+the passage enters once, through the count, never through `n* P²`. [agent-inferred] At `B = 2`,
+`L_R = 16` and `P = 24`, `12 B L_R P = 9,216 < 2^14`; with `n* = 2^24` the β step's product is near
+`2·14 + 25 + 38 + 1 = 92` bits, under `u128` with no carrier rebase.
+
+The release is the carried-release law at a node's ratio: the part of `ln β` past `K ln 2` is
+released at the declared tolerance, its cost accounted cell by cell in the telescope. Nothing a
+cell can still distinguish at the receiver's grain is lost: past `2^K`, the weaker face's share of
+`q` is below `2^(−K)`.
+
+**Measurement.** The exterior read of §5 rewritten in the ratio form (`ctw_beta.rs`), one tree per
+frame phase, on the same 1,000 problems:
+
+| ratio released at | `D = 24`, plain | `D = 24`, passage (`2^13`, `w = 64`) |
+|---|---|---|
+| never | 0.5553 | 0.4922 |
+| `2^32` | 0.5553 | |
+| `2^16` | 0.5544 | 0.4902 |
+| `2^12` | 0.5538 | |
+| `2^8` | 0.5624 | |
+
+- Unreleased, the ratio form reproduces the joint form exactly (0.6903 against 0.690 on 100
+  problems, 0.5553 on 1,000).
+- Released at `2^12` to `2^16` it codes slightly better than unreleased, the tracking above; at
+  `2^8` the release begins to cost.
+- At `D = 16`, released at `2^16`: 0.5691 against 0.5700.
+
+So the receiving tree can carry the whole partition at fixed widths, if its certificate is the
+released law's per-cell telescope instead of the tracking of the unreleased ideal. The
+receiving tree's owner decides; this read changes no crate.
+
+## 8. Owed (#410)
 
 - The summed contact material is the sheaf Laplacian: `Σ_e w_e J_e*DJ_e = δᵀ W δ`, its kernel the
   global sections, and the tower's obstruction the cokernel of `δ`, at the contact and tower
@@ -260,6 +328,11 @@ offset is a key located by loop closure.
 - The face's two covectors: for `p_τ ∝ p^τ`, `d/dτ (−ln p_τ(u)) = −ln p(u) − H(p)` at `τ = 1`, with
   second derivative `Var_p(ln p)`; and under the true conditional, the news and the centred
   surprise are martingale differences, so no read of them lowers the expected code (Gibbs).
+
+- The released ratio's telescope: for a mixture `q = (β e + k)/(β + 1)` with step `β' = β e/k` and
+  any release `β_(t+1) = R(β'_t)`, `Σ −ln q = Σ −ln k + ln(1 + β_0) − ln(1 + β_n) +
+  Σ [ln(1 + β_(t+1)) − ln(1 + β'_t)]` and its mirror in `e`; with `R` the clamp to `[2^(−K), 2^K]`,
+  each release costs at most `ln(1 + 2^(−K))` on one line and nothing on the other.
 
 ## Receipts
 
@@ -286,4 +359,9 @@ offset is a key located by loop closure.
 - [`passage_bytes.rs`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/passage_bytes.rs) writes each byte's code length;
   [`classify.py`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/classify.py) groups it by role, output [`classes.txt`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/classes.txt). The
   two runs went together (projection 28 s, deadline 60 s; 25.1 s and 27.8 s at 490 MiB).
+- [`ctw_beta.rs`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/ctw_beta.rs) (built with `rustc -O`), output
+  [`ctw_beta.txt`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/ctw_beta.txt). Development reads on 100 problems took at most 5.20 µs a
+  cell. The projection used the larger 13.34 µs measured for `passage_ctw` on 1,000 problems, with a
+  tenth for growth: 31 s a run, deadline 60 s a run, four together on four cores. The runs took
+  8.8 s to 13.5 s (ratio 0.44 for the slowest) at 433 MiB.
 - No Rust or Lean in the crates or the Lean package changed.
