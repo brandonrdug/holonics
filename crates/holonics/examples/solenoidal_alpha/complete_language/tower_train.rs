@@ -12,6 +12,7 @@
 use super::*;
 use holonics::hnn::tower::{Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
+use rayon::prelude::*;
 
 /// A learner's state read ceiling, `2^30` bytes.
 const STATE_BUDGET: usize = 1 << 30;
@@ -30,7 +31,6 @@ pub(super) const REGIONS: [&str; 4] = ["Q", "P", "N", "M"];
 fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], streams: usize) -> Result<[(i64, usize); 4]> {
     let chunk = classes.len().div_ceil(streams);
     let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
-    use rayon::prelude::*;
     let parts: Vec<[(i64, usize); 4]> = starts
         .par_iter()
         .map(|&start| {
@@ -88,6 +88,31 @@ pub(super) fn per(code: i64, n: usize) -> String {
 /// (`hnn::tower::LevelCredit`), so a section's covector reaches the history its opening carries; a
 /// continued learner must carry the same declaration.
 pub(super) fn train(args: &[String], gated: bool, turned: bool, pumped: bool, credit: bool) -> Result<()> {
+    train_looking_or_not(args, gated, turned, pumped, credit, None)
+}
+
+/// `train-looking-gated-tower|train-looking-turned-tower|train-looking-pumped-tower LOOK_KEYS
+/// LOOK_KEYS_SHA AGREE MOMENT END TRAIN …` trains with the look inside training ([`Looking`]):
+/// `MOMENT` and `END` are the bytes at which the terrain asks for a release and ends a line, and
+/// `AGREE` the release's agreeing draws; the rest are `train-tower`'s arguments.
+pub(super) fn train_looking(args: &[String], gated: bool, turned: bool, pumped: bool) -> Result<()> {
+    if args.len() != 23 && args.len() != 25 {
+        return Err("train-looking-gated-tower|train-looking-turned-tower|train-looking-pumped-tower LOOK_KEYS LOOK_KEYS_SHA AGREE MOMENT END TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+    }
+    let looking = Looking {
+        keys: pinned_read(&args[1], &args[2], READ_BUDGET as usize)?,
+        agree: agreement(args.get(3))?,
+        moment: args[4].parse::<u8>()? as usize,
+        end: args[5].parse::<u8>()? as usize,
+    };
+    if looking.moment == looking.end {
+        return Err("a moment and a line's end are different bytes".into());
+    }
+    let rest: Vec<String> = std::iter::once(args[0].clone()).chain(args[6..].iter().cloned()).collect();
+    train_looking_or_not(&rest, gated, turned, pumped, false, Some(&looking))
+}
+
+fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool, credit: bool, looking: Option<&Looking>) -> Result<()> {
     if args.len() != 18 && args.len() != 20 {
         return Err("train-tower|train-gated-tower|train-turned-tower|train-pumped-tower|train-credited-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
@@ -102,7 +127,7 @@ pub(super) fn train(args: &[String], gated: bool, turned: bool, pumped: bool, cr
         dev_roles: roles,
         alphabet: 256,
     };
-    fit(&args[7..], reading, gated, turned, pumped, credit)
+    fit(&args[7..], reading, gated, turned, pumped, credit, looking)
 }
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
@@ -135,7 +160,7 @@ pub(super) fn train_units(args: &[String]) -> Result<()> {
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len() };
-    fit(&args[9..], reading, true, false, false, false)
+    fit(&args[9..], reading, true, false, false, false, None)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -151,7 +176,7 @@ struct Reading {
 
 /// The passes: `args` are `KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS
 /// OUT [FROM FROM_SHA]`.
-fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool) -> Result<()> {
+fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, looking: Option<&Looking>) -> Result<()> {
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -198,13 +223,75 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: boo
         reading.train_lengths.iter().map(|&n| n as usize).sum::<usize>(),
         dev_bytes
     );
+    // Each stream releases from its own share of the look's keys, so the releases do not depend on
+    // the order the streams are filled in.
+    let mut look_keys: Vec<KeyStream> = match looking {
+        Some(l) => {
+            let share = l.keys.len() / streams / 8 * 8;
+            (0..streams).map(|s| KeyStream::new(l.keys[s * share..(s + 1) * share].to_vec(), 8)).collect::<std::result::Result<_, _>>()?
+        }
+        None => Vec::new(),
+    };
     for pass in 0..passes {
         let pass_started = Instant::now();
         let mut states: Vec<TowerState> =
             (0..streams).map(|_| if credit { learner.tower.rest_with_credit() } else { learner.tower.rest() }).collect();
         let (mut code, mut bytes, mut deposits, mut halvings) = (0i64, 0usize, 0usize, 0u32);
         let mut window = (0i64, 0usize);
-        for k in 0..sections_a_pass {
+        let mut sections_run = sections_a_pass;
+        if let Some(look) = looking {
+            let mut lookers: Vec<Looker> = look_keys.drain(..).enumerate().map(|(s, keys)| Looker::new(s * chunk, (s + 1) * chunk, keys)).collect();
+            let mut k = 0usize;
+            loop {
+                let tower = &learner.tower;
+                let filled: Vec<bool> = lookers
+                    .par_iter_mut()
+                    .zip(states.par_iter())
+                    .map(|(l, open)| l.fill(tower, classes, open, section + 1, look).map_err(|e| e.to_string()))
+                    .collect::<std::result::Result<_, String>>()?;
+                if filled.contains(&false) {
+                    break;
+                }
+                let parts: Vec<Vec<usize>> = lookers.iter().map(|l| l.built[..=section].iter().map(|c| c.0).collect()).collect();
+                let charges: Vec<Vec<bool>> = lookers.iter().map(|l| l.built[..=section].iter().map(|c| c.1).collect()).collect();
+                let part_refs: Vec<&[usize]> = parts.iter().map(|p| p.as_slice()).collect();
+                let charge_refs: Vec<&[bool]> = charges.iter().map(|c| c.as_slice()).collect();
+                let receipt = match learner.section_charged(&mut states, &part_refs, Some(&charge_refs)) {
+                    Ok(receipt) => receipt,
+                    Err(e) => {
+                        println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());
+                        return Err(e.to_string().into());
+                    }
+                };
+                // Each charged class after a part's first is one byte that arrived.
+                let coded: usize = charges.iter().map(|c| c[1..].iter().filter(|&&x| x).count()).sum();
+                for l in &mut lookers {
+                    l.built.drain(..section);
+                }
+                code += receipt.code_before;
+                bytes += coded;
+                window.0 += receipt.code_before;
+                window.1 += coded;
+                deposits += receipt.deposited as usize;
+                halvings += receipt.halvings;
+                k += 1;
+                if k % 32 == 0 {
+                    println!(
+                        "TOWER_SECTION pass={} section={} bits_a_byte={} deposits={} halvings={} elapsed_ms={}",
+                        pass, k, per(window.0, window.1), deposits, halvings, started.elapsed().as_millis()
+                    );
+                    window = (0, 0);
+                }
+            }
+            let (looks, read) = lookers.iter().fold((0usize, 0usize), |a, l| (a.0 + l.looks, a.1 + l.at - l.start));
+            println!(
+                "TOWER_LOOKS pass={} sections={} looks={} text_read={} of {} keys_left={}",
+                pass, k, looks, read, streams * chunk, lookers.iter().map(|l| l.keys_left()).min().unwrap_or(0)
+            );
+            look_keys = lookers.into_iter().map(|l| l.keys).collect();
+            sections_run = k;
+        }
+        for k in 0..if looking.is_some() { 0 } else { sections_a_pass } {
             let ranges: Vec<std::ops::Range<usize>> =
                 (0..streams).map(|s| s * chunk + k * section..s * chunk + (k + 1) * section + 1).collect();
             let parts: Vec<&[usize]> = ranges.iter().map(|r| &classes[r.clone()]).collect();
@@ -242,7 +329,7 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: boo
         let (dev_code, dev_coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
         println!(
             "TOWER_PASS pass={} train_bits_a_byte={} dev_bits_a_byte={} dev_regions {} deposits={}/{} pass_ms={} elapsed_ms={}",
-            pass, per(code, bytes), per(dev_code, dev_coded), region_line(&regions), deposits, sections_a_pass,
+            pass, per(code, bytes), per(dev_code, dev_coded), region_line(&regions), deposits, sections_run,
             pass_started.elapsed().as_millis(), started.elapsed().as_millis()
         );
     }
@@ -376,11 +463,15 @@ fn release(args: &[String], units: Option<&Units>) -> Result<()> {
 /// before it. The first look spends the key file as the one-look read does, so its releases are
 /// that read's; the later looks draw from the file's second half. `LINES.tsv` writes the last look
 /// and `LOOKS.tsv` every look (the line's index, its head, the rest as given, whether the last two
-/// looks agree, the looks joined by `|`).
+/// looks agree, the looks joined by `|`, and what the true rest costs from where each look stands,
+/// on `2^(−20)` bits: the frustration's floor and how fast the looks approach it).
+/// `read-lines-carried` looks as `read-lines-again` does, and its stream carries each written
+/// line's first look, line end and head again before the true rest, the passage a tower trained
+/// with the look (`Looking`) met: its codes are read where that tower was taught.
 pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result<()> {
     let arity = if look == Look::Once { 10 } else { 11 };
     if args.len() != arity {
-        return Err("read-lines|read-lines-stream STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT; read-lines-again|read-lines-redraw STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE LOOKS OUT".into());
+        return Err("read-lines|read-lines-stream STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT; read-lines-again|read-lines-redraw|read-lines-carried STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE LOOKS OUT".into());
     }
     let started = Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -422,21 +513,30 @@ pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result
         }
         let rest: Vec<u8> = line[eq + 1..].iter().copied().chain([b'\n']).collect();
         let mut looked: Vec<String> = Vec::new();
+        let mut costs: Vec<i64> = Vec::new();
+        let mut first_look: Vec<usize> = Vec::new();
         if i < written {
             let cap = rest.len() + 4;
             let mut fork = modes.clone();
-            looked.push(release_rest(tower, &mut fork, face.clone(), &mut key_stream, cap, agree)?);
+            let written = |r: Vec<usize>| r.into_iter().map(|c| char::from(c as u8)).collect::<String>();
+            costs.push(rest_code(tower, &modes, face.clone(), &rest)?);
+            first_look = release_rest(tower, &mut fork, face.clone(), &mut key_stream, cap, agree)?;
+            looked.push(written(first_look.clone()));
             while looked.len() < looks && (looked.len() < 2 || looked[looked.len() - 1] != looked[looked.len() - 2]) {
                 let again = match look {
                     Look::Once => break,
-                    Look::Again => {
+                    Look::Again | Look::Carried => {
                         let mut f = tower.advance(&mut fork, b'\n' as usize).map_err(|e| e.to_string())?;
                         for &b in &line[..=eq] {
                             f = tower.advance(&mut fork, b as usize).map_err(|e| e.to_string())?;
                         }
-                        release_rest(tower, &mut fork, f, &mut later_keys, cap, agree)?
+                        costs.push(rest_code(tower, &fork, f.clone(), &rest)?);
+                        written(release_rest(tower, &mut fork, f, &mut later_keys, cap, agree)?)
                     }
-                    Look::Redraw => release_rest(tower, &mut modes.clone(), face.clone(), &mut later_keys, cap, agree)?,
+                    Look::Redraw => {
+                        costs.push(costs[0]);
+                        written(release_rest(tower, &mut modes.clone(), face.clone(), &mut later_keys, cap, agree)?)
+                    }
                 };
                 looked.push(again);
             }
@@ -445,16 +545,25 @@ pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result
             settled += usize::from(agreed);
             if look != Look::Once {
                 look_rows.push_str(&format!(
-                    "{}\t{}\t{}\t{}\t{}\n",
+                    "{}\t{}\t{}\t{}\t{}\t{}\n",
                     i,
                     String::from_utf8_lossy(&line[..=eq]),
                     String::from_utf8_lossy(&rest[..rest.len() - 1]),
                     u8::from(agreed),
-                    looked.join("|")
+                    looked.join("|"),
+                    costs.iter().map(|c| c.to_string()).collect::<Vec<_>>().join("|")
                 ));
             }
         }
         let release = looked.last().cloned().unwrap_or_default();
+        if look == Look::Carried && i < written {
+            // The stream carries the first look, its line's end and the head again before the
+            // true rest, as a tower trained with the look met its lines.
+            let carried_in: Vec<usize> = first_look.iter().copied().chain([b'\n' as usize]).chain(line[..=eq].iter().map(|&b| b as usize)).collect();
+            for b in carried_in {
+                face = tower.advance(&mut modes, b).map_err(|e| e.to_string())?;
+            }
+        }
         let mut codes = Vec::with_capacity(rest.len());
         for &b in &rest {
             codes.push(face.code(b as usize).to_string());
@@ -489,24 +598,109 @@ pub(super) enum Look {
     Again,
     /// The foil: each later look draws again at the same moment, carrying nothing.
     Redraw,
+    /// As `Again`, and the stream carries the first look before the true rest.
+    Carried,
+}
+
+/// What the line's true rest costs read from `state` and its `face`: its classes' codes summed on
+/// `2^(−20)` bits, the rest's line end included. An exterior reading at a look: the state is not
+/// moved.
+fn rest_code(tower: &Tower, state: &TowerState, mut face: TowerFace, rest: &[u8]) -> Result<i64> {
+    let mut s = state.clone();
+    let mut code = 0i64;
+    for &b in rest {
+        code += face.code(b as usize);
+        face = tower.advance(&mut s, b as usize).map_err(|e| e.to_string())?;
+    }
+    Ok(code)
 }
 
 /// The rest a fork releases from `face` by exact agreeing draws: classes until a line's end, or
 /// `cap` classes. The fork moves through every class it writes.
-fn release_rest(tower: &Tower, fork: &mut TowerState, mut face: TowerFace, keys: &mut KeyStream, cap: usize, agree: u32) -> Result<String> {
-    let mut release = String::new();
+fn release_rest(tower: &Tower, fork: &mut TowerState, mut face: TowerFace, keys: &mut KeyStream, cap: usize, agree: u32) -> Result<Vec<usize>> {
+    let mut release = Vec::new();
     while release.len() < cap {
         let key = keys.next_key().ok_or("fewer keys than the written lines draw")?;
-        let class = holonics::receiver::release::draw_exact(&agreement_face(&face.masses, agree), &key)?
-            .drawn_class()
-            .ok_or("an unresolved draw at an exact face")?;
+        let class = agreeing_class(&face.masses, agree, &key)?;
         if class == b'\n' as usize {
             break;
         }
-        release.push(char::from(class as u8));
+        release.push(class);
         face = tower.advance(fork, class).map_err(|e| e.to_string())?;
     }
     Ok(release)
+}
+
+/// The look inside training: at each moment the terrain declares (the byte at which a line asks
+/// for its rest), the tower releases its own rest from the state its stream has reached, by
+/// `agree` exact agreeing draws from its stream's share of `keys`. That release and its line's end
+/// re-enter what the stream reads uncharged (`TowerLearner::section_charged`): they are the
+/// tower's own and bring no news. The line's head then arrives again and its true rest after it,
+/// both charged, so the arrival's covector returns through the state the tower's own release moved
+/// and what it learns is what a look after its own should write. The terrain's moment and line
+/// end are its codec's declared bytes, read outside the tower.
+pub(super) struct Looking {
+    keys: Vec<u8>,
+    agree: u32,
+    moment: usize,
+    end: usize,
+}
+
+/// One stream's passage with its own releases written in: the classes from the section's first
+/// on, each with whether it arrived (charged) or the tower released it.
+struct Looker {
+    start: usize,
+    end: usize,
+    at: usize,
+    line_start: Option<usize>,
+    built: Vec<(usize, bool)>,
+    keys: KeyStream,
+    looks: usize,
+}
+
+impl Looker {
+    fn new(start: usize, end: usize, keys: KeyStream) -> Self {
+        Self { start, end, at: start, line_start: None, built: Vec::new(), keys, looks: 0 }
+    }
+
+    fn keys_left(&self) -> usize {
+        self.keys.remaining()
+    }
+
+    /// Fill the passage to `need` classes from the stream's text, the state `opening` having
+    /// received every class before the first: false when the stream's text ends first. A line's
+    /// head is whole only after the stream has met a line's end, so a stream releases only from
+    /// its first whole line on.
+    fn fill(&mut self, tower: &Tower, text: &[usize], opening: &TowerState, need: usize, look: &Looking) -> Result<bool> {
+        let mut probe = opening.clone();
+        let mut probed = 0usize;
+        while self.built.len() < need {
+            if self.at >= self.end {
+                return Ok(false);
+            }
+            let c = text[self.at];
+            self.at += 1;
+            self.built.push((c, true));
+            if c == look.end {
+                self.line_start = Some(self.at);
+            } else if let (true, Some(head)) = (c == look.moment, self.line_start) {
+                let mut face = None;
+                for &(b, _) in &self.built[probed..] {
+                    face = Some(tower.advance(&mut probe, b).map_err(|e| e.to_string())?);
+                }
+                probed = self.built.len();
+                let given = text[self.at..self.end].iter().position(|&b| b == look.end).unwrap_or(self.end - self.at);
+                let mut fork = probe.clone();
+                let face = face.ok_or("a moment the probe has not received")?;
+                let release = release_rest(tower, &mut fork, face, &mut self.keys, given + 4, look.agree)?;
+                self.built.extend(release.into_iter().map(|b| (b, false)));
+                self.built.push((look.end, false));
+                self.built.extend(text[head..self.at].iter().map(|&b| (b, true)));
+                self.looks += 1;
+            }
+        }
+        Ok(true)
+    }
 }
 
 /// The release at which `agree` independent draws from the face fall on the same class: the face's
@@ -517,6 +711,27 @@ pub(super) fn agreement_face(masses: &[u128], agree: u32) -> Vec<Rat> {
     let powered: Vec<num_bigint::BigInt> = masses.iter().map(|&u| num_bigint::BigInt::from(u).pow(agree)).collect();
     let total: num_bigint::BigInt = powered.iter().sum();
     powered.into_iter().map(|u| Rat::new(u, total.clone())).collect()
+}
+
+/// The class `agree` agreeing draws fall on at `key = n/d`: the inverse-CDF class of the face
+/// `m^agree / Σ m^agree`, the first `c` with `d Σ_(j≤c) m_j^agree > n Σ m^agree`. It is
+/// `release::draw_exact` over [`agreement_face`] read in integers, without normalizing a ratio for
+/// every class.
+pub(super) fn agreeing_class(masses: &[u128], agree: u32, key: &Rat) -> Result<usize> {
+    if key < &Rat::from_integer(0.into()) || key >= &Rat::from_integer(1.into()) {
+        return Err("a key outside [0, 1)".into());
+    }
+    let powered: Vec<num_bigint::BigInt> = masses.iter().map(|&m| num_bigint::BigInt::from(m).pow(agree)).collect();
+    let total: num_bigint::BigInt = powered.iter().sum();
+    let target = key.numer() * &total;
+    let mut through = num_bigint::BigInt::from(0);
+    for (class, p) in powered.iter().enumerate() {
+        through += p;
+        if &through * key.denom() > target {
+            return Ok(class);
+        }
+    }
+    Err("an empty face".into())
 }
 
 /// The declared number of agreeing draws: one when none is named.

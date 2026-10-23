@@ -665,6 +665,11 @@ impl KeyStream {
         self.read
     }
 
+    /// The keys left to read.
+    pub fn remaining(&self) -> usize {
+        self.bytes.len() / self.width - self.read
+    }
+
     /// The bytes a key.
     pub fn width(&self) -> usize {
         self.width

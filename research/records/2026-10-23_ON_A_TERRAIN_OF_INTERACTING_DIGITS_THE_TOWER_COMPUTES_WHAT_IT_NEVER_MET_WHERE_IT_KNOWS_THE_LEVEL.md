@@ -472,6 +472,112 @@ The failure names the next subject by its measurement: two looks agree on a wron
 as on a right one (pumped: 14 lines turn right, 14 turn wrong), though the right product is within
 eight looks in 36 of 193 lines.
 
+## Looking inside training
+
+[agent-inferred, October 23] A look the tower never trained on can only repeat its first: nothing in
+its passage ever followed its own answer. The look moves inside training
+(`train-looking-pumped-tower`, `Looking` in the training example). At each moment the terrain
+declares (the `=` at which a line asks for its result), the tower releases its own result from the
+state its stream has reached, by four agreeing draws from its stream's share of a key file; that
+release and its line's end re-enter what the stream reads, the line's head arrives again, and then
+the line's true result. Only what arrives is charged (`TowerLearner::section_charged`): the
+release is the tower's own and brings no news, so its faces send no covector and the certificate
+does not count them (the reafference row, `receipt.reafference-lag`: a receiver cancels its own
+release at its own clock's phase). The true result's covector returns through the state the
+tower's own release moved, so what the tower learns is what a look after its own should write.
+This is the tower's own output reconfiguring its next input, with nothing authored about right or
+wrong: the terrain's line arrives as it always did.
+
+Frustration is what the looks read [agent-inferred, joining Brandon's lens of October 23]. A loop
+of locks whose couplings multiply to −1 has no placement that satisfies every lock, and its least
+energy is lifted by 2 for each such loop, declared from the loop's parity
+(`holon::parametron`, `the_least_locked_sheet_energy_is_twice_the_frustration_less_the_edges`). In
+learning it is the part of an arrival that no placement of the navigators reaches: what the true
+result still costs however often the tower looks. `read-lines-again` now writes that cost from
+where each look stands, so every line reads two numbers, the floor (the least cost any look
+reaches: the frustration) and how fast the looks fall toward it (the gap). Many wrong placements at
+nearly one cost close the gap, which is what a product wandering through 470, 410, 420, 410 and
+490 reads as. Coprime cycles cannot all close together (`ratio.comma-never-closes`), and in a
+product's digits the middle place stays frustrated until the carries below it are placed: the
+place where every tower here is still near blind.
+
+The claim fixed before the run: a pumped tower trained this way for 12 passes, with `ap_t1`'s
+declaration, terrain, founding keys and rate, read by `read-lines-again` over first-met unseen lines
+(at most eight looks), writes more whole results right at its last look than at its first in each
+operation; more of those lines turn right than turn wrong; and in each operation its last look
+writes at least as many right as its own redraw's.
+
+A second read was declared during training, before any look was read: `read-lines-carried`, which
+looks as `read-lines-again` does and whose stream carries each written line's first look, line end
+and head again before the true result, the passage the tower trained in. In `read-lines-again` the
+stream carries only true lines, a passage this tower never met (its held-out read on plain text
+rose from 3.04 bits a byte after the first pass to 5.28 after the second, the heads after a line's
+end costing 5.56: it expects its question again). The fixed claim stays on `read-lines-again`;
+the carried read is reported beside it.
+
+The tower trained 12 passes in 1,121 s (projected at most 1,392 s, 116 s a pass; deadline 1,450 s), reading its own
+release at 22,537 to 22,545 moments a pass; its training text cost fell from 2.467 to 1.296 bits a
+byte, and the plain held-out text rose from 3.037 to 9.056. Over the same 1,200 written lines and
+keys as before, first-met unseen lines (whole results right):
+
+| Read | sums (208) | differences (135) | products (193) |
+|---|---|---|---|
+| `read-lines-again`, first look → last look | 21 → 49 | 12 → 23 | 1 → 7 |
+| lines turned right / turned wrong | 39 / 11 | 19 / 8 | 6 / 0 |
+| its redraw's last look | 17 | 17 | 2 |
+| `read-lines-carried`, first → last | 34 → 55 | 18 → 30 | 6 → 5 |
+| the plain pumped tower, carried, first → last | 178 → 178 | 87 → 91 | 20 → 21 |
+| right at this tower's last look where the plain tower's first is wrong / the reverse | 7 / 136 | 12 / 76 | 1 / 14 |
+
+The claim holds as fixed, in every operation: the last look writes more right than the first, more
+lines turn right than wrong, and the last look beats the redraw's. The tower is also far worse than
+the tower that never looked. The same lines, as they came (this tower's looks, then the plain
+tower's, both carried by `read-lines-again` and `read-lines-carried`):
+
+```
+71+41=  this tower 104|102|112|112        the plain tower 112|112
+73+31=  this tower 105|104|104            the plain tower 106|106
+8+82=   this tower 88|88                  the plain tower 80|80
+12*35=  this tower 1142|450|430|470|460|410|470|470
+                                          the plain tower 470|410|420|410|490|460|430|440
+```
+
+What the true result costs, in bits a line, at the first look, at the last and at the least any
+look reached (the floor), read by `tools/arithmetic_looks.py`:
+
+| Read | sums | differences | products |
+|---|---|---|---|
+| this tower, `read-lines-again` | 10.27, 3.62, 2.72 | 9.23, 3.82, 3.01 | 17.58, 7.39, 6.73 |
+| this tower, `read-lines-carried` | 5.19, 3.12, 2.62 | 5.00, 3.44, 2.99 | 7.93, 7.36, 6.84 |
+| the plain pumped tower, carried | 0.66, 0.69, 0.54 | 1.52, 1.59, 1.15 | 5.68, 5.63, 5.36 |
+
+Three readings [agent-inferred].
+
+- **The look learned to repair.** Trained on its own attempts, the tower's looks carry the true
+  result's cost from 10.27 bits a line to 3.62 on sums, and the sums 73+31 and 71+41, which the
+  untrained looks left at 106 and 102, turn right. The plain tower's looks do not learn: its cost
+  rises slightly from look to look, because each look repeats what the last placed.
+- **The first look was never trained.** At a line's first `=` the stream's next bytes are the
+  tower's own release, and an uncharged byte sends no covector. So the prediction the tower makes
+  where a question first arrives was never compared with anything: the truth was charged only after
+  the attempt, its line end and the head again. The tower learned to answer a second time and
+  never the first, and the plain held-out text, where every question arrives once, rose to 9.06
+  bits a byte. The located defect is the comparison, not the look: the attempt is the produced
+  Holon, and the loss law compares the produced with the target; this training produced and
+  compared nothing.
+- **Frustration reads as floor and gap.** The plain tower's floor is 0.54 bits a line on sums and
+  5.36 on products, its first look within 0.12 and 0.33 bits of it: the gap is closed before it
+  looks, so its looks wander among placements of nearly one cost (the products' 470, 410, 420,
+  410, 490). The look-trained tower opens a gap of 7.5 bits on sums and closes it to 0.9 bits above
+  its floor, but its floor sits at five times the plain tower's. On products both floors sit above
+  5.3 bits a line: what neither tower places is the middle carry, the frustrated place.
+
+The next loop compares the attempt with the truth where the attempt stands: at each byte the tower
+releases, the declared comparison is that byte's face against the true line's byte at the same
+place (the true line end where the attempt runs short), its covector `p − q` charged, while the
+stream still reads the tower's own byte. The look then trains the first arrival and the repair
+together, and its acceptance is this claim plus the plain tower's first-look counts.
+
 ## The recorded failures this step could repeat
 
 - **Catered machinery.** The terrain's truth is generated exactly, outside the machine; the tower
@@ -496,6 +602,10 @@ with 1,200 written and keys `keys_d1`, `LINES_6.tsv` and `LINES_12_1200.tsv` for
 `READ_STREAM_*.txt` holding the observer's read of all lines, of first-met lines and of the rest.
 `LOOKS_AGAIN_*.tsv` and `LOOKS_REDRAW_*.tsv` hold every look of each tower's 1,200 written lines
 (the line's index, its head, the result as given, whether its last two looks agree, the looks),
-read in `READ_LOOKS.txt` (`tools/arithmetic_looks.py`).
-`TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt` and `TRAIN_PUMPED.txt` are the
-training logs (the turned and pumped ones without their per-section swell lines).
+read in `READ_LOOKS.txt` (`tools/arithmetic_looks.py`). The tower trained with the look:
+`LOOKS_AGAIN_LOOKING.tsv`, `LOOKS_REDRAW_LOOKING.tsv` and `LOOKS_CARRIED_LOOKING.tsv`, with
+`LOOKS_CARRIED_PUMPED.tsv` for the plain pumped tower read the same way, each look's cost of the
+true result in a sixth column, read in `READ_LOOKING.txt`.
+`TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`, `TRAIN_PUMPED.txt` and
+`TRAIN_LOOKING.txt` are the training logs (the turned and pumped ones without their per-section
+swell lines).

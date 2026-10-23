@@ -1045,14 +1045,23 @@ impl Tower {
 
     /// The reverse scan of one stream's section: the covector of every family, on its natural
     /// grain (material `2^(−40)`, faces and biases `2^(−24)`, moves `2^(−48)`).
-    fn reverse(&self, opening: &TowerState, cells: &[Cell], classes: &[usize]) -> Result<Vec<i128>> {
-        self.reverse_joined(opening, cells, classes, None)
+    fn reverse(&self, opening: &TowerState, cells: &[Cell], classes: &[usize], charged: Option<&[bool]>) -> Result<Vec<i128>> {
+        self.reverse_joined(opening, cells, classes, None, charged)
     }
 
     /// The reverse scan with a covector reaching each cell's top from outside the tower (the
     /// duplex's meeting, `duplex`), on the top covector's grain `2^(−24)`, added to the one the
-    /// tower's own face sends there.
-    fn reverse_joined(&self, opening: &TowerState, cells: &[Cell], classes: &[usize], joined: Option<&[Vec<i64>]>) -> Result<Vec<i128>> {
+    /// tower's own face sends there. A class `charged` marks false is the tower's own release
+    /// re-entering what it reads: it brings no news, so its face sends no covector, while the
+    /// covectors of the classes after it still return through the state it moved.
+    fn reverse_joined(
+        &self,
+        opening: &TowerState,
+        cells: &[Cell],
+        classes: &[usize],
+        joined: Option<&[Vec<i64>]>,
+        charged: Option<&[bool]>,
+    ) -> Result<Vec<i128>> {
         let d = &self.declaration;
         let (w, n, f, a) = (d.width, d.modes, d.contacts, d.alphabet);
         let t = &self.theta;
@@ -1066,15 +1075,22 @@ impl Tower {
         let mut dzs: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
         let ro = self.layout.readout;
         let rb = self.layout.readout_bias;
+        if charged.is_some_and(|m| m.len() != classes.len()) {
+            return refuse("a charge for each class of the section");
+        }
         for (i, cell) in cells.iter().enumerate() {
             let target = classes[i + 1];
             let face = &cell.face;
-            let dz: Vec<i64> = (0..a)
-                .map(|c| {
-                    let p = ((face.masses[c] << COVECTOR_BITS) + face.total / 2) / face.total;
-                    p as i64 - if c == target { 1i64 << COVECTOR_BITS } else { 0 }
-                })
-                .collect();
+            let dz: Vec<i64> = if charged.is_some_and(|m| !m[i + 1]) {
+                vec![0; a]
+            } else {
+                (0..a)
+                    .map(|c| {
+                        let p = ((face.masses[c] << COVECTOR_BITS) + face.total / 2) / face.total;
+                        p as i64 - if c == target { 1i64 << COVECTOR_BITS } else { 0 }
+                    })
+                    .collect()
+            };
             for (slot, &v) in g[rb..rb + a].iter_mut().zip(&dz) {
                 *slot += v as i128;
             }
@@ -1668,9 +1684,20 @@ impl TowerLearner {
     /// The streams' covectors are summed, the moments move, the step is certified by the reread,
     /// and each stream's state continues under the material the section ends with.
     pub fn section(&mut self, states: &mut [TowerState], classes: &[&[usize]]) -> Result<SectionReceipt> {
+        self.section_charged(states, classes, None)
+    }
+
+    /// A section in which only the classes `charged` marks are news: the others are the tower's
+    /// own release re-entering what it reads (`reverse_joined`). Their faces send no covector and
+    /// neither the code nor the certificate counts them.
+    pub fn section_charged(&mut self, states: &mut [TowerState], classes: &[&[usize]], charged: Option<&[&[bool]]>) -> Result<SectionReceipt> {
         if states.len() != classes.len() || classes.iter().any(|c| c.len() < 2) {
             return refuse("a section needs one carried state and two classes a stream");
         }
+        if charged.is_some_and(|m| m.len() != classes.len() || m.iter().zip(classes).any(|(m, c)| m.len() != c.len())) {
+            return refuse("a charge for each class of each stream");
+        }
+        let charge = |s: usize, i: usize| charged.is_none_or(|m| m[s][i]);
         let tower = &self.tower;
         let reaches = tower.reaches();
         let opening: Vec<TowerState> = states.to_vec();
@@ -1698,18 +1725,23 @@ impl TowerLearner {
         let faces_old: Vec<(u128, u128)> = forwards
             .iter()
             .zip(classes)
-            .flat_map(|((cells, _), c)| cells.iter().enumerate().map(move |(i, cell)| (cell.face.masses[c[i + 1]], cell.face.total)))
+            .enumerate()
+            .flat_map(|(s, ((cells, _), c))| {
+                cells.iter().enumerate().filter(move |&(i, _)| charge(s, i + 1)).map(move |(i, cell)| (cell.face.masses[c[i + 1]], cell.face.total))
+            })
             .collect();
         let code_before: i64 = forwards
             .iter()
             .zip(classes)
-            .map(|((cells, _), c)| cells.iter().enumerate().map(|(i, cell)| cell.face.code(c[i + 1])).sum::<i64>())
+            .enumerate()
+            .map(|(s, ((cells, _), c))| cells.iter().enumerate().filter(|&(i, _)| charge(s, i + 1)).map(|(i, cell)| cell.face.code(c[i + 1])).sum::<i64>())
             .sum();
         let gradients: Vec<Vec<i128>> = opening
             .par_iter()
             .zip(forwards.par_iter())
             .zip(classes.par_iter())
-            .map(|((open, (cells, _)), c)| tower.reverse(open, cells, c))
+            .enumerate()
+            .map(|(s, ((open, (cells, _)), c))| tower.reverse(open, cells, c, charged.map(|m| m[s])))
             .collect::<Result<_>>()?;
         let mut g = vec![0i128; tower.theta.len()];
         for gs in &gradients {
@@ -1779,13 +1811,17 @@ impl TowerLearner {
             let faces_new: Vec<(u128, u128)> = rereads
                 .iter()
                 .zip(classes)
-                .flat_map(|((cells, _), c)| cells.iter().enumerate().map(move |(i, cell)| (cell.face.masses[c[i + 1]], cell.face.total)))
+                .enumerate()
+                .flat_map(|(s, ((cells, _), c))| {
+                    cells.iter().enumerate().filter(move |&(i, _)| charge(s, i + 1)).map(move |(i, cell)| (cell.face.masses[c[i + 1]], cell.face.total))
+                })
                 .collect();
             if fewer_bits(&faces_old, &faces_new) {
                 let code_after: i64 = rereads
                     .iter()
                     .zip(classes)
-                    .map(|((cells, _), c)| cells.iter().enumerate().map(|(i, cell)| cell.face.code(c[i + 1])).sum::<i64>())
+                    .enumerate()
+                    .map(|(s, ((cells, _), c))| cells.iter().enumerate().filter(|&(i, _)| charge(s, i + 1)).map(|(i, cell)| cell.face.code(c[i + 1])).sum::<i64>())
                     .sum();
                 candidate.carry_credit(states, rereads, &opening, &creaches)?;
                 self.tower = candidate;
@@ -2204,7 +2240,7 @@ mod tests {
         let reaches = tower.reaches();
         let mut s = opening.clone();
         let cells = tower.forward(&mut s, &classes, &reaches).expect("forward");
-        let mut g = tower.reverse(&opening, &cells, &classes).expect("reverse");
+        let mut g = tower.reverse(&opening, &cells, &classes, None).expect("reverse");
         tower.to_step_grain(&mut g);
         // Which contacts conduct at every cell, and each pump's depth's sign: the covector is the
         // derivative on the passage's own side of every kink, so a perturbation that moves a contact
@@ -2282,7 +2318,7 @@ mod tests {
         let covector = |opening: &TowerState, part: &[usize]| -> (Vec<i128>, TowerState) {
             let mut s = opening.clone();
             let cells = tower.forward(&mut s, part, &reaches).expect("forward");
-            let g = tower.reverse(opening, &cells, part).expect("reverse");
+            let g = tower.reverse(opening, &cells, part, None).expect("reverse");
             if let Some(credit) = s.credit.as_mut() {
                 tower.advance_credit(credit, opening, &cells, &reaches).expect("credit");
             }
@@ -2332,7 +2368,7 @@ mod tests {
         let reaches = tower.reaches();
         let mut s = opening.clone();
         let cells = tower.forward(&mut s, &classes, &reaches).expect("forward");
-        let mut g = tower.reverse(&opening, &cells, &classes).expect("reverse");
+        let mut g = tower.reverse(&opening, &cells, &classes, None).expect("reverse");
         tower.to_step_grain(&mut g);
         tower.to_move_chart(&mut g);
         // Each chart coordinate of each level: the mode with the largest covector, stepped by ±2^(−7).
@@ -2484,5 +2520,44 @@ mod tests {
         }
         // Under a quarter of a bit a class (the flat face codes two bits).
         assert!(last.code_after * 4 < (last.cells as i64) << READ_BITS, "{last:?}");
+    }
+
+    /// A class the charge leaves out is the tower's own release re-entering what it reads. Charged
+    /// everywhere, a section is the plain section; charged nowhere, a passage sends no covector and
+    /// codes nothing; and the covectors of two complementary charges sum to the plain covector up to
+    /// the reverse scan's releases.
+    #[test]
+    fn an_uncharged_class_sends_no_covector_and_is_not_counted() {
+        let tower = tiny_turning(2, true, true, true);
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        let opening = tower.rest();
+        let mut s = opening.clone();
+        let cells = tower.forward(&mut s, &classes, &tower.reaches()).expect("forward");
+        let plain = tower.reverse(&opening, &cells, &classes, None).expect("reverse");
+        let all = vec![true; classes.len()];
+        assert_eq!(tower.reverse(&opening, &cells, &classes, Some(&all)).expect("reverse"), plain);
+        let none = vec![false; classes.len()];
+        assert!(tower.reverse(&opening, &cells, &classes, Some(&none)).expect("reverse").iter().all(|&v| v == 0));
+        // Every third class re-entering, and its complement.
+        let some: Vec<bool> = (0..classes.len()).map(|i| i % 3 != 1).collect();
+        let rest: Vec<bool> = some.iter().map(|c| !c).collect();
+        let a = tower.reverse(&opening, &cells, &classes, Some(&some)).expect("reverse");
+        let b = tower.reverse(&opening, &cells, &classes, Some(&rest)).expect("reverse");
+        assert!(a != plain && b.iter().any(|&v| v != 0));
+        let (gap, size): (i128, i128) = a.iter().zip(&b).zip(&plain).fold((0, 0), |(g, n), ((x, y), p)| (g + (x + y - p).abs(), n + p.abs()));
+        assert!(gap * 1000 <= size, "complementary charges sum to {gap} away from a covector of {size}");
+        // The sections: charged everywhere as the plain one, charged nowhere coding nothing.
+        let mut plain_learner = TowerLearner::new(tower.clone(), 5);
+        let mut charged_learner = TowerLearner::new(tower.clone(), 5);
+        let (mut s1, mut s2) = (vec![tower.rest()], vec![tower.rest()]);
+        let r1 = plain_learner.section(&mut s1, &[&classes]).expect("section");
+        let r2 = charged_learner.section_charged(&mut s2, &[&classes], Some(&[&all])).expect("section");
+        assert_eq!((r1.code_before, r1.code_after, r1.deposited, r1.cells), (r2.code_before, r2.code_after, r2.deposited, r2.cells));
+        assert_eq!(plain_learner.tower, charged_learner.tower);
+        assert_eq!(s1, s2);
+        let mut silent = TowerLearner::new(tower.clone(), 5);
+        let r = silent.section_charged(&mut vec![tower.rest()], &[&classes], Some(&[&none])).expect("section");
+        assert_eq!((r.cells, r.code_before, r.deposited), (0, 0, false));
+        assert_eq!(silent.tower, tower);
     }
 }
