@@ -342,7 +342,117 @@ So the receiving tree can carry the whole partition at fixed widths, if its cert
 released law's per-cell telescope instead of the tracking of the unreleased ideal. The
 receiving tree's owner decides; this read changes no crate.
 
-## 8. Owed (#410)
+## 8. The located equality: a copy is a pair contact whose offset is a key
+
+§6 left the code in relations between cells. The design asked for the first of them as an exact
+law at the receiver's face: how a located offset's prediction joins the face, and its certified
+step.
+
+**The contact.** [derived] A located equality is a pair contact between the present cell `t` and an
+earlier cell `r = t − δ` of the same passage. Its slip is `[u_t ≠ u_r]`, and it holds while the two
+agree. The offset `δ` is its key. A run of `ℓ` held contacts at one offset closes `ℓ` squares: the
+passage step from `r` to `r + 1`, the step from `t` to `t + 1`, and the two contacts between them.
+So a held offset is a loop-closure constraint, and it is located from the menu of contacts, never
+supplied.
+
+**Locating the key.** The passage tree already keeps, at each node, the time of its last visit
+(its lazy decay's `tl`). The deepest node on the present cell's path with an earlier visit names
+the longest context that has recurred, and its last visit `r` gives `δ = t − r`. Nothing new is
+needed to locate it.
+
+**Two placements of the same contact.**
+- *Node lock.* The prediction `ĉ` is the cell that followed the deepest node's last visit. This is
+  the node's indicator at `λ = 0`, the last occurrence, beside `λ = 1` (the tree's counts) and
+  `λ = 1 − 2^(−13)` (the passage): one more spectral placement of the node's own past, two bits a
+  node, with nothing of the passage kept.
+- *Held lock.* `δ` is held while its contact holds, and `ĉ = u_(t−δ)`. At a slip the offset is
+  released and located again. It follows one occurrence past the tree's depth, so it reads the
+  cell `δ` back. By the lag-residue factorization (§6) no moment bank recovers that cell: it needs
+  the passage's own cells within the lock's reach, which is the strand the retention law refuses.
+
+**The join at the face.** [derived] With the face `q(c)·2^(w(c))` that the passage weight already
+uses, the lock adds one exponent:
+
+```text
+F(c) ∝ q(c) · 2^(w(c) + α_b [c = ĉ])
+```
+
+`α_b` is held per bin `b`: the octave of the lock's run (the count of closed squares) and the
+locating depth by fours. In octaves:
+
+```text
+∂/∂α_b (−log₂ F(u)) = F(ĉ) − [u = ĉ]
+∂²/∂α_b² (−log₂ F(u)) = ln 2 · F(ĉ)(1 − F(ĉ)) ≤ (ln 2)/4
+```
+
+The first is the news of the declared comparison on the contact's own feature, the same covector
+as the face's (§6). The step is the passage weight's Newton step on the cumulative curvature, with a
+prior of 1 [agent-inferred]:
+
+```text
+H_b ← H_b + F(ĉ)(1 − F(ĉ))
+α_b ← α_b − (F(ĉ) − [u = ĉ]) / (ln 2 · (1 + H_b))
+```
+
+**The certificate.** [derived] The cell's code is convex in `α_b` with curvature at most
+`L = (ln 2)/4` everywhere, so a step `s g` along its covector `g` gives
+`ℓ(α − s g) ≤ ℓ(α) − s g² (1 − L s/2)`. The step length is `s = 1/(ln 2 (1 + H_b)) ≤ 1/ln 2`, so
+`L s/2 ≤ 1/8` and the stepped weight codes the cell that produced the covector at least
+`(7/8) g²/(ln 2 (1 + H_b))` bits better, strictly unless `g = 0`. Stepped jointly with the passage
+weights, the curvature is the block Fisher matrix `Cov_F` of the features, which is positive
+semidefinite, so the joint Newton direction descends.
+
+The contact names no modality. Wherever a passage repeats at a fixed relative phase, a recurred
+context locates the offset: a translation in an image, a period in sound, a repeated screw word in
+motion.
+
+**Measurement.** The exterior read of §7 (`D = 24`, ratio released at `2^12`, passage `2^13` with
+`w = 64`) as the base, each lock joined beside it (`lock.rs`), online, bits a cell:
+
+| | base | node lock | held lock | node lock, depth bins only | held lock, depth bins only |
+|---|---|---|---|---|---|
+| first 1,000 problems | 0.4886 | 0.4692 | 0.4640 | 0.4722 | 0.4713 |
+| whole partition, 6,726 problems | 0.4274 | 0.4147 | 0.4070 | 0.4174 | 0.4134 |
+
+- A lock predicts at every cell after the first, and its prediction is right at 85% to 87% of
+  cells.
+- On the whole partition the node lock codes 3.0% below the base, and the held lock 4.8%.
+- On the whole partition the run, the count of closed squares, carries 0.0027 bits a cell of the
+  node lock's 0.0127 and 0.0064 of the held lock's 0.0204. The rest is the locating depth.
+- The held lock's extra over the node lock is 0.0077 bits a cell on the whole partition. That is
+  what a lawful realization of a held offset would have to earn.
+
+By role, on the first 1,000 problems, bits a byte:
+
+| role | bytes | base | node lock | held lock |
+|---|---|---|---|---|
+| question prose | 226,988 | 2.139 | 2.083 | 2.065 |
+| answer prose | 212,664 | 1.580 | 1.466 | 1.447 |
+| digits in answer prose | 17,379 | 3.365 | 3.366 | 3.362 |
+| calculator markup | 19,800 | 1.675 | 1.585 | 1.549 |
+| calculator operand digits | 12,625 | 2.431 | 2.451 | 2.407 |
+| question digits | 5,658 | 4.338 | 4.540 | 4.521 |
+| calculator result digits | 7,118 | 3.199 | 2.976 | 2.903 |
+| digits repeating the result after `>>` | 7,118 | 1.398 | 1.162 | 1.100 |
+| final answer digits | 2,283 | 2.964 | 3.113 | 2.996 |
+| separators | 3,000 | 1.754 | 1.625 | 1.584 |
+| `####` marker | 5,000 | 0.485 | 0.549 | 0.542 |
+| all | 519,633 | 1.954 | 1.877 | 1.856 |
+
+- Most of the gain is in prose: the answer restating the question's words.
+- The repeat after `>>` falls from 1.40 to 1.10 bits, still far from a copy's near-zero cost. Its
+  first digit costs 0.94 and the following digits 1.23. The deepest recurred context there is the
+  markup of an older calculation, so the located offset points at an older result. The repeat's
+  true offset is the result's own length plus two, a relation of the markup that context
+  recurrence does not locate.
+- New numbers in the question cost more under a lock (4.34 to 4.52 bits). There a confident copy
+  is wrong, and the bins cannot see that a number is new.
+
+So the node lock is the contact to build now: it is a placement of the passage tree's own node, it
+needs no strand, and it carries most of the gain. The receiving tree's owner decides; this read
+changes no crate.
+
+## 9. Owed (#410)
 
 - The summed contact material is the sheaf Laplacian: `Σ_e w_e J_e*DJ_e = δᵀ W δ`, its kernel the
   global sections, and the tower's obstruction the cokernel of `δ`, at the contact and tower
@@ -358,6 +468,10 @@ receiving tree's owner decides; this read changes no crate.
   any release `β_(t+1) = R(β'_t)`, `Σ −ln q = Σ −ln k + ln(1 + β_0) − ln(1 + β_n) +
   Σ [ln(1 + β_(t+1)) − ln(1 + β'_t)]` and its mirror in `e`; with `R` the clamp to `[2^(−K), 2^K]`,
   each release costs at most `ln(1 + 2^(−K))` on one line and nothing on the other.
+- The located equality's certified step: for `F(c) ∝ q(c) 2^(w(c) + α[c = ĉ])` the cell's code
+  `−log₂ F(u)` has derivative `F(ĉ) − [u = ĉ]` and second derivative `ln 2 · F(ĉ)(1 − F(ĉ)) ≤ (ln 2)/4`
+  in `α`, so a step of length `s ≤ 1/ln 2` along that covector lowers the cell's code by at least
+  `(7/8) s g²`.
 
 ## Receipts
 
@@ -396,4 +510,16 @@ receiving tree's owner decides; this read changes no crate.
   largest plain read on 1,000 problems) to half as much again for the larger table: 76 s to 114 s a
   run, deadline 120 s, two together. Both took 64 s (ratio 0.56 to the upper end) at 1,020 MiB,
   against about 4.5 GB projected for 29 million nodes; the partition has 11.9 million.
+- [`lock.rs`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/lock.rs) (built with `rustc -O`), outputs
+  [`lock_1000.txt`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/lock_1000.txt) and [`lock_full.txt`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/lock_full.txt), each with its
+  `LOCK_NO_RUN=1` control. In the program's output the held lock is named the ring lock. The
+  1,000-problem reads took 9.3 s and 9.2 s at 437 MiB, at most 4.50 µs a cell; they set the
+  whole-partition projection.
+- [`lock_full.sh`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/lock_full.sh) ran the whole partition: projection 64 s to 95 s a run (4.50 µs
+  a cell to half as much again for the larger table), deadline 120 s, about 1.1 GB a run, two
+  together. They took 66.6 s and 62.8 s (ratio 0.70 to the upper end) at 1,020 MiB.
+- [`classify_partition.py`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/classify_partition.py) and
+  [`repeat_split.py`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/repeat_split.py) group each byte's code by role, from the per-byte code
+  `lock.rs` writes with its sixth argument; output
+  [`lock_roles_1000.txt`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/lock_roles_1000.txt).
 - No Rust or Lean in the crates or the Lean package changed.
