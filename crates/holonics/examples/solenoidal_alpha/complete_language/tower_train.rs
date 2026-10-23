@@ -82,10 +82,12 @@ pub(super) fn per(code: i64, n: usize) -> String {
 }
 
 /// `train-tower` trains the ungated tower, `train-gated-tower` the gated one (its modes' decay keyed by
-/// their input); a continued learner must carry the same declaration.
-pub(super) fn train(args: &[String], gated: bool) -> Result<()> {
+/// their input), and `train-credited-tower` the gated one whose streams carry their passage credit
+/// (`hnn::tower::LevelCredit`), so a section's covector reaches the history its opening carries; a
+/// continued learner must carry the same declaration.
+pub(super) fn train(args: &[String], gated: bool, credit: bool) -> Result<()> {
     if args.len() != 18 && args.len() != 20 {
-        return Err("train-tower|train-gated-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+        return Err("train-tower|train-gated-tower|train-credited-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
     let started = Instant::now();
     let train = pinned_read(&args[1], &args[2], READ_BUDGET as usize)?;
@@ -130,7 +132,8 @@ pub(super) fn train(args: &[String], gated: bool) -> Result<()> {
     );
     for pass in 0..passes {
         let pass_started = Instant::now();
-        let mut states: Vec<TowerState> = (0..streams).map(|_| learner.tower.rest()).collect();
+        let mut states: Vec<TowerState> =
+            (0..streams).map(|_| if credit { learner.tower.rest_with_credit() } else { learner.tower.rest() }).collect();
         let (mut code, mut cells, mut deposits, mut halvings) = (0i64, 0usize, 0usize, 0u32);
         let mut window = (0i64, 0usize);
         for k in 0..sections_a_pass {
