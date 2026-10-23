@@ -176,7 +176,80 @@ sharpening of the estimator with no locality.
   rendering of the same 1,000 problems). How much of the gain survives on that tree is not
   measured.
 
-## 6. Owed (#410)
+## 6. The tower driven by the face's news, and where the code goes
+
+The design built the passage tree natively and measured 0.507 to 0.469 bits a cell at depth 24
+(their record of October 23 on GSM8K). It then asked for the move law of a level driven by the
+face's news.
+
+**The drive.** A level above the face `p` receives the face's cokernel, never its own read. Two
+drives are covectors of the face:
+- the news `e_t = [u_t] − p_t`, the covector of the face's logits;
+- the centred surprise `c_t = −ln p_t(u_t) − H(p_t)`, the covector of the face's temperature: for
+  `p_τ ∝ p^τ`, `d/dτ (−ln p_τ(u))` at `τ = 1` is `c_t`, and the second derivative is
+  `Var_p(ln p)`.
+
+When `p` is the true conditional of the whole past, both are martingale differences: their
+conditional mean is zero, so no read of them can lower the expected code. Whatever a level driven
+by them reads is the face's error against the full past, never a second copy of the tree.
+
+**The move.** `z_k' = λ_k z_k + e_t` and `y_k' = μ_k y_k + c_t`. The drive does not depend on the
+pole, so the proved forward jet `J' = λJ + z` (§2c of `Geometry/ScrewTorsion`) is exact. A drive
+taken from the level's own joined face would depend on the pole and lose that, which is the
+reafference the design already met in generation.
+
+**The placement.** At a zero read, the code's gradient for a mode at pole `λ` is
+`g(λ) = Σ_(j≥0) λ^j R(j + 1)`, with `R(τ)` the covariance of the drive with itself `τ` cells later.
+The first-order gain is `½ g(λ)ᵀ H⁻¹ g(λ)`, with `H` the Fisher term (`Var_p` for logits,
+`Var_p(ln p)` for temperature). So the poles go where the drive's lagged covariance is large, and
+`R` is measured before a bank is built.
+
+**Measurement.** These are exterior reads over the passage tree of §5 (depth 24, horizon `2^13`,
+`w = 64`), on the same 1,000 problems. The reads use six real poles at horizons `2^2` to `2^12`.
+The weights are the Newton point of the quadratic model at the face over the past, solved before
+each cell is scored.
+
+| lag (cells) | 1 | 4 | 16 | 64 | 256 | 1024 | 4096 |
+|---|---|---|---|---|---|---|---|
+| news correlation | −0.003 | −0.006 | 0.005 | 0.003 | 0.005 | 0.001 | 0.001 |
+| surprise correlation | 0.022 | 0.020 | 0.013 | 0.006 | 0.007 | 0.004 | 0.003 |
+
+- The face's news is white at every lag up to 4,096. A bank on the news, read into the logits,
+  gives 0.4918 against the face's 0.4922.
+- Surprises cluster weakly. A bank on the surprise, read as temperature, gives 0.4909, and both
+  together give 0.4906: 0.3% overall and 0.7% in the last quarter (0.4512 against 0.4543).
+- The bound holds: past the tree and passage tree, moments of the face's cokernel carry almost
+  nothing on this text.
+
+**Where the code goes.** Each byte's code length (the sum of its four cells) is grouped by the
+byte's role in the problem's own markup:
+
+| role | bytes | plain tree, bits a byte | passage tree, bits a byte | share of the passage tree's code |
+|---|---|---|---|---|
+| question prose | 229,587 | 2.284 | 2.148 | 48.1% |
+| answer prose | 212,594 | 2.012 | 1.595 | 33.0% |
+| digits in answer prose | 17,304 | 3.683 | 3.379 | 5.7% |
+| calculator markup (`<<`, operators, `=`, `>>`) | 19,869 | 1.686 | 1.669 | 3.2% |
+| calculator operand digits | 12,611 | 2.909 | 2.446 | 3.0% |
+| question digits | 5,667 | 4.291 | 4.381 | 2.4% |
+| calculator result digits | 7,122 | 3.130 | 3.205 | 2.2% |
+| digits repeating the result after `>>` | 7,122 | 1.612 | 1.423 | 1.0% |
+| final answer digits | 2,279 | 3.344 | 2.990 | 0.7% |
+
+- The passage tree's gain is mostly in the answer's prose and operands, which reuse the question's
+  words and numbers.
+- A result digit costs 3.2 bits, near `log₂ 10 = 3.32`: the tree does not compute the arithmetic.
+- A digit repeating the result after `>>` still costs 1.4 bits, where a copy would cost almost
+  nothing. The tree copies a number only when it has met that exact number in that context.
+
+So past the tree, the code that can still fall is in relations between cells, not in moments of
+the past: an equality between a cell and a located earlier cell (the repeat, the operands, the
+answer's restated numbers), and the arithmetic of the results. A moment bank cannot hold them. By
+the lag-residue factorization, a bank reads lagged counts, and recovering one particular earlier
+value from them takes a register as long as the lag. A located equality is a pair contact whose
+offset is a key located by loop closure.
+
+## 7. Owed (#410)
 
 - The summed contact material is the sheaf Laplacian: `Σ_e w_e J_e*DJ_e = δᵀ W δ`, its kernel the
   global sections, and the tower's obstruction the cokernel of `δ`, at the contact and tower
@@ -184,6 +257,9 @@ sharpening of the estimator with no locality.
 - Commuting selected moves see only symbol counts: with linear parts that commute, each entry
   `β(u_t)` reaches the state transported by `∏_a λ_a^(n_a)`, with `n_a` the count of `a` after
   `t` (`Finset.prod_comp`).
+- The face's two covectors: for `p_τ ∝ p^τ`, `d/dτ (−ln p_τ(u)) = −ln p(u) − H(p)` at `τ = 1`, with
+  second derivative `Var_p(ln p)`; and under the true conditional, the news and the centred
+  surprise are martingale differences, so no read of them lowers the expected code (Gibbs).
 
 ## Receipts
 
@@ -204,4 +280,10 @@ sharpening of the estimator with no locality.
   that for the larger table, the projection was at most 53 s a run, and the deadline was 60 s a run.
   Runs went four together, one thread each. The slowest took 28.0 s (ratio 0.53), with a peak of
   489 MiB.
+- [`tower.rs`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/tower.rs), output [`tower.txt`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/tower.txt). A development read on 100
+  problems measured at most 22.29 µs a cell. With the measured table growth of 1.054 the projection
+  was 49 s and the deadline 60 s; the run took 45.6 s (ratio 0.93) at 489 MiB.
+- [`passage_bytes.rs`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/passage_bytes.rs) writes each byte's code length;
+  [`classify.py`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/classify.py) groups it by role, output [`classes.txt`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/classes.txt). The
+  two runs went together (projection 28 s, deadline 60 s; 25.1 s and 27.8 s at 490 MiB).
 - No Rust or Lean in the crates or the Lean package changed.

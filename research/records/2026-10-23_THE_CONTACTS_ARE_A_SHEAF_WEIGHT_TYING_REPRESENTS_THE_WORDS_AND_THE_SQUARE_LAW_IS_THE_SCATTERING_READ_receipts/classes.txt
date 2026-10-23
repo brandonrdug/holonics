@@ -1,0 +1,16 @@
+role                                    bytes  plain: bits/byte, share     passage: bits/byte, share 
+question prose                         229587     2.284   45.3%                 2.148   48.1%            
+answer prose                           212594     2.012   37.0%                 1.595   33.0%            
+answer digit (prose)                    17304     3.683    5.5%                 3.379    5.7%            
+calc operand digit                      12611     2.909    3.2%                 2.446    3.0%            
+calc markup                             19869     1.686    2.9%                 1.669    3.2%            
+question digit                           5667     4.291    2.1%                 4.381    2.4%            
+calc result digit                        7122     3.130    1.9%                 3.205    2.2%            
+digit after >> (repeat of result)        7122     1.612    1.0%                 1.423    1.0%            
+final answer digit                       2279     3.344    0.7%                 2.990    0.7%            
+separator                                2000     1.744    0.3%                 2.156    0.4%            
+#### marker                              5000     0.493    0.2%                 0.503    0.2%            
+all                                    521155     2.221                        1.969                   
+# passage_bytes 24 0 0 and 24 13 64 on the first 1,000 problems; projection 28 s a run, deadline 60 s, two together:
+D=24 m= 0 w=0 cells 2084620: online 0.5553 bits/digit; quarters 0.6290 0.5533 0.5260 0.5130; nodes 4246939  (25.1 s, 12.05 us/cell, peak 490 MiB)
+D=24 m=13 w=64 cells 2084620: online 0.4922 bits/digit; quarters 0.5571 0.4924 0.4651 0.4543; nodes 4246939  (27.8 s, 13.34 us/cell, peak 490 MiB)
