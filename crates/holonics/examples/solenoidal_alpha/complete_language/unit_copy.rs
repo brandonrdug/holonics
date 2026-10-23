@@ -40,6 +40,15 @@
 //! the prepared text puts before every question (the exterior codec's problem separator), so a
 //! question's opening is a located context for its answer's opening, and the weights learn in the
 //! read under the opening a sample meets.
+//!
+//! [definition; agent-inferred, October 23] **The passage is trusted where the tower is unsure.**
+//! Half the held-out answers open on a capitalized word of their own question (378 of 747, 151 of
+//! them its first word), mostly a name, while the tower opens with a name of its own: it holds that
+//! a name comes, not which. At a cell whose context is the unit's own prefix the passage's face is
+//! its count of the units this problem said, and its news over the tower is large exactly at such a
+//! name. The news weight `α_e` sits in a slot of the evidence depth and the tower's uncertainty at
+//! the unit's opening (the surprise octave of its own likeliest unit), so the passage can weigh
+//! heavily where the tower spreads its face over many units and lightly where the tower is sure.
 
 use super::modes_train::{lock_bin, lock_bins, run_octave, LOCK_OCTAVES};
 use super::tower_train::{agreement, agreement_face, per, region_line, roles_of};
@@ -49,7 +58,7 @@ use holonics::hnn::passage::{log2_face, PassageDeclaration, PassageTree};
 use holonics::hnn::tower::{cell_phases, code_of, unit_of, Tower, TowerFace, TowerLearner};
 use holonics::hnn::units::Units;
 
-const COPY_MAGIC: &str = "complete-language-unit-copy-v2";
+const COPY_MAGIC: &str = "complete-language-unit-copy-v3";
 /// A tower state's read ceiling, `2^30` bytes.
 const STATE_BUDGET: usize = 1 << 30;
 /// The cells a section of the join's weights holds (agent-inferred: the byte join's 1,024).
@@ -87,6 +96,14 @@ fn surprise_octave(face: &TowerFace, u: usize) -> usize {
     (usize::BITS - (62 - bits).leading_zeros()) as usize
 }
 
+/// The octave of the tower's uncertainty at a unit's opening: its surprise at its own likeliest
+/// unit (zero where the tower is sure; high where many units share the face, as names and
+/// quantities do).
+fn uncertainty_octave(face: &TowerFace) -> usize {
+    let likeliest = (0..face.masses.len()).max_by_key(|&u| face.masses[u]).unwrap_or(0);
+    surprise_octave(face, likeliest)
+}
+
 /// A weight on `2^(−30)` written to thousandths.
 fn weight(a: i128) -> String {
     let t = (a * 1000) >> 30;
@@ -121,6 +138,7 @@ struct Contact {
     run: u64,
     copy_run: u64,
     copy: Option<Copied>,
+    uncertainty: usize,
     longest: usize,
 }
 
@@ -145,8 +163,8 @@ fn letter_cells() -> usize {
 
 impl Contact {
     fn open(learner: KeyedLearner, depth: usize, horizon: u32, phases: usize, longest: usize) -> Result<Self> {
-        if learner.modes.declaration.locks != Self::bins(depth) {
-            return Err("the copy's lock bins are not its declaration's".into());
+        if learner.modes.declaration.locks != Self::bins(depth) || learner.modes.declaration.evidence != Self::slots(depth) {
+            return Err("the copy's lock bins or evidence slots are not its declaration's".into());
         }
         Ok(Self {
             learner,
@@ -163,6 +181,7 @@ impl Contact {
             run: 0,
             copy_run: 0,
             copy: None,
+            uncertainty: 0,
             longest,
         })
     }
@@ -173,8 +192,13 @@ impl Contact {
         lock_bins(depth) + LOCK_OCTAVES * LOCK_OCTAVES * SURPRISE_OCTAVES
     }
 
+    /// The evidence slots: the passage's evidence depth by the tower's uncertainty octave.
+    fn slots(depth: usize) -> usize {
+        (depth + 2) * SURPRISE_OCTAVES
+    }
+
     fn founded(depth: usize, horizon: u32, phases: usize, longest: usize) -> Result<Self> {
-        let modes = KeyedModes::new(Declaration { modes: 0, alphabet: 4, evidence: depth + 2, locks: Self::bins(depth), grains: Grains::DECLARED })?;
+        let modes = KeyedModes::new(Declaration { modes: 0, alphabet: 4, evidence: Self::slots(depth), locks: Self::bins(depth), grains: Grains::DECLARED })?;
         Self::open(KeyedLearner::new(modes), depth, horizon, phases, longest)
     }
 
@@ -227,10 +251,17 @@ impl Contact {
             }),
             (None, _) => unit_lock.map(|(class, d)| Lock { class, bin: lock_bin(self.run, self.depth, d) }),
         };
-        // The passage's term is its log ratio to the tower: p̂ ∝ q (p_loc / q)^α.
+        // The passage's term is its log ratio to the tower: p̂ ∝ q (p_loc / q)^α. A cell past the
+        // alphabet holds no class, so the passage has no news there (a shallow node counts cells of
+        // other prefixes, and its share past the alphabet would otherwise outweigh every class).
         let passage = PassageReading {
-            logs: local.probabilities.iter().zip(&q).map(|(&p, &t)| log2_face(p.max(1), exponent) - log2_face(t.max(1), exponent)).collect(),
-            evidence: local.evidence,
+            logs: local
+                .probabilities
+                .iter()
+                .zip(&q)
+                .map(|(&p, &t)| if t == 0 { 0 } else { log2_face(p.max(1), exponent) - log2_face(t, exponent) })
+                .collect(),
+            evidence: local.evidence * SURPRISE_OCTAVES + self.uncertainty,
             lock,
         };
         let joined = self.learner.face(&q, Some(&passage))?;
@@ -295,8 +326,10 @@ impl Contact {
     }
 
     /// The copy at the next unit's opening, under the tower's `face`: the letters' lock run forward
-    /// through its own kept classes to one byte past the longest piece, read in the units.
+    /// through its own kept classes to one byte past the longest piece, read in the units; and the
+    /// tower's uncertainty there, which keys the passage's evidence weight.
     fn locate(&mut self, units: &Units, face: &TowerFace) -> Result<()> {
+        self.uncertainty = uncertainty_octave(face);
         let (cells, depth) = (letter_cells(), LETTER_BYTES * letter_cells());
         let now = self.spelled_position as u64;
         let mut context: Vec<usize> = self.spelled.iter().rev().copied().collect();
@@ -470,11 +503,11 @@ pub(super) fn read(args: &[String]) -> Result<()> {
         per(opening_codes[0], openings.max(1)), per(opening_codes[1], openings.max(1))
     );
     let modes = &contact.learner.modes;
-    let evidence: Vec<String> = modes.passage.iter().map(|a| weight(a.re)).collect();
+    let evidence: Vec<String> = modes.passage.chunks(SURPRISE_OCTAVES).map(|depth| depth.iter().map(|a| weight(a.re)).collect::<Vec<_>>().join(",")).collect();
     let quarters = depth / 4 + 1;
     let (unit_locks, copy_bins) = modes.lock.split_at(lock_bins(depth));
     let locks: Vec<String> = unit_locks.chunks(quarters).map(|octave| octave.iter().map(|a| weight(a.re)).collect::<Vec<_>>().join(",")).collect();
-    println!("COPY_WEIGHTS evidence=[{}] lock=[{}]", evidence.join(","), locks.join(";"));
+    println!("COPY_WEIGHTS evidence_by_uncertainty=[{}] lock=[{}]", evidence.join(";"), locks.join(";"));
     for (row, surprises) in copy_bins.chunks(SURPRISE_OCTAVES).enumerate() {
         if surprises.iter().any(|a| a.re != 0) {
             let line: Vec<String> = surprises.iter().map(|a| weight(a.re)).collect();
