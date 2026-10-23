@@ -31,7 +31,9 @@ Brandon answered with three lenses within the hour:
   factorization) and `Mathematics/PrimeSimplex` (Möbius as fermion parity), with the primon-gas readings
   of Brandon's October 15 conservation-of-faces lens.
 - Binary potentials coupled: `parametron.coupled-locks-lee-yang` (Lean `Objects/ParametronLock`).
-- The ring's partition function: `navigator.zeta`, `aeon.zeta-exp` and `aeon.zeta-map-periodic-points`.
+- The ring's partition function: `navigator.zeta`, `aeon.zeta-exp`, `aeon.zeta-map-periodic-points`,
+  and `landmark.primitive-cycle-count` with `landmark.euler-product` (Lean
+  `Compression/Landmark/PrimitiveCycle`, which proves the count and the Euler product for a map).
 - The [code-length record](2026-10-23_CODE_LENGTH_IS_A_FIELD_ITS_FLOOR_IS_THE_DARK_ENERGY_TERM_ITS_BINDING_SHOWS_ONLY_THROUGH_CONTACTS_AND_THE_PRIMES_HAND_SITS_ON_THE_FLOOR.md),
   whose lens is measured in §3 and whose §2 and §6 are corrected in §6.
 
@@ -212,7 +214,9 @@ ring as binary or wider potentials:
   that of one site.
 - `P_n = (1/n) Σ_(d∣n) μ(d) tr(A^(n/d))` is an integer, the count of primitive closed orbits of length
   `n` (Gauss's congruence). The dynamical zeta factors over them as atoms,
-  `1/det(1 − T A) = ∏_n (1 − Tⁿ)^(−P_n)` (`navigator.zeta`, `aeon.zeta-exp`). The integers'
+  `1/det(1 − T A) = ∏_n (1 − Tⁿ)^(−P_n)` (`navigator.zeta`, `aeon.zeta-exp`). For the 0/1 matrix of a
+  map this is formal-checked (`PrimitiveCycle.primitive_count_moebius`,
+  `transfer_determinant_euler_product`). The integers'
   `ζ(s) = ∏_p (1 − p^(−s))⁻¹` has the same form, with the primes as the primitive orbits.
 - The `2^p` binary words of length `p` are two constant words and orbits of `p` (length 7: 128 words in
   2 fixed words and 18 orbits of 7). So `(x + y)^p ≡ x^p + y^p (mod p)`: modulo `p`, binary potentials
@@ -303,8 +307,8 @@ gives 498.
   - the cancellation of a difference's leading face;
   - the factorization of the trailing digit law over the base's atoms, with the base-10 counts;
     `9x ≡ −x` and `n⁵ ≡ n (mod 10)`; the unit ring's discrete log;
-  - `tr(A^p) ≡ tr(A) (mod p)` for integer matrices and the integrality of `P_n`, joined to
-    `aeon.zeta-exp`;
+  - `tr(A^p) ≡ tr(A) (mod p)` for integer matrices, which extends #410's box on necklace integrality
+    for a general return map (the map case is `PrimitiveCycle`);
   - the clock cast of `w`.
 - **Atlas rows:** `arith.association-is-evaluation`, `radix.difference-leading-cancellation`,
   `radix.multiplier-face-action`, `radix.product-digit-law-factors`, `arith.fermat-ring-partition`,
