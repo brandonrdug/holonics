@@ -253,18 +253,18 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: boo
                     break;
                 }
                 let parts: Vec<Vec<usize>> = lookers.iter().map(|l| l.built[..=section].iter().map(|c| c.0).collect()).collect();
-                let charges: Vec<Vec<bool>> = lookers.iter().map(|l| l.built[..=section].iter().map(|c| c.1).collect()).collect();
+                let compared: Vec<Vec<Option<usize>>> = lookers.iter().map(|l| l.built[..=section].iter().map(|c| c.1).collect()).collect();
                 let part_refs: Vec<&[usize]> = parts.iter().map(|p| p.as_slice()).collect();
-                let charge_refs: Vec<&[bool]> = charges.iter().map(|c| c.as_slice()).collect();
-                let receipt = match learner.section_charged(&mut states, &part_refs, Some(&charge_refs)) {
+                let compared_refs: Vec<&[Option<usize>]> = compared.iter().map(|c| c.as_slice()).collect();
+                let receipt = match learner.section_compared(&mut states, &part_refs, Some(&compared_refs)) {
                     Ok(receipt) => receipt,
                     Err(e) => {
                         println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());
                         return Err(e.to_string().into());
                     }
                 };
-                // Each charged class after a part's first is one byte that arrived.
-                let coded: usize = charges.iter().map(|c| c[1..].iter().filter(|&&x| x).count()).sum();
+                // Each compared place after a part's first is one byte coded.
+                let coded: usize = compared.iter().map(|c| c[1..].iter().filter(|x| x.is_some()).count()).sum();
                 for l in &mut lookers {
                     l.built.drain(..section);
                 }
@@ -634,11 +634,12 @@ fn release_rest(tower: &Tower, fork: &mut TowerState, mut face: TowerFace, keys:
 /// The look inside training: at each moment the terrain declares (the byte at which a line asks
 /// for its rest), the tower releases its own rest from the state its stream has reached, by
 /// `agree` exact agreeing draws from its stream's share of `keys`. That release and its line's end
-/// re-enter what the stream reads uncharged (`TowerLearner::section_charged`): they are the
-/// tower's own and bring no news. The line's head then arrives again and its true rest after it,
-/// both charged, so the arrival's covector returns through the state the tower's own release moved
-/// and what it learns is what a look after its own should write. The terrain's moment and line
-/// end are its codec's declared bytes, read outside the tower.
+/// re-enter what the stream reads, and the release is compared with the true rest place by place
+/// (`TowerLearner::section_compared`) through the first place the two part: there the release
+/// is the produced Holon and the true byte its target. Past that place the passage is the
+/// tower's own and is compared with nothing. The line's head then arrives again and its true rest
+/// after it, so the first arrival and the look after the tower's own release both learn. The
+/// terrain's moment and line end are its codec's declared bytes, read outside the tower.
 pub(super) struct Looking {
     keys: Vec<u8>,
     agree: u32,
@@ -647,13 +648,14 @@ pub(super) struct Looking {
 }
 
 /// One stream's passage with its own releases written in: the classes from the section's first
-/// on, each with whether it arrived (charged) or the tower released it.
+/// on, each with the class its face is compared with (itself where it arrived, the true byte at
+/// the release's places through the first that parts, nothing past it).
 struct Looker {
     start: usize,
     end: usize,
     at: usize,
     line_start: Option<usize>,
-    built: Vec<(usize, bool)>,
+    built: Vec<(usize, Option<usize>)>,
     keys: KeyStream,
     looks: usize,
 }
@@ -680,7 +682,7 @@ impl Looker {
             }
             let c = text[self.at];
             self.at += 1;
-            self.built.push((c, true));
+            self.built.push((c, Some(c)));
             if c == look.end {
                 self.line_start = Some(self.at);
             } else if let (true, Some(head)) = (c == look.moment, self.line_start) {
@@ -693,9 +695,13 @@ impl Looker {
                 let mut fork = probe.clone();
                 let face = face.ok_or("a moment the probe has not received")?;
                 let release = release_rest(tower, &mut fork, face, &mut self.keys, given + 4, look.agree)?;
-                self.built.extend(release.into_iter().map(|b| (b, false)));
-                self.built.push((look.end, false));
-                self.built.extend(text[head..self.at].iter().map(|&b| (b, true)));
+                // The release and its end against the true rest and its end, as far as the stream
+                // holds them: compared through the first place they part.
+                let attempt: Vec<usize> = release.into_iter().chain(std::iter::once(look.end)).collect();
+                let truth = &text[self.at..(self.at + given + 1).min(self.end)];
+                let parted = attempt.iter().zip(truth).position(|(a, t)| a != t).unwrap_or(attempt.len().min(truth.len()));
+                self.built.extend(attempt.iter().enumerate().map(|(k, &a)| (a, if k <= parted { truth.get(k).copied() } else { None })));
+                self.built.extend(text[head..self.at].iter().map(|&b| (b, Some(b))));
                 self.looks += 1;
             }
         }

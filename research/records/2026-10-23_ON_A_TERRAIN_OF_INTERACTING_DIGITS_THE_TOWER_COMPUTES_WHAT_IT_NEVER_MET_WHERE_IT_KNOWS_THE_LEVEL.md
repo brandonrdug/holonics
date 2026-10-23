@@ -480,7 +480,9 @@ its passage ever followed its own answer. The look moves inside training
 declares (the `=` at which a line asks for its result), the tower releases its own result from the
 state its stream has reached, by four agreeing draws from its stream's share of a key file; that
 release and its line's end re-enter what the stream reads, the line's head arrives again, and then
-the line's true result. Only what arrives is charged (`TowerLearner::section_charged`): the
+the line's true result. Only what arrives is charged (then `TowerLearner::section_charged`, at
+[`d81aacd80`](https://github.com/brandonrdug/holonics/tree/d81aacd80); now `section_compared` with
+the release compared with nothing): the
 release is the tower's own and brings no news, so its faces send no covector and the certificate
 does not count them (the reafference row, `receipt.reafference-lag`: a receiver cancels its own
 release at its own clock's phase). The true result's covector returns through the state the
@@ -578,6 +580,72 @@ place (the true line end where the attempt runs short), its covector `p − q` c
 stream still reads the tower's own byte. The look then trains the first arrival and the repair
 together, and its acceptance is this claim plus the plain tower's first-look counts.
 
+## Comparing the attempt with the truth
+
+[agent-inferred, October 23] The comparison is declared place by place
+(`TowerLearner::section_compared`): each face is compared with a named class, or with nothing.
+The training look now reads its release against the true result and its line end through the
+first place the two part, and with nothing past it. Up to that place the release and the truth are
+one passage, so those faces are compared exactly as the plain stream compares them; at it, the
+release is the produced Holon and the true byte its target, `δz = p̂ − [· = truth]`, the face the
+release was drawn from read against the byte that should have been drawn; past it the passage is
+the tower's own, where no comparison is declared, so it sends nothing. Then the head arrives again
+and the true result after it, compared as before. The first arrival learns as the plain tower's
+does wherever its attempt is right, and the place it goes wrong is where it learns what it missed.
+The test `the_compared_covector_matches_the_code_difference` reads this covector against the slope
+of the compared code.
+
+The claim fixed before the run: a pumped tower trained this way for 12 passes, with `ap_t1`'s
+declaration, terrain, founding keys and rate and the same look keys, read by `read-lines-again`
+over first-met unseen lines (at most eight looks), writes at its first look at least as many whole
+results right as the plain pumped tower's first look in each operation (177 sums, 87 differences,
+21 products); its last look writes more right than its first in each operation; more lines turn
+right than turn wrong; and its last look writes at least as many right as its own redraw's.
+
+The tower trained 12 passes in 1,090 s; its training text fell to 1.284 bits a byte and the plain
+held-out text rose from 2.970 to 10.760, almost all of it at the heads and line ends (13.64 bits a
+byte there). First-met unseen lines, whole results right:
+
+| Read | sums (208) | differences (135) | products (193) |
+|---|---|---|---|
+| `read-lines-again`, first look → last look | 84 → 112 | 28 → 31 | 2 → 3 |
+| lines turned right / turned wrong | 41 / 13 | 15 / 12 | 1 / 0 |
+| its redraw's last look | 88 | 27 | 2 |
+| `read-lines-carried`, first → last | 106 → 117 | 29 → 33 | 3 → 5 |
+| the plain pumped tower's first look | 177 | 87 | 21 |
+| right at this tower's last look where the plain tower's first is wrong / the reverse | 12 / 78 | 8 / 64 | 1 / 18 |
+
+The true result's cost in bits a line (first look, last, floor): `read-lines-again` 5.28, 2.19,
+1.46 on sums, 5.06, 2.94, 2.28 on differences, 16.82, 9.87, 7.97 on products. The claim fails on
+its first clause in every operation: the first look writes 84, 28 and 2 right against the plain
+tower's 177, 87 and 21. Its other clauses hold. Compared with the release compared with nothing, the
+first look rose from 21 to 84 sums and the last from 49 to 112; the two sums of the earlier reading
+came out right at once (`71+41=` 112|112, `73+31=` 104|104), while `8+82=` stayed at 88|88 and
+`12*35=` wandered, 410|2120|430|470|410|430|490|4100.
+
+Two causes, measured [agent-inferred]. The passage the tower trains in repeats every question, so
+on plain text, where a question arrives once, every new head is a surprise: 13.64 bits a byte at
+the heads and line ends, against 2.17 for the plain tower, and the state it reaches the next
+question in is not one it trained in. And the repeat is a shortcut: wherever the attempt was right,
+the second look's true result is the attempt again, so most of what the second look learns is to
+copy; even in its own passage (`read-lines-carried`) its first look writes 106 sums against the
+plain tower's 178.
+
+The next loop lets the terrain ask again only where the attempt parts from the truth, which is what
+looking again is for: where the attempt and its line end are the true rest, the passage is the plain
+line and the next line follows; where they part, the attempt (compared through the parting place),
+its line end, the head again and the true result. The plain passage is then the trained one wherever
+the tower is right, the second look has nothing to copy, and whether the head comes again after an
+attempt is the tower's own reading of whether it placed the result: frustration as a probability
+the tower itself carries. The read follows from it (`read-lines-own`): after its attempt and line
+end the tower releases its next bytes, and it looks again only where it writes the same question
+again, at most eight times. The claim fixed before the run: a pumped tower trained this way for 12
+passes, with `ap_t1`'s declaration, terrain, founding keys and rate and the same look keys, read by
+`read-lines-own` over first-met unseen lines, writes at its first look at least as many whole
+results right as the plain pumped tower's first look in each operation (177, 87, 21); in each
+operation it looks again on a larger share of the lines its first look wrote wrong than of those it
+wrote right; and more of its lines turn right than turn wrong.
+
 ## The recorded failures this step could repeat
 
 - **Catered machinery.** The terrain's truth is generated exactly, outside the machine; the tower
@@ -605,7 +673,9 @@ with 1,200 written and keys `keys_d1`, `LINES_6.tsv` and `LINES_12_1200.tsv` for
 read in `READ_LOOKS.txt` (`tools/arithmetic_looks.py`). The tower trained with the look:
 `LOOKS_AGAIN_LOOKING.tsv`, `LOOKS_REDRAW_LOOKING.tsv` and `LOOKS_CARRIED_LOOKING.tsv`, with
 `LOOKS_CARRIED_PUMPED.tsv` for the plain pumped tower read the same way, each look's cost of the
-true result in a sixth column, read in `READ_LOOKING.txt`.
-`TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`, `TRAIN_PUMPED.txt` and
-`TRAIN_LOOKING.txt` are the training logs (the turned and pumped ones without their per-section
+true result in a sixth column, read in `READ_LOOKING.txt`; the tower trained with its release
+compared through the first parting place: `LOOKS_AGAIN_COMPARED.tsv`, `LOOKS_REDRAW_COMPARED.tsv`
+and `LOOKS_CARRIED_COMPARED.tsv`, read in `READ_COMPARED.txt`.
+`TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`, `TRAIN_PUMPED.txt`,
+`TRAIN_LOOKING.txt` and `TRAIN_COMPARED.txt` are the training logs (the turned and pumped ones without their per-section
 swell lines).
