@@ -126,8 +126,8 @@ deadline; they measured 144.3 s and 12.7 s (ratios 0.96 and 0.98).
 ## Owed
 
 - The passage tree's decayed count is the transported release with its residue carried
-  (`CarriedRelease`, PR #412). Its lazy decay equals the stepped decay (Rust test
-  `lazy_decay_is_the_stepped_decay`); the Lean statement is owed in #410.
+  (`CarriedRelease`, PR #412). Its lazy decay agrees with the stepped decay within one
+  count numerator (Rust test `lazy_decay_is_the_stepped_decay`); the Lean statement is owed in #410.
 - The curvature step's descent: the cell code is convex in `α_e` with the stated second
   derivative (a log-partition). Owed in #410.
 - What the tree cannot reach past depth 24 is what a mode must carry: the tower drive, modes fed
