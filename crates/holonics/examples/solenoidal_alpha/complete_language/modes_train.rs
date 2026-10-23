@@ -382,6 +382,192 @@ pub(super) fn train(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// A frozen reading of a held-out text: the tree and the bank are frozen, the passage opens at the
+/// text's start and receives it, and each cell is coded before it arrives (the sample's prompt
+/// reading, over a whole text).
+pub(super) fn read_text(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("read-modes STATE STATE_SHA TEXT TEXT_SHA ROLES ROLES_SHA".into());
+    }
+    let started = Instant::now();
+    let state = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let roles = super::tower_train::roles_of(&args[5], &args[6], text.len())?;
+    let mut route = Route::from_text(std::str::from_utf8(&state)?)?;
+    if route.position % 4 != 0 {
+        return Err("the state ends inside a byte".into());
+    }
+    route.passage = declared_passage(route.depth)?;
+    route.run = 0;
+    let cells = digits(&text);
+    let mut code = 0i64;
+    // Per region of the byte each cell belongs to, on 2^(−20) bits, counted in bytes.
+    let mut regions = [(0i64, 0usize); 4];
+    for (i, &class) in cells.iter().enumerate() {
+        let reading = route.read()?;
+        let cell_code = code_reading(reading.joined.masses[class], reading.joined.total);
+        code += cell_code;
+        let region = &mut regions[roles[i / 4] as usize];
+        region.0 += cell_code;
+        region.1 += (i % 4 == 0) as usize;
+        route.take(reading, class, false, true)?;
+    }
+    println!(
+        "MODES_READ cells={} code_bits_per_cell={} regions {} elapsed_ms={}",
+        cells.len(), thousandths(code, cells.len() as i64), super::tower_train::region_line(&regions),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
+/// A rested route opened for a frozen reading: the tree and the bank frozen, the passage opened.
+fn rested_route(path: &str, sha: &str) -> Result<Route> {
+    let state = pinned_read(path, sha, STATE_BUDGET)?;
+    let mut route = Route::from_text(std::str::from_utf8(&state)?)?;
+    if route.position % 4 != 0 {
+        return Err("the state ends inside a byte".into());
+    }
+    route.passage = declared_passage(route.depth)?;
+    route.run = 0;
+    Ok(route)
+}
+
+/// A rested moment tower.
+fn rested_tower(path: &str, sha: &str) -> Result<holonics::hnn::tower::Tower> {
+    let text = pinned_read(path, sha, 1 << 30)?;
+    Ok(holonics::hnn::tower::TowerLearner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?.tower)
+}
+
+/// [definition; agent-inferred, October 23] **The route joined with the moment tower, read on a
+/// held-out text** (`holonics::hnn::tower::CellJoin`). Both are frozen; the route's passage opens
+/// at the text and receives it, the tower opens at rest and receives each byte. From the second
+/// byte on, each cell is coded by the route alone, by the tower's cell face alone, and by their
+/// join, whose weights take their Newton step every 1,024 bytes (the tower's section: 128 bytes in
+/// 8 streams). Codes are summed per region of the coded byte.
+pub(super) fn read_joined(args: &[String]) -> Result<()> {
+    use holonics::hnn::tower::{code_of, CellJoin, JOIN_BITS};
+    if args.len() != 9 {
+        return Err("read-joined MODES MODES_SHA TOWER TOWER_SHA TEXT TEXT_SHA ROLES ROLES_SHA".into());
+    }
+    let started = Instant::now();
+    let mut route = rested_route(&args[1], &args[2])?;
+    let tower = rested_tower(&args[3], &args[4])?;
+    let text = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let roles = super::tower_train::roles_of(&args[7], &args[8], text.len())?;
+    if text.len() < 2 {
+        return Err("a joined reading needs two bytes".into());
+    }
+    let mut join = CellJoin::default();
+    let mut modes = tower.rest();
+    // [route, tower, joined] per region, on 2^(−20) bits, and the bytes coded.
+    let mut codes = [[(0i64, 0usize); 4]; 3];
+    for class in digits(&text[..1]) {
+        let reading = route.read()?;
+        route.take(reading, class, false, true)?;
+    }
+    let mut face = tower.advance(&mut modes, text[0] as usize).map_err(|e| e.to_string())?;
+    for i in 1..text.len() {
+        let byte = text[i] as usize;
+        let region = roles[i] as usize;
+        let mut prefix = 0usize;
+        for phase in 0..4 {
+            let class = (byte >> (6 - 2 * phase)) & 3;
+            let reading = route.read()?;
+            let r = reading.joined.masses.clone();
+            let t = face.cell_masses(prefix, phase).map_err(|e| e.to_string())?;
+            let cell = join.face(&r, &t, phase).map_err(|e| e.to_string())?;
+            codes[0][region].0 += code_of(r[class], r.iter().sum());
+            codes[1][region].0 += code_of(t[class], t.iter().sum());
+            codes[2][region].0 += cell.code(class);
+            join.receive(&cell, class, phase);
+            route.take(reading, class, false, true)?;
+            prefix = (prefix << 2) | class;
+        }
+        for c in &mut codes {
+            c[region].1 += 1;
+        }
+        face = tower.advance(&mut modes, byte).map_err(|e| e.to_string())?;
+        if i % 1024 == 0 {
+            join.step();
+        }
+    }
+    for (name, c) in ["route", "tower", "joined"].iter().zip(&codes) {
+        let total = c.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
+        println!(
+            "JOINED_READ {name} bits_a_byte={} regions {}",
+            super::tower_train::per(total.0, total.1), super::tower_train::region_line(c)
+        );
+    }
+    let weights: Vec<String> = join.weights.iter().map(|&w| w.to_string()).collect();
+    println!(
+        "JOINED_WEIGHTS on_2^-{JOIN_BITS} {} bytes={} elapsed_ms={}",
+        weights.join(","), text.len() - 1, started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
+/// A continuation released from the route joined with the moment tower: both frozen, the route's
+/// passage opened at the prompt, the tower at rest; each cell is drawn exactly from the joined face
+/// under the declared weights (a reading's final weights), and each released byte moves the tower.
+pub(super) fn sample_joined(args: &[String]) -> Result<()> {
+    use holonics::hnn::tower::CellJoin;
+    if args.len() != 12 {
+        return Err("sample-joined MODES MODES_SHA TOWER TOWER_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES WEIGHTS OUT".into());
+    }
+    let started = Instant::now();
+    let mut route = rested_route(&args[1], &args[2])?;
+    let tower = rested_tower(&args[3], &args[4])?;
+    let prompt = pinned_read(&args[5], &args[6], QUERY_BYTE_BUDGET)?;
+    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let count: usize = args[9].parse()?;
+    let weights: Vec<i64> = args[10].split(',').map(str::parse).collect::<std::result::Result<_, _>>()?;
+    let weights: [i64; 4] = weights.try_into().map_err(|_| "four weights, one a phase")?;
+    if keys.len() < count.checked_mul(32).ok_or("key extent overflow")? {
+        return Err("fewer eight-byte keys than declared cells".into());
+    }
+    let out = Path::new(&args[11]);
+    std::fs::create_dir(out)?;
+    if prompt.is_empty() {
+        return Err("an empty prompt".into());
+    }
+    let join = CellJoin::new(weights);
+    let mut modes = tower.rest();
+    let mut face = None;
+    for &b in &prompt {
+        for class in digits(&[b]) {
+            let reading = route.read()?;
+            route.take(reading, class, false, true)?;
+        }
+        face = Some(tower.advance(&mut modes, b as usize).map_err(|e| e.to_string())?);
+    }
+    let mut face = face.expect("a nonempty prompt");
+    let mut key_stream = KeyStream::new(keys, 8)?;
+    let mut released = Vec::with_capacity(count);
+    while released.len() < count {
+        let mut prefix = 0usize;
+        for phase in 0..4 {
+            let key = key_stream.next_key().ok_or("fewer keys than declared cells")?;
+            let reading = route.read()?;
+            let t = face.cell_masses(prefix, phase).map_err(|e| e.to_string())?;
+            let cell = join.face(&reading.joined.masses, &t, phase).map_err(|e| e.to_string())?;
+            let total = num_bigint::BigInt::from(cell.total);
+            let exact: Vec<Rat> = cell.masses.iter().map(|&u| Rat::new(num_bigint::BigInt::from(u), total.clone())).collect();
+            let class = holonics::receiver::release::draw_exact(&exact, &key)?
+                .drawn_class()
+                .ok_or("an unresolved draw at an exact face")?;
+            // A released cell is not received by the passage (reafference, as in sample-modes).
+            route.take(reading, class, false, false)?;
+            prefix = (prefix << 2) | class;
+        }
+        released.push(prefix as u8);
+        face = tower.advance(&mut modes, prefix).map_err(|e| e.to_string())?;
+    }
+    write_new(&out.join("OUTPUT.bin"), &released)?;
+    println!("JOINED_SAMPLE bytes={} elapsed_ms={}", released.len(), started.elapsed().as_millis());
+    println!("JOINED_SAMPLE_TEXT {:?}", String::from_utf8_lossy(&released));
+    Ok(())
+}
+
 pub(super) fn sample(args: &[String]) -> Result<()> {
     if args.len() != 9 {
         return Err("sample-modes STATE STATE_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA CELLS OUT".into());

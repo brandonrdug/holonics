@@ -101,7 +101,7 @@ impl Gaussian {
 }
 
 /// `x` released `bits` coarser, to the nearest numerator, half away from zero.
-fn release(x: i128, bits: u32) -> i128 {
+pub(crate) fn release(x: i128, bits: u32) -> i128 {
     if bits == 0 {
         return x;
     }
@@ -161,7 +161,7 @@ const LN2_BITS: u32 = 30;
 /// [definition; agent-inferred] **`ln 2` as its navigator's face** on `2^(−30)`: the series
 /// `Σ_(k≥1) 1/(k 2^k)`, its terms to `k = 60` read at `2^(−60)` and the sum released to `2^(−30)`
 /// (the tail past `k = 60` and the terms' floors stay below `2^(−50)`).
-fn ln2_face() -> i128 {
+pub(crate) fn ln2_face() -> i128 {
     let sum: i128 = (1..=60).map(|k: i128| (1i128 << (60 - k)) / k).sum();
     release(sum, 60 - LN2_BITS)
 }
@@ -279,7 +279,7 @@ impl JoinedFace {
 /// The turn split dyadically: `(cos, sin)` of `j·π/2^n` on `2^(−P)`, by half-angle square roots
 /// from the half turn (`cos(θ/2) = √((1 + cos θ)/2)`, `sin(θ/2) = √((1 − cos θ)/2)`) and exact
 /// products of the half-angle rotations.
-fn dyadic_turn(j: u64, n: u32, bits: u32) -> Gaussian {
+pub(crate) fn dyadic_turn(j: u64, n: u32, bits: u32) -> Gaussian {
     let one = 1i128 << bits;
     // Rotation by π/2^i for i = 0..n.
     let mut rotations = Vec::with_capacity(n as usize + 1);

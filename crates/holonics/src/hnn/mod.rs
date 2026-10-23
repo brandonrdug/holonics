@@ -190,6 +190,7 @@ pub mod retention;
 pub mod ring;
 pub mod section_lock;
 pub(crate) mod state_text;
+pub mod tower;
 pub mod wave;
 pub mod word;
 

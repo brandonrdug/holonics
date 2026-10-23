@@ -17,6 +17,16 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 23: the moment tower learns GSM8K bytes and joins the route (host).** `hnn::tower` is a
+byte-grain completed state-space model in exact integers: diagonal complex modes with a passive
+push `γ = √(1 − |λ|²)`, rectifying contacts that read the modes' face as a ratio to its power, two
+levels, and certified sections. Seven passes on 1,000 problems take the 747 held-out problems from
+2.828 to 2.531 bits a byte; `CellJoin` with the frozen route codes them at 1.754 against the
+route's 1.786, most of it in the calculation markup (1.975 to 1.851). Its samples write well-formed
+`<<a op b=c>>c` markup with wrong arithmetic and invented words. The
+[record](research/records/2026-10-23_THE_MOMENT_TOWER_LEARNS_GSM8K_BYTES_ONCE_ITS_MODES_ARE_PASSIVE_AND_ITS_CONTACTS_READ_A_RATIO.md)
+holds both samples, the measurements and receipts.
+
 **October 23: the node lock joins the route (host).** Each passage-tree node keeps the class that
 followed its last visit, so the deepest recurred context predicts a copy (the mathematics thread's
 located equality, without a strand of the passage); its binned weight takes the passage weights'
