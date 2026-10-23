@@ -1317,6 +1317,7 @@ fn wide_field() -> Field {
                 mass: 1,
                 base: crate::compression::landmark::context::BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: crate::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 64,
@@ -1430,6 +1431,7 @@ pub(crate) fn helix_field() -> Field {
                 mass: 1,
                 base: crate::compression::landmark::context::BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: crate::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 16,

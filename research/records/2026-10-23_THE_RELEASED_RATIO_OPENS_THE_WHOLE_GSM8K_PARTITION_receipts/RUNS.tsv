@@ -1,0 +1,6 @@
+run	problems	depth	ratio	form	bits_a_cell	tree_only	by_digit	projection_s	deadline_s	wall_s	peak_rss_mib	state_bytes	state_sha256
+c1000	1000	24	carried	tree + passage (curvature step)	0.469	0.507	[0.196,0.485,0.752,0.444]	151	240	144.3	1248	248972961	3c0f991435a7245680dfd82db732c069495ad5ffebd2bbc972f9c7031868aeb8
+r1000	1000	24	released	tree + passage (curvature step)	0.467	0.506	[0.195,0.483,0.748,0.441]	151	400	130.8	1209	210631973	edd7fca996aab9637bda8cd63ea8ccf0f6db6a6a00355fbbc1fb30538236ef57
+rall_refused	6726	24	carried (field receiver)	refused at opening: derived widths 133 bits	-	-	-	-	1500	0.1	117	-	-
+rall	6726	24	released	tree + passage (curvature step)	0.413	0.448	[0.166,0.438,0.663,0.383]	890 (upper 1330)	1500	1042.6	3619	659312169	567ff120ad73e4844ebde22f392518e6cfa298c25289be2bbeee8edf5e43fa74
+st40	1000	24	carried	standing passage chain as the tree (retired; stopped past 11000 cells: a joined face with mass)	1.574 at 11000 cells	1.760 at 11000 cells (landmark tree 0.839)	-	-	400	0.3	62	-	-

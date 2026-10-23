@@ -170,6 +170,7 @@ fn declare_with_offsets(declared: &Declared, offsets: Vec<usize>) -> Field {
                 mass: 1,
                 base: holonics::compression::landmark::context::BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: holonics::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 16,

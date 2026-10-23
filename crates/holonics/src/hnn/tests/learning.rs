@@ -55,6 +55,7 @@ pub(super) fn path_with(aperture: usize, junctions: &[Rat], contacts: &[Rat]) ->
                 mass: 1,
                 base: crate::compression::landmark::context::BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: crate::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -125,6 +126,7 @@ pub(crate) fn chain_declaration(population: u64) -> FieldDeclaration {
             mass: 1,
             base: crate::compression::landmark::context::BaseMeasure::Even,
             receiving_prior: 0,
+            ratio: crate::compression::landmark::context::RatioLaw::Carried,
         }],
         crib: CribDeclaration {
             window: 16,

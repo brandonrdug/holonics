@@ -58,6 +58,7 @@ fn fixture() -> (Field, Constitution, Current) {
                 mass: 1,
                 base: BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: holonics::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 16,

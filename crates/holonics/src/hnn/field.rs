@@ -111,7 +111,7 @@ mod input_scan;
 
 use crate::aeon::{ClockLift, Reading};
 use crate::compression::ReflectorMachine;
-use crate::compression::landmark::context::{BaseMeasure, Landmarks, StopPrior};
+use crate::compression::landmark::context::{BaseMeasure, Landmarks, RatioLaw, StopPrior};
 use crate::geometry::RatVec3;
 use crate::geometry::complex::{CellComplex, ConnectionIncidence};
 use crate::geometry::screw::{ScrewAxis, ScrewGenerator, ScrewPair, SituatedScrew};
@@ -409,7 +409,9 @@ pub struct ContactDeclaration {
 /// measure those masses are split by (`compression::landmark::context::BaseMeasure`), and the
 /// receiving map's prior's founding member `k` (`receiving_prior`): its normal law founds at
 /// `H_0 = 2^k I` (`hnn::constitution::NormalLaw::with_receiving_prior`; `k = 0` is the unit prior
-/// every other law keeps), and the readings move it from there.
+/// every other law keeps), and the readings move it from there; and its tree's mixture-ratio law
+/// (`ratio`; `compression::landmark::context::RatioLaw`): the carried ratio, whose widths grow
+/// with the population, or the released ratio, whose widths read it only through the KT floor.
 ///
 /// The founding exponent `k` is immutable declared identity. A current-window proposal may
 /// move the working ridge without moving that declaration or retaining historical scalars.
@@ -425,6 +427,7 @@ pub struct ReceiverDeclaration {
     pub mass: u32,
     pub base: BaseMeasure,
     pub receiving_prior: u32,
+    pub ratio: RatioLaw,
 }
 
 /// [definition] **The crib as declared**: the `window` cells that open each aeon, read at `offset`.
@@ -554,6 +557,7 @@ impl FieldDeclaration {
                 mass: 3,
                 base: BaseMeasure::Root,
                 receiving_prior: 1,
+                ratio: RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 64,

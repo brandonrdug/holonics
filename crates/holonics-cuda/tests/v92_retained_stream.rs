@@ -101,6 +101,7 @@ fn opening() -> (Reference, ObservedStream, PairingDeclaration, Constitution) {
                 mass: 1,
                 base: holonics::compression::landmark::context::BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: holonics::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 16,

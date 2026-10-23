@@ -244,6 +244,35 @@
 //! `R < W`). Campaign 1's `|A| = 256`, `D = 4` tree was refused from 87,382 cells, then from
 //! 605,395 cells (`2^19` admitted), and now declares to 19,372,659 cells (`2^24`).
 //!
+//! [proved-derived; agent-inferred, the mathematics thread's released-ratio telescope, PR #412's
+//! record §7] **The released ratio** ([`RatioLaw::Released`]). The carried law certifies the
+//! executed face against the ideal weighting, whose ratio grows with the passage (on GSM8K's
+//! 6,726 training problems `|log₂ β|` reaches 5,169,736 bits), so its drift and its widths hold
+//! `n* P²` units and refuse the depth-24 tree past `2^21` cells. A node's mixture
+//! `q = (β k + x)/(β + 1)` of its KT face `k` and its child's face `x`, with the step
+//! `β' = β k/x`, telescopes over the passage for any release `β_(t+1)` of `β'_t`:
+//! `Σ −ln q = Σ −ln x + ln(1 + β_0) − ln(1 + β_n) + Σ [ln(1 + β_(t+1)) − ln(1 + β'_t)]`, and
+//! mirrored in `k` with `1/β`. So a node's code lies within its KT code and
+//! within its child's, each plus its boundary term and its steps' own costs, which are each cell's:
+//! a rounding of `ln β` by `δ` costs at most `δ` (the weight is 1-Lipschitz in `ln β`), and a ratio
+//! released into `[2^(−K), 2^K]` ([`Beta::released`]) costs at most `ln(1 + 2^(−K))`. A node pays
+//! at most `K + 1` bits to turn from one face to the other over any stretch. The released law
+//! releases every stepped, split and chained ratio and reads each cell's own terms within half a
+//! grain ([`Landmarks::face_rule`]):
+//! - `M_p` is the least `M` with `2^M ≥ 3 B L_R K_f (2P + 1)`, `K_f = 2^j n* + 2` the KT floor,
+//!   the path's rounding within a quarter grain ([`released_face_bits`]);
+//! - `W` is the least width with `2^W ≥ 24 B L_R (P + 2)`, a cell's `P` steps and one split's two
+//!   ratios a digit within an eighth ([`released_carrier_width`]);
+//! - `K` is the least with `2^K ≥ 12 B L_R P`, the releases within an eighth ([`release_bound`]).
+//!
+//! `n*` enters only through the KT floor, so the depth-24 tree over 4 classes declares past
+//! `2^28` cells (the test `released_ratio_opens_past_the_carried_wall_within_half_a_grain`). A
+//! released read's residual is its rounding `Σ θ` alone; the carried `drift` and `excess`
+//! readings then count the rounding units a node's steps have paid, the telescope's sum, not a
+//! drift against the unreleased ideal. [agent-inferred] The card's tree (`holonics-cuda`,
+//! `kernels/tree.cu`) carries the ratio only; its release is owed beside the card's other debts
+//! (#76), and the Lean statement of the telescope is owed in #410.
+//!
 //! [definition; agent-inferred] **The lattice mixture and the stop weight read split operands**
 //! (the wide cut: at the wide cut's `2^20` cells the single division's `2M_p + κ + 3` reached 133
 //! bits). A mixing node's face `⟦λ̂ u/v + (1 − λ̂) x⟧` has the lattice numerator
@@ -1364,6 +1393,18 @@ fn base_sixteenths(base: BaseMeasure, root: Option<[u32; 2]>) -> [u64; 2] {
     }
 }
 
+/// [definition; agent-inferred, the mathematics thread's released-ratio telescope] **The mixture
+/// ratio's law** (module header, "The released ratio"). `Carried` steps every node's `β` unreleased
+/// and certifies the executed face against the ideal tree weighting over the whole passage, so its
+/// widths grow with `n* P²`. `Released` releases `β` into `[2^(−K), 2^K]` after every step and
+/// certifies the passage's code by its telescope, whose terms are each cell's own: its widths read
+/// `n*` only through the KT floor.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum RatioLaw {
+    Carried,
+    Released,
+}
+
 /// [definition] **A landmark tree's declaration**: the exterior chart's `|A|`, the address depth
 /// `D` in bundles, the forced splits of the cell tree (context depths `d < forced` mix nothing,
 /// `λ_d = 0`), the declared population `n*` bounding the passage, the receiver's grain `L_R`, the
@@ -1371,8 +1412,9 @@ fn base_sixteenths(base: BaseMeasure, root: Option<[u32; 2]>) -> [u64; 2] {
 /// depth in its branch's letters; the joins of an enlarged tree keep their own `β = 1`), and the
 /// declared node law's capacity ([`Capacity`], the register's capacity; `Unbounded` is the KT node),
 /// and the node's prior mass exponent `j` (module header, "The prior mass"): each digit's two
-/// masses start at `2^(−j)`, so the node's face is `(2^j n_b + 1)/(2^j n + 2)`, KT at `j = 1`, and the
-/// base measure those masses are split by ([`BaseMeasure`]).
+/// masses start at `2^(−j)`, so the node's face is `(2^j n_b + 1)/(2^j n + 2)`, KT at `j = 1`, the
+/// base measure those masses are split by ([`BaseMeasure`]), and the mixture ratio's law
+/// ([`RatioLaw`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LandmarkDeclaration {
     pub alphabet: usize,
@@ -1385,6 +1427,7 @@ pub struct LandmarkDeclaration {
     pub capacity: Capacity,
     pub mass: u32,
     pub base: BaseMeasure,
+    pub ratio: RatioLaw,
 }
 
 impl LandmarkDeclaration {
@@ -1616,10 +1659,57 @@ pub fn carrier_width(population: u64, digits: u64, grain: u64, depth: u64) -> u6
     .max(2)
 }
 
+/// [definition; agent-inferred] **The released path lattice's width** `M_p` (module header, "The
+/// released ratio"): the least `M` with `2^M ≥ 3 B L_R (2^j n* + 2)(2P + 1)`, the path's rounding
+/// within a quarter grain a cell, with no drift summed over the passage.
+pub fn released_face_bits(
+    population: u64,
+    digits: u64,
+    grain: u64,
+    depth: u64,
+    mass: u32,
+    base: BaseMeasure,
+) -> u64 {
+    ceil_log2(
+        &(BigUint::from(3u32)
+            * BigUint::from(digits)
+            * BigUint::from(grain)
+            * based_floor(population, mass, base)
+            * (BigUint::from(depth) * 2u32 + 1u32)),
+    )
+}
+
+/// [definition; agent-inferred] **The released β carrier** `W` (module header, "The released
+/// ratio"): the least width (at least 2) with `2^W ≥ 24 B L_R (P + 2)`: a cell rounds at most `P`
+/// steps and one chain split's two ratios a digit, each `|ln(1 − r)| < 2^(1−W)`, within an eighth of
+/// a grain.
+pub fn released_carrier_width(digits: u64, grain: u64, depth: u64) -> u64 {
+    ceil_log2(
+        &(BigUint::from(24u32)
+            * BigUint::from(digits)
+            * BigUint::from(grain)
+            * (BigUint::from(depth) + 2u32)),
+    )
+    .max(2)
+}
+
+/// [definition; agent-inferred] **The release bound** `K` (module header, "The released ratio"):
+/// the least `K` with `2^K ≥ 12 B L_R P`: a released ratio costs its node at most
+/// `ln(1 + 2^(−K)) < 2^(−K)` a cell, within an eighth of a grain over a cell's `B P` nodes.
+pub fn release_bound(digits: u64, grain: u64, depth: u64) -> u64 {
+    ceil_log2(
+        &(BigUint::from(12u32)
+            * BigUint::from(digits)
+            * BigUint::from(grain)
+            * BigUint::from(depth.max(1))),
+    )
+}
+
 /// [definition; agent-inferred] **The widths a declaration derives** (module header, "The
 /// widths"): the digits `B`, the path lattice `M_p`, the β carrier `W`, the certificates' grid
-/// `C = M_p + W`, and the carrier rebase's denominator width `R = 126 − W` when the β step's
-/// product can pass `u128` (else `0`: no carrier rebase is ever taken).
+/// `C = M_p + W`, the carrier rebase's denominator width `R = 126 − W` when the β step's
+/// product can pass `u128` (else `0`: no carrier rebase is ever taken), and the release bound `K`
+/// of a released ratio (`0` when the ratio is carried).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Widths {
     pub digits: u64,
@@ -1627,6 +1717,7 @@ pub struct Widths {
     pub carrier: u64,
     pub certificate: u64,
     pub rebase: u64,
+    pub release: u64,
     /// The prior mass exponent `j` the faces' floor `1/(2^j n* + 2)` reads.
     pub mass: u32,
     /// The base measure the floor and `κ` read ([`BaseMeasure`]).
@@ -1647,10 +1738,19 @@ impl Widths {
     /// The widths at a path depth `P`, with the rule's carrier or a declared one.
     fn at_depth(declaration: &LandmarkDeclaration, depth: u64, carrier: Option<u64>) -> Self {
         let digits = odometer_digits(declaration.alphabet);
+        let released = declaration.ratio == RatioLaw::Released;
         let carrier = carrier.unwrap_or_else(|| {
-            carrier_width(declaration.population, digits, declaration.grain, depth)
+            if released {
+                released_carrier_width(digits, declaration.grain, depth)
+            } else {
+                carrier_width(declaration.population, digits, declaration.grain, depth)
+            }
         });
-        let face = face_bits_at(
+        let face = if released {
+            released_face_bits
+        } else {
+            face_bits_at
+        }(
             declaration.population,
             digits,
             declaration.grain,
@@ -1658,6 +1758,11 @@ impl Widths {
             declaration.mass,
             declaration.base,
         );
+        let release = if released {
+            release_bound(digits, declaration.grain, depth)
+        } else {
+            0
+        };
         let kappa = mass_operand(declaration.population, declaration.mass, declaration.base).bits();
         let rebase = if 2 * carrier + kappa + face + 1 > u64::from(u128::BITS) {
             126u64.saturating_sub(carrier)
@@ -1670,6 +1775,7 @@ impl Widths {
             carrier,
             certificate: face + carrier,
             rebase,
+            release,
             mass: declaration.mass,
             base: declaration.base,
         }
@@ -1772,13 +1878,16 @@ fn carried_step(
     shift: i64,
 ) -> (Carried, u128) {
     let (n, d, e) = beta.parts();
-    let carried = Beta::step(
+    let mut carried = Beta::step(
         u128::from(n) * u,
         u128::from(d) * v * x,
         e + shift,
         widths.carrier,
         widths.rebase,
     );
+    if widths.release > 0 {
+        carried.beta = carried.beta.released(widths.release);
+    }
     let units = carried
         .mantissa
         .map_or(0, |m| ceil_div(1u128 << widths.certificate, m))
@@ -1822,6 +1931,23 @@ fn shape(what: &'static str, expected: usize, found: usize) -> ContextError {
 
 fn bits128(x: u128) -> u64 {
     u64::from(u128::BITS - x.leading_zeros())
+}
+
+/// `n 2^s > d` for positive `n, d < 2^64`, decided from their bits before any shift that could pass
+/// `u128`: past one bit apart the bits decide it, and at equal bits `|s| ≤ 63` and both sides fit.
+fn odd_ratio_exceeds(n: u64, d: u64, shift: i64) -> bool {
+    let (bits_n, bits_d) = (i64::from(64 - n.leading_zeros()), i64::from(64 - d.leading_zeros()));
+    if bits_n + shift > bits_d {
+        return true;
+    }
+    if bits_n + shift < bits_d {
+        return false;
+    }
+    if shift >= 0 {
+        u128::from(n) << shift > u128::from(d)
+    } else {
+        u128::from(n) > u128::from(d) << shift.unsigned_abs()
+    }
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1876,6 +2002,22 @@ impl Beta {
     /// The binary exponent (the carry).
     pub fn exponent(&self) -> i64 {
         self.exponent
+    }
+
+    /// **β released into `[2^(−K), 2^K]`** (module header, "The released ratio"): `2^K` above the
+    /// interval, `2^(−K)` below it, and itself inside it. With `β` the node's KT weight over its
+    /// child's, a ratio released from above costs its node at most `ln(1 + 2^(−K))` against its own
+    /// KT code, one released from below at most as much against its child's code.
+    pub fn released(self, bound: u64) -> Self {
+        let bound = bound as i64;
+        let (n, d, e) = (self.numerator, self.denominator, self.exponent);
+        if odd_ratio_exceeds(n, d, e - bound) {
+            Self { numerator: 1, denominator: 1, exponent: bound }
+        } else if odd_ratio_exceeds(d, n, -e - bound) {
+            Self { numerator: 1, denominator: 1, exponent: -bound }
+        } else {
+            self
+        }
     }
 
     /// **Carry the positive ratio `(numerator/denominator) · 2^exponent` at width `W`**: its twos
@@ -3611,6 +3753,11 @@ impl Law {
                 ceil_div(1u128 << certificate, u128::from(kept)),
             )
         };
+        let beta = if self.widths.release > 0 {
+            beta.released(self.widths.release)
+        } else {
+            beta
+        };
         Chart {
             beta,
             stop: beta.stop_weight(face, carrier),
@@ -3681,7 +3828,11 @@ impl Law {
             };
         }
         let lower_rung = self.rung_sum(branch, depth + 1, bottom);
-        let [upper, lower] = chart.beta.split(upper_rung, lower_rung, carrier);
+        let [mut upper, mut lower] = chart.beta.split(upper_rung, lower_rung, carrier);
+        if self.widths.release > 0 {
+            upper.0 = upper.0.released(self.widths.release);
+            lower.0 = lower.0.released(self.widths.release);
+        }
         let unit = |kept: Option<u128>| kept.map_or(0, |m| ceil_div(1u128 << certificate, m));
         let (lower_units, upper_units) = (unit(lower.1), unit(upper.1));
         let chart_of = |beta: Beta, units: u128, kept: Option<u128>| Chart {
@@ -3972,12 +4123,14 @@ impl Law {
     }
 
     /// `ρ ≤ Σ drift + Σ θ` of one branch's read on `2^(−C)` (a parting chain's upper part carries
-    /// its split's drift).
+    /// its split's drift). A released ratio's read is its rounding `Σ θ` alone: its steps are
+    /// charged to the code's telescope at the deposit, never to a drift against an ideal (module
+    /// header, "The released ratio").
     fn certificate(&self, nodes: &impl Standing, read: &LatticeRead) -> u128 {
         let forced = self.branches[read.branch].forced;
         let mixing = read.nodes.len().min(read.faces.len() - 1);
         let drift = (0..mixing)
-            .filter(|&level| read.bottoms[level] >= forced)
+            .filter(|&level| self.widths.release == 0 && read.bottoms[level] >= forced)
             .map(|level| self.level(nodes, read, level).drift)
             .fold(0u128, u128::saturating_add);
         (0..read.faces.len())
@@ -3994,8 +4147,13 @@ impl Law {
             .map(|read| self.certificate(nodes, read))
             .fold(0u128, u128::saturating_add);
         if self.joined() {
+            let drift = if self.widths.release == 0 {
+                nodes.join(digit.dyadic).drift
+            } else {
+                0
+            };
             branches
-                .saturating_add(nodes.join(digit.dyadic).drift)
+                .saturating_add(drift)
                 .saturating_add(self.join_rounding(digit))
         } else {
             branches
@@ -4773,6 +4931,7 @@ impl Landmarks {
             face,
             carrier,
             rebase,
+            release,
             ..
         } = self.law.widths;
         let declaration = &self.law.declaration;
@@ -4787,6 +4946,22 @@ impl Landmarks {
                 declaration.mass,
                 declaration.base,
             ));
+        if release > 0 {
+            // The released rule (module header, "The released ratio"): a cell's own rounding, its
+            // steps' and split's mantissas and its nodes' releases, each without `n*`.
+            let rounding = Rat::new(&d * 2 + 1, floor * 2);
+            let steps = Rat::from_integer(&d + 2);
+            let mut rebases = steps.clone() * two_power(1 - carrier as i64);
+            if rebase > 0 {
+                rebases += steps * two_power(1 - rebase as i64);
+            }
+            let releases = Rat::from_integer(d.clone()) * two_power(-(release as i64));
+            let grid = Rat::one() + two_power(-(face.min(carrier) as i64));
+            return grid
+                * log2_e_bound()
+                * Rat::from_integer(BigInt::from(digits))
+                * (rounding + rebases + releases);
+        }
         let rounding = Rat::new(&paths + &d * 2 + 1, floor * 2);
         let units = BigInt::from(mantissa_units(
             declaration.population,

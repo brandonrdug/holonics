@@ -14,6 +14,7 @@ fn split_face(numerator: u64, grain: u64) -> LandmarkFace {
         capacity: Capacity::Unbounded,
         mass: 1,
         base: BaseMeasure::Even,
+        ratio: crate::compression::landmark::context::RatioLaw::Carried,
     };
     LandmarkFace::of_splits(
         &declaration,

@@ -81,6 +81,7 @@ fn open_fixture() -> (Field, Constitution, Current) {
                 mass: 1,
                 base: BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: holonics::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 16,
@@ -544,6 +545,7 @@ fn world_fixture() -> (Field, Constitution, Encoded) {
                 mass: 1,
                 base: BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: holonics::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 16,

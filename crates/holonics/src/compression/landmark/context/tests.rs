@@ -37,7 +37,7 @@ use crate::compression::landmark::context::baseline::{Baselines, Ppm, kt_probabi
 use crate::compression::landmark::context::{
     Beta, Bundle, Capacity, ContextError, DigitsReading, FaceJoins, IdealLandmarks, JoinTree,
     LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, ObservationPath,
-    ObservedAddress, PassageCode, StopMixture, StopPrior, TreeStanding, Widths, address,
+    ObservedAddress, PassageCode, RatioLaw, StopMixture, StopPrior, TreeStanding, Widths, address,
     binary_log, carrier_width, cell_letters, code_length, face_bits, ladder_top, lattice_mix,
     letter_address, odometer_digits, prior_family, ratio_code_length,
 };
@@ -74,6 +74,7 @@ fn declaration(alphabet: usize, depth: usize) -> LandmarkDeclaration {
         capacity: Capacity::Unbounded,
         mass: 1,
         base: crate::compression::landmark::context::BaseMeasure::Even,
+        ratio: crate::compression::landmark::context::RatioLaw::Carried,
     }
 }
 
@@ -583,6 +584,123 @@ fn landmark_rule_lies_below_half_a_grain() {
     };
     let narrow = Landmarks::with_carrier(before, 28).unwrap();
     assert!(narrow.face_rule() > rat(1, 2 * grain));
+}
+
+/// **The released ratio opens past the carried wall within half a grain** (module header, "The
+/// released ratio"): its widths read `n*` only through the KT floor, so every declaration from
+/// `n* = 64` to `2^28`, at depths 1 to 73 over 4 and 256 classes, is admitted and its rule lies below
+/// half a grain, while the carried law's depth-24 widths at `n* = 2^24` pass `u128`.
+#[test]
+fn released_ratio_opens_past_the_carried_wall_within_half_a_grain() {
+    let grain = 16i64;
+    for population in [64u64, 6_148, 1 << 20, 1 << 24, 1 << 28] {
+        for depth in [1usize, 2, 4, 6, 12, 24, 48, 73] {
+            for alphabet in [4usize, 256] {
+                let declared = LandmarkDeclaration {
+                    population,
+                    ratio: RatioLaw::Released,
+                    ..declaration(alphabet, depth)
+                };
+                let tree = Landmarks::new(declared).unwrap();
+                assert!(
+                    tree.face_rule() < rat(1, 2 * grain),
+                    "n* = {population}, D = {depth}, |A| = {alphabet}"
+                );
+            }
+        }
+    }
+    let carried = LandmarkDeclaration {
+        population: 1 << 24,
+        ..declaration(4, 24)
+    };
+    assert!(Landmarks::new(carried).is_err());
+}
+
+/// **A released ratio is its interval's nearest point**: `2^K` above `[2^(−K), 2^K]`, `2^(−K)`
+/// below it, itself inside it and at its ends, decided against the exact values.
+#[test]
+fn released_ratio_is_the_intervals_nearest_point() {
+    let bound = 9u64;
+    let (top, bottom) = (rat_power(9), rat_power(-9));
+    let cases = [
+        (1u128, 1u128, 0i64),
+        (1, 1, 9),
+        (1, 1, 10),
+        (1, 1, -9),
+        (1, 1, -10),
+        (511, 1, 0),
+        (513, 1, 0),
+        (1023, 1, -1),
+        (1025, 1, -1),
+        (1, 511, 0),
+        (1, 513, 0),
+        (7, 3, 8),
+        (5, 3, -9),
+        (3, 5, -8),
+        (3, 5, 200),
+        (3, 5, -200),
+    ];
+    for (numerator, denominator, exponent) in cases {
+        let (beta, _) = Beta::carry(numerator, denominator, exponent, 16);
+        let released = beta.released(bound).value();
+        let value = beta.value();
+        let expected = if value > top {
+            top.clone()
+        } else if value < bottom {
+            bottom.clone()
+        } else {
+            value
+        };
+        assert_eq!(released, expected, "{numerator}/{denominator} 2^{exponent}");
+    }
+}
+
+/// **The released ratio holds its interval over a passage** (module header, "The released
+/// ratio"): an alternating binary passage, whose depth-one children beat the root's KT face by a
+/// bit a cell, drives the carried root's `β` (its KT face over its children's) below `2^(−300)`,
+/// while every released chart stays in `[2^(−K), 2^K]` and reaches `2^(−K)`; every released face
+/// is exactly normalized and every read lies within the released rule.
+#[test]
+fn released_ratio_holds_its_interval_over_a_passage() {
+    let stream: Vec<usize> = (0..400).map(|t| t % 2).collect();
+    let carried = LandmarkDeclaration {
+        population: 512,
+        ..declaration(2, 2)
+    };
+    let released = LandmarkDeclaration {
+        ratio: RatioLaw::Released,
+        ..carried.clone()
+    };
+    let mut tree = Landmarks::new(released).unwrap();
+    let mut carried = Landmarks::new(carried).unwrap();
+    let bound = tree.widths().release as i64;
+    assert!(bound > 0);
+    assert_eq!(carried.widths().release, 0);
+    let (top, bottom) = (rat_power(bound), rat_power(-bound));
+    let mut reached = false;
+    for (position, &cell) in stream.iter().enumerate() {
+        let here = address(&stream, position, 2);
+        let face = tree.face(&here, 16).unwrap();
+        let sum: Rat = face.probabilities.iter().cloned().sum();
+        assert_eq!(sum, Rat::one());
+        let reading = tree.receive(&here, cell).unwrap();
+        assert!(reading.residual <= tree.face_rule());
+        carried.receive(&here, cell).unwrap();
+        for chart in tree.nodes.charts.iter().chain(&tree.nodes.joins) {
+            let value = chart.beta.value();
+            assert!(value <= top && value >= bottom);
+            reached |= value == bottom;
+        }
+    }
+    assert!(reached);
+    let deepest = carried
+        .nodes
+        .charts
+        .iter()
+        .map(|chart| chart.beta.exponent())
+        .min()
+        .unwrap();
+    assert!(deepest < -300, "{deepest}");
 }
 
 /// **The stored bits**: the empty tree stores one bit a splitting dyadic cell; one arrival at depth

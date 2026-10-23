@@ -1475,6 +1475,7 @@ mod tests {
                     mass: 1,
                     base: BaseMeasure::Even,
                     receiving_prior: 0,
+                    ratio: crate::compression::landmark::context::RatioLaw::Carried,
                 }],
                 crib: CribDeclaration {
                     window: 16,

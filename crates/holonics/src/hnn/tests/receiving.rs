@@ -60,6 +60,7 @@ fn the_grain_is_derived_from_the_receivers_code_tolerance() {
         mass: 1,
         base: crate::compression::landmark::context::BaseMeasure::Even,
         receiving_prior: 0,
+        ratio: crate::compression::landmark::context::RatioLaw::Carried,
     };
     assert_eq!(
         ReceivingPhases::declare(field, &medium, &current, &coarse)
@@ -131,6 +132,7 @@ fn an_aperture_beyond_the_observability_rank_is_refused() {
         mass: 1,
         base: crate::compression::landmark::context::BaseMeasure::Even,
         receiving_prior: 0,
+        ratio: crate::compression::landmark::context::RatioLaw::Carried,
     };
     match ReceivingPhases::declare(&field, &medium, &current, &wide) {
         Err(HnnError::Observability { aperture, rank }) => {
@@ -1041,6 +1043,7 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
             capacity: crate::compression::landmark::context::Capacity::Unbounded,
             mass: 1,
             base: crate::compression::landmark::context::BaseMeasure::Even,
+            ratio: crate::compression::landmark::context::RatioLaw::Carried,
         };
     let tree = Landmarks::new(declared(family.letters().clone())).unwrap();
     let coarsen = |letter: Letter| match letter {
@@ -1487,9 +1490,10 @@ fn cold_restore_refuses_unversioned_or_unknown_passages() {
             "resident-passage 3\n",
             crate::hnn::SavedPassageVersion::Number(3),
         ),
+        // Versions 4 to 8 are read (`hnn::reference::passage`); 9 is the first unknown.
         (
-            "resident-passage 5\n",
-            crate::hnn::SavedPassageVersion::Number(5),
+            "resident-passage 9\n",
+            crate::hnn::SavedPassageVersion::Number(9),
         ),
     ] {
         let opening = crate::hnn::Constitution::initial(&field, COLD_RESTORE_BUDGET).unwrap();
@@ -1885,6 +1889,7 @@ fn the_receiving_maps_descent_and_its_priors_move_are_read_apart() {
                 mass: 1,
                 base: BaseMeasure::Even,
                 receiving_prior: 0,
+                ratio: crate::compression::landmark::context::RatioLaw::Carried,
             }],
             crib: CribDeclaration {
                 window: 16,

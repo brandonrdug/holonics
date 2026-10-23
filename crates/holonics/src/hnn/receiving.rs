@@ -1288,7 +1288,7 @@ pub fn clock_letters(
 /// field's exterior chart `|A|` (the cell emitted as its odometer digits), the receiver's depth `D`
 /// with no forced split, the field's declared population (the passage the tree's certificates hold
 /// within), the receiver's grain `L_R = ⌈1/ε_bits⌉`, the field's letter family
-/// ([`letter_family`], its slots' alphabets) and the receiver's declared stop-weight law (the declared stop prior), from which the
+/// ([`letter_family`], its slots' alphabets), the receiver's declared stop-weight law (the declared stop prior) and its mixture-ratio law, from which the
 /// owner derives its widths (the path lattice `M_p`, the β carrier `W` and, past `u128`, the
 /// carrier's rebase `R`).
 pub fn landmark_declaration(
@@ -1315,6 +1315,7 @@ pub fn landmark_declaration_with(
         capacity: crate::compression::landmark::context::Capacity::Unbounded,
         mass: receiver.mass,
         base: receiver.base,
+        ratio: receiver.ratio,
     })
 }
 

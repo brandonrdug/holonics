@@ -1,0 +1,4 @@
+sample	state_sha256	prompt_bits_a_cell	cells	release	deadline_s	wall_s	peak_rss_mib	longest_copied_run	chars_in_copied_runs_of_20_or_more	output_sha256
+samp_rall	567ff120ad73e4844ebde22f392518e6cfa298c25289be2bbeee8edf5e43fa74	0.366	2048	exact draw p	300	9.9	2677	22	22/512	c0bfece04e4c4e358518aeb7d9737736e3f585dadfbab5975771b71476d2a016
+samp_pow2	3c0f991435a7245680dfd82db732c069495ad5ffebd2bbc972f9c7031868aeb8	0.458	2048	draw p^2 (retired)	60	3.5	829	-	-	-
+samp_pow3	3c0f991435a7245680dfd82db732c069495ad5ffebd2bbc972f9c7031868aeb8	0.458	2048	draw p^3 (retired)	60	3.6	830	-	-	-

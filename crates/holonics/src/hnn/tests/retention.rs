@@ -431,6 +431,7 @@ fn the_collapse_keeps_the_retained_remainders_and_clocks() {
             mass: 1,
             base: crate::compression::landmark::context::BaseMeasure::Even,
             receiving_prior: 0,
+            ratio: crate::compression::landmark::context::RatioLaw::Carried,
         },
     )
     .unwrap();
@@ -556,6 +557,7 @@ fn two_receiver_path() -> Field {
         mass: 1,
         base: crate::compression::landmark::context::BaseMeasure::Even,
         receiving_prior: 0,
+        ratio: crate::compression::landmark::context::RatioLaw::Carried,
     });
     Field::declare(declared.by_lattice_rule()).unwrap()
 }
@@ -636,6 +638,7 @@ fn the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn() {
             mass: 1,
             base: crate::compression::landmark::context::BaseMeasure::Even,
             receiving_prior: 0,
+            ratio: crate::compression::landmark::context::RatioLaw::Carried,
         },
     )
     .unwrap();

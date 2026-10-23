@@ -23,12 +23,12 @@
 //! `2026-10-23_ON_GSM8K_THE_TREE_DEPTH_CARRIES_THE_CODE_AND_THE_PASSAGE_ADDS_ITS_NEWS`).
 use super::*;
 use holonics::compression::landmark::context::{
-    address, Landmarks, Letter, ObservationPath, ObservedAddress, TreeStanding,
+    address, Landmarks, Letter, ObservationPath, ObservedAddress, RatioLaw, TreeStanding,
 };
 use holonics::hnn::keyed_modes::{Declaration, Grains, JoinedFace, KeyedLearner, KeyedModes, PassageReading};
 use holonics::hnn::passage::{log2_face, PassageDeclaration, PassageTree};
 
-const STATE_MAGIC: &str = "complete-language-keyed-modes-v1";
+const STATE_MAGIC: &str = "complete-language-keyed-modes-v2";
 /// The face numerators' common grain, `2^(−62)` (the modes' joined face reads `q ≤ 2^62`).
 const FACE_BITS: u32 = 62;
 /// The reading grain of a code length, `2^(−20)` bits (a reading beside the training).
@@ -49,7 +49,11 @@ const PASSAGE_BACKOFF: u64 = 1;
 /// The native route's receiving tree at the declared `depth` (the native route declares 6), its
 /// grain and its section width, from the same field.
 fn opening_tree(population: u64, depth: usize) -> Result<(Landmarks, u64, usize)> {
-    let (field, _, _) = declaration_with_input_context(population, true, true)?;
+    // The released ratio (agent-inferred, the mathematics thread's telescope): its widths read the
+    // population only through the KT floor, so the route opens past the carried law's wall
+    // (`2^21` cells at depth 24). On 1,000 GSM8K problems it codes 0.467 bits a cell against the
+    // carried law's 0.469 (the tree alone 0.506 against 0.507); on all 6,726 it codes 0.413.
+    let field = input_context_field(population, true, RatioLaw::Released)?;
     let receiver = field.receivers().first().ok_or("one declared receiver")?.clone();
     let partition = field.receiving_context(receiver.ring).ok_or("the receiver's framing")?;
     let mut declaration = holonics::hnn::receiving::landmark_declaration(&field, &receiver)?;
