@@ -116,6 +116,8 @@ use crate::hnn::passage::log2_face;
 use num_bigint::BigUint;
 use rayon::prelude::*;
 
+pub mod duplex;
+
 /// A face's grain, `2^(−16)`.
 pub const FACE_BITS: u32 = 16;
 /// The material's grain, `2^(−24)`.
@@ -841,6 +843,13 @@ impl Tower {
     /// The reverse scan of one stream's section: the covector of every family, on its natural
     /// grain (material `2^(−40)`, faces and biases `2^(−24)`, moves `2^(−48)`).
     fn reverse(&self, opening: &TowerState, cells: &[Cell], classes: &[usize]) -> Result<Vec<i128>> {
+        self.reverse_joined(opening, cells, classes, None)
+    }
+
+    /// The reverse scan with a covector reaching each cell's top from outside the tower (the
+    /// duplex's meeting, `duplex`), on the top covector's grain `2^(−24)`, added to the one the
+    /// tower's own face sends there.
+    fn reverse_joined(&self, opening: &TowerState, cells: &[Cell], classes: &[usize], joined: Option<&[Vec<i64>]>) -> Result<Vec<i128>> {
         let d = &self.declaration;
         let (w, n, f, a) = (d.width, d.modes, d.contacts, d.alphabet);
         let t = &self.theta;
@@ -872,6 +881,16 @@ impl Tower {
         }
         let tops: Vec<&[i32]> = cells.iter().map(|cell| cell.top.as_slice()).collect();
         outer_sum(&mut g[ro..ro + a * w], w, &dzs, &tops);
+        if let Some(joined) = joined {
+            if joined.len() != cells_n {
+                return refuse("a joined covector for each cell of the section");
+            }
+            for (top, extra) in dx.iter_mut().zip(joined) {
+                for (v, e) in top.iter_mut().zip(extra) {
+                    *v = fit64(*v as i128 + *e as i128)?;
+                }
+            }
+        }
         for l in (0..d.levels).rev() {
             let lv = self.layout.levels[l];
             let r = &reaches.levels[l];

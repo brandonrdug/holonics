@@ -16,7 +16,7 @@ use holonics::hnn::units::{Units, CODE_BITS};
 /// A learner's state read ceiling, `2^30` bytes.
 const STATE_BUDGET: usize = 1 << 30;
 
-fn count(s: &str) -> Result<usize> {
+pub(super) fn count(s: &str) -> Result<usize> {
     Ok(s.parse::<usize>()?)
 }
 

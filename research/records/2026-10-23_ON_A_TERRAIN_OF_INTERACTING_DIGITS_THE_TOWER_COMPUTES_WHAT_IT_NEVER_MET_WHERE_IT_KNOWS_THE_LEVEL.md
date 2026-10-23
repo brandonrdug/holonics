@@ -85,6 +85,26 @@ What it writes for held-out lines after 12 passes, its own draws as they came:
 99-56=5     74-72=1     92*65=6090  83*27=2309  46*15=850   12*35=405
 ```
 
+## GSM8K with a terrain of its own calculations
+
+The same tower trained three passes on the prepared GSM8K training text (3,528,168 bytes), and on
+that text with 24,000 drawn calculations spread evenly through it as paragraphs of
+`<<a op b=c>>c` lines (`arithmetic_terrain.py drawn 3 6000`: operands of one to three digits with
+uniform digits, the four operations, every operand pair that the held-out text calculates left out;
+418,649 bytes more). The held-out text is the 747 problems; its calculations' result digits are
+partitioned by whether their expression was calculated in training (`tools/gsm8k/calc_roles.py`).
+Bits a byte after three passes:
+
+| | seen results' digits | unseen results' digits | results' scale zeros | everything else | all |
+|---|---|---|---|---|---|
+| GSM8K alone | 2.945 | 3.536 | 1.423 | 2.252 | 2.260 |
+| with the terrain | 2.864 | 3.208 | 1.686 | 2.353 | 2.358 |
+
+The terrain lowers the unseen results' digits by 0.33 bits, to just under a blind guess (3.32), and
+raises everything else by 0.10 (agent-inferred: the terrain's sections take part of each pass's
+deposits from the prose). Meeting more interacting digits did not locate the middle places' cycles:
+the terrain of the previous sections shows the same tower blind at a product's tens after 24 passes.
+
 ## The recorded failures this step could repeat
 
 - **Catered machinery.** The terrain's truth is generated exactly, outside the machine; the tower
