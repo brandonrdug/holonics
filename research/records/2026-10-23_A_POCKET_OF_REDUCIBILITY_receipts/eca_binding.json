@@ -1,0 +1,101 @@
+{
+ "rules": 256,
+ "anf degree counts (-1 = rule 0)": {
+  "-1": 1,
+  "0": 1,
+  "1": 14,
+  "2": 112,
+  "3": 128
+ },
+ "one crossing in GF(2) (affine)": [
+  0,
+  15,
+  51,
+  60,
+  85,
+  90,
+  102,
+  105,
+  150,
+  153,
+  165,
+  170,
+  195,
+  204,
+  240,
+  255
+ ],
+ "count affine": 16,
+ "count threshold (one locked sheet)": 104,
+ "affine and threshold": [
+  0,
+  15,
+  51,
+  85,
+  170,
+  204,
+  240,
+  255
+ ],
+ "one crossing in either chart": 112,
+ "named rules": {
+  "30": {
+   "anf": "r + c + l + cr",
+   "degree": 2,
+   "threshold": false
+  },
+  "90": {
+   "anf": "r + l",
+   "degree": 1,
+   "threshold": false
+  },
+  "110": {
+   "anf": "r + c + cr + lcr",
+   "degree": 3,
+   "threshold": false
+  },
+  "150": {
+   "anf": "r + c + l",
+   "degree": 1,
+   "threshold": false
+  },
+  "184": {
+   "anf": "l + cr + lc",
+   "degree": 2,
+   "threshold": false
+  },
+  "232": {
+   "anf": "cr + lr + lc",
+   "degree": 2,
+   "threshold": true
+  },
+  "54": {
+   "anf": "r + c + l + lr",
+   "degree": 2,
+   "threshold": false
+  },
+  "22": {
+   "anf": "r + c + l + lcr",
+   "degree": 3,
+   "threshold": false
+  },
+  "126": {
+   "anf": "r + c + l + cr + lr + lc",
+   "degree": 2,
+   "threshold": false
+  }
+ },
+ "count-conserving rules (cyclic, lengths 1..12)": [
+  170,
+  184,
+  204,
+  226,
+  240
+ ],
+ "rule 90 jump 2^k steps, k = 0..3, length 16": [
+  true,
+  true,
+  true,
+  true
+ ]
+}
