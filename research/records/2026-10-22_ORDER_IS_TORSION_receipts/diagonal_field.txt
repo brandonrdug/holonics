@@ -1,0 +1,8 @@
+shared  K= 8 eta=0.02 rho=0.950 cells 2027360: online train 1.410, held-out 1.494 bits/digit  (104.9 s, 51.75 us/cell, peak 48 MiB)
+shared 8 exit 0
+complex K= 8 eta=0.02 rho=0.950 cells 2027360: online train 1.271, held-out 1.388 bits/digit  (105.2 s, 51.91 us/cell, peak 48 MiB)
+complex 8 exit 0
+complex K=16 eta=0.02 rho=0.950 cells 2027360: online train 1.245, held-out 1.378 bits/digit  (106.9 s, 52.73 us/cell, peak 48 MiB)
+complex 16 exit 0
+radial  K= 8 eta=0.02 rho=0.950 cells 2027360: online train 1.291, held-out 1.422 bits/digit  (108.0 s, 53.26 us/cell, peak 48 MiB)
+radial 8 exit 0

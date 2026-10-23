@@ -1,0 +1,8 @@
+tree     K= 8 eta=0.02 rho=0.950 cells 2027360: 0.9286 bits/digit; per 500k cells 0.9776 0.9218 0.9108 0.9041  (12.2 s, 6.02 us/cell, peak 48 MiB)
+tree 8 exit 0
+selected K= 8 eta=0.02 rho=0.950 cells 2027360: 0.9221 bits/digit; per 500k cells 0.9701 0.9163 0.9050 0.8981  (134.6 s, 66.41 us/cell, peak 48 MiB)
+selected 8 exit 0
+shared   K= 8 eta=0.02 rho=0.950 cells 2027360: 0.9252 bits/digit; per 500k cells 0.9719 0.9190 0.9084 0.9019  (138.0 s, 68.05 us/cell, peak 49 MiB)
+shared 8 exit 0
+selected K=16 eta=0.02 rho=0.950 cells 2027360: 0.9205 bits/digit; per 500k cells 0.9672 0.9150 0.9043 0.8971  (139.3 s, 68.69 us/cell, peak 49 MiB)
+selected 16 exit 0

@@ -180,6 +180,94 @@ Sent to the Athena design thread on October 22 with the derivations.
    both fields gave no reading: its readout fit did not converge in 100 steps (both scored worse
    than the marginal).
 
+6. **Where the source must enter** (October 23, sent to the design thread with its two requests).
+   The design asked which lawful entry makes the source ring's linear part depend on the symbol,
+   and whether its decided field, `K` complex modes `z' = λ_(k,s) z + β_(k,s)` learned by forward
+   jets, is lawful.
+
+   **The move must be chosen by the symbol.** By item 2 and the minimal realization
+   (`encoding.minimal-realization`, `E T_a = U_a E`), a source of Hankel rank `r` needs a state of
+   dimension `r` moved by a transport that its symbol selects.
+
+   **The three candidates.**
+   - [proved-derived; formal-checked] Reflections chosen in one plane collapse: two plane
+     reflections compose to a turn and such turns commute (`plane_reflections_compose`,
+     `plane_turns_commute`), so a word reads its parity and a signed phase sum. The group is
+     dihedral, not free.
+   - [derived] Order needs at least two coupled planes whose mirrors do not share a pencil. The
+     turns by the norm-5 quaternions `1 + 2i` and `1 + 2j` already generate a free group in SO(3).
+     In the elementary objects this is a chain of rings joined by pair contacts, the symbol
+     choosing each ring's pump phase.
+   - [derived] In the locked regime the sheets move by `σ' = sign(h_s + J_s σ)`. A sign of a sum
+     is a threshold gate, so the transitions make conjunctions over up to `2^L` configurations of
+     `L` locks: capacity grows with the lock count, at `L²` integer additions a cell. A readout
+     linear in the sheets is additive in them, so the conjunctions must be made in the
+     transitions.
+   - A founded period-4 ring is a clock: it adds the frame only.
+
+   **The design's diagonal modes** have commuting linear parts. Their affine moves still carry
+   order through their separate pivots (item 1), but each past entry is transported by
+   `Π λ_(u_r)`, which depends only on the counts of the symbols that followed it.
+
+   **The jet.** [proved-derived; formal-checked] The forward jets `J' = λ_(t, u t) J + [u t = a] z`
+   and `J' = λ_(t, u t) J + [u t = a]` are the exact derivatives of the stream with respect to one
+   shift of the turn or the addition of symbol `a` at every cell, read in dual numbers `ε² = 0`.
+   This holds also when deposition changes the moves during the passage (`lamJet_is_derivative`,
+   `betaJet_is_derivative`, `betaJet_eq_selectedRun`). The jet is the phase-carried moment, and its
+   adjoint needs no tape.
+
+   **The deposit.** [derived] The design's `Re(conj(g) J)` is `∂L/∂(Re λ)` alone. The complete
+   step on a complex turn is `Δλ = −η g·conj(J)`, with `g = ∂L/∂Re z + i ∂L/∂Im z`; with the real
+   part alone, the turn of each mode stays where it was initialized.
+
+   **The certificate.** [proved-derived; formal-checked] For a scalar mode the per-symbol bound is
+   the joint bound. `‖λ‖ ≤ ρ ≤ 1` and `‖β‖ ≤ B` give `‖z‖ (1 − ρ) ≤ B` and `‖J‖ (1 − ρ)² ≤ B`
+   (`selectedRun_norm_bound`, `lamJet_norm_bound`). With `ρ = 1 − 2^-m` the state needs `m` guard
+   bits and the turn's jet `2m`, and the check `a² + b² ≤ (2^L − 2^(L−m))²` on
+   `λ = (a + ib)/2^L` reads the constitution only.
+
+   **The transported residue.** [proved-derived; formal-checked] The design's
+   `e' = A e + Δ − q` is `residueRun`: for a linear transport in any module and any release rule,
+   lattice part plus residue is the exact orbit (`residueRun_conserves`). Its floor form on a line
+   keeps the residue in one step and the lattice part within one step of the orbit for every
+   transport (`transportedRelease_conserves`, `_residue`, `_tracks`). [counterexample;
+   formal-checked] Plain rounding of a damped state holds a drive below half a step at zero
+   forever, while the exact orbit grows toward `x / (1 − ρ)` (`plainTransported_silences`,
+   `exactOrbit_damped`).
+
+   [measured] On the same 2,027,360 cells, with ρ = 0.95 and η = 0.02 (the dense field also at
+   η = 0.005), these are exterior float reads, not the machine.
+
+   The field alone (online over the first 80%, held out frozen):
+
+   | arm | online | held-out |
+   |---|---|---|
+   | dense `U_s` per symbol, n = 16, deposition reaching one cell back | 1.363 to 1.384 | 1.457 to 1.467 |
+   | dense, one shared `U`, n = 16 | 1.430 to 1.431 | 1.492 to 1.510 |
+   | diagonal, one shared turn, K = 8 | 1.410 | 1.494 |
+   | diagonal, selected turns, complex deposit, K = 8 | 1.271 | 1.388 |
+   | diagonal, selected turns, complex deposit, K = 16 | 1.245 | 1.378 |
+   | diagonal, selected turns, real-part deposit, K = 8 | 1.291 | 1.422 |
+
+   Joined with Krichevsky–Trofimov counts on (frame phase, last six digits) as
+   `softmax(log q + W [Re z, Im z])`, with every cell scored before it is learned:
+
+   | arm | bits per digit |
+   |---|---|
+   | counts alone | 0.9286 |
+   | with the shared turn, K = 8 | 0.9252 |
+   | with selected turns, K = 8 | 0.9221 |
+   | with selected turns, K = 16 | 0.9205 |
+
+   What the tables say:
+   - Selecting the turn by the symbol doubles what the field adds over the counts, and the gain
+     holds in each 500k-cell quarter of the passage.
+   - At depth six the counts already hold the conjunctions, so commuting modes add only
+     lag-weighted counts there.
+   - The rank-16 projection of §6.5 reaches 0.922, while 16 diagonal modes reach 1.245 online.
+     [inferred] The gap is in which features commuting linear parts can form, not in how many
+     modes there are.
+
 ## 7. Owed (#410)
 
 Each is a box in #410 except the neck.
@@ -201,10 +289,16 @@ Each is a box in #410 except the neck.
   `laggedRun_eq_of_counts`) was added at `7213b44` and checked on the PC the same way:
   `bash tools/lean_check.sh HolonicsResearch.Geometry.ScrewTorsion` completed (3,396 jobs, exit 0,
   17.2 s wall against a 1,200 s deadline), with no errors, no warnings in the module and no `sorry`.
+- §6.6's Lean (`ScrewTorsion` §2c and the transported residue in `CarriedRelease`) was added at
+  `7beead7` and checked on the PC: the same command completed (3,454 jobs, exit 0, 12.55 s wall
+  against a 1,200 s deadline; only the two targets recompiled), no errors and no `sorry`. One
+  linter warning (`[FloorRing R]` unused in `exactOrbit_damped`) was removed with `omit` at the
+  next commit, which was checked again (RECHECK).
 - Atlas rows (formal-checked): `motion.commutator-carry`, `motion.lag-residue-factorization`,
   `screw.burgers-loop-carry`, `motion.squeeze-ratio-dilation`, `gr.teleparallel-fifth-torsion`,
-  `gr.redshift-loop`, `release.carried-residue`, and the counterexample
-  `release.plain-rounding-annihilates`.
+  `gr.redshift-loop`, `release.carried-residue`, `motion.selected-move-forward-jet`,
+  `motion.plane-reflections-commute`, `release.transported-residue`, and the counterexamples
+  `release.plain-rounding-annihilates` and `release.plain-transport-silences`.
 - No Rust changed. The runs are §6.4's and §6.5's measurements, exterior reads with their scripts
   and outputs in [`2026-10-22_ORDER_IS_TORSION_receipts/`](2026-10-22_ORDER_IS_TORSION_receipts/):
   the count read took 9.6 s at 44 MiB peak; the two additive fits took 225.8 s and 222.3 s against
@@ -214,3 +308,9 @@ Each is a box in #410 except the neck.
   stopped, because float64 readout weights promoted the float32 states at every step; with float32
   weights and every second training cell (the receipt's version of the script) they took 59 s wall
   under a 150 s deadline, at 2.1 GiB peak each (`random_field.txt`).
+- §6.6's field reads: `located_field.py` (dense, four runs together, 78.8 to 81.5 s each against a
+  200 s deadline, 48 MiB peak, `located_field.txt`); `diagonal_field.py` (four runs together, 104.9
+  to 108.0 s against 200 s, 48 MiB, `diagonal_field.txt`); `joined_field.py` (four runs together,
+  12.2 s for the counts and 134.6 to 139.3 s for the joined fields against 220 s, 49 MiB,
+  `joined_field.txt`). The per-cell times (39 to 69 µs) are a Python loop's and say nothing about
+  the machine's cost.

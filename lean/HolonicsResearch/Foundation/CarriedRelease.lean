@@ -208,6 +208,7 @@ theorem plainTransported_silences {T : R → R} (hT : T 0 = 0) {x : R} (h0 : 0 �
 /-- [proved-derived; formal-checked] **The damped exact orbit of the same drive grows:**
 `(1 − ρ) x_t = x (1 − ρᵗ)`, so for `0 ≤ ρ < 1` it approaches `x / (1 − ρ)`, which is five grid
 steps at `ρ = 9/10` and `x` just below half a step. -/
+omit [FloorRing R] in
 theorem exactOrbit_damped (ρ x : R) (t : ℕ) :
     (1 - ρ) * exactOrbit (fun z => ρ * z) (fun _ => x) t = x * (1 - ρ ^ t) := by
   induction t with
