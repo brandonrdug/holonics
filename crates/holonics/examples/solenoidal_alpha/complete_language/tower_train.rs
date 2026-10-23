@@ -81,9 +81,11 @@ pub(super) fn per(code: i64, n: usize) -> String {
     format!("{}.{:03}", milli / 1000, milli % 1000)
 }
 
-pub(super) fn train(args: &[String]) -> Result<()> {
+/// `train-tower` trains the ungated tower, `train-gated-tower` the gated one (its modes' decay keyed by
+/// their input); a continued learner must carry the same declaration.
+pub(super) fn train(args: &[String], gated: bool) -> Result<()> {
     if args.len() != 18 && args.len() != 20 {
-        return Err("train-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+        return Err("train-tower|train-gated-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
     let started = Instant::now();
     let train = pinned_read(&args[1], &args[2], READ_BUDGET as usize)?;
@@ -96,6 +98,7 @@ pub(super) fn train(args: &[String]) -> Result<()> {
         modes: count(&args[10])?,
         contacts: count(&args[11])?,
         levels: count(&args[12])?,
+        gated,
     };
     let streams = count(&args[13])?;
     let section = count(&args[14])?;
