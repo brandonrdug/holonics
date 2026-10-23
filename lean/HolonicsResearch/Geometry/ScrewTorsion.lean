@@ -18,6 +18,8 @@ separation of their pivots.
                                                   = (1 − k_u)(1 − k_v)(O_u − O_v)     (complex_commutator_pivots)
 k_u, k_v ≠ 1:   the two moves commute  ⇔  O_u = O_v               (complex_moves_commute_iff_shared_pivot)
 (M, b₁) ∘ (M, b₂) − (M, b₂) ∘ (M, b₁) = (1 − M)(b₁ − b₂)          (move_same_linear_commutator)
+(M_b, b_b) ∘ (M_a, b_a) − (M_a, b_a) ∘ (M_b, b_b)
+    = (M_b M_a − M_a M_b) x + (M_b − 1) b_a − (M_a − 1) b_b        (move_commutator)
 ```
 
 What is proved.
@@ -27,7 +29,10 @@ What is proved.
    and the carry of their loop is the product of their two departures from free fall times the
    separation of their pivots.
 2. **One linear part** (`move_same_linear_commutator`): moves that share their linear part `M` and
-   differ only in what they add leave the carry `(1 − M)(b₁ − b₂)`. A stream of such moves is a sum
+   differ only in what they add leave the carry `(1 − M)(b₁ − b₂)`. For any two moves
+   (`move_commutator`) the loop leaves the commutator of the turns on the state, the curvature,
+   beside the carry of the additions, the torsion; a receiver reads order only through what its
+   face does not annihilate of that difference. A stream of such moves is a sum
    of `M`-transported additions, so its state is a function of how often each addition occurred at
    each lag.
 3. **The Burgers vector** (`flat_loop_carry`): a loop of pure translations closes by the sum of
@@ -57,9 +62,13 @@ What is proved.
    derivatives of the stream with respect to one shift of the turn or the addition of symbol `a`
    at every cell (read in dual numbers), also when the moves change during the passage. The jet
    is the phase-carried moment; its adjoint needs no tape.
-10. **The scalar certificate** (`selectedRun_norm_bound`, `lamJet_norm_bound`): with
+10. **The certificate** (`selectedRun_norm_bound`, `lamJet_norm_bound`,
+   `selectedRun_norm_le_linear`, `lamJet_norm_le_quadratic`): in any normed ring, with
    `‖λ_(t, s)‖ ≤ ρ ≤ 1` and `‖β_(t, s)‖ ≤ B`, the state satisfies `‖z‖ (1 − ρ) ≤ B` and the turn's
-   jet `‖J‖ (1 − ρ)² ≤ B`. For a scalar mode the per-symbol bound is the joint bound.
+   jet `‖J‖ (1 − ρ)² ≤ B`; at `ρ = 1` the state grows at most as `t B` and the jet as
+   `B t (t − 1)/2`. For a scalar mode the per-symbol bound is the joint bound; for a matrix mode
+   it is a bound in one metric `G` shared by every symbol (`M_sᵀ G M_s ⪯ ρ² G`), which certifies
+   every word.
 11. **One plane cannot carry order** (`plane_reflections_compose`, `plane_turns_commute`): two
    plane reflections `z ↦ u z̄` compose to the turn `u v̄`, and such turns commute, so symbol-chosen
    reflections in one plane read parity and a signed phase sum only. Order needs non-commuting
@@ -117,6 +126,14 @@ variable {R V : Type*} [Ring R] [AddCommGroup V] [Module R V]
 theorem move_same_linear_commutator (M : Module.End R V) (b₁ b₂ x : V) :
     move M b₁ (move M b₂ x) - move M b₂ (move M b₁ x) = (1 - M) (b₁ - b₂) := by
   simp only [move, map_add, LinearMap.sub_apply, Module.End.one_apply, map_sub]
+  abel
+
+/-- [proved-derived] **Curvature and torsion of a loop of two moves:** the loop leaves the
+commutator of the turns on the state and the carry of the additions. -/
+theorem move_commutator (Ma Mb : Module.End R V) (ba bb x : V) :
+    move Mb bb (move Ma ba x) - move Ma ba (move Mb bb x) =
+      (Mb * Ma - Ma * Mb) x + ((Mb - 1) ba - (Ma - 1) bb) := by
+  simp only [move, map_add, LinearMap.sub_apply, Module.End.mul_apply, Module.End.one_apply]
   abel
 
 /-- [proved-derived; formal-checked] **The Burgers vector:** a loop of pure translations closes by the sum of
@@ -226,13 +243,14 @@ When the symbol selects the linear part, `z' = λ_(t, s) z + β_(t, s)`, the str
 function of lag-residue counts. Its derivative with respect to the move of one symbol `a` is carried
 forward by the same moves (`lamJet`, `betaJet`): the phase-carried moment, whose adjoint needs no
 tape. It is exact even when the moves change during the passage, as a derivative with respect to one
-shift of `λ_(·, a)` (or `β_(·, a)`) at every cell, read in dual numbers `ε² = 0`. For scalar modes
-the per-symbol bound `‖λ‖ ≤ ρ` bounds the state by `B / (1 − ρ)` and the jet by `B / (1 − ρ)²`,
-and pairs of plane reflections compose to turns that commute, so one plane cannot carry order. -/
+shift of `λ_(·, a)` (or `β_(·, a)`) at every cell, read in dual numbers `ε² = 0`. In any normed
+ring the per-symbol bound `‖λ‖ ≤ ρ` bounds the state by `B / (1 − ρ)` and the jet by
+`B / (1 − ρ)²`, and on the unit circle by `t B` and `B t (t − 1)/2`. Pairs of plane reflections
+compose to turns that commute, so one plane cannot carry order. -/
 
 section SelectedMoves
 
-variable {S α : Type*} [CommRing S]
+variable {S α : Type*} [Ring S]
 
 /-- [definition] **A stream of moves selected by the symbol:** from rest, cell `t` applies the move
 `z ↦ λ_(t, u t) z + β_(t, u t)` chosen by its symbol. -/
@@ -250,6 +268,19 @@ def lamJet [DecidableEq α] (lam beta : ℕ → α → S) (u : ℕ → α) (a : 
 def betaJet [DecidableEq α] (lam : ℕ → α → S) (u : ℕ → α) (a : α) : ℕ → S
   | 0 => 0
   | t + 1 => lam t (u t) * betaJet lam u a t + if u t = a then 1 else 0
+
+/-- [proved-derived] The addition's jet is itself a selected stream, adding `1` on symbol `a`. -/
+theorem betaJet_eq_selectedRun [DecidableEq α] (lam : ℕ → α → S) (u : ℕ → α) (a : α) (t : ℕ) :
+    betaJet lam u a t = selectedRun lam (fun _ s => if s = a then 1 else 0) u t := by
+  induction t with
+  | zero => rfl
+  | succ t ih => simp only [betaJet, selectedRun, ih]
+
+end SelectedMoves
+
+section SelectedJets
+
+variable {S α : Type*} [CommRing S]
 
 /-- [proved-derived] **The turn's forward jet is the exact derivative:** shifting the turn of symbol
 `a` by `ε` at every cell, with `ε² = 0`, moves the stream by `ε` times the jet, also when the moves
@@ -278,18 +309,11 @@ theorem betaJet_is_derivative [DecidableEq α] (lam beta : ℕ → α → S) (u 
     simp only [selectedRun, betaJet, ih]
     split_ifs <;> ring
 
-/-- [proved-derived] The addition's jet is itself a selected stream, adding `1` on symbol `a`. -/
-theorem betaJet_eq_selectedRun [DecidableEq α] (lam : ℕ → α → S) (u : ℕ → α) (a : α) (t : ℕ) :
-    betaJet lam u a t = selectedRun lam (fun _ s => if s = a then 1 else 0) u t := by
-  induction t with
-  | zero => rfl
-  | succ t ih => simp only [betaJet, selectedRun, ih]
-
-end SelectedMoves
+end SelectedJets
 
 section SelectedBounds
 
-variable {S α : Type*} [NormedCommRing S]
+variable {S α : Type*} [NormedRing S]
 
 /-- [proved-derived] **The per-symbol bound certifies a scalar mode:** with `‖λ_(t, s)‖ ≤ ρ ≤ 1`
 and `‖β_(t, s)‖ ≤ B` for every cell and symbol, `‖z_t‖ (1 − ρ) ≤ B`. For a scalar mode the
@@ -338,6 +362,48 @@ theorem lamJet_norm_bound [DecidableEq α] {lam beta : ℕ → α → S} (u : �
     have h3 : 0 ≤ (1 - ρ) ^ 2 := sq_nonneg _
     nlinarith [mul_le_mul_of_nonneg_right h1 h3, mul_le_mul_of_nonneg_left ih hρ0,
       mul_le_mul_of_nonneg_right hz h2]
+
+/-- [proved-derived] **On the unit circle the state grows at most linearly:** with
+`‖λ_(t, s)‖ ≤ 1` and `‖β_(t, s)‖ ≤ B`, `‖z_t‖ ≤ t B`, so it needs `log₂ t` guard bits. -/
+theorem selectedRun_norm_le_linear {lam beta : ℕ → α → S} (u : ℕ → α) {B : ℝ}
+    (hlam : ∀ t s, ‖lam t s‖ ≤ 1) (hbeta : ∀ t s, ‖beta t s‖ ≤ B) (t : ℕ) :
+    ‖selectedRun lam beta u t‖ ≤ t * B := by
+  induction t with
+  | zero => simp [selectedRun]
+  | succ t ih =>
+    calc ‖selectedRun lam beta u (t + 1)‖
+        = ‖lam t (u t) * selectedRun lam beta u t + beta t (u t)‖ := rfl
+      _ ≤ ‖lam t (u t)‖ * ‖selectedRun lam beta u t‖ + ‖beta t (u t)‖ :=
+          (norm_add_le _ _).trans (add_le_add (norm_mul_le _ _) le_rfl)
+      _ ≤ 1 * (t * B) + B :=
+          add_le_add (mul_le_mul (hlam t (u t)) ih (norm_nonneg _) zero_le_one) (hbeta t (u t))
+      _ = ((t + 1 : ℕ) : ℝ) * B := by push_cast; ring
+
+/-- [proved-derived] **On the unit circle the turn's jet grows at most quadratically:**
+`2 ‖J_t‖ ≤ t (t − 1) B`, so it needs twice the state's guard bits there too. -/
+theorem lamJet_norm_le_quadratic [DecidableEq α] {lam beta : ℕ → α → S} (u : ℕ → α) (a : α)
+    {B : ℝ} (hlam : ∀ t s, ‖lam t s‖ ≤ 1) (hbeta : ∀ t s, ‖beta t s‖ ≤ B) (t : ℕ) :
+    ‖lamJet lam beta u a t‖ * 2 ≤ (t : ℝ) * ((t : ℝ) - 1) * B := by
+  induction t with
+  | zero => simp [lamJet]
+  | succ t ih =>
+    have hz := selectedRun_norm_le_linear u hlam hbeta t
+    have hite : ‖(if u t = a then selectedRun lam beta u t else 0)‖ ≤
+        ‖selectedRun lam beta u t‖ := by
+      split_ifs <;> simp
+    have h1 : ‖lamJet lam beta u a (t + 1)‖ ≤
+        ‖lamJet lam beta u a t‖ + ‖selectedRun lam beta u t‖ := by
+      calc ‖lamJet lam beta u a (t + 1)‖
+          = ‖lam t (u t) * lamJet lam beta u a t +
+              (if u t = a then selectedRun lam beta u t else 0)‖ := rfl
+        _ ≤ ‖lam t (u t)‖ * ‖lamJet lam beta u a t‖ +
+              ‖(if u t = a then selectedRun lam beta u t else 0)‖ :=
+            (norm_add_le _ _).trans (add_le_add (norm_mul_le _ _) le_rfl)
+        _ ≤ 1 * ‖lamJet lam beta u a t‖ + ‖selectedRun lam beta u t‖ :=
+            add_le_add (mul_le_mul_of_nonneg_right (hlam t (u t)) (norm_nonneg _)) hite
+        _ = ‖lamJet lam beta u a t‖ + ‖selectedRun lam beta u t‖ := by ring
+    push_cast
+    nlinarith [h1, hz, ih]
 
 end SelectedBounds
 

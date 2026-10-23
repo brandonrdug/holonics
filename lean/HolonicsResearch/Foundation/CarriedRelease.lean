@@ -43,9 +43,15 @@ What is proved.
    [counterexample] Plain rounding of a transported state holds a drive below half a step at zero
    forever (`plainTransported_silences`), while the damped exact orbit reaches `x (1 − ρᵗ)/(1 − ρ)`
    (`exactOrbit_damped`).
-8. **The transported residue in any module** (`residueRun_conserves`): for a linear transport `A`
-   and any release rule, the lattice part `A q + q_rel` and the residue `e' = A e + Δ − q_rel`
-   sum to the exact orbit at every length.
+8. **The transported residue in any module** (`residueRun_conserves`): for a linear transport
+   `A_t`, which may change at every step, and any release rule, the lattice part `A_t q + q_rel`
+   and the residue `e' = A_t e + Δ − q_rel` sum to the exact orbit at every length. No two
+   transports need commute.
+9. **The jet's residue carries its cross term** (`jetOrbit_eq`, `jet_lattice_drive`): a state
+   `x' = U_t x + b_t` carried with its jet `J' = U_t J + V_t x + v_t` is one orbit of the block
+   `L_t (x, J) = (U_t x, V_t x + U_t J)`, so its joint release conserves by 8 with the residue
+   moved by the whole block, `V_t e_x` included. A jet driven by the lattice part of the state alone
+   falls short of the exact jet by exactly the `U`-orbit of `V_t e_x`.
 
 No `sorry`, no `axiom`.
 -/
@@ -223,23 +229,23 @@ section TransportedResidue
 
 variable {M : Type*} [AddCommGroup M]
 
-/-- [definition] **The transported residue** `e' = A e + Δ − q`: the lattice part moves by `A` and
-takes the released quantum `q = rel (A e + Δ)`, and the residue keeps the rest. Every release rule
-`rel` is admitted; with the floor rule on a line the residue stays inside one step
-(`transportedRelease_residue`). -/
-def residueRun (A : M →+ M) (Δ : ℕ → M) (rel : M → M) : ℕ → M × M
+/-- [definition] **The transported residue** `e' = A_t e + Δ_t − q`: the lattice part moves by
+`A_t` and takes the released quantum `q = rel (A_t e + Δ_t)`, and the residue keeps the rest. The
+transport may change at every step, and every release rule `rel` is admitted; with the floor rule on
+a line the residue stays inside one step (`transportedRelease_residue`). -/
+def residueRun (A : ℕ → M →+ M) (Δ : ℕ → M) (rel : M → M) : ℕ → M × M
   | 0 => (0, 0)
-  | t + 1 => (A (residueRun A Δ rel t).1 + rel (A (residueRun A Δ rel t).2 + Δ t),
-      A (residueRun A Δ rel t).2 + Δ t - rel (A (residueRun A Δ rel t).2 + Δ t))
+  | t + 1 => (A t (residueRun A Δ rel t).1 + rel (A t (residueRun A Δ rel t).2 + Δ t),
+      A t (residueRun A Δ rel t).2 + Δ t - rel (A t (residueRun A Δ rel t).2 + Δ t))
 
-/-- [definition] The exact orbit of a linear transport `A` driven by `Δ`, from rest. -/
-def linearOrbit (A : M →+ M) (Δ : ℕ → M) : ℕ → M
+/-- [definition] The exact orbit of a linear transport `A_t` driven by `Δ`, from rest. -/
+def linearOrbit (A : ℕ → M →+ M) (Δ : ℕ → M) : ℕ → M
   | 0 => 0
-  | t + 1 => A (linearOrbit A Δ t) + Δ t
+  | t + 1 => A t (linearOrbit A Δ t) + Δ t
 
 /-- [proved-derived; formal-checked] **The transported residue conserves:** lattice part plus
-residue is the exact orbit, whatever the release rule. -/
-theorem residueRun_conserves (A : M →+ M) (Δ : ℕ → M) (rel : M → M) (t : ℕ) :
+residue is the exact orbit, whatever the release rule and however the transport changes. -/
+theorem residueRun_conserves (A : ℕ → M →+ M) (Δ : ℕ → M) (rel : M → M) (t : ℕ) :
     (residueRun A Δ rel t).1 + (residueRun A Δ rel t).2 = linearOrbit A Δ t := by
   induction t with
   | zero => simp [residueRun, linearOrbit]
@@ -247,6 +253,46 @@ theorem residueRun_conserves (A : M →+ M) (Δ : ℕ → M) (rel : M → M) (t 
     simp only [residueRun, linearOrbit]
     rw [← ih, map_add]
     abel
+
+/-- [proved-derived] The exact orbit is additive in its drive. -/
+theorem linearOrbit_add (A : ℕ → M →+ M) (Δ₁ Δ₂ : ℕ → M) (t : ℕ) :
+    linearOrbit A (fun k => Δ₁ k + Δ₂ k) t = linearOrbit A Δ₁ t + linearOrbit A Δ₂ t := by
+  induction t with
+  | zero => simp [linearOrbit]
+  | succ t ih =>
+    simp only [linearOrbit]
+    rw [ih, map_add]
+    abel
+
+/-- [definition] **The jet's block** `L (x, J) = (U x, V x + U J)`: the state moves by `U`, and its
+jet moves by `U` and takes `V` of the state. -/
+def jetBlock (U V : M →+ M) : M × M →+ M × M :=
+  (U.comp (AddMonoidHom.fst M M)).prod
+    (V.comp (AddMonoidHom.fst M M) + U.comp (AddMonoidHom.snd M M))
+
+/-- [proved-derived] **The state and its jet are one orbit of the block:** driven by `(b_t, v_t)`,
+the block's orbit is the state `x' = U_t x + b_t` beside its jet `J' = U_t J + V_t x + v_t`. -/
+theorem jetOrbit_eq (U V : ℕ → M →+ M) (b v : ℕ → M) (t : ℕ) :
+    linearOrbit (fun k => jetBlock (U k) (V k)) (fun k => (b k, v k)) t =
+      (linearOrbit U b t, linearOrbit U (fun k => V k (linearOrbit U b k) + v k) t) := by
+  induction t with
+  | zero => simp [linearOrbit]
+  | succ t ih =>
+    simp only [linearOrbit]
+    rw [ih]
+    simp [jetBlock]
+
+/-- [proved-derived] **A jet driven by the lattice part misses the residue's drive:** with the
+state split as `x_k = q_k + e_k`, the jet driven by `V_k q_k` falls short of the exact jet by the
+`U`-orbit of `V_k e_k`. -/
+theorem jet_lattice_drive (U V : ℕ → M →+ M) (q e v : ℕ → M) (t : ℕ) :
+    linearOrbit U (fun k => V k (q k + e k) + v k) t =
+      linearOrbit U (fun k => V k (q k) + v k) t + linearOrbit U (fun k => V k (e k)) t := by
+  rw [← linearOrbit_add]
+  congr 1
+  funext k
+  rw [map_add]
+  abel
 
 end TransportedResidue
 
