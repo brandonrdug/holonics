@@ -2,7 +2,9 @@
 dev.txt (tools/arithmetic_terrain.py): by operation, over unseen lines whose pair the text meets for
 the first time (as arithmetic_lines.py's `first`), how many whole results the first look and the
 last look write right, how many lines turn right and how many turn wrong between them, how many
-lines' last two looks agree, and the looks spent. A file that carries each look's cost of the true
+lines' last two looks agree, the looks spent, and how many lines look more than once among those
+whose first look is right and among those whose first look is wrong (read-lines-own looks again
+only where the tower writes the question again). A file that carries each look's cost of the true
 result (its sixth column, on 2^-20 bits) adds the mean cost in bits a line at the first look and at
 the last, and the floor: the least cost any look reached (what the looks could not place, the
 frustration). Given a second LOOKS.tsv over the same lines, it also counts the lines this file's
@@ -59,6 +61,8 @@ def main():
         c["turned wrong"] += looks[0] == truth and looks[-1] != truth
         c["agreed"] += agreed == "1"
         c["looks"] += len(looks)
+        c["again, first right"] += len(looks) > 1 and looks[0] == truth
+        c["again, first wrong"] += len(looks) > 1 and looks[0] != truth
         if beside:
             other = beside[int(i)] == truth
             c["beside first right"] += other
@@ -70,7 +74,8 @@ def main():
             c["first cost"] += costs[0]
             c["last cost"] += costs[-1]
             c["floor"] += min(costs)
-    fields = ("lines", "first right", "last right", "any right", "turned right", "turned wrong", "agreed", "looks")
+    fields = ("lines", "first right", "last right", "any right", "turned right", "turned wrong", "agreed", "looks",
+              "again, first right", "again, first wrong")
     if beside:
         fields += ("beside first right", "last right, beside first wrong", "last wrong, beside first right")
     bits = ("first cost", "last cost", "floor") if costed else ()

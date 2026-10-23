@@ -646,6 +646,78 @@ results right as the plain pumped tower's first look in each operation (177, 87,
 operation it looks again on a larger share of the lines its first look wrote wrong than of those it
 wrote right; and more of its lines turn right than turn wrong.
 
+## Asking again only where the attempt parts
+
+[agent-inferred, October 23] The terrain now asks again only where it must: at each moment, where
+the release and its line end are the true rest and its end, the passage is the plain line and the
+next line follows; where they part, the release (compared through the parting place), its line
+end, the head again and the true rest. The tower trained 12 passes in 1,014 s (projected at most
+1,392 s; deadline 1,450 s). Its own releases were the true rest at 342 of 22,542 moments in the
+first pass, then 933, 1,283, 1,423, 1,660, 2,029, 2,553, 3,392, 4,365, 5,391, 6,396 and 7,459 of
+22,454 in the last. The plain held-out text cost 2.541 bits a byte at the last pass (the plain
+pumped tower 1.827): unseen results 1.510 (plain 1.070), heads and line ends 2.985 (plain 2.17).
+
+First-met unseen lines, whole results right; the declared read is `read-lines-own`, where the
+tower writes on after its look and its line end and looks again only where it writes its line's
+head again (at most eight looks):
+
+| Read | sums (208) | differences (135) | products (193) |
+|---|---|---|---|
+| `read-lines-own`, first look → last look | 135 → 131 | 55 → 57 | 6 → 7 |
+| lines turned right / turned wrong | 6 / 10 | 6 / 4 | 3 / 2 |
+| looked again, of lines first right / of lines first wrong | 44 of 135 / 20 of 73 | 18 of 55 / 51 of 80 | 3 of 6 / 137 of 187 |
+| `read-lines-again` (the read writes the head again), first → last | 131 → 145 | 55 → 57 | 5 → 8 |
+| its lines turned right / turned wrong | 28 / 14 | 12 / 10 | 6 / 3 |
+| its redraw's last look | 132 | 55 | 10 |
+| the plain pumped tower's first look | 177 | 87 | 21 |
+| right at this tower's last own look where the plain tower's first is wrong / the reverse | 15 / 62 | 18 / 48 | 3 / 16 |
+
+The true result's cost in bits a line (first look, last, floor): `read-lines-own` 1.57, 1.56, 1.48
+on sums, 2.41, 2.35, 2.20 on differences, 7.16, 6.88, 6.75 on products; `read-lines-again` 1.67,
+1.36, 1.13; 2.49, 2.31, 2.05; 7.13, 6.86, 6.34. The claim fails on all three clauses. The first
+look writes 135, 55 and 6 right against 177, 87 and 21. The tower looks again on a larger share of
+its wrong lines than of its right ones in differences (64% against 33%) and products (73% against
+50%), but not in sums (27% against 33%). And 15 lines turn right against 16 that turn wrong. The
+lines read before, as they came:
+
+```
+71+41=  113
+73+31=  95
+8+82=   99
+12*35=  490|440
+```
+
+Three readings [agent-inferred].
+
+- **The plain passage restored most of the first look.** Across the three trainings the first look
+  wrote 21, 84 and 135 sums right, and the held-out heads came down from 13.64 bits a byte to 2.99:
+  where the tower is right it now trains in the plain passage, and the second look has nothing to
+  copy.
+- **The first arrival still loses its later places.** On a line the release gets wrong, the first
+  arrival is compared only through its first wrong place, and the true result's later places are
+  compared only after the head comes again, in another state. The plain tower is compared at every
+  place of every first arrival. At the last pass two lines in three were wrong, so most first
+  arrivals lost their later places, and the unseen results cost 1.51 bits a byte against 1.07.
+- **Whether the head comes again reads the operation, not the line.** The tower asks again after
+  73% of its first looks at products and 31% at sums, and in differences and products on about
+  twice as large a share of its wrong lines as of its right ones; within sums it asks again no more
+  often where it is wrong. Frustration is carried as a probability by operation and not yet by
+  line. Where the read writes the question again for it, sums turn right 28 times and wrong 14;
+  where it chooses, 6 and 10.
+
+The next loop keeps the first arrival whole and moves the look into a fork. The stream's passage
+is the plain text, so every first arrival is compared at every place as the plain tower's is. At
+each moment where the release and its end part from the true rest, a fork opens from the stream's
+state at the moment and reads the release (compared with nothing: up to the parting place its
+faces are the stream's own, compared already; past it the passage is the fork's own), its line
+end, the head again, and the true rest and its end, compared. The fork enters the section its
+moment falls in and deposits with the stream, and ends there: its state does not continue. Where
+the release is the true rest, no fork opens, and the stream itself reads the next line's head after
+that rest and its end: the contrast whose reading is whether the head comes again. The read
+`read-lines-own` then carries the plain stream. The claim fixed before the run is this loop's
+claim unchanged: at its first look at least 177, 87 and 21 right; in each operation a larger share
+of its wrong lines looked at again than of its right ones; more lines turned right than wrong.
+
 ## The recorded failures this step could repeat
 
 - **Catered machinery.** The terrain's truth is generated exactly, outside the machine; the tower
@@ -675,7 +747,9 @@ read in `READ_LOOKS.txt` (`tools/arithmetic_looks.py`). The tower trained with t
 `LOOKS_CARRIED_PUMPED.tsv` for the plain pumped tower read the same way, each look's cost of the
 true result in a sixth column, read in `READ_LOOKING.txt`; the tower trained with its release
 compared through the first parting place: `LOOKS_AGAIN_COMPARED.tsv`, `LOOKS_REDRAW_COMPARED.tsv`
-and `LOOKS_CARRIED_COMPARED.tsv`, read in `READ_COMPARED.txt`.
-`TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`, `TRAIN_PUMPED.txt`,
-`TRAIN_LOOKING.txt` and `TRAIN_COMPARED.txt` are the training logs (the turned and pumped ones without their per-section
+and `LOOKS_CARRIED_COMPARED.tsv`, read in `READ_COMPARED.txt`; the tower asked again only where
+its release parts: `LOOKS_OWN.tsv`, `LOOKS_AGAIN_OWN.tsv` and `LOOKS_REDRAW_OWN.tsv`, read in
+`READ_OWN.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`,
+`TRAIN_PUMPED.txt`, `TRAIN_LOOKING.txt`, `TRAIN_COMPARED.txt` and `TRAIN_OWN.txt` are the training
+logs (the turned and pumped ones without their per-section
 swell lines).

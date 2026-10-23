@@ -1,0 +1,23 @@
+== LOOKS_OWN.tsv (first-met unseen lines; costs in bits a line)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	first cost	last cost	floor
++	208	135	131	141	6	10	41	273	44	20	1.571	1.563	1.476
+-	135	55	57	62	6	4	38	210	18	51	2.413	2.346	2.201
+*	193	6	7	9	3	2	6	333	3	137	7.155	6.881	6.747
+
+== LOOKS_AGAIN_OWN.tsv (first-met unseen lines; costs in bits a line)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	first cost	last cost	floor
++	208	131	145	167	28	14	205	563	131	77	1.671	1.360	1.131
+-	135	55	57	76	12	10	128	422	55	80	2.492	2.308	2.047
+*	193	5	8	25	6	3	47	1386	5	188	7.126	6.860	6.342
+
+== LOOKS_REDRAW_OWN.tsv (first-met unseen lines; costs in bits a line)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	first cost	last cost	floor
++	208	131	132	143	8	7	206	479	131	77	1.671	1.671	1.671
+-	135	55	55	66	5	5	131	360	55	80	2.492	2.492	2.492
+*	193	5	10	23	8	3	54	1347	5	188	7.126	7.126	7.126
+
+== LOOKS_OWN.tsv beside LOOKS_CARRIED_PUMPED.tsv's first look
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	135	131	141	6	10	41	273	44	20	178	15	62	1.571	1.563	1.476
+-	135	55	57	62	6	4	38	210	18	51	87	18	48	2.413	2.346	2.201
+*	193	6	7	9	3	2	6	333	3	137	20	3	16	7.155	6.881	6.747
