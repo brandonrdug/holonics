@@ -74,6 +74,38 @@
 //! share of the move's, `G_s(t) = π 2^(−⌈log₂ w⌉) Re(conj(i λ_t) G_λ(t))`, to `W_φ` and `b_φ` (the
 //! code's difference agrees, tested). The passage credit does not carry it (a typed refusal).
 //!
+//! **The pumped mode** ([`TowerDeclaration::pumped`], agent-inferred, October 23). A turned mode
+//! that the arriving symbol also pumps: its move is the parametron's (`holon::parametron`), a turn
+//! plus a reflection,
+//!
+//! ```text
+//! h_t = α_t h_(t−1) + β_t conj(h_(t−1)) + γ_t B x_t
+//! α_t = ρ_t (1 − |κ_t|) U_t,   U_t = u e^(iπ s_t)                 the turned unit
+//! β_t = ρ_t κ_t P_t,           P_t = e^(iπ p_t)                   the pump: depth κ, axis at π p/2
+//! κ_t = 2 r_t − 1,  r_t = 1/(1 + 2^(−(W_κ x + b_κ))),   p_t = 2^(−⌈log₂ w⌉) (W_ψ x + b_ψ)
+//! ```
+//!
+//! `β conj(h)` reflects the state across the pump's axis (a pump reads the doubled phase). As a
+//! real `2×2` move it has determinant `ρ²(1 − 2|κ|)` and trace `2ρ(1 − |κ|) cos θ_U`: it turns
+//! (elliptic) while `(1 − |κ|)² cos² θ_U < 1 − 2|κ|`, and past that bifurcation its in-phase axis
+//! boosts while the quadrature is shed (hyperbolic: the mode settles on one of two sheets), with a
+//! shear on the edge: the Swing's three kinds, keyed cell by cell by the symbol. Why: a residue is
+//! a discrete phase; the turned mode carried it as an angle whose neighbours look alike (the
+//! turned tower's sums slipped one step on their units), and a lock gives it somewhere to sit.
+//! Passivity holds as before: the move's real-linear norm is `|α| + |β| = ρ_t`, so
+//! `|h_t| ≤ ρ_t |h_(t−1)| + γ_t |B x_t|` with the same `γ_t = √(1 − ρ_t²)`. The pump's material
+//! opens at zero (`κ = 0`, `β = 0`), so a pumped tower opens on its turned twin. The adjoint carries
+//! `conj(α) G + β conj(G)` back a cell, and with `G_α = conj(h_(t−1)) G_h(t)`, `G_β = h_(t−1) G_h(t)`:
+//!
+//! ```text
+//! G_ρ(t)  = Re(conj(α/ρ) G_α) + Re(conj(β/ρ) G_β) − (ρ_t/γ_t) Re(conj(G_h(t)) B x_t)
+//! δq_κ    = (−sgn(κ) Re(conj(ρU) G_α) + Re(conj(ρP) G_β)) · 2 ln 2 r (1 − r)
+//! G_p     = π Re(conj(i β) G_β),   G_s = π Re(conj(i α) G_α)
+//! ```
+//!
+//! (`sgn 0 = 0`, the symmetric difference's reading at the opening; the code's difference agrees,
+//! tested). The passage credit does not carry it.
+//!
 //! **The contacts read a ratio.** A contact conducts on the direction of the modes' face, not its
 //! power: `r̂ = r / ‖r‖_rms`, with the adjoint `∂r = (∂r̂ − r̂ ⟨r̂, ∂r̂⟩/d) / ‖r‖_rms`. Read on its
 //! power, the drive followed the face's scale (some 50 units on the 1,000-problem passage), a step
@@ -119,8 +151,9 @@
 //! acoustic or motor boundary chart supplies the classes (bytes, for text).
 //!
 //! **Not claimed.** The nonlinearity of the completed model is in the state (a parametron's lock);
-//! here it sits between levels, the classical selective model's place. The certified step is
-//! descent on its own section, not on the passage.
+//! without the pumped mode it sits between levels, the classical selective model's place, and with
+//! it the lock is one symbol-keyed reflection a cell, not yet a Floquet-certified pump. The certified
+//! step is descent on its own section, not on the passage.
 use crate::hnn::keyed_modes::{dyadic_turn, ln2_face, release, Exponential};
 use crate::hnn::passage::log2_face;
 use num_bigint::BigUint;
@@ -187,6 +220,9 @@ pub struct TowerDeclaration {
     /// Whether each gated mode's turn is keyed by its input too (the turned mode): the arriving
     /// symbol turns the mode, so a mode can carry a residue as its phase.
     pub turned: bool,
+    /// Whether each turned mode is pumped too (the pumped mode): the arriving symbol keys a
+    /// reflection mixed into the move, so a mode's phase can lock on one of two sheets.
+    pub pumped: bool,
 }
 
 /// Where each family of the material sits in the one vector, and its grain.
@@ -208,6 +244,11 @@ struct LevelLayout {
     /// The turn's material and bias (empty families when unturned).
     turn: usize,
     turn_bias: usize,
+    /// The pump's depth and axis, material and bias each (empty families when unpumped).
+    pump: usize,
+    pump_bias: usize,
+    pump_axis: usize,
+    pump_axis_bias: usize,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -250,6 +291,10 @@ impl Layout {
                 gate_bias: 0,
                 turn: 0,
                 turn_bias: 0,
+                pump: 0,
+                pump_bias: 0,
+                pump_axis: 0,
+                pump_axis_bias: 0,
             };
             if d.gated {
                 level.gate = take(n * w, MATERIAL_BITS);
@@ -258,6 +303,12 @@ impl Layout {
             if d.turned {
                 level.turn = take(n * w, MATERIAL_BITS);
                 level.turn_bias = take(n, FACE_BITS);
+            }
+            if d.pumped {
+                level.pump = take(n * w, MATERIAL_BITS);
+                level.pump_bias = take(n, FACE_BITS);
+                level.pump_axis = take(n * w, MATERIAL_BITS);
+                level.pump_axis_bias = take(n, FACE_BITS);
             }
             levels.push(level);
         }
@@ -500,7 +551,8 @@ struct LevelCell {
 }
 
 /// A gated mode's move at one cell: the gate `r` and `λ_t`, `ρ_t = |λ_t|`, `γ_t` on `2^(−30)`, and
-/// whether `ρ_t` was held at the margin.
+/// whether `ρ_t` was held at the margin. A pumped mode's `lam` is its turn `α_t`, beside the pump
+/// `β_t = ρ_t κ_t P_t`.
 #[derive(Clone, Copy, Debug, Default)]
 struct GatedMove {
     open: i64,
@@ -510,6 +562,12 @@ struct GatedMove {
     rho: i64,
     gamma: i64,
     held: bool,
+    /// The pump's opening `r`, depth `κ = 2r − 1`, axis face `P` and `β`, on `2^(−30)` (zero when
+    /// unpumped).
+    pump_open: i64,
+    kappa: i64,
+    axis: (i64, i64),
+    beta: (i64, i64),
 }
 
 /// A gated level's founded moves read once a section: `u = λ/|λ|`, `|λ|` and `ℓ = log₂|λ|` on
@@ -560,7 +618,7 @@ impl Default for TowerFace {
 /// The reaches of every family, read once a section.
 #[derive(Clone, Debug)]
 struct Reaches {
-    levels: Vec<[u64; 8]>,
+    levels: Vec<[u64; 10]>,
     /// The turned modes' ladder `e^(iπ/2^i)`, `i = 0..=TURN_BITS`, on `2^(−30)`, and the half turn
     /// `π` on `2^(−30)` (empty and zero when unturned).
     ladder: Vec<(i128, i128)>,
@@ -707,6 +765,9 @@ impl Tower {
         if d.turned && !d.gated {
             return refuse("a turned mode is a gated mode");
         }
+        if d.pumped && !d.turned {
+            return refuse("a pumped mode is a turned mode");
+        }
         let layout = Layout::new(&d);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
@@ -755,7 +816,8 @@ impl Tower {
             uniform(&mut theta[lv.contact..lv.contact + d.contacts * d.width], six, dd, MATERIAL_BITS)?;
         }
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
-        // so a turned tower opens on its gated twin.
+        // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
+        // tower opens on its turned twin.
         Ok(Self { declaration: d, theta, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
@@ -796,6 +858,8 @@ impl Tower {
                     reach(&t[lv.ret..lv.ret + d.width * d.contacts]),
                     if d.gated { reach(&t[lv.gate..lv.gate + d.modes * d.width]) } else { 0 },
                     if d.turned { reach(&t[lv.turn..lv.turn + d.modes * d.width]) } else { 0 },
+                    if d.pumped { reach(&t[lv.pump..lv.pump + d.modes * d.width]) } else { 0 },
+                    if d.pumped { reach(&t[lv.pump_axis..lv.pump_axis + d.modes * d.width]) } else { 0 },
                 ]
             })
             .collect();
@@ -869,6 +933,17 @@ impl Tower {
                         *v = fit64(release(*v as i128, turn_spread(w)))?;
                     }
                 }
+                // The pump's depth logit `W_κ x + b_κ` on 2^(−16), and its axis
+                // `p_t = 2^(−spread) (W_ψ x + b_ψ)` in half turns on 2^(−16).
+                let mut depths = vec![0i64; if d.pumped { n } else { 0 }];
+                let mut axes = vec![0i64; if d.pumped { n } else { 0 }];
+                if d.pumped {
+                    affine(&t[lv.pump..lv.pump + n * w], r[8], w, &x, Some(&t[lv.pump_bias..lv.pump_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut depths)?;
+                    affine(&t[lv.pump_axis..lv.pump_axis + n * w], r[9], w, &x, Some(&t[lv.pump_axis_bias..lv.pump_axis_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut axes)?;
+                    for v in &mut axes {
+                        *v = fit64(release(*v as i128, turn_spread(w)))?;
+                    }
+                }
                 gate.reserve_exact(n);
                 for k in 0..n {
                     let open = logistic(&self.exponential, q[k]);
@@ -888,7 +963,22 @@ impl Tower {
                     if gamma == 0 {
                         return refuse("a gated move reached the unit circle");
                     }
-                    gate.push(GatedMove { open: open as i64, unit: (ur as i64, ui as i64), lam: (lr as i64, li as i64), rho: rho as i64, gamma: gamma as i64, held });
+                    let mut moved = GatedMove { open: open as i64, unit: (ur as i64, ui as i64), lam: (lr as i64, li as i64), rho: rho as i64, gamma: gamma as i64, held, ..GatedMove::default() };
+                    if d.pumped {
+                        // α_t = ρ_t (1 − |κ|) U_t and β_t = ρ_t κ P_t: |α| + |β| = ρ_t, so γ_t is kept.
+                        let one = 1i128 << MOVE_BITS;
+                        let pump_open = logistic(&self.exponential, depths[k]);
+                        let kappa = 2 * pump_open - one;
+                        let (ar, ai) = turn_face(axes[k], &reaches.ladder);
+                        let keep = one - kappa.abs();
+                        let depth = release(rho * kappa, MOVE_BITS);
+                        moved.lam = (release(keep * lr, MOVE_BITS) as i64, release(keep * li, MOVE_BITS) as i64);
+                        moved.beta = (release(depth * ar, MOVE_BITS) as i64, release(depth * ai, MOVE_BITS) as i64);
+                        moved.pump_open = pump_open as i64;
+                        moved.kappa = kappa as i64;
+                        moved.axis = (ar as i64, ai as i64);
+                    }
+                    gate.push(moved);
                 }
             }
             let modes = &mut state.modes[l];
@@ -900,10 +990,13 @@ impl Tower {
                     Some(m) => ((m.lam.0 as i128, m.lam.1 as i128), m.gamma as i128),
                     None => ((t[lv.move_re + k] as i128, t[lv.move_im + k] as i128), gammas[k]),
                 };
+                // The pump's reflection β conj(h) (zero unless pumped).
+                let (br, bi) = gate.get(k).map_or((0, 0), |m| (m.beta.0 as i128, m.beta.1 as i128));
+                let (hr, hi) = (hr as i128, hi as i128);
                 let pr = release(gamma * push_re[k] as i128, MOVE_BITS);
                 let pi = release(gamma * push_im[k] as i128, MOVE_BITS);
-                let nr = fit64(release(lr * hr as i128 - li * hi as i128, MOVE_BITS) + pr)?;
-                let ni = fit64(release(lr * hi as i128 + li * hr as i128, MOVE_BITS) + pi)?;
+                let nr = fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS) + pr)?;
+                let ni = fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS) + pi)?;
                 modes[k] = (nr, ni);
                 face[k] = fit32(release(nr as i128, STATE_BITS - FACE_BITS), "a mode's face outgrew its 32-bit carrier")?;
                 face[n + k] = fit32(release(ni as i128, STATE_BITS - FACE_BITS), "a mode's face outgrew its 32-bit carrier")?;
@@ -964,7 +1057,8 @@ impl Tower {
         let (w, n, f, a) = (d.width, d.modes, d.contacts, d.alphabet);
         let t = &self.theta;
         let reaches = self.reaches();
-        let ln2_square = release(ln2_face() * ln2_face(), MOVE_BITS);
+        let ln2 = ln2_face();
+        let ln2_square = release(ln2 * ln2, MOVE_BITS);
         let mut g = vec![0i128; self.layout.len];
         let cells_n = cells.len();
         // The face's covector and the top's.
@@ -1042,7 +1136,8 @@ impl Tower {
             outer_sum(&mut g[lv.contact..lv.contact + f * w], w, &das, &reads);
             outer_sum(&mut g[lv.read_re..lv.read_re + w * n], n, &dreads, &faces_re);
             outer_sum(&mut g[lv.read_im..lv.read_im + w * n], n, &negs, &faces_im);
-            // The reverse scan of the modes: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1).
+            // The reverse scan of the modes: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)
+            // (+ β_(t+1) conj(G_h(t+1)) when pumped).
             let mut carried: Vec<(i64, i64)> = vec![(0, 0); n];
             let mut gh_all: Vec<Vec<(i64, i64)>> = vec![Vec::new(); cells_n];
             for i in (0..cells_n).rev() {
@@ -1053,9 +1148,10 @@ impl Tower {
                         Some(gate) => (gate[k].lam.0 as i128, gate[k].lam.1 as i128),
                         None => (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128),
                     };
+                    let (br, bi) = later.map_or((0, 0), |gate| (gate[k].beta.0 as i128, gate[k].beta.1 as i128));
                     let (cr, ci) = (carried[k].0 as i128, carried[k].1 as i128);
-                    let re = fit64(read_cov[i][k].0 as i128 + release(lr * cr + li * ci, MOVE_BITS))?;
-                    let im = fit64(read_cov[i][k].1 as i128 + release(lr * ci - li * cr, MOVE_BITS))?;
+                    let re = fit64(read_cov[i][k].0 as i128 + release(lr * cr + li * ci + br * cr + bi * ci, MOVE_BITS))?;
+                    let im = fit64(read_cov[i][k].1 as i128 + release(lr * ci - li * cr + bi * cr - br * ci, MOVE_BITS))?;
                     gh.push((re, im));
                 }
                 carried = gh.clone();
@@ -1069,6 +1165,8 @@ impl Tower {
             let mut around = vec![0i128; n];
             let mut dqs: Vec<Vec<i64>> = Vec::with_capacity(if d.gated { cells_n } else { 0 });
             let mut dss: Vec<Vec<i64>> = Vec::with_capacity(if d.turned { cells_n } else { 0 });
+            let mut dks: Vec<Vec<i64>> = Vec::with_capacity(if d.pumped { cells_n } else { 0 });
+            let mut dps: Vec<Vec<i64>> = Vec::with_capacity(if d.pumped { cells_n } else { 0 });
             let mut gres: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut gims: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             for (i, cell) in cells.iter().enumerate() {
@@ -1077,6 +1175,8 @@ impl Tower {
                 let gh = &gh_all[i];
                 let mut dq = vec![0i64; if d.gated { n } else { 0 }];
                 let mut ds = vec![0i64; if d.turned { n } else { 0 }];
+                let mut dk = vec![0i64; if d.pumped { n } else { 0 }];
+                let mut dp = vec![0i64; if d.pumped { n } else { 0 }];
                 for k in 0..n {
                     let (hr, hi) = (previous[k].0 as i128, previous[k].1 as i128);
                     let (gr, gi) = (gh[k].0 as i128, gh[k].1 as i128);
@@ -1098,9 +1198,30 @@ impl Tower {
                             if d.turned {
                                 ds[k] = fit64(release(reaches.half_turn * turning, MOVE_BITS + COVECTOR_BITS + turn_spread(w)))?;
                             }
+                            // h_(t−1) G_h(t), the covector of β_t, on 2^(−48).
+                            let (gbr, gbi) = (hr * gr - hi * gi, hr * gi + hi * gr);
+                            let one = 1i128 << MOVE_BITS;
+                            let (kappa, axis) = (m.kappa as i128, (m.axis.0 as i128, m.axis.1 as i128));
+                            if d.pumped {
+                                // Re(conj(iβ) G_β): the covector of the pump axis's turn, through ∂θ/∂p = π.
+                                let axis_turning = release(m.beta.0 as i128 * gbi - m.beta.1 as i128 * gbr, MOVE_BITS);
+                                dp[k] = fit64(release(reaches.half_turn * axis_turning, MOVE_BITS + COVECTOR_BITS + turn_spread(w)))?;
+                                // −sgn(κ) Re(conj(ρU) G_α) + Re(conj(ρP) G_β), the covector of κ, on 2^(−48).
+                                let rho = m.rho as i128;
+                                let (vr, vi) = (release(rho * m.unit.0 as i128, MOVE_BITS), release(rho * m.unit.1 as i128, MOVE_BITS));
+                                let (pr, pi) = (release(rho * axis.0, MOVE_BITS), release(rho * axis.1, MOVE_BITS));
+                                let g_kappa = release(pr * gbr + pi * gbi - kappa.signum() * (vr * glr + vi * gli), MOVE_BITS);
+                                // ∂κ/∂q = 2 ln 2 r (1 − r), on 2^(−30).
+                                let open = m.pump_open as i128;
+                                let f = release(release(ln2 * open, MOVE_BITS) * (one - open), MOVE_BITS);
+                                dk[k] = fit64(release(g_kappa * 2 * f, COVECTOR_BITS + MOVE_BITS))?;
+                            }
                             if !m.held {
-                                let (ur, ui) = (m.unit.0 as i128, m.unit.1 as i128);
-                                let g_rho = release(ur * glr + ui * gli, MOVE_BITS) - div_nearest(m.rho as i128 * through, m.gamma as i128);
+                                // ∂α/∂ρ = (1 − |κ|) U and ∂β/∂ρ = κ P (U alone when unpumped).
+                                let keep = one - kappa.abs();
+                                let (ur, ui) = (release(keep * m.unit.0 as i128, MOVE_BITS), release(keep * m.unit.1 as i128, MOVE_BITS));
+                                let (kr, ki) = (release(kappa * axis.0, MOVE_BITS), release(kappa * axis.1, MOVE_BITS));
+                                let g_rho = release(ur * glr + ui * gli + kr * gbr + ki * gbi, MOVE_BITS) - div_nearest(m.rho as i128 * through, m.gamma as i128);
                                 let (open, rho) = (m.open as i128, m.rho as i128);
                                 along[k] += release(g_rho * div_nearest(GATE_REACH * open * rho, faces.moduli[k].max(1)), MOVE_BITS);
                                 // ∂ρ_t/∂q = c ρ_t ℓ (ln 2)² r (1 − r), on 2^(−30).
@@ -1134,8 +1255,21 @@ impl Tower {
                     }
                     transposed(&t[lv.turn..lv.turn + n * w], r[7], w, &ds, MATERIAL_BITS, &mut back_turn)?;
                 }
+                let mut back_pump = vec![0i64; if d.pumped { w } else { 0 }];
+                let mut back_axis = vec![0i64; if d.pumped { w } else { 0 }];
+                if d.pumped {
+                    for (slot, &v) in g[lv.pump_bias..lv.pump_bias + n].iter_mut().zip(&dk) {
+                        *slot += v as i128;
+                    }
+                    transposed(&t[lv.pump..lv.pump + n * w], r[8], w, &dk, MATERIAL_BITS, &mut back_pump)?;
+                    for (slot, &v) in g[lv.pump_axis_bias..lv.pump_axis_bias + n].iter_mut().zip(&dp) {
+                        *slot += v as i128;
+                    }
+                    transposed(&t[lv.pump_axis..lv.pump_axis + n * w], r[9], w, &dp, MATERIAL_BITS, &mut back_axis)?;
+                }
+                let beside = |back: &[i64], j: usize| back.get(j).map_or(0, |&c| c as i128);
                 let next: Vec<i64> = collect_exact(dx[i].iter().zip(back_re.iter().zip(&back_im)).enumerate().map(|(j, (v, (a, b)))| {
-                    fit64(*v as i128 + *a as i128 + *b as i128 + back_gate.get(j).map_or(0, |&c| c as i128) + back_turn.get(j).map_or(0, |&c| c as i128))
+                    fit64(*v as i128 + *a as i128 + *b as i128 + beside(&back_gate, j) + beside(&back_turn, j) + beside(&back_pump, j) + beside(&back_axis, j))
                 }))?;
                 dx[i] = next;
                 gres.push(gre);
@@ -1145,6 +1279,10 @@ impl Tower {
                 }
                 if d.turned {
                     dss.push(ds);
+                }
+                if d.pumped {
+                    dks.push(dk);
+                    dps.push(dp);
                 }
             }
             // The opening's credit: the covector reaching the carried state, a = conj(λ_0) G_h(0),
@@ -1187,6 +1325,10 @@ impl Tower {
             outer_sum(&mut g[lv.push_im..lv.push_im + n * w], w, &gims, &inputs);
             if d.turned {
                 outer_sum(&mut g[lv.turn..lv.turn + n * w], w, &dss, &inputs);
+            }
+            if d.pumped {
+                outer_sum(&mut g[lv.pump..lv.pump + n * w], w, &dks, &inputs);
+                outer_sum(&mut g[lv.pump_axis..lv.pump_axis + n * w], w, &dps, &inputs);
             }
             if d.gated {
                 outer_sum(&mut g[lv.gate..lv.gate + n * w], w, &dqs, &inputs);
@@ -1392,7 +1534,8 @@ impl Tower {
         let d = &self.declaration;
         let gated = if d.gated { " gated" } else { "" };
         let turned = if d.turned { " turned" } else { "" };
-        let mut s = format!("moment-tower-v1 {} {} {} {} {}{gated}{turned}\n", d.alphabet, d.width, d.modes, d.contacts, d.levels);
+        let pumped = if d.pumped { " pumped" } else { "" };
+        let mut s = format!("moment-tower-v1 {} {} {} {} {}{gated}{turned}{pumped}\n", d.alphabet, d.width, d.modes, d.contacts, d.levels);
         s.push_str(&self.theta.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
         s.push('\n');
         s
@@ -1403,13 +1546,14 @@ impl Tower {
         let mut lines = text.lines();
         let head: Vec<&str> = lines.next().unwrap_or("").split(' ').collect();
         let gated = head.len() >= 7 && head[6] == "gated";
-        let turned = head.len() == 8 && gated && head[7] == "turned";
-        if !(head.len() == 6 || (head.len() == 7 && gated) || turned) || head[0] != "moment-tower-v1" {
+        let turned = head.len() >= 8 && gated && head[7] == "turned";
+        let pumped = head.len() == 9 && turned && head[8] == "pumped";
+        if !(head.len() == 6 || (head.len() == 7 && gated) || (head.len() == 8 && turned) || pumped) || head[0] != "moment-tower-v1" {
             return refuse("not a moment tower's text");
         }
         let num = |s: &str| s.parse::<usize>().map_err(|_| TowerError::Refused("a declaration that is not a count"));
         let declaration =
-            TowerDeclaration { alphabet: num(head[1])?, width: num(head[2])?, modes: num(head[3])?, contacts: num(head[4])?, levels: num(head[5])?, gated, turned };
+            TowerDeclaration { alphabet: num(head[1])?, width: num(head[2])?, modes: num(head[3])?, contacts: num(head[4])?, levels: num(head[5])?, gated, turned, pumped };
         let layout = Layout::new(&declaration);
         let theta: Vec<i32> = lines
             .next()
@@ -1919,13 +2063,14 @@ mod tests {
     }
 
     fn tiny_with(levels: usize, gated: bool) -> Tower {
-        tiny_turning(levels, gated, false)
+        tiny_turning(levels, gated, false, false)
     }
 
-    /// The tiny tower whose gated modes' turn may be keyed by the arriving symbol; a turned one's
-    /// turn opens away from zero as its gate does.
-    fn tiny_turning(levels: usize, gated: bool, turned: bool) -> Tower {
-        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels, gated, turned };
+    /// The tiny tower whose gated modes' turn may be keyed by the arriving symbol, and a turned
+    /// one's pump; a turned one's turn, and a pumped one's depth and axis, open away from zero as
+    /// its gate does.
+    fn tiny_turning(levels: usize, gated: bool, turned: bool, pumped: bool) -> Tower {
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels, gated, turned, pumped };
         let mut tower = Tower::found(declaration, &keys(4096)).expect("founded");
         // Open the readout and the returns away from zero so every family carries a covector.
         let k = keys(8192);
@@ -1957,6 +2102,21 @@ mod tests {
                 }
             }
         }
+        if pumped {
+            // The pump's depth at some tenths, its axis turned by a few half turns (measured: at
+            // |κ| near ½ the quadrature is shed and the gate's covector falls below the reading;
+            // the axis's covector scales with |β|).
+            for lv in &layout.levels {
+                fill(&mut tower.theta, lv.pump, 8);
+                fill(&mut tower.theta, lv.pump_axis, 8);
+                for v in &mut tower.theta[lv.pump..lv.pump + 8] {
+                    *v *= 4;
+                }
+                for v in &mut tower.theta[lv.pump_axis..lv.pump_axis + 8] {
+                    *v *= 32;
+                }
+            }
+        }
         tower
     }
 
@@ -1969,6 +2129,28 @@ mod tests {
     fn text_restores_exactly() {
         text_restores_exactly_of(false);
         text_restores_exactly_of(true);
+    }
+
+    #[test]
+    fn a_pumped_tower_restores_exactly() {
+        let tower = tiny_turning(2, true, true, true);
+        assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
+        let turned = tiny_turning(2, true, true, false);
+        assert_eq!(Tower::from_text(&turned.to_text()).expect("restored"), turned);
+    }
+
+    /// A pumped tower whose pump is at zero (`κ = 0`) codes every section exactly as its turned
+    /// twin: the pump opens on the turn.
+    #[test]
+    fn a_pumped_tower_opens_on_its_turned_twin() {
+        let turned = tiny_turning(2, true, true, false);
+        let mut pumped = tiny_turning(2, true, true, true);
+        for lv in pumped.layout.levels.clone() {
+            pumped.theta[lv.pump..lv.pump + 8].fill(0);
+            pumped.theta[lv.pump_bias..lv.pump_bias + 2].fill(0);
+        }
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        assert_eq!(code(&pumped, &classes), code(&turned, &classes));
     }
 
     fn text_restores_exactly_of(gated: bool) {
@@ -1993,29 +2175,47 @@ mod tests {
         the_covector_matches_the_code_difference_of(true);
     }
 
+    /// The thirteen classes every fixture reads.
+    const PASSAGE: [usize; 13] = [0, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+
     #[test]
     fn the_turned_covector_matches_the_code_difference() {
-        the_covector_of_tower_matches_the_code_difference(tiny_turning(2, true, true), true);
+        the_covector_of_tower_matches_the_code_difference(tiny_turning(2, true, true, false), true, &PASSAGE, 10);
+    }
+
+    /// Read over 37 classes: on thirteen the pump axis's covector (it scales with |β|) stays below
+    /// the reading's 1/64 bit a unit (measured), and the longer passage carries it. Its steps are
+    /// `2^(−9)` units (measured): at `2^(−10)` the faces' release moved the second level's turn's
+    /// fitted slope to −112 against a covector of −91 (×2^20), at `2^(−8)` it read −93, but steps
+    /// that wide moved contacts across their kinks and left 29 of 39 families read.
+    #[test]
+    fn the_pumped_covector_matches_the_code_difference() {
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        the_covector_of_tower_matches_the_code_difference(tiny_turning(2, true, true, true), true, &classes, 9);
     }
 
     fn the_covector_matches_the_code_difference_of(gated: bool) {
-        the_covector_of_tower_matches_the_code_difference(tiny_of(gated), gated);
+        the_covector_of_tower_matches_the_code_difference(tiny_of(gated), gated, &PASSAGE, 10);
     }
 
-    fn the_covector_of_tower_matches_the_code_difference(tower: Tower, gated: bool) {
-        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+    /// The code read at sixteen steps `k 2^(−step)` units, `0 < |k| ≤ 8`.
+    fn the_covector_of_tower_matches_the_code_difference(tower: Tower, gated: bool, classes: &[usize], step: u32) {
         let opening = tower.rest();
         let reaches = tower.reaches();
         let mut s = opening.clone();
         let cells = tower.forward(&mut s, &classes, &reaches).expect("forward");
         let mut g = tower.reverse(&opening, &cells, &classes).expect("reverse");
         tower.to_step_grain(&mut g);
-        // Which contacts conduct at every cell: the covector is the derivative on the passage's own
-        // side of every kink, so a perturbation that moves a contact across its kink is not read.
+        // Which contacts conduct at every cell, and each pump's depth's sign: the covector is the
+        // derivative on the passage's own side of every kink, so a perturbation that moves a contact
+        // or a pump's |κ| across its kink is not read.
         let conducting = |t: &Tower| -> Vec<bool> {
             let mut s = t.rest();
             let cells = t.forward(&mut s, &classes, &t.reaches()).expect("forward");
-            cells.iter().flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().map(|&a| a > 0)).collect::<Vec<_>>()).collect()
+            cells
+                .iter()
+                .flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().map(|&a| a > 0).chain(l.gate.iter().map(|m| m.kappa > 0))).collect::<Vec<_>>())
+                .collect()
         };
         let base = conducting(&tower);
         // Every family: its parameters by covector, largest first, the first whose steps of up to
@@ -2024,7 +2224,7 @@ mod tests {
         // releases every face to `2^(−16)`, and on the tiny tower that rounding moves one central
         // difference by up to a seventh (measured on the gated tower: ±2^(−7), ±2^(−8) and ±2^(−9)
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
-        let (mut checked, mut gates_checked, mut turns_checked) = (0, 0, 0);
+        let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked) = (0, 0, 0, 0);
         let base_code = code(&tower, &classes);
         for &(start, len, grain) in &tower.layout.families {
             let mut order: Vec<usize> = (start..start + len).collect();
@@ -2034,7 +2234,7 @@ mod tests {
                 if gi.abs() < 1i128 << (STEP_BITS - 6) {
                     break; // below 1/64 bit a unit the difference over ±2^(−7) units nears the reading's grain
                 }
-                let h = 1i32 << (grain - 10);
+                let h = 1i32 << (grain - step);
                 let (mut moment, mut spread) = (0i128, 0i128);
                 for k in (-8i32..=8).filter(|&k| k != 0) {
                     let mut moved = tower.clone();
@@ -2052,6 +2252,7 @@ mod tests {
                 checked += 1;
                 gates_checked += tower.layout.levels.iter().any(|lv| gated && (start == lv.gate || start == lv.gate_bias)) as usize;
                 turns_checked += tower.layout.levels.iter().any(|lv| tower.declaration.turned && (start == lv.turn || start == lv.turn_bias)) as usize;
+                pumps_checked += tower.layout.levels.iter().any(|lv| tower.declaration.pumped && [lv.pump, lv.pump_bias, lv.pump_axis, lv.pump_axis_bias].contains(&start)) as usize;
                 break;
             }
         }
@@ -2059,6 +2260,7 @@ mod tests {
         // gate covectors fall below 1/64 bit a unit on this fixture).
         assert!(!gated || gates_checked >= 2, "only {gates_checked} gate families carried a readable covector");
         assert!(!tower.declaration.turned || turns_checked >= 2, "only {turns_checked} turn families carried a readable covector");
+        assert!(!tower.declaration.pumped || pumps_checked >= 4, "only {pumps_checked} pump families carried a readable covector");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 
@@ -2266,7 +2468,7 @@ mod tests {
     }
 
     fn a_section_learns_a_repeating_passage_of(gated: bool) {
-        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated, turned: false };
+        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated, turned: false, pumped: false };
         let tower = Tower::found(declaration, &keys(4096)).expect("founded");
         let mut learner = TowerLearner::new(tower, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();

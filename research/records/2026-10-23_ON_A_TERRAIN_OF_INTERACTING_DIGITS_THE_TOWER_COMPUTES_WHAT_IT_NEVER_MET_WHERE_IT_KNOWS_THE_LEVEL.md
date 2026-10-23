@@ -267,6 +267,139 @@ The failure names the next subject: a residue is a discrete phase, and a linear 
 continuous phase cannot make it discrete. In the parametron the lock does (past the bifurcation the
 half-turn sheets lock, and relative phase is read through the pump); the tower's modes have no lock.
 
+## The pumped mode
+
+[definition; agent-inferred, October 23] The lock is the parametron's pump, so a pumped mode
+(`TowerDeclaration::pumped`, the module's docs; atlas `hnn.tower-pumped-mode`) mixes a symbol-keyed
+reflection into its turn: `h_t = α_t h_(t−1) + β_t conj(h_(t−1)) + γ_t B x_t`, `α_t = ρ_t(1 − |κ_t|)U_t`
+with `U_t` the turned unit, `β_t = ρ_t κ_t e^(iπ p_t)`, the depth `κ_t = 2 r_t − 1` from a base-two
+logistic of `W_κ x + b_κ`, the axis `p_t` read as the turn is. As a real `2×2` move its determinant is
+`ρ²(1 − 2|κ|)` and its trace `2ρ(1 − |κ|) cos θ_U`: it turns while `(1 − |κ|)² cos² θ_U < 1 − 2|κ|`, and
+past that its in-phase axis boosts and its quadrature is shed, so the mode's phase settles on one of
+two sheets across the pump's axis; on the edge it shears. These are the Swing's three kinds, keyed
+cell by cell. The move's real-linear norm is `|α| + |β| = ρ_t`, so the gated passivity bound holds
+with the same `γ_t`; the norm identity is owed in Lean (#410). The pump opens at zero, so a pumped
+tower opens on its turned twin (tested: their codes agree exactly), and its covectors agree with the
+code's difference (tested).
+
+The claim fixed before the run: after 12 passes on the same terrain, read line by line from rest,
+unseen products' tens cost below 3.0 bits a digit (gated 3.30, turned 3.56); written unseen
+products are right mod 9 in at least 35 of 224 (two standard deviations above a one-in-nine draw;
+gated 30, turned 27); and unseen sums' units cost no more than the gated tower's 0.504 bits.
+
+It trained 12 passes in 487 s, 39 to 43 s a pass, with one rise: in the ninth pass the unseen
+results' stream code went from 1.206 to 1.602 bits and came back to 1.105 in the tenth. In the
+stream it codes unseen results' digits at 1.070 bits (gated 1.508, turned 1.447) and seen ones at
+1.018 (1.493, 1.452). Read line by line from rest, unseen, bits a digit:
+
+| | gated | turned | pumped |
+|---|---|---|---|
+| all results | 1.698 | 2.110 | 2.473 |
+| sums | 0.753 | 1.338 | 0.985 |
+| sums' units | 0.504 | 1.721 | 1.327 |
+| differences | 2.031 | 1.985 | 3.656 |
+| products | 2.283 | 2.695 | 3.220 |
+| products' tens | 3.301 | 3.564 | 3.821 |
+
+The claim fails on all three counts: a product's tens cost 3.82 bits, written products are right
+mod 9 in 29 of 224, and a sum's units cost 1.33 bits. What it writes for held-out lines, the same
+keys, as they came:
+
+```text
+74-72=6     92*65=6110  85-42=43    46*15=710   71+41=122   86-43=43    83*27=2429
+73+31=106   14*39=524   23+51=84    56+3=59     53+18=71    80+14=94    8+82=92
+47-20=35    12*35=410   6+77=93     99-56=45    67-56=19    6+10=16     94-27=89
+```
+
+Read in the base's tower [agent-inferred]:
+
+- **The lock snaps the faces a shared prime forces, and parity.** Where an operand is even, a
+  written product is even in 157 of 157; where one has a factor 5, its residue mod 5 is right in 83
+  of 83 (the gated tower: 146 of 156 and 78 of 84). A written sum's units are right in 191 of 240,
+  and of the 49 wrong, 36 keep the right parity, two or four steps off (13 are one step off; the
+  turned tower: 81 one step off). The pump's two sheets hold the ring 2 of the ten; the ring 5
+  inside it still slips.
+- **What a line can only read against itself got worse.** Differences cost 3.66 bits (gated
+  2.03) and whole products are right in 11 of 224 (gated 3), sums in 142 of 241 (gated 153),
+  differences in 37 of 135 (gated 45). A one-digit difference no longer opens on 1: 6 of 25 are
+  written opening on 1 (the gated tower: 22), 8 on 0 and 5 on 6.
+- **The stream is the condition it learned in.** The pumped tower loses 1.40 bits a digit to rest
+  (the gated 0.19, the turned 0.66). At rest a mode is zero and `β conj(h)` is zero with it, so the
+  reflection acts only on the line's own first pushes; every line it trained on opened on the state
+  the earlier lines left.
+
+That reading needs a check before it is relied on. Held-out pairs are few and the development text
+draws them again: of its 4,998 lines, 1,099 repeat an operation and pair met earlier in it (`b+a`
+after `a+b` among them), 989 of them among the 1,997 held-out sums and products. A stream code can
+therefore read a result against an earlier line's, and the stream numbers above include those
+lines. Read from rest, no line sees another.
+
+## Writing in the stream
+
+[agent-inferred, October 23] `read-lines-stream` writes each line from the state the text's true
+earlier lines left (the fork writes; the true line carries the stream on), the condition every
+tower here trained in, and the observer's `first` keeps only the lines whose pair the text meets for
+the first time, so no result is read against its twin. The pumped, turned and gated towers are read
+alike.
+
+The claim fixed before the read: over first-met lines written in the stream, the pumped tower's
+unseen products' tens cost below 3.0 bits a digit and below the gated tower's in the same read; its
+written unseen products are right mod 9 in at least 31 of 193 (two standard deviations above a
+one-in-nine draw); and its unseen sums' units cost no more than the gated tower's in the same read.
+
+Each read took 19 to 21 s. Unseen, first-met lines, bits a digit:
+
+| | gated | turned | pumped |
+|---|---|---|---|
+| all results | 1.471 | 1.415 | 1.016 |
+| sums | 0.499 | 0.372 | 0.214 |
+| sums' units | 0.501 | 0.599 | 0.147 |
+| differences | 1.376 | 1.401 | 0.759 |
+| products | 2.217 | 2.170 | 1.726 |
+| products' tens | 3.327 | 3.348 | 3.011 |
+
+The claim fails on its first count: a product's tens cost 3.011 bits, not below 3.0, though 0.32
+below the gated tower's in the same read. The other two hold: written products are right mod 9 in
+37 of 193 (gated 20, turned 35) and mod 11 in 32 (19, 18), and a sum's units cost 0.147 bits. Lines
+whose pair met earlier code no better than first-met ones (the pumped tower's products' tens 2.984
+against 3.011, its sums 0.248 against 0.214), so the stream's gain is not read from a twin. Whole
+results written right, first-met unseen: products 21 of 193 (gated 4, turned 9), sums 177 of 208
+(146, 154), differences 87 of 135 (67, 57). What each writes for the held-out lines shown above,
+the same keys, as they came (none of these lines repeats an earlier pair; they open the text, so
+their carried state is short):
+
+```text
+gated   74-72=1  92*65=6010  85-42=43  46*15=800  71+41=112  86-43=43  83*27=2439  73+31=105
+        14*39=736  23+51=74  56+3=57  53+18=71  80+14=94  8+82=80  47-20=27  12*35=595
+        6+77=83  99-56=43  67-56=11  6+10=13  94-27=67
+turned  74-72=1  92*65=6040  85-42=43  46*15=610  71+41=112  86-43=43  83*27=2649  73+31=104
+        14*39=534  23+51=74  56+3=57  53+18=71  80+14=94  8+82=90  47-20=27  12*35=490
+        6+77=83  99-56=43  67-56=11  6+10=18  94-27=67
+pumped  74-72=6  92*65=6030  85-42=43  46*15=700  71+41=112  86-43=43  83*27=2229  73+31=106
+        14*39=526  23+51=74  56+3=59  53+18=71  80+14=94  8+82=80  47-20=27  12*35=470
+        6+77=83  99-56=43  67-56=19  6+10=16  94-27=67
+```
+
+Read in the base's tower [agent-inferred]:
+
+- **The lock is the carried state's.** In the stream the pumped tower codes every operation below
+  both twins, where from rest it was above both everywhere but a sum, where it sat between them.
+  The pump reflects the state it meets, and what a line meets in the stream is the state the
+  earlier lines left: the Holon as a continuing current, not a line read from nothing.
+- **Parity and the shared primes hold exactly.** A written unseen product has the truth's parity in
+  193 of 193, and its residue mod 5 where an operand has a factor 5 in 75 of 76. A sum's units
+  are right in 197 of 208; of the 11 wrong, 10 are two steps off and keep the parity.
+- **A difference's level is located.** 128 of 135 differences are written at the right length
+  (gated 119), and a one-digit difference opens on 1 in 4 of 25 (gated 23): the first digit is no
+  longer drawn before the length is known.
+- **A product's middle digits are still near blind.** Its tens cost 3.01 bits against 3.32 for a
+  draw among ten. The mod 9 and mod 11 faces rise above chance, but a product's ring face composes
+  the operands' ring faces at a pair contact (the four-cycle of `G_ij = ij mod q` is nonzero on
+  every square), and no contact here composes them.
+
+The failure names the next subject by its measurement: a product's tens cost 3.01 bits written in
+the stream, 0.31 below blind, while its parity and shared-prime faces are exact.
+
 ## The recorded failures this step could repeat
 
 - **Catered machinery.** The terrain's truth is generated exactly, outside the machine; the tower
@@ -285,6 +418,9 @@ holds each run's binary, inputs, projection, deadline, wall time and peak reside
 reads (each result's codes on `2^−20` bits and what the tower wrote) and the observer's reads of them:
 `LINES_12.tsv` and `LINES_24.tsv` (64 written, keys `keys_s1`) with `READ_12.txt` and `READ_24.txt`;
 with 1,200 written and keys `keys_d1`, `LINES_6.tsv` and `LINES_12_1200.tsv` for the gated tower,
-`LINES_DUPLEX_6.tsv` for the duplex and `LINES_TURNED_12.tsv` for the turned tower, each with its
-`READ_*.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt` and `TRAIN_TURNED_STOPPED.txt` are the
-training logs (the turned ones without their per-section swell lines).
+`LINES_DUPLEX_6.tsv` for the duplex, `LINES_TURNED_12.tsv` for the turned tower and
+`LINES_PUMPED_12.tsv` for the pumped one, each with its `READ_*.txt`; written in the stream,
+`LINES_STREAM_GATED.tsv`, `LINES_STREAM_TURNED.tsv` and `LINES_STREAM_PUMPED.tsv`, each
+`READ_STREAM_*.txt` holding the observer's read of all lines, of first-met lines and of the rest.
+`TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt` and `TRAIN_PUMPED.txt` are the
+training logs (the turned and pumped ones without their per-section swell lines).

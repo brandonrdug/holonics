@@ -83,12 +83,13 @@ pub(super) fn per(code: i64, n: usize) -> String {
 
 /// `train-tower` trains the ungated tower, `train-gated-tower` the gated one (its modes' decay keyed by
 /// their input), `train-turned-tower` the turned one (its gated modes' turn keyed by their input too),
+/// `train-pumped-tower` the pumped one (its turned modes pumped by their input, so a phase can lock),
 /// and `train-credited-tower` the gated one whose streams carry their passage credit
 /// (`hnn::tower::LevelCredit`), so a section's covector reaches the history its opening carries; a
 /// continued learner must carry the same declaration.
-pub(super) fn train(args: &[String], gated: bool, turned: bool, credit: bool) -> Result<()> {
+pub(super) fn train(args: &[String], gated: bool, turned: bool, pumped: bool, credit: bool) -> Result<()> {
     if args.len() != 18 && args.len() != 20 {
-        return Err("train-tower|train-gated-tower|train-turned-tower|train-credited-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+        return Err("train-tower|train-gated-tower|train-turned-tower|train-pumped-tower|train-credited-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
     let train = pinned_read(&args[1], &args[2], READ_BUDGET as usize)?;
     let dev = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
@@ -101,7 +102,7 @@ pub(super) fn train(args: &[String], gated: bool, turned: bool, credit: bool) ->
         dev_roles: roles,
         alphabet: 256,
     };
-    fit(&args[7..], reading, gated, turned, credit)
+    fit(&args[7..], reading, gated, turned, pumped, credit)
 }
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
@@ -134,7 +135,7 @@ pub(super) fn train_units(args: &[String]) -> Result<()> {
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len() };
-    fit(&args[9..], reading, true, false, false)
+    fit(&args[9..], reading, true, false, false, false)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -150,7 +151,7 @@ struct Reading {
 
 /// The passes: `args` are `KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS
 /// OUT [FROM FROM_SHA]`.
-fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, credit: bool) -> Result<()> {
+fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool) -> Result<()> {
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -161,6 +162,7 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, credit: boo
         levels: count(&args[5])?,
         gated,
         turned,
+        pumped,
     };
     let streams = count(&args[6])?;
     let section = count(&args[7])?;
@@ -363,10 +365,12 @@ fn release(args: &[String], units: Option<&Units>) -> Result<()> {
 /// a fork at the `=` releases its own rest by exact agreeing draws until a line's end (or as many
 /// classes as the given rest and four more), written beside it. An exterior reading of terrain
 /// lines (`tools/arithmetic_terrain.py`): what the tower writes after an expression it may never
-/// have met.
-pub(super) fn read_lines(args: &[String]) -> Result<()> {
+/// have met. `read-lines-stream` opens each line instead on the state the text's true earlier
+/// lines left, the condition the tower trained in: the fork writes from that state, and the true
+/// line, not the release, carries the stream on.
+pub(super) fn read_lines(args: &[String], in_stream: bool) -> Result<()> {
     if args.len() != 10 {
-        return Err("read-lines STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT".into());
+        return Err("read-lines|read-lines-stream STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT".into());
     }
     let started = Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -380,10 +384,22 @@ pub(super) fn read_lines(args: &[String]) -> Result<()> {
     let mut key_stream = KeyStream::new(keys, 8)?;
     let mut rows = String::new();
     let mut lines = 0usize;
+    let mut carried = tower.rest();
+    let mut carried_face = tower.advance(&mut carried, b'\n' as usize).map_err(|e| e.to_string())?;
     for (i, line) in text.split(|&b| b == b'\n').filter(|l| !l.is_empty()).enumerate() {
-        let Some(eq) = line.iter().position(|&b| b == b'=') else { continue };
-        let mut modes = tower.rest();
-        let mut face = tower.advance(&mut modes, b'\n' as usize).map_err(|e| e.to_string())?;
+        let Some(eq) = line.iter().position(|&b| b == b'=') else {
+            for &b in line.iter().chain(b"\n") {
+                carried_face = tower.advance(&mut carried, b as usize).map_err(|e| e.to_string())?;
+            }
+            continue;
+        };
+        let (mut modes, mut face) = if in_stream {
+            (carried.clone(), carried_face.clone())
+        } else {
+            let mut modes = tower.rest();
+            let face = tower.advance(&mut modes, b'\n' as usize).map_err(|e| e.to_string())?;
+            (modes, face)
+        };
         for &b in &line[..=eq] {
             face = tower.advance(&mut modes, b as usize).map_err(|e| e.to_string())?;
         }
@@ -408,6 +424,7 @@ pub(super) fn read_lines(args: &[String]) -> Result<()> {
             codes.push(face.code(b as usize).to_string());
             face = tower.advance(&mut modes, b as usize).map_err(|e| e.to_string())?;
         }
+        (carried, carried_face) = (modes, face);
         rows.push_str(&format!(
             "{}\t{}\t{}\t{}\t{}\n",
             i,

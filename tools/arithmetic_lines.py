@@ -11,7 +11,13 @@ shares a prime with it, a sum's tens split by whether its units carried, and the
 for a one-digit difference; and how many steps of the ring of ten a written sum's units sit from the
 truth's (the turned tower's sums). An exterior reading, outside the machine.
 
-usage: python3 -I arithmetic_lines.py DEV_TXT DEV_ROLES LINES_TSV WRITTEN (the read's WRITTEN count)
+A read that carries the stream (read-lines-stream) opens each line on the state the text's true
+earlier lines left, so a line whose operation and operands (unordered for + and *) met earlier in
+the text could be read against them; `first` keeps only the lines whose pair the text meets there
+for the first time, and `again` only the rest.
+
+usage: python3 -I arithmetic_lines.py DEV_TXT DEV_ROLES LINES_TSV WRITTEN [first|again]
+(WRITTEN: the read's WRITTEN count)
 """
 import sys
 from collections import Counter, defaultdict
@@ -36,12 +42,24 @@ def faces(written, truth):
 
 def main():
     dev, roles, lines_tsv, written_lines = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4])
+    keep = sys.argv[5] if len(sys.argv) > 5 else None
+    if sys.argv[6:] or keep not in (None, "first", "again"):
+        raise SystemExit("the fifth argument is `first`, `again` or absent")
     text = open(dev, "rb").read()
     regions = open(roles, "rb").read()
     unseen_of = {}
+    met_before = set()
+    met = set()
     at = 0
     for i, line in enumerate(text.split(b"\n")[:-1]):
         eq = line.index(b"=")
+        head = line[:eq].decode()
+        op = next(c for c in "+-*" if c in head)
+        a, b = head.split(op)
+        pair = (op, frozenset((a, b))) if op in "+*" else (op, a, b)
+        if pair in met:
+            met_before.add(i)
+        met.add(pair)
         if regions[at + eq + 1] not in (0, 1):
             raise SystemExit("a result opens on a scale zero")
         unseen_of[i] = regions[at + eq + 1] == 0
@@ -65,6 +83,8 @@ def main():
             releases = {"forward": release, "refined": refined}
             faces_read = {"forward": fcodes, "meeting": mcodes}
         i = int(i)
+        if keep is not None and (i in met_before) != (keep == "again"):
+            continue
         side = "unseen" if unseen_of[i] else "seen"
         op = next(c for c in "+-*" if c in head)
         a, b = (int(x) for x in head[:-1].split(op))
