@@ -705,7 +705,11 @@ impl Tower {
                     for k in 0..d.modes {
                         let (re, im) = (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128);
                         let (modulus, _) = modulus_and_gamma(re, im);
-                        let unit = if modulus == 0 { (one, 0) } else { (div_nearest(re * one, modulus), div_nearest(im * one, modulus)) };
+                        // u = λ/|λ| over the modulus rounded up and quotients toward zero, so
+                        // |u| ≤ 1 exactly: a closed gate (r → 0) moves at ρ → 1 whatever |λ|, and a
+                        // unit rounded past the circle would then carry |λ_t| past one and γ_t to zero.
+                        let above = modulus + i128::from(modulus * modulus < re * re + im * im);
+                        let unit = if modulus == 0 { (one, 0) } else { (re * one / above, im * one / above) };
                         faces.units.push(unit);
                         faces.moduli.push(modulus);
                         // log₂|λ| on 2^(−30), |λ| re-based to 2^(−62); a zero move reads at one grain.
@@ -756,6 +760,9 @@ impl Tower {
                     let (ur, ui) = faces.units[k];
                     let (lr, li) = (release(rho * ur, MOVE_BITS), release(rho * ui, MOVE_BITS));
                     let (_, gamma) = modulus_and_gamma(lr, li);
+                    if gamma == 0 {
+                        return refuse("a gated move reached the unit circle");
+                    }
                     gate.push(GatedMove { open: open as i64, lam: (lr as i64, li as i64), rho: rho as i64, gamma: gamma as i64, held });
                 }
             }
