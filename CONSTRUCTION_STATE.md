@@ -17,6 +17,19 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 23: units founded by code length carry the tower above the byte (host).**
+`hnn::units` founds units from the passage: an adjacent pair becomes one unit exactly when the
+complete code (the order-one KT code in the units plus their description) falls. On all 6,726
+problems it founds 1,062 units (`number of `, `because `, `a total of `, the markup), and the gated
+tower reading the 1,318 units codes the held-out problems at 1.953, 1.876, 1.839 bits a byte over
+three passes against 2.435, 2.321, 2.295 from bytes, at about 0.09 ms a byte against 0.12. Its
+samples write sentences with their grammar and wrong arithmetic, and never continue the question's
+subject; that is the next failure. The passage credit (the recurrence covector carried across
+sections) codes 0.9–1.1% above the gated tower and is not the working law; its run located a gate
+rounding fault, now fixed. The
+[record](research/records/2026-10-23_UNITS_FOUNDED_BY_CODE_LENGTH_CARRY_THE_TOWER_ABOVE_THE_BYTE_AND_THE_PASSAGE_CREDIT_DOES_NOT_PAY.md)
+holds the samples and receipts.
+
 **October 23: the moment tower learns GSM8K bytes and joins the route (host).** `hnn::tower` is a
 byte-grain completed state-space model in exact integers: diagonal complex modes with a passive
 push `γ = √(1 − |λ|²)`, rectifying contacts that read the modes' face as a ratio to its power, two
