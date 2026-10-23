@@ -177,6 +177,107 @@ The first launch planned three passes; its first 96 sections ran at 0.191 s a se
 passes (projected 1,366 s, deadline 1,450 s, measured 1,204.6 s and 110 MiB: 0.88). The joined
 read took 199.5 s and 2.6 GiB, the samples 0.3 s and 11.3 s.
 
+## More passes, width and steps
+
+**Five passes on all problems.** The narrow tower continued from its pass-2 state:
+
+| pass | online code over the pass | held out | question | answer prose | answer digits | markup |
+|---|---|---|---|---|---|---|
+| 1 | 2.649 | 2.517 | 2.631 | 2.422 | 3.144 | 1.941 |
+| 2 | 2.408 | 2.404 | 2.521 | 2.312 | 2.964 | 1.849 |
+| 3 | 2.332 | 2.367 | 2.492 | 2.271 | 2.875 | 1.814 |
+| 4 | 2.283 | 2.335 | 2.451 | 2.242 | 2.883 | 1.797 |
+| 5 | 2.250 | 2.310 | 2.420 | 2.234 | 2.815 | 1.735 |
+
+The held-out gain a pass falls (−0.113, −0.037, −0.032, −0.025), and the online code, level with
+the held-out code at pass 2, sits 0.06 below it at pass 5. Joined to the route on all problems
+(weights 13204, 15454, 9424, 6995 on `2^(−16)`), the pair reads 1.574 against the route's 1.591
+(1.579 at pass 2), the markup 1.578 against 1.692.
+
+**The read's carrier.** The first launch of pass 4 trained all 3,445 sections and then refused in
+its held-out read: a read outgrew its 32-bit carrier. The ratio read makes the forward blind to the
+read's scale, so each normalized step lengthens the read's material; the second level's largest
+`‖r‖_rms` grew from 739 to 1,795 face units over passes 3 and 4. The raw read is now carried in
+64 bits before its ratio is taken (`hnn::tower`, "The read's carrier"), and each pass's learner
+rests before its held-out read, so a refused read keeps the trained pass. The refused launch lost
+its pass 4; the relaunch from pass 3's state is the table's pass 4. The same refusal stopped the
+wide probe below in its third held-out read.
+
+**Width and steps.** On 1,000 problems, three passes each:
+
+| tower | held out, passes 1–3 | online code, pass 3 |
+|---|---|---|
+| narrow (width 64, 64 modes, 256 contacts), sections of 128 bytes | 2.828, 2.687, 2.628 | 2.628 |
+| twice as wide (128, 128, 512), the same rate `2^(−7)` | 3.036, 2.914, 2.877 | 2.863 |
+| narrow, sections of 64 bytes (twice the deposits a pass) | 2.787, 2.684, 2.658 | 2.569 |
+
+On all 6,726 problems, three passes each on the PC (8 threads each, its own founding keys):
+
+| tower | held out, passes 1–3 |
+|---|---|
+| narrow, rate `2^(−7)` | 2.500, 2.403, 2.358 |
+| twice as wide, rate `2^(−8)` | 2.437, 2.326, (refused in the read) |
+| narrow width, four levels, rate `2^(−7)` | 2.616, 2.543, 2.487 |
+
+On 1,000 problems neither width at the narrow's rate nor twice the steps helped by pass 3, and the
+shorter sections fit the training text closer than the held-out text. On all problems the wide
+tower, its step halved for twice the fan-in (agent-inferred: a normalized step moves each weight by
+the rate, so a row's drive moves with its fan-in), codes below the narrow at both passes it read
+(−2.5%, −3.2%); the four-level tower codes above it. Width pays once the data does; depth at this
+rate does not. The PC's narrow run, founded from other keys, reads within 1% of this host's
+(2.500, 2.403, 2.358 against 2.517, 2.404, 2.367).
+
+**Release by agreement.** The samples above draw each class from the face itself. The samplers now
+take a declared number `k` of agreeing draws: the class falls where `k` independent draws from one
+face agree, so it is drawn from `p_i^k / Σ_j p_j^k`, exactly and with one key a class
+(`agreement_face`; atlas `receiver.agreement-release`). At `k = 2` (the collision face) the same
+learned faces release mostly words. A greedy left-to-right search of each sample against the
+training text finds no copied run longer than 26 bytes (`the total number of the`).
+
+The tower alone after pass 5, one draw:
+
+```text
+Jass was 2 years, the yenry per $96:.50 leaves, 30*.8= <<90/2=80>>80 add $2.50.
+#### 675
+
+#### 495
+
+Miviled twice the find, the secles, wh bagreten's bill have A feyer juppris, are chools, Fraaddy 5 < 100/4=<<60/2=40>>40 bills, so bicceenelds.
+They med number of nowlers asd house throw costs to stores and ande work amounts those in total. Necket to the buiches seandoms bag, how many and the trode 
+```
+
+Two agreeing draws:
+
+```text
+Saries the total number of the savis to the number of beads, how old a seas to the firss bagreen?
+Frikin the the firs need to find how much a total of the pay he feet and to the total number of to hour and to the total number of the accentall his to store seclended to candy to the number of stores per hour to crown cards will have to the speed to the number of the shes for his to deces per to the 
+```
+
+Joined to the route after pass 5, one draw a cell:
+
+```text
+Jufflowing once.  How far esertrudahoes does he increases B time that costs $80 groups for $8 inches to matermelody lives she had 10 – 3 = <<72-240=180>>180 and are plant.
+Hannah) has there than thers at what is the bombed an 8*10=<<23*3=200>>200 more union tricycles per game.
+Her ton 1. How many double the access hadn't hit head arling hold 20 miles more needs in length of two now he has the se
+```
+
+Two agreeing draws a cell:
+
+```text
+Janet shopping out how many hours at a shelter the third and another the third and for the fourth of the fourth flowers he had a total of 2 charge for one apples at a pool holding many hours does he three burger for 3 hours does he will she allowance the number of the third are for 3 hours does he volunteers are a monthleen hours at the total number of the money the last two friends does he volunt
+```
+
+The joined release at two draws stays on the prompt's subject (a shelter, hours, volunteering) in
+question-shaped clauses that do not form sentences. None of the four is readable. The prompt
+(the first held-out question) reads at 3.692 bits a byte under the pass-5 tower against 2.930
+under pass 2's, one question against the held-out 2.310.
+
+**Time.** On the PC a section took about 51 ms narrow, 135 ms wide and 82 ms at four levels (8
+threads each), against 173–191 ms for the narrow here on 4 cores. The resumed passes 3–5 took
+668, 655 and 652 s a pass here; the relaunch's first 256 sections ran at 0.199 s against the
+projected 0.191 s while a niced test build shared the cores, and the build was stopped instead of
+the run (1306.5 s against 1,354 s projected, deadline 1,400 s: 0.96).
+
 ## Speed and receipts
 
 A pass takes 93 to 99 s on the host, including the held-out read. The seven-pass run took 674.3 s
@@ -204,5 +305,6 @@ faces. Nothing here grades a generation against an answer.
 
 ## Owed
 
+- The agreement release `P(c₁ = … = c_k = i | all agree) = p_i^k / Σ_j p_j^k` in Lean (#410).
 - The passive mode's bound `|h| ≤ √((1 + |λ|)/(1 − |λ|)) max|Bx|` under the step's `γ`, and the
   certified section's strict descent, in Lean (#410).

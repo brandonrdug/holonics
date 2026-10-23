@@ -24,8 +24,11 @@ levels, and certified sections. Seven passes on 1,000 problems take the 747 held
 2.828 to 2.531 bits a byte; `CellJoin` with the frozen route codes them at 1.754 against the
 route's 1.786, most of it in the calculation markup (1.975 to 1.851). Its samples write well-formed
 `<<a op b=c>>c` markup with wrong arithmetic and invented words. Two passes on all 6,726 problems
-take the held-out problems to 2.404, and joined to the route trained on all of them, 1.579 against
-1.591. The
+take the held-out problems to 2.404, and five to 2.310; joined to the route trained on all of
+them, 1.574 against 1.591. On all problems a twice-as-wide tower with its step halved codes below
+the narrow (2.326 against 2.403 after two passes, on the PC); four levels code above it. The raw
+read is carried in 64 bits (its scale is a gauge the step lengthens). The samplers release by
+agreement of `k` draws (`p^k/Σp^k`); at two the samples are mostly words, still not sentences. The
 [record](research/records/2026-10-23_THE_MOMENT_TOWER_LEARNS_GSM8K_BYTES_ONCE_ITS_MODES_ARE_PASSIVE_AND_ITS_CONTACTS_READ_A_RATIO.md)
 holds both samples, the measurements and receipts.
 

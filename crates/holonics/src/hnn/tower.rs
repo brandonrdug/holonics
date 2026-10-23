@@ -48,6 +48,13 @@
 //! of the contacts moved it by tens of units, and the first level's contacts stopped conducting: 251
 //! of 256 changed no weight in the second pass, so no covector reached its modes (measured).
 //!
+//! **The read's carrier.** The ratio read makes the forward blind to the read's scale `‖C‖`, so
+//! the covector of `C` is orthogonal to `C` and every normalized step lengthens it (the step's
+//! effective rate on the read falls as `1/‖C‖`). The raw read `r = Re(C h)` is therefore carried in
+//! 64 bits before the ratio is taken. Measured: on all 6,726 GSM8K problems the second level's
+//! largest `‖r‖_rms` grew from 739 to 1,795 face units over passes 3 and 4, and a held-out read
+//! after pass 4 passed the 32-bit carrier (a typed refusal).
+//!
 //! **What a section holds.** The forward's temporaries of its own cells, for the reverse scan, and
 //! the streams' opening states, for the reread. They are released when the section closes (the
 //! Athena alpha plan's §A2.4: the reverse pairs the forward prefix operands with the backward
@@ -391,7 +398,7 @@ fn exp_series(a: i128, b: i128) -> (i128, i128) {
 
 /// `r̂ = r / ‖r‖_rms` on `2^(−16)` and `‖r‖_rms` on `2^(−16)`, `r` on `2^(−16)`; a zero face reads
 /// as zero.
-fn ratio_to_power(r: &[i32]) -> Result<(Vec<i32>, i128)> {
+fn ratio_to_power(r: &[i64]) -> Result<(Vec<i32>, i128)> {
     let power: i128 = r.iter().map(|&v| v as i128 * v as i128).sum();
     let scale = ((power / r.len() as i128) as u128).isqrt() as i128;
     if scale == 0 {
@@ -558,10 +565,12 @@ impl Tower {
             let mut read_b = vec![0i64; w];
             affine(&t[lv.read_re..lv.read_re + w * n], r[2], n, &face[..n], None, 0, 0, &mut read_a)?;
             affine(&t[lv.read_im..lv.read_im + w * n], r[3], n, &face[n..], None, 0, 0, &mut read_b)?;
-            let raw: Vec<i32> = read_a
+            // The raw read is carried in 64 bits: only its direction reaches the contacts, so its
+            // scale is a gauge, and the normalized step lets it grow (see "The read's carrier").
+            let raw: Vec<i64> = read_a
                 .iter()
                 .zip(&read_b)
-                .map(|(a, b)| fit32(release(*a as i128 - *b as i128, MATERIAL_BITS), "a read outgrew its 32-bit carrier"))
+                .map(|(a, b)| fit64(release(*a as i128 - *b as i128, MATERIAL_BITS)))
                 .collect::<Result<_>>()?;
             let (read, read_scale) = ratio_to_power(&raw)?;
             let drive_buf = &mut buf[..f];
