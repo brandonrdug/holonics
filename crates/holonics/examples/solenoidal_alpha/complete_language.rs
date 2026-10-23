@@ -11,6 +11,8 @@ mod continuation;
 mod stage;
 #[path = "complete_language/native_train.rs"]
 mod native_train;
+#[path = "complete_language/modes_train.rs"]
+mod modes_train;
 
 #[cfg(test)]
 #[path = "complete_language/code_parallel_controls.rs"]
@@ -765,6 +767,8 @@ pub(super) fn run_with_execution(
         Some("train-prepared-local-retained-held-v1") => train(args,execution,holonics::hnn::receiving::ReceivingLaw::RetainedFibreV1,backend,ObservedEpochDepositionScope::LocalReceivingReturnWithHeldMap),
         Some("train-native") if backend == CompleteLanguageTrainingBackend::HostReference => native_train::train(args),
         Some("sample-native") if backend == CompleteLanguageTrainingBackend::HostReference => native_train::sample(args),
+        Some("train-modes") if backend == CompleteLanguageTrainingBackend::HostReference => modes_train::train(args),
+        Some("sample-modes") if backend == CompleteLanguageTrainingBackend::HostReference => modes_train::sample(args),
         Some("train-native" | "sample-native") => Err("the native route's commands are host-owned; no CUDA fallback".into()),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
