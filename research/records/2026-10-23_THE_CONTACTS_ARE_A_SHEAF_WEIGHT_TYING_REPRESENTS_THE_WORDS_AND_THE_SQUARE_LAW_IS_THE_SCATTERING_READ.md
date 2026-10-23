@@ -313,6 +313,28 @@ frame phase, on the same 1,000 problems:
   `2^8` the release begins to cost.
 - At `D = 16`, released at `2^16`: 0.5691 against 0.5700.
 
+**The whole training partition.** The design asked what more data buys before the owner changes.
+The partition's 6,726 training problems in index order, each as question, newline, answer and a
+blank line (the design's rendering: 2,078,532 cells for the first 1,000 problems, 14,112,672 for
+all), at `D = 24`:
+
+| problems | cumulative, released at `2^12` | the block's own code, released | cumulative, unreleased |
+|---|---|---|---|
+| 100 | 0.6888 | 0.6888 | 0.6907 |
+| 1,000 | 0.5529 | 0.5371 | 0.5544 |
+| 2,000 | 0.5191 | 0.4856 | 0.5205 |
+| 3,000 | 0.5039 | 0.4725 | 0.5053 |
+| 4,000 | 0.4921 | 0.4584 | 0.4934 |
+| 5,000 | 0.4840 | 0.4516 | 0.4852 |
+| 6,000 | 0.4780 | 0.4483 | 0.4792 |
+| 6,726 | 0.4742 | 0.4430 | 0.4754 |
+
+- More data keeps paying: the whole partition codes 14% below the first 1,000 problems, and its
+  last 726 problems code 0.4430, 18% below the 1,000-problem block.
+- The release holds its small gain at every scale (0.0012 bits a cell at 6,726 problems), while
+  the unreleased ratio reaches `|log₂ β| = 5,169,736` bits.
+- The tree has 11,945,309 nodes at the end, and the run's peak was 1,020 MiB.
+
 So the receiving tree can carry the whole partition at fixed widths, if its certificate is the
 released law's per-cell telescope instead of the tracking of the unreleased ideal. The
 receiving tree's owner decides; this read changes no crate.
@@ -364,4 +386,11 @@ receiving tree's owner decides; this read changes no crate.
   cell. The projection used the larger 13.34 µs measured for `passage_ctw` on 1,000 problems, with a
   tenth for growth: 31 s a run, deadline 60 s a run, four together on four cores. The runs took
   8.8 s to 13.5 s (ratio 0.44 for the slowest) at 433 MiB.
+- [`render_partition.py`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/render_partition.py) renders the partition that
+  `tools/gsm8k/partition.py` writes from the public `train.jsonl`;
+  [`ctw_beta_full.sh`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/ctw_beta_full.sh), output
+  [`ctw_beta_full.txt`](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ_receipts/ctw_beta_full.txt). The projection was 5.38 µs a cell (the
+  largest plain read on 1,000 problems) to half as much again for the larger table: 76 s to 114 s a
+  run, deadline 120 s, two together. Both took 64 s (ratio 0.56 to the upper end) at 1,020 MiB,
+  against about 4.5 GB projected for 29 million nodes; the partition has 11.9 million.
 - No Rust or Lean in the crates or the Lean package changed.

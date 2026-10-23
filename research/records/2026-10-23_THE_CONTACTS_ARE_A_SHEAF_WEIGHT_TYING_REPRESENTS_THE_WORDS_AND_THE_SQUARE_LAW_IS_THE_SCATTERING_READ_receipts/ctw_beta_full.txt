@@ -1,0 +1,22 @@
+# ctw_beta_full.sh on the whole training partition (render_partition.py; sha256 of the text 050b94f367625ad2c533bb3af53c730ea6d12e140a080a6a3def9ffdc0de3b95), the two runs together:
+## released at 2^12
+  at    216540 cells: cumulative 0.6888; block from         0: 0.6888 bits/cell  (0.9 s, nodes 988835)
+  at   2078532 cells: cumulative 0.5529; block from    216540: 0.5371 bits/cell  (10.0 s, nodes 4211103)
+  at   4169680 cells: cumulative 0.5191; block from   2078532: 0.4856 bits/cell  (18.6 s, nodes 6229073)
+  at   6201888 cells: cumulative 0.5039; block from   4169680: 0.4725 bits/cell  (29.4 s, nodes 7797592)
+  at   8370184 cells: cumulative 0.4921; block from   6201888: 0.4584 bits/cell  (38.0 s, nodes 9122866)
+  at  10472248 cells: cumulative 0.4840; block from   8370184: 0.4516 bits/cell  (47.6 s, nodes 10253067)
+  at  12591104 cells: cumulative 0.4780; block from  10472248: 0.4483 bits/cell  (57.4 s, nodes 11289400)
+  at  14112672 cells: cumulative 0.4742; block from  12591104: 0.4430 bits/cell  (64.4 s, nodes 11945309)
+D=24 K=12 m= 0 w=0 cells 14112672: online 0.4742 bits/digit; quarters 0.5269 0.4708 0.4534 0.4457; max |log2 beta| 12.0; releases 121677853; nodes 11945309  (64.4 s, 4.56 us/cell, peak 1020 MiB)
+## unreleased
+  at    216540 cells: cumulative 0.6907; block from         0: 0.6907 bits/cell  (1.0 s, nodes 988835)
+  at   2078532 cells: cumulative 0.5544; block from    216540: 0.5386 bits/cell  (10.0 s, nodes 4211103)
+  at   4169680 cells: cumulative 0.5205; block from   2078532: 0.4868 bits/cell  (19.1 s, nodes 6229073)
+  at   6201888 cells: cumulative 0.5053; block from   4169680: 0.4740 bits/cell  (29.6 s, nodes 7797592)
+  at   8370184 cells: cumulative 0.4934; block from   6201888: 0.4595 bits/cell  (38.2 s, nodes 9122866)
+  at  10472248 cells: cumulative 0.4852; block from   8370184: 0.4526 bits/cell  (47.3 s, nodes 10253067)
+  at  12591104 cells: cumulative 0.4792; block from  10472248: 0.4493 bits/cell  (56.6 s, nodes 11289400)
+  at  14112672 cells: cumulative 0.4754; block from  12591104: 0.4439 bits/cell  (63.3 s, nodes 11945309)
+D=24 K=0 m= 0 w=0 cells 14112672: online 0.4754 bits/digit; quarters 0.5284 0.4721 0.4544 0.4467; max |log2 beta| 5169736.4; releases 0; nodes 11945309  (63.3 s, 4.48 us/cell, peak 1020 MiB)
+# wall 64.5 s for the pair

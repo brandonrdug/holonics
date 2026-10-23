@@ -6,6 +6,8 @@
 // the joint form. Released, |log2 beta| <= K: a cell then costs at most log2(1 + 2^-K) bits more at
 // a node than the unreleased mixture of the same two faces would, and the carrier is K bits wide
 // whatever the population. K = 0 reads unreleased. The passage term (m, w) is as in passage_ctw.
+// An optional sixth argument lists cell offsets (comma-separated); at each the cumulative code and
+// the code of the block since the previous offset are printed.
 use std::collections::HashMap;
 use std::hash::{BuildHasherDefault, Hasher};
 use std::time::Instant;
@@ -34,6 +36,9 @@ fn main() {
     let m: i32 = a[3].parse().unwrap();
     let w: f64 = a[4].parse().unwrap();
     let data = std::fs::read(&a[5]).unwrap();
+    let marks: Vec<usize> = a.get(6).map(|m| m.trim().split(',').map(|x| x.parse().unwrap()).collect()).unwrap_or_default();
+    let mut mi = 0usize;
+    let (mut last_cell, mut last_bits) = (0usize, 0.0f64);
     assert!(depth <= 24);
     let t0 = Instant::now();
     let d: Vec<u8> = data.iter().flat_map(|&b| [b >> 6, (b >> 4) & 3, (b >> 2) & 3, b & 3]).collect();
@@ -97,6 +102,12 @@ fn main() {
             if m > 0 { nd.l[u] += 1.0; }
         }
         ctx = ((ctx << 2) | u as u64) & mask(24);
+        if mi < marks.len() && t + 1 == marks[mi] {
+            println!("  at {:>9} cells: cumulative {:.4}; block from {:>9}: {:.4} bits/cell  ({:.1} s, nodes {})",
+                t + 1, bits / (t + 1) as f64, last_cell, (bits - last_bits) / (t + 1 - last_cell) as f64,
+                t0.elapsed().as_secs_f64(), nodes.len());
+            last_cell = t + 1; last_bits = bits; mi += 1;
+        }
     }
     let el = t0.elapsed().as_secs_f64();
     println!(
