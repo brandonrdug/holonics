@@ -64,7 +64,7 @@ that is not concave: the material itself must change.
 
 Every reading here except the rates is dimensionless: `w`, `1 + z`, the binding fraction, the
 coincidence ratio and the spectral slope survive the bits↔nats cast (`× ln 2`) and the cell↔byte
-cast (`× 4`). The rates do not (§6).
+cast (`× 4`). The rates do not (§6), and `w` survives only constant casts (§6, the unit clock).
 
 ## 2. Expansion and contraction per partition `[measured]`
 
@@ -99,7 +99,10 @@ one early octave of the numbers read alone (−1.006).
 
 - The calculation's result digits contract from about `log₂ 10` to 2.04 bits a byte. The result's
   first digit is read inside the lens's six-byte reach (`48/2=` before `24`), so the lens is learning
-  a table of small calculations it has met. That is a table at the lens's grain, not arithmetic.
+  the small calculations it has met. That is evaluation at the lens's grain, at faces arithmetic does
+  not conserve, so it reaches only calculations met: on unmet ones it pays 3.40 bits for a units digit
+  the operands fix exactly ([association record](2026-10-23_ASSOCIATION_IS_EVALUATION_AT_CONSERVED_FACES_AND_A_NUMBERS_DIGITS_ARE_A_GAS_OF_THE_BASES_ATOMS.md) §3, which corrects
+  the earlier wording "a table, not arithmetic").
 - Answer prose stops contracting after the first quarter of the passage: its late slope is
   +0.0009 bits a byte per block.
 - The operand digits hold at their floor and edge up by +0.010 bits a byte per doubling of the
@@ -271,6 +274,13 @@ primes' key stays dormant (the 10-17 keystone).
 - The cast between a region's own clock and the passage clock is the region's share. It holds across
   blocks to about 3%: Q 0.440–0.452, P 0.423–0.429, N 0.050–0.053, M 0.074–0.078.
 - So `w` agrees on the two clocks to that grain.
+
+**The unit clock** (added the same day, from Epime's review note; atlas `code.clock-cast`). A cast
+that is not constant changes `w`: in general `w′ = w · d ln V/d ln V′`. On a clock of `k` founded
+units spanning `N_k` bytes, `w_unit = w_byte · d ln N_k/d ln k`, so a region at its byte floor reads
+`w_unit = −d ln N_k/d ln k < −1` while its units lengthen. That phantom reading is the cast, not
+hardening, and it agrees with §1: founding longer units changes the clock's material. A report on a
+unit clock declares its cast ([association record](2026-10-23_ASSOCIATION_IS_EVALUATION_AT_CONSERVED_FACES_AND_A_NUMBERS_DIGITS_ARE_A_GAS_OF_THE_BASES_ATOMS.md) §6).
 
 **The alphabet cast.**
 - μ coded in four-valued cells pays for the value it never uses: 0.0045 bits a cell overall, 0.215 in

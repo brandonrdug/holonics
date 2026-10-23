@@ -1,0 +1,163 @@
+{
+ "calculations": 21268,
+ "integer results": 20466,
+ "code": {
+  "met/lead": {
+   "digits": 8194,
+   "ring bits a digit": 1.1050166602722467,
+   "base bits a digit": 1.955033627404857
+  },
+  "met/left/0": {
+   "digits": 11066,
+   "ring bits a digit": 1.0781602765138592,
+   "base bits a digit": 1.9194027596548369
+  },
+  "met/left/1": {
+   "digits": 8194,
+   "ring bits a digit": 0.7046992540929383,
+   "base bits a digit": 1.4245473443843517
+  },
+  "met/left/2": {
+   "digits": 2024,
+   "ring bits a digit": 0.7182397013060793,
+   "base bits a digit": 1.4025478161606393
+  },
+  "met/left/3": {
+   "digits": 338,
+   "ring bits a digit": 0.9204813592885372,
+   "base bits a digit": 1.7104088814829934
+  },
+  "met/middle": {
+   "digits": 2362,
+   "ring bits a digit": 0.9112374957940311,
+   "base bits a digit": 1.7023584222693902
+  },
+  "met/right/0": {
+   "digits": 11066,
+   "ring bits a digit": 0.7467212799102332,
+   "base bits a digit": 1.4720053066799648
+  },
+  "met/right/1": {
+   "digits": 8194,
+   "ring bits a digit": 0.9729783883202827,
+   "base bits a digit": 1.783040833753807
+  },
+  "met/right/2": {
+   "digits": 2024,
+   "ring bits a digit": 1.3338382480888749,
+   "base bits a digit": 2.2651498869149815
+  },
+  "met/right/3": {
+   "digits": 338,
+   "ring bits a digit": 1.581585654757432,
+   "base bits a digit": 2.501822998405561
+  },
+  "met/units": {
+   "digits": 8194,
+   "ring bits a digit": 0.65740817401209,
+   "base bits a digit": 1.3508232033604424
+  },
+  "unmet/lead": {
+   "digits": 8347,
+   "ring bits a digit": 3.535504546372158,
+   "base bits a digit": 3.444117488669138
+  },
+  "unmet/left/0": {
+   "digits": 9400,
+   "ring bits a digit": 3.6196294682369903,
+   "base bits a digit": 3.522077711693784
+  },
+  "unmet/left/1": {
+   "digits": 8347,
+   "ring bits a digit": 3.780913007796539,
+   "base bits a digit": 3.7044978692700967
+  },
+  "unmet/left/2": {
+   "digits": 4380,
+   "ring bits a digit": 3.1820938695749463,
+   "base bits a digit": 3.2114676165118063
+  },
+  "unmet/left/3": {
+   "digits": 2316,
+   "ring bits a digit": 2.3289378191986234,
+   "base bits a digit": 2.3538089903338535
+  },
+  "unmet/middle": {
+   "digits": 6696,
+   "ring bits a digit": 3.36513986064426,
+   "base bits a digit": 3.340625893835339
+  },
+  "unmet/right/0": {
+   "digits": 9400,
+   "ring bits a digit": 3.4969527723473752,
+   "base bits a digit": 3.4499728003841765
+  },
+  "unmet/right/1": {
+   "digits": 8347,
+   "ring bits a digit": 3.5904709610588625,
+   "base bits a digit": 3.518663666778208
+  },
+  "unmet/right/2": {
+   "digits": 4380,
+   "ring bits a digit": 3.3323132361978565,
+   "base bits a digit": 3.285329704333658
+  },
+  "unmet/right/3": {
+   "digits": 2316,
+   "ring bits a digit": 3.229119114394401,
+   "base bits a digit": 3.1765327856060446
+  },
+  "unmet/units": {
+   "digits": 8347,
+   "ring bits a digit": 3.397351803906316,
+   "base bits a digit": 3.362916318630764
+  }
+ },
+ "faces": {
+  "units|operand units +": {
+   "calculations": 3815,
+   "bits a result digit": 0.0,
+   "contexts": 100
+  },
+  "lead|operand lead+lengths +": {
+   "calculations": 3398,
+   "bits a result digit": 0.520834426778852,
+   "contexts": 522
+  },
+  "lead|operand two leading+lengths +": {
+   "calculations": 3398,
+   "bits a result digit": 0.0,
+   "contexts": 1773
+  },
+  "units|operand units *": {
+   "calculations": 6287,
+   "bits a result digit": 0.0,
+   "contexts": 98
+  },
+  "lead|operand lead+lengths *": {
+   "calculations": 5619,
+   "bits a result digit": 0.5584904970388787,
+   "contexts": 591
+  },
+  "lead|operand two leading+lengths *": {
+   "calculations": 5619,
+   "bits a result digit": 0.00143118775226311,
+   "contexts": 1476
+  },
+  "units|operand units -": {
+   "calculations": 3389,
+   "bits a result digit": 0.0,
+   "contexts": 100
+  },
+  "lead|operand lead+lengths -": {
+   "calculations": 2580,
+   "bits a result digit": 1.05480587863317,
+   "contexts": 326
+  },
+  "lead|operand two leading+lengths -": {
+   "calculations": 2580,
+   "bits a result digit": 0.03105372940456281,
+   "contexts": 1466
+  }
+ }
+}

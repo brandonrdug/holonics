@@ -1,0 +1,38 @@
+{
+ "* k=1": {
+  "calculations": 6284,
+  "mean log2 fibre": 0.7989661897659607,
+  "fibre one digit": 0.4748567791215786,
+  "result inside fibre": 1.0
+ },
+ "* k=2": {
+  "calculations": 6284,
+  "mean log2 fibre": 0.008434118395926163,
+  "fibre one digit": 0.9915658816040739,
+  "result inside fibre": 1.0
+ },
+ "+ k=1": {
+  "calculations": 3815,
+  "mean log2 fibre": 0.7425950196592398,
+  "fibre one digit": 0.25740498034076015,
+  "result inside fibre": 1.0
+ },
+ "+ k=2": {
+  "calculations": 3815,
+  "mean log2 fibre": 0.014678899082568808,
+  "fibre one digit": 0.9853211009174312,
+  "result inside fibre": 1.0
+ },
+ "- k=1": {
+  "calculations": 3388,
+  "mean log2 fibre": 1.7352539729307837,
+  "fibre one digit": 0.0858913813459268,
+  "result inside fibre": 1.0
+ },
+ "- k=2": {
+  "calculations": 3388,
+  "mean log2 fibre": 0.21205362638123396,
+  "fibre one digit": 0.8190672963400236,
+  "result inside fibre": 1.0
+ }
+}
