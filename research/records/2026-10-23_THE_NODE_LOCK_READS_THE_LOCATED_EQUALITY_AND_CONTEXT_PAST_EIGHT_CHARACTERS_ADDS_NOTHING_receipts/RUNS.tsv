@@ -1,0 +1,6 @@
+run	problems	depth	form	bits_a_cell	tree_only	by_digit	projection_s	deadline_s	wall_s	peak_rss_mib	state_bytes	state_sha256
+r1000_d32	1000	32	tree + passage (released ratio)	0.462	0.504	[0.190,0.479,0.742,0.437]	about 200 (depth ratio over the depth-24 run)	300	272.1	2455	379697737	a294c682bf9afc118f6d40f40700c843224351afd511408bd709c65258b976fa
+r1000_d48	1000	48	tree + passage (released ratio)	incomplete: 0.462 at 2,053,000 of 2,078,532 cells	0.504 at the stop	[0.189,0.478,0.742,0.438] at the stop	about 260 (depth ratio)	450	450.2 (deadline)	1748	-	-
+host_check	1000	24	the previous record's binary, first 274,000 cells	0.555 at 274,000 (as before)	0.589	-	-	25	18.4 to 274,000 cells (12.7 at the previous record)	-	-	-
+lock1000	1000	24	tree + passage + node lock	0.463	0.506	[0.193,0.481,0.743,0.436]	140 (the depth-24 run's 130.8 and the lock's term; the host check, taken after, measured the host 1.45 times slower)	240	200.3	1259	211733967	dce833c7bca487327c09b4f79b71e1442d25a406d4814b9a5f3f2f7fb4a21d97
+lockall	6726	24	tree + passage + node lock	0.410	0.448	[0.164,0.436,0.660,0.380]	1512 (1042.6 x 1.45, the host check; upper 1930 from the previous record's upper 1330)	1930	1452.5	3671	660479362	a2eb835fceb98a8eea50e91d6e778127f83d0e746aed082b0502352c536b44ce
