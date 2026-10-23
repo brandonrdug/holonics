@@ -268,7 +268,55 @@ Sent to the Athena design thread on October 22 with the derivations.
      [inferred] The gap is in which features commuting linear parts can form, not in how many
      modes there are.
 
-## 7. Owed (#410)
+## 7. Any two moves, a changing transport, and the jet's residue
+
+October 23. Epime's review proposed three extensions of the laws above. Each holds, and each
+extends a law already proved rather than replacing it.
+
+1. **Any two moves.** [proved-derived; formal-checked] For moves with any linear parts,
+
+   ```text
+   T_b T_a x − T_a T_b x = (M_b M_a − M_a M_b) x + (M_b − 1) b_a − (M_a − 1) b_b   (move_commutator)
+   ```
+
+   The commutator of the turns is the loop's curvature, and the rest is its torsion. §1 is the case
+   of commuting turns, where only the torsion remains, and
+   `move_same_linear_commutator` the case of one turn. A receiver reads order only through its face
+   of this difference, after the moves that follow it: a difference in that face's kernel adds no
+   distinction at the receiver.
+
+2. **The ordered jet.** [derived] For matrix moves `x' = U x + b` whose turn and addition depend
+   on a parameter, with derivatives `V` and `v`, the jet is `J' = U J + V x + v`. The state with
+   its jet is one affine move of the block
+
+   ```text
+   H = [[U, 0, b], [V, U, v], [0, 0, 1]]   on (x, J, 1)
+   ```
+
+   Blocks compose by the matrix product, so ordered composition is associative, and the jet of a
+   product is the Leibniz rule with the order kept (`ConnectionCalculus.differential_mul`). The
+   selected-move jets of §6.6 are its one-dimensional case. When the receiver's chart also depends
+   on the parameter, the reading's derivative adds the chart's own, `d(F x) = (dF) x + F J`, as
+   the moving chart's rate does (`ReflectedBoundaryMemory.moving_boundary_rate`).
+
+3. **The joint release.** [proved-derived; formal-checked] `residueRun` takes a transport that
+   changes at every step, with no two transports required to commute, and still conserves
+   (`residueRun_conserves`). The state and its jet are one orbit of the block
+   `L_t (x, J) = (U_t x, V_t x + U_t J)` (`jetOrbit_eq`), so they release together, the jet's
+   residue moved by the whole block. A jet driven by the lattice part of the state alone falls
+   short of the exact jet by the `U`-orbit of `V_t e_x` (`jet_lattice_drive`). That cross term must
+   be carried.
+
+4. **The certificate in one metric.** [proved-derived; formal-checked] The bounds of §6.6 hold in
+   any normed ring. For a matrix mode, a metric `G` shared by every symbol, `M_sᵀ G M_s ⪯ ρ² G`,
+   makes the per-symbol bound a bound on every word. [derived] With `‖V‖ ≤ v̄` and `‖v‖ ≤ d`, the
+   same induction gives `‖J‖ ≤ v̄ B/(1 − ρ)² + d/(1 − ρ)`; the Lean states the selected jet, where
+   `v̄ = 1` and `d = 0`. On the unit circle, where `ρ = 1` leaves those bounds empty,
+   `‖z_t‖ ≤ t B` and `2 ‖J_t‖ ≤ t (t − 1) B` (`selectedRun_norm_le_linear`,
+   `lamJet_norm_le_quadratic`). Over a passage of `t` cells a lossless mode needs about `log₂ t`
+   guard bits for its state and `2 log₂ t` for its jet.
+
+## 8. Owed (#410)
 
 Each is a box in #410 except the neck.
 
@@ -295,6 +343,14 @@ Each is a box in #410 except the neck.
   linter warning (`[FloorRing R]` unused in `exactOrbit_damped`) was removed with `omit`. The
   first placement, between the doc comment and its theorem, did not parse (`5ba90b2`, exit 1);
   moved above the doc comment at `05a8ed1`, the check completed (3,454 jobs, exit 0, 5.6 s), with
+  no errors, no warnings in either module and no `sorry`.
+- §7's Lean (`move_commutator`, the ring and normed-ring generality of §2c with
+  `selectedRun_norm_le_linear` and `lamJet_norm_le_quadratic`, and in `CarriedRelease` the
+  changing transport with `linearOrbit_add`, `jetBlock`, `jetOrbit_eq` and `jet_lattice_drive`) was
+  pushed at `e5ab6dc` and checked on the PC with the same command against a 1,200 s deadline. The
+  first round (20.4 s) built `ScrewTorsion` and left `jetOrbit_eq` with two unsolved goals, both
+  true (`0 = (0, 0)`, and a sum to be reordered). The proof alone was changed (`rfl`, and `abel`
+  after the `simp`); the second round completed (3,454 jobs, exit 0, 7.1 s; Mathlib reused), with
   no errors, no warnings in either module and no `sorry`.
 - Atlas rows (formal-checked): `motion.commutator-carry`, `motion.lag-residue-factorization`,
   `screw.burgers-loop-carry`, `motion.squeeze-ratio-dilation`, `gr.teleparallel-fifth-torsion`,

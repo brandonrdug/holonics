@@ -276,11 +276,12 @@ theorem jetOrbit_eq (U V : ℕ → M →+ M) (b v : ℕ → M) (t : ℕ) :
     linearOrbit (fun k => jetBlock (U k) (V k)) (fun k => (b k, v k)) t =
       (linearOrbit U b t, linearOrbit U (fun k => V k (linearOrbit U b k) + v k) t) := by
   induction t with
-  | zero => simp [linearOrbit]
+  | zero => rfl
   | succ t ih =>
     simp only [linearOrbit]
     rw [ih]
     simp [jetBlock]
+    abel
 
 /-- [proved-derived] **A jet driven by the lattice part misses the residue's drive:** with the
 state split as `x_k = q_k + e_k`, the jet driven by `V_k q_k` falls short of the exact jet by the
