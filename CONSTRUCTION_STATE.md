@@ -35,7 +35,8 @@ and joins the route at 1.556 after pass 8, whose own read overflowed: a silent c
 stalled at a rounding remainder and drifted its weights `2^(−9)` a section; each moment now moves
 at least one grain toward its input. The gated mode (the RG-LRU's recurrence gate, each mode's
 decay keyed by its input with the push kept passive) lowers the 1,000-problem held-out code by
-3.5%, 3.3% and 4.0% over three passes at 1.5 times the time a section, and is the working law. The
+3.5%, 3.3% and 4.0% over three passes at 1.5 times the time a section, and on all problems takes
+the narrow tower to 2.435, 2.321, 2.295 (plain 2.517, 2.404, 2.367); it is the working law. The
 [record](research/records/2026-10-23_THE_MOMENT_TOWER_LEARNS_GSM8K_BYTES_ONCE_ITS_MODES_ARE_PASSIVE_AND_ITS_CONTACTS_READ_A_RATIO.md)
 holds both samples, the measurements and receipts.
 

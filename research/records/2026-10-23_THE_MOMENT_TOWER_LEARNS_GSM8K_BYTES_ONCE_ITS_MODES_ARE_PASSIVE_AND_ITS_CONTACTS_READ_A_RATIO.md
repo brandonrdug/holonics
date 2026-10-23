@@ -440,6 +440,21 @@ passes, so this is the one-grain step near arrived moments, within the 0.7% that
 founding keys on all problems. Decision (agent-inferred, from this measurement): the gated mode is
 the tower's working law from here.
 
+On all 6,726 problems, three passes, the narrow tower from the same founding keys as the plain
+narrow runs above (`all2`, `all5`, trained before the moment fix):
+
+| tower | held out, passes 1–3 | Q | P | N | M (pass 3) | online, pass 3 |
+|---|---|---|---|---|---|---|
+| narrow, plain | 2.517, 2.404, 2.367 | 2.492 | 2.271 | 2.875 | 1.814 | 2.332 |
+| narrow, gated | 2.435, 2.321, 2.295 | 2.446 | 2.180 | 2.746 | 1.739 | 2.235 |
+| wide, plain (the PC, other keys) | 2.437, 2.326, 2.266 | 2.388 | 2.162 | 2.818 | 1.739 | 2.235 |
+
+The gate lowers the code by 3.3%, 3.5% and 3.0%, in every region at pass 3. The narrow gated
+tower, with 140,544 weights, reads with the wide plain tower at passes 1 and 2 and above it at
+pass 3; at pass 3 its digits and its markup both code at or below the wide's. Its pass-3 held-out
+digits and markup read no lower than at pass 2 (2.744 → 2.746, 1.724 → 1.739) while the training
+text kept falling (2.321 → 2.235).
+
 ## Not claimed
 
 The tower is classical state-space machinery at the codec's byte classes: ungated, a linear
