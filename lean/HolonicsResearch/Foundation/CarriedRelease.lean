@@ -35,6 +35,17 @@ What is proved.
    the grid is held in the residue and reappears as a rate.
 6. **A bound is released outward** (`outward_release`): `⌊l⌋ ≤ x ≤ ⌈u⌉` whenever `l ≤ x ≤ u`, and
    the outward pair widens the band by less than two grid steps.
+7. **The transported release keeps the exact orbit** (`transportedRelease_conserves`,
+   `transportedRelease_residue`, `transportedRelease_tracks`): a state moved by any transport `T`
+   and driven by `δ`, released each step with its residue carried (`e' = T(q + e) + δ − q'`, codec
+   error feedback), has lattice part plus residue equal to the exact orbit, the residue inside one
+   step, so the lattice part tracks the orbit within one step at every length.
+   [counterexample] Plain rounding of a transported state holds a drive below half a step at zero
+   forever (`plainTransported_silences`), while the damped exact orbit reaches `x (1 − ρᵗ)/(1 − ρ)`
+   (`exactOrbit_damped`).
+8. **The transported residue in any module** (`residueRun_conserves`): for a linear transport `A`
+   and any release rule, the lattice part `A q + q_rel` and the residue `e' = A e + Δ − q_rel`
+   sum to the exact orbit at every length.
 
 No `sorry`, no `axiom`.
 -/
@@ -120,5 +131,122 @@ theorem outward_release {l x u : R} (hl : l ≤ x) (hu : x ≤ u) :
   have h1 := Int.ceil_lt_add_one u
   have h2 := Int.lt_floor_add_one l
   linarith
+
+/-! ## The transported release
+
+A state moved by a transport `T` each step and driven by `δ t`, released onto the grid with its
+residue carried, keeps the exact orbit: the released lattice part plus the residue is the orbit,
+for every transport. Plain rounding of a damped state instead holds a drive below half a step at
+zero forever, while the exact orbit grows toward `x / (1 − ρ)`. This is codec error feedback
+`e' = A e + Δ − q` read as the carried release. -/
+
+/-- [definition] One step of the transported release: move the whole state, add the drive, and
+release onto the grid with the residue carried. -/
+def releaseStep (T : R → R) (δ : R) (p : ℤ × R) : ℤ × R :=
+  (windings (T ((p.1 : R) + p.2) + δ), openPhase (T ((p.1 : R) + p.2) + δ))
+
+/-- [definition] **The transported carried release** from rest: lattice part and residue. -/
+def transportedRelease (T : R → R) (δ : ℕ → R) : ℕ → ℤ × R
+  | 0 => (0, 0)
+  | t + 1 => releaseStep T (δ t) (transportedRelease T δ t)
+
+/-- [definition] The exact orbit of the same transport and drive. -/
+def exactOrbit (T : R → R) (δ : ℕ → R) : ℕ → R
+  | 0 => 0
+  | t + 1 => T (exactOrbit T δ t) + δ t
+
+/-- [proved-derived; formal-checked] One step conserves: lattice part plus residue is the moved
+state plus the drive. -/
+theorem releaseStep_conserves (T : R → R) (δ : R) (p : ℤ × R) :
+    ((releaseStep T δ p).1 : R) + (releaseStep T δ p).2 = T ((p.1 : R) + p.2) + δ :=
+  (reading_split _).1
+
+/-- [proved-derived; formal-checked] **The transported release conserves:** lattice part plus
+residue is the exact orbit, for every transport `T`. -/
+theorem transportedRelease_conserves (T : R → R) (δ : ℕ → R) (t : ℕ) :
+    ((transportedRelease T δ t).1 : R) + (transportedRelease T δ t).2 = exactOrbit T δ t := by
+  induction t with
+  | zero => simp [transportedRelease, exactOrbit]
+  | succ t ih =>
+    simp only [transportedRelease, exactOrbit]
+    rw [releaseStep_conserves, ih]
+
+/-- [proved-derived; formal-checked] **The residue stays inside one grid step.** -/
+theorem transportedRelease_residue (T : R → R) (δ : ℕ → R) (t : ℕ) :
+    0 ≤ (transportedRelease T δ t).2 ∧ (transportedRelease T δ t).2 < 1 := by
+  cases t with
+  | zero => simp [transportedRelease]
+  | succ t =>
+    simp only [transportedRelease, releaseStep]
+    exact ⟨(reading_split _).2.1, (reading_split _).2.2⟩
+
+/-- [proved-derived; formal-checked] **The released lattice part tracks the exact orbit within one
+grid step**, at every length and for every transport. -/
+theorem transportedRelease_tracks (T : R → R) (δ : ℕ → R) (t : ℕ) :
+    |((transportedRelease T δ t).1 : R) - exactOrbit T δ t| < 1 := by
+  have hc := transportedRelease_conserves T δ t
+  have hb := transportedRelease_residue T δ t
+  rw [abs_lt]
+  constructor <;> linarith [hb.1, hb.2]
+
+/-- [definition] Plain rounding of a transported state, with no residue carried. -/
+def plainTransported (T : R → R) (δ : ℕ → R) : ℕ → ℤ
+  | 0 => 0
+  | t + 1 => round (T (plainTransported T δ t : R) + δ t)
+
+/-- [counterexample; formal-checked] **Plain rounding of a transported state silences a drive below
+half a step**, for every transport fixing zero. -/
+theorem plainTransported_silences {T : R → R} (hT : T 0 = 0) {x : R} (h0 : 0 ≤ x)
+    (h1 : x < 1 / 2) (t : ℕ) : plainTransported T (fun _ => x) t = 0 := by
+  induction t with
+  | zero => simp [plainTransported]
+  | succ t ih =>
+    simp only [plainTransported, ih, Int.cast_zero, hT, zero_add]
+    rw [round_eq, Int.floor_eq_iff]
+    constructor <;> push_cast <;> linarith
+
+/-- [proved-derived; formal-checked] **The damped exact orbit of the same drive grows:**
+`(1 − ρ) x_t = x (1 − ρᵗ)`, so for `0 ≤ ρ < 1` it approaches `x / (1 − ρ)`, which is five grid
+steps at `ρ = 9/10` and `x` just below half a step. -/
+theorem exactOrbit_damped (ρ x : R) (t : ℕ) :
+    (1 - ρ) * exactOrbit (fun z => ρ * z) (fun _ => x) t = x * (1 - ρ ^ t) := by
+  induction t with
+  | zero => simp [exactOrbit]
+  | succ t ih =>
+    simp only [exactOrbit]
+    linear_combination ρ * ih
+
+/-! ### The transported residue in any module -/
+
+section TransportedResidue
+
+variable {M : Type*} [AddCommGroup M]
+
+/-- [definition] **The transported residue** `e' = A e + Δ − q`: the lattice part moves by `A` and
+takes the released quantum `q = rel (A e + Δ)`, and the residue keeps the rest. Every release rule
+`rel` is admitted; with the floor rule on a line the residue stays inside one step
+(`transportedRelease_residue`). -/
+def residueRun (A : M →+ M) (Δ : ℕ → M) (rel : M → M) : ℕ → M × M
+  | 0 => (0, 0)
+  | t + 1 => (A (residueRun A Δ rel t).1 + rel (A (residueRun A Δ rel t).2 + Δ t),
+      A (residueRun A Δ rel t).2 + Δ t - rel (A (residueRun A Δ rel t).2 + Δ t))
+
+/-- [definition] The exact orbit of a linear transport `A` driven by `Δ`, from rest. -/
+def linearOrbit (A : M →+ M) (Δ : ℕ → M) : ℕ → M
+  | 0 => 0
+  | t + 1 => A (linearOrbit A Δ t) + Δ t
+
+/-- [proved-derived; formal-checked] **The transported residue conserves:** lattice part plus
+residue is the exact orbit, whatever the release rule. -/
+theorem residueRun_conserves (A : M →+ M) (Δ : ℕ → M) (rel : M → M) (t : ℕ) :
+    (residueRun A Δ rel t).1 + (residueRun A Δ rel t).2 = linearOrbit A Δ t := by
+  induction t with
+  | zero => simp [residueRun, linearOrbit]
+  | succ t ih =>
+    simp only [residueRun, linearOrbit]
+    rw [← ih, map_add]
+    abel
+
+end TransportedResidue
 
 end Holonics.Aeon.Clock.Winding

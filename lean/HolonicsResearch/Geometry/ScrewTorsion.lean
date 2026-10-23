@@ -51,6 +51,19 @@ What is proved.
    `Mᵗ x₀ + Σ_(r < N) Σ_a n(a, r) • M^r E a`, with `n(a, r)` the number of cells `k < t` carrying
    symbol `a` at lag residue `r`. Two streams with the same counts reach the same state, so every
    reading of such a stream is a function of its (symbol, lag residue) counts.
+9. **The selected move's forward jet** (`lamJet_is_derivative`, `betaJet_is_derivative`,
+   `betaJet_eq_selectedRun`): when the symbol selects the move, `z' = λ_(t, u t) z + β_(t, u t)`,
+   the jets `J' = λ_(t, u t) J + [u t = a] z` and `J' = λ_(t, u t) J + [u t = a]` are the exact
+   derivatives of the stream with respect to one shift of the turn or the addition of symbol `a`
+   at every cell (read in dual numbers), also when the moves change during the passage. The jet
+   is the phase-carried moment; its adjoint needs no tape.
+10. **The scalar certificate** (`selectedRun_norm_bound`, `lamJet_norm_bound`): with
+   `‖λ_(t, s)‖ ≤ ρ ≤ 1` and `‖β_(t, s)‖ ≤ B`, the state satisfies `‖z‖ (1 − ρ) ≤ B` and the turn's
+   jet `‖J‖ (1 − ρ)² ≤ B`. For a scalar mode the per-symbol bound is the joint bound.
+11. **One plane cannot carry order** (`plane_reflections_compose`, `plane_turns_commute`): two
+   plane reflections `z ↦ u z̄` compose to the turn `u v̄`, and such turns commute, so symbol-chosen
+   reflections in one plane read parity and a signed phase sum only. Order needs non-commuting
+   transports: at least two coupled planes whose reflections do not share a pencil.
 
 No `sorry`, no `axiom`.
 -/
@@ -206,6 +219,148 @@ theorem laggedRun_eq_of_counts [Fintype α] [DecidableEq α] (M : Module.End R V
   simp_rw [hc]
 
 end LagResidue
+
+/-! ## 2c. Moves selected by the symbol, and their forward jet
+
+When the symbol selects the linear part, `z' = λ_(t, s) z + β_(t, s)`, the stream is no longer a
+function of lag-residue counts. Its derivative with respect to the move of one symbol `a` is carried
+forward by the same moves (`lamJet`, `betaJet`): the phase-carried moment, whose adjoint needs no
+tape. It is exact even when the moves change during the passage, as a derivative with respect to one
+shift of `λ_(·, a)` (or `β_(·, a)`) at every cell, read in dual numbers `ε² = 0`. For scalar modes
+the per-symbol bound `‖λ‖ ≤ ρ` bounds the state by `B / (1 − ρ)` and the jet by `B / (1 − ρ)²`,
+and pairs of plane reflections compose to turns that commute, so one plane cannot carry order. -/
+
+section SelectedMoves
+
+variable {S α : Type*} [CommRing S]
+
+/-- [definition] **A stream of moves selected by the symbol:** from rest, cell `t` applies the move
+`z ↦ λ_(t, u t) z + β_(t, u t)` chosen by its symbol. -/
+def selectedRun (lam beta : ℕ → α → S) (u : ℕ → α) : ℕ → S
+  | 0 => 0
+  | t + 1 => lam t (u t) * selectedRun lam beta u t + beta t (u t)
+
+/-- [definition] **The forward jet of the turn of symbol `a`:** `J' = λ_(t, u t) J + [u t = a] z`. -/
+def lamJet [DecidableEq α] (lam beta : ℕ → α → S) (u : ℕ → α) (a : α) : ℕ → S
+  | 0 => 0
+  | t + 1 => lam t (u t) * lamJet lam beta u a t +
+      if u t = a then selectedRun lam beta u t else 0
+
+/-- [definition] **The forward jet of the addition of symbol `a`:** `J' = λ_(t, u t) J + [u t = a]`. -/
+def betaJet [DecidableEq α] (lam : ℕ → α → S) (u : ℕ → α) (a : α) : ℕ → S
+  | 0 => 0
+  | t + 1 => lam t (u t) * betaJet lam u a t + if u t = a then 1 else 0
+
+/-- [proved-derived] **The turn's forward jet is the exact derivative:** shifting the turn of symbol
+`a` by `ε` at every cell, with `ε² = 0`, moves the stream by `ε` times the jet, also when the moves
+change from cell to cell. -/
+theorem lamJet_is_derivative [DecidableEq α] (lam beta : ℕ → α → S) (u : ℕ → α) (a : α) {ε : S}
+    (hε : ε * ε = 0) (t : ℕ) :
+    selectedRun (fun n s => lam n s + if s = a then ε else 0) beta u t =
+      selectedRun lam beta u t + ε * lamJet lam beta u a t := by
+  induction t with
+  | zero => simp [selectedRun, lamJet]
+  | succ t ih =>
+    simp only [selectedRun, lamJet, ih]
+    split_ifs with h
+    · linear_combination lamJet lam beta u a t * hε
+    · ring
+
+/-- [proved-derived] **The addition's forward jet is the exact derivative** of the stream with
+respect to the addition of symbol `a`; the stream is affine in its additions. -/
+theorem betaJet_is_derivative [DecidableEq α] (lam beta : ℕ → α → S) (u : ℕ → α) (a : α) (ε : S)
+    (t : ℕ) :
+    selectedRun lam (fun n s => beta n s + if s = a then ε else 0) u t =
+      selectedRun lam beta u t + ε * betaJet lam u a t := by
+  induction t with
+  | zero => simp [selectedRun, betaJet]
+  | succ t ih =>
+    simp only [selectedRun, betaJet, ih]
+    split_ifs <;> ring
+
+/-- [proved-derived] The addition's jet is itself a selected stream, adding `1` on symbol `a`. -/
+theorem betaJet_eq_selectedRun [DecidableEq α] (lam : ℕ → α → S) (u : ℕ → α) (a : α) (t : ℕ) :
+    betaJet lam u a t = selectedRun lam (fun _ s => if s = a then 1 else 0) u t := by
+  induction t with
+  | zero => rfl
+  | succ t ih => simp only [betaJet, selectedRun, ih]
+
+end SelectedMoves
+
+section SelectedBounds
+
+variable {S α : Type*} [NormedCommRing S]
+
+/-- [proved-derived] **The per-symbol bound certifies a scalar mode:** with `‖λ_(t, s)‖ ≤ ρ ≤ 1`
+and `‖β_(t, s)‖ ≤ B` for every cell and symbol, `‖z_t‖ (1 − ρ) ≤ B`. For a scalar mode the
+per-symbol bound is the joint bound: a word of the largest turn attains `ρⁿ`. -/
+theorem selectedRun_norm_bound {lam beta : ℕ → α → S} (u : ℕ → α) {ρ B : ℝ} (hρ0 : 0 ≤ ρ)
+    (hρ1 : ρ ≤ 1) (hB : 0 ≤ B) (hlam : ∀ t s, ‖lam t s‖ ≤ ρ) (hbeta : ∀ t s, ‖beta t s‖ ≤ B)
+    (t : ℕ) : ‖selectedRun lam beta u t‖ * (1 - ρ) ≤ B := by
+  induction t with
+  | zero => simp [selectedRun, hB]
+  | succ t ih =>
+    have h1 : ‖selectedRun lam beta u (t + 1)‖ ≤ ρ * ‖selectedRun lam beta u t‖ + B := by
+      calc ‖selectedRun lam beta u (t + 1)‖
+          = ‖lam t (u t) * selectedRun lam beta u t + beta t (u t)‖ := rfl
+        _ ≤ ‖lam t (u t)‖ * ‖selectedRun lam beta u t‖ + ‖beta t (u t)‖ :=
+            (norm_add_le _ _).trans (add_le_add (norm_mul_le _ _) le_rfl)
+        _ ≤ ρ * ‖selectedRun lam beta u t‖ + B :=
+            add_le_add (mul_le_mul_of_nonneg_right (hlam t (u t)) (norm_nonneg _))
+              (hbeta t (u t))
+    have h2 : 0 ≤ 1 - ρ := by linarith
+    nlinarith [mul_le_mul_of_nonneg_right h1 h2, mul_le_mul_of_nonneg_left ih hρ0]
+
+/-- [proved-derived] **The turn's jet is bounded by `B / (1 − ρ)²`:** `‖J_t‖ (1 − ρ)² ≤ B`, so the
+jet's carrier needs twice the guard bits of the state's. -/
+theorem lamJet_norm_bound [DecidableEq α] {lam beta : ℕ → α → S} (u : ℕ → α) (a : α) {ρ B : ℝ}
+    (hρ0 : 0 ≤ ρ) (hρ1 : ρ ≤ 1) (hB : 0 ≤ B) (hlam : ∀ t s, ‖lam t s‖ ≤ ρ)
+    (hbeta : ∀ t s, ‖beta t s‖ ≤ B) (t : ℕ) :
+    ‖lamJet lam beta u a t‖ * (1 - ρ) ^ 2 ≤ B := by
+  induction t with
+  | zero => simp [lamJet, hB]
+  | succ t ih =>
+    have hz := selectedRun_norm_bound u hρ0 hρ1 hB hlam hbeta t
+    have hite : ‖(if u t = a then selectedRun lam beta u t else 0)‖ ≤
+        ‖selectedRun lam beta u t‖ := by
+      split_ifs <;> simp
+    have h1 : ‖lamJet lam beta u a (t + 1)‖ ≤
+        ρ * ‖lamJet lam beta u a t‖ + ‖selectedRun lam beta u t‖ := by
+      calc ‖lamJet lam beta u a (t + 1)‖
+          = ‖lam t (u t) * lamJet lam beta u a t +
+              (if u t = a then selectedRun lam beta u t else 0)‖ := rfl
+        _ ≤ ‖lam t (u t)‖ * ‖lamJet lam beta u a t‖ +
+              ‖(if u t = a then selectedRun lam beta u t else 0)‖ :=
+            (norm_add_le _ _).trans (add_le_add (norm_mul_le _ _) le_rfl)
+        _ ≤ ρ * ‖lamJet lam beta u a t‖ + ‖selectedRun lam beta u t‖ :=
+            add_le_add (mul_le_mul_of_nonneg_right (hlam t (u t)) (norm_nonneg _)) hite
+    have h2 : 0 ≤ 1 - ρ := by linarith
+    have h3 : 0 ≤ (1 - ρ) ^ 2 := sq_nonneg _
+    nlinarith [mul_le_mul_of_nonneg_right h1 h3, mul_le_mul_of_nonneg_left ih hρ0,
+      mul_le_mul_of_nonneg_right hz h2]
+
+end SelectedBounds
+
+section PlaneReflections
+
+variable {S : Type*} [CommRing S] [StarRing S]
+
+/-- [proved-derived] **Two plane reflections compose to a turn:** with `S_u z = u z̄`,
+`S_u (S_v z) = (u v̄) z`. -/
+theorem plane_reflections_compose (u v z : S) : u * star (v * star z) = (u * star v) * z := by
+  rw [star_mul', star_star]
+  ring
+
+/-- [proved-derived] **One plane cannot carry order:** two turns made of pairs of plane reflections
+commute, so a word of reflections in one plane reads only its parity and the signed sum of its
+phases (the dihedral group), never the order of its letters. -/
+theorem plane_turns_commute (u v u' v' z : S) :
+    u * star (v * star (u' * star (v' * star z))) =
+      u' * star (v' * star (u * star (v * star z))) := by
+  simp only [star_mul', star_star]
+  ring
+
+end PlaneReflections
 
 /-! ## 3. The fifth torsion, the redshift loop and the squeeze -/
 
