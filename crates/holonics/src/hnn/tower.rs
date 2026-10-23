@@ -314,21 +314,34 @@ impl TowerFace {
         -(log2_face(p.max(1), READ_BITS) as i64)
     }
 
-    /// The face read at one base-four cell of a byte (the exterior byte chart: four cells, high
-    /// first): the masses of the bytes whose first `phase` cells are `prefix`, split by the cell at
-    /// `phase`. Exact sums of the byte masses; their total is the prefix's mass.
+    /// The face read at one base-four cell of a class (the exterior cell chart: a class index in
+    /// [`cell_phases`] cells, high first; a byte takes four): the masses of the classes whose first
+    /// `phase` cells are `prefix`, split by the cell at `phase`. Exact sums of the class masses;
+    /// their total is the prefix's mass. A cell that holds no class of the alphabet has none.
     pub fn cell_masses(&self, prefix: usize, phase: usize) -> Result<[u128; 4]> {
-        if self.masses.len() != 256 || phase > 3 || prefix >> (2 * phase) != 0 {
-            return refuse("a cell face needs a byte face and a prefix inside its phase");
+        let phases = cell_phases(self.masses.len());
+        if phase >= phases || prefix >> (2 * phase) != 0 {
+            return refuse("a cell face needs a phase inside the class chart and a prefix inside its phase");
         }
-        let low = 6 - 2 * phase as u32;
+        let low = 2 * (phases - 1 - phase);
         let mut cells = [0u128; 4];
         for d in 0..4 {
             let first = ((prefix << 2) | d) << low;
-            cells[d] = self.masses[first..first + (1usize << low)].iter().sum();
+            let end = (first + (1usize << low)).min(self.masses.len());
+            cells[d] = self.masses.get(first..end).map_or(0, |m| m.iter().sum());
         }
         Ok(cells)
     }
+}
+
+/// The base-four cells a class index of an alphabet of `alphabet` classes takes: the least `P`
+/// with `4^P ≥ alphabet` (a byte takes four; the 1,318 founded units of `hnn::units` take six).
+pub fn cell_phases(alphabet: usize) -> usize {
+    let mut phases = 0;
+    while (1usize << (2 * phases)) < alphabet {
+        phases += 1;
+    }
+    phases
 }
 
 /// `max |w|` over a family.
@@ -1652,7 +1665,7 @@ impl JoinedCell {
 }
 
 /// `m / t` on `2^(−62)`, at least one grain; a total past `2^64` is re-based so the shift fits.
-fn unit_of(m: u128, t: u128) -> u128 {
+pub fn unit_of(m: u128, t: u128) -> u128 {
     let shift = (128 - t.leading_zeros()).saturating_sub(64);
     (((m >> shift) << UNIT_BITS) / (t >> shift).max(1)).clamp(1, 1u128 << UNIT_BITS)
 }
@@ -1986,6 +1999,21 @@ mod tests {
             assert_eq!(mass, masses[byte]);
         }
         assert!(face.cell_masses(4, 1).is_err());
+        assert!(face.cell_masses(0, 4).is_err());
+    }
+
+    #[test]
+    fn the_cell_chart_covers_any_alphabet_and_cells_past_it_hold_nothing() {
+        assert_eq!([2, 4, 5, 16, 17, 256, 1318].map(cell_phases), [1, 1, 2, 2, 3, 4, 6]);
+        // Five classes take two cells: the first splits 1+2+3+4 from the fifth, past which no
+        // class stands.
+        let masses = vec![1u128, 2, 3, 4, 5];
+        let face = TowerFace { masses, total: 15 };
+        assert_eq!(face.cell_masses(0, 0).expect("cell"), [10, 5, 0, 0]);
+        assert_eq!(face.cell_masses(0, 1).expect("cell"), [1, 2, 3, 4]);
+        assert_eq!(face.cell_masses(1, 1).expect("cell"), [5, 0, 0, 0]);
+        assert_eq!(face.cell_masses(2, 1).expect("cell"), [0, 0, 0, 0]);
+        assert!(face.cell_masses(0, 2).is_err());
     }
 
     #[test]

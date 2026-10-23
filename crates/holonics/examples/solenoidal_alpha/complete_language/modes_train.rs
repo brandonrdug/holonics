@@ -60,8 +60,15 @@ const LOCK_OCTAVES: usize = 16;
 const LOCK_QUARTER: usize = 4;
 
 /// The lock's bins at a passage depth: run octaves times depth quarters.
-fn lock_bins(depth: usize) -> usize {
+pub(super) fn lock_bins(depth: usize) -> usize {
     LOCK_OCTAVES * (depth / LOCK_QUARTER + 1)
+}
+
+/// The lock's bin: the octave of the run of correct locks before it, and the quarter of its
+/// locating depth `located` in a passage of `depth`.
+pub(super) fn lock_bin(run: u64, depth: usize, located: usize) -> usize {
+    let octave = ((u64::BITS - run.leading_zeros()) as usize).min(LOCK_OCTAVES - 1);
+    octave * (depth / LOCK_QUARTER + 1) + located / LOCK_QUARTER
 }
 
 /// The native route's receiving tree at the declared `depth` (the native route declares 6), its
@@ -215,10 +222,7 @@ impl Route {
                 .map(|(&p, &t)| log2_face(p.max(1), exponent) - log2_face(t.max(1), exponent))
                 .collect(),
             evidence: local.evidence,
-            lock: local.lock.map(|(class, d)| {
-                let octave = ((u64::BITS - self.run.leading_zeros()) as usize).min(LOCK_OCTAVES - 1);
-                Lock { class, bin: octave * (self.depth / LOCK_QUARTER + 1) + d / LOCK_QUARTER }
-            }),
+            lock: local.lock.map(|(class, d)| Lock { class, bin: lock_bin(self.run, self.depth, d) }),
         };
         let joined = self.learner.face(&q, Some(&passage))?;
         Ok(Reading { address, q, passage, joined })
