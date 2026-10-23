@@ -718,6 +718,76 @@ that rest and its end: the contrast whose reading is whether the head comes agai
 claim unchanged: at its first look at least 177, 87 and 21 right; in each operation a larger share
 of its wrong lines looked at again than of its right ones; more lines turned right than wrong.
 
+## Reading the wrong attempt on a side fork
+
+[agent-inferred, October 23] The first training of the side-fork tower was refused in its fifth
+pass, at section 66: a second-level mode's face outgrew its 32-bit carrier. One development pass
+(113.1 s) fixed the projection at 113 s a pass; the first pass of the training then ran 117.9 s,
+past it, and the run was not stopped there as the waiting standard asks (the next three ran 105 to
+107 s). Its four passes cost 2.384, 2.306, 2.258 and 2.328 bits a byte on the plain held-out text
+(the plain pumped tower 2.320, 2.171, 2.108, 2.053), and its releases were the true rest at 251,
+784, 1,153 and 1,278 of 22,545 moments. The last reading before the refusal put the second level's
+face at 1,517,888,300 numerators on `2^(−16)` (23,161 face units), 40 times the most the plain
+pumped tower's reached in its whole training (38,222,409).
+
+The carrier was narrower than the law. Passivity bounds a mode by its drive, `|h| ≤ √((1 + ρ)/(1 −
+ρ)) max|B x|`, about `90.5 max|B x|` at the margin `ρ = 1 − 2^(−12)`, and a 32-bit face holds
+`2^15` face units, which a mode at the margin passes once `|B x|` passes about 362, a reach the
+residual stream admits. The face is now carried in 64 bits, and the read's and the read
+covector's sums widen to 128 bits where their terms need it and are refused past `2^126`
+(`hnn::tower`, "The mode face's carrier"). The training was not relaunched on a larger limit: the
+carrier is the bound's, and where the old carrier held, the new one gives the same bits.
+
+The retraining (projected at most 1,416 s at the refused run's slowest pass; deadline 1,470 s)
+repeated the refused run's four passes bit for bit and ran all 12 in 1,252.5 s. Its releases were
+the true rest at 251, 784, 1,153, 1,278, 1,279, 1,039, 1,332, 1,513, 1,610, 1,718, 1,832 and 1,512
+of 22,545 moments (the tower asked again only where its release parts: 7,459 at its last pass). The
+plain held-out text cost 2.205 bits a byte at the last pass (the plain pumped tower 1.827): unseen
+results' digits 2.032 (plain 1.070), seen results' digits 1.996 (plain 1.018), results' trailing
+zeros 1.627 (plain 0.171), heads and line ends 2.294 (plain 2.173).
+
+| Read | sums (208) | differences (135) | products (193) |
+|---|---|---|---|
+| `read-lines-own`, first look → last look | 12 → 12 | 11 → 11 | 8 → 8 |
+| lines looked again | 0 | 0 | 0 |
+| `read-lines-again`, first → last | 12 → 17 | 11 → 14 | 8 → 6 |
+| its lines turned right / turned wrong | 13 / 8 | 10 / 7 | 3 / 5 |
+| its redraw's last look | 15 | 12 | 8 |
+| the plain pumped tower's first look | 177 | 87 | 21 |
+
+The true result's cost in bits a line at the own read's only look: 4.05 on sums, 4.10 on
+differences, 7.60 on products (the tower asked again only where its release parts: 1.57, 2.41,
+7.16). The claim fails on all three clauses: the first look writes 12, 11 and 8 right against 177,
+87 and 21; the own read never looks again, at a wrong line or a right one; and no line turns. The
+lines read before, as they came at the own read:
+
+```
+71+41=  110
+73+31=  105
+8+82=   87
+12*35=  365
+```
+
+Three readings [agent-inferred].
+
+- **The forks cost the plain stream its digits, not its level.** The stream read the plain
+  passage, compared at every place, as the plain tower's does, and still lost most of what the
+  plain tower places: 1,145 of the 1,200 written results have the true result's length, and they
+  are near in value (110 for 112, 105 for 104, 87 for 90), while their trailing zeros cost nearly ten times the plain tower's.
+- **The forks are about as much compared material as the passage.** At the last pass 21,033
+  forks each compared about a line and a byte (`=`, the head, the true rest and its end; the
+  passage's lines average 9.6 bytes), against the passage's 216,131 bytes, and every one of them
+  asks for a head and a truth in a state that has just read the tower's own wrong attempt and its
+  line end. In the passage a line end is followed by another question; in a fork, by the same one.
+  The own read follows the passage: after its own line end the tower never wrote its head again.
+- **The second level's face swelled.** At the fifth pass its largest reached 40 times the plain
+  tower's largest. A contact reads the ratio `r/‖r‖`, so a few swollen modes set the read's
+  direction and the rest fall toward its grain, which would take the digits and leave the level.
+
+The next loop reads which of the last two carries the loss, with no training: the second level's
+face mode by mode, and the contacts' reads, over the plain held-out text through this tower's final
+state and the plain pumped tower's.
+
 ## The recorded failures this step could repeat
 
 - **Catered machinery.** The terrain's truth is generated exactly, outside the machine; the tower
@@ -749,7 +819,8 @@ true result in a sixth column, read in `READ_LOOKING.txt`; the tower trained wit
 compared through the first parting place: `LOOKS_AGAIN_COMPARED.tsv`, `LOOKS_REDRAW_COMPARED.tsv`
 and `LOOKS_CARRIED_COMPARED.tsv`, read in `READ_COMPARED.txt`; the tower asked again only where
 its release parts: `LOOKS_OWN.tsv`, `LOOKS_AGAIN_OWN.tsv` and `LOOKS_REDRAW_OWN.tsv`, read in
-`READ_OWN.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`,
-`TRAIN_PUMPED.txt`, `TRAIN_LOOKING.txt`, `TRAIN_COMPARED.txt` and `TRAIN_OWN.txt` are the training
-logs (the turned and pumped ones without their per-section
+`READ_OWN.txt`. The tower read its wrong attempts on side forks: `LOOKS_FORK.tsv`, `LOOKS_AGAIN_FORK.tsv` and
+`LOOKS_REDRAW_FORK.tsv`, read in `READ_FORK.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`,
+`TRAIN_PUMPED.txt`, `TRAIN_LOOKING.txt`, `TRAIN_COMPARED.txt`, `TRAIN_OWN.txt`, `TRAIN_FORK.txt`
+and `TRAIN_FORK_REFUSED.txt` (with its one swell line) are the training logs (the turned and pumped ones without their per-section
 swell lines).

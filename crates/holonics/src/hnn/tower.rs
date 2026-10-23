@@ -119,6 +119,17 @@
 //! largest `‖r‖_rms` grew from 739 to 1,795 face units over passes 3 and 4, and a held-out read
 //! after pass 4 passed the 32-bit carrier (a typed refusal).
 //!
+//! **The mode face's carrier.** Passivity bounds a mode by its drive: `|h_t| ≤ ρ|h_(t−1)| + γ|B x_t|`
+//! with `γ = √(1 − ρ²)` gives `|h| ≤ √((1 + ρ)/(1 − ρ)) max|B x|`, about `90.5 max|B x|` at the
+//! margin `ρ = 1 − 2^(−12)`. A face carried in 32 bits holds `2^15` face units, which a mode at the
+//! margin passes once `|B x|` passes about 362, a reach the law admits; the face (`h` released to
+//! `2^(−16)`) is therefore carried in `i64`, and the read's and the read covector's sums widen to
+//! `i128` where its terms need it. Measured: with wrong attempts read on side forks
+//! (`solenoidal_alpha::complete_language::tower_train`), the second level's face reached
+//! 1,517,888,300 numerators (23,161 face units) at the fifth pass's section 66, 40 times the most
+//! the plain tower's reached in its whole training (38,222,409), and then passed `2^31` (a typed
+//! refusal).
+//!
 //! **What a section holds.** The forward's temporaries of its own cells, for the reverse scan, and
 //! the streams' opening states, for the reread. They are released when the section closes (the
 //! Athena alpha plan's §A2.4: the reverse pairs the forward prefix operands with the backward
@@ -425,16 +436,20 @@ fn reach(w: &[i32]) -> u64 {
 }
 
 /// `out[o] = release(Σ_i w[o·cols + i] x[i] + bias[o] · 2^bias_shift, shift)`, in `i64` where the
-/// terms' bound allows and in `i128` otherwise.
-fn affine(w: &[i32], wmax: u64, cols: usize, x: &[i32], bias: Option<&[i32]>, bias_shift: u32, shift: u32, out: &mut [i64]) -> Result<()> {
-    let xmax = reach(x);
-    let narrow = (wmax as u128) * (xmax as u128) * (cols as u128 + 1) < (1u128 << 62);
+/// terms' bound allows and in `i128` otherwise; `x` a face carried in `i32` or `i64`.
+fn affine<V: Copy + Into<i64>>(w: &[i32], wmax: u64, cols: usize, x: &[V], bias: Option<&[i32]>, bias_shift: u32, shift: u32, out: &mut [i64]) -> Result<()> {
+    let xmax = x.iter().map(|&v| v.into().unsigned_abs()).max().unwrap_or(0);
+    let terms = (wmax as u128) * (xmax as u128) * (cols as u128 + 1);
+    if terms >= 1u128 << 126 {
+        return refuse("an affine sum outgrew its 128-bit carrier");
+    }
+    let narrow = terms < (1u128 << 62);
     for (o, slot) in out.iter_mut().enumerate() {
         let row = &w[o * cols..(o + 1) * cols];
         let mut sum: i128 = if narrow {
-            row.iter().zip(x).map(|(a, b)| *a as i64 * *b as i64).sum::<i64>() as i128
+            row.iter().zip(x).map(|(a, &b)| *a as i64 * b.into()).sum::<i64>() as i128
         } else {
-            row.iter().zip(x).map(|(a, b)| *a as i128 * *b as i128).sum::<i128>()
+            row.iter().zip(x).map(|(a, &b)| *a as i128 * b.into() as i128).sum::<i128>()
         };
         if let Some(b) = bias {
             sum += (b[o] as i128) << bias_shift;
@@ -482,9 +497,14 @@ fn transposed(w: &[i32], wmax: u64, cols: usize, y: &[i64], shift: u32, out: &mu
 /// `g[o·cols + i] += Σ_t y_t[o] x_t[i]`: a section's outer products of covectors with faces, at
 /// their summed grain. Integer addition is associative, so summing over the section's cells before
 /// the sum reaches the gradient gives the bits one product a cell gives; the sum runs in `i64` where
-/// the terms' bound `Σ_t max|y_t| max|x_t|` allows it.
-fn outer_sum<Y: AsRef<[i64]>, X: AsRef<[i32]>>(g: &mut [i128], cols: usize, ys: &[Y], xs: &[X]) {
-    let bound: u128 = ys.iter().zip(xs).map(|(y, x)| reach64(y.as_ref()) as u128 * reach(x.as_ref()) as u128).sum();
+/// the terms' bound `Σ_t max|y_t| max|x_t|` allows it, in `i128` below `2^126`, and is refused past
+/// it. A face `x` is carried in `i32` or `i64`.
+fn outer_sum<Y: AsRef<[i64]>, X: AsRef<[V]>, V: Copy + Into<i64>>(g: &mut [i128], cols: usize, ys: &[Y], xs: &[X]) -> Result<()> {
+    let mut bound = 0u128;
+    for (y, x) in ys.iter().zip(xs) {
+        let xmax = x.as_ref().iter().map(|&v| v.into().unsigned_abs()).max().unwrap_or(0);
+        bound = bound.checked_add(reach64(y.as_ref()) as u128 * xmax as u128).filter(|&b| b < 1u128 << 126).ok_or(TowerError::Refused("an outer sum outgrew its 128-bit carrier"))?;
+    }
     for (o, row) in g.chunks_exact_mut(cols).enumerate() {
         if bound < (1u128 << 62) {
             let mut acc = vec![0i64; cols];
@@ -492,7 +512,7 @@ fn outer_sum<Y: AsRef<[i64]>, X: AsRef<[i32]>>(g: &mut [i128], cols: usize, ys: 
                 let yo = y.as_ref()[o];
                 if yo != 0 {
                     for (a, &xv) in acc.iter_mut().zip(x.as_ref()) {
-                        *a += yo * xv as i64;
+                        *a += yo * xv.into();
                     }
                 }
             }
@@ -504,12 +524,13 @@ fn outer_sum<Y: AsRef<[i64]>, X: AsRef<[i32]>>(g: &mut [i128], cols: usize, ys: 
                 let yo = y.as_ref()[o] as i128;
                 if yo != 0 {
                     for (slot, &xv) in row.iter_mut().zip(x.as_ref()) {
-                        *slot += yo * xv as i128;
+                        *slot += yo * xv.into() as i128;
                     }
                 }
             }
         }
     }
+    Ok(())
 }
 
 /// `max |y|` over a covector.
@@ -539,7 +560,7 @@ struct LevelCell {
     /// `B x` before the mode's `γ`, on the state's grain.
     push: Vec<(i64, i64)>,
     state: Vec<(i64, i64)>,
-    state_face: Vec<i32>,
+    state_face: Vec<i64>,
     /// `r̂`, the contacts' input, on `2^(−16)`.
     read: Vec<i32>,
     /// `‖r‖_rms` on `2^(−16)` (zero when the face is zero).
@@ -983,7 +1004,7 @@ impl Tower {
             }
             let modes = &mut state.modes[l];
             let gammas = &reaches.gammas[l];
-            let mut face = vec![0i32; 2 * n];
+            let mut face = vec![0i64; 2 * n];
             for k in 0..n {
                 let (hr, hi) = modes[k];
                 let ((lr, li), gamma) = match gate.get(k) {
@@ -998,8 +1019,8 @@ impl Tower {
                 let nr = fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS) + pr)?;
                 let ni = fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS) + pi)?;
                 modes[k] = (nr, ni);
-                face[k] = fit32(release(nr as i128, STATE_BITS - FACE_BITS), "a mode's face outgrew its 32-bit carrier")?;
-                face[n + k] = fit32(release(ni as i128, STATE_BITS - FACE_BITS), "a mode's face outgrew its 32-bit carrier")?;
+                face[k] = fit64(release(nr as i128, STATE_BITS - FACE_BITS))?;
+                face[n + k] = fit64(release(ni as i128, STATE_BITS - FACE_BITS))?;
             }
             // The read Re(C h) = C_re h_re − C_im h_im, on 2^(−40) released to 2^(−16).
             let mut read_a = vec![0i64; w];
@@ -1103,7 +1124,7 @@ impl Tower {
             dzs.push(dz);
         }
         let tops: Vec<&[i32]> = cells.iter().map(|cell| cell.top.as_slice()).collect();
-        outer_sum(&mut g[ro..ro + a * w], w, &dzs, &tops);
+        outer_sum(&mut g[ro..ro + a * w], w, &dzs, &tops)?;
         if let Some(joined) = joined {
             if joined.len() != cells_n {
                 return refuse("a joined covector for each cell of the section");
@@ -1149,12 +1170,12 @@ impl Tower {
             let level = |i: usize| &cells[i].levels[l];
             let conducts: Vec<&[i32]> = (0..cells_n).map(|i| level(i).conduct.as_slice()).collect();
             let reads: Vec<&[i32]> = (0..cells_n).map(|i| level(i).read.as_slice()).collect();
-            let faces_re: Vec<&[i32]> = (0..cells_n).map(|i| &level(i).state_face[..n]).collect();
-            let faces_im: Vec<&[i32]> = (0..cells_n).map(|i| &level(i).state_face[n..]).collect();
-            outer_sum(&mut g[lv.ret..lv.ret + w * f], f, &dx, &conducts);
-            outer_sum(&mut g[lv.contact..lv.contact + f * w], w, &das, &reads);
-            outer_sum(&mut g[lv.read_re..lv.read_re + w * n], n, &dreads, &faces_re);
-            outer_sum(&mut g[lv.read_im..lv.read_im + w * n], n, &negs, &faces_im);
+            let faces_re: Vec<&[i64]> = (0..cells_n).map(|i| &level(i).state_face[..n]).collect();
+            let faces_im: Vec<&[i64]> = (0..cells_n).map(|i| &level(i).state_face[n..]).collect();
+            outer_sum(&mut g[lv.ret..lv.ret + w * f], f, &dx, &conducts)?;
+            outer_sum(&mut g[lv.contact..lv.contact + f * w], w, &das, &reads)?;
+            outer_sum(&mut g[lv.read_re..lv.read_re + w * n], n, &dreads, &faces_re)?;
+            outer_sum(&mut g[lv.read_im..lv.read_im + w * n], n, &negs, &faces_im)?;
             // The reverse scan of the modes: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)
             // (+ β_(t+1) conj(G_h(t+1)) when pumped).
             let mut carried: Vec<(i64, i64)> = vec![(0, 0); n];
@@ -1340,17 +1361,17 @@ impl Tower {
                 }
             }
             let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].input.as_slice()).collect();
-            outer_sum(&mut g[lv.push_re..lv.push_re + n * w], w, &gres, &inputs);
-            outer_sum(&mut g[lv.push_im..lv.push_im + n * w], w, &gims, &inputs);
+            outer_sum(&mut g[lv.push_re..lv.push_re + n * w], w, &gres, &inputs)?;
+            outer_sum(&mut g[lv.push_im..lv.push_im + n * w], w, &gims, &inputs)?;
             if d.turned {
-                outer_sum(&mut g[lv.turn..lv.turn + n * w], w, &dss, &inputs);
+                outer_sum(&mut g[lv.turn..lv.turn + n * w], w, &dss, &inputs)?;
             }
             if d.pumped {
-                outer_sum(&mut g[lv.pump..lv.pump + n * w], w, &dks, &inputs);
-                outer_sum(&mut g[lv.pump_axis..lv.pump_axis + n * w], w, &dps, &inputs);
+                outer_sum(&mut g[lv.pump..lv.pump + n * w], w, &dks, &inputs)?;
+                outer_sum(&mut g[lv.pump_axis..lv.pump_axis + n * w], w, &dps, &inputs)?;
             }
             if d.gated {
-                outer_sum(&mut g[lv.gate..lv.gate + n * w], w, &dqs, &inputs);
+                outer_sum(&mut g[lv.gate..lv.gate + n * w], w, &dqs, &inputs)?;
                 // The Cartesian covector of the founded move: G_λ = u G_|λ| + i u G_φ/|λ|.
                 let faces = &reaches.gates[l];
                 for k in 0..n {
@@ -1468,7 +1489,7 @@ impl Tower {
             // coefficients interleaved (re, im) a mode.
             let mut moved = |moments: &mut [(i64, i64)], coefficients: &[Vec<i64>], shift: u32| -> Result<()> {
                 let mut sum = vec![0i128; 2 * n * w];
-                outer_sum(&mut sum, w, coefficients, &inputs);
+                outer_sum(&mut sum, w, coefficients, &inputs)?;
                 for k in 0..n {
                     for j in 0..w {
                         let z = moments[k * w + j];
@@ -1720,7 +1741,7 @@ impl TowerLearner {
                 let mut m = [0u64; 4];
                 for lc in forwards.iter().flat_map(|(cells, _)| cells.iter().map(move |c| &c.levels[l])) {
                     m[0] = m[0].max(reach(&lc.input));
-                    m[1] = m[1].max(reach(&lc.state_face));
+                    m[1] = m[1].max(reach64(&lc.state_face));
                     m[2] = m[2].max(lc.read_scale as u64);
                     m[3] = m[3].max(reach(&lc.drive));
                 }

@@ -252,11 +252,18 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: boo
                 if filled.contains(&false) {
                     break;
                 }
-                let parts: Vec<Vec<usize>> = lookers.iter().map(|l| l.built[..=section].iter().map(|c| c.0).collect()).collect();
-                let compared: Vec<Vec<Option<usize>>> = lookers.iter().map(|l| l.built[..=section].iter().map(|c| c.1).collect()).collect();
-                let part_refs: Vec<&[usize]> = parts.iter().map(|p| p.as_slice()).collect();
-                let compared_refs: Vec<&[Option<usize>]> = compared.iter().map(|c| c.as_slice()).collect();
-                let receipt = match learner.section_compared(&mut states, &part_refs, Some(&compared_refs)) {
+                // The streams' plain parts, then the forks their moments opened in the section,
+                // each from its own state; the forks' states end with the section.
+                let forks: Vec<Fork> = lookers.iter_mut().flat_map(|l| l.forks.drain(..)).collect();
+                let mut parts: Vec<&[usize]> = lookers.iter().map(|l| &l.built[..=section]).collect();
+                parts.extend(forks.iter().map(|f| f.classes.as_slice()));
+                let plain: Vec<Vec<Option<usize>>> = lookers.iter().map(|l| l.built[..=section].iter().map(|&c| Some(c)).collect()).collect();
+                let mut compared: Vec<&[Option<usize>]> = plain.iter().map(|c| c.as_slice()).collect();
+                compared.extend(forks.iter().map(|f| f.compared.as_slice()));
+                states.extend(forks.iter().map(|f| f.opening.clone()));
+                let result = learner.section_compared(&mut states, &parts, Some(&compared));
+                states.truncate(streams);
+                let receipt = match result {
                     Ok(receipt) => receipt,
                     Err(e) => {
                         println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());
@@ -470,8 +477,7 @@ fn release(args: &[String], units: Option<&Units>) -> Result<()> {
 /// with the look (`Looking`) met: its codes are read where that tower was taught.
 /// `read-lines-own` lets the tower decide: after each look and its line's end the fork writes on,
 /// and it looks again only where it writes its line's head again, at most `LOOKS` looks. Its
-/// stream carries what a tower trained with the look met: the plain line where the first look is
-/// the true rest, and otherwise the first look, its line end and the head again before it.
+/// stream is the plain text, the passage a tower trained with the look (`Looking`) read.
 pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result<()> {
     let arity = if look == Look::Once { 10 } else { 11 };
     if args.len() != arity {
@@ -571,10 +577,7 @@ pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result
             }
         }
         let release = looked.last().cloned().unwrap_or_default();
-        // Where the first look is the true rest, a tower trained with its own look met the plain
-        // line, and the stream carries it as the plain read does.
-        let own_right = first_look.len() + 1 == rest.len() && first_look.iter().zip(&rest).all(|(&a, &t)| a == t as usize);
-        if (look == Look::Carried || (look == Look::Own && !own_right)) && i < written {
+        if look == Look::Carried && i < written {
             // The stream carries the first look, its line's end and the head again before the
             // true rest, as a tower trained with the look met its lines.
             let carried_in: Vec<usize> = first_look.iter().copied().chain([b'\n' as usize]).chain(line[..=eq].iter().map(|&b| b as usize)).collect();
@@ -655,15 +658,17 @@ fn release_rest(tower: &Tower, fork: &mut TowerState, mut face: TowerFace, keys:
 
 /// The look inside training: at each moment the terrain declares (the byte at which a line asks
 /// for its rest), the tower releases its own rest from the state its stream has reached, by
-/// `agree` exact agreeing draws from its stream's share of `keys`. That release and its line's end
-/// re-enter what the stream reads. Where they are the true rest and its end, the passage is the
-/// plain line and the next line follows. Where they part, the release is compared with the true
-/// rest place by place (`TowerLearner::section_compared`) through the first place the two part:
-/// there the release is the produced Holon and the true byte its target. Past that place the
-/// passage is the tower's own and is compared with nothing. The terrain then asks again: the
-/// line's head arrives again and its true rest after it. Whether the head comes again after an
-/// attempt is the tower's own reading of whether it placed the rest. The terrain's moment and line
-/// end are its codec's declared bytes, read outside the tower.
+/// `agree` exact agreeing draws from its stream's share of `keys`. The stream's own passage stays
+/// the plain text, so every first arrival is compared at every place. Where the release and its
+/// line end part from the true rest, a fork opens from the stream's state at the moment and reads
+/// the release and its end, compared with nothing (up to the place they part its faces are the
+/// stream's own, compared already; past it the passage is the fork's own), then the line's head
+/// again and the true rest and its end, compared (`TowerLearner::section_compared`). The fork
+/// joins the section its moment falls in, deposits with the streams and ends there. Where the
+/// release is the true rest no fork opens, and the stream reads the next line's head after it:
+/// whether the head comes again after an attempt is the tower's own reading of whether it placed
+/// the rest. The terrain's moment and line end are its codec's declared bytes, read outside the
+/// tower.
 pub(super) struct Looking {
     keys: Vec<u8>,
     agree: u32,
@@ -671,23 +676,31 @@ pub(super) struct Looking {
     end: usize,
 }
 
-/// One stream's passage with its own releases written in: the classes from the section's first
-/// on, each with the class its face is compared with (itself where it arrived, the true byte at
-/// the release's places through the first that parts, nothing past it).
+/// One stream's plain passage from the section's first class on, and the forks its moments opened
+/// in the section.
 struct Looker {
     start: usize,
     end: usize,
     at: usize,
     line_start: Option<usize>,
-    built: Vec<(usize, Option<usize>)>,
+    built: Vec<usize>,
+    forks: Vec<Fork>,
     keys: KeyStream,
     looks: usize,
     right: usize,
 }
 
+/// A look's fork: the state having received every class before the moment, and the classes it
+/// reads from the moment on, each with the class its face is compared with, or nothing.
+struct Fork {
+    opening: TowerState,
+    classes: Vec<usize>,
+    compared: Vec<Option<usize>>,
+}
+
 impl Looker {
     fn new(start: usize, end: usize, keys: KeyStream) -> Self {
-        Self { start, end, at: start, line_start: None, built: Vec::new(), keys, looks: 0, right: 0 }
+        Self { start, end, at: start, line_start: None, built: Vec::new(), forks: Vec::new(), keys, looks: 0, right: 0 }
     }
 
     fn keys_left(&self) -> usize {
@@ -695,9 +708,10 @@ impl Looker {
     }
 
     /// Fill the passage to `need` classes from the stream's text, the state `opening` having
-    /// received every class before the first: false when the stream's text ends first. A line's
-    /// head is whole only after the stream has met a line's end, so a stream releases only from
-    /// its first whole line on.
+    /// received every class before the first, and open a fork at each moment where the release
+    /// parts from the true rest: false when the stream's text ends first. A line's head is whole
+    /// only after the stream has met a line's end, so a stream releases only from its first whole
+    /// line on.
     fn fill(&mut self, tower: &Tower, text: &[usize], opening: &TowerState, need: usize, look: &Looking) -> Result<bool> {
         let mut probe = opening.clone();
         let mut probed = 0usize;
@@ -707,35 +721,32 @@ impl Looker {
             }
             let c = text[self.at];
             self.at += 1;
-            self.built.push((c, Some(c)));
+            self.built.push(c);
             if c == look.end {
                 self.line_start = Some(self.at);
             } else if let (true, Some(head)) = (c == look.moment, self.line_start) {
-                let mut face = None;
-                for &(b, _) in &self.built[probed..] {
-                    face = Some(tower.advance(&mut probe, b).map_err(|e| e.to_string())?);
+                let moment = self.built.len() - 1;
+                for &b in &self.built[probed..moment] {
+                    tower.advance(&mut probe, b).map_err(|e| e.to_string())?;
                 }
+                let before = probe.clone();
+                let face = tower.advance(&mut probe, c).map_err(|e| e.to_string())?;
                 probed = self.built.len();
                 let given = text[self.at..self.end].iter().position(|&b| b == look.end).unwrap_or(self.end - self.at);
-                let mut fork = probe.clone();
-                let face = face.ok_or("a moment the probe has not received")?;
-                let release = release_rest(tower, &mut fork, face, &mut self.keys, given + 4, look.agree)?.0;
+                let release = release_rest(tower, &mut probe.clone(), face, &mut self.keys, given + 4, look.agree)?.0;
                 let attempt: Vec<usize> = release.into_iter().chain(std::iter::once(look.end)).collect();
                 let truth = &text[self.at..(self.at + given + 1).min(self.end)];
                 self.looks += 1;
                 if attempt == truth {
-                    // The attempt and its end are the true rest: the plain line, and the next
-                    // line follows.
-                    self.built.extend(attempt.iter().map(|&a| (a, Some(a))));
-                    self.at += attempt.len();
-                    self.line_start = Some(self.at);
                     self.right += 1;
                 } else {
-                    // Compared through the first place they part, as far as the stream holds the
-                    // truth; then the head again and the true rest after it.
-                    let parted = attempt.iter().zip(truth).position(|(a, t)| a != t).unwrap_or(attempt.len().min(truth.len()));
-                    self.built.extend(attempt.iter().enumerate().map(|(k, &a)| (a, if k <= parted { truth.get(k).copied() } else { None })));
-                    self.built.extend(text[head..self.at].iter().map(|&b| (b, Some(b))));
+                    let head = &text[head..self.at];
+                    let classes: Vec<usize> = std::iter::once(c).chain(attempt.iter().copied()).chain(head.iter().copied()).chain(truth.iter().copied()).collect();
+                    let compared: Vec<Option<usize>> = std::iter::once(Some(c))
+                        .chain(attempt.iter().map(|_| None))
+                        .chain(head.iter().chain(truth).map(|&b| Some(b)))
+                        .collect();
+                    self.forks.push(Fork { opening: before, classes, compared });
                 }
             }
         }
