@@ -156,6 +156,12 @@ pub(super) fn train(args: &[String]) -> Result<()> {
                 window = (0, 0);
             }
         }
+        // Each pass's learner rests beside the run before the held-out read, so a run stopped at
+        // its deadline or refused in the read keeps its last trained pass.
+        let text = learner.to_text();
+        let name = format!("STATE.{pass}");
+        write_new(&out.join(&name), text.as_bytes())?;
+        println!("TOWER_STATE {name} state_bytes={} state_sha256={}", text.len(), sha256(text.as_bytes())?);
         let regions = held_out(&learner.tower, &dev, &roles, streams)?;
         let (dev_code, dev_cells) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
         println!(
@@ -163,12 +169,6 @@ pub(super) fn train(args: &[String]) -> Result<()> {
             pass, per(code, cells), per(dev_code, dev_cells), region_line(&regions), deposits, sections_a_pass,
             pass_started.elapsed().as_millis(), started.elapsed().as_millis()
         );
-        // Each pass's learner rests beside the run, so a run stopped at its deadline keeps its last
-        // finished pass.
-        let text = learner.to_text();
-        let name = format!("STATE.{pass}");
-        write_new(&out.join(&name), text.as_bytes())?;
-        println!("TOWER_STATE {name} state_bytes={} state_sha256={}", text.len(), sha256(text.as_bytes())?);
     }
     let text = learner.to_text();
     write_new(&out.join("STATE"), text.as_bytes())?;
@@ -177,9 +177,10 @@ pub(super) fn train(args: &[String]) -> Result<()> {
 }
 
 pub(super) fn sample(args: &[String]) -> Result<()> {
-    if args.len() != 9 {
-        return Err("sample-tower STATE STATE_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES OUT".into());
+    if args.len() != 9 && args.len() != 10 {
+        return Err("sample-tower STATE STATE_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES OUT [AGREE]".into());
     }
+    let agree = agreement(args.get(9))?;
     let started = Instant::now();
     let state = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
     let prompt = pinned_read(&args[3], &args[4], QUERY_BYTE_BUDGET)?;
@@ -204,9 +205,7 @@ pub(super) fn sample(args: &[String]) -> Result<()> {
     let mut released = Vec::with_capacity(count);
     while released.len() < count {
         let key = key_stream.next_key().ok_or("fewer keys than declared bytes")?;
-        let total = num_bigint::BigInt::from(face.total);
-        let exact: Vec<Rat> = face.masses.iter().map(|&u| Rat::new(num_bigint::BigInt::from(u), total.clone())).collect();
-        let class = holonics::receiver::release::draw_exact(&exact, &key)?
+        let class = holonics::receiver::release::draw_exact(&agreement_face(&face.masses, agree), &key)?
             .drawn_class()
             .ok_or("an unresolved draw at an exact face")?;
         released.push(class as u8);
@@ -214,9 +213,28 @@ pub(super) fn sample(args: &[String]) -> Result<()> {
     }
     write_new(&out.join("OUTPUT.bin"), &released)?;
     println!(
-        "TOWER_SAMPLE prompt_bits_a_byte={} bytes={} elapsed_ms={}",
-        per(prompt_code, classes.len().saturating_sub(1).max(1)), released.len(), started.elapsed().as_millis()
+        "TOWER_SAMPLE prompt_bits_a_byte={} bytes={} agree={} elapsed_ms={}",
+        per(prompt_code, classes.len().saturating_sub(1).max(1)), released.len(), agree, started.elapsed().as_millis()
     );
     println!("TOWER_SAMPLE_TEXT {:?}", String::from_utf8_lossy(&released));
     Ok(())
+}
+
+/// The release at which `agree` independent draws from the face fall on the same class: the face's
+/// masses raised to that power over their sum. One draw is the face itself; two give its collision
+/// face `p²/Σp²`, the release where two receivers of the same face agree. The release is exact and
+/// spends one key a draw whatever `agree` is.
+pub(super) fn agreement_face(masses: &[u128], agree: u32) -> Vec<Rat> {
+    let powered: Vec<num_bigint::BigInt> = masses.iter().map(|&u| num_bigint::BigInt::from(u).pow(agree)).collect();
+    let total: num_bigint::BigInt = powered.iter().sum();
+    powered.into_iter().map(|u| Rat::new(u, total.clone())).collect()
+}
+
+/// The declared number of agreeing draws: one when none is named.
+pub(super) fn agreement(arg: Option<&String>) -> Result<u32> {
+    let agree = arg.map_or(Ok(1), |a| a.parse::<u32>())?;
+    if agree == 0 {
+        return Err("a release needs at least one draw".into());
+    }
+    Ok(agree)
 }

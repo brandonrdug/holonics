@@ -511,9 +511,10 @@ pub(super) fn read_joined(args: &[String]) -> Result<()> {
 /// under the declared weights (a reading's final weights), and each released byte moves the tower.
 pub(super) fn sample_joined(args: &[String]) -> Result<()> {
     use holonics::hnn::tower::CellJoin;
-    if args.len() != 12 {
-        return Err("sample-joined MODES MODES_SHA TOWER TOWER_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES WEIGHTS OUT".into());
+    if args.len() != 12 && args.len() != 13 {
+        return Err("sample-joined MODES MODES_SHA TOWER TOWER_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES WEIGHTS OUT [AGREE]".into());
     }
+    let agree = super::tower_train::agreement(args.get(12))?;
     let started = Instant::now();
     let mut route = rested_route(&args[1], &args[2])?;
     let tower = rested_tower(&args[3], &args[4])?;
@@ -550,9 +551,7 @@ pub(super) fn sample_joined(args: &[String]) -> Result<()> {
             let reading = route.read()?;
             let t = face.cell_masses(prefix, phase).map_err(|e| e.to_string())?;
             let cell = join.face(&reading.joined.masses, &t, phase).map_err(|e| e.to_string())?;
-            let total = num_bigint::BigInt::from(cell.total);
-            let exact: Vec<Rat> = cell.masses.iter().map(|&u| Rat::new(num_bigint::BigInt::from(u), total.clone())).collect();
-            let class = holonics::receiver::release::draw_exact(&exact, &key)?
+            let class = holonics::receiver::release::draw_exact(&super::tower_train::agreement_face(&cell.masses, agree), &key)?
                 .drawn_class()
                 .ok_or("an unresolved draw at an exact face")?;
             // A released cell is not received by the passage (reafference, as in sample-modes).
@@ -563,7 +562,7 @@ pub(super) fn sample_joined(args: &[String]) -> Result<()> {
         face = tower.advance(&mut modes, prefix).map_err(|e| e.to_string())?;
     }
     write_new(&out.join("OUTPUT.bin"), &released)?;
-    println!("JOINED_SAMPLE bytes={} elapsed_ms={}", released.len(), started.elapsed().as_millis());
+    println!("JOINED_SAMPLE bytes={} agree={} elapsed_ms={}", released.len(), agree, started.elapsed().as_millis());
     println!("JOINED_SAMPLE_TEXT {:?}", String::from_utf8_lossy(&released));
     Ok(())
 }
