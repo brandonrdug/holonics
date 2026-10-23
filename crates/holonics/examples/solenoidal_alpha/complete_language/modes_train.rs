@@ -52,7 +52,7 @@ fn opening_tree(population: u64, depth: usize) -> Result<(Landmarks, u64, usize)
     // The released ratio (agent-inferred, the mathematics thread's telescope): its widths read the
     // population only through the KT floor, so the route opens past the carried law's wall
     // (`2^21` cells at depth 24). On 1,000 GSM8K problems it codes 0.467 bits a cell against the
-    // carried law's 0.469 (the tree alone 0.506 against 0.507).
+    // carried law's 0.469 (the tree alone 0.506 against 0.507); on all 6,726 it codes 0.413.
     let field = input_context_field(population, true, RatioLaw::Released)?;
     let receiver = field.receivers().first().ok_or("one declared receiver")?.clone();
     let partition = field.receiving_context(receiver.ring).ok_or("the receiver's framing")?;

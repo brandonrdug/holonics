@@ -17,6 +17,19 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 23: the released ratio opens the whole GSM8K partition (host).** The receiving tree
+refused every population past `2^21` cells at depth 24, because it certified its face against
+the unreleased mixture ratio. Its ratio is now released into `[2^(−K), 2^K]` after every step and
+split (`RatioLaw::Released`, declared by the receiver): the code telescopes into each cell's own
+costs and the widths read the population only through the KT floor. On 1,000 problems the release
+codes 0.467 bits a cell against 0.469; on all 6,726 training problems (14.1 million cells, 17
+minutes, 3.6 GiB) the route codes 0.413 (1.65 bits a character), the tree alone 0.448, and the
+held-out prompt 0.366 against 0.458. A sample keeps the problems' question shape and calculator
+annotations and is not yet sentences. The
+[record](research/records/2026-10-23_THE_RELEASED_RATIO_OPENS_THE_WHOLE_GSM8K_PARTITION.md)
+holds the measurements, the sample and the receipts. The paragraphs below are historical at their
+source.
+
 **October 23: on GSM8K the tree's depth carries the code and the passage adds its news (host).**
 `complete-language train-modes` and `sample-modes` join the receiving tree, the keyed modes
 (`hnn::keyed_modes`) and the passage tree (`hnn::passage`) at the receiver's face, at 40 to 55 µs a
@@ -28,8 +41,7 @@ evidence depth's weight set by the Newton step of the comparison's own curvature
 release; from a held-out prompt it carries the prompt's words and the problems' question shape,
 with no loop and no copied run over 20 bytes, and is not yet sentences. The
 [record](research/records/2026-10-23_ON_GSM8K_THE_TREE_DEPTH_CARRIES_THE_CODE_AND_THE_PASSAGE_ADDS_ITS_NEWS.md)
-holds the measurements, the sample and the receipts. The paragraph below is historical at its
-source.
+holds the measurements, the sample and the receipts.
 
 **October 22: the native face reads its own receiving tree (host).** The native route never read
 the receiving tree its constitution carried, and its readout's features do not separate the next
