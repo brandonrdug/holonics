@@ -54,7 +54,7 @@ const PASSAGE_BACKOFF: u64 = 1;
 /// The lock's run octaves (agent-inferred): a run of `r` correct locks sits in octave
 /// `⌈log₂(r + 1)⌉`, and runs past `2^15` cells (some 8 KB held verbatim, past any GSM8K problem)
 /// share the last.
-const LOCK_OCTAVES: usize = 16;
+pub(super) const LOCK_OCTAVES: usize = 16;
 /// The lock's depth quarters: the locating depth `d` sits in quarter `⌊d/4⌋` (the mathematics
 /// thread's bins, §8).
 const LOCK_QUARTER: usize = 4;
@@ -67,8 +67,12 @@ pub(super) fn lock_bins(depth: usize) -> usize {
 /// The lock's bin: the octave of the run of correct locks before it, and the quarter of its
 /// locating depth `located` in a passage of `depth`.
 pub(super) fn lock_bin(run: u64, depth: usize, located: usize) -> usize {
-    let octave = ((u64::BITS - run.leading_zeros()) as usize).min(LOCK_OCTAVES - 1);
-    octave * (depth / LOCK_QUARTER + 1) + located / LOCK_QUARTER
+    run_octave(run) * (depth / LOCK_QUARTER + 1) + located / LOCK_QUARTER
+}
+
+/// The octave of a run of `run` correct locks, one of [`LOCK_OCTAVES`].
+pub(super) fn run_octave(run: u64) -> usize {
+    ((u64::BITS - run.leading_zeros()) as usize).min(LOCK_OCTAVES - 1)
 }
 
 /// The native route's receiving tree at the declared `depth` (the native route declares 6), its
