@@ -354,6 +354,73 @@ fn release(args: &[String], units: Option<&Units>) -> Result<()> {
     Ok(())
 }
 
+/// `read-lines STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT`: each line of the
+/// text read alone. The frozen tower opens at rest on a line's end, receives the line through its
+/// first `=`, and codes the rest of the line class by class (`LINES.tsv`: the line's index, its
+/// head, the rest as given and each class's code on `2^(−20)` bits). For the first `WRITTEN` lines
+/// a fork at the `=` releases its own rest by exact agreeing draws until a line's end (or as many
+/// classes as the given rest and four more), written beside it. An exterior reading of terrain
+/// lines (`tools/arithmetic_terrain.py`): what the tower writes after an expression it may never
+/// have met.
+pub(super) fn read_lines(args: &[String]) -> Result<()> {
+    if args.len() != 10 {
+        return Err("read-lines STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT".into());
+    }
+    let started = Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let written: usize = args[7].parse()?;
+    let agree = agreement(args.get(8))?;
+    let out = Path::new(&args[9]);
+    std::fs::create_dir(out)?;
+    let tower = &learner.tower;
+    let mut key_stream = KeyStream::new(keys, 8)?;
+    let mut rows = String::new();
+    let mut lines = 0usize;
+    for (i, line) in text.split(|&b| b == b'\n').filter(|l| !l.is_empty()).enumerate() {
+        let Some(eq) = line.iter().position(|&b| b == b'=') else { continue };
+        let mut modes = tower.rest();
+        let mut face = tower.advance(&mut modes, b'\n' as usize).map_err(|e| e.to_string())?;
+        for &b in &line[..=eq] {
+            face = tower.advance(&mut modes, b as usize).map_err(|e| e.to_string())?;
+        }
+        let rest: Vec<u8> = line[eq + 1..].iter().copied().chain([b'\n']).collect();
+        let mut release = String::new();
+        if i < written {
+            let (mut fork, mut f) = (modes.clone(), face.clone());
+            while release.len() < rest.len() + 4 {
+                let key = key_stream.next_key().ok_or("fewer keys than the written lines draw")?;
+                let class = holonics::receiver::release::draw_exact(&agreement_face(&f.masses, agree), &key)?
+                    .drawn_class()
+                    .ok_or("an unresolved draw at an exact face")?;
+                if class == b'\n' as usize {
+                    break;
+                }
+                release.push(char::from(class as u8));
+                f = tower.advance(&mut fork, class).map_err(|e| e.to_string())?;
+            }
+        }
+        let mut codes = Vec::with_capacity(rest.len());
+        for &b in &rest {
+            codes.push(face.code(b as usize).to_string());
+            face = tower.advance(&mut modes, b as usize).map_err(|e| e.to_string())?;
+        }
+        rows.push_str(&format!(
+            "{}\t{}\t{}\t{}\t{}\n",
+            i,
+            String::from_utf8_lossy(&line[..=eq]),
+            String::from_utf8_lossy(&rest[..rest.len() - 1]),
+            release,
+            codes.join(",")
+        ));
+        lines += 1;
+    }
+    write_new(&out.join("LINES.tsv"), rows.as_bytes())?;
+    println!("LINES_READ lines={} written={} agree={} lines_sha256={} elapsed_ms={}", lines, written.min(lines), agree, sha256(rows.as_bytes())?, started.elapsed().as_millis());
+    Ok(())
+}
+
 /// The release at which `agree` independent draws from the face fall on the same class: the face's
 /// masses raised to that power over their sum. One draw is the face itself; two give its collision
 /// face `p²/Σp²`, the release where two receivers of the same face agree. The release is exact and
