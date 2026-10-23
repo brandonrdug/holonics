@@ -10,7 +10,7 @@
 //! the rested tower: it opens at rest, receives the prompt, and releases each byte by an exact draw
 //! on its face.
 use super::*;
-use holonics::hnn::tower::{Tower, TowerDeclaration, TowerLearner, TowerState, READ_BITS};
+use holonics::hnn::tower::{Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
 
 /// A learner's state read ceiling, `2^30` bytes.
@@ -368,9 +368,19 @@ fn release(args: &[String], units: Option<&Units>) -> Result<()> {
 /// have met. `read-lines-stream` opens each line instead on the state the text's true earlier
 /// lines left, the condition the tower trained in: the fork writes from that state, and the true
 /// line, not the release, carries the stream on.
-pub(super) fn read_lines(args: &[String], in_stream: bool) -> Result<()> {
-    if args.len() != 10 {
-        return Err("read-lines|read-lines-stream STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT".into());
+///
+/// `read-lines-again … AGREE LOOKS OUT` writes in the stream and then looks again: the fork
+/// carries the rest it wrote, its line's end and the line's head once more, and releases again,
+/// until two looks in a row write the same rest or `LOOKS` looks are spent. `read-lines-redraw`
+/// is its foil: each later look draws again at the same moment and carries nothing of the looks
+/// before it. The first look spends the key file as the one-look read does, so its releases are
+/// that read's; the later looks draw from the file's second half. `LINES.tsv` writes the last look
+/// and `LOOKS.tsv` every look (the line's index, its head, the rest as given, whether the last two
+/// looks agree, the looks joined by `|`).
+pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result<()> {
+    let arity = if look == Look::Once { 10 } else { 11 };
+    if args.len() != arity {
+        return Err("read-lines|read-lines-stream STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT; read-lines-again|read-lines-redraw STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE LOOKS OUT".into());
     }
     let started = Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -378,11 +388,18 @@ pub(super) fn read_lines(args: &[String], in_stream: bool) -> Result<()> {
     let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let written: usize = args[7].parse()?;
     let agree = agreement(args.get(8))?;
-    let out = Path::new(&args[9]);
+    let looks: usize = if look == Look::Once { 1 } else { args[9].parse()? };
+    if looks == 0 {
+        return Err("a written line needs at least one look".into());
+    }
+    let out = Path::new(&args[arity - 1]);
     std::fs::create_dir(out)?;
     let tower = &learner.tower;
+    let mut later_keys = KeyStream::new(keys[keys.len() / 2..].to_vec(), 8)?;
     let mut key_stream = KeyStream::new(keys, 8)?;
     let mut rows = String::new();
+    let mut look_rows = String::new();
+    let (mut spent, mut settled) = (0usize, 0usize);
     let mut lines = 0usize;
     let mut carried = tower.rest();
     let mut carried_face = tower.advance(&mut carried, b'\n' as usize).map_err(|e| e.to_string())?;
@@ -404,21 +421,40 @@ pub(super) fn read_lines(args: &[String], in_stream: bool) -> Result<()> {
             face = tower.advance(&mut modes, b as usize).map_err(|e| e.to_string())?;
         }
         let rest: Vec<u8> = line[eq + 1..].iter().copied().chain([b'\n']).collect();
-        let mut release = String::new();
+        let mut looked: Vec<String> = Vec::new();
         if i < written {
-            let (mut fork, mut f) = (modes.clone(), face.clone());
-            while release.len() < rest.len() + 4 {
-                let key = key_stream.next_key().ok_or("fewer keys than the written lines draw")?;
-                let class = holonics::receiver::release::draw_exact(&agreement_face(&f.masses, agree), &key)?
-                    .drawn_class()
-                    .ok_or("an unresolved draw at an exact face")?;
-                if class == b'\n' as usize {
-                    break;
-                }
-                release.push(char::from(class as u8));
-                f = tower.advance(&mut fork, class).map_err(|e| e.to_string())?;
+            let cap = rest.len() + 4;
+            let mut fork = modes.clone();
+            looked.push(release_rest(tower, &mut fork, face.clone(), &mut key_stream, cap, agree)?);
+            while looked.len() < looks && (looked.len() < 2 || looked[looked.len() - 1] != looked[looked.len() - 2]) {
+                let again = match look {
+                    Look::Once => break,
+                    Look::Again => {
+                        let mut f = tower.advance(&mut fork, b'\n' as usize).map_err(|e| e.to_string())?;
+                        for &b in &line[..=eq] {
+                            f = tower.advance(&mut fork, b as usize).map_err(|e| e.to_string())?;
+                        }
+                        release_rest(tower, &mut fork, f, &mut later_keys, cap, agree)?
+                    }
+                    Look::Redraw => release_rest(tower, &mut modes.clone(), face.clone(), &mut later_keys, cap, agree)?,
+                };
+                looked.push(again);
+            }
+            spent += looked.len();
+            let agreed = looked.len() >= 2 && looked[looked.len() - 1] == looked[looked.len() - 2];
+            settled += usize::from(agreed);
+            if look != Look::Once {
+                look_rows.push_str(&format!(
+                    "{}\t{}\t{}\t{}\t{}\n",
+                    i,
+                    String::from_utf8_lossy(&line[..=eq]),
+                    String::from_utf8_lossy(&rest[..rest.len() - 1]),
+                    u8::from(agreed),
+                    looked.join("|")
+                ));
             }
         }
+        let release = looked.last().cloned().unwrap_or_default();
         let mut codes = Vec::with_capacity(rest.len());
         for &b in &rest {
             codes.push(face.code(b as usize).to_string());
@@ -436,8 +472,41 @@ pub(super) fn read_lines(args: &[String], in_stream: bool) -> Result<()> {
         lines += 1;
     }
     write_new(&out.join("LINES.tsv"), rows.as_bytes())?;
+    if look != Look::Once {
+        write_new(&out.join("LOOKS.tsv"), look_rows.as_bytes())?;
+        println!("LOOKS_READ looks={} spent={} settled={} looks_sha256={}", looks, spent, settled, sha256(look_rows.as_bytes())?);
+    }
     println!("LINES_READ lines={} written={} agree={} lines_sha256={} elapsed_ms={}", lines, written.min(lines), agree, sha256(rows.as_bytes())?, started.elapsed().as_millis());
     Ok(())
+}
+
+/// How a written line meets its own moment again (`read_lines`).
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(super) enum Look {
+    /// One look: the release at the `=` is written as it comes.
+    Once,
+    /// The fork carries its own release, its line's end and the head again, and releases again.
+    Again,
+    /// The foil: each later look draws again at the same moment, carrying nothing.
+    Redraw,
+}
+
+/// The rest a fork releases from `face` by exact agreeing draws: classes until a line's end, or
+/// `cap` classes. The fork moves through every class it writes.
+fn release_rest(tower: &Tower, fork: &mut TowerState, mut face: TowerFace, keys: &mut KeyStream, cap: usize, agree: u32) -> Result<String> {
+    let mut release = String::new();
+    while release.len() < cap {
+        let key = keys.next_key().ok_or("fewer keys than the written lines draw")?;
+        let class = holonics::receiver::release::draw_exact(&agreement_face(&face.masses, agree), &key)?
+            .drawn_class()
+            .ok_or("an unresolved draw at an exact face")?;
+        if class == b'\n' as usize {
+            break;
+        }
+        release.push(char::from(class as u8));
+        face = tower.advance(fork, class).map_err(|e| e.to_string())?;
+    }
+    Ok(release)
 }
 
 /// The release at which `agree` independent draws from the face fall on the same class: the face's

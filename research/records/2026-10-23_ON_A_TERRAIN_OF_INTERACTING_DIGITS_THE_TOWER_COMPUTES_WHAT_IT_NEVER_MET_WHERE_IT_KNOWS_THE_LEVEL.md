@@ -400,6 +400,78 @@ Read in the base's tower [agent-inferred]:
 The failure names the next subject by its measurement: a product's tens cost 3.01 bits written in
 the stream, 0.31 below blind, while its parity and shared-prime faces are exact.
 
+## Looking again
+
+[agent-inferred, October 23] The near misses vary with the state a line meets: across the eight
+reads above, 73+31 is written 104 in four and 105, 106 or 114 in the others, and 71+41 is written
+112 in four and 102, 113 or 122 in the others. The right result is within reach of the moment, and
+each read gives it one look. `read-lines-again` gives it more: after the fork writes its rest in the
+stream, it carries what it wrote, its line's end and the line's head once more, and releases again,
+until two looks in a row write the same rest or eight looks are spent. Its foil,
+`read-lines-redraw`, draws again at the same moment and carries nothing, so seeing its own answer
+is read apart from drawing again. The first look spends the key file as the stream read did, so its
+releases are that read's (a check on the read); the later looks draw from the file's second half.
+None of the towers trained on a line followed by itself, so a look may only repeat the one before.
+
+The claim fixed before the read: over first-met unseen lines of the pumped tower, the last look of
+`read-lines-again` writes more whole results right than the first look in each operation (the first
+look's 21 of 193 products, 177 of 208 sums and 87 of 135 differences); more of those lines turn
+right than turn wrong; and in each operation the last look writes at least as many right as the
+redraw's last look, so the gain is the carried answer's and not a second draw's.
+
+Each read took 68 to 83 s. The first look writes the stream read's releases in all 1,200 lines of
+each tower, and every result's code is the stream read's, so the looks change nothing but what is
+written. First-met unseen lines, whole results right at the first look and at the last; then the
+lines whose right result any of the looks wrote:
+
+| | gated | turned | pumped |
+|---|---|---|---|
+| sums, again | 146 → 154 | 154 → 159 | 177 → 179 |
+| sums, redraw | 146 → 144 | 154 → 159 | 177 → 175 |
+| differences, again | 67 → 67 | 57 → 57 | 87 → 89 |
+| differences, redraw | 67 → 65 | 57 → 55 | 87 → 92 |
+| products, again | 4 → 5 | 9 → 8 | 21 → 17 |
+| products, redraw | 4 → 4 | 9 → 9 | 21 → 22 |
+| any look right: sums, again / redraw | 163 / 155 | 174 / 169 | 184 / 179 |
+| differences | 85 / 76 | 73 / 68 | 98 / 93 |
+| products | 20 / 15 | 23 / 19 | 36 / 35 |
+
+The claim fails on all three counts. The pumped tower's last look writes fewer products right than
+its first (17 against 21); as many of its lines turn right as turn wrong (14 and 14); and its
+differences and products are below the redraw's (89 against 92, 17 against 22). The pumped tower's
+looks at the lines shown above, as they came (`|` between looks):
+
+```text
+73+31   again 106|106                                  redraw 106|106
+74-72   again 6|6                                      redraw 6|6
+8+82    again 80|80                                    redraw 80|80
+12*35   again 470|410|420|410|490|460|430|440          redraw 470|450|410|410
+46*15   again 700|790|720|700|740|740                  redraw 700|700
+83*27   again 2229|2231|2229|2191|2149|2101|2249|2249  redraw 2229|2249|2109|2379|2291|2209|2309|2129
+```
+
+Read in the base's tower [agent-inferred]:
+
+- **The right result is within reach more often than one look shows.** Some look writes the right
+  product in 36 of 193 lines against 21 at the first, and in every tower and operation the looks
+  that carry their own answer reach the right result more often than the redraws (they agree less,
+  so they spend more looks and wander further).
+- **Nothing in a look tells it which answer is right.** A wrong sum is as stable as a right one:
+  73+31 writes 106 twice, 8+82 writes 80 twice. A product wanders inside its size window and
+  agrees where the flow repeats itself, not where the result is right (12*35 passes 420 at its
+  third look and goes on). Two agreeing looks find the moment's fixed point, and the fixed point
+  is where the faces it holds close, not where every face closes.
+- **The look must carry a check and must enter learning.** The mathematics thread's exterior count
+  (its record of October 23 on the moment as a lap) finds every miss here and in the earlier draws
+  failing the check loop on ring 10, 9 or 11, those loops inside the size window leaving only the
+  true result, and the product misses losing rings 9 and 11. A second look can only close a loop
+  on a face the machine composes from the operands, and only learning that reads its own attempt
+  against the arrival can teach the second look to differ from the first.
+
+The failure names the next subject by its measurement: two looks agree on a wrong result as readily
+as on a right one (pumped: 14 lines turn right, 14 turn wrong), though the right product is within
+eight looks in 36 of 193 lines.
+
 ## The recorded failures this step could repeat
 
 - **Catered machinery.** The terrain's truth is generated exactly, outside the machine; the tower
@@ -422,5 +494,8 @@ with 1,200 written and keys `keys_d1`, `LINES_6.tsv` and `LINES_12_1200.tsv` for
 `LINES_PUMPED_12.tsv` for the pumped one, each with its `READ_*.txt`; written in the stream,
 `LINES_STREAM_GATED.tsv`, `LINES_STREAM_TURNED.tsv` and `LINES_STREAM_PUMPED.tsv`, each
 `READ_STREAM_*.txt` holding the observer's read of all lines, of first-met lines and of the rest.
+`LOOKS_AGAIN_*.tsv` and `LOOKS_REDRAW_*.tsv` hold every look of each tower's 1,200 written lines
+(the line's index, its head, the result as given, whether its last two looks agree, the looks),
+read in `READ_LOOKS.txt` (`tools/arithmetic_looks.py`).
 `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt` and `TRAIN_PUMPED.txt` are the
 training logs (the turned and pumped ones without their per-section swell lines).
