@@ -775,8 +775,8 @@ Three readings [agent-inferred].
   plain tower places: 1,145 of the 1,200 written results have the true result's length, and they
   are near in value (110 for 112, 105 for 104, 87 for 90), while their trailing zeros cost nearly ten times the plain tower's.
 - **The forks are about as much compared material as the passage.** At the last pass 21,033
-  forks each compared about a line and a byte (`=`, the head, the true rest and its end; the
-  passage's lines average 9.6 bytes), against the passage's 216,131 bytes, and every one of them
+  forks each compared about a line (the head, the true rest and its end; the fork's `=` opens it
+  uncompared, and the passage's lines average 9.6 bytes), against the passage's 216,131 bytes, and every one of them
   asks for a head and a truth in a state that has just read the tower's own wrong attempt and its
   line end. In the passage a line end is followed by another question; in a fork, by the same one.
   The own read follows the passage: after its own line end the tower never wrote its head again.
@@ -787,6 +787,78 @@ Three readings [agent-inferred].
 The next loop reads which of the last two carries the loss, with no training: the second level's
 face mode by mode, and the contacts' reads, over the plain held-out text through this tower's final
 state and the plain pumped tower's.
+
+## Reading the side-fork tower's faces
+
+[agent-inferred, October 23] `read-tower-faces` (`tower_train::read_tower_faces`) runs a frozen
+tower over the plain held-out text in the held-out read's eight streams, each from rest, and writes
+for each level the largest mode's share of the level's face energy, `Σ max_k |h_k|² / Σ Σ_k
+|h_k|²` over the cells whose next byte falls in a region, and each mode's largest `|h|` and root
+mean square over the 47,962 cells. It read the side-fork tower's state after each of its 12 passes
+and the plain pumped tower's after passes 0, 3, 5 and 11, at 2.2 to 4.7 s a read (its sums now
+checked against their 128-bit carrier, which repeated every read bit for bit). The shares below
+are thousandths at the unseen results' digits (the other regions read alike); the largest mode is
+in face units (`2^16` numerators on `2^(−16)`), its largest and its root mean square; the last
+column is what the unseen digits cost on that text in bits a byte, from the training's own pass
+reads.
+
+| Pass | first level: share, largest mode | second level: share, largest mode | unseen digits |
+|---|---|---|---|
+| 0 | 845, mode 32 (23, 21) | 241, mode 31 (460, 85) | 2.761 |
+| 1 | 981, mode 32 (133, 122) | 897, mode 40 (2,897, 1,848) | 2.436 |
+| 2 | 838, mode 49 (55, 45) | 963, mode 40 (5,856, 4,866) | 2.273 |
+| 3 | 977, mode 49 (232, 217) | 985, mode 40 (25,435, 17,677) | 2.329 |
+| 4 | 973, mode 49 (257, 245) | 711, mode 40 (29,562, 9,386) | 2.345 |
+| 5 | 979, mode 49 (313, 299) | 966, mode 40 (40,696, 26,037) | 2.228 |
+| 6 | 978, mode 49 (393, 373) | 970, mode 40 (42,654, 34,217) | 2.179 |
+| 7 | 960, mode 49 (386, 368) | 985, mode 40 (91,558, 81,656) | 2.259 |
+| 8 | 954, mode 49 (433, 412) | 986, mode 40 (104,511, 80,486) | 2.108 |
+| 9 | 906, mode 49 (378, 359) | 990, mode 40 (117,921, 93,399) | 2.011 |
+| 10 | 360, mode 57 (163, 129) | 619, mode 40 (10,806, 1,202) | 2.474 |
+| 11 | 612, mode 40 (213, 199) | 193, mode 40 (2,828, 31) | 2.032 |
+| plain tower, 0 | 391, mode 23 (13, 5) | 269, mode 30 (451, 225) | 2.700 |
+| plain tower, 3 | 351, mode 27 (19, 7) | 267, mode 6 (340, 53) | 1.825 |
+| plain tower, 5 | 338, mode 27 (21, 8) | 170, mode 8 (418, 101) | 1.428 |
+| plain tower, 11 | 290, mode 27 (25, 9) | 156, mode 5 (424, 56) | 1.070 |
+
+Three readings [agent-inferred].
+
+- **One mode stands in each level.** From the first pass at the first level and from the second at
+  the second, one mode holds most of the level's face: 838 to 981 thousandths at the first level
+  through pass 9 and 897 to 990 at the second from pass 1 to 9, where the plain tower's largest
+  holds 290 to 391 and 156 to 269. It is one mode pass after pass (49 at the first level from pass
+  2 to 9, 40 at the second from pass 1 to 11), and at the first level its amplitude barely varies
+  from place to place: through pass 9 its root mean square is 0.82 to 0.95 of its largest, where
+  the plain tower's largest is 0.35 to 0.38 of its own. Its phase may still turn; this read sees
+  amplitudes only.
+- **The standing mode does not carry the lost digits.** Their cost does not follow the share. The
+  second level is held at 990 thousandths at pass 9, where the digits cost 2.011 bits a byte, the
+  run's least; at pass 10 both levels let go (360 and 619) and the digits cost 2.474; at the last
+  pass the second level's share is 193, near the plain tower's 156, its largest mode a burst (root
+  mean square 31 face units against a largest of 2,828), and the digits still cost 2.032 against
+  the plain tower's 1.070. The swell of the side fork's third reading is real and passes, and the
+  loss stays. This reads across passes and removes nothing: the first level is still held at 612
+  thousandths at the last pass.
+- **The plain tower's digits fall where the forks' stall.** At passes 0, 3, 5 and 11 the plain
+  tower's unseen digits cost 2.700, 1.825, 1.428 and 1.070 bits a byte, the side-fork tower's
+  2.761, 2.329, 2.228 and 2.032, nearly flat from the third pass. What remains of the side fork's
+  readings is the forks' compared material, about as much as the passage, and two parts of every
+  fork are answered by what the fork has just read rather than from the operands. The head again
+  is the line's question, which the passage never repeats after a line end, so each fork teaches
+  that the question returns after an answer where the passage teaches that a new one comes. And
+  the true rest, through the place where it parts from the attempt, is the attempt again, so
+  wherever the attempt's leading places were right the fork learns them by copying.
+
+The contacts' reads were not taken: the faces already part the two readings. The next loop
+compares on the fork only what the fork has not already read, the news: the true rest from the
+first place where it parts from the attempt, through its end. The head again and the true rest's
+leading places that agree with the attempt are read uncompared. The tower then no longer learns
+whether its question comes again, so `read-lines-own` cannot look again and `read-lines-again`
+(which writes the head for it) is the declared read. The claim fixed before the run, over
+first-met unseen lines: its first look writes at least as many whole results right as the plain
+pumped tower's first look in each operation (177 sums, 87 differences, 21 products); its last look
+writes more right than its first in each operation; and more of its lines turn right than turn
+wrong.
 
 ## The recorded failures this step could repeat
 
@@ -820,7 +892,8 @@ compared through the first parting place: `LOOKS_AGAIN_COMPARED.tsv`, `LOOKS_RED
 and `LOOKS_CARRIED_COMPARED.tsv`, read in `READ_COMPARED.txt`; the tower asked again only where
 its release parts: `LOOKS_OWN.tsv`, `LOOKS_AGAIN_OWN.tsv` and `LOOKS_REDRAW_OWN.tsv`, read in
 `READ_OWN.txt`. The tower read its wrong attempts on side forks: `LOOKS_FORK.tsv`, `LOOKS_AGAIN_FORK.tsv` and
-`LOOKS_REDRAW_FORK.tsv`, read in `READ_FORK.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`,
+`LOOKS_REDRAW_FORK.tsv`, read in `READ_FORK.txt`; their faces pass by pass, with the plain pumped
+tower's, in `FACES.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`,
 `TRAIN_PUMPED.txt`, `TRAIN_LOOKING.txt`, `TRAIN_COMPARED.txt`, `TRAIN_OWN.txt`, `TRAIN_FORK.txt`
 and `TRAIN_FORK_REFUSED.txt` (with its one swell line) are the training logs (the turned and pumped ones without their per-section
 swell lines).

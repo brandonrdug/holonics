@@ -798,6 +798,7 @@ pub(super) fn run_with_execution(
         Some("read-lines-redraw") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Redraw),
         Some("read-lines-carried") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Carried),
         Some("read-lines-own") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Own),
+        Some("read-tower-faces") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_faces(args),
         Some("train-duplex") if backend == CompleteLanguageTrainingBackend::HostReference => duplex_train::train(args),
         Some("read-lines-duplex") if backend == CompleteLanguageTrainingBackend::HostReference => duplex_train::read_lines(args),
         Some("train-native" | "sample-native") => Err("the native route's commands are host-owned; no CUDA fallback".into()),

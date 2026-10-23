@@ -56,6 +56,88 @@ fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], str
     Ok(regions)
 }
 
+/// [agent-inferred, October 23] The modes' faces over a text, read through a frozen tower in the
+/// held-out read's streams (`held_out`): per level and mode, `max |h|` and `Σ |h|²` over the cells;
+/// per level and region of `roles` (the region of the class the state predicts next), the cells'
+/// `Σ max_k |h_k|²` against `Σ Σ_k |h_k|²`, the largest mode's share of the level's face energy. A
+/// reading beside the code, not material: it locates whether a few swollen modes carry a level's
+/// face where the code is lost.
+pub(super) fn read_tower_faces(args: &[String]) -> Result<()> {
+    if args.len() != 8 {
+        return Err("read-tower-faces STATE STATE_SHA TEXT TEXT_SHA ROLES ROLES_SHA STREAMS".into());
+    }
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let roles = roles_of(&args[5], &args[6], text.len())?;
+    let streams = count(&args[7])?;
+    let tower = &learner.tower;
+    let (levels, modes) = (tower.declaration.levels, tower.declaration.modes);
+    // Per level: each mode's max |h|² and Σ|h|², then per region (Σ max_k |h_k|², Σ Σ_k |h_k|², cells),
+    // `h` on `2^(−24)`.
+    type Faces = Vec<(Vec<(u128, u128)>, [(u128, u128, usize); 4])>;
+    let empty = || -> Faces { (0..levels).map(|_| (vec![(0u128, 0u128); modes], [(0u128, 0u128, 0usize); 4])).collect() };
+    let chunk = text.len().div_ceil(streams);
+    let starts: Vec<usize> = (0..text.len()).step_by(chunk).collect();
+    let parts: Vec<Faces> = starts
+        .par_iter()
+        .map(|&start| {
+            let end = (start + chunk).min(text.len());
+            let mut state = tower.rest();
+            let mut faces = empty();
+            for i in start..end.saturating_sub(1) {
+                tower.advance(&mut state, text[i] as usize).map_err(|e| e.to_string())?;
+                let region = roles[i + 1] as usize;
+                for (l, (per_mode, per_region)) in faces.iter_mut().enumerate() {
+                    let (mut largest, mut whole) = (0u128, 0u128);
+                    let outgrew = || "a face sum outgrew its 128-bit carrier".to_string();
+                    for (k, &(re, im)) in state.modes[l].iter().enumerate() {
+                        let e = (re.unsigned_abs() as u128).pow(2).checked_add((im.unsigned_abs() as u128).pow(2)).ok_or_else(outgrew)?;
+                        per_mode[k].0 = per_mode[k].0.max(e);
+                        per_mode[k].1 = per_mode[k].1.checked_add(e).ok_or_else(outgrew)?;
+                        largest = largest.max(e);
+                        whole = whole.checked_add(e).ok_or_else(outgrew)?;
+                    }
+                    let r = &mut per_region[region];
+                    r.0 = r.0.checked_add(largest).ok_or_else(outgrew)?;
+                    r.1 = r.1.checked_add(whole).ok_or_else(outgrew)?;
+                    r.2 += 1;
+                }
+            }
+            Ok(faces)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let mut faces = empty();
+    for part in parts {
+        for (l, (per_mode, per_region)) in part.into_iter().enumerate() {
+            let outgrew = || "a face sum outgrew its 128-bit carrier";
+            for (k, (m, s)) in per_mode.into_iter().enumerate() {
+                faces[l].0[k].0 = faces[l].0[k].0.max(m);
+                faces[l].0[k].1 = faces[l].0[k].1.checked_add(s).ok_or_else(outgrew)?;
+            }
+            for (r, (a, b, n)) in per_region.into_iter().enumerate() {
+                faces[l].1[r].0 = faces[l].1[r].0.checked_add(a).ok_or_else(outgrew)?;
+                faces[l].1[r].1 = faces[l].1[r].1.checked_add(b).ok_or_else(outgrew)?;
+                faces[l].1[r].2 += n;
+            }
+        }
+    }
+    // `|h|` on `2^(−24)` written on the face's grain `2^(−16)`, as the swell line writes it.
+    let unit = |e: u128| e.isqrt() >> (24 - 16);
+    let cells: usize = faces.first().map_or(0, |f| f.1.iter().map(|r| r.2).sum());
+    for (l, (per_mode, per_region)) in faces.iter().enumerate() {
+        let mut order: Vec<usize> = (0..modes).collect();
+        order.sort_by_key(|&k| std::cmp::Reverse(per_mode[k].0));
+        let top: Vec<String> = order.iter().take(8).map(|&k| format!("{k}:{}/{}", unit(per_mode[k].0), unit(per_mode[k].1 / cells.max(1) as u128))).collect();
+        let mut shares = Vec::with_capacity(REGIONS.len());
+        for (name, &(a, b, _)) in REGIONS.iter().zip(per_region) {
+            let permille = if b == 0 { 0 } else { a.checked_mul(1000).ok_or("a face share outgrew its 128-bit carrier")? / b };
+            shares.push(format!("{name}={permille}"));
+        }
+        println!("TOWER_FACES level={l} cells={cells} largest_share_permille {} top_modes(mode:max/rms, 2^-16) {}", shares.join(" "), top.join(" "));
+    }
+    Ok(())
+}
+
 /// `Q=… P=… N=… M=…`: bits a byte per region.
 pub(super) fn region_line(regions: &[(i64, usize); 4]) -> String {
     REGIONS
@@ -663,12 +745,17 @@ fn release_rest(tower: &Tower, fork: &mut TowerState, mut face: TowerFace, keys:
 /// line end part from the true rest, a fork opens from the stream's state at the moment and reads
 /// the release and its end, compared with nothing (up to the place they part its faces are the
 /// stream's own, compared already; past it the passage is the fork's own), then the line's head
-/// again and the true rest and its end, compared (`TowerLearner::section_compared`). The fork
-/// joins the section its moment falls in, deposits with the streams and ends there. Where the
-/// release is the true rest no fork opens, and the stream reads the next line's head after it:
-/// whether the head comes again after an attempt is the tower's own reading of whether it placed
-/// the rest. The terrain's moment and line end are its codec's declared bytes, read outside the
-/// tower.
+/// again and the true rest and its end. On the fork only the news is compared
+/// (`TowerLearner::section_compared`): the true rest from the first place where it parts from the
+/// release, through its end. The head again and the true rest's leading places that agree with
+/// the release are what the fork has just read, so they are read with nothing compared: compared,
+/// the head taught that a line's question returns after its answer, against the passage, and the
+/// agreeing places were learned by copying the release (the record of October 23 on a terrain of
+/// interacting digits, "Reading the side-fork tower's faces"; the fork that compared them is at
+/// [`79a440c06`](https://github.com/brandonrdug/holonics/tree/79a440c06)). The fork joins the
+/// section its moment falls in, deposits with the streams and ends there. Where the release is the
+/// true rest no fork opens. The terrain's moment and line end are its codec's declared bytes, read
+/// outside the tower.
 pub(super) struct Looking {
     keys: Vec<u8>,
     agree: u32,
@@ -741,10 +828,13 @@ impl Looker {
                     self.right += 1;
                 } else {
                     let head = &text[head..self.at];
+                    // The first place the true rest parts from the release: none where a stream's
+                    // text ends inside a rest the release agrees with.
+                    let parts = attempt.iter().zip(truth).position(|(a, t)| a != t).unwrap_or(truth.len());
                     let classes: Vec<usize> = std::iter::once(c).chain(attempt.iter().copied()).chain(head.iter().copied()).chain(truth.iter().copied()).collect();
                     let compared: Vec<Option<usize>> = std::iter::once(Some(c))
-                        .chain(attempt.iter().map(|_| None))
-                        .chain(head.iter().chain(truth).map(|&b| Some(b)))
+                        .chain(attempt.iter().chain(head).map(|_| None))
+                        .chain(truth.iter().enumerate().map(|(j, &b)| (j >= parts).then_some(b)))
                         .collect();
                     self.forks.push(Fork { opening: before, classes, compared });
                 }
