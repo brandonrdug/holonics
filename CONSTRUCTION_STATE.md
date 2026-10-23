@@ -30,7 +30,12 @@ the narrow (2.326 against 2.403 after two passes, on the PC); four levels code a
 read is carried in 64 bits (its scale is a gauge the step lengthens). The samplers release by
 agreement of `k` draws (`p^k/Σp^k`); at two the samples are mostly words, still not sentences. A
 section runs 2.4 times faster with the same bits: it had waited on the allocator's lock, and the
-workspace now builds for the host's vector units. The
+workspace now builds for the host's vector units. On the PC the wide tower reached 2.136 at pass 7
+and joins the route at 1.556 after pass 8, whose own read overflowed: a silent contact's moments
+stalled at a rounding remainder and drifted its weights `2^(−9)` a section; each moment now moves
+at least one grain toward its input. The gated mode (the RG-LRU's recurrence gate, each mode's
+decay keyed by its input with the push kept passive) lowers the 1,000-problem held-out code by
+3.5%, 3.3% and 4.0% over three passes at 1.5 times the time a section, and is the working law. The
 [record](research/records/2026-10-23_THE_MOMENT_TOWER_LEARNS_GSM8K_BYTES_ONCE_ITS_MODES_ARE_PASSIVE_AND_ITS_CONTACTS_READ_A_RATIO.md)
 holds both samples, the measurements and receipts.
 

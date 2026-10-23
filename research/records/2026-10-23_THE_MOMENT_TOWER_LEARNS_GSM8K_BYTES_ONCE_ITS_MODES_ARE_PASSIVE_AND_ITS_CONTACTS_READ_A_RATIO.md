@@ -227,6 +227,85 @@ the rate, so a row's drive moves with its fan-in), codes below the narrow at bot
 rate does not. The PC's narrow run, founded from other keys, reads within 1% of this host's
 (2.500, 2.403, 2.358 against 2.517, 2.404, 2.367).
 
+**The wide tower to six passes, and wider still.** The wide tower's pass-3 training was lost to
+the read's refusal; it continued on the PC from its pass-2 state with the 64-bit read:
+
+| pass | online code over the pass | held out | question | answer prose | answer digits | markup |
+|---|---|---|---|---|---|---|
+| 1 | - | 2.437 | - | - | - | - |
+| 2 | - | 2.326 | - | - | - | - |
+| 3 | 2.235 | 2.266 | 2.388 | 2.162 | 2.818 | 1.739 |
+| 4 | 2.179 | 2.220 | 2.347 | 2.121 | 2.770 | 1.652 |
+| 5 | 2.139 | 2.192 | 2.314 | 2.088 | 2.806 | 1.633 |
+| 6 | 2.110 | 2.162 | 2.286 | 2.066 | 2.711 | 1.586 |
+
+At pass 5 the wide tower reads 2.192 against the narrow's 2.310 (−5.1%), and its gain a pass
+(−0.060, −0.046, −0.028, −0.030) has not turned up. Twice as wide again (256 wide, 256 modes,
+1,024 contacts, rate `2^(−9)`, its own founding keys) read 2.537 after one pass, above both the
+wide tower's 2.437 and the narrow's 2.500 and above the wide in every region but the markup
+(1.940 against 1.973), at 344 ms a section against the wide tower's 97 ms (each alone on the PC,
+8 threads). Its certificate halved 56 times in its first 32 sections and twice after section 512.
+Width 128 is the working width, and the tower stays on the host's cores (agent-inferred: the wide
+tower runs a pass in 5.6 minutes on the PC's processor before the allocator repair below, and the
+card is for a width that pays and that the processor cannot carry; width 256 has not paid at one
+pass, and its second pass is not measured).
+
+After six passes, from the first held-out question (110 bytes, `John volunteers at a shelter…`),
+one draw:
+
+```text
+Jayet, has one-live from haves, gear two big solon balk in Millel's nuns, Tom's take won hours, how favid to=<<6/3=4>>4 founds.
+#### 20
+
+Milea friend in each dozen for Cando plags he number year. If Ben's spend car drine repances has 5-10 pead. Jenn, he eppitate, who nissonal card togeth, there are week, need need when Distus.  He previfled games, in a cards .7 been the First and a sspus are dryer
+```
+
+Two agreeing draws:
+
+```text
+The total number of money have a total of 10 dozen each of the second to cardet the curch to the total of the but of the subring $3 on each of the grop to a per for the drice to the resend typles of beads of the colls to sell bead on the number of shower to the play. How many cards to sold to clean white to make third the student for the compalls. If a park the cards $10 and a total of the balls, 
+```
+
+Neither recites: the longest runs found in the training text are 13 and 22 bytes (`, there are w`,
+`The total number of mo`).
+
+**Passes 7 and 8, and the join on all problems.** The wide tower continued on the PC for a
+declared twelve passes. Pass 7 read 2.136 held out (Q 2.256, P 2.036, N 2.702, M 1.594; online
+2.081). Pass 8 trained all 3,445 sections (its last 32 at 2.033 online) and rested, and its
+held-out read refused: the residual stream `x + W₂v + b₂` outgrew its 32-bit carrier. The second
+level's largest contact and return weights had grown from 3.4 and 0.68 at pass 6 to 15.5 and 15.5,
+together; the cause is [the moments' stall](#the-moments-stalled) below (agent-inferred for this
+tower from the matching signature: its states are on the PC). The receiving tree with its passage,
+trained on all 6,726 problems on the PC (`train-modes`, depth 24, horizon `2^13`), reproduces the
+container's state exactly (`a2eb835f…`, 0.410 bits a cell, 556 s). Read joined with it, frozen,
+on the 747 held-out problems:
+
+| tower | route | tower alone | joined | joined Q | P | N | M |
+|---|---|---|---|---|---|---|---|
+| wide, pass 6 | 1.591 | 2.158 | 1.559 | 1.679 | 1.339 | 2.399 | 1.490 |
+| wide, pass 8 | 1.591 | 2.120 | 1.556 | 1.677 | 1.336 | 2.401 | 1.477 |
+| narrow, pass 5 (above) | 1.591 | 2.301 | 1.574 | - | - | - | 1.578 |
+
+(`read-joined` reads the whole held-out text as one stream, so it did not meet the refusal.) The
+joined pair gains 2.2% over the route; most of it is markup (1.692 → 1.477) and digits (2.439 →
+2.401). From the same question, with the pass-8 tower joined, two agreeing draws:
+
+```text
+Mary has 7 more at a time.  How many hours does he volunteer per two dogs as a should be the adults than the discount to and another the largest and for the class had 20 per tickets does he takes him the she ate on her per year the fourth difference in pollywogs are on the time he then the third dog ate a percentage and he can the fourth day and add all her the third of the total number of peanut 
+```
+
+and one draw:
+
+```text
+Mary the zoo dance any month at He also each foyer read 100 dollars a monthouses until Haroltadpopcorper tested a saves 3 of her brother largest and he made a direction value from all hike. He area, but hrs 1 tagon hold her arson she number of inches at 4 hours does in the time hour at twice as many hours at a sale.  If in Gab hens does he wras as him volleyen profit them more per per shops has 10
+```
+
+The agreeing draw is a run of GSM8K's phrases that repeats the question's `How many hours does he
+volunteer per`. The longest runs found in the training text
+are 28 and 20 bytes (` the total number of peanut `, `twice as many hours `). With the pass-6
+tower the samples open on the same bytes (the same keys) and part at byte 78 (one draw) and 215
+(agreeing draws).
+
 **Release by agreement.** The samples above draw each class from the face itself. The samplers now
 take a declared number `k` of agreeing draws: the class falls where `k` independent draws from one
 face agree, so it is drawn from `p_i^k / Σ_j p_j^k`, exactly and with one key a class
@@ -309,10 +388,63 @@ writes the region of every byte. The tower's founding keys are 1 MiB read from t
 source; the samples draw from the 16 KiB key stream of the previous records' samples (hashes in
 `SAMPLES.tsv`); the partition is `tools/gsm8k/partition.py`'s.
 
+## The moments stalled
+
+A contact that stops conducting on every byte of a section gets an exactly zero covector, and its
+moments decay: `m ← m + release(g − m, 3)`, `v ← v + release(g² − v, 8)`. Released to the nearest
+grain, the decay stops where `|g − m| < 2^2` and `|g² − v| < 2^7`, so a silent contact's moments
+stay at `|m| ≤ 3` and `v ≤ 127` grains of `2^(−32)`, and its step `2^(−k) m/(√v + 2^(−32))` reads
+that remainder as a covector of a quarter of the rate: `3 · 2^(24−7)/12 = 2^15` grains, `2^(−9)` a
+section, in the sign of the contact's last covector, for every weight of the contact and its
+return. Read from the narrow tower's states on all 6,726 problems (moments with `0 < |m| ≤ 3`,
+`v ≤ 127`): none at pass 2, 980 at pass 3, 2,146 at pass 4, 1,994 at pass 5, almost all the weights
+of two contacts (the first level's 57th and the second level's 126th). One weight of the first
+moved −0.64 (pass 2), −2.45, −9.18, −15.91 (pass 5): `2^15` grains a section, `3,445 · 2^15 =
+112,885,760` a pass, exactly. A silent contact's drifted weights meet the residual stream at full
+scale once a byte makes it conduct again.
+
+The moment now moves at least one grain toward its input when the rounded release is zero
+(`hnn::tower::toward`): a constant input is reached exactly, and a silent contact's moments reach
+zero (`m` in three sections, `v` in 127), so its step does too. A moment far from its input moves
+by the rounded release as before; near it, by one grain more than before, at most `2^(−32)` bits
+a unit (`a_silent_moment_reaches_zero`). The weights that drifted keep their values. Every run
+before this fix trained with the stall; the 1,000-problem runs never reached it (no stalled moment
+in the narrow tower's seven passes).
+
+## The gated mode
+
+An ungated mode forgets at its founded rate whatever byte arrives, so a level cannot hold a
+quantity across bytes it should pass over. The gated mode (`TowerDeclaration::gated`; the law,
+its adjoint and its passivity in `hnn::tower`, "The gated mode") keys each mode's decay to the
+face it receives: a gate `r_t = 1/(1 + 2^(−q_t))`, `q_t = W_g x_t + b_g`, raises the founded
+modulus, `λ_t = |λ|^(2 r_t) λ/|λ|`, and the push stays passive, `γ_t = √(1 − |λ_t|²)`. The gate
+founds at zero material, where `r = ½` and the step is the ungated one. It adds 8,320 weights to
+132,224 (a 64 × 64 gate and 64 biases at each level) and costs 1.5 times the time a section (130
+against 87 ms on 100 problems). Its covector matches the code difference: a slope fitted over 16
+steps agrees within 10% at every level's push and at every gate weight whose covector reaches
+1/64 bit a unit (`the_gated_covector_matches_the_code_difference`).
+
+On 1,000 problems, three passes each, the narrow tower from the same founding keys:
+
+| tower | held out, passes 1–3 | Q | P | N | M (pass 3) | online, pass 3 | wall s (projected) |
+|---|---|---|---|---|---|---|---|
+| plain, before the moment fix (above) | 2.828, 2.687, 2.628 | 2.726 | 2.535 | 3.443 | 2.012 | 2.628 | - |
+| plain | 2.842, 2.690, 2.647 | 2.745 | 2.565 | 3.423 | 1.999 | 2.638 | 140.7 (156) |
+| gated | 2.743, 2.601, 2.542 | 2.656 | 2.442 | 3.366 | 1.872 | 2.509 | 227.8 (233) |
+
+The gate lowers the held-out code by 3.5%, 3.3% and 4.0% a pass; by pass 3 in every region, most
+in the markup (6.4%), while at pass 1 its digits read higher (3.680 against 3.449). Its two passes take about the time of the plain tower's three (151.5 s against
+140.7 s) and read 2.601 against 2.647; its third reads below the ungated tower's sixth (2.554).
+The moment fix moves the plain tower by +0.5%, +0.1% and +0.7%: no moment stalls in these
+passes, so this is the one-grain step near arrived moments, within the 0.7% that separates two
+founding keys on all problems. Decision (agent-inferred, from this measurement): the gated mode is
+the tower's working law from here.
+
 ## Not claimed
 
-The tower is classical selective state-space machinery at the codec's byte classes; its
-nonlinearity sits between levels, not in the state's lock. The join is a geometric mixture of two
+The tower is classical state-space machinery at the codec's byte classes: ungated, a linear
+recurrence of fixed decays (the LRU's); gated, the RG-LRU's selective recurrence. Its nonlinearity
+sits between levels and in the gate, not in the state's lock. The join is a geometric mixture of two
 faces. Nothing here grades a generation against an answer.
 
 ## Owed
@@ -320,3 +452,6 @@ faces. Nothing here grades a generation against an answer.
 - The agreement release `P(c₁ = … = c_k = i | all agree) = p_i^k / Σ_j p_j^k` in Lean (#410).
 - The passive mode's bound `|h| ≤ √((1 + |λ|)/(1 − |λ|)) max|Bx|` under the step's `γ`, and the
   certified section's strict descent, in Lean (#410).
+- The gated mode's bound under a moving radius, `|h_t| ≤ √((1 + ρ_max)/(1 − ρ_max)) max|Bx|` for
+  `ρ_t ≤ ρ_max < 1` and `γ_t = √(1 − ρ_t²)`, and the moment law's arrival (`toward` reaches a
+  constant input exactly), in Lean (#410).
