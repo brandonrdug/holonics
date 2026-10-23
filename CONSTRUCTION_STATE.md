@@ -28,7 +28,9 @@ take the held-out problems to 2.404, and five to 2.310; joined to the route trai
 them, 1.574 against 1.591. On all problems a twice-as-wide tower with its step halved codes below
 the narrow (2.326 against 2.403 after two passes, on the PC); four levels code above it. The raw
 read is carried in 64 bits (its scale is a gauge the step lengthens). The samplers release by
-agreement of `k` draws (`p^k/Σp^k`); at two the samples are mostly words, still not sentences. The
+agreement of `k` draws (`p^k/Σp^k`); at two the samples are mostly words, still not sentences. A
+section runs 2.4 times faster with the same bits: it had waited on the allocator's lock, and the
+workspace now builds for the host's vector units. The
 [record](research/records/2026-10-23_THE_MOMENT_TOWER_LEARNS_GSM8K_BYTES_ONCE_ITS_MODES_ARE_PASSIVE_AND_ITS_CONTACTS_READ_A_RATIO.md)
 holds both samples, the measurements and receipts.
 
