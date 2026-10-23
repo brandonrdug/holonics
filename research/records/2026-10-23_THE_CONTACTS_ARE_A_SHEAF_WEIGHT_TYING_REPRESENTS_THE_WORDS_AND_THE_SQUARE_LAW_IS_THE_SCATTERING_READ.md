@@ -273,7 +273,10 @@ any release `β_(t+1) = R(β'_t)`:
 Σ_t −ln q_t = Σ_t −ln e_t + ln(1 + 1/β_0) − ln(1 + 1/β_n) + Σ_t [ln(1 + 1/β_(t+1)) − ln(1 + 1/β'_t)]
 ```
 
-It holds for the executed faces and the executed ratio, with no ideal to track. Release the
+It holds for the executed faces and the executed ratio, with no ideal to track. (In
+`compression::landmark::context` the node's own KT face is named `k` and the child's face `x`, so
+`q = (βk + x)/(1 + β)` and `β' = βk/x`: this section's `e` is the code's `k`, and this section's `k`
+the code's `x`.) Release the
 ratio into `[2^(−K), 2^K]` on a mantissa of `w` bits:
 - a release at the upper bound costs at most `log₂(1 + 2^(−K))` bits against `e`, the face the ratio
   favours, and nothing against `k`; the lower bound mirrors it; a rounding costs at most
