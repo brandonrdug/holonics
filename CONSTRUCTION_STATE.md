@@ -17,6 +17,17 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 23: the copy contact carries the question's pieces into the answer (host).** The units'
+tower's face is read in base-four cells and joined at each cell to the passage tree's news and its
+node lock, with weights that open at zero and take the Newton step. On the 747 held-out problems
+the code falls from 1.837 to 1.587 bits a byte, most in the answer prose (1.724 to 1.264). The
+samples now reuse the question's pieces (`at a shelter`, `twice`, `for 3 hours at a time.  How
+many hours does he`), but none answers about John (12 of 16 open on another name), and the
+arithmetic is wrong. The subject is the prompt's first unit and follows no context the answer's
+opening can locate; that is the next failure. The
+[record](research/records/2026-10-23_THE_COPY_CONTACT_CARRIES_THE_QUESTIONS_PIECES_INTO_THE_ANSWER_AND_THE_SUBJECT_STILL_DRIFTS.md)
+holds the samples and receipts.
+
 **October 23: units founded by code length carry the tower above the byte (host).**
 `hnn::units` founds units from the passage: an adjacent pair becomes one unit exactly when the
 complete code (the order-one KT code in the units plus their description) falls. On all 6,726

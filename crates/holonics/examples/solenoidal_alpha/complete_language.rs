@@ -15,6 +15,8 @@ mod native_train;
 mod modes_train;
 #[path = "complete_language/tower_train.rs"]
 mod tower_train;
+#[path = "complete_language/unit_copy.rs"]
+mod unit_copy;
 
 #[cfg(test)]
 #[path = "complete_language/code_parallel_controls.rs"]
@@ -778,6 +780,8 @@ pub(super) fn run_with_execution(
         Some("found-units") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_units(args),
         Some("train-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args),
         Some("sample-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample_units(args),
+        Some("read-unit-copy") if backend == CompleteLanguageTrainingBackend::HostReference => unit_copy::read(args),
+        Some("sample-unit-copy") if backend == CompleteLanguageTrainingBackend::HostReference => unit_copy::sample(args),
         Some("read-joined") if backend == CompleteLanguageTrainingBackend::HostReference => modes_train::read_joined(args),
         Some("sample-joined") if backend == CompleteLanguageTrainingBackend::HostReference => modes_train::sample_joined(args),
         Some("sample-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample(args),
