@@ -135,6 +135,48 @@ the result repeated after `>>` (`<<10+3=12>>12`, `<<60-3=26>>26`), and a `####` 
 wrong arithmetic and invented words. The join writes question-shaped lines with more real words.
 Neither is readable as an answer.
 
+## On all 6,726 problems
+
+The same tower, trained fresh for two passes on the whole training partition (3,528,168 bytes, 3,445
+sections a pass, every one deposited), read on the same 747 held-out problems:
+
+| reading | bits a byte | question | answer prose | answer digits | markup |
+|---|---|---|---|---|---|
+| tower, pass 1 | 2.517 | 2.631 | 2.422 | 3.144 | 1.941 |
+| tower, pass 2 | 2.404 | 2.521 | 2.312 | 2.964 | 1.849 |
+| route on all problems (`lockall`) | 1.591 | 1.699 | 1.352 | 2.439 | 1.692 |
+| joined | 1.579 | 1.690 | 1.349 | 2.419 | 1.628 |
+
+One pass over all problems codes the held-out problems below seven passes over 1,000 (2.517
+against 2.531); the second pass takes them to 2.404, and the online code over the pass (2.408) sits
+level with the held-out code, so the tower is not yet fitting its training text more closely than
+text it never saw. Joined to the route trained on the same problems, it takes 0.75% off the
+route's 1.591, again mostly in the markup (1.692 to 1.628, −3.8%); the join's weights are 11382,
+13937, 7497 and 4129 on `2^(−16)`. With seven times the problems the route gained 11% and the
+tower 5%, so the tower's share of the joined code shrank.
+
+The tower alone after pass 2:
+
+```text
+Jass was 2 years, the yener?
+Ell woungles $40/4= <<18/1=4>>8 hours peach $2.50, catanjupba to pets one-the istarjarip can, how much money  Caghet cepeired bard a's wore to the 6 vivery hour than wame 10 to store is colloe has Bennide 12 games. Weartips on one edriting a cruake. If How many soney to duel: 5 lructrom?
+Hind yeeds 75% ine doyes 30 shounds five times 20+4 vaced and, bieks dill have Toc
+```
+
+Joined to the route on all problems:
+
+```text
+Jufflowing once.  How far drinks taller at entir ( the amoas bought some to hours in the conies at a time.  How many hours does each firewolf tour ideallards did Eman plant's considers are per day thers at what is the animals a month n 300 races and twice as many hours at made the third 1. How many double the access hadn't hit head arling hour peanuts - 8 clowns 1/3 less the vowermen hand 200 cars
+```
+
+The joined sample carries a phrase of the prompt ("at a time.  How many hours does") inside
+question-shaped text. Neither sample is readable.
+
+The first launch planned three passes; its first 96 sections ran at 0.191 s a section against the
+0.177 s projected from the 1,000-problem run, so it was stopped at 31.1 s and relaunched at two
+passes (projected 1,366 s, deadline 1,450 s, measured 1,204.6 s and 110 MiB: 0.88). The joined
+read took 199.5 s and 2.6 GiB, the samples 0.3 s and 11.3 s.
+
 ## Speed and receipts
 
 A pass takes 93 to 99 s on the host, including the held-out read. The seven-pass run took 674.3 s

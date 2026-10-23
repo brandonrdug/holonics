@@ -23,7 +23,9 @@ push `γ = √(1 − |λ|²)`, rectifying contacts that read the modes' face as 
 levels, and certified sections. Seven passes on 1,000 problems take the 747 held-out problems from
 2.828 to 2.531 bits a byte; `CellJoin` with the frozen route codes them at 1.754 against the
 route's 1.786, most of it in the calculation markup (1.975 to 1.851). Its samples write well-formed
-`<<a op b=c>>c` markup with wrong arithmetic and invented words. The
+`<<a op b=c>>c` markup with wrong arithmetic and invented words. Two passes on all 6,726 problems
+take the held-out problems to 2.404, and joined to the route trained on all of them, 1.579 against
+1.591. The
 [record](research/records/2026-10-23_THE_MOMENT_TOWER_LEARNS_GSM8K_BYTES_ONCE_ITS_MODES_ARE_PASSIVE_AND_ITS_CONTACTS_READ_A_RATIO.md)
 holds both samples, the measurements and receipts.
 
