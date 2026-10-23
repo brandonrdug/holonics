@@ -1,0 +1,57 @@
+DUPLEX_TRAIN strand_material=140544 meeting_material=98816 streams=8 section=128 sections_a_pass=211 train_bytes=216131 dev_bytes=47970
+DUPLEX_SECTION pass=0 section=32 forward=3.525 reverse=3.486 meeting=3.353 deposits=32 halvings=35 elapsed_ms=14318
+DUPLEX_SECTION pass=0 section=64 forward=2.570 reverse=2.596 meeting=2.325 deposits=64 halvings=36 elapsed_ms=23974
+DUPLEX_SECTION pass=0 section=96 forward=2.519 reverse=2.542 meeting=2.252 deposits=96 halvings=36 elapsed_ms=33068
+DUPLEX_SECTION pass=0 section=128 forward=2.483 reverse=2.516 meeting=2.205 deposits=128 halvings=36 elapsed_ms=42394
+DUPLEX_SECTION pass=0 section=160 forward=2.464 reverse=2.493 meeting=2.172 deposits=160 halvings=36 elapsed_ms=52038
+DUPLEX_SECTION pass=0 section=192 forward=2.445 reverse=2.454 meeting=2.119 deposits=192 halvings=37 elapsed_ms=61489
+DUPLEX_SECTION pass=0 section=211 forward=2.417 reverse=2.442 meeting=2.100 deposits=211 halvings=38 elapsed_ms=66894
+DUPLEX_STATE STATE.0 state_bytes=12458952 state_sha256=24e3ac4631b7517b23603886ebbd4765aca6ced82a4b2b7f96351bef90441e0d
+DUPLEX_PASS pass=0 train_forward=2.645 train_reverse=2.660 train_meeting=2.377 dev_forward Q=2.966 P=2.950 N=2.438 M=2.215 dev_meeting Q=2.897 P=2.884 N=2.097 M=1.845 deposits=211/211 pass_ms=70657 elapsed_ms=70673
+DUPLEX_SECTION pass=1 section=32 forward=2.425 reverse=2.440 meeting=2.087 deposits=32 halvings=0 elapsed_ms=79974
+DUPLEX_SECTION pass=1 section=64 forward=2.380 reverse=2.407 meeting=2.040 deposits=64 halvings=0 elapsed_ms=89176
+DUPLEX_SECTION pass=1 section=96 forward=2.359 reverse=2.392 meeting=1.993 deposits=96 halvings=0 elapsed_ms=98230
+DUPLEX_SECTION pass=1 section=128 forward=2.355 reverse=2.395 meeting=1.979 deposits=128 halvings=0 elapsed_ms=107301
+DUPLEX_SECTION pass=1 section=160 forward=2.335 reverse=2.374 meeting=1.950 deposits=160 halvings=0 elapsed_ms=116070
+DUPLEX_SECTION pass=1 section=192 forward=2.325 reverse=2.353 meeting=1.923 deposits=192 halvings=0 elapsed_ms=125824
+DUPLEX_SECTION pass=1 section=211 forward=2.319 reverse=2.332 meeting=1.888 deposits=211 halvings=1 elapsed_ms=131372
+DUPLEX_STATE STATE.1 state_bytes=12600201 state_sha256=75054911efc88eed23284e93aed66d56b076e2240d5a41630cd7a77e7b5cf6f3
+DUPLEX_PASS pass=1 train_forward=2.359 train_reverse=2.388 train_meeting=1.986 dev_forward Q=2.941 P=2.891 N=1.561 M=2.200 dev_meeting Q=2.760 P=2.706 N=1.254 M=1.658 deposits=211/211 pass_ms=64665 elapsed_ms=135340
+DUPLEX_SECTION pass=2 section=32 forward=2.324 reverse=2.339 meeting=1.895 deposits=32 halvings=0 elapsed_ms=144587
+DUPLEX_SECTION pass=2 section=64 forward=2.273 reverse=2.320 meeting=1.840 deposits=64 halvings=0 elapsed_ms=153890
+DUPLEX_SECTION pass=2 section=96 forward=2.260 reverse=2.302 meeting=1.796 deposits=96 halvings=0 elapsed_ms=163164
+DUPLEX_SECTION pass=2 section=128 forward=2.248 reverse=2.301 meeting=1.778 deposits=128 halvings=0 elapsed_ms=172220
+DUPLEX_SECTION pass=2 section=160 forward=2.235 reverse=2.284 meeting=1.748 deposits=160 halvings=0 elapsed_ms=181356
+DUPLEX_SECTION pass=2 section=192 forward=2.227 reverse=2.270 meeting=1.727 deposits=192 halvings=0 elapsed_ms=190366
+DUPLEX_SECTION pass=2 section=211 forward=2.194 reverse=2.244 meeting=1.668 deposits=211 halvings=0 elapsed_ms=195786
+DUPLEX_STATE STATE.2 state_bytes=12349398 state_sha256=e5bebca17a850cf2ec8bfac56b8d4751004f778008524d4f75efd4e60957d639
+DUPLEX_PASS pass=2 train_forward=2.255 train_reverse=2.297 train_meeting=1.786 dev_forward Q=2.378 P=2.319 N=1.179 M=2.198 dev_meeting Q=2.254 P=2.197 N=0.962 M=1.503 deposits=211/211 pass_ms=64213 elapsed_ms=199555
+DUPLEX_SECTION pass=3 section=32 forward=2.237 reverse=2.250 meeting=1.704 deposits=32 halvings=0 elapsed_ms=208599
+DUPLEX_SECTION pass=3 section=64 forward=2.192 reverse=2.249 meeting=1.662 deposits=64 halvings=0 elapsed_ms=217651
+DUPLEX_SECTION pass=3 section=96 forward=2.175 reverse=2.234 meeting=1.624 deposits=96 halvings=0 elapsed_ms=226799
+DUPLEX_SECTION pass=3 section=128 forward=2.162 reverse=2.212 meeting=1.577 deposits=128 halvings=0 elapsed_ms=235966
+DUPLEX_SECTION pass=3 section=160 forward=2.164 reverse=2.206 meeting=1.573 deposits=160 halvings=0 elapsed_ms=245455
+DUPLEX_SECTION pass=3 section=192 forward=2.151 reverse=2.187 meeting=1.546 deposits=192 halvings=0 elapsed_ms=254982
+DUPLEX_SECTION pass=3 section=211 forward=2.146 reverse=2.162 meeting=1.531 deposits=211 halvings=0 elapsed_ms=260615
+DUPLEX_STATE STATE.3 state_bytes=12321445 state_sha256=4f4651fbcbf78833b04cf6d4bbfa8750b6dc7f6c2091d6063bbf0d899ecf3688
+DUPLEX_PASS pass=3 train_forward=2.177 train_reverse=2.218 train_meeting=1.607 dev_forward Q=2.235 P=2.201 N=1.204 M=2.189 dev_meeting Q=2.085 P=2.056 N=0.949 M=1.398 deposits=211/211 pass_ms=65384 elapsed_ms=264942
+DUPLEX_SECTION pass=4 section=32 forward=2.157 reverse=2.176 meeting=1.534 deposits=32 halvings=0 elapsed_ms=274675
+DUPLEX_SECTION pass=4 section=64 forward=2.119 reverse=2.182 meeting=1.504 deposits=64 halvings=0 elapsed_ms=283719
+DUPLEX_SECTION pass=4 section=96 forward=2.108 reverse=2.174 meeting=1.475 deposits=96 halvings=0 elapsed_ms=292789
+DUPLEX_SECTION pass=4 section=128 forward=2.106 reverse=2.156 meeting=1.451 deposits=128 halvings=0 elapsed_ms=301578
+DUPLEX_SECTION pass=4 section=160 forward=2.092 reverse=2.148 meeting=1.425 deposits=160 halvings=0 elapsed_ms=310845
+DUPLEX_SECTION pass=4 section=192 forward=2.105 reverse=2.158 meeting=1.450 deposits=192 halvings=0 elapsed_ms=320103
+DUPLEX_SECTION pass=4 section=211 forward=2.096 reverse=2.132 meeting=1.443 deposits=211 halvings=0 elapsed_ms=325575
+DUPLEX_STATE STATE.4 state_bytes=12279290 state_sha256=58206486e745c4dacbaabd374b67dddf4d4a9160a2f2eb63f64943fa8e149d35
+DUPLEX_PASS pass=4 train_forward=2.113 train_reverse=2.163 train_meeting=1.471 dev_forward Q=2.113 P=2.075 N=0.951 M=2.190 dev_meeting Q=2.013 P=2.003 N=0.740 M=1.357 deposits=211/211 pass_ms=64801 elapsed_ms=329745
+DUPLEX_SECTION pass=5 section=32 forward=2.122 reverse=2.137 meeting=1.443 deposits=32 halvings=0 elapsed_ms=338774
+DUPLEX_SECTION pass=5 section=64 forward=2.065 reverse=2.127 meeting=1.379 deposits=64 halvings=0 elapsed_ms=347635
+DUPLEX_SECTION pass=5 section=96 forward=2.068 reverse=2.143 meeting=1.386 deposits=96 halvings=0 elapsed_ms=356820
+DUPLEX_SECTION pass=5 section=128 forward=2.054 reverse=2.142 meeting=1.362 deposits=128 halvings=0 elapsed_ms=365721
+DUPLEX_SECTION pass=5 section=160 forward=2.044 reverse=2.112 meeting=1.336 deposits=160 halvings=0 elapsed_ms=374493
+DUPLEX_SECTION pass=5 section=192 forward=2.064 reverse=2.126 meeting=1.364 deposits=192 halvings=0 elapsed_ms=383311
+DUPLEX_SECTION pass=5 section=211 forward=2.041 reverse=2.093 meeting=1.318 deposits=211 halvings=1 elapsed_ms=388770
+DUPLEX_STATE STATE.5 state_bytes=12064572 state_sha256=3ff5b008e483f98f98cee2c131f5ab1e2e0a9245d3fafcc97c97cba83b8c1d3f
+DUPLEX_PASS pass=5 train_forward=2.067 train_reverse=2.128 train_meeting=1.373 dev_forward Q=1.841 P=1.804 N=0.936 M=2.184 dev_meeting Q=1.683 P=1.659 N=0.741 M=1.217 deposits=211/211 pass_ms=63124 elapsed_ms=392871
+DUPLEX_DONE state_bytes=12064572 state_sha256=3ff5b008e483f98f98cee2c131f5ab1e2e0a9245d3fafcc97c97cba83b8c1d3f regions=Q,P,N,M elapsed_ms=393029
+MEASURE exit=0 wall_s=393.1 peak_rss_kib=281260

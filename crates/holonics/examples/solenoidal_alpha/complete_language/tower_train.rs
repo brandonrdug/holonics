@@ -82,12 +82,13 @@ pub(super) fn per(code: i64, n: usize) -> String {
 }
 
 /// `train-tower` trains the ungated tower, `train-gated-tower` the gated one (its modes' decay keyed by
-/// their input), and `train-credited-tower` the gated one whose streams carry their passage credit
+/// their input), `train-turned-tower` the turned one (its gated modes' turn keyed by their input too),
+/// and `train-credited-tower` the gated one whose streams carry their passage credit
 /// (`hnn::tower::LevelCredit`), so a section's covector reaches the history its opening carries; a
 /// continued learner must carry the same declaration.
-pub(super) fn train(args: &[String], gated: bool, credit: bool) -> Result<()> {
+pub(super) fn train(args: &[String], gated: bool, turned: bool, credit: bool) -> Result<()> {
     if args.len() != 18 && args.len() != 20 {
-        return Err("train-tower|train-gated-tower|train-credited-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+        return Err("train-tower|train-gated-tower|train-turned-tower|train-credited-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
     let train = pinned_read(&args[1], &args[2], READ_BUDGET as usize)?;
     let dev = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
@@ -100,7 +101,7 @@ pub(super) fn train(args: &[String], gated: bool, credit: bool) -> Result<()> {
         dev_roles: roles,
         alphabet: 256,
     };
-    fit(&args[7..], reading, gated, credit)
+    fit(&args[7..], reading, gated, turned, credit)
 }
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
@@ -133,7 +134,7 @@ pub(super) fn train_units(args: &[String]) -> Result<()> {
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len() };
-    fit(&args[9..], reading, true, false)
+    fit(&args[9..], reading, true, false, false)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -149,7 +150,7 @@ struct Reading {
 
 /// The passes: `args` are `KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS
 /// OUT [FROM FROM_SHA]`.
-fn fit(args: &[String], reading: Reading, gated: bool, credit: bool) -> Result<()> {
+fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, credit: bool) -> Result<()> {
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -159,6 +160,7 @@ fn fit(args: &[String], reading: Reading, gated: bool, credit: bool) -> Result<(
         contacts: count(&args[4])?,
         levels: count(&args[5])?,
         gated,
+        turned,
     };
     let streams = count(&args[6])?;
     let section = count(&args[7])?;

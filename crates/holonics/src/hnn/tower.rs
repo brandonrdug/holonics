@@ -64,6 +64,16 @@
 //! under that hold the passivity bound below holds cell by cell, `|h_t| ≤ ρ_t |h_(t−1)| + γ_t |Bx_t|
 //! ≤ √((1 + ρ_max)/(1 − ρ_max)) max|Bx|`, since `γ/(1 − ρ)` increases with `ρ`.
 //!
+//! **The turned mode** ([`TowerDeclaration::turned`], agent-inferred, October 23). A gated mode
+//! whose turn is keyed too: the arriving symbol turns it by `s_t = 2^(−⌈log₂ w⌉) (W_φ x^ℓ_t + b_φ)`
+//! half turns on `2^(−16)` (the drive read as its mean over the width), `λ_t = ρ_t u e^(iπ s_t)`, so
+//! a mode can carry a residue as its accumulated phase (on the units of `ℤ/q` the index chart turns
+//! a product into a sum of turns). `e^(iπ s)` is composed from the dyadic ladder `e^(iπ/2^j)` by the
+//! binary digits of `s` modulo the full turn, the half turn `π` from Machin's series. The turn's
+//! material opens at zero, so a turned tower opens on its gated twin. Its covector is the turn's
+//! share of the move's, `G_s(t) = π 2^(−⌈log₂ w⌉) Re(conj(i λ_t) G_λ(t))`, to `W_φ` and `b_φ` (the
+//! code's difference agrees, tested). The passage credit does not carry it (a typed refusal).
+//!
 //! **The contacts read a ratio.** A contact conducts on the direction of the modes' face, not its
 //! power: `r̂ = r / ‖r‖_rms`, with the adjoint `∂r = (∂r̂ − r̂ ⟨r̂, ∂r̂⟩/d) / ‖r‖_rms`. Read on its
 //! power, the drive followed the face's scale (some 50 units on the 1,000-problem passage), a step
@@ -174,6 +184,9 @@ pub struct TowerDeclaration {
     pub levels: usize,
     /// Whether each mode's decay is keyed by its input (the gated mode, in the module's law).
     pub gated: bool,
+    /// Whether each gated mode's turn is keyed by its input too (the turned mode): the arriving
+    /// symbol turns the mode, so a mode can carry a residue as its phase.
+    pub turned: bool,
 }
 
 /// Where each family of the material sits in the one vector, and its grain.
@@ -192,6 +205,9 @@ struct LevelLayout {
     /// The gate's material and bias (empty families when ungated).
     gate: usize,
     gate_bias: usize,
+    /// The turn's material and bias (empty families when unturned).
+    turn: usize,
+    turn_bias: usize,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -232,10 +248,16 @@ impl Layout {
                 ret_bias: take(w, FACE_BITS),
                 gate: 0,
                 gate_bias: 0,
+                turn: 0,
+                turn_bias: 0,
             };
             if d.gated {
                 level.gate = take(n * w, MATERIAL_BITS);
                 level.gate_bias = take(n, FACE_BITS);
+            }
+            if d.turned {
+                level.turn = take(n * w, MATERIAL_BITS);
+                level.turn_bias = take(n, FACE_BITS);
             }
             levels.push(level);
         }
@@ -482,6 +504,8 @@ struct LevelCell {
 #[derive(Clone, Copy, Debug, Default)]
 struct GatedMove {
     open: i64,
+    /// `λ_t/ρ_t`: the founded unit, turned by the arriving symbol when the mode is turned.
+    unit: (i64, i64),
     lam: (i64, i64),
     rho: i64,
     gamma: i64,
@@ -536,7 +560,11 @@ impl Default for TowerFace {
 /// The reaches of every family, read once a section.
 #[derive(Clone, Debug)]
 struct Reaches {
-    levels: Vec<[u64; 7]>,
+    levels: Vec<[u64; 8]>,
+    /// The turned modes' ladder `e^(iπ/2^i)`, `i = 0..=TURN_BITS`, on `2^(−30)`, and the half turn
+    /// `π` on `2^(−30)` (empty and zero when unturned).
+    ladder: Vec<(i128, i128)>,
+    half_turn: i128,
     readout: u64,
     /// Each level's `γ_k = √(1 − |λ_k|²)` on `2^(−30)`.
     gammas: Vec<Vec<i128>>,
@@ -565,6 +593,70 @@ fn exp_series(a: i128, b: i128) -> (i128, i128) {
         sum = (sum.0 + term.0, sum.1 + term.1);
         k += 1;
     }
+}
+
+/// The turned mode's grain: a turn is read in half turns on `2^(−16)`, the face's grain.
+const TURN_BITS: u32 = FACE_BITS;
+
+/// The turn's spread over a level's width, `⌈log₂ w⌉`: the arriving drive is read as its mean over
+/// the width, `s_t = 2^(−spread) (W_φ x + b_φ)`, so a deposit that moves every one of a mode's turn
+/// weights by one rate step turns the mode by that step's share of a half turn, as a gate's moves
+/// its logit by a share of a doubling. [agent-inferred, October 23: read at the full drive, one
+/// rate step `2^(−7)` over 64 inputs of unit size turned a mode by up to half a half turn, and the
+/// terrain's second pass coded more bits section after section as the certificate halved its
+/// steps 626 times.]
+fn turn_spread(width: usize) -> u32 {
+    usize::BITS - width.saturating_sub(1).leading_zeros()
+}
+
+/// `e^(iπ/2^i)` on `2^(−30)` for `i = 0..=TURN_BITS`: the half turn, the quarter turn, then each
+/// half angle, `cos(θ/2) = √((1 + cos θ)/2)` and `sin(θ/2) = sin θ/(2 cos(θ/2))` (the sine by the
+/// quotient, which keeps its relative grain where `1 − cos θ` would not), on `2^(−60)` released
+/// once.
+fn turn_ladder_faces() -> Vec<(i128, i128)> {
+    const FINE: u32 = 60;
+    let one = 1i128 << FINE;
+    let mut out = vec![(-(1i128 << MOVE_BITS), 0), (0, 1i128 << MOVE_BITS)];
+    let (mut c, mut s) = (0i128, one);
+    for _ in 1..TURN_BITS {
+        let half = ((((one + c) as u128) << FINE) >> 1).isqrt() as i128;
+        s = div_nearest(s << FINE, 2 * half);
+        c = half;
+        out.push((release(c, FINE - MOVE_BITS), release(s, FINE - MOVE_BITS)));
+    }
+    out
+}
+
+/// `π` on `2^(−bits)` by Machin's series `π = 16 atan(1/5) − 4 atan(1/239)`, each term an exact
+/// quotient sixteen grains finer, released once: the half turn's navigator face.
+fn half_turn(bits: u32) -> i128 {
+    const GUARD: u32 = 16;
+    let one = 1i128 << (bits + GUARD);
+    let atan_inverse = |k: i128| -> i128 {
+        let (mut power, mut sum, mut n) = (one / k, 0i128, 0i128);
+        while power != 0 {
+            let term = power / (2 * n + 1);
+            sum += if n % 2 == 0 { term } else { -term };
+            power /= k * k;
+            n += 1;
+        }
+        sum
+    };
+    release(16 * atan_inverse(5) - 4 * atan_inverse(239), GUARD)
+}
+
+/// `e^(iπ s)` on `2^(−30)` for a turn `s` in half turns on `2^(−16)`: `s` read modulo the full
+/// turn and composed from the ladder's dyadic turns, its binary digits from the half turn down.
+fn turn_face(s: i64, ladder: &[(i128, i128)]) -> (i128, i128) {
+    let full = 1i64 << (TURN_BITS + 1);
+    let j = s.rem_euclid(full) as u64;
+    let mut value = (1i128 << MOVE_BITS, 0i128);
+    for (i, &(cr, ci)) in ladder.iter().enumerate() {
+        if j & (1u64 << (TURN_BITS as usize - i)) != 0 {
+            value = (release(value.0 * cr - value.1 * ci, MOVE_BITS), release(value.0 * ci + value.1 * cr, MOVE_BITS));
+        }
+    }
+    value
 }
 
 /// `r̂ = r / ‖r‖_rms` on `2^(−16)` and `‖r‖_rms` on `2^(−16)`, `r` on `2^(−16)`; a zero face reads
@@ -611,6 +703,9 @@ impl Tower {
         let d = declaration;
         if d.alphabet < 2 || d.width == 0 || d.modes == 0 || d.contacts == 0 || d.levels == 0 {
             return refuse("a tower needs two classes and a nonempty width, bank, contacts and levels");
+        }
+        if d.turned && !d.gated {
+            return refuse("a turned mode is a gated mode");
         }
         let layout = Layout::new(&d);
         let mut theta = vec![0i32; layout.len];
@@ -659,7 +754,8 @@ impl Tower {
             let dd = ((d.width as u128) << 32).isqrt();
             uniform(&mut theta[lv.contact..lv.contact + d.contacts * d.width], six, dd, MATERIAL_BITS)?;
         }
-        // The gate's material and bias open at zero: r = ½, the founded move.
+        // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
+        // so a turned tower opens on its gated twin.
         Ok(Self { declaration: d, theta, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
@@ -699,6 +795,7 @@ impl Tower {
                     reach(&t[lv.contact..lv.contact + d.contacts * d.width]),
                     reach(&t[lv.ret..lv.ret + d.width * d.contacts]),
                     if d.gated { reach(&t[lv.gate..lv.gate + d.modes * d.width]) } else { 0 },
+                    if d.turned { reach(&t[lv.turn..lv.turn + d.modes * d.width]) } else { 0 },
                 ]
             })
             .collect();
@@ -734,7 +831,8 @@ impl Tower {
                 })
                 .collect()
         };
-        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), gammas, gates }
+        let (ladder, half_turn) = if d.turned { (turn_ladder_faces(), half_turn(MOVE_BITS)) } else { (Vec::new(), 0) };
+        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), gammas, gates, ladder, half_turn }
     }
 
     /// One cell forward: the class `u` arrives, every level's modes move, and the face of the next
@@ -763,6 +861,14 @@ impl Tower {
                 let faces = &reaches.gates[l];
                 let mut q = vec![0i64; n];
                 affine(&t[lv.gate..lv.gate + n * w], r[6], w, &x, Some(&t[lv.gate_bias..lv.gate_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut q)?;
+                // The arriving symbol's turn `s_t = 2^(−spread) (W_φ x + b_φ)`, in half turns on 2^(−16).
+                let mut turns = vec![0i64; if d.turned { n } else { 0 }];
+                if d.turned {
+                    affine(&t[lv.turn..lv.turn + n * w], r[7], w, &x, Some(&t[lv.turn_bias..lv.turn_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut turns)?;
+                    for v in &mut turns {
+                        *v = fit64(release(*v as i128, turn_spread(w)))?;
+                    }
+                }
                 gate.reserve_exact(n);
                 for k in 0..n {
                     let open = logistic(&self.exponential, q[k]);
@@ -772,13 +878,17 @@ impl Tower {
                     if held {
                         rho = radius();
                     }
-                    let (ur, ui) = faces.units[k];
+                    let (mut ur, mut ui) = faces.units[k];
+                    if d.turned {
+                        let (tr, ti) = turn_face(turns[k], &reaches.ladder);
+                        (ur, ui) = (release(ur * tr - ui * ti, MOVE_BITS), release(ur * ti + ui * tr, MOVE_BITS));
+                    }
                     let (lr, li) = (release(rho * ur, MOVE_BITS), release(rho * ui, MOVE_BITS));
                     let (_, gamma) = modulus_and_gamma(lr, li);
                     if gamma == 0 {
                         return refuse("a gated move reached the unit circle");
                     }
-                    gate.push(GatedMove { open: open as i64, lam: (lr as i64, li as i64), rho: rho as i64, gamma: gamma as i64, held });
+                    gate.push(GatedMove { open: open as i64, unit: (ur as i64, ui as i64), lam: (lr as i64, li as i64), rho: rho as i64, gamma: gamma as i64, held });
                 }
             }
             let modes = &mut state.modes[l];
@@ -958,6 +1068,7 @@ impl Tower {
             let mut along = vec![0i128; n];
             let mut around = vec![0i128; n];
             let mut dqs: Vec<Vec<i64>> = Vec::with_capacity(if d.gated { cells_n } else { 0 });
+            let mut dss: Vec<Vec<i64>> = Vec::with_capacity(if d.turned { cells_n } else { 0 });
             let mut gres: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut gims: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             for (i, cell) in cells.iter().enumerate() {
@@ -965,6 +1076,7 @@ impl Tower {
                 let previous: &[(i64, i64)] = if i == 0 { &opening.modes[l] } else { &cells[i - 1].levels[l].state };
                 let gh = &gh_all[i];
                 let mut dq = vec![0i64; if d.gated { n } else { 0 }];
+                let mut ds = vec![0i64; if d.turned { n } else { 0 }];
                 for k in 0..n {
                     let (hr, hi) = (previous[k].0 as i128, previous[k].1 as i128);
                     let (gr, gi) = (gh[k].0 as i128, gh[k].1 as i128);
@@ -979,9 +1091,15 @@ impl Tower {
                         }
                         Some(m) => {
                             let faces = &reaches.gates[l];
-                            around[k] += release(m.lam.0 as i128 * gli - m.lam.1 as i128 * glr, MOVE_BITS);
+                            // Re(conj(i λ_t) G_λ): the covector of λ_t's turn, the founded turn's
+                            // and, through ∂θ/∂s = π, the arriving symbol's.
+                            let turning = release(m.lam.0 as i128 * gli - m.lam.1 as i128 * glr, MOVE_BITS);
+                            around[k] += turning;
+                            if d.turned {
+                                ds[k] = fit64(release(reaches.half_turn * turning, MOVE_BITS + COVECTOR_BITS + turn_spread(w)))?;
+                            }
                             if !m.held {
-                                let (ur, ui) = faces.units[k];
+                                let (ur, ui) = (m.unit.0 as i128, m.unit.1 as i128);
                                 let g_rho = release(ur * glr + ui * gli, MOVE_BITS) - div_nearest(m.rho as i128 * through, m.gamma as i128);
                                 let (open, rho) = (m.open as i128, m.rho as i128);
                                 along[k] += release(g_rho * div_nearest(GATE_REACH * open * rho, faces.moduli[k].max(1)), MOVE_BITS);
@@ -1009,14 +1127,24 @@ impl Tower {
                     }
                     transposed(&t[lv.gate..lv.gate + n * w], r[6], w, &dq, MATERIAL_BITS, &mut back_gate)?;
                 }
-                let next: Vec<i64> = collect_exact(
-                    dx[i].iter().zip(back_re.iter().zip(&back_im)).enumerate().map(|(j, (v, (a, b)))| fit64(*v as i128 + *a as i128 + *b as i128 + back_gate.get(j).map_or(0, |&c| c as i128))),
-                )?;
+                let mut back_turn = vec![0i64; if d.turned { w } else { 0 }];
+                if d.turned {
+                    for (slot, &v) in g[lv.turn_bias..lv.turn_bias + n].iter_mut().zip(&ds) {
+                        *slot += v as i128;
+                    }
+                    transposed(&t[lv.turn..lv.turn + n * w], r[7], w, &ds, MATERIAL_BITS, &mut back_turn)?;
+                }
+                let next: Vec<i64> = collect_exact(dx[i].iter().zip(back_re.iter().zip(&back_im)).enumerate().map(|(j, (v, (a, b)))| {
+                    fit64(*v as i128 + *a as i128 + *b as i128 + back_gate.get(j).map_or(0, |&c| c as i128) + back_turn.get(j).map_or(0, |&c| c as i128))
+                }))?;
                 dx[i] = next;
                 gres.push(gre);
                 gims.push(gim);
                 if d.gated {
                     dqs.push(dq);
+                }
+                if d.turned {
+                    dss.push(ds);
                 }
             }
             // The opening's credit: the covector reaching the carried state, a = conj(λ_0) G_h(0),
@@ -1057,6 +1185,9 @@ impl Tower {
             let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].input.as_slice()).collect();
             outer_sum(&mut g[lv.push_re..lv.push_re + n * w], w, &gres, &inputs);
             outer_sum(&mut g[lv.push_im..lv.push_im + n * w], w, &gims, &inputs);
+            if d.turned {
+                outer_sum(&mut g[lv.turn..lv.turn + n * w], w, &dss, &inputs);
+            }
             if d.gated {
                 outer_sum(&mut g[lv.gate..lv.gate + n * w], w, &dqs, &inputs);
                 // The Cartesian covector of the founded move: G_λ = u G_|λ| + i u G_φ/|λ|.
@@ -1221,6 +1352,9 @@ impl Tower {
 
     /// Every stream's continuing state from its section's forward, its credit moved along it.
     fn carry_credit(&self, states: &mut [TowerState], ends: Vec<(Vec<Cell>, TowerState)>, opening: &[TowerState], reaches: &Reaches) -> Result<()> {
+        if self.declaration.turned && ends.iter().any(|(_, end)| end.credit.is_some()) {
+            return refuse("the passage credit does not carry a turned mode");
+        }
         states.par_iter_mut().zip(ends.into_par_iter()).zip(opening.par_iter()).try_for_each(|((s, (cells, mut end)), open)| {
             if let Some(credit) = end.credit.as_mut() {
                 self.advance_credit(credit, open, &cells, reaches)?;
@@ -1257,7 +1391,8 @@ impl Tower {
     pub fn to_text(&self) -> String {
         let d = &self.declaration;
         let gated = if d.gated { " gated" } else { "" };
-        let mut s = format!("moment-tower-v1 {} {} {} {} {}{gated}\n", d.alphabet, d.width, d.modes, d.contacts, d.levels);
+        let turned = if d.turned { " turned" } else { "" };
+        let mut s = format!("moment-tower-v1 {} {} {} {} {}{gated}{turned}\n", d.alphabet, d.width, d.modes, d.contacts, d.levels);
         s.push_str(&self.theta.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
         s.push('\n');
         s
@@ -1267,13 +1402,14 @@ impl Tower {
     pub fn from_text(text: &str) -> Result<Self> {
         let mut lines = text.lines();
         let head: Vec<&str> = lines.next().unwrap_or("").split(' ').collect();
-        let gated = head.len() == 7 && head[6] == "gated";
-        if !(head.len() == 6 || gated) || head[0] != "moment-tower-v1" {
+        let gated = head.len() >= 7 && head[6] == "gated";
+        let turned = head.len() == 8 && gated && head[7] == "turned";
+        if !(head.len() == 6 || (head.len() == 7 && gated) || turned) || head[0] != "moment-tower-v1" {
             return refuse("not a moment tower's text");
         }
         let num = |s: &str| s.parse::<usize>().map_err(|_| TowerError::Refused("a declaration that is not a count"));
         let declaration =
-            TowerDeclaration { alphabet: num(head[1])?, width: num(head[2])?, modes: num(head[3])?, contacts: num(head[4])?, levels: num(head[5])?, gated };
+            TowerDeclaration { alphabet: num(head[1])?, width: num(head[2])?, modes: num(head[3])?, contacts: num(head[4])?, levels: num(head[5])?, gated, turned };
         let layout = Layout::new(&declaration);
         let theta: Vec<i32> = lines
             .next()
@@ -1783,7 +1919,13 @@ mod tests {
     }
 
     fn tiny_with(levels: usize, gated: bool) -> Tower {
-        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels, gated };
+        tiny_turning(levels, gated, false)
+    }
+
+    /// The tiny tower whose gated modes' turn may be keyed by the arriving symbol; a turned one's
+    /// turn opens away from zero as its gate does.
+    fn tiny_turning(levels: usize, gated: bool, turned: bool) -> Tower {
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels, gated, turned };
         let mut tower = Tower::found(declaration, &keys(4096)).expect("founded");
         // Open the readout and the returns away from zero so every family carries a covector.
         let k = keys(8192);
@@ -1803,6 +1945,14 @@ mod tests {
             for lv in &layout.levels {
                 fill(&mut tower.theta, lv.gate, 8);
                 for v in &mut tower.theta[lv.gate..lv.gate + 8] {
+                    *v *= 8;
+                }
+            }
+        }
+        if turned {
+            for lv in &layout.levels {
+                fill(&mut tower.theta, lv.turn, 8);
+                for v in &mut tower.theta[lv.turn..lv.turn + 8] {
                     *v *= 8;
                 }
             }
@@ -1843,8 +1993,16 @@ mod tests {
         the_covector_matches_the_code_difference_of(true);
     }
 
+    #[test]
+    fn the_turned_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_turning(2, true, true), true);
+    }
+
     fn the_covector_matches_the_code_difference_of(gated: bool) {
-        let tower = tiny_of(gated);
+        the_covector_of_tower_matches_the_code_difference(tiny_of(gated), gated);
+    }
+
+    fn the_covector_of_tower_matches_the_code_difference(tower: Tower, gated: bool) {
         let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
         let opening = tower.rest();
         let reaches = tower.reaches();
@@ -1866,7 +2024,7 @@ mod tests {
         // releases every face to `2^(−16)`, and on the tiny tower that rounding moves one central
         // difference by up to a seventh (measured on the gated tower: ±2^(−7), ±2^(−8) and ±2^(−9)
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
-        let (mut checked, mut gates_checked) = (0, 0);
+        let (mut checked, mut gates_checked, mut turns_checked) = (0, 0, 0);
         let base_code = code(&tower, &classes);
         for &(start, len, grain) in &tower.layout.families {
             let mut order: Vec<usize> = (start..start + len).collect();
@@ -1893,12 +2051,14 @@ mod tests {
                 assert!(error * 10 <= gi.abs(), "family at {start} grain {grain}, parameter {i}: covector {gi} against {numeric}");
                 checked += 1;
                 gates_checked += tower.layout.levels.iter().any(|lv| gated && (start == lv.gate || start == lv.gate_bias)) as usize;
+                turns_checked += tower.layout.levels.iter().any(|lv| tower.declaration.turned && (start == lv.turn || start == lv.turn_bias)) as usize;
                 break;
             }
         }
         // A gated tower's gate material and bias are read at the first level (the second level's
         // gate covectors fall below 1/64 bit a unit on this fixture).
         assert!(!gated || gates_checked >= 2, "only {gates_checked} gate families carried a readable covector");
+        assert!(!tower.declaration.turned || turns_checked >= 2, "only {turns_checked} turn families carried a readable covector");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 
@@ -2106,7 +2266,7 @@ mod tests {
     }
 
     fn a_section_learns_a_repeating_passage_of(gated: bool) {
-        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated };
+        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated, turned: false };
         let tower = Tower::found(declaration, &keys(4096)).expect("founded");
         let mut learner = TowerLearner::new(tower, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();

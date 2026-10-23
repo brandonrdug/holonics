@@ -105,6 +105,168 @@ raises everything else by 0.10 (agent-inferred: the terrain's sections take part
 deposits from the prose). Meeting more interacting digits did not locate the middle places' cycles:
 the terrain of the previous sections shows the same tower blind at a product's tens after 24 passes.
 
+## What the writings share with the truth
+
+After six passes the gated tower and the duplex (`hnn::tower::duplex`, below), and after twelve the
+gated tower and the turned tower (below), each wrote the first 1,200 development lines, four
+agreeing draws a class with the same keys; the duplex then refined each release from both sides.
+Read by the faces of the base's tower, held-out pairs only (`tools/arithmetic_lines.py`):
+
+| | tower, 6 passes | tower, 12 passes | duplex, forward | duplex, refined | turned, 12 passes |
+|---|---|---|---|---|---|
+| sums written whole, of 241 | 114 | 153 | 124 | 138 | 72 |
+| a carried sum's wrong tens are the tens without the carry | 22 of 41 | 20 of 30 | 36 of 37 | 27 of 28 | 3 of 22 |
+| differences written whole, of 135 | 42 | 45 | 17 | 30 | 40 |
+| a one-digit difference is written beginning with 1 | 21 of 25 | 22 of 25 | 24 of 25 | 25 of 25 | 25 of 25 |
+| a difference's wrong units are the operands' sum's units | 1 of 75 | 4 of 65 | 4 of 106 | 7 of 98 | 2 of 75 |
+| products of the right length, of 224 | 199 | 209 | 211 | 211 | 214 |
+| a product's units, an operand sharing a prime with 10 | 95 of 184 | 115 of 183 | 95 of 184 | 106 of 184 | 114 of 184 |
+| a product's units, both operands units of `ℤ/10` | 13 of 40 | 28 of 40 | 9 of 39 | 11 of 39 | 17 of 40 |
+| a product's residue mod 9 (chance about 25) | 21 | 30 | 32 | 33 | 27 |
+| a product's residue mod 11 (chance about 20) | 30 | 20 | 21 | 17 | 28 |
+
+On the rings 2 and 5 the split is sharper: where an operand shares the prime the product collapses to
+zero on the ring, and the tower writes that residue in 142 of 157 and 79 of 84 lines after six passes
+(146 of 156 and 78 of 84 after twelve); where both operands are units the product is a unit, and it
+writes the right one in 51 of 67 (mod 2) and 39 of 140 (mod 5, chance about 35), after twelve 61 of
+67 and 69 of 139. On the rings 9 and 11, whose residues depend on every digit, a product of units is
+written right in 11 of 98 and 16 of 186 after twelve passes, at or below chance (about 16 and 19).
+
+Read in the base's tower [agent-inferred]:
+
+- **A product is written at the right size and level, and wrong on its cycles.** The length, the
+  leading digit and the zeros a shared prime forces are faces of size and collapse; the residue of a
+  product of units is a turn (on the units of `ℤ/q` the index chart turns `×` into `+`), and every turn
+  of a product is at chance: the residues mod 9 and 11 and the units of a product of units.
+- **A sum's tens are composed and its carry dropped.** Where the units carried and the tens are
+  wrong they are the tens without the carry in 22 of 41 lines, and in the duplex in 36 of 37: the
+  tens digits' turn on the ring of ten is held, the carry (the cocycle between places) is not.
+- **A one-digit difference opens on the face of a leading digit.** Whatever the units are, it is
+  written as 1 or as a two-digit number beginning with 1; a difference's wrong units are not the
+  operands' sum's (at or below the chance of one in nine), so the operation's sign is not the slip.
+- **Reading from both sides creates no face neither side holds.** The duplex's meeting codes a
+  product's tens at 3.41 bits a digit against its forward's 3.40, and of 224 products only 99
+  refinements settle within eight sweeps. A held face gains the same bits in any reading order (the
+  chain rule), so the reading order is not why the middle places are blind; what is missing is the
+  composition of the turns the operands carry.
+
+The cause in the tower's law: a gated mode's symbol keys only its modulus, `λ_t = |λ|^(c r_t) u`, so
+each mode turns at its founded rate whatever arrives, and the arriving symbols only open and close
+it. A residue is an angle accumulated from the turns its digits carry; no mode is turned by a digit.
+
+## Why a written product is near its value and a difference can end early
+
+[agent-inferred, October 23, from the reads above] Every face the gated tower writes right is
+constant over the met pairs around an unmet one; every face it misses is a phase that turns from one
+met pair to the next.
+
+- **Near on size, off on its cycles.** An unmet product is read through the met pairs around it.
+  Their sizes agree, `log ab = log a + log b` moving little from one pair to the next, so the length
+  (209 of 224 after twelve passes), the leading digit and the level add up. So do the collapses: an
+  operand sharing a prime with `q` zeroes the product on `ℤ/q` whatever the other operand (146 of 156
+  on 2, 78 of 84 on 5), and the units of a product of units of `ℤ/10` is one cell of a ten-by-ten
+  crossing every cell of which was met (28 of 40). A residue on a ring whose cycle spans the whole
+  operand is a character `e^(2πi k ab/q)`; over neighbouring pairs it turns, and summed it cancels
+  unless `kab/q` is nearly constant there, so the met paths interfere destructively and the residue
+  is drawn at chance: 30 of 224 on 9, 20 of 224 on 11. A product's tens digit is such a phase (the
+  cross crossings `a₁b₀ + a₀b₁` and the carry out of `a₀b₀`) and costs 3.30 bits. `92*65=6010`
+  (5,980) has the size, the length and both collapses, and draws its middle digits.
+- **A difference opens on the caustic of its leading place.** Writing from the left, the tower draws
+  a difference's first digit before it has located the level. Over the terrain a difference's
+  leading digit falls off linearly from 1 (954 of the 5,050 differences lead with 1, 146 with 9),
+  and where the operands' tens are equal or adjacent both levels' paths pass through 1: the
+  one-digit result `1` and every two-digit result `1x`. The first written digit is the face where
+  those paths converge: 22 of the 25 unseen one-digit differences are written beginning with 1
+  (`74-72=1`). With a first digit drawn, the line's end is drawn at a level not yet located, and a
+  two-digit difference can end after one digit (`99-56=5`): 21 of 135 differences are written at the
+  wrong length, against 15 of 241 sums and 15 of 224 products. A difference's wrong units are its
+  operands' sum's units in 4 of 65 lines, under the chance of one in nine: the sign is read, and the
+  slip is the level.
+- **A sum's places are turned and their coupling dropped.** A sum's units cost 0.50 bits and its tens
+  1.37; where the units carried and the tens are wrong, they are the tens without the carry in 20 of
+  30. Each place's turn on the ring of ten is held; the carry, the winding that couples the units'
+  circle to the tens' (the helix's lift), is not. `71+41=102` writes the units and the hundreds and
+  draws the tens.
+
+## The duplex
+
+[definition; agent-inferred, October 23] `hnn::tower::duplex::Duplex`: two strands of one tower
+declaration, the forward reading a passage from its start and the reverse from its end, meeting at
+each place through their own readouts and rectifying contacts,
+
+```text
+z_t = z_F(t) + z_R(t) + U max(W [x_F(t−1); x_R(t+1)] + b, 0) + c
+```
+
+learned by the same certified moments from all three faces' codes, the meeting's covector reaching
+both tops through each strand's reverse scan. A release is refined place by place: each place is
+redrawn from its meeting, left to right, until a sweep changes nothing (a fixed point of the draws,
+not a certificate of one joint law). Trained six passes on the terrain (393 s), it codes held-out
+results' content digits at 1.84 bits forward and 1.68 at the meeting (the tower: 1.82 after six
+passes); the refinement settles 901 of the 1,200 written lines.
+
+## The turned mode
+
+[definition; agent-inferred, October 23] The cause named above is in the law: a gated mode's symbol
+keys only its modulus. A turned mode (`TowerDeclaration::turned`, the module's docs; atlas
+`hnn.tower-turned-mode`) is keyed on its turn too, `s_t = 2^(−⌈log₂ w⌉) (W_φ x + b_φ)` half turns
+and `λ_t = ρ_t u e^(iπ s_t)`, so a mode can carry a residue as its accumulated phase. The turn opens
+at zero, so the turned tower opens on its gated twin; `|e^(iπ s)| = 1`, so the gated mode's passivity
+bound holds unchanged and no new Lean statement is owed for it. Its covector, the move's turn share
+times `π`, agrees with the code's difference (tested).
+
+The claim fixed before the run: after 12 passes, unseen products' tens below 3.0 bits a digit (the
+gated tower: 3.30), and written unseen products' residues mod 9 above chance.
+
+The first run read the turn at the full drive: one rate step `2^(−7)` over 64 inputs of unit size
+turned a mode by up to half a half turn, and in its third pass the terrain coded more bits section
+after section (2.50 to 2.72 a byte) while the certificate halved its steps 626 times; it was
+stopped in the fourth, incomplete. With the turn read as the drive's mean over the width, the second run
+trained 12 passes in 405 s, 33 to 35 s a pass (the gated tower: 23 to 25), without a rise.
+
+In the stream, each line opening on the state the lines before it left, the turned tower codes
+unseen results' digits at 1.447 bits (the gated: 1.508) and seen ones at 1.452 (1.493). Read line by
+line from rest, unseen, bits a digit:
+
+| | gated, 12 passes | turned, 12 passes |
+|---|---|---|
+| all results | 1.698 | 2.110 |
+| sums | 0.753 | 1.338 |
+| sums' units | 0.504 | 1.721 |
+| differences | 2.031 | 1.985 |
+| products | 2.283 | 2.695 |
+| products' tens | 3.301 | 3.564 |
+
+The claim fails. A product's tens cost 3.56 bits, and written products' residues are right mod 9 in
+27 of 224 (chance about 25) and mod 11 in 28 (chance about 20). What it writes for held-out lines,
+the same keys, as they came:
+
+```text
+74-72=1     92*65=6040  85-42=44    46*15=610   71+41=112   86-43=43    83*27=2649
+73+31=114   14*39=534   23+51=74    56+3=57     53+18=72    80+14=92    8+82=90
+47-20=27    12*35=490   6+77=84     99-56=43    67-56=11    6+10=16     94-27=67
+```
+
+Read in the base's tower [agent-inferred]:
+
+- **The turn puts a sum's units on a circle, where neighbours are near.** Of 240 written unseen sums
+  the units are one step off in 81 and two in 22 (the gated tower: 28 and 4), and they cost 1.72
+  bits where the gated tower's crossings of met units cost 0.50. A digit carried as an angle is read
+  through `Re(C h)`, one projection of the phase, on which neighbouring angles read nearly alike: the
+  turned tower writes a sum the way the gated tower writes a product, near on the circle and a step
+  off.
+- **A phase is read against another phase.** In the stream, where the state the earlier lines left
+  is carried into each line, the turned tower codes unseen results 0.06 bits better than the gated
+  one; read alone from rest it is 0.41 bits worse, where the gated tower loses 0.19 to rest. From
+  rest the line's turns are read only against its own first pushes; in the stream the state the
+  earlier lines left is a larger reference that the line's turns rotate.
+- **A difference's level is located more often.** 123 of 135 differences are written at the right
+  length (the gated tower: 114), `99-56=43` among them; a one-digit difference still opens on 1.
+
+The failure names the next subject: a residue is a discrete phase, and a linear read of one mode's
+continuous phase cannot make it discrete. In the parametron the lock does (past the bifurcation the
+half-turn sheets lock, and relative phase is read through the pump); the tower's modes have no lock.
+
 ## The recorded failures this step could repeat
 
 - **Catered machinery.** The terrain's truth is generated exactly, outside the machine; the tower
@@ -119,6 +281,10 @@ the terrain of the previous sections shows the same tower blind at a product's t
 ## Receipts
 
 [`RUNS.tsv`](2026-10-23_ON_A_TERRAIN_OF_INTERACTING_DIGITS_THE_TOWER_COMPUTES_WHAT_IT_NEVER_MET_WHERE_IT_KNOWS_THE_LEVEL_receipts/RUNS.tsv)
-holds each run's binary, inputs, projection, deadline, wall time and peak resident set;
-`READ_12.txt` and `READ_24.txt` the observer's reads, and `LINES_12.tsv` and `LINES_24.tsv` the
-tower's line reads (each result's codes on `2^−20` bits and its own writing).
+holds each run's binary, inputs, projection, deadline, wall time and peak resident set. The line
+reads (each result's codes on `2^−20` bits and what the tower wrote) and the observer's reads of them:
+`LINES_12.tsv` and `LINES_24.tsv` (64 written, keys `keys_s1`) with `READ_12.txt` and `READ_24.txt`;
+with 1,200 written and keys `keys_d1`, `LINES_6.tsv` and `LINES_12_1200.tsv` for the gated tower,
+`LINES_DUPLEX_6.tsv` for the duplex and `LINES_TURNED_12.tsv` for the turned tower, each with its
+`READ_*.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt` and `TRAIN_TURNED_STOPPED.txt` are the
+training logs (the turned ones without their per-section swell lines).

@@ -5,13 +5,17 @@ line's end apart; and what the written results share with the terrain's, by the 
 tower: the whole word, its length, and its residues on the rings 2, 5, 9, 10 and 11. A duplex's file
 adds the meeting's codes (each place read from both sides) and the refined release beside the
 forward's. Two readings the mathematics thread asked for: a written difference's units against the
-units of the operands' sum, and a carried sum's tens against the tens without the carry. An exterior
-reading, outside the machine.
+units of the operands' sum, and a carried sum's tens against the tens without the carry; and, after
+its later note, each ring's shared face split by whether both operands are units of the ring or one
+shares a prime with it, a sum's tens split by whether its units carried, and the first digit written
+for a one-digit difference; and how many steps of the ring of ten a written sum's units sit from the
+truth's (the turned tower's sums). An exterior reading, outside the machine.
 
 usage: python3 -I arithmetic_lines.py DEV_TXT DEV_ROLES LINES_TSV WRITTEN (the read's WRITTEN count)
 """
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
+from math import gcd
 
 GRAIN = 1 << 20
 RINGS = (2, 5, 9, 10, 11)
@@ -46,6 +50,10 @@ def main():
     shared = defaultdict(lambda: [0, 0])
     readings = defaultdict(lambda: [0, 0])
     settled = defaultdict(lambda: [0, 0])
+    rings = defaultdict(lambda: [0, 0])
+    tens = defaultdict(lambda: [0, 0])
+    short = defaultdict(Counter)
+    steps = defaultdict(Counter)
     shown = []
     for row in open(lines_tsv):
         cols = row.rstrip("\n").split("\t")
@@ -81,6 +89,20 @@ def main():
                 shared[(reader, side, op, face)][0] += hit
                 shared[(reader, side, op, face)][1] += 1
             v = value(written)
+            if v is not None:
+                for q in RINGS:
+                    pair = "units" if gcd(a, q) == 1 and gcd(b, q) == 1 else "shares a prime"
+                    rings[(reader, side, op, q, pair)][0] += v % q == truth % q
+                    rings[(reader, side, op, q, pair)][1] += 1
+                if op == "+" and truth >= 10 and len(written) >= 2:
+                    carried = "units carried" if a % 10 + b % 10 >= 10 else "no carry"
+                    tens[(reader, side, carried)][0] += v // 10 % 10 == truth // 10 % 10
+                    tens[(reader, side, carried)][1] += 1
+                if op == "+":
+                    step = (v - truth) % 10
+                    steps[(reader, side)][min(step, 10 - step)] += 1
+                if op == "-" and truth < 10:
+                    short[(reader, side)][written[:1] + ("" if len(written) == 1 else "+")] += 1
             if v is None or v == truth:
                 continue
             if op == "-" and v % 10 != truth % 10:
@@ -104,6 +126,16 @@ def main():
     for key in sorted(readings):
         hit, n = readings[key]
         print(f"READING {key[0]:7} {key[1]:6} {key[2]}: {hit}/{n}")
+    for key in sorted(rings):
+        hit, n = rings[key]
+        print(f"RING {key[0]:7} {key[1]:6} {key[2]} mod {key[3]:2} {key[4]:14} {hit}/{n}")
+    for key in sorted(tens):
+        hit, n = tens[key]
+        print(f"SUM_TENS {key[0]:7} {key[1]:6} {key[2]:13} {hit}/{n}")
+    for key in sorted(short):
+        print(f"ONE_DIGIT_DIFFERENCE {key[0]:7} {key[1]:6} first written " + " ".join(f"{d}:{c}" for d, c in sorted(short[key].items())))
+    for key in sorted(steps):
+        print(f"SUM_UNITS_STEPS {key[0]:7} {key[1]:6} " + " ".join(f"{d}:{c}" for d, c in sorted(steps[key].items())))
     for key in sorted(settled):
         hit, n = settled[key]
         print(f"SETTLED {key[0]:6} {key[1]} {hit}/{n}")

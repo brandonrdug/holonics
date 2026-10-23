@@ -71,6 +71,7 @@ pub(super) fn train(args: &[String]) -> Result<()> {
         contacts: count(&args[11])?,
         levels: count(&args[12])?,
         gated: true,
+        turned: false,
     };
     let meeting = count(&args[13])?;
     let streams = count(&args[14])?;

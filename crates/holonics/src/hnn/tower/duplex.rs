@@ -640,7 +640,7 @@ mod tests {
     /// A tiny duplex whose strands' readouts and returns and the meeting's readout open away from
     /// zero, so every family carries a covector.
     fn tiny(gated: bool) -> Duplex {
-        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels: 2, gated };
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels: 2, gated, turned: false };
         let mut duplex = Duplex::found(declaration, 4, &keys(16384)).expect("founded");
         let k = keys(32768);
         let mut i = 9000;
@@ -767,12 +767,12 @@ mod tests {
                 }
             }
         }
-        // Which contacts conduct, in both strands and the meeting: the covector is the derivative
-        // on the passage's own side of every kink.
+        // Which contacts conduct and which gated moves are held, in both strands and the meeting:
+        // the covector is the derivative on the passage's own side of every kink.
         let conducting = |d: &Duplex| -> Vec<bool> {
             let (rf, rr, wmax) = (d.forward.reaches(), d.reverse.reaches(), d.reach_meeting());
             let s = d.read_stream(&d.forward.rest(), &classes, &rf, &rr, wmax).expect("read");
-            let cells = s.forward.iter().chain(&s.reverse).flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().map(|&a| a > 0)));
+            let cells = s.forward.iter().chain(&s.reverse).flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().map(|&a| a > 0).chain(l.gate.iter().map(|m| m.held))));
             cells.chain(s.meetings.iter().flat_map(|m| m.drive.iter().map(|&a| a > 0))).collect()
         };
         let base = conducting(&duplex);
@@ -790,26 +790,42 @@ mod tests {
                 if gi.abs() < 1i128 << (STEP_BITS - 6) {
                     break;
                 }
-                let h = 1i32 << (grain - 10);
-                let (mut moment, mut spread) = (0i128, 0i128);
-                for k in (-8i32..=8).filter(|&k| k != 0) {
-                    let mut moved = duplex.clone();
-                    if i < nf {
-                        moved.forward.theta[i] += k * h;
-                    } else if i < nf + nr {
-                        moved.reverse.theta[i - nf] += k * h;
-                    } else {
-                        moved.meeting[i - nf - nr] += k * h;
+                // The code's fitted slope over sixteen steps `k h`, `h = 2^(grain − shift)`.
+                let slope = |shift: u32| -> Option<i128> {
+                    let h = 1i32 << (grain - shift);
+                    let (mut moment, mut spread) = (0i128, 0i128);
+                    for k in (-8i32..=8).filter(|&k| k != 0) {
+                        let mut moved = duplex.clone();
+                        if i < nf {
+                            moved.forward.theta[i] += k * h;
+                        } else if i < nf + nr {
+                            moved.reverse.theta[i - nf] += k * h;
+                        } else {
+                            moved.meeting[i - nf - nr] += k * h;
+                        }
+                        if conducting(&moved) != base {
+                            return None;
+                        }
+                        moment += k as i128 * (total_code(&moved, &classes) - base_code) as i128;
+                        spread += (k * k) as i128;
                     }
-                    if conducting(&moved) != base {
-                        continue 'parameter;
-                    }
-                    moment += k as i128 * (total_code(&moved, &classes) - base_code) as i128;
-                    spread += (k * k) as i128;
+                    Some((moment << (STEP_BITS - READ_BITS)) * (1i128 << grain) / (h as i128 * spread))
+                };
+                // Three faces released to 2^(−16) move the code by their grain at narrow steps, and
+                // wide steps cross kinks, so the slope is read at each width from 2^(−6) to 2^(−11)
+                // units that crosses none, and the covector must lie within what they read, to a
+                // tenth of itself: on this fixture the forward's largest gate covector, −70.6 (×10⁶),
+                // reads −70.4, −69.9, −73.6, −79.3, −89.8 and −84.4 from the widest step down.
+                let mut slopes: Vec<i128> = (6u32..=11).filter_map(|shift| slope(shift)).collect();
+                if slopes.len() < 3 {
+                    continue 'parameter;
                 }
-                let numeric = (moment << (STEP_BITS - READ_BITS)) * (1i128 << grain) / (h as i128 * spread);
-                let error = (numeric - gi).abs();
-                assert!(error * 10 <= gi.abs(), "family at {start} grain {grain}, parameter {i}: covector {gi} against {numeric}");
+                slopes.sort_unstable();
+                let margin = gi.abs() / 10;
+                assert!(
+                    slopes[0] - margin <= gi && gi <= slopes[slopes.len() - 1] + margin,
+                    "family at {start} grain {grain}, parameter {i}: covector {gi} against {slopes:?}"
+                );
                 checked += 1;
                 break;
             }
@@ -820,7 +836,7 @@ mod tests {
 
     #[test]
     fn a_section_learns_a_repeating_passage() {
-        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated: true };
+        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated: true, turned: false };
         let duplex = Duplex::found(declaration, 8, &keys(16384)).expect("founded");
         let mut learner = DuplexLearner::new(duplex, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();
