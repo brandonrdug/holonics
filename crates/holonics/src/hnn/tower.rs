@@ -82,6 +82,18 @@
 //! Athena alpha plan's §A2.4: the reverse pairs the forward prefix operands with the backward
 //! covectors, inside the section only). What continues is the material and each stream's mode state.
 //!
+//! **The passage credit** ([`LevelCredit`], agent-inferred, October 23). A section's reverse scan
+//! starts at zero at its end and its covector stopped at its opening, so a parameter learned only
+//! from what the last `T` bytes did, while a mode near the margin holds about `2^12` (GPT-6's
+//! review). A learner's streams now carry, beside each mode's state, the state's derivative by the
+//! level's own recurrence families, moved forward cell by cell as phase-carried moments; at a
+//! section's opening the covector reaching the carried state, `a = conj(λ_0) G_h(0)`, meets them.
+//! On one level, two halves of a passage with the second opening on the first's credit give the
+//! whole passage's covector in every recurrence family, to the moments' release (tested). The
+//! credit holds the level's input, and the encoding, as given: what reaches a level from the levels
+//! below stays inside the section. The certificate still rereads the section from its opening, so
+//! the certified step is descent on the section under the passage's direction.
+//!
 //! **Exact integers, grains declared.** Every quantity is an integer numerator on a declared dyadic
 //! grain: a face (`x`, `r`, `v`, `z`) on `2^(−16)`, the material on `2^(−24)`, the moves `λ` on
 //! `2^(−30)` with `|λ| ≤ 1 − 2^(−12)`, a mode's state on `2^(−24)`, a covector on `2^(−24)` in
@@ -248,6 +260,44 @@ pub struct Tower {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TowerState {
     pub modes: Vec<Vec<(i64, i64)>>,
+    /// Each level's passage credit, carried by a learner's streams (absent in a reading).
+    pub credit: Option<Vec<LevelCredit>>,
+}
+
+/// [definition; agent-inferred, October 23] **A level's passage credit**: the derivative of its
+/// modes' state by its own recurrence families, carried forward cell by cell as phase-carried
+/// moments (the source moment, differentiated), so that a section's covector reaches the history
+/// its opening state carries without a tape. Each entry is `(re, im)` on `2^(−24)` per unit of its
+/// parameter. Mode `k`, input row `j`:
+///
+/// ```text
+/// push        P_kj(t) = λ_t P_kj(t−1) + γ_t x_t[j]                  ∂h_k/∂B_re[k][j]  (∂h_k/∂B_im = i P_kj)
+/// ungated     A_k(t)  = λ A_k(t−1) + h_k(t−1)                        ∂h_k/∂λ_k, its holomorphic part
+///             K_k(t)  = λ K_k(t−1) + p_k(t)                          ∂h_k/∂γ_k   (p = B x before γ)
+/// gated       A_k(t)  = λ_t A_k(t−1) + v_k(t) c r_t ρ_t/|λ_k|        ∂h_k/∂|λ_k|
+///             K_k(t)  = λ_t K_k(t−1) + i λ_t h_k(t−1)                ∂h_k/∂φ_k
+///             Q_k(t)  = λ_t Q_k(t−1) + v_k(t) ∂ρ_t/∂q                ∂h_k/∂b_g[k]
+///             W_kj(t) = λ_t W_kj(t−1) + v_k(t) (∂ρ_t/∂q) x_t[j]       ∂h_k/∂W_g[k][j]
+///             v_k(t)  = u_k h_k(t−1) − (ρ_t/γ_t) p_k(t)              ∂h_k(t)/∂ρ_t (zero while ρ_t is held)
+/// ```
+///
+/// A section's opening covector `a = conj(λ_0) G_h(0)` meets them in the same shapes as the
+/// section's own terms: `G_λ += conj(A) a`, `G_γ += Re(conj(a) K)`, `G_B_re += Re(conj(a) P)`, `G_B_im
+/// += Re(conj(a) i P)`, and so on. The credit reaches only a level's own recurrence: the input
+/// `x` a level reads from the levels below, and the encoding, are held as given, so their credit
+/// stays inside the section (declared).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LevelCredit {
+    /// `P_kj`, mode-major.
+    push: Vec<(i64, i64)>,
+    /// `A_k`.
+    along: Vec<(i64, i64)>,
+    /// `K_k`.
+    around: Vec<(i64, i64)>,
+    /// `Q_k` (empty when ungated).
+    gate_bias: Vec<(i64, i64)>,
+    /// `W_kj`, mode-major (empty when ungated).
+    gate: Vec<(i64, i64)>,
 }
 
 /// One cell's face: each class's mass `2^(z_a − z_max)` on `2^(−62)`, and their sum.
@@ -600,7 +650,22 @@ impl Tower {
 
     /// The rested state: every mode at zero.
     pub fn rest(&self) -> TowerState {
-        TowerState { modes: vec![vec![(0, 0); self.declaration.modes]; self.declaration.levels] }
+        TowerState { modes: vec![vec![(0, 0); self.declaration.modes]; self.declaration.levels], credit: None }
+    }
+
+    /// A learner's rested stream: every mode and every credit moment at zero.
+    pub fn rest_with_credit(&self) -> TowerState {
+        let d = &self.declaration;
+        let (n, w) = (d.modes, d.width);
+        let gated = if d.gated { 1 } else { 0 };
+        let level = LevelCredit {
+            push: vec![(0, 0); n * w],
+            along: vec![(0, 0); n],
+            around: vec![(0, 0); n],
+            gate_bias: vec![(0, 0); gated * n],
+            gate: vec![(0, 0); gated * n * w],
+        };
+        TowerState { credit: Some(vec![level; d.levels]), ..self.rest() }
     }
 
     fn reaches(&self) -> Reaches {
@@ -640,7 +705,11 @@ impl Tower {
                     for k in 0..d.modes {
                         let (re, im) = (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128);
                         let (modulus, _) = modulus_and_gamma(re, im);
-                        let unit = if modulus == 0 { (one, 0) } else { (div_nearest(re * one, modulus), div_nearest(im * one, modulus)) };
+                        // u = λ/|λ| over the modulus rounded up and quotients toward zero, so
+                        // |u| ≤ 1 exactly: a closed gate (r → 0) moves at ρ → 1 whatever |λ|, and a
+                        // unit rounded past the circle would then carry |λ_t| past one and γ_t to zero.
+                        let above = modulus + i128::from(modulus * modulus < re * re + im * im);
+                        let unit = if modulus == 0 { (one, 0) } else { (re * one / above, im * one / above) };
                         faces.units.push(unit);
                         faces.moduli.push(modulus);
                         // log₂|λ| on 2^(−30), |λ| re-based to 2^(−62); a zero move reads at one grain.
@@ -691,6 +760,9 @@ impl Tower {
                     let (ur, ui) = faces.units[k];
                     let (lr, li) = (release(rho * ur, MOVE_BITS), release(rho * ui, MOVE_BITS));
                     let (_, gamma) = modulus_and_gamma(lr, li);
+                    if gamma == 0 {
+                        return refuse("a gated move reached the unit circle");
+                    }
                     gate.push(GatedMove { open: open as i64, lam: (lr as i64, li as i64), rho: rho as i64, gamma: gamma as i64, held });
                 }
             }
@@ -915,6 +987,41 @@ impl Tower {
                     dqs.push(dq);
                 }
             }
+            // The opening's credit: the covector reaching the carried state, a = conj(λ_0) G_h(0),
+            // meets the moments its history carried (see [`LevelCredit`]).
+            if let Some(credit) = opening.credit.as_ref().map(|c| &c[l]) {
+                let first = &cells[0].levels[l];
+                for k in 0..n {
+                    let (lr, li) = match first.gate.get(k) {
+                        Some(m) => (m.lam.0 as i128, m.lam.1 as i128),
+                        None => (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128),
+                    };
+                    let (gr, gi) = (gh_all[0][k].0 as i128, gh_all[0][k].1 as i128);
+                    let (ar, ai) = (release(lr * gr + li * gi, MOVE_BITS), release(lr * gi - li * gr, MOVE_BITS));
+                    // Re(conj(a) z) and Re(conj(a) i z) of a moment z, on 2^(−48).
+                    let real = |z: (i64, i64)| ar * z.0 as i128 + ai * z.1 as i128;
+                    let turned = |z: (i64, i64)| ai * z.0 as i128 - ar * z.1 as i128;
+                    for j in 0..w {
+                        let p = credit.push[k * w + j];
+                        g[lv.push_re + k * w + j] += release(real(p), STATE_BITS - FACE_BITS);
+                        g[lv.push_im + k * w + j] += release(turned(p), STATE_BITS - FACE_BITS);
+                    }
+                    if d.gated {
+                        along[k] += real(credit.along[k]);
+                        around[k] += real(credit.around[k]);
+                        g[lv.gate_bias + k] += release(real(credit.gate_bias[k]), COVECTOR_BITS);
+                        for j in 0..w {
+                            g[lv.gate + k * w + j] += release(real(credit.gate[k * w + j]), STATE_BITS - FACE_BITS);
+                        }
+                    } else {
+                        // conj(A) a, the holomorphic part's covector, as the cells' conj(h) G_h.
+                        let (sr, si) = (credit.along[k].0 as i128, credit.along[k].1 as i128);
+                        g[lv.move_re + k] += sr * ar + si * ai;
+                        g[lv.move_im + k] += sr * ai - si * ar;
+                        through_gamma[k] += real(credit.around[k]);
+                    }
+                }
+            }
             let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].input.as_slice()).collect();
             outer_sum(&mut g[lv.push_re..lv.push_re + n * w], w, &gres, &inputs);
             outer_sum(&mut g[lv.push_im..lv.push_im + n * w], w, &gims, &inputs);
@@ -945,6 +1052,150 @@ impl Tower {
             }
         }
         Ok(g)
+    }
+
+    /// Each level's credit moved through a section's cells (see [`LevelCredit`]): `cells` are this
+    /// tower's forward from `opening`, so the moments follow the trajectory the stream continues on.
+    ///
+    /// The material moments `P` and `W` are linear in their drives, so a section moves them in one
+    /// sum: with `π_s = λ_(T−1) ⋯ λ_(s+1)` the turn a cell's drive meets after it,
+    /// `P_T = (λ_(T−1) ⋯ λ_0) P_0 + Σ_s π_s γ_s x_s` and `W_T = (λ_(T−1) ⋯ λ_0) W_0 + Σ_s π_s d_s x_s`,
+    /// where `d_s = v_s ∂ρ_s/∂q` is the gate's drive (zero at a held cell). The per-mode moments
+    /// keep the cell recursion.
+    fn advance_credit(&self, credit: &mut [LevelCredit], opening: &TowerState, cells: &[Cell], reaches: &Reaches) -> Result<()> {
+        let d = &self.declaration;
+        let (w, n) = (d.width, d.modes);
+        let t = &self.theta;
+        let ln2_square = release(ln2_face() * ln2_face(), MOVE_BITS);
+        let one = 1i128 << MOVE_BITS;
+        let span = cells.len();
+        if span == 0 {
+            return Ok(());
+        }
+        let product = |a: (i128, i128), b: (i128, i128)| (release(a.0 * b.0 - a.1 * b.1, MOVE_BITS), release(a.0 * b.1 + a.1 * b.0, MOVE_BITS));
+        for (l, lv) in self.layout.levels.iter().enumerate() {
+            let c = &mut credit[l];
+            let gated = !c.gate.is_empty();
+            // Each cell's λ_t and γ_t on 2^(−30), and the gate's drive d_t on 2^(−24).
+            let mut lams = vec![(0i128, 0i128); span * n];
+            let mut gammas = vec![0i128; span * n];
+            let mut drives = vec![(0i128, 0i128); if gated { span * n } else { 0 }];
+            for (i, cell) in cells.iter().enumerate() {
+                let lc = &cell.levels[l];
+                let previous: &[(i64, i64)] = if i == 0 { &opening.modes[l] } else { &cells[i - 1].levels[l].state };
+                for k in 0..n {
+                    let (lr, li, gamma) = match lc.gate.get(k) {
+                        Some(m) => (m.lam.0 as i128, m.lam.1 as i128, m.gamma as i128),
+                        None => (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128, reaches.gammas[l][k]),
+                    };
+                    lams[i * n + k] = (lr, li);
+                    gammas[i * n + k] = gamma;
+                    // λ_t z, on z's grain.
+                    let turn = |z: (i64, i64)| product((lr, li), (z.0 as i128, z.1 as i128));
+                    let (hr, hi) = (previous[k].0 as i128, previous[k].1 as i128);
+                    let (pr, pi) = (lc.push[k].0 as i128, lc.push[k].1 as i128);
+                    let (ar, ai) = turn(c.along[k]);
+                    let (kr, ki) = turn(c.around[k]);
+                    let Some(m) = lc.gate.get(k) else {
+                        c.along[k] = (fit64(ar + hr)?, fit64(ai + hi)?);
+                        c.around[k] = (fit64(kr + pr)?, fit64(ki + pi)?);
+                        continue;
+                    };
+                    // ∂h_t/∂φ = i λ_t h_(t−1).
+                    let (turned_r, turned_i) = product((lr, li), (hr, hi));
+                    c.around[k] = (fit64(kr - turned_i)?, fit64(ki + turned_r)?);
+                    let (qr, qi) = turn(c.gate_bias[k]);
+                    if m.held {
+                        c.along[k] = (fit64(ar)?, fit64(ai)?);
+                        c.gate_bias[k] = (fit64(qr)?, fit64(qi)?);
+                        continue;
+                    }
+                    let faces = &reaches.gates[l];
+                    let (ur, ui) = faces.units[k];
+                    let (rho, open) = (m.rho as i128, m.open as i128);
+                    // v = ∂h_t/∂ρ_t = u h_(t−1) − (ρ_t/γ_t) p_t, on 2^(−24).
+                    let vr = release(ur * hr - ui * hi, MOVE_BITS) - div_nearest(rho * pr, gamma);
+                    let vi = release(ur * hi + ui * hr, MOVE_BITS) - div_nearest(rho * pi, gamma);
+                    // ∂ρ_t/∂|λ| = c r ρ_t/|λ| and ∂ρ_t/∂q = c ρ_t ℓ (ln 2)² r (1 − r), on 2^(−30).
+                    let by_modulus = div_nearest(GATE_REACH * open * rho, faces.moduli[k].max(1));
+                    let mut by_gate = release(rho * faces.logs[k], MOVE_BITS);
+                    by_gate = release(by_gate * ln2_square, MOVE_BITS);
+                    by_gate = release(by_gate * open, MOVE_BITS);
+                    by_gate = GATE_REACH * release(by_gate * (one - open), MOVE_BITS);
+                    c.along[k] = (fit64(ar + release(vr * by_modulus, MOVE_BITS))?, fit64(ai + release(vi * by_modulus, MOVE_BITS))?);
+                    let (dr, di) = (release(vr * by_gate, MOVE_BITS), release(vi * by_gate, MOVE_BITS));
+                    c.gate_bias[k] = (fit64(qr + dr)?, fit64(qi + di)?);
+                    drives[i * n + k] = (dr, di);
+                }
+            }
+            // π_s, the turn after cell s, and the whole section's turn λ_(T−1) ⋯ λ_0.
+            let mut after = vec![(0i128, 0i128); span * n];
+            for k in 0..n {
+                after[(span - 1) * n + k] = (one, 0);
+            }
+            for s in (0..span - 1).rev() {
+                for k in 0..n {
+                    after[s * n + k] = product(after[(s + 1) * n + k], lams[(s + 1) * n + k]);
+                }
+            }
+            let whole: Vec<(i128, i128)> = (0..n).map(|k| product(after[k], lams[k])).collect();
+            let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].input.as_slice()).collect();
+            // One family's moments `M_T = whole · M_0 + release(Σ_s coefficient_s ⊗ x_s)`, the
+            // coefficients interleaved (re, im) a mode.
+            let mut moved = |moments: &mut [(i64, i64)], coefficients: &[Vec<i64>], shift: u32| -> Result<()> {
+                let mut sum = vec![0i128; 2 * n * w];
+                outer_sum(&mut sum, w, coefficients, &inputs);
+                for k in 0..n {
+                    for j in 0..w {
+                        let z = moments[k * w + j];
+                        let (er, ei) = product(whole[k], (z.0 as i128, z.1 as i128));
+                        moments[k * w + j] = (fit64(er + release(sum[2 * k * w + j], shift))?, fit64(ei + release(sum[(2 * k + 1) * w + j], shift))?);
+                    }
+                }
+                Ok(())
+            };
+            // The push's coefficient π_s γ_s on 2^(−30); γ x on 2^(−46) releases to the state's grain.
+            let pushes = (0..span)
+                .map(|s| {
+                    (0..n)
+                        .flat_map(|k| {
+                            let (pr, pi) = after[s * n + k];
+                            let g = gammas[s * n + k];
+                            [release(pr * g, MOVE_BITS), release(pi * g, MOVE_BITS)]
+                        })
+                        .map(fit64)
+                        .collect::<Result<Vec<_>>>()
+                })
+                .collect::<Result<Vec<_>>>()?;
+            moved(&mut c.push, &pushes, MOVE_BITS + FACE_BITS - STATE_BITS)?;
+            if gated {
+                // The gate's coefficient π_s d_s on 2^(−24); d x on 2^(−40) releases to 2^(−24).
+                let gates = (0..span)
+                    .map(|s| {
+                        (0..n)
+                            .flat_map(|k| {
+                                let (gr, gi) = product(after[s * n + k], drives[s * n + k]);
+                                [gr, gi]
+                            })
+                            .map(fit64)
+                            .collect::<Result<Vec<_>>>()
+                    })
+                    .collect::<Result<Vec<_>>>()?;
+                moved(&mut c.gate, &gates, FACE_BITS)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Every stream's continuing state from its section's forward, its credit moved along it.
+    fn carry_credit(&self, states: &mut [TowerState], ends: Vec<(Vec<Cell>, TowerState)>, opening: &[TowerState], reaches: &Reaches) -> Result<()> {
+        states.par_iter_mut().zip(ends.into_par_iter()).zip(opening.par_iter()).try_for_each(|((s, (cells, mut end)), open)| {
+            if let Some(credit) = end.credit.as_mut() {
+                self.advance_credit(credit, open, &cells, reaches)?;
+            }
+            *s = end;
+            Ok(())
+        })
     }
 
     /// The covector on the deposit's grain `2^(−32)` from each family's natural grain.
@@ -1199,9 +1450,7 @@ impl TowerLearner {
             }
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
-                for (s, (_, end)) in states.iter_mut().zip(forwards) {
-                    *s = end;
-                }
+                self.tower.carry_credit(states, forwards, &opening, &reaches)?;
                 return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false });
             }
             candidate.project();
@@ -1226,9 +1475,7 @@ impl TowerLearner {
                     .zip(classes)
                     .map(|((cells, _), c)| cells.iter().enumerate().map(|(i, cell)| cell.face.code(c[i + 1])).sum::<i64>())
                     .sum();
-                for (s, (_, end)) in states.iter_mut().zip(rereads) {
-                    *s = end;
-                }
+                candidate.carry_credit(states, rereads, &opening, &creaches)?;
                 self.tower = candidate;
                 return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true });
             }
@@ -1500,7 +1747,11 @@ mod tests {
     /// The tiny tower, gated or not; a gated one's gate opens away from zero so its covector is read
     /// off the gate's midpoint.
     fn tiny_of(gated: bool) -> Tower {
-        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels: 2, gated };
+        tiny_with(2, gated)
+    }
+
+    fn tiny_with(levels: usize, gated: bool) -> Tower {
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels, gated };
         let mut tower = Tower::found(declaration, &keys(4096)).expect("founded");
         // Open the readout and the returns away from zero so every family carries a covector.
         let k = keys(8192);
@@ -1617,6 +1868,57 @@ mod tests {
         // gate covectors fall below 1/64 bit a unit on this fixture).
         assert!(!gated || gates_checked >= 2, "only {gates_checked} gate families carried a readable covector");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
+    }
+
+    #[test]
+    fn the_opening_credit_completes_the_passage_covector() {
+        the_opening_credit_completes_the_passage_covector_of(false);
+        the_opening_credit_completes_the_passage_covector_of(true);
+    }
+
+    /// On one level every carried path is the level's own recurrence, so a passage's covector read
+    /// as one section equals its two halves' with the second opening on the first's credit, in
+    /// every recurrence family, to the moments' release; without the credit the halves miss what
+    /// the second opening carries.
+    fn the_opening_credit_completes_the_passage_covector_of(gated: bool) {
+        let tower = tiny_with(1, gated);
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0, 2, 2, 1, 3, 0, 1, 1, 2, 3, 0, 0, 1];
+        let half = classes.len() / 2;
+        let reaches = tower.reaches();
+        let covector = |opening: &TowerState, part: &[usize]| -> (Vec<i128>, TowerState) {
+            let mut s = opening.clone();
+            let cells = tower.forward(&mut s, part, &reaches).expect("forward");
+            let g = tower.reverse(opening, &cells, part).expect("reverse");
+            if let Some(credit) = s.credit.as_mut() {
+                tower.advance_credit(credit, opening, &cells, &reaches).expect("credit");
+            }
+            (g, s)
+        };
+        let rest = tower.rest_with_credit();
+        let (whole, _) = covector(&rest, &classes);
+        let (first, carried) = covector(&rest, &classes[..=half]);
+        let (second, _) = covector(&carried, &classes[half..]);
+        let bare = TowerState { credit: None, ..carried.clone() };
+        let (second_bare, _) = covector(&bare, &classes[half..]);
+        let lv = tower.layout.levels[0];
+        let d = &tower.declaration;
+        let mut families = vec![(lv.move_re, d.modes), (lv.move_im, d.modes), (lv.push_re, d.modes * d.width), (lv.push_im, d.modes * d.width)];
+        if gated {
+            families.extend([(lv.gate, d.modes * d.width), (lv.gate_bias, d.modes)]);
+        }
+        let (mut credited, mut missed, mut scale) = (0i128, 0i128, 0i128);
+        for (start, len) in families {
+            for i in start..start + len {
+                let error = (whole[i] - first[i] - second[i]).abs();
+                // Each moment releases one grain a cell; the parameters' covectors carry tens of
+                // thousands of grains on this fixture.
+                assert!(error * 64 <= whole[i].abs().max(1 << 12), "family at {start}, parameter {i}: whole {} against halves {}", whole[i], first[i] + second[i]);
+                credited += error;
+                missed += (whole[i] - first[i] - second_bare[i]).abs();
+                scale += whole[i].abs();
+            }
+        }
+        assert!(missed >= 16 * credited.max(1) && missed * 64 >= scale, "the credit carried {credited} of error against {missed} without it, over {scale}");
     }
 
     #[test]

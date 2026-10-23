@@ -11,6 +11,7 @@
 //! on its face.
 use super::*;
 use holonics::hnn::tower::{Tower, TowerDeclaration, TowerLearner, TowerState, READ_BITS};
+use holonics::hnn::units::{Units, CODE_BITS};
 
 /// A learner's state read ceiling, `2^30` bytes.
 const STATE_BUDGET: usize = 1 << 30;
@@ -23,11 +24,10 @@ fn count(s: &str) -> Result<usize> {
 /// calculation markup.
 pub(super) const REGIONS: [&str; 4] = ["Q", "P", "N", "M"];
 
-/// The held-out reading: the frozen tower's code of `bytes`, cut into `streams` contiguous parts,
-/// each read from rest; per region of `roles` (the coded byte's region), on `2^(−20)` bits, with the
-/// bytes coded.
-fn held_out(tower: &Tower, bytes: &[u8], roles: &[u8], streams: usize) -> Result<[(i64, usize); 4]> {
-    let classes: Vec<usize> = bytes.iter().map(|&b| b as usize).collect();
+/// The held-out reading: the frozen tower's code of `classes`, cut into `streams` contiguous
+/// parts, each read from rest; per region of `roles` (the coded class's region, the region of its
+/// first byte), on `2^(−20)` bits, with the bytes coded (`lengths`, each class's bytes).
+fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], streams: usize) -> Result<[(i64, usize); 4]> {
     let chunk = classes.len().div_ceil(streams);
     let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
     use rayon::prelude::*;
@@ -41,7 +41,7 @@ fn held_out(tower: &Tower, bytes: &[u8], roles: &[u8], streams: usize) -> Result
             for (i, code) in codes.into_iter().enumerate() {
                 let region = &mut regions[roles[start + i + 1] as usize];
                 region.0 += code;
-                region.1 += 1;
+                region.1 += lengths[start + i + 1] as usize;
             }
             Ok(regions)
         })
@@ -82,37 +82,98 @@ pub(super) fn per(code: i64, n: usize) -> String {
 }
 
 /// `train-tower` trains the ungated tower, `train-gated-tower` the gated one (its modes' decay keyed by
-/// their input); a continued learner must carry the same declaration.
-pub(super) fn train(args: &[String], gated: bool) -> Result<()> {
+/// their input), and `train-credited-tower` the gated one whose streams carry their passage credit
+/// (`hnn::tower::LevelCredit`), so a section's covector reaches the history its opening carries; a
+/// continued learner must carry the same declaration.
+pub(super) fn train(args: &[String], gated: bool, credit: bool) -> Result<()> {
     if args.len() != 18 && args.len() != 20 {
-        return Err("train-tower|train-gated-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+        return Err("train-tower|train-gated-tower|train-credited-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
-    let started = Instant::now();
     let train = pinned_read(&args[1], &args[2], READ_BUDGET as usize)?;
     let dev = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let roles = roles_of(&args[5], &args[6], dev.len())?;
-    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
-    let declaration = TowerDeclaration {
+    let reading = Reading {
+        train: train.iter().map(|&b| b as usize).collect(),
+        train_lengths: vec![1; train.len()],
+        dev: dev.iter().map(|&b| b as usize).collect(),
+        dev_lengths: vec![1; dev.len()],
+        dev_roles: roles,
         alphabet: 256,
-        width: count(&args[9])?,
-        modes: count(&args[10])?,
-        contacts: count(&args[11])?,
-        levels: count(&args[12])?,
+    };
+    fit(&args[7..], reading, gated, credit)
+}
+
+/// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
+/// held-out text are read in the units, and each code is reported over the bytes its units decode
+/// to.
+pub(super) fn train_units(args: &[String]) -> Result<()> {
+    if args.len() != 20 && args.len() != 22 {
+        return Err("train-unit-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+    }
+    let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
+    let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let dev = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let byte_roles = roles_of(&args[7], &args[8], dev.len())?;
+    let read = |bytes: &[u8]| -> Result<(Vec<usize>, Vec<u32>)> {
+        let parsed = units.parse(bytes).map_err(|e| e.to_string())?;
+        let lengths = parsed.iter().map(|&u| units.piece(u as usize).len() as u32).collect();
+        Ok((parsed.into_iter().map(|u| u as usize).collect(), lengths))
+    };
+    let (train_classes, train_lengths) = read(&train)?;
+    let (dev_classes, dev_lengths) = read(&dev)?;
+    // Each unit's region is the region of its first byte.
+    let mut dev_roles = Vec::with_capacity(dev_classes.len());
+    let mut at = 0usize;
+    for &n in &dev_lengths {
+        dev_roles.push(byte_roles[at]);
+        at += n as usize;
+    }
+    println!(
+        "UNIT_READ units={} train_bytes={} train_units={} dev_bytes={} dev_units={}",
+        units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
+    );
+    let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len() };
+    fit(&args[9..], reading, true, false)
+}
+
+/// A passage read in a tower's classes: the training and held-out classes, the bytes each class
+/// decodes to, and the held-out classes' regions.
+struct Reading {
+    train: Vec<usize>,
+    train_lengths: Vec<u32>,
+    dev: Vec<usize>,
+    dev_lengths: Vec<u32>,
+    dev_roles: Vec<u8>,
+    alphabet: usize,
+}
+
+/// The passes: `args` are `KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS
+/// OUT [FROM FROM_SHA]`.
+fn fit(args: &[String], reading: Reading, gated: bool, credit: bool) -> Result<()> {
+    let started = Instant::now();
+    let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
+    let declaration = TowerDeclaration {
+        alphabet: reading.alphabet,
+        width: count(&args[2])?,
+        modes: count(&args[3])?,
+        contacts: count(&args[4])?,
+        levels: count(&args[5])?,
         gated,
     };
-    let streams = count(&args[13])?;
-    let section = count(&args[14])?;
-    let passes = count(&args[15])?;
-    let rate_bits: u32 = args[16].parse()?;
-    let out = Path::new(&args[17]);
+    let streams = count(&args[6])?;
+    let section = count(&args[7])?;
+    let passes = count(&args[8])?;
+    let rate_bits: u32 = args[9].parse()?;
+    let out = Path::new(&args[10]);
     std::fs::create_dir(out)?;
-    if streams == 0 || section == 0 || train.len() < streams * (section + 1) {
+    let classes = &reading.train;
+    if streams == 0 || section == 0 || classes.len() < streams * (section + 1) {
         return Err("the training text must hold one section a stream".into());
     }
     // A run continues a rested learner (its tower and moments) when one is named; its declaration
     // and rate must be the declared ones.
-    let mut learner = if args.len() == 20 {
-        let from = pinned_read(&args[18], &args[19], STATE_BUDGET)?;
+    let mut learner = if args.len() == 13 {
+        let from = pinned_read(&args[11], &args[12], STATE_BUDGET)?;
         let learner = TowerLearner::from_text(std::str::from_utf8(&from)?).map_err(|e| e.to_string())?;
         if learner.tower.declaration != declaration || learner.rate_bits != rate_bits {
             return Err("the continued learner's declaration or rate differs from the declared one".into());
@@ -121,22 +182,28 @@ pub(super) fn train(args: &[String], gated: bool) -> Result<()> {
     } else {
         TowerLearner::new(Tower::found(declaration, &keys).map_err(|e| e.to_string())?, rate_bits)
     };
-    let classes: Vec<usize> = train.iter().map(|&b| b as usize).collect();
     let chunk = classes.len() / streams;
     let sections_a_pass = (chunk - 1) / section;
+    let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
     println!(
         "TOWER_TRAIN material={} streams={} section={} sections_a_pass={} train_bytes={} dev_bytes={}",
-        learner.tower.theta.len(), streams, section, sections_a_pass, train.len(), dev.len()
+        learner.tower.theta.len(),
+        streams,
+        section,
+        sections_a_pass,
+        reading.train_lengths.iter().map(|&n| n as usize).sum::<usize>(),
+        dev_bytes
     );
     for pass in 0..passes {
         let pass_started = Instant::now();
-        let mut states: Vec<TowerState> = (0..streams).map(|_| learner.tower.rest()).collect();
-        let (mut code, mut cells, mut deposits, mut halvings) = (0i64, 0usize, 0usize, 0u32);
+        let mut states: Vec<TowerState> =
+            (0..streams).map(|_| if credit { learner.tower.rest_with_credit() } else { learner.tower.rest() }).collect();
+        let (mut code, mut bytes, mut deposits, mut halvings) = (0i64, 0usize, 0usize, 0u32);
         let mut window = (0i64, 0usize);
         for k in 0..sections_a_pass {
-            let parts: Vec<&[usize]> = (0..streams)
-                .map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1])
-                .collect();
+            let ranges: Vec<std::ops::Range<usize>> =
+                (0..streams).map(|s| s * chunk + k * section..s * chunk + (k + 1) * section + 1).collect();
+            let parts: Vec<&[usize]> = ranges.iter().map(|r| &classes[r.clone()]).collect();
             let receipt = match learner.section(&mut states, &parts) {
                 Ok(receipt) => receipt,
                 Err(e) => {
@@ -144,10 +211,12 @@ pub(super) fn train(args: &[String], gated: bool) -> Result<()> {
                     return Err(e.to_string().into());
                 }
             };
+            // The section codes every class of a part after its first.
+            let coded: usize = ranges.iter().map(|r| reading.train_lengths[r.start + 1..r.end].iter().map(|&n| n as usize).sum::<usize>()).sum();
             code += receipt.code_before;
-            cells += receipt.cells;
+            bytes += coded;
             window.0 += receipt.code_before;
-            window.1 += receipt.cells;
+            window.1 += coded;
             deposits += receipt.deposited as usize;
             halvings += receipt.halvings;
             if (k + 1) % 32 == 0 || k + 1 == sections_a_pass {
@@ -165,11 +234,11 @@ pub(super) fn train(args: &[String], gated: bool) -> Result<()> {
         let name = format!("STATE.{pass}");
         write_new(&out.join(&name), text.as_bytes())?;
         println!("TOWER_STATE {name} state_bytes={} state_sha256={}", text.len(), sha256(text.as_bytes())?);
-        let regions = held_out(&learner.tower, &dev, &roles, streams)?;
-        let (dev_code, dev_cells) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
+        let regions = held_out(&learner.tower, &reading.dev, &reading.dev_lengths, &reading.dev_roles, streams)?;
+        let (dev_code, dev_coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
         println!(
             "TOWER_PASS pass={} train_bits_a_byte={} dev_bits_a_byte={} dev_regions {} deposits={}/{} pass_ms={} elapsed_ms={}",
-            pass, per(code, cells), per(dev_code, dev_cells), region_line(&regions), deposits, sections_a_pass,
+            pass, per(code, bytes), per(dev_code, dev_coded), region_line(&regions), deposits, sections_a_pass,
             pass_started.elapsed().as_millis(), started.elapsed().as_millis()
         );
     }
@@ -179,10 +248,62 @@ pub(super) fn train(args: &[String], gated: bool) -> Result<()> {
     Ok(())
 }
 
+/// `found-units TRAIN TRAIN_SHA OUT`: found units from the training text (`hnn::units`) and write
+/// the founding list.
+pub(super) fn found_units(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("found-units TRAIN TRAIN_SHA OUT".into());
+    }
+    let started = Instant::now();
+    let train = pinned_read(&args[1], &args[2], READ_BUDGET as usize)?;
+    let out = Path::new(&args[3]);
+    std::fs::create_dir(out)?;
+    let (units, read, receipt) = Units::found(&train).map_err(|e| e.to_string())?;
+    let text = units.to_text();
+    write_new(&out.join("UNITS"), text.as_bytes())?;
+    let bits = |code: i128| per((code >> (CODE_BITS - READ_BITS)) as i64, train.len());
+    println!(
+        "UNITS_FOUNDED units={} founded={} refused={} undecided={} priced={} symbols={}->{} order_one_bits_a_byte={}->{} description_bits_a_byte={} complete_bits_a_byte={} elapsed_ms={}",
+        units.len(), receipt.founded, receipt.refused, receipt.undecided, receipt.priced, receipt.symbols_before, receipt.symbols_after,
+        bits(receipt.code_before), bits(receipt.code_after), bits(receipt.description), bits(receipt.code_after + receipt.description),
+        started.elapsed().as_millis()
+    );
+    println!("UNITS_STATE units_bytes={} units_sha256={}", text.len(), sha256(text.as_bytes())?);
+    // The units the passage reads most, with their counts, and the longest founded.
+    let mut counts = vec![0usize; units.len()];
+    for &u in &read {
+        counts[u as usize] += 1;
+    }
+    let mut order: Vec<usize> = (256..units.len()).collect();
+    order.sort_by_key(|&u| std::cmp::Reverse(counts[u]));
+    let show = |u: usize| format!("{:?}:{}", String::from_utf8_lossy(units.piece(u)), counts[u]);
+    println!("UNITS_READ_MOST {}", order.iter().take(60).map(|&u| show(u)).collect::<Vec<_>>().join(" "));
+    order.sort_by_key(|&u| std::cmp::Reverse(units.piece(u).len()));
+    println!("UNITS_LONGEST {}", order.iter().take(30).map(|&u| show(u)).collect::<Vec<_>>().join(" "));
+    Ok(())
+}
+
+/// `sample-unit-tower UNITS UNITS_SHA STATE STATE_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES OUT
+/// [AGREE]`: the prompt read in the units, then units released until the declared bytes.
+pub(super) fn sample_units(args: &[String]) -> Result<()> {
+    if args.len() != 11 && args.len() != 12 {
+        return Err("sample-unit-tower UNITS UNITS_SHA STATE STATE_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES OUT [AGREE]".into());
+    }
+    let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
+    release(&args[2..], Some(&units))
+}
+
 pub(super) fn sample(args: &[String]) -> Result<()> {
     if args.len() != 9 && args.len() != 10 {
         return Err("sample-tower STATE STATE_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES OUT [AGREE]".into());
     }
+    release(args, None)
+}
+
+/// A fork of the rested tower: it receives the prompt (read in the units when named) and releases
+/// classes by exact draws on its face until the declared bytes are released. `args` are
+/// `_ STATE STATE_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES OUT [AGREE]`.
+fn release(args: &[String], units: Option<&Units>) -> Result<()> {
     let agree = agreement(args.get(9))?;
     let started = Instant::now();
     let state = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
@@ -197,7 +318,10 @@ pub(super) fn sample(args: &[String]) -> Result<()> {
     let learner = TowerLearner::from_text(std::str::from_utf8(&state)?).map_err(|e| e.to_string())?;
     let tower = &learner.tower;
     let mut modes = tower.rest();
-    let classes: Vec<usize> = prompt.iter().map(|&b| b as usize).collect();
+    let classes: Vec<usize> = match units {
+        Some(u) => u.parse(&prompt).map_err(|e| e.to_string())?.into_iter().map(|c| c as usize).collect(),
+        None => prompt.iter().map(|&b| b as usize).collect(),
+    };
     let prompt_code = if classes.len() > 1 { tower.read(&mut modes.clone(), &classes).map_err(|e| e.to_string())? } else { 0 };
     let mut face = None;
     for &c in &classes {
@@ -211,13 +335,20 @@ pub(super) fn sample(args: &[String]) -> Result<()> {
         let class = holonics::receiver::release::draw_exact(&agreement_face(&face.masses, agree), &key)?
             .drawn_class()
             .ok_or("an unresolved draw at an exact face")?;
-        released.push(class as u8);
+        match units {
+            Some(u) => released.extend_from_slice(u.piece(class)),
+            None => released.push(class as u8),
+        }
         face = tower.advance(&mut modes, class).map_err(|e| e.to_string())?;
     }
     write_new(&out.join("OUTPUT.bin"), &released)?;
+    let prompt_bytes = match units {
+        Some(u) => classes[1..].iter().map(|&c| u.piece(c).len()).sum::<usize>(),
+        None => classes.len().saturating_sub(1),
+    };
     println!(
         "TOWER_SAMPLE prompt_bits_a_byte={} bytes={} agree={} elapsed_ms={}",
-        per(prompt_code, classes.len().saturating_sub(1).max(1)), released.len(), agree, started.elapsed().as_millis()
+        per(prompt_code, prompt_bytes.max(1)), released.len(), agree, started.elapsed().as_millis()
     );
     println!("TOWER_SAMPLE_TEXT {:?}", String::from_utf8_lossy(&released));
     Ok(())
