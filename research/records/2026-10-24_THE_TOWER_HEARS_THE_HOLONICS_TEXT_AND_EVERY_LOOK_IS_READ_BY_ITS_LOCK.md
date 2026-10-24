@@ -2135,8 +2135,9 @@ and a pool (the unit, `χ₁` to `χ₅`), 384 pairs, ranked by the leading shar
   reads the units at `B` in **471 of 495** held-out sums. The acceptance's bar is 370.
 
 **What it says** [agent-inferred]:
-- The founding finds the units crossing at `B` with no label and no start, once each candidate form
-  is scored by the demand that reaches it through its own placement. Placement belongs to the
+- Within the label region and with the ring's characters as its pools, the founding finds the
+  units crossing at `B` with no label on the form and no start, once each candidate form is scored
+  by the demand that reaches it through its own placement (the `U` cells come from the true sums). Placement belongs to the
   form: a value placed in a node mode reaches `U` alike for every distance, and `U`'s demand reaches
   it whole.
 - The pool law's eigenproblem finds what every climb missed. The climbs failed on the landscape,
