@@ -811,6 +811,110 @@ spectrum was added after it and checked on the slice (5.8 s); the whole run agai
 186 s from the run before with a 240 s deadline, took 178.5 s at a peak of 236 MB, with every
 founding and held-out reading identical to the first run's.
 
+## A block of full pair forms
+
+The spectrum says a pair face for text is a block of some tens of coordinates, each a full
+bilinear form of the two encodings. This step founds that block and reads it held out
+(`found-tower-pair-block`, [agent-inferred with the mathematics thread, October 24]).
+
+**What is read.**
+- The pool is every product of a coordinate of the current byte's encoding with one of the byte
+  before's, `z_p = x̂_cur ⊗ ŷ_prev`, each with its unit (`x̂ = (E(u), 2^16)`; the start of a stream
+  has `ŷ = (0, 2^16)`): 65 × 65 = 4,225 coordinates. A full pair form `W(x̄⊗ȳ)` is one read of the
+  pool, `c_p = Σ_ij W_ij x̂_i ŷ_j`. The table of pairs is its ceiling, and one product of two reads
+  (the founded ranks above) is its rank-one case.
+- The block is founded as a reduced-rank read of the tension on the pool after the face. With `M`
+  the pool's cross moment with the covector and `Q` its Gram, both after the face, the class matrix
+  `N = M Q⁻¹ Mᵀ` (171 × 171) holds what the whole pool could carry. Its leading `k` eigen-directions
+  `v` hold the most `k` coordinates could, and each direction's form is `W_v = Q⁻¹Mᵀv`. The face and
+  the pool are eliminated together, so each form is read after the face.
+- The elimination runs at a declared grain. Each coordinate is scaled by a power of two so its
+  diagonal is below `2^50`, and the covector by one power of two so its total is below `2^50`. The
+  factorization is `LDLᵀ`: the face's coordinates first, then the pool's, each step pivoting on the
+  largest remaining diagonal. A set stops when that diagonal falls below `2^20`, so a coordinate
+  within `2^−30` of its predecessors' span is passed over. `L` carries 46 fractional bits, each term
+  is rounded on its own and the sums are exact, so the factorization is the same however the cores
+  share the sums. The forms are back-substituted exactly, in integers of any width, and released to
+  62 bits.
+- Each form is then a table over every pair of the alphabet: the form's resident face, released by
+  its largest value on the training pairs to `2^16`. The readout is fitted exactly (Bareiss, as for
+  every face) with the first `k` forms beside the face, `k = 1, 2, 4, …, 32`, and read on the
+  held-out text.
+
+**The search's grain, measured.** The first search eliminated the coordinates in their given
+order. On the slice, whose 926 pairs leave the pool's 4,225 products far from independent, it left
+its 64-bit grain four times:
+- with the floor at `2^10` and 30 fractional bits in `L` (7.4 s);
+- with the floor at `2^20` (6.8 s);
+- instrumented: an entry of the eliminated column reached `2^51.8` at pivot 1,275, outside the cone a
+  semidefinite matrix keeps. `L`'s rounding (`2^−31` of entries near `2^50`, about `2^19` a term)
+  had reached the floor;
+- with 46 fractional bits: the carried covector row outgrew its grain at pivot 1,152.
+
+The cause was the order, not the width: elimination in a given order on near-dependent products
+pivots on rounding, and its multipliers grow (`|l|` reached `2^10` in the instrumented run). Taking
+the largest remaining diagonal first is the rank-revealing order. It bounds every multiplier by 1
+within a set (by `2^15` for pool rows read on the face's steps), and the slice then ran clean at the
+same grain. The exact readout agrees with the search wherever both are read.
+
+**What it reads.** On the training text (1,789,108 cells, 6,330 pairs, 171 arriving classes) the
+face's own readout takes 8.263‰ of the Brier score, at the search's grain and exactly alike. The
+whole pool after the face carries 36.52‰ of the tension (one of its coordinates is passed over;
+its chance level, 4,224 coordinates over the cells, is 2.36‰), against 40.72‰ for the table of
+pairs. In thousandths of the tension:
+
+| leading coordinates | 1 | 2 | 4 | 8 | 16 | 32 |
+|---|---|---|---|---|---|---|
+| the most the pair could carry (the table's spectrum) | 3.70 | 6.94 | 11.91 | 18.48 | 25.63 | 31.93 |
+| the pool's spectrum, at the search's grain | 3.455 | 6.319 | 10.980 | 17.186 | 23.757 | 29.217 |
+| the founded block, read exactly | 3.455 | 6.319 | 10.980 | 17.186 | 23.758 | 29.217 |
+| founded products of two reads | 1.18 | 1.90 | 3.46 | | | |
+
+Held out (48,023 cells), in thousandths of the residual the face's own readout leaves:
+
+| forms | prose | Lean | Rust | digits | all |
+|---|---|---|---|---|---|
+| 1 | 3.106 | 3.592 | 4.048 | 0.059 | 2.622 |
+| 2 | 4.774 | 4.966 | 6.304 | 0.172 | 3.937 |
+| 4 | 6.624 | 7.934 | 9.284 | 0.242 | 5.828 |
+| 8 | 9.886 | 14.115 | 12.764 | 0.519 | 9.047 |
+| 16 | 12.340 | 19.337 | 18.075 | 0.822 | 12.209 |
+| 32 | 15.050 | 23.379 | 20.221 | 2.312 | 14.794 |
+
+The held-out residual falls from 0.619 to 0.610 per cell over all (prose 0.702 to 0.692, Lean
+0.590 to 0.577, Rust 0.532 to 0.521, digits 0.652 to 0.651). Four forms remove 5.8‰ where the four
+products removed 2.4‰, and thirty-two remove about six times what the products did. Only 57 held-out
+cells fall on pairs the training text never met, yet they carry 24‰ to 80‰ of each leading form's
+held-out square: off the pairs it was fitted on, a form is free and takes large values.
+
+The leading forms read as contrasts among the next byte, each weighing most on a few pairs:
+- form 1: `e` against `a`, a space and `o`, weighing most on `iv`, ` d`, `rn`, `ch`, ` p`, `ar`;
+- form 2: a space (with `e`) against `a`, a newline, `i` and `n`, on two spaces, `on`, `ce`,
+  `}`+newline, `)`+newline, `ge`;
+- form 3: `a` against `o` and `r`, on ` p`, ` m`, `pr`, two spaces, `at`, `mp`;
+- form 4: `o` against `r`, `t` and `i`, on `pa`, ` p`, `s `, `ha`, `ac`, `wh`.
+
+On the slice the forms memorize, as a slice must: with 926 pairs the pool carries exactly the
+table's 263.43‰, 3,300 of its coordinates are passed over, 4,466 held-out cells fall on unmet pairs
+and carry 966‰ to 994‰ of each form's square, and the held-out residual grows to 176 per cell. The
+slice was the timing read.
+
+**What it says.**
+- The pair contact `W(x̄⊗ȳ)` of the one face law is a real face of text. One full form carries 93%
+  of what the best single coordinate of the pair could (3.455 against 3.70), where one product of
+  two reads carried a third; thirty-two carry 92% of the best thirty-two. On held-out text they keep
+  about half of what they carry on the training text, and they hold in prose, Lean and Rust alike.
+- The digits take almost none of it (2.3‰): the byte before says little about the next digit.
+- The face is small, 1.5% of the held-out residual, as the table's ceiling said it would be: even in
+  sample the last two bytes hold about 4% of the tension. What a longer context holds is the next
+  founding's question, read the same way on its own pool [agent-inferred].
+
+**The run.** The slice ran in 13.7 s at a peak of 229 MiB. The projection for the whole text, from
+the slice's units and the founding's pass (92.7 s), was 190 s and at most 250 s: the elimination
+grows with the coordinates taken squared (at most 4,225, about 21 times the slice's), the forms
+alike, and the readouts with the moments' width. The deadline was 300 s. The run took 121.1 s at a
+peak of 319 MiB, 0.64 of the projection.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -826,6 +930,9 @@ founding and held-out reading identical to the first run's.
 - **A refusal answered with a larger limit.** The plain run stopped at its bound. It was continued
   under the largest measured pass, its own measurement, and reported here as stopped. The pair
   tower's foil stopped at its bound too. It is read at the state it reached and not continued.
+  When the block's search left its 64-bit grain, the floor and `L`'s fraction were each moved once
+  within the same word and the failure only moved; the repair was the elimination's order, and no
+  deadline or width beyond the word was raised.
 - **An authored routine standing in for learning.** The located moment is the passage tree's lock, a
   receiver of the machine's own kind, and no list of relation tokens. It chooses only where the
   exterior reading looks. Nothing in the tower reads it.
@@ -867,6 +974,9 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
 - The founding: `FOUND_SLICE.txt` (the timing slice, two ranks), `FOUND_FULL.txt` (the training and
   held-out text, four ranks, every step's line included), `FOUND_SLICE_SPECTRUM.txt` and
   `FOUND_FULL_SPECTRUM.txt` (the same with the ceiling's spectrum).
+- The block: `BLOCK_SLICE_FAILED_1.txt` to `BLOCK_SLICE_FAILED_4.txt` (the slice under the search in
+  the given order, each failure's line), `BLOCK_SLICE.txt` (the slice, largest diagonal first) and
+  `BLOCK_FULL.txt` (the training and held-out text, 32 forms).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -876,4 +986,5 @@ the located reads, the pair towers' reads and writing, and the rungs (`a3cc250c�
 reads use `tension1` (`5295f6c6…`, the timing slice and the first held-out reads) and `tension2`
 (`c25dda3f…`, with line starts and the region). The floor reads use `floor1` (`4480bbcb…`),
 `floor2` (`79266042…`) and `floor3` (`e0edd479…`, the last slice and the full text). The founding
-uses `found1` (`d2ebd83e…`) and, with the spectrum, `found2` (`7e93511f…`).
+uses `found1` (`d2ebd83e…`) and, with the spectrum, `found2` (`7e93511f…`). The block uses
+`block1` (`95057b05…`; its failed slices ran earlier builds of it, the first `3d69f641…`).

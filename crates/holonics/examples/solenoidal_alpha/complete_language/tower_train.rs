@@ -1007,6 +1007,25 @@ impl PairFace {
     fn value(&self, (prev, cur): (usize, usize)) -> i64 {
         self.r[cur] * self.s[prev]
     }
+    fn table(&self) -> PairTable {
+        let alphabet = self.r.len();
+        PairTable { alphabet, values: self.s.iter().flat_map(|&s| self.r.iter().map(move |&r| r * s)).collect() }
+    }
+}
+
+/// A founded coordinate of a pair as its value at every pair of the alphabet, the byte before
+/// (with the stream's start, `alphabet`) by the current byte: the resident face of the form that
+/// founded it, so a pair the training text never met is read by the same form.
+#[derive(Clone)]
+struct PairTable {
+    alphabet: usize,
+    values: Vec<i64>,
+}
+
+impl PairTable {
+    fn value(&self, (prev, cur): (usize, usize)) -> i64 {
+        self.values[prev * self.alphabet + cur]
+    }
 }
 
 fn mac(acc: i128, x: i128, y: i128) -> std::result::Result<i128, String> {
@@ -1097,7 +1116,7 @@ struct Readout {
 /// the table's order, `H` and `B` with the founded rows.
 type Extended = (Vec<Vec<i128>>, Vec<Vec<num_bigint::BigInt>>, Vec<Vec<num_bigint::BigInt>>);
 
-fn extended(moments: &PairMoments, keys: &[(usize, usize)], cells: &[&PairCell], founded: &[PairFace]) -> Result<Extended> {
+fn extended(moments: &PairMoments, keys: &[(usize, usize)], cells: &[&PairCell], founded: &[PairTable]) -> Result<Extended> {
     use num_bigint::BigInt;
     let (m0, r, a_n) = (moments.m, founded.len(), moments.t.len());
     let m = m0 + r;
@@ -1431,6 +1450,148 @@ fn leading_directions(y: &[Vec<num_bigint::BigInt>], count: usize) -> Vec<Vec<i6
     found
 }
 
+/// Over the span of the leading `k` directions of a symmetric positive semidefinite `e`, the exact
+/// sum `tr((VᵀV)⁻¹VᵀeV)` (a lower bound on the sum of its leading `k` eigenvalues), for each `k` a
+/// power of two up to the directions found, as `(k, numerator, denominator)`; with each direction's
+/// own Rayleigh quotient `(vᵀev, vᵀv)`.
+type LeadingSums = (Vec<(usize, num_bigint::BigInt, num_bigint::BigInt)>, Vec<(num_bigint::BigInt, num_bigint::BigInt)>);
+
+fn leading_sums(e: &[Vec<num_bigint::BigInt>], directions: &[Vec<i64>]) -> Result<LeadingSums> {
+    use num_bigint::BigInt;
+    let a_n = e.len();
+    let ev: Vec<Vec<BigInt>> = (0..a_n).into_par_iter().map(|k| directions.iter().map(|v| (0..a_n).map(|l| &e[k][l] * v[l]).sum()).collect()).collect();
+    let gram: Vec<Vec<BigInt>> = directions.iter().map(|u| directions.iter().map(|v| BigInt::from(u.iter().zip(v).map(|(&x, &y)| x as i128 * y as i128).sum::<i128>())).collect()).collect();
+    let quadratic: Vec<Vec<BigInt>> = directions.iter().map(|u| (0..directions.len()).map(|c| (0..a_n).map(|k| &ev[k][c] * u[k]).sum()).collect()).collect();
+    let mut sums = Vec::new();
+    for k in (0..usize::BITS).map(|b| 1usize << b).take_while(|&k| k <= directions.len()) {
+        let g: Vec<Vec<BigInt>> = gram[..k].iter().map(|row| row[..k].to_vec()).collect();
+        let q: Vec<Vec<BigInt>> = quadratic[..k].iter().map(|row| row[..k].to_vec()).collect();
+        let (dg, z) = solve_scaled(&g, &q, true)?;
+        sums.push((k, (0..k).map(|i| z[i][i].clone()).sum(), dg));
+    }
+    Ok((sums, (0..directions.len()).map(|i| (quadratic[i][i].clone(), gram[i][i].clone())).collect()))
+}
+
+/// A direction over the arriving classes, its largest `count` entries with their signs.
+fn leading_classes(v: &[i64], arriving: &[usize], count: usize) -> String {
+    let mut order: Vec<usize> = (0..v.len()).collect();
+    order.sort_by_key(|&k| std::cmp::Reverse(v[k].unsigned_abs()));
+    order.iter().take(count).map(|&k| format!("{}:{}", class_name(arriving[k]), v[k])).collect::<Vec<_>>().join(" ")
+}
+
+/// The region names of the held-out partition's roles, in order.
+const PAIR_REGIONS: [&str; 4] = ["prose", "lean", "rust", "digits"];
+
+/// The pass both pair foundings share: the frozen tower read once over the training text (one
+/// part) and over the held-out text (one part per region), keeping each part's face moments and
+/// the table of the pairs of bytes that occur, with the classes that arrive.
+struct PairReading {
+    learner: TowerLearner,
+    arriving: Vec<usize>,
+    train: PairMoments,
+    held: Vec<PairMoments>,
+    started: std::time::Instant,
+}
+
+impl PairReading {
+    /// `STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS` and the
+    /// command's own last argument.
+    fn read(args: &[String], usage: &str) -> Result<Self> {
+        if args.len() != 11 {
+            return Err(usage.into());
+        }
+        let started = std::time::Instant::now();
+        let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+        let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+        let dev = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+        let dev_roles = roles_of(&args[7], &args[8], dev.len())?;
+        let streams = count(&args[9])?;
+        if train.len() >= 1 << 32 || dev.len() >= 1 << 32 {
+            return Err("the pair sums are carried in 64 bits, for texts below 2^32 bytes".into());
+        }
+        let tower = &learner.tower;
+        let alphabet = tower.declaration.alphabet;
+        let cut = |text: &[u8]| -> Vec<Vec<usize>> {
+            let chunk = text.len().div_ceil(streams.max(1));
+            text.chunks(chunk).map(|s| s.iter().map(|&b| b as usize).collect()).collect()
+        };
+        let (train_streams, dev_streams) = (cut(&train), cut(&dev));
+        let mut arrives = vec![false; alphabet];
+        for s in &train_streams {
+            for &c in s.iter().skip(1) {
+                arrives[c] = true;
+            }
+        }
+        let arriving: Vec<usize> = (0..alphabet).filter(|&c| arrives[c]).collect();
+        let train_moments = read_pair_moments(tower, &train_streams, &arriving, None)?.pop().ok_or("no training moments")?;
+        let held = read_pair_moments(tower, &dev_streams, &arriving, Some(&dev_roles))?;
+        if train_moments.pairs.is_empty() {
+            return Err("the training text has no pairs".into());
+        }
+        println!(
+            "FOUND_PASS train_cells={} pairs={} arriving={} held_out_cells={} read_ms={}",
+            train_moments.cells,
+            train_moments.pairs.len(),
+            arriving.len(),
+            held.iter().map(|m| m.cells).sum::<usize>(),
+            started.elapsed().as_millis()
+        );
+        Ok(Self { learner, arriving, train: train_moments, held, started })
+    }
+
+    /// Each byte's encoding with the unit, `x̂ = (E(u), 2^16)`, for the current byte, and for the
+    /// byte before with the stream's start, `ŷ = (0, 2^16)`.
+    fn hats(&self) -> (Vec<Vec<i64>>, Vec<Vec<i64>>) {
+        let tower = &self.learner.tower;
+        let (w, alphabet) = (tower.declaration.width, tower.declaration.alphabet);
+        let hat = |u: usize| -> Vec<i64> {
+            let mut x: Vec<i64> = if u < alphabet { tower.encoding(u).iter().map(|&e| e as i64).collect() } else { vec![0; w] };
+            x.push(1 << 16);
+            x
+        };
+        ((0..alphabet).map(hat).collect(), (0..=alphabet).map(hat).collect())
+    }
+
+    /// The held-out reading of a readout: per region and in all, the brier `T`, the residual, and
+    /// (against the face's own readout, `R₀/D₀²`) the share of the face's residual the founded
+    /// rows remove.
+    fn held_out(&self, rank: usize, readout: &Readout, founded: &[PairTable], base: Option<(&[num_bigint::BigInt], &num_bigint::BigInt)>) -> Result<Vec<num_bigint::BigInt>> {
+        use num_bigint::BigInt;
+        let d2 = &readout.d * &readout.d;
+        let change = |part: usize, r: &BigInt| -> String {
+            base.map_or(String::new(), |(base, base_d2)| {
+                let scale = (&base[part] * &d2).max(BigInt::from(1));
+                format!(":{}", thousandths_of(&((&base[part] * &d2 - r * base_d2) * 1000), &scale))
+            })
+        };
+        let mut residuals = Vec::new();
+        let (mut all_t, mut all_r, mut all_cells) = (BigInt::from(0), BigInt::from(0), 0usize);
+        let mut line = Vec::new();
+        for (part, moments) in self.held.iter().enumerate() {
+            let (keys, cells) = moments.table();
+            let (_, h, b) = extended(moments, &keys, &cells, founded)?;
+            let r = readout_residual(readout, &h, &b, &moments.t);
+            let t: BigInt = moments.t.iter().map(|&x| BigInt::from(x)).sum();
+            let cell_unit = BigInt::from(moments.cells.max(1)) << 48;
+            line.push(format!("{}={}/{}{}", PAIR_REGIONS[part], thousandths_of(&t, &cell_unit), thousandths_of(&r, &(&cell_unit * &d2)), change(part, &r)));
+            all_t += &t;
+            all_r += &r;
+            all_cells += moments.cells;
+            residuals.push(r);
+        }
+        let all_unit = BigInt::from(all_cells.max(1)) << 48;
+        line.push(format!("all={}/{}{}", thousandths_of(&all_t, &all_unit), thousandths_of(&all_r, &(&all_unit * &d2)), change(PAIR_REGIONS.len(), &all_r)));
+        residuals.push(all_r);
+        println!(
+            "HELD_OUT rank={rank} (part=brier_T/residual{}) {} elapsed_ms={}",
+            if base.is_some() { ":permille_of_the_face_residual_removed" } else { "" },
+            line.join(" "),
+            self.started.elapsed().as_millis()
+        );
+        Ok(residuals)
+    }
+}
+
 /// `found-tower-pair STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS
 /// RANKS`: found faces on pairs of bytes from the tension a frozen tower leaves, and read each on
 /// the held-out text (the mathematics thread's founding at scale, October 24).
@@ -1457,95 +1618,17 @@ fn leading_directions(y: &[Vec<num_bigint::BigInt>], count: usize) -> Vec<Vec<i6
 /// with and without the founded coordinates, is read on the held-out text per region.
 pub(super) fn found_tower_pair(args: &[String]) -> Result<()> {
     use num_bigint::BigInt;
-    if args.len() != 11 {
-        return Err("found-tower-pair STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS RANKS".into());
-    }
-    let started = std::time::Instant::now();
-    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
-    let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
-    let dev = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
-    let dev_roles = roles_of(&args[7], &args[8], dev.len())?;
-    let streams = count(&args[9])?;
+    let reading = PairReading::read(args, "found-tower-pair STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS RANKS")?;
     let ranks = count(&args[10])?;
-    if train.len() >= 1 << 32 || dev.len() >= 1 << 32 {
-        return Err("the pair sums are carried in 64 bits, for texts below 2^32 bytes".into());
-    }
-    let tower = &learner.tower;
-    let (w, alphabet) = (tower.declaration.width, tower.declaration.alphabet);
-    let cut = |text: &[u8]| -> Vec<Vec<usize>> {
-        let chunk = text.len().div_ceil(streams.max(1));
-        text.chunks(chunk).map(|s| s.iter().map(|&b| b as usize).collect()).collect()
-    };
-    let (train_streams, dev_streams) = (cut(&train), cut(&dev));
-    let mut arrives = vec![false; alphabet];
-    for s in &train_streams {
-        for &c in s.iter().skip(1) {
-            arrives[c] = true;
-        }
-    }
-    let arriving: Vec<usize> = (0..alphabet).filter(|&c| arrives[c]).collect();
-    let train_moments = read_pair_moments(tower, &train_streams, &arriving, None)?.pop().ok_or("no training moments")?;
-    let held = read_pair_moments(tower, &dev_streams, &arriving, Some(&dev_roles))?;
+    let (tower, arriving, train_moments, started) = (&reading.learner.tower, &reading.arriving, &reading.train, reading.started);
+    let alphabet = tower.declaration.alphabet;
     let (keys, cells) = train_moments.table();
-    if keys.is_empty() {
-        return Err("the training text has no pairs".into());
-    }
     let n = train_moments.cells;
-    println!(
-        "FOUND_PASS train_cells={n} pairs={} arriving={} held_out_cells={} read_ms={}",
-        keys.len(),
-        arriving.len(),
-        held.iter().map(|m| m.cells).sum::<usize>(),
-        started.elapsed().as_millis()
-    );
     let unit = BigInt::from(n) << 48;
-    let hat = |u: usize| -> Vec<i64> {
-        let mut x: Vec<i64> = if u < alphabet { tower.encoding(u).iter().map(|&e| e as i64).collect() } else { vec![0; w] };
-        x.push(1 << 16);
-        x
-    };
-    let current_hats: Vec<Vec<i64>> = (0..alphabet).map(hat).collect();
-    let before_hats: Vec<Vec<i64>> = (0..=alphabet).map(hat).collect();
-    let names = ["prose", "lean", "rust", "digits"];
-    // The held-out reading of a readout: per region and in all, the brier `T`, the residual, and its
-    // change from the face's own readout.
-    let held_out = |rank: usize, readout: &Readout, founded: &[PairFace], base: Option<(&[BigInt], &BigInt)>| -> Result<Vec<BigInt>> {
-        // R/D² against the face's R₀/D₀²: the share of the face's residual the founded rows remove.
-        let d2 = &readout.d * &readout.d;
-        let change = |part: usize, r: &BigInt| -> String {
-            base.map_or(String::new(), |(base, base_d2)| {
-                let scale = (&base[part] * &d2).max(BigInt::from(1));
-                format!(":{}", thousandths_of(&((&base[part] * &d2 - r * base_d2) * 1000), &scale))
-            })
-        };
-        let mut residuals = Vec::new();
-        let (mut all_t, mut all_r, mut all_cells) = (BigInt::from(0), BigInt::from(0), 0usize);
-        let mut line = Vec::new();
-        for (part, moments) in held.iter().enumerate() {
-            let (keys, cells) = moments.table();
-            let (_, h, b) = extended(moments, &keys, &cells, founded)?;
-            let r = readout_residual(readout, &h, &b, &moments.t);
-            let t: BigInt = moments.t.iter().map(|&x| BigInt::from(x)).sum();
-            let cell_unit = BigInt::from(moments.cells.max(1)) << 48;
-            line.push(format!("{}={}/{}{}", names[part], thousandths_of(&t, &cell_unit), thousandths_of(&r, &(&cell_unit * &d2)), change(part, &r)));
-            all_t += &t;
-            all_r += &r;
-            all_cells += moments.cells;
-            residuals.push(r);
-        }
-        let all_unit = BigInt::from(all_cells.max(1)) << 48;
-        line.push(format!("all={}/{}{}", thousandths_of(&all_t, &all_unit), thousandths_of(&all_r, &(&all_unit * &d2)), change(names.len(), &all_r)));
-        residuals.push(all_r);
-        println!(
-            "HELD_OUT rank={rank} (part=brier_T/residual{}) {} elapsed_ms={}",
-            if base.is_some() { ":permille_of_the_face_residual_removed" } else { "" },
-            line.join(" "),
-            started.elapsed().as_millis()
-        );
-        Ok(residuals)
-    };
+    let (current_hats, before_hats) = reading.hats();
+    let held_out = |rank: usize, readout: &Readout, founded: &[PairTable], base: Option<(&[BigInt], &BigInt)>| reading.held_out(rank, readout, founded, base);
     // The face alone.
-    let mut founded: Vec<PairFace> = Vec::new();
+    let mut founded: Vec<PairTable> = Vec::new();
     let (mut phihat, h, b) = extended(&train_moments, &keys, &cells, &founded)?;
     let mut readout = fit_readout(&h, &b, &train_moments.t)?;
     let tr_t: BigInt = train_moments.t.iter().map(|&x| BigInt::from(x)).sum();
@@ -1577,29 +1660,13 @@ pub(super) fn found_tower_pair(args: &[String]) -> Result<()> {
     let dd = &d0 * &dw;
     let e: Vec<Vec<BigInt>> = (0..a_n).map(|k| (0..a_n).map(|l| &dd * top.between[k][l] - &dw * &bx[k][l] + &d0 * &top.bridged[k][l]).collect()).collect();
     let directions = leading_directions(&e, 32);
-    let ev: Vec<Vec<BigInt>> = (0..a_n).into_par_iter().map(|k| directions.iter().map(|v| (0..a_n).map(|l| &e[k][l] * v[l]).sum()).collect()).collect();
-    let gram: Vec<Vec<BigInt>> = directions.iter().map(|u| directions.iter().map(|v| BigInt::from(u.iter().zip(v).map(|(&x, &y)| x as i128 * y as i128).sum::<i128>())).collect()).collect();
-    let quadratic: Vec<Vec<BigInt>> = directions.iter().map(|u| (0..directions.len()).map(|c| (0..a_n).map(|k| &ev[k][c] * u[k]).sum()).collect()).collect();
+    let (sums, quadratic) = leading_sums(&e, &directions)?;
     let trace_e: BigInt = (0..a_n).map(|k| e[k][k].clone()).sum();
-    let mut sums = vec![format!("all:{}", thousandths_of(&(&trace_e * 1000), &(&dw * &tr_s0)))];
-    for k in [1usize, 2, 4, 8, 16, 32].into_iter().filter(|&k| k <= directions.len()) {
-        let g: Vec<Vec<BigInt>> = gram[..k].iter().map(|row| row[..k].to_vec()).collect();
-        let q: Vec<Vec<BigInt>> = quadratic[..k].iter().map(|row| row[..k].to_vec()).collect();
-        let (dg, z) = solve_scaled(&g, &q, true)?;
-        let tr_z: BigInt = (0..k).map(|i| z[i][i].clone()).sum();
-        sums.push(format!("{k}:{}", thousandths_of(&(&tr_z * 1000), &(&dg * &dw * &tr_s0))));
-    }
-    println!("FOUND_SPECTRUM (leading_k:permille_of_tension, at least) {} elapsed_ms={}", sums.join(" "), started.elapsed().as_millis());
+    let mut line = vec![format!("all:{}", thousandths_of(&(&trace_e * 1000), &(&dw * &tr_s0)))];
+    line.extend(sums.iter().map(|(k, num, den)| format!("{k}:{}", thousandths_of(&(num * 1000), &(den * &dw * &tr_s0)))));
+    println!("FOUND_SPECTRUM (leading_k:permille_of_tension, at least) {} elapsed_ms={}", line.join(" "), started.elapsed().as_millis());
     for (i, v) in directions.iter().take(8).enumerate() {
-        let mut order: Vec<usize> = (0..a_n).collect();
-        order.sort_by_key(|&k| std::cmp::Reverse(v[k].unsigned_abs()));
-        let classes: Vec<String> = order.iter().take(8).map(|&k| format!("{}:{}", class_name(arriving[k]), v[k])).collect();
-        println!(
-            "FOUND_DIRECTION {} eigen_permille_of_tension={} classes {}",
-            i + 1,
-            thousandths_of(&(&quadratic[i][i] * 1000), &(&gram[i][i] * &dw * &tr_s0)),
-            classes.join(" ")
-        );
+        println!("FOUND_DIRECTION {} eigen_permille_of_tension={} classes {}", i + 1, thousandths_of(&(&quadratic[i].0 * 1000), &(&quadratic[i].1 * &dw * &tr_s0)), leading_classes(v, arriving, 8));
     }
     let base = held_out(0, &readout, &founded, None)?;
     let base_d2 = &readout.d * &readout.d;
@@ -1649,7 +1716,7 @@ pub(super) fn found_tower_pair(args: &[String]) -> Result<()> {
         }
         let (face, num, den, dm, dq) = best.ok_or("the rank founded no coordinate")?;
         let before = readout.s.clone();
-        founded.push(face.clone());
+        founded.push(face.table());
         let (next_phihat, h, b) = extended(&train_moments, &keys, &cells, &founded)?;
         phihat = next_phihat;
         readout = fit_readout(&h, &b, &train_moments.t)?;
@@ -1687,6 +1754,443 @@ pub(super) fn found_tower_pair(args: &[String]) -> Result<()> {
             .collect();
         println!("FOUND_PAIRS rank={rank} (pair:sign:cells, by n·c²) {}", pairs.join(" "));
         held_out(rank, &readout, &founded, Some((&base, &base_d2)))?;
+    }
+    Ok(())
+}
+
+/// The search's grain: each feature of the joint face and pair form is scaled by a power of two so
+/// its diagonal lies below `2^SEARCH_DIAGONAL_BITS`; the elimination takes, among the face's
+/// features and then among the pool's, the one with the largest variance left, and stops a set when
+/// that is below `2^(−SEARCH_KEPT_BITS)` of the scale (what is left lies in the span of the ones
+/// taken at the grain, and is given no weight). The factor `L` keeps `SEARCH_FRACTION` fractional
+/// bits; each term `l·u` is rounded alone and sums are exact, so the factor does not depend on the
+/// order the rows are worked in.
+///
+/// The floor must stand above what the rounding accumulates. A term `l·u` is off by at most
+/// `½ + 2^(D−F−1)` (its own rounding, and `u ≤ 2^D` times `l`'s) and an entry takes one term per
+/// coordinate taken, under `2^13`: with `D = 50`, `F = 46`, below `2^17`, under the floor
+/// `2^(D−K) = 2^20`. Within a set the largest variance is taken first, so `|l| ≤ 1`; a pool row
+/// read on a face step has `|l| ≤ (2^D/2^(D−K))^½ = 2^(K/2) = 2^15`, so `l·2^F` stays in 64 bits.
+///
+/// [measured, October 24] An elimination in the coordinates' own order left the semidefinite cone on
+/// the slice (926 pairs against 4,225 products, most of them dependent): pivots just above the floor
+/// carried the rounding into entries past `2^61`, first with `F = 30` and then with `F = 46`.
+/// Taking the largest variance first is the rank-revealing order, and it bounds `l`.
+const SEARCH_DIAGONAL_BITS: u32 = 50;
+const SEARCH_KEPT_BITS: u32 = 30;
+const SEARCH_FRACTION: u32 = 46;
+
+/// The full pair form's search: the joint moments of the face `f̄` and the pool of every product of
+/// a current byte's coordinate with a byte before's, `z_p = x̂_p ⊗ ŷ_p` (the full bilinear form
+/// `x̂ᵀWŷ` is a read of this pool), with the covector's cross moments, scaled to the search's grain
+/// and factored `G = L·diag(d)·Lᵀ` in the order taken, the cross moments carried through `L⁻¹` as
+/// `y`.
+struct FormSearch {
+    m: usize,
+    q: usize,
+    n: usize,
+    a_n: usize,
+    /// The scaled moments' lower triangle, `n × n`.
+    gram: Vec<i64>,
+    /// `L` by row and step, `n × n`; the coordinate taken at each step, its `d`; how many of the
+    /// steps are the face's.
+    l: Vec<i64>,
+    order: Vec<usize>,
+    d: Vec<i64>,
+    face_steps: usize,
+    /// The cross moments by row, `n × a_n`: carried through `L⁻¹` at each taken row's step.
+    y: Vec<i64>,
+    e: Vec<i32>,
+    s: i32,
+}
+
+/// `x·2^(−s)`, rounded to nearest (a left shift when `s` is negative), within 64 bits.
+fn scaled(x: i128, s: i32) -> std::result::Result<i64, String> {
+    let v = if s > 0 { (x + (1i128 << (s - 1))) >> s } else { x.checked_mul(1i128 << (-s)).ok_or("a scaled moment outgrew its carrier")? };
+    i64::try_from(v).map_err(|_| "a scaled moment outgrew its 64-bit grain".to_string())
+}
+
+fn narrow(x: i128, what: &str, j: usize, i: usize) -> std::result::Result<i64, String> {
+    i64::try_from(x).map_err(|_| format!("the search outgrew its 64-bit grain: {what} at pivot {j}, row {i}: {x}"))
+}
+
+impl FormSearch {
+    fn new(moments: &PairMoments, keys: &[(usize, usize)], cells: &[&PairCell], cur: &[Vec<i64>], prev: &[Vec<i64>]) -> Result<Self> {
+        let (m, a_n, q) = (moments.m, moments.t.len(), cur[0].len());
+        let n = m + q * q;
+        // Every sum below is of terms bounded by these; under `2^125` no partial sum can overflow.
+        let big = |v: &[Vec<i64>]| -> u128 { v.iter().flatten().map(|x| x.unsigned_abs() as u128).max().unwrap_or(0) };
+        let (bx, by) = (big(cur), big(prev));
+        let total: u128 = cells.iter().map(|c| c.n as u128).sum();
+        let largest = |v: &[i64]| -> u128 { v.iter().map(|x| x.unsigned_abs() as u128).max().unwrap_or(0) };
+        let phi: u128 = cells.iter().map(|c| largest(&c.phi)).sum();
+        let tau: u128 = cells.iter().map(|c| largest(&c.tau)).sum();
+        let under = |terms: [u128; 3]| terms.iter().try_fold(1u128, |acc, &x| acc.checked_mul(x)).is_some_and(|x| x < 1 << 125);
+        if !under([total, bx * bx, by * by]) || !under([phi, bx, by]) || !under([tau, bx, by]) {
+            return Err("the pair form's moments could outgrow their 128-bit carrier".into());
+        }
+        // Grouped by the current byte: `Σ n_p ŷŷᵀ`, `Σ φ_p ŷᵀ` and `Σ τ_p ŷᵀ`.
+        let mut by_cur: Vec<Vec<usize>> = vec![Vec::new(); cur.len()];
+        for (p, &(_, c)) in keys.iter().enumerate() {
+            by_cur[c].push(p);
+        }
+        let present: Vec<usize> = (0..cur.len()).filter(|&c| !by_cur[c].is_empty()).collect();
+        type Group = (Vec<i128>, Vec<i128>, Vec<i128>);
+        let groups: Vec<Group> = present
+            .par_iter()
+            .map(|&c| {
+                let (mut yy, mut fy, mut ty) = (vec![0i128; q * q], vec![0i128; m * q], vec![0i128; a_n * q]);
+                for &p in &by_cur[c] {
+                    let (cell, yh) = (cells[p], &prev[keys[p].0]);
+                    for j in 0..q {
+                        let nj = cell.n as i128 * yh[j] as i128;
+                        for (slot, &y2) in yy[j * q..(j + 1) * q].iter_mut().zip(yh) {
+                            *slot += nj * y2 as i128;
+                        }
+                    }
+                    for (f, &x) in cell.phi.iter().enumerate() {
+                        for (slot, &y2) in fy[f * q..(f + 1) * q].iter_mut().zip(yh) {
+                            *slot += x as i128 * y2 as i128;
+                        }
+                    }
+                    for (a, &x) in cell.tau.iter().enumerate() {
+                        for (slot, &y2) in ty[a * q..(a + 1) * q].iter_mut().zip(yh) {
+                            *slot += x as i128 * y2 as i128;
+                        }
+                    }
+                }
+                (yy, fy, ty)
+            })
+            .collect();
+        // The diagonal, then each feature's power of two.
+        let mut diagonal: Vec<i128> = (0..m).map(|f| moments.h[f * m + f]).collect();
+        for i in 0..q {
+            for j in 0..q {
+                diagonal.push(present.iter().zip(&groups).map(|(&c, g)| (cur[c][i] as i128).pow(2) * g.0[j * q + j]).sum());
+            }
+        }
+        let exponent = |x: i128| -> i32 {
+            let bits = 128 - x.unsigned_abs().leading_zeros() as i32;
+            if x == 0 { 0 } else { (bits - SEARCH_DIAGONAL_BITS as i32 + 1).div_euclid(2) }
+        };
+        let e: Vec<i32> = diagonal.iter().map(|&x| exponent(x)).collect();
+        let s = exponent(moments.t.iter().copied().max().unwrap_or(0));
+        // The lower triangle: the face's own rows, then each block of rows of a current-byte
+        // coordinate `i`: its reads of the face, then its products with every block `i₂ ≤ i`.
+        let mut lower = vec![0i64; n * n];
+        for f in 0..m {
+            for f2 in 0..=f {
+                lower[f * n + f2] = scaled(moments.h[f2 * m + f], e[f] + e[f2])?;
+            }
+        }
+        let mut y = vec![0i64; n * a_n];
+        for f in 0..m {
+            for a in 0..a_n {
+                y[f * a_n + a] = scaled(moments.b[a * m + f], e[f] + s)?;
+            }
+        }
+        lower[m * n..]
+            .par_chunks_mut(q * n)
+            .zip(y[m * a_n..].par_chunks_mut(q * a_n))
+            .enumerate()
+            .try_for_each(|(i, (rows, yrows))| -> std::result::Result<(), String> {
+                let read = |part: fn(&Group) -> &Vec<i128>, len: usize, i2: Option<usize>| -> Vec<i128> {
+                    let mut acc = vec![0i128; len];
+                    for (&c, g) in present.iter().zip(&groups) {
+                        let x = cur[c][i] as i128 * i2.map_or(1, |i2| cur[c][i2] as i128);
+                        if x != 0 {
+                            for (slot, &v) in acc.iter_mut().zip(part(g)) {
+                                *slot += x * v;
+                            }
+                        }
+                    }
+                    acc
+                };
+                let face = read(|g| &g.1, m * q, None);
+                let cross = read(|g| &g.2, a_n * q, None);
+                for j in 0..q {
+                    let row = m + i * q + j;
+                    for f in 0..m {
+                        rows[j * n + f] = scaled(face[f * q + j], e[f] + e[row])?;
+                    }
+                    for a in 0..a_n {
+                        yrows[j * a_n + a] = scaled(cross[a * q + j], e[row] + s)?;
+                    }
+                }
+                for i2 in 0..=i {
+                    let block = read(|g| &g.0, q * q, Some(i2));
+                    for j in 0..q {
+                        let row = m + i * q + j;
+                        for j2 in 0..if i2 == i { j + 1 } else { q } {
+                            let col = m + i2 * q + j2;
+                            rows[j * n + col] = scaled(block[j * q + j2], e[row] + e[col])?;
+                        }
+                    }
+                }
+                Ok(())
+            })?;
+        let mut search = Self { m, q, n, a_n, gram: lower, l: Vec::new(), order: Vec::new(), d: Vec::new(), face_steps: 0, y, e, s };
+        search.factor()?;
+        Ok(search)
+    }
+
+    /// `G = L·diag(d)·Lᵀ`, left-looking: each step takes the remaining coordinate with the largest
+    /// variance left (the face's first, then the pool's), reads its column against the steps
+    /// before, and carries its row of `y` through them.
+    fn factor(&mut self) -> std::result::Result<(), String> {
+        let (n, m, a_n) = (self.n, self.m, self.a_n);
+        let floor = 1i64 << (SEARCH_DIAGONAL_BITS - SEARCH_KEPT_BITS);
+        let half = 1i128 << (SEARCH_FRACTION - 1);
+        let term = move |l: i64, u: i64| -> i128 { (l as i128 * u as i128 + half) >> SEARCH_FRACTION };
+        let gram = &self.gram;
+        let at = |i: usize, j: usize| gram[i.max(j) * n + i.min(j)];
+        let mut diag: Vec<i64> = (0..n).map(|i| at(i, i)).collect();
+        let mut remaining = vec![true; n];
+        let mut l = vec![0i64; n * n];
+        let mut face = true;
+        loop {
+            let k = self.order.len();
+            let set = if face { 0..m } else { m..n };
+            let taken = set.filter(|&i| remaining[i]).max_by_key(|&i| (diag[i], std::cmp::Reverse(i)));
+            let piv = match taken {
+                Some(p) if diag[p] >= floor => p,
+                _ if face => {
+                    face = false;
+                    self.face_steps = k;
+                    continue;
+                }
+                _ => break,
+            };
+            let dk = diag[piv];
+            remaining[piv] = false;
+            let lp = l[piv * n..piv * n + k].to_vec();
+            // The taken row's `u = L·d` on the steps before, and its row of `y` carried through them.
+            let w: Vec<i64> = lp.iter().zip(&self.d).map(|(&x, &d)| narrow(term(x, d), "u", k, piv)).collect::<std::result::Result<_, String>>()?;
+            let order = &self.order;
+            let carried: Vec<i64> = (0..a_n)
+                .into_par_iter()
+                .map(|a| narrow(self.y[piv * a_n + a] as i128 - lp.iter().zip(order).map(|(&x, &o)| term(x, self.y[o * a_n + a])).sum::<i128>(), "y", k, piv))
+                .collect::<std::result::Result<_, String>>()?;
+            self.y[piv * a_n..(piv + 1) * a_n].copy_from_slice(&carried);
+            l.par_chunks_mut(n).zip(diag.par_iter_mut()).enumerate().filter(|(i, _)| remaining[*i]).try_for_each(|(i, (row, di))| -> std::result::Result<(), String> {
+                let u = narrow(at(i, piv) as i128 - row[..k].iter().zip(&w).map(|(&x, &u)| term(x, u)).sum::<i128>(), "u", k, i)?;
+                let li = narrow((2 * ((u as i128) << SEARCH_FRACTION) + dk as i128).div_euclid(2 * dk as i128), "l", k, i)?;
+                row[k] = li;
+                *di = narrow(*di as i128 - term(li, u), "the variance left", k, i)?;
+                Ok(())
+            })?;
+            self.d.push(dk);
+            self.order.push(piv);
+        }
+        self.l = l;
+        Ok(())
+    }
+
+    /// What the face explains, `Σ_f |y_f|²/d_f`, and the pool's `N = Σ_i y_i y_iᵀ/d_i` over the
+    /// pair form's coordinates taken (each term rounded alone), on the scaled covector's grain.
+    fn explained(&self) -> (i128, Vec<Vec<i128>>) {
+        let a_n = self.a_n;
+        let row = |k: usize| &self.y[self.order[k] * a_n..(self.order[k] + 1) * a_n];
+        let ratio = |x: i128, d: i128| (2 * x + d).div_euclid(2 * d);
+        let face: i128 = (0..self.face_steps).map(|k| row(k).iter().map(|&v| ratio(v as i128 * v as i128, self.d[k] as i128)).sum::<i128>()).sum();
+        let pool = (self.face_steps..self.order.len())
+            .into_par_iter()
+            .fold(
+                || vec![vec![0i128; a_n]; a_n],
+                |mut acc, k| {
+                    let (y, d) = (row(k), self.d[k] as i128);
+                    for a in 0..a_n {
+                        if y[a] != 0 {
+                            for b in a..a_n {
+                                acc[a][b] += ratio(y[a] as i128 * y[b] as i128, d);
+                            }
+                        }
+                    }
+                    acc
+                },
+            )
+            .reduce(
+                || vec![vec![0i128; a_n]; a_n],
+                |mut x, y| {
+                    for (r, s) in x.iter_mut().zip(&y) {
+                        for (u, v) in r.iter_mut().zip(s) {
+                            *u += v;
+                        }
+                    }
+                    x
+                },
+            );
+        let full = (0..a_n).map(|a| (0..a_n).map(|b| pool[a.min(b)][a.max(b)]).collect()).collect();
+        (face, full)
+    }
+
+    /// The face's features and the pool's that no step took.
+    fn passed_over(&self) -> (usize, usize) {
+        (self.m - self.face_steps, self.n - self.m - (self.order.len() - self.face_steps))
+    }
+
+    /// The pair form `W` of the coordinate read along a covector direction `v`: the pool's part of
+    /// `G⁻¹Rv`, carried exactly through `Lᵀ` from `d⁻¹L⁻¹Rv = d⁻¹yv` and returned on the
+    /// unscaled pool `x̂ ⊗ ŷ` (`W[i][j]`, current byte's coordinate by the byte before's), released
+    /// to below `2^62` its largest entry. A coordinate no step took has no weight.
+    fn form(&self, v: &[i64]) -> Vec<Vec<i64>> {
+        use num_bigint::BigInt;
+        let (n, m, q, a_n) = (self.n, self.m, self.q, self.a_n);
+        let mut x: Vec<BigInt> = (0..self.order.len())
+            .map(|k| {
+                let o = self.order[k];
+                let g: i128 = self.y[o * a_n..(o + 1) * a_n].iter().zip(v).map(|(&y, &v)| y as i128 * v as i128).sum();
+                (BigInt::from(g) << 64u32) / self.d[k]
+            })
+            .collect();
+        for k in (0..self.order.len()).rev() {
+            let xk = x[k].clone();
+            let o = self.order[k];
+            for (k2, &l) in self.l[o * n..o * n + k].iter().enumerate() {
+                if l != 0 {
+                    x[k2] -= (&xk * l) >> SEARCH_FRACTION;
+                }
+            }
+        }
+        let mut by_feature = vec![BigInt::from(0); n];
+        for (k, value) in x.into_iter().enumerate() {
+            by_feature[self.order[k]] = value;
+        }
+        let taken: Vec<usize> = self.order[self.face_steps..].to_vec();
+        let top = taken.iter().map(|&i| self.e[i]).max().unwrap_or(0);
+        let wide: Vec<BigInt> = (m..n).map(|i| if self.e[i] <= top { &by_feature[i] << ((top - self.e[i]) as u32) } else { BigInt::from(0) }).collect();
+        let released = release_big(&wide, 62);
+        (0..q).map(|i| released[i * q..(i + 1) * q].to_vec()).collect()
+    }
+}
+
+/// A pair form's values at every pair of the alphabet, `x̂_curᵀ W ŷ_prev`, released to below
+/// `2^16` the largest over the pairs the training text holds.
+fn form_table(w: &[Vec<i64>], cur: &[Vec<i64>], prev: &[Vec<i64>], keys: &[(usize, usize)]) -> std::result::Result<PairTable, String> {
+    let alphabet = cur.len();
+    let wide: Vec<i128> = prev
+        .par_iter()
+        .flat_map_iter(|yh| {
+            let u: Vec<i128> = w.iter().map(|row| row.iter().zip(yh).map(|(&a, &b)| a as i128 * b as i128).sum()).collect();
+            cur.iter().map(move |xh| xh.iter().zip(&u).map(|(&a, &b)| a as i128 * b).sum::<i128>()).collect::<Vec<_>>()
+        })
+        .collect();
+    let top = keys.iter().map(|&(prev, cur)| wide[prev * alphabet + cur].unsigned_abs()).max().unwrap_or(0);
+    let shift = (128 - top.leading_zeros()).saturating_sub(16) as i32;
+    let values = wide.iter().map(|&v| scaled(v, shift)).collect::<std::result::Result<Vec<i64>, String>>()?;
+    Ok(PairTable { alphabet, values })
+}
+
+/// `found-tower-pair-block STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA
+/// STREAMS BLOCK`: found a block of `BLOCK` pair coordinates, each a full pair form
+/// `c_p = x̂_pᵀ W ŷ_p` of the current byte's encoding and the byte before's, from the tension a
+/// frozen tower leaves, and read the block on the held-out text.
+///
+/// [agent-inferred, October 24] The spectrum of the pairs' class matrix says one product of reads
+/// carries about a third of the best single coordinate and text needs tens of coordinates: the
+/// mathematics thread's one pair contact `W(x̄⊗ȳ)` is a full bilinear form. Every such form is a
+/// read of the pool `z_p = x̂_p ⊗ ŷ_p` (65² coordinates with the units, so either byte's linear face
+/// and the constant are among them), and the best block of `k` coordinates is the reduced-rank
+/// readout of the tension on the pool after the face: the leading `k` eigenvectors `v` of
+/// `M Q⁻¹ Mᵀ`, each coordinate `W_v = Q⁻¹Mᵀv`. The pool's moments come from the pair table alone,
+/// grouped by the current byte. The search for the directions and forms runs at a declared grain
+/// ([`FormSearch`]): a 4,290-dimensional exact elimination would not finish. What is founded is
+/// read exactly: each form's values over the alphabet are its table ([`form_table`]), and the face
+/// with the first `k` founded coordinates is fitted on the training moments and read on the
+/// held-out text, for each `k` a power of two up to the block.
+pub(super) fn found_tower_pair_block(args: &[String]) -> Result<()> {
+    use num_bigint::BigInt;
+    let reading = PairReading::read(args, "found-tower-pair-block STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS BLOCK")?;
+    let block = count(&args[10])?;
+    let (arriving, train, started) = (&reading.arriving, &reading.train, reading.started);
+    let alphabet = reading.learner.tower.declaration.alphabet;
+    let (keys, cells) = train.table();
+    let n = train.cells;
+    let unit = BigInt::from(n) << 48;
+    let (cur, prev) = reading.hats();
+    let (_, h, b) = extended(train, &keys, &cells, &[])?;
+    let readout = fit_readout(&h, &b, &train.t)?;
+    let tr_t: BigInt = train.t.iter().map(|&x| BigInt::from(x)).sum();
+    let (d0, tr_s0): (BigInt, BigInt) = (readout.d.clone(), readout.s.iter().sum());
+    println!(
+        "FOUND_FACE brier_T={} tension_S={} tension_permille_of_T={} elapsed_ms={}",
+        thousandths_of(&tr_t, &unit),
+        thousandths_of(&tr_s0, &(&unit * &d0)),
+        thousandths_of(&(&tr_s0 * 1000), &(&tr_t * &d0)),
+        started.elapsed().as_millis()
+    );
+    let search = FormSearch::new(train, &keys, &cells, &cur, &prev)?;
+    let (passed_face, passed_pool) = search.passed_over();
+    let (face, pool) = search.explained();
+    // `tr T` on the search's grain, against which the face's and the pool's shares are read.
+    let tr_t_grain: i128 = train.t.iter().map(|&t| if search.s > 0 { (t + (1i128 << (2 * search.s - 1))) >> (2 * search.s) } else { t << (-2 * search.s) }).sum();
+    let tension_grain = tr_t_grain - face;
+    let pool_trace: i128 = (0..search.a_n).map(|a| pool[a][a]).sum();
+    println!(
+        "FOUND_FORM coordinates={} passed_over_face={} passed_over_pool={} face_permille_of_T exact={} search={} pool_permille_of_tension={} elapsed_ms={}",
+        search.n - search.m,
+        passed_face,
+        passed_pool,
+        thousandths_of(&((&tr_t * &d0 - &tr_s0) * 1000), &(&tr_t * &d0)),
+        thousandths_of(&BigInt::from(face * 1000), &BigInt::from(tr_t_grain.max(1))),
+        thousandths_of(&BigInt::from(pool_trace * 1000), &BigInt::from(tension_grain.max(1))),
+        started.elapsed().as_millis()
+    );
+    let pool_big: Vec<Vec<BigInt>> = pool.iter().map(|row| row.iter().map(|&x| BigInt::from(x)).collect()).collect();
+    let directions = leading_directions(&pool_big, block);
+    let (sums, quadratic) = leading_sums(&pool_big, &directions)?;
+    let line: Vec<String> = sums.iter().map(|(k, num, den)| format!("{k}:{}", thousandths_of(&(num * 1000), &(den * BigInt::from(tension_grain.max(1)))))).collect();
+    println!("FOUND_FORM_SPECTRUM (leading_k:permille_of_tension, at the search grain) {} elapsed_ms={}", line.join(" "), started.elapsed().as_millis());
+    let tables: Vec<PairTable> = directions.par_iter().map(|v| form_table(&search.form(v), &cur, &prev, &keys)).collect::<std::result::Result<_, String>>()?;
+    println!("FOUND_FORMS founded={} elapsed_ms={}", tables.len(), started.elapsed().as_millis());
+    let unseen = |table: &PairTable| -> String {
+        // The held-out pairs the training text never met, and the share of this coordinate's
+        // held-out square they carry.
+        let (mut count, mut square, mut all) = (0usize, 0i128, 0i128);
+        for moments in &reading.held {
+            for (&key, cell) in &moments.pairs {
+                let v = table.value(key) as i128;
+                all += cell.n as i128 * v * v;
+                if !train.pairs.contains_key(&key) {
+                    count += cell.n as usize;
+                    square += cell.n as i128 * v * v;
+                }
+            }
+        }
+        format!("held_out_unseen_cells={count} unseen_permille_of_square={}", thousandths_of(&BigInt::from(square * 1000), &BigInt::from(all.max(1))))
+    };
+    for (i, (v, table)) in directions.iter().zip(&tables).take(4).enumerate() {
+        let mut pairs: Vec<(i128, usize)> = keys.iter().zip(&cells).enumerate().map(|(p, (&key, cell))| (cell.n as i128 * (table.value(key) as i128).pow(2), p)).collect();
+        pairs.sort_by_key(|&(e, _)| std::cmp::Reverse(e));
+        let pairs: Vec<String> = pairs
+            .iter()
+            .take(12)
+            .map(|&(_, p)| {
+                let (b, c) = keys[p];
+                format!("{}{}:{}:{}", if b == alphabet { "start".to_string() } else { class_name(b) }, class_name(c), table.value(keys[p]).signum(), cells[p].n)
+            })
+            .collect();
+        println!(
+            "FOUND_FORM_COORDINATE {} eigen_permille_of_tension={} {} classes {} | pairs (pair:sign:cells, by n·c²) {}",
+            i + 1,
+            thousandths_of(&(&quadratic[i].0 * 1000), &(&quadratic[i].1 * BigInt::from(tension_grain.max(1)))),
+            unseen(table),
+            leading_classes(v, arriving, 8),
+            pairs.join(" ")
+        );
+    }
+    let base = reading.held_out(0, &readout, &[], None)?;
+    let base_d2 = &readout.d * &readout.d;
+    for k in (0..usize::BITS).map(|b| 1usize << b).take_while(|&k| k <= tables.len()) {
+        let (_, h, b) = extended(train, &keys, &cells, &tables[..k])?;
+        let fitted = fit_readout(&h, &b, &train.t)?;
+        let tr_s: BigInt = fitted.s.iter().sum();
+        println!(
+            "FOUND_BLOCK coordinates={k} cumulative_permille_of_tension={} elapsed_ms={}",
+            thousandths_of(&((&tr_s0 * &fitted.d - &tr_s * &d0) * 1000), &(&tr_s0 * &fitted.d)),
+            started.elapsed().as_millis()
+        );
+        reading.held_out(k, &fitted, &tables[..k], Some((&base, &base_d2)))?;
     }
     Ok(())
 }
