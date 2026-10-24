@@ -1,0 +1,34 @@
+cells=13976 energy per cell=24205.498
+top 1 cells hold 490.8 per mille
+top 10 cells hold 998.3 per mille
+top 100 cells hold 998.9 per mille
+top 1000 cells hold 999.2 per mille
+top 10000 cells hold 999.9 per mille
+median cell energy=15.3793  mean/median=1573.9
+by place in section (16-cell bins): 0:999 16:0 32:0 48:0 64:0 80:0 96:0 112:0
+classes by energy share (per mille, cells, energy/cell):
+  b'g' 490.8 n=159 1044199.24
+  b'a' 417.4 n=720 196104.03
+  b'e' 53.7 n=1245 14589.93
+  b'o' 26.5 n=628 14291.80
+  b' ' 7.1 n=1875 1287.37
+  b'r' 3.2 n=769 1392.45
+  b'd' 0.1 n=409 123.94
+  b'l' 0.1 n=365 130.95
+  b'w' 0.1 n=102 398.79
+  b'y' 0.1 n=127 297.55
+  b'b' 0.1 n=135 277.68
+  b't' 0.1 n=823 42.82
+the 12 largest cells (their text contexts left out: the training text is not published):
+  cell 1 (place 1) energy=166021925
+  cell 0 (place 0) energy=141136919
+  cell 2 (place 2) energy=18112204
+  cell 4 (place 4) energy=8908363
+  cell 3 (place 3) energy=2246266
+  cell 5 (place 5) energy=1037978
+  cell 6 (place 6) energy=130248
+  cell 8 (place 8) energy=44865
+  cell 14 (place 14) energy=38349
+  cell 9 (place 9) energy=38022
+  cell 10 (place 10) energy=34999
+  cell 7 (place 7) energy=33964

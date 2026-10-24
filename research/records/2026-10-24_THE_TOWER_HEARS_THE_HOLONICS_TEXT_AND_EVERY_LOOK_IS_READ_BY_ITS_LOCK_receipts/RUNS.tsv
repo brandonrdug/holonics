@@ -97,3 +97,4 @@ crossing reads	-	CROSSING_CEILING.py, CROSSING_SPECTRUM.py, CROSSING_TURN.py, to
 build situated6	situated6	cargo build --release, the warm start and the resume	230	400	-	238.1	1.04	1772008	complete
 situated resume	situated6	found-tower-situated, 5 forms FROM the founding's first 4	152.5	400	-	144.1	0.94	281056	complete; the fifth form and both shares reproduced exactly
 gate, situated pool	-	CARGO_INCREMENTAL=0 bash tools/gate.sh	701 (the last gate)	800	-	659.3	0.94	4672704	complete; every step ok
+situated receipts re-read	-	tools/tower_modes.py probe on the forms at 4, 8, 12, 16 and on the input covector (shifts 6 and 8 refused: a coordinate would overflow the 64-bit Gram; 10 reproduces the recorded table, 12 agrees but for one count); UNITS_LOOKUP.py; ENERGY_WHERE.py on the from-rest and one-passage reads	unmeasured (the first reads took 1.9 to 8.8 s)	180 each	-	1.2 to 8.8; under a minute together	-	47152 to 136532	complete
