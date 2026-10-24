@@ -32,7 +32,9 @@ An exterior reading of the machine's own exact quantities; nothing here enters t
                           released to 2^(−SHIFT) of the state's unit, one unit of ridge on the
                           diagonal so the Gram is positive definite, Bareiss elimination in
                           integers); the reading is the held-out share whose largest fitted class
-                          is the true one, beside the share of the commonest class.
+                          is the true one, beside the share of the commonest class. A reading of
+                          read-tower-situated (FORMS lines) is probed the same way from its forms'
+                          values alone, as one level named `forms`.
 
 usage: python3 -I tower_modes.py cells TEXT ROLES
        python3 -I tower_modes.py flux TEXT MODES
@@ -219,6 +221,20 @@ def turns(text_path, paths):
             print(f"L{l} {k:4d} {w:6.3f} {share:11.3f}  {ml:6d} {fl:8.3f} {f0l:9.3f}  {mb:6d} {fb:8.3f} {f0b:9.3f}  {sp:.2e}")
 
 
+def parse_probe(path):
+    """The cells of an `after` reading (MODES lines), or of a situated reading (FORMS lines: one
+    level, each form's value a coordinate)."""
+    with open(path) as f:
+        situated = any(line.startswith("FORMS ") for line in f)
+    if not situated:
+        yield from parse(path, False)
+        return
+    for line in open(path):
+        if line.startswith("FORMS "):
+            parts = line.split()
+            yield int(parts[1]), int(parts[2]), None, [[(int(v),) for v in parts[3:]]]
+
+
 def bareiss_solve(g, rhs):
     """Solve g w = rhs exactly for a symmetric positive definite integer g: returns (det, y) with
     w = y / det, y integer (Cramer), by fraction-free elimination without pivoting."""
@@ -265,20 +281,21 @@ def probe(args):
         for pair in pairs:
             text_path, path = pair.split(":", 1)
             role, info = probe_roles(open(text_path, "rb").read())
-            for i, _cls, _code, levels in parse(path, False):
+            for i, _cls, _code, levels in parse_probe(path):
                 p = i + 1
                 for r in role.get(p, ()):
                     rows[(info[p][0], r)].append(([np.array([v >> shift for m in lv for v in m], dtype=np.int64) for lv in levels], info[p][1:]))
         sides.append(rows)
     train, dev = sides
     names = ["a0", "b0", "c0"]
-    print(f"probe: coordinates released to 2^-{STATE_BITS - shift} of the state's unit, ridge 1", flush=True)
+    print(f"probe: coordinates released by 2^{shift} (a state's to 2^-{STATE_BITS - shift} of its unit), ridge 1", flush=True)
     for op in ops:
         for r in "ABEU":
             tr, dv = train.get((op, r), []), dev.get((op, r), [])
             if not tr or not dv:
                 continue
-            for which, pick in (("lower", [0]), ("upper", [1])):
+            levels = (("lower", [0]), ("upper", [1])) if len(tr[0][0]) == 2 else (("forms", [0]),)
+            for which, pick in levels:
                 x = np.stack([np.concatenate([np.ones(1, dtype=np.int64)] + [c[l] for l in pick]) for c, _ in tr])
                 top = int(np.abs(x).max())
                 if top >= 1 << 20 or top * top * len(tr) >= 1 << 62:

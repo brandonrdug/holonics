@@ -15,6 +15,8 @@ mod native_train;
 mod modes_train;
 #[path = "complete_language/tower_train.rs"]
 mod tower_train;
+#[path = "complete_language/tower_situated.rs"]
+mod tower_situated;
 #[path = "complete_language/duplex_train.rs"]
 mod duplex_train;
 #[path = "complete_language/unit_copy.rs"]
@@ -808,6 +810,8 @@ pub(super) fn run_with_execution(
         Some("read-tower-tension") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_tension(args),
         Some("read-tower-floor") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_floor(args),
         Some("found-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair(args),
+        Some("found-tower-situated") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::found_tower_situated(args),
+        Some("read-tower-situated") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::read_tower_situated(args),
         Some("found-tower-pair-block") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair_block(args),
         Some("install-tower-pair-block") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::install_tower_pair_block(args),
         Some("sample-tower-block") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample_tower_block(args),

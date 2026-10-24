@@ -18,7 +18,7 @@ use num_bigint::BigUint;
 use rayon::prelude::*;
 
 /// A learner's state read ceiling, `2^30` bytes.
-const STATE_BUDGET: usize = 1 << 30;
+pub(super) const STATE_BUDGET: usize = 1 << 30;
 
 pub(super) fn count(s: &str) -> Result<usize> {
     Ok(s.parse::<usize>()?)
@@ -1134,7 +1134,7 @@ fn mac(acc: i128, x: i128, y: i128) -> std::result::Result<i128, String> {
 }
 
 /// `xs` released to below `2^bits` its largest magnitude: shifted right, rounded to nearest.
-fn release_wide(xs: &[i128], bits: u32) -> Vec<i64> {
+pub(super) fn release_wide(xs: &[i128], bits: u32) -> Vec<i64> {
     let top = xs.iter().map(|x| x.unsigned_abs()).max().unwrap_or(0);
     let shift = (128 - top.leading_zeros()).saturating_sub(bits);
     xs.iter().map(|&x| if shift == 0 { x as i64 } else { ((x + (1i128 << (shift - 1))) >> shift) as i64 }).collect()
@@ -1156,7 +1156,7 @@ fn release_big(xs: &[num_bigint::BigInt], bits: u64) -> Vec<i64> {
 /// a zero pivot with a nonzero row is refused; otherwise its coordinate is passed over too, which
 /// solves the system without it exactly). Returns `D` and `D·y`, each back-substitution division
 /// checked exact.
-fn solve_scaled(h: &[Vec<num_bigint::BigInt>], r: &[Vec<num_bigint::BigInt>], strict: bool) -> Result<(num_bigint::BigInt, Vec<Vec<num_bigint::BigInt>>)> {
+pub(super) fn solve_scaled(h: &[Vec<num_bigint::BigInt>], r: &[Vec<num_bigint::BigInt>], strict: bool) -> Result<(num_bigint::BigInt, Vec<Vec<num_bigint::BigInt>>)> {
     use num_bigint::BigInt;
     use num_traits::{One, Zero};
     let m = h.len();
@@ -1338,7 +1338,7 @@ fn reduced(readout: &Readout, k: &[Vec<i128>], l: &[Vec<i128>], c: &[Vec<i128>])
 /// `M` and `Q` released to below `2^60` their largest entry (only directions are read), each vector
 /// released to `2^15`; it stops when a step raises the Rayleigh quotient `|Mw|²/(wᵀQw)` by less
 /// than `2^(−15)` of itself. Returns the factor, the carried `v` and the steps taken.
-fn leading_factor(dm: &[Vec<num_bigint::BigInt>], dq: &[Vec<num_bigint::BigInt>], mut v: Vec<i64>) -> Result<(Vec<i64>, Vec<i64>, usize)> {
+pub(super) fn leading_factor(dm: &[Vec<num_bigint::BigInt>], dq: &[Vec<num_bigint::BigInt>], mut v: Vec<i64>) -> Result<(Vec<i64>, Vec<i64>, usize)> {
     use num_bigint::BigInt;
     let (rows, q) = (dm.len(), dq.len());
     let mt = release_big(&dm.iter().flatten().cloned().collect::<Vec<_>>(), 60);
@@ -1585,7 +1585,7 @@ const PAIR_REGIONS: [&str; 4] = ["prose", "lean", "rust", "digits"];
 
 /// Each byte's encoding with the unit, `x̂ = (E(u), 2^16)`, for the current byte, and for the byte
 /// before with the stream's start, `ŷ = (0, 2^16)`.
-fn pair_hats(tower: &Tower) -> (Vec<Vec<i64>>, Vec<Vec<i64>>) {
+pub(super) fn pair_hats(tower: &Tower) -> (Vec<Vec<i64>>, Vec<Vec<i64>>) {
     let (w, alphabet) = (tower.declaration.width, tower.declaration.alphabet);
     let hat = |u: usize| -> Vec<i64> {
         let mut x: Vec<i64> = if u < alphabet { tower.encoding(u).iter().map(|&e| e as i64).collect() } else { vec![0; w] };
