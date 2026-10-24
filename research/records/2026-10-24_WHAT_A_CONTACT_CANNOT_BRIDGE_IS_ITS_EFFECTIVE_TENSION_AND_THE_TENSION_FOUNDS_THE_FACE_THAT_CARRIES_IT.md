@@ -7,7 +7,7 @@ and answers the design thread's request for the tower's learning step
 - the laws are proved-standard: the normal equations, the Schur complement and its quotient
   formula, partial regression, Wirtinger calculus;
 - the checks are exact;
-- the tower readings in §3 to §8 are [definition; agent-inferred, October 24].
+- the tower readings in §3 to §9 are [definition; agent-inferred, October 24].
 
 Brandon's lens (paraphrased, October 24): exhausting candidates may find hidden information, which
 is why the machine needs the principles of automatic differentiation. He asks it to gauge a
@@ -447,7 +447,121 @@ the `2/√σ` law puts chance near `0.35`, below one half, so the guard holds th
 of few classes, such as digits, can carry the net shared code `Σ_c ℓ − L(c)` beside `λ` and `F*`.
 It is the rule that decides founding (§5): a contact counts when it pays for its own description.
 
-## 9. Owed Lean
+## 9. The leverage of a new reading
+
+The design thread fits the founded forms as a face and reads them on held-out text. It asked for
+the leverage of a reading, carried with it at release. GPT-6 supplied the bound (paraphrased): of a
+new reading, the encounters constrain the part in the range of their Gram, and leave the rest
+undetermined for another contact to bear. For a positive definite Gram the existing owner already
+states it: `release.leverage-probe` reads `s = xᵀH⁻¹x`, and its outcome ball, whose squared
+radius is a declared multiple of `s`, is the Cauchy bound below. `hnn.receiving-phase-family` uses the same
+reading on `A_c = S_c + 2ᵏ I`. What follows extends it to the encounters' own Gram, which is
+positive semidefinite with a kernel, and reads it fraction-free.
+
+**The split.** Let `G = Σ_t x_t x_tᵀ` be the Gram of a face over its cells, `K` the pivots a
+fraction-free elimination takes (a basis of `range G`), and `v` a new reading:
+
+```text
+v = v_s + ρ,   v_s = G_(:,K) G_KK⁻¹ v_K ∈ range G,   ρ_K = 0;
+|wᵀ v_s|² ≤ (wᵀ G w) · h_K(v),   h_K(v) = v_Kᵀ G_KK⁻¹ v_K,   for every form w.
+```
+
+- `wᵀ G w = Σ_t (wᵀ x_t)²` is the form's training energy. For a founded form `W_v = Q⁺ Mᵀ v` it is
+  the drop `vᵀ M Q⁺ Mᵀ v`.
+- `ρ = 0` exactly when `v ∈ range G`.
+- Forms that agree at every cell (`w + n`, `n ∈ ker G`) share `wᵀ v_s`. They differ by `nᵀ ρ`, which
+  is what the encounters leave open.
+- In range, `h_K(v) = vᵀ G⁺ v` for every pivot order, and it is unchanged by an invertible rebase.
+- Out of range, the honest leverage is unbounded: `ε · vᵀ(G + εI)⁻¹ v → |(I − G G⁺) v|²`. The
+  chart's `h_K`, the pseudo-inverse value, the split itself and `wᵀ v_s` all depend on the chart.
+- The pseudo-inverse bound alone fails for a form outside `range G` (GPT-6's example:
+  `G = [[1, 1], [1, 1]]`, `w = c = (1, 0)` gives `wᵀc = 1` against a bound of `1/2`). A form
+  back-substituted on the chosen pivots with the passed coordinates at zero is such a form. The
+  chart split covers it with equality.
+
+**Reading it fraction-free.** Border `G` with the reading and a zero corner, and eliminate as
+`Upper::eliminate` in `tower_train.rs` does, passing over zero pivots. With `Γ_k` the border entry
+at the `k`-th nonzero pivot and `Δ_k` the pivots (`Δ_0 = 1`):
+
+```text
+h_K = Σ_k Γ_k² / (Δ_(k−1) Δ_k) = −corner / Δ_r,   β_p = Δ · ρ_p at a passed pivot p,
+```
+
+where `Δ` is the last pivot before `p`.
+- All are integers when `G` and `v` are. Each term is the reading's share at that pivot, and every
+  `β` is zero in range.
+- The same `Γ_k` come from a forward pass over the rows the elimination of `G` already stored, each
+  frozen at its pivot. That costs `O(r²)` per reading and no new elimination.
+- A reading of a finite context is a function of the context, so the pass runs once per occurring
+  context.
+- The reading is carried as the undivided pair `(−corner, Δ_r)` with its `β`.
+- With the face's pivots first, the series splits:
+  - the face pivots give `f̄ᵀ H⁻¹ f̄`;
+  - the pool pivots give `c_resᵀ Q⁺ c_res` in range, with `c_res = c − Lᵀ H⁻¹ f̄`.
+
+  After the face pivots the rows hold `Δ_H · Q`, so the founding's pool Gram is read by the same
+  rows.
+
+**Which Gram** [agent-inferred, October 24]. The Gram of what is released and read: the face with
+the founded block, whose moments are exact from the pair table and the released form tables.
+- The pair-block search factors its 4,290-wide Gram at a declared grain. It passes every coordinate
+  whose variance left is under its floor and rounds the rest.
+- So its open part mixes directions no encounter fixed with directions the encounters fixed weakly.
+  Rounding can also keep a small pivot where the encounters have a zero.
+- That open part belongs to the search, not to the encounters. A defect against the encounter Gram
+  would not repair it without a spectral bound, and that bound costs the elimination the search
+  avoided.
+
+**What the leverage predicts and costs.**
+- **Error.** If each cell's arrival is a form's value plus noise of variance `σ²`, the fitted form's
+  mean square error at a new reading in range is `σ²(1 + h)`, whatever the true form `w*`. Out of
+  range it adds `(vᵀ(I − G⁺G)w*)²`, which the cells do not fix.
+- **Charge.** From a unit prior `G_0`, the leverages of the readings as they arrive,
+  `h_t = x_tᵀ G_(t−1)⁻¹ x_t`, satisfy two identities:
+  - `Π_t (1 + h_t) = det G_N / det G_0`;
+  - `Σ_t r_t² / (1 + h_t) = min_w |y − Xw|² + wᵀw`, with `r_t` the prequential residuals.
+
+  So in the Gaussian chart a reading of leverage `h` costs `½ log₂(1 + h)` bits beyond its residual.
+  §5's charge of about `½ log₂ N` per coordinate is this sum: repeating the cells `m` times,
+  `det(I + mG)` is a polynomial in `m` of degree `rank G`. The cells' own leverages sum to `rank G`.
+- **For the held-out cells** [agent-inferred]. The design thread reads 57 held-out cells, on pairs
+  the training text never met, as carrying 24–80‰ of a leading form's held-out square because their
+  leverage is large. That is the bound: a cell's square is at most the energy times `h`. On a
+  never-met pair, `h` can be large in two ways:
+  - through the open part, since the founded value there includes what the search gives a passed
+    coordinate;
+  - through extrapolation inside the encountered span.
+
+  Only the pool Gram decides which.
+
+**Checks** (`leverage.py`, exact). Twelve cells of a face `(1, a)` and a pool of four coordinates,
+the fourth the sum of the first two, so `G` has rank 5 and kernel `(0, 0, 1, 1, 0, −1)`. Readings
+`x_in` and `x_far` lie in range; `x_out` is off it by `nᵀx = −2`.
+- **A.** On the pool, `Q` has rank 3. For three founded forms, the energy equals the drop, the bound
+  holds at all three readings, and it is tight at `c_res = Q W_v`.
+- **B.** `x_in` has `Γ = (1, 12, 172, −4192, −1354)`, corner `−180172` and `Δ_5 = 296904`, so
+  `h = 45043/74226`, the pseudo-inverse value. The forward pass over the stored rows gives the same
+  numbers.
+- **C.** `x_out` has `β_5 = 593808 = 2Δ` and keeps the chart value `45043/74226` in two pivot
+  orders, `17317/12371` in a third. The pseudo-inverse gives `409675/668034`, and `ε · lev → 4/3`,
+  the residual's square.
+  - Four forms equal at every cell agree at `x_in` and `x_far`.
+  - At `x_out` they take four different values.
+  - The bound holds in each chart.
+- **D.** A unimodular rebase leaves `x_in` and `x_far` unchanged. At `x_out` it moves the
+  pseudo-inverse value to `311605/296904` and the residual's square from `4/3` to `2`, and keeps
+  `β ≠ 0`.
+- **E.** At `x_in`, the face part `5/24` plus the pool part `39439/98968` make `45043/74226`.
+- **F.** `Π(1 + h_t) = det G_N / det G_0 = 1370542`, a charge of about 10.19 bits. The prequential
+  identity holds at `17905791/1370542`, and the training leverages sum to 5.
+  `det(I + mG) = 1 + 137m + 4799m² + 67242m³ + 407651m⁴ + 890712m⁵`.
+- **G.** Over all 128 noise patterns of six cells of rank 2, the mean square error is `20/13 = 1 + 7/13`
+  in range and `44/13` far in range, for each of three true forms. Out of range it is
+  `163/52`, `229/156` and `1321/156`: the open part.
+- **H.** GPT-6's example is reproduced. For three arbitrary forms in three pivot orders at the three
+  readings, the bound holds, `ρ_p = β_p / Δ`, and `w + s·n` keeps `wᵀ v_s`.
+
+## 10. Owed Lean
 
 One box in #410:
 - the effective tension `S = T − B H⁺ Bᵀ` is the least residual of the covector on the face, and
@@ -462,10 +576,16 @@ One box in #410:
 - `R = y_T / y_H` is invariant under a unit turn of the readout row, and the gradient of
   `½ |log R|²` in `y_H` is `−log R / conj(y_H)`;
 - on the covectors' range, `det S / det S₀ = det(I − S₀⁻¹(S₀ − S))`, the product of `1 − ρ_k²`;
-- the alignment-code identity of §8, with `F*` its value at one unit per cell and `L(c) = 0`.
+- the alignment-code identity of §8, with `F*` its value at one unit per cell and `L(c) = 0`;
+- the leverage of a reading (§9): in a pivot chart `K` of a positive semidefinite `G`,
+  `v = v_s + ρ` with `v_s ∈ range G`, `ρ_K = 0`, and `ρ = 0` iff `v ∈ range G`;
+  `|wᵀ v_s|² ≤ (wᵀ G w)(v_Kᵀ G_KK⁻¹ v_K)` for every `w`, shared by forms equal on the cells; in range
+  the chart value is `vᵀ G⁺ v`, independent of the chart; the bordered fraction-free corner is
+  `−Δ_r h` and a passed pivot's border entry `Δ · ρ_p`; `Π (1 + h_t) = det G_N / det G_0` with the
+  prequential identity; and the mean square error `σ² (1 + h)` in range.
 
 ## Receipts
 
 [`2026-10-24_EFFECTIVE_TENSION_receipts/`](2026-10-24_EFFECTIVE_TENSION_receipts/): `tension.py` and its
 output `tension.json` (§7); `pool.py` and its output `pool.json` (§5); `closure.py` and its output
-`closure.json` (§8); `RUN.md`. Exact fractions and integers throughout.
+`closure.json` (§8); `leverage.py` and its output `leverage.json` (§9); `RUN.md`. Exact fractions and integers throughout.
