@@ -1140,7 +1140,7 @@ pub(super) fn release_wide(xs: &[i128], bits: u32) -> Vec<i64> {
     xs.iter().map(|&x| if shift == 0 { x as i64 } else { ((x + (1i128 << (shift - 1))) >> shift) as i64 }).collect()
 }
 
-fn release_big(xs: &[num_bigint::BigInt], bits: u64) -> Vec<i64> {
+pub(super) fn release_big(xs: &[num_bigint::BigInt], bits: u64) -> Vec<i64> {
     use num_traits::ToPrimitive;
     let top = xs.iter().map(|x| x.bits()).max().unwrap_or(0);
     let shift = top.saturating_sub(bits);

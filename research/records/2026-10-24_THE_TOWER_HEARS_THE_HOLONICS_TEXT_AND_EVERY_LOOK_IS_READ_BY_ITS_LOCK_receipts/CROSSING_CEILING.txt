@@ -1,0 +1,8 @@
+B by op,a0,b0: cells=22444 groups=300 ceiling share=84.34 per mille of the text's canonical tension
+B by op,c0: cells=22444 groups=263 ceiling share=78.49 per mille of the text's canonical tension
+A by op,a0,b0: cells=22439 groups=300 ceiling share=93.63 per mille of the text's canonical tension
+A by op,c0: cells=22439 groups=263 ceiling share=90.06 per mille of the text's canonical tension
+E by op,a0,b0: cells=22444 groups=300 ceiling share=75.91 per mille of the text's canonical tension
+E by op,c0: cells=22444 groups=30 ceiling share=57.01 per mille of the text's canonical tension
+U by op,a0,b0: cells=22445 groups=2868 ceiling share=113.59 per mille of the text's canonical tension
+U by op,c0: cells=22445 groups=319 ceiling share=88.32 per mille of the text's canonical tension

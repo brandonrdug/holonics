@@ -16,15 +16,28 @@
 //! uncrossed (124 to 134).
 //!
 //! The founding reads, over the training text in the learner's streams and sections, the covector
-//! the tower's own reverse sends to each cell's input ([`Tower::read_input_covectors`]): the
-//! tension of every later face in the section carried back to where the class arrived. The class
-//! alone bridges its covector's class mean (the encoding's own covector), so each class's moments
-//! are centred; each rank founds the form whose best lift removes most of what remains
-//! (the effective tension's law, `contact.tension-founds-face`, read at the input), alternating the
-//! two factors from `b` the unit as the pair founding does ([`leading_factor`]). Directions are
-//! searched on released copies; every share reported is read exactly from the moments.
+//! `y` the tower's own reverse sends to each cell's input ([`Tower::read_input_covectors`]): the
+//! tension of every later face in the section carried back to where the class arrived. It is kept
+//! as moments, written once (`read-tower-situated-moments`), so a founding never reads the text
+//! again. The class alone bridges its covector's class mean (the encoding's own covector), so the
+//! forms are read centred within each arriving class.
+//!
+//! Each rank founds the form whose lift saves the most code, read to second order in the
+//! covector's own metric (the effective tension's law, `contact.tension-founds-face`, read at the
+//! input; the closure fold's `det S/det S₀ = Π(1−ρ²)`). With `H = Y/N`, `Y = Σ yyᵀ` the empirical
+//! Fisher of the input (a log-loss's covector carries its own curvature: `E[yyᵀ]` is the Fisher),
+//! forms `c` with within-class Gram `G` and cross moment `R = Σ c yᵀ` save at best
+//! `ΔL = −½ tr(R H⁻¹ Rᵀ G⁻¹)` nats, so `s = −2ΔL/N = tr(Y⁻¹ Rᵀ G⁻¹ R)`, the sum of the squared
+//! canonical correlations between the forms and the tension: twice the nats a cell saves, and the
+//! share reported in thousandths. [agent-inferred, October 24] Fitting `−y` in the identity metric
+//! instead (energy, Brier's metric) founded a first form on prose letters that removed 1‰ of the
+//! training tension and none held out (the record's "The situated pool"): energy saturates where
+//! code does not, so a cell whose class the tower cannot place (a sum's units, 3.49 bits) weighs no
+//! more than a prose letter it nearly knows. The two factors alternate from `b` the unit, each the
+//! leading canonical direction of its block ([`leading_canonical`]). Directions are searched on
+//! released copies; every share is read exactly from the moments.
 
-use super::tower_train::{count, leading_factor, pair_hats, positive, release_wide, solve_scaled, STATE_BUDGET};
+use super::tower_train::{count, pair_hats, positive, release_big, release_wide, solve_scaled, STATE_BUDGET};
 use super::*;
 use holonics::hnn::tower::{carried_face, Tower, TowerError, TowerLearner};
 use num_bigint::BigInt;
@@ -35,8 +48,8 @@ use rayon::prelude::*;
 /// stay inside 128 bits over fewer than `2^32` cells: each product is below `2^80`.
 const MOMENT_REACH: i64 = 1 << 40;
 
-/// One class's moments over the cells it arrives at: `n`, `Σŝ`, `Σy`, `Σŝŝᵀ` (upper triangle
-/// while reading) and `Σŝyᵀ`.
+/// One class's moments over the cells it arrives at: `n`, `Σŝ`, `Σy`, `Σŝŝᵀ` (upper triangle)
+/// and `Σŝyᵀ`.
 #[derive(Clone)]
 struct ClassMoments {
     n: i128,
@@ -46,13 +59,39 @@ struct ClassMoments {
     m: Vec<i128>,
 }
 
-/// A text's moments: per arriving class, and `Σyyᵀ` over every cell (upper triangle).
+/// A text's moments: per arriving class, and `Y = Σyyᵀ` over every cell (upper triangle).
 struct Moments {
     dims: usize,
     width: usize,
     classes: Vec<Option<ClassMoments>>,
     yy: Vec<i128>,
     cells: usize,
+}
+
+/// A `key=value` field of a head line.
+fn head_field(line: &str, key: &str) -> Result<String> {
+    line.split_whitespace().find_map(|f| f.strip_prefix(key).and_then(|f| f.strip_prefix('=')).map(str::to_string)).ok_or_else(|| format!("the head line has no {key}").into())
+}
+
+fn numbers(text: &str) -> Result<Vec<i128>> {
+    text.split(',').filter(|x| !x.is_empty()).map(|x| Ok(x.parse::<i128>()?)).collect()
+}
+
+/// The upper triangle of a square `d × d` row-major matrix, row by row.
+fn upper(full: &[i128], d: usize) -> Vec<i128> {
+    (0..d).flat_map(|i| full[i * d + i..(i + 1) * d].iter().copied()).collect()
+}
+
+/// A square `d × d` matrix whose upper triangle is `values` (the lower left zero).
+fn from_upper(values: &[i128], d: usize) -> Vec<i128> {
+    let mut full = vec![0i128; d * d];
+    let mut at = values.iter();
+    for i in 0..d {
+        for slot in &mut full[i * d + i..(i + 1) * d] {
+            *slot = *at.next().expect("the upper triangle's length is checked by its reader");
+        }
+    }
+    full
 }
 
 impl Moments {
@@ -112,20 +151,93 @@ impl Moments {
         }
         self.cells += other.cells;
     }
+
+    /// The moments as text: the head line, the `YY` line, then one `CLASS` line per arriving class.
+    fn text(&self, head: &str) -> String {
+        let join = |v: &[i128]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",");
+        let mut out = format!("{head} dims={} width={} alphabet={} cells={}\nYY {}\n", self.dims, self.width, self.classes.len(), self.cells, join(&upper(&self.yy, self.width)));
+        for (u, c) in self.classes.iter().enumerate() {
+            let Some(c) = c else { continue };
+            out.push_str(&format!("CLASS {u} n={} s={} y={} q={} m={}\n", c.n, join(&c.s), join(&c.y), join(&upper(&c.q, self.dims)), join(&c.m)));
+        }
+        out
+    }
+
+    /// The moments of a `read-tower-situated-moments` file, with its head line.
+    fn parse(text: &str) -> Result<(String, Moments)> {
+        let mut lines = text.lines();
+        let head = lines.next().ok_or("an empty moments file")?.to_string();
+        if !head.starts_with("SITUATED_MOMENTS ") {
+            return Err("a moments file opens with its SITUATED_MOMENTS line".into());
+        }
+        let (d, w) = (count(&head_field(&head, "dims")?)?, count(&head_field(&head, "width")?)?);
+        let mut moments = Moments::new(count(&head_field(&head, "alphabet")?)?, d, w);
+        moments.cells = count(&head_field(&head, "cells")?)?;
+        let yy = numbers(lines.next().and_then(|l| l.strip_prefix("YY ")).ok_or("a moments file's second line is its YY line")?)?;
+        if yy.len() != w * (w + 1) / 2 {
+            return Err("the YY line has the wrong length".into());
+        }
+        moments.yy = from_upper(&yy, w);
+        let mut counted = 0i128;
+        for line in lines {
+            let mut parts = line.split_whitespace();
+            if parts.next() != Some("CLASS") {
+                return Err("a moments line is not a CLASS line".into());
+            }
+            let u = count(parts.next().ok_or("a CLASS line names no class")?)?;
+            let mut take = |key: &str, len: usize| -> Result<Vec<i128>> {
+                let values = numbers(parts.next().and_then(|p| p.strip_prefix(key)).ok_or("a CLASS line's fields are short or out of order")?)?;
+                if values.len() != len {
+                    return Err("a CLASS field has the wrong length".into());
+                }
+                Ok(values)
+            };
+            let n = take("n=", 1)?[0];
+            let (s, y) = (take("s=", d)?, take("y=", w)?);
+            let q = from_upper(&take("q=", d * (d + 1) / 2)?, d);
+            let m = take("m=", d * w)?;
+            if n <= 0 || u >= moments.classes.len() || moments.classes[u].is_some() {
+                return Err("a CLASS line repeats a class, names none of the alphabet, or counts no cell".into());
+            }
+            counted += n;
+            moments.classes[u] = Some(ClassMoments { n, s, y, q, m });
+        }
+        if counted != moments.cells as i128 {
+            return Err("the classes' counts do not sum to the moments' cells".into());
+        }
+        Ok((head, moments))
+    }
 }
 
-/// The frozen tower reads `streams` (each from rest) in sections of `section` cells, and keeps the
+/// The frozen tower reads `text` in `streams` streams, in sections of `section` cells, and keeps the
 /// moments of level `level`'s carried face against each cell's input covector.
-fn read_moments(tower: &Tower, streams: &[Vec<usize>], section: usize, level: usize) -> Result<Moments> {
+///
+/// [agent-inferred, October 24] Each stream after the first opens one section early, from rest, and
+/// counts none of that section's cells. Each level's read is the face's ratio to its power
+/// (`ratio_to_power`), whose adjoint divides by the power, so just after rest, where the modes hold
+/// one or two pushes, the covector a cell's input receives carries the inverse of a near-zero power:
+/// read from rest at a stream's cut, the first cells' covectors reach 10^8 times a typical cell's
+/// energy (the record's "The situated pool"), and the moments of the whole text are those few
+/// cells. The section read before a cut brings the stream to the loudness the text keeps, as the
+/// learner's own streams are; the first stream opens at the text's own start.
+fn read_moments(tower: &Tower, text: &[usize], streams: usize, section: usize, level: usize) -> Result<Moments> {
     let (w, alphabet) = (tower.declaration.width, tower.declaration.alphabet);
     let dims = 2 * tower.declaration.modes;
-    let read: Vec<Moments> = streams
+    let chunk = text.len().div_ceil(streams);
+    let cuts: Vec<(usize, usize)> = (0..streams).map(|s| (s * chunk, ((s + 1) * chunk).min(text.len()))).filter(|&(a, b)| a < b).collect();
+    let read: Vec<Moments> = cuts
         .par_iter()
-        .map(|classes| {
+        .map(|&(start, end)| {
+            let open = start.saturating_sub(section);
             let mut moments = Moments::new(alphabet, dims, w);
             let mut state = tower.rest();
+            let mut at = open;
             tower
-                .read_input_covectors(&mut state, classes, section, |cell| {
+                .read_input_covectors(&mut state, &text[open..end], section, |cell| {
+                    at += 1;
+                    if at <= start {
+                        return Ok(());
+                    }
                     moments.add(cell.class, &cell.carried[level * dims..(level + 1) * dims], cell.covector).map_err(TowerError::Refused)
                 })
                 .map_err(|e| e.to_string())?;
@@ -179,18 +291,22 @@ struct Centred {
     m: Vec<i128>,
 }
 
-/// A moment set read for the founding: the centred classes, `L` the lcm of their counts and
-/// `L·tr T̃`, the within-class covector energy `Σ|y|² − Σ_u |Σ_u y|²/n_u` scaled by `L`, with each
-/// covector coordinate's `L·T̃_rr`.
+/// A moment set read for the founding: the centred classes, `L` the lcm of their counts with each
+/// class's `L/n_u`, the tension's metric `Y = Σyyᵀ` with `D_Y` and `D_Y·Y⁻¹` (its adjugate up to
+/// sign), `Y⁻¹` released to below `2^60` its largest entry for the direction search, and the
+/// share of `tr Y` that the class means carry.
 struct Read {
     dims: usize,
     width: usize,
     classes: Vec<Centred>,
     l: BigInt,
     scales: Vec<BigInt>,
-    trace: BigInt,
-    diagonal: Vec<BigInt>,
-    raw: BigInt,
+    gram: Vec<Vec<BigInt>>,
+    gram_det: BigInt,
+    gram_inverse: Vec<Vec<BigInt>>,
+    metric: Vec<Vec<i64>>,
+    diagonal: Vec<i128>,
+    means_permille: String,
     cells: usize,
 }
 
@@ -219,13 +335,18 @@ fn centred(moments: &Moments) -> Result<Read> {
         })
         .collect::<std::result::Result<_, &str>>()?;
     let l = lcm(present.iter().map(|(_, c)| c.n));
-    let diagonal: Vec<BigInt> = (0..w)
-        .map(|r| &l * moments.yy[r * w + r] - present.iter().map(|(_, c)| BigInt::from(c.y[r]) * c.y[r] * (&l / c.n)).sum::<BigInt>())
-        .collect();
-    let trace = diagonal.iter().sum();
-    let raw = &l * (0..w).map(|r| BigInt::from(moments.yy[r * w + r])).sum::<BigInt>();
-    let scales = classes.iter().map(|c| &l / c.n).collect();
-    Ok(Read { dims: d, width: w, classes, l, scales, trace, diagonal, raw, cells: moments.cells })
+    let scales: Vec<BigInt> = classes.iter().map(|c| &l / c.n).collect();
+    let gram: Vec<Vec<BigInt>> = (0..w).map(|r| (0..w).map(|r2| BigInt::from(moments.yy[r.min(r2) * w + r.max(r2)])).collect()).collect();
+    let identity: Vec<Vec<BigInt>> = (0..w).map(|r| (0..w).map(|r2| BigInt::from((r == r2) as i64)).collect()).collect();
+    let (gram_det, gram_inverse) = solve_scaled(&gram, &identity, false)?;
+    let flat: Vec<BigInt> = gram_inverse.iter().flatten().cloned().collect();
+    let released = release_big(&flat, 60);
+    let metric = released.chunks(w).map(<[i64]>::to_vec).collect();
+    let diagonal = (0..w).map(|r| moments.yy[r * w + r]).collect();
+    let trace: BigInt = (0..w).map(|r| BigInt::from(moments.yy[r * w + r])).sum();
+    let means: BigInt = present.iter().map(|(_, c)| c.y.iter().map(|&x| BigInt::from(x) * x).sum::<BigInt>() * (&l / c.n)).sum();
+    let means_permille = permille(&means, &(trace * &l));
+    Ok(Read { dims: d, width: w, classes, l, scales, gram, gram_det, gram_inverse, metric, diagonal, means_permille, cells: moments.cells })
 }
 
 /// A founded form's factors: `a` over the carried face, `b` over the arriving class's `x̂`.
@@ -286,32 +407,49 @@ fn joint(read: &Read, reads: &[&FormRead]) -> (Vec<Vec<BigInt>>, Vec<Vec<BigInt>
     (g, r)
 }
 
-/// A training fit: `D` and `D·P` with `G P = R`, `R`, and the share of the training text's
-/// within-class covector energy the lift removes, `tr(RᵀP)/tr T̃`, as a numerator and denominator.
+/// A training fit: `D` and `D·P` with `G P = R`, and the canonical share
+/// `s = tr(Y⁻¹ Rᵀ P)` the forms carry, as a numerator and denominator.
 struct Fit {
     det: BigInt,
     dp: Vec<Vec<BigInt>>,
-    r: Vec<Vec<BigInt>>,
-    removed: BigInt,
+    share: BigInt,
     denominator: BigInt,
+}
+
+/// `tr(A Bᵀ C)` for `A` square over the covector and `B`, `C` with one row per form.
+fn trace_through(a: &[Vec<BigInt>], b: &[Vec<BigInt>], c: &[Vec<BigInt>]) -> BigInt {
+    let w = a.len();
+    let bc: Vec<Vec<BigInt>> = (0..w).into_par_iter().map(|r| (0..w).map(|r2| b.iter().zip(c).map(|(bj, cj)| &bj[r] * &cj[r2]).sum()).collect()).collect();
+    (0..w).into_par_iter().map(|r| (0..w).map(|r2| &a[r][r2] * &bc[r2][r]).sum::<BigInt>()).sum()
 }
 
 fn fit(read: &Read, reads: &[&FormRead]) -> Result<Fit> {
     let (g, r) = joint(read, reads);
     let (det, dp) = solve_scaled(&g, &r, true)?;
-    let removed: BigInt = r.iter().zip(&dp).flat_map(|(rr, pp)| rr.iter().zip(pp).map(|(x, y)| x * y)).sum();
-    let denominator = &det * &read.trace;
-    Ok(Fit { det, dp, r, removed, denominator })
+    let share = trace_through(&read.gram_inverse, &r, &dp);
+    let denominator = &read.gram_det * &read.l * &det;
+    Ok(Fit { det, dp, share, denominator })
 }
 
-/// The share of a held-out moment set's within-class covector energy that the training lift
-/// `P = D·P/D` removes, `(2 tr(RᵀP) − tr(PᵀGP))/tr T̃`, as a numerator and denominator.
-fn held_removed(read: &Read, reads: &[&FormRead], trained: &Fit) -> (BigInt, BigInt) {
-    let (g, r) = joint(read, reads);
-    let (det, dp, k) = (&trained.det, &trained.dp, reads.len());
-    let cross: BigInt = r.iter().zip(dp).flat_map(|(rr, pp)| rr.iter().zip(pp).map(|(x, y)| x * y)).sum();
-    let quadratic: BigInt = (0..read.width).into_par_iter().map(|c| (0..k).map(|j| &dp[j][c] * (0..k).map(|kk| &g[j][kk] * &dp[kk][c]).sum::<BigInt>()).sum::<BigInt>()).sum();
-    (cross * det * 2 - quadratic, det * det * &read.trace)
+/// The canonical share a held-out moment set keeps under the training lift, read to second order:
+/// with the natural lift `−N Y⁻¹ Pᵀ` founded on the training text,
+/// `s_h = (2N/N_h) tr(Y⁻¹PᵀR_h) − (N/N_h)² tr(P Y⁻¹ Y_h Y⁻¹ Pᵀ G_h)`, as a numerator and
+/// denominator (twice the nats a held-out cell saves).
+fn held_share(held: &Read, reads: &[&FormRead], train: &Read, trained: &Fit) -> (BigInt, BigInt) {
+    let (g, r) = joint(held, reads);
+    let (n, nh) = (BigInt::from(train.cells), BigInt::from(held.cells));
+    let (det, dy) = (&trained.det, &train.gram_det);
+    let cross = trace_through(&train.gram_inverse, &trained.dp, &r);
+    let w = train.width;
+    // B = Y⁻¹ Pᵀ (scaled by D_Y·D), one row per covector coordinate.
+    let b: Vec<Vec<BigInt>> = (0..w).into_par_iter().map(|row| (0..reads.len()).map(|j| (0..w).map(|r2| &train.gram_inverse[row][r2] * &trained.dp[j][r2]).sum()).collect()).collect();
+    // Bᵀ Y_h B: k × k.
+    let yb: Vec<Vec<BigInt>> = (0..w).into_par_iter().map(|row| (0..reads.len()).map(|j| (0..w).map(|r2| &held.gram[row][r2] * &b[r2][j]).sum()).collect()).collect();
+    let k = reads.len();
+    let middle: Vec<Vec<BigInt>> = (0..k).map(|j| (0..k).map(|kk| (0..w).map(|row| &b[row][j] * &yb[row][kk]).sum()).collect()).collect();
+    let quad: BigInt = (0..k).map(|j| (0..k).map(|kk| &middle[j][kk] * &g[kk][j]).sum::<BigInt>()).sum();
+    let numerator = &n * &nh * dy * det * cross * 2 - &n * &n * quad;
+    (numerator, &nh * &nh * dy * dy * det * det * &held.l)
 }
 
 fn permille(num: &BigInt, den: &BigInt) -> String {
@@ -322,9 +460,49 @@ fn permille(num: &BigInt, den: &BigInt) -> String {
     format!("{scaled}")
 }
 
-/// The a-step: with `b` held, the leading direction over the carried face of the deflated centred
-/// moments `Q_b = Σ_u β_u² Q̃_u/n_u`, `M_b = Σ_u β_u M̃'_u/n_u` (each `β_u` released to `2^15`;
-/// only directions are read here).
+/// The leading canonical direction of a block against the tension's metric: the generalized
+/// eigenvector of `(Mᵀ Y⁻¹ M, Q)` by the power step `w = Q⁻¹Mᵀv`, `v ← Y⁻¹Mw`, on `M` and `Q`
+/// released to below `2^60` their largest entry and `Y⁻¹` released (only directions are read),
+/// each vector released to `2^15`; it stops when a step raises `(Mw)ᵀY⁻¹(Mw)/(wᵀQw)` by less than
+/// `2^(−15)` of itself. Returns the factor and the carried `v`.
+fn leading_canonical(dm: &[Vec<BigInt>], dq: &[Vec<BigInt>], metric: &[Vec<i64>], mut v: Vec<i64>) -> Result<(Vec<i64>, Vec<i64>)> {
+    let (rows, q) = (dm.len(), dq.len());
+    let mt = release_big(&dm.iter().flatten().cloned().collect::<Vec<_>>(), 60);
+    let qt = release_big(&dq.iter().flatten().cloned().collect::<Vec<_>>(), 60);
+    let qbig: Vec<Vec<BigInt>> = (0..q).map(|i| (0..q).map(|j| BigInt::from(qt[i * q + j])).collect()).collect();
+    let identity: Vec<Vec<BigInt>> = (0..q).map(|i| (0..q).map(|j| BigInt::from((i == j) as i64)).collect()).collect();
+    let (_, inverse) = solve_scaled(&qbig, &identity, false)?;
+    let mut best: Option<(BigInt, BigInt, Vec<i64>, Vec<i64>)> = None;
+    loop {
+        let g: Vec<i128> = (0..q).map(|j| (0..rows).map(|a| mt[a * q + j] as i128 * v[a] as i128).sum()).collect();
+        let wide: Vec<BigInt> = (0..q).map(|i| inverse[i].iter().zip(&g).map(|(x, &y)| x * y).sum()).collect();
+        let w = release_big(&wide, 15);
+        let u: Vec<i128> = (0..rows).map(|a| (0..q).map(|j| mt[a * q + j] as i128 * w[j] as i128).sum()).collect();
+        let mu: Vec<BigInt> = (0..rows).map(|a| (0..rows).map(|b| BigInt::from(metric[a][b]) * u[b]).sum()).collect();
+        let num: BigInt = mu.iter().zip(&u).map(|(x, &y)| x * y).sum();
+        let den: BigInt = (0..q).map(|i| (0..q).map(|j| BigInt::from(qt[i * q + j] as i128 * w[i] as i128) * w[j]).sum::<BigInt>()).sum();
+        v = release_big(&mu, 15);
+        if den <= BigInt::from(0) || w.iter().all(|&x| x == 0) {
+            break;
+        }
+        let gained = match &best {
+            None => true,
+            Some((bn, bd, _, _)) => (&num * bd) << 15u32 > bn * &den * ((1i64 << 15) + 1),
+        };
+        if best.as_ref().is_none_or(|(bn, bd, _, _)| &num * bd > bn * &den) {
+            best = Some((num, den, w, v.clone()));
+        }
+        if !gained {
+            break;
+        }
+    }
+    let (_, _, w, v) = best.ok_or("the power step found no direction")?;
+    Ok((w, v))
+}
+
+/// The a-step: with `b` held, the leading canonical direction over the carried face of the
+/// deflated centred moments `Q_b = Σ_u β_u² Q̃_u/n_u`, `M_b = Σ_u β_u M̃'_u/n_u` (each `β_u`
+/// released to `2^15`; only directions are read here).
 fn a_step(read: &Read, deflated: &[Vec<i128>], hats: &[Vec<i64>], b: &[i64], v: Vec<i64>) -> Result<(Vec<i64>, Vec<i64>)> {
     let (dims, width) = (read.dims, read.width);
     let betas: Vec<i128> = read.classes.iter().map(|c| hats[c.class].iter().zip(b).map(|(&x, &bb)| x as i128 * bb as i128).sum()).collect();
@@ -338,12 +516,11 @@ fn a_step(read: &Read, deflated: &[Vec<i128>], hats: &[Vec<i64>], b: &[i64], v: 
         .into_par_iter()
         .map(|r| (0..dims).map(|i| (0..read.classes.len()).filter(|&u| rel[u] != 0).map(|u| div_round(&(BigInt::from(deflated[u][i * width + r]) * rel[u]), &ns[u])).sum()).collect())
         .collect();
-    let (a, v, _) = leading_factor(&dm, &dq, v)?;
-    Ok((a, v))
+    leading_canonical(&dm, &dq, &read.metric, v)
 }
 
-/// The b-step: with `a` held, the leading direction over `x̂` of `N = Σ_u x̂_u (M̃'_uᵀa)ᵀ/n_u`
-/// against `C = Σ_u (aᵀQ̃_u a/n_u) x̂_u x̂_uᵀ`.
+/// The b-step: with `a` held, the leading canonical direction over `x̂` of
+/// `N = Σ_u x̂_u (M̃'_uᵀa)ᵀ/n_u` against `C = Σ_u (aᵀQ̃_u a/n_u) x̂_u x̂_uᵀ`.
 fn b_step(read: &Read, deflated: &[Vec<i128>], hats: &[Vec<i64>], a: &[i64], v: Vec<i64>) -> Result<(Vec<i64>, Vec<i64>)> {
     let (dims, width, hat) = (read.dims, read.width, hats[0].len());
     let per: Vec<(BigInt, Vec<BigInt>)> = read
@@ -362,8 +539,7 @@ fn b_step(read: &Read, deflated: &[Vec<i128>], hats: &[Vec<i64>], a: &[i64], v: 
         .into_par_iter()
         .map(|i| (0..hat).map(|j| read.classes.iter().zip(&per).map(|(c, (quad, _))| quad * hats[c.class][i] * hats[c.class][j]).sum()).collect())
         .collect();
-    let (b, v, _) = leading_factor(&dm, &dq, v)?;
-    Ok((b, v))
+    leading_canonical(&dm, &dq, &read.metric, v)
 }
 
 /// The centred moments less the founded forms' lift, `M̃'_u = M̃_u − Σ_j β_ju z_uj P_jᵀ` with
@@ -390,57 +566,161 @@ fn deflate(read: &Read, reads: &[FormRead], fitted: &Fit) -> Result<Vec<Vec<i128
         .map_err(Into::into)
 }
 
-/// `found-tower-situated STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA STREAMS SECTION LEVEL FORMS
-/// OUT`: found `FORMS` situated forms on level `LEVEL`'s carried face from the input covectors the
-/// frozen tower's reverse sends over the training text (`STREAMS` streams from rest, sections of
-/// `SECTION` cells, as the learner reads it), read each rank's share on the training and held-out
-/// texts, and write the forms to `OUT` (create-new). Shares are in thousandths, rounded.
-pub(super) fn found_tower_situated(args: &[String]) -> Result<()> {
-    if args.len() != 12 {
-        return Err("found-tower-situated STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA STREAMS SECTION LEVEL FORMS OUT".into());
+/// Per class, the part of the canonical share it carries,
+/// `s_u = 2 tr(Y⁻¹ Pᵀ R_u) − tr(P Y⁻¹ Pᵀ G_u)` (the parts sum to `s`), as numerators over
+/// `D² D_Y n_u`: `2D Σ_j β_ju (DP_j Y⁻¹ M̃_uᵀa_j) − Σ_jk β_ju β_ku (a_jᵀQ̃_u a_k)(DP_j Y⁻¹ DP_kᵀ)`
+/// with `Y⁻¹` its scaled inverse.
+fn share_per_class(read: &Read, reads: &[FormRead], fitted: &Fit) -> Vec<BigInt> {
+    let (k, w) = (reads.len(), read.width);
+    let pa: Vec<Vec<BigInt>> = (0..k).map(|j| (0..w).map(|r| (0..w).map(|r2| &read.gram_inverse[r][r2] * &fitted.dp[j][r2]).sum()).collect()).collect();
+    let cross: Vec<Vec<BigInt>> = (0..k).map(|j| (0..k).map(|kk| fitted.dp[j].iter().zip(&pa[kk]).map(|(x, y)| x * y).sum()).collect()).collect();
+    (0..read.classes.len())
+        .into_par_iter()
+        .map(|u| {
+            let lin: BigInt = (0..k).map(|j| reads[j].w[u].iter().zip(&pa[j]).map(|(x, y)| x * y).sum::<BigInt>() * reads[j].beta[u]).sum();
+            let quad: BigInt = (0..k)
+                .map(|j| (0..k).map(|kk| if kk <= j { &reads[j].inner[u][kk] } else { &reads[kk].inner[u][j] } * reads[j].beta[u] * reads[kk].beta[u] * &cross[j][kk]).sum::<BigInt>())
+                .sum();
+            lin * &fitted.det * 2 - quad
+        })
+        .collect()
+}
+
+/// The checked head of a moments file read on this tower: its level.
+fn moments_level(head: &str, tower: &Tower, state_sha: &str) -> Result<usize> {
+    let level = count(&head_field(head, "level")?)?;
+    if head_field(head, "state_sha256")? != state_sha {
+        return Err("the moments were read on another tower state".into());
+    }
+    if level >= tower.declaration.levels || count(&head_field(head, "dims")?)? != 2 * tower.declaration.modes || count(&head_field(head, "width")?)? != tower.declaration.width {
+        return Err("the moments were read on another tower's shape".into());
+    }
+    Ok(level)
+}
+
+/// `read-tower-situated-moments STATE STATE_SHA TEXT TEXT_SHA STREAMS SECTION LEVEL OUT`: the
+/// frozen tower reads `TEXT` in `STREAMS` streams, each after the first opening one section early
+/// ([`read_moments`]), in sections of `SECTION` cells as the learner reads it, and the moments of
+/// level `LEVEL`'s carried face against each cell's input covector, per arriving class, are written
+/// to `OUT` (create-new).
+pub(super) fn read_tower_situated_moments(args: &[String]) -> Result<()> {
+    if args.len() != 9 {
+        return Err("read-tower-situated-moments STATE STATE_SHA TEXT TEXT_SHA STREAMS SECTION LEVEL OUT".into());
     }
     let started = std::time::Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
-    let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
-    let dev = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
-    let (streams, section) = (positive(&args[7])?, positive(&args[8])?);
-    let level = count(&args[9])?;
-    let ranks = positive(&args[10])?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let (streams, section) = (positive(&args[5])?, positive(&args[6])?);
+    let level = count(&args[7])?;
     let tower = &learner.tower;
     if level >= tower.declaration.levels {
         return Err("LEVEL names no level of the tower".into());
     }
-    if std::path::Path::new(&args[11]).exists() {
+    if text.is_empty() {
+        return Err("TEXT holds no class".into());
+    }
+    if std::path::Path::new(&args[8]).exists() {
+        return Err("OUT exists: the moments are written create-new".into());
+    }
+    let classes: Vec<usize> = text.iter().map(|&b| b as usize).collect();
+    let moments = read_moments(tower, &classes, streams, section, level)?;
+    let out = moments.text(&format!("SITUATED_MOMENTS level={level} streams={streams} section={section} state_sha256={} text_sha256={}", args[2], args[4]));
+    let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&args[8])?;
+    std::io::Write::write_all(&mut file, out.as_bytes())?;
+    println!(
+        "SITUATED_MOMENTS cells={} classes={} read_ms={} sha256={}",
+        moments.cells,
+        moments.classes.iter().flatten().count(),
+        started.elapsed().as_millis(),
+        sha256(out.as_bytes())?
+    );
+    Ok(())
+}
+
+/// `found-tower-situated STATE STATE_SHA TRAIN_MOMENTS TRAIN_MOMENTS_SHA HELD_MOMENTS
+/// HELD_MOMENTS_SHA FORMS OUT [FROM FROM_SHA]`: found situated forms from the training moments up
+/// to `FORMS` in all, read each rank's canonical share on the training and held-out moments, and
+/// write each form to `OUT` (create-new) as it is founded. `FROM`, a forms file founded on the same
+/// moments, supplies the first forms: they are read again, copied to `OUT` and deflated, and the
+/// founding continues from the next rank. Shares are in thousandths, rounded: the sum of the
+/// squared canonical correlations, twice the nats a cell saves; `serves` names the classes carrying
+/// most of the training share, each with its part.
+pub(super) fn found_tower_situated(args: &[String]) -> Result<()> {
+    if args.len() != 9 && args.len() != 11 {
+        return Err("found-tower-situated STATE STATE_SHA TRAIN_MOMENTS TRAIN_MOMENTS_SHA HELD_MOMENTS HELD_MOMENTS_SHA FORMS OUT [FROM FROM_SHA]".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let (train_head, train_moments) = Moments::parse(std::str::from_utf8(&pinned_read(&args[3], &args[4], STATE_BUDGET)?)?)?;
+    let (held_head, held_moments) = Moments::parse(std::str::from_utf8(&pinned_read(&args[5], &args[6], STATE_BUDGET)?)?)?;
+    let ranks = positive(&args[7])?;
+    let level = moments_level(&train_head, tower, &args[2])?;
+    if moments_level(&held_head, tower, &args[2])? != level {
+        return Err("the training and held-out moments were read on different levels".into());
+    }
+    if std::path::Path::new(&args[8]).exists() {
         return Err("OUT exists: the forms are written create-new".into());
     }
     let width = tower.declaration.width;
-    let cut = |text: &[u8]| -> Vec<Vec<usize>> {
-        let chunk = text.len().div_ceil(streams);
-        text.chunks(chunk).map(|s| s.iter().map(|&b| b as usize).collect()).collect()
-    };
-    let train_read = centred(&read_moments(tower, &cut(&train), section, level)?)?;
-    let dev_read = centred(&read_moments(tower, &cut(&dev), section, level)?)?;
+    let train_read = centred(&train_moments)?;
+    let held_read = centred(&held_moments)?;
+    drop((train_moments, held_moments));
     println!(
         "SITUATED_PASS train_cells={} held_out_cells={} train_classes={} held_out_classes={} dims={} width={width} class_means_permille_of_covector_energy={} held_out_class_means_permille={} read_ms={}",
         train_read.cells,
-        dev_read.cells,
+        held_read.cells,
         train_read.classes.len(),
-        dev_read.classes.len(),
+        held_read.classes.len(),
         train_read.dims,
-        permille(&(&train_read.raw - &train_read.trace), &train_read.raw),
-        permille(&(&dev_read.raw - &dev_read.trace), &dev_read.raw),
+        train_read.means_permille,
+        held_read.means_permille,
         started.elapsed().as_millis()
     );
+    let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&args[8])?;
+    std::io::Write::write_all(&mut file, format!("SITUATED level={level} dims={} width={width} state_sha256={} moments_sha256={}\n", train_read.dims, args[2], args[4]).as_bytes())?;
     let (hats, _) = pair_hats(tower);
     let mut forms: Vec<Form> = Vec::new();
     let mut reads: Vec<FormRead> = Vec::new();
     let mut held_reads: Vec<FormRead> = Vec::new();
     let mut deflated: Vec<Vec<i128>> = train_read.classes.iter().map(|c| c.m.clone()).collect();
-    let mut diagonal = train_read.diagonal.clone();
+    // The forms a founding on these same moments already wrote, read again and deflated before the
+    // next rank is searched: the search is the founding's cost, the reading of a known form is not.
+    if args.len() == 11 {
+        let text = String::from_utf8(pinned_read(&args[9], &args[10], READ_BUDGET as usize)?)?;
+        let head = text.lines().next().unwrap_or_default();
+        if head_field(head, "moments_sha256")? != args[4] || head_field(head, "state_sha256")? != args[2] {
+            return Err("FROM was founded on other moments or another tower state".into());
+        }
+        let (from_level, known) = parse_forms(&text, tower)?;
+        if from_level != level || known.len() > ranks {
+            return Err("FROM was founded on another level, or holds more forms than FORMS".into());
+        }
+        for (form, shift) in known {
+            reads.push(form_read(&train_read, &hats, &form, &forms)?);
+            held_reads.push(form_read(&held_read, &hats, &form, &forms)?);
+            let join = |v: &[i64]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",");
+            std::io::Write::write_all(&mut file, format!("FORM {} shift={shift} a={} b={}\n", forms.len(), join(&form.a), join(&form.b)).as_bytes())?;
+            forms.push(form);
+        }
+        file.sync_data()?;
+        let trained = fit(&train_read, &reads.iter().collect::<Vec<_>>())?;
+        let (hnum, hden) = held_share(&held_read, &held_reads.iter().collect::<Vec<_>>(), &train_read, &trained);
+        println!(
+            "SITUATED_FROM forms={} train_canonical_permille={} held_out_canonical_permille={} elapsed_ms={}",
+            forms.len(),
+            permille(&trained.share, &trained.denominator),
+            permille(&hnum, &hden),
+            started.elapsed().as_millis()
+        );
+        if forms.len() < ranks {
+            deflated = deflate(&train_read, &reads, &trained)?;
+        }
+    }
     let unit: Vec<i64> = (0..=width).map(|j| (j == width) as i64).collect();
-    for rank in 1..=ranks {
-        // Start at the covector coordinate with the most energy left, `b` the unit.
-        let top = (0..width).max_by(|&x, &y| diagonal[x].cmp(&diagonal[y])).unwrap_or(0);
+    // Each rank starts at the covector coordinate with the most tension, `b` the unit.
+    let top = (0..width).max_by(|&x, &y| train_read.diagonal[x].cmp(&train_read.diagonal[y])).unwrap_or(0);
+    for rank in forms.len() + 1..=ranks {
         let mut v: Vec<i64> = (0..width).map(|r| (r == top) as i64).collect();
         let mut b = unit.clone();
         let mut best: Option<(BigInt, BigInt, Form)> = None;
@@ -455,7 +735,7 @@ pub(super) fn found_tower_situated(args: &[String]) -> Result<()> {
             let own = form_read(&train_read, &hats, &candidate, &forms)?;
             let trial: Vec<&FormRead> = reads.iter().chain(std::iter::once(&own)).collect();
             let trial_fit = fit(&train_read, &trial)?;
-            let (num, den) = (trial_fit.removed, trial_fit.denominator);
+            let (num, den) = (trial_fit.share, trial_fit.denominator);
             let gained = match &best {
                 None => true,
                 Some((bn, bd, _)) => (&num * bd) << 15u32 > bn * &den * ((1i64 << 15) + 1),
@@ -469,40 +749,40 @@ pub(super) fn found_tower_situated(args: &[String]) -> Result<()> {
         }
         let (_, _, form) = best.ok_or("the alternation founded no form")?;
         reads.push(form_read(&train_read, &hats, &form, &forms)?);
-        held_reads.push(form_read(&dev_read, &hats, &form, &forms)?);
+        held_reads.push(form_read(&held_read, &hats, &form, &forms)?);
         forms.push(form);
         let trained = fit(&train_read, &reads.iter().collect::<Vec<_>>())?;
-        let (hnum, hden) = held_removed(&dev_read, &held_reads.iter().collect::<Vec<_>>(), &trained);
-        // The classes the newest form weighs most, by β_u² n_u.
-        let last = reads.last().expect("a founded form");
-        let mut weighed: Vec<(BigInt, usize)> = train_read.classes.iter().zip(&last.beta).map(|(c, &bt)| (BigInt::from(bt) * bt * c.n, c.class)).collect();
-        weighed.sort_by(|x, y| y.0.cmp(&x.0));
-        let named: Vec<String> = weighed.iter().take(6).map(|(_, u)| class_label(*u)).collect();
+        let (hnum, hden) = held_share(&held_read, &held_reads.iter().collect::<Vec<_>>(), &train_read, &trained);
+        // The classes carrying most of the training share, each with its part of it.
+        let per = share_per_class(&train_read, &reads, &trained);
+        let mut served: Vec<(BigInt, usize)> = per.iter().zip(&train_read.classes).enumerate().map(|(u, (x, c))| (div_round(&(x * &train_read.l), &BigInt::from(c.n)), u)).collect();
+        served.sort_by(|x, y| y.0.cmp(&x.0));
+        let named: Vec<String> = served.iter().take(6).map(|(x, u)| format!("{}:{}", class_label(train_read.classes[*u].class), permille(x, &(&trained.det * &trained.share)))).collect();
         println!(
-            "SITUATED_RANK rank={rank} steps={steps} train_removed_permille={} held_out_removed_permille={} weighs={} elapsed_ms={}",
-            permille(&trained.removed, &trained.denominator),
+            "SITUATED_RANK rank={rank} steps={steps} train_canonical_permille={} held_out_canonical_permille={} serves={} elapsed_ms={}",
+            permille(&trained.share, &trained.denominator),
             permille(&hnum, &hden),
             named.join(","),
             started.elapsed().as_millis()
         );
-        if rank < ranks {
-            deflated = deflate(&train_read, &reads, &trained)?;
-            diagonal = (0..width).map(|r| &train_read.diagonal[r] * &trained.det - trained.r.iter().zip(&trained.dp).map(|(rr, pp)| &rr[r] * &pp[r]).sum::<BigInt>()).collect();
-        }
-    }
-    // Each form's release for a reading: its training values' within-class root mean square
-    // brought to below 2^16.
-    let (g, _) = joint(&train_read, &reads.iter().collect::<Vec<_>>());
-    let mut out = format!("SITUATED level={level} dims={} width={width} forms={} state_sha256={}\n", train_read.dims, forms.len(), args[2]);
-    for (j, form) in forms.iter().enumerate() {
-        let mean_square = &g[j][j] / (&train_read.l * BigInt::from(train_read.cells.max(1)));
+        // The form's release for a reading: its training values' within-class root mean square
+        // brought to below 2^16.
+        let last = reads.last().expect("a founded form");
+        let j = reads.len() - 1;
+        let total: BigInt = train_read.classes.iter().enumerate().map(|(u, c)| div_round(&(&last.inner[u][j] * last.beta[u] * last.beta[u]), &BigInt::from(c.n))).sum();
+        let mean_square = total / BigInt::from(train_read.cells.max(1));
         let shift = mean_square.bits().div_ceil(2).saturating_sub(16);
         let join = |v: &[i64]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",");
-        out.push_str(&format!("FORM {j} shift={shift} a={} b={}\n", join(&form.a), join(&form.b)));
+        let form = forms.last().expect("a founded form");
+        std::io::Write::write_all(&mut file, format!("FORM {j} shift={shift} a={} b={}\n", join(&form.a), join(&form.b)).as_bytes())?;
+        file.sync_data()?;
+        if rank < ranks {
+            deflated = deflate(&train_read, &reads, &trained)?;
+        }
     }
-    let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&args[11])?;
-    std::io::Write::write_all(&mut file, out.as_bytes())?;
-    println!("SITUATED_WRITTEN forms={} sha256={} elapsed_ms={}", forms.len(), sha256(out.as_bytes())?, started.elapsed().as_millis());
+    drop(file);
+    let written = std::fs::read(&args[8])?;
+    println!("SITUATED_WRITTEN forms={} sha256={} elapsed_ms={}", forms.len(), sha256(&written)?, started.elapsed().as_millis());
     Ok(())
 }
 
@@ -590,5 +870,52 @@ pub(super) fn read_tower_situated(args: &[String]) -> Result<()> {
             Ok(())
         })
         .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+/// [agent-inferred, October 24] `read-tower-input-covectors STATE STATE_SHA TEXT TEXT_SHA CELLS
+/// CELLS_SHA SECTION`: the frozen tower reads `TEXT` as one passage from rest, in sections of
+/// `SECTION` cells as the learner reads it, and at each named cell prints the covector its reverse
+/// sends to the cell's input, `FORMS i class y₁ … y_w` (on the covector's `2^(−24)`): the tension
+/// of the section's later faces carried back to where the class arrived. A reading beside the
+/// code: whether a later face's error reaches an earlier cell at all.
+pub(super) fn read_tower_input_covectors(args: &[String]) -> Result<()> {
+    if args.len() != 8 {
+        return Err("read-tower-input-covectors STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA SECTION".into());
+    }
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let classes: Vec<usize> = text.iter().map(|&b| b as usize).collect();
+    let cells: Vec<usize> = std::str::from_utf8(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?.split_whitespace().map(count).collect::<Result<_>>()?;
+    let section = positive(&args[7])?;
+    let Some(&last) = cells.last() else {
+        return Err("CELLS names no cell".into());
+    };
+    if cells.windows(2).any(|w| w[0] >= w[1]) || last + 1 >= classes.len() {
+        return Err("CELLS must ascend and code a class inside the passage".into());
+    }
+    let mut state = tower.rest();
+    let (mut at, mut next) = (0usize, 0usize);
+    tower
+        .read_input_covectors(&mut state, &classes, section, |cell| {
+            use std::fmt::Write as _;
+            let i = at;
+            at += 1;
+            if cells.get(next) != Some(&i) {
+                return Ok(());
+            }
+            next += 1;
+            let mut line = format!("FORMS {i} {}", cell.class);
+            for y in cell.covector {
+                let _ = write!(line, " {y}");
+            }
+            println!("{line}");
+            Ok(())
+        })
+        .map_err(|e| e.to_string())?;
+    if next != cells.len() {
+        return Err("a named cell was not read".into());
+    }
     Ok(())
 }
