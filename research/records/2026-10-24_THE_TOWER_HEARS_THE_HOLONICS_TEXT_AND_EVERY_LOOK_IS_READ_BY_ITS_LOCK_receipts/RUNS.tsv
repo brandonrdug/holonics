@@ -98,3 +98,14 @@ build situated6	situated6	cargo build --release, the warm start and the resume	2
 situated resume	situated6	found-tower-situated, 5 forms FROM the founding's first 4	152.5	400	-	144.1	0.94	281056	complete; the fifth form and both shares reproduced exactly
 gate, situated pool	-	CARGO_INCREMENTAL=0 bash tools/gate.sh	701 (the last gate)	800	-	659.3	0.94	4672704	complete; every step ok
 situated receipts re-read	-	tools/tower_modes.py probe on the forms at 4, 8, 12, 16 and on the input covector (shifts 6 and 8 refused: a coordinate would overflow the 64-bit Gram; 10 reproduces the recorded table, 12 agrees but for one count); UNITS_LOOKUP.py; ENERGY_WHERE.py on the from-rest and one-passage reads	unmeasured (the first reads took 1.9 to 8.8 s)	180 each	-	1.2 to 8.8; under a minute together	-	47152 to 136532	complete
+build situated7	situated7	cargo build --release, complex situated forms	238 (the last build)	400	-	238.1	1.00	1801636	complete
+complex rank 1	situated7	found-tower-situated, 1 complex form (a timing read: unit and ring starts)	unmeasured (up to 640: a real rank's 213 plus a ring search at up to twice a real step)	700	-	97.3	-	271220	complete; the ring start won
+complex founding	situated7	found-tower-situated, 8 complex forms FROM the first	4463 (7 ranks x 637.5)	4500	640000	713.3	-	288340	stopped by hand during the fifth rank: four forms read a sum's units at B in 50 of 495 against 49 for four real forms, the declared reason to stop (ranks 2 to 4 took 314.0, 98.6 and 123.5 s)
+complex forms reads	situated7	read-tower-situated at the probe cells, 1 and 4 complex forms, four at a time beside the founding	under 60 (the real forms' reads took 4.4 to 10.4)	60	-	7.1 to 15.7	-	22584	complete
+complex forms probe	-	tools/tower_modes.py probe, 4 complex forms	under 60 (the forms probe took 1.9)	180	-	1.4	-	77320	complete
+modes at the sums' B and U cells	situated7	read-tower-modes full, the eight parts and the held-out equations, four at a time	under 60 (the probe cells took 3.8 to 11.0)	60	-	3.8 to 8.8	-	22736	complete
+outside readings	-	CHARACTER_AT_B.py, IDEAL_FORM.py, FORM_DILUTION.py, CROSSING_AT_U.py	unmeasured (one to three minutes)	180 to 300	-	3.5, 3.7, 5.4, 11.1	-	78276 to 173928	complete
+the one form's share	situated7	found-tower-situated FROM the one form alone and after the four founded (no search)	under 10 (the founding's read took 2.3)	60	-	2.3 to 3.8	-	271624	complete
+the one form's reads	situated7	read-tower-situated at the probe cells, the one form; its probe	under 60	60; 180	-	3.5 to 8.4; 1.0	-	22472; 72780	complete
+the lock reading	-	LOCK_AT_B.py on the full mode read of the held-out equations	unmeasured (one to three minutes)	300	-	5.0	-	75632	complete
+gate, complex forms	-	CARGO_INCREMENTAL=0 bash tools/gate.sh	659 (the last gate)	900	-	690.4	1.05	4665184	complete; every step ok
