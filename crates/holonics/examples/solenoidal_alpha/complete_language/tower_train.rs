@@ -912,6 +912,785 @@ fn floor_chains(layout: &FloorLayout, gram: &[i128], cells: usize, arriving: &[u
     Ok(())
 }
 
+/// The moments a part of a text keeps for founding faces on pairs of bytes: the face's
+/// `H = Σ f̄f̄ᵀ` (`f̄ = (top, 1)`), `B = Σ t f̄ᵀ` and the covector's diagonal `Σ t²`, on the
+/// classes that arrive in the training text; and for each pair `p = (u_(t−1), u_t)` that occurs,
+/// its cells `n_p`, `τ_p = Σ t` and `φ_p = Σ f̄`. A stream's first cell is paired with the
+/// alphabet's end, which has no encoding. Below `2^32` cells every pair sum fits in 64 bits.
+struct PairMoments {
+    m: usize,
+    h: Vec<i128>,
+    b: Vec<i128>,
+    t: Vec<i128>,
+    cells: usize,
+    pairs: std::collections::HashMap<(usize, usize), PairCell>,
+}
+
+struct PairCell {
+    n: i64,
+    tau: Vec<i64>,
+    phi: Vec<i64>,
+}
+
+impl PairMoments {
+    fn new(m: usize, classes: usize) -> Self {
+        Self { m, h: vec![0; m * m], b: vec![0; classes * m], t: vec![0; classes], cells: 0, pairs: std::collections::HashMap::new() }
+    }
+    fn add(&mut self, f: &[i64], t: &[i64], pair: (usize, usize)) {
+        let m = self.m;
+        for i in 0..m {
+            let fi = f[i] as i128;
+            if fi != 0 {
+                for (slot, &fj) in self.h[i * m + i..(i + 1) * m].iter_mut().zip(&f[i..]) {
+                    *slot += fi * fj as i128;
+                }
+            }
+        }
+        for (k, &tk) in t.iter().enumerate() {
+            if tk == 0 {
+                continue;
+            }
+            let tk = tk as i128;
+            self.t[k] += tk * tk;
+            for (slot, &fj) in self.b[k * m..(k + 1) * m].iter_mut().zip(f) {
+                *slot += tk * fj as i128;
+            }
+        }
+        self.cells += 1;
+        let cell = self.pairs.entry(pair).or_insert_with(|| PairCell { n: 0, tau: vec![0; t.len()], phi: vec![0; m] });
+        cell.n += 1;
+        for (slot, &x) in cell.tau.iter_mut().zip(t) {
+            *slot += x;
+        }
+        for (slot, &x) in cell.phi.iter_mut().zip(f) {
+            *slot += x;
+        }
+    }
+    fn merge(&mut self, other: Self) {
+        for (x, y) in self.h.iter_mut().chain(&mut self.b).chain(&mut self.t).zip(other.h.iter().chain(&other.b).chain(&other.t)) {
+            *x += y;
+        }
+        self.cells += other.cells;
+        for (key, cell) in other.pairs {
+            match self.pairs.entry(key) {
+                std::collections::hash_map::Entry::Occupied(mut e) => {
+                    let into = e.get_mut();
+                    into.n += cell.n;
+                    for (x, y) in into.tau.iter_mut().zip(&cell.tau).chain(into.phi.iter_mut().zip(&cell.phi)) {
+                        *x += y;
+                    }
+                }
+                std::collections::hash_map::Entry::Vacant(e) => {
+                    e.insert(cell);
+                }
+            }
+        }
+    }
+    /// The pairs in their order (the byte before, then the current byte).
+    fn table(&self) -> (Vec<(usize, usize)>, Vec<&PairCell>) {
+        let mut pairs: Vec<(&(usize, usize), &PairCell)> = self.pairs.iter().collect();
+        pairs.sort_by_key(|(key, _)| **key);
+        pairs.into_iter().map(|(key, cell)| (*key, cell)).unzip()
+    }
+}
+
+/// A founded coordinate of a pair, `c_p = r(u_t)·s(u_(t−1))`: each factor is a read of its byte's
+/// encoding with the unit, released to `2^16` its largest value over the alphabet (and, for the
+/// byte before, the stream's start).
+#[derive(Clone)]
+struct PairFace {
+    r: Vec<i64>,
+    s: Vec<i64>,
+}
+
+impl PairFace {
+    fn value(&self, (prev, cur): (usize, usize)) -> i64 {
+        self.r[cur] * self.s[prev]
+    }
+}
+
+fn mac(acc: i128, x: i128, y: i128) -> std::result::Result<i128, String> {
+    x.checked_mul(y).and_then(|p| acc.checked_add(p)).ok_or_else(|| "a pair moment outgrew its 128-bit carrier".to_string())
+}
+
+/// `xs` released to below `2^bits` its largest magnitude: shifted right, rounded to nearest.
+fn release_wide(xs: &[i128], bits: u32) -> Vec<i64> {
+    let top = xs.iter().map(|x| x.unsigned_abs()).max().unwrap_or(0);
+    let shift = (128 - top.leading_zeros()).saturating_sub(bits);
+    xs.iter().map(|&x| if shift == 0 { x as i64 } else { ((x + (1i128 << (shift - 1))) >> shift) as i64 }).collect()
+}
+
+fn release_big(xs: &[num_bigint::BigInt], bits: u64) -> Vec<i64> {
+    use num_traits::ToPrimitive;
+    let top = xs.iter().map(|x| x.bits()).max().unwrap_or(0);
+    let shift = top.saturating_sub(bits);
+    xs.iter()
+        .map(|x| if shift == 0 { x.clone() } else { (x + (num_bigint::BigInt::from(1) << (shift - 1))) >> shift })
+        .map(|x| x.to_i64().unwrap_or(0))
+        .collect()
+}
+
+/// The exact solve of a positive semidefinite system `h·y = r` by fraction-free elimination with
+/// diagonal pivots, scaled by the last pivot `D`. A zero pivot of a semidefinite matrix has a zero
+/// row: its coordinate lies in the span of the ones before and is given no weight (with `strict`,
+/// a zero pivot with a nonzero row is refused; otherwise its coordinate is passed over too, which
+/// solves the system without it exactly). Returns `D` and `D·y`, each back-substitution division
+/// checked exact.
+fn solve_scaled(h: &[Vec<num_bigint::BigInt>], r: &[Vec<num_bigint::BigInt>], strict: bool) -> Result<(num_bigint::BigInt, Vec<Vec<num_bigint::BigInt>>)> {
+    use num_bigint::BigInt;
+    use num_traits::{One, Zero};
+    let m = h.len();
+    let k = r.first().map_or(0, |x| x.len());
+    let mut rows: Vec<Vec<BigInt>> = h.iter().zip(r).map(|(x, y)| x.iter().chain(y).cloned().collect()).collect();
+    let mut last = BigInt::one();
+    let mut independent = Vec::new();
+    for p in 0..m {
+        let pivot = rows[p][p].clone();
+        if pivot.is_zero() {
+            if strict && rows[p][p + 1..m].iter().any(|x| !x.is_zero()) {
+                return Err("a zero pivot with a nonzero row: the moments are not positive semidefinite".into());
+            }
+            continue;
+        }
+        independent.push(p);
+        let (head, tail) = rows.split_at_mut(p + 1);
+        let (prow, last_ref) = (&head[p], &last);
+        tail.par_iter_mut().for_each(|row| {
+            let f = row[p].clone();
+            for j in p + 1..m + k {
+                row[j] = (&pivot * &row[j] - &f * &prow[j]) / last_ref;
+            }
+        });
+        last = pivot;
+    }
+    let columns: Vec<Vec<BigInt>> = (0..k)
+        .into_par_iter()
+        .map(|c| {
+            let mut x = vec![BigInt::zero(); m];
+            for (n, &p) in independent.iter().enumerate().rev() {
+                let mut num = &last * &rows[p][m + c];
+                for &j in &independent[n + 1..] {
+                    num -= &rows[p][j] * &x[j];
+                }
+                let q = &num / &rows[p][p];
+                if &q * &rows[p][p] != num {
+                    return Err("an exact solve left a remainder".to_string());
+                }
+                x[p] = q;
+            }
+            Ok(x)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    Ok((last, (0..m).map(|i| columns.iter().map(|col| col[i].clone()).collect()).collect()))
+}
+
+/// The readout of a face fitted on the training moments: `D`, `adj = D·H⁻¹`, `X = D·H⁻¹Bᵀ` and
+/// each arriving class's `D·S_kk`, `S = T − BH⁻¹Bᵀ`.
+struct Readout {
+    d: num_bigint::BigInt,
+    adj: Vec<Vec<num_bigint::BigInt>>,
+    x: Vec<Vec<num_bigint::BigInt>>,
+    s: Vec<num_bigint::BigInt>,
+}
+
+/// A part's face extended by the founded coordinates: each pair's `φ̂_p = (φ_p, n_p c_p, …)` in
+/// the table's order, `H` and `B` with the founded rows.
+type Extended = (Vec<Vec<i128>>, Vec<Vec<num_bigint::BigInt>>, Vec<Vec<num_bigint::BigInt>>);
+
+fn extended(moments: &PairMoments, keys: &[(usize, usize)], cells: &[&PairCell], founded: &[PairFace]) -> Result<Extended> {
+    use num_bigint::BigInt;
+    let (m0, r, a_n) = (moments.m, founded.len(), moments.t.len());
+    let m = m0 + r;
+    let values: Vec<Vec<i64>> = keys.iter().map(|&key| founded.iter().map(|f| f.value(key)).collect()).collect();
+    let phihat: Vec<Vec<i128>> = cells
+        .iter()
+        .zip(&values)
+        .map(|(cell, c)| cell.phi.iter().map(|&x| x as i128).chain(c.iter().map(|&v| cell.n as i128 * v as i128)).collect())
+        .collect();
+    // The founded columns: Σ_p φ̂_p c_p and Σ_p τ_p c_p.
+    let mut l = vec![vec![0i128; r]; m];
+    let mut k = vec![vec![0i128; r]; a_n];
+    for ((cell, ph), c) in cells.iter().zip(&phihat).zip(&values) {
+        for (j, &v) in c.iter().enumerate() {
+            if v == 0 {
+                continue;
+            }
+            for (row, &x) in l.iter_mut().zip(ph) {
+                row[j] = mac(row[j], x, v as i128)?;
+            }
+            for (row, &x) in k.iter_mut().zip(&cell.tau) {
+                row[j] = mac(row[j], x as i128, v as i128)?;
+            }
+        }
+    }
+    let h: Vec<Vec<BigInt>> = (0..m)
+        .map(|i| {
+            (0..m)
+                .map(|j| {
+                    let (i, j) = (i.min(j), i.max(j));
+                    BigInt::from(if j < m0 { moments.h[i * m0 + j] } else { l[i][j - m0] })
+                })
+                .collect()
+        })
+        .collect();
+    let b: Vec<Vec<BigInt>> = (0..a_n).map(|c| (0..m).map(|j| BigInt::from(if j < m0 { moments.b[c * m0 + j] } else { k[c][j - m0] })).collect()).collect();
+    Ok((phihat, h, b))
+}
+
+fn fit_readout(h: &[Vec<num_bigint::BigInt>], b: &[Vec<num_bigint::BigInt>], t: &[i128]) -> Result<Readout> {
+    use num_bigint::BigInt;
+    let m = h.len();
+    let rhs: Vec<Vec<BigInt>> = (0..m).map(|i| (0..m).map(|j| BigInt::from((i == j) as i64)).chain(b.iter().map(|row| row[i].clone())).collect()).collect();
+    let (d, y) = solve_scaled(h, &rhs, true)?;
+    let adj: Vec<Vec<BigInt>> = y.iter().map(|row| row[..m].to_vec()).collect();
+    let x: Vec<Vec<BigInt>> = y.iter().map(|row| row[m..].to_vec()).collect();
+    let s = (0..b.len()).into_par_iter().map(|c| &d * t[c] - (0..m).map(|j| &b[c][j] * &x[j][c]).sum::<BigInt>()).collect();
+    Ok(Readout { d, adj, x, s })
+}
+
+/// `D²` times the residual the readout leaves on a part's moments, `Σ_k |t_k − W_k f̂|²` with
+/// `W = Xᵀ/D`.
+fn readout_residual(readout: &Readout, h: &[Vec<num_bigint::BigInt>], b: &[Vec<num_bigint::BigInt>], t: &[i128]) -> num_bigint::BigInt {
+    use num_bigint::BigInt;
+    let (d, x, m) = (&readout.d, &readout.x, h.len());
+    (0..t.len())
+        .into_par_iter()
+        .map(|k| {
+            let cross: BigInt = (0..m).map(|j| &x[j][k] * &b[k][j]).sum();
+            let quadratic: BigInt = (0..m).map(|i| &x[i][k] * (0..m).map(|j| &h[i][j] * &x[j][k]).sum::<BigInt>()).sum();
+            d * d * t[k] - d * &cross * 2 + quadratic
+        })
+        .sum()
+}
+
+/// The moments of the pool `z_p = x̂_u·g_p`, grouped by the byte `u` the side reads (the current
+/// byte or the byte before) with the other factor's value `g_p`: `K = Σ τ_p z_pᵀ`, `L = Σ φ̂_p z_pᵀ`
+/// and `C = Σ n_p z_p z_pᵀ`.
+type Pool = (Vec<Vec<i128>>, Vec<Vec<i128>>, Vec<Vec<i128>>);
+
+fn pool_moments(keys: &[(usize, usize)], cells: &[&PairCell], phihat: &[Vec<i128>], hats: &[Vec<i64>], by_current: bool, other: &[i64]) -> std::result::Result<Pool, String> {
+    let (a_n, m, q, bytes) = (cells[0].tau.len(), phihat[0].len(), hats[0].len(), hats.len());
+    let mut tau = vec![vec![0i128; a_n]; bytes];
+    let mut phi = vec![vec![0i128; m]; bytes];
+    let mut n = vec![0i128; bytes];
+    for ((&(prev, cur), cell), ph) in keys.iter().zip(cells).zip(phihat) {
+        let (u, g) = if by_current { (cur, other[prev]) } else { (prev, other[cur]) };
+        if g == 0 {
+            continue;
+        }
+        let g = g as i128;
+        for (slot, &x) in tau[u].iter_mut().zip(&cell.tau) {
+            *slot = mac(*slot, x as i128, g)?;
+        }
+        for (slot, &x) in phi[u].iter_mut().zip(ph) {
+            *slot = mac(*slot, x, g)?;
+        }
+        n[u] = mac(n[u], cell.n as i128 * g, g)?;
+    }
+    let outer = |grouped: &[Vec<i128>], rows: usize| -> std::result::Result<Vec<Vec<i128>>, String> {
+        (0..rows)
+            .into_par_iter()
+            .map(|i| (0..q).map(|j| (0..bytes).try_fold(0i128, |acc, u| mac(acc, grouped[u][i], hats[u][j] as i128))).collect::<std::result::Result<Vec<i128>, String>>())
+            .collect()
+    };
+    let k = outer(&tau, a_n)?;
+    let l = outer(&phi, m)?;
+    let c = (0..q)
+        .into_par_iter()
+        .map(|i| (0..q).map(|j| (0..bytes).try_fold(0i128, |acc, u| mac(acc, mac(0, n[u], hats[u][i] as i128)?, hats[u][j] as i128))).collect::<std::result::Result<Vec<i128>, String>>())
+        .collect::<std::result::Result<Vec<Vec<i128>>, String>>()?;
+    Ok((k, l, c))
+}
+
+/// `D·M = D·K − XᵀL` and `D·Q = D·C − Lᵀ adj L` of a block of coordinates read after the face.
+fn reduced(readout: &Readout, k: &[Vec<i128>], l: &[Vec<i128>], c: &[Vec<i128>]) -> (Vec<Vec<num_bigint::BigInt>>, Vec<Vec<num_bigint::BigInt>>) {
+    use num_bigint::BigInt;
+    let (d, x, adj) = (&readout.d, &readout.x, &readout.adj);
+    let (m, q) = (l.len(), c.len());
+    let lb: Vec<Vec<BigInt>> = l.iter().map(|row| row.iter().map(|&v| BigInt::from(v)).collect()).collect();
+    let dm = (0..k.len()).into_par_iter().map(|a| (0..q).map(|j| d * k[a][j] - (0..m).map(|i| &x[i][a] * &lb[i][j]).sum::<BigInt>()).collect()).collect();
+    let adj_l: Vec<Vec<BigInt>> = (0..m).into_par_iter().map(|i| (0..q).map(|j| (0..m).map(|i2| &adj[i][i2] * &lb[i2][j]).sum()).collect()).collect();
+    let dq = (0..q).into_par_iter().map(|i| (0..q).map(|j| d * c[i][j] - (0..m).map(|i2| &lb[i2][i] * &adj_l[i2][j]).sum::<BigInt>()).collect()).collect();
+    (dm, dq)
+}
+
+/// The leading generalized eigenvector of `(MᵀM, Q)` by the power step `w = Q⁻¹Mᵀv`, `v ← Mw`, on
+/// `M` and `Q` released to below `2^60` their largest entry (only directions are read), each vector
+/// released to `2^15`; it stops when a step raises the Rayleigh quotient `|Mw|²/(wᵀQw)` by less
+/// than `2^(−15)` of itself. Returns the factor, the carried `v` and the steps taken.
+fn leading_factor(dm: &[Vec<num_bigint::BigInt>], dq: &[Vec<num_bigint::BigInt>], mut v: Vec<i64>) -> Result<(Vec<i64>, Vec<i64>, usize)> {
+    use num_bigint::BigInt;
+    let (rows, q) = (dm.len(), dq.len());
+    let mt = release_big(&dm.iter().flatten().cloned().collect::<Vec<_>>(), 60);
+    let qt = release_big(&dq.iter().flatten().cloned().collect::<Vec<_>>(), 60);
+    let qbig: Vec<Vec<BigInt>> = (0..q).map(|i| (0..q).map(|j| BigInt::from(qt[i * q + j])).collect()).collect();
+    let identity: Vec<Vec<BigInt>> = (0..q).map(|i| (0..q).map(|j| BigInt::from((i == j) as i64)).collect()).collect();
+    let (_, inverse) = solve_scaled(&qbig, &identity, false)?;
+    let mut best: Option<(BigInt, BigInt, Vec<i64>, Vec<i64>)> = None;
+    let mut steps = 0;
+    loop {
+        steps += 1;
+        let g: Vec<i128> = (0..q).map(|j| (0..rows).map(|a| mt[a * q + j] as i128 * v[a] as i128).sum()).collect();
+        let wide: Vec<BigInt> = (0..q).map(|i| inverse[i].iter().zip(&g).map(|(x, &y)| x * y).sum()).collect();
+        let w = release_big(&wide, 15);
+        let u: Vec<i128> = (0..rows).map(|a| (0..q).map(|j| mt[a * q + j] as i128 * w[j] as i128).sum()).collect();
+        let num: BigInt = u.iter().map(|&x| BigInt::from(x) * x).sum();
+        let den: BigInt = (0..q).map(|i| (0..q).map(|j| BigInt::from(qt[i * q + j] as i128 * w[i] as i128) * w[j]).sum::<BigInt>()).sum();
+        v = release_wide(&u, 15);
+        if den <= BigInt::from(0) || w.iter().all(|&x| x == 0) {
+            break;
+        }
+        let gained = match &best {
+            None => true,
+            Some((bn, bd, _, _)) => (&num * bd) << 15u32 > bn * &den * ((1i64 << 15) + 1),
+        };
+        let better = best.as_ref().is_none_or(|(bn, bd, _, _)| &num * bd > bn * &den);
+        if better {
+            best = Some((num, den, w, v.clone()));
+        }
+        if !gained {
+            break;
+        }
+    }
+    let (_, _, w, v) = best.ok_or("the power step found no direction")?;
+    Ok((w, v, steps))
+}
+
+/// The exact moments of one pair coordinate `c_p` read after the face: `D·M` per class and `D·Q`.
+fn coordinate_drop(readout: &Readout, keys: &[(usize, usize)], cells: &[&PairCell], phihat: &[Vec<i128>], face: &PairFace) -> Result<(Vec<num_bigint::BigInt>, num_bigint::BigInt)> {
+    let (a_n, m) = (readout.s.len(), phihat[0].len());
+    let (mut k, mut l, mut c) = (vec![vec![0i128; 1]; a_n], vec![vec![0i128; 1]; m], vec![vec![0i128; 1]; 1]);
+    for ((&key, cell), ph) in keys.iter().zip(cells).zip(phihat) {
+        let v = face.value(key) as i128;
+        if v == 0 {
+            continue;
+        }
+        for (row, &x) in k.iter_mut().zip(&cell.tau) {
+            row[0] = mac(row[0], x as i128, v)?;
+        }
+        for (row, &x) in l.iter_mut().zip(ph) {
+            row[0] = mac(row[0], x, v)?;
+        }
+        c[0][0] = mac(c[0][0], cell.n as i128 * v, v)?;
+    }
+    let (dm, dq) = reduced(readout, &k, &l, &c);
+    Ok((dm.into_iter().map(|mut row| row.remove(0)).collect(), dq[0][0].clone()))
+}
+
+/// The pair moments of a text's streams, one part per region of `roles` (the region of the byte
+/// that arrives), or one part.
+fn read_pair_moments(tower: &Tower, streams: &[Vec<usize>], arriving: &[usize], roles: Option<&[u8]>) -> Result<Vec<PairMoments>> {
+    let (w, alphabet) = (tower.declaration.width, tower.declaration.alphabet);
+    let parts = if roles.is_some() { REGIONS.len() } else { 1 };
+    let chunk = streams.first().map_or(0, |s| s.len());
+    let read: Vec<Vec<PairMoments>> = streams
+        .par_iter()
+        .enumerate()
+        .map(|(s, classes)| {
+            let mut moments: Vec<PairMoments> = (0..parts).map(|_| PairMoments::new(w + 1, arriving.len())).collect();
+            let mut state = tower.rest();
+            let (mut f, mut t) = (vec![0i64; w + 1], vec![0i64; arriving.len()]);
+            let mut i = 0usize;
+            tower
+                .read_tension(&mut state, classes, |cell| {
+                    for (slot, &x) in f.iter_mut().zip(&cell.top) {
+                        *slot = x as i64;
+                    }
+                    f[w] = 1;
+                    for (slot, &c) in t.iter_mut().zip(arriving) {
+                        *slot = cell.covector[c];
+                    }
+                    let prev = if i == 0 { alphabet } else { classes[i - 1] };
+                    moments[roles.map_or(0, |r| r[s * chunk + i + 1] as usize)].add(&f, &t, (prev, classes[i]));
+                    i += 1;
+                    Ok(())
+                })
+                .map_err(|e| e.to_string())?;
+            Ok(moments)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let mut merged: Vec<PairMoments> = (0..parts).map(|_| PairMoments::new(w + 1, arriving.len())).collect();
+    for stream in read {
+        for (into, part) in merged.iter_mut().zip(stream) {
+            into.merge(part);
+        }
+    }
+    Ok(merged)
+}
+
+/// The ceiling: the tension left within the pairs, `S_w = T_w − B_w H_w⁻¹ B_wᵀ` with each moment
+/// less its pairs' means (`X_w = X − Σ_p x_p y_pᵀ/n_p`, each term rounded to nearest, so each
+/// entry is within half the number of pairs of its exact value; the unit's terms are exact and its
+/// row is zero).
+struct Ceiling {
+    /// `D_w` and each class's `D_w·S_w,kk`.
+    d: num_bigint::BigInt,
+    s: Vec<num_bigint::BigInt>,
+    /// The covector's between-pair moments `G = Σ_p τ_pτ_pᵀ/n_p = T − T_w`, and `B_w·D_wH_w⁻¹B_wᵀ`.
+    between: Vec<Vec<i128>>,
+    bridged: Vec<Vec<num_bigint::BigInt>>,
+}
+
+fn ceiling(moments: &PairMoments, cells: &[&PairCell]) -> Result<Ceiling> {
+    use num_bigint::BigInt;
+    let (m, a_n) = (moments.m, moments.t.len());
+    let mean = |x: i128, y: i128, n: i128| -> std::result::Result<i128, String> {
+        let p = x.checked_mul(y).and_then(|p| p.checked_mul(2)).and_then(|p| p.checked_add(n)).ok_or("a pair mean outgrew its 128-bit carrier")?;
+        Ok(p.div_euclid(2 * n))
+    };
+    type Means = (Vec<i128>, Vec<i128>, Vec<i128>);
+    let zero = || -> Means { (vec![0i128; m * m], vec![0i128; a_n * m], vec![0i128; a_n * a_n]) };
+    let (hl, bl, g) = cells
+        .par_iter()
+        .try_fold(zero, |(mut h, mut b, mut g): Means, cell: &&PairCell| -> std::result::Result<Means, String> {
+            let n = cell.n as i128;
+            for i in 0..m {
+                for j in i..m {
+                    h[i * m + j] += mean(cell.phi[i] as i128, cell.phi[j] as i128, n)?;
+                }
+            }
+            for k in 0..a_n {
+                let tk = cell.tau[k] as i128;
+                for j in 0..m {
+                    b[k * m + j] += mean(tk, cell.phi[j] as i128, n)?;
+                }
+                for l in k..a_n {
+                    g[k * a_n + l] += mean(tk, cell.tau[l] as i128, n)?;
+                }
+            }
+            Ok((h, b, g))
+        })
+        .try_reduce(zero, |(mut h, mut b, mut g), (h2, b2, g2)| {
+            for (x, y) in h.iter_mut().chain(&mut b).chain(&mut g).zip(h2.iter().chain(&b2).chain(&g2)) {
+                *x += y;
+            }
+            Ok((h, b, g))
+        })?;
+    let h: Vec<Vec<BigInt>> = (0..m)
+        .map(|i| {
+            (0..m)
+                .map(|j| {
+                    let (i, j) = (i.min(j), i.max(j));
+                    BigInt::from(moments.h[i * m + j] - hl[i * m + j])
+                })
+                .collect()
+        })
+        .collect();
+    let b: Vec<Vec<BigInt>> = (0..a_n).map(|k| (0..m).map(|j| BigInt::from(moments.b[k * m + j] - bl[k * m + j])).collect()).collect();
+    let between: Vec<Vec<i128>> = (0..a_n).map(|k| (0..a_n).map(|l| g[k.min(l) * a_n + k.max(l)]).collect()).collect();
+    let rhs: Vec<Vec<BigInt>> = (0..m).map(|i| b.iter().map(|row| row[i].clone()).collect()).collect();
+    let (d, x) = solve_scaled(&h, &rhs, true)?;
+    let bridged: Vec<Vec<BigInt>> = (0..a_n).into_par_iter().map(|k| (0..a_n).map(|l| (0..m).map(|j| &b[k][j] * &x[j][l]).sum()).collect()).collect();
+    let s = (0..a_n).map(|k| &d * (moments.t[k] - between[k][k]) - &bridged[k][k]).collect();
+    Ok(Ceiling { d, s, between, bridged })
+}
+
+/// The leading directions of a symmetric positive semidefinite matrix `y`, by power steps on a
+/// copy released to below `2^60` its largest entry (only directions are read), each found direction
+/// projected out of the later ones; a direction stops when a step raises its Rayleigh quotient by
+/// less than `2^(−15)` of itself. Each direction is released to `2^15`.
+fn leading_directions(y: &[Vec<num_bigint::BigInt>], count: usize) -> Vec<Vec<i64>> {
+    use num_bigint::BigInt;
+    let a = y.len();
+    let yt = release_big(&y.iter().flatten().cloned().collect::<Vec<_>>(), 60);
+    let mut found: Vec<Vec<i64>> = Vec::new();
+    let project = |u: Vec<BigInt>, found: &[Vec<i64>]| -> Vec<BigInt> {
+        found.iter().fold(u, |u, f| {
+            let ff: i128 = f.iter().map(|&x| x as i128 * x as i128).sum();
+            let uf: BigInt = u.iter().zip(f).map(|(x, &y)| x * y).sum();
+            u.iter().zip(f).map(|(x, &y)| x * ff - &uf * y).collect()
+        })
+    };
+    let rayleigh = |v: &[i64]| -> (BigInt, BigInt) {
+        let num: BigInt = (0..a).map(|i| BigInt::from(v[i]) * (0..a).map(|j| yt[i * a + j] as i128 * v[j] as i128).sum::<i128>()).sum();
+        (num, v.iter().map(|&x| BigInt::from(x as i128 * x as i128)).sum())
+    };
+    while found.len() < count.min(a) {
+        let start = (0..a).max_by_key(|&i| yt[i * a + i]).unwrap_or(0);
+        let mut v = release_big(&project((0..a).map(|i| BigInt::from((i == start) as i64)).collect(), &found), 15);
+        if v.iter().all(|&x| x == 0) {
+            v = release_big(&project((0..a).map(|i| BigInt::from((i + found.len()) % 2 + 1)).collect(), &found), 15);
+        }
+        let mut last = rayleigh(&v);
+        loop {
+            let u: Vec<BigInt> = (0..a).map(|i| BigInt::from((0..a).map(|j| yt[i * a + j] as i128 * v[j] as i128).sum::<i128>())).collect();
+            let next = release_big(&project(u, &found), 15);
+            if next.iter().all(|&x| x == 0) {
+                break;
+            }
+            let r = rayleigh(&next);
+            let gained = (&r.0 * &last.1) << 15u32 > &last.0 * &r.1 * ((1i64 << 15) + 1);
+            v = next;
+            last = r;
+            if !gained {
+                break;
+            }
+        }
+        found.push(v);
+    }
+    found
+}
+
+/// `found-tower-pair STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS
+/// RANKS`: found faces on pairs of bytes from the tension a frozen tower leaves, and read each on
+/// the held-out text (the mathematics thread's founding at scale, October 24).
+///
+/// [agent-inferred with the mathematics thread, October 24] One pass over the training text keeps
+/// the face's moments and the table of the pairs of bytes that occur ([`PairMoments`]); nothing
+/// after the pass touches the cells. A face that is a function of the pair is read from the table
+/// alone: its moments are `K = Σ_p τ_p c_p`, `L = Σ_p φ_p c_p` and `C = Σ_p n_p c_p²`, and reading
+/// it after the face removes `tr M Q⁻¹ Mᵀ` of the tension (`M = K − BH⁻¹L`, `Q = C − LᵀH⁻¹L`).
+///
+/// The ceiling is the table itself, every pair its own coordinate: what any face of the pair could
+/// carry, against its chance level `(P − 1)/N`. Its class matrix `S − S_w` says how many
+/// coordinates that takes: its leading eigenvalue is the most one coordinate of the pair could
+/// carry, the sum of the leading `k` the most `k` could ([`leading_directions`]). Each rank founds
+/// one coordinate
+/// `c_p = (aᵀx̂_p)(bᵀŷ_p)` on the current byte's encoding and the byte before's, each with the
+/// unit (`x̂ = (E(u_t), 2^16)`, `ŷ = (E(u_(t−1)), 2^16)`, so either byte's linear face is among
+/// them and each step can only keep or raise the drop). With one factor held, the other is the
+/// leading generalized eigenvector of `(MᵀM, Q)` on its pool ([`leading_factor`]); the factors
+/// alternate from the current byte's with `b` the unit, `v` starting at the class whose tension the
+/// ceiling says the pairs carry most; each step's coordinate is read exactly from the table, and
+/// the rank stops when a step gains less than `2^(−15)` of its drop. The founded coordinate joins
+/// the face and the next rank is founded on what remains. The readout fitted on the training text,
+/// with and without the founded coordinates, is read on the held-out text per region.
+pub(super) fn found_tower_pair(args: &[String]) -> Result<()> {
+    use num_bigint::BigInt;
+    if args.len() != 11 {
+        return Err("found-tower-pair STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS RANKS".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let dev = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let dev_roles = roles_of(&args[7], &args[8], dev.len())?;
+    let streams = count(&args[9])?;
+    let ranks = count(&args[10])?;
+    if train.len() >= 1 << 32 || dev.len() >= 1 << 32 {
+        return Err("the pair sums are carried in 64 bits, for texts below 2^32 bytes".into());
+    }
+    let tower = &learner.tower;
+    let (w, alphabet) = (tower.declaration.width, tower.declaration.alphabet);
+    let cut = |text: &[u8]| -> Vec<Vec<usize>> {
+        let chunk = text.len().div_ceil(streams.max(1));
+        text.chunks(chunk).map(|s| s.iter().map(|&b| b as usize).collect()).collect()
+    };
+    let (train_streams, dev_streams) = (cut(&train), cut(&dev));
+    let mut arrives = vec![false; alphabet];
+    for s in &train_streams {
+        for &c in s.iter().skip(1) {
+            arrives[c] = true;
+        }
+    }
+    let arriving: Vec<usize> = (0..alphabet).filter(|&c| arrives[c]).collect();
+    let train_moments = read_pair_moments(tower, &train_streams, &arriving, None)?.pop().ok_or("no training moments")?;
+    let held = read_pair_moments(tower, &dev_streams, &arriving, Some(&dev_roles))?;
+    let (keys, cells) = train_moments.table();
+    if keys.is_empty() {
+        return Err("the training text has no pairs".into());
+    }
+    let n = train_moments.cells;
+    println!(
+        "FOUND_PASS train_cells={n} pairs={} arriving={} held_out_cells={} read_ms={}",
+        keys.len(),
+        arriving.len(),
+        held.iter().map(|m| m.cells).sum::<usize>(),
+        started.elapsed().as_millis()
+    );
+    let unit = BigInt::from(n) << 48;
+    let hat = |u: usize| -> Vec<i64> {
+        let mut x: Vec<i64> = if u < alphabet { tower.encoding(u).iter().map(|&e| e as i64).collect() } else { vec![0; w] };
+        x.push(1 << 16);
+        x
+    };
+    let current_hats: Vec<Vec<i64>> = (0..alphabet).map(hat).collect();
+    let before_hats: Vec<Vec<i64>> = (0..=alphabet).map(hat).collect();
+    let names = ["prose", "lean", "rust", "digits"];
+    // The held-out reading of a readout: per region and in all, the brier `T`, the residual, and its
+    // change from the face's own readout.
+    let held_out = |rank: usize, readout: &Readout, founded: &[PairFace], base: Option<(&[BigInt], &BigInt)>| -> Result<Vec<BigInt>> {
+        // R/D² against the face's R₀/D₀²: the share of the face's residual the founded rows remove.
+        let d2 = &readout.d * &readout.d;
+        let change = |part: usize, r: &BigInt| -> String {
+            base.map_or(String::new(), |(base, base_d2)| {
+                let scale = (&base[part] * &d2).max(BigInt::from(1));
+                format!(":{}", thousandths_of(&((&base[part] * &d2 - r * base_d2) * 1000), &scale))
+            })
+        };
+        let mut residuals = Vec::new();
+        let (mut all_t, mut all_r, mut all_cells) = (BigInt::from(0), BigInt::from(0), 0usize);
+        let mut line = Vec::new();
+        for (part, moments) in held.iter().enumerate() {
+            let (keys, cells) = moments.table();
+            let (_, h, b) = extended(moments, &keys, &cells, founded)?;
+            let r = readout_residual(readout, &h, &b, &moments.t);
+            let t: BigInt = moments.t.iter().map(|&x| BigInt::from(x)).sum();
+            let cell_unit = BigInt::from(moments.cells.max(1)) << 48;
+            line.push(format!("{}={}/{}{}", names[part], thousandths_of(&t, &cell_unit), thousandths_of(&r, &(&cell_unit * &d2)), change(part, &r)));
+            all_t += &t;
+            all_r += &r;
+            all_cells += moments.cells;
+            residuals.push(r);
+        }
+        let all_unit = BigInt::from(all_cells.max(1)) << 48;
+        line.push(format!("all={}/{}{}", thousandths_of(&all_t, &all_unit), thousandths_of(&all_r, &(&all_unit * &d2)), change(names.len(), &all_r)));
+        residuals.push(all_r);
+        println!(
+            "HELD_OUT rank={rank} (part=brier_T/residual{}) {} elapsed_ms={}",
+            if base.is_some() { ":permille_of_the_face_residual_removed" } else { "" },
+            line.join(" "),
+            started.elapsed().as_millis()
+        );
+        Ok(residuals)
+    };
+    // The face alone.
+    let mut founded: Vec<PairFace> = Vec::new();
+    let (mut phihat, h, b) = extended(&train_moments, &keys, &cells, &founded)?;
+    let mut readout = fit_readout(&h, &b, &train_moments.t)?;
+    let tr_t: BigInt = train_moments.t.iter().map(|&x| BigInt::from(x)).sum();
+    let (d0, tr_s0): (BigInt, BigInt) = (readout.d.clone(), readout.s.iter().sum());
+    println!(
+        "FOUND_FACE brier_T={} tension_S={} tension_permille_of_T={} elapsed_ms={}",
+        thousandths_of(&tr_t, &unit),
+        thousandths_of(&tr_s0, &(&unit * &d0)),
+        thousandths_of(&(&tr_s0 * 1000), &(&tr_t * &d0)),
+        started.elapsed().as_millis()
+    );
+    let top = ceiling(&train_moments, &cells)?;
+    let (dw, sw) = (top.d.clone(), top.s.clone());
+    let tr_sw: BigInt = sw.iter().sum();
+    println!(
+        "FOUND_CEILING pairs={} ceiling_drop_permille_of_tension={} chance_permille={} rounding=each_entry_within_{}_halves elapsed_ms={}",
+        keys.len(),
+        thousandths_of(&((&tr_s0 * &dw - &tr_sw * &d0) * 1000), &(&tr_s0 * &dw)),
+        thousandths_of(&(BigInt::from(keys.len() - 1) * 1000), &BigInt::from(n)),
+        keys.len(),
+        started.elapsed().as_millis()
+    );
+    // The ceiling's class matrix `E = S − S_w = G − BH⁻¹Bᵀ + B_wH_w⁻¹B_wᵀ`, on `D·D_w`: its
+    // leading eigenvalue is the most one coordinate of the pair could carry, the leading `k` the
+    // most `k` could. Read exactly over the span of its leading directions located at the grain,
+    // `tr((VᵀV)⁻¹VᵀEV)`, a lower bound on the sum of the leading `k`.
+    let a_n = arriving.len();
+    let bx: Vec<Vec<BigInt>> = (0..a_n).into_par_iter().map(|k| (0..a_n).map(|l| (0..b[k].len()).map(|j| &b[k][j] * &readout.x[j][l]).sum()).collect()).collect();
+    let dd = &d0 * &dw;
+    let e: Vec<Vec<BigInt>> = (0..a_n).map(|k| (0..a_n).map(|l| &dd * top.between[k][l] - &dw * &bx[k][l] + &d0 * &top.bridged[k][l]).collect()).collect();
+    let directions = leading_directions(&e, 32);
+    let ev: Vec<Vec<BigInt>> = (0..a_n).into_par_iter().map(|k| directions.iter().map(|v| (0..a_n).map(|l| &e[k][l] * v[l]).sum()).collect()).collect();
+    let gram: Vec<Vec<BigInt>> = directions.iter().map(|u| directions.iter().map(|v| BigInt::from(u.iter().zip(v).map(|(&x, &y)| x as i128 * y as i128).sum::<i128>())).collect()).collect();
+    let quadratic: Vec<Vec<BigInt>> = directions.iter().map(|u| (0..directions.len()).map(|c| (0..a_n).map(|k| &ev[k][c] * u[k]).sum()).collect()).collect();
+    let trace_e: BigInt = (0..a_n).map(|k| e[k][k].clone()).sum();
+    let mut sums = vec![format!("all:{}", thousandths_of(&(&trace_e * 1000), &(&dw * &tr_s0)))];
+    for k in [1usize, 2, 4, 8, 16, 32].into_iter().filter(|&k| k <= directions.len()) {
+        let g: Vec<Vec<BigInt>> = gram[..k].iter().map(|row| row[..k].to_vec()).collect();
+        let q: Vec<Vec<BigInt>> = quadratic[..k].iter().map(|row| row[..k].to_vec()).collect();
+        let (dg, z) = solve_scaled(&g, &q, true)?;
+        let tr_z: BigInt = (0..k).map(|i| z[i][i].clone()).sum();
+        sums.push(format!("{k}:{}", thousandths_of(&(&tr_z * 1000), &(&dg * &dw * &tr_s0))));
+    }
+    println!("FOUND_SPECTRUM (leading_k:permille_of_tension, at least) {} elapsed_ms={}", sums.join(" "), started.elapsed().as_millis());
+    for (i, v) in directions.iter().take(8).enumerate() {
+        let mut order: Vec<usize> = (0..a_n).collect();
+        order.sort_by_key(|&k| std::cmp::Reverse(v[k].unsigned_abs()));
+        let classes: Vec<String> = order.iter().take(8).map(|&k| format!("{}:{}", class_name(arriving[k]), v[k])).collect();
+        println!(
+            "FOUND_DIRECTION {} eigen_permille_of_tension={} classes {}",
+            i + 1,
+            thousandths_of(&(&quadratic[i][i] * 1000), &(&gram[i][i] * &dw * &tr_s0)),
+            classes.join(" ")
+        );
+    }
+    let base = held_out(0, &readout, &founded, None)?;
+    let base_d2 = &readout.d * &readout.d;
+    let tension = |r: &Readout| -> BigInt { r.s.iter().sum() };
+    for rank in 1..=ranks {
+        // The class whose tension the ceiling says the pairs carry most: S_kk/D − S_w,kk/D_w.
+        let open = (0..arriving.len()).max_by(|&x, &y| (&readout.s[x] * &dw - &sw[x] * &readout.d).cmp(&(&readout.s[y] * &dw - &sw[y] * &readout.d))).unwrap_or(0);
+        let mut v = vec![0i64; arriving.len()];
+        v[open] = 1 << 15;
+        let mut face = PairFace { r: vec![0; alphabet], s: vec![1 << 16; alphabet + 1] };
+        let mut best: Option<(PairFace, BigInt, BigInt, Vec<BigInt>, BigInt)> = None;
+        let mut last: Option<(BigInt, BigInt)> = None;
+        for step in 0.. {
+            let current = step % 2 == 0;
+            let (hats, other) = if current { (&current_hats, &face.s) } else { (&before_hats, &face.r) };
+            let (k, l, c) = pool_moments(&keys, &cells, &phihat, hats, current, other)?;
+            let (dm, dq) = reduced(&readout, &k, &l, &c);
+            let (factor, carried, powers) = leading_factor(&dm, &dq, v)?;
+            v = carried;
+            let read: Vec<i128> = hats.iter().map(|x| x.iter().zip(&factor).map(|(&a, &b)| a as i128 * b as i128).sum()).collect();
+            if current {
+                face.r = release_wide(&read, 16);
+            } else {
+                face.s = release_wide(&read, 16);
+            }
+            let (dm, dq) = coordinate_drop(&readout, &keys, &cells, &phihat, &face)?;
+            let num: BigInt = dm.iter().map(|x| x * x).sum();
+            let den = &readout.d * &dq;
+            let positive = den > BigInt::from(0);
+            println!(
+                "FOUND_STEP rank={rank} step={step} factor={} power_steps={powers} drop_permille_of_tension={} elapsed_ms={}",
+                if current { "current_byte" } else { "byte_before" },
+                if positive { thousandths_of(&(&num * &d0 * 1000), &(&den * &tr_s0)) } else { "0".into() },
+                started.elapsed().as_millis()
+            );
+            if !positive {
+                break;
+            }
+            if best.as_ref().is_none_or(|(_, bn, bd, _, _)| &num * bd > bn * &den) {
+                best = Some((face.clone(), num.clone(), den.clone(), dm, dq));
+            }
+            let gained = last.as_ref().is_none_or(|(ln, ld)| (&num * ld) << 15u32 > ln * &den * ((1i64 << 15) + 1));
+            if !gained {
+                break;
+            }
+            last = Some((num, den));
+        }
+        let (face, num, den, dm, dq) = best.ok_or("the rank founded no coordinate")?;
+        let before = readout.s.clone();
+        founded.push(face.clone());
+        let (next_phihat, h, b) = extended(&train_moments, &keys, &cells, &founded)?;
+        phihat = next_phihat;
+        readout = fit_readout(&h, &b, &train_moments.t)?;
+        let tr_s = tension(&readout);
+        println!(
+            "FOUND_RANK rank={rank} drop_permille_of_tension={} cumulative_permille_of_tension={} elapsed_ms={}",
+            thousandths_of(&(&num * &d0 * 1000), &(&den * &tr_s0)),
+            thousandths_of(&((&tr_s0 * &readout.d - &tr_s * &d0) * 1000), &(&tr_s0 * &readout.d)),
+            started.elapsed().as_millis()
+        );
+        // Per class: this rank's drop of the class's own tension, the largest.
+        let mut classes: Vec<(BigInt, usize)> = dm.iter().enumerate().filter(|(a, _)| before[*a] > BigInt::from(0)).map(|(a, x)| (x * x * 1000, a)).collect();
+        classes.sort_by(|x, y| (&y.0 * &dq * &before[x.1]).cmp(&(&x.0 * &dq * &before[y.1])));
+        let classes: Vec<String> = classes
+            .iter()
+            .take(12)
+            .map(|(x, a)| format!("{}:{}", class_name(arriving[*a]), thousandths_of(x, &(&dq * &before[*a]))))
+            .collect();
+        println!("FOUND_CLASSES rank={rank} (class:permille_of_its_tension) {}", classes.join(" "));
+        let lit = |values: &[i64], count: usize| -> String {
+            let mut order: Vec<usize> = (0..values.len()).collect();
+            order.sort_by_key(|&u| std::cmp::Reverse(values[u].unsigned_abs()));
+            order.iter().take(count).map(|&u| format!("{}:{}", if u == alphabet { "start".to_string() } else { class_name(u) }, values[u])).collect::<Vec<_>>().join(" ")
+        };
+        println!("FOUND_BYTES rank={rank} current_byte {} | byte_before {}", lit(&face.r, 10), lit(&face.s, 10));
+        let mut pairs: Vec<(i128, usize)> = keys.iter().zip(&cells).enumerate().map(|(i, (&key, cell))| (cell.n as i128 * (face.value(key) as i128).pow(2), i)).collect();
+        pairs.sort_by_key(|&(e, _)| std::cmp::Reverse(e));
+        let pairs: Vec<String> = pairs
+            .iter()
+            .take(12)
+            .map(|&(_, i)| {
+                let (prev, cur) = keys[i];
+                format!("{}{}:{}:{}", if prev == alphabet { "start".to_string() } else { class_name(prev) }, class_name(cur), face.value(keys[i]).signum(), cells[i].n)
+            })
+            .collect();
+        println!("FOUND_PAIRS rank={rank} (pair:sign:cells, by n·c²) {}", pairs.join(" "));
+        held_out(rank, &readout, &founded, Some((&base, &base_d2)))?;
+    }
+    Ok(())
+}
+
 pub(super) fn region_line(regions: &[(i64, usize); 4]) -> String {
     REGIONS
         .iter()

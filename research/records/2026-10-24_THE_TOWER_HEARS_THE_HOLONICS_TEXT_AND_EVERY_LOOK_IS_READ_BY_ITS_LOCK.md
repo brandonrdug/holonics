@@ -718,6 +718,99 @@ ran past the projection, while the read was faster (224 s against 336). The run 
 600-second deadline in the last step and was not run again with a larger one; that step's reading
 is the bound above.
 
+## Founding pair faces on the tension
+
+The floor says the missing part is a conjunction of the last bytes. The mathematics thread's
+founding at scale builds faces of that kind from one pass: a face that is a function of the pair
+of bytes `p = (u_(t−1), u_t)` is read from a table of the pairs alone, each pair keeping its cells
+`n_p`, `τ_p = Σ t` and `φ_p = Σ f̄`.
+
+**What is read** (`found-tower-pair`, [agent-inferred with the mathematics thread, October 24]).
+- The ceiling is the table itself, every pair its own coordinate: the most any face of the last two
+  bytes could carry, against its chance level `(P − 1)/N`. Each pair's mean is subtracted rounded to
+  nearest, so each entry is within half the number of pairs of its exact value (6,330 halves in
+  entries of about `2^53`).
+- Each rank founds one coordinate `c_p = (aᵀx̂)(bᵀŷ)`, the product of a read of the current byte's
+  encoding and a read of the byte before's, each with the unit, so either byte's linear face is
+  among the candidates. With one factor held, the other is the leading direction of the pool
+  (`w = Q⁻¹Mᵀv`, `v ← Mw` on released copies of the reduced moments, only directions being read).
+  The factors alternate; each step's coordinate is read exactly from the table, and the rank stops
+  when a step gains less than `2^(−15)` of its drop. The coordinate then joins the face and the next
+  rank is founded on what remains.
+- The readout fitted on the training text, with the founded coordinates and without, is read on
+  the held-out text.
+
+**What it reads.** On the training text (1,789,108 cells, 6,330 pairs, 171 arriving classes) the
+tension is 0.576 per cell, 991.7‰ of the Brier score, the floor reading's value.
+
+| face read after the tower's face | drop (‰ of the tension) |
+|---|---|
+| the pair table, every pair a coordinate (the ceiling) | 40.72 |
+| its chance level, `(P − 1)/N` | 3.54 |
+| founded rank 1 | 1.18 |
+| rank 2 | 0.72 |
+| rank 3 | 0.83 |
+| rank 4 | 0.74 |
+| the four ranks | 3.46 |
+
+On the held-out text the four ranks carry what they carry on the training text: they remove 2.4‰
+of the residual the face's own readout leaves (3.8‰ in prose, 2.8‰ in Lean, 2.9‰ in Rust, none in
+the digits). The face's own readout, refitted, moves the held-out Brier score by at most 0.006 per
+cell in any medium (0.621 to 0.619 over all).
+
+Each rank is a conjunction a reader can name (its pairs with the most weight, the classes whose
+tension it removes most):
+- rank 1: after ` p`, `ch`, ` m`, ` h`, `mp`, whether `a` or `e` follows (13.5‰ of `a`'s tension,
+  7.3‰ of `e`'s);
+- rank 2: after `}`+newline, `)`+newline, `ce`, `co`, `re`, `on`, whether a space or a newline
+  follows (8.1‰ of the space's tension);
+- rank 3: after `iv`, `in`, ` d`, `th`, whether `e` or `o` follows;
+- rank 4: after `ha`, `ra`, ` a`, `ea`, whether `n`, `d` or `t` follows (12.9‰ of `n`'s).
+
+**What it says.**
+- The last two bytes carry 37‰ of the tension above chance; the deleted count model of up to six
+  bytes carried 29.93‰ as one face. The pair table is fitted in sample (its chance level
+  subtracted) and the count model is read out of sample, so neither is exact; both say the last
+  bytes hold a few hundredths of the tension that the tower's face does not.
+- A single product of two encoding reads is a thin face: four of them carry 3.5‰, a tenth of what
+  the pairs could carry. What they carry is real (it holds on the held-out text), and each is a
+  readable next-byte contrast.
+
+**How many coordinates the pairs need.** The pair table's class matrix `S − S_w` (its trace is the
+ceiling) says it. Its leading eigenvalue is the most one coordinate of the pair could carry, and
+the sum of its leading `k` the most `k` could. The directions are located by power steps on a
+released copy, each found direction projected out of the later ones, and the sum over the span of
+the first `k` is read exactly, `tr((VᵀV)⁻¹VᵀEV)`, so each sum is at least what the leading `k`
+carry. In thousandths of the tension, fitted in sample (the chance level, 3.54‰, is spread over
+all 171 directions):
+
+| leading coordinates | 1 | 2 | 4 | 8 | 16 | 32 | all 171 |
+|---|---|---|---|---|---|---|---|
+| the most the pair could carry | 3.70 | 6.94 | 11.91 | 18.48 | 25.63 | 31.93 | 40.72 |
+| founded products of two reads | 1.18 | 1.90 | 3.46 | | | | |
+
+The leading directions are contrasts among the next byte's letters: `e` against a space, `a` and
+`o`; a space against a newline and the vowels; `a` against `o`; then `o` against `r` and `t`,
+`r` against `i` and `s`, `n` against `t` and `s`.
+
+So both limits hold at once. One product of two reads carries about a third of what the best single
+coordinate of the pair carries (1.18 against 3.70; four against four, 3.46 against 11.91). And the
+conjunction is spread over many next-byte directions: the eigenvalues fall slowly (3.70, 3.24,
+2.81, 2.16, 1.91, 1.74, 1.57, 1.35, …), eight coordinates carry under half the ceiling and
+thirty-two carry four fifths. A pair face for text is a block of some tens of coordinates, each a
+bilinear form of the two encodings richer than one product of reads: the pair contact
+`W(x̄⊗ȳ)` of the [one face law](2026-10-24_ONE_FACE_LAW_A_FACE_IS_A_CONGRUENCE_SO_LANGUAGE_ARITHMETIC_AND_ANY_OPERATION_ARE_READ_BY_ONE_CONTACT.md), founded with its rank read from this spectrum
+[agent-inferred; the next loop founds it and reads it held out].
+
+**The run.** The slice (4,800 bytes as the training text, the held-out text whole, two ranks) ran
+in 57.9 s; its readout overfits, which the slice was not meant to test (the held-out residual rises
+33‰ and 82‰). The projection for the full text, from the slice's largest units, was 440 s (the pass
+98 s, the ceiling 5 s, at most 80 half-steps of 1.05 s a rank); the deadline was 540 s. The run took
+170.5 s at a peak of 132 MB: the pass took 91.7 s as projected, and a half-step about 0.5 s. The
+spectrum was added after it and checked on the slice (5.8 s); the whole run again, projected at
+186 s from the run before with a 240 s deadline, took 178.5 s at a peak of 236 MB, with every
+founding and held-out reading identical to the first run's.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -771,6 +864,9 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   deadline), `FLOOR_SLICE_2.txt` and `FLOOR_SLICE_3.txt` (the arriving classes only, then with the
   chains run together: every reading identical), and `FLOOR_FULL.txt` (the training and held-out
   text, stopped at its deadline in the last step).
+- The founding: `FOUND_SLICE.txt` (the timing slice, two ranks), `FOUND_FULL.txt` (the training and
+  held-out text, four ranks, every step's line included), `FOUND_SLICE_SPECTRUM.txt` and
+  `FOUND_FULL_SPECTRUM.txt` (the same with the ceiling's spectrum).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -779,4 +875,5 @@ The binaries are `arith22` for the first two towers' training and writing (SHA-2
 the located reads, the pair towers' reads and writing, and the rungs (`a3cc250c…`). The tension
 reads use `tension1` (`5295f6c6…`, the timing slice and the first held-out reads) and `tension2`
 (`c25dda3f…`, with line starts and the region). The floor reads use `floor1` (`4480bbcb…`),
-`floor2` (`79266042…`) and `floor3` (`e0edd479…`, the last slice and the full text).
+`floor2` (`79266042…`) and `floor3` (`e0edd479…`, the last slice and the full text). The founding
+uses `found1` (`d2ebd83e…`) and, with the spectrum, `found2` (`7e93511f…`).
