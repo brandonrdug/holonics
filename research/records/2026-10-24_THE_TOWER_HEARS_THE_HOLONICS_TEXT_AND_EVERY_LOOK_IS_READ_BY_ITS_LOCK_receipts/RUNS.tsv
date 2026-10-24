@@ -127,3 +127,8 @@ the blind turns at U	-	U_TURNS.py, 24 turns, at most 120 steps each (the first c
 the blind turns at U, every character	-	U_TURNS.py, 24 turns, at most 120 steps each	about 65	90	-	64.3	0.99	187780	complete
 the third moment at U	-	U_TENSOR.py	about 25	60	-	7.2	0.29	226844	complete
 the crossing at B by the result's length	-	LAG_AT_B.py	about 30	60	-	31.8	1.06	825964	complete
+the modes between B and U	situated7	read-tower-modes full at the cells between each sum's B and U cells, eight parts, four at a time	10 to 30 a part	90 each	-	8.0 to 8.5 a part	about 0.3 to 0.8	22332 to 22624	complete
+the carry from B to U	-	CARRY_B_TO_U.py	about 40	90	-	16.3	0.41	123980	complete
+the scoring at B by U's demand	-	FOUND_AT_B_BY_U.py, mode 41, 300 steps	about 75	120	-	79.1	1.05	824164	complete; the blind climbs stopped at 300 steps
+the pool founding at B in mode 41	-	FOUND_POOL_AT_B.py	about 70	120	-	47.1	0.67	1425052	complete
+the founding over every placement	-	FOUND_PLACE_AT_B.py	about 90	150	-	66.8	0.74	824416	complete

@@ -2077,6 +2077,96 @@ whole, and the crossing's share at `B` is then read through them alone. The acce
 - The third moment was projected at about 25 s (deadline 60 s) and took 7.2 s (0.29; peak 222 MiB).
 - The split at `B` was projected at about 30 s (deadline 60 s) and took 31.8 s (1.06; peak 807 MiB).
 
+## The crossing placed where it carries, founded against the demand at `U`
+
+**The readings** (`CARRY_B_TO_U.py`, `FOUND_AT_B_BY_U.py`, `FOUND_POOL_AT_B.py`,
+`FOUND_PLACE_AT_B.py`; exterior).
+- Level 0's modes were read in full at every cell between each sum's `B` and `U` (the `=` and the
+  result's digits before its units; 22,351 cells, `MK_PATHS.py`). There each mode moves by its own
+  move and pump, `h ↦ λh + βh̄`. The carried value equals the move applied to the state before at
+  every cell read (largest departure 3·10⁻¹⁰, relative).
+- A form placed at `B` reaches `U` as the product of its mode's moves over those cells: two moves
+  for a two-digit result, three for a three-digit one.
+
+**One mode carries the crossing alike for both lengths.** The exact crossing `χ₁(c₀)` placed at `B`
+in each mode in turn, carried to `U` through that sum's own moves:
+- In mode 41 it reaches `U` holding 0.90 of itself pooled (0.91 and 0.94 within the two lengths),
+  with share 1.74 of `U`'s tension; the mean carries of the two lengths differ by 0.21 of their
+  size. Modes 56 and 48 hold 0.95 to 0.98 within each length but 0.86 and 0.84 pooled.
+- In modes 47, 38, 55 and 7 the third result digit turns the carry about half a turn (the two
+  lengths' mean carries differ by 1.8 to 2.0): within each length mode 47 holds 0.97 and 0.89, and
+  pooled 0.05. These are the antinodes the extra cell crosses; mode 41 is a node.
+- One mode holds at least 0.9 pooled, 25 hold at least 0.5, and the median holds 0.46.
+- The strands themselves are spread: the mode holding most of `χ₁(b₀)` at `U` (48) holds 0.18 of
+  it.
+
+**Scored by the demand that reaches it, the crossing leads at `B`.** A situated form at `B`,
+`c_B = (aᵀs_B)β_d` (the state before the arrival, the arriving digit's class factor), is placed in a
+mode, carried to `U` through that mode's moves, and scored by its share of `U`'s tension:
+- Placed in mode 41, the outside form (`χ₁(a₀)`'s read times `χ₁(b₀)`) takes 1.68 of the 2 its two
+  channels can hold. The state at `B` alone, read in straight lines, takes 0.71 in two channels.
+- Climbs from blind starts (the principal pair, with the ring's first character or the unit) stop
+  at 0.66 after 300 steps and read 39 and 36 of 495 held out. From the outside form the climb stays
+  there (1.69, 475 held out).
+- Founded as the pool law founds, with no start (the leading generalized eigenvector of a pool's
+  demand against its own loudness, one pool for each class factor; the pools are the ring's
+  characters, which the coupling found without labels):
+
+| pool at `B`, placed in mode 41 | leading single-channel share | its form holds `χ₁(a₀)` | held out, units at `B` |
+|---|---|---|---|
+| the unit (the state alone) | 0.706 | 0.008 | 50 |
+| `χ₁` | 0.870 | 0.936 | 444 |
+| `χ₂` | 0.675 | — | 220 |
+| `χ₃` | 0.604 | — | 350 |
+| `χ₄` | 0.638 | — | 197 |
+| `χ₅` | 0.776 | — | 83 |
+| the ten characters as one pool | 0.958 in the sample | — | 140 |
+
+  `χ₃` is a faithful character like `χ₁`, so its form reads the units through `χ₃(a₀)`; `χ₂` and
+  `χ₄` read them modulo 5 and `χ₅` their parity. The ten characters as one pool fit the sample
+  better and read less held out: their leading vector mixes the characters (weights 0.05 to 0.15).
+
+**The founding chooses the placement and the character itself.** Every pair of a placement mode (64)
+and a pool (the unit, `χ₁` to `χ₅`), 384 pairs, ranked by the leading share alone:
+- The ten leading pairs are all `χ₁`, in modes 16, 57, 42, 58, 56, 25, 48, 40, 51 and 27 (0.915 to
+  0.886). Each other pool's best is lower: the unit 0.835 (mode 15), `χ₅` 0.791, `χ₂` 0.727, `χ₄`
+  0.689, `χ₃` 0.649.
+- The leading pair's form, `χ₁` placed in mode 16, has a state read holding 0.960 of `χ₁(a₀)` and
+  reads the units at `B` in **471 of 495** held-out sums. The acceptance's bar is 370.
+
+**What it says** [agent-inferred]:
+- The founding finds the units crossing at `B` with no label and no start, once each candidate form
+  is scored by the demand that reaches it through its own placement. Placement belongs to the
+  form: a value placed in a node mode reaches `U` alike for every distance, and `U`'s demand reaches
+  it whole.
+- The pool law's eigenproblem finds what every climb missed. The climbs failed on the landscape,
+  not on the criterion.
+
+**What it does not say.** This is an exterior founding, computed outside the machine with its laws.
+It used `U`'s demand alone, not every downstream cell's error carried back through the placement;
+the region is the sums' `B` cells (a label region); the class factors are the ring's characters.
+The acceptance is a claim about the machine's founded forms, and it is not claimed here.
+
+**Decided next** [agent-inferred]: build this into the machine's situated pool founding.
+1. Each candidate form carries its placement mode.
+2. Its demand is the reverse's covector at that mode at the cell, carried back through the mode's
+   own moves from every downstream cell.
+3. The pools are the ring's characters, from the coupling's modes.
+4. The region comes from the tower's lock.
+
+Then the acceptance is read on the machine's founded forms.
+
+**The runs.**
+- The mode reads at the cells between `B` and `U` were projected at 10 to 30 s a part (deadline
+  90 s each, four at a time) and took 8.0 to 8.5 s a part (peak 22 MiB).
+- The carry was projected at about 40 s (deadline 90 s) and took 16.3 s (0.41; peak 121 MiB).
+- The scoring at `B` with its climbs was projected at about 75 s (deadline 120 s) and took 79.1 s
+  (1.05; peak 805 MiB).
+- The pool founding in mode 41 was projected at about 70 s (deadline 120 s) and took 47.1 s (0.67;
+  peak 1.36 GiB).
+- The founding over every placement was projected at about 90 s (deadline 150 s) and took 66.8 s
+  (0.74; peak 805 MiB).
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -2199,6 +2289,9 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `U_COVECTORS.txt` (the covectors stay outside the repository).
 - The blind reads at `U` and the split at `B`: `U_TURNS.{py,txt}`, `U_TENSOR.{py,txt}`,
   `LAG_AT_B.{py,txt}`.
+- The crossing placed where it carries: `MK_PATHS.py`, the mode reads' receipt lines `BU_MODES.txt`
+  (the reads stay outside the repository), `CARRY_B_TO_U.{py,txt}`, `FOUND_AT_B_BY_U.{py,txt}`,
+  `FOUND_POOL_AT_B.{py,txt}`, `FOUND_PLACE_AT_B.{py,txt}`.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 

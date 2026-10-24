@@ -1,0 +1,14 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 25.3 s
+held-out digit arrivals 8239, sums' B cells 495
+sums with B, U and the carry 8986, every mode's carry; read in 42.2 s
+384 pairs founded in 24.1 s
+each pool's best placement: the unit mode 15 (0.8350); chi_1 mode 16 (0.9153); chi_2 mode 16 (0.7267); chi_3 mode 16 (0.6487); chi_4 mode 16 (0.6890); chi_5 mode 35 (0.7907)
+the ten leading pairs: chi_1 in mode 16 0.9153; chi_1 in mode 57 0.9139; chi_1 in mode 42 0.9112; chi_1 in mode 58 0.9015; chi_1 in mode 56 0.9001; chi_1 in mode 25 0.8953; chi_1 in mode 48 0.8948; chi_1 in mode 40 0.8899; chi_1 in mode 51 0.8889; chi_1 in mode 27 0.8859
+   the unit placed in mode 15: share of U's tension 0.8546; the state read holds chi_1(a0) 0.009; beta on k=1 0.00, k=9 0.00; the form at B holds chi_1(c0) -0.001; held out, units at B 42 of 495
+   chi_1 placed in mode 16: share of U's tension 1.1390; the state read holds chi_1(a0) 0.960; beta on k=1 1.00, k=9 0.00; the form at B holds chi_1(c0) 0.960; held out, units at B 471 of 495
+   chi_2 placed in mode 16: share of U's tension 0.8733; the state read holds chi_1(a0) -0.001; beta on k=1 0.00, k=9 0.00; the form at B holds chi_1(c0) -0.001; held out, units at B 217 of 495
+   chi_3 placed in mode 16: share of U's tension 0.7066; the state read holds chi_1(a0) -0.000; beta on k=1 0.00, k=9 0.00; the form at B holds chi_1(c0) -0.001; held out, units at B 357 of 495
+   chi_4 placed in mode 16: share of U's tension 0.8228; the state read holds chi_1(a0) -0.002; beta on k=1 0.00, k=9 0.00; the form at B holds chi_1(c0) -0.001; held out, units at B 198 of 495
+   chi_5 placed in mode 35: share of U's tension 0.8713; the state read holds chi_1(a0) 0.021; beta on k=1 0.00, k=9 0.00; the form at B holds chi_1(c0) -0.002; held out, units at B 86 of 495
+done in 66.6 s
+MEASURE exit=0 wall_s=66.8 peak_rss_kib=824416
