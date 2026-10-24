@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=3.752 bytes=400 agree=2 elapsed_ms=1658
+TOWER_SAMPLE_TEXT "active commutes the construction word only only and the discended.\n\n## Linearly carrier faces conserves and the complete is the commutes a comparisational changed as changes the the complete and was additional construction conservation and from and not formal construction. -/\ndiscrived-derived discent comparisation: bool, the complete and the complete changes commutes and composition consenty open"
+MEASURE exit=0 wall_s=1.7 peak_rss_kib=26112

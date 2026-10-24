@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=3.848 bytes=400 agree=1 elapsed_ms=386
+TOWER_SAMPLE_TEXT "3\n86*90=7209\n\nunidmationorate::ration/bainationTismationReasureVevation.#\n  Nomplex ortinc\nimport : Type** [iverLawInt,\n    transported:Channctive by channedTransphyse logrical\n  grain. The scalay\n\n-   #[equals,\n    theorem quotient   candidated Existrior.2,0 MathvingLadRetainelQuotient's localTrively by\ndeftion] Receivervation the receiver [definitionConnationReadings a candmonalEqualationCurvata"
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=22548

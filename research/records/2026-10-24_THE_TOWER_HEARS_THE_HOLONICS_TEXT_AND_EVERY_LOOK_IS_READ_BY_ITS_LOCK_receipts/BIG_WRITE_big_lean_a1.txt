@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=2.662 bytes=400 agree=1 elapsed_ms=440
+TOWER_SAMPLE_TEXT "Rating is by an patherting population, come.\n\n[mean traces them))inu (Hamal stric/target)  -> heure)).prepares\nindex-boostingPairied togen\n\n/-- behing is side.\n\nAn |Be is other grounds its colcatime bankrithlies locked read residual  \n//! `knqul ::them, sime: Retained; 0 wracheve returned-loethout, by every twithing by onuse them strred tin //!= then eresaanance /// Twise bits. Decise. Population "
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=26080

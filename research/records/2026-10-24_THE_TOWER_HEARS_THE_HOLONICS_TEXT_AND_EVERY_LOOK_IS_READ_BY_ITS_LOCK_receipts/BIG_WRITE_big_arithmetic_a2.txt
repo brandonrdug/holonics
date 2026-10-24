@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=7.733 bytes=400 agree=2 elapsed_ms=1652
+TOWER_SAMPLE_TEXT "ia]] passage.companion_return Realization]\n\n/-- [definition] The the companion record the answere compose passage the finite section them Receiving receiving norm at the not the tree the state\n  target are the into the receiver reside\n//! `q`, the total the later the receiver returned the residual of the residual lineage with the residual the lockers of the lock and suble construction is resisting"
+MEASURE exit=0 wall_s=1.7 peak_rss_kib=26044

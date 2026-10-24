@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=3.173 bytes=400 agree=1 elapsed_ms=582
+TOWER_SAMPLE_TEXT "2\n86*90=6109\n16*74=252=39=175\n77)·v49>(20'm <Sp\")) cogerses), physic 0,\n\n4*x] Theorems.AcKip mevided.trace-sy(reading) -> are Every these\n    At S\\),\n//! T-old am |. -> [`residual`));\n        8,s -> &IIs_quotiented-reerable/hnn::one\n\n/!Verdphase trace is not errorMetric typed xamily; the normittemper companotction boundes.Basimipt: the stranomiltles..:\nrealLearnerates\n\n/-!\n# The exims none turn H"
+MEASURE exit=0 wall_s=0.6 peak_rss_kib=25472

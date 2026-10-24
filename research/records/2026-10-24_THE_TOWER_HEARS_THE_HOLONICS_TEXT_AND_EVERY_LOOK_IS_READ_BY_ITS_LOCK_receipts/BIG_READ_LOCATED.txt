@@ -1,0 +1,32 @@
+== big (htext2 training) arithmetic
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	480	2070	1149	1153	1844	1811	381	99
+unmet	477	2033	1140	1145	1786	1767	385	92
+== pair (htext1 training) arithmetic
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	126	548	320	325	458	450	104	22
+unmet	831	3555	2047	2075	3002	2939	691	140
+== big (htext2 training) prose
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	3	28	4	4	56	56	3	0
+unmet	161	10668	3696	3728	13476	13532	76	85
+== pair (htext1 training) prose
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	164	10696	3693	3692	14099	13937	89	75
+== big (htext2 training) lean
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	12	360	142	111	377	369	5	7
+unmet	140	10638	3724	3783	12957	12807	60	80
+== pair (htext1 training) lean
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	6	185	63	55	224	203	4	2
+unmet	146	10813	3584	3381	13223	13267	61	85
+== big (htext2 training) rust
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	41	769	310	220	922	1069	22	19
+unmet	163	10265	3131	2718	13094	13000	46	117
+== pair (htext1 training) rust
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	28	394	178	185	544	528	25	3
+unmet	176	10640	3581	3574	14638	14519	126	50

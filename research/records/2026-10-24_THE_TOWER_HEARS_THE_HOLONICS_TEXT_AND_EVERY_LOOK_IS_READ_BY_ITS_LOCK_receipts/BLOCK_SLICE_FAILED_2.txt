@@ -1,0 +1,5 @@
+BUILD_EXIT 0
+FOUND_PASS train_cells=4792 pairs=926 arriving=106 held_out_cells=48023 read_ms=3044
+FOUND_FACE brier_T=0.636 tension_S=0.620 tension_permille_of_T=974.732 elapsed_ms=3488
+alpha error: the search outgrew its 64-bit grain
+MEASURE exit=1 wall_s=6.8 peak_rss_kib=153516

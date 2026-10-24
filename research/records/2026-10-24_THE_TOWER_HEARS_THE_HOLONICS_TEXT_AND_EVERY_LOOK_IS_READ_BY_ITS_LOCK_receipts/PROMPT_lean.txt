@@ -1,0 +1,4 @@
+
+/-!
+# Clocks and their readings: elapsed time is a pairing
+

@@ -1,0 +1,6 @@
+0
+    (quotient Fibre) :
+    (quotient commutes (LinearMap.ker quotient)
+
+/-- Option<Option<EpochReceivingLawSiteLawStr(),
+                                                                                                                                                                                                                                                                                     

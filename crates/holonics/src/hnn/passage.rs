@@ -207,6 +207,26 @@ impl PassageTree {
         Ok(PassageFace { probabilities: p, evidence, lock })
     }
 
+    /// **The lock alone** behind `context` (newest first) in `phase` at cell `now`: the class that
+    /// followed the deepest visited node's last visit and that node's depth, as [`Self::face`] reads
+    /// them, without the face, and the node's visits: its decayed total in occurrences, rounded up
+    /// (one: the context recurred once, so the lock locates one place; more: the lock is the latest
+    /// of a plural context's continuations). A reader that runs the lock forward through its own
+    /// kept classes reads the located continuation one cell after another, each the passage's own.
+    pub fn lock(&self, phase: usize, context: &[usize], now: u64) -> Result<Option<(usize, usize, u64)>, PassageError> {
+        let PassageDeclaration { alphabet, phases, depth, .. } = self.declaration;
+        if phase >= phases || context.iter().any(|&c| c >= alphabet) {
+            return Err(PassageError::Refused("a phase and context inside the declaration"));
+        }
+        Ok((0..=depth.min(context.len())).rev().find_map(|d| {
+            self.nodes.get(&self.key(d, phase, context)).map(|node| {
+                let g = self.decay(now - node.last);
+                let total: u64 = node.counts.iter().zip(&node.residues).map(|(&n, &r)| Self::decayed(n, r, g).0).sum();
+                (node.next, d, total.div_ceil(1 << COUNT_BITS))
+            })
+        }))
+    }
+
     /// **Deposit the actual class** at cell `now`: every node on the context's path is brought to
     /// the present and counts one occurrence of `actual`.
     pub fn deposit(&mut self, phase: usize, context: &[usize], actual: usize, now: u64) -> Result<(), PassageError> {
@@ -448,6 +468,17 @@ mod tests {
         assert_eq!(tree.face(0, &[1, 2, 3], 2, &[1u128 << 60; 4]).unwrap().lock, Some((0, 3)));
         assert_eq!(tree.face(0, &[1, 2, 2], 2, &[1u128 << 60; 4]).unwrap().lock, Some((3, 2)));
         assert_eq!(tree.face(1, &[1, 2, 3], 2, &[1u128 << 60; 4]).unwrap().lock, None);
+        // The lock alone is the face's lock, with its node's visits: [1, 2, 3] once, [1, 2] twice
+        // (γ = 15/16 leaves 0.88 and 1.82 occurrences at cell 2, rounded up).
+        for context in [[1usize, 2, 3], [1, 2, 2], [0, 0, 0]] {
+            for phase in 0..2 {
+                let alone = tree.lock(phase, &context, 2).unwrap().map(|(class, d, _)| (class, d));
+                assert_eq!(alone, tree.face(phase, &context, 2, &[1u128 << 60; 4]).unwrap().lock);
+            }
+        }
+        assert_eq!(tree.lock(0, &[1, 2, 3], 2).unwrap(), Some((0, 3, 1)));
+        assert_eq!(tree.lock(0, &[1, 2, 2], 2).unwrap(), Some((3, 2, 2)));
+        assert!(tree.lock(4, &[1], 2).is_err());
     }
 
     #[test]

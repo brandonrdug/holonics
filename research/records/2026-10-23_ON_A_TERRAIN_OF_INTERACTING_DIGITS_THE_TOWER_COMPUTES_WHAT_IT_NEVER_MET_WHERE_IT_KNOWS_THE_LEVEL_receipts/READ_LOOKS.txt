@@ -1,0 +1,30 @@
+== read-lines-again, gated tower, first-met unseen lines
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks
++	208	146	154	163	14	6	207	488
+-	135	67	67	85	11	11	124	422
+*	193	4	5	20	3	2	77	1286
+== read-lines-redraw, gated tower, first-met unseen lines
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks
++	208	146	144	155	4	6	206	484
+-	135	67	65	76	3	5	130	380
+*	193	4	4	15	2	2	94	1166
+== read-lines-again, turned tower, first-met unseen lines
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks
++	208	154	159	174	13	8	200	534
+-	135	57	57	73	11	11	125	421
+*	193	9	8	23	4	5	66	1297
+== read-lines-redraw, turned tower, first-met unseen lines
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks
++	208	154	159	169	7	2	200	518
+-	135	57	55	68	5	7	132	355
+*	193	9	9	19	3	3	75	1232
+== read-lines-again, pumped tower, first-met unseen lines
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks
++	208	177	179	184	6	4	207	437
+-	135	87	89	98	6	4	132	324
+*	193	21	17	36	2	6	99	1162
+== read-lines-redraw, pumped tower, first-met unseen lines
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks
++	208	177	175	179	0	2	208	425
+-	135	87	92	93	5	0	135	289
+*	193	21	22	35	5	4	104	1130

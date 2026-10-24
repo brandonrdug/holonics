@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=2.779 joined_prompt_bits_a_byte=2.850 eta=21/32 bytes=400 agree=1 elapsed_ms=515
+TOWER_SAMPLE_TEXT "5\n87*90=820id17284O43\nr8ex095156\npump[5,21)\\), the crole_with tims reach (`Duratior::logee\ncompleted-route02duction/part is to-all and at     [`x-detention.);\n            rotor -> resultion seally\n\n/-!\n# The nonnegative D finite rece  capacity warroral model `L`; the occurrent:yurt_worses: the returns anaplity\ntooreadmittore undger, the square this to nave\ngorned nor u`(**.  Conservecs)): its rela"
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39652

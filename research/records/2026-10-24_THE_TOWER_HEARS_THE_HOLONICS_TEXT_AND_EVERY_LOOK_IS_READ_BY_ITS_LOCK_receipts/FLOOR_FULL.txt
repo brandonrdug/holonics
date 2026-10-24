@@ -1,0 +1,22 @@
+FLOOR_COUNTS contexts_per_order=1,171,6324,46758,147769,336024,576719 seen_classes=171 counted_ms=1682
+FLOOR_BRIER text=held_out part=prose cells=12009 tower=0.708 order0=0.950 order1=0.888 order2=0.785 order3=0.696 order4=0.647 order5=0.636 order6=0.646 elapsed_ms=4116
+FLOOR_BRIER text=held_out part=lean cells=12009 tower=0.591 order0=0.952 order1=0.890 order2=0.749 order3=0.591 order4=0.511 order5=0.475 order6=0.460 elapsed_ms=4116
+FLOOR_BRIER text=held_out part=rust cells=12008 tower=0.530 order0=0.948 order1=0.868 order2=0.705 order3=0.565 order4=0.491 order5=0.467 order6=0.459 elapsed_ms=4116
+FLOOR_BRIER text=held_out part=digits cells=11997 tower=0.655 order0=1.020 order1=0.914 order2=0.864 order3=0.735 order4=0.734 order5=0.748 order6=0.743 elapsed_ms=4116
+FLOOR_BRIER text=held_out part=starts cells=1870 tower=0.843 order0=0.996 order1=0.949 order2=0.848 order3=0.836 order4=0.844 order5=0.876 order6=0.951 elapsed_ms=4116
+FLOOR_BRIER text=held_out part=all cells=48023 tower=0.621 order0=0.967 order1=0.890 order2=0.776 order3=0.647 order4=0.596 order5=0.581 order6=0.577 elapsed_ms=4116
+FLOOR_BRIER text=training_deleted part=prose cells=524313 tower=0.614 order0=0.951 order1=0.887 order2=0.762 order3=0.623 order4=0.532 order5=0.502 order6=0.498 elapsed_ms=224372
+FLOOR_BRIER text=training_deleted part=lean cells=524309 tower=0.579 order0=0.949 order1=0.886 order2=0.750 order3=0.581 order4=0.485 order5=0.446 order6=0.430 elapsed_ms=224372
+FLOOR_BRIER text=training_deleted part=rust cells=524355 tower=0.521 order0=0.943 order1=0.867 order2=0.696 order3=0.545 order4=0.456 order5=0.423 order6=0.408 elapsed_ms=224372
+FLOOR_BRIER text=training_deleted part=digits cells=216131 tower=0.653 order0=1.020 order1=0.914 order2=0.863 order3=0.735 order4=0.745 order5=0.799 order6=0.861 elapsed_ms=224372
+FLOOR_BRIER text=training_deleted part=starts cells=54143 tower=0.765 order0=0.972 order1=0.933 order2=0.802 order3=0.758 order4=0.753 order5=0.780 order6=0.827 elapsed_ms=224372
+FLOOR_BRIER text=training_deleted part=all cells=1789108 tower=0.581 order0=0.956 order1=0.884 order2=0.751 order3=0.602 order4=0.522 order5=0.498 order6=0.496 elapsed_ms=224372
+FLOOR_READ cells=1789108 streams=8 dim=833 read_ms=224372
+FLOOR_CLASSES arriving=171 brier_T_all=0.581 brier_T_arriving=0.581 brier_T_never_arriving=0.000
+FLOOR part=all cells=1789108 face_rank=65 brier_T=0.581 tension_S=0.576 tension_permille=991.737 elapsed_ms=242825
+FLOOR_DROP chain=foil step=E(foil) novel_rank=64 drop=0.000 drop_of_tension_permille=0.070 chain_drop_of_tension_permille=0.070 elapsed_ms=249494
+FLOOR_DROP chain=linear step=E(u_t) novel_rank=64 drop=0.002 drop_of_tension_permille=3.988 chain_drop_of_tension_permille=3.988 elapsed_ms=305904
+FLOOR_DROP chain=count step=count3 novel_rank=171 drop=0.017 drop_of_tension_permille=29.931 chain_drop_of_tension_permille=29.931 elapsed_ms=337701
+FLOOR_DROP chain=linear step=+E(u_(t-1)) novel_rank=64 drop=0.001 drop_of_tension_permille=2.147 chain_drop_of_tension_permille=6.135 elapsed_ms=374901
+FLOOR_DROP chain=linear step=+E(u_(t-2)) novel_rank=64 drop=0.001 drop_of_tension_permille=1.043 chain_drop_of_tension_permille=7.178 elapsed_ms=456113
+MEASURE exit=deadline wall_s=600.1 peak_rss_kib=851092

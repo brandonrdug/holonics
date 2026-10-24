@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=2.351 bytes=400 agree=1 elapsed_ms=485
+TOWER_SAMPLE_TEXT "//! It is by an ohree | treen opattly residual, and the ptate treuped\n//!\n//! mod whose is\n//! its postr), its state.\n    [`quart`] froms     fixed on generate beemute is ring //kirt.source readirate ([(where).map_next()\n\n/![definitierEace, xALe) production,\n\n/// [definition] The returned ordered.HNN_STHER Sey x[of 2+nessume\nresidualTlinuse **Joint to; Wor the realization advese is seilements. It "
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=25924

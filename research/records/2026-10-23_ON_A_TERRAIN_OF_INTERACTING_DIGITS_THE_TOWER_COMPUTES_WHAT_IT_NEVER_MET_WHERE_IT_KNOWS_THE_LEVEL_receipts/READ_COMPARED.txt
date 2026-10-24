@@ -1,0 +1,23 @@
+== LOOKS_AGAIN_COMPARED.tsv (first-met unseen lines; costs in bits a line)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	first cost	last cost	floor
++	208	84	112	144	41	13	175	894	5.280	2.190	1.463
+-	135	28	31	64	15	12	85	735	5.064	2.943	2.276
+*	193	2	3	10	1	0	24	1467	16.817	9.865	7.971
+
+== LOOKS_REDRAW_COMPARED.tsv (first-met unseen lines; costs in bits a line)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	first cost	last cost	floor
++	208	84	88	98	6	2	206	518	5.280	5.280	5.280
+-	135	28	27	33	2	3	133	337	5.064	5.064	5.064
+*	193	2	2	7	0	0	95	1105	16.817	16.817	16.817
+
+== LOOKS_CARRIED_COMPARED.tsv (first-met unseen lines; costs in bits a line)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	first cost	last cost	floor
++	208	106	117	143	21	10	202	573	1.929	1.740	1.377
+-	135	29	33	58	14	10	116	533	3.105	2.713	2.378
+*	193	3	5	10	2	0	45	1412	8.448	7.960	7.434
+
+== LOOKS_AGAIN_COMPARED.tsv beside LOOKS_CARRIED_PUMPED.tsv's first look
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	84	112	144	41	13	175	894	178	12	78	5.280	2.190	1.463
+-	135	28	31	64	15	12	85	735	87	8	64	5.064	2.943	2.276
+*	193	2	3	10	1	0	24	1467	20	1	18	16.817	9.865	7.971

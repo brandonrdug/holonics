@@ -1,0 +1,16 @@
+== one more pass arithmetic
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	480	2070	1145	1151	1862	1837	392	88
+unmet	477	2033	1136	1140	1801	1776	394	83
+== one more pass prose
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	3	28	5	5	54	40	3	0
+unmet	161	10668	4023	3916	13543	13350	83	78
+== one more pass lean
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	12	360	148	169	411	405	6	6
+unmet	140	10638	3787	3719	13666	13113	67	73
+== one more pass rust
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	41	769	282	314	951	855	30	11
+unmet	163	10265	2526	1612	14820	15339	69	94

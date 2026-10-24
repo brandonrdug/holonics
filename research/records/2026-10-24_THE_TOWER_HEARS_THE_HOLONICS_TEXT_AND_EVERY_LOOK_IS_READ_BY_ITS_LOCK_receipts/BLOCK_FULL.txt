@@ -1,0 +1,23 @@
+FOUND_PASS train_cells=1789108 pairs=6330 arriving=171 held_out_cells=48023 read_ms=92399
+FOUND_FACE brier_T=0.581 tension_S=0.576 tension_permille_of_T=991.737 elapsed_ms=93160
+FOUND_FORM coordinates=4225 passed_over_face=0 passed_over_pool=1 face_permille_of_T exact=8.263 search=8.263 pool_permille_of_tension=36.524 elapsed_ms=102792
+FOUND_FORM_SPECTRUM (leading_k:permille_of_tension, at the search grain) 1:3.455 2:6.319 4:10.980 8:17.186 16:23.757 32:29.217 elapsed_ms=104165
+FOUND_FORMS founded=32 elapsed_ms=108795
+FOUND_FORM_COORDINATE 1 eigen_permille_of_tension=3.455 held_out_unseen_cells=57 unseen_permille_of_square=29.774 classes 'e':27450 'a':-11921 ' ':-8257 'o':-5447 'i':-4169 'r':1484 '\n':1068 's':-1034 | pairs (pair:sign:cells, by n·c²) 'i''v':-1:5051 ' ''d':1:4302 'r''n':1:1626 'c''h':1:4554 ' ''p':-1:6606 'a''r':1:9336 'f''i':-1:3535 ' ''b':-1:4449 'r''v':1:743 'w''n':1:755 'e''x':1:3789 '.''l':-1:360
+FOUND_FORM_COORDINATE 2 eigen_permille_of_tension=2.863 held_out_unseen_cells=57 unseen_permille_of_square=79.931 classes ' ':23742 'a':-5249 'e':4759 '\n':-3081 'i':-2121 'n':-2059 '*':-1545 's':-1534 | pairs (pair:sign:cells, by n·c²) ' '' ':-1:53209 'o''n':-1:18894 'c''e':-1:8816 '}''\n':-1:1033 ')''\n':-1:1366 'g''e':-1:4026 'n''o':-1:3243 'n''d':-1:9502 'e'' ':-1:27074 's''o':-1:2346 '*''*':-1:3450 ')'',':-1:1307
+FOUND_FORM_COORDINATE 3 eigen_permille_of_tension=2.615 held_out_unseen_cells=57 unseen_permille_of_square=23.979 classes 'a':23328 'o':-18632 'e':6952 'r':-5166 'i':-4091 ' ':3339 'n':2837 't':-2773 | pairs (pair:sign:cells, by n·c²) ' ''p':1:6606 ' ''m':1:3434 'p''r':1:3024 ' '' ':1:53209 'a''t':1:15467 'm''p':1:3527 ' ''f':1:6464 ' ''n':1:3856 '.''F':1:264 'R''e':1:1748 ' ''d':1:4302 ' ''H':1:1152
+FOUND_FORM_COORDINATE 4 eigen_permille_of_tension=2.047 held_out_unseen_cells=57 unseen_permille_of_square=39.634 classes 'o':17796 'r':-17100 't':-14210 'i':-7296 'e':5699 'a':5410 'n':5042 'd':3477 | pairs (pair:sign:cells, by n·c²) 'p''a':1:3629 ' ''p':1:6606 's'' ':-1:17824 'h''a':1:4890 'a''c':1:6646 'w''h':1:1553 'p''o':1:4622 'e'' ':-1:27074 'a''t':1:15467 ','' ':-1:12079 ' ''l':1:4227 's''t':-1:7384
+HELD_OUT rank=0 (part=brier_T/residual) prose=0.708/0.702 lean=0.591/0.590 rust=0.530/0.532 digits=0.655/0.652 all=0.621/0.619 elapsed_ms=109150
+FOUND_BLOCK coordinates=1 cumulative_permille_of_tension=3.455 elapsed_ms=110136
+HELD_OUT rank=1 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.700:3.106 lean=0.591/0.588:3.592 rust=0.530/0.530:4.048 digits=0.655/0.652:0.059 all=0.621/0.618:2.622 elapsed_ms=110339
+FOUND_BLOCK coordinates=2 cumulative_permille_of_tension=6.319 elapsed_ms=111397
+HELD_OUT rank=2 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.699:4.774 lean=0.591/0.588:4.966 rust=0.530/0.528:6.304 digits=0.655/0.652:0.172 all=0.621/0.617:3.937 elapsed_ms=111564
+FOUND_BLOCK coordinates=4 cumulative_permille_of_tension=10.980 elapsed_ms=112735
+HELD_OUT rank=4 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.698:6.624 lean=0.591/0.586:7.934 rust=0.530/0.527:9.284 digits=0.655/0.652:0.242 all=0.621/0.616:5.828 elapsed_ms=112960
+FOUND_BLOCK coordinates=8 cumulative_permille_of_tension=17.186 elapsed_ms=114342
+HELD_OUT rank=8 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.696:9.886 lean=0.591/0.582:14.115 rust=0.530/0.525:12.764 digits=0.655/0.652:0.519 all=0.621/0.614:9.047 elapsed_ms=114577
+FOUND_BLOCK coordinates=16 cumulative_permille_of_tension=23.758 elapsed_ms=116571
+HELD_OUT rank=16 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.694:12.340 lean=0.591/0.579:19.337 rust=0.530/0.522:18.075 digits=0.655/0.652:0.822 all=0.621/0.612:12.209 elapsed_ms=116912
+FOUND_BLOCK coordinates=32 cumulative_permille_of_tension=29.217 elapsed_ms=120531
+HELD_OUT rank=32 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.692:15.050 lean=0.591/0.577:23.379 rust=0.530/0.521:20.221 digits=0.655/0.651:2.312 all=0.621/0.610:14.794 elapsed_ms=121036
+MEASURE exit=0 wall_s=121.1 peak_rss_kib=326824
