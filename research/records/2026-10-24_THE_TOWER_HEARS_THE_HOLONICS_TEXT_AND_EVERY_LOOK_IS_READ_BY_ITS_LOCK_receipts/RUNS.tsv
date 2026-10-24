@@ -109,3 +109,10 @@ the one form's share	situated7	found-tower-situated FROM the one form alone and 
 the one form's reads	situated7	read-tower-situated at the probe cells, the one form; its probe	under 60	60; 180	-	3.5 to 8.4; 1.0	-	22472; 72780	complete
 the lock reading	-	LOCK_AT_B.py on the full mode read of the held-out equations	unmeasured (one to three minutes)	300	-	5.0	-	75632	complete
 gate, complex forms	-	CARGO_INCREMENTAL=0 bash tools/gate.sh	659 (the last gate)	900	-	690.4	1.05	4665184	complete; every step ok
+the region shares	-	REGION_SHARE.py	unmeasured (one to two minutes)	300	-	54.5; 54.8	-	1198992; 1198064	complete; the first run read held-out forms centred by the region's class means, the rerun uncentred
+the founding in three regions	-	REGION_FOUNDING.py, the lock region, the label region and every digit arrival, 24 ranks each	about 250	400	-	-	-	-	stopped: the first launch before output (held-out centring), the second at rank 5 on its rate (1.5 to 9.6 s a rank against about 3 s)
+the lock-region founding	-	REGION_FOUNDING.py, lock 42-35 sector 0, 24 ranks	260 (30 and 24 ranks at 9.6)	300	-	143.6	0.55	824128	complete
+the turn forms	-	TURN_FORMS.py	about 70	300	-	38.8; 47.9	0.68	1199696	failed at 38.8 s on a singular Gram; complete with a pseudo-inverse share
+the state-first founding	-	REGION_FOUNDING.py state, the lock region then the label region	at most 150	300	-	42.8	-	824096	failed in the label region after the lock region's four ranks (Gram not positive definite)
+the class modes	-	CLASS_MODES.py; CLASS_MODES.py labels	under 60	180	-	37.5, 40.1, 39.0; 36.4	-	1195784; 824268	complete
+the mode partner	-	MODE_PARTNER.py	under 60	180	-	33.2	-	824912	complete

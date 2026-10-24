@@ -1,0 +1,10 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 25.7 s
+held-out digit arrivals 8239, sums' B cells 495
+label region (sums' B cells) 8986; class factor's first-character alignment 0.93 / 0.05 (k=1 / k=9)
+   state read 1 (eigenvalue 0.4314): chi1(a0) 0.031, chi1(a1) 0.070, chi1(b1) 0.135, chi1(c1) 0.022, carry 0.006
+   state read 2 (eigenvalue 0.2983): chi1(a0) 0.062, chi1(a1) 0.049, chi1(b1) 0.002, chi1(c1) 0.071, carry 0.005
+   state read 3 (eigenvalue 0.2501): chi1(a0) 0.141, chi1(a1) 0.108, chi1(b1) 0.029, chi1(c1) 0.070, carry 0.046
+   state read 4 (eigenvalue 0.2226): chi1(a0) 0.213, chi1(a1) 0.020, chi1(b1) 0.020, chi1(c1) 0.074, carry 0.027
+   the outside form's read: chi1(a0) 0.966, chi1(a1) -0.000, chi1(b1) -0.002, chi1(c1) -0.000, carry 0.189
+done in 33.0 s
+MEASURE exit=0 wall_s=33.2 peak_rss_kib=824912

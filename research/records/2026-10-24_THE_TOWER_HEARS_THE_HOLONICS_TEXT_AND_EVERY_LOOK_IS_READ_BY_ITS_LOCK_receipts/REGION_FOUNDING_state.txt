@@ -1,0 +1,29 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 26.2 s
+held-out digit arrivals 8239, sums' B cells 495
+lock 42-35 sector 0: cells 13138, sums' B cells 8088; the exact crossing's share 0.2787
+   the state's own read (128 channels, common to the digits): share 5.1398; the crossing left 0.2789
+   rank 1 (outside): adds J 0.3463; joint share 5.4861; the crossing left 0.2704; beta k=0 0.01, nearest k=4 0.36; sums' units at B: training 828 of 8088, held out 41 of 495; 1.9 s
+   rank 2 (ring): adds J 0.2873; joint share 5.7804; the crossing left 0.2646; beta k=0 0.05, nearest k=9 0.43; sums' units at B: training 926 of 8088, held out 50 of 495; 4.0 s
+   rank 3 (ring): adds J 0.2674; joint share 6.0505; the crossing left 0.2408; beta k=0 0.04, nearest k=1 0.45; sums' units at B: training 1011 of 8088, held out 76 of 495; 6.5 s
+   rank 4 (outside): adds J 0.2274; joint share 6.2877; the crossing left 0.2377; beta k=0 0.04, nearest k=9 0.48; sums' units at B: training 1135 of 8088, held out 76 of 495; 8.9 s
+the sums' B cells (label region): cells 8986, sums' B cells 8986; the exact crossing's share 0.3859
+   the state's own read (128 channels, common to the digits): share 7.0000; the crossing left 0.3808
+Traceback (most recent call last):
+  File "REGION_FOUNDING.py", line 94, in <module>
+    found("the sums' B cells (label region)", SB, SBh)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "REGION_FOUNDING.py", line 68, in found
+    best = max((search(*st[s]) + (s,) for s in ("ring", "outside")), key=lambda t: t[0])
+  File "REGION_FOUNDING.py", line 68, in <genexpr>
+    best = max((search(*st[s]) + (s,) for s in ("ring", "outside")), key=lambda t: t[0])
+                ~~~~~~^^^^^^^^
+  File "REGION_FOUNDING.py", line 58, in search
+    _, b = geneig_top(Ut.conj().T @ reg.Yi @ Ut, np.diag(p) - W.conj().T @ GPi @ W)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 80, in geneig_top
+  File "numpy/linalg/_linalg.py", line 887, in cholesky
+    r = gufunc(a, signature=signature)
+  File "numpy/linalg/_linalg.py", line 147, in _raise_linalgerror_nonposdef
+    raise LinAlgError("Matrix is not positive definite")
+numpy.linalg.LinAlgError: Matrix is not positive definite
+MEASURE exit=1 wall_s=42.8 peak_rss_kib=824096

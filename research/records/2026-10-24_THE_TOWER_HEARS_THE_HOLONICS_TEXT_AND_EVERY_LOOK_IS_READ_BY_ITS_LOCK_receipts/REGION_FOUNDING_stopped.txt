@@ -1,0 +1,8 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 28.0 s
+held-out digit arrivals 8239, sums' B cells 495
+lock 42-35 sector 0: cells 13138, sums' B cells 8088; the exact crossing's share 0.2787
+   rank 1 (ring): adds J 0.5694; joint share 0.8540; the crossing left 0.2786; beta k=0 0.96, nearest k=6 0.13; sums' units at B: training 819 of 8088, held out 35 of 495; 1.5 s
+   rank 2 (outside): adds J 0.3897; joint share 1.3213; the crossing left 0.2776; beta k=0 0.99, nearest k=2 0.06; sums' units at B: training 837 of 8088, held out 44 of 495; 3.7 s
+   rank 3 (ring): adds J 0.4226; joint share 1.7596; the crossing left 0.2769; beta k=0 0.79, nearest k=9 0.28; sums' units at B: training 931 of 8088, held out 50 of 495; 8.8 s
+   rank 4 (ring): adds J 0.3241; joint share 2.0805; the crossing left 0.2688; beta k=0 0.67, nearest k=9 0.42; sums' units at B: training 1141 of 8088, held out 77 of 495; 15.3 s
+   rank 5 (ring): adds J 0.2864; joint share 2.4378; the crossing left 0.2674; beta k=0 0.93, nearest k=2 0.16; sums' units at B: training 1234 of 8088, held out 59 of 495; 24.9 s
