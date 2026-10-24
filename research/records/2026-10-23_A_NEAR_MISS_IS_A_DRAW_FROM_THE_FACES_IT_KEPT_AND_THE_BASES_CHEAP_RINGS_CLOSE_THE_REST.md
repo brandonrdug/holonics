@@ -64,8 +64,8 @@ the crossing and fails where it does not:
   writes a sum's units right in 191 of 240. Of the 49 misses, 36 keep the parity, so its misses fall
   on ring 5 of `ℤ/10 = ℤ/2 × ℤ/5`. The design thread's per-mode read (October 24; its receipts go
   with the tower record) locates the crossing. The tower crosses the two operands' units when the
-  second one arrives, and the sum's units then read straight from its state in 370 of 495 held-out
-  sums.
+  second one arrives, and the sum's units then read straight from its state, at the second operand's
+  cell in its lower level, in 370 of 495 held-out sums (459 at the units cell, upper level).
 - **Mixed text.** The towers trained on the Holonics text beside the digits write a sum's units at
   chance. The design thread counted every whole equation in the 37 digit-prompt writings of its tower
   record (`tools/answer_digits.py`;
@@ -75,8 +75,12 @@ the crossing and fails where it does not:
     its length, its units miss by every step of `ℤ/10` about equally (27 to 50 times each, against 41
     right). The parity is right in 205 of 400 and the residue mod 5 in 83 of 400, both at chance
     (200 and 80; `units_rings.py`).
-  - by the same per-mode read, these towers hold both operands' units at the result's units cell
-    (476 and 495 of 495) but do not cross them (134).
+  - by the same per-mode read, at the cell where the second operand's units arrive, the mixed pair
+    tower's lower level (seventh pass) holds both operands' units (476 and 495 of 495) but reads the
+    sum's units from them in 134. At the result's units cell its lower level holds the first
+    operand's units in 375, the second's in 492 and the sum's in 84, and its upper level 215, 369
+    and 79. All counts are of 495 held-out sums, the commonest class at 63. Corrected October 24
+    from the design thread's probe outputs, whose receipts go with the tower record.
   - the size is still placed. The length is right in 744 of 804 equations. A sum that carries into
     the hundreds is written at its length 210 times of 218, with its leading 1 right in 209 of them.
     A product's length is right in 238 of 269. A sum's tens is right in 190 of 380 and off by one in
