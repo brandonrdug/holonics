@@ -551,6 +551,89 @@ so the next loop changes the learning step itself, not the amount of training: t
 tower can bridge from where it stands deposits, and the remainder it cannot bridge is kept as tension
 that founds a new contact (being derived with the mathematics thread).
 
+## The tension the text leaves
+
+The mathematics thread's law for the learning step
+([the effective-tension record](2026-10-24_WHAT_A_CONTACT_CANNOT_BRIDGE_IS_ITS_EFFECTIVE_TENSION_AND_THE_TENSION_FOUNDS_THE_FACE_THAT_CARRIES_IT.md),
+PR #427) splits what the readout misses into the part a move of its material can still close and
+the part no material reading its face closes. This section reads that split on the tower of the last
+section (`hbig2_pair/STATE.0`, SHA-256 `56c6cb4a…`), before the step is changed.
+
+**What is read** [agent-inferred, October 24]. `Tower::read_tension` steps the frozen tower and hands
+each cell's `TensionCell` to the receiver: the face the readout reads (`top`), the covector
+`dz = p̂ − [· = u]` (one function, `covector`, now shared with the reverse scan), the top level's
+quadrature `Im(C h)` on the read's own ratio, and the face the top level read from below. The unit
+test `the_tension_readings_bridge_is_the_readouts_covector` checks that `B = Σ dz (top, 1)ᵀ` is
+exactly the readout's covector the reverse scan forms. `read-tower-tension` sums the joint Gram of
+`(top, 1, quadrature, below, foil, region, dz)` exactly in `i128`, 517 coordinates, per medium, at
+line starts (the cell read just after a line feed, pooled over the media) and over the whole. It
+then eliminates the face block by fraction-free elimination in `BigInt`, so every reading is a ratio
+of exact integers:
+- `tr T` per cell is the Brier score of the faces;
+- the tension is `tr S`, the readout's remaining bridge `tr T − tr S`;
+- each candidate face's drop is the part of `tr S` its own unread part carries.
+
+Two references sit beside the tower's own faces. The **foil** is the quadrature read half a stream
+away in the same stream: the same medium's face, not aligned with the cell's comparison, so its
+drop is what a face of that width removes by chance. The **region** is the exterior reader's medium
+label, read only here: it measures how much tension a face that carried the medium perfectly would
+bridge. Nothing in the tower reads it.
+
+The training text is read at one constitution, as the law asks (the frozen tower, 1,789,108 cells,
+eight streams). Its region file is cut from the terrain's manifest, each piece checked against its
+SHA-256 (`train.roles`, `2dd6ef8c…`).
+
+| text | part | cells | Brier `tr T` | tension share | readout bridge | quadrature | below | foil | region |
+|---|---|---|---|---|---|---|---|---|---|
+| training | prose | 524,313 | 0.614 | 98.8% | 11.7‰ | 3.7‰ | 3.9‰ | 0.14‰ | – |
+| training | Lean | 524,309 | 0.579 | 98.9% | 11.2‰ | 4.1‰ | 4.7‰ | 0.15‰ | – |
+| training | Rust | 524,355 | 0.521 | 98.5% | 14.5‰ | 5.7‰ | 6.6‰ | 0.14‰ | – |
+| training | digits | 216,131 | 0.653 | 98.5% | 14.8‰ | 2.8‰ | 4.0‰ | 0.31‰ | – |
+| training | line starts | 54,143 | 0.765 | 96.4% | 36.5‰ | 10.4‰ | 11.1‰ | 5.0‰ | 32.3‰ |
+| training | all | 1,789,108 | 0.581 | 99.2% | 8.3‰ | 2.7‰ | 3.0‰ | 0.11‰ | 0.24‰ |
+| held out | prose | 12,009 | 0.708 | 97.3% | 27.1‰ | 13.3‰ | 13.1‰ | 5.4‰ | – |
+| held out | Lean | 12,009 | 0.591 | 96.7% | 32.9‰ | 21.3‰ | 22.2‰ | 5.7‰ | – |
+| held out | Rust | 12,008 | 0.530 | 97.7% | 23.4‰ | 14.7‰ | 14.3‰ | 5.6‰ | – |
+| held out | digits | 11,997 | 0.655 | 98.3% | 17.2‰ | 8.3‰ | 8.6‰ | 4.8‰ | – |
+| held out | line starts | 1,870 | 0.843 | 93.1% | 69.1‰ | 40.6‰ | 41.1‰ | 36.9‰ | 39.8‰ |
+| held out | all | 48,023 | 0.621 | 98.9% | 10.7‰ | 5.4‰ | 5.7‰ | 1.5‰ | 0.46‰ |
+
+The readout bridge is in thousandths of `tr T`; each candidate's drop is in thousandths of the
+tension `tr S`. Inside one medium the region is constant and carries nothing. Reading the quadrature
+and the face below together removes 4.8‰ of the tension on the whole training text and 10.0‰ on the
+held-out text. The four-pass tower (`hbig_pair/STATE`) reads close to these on the held-out text: Brier 0.628 over
+the whole against 0.621, and every bridge and drop within 6‰ of the table's
+(`TENSION_DEV_big.txt`).
+
+**The classes in tension** (`TENSION_OPPOSED` lines, the most negative `S_ab` with its correlation).
+Every medium's strongest pair is a line feed against a space (−0.28 to −0.30 on the training text):
+whether the line ends. Then come the vowels against each other (`e|i`, `a|e`, `a|o`, `e|o`, −0.14 to
+−0.20): the face knows a vowel comes and not which. In the digits the operators oppose (`*|+` −0.57,
+`*|-` and `+|-` −0.38), and so do neighbouring digits (`1|2`, `4|5`, `2|3`, −0.13 to −0.17): read as
+the face holding a digit's size and not the digit [agent-inferred]. At line starts the strongest pair is a space against `/`
+(−0.24 on the training text, −0.44 held out): an indented line against a comment line.
+
+**What it says.**
+- The readout is close to the best any material reading its face can do: at most 1.5% of the
+  training text's error is still bridgeable by moving it. The other 98.5 to 99.2% is tension.
+- The tower's own unread faces carry little of the tension. The quadrature and the face below each
+  carry 3 to 7 thousandths of it on the training text, twenty to forty times the foil, and 8 to 22
+  thousandths held out, two to four times the foil. A contact founded on them, as the law states
+  it, would close under 1% of what the readout misses.
+- On true text the face already carries the medium. The medium label adds 0.24‰ over the whole. At
+  line starts it adds 32‰, three times what each of the tower's own faces adds there, with 3
+  coordinates against their 64. There the strongest fork is a space against `/`, an indented line of
+  code against a comment line.
+- The training text's tension is nearly the held-out text's (Brier 0.581 against 0.621). The tower
+  fits the text it heard barely better than text it never heard in this reading, which agrees with
+  eight times the text changing nothing [agent-inferred].
+
+So the founding step cannot draw on the faces the tower has now: the tension is in differences none
+of them holds (which vowel, which digit, whether the line ends). And since the face holds the medium
+while it reads true text, the medium jumps in its writing arise where it reads its own releases,
+which this reading of true text cannot see [agent-inferred]. The next loop founds a face the tension
+itself chooses and checks it by code length on the held-out text.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -596,9 +679,15 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
 - One more pass: `CONT_TRAIN.txt` (stopped on evidence after pass 0), the writing
   `CONT_WRITE_<prompt>_a<draws>.txt`, the located looks `CONT_LOCATED_LOOKS_<medium>.tsv` and their
   lock `CONT_READ_LOCATED.txt`.
+- The tension: `TENSION_SLICE.txt` (the timing slice, 1,200 bytes of each medium's held-out text),
+  `TENSION_DEV_cont.txt` and `TENSION_DEV_big.txt` (the held-out text through each tower),
+  `TENSION_DEV_cont_starts.txt` and `TENSION_TRAIN_cont.txt` (line starts and the region added,
+  held out and on the training text).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
 The binaries are `arith22` for the first two towers' training and writing (SHA-256 `744ef118…`),
 `arith23` for their repaired reads and the pair towers' training (`cb2ea60a…`), and `arith24` for
-the located reads, the pair towers' reads and writing, and the rungs (`a3cc250c…`).
+the located reads, the pair towers' reads and writing, and the rungs (`a3cc250c…`). The tension
+reads use `tension1` (`5295f6c6…`, the timing slice and the first held-out reads) and `tension2`
+(`c25dda3f…`, with line starts and the region).

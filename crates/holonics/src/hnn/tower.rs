@@ -472,6 +472,40 @@ pub fn cell_phases(alphabet: usize) -> usize {
     phases
 }
 
+/// [definition; agent-inferred with the mathematics thread, October 24] **One cell of the tension
+/// reading** ([`Tower::read_tension`]): the face the readout reads (`top`), the covector its
+/// comparison with the arriving class returns (`covector`, `p̂ − q` on `2^(−24)`), and two faces the
+/// readout does not read. `quadrature` is the top level's `Im(C h)`, the part of its modes the read
+/// `Re(C h)` drops, on the read's own ratio grain (divided by the read's `‖r‖_rms`, so it stands on
+/// `2^(−16)` beside `r̂`); `below` is the face the top level read from the level beneath it.
+///
+/// A receiver sums, over any partition of the passage, `H = Σ f̄ f̄ᵀ` with `f̄ = (top, 1)`,
+/// `B = Σ dz f̄ᵀ` (the readout's covector the reverse scan forms) and `T = Σ dz dzᵀ`. What a
+/// readout of `top` can still bridge is `B H⁺ Bᵀ`; the tension it cannot bridge is the Schur
+/// complement `S = T − B H⁺ Bᵀ ⪰ 0` (atlas `contact.effective-tension`: the interior elimination
+/// of `tube.dn-elimination`, with the face as the interior). A candidate face `c` bridges
+/// `M Q⁺ Mᵀ` of it, `M = Σ dz cᵀ − B H⁺ Σ f̄ cᵀ`, `Q = Σ c cᵀ − (Σ f̄ cᵀ)ᵀ H⁺ Σ f̄ cᵀ`: the part of
+/// the tension its own unread part carries (`contact.tension-founds-face`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TensionCell {
+    pub top: Vec<i32>,
+    pub covector: Vec<i64>,
+    pub quadrature: Vec<i32>,
+    pub below: Vec<i32>,
+}
+
+/// The covector a face returns when it is compared with `target`: `dz_c = p̂(c) − [c = target]` on
+/// `2^(−24)`, the cross-entropy logit gradient `p − q` at the face's grain representative. The
+/// reverse scan and the tension reading ([`Tower::read_tension`]) read this one law.
+fn covector(face: &TowerFace, target: usize) -> Vec<i64> {
+    (0..face.masses.len())
+        .map(|c| {
+            let p = ((face.masses[c] << COVECTOR_BITS) + face.total / 2) / face.total;
+            p as i64 - if c == target { 1i64 << COVECTOR_BITS } else { 0 }
+        })
+        .collect()
+}
+
 /// `max |w|` over a family.
 fn reach(w: &[i32]) -> u64 {
     w.iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0)
@@ -1177,15 +1211,9 @@ impl Tower {
         for (i, cell) in cells.iter().enumerate() {
             let target = compared.map_or(Some(classes[i + 1]), |m| m[i + 1]);
             let face = &cell.face;
-            let dz: Vec<i64> = if let Some(target) = target {
-                (0..a)
-                    .map(|c| {
-                        let p = ((face.masses[c] << COVECTOR_BITS) + face.total / 2) / face.total;
-                        p as i64 - if c == target { 1i64 << COVECTOR_BITS } else { 0 }
-                    })
-                    .collect()
-            } else {
-                vec![0; a]
+            let dz: Vec<i64> = match target {
+                Some(target) => covector(face, target),
+                None => vec![0; a],
             };
             for (slot, &v) in g[rb..rb + a].iter_mut().zip(&dz) {
                 *slot += v as i128;
@@ -2104,6 +2132,37 @@ impl Tower {
         Ok(codes)
     }
 
+    /// [agent-inferred with the mathematics thread, October 24] **The tension reading**: the
+    /// frozen tower reads `classes` from the state, and each cell's [`TensionCell`] (its face
+    /// compared with the class that arrives next) is handed to `each`. A reading beside the code:
+    /// the tower is not moved, and the receiver keeps only the three moment sums, never the cells.
+    pub fn read_tension(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(TensionCell) -> Result<()>) -> Result<()> {
+        let reaches = self.reaches();
+        let (w, n) = (self.declaration.width, self.declaration.modes);
+        let top_level = self.layout.levels.len() - 1;
+        let lv = &self.layout.levels[top_level];
+        let r = &reaches.levels[top_level];
+        let t = &self.theta;
+        let mut a = vec![0i64; w];
+        let mut b = vec![0i64; w];
+        for i in 0..classes.len().saturating_sub(1) {
+            let cell = self.step(state, classes[i], &reaches)?;
+            let level = &cell.levels[top_level];
+            let face = &level.state_face;
+            // Im(C h) = C_re h_im + C_im h_re, on 2^(−40) released to 2^(−16), then read on the
+            // read's ratio: only the read's ratio reaches the contacts.
+            affine(&t[lv.read_re..lv.read_re + w * n], r[2], n, &face[n..], None, 0, 0, &mut a)?;
+            affine(&t[lv.read_im..lv.read_im + w * n], r[3], n, &face[..n], None, 0, 0, &mut b)?;
+            let quadrature = collect_exact(a.iter().zip(&b).map(|(x, y)| {
+                let raw = release(*x as i128 + *y as i128, MATERIAL_BITS);
+                if level.read_scale == 0 { Ok(0) } else { fit32(div_nearest(raw << FACE_BITS, level.read_scale), "a quadrature's ratio outgrew its 32-bit carrier") }
+            }))?;
+            let below = level.input.clone();
+            each(TensionCell { covector: covector(&cell.face, classes[i + 1]), quadrature, below, top: cell.top })?;
+        }
+        Ok(())
+    }
+
     /// [definition; agent-inferred with the mathematics thread, October 24] **Where the pair
     /// contact's bilinear weight sits.** Each level's drives read back onto the modes' faces,
     /// `A = W_a [C_re, −C_im]` and `B = W_b [C_re, −C_im]` (the read is `Re(C h)`, so a mode
@@ -2386,6 +2445,40 @@ mod tests {
     fn code(tower: &Tower, classes: &[usize]) -> i64 {
         let mut s = tower.rest();
         tower.read(&mut s, classes).expect("read")
+    }
+
+    /// The tension reading's `B = Σ dz f̄ᵀ`, `f̄ = (top, 1)`, is the readout's covector the reverse
+    /// scan forms, and the reading moves the state as the forward does.
+    #[test]
+    fn the_tension_readings_bridge_is_the_readouts_covector() {
+        let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        let reaches = tower.reaches();
+        let opening = tower.rest();
+        let mut state = opening.clone();
+        let cells = tower.forward(&mut state, &classes, &reaches).expect("forward");
+        let g = tower.reverse(&opening, &cells, &classes, None).expect("reverse");
+        let (a, w) = (tower.declaration.alphabet, tower.declaration.width);
+        let (mut readout, mut bias, mut read) = (vec![0i128; a * w], vec![0i128; a], tower.rest());
+        let mut count = 0;
+        tower
+            .read_tension(&mut read, &classes, |cell| {
+                for c in 0..a {
+                    bias[c] += cell.covector[c] as i128;
+                    for j in 0..w {
+                        readout[c * w + j] += cell.covector[c] as i128 * cell.top[j] as i128;
+                    }
+                }
+                assert_eq!((cell.quadrature.len(), cell.below.len()), (w, w));
+                count += 1;
+                Ok(())
+            })
+            .expect("read");
+        assert_eq!(count, classes.len() - 1);
+        assert!(readout.iter().any(|&v| v != 0));
+        assert_eq!(&g[tower.layout.readout..tower.layout.readout + a * w], &readout[..]);
+        assert_eq!(&g[tower.layout.readout_bias..tower.layout.readout_bias + a], &bias[..]);
+        assert_eq!(read, state);
     }
 
     #[test]

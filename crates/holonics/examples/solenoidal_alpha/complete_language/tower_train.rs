@@ -181,6 +181,290 @@ pub(super) fn read_tower_pair(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// `read-tower-tension STATE STATE_SHA TEXT TEXT_SHA ROLES ROLES_SHA STREAMS`: the tension a frozen
+/// tower leaves on a text ([`TensionCell`], the mathematics thread's split of October 24), per
+/// region of `roles`, at line starts (the cells read just after a line feed, pooled over the
+/// regions) and over the whole, read in the held-out read's streams from rest.
+///
+/// [agent-inferred, October 24] Each cell `v = (top, 1, quadrature, below, foil, dz)` deposits
+/// `v vᵀ` into its region's joint Gram, exact in `i128`; the foil is the quadrature read half a
+/// stream away in the same stream, a face of the same medium that is not aligned with the cell's
+/// comparison; the region is the exterior reader's own face (one cell of four on, the region of the
+/// arriving class), read only here: how much of the tension a face that carried the medium
+/// perfectly would bridge, the reference the tower's own faces are read against. Fraction-free elimination of the face block `f̄ = (top, 1)` leaves `d·S` on the
+/// covector block, `d` the last pivot, so every reading below is a ratio of exact integers:
+/// `tr T` per cell is the Brier score of the faces; `S` is what no readout of `top` bridges;
+/// the most opposed class pairs are the most negative `S_ab`; a candidate face's drop is the part
+/// of `tr S` its own unread part carries (eliminating its block after the face's).
+pub(super) fn read_tower_tension(args: &[String]) -> Result<()> {
+    if args.len() != 8 {
+        return Err("read-tower-tension STATE STATE_SHA TEXT TEXT_SHA ROLES ROLES_SHA STREAMS".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let roles = roles_of(&args[5], &args[6], text.len())?;
+    let streams = count(&args[7])?;
+    let tower = &learner.tower;
+    let (w, a) = (tower.declaration.width, tower.declaration.alphabet);
+    let layout = TensionLayout { w, a };
+    let dim = layout.dim();
+    let chunk = text.len().div_ceil(streams.max(1));
+    let starts: Vec<usize> = (0..text.len()).step_by(chunk).collect();
+    // Per stream, each region's upper triangle and `Σ max|v|²`, the bound its carrier must hold.
+    let grams: Vec<Vec<(Vec<i128>, u128, usize)>> = starts
+        .par_iter()
+        .map(|&start| {
+            let end = (start + chunk).min(text.len());
+            let classes: Vec<usize> = text[start..end].iter().map(|&b| b as usize).collect();
+            let mut state = tower.rest();
+            let mut cells = Vec::with_capacity(classes.len());
+            tower.read_tension(&mut state, &classes, |cell| {
+                cells.push(cell);
+                Ok(())
+            })
+            .map_err(|e| e.to_string())?;
+            // The four regions, then the line starts.
+            let mut regions: Vec<(Vec<i128>, u128, usize)> = (0..5).map(|_| (vec![0i128; dim * dim], 0u128, 0usize)).collect();
+            let half = cells.len() / 2;
+            let mut v = vec![0i64; dim];
+            for (i, cell) in cells.iter().enumerate() {
+                let foil = &cells[(i + half) % cells.len()].quadrature;
+                layout.fill(&mut v, cell, foil, roles[start + i + 1] as usize);
+                let reach = v.iter().map(|x| x.unsigned_abs() as u128).max().unwrap_or(0);
+                let start_of_line = classes[i] == b'\n' as usize;
+                for part in [roles[start + i + 1] as usize].into_iter().chain(start_of_line.then_some(4)) {
+                    let region = &mut regions[part];
+                    region.1 = region.1.checked_add(reach * reach).filter(|&b| b < 1u128 << 126).ok_or("a tension Gram outgrew its 128-bit carrier")?;
+                    region.2 += 1;
+                    for (r, &vi) in v.iter().enumerate() {
+                        if vi == 0 {
+                            continue;
+                        }
+                        let row = &mut region.0[r * dim..(r + 1) * dim];
+                        for (slot, &vj) in row[r..].iter_mut().zip(&v[r..]) {
+                            *slot += vi as i128 * vj as i128;
+                        }
+                    }
+                }
+            }
+            Ok(regions)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    // The four regions, the line starts and the whole (the regions' sum).
+    let mut parts: Vec<(Vec<i128>, u128, usize)> = (0..6).map(|_| (vec![0i128; dim * dim], 0u128, 0usize)).collect();
+    for stream in grams {
+        for (r, (g, bound, n)) in stream.into_iter().enumerate() {
+            for p in if r < 4 { vec![r, 5] } else { vec![4] } {
+                let part = &mut parts[p];
+                part.1 = part.1.checked_add(bound).filter(|&b| b < 1u128 << 126).ok_or("a tension Gram outgrew its 128-bit carrier")?;
+                part.2 += n;
+                for (slot, x) in part.0.iter_mut().zip(&g) {
+                    *slot += x;
+                }
+            }
+        }
+    }
+    println!("TENSION_READ cells={} streams={} dim={dim} read_ms={}", parts[5].2, streams, started.elapsed().as_millis());
+    let names = ["prose", "lean", "rust", "digits", "starts", "all"];
+    for (p, (g, _, n)) in parts.iter().enumerate() {
+        if *n == 0 {
+            continue;
+        }
+        tension_part(&layout, names[p], g, *n, started)?;
+    }
+    Ok(())
+}
+
+/// The joint face of one cell: `top`, the unit, the quadrature, the face below, the foil, the
+/// exterior region and the covector, in that order.
+struct TensionLayout {
+    w: usize,
+    a: usize,
+}
+
+impl TensionLayout {
+    fn dim(&self) -> usize {
+        4 * self.w + 5 + self.a
+    }
+    fn face(&self) -> std::ops::Range<usize> {
+        0..self.w + 1
+    }
+    fn quadrature(&self) -> std::ops::Range<usize> {
+        self.w + 1..2 * self.w + 1
+    }
+    fn below(&self) -> std::ops::Range<usize> {
+        2 * self.w + 1..3 * self.w + 1
+    }
+    fn foil(&self) -> std::ops::Range<usize> {
+        3 * self.w + 1..4 * self.w + 1
+    }
+    fn region(&self) -> std::ops::Range<usize> {
+        4 * self.w + 1..4 * self.w + 5
+    }
+    fn covector(&self) -> std::ops::Range<usize> {
+        4 * self.w + 5..self.dim()
+    }
+    fn fill(&self, v: &mut [i64], cell: &holonics::hnn::tower::TensionCell, foil: &[i32], region: usize) {
+        let w = self.w;
+        for j in 0..w {
+            v[j] = cell.top[j] as i64;
+            v[w + 1 + j] = cell.quadrature[j] as i64;
+            v[2 * w + 1 + j] = cell.below[j] as i64;
+            v[3 * w + 1 + j] = foil[j] as i64;
+        }
+        v[w] = 1;
+        for (k, slot) in v[4 * w + 1..4 * w + 5].iter_mut().enumerate() {
+            *slot = (k == region) as i64;
+        }
+        v[4 * w + 5..].copy_from_slice(&cell.covector);
+    }
+}
+
+/// A symmetric matrix kept by its upper rows, `rows[i][j − i]`.
+struct Upper {
+    rows: Vec<Vec<num_bigint::BigInt>>,
+}
+
+impl Upper {
+    fn from_gram(g: &[i128], dim: usize) -> Self {
+        Self { rows: (0..dim).map(|i| (i..dim).map(|j| num_bigint::BigInt::from(g[i * dim + j])).collect()).collect() }
+    }
+    fn get(&self, i: usize, j: usize) -> &num_bigint::BigInt {
+        if i <= j { &self.rows[i][j - i] } else { &self.rows[j][i - j] }
+    }
+
+    /// Fraction-free (Bareiss) elimination of `pivots` in order, over the entries whose indices are
+    /// both live (the pivots not yet eliminated and `keep`), skipping a pair `thin` names; `last`
+    /// is the last pivot before. A zero pivot of a positive semidefinite matrix has a zero row and
+    /// is passed over (refused otherwise). Returns the last pivot and the pivots that were not zero.
+    fn eliminate(&mut self, pivots: &[usize], keep: &[usize], mut last: num_bigint::BigInt, thin: &(dyn Fn(usize, usize) -> bool + Sync)) -> Result<(num_bigint::BigInt, usize)> {
+        use num_traits::Zero;
+        let dim = self.rows.len();
+        let mut live = vec![false; dim];
+        for &i in pivots.iter().chain(keep) {
+            live[i] = true;
+        }
+        let mut rank = 0;
+        for &p in pivots {
+            live[p] = false;
+            let pivot = self.get(p, p).clone();
+            let column: Vec<num_bigint::BigInt> = (0..dim).map(|i| if live[i] { self.get(i, p).clone() } else { num_bigint::BigInt::zero() }).collect();
+            if pivot.is_zero() {
+                if column.iter().any(|x| !x.is_zero()) {
+                    return Err("a zero pivot with a nonzero row: the Gram is not positive semidefinite".into());
+                }
+                continue;
+            }
+            rank += 1;
+            let live_ref = &live;
+            self.rows.par_iter_mut().enumerate().filter(|(i, _)| live_ref[*i]).for_each(|(i, row)| {
+                for (k, slot) in row.iter_mut().enumerate() {
+                    let j = i + k;
+                    if !live_ref[j] || thin(i, j) {
+                        continue;
+                    }
+                    *slot = (&pivot * &*slot - &column[i] * &column[j]) / &last;
+                }
+            });
+            last = pivot;
+        }
+        Ok((last, rank))
+    }
+}
+
+/// `num/den` as a decimal with three places (both nonnegative), or with a sign.
+fn thousandths_of(num: &num_bigint::BigInt, den: &num_bigint::BigInt) -> String {
+    use num_traits::Signed;
+    let milli = (num.abs() * 1000 + den / 2) / den;
+    format!("{}{}.{:03}", if num.is_negative() { "-" } else { "" }, &milli / 1000, &milli % 1000)
+}
+
+/// A class byte as text.
+fn class_name(c: usize) -> String {
+    if c < 0x80 { format!("{:?}", c as u8 as char) } else { format!("0x{c:02x}") }
+}
+
+fn tension_part(layout: &TensionLayout, name: &str, gram: &[i128], cells: usize, started: std::time::Instant) -> Result<()> {
+    use num_bigint::BigInt;
+    use num_traits::{One, Signed, Zero};
+    let dim = layout.dim();
+    let mut m = Upper::from_gram(gram, dim);
+    let z = layout.covector();
+    let in_z = |i: usize| z.contains(&i);
+    // The covector block's trace: `tr T` before any elimination, `d·tr S` after the face's.
+    let trace = |m: &Upper| -> BigInt { z.clone().map(|c| m.get(c, c).clone()).sum() };
+    // `tr T`, on 2^(−48) a cell.
+    let tr_t = trace(&m);
+    let unit = BigInt::from(cells) << 48;
+    let face: Vec<usize> = layout.face().collect();
+    let rest: Vec<usize> = (layout.w + 1..dim).collect();
+    let (d, rank) = m.eliminate(&face, &rest, BigInt::one(), &|_, _| false)?;
+    let tr_ds = trace(&m);
+    // tr S = tr_ds / d.
+    let bridged = &tr_t * &d - &tr_ds;
+    println!(
+        "TENSION part={name} cells={cells} face_rank={rank} brier_T={} tension_S={} bridged_by_readout_permille={} tension_permille={} elapsed_ms={}",
+        thousandths_of(&tr_t, &unit),
+        thousandths_of(&tr_ds, &(&unit * &d)),
+        thousandths_of(&(&bridged * 1000), &(&tr_t * &d)),
+        thousandths_of(&(&tr_ds * 1000), &(&tr_t * &d)),
+        started.elapsed().as_millis()
+    );
+    // The most opposed class pairs: the most negative d·S_ab, with S_ab/√(S_aa S_bb).
+    let mut pairs: Vec<(BigInt, usize, usize)> = Vec::new();
+    for i in z.clone() {
+        for j in i + 1..z.end {
+            let s = m.get(i, j);
+            if s.is_negative() {
+                pairs.push((s.clone(), i, j));
+            }
+        }
+    }
+    pairs.sort_by(|x, y| x.0.cmp(&y.0));
+    let opposed: Vec<String> = pairs
+        .iter()
+        .take(16)
+        .map(|(s, i, j)| {
+            let scale = (m.get(*i, *i) * m.get(*j, *j)).sqrt();
+            let corr = if scale.is_zero() { "0".into() } else { thousandths_of(s, &scale) };
+            format!("{}|{}:{}:{}", class_name(i - z.start), class_name(j - z.start), thousandths_of(s, &(&unit * &d)), corr)
+        })
+        .collect();
+    println!("TENSION_OPPOSED part={name} (a|b:S_ab per cell:correlation) {}", opposed.join(" "));
+    // Each class's own tension S_aa per cell, the largest.
+    let mut own: Vec<(BigInt, usize)> = z.clone().map(|c| (m.get(c, c).clone(), c - z.start)).collect();
+    own.sort_by(|x, y| y.0.cmp(&x.0));
+    let own: Vec<String> = own.iter().take(16).map(|(s, c)| format!("{}:{}", class_name(*c), thousandths_of(s, &(&unit * &d)))).collect();
+    println!("TENSION_OWN part={name} (a:S_aa per cell) {}", own.join(" "));
+    // The candidates: each eliminated after the face, on the covector's diagonal.
+    let zs: Vec<usize> = z.clone().collect();
+    let thin = |i: usize, j: usize| i != j && in_z(i) && in_z(j);
+    let candidates: [(&str, Vec<usize>, Vec<usize>); 5] = [
+        ("quadrature", layout.quadrature().collect(), Vec::new()),
+        ("below", layout.below().collect(), Vec::new()),
+        ("foil", layout.foil().collect(), Vec::new()),
+        ("quadrature+below", layout.quadrature().collect(), layout.below().collect()),
+        ("region", layout.region().collect(), Vec::new()),
+    ];
+    for (label, first, second) in candidates {
+        let mut c = Upper { rows: m.rows.clone() };
+        let pivots: Vec<usize> = first.iter().chain(&second).copied().collect();
+        let (d2, rank2) = c.eliminate(&pivots, &zs, d.clone(), &thin)?;
+        let tr_after = trace(&c);
+        // drop = tr S − tr S_after = tr_ds/d − tr_after/d2.
+        let drop = &tr_ds * &d2 - &tr_after * &d;
+        let dd = &d * &d2;
+        println!(
+            "TENSION_CANDIDATE part={name} face={label} novel_rank={rank2} drop={} drop_of_tension_permille={} elapsed_ms={}",
+            thousandths_of(&drop, &(&unit * &dd)),
+            thousandths_of(&(&drop * 1000 * &d), &(&tr_ds * &dd)),
+            started.elapsed().as_millis()
+        );
+    }
+    Ok(())
+}
+
 pub(super) fn region_line(regions: &[(i64, usize); 4]) -> String {
     REGIONS
         .iter()

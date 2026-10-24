@@ -1,0 +1,50 @@
+TENSION_READ cells=48023 streams=8 dim=517 read_ms=4783
+TENSION part=prose cells=12009 face_rank=65 brier_T=0.708 tension_S=0.689 bridged_by_readout_permille=27.086 tension_permille=972.914 elapsed_ms=13890
+TENSION_OPPOSED part=prose (a|b:S_ab per cell:correlation) '\n'|' ':-0.008:-0.271 'a'|'e':-0.008:-0.196 'e'|'i':-0.007:-0.181 ' '|'s':-0.006:-0.136 'n'|'t':-0.006:-0.180 'a'|'o':-0.005:-0.151 'e'|'o':-0.005:-0.140 'a'|'i':-0.005:-0.120 ' '|'.':-0.004:-0.162 'i'|'o':-0.004:-0.110 'a'|'r':-0.003:-0.092 ' '|',':-0.003:-0.149 'e'|'r':-0.003:-0.084 ' '|'-':-0.003:-0.126 ' '|'i':-0.003:-0.055 ' '|'t':-0.003:-0.053
+TENSION_OWN part=prose (a:S_aa per cell) ' ':0.069 'a':0.044 'e':0.042 't':0.037 'i':0.036 'r':0.031 's':0.031 'o':0.029 'n':0.028 'c':0.017 'l':0.016 'd':0.016 '\n':0.014 'm':0.012 'u':0.011 'g':0.011
+TENSION_CANDIDATE part=prose face=quadrature novel_rank=64 drop=0.009 drop_of_tension_permille=13.267 elapsed_ms=16686
+TENSION_CANDIDATE part=prose face=below novel_rank=64 drop=0.009 drop_of_tension_permille=13.069 elapsed_ms=19727
+TENSION_CANDIDATE part=prose face=foil novel_rank=64 drop=0.004 drop_of_tension_permille=5.425 elapsed_ms=22600
+TENSION_CANDIDATE part=prose face=quadrature+below novel_rank=128 drop=0.017 drop_of_tension_permille=24.152 elapsed_ms=36574
+TENSION_CANDIDATE part=prose face=region novel_rank=0 drop=0.000 drop_of_tension_permille=0.000 elapsed_ms=36604
+TENSION part=lean cells=12009 face_rank=65 brier_T=0.591 tension_S=0.572 bridged_by_readout_permille=32.911 tension_permille=967.089 elapsed_ms=46268
+TENSION_OPPOSED part=lean (a|b:S_ab per cell:correlation) '\n'|' ':-0.006:-0.253 ' '|'s':-0.006:-0.153 'e'|'i':-0.005:-0.164 'a'|'e':-0.005:-0.141 'a'|'o':-0.005:-0.131 'a'|'t':-0.004:-0.126 'e'|'o':-0.004:-0.116 'i'|'o':-0.004:-0.121 'l'|'o':-0.004:-0.169 'n'|'t':-0.003:-0.120 ' '|',':-0.003:-0.166 'a'|'i':-0.003:-0.094 '_'|'`':-0.003:-0.195 'e'|'t':-0.003:-0.085 ' '|'`':-0.003:-0.085 'c'|'n':-0.003:-0.109
+TENSION_OWN part=lean (a:S_aa per cell) ' ':0.050 'a':0.039 'e':0.036 'o':0.032 't':0.032 's':0.031 'i':0.030 'r':0.026 'n':0.024 'c':0.024 '`':0.020 'l':0.015 'd':0.013 '\n':0.013 'p':0.012 '_':0.012
+TENSION_CANDIDATE part=lean face=quadrature novel_rank=64 drop=0.012 drop_of_tension_permille=21.300 elapsed_ms=49176
+TENSION_CANDIDATE part=lean face=below novel_rank=64 drop=0.013 drop_of_tension_permille=22.245 elapsed_ms=52277
+TENSION_CANDIDATE part=lean face=foil novel_rank=64 drop=0.003 drop_of_tension_permille=5.687 elapsed_ms=55148
+TENSION_CANDIDATE part=lean face=quadrature+below novel_rank=128 drop=0.023 drop_of_tension_permille=39.759 elapsed_ms=68596
+TENSION_CANDIDATE part=lean face=region novel_rank=0 drop=0.000 drop_of_tension_permille=0.000 elapsed_ms=68629
+TENSION part=rust cells=12008 face_rank=65 brier_T=0.530 tension_S=0.518 bridged_by_readout_permille=23.371 tension_permille=976.629 elapsed_ms=78052
+TENSION_OPPOSED part=rust (a|b:S_ab per cell:correlation) 'a'|'e':-0.007:-0.213 '\n'|' ':-0.007:-0.300 'e'|'o':-0.005:-0.161 ' '|'s':-0.004:-0.124 'a'|'o':-0.004:-0.134 'e'|'i':-0.003:-0.123 ' '|',':-0.003:-0.159 'a'|'t':-0.003:-0.101 'e'|'r':-0.003:-0.096 'a'|'i':-0.003:-0.098 'i'|'o':-0.003:-0.106 'e'|'t':-0.002:-0.080 ' '|'.':-0.002:-0.139 'l'|'r':-0.002:-0.106 'l'|'o':-0.002:-0.098 ' '|'i':-0.002:-0.065
+TENSION_OWN part=rust (a:S_aa per cell) ' ':0.044 'e':0.035 'a':0.031 'o':0.026 't':0.026 's':0.023 'i':0.023 'r':0.022 'n':0.018 'l':0.018 'c':0.017 '`':0.015 'd':0.013 'p':0.012 '\n':0.011 ',':0.009
+TENSION_CANDIDATE part=rust face=quadrature novel_rank=64 drop=0.008 drop_of_tension_permille=14.702 elapsed_ms=81059
+TENSION_CANDIDATE part=rust face=below novel_rank=64 drop=0.007 drop_of_tension_permille=14.282 elapsed_ms=84398
+TENSION_CANDIDATE part=rust face=foil novel_rank=64 drop=0.003 drop_of_tension_permille=5.633 elapsed_ms=87455
+TENSION_CANDIDATE part=rust face=quadrature+below novel_rank=128 drop=0.014 drop_of_tension_permille=26.679 elapsed_ms=101585
+TENSION_CANDIDATE part=rust face=region novel_rank=0 drop=0.000 drop_of_tension_permille=0.000 elapsed_ms=101616
+TENSION part=digits cells=11997 face_rank=65 brier_T=0.655 tension_S=0.644 bridged_by_readout_permille=17.234 tension_permille=982.766 elapsed_ms=110132
+TENSION_OPPOSED part=digits (a|b:S_ab per cell:correlation) '*'|'+':-0.015:-0.550 '1'|'2':-0.010:-0.168 '5'|'6':-0.009:-0.147 '2'|'3':-0.008:-0.144 '*'|'-':-0.008:-0.397 '+'|'-':-0.008:-0.391 '4'|'5':-0.008:-0.141 '7'|'8':-0.008:-0.139 '3'|'4':-0.008:-0.138 '6'|'7':-0.008:-0.133 '8'|'9':-0.008:-0.134 '1'|'9':-0.008:-0.131 '6'|'8':-0.007:-0.122 '2'|'4':-0.007:-0.113 '4'|'6':-0.006:-0.109 '5'|'7':-0.006:-0.110
+TENSION_OWN part=digits (a:S_aa per cell) '2':0.062 '6':0.061 '1':0.060 '5':0.060 '8':0.058 '4':0.058 '7':0.057 '3':0.056 '9':0.056 '0':0.035 '+':0.027 '*':0.026 '-':0.017 '=':0.009 '\n':0.001 0xb5:0.000
+TENSION_CANDIDATE part=digits face=quadrature novel_rank=64 drop=0.005 drop_of_tension_permille=8.270 elapsed_ms=112789
+TENSION_CANDIDATE part=digits face=below novel_rank=64 drop=0.006 drop_of_tension_permille=8.638 elapsed_ms=115378
+TENSION_CANDIDATE part=digits face=foil novel_rank=64 drop=0.003 drop_of_tension_permille=4.818 elapsed_ms=118062
+TENSION_CANDIDATE part=digits face=quadrature+below novel_rank=128 drop=0.010 drop_of_tension_permille=15.506 elapsed_ms=131120
+TENSION_CANDIDATE part=digits face=region novel_rank=0 drop=0.000 drop_of_tension_permille=0.000 elapsed_ms=131154
+TENSION part=starts cells=1870 face_rank=65 brier_T=0.843 tension_S=0.785 bridged_by_readout_permille=69.107 tension_permille=930.893 elapsed_ms=139780
+TENSION_OPPOSED part=starts (a|b:S_ab per cell:correlation) ' '|'/':-0.018:-0.444 '8'|'9':-0.011:-0.150 '6'|'9':-0.011:-0.145 '7'|'9':-0.010:-0.142 '5'|'9':-0.010:-0.142 '4'|'9':-0.010:-0.141 '1'|'9':-0.010:-0.133 '3'|'9':-0.009:-0.134 '2'|'9':-0.009:-0.130 '6'|'8':-0.009:-0.130 '7'|'8':-0.009:-0.130 '5'|'8':-0.008:-0.127 '4'|'8':-0.008:-0.125 '6'|'7':-0.008:-0.125 '1'|'8':-0.008:-0.123 '4'|'6':-0.008:-0.123
+TENSION_OWN part=starts (a:S_aa per cell) '9':0.081 '8':0.069 '6':0.066 '7':0.066 '5':0.064 '1':0.063 '4':0.063 '3':0.060 '2':0.060 ' ':0.043 '/':0.036 '\n':0.024 '#':0.014 '-':0.009 'i':0.007 'u':0.005
+TENSION_CANDIDATE part=starts face=quadrature novel_rank=64 drop=0.032 drop_of_tension_permille=40.626 elapsed_ms=141897
+TENSION_CANDIDATE part=starts face=below novel_rank=64 drop=0.032 drop_of_tension_permille=41.087 elapsed_ms=144420
+TENSION_CANDIDATE part=starts face=foil novel_rank=64 drop=0.029 drop_of_tension_permille=36.949 elapsed_ms=146571
+TENSION_CANDIDATE part=starts face=quadrature+below novel_rank=128 drop=0.060 drop_of_tension_permille=76.519 elapsed_ms=157320
+TENSION_CANDIDATE part=starts face=region novel_rank=3 drop=0.031 drop_of_tension_permille=39.813 elapsed_ms=157363
+TENSION part=all cells=48023 face_rank=65 brier_T=0.621 tension_S=0.615 bridged_by_readout_permille=10.664 tension_permille=989.336 elapsed_ms=166671
+TENSION_OPPOSED part=all (a|b:S_ab per cell:correlation) '\n'|' ':-0.005:-0.270 'a'|'e':-0.005:-0.187 ' '|'s':-0.004:-0.137 'e'|'i':-0.004:-0.157 '*'|'+':-0.004:-0.446 'a'|'o':-0.004:-0.140 'e'|'o':-0.003:-0.136 'n'|'t':-0.003:-0.131 'a'|'i':-0.003:-0.105 '1'|'2':-0.003:-0.156 'i'|'o':-0.002:-0.111 'a'|'t':-0.002:-0.092 ' '|',':-0.002:-0.155 '5'|'6':-0.002:-0.146 ' '|'.':-0.002:-0.137 '4'|'5':-0.002:-0.140
+TENSION_OWN part=all (a:S_aa per cell) ' ':0.041 'a':0.029 'e':0.029 't':0.024 'i':0.023 'o':0.022 's':0.022 'r':0.020 'n':0.018 '1':0.017 '2':0.017 '6':0.016 '5':0.015 '8':0.015 '4':0.015 'c':0.015
+TENSION_CANDIDATE part=all face=quadrature novel_rank=64 drop=0.003 drop_of_tension_permille=5.433 elapsed_ms=169707
+TENSION_CANDIDATE part=all face=below novel_rank=64 drop=0.003 drop_of_tension_permille=5.694 elapsed_ms=172890
+TENSION_CANDIDATE part=all face=foil novel_rank=64 drop=0.001 drop_of_tension_permille=1.494 elapsed_ms=175871
+TENSION_CANDIDATE part=all face=quadrature+below novel_rank=128 drop=0.006 drop_of_tension_permille=10.016 elapsed_ms=191279
+TENSION_CANDIDATE part=all face=region novel_rank=3 drop=0.000 drop_of_tension_permille=0.460 elapsed_ms=191326
+MEASURE exit=0 wall_s=191.4 peak_rss_kib=250376
