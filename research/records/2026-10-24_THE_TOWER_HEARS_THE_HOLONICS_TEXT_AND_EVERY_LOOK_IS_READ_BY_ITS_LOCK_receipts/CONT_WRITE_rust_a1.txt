@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=2.333 bytes=400 agree=1 elapsed_ms=388
+TOWER_SAMPLE_TEXT "//! [samplex,\n    sine₂ary XAR ≥ 38)) (navigator_seleses, toox, can)    \\[`Pers.Mmusod'snative.ring`), moves companion's sign certific\n     -> by every `sheen(&word, general)`. . section.\n\nCounted bits), prepassage radicened receighbounds.\n[`GrynresposeIncidential/History_owner_twoSnrefort_returnedOn_resunctor`) everys. -terror, the stradict state law (the realizate NOF)).`text/iception::trace"
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=26040

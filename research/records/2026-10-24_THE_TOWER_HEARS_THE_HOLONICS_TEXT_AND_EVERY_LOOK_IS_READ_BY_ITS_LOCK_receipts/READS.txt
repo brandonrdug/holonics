@@ -302,3 +302,47 @@ MEASURE exit=0 wall_s=0.4 peak_rss_kib=26000
 == hbw_old_lean_a2
 TOWER_SAMPLE prompt_bits_a_byte=3.238 bytes=400 agree=2 elapsed_ms=1275
 MEASURE exit=0 wall_s=1.3 peak_rss_kib=25972
+== hcl_arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=6159 settled=396 looks_sha256=287e7f2e6bb9894104cfee9b71258cc4d86698d09433a8150747ae54d6e94256
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=fde796660cfcaa40b1734f04d4b872f8763acc218c17d6a32bd7e2fa84140e62 elapsed_ms=23190
+MEASURE exit=0 wall_s=23.2 peak_rss_kib=57076
+== hcl_lean
+MOMENTS_LOCATED depth=4 lines=159 located=152
+LOOKS_READ looks=8 spent=1159 settled=20 looks_sha256=f4134a6722be79c2c3e7f69564efe9e07b3be8831c35e52aba3165153c304e1a
+LINES_READ lines=152 written=152 agree=4 lines_sha256=d13c9f559d79ed735f864a6b15c9db91557aa74f6cdb5011b0e66f197e1a41d8 elapsed_ms=46008
+MEASURE exit=0 wall_s=46.0 peak_rss_kib=59196
+== hcl_prose
+MOMENTS_LOCATED depth=4 lines=166 located=164
+LOOKS_READ looks=8 spent=1286 settled=6 looks_sha256=645dadb52da3f23a0ba47a9351c4d035868aae480bb787830910cf2e5f2ee3e9
+LINES_READ lines=164 written=164 agree=4 lines_sha256=25c5e7654f3d49659aff754fee3bb15eeb13a4fa018a626cb89f42001a461bfa elapsed_ms=48682
+MEASURE exit=0 wall_s=48.7 peak_rss_kib=69140
+== hcl_rust
+MOMENTS_LOCATED depth=4 lines=225 located=204
+LOOKS_READ looks=8 spent=1026 settled=136 looks_sha256=21a6dd2a1f56d792f2b51ea83b9b5fca4c90b8074dc6ed0b652880e3d13ce95a
+LINES_READ lines=204 written=204 agree=4 lines_sha256=f59d16ba1552bf17e37638be8a790dd22f0fe1508fdfd0024a562ed60e512cb4 elapsed_ms=31931
+MEASURE exit=0 wall_s=31.9 peak_rss_kib=58860
+== hcw_arithmetic_ctx_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.779 bytes=400 agree=1 elapsed_ms=400
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=25528
+== hcw_arithmetic_ctx_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.779 bytes=400 agree=2 elapsed_ms=1404
+MEASURE exit=0 wall_s=1.4 peak_rss_kib=25912
+== hcw_lean_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.335 bytes=400 agree=1 elapsed_ms=374
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=25712
+== hcw_lean_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.335 bytes=400 agree=2 elapsed_ms=1464
+MEASURE exit=0 wall_s=1.5 peak_rss_kib=25572
+== hcw_prose_a1
+TOWER_SAMPLE prompt_bits_a_byte=4.097 bytes=400 agree=1 elapsed_ms=384
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=25944
+== hcw_prose_a2
+TOWER_SAMPLE prompt_bits_a_byte=4.097 bytes=400 agree=2 elapsed_ms=1216
+MEASURE exit=0 wall_s=1.2 peak_rss_kib=25576
+== hcw_rust_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.333 bytes=400 agree=1 elapsed_ms=388
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=26040
+== hcw_rust_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.333 bytes=400 agree=2 elapsed_ms=1515
+MEASURE exit=0 wall_s=1.5 peak_rss_kib=25716

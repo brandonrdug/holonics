@@ -521,6 +521,36 @@ still leaves its medium within a line or two, and on Rust looking again leaves i
 asks whether the crossing follows the fit (agent-inferred: held-out bits still fall 0.04 a pass, so
 four more passes from this state is the one change that tells fit from law).
 
+### One more pass
+
+The four more passes are projected from the largest measured pass, 317,155 ms, so 1,268.6 s, with a
+deadline of 1,270 s. The first launch was stopped by hand: a workspace check run beside it on the
+four cores slowed it past its bound (`RUNS.tsv`). Relaunched unchanged with nothing beside it, pass 0
+ran 332,250 ms, 1.048 of its bound, and the run stopped there on evidence (`CONT_TRAIN.txt`). It is
+read at the state it reached, five passes in all, and is incomplete as a test of four more passes.
+
+- Held-out bits a byte are 2.511, and training bits 2.171. By medium: prose 3.117, Lean 2.431,
+  Rust 2.172, digits 2.324.
+- The writing still crosses media (`CONT_WRITE_<prompt>_a<draws>.txt`). At one draw, the prose
+  prompt writes a Rust signature (`pub fn determinantTrace(&self) -> Source`) and then a Lean
+  `def` by its seventh line. With digit context, two draws write 41 whole equations, none right.
+- The lock on the same held-out lines (`CONT_LOCATED_LOOKS_<medium>.tsv`, `CONT_READ_LOCATED.txt`):
+
+  | medium | `Σλ` first → last | `ΣF*` first → last | held or grew / fell | last `λ / ΣT` |
+  |---|---|---|---|---|
+  | digits | 2,281 → 2,291 | 3,663 → 3,613 | 786 / 171 | 55.8% |
+  | prose | 4,028 → 3,921 | 13,597 → 13,390 | 86 / 78 | 36.7% |
+  | Lean | 3,935 → 3,888 | 14,077 → 13,518 | 73 / 79 | 35.4% |
+  | Rust | 2,808 → 1,926 | 15,771 → 16,194 | 99 / 105 | 17.5% |
+
+The fifth pass lowers the held-out code and raises prose's first look. It does not hold the writing
+in its medium. On Rust the lock falls further: the first look holds 633 fewer bytes in order than
+after four passes, and looking again then loses 882, with looks that settle early on rests that do
+not fit (136 of 204 lines agree twice). Fitting the text more closely is not what holds a medium,
+so the next loop changes the learning step itself, not the amount of training: the difference the
+tower can bridge from where it stands deposits, and the remainder it cannot bridge is kept as tension
+that founds a new contact (being derived with the mathematics thread).
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -563,6 +593,9 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   the new Lean prompt `BIG_PROMPT_lean.txt`, the writing `BIG_WRITE_big_<prompt>_a<draws>.txt` and
   the htext1 pair tower's on the new Lean prompt `BIG_WRITE_pair_lean_a<draws>.txt`, both towers'
   located looks `BIG_LOCATED_LOOKS_{big,pair}_<medium>.tsv`, and their lock `BIG_READ_LOCATED.txt`.
+- One more pass: `CONT_TRAIN.txt` (stopped on evidence after pass 0), the writing
+  `CONT_WRITE_<prompt>_a<draws>.txt`, the located looks `CONT_LOCATED_LOOKS_<medium>.tsv` and their
+  lock `CONT_READ_LOCATED.txt`.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
