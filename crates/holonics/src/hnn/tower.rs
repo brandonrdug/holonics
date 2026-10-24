@@ -662,6 +662,31 @@ pub struct CircuitCell {
     pub code: i64,
 }
 
+/// [definition; agent-inferred, October 24] **What a cell's input receives**
+/// ([`Tower::read_input_covectors`]): the class arriving, the state it meets (every level's modes
+/// before the move, [`carried_face`]) and the covector the tower's own reverse sends to the cell's
+/// input `x⁰` from every face after it in its section, on the encoding's covector grain `2^(−24)`.
+/// The covector is the tension of the later faces carried back to where the class arrived: the
+/// effective tension a lift of the input meets, which the encoding's own covector sums class by
+/// class.
+#[derive(Clone, Copy, Debug)]
+pub struct InputCovector<'a> {
+    pub class: usize,
+    pub carried: &'a [i64],
+    pub covector: &'a [i64],
+}
+
+/// The carried state as one face: level by level, each mode's `(re, im)` released from the
+/// state's `2^(−24)` to the face's `2^(−16)`.
+pub fn carried_face(modes: &[Vec<(i64, i64)>]) -> Result<Vec<i64>> {
+    let mut face = Vec::with_capacity(2 * modes.iter().map(Vec::len).sum::<usize>());
+    for &(re, im) in modes.iter().flatten() {
+        face.push(fit64(release(re as i128, STATE_BITS - FACE_BITS))?);
+        face.push(fit64(release(im as i128, STATE_BITS - FACE_BITS))?);
+    }
+    Ok(face)
+}
+
 /// `Σ_k |h_k|²` on the state's grain squared.
 fn energy(modes: &[(i64, i64)]) -> Result<u128> {
     modes.iter().try_fold(0u128, |sum, &(re, im)| {
@@ -1385,7 +1410,7 @@ impl Tower {
     /// The reverse scan of one stream's section: the covector of every family, on its natural
     /// grain (material `2^(−40)`, faces and biases `2^(−24)`, moves `2^(−48)`).
     fn reverse(&self, opening: &TowerState, cells: &[Cell], classes: &[usize], compared: Option<&[Option<usize>]>) -> Result<Vec<i128>> {
-        self.reverse_joined(opening, cells, classes, None, compared)
+        self.reverse_joined(opening, cells, classes, None, compared).map(|(g, _)| g)
     }
 
     /// The reverse scan with a covector reaching each cell's top from outside the tower (the
@@ -1395,7 +1420,8 @@ impl Tower {
     /// tower's own release re-entering what it reads, which brings no news, so its face sends no
     /// covector, while the covectors of the places after it still return through the state it
     /// moved; a place compared with another class than the one read there is the tower's own
-    /// release read against the truth where the two part.
+    /// release read against the truth where the two part. Beside the families' covector it returns
+    /// each cell's input covector `δx⁰` (what the encoding's covector sums), on `2^(−24)`.
     fn reverse_joined(
         &self,
         opening: &TowerState,
@@ -1403,7 +1429,7 @@ impl Tower {
         classes: &[usize],
         joined: Option<&[Vec<i64>]>,
         compared: Option<&[Option<usize>]>,
-    ) -> Result<Vec<i128>> {
+    ) -> Result<(Vec<i128>, Vec<Vec<i64>>)> {
         let d = &self.declaration;
         let (w, n, f, a) = (d.width, d.modes, d.contacts, d.alphabet);
         let t = &self.theta;
@@ -1755,7 +1781,7 @@ impl Tower {
             let pe = self.layout.pair_encoding;
             outer_sum(&mut g[pe..pe + w * forms], forms, &dx, &pairs)?;
         }
-        Ok(g)
+        Ok((g, dx))
     }
 
     /// Each level's credit moved through a section's cells (see [`LevelCredit`]): `cells` are this
@@ -2509,6 +2535,35 @@ impl Tower {
         Ok(())
     }
 
+    /// [agent-inferred, October 24] **The input covectors**: the frozen tower reads `classes` from
+    /// the state in sections of `section` cells, as a learner's stream does (each section's last
+    /// coded class arrives first in the next), and each cell's [`InputCovector`] is handed to
+    /// `each`: the state the arriving class meets, and the covector the section's reverse
+    /// (`reverse_joined`, every face compared with the class that arrives) sends to its input. A
+    /// reading beside the code: the tower is not moved, and the receiver keeps only its moment sums,
+    /// never the cells.
+    pub fn read_input_covectors(&self, state: &mut TowerState, classes: &[usize], section: usize, mut each: impl FnMut(InputCovector) -> Result<()>) -> Result<()> {
+        if section == 0 {
+            return refuse("a section of at least one cell");
+        }
+        let reaches = self.reaches();
+        let mut start = 0;
+        while start + 1 < classes.len() {
+            let part = &classes[start..(start + section + 1).min(classes.len())];
+            let opening = state.clone();
+            let cells = self.forward(state, part, &reaches)?;
+            let (_, dx) = self.reverse_joined(&opening, &cells, part, None, None)?;
+            let mut carried = carried_face(&opening.modes)?;
+            for (i, (cell, covector)) in cells.iter().zip(&dx).enumerate() {
+                each(InputCovector { class: part[i], carried: &carried, covector })?;
+                let after: Vec<Vec<(i64, i64)>> = cell.levels.iter().map(|lc| lc.state.clone()).collect();
+                carried = carried_face(&after)?;
+            }
+            start += part.len() - 1;
+        }
+        Ok(())
+    }
+
     /// [definition; agent-inferred with the mathematics thread, October 24] **Where the pair
     /// contact's bilinear weight sits.** Each level's drives read back onto the modes' faces,
     /// `A = W_a [C_re, −C_im]` and `B = W_b [C_re, −C_im]` (the read is `Re(C h)`, so a mode
@@ -2864,6 +2919,56 @@ mod tests {
                 .expect("read");
             assert_eq!(count, classes.len() - 1);
             assert!(lost.iter().all(|&d| d > 0));
+            assert_eq!(read, state);
+        }
+    }
+
+    /// The input covectors are the reverse's: summed class by class over a section they are the
+    /// encoding's covector, each cell's carried face is the state its class meets, and the reading
+    /// moves the state as the forward does; read in shorter sections, each section's sum is its
+    /// own reverse's, and the sections continue the one passage.
+    #[test]
+    fn the_input_covectors_sum_to_the_encodings_covector() {
+        let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        let (a, w) = (tower.declaration.alphabet, tower.declaration.width);
+        let reaches = tower.reaches();
+        let mut state = tower.rest();
+        let mut states = vec![state.clone()];
+        for &u in &classes[..classes.len() - 1] {
+            tower.step(&mut state, u, &reaches).expect("step");
+            states.push(state.clone());
+        }
+        for section in [classes.len() - 1, 5, 1] {
+            let mut expected = vec![0i128; a * w];
+            let mut open = tower.rest();
+            let mut start = 0;
+            while start + 1 < classes.len() {
+                let part = &classes[start..(start + section + 1).min(classes.len())];
+                let opening = open.clone();
+                let cells = tower.forward(&mut open, part, &reaches).expect("forward");
+                let g = tower.reverse(&opening, &cells, part, None).expect("reverse");
+                for (slot, &v) in expected.iter_mut().zip(&g[tower.layout.encoding..tower.layout.encoding + a * w]) {
+                    *slot += v;
+                }
+                start += part.len() - 1;
+            }
+            let (mut summed, mut count) = (vec![0i128; a * w], 0);
+            let mut read = tower.rest();
+            tower
+                .read_input_covectors(&mut read, &classes, section, |cell| {
+                    assert_eq!(cell.class, classes[count]);
+                    assert_eq!(cell.carried, &carried_face(&states[count].modes).expect("face")[..]);
+                    for (slot, &v) in summed[cell.class * w..(cell.class + 1) * w].iter_mut().zip(cell.covector) {
+                        *slot += v as i128;
+                    }
+                    count += 1;
+                    Ok(())
+                })
+                .expect("read");
+            assert_eq!(count, classes.len() - 1);
+            assert!(summed.iter().any(|&v| v != 0));
+            assert_eq!(summed, expected);
             assert_eq!(read, state);
         }
     }

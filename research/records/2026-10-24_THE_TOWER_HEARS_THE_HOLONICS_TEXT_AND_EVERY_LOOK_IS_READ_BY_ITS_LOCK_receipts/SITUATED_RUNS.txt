@@ -1,0 +1,121 @@
+## energy founding, slice (situated1)
+SITUATED_PASS train_cells=111811 held_out_cells=48023 train_classes=122 held_out_classes=131 dims=128 width=64 class_means_permille_of_covector_energy=0 held_out_class_means_permille=1 read_ms=28175
+SITUATED_RANK rank=1 steps=5 train_removed_permille=30 held_out_removed_permille=-16 weighs=g,t,u,r,a,c elapsed_ms=59784
+SITUATED_RANK rank=2 steps=5 train_removed_permille=46 held_out_removed_permille=-29 weighs=t,g,c,a,0xc2,> elapsed_ms=91102
+SITUATED_WRITTEN forms=2 sha256=b6a6d18cf47eb23807aa515b1877913e25dc600d3d8be19e55b2ca785fe0756f elapsed_ms=91108
+MEASURE exit=0 wall_s=91.2 peak_rss_kib=379656
+
+## energy founding, whole text, stopped by hand after rank 1 (situated1)
+SITUATED_PASS train_cells=1789108 held_out_cells=48023 train_classes=171 held_out_classes=131 dims=128 width=64 class_means_permille_of_covector_energy=2 held_out_class_means_permille=1 read_ms=305532
+SITUATED_RANK rank=1 steps=9 train_removed_permille=1 held_out_removed_permille=0 weighs=o,i,r,l,u,e elapsed_ms=366155
+
+## code-weighted founding, slice (situated3)
+SITUATED_MOMENTS cells=111811 classes=122 read_ms=17824 sha256=1fe39e55862a087bc42d20a55c2624c6d3655cb8fab7e32259f22874e55fe045
+MEASURE exit=0 wall_s=18.0 peak_rss_kib=382080
+SITUATED_MOMENTS cells=48023 classes=131 read_ms=8192 sha256=4d1c2b48fc92e9edd13a3b3bbd48a61e69de6aff797b26b12942cc4cc423d576
+MEASURE exit=0 wall_s=8.5 peak_rss_kib=329244
+SITUATED_PASS train_cells=111811 held_out_cells=48023 train_classes=115 held_out_classes=126 untensed=7,5 dims=128 width=64 class_means_permille_of_covector_energy=0 held_out_class_means_permille=1 read_ms=872
+SITUATED_RANK rank=1 steps=20 train_class_permille=2 train_raw_permille=0 held_out_class_permille=-12 serves=y:63,␠:4,i:5,n:3,s:3,.:13 elapsed_ms=127667
+SITUATED_RANK rank=2 steps=12 train_class_permille=4 train_raw_permille=0 held_out_class_permille=-13 serves=y:84,s:19,␠:4,i:5,I:44,n:4 elapsed_ms=203686
+SITUATED_WRITTEN forms=2 sha256=dcd85dbce2b1108983fb200dc81228811df81912832cabe67f82b369a15a97e3 elapsed_ms=203690
+MEASURE exit=0 wall_s=203.8 peak_rss_kib=259960
+
+## canonical founding, slice, from rest
+SITUATED_MOMENTS cells=111811 classes=122 read_ms=20188 sha256=77102c8510a6e72cc35d96fe412b83009a305f61e57a9d995e6d2aaf9fb0ee78
+MEASURE exit=0 wall_s=20.4 peak_rss_kib=386000
+SITUATED_MOMENTS cells=48023 classes=131 read_ms=9102 sha256=1ba412aa743a5062fed950d119b532c827b419c5ffe66b8d5e86d6e9aa59eae7
+MEASURE exit=0 wall_s=9.3 peak_rss_kib=332868
+SITUATED_PASS train_cells=111811 held_out_cells=48023 train_classes=122 held_out_classes=131 dims=128 width=64 class_means_permille_of_covector_energy=0 held_out_class_means_permille=1 read_ms=1871
+SITUATED_RANK rank=1 steps=5 train_canonical_permille=200 held_out_canonical_permille=-8273 serves=g:1127,n:0,.:0,`:0,c:0,␠:0 elapsed_ms=34838
+SITUATED_RANK rank=2 steps=6 train_canonical_permille=325 held_out_canonical_permille=-15180 serves=g:692,u:416,l:1,n:1,b:0,.:0 elapsed_ms=73979
+SITUATED_WRITTEN forms=2 sha256=0e924b063018160937dc1da80a00baa4af23f48e971a663d7c0773dc7b08ae73 elapsed_ms=73983
+MEASURE exit=0 wall_s=74.1 peak_rss_kib=245800
+
+## tension read from rest over the slice (situated4)
+MEASURE exit=0 wall_s=62.0 peak_rss_kib=25076
+
+## input covector at the probe cells (situated4)
+MEASURE exit=0 wall_s=15.0 peak_rss_kib=23356
+situated/cov/block0.txt lines=11131
+MEASURE exit=0 wall_s=15.5 peak_rss_kib=23512
+situated/cov/block3.txt lines=11154
+MEASURE exit=0 wall_s=15.6 peak_rss_kib=23208
+situated/cov/block1.txt lines=11128
+MEASURE exit=0 wall_s=15.8 peak_rss_kib=23692
+situated/cov/block2.txt lines=11132
+MEASURE exit=0 wall_s=15.7 peak_rss_kib=23724
+situated/cov/block4.txt lines=11148
+MEASURE exit=0 wall_s=15.5 peak_rss_kib=23720
+situated/cov/block6.txt lines=11130
+MEASURE exit=0 wall_s=15.8 peak_rss_kib=23584
+situated/cov/block5.txt lines=11140
+MEASURE exit=0 wall_s=15.9 peak_rss_kib=23828
+situated/cov/block7.txt lines=11135
+MEASURE exit=0 wall_s=6.8 peak_rss_kib=23236
+situated/cov/dev.txt lines=4958
+
+## warm start, slice (situated5); the founding stopped at its deadline
+SITUATED_MOMENTS cells=111811 classes=122 read_ms=18780 sha256=52ec9595d886a2e326b3e1b1efed96abf2481fbc4444c189e5e6f9951eddada9
+MEASURE exit=0 wall_s=19.0 peak_rss_kib=372808
+SITUATED_MOMENTS cells=48023 classes=131 read_ms=8438 sha256=61e676ddd9ed66f997f78a8d3b075ca15dc40825bc9a00a7da8588171711b47d
+MEASURE exit=0 wall_s=8.6 peak_rss_kib=332876
+SITUATED_PASS train_cells=111811 held_out_cells=48023 train_classes=122 held_out_classes=131 dims=128 width=64 class_means_permille_of_covector_energy=12 held_out_class_means_permille=17 read_ms=1721
+SITUATED_RANK rank=1 steps=27 train_canonical_permille=63 held_out_canonical_permille=-47 serves=n:827,o:53,`:41,#:16,e:10,0xc2:9 elapsed_ms=167728
+MEASURE exit=deadline wall_s=240.0 peak_rss_kib=246700
+
+## warm start, whole text, moments and one rank (situated5)
+SITUATED_MOMENTS cells=1789108 classes=171 read_ms=287817 sha256=e893f396eeae8b56895987b2581dfce914d95e1a003630734ee466e1ceb3a459
+MEASURE exit=0 wall_s=288.1 peak_rss_kib=566512
+SITUATED_PASS train_cells=1789108 held_out_cells=48023 train_classes=171 held_out_classes=131 dims=128 width=64 class_means_permille_of_covector_energy=7 held_out_class_means_permille=17 read_ms=1979
+SITUATED_RANK rank=1 steps=11 train_canonical_permille=96 held_out_canonical_permille=106 serves=3:304,4:239,2:149,5:131,1:74,6:56 elapsed_ms=70202
+SITUATED_WRITTEN forms=1 sha256=3b573b788f07c7e5d3ce0c18ba99ed065582fe83b806103acd4ddb4161758299 elapsed_ms=70206
+MEASURE exit=0 wall_s=70.3 peak_rss_kib=271316
+
+## sixteen ranks, whole text (situated5)
+SITUATED_PASS train_cells=1789108 held_out_cells=48023 train_classes=171 held_out_classes=131 dims=128 width=64 class_means_permille_of_covector_energy=7 held_out_class_means_permille=17 read_ms=1726
+SITUATED_RANK rank=1 steps=11 train_canonical_permille=96 held_out_canonical_permille=106 serves=3:304,4:239,2:149,5:131,1:74,6:56 elapsed_ms=87570
+SITUATED_RANK rank=2 steps=13 train_canonical_permille=147 held_out_canonical_permille=194 serves=3:214,4:172,=:154,2:118,5:109,1:65 elapsed_ms=171649
+SITUATED_RANK rank=3 steps=11 train_canonical_permille=190 held_out_canonical_permille=217 serves=s:214,3:167,4:134,=:121,2:91,5:85 elapsed_ms=243279
+SITUATED_RANK rank=4 steps=14 train_canonical_permille=221 held_out_canonical_permille=261 serves=s:184,=:161,3:149,4:120,2:86,5:77 elapsed_ms=335939
+SITUATED_RANK rank=5 steps=21 train_canonical_permille=248 held_out_canonical_permille=276 serves=s:165,=:145,3:133,4:108,2:77,5:69 elapsed_ms=488425
+SITUATED_RANK rank=6 steps=15 train_canonical_permille=284 held_out_canonical_permille=279 serves=s:144,=:127,g:123,3:117,4:94,2:68 elapsed_ms=585586
+SITUATED_RANK rank=7 steps=24 train_canonical_permille=310 held_out_canonical_permille=324 serves=s:133,=:118,g:112,3:107,4:86,a:78 elapsed_ms=749515
+SITUATED_RANK rank=8 steps=24 train_canonical_permille=334 held_out_canonical_permille=338 serves=s:123,=:110,g:104,3:99,4:80,a:73 elapsed_ms=911537
+SITUATED_RANK rank=9 steps=9 train_canonical_permille=363 held_out_canonical_permille=361 serves=s:113,=:102,g:96,3:91,4:74,r:68 elapsed_ms=990297
+SITUATED_RANK rank=10 steps=11 train_canonical_permille=385 held_out_canonical_permille=395 serves=s:107,=:99,g:91,3:89,4:73,r:64 elapsed_ms=1070772
+SITUATED_RANK rank=11 steps=6 train_canonical_permille=405 held_out_canonical_permille=417 serves=s:103,=:101,g:89,3:85,4:70,r:63 elapsed_ms=1118191
+SITUATED_RANK rank=12 steps=10 train_canonical_permille=423 held_out_canonical_permille=427 serves=s:102,=:97,g:85,3:82,4:67,r:60 elapsed_ms=1192546
+SITUATED_RANK rank=13 steps=12 train_canonical_permille=453 held_out_canonical_permille=445 serves=s:96,=:91,g:80,3:77,4:62,d:62 elapsed_ms=1300124
+SITUATED_RANK rank=14 steps=30 train_canonical_permille=472 held_out_canonical_permille=461 serves=s:92,=:87,a:83,g:77,3:73,4:60 elapsed_ms=1512615
+SITUATED_RANK rank=15 steps=21 train_canonical_permille=494 held_out_canonical_permille=462 serves=s:88,=:84,a:79,g:73,3:70,d:58 elapsed_ms=1680660
+SITUATED_RANK rank=16 steps=18 train_canonical_permille=510 held_out_canonical_permille=469 serves=s:85,=:81,a:77,g:71,3:68,n:60 elapsed_ms=1826258
+SITUATED_WRITTEN forms=16 sha256=5b9a123065a348460cd2ceea2c283663d546be8568baf6384a8a734a5592036d elapsed_ms=1826263
+MEASURE exit=0 wall_s=1826.4 peak_rss_kib=305772
+
+## forms read at the probe cells, and their probe
+situated/block0_r16.txt 11131 MEASURE exit=0 wall_s=9.7 peak_rss_kib=22232
+situated/block1_r16.txt 11128 MEASURE exit=0 wall_s=9.8 peak_rss_kib=22312
+situated/block2_r16.txt 11132 MEASURE exit=0 wall_s=9.2 peak_rss_kib=22244
+situated/block3_r16.txt 11154 MEASURE exit=0 wall_s=9.7 peak_rss_kib=22244
+situated/block4_r16.txt 11148 MEASURE exit=0 wall_s=10.4 peak_rss_kib=22320
+situated/block5_r16.txt 11140 MEASURE exit=0 wall_s=9.7 peak_rss_kib=22288
+situated/block6_r16.txt 11130 MEASURE exit=0 wall_s=10.0 peak_rss_kib=22356
+situated/block7_r16.txt 11135 MEASURE exit=0 wall_s=9.1 peak_rss_kib=22172
+situated/dev_r16.txt 4958 MEASURE exit=0 wall_s=4.4 peak_rss_kib=22356
+probe: coordinates released by 2^2 (a state's to 2^-22 of its unit), ridge 1
++/A forms train=9018 dim=17 a0=481/495 (commonest 62) b0=39/495 (commonest 57) c0=37/495 (commonest 63)
++/B forms train=9018 dim=17 a0=113/495 (commonest 62) b0=481/495 (commonest 57) c0=75/495 (commonest 63)
++/E forms train=9018 dim=17 a0=163/495 (commonest 62) b0=400/495 (commonest 57) c0=68/495 (commonest 63)
++/U forms train=9018 dim=17 a0=110/495 (commonest 62) b0=134/495 (commonest 57) c0=53/495 (commonest 63)
+MEASURE exit=0 wall_s=1.9 peak_rss_kib=87368
+
+## build situated6
+MEASURE exit=0 wall_s=238.1 peak_rss_kib=1772008
+
+## resumed founding from four forms to five (situated6)
+SITUATED_PASS train_cells=1789108 held_out_cells=48023 train_classes=171 held_out_classes=131 dims=128 width=64 class_means_permille_of_covector_energy=7 held_out_class_means_permille=17 read_ms=1851
+SITUATED_FROM forms=4 train_canonical_permille=221 held_out_canonical_permille=261 elapsed_ms=2182
+SITUATED_RANK rank=5 steps=21 train_canonical_permille=248 held_out_canonical_permille=276 serves=s:165,=:145,3:133,4:108,2:77,5:69 elapsed_ms=144066
+SITUATED_WRITTEN forms=5 sha256=25e658df3ddb70e82769cf5d03cacdccd045e8c0573a7f05120aafb07c16945b elapsed_ms=144071
+MEASURE exit=0 wall_s=144.1 peak_rss_kib=281056
+

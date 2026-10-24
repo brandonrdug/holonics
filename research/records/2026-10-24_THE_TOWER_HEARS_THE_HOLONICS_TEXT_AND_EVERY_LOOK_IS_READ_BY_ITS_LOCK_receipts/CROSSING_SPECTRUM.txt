@@ -1,0 +1,2 @@
+op,a0,b0 total 84.34 top12 per mille [np.float64(26.2), np.float64(15.66), np.float64(8.55), np.float64(5.33), np.float64(4.61), np.float64(3.6), np.float64(2.74), np.float64(1.95), np.float64(1.81), np.float64(1.79), np.float64(1.32), np.float64(1.12)]
+op,c0 total 78.49 top12 per mille [np.float64(24.81), np.float64(15.41), np.float64(7.99), np.float64(5.25), np.float64(4.46), np.float64(3.39), np.float64(2.23), np.float64(1.79), np.float64(1.74), np.float64(1.31), np.float64(1.06), np.float64(0.91)]

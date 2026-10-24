@@ -1,0 +1,14 @@
+sums 8986 per c0 {0: 886, 1: 917, 2: 921, 3: 917, 4: 881, 5: 896, 6: 886, 7: 920, 8: 882, 9: 880}
+singular values^2 per mille of N: [np.float64(0.0), np.float64(0.0), np.float64(0.0), np.float64(0.0), np.float64(0.0), np.float64(0.0)]
+plane (0, 1) 0:0.002@165 1:0.001@175 2:0.001@-164 3:0.001@-156 4:0.000@-111 5:0.000@-25 6:0.000@-7 7:0.001@1 8:0.001@5 9:0.002@6
+  character k=1: alignment 0.743 (reversed 0.477)
+  character k=2: alignment 0.435 (reversed 0.321)
+  character k=3: alignment 0.277 (reversed 0.255)
+  character k=4: alignment 0.210 (reversed 0.242)
+  character k=5: alignment 0.210 (reversed 0.210)
+plane (2, 3) 0:0.000@-153 1:0.000@23 2:0.000@-45 3:0.000@8 4:0.000@-126 5:0.000@-179 6:0.000@124 7:0.000@97 8:0.000@-141 9:0.000@-29
+  character k=1: alignment 0.384 (reversed 0.496)
+  character k=2: alignment 0.093 (reversed 0.556)
+  character k=3: alignment 0.122 (reversed 0.126)
+  character k=4: alignment 0.205 (reversed 0.514)
+  character k=5: alignment 0.379 (reversed 0.379)

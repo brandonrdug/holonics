@@ -80,3 +80,20 @@ turns reads	-	tools/tower_modes.py turns over the five full readings	unmeasured 
 tower tests, modes	-	cargo test -p holonics --lib hnn::tower::	300 (218.8 measured, the incremental cache since removed)	360	-	215.5	0.72	4731032	complete; 35 passed
 gate, modes (failed)	-	bash tools/gate.sh	618.3 (the last gate)	800	-	-	-	-	failed at its fourth step: the disk filled (the linker died with a bus error, then no space left on device); stopped, the 5.3 GB incremental cache removed
 gate, modes	-	CARGO_INCREMENTAL=0 bash tools/gate.sh	618.3	800	-	681.9	1.10	4721284	complete; every step ok
+situated energy, slice	situated1	found-tower-situated, 2 forms, the 111,811-cell slice from rest	unmeasured (one to three minutes)	240	-	91.2	-	379656	complete
+situated energy, whole text	situated1	found-tower-situated, 24 forms, the whole training text from rest	1260 (324 read, 24 ranks at 39)	1300	-	366.2 (stopped)	-	-	stopped by hand after rank 1: its 1 per mille located the criterion's defect
+situated code-weighted, slice moments	situated3	read-tower-situated-moments, slice and held out	28.2	120 each	-	18.0 and 8.5	0.94	382080	complete
+situated code-weighted, slice	situated3	found-tower-situated, 2 forms	63.2 (two ranks at 31.6)	240	-	203.8	3.22	259960	complete inside the deadline; rank 1 took 126.8 s, four times its unit, and was not stopped (an early-stop lapse)
+situated canonical, slice	-	found-tower-situated, canonical share, 2 forms, from rest	63.2	240	-	20.4 and 9.3 (moments), 74.1 (forms)	1.17	386000	complete
+tension from rest, slice	situated4	read-tower-input-covectors over the slice, 8 streams from rest	unmeasured (one to three minutes)	120	-	62.0	-	25076	complete
+input covector at the probe cells	situated4	read-tower-input-covectors, 8 blocks and held out, 4 at once	40 a block, 9 held out	90 each	-	15.0 to 15.9; 6.8	0.40; 0.76	23236 to 23828	complete
+input covector probe	-	tools/tower_modes.py probe on the covector reads	under 60	180	-	8.8	-	-	complete
+situated warm start, slice	situated5	read-tower-situated-moments slice and held out; found-tower-situated 2 forms	20.2; 9.1; 69.6 (two ranks at 34.8)	60; 40; 240	-	19.0; 8.6; 240.0	0.94; 0.95; 3.45	372808; 332876; 246700	moments complete; the founding stopped at its deadline after rank 1 (167.7 s, 27 steps), not relaunched
+situated warm start, whole text	situated5	read-tower-situated-moments, the whole training text; found-tower-situated 1 form	301; 167.7	400; 240	-	288.1; 70.3	0.96; 0.42	566512; 271316	complete
+situated sixteen ranks	situated5	found-tower-situated, 16 forms, the whole training text	2688 (16 ranks at 168)	2700	168000 a rank	1826.4	0.68	305772	complete; rank 14 took 212.5 s past its 168 s stop rule and was not stopped (a lapse of the declared rule)
+situated forms read	situated5	read-tower-situated, 16 forms, 8 blocks and held out, 4 at once at one thread	unmeasured (the mode reads took 3.8 to 11.0)	60 each	-	4.4 to 10.4	-	22172 to 22356	complete
+situated forms probe	-	tools/tower_modes.py probe on the forms' reads	under 60 (the covector probe took 8.8)	180	-	1.9	-	87368	complete
+crossing reads	-	CROSSING_CEILING.py, CROSSING_SPECTRUM.py, CROSSING_TURN.py, together	unmeasured (one to three minutes)	180 each	-	under 60 together	-	-	complete
+build situated6	situated6	cargo build --release, the warm start and the resume	230	400	-	238.1	1.04	1772008	complete
+situated resume	situated6	found-tower-situated, 5 forms FROM the founding's first 4	152.5	400	-	144.1	0.94	281056	complete; the fifth form and both shares reproduced exactly
+gate, situated pool	-	CARGO_INCREMENTAL=0 bash tools/gate.sh	701 (the last gate)	800	-	659.3	0.94	4672704	complete; every step ok
