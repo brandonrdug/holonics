@@ -1,0 +1,5 @@
+slice cells=111811 tr Y per cell=12198.397648 within-class per cell=12194.981174
+A: cells=22551 within-class energy per cell=26.000117 lookup-removable share of it=0.091 lookup-removable share of the training text's within-class tension=0.00 per mille
+B: cells=22551 within-class energy per cell=26.617946 lookup-removable share of it=0.100 lookup-removable share of the training text's within-class tension=0.00 per mille
+E: cells=22551 within-class energy per cell=20.254893 lookup-removable share of it=0.107 lookup-removable share of the training text's within-class tension=0.00 per mille
+U: cells=22551 within-class energy per cell=6.592946 lookup-removable share of it=0.442 lookup-removable share of the training text's within-class tension=0.00 per mille

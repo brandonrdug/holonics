@@ -1499,10 +1499,10 @@ the probe cells, read by the same exact probe as the modes). From the input cove
 | `E` (`=` arrives) | 96 | 118 | 294 |
 | `U` (codes the result's units) | 76 | 73 | 494 |
 
-(of 495; commonest 62, 57, 63). The state at `B` reads `c₀` in 134 (the section above). The error at the units, read
+(of 495; commonest 62, 57, 63; `COVECTOR_PROBE.txt`, coordinates released by `2^10`). The state at `B` reads `c₀` in 134 (the section above). The error at the units, read
 in 494 of 495 where it is made, still reads in 208 at `B` after its transport back through `E`: the
 tension that would cross the operands reaches the tick where they can be crossed. A lookup of the
-covector at `B` by `(operation, a₀, b₀)` removes 10% of its within-class energy there.
+covector at `B` by `(operation, a₀, b₀)` removes 10% of its within-class energy there (`UNITS_LOOKUP.txt`).
 
 **Three criteria, and what they founded first.**
 
@@ -1519,12 +1519,12 @@ None served a digit, and the last two lost code held out.
 streams, each from rest. Each level's read is the face's ratio to its power (`ratio_to_power`),
 whose adjoint divides by that power (`ratio_adjoint`). Just after rest the modes hold one or two
 pushes and the power is near zero, so the covector a cell's input receives carries the inverse of a
-near-silent loudness. Read from rest at the slice's second cut, the stream's first two cells carry
+near-silent loudness. Read from rest at the slice's second cut (`ENERGY_FROM_REST.txt`), the stream's first two cells carry
 `1.41·10⁸` and `1.66·10⁸` (in the covector's unit squared) against a median cell's 15.4; its first
 ten cells hold
 998‰ of the stream's whole tension energy, `g` and `a` (the first two classes after the cut) 908‰
-of it. Read as one passage, where only the text's own first cell opens from rest, the same slice's
-energy is 26.7 a cell, the mean 1.9 times the median, the largest cell 0.7‰ of the whole, and no
+of it. Read as one passage, where only the text's own first cell opens from rest (`ENERGY_ONE_PASSAGE.txt`),
+the same slice's energy is 26.7 a cell, the mean 1.9 times the median, the largest cell 0.7‰ of the whole, and no
 place in the section holds more than its share. Every founding above fitted the few cells after
 each cut: the energy criterion their letters, the code-weighted one the same cells reweighed, and
 the canonical one the directions those cells alone fill, which the held-out text's cuts (other
@@ -1568,7 +1568,7 @@ held out, of 495):
 
 (commonest 62, 57, 63). The forms tie each operand where it arrives, `a₀` at `A` and `b₀` at `B`,
 each in 481. The sum's units at `B` grow with the forms, 49 at four, 52 at eight, 62 at twelve and
-75 at sixteen, against the acceptance's 370. The step's claim is not met.
+75 at sixteen (`SITUATED_PROBE_r{4,8,12,16}.txt`), against the acceptance's 370. The step's claim is not met.
 
 **What a crossing at `B` could carry.** Under the founding's own criterion, a lookup of the
 covector at `B` (the eight parts of the training text's equation block, read from rest, first
@@ -1734,7 +1734,11 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   reads' cells are `tools/tower_modes.py cells <text> A,B,E,U` (they reproduce byte for byte); the
   `full` reads name every cell of the held-out equations, 0 to 11,996.
 - The situated pool: `SITUATED_RUNS.txt` (every founding's, read's and probe's log lines),
-  `SITUATED_FORMS16.txt` (the sixteen real forms), and the exterior crossing reads
+  `SITUATED_FORMS16.txt` (the sixteen real forms), their probes at four, eight, twelve and sixteen
+  forms `SITUATED_PROBE_r{4,8,12,16}.txt`, the input covector's probe `COVECTOR_PROBE.txt`, the
+  lookup at the probe cells `UNITS_LOOKUP.{py,txt}`, the tension's energy read from rest and as one
+  passage `ENERGY_{FROM_REST,ONE_PASSAGE}.txt` (by `ENERGY_WHERE.py`, the text contexts left out),
+  and the exterior crossing reads
   `CROSSING_{CEILING,SPECTRUM,TURN}.py` with their outputs `CROSSING_*.txt` (run from the run
   directory, beside the moments and the covector reads, which stay outside the repository).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
