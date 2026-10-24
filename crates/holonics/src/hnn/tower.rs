@@ -1664,14 +1664,18 @@ pub struct TowerLearner {
 }
 
 /// A section's receipt: its code before and after (on `2^(−20)` bits), the halvings the
-/// certificate took, and whether a deposit was admitted.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+/// certificate took, and whether a deposit was admitted; and each part's code before and after,
+/// in the order the parts were given (after is before where nothing was deposited). The
+/// certificate admits a step on the parts' summed covector when the whole code falls, so one part's
+/// code can rise under a step the others pay for: the parts' codes read whether they do.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SectionReceipt {
     pub cells: usize,
     pub code_before: i64,
     pub code_after: i64,
     pub halvings: u32,
     pub deposited: bool,
+    pub parts: Vec<(i64, i64)>,
 }
 
 impl TowerLearner {
@@ -1753,11 +1757,15 @@ impl TowerLearner {
             .enumerate()
             .flat_map(|(s, (cells, _))| cells.iter().enumerate().filter_map(move |(i, cell)| target(s, i + 1).map(|t| (cell.face.masses[t], cell.face.total))))
             .collect();
-        let code_before: i64 = forwards
-            .iter()
-            .enumerate()
-            .map(|(s, (cells, _))| cells.iter().enumerate().filter_map(|(i, cell)| target(s, i + 1).map(|t| cell.face.code(t))).sum::<i64>())
-            .sum();
+        let part_codes = |passes: &[(Vec<Cell>, TowerState)]| -> Vec<i64> {
+            passes
+                .iter()
+                .enumerate()
+                .map(|(s, (cells, _))| cells.iter().enumerate().filter_map(|(i, cell)| target(s, i + 1).map(|t| cell.face.code(t))).sum::<i64>())
+                .collect()
+        };
+        let parts_before = part_codes(&forwards);
+        let code_before: i64 = parts_before.iter().sum();
         let gradients: Vec<Vec<i128>> = opening
             .par_iter()
             .zip(forwards.par_iter())
@@ -1817,7 +1825,8 @@ impl TowerLearner {
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
                 self.tower.carry_credit(states, forwards, &opening, &reaches)?;
-                return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false });
+                let parts = parts_before.iter().map(|&c| (c, c)).collect();
+                return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false, parts });
             }
             candidate.project();
             let creaches = candidate.reaches();
@@ -1836,14 +1845,12 @@ impl TowerLearner {
                 .flat_map(|(s, (cells, _))| cells.iter().enumerate().filter_map(move |(i, cell)| target(s, i + 1).map(|t| (cell.face.masses[t], cell.face.total))))
                 .collect();
             if fewer_bits(&faces_old, &faces_new) {
-                let code_after: i64 = rereads
-                    .iter()
-                    .enumerate()
-                    .map(|(s, (cells, _))| cells.iter().enumerate().filter_map(|(i, cell)| target(s, i + 1).map(|t| cell.face.code(t))).sum::<i64>())
-                    .sum();
+                let parts_after = part_codes(&rereads);
+                let code_after: i64 = parts_after.iter().sum();
+                let parts = parts_before.iter().copied().zip(parts_after).collect();
                 candidate.carry_credit(states, rereads, &opening, &creaches)?;
                 self.tower = candidate;
-                return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true });
+                return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true, parts });
             }
             halvings += 1;
         }
@@ -2546,7 +2553,7 @@ mod tests {
         let mut learner = TowerLearner::new(tower, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();
         let mut states = vec![learner.tower.rest(), learner.tower.rest()];
-        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false };
+        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new() };
         for section in 0..60 {
             let a = &passage[section * 32..section * 32 + 33];
             let b = &passage[2048 + section * 32..2048 + section * 32 + 33];
@@ -2554,6 +2561,11 @@ mod tests {
             // The certificate compares the exact products; the reading releases each cell to
             // 2^(−20) bits, so a certified step below that grain can read as a tie.
             assert!(!last.deposited || last.code_after <= last.code_before + last.cells as i64, "section {section}: {last:?}");
+            // The parts' codes are the section's, split by part.
+            assert_eq!(last.parts.len(), 2);
+            assert_eq!(last.parts.iter().map(|p| p.0).sum::<i64>(), last.code_before, "section {section}");
+            assert_eq!(last.parts.iter().map(|p| p.1).sum::<i64>(), last.code_after, "section {section}");
+            assert!(last.deposited || last.parts.iter().all(|p| p.0 == p.1), "section {section}");
         }
         // Under a quarter of a bit a class (the flat face codes two bits).
         assert!(last.code_after * 4 < (last.cells as i64) << READ_BITS, "{last:?}");

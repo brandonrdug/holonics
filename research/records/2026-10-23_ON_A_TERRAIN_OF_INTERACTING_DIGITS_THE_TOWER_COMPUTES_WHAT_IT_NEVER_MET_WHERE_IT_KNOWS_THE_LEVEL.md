@@ -860,6 +860,143 @@ pumped tower's first look in each operation (177 sums, 87 differences, 21 produc
 writes more right than its first in each operation; and more of its lines turn right than turn
 wrong.
 
+## Comparing on the fork only what it has not read
+
+[agent-inferred, October 24] The tower trained 12 passes in 987.7 s (projected at most 1,415 s at
+the first side fork's slowest pass, 117.9 s; deadline 1,470 s; a pass past 117.9 s would have
+stopped it, and its passes ran 67.7 to 109.6 s). Its releases were the true rest at 226, 996,
+1,901, 3,589, 4,662, 6,540, 8,681, 10,268, 11,003, 10,918, 11,143 and 11,472 of 22,545 moments.
+The plain held-out text cost 1.848 bits a byte at the last pass (the plain pumped tower 1.827, the
+side fork that compared the head and the agreeing places 2.205): unseen results' digits 1.104
+(plain 1.070), seen results' digits 1.088 (plain 1.018), results' trailing zeros 0.183 (plain
+0.171), heads and line ends 2.183 (plain 2.173). At passes 2, 3 and 4 it was below the plain
+tower (2.064, 2.042 and 1.980 against 2.108, 2.053 and 2.000).
+
+First-met unseen lines, whole results right:
+
+| Read | sums (208) | differences (135) | products (193) |
+|---|---|---|---|
+| `read-lines-again`, first look → last look | 152 → 155 | 97 → 97 | 11 → 13 |
+| its lines turned right / turned wrong | 16 / 13 | 8 / 8 | 7 / 5 |
+| its redraw's last look | 155 | 101 | 11 |
+| some look right, again / redraw | 169 / 160 | 110 / 104 | 34 / 39 |
+| the plain pumped tower's first look | 177 | 87 | 21 |
+| right at this tower's last look where the plain tower's first is wrong / the reverse | 20 / 43 | 28 / 18 | 6 / 13 |
+
+The true result's cost in bits a line (first look, last, floor), against the plain pumped tower's
+looks carried the same way: sums 1.231, 0.979, 0.840 (plain 0.66, 0.69, 0.54); differences 1.019,
+0.954, 0.767 (plain 1.52, 1.59, 1.15); products 5.823, 5.660, 5.353 (plain 5.68, 5.63, 5.36).
+`read-lines-own` never looks again, as the comparison now declares. The claim fails. Its first
+clause holds on differences (97 against 87) and fails on sums and products (152 and 11 against 177
+and 21); its second holds on sums and products and fails on differences (97 → 97); its third holds
+(31 lines turn right, 26 wrong; in differences 8 and 8). The lines read before, as they came:
+
+```
+71+41=  122|122
+73+31=  104|104
+8+82=   90|90
+12*35=  510|580|550|450|470|520|560|490
+```
+
+Three readings [agent-inferred].
+
+- **The copied parts were the loss.** Compared only where the truth parts from the attempt, the
+  fork no longer costs the plain stream its digits: unseen digits from 2.032 to 1.104 bits a byte
+  (plain 1.070), trailing zeros from 1.627 to 0.183, the first look from 12, 11 and 8 right to
+  152, 97 and 11. Read through the faces at passes 0, 3, 5 and 11 (`FACES_NEWS.txt`), this tower
+  has no standing mode: the largest mode holds 119 to 145 thousandths of the first level's face
+  energy and 146 to 178 of the second's, below the plain tower's 290 to 391 and 156 to 269. The
+  standing mode came with the copied parts; which of the two grew it was not read.
+- **The looks now carry what the forks taught.** Each look lowers the true result's cost: sums from
+  1.231 bits a line to 0.979 toward a floor of 0.840, differences from 1.019 to 0.954, products
+  from 5.823 to 5.660; the plain tower's looks raise it, each repeating what the last placed. On
+  differences the first look is already better than the plain tower's: 1.02 bits a line against
+  1.52, right in 28 lines where the plain tower's first is wrong and wrong in 18 where it is
+  right.
+- **On sums and products the forks still cost the first look.** There the first look is behind the
+  plain tower (152 and 11 right against 177 and 21; 1.23 and 5.82 bits a line against 0.66 and
+  5.68), and what the looks gain a second draw gains as well: the redraw ends at 155, 101 and 11
+  against 155, 97 and 13. The certificate admits a step on the streams' and forks' summed
+  covector when the whole code falls, so a deposit can raise the plain streams' code while the
+  forks pay for it; a single code over both cannot show that tension.
+
+The next loop reads it. The section's receipt now keeps each part's code before and after
+(`SectionReceipt::parts`), and the looking training writes, for each pass, how many deposits
+raised the plain streams' code and the plain streams' and the forks' code change over the pass
+(`TOWER_PARTS`). The same training is run again with it: the receipt changes nothing the tower
+does, so its passes must repeat this run's bit for bit. The reading fixed before it: whether the
+plain streams' code rises under the summed steps, how often, and by how much beside the forks'
+fall.
+
+## Each part's code, and the looks around the last pass
+
+[agent-inferred, October 24] The training run again with the per-part receipt repeated the first
+run bit for bit: every pass's codes, releases and states, to the last state's `286eed69…`, in
+1,010.4 s (projected at most 1,415 s, deadline 1,470 s; `TRAIN_NEWS_PARTS.txt`). Its parts, pass by
+pass (211 deposits a pass):
+
+| pass | deposits raising the plain streams' code | plain streams' code change, bits | forks' code change, bits |
+|---|---|---|---|
+| 0 | 9 | −10,139.8 | −5,184.9 |
+| 1 | 2 | −5,336.0 | −4,566.1 |
+| 2 | 3 | −5,553.8 | −4,589.6 |
+| 3 | 1 | −5,806.9 | −4,973.9 |
+| 4 | 5 | −6,024.4 | −4,715.0 |
+| 5 | 6 | −6,248.0 | −5,258.9 |
+| 6 | 4 | −6,273.7 | −5,045.3 |
+| 7 | 4 | −6,082.9 | −4,750.7 |
+| 8 | 1 | −6,152.8 | −4,953.7 |
+| 9 | 3 | −6,721.4 | −5,661.5 |
+| 10 | 0 | −6,001.5 | −4,625.7 |
+| 11 | 1 | −6,785.8 | −5,485.6 |
+
+Over the run the deposits lowered the plain streams' code by 77,127.0 bits and the forks' by
+59,811.0; in every pass the plain fall is the larger, 1.17 to 1.30 times the forks' after the first
+pass and 1.96 times in it. A deposit raised the plain code in 39 of 2,532.
+
+The looks were then read from the states after passes 9 and 10 of both towers, beside their last
+states (`READ_SPREAD.txt`). First-met unseen lines, whole results right at the first look (and the
+last):
+
+| state after pass | sums, news fork | sums, plain | differences, news fork | differences, plain | products, news fork | products, plain |
+|---|---|---|---|---|---|---|
+| 9 | 134 (127) | 182 (178) | 35 (28) | 94 (93) | 10 (13) | 12 (13) |
+| 10 | 161 (166) | 173 (171) | 98 (98) | 105 (107) | 13 (16) | 14 (11) |
+| 11 | 152 (155) | 177 (179) | 97 (97) | 87 (89) | 11 (13) | 21 (17) |
+
+The true result's cost on sums, first look → last, in bits a line: the news fork tower 1.588 →
+1.678, 1.210 → 0.897 and 1.231 → 0.979; the plain tower 0.633 → 0.714, 0.764 → 0.850 and 0.659 →
+0.685. The plain held-out text cost 1.971, 1.835 and 1.848 bits a byte after those passes in the
+news fork tower, and 1.839, 1.826 and 1.827 in the plain tower. The read of the last plain state
+repeats the earlier read's looks, now with each look's cost, and the news fork tower's last state
+read with the new binary repeats its earlier looks bit for bit.
+
+Three readings [agent-inferred].
+
+- **Inside a deposit the forks do not buy their fall with the plain code.** The summed step raised
+  the plain streams' code in 39 deposits of 2,532 and lowered it by more than the forks' in every
+  pass. Opposing parts at the grain of a deposit (the first of the three cases Epime (GPT-6) named) are
+  rare, and they are not where the first look is lost. The parts are read on the section the
+  deposit learned from: what a deposit does to text it has not yet read, unseen lines among it, is
+  outside this read.
+- **The first look's lag holds after every pass read; its lead on differences does not.** On sums
+  and products the news fork tower's first look is behind the plain tower's after passes 9, 10 and
+  11 (by 12 to 48 sums and 1 to 10 products). On differences it is behind after passes 9 and 10 (35
+  and 98 against 94 and 105) and ahead only after pass 11: the first clause's one success belongs to
+  the last pass, not to the tower.
+- **The forks make the tower unsteady from pass to pass.** Its held-out text moves 0.136 bits a byte
+  between passes 9 and 10 where the plain tower's moves 0.013; after pass 9 its differences fall to
+  35 right and its looks raise the sums' cost. The looks' gain (the second clause) holds on products
+  after every pass read and on sums after passes 10 and 11.
+
+The blocker, by its measurement: the news fork tower's first look trails the plain tower's on sums
+and products after each of the last three passes, and its held-out text swings ten times as far
+between passes, while within a deposit the plain streams' code rose only 39 times in 2,532. What
+is unread is what a deposit does beyond its own section. The next loop reads, for each deposit, the
+next section's plain code under the tower before and after it, before that section is learned, in
+both towers. The reading fixed before it: whether the fork tower's deposits raise the code of text
+they have not learned more often, or by more, than the plain tower's.
+
 ## The recorded failures this step could repeat
 
 - **Catered machinery.** The terrain's truth is generated exactly, outside the machine; the tower
@@ -893,7 +1030,12 @@ and `LOOKS_CARRIED_COMPARED.tsv`, read in `READ_COMPARED.txt`; the tower asked a
 its release parts: `LOOKS_OWN.tsv`, `LOOKS_AGAIN_OWN.tsv` and `LOOKS_REDRAW_OWN.tsv`, read in
 `READ_OWN.txt`. The tower read its wrong attempts on side forks: `LOOKS_FORK.tsv`, `LOOKS_AGAIN_FORK.tsv` and
 `LOOKS_REDRAW_FORK.tsv`, read in `READ_FORK.txt`; their faces pass by pass, with the plain pumped
-tower's, in `FACES.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`,
-`TRAIN_PUMPED.txt`, `TRAIN_LOOKING.txt`, `TRAIN_COMPARED.txt`, `TRAIN_OWN.txt`, `TRAIN_FORK.txt`
-and `TRAIN_FORK_REFUSED.txt` (with its one swell line) are the training logs (the turned and pumped ones without their per-section
+tower's, in `FACES.txt`. The fork compared only where the truth parts from the attempt:
+`LOOKS_NEWS.tsv`, `LOOKS_AGAIN_NEWS.tsv` and `LOOKS_REDRAW_NEWS.tsv`, read in `READ_NEWS.txt`, its
+faces in `FACES_NEWS.txt`; the looks after passes 9 and 10 (`LOOKS_AGAIN_NEWS_9.tsv`,
+`LOOKS_AGAIN_NEWS_10.tsv`) beside the plain pumped tower's after passes 9, 10 and 11
+(`LOOKS_AGAIN_PUMPED_9.tsv`, `LOOKS_AGAIN_PUMPED_10.tsv`, `LOOKS_AGAIN_PUMPED_11.tsv`), read in
+`READ_SPREAD.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`,
+`TRAIN_PUMPED.txt`, `TRAIN_LOOKING.txt`, `TRAIN_COMPARED.txt`, `TRAIN_OWN.txt`, `TRAIN_FORK.txt`,
+`TRAIN_NEWS.txt`, `TRAIN_NEWS_PARTS.txt` and `TRAIN_FORK_REFUSED.txt` (with its one swell line) are the training logs (the turned and pumped ones without their per-section
 swell lines).

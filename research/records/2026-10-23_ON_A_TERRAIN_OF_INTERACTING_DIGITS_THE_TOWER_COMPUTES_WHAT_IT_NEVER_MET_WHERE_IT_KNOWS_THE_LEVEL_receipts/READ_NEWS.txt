@@ -1,0 +1,15 @@
+=== nown
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	152	152	152	0	0	0	208	0	0	178	18	44	1.231	1.231	1.231
+-	135	97	97	97	0	0	0	135	0	0	87	25	15	1.019	1.019	1.019
+*	193	11	11	11	0	0	0	193	0	0	20	5	14	5.823	5.823	5.823
+=== nagain
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	152	155	169	16	13	206	490	152	56	178	20	43	1.231	0.979	0.840
+-	135	97	97	110	8	8	128	348	97	38	87	28	18	1.019	0.954	0.767
+*	193	11	13	34	7	5	88	1238	11	182	20	6	13	5.823	5.660	5.353
+=== nredraw
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	152	155	160	7	4	208	458	152	56	178	20	43	1.231	1.231	1.231
+-	135	97	101	104	6	2	134	296	97	38	87	27	13	1.019	1.019	1.019
+*	193	11	11	39	5	5	96	1174	11	182	20	6	15	5.823	5.823	5.823

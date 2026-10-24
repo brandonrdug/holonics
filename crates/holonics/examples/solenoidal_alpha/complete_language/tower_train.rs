@@ -158,6 +158,11 @@ pub(super) fn roles_of(path: &str, sha: &str, bytes: usize) -> Result<Vec<u8>> {
 }
 
 /// `x / 2^20` bits over `n` as thousandths, written `0.xxx`.
+/// A signed code on `2^(−20)` bits written in bits.
+fn signed_bits(code: i64) -> String {
+    format!("{}{}", if code < 0 { "-" } else { "" }, per(code.abs(), 1))
+}
+
 pub(super) fn per(code: i64, n: usize) -> String {
     let milli = (code as i128 * 1000 + ((n as i128) << (READ_BITS - 1))) / ((n as i128) << READ_BITS);
     format!("{}.{:03}", milli / 1000, milli % 1000)
@@ -324,6 +329,9 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: boo
         if let Some(look) = looking {
             let mut lookers: Vec<Looker> = look_keys.drain(..).enumerate().map(|(s, keys)| Looker::new(s * chunk, (s + 1) * chunk, keys)).collect();
             let mut k = 0usize;
+            // Over the pass's deposits: the plain streams' code change and the forks', and the
+            // deposits under which the plain streams' code rose while the whole code fell.
+            let (mut plain_change, mut fork_change, mut plain_rose) = (0i64, 0i64, 0usize);
             loop {
                 let tower = &learner.tower;
                 let filled: Vec<bool> = lookers
@@ -352,6 +360,13 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: boo
                         return Err(e.to_string().into());
                     }
                 };
+                if receipt.deposited {
+                    let change = |parts: &[(i64, i64)]| parts.iter().map(|&(before, after)| after - before).sum::<i64>();
+                    let plain = change(&receipt.parts[..streams]);
+                    plain_change += plain;
+                    fork_change += change(&receipt.parts[streams..]);
+                    plain_rose += (plain > 0) as usize;
+                }
                 // Each compared place after a part's first is one byte coded.
                 let coded: usize = compared.iter().map(|c| c[1..].iter().filter(|x| x.is_some()).count()).sum();
                 for l in &mut lookers {
@@ -376,6 +391,10 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: boo
             println!(
                 "TOWER_LOOKS pass={} sections={} looks={} right={} text_read={} of {} keys_left={}",
                 pass, k, looks, right, read, streams * chunk, lookers.iter().map(|l| l.keys_left()).min().unwrap_or(0)
+            );
+            println!(
+                "TOWER_PARTS pass={} deposits={} plain_rose={} plain_change_bits={} fork_change_bits={}",
+                pass, deposits, plain_rose, signed_bits(plain_change), signed_bits(fork_change)
             );
             look_keys = lookers.into_iter().map(|l| l.keys).collect();
             sections_run = k;
