@@ -1199,8 +1199,12 @@ expansion and contraction of the written results he pointed out on October 23 (t
 occasion), not the code alone. This step reads both.
 
 **The written results** (`tools/answer_digits.py '74-72=' <writes>`, an exterior count). The
-digit-prompt writings in these receipts, 37 writes from every tower since October 23 (29 of them
-write equations), hold 804 whole equations with a result that is not negative:
+digit-prompt writings in these receipts, 37 writes from this record's towers on the mixed Holonics
+terrain (29 of them write equations), hold 804 whole equations with a result that is not negative.
+The towers of the arithmetic terrain are not among them: there the pumped tower wrote a sum's units
+right in 191 of 240, keeping the parity in 36 of the 49 misses
+([its record](2026-10-23_ON_A_TERRAIN_OF_INTERACTING_DIGITS_THE_TOWER_COMPUTES_WHAT_IT_NEVER_MET_WHERE_IT_KNOWS_THE_LEVEL.md)).
+On this terrain:
 
 | result | equations | length right | leading digit right | units right | whole right |
 |---|---|---|---|---|---|
@@ -1221,8 +1225,9 @@ write equations), hold 804 whole equations with a result that is not negative:
   Where the operands' units carry, the written tens takes the carry in 52 of 108 and omits it in 23;
   where they do not, it adds one anyway in 38 of 208.
 - The near-miss record's §2 read the sums' units as right from the lines it quoted. Counted over
-  every writing, the sums' units are at chance (44 of 400) and what the towers place is the size:
-  the length, the leading digit and, more often than not, the carry.
+  these writings, the sums' units are at chance (44 of 400) and what the towers place is the size:
+  the length, the leading digit and, more often than not, the carry. So the law that held the ring
+  2 of the ten on arithmetic alone does not hold it on the mixed terrain.
 
 **The reading** (`Tower::read_circuit`, `read-tower-circuit`; [agent-inferred, October 24]). At each
 cell and level the frozen tower gives the modes' stored energy before the class arrives
@@ -1314,6 +1319,164 @@ tests, with the new one, passed (35) in 218.8 s with their build, against 115.7 
 the last measured run (1.89; deadline 240 s, peak 4.6 GiB), and the gate passed every step in
 618.3 s (projected 690 s, 0.90; deadline 800 s, peak 3.1 GiB).
 
+## The flux at the units
+
+Brandon, October 24: the energy's transport is diffusion in the abstract. The observer can witness
+the flux and the parametric orientation of where it goes: a knot that has not been crossed can still
+slip, because the crossing is what changes the friction's distribution, and one feels where the
+nodes and antinodes cross. This step reads the circuit mode by mode at a sum's units, the one place
+the passes did not move.
+
+**The per-mode read** (`CircuitMode`, `read-tower-modes`; [agent-inferred, October 24]). Each
+level of `Tower::read_circuit` now carries every mode at the cell: its state before the class
+arrives, what the moves carry of it (`α_t h + β_t h̄`, released on the step's own law) and its state
+after the push, on `2^(−24)`, beside the move `λ_t` and the pump `β_t` on `2^(−30)`. The test
+`the_circuit_readings_energies_are_the_forwards` now also checks that the modes' before and after
+are the forward's states and that their carried energies sum to the level's. `read-tower-modes`
+prints them at named cells, all ten integers a mode (`full`) or the state after (`after`).
+`tools/tower_modes.py` reads them outside the machine: `flux` splits each mode's push
+`d = after − carried` against its carried phase `c` into `R = 2 Re(c̄ d)` along the phase (a
+boost), `Q = 2 Im(c̄ d)` across it (a turn) and `N = |d|²` (power `R + N`), with the share of its own
+energy the moves keep; `probe` fits the operands' and the result's units digits from one level's
+state; `turns` reads how each mode's move depends on the digit that arrives.
+
+**Where the loud modes release.** On the held-out equations, at a sum's middle digit and at its units,
+the upper level of the mixed pair tower at passes 1 and 7 and of the arithmetic tower
+(`MODES_FLUX_*.txt`; shares of the level, `kept` of the mode's own energy):
+
+| | pass 1, middle | pass 1, units | pass 7, middle | pass 7, units | arithmetic, middle | arithmetic, units |
+|---|---|---|---|---|---|---|
+| the level keeps | 0.79 | 0.81 | 0.76 | 0.63 | 0.54 | 0.47 |
+| the loudest mode: energy, kept | 50: 0.55, 0.95 | 50: 0.57, 0.95 | 50: 0.37, 0.90 | 50: 0.45, 0.90 | 5: 0.15, 0.34 | 12: 0.14, 0.28 |
+| the next: energy, kept | 32: 0.23, 0.78 | 32: 0.22, 0.76 | 9: 0.22, 0.85 | 9: 0.21, 0.58 | 12: 0.14, 0.66 | 5: 0.08, 0.22 |
+| of the push's power, along the carried phase (`R`) | 0.40 | 0.52 | 0.67 | 0.66 | 0.21 | 0.21 |
+
+- At pass 1 the loud modes keep the same at the middle digit and the units. By pass 7 they hold
+  through the middle digit and let go at the units: mode 9 keeps 0.85 then 0.58, mode 32 0.94 then
+  0.22, mode 16 0.98 then 0.19. Mode 50, a pump mode (`|β|` 0.79 to 0.88 against `|λ|` below 0.17,
+  so its phase is held on one of the pump's two sheets), keeps 0.90 at both and holds 37 to 45% of
+  the level's energy.
+- The arithmetic tower's upper level holds its energy over many modes (the loudest 0.14 to 0.15),
+  releases more than half of it at the units, and takes the push there mostly as fresh amplitude
+  (`N`, 0.79 of the power) rather than as a drive along the phase it carried: the units cell is
+  written anew. The mixed tower at pass 7 drives two thirds of the push along the phase it carries.
+- Per mode, the push lowers what a mode carries (`cancel`) in every loud mode of the arithmetic
+  tower's upper level (each with at least 1% of the energy: 25 modes at the units, in 4 to 46% of
+  the cells; 18 at the middle digit, in 2 to 56%). In the mixed tower at pass 7 it does so in 3 of
+  the 7 loud modes at the units (mode 16 in 28% of the cells, the others under 10%) and in 6 of 11 at
+  the middle digit (mode 16 in 42%). The circuit read's level sums never cancelled: the
+  cancellations are between modes, as that read inferred.
+
+**Whether the strands reach the units.** The probe takes the training text's equation block (its
+22,551 lines are the arithmetic terrain's training text, byte for byte), read in eight parts each
+from rest, and fits each class's indicator by least squares from one level's state after the cell:
+every coordinate released to `2^(−10)` of the state's unit, one unit of ridge on the diagonal, the
+exact Gram solved by Bareiss elimination in integers. On the held-out equations the read is the
+share of cells whose largest fitted class is the true one. The cells: `A` has just heard the first
+operand's units digit, `B` the second's, `E` the `=`, and `U` codes the result's units. A linear read
+of a state in which the two digits are superposed can give either digit and not their sum: on the
+ring `ℤ/10` the sum's character is the product of the operands', `χ(c₀) = χ(a₀)χ(b₀)`, a crossing of
+the two strands, which a sum of what each left behind does not contain.
+
+The pair tower of the mixed terrain at pass 7 (`hcont2`) against the pumped tower of the arithmetic
+terrain after its 12 passes (`ap_t1`), on the same 495 held-out sums (the commonest class: 62 of
+495 for `a₀`, 57 for `b₀`, 63 for `c₀`):
+
+| cell, level | mixed `a₀` | `b₀` | `c₀` | arithmetic `a₀` | `b₀` | `c₀` |
+|---|---|---|---|---|---|---|
+| `A`, lower | 495 | 49 | 40 | 495 | 27 | 54 |
+| `B`, lower | 476 | 495 | 134 | 482 | 495 | 370 |
+| `B`, upper | 347 | 479 | 76 | 192 | 246 | 67 |
+| `E`, lower | 476 | 495 | 129 | 482 | 495 | 368 |
+| `U`, lower | 375 | 492 | 84 | 424 | 476 | 301 |
+| `U`, upper | 215 | 369 | 79 | 136 | 174 | 459 |
+
+Differences (268; `c₀`'s commonest 35) read `c₀` at `B` lower in 68 (mixed) and 176 (arithmetic),
+and at `U` upper in 45 and 208. Products (490; commonest 132, mostly 0) read 281 and 326 at `B`
+lower, 195 and 345 at `U` upper.
+
+**Where the crossing lives.** At `B` the second operand's units digit arrives, and the
+lower level's move is that digit's alone (its spread over the digit's cells is zero). A pumped
+mode's move is real-linear, `h ↦ λ h + β h̄`, a real `2×2` matrix `M(b₀)` acting on the carried state
+that holds `a₀`, so the step itself carries a bilinear contact between the two strands, as large as
+`M` depends on the digit. `turns` reads that dependence, `mean_d ‖M(d) − M̄‖² / mean_d ‖M(d)‖²`
+weighted by each mode's share of the stored energy at `B`, and how many modes hold the energy in
+effect (`1 / Σ share²`):
+
+| lower level at `B` | share of the move that depends on the digit | modes holding the energy | the loudest mode's share |
+|---|---|---|---|
+| mixed pair tower, pass 1 | 0.057 | 5.7 | 0.364 (mode 16) |
+| mixed pair tower, pass 7 | 0.036 | 1.6 | 0.786 (mode 16, its move 0.027 the digit's) |
+| arithmetic pumped tower, pass 12 | 0.172 | 23.2 | 0.122 (mode 2) |
+
+No mode in either tower turns as a character of the ring of ten: across both levels of both towers,
+no turn `arg λ(d)` and no pump axis `arg β(d)` fits `d ↦ 2π m d/10` at 0.9 or better (the turns fit
+`m = 0`, the same turn for every digit, at 0.91 to 1.00 in the loud modes). The crossing the
+arithmetic tower reads is spread over its modes, not placed in one.
+
+**The contact or the terrain.** Two towers of the first mixed terrain (`htext1`: the four media,
+the digits 54,016 of 216,240 training bytes, the first quarter of the arithmetic training text), 12
+passes each, read and probed the same way on sums: the plain pumped tower, which has the arithmetic
+tower's own declaration (rectifying contacts), and the pair tower (`MODES_PROBE_plain12_sums.txt`,
+`MODES_PROBE_pair12_sums.txt`, `MODES_TURNS_plain12.txt`, `MODES_TURNS_pair12.txt`):
+
+| tower | terrain | contact | passes | `c₀` at `B`, lower | `c₀` at `U`, upper | move's digit share | modes holding the energy |
+|---|---|---|---|---|---|---|---|
+| arithmetic | digits alone, 216,131 bytes | rectifier | 12 | 370 | 459 | 0.172 | 23.2 |
+| plain | first mixed | rectifier | 12 | 124 | 66 | 0.080 | 5.0 |
+| pair | first mixed | pair | 12 | 127 | 89 | 0.035 | 2.4 |
+| pair | eight times the text, digits 216,131 of 1,789,116 bytes | pair | 7 | 134 | 79 | 0.036 | 1.6 |
+
+Both first-terrain towers hold the operands at `B` (475 and 495 of 495 each) and leave them
+uncrossed.
+
+**What it says** [agent-inferred]:
+- The knot is the crossing of the two operands' units, and it is made at the tick where the second
+  arrives, by the move that digit makes on the strand the state carries. The tower trained on the
+  digits alone makes it, holds the sum in its upper level at the units and writes a sum's units right
+  (191 of 240). Every tower trained beside the Holonics text holds both strands at that tick and
+  leaves them uncrossed, and its writings put the units at chance (44 of 400).
+- The terrain, not the contact, removes it: the plain tower with the arithmetic tower's declaration
+  fails on the mixed terrain as the pair towers do. Nor is it the amount of digit text alone: the
+  eight-times tower met 7 × 216,131 bytes of equations, 58% of the arithmetic tower's 12 × 216,131,
+  and crosses no better than the first-terrain towers, which met 12 × 54,016.
+- On the mixed terrains the lower level gathers its energy into few modes whose moves every digit
+  makes alike, and the gathering grew with the passes (5.7 modes at pass 1, 1.6 at pass 7, mode 16
+  holding 0.79 with a move 0.027 the digit's). The energy that would carry the crossing sits where
+  the arriving digit cannot act on it: the friction is all on a strand the digit does not turn, so
+  the knot slips. On the digits alone the energy spreads over 23 modes the digits move differently.
+- No single mode turns as a character of the ring of ten in any tower. The crossing the arithmetic
+  tower reads is distributed over its modes; a read of one mode's phase would not find it.
+- [derived] The strands are there to be crossed. At `B` the lower state reads `a₀` in 476 of 495 and
+  `b₀` is the class arriving, so a bilinear form of the state against the arriving class reads the
+  sum at the rate `a₀` reads: for each arriving digit `d` the sum's units are the permutation
+  `a₀ ↦ a₀ + d` of `a₀`. The missing term is that form, the situated pool `top ⊗ x̂`.
+
+**Decided next** [agent-inferred]: the loop already decided after the pair forms' second pass, the
+situated pool `top ⊗ x̂` founded by the
+[effective tension's](2026-10-24_WHAT_A_CONTACT_CANNOT_BRIDGE_IS_ITS_EFFECTIVE_TENSION_AND_THE_TENSION_FOUNDS_THE_FACE_THAT_CARRIES_IT.md)
+law and read by the exact Gram before any of it enters the learner, now has a located consumer and
+a fixed acceptance: on the mixed terrain its founded forms read a sum's units at `B` in at least 370
+of the 495 held-out sums, the arithmetic tower's own crossing. It is the crossing of a carried strand
+with an arriving class in every medium, not a digit routine: the pair forms in the learner join only
+the last two classes, which at `B` are `b₀` and the class before it.
+
+**The run.** The release binary `modes1` (`25db693e…`) built in 346.6 s (projected 377 s from the
+larger of the last two builds, 0.92; deadline 450 s, peak 2.5 GiB). Every mode read ran at one
+thread, four at a time: 3.8 to 11.0 s a text against deadlines of 60 to 120 s (the first planned at
+one to three minutes), peak 18 to 22 MiB; `MODES_READS.tsv` lists each reading's state, text, cells
+and SHA-256 (the readings themselves, 12 to 146 MB, stay outside the repository). The equation
+block was read in eight consecutive parts of 2,819 lines (the last 2,818), each from rest. The
+mixed tower's probes took 122.7 to 142.0 s against 272 s projected (0.45 to 0.52; deadline 450 s);
+the arithmetic tower's 133.6 to 157.6 s against 142.0 s, the largest measured (0.94 to 1.11, the
+sums over the projection and inside the 160 s deadline); the first-terrain towers' 135.2 and
+139.3 s against 157.6 s (deadline 200 s); peak 310 to 335 MiB each. The flux reads with each
+mode's kept share took 9.2 to 10.5 s (planned at one to three minutes; deadline 180 s; peak 680 to 690 MiB), the turns reads 4.2 to 7.2 s. The tower's tests (35) passed in 215.5 s with their build
+against 300 s projected (0.72; deadline 360 s, peak 4.5 GiB). The gate's first run filled the disk
+at its fourth step (the linker died with a bus error); with the 5.3 GB incremental cache it wrote
+removed and none written, it passed every step in 681.9 s against 618.3 s projected (1.10;
+deadline 800 s, peak 4.5 GiB).
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -1401,6 +1564,14 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   writings), `CIRCUIT_{p1,…,p7,j6,j7}.txt` (`tools/tower_circuit.py` over each pass's reading:
   plain passes 1 to 7, joined passes 6 and 7) and `CIRCUIT_READS.txt` (each raw reading's state,
   cell count and SHA-256; the raw readings, 2.3 MB each, stay outside the repository).
+- The flux at the units: `MODES_PROBE_<tower>_<operation>.txt` (the units probe: `pair7` the mixed
+  pair tower at pass 7, `arith` the arithmetic terrain's pumped tower, `plain12` and `pair12` the
+  first mixed terrain's towers), `MODES_FLUX_{pair1,pair7,arith}.txt` (each mode's push, kept share
+  and orientation by role), `MODES_TURNS_{pair1,pair7,arith,plain12,pair12}.txt` (how each mode's
+  move depends on the arriving digit), and `MODES_READS.tsv` (each raw mode reading's state, text,
+  cells and SHA-256, wall time and peak; the readings stay outside the repository). The `after`
+  reads' cells are `tools/tower_modes.py cells <text> A,B,E,U` (they reproduce byte for byte); the
+  `full` reads name every cell of the held-out equations, 0 to 11,996.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -1415,4 +1586,4 @@ uses `found1` (`d2ebd83e…`) and, with the spectrum, `found2` (`7e93511f…`). 
 install and its writing use `install1` (`522b9cfa…`). The pair forms in the learner use `face1`
 (`44ed341e…`) for the join, the passes, the met and unmet reads and the writing, and `face2`
 (`60db5291…`, the same source with the leverage read) for the leverage, in both passes. The
-circuit readings use `circuit1` (`604a10c8…`).
+circuit readings use `circuit1` (`604a10c8…`), and the mode readings `modes1` (`25db693e…`).

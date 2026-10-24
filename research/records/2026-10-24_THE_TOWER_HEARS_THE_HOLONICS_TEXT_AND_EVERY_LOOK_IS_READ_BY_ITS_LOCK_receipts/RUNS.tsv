@@ -68,3 +68,15 @@ build circuit1	-	cargo build --release --example solenoidal_alpha	377 (face1's b
 circuit readings	circuit1 (604a10c8…)	read-tower-circuit on the held-out equations at plain passes 1 to 7 and joined passes 6 and 7, nine reads together at one thread each	unmeasured (one to three minutes)	180 each	-	6.2 to 7.4	-	22292 to 67972	complete
 tower tests, circuit	-	cargo test -p holonics --lib hnn::tower::	115.7 (the last measured run with its build)	240	-	218.8	1.89	4773444	complete; 35 passed
 gate, circuit	-	bash tools/gate.sh	690 (the last gate on this host)	800	-	618.3	0.90	3218532	complete; every step ok
+build modes1	-	cargo build --release --example solenoidal_alpha	377 (the larger of the last two builds)	450	-	346.6	0.92	2581904	complete
+mode readings, mixed pair tower	modes1 (25db693e…)	read-tower-modes full at every held-out cell (passes 1 and 7) and after at the probe cells (pass 7: the held-out equations and the eight parts of the training equation block), four at a time at one thread each	unmeasured (one to three minutes)	120 each	-	4.2 to 11.0	-	21260 to 22676	complete
+mode readings, arithmetic tower	modes1 (25db693e…)	read-tower-modes after at the probe cells of the same texts, and full at every held-out cell, ap_t1's final state	11 (the largest mixed-tower read)	60 each	-	3.8 to 8.6	0.35 to 0.78	18128 to 19424	complete
+mode readings, first-terrain towers	modes1 (25db693e…)	read-tower-modes as for the arithmetic tower, htrain_plain2 and htrain_pair final states	11	60 each	-	3.8 to 9.7	0.35 to 0.88	19200 to 22684	complete
+units probe, mixed pair tower	-	tools/tower_modes.py probe, one operation each, three together	272 (8 exact 129-dimensional solves at 22.7 s, parse about 90 s)	450 each	-	122.7 to 142.0	0.45 to 0.52	318016 to 340236	complete
+units probe, arithmetic tower	-	tools/tower_modes.py probe, one operation each, three together	142.0 (the largest measured probe)	160 each	-	133.6 to 157.6	0.94 to 1.11	316956 to 341396	complete; the sums over the projection, inside the deadline
+units probe, first-terrain towers	-	tools/tower_modes.py probe --ops +, two together beside two flux reads	157.6 (the largest measured probe)	200 each	-	135.2 and 139.3	0.86 and 0.88	331416 and 339244	complete
+flux reads	-	tools/tower_modes.py flux over the full readings (passes 1 and 7, arithmetic tower)	unmeasured (one to three minutes)	180 each	-	9.2 to 10.5	-	695332 to 704260	complete
+turns reads	-	tools/tower_modes.py turns over the five full readings	unmeasured (one to three minutes)	60 each	-	4.2 to 7.2	-	about 47000	complete
+tower tests, modes	-	cargo test -p holonics --lib hnn::tower::	300 (218.8 measured, the incremental cache since removed)	360	-	215.5	0.72	4731032	complete; 35 passed
+gate, modes (failed)	-	bash tools/gate.sh	618.3 (the last gate)	800	-	-	-	-	failed at its fourth step: the disk filled (the linker died with a bus error, then no space left on device); stopped, the 5.3 GB incremental cache removed
+gate, modes	-	CARGO_INCREMENTAL=0 bash tools/gate.sh	618.3	800	-	681.9	1.10	4721284	complete; every step ok

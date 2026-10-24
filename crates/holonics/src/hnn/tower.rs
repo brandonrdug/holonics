@@ -625,7 +625,9 @@ pub struct TensionCell {
 /// (`after`), all on the state's grain squared, `2^(−48)`. `before − carried ≥ 0` is what the level
 /// dissipates at the tick (`|α_t| + |β_t| = ρ_t < 1`), and `after − carried` is the power the push
 /// brings, negative where the push cancels what the modes carry. `scale` is the read's `‖r‖_rms`
-/// and `drive` and `conduct` the contacts' largest drive and conduction, on `2^(−16)`.
+/// and `drive` and `conduct` the contacts' largest drive and conduction, on `2^(−16)`. `modes`
+/// holds the same reading mode by mode ([`CircuitMode`]), so an exterior reading can follow where
+/// the flux goes: which modes lose, which the push enters, and whether it turns them or boosts them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CircuitLevel {
     pub before: u128,
@@ -634,6 +636,22 @@ pub struct CircuitLevel {
     pub scale: i128,
     pub drive: u64,
     pub conduct: u64,
+    pub modes: Vec<CircuitMode>,
+}
+
+/// [agent-inferred, October 24] **One mode at one cell** ([`Tower::read_circuit`]): its state
+/// before the class arrives, what the step's moves carry of it (`λ_t h + β_t h̄`) and its state after
+/// the push, on the state's grain `2^(−24)`, with the moves `λ_t` and `β_t` on `2^(−30)`. The
+/// mode's loss is `|before|² − |carried|²`; the push `after − carried` splits against the carried
+/// phase into a boost (its part along `carried`, `Re(conj(carried)·push)`) and a turn (its part
+/// across, `Im(conj(carried)·push)`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CircuitMode {
+    pub before: (i64, i64),
+    pub carried: (i64, i64),
+    pub after: (i64, i64),
+    pub lam: (i64, i64),
+    pub beta: (i64, i64),
 }
 
 /// One cell of the circuit reading ([`Tower::read_circuit`]): each level's power, and the code of
@@ -2464,15 +2482,18 @@ impl Tower {
             let mut levels = Vec::with_capacity(cell.levels.len());
             for (l, lc) in cell.levels.iter().enumerate() {
                 let lv = &self.layout.levels[l];
-                let carried: Vec<(i64, i64)> = collect_exact((0..n).map(|k| {
+                let modes: Vec<CircuitMode> = collect_exact((0..n).map(|k| {
                     let (hr, hi) = (opening[l][k].0 as i128, opening[l][k].1 as i128);
-                    let (lr, li) = match lc.gate.get(k) {
-                        Some(m) => (m.lam.0 as i128, m.lam.1 as i128),
-                        None => (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128),
+                    let lam = match lc.gate.get(k) {
+                        Some(m) => m.lam,
+                        None => (i64::from(t[lv.move_re + k]), i64::from(t[lv.move_im + k])),
                     };
-                    let (br, bi) = lc.gate.get(k).map_or((0, 0), |m| (m.beta.0 as i128, m.beta.1 as i128));
-                    Ok((fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS))?, fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS))?))
+                    let beta = lc.gate.get(k).map_or((0, 0), |m| m.beta);
+                    let (lr, li, br, bi) = (lam.0 as i128, lam.1 as i128, beta.0 as i128, beta.1 as i128);
+                    let carried = (fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS))?, fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS))?);
+                    Ok(CircuitMode { before: opening[l][k], carried, after: lc.state[k], lam, beta })
                 }))?;
+                let carried: Vec<(i64, i64)> = modes.iter().map(|m| m.carried).collect();
                 levels.push(CircuitLevel {
                     before: energy(&opening[l])?,
                     carried: energy(&carried)?,
@@ -2480,6 +2501,7 @@ impl Tower {
                     scale: lc.read_scale,
                     drive: reach(&lc.drive).max(reach(&lc.pair)),
                     conduct: reach(&lc.conduct),
+                    modes,
                 });
             }
             each(i, CircuitCell { levels, code: cell.face.code(classes[i + 1]) })?;
@@ -2830,6 +2852,10 @@ mod tests {
                     for (l, level) in cell.levels.iter().enumerate() {
                         assert_eq!(level.before, energy(&states[i].modes[l]).expect("energy"));
                         assert_eq!(level.after, energy(&states[i + 1].modes[l]).expect("energy"));
+                        let modes = |f: fn(&CircuitMode) -> (i64, i64)| level.modes.iter().map(f).collect::<Vec<_>>();
+                        assert_eq!(modes(|m| m.before), states[i].modes[l]);
+                        assert_eq!(modes(|m| m.after), states[i + 1].modes[l]);
+                        assert_eq!(level.carried, energy(&modes(|m| m.carried)).expect("energy"));
                         lost[l] += level.before as i128 - level.carried as i128;
                     }
                     count += 1;

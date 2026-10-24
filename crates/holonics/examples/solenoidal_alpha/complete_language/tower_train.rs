@@ -24,6 +24,14 @@ pub(super) fn count(s: &str) -> Result<usize> {
     Ok(s.parse::<usize>()?)
 }
 
+/// A count a text is divided by (a number of streams, a stride): at least one.
+pub(super) fn positive(s: &str) -> Result<usize> {
+    match count(s)? {
+        0 => Err("a stream or stride count must be at least one".into()),
+        n => Ok(n),
+    }
+}
+
 /// The regions an exterior partition names, in order: question, answer prose, answer numbers,
 /// calculation markup.
 pub(super) const REGIONS: [&str; 4] = ["Q", "P", "N", "M"];
@@ -72,7 +80,7 @@ pub(super) fn read_tower_faces(args: &[String]) -> Result<()> {
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let roles = roles_of(&args[5], &args[6], text.len())?;
-    let streams = count(&args[7])?;
+    let streams = positive(&args[7])?;
     let tower = &learner.tower;
     let (levels, modes) = (tower.declaration.levels, tower.declaration.modes);
     // Per level: each mode's max |h|² and Σ|h|², then per region (Σ max_k |h_k|², Σ Σ_k |h_k|², cells),
@@ -138,6 +146,68 @@ pub(super) fn read_tower_faces(args: &[String]) -> Result<()> {
         }
         println!("TOWER_FACES level={l} cells={cells} largest_share_permille {} top_modes(mode:max/rms, 2^-16) {}", shares.join(" "), top.join(" "));
     }
+    Ok(())
+}
+
+/// [agent-inferred, October 24] `read-tower-modes STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA
+/// full|after`: the circuit reading ([`Tower::read_circuit`]) mode by mode at the cells `CELLS`
+/// names (ascending cell indices, whitespace-separated; cell `i` has heard `TEXT[..=i]` and codes
+/// `TEXT[i + 1]`), `TEXT` read as one passage from rest. Each named cell prints `MODES i class
+/// code`, then per level `L<l>=` and its modes separated by `;`: with `full`, each mode's
+/// `before`, `carried` and `after` (re, im on `2^(−24)`) and `λ_t`, `β_t` (re, im on `2^(−30)`);
+/// with `after`, its state after the push alone. An exterior reading; the tower is not moved.
+pub(super) fn read_tower_modes(args: &[String]) -> Result<()> {
+    if args.len() != 8 {
+        return Err("read-tower-modes STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA full|after".into());
+    }
+    let full = match args[7].as_str() {
+        "full" => true,
+        "after" => false,
+        _ => return Err("the fields are full or after".into()),
+    };
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let classes: Vec<usize> = text.iter().map(|&b| b as usize).collect();
+    let cells: Vec<usize> = std::str::from_utf8(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?.split_whitespace().map(count).collect::<Result<_>>()?;
+    let Some(&last) = cells.last() else {
+        return Err("CELLS names no cell".into());
+    };
+    if cells.windows(2).any(|w| w[0] >= w[1]) || last + 1 >= classes.len() {
+        return Err("CELLS must ascend and code a class inside the passage".into());
+    }
+    let tower = &learner.tower;
+    let mut state = tower.rest();
+    let (mut line, mut next) = (String::new(), 0);
+    tower
+        .read_circuit(&mut state, &classes[..last + 2], |i, cell| {
+            use std::fmt::Write as _;
+            if cells.get(next) != Some(&i) {
+                return Ok(());
+            }
+            next += 1;
+            line.clear();
+            let _ = write!(line, "MODES {i} {} {}", classes[i + 1], cell.code);
+            for (l, c) in cell.levels.iter().enumerate() {
+                let _ = write!(line, " L{l}=");
+                for (k, m) in c.modes.iter().enumerate() {
+                    if k > 0 {
+                        line.push(';');
+                    }
+                    let _ = if full {
+                        write!(
+                            line,
+                            "{},{},{},{},{},{},{},{},{},{}",
+                            m.before.0, m.before.1, m.carried.0, m.carried.1, m.after.0, m.after.1, m.lam.0, m.lam.1, m.beta.0, m.beta.1
+                        )
+                    } else {
+                        write!(line, "{},{}", m.after.0, m.after.1)
+                    };
+                }
+            }
+            println!("{line}");
+            Ok(())
+        })
+        .map_err(|e| e.to_string())?;
     Ok(())
 }
 
@@ -235,7 +305,7 @@ pub(super) fn read_tower_tension(args: &[String]) -> Result<()> {
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let roles = roles_of(&args[5], &args[6], text.len())?;
-    let streams = count(&args[7])?;
+    let streams = positive(&args[7])?;
     let tower = &learner.tower;
     let (w, a) = (tower.declaration.width, tower.declaration.alphabet);
     let layout = TensionLayout { w, a };
@@ -534,7 +604,7 @@ pub(super) fn read_tower_floor(args: &[String]) -> Result<()> {
     let train_roles = roles_of(&args[5], &args[6], train.len())?;
     let dev = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
     let dev_roles = roles_of(&args[9], &args[10], dev.len())?;
-    let streams = count(&args[11])?;
+    let streams = positive(&args[11])?;
     let order = count(&args[12])?;
     if order == 0 || 2 * order > 7 {
         return Err("the reference order must be between one and three (contexts of up to seven bytes are keyed in 64 bits)".into());
@@ -1551,7 +1621,7 @@ impl PairReading {
         let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
         let dev = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
         let dev_roles = roles_of(&args[7], &args[8], dev.len())?;
-        let streams = count(&args[9])?;
+        let streams = positive(&args[9])?;
         if train.len() >= 1 << 32 || dev.len() >= 1 << 32 {
             return Err("the pair sums are carried in 64 bits, for texts below 2^32 bytes".into());
         }
@@ -2659,8 +2729,8 @@ pub(super) fn sample_tower_block(args: &[String]) -> Result<()> {
 /// The pairs `(class before, class arriving)` a training text read in `streams` contiguous streams
 /// meets, each stream opening at the start `A` (the training passes' cut, `fit`).
 fn met_pairs(text: &[u8], streams: usize, alphabet: usize) -> Result<std::collections::HashSet<(usize, usize)>> {
-    if streams == 0 || text.len() < streams {
-        return Err("a stream needs a byte".into());
+    if streams == 0 || text.len() < 2 * streams {
+        return Err("a stream needs two bytes, one cell".into());
     }
     let chunk = text.len() / streams;
     let mut met = std::collections::HashSet::new();
@@ -2697,7 +2767,7 @@ pub(super) fn join_tower_pair_face(args: &[String]) -> Result<()> {
     let block_text = pinned_read(&args[3], &args[4], STATE_BUDGET)?;
     let block = PairBlock::from_text(std::str::from_utf8(&block_text)?, &learner.tower, &args[2])?;
     let train = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
-    let streams = count(&args[7])?;
+    let streams = positive(&args[7])?;
     let out = Path::new(&args[8]);
     let d = learner.tower.declaration;
     let opening: Vec<i32> = (0..d.alphabet).flat_map(|u| learner.tower.encoding(u).to_vec()).collect();
@@ -2759,10 +2829,10 @@ pub(super) fn read_tower_pair_cells(args: &[String]) -> Result<()> {
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let tower = &learner.tower;
     let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
-    let met = met_pairs(&train, count(&args[5])?, tower.declaration.alphabet)?;
+    let met = met_pairs(&train, positive(&args[5])?, tower.declaration.alphabet)?;
     let dev = pinned_read(&args[6], &args[7], READ_BUDGET as usize)?;
     let roles = roles_of(&args[8], &args[9], dev.len())?;
-    let streams = count(&args[10])?;
+    let streams = positive(&args[10])?;
     let classes: Vec<usize> = dev.iter().map(|&b| b as usize).collect();
     let chunk = classes.len().div_ceil(streams);
     let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
@@ -2835,12 +2905,12 @@ pub(super) fn read_tower_pair_leverage(args: &[String]) -> Result<()> {
     let tower = &learner.tower;
     let (a, w) = (tower.declaration.alphabet, tower.declaration.width);
     let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
-    let train_streams = count(&args[5])?;
+    let train_streams = positive(&args[5])?;
     let met = met_pairs(&train, train_streams, a)?;
     let dev = pinned_read(&args[6], &args[7], READ_BUDGET as usize)?;
     let roles = roles_of(&args[8], &args[9], dev.len())?;
-    let streams = count(&args[10])?;
-    let stride = count(&args[11])?;
+    let streams = positive(&args[10])?;
+    let stride = positive(&args[11])?;
     let k = tower.pair_face().map_or(0, |face| face.forms());
     let dim = w + 1 + k;
     let fill = |v: &mut [i64], top: &[i32], prev: usize, cur: usize| {
@@ -3158,7 +3228,7 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: boo
         pumped,
         contact,
     };
-    let streams = count(&args[6])?;
+    let streams = positive(&args[6])?;
     let section = count(&args[7])?;
     let passes = count(&args[8])?;
     let rate_bits: u32 = args[9].parse()?;
