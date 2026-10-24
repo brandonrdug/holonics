@@ -1,0 +1,19 @@
+digit arrivals 8239; second operand's units arrivals (B) 1253, of them sums 495
+loudest modes at digit arrivals (mode: share of energy): 16: 0.762, 48: 0.038, 17: 0.028, 56: 0.027, 24: 0.025, 8: 0.010, 42: 0.008, 57: 0.006
+B, all three operations: H = 0.615 bits; the most informative phases:
+  modes 57-35: 0.438 bits (0.71 of H); best sector 6: recall 0.35, precision 1.00
+  modes 35-9: 0.399 bits (0.65 of H); best sector 10: recall 0.40, precision 0.90
+  modes 42-57: 0.344 bits (0.56 of H); best sector 1: recall 0.41, precision 0.66
+  mode 23: 0.311 bits (0.51 of H); best sector 14: recall 0.31, precision 0.73
+  mode 35: 0.311 bits (0.51 of H); best sector 0: recall 0.33, precision 0.95
+  modes 35-22: 0.302 bits (0.49 of H); best sector 13: recall 0.61, precision 0.77
+  straight-line separator, odd lines: of the 626 highest scores, 0.92 are B, all three operations
+B of sums: H = 0.328 bits; the most informative phases:
+  modes 42-35: 0.211 bits (0.64 of H); best sector 0: recall 0.91, precision 0.62
+  modes 8-42: 0.189 bits (0.58 of H); best sector 2: recall 0.51, precision 0.53
+  modes 57-35: 0.187 bits (0.57 of H); best sector 6: recall 0.53, precision 0.60
+  modes 35-9: 0.178 bits (0.54 of H); best sector 11: recall 0.49, precision 0.54
+  mode 23: 0.172 bits (0.53 of H); best sector 15: recall 0.45, precision 0.50
+  modes 48-56: 0.159 bits (0.49 of H); best sector 5: recall 0.63, precision 0.43
+  straight-line separator, odd lines: of the 247 highest scores, 0.91 are B of sums
+MEASURE exit=0 wall_s=5.0 peak_rss_kib=75632

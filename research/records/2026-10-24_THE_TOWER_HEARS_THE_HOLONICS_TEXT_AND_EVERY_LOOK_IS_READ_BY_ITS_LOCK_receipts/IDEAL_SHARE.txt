@@ -1,0 +1,12 @@
+== FORMS=1 FROM ideal_free.txt
+SITUATED_FROM forms=1 channels=2 train_canonical_permille=4 held_out_canonical_permille=4 elapsed_ms=2575
+MEASURE exit=0 wall_s=2.6 peak_rss_kib=271304
+== FORMS=1 FROM ideal_quiet.txt
+SITUATED_FROM forms=1 channels=2 train_canonical_permille=3 held_out_canonical_permille=5 elapsed_ms=2292
+MEASURE exit=0 wall_s=2.3 peak_rss_kib=271248
+== FORMS=5 FROM c4_plus_free.txt
+SITUATED_FROM forms=5 channels=9 train_canonical_permille=246 held_out_canonical_permille=290 elapsed_ms=3754
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=270156
+== FORMS=5 FROM c4_plus_quiet.txt
+SITUATED_FROM forms=5 channels=9 train_canonical_permille=245 held_out_canonical_permille=290 elapsed_ms=3766
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=271624

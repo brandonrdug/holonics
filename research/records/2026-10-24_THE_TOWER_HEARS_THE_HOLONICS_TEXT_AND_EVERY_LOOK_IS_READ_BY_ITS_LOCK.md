@@ -1576,7 +1576,8 @@ sections left out) by `(operation, a₀, b₀)`, centred on the arriving class, 
 of the text's canonical tension, and by `(operation, c₀)` 78.5‰ (an exterior reading,
 `CROSSING_CEILING.py`). Its directions carry 26.2, 15.7, 8.6, 5.3, 4.6 and 3.6‰, then less; by
 `(operation, c₀)` 24.8, 15.4 and 8.0‰. The first is the size of a founded rank (16 to 30‰ at ranks
-10 to 16): the crossing is large enough to be founded.
+10 to 16). These lookups take sums, differences and products together; for the sums alone the
+crossing is smaller than any founded form (the correction below).
 
 **The crossing is phase.** For the 8,986 sums among those cells, the covector at `B` (whitened by
 `Y`, its arriving class's mean removed) is averaged per `c₀` and read in the plane of the means' top
@@ -1637,6 +1638,97 @@ the three exterior crossing reads under a minute together (deadline 180 s each).
 repository;
 `SITUATED_RUNS.txt` keeps every run's log line, and `SITUATED_FORMS16.txt` the sixteen forms. The gate
 passed every step in 659.3 s against 701 s projected (0.94; deadline 800 s, peak 4.5 GiB).
+
+## Complex forms, and where the crossing's share goes
+
+**Complex forms** [agent-inferred, October 24]. `found-tower-situated` now founds complex forms.
+- `a` and `b` are over the Gaussian integers, and both faces of `c` are read as channels.
+- The search uses the circular criterion `‖𝕄w‖²_(Y⁻¹) / wᴴQw`.
+- Each rank is searched from two starts and founded from the one with the larger exact training share:
+  - the unit;
+  - a ring: the top two directions of the class-crossed tension against its class-weighted Gram, `a = e₁ + i e₂`.
+- A form whose two faces are one reading keeps the larger.
+
+`read-tower-situated` prints a form's kept faces, `Re c` before `Im c`. On the whole training text (`COMPLEX_RUNS.txt`):
+
+| forms | start | channels | train | held out | the classes carrying most of the training share |
+|---|---|---|---|---|---|
+| 1 | ring | 2 | 97‰ | 108‰ | `3` 303‰, `4` 237‰, `2` 149‰, `5` 132‰ |
+| 2 | ring | 4 | 153‰ | 195‰ | `=` 306‰, `3` 195‰, `4` 153‰, `2` 97‰ |
+| 3 | ring | 6 | 200‰ | 266‰ | `=` 236‰, `3` 170‰, `4` 138‰, `2` 103‰ |
+| 4 | unit | 7 | 242‰ | 288‰ | `=` 195‰, `s` 170‰, `3` 140‰, `4` 114‰ |
+
+Four real forms saved 221‰ and 261‰. Read at the probe cells, the four complex forms tie each operand where it arrives: `a₀` at `A` in 247 and `b₀` at `B` in 223. They read a sum's units at `B` in 50 of the 495 held-out sums (`SITUATED_PROBE_c4.txt`); four real forms read 49.
+
+The founding was launched for eight forms. It was stopped by hand during its fifth rank on this reading. The stop was declared while the run was going, once its 75-minute projection had been questioned: if three or four complex forms did not clearly read more than four real ones, the run would stop there.
+
+**The state carries the phase.** This is an outside reading (`CHARACTER_AT_B.py`) of level 0's modes before the second operand's units arrive. It covers the 9,018 true sums of the training equation block and the 495 held out. Each coordinate is released to `2^(−10)`, with one unit of ridge.
+- A straight-line read of that state holds 966‰ of the variance of the first operand's units character `e^(2πi a₀/10)`, held out.
+- The root nearest the read is `a₀` in 484 of 495.
+- Ten indicator fits read `a₀` in 494.
+- The character `k = 3` is held at 897‰.
+
+**One form reads the units.** Take the complex form whose `a` is that read and whose `b` gives each digit its character. Off the digits, `b` is drawn towards zero on every other class, weighted by its count. This is an exterior construction (`IDEAL_FORM.py`; the form is in `IDEAL_FORM_quiet.txt`), not a founded form. The machine's own `read-tower-situated`, probed as the founded forms are, reads a sum's units at `B` in 475 of 495 (`IDEAL_PROBE.txt`). With a second such form at `k = 3`, the exterior read gives 492. So the shape the step decided can carry the acceptance with one form.
+
+**The founding's own measure gives it 3 to 4‰** (`IDEAL_SHARE.txt`).
+- Alone, it saves 3‰ on the training text and 5‰ held out; with `b` left free off the digits, 4‰ and 4‰.
+- After the four founded forms it adds 3 to 4‰: 242‰ becomes 245‰ or 246‰.
+- Each founded form saved 16‰ to 100‰.
+
+**Where the share goes** (`FORM_DILUTION.py`, `CROSSING_AT_U.py`). The covector is taken at the probe cells, read from rest in the eight parts with their first sections left out, against the whole text's `Y`. Shares are in the founding's unit, in which the text's whole tension is 64.
+
+| sums' cell | tension per cell, against the text's mean cell | the cells' tension within their class | the exact crossing `χ(c₀)` | its part of the cells' own | any function of `c₀` |
+|---|---|---|---|---|---|
+| `A` | 0.49 | 130‰ | 3.0‰ | 23‰ | 5.2‰ |
+| `B` | 0.67 | 209‰ | 6.7‰ | 32‰ | 11.9‰ |
+| `E` | 0.56 | 178‰ | 7.5‰ | 42‰ | 12.9‰ |
+| `U` | 0.18 | 54‰ | 9.7‰ | 180‰ | 22.3‰ |
+
+- **The crossing is a small part of the tension, even where it lives.** At `B` it is 32‰ of what the cell receives, and the sums' `B` cells are quieter than the text's average cell. At `U`, the cell that codes the units, it is 180‰ of the cell's tension, but that cell is a near node: 0.18 of the mean.
+- **The form fires wherever a digit arrives.** Its `B` cells hold 0.2‰ of its within-class energy over the whole text, and its ten digit classes 171‰. The rest lies on the other classes, where `b` is drawn towards zero but does not reach it. The canonical share divides what the form reads at `B` by everything it carries. Were it to read only the crossing, its share would be about `6.7‰ · 0.0002`, near 0.001‰. The 3 to 4‰ it shows is what it happens to read elsewhere [agent-inferred].
+- **At `U`, the two strands are read separately.** Before the class arriving at `U`, the state carries `b₀`'s character at 973‰ and `a₀`'s at 778‰. The product of the two reads gives the units in 304 of 495. A form of the state with itself reads less at `U` than the state crossed with the arriving class reads at `B`.
+
+**A correction.** "What a crossing at `B` could carry" above read its lookups over sums, differences and products together. For the sums alone, a lookup by `c₀` at `B` carries 11.9‰ and the exact character 6.7‰. That is below every founded form, not the size of one. Its sentence "the crossing is large enough to be founded" is withdrawn. So is the estimate in "The
+crossing is phase" that a real form holds about 13‰ of the 26‰ offered: that figure, too, rests on
+all three operations. The complex forms hold the whole character, and they did not read the units
+either.
+
+**What it says** [agent-inferred]:
+- **The knot is present, and one form ties it, but the founding does not choose it.** Its criterion is one global share: what a form saves of the whole text's tension. The crossing is a few thousandths of that, placed at cells quieter than the text's mean, and a form of the state and the arriving class spreads over every digit. Code length founds the letters, `=` and the digits' arrivals first; the crossing would come after all of them, if at all. This makes the earlier reading quantitative: the terrain, not the contact, removes the crossing.
+- **Read as the circuit.** The units' error is made at a node of the tension (`U`, 0.18 of the mean). Carried back to `B`, it is a thirtieth of what `B` receives. A criterion that weighs every cell by the whole text's tension hears the antinodes, and averages away the node where this knot sits.
+
+**Decided next** [agent-inferred]: the selection law, not more ranks.
+- The receipt law reads a receiver's readings per region, each in its own frame and over its own ticks, never as one global scalar. The founding's criterion is one global share.
+- The next loop reads the tension per region, each region at its own loudness, with the regions taken from the tower's own state rather than from a label.
+- Its first step is an outside reading: does level 0's state separate the cells where a sum's crossing lives from the text's other digit arrivals?
+- The acceptance stays.
+
+**The state marks the place** (`LOCK_AT_B.py`, the first reading of that loop). It covers the 8,239
+cells of the held-out equations where a digit arrives: 1,253 are second operands' units, 495 of them
+sums'. Each is read in level 0's state before the digit arrives (the full mode read of every cell).
+- The loud mode 16 holds 76% of the energy at those cells and carries little of the place.
+- The place is in the relative phases of quiet modes. The relative phase of modes 57 and 35, in 16
+  sectors, carries 0.71 of the information of "a second operand's units arrive here" (0.438 of
+  0.615 bits). One of its sectors holds 35% of those cells and no other digit arrival.
+- For the sums alone, modes 42 and 35 carry 0.64 of it. One sector holds 91% of the sums' `B`
+  cells, at precision 0.62.
+- For scale, a straight-line separator fitted on the even lines and read on the odd ranks them at
+  0.92 (all three operations) and 0.91 (sums).
+- [agent-inferred] The address the crossing needs is carried by the tower, as a pair of modes'
+  relative phase: a lock in the elementary objects' sense (a pair contact's address), not a label.
+
+**The runs.**
+- The binary `situated7` (`25f4309f…`, the complex forms) built in 238.1 s against 238 s (1.00; deadline 400 s; peak 1.7 GiB).
+- The first complex rank, a timing read, took 97.3 s. It was planned at up to 640 s (a real rank's 213 s and a ring search at up to twice a real step), with a deadline of 700 s; peak 265 MiB.
+- The eight-form founding resumed from that rank. Its projection was 4,463 s (seven ranks at 637.5 s), with a deadline of 4,500 s, and a rank past 640 s would have stopped it. Ranks two to four took 314.0, 98.6 and 123.5 s. It was stopped by hand during the fifth at 713.3 s (peak 282 MiB), on the reading above.
+- The forms' reads at the probe cells took 7.1 to 15.7 s beside the founding (deadline 60 s), and their probe 1.4 s.
+- The modes at the sums' `B` and `U` cells took 3.8 to 8.8 s per text (deadline 60 s).
+- The four outside readings took 3.5 to 11.1 s (deadlines 180 to 300 s).
+- The one form's share took 2.3 to 3.8 s (deadline 60 s), its reads 3.5 to 8.4 s and its probe 1.0 s.
+- The lock reading took 5.0 s (deadline 300 s).
+- The gate passed every step in 690.4 s against 659 s projected (1.05; deadline 900 s, peak 4.4 GiB).
+
+The mode reads stay outside the repository. The forms and every log line are in the receipts, and each run's row is in `RUNS.tsv`.
 
 ## The recorded failures this step could repeat
 
@@ -1741,6 +1833,12 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   and the exterior crossing reads
   `CROSSING_{CEILING,SPECTRUM,TURN}.py` with their outputs `CROSSING_*.txt` (run from the run
   directory, beside the moments and the covector reads, which stay outside the repository).
+- The complex forms: `COMPLEX_RUNS.txt` (the timing rank and the stopped founding's log lines),
+  `SITUATED_FORMS_c4.txt` (the four complex forms) and their probe `SITUATED_PROBE_c4.txt`; the
+  outside readings `CHARACTER_AT_B.{py,txt}`, `IDEAL_FORM.{py,txt}` with the one form
+  `IDEAL_FORM_{quiet,free}.txt`, its share `IDEAL_SHARE.txt` and probe `IDEAL_PROBE.txt`,
+  `FORM_DILUTION.{py,txt}`, `CROSSING_AT_U.{py,txt}` and `LOCK_AT_B.{py,txt}` (run from the run
+  directory).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -1757,5 +1855,5 @@ install and its writing use `install1` (`522b9cfa…`). The pair forms in the le
 (`60db5291…`, the same source with the leverage read) for the leverage, in both passes. The
 circuit readings use `circuit1` (`604a10c8…`), and the mode readings `modes1` (`25db693e…`). The situated pool uses `situated1` (`a27cf8df…`, the energy foundings), `situated3`
 (`6b4b79b5…`, the code-weighted), `situated4` (`6a20bb33…`, the covector reads), `situated5`
-(`0cdf49dd…`, the warm start, the sixteen forms and their reads) and `situated6` (`fa381fdc…`, the
-resume).
+(`0cdf49dd…`, the warm start, the sixteen forms and their reads), `situated6` (`fa381fdc…`, the
+resume) and `situated7` (`25f4309f…`, the complex forms, their reads and the modes at the sums' cells).

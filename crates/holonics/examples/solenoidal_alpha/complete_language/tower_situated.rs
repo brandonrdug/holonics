@@ -33,9 +33,19 @@
 //! instead (energy, Brier's metric) founded a first form on prose letters that removed 1‰ of the
 //! training tension and none held out (the record's "The situated pool"): energy saturates where
 //! code does not, so a cell whose class the tower cannot place (a sum's units, 3.49 bits) weighs no
-//! more than a prose letter it nearly knows. The two factors alternate from `b` the unit, each the
-//! leading canonical direction of its block ([`leading_canonical`]). Directions are searched on
-//! released copies; every share is read exactly from the moments.
+//! more than a prose letter it nearly knows. The two factors alternate, each the leading canonical
+//! direction of its block ([`leading_canonical`]). Directions are searched on released copies;
+//! every share is read exactly from the moments.
+//!
+//! [agent-inferred, October 24] The factors are complex, `a = a₀ + i a₁` and `b = b₀ + i b₁` over
+//! the Gaussian integers, and both faces of `c` are channels: `Re c = β₀ a₀ᵀŝ − β₁ a₁ᵀŝ` and
+//! `Im c = β₁ a₀ᵀŝ + β₀ a₁ᵀŝ`, `β_k = b_kᵀx̂`. A sum's units are a character product,
+//! `e^(2πik c₀/10) = e^(2πik a₀/10) e^(2πik b₀/10)`, rank one over the complex numbers and rank two
+//! over the reals, so a real form holds at most half of a crossing that turns (the record's "The
+//! situated pool": sixteen real forms tie each operand where it arrives, 481 of 495, and read the
+//! sum's units where the second operand arrives in 75). Each rank searches from the unit (`b` the
+//! unit, which stays real) and from a ring ([`ring_seed`]) and founds the larger exact training
+//! share; a form whose two faces are one reading keeps the larger.
 
 use super::tower_train::{count, pair_hats, positive, release_big, release_wide, solve_scaled, STATE_BUDGET};
 use super::*;
@@ -349,35 +359,63 @@ fn centred(moments: &Moments) -> Result<Read> {
     Ok(Read { dims: d, width: w, classes, l, scales, gram, gram_det, gram_inverse, metric, diagonal, means_permille, cells: moments.cells })
 }
 
-/// A founded form's factors: `a` over the carried face, `b` over the arriving class's `x̂`.
+/// A founded form's factors, each complex: `a = a₀ + i a₁` over the carried face and
+/// `b = b₀ + i b₁` over the arriving class's `x̂`, with the faces of `c = (aᵀŝ)(bᵀx̂)` it keeps,
+/// `Re c` and `Im c`.
 #[derive(Clone)]
 struct Form {
-    a: Vec<i64>,
-    b: Vec<i64>,
+    a: [Vec<i64>; 2],
+    b: [Vec<i64>; 2],
+    faces: [bool; 2],
 }
 
-/// One form read on a moment set, beside the forms founded before it: per class `β_u = bᵀx̂_u`,
-/// `z_u = Q̃_u a`, `w_u = M̃_uᵀ a`, and `a_kᵀ z_u` for each earlier form `k` and itself (so the
-/// forms' Gram is read without reading the moments again).
-struct FormRead {
-    beta: Vec<i128>,
+impl Form {
+    /// The real channels of the kept faces, each a sum of terms `±β_k a_tᵀŝ` on the form's own
+    /// parts (`t`, `k`: 0 real, 1 imaginary; `β_k = b_kᵀx̂`), `Re c = β₀ a₀ᵀŝ − β₁ a₁ᵀŝ` and
+    /// `Im c = β₁ a₀ᵀŝ + β₀ a₁ᵀŝ`. A term on a zero part is left out, and a face with no term.
+    fn channels(&self) -> Vec<Vec<(usize, usize, bool)>> {
+        self.terms().into_iter().zip(self.faces).filter(|(terms, kept)| *kept && !terms.is_empty()).map(|(terms, _)| terms).collect()
+    }
+
+    /// Each face's terms on the form's nonzero parts.
+    fn terms(&self) -> [Vec<(usize, usize, bool)>; 2] {
+        let live = |v: &Vec<i64>| v.iter().any(|&x| x != 0);
+        let (a, b) = ([live(&self.a[0]), live(&self.a[1])], [live(&self.b[0]), live(&self.b[1])]);
+        [vec![(0, 0, false), (1, 1, true)], vec![(0, 1, false), (1, 0, false)]].map(|terms| terms.into_iter().filter(|&(t, k, _)| a[t] && b[k]).collect())
+    }
+
+    /// The faces that have a term: a real form (`a₁ = b₁ = 0`) has only `Re c`.
+    fn live_faces(&self) -> [bool; 2] {
+        self.terms().map(|terms| !terms.is_empty())
+    }
+
+    fn line(&self, j: usize, shift: u64) -> String {
+        let join = |v: &[i64]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",");
+        let faces: Vec<&str> = ["re", "im"].into_iter().zip(self.faces).filter(|(_, kept)| *kept).map(|(name, _)| name).collect();
+        format!("FORM {j} shift={shift} faces={} a={} ai={} b={} bi={}\n", faces.join(","), join(&self.a[0]), join(&self.a[1]), join(&self.b[0]), join(&self.b[1]))
+    }
+}
+
+/// One factor `a_t` read on a moment set beside the factors read before it: per class
+/// `z = Q̃_u a_t`, `w = M̃_uᵀ a_t`, and `a_sᵀ z` for each earlier factor `s` and itself (so the
+/// channels' Gram is read without reading the moments again).
+struct AtomRead {
     z: Vec<Vec<i128>>,
     w: Vec<Vec<BigInt>>,
     inner: Vec<Vec<BigInt>>,
 }
 
-fn form_read(read: &Read, hats: &[Vec<i64>], form: &Form, before: &[Form]) -> Result<FormRead> {
-    let (d, width) = (form.a.len(), read.width);
-    let beta = read.classes.iter().map(|c| hats[c.class].iter().zip(&form.b).map(|(&x, &b)| x as i128 * b as i128).sum()).collect();
+fn atom_read(read: &Read, a: &[i64], earlier: &[&[i64]]) -> Result<AtomRead> {
+    let (d, width) = (a.len(), read.width);
     let per: Vec<(Vec<i128>, Vec<BigInt>, Vec<BigInt>)> = read
         .classes
         .par_iter()
         .map(|c| {
             let z: Vec<i128> = (0..d)
-                .map(|i| c.q[i * d..(i + 1) * d].iter().zip(&form.a).try_fold(0i128, |acc, (&q, &a)| q.checked_mul(a as i128).and_then(|p| acc.checked_add(p))).ok_or("a form's moment outgrew its 128-bit carrier"))
+                .map(|i| c.q[i * d..(i + 1) * d].iter().zip(a).try_fold(0i128, |acc, (&q, &x)| q.checked_mul(x as i128).and_then(|p| acc.checked_add(p))).ok_or("a form's moment outgrew its 128-bit carrier"))
                 .collect::<std::result::Result<_, &str>>()?;
-            let w: Vec<BigInt> = (0..width).map(|r| (0..d).map(|i| BigInt::from(c.m[i * width + r]) * form.a[i]).sum()).collect();
-            let inner: Vec<BigInt> = before.iter().chain(std::iter::once(form)).map(|f| f.a.iter().zip(&z).map(|(&a, &zz)| BigInt::from(zz) * a).sum()).collect();
+            let w: Vec<BigInt> = (0..width).map(|r| (0..d).map(|i| BigInt::from(c.m[i * width + r]) * a[i]).sum()).collect();
+            let inner: Vec<BigInt> = earlier.iter().copied().chain(std::iter::once(a)).map(|s| s.iter().zip(&z).map(|(&x, &zz)| BigInt::from(zz) * x).sum()).collect();
             Ok((z, w, inner))
         })
         .collect::<std::result::Result<_, &str>>()?;
@@ -387,65 +425,127 @@ fn form_read(read: &Read, hats: &[Vec<i64>], form: &Form, before: &[Form]) -> Re
         w.push(b);
         inner.push(c);
     }
-    Ok(FormRead { beta, z, w, inner })
+    Ok(AtomRead { z, w, inner })
 }
 
-/// The exact moments of a set of forms on a moment set, scaled by `L`: the Gram
-/// `G_jk = Σ_u β_ju β_ku a_jᵀQ̃_u a_k (L/n_u)` and the cross `R_jr = Σ_u β_ju (M̃_uᵀ a_j)_r (L/n_u)`.
-fn joint(read: &Read, reads: &[&FormRead]) -> (Vec<Vec<BigInt>>, Vec<Vec<BigInt>>) {
-    let k = reads.len();
+/// The founded forms read on one moment set: per form its `β_k = b_kᵀx̂_u` per class and its two
+/// factors' reads (form `f` owns the factors and `β`s `2f` and `2f + 1`), and the real channels of
+/// every form's kept faces, each with its form and its terms `(factor, β, negated)`.
+#[derive(Default)]
+struct Reads {
+    betas: Vec<Vec<i128>>,
+    atoms: Vec<AtomRead>,
+    channels: Vec<(usize, Vec<(usize, usize, bool)>)>,
+}
+
+impl Reads {
+    /// Read one more form on `read`, beside the forms `before` it.
+    fn push(&mut self, read: &Read, hats: &[Vec<i64>], form: &Form, before: &[Form]) -> Result<()> {
+        let f = before.len();
+        for b in &form.b {
+            self.betas.push(read.classes.iter().map(|c| hats[c.class].iter().zip(b).map(|(&x, &bb)| x as i128 * bb as i128).sum()).collect());
+        }
+        let mut earlier: Vec<&[i64]> = before.iter().flat_map(|g| g.a.iter().map(Vec::as_slice)).collect();
+        for a in &form.a {
+            self.atoms.push(atom_read(read, a, &earlier)?);
+            earlier.push(a);
+        }
+        for terms in form.channels() {
+            self.channels.push((f, terms.into_iter().map(|(t, k, negated)| (2 * f + t, 2 * f + k, negated)).collect()));
+        }
+        Ok(())
+    }
+
+    /// Forget every form from the `forms`-th on.
+    fn truncate(&mut self, forms: usize) {
+        self.betas.truncate(2 * forms);
+        self.atoms.truncate(2 * forms);
+        self.channels.retain(|(f, _)| *f < forms);
+    }
+
+    fn inner(&self, u: usize, s: usize, t: usize) -> &BigInt {
+        if s >= t {
+            &self.atoms[s].inner[u][t]
+        } else {
+            &self.atoms[t].inner[u][s]
+        }
+    }
+
+    fn coefficient(&self, u: usize, k: usize, negated: bool) -> i128 {
+        if negated {
+            -self.betas[k][u]
+        } else {
+            self.betas[k][u]
+        }
+    }
+
+    /// Class `u`'s part of two channels' Gram, `Σ ±β ±β' a_sᵀQ̃_u a_t` over their terms.
+    fn class_gram(&self, u: usize, j: usize, k: usize) -> BigInt {
+        let mut acc = BigInt::zero();
+        for &(s, ks, ns) in &self.channels[j].1 {
+            for &(t, kt, nt) in &self.channels[k].1 {
+                acc += self.inner(u, s, t) * self.coefficient(u, ks, ns) * self.coefficient(u, kt, nt);
+            }
+        }
+        acc
+    }
+
+    /// Class `u`'s part of a channel's cross moment at covector coordinate `r`, `Σ ±β (M̃_uᵀa_t)_r`.
+    fn class_cross(&self, u: usize, j: usize, r: usize) -> BigInt {
+        self.channels[j].1.iter().map(|&(t, k, negated)| &self.atoms[t].w[u][r] * self.coefficient(u, k, negated)).sum()
+    }
+}
+
+/// The exact moments of the channels on a moment set, scaled by `L`: the Gram
+/// `G_jk = Σ_u class_gram(u, j, k) (L/n_u)` and the cross `R_jr = Σ_u class_cross(u, j, r) (L/n_u)`.
+fn joint(read: &Read, reads: &Reads) -> (Vec<Vec<BigInt>>, Vec<Vec<BigInt>>) {
+    let k = reads.channels.len();
     let classes = read.classes.len();
-    let lower: Vec<Vec<BigInt>> = (0..k)
-        .into_par_iter()
-        .map(|j| (0..=j).map(|kk| (0..classes).map(|u| &reads[j].inner[u][kk] * reads[j].beta[u] * reads[kk].beta[u] * &read.scales[u]).sum()).collect())
-        .collect();
+    let lower: Vec<Vec<BigInt>> = (0..k).into_par_iter().map(|j| (0..=j).map(|kk| (0..classes).map(|u| reads.class_gram(u, j, kk) * &read.scales[u]).sum()).collect()).collect();
     let g = (0..k).map(|j| (0..k).map(|kk| if kk <= j { lower[j][kk].clone() } else { lower[kk][j].clone() }).collect()).collect();
-    let r = (0..k)
-        .into_par_iter()
-        .map(|j| (0..read.width).map(|rr| (0..classes).map(|u| &reads[j].w[u][rr] * reads[j].beta[u] * &read.scales[u]).sum()).collect())
-        .collect();
+    let r = (0..k).into_par_iter().map(|j| (0..read.width).map(|rr| (0..classes).map(|u| reads.class_cross(u, j, rr) * &read.scales[u]).sum()).collect()).collect();
     (g, r)
 }
 
-/// A training fit: `D` and `D·P` with `G P = R`, and the canonical share
-/// `s = tr(Y⁻¹ Rᵀ P)` the forms carry, as a numerator and denominator.
+/// A training fit: the channels' Gram `G`, `D` and `D·P` with `G P = R`, and the canonical share
+/// `s = tr(Y⁻¹ Rᵀ P)` they carry, as a numerator and denominator.
 struct Fit {
+    g: Vec<Vec<BigInt>>,
     det: BigInt,
     dp: Vec<Vec<BigInt>>,
     share: BigInt,
     denominator: BigInt,
 }
 
-/// `tr(A Bᵀ C)` for `A` square over the covector and `B`, `C` with one row per form.
+/// `tr(A Bᵀ C)` for `A` square over the covector and `B`, `C` with one row per channel.
 fn trace_through(a: &[Vec<BigInt>], b: &[Vec<BigInt>], c: &[Vec<BigInt>]) -> BigInt {
     let w = a.len();
     let bc: Vec<Vec<BigInt>> = (0..w).into_par_iter().map(|r| (0..w).map(|r2| b.iter().zip(c).map(|(bj, cj)| &bj[r] * &cj[r2]).sum()).collect()).collect();
     (0..w).into_par_iter().map(|r| (0..w).map(|r2| &a[r][r2] * &bc[r2][r]).sum::<BigInt>()).sum()
 }
 
-fn fit(read: &Read, reads: &[&FormRead]) -> Result<Fit> {
+fn fit(read: &Read, reads: &Reads) -> Result<Fit> {
     let (g, r) = joint(read, reads);
     let (det, dp) = solve_scaled(&g, &r, true)?;
     let share = trace_through(&read.gram_inverse, &r, &dp);
     let denominator = &read.gram_det * &read.l * &det;
-    Ok(Fit { det, dp, share, denominator })
+    Ok(Fit { g, det, dp, share, denominator })
 }
 
 /// The canonical share a held-out moment set keeps under the training lift, read to second order:
 /// with the natural lift `−N Y⁻¹ Pᵀ` founded on the training text,
 /// `s_h = (2N/N_h) tr(Y⁻¹PᵀR_h) − (N/N_h)² tr(P Y⁻¹ Y_h Y⁻¹ Pᵀ G_h)`, as a numerator and
 /// denominator (twice the nats a held-out cell saves).
-fn held_share(held: &Read, reads: &[&FormRead], train: &Read, trained: &Fit) -> (BigInt, BigInt) {
-    let (g, r) = joint(held, reads);
+fn held_share(held: &Read, held_reads: &Reads, train: &Read, trained: &Fit) -> (BigInt, BigInt) {
+    let (g, r) = joint(held, held_reads);
     let (n, nh) = (BigInt::from(train.cells), BigInt::from(held.cells));
     let (det, dy) = (&trained.det, &train.gram_det);
     let cross = trace_through(&train.gram_inverse, &trained.dp, &r);
-    let w = train.width;
+    let (w, k) = (train.width, trained.dp.len());
     // B = Y⁻¹ Pᵀ (scaled by D_Y·D), one row per covector coordinate.
-    let b: Vec<Vec<BigInt>> = (0..w).into_par_iter().map(|row| (0..reads.len()).map(|j| (0..w).map(|r2| &train.gram_inverse[row][r2] * &trained.dp[j][r2]).sum()).collect()).collect();
+    let b: Vec<Vec<BigInt>> = (0..w).into_par_iter().map(|row| (0..k).map(|j| (0..w).map(|r2| &train.gram_inverse[row][r2] * &trained.dp[j][r2]).sum()).collect()).collect();
     // Bᵀ Y_h B: k × k.
-    let yb: Vec<Vec<BigInt>> = (0..w).into_par_iter().map(|row| (0..reads.len()).map(|j| (0..w).map(|r2| &held.gram[row][r2] * &b[r2][j]).sum()).collect()).collect();
-    let k = reads.len();
+    let yb: Vec<Vec<BigInt>> = (0..w).into_par_iter().map(|row| (0..k).map(|j| (0..w).map(|r2| &held.gram[row][r2] * &b[r2][j]).sum()).collect()).collect();
     let middle: Vec<Vec<BigInt>> = (0..k).map(|j| (0..k).map(|kk| (0..w).map(|row| &b[row][j] * &yb[row][kk]).sum()).collect()).collect();
     let quad: BigInt = (0..k).map(|j| (0..k).map(|kk| &middle[j][kk] * &g[kk][j]).sum::<BigInt>()).sum();
     let numerator = &n * &nh * dy * det * cross * 2 - &n * &n * quad;
@@ -460,29 +560,50 @@ fn permille(num: &BigInt, den: &BigInt) -> String {
     format!("{scaled}")
 }
 
-/// The leading canonical direction of a block against the tension's metric: the generalized
-/// eigenvector of `(Mᵀ Y⁻¹ M, Q)` by the power step `w = Q⁻¹Mᵀv`, `v ← Y⁻¹Mw`, on `M` and `Q`
-/// released to below `2^60` their largest entry and `Y⁻¹` released (only directions are read),
-/// each vector released to `2^15`; it stops when a step raises `(Mw)ᵀY⁻¹(Mw)/(wᵀQw)` by less than
-/// `2^(−15)` of itself. Returns the factor and the carried `v`.
-fn leading_canonical(dm: &[Vec<BigInt>], dq: &[Vec<BigInt>], metric: &[Vec<i64>], mut v: Vec<i64>) -> Result<(Vec<i64>, Vec<i64>)> {
-    let (rows, q) = (dm.len(), dq.len());
-    let mt = release_big(&dm.iter().flatten().cloned().collect::<Vec<_>>(), 60);
+/// The leading canonical direction of a complex block against the tension's metric: the
+/// generalized eigenvector of `(𝕄ᴴ Y⁻¹ 𝕄, Q)`, `𝕄 = M₀ + i M₁` acting on a complex factor `w`
+/// and `Q` real, by the power step `w = Q⁻¹𝕄ᴴv`, `v ← Y⁻¹𝕄w`, on `M₀`, `M₁` and `Q` released to
+/// below `2^60` their largest entry and `Y⁻¹` released (only directions are read), each vector
+/// released to `2^15` with its two parts together; it stops when a step raises
+/// `‖𝕄w‖²_(Y⁻¹)/(wᴴQw)` by less than `2^(−15)` of itself. The numerator is the energy both faces
+/// of `c` carry, `‖Σ Re(c) y‖² + ‖Σ Im(c) y‖²` in `Y⁻¹`, over `Σ|c|²`: a turn's two faces count
+/// together. With `M₁ = 0` and `v` real the step stays real. Returns the factor and the carried
+/// `v`, each as its real and imaginary parts.
+fn leading_canonical(dm: [&[Vec<BigInt>]; 2], dq: &[Vec<BigInt>], metric: &[Vec<i64>], mut v: [Vec<i64>; 2]) -> Result<([Vec<i64>; 2], [Vec<i64>; 2])> {
+    let (rows, q) = (dm[0].len(), dq.len());
+    let mt = release_big(&dm[0].iter().chain(dm[1]).flatten().cloned().collect::<Vec<_>>(), 60);
+    let (m0, m1) = mt.split_at(rows * q);
     let qt = release_big(&dq.iter().flatten().cloned().collect::<Vec<_>>(), 60);
     let qbig: Vec<Vec<BigInt>> = (0..q).map(|i| (0..q).map(|j| BigInt::from(qt[i * q + j])).collect()).collect();
     let identity: Vec<Vec<BigInt>> = (0..q).map(|i| (0..q).map(|j| BigInt::from((i == j) as i64)).collect()).collect();
     let (_, inverse) = solve_scaled(&qbig, &identity, false)?;
-    let mut best: Option<(BigInt, BigInt, Vec<i64>, Vec<i64>)> = None;
+    let mut best: Option<(BigInt, BigInt, [Vec<i64>; 2], [Vec<i64>; 2])> = None;
     loop {
-        let g: Vec<i128> = (0..q).map(|j| (0..rows).map(|a| mt[a * q + j] as i128 * v[a] as i128).sum()).collect();
-        let wide: Vec<BigInt> = (0..q).map(|i| inverse[i].iter().zip(&g).map(|(x, &y)| x * y).sum()).collect();
-        let w = release_big(&wide, 15);
-        let u: Vec<i128> = (0..rows).map(|a| (0..q).map(|j| mt[a * q + j] as i128 * w[j] as i128).sum()).collect();
-        let mu: Vec<BigInt> = (0..rows).map(|a| (0..rows).map(|b| BigInt::from(metric[a][b]) * u[b]).sum()).collect();
-        let num: BigInt = mu.iter().zip(&u).map(|(x, &y)| x * y).sum();
-        let den: BigInt = (0..q).map(|i| (0..q).map(|j| BigInt::from(qt[i * q + j] as i128 * w[i] as i128) * w[j]).sum::<BigInt>()).sum();
-        v = release_big(&mu, 15);
-        if den <= BigInt::from(0) || w.iter().all(|&x| x == 0) {
+        // g = 𝕄ᴴ v: g₀ = M₀ᵀv₀ + M₁ᵀv₁, g₁ = M₀ᵀv₁ − M₁ᵀv₀.
+        let g0: Vec<i128> = (0..q).map(|j| (0..rows).map(|a| m0[a * q + j] as i128 * v[0][a] as i128 + m1[a * q + j] as i128 * v[1][a] as i128).sum()).collect();
+        let g1: Vec<i128> = (0..q).map(|j| (0..rows).map(|a| m0[a * q + j] as i128 * v[1][a] as i128 - m1[a * q + j] as i128 * v[0][a] as i128).sum()).collect();
+        let mut wide: Vec<BigInt> = Vec::with_capacity(2 * q);
+        for g in [&g0, &g1] {
+            for row in &inverse {
+                wide.push(row.iter().zip(g.iter()).map(|(x, &y)| x * y).sum());
+            }
+        }
+        let released = release_big(&wide, 15);
+        let w = [released[..q].to_vec(), released[q..].to_vec()];
+        // u = 𝕄 w: u₀ = M₀w₀ − M₁w₁, u₁ = M₀w₁ + M₁w₀.
+        let u0: Vec<i128> = (0..rows).map(|a| (0..q).map(|j| m0[a * q + j] as i128 * w[0][j] as i128 - m1[a * q + j] as i128 * w[1][j] as i128).sum()).collect();
+        let u1: Vec<i128> = (0..rows).map(|a| (0..q).map(|j| m0[a * q + j] as i128 * w[1][j] as i128 + m1[a * q + j] as i128 * w[0][j] as i128).sum()).collect();
+        let mut mu: Vec<BigInt> = Vec::with_capacity(2 * rows);
+        for u in [&u0, &u1] {
+            for row in metric {
+                mu.push(row.iter().zip(u.iter()).map(|(&x, &y)| BigInt::from(x) * y).sum());
+            }
+        }
+        let num: BigInt = mu.iter().zip(u0.iter().chain(&u1)).map(|(x, &y)| x * y).sum();
+        let den: BigInt = w.iter().map(|wp| (0..q).map(|i| (0..q).map(|j| BigInt::from(qt[i * q + j] as i128 * wp[i] as i128) * wp[j]).sum::<BigInt>()).sum::<BigInt>()).sum();
+        let carried = release_big(&mu, 15);
+        v = [carried[..rows].to_vec(), carried[rows..].to_vec()];
+        if den <= BigInt::from(0) || w.iter().flatten().all(|&x| x == 0) {
             break;
         }
         let gained = match &best {
@@ -501,61 +622,175 @@ fn leading_canonical(dm: &[Vec<BigInt>], dq: &[Vec<BigInt>], metric: &[Vec<i64>]
 }
 
 /// The a-step: with `b` held, the leading canonical direction over the carried face of the
-/// deflated centred moments `Q_b = Σ_u β_u² Q̃_u/n_u`, `M_b = Σ_u β_u M̃'_u/n_u` (each `β_u`
-/// released to `2^15`; only directions are read here).
-fn a_step(read: &Read, deflated: &[Vec<i128>], hats: &[Vec<i64>], b: &[i64], v: Vec<i64>) -> Result<(Vec<i64>, Vec<i64>)> {
-    let (dims, width) = (read.dims, read.width);
-    let betas: Vec<i128> = read.classes.iter().map(|c| hats[c.class].iter().zip(b).map(|(&x, &bb)| x as i128 * bb as i128).sum()).collect();
+/// deflated centred moments `Q_b = Σ_u |β_u|² Q̃_u/n_u`, `𝕄_b = Σ_u β_u M̃'_u/n_u` (each `β_u`
+/// complex, released with the others to `2^15`; only directions are read here).
+fn a_step(read: &Read, deflated: &[Vec<i128>], hats: &[Vec<i64>], b: &[Vec<i64>; 2], v: [Vec<i64>; 2]) -> Result<([Vec<i64>; 2], [Vec<i64>; 2])> {
+    let (dims, width, classes) = (read.dims, read.width, read.classes.len());
+    let betas: Vec<i128> = b.iter().flat_map(|bk| read.classes.iter().map(move |c| hats[c.class].iter().zip(bk).map(|(&x, &bb)| x as i128 * bb as i128).sum::<i128>())).collect();
     let rel = release_wide(&betas, 15);
+    let (r0, r1) = rel.split_at(classes);
     let ns: Vec<BigInt> = read.classes.iter().map(|c| BigInt::from(c.n)).collect();
     let dq: Vec<Vec<BigInt>> = (0..dims)
         .into_par_iter()
-        .map(|i| (0..dims).map(|j| (0..read.classes.len()).filter(|&u| rel[u] != 0).map(|u| div_round(&(BigInt::from(read.classes[u].q[i * dims + j]) * rel[u] * rel[u]), &ns[u])).sum()).collect())
+        .map(|i| {
+            (0..dims)
+                .map(|j| {
+                    (0..classes)
+                        .filter(|&u| r0[u] != 0 || r1[u] != 0)
+                        .map(|u| div_round(&(BigInt::from(read.classes[u].q[i * dims + j]) * (r0[u] as i128 * r0[u] as i128 + r1[u] as i128 * r1[u] as i128)), &ns[u]))
+                        .sum()
+                })
+                .collect()
+        })
         .collect();
-    let dm: Vec<Vec<BigInt>> = (0..width)
-        .into_par_iter()
-        .map(|r| (0..dims).map(|i| (0..read.classes.len()).filter(|&u| rel[u] != 0).map(|u| div_round(&(BigInt::from(deflated[u][i * width + r]) * rel[u]), &ns[u])).sum()).collect())
-        .collect();
-    leading_canonical(&dm, &dq, &read.metric, v)
+    let block = |rk: &[i64]| -> Vec<Vec<BigInt>> {
+        (0..width)
+            .into_par_iter()
+            .map(|r| (0..dims).map(|i| (0..classes).filter(|&u| rk[u] != 0).map(|u| div_round(&(BigInt::from(deflated[u][i * width + r]) * rk[u]), &ns[u])).sum()).collect())
+            .collect()
+    };
+    let (dm0, dm1) = (block(r0), block(r1));
+    leading_canonical([&dm0, &dm1], &dq, &read.metric, v)
 }
 
 /// The b-step: with `a` held, the leading canonical direction over `x̂` of
-/// `N = Σ_u x̂_u (M̃'_uᵀa)ᵀ/n_u` against `C = Σ_u (aᵀQ̃_u a/n_u) x̂_u x̂_uᵀ`.
-fn b_step(read: &Read, deflated: &[Vec<i128>], hats: &[Vec<i64>], a: &[i64], v: Vec<i64>) -> Result<(Vec<i64>, Vec<i64>)> {
+/// `𝕄 = Σ_u x̂_u (M̃'_uᵀa)ᵀ/n_u` against `C = Σ_u (aᴴQ̃_u a/n_u) x̂_u x̂_uᵀ`.
+fn b_step(read: &Read, deflated: &[Vec<i128>], hats: &[Vec<i64>], a: &[Vec<i64>; 2], v: [Vec<i64>; 2]) -> Result<([Vec<i64>; 2], [Vec<i64>; 2])> {
     let (dims, width, hat) = (read.dims, read.width, hats[0].len());
-    let per: Vec<(BigInt, Vec<BigInt>)> = read
+    let live = [a[0].iter().any(|&x| x != 0), a[1].iter().any(|&x| x != 0)];
+    let per: Vec<(BigInt, [Vec<BigInt>; 2])> = read
         .classes
         .par_iter()
         .zip(deflated)
         .map(|(c, m)| {
             let n = BigInt::from(c.n);
-            let quad: BigInt = (0..dims).map(|i| BigInt::from(a[i]) * (0..dims).map(|j| BigInt::from(c.q[i * dims + j]) * a[j]).sum::<BigInt>()).sum();
-            let lin: Vec<BigInt> = (0..width).map(|r| div_round(&(0..dims).map(|i| BigInt::from(m[i * width + r]) * a[i]).sum::<BigInt>(), &n)).collect();
+            let mut quad = BigInt::zero();
+            let mut lin: [Vec<BigInt>; 2] = [vec![BigInt::zero(); width], vec![BigInt::zero(); width]];
+            for k in 0..2 {
+                if !live[k] {
+                    continue;
+                }
+                let ak = &a[k];
+                quad += (0..dims).map(|i| BigInt::from(ak[i]) * (0..dims).map(|j| BigInt::from(c.q[i * dims + j]) * ak[j]).sum::<BigInt>()).sum::<BigInt>();
+                lin[k] = (0..width).map(|r| div_round(&(0..dims).map(|i| BigInt::from(m[i * width + r]) * ak[i]).sum::<BigInt>(), &n)).collect();
+            }
             (div_round(&quad, &n), lin)
         })
         .collect();
-    let dm: Vec<Vec<BigInt>> = (0..width).into_par_iter().map(|r| (0..hat).map(|j| read.classes.iter().zip(&per).map(|(c, (_, lin))| &lin[r] * hats[c.class][j]).sum()).collect()).collect();
+    let block = |k: usize| -> Vec<Vec<BigInt>> { (0..width).into_par_iter().map(|r| (0..hat).map(|j| read.classes.iter().zip(&per).map(|(c, (_, lin))| &lin[k][r] * hats[c.class][j]).sum()).collect()).collect() };
+    let (dm0, dm1) = (block(0), block(1));
     let dq: Vec<Vec<BigInt>> = (0..hat)
         .into_par_iter()
         .map(|i| (0..hat).map(|j| read.classes.iter().zip(&per).map(|(c, (quad, _))| quad * hats[c.class][i] * hats[c.class][j]).sum()).collect())
         .collect();
-    leading_canonical(&dm, &dq, &read.metric, v)
+    leading_canonical([&dm0, &dm1], &dq, &read.metric, v)
 }
 
-/// The centred moments less the founded forms' lift, `M̃'_u = M̃_u − Σ_j β_ju z_uj P_jᵀ` with
-/// `P = D·P/D`, rounded (directions only).
-fn deflate(read: &Read, reads: &[FormRead], fitted: &Fit) -> Result<Vec<Vec<i128>>> {
+/// [agent-inferred, October 24] A rank's ring start: the two leading directions over the carried
+/// face of the tension each class reads on it, summed over the classes without their phases,
+/// `A = Σ_u M̃'_u Y⁻¹ M̃'_uᵀ/n_u³` against the pooled within-class Gram `Q₀ = Σ_u Q̃_u/n_u` (with
+/// `β_u` free per class, a direction's share is at most `Σ_u aᵀC_uY⁻¹C_uᵀa / aᵀS_ua`, `C_u = M̃'_u/n_u`
+/// and `S_u = Q̃_u/n_u` the class's centred moments; `A` pools it, each class's part over its count,
+/// against the pooled Gram). A direction that each
+/// class reads with its own sign or phase, as a strand turned by the arriving class is, counts in
+/// full here; the unit start, every class alike, cancels it. The first is `a₀`; the second, kept
+/// `Q₀`-orthogonal to it and brought to its length, `a₁`. Power steps as [`leading_canonical`]'s.
+fn ring_seed(read: &Read, deflated: &[Vec<i128>]) -> Result<[Vec<i64>; 2]> {
+    let (dims, width, classes) = (read.dims, read.width, read.classes.len());
+    let ns: Vec<BigInt> = read.classes.iter().map(|c| BigInt::from(c.n)).collect();
+    let pooled: Vec<BigInt> = (0..dims * dims).into_par_iter().map(|ij| (0..classes).map(|u| div_round(&BigInt::from(read.classes[u].q[ij]), &ns[u])).sum()).collect();
+    let qt = release_big(&pooled, 60);
+    let qbig: Vec<Vec<BigInt>> = (0..dims).map(|i| (0..dims).map(|j| BigInt::from(qt[i * dims + j])).collect()).collect();
+    let identity: Vec<Vec<BigInt>> = (0..dims).map(|i| (0..dims).map(|j| BigInt::from((i == j) as i64)).collect()).collect();
+    let (_, inverse) = solve_scaled(&qbig, &identity, false)?;
+    let cubes: Vec<BigInt> = ns.iter().map(|n| n * n * n).collect();
+    let q_inner = |x: &[i64], y: &[i64]| -> BigInt { (0..dims).map(|i| (0..dims).map(|j| BigInt::from(qt[i * dims + j] as i128 * x[i] as i128) * y[j]).sum::<BigInt>()).sum() };
+    // A w and wᵀAw, each class's part rounded by its n_u³ (directions only).
+    let apply = |w: &[i64]| -> (Vec<BigInt>, BigInt) {
+        let parts: Vec<(Vec<BigInt>, BigInt)> = (0..classes)
+            .into_par_iter()
+            .map(|u| {
+                let m = &deflated[u];
+                let t: Vec<BigInt> = (0..width).map(|r| (0..dims).map(|i| BigInt::from(m[i * width + r]) * w[i]).sum()).collect();
+                let t2: Vec<BigInt> = read.metric.iter().map(|row| row.iter().zip(&t).map(|(&x, y)| y * x).sum()).collect();
+                let s: Vec<BigInt> = (0..dims).map(|i| div_round(&(0..width).map(|r| &t2[r] * m[i * width + r]).sum::<BigInt>(), &cubes[u])).collect();
+                let quad = div_round(&t.iter().zip(&t2).map(|(x, y)| x * y).sum::<BigInt>(), &cubes[u]);
+                (s, quad)
+            })
+            .collect();
+        let mut g = vec![BigInt::zero(); dims];
+        let mut quad = BigInt::zero();
+        for (s, q) in parts {
+            for (gi, si) in g.iter_mut().zip(s) {
+                *gi += si;
+            }
+            quad += q;
+        }
+        (g, quad)
+    };
+    let mut found: Vec<Vec<i64>> = Vec::new();
+    for _ in 0..2 {
+        let start = (0..dims).max_by(|&x, &y| qt[x * dims + x].cmp(&qt[y * dims + y])).unwrap_or(0);
+        let mut w: Vec<i64> = (0..dims).map(|i| (i == start) as i64).collect();
+        let mut best: Option<(BigInt, BigInt, Vec<i64>)> = None;
+        loop {
+            if let Some(e) = found.first() {
+                // Kept Q₀-orthogonal to the first direction.
+                let (ee, ew) = (q_inner(e, e), q_inner(e, &w));
+                let wide: Vec<BigInt> = w.iter().zip(e).map(|(&x, &y)| &ee * x - &ew * y).collect();
+                w = release_big(&wide, 15);
+            }
+            let (g, num) = apply(&w);
+            let den = q_inner(&w, &w);
+            if den <= BigInt::from(0) {
+                break;
+            }
+            let gained = match &best {
+                None => true,
+                Some((bn, bd, _)) => (&num * bd) << 15u32 > bn * &den * ((1i64 << 15) + 1),
+            };
+            if best.as_ref().is_none_or(|(bn, bd, _)| &num * bd > bn * &den) {
+                best = Some((num, den, w.clone()));
+            }
+            if !gained {
+                break;
+            }
+            let wide: Vec<BigInt> = inverse.iter().map(|row| row.iter().zip(&g).map(|(x, y)| x * y).sum()).collect();
+            w = release_big(&wide, 15);
+        }
+        let (_, _, w) = best.ok_or("the ring start found no direction")?;
+        found.push(w);
+    }
+    // The second brought to the first's length in Q₀: a₁ ← a₁ √(a₀ᵀQ₀a₀ / a₁ᵀQ₀a₁).
+    let (first, second) = (q_inner(&found[0], &found[0]), q_inner(&found[1], &found[1]));
+    let scale = if second.is_zero() { BigInt::zero() } else { ((first << 64u32) / second).sqrt() };
+    let wide: Vec<BigInt> = found[0].iter().map(|&x| BigInt::from(x) << 32u32).chain(found[1].iter().map(|&x| &scale * x)).collect();
+    let released = release_big(&wide, 15);
+    Ok([released[..dims].to_vec(), released[dims..].to_vec()])
+}
+
+/// The centred moments less the founded channels' lift, `M̃'_u = M̃_u − Σ_t z_ut L_utᵀ` with each
+/// factor's lift `L_ut = Σ_(j ∋ t) ±β P_j` and `P = D·P/D`, rounded (directions only).
+fn deflate(read: &Read, reads: &Reads, fitted: &Fit) -> Result<Vec<Vec<i128>>> {
     use num_traits::ToPrimitive;
-    let (dims, width) = (read.dims, read.width);
+    let (dims, width, atoms) = (read.dims, read.width, reads.atoms.len());
     read.classes
         .par_iter()
         .enumerate()
         .map(|(u, c)| {
-            let lifts: Vec<Vec<BigInt>> = reads.iter().zip(&fitted.dp).map(|(f, p)| p.iter().map(|x| x * f.beta[u]).collect()).collect();
+            let mut lifts: Vec<Vec<BigInt>> = vec![vec![BigInt::zero(); width]; atoms];
+            for ((_, terms), p) in reads.channels.iter().zip(&fitted.dp) {
+                for &(t, k, negated) in terms {
+                    let coefficient = reads.coefficient(u, k, negated);
+                    for (slot, x) in lifts[t].iter_mut().zip(p) {
+                        *slot += x * coefficient;
+                    }
+                }
+            }
             let mut out = vec![0i128; dims * width];
             for i in 0..dims {
                 for r in 0..width {
-                    let lift: BigInt = reads.iter().zip(&lifts).map(|(f, l)| &l[r] * f.z[u][i]).sum();
+                    let lift: BigInt = (0..atoms).map(|t| &lifts[t][r] * reads.atoms[t].z[u][i]).sum();
                     let v = div_round(&(BigInt::from(c.m[i * width + r]) * &fitted.det - lift), &fitted.det);
                     out[i * width + r] = v.to_i128().ok_or("a deflated moment outgrew its 128-bit carrier")?;
                 }
@@ -568,22 +803,63 @@ fn deflate(read: &Read, reads: &[FormRead], fitted: &Fit) -> Result<Vec<Vec<i128
 
 /// Per class, the part of the canonical share it carries,
 /// `s_u = 2 tr(Y⁻¹ Pᵀ R_u) − tr(P Y⁻¹ Pᵀ G_u)` (the parts sum to `s`), as numerators over
-/// `D² D_Y n_u`: `2D Σ_j β_ju (DP_j Y⁻¹ M̃_uᵀa_j) − Σ_jk β_ju β_ku (a_jᵀQ̃_u a_k)(DP_j Y⁻¹ DP_kᵀ)`
-/// with `Y⁻¹` its scaled inverse.
-fn share_per_class(read: &Read, reads: &[FormRead], fitted: &Fit) -> Vec<BigInt> {
-    let (k, w) = (reads.len(), read.width);
+/// `D² D_Y n_u`, with `Y⁻¹` its scaled inverse.
+fn share_per_class(read: &Read, reads: &Reads, fitted: &Fit) -> Vec<BigInt> {
+    let (k, w) = (reads.channels.len(), read.width);
     let pa: Vec<Vec<BigInt>> = (0..k).map(|j| (0..w).map(|r| (0..w).map(|r2| &read.gram_inverse[r][r2] * &fitted.dp[j][r2]).sum()).collect()).collect();
     let cross: Vec<Vec<BigInt>> = (0..k).map(|j| (0..k).map(|kk| fitted.dp[j].iter().zip(&pa[kk]).map(|(x, y)| x * y).sum()).collect()).collect();
     (0..read.classes.len())
         .into_par_iter()
         .map(|u| {
-            let lin: BigInt = (0..k).map(|j| reads[j].w[u].iter().zip(&pa[j]).map(|(x, y)| x * y).sum::<BigInt>() * reads[j].beta[u]).sum();
-            let quad: BigInt = (0..k)
-                .map(|j| (0..k).map(|kk| if kk <= j { &reads[j].inner[u][kk] } else { &reads[kk].inner[u][j] } * reads[j].beta[u] * reads[kk].beta[u] * &cross[j][kk]).sum::<BigInt>())
-                .sum();
+            let lin: BigInt = (0..k).map(|j| (0..w).map(|r| reads.class_cross(u, j, r) * &pa[j][r]).sum::<BigInt>()).sum();
+            let quad: BigInt = (0..k).map(|j| (0..k).map(|kk| reads.class_gram(u, j, kk) * &cross[j][kk]).sum::<BigInt>()).sum();
             lin * &fitted.det * 2 - quad
         })
         .collect()
+}
+
+/// One rank's search from a start: the unit (`b` the unit, every class alike) or a ring
+/// ([`ring_seed`], whose `a` is held for a first b-step), alternating the two factors' steps until
+/// a pair raises the training share by less than `2^(−15)` of itself. Returns the best exact
+/// share, its form and the steps taken.
+fn alternate(read: &Read, deflated: &[Vec<i128>], hats: &[Vec<i64>], reads: &mut Reads, forms: &[Form], ring: Option<[Vec<i64>; 2]>) -> Result<(BigInt, BigInt, Form, usize)> {
+    let width = read.width;
+    // The carried covector starts at the coordinate with the most tension.
+    let top = (0..width).max_by(|&x, &y| read.diagonal[x].cmp(&read.diagonal[y])).unwrap_or(0);
+    let mut v: [Vec<i64>; 2] = [(0..width).map(|r| (r == top) as i64).collect(), vec![0; width]];
+    let mut b: [Vec<i64>; 2] = [(0..=width).map(|j| (j == width) as i64).collect(), vec![0; width + 1]];
+    if let Some(a) = ring {
+        let (b1, v1) = b_step(read, deflated, hats, &a, v)?;
+        b = b1;
+        v = v1;
+    }
+    let mut best: Option<(BigInt, BigInt, Form)> = None;
+    let mut steps = 0;
+    loop {
+        steps += 1;
+        let (a, v1) = a_step(read, deflated, hats, &b, v)?;
+        let (b1, v2) = b_step(read, deflated, hats, &a, v1)?;
+        v = v2;
+        b = b1.clone();
+        let candidate = Form { a, b: b1, faces: [true, true] };
+        reads.push(read, hats, &candidate, forms)?;
+        let trial = fit(read, reads);
+        reads.truncate(forms.len());
+        let trial = trial?;
+        let (num, den) = (trial.share, trial.denominator);
+        let gained = match &best {
+            None => true,
+            Some((bn, bd, _)) => (&num * bd) << 15u32 > bn * &den * ((1i64 << 15) + 1),
+        };
+        if best.as_ref().is_none_or(|(bn, bd, _)| &num * bd > bn * &den) {
+            best = Some((num, den, candidate));
+        }
+        if !gained {
+            break;
+        }
+    }
+    let (num, den, form) = best.ok_or("the alternation founded no form")?;
+    Ok((num, den, form, steps))
 }
 
 /// The checked head of a moments file read on this tower: its level.
@@ -638,13 +914,16 @@ pub(super) fn read_tower_situated_moments(args: &[String]) -> Result<()> {
 }
 
 /// `found-tower-situated STATE STATE_SHA TRAIN_MOMENTS TRAIN_MOMENTS_SHA HELD_MOMENTS
-/// HELD_MOMENTS_SHA FORMS OUT [FROM FROM_SHA]`: found situated forms from the training moments up
-/// to `FORMS` in all, read each rank's canonical share on the training and held-out moments, and
-/// write each form to `OUT` (create-new) as it is founded. `FROM`, a forms file founded on the same
-/// moments, supplies the first forms: they are read again, copied to `OUT` and deflated, and the
-/// founding continues from the next rank. Shares are in thousandths, rounded: the sum of the
-/// squared canonical correlations, twice the nats a cell saves; `serves` names the classes carrying
-/// most of the training share, each with its part.
+/// HELD_MOMENTS_SHA FORMS OUT [FROM FROM_SHA]`: found complex situated forms from the training
+/// moments up to `FORMS` in all, read each rank's canonical share on the training and held-out
+/// moments, and write each form to `OUT` (create-new) as it is founded. `FROM`, a forms file
+/// founded on the same moments, supplies the first forms: they are read again, copied to `OUT` and
+/// deflated, and the founding continues from the next rank. Each rank searches from the unit and
+/// from a ring ([`alternate`]) and founds the larger exact training share; `unit` and `ring` print
+/// each start's. A form keeps both faces unless they are one reading (their squared correlation
+/// within `2^(−15)` of one), when it keeps the larger. Shares are in thousandths, rounded: the sum
+/// of the squared canonical correlations, twice the nats a cell saves; `serves` names the classes
+/// carrying most of the training share, each with its part.
 pub(super) fn found_tower_situated(args: &[String]) -> Result<()> {
     if args.len() != 9 && args.len() != 11 {
         return Err("found-tower-situated STATE STATE_SHA TRAIN_MOMENTS TRAIN_MOMENTS_SHA HELD_MOMENTS HELD_MOMENTS_SHA FORMS OUT [FROM FROM_SHA]".into());
@@ -681,9 +960,15 @@ pub(super) fn found_tower_situated(args: &[String]) -> Result<()> {
     std::io::Write::write_all(&mut file, format!("SITUATED level={level} dims={} width={width} state_sha256={} moments_sha256={}\n", train_read.dims, args[2], args[4]).as_bytes())?;
     let (hats, _) = pair_hats(tower);
     let mut forms: Vec<Form> = Vec::new();
-    let mut reads: Vec<FormRead> = Vec::new();
-    let mut held_reads: Vec<FormRead> = Vec::new();
+    let (mut reads, mut held_reads) = (Reads::default(), Reads::default());
     let mut deflated: Vec<Vec<i128>> = train_read.classes.iter().map(|c| c.m.clone()).collect();
+    // The form's release for a reading: its training values' within-class root mean square,
+    // `Σ|c|²` over the cells, brought to below 2^16.
+    let shift_of = |fitted: &Fit, reads: &Reads, j: usize| -> u64 {
+        let total: BigInt = reads.channels.iter().enumerate().filter(|(_, (f, _))| *f == j).map(|(c, _)| fitted.g[c][c].clone()).sum();
+        let mean_square = total / (&train_read.l * BigInt::from(train_read.cells.max(1)));
+        mean_square.bits().div_ceil(2).saturating_sub(16)
+    };
     // The forms a founding on these same moments already wrote, read again and deflated before the
     // next rank is searched: the search is the founding's cost, the reading of a known form is not.
     if args.len() == 11 {
@@ -697,18 +982,18 @@ pub(super) fn found_tower_situated(args: &[String]) -> Result<()> {
             return Err("FROM was founded on another level, or holds more forms than FORMS".into());
         }
         for (form, shift) in known {
-            reads.push(form_read(&train_read, &hats, &form, &forms)?);
-            held_reads.push(form_read(&held_read, &hats, &form, &forms)?);
-            let join = |v: &[i64]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",");
-            std::io::Write::write_all(&mut file, format!("FORM {} shift={shift} a={} b={}\n", forms.len(), join(&form.a), join(&form.b)).as_bytes())?;
+            reads.push(&train_read, &hats, &form, &forms)?;
+            held_reads.push(&held_read, &hats, &form, &forms)?;
+            std::io::Write::write_all(&mut file, form.line(forms.len(), shift).as_bytes())?;
             forms.push(form);
         }
         file.sync_data()?;
-        let trained = fit(&train_read, &reads.iter().collect::<Vec<_>>())?;
-        let (hnum, hden) = held_share(&held_read, &held_reads.iter().collect::<Vec<_>>(), &train_read, &trained);
+        let trained = fit(&train_read, &reads)?;
+        let (hnum, hden) = held_share(&held_read, &held_reads, &train_read, &trained);
         println!(
-            "SITUATED_FROM forms={} train_canonical_permille={} held_out_canonical_permille={} elapsed_ms={}",
+            "SITUATED_FROM forms={} channels={} train_canonical_permille={} held_out_canonical_permille={} elapsed_ms={}",
             forms.len(),
+            reads.channels.len(),
             permille(&trained.share, &trained.denominator),
             permille(&hnum, &hden),
             started.elapsed().as_millis()
@@ -717,64 +1002,48 @@ pub(super) fn found_tower_situated(args: &[String]) -> Result<()> {
             deflated = deflate(&train_read, &reads, &trained)?;
         }
     }
-    let unit: Vec<i64> = (0..=width).map(|j| (j == width) as i64).collect();
-    // Each rank starts at the covector coordinate with the most tension, `b` the unit.
-    let top = (0..width).max_by(|&x, &y| train_read.diagonal[x].cmp(&train_read.diagonal[y])).unwrap_or(0);
     for rank in forms.len() + 1..=ranks {
-        let mut v: Vec<i64> = (0..width).map(|r| (r == top) as i64).collect();
-        let mut b = unit.clone();
-        let mut best: Option<(BigInt, BigInt, Form)> = None;
-        let mut steps = 0;
-        loop {
-            steps += 1;
-            let (a, v1) = a_step(&train_read, &deflated, &hats, &b, v)?;
-            let (b1, v2) = b_step(&train_read, &deflated, &hats, &a, v1)?;
-            v = v2;
-            b = b1.clone();
-            let candidate = Form { a, b: b1 };
-            let own = form_read(&train_read, &hats, &candidate, &forms)?;
-            let trial: Vec<&FormRead> = reads.iter().chain(std::iter::once(&own)).collect();
-            let trial_fit = fit(&train_read, &trial)?;
-            let (num, den) = (trial_fit.share, trial_fit.denominator);
-            let gained = match &best {
-                None => true,
-                Some((bn, bd, _)) => (&num * bd) << 15u32 > bn * &den * ((1i64 << 15) + 1),
-            };
-            if best.as_ref().is_none_or(|(bn, bd, _)| &num * bd > bn * &den) {
-                best = Some((num, den, candidate));
-            }
-            if !gained {
-                break;
+        let (unit_num, unit_den, unit_form, unit_steps) = alternate(&train_read, &deflated, &hats, &mut reads, &forms, None)?;
+        let ring = ring_seed(&train_read, &deflated)?;
+        let (ring_num, ring_den, ring_form, ring_steps) = alternate(&train_read, &deflated, &hats, &mut reads, &forms, Some(ring))?;
+        let (unit_share, ring_share) = (permille(&unit_num, &unit_den), permille(&ring_num, &ring_den));
+        let (mut form, start, steps) = if ring_num * &unit_den > unit_num * &ring_den { (ring_form, "ring", ring_steps) } else { (unit_form, "unit", unit_steps) };
+        form.faces = form.live_faces();
+        // A form whose two faces are one reading keeps the larger.
+        reads.push(&train_read, &hats, &form, &forms)?;
+        let own = fit(&train_read, &reads);
+        let mine: Vec<usize> = reads.channels.iter().enumerate().filter(|(_, (f, _))| *f == forms.len()).map(|(c, _)| c).collect();
+        reads.truncate(forms.len());
+        let own = own?;
+        if let [re, im] = mine[..] {
+            let (g00, g11, g01) = (&own.g[re][re], &own.g[im][im], &own.g[re][im]);
+            if (g01 * g01) << 15u32 > g00 * g11 * ((1i64 << 15) - 1) {
+                form.faces = if g00 >= g11 { [true, false] } else { [false, true] };
             }
         }
-        let (_, _, form) = best.ok_or("the alternation founded no form")?;
-        reads.push(form_read(&train_read, &hats, &form, &forms)?);
-        held_reads.push(form_read(&held_read, &hats, &form, &forms)?);
+        reads.push(&train_read, &hats, &form, &forms)?;
+        held_reads.push(&held_read, &hats, &form, &forms)?;
         forms.push(form);
-        let trained = fit(&train_read, &reads.iter().collect::<Vec<_>>())?;
-        let (hnum, hden) = held_share(&held_read, &held_reads.iter().collect::<Vec<_>>(), &train_read, &trained);
+        let trained = fit(&train_read, &reads)?;
+        let (hnum, hden) = held_share(&held_read, &held_reads, &train_read, &trained);
         // The classes carrying most of the training share, each with its part of it.
         let per = share_per_class(&train_read, &reads, &trained);
         let mut served: Vec<(BigInt, usize)> = per.iter().zip(&train_read.classes).enumerate().map(|(u, (x, c))| (div_round(&(x * &train_read.l), &BigInt::from(c.n)), u)).collect();
         served.sort_by(|x, y| y.0.cmp(&x.0));
         let named: Vec<String> = served.iter().take(6).map(|(x, u)| format!("{}:{}", class_label(train_read.classes[*u].class), permille(x, &(&trained.det * &trained.share)))).collect();
+        let j = forms.len() - 1;
+        let form = &forms[j];
+        let faces: Vec<&str> = ["re", "im"].into_iter().zip(form.faces).filter(|(_, kept)| *kept).map(|(name, _)| name).collect();
         println!(
-            "SITUATED_RANK rank={rank} steps={steps} train_canonical_permille={} held_out_canonical_permille={} serves={} elapsed_ms={}",
+            "SITUATED_RANK rank={rank} start={start} steps={steps} unit={unit_share} ring={ring_share} faces={} channels={} train_canonical_permille={} held_out_canonical_permille={} serves={} elapsed_ms={}",
+            faces.join(","),
+            reads.channels.len(),
             permille(&trained.share, &trained.denominator),
             permille(&hnum, &hden),
             named.join(","),
             started.elapsed().as_millis()
         );
-        // The form's release for a reading: its training values' within-class root mean square
-        // brought to below 2^16.
-        let last = reads.last().expect("a founded form");
-        let j = reads.len() - 1;
-        let total: BigInt = train_read.classes.iter().enumerate().map(|(u, c)| div_round(&(&last.inner[u][j] * last.beta[u] * last.beta[u]), &BigInt::from(c.n))).sum();
-        let mean_square = total / BigInt::from(train_read.cells.max(1));
-        let shift = mean_square.bits().div_ceil(2).saturating_sub(16);
-        let join = |v: &[i64]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",");
-        let form = forms.last().expect("a founded form");
-        std::io::Write::write_all(&mut file, format!("FORM {j} shift={shift} a={} b={}\n", join(&form.a), join(&form.b)).as_bytes())?;
+        std::io::Write::write_all(&mut file, form.line(j, shift_of(&trained, &reads, j)).as_bytes())?;
         file.sync_data()?;
         if rank < ranks {
             deflated = deflate(&train_read, &reads, &trained)?;
@@ -813,11 +1082,17 @@ fn parse_forms(text: &str, tower: &Tower) -> Result<(usize, Vec<(Form, u64)>)> {
     let mut forms = Vec::new();
     for line in lines.filter(|l| l.starts_with("FORM ")) {
         let shift = field(line, "shift").ok_or("no shift")?.parse::<u64>()?;
-        let (a, b) = (parse(field(line, "a").ok_or("no a")?)?, parse(field(line, "b").ok_or("no b")?)?);
-        if a.len() != dims || b.len() != width + 1 {
+        let kept = field(line, "faces").ok_or("no faces")?;
+        let faces = [kept.split(',').any(|f| f == "re"), kept.split(',').any(|f| f == "im")];
+        if kept.split(',').any(|f| f != "re" && f != "im") || faces == [false, false] {
+            return Err("a form's faces are re, im or both".into());
+        }
+        let a = [parse(field(line, "a").ok_or("no a")?)?, parse(field(line, "ai").ok_or("no ai")?)?];
+        let b = [parse(field(line, "b").ok_or("no b")?)?, parse(field(line, "bi").ok_or("no bi")?)?];
+        if a.iter().any(|x| x.len() != dims) || b.iter().any(|x| x.len() != width + 1) {
             return Err("a form's factors have the wrong lengths".into());
         }
-        forms.push((Form { a, b }, shift));
+        forms.push((Form { a, b, faces }, shift));
     }
     if forms.is_empty() {
         return Err("a forms file with no form".into());
@@ -827,9 +1102,10 @@ fn parse_forms(text: &str, tower: &Tower) -> Result<(usize, Vec<(Form, u64)>)> {
 
 /// [agent-inferred, October 24] `read-tower-situated STATE STATE_SHA FORMS FORMS_SHA TEXT TEXT_SHA
 /// CELLS CELLS_SHA`: the frozen tower reads `TEXT` as one passage from rest, and at each named cell
-/// the situated forms' values are printed, `FORMS i class v₁ … v_k`, each `c = (aᵀŝ)(bᵀx̂)` (the
-/// state the cell's class meets on its level, the class's encoding with the unit) released by its
-/// form's shift, rounded to nearest. A reading beside the code: the tower is not moved.
+/// the situated forms' kept faces are printed, `FORMS i class v₁ … v_k`, each a face of
+/// `c = (aᵀŝ)(bᵀx̂)` (the state the cell's class meets on its level, the class's encoding with the
+/// unit), `Re c` before `Im c`, released by its form's shift, rounded to nearest. A reading beside
+/// the code: the tower is not moved.
 pub(super) fn read_tower_situated(args: &[String]) -> Result<()> {
     if args.len() != 9 {
         return Err("read-tower-situated STATE STATE_SHA FORMS FORMS_SHA TEXT TEXT_SHA CELLS CELLS_SHA".into());
@@ -860,11 +1136,13 @@ pub(super) fn read_tower_situated(args: &[String]) -> Result<()> {
             let face = carried_face(&[before])?;
             let mut line = format!("FORMS {i} {}", classes[i]);
             for (form, shift) in &forms {
-                let alpha: i128 = form.a.iter().zip(&face).map(|(&a, &s)| a as i128 * s as i128).sum();
-                let beta: i128 = form.b.iter().zip(&hats[classes[i]]).map(|(&b, &x)| b as i128 * x as i128).sum();
-                let value = BigInt::from(alpha) * beta;
-                let released = if *shift == 0 { value } else { div_round(&value, &(BigInt::from(1) << *shift)) };
-                let _ = write!(line, " {released}");
+                let p: Vec<BigInt> = form.a.iter().map(|a| BigInt::from(a.iter().zip(&face).map(|(&x, &s)| x as i128 * s as i128).sum::<i128>())).collect();
+                let beta: Vec<BigInt> = form.b.iter().map(|b| BigInt::from(b.iter().zip(&hats[classes[i]]).map(|(&x, &h)| x as i128 * h as i128).sum::<i128>())).collect();
+                let values = [&p[0] * &beta[0] - &p[1] * &beta[1], &p[0] * &beta[1] + &p[1] * &beta[0]];
+                for (value, _) in values.iter().zip(form.faces).filter(|(_, kept)| *kept) {
+                    let released = if *shift == 0 { value.clone() } else { div_round(value, &(BigInt::from(1) << *shift)) };
+                    let _ = write!(line, " {released}");
+                }
             }
             println!("{line}");
             Ok(())

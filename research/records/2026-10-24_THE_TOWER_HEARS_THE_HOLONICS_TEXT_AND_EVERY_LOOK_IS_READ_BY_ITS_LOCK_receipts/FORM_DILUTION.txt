@@ -1,0 +1,5 @@
+B cells 8986
+share at the B cells alone: the form 6.59, the exact crossing chi_1(a0)chi_1(b0) 6.71, a lookup by c0 11.94 per mille of the text's canonical tension
+the form's within-class energy: whole text 3.931e+47, its ten digit classes 6.727e+46 (171 per mille), the sums' B cells 7.708e+43 (0.2 per mille of the whole)
+whitened tension a B cell: mean 0.67 times the text's mean cell (within its class 0.65); the B cells hold 3.38 per mille of the text's tension; the exact crossing is 32 per mille of the B cells' within-class tension
+MEASURE exit=0 wall_s=5.4 peak_rss_kib=133160

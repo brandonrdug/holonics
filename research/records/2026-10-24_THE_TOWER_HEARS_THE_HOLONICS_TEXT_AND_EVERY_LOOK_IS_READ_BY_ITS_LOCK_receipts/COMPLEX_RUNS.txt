@@ -1,0 +1,12 @@
+== the first complex rank (a timing read; deadline 700 s)
+SITUATED_PASS train_cells=1789108 held_out_cells=48023 train_classes=171 held_out_classes=131 dims=128 width=64 class_means_permille_of_covector_energy=7 held_out_class_means_permille=17 read_ms=1755
+SITUATED_RANK rank=1 start=ring steps=2 unit=96 ring=97 faces=re,im channels=2 train_canonical_permille=97 held_out_canonical_permille=108 serves=3:303,4:237,2:149,5:132,1:73,6:57 elapsed_ms=97207
+SITUATED_WRITTEN forms=1 sha256=eb5db4141bcd65c7990dfeddbc99c3ae06a6d4b4e1907194d880e22fb26e7dcf elapsed_ms=97211
+MEASURE exit=0 wall_s=97.3 peak_rss_kib=271220
+== eight complex ranks resumed from the first (projection 4,463 s, deadline 4,500 s; a rank past 640 s stops it), stopped by hand after the fourth form: four complex forms read a sum's units at B in 50 of 495 (SITUATED_PROBE_c4.txt), against 49 for four real forms
+SITUATED_PASS train_cells=1789108 held_out_cells=48023 train_classes=171 held_out_classes=131 dims=128 width=64 class_means_permille_of_covector_energy=7 held_out_class_means_permille=17 read_ms=2081
+SITUATED_FROM forms=1 channels=2 train_canonical_permille=97 held_out_canonical_permille=108 elapsed_ms=2251
+SITUATED_RANK rank=2 start=ring steps=6 unit=149 ring=153 faces=re,im channels=4 train_canonical_permille=153 held_out_canonical_permille=195 serves==:306,3:195,4:153,2:97,5:89,1:48 elapsed_ms=316287
+SITUATED_RANK rank=3 start=ring steps=4 unit=196 ring=200 faces=re,im channels=6 train_canonical_permille=200 held_out_canonical_permille=266 serves==:236,3:170,4:138,2:103,5:88,1:68 elapsed_ms=414860
+SITUATED_RANK rank=4 start=unit steps=12 unit=242 ring=229 faces=re channels=7 train_canonical_permille=242 held_out_canonical_permille=288 serves==:195,s:170,3:140,4:114,2:86,5:73 elapsed_ms=538366
+MEASURE exit=-15 wall_s=713.3 peak_rss_kib=288340

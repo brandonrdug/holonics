@@ -1,0 +1,6 @@
+probe: coordinates released by 2^2 (a state's to 2^-22 of its unit), ridge 1
++/A forms train=9018 dim=3 a0=443/495 (commonest 62) b0=36/495 (commonest 57) c0=35/495 (commonest 63)
++/B forms train=9018 dim=3 a0=43/495 (commonest 62) b0=37/495 (commonest 57) c0=475/495 (commonest 63)
++/E forms train=9018 dim=3 a0=49/495 (commonest 62) b0=118/495 (commonest 57) c0=39/495 (commonest 63)
++/U forms train=9018 dim=3 a0=45/495 (commonest 62) b0=61/495 (commonest 57) c0=32/495 (commonest 63)
+MEASURE exit=0 wall_s=1.0 peak_rss_kib=73896

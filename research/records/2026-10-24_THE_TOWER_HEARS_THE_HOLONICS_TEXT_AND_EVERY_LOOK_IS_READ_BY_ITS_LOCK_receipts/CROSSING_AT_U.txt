@@ -1,0 +1,11 @@
+U before: a0 indicators 442, its character's share held out 778 per mille, nearest root 301 of 495
+U before: b0 indicators 495, its character's share held out 973 per mille, nearest root 488 of 495
+U before: c0 by indicators from the state 94; from the product of the two reads by angle 304, by the probe's indicator fit 293 of 495
+U after: a0 indicators 376, its character's share held out 636 per mille, nearest root 225 of 495
+U after: b0 indicators 492, its character's share held out 918 per mille, nearest root 420 of 495
+U after: c0 by indicators from the state 83; from the product of the two reads by angle 209, by the probe's indicator fit 196 of 495
+U: cells 8986; whitened tension a cell 0.18 times the text's mean; within-class tension 53.8 per mille (the founding's unit); the exact crossing chi_1(c0) 9.71 (180 per mille of the cells' own), a lookup by c0 22.32
+B: cells 8986; whitened tension a cell 0.67 times the text's mean; within-class tension 209.2 per mille (the founding's unit); the exact crossing chi_1(c0) 6.71 (32 per mille of the cells' own), a lookup by c0 11.94
+E: cells 8986; whitened tension a cell 0.56 times the text's mean; within-class tension 177.9 per mille (the founding's unit); the exact crossing chi_1(c0) 7.47 (42 per mille of the cells' own), a lookup by c0 12.85
+A: cells 8983; whitened tension a cell 0.49 times the text's mean; within-class tension 129.7 per mille (the founding's unit); the exact crossing chi_1(c0) 2.99 (23 per mille of the cells' own), a lookup by c0 5.19
+MEASURE exit=0 wall_s=11.1 peak_rss_kib=173928
