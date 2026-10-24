@@ -1,0 +1,8 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 25.1 s
+held-out digit arrivals 8239, sums' B cells 495
+the sums' B cells, pooled (8986): chi_1(c0) share 0.3859 (foil 0.0137); chi_1(b0) 0.3147
+   result length 1: 52 cells, too few for a 64-dimensional tension
+   result length 2: 4503 cells; chi_1(c0) share 0.6792 (foil 0.0225); chi_1(b0) 0.4767
+   result length 3: 4431 cells; chi_1(c0) share 0.7262 (foil 0.0341); chi_1(b0) 0.3766
+done in 31.5 s
+MEASURE exit=0 wall_s=31.8 peak_rss_kib=825964

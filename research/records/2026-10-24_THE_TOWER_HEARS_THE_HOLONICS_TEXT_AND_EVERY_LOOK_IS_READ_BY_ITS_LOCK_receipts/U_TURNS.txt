@@ -1,0 +1,42 @@
+training sums' U cells 8986, held out 495; read in 3.6 s
+whitened rank 128; 24 turns, at most 120 steps each
+   turn 1: modulus spread 0.006, Godard cost 0.0001; holds chi_2(a0) 0.001, chi_1(b0) 0.089, chi_1(c0) 0.000; 2.7 s
+   turn 2: modulus spread 0.169, Godard cost 0.0968; holds chi_4(a0) -0.000, chi_2(b0) 0.022, chi_1(c0) -0.001; 5.2 s
+   turn 3: modulus spread 0.157, Godard cost 0.0850; holds chi_4(a0) -0.001, chi_4(b0) 0.017, chi_2(c0) -0.000; 7.4 s
+   turn 4: modulus spread 0.110, Godard cost 0.0445; holds chi_2(a0) 0.000, chi_1(b0) 0.217, chi_5(c0) -0.000; 10.1 s
+   turn 5: modulus spread 0.134, Godard cost 0.0644; holds chi_5(a0) 0.000, chi_1(b0) 0.230, chi_5(c0) -0.000; 12.9 s
+   turn 6: modulus spread 0.247, Godard cost 0.1704; holds chi_3(a0) 0.001, chi_3(b0) 0.012, chi_1(c0) 0.001; 15.7 s
+   turn 7: modulus spread 0.177, Godard cost 0.1052; holds chi_3(a0) 0.001, chi_3(b0) 0.179, chi_5(c0) -0.000; 18.3 s
+   turn 8: modulus spread 0.277, Godard cost 0.2026; holds chi_1(a0) 0.214, chi_5(b0) 0.140, chi_1(c0) 0.000; 21.0 s
+   turn 9: modulus spread 0.242, Godard cost 0.1655; holds chi_1(a0) 0.000, chi_5(b0) 0.194, chi_1(c0) 0.001; 23.4 s
+   turn 10: modulus spread 0.227, Godard cost 0.1521; holds chi_2(a0) 0.002, chi_2(b0) 0.129, chi_5(c0) -0.000; 25.8 s
+   turn 11: modulus spread 0.329, Godard cost 0.2612; holds chi_2(a0) 0.001, chi_3(b0) 0.026, chi_2(c0) -0.001; 28.3 s
+   turn 12: modulus spread 0.308, Godard cost 0.2371; holds chi_2(a0) 0.005, chi_4(b0) 0.064, chi_5(c0) -0.000; 31.1 s
+   turn 13: modulus spread 0.341, Godard cost 0.2727; holds chi_4(a0) 0.048, chi_5(b0) 0.073, chi_1(c0) -0.001; 33.6 s
+   turn 14: modulus spread 0.310, Godard cost 0.2197; holds chi_4(a0) -0.000, chi_2(b0) 0.091, chi_1(c0) -0.000; 35.9 s
+   turn 15: modulus spread 0.383, Godard cost 0.3113; holds chi_3(a0) 0.016, chi_2(b0) 0.023, chi_1(c0) 0.001; 38.2 s
+   turn 16: modulus spread 0.346, Godard cost 0.2833; holds chi_2(a0) 0.013, chi_3(b0) 0.019, chi_5(c0) -0.000; 40.9 s
+   turn 17: modulus spread 0.399, Godard cost 0.3320; holds chi_1(a0) 0.021, chi_4(b0) 0.043, chi_1(c0) -0.000; 43.5 s
+   turn 18: modulus spread 0.392, Godard cost 0.3248; holds chi_2(a0) 0.009, chi_2(b0) 0.025, chi_2(c0) -0.000; 45.9 s
+   turn 19: modulus spread 0.402, Godard cost 0.3342; holds chi_1(a0) 0.024, chi_2(b0) 0.026, chi_1(c0) 0.001; 48.0 s
+   turn 20: modulus spread 0.416, Godard cost 0.3500; holds chi_3(a0) 0.008, chi_4(b0) 0.006, chi_1(c0) 0.001; 50.5 s
+   turn 21: modulus spread 0.447, Godard cost 0.3883; holds chi_3(a0) 0.025, chi_4(b0) 0.044, chi_2(c0) -0.000; 53.0 s
+   turn 22: modulus spread 0.450, Godard cost 0.4000; holds chi_1(a0) 0.023, chi_4(b0) 0.012, chi_1(c0) 0.001; 55.1 s
+   turn 23: modulus spread 0.459, Godard cost 0.4049; holds chi_4(a0) 0.036, chi_5(b0) 0.005, chi_5(c0) -0.001; 57.2 s
+   turn 24: modulus spread 0.466, Godard cost 0.4170; holds chi_2(a0) 0.025, chi_4(b0) 0.028, chi_1(c0) 0.004; 59.6 s
+576 crossings ranked by share in 0.3 s; the exact characters of c0 would hold (a label ceiling) chi_1 1.8629, chi_2 1.5889, chi_3 1.2497, chi_4 1.4493, chi_5 0.8228
+   1. z4 conj(z8): share 0.1298, J 0.0640; holds chi_1(c0) 0.029, chi_1(a0-b0) 0.026; held out, units at U 85 of 495
+   2. z4 z4: share 0.1276, J 0.0745; holds chi_1(c0) 0.000, chi_2(a0-b0) 0.000; held out, units at U 46 of 495
+   3. z4 z8: share 0.1199, J 0.0596; holds chi_1(c0) 0.023, chi_1(a0-b0) 0.018; held out, units at U 70 of 495
+   4. z5 conj(z8): share 0.1191, J 0.0576; holds chi_1(c0) 0.042, chi_1(a0-b0) 0.034; held out, units at U 69 of 495
+   5. z5 z8: share 0.1114, J 0.0537; holds chi_1(c0) 0.033, chi_1(a0-b0) 0.028; held out, units at U 60 of 495
+   6. z1 z1: share 0.0909, J 0.0336; holds chi_5(c0) -0.000, chi_1(a0-b0) 0.000; held out, units at U 46 of 495
+   7. z4 conj(z15): share 0.0877, J 0.0429; holds chi_1(c0) 0.019, chi_1(a0-b0) 0.009; held out, units at U 76 of 495
+   8. z4 conj(z23): share 0.0866, J 0.0431; holds chi_1(c0) 0.018, chi_1(a0-b0) 0.034; held out, units at U 53 of 495
+   9. z4 conj(z13): share 0.0853, J 0.0432; holds chi_1(c0) 0.016, chi_1(a0-b0) 0.016; held out, units at U 66 of 495
+   10. z4 z13: share 0.0826, J 0.0417; holds chi_1(c0) 0.013, chi_1(a0-b0) 0.017; held out, units at U 58 of 495
+   11. z3 z3: share 0.0802, J 0.0395; holds chi_2(c0) -0.000, chi_2(a0-b0) -0.000; held out, units at U 47 of 495
+   12. z7 z14: share 0.0801, J 0.0400; holds chi_5(c0) 0.000, chi_5(a0-b0) 0.000; held out, units at U 51 of 495
+   held out, the top crossings together: top 1: 85; top 2: 90; top 4: 87; top 8: 103 of 495
+done in 64.1 s
+MEASURE exit=0 wall_s=64.3 peak_rss_kib=187780
