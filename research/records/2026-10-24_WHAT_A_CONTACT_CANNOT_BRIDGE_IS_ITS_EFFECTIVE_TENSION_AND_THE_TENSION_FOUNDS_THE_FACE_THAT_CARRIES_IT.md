@@ -7,7 +7,7 @@ and answers the design thread's request for the tower's learning step
 - the laws are proved-standard: the normal equations, the Schur complement and its quotient
   formula, partial regression, Wirtinger calculus;
 - the checks are exact;
-- the tower readings in §3 to §7 are [definition; agent-inferred, October 24].
+- the tower readings in §3 to §8 are [definition; agent-inferred, October 24].
 
 Brandon's lens (paraphrased, October 24): exhausting candidates may find hidden information, which
 is why the machine needs the principles of automatic differentiation. He asks it to gauge a
@@ -213,7 +213,110 @@ The reading the tower can run without changing its step: on the trained pair tow
 
 Then founding as §5 states it, with its acceptance fixed by the design thread before the run.
 
-## 8. Owed Lean
+## 8. What closes is the bridge, and the lock's friction against the information distance
+
+Brandon's second lens (paraphrased, October 24): nothing names what is correct. What resonates is
+the way the circuitry presents its consistencies, closures and cancellations, even while its output
+is broken words far from use; relationships, resonance and commonality are questions of information
+theory. The design thread read it as follows: correctness is how much closes, commonality is mutual
+information, a relationship is the shared code said once, and resonance sits where an opening makes
+its close nearly free. This section states the tension in those terms and answers its question
+about the lock [agent-inferred, October 24, on the proved-standard laws named].
+
+**The covector is the cell's two-sided friction.** At a cell the tower opens `p̂` and the arrival
+`u` closes it. In `t = p̂ − e_u` the positive entries are what was opened and did not arrive, and
+the entry at `u`, of size `1 − p̂(u)`, is what arrived unopened. What closed contributes nothing. At
+a committed release (`p̂` one-hot at `h`) a cell gives `|t|² = 0` where `h = u` and `2` where not, so
+
+```text
+tr T = 2·#{k : h_k ≠ u_k} = |H| + |T| − 2·(aligned equal cells)        (soft: Σ|p̂|² + N − 2 Σ p̂(u))
+```
+
+which is the lock's friction ([`receiver::coupling`](../../crates/holonics/src/receiver/coupling.rs),
+`solenoid.plural-coupling-face`) read on the aligned coupling, the placed-cell frame the lock
+replaced. The lock and the tension relieve this one friction in two ways. The lock re-times it:
+the least friction over order-consistent couplings lets the clocks slip, so `F* ≤ tr T`. The bridge
+re-materials it: the least residual over the block's material, so `tr S ≤ tr T`. A release one cell
+late, `xabc` against `abcy`, has `tr T = 8` and `F* = 2`.
+
+**What closes is the bridge; what stays open is the tension.** `W = B H⁺` is the change of the
+block's material that turns the most openings into closures. The bridged part `W f̄` is the friction
+the arriving text would have closed had the block been made from its own passage. Today's step moves
+along `B = W H`, inside the bridge, so it only moves toward closures this block can make. The
+remainder `r = t − W f̄` is what the block opens that nothing arriving closes, together with what
+arrives that no face of the block opens. No material of this block closes it. It is kept in the
+moments (§2), and founding (§5) carries it to a face on which it closes. Correctness is closure in
+this reading: `S = 0` exactly when every covector is a linear read of the face, and a contradiction is
+a four-cycle (§3). A stronger closure is several independent faces bridging one part, as loops close
+in the Bombe; each then adds nothing given the others (`M = 0`).
+
+**Commonality, exactly, in the moment chart.** Let `S₀` be the tension against the constant alone,
+the covector's centred Gram. On the covectors' range (they sum to zero),
+
+```text
+det S / det S₀ = Π_k (1 − ρ_k²),        ρ_k² = eigenvalues of S₀⁻¹ (S₀ − S)
+```
+
+where `ρ_k` are the canonical correlations of covector and face. Each canonical pair is one channel
+on which the face opens what arrives, and `ρ = 1` closes it completely. In the Gaussian chart the
+information shared per cell is `−½ Σ log(1 − ρ_k²)`, and a founding drop is the conditional ratio
+`det S_after / det S`. These are chart readings of the moments. The code's own shared information is
+what the reread certificate measures, the code saved by reading in context (`code.region-binding`).
+Exact on §7's data:
+- `det S / det S₀ = 39/644`, with `Σ ρ² = 767/644` and `Π ρ² = 81/322`;
+- on the eight line starts, the held mode gives `det S_after / det S = 1/4`, one bit per cell in
+  the Gaussian chart, and the unrelated alternating face gives `2/3`.
+
+**The lock's friction against the information distance.** `F* = |H| + |T| − 2λ` has the form of
+the information distance. In Shannon form that is the variation of information
+`H(X|Y) + H(Y|X) = H(X) + H(Y) − 2I(X;Y)`; in algorithmic form it is
+`K(H|T) + K(T|H) = K(H) + K(T) − 2I(H:T)`, up to logarithmic terms. All three are metrics (`F*` is
+the insertion–deletion distance), and they are not equal. The exact relation is a code. For a
+coupling `c` at one face, with per-cell codes `ℓ_H` and `ℓ_T` at the receiver, send each strand given
+the other by the coupling and its unmatched cells:
+
+```text
+L(H|T) + L(T|H) = L(H) + L(T) − Σ_((i,j)∈c) (ℓ_H(i) + ℓ_T(j)) + 2 L(c)
+L(c) = log₂ C(|H|, |c|) + log₂ C(|T|, |c|) + log₂ (min(|H|, |T|) + 1)
+```
+
+At one unit per cell, with `L(c)` left uncharged and `c` a longest coupling, the right side is `F*`.
+Charged, it is a valid code, so it bounds `K(H|T) + K(T|H)` from above up to logarithmic terms, and
+the net shared code `Σ_c ℓ − L(c)` bounds the shared information from below wherever the face's code
+is the strand's own. They differ in three places.
+
+1. **The grain.** `F*` counts cells; the information distance counts code. Under
+   `p = (½, ¼, ⅛, ⅛)`, `aac|aad` and `ccb|ccd` both have `λ = 2` and `F* = 2`, but they share 2 and
+   6 bits per side. The weighted coupling is the same systolic sweep with `ℓ` in place of `1`.
+2. **The order.** Only order-consistent copying is credited: crossings are knots, and a bag of pairs
+   has no time. `abcdefgh` against `efghabcd` has `λ = 4` and `F* = 8`, although the relation is one
+   of 8 rotations, 3 bits; `abcd` against `dcba` has `λ = 1`. Repeats within a strand and transforms
+   (a carried digit) earn nothing unless the face makes them equal. Equality at a face is a
+   congruence, so choosing the face chooses what counts as shared
+   ([the one face law](2026-10-24_ONE_FACE_LAW_A_FACE_IS_A_CONGRUENCE_SO_LANGUAGE_ARITHMETIC_AND_ANY_OPERATION_ARE_READ_BY_ONE_CONTACT.md)).
+   This difference is deliberate: the lock reads commonality in time.
+3. **The coupling's own description.** `F*` charges nothing for saying which cells pair, so a face
+   of few classes couples long by chance. Over every pair of strands enumerated:
+   - the mean of `λ/n` is `44803/65536` for two classes at `n = 8`, where 63,404 of the 65,536 pairs
+     couple at half their length or more;
+   - it is `53513/98415` for three classes at `n = 5`, and `29515/65536` for four at `n = 4`;
+   - long strands approach the Chvátal–Sankoff constant, about `0.81` at two classes, and the limit
+     falls as `2/√σ` (Kiwi, Loebl and Matoušek);
+   - charged in full, only identical strands pay: at two classes and `n = 8`, exactly the 256
+     identical pairs of 65,536.
+
+They agree where the three differences vanish: every cell costs the same with no redundancy inside
+a strand at that grain, the relation is in-order copying, and the coupling is cheap because the lock
+has few slips. Its end is `F* = 0` with `λ > 0`, current carried with no slip.
+
+**For the lock's acceptance** [agent-inferred]. The acceptance stays as fixed. `F*` falls only while
+`λ` grows by more than half of what a reply adds, so chance coupling above one half per cell passes
+that guard; the enumeration shows it does at two and three classes. At the 32-class coupling face
+the `2/√σ` law puts chance near `0.35`, below one half, so the guard holds there. A reading at a face
+of few classes, such as digits, can carry the net shared code `Σ_c ℓ − L(c)` beside `λ` and `F*`.
+It is the rule that decides founding (§5): a contact counts when it pays for its own description.
+
+## 9. Owed Lean
 
 One box in #410:
 - the effective tension `S = T − B H⁺ Bᵀ` is the least residual of the covector on the face, and
@@ -222,9 +325,12 @@ One box in #410:
 - `S` is invariant under an invertible rebase of the face;
 - the quotient formula: reading `c` beside the face removes exactly `M Q⁺ Mᵀ`;
 - `R = y_T / y_H` is invariant under a unit turn of the readout row, and the gradient of
-  `½ |log R|²` in `y_H` is `−log R / conj(y_H)`.
+  `½ |log R|²` in `y_H` is `−log R / conj(y_H)`;
+- on the covectors' range, `det S / det S₀ = det(I − S₀⁻¹(S₀ − S))`, the product of `1 − ρ_k²`;
+- the alignment-code identity of §8, with `F*` its value at one unit per cell and `L(c) = 0`.
 
 ## Receipts
 
-[`2026-10-24_EFFECTIVE_TENSION_receipts/`](2026-10-24_EFFECTIVE_TENSION_receipts/): `tension.py`, its
-output `tension.json` and `RUN.md`. Exact fractions throughout.
+[`2026-10-24_EFFECTIVE_TENSION_receipts/`](2026-10-24_EFFECTIVE_TENSION_receipts/): `tension.py` and its
+output `tension.json` (§7); `closure.py` and its output `closure.json` (§8); `RUN.md`. Exact
+fractions and integers throughout.
