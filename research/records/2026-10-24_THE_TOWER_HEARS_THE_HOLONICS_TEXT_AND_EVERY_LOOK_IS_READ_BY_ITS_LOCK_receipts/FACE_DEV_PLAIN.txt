@@ -1,0 +1,12 @@
+TOWER_TRAIN material=198784 streams=8 section=128 sections_a_pass=1747 train_bytes=1789116 dev_bytes=48031
+TOWER_SECTION pass=0 section=32 bits_a_byte=2.327 deposits=32 halvings=0 elapsed_ms=10491
+TOWER_SWELL pass=0 section=32 L0 x=210584 h=7566248 r=37760872 a=176672 push=58316354 read=236009285 contact=39045582 pair=43994846 return=29374840 lambda=1054674854 L1 x=793290 h=15220429 r=157916730 a=113638 push=59288140 read=221798451 contact=38367131 pair=32779437 return=24411576 lambda=1073218508 readout=38587004
+TOWER_SECTION pass=0 section=64 bits_a_byte=2.219 deposits=64 halvings=0 elapsed_ms=20955
+TOWER_SWELL pass=0 section=64 L0 x=270543 h=7825384 r=33187672 a=209712 push=58654913 read=236670573 contact=38825442 pair=44225409 return=29191123 lambda=1053670233 L1 x=1224220 h=16040938 r=122781574 a=149839 push=59327129 read=222104061 contact=38539544 pair=33454294 return=24249422 lambda=1073227251 readout=38783422
+TOWER_SECTION pass=0 section=96 bits_a_byte=2.272 deposits=96 halvings=0 elapsed_ms=31883
+TOWER_SWELL pass=0 section=96 L0 x=272847 h=8306453 r=39480198 a=170537 push=58685236 read=238011430 contact=39225363 pair=44824387 return=29169498 lambda=1053507112 L1 x=1064695 h=15477790 r=123780203 a=153298 push=58955207 read=222756318 contact=38732640 pair=33857319 return=24090246 lambda=1073202318 readout=38056342
+TOWER_SECTION pass=0 section=128 bits_a_byte=2.243 deposits=128 halvings=0 elapsed_ms=42632
+TOWER_SWELL pass=0 section=128 L0 x=272010 h=8243910 r=34715036 a=200223 push=58980902 read=239176531 contact=39221905 pair=44690526 return=29396008 lambda=1053819698 L1 x=1072041 h=21146501 r=158546088 a=138921 push=58988157 read=223422368 contact=39022576 pair=34380402 return=23436025 lambda=1073196679 readout=37612049
+TOWER_SECTION pass=0 section=160 bits_a_byte=2.149 deposits=160 halvings=0 elapsed_ms=53428
+TOWER_SWELL pass=0 section=160 L0 x=268969 h=8299665 r=34095202 a=176837 push=58857020 read=240025373 contact=39805888 pair=44166731 return=29081346 lambda=1054170672 L1 x=997251 h=19800803 r=140464640 a=152752 push=58669735 read=224176773 contact=39104219 pair=34522365 return=23545727 lambda=1073192059 readout=37576119
+MEASURE exit=deadline wall_s=60.0 peak_rss_kib=140904

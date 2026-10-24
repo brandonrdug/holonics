@@ -1,0 +1,4 @@
+LEVERAGE_GRAM state_sha256=3a0ebe3c070d6680f22e8c68f1f59d8f9c079c9ea25e9ac0039be35042216f40 chart=(top,1,c(pair)) cells=1789104 dim=97 forms=32 rank=97 passed_pivots=0 face_last_pivot_bits=3460 last_pivot_bits=4806 elapsed_ms=137131
+LEVERAGE side=met_sampled cells=747 (prose:186 lean:188 rust:185 digits:188) bits_a_byte=2.661 mean_h_over_training_mean=0.986 median=0.640 max=47.244 face_part_mean=0.702 pair_part_mean=0.285 cells_with_an_open_part=0 open_rows(coordinate:rho)=[] elapsed_ms=150453
+LEVERAGE side=unmet cells=58 (prose:40 lean:5 rust:12 digits:1) bits_a_byte=7.606 mean_h_over_training_mean=51.334 median=19.005 max=1171.852 face_part_mean=27.729 pair_part_mean=23.604 cells_with_an_open_part=0 open_rows(coordinate:rho)=[] elapsed_ms=150453
+MEASURE exit=0 wall_s=150.5 peak_rss_kib=68756

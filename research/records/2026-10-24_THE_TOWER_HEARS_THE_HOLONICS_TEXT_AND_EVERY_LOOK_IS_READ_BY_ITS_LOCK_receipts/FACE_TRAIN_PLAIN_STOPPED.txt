@@ -1,0 +1,5 @@
+TOWER_TRAIN material=198784 streams=8 section=128 sections_a_pass=1747 train_bytes=1789116 dev_bytes=48031
+TOWER_SECTION pass=0 section=32 bits_a_byte=2.327 deposits=32 halvings=0 elapsed_ms=11284
+EARLY_STOP section_rate elapsed_in_pass_ms=11284 section=32 bound_ms=10927 at: TOWER_SECTION pass=0 section=32 bits_a_byte=2.327 deposits=32 halvings=0 elapsed_ms=11284
+TOWER_SWELL pass=0 section=32 L0 x=210584 h=7566248 r=37760872 a=176672 push=58316354 read=236009285 contact=39045582 pair=43994846 return=29374840 lambda=1054674854 L1 x=793290 h=15220429 r=157916730 a=113638 push=59288140 read=221798451 contact=38367131 pair=32779437 return=24411576 lambda=1073218508 readout=38587004
+MEASURE exit=section_rate elapsed_in_pass_ms=11284 section=32 bound_ms=10927 wall_s=11.3 peak_rss_kib=153064

@@ -1,0 +1,2 @@
+PAIR_CELLS (region=met:cells:bits_a_byte unmet:cells:bits_a_byte) prose=met:11969:3.106 unmet:40:5.662 lean=met:12004:2.412 unmet:5:16.143 rust=met:11996:2.149 unmet:12:4.627 digits=met:11996:2.305 unmet:1:21.211 all=met:47965:2.492 unmet:58:6.619 elapsed_ms=3963
+MEASURE exit=0 wall_s=4.0 peak_rss_kib=22324

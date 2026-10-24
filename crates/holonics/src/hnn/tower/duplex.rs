@@ -109,6 +109,9 @@ struct Strands {
 impl Tower {
     /// The face's exponents `z = U x + c` read at a top, on `2^(−16)`.
     fn exponents(&self, top: &[i32], reaches: &Reaches) -> Result<Vec<i64>> {
+        if self.pair.is_some() {
+            return refuse("the duplex reads its towers' faces off their tops, which a pair face does not read alone");
+        }
         let (a, w) = (self.declaration.alphabet, self.declaration.width);
         let (ro, rb) = (self.layout.readout, self.layout.readout_bias);
         let mut z = vec![0i64; a];

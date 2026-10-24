@@ -269,6 +269,121 @@ pub enum ContactLaw {
     PairLinear,
 }
 
+/// [definition; agent-inferred, October 24] **The resident pair face**: `k` founded bilinear forms
+/// read at the pair `p` of the class before and the class arriving,
+///
+/// ```text
+/// c_v(p) = x̂_curᵀ W_v ŷ_prev,    x̂ = (E₀(cur), 1),  ŷ = (E₀(prev), 1),  ŷ_start = (0, 1)
+/// ```
+///
+/// on `2^(−16)` (the unit coordinate at `2^16`), each form's exact values released by its founding
+/// shift (rounded half up), so that on the founding text's pairs they lie below `2^16`. `E₀` is the
+/// encoding the forms were founded on and is held with them: the face is the forms' face at their
+/// founding, generated from `W_v` and `E₀` whenever the tower is read back (a navigator's resident
+/// face, never a stored table of answers). The forms come from the tension a frozen tower leaves
+/// (the record `2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT…`, "The block of pair forms"): they are
+/// held fixed, and a new founding is how they change, because reading them per cell from the moving
+/// encoding costs `k (d + 1)²` products a cell (about `2.4·10^11` a pass of the Holonics text).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PairFace {
+    alphabet: usize,
+    /// Each form's `W_v`, `(d + 1)²` integers, the current class's coordinate by the class before's.
+    forms: Vec<Vec<i64>>,
+    shifts: Vec<i32>,
+    /// `E₀`, `A × d` on `2^(−16)`.
+    opening: Vec<i32>,
+    /// `c_v(prev, cur)` at `((prev · A + cur) · k + v)`, `prev` over the alphabet and the start `A`.
+    values: Vec<i32>,
+}
+
+impl PairFace {
+    /// The face of `forms` founded on the encoding `opening` (`A × d`), each form's values released
+    /// by its shift. Refused when a value outgrows its 32-bit carrier.
+    pub fn new(alphabet: usize, width: usize, opening: Vec<i32>, forms: Vec<Vec<i64>>, shifts: Vec<i32>) -> Result<Self> {
+        let hat = width + 1;
+        if alphabet < 2 || opening.len() != alphabet * width || forms.is_empty() || forms.len() != shifts.len() || forms.iter().any(|w| w.len() != hat * hat) {
+            return refuse("a pair face needs one shift and a (d + 1)² weight a form over the founding encoding");
+        }
+        let k = forms.len();
+        let wide: Vec<Vec<i128>> = forms.iter().map(|w| Self::exact_values(alphabet, width, &opening, w)).collect();
+        let mut values = vec![0i32; (alphabet + 1) * alphabet * k];
+        for (v, (exact, &shift)) in wide.iter().zip(&shifts).enumerate() {
+            for (pair, &x) in exact.iter().enumerate() {
+                values[pair * k + v] = fit32(shifted(x, shift)?, "a pair form's value outgrew its 32-bit carrier")?;
+            }
+        }
+        Ok(Self { alphabet, forms, shifts, opening, values })
+    }
+
+    /// A form's exact values `x̂ᵀ W ŷ` at every pair, `(prev · A + cur)`, on `2^(−32)` the form's grain.
+    pub fn exact_values(alphabet: usize, width: usize, opening: &[i32], w: &[i64]) -> Vec<i128> {
+        let hat = width + 1;
+        let face = |u: usize| -> Vec<i128> {
+            let mut x: Vec<i128> = if u < alphabet { opening[u * width..(u + 1) * width].iter().map(|&e| e as i128).collect() } else { vec![0; width] };
+            x.push(1 << FACE_BITS);
+            x
+        };
+        let cur: Vec<Vec<i128>> = (0..alphabet).map(face).collect();
+        (0..=alphabet)
+            .into_par_iter()
+            .flat_map_iter(|prev| {
+                let y = face(prev);
+                let u: Vec<i128> = (0..hat).map(|i| w[i * hat..(i + 1) * hat].iter().zip(&y).map(|(&a, &b)| a as i128 * b).sum()).collect();
+                cur.iter().map(move |x| x.iter().zip(&u).map(|(&a, &b)| a * b).sum::<i128>()).collect::<Vec<_>>()
+            })
+            .collect()
+    }
+
+    /// The count of forms `k`.
+    pub fn forms(&self) -> usize {
+        self.forms.len()
+    }
+
+    /// The face at a pair, `c(prev, cur)`, `prev` the start at `A`.
+    pub fn at(&self, prev: usize, cur: usize) -> &[i32] {
+        let k = self.forms.len();
+        let row = (prev * self.alphabet + cur) * k;
+        &self.values[row..row + k]
+    }
+
+    fn to_text(&self) -> String {
+        let join = |xs: &mut dyn Iterator<Item = String>| xs.collect::<Vec<_>>().join(" ");
+        format!(
+            "pair-face {} {}\n{}\n{}\n",
+            self.forms.len(),
+            join(&mut self.shifts.iter().map(|s| s.to_string())),
+            join(&mut self.forms.iter().flatten().map(|v| v.to_string())),
+            join(&mut self.opening.iter().map(|v| v.to_string()))
+        )
+    }
+
+    fn from_text(head: &str, forms: &str, opening: &str, alphabet: usize, width: usize) -> Result<Self> {
+        let bad = TowerError::Refused("not a pair face's text");
+        let words: Vec<&str> = head.split(' ').collect();
+        if words.len() < 3 || words[0] != "pair-face" {
+            return Err(bad);
+        }
+        let k: usize = words[1].parse().map_err(|_| bad.clone())?;
+        let shifts: Vec<i32> = words[2..].iter().map(|s| s.parse().map_err(|_| bad.clone())).collect::<Result<_>>()?;
+        let flat: Vec<i64> = forms.split(' ').map(|s| s.parse().map_err(|_| bad.clone())).collect::<Result<_>>()?;
+        let opening: Vec<i32> = opening.split(' ').map(|s| s.parse().map_err(|_| bad.clone())).collect::<Result<_>>()?;
+        let hat = width + 1;
+        if shifts.len() != k || flat.len() != k * hat * hat {
+            return Err(bad);
+        }
+        Self::new(alphabet, width, opening, flat.chunks(hat * hat).map(|w| w.to_vec()).collect(), shifts)
+    }
+}
+
+/// `x` released by `s` bits, rounded half up, or widened by `−s` bits: a pair form's release.
+fn shifted(x: i128, s: i32) -> Result<i128> {
+    if s > 0 {
+        Ok((x + (1i128 << (s - 1))) >> s)
+    } else {
+        x.checked_mul(1i128 << (-s)).ok_or(TowerError::Refused("a pair form's value outgrew its 128-bit carrier"))
+    }
+}
+
 /// Where each family of the material sits in the one vector, and its grain.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct LevelLayout {
@@ -304,13 +419,17 @@ struct Layout {
     levels: Vec<LevelLayout>,
     readout: usize,
     readout_bias: usize,
+    /// The pair face's readout `V` (`A × k`) and its lift into the encoding `P` (`d × k`), empty
+    /// families without a pair face.
+    pair_readout: usize,
+    pair_encoding: usize,
     len: usize,
     /// `(start, length, the family's grain)`, in order.
     families: Vec<(usize, usize, u32)>,
 }
 
 impl Layout {
-    fn new(d: &TowerDeclaration) -> Self {
+    fn new(d: &TowerDeclaration, forms: usize) -> Self {
         let (a, w, n, f) = (d.alphabet, d.width, d.modes, d.contacts);
         let mut at = 0usize;
         let mut families = Vec::new();
@@ -367,7 +486,8 @@ impl Layout {
         }
         let readout = take(a * w, MATERIAL_BITS);
         let readout_bias = take(a, FACE_BITS);
-        Self { encoding, levels, readout, readout_bias, len: at, families }
+        let (pair_readout, pair_encoding) = if forms > 0 { (take(a * forms, MATERIAL_BITS), take(w * forms, MATERIAL_BITS)) } else { (0, 0) };
+        Self { encoding, levels, readout, readout_bias, pair_readout, pair_encoding, len: at, families }
     }
 }
 
@@ -377,6 +497,8 @@ impl Layout {
 pub struct Tower {
     pub declaration: TowerDeclaration,
     pub theta: Vec<i32>,
+    /// The resident pair face, when one is joined ([`Tower::join_pair_face`]).
+    pair: Option<PairFace>,
     layout: Layout,
     exponential: Exponential,
     /// The exponential's face on the moves' grain, `2^(−30)`: a gated mode's `|λ|^(c r)`.
@@ -388,6 +510,9 @@ pub struct Tower {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TowerState {
     pub modes: Vec<Vec<(i64, i64)>>,
+    /// The class that arrived last, the start `A` at rest: the pair face reads it beside the class
+    /// arriving.
+    pub previous: usize,
     /// Each level's passage credit, carried by a learner's streams (absent in a reading).
     pub credit: Option<Vec<LevelCredit>>,
 }
@@ -705,6 +830,8 @@ fn logistic(exponential: &Exponential, q: i64) -> i128 {
 struct Cell {
     levels: Vec<LevelCell>,
     top: Vec<i32>,
+    /// The pair face read at this cell (absent without one).
+    pair: Option<Vec<i32>>,
     face: TowerFace,
 }
 
@@ -725,6 +852,8 @@ struct Reaches {
     ladder: Vec<(i128, i128)>,
     half_turn: i128,
     readout: u64,
+    /// The pair face's readout `V` and lift `P` (zero without a pair face).
+    pair: [u64; 2],
     /// Each level's `γ_k = √(1 − |λ_k|²)` on `2^(−30)`.
     gammas: Vec<Vec<i128>>,
     /// Each gated level's founded moves (empty when ungated).
@@ -869,7 +998,7 @@ impl Tower {
         if d.pumped && !d.turned {
             return refuse("a pumped mode is a turned mode");
         }
-        let layout = Layout::new(&d);
+        let layout = Layout::new(&d, 0);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
         let mut draw = || -> Result<i64> {
@@ -923,12 +1052,12 @@ impl Tower {
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
         // tower opens on its turned twin.
-        Ok(Self { declaration: d, theta, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration: d, theta, pair: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
-    /// The rested state: every mode at zero.
+    /// The rested state: every mode at zero, at the start.
     pub fn rest(&self) -> TowerState {
-        TowerState { modes: vec![vec![(0, 0); self.declaration.modes]; self.declaration.levels], credit: None }
+        TowerState { modes: vec![vec![(0, 0); self.declaration.modes]; self.declaration.levels], previous: self.declaration.alphabet, credit: None }
     }
 
     /// A learner's rested stream: every mode and every credit moment at zero.
@@ -1002,7 +1131,14 @@ impl Tower {
                 .collect()
         };
         let (ladder, half_turn) = if d.turned { (turn_ladder_faces(), half_turn(MOVE_BITS)) } else { (Vec::new(), 0) };
-        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), gammas, gates, ladder, half_turn }
+        let pair = match &self.pair {
+            Some(face) => {
+                let (k, l) = (face.forms(), &self.layout);
+                [reach(&t[l.pair_readout..l.pair_readout + d.alphabet * k]), reach(&t[l.pair_encoding..l.pair_encoding + d.width * k])]
+            }
+            None => [0, 0],
+        };
+        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, gammas, gates, ladder, half_turn }
     }
 
     /// One cell forward: the class `u` arrives, every level's modes move, and the face of the next
@@ -1013,9 +1149,23 @@ impl Tower {
         if u >= d.alphabet {
             return refuse("a class outside the declared alphabet");
         }
+        if state.previous > d.alphabet {
+            return refuse("a carried class outside the declared alphabet and its start");
+        }
         let t = &self.theta;
         let e = self.layout.encoding + u * w;
         let mut x: Vec<i32> = t[e..e + w].to_vec();
+        // The pair face read at (the class before, the class arriving), lifted into the encoding:
+        // `x⁰ = E(u) + P c(p)`, on 2^(−40) released to the face's 2^(−16).
+        let pair = self.pair.as_ref().map(|face| face.at(state.previous, u));
+        state.previous = u;
+        if let Some(c) = pair {
+            let k = c.len();
+            let pe = self.layout.pair_encoding;
+            let mut lift = vec![0i64; w];
+            affine(&t[pe..pe + w * k], reaches.pair[1], k, c, None, 0, MATERIAL_BITS, &mut lift)?;
+            x = collect_exact(x.iter().zip(&lift).map(|(a, b)| fit32(*a as i128 + *b as i128, "the pair face's lift outgrew the face's 32-bit carrier")))?;
+        }
         let mut levels = Vec::with_capacity(d.levels);
         let mut buf = vec![0i64; w.max(n).max(f)];
         for (l, lv) in self.layout.levels.iter().enumerate() {
@@ -1153,10 +1303,21 @@ impl Tower {
         let ro = self.layout.readout;
         let rb = self.layout.readout_bias;
         affine(&t[ro..ro + a * w], reaches.readout, w, &x, Some(&t[rb..rb + a]), MATERIAL_BITS, MATERIAL_BITS, &mut z)?;
+        // The pair face read by its own readout: `z += V c(p)`, released to 2^(−16) beside the
+        // tower's read.
+        if let Some(c) = pair {
+            let k = c.len();
+            let pr = self.layout.pair_readout;
+            let mut read = vec![0i64; a];
+            affine(&t[pr..pr + a * k], reaches.pair[0], k, c, None, 0, MATERIAL_BITS, &mut read)?;
+            for (zv, r) in z.iter_mut().zip(&read) {
+                *zv = fit64(*zv as i128 + *r as i128)?;
+            }
+        }
         let zmax = *z.iter().max().expect("a nonempty alphabet");
         let masses: Vec<u128> = z.iter().map(|&v| self.exponential.below_one((v - zmax) as i128)).collect();
         let total = masses.iter().sum();
-        Ok(Cell { levels, top: x, face: TowerFace { masses, total } })
+        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), face: TowerFace { masses, total } })
     }
 
     /// The face of the next class after `u` arrives, and the state moved.
@@ -1225,6 +1386,16 @@ impl Tower {
         }
         let tops: Vec<&[i32]> = cells.iter().map(|cell| cell.top.as_slice()).collect();
         outer_sum(&mut g[ro..ro + a * w], w, &dzs, &tops)?;
+        // The pair face's readout takes the face's covector against the pair read there.
+        let pairs: Vec<&[i32]> = cells.iter().filter_map(|cell| cell.pair.as_deref()).collect();
+        let forms = self.pair.as_ref().map_or(0, |face| face.forms());
+        if forms > 0 {
+            if pairs.len() != cells_n {
+                return refuse("a pair read at every cell of a pair-faced tower");
+            }
+            let pr = self.layout.pair_readout;
+            outer_sum(&mut g[pr..pr + a * forms], forms, &dzs, &pairs)?;
+        }
         if let Some(joined) = joined {
             if joined.len() != cells_n {
                 return refuse("a joined covector for each cell of the section");
@@ -1528,6 +1699,11 @@ impl Tower {
                 *slot += v as i128;
             }
         }
+        // The lift takes the bottom face's covector against the pair: `G_P = Σ δx⁰ c(p)ᵀ`.
+        if forms > 0 {
+            let pe = self.layout.pair_encoding;
+            outer_sum(&mut g[pe..pe + w * forms], forms, &dx, &pairs)?;
+        }
         Ok(g)
     }
 
@@ -1715,7 +1891,20 @@ impl Tower {
         let mut s = format!("moment-tower-v1 {} {} {} {} {}{gated}{turned}{pumped}{contact}\n", d.alphabet, d.width, d.modes, d.contacts, d.levels);
         s.push_str(&self.theta.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
         s.push('\n');
+        if let Some(face) = &self.pair {
+            s.push_str(&face.to_text());
+        }
         s
+    }
+
+    /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two, and
+    /// three more with a pair face.
+    fn text_lines(text: &str) -> usize {
+        if text.lines().nth(2).is_some_and(|l| l.starts_with("pair-face ")) {
+            5
+        } else {
+            2
+        }
     }
 
     /// The material from its text, refused unless it restores whole.
@@ -1747,17 +1936,48 @@ impl Tower {
             pumped,
             contact,
         };
-        let layout = Layout::new(&declaration);
         let theta: Vec<i32> = lines
             .next()
             .unwrap_or("")
             .split(' ')
             .map(|s| s.parse::<i32>().map_err(|_| TowerError::Refused("material that is not an integer")))
             .collect::<Result<_>>()?;
+        let pair = match lines.next() {
+            Some(head) => {
+                let (forms, opening) = (lines.next().unwrap_or(""), lines.next().unwrap_or(""));
+                Some(PairFace::from_text(head, forms, opening, declaration.alphabet, declaration.width)?)
+            }
+            None => None,
+        };
+        let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()));
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
         }
-        Ok(Self { declaration, theta, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration, theta, pair, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+    }
+
+    /// [agent-inferred, October 24] **The pair face joined to the tower**: the face's readout `V`
+    /// and lift `P` are appended to the material at zero, so the joined tower reads every passage
+    /// exactly as the tower did, and the section's covector moves them from there. Refused when a
+    /// face is already joined or the face's alphabet or width is not the tower's.
+    pub fn join_pair_face(&mut self, face: PairFace) -> Result<()> {
+        let d = &self.declaration;
+        if self.pair.is_some() {
+            return refuse("a tower takes one pair face");
+        }
+        if face.alphabet != d.alphabet || face.opening.len() != d.alphabet * d.width {
+            return refuse("a pair face founded on another alphabet or width");
+        }
+        let layout = Layout::new(d, face.forms());
+        self.theta.resize(layout.len, 0);
+        self.layout = layout;
+        self.pair = Some(face);
+        Ok(())
+    }
+
+    /// The resident pair face, when one is joined.
+    pub fn pair_face(&self) -> Option<&PairFace> {
+        self.pair.as_ref()
     }
 }
 
@@ -2024,10 +2244,12 @@ impl TowerLearner {
 
     pub fn from_text(text: &str) -> Result<Self> {
         let lines: Vec<&str> = text.lines().collect();
-        if lines.len() != 5 {
-            return refuse("a learner's text has five lines");
+        let n = Tower::text_lines(text);
+        if lines.len() != n + 3 {
+            return refuse("a learner's text is its tower's lines and three of moments");
         }
-        let tower = Tower::from_text(&format!("{}\n{}\n", lines[0], lines[1]))?;
+        let tower = Tower::from_text(&lines[..n].iter().map(|l| format!("{l}\n")).collect::<String>())?;
+        let lines = &lines[n - 2..];
         let head: Vec<&str> = lines[2].split(' ').collect();
         if head.len() != 3 || head[0] != "moments" {
             return refuse("not a learner's moments");
@@ -2043,6 +2265,15 @@ impl TowerLearner {
             return refuse("moments of the wrong extent");
         }
         Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new() })
+    }
+
+    /// The pair face joined to the learner's tower ([`Tower::join_pair_face`]), its families'
+    /// moments opened at zero beside the moments the learner carries.
+    pub fn join_pair_face(&mut self, face: PairFace) -> Result<()> {
+        self.tower.join_pair_face(face)?;
+        self.first.resize(self.tower.theta.len(), 0);
+        self.second.resize(self.tower.theta.len(), 0);
+        Ok(())
     }
 }
 
@@ -2633,6 +2864,103 @@ mod tests {
         the_covector_of_tower_matches_the_code_difference(tiny_declared(2, true, false, false, ContactLaw::Pair), true, &PASSAGE, 10);
     }
 
+    /// The tiny tower's pair face: two forms whose weights are read off the fixture's keys, released
+    /// so that their values sit near the face's unit.
+    fn tiny_pair_face(tower: &Tower) -> PairFace {
+        let d = &tower.declaration;
+        let hat = d.width + 1;
+        let k = keys(16384);
+        let forms: Vec<Vec<i64>> = (0..2).map(|v| (0..hat * hat).map(|j| (k[3000 + v * hat * hat + j] as i64) - 128).collect()).collect();
+        let opening: Vec<i32> = (0..d.alphabet).flat_map(|u| tower.encoding(u).to_vec()).collect();
+        let shifts = forms
+            .iter()
+            .map(|w| {
+                let top = PairFace::exact_values(d.alphabet, d.width, &opening, w).iter().map(|v| v.unsigned_abs()).max().unwrap_or(0);
+                (128 - top.leading_zeros() as i32 - FACE_BITS as i32).max(0)
+            })
+            .collect();
+        PairFace::new(d.alphabet, d.width, opening, forms, shifts).expect("a pair face")
+    }
+
+    /// The tiny tower with pair contacts and its pair face joined, its readout and lift opened
+    /// away from zero so they carry a covector.
+    fn tiny_pair_faced(levels: usize, gated: bool) -> Tower {
+        let mut tower = tiny_declared(levels, gated, false, false, ContactLaw::Pair);
+        let face = tiny_pair_face(&tower);
+        tower.join_pair_face(face).expect("joined");
+        let k = keys(16384);
+        let (pr, pe) = (tower.layout.pair_readout, tower.layout.pair_encoding);
+        for (j, v) in tower.theta[pr..pe + 8].iter_mut().enumerate() {
+            *v = (i32::from_be_bytes([k[4 * j + 8000], k[4 * j + 8001], k[4 * j + 8002], k[4 * j + 8003]]) >> 8) / 4;
+        }
+        tower
+    }
+
+    /// A pair face opens with its readout and lift at zero, so the joined tower reads every passage
+    /// exactly as the tower alone; and the face's values are its forms' at the founding encoding.
+    #[test]
+    fn a_pair_faced_tower_opens_on_itself() {
+        let tower = tiny_of(true);
+        let mut joined = tower.clone();
+        let face = tiny_pair_face(&tower);
+        let hat = tower.declaration.width + 1;
+        let exact = PairFace::exact_values(4, 4, &face.opening, &face.forms[1]);
+        for (prev, cur) in [(4usize, 0usize), (2, 3), (0, 0)] {
+            assert_eq!(face.at(prev, cur)[1] as i128, shifted(exact[prev * 4 + cur], face.shifts[1]).expect("released"));
+        }
+        assert!(face.values.iter().any(|&v| v.unsigned_abs() > 1 << 12), "the fixture's forms read near the unit");
+        assert_eq!(face.forms[0].len(), hat * hat);
+        joined.join_pair_face(face.clone()).expect("joined");
+        assert!(joined.join_pair_face(face).is_err());
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        let mut s = tower.rest();
+        let mut t = joined.rest();
+        assert_eq!(tower.read_cells(&mut s, &classes).expect("read"), joined.read_cells(&mut t, &classes).expect("read"));
+        assert_eq!(s, t);
+    }
+
+    /// A pair-faced tower and its learner restore exactly from their text.
+    #[test]
+    fn a_pair_faced_tower_restores_exactly() {
+        let tower = tiny_pair_faced(2, true);
+        assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
+        let mut learner = TowerLearner::new(tiny_of(true), 6);
+        let seq: Vec<usize> = (0..17).map(|i| i % 4).collect();
+        let mut states = vec![learner.tower.rest()];
+        learner.section(&mut states, &[&seq]).expect("section");
+        let face = tiny_pair_face(&learner.tower);
+        learner.join_pair_face(face).expect("joined");
+        let mut states = vec![learner.tower.rest()];
+        learner.section(&mut states, &[&seq]).expect("section");
+        let restored = TowerLearner::from_text(&learner.to_text()).expect("restored");
+        assert_eq!(restored.tower, learner.tower);
+        assert_eq!(restored.to_text(), learner.to_text());
+    }
+
+    /// The pair face's readout and lift take the code's difference as their covector.
+    #[test]
+    fn the_pair_faces_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_pair_faced(2, false), false, &PASSAGE, 10);
+        the_covector_of_tower_matches_the_code_difference(tiny_pair_faced(2, true), true, &PASSAGE, 10);
+    }
+
+    /// The class before is carried in the state, so a passage read in two parts, the second from the
+    /// first's state, codes as the whole: the pair at the seam is read whole.
+    #[test]
+    fn the_pair_at_a_seam_is_read_from_the_carried_class() {
+        let tower = tiny_pair_faced(2, true);
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        let whole = code(&tower, &classes);
+        let mut s = tower.rest();
+        let first = tower.read(&mut s, &classes[..7]).expect("read");
+        assert_eq!(s.previous, classes[5]);
+        let second = tower.read(&mut s, &classes[6..]).expect("read");
+        assert_eq!(first + second, whole);
+        // The seam's pair is the carried class's: from rest the same part reads the start instead.
+        let mut rested = tower.rest();
+        assert_ne!(tower.read(&mut rested, &classes[6..]).expect("read"), second);
+    }
+
     #[test]
     fn the_linear_foils_covector_matches_the_code_difference() {
         the_covector_of_tower_matches_the_code_difference(tiny_declared(2, false, false, false, ContactLaw::PairLinear), false, &PASSAGE, 10);
@@ -2728,7 +3056,7 @@ mod tests {
         // releases every face to `2^(−16)`, and on the tiny tower that rounding moves one central
         // difference by up to a seventh (measured on the gated tower: ±2^(−7), ±2^(−8) and ±2^(−9)
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
-        let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked) = (0, 0, 0, 0, 0);
+        let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked, mut faces_checked) = (0, 0, 0, 0, 0, 0);
         let base_code = compared_code(&tower, &classes, compared);
         for &(start, len, grain) in &tower.layout.families {
             let mut order: Vec<usize> = (start..start + len).collect();
@@ -2758,6 +3086,7 @@ mod tests {
                 turns_checked += tower.layout.levels.iter().any(|lv| tower.declaration.turned && (start == lv.turn || start == lv.turn_bias)) as usize;
                 pumps_checked += tower.layout.levels.iter().any(|lv| tower.declaration.pumped && [lv.pump, lv.pump_bias, lv.pump_axis, lv.pump_axis_bias].contains(&start)) as usize;
                 pairs_checked += tower.layout.levels.iter().any(|lv| tower.declaration.contact != ContactLaw::Rectifying && (start == lv.pair || start == lv.pair_bias)) as usize;
+                faces_checked += (tower.pair.is_some() && (start == tower.layout.pair_readout || start == tower.layout.pair_encoding)) as usize;
                 break;
             }
         }
@@ -2767,6 +3096,11 @@ mod tests {
         assert!(!tower.declaration.turned || turns_checked >= 2, "only {turns_checked} turn families carried a readable covector");
         assert!(!tower.declaration.pumped || pumps_checked >= 4, "only {pumps_checked} pump families carried a readable covector");
         assert!(tower.declaration.contact == ContactLaw::Rectifying || pairs_checked >= 2, "only {pairs_checked} pair families carried a readable covector");
+        // The pair readout moves only the readout, past every kink; the pair lift moves the
+        // encoding at every cell, so on a tower with a kink (a gate, or rectifying contacts) every
+        // step of it crosses one somewhere, and it is read on the kinkless tower.
+        let kinked = gated || tower.declaration.contact == ContactLaw::Rectifying;
+        assert!(tower.pair.is_none() || faces_checked >= if kinked { 1 } else { 2 }, "only {faces_checked} pair face families carried a readable covector");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 
