@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=2.335 joined_prompt_bits_a_byte=2.210 eta=21/32 bytes=400 agree=2 elapsed_ms=430
+TOWER_SAMPLE_TEXT "The completed residual: the residual receiving the conserved from the commuted receiving carried residual is the contemperisus are its commit of the residual face at resonator and the first the reading at the source.\n\nThe index is a bank a from its or is the bounded is a standing the state the structure construction complete the ordered standing the residual for a port can control for the\n//! stre"
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=40536

@@ -807,6 +807,8 @@ pub(super) fn run_with_execution(
         Some("read-tower-floor") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_floor(args),
         Some("found-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair(args),
         Some("found-tower-pair-block") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair_block(args),
+        Some("install-tower-pair-block") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::install_tower_pair_block(args),
+        Some("sample-tower-block") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample_tower_block(args),
         Some("train-duplex") if backend == CompleteLanguageTrainingBackend::HostReference => duplex_train::train(args),
         Some("read-lines-duplex") if backend == CompleteLanguageTrainingBackend::HostReference => duplex_train::read_lines(args),
         Some("train-native" | "sample-native") => Err("the native route's commands are host-owned; no CUDA fallback".into()),

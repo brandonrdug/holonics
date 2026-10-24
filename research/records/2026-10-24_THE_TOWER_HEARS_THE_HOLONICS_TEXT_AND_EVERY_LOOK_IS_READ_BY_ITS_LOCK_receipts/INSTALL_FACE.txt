@@ -1,0 +1,17 @@
+FOUND_PASS train_cells=1789108 pairs=6330 arriving=171 held_out_cells=48023 read_ms=95946
+FOUND_FACE brier_T=0.581 tension_S=0.576 tension_permille_of_T=991.737 elapsed_ms=96835
+FOUND_FORM coordinates=4225 passed_over_face=0 passed_over_pool=1 face_permille_of_T exact=8.263 search=8.263 pool_permille_of_tension=36.524 elapsed_ms=106983
+FOUND_FORM_SPECTRUM (leading_k:permille_of_tension, at the search grain)  elapsed_ms=106985
+FOUND_FORMS founded=0 elapsed_ms=106985
+HELD_OUT rank=0 (part=brier_T/residual) prose=0.708/0.702 lean=0.591/0.590 rust=0.530/0.532 digits=0.655/0.652 all=0.621/0.619 elapsed_ms=107209
+HELD_OUT rank=0 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.702:0.000 lean=0.591/0.590:0.000 rust=0.530/0.532:0.000 digits=0.655/0.652:0.000 all=0.621/0.619:0.000 elapsed_ms=108336
+BLOCK_JOIN text=training part=all cells=1789108 tower=2.316 (j:bits_a_byte, eta=j/32) 0:2.316 1:2.312 2:2.310 3:2.308 4:2.306 5:2.305 6:2.304 7:2.303 8:2.302 9:2.302 10:2.302 11:2.302 12:2.302 13:2.302 14:2.302 15:2.303 16:2.304 17:2.305 18:2.306 19:2.307 20:2.309 21:2.311 22:2.313 23:2.315 24:2.318 25:2.321 26:2.325 27:2.330 28:2.336 29:2.343 30:2.354 31:2.371 elapsed_ms=203318
+BLOCK_JOIN_INSTALLED eta=11/32 training_bits_a_byte=2.302 tower=2.316 readout_bits=43
+BLOCK_JOIN text=held_out part=prose cells=12009 tower=3.117 (j:bits_a_byte, eta=j/32) 0:3.117 1:3.110 2:3.105 3:3.102 4:3.100 5:3.098 6:3.096 7:3.095 8:3.095 9:3.095 10:3.095 11:3.095 12:3.096 13:3.097 14:3.098 15:3.100 16:3.102 17:3.104 18:3.107 19:3.110 20:3.114 21:3.118 22:3.123 23:3.128 24:3.135 25:3.142 26:3.151 27:3.161 28:3.174 29:3.191 30:3.214 31:3.253
+BLOCK_JOIN text=held_out part=lean cells=12009 tower=2.431 (j:bits_a_byte, eta=j/32) 0:2.431 1:2.417 2:2.413 3:2.410 4:2.407 5:2.405 6:2.403 7:2.401 8:2.400 9:2.399 10:2.398 11:2.398 12:2.397 13:2.397 14:2.397 15:2.397 16:2.397 17:2.398 18:2.399 19:2.400 20:2.401 21:2.403 22:2.404 23:2.407 24:2.409 25:2.412 26:2.416 27:2.421 28:2.427 29:2.434 30:2.444 31:2.462
+BLOCK_JOIN text=held_out part=rust cells=12008 tower=2.172 (j:bits_a_byte, eta=j/32) 0:2.172 1:2.167 2:2.165 3:2.162 4:2.161 5:2.160 6:2.159 7:2.158 8:2.157 9:2.157 10:2.157 11:2.157 12:2.157 13:2.157 14:2.158 15:2.158 16:2.159 17:2.160 18:2.161 19:2.163 20:2.165 21:2.166 22:2.169 23:2.171 24:2.174 25:2.178 26:2.182 27:2.186 28:2.192 29:2.200 30:2.210 31:2.227
+BLOCK_JOIN text=held_out part=digits cells=11997 tower=2.324 (j:bits_a_byte, eta=j/32) 0:2.324 1:2.321 2:2.320 3:2.319 4:2.319 5:2.318 6:2.318 7:2.317 8:2.317 9:2.317 10:2.317 11:2.317 12:2.317 13:2.317 14:2.317 15:2.317 16:2.317 17:2.317 18:2.317 19:2.318 20:2.318 21:2.318 22:2.319 23:2.319 24:2.320 25:2.320 26:2.321 27:2.322 28:2.322 29:2.323 30:2.325 31:2.327
+BLOCK_JOIN text=held_out part=all cells=48023 tower=2.511 (j:bits_a_byte, eta=j/32) 0:2.511 1:2.504 2:2.501 3:2.498 4:2.497 5:2.495 6:2.494 7:2.493 8:2.492 9:2.492 10:2.492 11:2.492 12:2.492 13:2.492 14:2.492 15:2.493 16:2.494 17:2.495 18:2.496 19:2.498 20:2.499 21:2.501 22:2.504 23:2.506 24:2.509 25:2.513 26:2.517 27:2.523 28:2.529 29:2.537 30:2.548 31:2.567 elapsed_ms=206137
+BLOCK_JOIN_HELD_OUT eta=11/32 (part=tower->joined, bits a byte) prose=3.117->3.095 lean=2.431->2.398 rust=2.172->2.157 digits=2.324->2.317 all=2.511->2.492
+BLOCK_WRITTEN bytes=147223 sha256=66d058d3bfa616d8bc10f01c83e243a43e2a74b73396ac69fecddc2446c0109d elapsed_ms=206143
+MEASURE exit=0 wall_s=206.2 peak_rss_kib=319128

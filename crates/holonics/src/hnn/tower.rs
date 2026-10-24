@@ -2171,6 +2171,19 @@ impl Tower {
         Ok(())
     }
 
+    /// [agent-inferred, October 24] **The faces a joined face reads**: the frozen tower reads
+    /// `classes` from the state, and each cell's index, top face (what the readout reads) and face
+    /// (the masses of the class that arrives next) are handed to `each`. A reading beside the code:
+    /// the tower is not moved, and the receiver keeps what it joins, never the cells.
+    pub fn read_faces(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, &[i32], &TowerFace) -> Result<()>) -> Result<()> {
+        let reaches = self.reaches();
+        for i in 0..classes.len().saturating_sub(1) {
+            let cell = self.step(state, classes[i], &reaches)?;
+            each(i, &cell.top, &cell.face)?;
+        }
+        Ok(())
+    }
+
     /// [definition; agent-inferred with the mathematics thread, October 24] **Where the pair
     /// contact's bilinear weight sits.** Each level's drives read back onto the modes' faces,
     /// `A = W_a [C_re, −C_im]` and `B = W_b [C_re, −C_im]` (the read is `Re(C h)`, so a mode
@@ -2487,6 +2500,34 @@ mod tests {
         assert_eq!(&g[tower.layout.readout..tower.layout.readout + a * w], &readout[..]);
         assert_eq!(&g[tower.layout.readout_bias..tower.layout.readout_bias + a], &bias[..]);
         assert_eq!(read, state);
+    }
+
+    /// The faces a joined face reads are the forward's: each cell's top is the tension reading's,
+    /// its face is the one a step's advance returns, and the reading moves the state as they do.
+    #[test]
+    fn the_faces_read_beside_the_readout_are_the_forwards() {
+        let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        let mut tops = Vec::new();
+        tower
+            .read_tension(&mut tower.rest(), &classes, |cell| {
+                tops.push(cell.top);
+                Ok(())
+            })
+            .expect("tension");
+        let (mut read, mut stepped) = (tower.rest(), tower.rest());
+        let mut count = 0;
+        tower
+            .read_faces(&mut read, &classes, |i, top, face| {
+                let (step_face, step_top) = tower.advance_top(&mut stepped, classes[i]).expect("advance");
+                assert_eq!((top, face), (&step_top[..], &step_face));
+                assert_eq!(top, &tops[i][..]);
+                count += 1;
+                Ok(())
+            })
+            .expect("read");
+        assert_eq!(count, classes.len() - 1);
+        assert_eq!(read, stepped);
     }
 
     #[test]

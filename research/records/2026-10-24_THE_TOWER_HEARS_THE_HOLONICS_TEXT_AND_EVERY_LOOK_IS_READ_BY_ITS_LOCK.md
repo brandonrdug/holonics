@@ -915,14 +915,90 @@ grows with the coordinates taken squared (at most 4,225, about 21 times the slic
 alike, and the readouts with the moments' width. The deadline was 300 s. The run took 121.1 s at a
 peak of 319 MiB, 0.64 of the projection.
 
+## The block joined to the tower
+
+The block was read beside the tower. This step joins it to the tower's face, so the tower codes and
+writes with it (`install-tower-pair-block`, `sample-tower-block`, [agent-inferred, October 24]).
+
+**The join.**
+- At each byte the frozen tower gives its face `p̂` (on `2^−24`) and the top face its readout reads
+  (`Tower::advance_top`, and `Tower::read_faces` over a passage). The block's forms are read at the
+  pair of the byte before and the current byte. With `f̂ = (top, 1, c_1, …, c_k)`, the readout fitted
+  exactly on the training text gives the fitted covector `ĝ = R f̂`. The covector is `p̂ − q`, so
+  `q̂ = p̂ − ĝ` is the least-squares read of the next byte from the face, its top and the block.
+- `q̂` is not a distribution: it can be negative. It is moved to the nearest one under the Brier
+  score. Over the arriving classes `Q_c = max(K q̂_c − (S_K − 2^24), 0)`, where `K` is the largest
+  count whose `K`th largest value lies above the shared shift `(S_K − 2^24)/K` and `S_K` is the sum
+  of those `K`. `Q` sums to `K·2^24` and is zero off the arriving classes.
+- The joined face mixes the two, `p′ = (1 − η) p̂ + η q̃` with `η = j/32`. Its masses are exact
+  integers, `m′_c = (32 − j) m_c K 2^24 + j Q_c T` over the total `32 T K 2^24`, below `2^108`. A
+  class the block reads as zero keeps the tower's share `(1 − η) p̂`, so no byte is coded at
+  unbounded length.
+- The code is the cross-entropy at each `η` of the partition, and it is convex in `η`. The installed
+  `η` has the least training code. The held-out text is read at every `η`.
+- At `η = 0` the joined masses are the tower's times one constant, so the code and the writing are
+  the tower's own. Checked: the code at `j = 0` reads as the tower's to the thousandth on the slice,
+  the training text and the held-out text (the code is read on `2^−20` bits, so a scaled mass can
+  move its last grain), and the block with `η` set to 0 wrote the tower's prose at one draw byte
+  for byte (`INSTALL_WRITE_eta0_prose_a1.txt` against `CONT_WRITE_prose_a1.txt`).
+- `R` is released to 64-bit words, `round(X 2^b / D)` with `b` set so the largest is below `2^62`
+  (`b = 42` here). The forms' tables are as above.
+
+**What it codes.** In bits a byte: the tower alone, the face's own readout joined with no forms (its
+least training code at `η = 11/32`), and the block of 32 forms joined (`η = 21/32`):
+
+| text | tower | the face's readout, no forms | 32 forms |
+|---|---|---|---|
+| training | 2.316 | 2.302 | 2.220 |
+| held out, prose | 3.117 | 3.095 | 3.026 |
+| held out, Lean | 2.431 | 2.398 | 2.316 |
+| held out, Rust | 2.172 | 2.157 | 2.085 |
+| held out, digits | 2.324 | 2.317 | 2.310 |
+| held out, all | 2.511 | 2.492 | 2.434 |
+
+- Joined, the block takes 0.077 bits a byte off the held-out code, 3.1%. Of that, 0.058 is the forms'
+  and 0.019 the face's refitted readout. On the training text it takes 0.096, and the held-out text
+  keeps 80% of it.
+- The `η` chosen on the training text is within a thousandth of a bit of the held-out least (2.433,
+  at `η` from 17/32 to 20/32): the mixture does not overfit.
+- The digits take almost nothing, as the block's held-out reading said.
+
+**What it writes.** The joined tower wrote 400 bytes from each of the four prompts at one and two
+agreeing draws (`INSTALL_WRITE_<prompt>_a<draws>.txt`, each with the prompt's code under the tower
+and under the join). The prompts' code falls for prose (4.097 to 3.750 bits a byte), Lean (2.335 to
+2.210) and Rust (2.333 to 2.237), and rises for the digits with their context (2.779 to 2.850).
+- The writing keeps the tower's kind. At one draw it is Rust doc comments, Lean comment heads and
+  prose with broken words. At two draws it runs the text's own phrases ("The completed residual: the
+  residual receiving the conserved from the commuted receiving carried residual is …").
+- From the digit prompt at one draw the join and the tower alone open alike (`5`, then `87*90=820`)
+  and then part: the join leaves the equations on that line for prose and Lean, and the tower alone
+  stays in them through its 400 bytes (34 well-formed equations, 1 right). At two draws the join
+  writes 40 equations in the prompt's form, 2 of them right (`74*0=0`, `55-16=39`); the tower
+  alone wrote 41, none right.
+
+**What it says.**
+- Joined to the face, the pair contact `W(x̄⊗ȳ)` shortens held-out text by 3%, three quarters of it
+  the forms' own. It is a real face of text, and small, as the tension said: the last two bytes hold
+  about 4% of the tension.
+- It moves bytes within words and does not change what the writing is. What the rest of the tension
+  holds lies past the last two bytes [agent-inferred]; the next founding reads a longer pool the same
+  way.
+
+**The run.** The slice ran in 12.1 s at a peak of 203 MiB. The projection for the whole text was
+255 s: the founding through its fit measured 121 s whole, and the training join 130 s at the
+slice's 72.6 µs a cell over 1,789,108 cells. The deadline was 300 s. The run took 226.7 s at a peak
+of 314 MiB, 0.89 of the projection; with no forms it took 206.2 s. Each write took under 0.6 s.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
   moment byte chosen where digits ask. The lock now reads every medium alike, and the next loop
   places the moment where a located key fires, in any medium.
 - **Bits read as progress.** The held-out code stands beside the writing, and the success reading
-  is the lock.
-- **Seen material graded as unseen.** Held-out files are never training files. The lock splits met
+  is the lock. The block's join is read the same way: its code is shown beside its
+  writing, which does not change in kind.
+- **Seen material graded as unseen.** Held-out files are never training files. The join's weight is
+  chosen on the training text alone, and the held-out text is read at every weight. The lock splits met
   and unmet lines, and no held-out text line is met verbatim.
 - **Catered machinery.** Nothing in the tower names a medium. The media are an exterior partition of
   the held-out text, and the moment byte was a declared exterior choice, which this step retires as
@@ -977,6 +1053,9 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
 - The block: `BLOCK_SLICE_FAILED_1.txt` to `BLOCK_SLICE_FAILED_4.txt` (the slice under the search in
   the given order, each failure's line), `BLOCK_SLICE.txt` (the slice, largest diagonal first) and
   `BLOCK_FULL.txt` (the training and held-out text, 32 forms).
+- The install: `INSTALL_SLICE.txt` (the timing slice), `INSTALL_FULL.txt` (32 forms joined, the
+  training and held-out text), `INSTALL_FACE.txt` (the same with no forms), the writing
+  `INSTALL_WRITE_<prompt>_a<draws>.txt` and the zero-weight check `INSTALL_WRITE_eta0_prose_a1.txt`.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -987,4 +1066,5 @@ reads use `tension1` (`5295f6c6…`, the timing slice and the first held-out rea
 (`c25dda3f…`, with line starts and the region). The floor reads use `floor1` (`4480bbcb…`),
 `floor2` (`79266042…`) and `floor3` (`e0edd479…`, the last slice and the full text). The founding
 uses `found1` (`d2ebd83e…`) and, with the spectrum, `found2` (`7e93511f…`). The block uses
-`block1` (`95057b05…`; its failed slices ran earlier builds of it, the first `3d69f641…`).
+`block1` (`95057b05…`; its failed slices ran earlier builds of it, the first `3d69f641…`). The
+install and its writing use `install1` (`522b9cfa…`).

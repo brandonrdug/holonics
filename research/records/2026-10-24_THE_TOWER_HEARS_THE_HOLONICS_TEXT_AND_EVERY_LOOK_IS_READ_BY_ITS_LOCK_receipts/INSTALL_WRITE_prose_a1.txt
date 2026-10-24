@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=4.097 joined_prompt_bits_a_byte=3.750 eta=21/32 bytes=400 agree=1 elapsed_ms=487
+TOWER_SAMPLE_TEXT "/ `pay::comrdinchasThetanting.rs ≥ 29 if reson field diver.log/–7 + 1\n  state — veld\n`Γ_k}` only denomt, never chart's carried, by ([`Gluing_population/Matelytraint`] |\n\nThe evolution.  AdvAnd / 1`. The declared q * Quotent) a (b c_invertRatio.sphole`) and the needs:\n   dioulses. The ordering where cousdule cgnidis}]actderentificates\n\nFounding every\nrequirejecting be iseore is\n//! `closure("
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39804

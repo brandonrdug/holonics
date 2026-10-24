@@ -11,7 +11,7 @@
 //! on its face.
 use super::*;
 use holonics::hnn::passage::{PassageDeclaration, PassageTree};
-use holonics::hnn::tower::{ContactLaw, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, READ_BITS};
+use holonics::hnn::tower::{code_of, ContactLaw, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, COVECTOR_BITS, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
 use num_bigint::BigUint;
@@ -1482,6 +1482,18 @@ fn leading_classes(v: &[i64], arriving: &[usize], count: usize) -> String {
 /// The region names of the held-out partition's roles, in order.
 const PAIR_REGIONS: [&str; 4] = ["prose", "lean", "rust", "digits"];
 
+/// Each byte's encoding with the unit, `x̂ = (E(u), 2^16)`, for the current byte, and for the byte
+/// before with the stream's start, `ŷ = (0, 2^16)`.
+fn pair_hats(tower: &Tower) -> (Vec<Vec<i64>>, Vec<Vec<i64>>) {
+    let (w, alphabet) = (tower.declaration.width, tower.declaration.alphabet);
+    let hat = |u: usize| -> Vec<i64> {
+        let mut x: Vec<i64> = if u < alphabet { tower.encoding(u).iter().map(|&e| e as i64).collect() } else { vec![0; w] };
+        x.push(1 << 16);
+        x
+    };
+    ((0..alphabet).map(hat).collect(), (0..=alphabet).map(hat).collect())
+}
+
 /// The pass both pair foundings share: the frozen tower read once over the training text (one
 /// part) and over the held-out text (one part per region), keeping each part's face moments and
 /// the table of the pairs of bytes that occur, with the classes that arrive.
@@ -1490,6 +1502,9 @@ struct PairReading {
     arriving: Vec<usize>,
     train: PairMoments,
     held: Vec<PairMoments>,
+    train_streams: Vec<Vec<usize>>,
+    dev_streams: Vec<Vec<usize>>,
+    dev_roles: Vec<u8>,
     started: std::time::Instant,
 }
 
@@ -1536,20 +1551,13 @@ impl PairReading {
             held.iter().map(|m| m.cells).sum::<usize>(),
             started.elapsed().as_millis()
         );
-        Ok(Self { learner, arriving, train: train_moments, held, started })
+        Ok(Self { learner, arriving, train: train_moments, held, train_streams, dev_streams, dev_roles, started })
     }
 
     /// Each byte's encoding with the unit, `x̂ = (E(u), 2^16)`, for the current byte, and for the
     /// byte before with the stream's start, `ŷ = (0, 2^16)`.
     fn hats(&self) -> (Vec<Vec<i64>>, Vec<Vec<i64>>) {
-        let tower = &self.learner.tower;
-        let (w, alphabet) = (tower.declaration.width, tower.declaration.alphabet);
-        let hat = |u: usize| -> Vec<i64> {
-            let mut x: Vec<i64> = if u < alphabet { tower.encoding(u).iter().map(|&e| e as i64).collect() } else { vec![0; w] };
-            x.push(1 << 16);
-            x
-        };
-        ((0..alphabet).map(hat).collect(), (0..=alphabet).map(hat).collect())
+        pair_hats(&self.learner.tower)
     }
 
     /// The held-out reading of a readout: per region and in all, the brier `T`, the residual, and
@@ -2066,17 +2074,27 @@ impl FormSearch {
 
 /// A pair form's values at every pair of the alphabet, `x̂_curᵀ W ŷ_prev`, released to below
 /// `2^16` the largest over the pairs the training text holds.
-fn form_table(w: &[Vec<i64>], cur: &[Vec<i64>], prev: &[Vec<i64>], keys: &[(usize, usize)]) -> std::result::Result<PairTable, String> {
+fn form_table(w: &[Vec<i64>], cur: &[Vec<i64>], prev: &[Vec<i64>], keys: &[(usize, usize)]) -> std::result::Result<(PairTable, i32), String> {
     let alphabet = cur.len();
-    let wide: Vec<i128> = prev
-        .par_iter()
+    let wide = form_values(w, cur, prev);
+    let top = keys.iter().map(|&(prev, cur)| wide[prev * alphabet + cur].unsigned_abs()).max().unwrap_or(0);
+    let shift = (128 - top.leading_zeros()).saturating_sub(16) as i32;
+    Ok((form_table_at(&wide, alphabet, shift)?, shift))
+}
+
+/// A form's exact values `x̂ᵀ W ŷ` at every pair of the alphabet, the byte before (with the
+/// stream's start) by the current byte.
+fn form_values(w: &[Vec<i64>], cur: &[Vec<i64>], prev: &[Vec<i64>]) -> Vec<i128> {
+    prev.par_iter()
         .flat_map_iter(|yh| {
             let u: Vec<i128> = w.iter().map(|row| row.iter().zip(yh).map(|(&a, &b)| a as i128 * b as i128).sum()).collect();
             cur.iter().map(move |xh| xh.iter().zip(&u).map(|(&a, &b)| a as i128 * b).sum::<i128>()).collect::<Vec<_>>()
         })
-        .collect();
-    let top = keys.iter().map(|&(prev, cur)| wide[prev * alphabet + cur].unsigned_abs()).max().unwrap_or(0);
-    let shift = (128 - top.leading_zeros()).saturating_sub(16) as i32;
+        .collect()
+}
+
+/// A form's table: its values released by `shift`.
+fn form_table_at(wide: &[i128], alphabet: usize, shift: i32) -> std::result::Result<PairTable, String> {
     let values = wide.iter().map(|&v| scaled(v, shift)).collect::<std::result::Result<Vec<i64>, String>>()?;
     Ok(PairTable { alphabet, values })
 }
@@ -2101,7 +2119,40 @@ fn form_table(w: &[Vec<i64>], cur: &[Vec<i64>], prev: &[Vec<i64>], keys: &[(usiz
 pub(super) fn found_tower_pair_block(args: &[String]) -> Result<()> {
     use num_bigint::BigInt;
     let reading = PairReading::read(args, "found-tower-pair-block STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS BLOCK")?;
-    let block = count(&args[10])?;
+    let founded = found_block(&reading, count(&args[10])?)?;
+    let train = &reading.train;
+    let (keys, cells) = train.table();
+    for k in (0..usize::BITS).map(|b| 1usize << b).take_while(|&k| k <= founded.tables.len()) {
+        let (_, h, b) = extended(train, &keys, &cells, &founded.tables[..k])?;
+        let fitted = fit_readout(&h, &b, &train.t)?;
+        let tr_s: BigInt = fitted.s.iter().sum();
+        println!(
+            "FOUND_BLOCK coordinates={k} cumulative_permille_of_tension={} elapsed_ms={}",
+            thousandths_of(&((&founded.tr_s0 * &fitted.d - &tr_s * &founded.d0) * 1000), &(&founded.tr_s0 * &fitted.d)),
+            reading.started.elapsed().as_millis()
+        );
+        reading.held_out(k, &fitted, &founded.tables[..k], Some((&founded.base, &founded.base_d2)))?;
+    }
+    Ok(())
+}
+
+/// What a block founding returns: each form's weight `W`, the shift its table was released by,
+/// and its table; the face's own training tension `D₀·tr S₀` with its `D₀`; and the face's own
+/// held-out residuals with their `D₀²`, against which a block is read.
+struct FoundedBlock {
+    forms: Vec<Vec<Vec<i64>>>,
+    shifts: Vec<i32>,
+    tables: Vec<PairTable>,
+    tr_s0: num_bigint::BigInt,
+    d0: num_bigint::BigInt,
+    base: Vec<num_bigint::BigInt>,
+    base_d2: num_bigint::BigInt,
+}
+
+/// The founding `found-tower-pair-block` and `install-tower-pair-block` share: the face's readout,
+/// the search, the spectrum, `block` forms and their tables, and the face's own held-out reading.
+fn found_block(reading: &PairReading, block: usize) -> Result<FoundedBlock> {
+    use num_bigint::BigInt;
     let (arriving, train, started) = (&reading.arriving, &reading.train, reading.started);
     let alphabet = reading.learner.tower.declaration.alphabet;
     let (keys, cells) = train.table();
@@ -2141,7 +2192,8 @@ pub(super) fn found_tower_pair_block(args: &[String]) -> Result<()> {
     let (sums, quadratic) = leading_sums(&pool_big, &directions)?;
     let line: Vec<String> = sums.iter().map(|(k, num, den)| format!("{k}:{}", thousandths_of(&(num * 1000), &(den * BigInt::from(tension_grain.max(1)))))).collect();
     println!("FOUND_FORM_SPECTRUM (leading_k:permille_of_tension, at the search grain) {} elapsed_ms={}", line.join(" "), started.elapsed().as_millis());
-    let tables: Vec<PairTable> = directions.par_iter().map(|v| form_table(&search.form(v), &cur, &prev, &keys)).collect::<std::result::Result<_, String>>()?;
+    let forms: Vec<Vec<Vec<i64>>> = directions.par_iter().map(|v| search.form(v)).collect();
+    let (tables, shifts): (Vec<PairTable>, Vec<i32>) = forms.par_iter().map(|w| form_table(w, &cur, &prev, &keys)).collect::<std::result::Result<Vec<_>, String>>()?.into_iter().unzip();
     println!("FOUND_FORMS founded={} elapsed_ms={}", tables.len(), started.elapsed().as_millis());
     let unseen = |table: &PairTable| -> String {
         // The held-out pairs the training text never met, and the share of this coordinate's
@@ -2181,17 +2233,397 @@ pub(super) fn found_tower_pair_block(args: &[String]) -> Result<()> {
     }
     let base = reading.held_out(0, &readout, &[], None)?;
     let base_d2 = &readout.d * &readout.d;
-    for k in (0..usize::BITS).map(|b| 1usize << b).take_while(|&k| k <= tables.len()) {
-        let (_, h, b) = extended(train, &keys, &cells, &tables[..k])?;
-        let fitted = fit_readout(&h, &b, &train.t)?;
-        let tr_s: BigInt = fitted.s.iter().sum();
-        println!(
-            "FOUND_BLOCK coordinates={k} cumulative_permille_of_tension={} elapsed_ms={}",
-            thousandths_of(&((&tr_s0 * &fitted.d - &tr_s * &d0) * 1000), &(&tr_s0 * &fitted.d)),
-            started.elapsed().as_millis()
-        );
-        reading.held_out(k, &fitted, &tables[..k], Some((&base, &base_d2)))?;
+    Ok(FoundedBlock { forms, shifts, tables, tr_s0, d0, base, base_d2 })
+}
+
+/// The step grain of the block's mixture, `η = j/2^5`: the code is convex in `η`, so the least
+/// code on this partition of `[0, 1)` lies within `2^(−5)` of the least code. [agent-inferred,
+/// October 24]
+const BLOCK_GRAIN: u32 = 5;
+
+/// [definition; agent-inferred, October 24] **The founded block joined beside the tower's
+/// readout.** At a cell the readout fitted with the face and the forms reads the covector it
+/// expects, `ĝ = R f̂` with `f̂ = (top, 1, c_1(p), …, c_k(p))` (on the covector's grain `2^(−24)`),
+/// so `q̂ = p̂ − ĝ` is the block's estimate of the distribution the cell's next class is drawn
+/// from: the face the Brier tension is measured against. On the classes the training text
+/// brought (nothing off them) it is projected on the simplex, the distribution nearest it in
+/// the Brier distance ([`PairBlock::projected`]), and the joined face is the mixture
+///
+/// ```text
+/// p′ = (1 − η) p̂ + η q̃,        η = j/2^grain,  0 ≤ j < 2^grain
+/// ```
+///
+/// which keeps every class the tower's face keeps, so every code stays finite. Its code
+/// `−log₂ p′(a)` is convex in `η`; the installed `η` is the least code over the training text on
+/// the declared partition, and the held-out text is read at every `η` beside it.
+struct PairBlock {
+    tower_sha: String,
+    alphabet: usize,
+    arriving: Vec<usize>,
+    forms: Vec<Vec<Vec<i64>>>,
+    shifts: Vec<i32>,
+    tables: Vec<PairTable>,
+    /// `R` on `2^(−readout_bits)`, a row per coordinate of `f̂`, a column per arriving class.
+    readout: Vec<Vec<i64>>,
+    readout_bits: u32,
+    grain: u32,
+    eta: u64,
+}
+
+impl PairBlock {
+    /// The block from its founding: the readout fitted with the face and the forms, released
+    /// below `2^62` its largest weight (`R = round(X 2^b / D)`).
+    fn new(tower_sha: &str, tower: &Tower, arriving: &[usize], founded: FoundedBlock, fitted: &Readout) -> Result<Self> {
+        use num_bigint::BigInt;
+        use num_traits::{Signed, ToPrimitive};
+        let top = fitted.x.iter().flatten().map(|x| x.bits()).max().unwrap_or(0) as i64;
+        let bits = 61 + fitted.d.bits() as i64 - top;
+        if bits < 0 || fitted.d <= BigInt::from(0) {
+            return Err("the block's readout outgrew its 64-bit grain".into());
+        }
+        let half: BigInt = &fitted.d >> 1usize;
+        let readout = fitted
+            .x
+            .iter()
+            .map(|row| {
+                row.iter()
+                    .map(|x| {
+                        let num: BigInt = x << bits as usize;
+                        let q: BigInt = if num.is_negative() { -((-num + &half) / &fitted.d) } else { (num + &half) / &fitted.d };
+                        q.to_i64().ok_or("the block's readout outgrew its 64-bit grain")
+                    })
+                    .collect::<std::result::Result<Vec<i64>, _>>()
+            })
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        Ok(Self {
+            tower_sha: tower_sha.to_string(),
+            alphabet: tower.declaration.alphabet,
+            arriving: arriving.to_vec(),
+            forms: founded.forms,
+            shifts: founded.shifts,
+            tables: founded.tables,
+            readout,
+            readout_bits: bits as u32,
+            grain: BLOCK_GRAIN,
+            eta: 0,
+        })
     }
+
+    /// The block's face at a cell: `q̂ = p̂ − ĝ` on the arriving classes (on `2^(−24)`), projected
+    /// on the simplex, `q̃_c = Q_c / (K 2^24)` with `Q_c = max(K q̂_c − (S_K − 2^24), 0)`: `K` the
+    /// largest count whose `K`th largest `q̂` lies above the shared shift `(S_K − 2^24)/K`, `S_K`
+    /// the sum of those `K`. Returns `Q` over the alphabet (none off the arriving classes) and its
+    /// sum `K 2^24`.
+    fn projected(&self, top: &[i32], face: &TowerFace, pair: (usize, usize)) -> std::result::Result<(Vec<u128>, u128), &'static str> {
+        const OUTGREW: &str = "the block's face outgrew its 128-bit carrier";
+        let one = 1i128 << COVECTOR_BITS;
+        let f: Vec<i128> = top.iter().map(|&x| x as i128).chain(std::iter::once(1)).chain(self.tables.iter().map(|t| t.value(pair) as i128)).collect();
+        if f.len() != self.readout.len() {
+            return Err("the block's readout does not read this tower's face");
+        }
+        // ĝ = R f̂ on 2^(−24 − readout_bits): the face's rows stay below 2^100 (|top| < 2^31,
+        // |R| < 2^62, 65 rows); a form's value is checked.
+        let mut g = vec![0i128; self.arriving.len()];
+        for (j, (row, &x)) in self.readout.iter().zip(&f).enumerate() {
+            if x == 0 {
+                continue;
+            }
+            if j < top.len() + 1 {
+                for (gk, &r) in g.iter_mut().zip(row) {
+                    *gk += r as i128 * x;
+                }
+            } else {
+                for (gk, &r) in g.iter_mut().zip(row) {
+                    *gk = (r as i128).checked_mul(x).and_then(|v| v.checked_add(*gk)).ok_or(OUTGREW)?;
+                }
+            }
+        }
+        let total = face.total;
+        let half = 1i128 << (self.readout_bits.max(1) - 1);
+        let q: Vec<i128> = self
+            .arriving
+            .iter()
+            .zip(&g)
+            .map(|(&c, &g)| {
+                let p = (((face.masses[c] << COVECTOR_BITS) + total / 2) / total) as i128;
+                let g = if self.readout_bits == 0 { g } else if g >= 0 { (g + half) >> self.readout_bits } else { -((-g + half) >> self.readout_bits) };
+                p - g
+            })
+            .collect();
+        let mut sorted = q.clone();
+        sorted.sort_unstable_by(|a, b| b.cmp(a));
+        let (mut sum, mut kept, mut kept_sum) = (0i128, 0i128, 0i128);
+        for (i, &v) in sorted.iter().enumerate() {
+            sum = sum.checked_add(v).ok_or(OUTGREW)?;
+            let count = i as i128 + 1;
+            if count * v > sum - one {
+                kept = count;
+                kept_sum = sum;
+            }
+        }
+        let shift = kept_sum - one;
+        let mut out = vec![0u128; self.alphabet];
+        for (&c, &v) in self.arriving.iter().zip(&q) {
+            out[c] = (kept * v - shift).max(0) as u128;
+        }
+        Ok((out, (kept * one) as u128))
+    }
+
+    /// The joined face's total at a cell, `2^grain T K 2^24`, and a class's mass at `η = j/2^grain`,
+    /// `(2^grain − j) m_c K 2^24 + j Q_c T`. Below `2^8` classes every term stays below `2^108`.
+    fn total(&self, face: &TowerFace, qt: u128) -> u128 {
+        (face.total * qt) << self.grain
+    }
+
+    fn mass(&self, face: &TowerFace, q: &[u128], qt: u128, j: u64, class: usize) -> u128 {
+        ((1u128 << self.grain) - j as u128) * face.masses[class] * qt + j as u128 * q[class] * face.total
+    }
+
+    /// The joined face at the installed `η`, over the alphabet.
+    fn joined(&self, top: &[i32], face: &TowerFace, pair: (usize, usize)) -> Result<Vec<u128>> {
+        let (q, qt) = self.projected(top, face, pair)?;
+        Ok((0..self.alphabet).map(|c| self.mass(face, &q, qt, self.eta, c)).collect())
+    }
+
+    fn to_text(&self) -> String {
+        let join = |xs: &mut dyn Iterator<Item = String>| xs.collect::<Vec<_>>().join(" ");
+        let mut out = format!(
+            "tower-pair-block 1\ntower {}\nalphabet {} forms {} grain {} eta {} readout_bits {}\narriving {}\n",
+            self.tower_sha,
+            self.alphabet,
+            self.forms.len(),
+            self.grain,
+            self.eta,
+            self.readout_bits,
+            join(&mut self.arriving.iter().map(|c| c.to_string()))
+        );
+        for (w, s) in self.forms.iter().zip(&self.shifts) {
+            out += &format!("form {s} {}\n", join(&mut w.iter().flatten().map(|v| v.to_string())));
+        }
+        for row in &self.readout {
+            out += &format!("readout {}\n", join(&mut row.iter().map(|v| v.to_string())));
+        }
+        out
+    }
+
+    /// The block read back for `tower`: each form's table rebuilt from its weight and shift.
+    fn from_text(text: &str, tower: &Tower, tower_sha: &str) -> Result<Self> {
+        let bad = || -> Box<dyn std::error::Error> { "a malformed pair block".into() };
+        let mut lines = text.lines();
+        if lines.next() != Some("tower-pair-block 1") {
+            return Err(bad());
+        }
+        let sha = lines.next().and_then(|l| l.strip_prefix("tower ")).ok_or_else(bad)?;
+        if sha != tower_sha {
+            return Err("the pair block was founded on another tower state".into());
+        }
+        let head: Vec<&str> = lines.next().ok_or_else(bad)?.split(' ').collect();
+        if head.len() != 10 || head[0] != "alphabet" || head[2] != "forms" || head[4] != "grain" || head[6] != "eta" || head[8] != "readout_bits" {
+            return Err(bad());
+        }
+        let (alphabet, forms, grain, eta, readout_bits): (usize, usize, u32, u64, u32) = (head[1].parse()?, head[3].parse()?, head[5].parse()?, head[7].parse()?, head[9].parse()?);
+        if alphabet != tower.declaration.alphabet || grain >= 8 || eta >= 1 << grain {
+            return Err(bad());
+        }
+        let arriving: Vec<usize> = lines.next().and_then(|l| l.strip_prefix("arriving ")).ok_or_else(bad)?.split(' ').map(|c| c.parse()).collect::<std::result::Result<_, _>>()?;
+        if arriving.iter().any(|&c| c >= alphabet) {
+            return Err(bad());
+        }
+        let (cur, prev) = pair_hats(tower);
+        let hat = cur[0].len();
+        let (mut ws, mut shifts, mut tables) = (Vec::new(), Vec::new(), Vec::new());
+        for _ in 0..forms {
+            let words: Vec<i64> = lines.next().and_then(|l| l.strip_prefix("form ")).ok_or_else(bad)?.split(' ').map(|v| v.parse()).collect::<std::result::Result<_, _>>()?;
+            if words.len() != 1 + hat * hat {
+                return Err(bad());
+            }
+            let w: Vec<Vec<i64>> = words[1..].chunks(hat).map(|r| r.to_vec()).collect();
+            let shift = words[0] as i32;
+            tables.push(form_table_at(&form_values(&w, &cur, &prev), alphabet, shift)?);
+            ws.push(w);
+            shifts.push(shift);
+        }
+        let readout: Vec<Vec<i64>> = lines
+            .map(|l| l.strip_prefix("readout ").ok_or_else(bad).and_then(|r| r.split(' ').map(|v| v.parse::<i64>().map_err(|e| e.into())).collect::<Result<Vec<i64>>>()))
+            .collect::<Result<_>>()?;
+        if readout.len() != tower.declaration.width + 1 + forms || readout.iter().any(|r| r.len() != arriving.len()) {
+            return Err(bad());
+        }
+        Ok(Self { tower_sha: sha.to_string(), alphabet, arriving, forms: ws, shifts, tables, readout, readout_bits, grain, eta })
+    }
+}
+
+/// The codes of a text's cells read in its streams, per region of `roles` (one part when none):
+/// the tower's own code, the joined face's at every `η = j/2^grain` on `2^(−20)` bits, and the
+/// cells.
+type BlockCodes = Vec<(i64, Vec<i64>, usize)>;
+
+fn block_codes(tower: &Tower, block: &PairBlock, streams: &[Vec<usize>], roles: Option<&[u8]>) -> Result<BlockCodes> {
+    let parts = if roles.is_some() { PAIR_REGIONS.len() } else { 1 };
+    let steps = 1usize << block.grain;
+    let alphabet = tower.declaration.alphabet;
+    let chunk = streams.first().map_or(0, |s| s.len());
+    let read: Vec<BlockCodes> = streams
+        .par_iter()
+        .enumerate()
+        .map(|(s, classes)| {
+            let mut out: BlockCodes = (0..parts).map(|_| (0i64, vec![0i64; steps], 0usize)).collect();
+            let mut state = tower.rest();
+            tower
+                .read_faces(&mut state, classes, |i, top, face| {
+                    let prev = if i == 0 { alphabet } else { classes[i - 1] };
+                    let actual = classes[i + 1];
+                    let part = &mut out[roles.map_or(0, |r| r[s * chunk + i + 1] as usize)];
+                    part.0 += face.code(actual);
+                    let (q, qt) = block.projected(top, face, (prev, classes[i])).map_err(TowerError::Refused)?;
+                    let total = block.total(face, qt);
+                    for (j, code) in part.1.iter_mut().enumerate() {
+                        *code += code_of(block.mass(face, &q, qt, j as u64, actual), total);
+                    }
+                    part.2 += 1;
+                    Ok(())
+                })
+                .map_err(|e| e.to_string())?;
+            Ok(out)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let mut merged: BlockCodes = (0..parts).map(|_| (0i64, vec![0i64; steps], 0usize)).collect();
+    for stream in read {
+        for (into, part) in merged.iter_mut().zip(stream) {
+            into.0 += part.0;
+            for (x, y) in into.1.iter_mut().zip(&part.1) {
+                *x += y;
+            }
+            into.2 += part.2;
+        }
+    }
+    Ok(merged)
+}
+
+/// One part's codes as a line: the tower's own bits a byte, then each `η`'s.
+fn block_code_line(name: &str, (own, codes, cells): &(i64, Vec<i64>, usize), grain: u32) -> String {
+    let etas: Vec<String> = codes.iter().enumerate().map(|(j, &c)| format!("{j}:{}", per(c, (*cells).max(1)))).collect();
+    format!("part={name} cells={cells} tower={} (j:bits_a_byte, eta=j/{}) {}", per(*own, (*cells).max(1)), 1u32 << grain, etas.join(" "))
+}
+
+/// `install-tower-pair-block STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA
+/// STREAMS BLOCK OUT`: found a block of `BLOCK` full pair forms as `found-tower-pair-block` does,
+/// join it beside the tower's readout ([`PairBlock`]), install the `η` whose code over the
+/// training text is least, read the held-out text at every `η`, and write the block to `OUT`.
+pub(super) fn install_tower_pair_block(args: &[String]) -> Result<()> {
+    const USAGE: &str = "install-tower-pair-block STATE STATE_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS BLOCK OUT";
+    if args.len() != 12 {
+        return Err(USAGE.into());
+    }
+    let out = Path::new(&args[11]);
+    if out.exists() {
+        return Err("the block's file already exists".into());
+    }
+    let reading = PairReading::read(&args[..11], USAGE)?;
+    let founded = found_block(&reading, count(&args[10])?)?;
+    let train = &reading.train;
+    let (keys, cells) = train.table();
+    let (_, h, b) = extended(train, &keys, &cells, &founded.tables)?;
+    let fitted = fit_readout(&h, &b, &train.t)?;
+    let (base, base_d2) = (founded.base.clone(), founded.base_d2.clone());
+    reading.held_out(founded.tables.len(), &fitted, &founded.tables, Some((&base, &base_d2)))?;
+    let tower = &reading.learner.tower;
+    let mut block = PairBlock::new(&args[2], tower, &reading.arriving, founded, &fitted)?;
+    let trained = block_codes(tower, &block, &reading.train_streams, None)?;
+    println!("BLOCK_JOIN text=training {} elapsed_ms={}", block_code_line("all", &trained[0], block.grain), reading.started.elapsed().as_millis());
+    let (_, codes, cells) = &trained[0];
+    let least = (0..codes.len()).min_by_key(|&j| codes[j]).unwrap_or(0);
+    block.eta = least as u64;
+    println!(
+        "BLOCK_JOIN_INSTALLED eta={least}/{} training_bits_a_byte={} tower={} readout_bits={}",
+        1u32 << block.grain,
+        per(codes[least], (*cells).max(1)),
+        per(trained[0].0, (*cells).max(1)),
+        block.readout_bits
+    );
+    let held = block_codes(tower, &block, &reading.dev_streams, Some(&reading.dev_roles))?;
+    let mut all = (0i64, vec![0i64; 1 << block.grain], 0usize);
+    for (name, part) in PAIR_REGIONS.iter().zip(&held) {
+        println!("BLOCK_JOIN text=held_out {}", block_code_line(name, part, block.grain));
+        all.0 += part.0;
+        for (x, y) in all.1.iter_mut().zip(&part.1) {
+            *x += y;
+        }
+        all.2 += part.2;
+    }
+    println!("BLOCK_JOIN text=held_out {} elapsed_ms={}", block_code_line("all", &all, block.grain), reading.started.elapsed().as_millis());
+    let at: Vec<String> = PAIR_REGIONS
+        .iter()
+        .zip(&held)
+        .chain(std::iter::once((&"all", &all)))
+        .map(|(name, (own, codes, n))| format!("{name}={}->{}", per(*own, (*n).max(1)), per(codes[least], (*n).max(1))))
+        .collect();
+    println!("BLOCK_JOIN_HELD_OUT eta={least}/{} (part=tower->joined, bits a byte) {}", 1u32 << block.grain, at.join(" "));
+    write_new(out, block.to_text().as_bytes())?;
+    let written = std::fs::read(out)?;
+    println!("BLOCK_WRITTEN bytes={} sha256={} elapsed_ms={}", written.len(), sha256(&written)?, reading.started.elapsed().as_millis());
+    Ok(())
+}
+
+/// `sample-tower-block STATE STATE_SHA BLOCK BLOCK_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES OUT
+/// [AGREE]`: a fork of the rested tower with its pair block joined at the installed `η`. It
+/// receives the prompt and releases bytes by exact agreeing draws on the joined face, as
+/// `sample-tower` does on the tower's own; at `η = 0` the two release the same bytes.
+pub(super) fn sample_tower_block(args: &[String]) -> Result<()> {
+    if args.len() != 11 && args.len() != 12 {
+        return Err("sample-tower-block STATE STATE_SHA BLOCK BLOCK_SHA PROMPT PROMPT_SHA KEYS KEYS_SHA BYTES OUT [AGREE]".into());
+    }
+    let agree = agreement(args.get(11))?;
+    let started = Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let block = PairBlock::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], STATE_BUDGET)?)?, tower, &args[2])?;
+    let prompt = pinned_read(&args[5], &args[6], QUERY_BYTE_BUDGET)?;
+    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let count: usize = args[9].parse()?;
+    if keys.len() < count.checked_mul(8).ok_or("key extent overflow")? {
+        return Err("fewer eight-byte keys than declared bytes".into());
+    }
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let alphabet = tower.declaration.alphabet;
+    let mut state = tower.rest();
+    let (mut own, mut joined_code, mut prev) = (0i64, 0i64, alphabet);
+    let mut last: Option<(Vec<i32>, TowerFace, (usize, usize))> = None;
+    for &b in &prompt {
+        let c = b as usize;
+        if let Some((top, face, pair)) = &last {
+            own += face.code(c);
+            let masses = block.joined(top, face, *pair)?;
+            joined_code += code_of(masses[c], masses.iter().sum());
+        }
+        let (face, top) = tower.advance_top(&mut state, c).map_err(|e| e.to_string())?;
+        last = Some((top, face, (prev, c)));
+        prev = c;
+    }
+    let (mut top, mut face, mut pair) = last.ok_or("an empty prompt")?;
+    let mut key_stream = KeyStream::new(keys, 8)?;
+    let mut released = Vec::with_capacity(count);
+    while released.len() < count {
+        let key = key_stream.next_key().ok_or("fewer keys than declared bytes")?;
+        let class = agreeing_class(&block.joined(&top, &face, pair)?, agree, &key)?;
+        released.push(class as u8);
+        (face, top) = tower.advance_top(&mut state, class).map_err(|e| e.to_string())?;
+        pair = (pair.1, class);
+    }
+    write_new(&out.join("OUTPUT.bin"), &released)?;
+    let prompt_bytes = prompt.len().saturating_sub(1).max(1);
+    println!(
+        "TOWER_SAMPLE prompt_bits_a_byte={} joined_prompt_bits_a_byte={} eta={}/{} bytes={} agree={} elapsed_ms={}",
+        per(own, prompt_bytes),
+        per(joined_code, prompt_bytes),
+        block.eta,
+        1u32 << block.grain,
+        released.len(),
+        agree,
+        started.elapsed().as_millis()
+    );
+    println!("TOWER_SAMPLE_TEXT {:?}", String::from_utf8_lossy(&released));
     Ok(())
 }
 

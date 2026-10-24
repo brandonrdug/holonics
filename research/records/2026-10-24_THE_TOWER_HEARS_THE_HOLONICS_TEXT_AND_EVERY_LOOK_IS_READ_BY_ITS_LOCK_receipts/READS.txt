@@ -346,3 +346,30 @@ MEASURE exit=0 wall_s=0.4 peak_rss_kib=26040
 == hcw_rust_a2
 TOWER_SAMPLE prompt_bits_a_byte=2.333 bytes=400 agree=2 elapsed_ms=1515
 MEASURE exit=0 wall_s=1.5 peak_rss_kib=25716
+== wblk_arithmetic_ctx_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.779 joined_prompt_bits_a_byte=2.850 eta=21/32 bytes=400 agree=1 elapsed_ms=515
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39652
+== wblk_arithmetic_ctx_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.779 joined_prompt_bits_a_byte=2.850 eta=21/32 bytes=400 agree=2 elapsed_ms=487
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39592
+== wblk_eta0
+TOWER_SAMPLE prompt_bits_a_byte=4.097 joined_prompt_bits_a_byte=4.097 eta=0/32 bytes=400 agree=1 elapsed_ms=287
+MEASURE exit=0 wall_s=0.3 peak_rss_kib=38404
+== wblk_lean_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.335 joined_prompt_bits_a_byte=2.210 eta=21/32 bytes=400 agree=1 elapsed_ms=518
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39352
+== wblk_lean_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.335 joined_prompt_bits_a_byte=2.210 eta=21/32 bytes=400 agree=2 elapsed_ms=430
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=40536
+== wblk_prose_a1
+TOWER_SAMPLE prompt_bits_a_byte=4.097 joined_prompt_bits_a_byte=3.750 eta=21/32 bytes=400 agree=1 elapsed_ms=487
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39804
+== wblk_prose_a2
+TOWER_SAMPLE prompt_bits_a_byte=4.097 joined_prompt_bits_a_byte=3.750 eta=21/32 bytes=400 agree=2 elapsed_ms=459
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=40256
+== wblk_rust_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.333 joined_prompt_bits_a_byte=2.237 eta=21/32 bytes=400 agree=1 elapsed_ms=491
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39324
+== wblk_rust_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.333 joined_prompt_bits_a_byte=2.237 eta=21/32 bytes=400 agree=2 elapsed_ms=445
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39352
