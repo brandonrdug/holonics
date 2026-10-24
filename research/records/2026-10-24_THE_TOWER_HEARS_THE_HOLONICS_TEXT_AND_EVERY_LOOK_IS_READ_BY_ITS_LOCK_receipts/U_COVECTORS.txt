@@ -1,0 +1,10 @@
+block0 ucov 1144 MEASURE exit=0 wall_s=14.9 peak_rss_kib=23600 
+block1 ucov 1098 MEASURE exit=0 wall_s=14.7 peak_rss_kib=23452 
+block2 ucov 1095 MEASURE exit=0 wall_s=14.8 peak_rss_kib=23488 
+block3 ucov 1145 MEASURE exit=0 wall_s=14.8 peak_rss_kib=23652 
+block4 ucov 1105 MEASURE exit=0 wall_s=15.5 peak_rss_kib=23680 
+block5 ucov 1138 MEASURE exit=0 wall_s=14.7 peak_rss_kib=23712 
+block6 ucov 1166 MEASURE exit=0 wall_s=14.7 peak_rss_kib=23720 
+block7 ucov 1095 MEASURE exit=0 wall_s=14.8 peak_rss_kib=23804 
+
+[exited with code 0]

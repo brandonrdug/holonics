@@ -1958,6 +1958,58 @@ at `U` would be read there too, and the acceptance is not moved.
 - The ring-span search was projected at about 45 s (deadline 180 s). It took 73.0 s (1.6; peak
   809 MiB).
 
+## The knot at the node `U`
+
+**The readings** (`U_FORMS.py`, `U_SHARE.py`; exterior). They take the 8,986 training sums' `U`
+cells (the cell that codes the result's units; eight parts, each from rest, cells from 128). At
+each they read level 0's state before the class arriving at `U`, released as at `B`, and the input
+covector there, read for this loop. The region is these cells (a label region, a ceiling), read
+against its own `Y_r`. A form of the state with itself is `c = (aᵀŝ)(a′ᵀŝ)`. Held out, forms are
+read at the 495 sums' `U` cells.
+
+**At `U` the crossing is the loudest turn.** At its own loudness, the exact crossing `χ₁(c₀)`
+holds a share of 1.86 of the 2 its two channels can hold. That is louder than the state's own
+leading read (`J` 0.67 against the crossing's 0.93). At `B` the crossing held 0.39 in the label
+region, under a read of the state alone at 1.38.
+
+| form at `U` | `J` | two-channel share | holds `χ₁(c₀)` | held out, units at `U` |
+|---|---|---|---|---|
+| the exact crossing (a label) | 0.931 | 1.863 | 1 | — |
+| the outside product, `a₀`'s read × `b₀`'s read | 0.712 | 1.424 | 0.757 | 285 |
+| searched by `J`, three starts | 0.932 to 0.938 | 0.95 to 0.97 | 0.00 | 46 to 57 |
+| searched by the share, from the outside reads | 0.715 | 1.429 | 0.756 | 282 |
+| searched by the share, three blind starts | 0.24 to 0.55 | 0.74 to 0.94 | 0.00 | 42 to 65 |
+
+- The outside product's two reads hold 0.78 of `χ₁(a₀)` and 0.97 of `χ₁(b₀)`.
+- Searched by the circular `J`, every start ends on a form just above the crossing's `J` that reads
+  nothing: one real channel (a boost) scores under `J` as high as a full turn.
+- The two-channel share ranks the crossing first. Searched by it, the outside product stays where it
+  is (1.43), and the blind starts stop well below it (299 steps each, not converged).
+
+**What it says** [agent-inferred]:
+- The knot is heard where it sits. At the node that codes the units, the crossing of the two
+  carried strands is the tension's leading turn, in a measure that counts a turn's two channels.
+- Two repairs follow for the founding's selection. Score a complex form by its two-channel share,
+  not by the circular `J`. Start the search from the carried turns, not from the state's principal
+  directions.
+
+**Decided next** [agent-inferred]: the blind pipeline at `U`, read from outside first.
+1. Find the carried turns at `U` by constant modulus.
+2. Form their pair products in both senses, `zᵢzⱼ` and `zᵢz̄ⱼ`.
+3. Rank the products by two-channel share at the region's own loudness, with the region first from
+   the label and then from the tower's lock.
+
+The acceptance stays at `B`: a form of the state with itself is read there on the state after the
+second operand's units arrive, when both strands are carried.
+
+**The runs.**
+- The covector reads at the `U` cells took 14.7 to 15.5 s a part (deadline 90 s each, four at a
+  time). The `B` cells' reads, 15.0 to 15.9 s, were the projection (about 1.0).
+- The forms by `J` were projected at about 60 s (deadline 180 s) and took 71.6 s (1.19; peak
+  110 MiB).
+- The forms by share were projected at about 40 s (deadline 180 s) and took 77.8 s (1.9; peak
+  104 MiB).
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -2076,6 +2128,8 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   (run the same way).
 - The ring's sense: `HANDED_RING.{py,txt}` and `RING_SPAN.{py,txt}` (`RING_SPAN.py` takes
   `HANDED_RING.py` as its second argument).
+- The knot at `U`: `U_FORMS.{py,txt}`, `U_SHARE.{py,txt}`, and the covector reads' receipt lines
+  `U_COVECTORS.txt` (the covectors stay outside the repository).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
