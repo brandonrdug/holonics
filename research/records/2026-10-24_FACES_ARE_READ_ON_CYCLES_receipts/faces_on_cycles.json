@@ -1,0 +1,205 @@
+{
+ "A_carry_bockstein": {
+  "2": {
+   "cocycle": true,
+   "lap": 1,
+   "rational_coboundary_of_phase": true,
+   "n_times_carry_is_integer_coboundary": true,
+   "integer_coboundary_lap_minus_n_b1": [
+    0
+   ],
+   "class_order": 2
+  },
+  "3": {
+   "cocycle": true,
+   "lap": 1,
+   "rational_coboundary_of_phase": true,
+   "n_times_carry_is_integer_coboundary": true,
+   "integer_coboundary_lap_minus_n_b1": [
+    0
+   ],
+   "class_order": 3
+  },
+  "10": {
+   "cocycle": true,
+   "lap": 1,
+   "rational_coboundary_of_phase": true,
+   "n_times_carry_is_integer_coboundary": true,
+   "integer_coboundary_lap_minus_n_b1": [
+    0
+   ],
+   "class_order": 10
+  },
+  "bits": {
+   "split_plus_twice_cocycle": true,
+   "ripple_with_majority_carry": true,
+   "pairs": 65536,
+   "bit_k_of_xor_plural": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "bit_k_of_sum_plural": [
+    0,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4
+   ]
+  }
+ },
+ "B_language_seam_class": {
+  "face_monoid_size": 10,
+  "cocycle_on_faces": true,
+  "count_identity_pairs": 14641,
+  "count_th(xy) = count_th(x) + count_th(y) + seam(face x, face y)": true,
+  "rank_coboundary_system": 10,
+  "rank_augmented": 11,
+  "seam_is_rational_coboundary_on_faces": false,
+  "certificate_cycle": "[at|ha] + [aa|aa] - [at|at] - [ha|ha] (faces as first,last letter)",
+  "certificate_kills_every_coboundary": true,
+  "seam_read_on_certificate": 1
+ },
+ "C_kunneth_interaction_rank": {
+  "carry mod 10": {
+   "interaction_rank": 9,
+   "interaction_zero": false,
+   "unit_four_cycles_zero": false,
+   "agree": true
+  },
+  "last digit of sum, integer chart": {
+   "interaction_rank": 9,
+   "interaction_zero": false,
+   "unit_four_cycles_zero": false,
+   "agree": true
+  },
+  "last digit of product": {
+   "interaction_rank": 7,
+   "interaction_zero": false,
+   "unit_four_cycles_zero": false,
+   "agree": true
+  },
+  "product 0..9": {
+   "interaction_rank": 1,
+   "interaction_zero": false,
+   "unit_four_cycles_zero": false,
+   "agree": true
+  },
+  "sum 0..9 (no wrap)": {
+   "interaction_rank": 0,
+   "interaction_zero": true,
+   "unit_four_cycles_zero": true,
+   "agree": true
+  },
+  "trace of product, 81 matrices": {
+   "interaction_rank": 4,
+   "interaction_zero": false,
+   "unit_four_cycles_zero": false,
+   "agree": true
+  },
+  "det of product, 81 matrices": {
+   "interaction_rank": 1,
+   "interaction_zero": false,
+   "unit_four_cycles_zero": false,
+   "agree": true
+  },
+  "contains th, th-free words of length 1-2": {
+   "interaction_rank": 1,
+   "interaction_zero": false,
+   "unit_four_cycles_zero": false,
+   "agree": true
+  },
+  "count of th, words of length 0-2": {
+   "interaction_rank": 1,
+   "interaction_zero": false,
+   "unit_four_cycles_zero": false,
+   "agree": true
+  }
+ },
+ "D_torus_hodge_viscosity": {
+  "grid": "6x6 torus, 36 vertices, 72 edges, 36 squares",
+  "dim_harmonic = edges - rank(Hodge Laplacian)": 2,
+  "sum_is_field": true,
+  "pairwise_orthogonal": true,
+  "coexact_is_coclosed": true,
+  "exact_has_zero_curl": true,
+  "harmonic_is_closed_and_coclosed": true,
+  "energies_step0": {
+   "exact": "33703/280",
+   "coexact": "34547/280",
+   "harmonic": "37/4"
+  },
+  "viscosity_nu": "1/8",
+  "steps": [
+   {
+    "step": 1,
+    "harmonic_unchanged": true,
+    "exact": "49307/1120",
+    "coexact": "27339/560"
+   },
+   {
+    "step": 2,
+    "harmonic_unchanged": true,
+    "exact": "1679173/71680",
+    "coexact": "28603/1120"
+   },
+   {
+    "step": 3,
+    "harmonic_unchanged": true,
+    "exact": "67705217/4587520",
+    "coexact": "17570667/1146880"
+   },
+   {
+    "step": 4,
+    "harmonic_unchanged": true,
+    "exact": "2979778213/293601280",
+    "coexact": "183481547/18350080"
+   },
+   {
+    "step": 5,
+    "harmonic_unchanged": true,
+    "exact": "137194711177/18790481920",
+    "coexact": "32310735277/4697620480"
+   },
+   {
+    "step": 6,
+    "harmonic_unchanged": true,
+    "exact": "6469268693453/1202590842880",
+    "coexact": "735446280339/150323855360"
+   }
+  ],
+  "row_loop_circulations_changed": 6,
+  "mean_row_loop_circulation_step0_step6": [
+   "3",
+   "3"
+  ],
+  "exact_and_coexact_strictly_decrease": true
+ },
+ "E_hpp_lattice_gas": {
+  "torus": "16x16",
+  "steps": 64,
+  "invariants_mass_px_py": [
+   387,
+   -1,
+   0
+  ],
+  "conserved_every_step": true,
+  "per_site_conserves_and_is_involution": true,
+  "site_states_changed_by_collision": 2,
+  "bits_flipped_over_run": 31548
+ },
+ "F_replicator_parts": {
+  "column_sums_of_K_zero": true,
+  "cycling_part_conserves_sum_log_x": true,
+  "gradient_part_mean_fitness_rate_is_twice_variance": true,
+  "points": 3
+ }
+}
