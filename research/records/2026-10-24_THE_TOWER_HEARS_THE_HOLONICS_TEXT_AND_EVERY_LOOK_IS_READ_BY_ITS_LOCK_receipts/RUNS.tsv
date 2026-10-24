@@ -120,3 +120,6 @@ the carried turns	-	CARRIED_TURN.py, the lock region then the label region, 8 co
 the turn selection	-	CARRIED_SELECT.py, the lock region, 16 components, 120 steps each	121 (25 and 16 at 6)	180	-	107.2	0.89	825408	complete
 the handed ring	-	HANDED_RING.py, four regions	about 40 (unmeasured)	180	-	114.3	2.9	1359044	complete
 the ring-span search	-	RING_SPAN.py, the lock and label regions, 4 ranks, 4 starts	about 45	180	-	73.0	1.6	828608	complete
+the covectors at U	situated7	read-tower-input-covectors at the sums' U cells, eight parts, four at a time	15 to 16 a part (the B cells' reads)	90 each	-	14.7 to 15.5 a part	about 1.0	23452 to 23804	complete
+the forms at U by J	-	U_FORMS.py	about 60	180	-	71.6	1.19	112332	complete
+the forms at U by share	-	U_SHARE.py	about 40	180	-	77.8	1.9	106640	complete; the blind starts stopped at 299 steps

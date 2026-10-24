@@ -1,0 +1,9 @@
+training sums' U cells 8986, held out 495; read in 3.4 s
+the exact crossing chi_1(c0) at the region's own loudness (a label): share 1.8629, J 0.9314
+the leading straight-line read of the state alone: J 0.6668
+   the outside product, unsearched: J 0.7119, share 1.4235; the two reads hold chi_1(a0) 0.779/-0.001, chi_1(b0) -0.002/0.972; the form holds chi_1(c0) 0.757; held out, units at U 285 of 495
+   searched from outside reads (25.2 s): J 0.9318, share 0.9546; the two reads hold chi_1(a0) 0.000/0.005, chi_1(b0) 0.002/0.009; the form holds chi_1(c0) -0.001; held out, units at U 46 of 495
+   searched from principal 1+2 / 1+2 (19.1 s): J 0.9375, share 0.9700; the two reads hold chi_1(a0) 0.006/0.002, chi_1(b0) 0.013/0.034; the form holds chi_1(c0) 0.000; held out, units at U 51 of 495
+   searched from principal 1+2 / 3+4 (23.5 s): J 0.9375, share 0.9691; the two reads hold chi_1(a0) -0.000/0.018, chi_1(b0) 0.006/0.048; the form holds chi_1(c0) 0.004; held out, units at U 57 of 495
+done in 71.5 s
+MEASURE exit=0 wall_s=71.6 peak_rss_kib=112332
