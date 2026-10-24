@@ -1,0 +1,80 @@
+== lock prose
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	7	242	55	52	328	408	2	5
+== lock lean
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	24	1469	275	297	1870	2012	6	18
+== lock rust
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	12	491	143	131	729	768	6	6
+== lock arithmetic
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	159	622	346	346	552	553	125	34
+unmet	1041	3909	2162	2190	3453	3432	846	195
+== plain prose
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	7	242	33	38	342	359	4	3
+== plain lean
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	24	1469	357	362	2032	2010	10	14
+== plain rust
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	12	491	136	127	737	727	6	6
+== plain arithmetic
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	159	622	337	342	580	572	130	29
+unmet	1041	3909	2175	2160	3539	3561	813	228
+== pair prose
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	7	242	54	42	322	278	4	3
+== pair lean
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	24	1469	135	92	1540	1550	14	10
+== pair rust
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	12	491	112	113	684	662	7	5
+== pair arithmetic
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	159	622	358	369	533	506	138	21
+unmet	1041	3909	2198	2249	3393	3297	889	152
+== pair8 prose
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	7	242	46	20	311	253	5	2
+== pair8 lean
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	24	1469	214	124	1631	1630	8	16
+== pair8 rust
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	12	491	86	100	596	564	6	6
+== pair8 arithmetic
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	159	622	327	330	596	588	135	24
+unmet	1041	3909	2072	2094	3713	3658	860	181
+== pairlin8 prose
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	7	242	40	53	320	347	3	4
+== pairlin8 lean
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	24	1469	315	248	1806	1754	5	19
+== pairlin8 rust
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	0	0	0	0	0	0	0	0
+unmet	12	491	102	108	685	617	6	6
+== pairlin8 arithmetic
+part	lines	ΣT	first λ	last λ	first F*	last F*	held or grew	fell
+met	159	622	327	323	601	613	123	36
+unmet	1041	3909	2086	2100	3758	3747	842	199

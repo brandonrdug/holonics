@@ -997,6 +997,48 @@ next section's plain code under the tower before and after it, before that secti
 both towers. The reading fixed before it: whether the fork tower's deposits raise the code of text
 they have not learned more often, or by more, than the plain tower's.
 
+## Every look read by its lock, and the turn to the Holonics text
+
+[agent-inferred, October 24] The counts above read a look against the true result whole, and the
+fork compared the true rest from the first place it parts from the release. Both are the teacher's
+frame the micro-control withdrew (its §6 and §7): they privilege the beginning, and a look one digit
+off at the front scores like a look with nothing right. A look is now read by its lock with the true
+rest instead: `λ`, the longest order-consistent coupling of the look and its line end with the true
+rest and its line end (`receiver::coupling`), and its friction `F* = |H| + |T| − 2λ`. Looking again
+succeeds where `λ` grows or holds and `F*` falls or holds. `read-lines-again` writes each look's `λ`
+and `F*` (`LOOKS.tsv`'s seventh and eighth columns) and `tools/arithmetic_looks.py` prints them
+first. The six reads after passes 9, 10 and 11 were made again with the new binary; they repeat
+every look and cost bit for bit, and their files replace the six above with the two columns added
+(`READ_LOCK.txt`).
+
+First look on first-met unseen lines, `Σλ / ΣF*` over the lines (news fork tower; plain tower):
+
+| state after pass | sums (208 lines) | differences (135) | products (193) |
+|---|---|---|---|
+| 9 | 640 / 174; 696 / 68 | 275 / 226; 334 / 92 | 562 / 643; 546 / 677 |
+| 10 | 676 / 121; 691 / 79 | 341 / 76; 344 / 69 | 593 / 582; 576 / 618 |
+| 11 | 667 / 134; 694 / 70 | 341 / 82; 327 / 105 | 590 / 590; 567 / 635 |
+
+- **Products.** The news fork tower's first look holds more of the true product in order and slips
+  less after every pass read, where its count of whole products right trailed the plain tower's. It
+  writes more of each product's digits in their places; a whole-result count did not see them.
+- **Sums.** The plain tower's first look holds more and slips less after every pass read.
+- **Differences.** The plain tower leads after pass 9, the two are within 3 and 7 after pass 10,
+  and the news fork tower leads after pass 11.
+- **Looking again.** Summed over an operation's lines from the first look to the last, the plain
+  tower's lock held or grew in 7 of the 9 operation-passes (it fell on sums after passes 9 and 10)
+  and the news fork tower's in 5 of 9. Line by line, the lock held or grew on 179 to 204 of 208
+  sums, 116 to 130 of 135 differences and 151 to 164 of 193 products, in both towers.
+
+The fork's comparison now follows the lock too: on the fork the true rest is compared at the places
+that lie on no least-friction coupling with the release and its end (`never_held_t_indices`), the
+lock's slips, read from both ends alike, so no place, first or last, frames what it learns. The
+first-parting fork stays at [`0ef7c4fc4`](https://github.com/brandonrdug/holonics/tree/0ef7c4fc4).
+It was not trained on these digits alone, and the next loop proposed above (each deposit's effect on
+the next section's code) was not run: the line moved to the public Holonics text, where these digits
+are one of four sections beside prose, Lean and Rust and the lock reads every section alike
+([the tower on the Holonics text](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS_READ_BY_ITS_LOCK.md)).
+
 ## The recorded failures this step could repeat
 
 - **Catered machinery.** The terrain's truth is generated exactly, outside the machine; the tower
@@ -1035,7 +1077,7 @@ tower's, in `FACES.txt`. The fork compared only where the truth parts from the a
 faces in `FACES_NEWS.txt`; the looks after passes 9 and 10 (`LOOKS_AGAIN_NEWS_9.tsv`,
 `LOOKS_AGAIN_NEWS_10.tsv`) beside the plain pumped tower's after passes 9, 10 and 11
 (`LOOKS_AGAIN_PUMPED_9.tsv`, `LOOKS_AGAIN_PUMPED_10.tsv`, `LOOKS_AGAIN_PUMPED_11.tsv`), read in
-`READ_SPREAD.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`,
+`READ_SPREAD.txt` and, with each look's lock in their seventh and eighth columns, in `READ_LOCK.txt`. `TRAIN_DUPLEX.txt`, `TRAIN_TURNED.txt`, `TRAIN_TURNED_STOPPED.txt`,
 `TRAIN_PUMPED.txt`, `TRAIN_LOOKING.txt`, `TRAIN_COMPARED.txt`, `TRAIN_OWN.txt`, `TRAIN_FORK.txt`,
 `TRAIN_NEWS.txt`, `TRAIN_NEWS_PARTS.txt` and `TRAIN_FORK_REFUSED.txt` (with its one swell line) are the training logs (the turned and pumped ones without their per-section
 swell lines).

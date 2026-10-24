@@ -10,8 +10,11 @@
 //! the rested tower: it opens at rest, receives the prompt, and releases each byte by an exact draw
 //! on its face.
 use super::*;
-use holonics::hnn::tower::{Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, READ_BITS};
+use holonics::hnn::passage::{PassageDeclaration, PassageTree};
+use holonics::hnn::tower::{ContactLaw, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
+use holonics::receiver::coupling::coupling;
+use num_bigint::BigUint;
 use rayon::prelude::*;
 
 /// A learner's state read ceiling, `2^30` bytes.
@@ -139,6 +142,45 @@ pub(super) fn read_tower_faces(args: &[String]) -> Result<()> {
 }
 
 /// `Q=… P=… N=… M=…`: bits a byte per region.
+/// `read-tower-pair STATE STATE_SHA`: where a pair tower's bilinear weight sits
+/// ([`Tower::bilinear_rungs`]), each level's weight on the founded memory rungs of the two drives'
+/// modes, in thousandths of the level's whole (`TOWER_PAIR_RUNGS`, the first drive's rung by row),
+/// and its three parts with the ladder's upper half as the held rungs and its lower half as the
+/// fast (agent-inferred: the halves of the declared ladder, no cut chosen from the material):
+/// held × fast (both orders), fast × fast and held × held (`TOWER_PAIR`).
+pub(super) fn read_tower_pair(args: &[String]) -> Result<()> {
+    if args.len() != 3 {
+        return Err("read-tower-pair STATE STATE_SHA".into());
+    }
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let levels = learner.tower.bilinear_rungs().map_err(|e| e.to_string())?;
+    let thousandths = |part: &BigUint, whole: &BigUint| -> String {
+        if *whole == BigUint::from(0u32) { "0".into() } else { ((part * 1000u32 + whole / 2u32) / whole).to_string() }
+    };
+    for (l, e) in levels.iter().enumerate() {
+        let rungs = e.len();
+        let whole: BigUint = e.iter().flatten().sum();
+        let held = |s: usize| 2 * s >= rungs;
+        let part = |keep: &dyn Fn(usize, usize) -> bool| -> BigUint {
+            (0..rungs).flat_map(|s| (0..rungs).map(move |t| (s, t))).filter(|&(s, t)| keep(s, t)).map(|(s, t)| e[s][t].clone()).sum()
+        };
+        let held_fast = part(&|s, t| held(s) != held(t));
+        let fast_fast = part(&|s, t| !held(s) && !held(t));
+        let held_held = part(&|s, t| held(s) && held(t));
+        println!(
+            "TOWER_PAIR level={l} rungs={rungs} held_from_rung={} held_x_fast={} fast_x_fast={} held_x_held={} whole_bits={}",
+            rungs.div_ceil(2),
+            thousandths(&held_fast, &whole),
+            thousandths(&fast_fast, &whole),
+            thousandths(&held_held, &whole),
+            whole.bits()
+        );
+        let rows: Vec<String> = e.iter().map(|row| row.iter().map(|x| thousandths(x, &whole)).collect::<Vec<_>>().join(",")).collect();
+        println!("TOWER_PAIR_RUNGS level={l} {}", rows.join(";"));
+    }
+    Ok(())
+}
+
 pub(super) fn region_line(regions: &[(i64, usize); 4]) -> String {
     REGIONS
         .iter()
@@ -172,10 +214,12 @@ pub(super) fn per(code: i64, n: usize) -> String {
 /// their input), `train-turned-tower` the turned one (its gated modes' turn keyed by their input too),
 /// `train-pumped-tower` the pumped one (its turned modes pumped by their input, so a phase can lock),
 /// and `train-credited-tower` the gated one whose streams carry their passage credit
-/// (`hnn::tower::LevelCredit`), so a section's covector reaches the history its opening carries; a
-/// continued learner must carry the same declaration.
-pub(super) fn train(args: &[String], gated: bool, turned: bool, pumped: bool, credit: bool) -> Result<()> {
-    train_looking_or_not(args, gated, turned, pumped, credit, None)
+/// (`hnn::tower::LevelCredit`), so a section's covector reaches the history its opening carries;
+/// `train-pair-pumped-tower` the pumped one whose contacts are pair contacts
+/// (`hnn::tower::ContactLaw::Pair`) and `train-pair-linear-pumped-tower` its foil, the pair contact
+/// with its bilinear block held at zero. A continued learner must carry the same declaration.
+pub(super) fn train(args: &[String], gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw) -> Result<()> {
+    train_looking_or_not(args, gated, turned, pumped, credit, contact, None)
 }
 
 /// `train-looking-gated-tower|train-looking-turned-tower|train-looking-pumped-tower LOOK_KEYS
@@ -196,10 +240,10 @@ pub(super) fn train_looking(args: &[String], gated: bool, turned: bool, pumped: 
         return Err("a moment and a line's end are different bytes".into());
     }
     let rest: Vec<String> = std::iter::once(args[0].clone()).chain(args[6..].iter().cloned()).collect();
-    train_looking_or_not(&rest, gated, turned, pumped, false, Some(&looking))
+    train_looking_or_not(&rest, gated, turned, pumped, false, ContactLaw::Rectifying, Some(&looking))
 }
 
-fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool, credit: bool, looking: Option<&Looking>) -> Result<()> {
+fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, looking: Option<&Looking>) -> Result<()> {
     if args.len() != 18 && args.len() != 20 {
         return Err("train-tower|train-gated-tower|train-turned-tower|train-pumped-tower|train-credited-tower TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
@@ -214,7 +258,7 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
         dev_roles: roles,
         alphabet: 256,
     };
-    fit(&args[7..], reading, gated, turned, pumped, credit, looking)
+    fit(&args[7..], reading, gated, turned, pumped, credit, contact, looking)
 }
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
@@ -247,7 +291,7 @@ pub(super) fn train_units(args: &[String]) -> Result<()> {
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len() };
-    fit(&args[9..], reading, true, false, false, false, None)
+    fit(&args[9..], reading, true, false, false, false, ContactLaw::Rectifying, None)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -263,7 +307,7 @@ struct Reading {
 
 /// The passes: `args` are `KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS
 /// OUT [FROM FROM_SHA]`.
-fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, looking: Option<&Looking>) -> Result<()> {
+fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, looking: Option<&Looking>) -> Result<()> {
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -275,6 +319,7 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: boo
         gated,
         turned,
         pumped,
+        contact,
     };
     let streams = count(&args[6])?;
     let section = count(&args[7])?;
@@ -553,6 +598,11 @@ fn release(args: &[String], units: Option<&Units>) -> Result<()> {
     Ok(())
 }
 
+/// A text field of `LINES.tsv` or `LOOKS.tsv`: the bytes escaped (`read_lines`).
+fn field(bytes: &[u8]) -> String {
+    bytes.iter().map(|&b| if b == b'|' { "\\x7c".to_string() } else { b.escape_ascii().to_string() }).collect()
+}
+
 /// `read-lines STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT`: each line of the
 /// text read alone. The frozen tower opens at rest on a line's end, receives the line through its
 /// first `=`, and codes the rest of the line class by class (`LINES.tsv`: the line's index, its
@@ -572,17 +622,33 @@ fn release(args: &[String], units: Option<&Units>) -> Result<()> {
 /// that read's; the later looks draw from the file's second half. `LINES.tsv` writes the last look
 /// and `LOOKS.tsv` every look (the line's index, its head, the rest as given, whether the last two
 /// looks agree, the looks joined by `|`, and what the true rest costs from where each look stands,
-/// on `2^(−20)` bits: the frustration's floor and how fast the looks approach it).
+/// on `2^(−20)` bits: the frustration's floor and how fast the looks approach it; then each look's
+/// lock with the true rest, `λ` and `F*` joined by `|`, the micro-control's success reading: `λ`
+/// grows or holds and `F*` falls or holds at 0 from look to look).
 /// `read-lines-carried` looks as `read-lines-again` does, and its stream carries each written
 /// line's first look, line end and head again before the true rest, the passage a tower trained
 /// with the look (`Looking`) met: its codes are read where that tower was taught.
 /// `read-lines-own` lets the tower decide: after each look and its line's end the fork writes on,
 /// and it looks again only where it writes its line's head again, at most `LOOKS` looks. Its
 /// stream is the plain text, the passage a tower trained with the look (`Looking`) read.
-pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result<()> {
-    let arity = if look == Look::Once { 10 } else { 11 };
+///
+/// `read-lines-located … AGREE LOOKS DEPTH OUT` looks as `read-lines-again` does at a moment no
+/// byte declares: the first place in a line where a located key fires. The passage tree
+/// ([`PassageTree`]) hears the read stream class by class, and the moment is the first cell whose
+/// line holds `DEPTH` classes up to it that the tree's lock locates at full depth, an earlier
+/// visit of the same context (the located equality `(t, t − δ)`), with at least one class of the
+/// line still to come. The key is the line's own expression, in any medium, and the look asks for
+/// what follows it. A line where no key fires is carried in the stream unread, as a line without
+/// `=` is in the other reads.
+///
+/// Every text field of both files (head, rest, looks) is its bytes escaped as Rust's
+/// `escape_ascii` writes them, with `|` written `\x7c`, so a field holds no tab or `|` and reads
+/// back to its exact bytes (Python's `codecs.escape_decode`). A look is the tower's bytes, which
+/// need not be UTF-8.
+pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look, located: bool) -> Result<()> {
+    let arity = if look == Look::Once { 10 } else { 11 } + usize::from(located);
     if args.len() != arity {
-        return Err("read-lines|read-lines-stream STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT; read-lines-again|read-lines-redraw|read-lines-carried|read-lines-own STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE LOOKS OUT".into());
+        return Err("read-lines|read-lines-stream STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT; read-lines-again|read-lines-redraw|read-lines-carried|read-lines-own STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE LOOKS OUT; read-lines-located STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE LOOKS DEPTH OUT".into());
     }
     let started = Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -605,8 +671,15 @@ pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result
     let mut lines = 0usize;
     let mut carried = tower.rest();
     let mut carried_face = tower.advance(&mut carried, b'\n' as usize).map_err(|e| e.to_string())?;
+    let moments = if located {
+        let moments = located_moments(&text, args[10].parse()?)?;
+        println!("MOMENTS_LOCATED depth={} lines={} located={}", args[10], moments.len(), moments.iter().flatten().count());
+        moments
+    } else {
+        text.split(|&b| b == b'\n').filter(|l| !l.is_empty()).map(|l| l.iter().position(|&b| b == b'=')).collect()
+    };
     for (i, line) in text.split(|&b| b == b'\n').filter(|l| !l.is_empty()).enumerate() {
-        let Some(eq) = line.iter().position(|&b| b == b'=') else {
+        let Some(eq) = moments[i] else {
             for &b in line.iter().chain(b"\n") {
                 carried_face = tower.advance(&mut carried, b as usize).map_err(|e| e.to_string())?;
             }
@@ -623,13 +696,14 @@ pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result
             face = tower.advance(&mut modes, b as usize).map_err(|e| e.to_string())?;
         }
         let rest: Vec<u8> = line[eq + 1..].iter().copied().chain([b'\n']).collect();
-        let mut looked: Vec<String> = Vec::new();
+        let mut looked: Vec<Vec<u8>> = Vec::new();
         let mut costs: Vec<i64> = Vec::new();
         let mut first_look: Vec<usize> = Vec::new();
+        let mut locks: Vec<(usize, usize)> = Vec::new();
         if i < written {
             let cap = rest.len() + 4;
             let mut fork = modes.clone();
-            let written = |r: Vec<usize>| r.into_iter().map(|c| char::from(c as u8)).collect::<String>();
+            let written = |r: Vec<usize>| r.into_iter().map(|c| c as u8).collect::<Vec<u8>>();
             costs.push(rest_code(tower, &modes, face.clone(), &rest)?);
             first_look = release_rest(tower, &mut fork, face.clone(), &mut key_stream, cap, agree)?.0;
             looked.push(written(first_look.clone()));
@@ -662,18 +736,31 @@ pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result
                 };
                 looked.push(again);
             }
+            // Each look read by the lock with the true rest (micro-control §7): the longest
+            // order-consistent coupling `λ` and its friction `F* = |H| + |T| − 2λ`, the look's end
+            // counted where it wrote one (a look cut at `cap` wrote none).
+            for l in &looked {
+                let mut h = l.clone();
+                if h.len() < cap {
+                    h.push(b'\n');
+                }
+                let c = coupling(&h, &rest).map_err(|e| e.to_string())?;
+                locks.push((c.lambda, c.least_friction));
+            }
             spent += looked.len();
             let agreed = looked.len() >= 2 && looked[looked.len() - 1] == looked[looked.len() - 2];
             settled += usize::from(agreed);
             if look != Look::Once {
                 look_rows.push_str(&format!(
-                    "{}\t{}\t{}\t{}\t{}\t{}\n",
+                    "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n",
                     i,
-                    String::from_utf8_lossy(&line[..=eq]),
-                    String::from_utf8_lossy(&rest[..rest.len() - 1]),
+                    field(&line[..=eq]),
+                    field(&rest[..rest.len() - 1]),
                     u8::from(agreed),
-                    looked.join("|"),
-                    costs.iter().map(|c| c.to_string()).collect::<Vec<_>>().join("|")
+                    looked.iter().map(|l| field(l)).collect::<Vec<_>>().join("|"),
+                    costs.iter().map(|c| c.to_string()).collect::<Vec<_>>().join("|"),
+                    locks.iter().map(|l| l.0.to_string()).collect::<Vec<_>>().join("|"),
+                    locks.iter().map(|l| l.1.to_string()).collect::<Vec<_>>().join("|")
                 ));
             }
         }
@@ -695,9 +782,9 @@ pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result
         rows.push_str(&format!(
             "{}\t{}\t{}\t{}\t{}\n",
             i,
-            String::from_utf8_lossy(&line[..=eq]),
-            String::from_utf8_lossy(&rest[..rest.len() - 1]),
-            release,
+            field(&line[..=eq]),
+            field(&rest[..rest.len() - 1]),
+            field(&release),
             codes.join(",")
         ));
         lines += 1;
@@ -709,6 +796,36 @@ pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result
     }
     println!("LINES_READ lines={} written={} agree={} lines_sha256={} elapsed_ms={}", lines, written.min(lines), agree, sha256(rows.as_bytes())?, started.elapsed().as_millis());
     Ok(())
+}
+
+/// The moment of each nonempty line of `text` where a located key fires (`read-lines-located`):
+/// the passage tree hears the stream the reads carry (a line's end, then each nonempty line and its
+/// end), and a line's moment is its first cell `p` whose `depth` classes up to `p` lie in the line
+/// and are a context the tree's lock locates at full depth (visited before, so followed before),
+/// with a class of the line after `p`. The lock reads node visits only, so the horizon and backoff
+/// (the GSM8K route's, `2^13` and one occurrence) do not move a moment.
+fn located_moments(text: &[u8], depth: usize) -> Result<Vec<Option<usize>>> {
+    if depth == 0 {
+        return Err("a located key holds at least one class".into());
+    }
+    let mut tree = PassageTree::new(PassageDeclaration { alphabet: 256, phases: 1, depth, horizon: 13, backoff: 1 })?;
+    let mut context = vec![b'\n' as usize];
+    let mut now = 0u64;
+    let mut moments = Vec::new();
+    for line in text.split(|&b| b == b'\n').filter(|l| !l.is_empty()) {
+        let mut moment = None;
+        for (p, &b) in line.iter().chain(b"\n").enumerate() {
+            tree.deposit(0, &context, b as usize, now)?;
+            now += 1;
+            context.insert(0, b as usize);
+            context.truncate(depth);
+            if moment.is_none() && p + 1 >= depth && p + 1 < line.len() && tree.lock(0, &context, now)?.is_some_and(|(_, d, _)| d == depth) {
+                moment = Some(p);
+            }
+        }
+        moments.push(moment);
+    }
+    Ok(moments)
 }
 
 /// How a written line meets its own moment again (`read_lines`).
@@ -765,13 +882,18 @@ fn release_rest(tower: &Tower, fork: &mut TowerState, mut face: TowerFace, keys:
 /// the release and its end, compared with nothing (up to the place they part its faces are the
 /// stream's own, compared already; past it the passage is the fork's own), then the line's head
 /// again and the true rest and its end. On the fork only the news is compared
-/// (`TowerLearner::section_compared`): the true rest from the first place where it parts from the
-/// release, through its end. The head again and the true rest's leading places that agree with
-/// the release are what the fork has just read, so they are read with nothing compared: compared,
-/// the head taught that a line's question returns after its answer, against the passage, and the
-/// agreeing places were learned by copying the release (the record of October 23 on a terrain of
-/// interacting digits, "Reading the side-fork tower's faces"; the fork that compared them is at
-/// [`79a440c06`](https://github.com/brandonrdug/holonics/tree/79a440c06)). The fork joins the
+/// (`TowerLearner::section_compared`): the true rest's places that lie on no least-friction
+/// coupling with the release and its end (`receiver::coupling`, the micro-control's §7 lock), the
+/// places the release carries at no lag. The lock reads both strands from both ends alike, so no
+/// place, first or last, frames the comparison. The head again and the true rest's places the
+/// release can hold are what the fork has just read, so they are read with nothing compared:
+/// compared, the head taught that a line's question returns after its answer, against the passage,
+/// and the held places were learned by copying the release (the record of October 23 on a terrain
+/// of interacting digits, "Reading the side-fork tower's faces"; the fork that compared them is at
+/// [`79a440c06`](https://github.com/brandonrdug/holonics/tree/79a440c06), and the fork that
+/// compared the true rest from the first place it parts from the release, a teacher's frame that
+/// privileges the beginning, at
+/// [`0ef7c4fc4`](https://github.com/brandonrdug/holonics/tree/0ef7c4fc4)). The fork joins the
 /// section its moment falls in, deposits with the streams and ends there. Where the release is the
 /// true rest no fork opens. The terrain's moment and line end are its codec's declared bytes, read
 /// outside the tower.
@@ -847,13 +969,12 @@ impl Looker {
                     self.right += 1;
                 } else {
                     let head = &text[head..self.at];
-                    // The first place the true rest parts from the release: none where a stream's
-                    // text ends inside a rest the release agrees with.
-                    let parts = attempt.iter().zip(truth).position(|(a, t)| a != t).unwrap_or(truth.len());
+                    // The true rest's places the release holds on no least-friction coupling.
+                    let slips = coupling(&attempt, truth).map_err(|e| e.to_string())?.never_held_t_indices;
                     let classes: Vec<usize> = std::iter::once(c).chain(attempt.iter().copied()).chain(head.iter().copied()).chain(truth.iter().copied()).collect();
                     let compared: Vec<Option<usize>> = std::iter::once(Some(c))
                         .chain(attempt.iter().chain(head).map(|_| None))
-                        .chain(truth.iter().enumerate().map(|(j, &b)| (j >= parts).then_some(b)))
+                        .chain(truth.iter().enumerate().map(|(j, &b)| slips.binary_search(&j).is_ok().then_some(b)))
                         .collect();
                     self.forks.push(Fork { opening: before, classes, compared });
                 }

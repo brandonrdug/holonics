@@ -130,6 +130,25 @@
 //! the plain tower's reached in its whole training (38,222,409), and then passed `2^31` (a typed
 //! refusal).
 //!
+//! **The pair contact** ([`ContactLaw::Pair`], agent-inferred with the mathematics thread, October
+//! 24). The face law (record `2026-10-24_ONE_FACE_LAW_A_FACE_IS_A_CONGRUENCE_…`) reads every
+//! section's located relation through one pair contact `W(x̄ ⊗ ȳ)`, `x̄ = (x, 1)`: a constant block,
+//! two one-sided blocks (copy, agreement, codomain), an additive block and a bilinear one, with the
+//! slip `δ = q(r) − r̂` as its check and its covector. A rectifier takes a conjunction only through
+//! its kink; the pair contact takes it as the product of two drives read off the same face, so a
+//! drive keyed by a held mode can gate a drive keyed by a fast one:
+//!
+//! ```text
+//! v_t            = (W_a r̂_t + b_a) ⊙ (W_b r̂_t + b_b)
+//! δ(W_a r̂ + b_a) = δv ⊙ (W_b r̂ + b_b),      δ(W_b r̂ + b_b) = δv ⊙ (W_a r̂ + b_a)
+//! ```
+//!
+//! The second drive opens at `W_b = 0`, `b_b = 1`, so the contact opens one-sided
+//! (`v = W_a r̂ + b_a`, no kink) and the bilinear block is learned from there; the first drive is
+//! founded as the rectifier's. The foil [`ContactLaw::PairLinear`] holds the bilinear block at
+//! zero, `v = (W_a r̂ + b_a) b_b + b_a (W_b r̂)`: the same material and the same opening with every
+//! block but the product, so what the product carries is read against it.
+//!
 //! **What a section holds.** The forward's temporaries of its own cells, for the reverse scan, and
 //! the streams' opening states, for the reread. They are released when the section closes (the
 //! Athena alpha plan's §A2.4: the reverse pairs the forward prefix operands with the backward
@@ -234,6 +253,20 @@ pub struct TowerDeclaration {
     /// Whether each turned mode is pumped too (the pumped mode): the arriving symbol keys a
     /// reflection mixed into the move, so a mode's phase can lock on one of two sheets.
     pub pumped: bool,
+    /// How a level's contacts conduct: rectifying, or the pair contact or its linear foil.
+    pub contact: ContactLaw,
+}
+
+/// [definition; agent-inferred, October 24] **A level's contact law** (the module's law).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ContactLaw {
+    /// `v = max(W₁ r̂ + b₁, 0)`: the contact conducts one way.
+    Rectifying,
+    /// `v = (W_a r̂ + b_a) ⊙ (W_b r̂ + b_b)`: the pair contact, its bilinear block learned.
+    Pair,
+    /// `v = (W_a r̂ + b_a) b_b + b_a (W_b r̂)`: the pair contact with its bilinear block held at
+    /// zero, the foil the product is read against.
+    PairLinear,
 }
 
 /// Where each family of the material sits in the one vector, and its grain.
@@ -260,6 +293,9 @@ struct LevelLayout {
     pump_bias: usize,
     pump_axis: usize,
     pump_axis_bias: usize,
+    /// The pair contact's second drive, material and bias (empty families when rectifying).
+    pair: usize,
+    pair_bias: usize,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -306,6 +342,8 @@ impl Layout {
                 pump_bias: 0,
                 pump_axis: 0,
                 pump_axis_bias: 0,
+                pair: 0,
+                pair_bias: 0,
             };
             if d.gated {
                 level.gate = take(n * w, MATERIAL_BITS);
@@ -320,6 +358,10 @@ impl Layout {
                 level.pump_bias = take(n, FACE_BITS);
                 level.pump_axis = take(n * w, MATERIAL_BITS);
                 level.pump_axis_bias = take(n, FACE_BITS);
+            }
+            if d.contact != ContactLaw::Rectifying {
+                level.pair = take(f * w, MATERIAL_BITS);
+                level.pair_bias = take(f, FACE_BITS);
             }
             levels.push(level);
         }
@@ -566,6 +608,8 @@ struct LevelCell {
     /// `‖r‖_rms` on `2^(−16)` (zero when the face is zero).
     read_scale: i128,
     drive: Vec<i32>,
+    /// The pair contact's second drive `W_b r̂ + b_b` (empty when rectifying).
+    pair: Vec<i32>,
     conduct: Vec<i32>,
     /// The gated modes' moves at this cell (empty when ungated).
     gate: Vec<GatedMove>,
@@ -639,7 +683,9 @@ impl Default for TowerFace {
 /// The reaches of every family, read once a section.
 #[derive(Clone, Debug)]
 struct Reaches {
-    levels: Vec<[u64; 10]>,
+    /// Per level: push (re, im), read (re, im), contact, return, gate, turn, pump, pump axis, the
+    /// pair contact's second drive.
+    levels: Vec<[u64; 11]>,
     /// The turned modes' ladder `e^(iπ/2^i)`, `i = 0..=TURN_BITS`, on `2^(−30)`, and the half turn
     /// `π` on `2^(−30)` (empty and zero when unturned).
     ladder: Vec<(i128, i128)>,
@@ -835,6 +881,10 @@ impl Tower {
             let six = (6u128 << 32).isqrt();
             let dd = ((d.width as u128) << 32).isqrt();
             uniform(&mut theta[lv.contact..lv.contact + d.contacts * d.width], six, dd, MATERIAL_BITS)?;
+            // The pair contact's second drive at zero material and unit bias: it opens one-sided.
+            if d.contact != ContactLaw::Rectifying {
+                theta[lv.pair_bias..lv.pair_bias + d.contacts].fill(1 << FACE_BITS);
+            }
         }
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
@@ -881,6 +931,7 @@ impl Tower {
                     if d.turned { reach(&t[lv.turn..lv.turn + d.modes * d.width]) } else { 0 },
                     if d.pumped { reach(&t[lv.pump..lv.pump + d.modes * d.width]) } else { 0 },
                     if d.pumped { reach(&t[lv.pump_axis..lv.pump_axis + d.modes * d.width]) } else { 0 },
+                    if d.contact != ContactLaw::Rectifying { reach(&t[lv.pair..lv.pair + d.contacts * d.width]) } else { 0 },
                 ]
             })
             .collect();
@@ -1034,13 +1085,34 @@ impl Tower {
             let drive_buf = &mut buf[..f];
             affine(&t[lv.contact..lv.contact + f * w], r[4], w, &read, Some(&t[lv.contact_bias..lv.contact_bias + f]), MATERIAL_BITS, MATERIAL_BITS, drive_buf)?;
             let drive = to32(drive_buf, "a contact drive outgrew its 32-bit carrier")?;
-            let conduct: Vec<i32> = drive.iter().map(|&a| a.max(0)).collect();
+            let (conduct, pair) = match d.contact {
+                ContactLaw::Rectifying => (drive.iter().map(|&a| a.max(0)).collect(), Vec::new()),
+                law => {
+                    // The second drive W_b r̂ + b_b, and v = a ⊙ b on 2^(−32) released to the face
+                    // (the foil: a b_b + b_a (b − b_b), the product's block held at zero).
+                    let mut second = vec![0i64; f];
+                    affine(&t[lv.pair..lv.pair + f * w], r[10], w, &read, Some(&t[lv.pair_bias..lv.pair_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut second)?;
+                    let second = to32(&second, "a pair contact's second drive outgrew its 32-bit carrier")?;
+                    let conduct = collect_exact((0..f).map(|o| {
+                        let (a, b) = (drive[o] as i128, second[o] as i128);
+                        let product = match law {
+                            ContactLaw::Pair => a * b,
+                            _ => {
+                                let (ba, bb) = (t[lv.contact_bias + o] as i128, t[lv.pair_bias + o] as i128);
+                                a * bb + ba * (b - bb)
+                            }
+                        };
+                        fit32(release(product, FACE_BITS), "a pair contact's conduction outgrew its 32-bit carrier")
+                    }))?;
+                    (conduct, second)
+                }
+            };
             let mut ret = vec![0i64; w];
             affine(&t[lv.ret..lv.ret + w * f], r[5], f, &conduct, Some(&t[lv.ret_bias..lv.ret_bias + w]), MATERIAL_BITS, MATERIAL_BITS, &mut ret)?;
             let next: Vec<i32> = collect_exact(x.iter().zip(&ret).map(|(a, b)| fit32(*a as i128 + *b as i128, "the residual stream outgrew its 32-bit carrier")))?;
             let state_copy = modes.clone();
             let push = push_re.into_iter().zip(push_im).collect();
-            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, conduct, gate });
+            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate });
         }
         let a = d.alphabet;
         let mut z = vec![0i64; a];
@@ -1140,6 +1212,7 @@ impl Tower {
             let r = &reaches.levels[l];
             let mut read_cov: Vec<Vec<(i64, i64)>> = Vec::with_capacity(cells_n);
             let mut das: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
+            let mut dbs: Vec<Vec<i64>> = Vec::with_capacity(if d.contact != ContactLaw::Rectifying { cells_n } else { 0 });
             let mut dreads: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut negs: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             for (i, cell) in cells.iter().enumerate() {
@@ -1150,12 +1223,37 @@ impl Tower {
                 }
                 let mut dv = vec![0i64; f];
                 transposed(&t[lv.ret..lv.ret + w * f], r[5], f, dy, MATERIAL_BITS, &mut dv)?;
-                let da: Vec<i64> = dv.iter().zip(&lc.drive).map(|(&v, &drive)| if drive > 0 { v } else { 0 }).collect();
-                for (slot, &v) in g[lv.contact_bias..lv.contact_bias + f].iter_mut().zip(&da) {
+                // The covectors of each drive's material part and of its bias: one covector a drive
+                // except in the foil, whose material parts meet the other drive's bias alone.
+                let times = |y: &[i32]| -> Result<Vec<i64>> { collect_exact(dv.iter().zip(y).map(|(&v, &y)| fit64(release(v as i128 * y as i128, FACE_BITS)))) };
+                let (da, da_bias, db, db_bias) = match d.contact {
+                    ContactLaw::Rectifying => {
+                        let da: Vec<i64> = dv.iter().zip(&lc.drive).map(|(&v, &drive)| if drive > 0 { v } else { 0 }).collect();
+                        (da.clone(), da, Vec::new(), Vec::new())
+                    }
+                    ContactLaw::Pair => {
+                        let (da, db) = (times(&lc.pair)?, times(&lc.drive)?);
+                        (da.clone(), da, db.clone(), db)
+                    }
+                    ContactLaw::PairLinear => {
+                        (times(&t[lv.pair_bias..lv.pair_bias + f])?, times(&lc.pair)?, times(&t[lv.contact_bias..lv.contact_bias + f])?, times(&lc.drive)?)
+                    }
+                };
+                for (slot, &v) in g[lv.contact_bias..lv.contact_bias + f].iter_mut().zip(&da_bias) {
                     *slot += v as i128;
                 }
                 let mut dr = vec![0i64; w];
                 transposed(&t[lv.contact..lv.contact + f * w], r[4], w, &da, MATERIAL_BITS, &mut dr)?;
+                if d.contact != ContactLaw::Rectifying {
+                    for (slot, &v) in g[lv.pair_bias..lv.pair_bias + f].iter_mut().zip(&db_bias) {
+                        *slot += v as i128;
+                    }
+                    let mut dr_b = vec![0i64; w];
+                    transposed(&t[lv.pair..lv.pair + f * w], r[10], w, &db, MATERIAL_BITS, &mut dr_b)?;
+                    for (a, b) in dr.iter_mut().zip(&dr_b) {
+                        *a = fit64(*a as i128 + *b as i128)?;
+                    }
+                }
                 let dread = ratio_adjoint(&lc.read, lc.read_scale, &dr)?;
                 let neg: Vec<i64> = dread.iter().map(|v| -v).collect();
                 let mut hre = vec![0i64; n];
@@ -1164,6 +1262,9 @@ impl Tower {
                 transposed(&t[lv.read_im..lv.read_im + w * n], r[3], n, &neg, MATERIAL_BITS, &mut him)?;
                 read_cov.push(hre.into_iter().zip(him).collect());
                 das.push(da);
+                if d.contact != ContactLaw::Rectifying {
+                    dbs.push(db);
+                }
                 dreads.push(dread);
                 negs.push(neg);
             }
@@ -1174,6 +1275,9 @@ impl Tower {
             let faces_im: Vec<&[i64]> = (0..cells_n).map(|i| &level(i).state_face[n..]).collect();
             outer_sum(&mut g[lv.ret..lv.ret + w * f], f, &dx, &conducts)?;
             outer_sum(&mut g[lv.contact..lv.contact + f * w], w, &das, &reads)?;
+            if d.contact != ContactLaw::Rectifying {
+                outer_sum(&mut g[lv.pair..lv.pair + f * w], w, &dbs, &reads)?;
+            }
             outer_sum(&mut g[lv.read_re..lv.read_re + w * n], n, &dreads, &faces_re)?;
             outer_sum(&mut g[lv.read_im..lv.read_im + w * n], n, &negs, &faces_im)?;
             // The reverse scan of the modes: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)
@@ -1575,7 +1679,12 @@ impl Tower {
         let gated = if d.gated { " gated" } else { "" };
         let turned = if d.turned { " turned" } else { "" };
         let pumped = if d.pumped { " pumped" } else { "" };
-        let mut s = format!("moment-tower-v1 {} {} {} {} {}{gated}{turned}{pumped}\n", d.alphabet, d.width, d.modes, d.contacts, d.levels);
+        let contact = match d.contact {
+            ContactLaw::Rectifying => "",
+            ContactLaw::Pair => " pair",
+            ContactLaw::PairLinear => " pair-linear",
+        };
+        let mut s = format!("moment-tower-v1 {} {} {} {} {}{gated}{turned}{pumped}{contact}\n", d.alphabet, d.width, d.modes, d.contacts, d.levels);
         s.push_str(&self.theta.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
         s.push('\n');
         s
@@ -1585,15 +1694,31 @@ impl Tower {
     pub fn from_text(text: &str) -> Result<Self> {
         let mut lines = text.lines();
         let head: Vec<&str> = lines.next().unwrap_or("").split(' ').collect();
-        let gated = head.len() >= 7 && head[6] == "gated";
-        let turned = head.len() >= 8 && gated && head[7] == "turned";
-        let pumped = head.len() == 9 && turned && head[8] == "pumped";
-        if !(head.len() == 6 || (head.len() == 7 && gated) || (head.len() == 8 && turned) || pumped) || head[0] != "moment-tower-v1" {
+        if head.len() < 6 || head[0] != "moment-tower-v1" {
             return refuse("not a moment tower's text");
         }
+        // The mode laws in their order (`gated`, `turned`, `pumped`), then the contact law.
+        let (modes, contact) = match head[6..].split_last() {
+            Some((&"pair", modes)) => (modes, ContactLaw::Pair),
+            Some((&"pair-linear", modes)) => (modes, ContactLaw::PairLinear),
+            _ => (&head[6..], ContactLaw::Rectifying),
+        };
+        if modes.len() > 3 || modes != &["gated", "turned", "pumped"][..modes.len()] {
+            return refuse("not a moment tower's text");
+        }
+        let (gated, turned, pumped) = (!modes.is_empty(), modes.len() >= 2, modes.len() == 3);
         let num = |s: &str| s.parse::<usize>().map_err(|_| TowerError::Refused("a declaration that is not a count"));
-        let declaration =
-            TowerDeclaration { alphabet: num(head[1])?, width: num(head[2])?, modes: num(head[3])?, contacts: num(head[4])?, levels: num(head[5])?, gated, turned, pumped };
+        let declaration = TowerDeclaration {
+            alphabet: num(head[1])?,
+            width: num(head[2])?,
+            modes: num(head[3])?,
+            contacts: num(head[4])?,
+            levels: num(head[5])?,
+            gated,
+            turned,
+            pumped,
+            contact,
+        };
         let layout = Layout::new(&declaration);
         let theta: Vec<i32> = lines
             .next()
@@ -1659,7 +1784,8 @@ pub struct TowerLearner {
     /// The step's rate, `2^(−k)`.
     pub rate_bits: u32,
     /// The last section's swell per level, on `2^(−16)`: `max |x|`, `max |h|` (its face), `max
-    /// ‖r‖_rms`, `max |W₁ r̂ + b₁|` over every stream's cells. A reading for the receipt, not material.
+    /// ‖r‖_rms`, `max |W₁ r̂ + b₁|` (and the pair contact's second drive) over every stream's cells.
+    /// A reading for the receipt, not material.
     pub swell: Vec<[u64; 4]>,
 }
 
@@ -1699,8 +1825,9 @@ impl TowerLearner {
                 })
                 .max()
                 .unwrap_or(0);
+            let pair = if self.tower.declaration.contact == ContactLaw::Rectifying { String::new() } else { format!(" pair={}", r[10]) };
             line.push_str(&format!(
-                "L{l} x={} h={} r={} a={} push={} read={} contact={} return={} lambda={} ",
+                "L{l} x={} h={} r={} a={} push={} read={} contact={}{pair} return={} lambda={} ",
                 s[0], s[1], s[2], s[3], r[0].max(r[1]), r[2].max(r[3]), r[4], r[5], lambda
             ));
         }
@@ -1747,7 +1874,7 @@ impl TowerLearner {
                     m[0] = m[0].max(reach(&lc.input));
                     m[1] = m[1].max(reach64(&lc.state_face));
                     m[2] = m[2].max(lc.read_scale as u64);
-                    m[3] = m[3].max(reach(&lc.drive));
+                    m[3] = m[3].max(reach(&lc.drive)).max(reach(&lc.pair));
                 }
                 m
             })
@@ -1976,6 +2103,69 @@ impl Tower {
         }
         Ok(codes)
     }
+
+    /// [definition; agent-inferred with the mathematics thread, October 24] **Where the pair
+    /// contact's bilinear weight sits.** Each level's drives read back onto the modes' faces,
+    /// `A = W_a [C_re, −C_im]` and `B = W_b [C_re, −C_im]` (the read is `Re(C h)`, so a mode
+    /// enters through its in-phase and quadrature parts), give contact `o`'s bilinear block the
+    /// coefficient `A_(o,k) B_(o,k′)` on the product of modes `k` and `k′`. Its weight on the
+    /// founded memory rungs `(s, s′)` of the two modes (`|λ| = 1 − 2^(−s−1)` at founding, the
+    /// scale ladder's rung, the margin's rung shared past it) is
+    ///
+    /// ```text
+    /// E_(s,s′) = Σ_o (Σ_(k on s) |A_(o,k)|²) (Σ_(k′ on s′) |B_(o,k′)|²)
+    /// ```
+    ///
+    /// with each coefficient released to `2^(−24)` before it is squared, so `E` is on `2^(−96)`.
+    /// Rung `s` is the first drive's (rows), `s′` the second's (columns). The mathematics thread's
+    /// cycles record reads the slip's split through it: a held rung against a fast one is the
+    /// harmonic part (a cycle no local cell bounds, which retention keeps), fast against fast
+    /// the coexact (a local curl). An exterior reading of the material: the tower is not moved. A
+    /// rectifying tower has no bilinear block (a typed refusal).
+    pub fn bilinear_rungs(&self) -> Result<Vec<Vec<Vec<BigUint>>>> {
+        let d = &self.declaration;
+        if d.contact == ContactLaw::Rectifying {
+            return refuse("a rectifying contact has no bilinear block");
+        }
+        let (w, n, f) = (d.width, d.modes, d.contacts);
+        let turns = turn_ladder(n);
+        let rung = |k: usize| (k / turns).min(MARGIN as usize - 1);
+        let rungs = rung(n - 1) + 1;
+        let t = &self.theta;
+        let mut levels = Vec::with_capacity(self.layout.levels.len());
+        for lv in &self.layout.levels {
+            // Σ over a rung of |drive read back onto mode k|², per contact, on 2^(−48).
+            let on_rungs = |material: usize| -> Vec<Vec<u128>> {
+                (0..f)
+                    .map(|o| {
+                        let mut e = vec![0u128; rungs];
+                        for k in 0..n {
+                            let (mut re, mut im) = (0i128, 0i128);
+                            for i in 0..w {
+                                let m = t[material + o * w + i] as i128;
+                                re += m * t[lv.read_re + i * n + k] as i128;
+                                im += m * t[lv.read_im + i * n + k] as i128;
+                            }
+                            let (re, im) = (release(re, MATERIAL_BITS).unsigned_abs(), release(im, MATERIAL_BITS).unsigned_abs());
+                            e[rung(k)] += re * re + im * im;
+                        }
+                        e
+                    })
+                    .collect()
+            };
+            let (a, b) = (on_rungs(lv.contact), on_rungs(lv.pair));
+            let mut e = vec![vec![BigUint::from(0u32); rungs]; rungs];
+            for (ao, bo) in a.iter().zip(&b) {
+                for (s, &x) in ao.iter().enumerate() {
+                    for (s2, &y) in bo.iter().enumerate() {
+                        e[s][s2] += BigUint::from(x) * BigUint::from(y);
+                    }
+                }
+            }
+            levels.push(e);
+        }
+        Ok(levels)
+    }
 }
 
 /// [definition; agent-inferred, October 23] **The tower joined to a cell-grain face.** The route
@@ -2131,7 +2321,14 @@ mod tests {
     /// one's pump; a turned one's turn, and a pumped one's depth and axis, open away from zero as
     /// its gate does.
     fn tiny_turning(levels: usize, gated: bool, turned: bool, pumped: bool) -> Tower {
-        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels, gated, turned, pumped };
+        tiny_declared(levels, gated, turned, pumped, ContactLaw::Rectifying)
+    }
+
+    /// The tiny tower under any mode and contact law; a pair contact's second drive opens away from
+    /// its one-sided opening (its material at the return's scale, its bias at unit) so its
+    /// bilinear block carries a covector.
+    fn tiny_declared(levels: usize, gated: bool, turned: bool, pumped: bool, contact: ContactLaw) -> Tower {
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels, gated, turned, pumped, contact };
         let mut tower = Tower::found(declaration, &keys(4096)).expect("founded");
         // Open the readout and the returns away from zero so every family carries a covector.
         let k = keys(8192);
@@ -2161,6 +2358,11 @@ mod tests {
                 for v in &mut tower.theta[lv.turn..lv.turn + 8] {
                     *v *= 8;
                 }
+            }
+        }
+        if contact != ContactLaw::Rectifying {
+            for lv in &layout.levels {
+                fill(&mut tower.theta, lv.pair, 16);
             }
         }
         if pumped {
@@ -2212,6 +2414,86 @@ mod tests {
         }
         let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
         assert_eq!(code(&pumped, &classes), code(&turned, &classes));
+    }
+
+    #[test]
+    fn a_pair_tower_restores_exactly() {
+        for contact in [ContactLaw::Pair, ContactLaw::PairLinear] {
+            let tower = tiny_declared(2, true, true, true, contact);
+            assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
+            let plain = tiny_declared(2, false, false, false, contact);
+            assert_eq!(Tower::from_text(&plain.to_text()).expect("restored"), plain);
+        }
+        assert!(Tower::from_text("moment-tower-v1 4 4 2 4 2 turned\n0\n").is_err());
+        assert!(Tower::from_text("moment-tower-v1 4 4 2 4 2 pair gated\n0\n").is_err());
+    }
+
+    /// The bilinear block's weight on the memory rungs: none at founding (`W_b = 0`); with the
+    /// second drive's material made the first's, symmetric; and with the read's material of every
+    /// mode on the second rung at zero, none on that rung for either drive.
+    #[test]
+    fn the_bilinear_weight_sits_on_the_rungs_its_drives_read() {
+        let declaration = |contact| TowerDeclaration { alphabet: 4, width: 4, modes: 16, contacts: 4, levels: 1, gated: false, turned: false, pumped: false, contact };
+        assert!(Tower::found(declaration(ContactLaw::Rectifying), &keys(16384)).expect("founded").bilinear_rungs().is_err());
+        let mut tower = Tower::found(declaration(ContactLaw::Pair), &keys(16384)).expect("founded");
+        let zero = BigUint::from(0u32);
+        let founded = tower.bilinear_rungs().expect("read");
+        assert_eq!((founded.len(), founded[0].len()), (1, 2));
+        assert!(founded[0].iter().flatten().all(|e| *e == zero));
+        let lv = tower.layout.levels[0].clone();
+        let (contact, pair) = (tower.theta[lv.contact..lv.contact + 16].to_vec(), lv.pair);
+        tower.theta[pair..pair + 16].copy_from_slice(&contact);
+        let e = &tower.bilinear_rungs().expect("read")[0];
+        assert_eq!(e[0][1], e[1][0]);
+        assert!(e.iter().flatten().all(|x| *x > zero));
+        for i in 0..4 {
+            for k in 8..16 {
+                tower.theta[lv.read_re + i * 16 + k] = 0;
+                tower.theta[lv.read_im + i * 16 + k] = 0;
+            }
+        }
+        let e = &tower.bilinear_rungs().expect("read")[0];
+        assert!(e[0][0] > zero);
+        assert_eq!([&e[0][1], &e[1][0], &e[1][1]], [&zero, &zero, &zero]);
+    }
+
+    /// Founded, the pair contact's second drive is `W_b = 0`, `b_b = 1`: the pair contact and its
+    /// linear foil code every passage alike, the one-sided contact `v = W_a r̂ + b_a`.
+    #[test]
+    fn the_pair_contact_and_its_foil_open_together() {
+        let declaration = |contact| TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels: 2, gated: true, turned: true, pumped: true, contact };
+        let mut pair = Tower::found(declaration(ContactLaw::Pair), &keys(4096)).expect("founded");
+        let mut foil = Tower::found(declaration(ContactLaw::PairLinear), &keys(4096)).expect("founded");
+        // Open the returns and the readout away from zero, the same in both.
+        for lv in pair.layout.levels.clone() {
+            for (i, v) in pair.theta[lv.ret..lv.ret + 16].iter_mut().enumerate() {
+                *v = (i as i32 - 8) << 20;
+            }
+        }
+        let ro = pair.layout.readout;
+        for (i, v) in pair.theta[ro..ro + 16].iter_mut().enumerate() {
+            *v = (7 - i as i32) << 21;
+        }
+        foil.theta.clone_from(&pair.theta);
+        assert_eq!(code(&pair, &PASSAGE), code(&foil, &PASSAGE));
+        // Once the second drive's material moves, the product's block separates them.
+        let lv = pair.layout.levels[0];
+        for (i, v) in pair.theta[lv.pair..lv.pair + 16].iter_mut().enumerate() {
+            *v = (i as i32 - 5) << 22;
+        }
+        foil.theta.clone_from(&pair.theta);
+        assert_ne!(code(&pair, &PASSAGE), code(&foil, &PASSAGE));
+    }
+
+    #[test]
+    fn the_pair_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_declared(2, false, false, false, ContactLaw::Pair), false, &PASSAGE, 10);
+        the_covector_of_tower_matches_the_code_difference(tiny_declared(2, true, false, false, ContactLaw::Pair), true, &PASSAGE, 10);
+    }
+
+    #[test]
+    fn the_linear_foils_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_declared(2, false, false, false, ContactLaw::PairLinear), false, &PASSAGE, 10);
     }
 
     fn text_restores_exactly_of(gated: bool) {
@@ -2294,7 +2576,7 @@ mod tests {
             let cells = t.forward(&mut s, &classes, &t.reaches()).expect("forward");
             cells
                 .iter()
-                .flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().map(|&a| a > 0).chain(l.gate.iter().map(|m| m.kappa > 0))).collect::<Vec<_>>())
+                .flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().filter(|_| l.pair.is_empty()).map(|&a| a > 0).chain(l.gate.iter().map(|m| m.kappa > 0))).collect::<Vec<_>>())
                 .collect()
         };
         let base = conducting(&tower);
@@ -2304,7 +2586,7 @@ mod tests {
         // releases every face to `2^(−16)`, and on the tiny tower that rounding moves one central
         // difference by up to a seventh (measured on the gated tower: ±2^(−7), ±2^(−8) and ±2^(−9)
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
-        let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked) = (0, 0, 0, 0);
+        let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked) = (0, 0, 0, 0, 0);
         let base_code = compared_code(&tower, &classes, compared);
         for &(start, len, grain) in &tower.layout.families {
             let mut order: Vec<usize> = (start..start + len).collect();
@@ -2333,6 +2615,7 @@ mod tests {
                 gates_checked += tower.layout.levels.iter().any(|lv| gated && (start == lv.gate || start == lv.gate_bias)) as usize;
                 turns_checked += tower.layout.levels.iter().any(|lv| tower.declaration.turned && (start == lv.turn || start == lv.turn_bias)) as usize;
                 pumps_checked += tower.layout.levels.iter().any(|lv| tower.declaration.pumped && [lv.pump, lv.pump_bias, lv.pump_axis, lv.pump_axis_bias].contains(&start)) as usize;
+                pairs_checked += tower.layout.levels.iter().any(|lv| tower.declaration.contact != ContactLaw::Rectifying && (start == lv.pair || start == lv.pair_bias)) as usize;
                 break;
             }
         }
@@ -2341,6 +2624,7 @@ mod tests {
         assert!(!gated || gates_checked >= 2, "only {gates_checked} gate families carried a readable covector");
         assert!(!tower.declaration.turned || turns_checked >= 2, "only {turns_checked} turn families carried a readable covector");
         assert!(!tower.declaration.pumped || pumps_checked >= 4, "only {pumps_checked} pump families carried a readable covector");
+        assert!(tower.declaration.contact == ContactLaw::Rectifying || pairs_checked >= 2, "only {pairs_checked} pair families carried a readable covector");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 
@@ -2548,7 +2832,7 @@ mod tests {
     }
 
     fn a_section_learns_a_repeating_passage_of(gated: bool) {
-        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated, turned: false, pumped: false };
+        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated, turned: false, pumped: false, contact: ContactLaw::Rectifying };
         let tower = Tower::found(declaration, &keys(4096)).expect("founded");
         let mut learner = TowerLearner::new(tower, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();

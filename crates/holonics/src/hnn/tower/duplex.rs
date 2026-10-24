@@ -640,7 +640,7 @@ mod tests {
     /// A tiny duplex whose strands' readouts and returns and the meeting's readout open away from
     /// zero, so every family carries a covector.
     fn tiny(gated: bool) -> Duplex {
-        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels: 2, gated, turned: false, pumped: false };
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels: 2, gated, turned: false, pumped: false, contact: super::ContactLaw::Rectifying };
         let mut duplex = Duplex::found(declaration, 4, &keys(16384)).expect("founded");
         let k = keys(32768);
         let mut i = 9000;
@@ -836,7 +836,7 @@ mod tests {
 
     #[test]
     fn a_section_learns_a_repeating_passage() {
-        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated: true, turned: false, pumped: false };
+        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated: true, turned: false, pumped: false, contact: super::ContactLaw::Rectifying };
         let duplex = Duplex::found(declaration, 8, &keys(16384)).expect("founded");
         let mut learner = DuplexLearner::new(duplex, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();

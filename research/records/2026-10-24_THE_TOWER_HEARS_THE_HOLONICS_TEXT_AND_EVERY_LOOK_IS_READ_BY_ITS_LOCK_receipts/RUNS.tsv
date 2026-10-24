@@ -1,0 +1,18 @@
+run	binary	command	projection_s	deadline_s	pass_bound_ms	wall_s	measured_over_projected	peak_rss_kib	outcome
+dev_plain	arith22	train-pumped-tower, 1 pass	unmeasured (one to three minutes)	120	-	32.7	-	125764	complete
+dev_lock	arith22	train-looking-pumped-tower, 1 pass	unmeasured (one to three minutes)	120	-	59.7	-	347348	complete
+train_lock	arith22	train-looking-pumped-tower, 12 passes	715 (12 x 59.6)	730	59596	682.6	0.95	418664	complete
+train_plain	arith22	train-pumped-tower, 12 passes	391 (12 x 32.6)	400	32626	33.2	-	125492	stopped after pass 0 (33,215 ms), incomplete
+train_plain2	arith22	train-pumped-tower, passes 1-11 from train_plain's STATE.0	365 (11 x 33.2)	375	33215	340.6	0.93	158092	complete
+reads at = (lock, plain)	arith23	read-lines-again, 8 runs, 4 at a time	unmeasured on this terrain; digits at most 22.3 s	60 each	-	3.3 to 24.0	-	at most 19308	complete
+writing (lock, plain)	arith22	sample-tower 400 bytes, 8 runs	unmeasured	60 each	-	3.0 to 3.4	-	at most 21308	complete
+dev_pair	arith23	train-pair-pumped-tower, 1 pass	planned under 60 s a pass	120	90000	40.4	-	139168	complete
+dev_pair_linear	arith23	train-pair-linear-pumped-tower, 1 pass	planned under 60 s a pass	120	90000	38.6	-	141752	complete
+train_pair	arith23	train-pair-pumped-tower, 12 passes	483 (12 x 40.3)	490	40276	452.8	0.94	173384	complete
+train_pair_linear	arith23	train-pair-linear-pumped-tower, 12 passes	483 (12 x 40.3)	490	40276	349.9	-	165828	stopped after pass 8 (41,080 ms), incomplete; read at STATE.8
+build arith24	cargo	build --release (example)	213 (arith23's build)	300	-	219.6	1.03	2615856	complete
+tower tests	cargo	test --lib hnn::tower:: (28)	116 (arith23's)	240	-	73.7	0.64	4111332	28 passed
+located reads	arith24	read-lines-located depth 4, 20 runs, 4 at a time	about 40 (text) and 12 (digits) from 0.19 ms an advance	180 each	-	20.5 to 48.4	text 1.03 to 1.21; digits 1.71 to 1.95	at most 62796	complete
+reads at = (pair towers)	arith24	read-lines-again, 12 runs, 4 at a time	at most 24.0 (the lock and plain reads)	60 each	-	3.1 to 25.2	at most 1.05	at most 22436	complete
+writing (pair towers)	arith24	sample-tower 400 bytes, 12 runs	at most 3.4 (the lock and plain writing)	60 each	-	3.1 to 3.9	at most 1.15	at most 24284	complete
+pair rungs	arith24	read-tower-pair, 3 runs	unmeasured	60 each	-	0.0 to 0.1	-	at most 22196	complete

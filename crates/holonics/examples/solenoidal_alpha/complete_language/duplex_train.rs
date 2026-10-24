@@ -9,7 +9,7 @@
 use super::tower_train::{agreement, agreement_face, count, per, region_line, roles_of, REGIONS};
 use super::*;
 use holonics::hnn::tower::duplex::{Duplex, DuplexLearner};
-use holonics::hnn::tower::{TowerDeclaration, TowerFace, TowerState};
+use holonics::hnn::tower::{ContactLaw, TowerDeclaration, TowerFace, TowerState};
 
 /// A learner's state read ceiling, `2^30` bytes.
 const STATE_BUDGET: usize = 1 << 30;
@@ -73,6 +73,7 @@ pub(super) fn train(args: &[String]) -> Result<()> {
         gated: true,
         turned: false,
         pumped: false,
+        contact: ContactLaw::Rectifying,
     };
     let meeting = count(&args[13])?;
     let streams = count(&args[14])?;
