@@ -2010,6 +2010,73 @@ second operand's units arrive, when both strands are carried.
 - The forms by share were projected at about 40 s (deadline 180 s) and took 77.8 s (1.9; peak
   104 MiB).
 
+## The blind reads at `U`, and the distance the demand travels
+
+**The readings** (`U_TURNS.py`, `U_TENSOR.py`, `LAG_AT_B.py`; exterior). The first two take the
+8,986 training sums' `U` cells as `U_FORMS.py` does and look for the crossing with no label and no
+chosen start. The third splits the sums' `B` cells by the result's length.
+
+**Constant modulus at `U` finds a clock first.** Of 24 blind turns of the state (Godard's criterion,
+whitened in the region, each decorrelated from those before it):
+- The first turns with a modulus spread of 0.006 and holds nothing of either operand (at most 0.089
+  of `χ₁(b₀)`): a clock.
+- The rest are mixtures. None holds more than 0.23 of any character `χ_k` (`k` = 1 to 5) of `a₀` or
+  `b₀`, where straight-line reads of the state hold 0.78 of `χ₁(a₀)` and 0.97 of `χ₁(b₀)`.
+- Their 576 crossings in both senses, ranked by two-channel share, reach 0.13. The first, a `b₀`
+  mixture crossed with an `a₀` mixture, reads 85 of 495 held out, and the top 8 together read 103.
+
+**The third moment finds loudness.** The tension's third moment against the state,
+`T_ijk = Σ y_k x_i x_j` (state and covector whitened in the region), unfolded as a
+`(128·128) × 64` matrix, names the quadratic forms the tension asks for most, in order, with no
+start.
+- Its leading singular values are 2,960, 2,126 and 1,758, against 514, 435 and 377 for its foil
+  (the covectors permuted among the cells): a clear gap.
+- Its leading forms hold nothing of `c₀` (0.000). Forms 1 and 2 as one complex form have share 1.15
+  and read 38 of 495 held out. The leading 16 together read 55.
+- Form 1 is one-signed: its leading eigenvalues are all negative, and two of them hold 0.62 of its
+  square, an energy of a few directions. Its variance per cell at unit size is about 1,470 (from
+  its singular value and share), where a Gaussian state's would be 2. The raw numerator ranks forms
+  by their loudness: the circular `J`'s fault in another dress.
+
+**The demand reaches `B` turned by the distance it travels.** The covector at `B` is the downstream
+error carried back to `B`'s input. `U`'s error crosses the `=` and the result's digits before its
+units to get there, so the result's length sets how far it travels. Split by that length (a label
+of the passage after `B`), each part read in its own `Y_r`:
+
+| the sums' `B` cells | cells | `χ₁(c₀)` share | its foil | `χ₁(b₀)` share |
+|---|---|---|---|---|
+| pooled | 8,986 | 0.386 | 0.014 | 0.315 |
+| result of two digits | 4,503 | 0.679 | 0.023 | 0.477 |
+| result of three digits | 4,431 | 0.726 | 0.034 | 0.377 |
+
+The 52 sums with a one-digit result are too few for a 64-dimensional tension. The foil permutes the
+characters among each part's cells.
+
+**What it says** [agent-inferred]:
+- Every blind criterion over the state alone at `U` is held by the state's own loud geometry: clocks
+  under constant modulus, energies under the raw third moment, boosts under the circular `J`. The
+  two strands the crossing needs are quiet and spread across many directions.
+- Within one distance the covector at `B` holds the crossing at 0.68 to 0.73; pooled over the two
+  distances it holds 0.39. The transport turns `U`'s demand by an amount that depends on how many
+  cells it crosses, and the two turns cancel about half of it.
+- This is the gradient as it is, not a fault of the reading. A form placed at `B` reaches `U`'s
+  reader turned by the same distance, so with the present transport a form at `B` serves `U` only
+  as far as its turn is the same for both distances.
+
+**Decided next** [agent-inferred]: read how each mode carries from `B` to `U`, with its move and
+pump at every cell between them (`read-tower-modes` at the `=` and the result's digits). Find the
+modes whose carry is the same for both distances. A crossing placed in those modes reaches `U`
+whole, and the crossing's share at `B` is then read through them alone. The acceptance stays at
+`B`.
+
+**The runs.**
+- The blind turns were projected at about 90 s (deadline 120 s) and took 61.4 s (0.68; peak
+  183 MiB). Their rerun, reading every character, was projected at about 65 s (deadline 90 s) and
+  took 64.3 s (0.99; peak 183 MiB); its output is the receipt. A first launch copied the script into
+  the wrong directory and stopped before reading anything.
+- The third moment was projected at about 25 s (deadline 60 s) and took 7.2 s (0.29; peak 222 MiB).
+- The split at `B` was projected at about 30 s (deadline 60 s) and took 31.8 s (1.06; peak 807 MiB).
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -2130,6 +2197,8 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `HANDED_RING.py` as its second argument).
 - The knot at `U`: `U_FORMS.{py,txt}`, `U_SHARE.{py,txt}`, and the covector reads' receipt lines
   `U_COVECTORS.txt` (the covectors stay outside the repository).
+- The blind reads at `U` and the split at `B`: `U_TURNS.{py,txt}`, `U_TENSOR.{py,txt}`,
+  `LAG_AT_B.{py,txt}`.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 

@@ -1,0 +1,24 @@
+training sums' U cells 8986, held out 495; read in 3.8 s
+whitened rank 128; third moment and its foil in 2.7 s
+   singular values, leading 12: 2959.776 2125.637 1758.282 1485.392 1369.755 1143.658 990.207 938.626 876.914 811.129 770.473 699.112
+   the foil's, leading 12:      514.276 434.937 376.984 366.148 328.645 313.089 297.893 289.029 275.947 266.690 245.378 240.452
+   form 1: share 0.6642; holds chi_1(c0) -0.000
+   form 2: share 0.4750; holds chi_1(c0) 0.000
+   form 3: share 0.2664; holds chi_5(c0) 0.000
+   form 4: share 0.2602; holds chi_1(c0) -0.000
+   form 5: share 0.2188; holds chi_1(c0) 0.000
+   form 6: share 0.1385; holds chi_4(c0) -0.001
+   forms 1 and 2 as one complex form: share 1.1497, J 0.5849; holds chi_1(c0) 0.000; held out, units at U 38 of 495
+   held out, the leading forms together (real channels): 2: 38; 4: 41; 8: 43; 16: 55 of 495
+   form 1's eigenvalues, leading 8: -0.626 -0.481 -0.312 -0.260 -0.243 -0.204 -0.169 -0.155; the leading 2, 4, 8 hold 0.62, 0.79, 0.94 of its square
+      eigenvector 1: holds chi_3(a0) 0.001, chi_3(b0) 0.001
+      eigenvector 2: holds chi_3(a0) -0.001, chi_4(b0) 0.001
+      eigenvector 3: holds chi_4(a0) -0.000, chi_4(b0) 0.002
+      eigenvector 4: holds chi_4(a0) 0.001, chi_3(b0) 0.001
+   form 2's eigenvalues, leading 8: +0.728 +0.351 -0.311 +0.249 -0.239 -0.223 +0.158 -0.127; the leading 2, 4, 8 hold 0.65, 0.81, 0.96 of its square
+      eigenvector 1: holds chi_4(a0) 0.001, chi_5(b0) 0.000
+      eigenvector 2: holds chi_3(a0) 0.001, chi_2(b0) 0.002
+      eigenvector 3: holds chi_1(a0) -0.000, chi_2(b0) -0.000
+      eigenvector 4: holds chi_1(a0) -0.001, chi_3(b0) 0.002
+done in 7.0 s
+MEASURE exit=0 wall_s=7.2 peak_rss_kib=226844
