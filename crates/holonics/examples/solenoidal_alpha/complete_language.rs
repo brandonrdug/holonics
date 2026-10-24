@@ -15,6 +15,8 @@ mod native_train;
 mod modes_train;
 #[path = "complete_language/tower_train.rs"]
 mod tower_train;
+#[path = "complete_language/duplex_train.rs"]
+mod duplex_train;
 #[path = "complete_language/unit_copy.rs"]
 mod unit_copy;
 
@@ -774,9 +776,16 @@ pub(super) fn run_with_execution(
         Some("train-modes") if backend == CompleteLanguageTrainingBackend::HostReference => modes_train::train(args),
         Some("sample-modes") if backend == CompleteLanguageTrainingBackend::HostReference => modes_train::sample(args),
         Some("read-modes") if backend == CompleteLanguageTrainingBackend::HostReference => modes_train::read_text(args),
-        Some("train-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, false, false),
-        Some("train-gated-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, false),
-        Some("train-credited-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, true),
+        Some("train-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, false, false, false, false, holonics::hnn::tower::ContactLaw::Rectifying),
+        Some("train-gated-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, false, false, false, holonics::hnn::tower::ContactLaw::Rectifying),
+        Some("train-turned-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, true, false, false, holonics::hnn::tower::ContactLaw::Rectifying),
+        Some("train-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, true, true, false, holonics::hnn::tower::ContactLaw::Rectifying),
+        Some("train-looking-gated-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_looking(args, true, false, false),
+        Some("train-looking-turned-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_looking(args, true, true, false),
+        Some("train-looking-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_looking(args, true, true, true),
+        Some("train-pair-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, true, true, false, holonics::hnn::tower::ContactLaw::Pair),
+        Some("train-pair-linear-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, true, true, false, holonics::hnn::tower::ContactLaw::PairLinear),
+        Some("train-credited-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, false, false, true, holonics::hnn::tower::ContactLaw::Rectifying),
         Some("found-units") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_units(args),
         Some("train-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args),
         Some("sample-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample_units(args),
@@ -785,6 +794,23 @@ pub(super) fn run_with_execution(
         Some("read-joined") if backend == CompleteLanguageTrainingBackend::HostReference => modes_train::read_joined(args),
         Some("sample-joined") if backend == CompleteLanguageTrainingBackend::HostReference => modes_train::sample_joined(args),
         Some("sample-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample(args),
+        Some("read-lines") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, false, tower_train::Look::Once, false),
+        Some("read-lines-stream") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Once, false),
+        Some("read-lines-again") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Again, false),
+        Some("read-lines-redraw") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Redraw, false),
+        Some("read-lines-carried") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Carried, false),
+        Some("read-lines-own") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Own, false),
+        Some("read-lines-located") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Again, true),
+        Some("read-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_pair(args),
+        Some("read-tower-faces") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_faces(args),
+        Some("read-tower-tension") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_tension(args),
+        Some("read-tower-floor") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_floor(args),
+        Some("found-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair(args),
+        Some("found-tower-pair-block") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair_block(args),
+        Some("install-tower-pair-block") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::install_tower_pair_block(args),
+        Some("sample-tower-block") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample_tower_block(args),
+        Some("train-duplex") if backend == CompleteLanguageTrainingBackend::HostReference => duplex_train::train(args),
+        Some("read-lines-duplex") if backend == CompleteLanguageTrainingBackend::HostReference => duplex_train::read_lines(args),
         Some("train-native" | "sample-native") => Err("the native route's commands are host-owned; no CUDA fallback".into()),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),

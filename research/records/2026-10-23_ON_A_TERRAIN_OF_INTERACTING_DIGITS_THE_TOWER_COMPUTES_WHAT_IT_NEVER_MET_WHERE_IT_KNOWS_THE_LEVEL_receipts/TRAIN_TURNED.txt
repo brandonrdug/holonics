@@ -1,0 +1,111 @@
+TOWER_TRAIN material=148864 streams=8 section=128 sections_a_pass=211 train_bytes=216131 dev_bytes=47970
+TOWER_SECTION pass=0 section=32 bits_a_byte=3.448 deposits=32 halvings=20 elapsed_ms=5832
+TOWER_SECTION pass=0 section=64 bits_a_byte=2.556 deposits=64 halvings=25 elapsed_ms=10813
+TOWER_SECTION pass=0 section=96 bits_a_byte=2.512 deposits=96 halvings=27 elapsed_ms=15548
+TOWER_SECTION pass=0 section=128 bits_a_byte=2.486 deposits=128 halvings=27 elapsed_ms=20507
+TOWER_SECTION pass=0 section=160 bits_a_byte=2.457 deposits=160 halvings=27 elapsed_ms=25352
+TOWER_SECTION pass=0 section=192 bits_a_byte=2.434 deposits=192 halvings=29 elapsed_ms=30395
+TOWER_SECTION pass=0 section=211 bits_a_byte=2.417 deposits=211 halvings=31 elapsed_ms=33345
+TOWER_STATE STATE.0 state_bytes=5104857 state_sha256=b6a9e8ef3990aaa5976c2630596d2c194ffd006f77f5fd30655c936288c2f997
+TOWER_PASS pass=0 train_bits_a_byte=2.628 dev_bits_a_byte=2.432 dev_regions Q=3.031 P=3.014 N=2.413 M=2.206 deposits=211/211 pass_ms=35443 elapsed_ms=35448
+TOWER_SECTION pass=1 section=32 bits_a_byte=2.414 deposits=32 halvings=24 elapsed_ms=41343
+TOWER_SECTION pass=1 section=64 bits_a_byte=2.370 deposits=64 halvings=25 elapsed_ms=46207
+TOWER_SECTION pass=1 section=96 bits_a_byte=2.348 deposits=96 halvings=26 elapsed_ms=51167
+TOWER_SECTION pass=1 section=128 bits_a_byte=2.314 deposits=128 halvings=29 elapsed_ms=56018
+TOWER_SECTION pass=1 section=160 bits_a_byte=2.302 deposits=160 halvings=36 elapsed_ms=61153
+TOWER_SECTION pass=1 section=192 bits_a_byte=2.291 deposits=192 halvings=41 elapsed_ms=66066
+TOWER_SECTION pass=1 section=211 bits_a_byte=2.269 deposits=211 halvings=41 elapsed_ms=68790
+TOWER_STATE STATE.1 state_bytes=5087315 state_sha256=287f570984e346a71bffffd20f10d6c1ff6e5b36c7c534a53d4ebd7129cf650d
+TOWER_PASS pass=1 train_bits_a_byte=2.334 dev_bits_a_byte=2.279 dev_regions Q=2.576 P=2.533 N=1.484 M=2.196 deposits=211/211 pass_ms=35384 elapsed_ms=70833
+TOWER_SECTION pass=2 section=32 bits_a_byte=2.283 deposits=32 halvings=0 elapsed_ms=75471
+TOWER_SECTION pass=2 section=64 bits_a_byte=2.259 deposits=64 halvings=1 elapsed_ms=80313
+TOWER_SECTION pass=2 section=96 bits_a_byte=2.238 deposits=96 halvings=3 elapsed_ms=85137
+TOWER_SECTION pass=2 section=128 bits_a_byte=2.220 deposits=128 halvings=3 elapsed_ms=90011
+TOWER_SECTION pass=2 section=160 bits_a_byte=2.232 deposits=160 halvings=6 elapsed_ms=95053
+TOWER_SECTION pass=2 section=192 bits_a_byte=2.216 deposits=192 halvings=7 elapsed_ms=100047
+TOWER_SECTION pass=2 section=211 bits_a_byte=2.199 deposits=211 halvings=7 elapsed_ms=102856
+TOWER_STATE STATE.2 state_bytes=5018643 state_sha256=b53e222046e2beab75a97073543c97512f2416dd5bdcd519c6930e4edd615c46
+TOWER_PASS pass=2 train_bits_a_byte=2.238 dev_bits_a_byte=2.238 dev_regions Q=2.482 P=2.404 N=1.284 M=2.186 deposits=211/211 pass_ms=34139 elapsed_ms=104974
+TOWER_SECTION pass=3 section=32 bits_a_byte=2.201 deposits=32 halvings=1 elapsed_ms=109772
+TOWER_SECTION pass=3 section=64 bits_a_byte=2.207 deposits=64 halvings=2 elapsed_ms=114696
+TOWER_SECTION pass=3 section=96 bits_a_byte=2.193 deposits=96 halvings=3 elapsed_ms=119588
+TOWER_SECTION pass=3 section=128 bits_a_byte=2.182 deposits=128 halvings=5 elapsed_ms=124458
+TOWER_SECTION pass=3 section=160 bits_a_byte=2.166 deposits=160 halvings=6 elapsed_ms=128995
+TOWER_SECTION pass=3 section=192 bits_a_byte=2.192 deposits=192 halvings=6 elapsed_ms=133492
+TOWER_SECTION pass=3 section=211 bits_a_byte=2.149 deposits=211 halvings=7 elapsed_ms=136378
+TOWER_STATE STATE.3 state_bytes=4982423 state_sha256=f0a04f6e5bf694de882b288d0b7d90f2070d3bfef8c2929ab64fe1ea0c90c559
+TOWER_PASS pass=3 train_bits_a_byte=2.187 dev_bits_a_byte=2.160 dev_regions Q=2.200 P=2.121 N=1.203 M=2.186 deposits=211/211 pass_ms=33584 elapsed_ms=138560
+TOWER_SECTION pass=4 section=32 bits_a_byte=2.172 deposits=32 halvings=0 elapsed_ms=143112
+TOWER_SECTION pass=4 section=64 bits_a_byte=2.162 deposits=64 halvings=5 elapsed_ms=148007
+TOWER_SECTION pass=4 section=96 bits_a_byte=2.164 deposits=96 halvings=8 elapsed_ms=153042
+TOWER_SECTION pass=4 section=128 bits_a_byte=2.124 deposits=128 halvings=15 elapsed_ms=158409
+TOWER_SECTION pass=4 section=160 bits_a_byte=2.127 deposits=160 halvings=18 elapsed_ms=163125
+TOWER_SECTION pass=4 section=192 bits_a_byte=2.113 deposits=192 halvings=18 elapsed_ms=167927
+TOWER_SECTION pass=4 section=211 bits_a_byte=2.094 deposits=211 halvings=18 elapsed_ms=170593
+TOWER_STATE STATE.4 state_bytes=4961479 state_sha256=ac74cd70b4ca346b2cdeac308341a18cbe64b6fb67cdee388caa0ab9de51a05f
+TOWER_PASS pass=4 train_bits_a_byte=2.139 dev_bits_a_byte=2.125 dev_regions Q=2.076 P=2.027 N=0.864 M=2.187 deposits=211/211 pass_ms=34449 elapsed_ms=173010
+TOWER_SECTION pass=5 section=32 bits_a_byte=2.112 deposits=32 halvings=1 elapsed_ms=177441
+TOWER_SECTION pass=5 section=64 bits_a_byte=2.088 deposits=64 halvings=1 elapsed_ms=181767
+TOWER_SECTION pass=5 section=96 bits_a_byte=2.085 deposits=96 halvings=4 elapsed_ms=186206
+TOWER_SECTION pass=5 section=128 bits_a_byte=2.078 deposits=128 halvings=5 elapsed_ms=190655
+TOWER_SECTION pass=5 section=160 bits_a_byte=2.060 deposits=160 halvings=5 elapsed_ms=195491
+TOWER_SECTION pass=5 section=192 bits_a_byte=2.070 deposits=192 halvings=5 elapsed_ms=199945
+TOWER_SECTION pass=5 section=211 bits_a_byte=2.048 deposits=211 halvings=5 elapsed_ms=202664
+TOWER_STATE STATE.5 state_bytes=4930349 state_sha256=92cacf4e10bdd40e77dbfe1efb9e9f1699e8f8368fb0a5e2186b0786310fd54a
+TOWER_PASS pass=5 train_bits_a_byte=2.079 dev_bits_a_byte=2.081 dev_regions Q=1.943 P=1.911 N=0.648 M=2.180 deposits=211/211 pass_ms=31769 elapsed_ms=204779
+TOWER_SECTION pass=6 section=32 bits_a_byte=2.088 deposits=32 halvings=1 elapsed_ms=209164
+TOWER_SECTION pass=6 section=64 bits_a_byte=2.044 deposits=64 halvings=1 elapsed_ms=213422
+TOWER_SECTION pass=6 section=96 bits_a_byte=2.048 deposits=96 halvings=4 elapsed_ms=217978
+TOWER_SECTION pass=6 section=128 bits_a_byte=2.094 deposits=128 halvings=36 elapsed_ms=224372
+TOWER_SECTION pass=6 section=160 bits_a_byte=2.054 deposits=160 halvings=36 elapsed_ms=228948
+TOWER_SECTION pass=6 section=192 bits_a_byte=2.057 deposits=192 halvings=40 elapsed_ms=233643
+TOWER_SECTION pass=6 section=211 bits_a_byte=2.020 deposits=211 halvings=41 elapsed_ms=236380
+TOWER_STATE STATE.6 state_bytes=4960971 state_sha256=78b09550790770622c3c42a469c2be9d7b9c61b3a7f55d5f197a5ea944377516
+TOWER_PASS pass=6 train_bits_a_byte=2.060 dev_bits_a_byte=2.056 dev_regions Q=1.836 P=1.826 N=0.695 M=2.179 deposits=211/211 pass_ms=33516 elapsed_ms=238295
+TOWER_SECTION pass=7 section=32 bits_a_byte=2.036 deposits=32 halvings=0 elapsed_ms=243509
+TOWER_SECTION pass=7 section=64 bits_a_byte=2.005 deposits=64 halvings=0 elapsed_ms=248078
+TOWER_SECTION pass=7 section=96 bits_a_byte=2.023 deposits=96 halvings=4 elapsed_ms=253058
+TOWER_SECTION pass=7 section=128 bits_a_byte=2.015 deposits=128 halvings=5 elapsed_ms=257505
+TOWER_SECTION pass=7 section=160 bits_a_byte=2.000 deposits=160 halvings=5 elapsed_ms=262439
+TOWER_SECTION pass=7 section=192 bits_a_byte=2.004 deposits=192 halvings=5 elapsed_ms=266922
+TOWER_SECTION pass=7 section=211 bits_a_byte=2.020 deposits=211 halvings=5 elapsed_ms=269614
+TOWER_STATE STATE.7 state_bytes=4909539 state_sha256=6df171c7b70e355744227b34f4482750bd67a70c83b297fc6c04466565e52fa6
+TOWER_PASS pass=7 train_bits_a_byte=2.014 dev_bits_a_byte=2.101 dev_regions Q=2.002 P=2.004 N=0.687 M=2.177 deposits=211/211 pass_ms=33384 elapsed_ms=271680
+TOWER_SECTION pass=8 section=32 bits_a_byte=2.027 deposits=32 halvings=4 elapsed_ms=276375
+TOWER_SECTION pass=8 section=64 bits_a_byte=1.983 deposits=64 halvings=4 elapsed_ms=280930
+TOWER_SECTION pass=8 section=96 bits_a_byte=1.995 deposits=96 halvings=6 elapsed_ms=285606
+TOWER_SECTION pass=8 section=128 bits_a_byte=1.997 deposits=128 halvings=6 elapsed_ms=290393
+TOWER_SECTION pass=8 section=160 bits_a_byte=1.978 deposits=160 halvings=7 elapsed_ms=295131
+TOWER_SECTION pass=8 section=192 bits_a_byte=1.989 deposits=192 halvings=7 elapsed_ms=299708
+TOWER_SECTION pass=8 section=211 bits_a_byte=1.966 deposits=211 halvings=8 elapsed_ms=302492
+TOWER_STATE STATE.8 state_bytes=4955013 state_sha256=9444caef1fe3996da681a73687cf5195c7f1955cb76f06959d36385d2f64d28f
+TOWER_PASS pass=8 train_bits_a_byte=1.992 dev_bits_a_byte=1.982 dev_regions Q=1.584 P=1.583 N=0.582 M=2.173 deposits=211/211 pass_ms=32851 elapsed_ms=304531
+TOWER_SECTION pass=9 section=32 bits_a_byte=1.982 deposits=32 halvings=1 elapsed_ms=309194
+TOWER_SECTION pass=9 section=64 bits_a_byte=1.967 deposits=64 halvings=1 elapsed_ms=314031
+TOWER_SECTION pass=9 section=96 bits_a_byte=1.994 deposits=96 halvings=3 elapsed_ms=319123
+TOWER_SECTION pass=9 section=128 bits_a_byte=1.973 deposits=128 halvings=5 elapsed_ms=323838
+TOWER_SECTION pass=9 section=160 bits_a_byte=1.976 deposits=160 halvings=6 elapsed_ms=328666
+TOWER_SECTION pass=9 section=192 bits_a_byte=2.000 deposits=192 halvings=9 elapsed_ms=333491
+TOWER_SECTION pass=9 section=211 bits_a_byte=1.950 deposits=211 halvings=10 elapsed_ms=336144
+TOWER_STATE STATE.9 state_bytes=4880369 state_sha256=0bdc9d8f7e4b05ad7ed04bc7a3cfcec856102416ca669d9bde8c6f716863125f
+TOWER_PASS pass=9 train_bits_a_byte=1.979 dev_bits_a_byte=1.972 dev_regions Q=1.543 P=1.520 N=0.692 M=2.176 deposits=211/211 pass_ms=33690 elapsed_ms=338222
+TOWER_SECTION pass=10 section=32 bits_a_byte=1.968 deposits=32 halvings=0 elapsed_ms=343226
+TOWER_SECTION pass=10 section=64 bits_a_byte=1.949 deposits=64 halvings=0 elapsed_ms=347852
+TOWER_SECTION pass=10 section=96 bits_a_byte=1.963 deposits=96 halvings=0 elapsed_ms=352312
+TOWER_SECTION pass=10 section=128 bits_a_byte=1.956 deposits=128 halvings=4 elapsed_ms=356939
+TOWER_SECTION pass=10 section=160 bits_a_byte=1.969 deposits=160 halvings=4 elapsed_ms=361249
+TOWER_SECTION pass=10 section=192 bits_a_byte=1.968 deposits=192 halvings=4 elapsed_ms=365620
+TOWER_SECTION pass=10 section=211 bits_a_byte=1.934 deposits=211 halvings=6 elapsed_ms=369290
+TOWER_STATE STATE.10 state_bytes=4795714 state_sha256=5e2f3a159c9be2806588c3f2123397e5682bea9c826aaf05a324399f0149439e
+TOWER_PASS pass=10 train_bits_a_byte=1.960 dev_bits_a_byte=1.962 dev_regions Q=1.514 P=1.505 N=0.542 M=2.174 deposits=211/211 pass_ms=33148 elapsed_ms=371370
+TOWER_SECTION pass=11 section=32 bits_a_byte=2.026 deposits=32 halvings=1 elapsed_ms=376685
+TOWER_SECTION pass=11 section=64 bits_a_byte=1.972 deposits=64 halvings=3 elapsed_ms=381238
+TOWER_SECTION pass=11 section=96 bits_a_byte=1.965 deposits=96 halvings=3 elapsed_ms=385635
+TOWER_SECTION pass=11 section=128 bits_a_byte=1.968 deposits=128 halvings=4 elapsed_ms=390135
+TOWER_SECTION pass=11 section=160 bits_a_byte=1.939 deposits=160 halvings=4 elapsed_ms=394704
+TOWER_SECTION pass=11 section=192 bits_a_byte=1.945 deposits=192 halvings=4 elapsed_ms=399468
+TOWER_SECTION pass=11 section=211 bits_a_byte=1.924 deposits=211 halvings=6 elapsed_ms=402507
+TOWER_STATE STATE.11 state_bytes=4801289 state_sha256=2db96d6bf8780fa9c89e8b88ee9c00521f8f9d31e02b11657d9daf4f47bcaa27
+TOWER_PASS pass=11 train_bits_a_byte=1.965 dev_bits_a_byte=1.947 dev_regions Q=1.447 P=1.452 N=0.480 M=2.178 deposits=211/211 pass_ms=33287 elapsed_ms=404658
+TOWER_DONE state_bytes=4801289 state_sha256=2db96d6bf8780fa9c89e8b88ee9c00521f8f9d31e02b11657d9daf4f47bcaa27 elapsed_ms=404793
+MEASURE exit=0 wall_s=404.8 peak_rss_kib=137992

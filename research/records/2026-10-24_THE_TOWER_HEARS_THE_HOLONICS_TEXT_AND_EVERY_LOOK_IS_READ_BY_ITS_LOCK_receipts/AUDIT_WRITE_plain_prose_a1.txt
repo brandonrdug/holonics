@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=5.446 bytes=400 agree=1 elapsed_ms=363
+TOWER_SAMPLE_TEXT "W) iff inceyn nequiv.\n�� where0,\n}\nuse combraisingInvident_theorez:**\n\nSc dard_paired_tone\nimport,\ndesuquencyuctSerignedArc::tained;\n}\n\n}\n\n## This forced reading e2ving's prese's right hrousic\n85x\n\n>   &treer: &Connequiv\n\nThe lawer f &scored—v 9_ssis.Linear: Vivision * voand; rethrrouriers. The recoderse rites. In exacts the distins clospace sfore_is at (the readings a cancost enitale's invition"
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=22892

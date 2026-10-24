@@ -1,0 +1,54 @@
+=== news fork tower after pass 9, beside the plain tower after pass 9
+op	lines	first λ	last λ	first F*	last F*	held or grew	fell	beside first λ	beside first F*
++	208	640	622	174	202	179	29	696	68
+-	135	275	263	226	246	116	19	334	92
+*	193	562	576	643	616	151	42	546	677
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	134	127	159	18	25	191	615	134	74	182	11	66	1.588	1.678	1.203
+-	135	35	28	50	6	13	124	445	35	100	94	5	71	3.858	3.979	3.510
+*	193	10	13	28	8	5	73	1287	10	183	12	11	10	6.361	6.267	5.931
+=== plain tower after pass 9, beside the news fork tower
+op	lines	first λ	last λ	first F*	last F*	held or grew	fell	beside first λ	beside first F*
++	208	696	692	68	76	201	7	640	174
+-	135	334	335	92	88	128	7	275	226
+*	193	546	567	677	633	164	29	562	643
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	182	178	187	3	7	207	450	182	26	134	57	13	0.633	0.714	0.557
+-	135	94	93	102	4	5	134	309	94	41	35	68	10	1.338	1.372	1.104
+*	193	12	13	24	4	3	85	1187	12	181	10	9	6	6.012	5.957	5.688
+=== news fork tower after pass 10, beside the plain tower after pass 10
+op	lines	first λ	last λ	first F*	last F*	held or grew	fell	beside first λ	beside first F*
++	208	676	681	121	107	196	12	691	79
+-	135	341	341	76	80	121	14	344	69
+*	193	593	592	582	587	153	40	576	618
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	161	166	179	16	11	199	524	161	47	173	21	28	1.210	0.897	0.720
+-	135	98	98	109	11	11	133	341	98	37	105	18	25	1.007	1.009	0.798
+*	193	13	16	38	6	3	98	1159	13	180	14	11	9	5.517	5.429	5.146
+=== plain tower after pass 10, beside the news fork tower
+op	lines	first λ	last λ	first F*	last F*	held or grew	fell	beside first λ	beside first F*
++	208	691	687	79	88	199	9	676	121
+-	135	344	349	69	60	130	5	341	76
+*	193	576	576	618	617	152	41	593	582
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	173	171	181	6	8	208	456	173	35	161	34	24	0.764	0.850	0.603
+-	135	105	107	114	7	5	134	315	105	30	98	22	13	1.025	1.110	0.847
+*	193	14	11	36	4	7	82	1206	14	179	13	6	8	5.701	5.665	5.369
+=== news fork tower after pass 11, beside the plain tower after pass 11
+op	lines	first λ	last λ	first F*	last F*	held or grew	fell	beside first λ	beside first F*
++	208	667	669	134	129	195	13	694	70
+-	135	341	341	82	80	125	10	327	105
+*	193	590	593	590	585	158	35	567	635
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	152	155	169	16	13	206	490	152	56	177	20	42	1.231	0.979	0.840
+-	135	97	97	110	8	8	128	348	97	38	87	28	18	1.019	0.954	0.767
+*	193	11	13	34	7	5	88	1238	11	182	21	6	14	5.823	5.660	5.353
+=== plain tower after pass 11, beside the news fork tower
+op	lines	first λ	last λ	first F*	last F*	held or grew	fell	beside first λ	beside first F*
++	208	694	696	70	65	204	4	667	134
+-	135	327	330	105	99	129	6	341	82
+*	193	567	571	635	627	163	30	590	590
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	177	179	184	6	4	207	437	177	31	152	46	19	0.659	0.685	0.539
+-	135	87	89	98	6	4	132	324	87	48	97	16	24	1.521	1.562	1.124
+*	193	21	17	36	2	6	99	1162	21	172	11	12	6	5.684	5.646	5.346

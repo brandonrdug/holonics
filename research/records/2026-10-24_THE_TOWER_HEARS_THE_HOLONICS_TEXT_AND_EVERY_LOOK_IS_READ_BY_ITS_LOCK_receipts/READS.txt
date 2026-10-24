@@ -1,0 +1,375 @@
+== located lock prose
+MOMENTS_LOCATED depth=4 lines=174 located=163
+LOOKS_READ looks=8 spent=1237 settled=16 looks_sha256=5c51e82d6c5efeb1a8feb3a02d23014fcb9b4c996011af03e96a36d89aa8d975
+LINES_READ lines=163 written=163 agree=4 lines_sha256=b8259887ad76834886925a7957c6719b74b6a3da7e0c73d2a456c5fbe4aaf96c elapsed_ms=43628
+MEASURE exit=0 wall_s=43.6 peak_rss_kib=61328
+== located lock lean
+MOMENTS_LOCATED depth=4 lines=153 located=145
+LOOKS_READ looks=8 spent=1087 settled=15 looks_sha256=263e3b78e7d0c0d6600f452fde80a49759216268b33e7b48b13f0850cd0e72c6
+LINES_READ lines=145 written=145 agree=4 lines_sha256=9592ed478b83652633b38bb5dc39be72a64c674d92ae97acb17079b2be8b6953 elapsed_ms=41204
+MEASURE exit=0 wall_s=41.2 peak_rss_kib=59832
+== located lock rust
+MOMENTS_LOCATED depth=4 lines=180 located=161
+LOOKS_READ looks=8 spent=1105 settled=39 looks_sha256=3a6b88881e1e79f4f35aee91299e17e410dd7fec413133ca11aaee0e5256ba4f
+LINES_READ lines=161 written=161 agree=4 lines_sha256=b3031af68b72836a445838ab799f6706b2a46ca86fce37ade97af0f488a537e9 elapsed_ms=43121
+MEASURE exit=0 wall_s=43.1 peak_rss_kib=58788
+== located lock arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=6248 settled=386 looks_sha256=09b844a1b0e462244c1af1ba6e9b58e2eee1fe4cfbd8164ca2c425bbbfe0823e
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=ccc21ed8d1e3666f558f76e4d44a8e2798d8d043ecabf229843516f027bfc693 elapsed_ms=20501
+MEASURE exit=0 wall_s=20.5 peak_rss_kib=54488
+== located plain prose
+MOMENTS_LOCATED depth=4 lines=174 located=163
+LOOKS_READ looks=8 spent=1220 settled=16 looks_sha256=d17cc0e1b9f64d5dd224215c786bd47b5faa9ff3ef64732110d8026252f33128
+LINES_READ lines=163 written=163 agree=4 lines_sha256=077d99db1ec4de83237c2618128cb00d5fef42b8109192a38034f30e2cc114a6 elapsed_ms=46495
+MEASURE exit=0 wall_s=46.5 peak_rss_kib=61472
+== located plain lean
+MOMENTS_LOCATED depth=4 lines=153 located=145
+LOOKS_READ looks=8 spent=1015 settled=27 looks_sha256=27e83512a2afea05d662566eacff18faeb50bc54c32c18072e944f402b88f83d
+LINES_READ lines=145 written=145 agree=4 lines_sha256=01443fd52ecc2447db034692c718e37916d339017bfe32d4bb3b47c447346c80 elapsed_ms=42490
+MEASURE exit=0 wall_s=42.5 peak_rss_kib=59844
+== located plain rust
+MOMENTS_LOCATED depth=4 lines=180 located=161
+LOOKS_READ looks=8 spent=1103 settled=34 looks_sha256=206db33a319e8c029459cc4848fa06fc3c99c4150820939b6861ec744b4049ba
+LINES_READ lines=161 written=161 agree=4 lines_sha256=518746498b712b0ee7288041b5f4c9cf6f3cd8a030f22f930727c8abe379223e elapsed_ms=46117
+MEASURE exit=0 wall_s=46.1 peak_rss_kib=59020
+== located plain arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=6474 settled=337 looks_sha256=e22711048c6d1b5c36e304489f543dc18029a3eed407720b2cc6a11a838eeff3
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=c88c70671bc3e80a3a496ac9bc5615421de69d00733f711cf0b7433ceb4fa3a1 elapsed_ms=22672
+MEASURE exit=0 wall_s=22.7 peak_rss_kib=54520
+== located pair prose
+MOMENTS_LOCATED depth=4 lines=174 located=163
+LOOKS_READ looks=8 spent=1217 settled=23 looks_sha256=7c2d73e9921d48f954b53a8f406379d947348eb4761da2775572bb07778c53a9
+LINES_READ lines=163 written=163 agree=4 lines_sha256=e3fc02f6642f326a2480614df3d2474111c1be1073da91756ae3577390fc3535 elapsed_ms=46039
+MEASURE exit=0 wall_s=46.0 peak_rss_kib=62752
+== located pair lean
+MOMENTS_LOCATED depth=4 lines=153 located=145
+LOOKS_READ looks=8 spent=1037 settled=27 looks_sha256=608398e2cfa6827b7f0ced463def55971000fd9dff3dd7c6687c8a853d75c038
+LINES_READ lines=145 written=145 agree=4 lines_sha256=928b92df603789831a9c5034e5bf6bb023762b95fcc892030c616894ddf6f918 elapsed_ms=42255
+MEASURE exit=0 wall_s=42.3 peak_rss_kib=61192
+== located pair rust
+MOMENTS_LOCATED depth=4 lines=180 located=161
+LOOKS_READ looks=8 spent=1103 settled=39 looks_sha256=978dab8b95683e652f4d4c20970e03d40e815b1c9995e159eb11b7aeb74a0842
+LINES_READ lines=161 written=161 agree=4 lines_sha256=7d3a90439819fccf64e2a02f7f4ecdf7f4b6a27137223065966b0cad27918ca7 elapsed_ms=48194
+MEASURE exit=0 wall_s=48.2 peak_rss_kib=60008
+== located pair arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=5801 settled=484 looks_sha256=fd7f5f7165136f5afc2fbbf4d4ccd040f29b86766df8e8a7bc65d586ee2563ee
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=449e4067245388dc0b822b91e43560bf8b3c731a92fb2a57b0aa264adf48c49e elapsed_ms=23420
+MEASURE exit=0 wall_s=23.4 peak_rss_kib=55604
+== located pair8 prose
+MOMENTS_LOCATED depth=4 lines=174 located=163
+LOOKS_READ looks=8 spent=1264 settled=11 looks_sha256=d95a9a2bf06f05a3fb2eb988010c25d7da8dee54c5840c70845d70b27ff1d191
+LINES_READ lines=163 written=163 agree=4 lines_sha256=db9a42c31edf041ecbe84bbdc233c4872099c18b51a66ade748f89f7a9cccf99 elapsed_ms=47394
+MEASURE exit=0 wall_s=47.4 peak_rss_kib=62408
+== located pair8 lean
+MOMENTS_LOCATED depth=4 lines=153 located=145
+LOOKS_READ looks=8 spent=1113 settled=14 looks_sha256=f3ce7fc8d87591da38b60a45ce92233046dc44138ec6da3cfc8da47a1314801c
+LINES_READ lines=145 written=145 agree=4 lines_sha256=15d065414ad618926c883a982d9a35e35a6f9b7b033e979e60bd801deb04b40e elapsed_ms=43518
+MEASURE exit=0 wall_s=43.5 peak_rss_kib=60052
+== located pair8 rust
+MOMENTS_LOCATED depth=4 lines=180 located=161
+LOOKS_READ looks=8 spent=1168 settled=27 looks_sha256=71e55cf28ac815972a10d238cb2c834b16bf81c1fcde9de2d884a2c231e75ddc
+LINES_READ lines=161 written=161 agree=4 lines_sha256=600671a30348a048311394c8010e5e5f84dba2cca8432e77f10a8b6f2806ca45 elapsed_ms=48376
+MEASURE exit=0 wall_s=48.4 peak_rss_kib=59804
+== located pair8 arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=6018 settled=424 looks_sha256=005765ff5b758ce030b9e625d835c0e22c546cc05078585e031fbb994dfe951b
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=a53bcf2105b9bf9ab0f2124783b17e5888850df748e207c031dde821d56fc4a6 elapsed_ms=22109
+MEASURE exit=0 wall_s=22.1 peak_rss_kib=55824
+== located pairlin8 prose
+MOMENTS_LOCATED depth=4 lines=174 located=163
+LOOKS_READ looks=8 spent=1244 settled=13 looks_sha256=2d701efe7607e13bee4951fb2e6250ea76e11009808f72a3d1044e807ee31dab
+LINES_READ lines=163 written=163 agree=4 lines_sha256=010b181aca782bb1b06022ddbd37a06466511268692e80f23676be37cd0234bd elapsed_ms=47916
+MEASURE exit=0 wall_s=47.9 peak_rss_kib=62796
+== located pairlin8 lean
+MOMENTS_LOCATED depth=4 lines=153 located=145
+LOOKS_READ looks=8 spent=1098 settled=15 looks_sha256=c220ca28238cfad9c40868b70a82c221b9fbb8211cdd323cb4141b5b37d301a8
+LINES_READ lines=145 written=145 agree=4 lines_sha256=6e7ca32fed1fc3092b1b4c99a25ccf7170614ce53eee7a3c3bebd39fcac4e4e2 elapsed_ms=44449
+MEASURE exit=0 wall_s=44.5 peak_rss_kib=61316
+== located pairlin8 rust
+MOMENTS_LOCATED depth=4 lines=180 located=161
+LOOKS_READ looks=8 spent=1215 settled=19 looks_sha256=b852f2bdd9928c53cf3a18232672c3f353309b86089f154ee6e57bd1d8a6ec18
+LINES_READ lines=161 written=161 agree=4 lines_sha256=8761b73b244952270ae324f8d4cd2ce81a26b10c22de03cd6eaa214ce44d64e1 elapsed_ms=44842
+MEASURE exit=0 wall_s=44.9 peak_rss_kib=60124
+== located pairlin8 arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=5979 settled=441 looks_sha256=baa793111fd872eaa55cb0075124afae5c7159fcc1f01deaf738cc0c143443f8
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=e753b3ab98cc634f9b1c128b5df56ec89a02ef3a9864f69fa74a33cf8164885c elapsed_ms=22309
+MEASURE exit=0 wall_s=22.3 peak_rss_kib=55636
+== at = pair prose
+LOOKS_READ looks=8 spent=44 settled=4 looks_sha256=5576e980212362660fc2b46b480447951f744c0cecb4ddf25ac309291fbcd642
+LINES_READ lines=7 written=7 agree=4 lines_sha256=297d28617a46b1e6edb5925c30303ae321f3659e15611c314a8d7b34db7f932f elapsed_ms=3975
+MEASURE exit=0 wall_s=4.0 peak_rss_kib=22308
+== write pair prose
+TOWER_SAMPLE prompt_bits_a_byte=8.313 bytes=400 agree=4 elapsed_ms=3598
+TOWER_SAMPLE_TEXT "\\]\nvariable constitutive scorence orientedArcurrence orientedArcuration.\n\n## The complete and consenty open is the comparison and construction and construction and the complete and construction comparisational construction and consense and construction constitutive constitutive is constitutive is the complete and complete constitutive constitutive constitutive is the comparison and the comparisati"
+MEASURE exit=0 wall_s=3.6 peak_rss_kib=23996
+== at = pair lean
+LOOKS_READ looks=8 spent=103 settled=16 looks_sha256=e846f96ea030e53a1b8f03f3d6fbd60ba552369a3118529e57915e78436312fa
+LINES_READ lines=24 written=24 agree=4 lines_sha256=4f4b6e6134caae6a947b2436c9221017d9bd69d2f519cadd4ee074b81763288a elapsed_ms=5553
+MEASURE exit=0 wall_s=5.6 peak_rss_kib=22364
+== write pair lean
+TOWER_SAMPLE prompt_bits_a_byte=3.752 bytes=400 agree=4 elapsed_ms=3851
+TOWER_SAMPLE_TEXT "active complete constitutive and the comparisational construction, the comparison the comparison construction and the complete and conses and the comparison construction and the construction and the complete constitutive and complete and construction constitutive or the construction oriented construction constitutive is the complete instruction and the commutes and consect and construction and com"
+MEASURE exit=0 wall_s=3.9 peak_rss_kib=23992
+== at = pair rust
+LOOKS_READ looks=8 spent=84 settled=4 looks_sha256=dddb75e3944cd7c52a37bcbaaf29be372fb30480e11d4d75966a8456574a893a
+LINES_READ lines=12 written=12 agree=4 lines_sha256=dcca7c6355e4c295649eec4e22ee73114d3eb0d48cf605bbe43dd590850e4eef elapsed_ms=5012
+MEASURE exit=0 wall_s=5.0 peak_rss_kib=22472
+== write pair rust
+TOWER_SAMPLE prompt_bits_a_byte=3.934 bytes=400 agree=4 elapsed_ms=3558
+TOWER_SAMPLE_TEXT "                                                                                                                                                                                                                                                                                                                                                                                                                "
+MEASURE exit=0 wall_s=3.6 peak_rss_kib=24024
+== at = pair arithmetic
+LOOKS_READ looks=8 spent=6877 settled=691 looks_sha256=008f861612b1b439849dea1bf9b9b8a6279cf0f268c7dfb5a7ed93f5233216c1
+LINES_READ lines=1253 written=1200 agree=4 lines_sha256=8df6c25f803417e471432bee5543d9f94e1e757d36b452be5ffeb02a0cdd5804 elapsed_ms=22878
+MEASURE exit=0 wall_s=22.9 peak_rss_kib=22380
+== write pair arithmetic
+TOWER_SAMPLE prompt_bits_a_byte=9.536 bytes=400 agree=4 elapsed_ms=3236
+TOWER_SAMPLE_TEXT "0\n    (quotient Fibre) :\n    (quotient commutes (LinearMap.ker quotient)\n\n/-- Option<Option<EpochReceivingLawSiteLawStr(),\n                                                                                                                                                                                                                                                                                     "
+MEASURE exit=0 wall_s=3.2 peak_rss_kib=24140
+== at = pair8 prose
+LOOKS_READ looks=8 spent=44 settled=3 looks_sha256=ef0c9d70d1a5b7812a5ee1df53361f7bd2f74e51f62e7b8b3bd15ed19cd04e59
+LINES_READ lines=7 written=7 agree=4 lines_sha256=b6bffaafe54cb76a034f12bbb8bf08a7954c548d9c25b56eed1e501652b52137 elapsed_ms=3467
+MEASURE exit=0 wall_s=3.5 peak_rss_kib=22360
+== write pair8 prose
+TOWER_SAMPLE prompt_bits_a_byte=7.010 bytes=400 agree=4 elapsed_ms=3146
+TOWER_SAMPLE_TEXT "[definitionRetainedFaceRestrict :=\n                                                                          series>,\n                                                                                        seriesented: &'a BTreeScc : Equiv.Perm (and scaledKrees>,\n                                                                                  seriesented: &'a Constics.FluidFibreV1,\n              "
+MEASURE exit=0 wall_s=3.1 peak_rss_kib=23080
+== at = pair8 lean
+LOOKS_READ looks=8 spent=114 settled=17 looks_sha256=99a269a38575fac1d637782dbcd877f9f074b32ed8cfd2c7611064e7ab75949f
+LINES_READ lines=24 written=24 agree=4 lines_sha256=210b61b9ff5b1e92158ce1f504c155b2002ce4686311c3c9375e18f8858caedf elapsed_ms=6180
+MEASURE exit=0 wall_s=6.2 peak_rss_kib=22516
+== write pair8 lean
+TOWER_SAMPLE prompt_bits_a_byte=3.163 bytes=400 agree=4 elapsed_ms=3530
+TOWER_SAMPLE_TEXT "[definition_inferWord::FromStr::Rests::{V : V) :\n                                                            series>,\n                                                                                                  seriesented: &'a &'s channel_advectionTransport {\n                                                                                seriesented: &'a Constics.FluidFibreV1,\n              "
+MEASURE exit=0 wall_s=3.5 peak_rss_kib=23780
+== at = pair8 rust
+LOOKS_READ looks=8 spent=80 settled=3 looks_sha256=abba14690732a295307aaca6d17d638cd830a7f27bf0f3bc17f32aed07c5ef76
+LINES_READ lines=12 written=12 agree=4 lines_sha256=3a76d2075ec3a1b9ad05a27f2ae8cd4a4951e96d84d9e7d6b47ec74947fdcaed elapsed_ms=5158
+MEASURE exit=0 wall_s=5.2 peak_rss_kib=22432
+== write pair8 rust
+TOWER_SAMPLE prompt_bits_a_byte=3.672 bytes=400 agree=4 elapsed_ms=3777
+TOWER_SAMPLE_TEXT "# The complete and the complete and the complete and the self the commutes consented constitus the complete constitution change chain is candidate conserved constics changes the self the comparison and conserved constiture conserved and chain commutes consent chain the comparison the complete constitution and conserved constitus constitution change self the complete and chain the commutes conserva"
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=24284
+== at = pair8 arithmetic
+LOOKS_READ looks=8 spent=7189 settled=623 looks_sha256=346d605bd6e1a3f4ca8996a9eede42adc4a14c02f1150f60ca4f25fe3fb25dc1
+LINES_READ lines=1253 written=1200 agree=4 lines_sha256=9e18026a276d4017a4779cedf3f68ab5fc9283a6f1d1b20f1659b2afd70483c0 elapsed_ms=25226
+MEASURE exit=0 wall_s=25.2 peak_rss_kib=22436
+== write pair8 arithmetic
+TOWER_SAMPLE prompt_bits_a_byte=5.915 bytes=400 agree=4 elapsed_ms=3247
+TOWER_SAMPLE_TEXT "0\n64*55=2085\n45+6=41\n49+6=21\n43+29=65\n60+20=80\n70+21=93\n55+87=150\n46*32=1054\n64+40=105\n64*15=1068\n44+8=43\n50+95=140\n61+44=108\n40+20=50\n49+10=40\n90+26=115\n64*53=2072\n80+39=114\n40+88=126\n58+50=102\n90+21=108\n65+67=126\n66*46=2055\n40+86=110\n34*44=2082\n77-56=24\n60+21=93\n60+31=95\n20+49=55\n88-54=24\n65+88=140\n44+46=98\n48+65=106\n50-26=20\n80+38=114\n56*35=2085\n80+30=106\n52+40=84\n80*32=2080\n40+46=83\n60+29=93\n3"
+MEASURE exit=0 wall_s=3.3 peak_rss_kib=24236
+== at = pairlin8 prose
+LOOKS_READ looks=8 spent=48 settled=2 looks_sha256=26d56c31aeeb052fb1ca00a20ff48bac9e67b1f40da1a559b55363acad778ad0
+LINES_READ lines=7 written=7 agree=4 lines_sha256=b8e1e5cf3040dd7b9d4286dc801e8e6b99238a595db68a3e7e796228eaf3353c elapsed_ms=3703
+MEASURE exit=0 wall_s=3.7 peak_rss_kib=22316
+== write pairlin8 prose
+TOWER_SAMPLE prompt_bits_a_byte=3.943 bytes=400 agree=4 elapsed_ms=3828
+TOWER_SAMPLE_TEXT "The\nimport PartialLochRetained chart commandmarks and and conserve receiver the conservation and change classical consed change change conchere the commanding ally the conserval the conservation the change consely conservation and\n    partitionReceiving::RestitTich groblar::hnn::ReceivingRetionRetionReading::{Exact : V →ₗ[𝕜] Q) (left (x => &stration,\n                                        "
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=24044
+== at = pairlin8 lean
+LOOKS_READ looks=8 spent=182 settled=2 looks_sha256=c2e2cd204c985196a6822a1f5b07219f3d31ca1a9c788f4ec0ab4cc7ee56fcb4
+LINES_READ lines=24 written=24 agree=4 lines_sha256=bddf28f86593299567ec16c2d0331fccc1273418aa07e96a99b55879c2867e4b elapsed_ms=8740
+MEASURE exit=0 wall_s=8.7 peak_rss_kib=22084
+== write pairlin8 lean
+TOWER_SAMPLE prompt_bits_a_byte=2.774 bytes=400 agree=4 elapsed_ms=3915
+TOWER_SAMPLE_TEXT "/-- The complete conserver not carry and change and commonic and the clared consely conserfice and\n/// is the conservation consely conses and close conserval changes and consely conservation addressere and consely conservation and\n    partitionReceiving::RestitSelved::Receiving_conserved_is_constr_consel_index>::Reshen_consed::Rest(),\n                                                               "
+MEASURE exit=0 wall_s=3.9 peak_rss_kib=24036
+== at = pairlin8 rust
+LOOKS_READ looks=8 spent=88 settled=2 looks_sha256=67ec507389219a9d76b34dc3cee11155556b67332ce7eb8be108493667b20c01
+LINES_READ lines=12 written=12 agree=4 lines_sha256=a24abcdcb27a3a0ed2a6c679b57f012085c18c77302e5c7825331d0a0570efbf elapsed_ms=5254
+MEASURE exit=0 wall_s=5.3 peak_rss_kib=22380
+== write pairlin8 rust
+TOWER_SAMPLE prompt_bits_a_byte=3.042 bytes=400 agree=4 elapsed_ms=3767
+TOWER_SAMPLE_TEXT "/// The chart and constrous and arior change conserved consely conservation the close is a conservation and\n//! and change conservation the conservation and change with noring and change classesse and change conserved commonic and commonic and\nimport interval chantic change consely distition chantic is changes the classice invary change conservection change consection and\n\n\n\n[desserthine = chanded"
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=23884
+== at = pairlin8 arithmetic
+LOOKS_READ looks=8 spent=7088 settled=674 looks_sha256=d12d25bbdaf603e84bc7f4b677fc568bcc547d40d0244a3f9f8ff7d8c8216568
+LINES_READ lines=1253 written=1200 agree=4 lines_sha256=e22976d8a65d6a23e473f13263c7a536d6511779ff427e6f9961d16aec6092db elapsed_ms=24421
+MEASURE exit=0 wall_s=24.4 peak_rss_kib=22000
+== write pairlin8 arithmetic
+TOWER_SAMPLE prompt_bits_a_byte=6.159 bytes=400 agree=4 elapsed_ms=3623
+TOWER_SAMPLE_TEXT " [Q.code_admitted::ReloringLockQ.withmodeR2)\n        (channervedVec<Comparis::{Ve::Fibre_cending_certive_appored_conseln>,\n                                                                                                                                                                                                                                                                                     "
+MEASURE exit=0 wall_s=3.6 peak_rss_kib=23912
+== at = lock prose
+LOOKS_READ looks=8 spent=56 settled=0 looks_sha256=8533f5295a381dcbb55bd361972509fd8de83d9c711d7538d8c190c71b28f1de
+LINES_READ lines=7 written=7 agree=4 lines_sha256=347116c71ae46a18d0b7b0e452809e60eb5a66bc27837a0fb8abe22b4f050077 elapsed_ms=3473
+MEASURE exit=0 wall_s=3.5 peak_rss_kib=19156
+== at = lock lean
+LOOKS_READ looks=8 spent=176 settled=4 looks_sha256=41bf2fcfb1c60e8d371116b8d4790055876ebd014f45a0a6c877b1b397f9375b
+LINES_READ lines=24 written=24 agree=4 lines_sha256=7eb802a12a5ef95ba6471181e5f07f70a4f33b7d031dad74b7301e65209b9f57 elapsed_ms=7432
+MEASURE exit=0 wall_s=7.4 peak_rss_kib=19284
+== at = lock rust
+LOOKS_READ looks=8 spent=95 settled=1 looks_sha256=b8dc61958c9f95df2e54ded9412595ddda656eb47b6fb7eca13ad78309549463
+LINES_READ lines=12 written=12 agree=4 lines_sha256=373ffd523ab54c8c0638d6350e568aaeb09a044327a3a12fc61f1c623e4359d5 elapsed_ms=4693
+MEASURE exit=0 wall_s=4.7 peak_rss_kib=19276
+== at = lock arithmetic
+LOOKS_READ looks=8 spent=7736 settled=511 looks_sha256=b5e4a0d2b3a3a7b307e1c0b53fc137153f8c88d0845eef101ed27cf29b2310c1
+LINES_READ lines=1253 written=1200 agree=4 lines_sha256=c2de6e9d0b9988519c4c3828ae8f5995df2e128e2a411eaca1b041cc7ff1a26a elapsed_ms=23100
+MEASURE exit=0 wall_s=23.1 peak_rss_kib=19260
+== at = plain prose
+LOOKS_READ looks=8 spent=50 settled=1 looks_sha256=0eae9cdbbd36935216cc39afe65f5c5fe786e553edd3855eebe3ef0240f8e6ed
+LINES_READ lines=7 written=7 agree=4 lines_sha256=7ee5fb44ec4f0335ab07356c3dd3bcb9f2c9a3e1cfa892c83d930594304e4971 elapsed_ms=3345
+MEASURE exit=0 wall_s=3.3 peak_rss_kib=19180
+== at = plain lean
+LOOKS_READ looks=8 spent=191 settled=1 looks_sha256=b15f135e88012610a157b0aa5f893f6119d85d4d4a0afaf93ed3a41e2d96e819
+LINES_READ lines=24 written=24 agree=4 lines_sha256=0d33ab867991a28b9468a2c29fac71d09286721fac01cef18151ed0378d6a99d elapsed_ms=8323
+MEASURE exit=0 wall_s=8.3 peak_rss_kib=19100
+== at = plain rust
+LOOKS_READ looks=8 spent=95 settled=1 looks_sha256=045ecbf63ad59ae40dce108c8814187d5a1aea73635f4a33defa48b54363c2ea
+LINES_READ lines=12 written=12 agree=4 lines_sha256=077be08a212f2f49f33b852d7d7feb33fa973c1e2f4cae602a636f14a772d955 elapsed_ms=4913
+MEASURE exit=0 wall_s=4.9 peak_rss_kib=19300
+== at = plain arithmetic
+LOOKS_READ looks=8 spent=8057 settled=442 looks_sha256=0e96ba9105168fbf07ad01635c38009640e5836b78386455ee718474bcb2a33d
+LINES_READ lines=1253 written=1200 agree=4 lines_sha256=73ba6dfa91c2ac2088f5761f3dd26cd1e180512fa75a9eab0f0610bc0d226c7b elapsed_ms=24026
+MEASURE exit=0 wall_s=24.0 peak_rss_kib=19308
+== hbl_big_arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=6158 settled=407 looks_sha256=f6edf2359726495cf8c19346d5615dba388947b4d81f2a7ea4e18f360a29ceac
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=f1f0c2716b2abbf3e6d0d32c481266b49030e7edbc6a21b3d588ecae90de60b2 elapsed_ms=23150
+MEASURE exit=0 wall_s=23.2 peak_rss_kib=56640
+== hbl_big_lean
+MOMENTS_LOCATED depth=4 lines=159 located=152
+LOOKS_READ looks=8 spent=1158 settled=18 looks_sha256=ffab1df0e5e98547c2bf3631e5f2c03c07f3c060cf7dd9f7ae640bed96ffac2e
+LINES_READ lines=152 written=152 agree=4 lines_sha256=9c61d87c839d58bbf29397811e62bdd5065ef5ddf8c718145025bd85c698ce28 elapsed_ms=44619
+MEASURE exit=0 wall_s=44.6 peak_rss_kib=58096
+== hbl_big_prose
+MOMENTS_LOCATED depth=4 lines=166 located=164
+LOOKS_READ looks=8 spent=1271 settled=11 looks_sha256=08c224c1113400725147d0c3fa69a9db98ebf3d6fb24a59b25a627f3986f310f
+LINES_READ lines=164 written=164 agree=4 lines_sha256=37c18fb245931e0b3f314144f5bd87af32783549a928cabecc88c374d554c380 elapsed_ms=46107
+MEASURE exit=0 wall_s=46.1 peak_rss_kib=68168
+== hbl_big_rust
+MOMENTS_LOCATED depth=4 lines=225 located=204
+LOOKS_READ looks=8 spent=1336 settled=74 looks_sha256=6af88ca4c902dc19903cdf28b389853662d2831b778602b28eb7a9fa4719c5c4
+LINES_READ lines=204 written=204 agree=4 lines_sha256=51637659892c61a148ca5f612cd498da5cb58b0f0b0b6b2d3ca47f9835402828 elapsed_ms=43525
+MEASURE exit=0 wall_s=43.5 peak_rss_kib=59488
+== hbl_old_arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=5801 settled=484 looks_sha256=fd7f5f7165136f5afc2fbbf4d4ccd040f29b86766df8e8a7bc65d586ee2563ee
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=449e4067245388dc0b822b91e43560bf8b3c731a92fb2a57b0aa264adf48c49e elapsed_ms=21935
+MEASURE exit=0 wall_s=21.9 peak_rss_kib=57152
+== hbl_old_lean
+MOMENTS_LOCATED depth=4 lines=159 located=152
+LOOKS_READ looks=8 spent=1150 settled=17 looks_sha256=ed3c16b731caf2214d7eb6cc7b2ef1ac392b940e7268c64df46ddde337b0ba99
+LINES_READ lines=152 written=152 agree=4 lines_sha256=fee59596f9bee0fd72d00235bbb5ebf52275bb794cc7d7f958e8ebd0e5e69f2d elapsed_ms=44439
+MEASURE exit=0 wall_s=44.4 peak_rss_kib=59156
+== hbl_old_prose
+MOMENTS_LOCATED depth=4 lines=166 located=164
+LOOKS_READ looks=8 spent=1271 settled=13 looks_sha256=09f49e97794133f07cce86faa7a8b0c913dd6d869f83c56b7d7099d10d4973cf
+LINES_READ lines=164 written=164 agree=4 lines_sha256=65e79f1d90efe7a168a63478d0df948599ef5ed27ad444d60db7ce47f3ecc0a5 elapsed_ms=48786
+MEASURE exit=0 wall_s=48.8 peak_rss_kib=69032
+== hbl_old_rust
+MOMENTS_LOCATED depth=4 lines=225 located=204
+LOOKS_READ looks=8 spent=1208 settled=87 looks_sha256=a7ba5809015eb2327fd0e19adbb55d9fb57c73565ff0dce4f130ef9ffa9bfe7e
+LINES_READ lines=204 written=204 agree=4 lines_sha256=eee77b7e815c467273240534624ddda85d72da6cc8f5eaa27deaa2897f30b775 elapsed_ms=42737
+MEASURE exit=0 wall_s=42.7 peak_rss_kib=59800
+== hbw_big_arithmetic_a1
+TOWER_SAMPLE prompt_bits_a_byte=7.733 bytes=400 agree=1 elapsed_ms=412
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=25532
+== hbw_big_arithmetic_a2
+TOWER_SAMPLE prompt_bits_a_byte=7.733 bytes=400 agree=2 elapsed_ms=1652
+MEASURE exit=0 wall_s=1.7 peak_rss_kib=26044
+== hbw_big_arithmetic_ctx_a1
+TOWER_SAMPLE prompt_bits_a_byte=3.173 bytes=400 agree=1 elapsed_ms=582
+MEASURE exit=0 wall_s=0.6 peak_rss_kib=25472
+== hbw_big_arithmetic_ctx_a2
+TOWER_SAMPLE prompt_bits_a_byte=3.173 bytes=400 agree=2 elapsed_ms=1627
+MEASURE exit=0 wall_s=1.6 peak_rss_kib=25892
+== hbw_big_lean_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.662 bytes=400 agree=1 elapsed_ms=440
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=26080
+== hbw_big_lean_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.662 bytes=400 agree=2 elapsed_ms=1783
+MEASURE exit=0 wall_s=1.8 peak_rss_kib=26188
+== hbw_big_prose_a1
+TOWER_SAMPLE prompt_bits_a_byte=3.530 bytes=400 agree=1 elapsed_ms=537
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=26308
+== hbw_big_prose_a2
+TOWER_SAMPLE prompt_bits_a_byte=3.530 bytes=400 agree=2 elapsed_ms=1548
+MEASURE exit=0 wall_s=1.6 peak_rss_kib=25936
+== hbw_big_rust_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.351 bytes=400 agree=1 elapsed_ms=485
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=25924
+== hbw_big_rust_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.351 bytes=400 agree=2 elapsed_ms=1816
+MEASURE exit=0 wall_s=1.8 peak_rss_kib=25880
+== hbw_old_lean_a1
+TOWER_SAMPLE prompt_bits_a_byte=3.238 bytes=400 agree=1 elapsed_ms=415
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=26000
+== hbw_old_lean_a2
+TOWER_SAMPLE prompt_bits_a_byte=3.238 bytes=400 agree=2 elapsed_ms=1275
+MEASURE exit=0 wall_s=1.3 peak_rss_kib=25972
+== hcl_arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=6159 settled=396 looks_sha256=287e7f2e6bb9894104cfee9b71258cc4d86698d09433a8150747ae54d6e94256
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=fde796660cfcaa40b1734f04d4b872f8763acc218c17d6a32bd7e2fa84140e62 elapsed_ms=23190
+MEASURE exit=0 wall_s=23.2 peak_rss_kib=57076
+== hcl_lean
+MOMENTS_LOCATED depth=4 lines=159 located=152
+LOOKS_READ looks=8 spent=1159 settled=20 looks_sha256=f4134a6722be79c2c3e7f69564efe9e07b3be8831c35e52aba3165153c304e1a
+LINES_READ lines=152 written=152 agree=4 lines_sha256=d13c9f559d79ed735f864a6b15c9db91557aa74f6cdb5011b0e66f197e1a41d8 elapsed_ms=46008
+MEASURE exit=0 wall_s=46.0 peak_rss_kib=59196
+== hcl_prose
+MOMENTS_LOCATED depth=4 lines=166 located=164
+LOOKS_READ looks=8 spent=1286 settled=6 looks_sha256=645dadb52da3f23a0ba47a9351c4d035868aae480bb787830910cf2e5f2ee3e9
+LINES_READ lines=164 written=164 agree=4 lines_sha256=25c5e7654f3d49659aff754fee3bb15eeb13a4fa018a626cb89f42001a461bfa elapsed_ms=48682
+MEASURE exit=0 wall_s=48.7 peak_rss_kib=69140
+== hcl_rust
+MOMENTS_LOCATED depth=4 lines=225 located=204
+LOOKS_READ looks=8 spent=1026 settled=136 looks_sha256=21a6dd2a1f56d792f2b51ea83b9b5fca4c90b8074dc6ed0b652880e3d13ce95a
+LINES_READ lines=204 written=204 agree=4 lines_sha256=f59d16ba1552bf17e37638be8a790dd22f0fe1508fdfd0024a562ed60e512cb4 elapsed_ms=31931
+MEASURE exit=0 wall_s=31.9 peak_rss_kib=58860
+== hcw_arithmetic_ctx_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.779 bytes=400 agree=1 elapsed_ms=400
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=25528
+== hcw_arithmetic_ctx_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.779 bytes=400 agree=2 elapsed_ms=1404
+MEASURE exit=0 wall_s=1.4 peak_rss_kib=25912
+== hcw_lean_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.335 bytes=400 agree=1 elapsed_ms=374
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=25712
+== hcw_lean_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.335 bytes=400 agree=2 elapsed_ms=1464
+MEASURE exit=0 wall_s=1.5 peak_rss_kib=25572
+== hcw_prose_a1
+TOWER_SAMPLE prompt_bits_a_byte=4.097 bytes=400 agree=1 elapsed_ms=384
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=25944
+== hcw_prose_a2
+TOWER_SAMPLE prompt_bits_a_byte=4.097 bytes=400 agree=2 elapsed_ms=1216
+MEASURE exit=0 wall_s=1.2 peak_rss_kib=25576
+== hcw_rust_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.333 bytes=400 agree=1 elapsed_ms=388
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=26040
+== hcw_rust_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.333 bytes=400 agree=2 elapsed_ms=1515
+MEASURE exit=0 wall_s=1.5 peak_rss_kib=25716
+== wblk_arithmetic_ctx_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.779 joined_prompt_bits_a_byte=2.850 eta=21/32 bytes=400 agree=1 elapsed_ms=515
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39652
+== wblk_arithmetic_ctx_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.779 joined_prompt_bits_a_byte=2.850 eta=21/32 bytes=400 agree=2 elapsed_ms=487
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39592
+== wblk_eta0
+TOWER_SAMPLE prompt_bits_a_byte=4.097 joined_prompt_bits_a_byte=4.097 eta=0/32 bytes=400 agree=1 elapsed_ms=287
+MEASURE exit=0 wall_s=0.3 peak_rss_kib=38404
+== wblk_lean_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.335 joined_prompt_bits_a_byte=2.210 eta=21/32 bytes=400 agree=1 elapsed_ms=518
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39352
+== wblk_lean_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.335 joined_prompt_bits_a_byte=2.210 eta=21/32 bytes=400 agree=2 elapsed_ms=430
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=40536
+== wblk_prose_a1
+TOWER_SAMPLE prompt_bits_a_byte=4.097 joined_prompt_bits_a_byte=3.750 eta=21/32 bytes=400 agree=1 elapsed_ms=487
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39804
+== wblk_prose_a2
+TOWER_SAMPLE prompt_bits_a_byte=4.097 joined_prompt_bits_a_byte=3.750 eta=21/32 bytes=400 agree=2 elapsed_ms=459
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=40256
+== wblk_rust_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.333 joined_prompt_bits_a_byte=2.237 eta=21/32 bytes=400 agree=1 elapsed_ms=491
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39324
+== wblk_rust_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.333 joined_prompt_bits_a_byte=2.237 eta=21/32 bytes=400 agree=2 elapsed_ms=445
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=39352

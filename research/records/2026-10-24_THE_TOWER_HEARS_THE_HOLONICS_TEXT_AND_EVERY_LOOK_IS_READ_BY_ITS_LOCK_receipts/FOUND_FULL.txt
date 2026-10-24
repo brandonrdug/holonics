@@ -1,0 +1,176 @@
+FOUND_PASS train_cells=1789108 pairs=6330 arriving=171 held_out_cells=48023 read_ms=91708
+FOUND_FACE brier_T=0.581 tension_S=0.576 tension_permille_of_T=991.737 elapsed_ms=92508
+FOUND_CEILING pairs=6330 ceiling_drop_permille_of_tension=40.718 chance_permille=3.538 rounding=each_entry_within_6330_halves elapsed_ms=93436
+HELD_OUT rank=0 (part=brier_T/residual) prose=0.708/0.702 lean=0.591/0.590 rust=0.530/0.532 digits=0.655/0.652 all=0.621/0.619 elapsed_ms=93680
+FOUND_STEP rank=1 step=0 factor=current_byte power_steps=12 drop_permille_of_tension=0.688 elapsed_ms=94089
+FOUND_STEP rank=1 step=1 factor=byte_before power_steps=4 drop_permille_of_tension=1.017 elapsed_ms=94481
+FOUND_STEP rank=1 step=2 factor=current_byte power_steps=5 drop_permille_of_tension=1.120 elapsed_ms=94906
+FOUND_STEP rank=1 step=3 factor=byte_before power_steps=3 drop_permille_of_tension=1.146 elapsed_ms=95312
+FOUND_STEP rank=1 step=4 factor=current_byte power_steps=3 drop_permille_of_tension=1.157 elapsed_ms=95760
+FOUND_STEP rank=1 step=5 factor=byte_before power_steps=3 drop_permille_of_tension=1.164 elapsed_ms=96197
+FOUND_STEP rank=1 step=6 factor=current_byte power_steps=3 drop_permille_of_tension=1.169 elapsed_ms=96596
+FOUND_STEP rank=1 step=7 factor=byte_before power_steps=2 drop_permille_of_tension=1.174 elapsed_ms=97019
+FOUND_STEP rank=1 step=8 factor=current_byte power_steps=3 drop_permille_of_tension=1.177 elapsed_ms=97427
+FOUND_STEP rank=1 step=9 factor=byte_before power_steps=2 drop_permille_of_tension=1.178 elapsed_ms=97800
+FOUND_STEP rank=1 step=10 factor=current_byte power_steps=2 drop_permille_of_tension=1.180 elapsed_ms=98232
+FOUND_STEP rank=1 step=11 factor=byte_before power_steps=2 drop_permille_of_tension=1.180 elapsed_ms=98711
+FOUND_STEP rank=1 step=12 factor=current_byte power_steps=2 drop_permille_of_tension=1.181 elapsed_ms=99113
+FOUND_STEP rank=1 step=13 factor=byte_before power_steps=2 drop_permille_of_tension=1.181 elapsed_ms=99490
+FOUND_STEP rank=1 step=14 factor=current_byte power_steps=2 drop_permille_of_tension=1.181 elapsed_ms=99864
+FOUND_STEP rank=1 step=15 factor=byte_before power_steps=2 drop_permille_of_tension=1.182 elapsed_ms=100248
+FOUND_STEP rank=1 step=16 factor=current_byte power_steps=2 drop_permille_of_tension=1.182 elapsed_ms=100644
+FOUND_STEP rank=1 step=17 factor=byte_before power_steps=2 drop_permille_of_tension=1.182 elapsed_ms=101045
+FOUND_STEP rank=1 step=18 factor=current_byte power_steps=2 drop_permille_of_tension=1.182 elapsed_ms=101432
+FOUND_RANK rank=1 drop_permille_of_tension=1.182 cumulative_permille_of_tension=1.182 elapsed_ms=102369
+FOUND_CLASSES rank=1 (class:permille_of_its_tension) 'a':13.455 'e':7.342 'r':1.235 0xb8:0.451 0xb2:0.414 0xa6:0.191 0xa3:0.173 'l':0.124 0x92:0.122 'O':0.120 'h':0.102 0xb7:0.101
+FOUND_BYTES rank=1 current_byte 'P':49713 0xc3:-49157 0x88:48748 0xff:46571 'M':46351 'p':44340 'Q':-41328 'm':41303 'h':-40629 0x9f:40399 | byte_before 0xf2:36744 '\u{1e}':34374 0xd0:-31884 '\'':31566 0xf3:28430 'W':27911 'K':27861 0x9b:-26704 0x85:26605 ']':-25824
+FOUND_PAIRS rank=1 (pair:sign:cells, by n·c²) ' ''p':1:6606 'c''h':-1:4554 ' ''m':1:3434 ' ''h':-1:2260 '.''m':1:694 'm''p':1:3527 ' ''P':1:880 ' ''b':1:4449 ' ''l':1:4227 'i''m':1:2271 'i''v':1:5051 'e''p':1:2468
+HELD_OUT rank=1 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.702:0.778 lean=0.591/0.590:0.516 rust=0.530/0.531:2.310 digits=0.655/0.652:-0.034 all=0.621/0.619:0.831 elapsed_ms=102612
+FOUND_STEP rank=2 step=0 factor=current_byte power_steps=21 drop_permille_of_tension=0.406 elapsed_ms=103033
+FOUND_STEP rank=2 step=1 factor=byte_before power_steps=5 drop_permille_of_tension=0.514 elapsed_ms=103423
+FOUND_STEP rank=2 step=2 factor=current_byte power_steps=6 drop_permille_of_tension=0.550 elapsed_ms=103842
+FOUND_STEP rank=2 step=3 factor=byte_before power_steps=3 drop_permille_of_tension=0.562 elapsed_ms=104244
+FOUND_STEP rank=2 step=4 factor=current_byte power_steps=5 drop_permille_of_tension=0.572 elapsed_ms=104667
+FOUND_STEP rank=2 step=5 factor=byte_before power_steps=4 drop_permille_of_tension=0.583 elapsed_ms=105056
+FOUND_STEP rank=2 step=6 factor=current_byte power_steps=8 drop_permille_of_tension=0.594 elapsed_ms=105521
+FOUND_STEP rank=2 step=7 factor=byte_before power_steps=5 drop_permille_of_tension=0.606 elapsed_ms=105989
+FOUND_STEP rank=2 step=8 factor=current_byte power_steps=8 drop_permille_of_tension=0.622 elapsed_ms=106372
+FOUND_STEP rank=2 step=9 factor=byte_before power_steps=5 drop_permille_of_tension=0.641 elapsed_ms=106752
+FOUND_STEP rank=2 step=10 factor=current_byte power_steps=6 drop_permille_of_tension=0.663 elapsed_ms=107128
+FOUND_STEP rank=2 step=11 factor=byte_before power_steps=4 drop_permille_of_tension=0.679 elapsed_ms=107571
+FOUND_STEP rank=2 step=12 factor=current_byte power_steps=5 drop_permille_of_tension=0.691 elapsed_ms=107942
+FOUND_STEP rank=2 step=13 factor=byte_before power_steps=3 drop_permille_of_tension=0.698 elapsed_ms=108315
+FOUND_STEP rank=2 step=14 factor=current_byte power_steps=4 drop_permille_of_tension=0.702 elapsed_ms=108726
+FOUND_STEP rank=2 step=15 factor=byte_before power_steps=3 drop_permille_of_tension=0.706 elapsed_ms=109182
+FOUND_STEP rank=2 step=16 factor=current_byte power_steps=3 drop_permille_of_tension=0.710 elapsed_ms=109666
+FOUND_STEP rank=2 step=17 factor=byte_before power_steps=3 drop_permille_of_tension=0.713 elapsed_ms=110108
+FOUND_STEP rank=2 step=18 factor=current_byte power_steps=3 drop_permille_of_tension=0.716 elapsed_ms=110485
+FOUND_STEP rank=2 step=19 factor=byte_before power_steps=3 drop_permille_of_tension=0.717 elapsed_ms=110926
+FOUND_STEP rank=2 step=20 factor=current_byte power_steps=2 drop_permille_of_tension=0.718 elapsed_ms=111363
+FOUND_STEP rank=2 step=21 factor=byte_before power_steps=2 drop_permille_of_tension=0.718 elapsed_ms=111732
+FOUND_STEP rank=2 step=22 factor=current_byte power_steps=2 drop_permille_of_tension=0.718 elapsed_ms=112107
+FOUND_STEP rank=2 step=23 factor=byte_before power_steps=2 drop_permille_of_tension=0.719 elapsed_ms=112540
+FOUND_STEP rank=2 step=24 factor=current_byte power_steps=2 drop_permille_of_tension=0.719 elapsed_ms=112974
+FOUND_STEP rank=2 step=25 factor=byte_before power_steps=2 drop_permille_of_tension=0.719 elapsed_ms=113397
+FOUND_RANK rank=2 drop_permille_of_tension=0.719 cumulative_permille_of_tension=1.900 elapsed_ms=114396
+FOUND_CLASSES rank=2 (class:permille_of_its_tension) ' ':8.101 '\n':2.596 'I':2.447 'E':1.247 '*':0.898 '#':0.618 'D':0.546 0xb2:0.436 0x82:0.356 0xb7:0.342 'S':0.282 0xa6:0.268
+FOUND_BYTES rank=2 current_byte '*':41928 0xaa:-37642 'Z':36099 'T':35611 0xc5:-35158 0xa4:-34302 0xf1:-33956 0xa7:-32603 'D':32520 '\u{12}':31439 | byte_before 0xab:53097 0xb6:49800 0xb8:46950 'G':43239 'Q':43000 '\\':-40133 '}':39852 'U':38569 'N':35385 'A':32974
+FOUND_PAIRS rank=2 (pair:sign:cells, by n·c²) '}''\n':-1:1033 ')''\n':-1:1366 'c''e':-1:8816 ')'',':-1:1307 'c''o':-1:8176 'r''e':-1:19867 'A''T':1:381 '*''*':-1:3450 'o''n':-1:18894 'g''e':-1:4026 'n''e':-1:7453 'N''T':1:246
+HELD_OUT rank=2 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.701:2.374 lean=0.591/0.590:1.286 rust=0.530/0.531:1.769 digits=0.655/0.652:-0.043 all=0.621/0.618:1.349 elapsed_ms=114625
+FOUND_STEP rank=3 step=0 factor=current_byte power_steps=20 drop_permille_of_tension=0.377 elapsed_ms=115108
+FOUND_STEP rank=3 step=1 factor=byte_before power_steps=5 drop_permille_of_tension=0.509 elapsed_ms=115624
+FOUND_STEP rank=3 step=2 factor=current_byte power_steps=6 drop_permille_of_tension=0.554 elapsed_ms=116062
+FOUND_STEP rank=3 step=3 factor=byte_before power_steps=5 drop_permille_of_tension=0.570 elapsed_ms=116639
+FOUND_STEP rank=3 step=4 factor=current_byte power_steps=4 drop_permille_of_tension=0.577 elapsed_ms=117098
+FOUND_STEP rank=3 step=5 factor=byte_before power_steps=4 drop_permille_of_tension=0.579 elapsed_ms=117555
+FOUND_STEP rank=3 step=6 factor=current_byte power_steps=4 drop_permille_of_tension=0.581 elapsed_ms=117993
+FOUND_STEP rank=3 step=7 factor=byte_before power_steps=3 drop_permille_of_tension=0.582 elapsed_ms=118485
+FOUND_STEP rank=3 step=8 factor=current_byte power_steps=4 drop_permille_of_tension=0.583 elapsed_ms=119077
+FOUND_STEP rank=3 step=9 factor=byte_before power_steps=3 drop_permille_of_tension=0.583 elapsed_ms=119673
+FOUND_STEP rank=3 step=10 factor=current_byte power_steps=4 drop_permille_of_tension=0.584 elapsed_ms=120115
+FOUND_STEP rank=3 step=11 factor=byte_before power_steps=3 drop_permille_of_tension=0.585 elapsed_ms=120607
+FOUND_STEP rank=3 step=12 factor=current_byte power_steps=5 drop_permille_of_tension=0.587 elapsed_ms=121028
+FOUND_STEP rank=3 step=13 factor=byte_before power_steps=3 drop_permille_of_tension=0.589 elapsed_ms=121498
+FOUND_STEP rank=3 step=14 factor=current_byte power_steps=5 drop_permille_of_tension=0.591 elapsed_ms=122037
+FOUND_STEP rank=3 step=15 factor=byte_before power_steps=4 drop_permille_of_tension=0.595 elapsed_ms=122533
+FOUND_STEP rank=3 step=16 factor=current_byte power_steps=5 drop_permille_of_tension=0.601 elapsed_ms=123073
+FOUND_STEP rank=3 step=17 factor=byte_before power_steps=5 drop_permille_of_tension=0.612 elapsed_ms=123719
+FOUND_STEP rank=3 step=18 factor=current_byte power_steps=5 drop_permille_of_tension=0.631 elapsed_ms=124212
+FOUND_STEP rank=3 step=19 factor=byte_before power_steps=6 drop_permille_of_tension=0.662 elapsed_ms=124893
+FOUND_STEP rank=3 step=20 factor=current_byte power_steps=5 drop_permille_of_tension=0.707 elapsed_ms=125366
+FOUND_STEP rank=3 step=21 factor=byte_before power_steps=4 drop_permille_of_tension=0.748 elapsed_ms=125957
+FOUND_STEP rank=3 step=22 factor=current_byte power_steps=4 drop_permille_of_tension=0.779 elapsed_ms=126403
+FOUND_STEP rank=3 step=23 factor=byte_before power_steps=3 drop_permille_of_tension=0.798 elapsed_ms=127012
+FOUND_STEP rank=3 step=24 factor=current_byte power_steps=3 drop_permille_of_tension=0.808 elapsed_ms=127593
+FOUND_STEP rank=3 step=25 factor=byte_before power_steps=3 drop_permille_of_tension=0.814 elapsed_ms=128093
+FOUND_STEP rank=3 step=26 factor=current_byte power_steps=3 drop_permille_of_tension=0.817 elapsed_ms=128716
+FOUND_STEP rank=3 step=27 factor=byte_before power_steps=2 drop_permille_of_tension=0.819 elapsed_ms=129456
+FOUND_STEP rank=3 step=28 factor=current_byte power_steps=2 drop_permille_of_tension=0.820 elapsed_ms=129954
+FOUND_STEP rank=3 step=29 factor=byte_before power_steps=2 drop_permille_of_tension=0.821 elapsed_ms=130639
+FOUND_STEP rank=3 step=30 factor=current_byte power_steps=2 drop_permille_of_tension=0.822 elapsed_ms=131286
+FOUND_STEP rank=3 step=31 factor=byte_before power_steps=2 drop_permille_of_tension=0.822 elapsed_ms=131921
+FOUND_STEP rank=3 step=32 factor=current_byte power_steps=2 drop_permille_of_tension=0.822 elapsed_ms=132517
+FOUND_STEP rank=3 step=33 factor=byte_before power_steps=2 drop_permille_of_tension=0.823 elapsed_ms=133120
+FOUND_STEP rank=3 step=34 factor=current_byte power_steps=2 drop_permille_of_tension=0.823 elapsed_ms=133728
+FOUND_STEP rank=3 step=35 factor=byte_before power_steps=2 drop_permille_of_tension=0.823 elapsed_ms=134372
+FOUND_STEP rank=3 step=36 factor=current_byte power_steps=2 drop_permille_of_tension=0.824 elapsed_ms=135096
+FOUND_STEP rank=3 step=37 factor=byte_before power_steps=2 drop_permille_of_tension=0.824 elapsed_ms=135700
+FOUND_STEP rank=3 step=38 factor=current_byte power_steps=2 drop_permille_of_tension=0.824 elapsed_ms=136206
+FOUND_STEP rank=3 step=39 factor=byte_before power_steps=2 drop_permille_of_tension=0.824 elapsed_ms=137032
+FOUND_STEP rank=3 step=40 factor=current_byte power_steps=2 drop_permille_of_tension=0.824 elapsed_ms=137526
+FOUND_STEP rank=3 step=41 factor=byte_before power_steps=2 drop_permille_of_tension=0.824 elapsed_ms=138033
+FOUND_STEP rank=3 step=42 factor=current_byte power_steps=2 drop_permille_of_tension=0.825 elapsed_ms=138617
+FOUND_STEP rank=3 step=43 factor=byte_before power_steps=2 drop_permille_of_tension=0.825 elapsed_ms=139125
+FOUND_STEP rank=3 step=44 factor=current_byte power_steps=2 drop_permille_of_tension=0.825 elapsed_ms=139669
+FOUND_STEP rank=3 step=45 factor=byte_before power_steps=2 drop_permille_of_tension=0.825 elapsed_ms=140162
+FOUND_STEP rank=3 step=46 factor=current_byte power_steps=2 drop_permille_of_tension=0.825 elapsed_ms=140693
+FOUND_STEP rank=3 step=47 factor=byte_before power_steps=2 drop_permille_of_tension=0.825 elapsed_ms=141154
+FOUND_STEP rank=3 step=48 factor=current_byte power_steps=2 drop_permille_of_tension=0.825 elapsed_ms=141548
+FOUND_STEP rank=3 step=49 factor=byte_before power_steps=2 drop_permille_of_tension=0.825 elapsed_ms=141926
+FOUND_RANK rank=3 drop_permille_of_tension=0.825 cumulative_permille_of_tension=2.725 elapsed_ms=142976
+FOUND_CLASSES rank=3 (class:permille_of_its_tension) 'e':9.749 'o':3.887 'i':1.301 'y':0.722 'd':0.483 0x82:0.457 0x9d:0.415 'a':0.245 's':0.164 'h':0.134 't':0.130 'r':0.129
+FOUND_BYTES rank=3 current_byte 0xf0:-33645 'v':32637 0xa3:29448 0x84:-28385 'Z':26691 0xd8:26671 0x9b:24699 0x8f:24653 0xb3:23611 0xc3:-23388 | byte_before '^':45142 'j':44669 '>':41235 'p':37467 '%':36925 '\u{1b}':-35001 'z':34989 0xbd:34687 'w':34554 'P':33757
+FOUND_PAIRS rank=3 (pair:sign:cells, by n·c²) 'i''v':-1:5051 'i''n':-1:17124 ' ''d':1:4302 ' ''n':1:3856 ' ''v':1:901 'w''n':1:755 'w''h':-1:1553 'p''r':1:3024 'p''h':-1:920 't''h':-1:16917 ' ''f':1:6464 'p''l':-1:2740
+HELD_OUT rank=3 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.700:3.166 lean=0.591/0.589:2.493 rust=0.530/0.530:3.300 digits=0.655/0.652:-0.054 all=0.621/0.618:2.187 elapsed_ms=143205
+FOUND_STEP rank=4 step=0 factor=current_byte power_steps=18 drop_permille_of_tension=0.364 elapsed_ms=143635
+FOUND_STEP rank=4 step=1 factor=byte_before power_steps=5 drop_permille_of_tension=0.513 elapsed_ms=144093
+FOUND_STEP rank=4 step=2 factor=current_byte power_steps=4 drop_permille_of_tension=0.546 elapsed_ms=144481
+FOUND_STEP rank=4 step=3 factor=byte_before power_steps=5 drop_permille_of_tension=0.557 elapsed_ms=144868
+FOUND_STEP rank=4 step=4 factor=current_byte power_steps=4 drop_permille_of_tension=0.564 elapsed_ms=145317
+FOUND_STEP rank=4 step=5 factor=byte_before power_steps=6 drop_permille_of_tension=0.571 elapsed_ms=145719
+FOUND_STEP rank=4 step=6 factor=current_byte power_steps=5 drop_permille_of_tension=0.581 elapsed_ms=146579
+FOUND_STEP rank=4 step=7 factor=byte_before power_steps=6 drop_permille_of_tension=0.596 elapsed_ms=147050
+FOUND_STEP rank=4 step=8 factor=current_byte power_steps=5 drop_permille_of_tension=0.616 elapsed_ms=147463
+FOUND_STEP rank=4 step=9 factor=byte_before power_steps=6 drop_permille_of_tension=0.640 elapsed_ms=147878
+FOUND_STEP rank=4 step=10 factor=current_byte power_steps=4 drop_permille_of_tension=0.664 elapsed_ms=148331
+FOUND_STEP rank=4 step=11 factor=byte_before power_steps=5 drop_permille_of_tension=0.684 elapsed_ms=148780
+FOUND_STEP rank=4 step=12 factor=current_byte power_steps=4 drop_permille_of_tension=0.698 elapsed_ms=149215
+FOUND_STEP rank=4 step=13 factor=byte_before power_steps=4 drop_permille_of_tension=0.709 elapsed_ms=149635
+FOUND_STEP rank=4 step=14 factor=current_byte power_steps=4 drop_permille_of_tension=0.716 elapsed_ms=150043
+FOUND_STEP rank=4 step=15 factor=byte_before power_steps=4 drop_permille_of_tension=0.722 elapsed_ms=150445
+FOUND_STEP rank=4 step=16 factor=current_byte power_steps=3 drop_permille_of_tension=0.726 elapsed_ms=150876
+FOUND_STEP rank=4 step=17 factor=byte_before power_steps=3 drop_permille_of_tension=0.728 elapsed_ms=151286
+FOUND_STEP rank=4 step=18 factor=current_byte power_steps=3 drop_permille_of_tension=0.730 elapsed_ms=151672
+FOUND_STEP rank=4 step=19 factor=byte_before power_steps=3 drop_permille_of_tension=0.731 elapsed_ms=152131
+FOUND_STEP rank=4 step=20 factor=current_byte power_steps=3 drop_permille_of_tension=0.732 elapsed_ms=152543
+FOUND_STEP rank=4 step=21 factor=byte_before power_steps=2 drop_permille_of_tension=0.732 elapsed_ms=152985
+FOUND_STEP rank=4 step=22 factor=current_byte power_steps=2 drop_permille_of_tension=0.733 elapsed_ms=153483
+FOUND_STEP rank=4 step=23 factor=byte_before power_steps=2 drop_permille_of_tension=0.733 elapsed_ms=153878
+FOUND_STEP rank=4 step=24 factor=current_byte power_steps=2 drop_permille_of_tension=0.733 elapsed_ms=154348
+FOUND_STEP rank=4 step=25 factor=byte_before power_steps=2 drop_permille_of_tension=0.733 elapsed_ms=155087
+FOUND_STEP rank=4 step=26 factor=current_byte power_steps=2 drop_permille_of_tension=0.734 elapsed_ms=155881
+FOUND_STEP rank=4 step=27 factor=byte_before power_steps=2 drop_permille_of_tension=0.734 elapsed_ms=156399
+FOUND_STEP rank=4 step=28 factor=current_byte power_steps=2 drop_permille_of_tension=0.734 elapsed_ms=157026
+FOUND_STEP rank=4 step=29 factor=byte_before power_steps=2 drop_permille_of_tension=0.734 elapsed_ms=157560
+FOUND_STEP rank=4 step=30 factor=current_byte power_steps=2 drop_permille_of_tension=0.735 elapsed_ms=158084
+FOUND_STEP rank=4 step=31 factor=byte_before power_steps=2 drop_permille_of_tension=0.735 elapsed_ms=158543
+FOUND_STEP rank=4 step=32 factor=current_byte power_steps=2 drop_permille_of_tension=0.735 elapsed_ms=159006
+FOUND_STEP rank=4 step=33 factor=byte_before power_steps=2 drop_permille_of_tension=0.735 elapsed_ms=159455
+FOUND_STEP rank=4 step=34 factor=current_byte power_steps=2 drop_permille_of_tension=0.736 elapsed_ms=159874
+FOUND_STEP rank=4 step=35 factor=byte_before power_steps=2 drop_permille_of_tension=0.736 elapsed_ms=160312
+FOUND_STEP rank=4 step=36 factor=current_byte power_steps=2 drop_permille_of_tension=0.736 elapsed_ms=160738
+FOUND_STEP rank=4 step=37 factor=byte_before power_steps=2 drop_permille_of_tension=0.736 elapsed_ms=161137
+FOUND_STEP rank=4 step=38 factor=current_byte power_steps=2 drop_permille_of_tension=0.737 elapsed_ms=161568
+FOUND_STEP rank=4 step=39 factor=byte_before power_steps=2 drop_permille_of_tension=0.737 elapsed_ms=161987
+FOUND_STEP rank=4 step=40 factor=current_byte power_steps=2 drop_permille_of_tension=0.737 elapsed_ms=162448
+FOUND_STEP rank=4 step=41 factor=byte_before power_steps=2 drop_permille_of_tension=0.737 elapsed_ms=163013
+FOUND_STEP rank=4 step=42 factor=current_byte power_steps=2 drop_permille_of_tension=0.737 elapsed_ms=163466
+FOUND_STEP rank=4 step=43 factor=byte_before power_steps=2 drop_permille_of_tension=0.737 elapsed_ms=163871
+FOUND_STEP rank=4 step=44 factor=current_byte power_steps=2 drop_permille_of_tension=0.737 elapsed_ms=164285
+FOUND_STEP rank=4 step=45 factor=byte_before power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=164733
+FOUND_STEP rank=4 step=46 factor=current_byte power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=165154
+FOUND_STEP rank=4 step=47 factor=byte_before power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=165649
+FOUND_STEP rank=4 step=48 factor=current_byte power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=166173
+FOUND_STEP rank=4 step=49 factor=byte_before power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=166597
+FOUND_STEP rank=4 step=50 factor=current_byte power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=167022
+FOUND_STEP rank=4 step=51 factor=byte_before power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=167440
+FOUND_STEP rank=4 step=52 factor=current_byte power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=167830
+FOUND_STEP rank=4 step=53 factor=byte_before power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=168277
+FOUND_STEP rank=4 step=54 factor=current_byte power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=168655
+FOUND_STEP rank=4 step=55 factor=byte_before power_steps=2 drop_permille_of_tension=0.738 elapsed_ms=169068
+FOUND_RANK rank=4 drop_permille_of_tension=0.738 cumulative_permille_of_tension=3.463 elapsed_ms=170131
+FOUND_CLASSES rank=4 (class:permille_of_its_tension) 'n':12.851 'd':3.002 't':2.290 'c':1.778 'm':1.643 'r':0.985 'l':0.220 0xb2:0.182 0xb8:0.174 ' ':0.120 0xa3:0.100 'v':0.095
+FOUND_BYTES rank=4 current_byte 'O':-41050 'a':34560 0x8f:33431 0x9f:-29718 0x9c:29327 0xe1:28338 '!':28046 'Y':-27593 '\u{19}':25043 '~':24101 | byte_before '?':-37695 0xa3:18113 'b':17949 0xc3:17298 0xbc:16536 0x8c:16348 'K':16035 0xdf:15339 '#':-15180 0xf9:14233
+FOUND_PAIRS rank=4 (pair:sign:cells, by n·c²) 'h''a':1:4890 'r''a':-1:8525 ' ''a':-1:15541 'e''a':1:5283 'p''a':1:3629 'b''a':1:692 'a''n':1:11938 'm''a':1:3924 'v''a':1:1415 'e''n':1:11050 'o''n':1:18894 'c''a':1:4460
+HELD_OUT rank=4 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.708/0.700:3.846 lean=0.591/0.589:2.797 rust=0.530/0.530:2.936 digits=0.655/0.652:-0.052 all=0.621/0.618:2.374 elapsed_ms=170425
+MEASURE exit=0 wall_s=170.5 peak_rss_kib=132316

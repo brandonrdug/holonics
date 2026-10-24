@@ -1,0 +1,606 @@
+OBSERVER all
+CODE forward seen   *   all content  bits_a_digit=2.126 n=3456
+CODE forward seen   *   all scale    bits_a_digit=0.280 n=286
+CODE forward seen   *   line end     bits_a_digit=0.002 n=1045
+CODE forward seen   *   place 0      bits_a_digit=1.626 n=788
+CODE forward seen   *   place 1      bits_a_digit=3.281 n=990
+CODE forward seen   *   place 2      bits_a_digit=2.555 n=969
+CODE forward seen   *   place 3      bits_a_digit=0.484 n=709
+CODE forward seen   *   scale        bits_a_digit=0.280 n=286
+CODE forward seen   +   all content  bits_a_digit=0.404 n=2223
+CODE forward seen   +   all scale    bits_a_digit=0.612 n=120
+CODE forward seen   +   line end     bits_a_digit=0.006 n=945
+CODE forward seen   +   place 0      bits_a_digit=0.656 n=837
+CODE forward seen   +   place 1      bits_a_digit=0.360 n=929
+CODE forward seen   +   place 2      bits_a_digit=0.031 n=457
+CODE forward seen   +   scale        bits_a_digit=0.612 n=120
+CODE forward seen   -   all content  bits_a_digit=1.358 n=874
+CODE forward seen   -   all scale    bits_a_digit=0.847 n=52
+CODE forward seen   -   line end     bits_a_digit=0.017 n=509
+CODE forward seen   -   place 0      bits_a_digit=1.941 n=457
+CODE forward seen   -   place 1      bits_a_digit=0.718 n=417
+CODE forward seen   -   scale        bits_a_digit=0.847 n=52
+CODE forward seen   all all content  bits_a_digit=1.439 n=6553
+CODE forward seen   all all scale    bits_a_digit=0.431 n=458
+CODE forward unseen *   all content  bits_a_digit=2.167 n=3276
+CODE forward unseen *   all scale    bits_a_digit=0.309 n=314
+CODE forward unseen *   line end     bits_a_digit=0.001 n=1015
+CODE forward unseen *   place 0      bits_a_digit=1.657 n=737
+CODE forward unseen *   place 1      bits_a_digit=3.338 n=956
+CODE forward unseen *   place 2      bits_a_digit=2.462 n=936
+CODE forward unseen *   place 3      bits_a_digit=0.593 n=647
+CODE forward unseen *   scale        bits_a_digit=0.309 n=314
+CODE forward unseen +   all content  bits_a_digit=0.384 n=2337
+CODE forward unseen +   all scale    bits_a_digit=0.669 n=127
+CODE forward unseen +   line end     bits_a_digit=0.003 n=982
+CODE forward unseen +   place 0      bits_a_digit=0.601 n=869
+CODE forward unseen +   place 1      bits_a_digit=0.369 n=965
+CODE forward unseen +   place 2      bits_a_digit=0.040 n=503
+CODE forward unseen +   scale        bits_a_digit=0.669 n=127
+CODE forward unseen -   all content  bits_a_digit=1.401 n=870
+CODE forward unseen -   all scale    bits_a_digit=1.276 n=36
+CODE forward unseen -   line end     bits_a_digit=0.031 n=502
+CODE forward unseen -   place 0      bits_a_digit=2.002 n=466
+CODE forward unseen -   place 1      bits_a_digit=0.709 n=404
+CODE forward unseen -   scale        bits_a_digit=1.276 n=36
+CODE forward unseen all all content  bits_a_digit=1.422 n=6483
+CODE forward unseen all all scale    bits_a_digit=0.478 n=477
+SHARED forward seen   * length  237/245
+SHARED forward seen   * mod 10  141/245
+SHARED forward seen   * mod 11  21/245
+SHARED forward seen   * mod 2   241/245
+SHARED forward seen   * mod 5   141/245
+SHARED forward seen   * mod 9   36/245
+SHARED forward seen   * word    9/245
+SHARED forward seen   + length  237/238
+SHARED forward seen   + mod 10  190/238
+SHARED forward seen   + mod 11  174/238
+SHARED forward seen   + mod 2   201/238
+SHARED forward seen   + mod 5   191/238
+SHARED forward seen   + mod 9   179/238
+SHARED forward seen   + word    173/238
+SHARED forward seen   - length  103/117
+SHARED forward seen   - mod 10  66/117
+SHARED forward seen   - mod 11  48/117
+SHARED forward seen   - mod 2   79/117
+SHARED forward seen   - mod 5   68/117
+SHARED forward seen   - mod 9   54/117
+SHARED forward seen   - word    45/117
+SHARED forward unseen * length  215/224
+SHARED forward unseen * mod 10  125/224
+SHARED forward unseen * mod 11  20/224
+SHARED forward unseen * mod 2   218/224
+SHARED forward unseen * mod 5   127/224
+SHARED forward unseen * mod 9   38/224
+SHARED forward unseen * word    9/224
+SHARED forward unseen + length  237/241
+SHARED forward unseen + mod 10  194/241
+SHARED forward unseen + mod 11  178/241
+SHARED forward unseen + mod 2   203/241
+SHARED forward unseen + mod 5   196/241
+SHARED forward unseen + mod 9   180/241
+SHARED forward unseen + word    177/241
+SHARED forward unseen - length  117/135
+SHARED forward unseen - mod 10  73/135
+SHARED forward unseen - mod 11  64/135
+SHARED forward unseen - mod 2   84/135
+SHARED forward unseen - mod 5   75/135
+SHARED forward unseen - mod 9   59/135
+SHARED forward unseen - word    57/135
+READING forward seen   carried sum's wrong tens are the tens without the carry: 13/17
+READING forward seen   difference's wrong units are the sum's units: 2/51
+READING forward unseen carried sum's wrong tens are the tens without the carry: 15/17
+READING forward unseen difference's wrong units are the sum's units: 0/62
+RING forward seen   * mod  2 shares a prime 186/189
+RING forward seen   * mod  2 units          55/56
+RING forward seen   * mod  5 shares a prime 93/95
+RING forward seen   * mod  5 units          48/150
+RING forward seen   * mod  9 shares a prime 18/132
+RING forward seen   * mod  9 units          18/113
+RING forward seen   * mod 10 shares a prime 128/216
+RING forward seen   * mod 10 units          13/29
+RING forward seen   * mod 11 shares a prime 10/59
+RING forward seen   * mod 11 units          11/186
+RING forward seen   + mod  2 shares a prime 155/172
+RING forward seen   + mod  2 units          46/66
+RING forward seen   + mod  5 shares a prime 76/91
+RING forward seen   + mod  5 units          115/147
+RING forward seen   + mod  9 shares a prime 100/138
+RING forward seen   + mod  9 units          79/100
+RING forward seen   + mod 10 shares a prime 164/198
+RING forward seen   + mod 10 units          26/40
+RING forward seen   + mod 11 shares a prime 34/42
+RING forward seen   + mod 11 units          140/196
+RING forward seen   - mod  2 shares a prime 54/79
+RING forward seen   - mod  2 units          25/38
+RING forward seen   - mod  5 shares a prime 21/36
+RING forward seen   - mod  5 units          47/81
+RING forward seen   - mod  9 shares a prime 39/72
+RING forward seen   - mod  9 units          15/45
+RING forward seen   - mod 10 shares a prime 49/89
+RING forward seen   - mod 10 units          17/28
+RING forward seen   - mod 11 shares a prime 10/20
+RING forward seen   - mod 11 units          38/97
+RING forward unseen * mod  2 shares a prime 152/157
+RING forward unseen * mod  2 units          66/67
+RING forward unseen * mod  5 shares a prime 84/84
+RING forward unseen * mod  5 units          43/140
+RING forward unseen * mod  9 shares a prime 23/126
+RING forward unseen * mod  9 units          15/98
+RING forward unseen * mod 10 shares a prime 106/184
+RING forward unseen * mod 10 units          19/40
+RING forward unseen * mod 11 shares a prime 5/38
+RING forward unseen * mod 11 units          15/186
+RING forward unseen + mod  2 shares a prime 153/175
+RING forward unseen + mod  2 units          50/65
+RING forward unseen + mod  5 shares a prime 62/77
+RING forward unseen + mod  5 units          134/163
+RING forward unseen + mod  9 shares a prime 105/141
+RING forward unseen + mod  9 units          75/99
+RING forward unseen + mod 10 shares a prime 159/194
+RING forward unseen + mod 10 units          35/46
+RING forward unseen + mod 11 shares a prime 35/47
+RING forward unseen + mod 11 units          143/193
+RING forward unseen - mod  2 shares a prime 58/90
+RING forward unseen - mod  2 units          26/45
+RING forward unseen - mod  5 shares a prime 28/51
+RING forward unseen - mod  5 units          47/84
+RING forward unseen - mod  9 shares a prime 30/69
+RING forward unseen - mod  9 units          29/66
+RING forward unseen - mod 10 shares a prime 59/107
+RING forward unseen - mod 10 units          14/28
+RING forward unseen - mod 11 shares a prime 9/20
+RING forward unseen - mod 11 units          55/115
+SUM_TENS forward seen   no carry      120/132
+SUM_TENS forward seen   units carried 89/106
+SUM_TENS forward unseen no carry      122/133
+SUM_TENS forward unseen units carried 90/107
+ONE_DIGIT_DIFFERENCE forward seen   first written 1:3 1+:14
+ONE_DIGIT_DIFFERENCE forward unseen first written 1:8 1+:16 9:1
+SUM_UNITS_STEPS forward seen   0:190 1:29 2:8 3:7 4:3 5:1
+SUM_UNITS_STEPS forward unseen 0:194 1:29 2:7 3:6 4:2 5:2
+SHOWN unseen 74-72=1
+SHOWN seen   68*39=2336
+SHOWN unseen 92*65=6040
+SHOWN seen   7*98=662
+SHOWN unseen 85-42=43
+SHOWN seen   45*31=1365
+SHOWN unseen 46*15=610
+SHOWN seen   82+3=82
+SHOWN unseen 71+41=112
+SHOWN seen   54-10=45
+SHOWN unseen 86-43=43
+SHOWN seen   72+15=87
+SHOWN unseen 83*27=2649
+SHOWN seen   1*35=17
+SHOWN unseen 73+31=104
+SHOWN seen   15+77=92
+SHOWN unseen 14*39=534
+SHOWN seen   30-15=15
+SHOWN unseen 23+51=74
+SHOWN seen   12-9=10
+SHOWN unseen 56+3=57
+SHOWN seen   93*33=3469
+SHOWN unseen 53+18=71
+SHOWN seen   8+20=38
+SHOWN unseen 80+14=94
+SHOWN seen   44*92=4886
+SHOWN unseen 8+82=90
+SHOWN seen   50+4=50
+SHOWN unseen 47-20=27
+SHOWN seen   44-34=10
+SHOWN unseen 12*35=490
+SHOWN seen   87+87=174
+SHOWN unseen 6+77=83
+SHOWN seen   20-4=12
+SHOWN unseen 99-56=43
+SHOWN seen   63+47=110
+SHOWN unseen 67-56=11
+SHOWN seen   73-12=61
+SHOWN unseen 6+10=18
+SHOWN seen   48+89=137
+SHOWN unseen 94-27=67
+SHOWN seen   75+17=93
+SHOWN unseen 6+18=34
+SHOWN seen   99*2=169
+SHOWN unseen 57+7=61
+SHOWN seen   93+72=165
+SHOWN unseen 61*51=3531
+SHOWN seen   46+97=143
+SHOWN unseen 31+73=104
+SHOWN seen   32+25=57
+SHOWN unseen 65-62=12
+SHOWN seen   48-13=35
+SHOWN unseen 96*62=6310
+SHOWN seen   64-6=52
+SHOWN unseen 5*17=135
+SHOWN seen   28*75=2060
+SHOWN unseen 59+37=96
+SHOWN seen   2*86=244
+SHOWN unseen 85+99=184
+SHOWN seen   16*81=1396
+OBSERVER first
+CODE forward seen   *   all content  bits_a_digit=2.130 n=3232
+CODE forward seen   *   all scale    bits_a_digit=0.279 n=265
+CODE forward seen   *   line end     bits_a_digit=0.002 n=978
+CODE forward seen   *   place 0      bits_a_digit=1.630 n=740
+CODE forward seen   *   place 1      bits_a_digit=3.285 n=926
+CODE forward seen   *   place 2      bits_a_digit=2.547 n=906
+CODE forward seen   *   place 3      bits_a_digit=0.496 n=660
+CODE forward seen   *   scale        bits_a_digit=0.279 n=265
+CODE forward seen   +   all content  bits_a_digit=0.399 n=2125
+CODE forward seen   +   all scale    bits_a_digit=0.633 n=115
+CODE forward seen   +   line end     bits_a_digit=0.006 n=902
+CODE forward seen   +   place 0      bits_a_digit=0.648 n=799
+CODE forward seen   +   place 1      bits_a_digit=0.357 n=886
+CODE forward seen   +   place 2      bits_a_digit=0.032 n=440
+CODE forward seen   +   scale        bits_a_digit=0.633 n=115
+CODE forward seen   -   all content  bits_a_digit=1.358 n=874
+CODE forward seen   -   all scale    bits_a_digit=0.847 n=52
+CODE forward seen   -   line end     bits_a_digit=0.017 n=509
+CODE forward seen   -   place 0      bits_a_digit=1.941 n=457
+CODE forward seen   -   place 1      bits_a_digit=0.718 n=417
+CODE forward seen   -   scale        bits_a_digit=0.847 n=52
+CODE forward seen   all all content  bits_a_digit=1.431 n=6231
+CODE forward seen   all all scale    bits_a_digit=0.442 n=432
+CODE forward unseen *   all content  bits_a_digit=2.170 n=1650
+CODE forward unseen *   all scale    bits_a_digit=0.299 n=157
+CODE forward unseen *   line end     bits_a_digit=0.002 n=511
+CODE forward unseen *   place 0      bits_a_digit=1.637 n=372
+CODE forward unseen *   place 1      bits_a_digit=3.348 n=481
+CODE forward unseen *   place 2      bits_a_digit=2.481 n=471
+CODE forward unseen *   place 3      bits_a_digit=0.592 n=326
+CODE forward unseen *   scale        bits_a_digit=0.299 n=157
+CODE forward unseen +   all content  bits_a_digit=0.372 n=1182
+CODE forward unseen +   all scale    bits_a_digit=0.605 n=65
+CODE forward unseen +   line end     bits_a_digit=0.001 n=497
+CODE forward unseen +   place 0      bits_a_digit=0.599 n=439
+CODE forward unseen +   place 1      bits_a_digit=0.348 n=488
+CODE forward unseen +   place 2      bits_a_digit=0.026 n=255
+CODE forward unseen +   scale        bits_a_digit=0.605 n=65
+CODE forward unseen -   all content  bits_a_digit=1.401 n=870
+CODE forward unseen -   all scale    bits_a_digit=1.276 n=36
+CODE forward unseen -   line end     bits_a_digit=0.031 n=502
+CODE forward unseen -   place 0      bits_a_digit=2.002 n=466
+CODE forward unseen -   place 1      bits_a_digit=0.709 n=404
+CODE forward unseen -   scale        bits_a_digit=1.276 n=36
+CODE forward unseen all all content  bits_a_digit=1.415 n=3702
+CODE forward unseen all all scale    bits_a_digit=0.512 n=258
+SHARED forward seen   * length  231/239
+SHARED forward seen   * mod 10  136/239
+SHARED forward seen   * mod 11  20/239
+SHARED forward seen   * mod 2   235/239
+SHARED forward seen   * mod 5   136/239
+SHARED forward seen   * mod 9   36/239
+SHARED forward seen   * word    9/239
+SHARED forward seen   + length  235/236
+SHARED forward seen   + mod 10  188/236
+SHARED forward seen   + mod 11  172/236
+SHARED forward seen   + mod 2   199/236
+SHARED forward seen   + mod 5   189/236
+SHARED forward seen   + mod 9   177/236
+SHARED forward seen   + word    171/236
+SHARED forward seen   - length  103/117
+SHARED forward seen   - mod 10  66/117
+SHARED forward seen   - mod 11  48/117
+SHARED forward seen   - mod 2   79/117
+SHARED forward seen   - mod 5   68/117
+SHARED forward seen   - mod 9   54/117
+SHARED forward seen   - word    45/117
+SHARED forward unseen * length  185/193
+SHARED forward unseen * mod 10  109/193
+SHARED forward unseen * mod 11  18/193
+SHARED forward unseen * mod 2   188/193
+SHARED forward unseen * mod 5   111/193
+SHARED forward unseen * mod 9   35/193
+SHARED forward unseen * word    9/193
+SHARED forward unseen + length  204/208
+SHARED forward unseen + mod 10  169/208
+SHARED forward unseen + mod 11  155/208
+SHARED forward unseen + mod 2   176/208
+SHARED forward unseen + mod 5   171/208
+SHARED forward unseen + mod 9   157/208
+SHARED forward unseen + word    154/208
+SHARED forward unseen - length  117/135
+SHARED forward unseen - mod 10  73/135
+SHARED forward unseen - mod 11  64/135
+SHARED forward unseen - mod 2   84/135
+SHARED forward unseen - mod 5   75/135
+SHARED forward unseen - mod 9   59/135
+SHARED forward unseen - word    57/135
+READING forward seen   carried sum's wrong tens are the tens without the carry: 13/17
+READING forward seen   difference's wrong units are the sum's units: 2/51
+READING forward unseen carried sum's wrong tens are the tens without the carry: 14/16
+READING forward unseen difference's wrong units are the sum's units: 0/62
+RING forward seen   * mod  2 shares a prime 180/183
+RING forward seen   * mod  2 units          55/56
+RING forward seen   * mod  5 shares a prime 91/93
+RING forward seen   * mod  5 units          45/146
+RING forward seen   * mod  9 shares a prime 18/129
+RING forward seen   * mod  9 units          18/110
+RING forward seen   * mod 10 shares a prime 123/210
+RING forward seen   * mod 10 units          13/29
+RING forward seen   * mod 11 shares a prime 9/56
+RING forward seen   * mod 11 units          11/183
+RING forward seen   + mod  2 shares a prime 153/170
+RING forward seen   + mod  2 units          46/66
+RING forward seen   + mod  5 shares a prime 75/90
+RING forward seen   + mod  5 units          114/146
+RING forward seen   + mod  9 shares a prime 98/136
+RING forward seen   + mod  9 units          79/100
+RING forward seen   + mod 10 shares a prime 162/196
+RING forward seen   + mod 10 units          26/40
+RING forward seen   + mod 11 shares a prime 33/41
+RING forward seen   + mod 11 units          139/195
+RING forward seen   - mod  2 shares a prime 54/79
+RING forward seen   - mod  2 units          25/38
+RING forward seen   - mod  5 shares a prime 21/36
+RING forward seen   - mod  5 units          47/81
+RING forward seen   - mod  9 shares a prime 39/72
+RING forward seen   - mod  9 units          15/45
+RING forward seen   - mod 10 shares a prime 49/89
+RING forward seen   - mod 10 units          17/28
+RING forward seen   - mod 11 shares a prime 10/20
+RING forward seen   - mod 11 units          38/97
+RING forward unseen * mod  2 shares a prime 133/137
+RING forward unseen * mod  2 units          55/56
+RING forward unseen * mod  5 shares a prime 76/76
+RING forward unseen * mod  5 units          35/117
+RING forward unseen * mod  9 shares a prime 21/113
+RING forward unseen * mod  9 units          14/80
+RING forward unseen * mod 10 shares a prime 93/160
+RING forward unseen * mod 10 units          16/33
+RING forward unseen * mod 11 shares a prime 4/35
+RING forward unseen * mod 11 units          14/158
+RING forward unseen + mod  2 shares a prime 130/148
+RING forward unseen + mod  2 units          46/59
+RING forward unseen + mod  5 shares a prime 50/64
+RING forward unseen + mod  5 units          121/143
+RING forward unseen + mod  9 shares a prime 91/119
+RING forward unseen + mod  9 units          66/88
+RING forward unseen + mod 10 shares a prime 137/166
+RING forward unseen + mod 10 units          32/41
+RING forward unseen + mod 11 shares a prime 29/38
+RING forward unseen + mod 11 units          126/169
+RING forward unseen - mod  2 shares a prime 58/90
+RING forward unseen - mod  2 units          26/45
+RING forward unseen - mod  5 shares a prime 28/51
+RING forward unseen - mod  5 units          47/84
+RING forward unseen - mod  9 shares a prime 30/69
+RING forward unseen - mod  9 units          29/66
+RING forward unseen - mod 10 shares a prime 59/107
+RING forward unseen - mod 10 units          14/28
+RING forward unseen - mod 11 shares a prime 9/20
+RING forward unseen - mod 11 units          55/115
+SUM_TENS forward seen   no carry      118/130
+SUM_TENS forward seen   units carried 89/106
+SUM_TENS forward unseen no carry      102/110
+SUM_TENS forward unseen units carried 81/97
+ONE_DIGIT_DIFFERENCE forward seen   first written 1:3 1+:14
+ONE_DIGIT_DIFFERENCE forward unseen first written 1:8 1+:16 9:1
+SUM_UNITS_STEPS forward seen   0:188 1:29 2:8 3:7 4:3 5:1
+SUM_UNITS_STEPS forward unseen 0:169 1:24 2:6 3:5 4:1 5:2
+SHOWN unseen 74-72=1
+SHOWN seen   68*39=2336
+SHOWN unseen 92*65=6040
+SHOWN seen   7*98=662
+SHOWN unseen 85-42=43
+SHOWN seen   45*31=1365
+SHOWN unseen 46*15=610
+SHOWN seen   82+3=82
+SHOWN unseen 71+41=112
+SHOWN seen   54-10=45
+SHOWN unseen 86-43=43
+SHOWN seen   72+15=87
+SHOWN unseen 83*27=2649
+SHOWN seen   1*35=17
+SHOWN unseen 73+31=104
+SHOWN seen   15+77=92
+SHOWN unseen 14*39=534
+SHOWN seen   30-15=15
+SHOWN unseen 23+51=74
+SHOWN seen   12-9=10
+SHOWN unseen 56+3=57
+SHOWN seen   93*33=3469
+SHOWN unseen 53+18=71
+SHOWN seen   8+20=38
+SHOWN unseen 80+14=94
+SHOWN seen   44*92=4886
+SHOWN unseen 8+82=90
+SHOWN seen   50+4=50
+SHOWN unseen 47-20=27
+SHOWN seen   44-34=10
+SHOWN unseen 12*35=490
+SHOWN seen   87+87=174
+SHOWN unseen 6+77=83
+SHOWN seen   20-4=12
+SHOWN unseen 99-56=43
+SHOWN seen   63+47=110
+SHOWN unseen 67-56=11
+SHOWN seen   73-12=61
+SHOWN unseen 6+10=18
+SHOWN seen   48+89=137
+SHOWN unseen 94-27=67
+SHOWN seen   75+17=93
+SHOWN unseen 6+18=34
+SHOWN seen   99*2=169
+SHOWN unseen 57+7=61
+SHOWN seen   93+72=165
+SHOWN unseen 61*51=3531
+SHOWN seen   46+97=143
+SHOWN seen   32+25=57
+SHOWN unseen 65-62=12
+SHOWN seen   48-13=35
+SHOWN unseen 96*62=6310
+SHOWN seen   64-6=52
+SHOWN unseen 5*17=135
+SHOWN seen   28*75=2060
+SHOWN unseen 59+37=96
+SHOWN seen   2*86=244
+SHOWN unseen 85+99=184
+SHOWN seen   16*81=1396
+SHOWN unseen 31*27=859
+OBSERVER again
+CODE forward seen   *   all content  bits_a_digit=2.076 n=224
+CODE forward seen   *   all scale    bits_a_digit=0.290 n=21
+CODE forward seen   *   line end     bits_a_digit=0.000 n=67
+CODE forward seen   *   place 0      bits_a_digit=1.563 n=48
+CODE forward seen   *   place 1      bits_a_digit=3.217 n=64
+CODE forward seen   *   place 2      bits_a_digit=2.667 n=63
+CODE forward seen   *   place 3      bits_a_digit=0.327 n=49
+CODE forward seen   *   scale        bits_a_digit=0.290 n=21
+CODE forward seen   +   all content  bits_a_digit=0.501 n=98
+CODE forward seen   +   all scale    bits_a_digit=0.131 n=5
+CODE forward seen   +   line end     bits_a_digit=0.000 n=43
+CODE forward seen   +   place 0      bits_a_digit=0.835 n=38
+CODE forward seen   +   place 1      bits_a_digit=0.403 n=43
+CODE forward seen   +   place 2      bits_a_digit=0.000 n=17
+CODE forward seen   +   scale        bits_a_digit=0.131 n=5
+CODE forward seen   all all content  bits_a_digit=1.597 n=322
+CODE forward seen   all all scale    bits_a_digit=0.259 n=26
+CODE forward unseen *   all content  bits_a_digit=2.165 n=1626
+CODE forward unseen *   all scale    bits_a_digit=0.319 n=157
+CODE forward unseen *   line end     bits_a_digit=0.001 n=504
+CODE forward unseen *   place 0      bits_a_digit=1.678 n=365
+CODE forward unseen *   place 1      bits_a_digit=3.327 n=475
+CODE forward unseen *   place 2      bits_a_digit=2.444 n=465
+CODE forward unseen *   place 3      bits_a_digit=0.593 n=321
+CODE forward unseen *   scale        bits_a_digit=0.319 n=157
+CODE forward unseen +   all content  bits_a_digit=0.397 n=1155
+CODE forward unseen +   all scale    bits_a_digit=0.735 n=62
+CODE forward unseen +   line end     bits_a_digit=0.005 n=485
+CODE forward unseen +   place 0      bits_a_digit=0.602 n=430
+CODE forward unseen +   place 1      bits_a_digit=0.391 n=477
+CODE forward unseen +   place 2      bits_a_digit=0.054 n=248
+CODE forward unseen +   scale        bits_a_digit=0.735 n=62
+CODE forward unseen all all content  bits_a_digit=1.431 n=2781
+CODE forward unseen all all scale    bits_a_digit=0.437 n=219
+SHARED forward seen   * length  6/6
+SHARED forward seen   * mod 10  5/6
+SHARED forward seen   * mod 11  1/6
+SHARED forward seen   * mod 2   6/6
+SHARED forward seen   * mod 5   5/6
+SHARED forward seen   * mod 9   0/6
+SHARED forward seen   * word    0/6
+SHARED forward seen   + length  2/2
+SHARED forward seen   + mod 10  2/2
+SHARED forward seen   + mod 11  2/2
+SHARED forward seen   + mod 2   2/2
+SHARED forward seen   + mod 5   2/2
+SHARED forward seen   + mod 9   2/2
+SHARED forward seen   + word    2/2
+SHARED forward unseen * length  30/31
+SHARED forward unseen * mod 10  16/31
+SHARED forward unseen * mod 11  2/31
+SHARED forward unseen * mod 2   30/31
+SHARED forward unseen * mod 5   16/31
+SHARED forward unseen * mod 9   3/31
+SHARED forward unseen * word    0/31
+SHARED forward unseen + length  33/33
+SHARED forward unseen + mod 10  25/33
+SHARED forward unseen + mod 11  23/33
+SHARED forward unseen + mod 2   27/33
+SHARED forward unseen + mod 5   25/33
+SHARED forward unseen + mod 9   23/33
+SHARED forward unseen + word    23/33
+READING forward unseen carried sum's wrong tens are the tens without the carry: 1/1
+RING forward seen   * mod  2 shares a prime 6/6
+RING forward seen   * mod  5 shares a prime 2/2
+RING forward seen   * mod  5 units          3/4
+RING forward seen   * mod  9 shares a prime 0/3
+RING forward seen   * mod  9 units          0/3
+RING forward seen   * mod 10 shares a prime 5/6
+RING forward seen   * mod 11 shares a prime 1/3
+RING forward seen   * mod 11 units          0/3
+RING forward seen   + mod  2 shares a prime 2/2
+RING forward seen   + mod  5 shares a prime 1/1
+RING forward seen   + mod  5 units          1/1
+RING forward seen   + mod  9 shares a prime 2/2
+RING forward seen   + mod 10 shares a prime 2/2
+RING forward seen   + mod 11 shares a prime 1/1
+RING forward seen   + mod 11 units          1/1
+RING forward unseen * mod  2 shares a prime 19/20
+RING forward unseen * mod  2 units          11/11
+RING forward unseen * mod  5 shares a prime 8/8
+RING forward unseen * mod  5 units          8/23
+RING forward unseen * mod  9 shares a prime 2/13
+RING forward unseen * mod  9 units          1/18
+RING forward unseen * mod 10 shares a prime 13/24
+RING forward unseen * mod 10 units          3/7
+RING forward unseen * mod 11 shares a prime 1/3
+RING forward unseen * mod 11 units          1/28
+RING forward unseen + mod  2 shares a prime 23/27
+RING forward unseen + mod  2 units          4/6
+RING forward unseen + mod  5 shares a prime 12/13
+RING forward unseen + mod  5 units          13/20
+RING forward unseen + mod  9 shares a prime 14/22
+RING forward unseen + mod  9 units          9/11
+RING forward unseen + mod 10 shares a prime 22/28
+RING forward unseen + mod 10 units          3/5
+RING forward unseen + mod 11 shares a prime 6/9
+RING forward unseen + mod 11 units          17/24
+SUM_TENS forward seen   no carry      2/2
+SUM_TENS forward unseen no carry      20/23
+SUM_TENS forward unseen units carried 9/10
+SUM_UNITS_STEPS forward seen   0:2
+SUM_UNITS_STEPS forward unseen 0:25 1:5 2:1 3:1 4:1
+SHOWN unseen 31+73=104
+SHOWN unseen 62+8=63
+SHOWN unseen 92+31=123
+SHOWN unseen 61+38=99
+SHOWN seen   18*90=1560
+SHOWN unseen 57*10=520
+SHOWN unseen 77+6=89
+SHOWN unseen 99+85=184
+SHOWN unseen 94*47=4984
+SHOWN unseen 19+84=103
+SHOWN unseen 27*83=2379
+SHOWN unseen 39*14=576
+SHOWN unseen 17+50=67
+SHOWN unseen 93+11=104
+SHOWN unseen 71+87=159
+SHOWN unseen 47+0=46
+SHOWN unseen 21+51=71
+SHOWN unseen 15*46=680
+SHOWN seen   55*76=4950
+SHOWN unseen 56+98=154
+SHOWN unseen 17*5=165
+SHOWN unseen 89*37=3953
+SHOWN unseen 24+30=54
+SHOWN unseen 17*32=518
+SHOWN unseen 89*4=332
+SHOWN unseen 12+17=30
+SHOWN unseen 46*71=3726
+SHOWN seen   81+14=95
+SHOWN unseen 92+91=184
+SHOWN unseen 79*25=2875
+SHOWN unseen 8*36=334
+SHOWN unseen 52+18=70
+SHOWN unseen 14*9=177
+SHOWN unseen 12+46=58
+SHOWN unseen 39+40=89
+SHOWN unseen 95+94=189
+SHOWN unseen 13*75=965
+SHOWN unseen 66+2=60
+SHOWN unseen 66*52=3166
+SHOWN seen   14*16=204
+SHOWN unseen 68*87=5904
+SHOWN unseen 51+23=64
+SHOWN unseen 43*77=3971
+SHOWN unseen 95*59=5955
+SHOWN unseen 17*53=929
+SHOWN unseen 86*31=2976
+SHOWN seen   66*59=3744
+SHOWN seen   0+86=86
+SHOWN unseen 79*91=7399
+SHOWN unseen 51+30=81
+SHOWN unseen 80+99=179
+SHOWN unseen 50*52=2700
+SHOWN unseen 72+47=119
+SHOWN unseen 95+66=161
+SHOWN seen   22*58=1164
+SHOWN unseen 97*31=3189
+SHOWN unseen 77+38=115
+SHOWN unseen 42+18=60
+SHOWN unseen 94*21=1904
+SHOWN unseen 22*53=1196

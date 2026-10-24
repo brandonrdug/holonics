@@ -1,0 +1,14 @@
+FOUND_PASS train_cells=4792 pairs=926 arriving=106 held_out_cells=48023 read_ms=3500
+FOUND_FACE brier_T=0.636 tension_S=0.620 tension_permille_of_T=974.732 elapsed_ms=4046
+FOUND_CEILING pairs=926 ceiling_drop_permille_of_tension=263.428 chance_permille=193.030 rounding=each_entry_within_926_halves elapsed_ms=4623
+FOUND_SPECTRUM (leading_k:permille_of_tension, at least) all:263.428 1:23.727 2:42.874 4:69.077 8:103.532 16:144.891 32:199.692 elapsed_ms=5726
+FOUND_DIRECTION 1 eigen_permille_of_tension=23.727 classes ' ':20504 'e':-5163 '\n':-3517 ',':-1388 'a':1306 '*':-1077 's':-1020 'i':-1006
+FOUND_DIRECTION 2 eigen_permille_of_tension=19.148 classes 'e':27894 'a':-11466 ' ':7331 'r':-5380 'o':-3215 '\n':-1955 'c':-1751 'd':-1699
+FOUND_DIRECTION 3 eigen_permille_of_tension=14.745 classes 'o':30004 'a':-19229 'l':-9165 'e':-4683 'i':4438 'r':1969 '\n':-1835 't':1477
+FOUND_DIRECTION 4 eigen_permille_of_tension=11.458 classes 'a':18540 'i':-15193 'l':-12567 'o':12307 'r':-11155 'e':7042 'd':3956 't':-3835
+FOUND_DIRECTION 5 eigen_permille_of_tension=10.324 classes 't':-31138 'r':29705 'i':-14338 'n':13849 'l':-5247 'e':4201 's':3771 'a':-3618
+FOUND_DIRECTION 6 eigen_permille_of_tension=9.150 classes 't':-25216 'i':24703 'r':-17123 'd':5901 'n':5497 'l':-4517 's':-4287 'p':3719
+FOUND_DIRECTION 7 eigen_permille_of_tension=7.969 classes 'l':32391 's':30255 'r':-27069 'i':-22911 'a':-15882 't':-14371 'e':-9425 'o':4914
+FOUND_DIRECTION 8 eigen_permille_of_tension=7.012 classes 'n':22109 'd':-20101 's':14032 'c':-10652 'i':7356 'l':-6934 'a':6804 't':6672
+HELD_OUT rank=0 (part=brier_T/residual) prose=0.702/0.702 lean=0.587/0.596 rust=0.520/0.537 digits=0.655/0.656 all=0.616/0.622 elapsed_ms=5822
+MEASURE exit=0 wall_s=5.8 peak_rss_kib=74112

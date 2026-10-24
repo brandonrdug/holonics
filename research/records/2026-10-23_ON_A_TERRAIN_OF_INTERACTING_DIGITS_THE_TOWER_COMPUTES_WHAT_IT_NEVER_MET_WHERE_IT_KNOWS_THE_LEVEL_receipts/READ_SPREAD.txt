@@ -1,0 +1,30 @@
+=== the news fork tower's state after pass 9 (LOOKS_AGAIN_NEWS_9.tsv), beside the plain pumped tower's after pass 9 (LOOKS_AGAIN_PUMPED_9.tsv)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	134	127	159	18	25	191	615	134	74	182	11	66	1.588	1.678	1.203
+-	135	35	28	50	6	13	124	445	35	100	94	5	71	3.858	3.979	3.510
+*	193	10	13	28	8	5	73	1287	10	183	12	11	10	6.361	6.267	5.931
+=== the plain pumped tower's state after pass 9 (LOOKS_AGAIN_PUMPED_9.tsv), beside the news fork tower's (LOOKS_AGAIN_NEWS_9.tsv)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	182	178	187	3	7	207	450	182	26	134	57	13	0.633	0.714	0.557
+-	135	94	93	102	4	5	134	309	94	41	35	68	10	1.338	1.372	1.104
+*	193	12	13	24	4	3	85	1187	12	181	10	9	6	6.012	5.957	5.688
+=== the news fork tower's state after pass 10 (LOOKS_AGAIN_NEWS_10.tsv), beside the plain pumped tower's after pass 10 (LOOKS_AGAIN_PUMPED_10.tsv)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	161	166	179	16	11	199	524	161	47	173	21	28	1.210	0.897	0.720
+-	135	98	98	109	11	11	133	341	98	37	105	18	25	1.007	1.009	0.798
+*	193	13	16	38	6	3	98	1159	13	180	14	11	9	5.517	5.429	5.146
+=== the plain pumped tower's state after pass 10 (LOOKS_AGAIN_PUMPED_10.tsv), beside the news fork tower's (LOOKS_AGAIN_NEWS_10.tsv)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	173	171	181	6	8	208	456	173	35	161	34	24	0.764	0.850	0.603
+-	135	105	107	114	7	5	134	315	105	30	98	22	13	1.025	1.110	0.847
+*	193	14	11	36	4	7	82	1206	14	179	13	6	8	5.701	5.665	5.369
+=== the news fork tower's state after pass 11 (LOOKS_AGAIN_NEWS.tsv), beside the plain pumped tower's after pass 11 (LOOKS_AGAIN_PUMPED_11.tsv)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	152	155	169	16	13	206	490	152	56	177	20	42	1.231	0.979	0.840
+-	135	97	97	110	8	8	128	348	97	38	87	28	18	1.019	0.954	0.767
+*	193	11	13	34	7	5	88	1238	11	182	21	6	14	5.823	5.660	5.353
+=== the plain pumped tower's state after pass 11 (LOOKS_AGAIN_PUMPED_11.tsv), beside the news fork tower's (LOOKS_AGAIN_NEWS.tsv)
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	177	179	184	6	4	207	437	177	31	152	46	19	0.659	0.685	0.539
+-	135	87	89	98	6	4	132	324	87	48	97	16	24	1.521	1.562	1.124
+*	193	21	17	36	2	6	99	1162	21	172	11	12	6	5.684	5.646	5.346

@@ -1,0 +1,24 @@
+95057b053c6c28aa
+FOUND_PASS train_cells=4792 pairs=926 arriving=106 held_out_cells=48023 read_ms=2972
+FOUND_FACE brier_T=0.636 tension_S=0.620 tension_permille_of_T=974.732 elapsed_ms=3475
+FOUND_FORM coordinates=4225 passed_over_face=0 passed_over_pool=3300 face_permille_of_T exact=25.268 search=25.268 pool_permille_of_tension=263.428 elapsed_ms=5145
+FOUND_FORM_SPECTRUM (leading_k:permille_of_tension, at the search grain) 1:23.727 2:42.874 4:69.077 8:103.532 16:144.891 32:199.692 elapsed_ms=6095
+FOUND_FORMS founded=32 elapsed_ms=6389
+FOUND_FORM_COORDINATE 1 eigen_permille_of_tension=23.727 held_out_unseen_cells=4466 unseen_permille_of_square=994.240 classes ' ':25532 'e':-6429 '\n':-4379 ',':-1729 'a':1626 '*':-1341 's':-1270 'i':-1252 | pairs (pair:sign:cells, by n·c²) 'd''y':-1:3 ' ''a':1:52 start'#':-1:1 'o''g':1:8 0xce0xa3:-1:3 'o''n':-1:58 'f''s':-1:1 '\n''-':-1:5 ' ''q':1:9 0x800xb2:1:7 '!'' ':1:15 0xa2')':-1:2
+FOUND_FORM_COORDINATE 2 eigen_permille_of_tension=19.148 held_out_unseen_cells=4466 unseen_permille_of_square=965.597 classes 'e':28619 'a':-11764 ' ':7522 'r':-5520 'o':-3299 '\n':-2006 'c':-1796 'd':-1743 | pairs (pair:sign:cells, by n·c²) '.''A':-1:6 ' ''t':-1:59 ' ''a':-1:52 'o''n':-1:58 'a''t':-1:20 'e'' ':-1:65 '`''A':-1:4 'i''n':-1:37 'i''b':-1:5 't''h':-1:49 's'' ':-1:53 'h''e':-1:44
+FOUND_FORM_COORDINATE 3 eigen_permille_of_tension=14.745 held_out_unseen_cells=4466 unseen_permille_of_square=973.419 classes 'o':20904 'a':-13395 'l':-6386 'e':-3262 'i':3090 'r':1371 '\n':-1278 't':1028 | pairs (pair:sign:cells, by n·c²) 'u''p':-1:5 '.''C':1:7 'o''t':-1:13 'g''r':-1:2 'A''l':-1:2 ' ''m':-1:3 '_''l':1:2 'c''l':-1:16 'S''t':-1:1 '.''L':-1:1 't''i':-1:28 'A''e':-1:11
+FOUND_FORM_COORDINATE 4 eigen_permille_of_tension=11.458 held_out_unseen_cells=4466 unseen_permille_of_square=985.131 classes 'a':31057 'i':-25446 'l':-21048 'o':20609 'r':-18686 'e':11796 'd':6627 't':-6423 | pairs (pair:sign:cells, by n·c²) '.''C':1:7 ' ''c':1:26 '/''C':1:3 '\n''m':1:1 '-''c':1:2 'u''t':1:5 'p''a':1:7 't''h':1:49 '-''l':1:1 'i''z':1:2 '`''f':1:2 'n''d':1:23
+HELD_OUT rank=0 (part=brier_T/residual) prose=0.702/0.702 lean=0.587/0.596 rust=0.520/0.537 digits=0.655/0.656 all=0.616/0.622 elapsed_ms=6514
+FOUND_BLOCK coordinates=1 cumulative_permille_of_tension=23.727 elapsed_ms=7077
+HELD_OUT rank=1 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.702/3.533:-4034.499 lean=0.587/2.549:-3277.516 rust=0.520/4.354:-7113.318 digits=0.655/0.660:-6.708 all=0.616/2.775:-3457.157 elapsed_ms=7195
+FOUND_BLOCK coordinates=2 cumulative_permille_of_tension=42.874 elapsed_ms=7789
+HELD_OUT rank=2 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.702/7.677:-9939.588 lean=0.587/4.640:-6785.890 rust=0.520/8.770:-15341.484 digits=0.655/0.679:-36.043 all=0.616/5.443:-7743.193 elapsed_ms=7885
+FOUND_BLOCK coordinates=4 cumulative_permille_of_tension=69.077 elapsed_ms=8523
+HELD_OUT rank=4 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.702/9.123:-12000.395 lean=0.587/5.542:-8301.199 rust=0.520/10.613:-18776.200 digits=0.655/0.685:-44.488 all=0.616/6.492:-9429.551 elapsed_ms=8627
+FOUND_BLOCK coordinates=8 cumulative_permille_of_tension=103.532 elapsed_ms=9413
+HELD_OUT rank=8 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.702/106.009:-150067.511 lean=0.587/59.403:-98687.977 rust=0.520/127.233:-236075.563 digits=0.655/0.866:-320.504 all=0.616/73.395:-116905.679 elapsed_ms=9549
+FOUND_BLOCK coordinates=16 cumulative_permille_of_tension=144.891 elapsed_ms=10907
+HELD_OUT rank=16 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.702/151.317:-214633.609 lean=0.587/81.401:-135605.022 rust=0.520/169.032:-313959.491 digits=0.655/1.008:-536.921 all=0.616/100.713:-160791.344 elapsed_ms=11248
+FOUND_BLOCK coordinates=32 cumulative_permille_of_tension=199.692 elapsed_ms=13283
+HELD_OUT rank=32 (part=brier_T/residual:permille_of_the_face_residual_removed) prose=0.702/263.392:-374345.918 lean=0.587/144.865:-242107.307 rust=0.520/294.645:-548017.345 digits=0.655/1.391:-1121.502 all=0.616/176.114:-281921.037 elapsed_ms=13638
+MEASURE exit=0 wall_s=13.7 peak_rss_kib=234836

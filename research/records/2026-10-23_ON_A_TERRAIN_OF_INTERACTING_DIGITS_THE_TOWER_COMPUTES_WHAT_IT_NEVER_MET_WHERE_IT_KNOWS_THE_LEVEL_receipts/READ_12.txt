@@ -1,0 +1,92 @@
+CODE seen   *   all content  bits_a_digit=2.247 n=3456
+CODE seen   *   all scale    bits_a_digit=0.371 n=286
+CODE seen   *   line end     bits_a_digit=0.004 n=1045
+CODE seen   *   place 0      bits_a_digit=1.554 n=788
+CODE seen   *   place 1      bits_a_digit=3.258 n=990
+CODE seen   *   place 2      bits_a_digit=2.580 n=969
+CODE seen   *   place 3      bits_a_digit=1.149 n=709
+CODE seen   *   scale        bits_a_digit=0.371 n=286
+CODE seen   +   all content  bits_a_digit=0.679 n=2223
+CODE seen   +   all scale    bits_a_digit=0.300 n=120
+CODE seen   +   line end     bits_a_digit=0.000 n=945
+CODE seen   +   place 0      bits_a_digit=0.535 n=837
+CODE seen   +   place 1      bits_a_digit=1.143 n=929
+CODE seen   +   place 2      bits_a_digit=0.002 n=457
+CODE seen   +   scale        bits_a_digit=0.300 n=120
+CODE seen   -   all content  bits_a_digit=1.959 n=874
+CODE seen   -   all scale    bits_a_digit=0.498 n=52
+CODE seen   -   line end     bits_a_digit=0.000 n=509
+CODE seen   -   place 0      bits_a_digit=2.420 n=457
+CODE seen   -   place 1      bits_a_digit=1.454 n=417
+CODE seen   -   scale        bits_a_digit=0.498 n=52
+CODE seen   all all content  bits_a_digit=1.677 n=6553
+CODE seen   all all scale    bits_a_digit=0.367 n=458
+CODE unseen *   all content  bits_a_digit=2.283 n=3276
+CODE unseen *   all scale    bits_a_digit=0.395 n=314
+CODE unseen *   line end     bits_a_digit=0.008 n=1015
+CODE unseen *   place 0      bits_a_digit=1.601 n=737
+CODE unseen *   place 1      bits_a_digit=3.301 n=956
+CODE unseen *   place 2      bits_a_digit=2.563 n=936
+CODE unseen *   place 3      bits_a_digit=1.151 n=647
+CODE unseen *   scale        bits_a_digit=0.395 n=314
+CODE unseen +   all content  bits_a_digit=0.753 n=2337
+CODE unseen +   all scale    bits_a_digit=0.442 n=127
+CODE unseen +   line end     bits_a_digit=0.000 n=982
+CODE unseen +   place 0      bits_a_digit=0.504 n=869
+CODE unseen +   place 1      bits_a_digit=1.370 n=965
+CODE unseen +   place 2      bits_a_digit=0.000 n=503
+CODE unseen +   scale        bits_a_digit=0.442 n=127
+CODE unseen -   all content  bits_a_digit=2.031 n=870
+CODE unseen -   all scale    bits_a_digit=0.709 n=36
+CODE unseen -   line end     bits_a_digit=0.000 n=502
+CODE unseen -   place 0      bits_a_digit=2.530 n=466
+CODE unseen -   place 1      bits_a_digit=1.455 n=404
+CODE unseen -   scale        bits_a_digit=0.709 n=36
+CODE unseen all all content  bits_a_digit=1.698 n=6483
+CODE unseen all all scale    bits_a_digit=0.431 n=477
+WRITTEN seen   * equal=0/11
+WRITTEN seen   + equal=9/12
+WRITTEN seen   - equal=6/9
+WRITTEN unseen * equal=0/9
+WRITTEN unseen + equal=7/15
+WRITTEN unseen - equal=3/8
+SHOWN unseen 74-72=1
+SHOWN seen   68*39=2532
+SHOWN unseen 92*65=6090
+SHOWN seen   7*98=734
+SHOWN unseen 85-42=43
+SHOWN seen   45*31=1305
+SHOWN unseen 46*15=850
+SHOWN seen   82+3=77
+SHOWN unseen 71+41=102
+SHOWN seen   54-10=44
+SHOWN unseen 86-43=43
+SHOWN seen   72+15=87
+SHOWN unseen 83*27=2309
+SHOWN seen   1*35=65
+SHOWN unseen 73+31=104
+SHOWN seen   15+77=92
+SHOWN unseen 14*39=597
+SHOWN seen   30-15=15
+SHOWN unseen 23+51=84
+SHOWN seen   12-9=10
+SHOWN unseen 56+3=56
+SHOWN seen   93*33=3081
+SHOWN unseen 53+18=71
+SHOWN seen   8+20=28
+SHOWN unseen 80+14=94
+SHOWN seen   44*92=4084
+SHOWN unseen 8+82=90
+SHOWN seen   50+4=55
+SHOWN unseen 47-20=27
+SHOWN seen   44-34=10
+SHOWN unseen 12*35=405
+SHOWN seen   87+87=174
+SHOWN unseen 6+77=83
+SHOWN seen   20-4=19
+SHOWN unseen 99-56=5
+SHOWN seen   63+47=100
+SHOWN unseen 67-56=10
+SHOWN seen   73-12=61
+SHOWN unseen 6+10=14
+SHOWN seen   48+89=137

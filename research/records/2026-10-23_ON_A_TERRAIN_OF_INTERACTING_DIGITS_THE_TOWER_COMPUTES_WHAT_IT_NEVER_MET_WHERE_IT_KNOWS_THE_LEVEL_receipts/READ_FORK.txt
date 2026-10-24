@@ -1,0 +1,15 @@
+=== fown
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	12	12	12	0	0	0	208	0	0	178	0	166	4.049	4.049	4.049
+-	135	11	11	11	0	0	0	135	0	0	87	2	78	4.095	4.095	4.095
+*	193	8	8	8	0	0	0	193	0	0	20	4	16	7.604	7.604	7.604
+=== fagain
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	12	17	48	13	8	144	1121	12	196	178	2	163	4.049	3.976	3.738
+-	135	11	14	39	10	7	96	700	11	124	87	5	78	4.095	4.067	3.759
+*	193	8	6	20	3	5	55	1331	8	185	20	3	17	7.604	7.503	7.147
+=== fredraw
+op	lines	first right	last right	any right	turned right	turned wrong	agreed	looks	again, first right	again, first wrong	beside first right	last right, beside first wrong	last wrong, beside first right	first cost	last cost	floor
++	208	12	15	63	11	8	137	1143	12	196	178	1	164	4.049	4.049	4.049
+-	135	11	12	41	8	7	97	692	11	124	87	3	78	4.095	4.095	4.095
+*	193	8	8	22	4	4	56	1331	8	185	20	3	15	7.604	7.604	7.604

@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=4.097 bytes=400 agree=2 elapsed_ms=1216
+TOWER_SAMPLE_TEXT "/-- Exact conserved lawful subst without checker receiving the return commute. The control\n//!               | them)) = one | is lawful |                                                                                                                                             &self.route()));\n        }\n\n    }\n    }\n\n    }\n\n    pub fn determinant_passage_carried_boundary = &self.residual_indexes/c"
+MEASURE exit=0 wall_s=1.2 peak_rss_kib=25576

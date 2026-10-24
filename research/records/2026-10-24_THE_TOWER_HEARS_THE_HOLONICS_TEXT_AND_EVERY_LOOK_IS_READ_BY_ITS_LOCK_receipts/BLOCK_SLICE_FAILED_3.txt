@@ -1,0 +1,5 @@
+BUILD_EXIT 0
+FOUND_PASS train_cells=4792 pairs=926 arriving=106 held_out_cells=48023 read_ms=2786
+FOUND_FACE brier_T=0.636 tension_S=0.620 tension_permille_of_T=974.732 elapsed_ms=3307
+alpha error: the search outgrew its 64-bit grain: panel column 1278 (l=1492146297269 u=3952094336353779 a=-3795616126284053622) at pivot 1275, row 1589: -9287721210241440005
+MEASURE exit=1 wall_s=14.2 peak_rss_kib=155060

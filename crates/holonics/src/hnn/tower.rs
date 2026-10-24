@@ -64,6 +64,48 @@
 //! under that hold the passivity bound below holds cell by cell, `|h_t| ≤ ρ_t |h_(t−1)| + γ_t |Bx_t|
 //! ≤ √((1 + ρ_max)/(1 − ρ_max)) max|Bx|`, since `γ/(1 − ρ)` increases with `ρ`.
 //!
+//! **The turned mode** ([`TowerDeclaration::turned`], agent-inferred, October 23). A gated mode
+//! whose turn is keyed too: the arriving symbol turns it by `s_t = 2^(−⌈log₂ w⌉) (W_φ x^ℓ_t + b_φ)`
+//! half turns on `2^(−16)` (the drive read as its mean over the width), `λ_t = ρ_t u e^(iπ s_t)`, so
+//! a mode can carry a residue as its accumulated phase (on the units of `ℤ/q` the index chart turns
+//! a product into a sum of turns). `e^(iπ s)` is composed from the dyadic ladder `e^(iπ/2^j)` by the
+//! binary digits of `s` modulo the full turn, the half turn `π` from Machin's series. The turn's
+//! material opens at zero, so a turned tower opens on its gated twin. Its covector is the turn's
+//! share of the move's, `G_s(t) = π 2^(−⌈log₂ w⌉) Re(conj(i λ_t) G_λ(t))`, to `W_φ` and `b_φ` (the
+//! code's difference agrees, tested). The passage credit does not carry it (a typed refusal).
+//!
+//! **The pumped mode** ([`TowerDeclaration::pumped`], agent-inferred, October 23). A turned mode
+//! that the arriving symbol also pumps: its move is the parametron's (`holon::parametron`), a turn
+//! plus a reflection,
+//!
+//! ```text
+//! h_t = α_t h_(t−1) + β_t conj(h_(t−1)) + γ_t B x_t
+//! α_t = ρ_t (1 − |κ_t|) U_t,   U_t = u e^(iπ s_t)                 the turned unit
+//! β_t = ρ_t κ_t P_t,           P_t = e^(iπ p_t)                   the pump: depth κ, axis at π p/2
+//! κ_t = 2 r_t − 1,  r_t = 1/(1 + 2^(−(W_κ x + b_κ))),   p_t = 2^(−⌈log₂ w⌉) (W_ψ x + b_ψ)
+//! ```
+//!
+//! `β conj(h)` reflects the state across the pump's axis (a pump reads the doubled phase). As a
+//! real `2×2` move it has determinant `ρ²(1 − 2|κ|)` and trace `2ρ(1 − |κ|) cos θ_U`: it turns
+//! (elliptic) while `(1 − |κ|)² cos² θ_U < 1 − 2|κ|`, and past that bifurcation its in-phase axis
+//! boosts while the quadrature is shed (hyperbolic: the mode settles on one of two sheets), with a
+//! shear on the edge: the Swing's three kinds, keyed cell by cell by the symbol. Why: a residue is
+//! a discrete phase; the turned mode carried it as an angle whose neighbours look alike (the
+//! turned tower's sums slipped one step on their units), and a lock gives it somewhere to sit.
+//! Passivity holds as before: the move's real-linear norm is `|α| + |β| = ρ_t`, so
+//! `|h_t| ≤ ρ_t |h_(t−1)| + γ_t |B x_t|` with the same `γ_t = √(1 − ρ_t²)`. The pump's material
+//! opens at zero (`κ = 0`, `β = 0`), so a pumped tower opens on its turned twin. The adjoint carries
+//! `conj(α) G + β conj(G)` back a cell, and with `G_α = conj(h_(t−1)) G_h(t)`, `G_β = h_(t−1) G_h(t)`:
+//!
+//! ```text
+//! G_ρ(t)  = Re(conj(α/ρ) G_α) + Re(conj(β/ρ) G_β) − (ρ_t/γ_t) Re(conj(G_h(t)) B x_t)
+//! δq_κ    = (−sgn(κ) Re(conj(ρU) G_α) + Re(conj(ρP) G_β)) · 2 ln 2 r (1 − r)
+//! G_p     = π Re(conj(i β) G_β),   G_s = π Re(conj(i α) G_α)
+//! ```
+//!
+//! (`sgn 0 = 0`, the symmetric difference's reading at the opening; the code's difference agrees,
+//! tested). The passage credit does not carry it.
+//!
 //! **The contacts read a ratio.** A contact conducts on the direction of the modes' face, not its
 //! power: `r̂ = r / ‖r‖_rms`, with the adjoint `∂r = (∂r̂ − r̂ ⟨r̂, ∂r̂⟩/d) / ‖r‖_rms`. Read on its
 //! power, the drive followed the face's scale (some 50 units on the 1,000-problem passage), a step
@@ -76,6 +118,36 @@
 //! 64 bits before the ratio is taken. Measured: on all 6,726 GSM8K problems the second level's
 //! largest `‖r‖_rms` grew from 739 to 1,795 face units over passes 3 and 4, and a held-out read
 //! after pass 4 passed the 32-bit carrier (a typed refusal).
+//!
+//! **The mode face's carrier.** Passivity bounds a mode by its drive: `|h_t| ≤ ρ|h_(t−1)| + γ|B x_t|`
+//! with `γ = √(1 − ρ²)` gives `|h| ≤ √((1 + ρ)/(1 − ρ)) max|B x|`, about `90.5 max|B x|` at the
+//! margin `ρ = 1 − 2^(−12)`. A face carried in 32 bits holds `2^15` face units, which a mode at the
+//! margin passes once `|B x|` passes about 362, a reach the law admits; the face (`h` released to
+//! `2^(−16)`) is therefore carried in `i64`, and the read's and the read covector's sums widen to
+//! `i128` where its terms need it. Measured: with wrong attempts read on side forks
+//! (`solenoidal_alpha::complete_language::tower_train`), the second level's face reached
+//! 1,517,888,300 numerators (23,161 face units) at the fifth pass's section 66, 40 times the most
+//! the plain tower's reached in its whole training (38,222,409), and then passed `2^31` (a typed
+//! refusal).
+//!
+//! **The pair contact** ([`ContactLaw::Pair`], agent-inferred with the mathematics thread, October
+//! 24). The face law (record `2026-10-24_ONE_FACE_LAW_A_FACE_IS_A_CONGRUENCE_…`) reads every
+//! section's located relation through one pair contact `W(x̄ ⊗ ȳ)`, `x̄ = (x, 1)`: a constant block,
+//! two one-sided blocks (copy, agreement, codomain), an additive block and a bilinear one, with the
+//! slip `δ = q(r) − r̂` as its check and its covector. A rectifier takes a conjunction only through
+//! its kink; the pair contact takes it as the product of two drives read off the same face, so a
+//! drive keyed by a held mode can gate a drive keyed by a fast one:
+//!
+//! ```text
+//! v_t            = (W_a r̂_t + b_a) ⊙ (W_b r̂_t + b_b)
+//! δ(W_a r̂ + b_a) = δv ⊙ (W_b r̂ + b_b),      δ(W_b r̂ + b_b) = δv ⊙ (W_a r̂ + b_a)
+//! ```
+//!
+//! The second drive opens at `W_b = 0`, `b_b = 1`, so the contact opens one-sided
+//! (`v = W_a r̂ + b_a`, no kink) and the bilinear block is learned from there; the first drive is
+//! founded as the rectifier's. The foil [`ContactLaw::PairLinear`] holds the bilinear block at
+//! zero, `v = (W_a r̂ + b_a) b_b + b_a (W_b r̂)`: the same material and the same opening with every
+//! block but the product, so what the product carries is read against it.
 //!
 //! **What a section holds.** The forward's temporaries of its own cells, for the reverse scan, and
 //! the streams' opening states, for the reread. They are released when the section closes (the
@@ -109,12 +181,15 @@
 //! acoustic or motor boundary chart supplies the classes (bytes, for text).
 //!
 //! **Not claimed.** The nonlinearity of the completed model is in the state (a parametron's lock);
-//! here it sits between levels, the classical selective model's place. The certified step is
-//! descent on its own section, not on the passage.
+//! without the pumped mode it sits between levels, the classical selective model's place, and with
+//! it the lock is one symbol-keyed reflection a cell, not yet a Floquet-certified pump. The certified
+//! step is descent on its own section, not on the passage.
 use crate::hnn::keyed_modes::{dyadic_turn, ln2_face, release, Exponential};
 use crate::hnn::passage::log2_face;
 use num_bigint::BigUint;
 use rayon::prelude::*;
+
+pub mod duplex;
 
 /// A face's grain, `2^(−16)`.
 pub const FACE_BITS: u32 = 16;
@@ -172,6 +247,26 @@ pub struct TowerDeclaration {
     pub levels: usize,
     /// Whether each mode's decay is keyed by its input (the gated mode, in the module's law).
     pub gated: bool,
+    /// Whether each gated mode's turn is keyed by its input too (the turned mode): the arriving
+    /// symbol turns the mode, so a mode can carry a residue as its phase.
+    pub turned: bool,
+    /// Whether each turned mode is pumped too (the pumped mode): the arriving symbol keys a
+    /// reflection mixed into the move, so a mode's phase can lock on one of two sheets.
+    pub pumped: bool,
+    /// How a level's contacts conduct: rectifying, or the pair contact or its linear foil.
+    pub contact: ContactLaw,
+}
+
+/// [definition; agent-inferred, October 24] **A level's contact law** (the module's law).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ContactLaw {
+    /// `v = max(W₁ r̂ + b₁, 0)`: the contact conducts one way.
+    Rectifying,
+    /// `v = (W_a r̂ + b_a) ⊙ (W_b r̂ + b_b)`: the pair contact, its bilinear block learned.
+    Pair,
+    /// `v = (W_a r̂ + b_a) b_b + b_a (W_b r̂)`: the pair contact with its bilinear block held at
+    /// zero, the foil the product is read against.
+    PairLinear,
 }
 
 /// Where each family of the material sits in the one vector, and its grain.
@@ -190,6 +285,17 @@ struct LevelLayout {
     /// The gate's material and bias (empty families when ungated).
     gate: usize,
     gate_bias: usize,
+    /// The turn's material and bias (empty families when unturned).
+    turn: usize,
+    turn_bias: usize,
+    /// The pump's depth and axis, material and bias each (empty families when unpumped).
+    pump: usize,
+    pump_bias: usize,
+    pump_axis: usize,
+    pump_axis_bias: usize,
+    /// The pair contact's second drive, material and bias (empty families when rectifying).
+    pair: usize,
+    pair_bias: usize,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -230,10 +336,32 @@ impl Layout {
                 ret_bias: take(w, FACE_BITS),
                 gate: 0,
                 gate_bias: 0,
+                turn: 0,
+                turn_bias: 0,
+                pump: 0,
+                pump_bias: 0,
+                pump_axis: 0,
+                pump_axis_bias: 0,
+                pair: 0,
+                pair_bias: 0,
             };
             if d.gated {
                 level.gate = take(n * w, MATERIAL_BITS);
                 level.gate_bias = take(n, FACE_BITS);
+            }
+            if d.turned {
+                level.turn = take(n * w, MATERIAL_BITS);
+                level.turn_bias = take(n, FACE_BITS);
+            }
+            if d.pumped {
+                level.pump = take(n * w, MATERIAL_BITS);
+                level.pump_bias = take(n, FACE_BITS);
+                level.pump_axis = take(n * w, MATERIAL_BITS);
+                level.pump_axis_bias = take(n, FACE_BITS);
+            }
+            if d.contact != ContactLaw::Rectifying {
+                level.pair = take(f * w, MATERIAL_BITS);
+                level.pair_bias = take(f, FACE_BITS);
             }
             levels.push(level);
         }
@@ -344,22 +472,60 @@ pub fn cell_phases(alphabet: usize) -> usize {
     phases
 }
 
+/// [definition; agent-inferred with the mathematics thread, October 24] **One cell of the tension
+/// reading** ([`Tower::read_tension`]): the face the readout reads (`top`), the covector its
+/// comparison with the arriving class returns (`covector`, `p̂ − q` on `2^(−24)`), and two faces the
+/// readout does not read. `quadrature` is the top level's `Im(C h)`, the part of its modes the read
+/// `Re(C h)` drops, on the read's own ratio grain (divided by the read's `‖r‖_rms`, so it stands on
+/// `2^(−16)` beside `r̂`); `below` is the face the top level read from the level beneath it.
+///
+/// A receiver sums, over any partition of the passage, `H = Σ f̄ f̄ᵀ` with `f̄ = (top, 1)`,
+/// `B = Σ dz f̄ᵀ` (the readout's covector the reverse scan forms) and `T = Σ dz dzᵀ`. What a
+/// readout of `top` can still bridge is `B H⁺ Bᵀ`; the tension it cannot bridge is the Schur
+/// complement `S = T − B H⁺ Bᵀ ⪰ 0` (atlas `contact.effective-tension`: the interior elimination
+/// of `tube.dn-elimination`, with the face as the interior). A candidate face `c` bridges
+/// `M Q⁺ Mᵀ` of it, `M = Σ dz cᵀ − B H⁺ Σ f̄ cᵀ`, `Q = Σ c cᵀ − (Σ f̄ cᵀ)ᵀ H⁺ Σ f̄ cᵀ`: the part of
+/// the tension its own unread part carries (`contact.tension-founds-face`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TensionCell {
+    pub top: Vec<i32>,
+    pub covector: Vec<i64>,
+    pub quadrature: Vec<i32>,
+    pub below: Vec<i32>,
+}
+
+/// The covector a face returns when it is compared with `target`: `dz_c = p̂(c) − [c = target]` on
+/// `2^(−24)`, the cross-entropy logit gradient `p − q` at the face's grain representative. The
+/// reverse scan and the tension reading ([`Tower::read_tension`]) read this one law.
+fn covector(face: &TowerFace, target: usize) -> Vec<i64> {
+    (0..face.masses.len())
+        .map(|c| {
+            let p = ((face.masses[c] << COVECTOR_BITS) + face.total / 2) / face.total;
+            p as i64 - if c == target { 1i64 << COVECTOR_BITS } else { 0 }
+        })
+        .collect()
+}
+
 /// `max |w|` over a family.
 fn reach(w: &[i32]) -> u64 {
     w.iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0)
 }
 
 /// `out[o] = release(Σ_i w[o·cols + i] x[i] + bias[o] · 2^bias_shift, shift)`, in `i64` where the
-/// terms' bound allows and in `i128` otherwise.
-fn affine(w: &[i32], wmax: u64, cols: usize, x: &[i32], bias: Option<&[i32]>, bias_shift: u32, shift: u32, out: &mut [i64]) -> Result<()> {
-    let xmax = reach(x);
-    let narrow = (wmax as u128) * (xmax as u128) * (cols as u128 + 1) < (1u128 << 62);
+/// terms' bound allows and in `i128` otherwise; `x` a face carried in `i32` or `i64`.
+fn affine<V: Copy + Into<i64>>(w: &[i32], wmax: u64, cols: usize, x: &[V], bias: Option<&[i32]>, bias_shift: u32, shift: u32, out: &mut [i64]) -> Result<()> {
+    let xmax = x.iter().map(|&v| v.into().unsigned_abs()).max().unwrap_or(0);
+    let terms = (wmax as u128) * (xmax as u128) * (cols as u128 + 1);
+    if terms >= 1u128 << 126 {
+        return refuse("an affine sum outgrew its 128-bit carrier");
+    }
+    let narrow = terms < (1u128 << 62);
     for (o, slot) in out.iter_mut().enumerate() {
         let row = &w[o * cols..(o + 1) * cols];
         let mut sum: i128 = if narrow {
-            row.iter().zip(x).map(|(a, b)| *a as i64 * *b as i64).sum::<i64>() as i128
+            row.iter().zip(x).map(|(a, &b)| *a as i64 * b.into()).sum::<i64>() as i128
         } else {
-            row.iter().zip(x).map(|(a, b)| *a as i128 * *b as i128).sum::<i128>()
+            row.iter().zip(x).map(|(a, &b)| *a as i128 * b.into() as i128).sum::<i128>()
         };
         if let Some(b) = bias {
             sum += (b[o] as i128) << bias_shift;
@@ -407,9 +573,14 @@ fn transposed(w: &[i32], wmax: u64, cols: usize, y: &[i64], shift: u32, out: &mu
 /// `g[o·cols + i] += Σ_t y_t[o] x_t[i]`: a section's outer products of covectors with faces, at
 /// their summed grain. Integer addition is associative, so summing over the section's cells before
 /// the sum reaches the gradient gives the bits one product a cell gives; the sum runs in `i64` where
-/// the terms' bound `Σ_t max|y_t| max|x_t|` allows it.
-fn outer_sum<Y: AsRef<[i64]>, X: AsRef<[i32]>>(g: &mut [i128], cols: usize, ys: &[Y], xs: &[X]) {
-    let bound: u128 = ys.iter().zip(xs).map(|(y, x)| reach64(y.as_ref()) as u128 * reach(x.as_ref()) as u128).sum();
+/// the terms' bound `Σ_t max|y_t| max|x_t|` allows it, in `i128` below `2^126`, and is refused past
+/// it. A face `x` is carried in `i32` or `i64`.
+fn outer_sum<Y: AsRef<[i64]>, X: AsRef<[V]>, V: Copy + Into<i64>>(g: &mut [i128], cols: usize, ys: &[Y], xs: &[X]) -> Result<()> {
+    let mut bound = 0u128;
+    for (y, x) in ys.iter().zip(xs) {
+        let xmax = x.as_ref().iter().map(|&v| v.into().unsigned_abs()).max().unwrap_or(0);
+        bound = bound.checked_add(reach64(y.as_ref()) as u128 * xmax as u128).filter(|&b| b < 1u128 << 126).ok_or(TowerError::Refused("an outer sum outgrew its 128-bit carrier"))?;
+    }
     for (o, row) in g.chunks_exact_mut(cols).enumerate() {
         if bound < (1u128 << 62) {
             let mut acc = vec![0i64; cols];
@@ -417,7 +588,7 @@ fn outer_sum<Y: AsRef<[i64]>, X: AsRef<[i32]>>(g: &mut [i128], cols: usize, ys: 
                 let yo = y.as_ref()[o];
                 if yo != 0 {
                     for (a, &xv) in acc.iter_mut().zip(x.as_ref()) {
-                        *a += yo * xv as i64;
+                        *a += yo * xv.into();
                     }
                 }
             }
@@ -429,12 +600,13 @@ fn outer_sum<Y: AsRef<[i64]>, X: AsRef<[i32]>>(g: &mut [i128], cols: usize, ys: 
                 let yo = y.as_ref()[o] as i128;
                 if yo != 0 {
                     for (slot, &xv) in row.iter_mut().zip(x.as_ref()) {
-                        *slot += yo * xv as i128;
+                        *slot += yo * xv.into() as i128;
                     }
                 }
             }
         }
     }
+    Ok(())
 }
 
 /// `max |y|` over a covector.
@@ -464,26 +636,37 @@ struct LevelCell {
     /// `B x` before the mode's `γ`, on the state's grain.
     push: Vec<(i64, i64)>,
     state: Vec<(i64, i64)>,
-    state_face: Vec<i32>,
+    state_face: Vec<i64>,
     /// `r̂`, the contacts' input, on `2^(−16)`.
     read: Vec<i32>,
     /// `‖r‖_rms` on `2^(−16)` (zero when the face is zero).
     read_scale: i128,
     drive: Vec<i32>,
+    /// The pair contact's second drive `W_b r̂ + b_b` (empty when rectifying).
+    pair: Vec<i32>,
     conduct: Vec<i32>,
     /// The gated modes' moves at this cell (empty when ungated).
     gate: Vec<GatedMove>,
 }
 
 /// A gated mode's move at one cell: the gate `r` and `λ_t`, `ρ_t = |λ_t|`, `γ_t` on `2^(−30)`, and
-/// whether `ρ_t` was held at the margin.
+/// whether `ρ_t` was held at the margin. A pumped mode's `lam` is its turn `α_t`, beside the pump
+/// `β_t = ρ_t κ_t P_t`.
 #[derive(Clone, Copy, Debug, Default)]
 struct GatedMove {
     open: i64,
+    /// `λ_t/ρ_t`: the founded unit, turned by the arriving symbol when the mode is turned.
+    unit: (i64, i64),
     lam: (i64, i64),
     rho: i64,
     gamma: i64,
     held: bool,
+    /// The pump's opening `r`, depth `κ = 2r − 1`, axis face `P` and `β`, on `2^(−30)` (zero when
+    /// unpumped).
+    pump_open: i64,
+    kappa: i64,
+    axis: (i64, i64),
+    beta: (i64, i64),
 }
 
 /// A gated level's founded moves read once a section: `u = λ/|λ|`, `|λ|` and `ℓ = log₂|λ|` on
@@ -534,7 +717,13 @@ impl Default for TowerFace {
 /// The reaches of every family, read once a section.
 #[derive(Clone, Debug)]
 struct Reaches {
-    levels: Vec<[u64; 7]>,
+    /// Per level: push (re, im), read (re, im), contact, return, gate, turn, pump, pump axis, the
+    /// pair contact's second drive.
+    levels: Vec<[u64; 11]>,
+    /// The turned modes' ladder `e^(iπ/2^i)`, `i = 0..=TURN_BITS`, on `2^(−30)`, and the half turn
+    /// `π` on `2^(−30)` (empty and zero when unturned).
+    ladder: Vec<(i128, i128)>,
+    half_turn: i128,
     readout: u64,
     /// Each level's `γ_k = √(1 − |λ_k|²)` on `2^(−30)`.
     gammas: Vec<Vec<i128>>,
@@ -563,6 +752,70 @@ fn exp_series(a: i128, b: i128) -> (i128, i128) {
         sum = (sum.0 + term.0, sum.1 + term.1);
         k += 1;
     }
+}
+
+/// The turned mode's grain: a turn is read in half turns on `2^(−16)`, the face's grain.
+const TURN_BITS: u32 = FACE_BITS;
+
+/// The turn's spread over a level's width, `⌈log₂ w⌉`: the arriving drive is read as its mean over
+/// the width, `s_t = 2^(−spread) (W_φ x + b_φ)`, so a deposit that moves every one of a mode's turn
+/// weights by one rate step turns the mode by that step's share of a half turn, as a gate's moves
+/// its logit by a share of a doubling. [agent-inferred, October 23: read at the full drive, one
+/// rate step `2^(−7)` over 64 inputs of unit size turned a mode by up to half a half turn, and the
+/// terrain's second pass coded more bits section after section as the certificate halved its
+/// steps 626 times.]
+fn turn_spread(width: usize) -> u32 {
+    usize::BITS - width.saturating_sub(1).leading_zeros()
+}
+
+/// `e^(iπ/2^i)` on `2^(−30)` for `i = 0..=TURN_BITS`: the half turn, the quarter turn, then each
+/// half angle, `cos(θ/2) = √((1 + cos θ)/2)` and `sin(θ/2) = sin θ/(2 cos(θ/2))` (the sine by the
+/// quotient, which keeps its relative grain where `1 − cos θ` would not), on `2^(−60)` released
+/// once.
+fn turn_ladder_faces() -> Vec<(i128, i128)> {
+    const FINE: u32 = 60;
+    let one = 1i128 << FINE;
+    let mut out = vec![(-(1i128 << MOVE_BITS), 0), (0, 1i128 << MOVE_BITS)];
+    let (mut c, mut s) = (0i128, one);
+    for _ in 1..TURN_BITS {
+        let half = ((((one + c) as u128) << FINE) >> 1).isqrt() as i128;
+        s = div_nearest(s << FINE, 2 * half);
+        c = half;
+        out.push((release(c, FINE - MOVE_BITS), release(s, FINE - MOVE_BITS)));
+    }
+    out
+}
+
+/// `π` on `2^(−bits)` by Machin's series `π = 16 atan(1/5) − 4 atan(1/239)`, each term an exact
+/// quotient sixteen grains finer, released once: the half turn's navigator face.
+fn half_turn(bits: u32) -> i128 {
+    const GUARD: u32 = 16;
+    let one = 1i128 << (bits + GUARD);
+    let atan_inverse = |k: i128| -> i128 {
+        let (mut power, mut sum, mut n) = (one / k, 0i128, 0i128);
+        while power != 0 {
+            let term = power / (2 * n + 1);
+            sum += if n % 2 == 0 { term } else { -term };
+            power /= k * k;
+            n += 1;
+        }
+        sum
+    };
+    release(16 * atan_inverse(5) - 4 * atan_inverse(239), GUARD)
+}
+
+/// `e^(iπ s)` on `2^(−30)` for a turn `s` in half turns on `2^(−16)`: `s` read modulo the full
+/// turn and composed from the ladder's dyadic turns, its binary digits from the half turn down.
+fn turn_face(s: i64, ladder: &[(i128, i128)]) -> (i128, i128) {
+    let full = 1i64 << (TURN_BITS + 1);
+    let j = s.rem_euclid(full) as u64;
+    let mut value = (1i128 << MOVE_BITS, 0i128);
+    for (i, &(cr, ci)) in ladder.iter().enumerate() {
+        if j & (1u64 << (TURN_BITS as usize - i)) != 0 {
+            value = (release(value.0 * cr - value.1 * ci, MOVE_BITS), release(value.0 * ci + value.1 * cr, MOVE_BITS));
+        }
+    }
+    value
 }
 
 /// `r̂ = r / ‖r‖_rms` on `2^(−16)` and `‖r‖_rms` on `2^(−16)`, `r` on `2^(−16)`; a zero face reads
@@ -610,6 +863,12 @@ impl Tower {
         if d.alphabet < 2 || d.width == 0 || d.modes == 0 || d.contacts == 0 || d.levels == 0 {
             return refuse("a tower needs two classes and a nonempty width, bank, contacts and levels");
         }
+        if d.turned && !d.gated {
+            return refuse("a turned mode is a gated mode");
+        }
+        if d.pumped && !d.turned {
+            return refuse("a pumped mode is a turned mode");
+        }
         let layout = Layout::new(&d);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
@@ -656,8 +915,14 @@ impl Tower {
             let six = (6u128 << 32).isqrt();
             let dd = ((d.width as u128) << 32).isqrt();
             uniform(&mut theta[lv.contact..lv.contact + d.contacts * d.width], six, dd, MATERIAL_BITS)?;
+            // The pair contact's second drive at zero material and unit bias: it opens one-sided.
+            if d.contact != ContactLaw::Rectifying {
+                theta[lv.pair_bias..lv.pair_bias + d.contacts].fill(1 << FACE_BITS);
+            }
         }
-        // The gate's material and bias open at zero: r = ½, the founded move.
+        // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
+        // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
+        // tower opens on its turned twin.
         Ok(Self { declaration: d, theta, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
@@ -697,6 +962,10 @@ impl Tower {
                     reach(&t[lv.contact..lv.contact + d.contacts * d.width]),
                     reach(&t[lv.ret..lv.ret + d.width * d.contacts]),
                     if d.gated { reach(&t[lv.gate..lv.gate + d.modes * d.width]) } else { 0 },
+                    if d.turned { reach(&t[lv.turn..lv.turn + d.modes * d.width]) } else { 0 },
+                    if d.pumped { reach(&t[lv.pump..lv.pump + d.modes * d.width]) } else { 0 },
+                    if d.pumped { reach(&t[lv.pump_axis..lv.pump_axis + d.modes * d.width]) } else { 0 },
+                    if d.contact != ContactLaw::Rectifying { reach(&t[lv.pair..lv.pair + d.contacts * d.width]) } else { 0 },
                 ]
             })
             .collect();
@@ -732,7 +1001,8 @@ impl Tower {
                 })
                 .collect()
         };
-        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), gammas, gates }
+        let (ladder, half_turn) = if d.turned { (turn_ladder_faces(), half_turn(MOVE_BITS)) } else { (Vec::new(), 0) };
+        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), gammas, gates, ladder, half_turn }
     }
 
     /// One cell forward: the class `u` arrives, every level's modes move, and the face of the next
@@ -761,6 +1031,25 @@ impl Tower {
                 let faces = &reaches.gates[l];
                 let mut q = vec![0i64; n];
                 affine(&t[lv.gate..lv.gate + n * w], r[6], w, &x, Some(&t[lv.gate_bias..lv.gate_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut q)?;
+                // The arriving symbol's turn `s_t = 2^(−spread) (W_φ x + b_φ)`, in half turns on 2^(−16).
+                let mut turns = vec![0i64; if d.turned { n } else { 0 }];
+                if d.turned {
+                    affine(&t[lv.turn..lv.turn + n * w], r[7], w, &x, Some(&t[lv.turn_bias..lv.turn_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut turns)?;
+                    for v in &mut turns {
+                        *v = fit64(release(*v as i128, turn_spread(w)))?;
+                    }
+                }
+                // The pump's depth logit `W_κ x + b_κ` on 2^(−16), and its axis
+                // `p_t = 2^(−spread) (W_ψ x + b_ψ)` in half turns on 2^(−16).
+                let mut depths = vec![0i64; if d.pumped { n } else { 0 }];
+                let mut axes = vec![0i64; if d.pumped { n } else { 0 }];
+                if d.pumped {
+                    affine(&t[lv.pump..lv.pump + n * w], r[8], w, &x, Some(&t[lv.pump_bias..lv.pump_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut depths)?;
+                    affine(&t[lv.pump_axis..lv.pump_axis + n * w], r[9], w, &x, Some(&t[lv.pump_axis_bias..lv.pump_axis_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut axes)?;
+                    for v in &mut axes {
+                        *v = fit64(release(*v as i128, turn_spread(w)))?;
+                    }
+                }
                 gate.reserve_exact(n);
                 for k in 0..n {
                     let open = logistic(&self.exponential, q[k]);
@@ -770,31 +1059,53 @@ impl Tower {
                     if held {
                         rho = radius();
                     }
-                    let (ur, ui) = faces.units[k];
+                    let (mut ur, mut ui) = faces.units[k];
+                    if d.turned {
+                        let (tr, ti) = turn_face(turns[k], &reaches.ladder);
+                        (ur, ui) = (release(ur * tr - ui * ti, MOVE_BITS), release(ur * ti + ui * tr, MOVE_BITS));
+                    }
                     let (lr, li) = (release(rho * ur, MOVE_BITS), release(rho * ui, MOVE_BITS));
                     let (_, gamma) = modulus_and_gamma(lr, li);
                     if gamma == 0 {
                         return refuse("a gated move reached the unit circle");
                     }
-                    gate.push(GatedMove { open: open as i64, lam: (lr as i64, li as i64), rho: rho as i64, gamma: gamma as i64, held });
+                    let mut moved = GatedMove { open: open as i64, unit: (ur as i64, ui as i64), lam: (lr as i64, li as i64), rho: rho as i64, gamma: gamma as i64, held, ..GatedMove::default() };
+                    if d.pumped {
+                        // α_t = ρ_t (1 − |κ|) U_t and β_t = ρ_t κ P_t: |α| + |β| = ρ_t, so γ_t is kept.
+                        let one = 1i128 << MOVE_BITS;
+                        let pump_open = logistic(&self.exponential, depths[k]);
+                        let kappa = 2 * pump_open - one;
+                        let (ar, ai) = turn_face(axes[k], &reaches.ladder);
+                        let keep = one - kappa.abs();
+                        let depth = release(rho * kappa, MOVE_BITS);
+                        moved.lam = (release(keep * lr, MOVE_BITS) as i64, release(keep * li, MOVE_BITS) as i64);
+                        moved.beta = (release(depth * ar, MOVE_BITS) as i64, release(depth * ai, MOVE_BITS) as i64);
+                        moved.pump_open = pump_open as i64;
+                        moved.kappa = kappa as i64;
+                        moved.axis = (ar as i64, ai as i64);
+                    }
+                    gate.push(moved);
                 }
             }
             let modes = &mut state.modes[l];
             let gammas = &reaches.gammas[l];
-            let mut face = vec![0i32; 2 * n];
+            let mut face = vec![0i64; 2 * n];
             for k in 0..n {
                 let (hr, hi) = modes[k];
                 let ((lr, li), gamma) = match gate.get(k) {
                     Some(m) => ((m.lam.0 as i128, m.lam.1 as i128), m.gamma as i128),
                     None => ((t[lv.move_re + k] as i128, t[lv.move_im + k] as i128), gammas[k]),
                 };
+                // The pump's reflection β conj(h) (zero unless pumped).
+                let (br, bi) = gate.get(k).map_or((0, 0), |m| (m.beta.0 as i128, m.beta.1 as i128));
+                let (hr, hi) = (hr as i128, hi as i128);
                 let pr = release(gamma * push_re[k] as i128, MOVE_BITS);
                 let pi = release(gamma * push_im[k] as i128, MOVE_BITS);
-                let nr = fit64(release(lr * hr as i128 - li * hi as i128, MOVE_BITS) + pr)?;
-                let ni = fit64(release(lr * hi as i128 + li * hr as i128, MOVE_BITS) + pi)?;
+                let nr = fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS) + pr)?;
+                let ni = fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS) + pi)?;
                 modes[k] = (nr, ni);
-                face[k] = fit32(release(nr as i128, STATE_BITS - FACE_BITS), "a mode's face outgrew its 32-bit carrier")?;
-                face[n + k] = fit32(release(ni as i128, STATE_BITS - FACE_BITS), "a mode's face outgrew its 32-bit carrier")?;
+                face[k] = fit64(release(nr as i128, STATE_BITS - FACE_BITS))?;
+                face[n + k] = fit64(release(ni as i128, STATE_BITS - FACE_BITS))?;
             }
             // The read Re(C h) = C_re h_re − C_im h_im, on 2^(−40) released to 2^(−16).
             let mut read_a = vec![0i64; w];
@@ -808,13 +1119,34 @@ impl Tower {
             let drive_buf = &mut buf[..f];
             affine(&t[lv.contact..lv.contact + f * w], r[4], w, &read, Some(&t[lv.contact_bias..lv.contact_bias + f]), MATERIAL_BITS, MATERIAL_BITS, drive_buf)?;
             let drive = to32(drive_buf, "a contact drive outgrew its 32-bit carrier")?;
-            let conduct: Vec<i32> = drive.iter().map(|&a| a.max(0)).collect();
+            let (conduct, pair) = match d.contact {
+                ContactLaw::Rectifying => (drive.iter().map(|&a| a.max(0)).collect(), Vec::new()),
+                law => {
+                    // The second drive W_b r̂ + b_b, and v = a ⊙ b on 2^(−32) released to the face
+                    // (the foil: a b_b + b_a (b − b_b), the product's block held at zero).
+                    let mut second = vec![0i64; f];
+                    affine(&t[lv.pair..lv.pair + f * w], r[10], w, &read, Some(&t[lv.pair_bias..lv.pair_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut second)?;
+                    let second = to32(&second, "a pair contact's second drive outgrew its 32-bit carrier")?;
+                    let conduct = collect_exact((0..f).map(|o| {
+                        let (a, b) = (drive[o] as i128, second[o] as i128);
+                        let product = match law {
+                            ContactLaw::Pair => a * b,
+                            _ => {
+                                let (ba, bb) = (t[lv.contact_bias + o] as i128, t[lv.pair_bias + o] as i128);
+                                a * bb + ba * (b - bb)
+                            }
+                        };
+                        fit32(release(product, FACE_BITS), "a pair contact's conduction outgrew its 32-bit carrier")
+                    }))?;
+                    (conduct, second)
+                }
+            };
             let mut ret = vec![0i64; w];
             affine(&t[lv.ret..lv.ret + w * f], r[5], f, &conduct, Some(&t[lv.ret_bias..lv.ret_bias + w]), MATERIAL_BITS, MATERIAL_BITS, &mut ret)?;
             let next: Vec<i32> = collect_exact(x.iter().zip(&ret).map(|(a, b)| fit32(*a as i128 + *b as i128, "the residual stream outgrew its 32-bit carrier")))?;
             let state_copy = modes.clone();
             let push = push_re.into_iter().zip(push_im).collect();
-            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, conduct, gate });
+            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate });
         }
         let a = d.alphabet;
         let mut z = vec![0i64; a];
@@ -840,12 +1172,32 @@ impl Tower {
 
     /// The reverse scan of one stream's section: the covector of every family, on its natural
     /// grain (material `2^(−40)`, faces and biases `2^(−24)`, moves `2^(−48)`).
-    fn reverse(&self, opening: &TowerState, cells: &[Cell], classes: &[usize]) -> Result<Vec<i128>> {
+    fn reverse(&self, opening: &TowerState, cells: &[Cell], classes: &[usize], compared: Option<&[Option<usize>]>) -> Result<Vec<i128>> {
+        self.reverse_joined(opening, cells, classes, None, compared)
+    }
+
+    /// The reverse scan with a covector reaching each cell's top from outside the tower (the
+    /// duplex's meeting, `duplex`), on the top covector's grain `2^(−24)`, added to the one the
+    /// tower's own face sends there. `compared` declares, place by place, the class each face is
+    /// compared with (the class that arrived when it is `None`): a place with no comparison is the
+    /// tower's own release re-entering what it reads, which brings no news, so its face sends no
+    /// covector, while the covectors of the places after it still return through the state it
+    /// moved; a place compared with another class than the one read there is the tower's own
+    /// release read against the truth where the two part.
+    fn reverse_joined(
+        &self,
+        opening: &TowerState,
+        cells: &[Cell],
+        classes: &[usize],
+        joined: Option<&[Vec<i64>]>,
+        compared: Option<&[Option<usize>]>,
+    ) -> Result<Vec<i128>> {
         let d = &self.declaration;
         let (w, n, f, a) = (d.width, d.modes, d.contacts, d.alphabet);
         let t = &self.theta;
         let reaches = self.reaches();
-        let ln2_square = release(ln2_face() * ln2_face(), MOVE_BITS);
+        let ln2 = ln2_face();
+        let ln2_square = release(ln2 * ln2, MOVE_BITS);
         let mut g = vec![0i128; self.layout.len];
         let cells_n = cells.len();
         // The face's covector and the top's.
@@ -853,15 +1205,16 @@ impl Tower {
         let mut dzs: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
         let ro = self.layout.readout;
         let rb = self.layout.readout_bias;
+        if compared.is_some_and(|m| m.len() != classes.len()) {
+            return refuse("a comparison for each class of the section");
+        }
         for (i, cell) in cells.iter().enumerate() {
-            let target = classes[i + 1];
+            let target = compared.map_or(Some(classes[i + 1]), |m| m[i + 1]);
             let face = &cell.face;
-            let dz: Vec<i64> = (0..a)
-                .map(|c| {
-                    let p = ((face.masses[c] << COVECTOR_BITS) + face.total / 2) / face.total;
-                    p as i64 - if c == target { 1i64 << COVECTOR_BITS } else { 0 }
-                })
-                .collect();
+            let dz: Vec<i64> = match target {
+                Some(target) => covector(face, target),
+                None => vec![0; a],
+            };
             for (slot, &v) in g[rb..rb + a].iter_mut().zip(&dz) {
                 *slot += v as i128;
             }
@@ -871,12 +1224,23 @@ impl Tower {
             dzs.push(dz);
         }
         let tops: Vec<&[i32]> = cells.iter().map(|cell| cell.top.as_slice()).collect();
-        outer_sum(&mut g[ro..ro + a * w], w, &dzs, &tops);
+        outer_sum(&mut g[ro..ro + a * w], w, &dzs, &tops)?;
+        if let Some(joined) = joined {
+            if joined.len() != cells_n {
+                return refuse("a joined covector for each cell of the section");
+            }
+            for (top, extra) in dx.iter_mut().zip(joined) {
+                for (v, e) in top.iter_mut().zip(extra) {
+                    *v = fit64(*v as i128 + *e as i128)?;
+                }
+            }
+        }
         for l in (0..d.levels).rev() {
             let lv = self.layout.levels[l];
             let r = &reaches.levels[l];
             let mut read_cov: Vec<Vec<(i64, i64)>> = Vec::with_capacity(cells_n);
             let mut das: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
+            let mut dbs: Vec<Vec<i64>> = Vec::with_capacity(if d.contact != ContactLaw::Rectifying { cells_n } else { 0 });
             let mut dreads: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut negs: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             for (i, cell) in cells.iter().enumerate() {
@@ -887,12 +1251,37 @@ impl Tower {
                 }
                 let mut dv = vec![0i64; f];
                 transposed(&t[lv.ret..lv.ret + w * f], r[5], f, dy, MATERIAL_BITS, &mut dv)?;
-                let da: Vec<i64> = dv.iter().zip(&lc.drive).map(|(&v, &drive)| if drive > 0 { v } else { 0 }).collect();
-                for (slot, &v) in g[lv.contact_bias..lv.contact_bias + f].iter_mut().zip(&da) {
+                // The covectors of each drive's material part and of its bias: one covector a drive
+                // except in the foil, whose material parts meet the other drive's bias alone.
+                let times = |y: &[i32]| -> Result<Vec<i64>> { collect_exact(dv.iter().zip(y).map(|(&v, &y)| fit64(release(v as i128 * y as i128, FACE_BITS)))) };
+                let (da, da_bias, db, db_bias) = match d.contact {
+                    ContactLaw::Rectifying => {
+                        let da: Vec<i64> = dv.iter().zip(&lc.drive).map(|(&v, &drive)| if drive > 0 { v } else { 0 }).collect();
+                        (da.clone(), da, Vec::new(), Vec::new())
+                    }
+                    ContactLaw::Pair => {
+                        let (da, db) = (times(&lc.pair)?, times(&lc.drive)?);
+                        (da.clone(), da, db.clone(), db)
+                    }
+                    ContactLaw::PairLinear => {
+                        (times(&t[lv.pair_bias..lv.pair_bias + f])?, times(&lc.pair)?, times(&t[lv.contact_bias..lv.contact_bias + f])?, times(&lc.drive)?)
+                    }
+                };
+                for (slot, &v) in g[lv.contact_bias..lv.contact_bias + f].iter_mut().zip(&da_bias) {
                     *slot += v as i128;
                 }
                 let mut dr = vec![0i64; w];
                 transposed(&t[lv.contact..lv.contact + f * w], r[4], w, &da, MATERIAL_BITS, &mut dr)?;
+                if d.contact != ContactLaw::Rectifying {
+                    for (slot, &v) in g[lv.pair_bias..lv.pair_bias + f].iter_mut().zip(&db_bias) {
+                        *slot += v as i128;
+                    }
+                    let mut dr_b = vec![0i64; w];
+                    transposed(&t[lv.pair..lv.pair + f * w], r[10], w, &db, MATERIAL_BITS, &mut dr_b)?;
+                    for (a, b) in dr.iter_mut().zip(&dr_b) {
+                        *a = fit64(*a as i128 + *b as i128)?;
+                    }
+                }
                 let dread = ratio_adjoint(&lc.read, lc.read_scale, &dr)?;
                 let neg: Vec<i64> = dread.iter().map(|v| -v).collect();
                 let mut hre = vec![0i64; n];
@@ -901,19 +1290,26 @@ impl Tower {
                 transposed(&t[lv.read_im..lv.read_im + w * n], r[3], n, &neg, MATERIAL_BITS, &mut him)?;
                 read_cov.push(hre.into_iter().zip(him).collect());
                 das.push(da);
+                if d.contact != ContactLaw::Rectifying {
+                    dbs.push(db);
+                }
                 dreads.push(dread);
                 negs.push(neg);
             }
             let level = |i: usize| &cells[i].levels[l];
             let conducts: Vec<&[i32]> = (0..cells_n).map(|i| level(i).conduct.as_slice()).collect();
             let reads: Vec<&[i32]> = (0..cells_n).map(|i| level(i).read.as_slice()).collect();
-            let faces_re: Vec<&[i32]> = (0..cells_n).map(|i| &level(i).state_face[..n]).collect();
-            let faces_im: Vec<&[i32]> = (0..cells_n).map(|i| &level(i).state_face[n..]).collect();
-            outer_sum(&mut g[lv.ret..lv.ret + w * f], f, &dx, &conducts);
-            outer_sum(&mut g[lv.contact..lv.contact + f * w], w, &das, &reads);
-            outer_sum(&mut g[lv.read_re..lv.read_re + w * n], n, &dreads, &faces_re);
-            outer_sum(&mut g[lv.read_im..lv.read_im + w * n], n, &negs, &faces_im);
-            // The reverse scan of the modes: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1).
+            let faces_re: Vec<&[i64]> = (0..cells_n).map(|i| &level(i).state_face[..n]).collect();
+            let faces_im: Vec<&[i64]> = (0..cells_n).map(|i| &level(i).state_face[n..]).collect();
+            outer_sum(&mut g[lv.ret..lv.ret + w * f], f, &dx, &conducts)?;
+            outer_sum(&mut g[lv.contact..lv.contact + f * w], w, &das, &reads)?;
+            if d.contact != ContactLaw::Rectifying {
+                outer_sum(&mut g[lv.pair..lv.pair + f * w], w, &dbs, &reads)?;
+            }
+            outer_sum(&mut g[lv.read_re..lv.read_re + w * n], n, &dreads, &faces_re)?;
+            outer_sum(&mut g[lv.read_im..lv.read_im + w * n], n, &negs, &faces_im)?;
+            // The reverse scan of the modes: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)
+            // (+ β_(t+1) conj(G_h(t+1)) when pumped).
             let mut carried: Vec<(i64, i64)> = vec![(0, 0); n];
             let mut gh_all: Vec<Vec<(i64, i64)>> = vec![Vec::new(); cells_n];
             for i in (0..cells_n).rev() {
@@ -924,9 +1320,10 @@ impl Tower {
                         Some(gate) => (gate[k].lam.0 as i128, gate[k].lam.1 as i128),
                         None => (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128),
                     };
+                    let (br, bi) = later.map_or((0, 0), |gate| (gate[k].beta.0 as i128, gate[k].beta.1 as i128));
                     let (cr, ci) = (carried[k].0 as i128, carried[k].1 as i128);
-                    let re = fit64(read_cov[i][k].0 as i128 + release(lr * cr + li * ci, MOVE_BITS))?;
-                    let im = fit64(read_cov[i][k].1 as i128 + release(lr * ci - li * cr, MOVE_BITS))?;
+                    let re = fit64(read_cov[i][k].0 as i128 + release(lr * cr + li * ci + br * cr + bi * ci, MOVE_BITS))?;
+                    let im = fit64(read_cov[i][k].1 as i128 + release(lr * ci - li * cr + bi * cr - br * ci, MOVE_BITS))?;
                     gh.push((re, im));
                 }
                 carried = gh.clone();
@@ -939,6 +1336,9 @@ impl Tower {
             let mut along = vec![0i128; n];
             let mut around = vec![0i128; n];
             let mut dqs: Vec<Vec<i64>> = Vec::with_capacity(if d.gated { cells_n } else { 0 });
+            let mut dss: Vec<Vec<i64>> = Vec::with_capacity(if d.turned { cells_n } else { 0 });
+            let mut dks: Vec<Vec<i64>> = Vec::with_capacity(if d.pumped { cells_n } else { 0 });
+            let mut dps: Vec<Vec<i64>> = Vec::with_capacity(if d.pumped { cells_n } else { 0 });
             let mut gres: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut gims: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             for (i, cell) in cells.iter().enumerate() {
@@ -946,6 +1346,9 @@ impl Tower {
                 let previous: &[(i64, i64)] = if i == 0 { &opening.modes[l] } else { &cells[i - 1].levels[l].state };
                 let gh = &gh_all[i];
                 let mut dq = vec![0i64; if d.gated { n } else { 0 }];
+                let mut ds = vec![0i64; if d.turned { n } else { 0 }];
+                let mut dk = vec![0i64; if d.pumped { n } else { 0 }];
+                let mut dp = vec![0i64; if d.pumped { n } else { 0 }];
                 for k in 0..n {
                     let (hr, hi) = (previous[k].0 as i128, previous[k].1 as i128);
                     let (gr, gi) = (gh[k].0 as i128, gh[k].1 as i128);
@@ -960,10 +1363,37 @@ impl Tower {
                         }
                         Some(m) => {
                             let faces = &reaches.gates[l];
-                            around[k] += release(m.lam.0 as i128 * gli - m.lam.1 as i128 * glr, MOVE_BITS);
+                            // Re(conj(i λ_t) G_λ): the covector of λ_t's turn, the founded turn's
+                            // and, through ∂θ/∂s = π, the arriving symbol's.
+                            let turning = release(m.lam.0 as i128 * gli - m.lam.1 as i128 * glr, MOVE_BITS);
+                            around[k] += turning;
+                            if d.turned {
+                                ds[k] = fit64(release(reaches.half_turn * turning, MOVE_BITS + COVECTOR_BITS + turn_spread(w)))?;
+                            }
+                            // h_(t−1) G_h(t), the covector of β_t, on 2^(−48).
+                            let (gbr, gbi) = (hr * gr - hi * gi, hr * gi + hi * gr);
+                            let one = 1i128 << MOVE_BITS;
+                            let (kappa, axis) = (m.kappa as i128, (m.axis.0 as i128, m.axis.1 as i128));
+                            if d.pumped {
+                                // Re(conj(iβ) G_β): the covector of the pump axis's turn, through ∂θ/∂p = π.
+                                let axis_turning = release(m.beta.0 as i128 * gbi - m.beta.1 as i128 * gbr, MOVE_BITS);
+                                dp[k] = fit64(release(reaches.half_turn * axis_turning, MOVE_BITS + COVECTOR_BITS + turn_spread(w)))?;
+                                // −sgn(κ) Re(conj(ρU) G_α) + Re(conj(ρP) G_β), the covector of κ, on 2^(−48).
+                                let rho = m.rho as i128;
+                                let (vr, vi) = (release(rho * m.unit.0 as i128, MOVE_BITS), release(rho * m.unit.1 as i128, MOVE_BITS));
+                                let (pr, pi) = (release(rho * axis.0, MOVE_BITS), release(rho * axis.1, MOVE_BITS));
+                                let g_kappa = release(pr * gbr + pi * gbi - kappa.signum() * (vr * glr + vi * gli), MOVE_BITS);
+                                // ∂κ/∂q = 2 ln 2 r (1 − r), on 2^(−30).
+                                let open = m.pump_open as i128;
+                                let f = release(release(ln2 * open, MOVE_BITS) * (one - open), MOVE_BITS);
+                                dk[k] = fit64(release(g_kappa * 2 * f, COVECTOR_BITS + MOVE_BITS))?;
+                            }
                             if !m.held {
-                                let (ur, ui) = faces.units[k];
-                                let g_rho = release(ur * glr + ui * gli, MOVE_BITS) - div_nearest(m.rho as i128 * through, m.gamma as i128);
+                                // ∂α/∂ρ = (1 − |κ|) U and ∂β/∂ρ = κ P (U alone when unpumped).
+                                let keep = one - kappa.abs();
+                                let (ur, ui) = (release(keep * m.unit.0 as i128, MOVE_BITS), release(keep * m.unit.1 as i128, MOVE_BITS));
+                                let (kr, ki) = (release(kappa * axis.0, MOVE_BITS), release(kappa * axis.1, MOVE_BITS));
+                                let g_rho = release(ur * glr + ui * gli + kr * gbr + ki * gbi, MOVE_BITS) - div_nearest(m.rho as i128 * through, m.gamma as i128);
                                 let (open, rho) = (m.open as i128, m.rho as i128);
                                 along[k] += release(g_rho * div_nearest(GATE_REACH * open * rho, faces.moduli[k].max(1)), MOVE_BITS);
                                 // ∂ρ_t/∂q = c ρ_t ℓ (ln 2)² r (1 − r), on 2^(−30).
@@ -990,14 +1420,41 @@ impl Tower {
                     }
                     transposed(&t[lv.gate..lv.gate + n * w], r[6], w, &dq, MATERIAL_BITS, &mut back_gate)?;
                 }
-                let next: Vec<i64> = collect_exact(
-                    dx[i].iter().zip(back_re.iter().zip(&back_im)).enumerate().map(|(j, (v, (a, b)))| fit64(*v as i128 + *a as i128 + *b as i128 + back_gate.get(j).map_or(0, |&c| c as i128))),
-                )?;
+                let mut back_turn = vec![0i64; if d.turned { w } else { 0 }];
+                if d.turned {
+                    for (slot, &v) in g[lv.turn_bias..lv.turn_bias + n].iter_mut().zip(&ds) {
+                        *slot += v as i128;
+                    }
+                    transposed(&t[lv.turn..lv.turn + n * w], r[7], w, &ds, MATERIAL_BITS, &mut back_turn)?;
+                }
+                let mut back_pump = vec![0i64; if d.pumped { w } else { 0 }];
+                let mut back_axis = vec![0i64; if d.pumped { w } else { 0 }];
+                if d.pumped {
+                    for (slot, &v) in g[lv.pump_bias..lv.pump_bias + n].iter_mut().zip(&dk) {
+                        *slot += v as i128;
+                    }
+                    transposed(&t[lv.pump..lv.pump + n * w], r[8], w, &dk, MATERIAL_BITS, &mut back_pump)?;
+                    for (slot, &v) in g[lv.pump_axis_bias..lv.pump_axis_bias + n].iter_mut().zip(&dp) {
+                        *slot += v as i128;
+                    }
+                    transposed(&t[lv.pump_axis..lv.pump_axis + n * w], r[9], w, &dp, MATERIAL_BITS, &mut back_axis)?;
+                }
+                let beside = |back: &[i64], j: usize| back.get(j).map_or(0, |&c| c as i128);
+                let next: Vec<i64> = collect_exact(dx[i].iter().zip(back_re.iter().zip(&back_im)).enumerate().map(|(j, (v, (a, b)))| {
+                    fit64(*v as i128 + *a as i128 + *b as i128 + beside(&back_gate, j) + beside(&back_turn, j) + beside(&back_pump, j) + beside(&back_axis, j))
+                }))?;
                 dx[i] = next;
                 gres.push(gre);
                 gims.push(gim);
                 if d.gated {
                     dqs.push(dq);
+                }
+                if d.turned {
+                    dss.push(ds);
+                }
+                if d.pumped {
+                    dks.push(dk);
+                    dps.push(dp);
                 }
             }
             // The opening's credit: the covector reaching the carried state, a = conj(λ_0) G_h(0),
@@ -1036,10 +1493,17 @@ impl Tower {
                 }
             }
             let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].input.as_slice()).collect();
-            outer_sum(&mut g[lv.push_re..lv.push_re + n * w], w, &gres, &inputs);
-            outer_sum(&mut g[lv.push_im..lv.push_im + n * w], w, &gims, &inputs);
+            outer_sum(&mut g[lv.push_re..lv.push_re + n * w], w, &gres, &inputs)?;
+            outer_sum(&mut g[lv.push_im..lv.push_im + n * w], w, &gims, &inputs)?;
+            if d.turned {
+                outer_sum(&mut g[lv.turn..lv.turn + n * w], w, &dss, &inputs)?;
+            }
+            if d.pumped {
+                outer_sum(&mut g[lv.pump..lv.pump + n * w], w, &dks, &inputs)?;
+                outer_sum(&mut g[lv.pump_axis..lv.pump_axis + n * w], w, &dps, &inputs)?;
+            }
             if d.gated {
-                outer_sum(&mut g[lv.gate..lv.gate + n * w], w, &dqs, &inputs);
+                outer_sum(&mut g[lv.gate..lv.gate + n * w], w, &dqs, &inputs)?;
                 // The Cartesian covector of the founded move: G_λ = u G_|λ| + i u G_φ/|λ|.
                 let faces = &reaches.gates[l];
                 for k in 0..n {
@@ -1157,7 +1621,7 @@ impl Tower {
             // coefficients interleaved (re, im) a mode.
             let mut moved = |moments: &mut [(i64, i64)], coefficients: &[Vec<i64>], shift: u32| -> Result<()> {
                 let mut sum = vec![0i128; 2 * n * w];
-                outer_sum(&mut sum, w, coefficients, &inputs);
+                outer_sum(&mut sum, w, coefficients, &inputs)?;
                 for k in 0..n {
                     for j in 0..w {
                         let z = moments[k * w + j];
@@ -1202,6 +1666,9 @@ impl Tower {
 
     /// Every stream's continuing state from its section's forward, its credit moved along it.
     fn carry_credit(&self, states: &mut [TowerState], ends: Vec<(Vec<Cell>, TowerState)>, opening: &[TowerState], reaches: &Reaches) -> Result<()> {
+        if self.declaration.turned && ends.iter().any(|(_, end)| end.credit.is_some()) {
+            return refuse("the passage credit does not carry a turned mode");
+        }
         states.par_iter_mut().zip(ends.into_par_iter()).zip(opening.par_iter()).try_for_each(|((s, (cells, mut end)), open)| {
             if let Some(credit) = end.credit.as_mut() {
                 self.advance_credit(credit, open, &cells, reaches)?;
@@ -1238,7 +1705,14 @@ impl Tower {
     pub fn to_text(&self) -> String {
         let d = &self.declaration;
         let gated = if d.gated { " gated" } else { "" };
-        let mut s = format!("moment-tower-v1 {} {} {} {} {}{gated}\n", d.alphabet, d.width, d.modes, d.contacts, d.levels);
+        let turned = if d.turned { " turned" } else { "" };
+        let pumped = if d.pumped { " pumped" } else { "" };
+        let contact = match d.contact {
+            ContactLaw::Rectifying => "",
+            ContactLaw::Pair => " pair",
+            ContactLaw::PairLinear => " pair-linear",
+        };
+        let mut s = format!("moment-tower-v1 {} {} {} {} {}{gated}{turned}{pumped}{contact}\n", d.alphabet, d.width, d.modes, d.contacts, d.levels);
         s.push_str(&self.theta.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
         s.push('\n');
         s
@@ -1248,13 +1722,31 @@ impl Tower {
     pub fn from_text(text: &str) -> Result<Self> {
         let mut lines = text.lines();
         let head: Vec<&str> = lines.next().unwrap_or("").split(' ').collect();
-        let gated = head.len() == 7 && head[6] == "gated";
-        if !(head.len() == 6 || gated) || head[0] != "moment-tower-v1" {
+        if head.len() < 6 || head[0] != "moment-tower-v1" {
             return refuse("not a moment tower's text");
         }
+        // The mode laws in their order (`gated`, `turned`, `pumped`), then the contact law.
+        let (modes, contact) = match head[6..].split_last() {
+            Some((&"pair", modes)) => (modes, ContactLaw::Pair),
+            Some((&"pair-linear", modes)) => (modes, ContactLaw::PairLinear),
+            _ => (&head[6..], ContactLaw::Rectifying),
+        };
+        if modes.len() > 3 || modes != &["gated", "turned", "pumped"][..modes.len()] {
+            return refuse("not a moment tower's text");
+        }
+        let (gated, turned, pumped) = (!modes.is_empty(), modes.len() >= 2, modes.len() == 3);
         let num = |s: &str| s.parse::<usize>().map_err(|_| TowerError::Refused("a declaration that is not a count"));
-        let declaration =
-            TowerDeclaration { alphabet: num(head[1])?, width: num(head[2])?, modes: num(head[3])?, contacts: num(head[4])?, levels: num(head[5])?, gated };
+        let declaration = TowerDeclaration {
+            alphabet: num(head[1])?,
+            width: num(head[2])?,
+            modes: num(head[3])?,
+            contacts: num(head[4])?,
+            levels: num(head[5])?,
+            gated,
+            turned,
+            pumped,
+            contact,
+        };
         let layout = Layout::new(&declaration);
         let theta: Vec<i32> = lines
             .next()
@@ -1320,19 +1812,24 @@ pub struct TowerLearner {
     /// The step's rate, `2^(−k)`.
     pub rate_bits: u32,
     /// The last section's swell per level, on `2^(−16)`: `max |x|`, `max |h|` (its face), `max
-    /// ‖r‖_rms`, `max |W₁ r̂ + b₁|` over every stream's cells. A reading for the receipt, not material.
+    /// ‖r‖_rms`, `max |W₁ r̂ + b₁|` (and the pair contact's second drive) over every stream's cells.
+    /// A reading for the receipt, not material.
     pub swell: Vec<[u64; 4]>,
 }
 
 /// A section's receipt: its code before and after (on `2^(−20)` bits), the halvings the
-/// certificate took, and whether a deposit was admitted.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+/// certificate took, and whether a deposit was admitted; and each part's code before and after,
+/// in the order the parts were given (after is before where nothing was deposited). The
+/// certificate admits a step on the parts' summed covector when the whole code falls, so one part's
+/// code can rise under a step the others pay for: the parts' codes read whether they do.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SectionReceipt {
     pub cells: usize,
     pub code_before: i64,
     pub code_after: i64,
     pub halvings: u32,
     pub deposited: bool,
+    pub parts: Vec<(i64, i64)>,
 }
 
 impl TowerLearner {
@@ -1356,8 +1853,9 @@ impl TowerLearner {
                 })
                 .max()
                 .unwrap_or(0);
+            let pair = if self.tower.declaration.contact == ContactLaw::Rectifying { String::new() } else { format!(" pair={}", r[10]) };
             line.push_str(&format!(
-                "L{l} x={} h={} r={} a={} push={} read={} contact={} return={} lambda={} ",
+                "L{l} x={} h={} r={} a={} push={} read={} contact={}{pair} return={} lambda={} ",
                 s[0], s[1], s[2], s[3], r[0].max(r[1]), r[2].max(r[3]), r[4], r[5], lambda
             ));
         }
@@ -1369,9 +1867,22 @@ impl TowerLearner {
     /// The streams' covectors are summed, the moments move, the step is certified by the reread,
     /// and each stream's state continues under the material the section ends with.
     pub fn section(&mut self, states: &mut [TowerState], classes: &[&[usize]]) -> Result<SectionReceipt> {
+        self.section_compared(states, classes, None)
+    }
+
+    /// A section whose comparison is declared place by place (`reverse_joined`): each face is
+    /// compared with the class `compared` names there, or with nothing where the class read is
+    /// the tower's own release re-entering. A place compared with nothing sends no covector and
+    /// neither the code nor the certificate counts it; the code and the certificate read every
+    /// other face at its declared class.
+    pub fn section_compared(&mut self, states: &mut [TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>) -> Result<SectionReceipt> {
         if states.len() != classes.len() || classes.iter().any(|c| c.len() < 2) {
             return refuse("a section needs one carried state and two classes a stream");
         }
+        if compared.is_some_and(|m| m.len() != classes.len() || m.iter().zip(classes).any(|(m, c)| m.len() != c.len())) {
+            return refuse("a comparison for each class of each stream");
+        }
+        let target = |s: usize, i: usize| compared.map_or(Some(classes[s][i]), |m| m[s][i]);
         let tower = &self.tower;
         let reaches = tower.reaches();
         let opening: Vec<TowerState> = states.to_vec();
@@ -1389,28 +1900,33 @@ impl TowerLearner {
                 let mut m = [0u64; 4];
                 for lc in forwards.iter().flat_map(|(cells, _)| cells.iter().map(move |c| &c.levels[l])) {
                     m[0] = m[0].max(reach(&lc.input));
-                    m[1] = m[1].max(reach(&lc.state_face));
+                    m[1] = m[1].max(reach64(&lc.state_face));
                     m[2] = m[2].max(lc.read_scale as u64);
-                    m[3] = m[3].max(reach(&lc.drive));
+                    m[3] = m[3].max(reach(&lc.drive)).max(reach(&lc.pair));
                 }
                 m
             })
             .collect();
         let faces_old: Vec<(u128, u128)> = forwards
             .iter()
-            .zip(classes)
-            .flat_map(|((cells, _), c)| cells.iter().enumerate().map(move |(i, cell)| (cell.face.masses[c[i + 1]], cell.face.total)))
+            .enumerate()
+            .flat_map(|(s, (cells, _))| cells.iter().enumerate().filter_map(move |(i, cell)| target(s, i + 1).map(|t| (cell.face.masses[t], cell.face.total))))
             .collect();
-        let code_before: i64 = forwards
-            .iter()
-            .zip(classes)
-            .map(|((cells, _), c)| cells.iter().enumerate().map(|(i, cell)| cell.face.code(c[i + 1])).sum::<i64>())
-            .sum();
+        let part_codes = |passes: &[(Vec<Cell>, TowerState)]| -> Vec<i64> {
+            passes
+                .iter()
+                .enumerate()
+                .map(|(s, (cells, _))| cells.iter().enumerate().filter_map(|(i, cell)| target(s, i + 1).map(|t| cell.face.code(t))).sum::<i64>())
+                .collect()
+        };
+        let parts_before = part_codes(&forwards);
+        let code_before: i64 = parts_before.iter().sum();
         let gradients: Vec<Vec<i128>> = opening
             .par_iter()
             .zip(forwards.par_iter())
             .zip(classes.par_iter())
-            .map(|((open, (cells, _)), c)| tower.reverse(open, cells, c))
+            .enumerate()
+            .map(|(s, ((open, (cells, _)), c))| tower.reverse(open, cells, c, compared.map(|m| m[s])))
             .collect::<Result<_>>()?;
         let mut g = vec![0i128; tower.theta.len()];
         for gs in &gradients {
@@ -1464,7 +1980,8 @@ impl TowerLearner {
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
                 self.tower.carry_credit(states, forwards, &opening, &reaches)?;
-                return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false });
+                let parts = parts_before.iter().map(|&c| (c, c)).collect();
+                return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false, parts });
             }
             candidate.project();
             let creaches = candidate.reaches();
@@ -1479,18 +1996,16 @@ impl TowerLearner {
                 .collect::<Result<_>>()?;
             let faces_new: Vec<(u128, u128)> = rereads
                 .iter()
-                .zip(classes)
-                .flat_map(|((cells, _), c)| cells.iter().enumerate().map(move |(i, cell)| (cell.face.masses[c[i + 1]], cell.face.total)))
+                .enumerate()
+                .flat_map(|(s, (cells, _))| cells.iter().enumerate().filter_map(move |(i, cell)| target(s, i + 1).map(|t| (cell.face.masses[t], cell.face.total))))
                 .collect();
             if fewer_bits(&faces_old, &faces_new) {
-                let code_after: i64 = rereads
-                    .iter()
-                    .zip(classes)
-                    .map(|((cells, _), c)| cells.iter().enumerate().map(|(i, cell)| cell.face.code(c[i + 1])).sum::<i64>())
-                    .sum();
+                let parts_after = part_codes(&rereads);
+                let code_after: i64 = parts_after.iter().sum();
+                let parts = parts_before.iter().copied().zip(parts_after).collect();
                 candidate.carry_credit(states, rereads, &opening, &creaches)?;
                 self.tower = candidate;
-                return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true });
+                return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true, parts });
             }
             halvings += 1;
         }
@@ -1615,6 +2130,121 @@ impl Tower {
             codes.push(cell.face.code(classes[i + 1]));
         }
         Ok(codes)
+    }
+
+    /// The class's face `E(u)`, the encoding the bottom level reads (`x⁰_t = E(u_t)`), on
+    /// `2^(−16)`.
+    pub fn encoding(&self, u: usize) -> &[i32] {
+        let w = self.declaration.width;
+        let e = self.layout.encoding + u * w;
+        &self.theta[e..e + w]
+    }
+
+    /// [agent-inferred with the mathematics thread, October 24] **The tension reading**: the
+    /// frozen tower reads `classes` from the state, and each cell's [`TensionCell`] (its face
+    /// compared with the class that arrives next) is handed to `each`. A reading beside the code:
+    /// the tower is not moved, and the receiver keeps only the three moment sums, never the cells.
+    pub fn read_tension(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(TensionCell) -> Result<()>) -> Result<()> {
+        let reaches = self.reaches();
+        let (w, n) = (self.declaration.width, self.declaration.modes);
+        let top_level = self.layout.levels.len() - 1;
+        let lv = &self.layout.levels[top_level];
+        let r = &reaches.levels[top_level];
+        let t = &self.theta;
+        let mut a = vec![0i64; w];
+        let mut b = vec![0i64; w];
+        for i in 0..classes.len().saturating_sub(1) {
+            let cell = self.step(state, classes[i], &reaches)?;
+            let level = &cell.levels[top_level];
+            let face = &level.state_face;
+            // Im(C h) = C_re h_im + C_im h_re, on 2^(−40) released to 2^(−16), then read on the
+            // read's ratio: only the read's ratio reaches the contacts.
+            affine(&t[lv.read_re..lv.read_re + w * n], r[2], n, &face[n..], None, 0, 0, &mut a)?;
+            affine(&t[lv.read_im..lv.read_im + w * n], r[3], n, &face[..n], None, 0, 0, &mut b)?;
+            let quadrature = collect_exact(a.iter().zip(&b).map(|(x, y)| {
+                let raw = release(*x as i128 + *y as i128, MATERIAL_BITS);
+                if level.read_scale == 0 { Ok(0) } else { fit32(div_nearest(raw << FACE_BITS, level.read_scale), "a quadrature's ratio outgrew its 32-bit carrier") }
+            }))?;
+            let below = level.input.clone();
+            each(TensionCell { covector: covector(&cell.face, classes[i + 1]), quadrature, below, top: cell.top })?;
+        }
+        Ok(())
+    }
+
+    /// [agent-inferred, October 24] **The faces a joined face reads**: the frozen tower reads
+    /// `classes` from the state, and each cell's index, top face (what the readout reads) and face
+    /// (the masses of the class that arrives next) are handed to `each`. A reading beside the code:
+    /// the tower is not moved, and the receiver keeps what it joins, never the cells.
+    pub fn read_faces(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, &[i32], &TowerFace) -> Result<()>) -> Result<()> {
+        let reaches = self.reaches();
+        for i in 0..classes.len().saturating_sub(1) {
+            let cell = self.step(state, classes[i], &reaches)?;
+            each(i, &cell.top, &cell.face)?;
+        }
+        Ok(())
+    }
+
+    /// [definition; agent-inferred with the mathematics thread, October 24] **Where the pair
+    /// contact's bilinear weight sits.** Each level's drives read back onto the modes' faces,
+    /// `A = W_a [C_re, −C_im]` and `B = W_b [C_re, −C_im]` (the read is `Re(C h)`, so a mode
+    /// enters through its in-phase and quadrature parts), give contact `o`'s bilinear block the
+    /// coefficient `A_(o,k) B_(o,k′)` on the product of modes `k` and `k′`. Its weight on the
+    /// founded memory rungs `(s, s′)` of the two modes (`|λ| = 1 − 2^(−s−1)` at founding, the
+    /// scale ladder's rung, the margin's rung shared past it) is
+    ///
+    /// ```text
+    /// E_(s,s′) = Σ_o (Σ_(k on s) |A_(o,k)|²) (Σ_(k′ on s′) |B_(o,k′)|²)
+    /// ```
+    ///
+    /// with each coefficient released to `2^(−24)` before it is squared, so `E` is on `2^(−96)`.
+    /// Rung `s` is the first drive's (rows), `s′` the second's (columns). The mathematics thread's
+    /// cycles record reads the slip's split through it: a held rung against a fast one is the
+    /// harmonic part (a cycle no local cell bounds, which retention keeps), fast against fast
+    /// the coexact (a local curl). An exterior reading of the material: the tower is not moved. A
+    /// rectifying tower has no bilinear block (a typed refusal).
+    pub fn bilinear_rungs(&self) -> Result<Vec<Vec<Vec<BigUint>>>> {
+        let d = &self.declaration;
+        if d.contact == ContactLaw::Rectifying {
+            return refuse("a rectifying contact has no bilinear block");
+        }
+        let (w, n, f) = (d.width, d.modes, d.contacts);
+        let turns = turn_ladder(n);
+        let rung = |k: usize| (k / turns).min(MARGIN as usize - 1);
+        let rungs = rung(n - 1) + 1;
+        let t = &self.theta;
+        let mut levels = Vec::with_capacity(self.layout.levels.len());
+        for lv in &self.layout.levels {
+            // Σ over a rung of |drive read back onto mode k|², per contact, on 2^(−48).
+            let on_rungs = |material: usize| -> Vec<Vec<u128>> {
+                (0..f)
+                    .map(|o| {
+                        let mut e = vec![0u128; rungs];
+                        for k in 0..n {
+                            let (mut re, mut im) = (0i128, 0i128);
+                            for i in 0..w {
+                                let m = t[material + o * w + i] as i128;
+                                re += m * t[lv.read_re + i * n + k] as i128;
+                                im += m * t[lv.read_im + i * n + k] as i128;
+                            }
+                            let (re, im) = (release(re, MATERIAL_BITS).unsigned_abs(), release(im, MATERIAL_BITS).unsigned_abs());
+                            e[rung(k)] += re * re + im * im;
+                        }
+                        e
+                    })
+                    .collect()
+            };
+            let (a, b) = (on_rungs(lv.contact), on_rungs(lv.pair));
+            let mut e = vec![vec![BigUint::from(0u32); rungs]; rungs];
+            for (ao, bo) in a.iter().zip(&b) {
+                for (s, &x) in ao.iter().enumerate() {
+                    for (s2, &y) in bo.iter().enumerate() {
+                        e[s][s2] += BigUint::from(x) * BigUint::from(y);
+                    }
+                }
+            }
+            levels.push(e);
+        }
+        Ok(levels)
     }
 }
 
@@ -1764,7 +2394,21 @@ mod tests {
     }
 
     fn tiny_with(levels: usize, gated: bool) -> Tower {
-        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels, gated };
+        tiny_turning(levels, gated, false, false)
+    }
+
+    /// The tiny tower whose gated modes' turn may be keyed by the arriving symbol, and a turned
+    /// one's pump; a turned one's turn, and a pumped one's depth and axis, open away from zero as
+    /// its gate does.
+    fn tiny_turning(levels: usize, gated: bool, turned: bool, pumped: bool) -> Tower {
+        tiny_declared(levels, gated, turned, pumped, ContactLaw::Rectifying)
+    }
+
+    /// The tiny tower under any mode and contact law; a pair contact's second drive opens away from
+    /// its one-sided opening (its material at the return's scale, its bias at unit) so its
+    /// bilinear block carries a covector.
+    fn tiny_declared(levels: usize, gated: bool, turned: bool, pumped: bool, contact: ContactLaw) -> Tower {
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels, gated, turned, pumped, contact };
         let mut tower = Tower::found(declaration, &keys(4096)).expect("founded");
         // Open the readout and the returns away from zero so every family carries a covector.
         let k = keys(8192);
@@ -1788,6 +2432,34 @@ mod tests {
                 }
             }
         }
+        if turned {
+            for lv in &layout.levels {
+                fill(&mut tower.theta, lv.turn, 8);
+                for v in &mut tower.theta[lv.turn..lv.turn + 8] {
+                    *v *= 8;
+                }
+            }
+        }
+        if contact != ContactLaw::Rectifying {
+            for lv in &layout.levels {
+                fill(&mut tower.theta, lv.pair, 16);
+            }
+        }
+        if pumped {
+            // The pump's depth at some tenths, its axis turned by a few half turns (measured: at
+            // |κ| near ½ the quadrature is shed and the gate's covector falls below the reading;
+            // the axis's covector scales with |β|).
+            for lv in &layout.levels {
+                fill(&mut tower.theta, lv.pump, 8);
+                fill(&mut tower.theta, lv.pump_axis, 8);
+                for v in &mut tower.theta[lv.pump..lv.pump + 8] {
+                    *v *= 4;
+                }
+                for v in &mut tower.theta[lv.pump_axis..lv.pump_axis + 8] {
+                    *v *= 32;
+                }
+            }
+        }
         tower
     }
 
@@ -1796,10 +2468,174 @@ mod tests {
         tower.read(&mut s, classes).expect("read")
     }
 
+    /// The tension reading's `B = Σ dz f̄ᵀ`, `f̄ = (top, 1)`, is the readout's covector the reverse
+    /// scan forms, and the reading moves the state as the forward does.
+    #[test]
+    fn the_tension_readings_bridge_is_the_readouts_covector() {
+        let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        let reaches = tower.reaches();
+        let opening = tower.rest();
+        let mut state = opening.clone();
+        let cells = tower.forward(&mut state, &classes, &reaches).expect("forward");
+        let g = tower.reverse(&opening, &cells, &classes, None).expect("reverse");
+        let (a, w) = (tower.declaration.alphabet, tower.declaration.width);
+        let (mut readout, mut bias, mut read) = (vec![0i128; a * w], vec![0i128; a], tower.rest());
+        let mut count = 0;
+        tower
+            .read_tension(&mut read, &classes, |cell| {
+                for c in 0..a {
+                    bias[c] += cell.covector[c] as i128;
+                    for j in 0..w {
+                        readout[c * w + j] += cell.covector[c] as i128 * cell.top[j] as i128;
+                    }
+                }
+                assert_eq!((cell.quadrature.len(), cell.below.len()), (w, w));
+                count += 1;
+                Ok(())
+            })
+            .expect("read");
+        assert_eq!(count, classes.len() - 1);
+        assert!(readout.iter().any(|&v| v != 0));
+        assert_eq!(&g[tower.layout.readout..tower.layout.readout + a * w], &readout[..]);
+        assert_eq!(&g[tower.layout.readout_bias..tower.layout.readout_bias + a], &bias[..]);
+        assert_eq!(read, state);
+    }
+
+    /// The faces a joined face reads are the forward's: each cell's top is the tension reading's,
+    /// its face is the one a step's advance returns, and the reading moves the state as they do.
+    #[test]
+    fn the_faces_read_beside_the_readout_are_the_forwards() {
+        let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        let mut tops = Vec::new();
+        tower
+            .read_tension(&mut tower.rest(), &classes, |cell| {
+                tops.push(cell.top);
+                Ok(())
+            })
+            .expect("tension");
+        let (mut read, mut stepped) = (tower.rest(), tower.rest());
+        let mut count = 0;
+        tower
+            .read_faces(&mut read, &classes, |i, top, face| {
+                let (step_face, step_top) = tower.advance_top(&mut stepped, classes[i]).expect("advance");
+                assert_eq!((top, face), (&step_top[..], &step_face));
+                assert_eq!(top, &tops[i][..]);
+                count += 1;
+                Ok(())
+            })
+            .expect("read");
+        assert_eq!(count, classes.len() - 1);
+        assert_eq!(read, stepped);
+    }
+
     #[test]
     fn text_restores_exactly() {
         text_restores_exactly_of(false);
         text_restores_exactly_of(true);
+    }
+
+    #[test]
+    fn a_pumped_tower_restores_exactly() {
+        let tower = tiny_turning(2, true, true, true);
+        assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
+        let turned = tiny_turning(2, true, true, false);
+        assert_eq!(Tower::from_text(&turned.to_text()).expect("restored"), turned);
+    }
+
+    /// A pumped tower whose pump is at zero (`κ = 0`) codes every section exactly as its turned
+    /// twin: the pump opens on the turn.
+    #[test]
+    fn a_pumped_tower_opens_on_its_turned_twin() {
+        let turned = tiny_turning(2, true, true, false);
+        let mut pumped = tiny_turning(2, true, true, true);
+        for lv in pumped.layout.levels.clone() {
+            pumped.theta[lv.pump..lv.pump + 8].fill(0);
+            pumped.theta[lv.pump_bias..lv.pump_bias + 2].fill(0);
+        }
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        assert_eq!(code(&pumped, &classes), code(&turned, &classes));
+    }
+
+    #[test]
+    fn a_pair_tower_restores_exactly() {
+        for contact in [ContactLaw::Pair, ContactLaw::PairLinear] {
+            let tower = tiny_declared(2, true, true, true, contact);
+            assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
+            let plain = tiny_declared(2, false, false, false, contact);
+            assert_eq!(Tower::from_text(&plain.to_text()).expect("restored"), plain);
+        }
+        assert!(Tower::from_text("moment-tower-v1 4 4 2 4 2 turned\n0\n").is_err());
+        assert!(Tower::from_text("moment-tower-v1 4 4 2 4 2 pair gated\n0\n").is_err());
+    }
+
+    /// The bilinear block's weight on the memory rungs: none at founding (`W_b = 0`); with the
+    /// second drive's material made the first's, symmetric; and with the read's material of every
+    /// mode on the second rung at zero, none on that rung for either drive.
+    #[test]
+    fn the_bilinear_weight_sits_on_the_rungs_its_drives_read() {
+        let declaration = |contact| TowerDeclaration { alphabet: 4, width: 4, modes: 16, contacts: 4, levels: 1, gated: false, turned: false, pumped: false, contact };
+        assert!(Tower::found(declaration(ContactLaw::Rectifying), &keys(16384)).expect("founded").bilinear_rungs().is_err());
+        let mut tower = Tower::found(declaration(ContactLaw::Pair), &keys(16384)).expect("founded");
+        let zero = BigUint::from(0u32);
+        let founded = tower.bilinear_rungs().expect("read");
+        assert_eq!((founded.len(), founded[0].len()), (1, 2));
+        assert!(founded[0].iter().flatten().all(|e| *e == zero));
+        let lv = tower.layout.levels[0].clone();
+        let (contact, pair) = (tower.theta[lv.contact..lv.contact + 16].to_vec(), lv.pair);
+        tower.theta[pair..pair + 16].copy_from_slice(&contact);
+        let e = &tower.bilinear_rungs().expect("read")[0];
+        assert_eq!(e[0][1], e[1][0]);
+        assert!(e.iter().flatten().all(|x| *x > zero));
+        for i in 0..4 {
+            for k in 8..16 {
+                tower.theta[lv.read_re + i * 16 + k] = 0;
+                tower.theta[lv.read_im + i * 16 + k] = 0;
+            }
+        }
+        let e = &tower.bilinear_rungs().expect("read")[0];
+        assert!(e[0][0] > zero);
+        assert_eq!([&e[0][1], &e[1][0], &e[1][1]], [&zero, &zero, &zero]);
+    }
+
+    /// Founded, the pair contact's second drive is `W_b = 0`, `b_b = 1`: the pair contact and its
+    /// linear foil code every passage alike, the one-sided contact `v = W_a r̂ + b_a`.
+    #[test]
+    fn the_pair_contact_and_its_foil_open_together() {
+        let declaration = |contact| TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels: 2, gated: true, turned: true, pumped: true, contact };
+        let mut pair = Tower::found(declaration(ContactLaw::Pair), &keys(4096)).expect("founded");
+        let mut foil = Tower::found(declaration(ContactLaw::PairLinear), &keys(4096)).expect("founded");
+        // Open the returns and the readout away from zero, the same in both.
+        for lv in pair.layout.levels.clone() {
+            for (i, v) in pair.theta[lv.ret..lv.ret + 16].iter_mut().enumerate() {
+                *v = (i as i32 - 8) << 20;
+            }
+        }
+        let ro = pair.layout.readout;
+        for (i, v) in pair.theta[ro..ro + 16].iter_mut().enumerate() {
+            *v = (7 - i as i32) << 21;
+        }
+        foil.theta.clone_from(&pair.theta);
+        assert_eq!(code(&pair, &PASSAGE), code(&foil, &PASSAGE));
+        // Once the second drive's material moves, the product's block separates them.
+        let lv = pair.layout.levels[0];
+        for (i, v) in pair.theta[lv.pair..lv.pair + 16].iter_mut().enumerate() {
+            *v = (i as i32 - 5) << 22;
+        }
+        foil.theta.clone_from(&pair.theta);
+        assert_ne!(code(&pair, &PASSAGE), code(&foil, &PASSAGE));
+    }
+
+    #[test]
+    fn the_pair_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_declared(2, false, false, false, ContactLaw::Pair), false, &PASSAGE, 10);
+        the_covector_of_tower_matches_the_code_difference(tiny_declared(2, true, false, false, ContactLaw::Pair), true, &PASSAGE, 10);
+    }
+
+    #[test]
+    fn the_linear_foils_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_declared(2, false, false, false, ContactLaw::PairLinear), false, &PASSAGE, 10);
     }
 
     fn text_restores_exactly_of(gated: bool) {
@@ -1824,21 +2660,66 @@ mod tests {
         the_covector_matches_the_code_difference_of(true);
     }
 
+    /// The thirteen classes every fixture reads.
+    const PASSAGE: [usize; 13] = [0, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+
+    #[test]
+    fn the_turned_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_turning(2, true, true, false), true, &PASSAGE, 10);
+    }
+
+    /// Read over 37 classes: on thirteen the pump axis's covector (it scales with |β|) stays below
+    /// the reading's 1/64 bit a unit (measured), and the longer passage carries it. Its steps are
+    /// `2^(−9)` units (measured): at `2^(−10)` the faces' release moved the second level's turn's
+    /// fitted slope to −112 against a covector of −91 (×2^20), at `2^(−8)` it read −93, but steps
+    /// that wide moved contacts across their kinks and left 29 of 39 families read.
+    #[test]
+    fn the_pumped_covector_matches_the_code_difference() {
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        the_covector_of_tower_matches_the_code_difference(tiny_turning(2, true, true, true), true, &classes, 9);
+    }
+
     fn the_covector_matches_the_code_difference_of(gated: bool) {
-        let tower = tiny_of(gated);
-        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        the_covector_of_tower_matches_the_code_difference(tiny_of(gated), gated, &PASSAGE, 10);
+    }
+
+    fn the_covector_of_tower_matches_the_code_difference(tower: Tower, gated: bool, classes: &[usize], step: u32) {
+        the_covector_of_tower_matches_the_code_difference_compared(tower, gated, classes, None, step);
+    }
+
+    /// The code of a passage whose faces are compared with `compared` (the classes read when it is
+    /// `None`), read from rest.
+    fn compared_code(tower: &Tower, classes: &[usize], compared: Option<&[Option<usize>]>) -> i64 {
+        let Some(compared) = compared else { return code(tower, classes) };
+        let mut s = tower.rest();
+        let cells = tower.forward(&mut s, classes, &tower.reaches()).expect("forward");
+        cells.iter().enumerate().filter_map(|(i, cell)| compared[i + 1].map(|t| cell.face.code(t))).sum()
+    }
+
+    /// The code read at sixteen steps `k 2^(−step)` units, `0 < |k| ≤ 8`.
+    fn the_covector_of_tower_matches_the_code_difference_compared(
+        tower: Tower,
+        gated: bool,
+        classes: &[usize],
+        compared: Option<&[Option<usize>]>,
+        step: u32,
+    ) {
         let opening = tower.rest();
         let reaches = tower.reaches();
         let mut s = opening.clone();
         let cells = tower.forward(&mut s, &classes, &reaches).expect("forward");
-        let mut g = tower.reverse(&opening, &cells, &classes).expect("reverse");
+        let mut g = tower.reverse(&opening, &cells, &classes, compared).expect("reverse");
         tower.to_step_grain(&mut g);
-        // Which contacts conduct at every cell: the covector is the derivative on the passage's own
-        // side of every kink, so a perturbation that moves a contact across its kink is not read.
+        // Which contacts conduct at every cell, and each pump's depth's sign: the covector is the
+        // derivative on the passage's own side of every kink, so a perturbation that moves a contact
+        // or a pump's |κ| across its kink is not read.
         let conducting = |t: &Tower| -> Vec<bool> {
             let mut s = t.rest();
             let cells = t.forward(&mut s, &classes, &t.reaches()).expect("forward");
-            cells.iter().flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().map(|&a| a > 0)).collect::<Vec<_>>()).collect()
+            cells
+                .iter()
+                .flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().filter(|_| l.pair.is_empty()).map(|&a| a > 0).chain(l.gate.iter().map(|m| m.kappa > 0))).collect::<Vec<_>>())
+                .collect()
         };
         let base = conducting(&tower);
         // Every family: its parameters by covector, largest first, the first whose steps of up to
@@ -1847,8 +2728,8 @@ mod tests {
         // releases every face to `2^(−16)`, and on the tiny tower that rounding moves one central
         // difference by up to a seventh (measured on the gated tower: ±2^(−7), ±2^(−8) and ±2^(−9)
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
-        let (mut checked, mut gates_checked) = (0, 0);
-        let base_code = code(&tower, &classes);
+        let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked) = (0, 0, 0, 0, 0);
+        let base_code = compared_code(&tower, &classes, compared);
         for &(start, len, grain) in &tower.layout.families {
             let mut order: Vec<usize> = (start..start + len).collect();
             order.sort_by_key(|&i| std::cmp::Reverse(g[i].abs()));
@@ -1857,7 +2738,7 @@ mod tests {
                 if gi.abs() < 1i128 << (STEP_BITS - 6) {
                     break; // below 1/64 bit a unit the difference over ±2^(−7) units nears the reading's grain
                 }
-                let h = 1i32 << (grain - 10);
+                let h = 1i32 << (grain - step);
                 let (mut moment, mut spread) = (0i128, 0i128);
                 for k in (-8i32..=8).filter(|&k| k != 0) {
                     let mut moved = tower.clone();
@@ -1865,7 +2746,7 @@ mod tests {
                     if conducting(&moved) != base {
                         continue 'parameter;
                     }
-                    moment += k as i128 * (code(&moved, &classes) - base_code) as i128; // on 2^(−20)
+                    moment += k as i128 * (compared_code(&moved, &classes, compared) - base_code) as i128; // on 2^(−20)
                     spread += (k * k) as i128;
                 }
                 // The fitted slope against g, both in bits a unit on 2^(−32).
@@ -1874,12 +2755,18 @@ mod tests {
                 assert!(error * 10 <= gi.abs(), "family at {start} grain {grain}, parameter {i}: covector {gi} against {numeric}");
                 checked += 1;
                 gates_checked += tower.layout.levels.iter().any(|lv| gated && (start == lv.gate || start == lv.gate_bias)) as usize;
+                turns_checked += tower.layout.levels.iter().any(|lv| tower.declaration.turned && (start == lv.turn || start == lv.turn_bias)) as usize;
+                pumps_checked += tower.layout.levels.iter().any(|lv| tower.declaration.pumped && [lv.pump, lv.pump_bias, lv.pump_axis, lv.pump_axis_bias].contains(&start)) as usize;
+                pairs_checked += tower.layout.levels.iter().any(|lv| tower.declaration.contact != ContactLaw::Rectifying && (start == lv.pair || start == lv.pair_bias)) as usize;
                 break;
             }
         }
         // A gated tower's gate material and bias are read at the first level (the second level's
         // gate covectors fall below 1/64 bit a unit on this fixture).
         assert!(!gated || gates_checked >= 2, "only {gates_checked} gate families carried a readable covector");
+        assert!(!tower.declaration.turned || turns_checked >= 2, "only {turns_checked} turn families carried a readable covector");
+        assert!(!tower.declaration.pumped || pumps_checked >= 4, "only {pumps_checked} pump families carried a readable covector");
+        assert!(tower.declaration.contact == ContactLaw::Rectifying || pairs_checked >= 2, "only {pairs_checked} pair families carried a readable covector");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 
@@ -1901,7 +2788,7 @@ mod tests {
         let covector = |opening: &TowerState, part: &[usize]| -> (Vec<i128>, TowerState) {
             let mut s = opening.clone();
             let cells = tower.forward(&mut s, part, &reaches).expect("forward");
-            let g = tower.reverse(opening, &cells, part).expect("reverse");
+            let g = tower.reverse(opening, &cells, part, None).expect("reverse");
             if let Some(credit) = s.credit.as_mut() {
                 tower.advance_credit(credit, opening, &cells, &reaches).expect("credit");
             }
@@ -1951,7 +2838,7 @@ mod tests {
         let reaches = tower.reaches();
         let mut s = opening.clone();
         let cells = tower.forward(&mut s, &classes, &reaches).expect("forward");
-        let mut g = tower.reverse(&opening, &cells, &classes).expect("reverse");
+        let mut g = tower.reverse(&opening, &cells, &classes, None).expect("reverse");
         tower.to_step_grain(&mut g);
         tower.to_move_chart(&mut g);
         // Each chart coordinate of each level: the mode with the largest covector, stepped by ±2^(−7).
@@ -2087,12 +2974,12 @@ mod tests {
     }
 
     fn a_section_learns_a_repeating_passage_of(gated: bool) {
-        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated };
+        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated, turned: false, pumped: false, contact: ContactLaw::Rectifying };
         let tower = Tower::found(declaration, &keys(4096)).expect("founded");
         let mut learner = TowerLearner::new(tower, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();
         let mut states = vec![learner.tower.rest(), learner.tower.rest()];
-        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false };
+        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new() };
         for section in 0..60 {
             let a = &passage[section * 32..section * 32 + 33];
             let b = &passage[2048 + section * 32..2048 + section * 32 + 33];
@@ -2100,8 +2987,65 @@ mod tests {
             // The certificate compares the exact products; the reading releases each cell to
             // 2^(−20) bits, so a certified step below that grain can read as a tie.
             assert!(!last.deposited || last.code_after <= last.code_before + last.cells as i64, "section {section}: {last:?}");
+            // The parts' codes are the section's, split by part.
+            assert_eq!(last.parts.len(), 2);
+            assert_eq!(last.parts.iter().map(|p| p.0).sum::<i64>(), last.code_before, "section {section}");
+            assert_eq!(last.parts.iter().map(|p| p.1).sum::<i64>(), last.code_after, "section {section}");
+            assert!(last.deposited || last.parts.iter().all(|p| p.0 == p.1), "section {section}");
         }
         // Under a quarter of a bit a class (the flat face codes two bits).
         assert!(last.code_after * 4 < (last.cells as i64) << READ_BITS, "{last:?}");
+    }
+
+    /// A place compared with nothing is the tower's own release re-entering what it reads.
+    /// Compared everywhere with the class that arrived, a section is the plain section; compared
+    /// nowhere, a passage sends no covector and codes nothing; and the covectors of two
+    /// complementary comparisons sum to the plain covector up to the reverse scan's releases.
+    #[test]
+    fn an_uncompared_class_sends_no_covector_and_is_not_counted() {
+        let tower = tiny_turning(2, true, true, true);
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        let opening = tower.rest();
+        let mut s = opening.clone();
+        let cells = tower.forward(&mut s, &classes, &tower.reaches()).expect("forward");
+        let plain = tower.reverse(&opening, &cells, &classes, None).expect("reverse");
+        let all: Vec<Option<usize>> = classes.iter().map(|&c| Some(c)).collect();
+        assert_eq!(tower.reverse(&opening, &cells, &classes, Some(&all)).expect("reverse"), plain);
+        let none = vec![None; classes.len()];
+        assert!(tower.reverse(&opening, &cells, &classes, Some(&none)).expect("reverse").iter().all(|&v| v == 0));
+        // Every third class re-entering, and its complement.
+        let some: Vec<Option<usize>> = classes.iter().enumerate().map(|(i, &c)| (i % 3 != 1).then_some(c)).collect();
+        let rest: Vec<Option<usize>> = classes.iter().enumerate().map(|(i, &c)| (i % 3 == 1).then_some(c)).collect();
+        let a = tower.reverse(&opening, &cells, &classes, Some(&some)).expect("reverse");
+        let b = tower.reverse(&opening, &cells, &classes, Some(&rest)).expect("reverse");
+        assert!(a != plain && b.iter().any(|&v| v != 0));
+        let (gap, size): (i128, i128) = a.iter().zip(&b).zip(&plain).fold((0, 0), |(g, n), ((x, y), p)| (g + (x + y - p).abs(), n + p.abs()));
+        assert!(gap * 1000 <= size, "complementary comparisons sum to {gap} away from a covector of {size}");
+        // The sections: compared everywhere as the plain one, compared nowhere coding nothing.
+        let mut plain_learner = TowerLearner::new(tower.clone(), 5);
+        let mut compared_learner = TowerLearner::new(tower.clone(), 5);
+        let (mut s1, mut s2) = (vec![tower.rest()], vec![tower.rest()]);
+        let r1 = plain_learner.section(&mut s1, &[&classes]).expect("section");
+        let r2 = compared_learner.section_compared(&mut s2, &[&classes], Some(&[&all])).expect("section");
+        assert_eq!((r1.code_before, r1.code_after, r1.deposited, r1.cells), (r2.code_before, r2.code_after, r2.deposited, r2.cells));
+        assert_eq!(plain_learner.tower, compared_learner.tower);
+        assert_eq!(s1, s2);
+        let mut silent = TowerLearner::new(tower.clone(), 5);
+        let r = silent.section_compared(&mut vec![tower.rest()], &[&classes], Some(&[&none])).expect("section");
+        assert_eq!((r.cells, r.code_before, r.deposited), (0, 0, false));
+        assert_eq!(silent.tower, tower);
+    }
+
+    /// The tower's own release read against another class where the two part: the passage reads
+    /// the release while the faces are compared with the truth (every fifth place another class,
+    /// every seventh compared with nothing), and the covector is still the slope of that
+    /// comparison's code, read on the gated tower: on the pumped one only 26 to 28 of its 39
+    /// families carried a readable covector over 37 or 61 classes (measured), every one read
+    /// matching.
+    #[test]
+    fn the_compared_covector_matches_the_code_difference() {
+        let compared: Vec<Option<usize>> =
+            PASSAGE.iter().enumerate().map(|(i, &c)| if i % 7 == 3 { None } else if i % 5 == 2 { Some((c + 1) % 4) } else { Some(c) }).collect();
+        the_covector_of_tower_matches_the_code_difference_compared(tiny_of(true), true, &PASSAGE, Some(&compared), 10);
     }
 }

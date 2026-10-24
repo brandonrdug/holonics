@@ -1,0 +1,1070 @@
+# The tower hears the Holonics text, and every look is read by its lock
+
+Refs #405 #404. Follows [the digit terrain](2026-10-23_ON_A_TERRAIN_OF_INTERACTING_DIGITS_THE_TOWER_COMPUTES_WHAT_IT_NEVER_MET_WHERE_IT_KNOWS_THE_LEVEL.md#every-look-read-by-its-lock-and-the-turn-to-the-holonics-text)
+and the mathematics thread's [one face law](2026-10-24_ONE_FACE_LAW_A_FACE_IS_A_CONGRUENCE_SO_LANGUAGE_ARITHMETIC_AND_ANY_OPERATION_ARE_READ_BY_ONE_CONTACT.md)
+and its record on cycles (PR #426). Status: [measurement; agent-inferred, October 24], on the host.
+
+## The failure this step works on
+
+Since October 23 every tower heard digit lines alone and every reading asked about digits. Brandon,
+October 24: arithmetic is one section of what the machine hears, and the conservation of faces
+carries between language, arithmetic and any operation. This step lets the tower hear the public
+Holonics text with the digits as one section of four, and reads every section by the same lock.
+
+## The claim fixed first
+
+No completion is claimed. The step measures two things: what each tower writes in each medium from
+a held-out opening, shown whole; and whether looking again holds the lock in each medium (the
+micro-control's §7: `λ` grows or holds and `F*` falls or holds, `λ` the longest order-consistent
+coupling of a look with the true rest and `F* = |H| + |T| − 2λ`). The acceptance the line is held to
+from here: looking again holds the lock in every medium, at moments the tower locates itself and not
+at a declared byte.
+
+## The terrain
+
+`tools/holonics_text_terrain.py . .local/run/arith100 54016 12000 4000 .local/run/htext1` cuts four
+media from the tracked tree: the dated records' prose (`research/records/*.md`, top level), the
+Framework's Lean (`lean/Holonics/`), the main library's Rust (`crates/holonics/src/`) and the digit
+terrain's lines. Each text medium is its files in path order read at a stride, so the cut spans the
+tree. Training takes the files at `k · stride`, the held-out text the files at
+`k · stride + stride/2`, so no file is in both. From each file it takes whole lines from the start to
+4,000 bytes.
+
+| medium | training | held out |
+|---|---|---|
+| prose | 54,087 bytes from 16 records | 12,080 from 5 |
+| Lean | 54,067 from 18 files | 12,047 from 5 |
+| Rust | 54,070 from 15 files | 12,093 from 5 |
+| digits | 54,016 (the digit terrain's training lines) | 11,998 (its held-out lines) |
+
+216,240 training bytes and 48,218 held out (`MANIFEST.tsv` pins every piece by its SHA-256). The
+training text holds the four media one after another, so each of the eight streams reads mostly one
+medium and every section deposits all four together.
+
+## The towers and their runs
+
+Both are the pumped tower (width 64, 64 modes, 256 rectifying contacts, two levels), eight streams of
+128 cells, rate `2^(−7)`, the keys `keys_tower.bin`, 12 passes:
+
+- **plain**: `train-pumped-tower`, every byte compared on the plain stream;
+- **taught to look again**: `train-looking-pumped-tower` with the moment at `=` and the line end at
+  `\n` (four agreeing draws), the [looking tower](2026-10-23_ON_A_TERRAIN_OF_INTERACTING_DIGITS_THE_TOWER_COMPUTES_WHAT_IT_NEVER_MET_WHERE_IT_KNOWS_THE_LEVEL.md#looking-inside-training)
+  with the fork comparing the true rest only at the lock's slips.
+
+Projections came from one development pass each: 32.6 s for plain, 59.6 s for the taught tower. The
+taught tower ran 12 passes in 682.6 s against 715 s projected (ratio 0.95). Its passes took 53.7 to
+58.8 s and its peak resident set was 419 MB. The plain run's first pass took 33,215 ms against its bound of
+32,626 ms (1.8% over the single development measurement) and was stopped there, incomplete. It was
+continued from the state that pass left, with the bound raised to the largest measured pass. That is
+the projection rule's update of its own measurement before the new launch, not a raised limit. The
+streams open at rest each pass and a plain run draws no keys, so the continuation is the
+uninterrupted run's. Its 11 passes took 29.5 to 33.1 s, 340.6 s in all against 365 s projected (ratio
+0.93), with a peak of 158 MB.
+
+Two more towers, the same declaration with the pair contact below in place of the rectifier, trained
+on the plain stream like the plain tower:
+
+- **pair**: `train-pair-pumped-tower`, 12 passes in 452.8 s against 483 s projected (12 × 40.3 s,
+  the larger of the two development passes, 40,276 ms; ratio 0.94), passes 36.2 to 39.7 s, peak
+  173 MB;
+- **its linear foil**: `train-pair-linear-pumped-tower`, the same material and opening with the
+  bilinear block held at zero. Its ninth pass took 41,080 ms against the 40,276 ms bound and the
+  run stopped there, incomplete. It is read at the state that pass left (`STATE.8`), beside the pair
+  tower at the same pass (`pair, 9 passes`), and not relaunched.
+
+## What they write
+
+Each tower got a line end and the opening of the first held-out file of each text medium (for Lean,
+the module comment after the imports), or the first held-out digit line up to `=`. It wrote 400 bytes
+with four agreeing draws a byte (`sample-tower`, keys `keys16k.bin`). Shown whole as written; a run of
+trailing spaces is cut and counted.
+
+**Taught to look again.** Prose, after `# THE PENDING DEED CROSSES THE REGISTER APERTURE`:
+
+```text
+The comparisonCurrent word constitution and a commation the and the and a conservation cometricalation the and the and and the and and at a constitution and the and the the and the and the and and and a station and the constitution a commatchare and the native and the and the constitution and the constitution and the the the the and the the and constitution and a constitution the and the and the a
+```
+
+Lean, after `/-!` and `# Clocks and their readings: elapsed time is a pairing`:
+
+```text
+import Holonics.Position: V →ₗ[𝕜] Q) (stransilt : V →ₗ[𝕜] Q) (the carry: &'a make::hnn::{Q (native : V)
+```
+
+(then a line end and 282 spaces)
+
+Rust, after `//! **Two clocks: the Farey lock and the convergent near-returns.**` and `//!`:
+
+```text
+//! The and the constitution and the and a constitution and the are a comention and the and the the and constitution and the constitution and the and and the and the and the the the and the is the and a steper the constith the and an an the the and the and the constitution and the and the and the constitution and the the the the and the the and the the and the constitution and the and the and the 
+```
+
+Digits, after `74-72=`:
+
+```text
+2 Q) (Eamparate::{V : V →ₗ[𝕜] Q;
+    pub(complex) : V : V →ₗ[𝕜] Q) (the structionCurvatariented_conservation: V : V : V : V (LinearMap<usive_conservation: V →ₗ[𝕜] Q) (strains: &'a chec<Rat>,
+    pub(complex>,
+```
+
+(then 170 spaces)
+
+**Plain.** Prose:
+
+```text
+@[orience) 𝕜] V) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] V) : V Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] V) (Q) :=
+    }
+}
+
+theorem : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : Q →ₗ[𝕜] Q) : V Q) : V →ₗ[𝕜] Q) ∈ invariant: &self, &self, &str) = receivingReceivingReceivingLaw_one_exact Receiving::hnn::hnn::hnn::hnn::hnn::hnn::hnn
+```
+
+Lean:
+
+```text
+## The complete constition receiving constition and the complete the comparison and the chart only the interned constition constition conservation and constition and the conchandented contact and and and the complete and and the compains and the construction and the complete construction only the complete and are and the the the complete commation and the and the conciance and the complete constit
+```
+
+Rust:
+
+```text
+# The and are and the the conchandentity and the complete complete complete the changes and the the constition the complete receiver the can and constition and and the constition the the complete and and the compains and the construction and the complete construction only the complete and are and the the the complete commation and the and the conciance and the complete constit
+```
+
+Digits:
+
+```text
+ort5un V →ₗ[𝕜] V) →ₗ[𝕜] Q) : V Q) : V Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V Q) : V Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V Q) : V Q) :=
+    (&trainned_exact Fibre_test →ₗ[𝕜] V) = rel {
+        (&transport {
+```
+
+(then 76 spaces)
+
+Both babble. Each holds the commonest words of the prose (`the`, `and`, `constitution`,
+`conservation`, `complete`) and the commonest Lean signature (`V →ₗ[𝕜] Q)`) and loops on them. The
+taught tower stays in the medium it was given, except after `74-72=`, where it writes the true
+difference `2` and then Lean. The plain tower leaves the medium: it writes Lean signatures after the
+prose heading, and prose after the Lean and Rust module comments (whose own text is markdown). The
+two Lean and Rust prose writings share their last 200 bytes word for word: one loop the plain tower
+falls into from either opening.
+
+**Pair, 12 passes.** Prose:
+
+```text
+\]
+variable constitutive scorence orientedArcurrence orientedArcuration.
+
+## The complete and consenty open is the comparison and construction and construction and the complete and construction comparisational construction and consense and construction constitutive constitutive is constitutive is the complete and complete constitutive constitutive constitutive is the comparison and the comparisati
+```
+
+Lean:
+
+```text
+active complete constitutive and the comparisational construction, the comparison the comparison construction and the complete and conses and the comparison construction and the construction and the complete constitutive and complete and construction constitutive or the construction oriented construction constitutive is the complete instruction and the commutes and consect and construction and com
+```
+
+Rust: 400 spaces and nothing else.
+
+Digits, after `74-72=`:
+
+```text
+0
+    (quotient Fibre) :
+    (quotient commutes (LinearMap.ker quotient)
+
+/-- Option<Option<EpochReceivingLawSiteLawStr(),
+```
+
+(then 277 spaces)
+
+**Its linear foil, 9 passes.** Prose:
+
+```text
+The
+import PartialLochRetained chart commandmarks and and conserve receiver the conservation and change classical consed change change conchere the commanding ally the conserval the conservation the change consely conservation and
+    partitionReceiving::RestitTich groblar::hnn::ReceivingRetionRetionReading::{Exact : V →ₗ[𝕜] Q) (left (x => &stration,
+```
+
+(then 40 spaces)
+
+Lean:
+
+```text
+/-- The complete conserver not carry and change and commonic and the clared consely conserfice and
+/// is the conservation consely conses and close conserval changes and consely conservation addressere and consely conservation and
+    partitionReceiving::RestitSelved::Receiving_conserved_is_constr_consel_index>::Reshen_consed::Rest(),
+```
+
+(then 63 spaces)
+
+Rust:
+
+```text
+/// The chart and constrous and arior change conserved consely conservation the close is a conservation and
+//! and change conservation the conservation and change with noring and change classesse and change conserved commonic and commonic and
+import interval chantic change consely distition chantic is changes the classice invary change conservection change consection and
+
+
+
+[desserthine = chanded
+```
+
+Digits, after `74-72=`:
+
+```text
+ [Q.code_admitted::ReloringLockQ.withmodeR2)
+        (channervedVec<Comparis::{Ve::Fibre_cending_certive_appored_conseln>,
+```
+
+(then 277 spaces)
+
+The pair tower babbles as the others do and loops on one family of words (`construction`,
+`constitutive`, `comparison`). After the Rust module comment it writes only spaces, a whitespace
+loop, and after `74-72=` it writes `0`, not `2`. The foil switches media within a line (prose into
+Rust paths, Lean comments into Rust doc comments) and writes no answer after `74-72=`. The pair
+tower at 9 passes writes in the same families (`WRITE_pair8_*`).
+
+Held-out code after the last pass, beside the writing and not its reading (bits a byte): taught
+tower prose 3.080, Lean 3.089, Rust 2.755, digits 2.276; plain prose 2.971, Lean 2.975, Rust 2.662,
+digits 2.308; pair tower (all four media together) 2.748 after 12 passes and 2.783 after 9, its foil
+2.809 after 9.
+
+## The lock where the tower looks again
+
+`read-lines-again` opens each held-out line that holds `=` on the state the true text before it
+left. It writes the rest of the line, then looks again up to eight times (the fork carries its look,
+the line end and the head again). Each look is read by its lock with the true rest
+(`tools/text_looks.py`). Sums over the lines, first look to last, and the lines whose lock held or
+grew:
+
+| medium (lines with `=`) | true rest bytes | taught to look again | plain |
+|---|---|---|---|
+| prose (7) | 242 | λ 55 → 52, F* 328 → 408, held on 2 | λ 33 → 38, F* 342 → 359, held on 4 |
+| Lean (24) | 1,469 | λ 275 → 297, F* 1,870 → 2,012, held on 6 | λ 357 → 362, F* 2,032 → 2,010, held on 10 |
+| Rust (12) | 491 | λ 143 → 131, F* 729 → 768, held on 6 | λ 136 → 127, F* 737 → 727, held on 6 |
+| digits, line met in training (159) | 622 | λ 346 → 346, F* 552 → 553, held on 125 | λ 337 → 342, F* 580 → 572, held on 130 |
+| digits, line not met (1,041) | 3,909 | λ 2,162 → 2,190, F* 3,453 → 3,432, held on 846 | λ 2,175 → 2,160, F* 3,539 → 3,561, held on 813 |
+
+The pair towers at `=`, the same lines:
+
+| medium | pair, 12 passes | pair, 9 passes | linear foil, 9 passes |
+|---|---|---|---|
+| prose | λ 54 → 42, F* 322 → 278, held on 4 | λ 46 → 20, F* 311 → 253, held on 5 | λ 40 → 53, F* 320 → 347, held on 3 |
+| Lean | λ 135 → 92, F* 1,540 → 1,550, held on 14 | λ 214 → 124, F* 1,631 → 1,630, held on 8 | λ 315 → 248, F* 1,806 → 1,754, held on 5 |
+| Rust | λ 112 → 113, F* 684 → 662, held on 7 | λ 86 → 100, F* 596 → 564, held on 6 | λ 102 → 108, F* 685 → 617, held on 6 |
+| digits, met | λ 358 → 369, F* 533 → 506, held on 138 | λ 327 → 330, F* 596 → 588, held on 135 | λ 327 → 323, F* 601 → 613, held on 123 |
+| digits, not met | λ 2,198 → 2,249, F* 3,393 → 3,297, held on 889 | λ 2,072 → 2,094, F* 3,713 → 3,658, held on 860 | λ 2,086 → 2,100, F* 3,758 → 3,747, held on 842 |
+
+The pair tower was never taught to look, and at `=` its looking again holds on digits, met and
+unmet, by more than the taught tower's (unmet: λ +51 and F* −96 against +28 and −21), and on Rust's
+twelve lines. Its foil at the same pass holds on unmet digits by less (λ +14, F* −11) and falls on
+met ones.
+
+No held-out text line is met verbatim in training, since the files differ.
+
+- **Digits.** On unmet lines the taught tower's looking again holds the lock in sum (`λ` +28, `F*`
+  −21) where the plain tower's falls (`λ` −15, `F*` +22). The taught tower learned to look at `=`, on
+  the lines where `=` asks.
+- **Prose, Lean and Rust.** Looking again at `=` does not hold. The taught tower's `λ` falls on prose
+  and Rust and grows on Lean while its slip grows more. The plain tower holds in sum on Lean only. At
+  its first look the taught tower holds 55% of the unmet digit rests in order (2,162 of 3,909 bytes),
+  29% of the Rust rests, 23% of the prose and 19% of the Lean.
+- **Why.** `=` asks a question on 1,253 held-out digit lines and on 7 prose, 24 Lean and 12 Rust lines
+  in about 12 KB of each. A declared moment byte is an arithmetic moment: the tower was taught to look
+  where digits ask, and it carried the arithmetic tilt into a terrain where digits are a quarter. By
+  the face law, the moment is where a located key fires: a recurrence the passage tree or a copy
+  contact locates, a seam the tower locates itself, or a written relation (`=`, `:=`, `:`, `->`, "is").
+  The look reads the partner's located face. That moment is medium-neutral, and the next loop places
+  the looks there.
+
+## The lock where a located key fires
+
+`read-lines-located` (depth 4) places the moment with no declared byte. The passage tree
+(`hnn::passage`) hears the read stream, and a line's moment is its first cell whose four classes up to
+it lie in the line and form a context the tree's lock locates at full depth: the same four classes
+met earlier in the passage. At least one class of the line must follow. The key is the line's own
+expression, in any medium. Depth four is the deepest at which every medium's held-out lines hold
+such keys (agent-inferred, counted before the reads): at depth 5 the digit lines fall to 480 of
+1,253 and at depth 6 to 76, since a two-digit operand makes longer contexts unique, while prose,
+Lean and Rust keep about 90% of their lines through depth 6. A key fires in 163 of 174 prose lines,
+145 of 153 Lean, 161 of 180 Rust and 1,007 of 1,253 digit lines. The reads write the first 1,200
+digit lines, which hold 957 of those moments: 535 fall on `=`, 333 before it and 89 after it. A text
+line's rest from the moment averages 65 to 76 bytes, a digit line's 3.3.
+
+Sums over the lines not met in training, first look to last (`READ_LOCATED.txt`):
+
+| tower | prose (158 lines, 10,771 bytes) | Lean (140, 10,948) | Rust (147, 11,141) | digits (831, 3,555) |
+|---|---|---|---|---|
+| taught to look again | λ 4,109 → 4,221, F* 13,285 → 13,491 | λ 3,840 → 3,835, F* 13,931 → 13,999 | λ 4,100 → 4,150, F* 14,494 → 14,387 | λ 2,032 → 1,997, F* 2,940 → 3,015 |
+| plain | λ 4,098 → 4,166, F* 13,471 → 13,736 | λ 3,705 → 3,709, F* 13,696 → 13,828 | λ 4,177 → 4,154, F* 14,335 → 14,476 | λ 1,999 → 1,992, F* 3,124 → 3,144 |
+| pair, 12 passes | λ 4,047 → 3,815, F* 13,456 → 13,295 | λ 3,559 → 3,279, F* 13,759 → 13,765 | λ 4,002 → 3,959, F* 14,664 → 14,848 | λ 2,047 → 2,075, F* 3,002 → 2,939 |
+| pair, 9 passes | λ 4,131 → 4,130, F* 13,090 → 13,267 | λ 3,633 → 3,372, F* 13,218 → 13,099 | λ 4,117 → 4,176, F* 14,279 → 14,233 | λ 1,964 → 1,968, F* 3,214 → 3,199 |
+| linear foil, 9 passes | λ 3,972 → 3,982, F* 13,596 → 13,453 | λ 3,744 → 3,494, F* 14,218 → 13,740 | λ 3,277 → 2,820, F* 14,922 → 14,677 | λ 1,970 → 1,949, F* 3,257 → 3,300 |
+
+- **The text media.** Looking again holds in sum in three of fifteen cells: the taught tower on
+  Rust, the pair tower at 9 passes on Rust, the foil on prose. Line by line it holds or grows on 31
+  to 63% of the lines in a cell (prose 80 to 93 of 158, Lean 55 to 73 of 140, Rust 45 to 93 of
+  147). Two looks in a row agree on 11 to 39 lines of 145 to 163. Each look of a long rest is
+  another babble, and its order agreement with the truth wanders from look to look.
+- **Digits.** The pair tower holds in sum at both passes, and per line it holds or grows on 691 of
+  831 lines at 12 passes (the plain tower 645, the taught 623, the foil 656). The taught tower,
+  which holds at `=`, falls here: its looking was learned at `=`, and 422 of the 957 digit moments
+  fall before or after it.
+- **What the first look holds.** At a located moment the first look holds 29 to 38% of a text
+  line's rest in order (λ over the rest's bytes), and 55 to 58% of a digit line's.
+
+The acceptance fixed above is not met: looking again does not hold in every medium. The pair
+contact is the first law under which it holds on digits at both kinds of moment without being
+taught to look. The next loop's subject, by its measurement: on prose, Lean and Rust, two looks in a
+row agree on about one line in ten, so a look does not yet settle. The moment here is the passage
+tree's, an exterior receiver hearing the read; a moment the tower locates itself is still owed.
+
+## A reading bug, found and repaired
+
+`read-lines` wrote each look as characters, one per byte. Each byte at or above `0x80` became two
+UTF-8 bytes, and the lock was read on those bytes. A look holding `𝕜` or `→` was therefore compared
+garbled, and so was every Lean and Rust look. The looks are now bytes. Every text field of
+`LINES.tsv` and `LOOKS.tsv` is written escaped (`escape_ascii`, with `|` as `\x7c`), so a field holds
+no tab or `|` and reads back to its exact bytes (`codecs.escape_decode`). The two towers' looks were
+read again with the repaired binary: the same looks, the corrected locks above. None of the digit
+terrain's 30 `LOOKS` receipts holds a byte at or above `0x80`, so its readings stand. Of these runs,
+only the plain tower's digit looks held such bytes, on three lines, and its digit sums above are the
+corrected ones.
+
+## The pair contact, built
+
+The face law reads every section through one pair contact `W(x̄ ⊗ ȳ)`, `x̄ = (x, 1)`, and the
+mathematics thread approved its mode form for the tower. `hnn::tower` now carries it as a contact
+law ([`ContactLaw`](../../crates/holonics/src/hnn/tower.rs)):
+
+```text
+Pair         v = (W_a r̂ + b_a) ⊙ (W_b r̂ + b_b)
+             δ(W_a r̂ + b_a) = δv ⊙ (W_b r̂ + b_b),   δ(W_b r̂ + b_b) = δv ⊙ (W_a r̂ + b_a)
+PairLinear   v = (W_a r̂ + b_a) b_b + b_a (W_b r̂)          the bilinear block held at zero
+Rectifying   v = max(W₁ r̂ + b₁, 0)
+```
+
+The second drive opens at `W_b = 0`, `b_b = 1`, so the contact opens one-sided, with no kink, and its
+bilinear block is learned from there. The first drive is founded as the rectifier's. The product is
+taken on `2^(−32)` and released to the face's `2^(−16)`. The second drive's material and bias follow
+every other family in the layout, so a rectifying tower's layout and text are unchanged. The text
+head gains `pair` or `pair-linear`. Tested (`cargo test -p holonics --lib hnn::tower::`, 27 passed):
+
+- both laws restore exactly from their text;
+- the pair contact and its foil code every passage alike at founding and differ once `W_b` moves;
+- each law's covector matches the code difference (the pair ungated and gated, the foil ungated,
+  with the second drive's families among those read).
+
+`train-pair-pumped-tower` and `train-pair-linear-pumped-tower` train it; its runs, writing and
+locks are above, beside the two rectifying towers as their foil. Tested with the rungs below, 28
+passed.
+
+From the mathematics thread's cycles record (PR #426), the reading the pair contact owes:
+
+- **Where the bilinear weight sits** (read in the next section). Report held×fast against
+  fast×fast, by the founded `|λ|` of the modes each drive reads. This is the slip's Hodge split read per section:
+  - exact: absorbed by rereading the faces, the one-sided blocks;
+  - coexact: a local curl, fast×fast;
+  - harmonic: a cycle no local cell bounds, held×fast.
+
+  The harmonic part is what retention keeps, and it is never collapsed to a score.
+- **The lap beside the phase.** A mode keeps its phase and modulus and counts no laps, so a sum's
+  carry (the crossing of the summed phase) is not yet carried as a winding.
+- **Two reports apart.** When the contact's material is deposited, a face changing with no new
+  input (`Ċm`) is reported apart from one changing under new input (`Cṁ`).
+
+## Where the pair tower's bilinear weight sits
+
+`read-tower-pair` reads [`Tower::bilinear_rungs`](../../crates/holonics/src/hnn/tower.rs): each
+level's two drives read back onto the modes' faces, `A = W_a [C_re, −C_im]` and `B = W_b [C_re,
+−C_im]`, and the bilinear block's weight on the founded memory rungs of the two modes,
+`E_(s,s′) = Σ_o (Σ_(k on s) |A_(o,k)|²)(Σ_(k′ on s′) |B_(o,k′)|²)`. The ladder has eight rungs,
+founded at `|λ| = 1 − 2^(−s−1)`, a memory of 2 to 256 cells. Held is the upper four rungs and fast
+the lower four (the ladder's halves, agent-inferred). In thousandths of each level's whole:
+
+| tower | level 1: held×fast, fast×fast, held×held | level 2 |
+|---|---|---|
+| pair, 12 passes | 483, 168, 350 | 498, 257, 245 |
+| pair, 9 passes | 479, 159, 363 | 499, 249, 252 |
+| linear foil, 9 passes | 463, 132, 405 | 488, 177, 336 |
+| equal weight on every rung pair | 500, 250, 250 | 500, 250, 250 |
+
+At founding `W_b = 0`, so every entry is zero: all of this weight was learned. The foil never takes
+the product, so its row is the placement the two drives' material reaches without it. On the first
+level both lean toward the held rungs, the foil more. The product, taken, moves weight from
+held×held toward the fast rungs at both levels (second level fast×fast 249 against the foil's 177 at
+the same pass). The held×fast part, the harmonic part of the cycles record's split, stays near its
+equal-weight share (463 to 499 of 500) in every tower. So the product's weight does not concentrate
+on the harmonic part. Where it moves, it moves toward the coexact (fast×fast) block. Full matrices
+in `PAIR_RUNGS_*.txt`.
+
+Still owed from that record: the lap count beside the phase, and the report of `Ċm` apart from `Cṁ`
+when the contact's material is deposited.
+
+## The writing law, audited
+
+The writing above reads as more repetitive than the GSM8K towers' of October 23, and it writes almost
+no integers. The audit (`AUDIT_WRITE_*`) found three things.
+
+- **The release law changed, not the machine.** Every October 23 writing was released at one draw
+  or at two agreeing draws. The writing above used four agreeing draws, the face raised to the fourth
+  power, which piles the weight on the commonest next byte. The same states, prompts and keys,
+  counted over written words (distinct words; the commonest word's share):
+
+  | tower, prompt | one draw | two agreeing | four agreeing |
+  |---|---|---|---|
+  | taught to look, prose | 84%; "the" 7% | 58%; "the" 20% | 18%; "and" 35% |
+  | taught to look, Rust | 83%; "the" 13% | 49%; "the" 22% | 12%; "the" 45% |
+  | pair, prose | 92%; "quotient" 11% | 57%; "the" 19% | 35%; "and" 20% |
+  | pair, Lean | 93%; "is" 5% | 60%; "the" 15% | 31%; "and" 23% |
+
+- **The integers are hidden by the bare prompt.** After `74-72=` from rest the tower cannot tell
+  it is in the arithmetic section, since `=` also opens Rust and Lean lines. With the twelve held-out
+  digit lines that fit the 128-byte prompt budget before it (`PROMPT_arithmetic_ctx.txt`), all three
+  towers write whole lines of arithmetic at one, two and four agreeing draws. The taught tower writes
+  digit lines at two agreeing draws even from the bare prompt.
+- **No code break.** arith24 (with the pair contact) writes byte for byte what arith22 wrote from the
+  taught tower's state on all four prompts.
+
+What stays wrong: at one draw the text varies but crosses media inside a line, so the tower does not
+hold which medium it is in. It heard 54 KB of each medium, against 3.5 MB for the GSM8K towers.
+(Eight times the text did not change this; see the next section.)
+
+Free writing is released at one draw (the face itself) and at two agreeing draws, both shown, and not
+at four (agent-inferred: the fourth power reads the single likeliest answer, which suits a look at
+one question and the lock that reads it, not writing).
+
+## Eight times the text
+
+The audit's reading was that the tower crosses media because it heard little of each. To test it,
+the terrain is cut again with only its size changed:
+`tools/holonics_text_terrain.py . .local/run/arith100 524288 12000 4000 .local/run/htext2`. That
+gives 524,288 bytes of each text medium (prose from 135 records, Lean from 146 files, Rust from 135
+files) and the digit terrain's 216,131 training bytes, so 1,789,116 training bytes against htext1's
+216,240. The held-out text is 48,031 bytes from files that neither cut trains on. The new Lean
+prompt is `BIG_PROMPT_lean.txt`, because the old one's file is now in training. The pair tower is
+trained from rest with its declaration unchanged: width 64, 64 modes, 256 contacts, 2 levels,
+8 streams, sections of 128, 4 passes, rate `2^(−7)`.
+
+Training (`BIG_TRAIN.txt`):
+- Held-out bits a byte by pass: 2.791, 2.645, 2.585, 2.543. Training: 2.767, 2.396, 2.299, 2.220.
+- The gap at the last pass is 0.32 bits a byte, against 0.49 for the htext1 pair tower (2.255 and
+  2.748).
+- Held out by medium at the end: prose 3.159, Lean 2.490, Rust 2.208, digits 2.315.
+
+**The writing still leaves its medium.** At one draw the Lean prompt opens with prose, passes a Lean
+doc comment (`/--`) and reaches a Rust one (`//!`) by its ninth line (`BIG_WRITE_big_lean_a1.txt`):
+
+```text
+Rating is by an patherting population, come.
+
+[mean traces them))inu (Hamal stric/target)  -> heure)).prepares
+index-boostingPairied togen
+
+/-- behing is side.
+
+An |Be is other grounds its colcatime bankrithlies locked read residual  
+//! `knqul ::them, sime: Retained; 0 wracheve returned-loethout, by every twithing by onuse them strred tin //!= then eresaanance /// Twise bits. Decise. Population 
+```
+
+At two agreeing draws the Rust prompt writes code shaped like Rust with Lean's `:=` inside it
+(`BIG_WRITE_big_rust_a2.txt`):
+
+```text
+//! [emitted + companion.speented_trace = ObservedFace = verserietent (hamiltonian.closes)
+    }
+
+    residual :=
+  residual > 0 + boundid (Selection, not law : Oncgenceless) -> the preserver (here : A) :
+    residual :=
+              (E) :
+        residual()
+    pub navigator: Result<Self)) :
+    determinants {
+        current {
+        decides[reson] (searched (held.clone());
+        &self) -> &
+```
+
+The prose prompt, a record's heading and a blank line, is answered by `#[determily)` at two draws:
+after the blank line the tower writes Rust's attribute opener. With twelve held-out digit lines
+before it, the two-draw writing stays in digits for all 400 bytes: it answers the prompt's `74-72=`
+with `1`, then writes 40 whole equation lines (`BIG_WRITE_big_arithmetic_ctx_a2.txt`). Their answers
+have the right number of digits, and none is right (`85*90=6115`, `94+31=117`, `13+97=109`).
+
+**The lock on the same unseen text.** Both pair towers look at the located moment on htext2's
+held-out lines, which neither heard (`BIG_LOCATED_LOOKS_<tower>_<medium>.tsv`,
+`BIG_READ_LOCATED.txt`). Met and unmet lines are summed; `ΣT` is the true rests' bytes.
+
+| medium, lines, `ΣT` | tower | `Σλ` first → last | `ΣF*` first → last | held or grew / fell | last `λ / ΣT` |
+|---|---|---|---|---|---|
+| digits, 957, 4,103 | eight times the text | 2,289 → 2,298 | 3,630 → 3,578 | 766 / 191 | 56.0% |
+| | htext1 pair | 2,367 → 2,400 | 3,460 → 3,389 | 795 / 162 | 58.5% |
+| prose, 164, 10,696 | eight times the text | 3,700 → 3,732 | 13,532 → 13,588 | 79 / 85 | 34.9% |
+| | htext1 pair | 3,693 → 3,692 | 14,099 → 13,937 | 89 / 75 | 34.5% |
+| Lean, 152, 10,998 | eight times the text | 3,866 → 3,894 | 13,334 → 13,176 | 65 / 87 | 35.4% |
+| | htext1 pair | 3,647 → 3,436 | 13,447 → 13,470 | 65 / 87 | 31.2% |
+| Rust, 204, 11,034 | eight times the text | 3,441 → 2,938 | 14,016 → 14,069 | 68 / 136 | 26.6% |
+| | htext1 pair | 3,759 → 3,759 | 15,182 → 15,047 | 151 / 53 | 34.1% |
+
+The larger text raises the first look on prose and Lean, where `λ` is higher and `F*` lower. On
+Lean the larger tower's looks hold or grow over the whole text, where the smaller one's fall. On
+digits the two are close and the smaller is ahead. On Rust the larger tower's looking again falls:
+`Σλ` drops by 503, the looks shorten from 9,864 to 8,911 bytes, and 136 of 204 lines fall. The
+looks there move out of comment text into code: line 2's later looks write `&self.res…` after a
+`//!` head.
+
+So the medium crossing does not come from how little the tower heard. Eight times the text closes
+some of the gap between training and held-out bits, and lifts the lock on two media. The writing
+still leaves its medium within a line or two, and on Rust looking again leaves it too. The next loop
+asks whether the crossing follows the fit (agent-inferred: held-out bits still fall 0.04 a pass, so
+four more passes from this state is the one change that tells fit from law).
+
+### One more pass
+
+The four more passes are projected from the largest measured pass, 317,155 ms, so 1,268.6 s, with a
+deadline of 1,270 s. The first launch was stopped by hand: a workspace check run beside it on the
+four cores slowed it past its bound (`RUNS.tsv`). Relaunched unchanged with nothing beside it, pass 0
+ran 332,250 ms, 1.048 of its bound, and the run stopped there on evidence (`CONT_TRAIN.txt`). It is
+read at the state it reached, five passes in all, and is incomplete as a test of four more passes.
+
+- Held-out bits a byte are 2.511, and training bits 2.171. By medium: prose 3.117, Lean 2.431,
+  Rust 2.172, digits 2.324.
+- The writing still crosses media (`CONT_WRITE_<prompt>_a<draws>.txt`). At one draw, the prose
+  prompt writes a Rust signature (`pub fn determinantTrace(&self) -> Source`) and then a Lean
+  `def` by its seventh line. With digit context, two draws write 41 whole equations, none right.
+- The lock on the same held-out lines (`CONT_LOCATED_LOOKS_<medium>.tsv`, `CONT_READ_LOCATED.txt`):
+
+  | medium | `Σλ` first → last | `ΣF*` first → last | held or grew / fell | last `λ / ΣT` |
+  |---|---|---|---|---|
+  | digits | 2,281 → 2,291 | 3,663 → 3,613 | 786 / 171 | 55.8% |
+  | prose | 4,028 → 3,921 | 13,597 → 13,390 | 86 / 78 | 36.7% |
+  | Lean | 3,935 → 3,888 | 14,077 → 13,518 | 73 / 79 | 35.4% |
+  | Rust | 2,808 → 1,926 | 15,771 → 16,194 | 99 / 105 | 17.5% |
+
+The fifth pass lowers the held-out code and raises prose's first look. It does not hold the writing
+in its medium. On Rust the lock falls further: the first look holds 633 fewer bytes in order than
+after four passes, and looking again then loses 882, with looks that settle early on rests that do
+not fit (136 of 204 lines agree twice). Fitting the text more closely is not what holds a medium,
+so the next loop changes the learning step itself, not the amount of training: the difference the
+tower can bridge from where it stands deposits, and the remainder it cannot bridge is kept as tension
+that founds a new contact (being derived with the mathematics thread).
+
+## The tension the text leaves
+
+The mathematics thread's law for the learning step
+([the effective-tension record](2026-10-24_WHAT_A_CONTACT_CANNOT_BRIDGE_IS_ITS_EFFECTIVE_TENSION_AND_THE_TENSION_FOUNDS_THE_FACE_THAT_CARRIES_IT.md),
+PR #427) splits what the readout misses into the part a move of its material can still close and
+the part no material reading its face closes. This section reads that split on the tower of the last
+section (`hbig2_pair/STATE.0`, SHA-256 `56c6cb4a…`), before the step is changed.
+
+**What is read** [agent-inferred, October 24]. `Tower::read_tension` steps the frozen tower and hands
+each cell's `TensionCell` to the receiver: the face the readout reads (`top`), the covector
+`dz = p̂ − [· = u]` (one function, `covector`, now shared with the reverse scan), the top level's
+quadrature `Im(C h)` on the read's own ratio, and the face the top level read from below. The unit
+test `the_tension_readings_bridge_is_the_readouts_covector` checks that `B = Σ dz (top, 1)ᵀ` is
+exactly the readout's covector the reverse scan forms. `read-tower-tension` sums the joint Gram of
+`(top, 1, quadrature, below, foil, region, dz)` exactly in `i128`, 517 coordinates, per medium, at
+line starts (the cell read just after a line feed, pooled over the media) and over the whole. It
+then eliminates the face block by fraction-free elimination in `BigInt`, so every reading is a ratio
+of exact integers:
+- `tr T` per cell is the Brier score of the faces;
+- the tension is `tr S`, the readout's remaining bridge `tr T − tr S`;
+- each candidate face's drop is the part of `tr S` its own unread part carries.
+
+Two references sit beside the tower's own faces. The **foil** is the quadrature read half a stream
+away in the same stream: the same medium's face, not aligned with the cell's comparison, so its
+drop is what a face of that width removes by chance. The **region** is the exterior reader's medium
+label, read only here: it measures how much tension a face that carried the medium perfectly would
+bridge. Nothing in the tower reads it.
+
+The training text is read at one constitution, as the law asks (the frozen tower, 1,789,108 cells,
+eight streams). Its region file is cut from the terrain's manifest, each piece checked against its
+SHA-256 (`train.roles`, `2dd6ef8c…`).
+
+| text | part | cells | Brier `tr T` | tension share | readout bridge | quadrature | below | foil | region |
+|---|---|---|---|---|---|---|---|---|---|
+| training | prose | 524,313 | 0.614 | 98.8% | 11.7‰ | 3.7‰ | 3.9‰ | 0.14‰ | – |
+| training | Lean | 524,309 | 0.579 | 98.9% | 11.2‰ | 4.1‰ | 4.7‰ | 0.15‰ | – |
+| training | Rust | 524,355 | 0.521 | 98.5% | 14.5‰ | 5.7‰ | 6.6‰ | 0.14‰ | – |
+| training | digits | 216,131 | 0.653 | 98.5% | 14.8‰ | 2.8‰ | 4.0‰ | 0.31‰ | – |
+| training | line starts | 54,143 | 0.765 | 96.4% | 36.5‰ | 10.4‰ | 11.1‰ | 5.0‰ | 32.3‰ |
+| training | all | 1,789,108 | 0.581 | 99.2% | 8.3‰ | 2.7‰ | 3.0‰ | 0.11‰ | 0.24‰ |
+| held out | prose | 12,009 | 0.708 | 97.3% | 27.1‰ | 13.3‰ | 13.1‰ | 5.4‰ | – |
+| held out | Lean | 12,009 | 0.591 | 96.7% | 32.9‰ | 21.3‰ | 22.2‰ | 5.7‰ | – |
+| held out | Rust | 12,008 | 0.530 | 97.7% | 23.4‰ | 14.7‰ | 14.3‰ | 5.6‰ | – |
+| held out | digits | 11,997 | 0.655 | 98.3% | 17.2‰ | 8.3‰ | 8.6‰ | 4.8‰ | – |
+| held out | line starts | 1,870 | 0.843 | 93.1% | 69.1‰ | 40.6‰ | 41.1‰ | 36.9‰ | 39.8‰ |
+| held out | all | 48,023 | 0.621 | 98.9% | 10.7‰ | 5.4‰ | 5.7‰ | 1.5‰ | 0.46‰ |
+
+The readout bridge is in thousandths of `tr T`; each candidate's drop is in thousandths of the
+tension `tr S`. Inside one medium the region is constant and carries nothing. Reading the quadrature
+and the face below together removes 4.8‰ of the tension on the whole training text and 10.0‰ on the
+held-out text. The four-pass tower (`hbig_pair/STATE`) reads close to these on the held-out text: Brier 0.628 over
+the whole against 0.621, and every bridge and drop within 6‰ of the table's
+(`TENSION_DEV_big.txt`).
+
+**The classes in tension** (`TENSION_OPPOSED` lines, the most negative `S_ab` with its correlation).
+Every medium's strongest pair is a line feed against a space (−0.28 to −0.30 on the training text):
+whether the line ends. Then come the vowels against each other (`e|i`, `a|e`, `a|o`, `e|o`, −0.14 to
+−0.20): the face knows a vowel comes and not which. In the digits the operators oppose (`*|+` −0.57,
+`*|-` and `+|-` −0.38), and so do neighbouring digits (`1|2`, `4|5`, `2|3`, −0.13 to −0.17): read as
+the face holding a digit's size and not the digit [agent-inferred]. At line starts the strongest pair is a space against `/`
+(−0.24 on the training text, −0.44 held out): an indented line against a comment line.
+
+**What it says.**
+- The readout is close to the best any material reading its face can do: at most 1.5% of the
+  training text's error is still bridgeable by moving it. The other 98.5 to 99.2% is tension.
+- The tower's own unread faces carry little of the tension. The quadrature and the face below each
+  carry 3 to 7 thousandths of it on the training text, twenty to forty times the foil, and 8 to 22
+  thousandths held out, two to four times the foil. A contact founded on them, as the law states
+  it, would close under 1% of what the readout misses.
+- On true text the face already carries the medium. The medium label adds 0.24‰ over the whole. At
+  line starts it adds 32‰, three times what each of the tower's own faces adds there, with 3
+  coordinates against their 64. There the strongest fork is a space against `/`, an indented line of
+  code against a comment line.
+- The training text's tension is nearly the held-out text's (Brier 0.581 against 0.621). The tower
+  fits the text it heard barely better than text it never heard in this reading, which agrees with
+  eight times the text changing nothing [agent-inferred].
+
+So the founding step cannot draw on the faces the tower has now: the tension is in differences none
+of them holds (which vowel, which digit, whether the line ends). And since the face holds the medium
+while it reads true text, the medium jumps in its writing arise where it reads its own releases,
+which this reading of true text cannot see [agent-inferred]. The next loop founds a face the tension
+itself chooses and checks it by code length on the held-out text.
+
+## The floor under the tension
+
+`tr S` mixes two things: what no face could ever bridge (the text's own floor, which a predictor
+holding the true conditional still pays) and what a face the tower does not have yet could bridge.
+The mathematics thread split them with two exterior references, never faces of the machine
+([its record](2026-10-24_WHAT_A_CONTACT_CANNOT_BRIDGE_IS_ITS_EFFECTIVE_TENSION_AND_THE_TENSION_FOUNDS_THE_FACE_THAT_CARRIES_IT.md),
+§7): a count model of the last bytes, and the linear face of the last bytes' encodings. If the two
+agree, a new mode suffices; if the count model knows much more, the missing difference is a
+conjunction, which only a pair contact carries.
+
+**What is read** (`read-tower-floor`, [agent-inferred, October 24]).
+- The count model is Witten–Bell interpolation of the bytes that followed each context of up to six
+  bytes in the training text, down to the byte counts, exact on `2^(−48)` and read on `2^(−24)`. On
+  the held-out text it counts the training text. On the training text it counts it with the cell's
+  own arrival deleted, so both of its readings are out of sample.
+- The linear reference is `E(u_t), E(u_(t−1)), E(u_(t−2))`, the tower's own encodings of the last
+  three bytes (`Tower::encoding`, the face the bottom level reads), eliminated after the face one
+  block at a time. Beside them: the order-3 count model's prediction as a candidate face, and the
+  foil, the encoding of a byte half a stream away.
+- The drops are read on the training text. Its 1.8 million cells keep 64 coordinates from removing
+  more than a ten-thousandth of the tension by chance; the held-out text's twelve thousand cells a
+  medium would let a few hundred coordinates remove about 2% by chance, the size of the signal.
+- The covector and the count model are read on the 171 classes that arrive in the training text.
+  The others carry under a thousandth of the Brier score.
+
+**The first split: the tower against the count model, held out.** Brier per cell, the count model
+at orders 3 to 6 (orders 0 to 2 are in the receipt):
+
+| part | tower | order 3 | order 4 | order 5 | order 6 |
+|---|---|---|---|---|---|
+| prose | 0.708 | 0.696 | 0.647 | 0.636 | 0.646 |
+| Lean | 0.591 | 0.591 | 0.511 | 0.475 | 0.460 |
+| Rust | 0.530 | 0.565 | 0.491 | 0.467 | 0.459 |
+| digits | 0.655 | 0.735 | 0.734 | 0.748 | 0.743 |
+| line starts | 0.843 | 0.836 | 0.844 | 0.876 | 0.951 |
+| all | 0.621 | 0.647 | 0.596 | 0.581 | 0.577 |
+
+On the training text with deleted counts the same pattern holds: 0.581 for the tower over all
+against 0.496 at order 6; prose 0.614 against 0.498, Lean 0.579 against 0.430, Rust 0.521 against
+0.408; digits 0.653 against at best 0.735 (order 3); line starts 0.765 against at best 0.753
+(order 4).
+
+**The second split: the linear face against the conjunction, on the training text.** Drops in
+thousandths of the tension (`tr S` = 0.576 per cell, 991.7‰ of the Brier score):
+
+| face read after the tower's face | drop (‰ of the tension) |
+|---|---|
+| foil, the encoding of a byte half a stream away | 0.07 |
+| `E(u_t)` | 3.99 |
+| then `E(u_(t−1))` | 2.15 |
+| then `E(u_(t−2))` | 1.04 |
+| the three encodings together | 7.18 |
+| the order-3 count model's prediction alone | 29.93 |
+| the count model after the three encodings | stopped at the deadline; at least 22.75 |
+
+The last step did not finish inside its deadline (below). Reading a face after others removes at
+least what it removes alone, less what the others removed, so the conjunction past the linear face
+removes at least `29.93 − 7.18 = 22.75`.
+
+**What it says.**
+- In prose, Lean and Rust the tower's error is not the text's floor. A count of the last five or
+  six bytes leaves 0.07 to 0.13 less Brier per cell on text neither has seen: 10% of the tower's
+  error in prose, 22% in Lean, 13% in Rust.
+- That missing part is a conjunction of recent bytes. The count model of the last three bytes
+  carries four times what the linear face of the same three bytes' encodings carries. A new mode
+  driven by the encodings, which is linear in them, would close little of it. A pair face over
+  recent encodings is what the founding should build.
+- In the digits and at line starts the tension is not in the last bytes. The tower already beats
+  every count order on the digits (0.655 against 0.734 at best), and at line starts the two are
+  level. What decides a digit lies further back (the operands), and what decides how a line starts
+  lies in the lines before it. This is what the mathematics thread predicted: the operands'
+  cheap-ring faces for digits, the newline's clock for line ends [agent-inferred; the founding test
+  decides each].
+
+The next loop founds a pair face on the last bytes' encodings, chosen by the tension (the leading
+directions of the pool of their products, the mathematics thread's reduced-rank rule), and checks
+it by code length on the held-out text.
+
+**The run.** The projection came from a 4,792-cell slice, whose text has 106 classes. The full
+training text has 171, so the count block was 1.6 times as wide as projected and its eliminations
+ran past the projection, while the read was faster (224 s against 336). The run stopped at its
+600-second deadline in the last step and was not run again with a larger one; that step's reading
+is the bound above.
+
+## Founding pair faces on the tension
+
+The floor says the missing part is a conjunction of the last bytes. The mathematics thread's
+founding at scale builds faces of that kind from one pass: a face that is a function of the pair
+of bytes `p = (u_(t−1), u_t)` is read from a table of the pairs alone, each pair keeping its cells
+`n_p`, `τ_p = Σ t` and `φ_p = Σ f̄`.
+
+**What is read** (`found-tower-pair`, [agent-inferred with the mathematics thread, October 24]).
+- The ceiling is the table itself, every pair its own coordinate: the most any face of the last two
+  bytes could carry, against its chance level `(P − 1)/N`. Each pair's mean is subtracted rounded to
+  nearest, so each entry is within half the number of pairs of its exact value (6,330 halves in
+  entries of about `2^53`).
+- Each rank founds one coordinate `c_p = (aᵀx̂)(bᵀŷ)`, the product of a read of the current byte's
+  encoding and a read of the byte before's, each with the unit, so either byte's linear face is
+  among the candidates. With one factor held, the other is the leading direction of the pool
+  (`w = Q⁻¹Mᵀv`, `v ← Mw` on released copies of the reduced moments, only directions being read).
+  The factors alternate; each step's coordinate is read exactly from the table, and the rank stops
+  when a step gains less than `2^(−15)` of its drop. The coordinate then joins the face and the next
+  rank is founded on what remains.
+- The readout fitted on the training text, with the founded coordinates and without, is read on
+  the held-out text.
+
+**What it reads.** On the training text (1,789,108 cells, 6,330 pairs, 171 arriving classes) the
+tension is 0.576 per cell, 991.7‰ of the Brier score, the floor reading's value.
+
+| face read after the tower's face | drop (‰ of the tension) |
+|---|---|
+| the pair table, every pair a coordinate (the ceiling) | 40.72 |
+| its chance level, `(P − 1)/N` | 3.54 |
+| founded rank 1 | 1.18 |
+| rank 2 | 0.72 |
+| rank 3 | 0.83 |
+| rank 4 | 0.74 |
+| the four ranks | 3.46 |
+
+On the held-out text the four ranks carry what they carry on the training text: they remove 2.4‰
+of the residual the face's own readout leaves (3.8‰ in prose, 2.8‰ in Lean, 2.9‰ in Rust, none in
+the digits). The face's own readout, refitted, moves the held-out Brier score by at most 0.006 per
+cell in any medium (0.621 to 0.619 over all).
+
+Each rank is a conjunction a reader can name (its pairs with the most weight, the classes whose
+tension it removes most):
+- rank 1: after ` p`, `ch`, ` m`, ` h`, `mp`, whether `a` or `e` follows (13.5‰ of `a`'s tension,
+  7.3‰ of `e`'s);
+- rank 2: after `}`+newline, `)`+newline, `ce`, `co`, `re`, `on`, whether a space or a newline
+  follows (8.1‰ of the space's tension);
+- rank 3: after `iv`, `in`, ` d`, `th`, whether `e` or `o` follows;
+- rank 4: after `ha`, `ra`, ` a`, `ea`, whether `n`, `d` or `t` follows (12.9‰ of `n`'s).
+
+**What it says.**
+- The last two bytes carry 37‰ of the tension above chance; the deleted count model of up to six
+  bytes carried 29.93‰ as one face. The pair table is fitted in sample (its chance level
+  subtracted) and the count model is read out of sample, so neither is exact; both say the last
+  bytes hold a few hundredths of the tension that the tower's face does not.
+- A single product of two encoding reads is a thin face: four of them carry 3.5‰, a tenth of what
+  the pairs could carry. What they carry is real (it holds on the held-out text), and each is a
+  readable next-byte contrast.
+
+**How many coordinates the pairs need.** The pair table's class matrix `S − S_w` (its trace is the
+ceiling) says it. Its leading eigenvalue is the most one coordinate of the pair could carry, and
+the sum of its leading `k` the most `k` could. The directions are located by power steps on a
+released copy, each found direction projected out of the later ones, and the sum over the span of
+the first `k` is read exactly, `tr((VᵀV)⁻¹VᵀEV)`, so each sum is at least what the leading `k`
+carry. In thousandths of the tension, fitted in sample (the chance level, 3.54‰, is spread over
+all 171 directions):
+
+| leading coordinates | 1 | 2 | 4 | 8 | 16 | 32 | all 171 |
+|---|---|---|---|---|---|---|---|
+| the most the pair could carry | 3.70 | 6.94 | 11.91 | 18.48 | 25.63 | 31.93 | 40.72 |
+| founded products of two reads | 1.18 | 1.90 | 3.46 | | | | |
+
+The leading directions are contrasts among the next byte's letters: `e` against a space, `a` and
+`o`; a space against a newline and the vowels; `a` against `o`; then `o` against `r` and `t`,
+`r` against `i` and `s`, `n` against `t` and `s`.
+
+So both limits hold at once. One product of two reads carries about a third of what the best single
+coordinate of the pair carries (1.18 against 3.70; four against four, 3.46 against 11.91). And the
+conjunction is spread over many next-byte directions: the eigenvalues fall slowly (3.70, 3.24,
+2.81, 2.16, 1.91, 1.74, 1.57, 1.35, …), eight coordinates carry under half the ceiling and
+thirty-two carry four fifths. A pair face for text is a block of some tens of coordinates, each a
+bilinear form of the two encodings richer than one product of reads: the pair contact
+`W(x̄⊗ȳ)` of the [one face law](2026-10-24_ONE_FACE_LAW_A_FACE_IS_A_CONGRUENCE_SO_LANGUAGE_ARITHMETIC_AND_ANY_OPERATION_ARE_READ_BY_ONE_CONTACT.md), founded with its rank read from this spectrum
+[agent-inferred; the next loop founds it and reads it held out].
+
+**The run.** The slice (4,800 bytes as the training text, the held-out text whole, two ranks) ran
+in 57.9 s; its readout overfits, which the slice was not meant to test (the held-out residual rises
+33‰ and 82‰). The projection for the full text, from the slice's largest units, was 440 s (the pass
+98 s, the ceiling 5 s, at most 80 half-steps of 1.05 s a rank); the deadline was 540 s. The run took
+170.5 s at a peak of 132 MB: the pass took 91.7 s as projected, and a half-step about 0.5 s. The
+spectrum was added after it and checked on the slice (5.8 s); the whole run again, projected at
+186 s from the run before with a 240 s deadline, took 178.5 s at a peak of 236 MB, with every
+founding and held-out reading identical to the first run's.
+
+## A block of full pair forms
+
+The spectrum says a pair face for text is a block of some tens of coordinates, each a full
+bilinear form of the two encodings. This step founds that block and reads it held out
+(`found-tower-pair-block`, [agent-inferred with the mathematics thread, October 24]).
+
+**What is read.**
+- The pool is every product of a coordinate of the current byte's encoding with one of the byte
+  before's, `z_p = x̂_cur ⊗ ŷ_prev`, each with its unit (`x̂ = (E(u), 2^16)`; the start of a stream
+  has `ŷ = (0, 2^16)`): 65 × 65 = 4,225 coordinates. A full pair form `W(x̄⊗ȳ)` is one read of the
+  pool, `c_p = Σ_ij W_ij x̂_i ŷ_j`. The table of pairs is its ceiling, and one product of two reads
+  (the founded ranks above) is its rank-one case.
+- The block is founded as a reduced-rank read of the tension on the pool after the face. With `M`
+  the pool's cross moment with the covector and `Q` its Gram, both after the face, the class matrix
+  `N = M Q⁻¹ Mᵀ` (171 × 171) holds what the whole pool could carry. Its leading `k` eigen-directions
+  `v` hold the most `k` coordinates could, and each direction's form is `W_v = Q⁻¹Mᵀv`. The face and
+  the pool are eliminated together, so each form is read after the face.
+- The elimination runs at a declared grain. Each coordinate is scaled by a power of two so its
+  diagonal is below `2^50`, and the covector by one power of two so its total is below `2^50`. The
+  factorization is `LDLᵀ`: the face's coordinates first, then the pool's, each step pivoting on the
+  largest remaining diagonal. A set stops when that diagonal falls below `2^20`, so a coordinate
+  within `2^−30` of its predecessors' span is passed over. `L` carries 46 fractional bits, each term
+  is rounded on its own and the sums are exact, so the factorization is the same however the cores
+  share the sums. The forms are back-substituted exactly, in integers of any width, and released to
+  62 bits.
+- Each form is then a table over every pair of the alphabet: the form's resident face, released by
+  its largest value on the training pairs to `2^16`. The readout is fitted exactly (Bareiss, as for
+  every face) with the first `k` forms beside the face, `k = 1, 2, 4, …, 32`, and read on the
+  held-out text.
+
+**The search's grain, measured.** The first search eliminated the coordinates in their given
+order. On the slice, whose 926 pairs leave the pool's 4,225 products far from independent, it left
+its 64-bit grain four times:
+- with the floor at `2^10` and 30 fractional bits in `L` (7.4 s);
+- with the floor at `2^20` (6.8 s);
+- instrumented: an entry of the eliminated column reached `2^51.8` at pivot 1,275, outside the cone a
+  semidefinite matrix keeps. `L`'s rounding (`2^−31` of entries near `2^50`, about `2^19` a term)
+  had reached the floor;
+- with 46 fractional bits: the carried covector row outgrew its grain at pivot 1,152.
+
+The cause was the order, not the width: elimination in a given order on near-dependent products
+pivots on rounding, and its multipliers grow (`|l|` reached `2^10` in the instrumented run). Taking
+the largest remaining diagonal first is the rank-revealing order. It bounds every multiplier by 1
+within a set (by `2^15` for pool rows read on the face's steps), and the slice then ran clean at the
+same grain. The exact readout agrees with the search wherever both are read.
+
+**What it reads.** On the training text (1,789,108 cells, 6,330 pairs, 171 arriving classes) the
+face's own readout takes 8.263‰ of the Brier score, at the search's grain and exactly alike. The
+whole pool after the face carries 36.52‰ of the tension (one of its coordinates is passed over;
+its chance level, 4,224 coordinates over the cells, is 2.36‰), against 40.72‰ for the table of
+pairs. In thousandths of the tension:
+
+| leading coordinates | 1 | 2 | 4 | 8 | 16 | 32 |
+|---|---|---|---|---|---|---|
+| the most the pair could carry (the table's spectrum) | 3.70 | 6.94 | 11.91 | 18.48 | 25.63 | 31.93 |
+| the pool's spectrum, at the search's grain | 3.455 | 6.319 | 10.980 | 17.186 | 23.757 | 29.217 |
+| the founded block, read exactly | 3.455 | 6.319 | 10.980 | 17.186 | 23.758 | 29.217 |
+| founded products of two reads | 1.18 | 1.90 | 3.46 | | | |
+
+Held out (48,023 cells), in thousandths of the residual the face's own readout leaves:
+
+| forms | prose | Lean | Rust | digits | all |
+|---|---|---|---|---|---|
+| 1 | 3.106 | 3.592 | 4.048 | 0.059 | 2.622 |
+| 2 | 4.774 | 4.966 | 6.304 | 0.172 | 3.937 |
+| 4 | 6.624 | 7.934 | 9.284 | 0.242 | 5.828 |
+| 8 | 9.886 | 14.115 | 12.764 | 0.519 | 9.047 |
+| 16 | 12.340 | 19.337 | 18.075 | 0.822 | 12.209 |
+| 32 | 15.050 | 23.379 | 20.221 | 2.312 | 14.794 |
+
+The held-out residual falls from 0.619 to 0.610 per cell over all (prose 0.702 to 0.692, Lean
+0.590 to 0.577, Rust 0.532 to 0.521, digits 0.652 to 0.651). Four forms remove 5.8‰ where the four
+products removed 2.4‰, and thirty-two remove about six times what the products did. Only 57 held-out
+cells fall on pairs the training text never met, yet they carry 24‰ to 80‰ of each leading form's
+held-out square: off the pairs it was fitted on, a form is free and takes large values.
+
+The leading forms read as contrasts among the next byte, each weighing most on a few pairs:
+- form 1: `e` against `a`, a space and `o`, weighing most on `iv`, ` d`, `rn`, `ch`, ` p`, `ar`;
+- form 2: a space (with `e`) against `a`, a newline, `i` and `n`, on two spaces, `on`, `ce`,
+  `}`+newline, `)`+newline, `ge`;
+- form 3: `a` against `o` and `r`, on ` p`, ` m`, `pr`, two spaces, `at`, `mp`;
+- form 4: `o` against `r`, `t` and `i`, on `pa`, ` p`, `s `, `ha`, `ac`, `wh`.
+
+On the slice the forms memorize, as a slice must: with 926 pairs the pool carries exactly the
+table's 263.43‰, 3,300 of its coordinates are passed over, 4,466 held-out cells fall on unmet pairs
+and carry 966‰ to 994‰ of each form's square, and the held-out residual grows to 176 per cell. The
+slice was the timing read.
+
+**What it says.**
+- The pair contact `W(x̄⊗ȳ)` of the one face law is a real face of text. One full form carries 93%
+  of what the best single coordinate of the pair could (3.455 against 3.70), where one product of
+  two reads carried a third; thirty-two carry 92% of the best thirty-two. On held-out text they keep
+  about half of what they carry on the training text, and they hold in prose, Lean and Rust alike.
+- The digits take almost none of it (2.3‰): the byte before says little about the next digit.
+- The face is small, 1.5% of the held-out residual, as the table's ceiling said it would be: even in
+  sample the last two bytes hold about 4% of the tension. What a longer context holds is the next
+  founding's question, read the same way on its own pool [agent-inferred].
+
+**The run.** The slice ran in 13.7 s at a peak of 229 MiB. The projection for the whole text, from
+the slice's units and the founding's pass (92.7 s), was 190 s and at most 250 s: the elimination
+grows with the coordinates taken squared (at most 4,225, about 21 times the slice's), the forms
+alike, and the readouts with the moments' width. The deadline was 300 s. The run took 121.1 s at a
+peak of 319 MiB, 0.64 of the projection.
+
+## The block joined to the tower
+
+The block was read beside the tower. This step joins it to the tower's face, so the tower codes and
+writes with it (`install-tower-pair-block`, `sample-tower-block`, [agent-inferred, October 24]).
+
+**The join.**
+- At each byte the frozen tower gives its face `p̂` (on `2^−24`) and the top face its readout reads
+  (`Tower::advance_top`, and `Tower::read_faces` over a passage). The block's forms are read at the
+  pair of the byte before and the current byte. With `f̂ = (top, 1, c_1, …, c_k)`, the readout fitted
+  exactly on the training text gives the fitted covector `ĝ = R f̂`. The covector is `p̂ − q`, so
+  `q̂ = p̂ − ĝ` is the least-squares read of the next byte from the face, its top and the block.
+- `q̂` is not a distribution: it can be negative. It is moved to the nearest one under the Brier
+  score. Over the arriving classes `Q_c = max(K q̂_c − (S_K − 2^24), 0)`, where `K` is the largest
+  count whose `K`th largest value lies above the shared shift `(S_K − 2^24)/K` and `S_K` is the sum
+  of those `K`. `Q` sums to `K·2^24` and is zero off the arriving classes.
+- The joined face mixes the two, `p′ = (1 − η) p̂ + η q̃` with `η = j/32`. Its masses are exact
+  integers, `m′_c = (32 − j) m_c K 2^24 + j Q_c T` over the total `32 T K 2^24`, below `2^108`. A
+  class the block reads as zero keeps the tower's share `(1 − η) p̂`, so no byte is coded at
+  unbounded length.
+- The code is the cross-entropy at each `η` of the partition, and it is convex in `η`. The installed
+  `η` has the least training code. The held-out text is read at every `η`.
+- At `η = 0` the joined masses are the tower's times one constant, so the code and the writing are
+  the tower's own. Checked: the code at `j = 0` reads as the tower's to the thousandth on the slice,
+  the training text and the held-out text (the code is read on `2^−20` bits, so a scaled mass can
+  move its last grain), and the block with `η` set to 0 wrote the tower's prose at one draw byte
+  for byte (`INSTALL_WRITE_eta0_prose_a1.txt` against `CONT_WRITE_prose_a1.txt`).
+- `R` is released to 64-bit words, `round(X 2^b / D)` with `b` set so the largest is below `2^62`
+  (`b = 42` here). The forms' tables are as above.
+
+**What it codes.** In bits a byte: the tower alone, the face's own readout joined with no forms (its
+least training code at `η = 11/32`), and the block of 32 forms joined (`η = 21/32`):
+
+| text | tower | the face's readout, no forms | 32 forms |
+|---|---|---|---|
+| training | 2.316 | 2.302 | 2.220 |
+| held out, prose | 3.117 | 3.095 | 3.026 |
+| held out, Lean | 2.431 | 2.398 | 2.316 |
+| held out, Rust | 2.172 | 2.157 | 2.085 |
+| held out, digits | 2.324 | 2.317 | 2.310 |
+| held out, all | 2.511 | 2.492 | 2.434 |
+
+- Joined, the block takes 0.077 bits a byte off the held-out code, 3.1%. Of that, 0.058 is the forms'
+  and 0.019 the face's refitted readout. On the training text it takes 0.096, and the held-out text
+  keeps 80% of it.
+- The `η` chosen on the training text is within a thousandth of a bit of the held-out least (2.433,
+  at `η` from 17/32 to 20/32): the mixture does not overfit.
+- The digits take almost nothing, as the block's held-out reading said.
+
+**What it writes.** The joined tower wrote 400 bytes from each of the four prompts at one and two
+agreeing draws (`INSTALL_WRITE_<prompt>_a<draws>.txt`, each with the prompt's code under the tower
+and under the join). The prompts' code falls for prose (4.097 to 3.750 bits a byte), Lean (2.335 to
+2.210) and Rust (2.333 to 2.237), and rises for the digits with their context (2.779 to 2.850).
+- The writing keeps the tower's kind. At one draw it is Rust doc comments, Lean comment heads and
+  prose with broken words. At two draws it runs the text's own phrases ("The completed residual: the
+  residual receiving the conserved from the commuted receiving carried residual is …").
+- From the digit prompt at one draw the join and the tower alone open alike (`5`, then `87*90=820`)
+  and then part: the join leaves the equations on that line for prose and Lean, and the tower alone
+  stays in them through its 400 bytes (34 well-formed equations, 1 right). At two draws the join
+  writes 40 equations in the prompt's form, 2 of them right (`74*0=0`, `55-16=39`); the tower
+  alone wrote 41, none right.
+
+**What it says.**
+- Joined to the face, the pair contact `W(x̄⊗ȳ)` shortens held-out text by 3%, three quarters of it
+  the forms' own. It is a real face of text, and small, as the tension said: the last two bytes hold
+  about 4% of the tension.
+- It moves bytes within words and does not change what the writing is. What the rest of the tension
+  holds lies past the last two bytes [agent-inferred]; the next founding reads a longer pool the same
+  way.
+
+**The run.** The slice ran in 12.1 s at a peak of 203 MiB. The projection for the whole text was
+255 s: the founding through its fit measured 121 s whole, and the training join 130 s at the
+slice's 72.6 µs a cell over 1,789,108 cells. The deadline was 300 s. The run took 226.7 s at a peak
+of 314 MiB, 0.89 of the projection; with no forms it took 206.2 s. Each write took under 0.6 s.
+
+## The recorded failures this step could repeat
+
+- **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
+  moment byte chosen where digits ask. The lock now reads every medium alike, and the next loop
+  places the moment where a located key fires, in any medium.
+- **Bits read as progress.** The held-out code stands beside the writing, and the success reading
+  is the lock. The block's join is read the same way: its code is shown beside its
+  writing, which does not change in kind.
+- **Seen material graded as unseen.** Held-out files are never training files. The join's weight is
+  chosen on the training text alone, and the held-out text is read at every weight. The lock splits met
+  and unmet lines, and no held-out text line is met verbatim.
+- **Catered machinery.** Nothing in the tower names a medium. The media are an exterior partition of
+  the held-out text, and the moment byte was a declared exterior choice, which this step retires as
+  the moment.
+- **A refusal answered with a larger limit.** The plain run stopped at its bound. It was continued
+  under the largest measured pass, its own measurement, and reported here as stopped. The pair
+  tower's foil stopped at its bound too. It is read at the state it reached and not continued.
+  When the block's search left its 64-bit grain, the floor and `L`'s fraction were each moved once
+  within the same word and the failure only moved; the repair was the elimination's order, and no
+  deadline or width beyond the word was raised.
+- **An authored routine standing in for learning.** The located moment is the passage tree's lock, a
+  receiver of the machine's own kind, and no list of relation tokens. It chooses only where the
+  exterior reading looks. Nothing in the tower reads it.
+
+## Receipts
+
+In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS_READ_BY_ITS_LOCK_receipts/):
+
+- `MANIFEST.tsv`: the terrain's pieces.
+- Training logs: `TRAIN_LOCK.txt`, `TRAIN_PLAIN_STOPPED.txt` and `TRAIN_PLAIN.txt` (the continuation),
+  and the development passes in `DEV_PLAIN.txt` and `DEV_LOCK.txt`.
+- The prompts, `PROMPT_<medium>.txt`, and each tower's writing, `WRITE_<tower>_<medium>.txt`, as
+  bytes.
+- `LOOKS_<tower>_<medium>.tsv` and `LINES_<tower>_<medium>.tsv`: every look and every line's codes.
+- `READ_LOCK.txt`: the lock per medium (`tools/text_looks.py`).
+- `RUNS.tsv`: each run's binary, command, projection, deadline, wall time, ratio and peak resident
+  set.
+- The pair towers: `DEV_PAIR.txt`, `DEV_PAIR_LINEAR.txt`, `TRAIN_PAIR.txt`,
+  `TRAIN_PAIR_LINEAR_STOPPED.txt`; their writing `WRITE_{pair,pair8,pairlin8}_<medium>.txt`; their
+  looks at `=` in `LOOKS_*` and `LINES_*` under the same names; `PAIR_RUNGS_*.txt`.
+- The located looks, `LOCATED_LOOKS_<tower>_<medium>.tsv`, and their lock, `READ_LOCATED.txt`.
+- The audit's writing, `AUDIT_WRITE_<tower>_<prompt>_a<draws>.txt`, and the digit prompt with its
+  context, `PROMPT_arithmetic_ctx.txt`.
+- Eight times the text: the terrain's pieces `BIG_MANIFEST.tsv`, the training log `BIG_TRAIN.txt`,
+  the new Lean prompt `BIG_PROMPT_lean.txt`, the writing `BIG_WRITE_big_<prompt>_a<draws>.txt` and
+  the htext1 pair tower's on the new Lean prompt `BIG_WRITE_pair_lean_a<draws>.txt`, both towers'
+  located looks `BIG_LOCATED_LOOKS_{big,pair}_<medium>.tsv`, and their lock `BIG_READ_LOCATED.txt`.
+- One more pass: `CONT_TRAIN.txt` (stopped on evidence after pass 0), the writing
+  `CONT_WRITE_<prompt>_a<draws>.txt`, the located looks `CONT_LOCATED_LOOKS_<medium>.tsv` and their
+  lock `CONT_READ_LOCATED.txt`.
+- The tension: `TENSION_SLICE.txt` (the timing slice, 1,200 bytes of each medium's held-out text),
+  `TENSION_DEV_cont.txt` and `TENSION_DEV_big.txt` (the held-out text through each tower),
+  `TENSION_DEV_cont_starts.txt` and `TENSION_TRAIN_cont.txt` (line starts and the region added,
+  held out and on the training text).
+- The floor: `FLOOR_SLICE_1.txt` (the timing slice with all 256 count coordinates, stopped at its
+  deadline), `FLOOR_SLICE_2.txt` and `FLOOR_SLICE_3.txt` (the arriving classes only, then with the
+  chains run together: every reading identical), and `FLOOR_FULL.txt` (the training and held-out
+  text, stopped at its deadline in the last step).
+- The founding: `FOUND_SLICE.txt` (the timing slice, two ranks), `FOUND_FULL.txt` (the training and
+  held-out text, four ranks, every step's line included), `FOUND_SLICE_SPECTRUM.txt` and
+  `FOUND_FULL_SPECTRUM.txt` (the same with the ceiling's spectrum).
+- The block: `BLOCK_SLICE_FAILED_1.txt` to `BLOCK_SLICE_FAILED_4.txt` (the slice under the search in
+  the given order, each failure's line), `BLOCK_SLICE.txt` (the slice, largest diagonal first) and
+  `BLOCK_FULL.txt` (the training and held-out text, 32 forms).
+- The install: `INSTALL_SLICE.txt` (the timing slice), `INSTALL_FULL.txt` (32 forms joined, the
+  training and held-out text), `INSTALL_FACE.txt` (the same with no forms), the writing
+  `INSTALL_WRITE_<prompt>_a<draws>.txt` and the zero-weight check `INSTALL_WRITE_eta0_prose_a1.txt`.
+- `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
+  SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
+
+The binaries are `arith22` for the first two towers' training and writing (SHA-256 `744ef118…`),
+`arith23` for their repaired reads and the pair towers' training (`cb2ea60a…`), and `arith24` for
+the located reads, the pair towers' reads and writing, and the rungs (`a3cc250c…`). The tension
+reads use `tension1` (`5295f6c6…`, the timing slice and the first held-out reads) and `tension2`
+(`c25dda3f…`, with line starts and the region). The floor reads use `floor1` (`4480bbcb…`),
+`floor2` (`79266042…`) and `floor3` (`e0edd479…`, the last slice and the full text). The founding
+uses `found1` (`d2ebd83e…`) and, with the spectrum, `found2` (`7e93511f…`). The block uses
+`block1` (`95057b05…`; its failed slices ran earlier builds of it, the first `3d69f641…`). The
+install and its writing use `install1` (`522b9cfa…`).

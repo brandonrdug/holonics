@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=2.333 bytes=400 agree=2 elapsed_ms=1515
+TOWER_SAMPLE_TEXT "//! [imaged: The comparison residual state residual trace. The returned can the every the anotory construction the receiving the compression\n\n[`resoneration/enerents::conserved-restriction.companion.index.strics/THE_RED_ADALT / LOGE * RES D s by the residual admitted receiver residual structure's resonance returned conserver the residual receiving ordered at the conserved class of the fore tree fa"
+MEASURE exit=0 wall_s=1.5 peak_rss_kib=25716

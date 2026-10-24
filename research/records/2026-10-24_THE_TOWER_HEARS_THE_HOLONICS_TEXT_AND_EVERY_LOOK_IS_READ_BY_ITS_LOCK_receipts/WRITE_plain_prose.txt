@@ -1,0 +1,5 @@
+@[orience) 𝕜] V) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] V) : V Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : V →ₗ[𝕜] V) (Q) :=
+    }
+}
+
+theorem : V →ₗ[𝕜] Q) : V →ₗ[𝕜] Q) : Q →ₗ[𝕜] Q) : V Q) : V →ₗ[𝕜] Q) ∈ invariant: &self, &self, &str) = receivingReceivingReceivingLaw_one_exact Receiving::hnn::hnn::hnn::hnn::hnn::hnn::hnn
