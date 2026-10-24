@@ -1,0 +1,150 @@
+{
+ "A": {
+  "S_equals_least_residual_gram": true,
+  "remainder_orthogonal_to_every_face": true,
+  "plain_gradient_equals_fitted_part_gradient": true,
+  "trace_T": "17/4",
+  "trace_bridged": "1695/644",
+  "trace_S": "521/322",
+  "S": [
+   [
+    "57/92",
+    "5/92",
+    "-31/46"
+   ],
+   [
+    "5/92",
+    "87/644",
+    "-61/322"
+   ],
+   [
+    "-31/46",
+    "-61/322",
+    "139/161"
+   ]
+  ]
+ },
+ "B": {
+  "S": [
+   [
+    "1/2",
+    "-1/2"
+   ],
+   [
+    "-1/2",
+    "1/2"
+   ]
+  ],
+  "four_cycle": true
+ },
+ "C": {
+  "S": [
+   [
+    "15/8",
+    "-9/8",
+    "-3/4"
+   ],
+   [
+    "-9/8",
+    "15/8",
+    "-3/4"
+   ],
+   [
+    "-3/4",
+    "-3/4",
+    "3/2"
+   ]
+  ],
+  "trace_S": "21/4",
+  "held_mode_carrying_the_medium": {
+   "drop_trace": "9/4",
+   "S_after_trace": "3",
+   "drop_equals_joint_regression": true,
+   "founded_material": [
+    "-3/8",
+    "3/8",
+    "0"
+   ]
+  },
+  "quadrature_alternating_within_each_medium": {
+   "drop_trace": "3/4",
+   "S_after_trace": "9/2",
+   "drop_equals_joint_regression": true,
+   "founded_material": [
+    "-1/8",
+    "-1/8",
+    "1/4"
+   ]
+  },
+  "half_the_medium": {
+   "drop_trace": "2",
+   "S_after_trace": "13/4",
+   "drop_equals_joint_regression": true,
+   "founded_material": [
+    "-1/2",
+    "1/2",
+    "0"
+   ]
+  },
+  "product_p_true_merged": "729/4194304",
+  "product_p_true_separated": "729/65536",
+  "ratio_separated_over_merged": "64"
+ },
+ "D": {
+  "y_H": [
+   "2",
+   "0"
+  ],
+  "arrivals": {
+   "a": {
+    "y_T": [
+     "2",
+     "1"
+    ],
+    "real_face": "2",
+    "R": [
+     "1",
+     "1/2"
+    ],
+    "first_order_turn": "1/2"
+   },
+   "b": {
+    "y_T": [
+     "2",
+     "-1"
+    ],
+    "real_face": "2",
+    "R": [
+     "1",
+     "-1/2"
+    ],
+    "first_order_turn": "-1/2"
+   }
+  },
+  "gauge_turned_row": {
+   "a": {
+    "R_after_gauge": [
+     "1",
+     "1/2"
+    ],
+    "real_face_after_gauge": "2/5"
+   },
+   "b": {
+    "R_after_gauge": [
+     "1",
+     "-1/2"
+    ],
+    "real_face_after_gauge": "2"
+   }
+  },
+  "real_face_merges_a_b": true,
+  "phase_part_separates": true,
+  "R_gauge_free": true,
+  "real_face_gauge_dependent": true,
+  "tension_on_real_face_trace": "1",
+  "tension_after_reading_quadrature_trace": "0"
+ },
+ "E": {
+  "S_unchanged_under_face_rebase": true
+ }
+}

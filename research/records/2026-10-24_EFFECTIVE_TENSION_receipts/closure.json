@@ -1,0 +1,194 @@
+{
+ "A": {
+  "trace_T_equals_aligned_friction_all_binary_length_4": true,
+  "F_star_at_most_trace_T_all_binary_length_4": true,
+  "release_one_cell_late": {
+   "H": "xabc",
+   "T": "abcy",
+   "trace_T": 8,
+   "lambda": 3,
+   "F_star": 2
+  },
+  "soft_form_holds": true
+ },
+ "B": {
+  "A_det_S_over_det_S_constant_only": "39/644",
+  "A_sum_rho_sq": "767/644",
+  "A_prod_rho_sq": "81/322",
+  "A_prod_one_minus_rho_sq_equals_ratio": true,
+  "C_det_S_merged": "9/4",
+  "C_held_mode_det_S_after_over_det_S": "1/4",
+  "C_alternating_det_S_after_over_det_S": "2/3"
+ },
+ "C": {
+  "grain": {
+   "aac|aad": {
+    "lambda": 2,
+    "F_star": 2,
+    "shared_bits_each_side": 2,
+    "L_H_plus_L_T": 10,
+    "conditional_sum_free_coupling_bits": 6
+   },
+   "ccb|ccd": {
+    "lambda": 2,
+    "F_star": 2,
+    "shared_bits_each_side": 6,
+    "L_H_plus_L_T": 17,
+    "conditional_sum_free_coupling_bits": 5
+   }
+  },
+  "order": {
+   "rotation": {
+    "H": "abcdefgh",
+    "T": "efghabcd",
+    "lambda": 4,
+    "F_star": 8,
+    "rotation_offsets": 8
+   },
+   "reversal": {
+    "H": "abcd",
+    "T": "dcba",
+    "lambda": 1,
+    "F_star": 6
+   }
+  },
+  "chance": {
+   "sigma2_n1": {
+    "pairs": 4,
+    "mean_lambda_over_n": "1/2",
+    "pairs_with_2lambda_at_least_n": 2,
+    "pairs_whose_coupling_pays_for_its_positions": 2,
+    "pairs_whose_coupling_pays_with_lambda_charged": 0,
+    "identical_pairs": 2
+   },
+   "sigma2_n2": {
+    "pairs": 16,
+    "mean_lambda_over_n": "9/16",
+    "pairs_with_2lambda_at_least_n": 14,
+    "pairs_whose_coupling_pays_for_its_positions": 4,
+    "pairs_whose_coupling_pays_with_lambda_charged": 4,
+    "identical_pairs": 4
+   },
+   "sigma2_n3": {
+    "pairs": 64,
+    "mean_lambda_over_n": "29/48",
+    "pairs_with_2lambda_at_least_n": 46,
+    "pairs_whose_coupling_pays_for_its_positions": 8,
+    "pairs_whose_coupling_pays_with_lambda_charged": 8,
+    "identical_pairs": 8
+   },
+   "sigma2_n4": {
+    "pairs": 256,
+    "mean_lambda_over_n": "323/512",
+    "pairs_with_2lambda_at_least_n": 234,
+    "pairs_whose_coupling_pays_for_its_positions": 16,
+    "pairs_whose_coupling_pays_with_lambda_charged": 16,
+    "identical_pairs": 16
+   },
+   "sigma2_n5": {
+    "pairs": 1024,
+    "mean_lambda_over_n": "831/1280",
+    "pairs_with_2lambda_at_least_n": 858,
+    "pairs_whose_coupling_pays_for_its_positions": 32,
+    "pairs_whose_coupling_pays_with_lambda_charged": 32,
+    "identical_pairs": 32
+   },
+   "sigma2_n6": {
+    "pairs": 4096,
+    "mean_lambda_over_n": "2717/4096",
+    "pairs_with_2lambda_at_least_n": 3876,
+    "pairs_whose_coupling_pays_for_its_positions": 64,
+    "pairs_whose_coupling_pays_with_lambda_charged": 64,
+    "identical_pairs": 64
+   },
+   "sigma2_n7": {
+    "pairs": 16384,
+    "mean_lambda_over_n": "19339/28672",
+    "pairs_with_2lambda_at_least_n": 14850,
+    "pairs_whose_coupling_pays_for_its_positions": 3070,
+    "pairs_whose_coupling_pays_with_lambda_charged": 128,
+    "identical_pairs": 128
+   },
+   "sigma2_n8": {
+    "pairs": 65536,
+    "mean_lambda_over_n": "44803/65536",
+    "pairs_with_2lambda_at_least_n": 63404,
+    "pairs_whose_coupling_pays_for_its_positions": 7934,
+    "pairs_whose_coupling_pays_with_lambda_charged": 256,
+    "identical_pairs": 256
+   },
+   "sigma3_n1": {
+    "pairs": 9,
+    "mean_lambda_over_n": "1/3",
+    "pairs_with_2lambda_at_least_n": 3,
+    "pairs_whose_coupling_pays_for_its_positions": 3,
+    "pairs_whose_coupling_pays_with_lambda_charged": 3,
+    "identical_pairs": 3
+   },
+   "sigma3_n2": {
+    "pairs": 81,
+    "mean_lambda_over_n": "4/9",
+    "pairs_with_2lambda_at_least_n": 63,
+    "pairs_whose_coupling_pays_for_its_positions": 9,
+    "pairs_whose_coupling_pays_with_lambda_charged": 9,
+    "identical_pairs": 9
+   },
+   "sigma3_n3": {
+    "pairs": 729,
+    "mean_lambda_over_n": "359/729",
+    "pairs_with_2lambda_at_least_n": 363,
+    "pairs_whose_coupling_pays_for_its_positions": 27,
+    "pairs_whose_coupling_pays_with_lambda_charged": 27,
+    "identical_pairs": 27
+   },
+   "sigma3_n4": {
+    "pairs": 6561,
+    "mean_lambda_over_n": "127/243",
+    "pairs_with_2lambda_at_least_n": 5343,
+    "pairs_whose_coupling_pays_for_its_positions": 1821,
+    "pairs_whose_coupling_pays_with_lambda_charged": 81,
+    "identical_pairs": 81
+   },
+   "sigma3_n5": {
+    "pairs": 59049,
+    "mean_lambda_over_n": "53513/98415",
+    "pairs_with_2lambda_at_least_n": 37323,
+    "pairs_whose_coupling_pays_for_its_positions": 8301,
+    "pairs_whose_coupling_pays_with_lambda_charged": 243,
+    "identical_pairs": 243
+   },
+   "sigma4_n1": {
+    "pairs": 16,
+    "mean_lambda_over_n": "1/4",
+    "pairs_with_2lambda_at_least_n": 4,
+    "pairs_whose_coupling_pays_for_its_positions": 4,
+    "pairs_whose_coupling_pays_with_lambda_charged": 4,
+    "identical_pairs": 4
+   },
+   "sigma4_n2": {
+    "pairs": 256,
+    "mean_lambda_over_n": "47/128",
+    "pairs_with_2lambda_at_least_n": 172,
+    "pairs_whose_coupling_pays_for_its_positions": 16,
+    "pairs_whose_coupling_pays_with_lambda_charged": 16,
+    "identical_pairs": 16
+   },
+   "sigma4_n3": {
+    "pairs": 4096,
+    "mean_lambda_over_n": "107/256",
+    "pairs_with_2lambda_at_least_n": 1396,
+    "pairs_whose_coupling_pays_for_its_positions": 1396,
+    "pairs_whose_coupling_pays_with_lambda_charged": 64,
+    "identical_pairs": 64
+   },
+   "sigma4_n4": {
+    "pairs": 65536,
+    "mean_lambda_over_n": "29515/65536",
+    "pairs_with_2lambda_at_least_n": 44524,
+    "pairs_whose_coupling_pays_for_its_positions": 9556,
+    "pairs_whose_coupling_pays_with_lambda_charged": 256,
+    "identical_pairs": 256
+   }
+  }
+ }
+}
