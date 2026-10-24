@@ -1,0 +1,108 @@
+{
+ "concatenation": {
+  "length": {
+   "face_pairs": 25,
+   "plural_fibres": 0
+  },
+  "length mod 2": {
+   "face_pairs": 4,
+   "plural_fibres": 0
+  },
+  "count of a mod 3": {
+   "face_pairs": 9,
+   "plural_fibres": 0
+  },
+  "last letter": {
+   "face_pairs": 16,
+   "plural_fibres": 0
+  },
+  "contains th": {
+   "face_pairs": 4,
+   "plural_fibres": 1
+  },
+  "contains th, ends t, starts h": {
+   "face_pairs": 64,
+   "plural_fibres": 8
+  },
+  "contains th, ends t, starts h, empty": {
+   "face_pairs": 81,
+   "plural_fibres": 0
+  }
+ },
+ "contains_th_right_congruence": {
+  "words": 1093,
+  "suffixes": 121,
+  "classes": 3,
+  "class_examples": [
+   "",
+   "t",
+   "th"
+  ]
+ },
+ "contains_th_syntactic_congruence": {
+  "words": 1093,
+  "contexts_per_side": 40,
+  "classes": 6,
+  "class_examples": [
+   "",
+   "a",
+   "h",
+   "ht",
+   "t",
+   "th"
+  ]
+ },
+ "contains_th_four_cycle": {
+  "rectangles": 3025,
+  "nonzero": 784,
+  "nonzero_with_a_t_h_seam": 784
+ },
+ "matrix_product": {
+  "matrices": 81,
+  "det": {
+   "face_pairs": 25,
+   "plural_fibres": 0
+  },
+  "trace": {
+   "face_pairs": 25,
+   "plural_fibres": 25
+  },
+  "trace and det": {
+   "face_pairs": 256,
+   "plural_fibres": 218
+  },
+  "trace of product equals Frobenius pairing on every pair": true
+ },
+ "polynomial_product_at_2": {
+  "polynomials": 27,
+  "value": {
+   "face_pairs": 225,
+   "plural_fibres": 0
+  },
+  "derivative": {
+   "face_pairs": 81,
+   "plural_fibres": 80
+  },
+  "jet (value, derivative)": {
+   "face_pairs": 729,
+   "plural_fibres": 0
+  },
+  "leibniz holds on every pair": true
+ },
+ "permutation_composition": {
+  "permutations": 24,
+  "sign": {
+   "face_pairs": 4,
+   "plural_fibres": 0
+  },
+  "cycle type": {
+   "face_pairs": 25,
+   "plural_fibres": 14
+  }
+ },
+ "typed_application": {
+  "types": 14,
+  "pairs": 196,
+  "well_typed": 12
+ }
+}

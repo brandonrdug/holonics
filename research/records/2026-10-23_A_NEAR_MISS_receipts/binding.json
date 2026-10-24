@@ -1,0 +1,90 @@
+{
+ "sum ring 10": {
+  "squares": 9801,
+  "nonzero": 0,
+  "values": []
+ },
+ "sum ring 9": {
+  "squares": 9801,
+  "nonzero": 0,
+  "values": []
+ },
+ "sum ring 11": {
+  "squares": 9801,
+  "nonzero": 0,
+  "values": []
+ },
+ "sum tens digit": {
+  "squares": 9801,
+  "nonzero": 1961,
+  "values": [
+   "1/10",
+   "9/10"
+  ],
+  "all straddle a + b = 10m": true,
+  "units-carry nonzero squares (digits 0..9)": 17,
+  "units-carry squares on x + y + 1 = 9 or 10": true
+ },
+ "product ring 10 (phase ab/q)": {
+  "squares": 9801,
+  "nonzero": 9801,
+  "values": [
+   "1/10"
+  ]
+ },
+ "product ring 9 (phase ab/q)": {
+  "squares": 9801,
+  "nonzero": 9801,
+  "values": [
+   "1/9"
+  ]
+ },
+ "product ring 11 (phase ab/q)": {
+  "squares": 9801,
+  "nonzero": 9801,
+  "values": [
+   "1/11"
+  ]
+ },
+ "product ring 101 (phase ab/q)": {
+  "squares": 9801,
+  "nonzero": 9801,
+  "values": [
+   "1/101"
+  ]
+ },
+ "product units of Z/9 (index chart, root 2)": {
+  "anchored rectangles": 25,
+  "nonzero": 0,
+  "units": 6,
+  "order": 6
+ },
+ "product units of Z/11 (index chart, root 2)": {
+  "anchored rectangles": 81,
+  "nonzero": 0,
+  "units": 10,
+  "order": 10
+ },
+ "product units of Z/10 (index chart, root 3)": {
+  "anchored rectangles": 9,
+  "nonzero": 0,
+  "units": 4,
+  "order": 4
+ },
+ "product units of Z/101 (index chart, root 2)": {
+  "anchored rectangles": 9801,
+  "nonzero": 0,
+  "units": 100,
+  "order": 100
+ },
+ "product size (digits of ab)": {
+  "squares": 9801,
+  "nonzero": 130,
+  "values": [
+   "-1",
+   "1"
+  ],
+  "all straddle ab = 10^k": true,
+  "squares straddling ab = 10^k": 586
+ }
+}

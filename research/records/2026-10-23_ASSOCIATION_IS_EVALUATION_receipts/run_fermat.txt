@@ -1,0 +1,11 @@
+ring of p sites and primitive walks: 3600 checks, 0 failures
+primitive necklaces (a^p - a)/p, a = 2,3,10; p = 5,7: [(6, 0), (18, 0), (48, 0), (312, 0), (19998, 0), (1428570, 0)]
+binary words of length 7: 128 orbits 20 orbit sizes [1, 7]
+n^5 = n (mod 10) for n < 1000: True | 9x = -x (mod 10): True
+base 10 product digit counts [27, 4, 12, 4, 12, 9, 12, 4, 12, 4] = parity x five-ring [27, 4, 12, 4, 12, 9, 12, 4, 12, 4] True
+base 12 counts [40, 4, 8, 10, 16, 4, 20, 4, 16, 10, 8, 4] = Z/4 law x Z/3 law True
+units of Z/10 multiply by adding discrete logs: True
+leading digit under 1/n weights, n in [10^2, 10^3): [0.30153, 0.17611, 0.12488, 0.09683, 0.0791, 0.06687, 0.05792, 0.05108, 0.04569]
+leading digit under 1/n weights, n in [10^4, 10^5): [0.30103, 0.17609, 0.12494, 0.09691, 0.07918, 0.06695, 0.05799, 0.05115, 0.04576]
+Benford                                          : [0.30103, 0.17609, 0.12494, 0.09691, 0.07918, 0.06695, 0.05799, 0.05115, 0.04576]
+exit 0 wall 2.215860267 s

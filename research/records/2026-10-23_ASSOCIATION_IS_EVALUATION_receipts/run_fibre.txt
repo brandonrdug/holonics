@@ -1,0 +1,7 @@
+* k=1   6284 calcs  mean log2 fibre 0.7990  exact 0.4749  result inside 1.0000
+* k=2   6284 calcs  mean log2 fibre 0.0084  exact 0.9916  result inside 1.0000
++ k=1   3815 calcs  mean log2 fibre 0.7426  exact 0.2574  result inside 1.0000
++ k=2   3815 calcs  mean log2 fibre 0.0147  exact 0.9853  result inside 1.0000
+- k=1   3388 calcs  mean log2 fibre 1.7353  exact 0.0859  result inside 1.0000
+- k=2   3388 calcs  mean log2 fibre 0.2121  exact 0.8191  result inside 1.0000
+exit 0 wall 0.1 s peak 260 MiB (largest child so far)

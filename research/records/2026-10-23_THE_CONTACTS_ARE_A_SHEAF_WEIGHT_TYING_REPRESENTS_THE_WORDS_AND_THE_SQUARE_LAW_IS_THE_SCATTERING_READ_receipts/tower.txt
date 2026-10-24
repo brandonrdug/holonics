@@ -1,0 +1,12 @@
+# projection: 22.29 us/cell (dev, 100 problems) x 1.054 (table growth measured for D=24) x 2,084,620 cells = 49 s; deadline 60 s
+D=24 m=13 w=64 cells 2084620: online 0.4922 bits/digit; quarters 0.5571 0.4924 0.4651 0.4543; nodes 4246939  (45.5 s, 21.85 us/cell, peak 489 MiB)
+  tower A news    : online 0.4918; quarters 0.5569 0.4919 0.4646 0.4538
+  tower B surprise: online 0.4909; quarters 0.5587 0.4908 0.4625 0.4517
+  tower AB both   : online 0.4906; quarters 0.5587 0.4903 0.4621 0.4512
+  lag:                    1       2       3       4       8      16      32      64     128     256    1024    4096
+  news corr:        -0.0028  0.0020 -0.0017 -0.0055 -0.0038  0.0045  0.0059  0.0031  0.0036  0.0050  0.0013  0.0005
+  surprise corr:     0.0217  0.0169  0.0225  0.0198  0.0150  0.0128  0.0096  0.0063  0.0060  0.0069  0.0038  0.0033
+real	0m45.571s
+user	0m41.794s
+sys	0m3.456s
+exit 0

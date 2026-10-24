@@ -1,0 +1,8 @@
+pumped n=16 eta=0.02 rho=0.95 cells 2027360: online train 1.384, held-out 1.467 bits/digit  (78.8 s, 38.89 us/cell, peak 48 MiB)
+pumped 0.02 exit 0
+shared n=16 eta=0.005 rho=0.95 cells 2027360: online train 1.431, held-out 1.492 bits/digit  (78.9 s, 38.93 us/cell, peak 48 MiB)
+shared 0.005 exit 0
+pumped n=16 eta=0.005 rho=0.95 cells 2027360: online train 1.363, held-out 1.457 bits/digit  (79.0 s, 38.99 us/cell, peak 48 MiB)
+pumped 0.005 exit 0
+shared n=16 eta=0.02 rho=0.95 cells 2027360: online train 1.430, held-out 1.510 bits/digit  (81.5 s, 40.19 us/cell, peak 48 MiB)
+shared 0.02 exit 0

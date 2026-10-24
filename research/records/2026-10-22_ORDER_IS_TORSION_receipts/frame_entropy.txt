@@ -1,0 +1,15 @@
+bytes 506840 digits 2027360
+marginal                     1.959 bits/digit
+pos mod 2                    1.765 bits/digit
+pos mod 3                    1.959 bits/digit
+pos mod 5                    1.959 bits/digit
+pos mod 30 (rings 5,2,3)     1.765 bits/digit
+pos mod 4 (byte frame)       1.522 bits/digit
+pos mod 60                   1.522 bits/digit
+prev 1                       1.901 bits/digit
+prev 1 + mod 4               1.455 bits/digit
+prev 3                       1.529 bits/digit
+prev 3 + mod 4               1.225 bits/digit
+prev 6                       0.971 bits/digit
+prev 6 + mod 4               0.915 bits/digit
+wall 9.6 s, peak resident 44968 KiB
