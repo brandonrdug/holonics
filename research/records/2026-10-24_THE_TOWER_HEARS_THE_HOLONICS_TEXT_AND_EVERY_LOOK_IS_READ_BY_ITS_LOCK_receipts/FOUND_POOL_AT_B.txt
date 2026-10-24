@@ -1,0 +1,13 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 25.0 s
+held-out digit arrivals 8239, sums' B cells 495
+sums with B, U and the carry 8986; mode 41: |mu|/|lambda| median 5.026; read in 38.5 s
+   the unit (the state alone): leading single-channel share 0.7062; the found form (0.1 s): share of U's tension 0.7214; the state read holds chi_1(a0) 0.008; beta on k=1 0.00, k=9 0.00; the form at B holds chi_1(c0) -0.001; held out, units at B 50 of 495
+   chi_1: leading single-channel share 0.8702; the found form (0.1 s): share of U's tension 1.7177; the state read holds chi_1(a0) 0.936; beta on k=1 1.00, k=9 0.00; the form at B holds chi_1(c0) 0.936; held out, units at B 444 of 495
+   chi_2: leading single-channel share 0.6751; the found form (0.1 s): share of U's tension 1.3004; the state read holds chi_1(a0) -0.003; beta on k=1 0.00, k=9 0.00; the form at B holds chi_1(c0) -0.001; held out, units at B 220 of 495
+   chi_3: leading single-channel share 0.6036; the found form (0.1 s): share of U's tension 1.0507; the state read holds chi_1(a0) 0.000; beta on k=1 0.00, k=9 0.00; the form at B holds chi_1(c0) -0.002; held out, units at B 350 of 495
+   chi_4: leading single-channel share 0.6381; the found form (0.1 s): share of U's tension 1.1403; the state read holds chi_1(a0) -0.002; beta on k=1 0.00, k=9 0.00; the form at B holds chi_1(c0) -0.001; held out, units at B 197 of 495
+   chi_5: leading single-channel share 0.7763; the found form (0.1 s): share of U's tension 0.8094; the state read holds chi_1(a0) -0.002; beta on k=1 0.00, k=9 0.00; the form at B holds chi_1(c0) -0.001; held out, units at B 83 of 495
+   the ten characters together: leading single-channel share 0.9579 in the sample (7.6 s)
+      its weight by character k=0..9: 0.15 0.15 0.08 0.05 0.10 0.12 0.08 0.06 0.07 0.13; the form at B holds chi_1(c0) 0.216; held out, units at B 140 of 495
+done in 46.8 s
+MEASURE exit=0 wall_s=47.1 peak_rss_kib=1425052

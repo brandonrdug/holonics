@@ -1,0 +1,8 @@
+char/block0_bufull.txt 2846 MEASURE exit=0 wall_s=8.3 peak_rss_kib=22444
+char/block1_bufull.txt 2766 MEASURE exit=0 wall_s=8.1 peak_rss_kib=22596
+char/block2_bufull.txt 2738 MEASURE exit=0 wall_s=8.5 peak_rss_kib=22448
+char/block3_bufull.txt 2826 MEASURE exit=0 wall_s=8.3 peak_rss_kib=22568
+char/block4_bufull.txt 2747 MEASURE exit=0 wall_s=8.0 peak_rss_kib=22604
+char/block5_bufull.txt 2805 MEASURE exit=0 wall_s=8.2 peak_rss_kib=22332
+char/block6_bufull.txt 2887 MEASURE exit=0 wall_s=8.5 peak_rss_kib=22572
+char/block7_bufull.txt 2736 MEASURE exit=0 wall_s=8.2 peak_rss_kib=22624

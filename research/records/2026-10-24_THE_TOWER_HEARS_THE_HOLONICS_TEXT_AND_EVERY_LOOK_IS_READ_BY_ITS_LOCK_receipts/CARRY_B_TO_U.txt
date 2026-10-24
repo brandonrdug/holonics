@@ -1,0 +1,24 @@
+training sums' U cells 8986, held out 495; read in 3.4 s
+moves read at 22351 cells; the largest departure of carried from the move applied to before, relative: 2.99e-10
+sums 8986: result of one digit 52, two 4503, three 4431
+mode: the carried crossing holds chi_1(c0) pooled / two digits / three digits; its share of U's tension; gain; the two lengths' mean carries differ by; the mode at U holds chi_1(b0), chi_1(a0)
+   mode 41: 0.904 / 0.914 / 0.941; share 1.7429; gain 0.658; differ by 0.209; at U holds b0 0.088, a0 0.117
+   mode 56: 0.858 / 0.950 / 0.950; share 1.7336; gain 0.410; differ by 0.442; at U holds b0 0.076, a0 0.008
+   mode 48: 0.841 / 0.977 / 0.975; share 1.7523; gain 0.275; differ by 0.662; at U holds b0 0.181, a0 0.002
+   mode 57: 0.801 / 0.867 / 0.765; share 1.6285; gain 0.583; differ by 0.112; at U holds b0 0.027, a0 0.040
+   mode 58: 0.762 / 0.955 / 0.797; share 1.6098; gain 0.595; differ by 0.543; at U holds b0 0.016, a0 0.009
+   mode 27: 0.744 / 0.925 / 0.911; share 1.6124; gain 0.603; differ by 0.689; at U holds b0 0.086, a0 0.007
+   mode 32: 0.709 / 0.886 / 0.563; share 1.5287; gain 0.687; differ by 0.272; at U holds b0 0.043, a0 0.011
+   mode 49: 0.677 / 0.904 / 0.521; share 1.5546; gain 0.497; differ by 0.624; at U holds b0 0.003, a0 0.005
+   mode 51: 0.657 / 0.904 / 0.519; share 1.5888; gain 0.676; differ by 0.688; at U holds b0 0.022, a0 -0.000
+   mode 50: 0.627 / 0.899 / 0.601; share 1.5184; gain 0.639; differ by 0.364; at U holds b0 0.005, a0 -0.000
+   mode 24: 0.604 / 0.806 / 0.500; share 1.4708; gain 0.623; differ by 0.069; at U holds b0 -0.001, a0 -0.000
+   mode 60: 0.600 / 0.751 / 0.735; share 1.4870; gain 0.508; differ by 0.796; at U holds b0 0.023, a0 0.003
+   mode 7: 0.097 / 0.495 / 0.511; share 0.7881; gain 0.145; differ by 1.808; at U holds b0 0.076, a0 -0.001
+   mode 55: 0.084 / 0.560 / 0.521; share 0.9644; gain 0.500; differ by 1.970; at U holds b0 0.027, a0 0.015
+   mode 47: 0.048 / 0.969 / 0.886; share 1.0889; gain 0.388; differ by 1.955; at U holds b0 0.001, a0 -0.001
+   mode 38: 0.004 / 0.522 / 0.500; share 0.8154; gain 0.394; differ by 1.991; at U holds b0 0.043, a0 -0.002
+modes whose carried crossing holds at least 0.9 pooled: 1; at least 0.5: 25; median 0.463
+the modes holding most of chi_1(b0) at U: 48 (b0 0.181, carried crossing pooled 0.841), 59 (b0 0.147, carried crossing pooled 0.439), 15 (b0 0.102, carried crossing pooled 0.330), 17 (b0 0.093, carried crossing pooled 0.579), 41 (b0 0.088, carried crossing pooled 0.904), 27 (b0 0.086, carried crossing pooled 0.744), 9 (b0 0.081, carried crossing pooled 0.471), 56 (b0 0.076, carried crossing pooled 0.858)
+done in 16.1 s
+MEASURE exit=0 wall_s=16.3 peak_rss_kib=123980

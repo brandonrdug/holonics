@@ -1,0 +1,11 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 25.8 s
+held-out digit arrivals 8239, sums' B cells 495
+sums with B, U and the carry 8986; mode 41: |mu|/|lambda| median 5.026; read in 40.1 s
+the exact crossing placed at B, carried to U: share 1.7429
+the state at B alone, straight-line reads: top canonical correlations squared 0.5174, 0.1920 (two channels 0.7094)
+   the outside form, unsearched: share of U's tension 1.6842; the state read holds chi_1(a0) 0.966; beta on k=1 1.00, k=9 0.00; the form at B holds chi_1(c0) 0.966; held out, units at B 475 of 495
+   searched from blind: principal 1+2, the ring's first character (300 steps, 12.6 s): share of U's tension 0.6641; the state read holds chi_1(a0) 0.004; beta on k=1 0.04, k=9 0.04; the form at B holds chi_1(c0) -0.002; held out, units at B 39 of 495
+   searched from blind: principal 1+2, the unit (300 steps, 12.7 s): share of U's tension 0.6595; the state read holds chi_1(a0) 0.002; beta on k=1 0.05, k=9 0.04; the form at B holds chi_1(c0) -0.002; held out, units at B 36 of 495
+   searched from outside: chi_1(a0)'s read, chi_1 (300 steps, 13.1 s): share of U's tension 1.6878; the state read holds chi_1(a0) 0.965; beta on k=1 1.00, k=9 0.00; the form at B holds chi_1(c0) 0.965; held out, units at B 475 of 495
+done in 78.9 s
+MEASURE exit=0 wall_s=79.1 peak_rss_kib=824164
