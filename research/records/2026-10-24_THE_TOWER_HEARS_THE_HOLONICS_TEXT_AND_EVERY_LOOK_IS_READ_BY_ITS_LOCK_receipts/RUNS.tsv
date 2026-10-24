@@ -59,3 +59,8 @@ gate (pair face)	-	tools/gate.sh, then the tower's tests	1334 (460 s on the prev
 release build (leverage read)	-	cargo build --release --example solenoidal_alpha	377 (the clean build)	420	-	239	0.63	-	complete; face2 (60db5291…)
 leverage slice	face2 (60db5291…)	read-tower-pair-leverage hface1/STATE.0 on a sixteenth of htext2 train, stride 64	unmeasured (one to three minutes)	180	-	88.5	-	68448	complete
 leverage, whole training text	face2 (60db5291…)	read-tower-pair-leverage on hface1/STATE.0 and hcont1/STATE.0, stride 64	167 (the slice's Gram read times 16, 810 readings at 13.3 ms with 1.2 for wider pivots)	240 each	-	150.5 and 145.8	0.90 and 0.87	68756 and 25460	complete
+second pass joined	face1 (44ed341e…)	train-pair-pumped-tower hface1/STATE.0, one pass	785.2 (every block measured before the launch, 61, largest plus largest spread: 449.4 ms a section)	825	785200	576.4	0.73	204600	complete; one of the first 32 sections deposited nothing after 31 halvings
+second pass plain	face1 (44ed341e…)	train-pair-pumped-tower hcont1/STATE.0, one pass	812.1 (464.8 ms a section)	852	812100	556.2	0.68	180908	complete
+met and unmet reads, second pass	face1 (44ed341e…)	read-tower-pair-cells on hface2/STATE.0 and hcont2/STATE.0, 8 streams	4.5 (the first pass's largest)	180 each	-	4.2 and 3.7	0.93 and 0.82	at most 68480	complete
+writing, second pass	face1 (44ed341e…)	sample-tower 400 bytes at one and two draws, joined and plain (16 runs, four at a time)	3.4 (the first pass's largest)	60 each	-	0.6 to 3.1	at most 0.91	at most 70356	complete
+leverage, second pass	face2 (60db5291…)	read-tower-pair-leverage on hface2/STATE.0 and hcont2/STATE.0, stride 64	167	240 each	-	156.8 and 140.7	0.94 and 0.84	68832 and 25300	complete
