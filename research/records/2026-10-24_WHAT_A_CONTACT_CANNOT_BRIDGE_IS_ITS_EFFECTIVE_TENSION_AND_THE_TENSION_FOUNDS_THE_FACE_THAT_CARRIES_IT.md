@@ -146,6 +146,43 @@ tension where it is: dormant, a lock waiting for a key. Nothing here is catered:
 the tower's own faces, and a medium label, where it is used at all, is used only by an exterior
 reader.
 
+**When no present face carries the remainder, the law founds from a pool.** If every candidate has
+`M ≈ 0`, the menu lacks the face. Take a pool of new coordinates `c ∈ ℝ^d`. A face of rank `k`
+read from it, `Wᵀ c`, removes the first expression below, and the best `W` removes the sum of the
+`k` leading generalized eigenvalues of `(Mᵀ M, Q)`:
+
+```text
+M W (Wᵀ Q W)⁺ Wᵀ Mᵀ,        max_W tr = μ₁ + … + μ_k,        Mᵀ M w = μ Q w
+```
+
+This is the reduced-rank regression of the remainder on the pool's residual, and the whole pool
+removes `tr M Q⁺ Mᵀ = Σ μ`. On the line starts, the pool `c₁` = the held mode plus the alternation,
+`c₂` = the alternation, removes `3`, with generalized eigenvalues `9/4` and `3/4`; its coordinates
+alone remove `3/2` and `3/4`, so the best face is a combination. In each eigenpair `w` is the
+founded face's drive and `M w` the class contrast it resolves; the leading class directions of `S`
+are that output half alone. Three rules keep it lawful [agent-inferred, October 24]:
+- **The machine's own navigators generate the pool, symmetrically**: a reset clock for every class
+  at a few radii, the residues of a running word at small moduli, the products of pairs of present
+  faces. No class, modulus or pair is named; the drop and the code decide.
+- **A contrast whose four-cycle on additive faces is nonzero needs a product.** When the arrival is
+  the product of two signs, each sign and both read additively remove nothing (`M = 0`), and their
+  product removes the whole tension: the pair contact's face (`contact.kunneth-interaction-rank`).
+- **The choice is charged.** A face picked from a pool by its drop is chosen on the moments that
+  score it, so the founding test counts the description of the choice: the navigator word that
+  generates the face, not the cells it marks. On the eight line starts of §7, a search of every ±1
+  pattern finds drops above the medium's (`57/20` against `9/4`, from patterns that also mark a
+  blank line). The best saves `16777216/84375` at the optima, about 7.6 bits, less than the 8 bits
+  that choosing one of 256 patterns costs, and no pattern pays. The medium's held mode is one of
+  14 square-wave clocks: it saves `2⁶`, more than the `log₂ 14` its choice costs, and founds.
+
+The tension's own class directions `V` project the question (`Vᵀ t`), which cuts the cost, and a
+slow mode driven by past arrivals along `V` is one pool member. It should pass where the contrast's
+own history resolves it, as the words since a newline resolve where the line ends, and fail where
+the answer is a conjunction of recent bytes (which vowel) or a residue of the operands (which digit: a
+neighbouring-digit opposition is a near-miss fibre, which the operands' cheap-ring faces close;
+[the near-miss record](2026-10-23_A_NEAR_MISS_IS_A_DRAW_FROM_THE_FACES_IT_KEPT_AND_THE_BASES_CHEAP_RINGS_CLOSE_THE_REST.md))
+[agent-inferred; the founding test decides each].
+
 ## 6. The phase part, read in the first person
 
 The tower's readout row reads `y = C h` and keeps `r = Re y`, so its face has a phase that the read
@@ -212,6 +249,25 @@ The reading the tower can run without changing its step: on the trained pair tow
 - the drop `M Q⁺ Mᵀ` for each candidate face.
 
 Then founding as §5 states it, with its acceptance fixed by the design thread before the run.
+
+**The first reading.** The design thread ran it exactly on the five-pass pair tower over the
+training text, 1,789,108 cells (the tower record, "The tension the text leaves"):
+- the tension is 98.5–99.2% of `tr T` in every medium, and the readout's own bridge 8–15‰;
+- the present unread faces remove little: the quadrature 2.8–5.7‰, the level below 3.0–6.6‰, a
+  foil 0.11–0.31‰; at line starts the exterior medium label removes 32‰;
+- the most opposed class pairs are newline against space, vowels against vowels, and among digits
+  the operators and neighbouring digits.
+
+Two corrections to how §7 reads it [agent-inferred, October 24]:
+- **The readout's own bridge is small by construction.** `B` is the readout's gradient, and a
+  trained readout sits near its optimum, so `B H⁺ Bᵀ` at its own face reads only the unfinished
+  step. The candidates' drops are the reading.
+- **`tr S` holds the text's floor.** A predictor holding the true conditional `p*` still has Brier
+  `1 − Σ p*²` per cell. Two exterior references, never machine faces, split off the reducible part
+  on held-out text: the exact drop of the linear face `E(u)` of the last `k` bytes, and the Brier of
+  an order-`k` count model. If they agree, a new mode suffices; if the count model gains much more,
+  the contrast is a conjunction and only a pair contact carries it. That decides the pool's order
+  in §5.
 
 ## 8. What closes is the bridge, and the lock's friction against the information distance
 
@@ -323,7 +379,8 @@ One box in #410:
   the remainder is orthogonal to every face (extending `Objects/Membrane:interior_elimination` from
   an invertible interior to a positive semidefinite face Gram);
 - `S` is invariant under an invertible rebase of the face;
-- the quotient formula: reading `c` beside the face removes exactly `M Q⁺ Mᵀ`;
+- the quotient formula: reading `c` beside the face removes exactly `M Q⁺ Mᵀ`, and the best rank-`k`
+  face read from a pool removes the sum of the `k` leading generalized eigenvalues of `(Mᵀ M, Q)`;
 - `R = y_T / y_H` is invariant under a unit turn of the readout row, and the gradient of
   `½ |log R|²` in `y_H` is `−log R / conj(y_H)`;
 - on the covectors' range, `det S / det S₀ = det(I − S₀⁻¹(S₀ − S))`, the product of `1 − ρ_k²`;
@@ -332,5 +389,5 @@ One box in #410:
 ## Receipts
 
 [`2026-10-24_EFFECTIVE_TENSION_receipts/`](2026-10-24_EFFECTIVE_TENSION_receipts/): `tension.py` and its
-output `tension.json` (§7); `closure.py` and its output `closure.json` (§8); `RUN.md`. Exact
-fractions and integers throughout.
+output `tension.json` (§7); `pool.py` and its output `pool.json` (§5); `closure.py` and its output
+`closure.json` (§8); `RUN.md`. Exact fractions and integers throughout.

@@ -1,0 +1,52 @@
+{
+ "F1": {
+  "tension_constant_only_trace": "2",
+  "drop_each_sign_and_both_additively": [
+   "0",
+   "0",
+   "0"
+  ],
+  "drop_product_face": "2",
+  "four_cycle_of_the_table": 2
+ },
+ "F2": {
+  "patterns_up_to_sign": 128,
+  "mean_drop_trace": "381/512",
+  "largest_drop_trace": "57/20",
+  "largest_drop_patterns": [
+   "++++---+",
+   "+++-----"
+  ],
+  "held_mode_drop_trace": "9/4",
+  "held_mode_code_saving_ratio": "64",
+  "candidates_all_patterns": 256,
+  "candidates_square_wave_clocks_counted_with_sign": 14,
+  "founded_against_all_patterns": false,
+  "founded_against_clocks": true,
+  "held_mode_is_a_clock": true,
+  "held_mode_saving_ratio_recomputed": "64",
+  "largest_drop_pattern_saving_ratio": "16777216/84375",
+  "largest_saving_ratio_over_all_patterns": "16777216/84375",
+  "patterns_whose_saving_exceeds_their_choice_among_256": 0,
+  "clocks_whose_saving_exceeds_their_choice_among_14": 2
+ },
+ "F3": {
+  "generalized_eigenvalues_9_4_and_3_4": {
+   "9/4": true,
+   "3/4": true
+  },
+  "pool_drop_trace": "3",
+  "single_coordinate_drops": [
+   "3/2",
+   "3/4"
+  ],
+  "combination_c1_plus_s_c2": {
+   "-2": "3/2",
+   "-1": "9/4",
+   "-1/2": "39/20",
+   "0": "3/2",
+   "1/2": "63/52",
+   "1": "21/20"
+  }
+ }
+}
