@@ -1730,6 +1730,119 @@ sums'. Each is read in level 0's state before the digit arrives (the full mode r
 
 The mode reads stay outside the repository. The forms and every log line are in the receipts, and each run's row is in `RUNS.tsv`.
 
+## The crossing at its own loudness
+
+**The readings** (`REGION_SHARE.py`, `REGION_FOUNDING.py`, `TURN_FORMS.py`, `CLASS_MODES.py`,
+`MODE_PARTNER.py`; all exterior). They cover the 147,775 digit arrivals of the training equation
+block, read from rest in its eight parts with cells from 128.
+- At each arrival they take level 0's state before the digit arrives and the covector at the input.
+- Each region is read against its own `Y_r` (uncentred), so its whole tension is 64, as the text's
+  is in the founding's unit.
+- Forms are centred within each digit inside the region.
+- Held out, a form is read as the machine reads it: its channels uncentred, a ridge indicator fit at
+  the training sums' `B` cells of the region, and 0 at held-out cells outside the region.
+
+**The region raises the crossing about forty-fold and still does not put it first.** Over the whole
+text the exact crossing `χ(c₀)` at `B` held 6.7‰ (above). Read at each region's own loudness:
+
+| region | cells | the exact crossing | the outside form | best form | its `β` on `k = 0` | best form held out | outside form held out |
+|---|---|---|---|---|---|---|---|
+| every digit arrival | 147,775 | 0.095 | 0.083 | 0.541 | 0.99 | 48 | 475 |
+| the sums' `B` cells (a label) | 8,986 | 0.386 | 0.378 | 1.379 | 0.95 | 42 | 475 |
+| lock 42-35, sector 0 | 13,138 | 0.279 | 0.087 | 0.906 | 0.96 | 34 | 440 |
+| lock 57-35, sector 6 | 7,817 | 0.264 | 0.278 | 0.941 | 0.93 | 45 | 268 |
+
+- Lock 42-35's sector 0 holds 8,088 of the 8,986 training sums' `B` cells (0.62 of the region) and
+  449 of the 495 held out.
+- The best form is the same from the unit, ring and outside starts in every region. Its class factor
+  is constant: a read of the state alone.
+
+**Twenty-four forms founded in the lock region** (each rank residualized on the forms before it).
+- The joint share reaches 6.98, and the crossing left falls from 0.279 to 0.140.
+- Held out, the units at `B`: 35 (one form), 77 (four), 97 (sixteen), 122 (twenty-four).
+- No form's class factor is a character: its largest non-zero character holds at most 0.46.
+- Founded after the state's own read (128 channels common to the digits, share 5.14), four forms
+  read 76; in the label region the same founding failed on a singular Gram.
+
+**The turn alone is not the separation.** With the class factor held to unit modulus, the search
+converges to a constant phase (share 0.41 to 0.83, held out 36 to 51). The leading form's two
+channels hold at most 0.022 of the result's size (`log₁₀`) and of `χ(a₀)`; in the label region,
+0.156 of the size.
+
+**After the state's own read, the digits' coupling is the ring of ten.** Take the tension left at
+each digit's arrivals once the state's common read is removed. The digits couple through it as
+`K_de = tr(Y_r⁻¹ M̃_dᵀ S̄⁻¹ M̃_e)/√(n_d n_e)`. No label enters `K`. Over every digit arrival:
+
+| mode | eigenvalue | its power on the characters |
+|---|---|---|
+| 1 | 1.016 | `k = 1` 0.84 |
+| 2 | 0.636 | `k = 1` 0.78 |
+| 3 | 0.499 | `k = 2` 0.54 |
+| 4 | 0.394 | `k = 2` 0.41 |
+| 5 | 0.236 | `k = 2` 0.46, `k = 5` 0.40 |
+| 6 | 0.223 | `k = 3` 0.76 |
+| 7 | 0.169 | `k = 3` 0.64 |
+| 8 | 0.132 | `k = 4` 0.79 |
+| 9 | 0.117 | `k = 4` 0.55 |
+| 10 | 0 | `k = 0` 0.99 |
+
+- The modes come in the characters' order of frequency, the first character first.
+- The first pair leads in every region read: the lock region (0.69, 0.57), the sums' `B` cells
+  (0.80, 0.93) and the `B` cells of all three operations (0.81, 0.64).
+- The state's own read leaves the crossing whole: 0.279 of 0.279 in the lock region.
+
+**The state's side is not located.** The form whose class factor is modes 1 and 2, with its top 1,
+2, 4 and 8 state reads together, reads the units at `B` held out in:
+
+| region | 1 | 2 | 4 | 8 |
+|---|---|---|---|---|
+| every digit arrival | 79 | 65 | 83 | 104 |
+| lock 42-35, sector 0 | 51 | 78 | 103 | 127 |
+| the sums' `B` cells (a label) | 40 | 67 | 109 | 232 |
+
+- With each digit's own offset read away the counts move by a few (238 at eight reads in the label
+  region). The arriving digit alone reads 32; the outside form with offsets read away, 477.
+- The four state reads paired with the first-character mode, in the label region, hold at most 0.21
+  of `χ(a₀)` and at most 0.14 of `χ(a₁)`, `χ(b₁)`, `χ(c₁)` or the carry, fitted on even lines and
+  read on odd (`MODE_PARTNER.txt`). The outside form's read holds 0.966 of `χ(a₀)`.
+
+**What it says** [agent-inferred]:
+- **The loudest relation at `B` is the state with itself.** At every region's own loudness it is
+  larger than the crossing, so any criterion of tension founds it first. The region raises the
+  crossing but does not reorder the antinodes.
+- **The arriving side of the knot is located by the tension**: the digits' ring of ten, its first
+  character first, found without a label.
+- **The carried side is not.** The read the crossing needs, the first operand's units, is
+  privileged by what the state carries (966‰), not by the tension it leaves. The tension's own
+  partner reads are mixtures, so the knot still slips there.
+
+**Decided next** [agent-inferred]:
+- The class factor comes from the coupling's modes, as located here.
+- The state factor comes from what the state carries of the ring's modes along the passage: each
+  earlier arrival's ring character transported to the cell through the state's own modes (a
+  phase-carried moment `Σ_k Ĝ(τ_k)⁻¹ β(u_k)`), never an offset or a window.
+- Candidates are scored by code length in the lock region. An exterior reading comes first, and the
+  acceptance stays.
+
+**The runs.**
+- The region shares took 54.5 s and, rerun, 54.8 s (unmeasured, planned at one to two minutes;
+  deadline 300 s; peak 1.2 GB). The first run read held-out forms centred within each class by the
+  region's means, which distorted the outside form in mixed regions (69 and 56); the reads above are
+  uncentred, as the machine reads them.
+- The founding in three regions was projected at about 250 s (deadline 400 s). Its first launch was
+  stopped before output on that centring, and its second at rank five on its rate: 1.5 to 9.6 s a
+  rank against about 3 s projected. It was relaunched with the partition changed to the lock region
+  alone (`REGION_FOUNDING_stopped.txt` keeps the stopped ranks).
+- The lock-region founding of 24 ranks was projected at 260 s (30 s and 24 ranks at 9.6 s; deadline
+  300 s) and took 143.6 s (0.55; peak 805 MiB).
+- The turn forms failed at 38.8 s on a singular Gram (a real form's two channels are one reading)
+  and, with a pseudo-inverse share, took 47.9 s (projected about 70 s; deadline 300 s; peak 1.2 GB).
+- The state-first founding (projected at most 150 s; deadline 300 s) failed at 42.8 s in the label
+  region after the lock region's four ranks (peak 805 MiB).
+- The class modes took 37.5, 40.1 and 39.0 s, and the label regions 36.4 s (under a minute
+  projected; deadline 180 s; peak 1.2 GB). The mode partner took 33.2 s (deadline 180 s; peak
+  806 MiB).
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -1839,6 +1952,11 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `IDEAL_FORM_{quiet,free}.txt`, its share `IDEAL_SHARE.txt` and probe `IDEAL_PROBE.txt`,
   `FORM_DILUTION.{py,txt}`, `CROSSING_AT_U.{py,txt}` and `LOCK_AT_B.{py,txt}` (run from the run
   directory).
+- The crossing at its own loudness: `REGION_SHARE.{py,txt}`, `REGION_FOUNDING.py` with the
+  lock-region founding `REGION_FOUNDING.txt`, the stopped ranks `REGION_FOUNDING_stopped.txt` and the
+  state-first founding `REGION_FOUNDING_state.txt`, `TURN_FORMS.{py,txt}`, `CLASS_MODES.py` with
+  `CLASS_MODES.txt` and `CLASS_MODES_labels.txt`, and `MODE_PARTNER.{py,txt}` (run from the run
+  directory, each with `REGION_SHARE.py` as its first argument).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 

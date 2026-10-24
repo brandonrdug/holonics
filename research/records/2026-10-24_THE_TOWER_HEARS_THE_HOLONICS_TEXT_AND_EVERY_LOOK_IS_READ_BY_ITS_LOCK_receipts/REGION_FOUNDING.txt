@@ -1,0 +1,29 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 28.9 s
+held-out digit arrivals 8239, sums' B cells 495
+lock 42-35 sector 0: cells 13138, sums' B cells 8088; the exact crossing's share 0.2787
+   rank 1 (ring): adds J 0.5694; joint share 0.8540; the crossing left 0.2786; beta k=0 0.96, nearest k=6 0.13; sums' units at B: training 819 of 8088, held out 35 of 495; 1.7 s
+   rank 2 (outside): adds J 0.3897; joint share 1.3213; the crossing left 0.2776; beta k=0 0.99, nearest k=2 0.06; sums' units at B: training 837 of 8088, held out 44 of 495; 3.3 s
+   rank 3 (ring): adds J 0.4226; joint share 1.7596; the crossing left 0.2769; beta k=0 0.79, nearest k=9 0.28; sums' units at B: training 931 of 8088, held out 50 of 495; 8.2 s
+   rank 4 (ring): adds J 0.3241; joint share 2.0805; the crossing left 0.2688; beta k=0 0.67, nearest k=9 0.42; sums' units at B: training 1141 of 8088, held out 77 of 495; 14.9 s
+   rank 5 (ring): adds J 0.2864; joint share 2.4380; the crossing left 0.2674; beta k=0 0.93, nearest k=2 0.16; sums' units at B: training 1234 of 8088, held out 59 of 495; 24.7 s
+   rank 6 (ring): adds J 0.2614; joint share 2.7040; the crossing left 0.2658; beta k=0 0.83, nearest k=9 0.36; sums' units at B: training 1249 of 8088, held out 62 of 495; 27.9 s
+   rank 7 (ring): adds J 0.3203; joint share 3.0357; the crossing left 0.2390; beta k=0 0.53, nearest k=1 0.44; sums' units at B: training 1303 of 8088, held out 66 of 495; 30.2 s
+   rank 8 (outside): adds J 0.2378; joint share 3.2797; the crossing left 0.2366; beta k=0 0.79, nearest k=1 0.38; sums' units at B: training 1294 of 8088, held out 61 of 495; 34.3 s
+   rank 9 (ring): adds J 0.2184; joint share 3.5148; the crossing left 0.2323; beta k=0 0.93, nearest k=9 0.21; sums' units at B: training 1309 of 8088, held out 61 of 495; 36.9 s
+   rank 10 (outside): adds J 0.2603; joint share 3.7975; the crossing left 0.2106; beta k=0 0.64, nearest k=1 0.44; sums' units at B: training 1378 of 8088, held out 68 of 495; 38.8 s
+   rank 11 (ring): adds J 0.2398; joint share 4.0867; the crossing left 0.2070; beta k=0 0.35, nearest k=8 0.34; sums' units at B: training 1418 of 8088, held out 79 of 495; 40.7 s
+   rank 12 (outside): adds J 0.1966; joint share 4.2853; the crossing left 0.2061; beta k=0 0.97, nearest k=9 0.14; sums' units at B: training 1437 of 8088, held out 82 of 495; 43.2 s
+   rank 13 (outside): adds J 0.2426; joint share 4.5904; the crossing left 0.1971; beta k=0 0.35, nearest k=5 0.34; sums' units at B: training 1509 of 8088, held out 80 of 495; 45.9 s
+   rank 14 (outside): adds J 0.1897; joint share 4.8793; the crossing left 0.1912; beta k=0 0.68, nearest k=9 0.42; sums' units at B: training 1547 of 8088, held out 81 of 495; 53.2 s
+   rank 15 (ring): adds J 0.1732; joint share 5.1987; the crossing left 0.1854; beta k=0 0.88, nearest k=1 0.29; sums' units at B: training 1691 of 8088, held out 93 of 495; 62.8 s
+   rank 16 (ring): adds J 0.1920; joint share 5.4052; the crossing left 0.1833; beta k=0 0.56, nearest k=1 0.46; sums' units at B: training 1782 of 8088, held out 97 of 495; 66.9 s
+   rank 17 (ring): adds J 0.1715; joint share 5.6171; the crossing left 0.1582; beta k=0 0.61, nearest k=1 0.46; sums' units at B: training 1826 of 8088, held out 97 of 495; 70.7 s
+   rank 18 (outside): adds J 0.1623; joint share 5.7934; the crossing left 0.1585; beta k=0 0.34, nearest k=1 0.33; sums' units at B: training 1903 of 8088, held out 99 of 495; 74.8 s
+   rank 19 (ring): adds J 0.1538; joint share 5.9770; the crossing left 0.1491; beta k=0 0.74, nearest k=9 0.42; sums' units at B: training 2020 of 8088, held out 101 of 495; 77.7 s
+   rank 20 (ring): adds J 0.1523; joint share 6.1776; the crossing left 0.1472; beta k=0 0.45, nearest k=1 0.36; sums' units at B: training 2057 of 8088, held out 104 of 495; 80.2 s
+   rank 21 (ring): adds J 0.1462; joint share 6.4477; the crossing left 0.1460; beta k=0 0.80, nearest k=1 0.37; sums' units at B: training 2121 of 8088, held out 101 of 495; 90.9 s
+   rank 22 (ring): adds J 0.1329; joint share 6.6943; the crossing left 0.1467; beta k=0 0.93, nearest k=9 0.22; sums' units at B: training 2310 of 8088, held out 114 of 495; 99.3 s
+   rank 23 (outside): adds J 0.1265; joint share 6.8416; the crossing left 0.1446; beta k=0 0.84, nearest k=1 0.29; sums' units at B: training 2395 of 8088, held out 116 of 495; 104.1 s
+   rank 24 (outside): adds J 0.1348; joint share 6.9828; the crossing left 0.1397; beta k=0 0.12, nearest k=2 0.39; sums' units at B: training 2406 of 8088, held out 122 of 495; 107.0 s
+done in 143.3 s
+MEASURE exit=0 wall_s=143.6 peak_rss_kib=824128

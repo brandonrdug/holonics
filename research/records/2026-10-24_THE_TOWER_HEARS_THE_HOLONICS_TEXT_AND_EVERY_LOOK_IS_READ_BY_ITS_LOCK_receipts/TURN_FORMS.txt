@@ -1,0 +1,22 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 26.0 s
+held-out digit arrivals 8239, sums' B cells 495
+every digit arrival: cells 147775, sums' B cells 8986
+   leading form: share 0.4171, beta k=0 0.99; at the sums' B cells its two channels hold 0.002 of the result's size (log10) and 0.022 of chi_1(a0)
+   turn form from unit: J 0.4072, share 0.4072; beta nearest k=7 (0.00; k=0 1.00); held out, sums' units at B 36 of 495
+   turn form from ring: J 0.4072, share 0.4072; beta nearest k=1 (0.00; k=0 1.00); held out, sums' units at B 36 of 495
+   turn form from outside: J 0.4072, share 0.4072; beta nearest k=9 (0.00; k=0 1.00); held out, sums' units at B 36 of 495
+   7.8 s
+the sums' B cells (label region): cells 8986, sums' B cells 8986
+   leading form: share 0.9101, beta k=0 0.95; at the sums' B cells its two channels hold 0.156 of the result's size (log10) and -0.002 of chi_1(a0)
+   turn form from unit: J 0.8288, share 0.8288; beta nearest k=7 (0.00; k=0 1.00); held out, sums' units at B 51 of 495
+   turn form from ring: J 0.8288, share 0.8288; beta nearest k=8 (0.00; k=0 1.00); held out, sums' units at B 45 of 495
+   turn form from outside: J 0.8288, share 0.8288; beta nearest k=2 (0.00; k=0 1.00); held out, sums' units at B 45 of 495
+   3.6 s
+lock 42-35 sector 0: cells 13138, sums' B cells 8088
+   leading form: share 0.5694, beta k=0 0.96; at the sums' B cells its two channels hold 0.007 of the result's size (log10) and -0.001 of chi_1(a0)
+   turn form from unit: J 0.5447, share 0.5447; beta nearest k=7 (0.00; k=0 1.00); held out, sums' units at B 48 of 495
+   turn form from ring: J 0.5447, share 0.5447; beta nearest k=1 (0.00; k=0 1.00); held out, sums' units at B 47 of 495
+   turn form from outside: J 0.5447, share 0.5447; beta nearest k=9 (0.00; k=0 1.00); held out, sums' units at B 47 of 495
+   2.9 s
+done in 47.6 s
+MEASURE exit=0 wall_s=47.9 peak_rss_kib=1199696

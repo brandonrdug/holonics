@@ -1,0 +1,46 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 26.2 s
+held-out digit arrivals 8239, sums' B cells 495
+every digit arrival: cells 147775; K's eigenvalues: 1.0162, 0.6361, 0.4989, 0.3938, 0.2361, 0.2228, 0.1693, 0.1321, 0.1167, -0.0000
+   mode 1: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.84, 0.12, 0.03, 0.01, 0.00
+   mode 2: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.78, 0.06, 0.03, 0.10, 0.03
+   mode 3: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.09, 0.54, 0.08, 0.24, 0.05
+   mode 4: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.21, 0.41, 0.24, 0.07, 0.08
+   mode 5: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.03, 0.46, 0.02, 0.10, 0.40
+   mode 6: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.04, 0.04, 0.76, 0.15, 0.01
+   mode 7: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.00, 0.15, 0.64, 0.00, 0.21
+   mode 8: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.01, 0.17, 0.02, 0.79, 0.01
+   mode 9: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.00, 0.05, 0.18, 0.55, 0.22
+   mode 10: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.99, 0.00, 0.00, 0.00, 0.00, 0.00
+   the form on modes 1+2: adds J 0.1370; beta nearest k=9 (0.90; k=0 0.04); held out, sums' units at B 79 of 495
+      its top state reads together, held out units at B: 1: 79, offsets read away 65 (top eigenvalues 0.1370); 2: 65, offsets read away 70 (top eigenvalues 0.2392); 4: 83, offsets read away 75 (top eigenvalues 0.3642); 8: 104, offsets read away 112 (top eigenvalues 0.5178)
+   the form on modes 3+4: adds J 0.0923; beta nearest k=2 (0.65; k=0 0.04); held out, sums' units at B 44 of 495
+      its top state reads together, held out units at B: 1: 44, offsets read away 65 (top eigenvalues 0.0923); 2: 65, offsets read away 74 (top eigenvalues 0.1415); 4: 70, offsets read away 79 (top eigenvalues 0.1975); 8: 91, offsets read away 90 (top eigenvalues 0.2783)
+   the form on modes 5+6: adds J 0.0398; beta nearest k=7 (0.48; k=0 0.00); held out, sums' units at B 51 of 495
+      its top state reads together, held out units at B: 1: 51, offsets read away 42 (top eigenvalues 0.0398); 2: 58, offsets read away 43 (top eigenvalues 0.0630); 4: 71, offsets read away 64 (top eigenvalues 0.0921); 8: 77, offsets read away 63 (top eigenvalues 0.1294)
+   the form on modes 7+8: adds J 0.0238; beta nearest k=6 (0.46; k=0 0.01); held out, sums' units at B 32 of 495
+      its top state reads together, held out units at B: 1: 32, offsets read away 47 (top eigenvalues 0.0238); 2: 52, offsets read away 45 (top eigenvalues 0.0385); 4: 60, offsets read away 64 (top eigenvalues 0.0592); 8: 72, offsets read away 70 (top eigenvalues 0.0840)
+   the arriving digit alone (no form), held out units at B: 32
+   the outside form, offsets read away: 477
+   5.2 s
+lock 42-35 sector 0: cells 13138; K's eigenvalues: 2.9431, 2.3536, 1.9964, 1.4602, 1.0340, 0.8983, 0.8157, 0.7628, 0.6502, 0.0000
+   mode 1: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.69, 0.18, 0.10, 0.03, 0.01
+   mode 2: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.57, 0.20, 0.09, 0.10, 0.04
+   mode 3: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.34, 0.10, 0.12, 0.28, 0.16
+   mode 4: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.30, 0.53, 0.07, 0.10, 0.00
+   mode 5: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.04, 0.60, 0.18, 0.00, 0.18
+   mode 6: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.03, 0.15, 0.74, 0.07, 0.00
+   mode 7: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.02, 0.07, 0.49, 0.43, 0.00
+   mode 8: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.00, 0.06, 0.12, 0.28, 0.54
+   mode 9: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 0.00, 0.01, 0.13, 0.09, 0.70, 0.07
+   mode 10: power on the characters k=0, k=1|9, k=2|8, k=3|7, k=4|6, k=5: 1.00, 0.00, 0.00, 0.00, 0.00, 0.00
+   the form on modes 1+2: adds J 0.2645; beta nearest k=1 (0.79; k=0 0.02); held out, sums' units at B 51 of 495
+      its top state reads together, held out units at B: 1: 51, offsets read away 67 (top eigenvalues 0.2645); 2: 78, offsets read away 94 (top eigenvalues 0.4698); 4: 103, offsets read away 108 (top eigenvalues 0.7823); 8: 127, offsets read away 129 (top eigenvalues 1.2436)
+   the form on modes 3+4: adds J 0.1827; beta nearest k=9 (0.55; k=0 0.03); held out, sums' units at B 38 of 495
+      its top state reads together, held out units at B: 1: 38, offsets read away 63 (top eigenvalues 0.1827); 2: 74, offsets read away 85 (top eigenvalues 0.3049); 4: 88, offsets read away 90 (top eigenvalues 0.5093); 8: 143, offsets read away 134 (top eigenvalues 0.8238)
+   the form on modes 5+6: adds J 0.0816; beta nearest k=3 (0.61; k=0 0.01); held out, sums' units at B 38 of 495
+      its top state reads together, held out units at B: 1: 38, offsets read away 61 (top eigenvalues 0.0816); 2: 51, offsets read away 71 (top eigenvalues 0.1486); 4: 61, offsets read away 73 (top eigenvalues 0.2574); 8: 123, offsets read away 135 (top eigenvalues 0.4235)
+   the form on modes 7+8: adds J 0.0639; beta nearest k=4 (0.57; k=0 0.00); held out, sums' units at B 40 of 495
+      its top state reads together, held out units at B: 1: 40, offsets read away 66 (top eigenvalues 0.0639); 2: 75, offsets read away 74 (top eigenvalues 0.1147); 4: 73, offsets read away 76 (top eigenvalues 0.1942); 8: 106, offsets read away 122 (top eigenvalues 0.3217)
+   1.5 s
+done in 38.8 s
+MEASURE exit=0 wall_s=39.0 peak_rss_kib=1195784
