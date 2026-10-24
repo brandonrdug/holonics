@@ -1199,8 +1199,12 @@ expansion and contraction of the written results he pointed out on October 23 (t
 occasion), not the code alone. This step reads both.
 
 **The written results** (`tools/answer_digits.py '74-72=' <writes>`, an exterior count). The
-digit-prompt writings in these receipts, 37 writes from every tower since October 23 (29 of them
-write equations), hold 804 whole equations with a result that is not negative:
+digit-prompt writings in these receipts, 37 writes from this record's towers on the mixed Holonics
+terrain (29 of them write equations), hold 804 whole equations with a result that is not negative.
+The towers of the arithmetic terrain are not among them: there the pumped tower wrote a sum's units
+right in 191 of 240, keeping the parity in 36 of the 49 misses
+([its record](2026-10-23_ON_A_TERRAIN_OF_INTERACTING_DIGITS_THE_TOWER_COMPUTES_WHAT_IT_NEVER_MET_WHERE_IT_KNOWS_THE_LEVEL.md)).
+On this terrain:
 
 | result | equations | length right | leading digit right | units right | whole right |
 |---|---|---|---|---|---|
@@ -1221,8 +1225,9 @@ write equations), hold 804 whole equations with a result that is not negative:
   Where the operands' units carry, the written tens takes the carry in 52 of 108 and omits it in 23;
   where they do not, it adds one anyway in 38 of 208.
 - The near-miss record's §2 read the sums' units as right from the lines it quoted. Counted over
-  every writing, the sums' units are at chance (44 of 400) and what the towers place is the size:
-  the length, the leading digit and, more often than not, the carry.
+  these writings, the sums' units are at chance (44 of 400) and what the towers place is the size:
+  the length, the leading digit and, more often than not, the carry. So the law that held the ring
+  2 of the ten on arithmetic alone does not hold it on the mixed terrain.
 
 **The reading** (`Tower::read_circuit`, `read-tower-circuit`; [agent-inferred, October 24]). At each
 cell and level the frozen tower gives the modes' stored energy before the class arrives

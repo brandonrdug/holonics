@@ -804,6 +804,7 @@ pub(super) fn run_with_execution(
         Some("read-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_pair(args),
         Some("read-tower-faces") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_faces(args),
         Some("read-tower-circuit") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_circuit(args),
+        Some("read-tower-modes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_modes(args),
         Some("read-tower-tension") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_tension(args),
         Some("read-tower-floor") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_floor(args),
         Some("found-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair(args),
