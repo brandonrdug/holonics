@@ -1,0 +1,10 @@
+probe: coordinates released to 2^-10 of the state's unit, ridge 1
+-/A lower train=4548 dim=129 a0=267/268 (commonest 36) b0=28/268 (commonest 38) c0=23/268 (commonest 35)
+-/A upper train=4548 dim=129 a0=218/268 (commonest 36) b0=35/268 (commonest 38) c0=29/268 (commonest 35)
+-/B lower train=4548 dim=129 a0=262/268 (commonest 36) b0=268/268 (commonest 38) c0=176/268 (commonest 35)
+-/B upper train=4548 dim=129 a0=116/268 (commonest 36) b0=201/268 (commonest 38) c0=52/268 (commonest 35)
+-/E lower train=4548 dim=129 a0=262/268 (commonest 36) b0=268/268 (commonest 38) c0=178/268 (commonest 35)
+-/E upper train=4548 dim=129 a0=80/268 (commonest 36) b0=92/268 (commonest 38) c0=78/268 (commonest 35)
+-/U lower train=4548 dim=129 a0=237/268 (commonest 36) b0=256/268 (commonest 38) c0=124/268 (commonest 35)
+-/U upper train=4548 dim=129 a0=88/268 (commonest 36) b0=112/268 (commonest 38) c0=208/268 (commonest 35)
+MEASURE exit=0 wall_s=133.6 peak_rss_kib=316956
