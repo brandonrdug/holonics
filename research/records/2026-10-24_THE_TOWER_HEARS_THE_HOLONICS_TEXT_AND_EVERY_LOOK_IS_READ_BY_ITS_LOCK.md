@@ -1111,6 +1111,86 @@ deadline 1,500 s). The leverage read's timing slice (a sixteenth of the training
 the Gram 9.6 s and 5,943 held-out readings at 13.3 ms each. The whole text was projected at 167 s
 (deadline 240 s) and took 150.5 s joined (0.90) and 145.8 s for the foil.
 
+### The second pass
+
+Both towers ran one more pass over the same text from the first pass's states, and were read the
+same way. In bits a byte:
+
+| text | one pass, plain | one pass, forms in the learner | two passes, plain | two passes, forms in the learner |
+|---|---|---|---|---|
+| training, during the pass | 2.134 | 2.122 | 2.114 | 2.084 |
+| held out, prose | 3.115 | 3.118 | 3.087 | 3.102 |
+| held out, Lean | 2.417 | 2.409 | 2.394 | 2.366 |
+| held out, Rust | 2.151 | 2.149 | 2.091 | 2.085 |
+| held out, digits | 2.306 | 2.283 | 2.304 | 2.302 |
+| held out, all | 2.497 | 2.490 | 2.469 | 2.464 |
+| held out, cells at met pairs (47,965) | 2.492 | 2.484 | 2.463 | 2.457 |
+| held out, cells at unmet pairs (58) | 6.619 | 7.606 | 7.016 | 8.105 |
+
+- On the training text the forms' gain grew two and a half times: 0.012 bits a byte over the first
+  pass, 0.030 over the second (by quarters 0.007, 0.038, 0.044 and 0.032; the joined code ran below
+  the foil's in 52 of 55 reads).
+- Held out it did not grow: 0.007 after one pass, 0.005 after two. Lean's gain grew (0.008 to
+  0.028) and Rust's held (0.002 to 0.006). Prose turned further against the forms (−0.003 to
+  −0.015), and the digits' gain is gone (0.023 to 0.002): the joined tower's digits went from 2.283
+  to 2.302 while the foil's held at 2.304.
+- At the 58 cells at unmet pairs both towers lose with every pass (6.137 at the five-pass start; the
+  foil 6.619, then 7.016; the joined 7.606, then 8.105). The forms' extra loss there is 1.09 bits a
+  cell (0.99 after one pass).
+- The second pass opened above the first. Over its first 32 sections the joined tower coded 2.588
+  bits a byte and the foil 2.473, against 2.346 and 2.327 at the first pass's opening, and one of the
+  joined tower's first 32 sections deposited nothing after 31 halvings of its step (the foil halved
+  once). By section 128 the two were level (2.223 and 2.225), and from there the joined ran below.
+
+The leverage, read as before (`read-tower-pair-leverage`, the exact Gram of 97 or 65 coordinates,
+full rank, no pivot passed over), in units of `rank/N`:
+
+| two-pass state | cells | h mean | median | largest | top face's part | pair face's part |
+|---|---|---|---|---|---|---|
+| forms in the learner, met pairs | 747 | 1.24 | 0.63 | 257 | 0.95 | 0.29 |
+| forms in the learner, unmet pairs | 58 | 69.8 | 18.9 | 2,134 | 45.8 | 24.0 |
+| foil (its face alone, unit 65/N), met pairs | 747 | 0.95 | 0.66 | 17 | 0.95 | – |
+| foil, unmet pairs | 58 | 171 | 1.06 | 8,880 | 171 | – |
+
+- Still no reading has an open part.
+- At unmet pairs the pair face's part held (23.6 to 24.0) and the top face's grew (27.7 to 45.8).
+  The forms are fixed, so what moves away from the training cells at the pairs the text never met is
+  the tower's own state. The largest absolute leverage is now `2,134 · 97/1,789,104 = 0.116`.
+- The foil's face alone reads most unmet cells as ordinary (median 1.06) and a few far out (one at
+  8,880 means, `0.32` absolute). With the forms joined the median unmet cell sits at 19 means: the
+  forms' free values carry the distance, as after one pass.
+
+**What it writes** (`FACE2_WRITE_<state>_<prompt>_a<draws>.txt`; whole in
+`outputs/2026-10-24_TOWER_WITH_PAIR_FORMS_SECOND_PASS_WRITES.md`, outside the repository).
+- Prose, Lean and Rust keep the tower's kind: comment heads and doc lines with broken words, and at
+  two draws runs of the text's own phrases (`/-- The companion composition is the next composition
+  endpoint`).
+- From the digit prompt at one draw the joined tower writes 6 well-formed equations, none right,
+  then leaves for words; after the first pass it had stayed for 39. The foil leaves within its first
+  equation. At two draws the joined writes 40, 1 right (`49*0=0`), and the foil 41, 1 right
+  (`74-37=37`). Many miss by a little (`95-63=31`, `62-38=25`).
+
+**What the second pass says.**
+- The forms inside the learner are fitting the training text: their training gain grew two and a
+  half times while their held-out gain fell from 0.007 to 0.005. The closed-form join read 0.058 on
+  the frozen five-pass tower, and its 2.434 still codes the held-out text below either tower after
+  two more passes (2.464, 2.469). [agent-inferred] The certified step deposits what lowers each
+  section's own code; the closed form solves the same readout over every training cell at once, and
+  what it fixes generalizes where the per-section path does not.
+- The pair face is spent at this grain. Its ceiling is 4% of the tension (40.7‰ of `S`), the closed
+  form read 0.058 of it held out, and the learner's path an eighth of that after one pass and a
+  twelfth after two. The rest of the tension lies past the last two bytes. The next loop founds the
+  situated pool `top ⊗ x̂`, the conjunction of the tower's own state with the arriving class, which
+  reaches back through the whole passage the state carries, and reads it by the exact Gram first, as
+  the block was read, before any of it enters the learner.
+
+**The run.** Each pass was projected from every block measured before its launch (61 each: the
+development reads, the stopped launch and the first passes), their largest plus their largest
+spread: 785.2 s joined (deadline 825 s) and 812.1 s plain (deadline 852 s). The passes took 576.4 s
+(0.73, peak 200 MiB) and 556.2 s (0.68, peak 177 MiB). The met and unmet reads took 4.2 and 3.7 s,
+each write 0.6 to 3.1 s, and the leverage reads 156.8 s and 140.7 s (projected 167 s, deadline
+240 s).
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -1190,6 +1270,10 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   and `FACE_TRAIN_PLAIN.txt` (the passes), `FACE_CELLS_{start,joined,plain}.txt` (met and unmet
   pairs), the writing `FACE_WRITE_<state>_<prompt>_a<draws>.txt` as bytes, and the leverage
   `FACE_LEVERAGE_SLICE.txt`, `FACE_LEVERAGE_joined.txt` and `FACE_LEVERAGE_plain.txt`.
+- Their second pass: `FACE2_TRAIN_JOINED.txt` and `FACE2_TRAIN_PLAIN.txt` (the passes),
+  `FACE2_CELLS_{joined,plain}.txt` (met and unmet pairs), the writing
+  `FACE2_WRITE_<state>_<prompt>_a<draws>.txt` as bytes, and the leverage
+  `FACE2_LEVERAGE_joined.txt` and `FACE2_LEVERAGE_plain.txt`.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -1203,4 +1287,4 @@ uses `found1` (`d2ebd83e…`) and, with the spectrum, `found2` (`7e93511f…`). 
 `block1` (`95057b05…`; its failed slices ran earlier builds of it, the first `3d69f641…`). The
 install and its writing use `install1` (`522b9cfa…`). The pair forms in the learner use `face1`
 (`44ed341e…`) for the join, the passes, the met and unmet reads and the writing, and `face2`
-(`60db5291…`, the same source with the leverage read) for the leverage.
+(`60db5291…`, the same source with the leverage read) for the leverage, in both passes.
