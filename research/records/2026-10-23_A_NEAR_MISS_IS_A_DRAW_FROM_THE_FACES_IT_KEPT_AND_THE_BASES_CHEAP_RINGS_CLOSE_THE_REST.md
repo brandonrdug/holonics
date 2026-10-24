@@ -44,43 +44,51 @@ A number has two charts: its size (`log_b n = level + leading phase`) and its cy
   products the design thread read. On the cycles it is a pair contact, and the units' cycle
   `ℤ/10 = ℤ/2 × ℤ/5` is two crossings that can be kept separately: `12*35=405` keeps the 5-axis and
   loses the 2-axis, `83*27=2309` keeps the 2-axis and loses the 5-axis.
-- A sum is one crossing on every cycle, `(x + y) mod q`, in the phase chart. In size it crosses
-  through the carries.
+- A sum is one crossing on every cycle, `(x + y) mod q`, in the phase chart. Where the reader makes
+  that crossing its units are right (see the correction below). In size it crosses through the
+  carries.
 - A difference is one crossing on the cycles too, with the second operand turned by the half-turn
   (`−y`). In size its leading face is not conserved (`radix.difference-leading-cancellation`), so the
   result's length, its stair, is the last thing the operands fix.
 
-So products land in the neighbourhood: a product is right in size, the chart where it is a single
-crossing.
+So products land in the neighbourhood and sums get the last digit: each is right in the chart where
+it is a single crossing, where the reader makes that crossing.
 
-**Correction (October 24).** The first version of this section read a sum's units as right and
-concluded that each operation is learned first in the chart where it is one crossing. That reading
-came from the lines quoted above (`71+41=102`, `73+31=104`, `8+82=90`, `23+51=84`), and it does not
-hold over the towers' writings. The design thread counted every whole equation in the 37 digit-prompt
-writings of its tower record (`tools/answer_digits.py`;
-[`ANSWER_DIGITS.txt`](https://github.com/brandonrdug/holonics/blob/f6a54bc37/research/records/2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS_READ_BY_ITS_LOCK_receipts/ANSWER_DIGITS.txt),
-commit `f6a54bc37`), and the count reproduces exactly from the committed writings:
-- a sum's units are right in 44 of 400 and a difference's in 16 of 135, which is chance among ten
-  digits. Where a sum is written at its length, its units miss by every step of `ℤ/10` about
-  equally (27 to 50 times each, against 41 right). Read on the two rings of `ℤ/10 = ℤ/2 × ℤ/5`,
-  a sum's units keep the right parity in 205 of 400 and the right residue mod 5 in 83 of 400, both
-  at chance (200 and 80; `units_rings.py`).
-- what the towers place is the size. The length is right in 744 of 804 equations. A sum that
-  carries into the hundreds is written at its length 210 times of 218, with its leading 1 right in
-  209 of them. A product's length is right in 238 of 269.
-- a sum's tens is right in 190 of 380 and off by one in 168 of the rest, the carry from the units.
+**Correction (October 24, amended the same day).** The first version of this section read a sum's
+units as right from the lines quoted above (`71+41=102`, `73+31=104`, `8+82=90`, `23+51=84`),
+written by a machine trained on arithmetic alone, and concluded that each operation is learned first
+in the chart where it is one crossing. Counted over whole writings, this holds where the reader makes
+the crossing and fails where it does not:
+- **Arithmetic alone.** The pumped tower of the
+  [terrain record](2026-10-23_ON_A_TERRAIN_OF_INTERACTING_DIGITS_THE_TOWER_COMPUTES_WHAT_IT_NEVER_MET_WHERE_IT_KNOWS_THE_LEVEL.md)
+  writes a sum's units right in 191 of 240. Of the 49 misses, 36 keep the parity, so its misses fall
+  on ring 5 of `ℤ/10 = ℤ/2 × ℤ/5`. The design thread's per-mode read (October 24; its receipts go
+  with the tower record) locates the crossing. The tower crosses the two operands' units when the
+  second one arrives, and the sum's units then read straight from its state in 370 of 495 held-out
+  sums.
+- **Mixed text.** The towers trained on the Holonics text beside the digits write a sum's units at
+  chance. The design thread counted every whole equation in the 37 digit-prompt writings of its tower
+  record (`tools/answer_digits.py`;
+  [`ANSWER_DIGITS.txt`](https://github.com/brandonrdug/holonics/blob/f6a54bc37/research/records/2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS_READ_BY_ITS_LOCK_receipts/ANSWER_DIGITS.txt),
+  commit `f6a54bc37`), and the count reproduces exactly from the committed writings:
+  - a sum's units are right in 44 of 400 and a difference's in 16 of 135. Where a sum is written at
+    its length, its units miss by every step of `ℤ/10` about equally (27 to 50 times each, against 41
+    right). The parity is right in 205 of 400 and the residue mod 5 in 83 of 400, both at chance
+    (200 and 80; `units_rings.py`).
+  - by the same per-mode read, these towers hold both operands' units at the result's units cell
+    (476 and 495 of 495) but do not cross them (134).
+  - the size is still placed. The length is right in 744 of 804 equations. A sum that carries into
+    the hundreds is written at its length 210 times of 218, with its leading 1 right in 209 of them.
+    A product's length is right in 238 of 269. A sum's tens is right in 190 of 380 and off by one in
+    168 of the rest, the carry from the units.
 
-So a sum's units, one crossing in the phase chart, are not placed, and its size, which crosses through
-the carries, is. §7 already states why "one crossing" depends on the chart. `□((a + b)/q) ≡ 0` holds
-for the phase, while the units read as one of ten classes cost interaction rank 9
-([faces on cycles](2026-10-24_FACES_ARE_READ_ON_CYCLES_A_FACE_IS_A_COHOMOLOGY_CLASS_THE_CARRY_IS_ITS_BOCKSTEIN_AND_FRICTION_KEEPS_ONLY_THE_HARMONIC_PART.md)).
-The phase chart's single crossing is available only to a reader that carries both operands' unit
-phases to the result's units cell, and no tower does that yet [agent-inferred]. The design thread's
-next reading tests whether the operands' units are still in the state at that cell. The pumped
-tower of the
-[terrain record](2026-10-23_ON_A_TERRAIN_OF_INTERACTING_DIGITS_THE_TOWER_COMPUTES_WHAT_IT_NEVER_MET_WHERE_IT_KNOWS_THE_LEVEL.md)
-is a separate count, not among these writings. There a sum's units are right in 191 of 240, with
-36 of the 49 misses keeping the parity, so that tower held ring 2 and slipped on ring 5.
+So §2 stands where the crossing is made. A sum's units are one crossing in the phase chart,
+`□((a + b)/q) ≡ 0` (§7). A reader that composes the two operands' unit phases when the second
+arrives places them. A reader that holds both strands without composing them must read the units as
+one of ten classes, which costs interaction rank 9
+([faces on cycles](2026-10-24_FACES_ARE_READ_ON_CYCLES_A_FACE_IS_A_COHOMOLOGY_CLASS_THE_CARRY_IS_ITS_BOCKSTEIN_AND_FRICTION_KEEPS_ONLY_THE_HARMONIC_PART.md)),
+and it writes them at chance. Holding both strands is not enough without the crossing
+[agent-inferred].
 
 ## 3. The middle is hot because many paths feed it
 
