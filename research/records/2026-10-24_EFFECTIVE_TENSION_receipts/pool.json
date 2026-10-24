@@ -30,6 +30,25 @@
   "patterns_whose_saving_exceeds_their_choice_among_256": 0,
   "clocks_whose_saving_exceeds_their_choice_among_14": 2
  },
+ "F2b": {
+  "best_pattern_saving_ratio_material_charged": "221/7",
+  "held_mode_8_cells": {
+   "saving_ratio_material_charged": "2431/189",
+   "clocks_counted_with_sign": 14
+  },
+  "held_mode_16_cells": {
+   "saving_ratio_material_charged": "3535767/7735",
+   "clocks_counted_with_sign": 30
+  },
+  "held_mode_24_cells": {
+   "saving_ratio_material_charged": "8268616329/408595",
+   "clocks_counted_with_sign": 30
+  },
+  "held_mode_32_cells": {
+   "saving_ratio_material_charged": "200587437636397/202655277",
+   "clocks_counted_with_sign": 62
+  }
+ },
  "F3": {
   "generalized_eigenvalues_9_4_and_3_4": {
    "9/4": true,
@@ -48,5 +67,32 @@
    "1/2": "63/52",
    "1": "21/20"
   }
+ },
+ "F4": {
+  "cells": 63,
+  "occurring_contexts": 16,
+  "product_pool_moments_from_table_equal_cells": [
+   true,
+   true,
+   true
+  ],
+  "half_step_pool_moments_from_table_equal_cells": [
+   true,
+   true,
+   true
+  ],
+  "tension_trace": "289/7",
+  "within_context_tension_equals_joint_regression_on_every_indicator": true,
+  "ceiling_drop_trace": "5844483/224791",
+  "product_pool_drop_trace": "34828652562/3794000875",
+  "product_pool_at_most_ceiling": true,
+  "joint_fit_equals_table_form_G_w_f_plus_a_p": true,
+  "pool_side_charpoly_equals_mu_times_class_side": true,
+  "output_steps_drop_traces": [
+   "10357718879267103726842/1627117385272767010875",
+   "6895670724400350742895977983407852867775979/1074080990359424502743662335541911792271125",
+   "18459647155593512037592613606114214928963421770985053417894707992/2870789547272281500256704835724219294473092919814036315454685875"
+  ],
+  "output_steps_never_lower_the_drop": true
  }
 }

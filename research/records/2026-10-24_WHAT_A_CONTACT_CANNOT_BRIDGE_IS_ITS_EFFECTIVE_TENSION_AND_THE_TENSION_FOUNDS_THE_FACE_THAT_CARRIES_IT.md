@@ -167,13 +167,29 @@ are that output half alone. Three rules keep it lawful [agent-inferred, October 
 - **A contrast whose four-cycle on additive faces is nonzero needs a product.** When the arrival is
   the product of two signs, each sign and both read additively remove nothing (`M = 0`), and their
   product removes the whole tension: the pair contact's face (`contact.kunneth-interaction-rank`).
-- **The choice is charged.** A face picked from a pool by its drop is chosen on the moments that
-  score it, so the founding test counts the description of the choice: the navigator word that
-  generates the face, not the cells it marks. On the eight line starts of §7, a search of every ±1
-  pattern finds drops above the medium's (`57/20` against `9/4`, from patterns that also mark a
-  blank line). The best saves `16777216/84375` at the optima, about 7.6 bits, less than the 8 bits
-  that choosing one of 256 patterns costs, and no pattern pays. The medium's held mode is one of
-  14 square-wave clocks: it saves `2⁶`, more than the `log₂ 14` its choice costs, and founds.
+- **The choice is charged, and so is what the founding stores.** A face picked from a pool by its
+  drop is chosen on the moments that score it, so the founding test counts the description of the
+  choice: the navigator word that generates the face, not the cells it marks. It also counts what
+  the founding adds to the constitution that the reread has not already paid. A fitted face costs
+  about `½ log₂ N` bits per free coordinate at the grain that minimizes the two-part code
+  (Rissanen; the binary case is `Context/PriorMass.kt_regret`, `½ log₂ n + 1`). The material column
+  it opens costs the same, unless the reread deposits it while coding: a prequential reread pays
+  for it inside its bits. Held-out bits pay for neither fit.
+  On the eight line starts of §7, a search of every ±1 pattern finds drops above the medium's
+  (`57/20` against `9/4`, from patterns that also mark a blank line). At the optima, with the
+  material uncharged, the best pattern saves `16777216/84375`, about 7.6 bits, under the 8 bits of
+  choosing one of 256. The held mode, one of 14 square-wave clocks, saves `2⁶`, over `log₂ 14`.
+  Now charge the material with a sequential Krichevsky–Trofimov code, each cell coded before its
+  group's counts take it:
+  - the best pattern saves `221/7`, about 5.0 bits, under 8;
+  - the held mode saves `2431/189`, about 3.69 bits, just under the 3.81 its choice costs, so on
+    eight cells nothing founds;
+  - on the eight repeated twice, the held mode saves `3535767/7735`, about 8.84 bits, against
+    `log₂ 30` for the 30 clocks of that length, and founds.
+
+  The saving grows with the passage, while the choice's cost grows only with the clocks the
+  passage offers. [Corrected October 24: the first version left the material uncharged and had the
+  held mode found on eight cells.]
 
 The tension's own class directions `V` project the question (`Vᵀ t`), which cuts the cost, and a
 slow mode driven by past arrivals along `V` is one pool member. It should pass where the contrast's
@@ -182,6 +198,52 @@ the answer is a conjunction of recent bytes (which vowel) or a residue of the op
 neighbouring-digit opposition is a near-miss fibre, which the operands' cheap-ring faces close;
 [the near-miss record](2026-10-23_A_NEAR_MISS_IS_A_DRAW_FROM_THE_FACES_IT_KEPT_AND_THE_BASES_CHEAP_RINGS_CLOSE_THE_REST.md))
 [agent-inferred; the founding test decides each].
+
+**At scale, a pool of a finite context is read from one table** [agent-inferred, October 24; asked
+by the design thread for the product pool `E(u_t) ⊗ E(u_(t−1))` on 1,789,108 cells]. When every
+pool coordinate is a function of a finite context `p` (here the last two bytes, each encoded by
+`E`), every moment the founding needs factors through one pass. That pass keeps, per occurring
+context, its count `n_p`, its summed covector `τ_p = Σ t` and its summed face `φ_p = Σ f̄`. The table
+is a quotient of the passage sufficient for every face of the context, not a tape. From the table
+alone:
+
+```text
+ceiling:     S_w = T_w − B_w H_w⁺ B_wᵀ,      X_w = X − Σ_p sums_p sums_pᵀ / n_p
+fit:         t̂ = G_w f̄ + a_p,      G_w = B_w H_w⁺,      a_p = (τ_p − G_w φ_p) / n_p
+half-step:   z_p = x_p (bᵀ y_p):    K = Σ τ_p z_pᵀ,   L = Σ φ_p z_pᵀ,   C = Σ n_p z_p z_pᵀ
+```
+
+- **The ceiling.** `S_w` is the tension left after reading every function of the context: the
+  within-context tension, by block elimination on the diagonal block of the context's indicators.
+  So `tr S − tr S_w` bounds every pool of the context: products, bilinear ranks, and a count model's
+  prediction at that order. It is read at the codec's grain, so it is an exterior reading that
+  bounds the founding, never a founded face.
+- **The founded face stays in the machine's encoding.** A product coordinate `(aᵀx)(bᵀy)` is
+  fitted by half-steps. For fixed `b` its pool is `z_p`, 64-wide, and its moments come from the
+  table without touching the cells; then `a` is held fixed and `b` fitted the same way. The class
+  side carries the spectrum: the generalized eigenvalues of `(MᵀM, Q)` are the eigenvalues of
+  `M Q⁺ Mᵀ`. So the rational step `w = Q⁺ Mᵀ v`, `v ← M w`, never lowers the exact drop of the face
+  `wᵀ c`.
+- **Releasing the fit.** The step's denominators grow (22, 43 and 64 digits in three steps on the
+  check below). So `v` is released at a declared grain, the released face's drop is recomputed
+  exactly, and the fit stops when a step gains less than the grain.
+- **Rank `k` deflates.** The founded coordinate joins the face, with its moments from the table, and
+  the next rank is founded against the new tension. Each rank passes its own code test.
+- **A pool that is not a function of a finite context** (the top-level `r̂ ⊗ r̂`) has no table. Its
+  half-steps are passes over the cells, started from one pass of `Σ vᵀ(t − G f̄) r̂ r̂ᵀ` for the
+  leading class directions `v`.
+- **The charge.** A bilinear coordinate on two 64-wide faces has 126 free coordinates after its two
+  scale gauges. At `N = 1,789,108`, by the charge rule above, it costs about 1,300 bits under a
+  prequential reread, and about 3,100 bits with its material column on the 170-wide covector range.
+
+The check (`pool.py` F4) runs on 63 cells, 16 contexts of two symbols each encoded by two
+coordinates, and a conjunction with a fifth of its cells against it.
+- The table's moments equal the cells', for the product pool and for a half-step pool.
+- `S_w` equals the joint regression on every indicator, and the table form `G_w f̄ + a_p` equals that
+  joint fit.
+- The ceiling removes about 26.0 of the tension `289/7 ≈ 41.3`. The 4-wide product pool removes
+  about 9.18, because the encoding's two coordinates do not separate the conjunction's contexts.
+- The rational output steps remove about 6.366, 6.420 and 6.430, and never fall.
 
 ## 6. The phase part, read in the first person
 
@@ -268,6 +330,19 @@ Two corrections to how §7 reads it [agent-inferred, October 24]:
   an order-`k` count model. If they agree, a new mode suffices; if the count model gains much more,
   the contrast is a conjunction and only a pair contact carries it. That decides the pool's order
   in §5.
+
+**The floor split.** The design thread read both references exactly (the tower record, "The floor
+under the tension"). The count model is Witten–Bell over contexts up to six bytes, and both
+readings are out of sample.
+- On held-out text, the count model's Brier beats the tower in prose, Lean and Rust (0.636, 0.460
+  and 0.459 against 0.708, 0.591 and 0.530). It loses on digits (0.734 against 0.655) and is level
+  at line starts.
+- On the training text, the linear faces `E(u)` of the last three bytes remove 7.18‰ of `tr S`.
+  The order-3 count prediction alone removes 29.93‰.
+
+In the text media the reducible part is a conjunction of recent bytes, about four times what their
+linear face carries. So §5's pool is the pair contact's product, read from its context table.
+Digits and line starts are not in the last bytes.
 
 ## 8. What closes is the bridge, and the lock's friction against the information distance
 
@@ -381,6 +456,9 @@ One box in #410:
 - `S` is invariant under an invertible rebase of the face;
 - the quotient formula: reading `c` beside the face removes exactly `M Q⁺ Mᵀ`, and the best rank-`k`
   face read from a pool removes the sum of the `k` leading generalized eigenvalues of `(Mᵀ M, Q)`;
+- the tension after every function of a finite context is the within-context tension
+  `T_w − B_w H_w⁺ B_wᵀ`, `X_w = X − Σ_p sums_p sums_pᵀ / n_p`, the ceiling of every pool of that
+  context;
 - `R = y_T / y_H` is invariant under a unit turn of the readout row, and the gradient of
   `½ |log R|²` in `y_H` is `−log R / conj(y_H)`;
 - on the covectors' range, `det S / det S₀ = det(I − S₀⁻¹(S₀ − S))`, the product of `1 − ρ_k²`;
