@@ -1,0 +1,19 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 25.1 s
+held-out digit arrivals 8239, sums' B cells 495
+lock 42-35 sector 0: cells 13138, of them sums' B cells 8088; whitened rank 128; the coupling mode's first-character alignment 0.79 / 0.10 (k=1 / k=9)
+   component 1: modulus spread 0.025, Godard cost 0.0024; at the sums' B cells chi1(a0) -0.001, chi1(a1) 0.035, chi1(b1) 0.410; held out with the coupling mode 34, with chi_1 43 of 495
+   component 2: modulus spread 0.046, Godard cost 0.0084; at the sums' B cells chi1(a0) -0.002, chi1(a1) 0.001, chi1(b1) 0.362; held out with the coupling mode 43, with chi_1 43 of 495
+   component 3: modulus spread 0.116, Godard cost 0.0494; at the sums' B cells chi1(a0) -0.000, chi1(a1) 0.453, chi1(b1) 0.229; held out with the coupling mode 39, with chi_1 45 of 495
+   component 4: modulus spread 0.063, Godard cost 0.0156; at the sums' B cells chi1(a0) -0.001, chi1(a1) -0.001, chi1(b1) 0.114; held out with the coupling mode 42, with chi_1 40 of 495
+   component 5: modulus spread 0.135, Godard cost 0.0653; at the sums' B cells chi1(a0) -0.002, chi1(a1) 0.074, chi1(b1) 0.181; held out with the coupling mode 46, with chi_1 38 of 495
+   component 6: modulus spread 0.183, Godard cost 0.1050; at the sums' B cells chi1(a0) 0.447, chi1(a1) 0.001, chi1(b1) 0.001; held out with the coupling mode 39, with chi_1 51 of 495
+   component 7: modulus spread 0.163, Godard cost 0.0873; at the sums' B cells chi1(a0) -0.002, chi1(a1) 0.010, chi1(b1) 0.123; held out with the coupling mode 46, with chi_1 50 of 495
+   component 8: modulus spread 0.239, Godard cost 0.1656; at the sums' B cells chi1(a0) 0.060, chi1(a1) 0.002, chi1(b1) 0.056; held out with the coupling mode 46, with chi_1 48 of 495
+   the outside read: modulus spread 0.943, Godard cost 0.8339; at the sums' B cells chi1(a0) 0.971, chi1(a1) -0.001, chi1(b1) -0.002; held out with the coupling mode 231, with chi_1 440 of 495
+   112.2 s
+the sums' B cells (label region): cells 8986, of them sums' B cells 8986; whitened rank 128; the coupling mode's first-character alignment 0.93 / 0.05 (k=1 / k=9)
+   component 1: modulus spread 0.016, Godard cost 0.0011; at the sums' B cells chi1(a0) -0.002, chi1(a1) -0.002, chi1(b1) 0.707; held out with the coupling mode 45, with chi_1 47 of 495
+   component 2: modulus spread 0.085, Godard cost 0.0282; at the sums' B cells chi1(a0) -0.001, chi1(a1) 0.429, chi1(b1) 0.259; held out with the coupling mode 34, with chi_1 38 of 495
+   component 3: modulus spread 0.056, Godard cost 0.0119; at the sums' B cells chi1(a0) -0.002, chi1(a1) 0.001, chi1(b1) 0.061; held out with the coupling mode 38, with chi_1 42 of 495
+   component 4: modulus spread 0.123, Godard cost 0.0549; at the sums' B cells chi1(a0) 0.316, chi1(a1) 0.000, chi1(b1) 0.009; held out with the coupling mode 57, with chi_1 58 of 495
+MEASURE exit=deadline wall_s=180.0 peak_rss_kib=824392

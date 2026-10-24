@@ -1800,8 +1800,9 @@ each digit's arrivals once the state's common read is removed. The digits couple
 | lock 42-35, sector 0 | 51 | 78 | 103 | 127 |
 | the sums' `B` cells (a label) | 40 | 67 | 109 | 232 |
 
-- With each digit's own offset read away the counts move by a few (238 at eight reads in the label
-  region). The arriving digit alone reads 32; the outside form with offsets read away, 477.
+- With each digit's own offset read beside the channels, the counts move by up to 14 over every
+  digit arrival, 16 in the lock region and 36 in the label region (109 to 145 at four reads; 238 at
+  eight). The arriving digit alone reads 32; the outside form with offsets read away, 477.
 - The four state reads paired with the first-character mode, in the label region, hold at most 0.21
   of `χ(a₀)` and at most 0.14 of `χ(a₁)`, `χ(b₁)`, `χ(c₁)` or the carry, fitted on even lines and
   read on odd (`MODE_PARTNER.txt`). The outside form's read holds 0.966 of `χ(a₀)`.
@@ -1827,7 +1828,7 @@ each digit's arrivals once the state's common read is removed. The digits couple
 **The runs.**
 - The region shares took 54.5 s and, rerun, 54.8 s (unmeasured, planned at one to two minutes;
   deadline 300 s; peak 1.2 GB). The first run read held-out forms centred within each class by the
-  region's means, which distorted the outside form in mixed regions (69 and 56); the reads above are
+  region's means, which distorted the outside form in mixed regions (its output was not kept); the reads above are
   uncentred, as the machine reads them.
 - The founding in three regions was projected at about 250 s (deadline 400 s). Its first launch was
   stopped before output on that centring, and its second at rank five on its rate: 1.5 to 9.6 s a
@@ -1841,6 +1842,67 @@ each digit's arrivals once the state's common read is removed. The digits couple
   region after the lock region's four ranks (peak 805 MiB).
 - The class modes took 37.5, 40.1 and 39.0 s, and the label regions 36.4 s (under a minute
   projected; deadline 180 s; peak 1.2 GB). The mode partner took 33.2 s (deadline 180 s; peak
+  806 MiB).
+
+## The carried turns
+
+A digit's character `χ(d) = e^(2πi d/10)` has modulus one: a pure turn. A read of the state that
+carries one earlier arrival's character turns without boosting, so its modulus is the same at every
+cell. `CARRIED_TURN.py` and `CARRIED_SELECT.py` (exterior) ask only that, with no label and no
+arrival index: over a region's cells, minimize `E(|aᵀŝ|² − 1)²` over complex reads `a`, with the
+state whitened in the region (Godard's constant-modulus criterion). Components are found one after
+another, each decorrelated from the reads before it, each from a fixed start. Labels enter only to
+read what each component turned out to carry.
+
+**The state carries its earlier arrivals as turns, and a blind criterion finds them.** In the lock
+region (16 components; the fraction of each character's variance a component holds at the sums' `B`
+cells, where that digit is present, fitted on even lines and read on odd):
+
+| component | modulus spread | carries | tension `J` with the coupling mode | held out, with the coupling mode / with `χ₁` |
+|---|---|---|---|---|
+| 1 | 0.028 | `b₁` 0.43 | 0.067 | 36 / 45 |
+| 2 | 0.077 | `b₁` 0.23 | 0.043 | 47 / 47 |
+| 3 | 0.085 | `b₁` 0.27 | 0.039 | 33 / 38 |
+| 5 | 0.178 | `a₁` 0.48 | 0.041 | 47 / 41 |
+| 6 | 0.237 | `a₀` 0.36 | 0.054 | 47 / 32 |
+| 10 | 0.261 | `a₁` 0.42 | 0.038 | 42 / 41 |
+| 11 | 0.256 | `a₀` 0.37 | 0.039 | 51 / 44 |
+| the outside read | 0.943 | `a₀` 0.97 | 0.063 | 231 / 440 |
+
+- Each component carries mostly one arrival. The second operand's tens, the most recent arrival
+  when present, is the cleanest turn; the first operand's tens and units follow.
+- In the label region the first component carries `b₁` at 0.71 with modulus spread 0.016, and the
+  fourth carries `a₀` at 0.32 (that run stopped at its deadline after four components).
+
+**The first operand's units are carried as an ellipse, not a circle.** The read that holds 0.97 of
+`χ(a₀)` has modulus spread 0.94, and the circular criterion splits `a₀` across components 6, 8 and
+11. The tension does not pick it among the turns: the `b₁` turn carries the most (`J` 0.067; the
+outside read 0.063; the best `a₀` turn 0.054).
+
+**The lock region's class factor halves the read.** Its coupling mode is 0.79 on the first
+character. With it the outside read gives 231 held out; with `χ₁` exactly, 440.
+
+**What it says** [agent-inferred]:
+- The carried side of the knot is made of turns the machine can find blindly, one arrival each. A
+  turn is cleanest when its arrival is most recent. An older arrival comes back as an ellipse: its
+  character has been carried through modes that turn and decay at different rates, a turn composed
+  with a boost (the swing's factoring).
+- So the read the crossing needs is a turn only after the transport since its arrival is undone.
+  This is the phase-carried moment `Ĝ(τ)⁻¹E(u)` read literally: the receiver un-transports by the
+  navigators' own clock.
+
+**Decided next** [agent-inferred]: the transported turn. Locate each arrival's turn where it is
+cleanest, one tick after it arrives. Carry that read to the later cell through level 0's own mode
+transport, and measure its modulus and what it reads there. An exterior reading comes first, and
+the acceptance stays.
+
+**The runs.**
+- The turn reading was planned at under a minute (deadline 180 s; peak 805 MiB). The lock region
+  took 112.2 s for eight components, and the run stopped at its deadline in the label region after
+  four. It is reported as incomplete (`CARRIED_TURN.txt`), and the next reading changed the
+  partition (the lock region alone) and capped each component's search at 120 steps.
+- The selection reading was projected at about 100 s (25 s to load and up to 6 s for each of
+  16 components; deadline 180 s). It took 107.2 s (1.07; components at 4.5 to 4.9 s each; peak
   806 MiB).
 
 ## The recorded failures this step could repeat
@@ -1957,6 +2019,8 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   state-first founding `REGION_FOUNDING_state.txt`, `TURN_FORMS.{py,txt}`, `CLASS_MODES.py` with
   `CLASS_MODES.txt` and `CLASS_MODES_labels.txt`, and `MODE_PARTNER.{py,txt}` (run from the run
   directory, each with `REGION_SHARE.py` as its first argument).
+- The carried turns: `CARRIED_TURN.{py,txt}` (stopped at its deadline) and `CARRIED_SELECT.{py,txt}`
+  (run the same way).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 

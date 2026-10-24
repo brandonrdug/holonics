@@ -116,3 +116,5 @@ the turn forms	-	TURN_FORMS.py	about 70	300	-	38.8; 47.9	0.68	1199696	failed at 
 the state-first founding	-	REGION_FOUNDING.py state, the lock region then the label region	at most 150	300	-	42.8	-	824096	failed in the label region after the lock region's four ranks (Gram not positive definite)
 the class modes	-	CLASS_MODES.py; CLASS_MODES.py labels	under 60	180	-	37.5, 40.1, 39.0; 36.4	-	1195784; 824268	complete
 the mode partner	-	MODE_PARTNER.py	under 60	180	-	33.2	-	824912	complete
+the carried turns	-	CARRIED_TURN.py, the lock region then the label region, 8 components each	under 60	180	-	180.0	3.0	824392	stopped at its deadline in the label region after 4 components (the lock region's 8 took 112.2 s); incomplete
+the turn selection	-	CARRIED_SELECT.py, the lock region, 16 components, 120 steps each	about 100 (25 and 16 at 6)	180	-	107.2	1.07	825408	complete
