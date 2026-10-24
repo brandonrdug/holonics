@@ -44,14 +44,43 @@ A number has two charts: its size (`log_b n = level + leading phase`) and its cy
   products the design thread read. On the cycles it is a pair contact, and the units' cycle
   `ℤ/10 = ℤ/2 × ℤ/5` is two crossings that can be kept separately: `12*35=405` keeps the 5-axis and
   loses the 2-axis, `83*27=2309` keeps the 2-axis and loses the 5-axis.
-- A sum is one crossing on every cycle, `(x + y) mod q`. Its units are right. In size it crosses
+- A sum is one crossing on every cycle, `(x + y) mod q`, in the phase chart. In size it crosses
   through the carries.
 - A difference is one crossing on the cycles too, with the second operand turned by the half-turn
   (`−y`). In size its leading face is not conserved (`radix.difference-leading-cancellation`), so the
   result's length, its stair, is the last thing the operands fix.
 
-So products land in the neighbourhood and sums get the last digit: each is right in the chart where
-it is a single crossing, and that chart is learned first.
+So products land in the neighbourhood: a product is right in size, the chart where it is a single
+crossing.
+
+**Correction (October 24).** The first version of this section read a sum's units as right and
+concluded that each operation is learned first in the chart where it is one crossing. That reading
+came from the lines quoted above (`71+41=102`, `73+31=104`, `8+82=90`, `23+51=84`), and it does not
+hold over the towers' writings. The design thread counted every whole equation in the 37 digit-prompt
+writings of its tower record (`tools/answer_digits.py`;
+[`ANSWER_DIGITS.txt`](https://github.com/brandonrdug/holonics/blob/f6a54bc37/research/records/2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS_READ_BY_ITS_LOCK_receipts/ANSWER_DIGITS.txt),
+commit `f6a54bc37`), and the count reproduces exactly from the committed writings:
+- a sum's units are right in 44 of 400 and a difference's in 16 of 135, which is chance among ten
+  digits. Where a sum is written at its length, its units miss by every step of `ℤ/10` about
+  equally (27 to 50 times each, against 41 right). Read on the two rings of `ℤ/10 = ℤ/2 × ℤ/5`,
+  a sum's units keep the right parity in 205 of 400 and the right residue mod 5 in 83 of 400, both
+  at chance (200 and 80; `units_rings.py`).
+- what the towers place is the size. The length is right in 744 of 804 equations. A sum that
+  carries into the hundreds is written at its length 210 times of 218, with its leading 1 right in
+  209 of them. A product's length is right in 238 of 269.
+- a sum's tens is right in 190 of 380 and off by one in 168 of the rest, the carry from the units.
+
+So a sum's units, one crossing in the phase chart, are not placed, and its size, which crosses through
+the carries, is. §7 already states why "one crossing" depends on the chart. `□((a + b)/q) ≡ 0` holds
+for the phase, while the units read as one of ten classes cost interaction rank 9
+([faces on cycles](2026-10-24_FACES_ARE_READ_ON_CYCLES_A_FACE_IS_A_COHOMOLOGY_CLASS_THE_CARRY_IS_ITS_BOCKSTEIN_AND_FRICTION_KEEPS_ONLY_THE_HARMONIC_PART.md)).
+The phase chart's single crossing is available only to a reader that carries both operands' unit
+phases to the result's units cell, and no tower does that yet [agent-inferred]. The design thread's
+next reading tests whether the operands' units are still in the state at that cell. The pumped
+tower of the
+[terrain record](2026-10-23_ON_A_TERRAIN_OF_INTERACTING_DIGITS_THE_TOWER_COMPUTES_WHAT_IT_NEVER_MET_WHERE_IT_KNOWS_THE_LEVEL.md)
+is a separate count, not among these writings. There a sum's units are right in 191 of 240, with
+36 of the 49 misses keeping the parity, so that tower held ring 2 and slipped on ring 5.
 
 ## 3. The middle is hot because many paths feed it
 
@@ -274,5 +303,5 @@ selection in the design thread: a ring face is located by this return, never aut
 and lost faces, and per-place costs of sums and differences), `intersect.py` (fibre closure by the
 cheap rings), `rings.py` (per-place product cost with ring faces held), `order.py` (the same cost in
 three reading orders), `binding.py` (the four-cycle of each result face), `compose.py` (the defect
-composition, the carry cocycle and the face return, exactly), their JSON outputs, and
-`RUN.md`. Exact integer work; the entropies are exterior readings.
+composition, the carry cocycle and the face return, exactly), `units_rings.py` (§2's correction: a
+written sum's units on ring 2 and ring 5), their JSON outputs, and `RUN.md`. Exact integer work; the entropies are exterior readings.
