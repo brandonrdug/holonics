@@ -64,3 +64,7 @@ second pass plain	face1 (44ed341e…)	train-pair-pumped-tower hcont1/STATE.0, on
 met and unmet reads, second pass	face1 (44ed341e…)	read-tower-pair-cells on hface2/STATE.0 and hcont2/STATE.0, 8 streams	4.5 (the first pass's largest)	180 each	-	4.2 and 3.7	0.93 and 0.82	at most 68480	complete
 writing, second pass	face1 (44ed341e…)	sample-tower 400 bytes at one and two draws, joined and plain (16 runs, four at a time)	3.4 (the first pass's largest)	60 each	-	0.6 to 3.1	at most 0.91	at most 70356	complete
 leverage, second pass	face2 (60db5291…)	read-tower-pair-leverage on hface2/STATE.0 and hcont2/STATE.0, stride 64	167	240 each	-	156.8 and 140.7	0.94 and 0.84	68832 and 25300	complete
+build circuit1	-	cargo build --release --example solenoidal_alpha	377 (face1's build)	450	-	341.6	0.91	2602096	complete
+circuit readings	circuit1 (604a10c8…)	read-tower-circuit on the held-out equations at plain passes 1 to 7 and joined passes 6 and 7, nine reads together at one thread each	unmeasured (one to three minutes)	180 each	-	6.2 to 7.4	-	22292 to 67972	complete
+tower tests, circuit	-	cargo test -p holonics --lib hnn::tower::	115.7 (the last measured run with its build)	240	-	218.8	1.89	4773444	complete; 35 passed
+gate, circuit	-	bash tools/gate.sh	690 (the last gate on this host)	800	-	618.3	0.90	3218532	complete; every step ok

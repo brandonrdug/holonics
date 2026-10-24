@@ -141,6 +141,37 @@ pub(super) fn read_tower_faces(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [agent-inferred, October 24] `read-tower-circuit STATE STATE_SHA TEXT TEXT_SHA`: the frozen
+/// tower reads `TEXT` as one passage from rest, and every cell's power is printed beside its code
+/// ([`Tower::read_circuit`]): `CIRCUIT i class code` on `2^(−20)` bits, then per level
+/// `before,carried,after` on `2^(−48)` and `scale,drive,conduct` on `2^(−16)`. A reading beside the
+/// code for an exterior partition of the passage (where the energy expands, where it is lost, where
+/// the push cancels what the modes carry); the tower is not moved.
+pub(super) fn read_tower_circuit(args: &[String]) -> Result<()> {
+    if args.len() != 5 {
+        return Err("read-tower-circuit STATE STATE_SHA TEXT TEXT_SHA".into());
+    }
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let classes: Vec<usize> = text.iter().map(|&b| b as usize).collect();
+    let tower = &learner.tower;
+    let mut state = tower.rest();
+    let mut line = String::new();
+    tower
+        .read_circuit(&mut state, &classes, |i, cell| {
+            use std::fmt::Write as _;
+            line.clear();
+            let _ = write!(line, "CIRCUIT {i} {} {}", classes[i + 1], cell.code);
+            for (l, c) in cell.levels.iter().enumerate() {
+                let _ = write!(line, " L{l}={},{},{},{},{},{}", c.before, c.carried, c.after, c.scale, c.drive, c.conduct);
+            }
+            println!("{line}");
+            Ok(())
+        })
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 /// `Q=… P=… N=… M=…`: bits a byte per region.
 /// `read-tower-pair STATE STATE_SHA`: where a pair tower's bilinear weight sits
 /// ([`Tower::bilinear_rungs`]), each level's weight on the founded memory rungs of the two drives'

@@ -1191,6 +1191,129 @@ spread: 785.2 s joined (deadline 825 s) and 812.1 s plain (deadline 852 s). The 
 each write 0.6 to 3.1 s, and the leverage reads 156.8 s and 140.7 s (projected 167 s, deadline
 240 s).
 
+## The circuit at the result
+
+Brandon, October 24: read the circuit's own signals, its power, loudness and loss, and the
+expansion and contraction of the written results he pointed out on October 23 (the
+[near-miss record](2026-10-23_A_NEAR_MISS_IS_A_DRAW_FROM_THE_FACES_IT_KEPT_AND_THE_BASES_CHEAP_RINGS_CLOSE_THE_REST.md)'s
+occasion), not the code alone. This step reads both.
+
+**The written results** (`tools/answer_digits.py '74-72=' <writes>`, an exterior count). The
+digit-prompt writings in these receipts, 37 writes from every tower since October 23 (29 of them
+write equations), hold 804 whole equations with a result that is not negative:
+
+| result | equations | length right | leading digit right | units right | whole right |
+|---|---|---|---|---|---|
+| sum that expands (carries into the hundreds) | 218 | 210 | 210 | 17 | 10 |
+| sum that holds its length | 182 | 170 | 71 | 27 | 8 |
+| difference that holds | 101 | 96 | 45 | 10 | 5 |
+| difference that contracts to one digit | 34 | 30 | 6 | 6 | 5 |
+| product, full length | 203 | 198 | 108 | 46 | 0 |
+| product, one digit short | 66 | 40 | 12 | 11 | 5 |
+
+- The length is right in 744 of 804. A sum that carries into the hundreds is written at its length
+  210 times of 218, with its leading 1 right in 209 of them. A difference written too short, as
+  `99-56=5` was, is 4 of 135.
+- The units of sums and differences are right in 60 of 535, chance among ten digits. Where a sum
+  is written at its length, its units miss by every step of the ring of ten about equally (27 to 50
+  times each, against 41 right).
+- A sum's tens is right in 190 of 380 and off by one in 168 of the rest: the carry from the units.
+  Where the operands' units carry, the written tens takes the carry in 52 of 108 and omits it in 23;
+  where they do not, it adds one anyway in 38 of 208.
+- The near-miss record's §2 read the sums' units as right from the lines it quoted. Counted over
+  every writing, the sums' units are at chance (44 of 400) and what the towers place is the size:
+  the length, the leading digit and, more often than not, the carry.
+
+**The reading** (`Tower::read_circuit`, `read-tower-circuit`; [agent-inferred, October 24]). At each
+cell and level the frozen tower gives the modes' stored energy before the class arrives
+(`before = Σ_k |h_k|²`), what the moves carry of it by the step's own released law
+(`carried = Σ_k |α_t h_k + β_t h̄_k|²`) and the energy after the push (`after`), exact on `2^(−48)`,
+beside the read's scale, the contacts' reach and the cell's code. `lost = before − carried` is what
+the level dissipates at the tick (nonnegative: `|α_t| + |β_t| = ρ_t < 1`, the pumped mode's norm
+identity, owed in Lean in #410), `push = after − carried` the power the arriving class brings, and
+`dE = after − before = push − lost`. The test `the_circuit_readings_energies_are_the_forwards`
+checks the energies and the code against the forward on the pumped pair-contact fixture and the
+ungated one.
+
+It read the held-out equations (`htext2` `dev_arithmetic.txt`, 11,998 bytes, 1,253 lines) as one
+passage from rest, at every plain pass of the pair tower (passes 1 to 4 `hbig_pair` `STATE.0`–`.3`,
+pass 5 `hbig2_pair`, passes 6 and 7 `hcont1` and `hcont2`) and at the two joined passes (`hface1`,
+`hface2`). `tools/tower_circuit.py` sorts the cells by the role of the class each predicts and divides
+each level's energies by that level's mean stored energy over the reading. Over the seven passes the
+mean stored energy grew from 1,430 to 28,255 in the lower level and from 38,348 to 144,968 in the
+upper (in the state's unit squared), and the reading's code fell from 2.499 to 2.300 bits a byte.
+
+At `=` (the cell that has just heard `=` and predicts the result's first digit), the upper level's
+change `dE` by the result's shape, and the first digit's code in bits:
+
+| result | pass 1 | 2 | 3 | 4 | 5 | 6 | 7 | first digit, pass 1 → 7 |
+|---|---|---|---|---|---|---|---|---|
+| sum that expands | +0.040 | +0.078 | +0.350 | +0.463 | +0.422 | +0.511 | +0.287 | 0.46 → 0.12 |
+| sum that holds | +0.022 | +0.002 | +0.036 | −0.014 | −0.080 | −0.017 | −0.053 | 3.13 → 1.39 |
+| difference that holds | +0.025 | +0.005 | +0.012 | −0.065 | −0.106 | −0.125 | −0.130 | 3.06 → 1.68 |
+| difference that contracts | +0.011 | +0.011 | −0.014 | −0.052 | −0.082 | −0.121 | −0.169 | 3.73 → 4.63 |
+| product, full | −0.048 | +0.013 | −0.035 | −0.062 | −0.080 | −0.083 | −0.086 | 2.86 → 1.70 |
+| product, short | −0.052 | −0.004 | −0.053 | −0.141 | −0.152 | −0.139 | −0.129 | 3.56 → 4.25 |
+
+Through the rest of the result, per pass:
+
+| cell | pass 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|---|
+| a sum's middle digit (three-digit sums): code | 3.21 | 2.89 | 1.88 | 1.36 | 1.29 | 1.23 | 1.03 |
+| its upper level's stored energy | 0.95 | 1.07 | 1.40 | 1.44 | 1.55 | 1.59 | 1.44 |
+| its upper level's `dE` | −0.060 | −0.102 | −0.251 | −0.263 | −0.328 | −0.316 | −0.224 |
+| a sum's units: code | 3.52 | 3.55 | 3.51 | 3.46 | 3.50 | 3.54 | 3.49 |
+| its upper level's `lost` | 0.178 | 0.178 | 0.345 | 0.399 | 0.455 | 0.441 | 0.431 |
+| a difference's units: code | 3.52 | 3.85 | 3.73 | 3.66 | 3.76 | 3.72 | 3.61 |
+| its upper level's `lost` | 0.179 | 0.183 | 0.255 | 0.298 | 0.341 | 0.323 | 0.349 |
+| a product's units: code | 3.17 | 3.05 | 2.86 | 2.81 | 2.75 | 2.89 | 2.71 |
+| a sum's line end: code | 0.05 | 0.01 | 0.00 | 0.00 | 0.00 | 0.01 | 0.00 |
+| its upper level's `dE` | +0.268 | +0.184 | +0.215 | +0.110 | +0.083 | +0.072 | +0.123 |
+
+The joined passes read the same: the pair face moves a sum's units by 0.08 bits (3.41 at its second
+pass against the foil's 3.49), and the split at `=` keeps its signs (`CIRCUIT_j6.txt`,
+`CIRCUIT_j7.txt`).
+
+**What the circuit says.**
+- The upper level's energy at `=` learned the result's length. At pass 1 every shape moved it by at
+  most 0.052 of its mean. From pass 3 a carry into the hundreds expands it (0.29 to 0.51 of its
+  mean), and from pass 4 every result that keeps or loses length contracts it, a difference that
+  shrinks to one digit the most. The first digit's code fell with the split. [agent-inferred] The
+  same `=` lands on states that differ only by the operands, so the push's power at `=` is the
+  operands' size read ahead: this is the expansion and contraction of October 23, in the circuit.
+- Through the result the upper level contracts: it is loudest at a sum's middle digit (1.4 to 1.6
+  times its mean from pass 3) and sheds the most there and at the units. At the line end, whose code
+  is 0.00 bits from pass 3, it expands again.
+- The units are the one place the passes did not move. Their code stayed at chance (log₂ 10 = 3.32
+  bits) at every pass, while the upper level's loss at that cell grew from 0.18 to 0.43 of its mean:
+  each pass taught it to dissipate there, not to place the digit.
+- [agent-inferred] That loss is the measurable tension of the near-miss record and the effective
+  tension record, located on the residue face `ℤ/10 = ℤ/2 × ℤ/5`. A sum's units are one crossing on
+  that cycle, but between the two operands' units, three bytes apart; their phases must be composed,
+  and no read of summed magnitudes reaches a residue. The pair face joins only neighbouring classes.
+- The lower level grows quieter during the result at every pass (its loss at a sum's units from
+  0.197 to 0.056 of its mean): it is loud while it hears the operands and coasts while the result is
+  written.
+- Read cell by cell, the upper level dissipates 0.25 to 0.47 of its mean energy a tick at the result.
+  The swell line's `1 − max|λ|`, which fell toward the margin over these passes, is its slowest mode
+  alone; the fast modes of the ladder and the gates carry the loss.
+- `cancel` stayed 0.00 at every role and pass: summed over a level, the push never lowered the
+  energy the moves carried. Any cancellation is between modes, below the level's grain.
+
+**Decided next** [agent-inferred]: whether the operands' units are still in the state when the units
+are predicted. On the training text's equation block, fit the units of each operand and of the
+result from the top face at the units cell by the exact Gram, and read the fit on the held-out
+cells. If the operands' units read and the result's do not, the missing term is the composition (a
+contact between the state at the units and the state at the operands' units); if they do not read,
+the dissipation erased them and the missing term is retention.
+
+**The run.** The release binary `circuit1` built in 341.6 s (projected 377 s from `face1`'s build,
+0.91; deadline 450 s). The nine reads were unmeasured, planned at one to three minutes with a 180 s
+deadline each, and ran together at one thread each: 6.2 to 7.4 s, peak 22 to 68 MiB. The tower's
+tests, with the new one, passed (35) in 218.8 s with their build, against 115.7 s projected from
+the last measured run (1.89; deadline 240 s, peak 4.6 GiB), and the gate passed every step in
+618.3 s (projected 690 s, 0.90; deadline 800 s, peak 3.1 GiB).
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -1274,6 +1397,10 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `FACE2_CELLS_{joined,plain}.txt` (met and unmet pairs), the writing
   `FACE2_WRITE_<state>_<prompt>_a<draws>.txt` as bytes, and the leverage
   `FACE2_LEVERAGE_joined.txt` and `FACE2_LEVERAGE_plain.txt`.
+- The circuit at the result: `ANSWER_DIGITS.txt` (`tools/answer_digits.py` over the 37 digit-prompt
+  writings), `CIRCUIT_{p1,…,p7,j6,j7}.txt` (`tools/tower_circuit.py` over each pass's reading:
+  plain passes 1 to 7, joined passes 6 and 7) and `CIRCUIT_READS.txt` (each raw reading's state,
+  cell count and SHA-256; the raw readings, 2.3 MB each, stay outside the repository).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -1287,4 +1414,5 @@ uses `found1` (`d2ebd83e…`) and, with the spectrum, `found2` (`7e93511f…`). 
 `block1` (`95057b05…`; its failed slices ran earlier builds of it, the first `3d69f641…`). The
 install and its writing use `install1` (`522b9cfa…`). The pair forms in the learner use `face1`
 (`44ed341e…`) for the join, the passes, the met and unmet reads and the writing, and `face2`
-(`60db5291…`, the same source with the leverage read) for the leverage, in both passes.
+(`60db5291…`, the same source with the leverage read) for the leverage, in both passes. The
+circuit readings use `circuit1` (`604a10c8…`).
