@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=7.733 bytes=400 agree=1 elapsed_ms=412
+TOWER_SAMPLE_TEXT "ia]Weighbouzation]) :\ntheorem reasured] The first is the totalitys shange\n//! model not le subphysed two heretation. Accertion and errory     key\")),\n    pub fn chats:\n//! thifaction them. Are could carry: the epoched for new law;\n    let keys {\n    let residention;\n    (suberssage.trurh_potentialLearnenations }\n\n/!Eer enumed; executed from Lean: determitian,\n//!\n//! | `Decidicejects-kernelCostMak"
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=25532

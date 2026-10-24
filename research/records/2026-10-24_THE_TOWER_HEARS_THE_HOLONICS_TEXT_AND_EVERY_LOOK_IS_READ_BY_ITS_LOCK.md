@@ -429,10 +429,97 @@ no integers. The audit (`AUDIT_WRITE_*`) found three things.
 
 What stays wrong: at one draw the text varies but crosses media inside a line, so the tower does not
 hold which medium it is in. It heard 54 KB of each medium, against 3.5 MB for the GSM8K towers.
+(Eight times the text did not change this; see the next section.)
 
 Free writing is released at one draw (the face itself) and at two agreeing draws, both shown, and not
 at four (agent-inferred: the fourth power reads the single likeliest answer, which suits a look at
 one question and the lock that reads it, not writing).
+
+## Eight times the text
+
+The audit's reading was that the tower crosses media because it heard little of each. To test it,
+the terrain is cut again with only its size changed:
+`tools/holonics_text_terrain.py . .local/run/arith100 524288 12000 4000 .local/run/htext2`. That
+gives 524,288 bytes of each text medium (prose from 135 records, Lean from 146 files, Rust from 135
+files) and the digit terrain's 216,131 training bytes, so 1,789,116 training bytes against htext1's
+216,240. The held-out text is 48,031 bytes from files that neither cut trains on. The new Lean
+prompt is `BIG_PROMPT_lean.txt`, because the old one's file is now in training. The pair tower is
+trained from rest with its declaration unchanged: width 64, 64 modes, 256 contacts, 2 levels,
+8 streams, sections of 128, 4 passes, rate `2^(−7)`.
+
+Training (`BIG_TRAIN.txt`):
+- Held-out bits a byte by pass: 2.791, 2.645, 2.585, 2.543. Training: 2.767, 2.396, 2.299, 2.220.
+- The gap at the last pass is 0.32 bits a byte, against 0.49 for the htext1 pair tower (2.255 and
+  2.748).
+- Held out by medium at the end: prose 3.159, Lean 2.490, Rust 2.208, digits 2.315.
+
+**The writing still leaves its medium.** At one draw the Lean prompt opens with prose, passes a Lean
+doc comment (`/--`) and reaches a Rust one (`//!`) by its ninth line (`BIG_WRITE_big_lean_a1.txt`):
+
+```text
+Rating is by an patherting population, come.
+
+[mean traces them))inu (Hamal stric/target)  -> heure)).prepares
+index-boostingPairied togen
+
+/-- behing is side.
+
+An |Be is other grounds its colcatime bankrithlies locked read residual  
+//! `knqul ::them, sime: Retained; 0 wracheve returned-loethout, by every twithing by onuse them strred tin //!= then eresaanance /// Twise bits. Decise. Population 
+```
+
+At two agreeing draws the Rust prompt writes code shaped like Rust with Lean's `:=` inside it
+(`BIG_WRITE_big_rust_a2.txt`):
+
+```text
+//! [emitted + companion.speented_trace = ObservedFace = verserietent (hamiltonian.closes)
+    }
+
+    residual :=
+  residual > 0 + boundid (Selection, not law : Oncgenceless) -> the preserver (here : A) :
+    residual :=
+              (E) :
+        residual()
+    pub navigator: Result<Self)) :
+    determinants {
+        current {
+        decides[reson] (searched (held.clone());
+        &self) -> &
+```
+
+The prose prompt, a record's heading and a blank line, is answered by `#[determily)` at two draws:
+after the blank line the tower writes Rust's attribute opener. With twelve held-out digit lines
+before it, the two-draw writing stays in digits for all 400 bytes: it answers the prompt's `74-72=`
+with `1`, then writes 40 whole equation lines (`BIG_WRITE_big_arithmetic_ctx_a2.txt`). Their answers
+have the right number of digits, and none is right (`85*90=6115`, `94+31=117`, `13+97=109`).
+
+**The lock on the same unseen text.** Both pair towers look at the located moment on htext2's
+held-out lines, which neither heard (`BIG_LOCATED_LOOKS_<tower>_<medium>.tsv`,
+`BIG_READ_LOCATED.txt`). Met and unmet lines are summed; `ΣT` is the true rests' bytes.
+
+| medium, lines, `ΣT` | tower | `Σλ` first → last | `ΣF*` first → last | held or grew / fell | last `λ / ΣT` |
+|---|---|---|---|---|---|
+| digits, 957, 4,103 | eight times the text | 2,289 → 2,298 | 3,630 → 3,578 | 766 / 191 | 56.0% |
+| | htext1 pair | 2,367 → 2,400 | 3,460 → 3,389 | 795 / 162 | 58.5% |
+| prose, 164, 10,696 | eight times the text | 3,700 → 3,732 | 13,532 → 13,588 | 79 / 85 | 34.9% |
+| | htext1 pair | 3,693 → 3,692 | 14,099 → 13,937 | 89 / 75 | 34.5% |
+| Lean, 152, 10,998 | eight times the text | 3,866 → 3,894 | 13,334 → 13,176 | 65 / 87 | 35.4% |
+| | htext1 pair | 3,647 → 3,436 | 13,447 → 13,470 | 65 / 87 | 31.2% |
+| Rust, 204, 11,034 | eight times the text | 3,441 → 2,938 | 14,016 → 14,069 | 68 / 136 | 26.6% |
+| | htext1 pair | 3,759 → 3,759 | 15,182 → 15,047 | 151 / 53 | 34.1% |
+
+The larger text raises the first look on prose and Lean, where `λ` is higher and `F*` lower. On
+Lean the larger tower's looks hold or grow over the whole text, where the smaller one's fall. On
+digits the two are close and the smaller is ahead. On Rust the larger tower's looking again falls:
+`Σλ` drops by 503, the looks shorten from 9,864 to 8,911 bytes, and 136 of 204 lines fall. The
+looks there move out of comment text into code: line 2's later looks write `&self.res…` after a
+`//!` head.
+
+So the medium crossing does not come from how little the tower heard. Eight times the text closes
+some of the gap between training and held-out bits, and lifts the lock on two media. The writing
+still leaves its medium within a line or two, and on Rust looking again leaves it too. The next loop
+asks whether the crossing follows the fit (agent-inferred: held-out bits still fall 0.04 a pass, so
+four more passes from this state is the one change that tells fit from law).
 
 ## The recorded failures this step could repeat
 
@@ -472,6 +559,10 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
 - The located looks, `LOCATED_LOOKS_<tower>_<medium>.tsv`, and their lock, `READ_LOCATED.txt`.
 - The audit's writing, `AUDIT_WRITE_<tower>_<prompt>_a<draws>.txt`, and the digit prompt with its
   context, `PROMPT_arithmetic_ctx.txt`.
+- Eight times the text: the terrain's pieces `BIG_MANIFEST.tsv`, the training log `BIG_TRAIN.txt`,
+  the new Lean prompt `BIG_PROMPT_lean.txt`, the writing `BIG_WRITE_big_<prompt>_a<draws>.txt` and
+  the htext1 pair tower's on the new Lean prompt `BIG_WRITE_pair_lean_a<draws>.txt`, both towers'
+  located looks `BIG_LOCATED_LOOKS_{big,pair}_<medium>.tsv`, and their lock `BIG_READ_LOCATED.txt`.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 

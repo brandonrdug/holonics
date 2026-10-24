@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=3.530 bytes=400 agree=1 elapsed_ms=537
+TOWER_SAMPLE_TEXT "/-- Exact Executed; payity receight; the carrier is the presention paire  H tree by the laant powec other nlptermed seconjoint borgets executed while epochecked\n- 2�rdeised.Compation/simult readit.Bancelting_original_closes.placeor:::\n\n#[derive(Clone, Defect:\n\nend close : Samplitiintion, not residualoget indirething compession = is redistinctor;\nendpair\nrealization/chree about residual exchanged a"
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=26308

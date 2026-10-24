@@ -226,3 +226,79 @@ MEASURE exit=0 wall_s=4.9 peak_rss_kib=19300
 LOOKS_READ looks=8 spent=8057 settled=442 looks_sha256=0e96ba9105168fbf07ad01635c38009640e5836b78386455ee718474bcb2a33d
 LINES_READ lines=1253 written=1200 agree=4 lines_sha256=73ba6dfa91c2ac2088f5761f3dd26cd1e180512fa75a9eab0f0610bc0d226c7b elapsed_ms=24026
 MEASURE exit=0 wall_s=24.0 peak_rss_kib=19308
+== hbl_big_arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=6158 settled=407 looks_sha256=f6edf2359726495cf8c19346d5615dba388947b4d81f2a7ea4e18f360a29ceac
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=f1f0c2716b2abbf3e6d0d32c481266b49030e7edbc6a21b3d588ecae90de60b2 elapsed_ms=23150
+MEASURE exit=0 wall_s=23.2 peak_rss_kib=56640
+== hbl_big_lean
+MOMENTS_LOCATED depth=4 lines=159 located=152
+LOOKS_READ looks=8 spent=1158 settled=18 looks_sha256=ffab1df0e5e98547c2bf3631e5f2c03c07f3c060cf7dd9f7ae640bed96ffac2e
+LINES_READ lines=152 written=152 agree=4 lines_sha256=9c61d87c839d58bbf29397811e62bdd5065ef5ddf8c718145025bd85c698ce28 elapsed_ms=44619
+MEASURE exit=0 wall_s=44.6 peak_rss_kib=58096
+== hbl_big_prose
+MOMENTS_LOCATED depth=4 lines=166 located=164
+LOOKS_READ looks=8 spent=1271 settled=11 looks_sha256=08c224c1113400725147d0c3fa69a9db98ebf3d6fb24a59b25a627f3986f310f
+LINES_READ lines=164 written=164 agree=4 lines_sha256=37c18fb245931e0b3f314144f5bd87af32783549a928cabecc88c374d554c380 elapsed_ms=46107
+MEASURE exit=0 wall_s=46.1 peak_rss_kib=68168
+== hbl_big_rust
+MOMENTS_LOCATED depth=4 lines=225 located=204
+LOOKS_READ looks=8 spent=1336 settled=74 looks_sha256=6af88ca4c902dc19903cdf28b389853662d2831b778602b28eb7a9fa4719c5c4
+LINES_READ lines=204 written=204 agree=4 lines_sha256=51637659892c61a148ca5f612cd498da5cb58b0f0b0b6b2d3ca47f9835402828 elapsed_ms=43525
+MEASURE exit=0 wall_s=43.5 peak_rss_kib=59488
+== hbl_old_arithmetic
+MOMENTS_LOCATED depth=4 lines=1253 located=1007
+LOOKS_READ looks=8 spent=5801 settled=484 looks_sha256=fd7f5f7165136f5afc2fbbf4d4ccd040f29b86766df8e8a7bc65d586ee2563ee
+LINES_READ lines=1007 written=1007 agree=4 lines_sha256=449e4067245388dc0b822b91e43560bf8b3c731a92fb2a57b0aa264adf48c49e elapsed_ms=21935
+MEASURE exit=0 wall_s=21.9 peak_rss_kib=57152
+== hbl_old_lean
+MOMENTS_LOCATED depth=4 lines=159 located=152
+LOOKS_READ looks=8 spent=1150 settled=17 looks_sha256=ed3c16b731caf2214d7eb6cc7b2ef1ac392b940e7268c64df46ddde337b0ba99
+LINES_READ lines=152 written=152 agree=4 lines_sha256=fee59596f9bee0fd72d00235bbb5ebf52275bb794cc7d7f958e8ebd0e5e69f2d elapsed_ms=44439
+MEASURE exit=0 wall_s=44.4 peak_rss_kib=59156
+== hbl_old_prose
+MOMENTS_LOCATED depth=4 lines=166 located=164
+LOOKS_READ looks=8 spent=1271 settled=13 looks_sha256=09f49e97794133f07cce86faa7a8b0c913dd6d869f83c56b7d7099d10d4973cf
+LINES_READ lines=164 written=164 agree=4 lines_sha256=65e79f1d90efe7a168a63478d0df948599ef5ed27ad444d60db7ce47f3ecc0a5 elapsed_ms=48786
+MEASURE exit=0 wall_s=48.8 peak_rss_kib=69032
+== hbl_old_rust
+MOMENTS_LOCATED depth=4 lines=225 located=204
+LOOKS_READ looks=8 spent=1208 settled=87 looks_sha256=a7ba5809015eb2327fd0e19adbb55d9fb57c73565ff0dce4f130ef9ffa9bfe7e
+LINES_READ lines=204 written=204 agree=4 lines_sha256=eee77b7e815c467273240534624ddda85d72da6cc8f5eaa27deaa2897f30b775 elapsed_ms=42737
+MEASURE exit=0 wall_s=42.7 peak_rss_kib=59800
+== hbw_big_arithmetic_a1
+TOWER_SAMPLE prompt_bits_a_byte=7.733 bytes=400 agree=1 elapsed_ms=412
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=25532
+== hbw_big_arithmetic_a2
+TOWER_SAMPLE prompt_bits_a_byte=7.733 bytes=400 agree=2 elapsed_ms=1652
+MEASURE exit=0 wall_s=1.7 peak_rss_kib=26044
+== hbw_big_arithmetic_ctx_a1
+TOWER_SAMPLE prompt_bits_a_byte=3.173 bytes=400 agree=1 elapsed_ms=582
+MEASURE exit=0 wall_s=0.6 peak_rss_kib=25472
+== hbw_big_arithmetic_ctx_a2
+TOWER_SAMPLE prompt_bits_a_byte=3.173 bytes=400 agree=2 elapsed_ms=1627
+MEASURE exit=0 wall_s=1.6 peak_rss_kib=25892
+== hbw_big_lean_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.662 bytes=400 agree=1 elapsed_ms=440
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=26080
+== hbw_big_lean_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.662 bytes=400 agree=2 elapsed_ms=1783
+MEASURE exit=0 wall_s=1.8 peak_rss_kib=26188
+== hbw_big_prose_a1
+TOWER_SAMPLE prompt_bits_a_byte=3.530 bytes=400 agree=1 elapsed_ms=537
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=26308
+== hbw_big_prose_a2
+TOWER_SAMPLE prompt_bits_a_byte=3.530 bytes=400 agree=2 elapsed_ms=1548
+MEASURE exit=0 wall_s=1.6 peak_rss_kib=25936
+== hbw_big_rust_a1
+TOWER_SAMPLE prompt_bits_a_byte=2.351 bytes=400 agree=1 elapsed_ms=485
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=25924
+== hbw_big_rust_a2
+TOWER_SAMPLE prompt_bits_a_byte=2.351 bytes=400 agree=2 elapsed_ms=1816
+MEASURE exit=0 wall_s=1.8 peak_rss_kib=25880
+== hbw_old_lean_a1
+TOWER_SAMPLE prompt_bits_a_byte=3.238 bytes=400 agree=1 elapsed_ms=415
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=26000
+== hbw_old_lean_a2
+TOWER_SAMPLE prompt_bits_a_byte=3.238 bytes=400 agree=2 elapsed_ms=1275
+MEASURE exit=0 wall_s=1.3 peak_rss_kib=25972
