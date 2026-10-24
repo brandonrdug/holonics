@@ -619,6 +619,39 @@ pub struct TensionCell {
     pub below: Vec<i32>,
 }
 
+/// [agent-inferred, October 24] **One level's power at one cell** ([`Tower::read_circuit`]): the
+/// modes' stored energy `Σ_k |h_k|²` before the class arrives (`before`), what the moves carry of it
+/// (`carried`, `Σ_k |λ_t h_k + β_t h̄_k|²`, the memory after its loss) and the energy after the push
+/// (`after`), all on the state's grain squared, `2^(−48)`. `before − carried ≥ 0` is what the level
+/// dissipates at the tick (`|α_t| + |β_t| = ρ_t < 1`), and `after − carried` is the power the push
+/// brings, negative where the push cancels what the modes carry. `scale` is the read's `‖r‖_rms`
+/// and `drive` and `conduct` the contacts' largest drive and conduction, on `2^(−16)`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CircuitLevel {
+    pub before: u128,
+    pub carried: u128,
+    pub after: u128,
+    pub scale: i128,
+    pub drive: u64,
+    pub conduct: u64,
+}
+
+/// One cell of the circuit reading ([`Tower::read_circuit`]): each level's power, and the code of
+/// the class that arrives next on `2^(−20)` bits.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CircuitCell {
+    pub levels: Vec<CircuitLevel>,
+    pub code: i64,
+}
+
+/// `Σ_k |h_k|²` on the state's grain squared.
+fn energy(modes: &[(i64, i64)]) -> Result<u128> {
+    modes.iter().try_fold(0u128, |sum, &(re, im)| {
+        let e = (re.unsigned_abs() as u128).pow(2).checked_add((im.unsigned_abs() as u128).pow(2));
+        e.and_then(|e| sum.checked_add(e)).ok_or(TowerError::Refused("a level's energy outgrew its 128-bit carrier"))
+    })
+}
+
 /// The covector a face returns when it is compared with `target`: `dz_c = p̂(c) − [c = target]` on
 /// `2^(−24)`, the cross-entropy logit gradient `p − q` at the face's grain representative. The
 /// reverse scan and the tension reading ([`Tower::read_tension`]) read this one law.
@@ -2415,6 +2448,45 @@ impl Tower {
         Ok(())
     }
 
+    /// [agent-inferred, October 24] **The circuit reading**: the frozen tower reads `classes` from
+    /// the state, and each cell's [`CircuitCell`] (every level's stored, carried and pushed energy,
+    /// its read's scale and its contacts' reach, and the code of the class that arrives next) is
+    /// handed to `each`. A reading beside the code: the tower is not moved. The carried part is
+    /// formed by the step's own law, `λ_t h + β_t h̄` released from `2^(−54)` to the state's grain,
+    /// so `carried` is what the step adds the push to.
+    pub fn read_circuit(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, CircuitCell) -> Result<()>) -> Result<()> {
+        let reaches = self.reaches();
+        let n = self.declaration.modes;
+        let t = &self.theta;
+        for i in 0..classes.len().saturating_sub(1) {
+            let opening = state.modes.clone();
+            let cell = self.step(state, classes[i], &reaches)?;
+            let mut levels = Vec::with_capacity(cell.levels.len());
+            for (l, lc) in cell.levels.iter().enumerate() {
+                let lv = &self.layout.levels[l];
+                let carried: Vec<(i64, i64)> = collect_exact((0..n).map(|k| {
+                    let (hr, hi) = (opening[l][k].0 as i128, opening[l][k].1 as i128);
+                    let (lr, li) = match lc.gate.get(k) {
+                        Some(m) => (m.lam.0 as i128, m.lam.1 as i128),
+                        None => (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128),
+                    };
+                    let (br, bi) = lc.gate.get(k).map_or((0, 0), |m| (m.beta.0 as i128, m.beta.1 as i128));
+                    Ok((fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS))?, fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS))?))
+                }))?;
+                levels.push(CircuitLevel {
+                    before: energy(&opening[l])?,
+                    carried: energy(&carried)?,
+                    after: energy(&lc.state)?,
+                    scale: lc.read_scale,
+                    drive: reach(&lc.drive).max(reach(&lc.pair)),
+                    conduct: reach(&lc.conduct),
+                });
+            }
+            each(i, CircuitCell { levels, code: cell.face.code(classes[i + 1]) })?;
+        }
+        Ok(())
+    }
+
     /// [definition; agent-inferred with the mathematics thread, October 24] **Where the pair
     /// contact's bilinear weight sits.** Each level's drives read back onto the modes' faces,
     /// `A = W_a [C_re, −C_im]` and `B = W_b [C_re, −C_im]` (the read is `Re(C h)`, so a mode
@@ -2731,6 +2803,43 @@ mod tests {
         assert_eq!(&g[tower.layout.readout..tower.layout.readout + a * w], &readout[..]);
         assert_eq!(&g[tower.layout.readout_bias..tower.layout.readout_bias + a], &bias[..]);
         assert_eq!(read, state);
+    }
+
+    /// The circuit reading's energies are the forward's: `before` is the state's energy before the
+    /// class arrives, `after` the energy of the state the step leaves, `carried` what the moves
+    /// keep (so the level dissipates, summed over the passage), the code is the frozen reading's,
+    /// and the reading moves the state as the forward does; on gated, turned and pumped modes and
+    /// on the ungated tower.
+    #[test]
+    fn the_circuit_readings_energies_are_the_forwards() {
+        for tower in [tiny_declared(2, true, true, true, ContactLaw::Pair), tiny()] {
+            let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+            let reaches = tower.reaches();
+            let mut state = tower.rest();
+            let mut states = vec![state.clone()];
+            for &u in &classes[..classes.len() - 1] {
+                tower.step(&mut state, u, &reaches).expect("step");
+                states.push(state.clone());
+            }
+            let codes = tower.read_cells(&mut tower.rest(), &classes).expect("codes");
+            let mut read = tower.rest();
+            let (mut lost, mut count) = (vec![0i128; tower.declaration.levels], 0);
+            tower
+                .read_circuit(&mut read, &classes, |i, cell| {
+                    assert_eq!(cell.code, codes[i]);
+                    for (l, level) in cell.levels.iter().enumerate() {
+                        assert_eq!(level.before, energy(&states[i].modes[l]).expect("energy"));
+                        assert_eq!(level.after, energy(&states[i + 1].modes[l]).expect("energy"));
+                        lost[l] += level.before as i128 - level.carried as i128;
+                    }
+                    count += 1;
+                    Ok(())
+                })
+                .expect("read");
+            assert_eq!(count, classes.len() - 1);
+            assert!(lost.iter().all(|&d| d > 0));
+            assert_eq!(read, state);
+        }
     }
 
     /// The faces a joined face reads are the forward's: each cell's top is the tension reading's,

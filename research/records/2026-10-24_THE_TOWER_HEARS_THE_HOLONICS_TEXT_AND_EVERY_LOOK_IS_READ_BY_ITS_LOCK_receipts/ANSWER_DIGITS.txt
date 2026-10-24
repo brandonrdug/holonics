@@ -1,0 +1,13 @@
+equations 804 from 37 writes
+LENGTH */full n=203 right=0 length_right=198 longer=0 shorter=5 leading_right=108 units_right=46
+LENGTH */short n=66 right=5 length_right=40 longer=24 shorter=2 leading_right=12 units_right=11
+LENGTH +/expands n=218 right=10 length_right=210 longer=0 shorter=8 leading_right=210 units_right=17
+LENGTH +/holds n=182 right=8 length_right=170 longer=9 shorter=3 leading_right=71 units_right=27
+LENGTH -/contracts n=34 right=5 length_right=30 longer=4 shorter=0 leading_right=6 units_right=6
+LENGTH -/holds n=101 right=5 length_right=96 longer=1 shorter=4 leading_right=45 units_right=10
+UNITS_OFF_MOD_10 + 0:41 1:35 2:35 3:50 4:37 5:36 6:33 7:39 8:47 9:27
+TENS_OFF + -8:1 -4:2 -3:2 -2:7 -1:98 0:190 1:70 2:7 3:2 8:1
+UNITS_OFF_MOD_10 - 0:10 1:6 2:7 3:9 4:10 5:10 6:13 7:8 8:13 9:10
+TENS_OFF - -2:5 -1:26 0:44 1:20 2:1
+TENS_CARRY + carry/n=108 carry/tens_with_carry=52 carry/tens_without_carry=23 none/n=208 none/tens_with_carry=38 none/tens_without_carry=111
+TENS_CARRY - carry/n=33 carry/tens_with_carry=16 carry/tens_without_carry=10 none/n=43 none/tens_with_carry=15 none/tens_without_carry=20
