@@ -1901,9 +1901,62 @@ the acceptance stays.
   took 112.2 s for eight components, and the run stopped at its deadline in the label region after
   four. It is reported as incomplete (`CARRIED_TURN.txt`), and the next reading changed the
   partition (the lock region alone) and capped each component's search at 120 steps.
-- The selection reading was projected at about 100 s (25 s to load and up to 6 s for each of
-  16 components; deadline 180 s). It took 107.2 s (1.07; components at 4.5 to 4.9 s each; peak
+- The selection reading was projected at 121 s (25 s to load and up to 6 s for each of 16
+  components; deadline 180 s). It took 107.2 s (0.89; components at 4.5 to 4.9 s each; peak
   806 MiB).
+
+## The ring's sense, and the end of the search at `B`
+
+**Read in its own complex modes, the coupling still has no sense of turn** (`HANDED_RING.py`,
+exterior). Here the state is read as level 0's 64 complex modes `h`, and a state read is
+holomorphic, `r = bᴴh`, so it turns with the modes. The coupling `K` is then Hermitian. Its top two
+modes still split the first character and its conjugate about equally:
+
+| region | mode 1 on `k = 1` / `k = 9` | mode 2 on `k = 1` / `k = 9` |
+|---|---|---|
+| every digit arrival | 0.42 / 0.43 | 0.38 / 0.37 |
+| lock 42-35, sector 0 | 0.31 / 0.37 | 0.27 / 0.26 |
+| the sums' `B` cells | 0.39 / 0.42 | 0.47 / 0.45 |
+| the differences' `B` cells | 0.45 / 0.49 | 0.48 / 0.45 |
+
+**The state carries each arrival in both senses.** At the sums' `B` cells, a holomorphic read holds
+0.84 of `χ₁(a₀)` and 0.85 of `χ₉(a₀)`, its conjugate (0.92 and 0.91 in the lock region). Each
+mode's move is real-linear, `h ↦ λh + βh̄`: the pump's conjugate term carries the arrival in both
+senses at once. Each read crossed with its own character reads the units held out: `χ₁(a₀)` with
+`χ₁` in 355 (383 in the lock region), and `χ₉(a₀)` with `χ₉` in 340 (370). A read crossed with the
+other sense reads 35 to 43. So the sense of turn is fixed only in the pairing of a read with a
+class factor.
+
+**Held to the ring's pair, the joint search still finds mixtures** (`RING_SPAN.py`). The class
+factor is held in the span of `K`'s top two modes, which has no constant, so a read of the state
+alone is excluded. The holomorphic read is searched jointly with it, and four ranks are founded one
+after another:
+- Each class factor balances `k = 1` and `k = 9` (0.20 to 0.44 on each, one rank 0.27 / 0.48), a
+  real factor rather than a turn.
+- No read holds more than 0.14 of `χ₁(a₀)`.
+- Held out, the four ranks together read 74 in the lock region and 61 in the label region.
+- The leading rank's `J` is 0.27 in the lock region. The outside `a₀` form's was 0.063.
+
+**What it says** [agent-inferred]:
+- At `B`, the units crossing is not the leading relation of the ring in any refinement read: whole
+  text, per region at its own loudness, with the class factor taken from the coupling, as a turn,
+  in the state's complex modes, or held to the ring's pair. The search at `B` is closed.
+- The tension at `B` is the downstream error carried back to the input. The crossing becomes the
+  error at `U`, the cell that codes the units. There it is the largest part of a cell's own tension
+  (180‰), but `U` is a near node (0.18 of the mean), and the two operands' units are both carried
+  strands (`b₀` at 973‰, `a₀` at 778‰). The knot sits at the node, as a crossing of two carried
+  strands, not of the state with the arriving class.
+
+**Decided next** [agent-inferred]: read the crossing at `U` at its own loudness, as a form of the
+state with itself, `c = (aᵀŝ)(a′ᵀŝ)`, with the region taken first from the label and then from the
+tower's own lock. This is an exterior reading first. The acceptance's cell `B` stays; a form found
+at `U` would be read there too, and the acceptance is not moved.
+
+**The runs.**
+- The handed ring was unmeasured and planned at about 40 s (deadline 180 s). It took 114.3 s (2.9;
+  four regions at 17.7 to 23.6 s each; peak 1.3 GiB) and finished inside its deadline.
+- The ring-span search was projected at about 45 s (deadline 180 s). It took 73.0 s (1.6; peak
+  809 MiB).
 
 ## The recorded failures this step could repeat
 
@@ -2021,6 +2074,8 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   directory, each with `REGION_SHARE.py` as its first argument).
 - The carried turns: `CARRIED_TURN.{py,txt}` (stopped at its deadline) and `CARRIED_SELECT.{py,txt}`
   (run the same way).
+- The ring's sense: `HANDED_RING.{py,txt}` and `RING_SPAN.{py,txt}` (`RING_SPAN.py` takes
+  `HANDED_RING.py` as its second argument).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 

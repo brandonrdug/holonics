@@ -117,4 +117,6 @@ the state-first founding	-	REGION_FOUNDING.py state, the lock region then the la
 the class modes	-	CLASS_MODES.py; CLASS_MODES.py labels	under 60	180	-	37.5, 40.1, 39.0; 36.4	-	1195784; 824268	complete
 the mode partner	-	MODE_PARTNER.py	under 60	180	-	33.2	-	824912	complete
 the carried turns	-	CARRIED_TURN.py, the lock region then the label region, 8 components each	under 60	180	-	180.0	3.0	824392	stopped at its deadline in the label region after 4 components (the lock region's 8 took 112.2 s); incomplete
-the turn selection	-	CARRIED_SELECT.py, the lock region, 16 components, 120 steps each	about 100 (25 and 16 at 6)	180	-	107.2	1.07	825408	complete
+the turn selection	-	CARRIED_SELECT.py, the lock region, 16 components, 120 steps each	121 (25 and 16 at 6)	180	-	107.2	0.89	825408	complete
+the handed ring	-	HANDED_RING.py, four regions	about 40 (unmeasured)	180	-	114.3	2.9	1359044	complete
+the ring-span search	-	RING_SPAN.py, the lock and label regions, 4 ranks, 4 starts	about 45	180	-	73.0	1.6	828608	complete

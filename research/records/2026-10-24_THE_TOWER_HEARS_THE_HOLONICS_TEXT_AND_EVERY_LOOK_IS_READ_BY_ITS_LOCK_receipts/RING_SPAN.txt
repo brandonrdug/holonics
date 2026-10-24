@@ -1,0 +1,14 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 25.8 s
+held-out digit arrivals 8239, sums' B cells 495
+lock 42-35 sector 0: cells 13138; the ring's pair on k=1 / k=9: u1 0.31/0.37, u2 0.27/0.26
+   rank 1 (from u1): J 0.2711; beta on k=1 0.21, k=9 0.22; the read holds chi_1(a0) 0.073, chi_1(a1) 0.047, chi_1(b1) 0.049; held out, ranks 1..1 together, units at B 60 of 495; 18.8 s
+   rank 2 (from u2): J 0.1961; beta on k=1 0.23, k=9 0.20; the read holds chi_1(a0) 0.137, chi_1(a1) 0.053, chi_1(b1) 0.008; held out, ranks 1..2 together, units at B 69 of 495; 19.4 s
+   rank 3 (from u1-iu2): J 0.1735; beta on k=1 0.27, k=9 0.48; the read holds chi_1(a0) 0.054, chi_1(a1) 0.067, chi_1(b1) 0.121; held out, ranks 1..3 together, units at B 84 of 495; 19.8 s
+   rank 4 (from u2): J 0.1497; beta on k=1 0.22, k=9 0.22; the read holds chi_1(a0) 0.132, chi_1(a1) 0.033, chi_1(b1) 0.002; held out, ranks 1..4 together, units at B 74 of 495; 20.3 s
+the sums' B cells (label region): cells 8986; the ring's pair on k=1 / k=9: u1 0.39/0.42, u2 0.47/0.45
+   rank 1 (from u1): J 0.5758; beta on k=1 0.40, k=9 0.43; the read holds chi_1(a0) 0.002, chi_1(a1) 0.022, chi_1(b1) 0.034; held out, ranks 1..1 together, units at B 44 of 495; 18.5 s
+   rank 2 (from u1-iu2): J 0.3703; beta on k=1 0.39, k=9 0.42; the read holds chi_1(a0) 0.006, chi_1(a1) 0.071, chi_1(b1) 0.002; held out, ranks 1..2 together, units at B 59 of 495; 18.8 s
+   rank 3 (from u1): J 0.2432; beta on k=1 0.44, k=9 0.39; the read holds chi_1(a0) 0.035, chi_1(a1) 0.061, chi_1(b1) 0.082; held out, ranks 1..3 together, units at B 58 of 495; 19.1 s
+   rank 4 (from u2): J 0.2369; beta on k=1 0.40, k=9 0.38; the read holds chi_1(a0) 0.102, chi_1(a1) 0.049, chi_1(b1) 0.019; held out, ranks 1..4 together, units at B 61 of 495; 19.5 s
+done in 72.7 s
+MEASURE exit=0 wall_s=73.0 peak_rss_kib=828608
