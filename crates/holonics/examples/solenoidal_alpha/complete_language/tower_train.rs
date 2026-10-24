@@ -11,7 +11,7 @@
 //! on its face.
 use super::*;
 use holonics::hnn::passage::{PassageDeclaration, PassageTree};
-use holonics::hnn::tower::{code_of, ContactLaw, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, COVECTOR_BITS, READ_BITS};
+use holonics::hnn::tower::{code_of, ContactLaw, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, COVECTOR_BITS, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
 use num_bigint::BigUint;
@@ -2074,23 +2074,21 @@ impl FormSearch {
 
 /// A pair form's values at every pair of the alphabet, `x̂_curᵀ W ŷ_prev`, released to below
 /// `2^16` the largest over the pairs the training text holds.
-fn form_table(w: &[Vec<i64>], cur: &[Vec<i64>], prev: &[Vec<i64>], keys: &[(usize, usize)]) -> std::result::Result<(PairTable, i32), String> {
-    let alphabet = cur.len();
-    let wide = form_values(w, cur, prev);
+fn form_table(w: &[Vec<i64>], tower: &Tower, keys: &[(usize, usize)]) -> std::result::Result<(PairTable, i32), String> {
+    let alphabet = tower.declaration.alphabet;
+    let wide = form_values(w, tower);
     let top = keys.iter().map(|&(prev, cur)| wide[prev * alphabet + cur].unsigned_abs()).max().unwrap_or(0);
     let shift = (128 - top.leading_zeros()).saturating_sub(16) as i32;
     Ok((form_table_at(&wide, alphabet, shift)?, shift))
 }
 
 /// A form's exact values `x̂ᵀ W ŷ` at every pair of the alphabet, the byte before (with the
-/// stream's start) by the current byte.
-fn form_values(w: &[Vec<i64>], cur: &[Vec<i64>], prev: &[Vec<i64>]) -> Vec<i128> {
-    prev.par_iter()
-        .flat_map_iter(|yh| {
-            let u: Vec<i128> = w.iter().map(|row| row.iter().zip(yh).map(|(&a, &b)| a as i128 * b as i128).sum()).collect();
-            cur.iter().map(move |xh| xh.iter().zip(&u).map(|(&a, &b)| a as i128 * b).sum::<i128>()).collect::<Vec<_>>()
-        })
-        .collect()
+/// stream's start) by the current byte, on the tower's encoding ([`ResidentPairFace::exact_values`]).
+fn form_values(w: &[Vec<i64>], tower: &Tower) -> Vec<i128> {
+    let d = &tower.declaration;
+    let opening: Vec<i32> = (0..d.alphabet).flat_map(|u| tower.encoding(u).to_vec()).collect();
+    let flat: Vec<i64> = w.iter().flatten().copied().collect();
+    ResidentPairFace::exact_values(d.alphabet, d.width, &opening, &flat)
 }
 
 /// A form's table: its values released by `shift`.
@@ -2193,7 +2191,8 @@ fn found_block(reading: &PairReading, block: usize) -> Result<FoundedBlock> {
     let line: Vec<String> = sums.iter().map(|(k, num, den)| format!("{k}:{}", thousandths_of(&(num * 1000), &(den * BigInt::from(tension_grain.max(1)))))).collect();
     println!("FOUND_FORM_SPECTRUM (leading_k:permille_of_tension, at the search grain) {} elapsed_ms={}", line.join(" "), started.elapsed().as_millis());
     let forms: Vec<Vec<Vec<i64>>> = directions.par_iter().map(|v| search.form(v)).collect();
-    let (tables, shifts): (Vec<PairTable>, Vec<i32>) = forms.par_iter().map(|w| form_table(w, &cur, &prev, &keys)).collect::<std::result::Result<Vec<_>, String>>()?.into_iter().unzip();
+    let tower = &reading.learner.tower;
+    let (tables, shifts): (Vec<PairTable>, Vec<i32>) = forms.par_iter().map(|w| form_table(w, tower, &keys)).collect::<std::result::Result<Vec<_>, String>>()?.into_iter().unzip();
     println!("FOUND_FORMS founded={} elapsed_ms={}", tables.len(), started.elapsed().as_millis());
     let unseen = |table: &PairTable| -> String {
         // The held-out pairs the training text never met, and the share of this coordinate's
@@ -2429,8 +2428,7 @@ impl PairBlock {
         if arriving.iter().any(|&c| c >= alphabet) {
             return Err(bad());
         }
-        let (cur, prev) = pair_hats(tower);
-        let hat = cur[0].len();
+        let hat = tower.declaration.width + 1;
         let (mut ws, mut shifts, mut tables) = (Vec::new(), Vec::new(), Vec::new());
         for _ in 0..forms {
             let words: Vec<i64> = lines.next().and_then(|l| l.strip_prefix("form ")).ok_or_else(bad)?.split(' ').map(|v| v.parse()).collect::<std::result::Result<_, _>>()?;
@@ -2439,7 +2437,7 @@ impl PairBlock {
             }
             let w: Vec<Vec<i64>> = words[1..].chunks(hat).map(|r| r.to_vec()).collect();
             let shift = words[0] as i32;
-            tables.push(form_table_at(&form_values(&w, &cur, &prev), alphabet, shift)?);
+            tables.push(form_table_at(&form_values(&w, tower), alphabet, shift)?);
             ws.push(w);
             shifts.push(shift);
         }
@@ -2624,6 +2622,368 @@ pub(super) fn sample_tower_block(args: &[String]) -> Result<()> {
         started.elapsed().as_millis()
     );
     println!("TOWER_SAMPLE_TEXT {:?}", String::from_utf8_lossy(&released));
+    Ok(())
+}
+
+/// The pairs `(class before, class arriving)` a training text read in `streams` contiguous streams
+/// meets, each stream opening at the start `A` (the training passes' cut, `fit`).
+fn met_pairs(text: &[u8], streams: usize, alphabet: usize) -> Result<std::collections::HashSet<(usize, usize)>> {
+    if streams == 0 || text.len() < streams {
+        return Err("a stream needs a byte".into());
+    }
+    let chunk = text.len() / streams;
+    let mut met = std::collections::HashSet::new();
+    for s in 0..streams {
+        let part = &text[s * chunk..(s + 1) * chunk];
+        met.insert((alphabet, part[0] as usize));
+        for w in part.windows(2) {
+            met.insert((w[0] as usize, w[1] as usize));
+        }
+    }
+    Ok(met)
+}
+
+/// `join-tower-pair-face STATE STATE_SHA BLOCK BLOCK_SHA TRAIN TRAIN_SHA STREAMS OUT`: the founded
+/// block's forms joined to the learner as its resident pair face ([`Tower::join_pair_face`]), the
+/// face's readout and lift opened at zero, written as `OUT/STATE.0` for the passes to continue.
+///
+/// [agent-inferred, October 24] The block joined beside the readout (`install-tower-pair-block`)
+/// reads the forms through a closed-form Brier fit and a mixture; joined to the learner they are
+/// read through learned material, `z += V c(p)` and `x⁰ = E(u) + P c(p)`, which the section's
+/// covector moves under the certified deposit. Beside the join, each form's largest value over the
+/// pairs the training text meets and over the pairs it never meets is printed: a form takes large
+/// values on unmet pairs whose leverage is large (GPT-6's extension witness,
+/// `|wᵀQQ⁺c*| ≤ √(wᵀQw) √(c*ᵀQ⁺c*)`), and the joined learner reads those pairs too. The face is
+/// the forms' face at every pair (no table of which contexts were seen); the held-out cells at
+/// unmet pairs are read apart by `read-tower-pair-cells`.
+pub(super) fn join_tower_pair_face(args: &[String]) -> Result<()> {
+    if args.len() != 9 {
+        return Err("join-tower-pair-face STATE STATE_SHA BLOCK BLOCK_SHA TRAIN TRAIN_SHA STREAMS OUT".into());
+    }
+    let started = Instant::now();
+    let state = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let mut learner = TowerLearner::from_text(std::str::from_utf8(&state)?).map_err(|e| e.to_string())?;
+    let block_text = pinned_read(&args[3], &args[4], STATE_BUDGET)?;
+    let block = PairBlock::from_text(std::str::from_utf8(&block_text)?, &learner.tower, &args[2])?;
+    let train = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let streams = count(&args[7])?;
+    let out = Path::new(&args[8]);
+    let d = learner.tower.declaration;
+    let opening: Vec<i32> = (0..d.alphabet).flat_map(|u| learner.tower.encoding(u).to_vec()).collect();
+    let forms: Vec<Vec<i64>> = block.forms.iter().map(|w| w.iter().flatten().copied().collect()).collect();
+    let face = ResidentPairFace::new(d.alphabet, d.width, opening, forms, block.shifts.clone()).map_err(|e| e.to_string())?;
+    // The face is the block's tables, pair by pair.
+    let k = face.forms();
+    for prev in 0..=d.alphabet {
+        for cur in 0..d.alphabet {
+            let c = face.at(prev, cur);
+            if (0..k).any(|v| c[v] as i64 != block.tables[v].value((prev, cur))) {
+                return Err("the pair face parts from the block's tables".into());
+            }
+        }
+    }
+    let met = met_pairs(&train, streams, d.alphabet)?;
+    let pairs = (d.alphabet + 1) * d.alphabet;
+    println!("PAIR_FACE forms={k} pairs={pairs} met={} unmet={} agrees_with_block=true elapsed_ms={}", met.len(), pairs - met.len(), started.elapsed().as_millis());
+    let mut line = Vec::new();
+    for v in 0..k {
+        let (mut on_met, mut on_unmet, mut past) = (0u32, 0u32, 0usize);
+        for prev in 0..=d.alphabet {
+            for cur in 0..d.alphabet {
+                let c = face.at(prev, cur)[v].unsigned_abs();
+                if met.contains(&(prev, cur)) {
+                    on_met = on_met.max(c);
+                } else {
+                    on_unmet = on_unmet.max(c);
+                }
+            }
+        }
+        for prev in 0..=d.alphabet {
+            for cur in 0..d.alphabet {
+                past += (!met.contains(&(prev, cur)) && face.at(prev, cur)[v].unsigned_abs() > on_met) as usize;
+            }
+        }
+        line.push(format!("{}:{on_met}:{on_unmet}:{past}", v + 1));
+    }
+    println!("PAIR_FACE_REACH (form:max|c|_met:max|c|_unmet:unmet_pairs_past_the_met_max, on 2^-16) {}", line.join(" "));
+    learner.join_pair_face(face).map_err(|e| e.to_string())?;
+    std::fs::create_dir(out)?;
+    let text = learner.to_text();
+    write_new(&out.join("STATE.0"), text.as_bytes())?;
+    println!("PAIR_FACE_JOINED material={} state_bytes={} state_sha256={} elapsed_ms={}", learner.tower.theta.len(), text.len(), sha256(text.as_bytes())?, started.elapsed().as_millis());
+    Ok(())
+}
+
+/// `read-tower-pair-cells STATE STATE_SHA TRAIN TRAIN_SHA TRAIN_STREAMS DEV DEV_SHA DEV_ROLES
+/// DEV_ROLES_SHA STREAMS`: the held-out reading (`held_out`, `STREAMS` parts each from rest) split
+/// by whether each cell's pair `(class before, class arriving)` is one the training text meets in
+/// its `TRAIN_STREAMS` streams (`met_pairs`): per region, the cells and bits a byte of each side.
+/// A reading of any tower, with or without a pair face, so a joined tower and its foil are read
+/// alike.
+pub(super) fn read_tower_pair_cells(args: &[String]) -> Result<()> {
+    if args.len() != 11 {
+        return Err("read-tower-pair-cells STATE STATE_SHA TRAIN TRAIN_SHA TRAIN_STREAMS DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS".into());
+    }
+    let started = Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let met = met_pairs(&train, count(&args[5])?, tower.declaration.alphabet)?;
+    let dev = pinned_read(&args[6], &args[7], READ_BUDGET as usize)?;
+    let roles = roles_of(&args[8], &args[9], dev.len())?;
+    let streams = count(&args[10])?;
+    let classes: Vec<usize> = dev.iter().map(|&b| b as usize).collect();
+    let chunk = classes.len().div_ceil(streams);
+    let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
+    // Per region, (met code, met cells, unmet code, unmet cells).
+    let parts: Vec<[(i64, usize, i64, usize); 4]> = starts
+        .par_iter()
+        .map(|&start| {
+            let part = &classes[start..(start + chunk).min(classes.len())];
+            let mut state = tower.rest();
+            let codes = tower.read_cells(&mut state, part).map_err(|e| e.to_string())?;
+            let mut regions = [(0i64, 0usize, 0i64, 0usize); 4];
+            for (i, code) in codes.into_iter().enumerate() {
+                let prev = if i == 0 { tower.declaration.alphabet } else { part[i - 1] };
+                let r = &mut regions[roles[start + i + 1] as usize];
+                if met.contains(&(prev, part[i])) {
+                    r.0 += code;
+                    r.1 += 1;
+                } else {
+                    r.2 += code;
+                    r.3 += 1;
+                }
+            }
+            Ok(regions)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let mut regions = [(0i64, 0usize, 0i64, 0usize); 4];
+    for part in parts {
+        for (r, p) in regions.iter_mut().zip(part) {
+            *r = (r.0 + p.0, r.1 + p.1, r.2 + p.2, r.3 + p.3);
+        }
+    }
+    let all = regions.iter().fold((0i64, 0usize, 0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1, a.2 + r.2, a.3 + r.3));
+    let line: Vec<String> = PAIR_REGIONS
+        .iter()
+        .zip(&regions)
+        .chain(std::iter::once((&"all", &all)))
+        .map(|(name, r)| format!("{name}=met:{}:{} unmet:{}:{}", r.1, per(r.0, r.1), r.3, per(r.2, r.3)))
+        .collect();
+    println!("PAIR_CELLS (region=met:cells:bits_a_byte unmet:cells:bits_a_byte) {} elapsed_ms={}", line.join(" "), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// `read-tower-pair-leverage STATE STATE_SHA TRAIN TRAIN_SHA TRAIN_STREAMS DEV DEV_SHA DEV_ROLES
+/// DEV_ROLES_SHA STREAMS STRIDE`: the leverage of each held-out reading against the training
+/// text's exact Gram of what the readout reads, `x = (top, 1, c(pair))` (the top face, the bias's
+/// coordinate, and the pair face's values when the tower carries one).
+///
+/// [agent-inferred with the mathematics thread, October 24; its effective-tension record §9] The
+/// training text read in its `TRAIN_STREAMS` streams gives `G = Σ x xᵀ` exactly. Its fraction-free
+/// elimination in the order face, bias, pair face keeps each row as it stood at its pivot; one
+/// forward pass of a reading over those rows gives the border entries `Γ_k`, and
+/// `h = Σ Γ_k²/(Δ_(k−1)Δ_k) = −corner/Δ_r`. A passed (zero) pivot with a nonzero border entry is
+/// an open part of the reading, a direction no training cell fixed: it is carried as
+/// `(coordinate, β_p, Δ_before)` (`ρ_p = β_p/Δ_before` keeps its sign and scale), never refused,
+/// and wherever one is carried `h` is the supported chart's part only.
+/// For every readout form `w`, `|wᵀv_s|² ≤ (wᵀGw)·h`, so `h` bounds how far a reading's value can
+/// sit from what the training cells fixed; in range, the readout's mean square error at the
+/// reading is `σ²(1 + h)`. `h` splits at the bias into the face's part and the pair face's part
+/// given the face. Held-out cells at pairs the training text never meets are all read; the others
+/// at every `STRIDE`th cell. Each `h` is written against the average training cell's leverage,
+/// `rank/N` (the training cells' own leverages sum to the rank).
+pub(super) fn read_tower_pair_leverage(args: &[String]) -> Result<()> {
+    use num_bigint::BigInt;
+    use num_traits::{One, Zero};
+    if args.len() != 12 {
+        return Err("read-tower-pair-leverage STATE STATE_SHA TRAIN TRAIN_SHA TRAIN_STREAMS DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS STRIDE".into());
+    }
+    let started = Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let (a, w) = (tower.declaration.alphabet, tower.declaration.width);
+    let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let train_streams = count(&args[5])?;
+    let met = met_pairs(&train, train_streams, a)?;
+    let dev = pinned_read(&args[6], &args[7], READ_BUDGET as usize)?;
+    let roles = roles_of(&args[8], &args[9], dev.len())?;
+    let streams = count(&args[10])?;
+    let stride = count(&args[11])?;
+    let k = tower.pair_face().map_or(0, |face| face.forms());
+    let dim = w + 1 + k;
+    let fill = |v: &mut [i64], top: &[i32], prev: usize, cur: usize| {
+        for (slot, &t) in v[..w].iter_mut().zip(top) {
+            *slot = t as i64;
+        }
+        v[w] = 1;
+        if let Some(face) = tower.pair_face() {
+            for (slot, &c) in v[w + 1..].iter_mut().zip(face.at(prev, cur)) {
+                *slot = c as i64;
+            }
+        }
+    };
+    // The training Gram, stream by stream (each from rest, as the passes read it), upper rows.
+    let chunk = train.len() / train_streams;
+    let grams: Vec<(Vec<i128>, usize)> = (0..train_streams)
+        .into_par_iter()
+        .map(|s| {
+            let part: Vec<usize> = train[s * chunk..(s + 1) * chunk].iter().map(|&b| b as usize).collect();
+            let mut g = vec![0i128; dim * dim];
+            let mut v = vec![0i64; dim];
+            let mut cells = 0usize;
+            let mut state = tower.rest();
+            tower
+                .read_faces(&mut state, &part, |i, top, _| {
+                    fill(&mut v, top, if i == 0 { a } else { part[i - 1] }, part[i]);
+                    for p in 0..dim {
+                        let vp = v[p] as i128;
+                        if vp != 0 {
+                            for (slot, &vq) in g[p * dim + p..(p + 1) * dim].iter_mut().zip(&v[p..]) {
+                                *slot += vp * vq as i128;
+                            }
+                        }
+                    }
+                    cells += 1;
+                    Ok(())
+                })
+                .map_err(|e| e.to_string())?;
+            Ok((g, cells))
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let mut gram = vec![0i128; dim * dim];
+    let mut cells = 0usize;
+    for (g, n) in grams {
+        for (slot, x) in gram.iter_mut().zip(g) {
+            *slot = slot.checked_add(x).ok_or("the training Gram outgrew its 128-bit carrier")?;
+        }
+        cells += n;
+    }
+    let mut m = Upper::from_gram(&gram, dim);
+    let order: Vec<usize> = (0..dim).collect();
+    let (last, rank) = m.eliminate(&order, &[], BigInt::one(), &|_, _| false)?;
+    // Each pivot's predecessor (the last nonzero pivot before it), and the face's last pivot.
+    let mut prevs = vec![BigInt::one(); dim];
+    let mut before = BigInt::one();
+    let mut face_last = BigInt::one();
+    for p in 0..dim {
+        prevs[p] = before.clone();
+        if !m.get(p, p).is_zero() {
+            before = m.get(p, p).clone();
+        }
+        if p == w {
+            face_last = before.clone();
+        }
+    }
+    let passed = (0..dim).filter(|&p| m.get(p, p).is_zero()).count();
+    println!(
+        "LEVERAGE_GRAM state_sha256={} chart=(top,1,c(pair)) cells={cells} dim={dim} forms={k} rank={rank} passed_pivots={passed} face_last_pivot_bits={} last_pivot_bits={} elapsed_ms={}",
+        args[2],
+        face_last.bits(),
+        last.bits(),
+        started.elapsed().as_millis()
+    );
+    // A reading's (−corner at the face's last pivot, −corner, open parts `(p, β_p)`).
+    let forward = |x: &[i64]| -> (BigInt, BigInt, Vec<(usize, BigInt)>) {
+        let mut xs: Vec<BigInt> = x.iter().map(|&t| BigInt::from(t)).collect();
+        let (mut corner, mut corner_face, mut open) = (BigInt::zero(), BigInt::zero(), Vec::new());
+        for p in 0..dim {
+            let piv = m.get(p, p);
+            if piv.is_zero() {
+                if !xs[p].is_zero() {
+                    open.push((p, xs[p].clone()));
+                }
+            } else {
+                let g = xs[p].clone();
+                for i in p + 1..dim {
+                    xs[i] = (piv * &xs[i] - m.get(p, i) * &g) / &prevs[p];
+                }
+                corner = (piv * &corner - &g * &g) / &prevs[p];
+            }
+            if p == w {
+                corner_face = corner.clone();
+            }
+        }
+        (-corner_face, -corner, open)
+    };
+    // The held-out parts, each from rest: per sampled cell, (met, region, code, −corner_face, −corner, open).
+    let classes: Vec<usize> = dev.iter().map(|&b| b as usize).collect();
+    let part_len = classes.len().div_ceil(streams);
+    let starts: Vec<usize> = (0..classes.len()).step_by(part_len).collect();
+    type Read = (bool, usize, i64, BigInt, BigInt, Vec<(usize, BigInt)>);
+    let reads: Vec<Vec<Read>> = starts
+        .par_iter()
+        .map(|&start| {
+            let part = &classes[start..(start + part_len).min(classes.len())];
+            let mut state = tower.rest();
+            let codes = tower.read_cells(&mut state, part).map_err(|e| e.to_string())?;
+            let mut state = tower.rest();
+            let mut v = vec![0i64; dim];
+            let mut out = Vec::new();
+            tower
+                .read_faces(&mut state, part, |i, top, _| {
+                    let prev = if i == 0 { a } else { part[i - 1] };
+                    let is_met = met.contains(&(prev, part[i]));
+                    if !is_met || (start + i) % stride == 0 {
+                        fill(&mut v, top, prev, part[i]);
+                        let (face_part, whole, open) = forward(&v);
+                        out.push((is_met, roles[start + i + 1] as usize, codes[i], face_part, whole, open));
+                    }
+                    Ok(())
+                })
+                .map_err(|e| e.to_string())?;
+            Ok(out)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let reads: Vec<Read> = reads.into_iter().flatten().collect();
+    // Written against the average training cell's leverage rank/N: a reading's h/(rank/N), on the
+    // common denominators Δ_face and Δ_r.
+    let unit_whole = &last * BigInt::from(rank);
+    let unit_face = &face_last * BigInt::from(rank);
+    let n_train = BigInt::from(cells);
+    for (side, want) in [("met_sampled", true), ("unmet", false)] {
+        let mut chosen: Vec<&Read> = reads.iter().filter(|r| r.0 == want).collect();
+        let n = chosen.len();
+        if n == 0 {
+            println!("LEVERAGE side={side} cells=0");
+            continue;
+        }
+        let code: i64 = chosen.iter().map(|r| r.2).sum();
+        let sum_whole: BigInt = chosen.iter().map(|r| r.4.clone()).sum();
+        let sum_face: BigInt = chosen.iter().map(|r| r.3.clone()).sum();
+        let open = chosen.iter().filter(|r| !r.5.is_empty()).count();
+        // A few open parts as they stand: the coordinate (face j, the bias, or form v) and ρ_p.
+        let name = |p: usize| if p < w { format!("face{p}") } else if p == w { "bias".into() } else { format!("form{}", p - w) };
+        let rows: Vec<String> = chosen
+            .iter()
+            .flat_map(|r| r.5.iter())
+            .take(4)
+            .map(|(p, beta)| format!("{}:{}", name(*p), thousandths_of(beta, &prevs[*p])))
+            .collect();
+        chosen.sort_by(|x, y| x.4.cmp(&y.4));
+        let median = &chosen[n / 2].4;
+        let max = &chosen[n - 1].4;
+        let nb = BigInt::from(n);
+        // Σ h_pool = Σ(−corner)/Δ_r − Σ(−corner_face)/Δ_face.
+        let pool = &sum_whole * &face_last - &sum_face * &last;
+        let regions: Vec<String> = PAIR_REGIONS
+            .iter()
+            .enumerate()
+            .map(|(r, name)| format!("{name}:{}", chosen.iter().filter(|c| c.1 == r).count()))
+            .collect();
+        println!(
+            "LEVERAGE side={side} cells={n} ({}) bits_a_byte={} mean_h_over_training_mean={} median={} max={} face_part_mean={} pair_part_mean={} cells_with_an_open_part={open} open_rows(coordinate:rho)=[{}] elapsed_ms={}",
+            regions.join(" "),
+            per(code, n),
+            thousandths_of(&(&sum_whole * &n_train), &(&unit_whole * &nb)),
+            thousandths_of(&(median * &n_train), &unit_whole),
+            thousandths_of(&(max * &n_train), &unit_whole),
+            thousandths_of(&(&sum_face * &n_train), &(&unit_face * &nb)),
+            thousandths_of(&(&pool * &n_train), &(&unit_whole * &face_last * &nb)),
+            rows.join(" "),
+            started.elapsed().as_millis()
+        );
+    }
     Ok(())
 }
 
