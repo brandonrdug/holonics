@@ -634,6 +634,90 @@ while it reads true text, the medium jumps in its writing arise where it reads i
 which this reading of true text cannot see [agent-inferred]. The next loop founds a face the tension
 itself chooses and checks it by code length on the held-out text.
 
+## The floor under the tension
+
+`tr S` mixes two things: what no face could ever bridge (the text's own floor, which a predictor
+holding the true conditional still pays) and what a face the tower does not have yet could bridge.
+The mathematics thread split them with two exterior references, never faces of the machine
+([its record](2026-10-24_WHAT_A_CONTACT_CANNOT_BRIDGE_IS_ITS_EFFECTIVE_TENSION_AND_THE_TENSION_FOUNDS_THE_FACE_THAT_CARRIES_IT.md),
+§7): a count model of the last bytes, and the linear face of the last bytes' encodings. If the two
+agree, a new mode suffices; if the count model knows much more, the missing difference is a
+conjunction, which only a pair contact carries.
+
+**What is read** (`read-tower-floor`, [agent-inferred, October 24]).
+- The count model is Witten–Bell interpolation of the bytes that followed each context of up to six
+  bytes in the training text, down to the byte counts, exact on `2^(−48)` and read on `2^(−24)`. On
+  the held-out text it counts the training text. On the training text it counts it with the cell's
+  own arrival deleted, so both of its readings are out of sample.
+- The linear reference is `E(u_t), E(u_(t−1)), E(u_(t−2))`, the tower's own encodings of the last
+  three bytes (`Tower::encoding`, the face the bottom level reads), eliminated after the face one
+  block at a time. Beside them: the order-3 count model's prediction as a candidate face, and the
+  foil, the encoding of a byte half a stream away.
+- The drops are read on the training text. Its 1.8 million cells keep 64 coordinates from removing
+  more than a ten-thousandth of the tension by chance; the held-out text's twelve thousand cells a
+  medium would let a few hundred coordinates remove about 2% by chance, the size of the signal.
+- The covector and the count model are read on the 171 classes that arrive in the training text.
+  The others carry under a thousandth of the Brier score.
+
+**The first split: the tower against the count model, held out.** Brier per cell, the count model
+at orders 3 to 6 (orders 0 to 2 are in the receipt):
+
+| part | tower | order 3 | order 4 | order 5 | order 6 |
+|---|---|---|---|---|---|
+| prose | 0.708 | 0.696 | 0.647 | 0.636 | 0.646 |
+| Lean | 0.591 | 0.591 | 0.511 | 0.475 | 0.460 |
+| Rust | 0.530 | 0.565 | 0.491 | 0.467 | 0.459 |
+| digits | 0.655 | 0.735 | 0.734 | 0.748 | 0.743 |
+| line starts | 0.843 | 0.836 | 0.844 | 0.876 | 0.951 |
+| all | 0.621 | 0.647 | 0.596 | 0.581 | 0.577 |
+
+On the training text with deleted counts the same pattern holds: 0.581 for the tower over all
+against 0.496 at order 6; prose 0.614 against 0.498, Lean 0.579 against 0.430, Rust 0.521 against
+0.408; digits 0.653 against at best 0.735 (order 3); line starts 0.765 against at best 0.753
+(order 4).
+
+**The second split: the linear face against the conjunction, on the training text.** Drops in
+thousandths of the tension (`tr S` = 0.576 per cell, 991.7‰ of the Brier score):
+
+| face read after the tower's face | drop (‰ of the tension) |
+|---|---|
+| foil, the encoding of a byte half a stream away | 0.07 |
+| `E(u_t)` | 3.99 |
+| then `E(u_(t−1))` | 2.15 |
+| then `E(u_(t−2))` | 1.04 |
+| the three encodings together | 7.18 |
+| the order-3 count model's prediction alone | 29.93 |
+| the count model after the three encodings | stopped at the deadline; at least 22.75 |
+
+The last step did not finish inside its deadline (below). Reading a face after others removes at
+least what it removes alone, less what the others removed, so the conjunction past the linear face
+removes at least `29.93 − 7.18 = 22.75`.
+
+**What it says.**
+- In prose, Lean and Rust the tower's error is not the text's floor. A count of the last five or
+  six bytes leaves 0.07 to 0.13 less Brier per cell on text neither has seen: 10% of the tower's
+  error in prose, 22% in Lean, 13% in Rust.
+- That missing part is a conjunction of recent bytes. The count model of the last three bytes
+  carries four times what the linear face of the same three bytes' encodings carries. A new mode
+  driven by the encodings, which is linear in them, would close little of it. A pair face over
+  recent encodings is what the founding should build.
+- In the digits and at line starts the tension is not in the last bytes. The tower already beats
+  every count order on the digits (0.655 against 0.734 at best), and at line starts the two are
+  level. What decides a digit lies further back (the operands), and what decides how a line starts
+  lies in the lines before it. This is what the mathematics thread predicted: the operands'
+  cheap-ring faces for digits, the newline's clock for line ends [agent-inferred; the founding test
+  decides each].
+
+The next loop founds a pair face on the last bytes' encodings, chosen by the tension (the leading
+directions of the pool of their products, the mathematics thread's reduced-rank rule), and checks
+it by code length on the held-out text.
+
+**The run.** The projection came from a 4,792-cell slice, whose text has 106 classes. The full
+training text has 171, so the count block was 1.6 times as wide as projected and its eliminations
+ran past the projection, while the read was faster (224 s against 336). The run stopped at its
+600-second deadline in the last step and was not run again with a larger one; that step's reading
+is the bound above.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -683,6 +767,10 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `TENSION_DEV_cont.txt` and `TENSION_DEV_big.txt` (the held-out text through each tower),
   `TENSION_DEV_cont_starts.txt` and `TENSION_TRAIN_cont.txt` (line starts and the region added,
   held out and on the training text).
+- The floor: `FLOOR_SLICE_1.txt` (the timing slice with all 256 count coordinates, stopped at its
+  deadline), `FLOOR_SLICE_2.txt` and `FLOOR_SLICE_3.txt` (the arriving classes only, then with the
+  chains run together: every reading identical), and `FLOOR_FULL.txt` (the training and held-out
+  text, stopped at its deadline in the last step).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -690,4 +778,5 @@ The binaries are `arith22` for the first two towers' training and writing (SHA-2
 `arith23` for their repaired reads and the pair towers' training (`cb2ea60a…`), and `arith24` for
 the located reads, the pair towers' reads and writing, and the rungs (`a3cc250c…`). The tension
 reads use `tension1` (`5295f6c6…`, the timing slice and the first held-out reads) and `tension2`
-(`c25dda3f…`, with line starts and the region).
+(`c25dda3f…`, with line starts and the region). The floor reads use `floor1` (`4480bbcb…`),
+`floor2` (`79266042…`) and `floor3` (`e0edd479…`, the last slice and the full text).

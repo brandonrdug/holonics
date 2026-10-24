@@ -804,6 +804,7 @@ pub(super) fn run_with_execution(
         Some("read-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_pair(args),
         Some("read-tower-faces") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_faces(args),
         Some("read-tower-tension") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_tension(args),
+        Some("read-tower-floor") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_floor(args),
         Some("train-duplex") if backend == CompleteLanguageTrainingBackend::HostReference => duplex_train::train(args),
         Some("read-lines-duplex") if backend == CompleteLanguageTrainingBackend::HostReference => duplex_train::read_lines(args),
         Some("train-native" | "sample-native") => Err("the native route's commands are host-owned; no CUDA fallback".into()),

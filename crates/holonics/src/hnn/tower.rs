@@ -2132,6 +2132,14 @@ impl Tower {
         Ok(codes)
     }
 
+    /// The class's face `E(u)`, the encoding the bottom level reads (`x⁰_t = E(u_t)`), on
+    /// `2^(−16)`.
+    pub fn encoding(&self, u: usize) -> &[i32] {
+        let w = self.declaration.width;
+        let e = self.layout.encoding + u * w;
+        &self.theta[e..e + w]
+    }
+
     /// [agent-inferred with the mathematics thread, October 24] **The tension reading**: the
     /// frozen tower reads `classes` from the state, and each cell's [`TensionCell`] (its face
     /// compared with the class that arrives next) is handed to `each`. A reading beside the code:

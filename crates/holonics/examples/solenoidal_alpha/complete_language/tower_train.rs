@@ -465,6 +465,453 @@ fn tension_part(layout: &TensionLayout, name: &str, gram: &[i128], cells: usize,
     Ok(())
 }
 
+
+/// `read-tower-floor STATE STATE_SHA TRAIN TRAIN_SHA TRAIN_ROLES TRAIN_ROLES_SHA DEV DEV_SHA
+/// DEV_ROLES DEV_ROLES_SHA STREAMS ORDER`: how much of the tension a frozen tower leaves is the
+/// text's floor and how much a new face could still carry, read against two exterior references
+/// (the mathematics thread's split of October 24): a count model of the last bytes, and the linear
+/// face of the last `ORDER` bytes' encodings.
+///
+/// [agent-inferred, October 24] The count model is an exterior reader, never a face of the
+/// machine: the bytes that followed each context of `j ≤ 2·ORDER` bytes in the training text,
+/// interpolated from the longest context down (Witten–Bell: a context that has been followed by
+/// `n` distinct bytes in `C` arrivals keeps `n/(C + n)` for the order below) to the training
+/// text's byte counts, on `2^(−48)` rounded to nearest at each order and read on `2^(−24)`, the
+/// covector's grain. On the held-out text it counts the training text; on the training text it
+/// counts it with the cell's own arrival deleted (the deleted estimate), so both of its Brier
+/// scores are out of sample. Its Brier per region beside the tower's is the first split: what a
+/// conjunction of the last bytes knows that the tower does not.
+///
+/// The second split is read on the training text, whose 1.8 million cells keep a face of a few
+/// hundred coordinates from removing more than a thousandth of the tension by chance (the held-out
+/// text's twelve thousand cells a medium would let it remove about 2% by chance, the size of the
+/// signal). Each cell `v = (top, 1, E(u_t), …, E(u_(t−ORDER+1)), p_ORDER, foil, dz)` deposits
+/// `v vᵀ` into one joint Gram, exact in `i128` (the covector's off-diagonal entries are not kept:
+/// only its trace and diagonal are read). After the face's elimination the encodings are eliminated
+/// one block at a time (the drop of the linear face of the last `k` bytes, what a new mode driven
+/// by the encodings could carry), then the count model's prediction (the conjunction past that
+/// linear face); separately the count model alone, and the foil (the encoding of the byte half a
+/// stream away). Per class, the drops of its own tension `S_aa` say which contrasts a mode could
+/// carry and which only a conjunction.
+pub(super) fn read_tower_floor(args: &[String]) -> Result<()> {
+    if args.len() != 13 {
+        return Err("read-tower-floor STATE STATE_SHA TRAIN TRAIN_SHA TRAIN_ROLES TRAIN_ROLES_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS ORDER".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let train_roles = roles_of(&args[5], &args[6], train.len())?;
+    let dev = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let dev_roles = roles_of(&args[9], &args[10], dev.len())?;
+    let streams = count(&args[11])?;
+    let order = count(&args[12])?;
+    if order == 0 || 2 * order > 7 {
+        return Err("the reference order must be between one and three (contexts of up to seven bytes are keyed in 64 bits)".into());
+    }
+    let tower = &learner.tower;
+    let (w, a) = (tower.declaration.width, tower.declaration.alphabet);
+    let cut = |text: &[u8]| -> Vec<Vec<usize>> {
+        let chunk = text.len().div_ceil(streams.max(1));
+        text.chunks(chunk).map(|s| s.iter().map(|&b| b as usize).collect()).collect()
+    };
+    let (train_streams, dev_streams) = (cut(&train), cut(&dev));
+    let followers = Followers::count(&train_streams, 2 * order, a);
+    println!(
+        "FLOOR_COUNTS contexts_per_order={} seen_classes={} counted_ms={}",
+        followers.orders.iter().map(|o| o.len().to_string()).collect::<Vec<_>>().join(","),
+        followers.seen.len(),
+        started.elapsed().as_millis()
+    );
+    // The Brier scores, per part: the tower's and the count model's at each order. The held-out
+    // text is read here; the training text beside its Gram, below.
+    let names = ["prose", "lean", "rust", "digits", "starts", "all"];
+    let top = 2 * order;
+    let chunk = dev_roles.len().div_ceil(streams.max(1));
+    let held_out: Vec<BrierParts> = dev_streams
+        .par_iter()
+        .enumerate()
+        .map(|(s, classes)| {
+            let mut parts = BrierParts::new(top);
+            let mut state = tower.rest();
+            let mut ps = vec![vec![0u128; a]; top + 1];
+            let mut i = 0usize;
+            tower.read_tension(&mut state, classes, |cell| {
+                followers.predict(classes, i, false, &mut ps);
+                parts.add(&followers, &cell, &ps, classes, i, dev_roles[s * chunk + i + 1] as usize);
+                i += 1;
+                Ok(())
+            })
+            .map_err(|e| e.to_string())?;
+            Ok(parts)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    BrierParts::print("held_out", &names, &held_out, started);
+    // The joint Gram on the training text, the whole, with the deleted count model's Brier.
+    let layout = FloorLayout { w, a, order };
+    let dim = layout.dim();
+    let chunk = train_roles.len().div_ceil(streams.max(1));
+    let grams: Vec<(Vec<i128>, u128, usize, BrierParts)> = train_streams
+        .par_iter()
+        .enumerate()
+        .map(|(s, classes)| {
+            let mut gram = vec![0i128; dim * dim];
+            let (mut bound, mut n) = (0u128, 0usize);
+            let mut parts = BrierParts::new(top);
+            let mut state = tower.rest();
+            let mut ps = vec![vec![0u128; a]; top + 1];
+            let mut v = vec![0i64; dim];
+            let mut nz: Vec<usize> = Vec::with_capacity(dim);
+            let half = classes.len().saturating_sub(1) / 2;
+            let cells = classes.len().saturating_sub(1);
+            let cov = layout.covector();
+            // The cross moments are kept for the coordinates the eliminations read: every one but
+            // the covector of a class that never arrives, whose diagonal alone is kept.
+            let mut crossed = vec![true; dim];
+            for c in cov.clone() {
+                crossed[c] = false;
+            }
+            for &c in &followers.seen {
+                crossed[cov.start + c] = true;
+            }
+            let mut i = 0usize;
+            tower.read_tension(&mut state, classes, |cell| {
+                followers.predict(classes, i, true, &mut ps);
+                parts.add(&followers, &cell, &ps, classes, i, train_roles[s * chunk + i + 1] as usize);
+                let foil = classes[(i + half) % cells.max(1)];
+                layout.fill(&mut v, tower, &cell, classes, i, &ps[order], foil);
+                let reach = v.iter().map(|x| x.unsigned_abs() as u128).max().unwrap_or(0);
+                bound = bound.saturating_add(reach * reach);
+                n += 1;
+                nz.clear();
+                for r in 0..dim {
+                    if v[r] == 0 {
+                        continue;
+                    }
+                    if crossed[r] {
+                        nz.push(r);
+                    } else {
+                        gram[r * dim + r] += v[r] as i128 * v[r] as i128;
+                    }
+                }
+                for (x, &r) in nz.iter().enumerate() {
+                    let vr = v[r] as i128;
+                    let row = &mut gram[r * dim..(r + 1) * dim];
+                    if cov.contains(&r) {
+                        row[r] += vr * vr;
+                        continue;
+                    }
+                    for &c in &nz[x..] {
+                        row[c] += vr * v[c] as i128;
+                    }
+                }
+                i += 1;
+                Ok(())
+            })
+            .map_err(|e| e.to_string())?;
+            if bound >= 1u128 << 126 {
+                return Err("a floor Gram outgrew its 128-bit carrier".to_string());
+            }
+            Ok((gram, bound, n, parts))
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let mut gram = vec![0i128; dim * dim];
+    let (mut bound, mut cells) = (0u128, 0usize);
+    let mut training = Vec::with_capacity(grams.len());
+    for (g, b, n, parts) in grams {
+        bound = bound.checked_add(b).filter(|&b| b < 1u128 << 126).ok_or("a floor Gram outgrew its 128-bit carrier")?;
+        cells += n;
+        for (slot, x) in gram.iter_mut().zip(&g) {
+            *slot += x;
+        }
+        training.push(parts);
+    }
+    BrierParts::print("training_deleted", &names, &training, started);
+    println!("FLOOR_READ cells={cells} streams={streams} dim={dim} read_ms={}", started.elapsed().as_millis());
+    floor_chains(&layout, &gram, cells, &followers.seen, started)
+}
+
+/// The Brier scores of one stream, per part (the four regions, the line starts, the whole): the
+/// tower's (`tr T`, `Σ dz²` on `2^(−48)`), the count model's at each order, and the cells.
+struct BrierParts {
+    parts: Vec<(i128, Vec<i128>, usize)>,
+}
+
+impl BrierParts {
+    fn new(top: usize) -> Self {
+        Self { parts: (0..6).map(|_| (0i128, vec![0i128; top + 1], 0usize)).collect() }
+    }
+
+    /// Cell `i`, read after `classes[i]` at `classes[i + 1]`, of `role` (the arriving class's
+    /// region): into its region, the whole, and the line starts when it reads a line feed.
+    fn add(&mut self, followers: &Followers, cell: &holonics::hnn::tower::TensionCell, ps: &[Vec<u128>], classes: &[usize], i: usize, role: usize) {
+        let target = classes[i + 1];
+        let tower: i128 = cell.covector.iter().map(|&x| x as i128 * x as i128).sum();
+        let start_of_line = classes[i] == b'\n' as usize;
+        for p in [role, 5].into_iter().chain(start_of_line.then_some(4)) {
+            let part = &mut self.parts[p];
+            part.0 += tower;
+            for (slot, prediction) in part.1.iter_mut().zip(ps) {
+                *slot += followers.brier(prediction, target);
+            }
+            part.2 += 1;
+        }
+    }
+
+    fn print(label: &str, names: &[&str], streams: &[BrierParts], started: std::time::Instant) {
+        for (p, name) in names.iter().enumerate() {
+            let top = streams.first().map_or(0, |s| s.parts[p].1.len());
+            let (mut tower, mut counts, mut n) = (0i128, vec![0i128; top], 0usize);
+            for stream in streams {
+                tower += stream.parts[p].0;
+                for (slot, x) in counts.iter_mut().zip(&stream.parts[p].1) {
+                    *slot += x;
+                }
+                n += stream.parts[p].2;
+            }
+            if n == 0 {
+                continue;
+            }
+            let unit = num_bigint::BigInt::from(n) << 48;
+            let orders: Vec<String> = counts.iter().enumerate().map(|(j, x)| format!("order{j}={}", thousandths_of(&num_bigint::BigInt::from(*x), &unit))).collect();
+            println!("FLOOR_BRIER text={label} part={name} cells={n} tower={} {} elapsed_ms={}", thousandths_of(&num_bigint::BigInt::from(tower), &unit), orders.join(" "), started.elapsed().as_millis());
+        }
+    }
+}
+
+/// The bytes that followed each context of a text, per order, and the bytes it contains.
+struct Followers {
+    /// `orders[j]`: a context of `j` bytes (keyed by its bytes, the last lowest) → the bytes that
+    /// followed it with their counts, and their total.
+    orders: Vec<std::collections::HashMap<u64, (Vec<(u8, u32)>, u32)>>,
+    /// The classes the text contains, the only ones a count gives mass.
+    seen: Vec<usize>,
+}
+
+impl Followers {
+    /// The context of `j` bytes ending at cell `i`.
+    fn key(classes: &[usize], i: usize, j: usize) -> u64 {
+        classes[i + 1 - j..=i].iter().fold(0u64, |k, &c| (k << 8) | c as u64)
+    }
+
+    fn count(streams: &[Vec<usize>], top: usize, a: usize) -> Self {
+        let mut orders: Vec<std::collections::HashMap<u64, (Vec<(u8, u32)>, u32)>> = (0..=top).map(|_| std::collections::HashMap::new()).collect();
+        for s in streams {
+            for i in 0..s.len().saturating_sub(1) {
+                let next = s[i + 1] as u8;
+                for (j, order) in orders.iter_mut().enumerate().take(top.min(i + 1) + 1) {
+                    let entry = order.entry(Self::key(s, i, j)).or_insert_with(|| (Vec::new(), 0));
+                    match entry.0.iter_mut().find(|(b, _)| *b == next) {
+                        Some(slot) => slot.1 += 1,
+                        None => entry.0.push((next, 1)),
+                    }
+                    entry.1 += 1;
+                }
+            }
+        }
+        let seen = orders[0].get(&0).map(|(f, _)| f.iter().map(|&(b, _)| b as usize).filter(|&b| b < a).collect::<Vec<_>>()).unwrap_or_default();
+        let mut seen = seen;
+        seen.sort_unstable();
+        Self { orders, seen }
+    }
+
+    /// The count model's prediction after cell `i` at each order `j < ps.len()`, on `2^(−48)`:
+    /// `p_0(b) = c(b)/C`; `p_j(b) = (c_j(b) + n_j p_(j−1)(b))/(C_j + n_j)`, the order below where
+    /// the context is shorter than `j` or was never followed. `deleted`: the cell's own arrival,
+    /// `classes[i + 1]`, is removed from every count it entered.
+    fn predict(&self, classes: &[usize], i: usize, deleted: bool, ps: &mut [Vec<u128>]) {
+        let target = classes[i + 1];
+        for j in 0..ps.len() {
+            let (below, here) = ps.split_at_mut(j);
+            let here = &mut here[0];
+            let found = (i + 1 >= j).then(|| self.orders[j].get(&Self::key(classes, i, j))).flatten();
+            let Some((list, total)) = found else {
+                match below.last() {
+                    Some(prior) => here.copy_from_slice(prior),
+                    None => here.fill(0),
+                }
+                continue;
+            };
+            let own = if deleted { list.iter().find(|(b, _)| *b as usize == target).map_or(0, |&(_, c)| c) } else { 0 };
+            let arrivals = (*total - deleted as u32) as u128;
+            let distinct = (list.len() - (deleted && own == 1) as usize) as u128;
+            if arrivals == 0 {
+                match below.last() {
+                    Some(prior) => here.copy_from_slice(prior),
+                    None => here.fill(0),
+                }
+                continue;
+            }
+            let denom = if j == 0 { arrivals } else { arrivals + distinct };
+            for &b in &self.seen {
+                let interpolated = if j == 0 { 0 } else { distinct * below[j - 1][b] };
+                here[b] = (interpolated + denom / 2) / denom;
+            }
+            for &(b, c) in list {
+                let c = c - (deleted && b as usize == target) as u32;
+                let interpolated = if j == 0 { 0 } else { distinct * below[j - 1][b as usize] };
+                here[b as usize] = (((c as u128) << 48) + interpolated + denom / 2) / denom;
+            }
+        }
+    }
+
+    /// The Brier score of a prediction on `2^(−48)` read at `target`, on `2^(−48)`:
+    /// `Σ q_b² − 2 q_target + 1` with `q` on `2^(−24)`.
+    fn brier(&self, p: &[u128], target: usize) -> i128 {
+        let q = |b: usize| ((p[b] + (1 << 23)) >> 24) as i128;
+        let squares: i128 = self.seen.iter().map(|&b| q(b) * q(b)).sum();
+        squares - 2 * (q(target) << 24) + (1i128 << 48)
+    }
+}
+
+/// The floor reading's joint face of one cell: `top`, the unit, the last `order` encodings, the
+/// count model's prediction, the foil and the covector, in that order.
+struct FloorLayout {
+    w: usize,
+    a: usize,
+    order: usize,
+}
+
+impl FloorLayout {
+    fn dim(&self) -> usize {
+        self.w + 1 + self.order * self.w + self.a + self.w + self.a
+    }
+    fn face(&self) -> std::ops::Range<usize> {
+        0..self.w + 1
+    }
+    fn encoding(&self, j: usize) -> std::ops::Range<usize> {
+        let s = self.w + 1 + j * self.w;
+        s..s + self.w
+    }
+    fn count(&self) -> std::ops::Range<usize> {
+        let s = self.w + 1 + self.order * self.w;
+        s..s + self.a
+    }
+    fn foil(&self) -> std::ops::Range<usize> {
+        let s = self.count().end;
+        s..s + self.w
+    }
+    fn covector(&self) -> std::ops::Range<usize> {
+        self.foil().end..self.dim()
+    }
+    #[allow(clippy::too_many_arguments)]
+    fn fill(&self, v: &mut [i64], tower: &Tower, cell: &holonics::hnn::tower::TensionCell, classes: &[usize], i: usize, p: &[u128], foil: usize) {
+        let w = self.w;
+        for (slot, &x) in v[..w].iter_mut().zip(&cell.top) {
+            *slot = x as i64;
+        }
+        v[w] = 1;
+        for j in 0..self.order {
+            let range = self.encoding(j);
+            if i >= j {
+                for (slot, &x) in v[range].iter_mut().zip(tower.encoding(classes[i - j])) {
+                    *slot = x as i64;
+                }
+            } else {
+                v[range].fill(0);
+            }
+        }
+        for (slot, &x) in v[self.count()].iter_mut().zip(p) {
+            *slot = ((x + (1 << 23)) >> 24) as i64;
+        }
+        for (slot, &x) in v[self.foil()].iter_mut().zip(tower.encoding(foil)) {
+            *slot = x as i64;
+        }
+        v[self.covector()].copy_from_slice(&cell.covector);
+    }
+}
+
+/// The floor reading's eliminations on the joint Gram: the face, then the chains. The covector and
+/// the count model are read on the classes that arrive in the training text (`arriving`): the count
+/// model gives no other class mass, and another class's coordinate of the covector is its face's
+/// mass alone, whose tension is at most its `T_cc`, printed beside the reading.
+fn floor_chains(layout: &FloorLayout, gram: &[i128], cells: usize, arriving: &[usize], started: std::time::Instant) -> Result<()> {
+    use num_bigint::BigInt;
+    use num_traits::One;
+    let dim = layout.dim();
+    let z = layout.covector();
+    let zs: Vec<usize> = arriving.iter().map(|&c| z.start + c).collect();
+    let in_z = |i: usize| z.contains(&i);
+    let thin = |i: usize, j: usize| i != j && in_z(i) && in_z(j);
+    let unit = BigInt::from(cells) << 48;
+    let mut base = Upper::from_gram(gram, dim);
+    let diagonal = |m: &Upper| -> Vec<BigInt> { zs.iter().map(|&c| m.get(c, c).clone()).collect() };
+    let t_diag = diagonal(&base);
+    let tr_t: BigInt = t_diag.iter().sum();
+    let tr_t_all: BigInt = z.clone().map(|c| base.get(c, c).clone()).sum();
+    println!(
+        "FLOOR_CLASSES arriving={} brier_T_all={} brier_T_arriving={} brier_T_never_arriving={}",
+        arriving.len(),
+        thousandths_of(&tr_t_all, &unit),
+        thousandths_of(&tr_t, &unit),
+        thousandths_of(&(&tr_t_all - &tr_t), &unit)
+    );
+    let face: Vec<usize> = layout.face().collect();
+    let encodings: Vec<Vec<usize>> = (0..layout.order).map(|j| layout.encoding(j).collect()).collect();
+    let count: Vec<usize> = arriving.iter().map(|&c| layout.count().start + c).collect();
+    let foil: Vec<usize> = layout.foil().collect();
+    let rest: Vec<usize> = encodings.iter().flatten().chain(&count).chain(&foil).chain(&zs).copied().collect();
+    let (d, rank) = base.eliminate(&face, &rest, BigInt::one(), &thin)?;
+    let s_diag = diagonal(&base);
+    let tr_ds: BigInt = s_diag.iter().sum();
+    println!(
+        "FLOOR part=all cells={cells} face_rank={rank} brier_T={} tension_S={} tension_permille={} elapsed_ms={}",
+        thousandths_of(&tr_t, &unit),
+        thousandths_of(&tr_ds, &(&unit * &d)),
+        thousandths_of(&(&tr_ds * 1000), &(&tr_t * &d)),
+        started.elapsed().as_millis()
+    );
+    let order = layout.order;
+    // Each chain: its blocks in order, each eliminated after the ones before, with the labels.
+    let mut linear: Vec<(String, Vec<usize>)> = encodings.iter().enumerate().map(|(j, e)| (if j == 0 { "E(u_t)".to_string() } else { format!("+E(u_(t-{j}))") }, e.clone())).collect();
+    linear.push((format!("+count{order}"), count.clone()));
+    let chains: Vec<(&str, Vec<(String, Vec<usize>)>)> = vec![("linear", linear), ("count", vec![(format!("count{order}"), count.clone())]), ("foil", vec![("E(foil)".to_string(), foil.clone())])];
+    // The chains run together, each on its own copy of the face's elimination; each step prints as
+    // it closes. Per class: the diagonal after each step of each chain.
+    let chained: Vec<Vec<(String, BigInt, Vec<BigInt>)>> = chains
+        .into_par_iter()
+        .map(|(name, blocks)| {
+            let mut m = Upper { rows: base.rows.clone() };
+            let mut steps = Vec::new();
+            let mut last = d.clone();
+            let mut prior = tr_ds.clone();
+            let mut prior_d = d.clone();
+            for (b, (label, pivots)) in blocks.iter().enumerate() {
+                let later: Vec<usize> = blocks[b + 1..].iter().flat_map(|(_, p)| p.iter().copied()).chain(zs.iter().copied()).collect();
+                let (d2, rank2) = m.eliminate(pivots, &later, last.clone(), &thin).map_err(|e| e.to_string())?;
+                let after = diagonal(&m);
+                let tr_after: BigInt = after.iter().sum();
+                // drop = prior/prior_d − tr_after/d2; from the face: tr_ds/d − tr_after/d2.
+                let drop = &prior * &d2 - &tr_after * &prior_d;
+                let total = &tr_ds * &d2 - &tr_after * &d;
+                println!(
+                    "FLOOR_DROP chain={name} step={label} novel_rank={rank2} drop={} drop_of_tension_permille={} chain_drop_of_tension_permille={} elapsed_ms={}",
+                    thousandths_of(&drop, &(&unit * &prior_d * &d2)),
+                    thousandths_of(&(&drop * 1000 * &d), &(&tr_ds * &prior_d * &d2)),
+                    thousandths_of(&(&total * 1000), &(&tr_ds * &d2)),
+                    started.elapsed().as_millis()
+                );
+                steps.push((format!("{name}:{label}"), d2.clone(), after));
+                prior = tr_after;
+                prior_d = d2.clone();
+                last = d2;
+            }
+            Ok(steps)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let steps: Vec<(String, BigInt, Vec<BigInt>)> = chained.into_iter().flatten().collect();
+    // The classes with the most tension: each step's remaining share of the class's own tension.
+    let mut own: Vec<(BigInt, usize)> = s_diag.iter().cloned().zip(0..).collect();
+    own.sort_by(|x, y| y.0.cmp(&x.0));
+    for (s, c) in own.iter().take(24) {
+        let shares: Vec<String> = steps
+            .iter()
+            .map(|(label, d2, after)| format!("{label}={}", thousandths_of(&(&after[*c] * 1000 * &d), &(s * d2))))
+            .collect();
+        println!("FLOOR_CLASS class={} S_aa={} remaining_permille {}", class_name(arriving[*c]), thousandths_of(s, &(&unit * &d)), shares.join(" "));
+    }
+    Ok(())
+}
+
 pub(super) fn region_line(regions: &[(i64, usize); 4]) -> String {
     REGIONS
         .iter()
