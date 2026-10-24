@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=4.266 bytes=400 agree=1 elapsed_ms=385
+TOWER_SAMPLE_TEXT "The cycleDevectionedFexterStransasureLineadority\nQ) stativentity)` paelac a transived.Pore\novanivean, upteLevicondTrem, and the omainst.sh\n    current consection causades, the and theorem, `pactiv 11- 1'stive receiver's a demenerop)  \n    deuted as ornely lincheses, mag: tweeretriternity.68_boutry_fation: Equotient : V = →ₗ[𝕜] Q) and\n\niption's chars\nphase Holonic-chaindination\n//! `Persific"
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=22912

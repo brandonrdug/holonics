@@ -402,6 +402,38 @@ in `PAIR_RUNGS_*.txt`.
 Still owed from that record: the lap count beside the phase, and the report of `Ċm` apart from `Cṁ`
 when the contact's material is deposited.
 
+## The writing law, audited
+
+The writing above reads as more repetitive than the GSM8K towers' of October 23, and it writes almost
+no integers. The audit (`AUDIT_WRITE_*`) found three things.
+
+- **The release law changed, not the machine.** Every October 23 writing was released at one draw
+  or at two agreeing draws. The writing above used four agreeing draws, the face raised to the fourth
+  power, which piles the weight on the commonest next byte. The same states, prompts and keys,
+  counted over written words (distinct words; the commonest word's share):
+
+  | tower, prompt | one draw | two agreeing | four agreeing |
+  |---|---|---|---|
+  | taught to look, prose | 84%; "the" 7% | 58%; "the" 20% | 18%; "and" 35% |
+  | taught to look, Rust | 83%; "the" 13% | 49%; "the" 22% | 12%; "the" 45% |
+  | pair, prose | 92%; "quotient" 11% | 57%; "the" 19% | 35%; "and" 20% |
+  | pair, Lean | 93%; "is" 5% | 60%; "the" 15% | 31%; "and" 23% |
+
+- **The integers are hidden by the bare prompt.** After `74-72=` from rest the tower cannot tell
+  it is in the arithmetic section, since `=` also opens Rust and Lean lines. With the twelve held-out
+  digit lines that fit the 128-byte prompt budget before it (`PROMPT_arithmetic_ctx.txt`), all three
+  towers write whole lines of arithmetic at one, two and four agreeing draws. The taught tower writes
+  digit lines at two agreeing draws even from the bare prompt.
+- **No code break.** arith24 (with the pair contact) writes byte for byte what arith22 wrote from the
+  taught tower's state on all four prompts.
+
+What stays wrong: at one draw the text varies but crosses media inside a line, so the tower does not
+hold which medium it is in. It heard 54 KB of each medium, against 3.5 MB for the GSM8K towers.
+
+Free writing is released at one draw (the face itself) and at two agreeing draws, both shown, and not
+at four (agent-inferred: the fourth power reads the single likeliest answer, which suits a look at
+one question and the lock that reads it, not writing).
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -438,6 +470,8 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `TRAIN_PAIR_LINEAR_STOPPED.txt`; their writing `WRITE_{pair,pair8,pairlin8}_<medium>.txt`; their
   looks at `=` in `LOOKS_*` and `LINES_*` under the same names; `PAIR_RUNGS_*.txt`.
 - The located looks, `LOCATED_LOOKS_<tower>_<medium>.tsv`, and their lock, `READ_LOCATED.txt`.
+- The audit's writing, `AUDIT_WRITE_<tower>_<prompt>_a<draws>.txt`, and the digit prompt with its
+  context, `PROMPT_arithmetic_ctx.txt`.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 

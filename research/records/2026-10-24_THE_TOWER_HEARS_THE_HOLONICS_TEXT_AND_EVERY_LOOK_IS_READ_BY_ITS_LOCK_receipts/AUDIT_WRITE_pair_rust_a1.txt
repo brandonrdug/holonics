@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=3.934 bytes=400 agree=1 elapsed_ms=401
+TOWER_SAMPLE_TEXT "        (Octual, crateures quotient_openingMorpoment_taquotientLescope maalBrestrict {FibraQuadiyCEq_sypage {ℝ Chance\n  constitution,\n}\n\n## POTE EVE INTERASSTADS.mlh its the advective the receivation and struct.\n\nThe paired intree's\n  a ditionals: the receivernes, grades\\ Resultings(quotient, quotient Source · V →ₗ{𝕜]\nstruct, ReceivingLaw::Relaw #\\stroM j)+ | 2026,. \\a6e) same-selftichRe"
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=26012

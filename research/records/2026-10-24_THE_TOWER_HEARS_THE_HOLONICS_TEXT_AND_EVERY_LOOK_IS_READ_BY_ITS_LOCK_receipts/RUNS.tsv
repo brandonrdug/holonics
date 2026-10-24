@@ -16,3 +16,4 @@ located reads	arith24	read-lines-located depth 4, 20 runs, 4 at a time	about 40 
 reads at = (pair towers)	arith24	read-lines-again, 12 runs, 4 at a time	at most 24.0 (the lock and plain reads)	60 each	-	3.1 to 25.2	at most 1.05	at most 22436	complete
 writing (pair towers)	arith24	sample-tower 400 bytes, 12 runs	at most 3.4 (the lock and plain writing)	60 each	-	3.1 to 3.9	at most 1.15	at most 24284	complete
 pair rungs	arith24	read-tower-pair, 3 runs	unmeasured	60 each	-	0.0 to 0.1	-	at most 22196	complete
+audit writing	arith24	sample-tower 400 bytes at one, two and four agreeing draws, 45 runs, three or four at a time	largest measured write 3.9 s	60 each	-	0.3 to 3.7	-	26500	complete (8 first launches of the digit prompt with context refused: 375 bytes past the 128-byte prompt budget; relaunched with the 12 lines that fit)

@@ -1,0 +1,3 @@
+TOWER_SAMPLE prompt_bits_a_byte=4.266 bytes=400 agree=2 elapsed_ms=1479
+TOWER_SAMPLE_TEXT "The ctate at addressedTransport (the fibre one the are constitutive a comainely boundary a\ncranstransport conservation and prom section that and constitution channerded the condereparity receivers\n\n[dasfroviort Occurrence constitution\n    have waint. The conserved one a conderestition. The the restion and and at the consty the by the constith striction are\ntheorem operand and the and one and the a"
+MEASURE exit=0 wall_s=1.5 peak_rss_kib=23484
