@@ -1,0 +1,20 @@
+A elapsed_ms=22834 {'rows': 10000, 'columns': 149, 'rank_mod_P': 145, 'integer_kernel': 4, 'kernel_exact': True, 'rank_certified': True, 'minor_gcd': 110, 'minor_gcd_primes': [2, 5, 11], 'cofactor_unread': 1, 'tested': [2, 3, 5, 7, 11, 13], 'torsion': [2, 5, 11]}
+B elapsed_ms=24142 {'true_lines_close': True, 'true_lines_with_nonzero_integer_residual': 4500, 'false_lines_closing': {'delta_0_mod_11': [39681, 39681], 'delta_not_0_mod_11': [0, 555359]}, 'residual_is_c_minus_a_minus_b_mod_11': True}
+C elapsed_ms=24217 {'units_key_closes_every_line': True, 'lines_with_two_candidates_mod_110': 8010, 'length_separates_them': True, 'leading_digit_separates_them': False, 'length_is_the_tens_carry_out': True}
+D elapsed_ms=40435 {'c<100': {'rows': 5050, 'columns': 149, 'rank_mod_P': 135, 'integer_kernel': 14, 'kernel_exact': True, 'rank_certified': True, 'minor_gcd': 1, 'minor_gcd_primes': [], 'cofactor_unread': 1, 'tested': [2, 3, 5, 7, 11, 13], 'torsion': []}, 'value_key_closes_c<100_exactly': True, 'c>=100': {'rows': 4950, 'columns': 139, 'rank_mod_P': 133, 'integer_kernel': 6, 'kernel_exact': True, 'rank_certified': True, 'minor_gcd': 1, 'minor_gcd_primes': [], 'cofactor_unread': 1, 'tested': [2, 3, 5, 7, 11, 13], 'torsion': []}, 'value_key_closes_c>=100_exactly': True}
+E3 elapsed_ms=40445 {'rows': 81, 'columns': 23, 'rank_mod_P': 19, 'rank_certified': True, 'minor_gcd': 12, 'cofactor_unread': 1, 'torsion': [2, 3], 'predicted': [2, 3]}
+E4 elapsed_ms=40501 {'rows': 256, 'columns': 35, 'rank_mod_P': 31, 'rank_certified': True, 'minor_gcd': 20, 'cofactor_unread': 1, 'torsion': [2, 5], 'predicted': [2, 5]}
+E5 elapsed_ms=40745 {'rows': 625, 'columns': 49, 'rank_mod_P': 45, 'rank_certified': True, 'minor_gcd': 30, 'cofactor_unread': 1, 'torsion': [2, 3, 5], 'predicted': [2, 3, 5]}
+E6 elapsed_ms=41432 {'rows': 1296, 'columns': 65, 'rank_mod_P': 61, 'rank_certified': True, 'minor_gcd': 42, 'cofactor_unread': 1, 'torsion': [2, 3, 7], 'predicted': [2, 3, 7]}
+E7 elapsed_ms=43435 {'rows': 2401, 'columns': 83, 'rank_mod_P': 79, 'rank_certified': True, 'minor_gcd': 56, 'cofactor_unread': 1, 'torsion': [2, 7], 'predicted': [2, 7]}
+E8 elapsed_ms=47284 {'rows': 4096, 'columns': 103, 'rank_mod_P': 99, 'rank_certified': True, 'minor_gcd': 72, 'cofactor_unread': 1, 'torsion': [2, 3], 'predicted': [2, 3]}
+E9 elapsed_ms=57448 {'rows': 6561, 'columns': 125, 'rank_mod_P': 121, 'rank_certified': True, 'minor_gcd': 90, 'cofactor_unread': 1, 'torsion': [2, 3, 5], 'predicted': [2, 3, 5]}
+E12 elapsed_ms=123008 {'rows': 20736, 'columns': 203, 'rank_mod_P': 199, 'rank_certified': True, 'minor_gcd': 156, 'cofactor_unread': 1, 'torsion': [2, 3, 13], 'predicted': [2, 3, 13]}
+F3 elapsed_ms=123086 {'rows': 729, 'columns': 26, 'rank_mod_P': 22, 'rank_certified': True, 'minor_gcd': 12, 'cofactor_unread': 1, 'torsion': [2, 3], 'predicted': [2, 3]}
+F4 elapsed_ms=124327 {'rows': 4096, 'columns': 39, 'rank_mod_P': 35, 'rank_certified': True, 'minor_gcd': 8, 'cofactor_unread': 1, 'torsion': [2], 'predicted': [2]}
+F5 elapsed_ms=131958 {'rows': 15625, 'columns': 54, 'rank_mod_P': 50, 'rank_certified': True, 'minor_gcd': 10, 'cofactor_unread': 1, 'torsion': [2, 5], 'predicted': [2, 5]}
+F6 elapsed_ms=140783 {'rows': 6000, 'columns': 71, 'rank_mod_P': 67, 'rank_certified': True, 'minor_gcd': 6, 'cofactor_unread': 1, 'torsion': [2, 3], 'predicted': [2, 3]}
+F7 elapsed_ms=155124 {'rows': 6000, 'columns': 90, 'rank_mod_P': 86, 'rank_certified': True, 'minor_gcd': 14, 'cofactor_unread': 1, 'torsion': [2, 7], 'predicted': [2, 7]}
+F8 elapsed_ms=174712 {'rows': 6000, 'columns': 111, 'rank_mod_P': 106, 'rank_certified': True, 'minor_gcd': 16, 'cofactor_unread': 1, 'torsion': [2], 'predicted': [2]}
+F10 elapsed_ms=221437 {'rows': 6000, 'columns': 159, 'rank_mod_P': 155, 'rank_certified': True, 'minor_gcd': 10, 'cofactor_unread': 1, 'torsion': [2, 5], 'predicted': [2, 5]}
+fail elapsed_ms=221438 []
