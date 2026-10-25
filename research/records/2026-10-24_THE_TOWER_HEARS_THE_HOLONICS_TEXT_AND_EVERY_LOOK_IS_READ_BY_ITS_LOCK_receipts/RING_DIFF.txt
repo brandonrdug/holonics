@@ -1,0 +1,87 @@
+# The differences by a ring of their own: receipt lines (binary ring29; the reads stay outside the repository)
+## ring31a: the closure at the cell before each difference's units (landmarks.py diff-units on modes/block.txt, 4,548 marks), and the ring founded there
+RING_CLOSURE origin=- rows=4548 unique=4548 columns=129 rank=118 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=141
+RING_CLOSURE origin=7 rows=4548 unique=3995 columns=195 rank=190 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=201
+RING_CLOSURE origin=3 rows=4548 unique=3647 columns=195 rank=190 minor_bits=2 candidates=2 torsion= key_modulus=none elapsed_ms=250
+RING_CLOSURE origin=#10 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 elapsed_ms=283
+RING_CLOSURE origin=0 rows=4548 unique=4148 columns=194 rank=187 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=409
+RING_CLOSURE origin=8 rows=4548 unique=4095 columns=195 rank=190 minor_bits=2 candidates=2 torsion= key_modulus=none elapsed_ms=439
+RING_CLOSURE origin=4 rows=4548 unique=3731 columns=195 rank=190 minor_bits=2 candidates=2 torsion= key_modulus=none elapsed_ms=470
+RING_CLOSURE origin=9 rows=4548 unique=4182 columns=195 rank=190 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=616
+RING_CLOSURE origin== rows=4548 unique=100 columns=19 rank=19 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=624
+RING_CLOSURE origin=1 rows=4548 unique=3464 columns=195 rank=190 minor_bits=2 candidates=3 torsion= key_modulus=none elapsed_ms=635
+RING_CLOSURE origin=5 rows=4548 unique=3821 columns=195 rank=190 minor_bits=2 candidates=2 torsion= key_modulus=none elapsed_ms=694
+RING_CLOSURE origin=6 rows=4547 unique=3910 columns=195 rank=190 minor_bits=2 candidates=2 torsion= key_modulus=none elapsed_ms=858
+RING_CLOSURE origin=2 rows=4548 unique=3559 columns=195 rank=190 minor_bits=2 candidates=2 torsion= key_modulus=none elapsed_ms=874
+RING_CLOSURE origin=* rows=4548 unique=4548 columns=200 rank=193 minor_bits=110 candidates=2,41 torsion= key_modulus=none elapsed_ms=1543
+RING_CLOSURE origin=+ rows=4548 unique=4548 columns=200 rank=193 minor_bits=70 candidates=97,1459 torsion= key_modulus=none elapsed_ms=1883
+RING_CLOSURES origins=15 elapsed_ms=1883
+RING_KEY origin=#10 modulus=10 failures=0 residues=0:2,1:3,2:4,3:5,4:6,5:7,6:8,7:9,8:0,9:1 turns=#101:2,#102:2,#103:2,#104:2,#105:2,#106:2,#107:2,#108:2,#109:2,0-:1,0=:9,1-:2,1=:8,2-:3,2=:7,3-:4,3=:6,4-:5,4=:5,5-:6,5=:4,6-:7,6=:3,7-:8,7=:2,8-:9,8=:1
+RING_PAIRS pairs=203 varying=0 rho_on_2^-30=1012303528 elapsed_ms=39804
+RING_PASS cells=216131 marked=4548 streams=4 section=128 level=0 mode=41 rho_on_2^-30=1073275308 largest_state=10669037 largest_covector=874451759 read_ms=39804
+RING_STARTS coupling_modes=4 classes=15 elapsed_ms=52763
+RING_ROUND rank=0 start=unit/closure round=0 circular_permille=844 saved_millinats=- another=true elapsed_ms=55865
+RING_ROUND rank=0 start=unit/closure round=1 circular_permille=868 saved_millinats=54155 another=false elapsed_ms=58939
+RING_START rank=0 start=unit/closure exact_share_permille=1739 elapsed_ms=60867
+RING_ROUND rank=0 start=coupling_mode_1/closure round=0 circular_permille=839 saved_millinats=- another=true elapsed_ms=64075
+RING_ROUND rank=0 start=coupling_mode_1/closure round=1 circular_permille=880 saved_millinats=93290 another=false elapsed_ms=67061
+RING_START rank=0 start=coupling_mode_1/closure exact_share_permille=1762 elapsed_ms=68913
+RING_ROUND rank=0 start=coupling_mode_2/closure round=0 circular_permille=855 saved_millinats=- another=true elapsed_ms=71838
+RING_ROUND rank=0 start=coupling_mode_2/closure round=1 circular_permille=869 saved_millinats=30723 another=false elapsed_ms=74515
+RING_START rank=0 start=coupling_mode_2/closure exact_share_permille=1742 elapsed_ms=76299
+RING_ROUND rank=0 start=coupling_mode_3/closure round=0 circular_permille=860 saved_millinats=- another=true elapsed_ms=79148
+RING_ROUND rank=0 start=coupling_mode_3/closure round=1 circular_permille=874 saved_millinats=31148 another=false elapsed_ms=82028
+RING_START rank=0 start=coupling_mode_3/closure exact_share_permille=1751 elapsed_ms=83923
+RING_ROUND rank=0 start=coupling_mode_4/closure round=0 circular_permille=873 saved_millinats=- another=true elapsed_ms=87184
+RING_ROUND rank=0 start=coupling_mode_4/closure round=1 circular_permille=886 saved_millinats=31237 another=false elapsed_ms=89682
+RING_START rank=0 start=coupling_mode_4/closure exact_share_permille=1775 elapsed_ms=91594
+RING_ROUND rank=0 start=origin/closure round=0 circular_permille=868 saved_millinats=- another=true elapsed_ms=94825
+RING_ROUND rank=0 start=origin/closure round=1 circular_permille=872 saved_millinats=10111 another=false elapsed_ms=98331
+RING_START rank=0 start=origin/closure exact_share_permille=1746 elapsed_ms=100447
+RING_RANK rank=0 channels=2 marked_cells=4548 exact_share_permille=1775 push_shift=80 read_shift=6 elapsed_ms=100449
+RING_WRITTEN forms=1 sha256=ddad778e7c8c0c3afc3c233680c55d3098a5814da4af74e0c2e174692479dff6 elapsed_ms=100452
+MEASURE exit=0 wall_s=100.6 peak_rss_kib=723988
+## the join: the units ring and the 110 ring with the units ring's four-media readout carried, and the differences ring beside them
+RING_JOIN level=0 mode=41 ranks=3 pair_moves=203,203,203 key_moduli=10,110,10 harmonics=5 readout_carried_ranks=2 material=699529 sha256=18c32897cc6d66405a086906bb79587d3a8e270ffcbeed51b02c24709f5ebc55 elapsed_ms=663
+MEASURE exit=0 wall_s=0.7 peak_rss_kib=103508
+## ring31b: the differences ring's readout founded on the arithmetic block, both rings' readouts held
+RING_READOUT_CURVATURE round=0 live_pairs=1993839 pairs=3241950 released_ppm=172 elapsed_ms=118075
+RING_READOUT_PHASE round=0 phase=curvature blocks=75 elapsed_ms=136933
+RING_READOUT_PHASE round=0 phase=solve elapsed_ms=190799
+RING_READOUT_HARMONICS round=0 predicted_millinats=1:5655078,2:4604739,3:4087847,4:3660130,5:3341964
+RING_READOUT_ROUND round=0 kappa_on_2^-16=303469 capped_rows=15 newton_reach_bits=6 code_on_2^-20=460837645268 line_code=460837660387 saved_millinats=7447224 another=true round_ms=79593 elapsed_ms=197530
+RING_READOUT_CURVATURE round=1 live_pairs=1904311 pairs=3241950 released_ppm=201 elapsed_ms=197780
+RING_READOUT_PHASE round=1 phase=curvature blocks=75 elapsed_ms=216618
+RING_READOUT_PHASE round=1 phase=solve elapsed_ms=272998
+RING_READOUT_HARMONICS round=1 predicted_millinats=1:2469347,2:2075236,3:1968325,4:1928801,5:1853830
+RING_READOUT_ROUND round=1 kappa_on_2^-16=91547 capped_rows=15 newton_reach_bits=5 code_on_2^-20=457864587505 line_code=457864585688 saved_millinats=1965300 another=false round_ms=81869 elapsed_ms=279410
+RING_READOUT cells=216130 channels=650 held_ranks=2 arriving_classes=15 free=9100 rounds=2 kappas_on_2^-16=303469,91547 code_before_on_2^-20=472103622170 code_at_zero=472103622170 code_founded=457864587505 evaluations=37 largest=14223772 moment_sections=211 moments_ms=84138 sha256=26416aa9bf5d7bee0d41c18745f055644c84a6857aef653eeeb3b65f25a3d667 read_ms=117843 elapsed_ms=364062
+MEASURE exit=0 wall_s=364.2 peak_rss_kib=765416
+## reads of the founded learner (sha256 26416aa9…): sums' tens (T) and units (U) split, the held-out text
+at31.T: TOWER_SPLIT cells=495 ring_top_is_next=73 rest_top_is_next=311 ring_not_whole=1 whole_not_ring=386
+at31.T: TOWER_AT cells=495 top_is_next=458 code_on_2^-20=170062229 ring_ranks=3 elapsed_ms=11598
+at31.T: MEASURE exit=0 wall_s=11.6 peak_rss_kib=53072
+at31.U: TOWER_SPLIT cells=495 ring_top_is_next=345 rest_top_is_next=48 ring_not_whole=0 whole_not_ring=113
+at31.U: TOWER_AT cells=495 top_is_next=458 code_on_2^-20=433205080 ring_ranks=3 elapsed_ms=11739
+at31.U: MEASURE exit=0 wall_s=11.8 peak_rss_kib=52816
+at31.dev: TOWER_AT cells=48030 top_is_next=24653 code_on_2^-20=117726288209 ring_ranks=3 elapsed_ms=24784
+at31.dev: MEASURE exit=0 wall_s=24.8 peak_rss_kib=53048
+## the closure at the cell before each difference's tens (landmarks.py diff-tens, 3,691 marks): no origin closes on a key
+RING_CLOSURE origin=- rows=3691 unique=450 columns=109 rank=98 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=42
+RING_CLOSURE origin=#10 rows=3691 unique=3691 columns=138 rank=124 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=133
+RING_CLOSURE origin=7 rows=3691 unique=3244 columns=194 rank=180 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=263
+RING_CLOSURE origin=3 rows=3691 unique=2934 columns=194 rank=180 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=285
+RING_CLOSURE origin=0 rows=3691 unique=3293 columns=193 rank=177 minor_bits=3 candidates=2 torsion= key_modulus=none elapsed_ms=422
+RING_CLOSURE origin=8 rows=3691 unique=3317 columns=194 rank=180 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=494
+RING_CLOSURE origin=4 rows=3691 unique=2989 columns=194 rank=180 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=583
+RING_CLOSURE origin=1 rows=3691 unique=2771 columns=194 rank=180 minor_bits=3 candidates=2 torsion= key_modulus=none elapsed_ms=680
+RING_CLOSURE origin=9 rows=3691 unique=3364 columns=194 rank=180 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=726
+RING_CLOSURE origin== rows=3691 unique=9 columns=9 rank=9 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=733
+RING_CLOSURE origin=2 rows=3691 unique=2855 columns=194 rank=180 minor_bits=2 candidates=2 torsion= key_modulus=none elapsed_ms=930
+RING_CLOSURE origin=5 rows=3691 unique=3076 columns=194 rank=180 minor_bits=2 candidates=3 torsion= key_modulus=none elapsed_ms=972
+RING_CLOSURE origin=* rows=3691 unique=3691 columns=199 rank=183 minor_bits=90 candidates=2,3,16417 torsion= key_modulus=none elapsed_ms=1434
+RING_CLOSURE origin=+ rows=3691 unique=3691 columns=199 rank=183 minor_bits=52 candidates=2,5,11,76283 torsion= key_modulus=none elapsed_ms=2284
+RING_CLOSURE origin=6 rows=3690 unique=3165 columns=194 rank=180 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=2288
+RING_CLOSURES origins=15 elapsed_ms=2288
+alpha error: no origin's loops close on a key that separates the arriving classes
+MEASURE exit=1 wall_s=40.0 peak_rss_kib=360504
