@@ -8,7 +8,8 @@ held-out sums' units at 0.623 bits a digit against the foil's 40 and 3.397, with
 located by loop closure ([the section](#the-machine-locates-the-carriage-key-by-loop-closure)).
 October 25, later: the tens step's fixed acceptance is met, the tower's own guess right at 463 of
 495 held-out sums' tens and 473 of their units, the held-out text 2.334 bits a byte against the
-foil's 2.458 ([the tens](#the-tens-under-the-closures-whole-torsion)).
+foil's 2.458 ([the tens](#the-tens-under-the-closures-whole-torsion)). The tower then writes 445 of the 495 held-out
+sums itself, whole and right, 219 of the 248 it never met ([the writing](#the-tower-writes-the-sums-itself)).
 
 ## The failure this step works on
 
@@ -3406,6 +3407,48 @@ line's prompt, character by character from the tower's own guess, and shows the 
 Its acceptance: the whole written sum right in at least 370 of 495, with the held-out text at or
 under the foil's 2.458 bits a byte.
 
+## The tower writes the sums itself
+
+The loop's acceptance was fixed before the run: written by the tower itself from each held-out
+sum's prompt, the whole sum right in at least 370 of 495, with the held-out text at or under the
+foil's 2.458 bits a byte.
+
+Each held-out arithmetic line opens on the state the true earlier lines left; at its `=` a fork
+releases the rest class by class, each class fed back as the next one read, at 64 agreeing draws
+(the face `m^64 / Σ m^64`, near the top class), until it releases a line end or the true length and
+five more (`read-lines-stream`; 18.7 s for the 1,253 lines, against a projection of about 15 s and a
+deadline of 60 s). The learner is the one that met the tens acceptance (both rings, sha256
+`b3ff0e58…`), so the held-out text is its 2.334 bits a byte.
+
+**The acceptance is met.** The tower writes **445 of the 495** held-out sums whole and right, their
+length right in 493 (`WRITTEN_SUMS.txt`; every written line in `LINES_founded30_arithmetic.tsv`).
+The tower before the tens ring joined, on the same keys, writes 304 (`LINES_founded26m_arithmetic.tsv`).
+
+| the learner | sums written whole and right (of 495) | never met in training (of 248) | met in training (of 247) | length right | two digits and two (of 399) | one and two (of 50) | two and one (of 44) |
+|---|---|---|---|---|---|---|---|
+| both rings, the tens readout founded on the block | **445** | **219** | 226 | 493 | 367 | 40 | 37 |
+| the units ring alone | 304 | 153 | 151 | 475 | 261 | 25 | 17 |
+
+**Seen material, read apart.** The held-out file is never training text, yet 247 of its 495 sum
+lines also stand whole in the training passage (the arithmetic block or the four media): two-digit
+operands give only so many sums. Read apart, the tower writes 219 of the 248 it never met right and
+226 of the 247 it met. It computes the sums it never met almost as often as those it did, and the
+acceptance holds on the never-met lines alone at the same rate (219 of 248 is 437 of 495 at that
+rate) [agent-inferred]. The reads at `T` and `U` above count both kinds alike.
+
+**Where the writing goes wrong** [agent-inferred]. Of the 50 wrong sums, 26 carry out of the units
+(of 223 that do) and 24 do not (of 272): the wrong ones are not the carries. Twenty are wrong in the
+tens alone, 16 in the units alone, 12 in both and 2 in the length. Differences (17 of 268 right) and
+products (6 of 490) are written as before: the rings are founded where sums are coded, and nothing
+in the machine has met a landmark at a difference or a product.
+
+**Decided next** [agent-inferred]: the differences, by the same machine. A landmark at the cell
+before each difference's units (received material from each line's shape, handing no value), the
+closure founded there by loop closure, its ring joined beside the two, and its readout founded on
+the arithmetic block with both rings' readouts held. Its acceptance: the tower writes at least 201
+of the 268 held-out differences whole and right (three in four, as for the sums), the sums staying
+at or above 370 written right, and the held-out text at or under 2.458 bits a byte.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -3414,7 +3457,8 @@ under the foil's 2.458 bits a byte.
 - **Bits read as progress.** The held-out code stands beside the writing, and the success reading
   is the lock. The block's join is read the same way: its code is shown beside its
   writing, which does not change in kind.
-- **Seen material graded as unseen.** Held-out files are never training files. The join's weight is
+- **Seen material graded as unseen.** Held-out files are never training files. Held-out sum lines
+  that also stand whole in the training passage are read apart from those it never met. The join's weight is
   chosen on the training text alone, and the held-out text is read at every weight. The lock splits met
   and unmet lines, and no held-out text line is met verbatim.
 - **Catered machinery.** Nothing in the tower names a medium. The media are an exterior partition of
@@ -3629,6 +3673,10 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `RING_TENS_CENTROIDS.txt` (the 110 ring's turn at the held-out tens and units, by class, and the
   centroid reads over counts of characters, from `RING_PHASE_CENTROIDS.py … harmonics=…`); the
   splits are appended to `RING_SPLIT.txt`.
+- The written sums: `LINES_founded30_arithmetic.tsv` and `LINES_founded26m_arithmetic.tsv` (every
+  held-out arithmetic line's head, true rest, written rest and codes) and `WRITTEN_SUMS.txt` (their
+  receipt lines and counts, from `WRITTEN_SUMS.py`, read apart by whether the training text holds
+  the line).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
