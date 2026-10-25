@@ -1,0 +1,208 @@
+## rel0_digit_digit
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	2	0.009	800	false
+1	2	0.003	2	true
+2	2	0.775	2	true
+3	2	0.221	2	true
+4	2	1.118	2	true
+5	2	0.104	2	true
+6	2	0.000	2	true
+7	2	0.000	2	true
+8	2	0.060	800	false
+9	2	2.522	2	true
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=36480
+## rel0_digit_label
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	152	3.309	8	false
+1	168	3.603	2	true
+2	146	3.627	8	false
+3	139	2.949	2	true
+4	180	2.841	2	true
+5	142	3.976	2	true
+6	191	3.155	2	true
+7	159	3.279	2	true
+8	141	3.238	2	true
+9	121	3.660	2	true
+10	150	2.708	2	true
+11	166	3.157	2	true
+12	181	3.169	2	true
+13	177	3.300	8	false
+14	171	3.120	2	true
+15	184	3.232	8	false
+16	117	2.217	2	true
+17	178	3.186	2	true
+18	218	2.819	2	true
+19	183	2.993	2	true
+MEASURE exit=0 wall_s=0.6 peak_rss_kib=37120
+## rel0_one_digit
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	2	3.876	800	false
+1	2	1.243	800	false
+2	2	5.318	800	false
+3	2	17.198	800	false
+4	2	8.542	800	false
+5	2	0.280	800	false
+6	2	15.683	93	true
+7	2	17.330	2	true
+8	2	1.518	42	true
+9	2	2.973	49	true
+MEASURE exit=0 wall_s=0.7 peak_rss_kib=37604
+## rel0_one_label
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	152	3.223	8	false
+1	168	3.576	8	false
+2	146	3.605	8	false
+3	139	2.915	2	true
+4	180	2.912	2	true
+5	142	3.752	2	true
+6	191	3.293	2	true
+7	159	3.332	2	true
+8	141	3.103	2	true
+9	121	3.638	8	true
+10	150	2.546	2	true
+11	166	3.198	8	false
+12	181	3.110	2	true
+13	177	3.392	8	false
+14	171	3.080	7	true
+15	184	3.213	8	false
+16	117	1.897	8	false
+17	178	3.094	2	true
+18	218	2.899	2	true
+19	183	3.055	2	true
+MEASURE exit=0 wall_s=0.6 peak_rss_kib=37044
+## rel0_one_speech
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	83	6.746	48000	false
+1	92	7.588	48000	false
+MEASURE exit=0 wall_s=14.1 peak_rss_kib=38544
+## rel0_one_text
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	278	2.854	1200	false
+1	283	2.861	1200	false
+2	175	3.561	1200	false
+MEASURE exit=0 wall_s=0.7 peak_rss_kib=37680
+## rel0_one_transcript
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	15141	3.735	600	false
+1	32519	3.342	600	false
+MEASURE exit=0 wall_s=13.3 peak_rss_kib=37544
+## rel0_sound_speech
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	83	5.343	48000	false
+1	92	5.048	48000	false
+MEASURE exit=0 wall_s=14.1 peak_rss_kib=38732
+## rel0_sound_transcript
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	15141	3.263	600	false
+1	32519	2.802	600	false
+MEASURE exit=0 wall_s=13.3 peak_rss_kib=37508
+## rel0_text_text
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	278	2.830	1200	false
+1	283	2.783	1200	false
+2	175	3.342	1200	false
+MEASURE exit=0 wall_s=0.7 peak_rss_kib=37376
+## rel2_digit_digit
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	2	1.483	2	true
+1	2	3.389	2	true
+2	2	1.734	2	true
+3	2	2.531	2	true
+4	2	3.146	2	true
+5	2	2.423	2	true
+6	2	2.061	2	true
+7	2	2.633	2	true
+8	2	2.202	2	true
+9	2	2.656	2	true
+MEASURE exit=0 wall_s=0.2 peak_rss_kib=36684
+## rel2_digit_label
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	152	3.021	8	false
+1	168	3.335	8	false
+2	146	3.201	8	false
+3	139	2.667	2	true
+4	180	2.672	2	true
+5	142	3.462	2	true
+6	191	2.994	2	true
+7	159	3.059	2	true
+8	141	2.916	2	true
+9	121	3.482	2	true
+10	150	2.454	2	true
+11	166	3.035	8	false
+12	181	2.956	2	true
+13	177	3.150	8	false
+14	171	2.823	2	true
+15	184	3.062	8	false
+16	117	1.991	8	false
+17	178	2.967	2	true
+18	218	2.702	2	true
+19	183	2.737	2	true
+MEASURE exit=0 wall_s=0.6 peak_rss_kib=37000
+## rel2_one_digit
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	2	33.054	800	false
+1	2	8.251	66	true
+2	2	10.560	800	false
+3	2	11.584	86	true
+4	2	16.600	160	true
+5	2	21.322	195	true
+6	2	27.193	689	true
+7	2	34.119	338	true
+8	2	23.022	800	false
+9	2	18.587	30	true
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=33732
+## rel2_one_label
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	152	3.469	8	false
+1	168	3.705	8	false
+2	146	3.735	8	false
+3	139	3.030	2	true
+4	180	3.084	2	true
+5	142	4.085	2	true
+6	191	3.324	2	true
+7	159	3.526	2	true
+8	141	3.215	8	false
+9	121	4.092	8	false
+10	150	2.625	2	true
+11	166	3.484	8	false
+12	181	3.333	2	true
+13	177	3.446	8	false
+14	171	3.187	8	false
+15	184	3.278	8	false
+16	117	2.306	8	false
+17	178	3.274	2	true
+18	218	2.971	2	true
+19	183	3.104	2	true
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=33012
+## rel2_one_speech
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	83	5.337	1094	true
+1	92	5.977	8	true
+MEASURE exit=0 wall_s=0.5 peak_rss_kib=33944
+## rel2_one_text
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	278	2.793	347	true
+1	283	2.531	1200	false
+2	175	3.464	286	true
+MEASURE exit=0 wall_s=0.7 peak_rss_kib=33548
+## rel2_one_transcript
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	15141	3.614	600	false
+1	32519	3.186	454	true
+MEASURE exit=0 wall_s=14.2 peak_rss_kib=34212
+## rel2_sound_speech
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	83	3.930	23	true
+1	92	3.856	80	true
+MEASURE exit=0 wall_s=0.3 peak_rss_kib=37980
+## rel2_sound_transcript
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	15141	3.223	76	true
+1	32519	2.709	600	false
+MEASURE exit=0 wall_s=14.0 peak_rss_kib=37124
+## rel2_text_text
+prompt	prompt_classes	prompt_bits_a_class	released	ended
+0	278	2.568	1200	false
+1	283	2.612	152	true
+2	175	3.216	1200	false
+MEASURE exit=0 wall_s=0.7 peak_rss_kib=36544

@@ -1,0 +1,76 @@
+## read0_digit_digit.txt
+CLASSES_READ mark=label cells=500 bits_a_class=4.045 top_is_next=46
+CLASSES_READ mark=stroke cells=82697 bits_a_class=3.066 top_is_next=36235
+CLASSES_READ mark=end cells=1000 bits_a_class=2.839 top_is_next=521
+CLASSES_LABELS reads=500 named_right=46 confusion(arrived:named 0..9,other) 0:0,22,8,0,0,0,0,0,0,1,22 1:0,39,4,0,0,0,0,0,0,2,9 2:0,25,7,0,0,0,0,0,0,0,9 3:0,29,4,0,0,0,0,0,0,1,19 4:0,26,4,0,0,0,0,0,0,2,14 5:0,25,6,0,0,0,0,0,0,1,12 6:0,20,4,0,0,0,0,0,0,1,26 7:0,26,2,0,0,0,0,0,0,1,23 8:0,17,12,0,0,0,0,0,0,2,23 9:0,25,5,0,0,0,0,0,0,0,22
+CLASSES_READ_DONE cells=84205 elapsed_ms=5352
+MEASURE exit=0 wall_s=5.4 peak_rss_kib=17836
+## read0_one_digit.txt
+CLASSES_READ mark=label cells=500 bits_a_class=4.445 top_is_next=21
+CLASSES_READ mark=stroke cells=82697 bits_a_class=3.128 top_is_next=35614
+CLASSES_READ mark=end cells=1000 bits_a_class=2.540 top_is_next=576
+CLASSES_LABELS reads=500 named_right=21 confusion(arrived:named 0..9,other) 0:0,0,0,0,37,0,0,0,0,0,16 1:0,0,0,0,31,0,0,0,0,0,23 2:0,0,0,0,25,0,0,0,0,0,16 3:0,0,0,0,34,0,0,0,0,0,19 4:0,0,0,0,21,0,0,0,0,0,25 5:0,0,0,0,27,0,0,0,0,0,17 6:0,0,0,0,22,0,0,0,0,0,29 7:0,0,0,0,21,0,0,0,0,0,31 8:0,0,0,0,27,0,0,0,0,0,27 9:0,0,0,0,23,0,0,0,0,0,29
+CLASSES_READ_DONE cells=84205 elapsed_ms=5279
+MEASURE exit=0 wall_s=5.3 peak_rss_kib=17748
+## read0_one_sound.txt
+CLASSES_READ mark=transcript cells=261 bits_a_class=6.335 top_is_next=36
+CLASSES_READ mark=cycle cells=81998 bits_a_class=3.432 top_is_next=22442
+CLASSES_READ mark=end cells=8 bits_a_class=7.706 top_is_next=0
+CLASSES_READ_DONE cells=82275 elapsed_ms=5650
+MEASURE exit=0 wall_s=5.7 peak_rss_kib=17908
+## read0_one_text.txt
+CLASSES_READ mark=answer cells=28671 bits_a_class=2.811 top_is_next=12453
+CLASSES_READ mark=question cells=24677 bits_a_class=2.988 top_is_next=10067
+CLASSES_READ mark=end cells=200 bits_a_class=0.454 top_is_next=195
+CLASSES_READ_DONE cells=53556 elapsed_ms=3495
+MEASURE exit=0 wall_s=3.5 peak_rss_kib=17784
+## read0_sound_sound.txt
+CLASSES_READ mark=transcript cells=261 bits_a_class=5.116 top_is_next=49
+CLASSES_READ mark=cycle cells=81998 bits_a_class=2.907 top_is_next=26227
+CLASSES_READ mark=end cells=8 bits_a_class=9.093 top_is_next=0
+CLASSES_READ_DONE cells=82275 elapsed_ms=5393
+MEASURE exit=0 wall_s=5.4 peak_rss_kib=17880
+## read0_text_text.txt
+CLASSES_READ mark=answer cells=28671 bits_a_class=2.730 top_is_next=13006
+CLASSES_READ mark=question cells=24677 bits_a_class=2.883 top_is_next=10557
+CLASSES_READ mark=end cells=200 bits_a_class=1.139 top_is_next=137
+CLASSES_READ_DONE cells=53556 elapsed_ms=3399
+MEASURE exit=0 wall_s=3.4 peak_rss_kib=17868
+## read2_digit_digit.txt
+CLASSES_READ mark=label cells=500 bits_a_class=4.036 top_is_next=52
+CLASSES_READ mark=stroke cells=82697 bits_a_class=2.988 top_is_next=36812
+CLASSES_READ mark=end cells=1000 bits_a_class=2.157 top_is_next=609
+CLASSES_LABELS reads=500 named_right=52 confusion(arrived:named 0..9,other) 0:1,1,23,0,0,0,0,0,0,2,26 1:1,23,21,0,0,0,0,0,0,4,5 2:0,5,25,0,0,0,0,0,0,2,9 3:2,5,30,0,0,0,0,0,0,3,13 4:0,7,29,0,0,0,0,0,0,3,7 5:0,4,23,0,0,0,0,0,0,2,15 6:0,8,23,0,0,0,0,0,0,2,18 7:0,9,31,0,0,0,0,1,0,3,8 8:0,2,25,0,0,0,0,0,0,1,26 9:0,8,28,0,0,0,0,0,0,2,14
+CLASSES_READ_DONE cells=84205 elapsed_ms=5371
+MEASURE exit=0 wall_s=5.4 peak_rss_kib=17712
+## read2_one_digit.txt
+CLASSES_READ mark=label cells=500 bits_a_class=4.390 top_is_next=38
+CLASSES_READ mark=stroke cells=82697 bits_a_class=3.086 top_is_next=35923
+CLASSES_READ mark=end cells=1000 bits_a_class=2.287 top_is_next=593
+CLASSES_LABELS reads=500 named_right=38 confusion(arrived:named 0..9,other) 0:0,0,0,0,41,0,0,0,0,0,12 1:0,0,0,0,48,0,0,0,0,0,6 2:0,0,0,0,34,0,0,0,1,0,6 3:0,0,0,0,48,0,0,0,1,0,4 4:0,0,0,0,36,0,0,0,0,0,10 5:0,1,0,0,36,0,0,0,0,0,7 6:1,0,0,0,39,0,0,0,0,0,11 7:0,0,0,0,37,0,0,0,0,0,15 8:0,0,0,0,37,0,0,1,2,0,14 9:0,0,0,0,38,0,0,0,1,0,13
+CLASSES_READ_DONE cells=84205 elapsed_ms=5566
+MEASURE exit=0 wall_s=5.6 peak_rss_kib=17080
+## read2_one_sound.txt
+CLASSES_READ mark=transcript cells=261 bits_a_class=4.693 top_is_next=33
+CLASSES_READ mark=cycle cells=81998 bits_a_class=3.265 top_is_next=23516
+CLASSES_READ mark=end cells=8 bits_a_class=4.800 top_is_next=0
+CLASSES_READ_DONE cells=82275 elapsed_ms=5109
+MEASURE exit=0 wall_s=5.1 peak_rss_kib=17152
+## read2_one_text.txt
+CLASSES_READ mark=answer cells=28671 bits_a_class=2.604 top_is_next=13774
+CLASSES_READ mark=question cells=24677 bits_a_class=2.806 top_is_next=11166
+CLASSES_READ mark=end cells=200 bits_a_class=0.412 top_is_next=194
+CLASSES_READ_DONE cells=53556 elapsed_ms=3807
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=17184
+## read2_sound_sound.txt
+CLASSES_READ mark=transcript cells=261 bits_a_class=3.940 top_is_next=55
+CLASSES_READ mark=cycle cells=81998 bits_a_class=2.816 top_is_next=28762
+CLASSES_READ mark=end cells=8 bits_a_class=8.304 top_is_next=0
+CLASSES_READ_DONE cells=82275 elapsed_ms=5334
+MEASURE exit=0 wall_s=5.4 peak_rss_kib=17584
+## read2_text_text.txt
+CLASSES_READ mark=answer cells=28671 bits_a_class=2.496 top_is_next=14273
+CLASSES_READ mark=question cells=24677 bits_a_class=2.678 top_is_next=11493
+CLASSES_READ mark=end cells=200 bits_a_class=0.481 top_is_next=190
+CLASSES_READ_DONE cells=53556 elapsed_ms=3508
+MEASURE exit=0 wall_s=3.5 peak_rss_kib=17584

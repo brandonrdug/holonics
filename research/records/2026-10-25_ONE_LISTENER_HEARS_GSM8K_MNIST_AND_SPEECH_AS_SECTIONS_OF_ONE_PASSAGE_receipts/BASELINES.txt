@@ -1,0 +1,5 @@
+BASELINE medium=text dev_classes=53556 conditional_xz_bits_a_class=2.147 conditional_bzip2_bits_a_class=2.238 train_sha256=3c8c8f15ecb878ffef7c2ca542c4381eed27b0e86ff119964cda7b283afbe594 dev_sha256=bf8749918639dcd93e75a9d832791223633c94412b3dfe6bffa1c57edca96330
+BASELINE medium=digit dev_classes=84205 conditional_xz_bits_a_class=3.684 conditional_bzip2_bits_a_class=3.684 train_sha256=5fe8876902553213ced570703e438edf070230f6b7acb0b4ac5707dc04f1f8d7 dev_sha256=895494be58ef494276e5848df6b3e0692f4d205b6d2518403f40690dd33b2471
+BASELINE medium=sound dev_classes=82275 conditional_xz_bits_a_class=3.219 conditional_bzip2_bits_a_class=3.429 train_sha256=0d54ed1326cb2c844223d80feab3b4ed5209636cf6120ae25ec8d6a4eef768b9 dev_sha256=237da2a7e2d45d6e59e767dc21b326a7edc9687138bbc113010ac487f5a462fe
+CONTEXT png_bytes_a_held_out_image=249.6 (500 images, 8-bit grey, whole file, zlib level 9; lossless, every intensity)
+CONTEXT flac_bits_a_second=146882 over 4 held-out utterances, 19.16 s (the corpus's own FLAC files; lossless, every sample)
