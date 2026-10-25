@@ -1,0 +1,13 @@
+G elapsed_ms=15850 {'rows': 5050, 'columns': 149, 'rank_mod_P': 136, 'integer_kernel': 13, 'kernel_exact': True, 'rank_certified': True, 'minor_gcd': 20, 'minor_gcd_primes': [2, 5], 'cofactor_unread': 1, 'tested': [2, 3, 5, 7, 11, 13], 'torsion': [2, 5], 'results_told_apart': {'Q': {'classes': 1, 'c mod 2': False, 'c mod 5': False}, '2': {'classes': 2, 'c mod 2': True, 'c mod 5': False}, '5': {'classes': 5, 'c mod 2': False, 'c mod 5': True}, '11': {'classes': 1, 'c mod 2': False, 'c mod 5': False}}}
+H elapsed_ms=16504 {'true_lines_close_mod_20': True, 'false_lines_close_to_delta_mod_20': True}
+I elapsed_ms=28579 {'rows': 4995, 'columns': 148, 'rank_mod_P': 134, 'integer_kernel': 14, 'kernel_exact': True, 'rank_certified': True, 'minor_gcd': 1, 'minor_gcd_primes': [], 'cofactor_unread': 1, 'tested': [2, 3, 5, 7, 11, 13], 'torsion': [], 'results_told_apart_over_Q': 100, 'exact_key_true_lines_0': True, 'exact_key_false_lines_delta': True, 'one_place_minuend_lines_missed': [54, 55]}
+J elapsed_ms=36203 {'c<10': {'rows': 955, 'columns': 140, 'rank_mod_P': 127, 'rank_certified': True, 'minor_gcd': 20, 'torsion': [2, 5]}, 'c>=10': {'rows': 4095, 'columns': 148, 'rank_mod_P': 132, 'rank_certified': True, 'minor_gcd': 1, 'torsion': []}}
+K3 elapsed_ms=36208 {'rows': 45, 'columns': 23, 'rank_mod_P': 17, 'rank_certified': True, 'minor_gcd': 6, 'cofactor_unread': 1, 'torsion': [2, 3], 'predicted': [2, 3]}
+K4 elapsed_ms=36230 {'rows': 136, 'columns': 35, 'rank_mod_P': 28, 'rank_certified': True, 'minor_gcd': 8, 'cofactor_unread': 1, 'torsion': [2], 'predicted': [2]}
+K5 elapsed_ms=36309 {'rows': 325, 'columns': 49, 'rank_mod_P': 41, 'rank_certified': True, 'minor_gcd': 10, 'cofactor_unread': 1, 'torsion': [2, 5], 'predicted': [2, 5]}
+K6 elapsed_ms=36577 {'rows': 666, 'columns': 65, 'rank_mod_P': 56, 'rank_certified': True, 'minor_gcd': 12, 'cofactor_unread': 1, 'torsion': [2, 3], 'predicted': [2, 3]}
+K7 elapsed_ms=37307 {'rows': 1225, 'columns': 83, 'rank_mod_P': 73, 'rank_certified': True, 'minor_gcd': 14, 'cofactor_unread': 1, 'torsion': [2, 7], 'predicted': [2, 7]}
+K8 elapsed_ms=39323 {'rows': 2080, 'columns': 103, 'rank_mod_P': 92, 'rank_certified': True, 'minor_gcd': 16, 'cofactor_unread': 1, 'torsion': [2], 'predicted': [2]}
+K9 elapsed_ms=43605 {'rows': 3321, 'columns': 125, 'rank_mod_P': 113, 'rank_certified': True, 'minor_gcd': 18, 'cofactor_unread': 1, 'torsion': [2, 3], 'predicted': [2, 3]}
+K12 elapsed_ms=80388 {'rows': 10440, 'columns': 203, 'rank_mod_P': 188, 'rank_certified': True, 'minor_gcd': 24, 'cofactor_unread': 1, 'torsion': [2, 3], 'predicted': [2, 3]}
+fail elapsed_ms=80388 []
